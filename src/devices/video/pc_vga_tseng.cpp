@@ -8,9 +8,16 @@
  * - ET4000AX
  * \- No logging whatsoever;
  * \- Unsupported True Color modes, also "Return current video mode failed" in VESA24_2 test;
- * - ET4000/W32i (2d accelerator)
+ * - ET4000/W32i (2d accelerator, VBE 1.2)
+ * \- MMIO ports
+ * \- ACL BitBlt at I/O $21xy (x = IOD pin selectable?)
+ * \- Secondary CRTC controller (CRTCB/Sprite)
  * - ET4000/W32p (PCI version of above)
  * - ET6000/ET6100
+ *
+ * Notes:
+ * - Regular et4k BIOS isn't VBE compliant, fails SDD/VBETEST setups and (at very least) has issues
+ *   rendering Toshinden title/gameplay demo. These issues are not present with W32i.
  *
  */
 
@@ -20,8 +27,8 @@
 // TODO: refactor this macro
 #define GRAPHIC_MODE (vga.gc.alpha_dis) /* else text mode */
 
-DEFINE_DEVICE_TYPE(TSENG_VGA,  tseng_vga_device,        "tseng_vga",  "Tseng Labs ET4000AX VGA i/f")
-DEFINE_DEVICE_TYPE(ET4KW32I_VGA,  et4kw32i_vga_device,  "et4kw32i_vga",  "Tseng Labs ET4000/W32i TC6167HF VGA i/f")
+DEFINE_DEVICE_TYPE(TSENG_VGA,    tseng_vga_device,    "tseng_vga",    "Tseng Labs ET4000AX VGA i/f")
+DEFINE_DEVICE_TYPE(ET4KW32I_VGA, et4kw32i_vga_device, "et4kw32i_vga", "Tseng Labs ET4000/W32i TC6167HF VGA i/f")
 
 tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_type type, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)

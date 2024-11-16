@@ -176,7 +176,7 @@ void ct486_state::ct486(machine_config &config)
 	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
 	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
-	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "svga_et4kw32i", false);
 	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
