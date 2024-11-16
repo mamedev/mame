@@ -50,6 +50,7 @@ public:
 
 	// The access has already happened, nothing to abort
 	void access_after_delay(u32 cycles) noexcept;
+
 	void defer_access() noexcept;
 	void retry_access() noexcept;
 
