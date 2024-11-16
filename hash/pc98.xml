@@ -35866,18 +35866,22 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>Nihon Juudan Cessna Flight</description>
 		<year>1988</year>
 		<publisher>コムパック (Compac)</publisher>
+		<notes><![CDATA[
+Autoboot fails
+Throws disk errors if launched from DOS
+]]></notes>
 		<info name="alt_title" value="日本縦断セスナ・フライト" />
 		<info name="release" value="198806xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="disk_a.d88" size="1281968" crc="71d15a79" sha1="07b919fb53bf822f5b28242410a651de01f89fc5" offset="0" />
+				<rom name="disk_a.d88" size="1281968" crc="71d15a79" sha1="07b919fb53bf822f5b28242410a651de01f89fc5" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="disk_b.d88" size="1281968" crc="d8fd0be3" sha1="577dff7a924267ebbb9d1a7919f11b370d70df69" offset="0" />
+				<rom name="disk_b.d88" size="1281968" crc="d8fd0be3" sha1="577dff7a924267ebbb9d1a7919f11b370d70df69" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -57864,10 +57868,13 @@ Has [GS] and [CD] options, latter requiring a redbook?
 		</part>
 	</software>
 
-	<software name="gakubaku" supported="no">
+	<software name="gakubaku" supported="partial">
 		<description>Gakuen Bakuretsu Tenkousei!</description>
 		<year>1995</year>
 		<publisher>ジックス (ZyX)</publisher>
+		<notes><![CDATA[
+Unemulated [MIDI] LAPC-N option
+]]></notes>
 		<info name="alt_title" value="学園爆裂転校生！" />
 		<info name="release" value="19951020" />
 		<part name="flop1" interface="floppy_5_25">
@@ -57894,8 +57901,13 @@ Has [GS] and [CD] options, latter requiring a redbook?
 		<description>Gakuen Senshi Sailor Fighter</description>
 		<year>1994</year>
 		<publisher>ピーチソフト (Peach Soft)</publisher>
+		<notes><![CDATA[
+Hangs if [PC9801-86] is mounted, no BGM is played
+[DAC1BIT] intended for PC9821? (verify)
+]]></notes>
 		<info name="alt_title" value="学園戦士セーラーファイター" />
 		<info name="release" value="19940415" />
+		<info name="usage" value="Requires DOS HDD install, launch with SFM.BAT with Disk A and B in drives" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="941052">
@@ -59103,7 +59115,7 @@ Has [GS] and [CD] options, latter requiring a redbook?
 		</part>
 	</software>
 
-	<software name="joker2" supported="no">
+	<software name="joker2" supported="yes">
 		<description>Joker II</description>
 		<year>1992</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -65711,7 +65723,7 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 		<year>199?</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<notes><![CDATA[
-Non-working 3.5" floppy
+Requires 3.5" floppy emulation
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -65722,7 +65734,7 @@ Non-working 3.5" floppy
 
 	<software name="camelzoo" supported="yes">
 		<description>Camel-Zoo</description>
-		<year>19??</year>
+		<year>1993?</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -65731,11 +65743,13 @@ Non-working 3.5" floppy
 		</part>
 	</software>
 
-	<!-- This game is supposed to play sound effects through the beeper, but in MAME it just outputs a constant beep -->
 	<software name="car2gp" supported="partial">
 		<description>Car II Grand Prix</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT] for sound (verify)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="car 2 grand prix (bio 100).fdi" size="1265664" crc="d60d66eb" sha1="27f3015f11157d9a631f2386b49c45b9a3d62133" offset="0" />
@@ -65743,14 +65757,17 @@ Non-working 3.5" floppy
 		</part>
 	</software>
 
-	<!-- This game is supposed to play sound effects through the beeper, but in MAME it just outputs a constant beep -->
 	<software name="carax92" supported="partial">
 		<description>Carax 92</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT] for sound (verify)
+]]></notes>
+		<!-- baddump: has non-factory hi-score entries -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="carax'92 (bio100).fdi" size="1265664" crc="fcc52afb" sha1="1dd507301005d9287a5e53e1055d00ac9b1d66dd" offset="0" />
+				<rom name="carax'92 (bio100).fdi" size="1265664" crc="fcc52afb" sha1="1dd507301005d9287a5e53e1055d00ac9b1d66dd" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -65759,6 +65776,9 @@ Non-working 3.5" floppy
 		<description>Cray Shoot</description>
 		<year>19??</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Requires 3.5" floppy emulation
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="cray shoot (bio 100).fdi" size="1478656" crc="e37e85d7" sha1="0deb3e1eaa4e917c4110c9901a35a17f12919603" offset="0" />
@@ -65770,6 +65790,9 @@ Non-working 3.5" floppy
 		<description>Dynamo</description>
 		<year>1991</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Requires 3.5" floppy emulation
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1461756">
 				<rom name="dynamo (1991)(marka project).fdd" size="1461756" crc="c0935bcc" sha1="78c52f0ee6c85a3504ff37b71a2a48d2f9754781" offset="0" />
@@ -65781,6 +65804,9 @@ Non-working 3.5" floppy
 		<description>F1 Grandprix</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Requires 3.5" floppy emulation
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="f1 grandprix (1992)(bio 100).fdi" size="1478656" crc="8fa46fda" sha1="146ee288486174095297be074feb3d1007ec0de4" offset="0" />
@@ -65788,10 +65814,14 @@ Non-working 3.5" floppy
 		</part>
 	</software>
 
-	<software name="finalty">
-		<description>Finalty - Super Depth 2</description>
+	<software name="finalty" supported="yes">
+		<!-- "Superdepth 2 Finalty" displayed on title -->
+		<description>Finalty - Super Depth 2 (Test Version)</description>
 		<year>1995</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT] for sound
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="superdepth 2 finalty (bio 100).fdi" size="1265664" crc="299724f1" sha1="21849d8a9f2bc71a59d5f9d32fcff6bde22369ee" offset="0" />
@@ -65818,6 +65848,9 @@ Uses [DAC1BIT] only for sound
 		<description>Gemini Snake</description>
 		<year>1990</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Requires 3.5" floppy emulation
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="gemini snake (1990)(bio 100).fdi" size="1478656" crc="2a28bfa9" sha1="8b20b04f86210b16683048b8a9a34b873b342b9d" offset="0" />
@@ -65825,8 +65858,9 @@ Uses [DAC1BIT] only for sound
 		</part>
 	</software>
 
-	<software name="goggle2">
-		<description>Goggle-II</description>
+	<software name="goggle2" supported="yes">
+		<!-- "The Ptolemaic Game" -->
+		<description>Goggle-II (5.25&quot; Disk)</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -65836,8 +65870,8 @@ Uses [DAC1BIT] only for sound
 		</part>
 	</software>
 
-	<software name="goggle2a" cloneof="goggle2">
-		<description>Goggle-II (alt)</description>
+	<software name="goggle2a" cloneof="goggle2" supported="yes">
+		<description>Goggle-II (3.5&quot; Disk)</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -66549,14 +66583,16 @@ Uses [DAC1BIT]
 		</part>
 	</software>
 
-	<!-- Crashes after the title screen with "初期設定データがありません" (initial settings data not present) error -->
 	<software name="ambcaptn" supported="no">
 		<description>The Ambition of Captain</description>
-		<year>19??</year>
+		<year>1992?</year>
 		<publisher>&lt;unofficial&gt;</publisher>
+		<notes><![CDATA[
+Crashes after the title screen with "初期設定データがありません" (initial settings data not present) error
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="the_ambition_of_captain.fdi" size="1265664" crc="4d1eed79" sha1="53956e9de710603996ae3d62191407acb4da50a6" offset="0" />
+				<rom name="the_ambition_of_captain.fdi" size="1265664" crc="4d1eed79" sha1="53956e9de710603996ae3d62191407acb4da50a6" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
