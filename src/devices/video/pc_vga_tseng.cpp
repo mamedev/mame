@@ -8,8 +8,9 @@
  * - ET4000AX
  * \- No logging whatsoever;
  * \- Unsupported True Color modes, also "Return current video mode failed" in VESA24_2 test;
- * - ET4000/W32 (2d accelerator)
- * - ET4000/W32p (PCI version)
+ * - ET4000/W32i (2d accelerator)
+ * - ET4000/W32p (PCI version of above)
+ * - ET6000/ET6100
  *
  */
 
@@ -272,3 +273,4 @@ void tseng_vga_device::mem_w(offs_t offset, uint8_t data)
 	else
 		vga_device::mem_w(offset,data);
 }
+

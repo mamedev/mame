@@ -44,9 +44,6 @@ protected:
 	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
-	void map_io();
-	void map_ram();
-	void map_rom();
 	required_device<tseng_vga_device> m_vga;
 };
 
@@ -63,8 +60,32 @@ private:
 	required_region_ptr<uint8_t> m_hangul_rom;
 };
 
+class isa16_svga_et4k_w32i_device :
+		public device_t,
+		public device_isa16_card_interface
+{
+public:
+	isa16_svga_et4k_w32i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	void io_isa_map(address_map &map) ATTR_COLD;
+
+private:
+	required_device<tseng_vga_device> m_vga;
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(ISA16_SVGA_ET4K,         isa16_svga_et4k_device)
 DECLARE_DEVICE_TYPE(ISA16_SVGA_ET4K_KASAN16, isa16_svga_et4k_kasan16_device)
+DECLARE_DEVICE_TYPE(ISA16_SVGA_ET4K_W32I,    isa16_svga_et4k_w32i_device)
 
 #endif // MAME_BUS_ISA_SVGA_TSENG_H

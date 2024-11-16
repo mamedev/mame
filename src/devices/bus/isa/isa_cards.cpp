@@ -217,6 +217,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("pvga1a_jk", ISA16_PVGA1A_JK);
 	device.option_add("svga_et4k", ISA16_SVGA_ET4K);
 	device.option_add("svga_et4k_kasan16", ISA16_SVGA_ET4K_KASAN16);
+	device.option_add("svga_et4kw32i", ISA16_SVGA_ET4K_W32I);
 	device.option_add("wd90c00_jk", ISA16_WD90C00_JK);
 	device.option_add("wd90c11_lr", ISA16_WD90C11_LR);
 	device.option_add("wd90c30_lr", ISA16_WD90C30_LR);
