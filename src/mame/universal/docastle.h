@@ -72,15 +72,14 @@ private:
 	int m_adpcm_status = 0;
 
 	uint8_t m_shared_latch = 0;
-	bool m_maincpu_defer_access = false;
-	bool m_subcpu_defer_access = false;
+	bool m_maincpu_wait = false;
 
 	tilemap_t *m_do_tilemap = nullptr;
 
-	uint8_t main_from_sub_r();
-	void main_to_sub_w(uint8_t data);
-	uint8_t sub_from_main_r();
-	void sub_to_main_w(uint8_t data);
+	uint8_t main_from_sub_r(offs_t offset);
+	void main_to_sub_w(offs_t offset, uint8_t data);
+	uint8_t sub_from_main_r(offs_t offset);
+	void sub_to_main_w(offs_t offset, uint8_t data);
 	void subcpu_nmi_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);

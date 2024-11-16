@@ -11,6 +11,11 @@
 #include "cpu/z80/z80.h"
 #include "docastle.h"
 
+#define LOG_MAINSUB (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 /*
 
 Communication between the two CPUs happens through a single bidirectional latch.
@@ -23,68 +28,68 @@ timing needs to be cycle-accurate, both CPUs do LDIR opcodes in lockstep.
 
 */
 
-uint8_t docastle_state::main_from_sub_r()
+uint8_t docastle_state::main_from_sub_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
-		m_maincpu_defer_access = !m_maincpu_defer_access;
+		m_maincpu_wait = !m_maincpu_wait;
 
-		if (m_maincpu_defer_access)
+		if (m_maincpu_wait)
 		{
+			// steal 1 cycle ahead of WAIT to avoid race condition
+			m_maincpu->adjust_icount(-1);
+
 			machine().scheduler().perfect_quantum(attotime::from_usec(100));
 			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 
 			// defer access to let subcpu write the latch and clear WAIT
 			m_maincpu->defer_access();
 		}
+		else
+		{
+			LOGMASKED(LOG_MAINSUB, "%dR%02X%c", offset, m_shared_latch, (offset == 8) ? '\n' : ' ');
+
+			// give back stolen cycle
+			m_maincpu->adjust_icount(1);
+		}
 	}
 
 	return m_shared_latch;
 }
 
-void docastle_state::main_to_sub_w(uint8_t data)
+void docastle_state::main_to_sub_w(offs_t offset, uint8_t data)
 {
+	LOGMASKED(LOG_MAINSUB, "%dW%02X ", offset, data);
+
 	m_shared_latch = data;
 	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 }
 
-uint8_t docastle_state::sub_from_main_r()
+uint8_t docastle_state::sub_from_main_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
-		m_subcpu_defer_access = !m_subcpu_defer_access;
-
-		if (m_subcpu_defer_access)
-		{
-			// defer access to let maincpu react first
-			m_subcpu->defer_access();
-		}
-		else
-			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+		LOGMASKED(LOG_MAINSUB, "%dr%02X%c", offset, m_shared_latch, (offset == 8) ? '\n' : ' ');
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 	}
 
 	return m_shared_latch;
 }
 
-void docastle_state::sub_to_main_w(uint8_t data)
+void docastle_state::sub_to_main_w(offs_t offset, uint8_t data)
 {
-	m_subcpu_defer_access = !m_subcpu_defer_access;
+	LOGMASKED(LOG_MAINSUB, "%dw%02X ", offset, data);
 
-	if (m_subcpu_defer_access)
-	{
-		// defer access to let maincpu react first
-		m_subcpu->defer_access();
-	}
-	else
-	{
-		m_shared_latch = data;
-		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
-	}
+	m_shared_latch = data;
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
 
 void docastle_state::subcpu_nmi_w(uint8_t data)
 {
+	LOGMASKED(LOG_MAINSUB, "%s trigger subcpu NMI\n", machine().describe_context());
+
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
