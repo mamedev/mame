@@ -397,7 +397,7 @@ uint8_t quizpun2_state::protection_r()
 			m_mcu_pending = true;
 			m_mcu_written = false;
 			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-			m_maincpu->defer_access();
+			m_maincpu->retry_access();
 		}
 
 		m_mcu_repeat = !m_mcu_repeat;

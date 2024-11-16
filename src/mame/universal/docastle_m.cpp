@@ -42,8 +42,8 @@ uint8_t docastle_state::main_from_sub_r(offs_t offset)
 			machine().scheduler().perfect_quantum(attotime::from_usec(100));
 			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 
-			// defer access to let subcpu write the latch and clear WAIT
-			m_maincpu->defer_access();
+			// retry access after subcpu writes the latch and clears WAIT
+			m_maincpu->retry_access();
 		}
 		else
 		{
