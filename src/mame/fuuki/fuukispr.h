@@ -1,18 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders: Luca Elia, David Haywood
 
-#ifndef MAME_FUUKI_FUUKIFG_H
-#define MAME_FUUKI_FUUKIFG_H
+#ifndef MAME_FUUKI_FUUKISPR_H
+#define MAME_FUUKI_FUUKISPR_H
 
 #pragma once
 
-class fuukivid_device : public device_t, public device_gfx_interface, public device_video_interface
+class fuukispr_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
 	typedef device_delegate<void (u32 &code)> tile_delegate;
 	typedef device_delegate<void (u32 &colour, u32 &pri_mask)> colpri_cb_delegate;
 
-	fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	fuukispr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
 	void set_color_base(u16 base) { m_colbase = base; }
@@ -28,11 +28,12 @@ protected:
 private:
 	tile_delegate m_tile_cb;
 	colpri_cb_delegate m_colpri_cb;
-	required_memory_region m_gfx_region;
 	u16 m_colbase;
 	u16 m_colnum;
+
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 };
 
-DECLARE_DEVICE_TYPE(FUUKI_VIDEO, fuukivid_device)
+DECLARE_DEVICE_TYPE(FUUKI_SPRITE, fuukispr_device)
 
-#endif // MAME_FUUKI_FUUKIFG_H
+#endif // MAME_FUUKI_FUUKISPR_H
