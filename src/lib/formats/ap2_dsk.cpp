@@ -236,7 +236,9 @@ int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 	static const unsigned char cpm22_block1[8] = { 0xa2, 0x55, 0xa9, 0x00, 0x9d, 0x00, 0x0d, 0xca };
 	static const unsigned char subnod_block1[8] = { 0x63, 0xaa, 0xf0, 0x76, 0x8d, 0x63, 0xaa, 0x8e };
 
-	/*auto const [err, actual] =*/ read_at(io, 0, sector_data, 256*2); // FIXME: check for errors and premature EOF
+	auto const [err, actual] = read_at(io, 0, sector_data, sizeof sector_data);
+	if (err || actual != sizeof sector_data)
+		return 0;
 
 	bool prodos_order = false;
 	// check ProDOS boot block
@@ -309,7 +311,9 @@ bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const s
 		std::vector<uint32_t> track_data;
 		uint8_t sector_data[256*16];
 
-		/*auto const [err, actual] =*/ read_at(io, fpos, sector_data, 256*16); // FIXME: check for errors and premature EOF
+		auto const [err, actual] = read_at(io, fpos, sector_data, sizeof sector_data);
+		if (err || actual != sizeof sector_data)
+			return false;
 
 		fpos += 256*16;
 		for(int i=0; i<49; i++)
@@ -587,7 +591,9 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 		for(int i=0; i<nsect; i++) {
 			//if(nsect>0) printf("t%d,", track);
 			uint8_t const *const data = sectdata + (256)*i;
-			/*auto const [err, actual] =*/ write_at(io, pos_data, data, 256); // FIXME: check for errors
+			auto const [err, actual] = write_at(io, pos_data, data, 256);
+			if (err || actual != 256)
+				return false;
 			pos_data += 256;
 		}
 		//printf("\n");
@@ -1165,9 +1171,10 @@ bool a2_edd_format::load(util::random_read &io, uint32_t form_factor, const std:
 {
 	uint8_t nibble[16384], stream[16384];
 	int npos[16384];
+	static const size_t img_size = 2'244'608;
 
-	auto [err, img, actual] = read_at(io, 0, 2'244'608); // TODO: check for premature EOF
-	if(err)
+	auto [err, img, actual] = read_at(io, 0, img_size);
+	if(err || actual != img_size)
 		return false;
 
 	for(int i=0; i<137; i++) {
@@ -1404,7 +1411,10 @@ bool a2_nib_format::load(util::random_read &io, uint32_t form_factor, const std:
 
 	std::vector<uint8_t> nibbles(nibbles_per_track);
 	for (unsigned track = 0; track < nr_tracks; ++track) {
-		/*auto const [err, actual] =*/ read_at(io, track * nibbles_per_track, &nibbles[0], nibbles_per_track); // FIXME: check for errors and premature EOF
+		auto const [err, actual] = read_at(io, track * nibbles_per_track, &nibbles[0], nibbles_per_track);
+		if (err || actual != nibbles_per_track)
+			return false;
+
 		auto levels = generate_levels_from_nibbles(nibbles);
 		if (!levels.empty()) {
 			generate_track_from_levels(track, 0, levels, 0, image);
