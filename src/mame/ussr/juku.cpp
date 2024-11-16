@@ -22,7 +22,6 @@
 
     TODO:
     - Work out how the floppy interface really works?
-    - Figure out missing bits in PIO0 port B
     - Tape? (split up to E5101 batch as tape only?)
     - И41 (=Multibus-1) compatibility?
     - Network?
@@ -52,6 +51,7 @@
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -119,6 +119,7 @@ private:
 	void pio0_porta_w(uint8_t data);
 	uint8_t pio0_portb_r();
 	void pio0_portc_w(uint8_t data);
+	uint8_t m_contrdat;
 
 	int m_width, m_height, m_hbporch, m_vbporch;
 	void screen_width(uint8_t data);
@@ -204,7 +205,6 @@ void juku_state::io_map(address_map &map)
 //  INPUT PORT DEFINITIONS
 //**************************************************************************
 
-
 static INPUT_PORTS_START( juku )
 	PORT_START("COL.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F6))
@@ -285,7 +285,12 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN) PORT_CHAR(']') // ] õ
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_INSERT) PORT_NAME("ERASE") // ERASE
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13) PORT_NAME("RETURN")
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x40, 0x00, "B4_0") PORT_DIPLOCATION("CONTRDAT1:01")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x80, "B5_0") PORT_DIPLOCATION("CONTRDAT2:01")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x80, DEF_STR(On))
 
 	PORT_START("COL.9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -294,7 +299,12 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_END) PORT_CHAR('[') // [ ö
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Ä  Ü") // Ä Ü
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x40, 0x00, "B4_1") PORT_DIPLOCATION("CONTRDAT1:02")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x80, "B5_1") PORT_DIPLOCATION("CONTRDAT2:02")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x80, DEF_STR(On))
 
 	PORT_START("COL.10")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -303,7 +313,12 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("õ  Õ") // õ Õ
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_NAME("Ö  Õ") // Ö Õ
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(':') PORT_CHAR('*') // : *
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x40, 0x00, "B4_2") PORT_DIPLOCATION("CONTRDAT1:03")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x80, "B5_2") PORT_DIPLOCATION("CONTRDAT2:03")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x80, DEF_STR(On))
 
 	PORT_START("COL.11")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -313,7 +328,12 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('\\') PORT_CHAR('^') PORT_NAME("ü  Ü") // ü Ü
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-') PORT_CHAR('=') // - =
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("ä  Ä") // ä Ä
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x40, 0x00, "B4_3") PORT_DIPLOCATION("CONTRDAT1:04")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x80, "B5_3") PORT_DIPLOCATION("CONTRDAT2:04")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x80, DEF_STR(On))
 
 	PORT_START("COL.12")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -322,7 +342,12 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') // p P
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0') PORT_CHAR('_') // 0 _
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_NAME("ö  Ö") // ö Ö
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x40, 0x00, "B4_4") PORT_DIPLOCATION("CONTRDAT1:05")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x80, "B5_4") PORT_DIPLOCATION("CONTRDAT2:05")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x80, DEF_STR(On))
 
 	PORT_START("COL.13")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -331,7 +356,12 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O') // o O
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9') PORT_CHAR(')') // 9 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L') // l L
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x40, 0x00, "B4_5") PORT_DIPLOCATION("CONTRDAT1:06")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x80, "B5_5") PORT_DIPLOCATION("CONTRDAT2:06")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x80, DEF_STR(On))
 
 	PORT_START("COL.14")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(F8)) // "7-8-9-F8" on numpad (popular gaming controls)
@@ -340,11 +370,21 @@ static INPUT_PORTS_START( juku )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') // i I
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8') PORT_CHAR('(') // 8 (
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K') // k K
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x40, 0x00, "B4_6") PORT_DIPLOCATION("CONTRDAT1:07")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x80, "B5_6") PORT_DIPLOCATION("CONTRDAT2:07")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x80, DEF_STR(On))
 
-	// CONTRDAT?
 	PORT_START("COL.15")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x40, 0x00, "B4_7") PORT_DIPLOCATION("CONTRDAT1:08")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x80, "B5_7") PORT_DIPLOCATION("CONTRDAT2:08")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x80, DEF_STR(On))
 
 	PORT_START("SPECIAL")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
@@ -524,6 +564,7 @@ void juku_state::fdc_data_w(uint8_t data)
 	m_fdc->data_w(data);
 }
 
+
 //**************************************************************************
 //  SOUND
 //**************************************************************************
@@ -532,6 +573,7 @@ void juku_state::speaker_w(int state)
 {
 	m_speaker->level_w((m_beep_state = state) << m_beep_level);
 }
+
 
 //**************************************************************************
 //  MACHINE EMULATION
@@ -545,9 +587,12 @@ void juku_state::pio0_porta_w(uint8_t data)
 	// ---4----  audc
 	// ----3210  keyboard column
 
-	for (int i = 0; i < 6; i++)
-		m_key_encoder->input_line_w(i, BIT(m_keys[data & 0x0f]->read(), i));
+	uint8_t col_data = m_keys[data & 0xf]->read();
 
+	for (int i = 0; i < 6; i++)
+		m_key_encoder->input_line_w(i, BIT(col_data, i));
+	m_contrdat = (col_data & 0b1100'0000) >> 6; // decoded by 2x К555ИД7
+	
 	if (m_beep_level != BIT(data, 4))
 		m_speaker->level_w(m_beep_state << (m_beep_level = BIT(data, 4)));
 
@@ -558,14 +603,14 @@ uint8_t juku_state::pio0_portb_r()
 {
 	// 7-------  ctrl
 	// -6------  shift
-	// --54----  not used (reported 10 on E5104)
+	// --54----  contrdat?
 	// ----321-  keyboard data
 	// -------0  key pressed
 
 	uint8_t data = 0;
 
 	data |= m_key_special->read();
-	data |= 0b10'0000;
+	data |= m_contrdat << 4;
 	data |= m_key_encoder->output_r() << 1;
 	data |= m_key_encoder->output_valid_r();
 
@@ -609,6 +654,7 @@ void juku_state::machine_start()
 	save_pointer(NAME(m_ram), 0x10000);
 	save_item(NAME(m_beep_state));
 	save_item(NAME(m_beep_level));
+	save_item(NAME(m_contrdat));
 	save_item(NAME(m_fdc_cur_cmd));
 	save_item(NAME(m_width));
 	save_item(NAME(m_height));
@@ -626,6 +672,7 @@ void juku_state::machine_reset()
 	m_key_encoder->enable_input_w(0);
 	m_beep_state = 0;
 	m_beep_level = 0;
+	m_contrdat = 0b11;
 	m_fdc_cur_cmd = 0;
 	m_width = DEFAULT_WIDTH, m_height = DEFAULT_HEIGHT;
 	m_hbporch = HORIZ_BACK_PORCH, m_vbporch = VERT_BACK_PORCH;
@@ -720,6 +767,7 @@ void juku_state::juku(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1);
 	m_speaker->set_levels(3, SPEAKER_LEVELS);
 
+	// К155ИВ1
 	TTL74148(config, m_key_encoder, 0);
 
 	// КР1818ВГ93 (for E6502 disk drive)
@@ -780,8 +828,6 @@ ROM_START( juku )
 	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(3))
 	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(4))
 	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(5))
-
-
 ROM_END
 
 } // Anonymous namespace
