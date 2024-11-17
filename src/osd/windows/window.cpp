@@ -1948,11 +1948,8 @@ void win_window_info::pointer_capture_changed(WPARAM wparam, LPARAM lparam)
 	if (m_active_pointers.end() != info)
 	{
 		// treat this as the pointer being stolen - fail any gestures
-		if (BIT(info->buttons, 0))
-		{
-			assert(0 <= info->clickcnt);
+		if (BIT(info->buttons, 0) && (0 < info->clickcnt))
 			info->clickcnt = -info->clickcnt;
-		}
 
 		// push to UI manager and dump pointer data
 		machine().ui_input().push_pointer_abort(
@@ -2033,9 +2030,8 @@ void win_window_info::mouse_updated(WPARAM wparam, LPARAM lparam)
 void win_window_info::expire_pointer(std::vector<win_pointer_info>::iterator info, POINT const &where, bool canceled)
 {
 	// leaving implicitly releases buttons, so check hold/drag if necessary
-	if (BIT(info->buttons, 0))
+	if (BIT(info->buttons, 0) && (0 < info->clickcnt))
 	{
-		assert(0 <= info->clickcnt);
 		if (!canceled)
 		{
 			auto const now(std::chrono::steady_clock::now());
