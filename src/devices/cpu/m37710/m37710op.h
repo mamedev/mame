@@ -2536,6 +2536,7 @@ TABLE_FUNCTION(int, execute, (int clocks))
 {
 	if(CPU_STOPPED)
 		debugger_wait_hook();
+	else
 	{
 		CLOCKS = clocks;
 		do
