@@ -69,9 +69,28 @@ public:
 	// construction/destruction
 	et4kw32i_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	u8 acl_index_r(offs_t offset);
+	void acl_index_w(offs_t offset, u8 data);
+	u8 acl_data_r(offs_t offset);
+	void acl_data_w(offs_t offset, u8 data);
+
+	virtual uint8_t mem_r(offs_t offset) override;
+	virtual void mem_w(offs_t offset, uint8_t data) override;
+
 protected:
 	virtual void crtc_map(address_map &map) override ATTR_COLD;
 	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
+
+private:
+	virtual space_config_vector memory_space_config() const override;
+
+	address_space_config m_acl_space_config;
+	address_space_config m_mmu_space_config;
+
+	void acl_map(address_map &map) ATTR_COLD;
+	void mmu_map(address_map &map) ATTR_COLD;
+
+	u8 m_acl_idx;
 };
 
 

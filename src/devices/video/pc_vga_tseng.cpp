@@ -220,7 +220,7 @@ void tseng_vga_device::crtc_map(address_map &map)
 		})
 	);
 	// Horizontal overflow
-	// NOTE: undocumented in ET4000AX
+	// NOTE: undocumented in ET4000AX, may apply to w32i only
 	map(0x3f, 0x3f).lrw8(
 		NAME([this] (offs_t offset) {
 			return et4k.horz_overflow;
@@ -229,6 +229,7 @@ void tseng_vga_device::crtc_map(address_map &map)
 			et4k.horz_overflow = data;
 			vga.crtc.horz_total = (vga.crtc.horz_total & 0xff) | ((data & 1) << 8);
 			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x80) << 1);
+			// TODO: bits 4 & 2 (horizontal sync and blank start, bit 8)
 			recompute_params();
 		})
 	);
@@ -379,6 +380,18 @@ uint32_t tseng_vga_device::latch_start_addr()
 et4kw32i_vga_device::et4kw32i_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tseng_vga_device(mconfig, tag, ET4KW32I_VGA, owner, clock)
 {
+	m_acl_space_config = address_space_config("acl_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(et4kw32i_vga_device::acl_map), this));
+	m_mmu_space_config = address_space_config("mmu_regs", ENDIANNESS_LITTLE, 8, 15, 0, address_map_constructor(FUNC(et4kw32i_vga_device::mmu_map), this));
+
+	m_acl_idx = 0;
+}
+
+device_memory_interface::space_config_vector et4kw32i_vga_device::memory_space_config() const
+{
+	auto r = svga_device::memory_space_config();
+	r.emplace_back(std::make_pair(EXT_REG,     &m_acl_space_config));
+	r.emplace_back(std::make_pair(EXT_REG + 1, &m_mmu_space_config));
+	return r;
 }
 
 void et4kw32i_vga_device::crtc_map(address_map &map)
@@ -434,3 +447,73 @@ void et4kw32i_vga_device::io_3cx_map(address_map &map)
 	);
 }
 
+u8 et4kw32i_vga_device::acl_index_r(offs_t offset)
+{
+	return m_acl_idx;
+}
+
+void et4kw32i_vga_device::acl_index_w(offs_t offset, u8 data)
+{
+	m_acl_idx = data;
+}
+
+u8 et4kw32i_vga_device::acl_data_r(offs_t offset)
+{
+	return space(EXT_REG).read_byte(m_acl_idx);
+}
+
+void et4kw32i_vga_device::acl_data_w(offs_t offset, u8 data)
+{
+	space(EXT_REG).write_byte(m_acl_idx, data);
+}
+
+void et4kw32i_vga_device::acl_map(address_map &map)
+{
+
+}
+
+uint8_t et4kw32i_vga_device::mem_r(offs_t offset)
+{
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
+	{
+		if (et4k.vsconf1 & 0x28 && vga.gc.memory_map_sel)
+		{
+			const u32 mmu_address = vga.gc.memory_map_sel & 2 ? 0x08000 : 0x18000;
+
+			if ((offset & 0x18000) == mmu_address)
+				return space(EXT_REG + 1).read_byte(offset & 0x7fff);
+		}
+
+		offset &= 0xffff;
+		return svga_device::mem_linear_r(offset + svga.bank_r * 0x10000);
+	}
+
+	return vga_device::mem_r(offset);
+}
+
+void et4kw32i_vga_device::mem_w(offs_t offset, uint8_t data)
+{
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
+	{
+		if (et4k.vsconf1 & 0x28 && vga.gc.memory_map_sel)
+		{
+			const u32 mmu_address = vga.gc.memory_map_sel & 2 ? 0x08000 : 0x18000;
+
+			if ((offset & 0x18000) == mmu_address)
+			{
+				space(EXT_REG + 1).write_byte(offset & 0x7fff, data);
+				return;
+			}
+		}
+
+		offset &= 0xffff;
+		svga_device::mem_linear_w(offset + svga.bank_w * 0x10000, data);
+		return;
+	}
+
+	vga_device::mem_w(offset,data);
+}
+
+void et4kw32i_vga_device::mmu_map(address_map &map)
+{
+}
