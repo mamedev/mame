@@ -32,6 +32,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "imagedev/floppy.h"
 #include "machine/74148.h"
@@ -42,9 +43,11 @@
 #include "machine/pit8253.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
 #include "formats/juku_dsk.h"
 
 //#define VERBOSE 1
@@ -112,6 +115,19 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_speaker;
 
+	int32_t m_width, m_height, m_hbporch, m_vbporch;
+
+	uint8_t m_contrdat;
+
+	int16_t m_height_lsb, m_vblank_period_lsb;
+	int16_t m_monitor_bits, m_empty_screen_on_update;
+
+	bool m_beep_state, m_beep_level;
+
+	uint8_t m_fdc_cur_cmd;
+
+	std::unique_ptr<uint8_t[]> m_ram;
+
 	void mem_map(address_map &map) ATTR_COLD;
 	void bank_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
@@ -119,9 +135,7 @@ private:
 	void pio0_porta_w(uint8_t data);
 	uint8_t pio0_portb_r();
 	void pio0_portc_w(uint8_t data);
-	uint8_t m_contrdat;
 
-	int m_width, m_height, m_hbporch, m_vbporch;
 	void screen_width(uint8_t data);
 	void screen_hblank_period(uint8_t data);
 	void screen_hfporch(uint8_t data);
@@ -131,11 +145,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// helpers to coordinate screen mode switching
-	int m_height_lsb, m_vblank_period_lsb;
-	int m_monitor_bits, m_empty_screen_on_update;
 	void adjust_monitor_params(uint8_t monitor_bits);
 
-	bool m_beep_state, m_beep_level;
 	void speaker_w(int state);
 
 	static void floppy_formats(format_registration &fr);
@@ -143,9 +154,6 @@ private:
 	void fdc_cmd_w(uint8_t data);
 	uint8_t fdc_data_r();
 	void fdc_data_w(uint8_t data);
-	uint8_t m_fdc_cur_cmd;
-
-	std::unique_ptr<uint8_t[]> m_ram;
 };
 
 
@@ -399,10 +407,10 @@ INPUT_PORTS_END
 inline uint16_t bcd_value(uint16_t val) 
 {
 	return
-		((val>>12) & 0xF) *  1000 +
-		((val>> 8) & 0xF) *   100 +
-		((val>> 4) & 0xF) *    10 +
-		( val      & 0xF);
+		((val>>12) & 0xf) *  1000 +
+		((val>> 8) & 0xf) *   100 +
+		((val>> 4) & 0xf) *    10 +
+		( val      & 0xf);
 }
 
 void juku_state::screen_width(uint8_t data)
@@ -481,15 +489,15 @@ void juku_state::adjust_monitor_params(uint8_t monitor_bits)
 	// horizontal/vertical rates in 10h and 14h are set in BIOS and not changed in normal video mode switching
 	// expect changing params in order AND vertical front porch in 16h as the final step
 	if (monitor_bits == 0b0010'0000 && m_monitor_bits == 0b0011'1111) {
-		m_screen->set_visarea(m_hbporch, m_hbporch+m_width-1, m_vbporch, m_vbporch+m_height-1);
+		m_screen->set_visarea(m_hbporch, m_hbporch + m_width - 1, m_vbporch, m_vbporch + m_height - 1);
 		m_monitor_bits = 0b000'01001;
 	}
 }
 
 uint32_t juku_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {	      
-	int y_max = m_vbporch < 0 ? m_height + m_vbporch : m_vbporch+m_height > m_screen->height() ? m_screen->height() : m_height;
-	int x_max = m_hbporch < 0 ? m_width + m_hbporch : m_hbporch+m_width > m_screen->width() ? m_screen->width() : m_width;
+	int y_max = (m_vbporch < 0) ? (m_height + m_vbporch) : (m_vbporch+m_height > m_screen->height()) ? m_screen->height() : m_height;
+	int x_max = (m_hbporch < 0) ? (m_width + m_hbporch) : (m_hbporch+m_width > m_screen->width()) ? m_screen->width() : m_width;
 	
 	if (m_empty_screen_on_update) {
 		m_empty_screen_on_update--;
@@ -642,7 +650,7 @@ void juku_state::pio0_portc_w(uint8_t data)
 
 void juku_state::machine_start()
 {
-	m_ram = std::make_unique<uint8_t[]>(0x10000);
+	m_ram = std::make_unique<uint8_t []>(0x10000);
 
 	membank("rom_d800")->set_base(memregion("maincpu")->base() + 0x1800);
 
@@ -651,19 +659,19 @@ void juku_state::machine_start()
 	membank("ram_c000")->set_base(&m_ram[0xc000]);
 
 	// register for save states
-	save_pointer(NAME(m_ram), 0x10000);
-	save_item(NAME(m_beep_state));
-	save_item(NAME(m_beep_level));
-	save_item(NAME(m_contrdat));
-	save_item(NAME(m_fdc_cur_cmd));
 	save_item(NAME(m_width));
 	save_item(NAME(m_height));
 	save_item(NAME(m_hbporch));
 	save_item(NAME(m_vbporch));
+	save_item(NAME(m_contrdat));
+	save_item(NAME(m_monitor_bits));
 	save_item(NAME(m_height_lsb));
 	save_item(NAME(m_vblank_period_lsb));
-	save_item(NAME(m_monitor_bits));
 	save_item(NAME(m_empty_screen_on_update));
+	save_item(NAME(m_beep_state));
+	save_item(NAME(m_beep_level));
+	save_item(NAME(m_fdc_cur_cmd));
+	save_pointer(NAME(m_ram), 0x10000);
 }
 
 void juku_state::machine_reset()
@@ -830,7 +838,7 @@ ROM_START( juku )
 	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(5))
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 //**************************************************************************
