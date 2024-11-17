@@ -23,9 +23,8 @@ TODO:
 - sound
 - is visible area correct?
 - remaining DIPs
-
-BTANB:
-- colors are horrible but match available screenshot
+- colors aren't 100% correct (see i.e. the stripes in the curtains)
+  reference video: https://www.youtube.com/watch?v=zTOFIhuwR2w
 */
 
 
