@@ -684,14 +684,16 @@ ffff
 	call check_interrupts
 	m_after_ei = false;
 	m_after_ldair = false;
-	PRVPC = PC;
-	debugger_instruction_hook(PC);
-	call rop
 	if (m_halt) {
+		debugger_wait_hook();
+		call rop
 		PC--;
 		m_ref = 0xffff00;
 		return;
 	} else {
+		PRVPC = PC;
+		debugger_instruction_hook(PC);
+		call rop
 		m_ref = (0x00 << 16) | (TDAT8 << 8);
 		return;
 	}

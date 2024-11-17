@@ -877,6 +877,7 @@ void hmcs400_cpu_device::execute_run()
 	// in stop mode, the internal clock is not running
 	if (m_stop)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}

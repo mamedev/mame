@@ -1038,6 +1038,8 @@ void adsp21062_device::execute_run()
 
 		if (m_core->idle && m_core->irq_pending == 0)
 		{
+			debugger_wait_hook();
+
 			int dma_count = m_core->icount;
 
 			// run active DMAs even while idling
@@ -1052,7 +1054,6 @@ void adsp21062_device::execute_run()
 			}
 
 			m_core->icount = 0;
-			debugger_instruction_hook(m_core->daddr);
 		}
 		if (m_core->irq_pending != 0)
 		{

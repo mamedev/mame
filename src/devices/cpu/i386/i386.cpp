@@ -2778,6 +2778,7 @@ void i386_device::execute_run()
 
 	if (m_halted)
 	{
+		debugger_wait_hook();
 		m_tsc += cycles;
 		m_cycles = 0;
 		return;

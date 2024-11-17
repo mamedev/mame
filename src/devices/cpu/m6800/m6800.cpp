@@ -612,6 +612,7 @@ void m6800_cpu_device::execute_run()
 	{
 		if (m_wai_state & (M6800_WAI | M6800_SLP))
 		{
+			debugger_wait_hook();
 			eat_cycles();
 		}
 		else

@@ -4471,19 +4471,22 @@ void sparc_base_device::run_loop()
 		    continue;
 		}*/
 
-		if (CHECK_DEBUG)
-			debugger_instruction_hook(PC);
-
 		if (MODE == MODE_RESET)
 		{
+			if (CHECK_DEBUG)
+				debugger_wait_hook();
 			reset_step();
 		}
 		else if (MODE == MODE_ERROR)
 		{
+			if (CHECK_DEBUG)
+				debugger_wait_hook();
 			error_step();
 		}
 		else if (MODE == MODE_EXECUTE)
 		{
+			if (CHECK_DEBUG)
+				debugger_instruction_hook(PC);
 			execute_step();
 		}
 

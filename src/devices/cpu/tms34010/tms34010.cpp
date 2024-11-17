@@ -863,6 +863,7 @@ void tms340x0_device::execute_run()
 	/* Get out if CPU is halted. Absolutely no interrupts must be taken!!! */
 	if (IOREG(REG_HSTCTLH) & 0x8000)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}

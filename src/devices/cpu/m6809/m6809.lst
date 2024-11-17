@@ -13,7 +13,6 @@ MAIN:
 	m_ppc = m_pc;
 	debugger_instruction_hook(m_pc.w);
 
-DISPATCH01:
 	// opcode fetch
 	m_lic_func(ASSERT_LINE);
 	@m_opcode = read_opcode();
@@ -21,6 +20,7 @@ DISPATCH01:
 
 	if (m_free_run) goto FREERUN;
 
+DISPATCH01:
 	// dispatch opcode
 	switch(m_opcode)
 	{

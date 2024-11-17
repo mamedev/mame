@@ -1,4 +1,4 @@
-#!/bin/python
+#!/bin/python3
 
 # m68000 emulation code generator
 
@@ -1893,7 +1893,7 @@ def generate_code_from_blocks(blocks, ir, irmask, tvn, priv, group01):
             if len(b[3]) == 0:
                 if cb[-1][0] != "set_trace":
                     # stop #nnnn case, which loops on itself transparently
-                    cb.append(["next"])
+                    cb.append(["next_stop"])
                 else:
                     cb[-1][0] = "next_trace"
             elif b[3][0] == ib:
@@ -2285,10 +2285,12 @@ def generate_source_from_code(code, gen_mode):
                     source.append("\tsr_%s();" % aflags)
             elif ci[0] == "=t":
                 source.append("\tm_t = %s;" % ci[1])
-            elif ci[0] == "next" or ci[0] == "next_trace":
+            elif ci[0] == "next_stop" or ci[0] == "next_trace":
                 source.append("\tm_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];")
                 if not (gen_mode & GEN.full):
                     source.append("\tm_inst_substate = 0;")
+                if ci[0] == "next_stop":
+                    source.append("\tdebugger_wait_hook();")
                 if ci[0] == "next_trace":
                     source.append("\tif(m_sr & SR_T)")
                     source.append("\t\tm_next_state = S_TRACE;")
