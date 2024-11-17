@@ -150,9 +150,12 @@ TODO:
   CURSOR pin. The cursor is configured at scanline 0, and causes the games to
   update the next video frame during active display. What is the culprit here?
   For now, it's simply hooked up to vsync.
-- idsoccera gives a subcpu ROM checksum error (hold START at boot). idsoccert
+- idsoccera gives a subcpu ROM checksum error (hold button 1 at boot). idsoccert
   subcpu ROM dump is identical, so it's probably fine? Moreover, idsoccert
   gives maincpu ROM checksum errors.
+- Is idsoccert always hardcoded to single joystick mode? Like with asoccer's
+  single joystick DSW setting, 2nd button switches between characters. Tecfri's
+  pinout diagram does list 2 joysticks though.
 
 *******************************************************************************/
 
@@ -326,7 +329,7 @@ void idsoccer_state::machine_reset()
 {
 	docastle_state::machine_reset();
 
-	m_adpcm_idle = 0;
+	m_adpcm_idle = 1;
 	m_adpcm_data = 0;
 }
 
@@ -818,7 +821,7 @@ static INPUT_PORTS_START( docastle )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(32)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // hold
 	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -827,31 +830,31 @@ static INPUT_PORTS_START( docastle )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SWA:8,7")
-	PORT_DIPSETTING(    0x03, "1 (Beginner)" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPSETTING(    0x00, "4 (Advanced)" )
-	PORT_DIPNAME( 0x04, 0x04, "Rack Test" ) PORT_DIPLOCATION("SWA:6")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SWA:8,7")
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x04, 0x04, "Rack Test" )            PORT_DIPLOCATION("SWA:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Advance Level on Getting Diamond" ) PORT_DIPLOCATION("SWA:5")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Difficulty of EXTRA" ) PORT_DIPLOCATION("SWA:4")
+	PORT_DIPNAME( 0x08, 0x08, "Advance Credit & Level on Diamond" ) PORT_DIPLOCATION("SWA:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, "Difficulty of EXTRA" )  PORT_DIPLOCATION("SWA:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWA:3")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )     PORT_DIPLOCATION("SWA:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:2,1")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )       PORT_DIPLOCATION("SWA:2,1")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWB:8,7,6,5")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )      PORT_DIPLOCATION("SWB:8,7,6,5")
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
@@ -864,7 +867,7 @@ static INPUT_PORTS_START( docastle )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	// 0x01, 0x02, 0x03, 0x04, 0x05 all give 1 Coin/1 Credit
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWB:4,3,2,1")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )      PORT_DIPLOCATION("SWB:4,3,2,1")
 	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
@@ -889,10 +892,10 @@ static INPUT_PORTS_START( dorunrun )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Special" ) PORT_DIPLOCATION("SWA:2")
+	PORT_DIPNAME( 0x40, 0x40, "Special" )              PORT_DIPLOCATION("SWA:2")
 	PORT_DIPSETTING(    0x40, "Given" )
 	PORT_DIPSETTING(    0x00, "Not Given" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )       PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 INPUT_PORTS_END
@@ -901,7 +904,7 @@ static INPUT_PORTS_START( runrun )
 	PORT_INCLUDE( dorunrun )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )       PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 INPUT_PORTS_END
@@ -913,10 +916,10 @@ static INPUT_PORTS_START( dowild )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Special" ) PORT_DIPLOCATION("SWA:2")
+	PORT_DIPNAME( 0x40, 0x40, "Special" )              PORT_DIPLOCATION("SWA:2")
 	PORT_DIPSETTING(    0x40, "Given" )
 	PORT_DIPSETTING(    0x00, "Not Given" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )       PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 INPUT_PORTS_END
@@ -925,15 +928,15 @@ static INPUT_PORTS_START( jjack )
 	PORT_INCLUDE( docastle )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
+	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )          PORT_DIPLOCATION("SWA:8,7")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Extra?" )
+	PORT_DIPNAME( 0x10, 0x10, "Extra?" )               PORT_DIPLOCATION("SWA:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 INPUT_PORTS_END
@@ -942,39 +945,23 @@ static INPUT_PORTS_START( kickridr )
 	PORT_INCLUDE( docastle )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
+	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )          PORT_DIPLOCATION("SWA:8,7")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW2" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SWA:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SWA:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SWA:1" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( idsoccer )
 	PORT_INCLUDE( docastle )
 
 	PORT_MODIFY("JOYS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_PLAYER(2)
-
-	PORT_START("JOYS2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY
@@ -984,29 +971,80 @@ static INPUT_PORTS_START( idsoccer )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(2)
 
+	PORT_START("JOYS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_PLAYER(2)
+
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SWA:8,7")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, "One Player vs. Computer" ) PORT_DIPLOCATION("SW1:!6") // Additional time extended for winning score
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x04, 0x04, "Continuity" )           PORT_DIPLOCATION("SWA:6") // 1P game continues after win
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Player 2 Time Extension" ) PORT_DIPLOCATION("SW1:4") // Player may play same game with additional credit
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Player 1 Time Extension" ) PORT_DIPLOCATION("SW1:3") // Player may play same game with additional credit
+	PORT_DIPNAME( 0x10, 0x10, "Allow Continue (2P)" )  PORT_DIPLOCATION("SWA:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Allow Continue (1P)" )  PORT_DIPLOCATION("SWA:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Real Game Time" )       PORT_DIPLOCATION("SWA:2,1") // Indicator always shows 3:00 and counts down
+	PORT_DIPSETTING(    0x00, "1:00" )
+	PORT_DIPSETTING(    0x40, "2:00" )
+	PORT_DIPSETTING(    0x80, "2:30" )
+	PORT_DIPSETTING(    0xc0, "3:00" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )      PORT_DIPLOCATION("SWB:8,7,6,5")
+	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )      PORT_DIPLOCATION("SWB:4,3,2,1")
+	PORT_DIPSETTING(    0x50, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( asoccer )
+	PORT_INCLUDE( idsoccer )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x04, 0x04, "Joysticks" )            PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(    0x00, "Single" )
+	PORT_DIPSETTING(    0x04, "Dual" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SWA:4" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWA:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Real Game Time" ) PORT_DIPLOCATION("SW1:1,2") // Indicator always shows 3:00 and counts down
-	PORT_DIPSETTING(    0xc0, "3:00" )
-	PORT_DIPSETTING(    0x80, "2:30" )
-	PORT_DIPSETTING(    0x40, "2:00" )
-	PORT_DIPSETTING(    0x00, "1:00" )
 INPUT_PORTS_END
 
 
@@ -1605,7 +1643,7 @@ ROM_END
 GAME( 1983, docastle,   0,        docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (set 1)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1983, docastle2,  docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (set 2)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1983, docastleo,  docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (older)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, douni,      docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do vs. Unicorns",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1983, douni,      docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do! vs. Unicorns (Japan)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dorunrun,   0,        dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 1)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dorunrun2,  dorunrun, dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 2)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dorunrunc,  dorunrun, docastle, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", MACHINE_SUPPORTS_SAVE )
@@ -1619,4 +1657,4 @@ GAME( 1984, kickridr,   0,        dorunrun, kickridr, docastle_state, empty_init
 GAME( 1985, idsoccer,   0,        idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 1)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1985, idsoccera,  idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 2)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1985, idsoccert,  idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal (Tecfri license)", "Indoor Soccer (Tecfri)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1987, asoccer,    idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "American Soccer (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1987, asoccer,    idsoccer, idsoccer, asoccer,  idsoccer_state, empty_init, ROT0,   "Universal", "American Soccer (Japan)",                   MACHINE_SUPPORTS_SAVE )
