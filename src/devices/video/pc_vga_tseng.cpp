@@ -384,6 +384,7 @@ et4kw32i_vga_device::et4kw32i_vga_device(const machine_config &mconfig, const ch
 	m_mmu_space_config = address_space_config("mmu_regs", ENDIANNESS_LITTLE, 8, 15, 0, address_map_constructor(FUNC(et4kw32i_vga_device::mmu_map), this));
 
 	m_acl_idx = 0;
+	m_ima.control = 0;
 }
 
 device_memory_interface::space_config_vector et4kw32i_vga_device::memory_space_config() const
@@ -392,6 +393,19 @@ device_memory_interface::space_config_vector et4kw32i_vga_device::memory_space_c
 	r.emplace_back(std::make_pair(EXT_REG,     &m_acl_space_config));
 	r.emplace_back(std::make_pair(EXT_REG + 1, &m_mmu_space_config));
 	return r;
+}
+
+void et4kw32i_vga_device::device_start()
+{
+	tseng_vga_device::device_start();
+
+	save_item(NAME(m_acl_idx));
+
+	save_item(NAME(m_crtcb.xpos));
+	save_item(NAME(m_crtcb.ypos));
+	save_item(NAME(m_crtcb.address));
+
+	save_item(NAME(m_ima.control));
 }
 
 void et4kw32i_vga_device::crtc_map(address_map &map)
@@ -467,11 +481,7 @@ void et4kw32i_vga_device::acl_data_w(offs_t offset, u8 data)
 	space(EXT_REG).write_byte(m_acl_idx, data);
 }
 
-void et4kw32i_vga_device::acl_map(address_map &map)
-{
-
-}
-
+// TODO: sketchy, essentially stacks MMU on top of normally mirrored VGA memory
 uint8_t et4kw32i_vga_device::mem_r(offs_t offset)
 {
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
@@ -517,3 +527,110 @@ void et4kw32i_vga_device::mem_w(offs_t offset, uint8_t data)
 void et4kw32i_vga_device::mmu_map(address_map &map)
 {
 }
+
+void et4kw32i_vga_device::acl_map(address_map &map)
+{
+	map(0xe0, 0xe1).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_crtcb.xpos >> (offset * 8);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if (offset)
+			{
+				m_crtcb.xpos &= 0xff;
+				m_crtcb.xpos |= (data & 7) << 8;
+			}
+			else
+			{
+				m_crtcb.xpos &= 0x700;
+				m_crtcb.xpos |= (data & 0xff);
+			}
+		})
+	);
+	map(0xe4, 0xe5).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_crtcb.ypos >> (offset * 8);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if (offset)
+			{
+				m_crtcb.ypos &= 0xff;
+				m_crtcb.ypos |= (data & 7) << 8;
+			}
+			else
+			{
+				m_crtcb.ypos &= 0x700;
+				m_crtcb.ypos |= (data & 0xff);
+			}
+		})
+	);
+
+	map(0xe8, 0xea).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_crtcb.address >> (offset * 8);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			const u8 shift = offset * 8;
+			const u32 mask = ~(0xff << shift);
+			m_crtcb.address &= mask;
+			m_crtcb.address |= (data << shift);
+			m_crtcb.address &= 0xfffff;
+		})
+	);
+
+	/*
+	 * x--- ---- CRTCB enable
+	 * -x-- ---- Token outputs/External Sprite enable
+	 * --xx xx-- <reserved>, always 1000
+	 * ---- --x- Interlace Image Port address
+	 * ---- ---x Image Port enable
+	 */
+	map(0xf7, 0xf7).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ima.control;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_ima.control = data;
+			if (data & 0x5f)
+				popmessage("pc_vga_tseng.cpp: IMA $f7 write %02x", data);
+		})
+	);
+}
+
+uint32_t et4kw32i_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	svga_device::screen_update(screen, bitmap, cliprect);
+
+	// HW cursor
+	// TODO: enough for Win95 in 8bpp and not much else
+	if (BIT(m_ima.control, 7))
+	{
+		const u32 base_offs = (m_crtcb.address << 2) + 0x3f0;
+		const u8 transparent_pen = 2;
+
+		for (int y = 0; y < 32; y ++)
+		{
+			int res_y = y + m_crtcb.ypos;
+			for (int x = 0; x < 32; x++)
+			{
+				int res_x = x + m_crtcb.xpos;
+				if (!cliprect.contains(res_x, res_y))
+					continue;
+				// TODO: odd bytes
+				const u32 cursor_address = (((x >> 2) + y * 16) << 1) + base_offs;
+
+				const int xi = (x & 3) * 2;
+				u8 cursor_gfx =  (vga.memory[(cursor_address) % vga.svga_intf.vram_size] >> xi) & 3;
+
+				// TODO: pen 3 really RMW with a xor
+				if (cursor_gfx == transparent_pen)
+					continue;
+
+				bitmap.pix(res_y, res_x) = cursor_gfx & 1 ? 0xffffff : 0x000000;
+			}
+		}
+	}
+
+	return 0;
+}
+

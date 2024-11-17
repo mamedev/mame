@@ -77,9 +77,13 @@ public:
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
 protected:
 	virtual void crtc_map(address_map &map) override ATTR_COLD;
 	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
+
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	virtual space_config_vector memory_space_config() const override;
@@ -91,6 +95,15 @@ private:
 	void mmu_map(address_map &map) ATTR_COLD;
 
 	u8 m_acl_idx;
+
+	struct {
+		u16 xpos, ypos;
+		u32 address;
+	}m_crtcb;
+
+	struct {
+		u8 control;
+	}m_ima;
 };
 
 
