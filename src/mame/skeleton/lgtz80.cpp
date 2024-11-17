@@ -145,7 +145,8 @@ void lgtz80_state::fruitcat_io_map(address_map &map)
 void lgtz80_state::arthurkn_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x88, 0x88).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x88, 0x88).nopw();
+	map(0xa0, 0xa0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xb0, 0xb2).nopw(); // RAMDAC?
 	map(0xc0, 0xc0).rw(FUNC(lgtz80_state::control_r), FUNC(lgtz80_state::control_w));
 	map(0xe0, 0xe0).r(FUNC(lgtz80_state::e0_r));
