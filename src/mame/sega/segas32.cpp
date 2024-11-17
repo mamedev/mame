@@ -5926,7 +5926,6 @@ void segas32_state::init_jleague()
 void segas32_state::init_titlef()
 {
 	segas32_common_init();
-	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8smo_delegate(*this, FUNC(segas32_state::scross_bank_w)));
 	m_sw1_output = &segas32_state::titlef_sw1_output;
 	m_sw2_output = &segas32_state::titlef_sw2_output;
 }
