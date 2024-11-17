@@ -150,16 +150,10 @@ TODO:
   CURSOR pin. The cursor is configured at scanline 0, and causes the games to
   update the next video frame during active display. What is the culprit here?
   For now, it's simply hooked up to vsync.
-- correct adpcm status in idsoccer
-- real values for the adpcm interface in idsoccer
-- bad adpcm sound in attract mode for idsoccer clones (once you get them to boot up)
-- idsoccer clones lock up MAME after writing junk to CRTC. Workaround:
-  idsoccera/idsoccert: maincpu bp 1120 -> pc=1123 -> run
-  asoccer: maincpu bp 1120 -> pc=1135 -> run
-  Or simply ROM_FILL(0x247, 1, 0x23 or 0x35 instead of 0x20) on the subcpu (not
-  guaranteed that a permanent ROM hack like this won't break anything).
-  This 0x1120 is a return address written to the stack after communicating with
-  the subcpu. Maybe protection. See MT05419.
+- verify real values for the adpcm interface in idsoccer
+- idsoccera gives a subcpu ROM checksum error (hold START at boot). idsoccert
+  subcpu ROM dump is identical, so it's probably fine? Moreover, idsoccert
+  gives maincpu ROM checksum errors.
 
 *******************************************************************************/
 
@@ -265,7 +259,8 @@ class idsoccer_state : public docastle_state
 public:
 	idsoccer_state(const machine_config &mconfig, device_type type, const char *tag) :
 		docastle_state(mconfig, type, tag),
-		m_msm(*this, "msm")
+		m_msm(*this, "msm"),
+		m_adpcm_rom(*this, "adpcm")
 	{ }
 
 	void idsoccer(machine_config &config);
@@ -276,11 +271,11 @@ protected:
 
 private:
 	required_device<msm5205_device> m_msm;
+	required_region_ptr<uint8_t> m_adpcm_rom;
 
-	int m_adpcm_pos = 0;
-	int m_adpcm_idle = 0;
-	int m_adpcm_data = 0;
-	int m_adpcm_status = 0;
+	uint32_t m_adpcm_pos = 0;
+	uint32_t m_adpcm_end = 0;
+	uint8_t m_adpcm_idle = 0;
 
 	void idsoccer_map(address_map &map) ATTR_COLD;
 
@@ -307,9 +302,8 @@ void idsoccer_state::machine_start()
 	docastle_state::machine_start();
 
 	save_item(NAME(m_adpcm_pos));
-	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_adpcm_end));
 	save_item(NAME(m_adpcm_idle));
-	save_item(NAME(m_adpcm_status));
 }
 
 void docastle_state::machine_reset()
@@ -330,12 +324,7 @@ void idsoccer_state::machine_reset()
 {
 	docastle_state::machine_reset();
 
-	m_prev_ma6 = 0;
-
-	m_adpcm_pos = 0;
-	m_adpcm_idle = 0;
-	m_adpcm_data = -1;
-	m_adpcm_status = 0;
+	m_adpcm_idle = 1;
 }
 
 
@@ -664,28 +653,22 @@ void docastle_state::subcpu_nmi_w(uint8_t data)
 
 void idsoccer_state::adpcm_int(int state)
 {
-	if (m_adpcm_pos >= memregion("adpcm")->bytes())
+	if (m_adpcm_pos >= m_adpcm_end || m_adpcm_pos >= m_adpcm_rom.bytes() * 2)
 	{
 		m_adpcm_idle = 1;
 		m_msm->reset_w(1);
 	}
-	else if (m_adpcm_data != -1)
-	{
-		m_msm->data_w(m_adpcm_data & 0x0f);
-		m_adpcm_data = -1;
-	}
 	else
 	{
-		m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos++];
-		m_msm->data_w(m_adpcm_data >> 4);
+		uint8_t data = m_adpcm_rom[m_adpcm_pos / 2];
+		m_msm->data_w(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
+		m_adpcm_pos++;
 	}
 }
 
 uint8_t idsoccer_state::adpcm_status_r()
 {
-	// this is wrong, but the samples work anyway!!
-	m_adpcm_status ^= 0x80;
-	return m_adpcm_status;
+	return m_adpcm_idle ? 0 : 0x80;
 }
 
 void idsoccer_state::adpcm_w(uint8_t data)
@@ -695,9 +678,10 @@ void idsoccer_state::adpcm_w(uint8_t data)
 		m_adpcm_idle = 1;
 		m_msm->reset_w(1);
 	}
-	else
+	else if (data & 0x40)
 	{
-		m_adpcm_pos = (data & 0x7f) * 0x200;
+		m_adpcm_pos = (data & 3) * 0x8000;
+		m_adpcm_end = m_adpcm_pos + 0x8000;
 		m_adpcm_idle = 0;
 		m_msm->reset_w(0);
 	}
@@ -1110,9 +1094,9 @@ void idsoccer_state::idsoccer(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(idsoccer_state,dorunrun)
 
 	// sound hardware
-	MSM5205(config, m_msm, 384_kHz_XTAL); // Crystal verified on American Soccer board.
+	MSM5205(config, m_msm, 384_kHz_XTAL); // XTAL verified on American Soccer board
 	m_msm->vck_legacy_callback().set(FUNC(idsoccer_state::adpcm_int)); // interrupt function
-	m_msm->set_prescaler_selector(msm5205_device::S64_4B); // 6 kHz ???
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // 8 kHz?
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
@@ -1509,8 +1493,6 @@ ROM_START( idsoccera )
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "indoor.e6",    0x0000, 0x4000, CRC(a57c7a11) SHA1(9faebad0050da05101811427f350e163a7811396) )
 
-	// some graphic / sound ROMs also differ on this set - verify them
-	// the sound ROM causes bad sound, but the implementation is hacked
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "indoor.p3",    0x00000, 0x8000, CRC(b42a6f4a) SHA1(ddce4438b3649610bd3703cbd7592aaa9a3eda0e) )
 	ROM_LOAD( "indoor.n3",    0x08000, 0x8000, CRC(fa2b1c77) SHA1(0d8e9db065c76621deb58575f01c6ec5ee6cf6b0) )
@@ -1518,7 +1500,7 @@ ROM_START( idsoccera )
 	ROM_LOAD( "indoor.k3",    0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 )
-	ROM_LOAD( "indoor.ic1",   0x0000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) ) // different (causes bad sound in attract, but isn't a bad dump since it has been confirmed on multiple boards)
+	ROM_LOAD( "indoor.ic1",   0x0000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) ) // different
 	ROM_LOAD( "indoor.ic3",   0x8000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
 	ROM_LOAD( "indoor.ic4",   0xc000, 0x4000, CRC(dd5ffaa2) SHA1(4bc4330a54ca93448a8fe05207d3fb1a3a9872e1) )
 
@@ -1619,7 +1601,7 @@ GAME( 1984, dowild,     0,        dorunrun, dowild,   docastle_state, empty_init
 GAME( 1984, jjack,      0,        dorunrun, jjack,    docastle_state, empty_init, ROT270, "Universal", "Jumping Jack",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kickridr,   0,        dorunrun, kickridr, docastle_state, empty_init, ROT0,   "Universal", "Kick Rider",                                MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, idsoccer,   0,        idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 1)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1985, idsoccera,  idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 2)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // see MT05419
-GAME( 1985, idsoccert,  idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal (Tecfri license)", "Indoor Soccer (Tecfri license PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // see MT05419
-GAME( 1987, asoccer,    idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "American Soccer",                           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // see MT05419
+GAME( 1985, idsoccer,   0,        idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 1)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1985, idsoccera,  idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 2)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1985, idsoccert,  idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal (Tecfri license)", "Indoor Soccer (Tecfri)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1987, asoccer,    idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "American Soccer (Japan)",                   MACHINE_SUPPORTS_SAVE )

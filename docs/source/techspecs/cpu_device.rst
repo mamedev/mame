@@ -183,9 +183,9 @@ the access time and false is returned to tell to do the access.
 
 The method ``access_before_delay`` allows to try to run an access
 after a given delay.  The tag is an opaque, non-nullptr value used to
-characterize the source of the delay, so taht the delay is not applied
+characterize the source of the delay, so that the delay is not applied
 multiple times.  Similarly to the previous method cycles are eaten and
-true is returned to abort the access, false do execute it.
+true is returned to abort the access, false to execute it.
 
 .. code-block:: C++
 
