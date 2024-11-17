@@ -150,7 +150,6 @@ TODO:
   CURSOR pin. The cursor is configured at scanline 0, and causes the games to
   update the next video frame during active display. What is the culprit here?
   For now, it's simply hooked up to vsync.
-- verify real values for the adpcm interface in idsoccer
 - idsoccera gives a subcpu ROM checksum error (hold START at boot). idsoccert
   subcpu ROM dump is identical, so it's probably fine? Moreover, idsoccert
   gives maincpu ROM checksum errors.
@@ -173,6 +172,7 @@ TODO:
 #include "tilemap.h"
 
 #define LOG_MAINSUB (1U << 1)
+#define LOG_ADPCM   (2U << 1)
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -227,7 +227,7 @@ protected:
 	uint8_t m_shared_latch = 0;
 	bool m_maincpu_wait = false;
 
-	tilemap_t *m_do_tilemap = nullptr;
+	tilemap_t *m_tilemap = nullptr;
 
 	void main_map(address_map &map) ATTR_COLD;
 	void main_io(address_map &map) ATTR_COLD;
@@ -276,6 +276,7 @@ private:
 	uint32_t m_adpcm_pos = 0;
 	uint32_t m_adpcm_end = 0;
 	uint8_t m_adpcm_idle = 0;
+	uint8_t m_adpcm_data = 0;
 
 	void idsoccer_map(address_map &map) ATTR_COLD;
 
@@ -304,6 +305,7 @@ void idsoccer_state::machine_start()
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_end));
 	save_item(NAME(m_adpcm_idle));
+	save_item(NAME(m_adpcm_data));
 }
 
 void docastle_state::machine_reset()
@@ -324,7 +326,8 @@ void idsoccer_state::machine_reset()
 {
 	docastle_state::machine_reset();
 
-	m_adpcm_idle = 1;
+	m_adpcm_idle = 0;
+	m_adpcm_data = 0;
 }
 
 
@@ -335,15 +338,15 @@ void idsoccer_state::machine_reset()
 
 void docastle_state::video_start()
 {
-	m_do_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(docastle_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_do_tilemap->set_scrolldy(-32, -32);
-	m_do_tilemap->set_transmask(0, 0x00ff, 0);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(docastle_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap->set_scrolldy(-32, -32);
+	m_tilemap->set_transmask(0, 0x00ff, 0);
 }
 
 VIDEO_START_MEMBER(docastle_state,dorunrun)
 {
 	video_start();
-	m_do_tilemap->set_transmask(0, 0xff00, 0);
+	m_tilemap->set_transmask(0, 0xff00, 0);
 }
 
 TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
@@ -416,13 +419,13 @@ void docastle_state::palette(palette_device &palette) const
 void docastle_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
-	m_do_tilemap->mark_tile_dirty(offset);
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 void docastle_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
-	m_do_tilemap->mark_tile_dirty(offset);
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 uint8_t docastle_state::inputs_flipscreen_r(offs_t offset)
@@ -540,9 +543,9 @@ void docastle_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 uint32_t docastle_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_do_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(screen, bitmap, cliprect);
-	m_do_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }
 
@@ -655,6 +658,9 @@ void idsoccer_state::adpcm_int(int state)
 {
 	if (m_adpcm_pos >= m_adpcm_end || m_adpcm_pos >= m_adpcm_rom.bytes() * 2)
 	{
+		if (!m_adpcm_idle)
+			LOGMASKED(LOG_ADPCM, "adpcm_int end @ %X\n", m_adpcm_pos);
+
 		m_adpcm_idle = 1;
 		m_msm->reset_w(1);
 	}
@@ -668,23 +674,32 @@ void idsoccer_state::adpcm_int(int state)
 
 uint8_t idsoccer_state::adpcm_status_r()
 {
+	LOGMASKED(LOG_ADPCM, "adpcm_status_r, idle = %d\n", m_adpcm_idle);
 	return m_adpcm_idle ? 0 : 0x80;
 }
 
 void idsoccer_state::adpcm_w(uint8_t data)
 {
-	if (data & 0x80)
+	if (data != m_adpcm_data)
+		LOGMASKED(LOG_ADPCM, "adpcm_w = %02X\n", data);
+
+	// d7 falling edge: reset adpcm
+	if (BIT(~data & m_adpcm_data, 7))
 	{
 		m_adpcm_idle = 1;
 		m_msm->reset_w(1);
 	}
-	else if (data & 0x40)
+
+	// d6 falling edge: start adpcm
+	if (BIT(~data & m_adpcm_data, 6))
 	{
 		m_adpcm_pos = (data & 3) * 0x8000;
 		m_adpcm_end = m_adpcm_pos + 0x8000;
 		m_adpcm_idle = 0;
 		m_msm->reset_w(0);
 	}
+
+	m_adpcm_data = data;
 }
 
 
@@ -1095,8 +1110,8 @@ void idsoccer_state::idsoccer(machine_config &config)
 
 	// sound hardware
 	MSM5205(config, m_msm, 384_kHz_XTAL); // XTAL verified on American Soccer board
-	m_msm->vck_legacy_callback().set(FUNC(idsoccer_state::adpcm_int)); // interrupt function
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // 8 kHz?
+	m_msm->vck_legacy_callback().set(FUNC(idsoccer_state::adpcm_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
@@ -1469,7 +1484,7 @@ ROM_START( idsoccer )
 	ROM_LOAD( "id08",         0x10000, 0x8000, CRC(5e97eab9) SHA1(40d261a0255c594353816c18aa6c0c245aeb68a8) )
 	ROM_LOAD( "id09",         0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )
+	ROM_REGION( 0x10000, "adpcm", ROMREGION_ERASE00 )
 	ROM_LOAD( "is1",          0x0000, 0x4000, CRC(9eb76196) SHA1(c15331dd8c3efaa83a95245210d05eaaa64b3161) )
 	ROM_LOAD( "is3",          0x8000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
 	ROM_LOAD( "is4",          0xc000, 0x4000, CRC(dd5ffaa2) SHA1(4bc4330a54ca93448a8fe05207d3fb1a3a9872e1) )
@@ -1499,7 +1514,7 @@ ROM_START( idsoccera )
 	ROM_LOAD( "indoor.l3",    0x10000, 0x8000, CRC(2663405c) SHA1(16c054c5c16ace80941523a64654afa3a77d7611) ) // different
 	ROM_LOAD( "indoor.k3",    0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )
+	ROM_REGION( 0x10000, "adpcm", ROMREGION_ERASE00 )
 	ROM_LOAD( "indoor.ic1",   0x0000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) ) // different
 	ROM_LOAD( "indoor.ic3",   0x8000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
 	ROM_LOAD( "indoor.ic4",   0xc000, 0x4000, CRC(dd5ffaa2) SHA1(4bc4330a54ca93448a8fe05207d3fb1a3a9872e1) )
@@ -1529,7 +1544,7 @@ ROM_START( idsoccert ) // UNIVERSAL 8461-A (with TECFRI SA logo) + UNIVERSAL 846
 	ROM_LOAD( "6.l3",         0x10000, 0x8000, CRC(2663405c) SHA1(16c054c5c16ace80941523a64654afa3a77d7611) )
 	ROM_LOAD( "5.k3",         0x18000, 0x8000, CRC(a2a69223) SHA1(6bd9b76e0119643450c9f64c80b52e9056da82d6) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 )
+	ROM_REGION( 0x10000, "adpcm", ROMREGION_ERASE00 )
 	ROM_LOAD( "10_sub-1.ic1", 0x0000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) )
 	// ic2 empty
 	ROM_LOAD( "11_sub-1.ic3", 0x8000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
@@ -1568,7 +1583,7 @@ ROM_START( asoccer )
 	ROM_LOAD( "as8.l3-2",  0x10000, 0x8000, CRC(dafad065) SHA1(a491680b642bd1ea4936f914297e61d4e3ccad88) )
 	ROM_LOAD( "as9.j3-2",  0x18000, 0x8000, CRC(3a2ae776) SHA1(d9682abd30f64c51498c678257797d125b1c6a43) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) // These roms are located on the 8461-SUB board.
+	ROM_REGION( 0x10000, "adpcm", ROMREGION_ERASE00 ) // These roms are located on the 8461-SUB board.
 	ROM_LOAD( "1.ic1",     0x00000, 0x4000, CRC(3bb65dc7) SHA1(499151903b3da9fa2455b3d2c04863b3e33e853d) )
 	// Verified on board that IC2 is not populated.
 	ROM_LOAD( "3.ic3",     0x08000, 0x4000, CRC(27bebba3) SHA1(cf752b22603c1e2a0b33958481c652d6d56ebf68) )
