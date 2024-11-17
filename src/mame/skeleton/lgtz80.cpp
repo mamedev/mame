@@ -25,7 +25,6 @@ fruitcat currently runs off the rails due to seemingly missing code, but fortuit
 
 #include "emu.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/z80/kl5c80a12.h"
 #include "sound/okim6295.h"
 
@@ -139,13 +138,14 @@ void lgtz80_state::fruitcat_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x80, 0x82).nopw(); // RAMDAC?
+	map(0x88, 0x88).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc0, 0xc0).rw(FUNC(lgtz80_state::control_r), FUNC(lgtz80_state::control_w));
 }
 
 void lgtz80_state::arthurkn_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x88, 0x88).nopw();
+	map(0x88, 0x88).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xb0, 0xb2).nopw(); // RAMDAC?
 	map(0xc0, 0xc0).rw(FUNC(lgtz80_state::control_r), FUNC(lgtz80_state::control_w));
 	map(0xe0, 0xe0).r(FUNC(lgtz80_state::e0_r));
