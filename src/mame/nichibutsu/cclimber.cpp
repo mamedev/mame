@@ -429,13 +429,13 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<ls259_device> m_mainlatch;
-	required_shared_ptr<uint8_t> m_bigsprite_videoram;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_bigsprite_control;
-	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<u8> m_bigsprite_videoram;
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_spriteram;
+	required_shared_ptr<u8> m_bigsprite_control;
+	required_shared_ptr<u8> m_colorram;
 
-	std::unique_ptr<uint8_t[]> m_opcodes;
+	std::unique_ptr<u8[]> m_opcodes;
 
 	bool m_flip_x = false;
 	bool m_flip_y = false;
@@ -444,15 +444,15 @@ protected:
 	tilemap_t *m_bs_tilemap = nullptr;
 
 	void nmi_mask_w(int state);
-	void cclimber_colorram_w(offs_t offset, uint8_t data);
+	void cclimber_colorram_w(offs_t offset, u8 data);
 	void flip_screen_x_w(int state) { m_flip_x = state; }
 	void flip_screen_y_w(int state) { m_flip_y = state; }
 
 	void cclimber_portmap(address_map &map) ATTR_COLD;
 
 	void vblank_irq(int state);
-	void sound_nmi_clear_w(uint8_t data);
-	uint8_t sound_nmi_clear_r();
+	void sound_nmi_clear_w(u8 data);
+	u8 sound_nmi_clear_r();
 
 	TILE_GET_INFO_MEMBER(cclimber_get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(cclimber_get_bs_tile_info);
@@ -462,8 +462,8 @@ protected:
 	void toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 
 private:
-	optional_shared_ptr<uint8_t> m_column_scroll;
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	optional_shared_ptr<u8> m_column_scroll;
+	optional_shared_ptr<u8> m_decrypted_opcodes;
 
 	bool m_nmi_mask = false;
 
@@ -471,10 +471,10 @@ private:
 
 	void cclimber_palette(palette_device &palette) const;
 
-	uint32_t screen_update_cclimber(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_cclimber(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
-	void cclimber_decode(const uint8_t convtable[8][16]);
+	void cclimber_decode(const u8 convtable[8][16]);
 
 	void bagmanf_map(address_map &map) ATTR_COLD;
 	void cannonb_map(address_map &map) ATTR_COLD;
@@ -503,13 +503,13 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	optional_shared_ptr<uint8_t> m_bgcolor;
+	optional_shared_ptr<u8> m_bgcolor;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 	bool m_sidebg_enabled = false;
 	bool m_palettebank = false;
 
-	uint8_t soundlatch_read_and_clear();
+	u8 soundlatch_read_and_clear();
 	void sidebg_enable_w(int state) { m_sidebg_enabled = state; }
 	void palette_bank_w(int state) { m_palettebank = state; }
 
@@ -522,7 +522,7 @@ private:
 
 	void swimmer_palette(palette_device &palette) const;
 	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element* gfx);
-	uint32_t screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_background_pen();
 	TILE_GET_INFO_MEMBER(swimmer_get_pf_tile_info);
 };
@@ -546,8 +546,8 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	optional_shared_ptr<uint8_t> m_bg_videoram;
-	optional_shared_ptr<uint8_t> m_bg_coloram;
+	optional_shared_ptr<u8> m_bg_videoram;
+	optional_shared_ptr<u8> m_bg_coloram;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank1d;
 
@@ -559,7 +559,7 @@ private:
 	void toprollr_palette(palette_device &palette) const;
 	void toprollr_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void toprollr_rombank_w(int state);
-	uint32_t screen_update_toprollr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_toprollr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(toprollr_get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(toprollr_get_bs_tile_info);
 	TILE_GET_INFO_MEMBER(toproller_get_bg_tile_info);
@@ -579,7 +579,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	required_region_ptr<uint8_t> m_gradient_rom;
+	required_region_ptr<u8> m_gradient_rom;
 
 	bitmap_ind16 m_dest_bitmap;
 
@@ -590,7 +590,7 @@ private:
 	void yamato_audio_portmap(address_map &map) ATTR_COLD;
 
 	void yamato_palette(palette_device &palette) const;
-	uint32_t screen_update_yamato(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_yamato(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -625,7 +625,7 @@ void cclimber_state::machine_start()
 
 void cclimber_state::cclimber_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	const u8 *color_prom = memregion("proms")->base();
 	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
 	static constexpr int resistances_b [2] = { 470, 220 };
 
@@ -700,7 +700,7 @@ void cclimber_state::cclimber_palette(palette_device &palette) const
 
 void swimmer_state::swimmer_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	const u8 *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 0x100; i++)
 	{
@@ -767,7 +767,7 @@ void swimmer_state::swimmer_palette(palette_device &palette) const
 
 void yamato_state::yamato_palette(palette_device &palette) const
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	u8 const *const color_prom = memregion("proms")->base();
 
 	// chars - 12 bits RGB
 	for (int i = 0; i < 0x40; i++)
@@ -828,7 +828,7 @@ void yamato_state::yamato_palette(palette_device &palette) const
 
 void toprollr_state::toprollr_palette(palette_device &palette) const
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	u8 const *const color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 0xa0; i++)
 	{
@@ -900,7 +900,7 @@ void swimmer_state::set_background_pen()
 }
 
 
-void cclimber_state::cclimber_colorram_w(offs_t offset, uint8_t data)
+void cclimber_state::cclimber_colorram_w(offs_t offset, u8 data)
 {
 	// A5 is not connected, there is only 0x200 bytes of RAM
 	m_colorram[offset & ~0x20] = data;
@@ -1061,8 +1061,8 @@ void cclimber_state::draw_playfield(screen_device &screen, bitmap_ind16 &bitmap,
 
 void cclimber_state::cclimber_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t x = m_bigsprite_control[3] - 8;
-	uint8_t y = m_bigsprite_control[2];
+	u8 x = m_bigsprite_control[3] - 8;
+	u8 y = m_bigsprite_control[2];
 	int bigsprite_flip_x = (m_bigsprite_control[1] & 0x10) >> 4;
 	int bigsprite_flip_y = (m_bigsprite_control[1] & 0x20) >> 5;
 
@@ -1085,8 +1085,8 @@ void cclimber_state::cclimber_draw_bigsprite(screen_device &screen, bitmap_ind16
 
 void toprollr_state::toprollr_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t x = m_bigsprite_control[3] - 8;
-	uint8_t y = m_bigsprite_control[2];
+	u8 x = m_bigsprite_control[3] - 8;
+	u8 y = m_bigsprite_control[2];
 
 	if (m_flip_x)
 		x = 0x80 - x;
@@ -1210,7 +1210,7 @@ void swimmer_state::swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 }
 
 
-uint32_t cclimber_state::screen_update_cclimber(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 cclimber_state::screen_update_cclimber(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	draw_playfield(screen, bitmap, cliprect);
@@ -1232,24 +1232,24 @@ uint32_t cclimber_state::screen_update_cclimber(screen_device &screen, bitmap_in
 }
 
 
-uint32_t yamato_state::screen_update_yamato(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 yamato_state::screen_update_yamato(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
 	// gradient bank from 74259
-	uint16_t bank = bitswap<3>(m_mainlatch->output_state(),3,5,6) << 8;
+	u16 bank = bitswap<3>(m_mainlatch->output_state(),3,5,6) << 8;
 	bank |= m_flip_x ? 0x80 : 0;
 
 	// fill in the gradient
 	for (int i = 0; i < 0x80; i++)
 	{
-		const uint8_t data0 = m_gradient_rom[0x0000 | bank | i];
-		const uint8_t data1 = m_gradient_rom[0x1000 | bank | i];
+		const u8 data0 = m_gradient_rom[0x0000 | bank | i];
+		const u8 data1 = m_gradient_rom[0x1000 | bank | i];
 
-		uint8_t r = pal5bit(data0 & 0x1f);
-		uint8_t g = pal5bit(data0 >> 5 | (data1 << 3 & 0x18));
-		uint8_t b = pal6bit(data1 >> 2);
-		uint32_t color = r << 16 | g << 8 | b;
+		u8 r = pal5bit(data0 & 0x1f);
+		u8 g = pal5bit(data0 >> 5 | (data1 << 3 & 0x18));
+		u8 b = pal6bit(data1 >> 2);
+		u32 color = r << 16 | g << 8 | b;
 
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
@@ -1293,7 +1293,7 @@ uint32_t yamato_state::screen_update_yamato(screen_device &screen, bitmap_rgb32 
 }
 
 
-uint32_t swimmer_state::screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 swimmer_state::screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_bgcolor)
 		set_background_pen();
@@ -1301,7 +1301,7 @@ uint32_t swimmer_state::screen_update_swimmer(screen_device &screen, bitmap_ind1
 	// fill side panel background
 	if (m_sidebg_enabled)
 	{
-		const uint8_t split_pos = 0x18 * 8;
+		const u8 split_pos = 0x18 * 8;
 
 		if (m_flip_x)
 		{
@@ -1348,7 +1348,7 @@ uint32_t swimmer_state::screen_update_swimmer(screen_device &screen, bitmap_ind1
 }
 
 
-uint32_t toprollr_state::screen_update_toprollr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 toprollr_state::screen_update_toprollr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle scroll_area_clip = cliprect;
 	scroll_area_clip.min_x = (m_flip_x ? 3 : 5) * 8;
@@ -1405,12 +1405,12 @@ void cclimber_state::bagmanf_vblank_irq(int state)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-void cclimber_state::sound_nmi_clear_w(uint8_t data)
+void cclimber_state::sound_nmi_clear_w(u8 data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-uint8_t cclimber_state::sound_nmi_clear_r()
+u8 cclimber_state::sound_nmi_clear_r()
 {
 	if (!machine().side_effects_disabled())
 		sound_nmi_clear_w(0);
@@ -1418,9 +1418,9 @@ uint8_t cclimber_state::sound_nmi_clear_r()
 }
 
 
-uint8_t swimmer_state::soundlatch_read_and_clear()
+u8 swimmer_state::soundlatch_read_and_clear()
 {
-	uint8_t res = m_soundlatch->read();
+	u8 res = m_soundlatch->read();
 
 	// An extra flip-flop is used to clear the LS273 after reading it through a LS245
 	// (this flip-flop is then cleared in sync with the sound CPU clock)
@@ -1433,7 +1433,7 @@ uint8_t swimmer_state::soundlatch_read_and_clear()
 
 void toprollr_state::toprollr_rombank_w(int state)
 {
-	uint8_t bank = m_mainlatch->output_state() >> 5 & 3;
+	u8 bank = m_mainlatch->output_state() >> 5 & 3;
 
 	if (bank < 3)
 	{
@@ -4097,13 +4097,13 @@ ROM_START( toprollr )
 ROM_END
 
 
-void cclimber_state::cclimber_decode(const uint8_t convtable[8][16])
+void cclimber_state::cclimber_decode(const u8 convtable[8][16])
 {
-	uint8_t *rom = memregion("maincpu")->base();
+	u8 *rom = memregion("maincpu")->base();
 
 	for (int A = 0x0000; A < 0x6000; A++)
 	{
-		uint8_t src = rom[A];
+		u8 src = rom[A];
 
 		// pick the translation table from bit 0 of the address
 		// and from bits 1 7 of the source data
@@ -4119,7 +4119,7 @@ void cclimber_state::cclimber_decode(const uint8_t convtable[8][16])
 
 void cclimber_state::init_cclimber()
 {
-	static const uint8_t convtable[8][16] =
+	static const u8 convtable[8][16] =
 	{
 		// 0xff marks spots which are unused and therefore unknown
 		{ 0x44,0x14,0x54,0x10,0x11,0x41,0x05,0x50,0x51,0x00,0x40,0x55,0x45,0x04,0x01,0x15 },
@@ -4137,7 +4137,7 @@ void cclimber_state::init_cclimber()
 
 void cclimber_state::init_cclimberj()
 {
-	static const uint8_t convtable[8][16] =
+	static const u8 convtable[8][16] =
 	{
 		{ 0x41,0x54,0x51,0x14,0x05,0x10,0x01,0x55,0x44,0x11,0x00,0x50,0x15,0x40,0x04,0x45 },
 		{ 0x50,0x11,0x40,0x55,0x51,0x14,0x45,0x04,0x54,0x15,0x10,0x05,0x44,0x01,0x00,0x41 },
@@ -4155,7 +4155,7 @@ void cclimber_state::init_cclimberj()
 
 void cclimber_state::init_ckongb()
 {
-	uint8_t *rom = memregion("maincpu")->base();
+	u8 *rom = memregion("maincpu")->base();
 
 	// all the program ROMs are encrypted
 	for (int A = 0x0000; A < 0x6000; A++)
@@ -4164,7 +4164,7 @@ void cclimber_state::init_ckongb()
 
 void cclimber_state::init_dking()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
+	u8 *rom = memregion( "maincpu" )->base();
 
 	for (int j = 0; j < 0x5000; j += 0x1000)
 	{
@@ -4178,7 +4178,7 @@ void cclimber_state::init_dking()
 
 void cclimber_state::init_rpatrol()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
+	u8 *rom = memregion( "maincpu" )->base();
 
 	// Bits are inverted
 	for (int i = 0x0000; i < 0x5000; i++)
@@ -4192,14 +4192,14 @@ void cclimber_state::init_rpatrol()
 
 void cclimber_state::init_cannonb()
 {
-	uint8_t *rom = memregion("maincpu")->base();
+	u8 *rom = memregion("maincpu")->base();
 
 	// only first ROM is encrypted
 	for (int A = 0x0000; A < 0x1000; A++)
 	{
-		static const uint8_t xor_tab[4] = { 0x92, 0x82, 0x12, 0x10 };
+		static const u8 xor_tab[4] = { 0x92, 0x82, 0x12, 0x10 };
 
-		uint8_t src = rom[A + 0x10000];
+		u8 src = rom[A + 0x10000];
 		int i = ((A & 0x200) >> 8) | ((A & 0x80) >> 7);
 		src ^= xor_tab[i];
 
@@ -4213,7 +4213,7 @@ void cclimber_state::init_cannonb2()
 {
 	// set to 1 to fix protection check after bonus round (see notes in pacman.cpp driver)
 #if 0
-	uint8_t *rom = memregion("maincpu")->base();
+	u8 *rom = memregion("maincpu")->base();
 
 	rom[0x2ba0] = 0x21;
 	rom[0x2ba1] = 0xfb;
@@ -4225,7 +4225,7 @@ void cclimber_state::init_cannonb2()
 
 void toprollr_state::init_toprollr()
 {
-	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
+	m_opcodes = std::make_unique<u8[]>(0x6000*3);
 
 	segacrpt_z80_device &cpu = downcast<segacrpt_z80_device &>(*m_maincpu);
 	cpu.set_region_p(memregion("user1")->base());

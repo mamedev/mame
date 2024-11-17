@@ -218,16 +218,16 @@ protected:
 	required_device_array<tms1025_device, 2> m_inp;
 
 	// memory pointers
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_colorram;
+	required_shared_ptr<u8> m_spriteram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	// misc
-	uint8_t m_prev_ma6 = 0;
-	uint8_t m_shared_latch = 0;
+	u8 m_prev_ma6 = 0;
+	u8 m_shared_latch = 0;
 	bool m_maincpu_wait = false;
 
 	tilemap_t *m_tilemap = nullptr;
@@ -240,20 +240,20 @@ protected:
 	void dorunrun_sub_map(address_map &map) ATTR_COLD;
 
 	void docastle_tint(int state);
-	uint8_t main_from_sub_r(offs_t offset);
-	void main_to_sub_w(offs_t offset, uint8_t data);
-	uint8_t sub_from_main_r(offs_t offset);
-	void sub_to_main_w(offs_t offset, uint8_t data);
-	void subcpu_nmi_w(uint8_t data);
-	void videoram_w(offs_t offset, uint8_t data);
-	void colorram_w(offs_t offset, uint8_t data);
-	uint8_t inputs_flipscreen_r(offs_t offset);
-	void flipscreen_w(offs_t offset, uint8_t data);
+	u8 main_from_sub_r(offs_t offset);
+	void main_to_sub_w(offs_t offset, u8 data);
+	u8 sub_from_main_r(offs_t offset);
+	void sub_to_main_w(offs_t offset, u8 data);
+	void subcpu_nmi_w(u8 data);
+	void videoram_w(offs_t offset, u8 data);
+	void colorram_w(offs_t offset, u8 data);
+	u8 inputs_flipscreen_r(offs_t offset);
+	void flipscreen_w(offs_t offset, u8 data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(dorunrun);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -274,17 +274,17 @@ protected:
 
 private:
 	required_device<msm5205_device> m_msm;
-	required_region_ptr<uint8_t> m_adpcm_rom;
+	required_region_ptr<u8> m_adpcm_rom;
 
-	uint32_t m_adpcm_pos = 0;
-	uint32_t m_adpcm_end = 0;
-	uint8_t m_adpcm_idle = 0;
-	uint8_t m_adpcm_data = 0;
+	u32 m_adpcm_pos = 0;
+	u32 m_adpcm_end = 0;
+	u8 m_adpcm_idle = 0;
+	u8 m_adpcm_data = 0;
 
 	void idsoccer_map(address_map &map) ATTR_COLD;
 
-	uint8_t adpcm_status_r();
-	void adpcm_w(uint8_t data);
+	u8 adpcm_status_r();
+	void adpcm_w(u8 data);
 	void adpcm_int(int state);
 };
 
@@ -386,7 +386,7 @@ GFXDECODE_END
 
 void docastle_state::palette(palette_device &palette) const
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	u8 const *const color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 256; i++)
 	{
@@ -419,21 +419,21 @@ void docastle_state::palette(palette_device &palette) const
 }
 
 
-void docastle_state::videoram_w(offs_t offset, uint8_t data)
+void docastle_state::videoram_w(offs_t offset, u8 data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-void docastle_state::colorram_w(offs_t offset, uint8_t data)
+void docastle_state::colorram_w(offs_t offset, u8 data)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-uint8_t docastle_state::inputs_flipscreen_r(offs_t offset)
+u8 docastle_state::inputs_flipscreen_r(offs_t offset)
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	if (!machine().side_effects_disabled())
 	{
@@ -449,7 +449,7 @@ uint8_t docastle_state::inputs_flipscreen_r(offs_t offset)
 	return data;
 }
 
-void docastle_state::flipscreen_w(offs_t offset, uint8_t data)
+void docastle_state::flipscreen_w(offs_t offset, u8 data)
 {
 	flip_screen_set(BIT(offset, 7));
 }
@@ -544,7 +544,7 @@ void docastle_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 	}
 }
 
-uint32_t docastle_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 docastle_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(screen, bitmap, cliprect);
@@ -585,7 +585,7 @@ timing needs to be cycle-accurate, both CPUs do LDIR opcodes in lockstep.
 
 */
 
-uint8_t docastle_state::main_from_sub_r(offs_t offset)
+u8 docastle_state::main_from_sub_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -614,7 +614,7 @@ uint8_t docastle_state::main_from_sub_r(offs_t offset)
 	return m_shared_latch;
 }
 
-void docastle_state::main_to_sub_w(offs_t offset, uint8_t data)
+void docastle_state::main_to_sub_w(offs_t offset, u8 data)
 {
 	LOGMASKED(LOG_MAINSUB, "%dW%02X ", offset, data);
 
@@ -623,7 +623,7 @@ void docastle_state::main_to_sub_w(offs_t offset, uint8_t data)
 	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 }
 
-uint8_t docastle_state::sub_from_main_r(offs_t offset)
+u8 docastle_state::sub_from_main_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -634,7 +634,7 @@ uint8_t docastle_state::sub_from_main_r(offs_t offset)
 	return m_shared_latch;
 }
 
-void docastle_state::sub_to_main_w(offs_t offset, uint8_t data)
+void docastle_state::sub_to_main_w(offs_t offset, u8 data)
 {
 	LOGMASKED(LOG_MAINSUB, "%dw%02X ", offset, data);
 
@@ -643,7 +643,7 @@ void docastle_state::sub_to_main_w(offs_t offset, uint8_t data)
 }
 
 
-void docastle_state::subcpu_nmi_w(uint8_t data)
+void docastle_state::subcpu_nmi_w(u8 data)
 {
 	LOGMASKED(LOG_MAINSUB, "%s trigger subcpu NMI\n", machine().describe_context());
 
@@ -669,19 +669,19 @@ void idsoccer_state::adpcm_int(int state)
 	}
 	else
 	{
-		uint8_t data = m_adpcm_rom[m_adpcm_pos / 2];
+		u8 data = m_adpcm_rom[m_adpcm_pos / 2];
 		m_msm->data_w(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
 		m_adpcm_pos++;
 	}
 }
 
-uint8_t idsoccer_state::adpcm_status_r()
+u8 idsoccer_state::adpcm_status_r()
 {
 	LOGMASKED(LOG_ADPCM, "adpcm_status_r, idle = %d\n", m_adpcm_idle);
 	return m_adpcm_idle ? 0 : 0x80;
 }
 
-void idsoccer_state::adpcm_w(uint8_t data)
+void idsoccer_state::adpcm_w(u8 data)
 {
 	if (data != m_adpcm_data)
 		LOGMASKED(LOG_ADPCM, "adpcm_w = %02X\n", data);
