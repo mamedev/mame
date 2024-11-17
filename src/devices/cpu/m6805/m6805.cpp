@@ -459,7 +459,7 @@ void m6805_base_device::interrupt_vector()
 /* Generate interrupts */
 void m6805_base_device::interrupt()
 {
-	/* the 6805 latches interrupt requessr internally, so we don't clear */
+	/* the 6805 latches interrupt requests internally, so we don't clear */
 	/* pending_interrupts until the interrupt is taken, no matter what the */
 	/* external IRQ pin does. */
 
