@@ -12,19 +12,21 @@ scratched off square 44-pin chip, stickered ASIC 4
 12 MHz XTAL (near ASIC 2)
 7.3728 MHz XTAL (near ASIC 4)
 U6295 sound chip
-HM86171-80 RAM (near CPU ROM)
+HM86171-80 RAMDAC (near CPU ROM)
 6x M5M5256DVP (1 near CPU ROM, 5 near GFX ROMs)
 
 The two dumped games use PCBs with different layout, however the components appear
 to be the same or at least same from different manufacturers.
 
-TODO: everything. Exact CPU model isn't identified, but it's surely a Z80 derivative.
+TODO: everything. "ASIC 1" is probably a KL5C80A12 CPU, though its on-chip peripherals are mostly unused.
+fruitcat currently runs off the rails due to seemingly missing code, but fortuitously recovers.
 */
 
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/z80/kl5c80a12.h"
 #include "sound/okim6295.h"
 
 #include "emupal.h"
@@ -44,7 +46,8 @@ public:
 		m_control(0)
 	{ }
 
-	void lgtz80(machine_config &config) ATTR_COLD;
+	void fruitcat(machine_config &config) ATTR_COLD;
+	void arthurkn(machine_config &config) ATTR_COLD;
 
 	void init_arthurkn() ATTR_COLD;
 	void init_fruitcat() ATTR_COLD;
@@ -55,17 +58,22 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<kl5c80a12_device> m_maincpu;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint8_t control_r();
-	void control_w(uint8_t data);
+	void vblank_nmi_w(int state);
+
+	void p0_w(u8 data);
+	u8 control_r();
+	void control_w(u8 data);
+	u8 e0_r();
 
 	void program_map(address_map &map) ATTR_COLD;
-	void io_map(address_map &map) ATTR_COLD;
+	void fruitcat_io_map(address_map &map) ATTR_COLD;
+	void arthurkn_io_map(address_map &map) ATTR_COLD;
 
-	uint8_t m_control;
+	u8 m_control;
 };
 
 
@@ -76,7 +84,7 @@ void lgtz80_state::machine_start()
 
 void lgtz80_state::machine_reset()
 {
-	m_control = 0;
+	control_w(0);
 }
 
 uint32_t lgtz80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -89,63 +97,91 @@ void lgtz80_state::video_start()
 }
 
 
-uint8_t lgtz80_state::control_r()
+void lgtz80_state::p0_w(u8 data)
+{
+	logerror("%s: p0_w(%02X)\n", machine().describe_context(), data);
+}
+
+u8 lgtz80_state::control_r()
 {
 	return m_control;
 }
 
-void lgtz80_state::control_w(uint8_t data)
+void lgtz80_state::control_w(u8 data)
 {
 	// Bit 7 = NMI mask
-	logerror("%s: control_w(%02X)\n", machine().describe_context(), data);
 	m_control = data;
+	if (!BIT(data, 7))
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+u8 lgtz80_state::e0_r()
+{
+	// arthurkn: protection?
+	return 0x6e;
+}
+
+void lgtz80_state::vblank_nmi_w(int state)
+{
+	if (state && BIT(m_control, 7))
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 void lgtz80_state::program_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).ram(); // NVRAM?
-	map(0xb000, 0xbfff).rom(); // not correct
-	map(0xf800, 0xffff).ram();
+	map(0x00000, 0x1ffff).rom();
+	map(0x28000, 0x29fff).ram(); // NVRAM?
+	map(0x2a000, 0x2bfff).ram(); // arthurkn needs to copy code to RAM here, but fruitcat doesn't initialize it!
+	map(0x4c000, 0x4efff).ram(); // video RAM?
 }
 
-void lgtz80_state::io_map(address_map &map)
+void lgtz80_state::fruitcat_io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x80, 0x82).nopw(); // RAMDAC?
 	map(0xc0, 0xc0).rw(FUNC(lgtz80_state::control_r), FUNC(lgtz80_state::control_w));
+}
+
+void lgtz80_state::arthurkn_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x88, 0x88).nopw();
+	map(0xb0, 0xb2).nopw(); // RAMDAC?
+	map(0xc0, 0xc0).rw(FUNC(lgtz80_state::control_r), FUNC(lgtz80_state::control_w));
+	map(0xe0, 0xe0).r(FUNC(lgtz80_state::e0_r));
 }
 
 
 static INPUT_PORTS_START( fruitcat )
-	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 // no DSW on PCB
 INPUT_PORTS_END
@@ -156,12 +192,15 @@ static GFXDECODE_START( gfx_lgtz80 )
 GFXDECODE_END
 
 
-void lgtz80_state::lgtz80(machine_config &config)
+void lgtz80_state::fruitcat(machine_config &config)
 {
-	Z80(config, m_maincpu, 12_MHz_XTAL / 4 ); // exact CPU model and divider not verified
+	KL5C80A12(config, m_maincpu, 12_MHz_XTAL); // exact CPU model and divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &lgtz80_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &lgtz80_state::io_map);
-	// m_maincpu->set_vblank_int("screen", FUNC(lgtz80_state::irq0_line_hold));
+	m_maincpu->set_addrmap(AS_IO, &lgtz80_state::fruitcat_io_map);
+	m_maincpu->out_p0_callback().set(FUNC(lgtz80_state::p0_w));
+	m_maincpu->in_p1_callback().set_ioport("IN1");
+	m_maincpu->in_p2_callback().set_ioport("IN2");
+	m_maincpu->in_p3_callback().set_ioport("IN3");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
 	screen.set_refresh_hz(60);
@@ -169,6 +208,7 @@ void lgtz80_state::lgtz80(machine_config &config)
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
 	screen.set_screen_update(FUNC(lgtz80_state::screen_update));
+	screen.screen_vblank().set(FUNC(lgtz80_state::vblank_nmi_w));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_lgtz80);
 
@@ -177,6 +217,12 @@ void lgtz80_state::lgtz80(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // pin 7 and clock not verified
+}
+
+void lgtz80_state::arthurkn(machine_config &config)
+{
+	fruitcat(config);
+	m_maincpu->set_addrmap(AS_IO, &lgtz80_state::arthurkn_io_map);
 }
 
 
@@ -214,7 +260,7 @@ ROM_END
 void lgtz80_state::init_fruitcat()
 {
 	// Encryption involves a permutation of odd-numbered data lines, conditional on address lines
-	uint8_t *rom = memregion("maincpu")->base();
+	u8 *rom = memregion("maincpu")->base();
 	for (int i = 0; i < 0x20000; i++)
 	{
 		switch (i & 0x7c0)
@@ -329,7 +375,7 @@ void lgtz80_state::init_fruitcat()
 void lgtz80_state::init_arthurkn()
 {
 	// Encryption involves a permutation of odd-numbered data lines, conditional on address lines
-	uint8_t *rom = memregion("maincpu")->base();
+	u8 *rom = memregion("maincpu")->base();
 	for (int i = 0; i < 0x20000; i++)
 	{
 		switch (i & 0x7c0)
@@ -444,5 +490,5 @@ void lgtz80_state::init_arthurkn()
 } // anonymous namespace
 
 
-GAME( 2003?, fruitcat, 0, lgtz80, fruitcat, lgtz80_state, init_fruitcat, ROT0, "LGT", "Fruit Cat (v2.00)", MACHINE_IS_SKELETON )
-GAME( 200?,  arthurkn, 0, lgtz80, fruitcat, lgtz80_state, init_arthurkn, ROT0, "LGT", "Arthur's Knights",  MACHINE_IS_SKELETON )
+GAME( 2003?, fruitcat, 0, fruitcat, fruitcat, lgtz80_state, init_fruitcat, ROT0, "LGT", "Fruit Cat (v2.00)", MACHINE_IS_SKELETON )
+GAME( 200?,  arthurkn, 0, arthurkn, fruitcat, lgtz80_state, init_arthurkn, ROT0, "LGT", "Arthur's Knights",  MACHINE_IS_SKELETON )
