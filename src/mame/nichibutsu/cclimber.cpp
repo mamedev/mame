@@ -379,6 +379,11 @@ void cclimber_state::machine_start()
 }
 
 
+
+/*******************************************************************************
+    I/O
+*******************************************************************************/
+
 void cclimber_state::nmi_mask_w(int state)
 {
 	m_nmi_mask = state;
@@ -435,6 +440,11 @@ void toprollr_state::toprollr_rombank_w(int state)
 		logerror("invalid ROM bank %d\n", bank); // doesn't happen
 }
 
+
+
+/*******************************************************************************
+    Address Maps
+*******************************************************************************/
 
 /* Note that River Patrol reads/writes to a000-a4f0. This is a bug in the code.
    The instruction at 0x0593 should say LD DE,$8000 */
@@ -704,6 +714,11 @@ void cclimber_state::tangramq_sound_map(address_map &map)
 	map(0xe000, 0xe3ff).ram();
 }
 
+
+
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( cclimber )
 	PORT_START("P1")
@@ -1353,6 +1368,11 @@ static INPUT_PORTS_START( au )
 INPUT_PORTS_END
 
 
+
+/*******************************************************************************
+    GFX Layouts
+*******************************************************************************/
+
 static const gfx_layout cclimber_charlayout =
 {
 	8,8,
@@ -1456,6 +1476,11 @@ static GFXDECODE_START( gfx_au )
 	GFXDECODE_ENTRY( "bigsprite", 0x0000, swimmer_charlayout,  0,  8 ) // big sprites
 GFXDECODE_END
 
+
+
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 void cclimber_state::root(machine_config &config)
 {
@@ -1704,11 +1729,10 @@ void swimmer_state::au(machine_config &config)
 }
 
 
-/***************************************************************************
 
-  Game driver(s)
-
-***************************************************************************/
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( cclimber )
 	ROM_REGION( 0x6000, "maincpu", 0 )
@@ -3069,6 +3093,132 @@ ROM_START( toprollr )
 ROM_END
 
 
+void cclimber_state::cclimber_decode(const uint8_t convtable[8][16])
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int A = 0x0000; A < 0x6000; A++)
+	{
+		uint8_t src = rom[A];
+
+		// pick the translation table from bit 0 of the address
+		// and from bits 1 7 of the source data
+		int i = (A & 1) | (src & 0x02) | ((src & 0x80) >> 5);
+
+		// pick the offset in the table from bits 0 2 4 6 of the source data
+		int j = (src & 0x01) | ((src & 0x04) >> 1) | ((src & 0x10) >> 2) | ((src & 0x40) >> 3);
+
+		// decode the opcodes
+		m_decrypted_opcodes[A] = (src & 0xaa) | convtable[i][j];
+	}
+}
+
+void cclimber_state::init_cclimber()
+{
+	static const uint8_t convtable[8][16] =
+	{
+		// 0xff marks spots which are unused and therefore unknown
+		{ 0x44,0x14,0x54,0x10,0x11,0x41,0x05,0x50,0x51,0x00,0x40,0x55,0x45,0x04,0x01,0x15 },
+		{ 0x44,0x10,0x15,0x55,0x00,0x41,0x40,0x51,0x14,0x45,0x11,0x50,0x01,0x54,0x04,0x05 },
+		{ 0x45,0x10,0x11,0x44,0x05,0x50,0x51,0x04,0x41,0x14,0x15,0x40,0x01,0x54,0x55,0x00 },
+		{ 0x04,0x51,0x45,0x00,0x44,0x10,0xff,0x55,0x11,0x54,0x50,0x40,0x05,0xff,0x14,0x01 },
+		{ 0x54,0x51,0x15,0x45,0x44,0x01,0x11,0x41,0x04,0x55,0x50,0xff,0x00,0x10,0x40,0xff },
+		{ 0xff,0x54,0x14,0x50,0x51,0x01,0xff,0x40,0x41,0x10,0x00,0x55,0x05,0x44,0x11,0x45 },
+		{ 0x51,0x04,0x10,0xff,0x50,0x40,0x00,0xff,0x41,0x01,0x05,0x15,0x11,0x14,0x44,0x54 },
+		{ 0xff,0xff,0x54,0x01,0x15,0x40,0x45,0x41,0x51,0x04,0x50,0x05,0x11,0x44,0x10,0x14 }
+	};
+
+	cclimber_decode(convtable);
+}
+
+void cclimber_state::init_cclimberj()
+{
+	static const uint8_t convtable[8][16] =
+	{
+		{ 0x41,0x54,0x51,0x14,0x05,0x10,0x01,0x55,0x44,0x11,0x00,0x50,0x15,0x40,0x04,0x45 },
+		{ 0x50,0x11,0x40,0x55,0x51,0x14,0x45,0x04,0x54,0x15,0x10,0x05,0x44,0x01,0x00,0x41 },
+		{ 0x44,0x11,0x00,0x50,0x41,0x54,0x04,0x14,0x15,0x40,0x51,0x55,0x05,0x10,0x01,0x45 },
+		{ 0x10,0x50,0x54,0x55,0x01,0x44,0x40,0x04,0x14,0x11,0x00,0x41,0x45,0x15,0x51,0x05 },
+		{ 0x14,0x41,0x01,0x44,0x04,0x50,0x51,0x45,0x11,0x40,0x54,0x15,0x10,0x00,0x55,0x05 },
+		{ 0x01,0x05,0x41,0x45,0x54,0x50,0x55,0x10,0x11,0x15,0x51,0x14,0x44,0x40,0x04,0x00 },
+		{ 0x05,0x55,0x00,0x50,0x11,0x40,0x54,0x14,0x45,0x51,0x10,0x04,0x44,0x01,0x41,0x15 },
+		{ 0x55,0x50,0x15,0x10,0x01,0x04,0x41,0x44,0x45,0x40,0x05,0x00,0x11,0x14,0x51,0x54 },
+	};
+
+	cclimber_decode(convtable);
+}
+
+
+void cclimber_state::init_ckongb()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	// all the program ROMs are encrypted
+	for (int A = 0x0000; A < 0x6000; A++)
+		rom[A] = rom[A] ^ 0xf0;
+}
+
+void cclimber_state::init_dking()
+{
+	uint8_t *rom = memregion( "maincpu" )->base();
+
+	for (int j = 0; j < 0x5000; j += 0x1000)
+	{
+		for (int i = 0x0500; i < 0x0800; i++)
+			rom[i + j] ^= 0xff;
+		for (int i = 0x0d00; i < 0x1000; i++)
+			rom[i + j] ^= 0xff;
+	}
+}
+
+
+void cclimber_state::init_rpatrol()
+{
+	uint8_t *rom = memregion( "maincpu" )->base();
+
+	// Bits are inverted
+	for (int i = 0x0000; i < 0x5000; i++)
+	{
+		rom[i] = rom[i] ^ 0x79;
+		i++;
+		rom[i] = rom[i] ^ 0x5b;
+	}
+}
+
+
+void cclimber_state::init_cannonb()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	// only first ROM is encrypted
+	for (int A = 0x0000; A < 0x1000; A++)
+	{
+		static const uint8_t xor_tab[4] = { 0x92, 0x82, 0x12, 0x10 };
+
+		uint8_t src = rom[A + 0x10000];
+		int i = ((A & 0x200) >> 8) | ((A & 0x80) >> 7);
+		src ^= xor_tab[i];
+
+		rom[A] = src;
+	}
+
+	init_cannonb2();
+}
+
+void cclimber_state::init_cannonb2()
+{
+	// set to 1 to fix protection check after bonus round (see notes in pacman.cpp driver)
+#if 0
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x2ba0] = 0x21;
+	rom[0x2ba1] = 0xfb;
+	rom[0x2ba2] = 0x0e;
+	rom[0x2ba3] = 0x00;
+#endif
+}
+
+
 void toprollr_state::init_toprollr()
 {
 	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
@@ -3086,31 +3236,11 @@ void toprollr_state::init_toprollr()
 
 
 
-void cclimber_state::init_dking()
-{
-	uint8_t *rom = memregion( "maincpu" )->base();
-	for (int j = 0; j < 0x5000; j += 0x1000)
-	{
-		for (int i = 0x0500; i < 0x0800; i++)  rom[i+j] ^=0xff;
-		for (int i = 0x0d00; i < 0x1000; i++)  rom[i+j] ^=0xff;
-	}
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
 
-}
-
-void cclimber_state::init_rpatrol()
-{
-	uint8_t *rom = memregion( "maincpu" )->base();
-
-	// Bits are inverted
-	for (int i = 0x0000; i < 0x5000; i++)
-	{
-		rom[i] = rom[i] ^ 0x79;
-		i++;
-		rom[i] = rom[i] ^ 0x5b;
-	}
-}
-
-
+//    YEAR  NAME         PARENT    MACHINE    INPUT      CLASS           INIT            SCREEN  COMPANY                   FULLNAME                                       FLAGS
 GAME( 1980, cclimber,    0,        cclimberx, cclimber,  cclimber_state, init_cclimber,  ROT0,   "Nichibutsu",             "Crazy Climber (US set 1)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1980, cclimbera,   cclimber, cclimberx, cclimber,  cclimber_state, init_cclimber,  ROT0,   "Nichibutsu",             "Crazy Climber (US set 2)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1980, cclimberj,   cclimber, cclimberx, cclimberj, cclimber_state, init_cclimberj, ROT0,   "Nichibutsu",             "Crazy Climber (Japan)",                       MACHINE_SUPPORTS_SAVE )
