@@ -43201,6 +43201,9 @@ librie                          // Sony Librie EBR 1000
 @source:sony/news_38xx.cpp
 nws3860                         // Sony NEWS NWS-3860
 
+@source:sony/news_68k_iop.cpp
+nws831                          // Sony NEWS NWS-831
+
 @source:sony/news_68k.cpp
 nws1580                         // Sony NEWS NWS-1580
 
