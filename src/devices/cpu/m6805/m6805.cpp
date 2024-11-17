@@ -395,7 +395,7 @@ void m6805_base_device::device_reset()
 
 	m_nmi_state = 0;
 
-	/* IRQ disabled */
+	// IRQ disabled 
 	SEI;
 
 	if (m_params.m_addr_width > 14)
@@ -456,12 +456,12 @@ void m6805_base_device::interrupt_vector()
 		rm16<false>(0xfffa & m_params.m_vector_mask, m_pc);
 }
 
-/* Generate interrupts */
+// Generate interrupts 
 void m6805_base_device::interrupt()
 {
-	/* the 6805 latches interrupt requests internally, so we don't clear */
-	/* pending_interrupts until the interrupt is taken, no matter what the */
-	/* external IRQ pin does. */
+	// the 6805 latches interrupt requests internally, so we don't clear 
+	// pending_interrupts until the interrupt is taken, no matter what the 
+	// external IRQ pin does. 
 
 	if (BIT(m_pending_interrupts, HD63705_INT_NMI))
 	{
@@ -479,7 +479,7 @@ void m6805_base_device::interrupt()
 			pushbyte<false>(m_cc);
 		}
 		SEI;
-		/* no vectors supported, just do the callback to clear irq_state if needed */
+		// no vectors supported, just do the callback to clear irq_state if needed 
 		standard_irq_callback(0, m_pc.w.l);
 
 		if (m_params.m_addr_width > 14)
@@ -495,7 +495,7 @@ void m6805_base_device::interrupt()
 	{
 		if ((CC & IFLAG) == 0)
 		{
-			/* standard IRQ */
+			// standard IRQ 
 			if (m_params.m_addr_width > 14) {
 				pushword<true>(m_pc);
 				pushbyte<true>(m_x);
@@ -510,7 +510,8 @@ void m6805_base_device::interrupt()
 				pushbyte<false>(m_cc);
 			}
 			SEI;
-			/* no vectors supported, just do the callback to clear irq_state if needed */
+
+			// no vectors supported, just do the callback to clear irq_state if needed 
 			standard_irq_callback(0, m_pc.w.l);
 
 			interrupt_vector();
@@ -581,10 +582,10 @@ uint32_t m6805_base_device::execute_max_cycles() const noexcept
 }
 
 
-/* execute instructions on this CPU until icount expires */
+// execute instructions on this CPU until icount expires 
 void m6805_base_device::execute_run()
 {
-	S = SP_ADJUST( S );     /* Taken from CPU_SET_CONTEXT when pointer'afying */
+	S = SP_ADJUST( S ); // Taken from CPU_SET_CONTEXT when pointer'ifying
 
 	do
 	{
@@ -621,6 +622,7 @@ void m6805_base_device::execute_set_input(int inputnum, int state)
 /****************************************************************************
  * M68HC05EG section
  ****************************************************************************/
+
 m68hc05eg_device::m68hc05eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m6805_base_device(
 			mconfig,
@@ -674,8 +676,9 @@ std::unique_ptr<util::disasm_interface> m68hc05eg_device::create_disassembler()
 }
 
 /****************************************************************************
- * HD63705 section
+ * HD6305 section
  ****************************************************************************/
+
 hd6305_device::hd6305_device(
 		machine_config const &mconfig,
 		char const *tag,
@@ -701,7 +704,6 @@ hd6305v0_device::hd6305v0_device(const machine_config &mconfig, const char *tag,
 	  m_write_port(*this),
 	  m_sci_clk(*this),
 	  m_sci_tx(*this)
-
 {
 }
 
@@ -939,7 +941,7 @@ TIMER_CALLBACK_MEMBER(hd6305v0_device::sci_cb)
 		}
 		m_sci_tx_step++;
 	}
-		
+
 	sci_timer_step();
 }
 
@@ -1086,12 +1088,7 @@ void hd63705z0_device::internal_map(address_map &map)
 	map(0x01c0, 0x1fff).rom().region(DEVICE_SELF, 0x01c0);
 }
 
-void hd6305_device::device_reset()
-{
-	m6805_base_device::device_reset();
-}
-
-void hd6305_device::execute_set_input(int inputnum, int state)
+void hd63705z0_device::execute_set_input(int inputnum, int state)
 {
 	if (inputnum == INPUT_LINE_NMI)
 	{
@@ -1119,10 +1116,10 @@ void hd6305_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-void hd6305_device::interrupt_vector()
+void hd63705z0_device::interrupt_vector()
 {
-	/* Need to add emulation of other interrupt sources here KW-2/4/99 */
-	/* This is just a quick patch for Namco System 2 operation         */
+	// Need to add emulation of other interrupt sources here KW-2/4/99 
+	// This is just a quick patch for Namco System 2 operation         
 
 	if ((m_pending_interrupts & (1 << HD63705_INT_IRQ1)) != 0)
 	{
