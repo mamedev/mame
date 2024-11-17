@@ -212,10 +212,10 @@ private:
 	void eeprom_data_w(offs_t offset, uint32_t data);
 	void gpu_jump_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t gpu_jump_r();
-	uint32_t cojagr3k_main_speedup_r();
-	uint32_t main_gpu_wait_r();
-	void area51_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void area51mx_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	[[maybe_unused]] uint32_t cojagr3k_main_speedup_r();
+	[[maybe_unused]] uint32_t main_gpu_wait_r();
+	[[maybe_unused]] void area51_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	[[maybe_unused]] void area51mx_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint16_t gpuctrl_r16(offs_t offset, uint16_t mem_mask = ~0);
 	void gpuctrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t blitter_r16(offs_t offset, uint16_t mem_mask = ~0);
@@ -249,14 +249,14 @@ private:
 	uint16_t gpu_ram_r16(offs_t offset);
 	void gpu_ram_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	// from audio/jaguar.cpp
+	// from jaguar_a.cpp
 	uint16_t jerry_regs_r(offs_t offset);
 	void jerry_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t serial_r(offs_t offset);
 	void serial_w(offs_t offset, uint32_t data);
 	TIMER_CALLBACK_MEMBER(serial_update);
 
-	// from video/jaguar.cpp
+	// from jaguar_v.cpp
 	uint32_t blitter_r(offs_t offset, uint32_t mem_mask = ~0);
 	void blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint16_t tom_regs_r(offs_t offset);
@@ -285,20 +285,20 @@ private:
 	void r3000_map(address_map &map) ATTR_COLD;
 	void r3000_rom_map(address_map &map) ATTR_COLD;
 
-	void gpu_suspend() { m_gpu->suspend(SUSPEND_REASON_SPIN, 1); }
+	[[maybe_unused]] void gpu_suspend() { m_gpu->suspend(SUSPEND_REASON_SPIN, 1); }
 	void gpu_resume() { m_gpu->resume(SUSPEND_REASON_SPIN); }
-	void dsp_suspend() { m_dsp->suspend(SUSPEND_REASON_SPIN, 1); }
+	[[maybe_unused]] void dsp_suspend() { m_dsp->suspend(SUSPEND_REASON_SPIN, 1); }
 	void dsp_resume() { m_dsp->resume(SUSPEND_REASON_SPIN); }
 
 	void fix_endian( void *base, uint32_t size );
 	void cojag_common_init(uint16_t gpu_jump_offs, uint16_t spin_pc);
 	void init_freeze_common(offs_t main_speedup_addr);
 
-	// from audio/jaguar.cpp
+	// from jaguar_a.cpp
 	void update_gpu_irq();
-	void dsp_flags_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	[[maybe_unused]] void dsp_flags_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	// from video/jaguar.cpp
+	// from jaguar_v.cpp
 	void get_crosshair_xy(int player, int &x, int &y);
 	int effective_hvalue(int value);
 	bool adjust_object_timer(int vc);
@@ -309,7 +309,7 @@ private:
 	TIMER_CALLBACK_MEMBER(scanline_update);
 	void set_palette(uint16_t vmode);
 
-	/* from jagobj.cpp */
+	// from jagobj.ipp
 	void jagobj_init();
 	uint32_t *process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc);
 	uint32_t *process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc);
@@ -352,7 +352,7 @@ private:
 	void bitmap_32_6(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos);
 	void bitmap_32_7(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos);
 
-	/* from jagblit.cpp */
+	// from jagblit.ipp
 	void generic_blitter(uint32_t command, uint32_t a1flags, uint32_t a2flags);
 	void blitter_09800001_010020_010020(uint32_t command, uint32_t a1flags, uint32_t a2flags);
 	void blitter_09800009_000020_000020(uint32_t command, uint32_t a1flags, uint32_t a2flags);
