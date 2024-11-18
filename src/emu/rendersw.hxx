@@ -577,7 +577,6 @@ private:
 	}
 
 
-
 	//**************************************************************************
 	//  RECT RASTERIZERS
 	//**************************************************************************
@@ -765,7 +764,8 @@ private:
 
 	//-------------------------------------------------
 	//  draw_quad_palette16_add - perform
-	//  rasterization of a 16bpp palettized texture
+	//  rasterization by using RGB add after 16bpp
+	//  conversion
 	//-------------------------------------------------
 
 	static void draw_quad_palette16_add(render_primitive const &prim, PixelType *dstdata, u32 pitch, quad_setup_data const &setup)
@@ -787,7 +787,7 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					const u32 pix = get_texel_palette16(prim.texture, curu, curv);
+					u32 const pix = get_texel_palette16(prim.texture, curu, curv);
 					if ((pix & 0xffffff) != 0)
 					{
 						u32 const dpix = NoDestRead ? 0 : *dest;
@@ -834,15 +834,15 @@ private:
 						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
 						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
 						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
-						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += setup.dudx;
-						curv += setup.dvdx;
+						*dest = dest_assemble_rgb(r, g, b);
 					}
+					dest++;
+					curu += setup.dudx;
+					curv += setup.dvdx;
 				}
 			}
 		}
 	}
-
 
 
 	//**************************************************************************
@@ -976,6 +976,7 @@ private:
 					r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
 					g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
 					b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
+
 					*dest++ = dest_assemble_rgb(r, g, b);
 					curu += setup.dudx;
 					curv += setup.dvdx;
@@ -1002,14 +1003,15 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					const u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					const u32 dpix = NoDestRead ? 0 : *dest;
+					u32 const pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
+					u32 const dpix = NoDestRead ? 0 : *dest;
 					u32 r = ((source32_r(pix) * sr * sa) >> 16) + dest_r(dpix);
 					u32 g = ((source32_g(pix) * sg * sa) >> 16) + dest_g(dpix);
 					u32 b = ((source32_b(pix) * sb * sa) >> 16) + dest_b(dpix);
 					r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
 					g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
 					b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
+
 					*dest++ = dest_assemble_rgb(r, g, b);
 					curu += setup.dudx;
 					curv += setup.dvdx;
@@ -1225,6 +1227,7 @@ private:
 						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
 						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
 						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
+
 						*dest++ = dest_assemble_rgb(r, g, b);
 						curu += setup.dudx;
 						curv += setup.dvdx;
@@ -1245,6 +1248,7 @@ private:
 						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
 						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
 						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
+
 						*dest++ = dest_assemble_rgb(r, g, b);
 						curu += setup.dudx;
 						curv += setup.dvdx;
@@ -1284,6 +1288,7 @@ private:
 						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
 						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
 						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
+
 						*dest++ = dest_assemble_rgb(r, g, b);
 						curu += setup.dudx;
 						curv += setup.dvdx;
@@ -1304,6 +1309,7 @@ private:
 						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
 						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
 						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
+
 						*dest++ = dest_assemble_rgb(r, g, b);
 						curu += setup.dudx;
 						curv += setup.dvdx;
