@@ -501,13 +501,13 @@ static INPUT_PORTS_START( travrusa )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Fuel Reduced on Collision" ) PORT_DIPLOCATION("DSW1:1,2")
-	PORT_DIPSETTING(    0x03, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x02, "Med" )
-	PORT_DIPSETTING(    0x01, "Hi" )
-	PORT_DIPSETTING(    0x00, "Max" )
+	PORT_DIPSETTING(    0x03, "8/120 Dots" )
+	PORT_DIPSETTING(    0x02, "10/120 Dots" )
+	PORT_DIPSETTING(    0x01, "12/120 Dots" )
+	PORT_DIPSETTING(    0x00, "14/120 Dots" )
 	PORT_DIPNAME( 0x04, 0x04, "Fuel Consumption" )      PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, "Hi" )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -631,7 +631,9 @@ static INPUT_PORTS_START( shtrider )
 	PORT_DIPNAME( 0x02, 0x02, "Speed Display" )         PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x02, "km/h" )
 	PORT_DIPSETTING(    0x00, "mph" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW2:3" )
+	PORT_DIPNAME( 0x04, 0x04, "Fuel Reduced on Collision" ) PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(    0x04, "10%" )
+	PORT_DIPSETTING(    0x00, "15%" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -730,13 +732,13 @@ void travrusa_state::shtrider(machine_config &config)
 
 void travrusa_state::shtriderb(machine_config &config)
 {
-	shtrider(config);
+	travrusa(config);
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &travrusa_state::shtriderb_io_map);
 
 	// video hardware
-	m_palette->set_init(FUNC(travrusa_state::travrusa_palette));
+	m_gfxdecode->set_info(gfx_shtrider);
 }
 
 
@@ -1007,4 +1009,4 @@ GAME( 1983, motorace,   travrusa, travrusa,  motorace, travrusa_state, init_moto
 
 GAME( 1985, shtrider,   0,        shtrider,  shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider",                             MACHINE_SUPPORTS_SAVE ) // possible bootleg
 GAME( 1984, shtridera,  shtrider, shtrider,  shtrider, travrusa_state, init_shtridra, ROT270 | ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shtriderb,  shtrider, shtriderb, shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shtriderb,  shtrider, shtriderb, shtrider, travrusa_state, empty_init,    ROT270 | ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)",                   MACHINE_SUPPORTS_SAVE ) // on bootleg Zippy Race hardware
