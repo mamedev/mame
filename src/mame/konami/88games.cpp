@@ -245,11 +245,11 @@ void _88games_state::main_map(address_map &map)
 	m_palette_view[0](0x1000, 0x1fff).readonly().share("palette");
 	map(0x2000, 0x2fff).ram();
 	map(0x3000, 0x37ff).ram().share("nvram");
-	map(0x3800, 0x3fff).ram();
 	map(0x3800, 0x3fff).view(m_k051316_view);
 	m_k051316_view[0](0x3800, 0x3fff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write));
 	m_k051316_view[0](0x3800, 0x3fff).view(m_k051316_rom_view);
 	m_k051316_rom_view[0](0x3800, 0x3fff).r(m_k051316, FUNC(k051316_device::rom_r));
+	m_k051316_view[1](0x3800, 0x3fff).ram();
 	map(0x4000, 0x7fff).rw(FUNC(_88games_state::k052109_051960_r), FUNC(_88games_state::k052109_051960_w));
 	map(0x5f84, 0x5f84).w(FUNC(_88games_state::k88games_5f84_w));
 	map(0x5f88, 0x5f88).w("watchdog", FUNC(watchdog_timer_device::reset_w));
@@ -395,10 +395,7 @@ void _88games_state::banking_callback(uint8_t data)
 	else
 		m_palette_view.disable();
 
-	if (BIT(data, 4))
-		m_k051316_view.disable();
-	else
-		m_k051316_view.select(0);
+	m_k051316_view.select(BIT(data, 4));
 
 	// bit 5 = enable char ROM reading through the video RAM
 	m_k052109->set_rmrd_line(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
