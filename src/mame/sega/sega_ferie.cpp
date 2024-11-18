@@ -8,7 +8,7 @@
 
     - Fix input press state, e.g. World Travel test program tablet check not passed, unresponsive menu lists
     - LCD effects, in particular when to clear/show dots, e.g. Kitten test program credits are jumbled
-    - Most tablet commands aren't parsed, e.g. pen callibration positions
+    - Most tablet commands aren't parsed, e.g. pen calibration positions
     - Disk beeper (used in Test Program)
 
     Hardware
