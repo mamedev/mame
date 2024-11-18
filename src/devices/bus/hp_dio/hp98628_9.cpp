@@ -495,7 +495,7 @@ void base_98628_9_device::reg_w(offs_t addr, uint8_t data)
 
 uint8_t base_98628_9_device::low_ram_r_z80(offs_t addr)
 {
-	if (addr == 1) {
+	if (addr == 1 && !machine().side_effects_disabled()) {
 		// Clear CTSB/
 		m_ctsb = false;
 		m_sio->ctsb_w(m_ctsb);
@@ -506,7 +506,7 @@ uint8_t base_98628_9_device::low_ram_r_z80(offs_t addr)
 
 uint16_t base_98628_9_device::low_ram_r_68k(offs_t addr)
 {
-	if (addr == 0) {
+	if (addr == 0 && !machine().side_effects_disabled()) {
 		// Clear IRQ
 		m_irq = false;
 		update_irq();
@@ -517,7 +517,7 @@ uint16_t base_98628_9_device::low_ram_r_68k(offs_t addr)
 
 void base_98628_9_device::low_ram_w_z80(offs_t addr, uint8_t data)
 {
-	if (addr == 0 && !m_reset) {
+	if (addr == 0 && !m_reset && !machine().side_effects_disabled()) {
 		// Set IRQ
 		m_irq = true;
 		LOG("IRQ 1\n");
@@ -528,7 +528,7 @@ void base_98628_9_device::low_ram_w_z80(offs_t addr, uint8_t data)
 
 void base_98628_9_device::low_ram_w_68k(offs_t addr, uint16_t data)
 {
-	if (addr == 1) {
+	if (addr == 1 && !machine().side_effects_disabled()) {
 		// Set CTSB/
 		m_ctsb = true;
 		LOG("CTSB 1\n");
@@ -541,9 +541,9 @@ uint8_t base_98628_9_device::sio_r(offs_t addr)
 {
 	uint8_t res;
 
-	if (addr == 0 && m_cpu_wait) {
+	if (addr == 0 && m_cpu_wait && !machine().side_effects_disabled()) {
 		// ch-A data register can't be read right now
-		m_cpu->set_input_line(Z80_INPUT_LINE_WAIT, 1);
+		m_cpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 		m_cpu->defer_access();
 		m_cpu_waiting = true;
 		res = 0;
@@ -558,9 +558,9 @@ uint8_t base_98628_9_device::sio_r(offs_t addr)
 void base_98628_9_device::sio_w(offs_t addr, uint8_t data)
 {
 	LOG("SIO W %u=%02x\n", addr, data);
-	if (addr == 0 && m_cpu_wait) {
+	if (addr == 0 && m_cpu_wait && !machine().side_effects_disabled()) {
 		// ch-A data register can't be written right now
-		m_cpu->set_input_line(Z80_INPUT_LINE_WAIT, 1);
+		m_cpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 		m_cpu->defer_access();
 		m_cpu_waiting = true;
 		LOG("Z80 stalled\n");
@@ -608,7 +608,7 @@ void base_98628_9_device::update_cpu_wait()
 	m_cpu_wait = !m_wait_a && !m_sio_irq && !m_ctc_irq;
 	if (m_cpu_waiting && !m_cpu_wait) {
 		LOG("WAIT released wa %d si %d ci %d\n", m_wait_a, m_sio_irq, m_ctc_irq);
-		m_cpu->set_input_line(Z80_INPUT_LINE_WAIT, 0);
+		m_cpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 		m_cpu_waiting = false;
 	}
 }
