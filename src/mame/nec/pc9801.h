@@ -53,6 +53,8 @@
 #include "bus/cbus/pc9801_118.h"
 #include "bus/cbus/mpu_pc98.h"
 #include "bus/cbus/pc9801_cbus.h"
+#include "bus/cbus/sb16_ct2720.h"
+
 #include "pc9801_kbd.h"
 #include "pc9801_cd.h"
 

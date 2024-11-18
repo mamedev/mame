@@ -1936,6 +1936,7 @@ static void pc9801_cbus_devices(device_slot_interface &device)
 //  Spark Board
 	device.option_add("amd98",      AMD98);
 	device.option_add("mpu_pc98",   MPU_PC98);
+	device.option_add("sb16",       SB16_CT2720);
 
 	// doujinshi HW
 // MAD Factory / Doujin Hard (同人ハード)
