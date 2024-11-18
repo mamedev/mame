@@ -2,6 +2,7 @@
 // copyright-holders:Angelo Salese
 
 #ifndef MAME_BUS_CBUS_SB16_CT2720_H
+#define MAME_BUS_CBUS_SB16_CT2720_H
 
 #pragma once
 
@@ -9,7 +10,6 @@
 //#include "bus/midi/midi.h"
 //#include "bus/pc_joy/pc_joy.h"
 #include "sound/dac.h"
-//#include "sound/saa1099.h"
 #include "sound/ymopl.h"
 //#include "diserial.h"
 
@@ -47,4 +47,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SB16_CT2720, sb16_ct2720_device)
 
-#endif // MAME_BUS_CBUS_SB16_H
+#endif // MAME_BUS_CBUS_SB16_CT2720_H
