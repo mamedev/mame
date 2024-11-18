@@ -5497,49 +5497,34 @@ Ext IRQ         0x0ffe - 0x0fff
 
 uint8_t vt_vt1682_state::soundcpu_irq_vector_hack_r(offs_t offset)
 {
-	if (!machine().side_effects_disabled())
+	auto vector = m_current_sound_vector;
+	if (offset == 0)
 	{
-		if (offset == 0)
-			m_current_sound_vector = m_new_sound_vector;
-		// redirect to Timer IRQ!
-		return m_sound_share[m_current_sound_vector + offset];
+		vector = m_new_sound_vector;
+		if (!machine().side_effects_disabled())
+			m_current_sound_vector = vector;
 	}
-	else
-	{
-		// In the debugger we just want to see the vector table as it is
-		// and not the fake overlay.
-		//
-		// The overlay does not exist in hardware, the VT168 makes no
-		// external access to the soundcpu_irq_vector_hack_r address
-		// for anything other than Ext IRQ 0 and instead simply fetches
-		// from the address associated with the IRQ source (see table
-		// above)
-		//
-		// We do not want to hide the Ext IRQ 0 vector to the debugger
-		// when other IRQs are active, so we just return the ROM content
-		// here
-		return m_sound_share[0x0ffe + offset];
-	}
+
+	// redirect to required IRQ!
+	return m_sound_share[vector + offset];
 }
 
 
 
 uint8_t vt_vt1682_state::maincpu_irq_vector_hack_r(offs_t offset)
 {
-	if (!machine().side_effects_disabled())
+	auto vector = m_current_main_vector;
+	if (offset == 0)
 	{
-		if (offset == 0)
-			m_current_main_vector = m_new_main_vector;
+		vector = m_new_main_vector;
+		if (!machine().side_effects_disabled())
+			m_current_main_vector = vector;
+	}
 
-		uint8_t ret = rom_8000_to_ffff_r((m_current_main_vector - 0x8000) + offset);
-		// redirect to required IRQ!
-		return ret;
-	}
-	else
-	{
-		return rom_8000_to_ffff_r((0xfffe - 0x8000) + offset);
-	}
+	// redirect to required IRQ!
+	return rom_8000_to_ffff_r((vector - 0x8000) + offset);
 }
+
 
 // intg5410 writes a new program without resetting the CPU when selecting from the 'arcade' game main menu, this is problematic
 // it does appear to rewrite the vectors first, so maybe there is some hardware side-effect of this putting the CPU in reset state??
