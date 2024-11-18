@@ -24,6 +24,8 @@ Notes:
 
 TODO:
 - shtrider dip switches and figure out flip screen (not same as travrusa)
+- verify shtrider (not bootlegs) maincpu XTAL, 3.072MHz seems too slow:
+  see race countdown at start, and overall a lot of frame overflows
 
 ****************************************************************************
 
@@ -416,6 +418,7 @@ void travrusa_state::flipscreen_w(uint8_t data)
 
 	flip_screen_set(data & 1);
 
+	// and coincounters (not written by shtrider)
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 }
@@ -444,7 +447,7 @@ void travrusa_state::program_map(address_map &map)
 	map(0xa000, 0xa000).w(FUNC(travrusa_state::scroll_x_high_w));
 	map(0xc800, 0xc9ff).writeonly().share(m_spriteram);
 	map(0xd000, 0xd000).portr("SYSTEM").w("irem_audio", FUNC(irem_audio_device::cmd_w));
-	map(0xd001, 0xd001).portr("P1").w(FUNC(travrusa_state::flipscreen_w)); // + coin counters - not written by shtrider
+	map(0xd001, 0xd001).portr("P1").w(FUNC(travrusa_state::flipscreen_w));
 	map(0xd002, 0xd002).portr("P2");
 	map(0xd003, 0xd003).portr("DSW1");
 	map(0xd004, 0xd004).portr("DSW2");
@@ -693,7 +696,7 @@ GFXDECODE_END
 void travrusa_state::travrusa(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6);
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.072MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &travrusa_state::program_map);
 
 	// video hardware
@@ -701,7 +704,9 @@ void travrusa_state::travrusa(machine_config &config)
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 8, 248, 282, 0, 256); // verified from schematics; accurate frequency, measured on a Moon Patrol board, is 56.75Hz
 	screen.set_screen_update(FUNC(travrusa_state::screen_update));
 	screen.set_palette(m_palette);
-	// Race start countdown in shtrider needs multiple interrupts per frame to sync, mustache.cpp has the same, and is also a Seibu game
+
+	// Race start countdown in shtrider needs multiple interrupts per frame to sync,
+	// mustache.cpp has the same, and is also a Seibu game
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_travrusa);
@@ -715,6 +720,9 @@ void travrusa_state::shtrider(machine_config &config)
 {
 	travrusa(config);
 
+	// basic machine hardware
+	m_maincpu->set_clock(6'000'000); // 6MHz like Knuckle Joe?
+
 	// video hardware
 	m_gfxdecode->set_info(gfx_shtrider);
 	m_palette->set_init(FUNC(travrusa_state::shtrider_palette));
@@ -722,12 +730,13 @@ void travrusa_state::shtrider(machine_config &config)
 
 void travrusa_state::shtriderb(machine_config &config)
 {
-	travrusa(config);
+	shtrider(config);
 
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &travrusa_state::shtriderb_io_map);
 
 	// video hardware
-	m_gfxdecode->set_info(gfx_shtrider);
+	m_palette->set_init(FUNC(travrusa_state::travrusa_palette));
 }
 
 
@@ -823,7 +832,7 @@ ROM_END
 
 ROM_START( motorace )
 	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "mr.cpu",       0x0000, 0x2000, CRC(89030b0c) SHA1(dec4209385bbccff4a3c0d93d6507110ef841331) )    // encrypted
+	ROM_LOAD( "mr.cpu",       0x0000, 0x2000, CRC(89030b0c) SHA1(dec4209385bbccff4a3c0d93d6507110ef841331) ) // encrypted
 	ROM_LOAD( "mr1.3l",       0x2000, 0x2000, CRC(0904ed58) SHA1(2776e031cb58f99103bc35299bffd7612d954608) )
 	ROM_LOAD( "mr2.3k",       0x4000, 0x2000, CRC(8a2374ec) SHA1(7159731f5ef2485e3c822e3e8e51e9583dd1c6bc) )
 	ROM_LOAD( "mr3.3j",       0x6000, 0x2000, CRC(2f04c341) SHA1(ae990d9d4abdd7d6ef9d21aa62125fe2e0067623) )
@@ -955,12 +964,12 @@ ROM_START( shtriderb )
 
 	ROM_REGION( 0x06000, "sprites", 0 )
 	ROM_LOAD( "sr8.17.n3",   0x0000, 0x2000, CRC(4072b096) SHA1(e43482ac916a0fa259f74f99dc6ef72e86c23d9d) )
-	ROM_LOAD( "sr9.18.m3",   0x2000, 0x2000, CRC(fd4cc7e6) SHA1(3852883d32354e8c90c6cf701581ebc57d830c8b))
+	ROM_LOAD( "sr9.18.m3",   0x2000, 0x2000, CRC(fd4cc7e6) SHA1(3852883d32354e8c90c6cf701581ebc57d830c8b) )
 	ROM_LOAD( "sr10.19.k3",  0x4000, 0x2000, CRC(0a117925) SHA1(e061254428874b6153c2e9e514122373395f4da1) )
 
 	ROM_REGION( 0x0420,  "proms", 0 )
 	ROM_LOAD( "6349-2.k2",   0x0000, 0x0200, CRC(854487a7) SHA1(5f3a2a7f7ba89f945fda97debb5436af8a2c6885) )
-	ROM_LOAD( "prom1.6.f1",  0x0200, 0x0020, CRC(ee97c581) SHA1(a5d0ba5e03f3bcbdd72f89f0495a98cef2821e59))
+	ROM_LOAD( "prom1.6.f1",  0x0200, 0x0020, CRC(ee97c581) SHA1(a5d0ba5e03f3bcbdd72f89f0495a98cef2821e59) )
 	ROM_LOAD( "prom2.12.h2", 0x0220, 0x0100, CRC(5db47092) SHA1(8e234ee88143755a4fd5ec86a03b55be5f9c5db8) )
 ROM_END
 
@@ -984,7 +993,7 @@ void travrusa_state::init_shtridra()
 
 	// D3/D4 and D5/D6 swapped
 	for (int A = 0; A < 0x2000; A++)
-		rom[A] = bitswap<8>(rom[A],7 ,5, 6, 3, 4, 2, 1, 0);
+		rom[A] = bitswap<8>(rom[A], 7 ,5, 6, 3, 4, 2, 1, 0);
 }
 
 } // anonymous namespace
