@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald
+// copyright-holders:Barry Rodewald, Angelo Salese
 
 #ifndef MAME_VIDEO_PC_VGA_TSENG_H
 #define MAME_VIDEO_PC_VGA_TSENG_H
@@ -104,6 +104,16 @@ private:
 	struct {
 		u8 control;
 	}m_ima;
+
+	template <unsigned N> u8 mmu_blit_r(offs_t offset);
+	template <unsigned N> void mmu_blit_w(offs_t offset, u8 data);
+	template <unsigned N> u8 mmu_base_address_r(offs_t offset);
+	template <unsigned N> void mmu_base_address_w(offs_t offset, u8 data);
+
+	struct {
+		u8 control;
+		u32 base_address[3];
+	}m_mmu;
 };
 
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald
+// copyright-holders:Barry Rodewald, Angelo Salese
 /*
  * Tseng Labs VGA family
  *
@@ -524,8 +524,62 @@ void et4kw32i_vga_device::mem_w(offs_t offset, uint8_t data)
 	vga_device::mem_w(offset,data);
 }
 
+/*
+ * MMU & ACL interactions
+ */
+
+template <unsigned N> u8 et4kw32i_vga_device::mmu_blit_r(offs_t offset)
+{
+	if (m_mmu.control & 1 << N)
+	{
+		// To FIFO, TBD
+		return 0;
+	}
+
+	return svga_device::mem_linear_r(offset + m_mmu.base_address[N]);
+}
+
+template <unsigned N> void et4kw32i_vga_device::mmu_blit_w(offs_t offset, u8 data)
+{
+	if (m_mmu.control & 1 << N)
+	{
+		// To FIFO, TBD
+		return;
+	}
+
+	svga_device::mem_linear_w(offset + m_mmu.base_address[N], data);
+}
+
+template <unsigned N> u8 et4kw32i_vga_device::mmu_base_address_r(offs_t offset)
+{
+	return m_mmu.base_address[N] >> (offset * 8);
+}
+
+template <unsigned N> void et4kw32i_vga_device::mmu_base_address_w(offs_t offset, u8 data)
+{
+	const u8 shift = offset * 8;
+	const u32 mask = ~(0xff << shift);
+	m_mmu.base_address[N] &= mask;
+	m_mmu.base_address[N] |= (data << shift);
+}
+
+
 void et4kw32i_vga_device::mmu_map(address_map &map)
 {
+	map(0x0000, 0x1fff).rw(FUNC(et4kw32i_vga_device::mmu_blit_r<0>), FUNC(et4kw32i_vga_device::mmu_blit_w<0>));
+	map(0x2000, 0x3fff).rw(FUNC(et4kw32i_vga_device::mmu_blit_r<1>), FUNC(et4kw32i_vga_device::mmu_blit_w<1>));
+	map(0x4000, 0x5fff).rw(FUNC(et4kw32i_vga_device::mmu_blit_r<2>), FUNC(et4kw32i_vga_device::mmu_blit_w<2>));
+	map(0x6000, 0x6003).mirror(0x1f00).rw(FUNC(et4kw32i_vga_device::mmu_base_address_r<0>), FUNC(et4kw32i_vga_device::mmu_base_address_w<0>));
+	map(0x6004, 0x6007).mirror(0x1f00).rw(FUNC(et4kw32i_vga_device::mmu_base_address_r<1>), FUNC(et4kw32i_vga_device::mmu_base_address_w<1>));
+	map(0x6008, 0x600b).mirror(0x1f00).rw(FUNC(et4kw32i_vga_device::mmu_base_address_r<2>), FUNC(et4kw32i_vga_device::mmu_base_address_w<2>));
+	map(0x6013, 0x6013).mirror(0x1f00).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_mmu.control;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_mmu.control = data;
+		})
+	);
 }
 
 void et4kw32i_vga_device::acl_map(address_map &map)
