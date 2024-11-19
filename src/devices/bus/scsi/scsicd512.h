@@ -46,10 +46,10 @@ public:
 	dec_rrd45_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class toshiba_xm3301_device : public scsicd512_device
+class toshiba_xm3301ta_device : public scsicd512_device
 {
 public:
-	toshiba_xm3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	toshiba_xm3301ta_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class toshiba_xm5301_sun_device : public scsicd512_device
@@ -77,7 +77,7 @@ public:
 };
 
 DECLARE_DEVICE_TYPE(RRD45, dec_rrd45_device)
-DECLARE_DEVICE_TYPE(XM3301, toshiba_xm3301_device)
+DECLARE_DEVICE_TYPE(XM3301TA, toshiba_xm3301ta_device)
 DECLARE_DEVICE_TYPE(XM5301SUN, toshiba_xm5301_sun_device)
 DECLARE_DEVICE_TYPE(XM5401SUN, toshiba_xm5401_sun_device)
 DECLARE_DEVICE_TYPE(XM5701, toshiba_xm5701_device)
