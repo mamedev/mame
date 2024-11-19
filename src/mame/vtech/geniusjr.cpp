@@ -70,8 +70,8 @@ Undumped VTech laptops possibly on similar hardware:
    07  - La palabra escondida.       The hidden word.
    08  - Trueque de letras.          Swapped letters.
    09  - La letra intrusa.           The intruder letter.
-   10  - Matematicas (+,-,x,/).      Mathematics (+,-,x,/).
-   11  - Aprendiendo los numeros.    Learning the numbers.
+   10  - Matemáticas (+,-,x,÷).      Mathematics (+,-,x,÷).
+   11  - Aprendiendo los números.    Learning the numbers.
    12  - Redondeando cifras.         Rounding numbers.
    13  - Encuentra el signo.         Find the sign.
    14  - Calculadora.                Calculator.
