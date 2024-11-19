@@ -2291,7 +2291,6 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-			<feature name="cd_matrix" value="Made in Canada by Saturn   SM4258C 25CLD4ENG10" />
 				<disk name="civilization_call_to_power_le" sha1="94ad4b9e24bec7b32e32d1efe801c45025f673f5" />
 			</diskarea>
 		</part>
@@ -7026,7 +7025,6 @@ Installation and Open Circulation CDs are bootable.
 			<feature name="part_id" value="Installation CD-ROM"/>
 			<feature name="part_number" value="JB#44675"/>
 			<diskarea name="cdrom">
-			<feature name="cd_matrix" value="Made in Canada by Saturn   SM4262A 25CLD1ENG10100" />
 				<disk name="corel_linux_os_deluxe_install" sha1="dc70d14ee57d2c78a419d7422de8f9ffd498a4a9" />
 			</diskarea>
 		</part>
@@ -7034,7 +7032,6 @@ Installation and Open Circulation CDs are bootable.
 			<feature name="part_id" value="Application CD-ROM"/>
 			<feature name="part_number" value="JB#44675"/>
 			<diskarea name="cdrom">
-			<feature name="cd_matrix" value="Made in Canada by Saturn   SM4263A 25CLD3ENG10100" />
 				<disk name="corel_linux_os_deluxe_applications" sha1="89e7862346f3a0db5b877c4732b6311cad50f11c" />
 			</diskarea>
 		</part>
@@ -7042,7 +7039,6 @@ Installation and Open Circulation CDs are bootable.
 			<feature name="part_id" value="Open Circulation CD-ROM"/>
 			<feature name="part_number" value="JB#44150"/>
 			<diskarea name="cdrom">
-			<feature name="cd_matrix" value="Made in Canada by Saturn   SM4259C 25CL2ENG10100" />
 				<disk name="corel_linux_os_deluxe_open_circulation" sha1="99d02e94329115568afef4cc2c9e9583a34729f5" />
 			</diskarea>
 		</part>
@@ -7050,7 +7046,6 @@ Installation and Open Circulation CDs are bootable.
 			<feature name="part_id" value="Open Circulation CD-ROM (Alt)"/>
 			<feature name="part_number" value="JB#44150"/>
 			<diskarea name="cdrom">
-			<feature name="cd_matrix" value="Made in Canada by Saturn   SM4259B 25CL2ENG10100" />
 				<disk name="corel_linux_os_deluxe_open_circulation_alt" sha1="e66def04fb73155594a946cbee131aea35b79767" />
 			</diskarea>
 		</part>
@@ -7058,7 +7053,6 @@ Installation and Open Circulation CDs are bootable.
 			<feature name="part_id" value="Source Code CD-ROM"/>
 			<feature name="part_number" value="JB#44150"/>
 			<diskarea name="cdrom">
-			<feature name="cd_matrix" value="Made in Canada by Saturn   SM4261B 25CL2BENG10100" />
 				<disk name="corel_linux_os_deluxe_source_code" sha1="f435e52979b833c3ac00aaa05ddfdaf41bee5d8a"/>
 			</diskarea>
 		</part>
