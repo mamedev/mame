@@ -178,11 +178,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_bg_tile_info)
 	uint32_t const color = tile >> 12;
 
 	tile = tile & 0xfff;
-
-	tileinfo.set(1,
-			tile + m_back_bankbase,
-			color,
-			0);
+	tileinfo.set(1, tile + m_back_bankbase, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
@@ -191,11 +187,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
 	uint32_t const color = tile >> 12;
 
 	tile = tile & 0xfff;
-
-	tileinfo.set(2,
-			tile + m_fore_bankbase,
-			color,
-			0);
+	tileinfo.set(2, tile + m_fore_bankbase, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
@@ -204,11 +196,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
 	uint32_t const color = (tile >> 8) & 0x0f;
 
 	tile = (tile & 0xff) | ((tile & 0xc000) >> 6);
-
-	tileinfo.set(0,
-			tile,
-			color,
-			0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 void dynduke_state::video_start()
@@ -343,7 +331,6 @@ void dynduke_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 		uint16_t *const dst = &bitmap.pix(y);
 		uint8_t *const pdst = &screen.priority().pix(y);
 
-
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int const realx = (x + scrollx) & 0x1ff;
@@ -367,8 +354,6 @@ void dynduke_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 				dst[x] = srcdat;
 				pdst[x] |= pri_mask;
 			}
-
-
 		}
 	}
 }
@@ -471,7 +456,7 @@ void dynduke_state::sei80bu_encrypted_full_map(address_map &map)
 // Input Ports
 
 static INPUT_PORTS_START( dynduke )
-	SEIBU_COIN_INPUTS   // coin inputs read through sound CPU
+	SEIBU_COIN_INPUTS // coin inputs read through sound CPU
 
 	PORT_START("P1_P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
@@ -492,42 +477,44 @@ static INPUT_PORTS_START( dynduke )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" )               PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, "Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Mode 2" )
-	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:2,3") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0000)
+	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) )         PORT_DIPLOCATION("SW1:2,3") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0000)
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,5") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0000)
+	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Coin_B ) )         PORT_DIPLOCATION("SW1:4,5") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0000)
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:2,3,4,5") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0001)
+	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) )        PORT_DIPLOCATION("SW1:2,3,4,5") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0001)
 	PORT_DIPSETTING(      0x0018, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x001a, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x001c, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x001e, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Starting Coin" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020, 0x0020, "Starting Coin" )           PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "X 2" )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Cabinet ) )        PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0300, 0x0300, IPT_UNUSED )  // "SW2:1,2" - Always OFF according to the manual
-	PORT_DIPNAME( 0x0c00, 0x0400, "Bonus D.Punch" ) PORT_DIPLOCATION("SW2:3,4") // smart bomb extends
+
+	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW2:1" ) // Always OFF according to the manual
+	PORT_DIPUNUSED_DIPLOC( 0x0200, 0x0200, "SW2:2" ) // "
+	PORT_DIPNAME( 0x0c00, 0x0400, "Bonus D.Punch" )           PORT_DIPLOCATION("SW2:3,4") // smart bomb extends
 	PORT_DIPSETTING(      0x0c00, "80K 100K+" )
 	PORT_DIPSETTING(      0x0800, "100K 100K+" )
 	PORT_DIPSETTING(      0x0400, "120K 100K+" )
 	PORT_DIPSETTING(      0x0000, "120K 120K+" )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )     PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
@@ -535,7 +522,7 @@ static INPUT_PORTS_START( dynduke )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) )    PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -561,13 +548,13 @@ static const gfx_layout spritelayout =
 	4,      // 4 bits per pixel
 	{ 12, 8, 4, 0 },
 	{
-	0,1,2,3, 16,17,18,19,
-	512+0,512+1,512+2,512+3,
-	512+8+8,512+9+8,512+10+8,512+11+8,
+		0,1,2,3, 16,17,18,19,
+		512+0,512+1,512+2,512+3,
+		512+8+8,512+9+8,512+10+8,512+11+8,
 	},
 	{
-	0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
+		0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
 	},
 	1024
 };
@@ -577,9 +564,10 @@ static const gfx_layout bg_layout =
 	16,16,
 	RGN_FRAC(1,3),
 	6,
-	{ RGN_FRAC(2,3)+4, RGN_FRAC(2,3)+0,
+	{
+		RGN_FRAC(2,3)+4, RGN_FRAC(2,3)+0,
 		RGN_FRAC(1,3)+4, RGN_FRAC(1,3)+0,
-					4,               0 },
+		4,               0 },
 	{
 		0,1,2,3,8,9,10,11,
 		256+0,256+1,256+2,256+3,256+8,256+9,256+10,256+11
