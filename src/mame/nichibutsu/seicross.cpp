@@ -193,10 +193,8 @@ void seicross_state::videoram_w(offs_t offset, uint8_t data)
 
 void seicross_state::colorram_w(offs_t offset, uint8_t data)
 {
-	/* bit 5 of the address is not used for color memory. There is just
-	   512k of memory; every two consecutive rows share the same memory
-	   region. */
-
+	// bit 5 of the address is not used for color memory. There is just 512k
+	// of memory; every two consecutive rows share the same memory region.
 	offset &= 0xffdf;
 
 	m_colorram[offset] = data;
@@ -217,50 +215,37 @@ TILE_GET_INFO_MEMBER(seicross_state::get_bg_tile_info)
 
 void seicross_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seicross_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,
-			8, 8, 32, 32);
-
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seicross_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
 }
 
 void seicross_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram[0].bytes() - 4; offs >= 0; offs -= 4)
+	for (int bank = 0; bank < 2; bank++)
 	{
-		int const x = m_spriteram[0][offs + 3];
-		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-				(m_spriteram[0][offs] & 0x3f) + ((m_spriteram[0][offs + 1] & 0x10) << 2) + 128,
-				m_spriteram[0][offs + 1] & 0x0f,
-				m_spriteram[0][offs] & 0x40, m_spriteram[0][offs] & 0x80,
-				x, 240 - m_spriteram[0][offs + 2], 0);
-		if (x > 0xf0)
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-					(m_spriteram[0][offs] & 0x3f) + ((m_spriteram[0][offs + 1] & 0x10) << 2) + 128,
-					m_spriteram[0][offs + 1] & 0x0f,
-					m_spriteram[0][offs] & 0x40, m_spriteram[0][offs] & 0x80,
-					x - 256, 240 - m_spriteram[0][offs + 2], 0);
-	}
+		for (int offs = m_spriteram[bank].bytes() - 4; offs >= 0; offs -= 4)
+		{
+			uint8_t const *data = &m_spriteram[bank][offs];
+			int const code = (data[0] & 0x3f) | ((data[1] & 0x10) << 2) | (bank ? 0 : 0x80);
+			int const color = data[1] & 0x0f;
+			int const flipx = BIT(data[0], 6);
+			int const flipy = BIT(data[0], 7);
+			int const x = data[3];
+			int const y = 240 - data[2];
 
-	for (int offs = m_spriteram[1].bytes() - 4; offs >= 0; offs -= 4)
-	{
-		int const x = m_spriteram[1][offs + 3];
-		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-				(m_spriteram[1][offs] & 0x3f) + ((m_spriteram[1][offs + 1] & 0x10) << 2),
-				m_spriteram[1][offs + 1] & 0x0f,
-				m_spriteram[1][offs] & 0x40, m_spriteram[1][offs] & 0x80,
-				x, 240 - m_spriteram[1][offs + 2], 0);
-		if (x > 0xf0)
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-					(m_spriteram[1][offs] & 0x3f) + ((m_spriteram[1][offs + 1] & 0x10) << 2),
-					m_spriteram[1][offs + 1] & 0x0f,
-					m_spriteram[1][offs] & 0x40, m_spriteram[1][offs] & 0x80,
-					x - 256, 240 - m_spriteram[1][offs + 2], 0);
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, x, y, 0);
+
+			if (x > 0xf0)
+				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, x - 256, y, 0);
+		}
 	}
 }
 
 uint32_t seicross_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
+
 	for (int col = 0; col < 32; col++)
 		m_bg_tilemap->set_scrolly(col, m_row_scroll[col]);
 
@@ -272,9 +257,11 @@ uint32_t seicross_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void seicross_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const uint8_t init[32] = {
+	static const uint8_t init[32] =
+	{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-		0, 1, 0, 1, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0, };
+		0, 1, 0, 1, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0,
+	};
 
 	memset(data, 0x00, size);
 	memcpy(data, init, sizeof(init));
@@ -396,7 +383,7 @@ static INPUT_PORTS_START( friskyt )
 	PORT_DIPNAME( 0x02, 0x00, "Connection Error" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // probably unused
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( radrad )
@@ -423,7 +410,7 @@ static INPUT_PORTS_START( radrad )
 	PORT_START("TEST")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // probably unused
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
@@ -496,7 +483,7 @@ static INPUT_PORTS_START( seicross )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // probably unused
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 
@@ -505,7 +492,7 @@ static INPUT_PORTS_START( seicross )
 	PORT_DIPNAME( 0x02, 0x00, "Connection Error" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // probably unused
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
