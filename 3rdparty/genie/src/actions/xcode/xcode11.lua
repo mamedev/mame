@@ -1,35 +1,22 @@
 --
--- xcode9.lua
--- Define the Apple XCode 9.0 action and support functions.
+-- xcode11.lua
+-- Define the Apple XCode 11.0 action and support functions.
 --
 
 	local premake = premake
-	premake.xcode9 = { }
+	premake.xcode11 = { }
 
 	local xcode  = premake.xcode
-	local xcode8 = premake.xcode8
-	local xcode9 = premake.xcode9
+	local xcode10 = premake.xcode10
+	local xcode11 = premake.xcode11
 
-	function xcode9.XCBuildConfiguration_Project(tr, prj, cfg)
-		local options = xcode8.XCBuildConfiguration_Project(tr, prj, cfg)
-
-		if cfg.flags.Cpp17 then
-			options.CLANG_CXX_LANGUAGE_STANDARD = "c++17"
-		elseif cfg.flags.Cpp20 or cfg.flags.CppLatest then
-			options.CLANG_CXX_LANGUAGE_STANDARD = "c++20"
-		end
-
-		return table.merge(options, {
-			CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = "YES",
-			CLANG_WARN_COMMA = "YES",
-			CLANG_WARN_NON_LITERAL_NULL_CONVERSION = "YES",
-			CLANG_WARN_OBJC_LITERAL_CONVERSION = "YES",
-			CLANG_WARN_RANGE_LOOP_ANALYSIS = "YES",
-			CLANG_WARN_STRICT_PROTOTYPES = "YES",
-		})
+	function xcode11.XCBuildConfiguration_Target(tr, target, cfg)
+		local options = xcode10.XCBuildConfiguration_Target(tr, target, cfg)
+		options.CODE_SIGN_IDENTITY = "-"
+		return options
 	end
 
-	function xcode9.project(prj)
+	function xcode11.project(prj)
 		local tr = xcode.buildprjtree(prj)
 		xcode.Header(tr, 48)
 		xcode.PBXBuildFile(tr)
@@ -47,23 +34,24 @@
 		xcode.PBXVariantGroup(tr)
 		xcode.PBXTargetDependency(tr)
 		xcode.XCBuildConfiguration(tr, prj, {
-			ontarget = xcode8.XCBuildConfiguration_Target,
-			onproject = xcode9.XCBuildConfiguration_Project,
+			ontarget = xcode11.XCBuildConfiguration_Target,
+			onproject = xcode10.XCBuildConfiguration_Project,
 		})
 		xcode.XCBuildConfigurationList(tr)
 		xcode.Footer(tr)
 	end
+	--]]
 
 
 --
--- xcode9 action
+-- xcode11 action
 --
 
 	newaction
 	{
-		trigger         = "xcode9",
-		shortname       = "Xcode 9",
-		description     = "Generate Apple Xcode 9 project files",
+		trigger         = "xcode11",
+		shortname       = "Xcode 11",
+		description     = "Generate Apple Xcode 11 project files",
 		os              = "macosx",
 
 		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
@@ -74,13 +62,7 @@
 			cc     = { "gcc" },
 		},
 
-		valid_platforms = {
-			Native = "Native",
-			x32 = "Native 32-bit",
-			x64 = "Native 64-bit",
-			Universal = "Universal",
-		},
-
+		valid_platforms = { Native = "Native" },
 		default_platform = "Native",
 
 		onsolution = function(sln)
@@ -90,7 +72,7 @@
 		end,
 
 		onproject = function(prj)
-			premake.generate(prj, "%%.xcodeproj/project.pbxproj", xcode9.project)
+			premake.generate(prj, "%%.xcodeproj/project.pbxproj", xcode11.project)
 			xcode.generate_schemes(prj, "%%.xcodeproj/xcshareddata/xcschemes")
 		end,
 

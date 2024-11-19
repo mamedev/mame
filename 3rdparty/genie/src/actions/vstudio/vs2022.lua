@@ -1,22 +1,22 @@
 --
--- vsllvm.lua
--- Baseline support for Visual Studio LLVM.
+-- vs2022.lua
+-- Baseline support for Visual Studio 2022.
 --
 
-	premake.vstudio.vcllvm = {}
-	local vcllvm = premake.vstudio.vcllvm
+	premake.vstudio.vc2022 = {}
+	local vc2022 = premake.vstudio.vc2022
 	local vstudio = premake.vstudio
 
 
 ---
--- Register a command-line action for Visual Studio llvm.
+-- Register a command-line action for Visual Studio 2022.
 ---
 
 	newaction
 	{
-		trigger         = "vsllvm",
-		shortname       = "Visual Studio LLVM",
-		description     = "Generate Microsoft Visual Studio LLVM project files",
+		trigger         = "vs2022",
+		shortname       = "Visual Studio 2022",
+		description     = "Generate Microsoft Visual Studio 2022 project files",
 		os              = "windows",
 
 		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
@@ -55,10 +55,10 @@
 
 		vstudio = {
 			solutionVersion = "12",
-			targetFramework = "4.5.2",
-			toolsVersion    = "15.0",
-			windowsTargetPlatformVersion = "8.1",
+			targetFramework = "4.7.2",
+			toolsVersion    = "16.0",
+			windowsTargetPlatformVersion = "10.0",
 			supports64bitEditContinue    = true,
-			intDirAbsolute  = true,
+			intDirAbsolute  = false,
 		}
 	}
