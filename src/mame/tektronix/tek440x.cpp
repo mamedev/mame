@@ -89,6 +89,9 @@
 // do MMU translation inside memory_r / memory_w
 #define USE_MMUxx
 
+// pagetable as internal
+#define USE_INTERNAL_MAPxx
+
 class m68010_tekmmu_device : public m68010_device
 {
 	using m68010_device::m68010_device;
@@ -210,13 +213,6 @@ class m68010_tekmmu_device : public m68010_device
 #endif
 
 public:
-	int is_user()
-	{
-		int a = ((get_fc() & 4) == 0);
-		return (a );
-	}
-
-
 	// device_memory_interface overrides
 	bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override
 	{
@@ -743,7 +739,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 	if (!machine().side_effects_disabled())
 	{
-		if (m_maincpu->is_user())				// User mode access updates map_control from write latch
+		if ((m_maincpu->get_fc() & 4) == 0)				// User mode access updates map_control from write latch
 		{
 				// NB need to apply once only as m_map_control gets modified
 				if (m_latched_map_control && m_latched_map_control != m_map_control)
@@ -758,7 +754,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 #ifndef USE_MMU
 		if (!inbuserr)			// not in buserr interrupt
-		if (m_maincpu->is_user())			// only in User mode
+		if ((m_maincpu->get_fc() & 4) == 0)			// only in User mode
 		if (BIT(m_map_control, MAP_VM_ENABLE))
 		{
 		
@@ -809,7 +805,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (m_maincpu->is_user())		// User mode access updates map_control from write latch
+	if ((m_maincpu->get_fc() & 4) == 0)		// User mode access updates map_control from write latch
 	{
 			if (m_latched_map_control && m_latched_map_control != m_map_control)
 			{
@@ -821,7 +817,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	
 	const offs_t offset0 = offset;
 #ifndef USE_MMU
-	if (m_maincpu->is_user())		// only in User mode
+	if ((m_maincpu->get_fc() & 4) == 0)		// only in User mode
 	if (BIT(m_map_control, MAP_VM_ENABLE))
 	{
 		//LOG("memory_w: m_map(0x%04x)\n", m_map[offset >> 11]);
