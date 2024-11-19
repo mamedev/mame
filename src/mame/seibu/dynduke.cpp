@@ -22,6 +22,9 @@
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
+    TODO:
+    - can be moved to raiden.cpp?
+
 
         SW#1
         --------------------------------------------------------------------
@@ -248,7 +251,6 @@ void dynduke_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		// bit 0x04 unused? txt disable?
 		// bit 0x02 is used on the map screen (fore disable?)
 		// bit 0x01 set when inserting coin.. bg disable?
-
 		m_back_enable = BIT(~data, 0);
 		m_fore_enable = BIT(~data, 1);
 		m_txt_enable = BIT(~data, 2);
@@ -532,9 +534,9 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,        // 8*8 characters
+	8,8,    // 8*8 characters
 	1024,
-	4,          // 4 bits per pixel
+	4,      // 4 bits per pixel
 	{ 4,0,(0x10000*8)+4,0x10000*8 },
 	{ 0,1,2,3,8,9,10,11 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
@@ -625,13 +627,13 @@ void dynduke_state::vblank_irq(int state)
 void dynduke_state::dynduke(machine_config &config)
 {
 	// basic machine hardware
-	V30(config, m_maincpu, 16'000'000 / 2); // NEC V30-8 CPU
+	V30(config, m_maincpu, 16_MHz_XTAL / 2); // NEC V30-8 CPU
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynduke_state::master_map);
 
-	V30(config, m_slave, 16'000'000 / 2); // NEC V30-8 CPU
+	V30(config, m_slave, 16_MHz_XTAL / 2); // NEC V30-8 CPU
 	m_slave->set_addrmap(AS_PROGRAM, &dynduke_state::slave_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 14'318'180 / 4));
+	z80_device &audiocpu(Z80(config, "audiocpu", 14.318181_MHz_XTAL / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &dynduke_state::sound_map);
 	audiocpu.set_addrmap(AS_OPCODES, &dynduke_state::sound_decrypted_opcodes_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
@@ -660,11 +662,11 @@ void dynduke_state::dynduke(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14'318'180 / 4));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14.318181_MHz_XTAL / 4));
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1'320'000, okim6295_device::PIN7_LOW));
+	okim6295_device &oki(OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
