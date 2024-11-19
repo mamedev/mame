@@ -22,40 +22,32 @@ priority should be given to
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_tx_tile_info)
 {
-	int tileno, colour;
-
-	tileno = m_txram[tile_index *2]   & 0xffff;
-	colour = m_txram[tile_index *2+1] & 0x000f;
+	const int tileno = m_txram[tile_index *2]   & 0xffff;
+	const int colour = m_txram[tile_index *2+1] & 0x000f;
 
 	tileinfo.set(2,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_roz_tile_info)
 {
-	int tileno,colour;
-
-	tileno = m_rozram[tile_index *2]   & 0xffff;
-	colour = m_rozram[tile_index *2+1] & 0x000f;
+	const int tileno = m_rozram[tile_index *2]   & 0xffff;
+	const int colour = m_rozram[tile_index *2+1] & 0x000f;
 
 	tileinfo.set(0,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
 {
-	int tileno,colour;
-
-	tileno = m_bgram[tile_index *2]   & 0xffff;
-	colour = m_bgram[tile_index *2+1] & 0x000f;
+	const int tileno = m_bgram[tile_index *2]   & 0xffff;
+	const int colour = m_bgram[tile_index *2+1] & 0x000f;
 
 	tileinfo.set(1,tileno,colour,0);
 }
 
 TILE_GET_INFO_MEMBER(ms32_f1superbattle_state::get_ms32_extra_tile_info)
 {
-	int tileno,colour;
-
-	tileno = m_road_vram[tile_index *2]   & 0xffff;
-	colour = m_road_vram[tile_index *2+1] & 0x000f;
+	const int tileno = m_road_vram[tile_index *2]   & 0xffff;
+	const int colour = m_road_vram[tile_index *2+1] & 0x000f;
 
 	tileinfo.set(3,tileno,colour+0x50,0);
 }
@@ -135,15 +127,15 @@ void ms32_state::update_color(int color)
 	 */
 	if (~color & 0x4000)
 	{
-		r = ((m_palram[color*2] & 0xff00) >> 8 ) * m_brt_r / 0x100;
-		g = ((m_palram[color*2] & 0x00ff) >> 0 ) * m_brt_g / 0x100;
-		b = ((m_palram[color*2+1] & 0x00ff) >> 0 ) * m_brt_b / 0x100;
+		r = ((m_palram[color*2] & 0xff00) >> 8) * m_brt_r / 0x100;
+		g = ((m_palram[color*2] & 0x00ff) >> 0) * m_brt_g / 0x100;
+		b = ((m_palram[color*2+1] & 0x00ff) >> 0) * m_brt_b / 0x100;
 	}
 	else
 	{
-		r = ((m_palram[color*2] & 0xff00) >> 8 );
-		g = ((m_palram[color*2] & 0x00ff) >> 0 );
-		b = ((m_palram[color*2+1] & 0x00ff) >> 0 );
+		r = ((m_palram[color*2] & 0xff00) >> 8);
+		g = ((m_palram[color*2] & 0x00ff) >> 0);
+		b = ((m_palram[color*2+1] & 0x00ff) >> 0);
 	}
 
 	m_palette->set_pen_color(color,rgb_t(r,g,b));
@@ -151,14 +143,14 @@ void ms32_state::update_color(int color)
 
 void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	int oldword = m_brt[offset];
+	const u32 oldword = m_brt[offset];
 	COMBINE_DATA(&m_brt[offset]);
 
 
 	if (m_brt[offset] != oldword)
 	{
 		// TODO: bank "1" is for sprite colors
-		int bank = ((offset & 2) >> 1) * 0x4000;
+		const u32 bank = ((offset & 2) >> 1) * 0x4000;
 		//int i;
 
 		if (bank == 0)
@@ -240,13 +232,12 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 	if (m_roz_ctrl[0x5c/4] & 1)  /* "super" mode */
 	{
 		rectangle my_clip;
-		int y, maxy;
 
 		my_clip.min_x = cliprect.min_x;
 		my_clip.max_x = cliprect.max_x;
 
-		y = cliprect.min_y;
-		maxy = cliprect.max_y;
+		int y = cliprect.min_y;
+		const int maxy = cliprect.max_y;
 
 		while (y <= maxy)
 		{

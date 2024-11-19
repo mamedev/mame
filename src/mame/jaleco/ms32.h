@@ -80,6 +80,7 @@ public:
 		, m_sprram(*this, "sprram", 0x10000, ENDIANNESS_LITTLE)
 		, m_txram(*this, "txram", 0x4000, ENDIANNESS_LITTLE)
 		, m_bgram(*this, "bgram", 0x4000, ENDIANNESS_LITTLE)
+		, m_io_mj(*this, "MJ%u", 0U)
 	{ }
 
 	void ms32(machine_config &config);
@@ -121,6 +122,7 @@ private:
 	memory_share_creator<u16> m_sprram;
 	memory_share_creator<u16> m_txram;
 	memory_share_creator<u16> m_bgram;
+	optional_ioport_array<5> m_io_mj;
 
 	std::unique_ptr<u8[]> m_nvram_8;
 
@@ -178,6 +180,7 @@ public:
 	ms32_f1superbattle_state(const machine_config &mconfig, device_type type, const char *tag) :
 		ms32_state(mconfig, type, tag)
 		, m_road_vram(*this, "road_vram", 0x10000, ENDIANNESS_LITTLE)
+		, m_io_analog(*this, "AN%u", 0U)
 		// TODO: COPROs
 	{}
 
@@ -187,12 +190,16 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 private:
+	memory_share_creator<u16> m_road_vram;
+
+	required_ioport_array<3> m_io_analog;
+
+	tilemap_t* m_extra_tilemap;
+
 	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
 
 	void ms32_irq2_guess_w(u32 data);
 	void ms32_irq5_guess_w(u32 data);
-
-	memory_share_creator<u16> m_road_vram;
 
 	void f1superb_map(address_map &map) ATTR_COLD;
 
@@ -200,8 +207,6 @@ private:
 	u16 road_vram_r16(offs_t offset);
 
 	u32 analog_r();
-
-	tilemap_t* m_extra_tilemap;
 };
 
 #endif // MAME_JALECO_MS32_H
