@@ -873,7 +873,7 @@ ROM_END
 
 // Based on sectrzona set, with obviously patched MCU program to make it work on a standard 6802.
 ROM_START( sectrzont )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x7800, "maincpu", 0 )
 	ROM_LOAD( "czt_1.bin",  0x0000, 0x1000, CRC(f0a45cb4) SHA1(ab3b8d78e25cdbb2fd6a6c0718ae13767364994d) )
 	ROM_LOAD( "czt_2.bin",  0x1000, 0x1000, CRC(fea68ddb) SHA1(b9ed0cad9a2ded04bcc7042d975b77be63313070) )
 	ROM_LOAD( "czt_3.bin",  0x2000, 0x1000, CRC(baad4294) SHA1(e7fc3ccc940de6df8d786c986b602127c9db9ebb) )
