@@ -141,6 +141,31 @@ private:
 };
 
 
+void seicross_state::nvram_init(nvram_device &nvram, void *data, size_t size)
+{
+	static const uint8_t init[32] =
+	{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+		0, 1, 0, 1, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0,
+	};
+
+	memset(data, 0x00, size);
+	memcpy(data, init, sizeof(init));
+}
+
+void seicross_state::machine_start()
+{
+	save_item(NAME(m_portb));
+	save_item(NAME(m_irq_mask));
+}
+
+void seicross_state::machine_reset()
+{
+	// start with the protection MCU halted
+	m_mcu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+}
+
+
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -252,31 +277,6 @@ uint32_t seicross_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
-}
-
-
-void seicross_state::nvram_init(nvram_device &nvram, void *data, size_t size)
-{
-	static const uint8_t init[32] =
-	{
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-		0, 1, 0, 1, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0,
-	};
-
-	memset(data, 0x00, size);
-	memcpy(data, init, sizeof(init));
-}
-
-void seicross_state::machine_start()
-{
-	save_item(NAME(m_portb));
-	save_item(NAME(m_irq_mask));
-}
-
-void seicross_state::machine_reset()
-{
-	// start with the protection MCU halted
-	m_mcu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -793,7 +793,7 @@ ROM_START( seicross )
 	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) )
 ROM_END
 
-// this set is almost identical to sectrzon
+// This set is almost identical to sectrzona.
 ROM_START( seicrossa )
 	ROM_REGION( 0x7800, "maincpu", 0 )
 	ROM_LOAD( "sr-1.3a",    0x0000, 0x1000, CRC(f0a45cb4) SHA1(ab3b8d78e25cdbb2fd6a6c0718ae13767364994d) )
@@ -802,7 +802,7 @@ ROM_START( seicrossa )
 	ROM_LOAD( "sr-4.3e",    0x3000, 0x1000, CRC(75f2ca75) SHA1(fbf990edcb7b5a58f8dcee160883fde5e222ca6b) )
 	ROM_LOAD( "sr-5.3f",    0x4000, 0x1000, CRC(dc14f2c8) SHA1(dcda8d6f7be458d0adcddc37bbe0eb636a5b0b06) )
 	ROM_LOAD( "sr-6.3g",    0x5000, 0x1000, CRC(397a38c5) SHA1(6189028376c1781aae107c5fe0aec181a1d885e1) )
-	ROM_LOAD( "sr-7.3i",    0x6000, 0x1000, CRC(220a0919) SHA1(86e4c5d60353db17991fc5d6788308ed28bdc795) ) // unique, 1st half identical to seicross, 2nd half identical to sectrzon
+	ROM_LOAD( "sr-7.3i",    0x6000, 0x1000, CRC(220a0919) SHA1(86e4c5d60353db17991fc5d6788308ed28bdc795) ) // unique, 1st half identical to seicross, 2nd half identical to sectrzona
 	ROM_LOAD( "sr-8.3j",    0x7000, 0x0800, CRC(2a95ad44) SHA1(75f5e9ea90f23b4e253d9f5a781a32fa914dee8c) ) // 1ST AND 2ND HALF IDENTICAL, same as sz8.3j
 	ROM_IGNORE(                     0x0800)
 
@@ -814,64 +814,14 @@ ROM_START( seicrossa )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "sr-3.9c",    0x0000, 0x0020, CRC(4d218a3c) SHA1(26364dfdb7e13080357328a06c3bcf504778defd) )
-	ROM_LOAD( "sr-4.9b",    0x0020, 0x0020, BAD_DUMP CRC(969beb4c) SHA1(69499d916871bb0529952c89fbd75694124ec0b2) ) // unique, gives bad colors. No references available. TODO: verify if it's really bad
+	ROM_LOAD( "sr-4.9b",    0x0020, 0x0020, CRC(969beb4c) SHA1(69499d916871bb0529952c89fbd75694124ec0b2) ) // unique, gives different title logo colors
 
 	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, BAD_DUMP CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) ) // not dumped for this set
 ROM_END
 
+// This and set seicross seem bug-fixed versions, where the attract mode works. In the other sets during attract the player only goes straight until he crashes.
 ROM_START( sectrzon )
-	ROM_REGION( 0x7800, "maincpu", 0 )
-	ROM_LOAD( "sz1.3a",     0x0000, 0x1000, CRC(f0a45cb4) SHA1(ab3b8d78e25cdbb2fd6a6c0718ae13767364994d) )
-	ROM_LOAD( "sz2.3c",     0x1000, 0x1000, CRC(fea68ddb) SHA1(b9ed0cad9a2ded04bcc7042d975b77be63313070) )
-	ROM_LOAD( "sz3.3d",     0x2000, 0x1000, CRC(baad4294) SHA1(e7fc3ccc940de6df8d786c986b602127c9db9ebb) )
-	ROM_LOAD( "sz4.3e",     0x3000, 0x1000, CRC(75f2ca75) SHA1(fbf990edcb7b5a58f8dcee160883fde5e222ca6b) )
-	ROM_LOAD( "sz5.3fg",    0x4000, 0x1000, CRC(dc14f2c8) SHA1(dcda8d6f7be458d0adcddc37bbe0eb636a5b0b06) )
-	ROM_LOAD( "sz6.3h",     0x5000, 0x1000, CRC(397a38c5) SHA1(6189028376c1781aae107c5fe0aec181a1d885e1) )
-	ROM_LOAD( "sz7.3i",     0x6000, 0x1000, CRC(7b34dc1c) SHA1(fb163a908c991cd214e0d2d685e74563a460a929) )
-	ROM_LOAD( "sz8.3j",     0x7000, 0x0800, CRC(9933526a) SHA1(2178ef8653f1d60be28bcaebe1033ef7ae480157) )
-
-	ROM_REGION( 0x4000, "gfx", 0 )
-	ROM_LOAD( "sz11.7k",    0x0000, 0x1000, CRC(fbd9b91d) SHA1(6b3581f4b518c058b970d569ced07dd7dc6a87e6) )
-	ROM_LOAD( "sz12.7m",    0x1000, 0x1000, CRC(2bdef9ad) SHA1(50fe41e81c1307317b4fb6b47bf0619d141c42ff) )
-	ROM_LOAD( "sz9.7j",     0x2000, 0x1000, CRC(4819f0cd) SHA1(fa8d371efc3198daf76ff1264e22673c5521becf) )
-	ROM_LOAD( "sz10.7h",    0x3000, 0x1000, CRC(4c268778) SHA1(a1444fb3eb397c8167d769aa1f935c5f19df4d6d) )
-
-	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "sz73.10c",   0x0000, 0x0020, CRC(4d218a3c) SHA1(26364dfdb7e13080357328a06c3bcf504778defd) )
-	ROM_LOAD( "sz74.10b",   0x0020, 0x0020, CRC(c550531c) SHA1(d564aeb8a99861d29e00cf968242fe6c6cec478b) )
-
-	ROM_REGION( 0x0100, "plds", 0 )
-	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) )
-ROM_END
-
-ROM_START( sectrzont )
-	ROM_REGION( 0x7800, "maincpu", 0 )
-	ROM_LOAD( "czt_1.bin",  0x0000, 0x1000, CRC(f0a45cb4) SHA1(ab3b8d78e25cdbb2fd6a6c0718ae13767364994d) )
-	ROM_LOAD( "czt_2.bin",  0x1000, 0x1000, CRC(fea68ddb) SHA1(b9ed0cad9a2ded04bcc7042d975b77be63313070) )
-	ROM_LOAD( "czt_3.bin",  0x2000, 0x1000, CRC(baad4294) SHA1(e7fc3ccc940de6df8d786c986b602127c9db9ebb) )
-	ROM_LOAD( "czt_4.bin",  0x3000, 0x1000, CRC(75f2ca75) SHA1(fbf990edcb7b5a58f8dcee160883fde5e222ca6b) )
-	ROM_LOAD( "czt_5.bin",  0x4000, 0x1000, CRC(dc14f2c8) SHA1(dcda8d6f7be458d0adcddc37bbe0eb636a5b0b06) )
-	ROM_LOAD( "czt_6.bin",  0x5000, 0x1000, CRC(397a38c5) SHA1(6189028376c1781aae107c5fe0aec181a1d885e1) )
-	ROM_LOAD( "czt_7.bin",  0x6000, 0x1000, CRC(7b34dc1c) SHA1(fb163a908c991cd214e0d2d685e74563a460a929) )
-	ROM_LOAD( "czt_8.bin",  0x7000, 0x0800, CRC(673a20e7) SHA1(66be7581323dceddb594eed53dd3abc62b450327) ) // 1ST AND 2ND HALF IDENTICAL
-	ROM_IGNORE(                     0x0800)
-
-	ROM_REGION( 0x4000, "gfx", 0 )
-	ROM_LOAD( "czt_11.bin", 0x0000, 0x1000, CRC(fbd9b91d) SHA1(6b3581f4b518c058b970d569ced07dd7dc6a87e6) )
-	ROM_LOAD( "czt_12.bin", 0x1000, 0x1000, CRC(2bdef9ad) SHA1(50fe41e81c1307317b4fb6b47bf0619d141c42ff) )
-	ROM_LOAD( "czt_9.bin",  0x2000, 0x1000, CRC(4819f0cd) SHA1(fa8d371efc3198daf76ff1264e22673c5521becf) )
-	ROM_LOAD( "czt_10.bin", 0x3000, 0x1000, CRC(4c268778) SHA1(a1444fb3eb397c8167d769aa1f935c5f19df4d6d) )
-
-	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "czt_2_82s123.bin", 0x0000, 0x0020, CRC(4d218a3c) SHA1(26364dfdb7e13080357328a06c3bcf504778defd) )
-	ROM_LOAD( "czt_1_82s123.bin", 0x0020, 0x0020, CRC(c550531c) SHA1(d564aeb8a99861d29e00cf968242fe6c6cec478b) )
-
-	ROM_REGION( 0x0100, "plds", 0 )
-	ROM_LOAD( "czt_pal16h2cn.bin", 0x0000, 0x0044, CRC(7edec1ed) SHA1(1b28cb250875f14a76d84bfc0b23ee02b1862c2c) )
-ROM_END
-
-ROM_START( sectrzona ) // This and set seicross seem bug-fixed versions, where the attract mode works. In the other sets during attract the player only goes straight until he crashes
 	ROM_REGION( 0x7800, "maincpu", 0 )
 	ROM_LOAD( "sz1.3a",     0x0000, 0x1000, CRC(f6c3aeca) SHA1(d57019e80f7e3d47ca74f54604e92d40ba9819fc) )
 	ROM_LOAD( "sz2.3c",     0x1000, 0x1000, CRC(f167f10e) SHA1(d23043afe0f7a06fbec92b333d6db172523faf27) )
@@ -896,16 +846,70 @@ ROM_START( sectrzona ) // This and set seicross seem bug-fixed versions, where t
 	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, BAD_DUMP CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) )
 ROM_END
 
+ROM_START( sectrzona )
+	ROM_REGION( 0x7800, "maincpu", 0 )
+	ROM_LOAD( "sz1.3a",     0x0000, 0x1000, CRC(f0a45cb4) SHA1(ab3b8d78e25cdbb2fd6a6c0718ae13767364994d) )
+	ROM_LOAD( "sz2.3c",     0x1000, 0x1000, CRC(fea68ddb) SHA1(b9ed0cad9a2ded04bcc7042d975b77be63313070) )
+	ROM_LOAD( "sz3.3d",     0x2000, 0x1000, CRC(baad4294) SHA1(e7fc3ccc940de6df8d786c986b602127c9db9ebb) )
+	ROM_LOAD( "sz4.3e",     0x3000, 0x1000, CRC(75f2ca75) SHA1(fbf990edcb7b5a58f8dcee160883fde5e222ca6b) )
+	ROM_LOAD( "sz5.3fg",    0x4000, 0x1000, CRC(dc14f2c8) SHA1(dcda8d6f7be458d0adcddc37bbe0eb636a5b0b06) )
+	ROM_LOAD( "sz6.3h",     0x5000, 0x1000, CRC(397a38c5) SHA1(6189028376c1781aae107c5fe0aec181a1d885e1) )
+	ROM_LOAD( "sz7.3i",     0x6000, 0x1000, CRC(7b34dc1c) SHA1(fb163a908c991cd214e0d2d685e74563a460a929) )
+	ROM_LOAD( "sz8.3j",     0x7000, 0x0800, CRC(9933526a) SHA1(2178ef8653f1d60be28bcaebe1033ef7ae480157) )
+
+	ROM_REGION( 0x4000, "gfx", 0 )
+	ROM_LOAD( "sz11.7k",    0x0000, 0x1000, CRC(fbd9b91d) SHA1(6b3581f4b518c058b970d569ced07dd7dc6a87e6) )
+	ROM_LOAD( "sz12.7m",    0x1000, 0x1000, CRC(2bdef9ad) SHA1(50fe41e81c1307317b4fb6b47bf0619d141c42ff) )
+	ROM_LOAD( "sz9.7j",     0x2000, 0x1000, CRC(4819f0cd) SHA1(fa8d371efc3198daf76ff1264e22673c5521becf) )
+	ROM_LOAD( "sz10.7h",    0x3000, 0x1000, CRC(4c268778) SHA1(a1444fb3eb397c8167d769aa1f935c5f19df4d6d) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "sz73.10c",   0x0000, 0x0020, CRC(4d218a3c) SHA1(26364dfdb7e13080357328a06c3bcf504778defd) )
+	ROM_LOAD( "sz74.10b",   0x0020, 0x0020, CRC(c550531c) SHA1(d564aeb8a99861d29e00cf968242fe6c6cec478b) )
+
+	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) )
+ROM_END
+
+// Based on sectrzona set, with obviously patched MCU program to make it work on a standard 6802.
+ROM_START( sectrzont )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "czt_1.bin",  0x0000, 0x1000, CRC(f0a45cb4) SHA1(ab3b8d78e25cdbb2fd6a6c0718ae13767364994d) )
+	ROM_LOAD( "czt_2.bin",  0x1000, 0x1000, CRC(fea68ddb) SHA1(b9ed0cad9a2ded04bcc7042d975b77be63313070) )
+	ROM_LOAD( "czt_3.bin",  0x2000, 0x1000, CRC(baad4294) SHA1(e7fc3ccc940de6df8d786c986b602127c9db9ebb) )
+	ROM_LOAD( "czt_4.bin",  0x3000, 0x1000, CRC(75f2ca75) SHA1(fbf990edcb7b5a58f8dcee160883fde5e222ca6b) )
+	ROM_LOAD( "czt_5.bin",  0x4000, 0x1000, CRC(dc14f2c8) SHA1(dcda8d6f7be458d0adcddc37bbe0eb636a5b0b06) )
+	ROM_LOAD( "czt_6.bin",  0x5000, 0x1000, CRC(397a38c5) SHA1(6189028376c1781aae107c5fe0aec181a1d885e1) )
+	ROM_LOAD( "czt_7.bin",  0x6000, 0x1000, CRC(7b34dc1c) SHA1(fb163a908c991cd214e0d2d685e74563a460a929) )
+	ROM_LOAD( "czt_8.bin",  0x7000, 0x0800, CRC(673a20e7) SHA1(66be7581323dceddb594eed53dd3abc62b450327) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                     0x0800)
+
+	ROM_REGION( 0x4000, "gfx", 0 )
+	ROM_LOAD( "czt_11.bin", 0x0000, 0x1000, CRC(fbd9b91d) SHA1(6b3581f4b518c058b970d569ced07dd7dc6a87e6) )
+	ROM_LOAD( "czt_12.bin", 0x1000, 0x1000, CRC(2bdef9ad) SHA1(50fe41e81c1307317b4fb6b47bf0619d141c42ff) )
+	ROM_LOAD( "czt_9.bin",  0x2000, 0x1000, CRC(4819f0cd) SHA1(fa8d371efc3198daf76ff1264e22673c5521becf) )
+	ROM_LOAD( "czt_10.bin", 0x3000, 0x1000, CRC(4c268778) SHA1(a1444fb3eb397c8167d769aa1f935c5f19df4d6d) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "czt_2_82s123.bin", 0x0000, 0x0020, CRC(4d218a3c) SHA1(26364dfdb7e13080357328a06c3bcf504778defd) )
+	ROM_LOAD( "czt_1_82s123.bin", 0x0020, 0x0020, CRC(c550531c) SHA1(d564aeb8a99861d29e00cf968242fe6c6cec478b) )
+
+	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_LOAD( "czt_pal16h2cn.bin", 0x0000, 0x0044, CRC(7edec1ed) SHA1(1b28cb250875f14a76d84bfc0b23ee02b1862c2c) )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1981, friskyt,   0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 1)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskyta,  friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 2)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskytb,  friskyt,  friskytb, friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 3)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, radrad,    0,        no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Nichibutsu USA",     "Radical Radial (US)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, radradj,   radrad,   no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp.",      "Radical Radial (Japan)",               MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, seicross,  0,        no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 1)",                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, seicrossa, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 2)",                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzon,  seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 1)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzont, seicross, sectznt,  seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 2, Tecfri hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzona, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 3)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyt,   0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyta,  friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskytb,  friskyt,  friskytb, friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1982, radrad,    0,        no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp. (Nichibutsu USA license)", "Radical Radial (US)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, radradj,   radrad,   no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp.",                          "Radical Radial (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1984, seicross,  0,        no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 1)",      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, seicrossa, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 2)",      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzon,  seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 1)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzona, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 2)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzont, seicross, sectznt,  seicross, seicross_state, empty_init,    ROT90, "bootleg (Tecfri)",   "Sector Zone (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
