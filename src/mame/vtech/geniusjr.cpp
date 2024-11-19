@@ -350,7 +350,7 @@ ROM_END
 // Same main ROM as VTech "El Super-Ordenador Parlanchín", and also same label on the TSP50C10 (probably same ROM too)
 ROM_START( pitagjr )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "hc05_internal_sp	.bin", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "hc05_internal_sp.bin", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "extrom", 0 )
 	ROM_LOAD( "lh532hjt_9811d.u3", 0x00000, 0x40000, CRC(23878b45) SHA1(8f3c41c10cfde9d76763c3a8701ec6616db4ab40) )
