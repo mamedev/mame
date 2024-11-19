@@ -49,7 +49,6 @@ public:
 		m_palette(*this, "palette"),
 		m_mainbank(*this, "mainbank"),
 		m_k051316_view(*this, "k051316_view"),
-		m_k051316_rom_view(*this, "k051316_rom_view"),
 		m_palette_view(*this, "palette_view")
 	{ }
 
@@ -78,7 +77,6 @@ private:
 	required_memory_bank m_mainbank;
 
 	memory_view m_k051316_view;
-	memory_view m_k051316_rom_view;
 	memory_view m_palette_view;
 
 	uint8_t k052109_051960_r(offs_t offset);
@@ -226,12 +224,6 @@ void bottom9_state::_1f90_w(uint8_t data)
 	// bit 3 = disable video
 	m_video_enable = BIT(~data, 3);
 
-	// bit 4 = enable 051316 ROM reading
-	if (BIT(data, 4))
-		m_k051316_rom_view.select(0);
-	else
-		m_k051316_rom_view.disable();
-
 	// bit 5 = RAM bank
 	if (BIT(data, 5))
 	{
@@ -241,7 +233,8 @@ void bottom9_state::_1f90_w(uint8_t data)
 	else
 	{
 		m_palette_view.select(0);
-		m_k051316_view.select(0);
+		// bit 4 = enable 051316 ROM reading
+		m_k051316_view.select(BIT(data, 4));
 	}
 }
 
@@ -278,8 +271,7 @@ void bottom9_state::main_map(address_map &map)
 	map(0x0000, 0x3fff).rw(FUNC(bottom9_state::k052109_051960_r), FUNC(bottom9_state::k052109_051960_w));
 	map(0x0000, 0x07ff).view(m_k051316_view);
 	m_k051316_view[0](0x0000, 0x07ff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write));
-	m_k051316_view[0](0x0000, 0x07ff).view(m_k051316_rom_view);
-	m_k051316_rom_view[0](0x0000, 0x07ff).r(m_k051316, FUNC(k051316_device::rom_r));
+	m_k051316_view[1](0x0000, 0x07ff).rw(m_k051316, FUNC(k051316_device::rom_r), FUNC(k051316_device::write));
 	map(0x1f80, 0x1f80).w(FUNC(bottom9_state::bankswitch_w));
 	map(0x1f90, 0x1f90).w(FUNC(bottom9_state::_1f90_w));
 	map(0x1fa0, 0x1fa0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
@@ -404,7 +396,6 @@ void bottom9_state::machine_start()
 void bottom9_state::machine_reset()
 {
 	m_video_enable = 0;
-	m_k051316_rom_view.disable();
 	m_palette_view.select(0);
 	m_k051316_view.select(0);
 	m_nmienable = 0;
