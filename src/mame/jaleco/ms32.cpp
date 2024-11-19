@@ -484,18 +484,15 @@ Notes from Charles MacDonald
 
 ioport_value ms32_state::mahjong_ctrl_r()
 {
-	u32 mj_input = 0;
+	u32 mj_input = 0xff;
 
 	for (int i = 0; i < m_io_mj.size(); i++)
 	{
 		if (BIT(m_mahjong_input_select[0], i))
-		{
-			mj_input = m_io_mj[i]->read();
-			break;
-		}
+			mj_input &= m_io_mj[i]->read();
 	}
 
-	return mj_input & 0xff;
+	return mj_input;
 }
 
 void ms32_base_state::sound_command_w(u32 data)
@@ -1613,7 +1610,7 @@ IRQ_CALLBACK_MEMBER(ms32_base_state::irq_callback)
 {
 	int i;
 	// TODO: confirm irq priority
-	for (i = 15; i >= 0 && !(m_irqreq & (1 << i)); i--);
+	for (i = 15; i >= 0 && !(m_irqreq & (1 << i)); i--) { }
 	return i;
 }
 
