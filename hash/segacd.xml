@@ -3252,7 +3252,7 @@ Requires [disc swap]
 		<rom name="Sonic CD (USA) (Track 34).bin" size="16233504" crc="b9f018f8" />
 		<rom name="Sonic CD (USA) (Track 35).bin" size="32111856" crc="4194928d" />
 		-->
-		<description>Sonic the Hedgehog CD (USA)</description>
+		<description>Sonic the Hedgehog CD (USA, R1C)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4407"/>
@@ -3305,7 +3305,7 @@ Requires [disc swap]
 		<rom name="Sonic CD (USA) (RE125) (Track 34).bin" size="16405200" crc="393386fd" md5="d798e31b863cf5e31ef6e1b242aabe86" sha1="b52aa2b587cd4682e95a56e087cd15e215afa316"/>
 		<rom name="Sonic CD (USA) (RE125) (Track 35).bin" size="31940160" crc="9cebd39d" md5="dcfce720b4e4cb2236cc54537eb551c5" sha1="f3113ef9547a9242fc93bd6654adeb860f22dc27"/>
 		-->
-		<description>Sonic the Hedgehog CD (USA, alt)</description>
+		<description>Sonic the Hedgehog CD (USA, R7D)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4407"/>
@@ -3359,7 +3359,7 @@ Requires [disc swap]
 		<rom name="Sonic CD (USA) (RE125) (Alt) (Track 34).bin" size="16405200" crc="393386fd" md5="d798e31b863cf5e31ef6e1b242aabe86" sha1="b52aa2b587cd4682e95a56e087cd15e215afa316"/>
 		<rom name="Sonic CD (USA) (RE125) (Alt) (Track 35).bin" size="31940160" crc="9cebd39d" md5="dcfce720b4e4cb2236cc54537eb551c5" sha1="f3113ef9547a9242fc93bd6654adeb860f22dc27"/>
 		-->
-		<description>Sonic the Hedgehog CD (USA, alt 2)</description>
+		<description>Sonic the Hedgehog CD (USA, R8C)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="Sonic CD (Box)" />
@@ -3410,7 +3410,7 @@ Requires [disc swap]
 		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 34).bin" size="16405200" crc="393386fd" md5="d798e31b863cf5e31ef6e1b242aabe86" sha1="b52aa2b587cd4682e95a56e087cd15e215afa316" />
 		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 35).bin" size="31940160" crc="9cebd39d" md5="dcfce720b4e4cb2236cc54537eb551c5" sha1="f3113ef9547a9242fc93bd6654adeb860f22dc27" />
 		-->
-		<description>Sonic the Hedgehog CD (USA, alt 3)</description>
+		<description>Sonic the Hedgehog CD (USA, R4C)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4407"/>
