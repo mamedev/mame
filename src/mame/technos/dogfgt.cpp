@@ -7,12 +7,19 @@ Acrobatic Dog-Fight / 『バッテン・オハラのスチャラカ空中戦』
 
 driver by Nicola Salmoria
 
+TODO:
+- verify clocks: 1.5MHz AY clocks and 57.44Hz screen refresh rate are
+  certain when compared to PCB video, 16 IRQs per frame is also certain
+- flipscreen dipswitch, manual says it's on bank 2 #8, probably not
+  readable by software?
+
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 
 #include "emupal.h"
@@ -82,6 +89,7 @@ private:
 	uint8_t m_scroll[4]{};
 	uint8_t m_lastflip = 0U;
 	uint8_t m_lastpixcolor = 0U;
+
 	static constexpr uint8_t PIXMAP_COLOR_BASE = (16 + 32);
 	static constexpr uint16_t BITMAPRAM_SIZE = 0x6000;
 
@@ -91,13 +99,15 @@ private:
 	void subirqtrigger_w(uint8_t data);
 	void sub_irqack_w(uint8_t data);
 	void soundcontrol_w(uint8_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
 	void plane_select_w(uint8_t data);
 	uint8_t bitmapram_r(offs_t offset);
 	void internal_bitmapram_w(offs_t offset, uint8_t data);
 	void bitmapram_w(offs_t offset, uint8_t data);
 	void bgvideoram_w(offs_t offset, uint8_t data);
 	void scroll_w(offs_t offset, uint8_t data);
-	void _1800_w(uint8_t data);
+	void control_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
@@ -182,6 +192,60 @@ void dogfgt_state::video_start()
 
 /***************************************************************************
 
+  Display refresh
+
+***************************************************************************/
+
+void dogfgt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	{
+		if (m_spriteram[offs] & 0x01)
+		{
+			int sx = m_spriteram[offs + 3];
+			int sy = (240 - m_spriteram[offs + 2]) & 0xff;
+			int flipx = m_spriteram[offs] & 0x04;
+			int flipy = m_spriteram[offs] & 0x02;
+			if (flip_screen())
+			{
+				sx = 240 - sx;
+				sy = 240 - sy;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+					m_spriteram[offs + 1] + ((m_spriteram[offs] & 0x30) << 4),
+					(m_spriteram[offs] & 0x08) >> 3,
+					flipx, flipy,
+					sx, sy, 0);
+		}
+	}
+}
+
+
+uint32_t dogfgt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_lastflip != flip_screen() || m_lastpixcolor != m_pixcolor)
+	{
+		m_lastflip = flip_screen();
+		m_lastpixcolor = m_pixcolor;
+
+		for (int offs = 0; offs < BITMAPRAM_SIZE; offs++)
+			internal_bitmapram_w(offs, m_bitmapram[offs]);
+	}
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	draw_sprites(bitmap, cliprect);
+
+	copybitmap_trans(bitmap, m_pixbitmap, 0, 0, 0, 0, cliprect, PIXMAP_COLOR_BASE + 8 * m_pixcolor);
+	return 0;
+}
+
+
+/***************************************************************************
+
   Memory handlers
 
 ***************************************************************************/
@@ -248,7 +312,7 @@ void dogfgt_state::scroll_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->set_scrolly(0, m_scroll[2] + 256 * m_scroll[3]);
 }
 
-void dogfgt_state::_1800_w(uint8_t data)
+void dogfgt_state::control_w(uint8_t data)
 {
 	// bits 0 and 1 are probably text color (not verified because PROM is missing)
 	m_pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
@@ -262,61 +326,6 @@ void dogfgt_state::_1800_w(uint8_t data)
 
 	// other bits unused?
 	LOG1800("PC %04x: 1800 = %02x\n", m_maincpu->pc(), data);
-}
-
-
-/***************************************************************************
-
-  Display refresh
-
-***************************************************************************/
-
-void dogfgt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
-	{
-		if (m_spriteram[offs] & 0x01)
-		{
-			int sx = m_spriteram[offs + 3];
-			int sy = (240 - m_spriteram[offs + 2]) & 0xff;
-			int flipx = m_spriteram[offs] & 0x04;
-			int flipy = m_spriteram[offs] & 0x02;
-			if (flip_screen())
-			{
-				sx = 240 - sx;
-				sy = 240 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-					m_spriteram[offs + 1] + ((m_spriteram[offs] & 0x30) << 4),
-					(m_spriteram[offs] & 0x08) >> 3,
-					flipx, flipy,
-					sx, sy, 0);
-		}
-	}
-}
-
-
-uint32_t dogfgt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	if (m_lastflip != flip_screen() || m_lastpixcolor != m_pixcolor)
-	{
-		m_lastflip = flip_screen();
-		m_lastpixcolor = m_pixcolor;
-
-		for (int offs = 0; offs < BITMAPRAM_SIZE; offs++)
-			internal_bitmapram_w(offs, m_bitmapram[offs]);
-	}
-
-
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	draw_sprites(bitmap, cliprect);
-
-	copybitmap_trans(bitmap, m_pixbitmap, 0, 0, 0, 0, cliprect, PIXMAP_COLOR_BASE + 8 * m_pixcolor);
-	return 0;
 }
 
 
@@ -346,6 +355,21 @@ void dogfgt_state::soundcontrol_w(uint8_t data)
 }
 
 
+TIMER_DEVICE_CALLBACK_MEMBER(dogfgt_state::interrupt)
+{
+	const int scanline = param;
+
+	// 16 interrupts per frame
+	if ((scanline & 0xf) == 8 && scanline <= 248)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+
+/***************************************************************************
+
+  Address maps
+
+***************************************************************************/
 
 void dogfgt_state::main_map(address_map &map)
 {
@@ -353,7 +377,7 @@ void dogfgt_state::main_map(address_map &map)
 	map(0x0f80, 0x0fdf).writeonly().share(m_spriteram);
 	map(0x1000, 0x17ff).w(FUNC(dogfgt_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0x1800, 0x1800).portr("P1");
-	map(0x1800, 0x1800).w(FUNC(dogfgt_state::_1800_w));    // text color, flip screen & coin counters
+	map(0x1800, 0x1800).w(FUNC(dogfgt_state::control_w));
 	map(0x1810, 0x1810).portr("P2");
 	map(0x1810, 0x1810).w(FUNC(dogfgt_state::subirqtrigger_w));
 	map(0x1820, 0x1820).portr("DSW1");
@@ -376,6 +400,11 @@ void dogfgt_state::sub_map(address_map &map)
 }
 
 
+/***************************************************************************
+
+  Input ports
+
+***************************************************************************/
 
 static INPUT_PORTS_START( dogfgt )
 	PORT_START("P1")
@@ -417,24 +446,14 @@ static INPUT_PORTS_START( dogfgt )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, "Upright 1 Player" )
-	PORT_DIPSETTING(    0x80, "Upright 2 Players" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )     // "Cocktail 1 Player" - IMPOSSIBLE !
-	PORT_DIPSETTING(    0xc0, DEF_STR( Cocktail ) )     // "Cocktail 2 Players"
 
-
-/*  Manual shows:
-
-    Dip #7  TV-Screen
-        OFF Table type
-        ON  Up-right type use
-    Dip #8  Control Panel
-        OFF Table type use
-        ON  Up-right use
-
-There is a side note for these two: "Change both together"
-*/
+	// 2 separate switches for upright/table cabinet, manual says to change both together
+	PORT_DIPNAME( 0x40, 0x00, "Screen" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x80, 0x00, "Control Panel" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -452,18 +471,15 @@ There is a side note for these two: "Change both together"
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
-/*  Manual shows:
-
-    Dip #8  TV-Screen
-        OFF Normal
-        ON  Invert
-*/
-
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
+/***************************************************************************
+
+  GFX layouts
+
+***************************************************************************/
 
 static const gfx_layout tilelayout =
 {
@@ -497,6 +513,11 @@ static GFXDECODE_START( gfx_dogfgt )
 GFXDECODE_END
 
 
+/***************************************************************************
+
+  Machine initialization
+
+***************************************************************************/
 
 void dogfgt_state::machine_start()
 {
@@ -525,21 +546,18 @@ void dogfgt_state::machine_reset()
 void dogfgt_state::dogfgt(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 12_MHz_XTAL / 8); // 1.5 MHz ???? divisor not verified
+	M6502(config, m_maincpu, 12_MHz_XTAL / 8); // 1.5MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &dogfgt_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(dogfgt_state::irq0_line_hold), attotime::from_hz(16 * 60));   // ? controls music tempo
+	TIMER(config, "scantimer").configure_scanline(FUNC(dogfgt_state::interrupt), "screen", 0, 1);
 
-	M6502(config, m_subcpu, 12_MHz_XTAL / 8); // 1.5 MHz ???? divisor not verified
+	M6502(config, m_subcpu, 12_MHz_XTAL / 8); // 1.5MHz?
 	m_subcpu->set_addrmap(AS_PROGRAM, &dogfgt_state::sub_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248); // ~57.44Hz
 	m_screen->set_screen_update(FUNC(dogfgt_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -551,11 +569,16 @@ void dogfgt_state::dogfgt(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2149(config, m_ay[0], 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.30); // 1.5 MHz ???? divisor not verified
-	YM2149(config, m_ay[1], 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.30); // 1.5 MHz ???? divisor not verified
+	YM2149(config, m_ay[0], 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.30); // 1.5MHz
+	YM2149(config, m_ay[1], 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.30); // "
 }
 
 
+/***************************************************************************
+
+  ROMs
+
+***************************************************************************/
 
 ROM_START( dogfgt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -661,6 +684,12 @@ ROM_END
 
 } // anonymous namespace
 
+
+/***************************************************************************
+
+  Game drivers
+
+***************************************************************************/
 
 GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan",                               "Acrobatic Dog-Fight",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1985, dogfgtu, dogfgt, dogfgt, dogfgt, dogfgt_state, empty_init, ROT0, "Technos Japan (Data East USA, Inc. license)", "Acrobatic Dog-Fight (USA)",                         MACHINE_SUPPORTS_SAVE )
