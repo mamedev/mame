@@ -47,7 +47,9 @@ public:
 		m_k051960(*this, "k051960"),
 		m_k051316(*this, "k051316"),
 		m_palette(*this, "palette"),
-		m_mainbank(*this, "mainbank")
+		m_mainbank(*this, "mainbank"),
+		m_k051316_view(*this, "k051316_view"),
+		m_palette_view(*this, "palette_view")
 	{ }
 
 	void bottom9(machine_config &config);
@@ -59,8 +61,6 @@ protected:
 private:
 	// misc
 	uint8_t m_video_enable = 0;
-	uint8_t m_zoomreadroms = 0;
-	uint8_t m_k052109_selected = 0;
 	uint8_t m_nmienable = 0;
 
 	static constexpr int m_layer_colorbase[3] = { 0 / 16, 0 / 16, 256 / 16 };
@@ -76,12 +76,11 @@ private:
 
 	required_memory_bank m_mainbank;
 
+	memory_view m_k051316_view;
+	memory_view m_palette_view;
+
 	uint8_t k052109_051960_r(offs_t offset);
 	void k052109_051960_w(offs_t offset, uint8_t data);
-	uint8_t bankedram1_r(offs_t offset);
-	void bankedram1_w(offs_t offset, uint8_t data);
-	uint8_t bankedram2_r(offs_t offset);
-	void bankedram2_w(offs_t offset, uint8_t data);
 	void bankswitch_w(uint8_t data);
 	void _1f90_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
@@ -196,53 +195,16 @@ void bottom9_state::k052109_051960_w(offs_t offset, uint8_t data)
 		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
-uint8_t bottom9_state::bankedram1_r(offs_t offset)
-{
-	if (m_k052109_selected)
-		return k052109_051960_r(offset);
-	else
-	{
-		if (m_zoomreadroms)
-			return m_k051316->rom_r(offset);
-		else
-			return m_k051316->read(offset);
-	}
-}
-
-void bottom9_state::bankedram1_w(offs_t offset, uint8_t data)
-{
-	if (m_k052109_selected)
-		k052109_051960_w(offset, data);
-	else
-		m_k051316->write(offset, data);
-}
-
-uint8_t bottom9_state::bankedram2_r(offs_t offset)
-{
-	if (m_k052109_selected)
-		return k052109_051960_r(offset + 0x2000);
-	else
-		return m_palette->basemem().read8(offset);
-}
-
-void bottom9_state::bankedram2_w(offs_t offset, uint8_t data)
-{
-	if (m_k052109_selected)
-		k052109_051960_w(offset + 0x2000, data);
-	else
-		m_palette->write8(offset, data);
-}
-
 void bottom9_state::bankswitch_w(uint8_t data)
 {
 	// bit 0 = RAM bank
-	if ((data & 1) == 0)
+	if (BIT(~data, 0))
 		logerror("bankswitch RAM bank 0");
 
 	// bit 1-4 = ROM bank
 	int bank;
 
-	if (data & 0x10)
+	if (BIT(data, 4))
 		bank = 8 + ((data & 0x06) >> 1);
 	else
 		bank = ((data & 0x0e) >> 1);
@@ -253,20 +215,27 @@ void bottom9_state::bankswitch_w(uint8_t data)
 void bottom9_state::_1f90_w(uint8_t data)
 {
 	// bits 0/1 = coin counters
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
 	// bit 2 = enable char ROM reading through the video RAM
-	m_k052109->set_rmrd_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->set_rmrd_line(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 3 = disable video
-	m_video_enable = ~data & 0x08;
-
-	// bit 4 = enable 051316 ROM reading
-	m_zoomreadroms = data & 0x10;
+	m_video_enable = BIT(~data, 3);
 
 	// bit 5 = RAM bank
-	m_k052109_selected = data & 0x20;
+	if (BIT(data, 5))
+	{
+		m_palette_view.disable();
+		m_k051316_view.disable();
+	}
+	else
+	{
+		m_palette_view.select(0);
+		// bit 4 = enable 051316 ROM reading
+		m_k051316_view.select(BIT(data, 4));
+	}
 }
 
 void bottom9_state::sh_irqtrigger_w(uint8_t data)
@@ -300,7 +269,9 @@ void bottom9_state::sound_bank_w(uint8_t data)
 void bottom9_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rw(FUNC(bottom9_state::k052109_051960_r), FUNC(bottom9_state::k052109_051960_w));
-	map(0x0000, 0x07ff).rw(FUNC(bottom9_state::bankedram1_r), FUNC(bottom9_state::bankedram1_w));
+	map(0x0000, 0x07ff).view(m_k051316_view);
+	m_k051316_view[0](0x0000, 0x07ff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write));
+	m_k051316_view[1](0x0000, 0x07ff).rw(m_k051316, FUNC(k051316_device::rom_r), FUNC(k051316_device::write));
 	map(0x1f80, 0x1f80).w(FUNC(bottom9_state::bankswitch_w));
 	map(0x1f90, 0x1f90).w(FUNC(bottom9_state::_1f90_w));
 	map(0x1fa0, 0x1fa0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
@@ -312,7 +283,8 @@ void bottom9_state::main_map(address_map &map)
 	map(0x1fd3, 0x1fd3).portr("DSW1");
 	map(0x1fe0, 0x1fe0).portr("DSW2");
 	map(0x1ff0, 0x1fff).w(m_k051316, FUNC(k051316_device::ctrl_w));
-	map(0x2000, 0x27ff).rw(FUNC(bottom9_state::bankedram2_r), FUNC(bottom9_state::bankedram2_w)).share("palette");
+	map(0x2000, 0x27ff).view(m_palette_view);
+	m_palette_view[0](0x2000, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x4000, 0x5fff).ram();
 	map(0x6000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);
@@ -418,16 +390,14 @@ void bottom9_state::machine_start()
 	m_mainbank->configure_entries(0, 12, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_video_enable));
-	save_item(NAME(m_zoomreadroms));
-	save_item(NAME(m_k052109_selected));
 	save_item(NAME(m_nmienable));
 }
 
 void bottom9_state::machine_reset()
 {
 	m_video_enable = 0;
-	m_zoomreadroms = 0;
-	m_k052109_selected = 0;
+	m_palette_view.select(0);
+	m_k051316_view.select(0);
 	m_nmienable = 0;
 }
 
