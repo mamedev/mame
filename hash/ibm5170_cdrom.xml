@@ -2283,10 +2283,10 @@ Offset [CDDA] audio, does not stop when exiting game (including getting to Windo
 		<description>Civilization: Call to Power (Limited Edition, v1.1)</description>
 		<year>1996</year>
 		<publisher>Activision</publisher>
-		<info name="version" value="1.1" />
 		<notes><![CDATA[
 Full game, but with netplay and map editing disabled. Bundled with Corel Linux OS Deluxe.
 ]]></notes>
+		<info name="version" value="1.1" />
 		<info name="language" value="English" />
 
 		<part name="cdrom" interface="cdrom">
