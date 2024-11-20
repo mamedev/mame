@@ -10,8 +10,6 @@ driver by Nicola Salmoria
 TODO:
 - verify clocks: 1.5MHz AY clocks and 57.44Hz screen refresh rate are
   certain when compared to PCB video, 16 IRQs per frame is also certain
-- flipscreen dipswitch, manual says it's on bank 2 #8, probably not
-  readable by software?
 
 ***************************************************************************/
 
@@ -28,18 +26,6 @@ TODO:
 #include "tilemap.h"
 
 
-// configurable logging
-#define LOG_BITMAPRAM     (1U << 1)
-#define LOG_1800          (1U << 2)
-
-//#define VERBOSE (LOG_GENERAL | LOG_BITMAPRAM | LOG_1800)
-
-#include "logmacro.h"
-
-#define LOGBITMAPRAM(...)     LOGMASKED(LOG_BITMAPRAM,     __VA_ARGS__)
-#define LOG1800(...)          LOGMASKED(LOG_1800,          __VA_ARGS__)
-
-
 namespace {
 
 class dogfgt_state : public driver_device
@@ -47,19 +33,23 @@ class dogfgt_state : public driver_device
 public:
 	dogfgt_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_bgvideoram(*this, "bgvideoram"),
-		m_spriteram(*this, "spriteram"),
-		m_bitmapram(*this, "bitmapram", 0x6000, ENDIANNESS_BIG),
-		m_subcpu(*this, "sub") ,
 		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu") ,
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ay(*this, "ay%u", 0U),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_dsw(*this, "DSW%u", 1),
+		m_sharedram(*this, "sharedram"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_spriteram(*this, "spriteram"),
+		m_bitmapram(*this, "bitmapram", 0x6000, ENDIANNESS_BIG)
 	{ }
 
 	void dogfgt(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(flipscreen_switch) { control_w(m_control); }
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -67,34 +57,37 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	// memory pointers
-	required_shared_ptr<uint8_t> m_bgvideoram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	memory_share_creator<uint8_t> m_bitmapram;
-
 	// devices
-	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device_array<ay8910_device, 2> m_ay;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_ioport_array<3> m_dsw;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_sharedram;
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	memory_share_creator<uint8_t> m_bitmapram;
 
 	// video-related
 	bitmap_ind16 m_pixbitmap{};
 	tilemap_t *m_bg_tilemap = nullptr;
-	uint8_t m_bm_plane = 0U;
-	uint8_t m_pixcolor = 0U;
-	uint8_t m_scroll[4]{};
-	uint8_t m_lastflip = 0U;
-	uint8_t m_lastpixcolor = 0U;
+	uint8_t m_bm_plane = 0;
+	uint8_t m_pixcolor = 0;
+	uint8_t m_scroll[4] = { };
+	uint8_t m_lastflip = 0;
+	uint8_t m_lastpixcolor = 0;
 
 	static constexpr uint8_t PIXMAP_COLOR_BASE = (16 + 32);
 	static constexpr uint16_t BITMAPRAM_SIZE = 0x6000;
 
-	// sound-related
-	uint8_t m_last_snd_ctrl = 0U;
+	// misc
+	uint8_t m_control = 0;
+	uint8_t m_soundcontrol = 0;
 
 	void subirqtrigger_w(uint8_t data);
 	void sub_irqack_w(uint8_t data);
@@ -203,7 +196,7 @@ void dogfgt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if (m_spriteram[offs] & 0x01)
 		{
 			int sx = m_spriteram[offs + 3];
-			int sy = (240 - m_spriteram[offs + 2]) & 0xff;
+			int sy = (241 - m_spriteram[offs + 2]) & 0xff;
 			int flipx = m_spriteram[offs] & 0x04;
 			int flipy = m_spriteram[offs] & 0x02;
 			if (flip_screen())
@@ -259,7 +252,7 @@ uint8_t dogfgt_state::bitmapram_r(offs_t offset)
 {
 	if (m_bm_plane > 2)
 	{
-		LOGBITMAPRAM("bitmapram_r offs %04x plane %d\n", offset, m_bm_plane);
+		logerror("bitmapram_r offs %04x plane %d\n", offset, m_bm_plane);
 		return 0;
 	}
 
@@ -292,7 +285,7 @@ void dogfgt_state::bitmapram_w(offs_t offset, uint8_t data)
 {
 	if (m_bm_plane > 2)
 	{
-		LOGBITMAPRAM("bitmapram_w offs %04x plane %d\n", offset, m_bm_plane);
+		logerror("bitmapram_w offs %04x plane %d\n", offset, m_bm_plane);
 		return;
 	}
 
@@ -315,17 +308,19 @@ void dogfgt_state::scroll_w(offs_t offset, uint8_t data)
 void dogfgt_state::control_w(uint8_t data)
 {
 	// bits 0 and 1 are probably text color (not verified because PROM is missing)
-	m_pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
+	m_pixcolor = bitswap<2>(data, 0, 1);
 
 	// bits 4 and 5 are coin counters
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);
-	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
 
-	// bit 7 is screen flip
-	flip_screen_set(data & 0x80);
+	// bit 7 is screen flip (together with DSW 2-8)
+	flip_screen_set(BIT(data, 7) ^ (~m_dsw[2]->read() & 1));
 
 	// other bits unused?
-	LOG1800("PC %04x: 1800 = %02x\n", m_maincpu->pc(), data);
+	if (data & 0x4c)
+		logerror("%s: control_w unknown data %02X\n", machine().describe_context(), data);
+	m_control = data;
 }
 
 
@@ -344,14 +339,14 @@ void dogfgt_state::sub_irqack_w(uint8_t data)
 void dogfgt_state::soundcontrol_w(uint8_t data)
 {
 	// bit 5 goes to YM2149 #0 BDIR pin
-	if ((m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		m_ay[0]->data_address_w(m_last_snd_ctrl >> 4, m_soundlatch->read());
+	if ((m_soundcontrol & 0x20) == 0x20 && (data & 0x20) == 0x00)
+		m_ay[0]->data_address_w(m_soundcontrol >> 4, m_soundlatch->read());
 
 	// bit 7 goes to YM2149 #1 BDIR pin
-	if ((m_last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		m_ay[1]->data_address_w(m_last_snd_ctrl >> 6, m_soundlatch->read());
+	if ((m_soundcontrol & 0x80) == 0x80 && (data & 0x80) == 0x00)
+		m_ay[1]->data_address_w(m_soundcontrol >> 6, m_soundlatch->read());
 
-	m_last_snd_ctrl = data;
+	m_soundcontrol = data;
 }
 
 
@@ -373,9 +368,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(dogfgt_state::interrupt)
 
 void dogfgt_state::main_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("sharedram");
-	map(0x0f80, 0x0fdf).writeonly().share(m_spriteram);
-	map(0x1000, 0x17ff).w(FUNC(dogfgt_state::bgvideoram_w)).share(m_bgvideoram);
+	map(0x0000, 0x07ff).ram().share(m_sharedram);
+	map(0x0f80, 0x0fdf).writeonly().share(m_spriteram).nopr();
+	map(0x1000, 0x17ff).w(FUNC(dogfgt_state::bgvideoram_w)).share(m_bgvideoram).nopr();
 	map(0x1800, 0x1800).portr("P1");
 	map(0x1800, 0x1800).w(FUNC(dogfgt_state::control_w));
 	map(0x1810, 0x1810).portr("P2");
@@ -386,7 +381,7 @@ void dogfgt_state::main_map(address_map &map)
 	map(0x1830, 0x1830).portr("DSW2");
 	map(0x1830, 0x1830).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1840, 0x1840).w(FUNC(dogfgt_state::soundcontrol_w));
-	map(0x1870, 0x187f).w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x1870, 0x187f).w(m_palette, FUNC(palette_device::write8)).share("palette").nopr();
 	map(0x2000, 0x3fff).rw(FUNC(dogfgt_state::bitmapram_r), FUNC(dogfgt_state::bitmapram_w));
 	map(0x8000, 0xffff).rom();
 }
@@ -394,7 +389,7 @@ void dogfgt_state::main_map(address_map &map)
 void dogfgt_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x27ff).ram().share("sharedram");
+	map(0x2000, 0x27ff).ram().share(m_sharedram);
 	map(0x4000, 0x4000).w(FUNC(dogfgt_state::sub_irqack_w));
 	map(0x8000, 0xffff).rom();
 }
@@ -428,50 +423,50 @@ static INPUT_PORTS_START( dogfgt )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )          PORT_DIPLOCATION("S1:1")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Difficulty ) )     PORT_DIPLOCATION("S1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )    PORT_DIPLOCATION("S1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("S1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) // Manual states dips 5 & 6 are "Unused"
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "S1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "S1:6" )
 
 	// 2 separate switches for upright/table cabinet, manual says to change both together
-	PORT_DIPNAME( 0x40, 0x00, "Screen" )
+	PORT_DIPNAME( 0x40, 0x00, "Screen" )                  PORT_DIPLOCATION("S1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, "Control Panel" )
+	PORT_DIPNAME( 0x80, 0x00, "Control Panel" )           PORT_DIPLOCATION("S1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )         PORT_DIPLOCATION("S2:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_B ) )         PORT_DIPLOCATION("S2:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+
+	// flip screen dipswitch is controlled by hardware
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("S2:8") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dogfgt_state::flipscreen_switch), 0)
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -525,20 +520,20 @@ void dogfgt_state::machine_start()
 	save_item(NAME(m_lastflip));
 	save_item(NAME(m_pixcolor));
 	save_item(NAME(m_lastpixcolor));
-	save_item(NAME(m_last_snd_ctrl));
-
 	save_item(NAME(m_scroll));
+
+	save_item(NAME(m_control));
+	save_item(NAME(m_soundcontrol));
 }
 
 void dogfgt_state::machine_reset()
 {
 	m_bm_plane = 0;
-	m_lastflip = 0;
 	m_pixcolor = 0;
-	m_lastpixcolor = 0;
-	m_last_snd_ctrl = 0;
+	m_control = 0;
+	m_soundcontrol = 0;
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 		m_scroll[i] = 0;
 }
 
@@ -587,7 +582,7 @@ ROM_START( dogfgt )
 	ROM_LOAD( "bx02-5.36",   0xc000, 0x2000, CRC(d11b50c3) SHA1(99dbbc85e8ff66eadc48a9f65f800676b10e35e4) )
 	ROM_LOAD( "bx03-5.22",   0xe000, 0x2000, CRC(0e4813fb) SHA1(afcbd17029bc3c2de83c15cc941fe8f2ad062a5d) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "bx04.117",    0x8000, 0x2000, CRC(f8945f9d) SHA1(a0782a5007dc5efc302c4fd61827e1b68475e7ab) )
 	ROM_LOAD( "bx05.118",    0xa000, 0x2000, CRC(3ade57ad) SHA1(cc0a35257c00c463614a6718a24cc6dee75c2e5d) )
 	ROM_LOAD( "bx06.119",    0xc000, 0x2000, CRC(4a3b34cf) SHA1(f2e0bf9923a288b8137840f46fd90a23010f8018) )
@@ -621,7 +616,7 @@ ROM_START( dogfgtu )
 	ROM_LOAD( "bx02-7.36",   0xc000, 0x2000, CRC(afaf10e6) SHA1(67b1e0722ae0e8110acc44bc582b308e86743d60) )
 	ROM_LOAD( "bx03-6.33",   0xe000, 0x2000, CRC(51b20e8b) SHA1(0247345b3f9736e9140faf765cb33f97660f0ddd) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "bx04-7.117",  0x8000, 0x2000, CRC(c4c2183b) SHA1(27cf40d6f03b078c5cc4497f393309bf33dea9dc) )
 	ROM_LOAD( "bx05-7.118",  0xa000, 0x2000, CRC(d9a705ab) SHA1(7a49769d6c32e3d9840e4b24e3cbcd84a075d36d) )
 	ROM_LOAD( "bx06.119",    0xc000, 0x2000, CRC(4a3b34cf) SHA1(f2e0bf9923a288b8137840f46fd90a23010f8018) )
@@ -655,7 +650,7 @@ ROM_START( dogfgtj )
 	ROM_LOAD( "bx02.36",     0xc000, 0x2000, CRC(91f1b9b3) SHA1(dd939538abf615d3a0271fd561038acc6a2a616d) )
 	ROM_LOAD( "bx03.22",     0xe000, 0x2000, CRC(959ebf93) SHA1(de79dd44c68a232278b8d251e39c0ad35d160595) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "bx04.117",    0x8000, 0x2000, CRC(f8945f9d) SHA1(a0782a5007dc5efc302c4fd61827e1b68475e7ab) )
 	ROM_LOAD( "bx05.118",    0xa000, 0x2000, CRC(3ade57ad) SHA1(cc0a35257c00c463614a6718a24cc6dee75c2e5d) )
 	ROM_LOAD( "bx06.119",    0xc000, 0x2000, CRC(4a3b34cf) SHA1(f2e0bf9923a288b8137840f46fd90a23010f8018) )
