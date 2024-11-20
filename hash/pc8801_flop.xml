@@ -25392,9 +25392,12 @@ Should be supported by [PC8001mkIISR] too
 	</software>
 
 	<software name="okumanch">
-		<description>Okumanchoja</description>
+		<description>Okumanchouja</description>
 		<year>1987</year>
 		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
+		<notes><![CDATA[
+Weird wobbling on main menu (raster effects? verify)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198711xx"/>
 		<info name="alt_title" value="億万長者"/>

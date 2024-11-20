@@ -36785,7 +36785,7 @@ Requires [kanji] board, currently missing from vanilla class (use VM)
 	</software>
 
 	<software name="okumanc" supported="no">
-		<description>Okuman Chouja</description>
+		<description>Okumanchouja</description>
 		<year>1988</year>
 		<publisher>コスモス・コンピュータ (Cosmos Computer)</publisher>
 		<info name="alt_title" value="億万長者" />
@@ -36797,7 +36797,7 @@ Requires [kanji] board, currently missing from vanilla class (use VM)
 	</software>
 
 	<software name="okumanc2">
-		<description>Okuman Chouja II</description>
+		<description>Okumanchouja II</description>
 		<year>1990</year>
 		<publisher>コスモス・コンピュータ (Cosmos Computer)</publisher>
 		<info name="alt_title" value="億万長者２" />
@@ -36817,7 +36817,7 @@ Requires [kanji] board, currently missing from vanilla class (use VM)
 	</software>
 
 	<software name="okumanc3">
-		<description>Okuman Chouja III</description>
+		<description>Okumanchouja III</description>
 		<year>1992</year>
 		<publisher>コスモス・コンピュータ (Cosmos Computer)</publisher>
 		<info name="alt_title" value="億万長者３" />
