@@ -45,8 +45,8 @@ fuukitmap_device::fuukitmap_device(const machine_config &mconfig, const char *ta
 	, m_yoffs_flip(0)
 	, m_layer2_xoffs(0)
 	, m_layer2_yoffs(0)
-	, m_vregs(nullptr)
-	, m_unknown{0, 0}
+	, m_tilemap{ nullptr, nullptr, nullptr }
+	, m_unknown{ 0, 0 }
 	, m_priority(0)
 	, m_flip(false)
 	, m_tmap_front(0)
@@ -64,12 +64,12 @@ void fuukitmap_device::device_start()
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_vram[i] = make_unique_clear<u16[]>(0x2000 / 2);
+		m_vram[i] = make_unique_clear<u16 []>(0x2000 / 2);
 
 		save_pointer(NAME(m_vram[i]), 0x2000 / 2, i);
 	}
 
-	m_vregs = make_unique_clear<u16[]>(0x20 / 2);
+	m_vregs = make_unique_clear<u16 []>(0x20 / 2);
 
 	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(fuukitmap_device::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(fuukitmap_device::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
@@ -118,14 +118,14 @@ TIMER_CALLBACK_MEMBER(fuukitmap_device::raster_interrupt)
 }
 
 
-template<int Layer>
+template <int Layer>
 void fuukitmap_device::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset / 2);
 }
 
-template<int Layer>
+template <int Layer>
 void fuukitmap_device::vram_buffered_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const int buffer = (m_vregs[0x1e / 2] & 0x40) >> 6;
@@ -175,7 +175,7 @@ void fuukitmap_device::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 
 ***************************************************************************/
 
-template<int Layer>
+template <int Layer>
 TILE_GET_INFO_MEMBER(fuukitmap_device::get_tile_info)
 {
 	const int buffer = (Layer < 2) ? 0 : (m_vregs[0x1e / 2] & 0x40) >> 6;
