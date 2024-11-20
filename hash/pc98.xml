@@ -36818,7 +36818,7 @@ Requires [kanji] board, currently missing from vanilla class (use VM)
 
 	<software name="okumanc3">
 		<description>Okuman Chouja III</description>
-		<year>1990</year>
+		<year>1992</year>
 		<publisher>コスモス・コンピュータ (Cosmos Computer)</publisher>
 		<info name="alt_title" value="億万長者３" />
 		<info name="release" value="19921225" />
