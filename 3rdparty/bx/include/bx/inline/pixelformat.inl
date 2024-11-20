@@ -21,9 +21,7 @@ namespace bx
 
 	inline int32_t toSnorm(float _value, float _scale)
 	{
-		return int32_t(round(
-					clamp(_value, -1.0f, 1.0f) * _scale)
-					);
+		return int32_t(round(clamp(_value, -1.0f, 1.0f) * _scale) );
 	}
 
 	inline float fromSnorm(int32_t _value, float _scale)
@@ -721,46 +719,49 @@ namespace bx
 		memCopy(_dst, _src, 8);
 	}
 
-	template<int32_t MantissaBits, int32_t ExpBits>
+	template<int32_t MantissaBitsT, int32_t ExpBitsT>
 	inline void encodeRgbE(float* _dst, const float* _src)
 	{
 		// Reference(s):
 		// - https://web.archive.org/web/20181126040035/https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_texture_shared_exponent.txt
 		//
-		const int32_t expMax  = (1<<ExpBits) - 1;
-		const int32_t expBias = (1<<(ExpBits - 1) ) - 1;
+		const int32_t expMax  = (1<< ExpBitsT      ) - 1;
+		const int32_t expBias = (1<<(ExpBitsT - 1) ) - 1;
 		const float   sharedExpMax = float(expMax) / float(expMax + 1) * float(1 << (expMax - expBias) );
 
 		const float rr = clamp(_src[0], 0.0f, sharedExpMax);
 		const float gg = clamp(_src[1], 0.0f, sharedExpMax);
 		const float bb = clamp(_src[2], 0.0f, sharedExpMax);
 		const float mm = max(rr, gg, bb);
-		union { float ff; uint32_t ui; } cast = { mm };
-		int32_t expShared = int32_t(uint32_imax(uint32_t(-expBias-1), ( ( (cast.ui>>23) & 0xff) - 127) ) ) + 1 + expBias;
-		float denom = pow(2.0f, float(expShared - expBias - MantissaBits) );
+		const uint32_t mm_as_ui = bitCast<uint32_t>(mm);
 
-		if ( (1<<MantissaBits) == int32_t(round(mm/denom) ) )
+		int32_t expShared = int32_t(max(uint32_t(-expBias-1), ( ( (mm_as_ui>>23) & 0xff) - 127) ) ) + 1 + expBias;
+		float denom = pow(2.0f, float(expShared - expBias - MantissaBitsT) );
+
+		if ( (1<<MantissaBitsT) == int32_t(round(mm/denom) ) )
 		{
 			denom *= 2.0f;
 			++expShared;
 		}
 
-		const float invDenom = 1.0f/denom;
+		const float invDenom = rcpSafe(denom);
 		_dst[0] = round(rr * invDenom);
 		_dst[1] = round(gg * invDenom);
 		_dst[2] = round(bb * invDenom);
 		_dst[3] = float(expShared);
 	}
 
-	template<int32_t MantissaBits, int32_t ExpBits>
+	template<int32_t MantissaBitsT, int32_t ExpBitsT>
 	inline void decodeRgbE(float* _dst, const float* _src)
 	{
-		const int32_t expBias = (1<<(ExpBits - 1) ) - 1;
-		const float exponent  = _src[3]-float(expBias-MantissaBits);
+		const int32_t expBias = (1<<(ExpBitsT - 1) ) - 1;
+		const float exponent  = _src[3]-float(expBias-MantissaBitsT);
 		const float scale     = pow(2.0f, exponent);
-		_dst[0] = _src[0] * scale;
-		_dst[1] = _src[1] * scale;
-		_dst[2] = _src[2] * scale;
+		const float invScale  = rcpSafe(scale);
+
+		_dst[0] = _src[0] * invScale;
+		_dst[1] = _src[1] * invScale;
+		_dst[2] = _src[2] * invScale;
 	}
 
 	// RGB9E5F
@@ -779,12 +780,12 @@ namespace bx
 
 	inline void unpackRgb9E5F(float* _dst, const void* _src)
 	{
-		uint32_t packed = *( (const uint32_t*)_src);
+		const uint32_t packed = *( (const uint32_t*)_src);
 
 		float tmp[4];
-		tmp[0] = float( ( (packed    ) & 0x1ff) ) / 511.0f;
-		tmp[1] = float( ( (packed>> 9) & 0x1ff) ) / 511.0f;
-		tmp[2] = float( ( (packed>>18) & 0x1ff) ) / 511.0f;
+		tmp[0] = float( ( (packed    ) & 0x1ff) );
+		tmp[1] = float( ( (packed>> 9) & 0x1ff) );
+		tmp[2] = float( ( (packed>>18) & 0x1ff) );
 		tmp[3] = float( ( (packed>>27) &  0x1f) );
 
 		decodeRgbE<9, 5>(_dst, tmp);
