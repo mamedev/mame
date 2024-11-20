@@ -124,31 +124,31 @@ namespace bx
 
 	/// Returns sortable floating point value.
 	///
-	BX_CONST_FUNC uint32_t floatFlip(uint32_t _value);
+	BX_CONSTEXPR_FUNC uint32_t floatFlip(uint32_t _value);
 
 	/// Returns true if _f is a number that is NaN.
 	///
-	BX_CONST_FUNC bool isNan(float _f);
+	BX_CONSTEXPR_FUNC bool isNan(float _f);
 
 	/// Returns true if _f is a number that is NaN.
 	///
-	BX_CONST_FUNC bool isNan(double _f);
+	BX_CONSTEXPR_FUNC bool isNan(double _f);
 
 	/// Returns true if _f is not infinite and is not a NaN.
 	///
-	BX_CONST_FUNC bool isFinite(float _f);
+	BX_CONSTEXPR_FUNC bool isFinite(float _f);
 
 	/// Returns true if _f is not infinite and is not a NaN.
 	///
-	BX_CONST_FUNC bool isFinite(double _f);
+	BX_CONSTEXPR_FUNC bool isFinite(double _f);
 
 	/// Returns true if _f is infinite and is not a NaN.
 	///
-	BX_CONST_FUNC bool isInfinite(float _f);
+	BX_CONSTEXPR_FUNC bool isInfinite(float _f);
 
 	/// Returns true if _f is infinite and is not a NaN.
 	///
-	BX_CONST_FUNC bool isInfinite(double _f);
+	BX_CONSTEXPR_FUNC bool isInfinite(double _f);
 
 	/// Returns the largest integer value not greater than _f.
 	///

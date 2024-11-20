@@ -33,15 +33,15 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 	}
 }
 
-bool log2_test(float _a)
+static bool testLog2(float _a)
 {
 	return bx::log2(_a) == bx::log(_a) * (1.0f / bx::log(2.0f) );
 }
 
 TEST_CASE("log2", "[math][libm]")
 {
-	log2_test(0.0f);
-	log2_test(256.0f);
+	testLog2(0.0f);
+	testLog2(256.0f);
 
 	REQUIRE(0.0f == bx::log2(1.0f) );
 	REQUIRE(1.0f == bx::log2(2.0f) );
@@ -215,7 +215,7 @@ TEST_CASE("countBits", "[math]")
 }
 
 template<typename Ty>
-void testFindFirstSet()
+static void testFindFirstSet()
 {
 	for (uint8_t ii = 0, num = sizeof(Ty)*8; ii < num; ++ii)
 	{
@@ -257,7 +257,7 @@ TEST_CASE("findFirstSet", "[math]")
 }
 
 template<typename Ty>
-void testFindLastSet()
+static void testFindLastSet()
 {
 	for (uint8_t ii = 0, num = sizeof(Ty)*8; ii < num; ++ii)
 	{
@@ -306,16 +306,16 @@ TEST_CASE("rcp", "[math][libm]")
 {
 	STATIC_REQUIRE(1.0f == bx::rcp(1.0f) );
 	STATIC_REQUIRE(2.0f == bx::rcp(0.5f) );
-	REQUIRE(bx::isInfinite(bx::rcp( 0.0f) ) );
-	REQUIRE(bx::isInfinite(bx::rcp(-0.0f) ) );
+	STATIC_REQUIRE(bx::isInfinite(bx::rcp( 0.0f) ) );
+	STATIC_REQUIRE(bx::isInfinite(bx::rcp(-0.0f) ) );
 }
 
 TEST_CASE("rcpSafe", "[math][libm]")
 {
 	STATIC_REQUIRE(1.0f == bx::rcpSafe(1.0f) );
 	STATIC_REQUIRE(2.0f == bx::rcpSafe(0.5f) );
-	REQUIRE(!bx::isInfinite(bx::rcpSafe( 0.0f) ) );
-	REQUIRE(!bx::isInfinite(bx::rcpSafe(-0.0f) ) );
+	STATIC_REQUIRE(bx::isFinite(bx::rcpSafe( 0.0f) ) );
+	STATIC_REQUIRE(bx::isFinite(bx::rcpSafe(-0.0f) ) );
 }
 
 TEST_CASE("rsqrt", "[math][libm]")
@@ -670,8 +670,8 @@ TEST_CASE("sign", "[math][libm]")
 	STATIC_REQUIRE( 0 == bx::sign( 0.0000f) );
 	STATIC_REQUIRE( 1 == bx::sign( 0.1389f) );
 
-	REQUIRE(-1 == bx::sign(-bx::kFloatInfinity) );
-	REQUIRE( 1 == bx::sign( bx::kFloatInfinity) );
+	STATIC_REQUIRE(-1 == bx::sign(-bx::kFloatInfinity) );
+	STATIC_REQUIRE( 1 == bx::sign( bx::kFloatInfinity) );
 }
 
 TEST_CASE("signBit", "[math][libm]")
@@ -680,8 +680,8 @@ TEST_CASE("signBit", "[math][libm]")
 	STATIC_REQUIRE(!bx::signBit( 0.0000f) );
 	STATIC_REQUIRE(!bx::signBit( 0.1389f) );
 
-	REQUIRE( bx::signBit(-bx::kFloatInfinity) );
-	REQUIRE(!bx::signBit( bx::kFloatInfinity) );
+	STATIC_REQUIRE( bx::signBit(-bx::kFloatInfinity) );
+	STATIC_REQUIRE(!bx::signBit( bx::kFloatInfinity) );
 }
 
 TEST_CASE("copySign", "[math][libm]")
@@ -690,13 +690,13 @@ TEST_CASE("copySign", "[math][libm]")
 	STATIC_REQUIRE(-0.0000f == bx::copySign( 0.0000f, -1389) );
 	STATIC_REQUIRE(-0.1389f == bx::copySign( 0.1389f, -1389) );
 
-	REQUIRE(-bx::kFloatInfinity == bx::copySign(bx::kFloatInfinity, -1389) );
+	STATIC_REQUIRE(-bx::kFloatInfinity == bx::copySign(bx::kFloatInfinity, -1389) );
 }
 
 TEST_CASE("bitsToFloat, floatToBits, bitsToDouble, doubleToBits", "[math]")
 {
-	REQUIRE(UINT32_C(0x12345678)         == bx::floatToBits( bx::bitsToFloat( UINT32_C(0x12345678) ) ) );
-	REQUIRE(UINT64_C(0x123456789abcdef0) == bx::doubleToBits(bx::bitsToDouble(UINT32_C(0x123456789abcdef0) ) ) );
+	STATIC_REQUIRE(0x12345678u           == bx::floatToBits( bx::bitsToFloat (0x12345678u) ) );
+	STATIC_REQUIRE(0x123456789abcdef0llu == bx::doubleToBits(bx::bitsToDouble(0x123456789abcdef0llu) ) );
 }
 
 TEST_CASE("lerp", "[math]")

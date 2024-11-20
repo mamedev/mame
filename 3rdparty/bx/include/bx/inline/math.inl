@@ -44,7 +44,7 @@ namespace bx
 		return bitCast<double>(_a);
 	}
 
-	inline BX_CONST_FUNC uint32_t floatFlip(uint32_t _value)
+	inline BX_CONSTEXPR_FUNC uint32_t floatFlip(uint32_t _value)
 	{
 		// Reference(s):
 		// - http://archive.fo/2012.12.08-212402/http://stereopsis.com/radix.html
@@ -56,37 +56,37 @@ namespace bx
 		return result;
 	}
 
-	inline BX_CONST_FUNC bool isNan(float _f)
+	inline BX_CONSTEXPR_FUNC bool isNan(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp > kFloatExponentMask;
 	}
 
-	inline BX_CONST_FUNC bool isNan(double _f)
+	inline BX_CONSTEXPR_FUNC bool isNan(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp > kDoubleExponentMask;
 	}
 
-	inline BX_CONST_FUNC bool isFinite(float _f)
+	inline BX_CONSTEXPR_FUNC bool isFinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp < kFloatExponentMask;
 	}
 
-	inline BX_CONST_FUNC bool isFinite(double _f)
+	inline BX_CONSTEXPR_FUNC bool isFinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp < kDoubleExponentMask;
 	}
 
-	inline BX_CONST_FUNC bool isInfinite(float _f)
+	inline BX_CONSTEXPR_FUNC bool isInfinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp == kFloatExponentMask;
 	}
 
-	inline BX_CONST_FUNC bool isInfinite(double _f)
+	inline BX_CONSTEXPR_FUNC bool isInfinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp == kDoubleExponentMask;
