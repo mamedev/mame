@@ -52,25 +52,11 @@ public:
 
 	void set_transparent_pen(int layer, pen_t pen) { m_tilemap[layer]->set_transparent_pen(pen); }
 
-	// handlers
-	template<int Layer> u16 vram_r(offs_t offset) { return m_vram[Layer][offset]; }
-	template<int Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	template<int Layer> void vram_buffered_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	u16 vregs_r(offs_t offset) { return m_vregs[offset]; }
-	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	u16 unknown_r(offs_t offset) { return m_unknown[offset]; }
-	void unknown_w(offs_t offset, u16 data, u16 mem_mask = ~0) { COMBINE_DATA(&m_unknown[offset]); }
-
-	u16 priority_r() { return m_priority; }
-	void priority_w(offs_t offset, u16 data, u16 mem_mask = ~0) { COMBINE_DATA(&m_priority); }
-
 	void prepare();
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 i, int flag, u8 pri, u8 primask = 0xff);
 
-	void vram_map(address_map &map);
-	void vregs_map(address_map &map);
+	void vram_map(address_map &map) ATTR_COLD;
+	void vregs_map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -92,7 +78,7 @@ private:
 	// video-related
 	tilemap_t *m_tilemap[3]{};
 
-	std::unique_ptr<u16[]> m_vram[4]{};
+	std::unique_ptr<u16[]> m_vram[4];
 	std::unique_ptr<u16[]> m_vregs;
 	u16 m_unknown[2];
 	u16 m_priority;
@@ -107,12 +93,25 @@ private:
 	emu_timer *m_vblank_interrupt_timer;
 	emu_timer *m_raster_interrupt_timer;
 
+	// handlers
+	template <int Layer> u16 vram_r(offs_t offset) { return m_vram[Layer][offset]; }
+	template <int Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template <int Layer> void vram_buffered_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	u16 vregs_r(offs_t offset) { return m_vregs[offset]; }
+	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	u16 unknown_r(offs_t offset) { return m_unknown[offset]; }
+	void unknown_w(offs_t offset, u16 data, u16 mem_mask = ~0) { COMBINE_DATA(&m_unknown[offset]); }
+
+	u16 priority_r() { return m_priority; }
+	void priority_w(offs_t offset, u16 data, u16 mem_mask = ~0) { COMBINE_DATA(&m_priority); }
+
 	TIMER_CALLBACK_MEMBER(level1_interrupt);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt);
 	TIMER_CALLBACK_MEMBER(raster_interrupt);
 
-	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
-
+	template <int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 DECLARE_DEVICE_TYPE(FUUKI_TILEMAP, fuukitmap_device)
