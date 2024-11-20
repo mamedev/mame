@@ -41947,6 +41947,9 @@ atm                             //
 atmtb2                          //
 atmtb2plus                      //
 
+@source:sinclair/byte.cpp
+byte                            // 1990 Byte
+
 @source:sinclair/chloe.cpp
 chloe                           // 1999 Chloe Corporation
 
@@ -41997,7 +42000,6 @@ specpls3                        // 1987 ZX Spectrum +3
 @source:sinclair/spectrum.cpp
 bk08                            // Orel BK-08
 blitzs                          // 1990 Blic
-byte                            // 1990 Byte
 cip01                           // 1987 CIP-01
 cip03                           // 1988 CIP-03
 cobra80                         //
