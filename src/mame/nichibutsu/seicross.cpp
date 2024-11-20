@@ -63,16 +63,6 @@ TODO:
 #include "tilemap.h"
 
 
-// configurable logging
-#define LOG_AYPORTB     (1U << 1)
-
-//#define VERBOSE (LOG_GENERAL | LOG_AYPORTB)
-
-#include "logmacro.h"
-
-#define LOGAYPORTB(...)     LOGMASKED(LOG_AYPORTB,     __VA_ARGS__)
-
-
 namespace {
 
 class seicross_state : public driver_device
@@ -127,7 +117,7 @@ private:
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	uint8_t portb_r();
-	void portb_w(uint8_t data);
+	void portb_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -166,8 +156,8 @@ void seicross_state::machine_start()
 	// install MCU waitstates
 	address_space &space = m_mcu->space(AS_PROGRAM);
 
-	// MR is asserted when it does an access with A15 is high
-	// this makes DAC sound pitch the same as PCB recordings
+	// MR is asserted when it does an access with A15 is high,
+	// this makes DAC sound pitch the same as PCB recordings.
 	space.install_read_tap(
 			0x8000, 0xffff,
 			"mcu_mr_r",
@@ -285,10 +275,18 @@ void seicross_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			uint8_t const *data = &m_spriteram[bank][offs];
 			int const code = (data[0] & 0x3f) | ((data[1] & 0x10) << 2) | (bank ? 0 : 0x80);
 			int const color = data[1] & 0x0f;
-			int const flipx = BIT(data[0], 6);
-			int const flipy = BIT(data[0], 7);
-			int const x = data[3];
-			int const y = 240 - data[2];
+			int flipx = BIT(data[0], 6);
+			int flipy = BIT(data[0], 7);
+			int x = data[3];
+			int y = 240 - data[2];
+
+			if (flip_screen())
+			{
+				x = 240 - x;
+				y = 240 - y;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
 
 			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, x, y, 0);
 
@@ -314,27 +312,29 @@ uint32_t seicross_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 uint8_t seicross_state::portb_r()
 {
-	return (m_portb & 0x9f) | (m_debug_port.read_safe(0) & 0x60);
+	return (m_portb & 0x0f) | (m_debug_port.read_safe(0) & 0xf0);
 }
 
-void seicross_state::portb_w(uint8_t data)
+void seicross_state::portb_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	LOGAYPORTB("PC %04x: 8910 port B = %02x\n", m_maincpu->pc(), data);
+	// ignore if high-impedance (seicross relies on it)
+	if (mem_mask == 0)
+		return;
 
 	// bit 0 is IRQ enable
 	m_irq_mask = data & 1;
 
 	// bit 1 flips screen
+	flip_screen_set(data & 2);
 
 	// bit 2 resets the microcontroller
 	if (((m_portb & 4) == 0) && (data & 4))
 	{
-		// reset and start the protection MCU
 		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
-	// other bits unknown
+	// other bits unused
 	m_portb = data;
 }
 
@@ -568,14 +568,14 @@ static INPUT_PORTS_START( seicross )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DEBUG")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x20, 0x20, "Debug Mode" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Invulnerability" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -933,15 +933,15 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, friskyt,   0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskyta,  friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskytb,  friskyt,  friskytb, friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyt,   0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyta,  friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskytb,  friskyt,  friskytb, friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu", "Frisky Tom (set 3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, radrad,    0,        no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp. (Nichibutsu USA license)", "Radical Radial (US)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, radradj,   radrad,   no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp.",                          "Radical Radial (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, radrad,    0,        no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp. (Nichibutsu USA license)", "Radical Radial (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, radradj,   radrad,   no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp.",                          "Radical Radial (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, seicross,  0,        no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 1)",      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, seicrossa, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 2)",      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzon,  seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 1)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzona, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 2)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzont, seicross, sectznt,  seicross, seicross_state, empty_init,    ROT90, "bootleg (Tecfri)",   "Sector Zone (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, seicross,  0,        no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, seicrossa, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 2)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzon,  seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzona, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzont, seicross, sectznt,  seicross, seicross_state, empty_init,    ROT90, "bootleg (Tecfri)",   "Sector Zone (bootleg)", MACHINE_SUPPORTS_SAVE )
