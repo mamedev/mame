@@ -56,11 +56,11 @@ namespace bx
 	template <typename Rng>
 	inline float frndh(Rng* _rng)
 	{
-		return 2.0f * bx::frnd(_rng) - 1.0f;
+		return 2.0f * frnd(_rng) - 1.0f;
 	}
 
 	template <typename Rng>
-	inline bx::Vec3 randUnitCircle(Rng* _rng)
+	inline Vec3 randUnitCircle(Rng* _rng)
 	{
 		const float angle = frnd(_rng) * kPi2;
 
@@ -73,7 +73,7 @@ namespace bx
 	}
 
 	template <typename Rng>
-	inline bx::Vec3 randUnitSphere(Rng* _rng)
+	inline Vec3 randUnitSphere(Rng* _rng)
 	{
 		const float rand0  = frnd(_rng) * 2.0f - 1.0f;
 		const float rand1  = frnd(_rng) * kPi2;
@@ -88,14 +88,14 @@ namespace bx
 	}
 
 	template <typename Ty>
-	inline bx::Vec3 randUnitHemisphere(Ty* _rng, const bx::Vec3& _normal)
+	inline Vec3 randUnitHemisphere(Ty* _rng, const Vec3& _normal)
 	{
-		const bx::Vec3 dir = randUnitSphere(_rng);
-		const float ddotn  = bx::dot(dir, _normal);
+		const Vec3 dir = randUnitSphere(_rng);
+		const float ddotn  = dot(dir, _normal);
 
 		if (0.0f > ddotn)
 		{
-			return bx::neg(dir);
+			return neg(dir);
 		}
 
 		return dir;
@@ -142,7 +142,7 @@ namespace bx
 		for (uint32_t ii = 0, num = _num-1; ii < num; ++ii)
 		{
 			uint32_t jj = ii + 1 + _rng->gen() % (num - ii);
-			bx::swap(_array[ii], _array[jj]);
+			swap(_array[ii], _array[jj]);
 		}
 	}
 

@@ -103,14 +103,14 @@ namespace bx
 
 	inline HandleAlloc* createHandleAlloc(AllocatorI* _allocator, uint16_t _maxHandles)
 	{
-		uint8_t* ptr = (uint8_t*)bx::alloc(_allocator, sizeof(HandleAlloc) + 2*_maxHandles*sizeof(uint16_t) );
+		uint8_t* ptr = (uint8_t*)alloc(_allocator, sizeof(HandleAlloc) + 2*_maxHandles*sizeof(uint16_t) );
 		return BX_PLACEMENT_NEW(ptr, HandleAlloc)(_maxHandles);
 	}
 
 	inline void destroyHandleAlloc(AllocatorI* _allocator, HandleAlloc* _handleAlloc)
 	{
 		_handleAlloc->~HandleAlloc();
-		bx::free(_allocator, _handleAlloc);
+		free(_allocator, _handleAlloc);
 	}
 
 	template <uint16_t MaxHandlesT>

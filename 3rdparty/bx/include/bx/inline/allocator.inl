@@ -26,7 +26,7 @@ namespace bx
 	{
 		const uintptr_t addr = bitCast<uintptr_t>(_ptr);
 		const uintptr_t unaligned = addr + _extra; // space for header
-		const uintptr_t aligned = bx::alignUp(unaligned, int32_t(_align) );
+		const uintptr_t aligned = alignUp(unaligned, int32_t(_align) );
 
 		return bitCast<void*>(aligned);
 	}

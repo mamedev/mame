@@ -96,13 +96,13 @@ namespace bx
 	template<typename Ty>
 	inline constexpr Ty max()
 	{
-		return bx::LimitsT<Ty>::max;
+		return LimitsT<Ty>::max;
 	}
 
 	template<typename Ty>
 	inline constexpr Ty min()
 	{
-		return bx::LimitsT<Ty>::min;
+		return LimitsT<Ty>::min;
 	}
 
 	template<typename Ty>

@@ -187,7 +187,7 @@ namespace bx
 		return m_0terminated;
 	}
 
-	template<bx::AllocatorI** AllocatorT>
+	template<AllocatorI** AllocatorT>
 	inline StringT<AllocatorT>::StringT()
 		: StringView()
 		, m_capacity(0)
@@ -195,7 +195,7 @@ namespace bx
 		clear();
 	}
 
-	template<bx::AllocatorI** AllocatorT>
+	template<AllocatorI** AllocatorT>
 	inline StringT<AllocatorT>::StringT(const StringT<AllocatorT>& _rhs)
 		: StringView()
 		, m_capacity(0)
@@ -203,7 +203,7 @@ namespace bx
 		set(_rhs);
 	}
 
-	template<bx::AllocatorI** AllocatorT>
+	template<AllocatorI** AllocatorT>
 	inline StringT<AllocatorT>::StringT(const StringView& _rhs)
 		: StringView()
 		, m_capacity(0)
@@ -211,27 +211,27 @@ namespace bx
 		set(_rhs);
 	}
 
-	template<bx::AllocatorI** AllocatorT>
+	template<AllocatorI** AllocatorT>
 	inline StringT<AllocatorT>::~StringT()
 	{
 		clear();
 	}
 
-	template<bx::AllocatorI** AllocatorT>
+	template<AllocatorI** AllocatorT>
 	inline StringT<AllocatorT>& StringT<AllocatorT>::operator=(const StringT<AllocatorT>& _rhs)
 	{
 		set(_rhs);
 		return *this;
 	}
 
-	template<bx::AllocatorI** AllocatorT>
+	template<AllocatorI** AllocatorT>
 	inline void StringT<AllocatorT>::set(const StringView& _str)
 	{
 		clear();
 		append(_str);
 	}
 
-	template<bx::AllocatorI** AllocatorT>
+	template<AllocatorI** AllocatorT>
 	inline void StringT<AllocatorT>::append(const StringView& _str)
 	{
 		if (0 != _str.getLength() )
@@ -244,7 +244,7 @@ namespace bx
 			if (len+1 > m_capacity)
 			{
 				const int32_t capacity = alignUp(len+1, 256);
-				ptr = (char*)bx::realloc(*AllocatorT, 0 != m_capacity ? ptr : NULL, capacity);
+				ptr = (char*)realloc(*AllocatorT, 0 != m_capacity ? ptr : NULL, capacity);
 
 				*const_cast<char**>(&m_ptr) = ptr;
 				m_capacity = capacity;
@@ -255,27 +255,27 @@ namespace bx
 		}
 	}
 
-	template<bx::AllocatorI** AllocatorT>
+	template<AllocatorI** AllocatorT>
 	inline void StringT<AllocatorT>::append(const char* _ptr, const char* _term)
 	{
 		append(StringView(_ptr, _term) );
 	}
 
-	template<bx::AllocatorI** AllocatorT>
+	template<AllocatorI** AllocatorT>
 	inline void StringT<AllocatorT>::clear()
 	{
 		m_0terminated = true;
 
 		if (0 != m_capacity)
 		{
-			bx::free(*AllocatorT, const_cast<char*>(m_ptr) );
+			free(*AllocatorT, const_cast<char*>(m_ptr) );
 
 			StringView::clear();
 			m_capacity = 0;
 		}
 	}
 
-	template<bx::AllocatorI** AllocatorT>
+	template<AllocatorI** AllocatorT>
 	inline const char* StringT<AllocatorT>::getCPtr() const
 	{
 		return getPtr();
@@ -286,7 +286,7 @@ namespace bx
 		return StringView(_str, _start, _len);
 	}
 
-	inline LineReader::LineReader(const bx::StringView& _str)
+	inline LineReader::LineReader(const StringView& _str)
 		: m_str(_str)
 	{
 		reset();
@@ -305,7 +305,7 @@ namespace bx
 			++m_line;
 
 			StringView curr(m_curr);
-			m_curr = bx::strFindNl(m_curr);
+			m_curr = strFindNl(m_curr);
 
 			StringView line(curr.getPtr(), m_curr.getPtr() );
 

@@ -138,7 +138,7 @@ namespace bx
 	};
 
 	/// ASCII string
-	template<bx::AllocatorI** AllocatorT>
+	template<AllocatorI** AllocatorT>
 	class StringT : public StringView
 	{
 	public:

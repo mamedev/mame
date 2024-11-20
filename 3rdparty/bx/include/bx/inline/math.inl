@@ -366,12 +366,12 @@ namespace bx
 		return countTrailingZeros<unsigned long long>(_val);
 	}
 
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint8_t  _val) { return bx::min<uint8_t>(8,  countTrailingZeros<uint32_t>(_val) ); }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int8_t   _val) { return                      countTrailingZeros<uint8_t >(_val);   }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint16_t _val) { return bx::min<uint8_t>(16, countTrailingZeros<uint32_t>(_val) ); }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int16_t  _val) { return                      countTrailingZeros<uint16_t>(_val);   }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int32_t  _val) { return                      countTrailingZeros<uint32_t>(_val);   }
-	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int64_t  _val) { return                      countTrailingZeros<uint64_t>(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint8_t  _val) { return min<uint8_t>(8,  countTrailingZeros<uint32_t>(_val) ); }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int8_t   _val) { return                  countTrailingZeros<uint8_t >(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint16_t _val) { return min<uint8_t>(16, countTrailingZeros<uint32_t>(_val) ); }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int16_t  _val) { return                  countTrailingZeros<uint16_t>(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int32_t  _val) { return                  countTrailingZeros<uint32_t>(_val);   }
+	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(int64_t  _val) { return                  countTrailingZeros<uint64_t>(_val);   }
 
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC uint8_t findFirstSet(Ty _val)
@@ -536,9 +536,29 @@ namespace bx
 		return rcp(copySign(max(kFloatSmallest, abs(_a) ), _a) );
 	}
 
+	inline BX_CONSTEXPR_FUNC float div(float _a, float _b)
+	{
+		return mul(_a, rcp(_b) );
+	}
+
+	inline BX_CONSTEXPR_FUNC float divSafe(float _a, float _b)
+	{
+		return mul(_a, rcpSafe(_b) );
+	}
+
+	inline BX_CONSTEXPR_FUNC float ceilDiv(float _a, float _b)
+	{
+		return div(_a + _b - 1, _b);
+	}
+
+	inline BX_CONSTEXPR_FUNC float ceilDivSafe(float _a, float _b)
+	{
+		return divSafe(_a + _b - 1, _b);
+	}
+
 	inline BX_CONSTEXPR_FUNC float mod(float _a, float _b)
 	{
-		return _a - _b * floor(mul(_a, rcp(_b) ) );
+		return _a - _b * floor(div(_a, _b) );
 	}
 
 	inline BX_CONSTEXPR_FUNC bool isEqual(float _a, float _b, float _epsilon)
@@ -900,8 +920,8 @@ namespace bx
 
 	inline BX_CONST_FUNC Vec3 normalize(const Vec3 _a)
 	{
-		const float invLen = rcpSafe(length(_a) );
-		const Vec3 result = mul(_a, invLen);
+		const float len   = length(_a);
+		const Vec3 result = divSafe(_a, len);
 		return result;
 	}
 
