@@ -93,8 +93,8 @@ protected:
 
 	base_98628_9_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void reset_in(int state) override;
 
@@ -103,10 +103,10 @@ protected:
 	void update_modem_ctrl();
 	void update_clocks();
 
-	void base_config(machine_config &config);
-	virtual void cpu_program_mem_map(address_map &map);
-	void cpu_io_mem_map(address_map &map);
-	virtual void install_68k_map(offs_t base_addr);
+	void base_config(machine_config &config) ATTR_COLD;
+	virtual void cpu_program_mem_map(address_map &map) ATTR_COLD;
+	void cpu_io_mem_map(address_map &map) ATTR_COLD;
+	virtual void install_68k_map(offs_t base_addr) ATTR_COLD;
 	uint8_t reg_r(offs_t addr);
 	void reg_w(offs_t addr, uint8_t data);
 	uint8_t low_ram_r_z80(offs_t addr);
@@ -125,11 +125,11 @@ protected:
 	void ctc_int_w(int state);
 	uint8_t sw1_r(offs_t addr);
 	// Output signals
-	virtual void tx_out(int state) {};
-	virtual void tt_out(int state) {};
+	virtual void tx_out(int state) {}
+	virtual void tt_out(int state) {}
 	virtual void rts_out(int state) {}
-	virtual void dtr_out(int state) {};
-	virtual void ocd1_out(int state) {};
+	virtual void dtr_out(int state) {}
+	virtual void ocd1_out(int state) {}
 
 	required_device<z80_device> m_cpu;
 	required_device<z80ctc_device> m_ctc;
@@ -430,7 +430,9 @@ uint8_t base_98628_9_device::reg_r(offs_t addr)
 		if (!m_semaphore) {
 			BIT_SET(res, 7);
 		}
-		m_semaphore = false;
+		if (!machine().side_effects_disabled()) {
+			m_semaphore = false;
+		}
 		break;
 	case 3:
 		// Modem status
@@ -473,7 +475,7 @@ void base_98628_9_device::reg_w(offs_t addr, uint8_t data)
 	case 2:
 		// Semaphore
 		// Set
-		if (!m_reset) {
+		if (!m_reset && !machine().side_effects_disabled()) {
 			m_semaphore = true;
 		}
 		break;
@@ -720,9 +722,9 @@ protected:
 	{
 	}
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void tx_out(int state) override;
 	virtual void tt_out(int state) override;
@@ -847,14 +849,14 @@ protected:
 	{
 	}
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	virtual void cpu_program_mem_map(address_map &map) override;
-	virtual void install_68k_map(offs_t base_addr) override;
+	virtual void cpu_program_mem_map(address_map &map) override ATTR_COLD;
+	virtual void install_68k_map(offs_t base_addr) override ATTR_COLD;
 	uint8_t high_ram_r_z80(offs_t addr);
 	void high_ram_w_z80(offs_t addr, uint8_t data);
 	virtual void tx_out(int state) override;

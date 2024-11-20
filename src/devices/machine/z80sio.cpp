@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder, Joakim Larsson Edstrom, F.Ulivi
+// copyright-holders:Curt Coder, Joakim Larsson Edstrom
 /***************************************************************************
 
     Z80-SIO Serial Input/Output emulation
@@ -86,7 +86,6 @@
 #define LOG_BRG     (1U << 12)
 
 //#define VERBOSE  (LOG_CMD | LOG_SETUP | LOG_SYNC | LOG_BIT | LOG_TX )
-#define VERBOSE  (LOG_INT|LOG_CTS)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -685,6 +684,8 @@ void z80sio_device::trigger_interrupt(int index, int type)
 		   {{"INT_TRANSMIT", "INT_EXTERNAL", "INT_RECEIVE"}}[type]);
 
 	// trigger interrupt
+	if (m_int_state[(index * 3) + type] & Z80_DAISY_INT)
+		return;
 	m_int_state[(index * 3) + type] |= Z80_DAISY_INT;
 	m_chanA->m_rr0 |= RR0_INTERRUPT_PENDING;
 
@@ -702,6 +703,8 @@ void z80sio_device::clear_interrupt(int index, int type)
 		   {{"INT_TRANSMIT", "INT_EXTERNAL", "INT_RECEIVE"}}[type]);
 
 	// clear interrupt
+	if (!(m_int_state[(index * 3) + type] & Z80_DAISY_INT))
+		return;
 	m_int_state[(index * 3) + type] &= ~Z80_DAISY_INT;
 	if (std::find_if(std::begin(m_int_state), std::end(m_int_state), [] (int state) { return bool(state & Z80_DAISY_INT); }) == std::end(m_int_state))
 		m_chanA->m_rr0 &= ~RR0_INTERRUPT_PENDING;
@@ -1322,7 +1325,7 @@ void z80sio_channel::set_tx_empty(bool prev_state, bool new_state)
 
 	bool curr_tx_empty = get_tx_empty();
 
-	if (!prev_state && curr_tx_empty && (m_wr1 & WR1_TX_INT_ENABLE) != 0)
+	if (!prev_state && curr_tx_empty && (m_wr1 & WR1_TX_INT_ENABLE))
 	{
 		m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
 	}
@@ -1714,7 +1717,7 @@ void z80sio_channel::do_sioreg_wr1(uint8_t data)
 	LOGSETUP(" - Receiver Interrupt %s\n",  std::array<char const *, 4>
 		 {{"Disabled", "on First Character", "on All Characters, Parity Affects Vector", "on All Characters"}}[(m_wr2 >> 3) & 0x03]);
 
-		update_wait_ready();
+	update_wait_ready();
 }
 
 void z80sio_channel::do_sioreg_wr2(uint8_t data)
@@ -1920,7 +1923,9 @@ void z80sio_channel::advance_rx_fifo()
 uint8_t z80sio_channel::get_special_rx_mask() const
 {
 	if ((m_wr1 & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_DISABLE)
+	{
 		return 0;
+	}
 	else
 	{
 		uint8_t mask = ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC) ?
@@ -2545,10 +2550,10 @@ void z80sio_channel::txc_w(int state)
 			{
 				// Generate a new bit
 				bool new_bit = false;
-								if ((m_wr4 & (WR4_SYNC_MODE_MASK | WR4_STOP_BITS_MASK)) == (WR4_SYNC_MODE_SDLC | WR4_STOP_BITS_SYNC) &&
-									(m_tx_flags & (TX_FLAG_DATA_TX | TX_FLAG_CRC_TX)) && (m_tx_hist & 0x1f) == 0x1f)
-									// SDLC, sending data/CRC & 5 ones in a row: do zero insertion
-									new_bit = false;
+				if ((m_wr4 & (WR4_SYNC_MODE_MASK | WR4_STOP_BITS_MASK)) == (WR4_SYNC_MODE_SDLC | WR4_STOP_BITS_SYNC) &&
+					(m_tx_flags & (TX_FLAG_DATA_TX | TX_FLAG_CRC_TX)) && (m_tx_hist & 0x1f) == 0x1f)
+					// SDLC, sending data/CRC & 5 ones in a row: do zero insertion
+					new_bit = false;
 				else
 				{
 					bool get_out = false;
