@@ -2636,6 +2636,9 @@ ROM_START( calspeed )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "329_calif_speed_31.u96", 0x0000, 0x2000, CRC(8b470160) SHA1(4e4cc431432f07423cff2d711ae03de0a4e22f97) ) // actual label 329_calif_speed_31''
 ROM_END
 
 
@@ -2662,6 +2665,9 @@ ROM_START( calspeeda )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "329_calif_speed_31.u96", 0x0000, 0x2000, CRC(8b470160) SHA1(4e4cc431432f07423cff2d711ae03de0a4e22f97) )
 ROM_END
 
 
@@ -2676,6 +2682,9 @@ ROM_START( calspeedb )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "329_calif_speed_31.u96", 0x0000, 0x2000, CRC(8b470160) SHA1(4e4cc431432f07423cff2d711ae03de0a4e22f97) )
 ROM_END
 
 
@@ -2740,6 +2749,9 @@ ROM_START( blitz )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version 1.21
 	DISK_IMAGE( "blitz", 0, SHA1(9131c7888e89b3c172780156ed3fe1fe46f78b0a) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "444_blitz.u96", 0x0000, 0x2000, CRC(240c4f08) SHA1(a12b53995679e4ac8bbc8248ed446bf99bbb4ea1) )
 ROM_END
 
 
@@ -2791,6 +2803,9 @@ ROM_START( blitz2k )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Hard Drive Version 1.5
 	DISK_IMAGE( "blitz2k", 0, SHA1(e89b7fbd4b4a9854d47ae97493e0afffbd1f69e7) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "494_blitz_2000.u96", 0x0000, 0x2000, CRC(f27b38a4) SHA1(919a772d69d888738dd56c96ed443ccea67049aa) )
 ROM_END
 
 

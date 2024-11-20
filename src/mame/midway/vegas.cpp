@@ -2550,6 +2550,9 @@ ROM_START( roadburn ) // version 1.04 - verified on hardware
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 5/19/1999 GAME 5/19/1999
 	DISK_IMAGE( "road burners v1.04", 0, SHA1(30567241c000ee572a9cfb1b080c02a51a2b12d2) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "325_road_burners.u37", 0x0000, 0x2000, CRC(146c1ea1) SHA1(4bfda77f2ea6a421f59bbbd251b193a4e7743691) )
 ROM_END
 
 ROM_START( roadburn1 ) // version 1.0 - verified on hardware
@@ -2561,6 +2564,9 @@ ROM_START( roadburn1 ) // version 1.0 - verified on hardware
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 4/22/1999 GAME 4/22/1999
 	DISK_IMAGE( "roadburn", 0, SHA1(a62870cceafa6357d7d3505aca250c3f16087566) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "325_road_burners.u37", 0x0000, 0x2000, CRC(146c1ea1) SHA1(4bfda77f2ea6a421f59bbbd251b193a4e7743691) )
 ROM_END
 
 

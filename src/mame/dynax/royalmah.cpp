@@ -5967,6 +5967,18 @@ ROM_START( ichiban ) // TODO: how does the banking work?
 	ROM_LOAD( "mjb.u38", 0x400, 0x200, CRC(0ef881cb) SHA1(44b61a443d683f5cb2d1b1a4f74d8a8f41021de5) )
 ROM_END
 
+ROM_START( dragonmj ) // MJ911 PCB, as ichiban. TODO: how does the banking work?
+	ROM_REGION( 0x60000, "maincpu", 0 ) // opcodes in first half are mixed with pseudo-random garbage
+	ROM_LOAD( "oct3.u15", 0x00000, 0x20000, CRC(87ac834d) SHA1(ab98406a008b566aff95da9ecb11d238e2f472ca) )
+	ROM_LOAD( "oct1.u28", 0x20000, 0x20000, CRC(0142aed1) SHA1(1ee627d6cbddeafbe1407fd569704ec511874c60) )
+	ROM_LOAD( "oct2.u14", 0x40000, 0x20000, CRC(40310894) SHA1(072418ed995e8dda1b47b59483a5139d731ed542) )
+
+	ROM_REGION( 0x600, "proms", 0 )
+	ROM_LOAD( "r.u36", 0x000, 0x200, CRC(1c5d555b) SHA1(cc9bc20d3ef5397acf3f3e195d59c7a633e6500e) )
+	ROM_LOAD( "g.u37", 0x200, 0x200, CRC(eb40711b) SHA1(2ed08fd86dc4f578536ebf65f377c63c8fdc6e07) )
+	ROM_LOAD( "b.u38", 0x400, 0x200, CRC(6b2fa97a) SHA1(7f8e33f2132348eaca1af55062b280e0a9234ac9) )
+ROM_END
+
 
 /*
 Pong Boo! 2 by OCT
@@ -6229,6 +6241,7 @@ GAME( 1992,  cafetime, 0,        cafetime, cafetime, royalmah_prgbank_state, ini
 GAME( 1993,  cafedoll, 0,        cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
 GAME( 1993,  cafedollg,cafedoll, cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll Great (Japan, Ver. 1.00)", MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
 GAME( 1993,  ichiban,  0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // ROM banking is wrong, causing several GFX problems
+GAME( 1993,  dragonmj, 0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "OCT",                        "Dragon Mahjong (Ver 1.20)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // " - DRAGON Ver1.20 1993/11/09
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             MACHINE_NOT_WORKING )
 GAME( 1996,  majrjhdx, 0,        majrjh,   mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Raijinhai DX (Ver. D105)",      0 )
 GAME( 1996,  majrjh,   majrjhdx, majrjh,   mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Raijinhai (Ver. D105)",         0 )
