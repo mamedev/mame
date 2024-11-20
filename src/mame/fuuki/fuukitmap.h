@@ -70,6 +70,7 @@ public:
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 i, int flag, u8 pri, u8 primask = 0xff);
 
 	void vram_map(address_map &map);
+	void vregs_map(address_map &map);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -92,7 +93,7 @@ private:
 	tilemap_t *m_tilemap[3]{};
 
 	std::unique_ptr<u16[]> m_vram[4]{};
-	std::unique_ptr<u16[]> m_vregs = nullptr;
+	std::unique_ptr<u16[]> m_vregs;
 	u16 m_unknown[2];
 	u16 m_priority;
 
@@ -102,9 +103,9 @@ private:
 	u8 m_tmap_back;
 
 	// misc
-	emu_timer *m_level_1_interrupt_timer = nullptr;
-	emu_timer *m_vblank_interrupt_timer = nullptr;
-	emu_timer *m_raster_interrupt_timer = nullptr;
+	emu_timer *m_level_1_interrupt_timer;
+	emu_timer *m_vblank_interrupt_timer;
+	emu_timer *m_raster_interrupt_timer;
 
 	TIMER_CALLBACK_MEMBER(level1_interrupt);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt);

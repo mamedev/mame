@@ -21,6 +21,13 @@ void fuukitmap_device::vram_map(address_map &map)
 	map(0x6000, 0x7fff).rw(FUNC(fuukitmap_device::vram_r<3>), FUNC(fuukitmap_device::vram_buffered_w<3>));
 }
 
+void fuukitmap_device::vregs_map(address_map &map)
+{
+	map(0x00000, 0x0001f).rw(FUNC(fuukitmap_device::vregs_r), FUNC(fuukitmap_device::vregs_w));
+	map(0x10000, 0x10003).rw(FUNC(fuukitmap_device::unknown_r), FUNC(fuukitmap_device::unknown_w)); // Flipscreen related
+	map(0x20000, 0x20001).rw(FUNC(fuukitmap_device::priority_r), FUNC(fuukitmap_device::priority_w)); // Controls layer order
+}
+
 
 DEFINE_DEVICE_TYPE(FUUKI_TILEMAP, fuukitmap_device, "fuukitmap", "Fuuki Tilemap hardware")
 
@@ -38,12 +45,16 @@ fuukitmap_device::fuukitmap_device(const machine_config &mconfig, const char *ta
 	, m_yoffs_flip(0)
 	, m_layer2_xoffs(0)
 	, m_layer2_yoffs(0)
+	, m_vregs(nullptr)
 	, m_unknown{0, 0}
 	, m_priority(0)
 	, m_flip(false)
 	, m_tmap_front(0)
 	, m_tmap_middle(1)
 	, m_tmap_back(2)
+	, m_level_1_interrupt_timer(nullptr)
+	, m_vblank_interrupt_timer(nullptr)
+	, m_raster_interrupt_timer(nullptr)
 {
 }
 

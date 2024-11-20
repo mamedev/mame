@@ -402,9 +402,7 @@ void fuuki32_state::main_map(address_map &map)
 	map(0x880000, 0x880003).lr16(NAME([this] () { return u16(m_dsw[0]->read()); }));           // Service + DIPs
 	map(0x890000, 0x890003).lr16(NAME([this] () { return u16(m_dsw[1]->read()); }));           // More DIPs
 
-	map(0x8c0000, 0x8c001f).rw(m_fuukitmap, FUNC(fuukitmap_device::vregs_r), FUNC(fuukitmap_device::vregs_w));
-	map(0x8d0000, 0x8d0003).rw(m_fuukitmap, FUNC(fuukitmap_device::unknown_r), FUNC(fuukitmap_device::unknown_w));                              // Flipscreen related
-	map(0x8e0000, 0x8e0001).rw(m_fuukitmap, FUNC(fuukitmap_device::priority_r), FUNC(fuukitmap_device::priority_w));                            // Controls layer order
+	map(0x8c0000, 0x8effff).m(m_fuukitmap, FUNC(fuukitmap_device::vregs_map));
 	map(0x903fe0, 0x903fff).rw(FUNC(fuuki32_state::snd_020_r), FUNC(fuuki32_state::snd_020_w)).umask32(0x00ff00ff);                                         // Shared with Z80
 	map(0xa00000, 0xa00003).writeonly().share(m_tilebank);
 }

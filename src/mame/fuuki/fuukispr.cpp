@@ -4,7 +4,7 @@
 /*
 	Fuuki Sprite hardware
 
-	Used at:
+	Used by:
 	fuukifg2.cpp
 	fuukifg3.cpp (with sprite tile bankswitching, triple buffered)
 */

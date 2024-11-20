@@ -220,9 +220,7 @@ void fuuki16_state::main_map(address_map &map)
 	map(0x810000, 0x810001).portr("P1_P2");
 	map(0x880000, 0x880001).portr("DSW");
 	map(0x8a0001, 0x8a0001).w(FUNC(fuuki16_state::sound_command_w));
-	map(0x8c0000, 0x8c001f).rw(m_fuukitmap, FUNC(fuukitmap_device::vregs_r), FUNC(fuukitmap_device::vregs_w));
-	map(0x8d0000, 0x8d0003).rw(m_fuukitmap, FUNC(fuukitmap_device::unknown_r), FUNC(fuukitmap_device::unknown_w));
-	map(0x8e0000, 0x8e0001).rw(m_fuukitmap, FUNC(fuukitmap_device::priority_r), FUNC(fuukitmap_device::priority_w));
+	map(0x8c0000, 0x8effff).m(m_fuukitmap, FUNC(fuukitmap_device::vregs_map));
 }
 
 
