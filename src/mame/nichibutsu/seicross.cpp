@@ -21,7 +21,7 @@ B800      watchdog reset
 Write:
 8820-887f Sprite ram
 9800-981f Scroll control
-9880-989f ? (always 0?)
+9880-989f Sprite ram
 
 I/O ports:
 0         8910 control
@@ -39,6 +39,12 @@ Differences in new/old version of Frisky Tom
 - Old version uses larger board
 
 This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
+
+TODO:
+- Dump radradj color proms instead of using the ones from the USA version.
+  Although it doesn't look displeasing right now, radradj middle colors of
+  both pen #0 and pen #6 should be green, so the 1st level background is
+  green instead of sandy.
 
 ***************************************************************************/
 
@@ -81,6 +87,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_debug_port(*this, "DEBUG"),
+		m_sharedram(*this, "sharedram"),
 		m_spriteram(*this, "spriteram%u", 1U),
 		m_videoram(*this, "videoram"),
 		m_row_scroll(*this, "row_scroll"),
@@ -107,6 +114,7 @@ private:
 
 	optional_ioport m_debug_port;
 
+	required_shared_ptr<uint8_t> m_sharedram;
 	required_shared_ptr_array<uint8_t, 2> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_row_scroll;
@@ -159,6 +167,7 @@ void seicross_state::machine_start()
 	address_space &space = m_mcu->space(AS_PROGRAM);
 
 	// MR is asserted when it does an access with A15 is high
+	// this makes DAC sound pitch the same as PCB recordings
 	space.install_read_tap(
 			0x8000, 0xffff,
 			"mcu_mr_r",
@@ -311,6 +320,7 @@ uint8_t seicross_state::portb_r()
 void seicross_state::portb_w(uint8_t data)
 {
 	LOGAYPORTB("PC %04x: 8910 port B = %02x\n", m_maincpu->pc(), data);
+
 	// bit 0 is IRQ enable
 	m_irq_mask = data & 1;
 
@@ -336,7 +346,7 @@ void seicross_state::dac_w(uint8_t data)
 void seicross_state::main_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();
-	map(0x7800, 0x7fff).ram().share("sharedram");
+	map(0x7800, 0x7fff).ram().share(m_sharedram);
 	map(0x8820, 0x887f).ram().share(m_spriteram[0]);
 	map(0x9000, 0x93ff).ram().w(FUNC(seicross_state::videoram_w)).share(m_videoram);
 	map(0x9800, 0x981f).ram().share(m_row_scroll);
@@ -361,7 +371,7 @@ void seicross_state::mcu_nvram_map(address_map &map)
 	map(0x1000, 0x10ff).ram().share("nvram");
 	map(0x2000, 0x2000).w(FUNC(seicross_state::dac_w));
 	map(0x8000, 0xf7ff).rom().region("maincpu", 0);
-	map(0xf800, 0xffff).ram().share("sharedram");
+	map(0xf800, 0xffff).ram().share(m_sharedram);
 }
 
 void seicross_state::mcu_no_nvram_map(address_map &map)
@@ -371,7 +381,7 @@ void seicross_state::mcu_no_nvram_map(address_map &map)
 	map(0x1006, 0x1006).portr("DSW3");
 	map(0x2000, 0x2000).w(FUNC(seicross_state::dac_w));
 	map(0x8000, 0xf7ff).rom().region("maincpu", 0);
-	map(0xf800, 0xffff).ram().share("sharedram");
+	map(0xf800, 0xffff).ram().share(m_sharedram);
 }
 
 
@@ -783,11 +793,11 @@ ROM_START( radradj ) // Top and bottom PCBs have Nihon Bussan etched and the top
 	ROM_LOAD( "10.7j",      0x3000, 0x1000, CRC(79237913) SHA1(b07dd531d06ef01f756169e87a8cccda35ed38d3) ) // 2732
 
 	ROM_REGION( 0x0040, "proms", 0 ) // not dumped for this set
-	ROM_LOAD( "clr.9c",     0x0000, 0x0020, CRC(c9d88422) SHA1(626216bac1a6317a32f2a51b89375043f58b5503) )
-	ROM_LOAD( "clr.9b",     0x0020, 0x0020, CRC(ee81af16) SHA1(e1bab9738d37dea0473a7184a4303234b75e6cc6) )
+	ROM_LOAD( "clr.9c",     0x0000, 0x0020, BAD_DUMP CRC(c9d88422) SHA1(626216bac1a6317a32f2a51b89375043f58b5503) )
+	ROM_LOAD( "clr.9b",     0x0020, 0x0020, BAD_DUMP CRC(ee81af16) SHA1(e1bab9738d37dea0473a7184a4303234b75e6cc6) )
 
-	ROM_REGION( 0x0100, "plds", 0 )  // not dumped for this set
-	ROM_LOAD( "pal16h2.2b", 0x0000, 0x0044, CRC(a356803a) SHA1(a324d3cbe2de5bf54be9aa07c984054149ac3eb0) )
+	ROM_REGION( 0x0100, "plds", 0 ) // not dumped for this set
+	ROM_LOAD( "pal16h2.2b", 0x0000, 0x0044, BAD_DUMP CRC(a356803a) SHA1(a324d3cbe2de5bf54be9aa07c984054149ac3eb0) )
 ROM_END
 
 ROM_START( seicross )
