@@ -23,7 +23,7 @@ Notes:
   with the driver.
 
 TODO:
-- shtrider dip switches and figure out flip screen (not same as travrusa)
+- figure out remaining shtrider dip switches
 - verify shtrider (not bootlegs) maincpu XTAL, 3.072MHz seems too slow:
   see race countdown at start, and overall a lot of frame overflows
 
@@ -87,6 +87,8 @@ public:
 	void init_motorace();
 	void init_shtridrb();
 
+	DECLARE_INPUT_CHANGED_MEMBER(flipscreen_switch) { flipscreen_w(m_flipscreen); }
+
 protected:
 	virtual void video_start() override ATTR_COLD;
 
@@ -101,7 +103,8 @@ private:
 	required_ioport_array<2> m_dsw;
 
 	tilemap_t *m_bg_tilemap = nullptr;
-	uint8_t m_scrollx[2]{};
+	uint8_t m_scrollx[2] = { };
+	uint8_t m_flipscreen = 0;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void scroll_x_low_w(uint8_t data);
@@ -314,6 +317,7 @@ TILE_GET_INFO_MEMBER(travrusa_state::get_tile_info)
 void travrusa_state::video_start()
 {
 	save_item(NAME(m_scrollx));
+	save_item(NAME(m_flipscreen));
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(travrusa_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
@@ -414,13 +418,13 @@ void travrusa_state::scroll_x_high_w(uint8_t data)
 void travrusa_state::flipscreen_w(uint8_t data)
 {
 	// screen flip is handled both by software and hardware
-	data ^= ~m_dsw[1]->read() & 1;
-
-	flip_screen_set(data & 1);
+	flip_screen_set((data & 1) ^ (~m_dsw[1]->read() & 1));
 
 	// and coincounters (not written by shtrider)
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+
+	m_flipscreen = data;
 }
 
 
@@ -547,7 +551,7 @@ static INPUT_PORTS_START( travrusa )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )    PORT_CONDITION("DSW2", 0x04, EQUALS, 0x00)
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSW2:1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(travrusa_state::flipscreen_switch), 0)
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("DSW2:2")
@@ -625,7 +629,7 @@ static INPUT_PORTS_START( shtrider )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW1:8" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSW2:1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(travrusa_state::flipscreen_switch), 0)
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Speed Display" )         PORT_DIPLOCATION("DSW2:2")
