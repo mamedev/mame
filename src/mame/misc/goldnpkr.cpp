@@ -10978,6 +10978,8 @@ ROM_START( falcnwldd ) // "831 1.1 MADE IN JAPAN" without extra MCU
 	ROM_LOAD( "falcon_1.bin",   0x0000, 0x0100, CRC(3db3b9e0) SHA1(c956493d5d754665d214b416e6a473d73c22716c) )
 ROM_END
 
+
+
 /**************************************** OTHER SETS ****************************************/
 
 

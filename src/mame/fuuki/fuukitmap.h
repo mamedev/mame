@@ -76,10 +76,10 @@ private:
 	int m_layer2_yoffs;
 
 	// video-related
-	tilemap_t *m_tilemap[3]{};
+	tilemap_t *m_tilemap[3];
 
-	std::unique_ptr<u16[]> m_vram[4];
-	std::unique_ptr<u16[]> m_vregs;
+	memory_share_array_creator<u16, 4> m_vram;
+	u16 m_vregs[0x20 / 2];
 	u16 m_unknown[2];
 	u16 m_priority;
 

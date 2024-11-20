@@ -12,6 +12,8 @@
 #include "emu.h"
 #include "fuukitmap.h"
 
+#include <algorithm>
+
 
 void fuukitmap_device::vram_map(address_map &map)
 {
@@ -46,6 +48,7 @@ fuukitmap_device::fuukitmap_device(const machine_config &mconfig, const char *ta
 	, m_layer2_xoffs(0)
 	, m_layer2_yoffs(0)
 	, m_tilemap{ nullptr, nullptr, nullptr }
+	, m_vram(*this, "vram%u", 0U, 0x2000U, ENDIANNESS_BIG)
 	, m_unknown{ 0, 0 }
 	, m_priority(0)
 	, m_flip(false)
@@ -62,14 +65,7 @@ void fuukitmap_device::device_start()
 {
 	m_colour_cb.resolve();
 
-	for (int i = 0; i < 4; i++)
-	{
-		m_vram[i] = make_unique_clear<u16 []>(0x2000 / 2);
-
-		save_pointer(NAME(m_vram[i]), 0x2000 / 2, i);
-	}
-
-	m_vregs = make_unique_clear<u16 []>(0x20 / 2);
+	std::fill(std::begin(m_vregs), std::end(m_vregs), 0);
 
 	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(fuukitmap_device::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(fuukitmap_device::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
@@ -79,7 +75,7 @@ void fuukitmap_device::device_start()
 	m_vblank_interrupt_timer = timer_alloc(FUNC(fuukitmap_device::vblank_interrupt), this);
 	m_raster_interrupt_timer = timer_alloc(FUNC(fuukitmap_device::raster_interrupt), this);
 
-	save_pointer(NAME(m_vregs), 0x20 / 2);
+	save_item(NAME(m_vregs));
 	save_item(NAME(m_unknown));
 	save_item(NAME(m_priority));
 	save_item(NAME(m_flip));

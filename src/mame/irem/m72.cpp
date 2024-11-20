@@ -565,9 +565,9 @@ u16 m72_state::protection_r(offs_t offset, u16 mem_mask)
 	if (ACCESSING_BITS_8_15)
 	{
 		if (!machine().side_effects_disabled())
-			copy_le(m_protection_ram.get(),m_protection_code,CODE_LEN);
+			copy_le(m_protection_ram.get(), m_protection_code, CODE_LEN);
 	}
-	return m_protection_ram[0xffa/2+offset];
+	return m_protection_ram[0xffa/2 + offset];
 }
 
 void m72_state::protection_w(offs_t offset, u16 data, u16 mem_mask)

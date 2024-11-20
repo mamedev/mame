@@ -330,13 +330,13 @@ void m72_state::port02_w(u8 data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
 	/* bit 2 is flip screen (handled both by software and hardware) */
-	flip_screen_set(BIT(data, 2) ^ ((~m_io_dsw->read() >> 8) & 1));
+	flip_screen_set(BIT(data, 2) ^ BIT(~m_io_dsw->read(), 8));
 
 	/* bit 3 is display disable */
 	m_video_off = BIT(data, 3);
 
 	/* bit 4 resets sound CPU (active low) */
-	if (data & 0x10)
+	if (BIT(data, 4))
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	else
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

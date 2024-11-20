@@ -7,11 +7,11 @@
     The CPU is identified on schematics as a custom "90435" type, but
     board photos confirm it really is a CDP1802ACE as the pinout
     and support ICs suggest. Its XTAL value is specified as 2.95 MHz,
-    but 3 MHZ has also been seen on one set of Night Mare.
+    but 3 MHz has also been seen on one set of Night Mare.
 
     The synthesizer IC is custom-marked as EFO90503, but it also bears
     a TI logo and is obviously some sort of TMS5220 variant. Its
-    discrete oscillator circuit is tuned for a 160 KHz operating
+    discrete oscillator circuit is tuned for a 160 kHz operating
     frequency, according to both schematics and board markings.
     (Unlike other EFO sound boards, Sound-3 has no PSG.)
 
