@@ -406,6 +406,24 @@ void sb16_lle_device::sb16_io(address_map &map)
 
 void sb16_lle_device::host_io(address_map &map)
 {
+    // TODO: move to own mixer core
+    map(0x4, 0x4).lrw8(
+        NAME([this] (offs_t offset) {
+            return m_mixer_index;
+        }),
+        NAME([this] (offs_t offset, u8 data) {
+            m_mixer_index = data;
+        })
+    );
+    map(0x5, 0x5).lr8(
+        NAME([this] (offs_t offset) {
+            if (m_mixer_index == 0x80)
+                return 0x12;
+            if (m_mixer_index == 0x81)
+                return 0x22;
+            return 0;
+        })
+    );
 	map(0x6, 0x7).w(FUNC(sb16_lle_device::dsp_reset_w));
 	map(0xa, 0xb).r(FUNC(sb16_lle_device::host_data_r));
 	map(0xc, 0xd).rw(FUNC(sb16_lle_device::dsp_wbuf_status_r), FUNC(sb16_lle_device::host_cmd_w));
@@ -712,7 +730,7 @@ void sb16_lle_device::device_start()
 	m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
 	m_isa->install_device(0x0220, 0x022f, *this, &sb16_lle_device::host_io);
 	m_isa->install_device(0x0330, 0x0331, read8sm_delegate(*this, FUNC(sb16_lle_device::mpu401_r)), write8sm_delegate(*this, FUNC(sb16_lle_device::mpu401_w)));
-	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
+	m_isa->install_device(0x0388, 0x038b, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
 	m_isa->install_device(0x0220, 0x0223, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
 	m_isa->install_device(0x0228, 0x0229, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
 	m_isa->set_dma_channel(1, this, false);

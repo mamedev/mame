@@ -112,6 +112,8 @@ private:
 	bool m_dma8_done, m_dma16_done;
 
 	emu_timer *m_timer;
+
+    u8 m_mixer_index;
 };
 
 // device type definition
