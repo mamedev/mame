@@ -1518,7 +1518,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(vtech1_cassette_formats); // vt_cas.h
 	en.add(vtech2_cassette_formats); // vt_cas.h
 #endif
-#ifdef HAS_FORMATS_VT_DSJ
+#ifdef HAS_FORMATS_VT_DSK
 	en.add(FLOPPY_VTECH_BIN_FORMAT); // vt_dsk.h
 	en.add(FLOPPY_VTECH_DSK_FORMAT); // vt_dsk.h
 #endif
