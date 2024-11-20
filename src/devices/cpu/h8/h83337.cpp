@@ -24,8 +24,8 @@ DEFINE_DEVICE_TYPE(H83336, h83336_device, "h83336", "Hitachi H8/3336")
 DEFINE_DEVICE_TYPE(H83337, h83337_device, "h83337", "Hitachi H8/3337")
 
 
-h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
-	h8_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83337_device::map), this)),
+h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate, u32 start) :
+	h8_device(mconfig, type, tag, owner, clock, map_delegate),
 	m_intc(*this, "intc"),
 	m_adc(*this, "adc"),
 	m_port1(*this, "port1"),
@@ -43,6 +43,11 @@ h83337_device::h83337_device(const machine_config &mconfig, device_type type, co
 	m_timer16_0(*this, "timer16:0"),
 	m_watchdog(*this, "watchdog"),
 	m_ram_start(start)
+{
+}
+
+h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start) :
+	h83337_device(mconfig, H83337, tag, owner, clock, address_map_constructor(FUNC(h83337_device::map), this), 0xf780)
 {
 }
 
@@ -97,8 +102,8 @@ void h83337_device::map(address_map &map)
 	map(0xffb9, 0xffb9).rw(m_port6, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(0xffba, 0xffba).rw(m_port5, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffbb, 0xffbb).rw(m_port6, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-	map(0xffbd, 0xffbd).rw(m_port8, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
-	map(0xffbe, 0xffbe).rw(m_port7, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
+	map(0xffbd, 0xffbd).w(m_port8, FUNC(h8_port_device::ddr_w));
+	map(0xffbe, 0xffbe).r(m_port7, FUNC(h8_port_device::port_r));
 	map(0xffbf, 0xffbf).rw(m_port8, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xffc0, 0xffc0).rw(m_port9, FUNC(h8_port_device::ff_r), FUNC(h8_port_device::ddr_w));
 	map(0xffc1, 0xffc1).rw(m_port9, FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));

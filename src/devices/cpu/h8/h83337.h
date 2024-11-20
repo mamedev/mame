@@ -64,6 +64,7 @@ public:
 	void mdcr_w(u8 data);
 
 protected:
+	h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map_delegate, u32 start);
 	h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 start);
 
 	required_device<h8_intc_device> m_intc;
