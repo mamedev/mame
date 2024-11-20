@@ -306,8 +306,8 @@ TEST_CASE("rcp", "[math][libm]")
 {
 	STATIC_REQUIRE(1.0f == bx::rcp(1.0f) );
 	STATIC_REQUIRE(2.0f == bx::rcp(0.5f) );
-	STATIC_REQUIRE(bx::isInfinite(bx::rcp( 0.0f) ) );
-	STATIC_REQUIRE(bx::isInfinite(bx::rcp(-0.0f) ) );
+	REQUIRE(bx::isInfinite(bx::rcp( 0.0f) ) );
+	REQUIRE(bx::isInfinite(bx::rcp(-0.0f) ) );
 }
 
 TEST_CASE("rcpSafe", "[math][libm]")
