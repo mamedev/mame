@@ -207,6 +207,7 @@
 ******************************************************************************/
 
 #include "emu.h"
+#include "efo_sound3.h"
 #include "video/tms9928a.h"
 #include "cpu/cosmac/cosmac.h"
 #include "machine/cdp1852.h"
@@ -226,7 +227,7 @@ public:
 	nightmare_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "cdp1802")
-		, m_soundcpu(*this,"cdp1802_sound")
+		, m_sound3(*this, "sound3")
 		, m_vdc(*this, "vdc")
 		, m_vdc2(*this, "vdc2")
 		, m_eeprom(*this,"eeprom")
@@ -245,16 +246,14 @@ protected:
 	int ef2_r();
 	void q_w(int state);
 	void ic10_w(uint8_t data);
-	void unkout_w(uint8_t data);
+	void sound_w(uint8_t data);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
-	void sound_io_map(address_map &map) ATTR_COLD;
 	uint32_t screen_update_nightmare(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cosmac_device> m_maincpu;
-	required_device<cosmac_device> m_soundcpu;
+	required_device<efo_sound3_device> m_sound3;
 	required_device<tms9928a_device> m_vdc;
 	required_device<tms9928a_device> m_vdc2;
 	required_device<sda2006_device> m_eeprom;
@@ -324,14 +323,20 @@ void nightmare_state::ic10_w(uint8_t data)
     0 - ?
   */
 
-	m_eeprom->write_data((data&0x80) ?1:0);
-	m_eeprom->write_enable((data&0x40) ?1:0);
+	m_eeprom->write_data(BIT(data, 7));
+	m_eeprom->write_enable(BIT(data, 6));
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
 }
 
 
-void nightmare_state::unkout_w(uint8_t data)
+void nightmare_state::sound_w(uint8_t data)
 {
-  // J3
+	// J3
+	m_sound3->input_w(data);
+	m_sound3->clock_w(1);
+	m_sound3->clock_w(0);
 }
 
 void nightmare_state::main_map(address_map &map)
@@ -342,20 +347,11 @@ void nightmare_state::main_map(address_map &map)
 
 void nightmare_state::io_map(address_map &map)
 {
-	map(1, 1).r("ic8", FUNC(cdp1852_device::read)).w(FUNC(nightmare_state::unkout_w));
+	map(1, 1).r("ic8", FUNC(cdp1852_device::read)).w(FUNC(nightmare_state::sound_w));
 	map(2, 2).r("ic9", FUNC(cdp1852_device::read)).w("ic10", FUNC(cdp1852_device::write));
 
 	map(4, 5).rw(m_vdc, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(6, 7).rw(m_vdc2, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
-}
-
-void nightmare_state::sound_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rom();
-}
-
-void nightmare_state::sound_io_map(address_map &map)
-{
 }
 
 uint32_t nightmare_state::screen_update_nightmare(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -425,12 +421,6 @@ void nightmare_state::nightmare(machine_config &config)
 	m_maincpu->ef2_cb().set(FUNC(nightmare_state::ef2_r));
 	m_maincpu->tpb_cb().set("ic10", FUNC(cdp1852_device::clock_w));
 
-	// sound CPU
-	CDP1802(config, m_soundcpu, SOUND_CLOCK);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &nightmare_state::sound_map);
-	m_soundcpu->set_addrmap(AS_IO, &nightmare_state::sound_io_map);
-	m_soundcpu->set_disable();
-
 	// I/O hardware
 	cdp1852_device &ic8(CDP1852(config, "ic8"));
 	ic8.mode_cb().set_constant(0);
@@ -458,6 +448,8 @@ void nightmare_state::nightmare(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(nightmare_state::screen_update_nightmare));
+
+	EFO_SOUND3(config, m_sound3);
 }
 
 
@@ -467,9 +459,8 @@ ROM_START( nightmare )
 	ROM_LOAD( "nm1-ib1.ic12", 0x2000, 0x2000, CRC(c10695f7) SHA1(929467fe7529782e8181d3caae3a67bb0a8d8753) )
 	ROM_LOAD( "nm1-ic1.ic13", 0x4000, 0x2000, CRC(a3117246) SHA1(ca9601401f7ab34200c969e41ffae50bee0aca4d) )
 
-	ROM_REGION( 0x4000, "cdp1802_sound", 0 )
+	ROM_REGION( 0x2000, "sound3:rom", 0 )
 	ROM_LOAD( "scl-1a1.ic5",  0x0000, 0x2000, CRC(4bba61af) SHA1(b324344081e3d4b5db43a8ff3122c28cf75aec84) )
-	ROM_RELOAD(               0x2000, 0x2000 )
 
 	ROM_REGION( 0x40, "eeprom", 0 )
 	ROM_LOAD( "eeprom.ic7",   0x0000, 0x0040, CRC(7824e1f8) SHA1(2ccac62b4e8abcb2b3d66fa4025947fea184664e) )
@@ -481,9 +472,8 @@ ROM_START( nightmarea )
 	ROM_LOAD( "nm1-ib1.ic12", 0x2000, 0x2000, CRC(c10695f7) SHA1(929467fe7529782e8181d3caae3a67bb0a8d8753) )
 	ROM_LOAD( "nm1-ic1.ic13", 0x4000, 0x2000, CRC(b0f8f163) SHA1(cbc4be2880b7a30f094c6fee9dccfa24adec3096) ) // Different from the parent set
 
-	ROM_REGION( 0x4000, "cdp1802_sound", 0 )
+	ROM_REGION( 0x2000, "sound3:rom", 0 )
 	ROM_LOAD( "scl-1a1.ic5",  0x0000, 0x2000, CRC(4bba61af) SHA1(b324344081e3d4b5db43a8ff3122c28cf75aec84) )
-	ROM_RELOAD(               0x2000, 0x2000 )
 
 	ROM_REGION( 0x40, "eeprom", 0 )
 	ROM_LOAD( "eeprom.ic7",   0x0000, 0x0040, CRC(7824e1f8) SHA1(2ccac62b4e8abcb2b3d66fa4025947fea184664e) )
@@ -492,5 +482,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1982, nightmare,  0,         nightmare, nightmare, nightmare_state, empty_init, ROT90, "E.F.O.", "Night Mare (Spain, set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1982, nightmarea, nightmare, nightmare, nightmare, nightmare_state, empty_init, ROT90, "E.F.O.", "Night Mare (Spain, set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1982, nightmare,  0,         nightmare, nightmare, nightmare_state, empty_init, ROT90, "E.F.O.", "Night Mare (Spain, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1982, nightmarea, nightmare, nightmare, nightmare, nightmare_state, empty_init, ROT90, "E.F.O.", "Night Mare (Spain, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
