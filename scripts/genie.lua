@@ -1293,6 +1293,9 @@ configuration { "vs20*" }
 		}
 
 		buildoptions {
+			"/Zc:preprocessor",
+			"/utf-8",
+			"/permissive-",
 			"/w45038", -- warning C5038: data member 'member1' will be initialized after data member 'member2'
 		}
 
