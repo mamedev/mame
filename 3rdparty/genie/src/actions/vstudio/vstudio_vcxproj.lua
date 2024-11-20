@@ -341,6 +341,13 @@
 		end
 	end
 
+	local function include_resdirs(indent,cfg)
+		if #cfg.resincludedirs> 0 then
+			_p(indent,'<AdditionalIncludeDirectories>%s;%%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>'
+					,premake.esc(path.translate(table.concat(cfg.resincludedirs, ";"), '\\')))
+		end
+	end
+
 	local function using_dirs(indent,cfg)
 		if #cfg.usingdirs > 0 then
 			_p(indent,'<AdditionalUsingDirectories>%s;%%(AdditionalUsingDirectories)</AdditionalUsingDirectories>'
@@ -351,7 +358,7 @@
 	local function resource_compile(cfg)
 		_p(2,'<ResourceCompile>')
 			preprocessor(3,cfg,true)
-			include_dirs(3,cfg)
+			include_resdirs(3,cfg)
 		_p(2,'</ResourceCompile>')
 
 	end
