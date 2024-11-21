@@ -5062,6 +5062,38 @@ ROM_START( wbmlb )
 	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
+ROM_START( wbmlb2 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "m5.e8", 0x20000, 0x8000, CRC(66482638) SHA1(887f93015f0effa2d0fa1f1f59082f75ac072221) ) // Unencrypted opcodes
+	ROM_CONTINUE(      0x00000, 0x8000 ) // Now load the operands in RAM
+	ROM_LOAD( "m6.f8", 0x30000, 0x8000, CRC(c05e365a) SHA1(f8339af02538258a88ed348524c23a337fe152b6) ) // Unencrypted opcodes
+	ROM_CONTINUE(      0x10000, 0x8000 )
+	ROM_LOAD( "m7.g8", 0x38000, 0x8000, CRC(cb3ea856) SHA1(4d9eedecccccf2bf40cb65473a155f519803f6f9) ) // Unencrypted opcodes
+	ROM_CONTINUE(      0x18000, 0x8000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "m8", 0x0000, 0x8000, BAD_DUMP CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) ) // was removed on the PCB, using wbmlb's one for now
+
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "m11.g19", 0x00000, 0x8000, CRC(bbea6afe) SHA1(ba56c6789a35eb57cd226296ebf57e9aa19ba625) )
+	ROM_LOAD( "m10.f19", 0x08000, 0x8000, BAD_DUMP CRC(77567d41) SHA1(2ac501661522615859f8a1718dbb8451272d6931) ) // rotten, but the other 2 ROMs match wbmlb so use that for now
+	ROM_LOAD( "m9.e19",  0x10000, 0x8000, CRC(a52ffbdd) SHA1(609375112268b770a798186697ecab5853f29f89) )
+
+	ROM_REGION( 0x20000, "sprites", 0 )
+	ROM_LOAD( "m2.b8", 0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
+	ROM_LOAD( "m1.a8", 0x08000, 0x8000, CRC(0cf576d1) SHA1(b9fe4a8405fc95ec08ab5f1f1029fa9c6ddd81be) )
+	ROM_LOAD( "m4.d8", 0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
+	ROM_LOAD( "m3.c8", 0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
+
+	ROM_REGION( 0x0300, "color_proms", 0 )
+	ROM_LOAD( "pr11026.20", 0x0000, 0x0100, CRC(27057298) SHA1(654be7abb937bb0720263ee6512e31194662effe) )
+	ROM_LOAD( "pr11025.14", 0x0100, 0x0100, CRC(41e4d86b) SHA1(a86e8bb0a465d01b04410edfbb82eb96f12b909f) )
+	ROM_LOAD( "pr11024.8",  0x0200, 0x0100, CRC(08d71954) SHA1(df045dbfb3d669e4d42fbdba1e7191cd046f7b47) )
+
+	ROM_REGION( 0x0100, "lookup_proms", 0 )
+	ROM_LOAD( "pr5317.37", 0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+ROM_END
+
 ROM_START( wbmlbg )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "galaxy.ic90",  0x20000, 0x8000, CRC(66482638) SHA1(887f93015f0effa2d0fa1f1f59082f75ac072221) ) // Unencrypted opcodes
@@ -5781,6 +5813,7 @@ GAME( 1987, wbml,       0,        sys2xb,            wbml,      system1_state, i
 GAME( 1987, wbmljo,     wbml,     sys2xb,            wbml,      system1_state, init_wbml,      ROT0,   "Sega / Westone", "Wonder Boy - Monster Land (Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbmljb,     wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,  ROT0,   "bootleg", "Wonder Boy - Monster Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbmlb,      wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,  ROT0,   "bootleg", "Wonder Boy - Monster Land (English bootleg set 1)", MACHINE_SUPPORTS_SAVE)
+GAME( 1987, wbmlb2,     wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,  ROT0,   "bootleg", "Wonder Boy - Monster Land (English bootleg set 4)", MACHINE_SUPPORTS_SAVE)
 GAME( 1987, wbmlbg,     wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,  ROT0,   "bootleg (Galaxy Electronics)", "Wonder Boy - Monster Land (English bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, wbmlbge,    wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,  ROT0,   "bootleg (Gecas)", "Wonder Boy - Monster Land (English bootleg set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 2009, wbmlvc,     wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,  ROT0,   "Sega", "Wonder Boy - Monster Land (English, Virtual Console)", MACHINE_SUPPORTS_SAVE )

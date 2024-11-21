@@ -16004,6 +16004,9 @@ spangbl                         // bootleg
 spangbl2                        // bootleg
 spangj                          // --/--/1990 (c) 1990 Mitchell (Japan)
 
+@source:capcom/miteshin.cpp
+miteshin
+
 @source:capcom/psrockman.cpp
 psrockmn                        //
 
@@ -41000,8 +41003,9 @@ ufosensib                       // bootleg
 upndown                         // (c) 1983 (S1)
 upndownu                        // (c) 1983 (S1)
 wbdeluxe                        // (c) 1986 + Escape license (S1)
-wbml                            // bootleg (S2)
+wbml                            // Sega / Westone (S2)
 wbmlb                           // bootleg? (S2)
+wbmlb2                          // bootleg (S2)
 wbmlbg                          // bootleg (Galaxy Electronics)
 wbmlbge                         // bootleg (Gecas)
 wbmljb                          // (c) 1987 Sega/Westone (S2)
