@@ -466,21 +466,7 @@ ROM_START( nightmare )
 	ROM_LOAD( "eeprom.ic7",   0x0000, 0x0040, CRC(7824e1f8) SHA1(2ccac62b4e8abcb2b3d66fa4025947fea184664e) )
 ROM_END
 
-ROM_START( nightmarea )
-	ROM_REGION( 0x6000, "cdp1802", 0 )
-	ROM_LOAD( "nm1-ia1.ic11", 0x0000, 0x2000, CRC(5d648f62) SHA1(028a47d4b1b4910d0d4e00f81d4e94a5478834d3) )
-	ROM_LOAD( "nm1-ib1.ic12", 0x2000, 0x2000, CRC(c10695f7) SHA1(929467fe7529782e8181d3caae3a67bb0a8d8753) )
-	ROM_LOAD( "nm1-ic1.ic13", 0x4000, 0x2000, CRC(b0f8f163) SHA1(cbc4be2880b7a30f094c6fee9dccfa24adec3096) ) // Different from the parent set
-
-	ROM_REGION( 0x2000, "sound3:rom", 0 )
-	ROM_LOAD( "scl-1a1.ic5",  0x0000, 0x2000, CRC(4bba61af) SHA1(b324344081e3d4b5db43a8ff3122c28cf75aec84) )
-
-	ROM_REGION( 0x40, "eeprom", 0 )
-	ROM_LOAD( "eeprom.ic7",   0x0000, 0x0040, CRC(7824e1f8) SHA1(2ccac62b4e8abcb2b3d66fa4025947fea184664e) )
-ROM_END
-
 } // anonymous namespace
 
 
-GAME( 1982, nightmare,  0,         nightmare, nightmare, nightmare_state, empty_init, ROT90, "E.F.O.", "Night Mare (Spain, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1982, nightmarea, nightmare, nightmare, nightmare, nightmare_state, empty_init, ROT90, "E.F.O.", "Night Mare (Spain, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1982, nightmare,  0,         nightmare, nightmare, nightmare_state, empty_init, ROT90, "E.F.O.", "Night Mare (Spain)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
