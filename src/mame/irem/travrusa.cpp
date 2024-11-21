@@ -87,6 +87,7 @@ public:
 	void init_motorace();
 	void init_shtridrb();
 
+	// refresh flipscreen when the dipswitch is changed
 	DECLARE_INPUT_CHANGED_MEMBER(flipscreen_switch) { flipscreen_w(m_flipscreen); }
 
 protected:
