@@ -6876,6 +6876,31 @@ https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 		</part>
 	</software>
 
+	<software name="zorknem">
+		<description>Zork Nemesis: The Forbidden Lands</description>
+		<year>1996</year>
+		<publisher>Activision</publisher>
+		<info name="language" value="English" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="I" />
+			<diskarea name="cdrom">
+				<disk name="zork nemesis i" sha1="85a6cac392f3648ba02320455690df1196b0bd79" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="II" />
+			<diskarea name="cdrom">
+				<disk name="zork nemesis ii" sha1="566903d9419cb929ed6fd4f230b71bbfb608245a" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="III" />
+			<diskarea name="cdrom">
+				<disk name="zork nemesis iii" sha1="356fcaef31915484cb444529159cb9b69caefef5" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- Crashes in Windows 95 -->
 	<software name="zyclunt" supported="partial">
@@ -7688,23 +7713,10 @@ Provided with an OEM S3 ViRGE/DX, this CD is dated March 1998 and contains the f
 		</part>
 	</software>
 
-	<!-- DOS / Windows 3.1 / 95 -->
-	<software name="sb16">
-		<description>Sound Blaster 16 CD driver</description>
-		<year>1996</year>
-		<publisher>Creative Labs</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="sb16" sha1="c87097c58d1c3fcea03e5e4b50d2cafdcb870f16" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- <rom name="Sound Blaster 16 CD.cue" size="475" crc="dd9e3752" sha1="bbf49ed1b322ba873a9befcf42d72e86368c76e0"/> -->
 	<!-- <rom name="Sound Blaster 16 CD.bin" size="310741536" crc="295cb2d2" sha1="f09805b982a17b756626e9702d8e2b8f6da68e60"/> -->
 	<software name="sb16cd">
-		<description>Sound Blaster 16 CD</description>
+		<description>Sound Blaster 16 CD (Europe)</description>
 		<year>1996</year>
 		<publisher>Creative Labs</publisher>
 		<notes><![CDATA[
@@ -7727,6 +7739,20 @@ Wave Studio v3.12
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Sound Blaster 16 CD" sha1="7e91bd013f18a9a9d5b5459280e3a075b49309f6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS / Windows 3.1 / 95 -->
+	<software name="sb16cda" cloneof="sb16cd">
+		<description>Sound Blaster 16 CD (USA?)</description>
+		<year>1996</year>
+		<publisher>Creative Labs</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sb16" sha1="c87097c58d1c3fcea03e5e4b50d2cafdcb870f16" />
 			</diskarea>
 		</part>
 	</software>
@@ -7829,31 +7855,6 @@ Wave Studio v3.12
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="050-151-320" sha1="4840cb3624e4032456434e099cd0362bc278e680" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="zorknem">
-		<description>Zork Nemesis: The Forbidden Lands</description>
-		<year>1996</year>
-		<publisher>Activision</publisher>
-		<info name="language" value="English" />
-		<part name="cdrom1" interface="cdrom">
-			<feature name="part_id" value="I" />
-			<diskarea name="cdrom">
-				<disk name="zork nemesis i" sha1="85a6cac392f3648ba02320455690df1196b0bd79" />
-			</diskarea>
-		</part>
-		<part name="cdrom2" interface="cdrom">
-			<feature name="part_id" value="II" />
-			<diskarea name="cdrom">
-				<disk name="zork nemesis ii" sha1="566903d9419cb929ed6fd4f230b71bbfb608245a" />
-			</diskarea>
-		</part>
-		<part name="cdrom3" interface="cdrom">
-			<feature name="part_id" value="III" />
-			<diskarea name="cdrom">
-				<disk name="zork nemesis iii" sha1="356fcaef31915484cb444529159cb9b69caefef5" />
 			</diskarea>
 		</part>
 	</software>
