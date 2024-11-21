@@ -479,7 +479,7 @@ static INPUT_PORTS_START( sc3000 )
 	// keyboard keys are added by the embedded sk1100 device
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sg1000_state::trigger_nmi), 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sg1000_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
 /*-------------------------------------------------
