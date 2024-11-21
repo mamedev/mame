@@ -325,8 +325,7 @@ public:
 		m_namcos21_dsp(*this, "namcos21dsp")
 	{ }
 
-	void configure_c148_standard(machine_config &config);
-	void winrun(machine_config &config);
+	void winrun(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -390,7 +389,8 @@ private:
 
 	void winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void configure_c65_namcos21(machine_config &config);
+	void configure_c65_namcos21(machine_config &config) ATTR_COLD;
+	void configure_c148_standard(machine_config &config) ATTR_COLD;
 
 	void winrun_master_map(address_map &map) ATTR_COLD;
 	void winrun_slave_map(address_map &map) ATTR_COLD;
@@ -630,7 +630,7 @@ void namcos21_state::c140_map(address_map &map)
 
 void namcos21_state::configure_c65_namcos21(machine_config &config)
 {
-	NAMCOC65(config, m_c65, 2048000);
+	NAMCOC65(config, m_c65, 2'048'000);
 	m_c65->in_pb_callback().set_ioport("MCUB");
 	m_c65->in_pc_callback().set_ioport("MCUC");
 	m_c65->in_ph_callback().set_ioport("MCUH");

@@ -27,7 +27,7 @@ public:
 	void copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi);
 	void swap_and_clear_poly_framebuffer();
 
-	void draw_quad(int sx[4], int sy[4], int zcode[4], unsigned color);
+	void draw_quad(int sx[4], int sy[4], int zcode[4], uint16_t color);
 
 protected:
 	// device-level overrides
@@ -47,9 +47,9 @@ private:
 		double z;
 	};
 
-	void renderscanline_flat(const edge *e1, const edge *e2, unsigned sy, unsigned color, bool depthcueenable);
-	void rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, unsigned color, bool depthcueenable);
-	void allocate_poly_framebuffer();
+	void renderscanline_flat(const edge *e1, const edge *e2, unsigned sy, uint16_t color, bool depthcueenable);
+	void rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, uint16_t color, bool depthcueenable);
+	void allocate_poly_framebuffer() ATTR_COLD;
 
 	std::unique_ptr<uint16_t[]> m_mpPolyFrameBufferPens;
 	std::unique_ptr<uint16_t[]> m_mpPolyFrameBufferZ;

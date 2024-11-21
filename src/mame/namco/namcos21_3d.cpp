@@ -83,7 +83,7 @@ void namcos21_3d_device::copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, con
 
 /*********************************************************************************************/
 
-void namcos21_3d_device::renderscanline_flat(const edge *e1, const edge *e2, unsigned sy, unsigned color, bool depthcueenable)
+void namcos21_3d_device::renderscanline_flat(const edge *e1, const edge *e2, unsigned sy, uint16_t color, bool depthcueenable)
 {
 	if (e1->x > e2->x)
 		std::swap(e1, e2);
@@ -115,11 +115,11 @@ void namcos21_3d_device::renderscanline_flat(const edge *e1, const edge *e2, uns
 
 		if (zz < pZBuf[x])
 		{
-			unsigned pen = color;
+			uint16_t pen = color;
 
 			if (depthcueenable && zz > 0)
 			{
-				const unsigned depth = (zz >> m_zz_shift) * m_zzmult;
+				const uint16_t depth = (zz >> m_zz_shift) * m_zzmult;
 
 				if (m_depth_reverse)
 					pen += depth;
@@ -135,7 +135,7 @@ void namcos21_3d_device::renderscanline_flat(const edge *e1, const edge *e2, uns
 	}
 }
 
-void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, unsigned color, bool depthcueenable)
+void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, uint16_t color, bool depthcueenable)
 {
 	/* first, sort so that v0->y <= v1->y <= v2->y */
 	{
@@ -212,7 +212,7 @@ void namcos21_3d_device::rendertri(const n21_vertex *v0, const n21_vertex *v1, c
 	}
 }
 
-void namcos21_3d_device::draw_quad(int sx[4], int sy[4], int zcode[4], unsigned color)
+void namcos21_3d_device::draw_quad(int sx[4], int sy[4], int zcode[4], uint16_t color)
 {
 	bool depthcueenable = true;
 	/*
@@ -230,7 +230,7 @@ void namcos21_3d_device::draw_quad(int sx[4], int sy[4], int zcode[4], unsigned 
 	}
 	else
 	{ /* map color code to hardware pen */
-		unsigned code = color >> 8;
+		uint8_t code = color >> 8;
 		if (BIT(code, 7))
 		{
 			color = 0x2100 | (color & 0xff);

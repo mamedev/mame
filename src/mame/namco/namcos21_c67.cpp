@@ -299,14 +299,13 @@ public:
 		m_namcos21_dsp_c67(*this, "namcos21dsp_c67")
 	{ }
 
-	void configure_c148_standard(machine_config &config);
-	void namcos21(machine_config &config);
-	void cybsled(machine_config &config);
-	void solvalou(machine_config &config);
-	void aircomb(machine_config &config);
-	void starblad(machine_config &config);
+	void namcos21(machine_config &config) ATTR_COLD;
+	void cybsled(machine_config &config) ATTR_COLD;
+	void solvalou(machine_config &config) ATTR_COLD;
+	void aircomb(machine_config &config) ATTR_COLD;
+	void starblad(machine_config &config) ATTR_COLD;
 
-	void init_solvalou();
+	void init_solvalou() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -357,7 +356,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void configure_c68_namcos21(machine_config &config);
+	void configure_c68_namcos21(machine_config &config) ATTR_COLD;
+	void configure_c148_standard(machine_config &config) ATTR_COLD;
 
 	void common_map(address_map &map) ATTR_COLD;
 	void master_map(address_map &map) ATTR_COLD;
