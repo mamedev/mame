@@ -75,25 +75,25 @@ TEST_CASE("ceilLog2", "[math]")
 			REQUIRE(ii == bx::ceilLog2(uint8_t(1<<ii) ) );
 			REQUIRE(ii == bx::ceilLog2(uint16_t(1<<ii) ) );
 			REQUIRE(ii == bx::ceilLog2(uint32_t(1<<ii) ) );
-			REQUIRE(ii == bx::ceilLog2(uint64_t(1llu<<ii) ) );
+			REQUIRE(ii == bx::ceilLog2(uint64_t(1ull<<ii) ) );
 		}
 
 		for (; ii < 16; ++ii)
 		{
 			REQUIRE(ii == bx::ceilLog2(uint16_t(1<<ii) ) );
 			REQUIRE(ii == bx::ceilLog2(uint32_t(1<<ii) ) );
-			REQUIRE(ii == bx::ceilLog2(uint64_t(1llu<<ii) ) );
+			REQUIRE(ii == bx::ceilLog2(uint64_t(1ull<<ii) ) );
 		}
 
 		for (; ii < 32; ++ii)
 		{
 			REQUIRE(ii == bx::ceilLog2(uint32_t(1<<ii) ) );
-			REQUIRE(ii == bx::ceilLog2(uint64_t(1llu<<ii) ) );
+			REQUIRE(ii == bx::ceilLog2(uint64_t(1ull<<ii) ) );
 		}
 
 		for (; ii < 64; ++ii)
 		{
-			REQUIRE(ii == bx::ceilLog2(uint64_t(1llu<<ii) ) );
+			REQUIRE(ii == bx::ceilLog2(uint64_t(1ull<<ii) ) );
 		}
 	}
 
@@ -124,25 +124,25 @@ TEST_CASE("floorLog2", "[math]")
 			REQUIRE(ii == bx::floorLog2(uint8_t(1<<ii) ) );
 			REQUIRE(ii == bx::floorLog2(uint16_t(1<<ii) ) );
 			REQUIRE(ii == bx::floorLog2(uint32_t(1<<ii) ) );
-			REQUIRE(ii == bx::floorLog2(uint64_t(1llu<<ii) ) );
+			REQUIRE(ii == bx::floorLog2(uint64_t(1ull<<ii) ) );
 		}
 
 		for (; ii < 16; ++ii)
 		{
 			REQUIRE(ii == bx::floorLog2(uint16_t(1<<ii) ) );
 			REQUIRE(ii == bx::floorLog2(uint32_t(1<<ii) ) );
-			REQUIRE(ii == bx::floorLog2(uint64_t(1llu<<ii) ) );
+			REQUIRE(ii == bx::floorLog2(uint64_t(1ull<<ii) ) );
 		}
 
 		for (; ii < 32; ++ii)
 		{
 			REQUIRE(ii == bx::floorLog2(uint32_t(1<<ii) ) );
-			REQUIRE(ii == bx::floorLog2(uint64_t(1llu<<ii) ) );
+			REQUIRE(ii == bx::floorLog2(uint64_t(1ull<<ii) ) );
 		}
 
 		for (; ii < 64; ++ii)
 		{
-			REQUIRE(ii == bx::floorLog2(uint64_t(1llu<<ii) ) );
+			REQUIRE(ii == bx::floorLog2(uint64_t(1ull<<ii) ) );
 		}
 	}
 }
@@ -206,7 +206,7 @@ TEST_CASE("countBits", "[math]")
 	STATIC_REQUIRE( 4 == bx::countBits<uint8_t>(0x55) );
 	STATIC_REQUIRE( 8 == bx::countBits<uint16_t>(0x5555) );
 	STATIC_REQUIRE(16 == bx::countBits<uint32_t>(0x55555555) );
-	STATIC_REQUIRE(32 == bx::countBits<uint64_t>(0x5555555555555555) );
+	STATIC_REQUIRE(32 == bx::countBits<uint64_t>(0x5555555555555555ull) );
 
 	STATIC_REQUIRE( 8 == bx::countBits(UINT8_MAX) );
 	STATIC_REQUIRE(16 == bx::countBits(UINT16_MAX) );
@@ -696,7 +696,7 @@ TEST_CASE("copySign", "[math][libm]")
 TEST_CASE("bitsToFloat, floatToBits, bitsToDouble, doubleToBits", "[math]")
 {
 	STATIC_REQUIRE(0x12345678u           == bx::floatToBits( bx::bitsToFloat (0x12345678u) ) );
-	STATIC_REQUIRE(0x123456789abcdef0llu == bx::doubleToBits(bx::bitsToDouble(0x123456789abcdef0llu) ) );
+	STATIC_REQUIRE(0x123456789abcdef0ull == bx::doubleToBits(bx::bitsToDouble(0x123456789abcdef0ull) ) );
 }
 
 TEST_CASE("lerp", "[math]")
