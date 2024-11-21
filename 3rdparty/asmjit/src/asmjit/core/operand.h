@@ -738,26 +738,24 @@ struct Operand_ {
 
   //! Returns a size of a register or an X86 memory operand.
   //!
-  //! At the moment only X86 and X86_64 memory operands have a size - other memory operands can use bits that represent
-  //! size as an additional payload. This means that memory size is architecture specific and should be accessed via
-  //! \ref x86::Mem::size(). Sometimes when the user knows that the operand is either a register or memory operand this
-  //! function can be helpful as it avoids casting.
-  ASMJIT_INLINE_NODEBUG constexpr uint32_t x86RmSize() const noexcept {
-    return _signature.size();
-  }
-
-#if !defined(ASMJIT_NO_DEPRECATED)
-  ASMJIT_DEPRECATED("hasSize() is no longer portable - use x86RmSize() instead, if your target is X86/X86_64")
-  ASMJIT_INLINE_NODEBUG constexpr bool hasSize() const noexcept { return x86RmSize() != 0u; }
-
-  ASMJIT_DEPRECATED("hasSize() is no longer portable - use x86RmSize() instead, if your target is X86/X86_64")
-  ASMJIT_INLINE_NODEBUG constexpr bool hasSize(uint32_t s) const noexcept { return x86RmSize() == s; }
-
-  ASMJIT_DEPRECATED("size() is no longer portable - use x86RmSize() instead, if your target is X86/X86_64")
-  ASMJIT_INLINE_NODEBUG constexpr uint32_t size() const noexcept { return _signature.getField<Signature::kSizeMask>(); }
-#endif
+  //! \remarks At the moment only X86 and X86_64 memory operands have a size - other memory operands can use bits
+  //! that represent size as an additional payload. This means that memory size is architecture specific and should
+  //! be accessed via \ref x86::Mem::size(). Sometimes when the user knows that the operand is either a register or
+  //! memory operand this function can be helpful as it avoids casting, but it only works when it targets X86 and X86_64.
+  ASMJIT_INLINE_NODEBUG constexpr uint32_t x86RmSize() const noexcept { return _signature.size(); }
 
   //! \}
+
+#if !defined(ASMJIT_NO_DEPRECATED)
+  ASMJIT_DEPRECATED("hasSize() is no longer portable - use x86RmSize() or x86::Mem::hasSize() instead, if your target is X86/X86_64")
+  ASMJIT_INLINE_NODEBUG constexpr bool hasSize() const noexcept { return x86RmSize() != 0u; }
+
+  ASMJIT_DEPRECATED("hasSize() is no longer portable - use x86RmSize() or x86::Mem::hasSize() instead, if your target is X86/X86_64")
+  ASMJIT_INLINE_NODEBUG constexpr bool hasSize(uint32_t s) const noexcept { return x86RmSize() == s; }
+
+  ASMJIT_DEPRECATED("size() is no longer portable - use x86RmSize() or x86::Mem::size() instead, if your target is X86/X86_64")
+  ASMJIT_INLINE_NODEBUG constexpr uint32_t size() const noexcept { return _signature.getField<Signature::kSizeMask>(); }
+#endif
 };
 
 //! Base class representing an operand in AsmJit (default constructed version).
@@ -1600,9 +1598,6 @@ public:
   //! Resets the memory operand's INDEX register.
   ASMJIT_INLINE_NODEBUG void resetIndex() noexcept { _setIndex(RegType::kNone, 0); }
 
-  //! Sets the memory operand size (in bytes).
-  ASMJIT_INLINE_NODEBUG void setSize(uint32_t size) noexcept { _signature.setField<Signature::kSizeMask>(size); }
-
   //! Tests whether the memory operand has a 64-bit offset or absolute address.
   //!
   //! If this is true then `hasBase()` must always report false.
@@ -1670,6 +1665,11 @@ public:
   ASMJIT_INLINE_NODEBUG void resetOffsetLo32() noexcept { setOffsetLo32(0); }
 
   //! \}
+
+#if !defined(ASMJIT_NO_DEPRECATED)
+  ASMJIT_DEPRECATED("setSize() is no longer portable - use setX86RmSize() or x86::Mem::setSize() instead, if your target is X86/X86_64")
+  ASMJIT_INLINE_NODEBUG void setSize(uint32_t size) noexcept { _signature.setField<Signature::kSizeMask>(size); }
+#endif
 };
 
 //! Type of the an immediate value.
