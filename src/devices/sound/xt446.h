@@ -12,6 +12,8 @@
 #ifndef DEVICE_SOUND_XT446_H
 #define DEVICE_SOUND_XT446_H
 
+#pragma once
+
 #include "cpu/h8/h8s2655.h"
 #include "sound/swp30.h"
 
