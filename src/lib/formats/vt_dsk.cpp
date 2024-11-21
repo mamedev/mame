@@ -94,29 +94,41 @@ std::vector<uint8_t> vtech_common_format::flux_to_image(const floppy_image &imag
 			continue;
 
 		std::vector<bool> bitstream;
-		int lpos = -1;
-		bool looped = !((buffer[sz-1] ^ buffer[0]) & floppy_image::MG_MASK);
-		int cpos = looped ? sz-1 : 0;
-		while(cpos != lpos) {
-			int dt = looped && cpos == sz-1 ? (200000000 - (buffer[cpos] & floppy_image::TIME_MASK)) + (buffer[1] & floppy_image::TIME_MASK) :
-				cpos == sz-1 ? 200000000 - (buffer[cpos] & floppy_image::TIME_MASK) :
-				(buffer[cpos+1] & floppy_image::TIME_MASK) - (buffer[cpos] & floppy_image::TIME_MASK);
+		int cpos = 0;
+		while((buffer[cpos] & floppy_image::MG_MASK) != floppy_image::MG_F) {
+			cpos++;
+			if(cpos == sz) {
+				cpos = -1;
+				break;
+			}
+		}
+		if(cpos == -1)
+			continue;
+		for(;;) {
+			int npos = cpos;
+			for(;;) {
+				npos++;
+				if(npos == sz)
+					npos = 0;
+				if((buffer[npos] & floppy_image::MG_MASK) == floppy_image::MG_F)
+					break;
+			}
+			int dt = (buffer[npos] & floppy_image::TIME_MASK) - (buffer[cpos] & floppy_image::TIME_MASK);
+			if(dt < 0)
+				cpos += 200000000;
 			int t = dt >= 9187 - 143 ? 0 :
 				dt >= 2237 - 143 && dt <= 2237 + 143 ? 1 :
 				2;
-			if(t <= 1) {
-				if(lpos == -1)
-					lpos = cpos;
+			if(t <= 1)
 				bitstream.push_back(t);
-			}
-			cpos += 1;
-			if(cpos == sz)
-				cpos = looped ? 1 : 0;
+			if(npos <= cpos)
+				break;
+			cpos = npos;
 		}
 		int mode = 0;
 		int pos = 0;
 		int count = 0;
-		looped = false;
+		bool looped = false;
 		uint8_t *dest = nullptr;
 		[[maybe_unused]] uint16_t checksum = 0;
 		uint64_t buf = 0;
