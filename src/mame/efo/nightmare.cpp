@@ -201,7 +201,6 @@
   - Soft reset doesn't work.
   - Verify video mixing (Press F2 to enter service mode, then press 1 + 2 to continue
     to settings screen. There's diagnostic color pattern at the top of screen)
-  - Hook up sound hardware
   - Quitting MAME while in service mode settings screen will invalidate settings
 
 ******************************************************************************/
@@ -381,6 +380,7 @@ uint32_t nightmare_state::screen_update_nightmare(screen_device &screen, bitmap_
 	return 0;
 }
 
+// Note: cocktail mode setting is saved in EEPROM
 static INPUT_PORTS_START( nightmare )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -469,4 +469,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1982, nightmare,  0,         nightmare, nightmare, nightmare_state, empty_init, ROT90, "E.F.O.", "Night Mare (Spain)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1982, nightmare,  0,         nightmare, nightmare, nightmare_state, empty_init, ROT90, "E.F.O.", "Night Mare (Spain)", MACHINE_SUPPORTS_SAVE )
