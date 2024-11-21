@@ -627,7 +627,7 @@ void tms5220_device::data_write(int data)
 			m_fifo[m_fifo_tail] = data;
 			m_fifo_tail = (m_fifo_tail + 1) % FIFO_SIZE;
 			m_fifo_count++;
-			LOGMASKED(LOG_FIFO, "data_write: Added byte to FIFO (current count=%2d)\n", m_fifo_count);
+			LOGMASKED(LOG_FIFO, "data_write: Added %02X byte to FIFO (current count=%2d)\n", data, m_fifo_count);
 			update_fifo_status_and_ints();
 
 			// if we just unset buffer low with that last write, and SPEN *was* zero (see circuit 251, sheet 12)
@@ -884,7 +884,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 	int i, bitout;
 	int32_t this_sample;
 
-	LOG("process called with size of %d; IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", size, m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
+	LOGMASKED(LOG_GENERATION, "process called with size of %d; IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", size, m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
 
 	/* loop until the buffer is full or we've stopped speaking */
 	while (size > 0)

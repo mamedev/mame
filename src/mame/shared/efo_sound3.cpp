@@ -64,9 +64,14 @@ u8 efo_sound3_device::input_r()
 
 void efo_sound3_device::intf_cs_w(int state)
 {
-	// slightly hacky, but the data path must be enabled somehow
-	if (!m_tms->readyq_r() && !m_intflatch->sr_r())
-		m_tms->data_w(m_intflatch->read());
+	if (!m_intflatch->sr_r())
+	{
+		// CS1 enables data while READY is inactive high!
+		if (m_tms->readyq_r())
+			m_tms->data_w(m_intflatch->do_r());
+		else
+			(void)m_intflatch->read(); // reset SR (and end WSQ)
+	}
 }
 
 void efo_sound3_device::efo90435_mem(address_map &map)
