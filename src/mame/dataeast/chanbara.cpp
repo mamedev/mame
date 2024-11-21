@@ -186,8 +186,8 @@ void chanbara_state::draw_sprites(screen_device &screen, bitmap_ind16& bitmap, c
 		int sx = (240 - m_spriteram[offs + 3]) & 0xff;
 		int sy = (240 - m_spriteram[offs + 2]) & 0xff;
 
-		// hidden or invalid?
-		if (~attr & 0x01 || attr & 0x08)
+		// invalid?
+		if (~attr & 0x01)
 			continue;
 
 		if (flip_screen())
@@ -205,14 +205,17 @@ void chanbara_state::draw_sprites(screen_device &screen, bitmap_ind16& bitmap, c
 
 		if (attr & 0x10)
 		{
+			// 16x32
+			code &= ~1;
 			if (flip_screen())
 				sy += 16;
 
-			m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, code + (flipy ^ 1), color, flipx, flipy, sx, sy, screen.priority(), pri_mask, 0);
-			m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, code + flipy, color, flipx, flipy, sx, sy - 16, screen.priority(), pri_mask, 0);
+			m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, code | (flipy ^ 1), color, flipx, flipy, sx, sy, screen.priority(), pri_mask, 0);
+			m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, code | flipy, color, flipx, flipy, sx, sy - 16, screen.priority(), pri_mask, 0);
 		}
 		else
 		{
+			// 16x16
 			m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, screen.priority(), pri_mask, 0);
 		}
 	}
