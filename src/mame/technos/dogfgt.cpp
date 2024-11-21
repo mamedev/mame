@@ -200,6 +200,7 @@ void dogfgt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			int sy = (241 - m_spriteram[offs + 2]) & 0xff;
 			int flipx = m_spriteram[offs] & 0x04;
 			int flipy = m_spriteram[offs] & 0x02;
+
 			if (flip_screen())
 			{
 				sx = 240 - sx;

@@ -277,21 +277,21 @@ void seicross_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			int const color = data[1] & 0x0f;
 			int flipx = BIT(data[0], 6);
 			int flipy = BIT(data[0], 7);
-			int x = data[3];
-			int y = 240 - data[2];
+			int sx = data[3];
+			int sy = 240 - data[2];
 
 			if (flip_screen())
 			{
-				x = 240 - x;
-				y = 240 - y;
+				sx = 240 - sx;
+				sy = 240 - sy;
 				flipx = !flipx;
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, x, y, 0);
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
 
-			if (x > 0xf0)
-				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, x - 256, y, 0);
+			if (sx > 0xf0)
+				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx - 256, sy, 0);
 		}
 	}
 }
