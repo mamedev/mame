@@ -285,7 +285,7 @@ TIMER_CALLBACK_MEMBER(enigma2_state::audio_interrupt_callback)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 	int next_vpos = m_screen->vpos() + 16;
-	m_audio_interrupt_timer->adjust(m_screen->time_until_pos(next_vpos > VTOTAL ? 8 : next_vpos));
+	m_audio_interrupt_timer->adjust(m_screen->time_until_pos(next_vpos >= VTOTAL ? 8 : next_vpos));
 }
 
 
