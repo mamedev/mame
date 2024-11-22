@@ -456,13 +456,18 @@ ROM_START(r_fairfght)
 	ROM_LOAD("fa.c5",         0x0000, 0x0100, CRC(5d3694da) SHA1(4d0a8033acb6ef2e2af107f76540fd19b4a39b12) )
 ROM_END
 
+/* There are three different known dumps for Poker Plus:
+    (1) CRC(571ee27b) SHA1(482a3ba18eff05bce4cab073b1f13fc2f145bb2b) 
+    (2) CRC(60a199a8) SHA1(045d61f56ea03a694722da810d465ab65d85cbfd)
+    (3) CRC(fadd715a) SHA1(6c5b6e8fcf77be2b0b7076dc1139760f7e4d5688)
+  (1) was tested on a real machine and works OK, (2) was also tested, but the pinball did not work with it,
+  (3) was not tested.
+*/
 ROM_START(r_pokrplus)
 	RECEL_BIOS
 
 	ROM_REGION( 0x0800, "module", ROMREGION_ERASEFF )
-	ROM_LOAD("po.c5",         0x0000, 0x0100, CRC(60a199a8) SHA1(045d61f56ea03a694722da810d465ab65d85cbfd) )
-	//ROM_LOAD( "po2.c5",       0x0000, 0x0100, CRC(571ee27b) SHA1(482a3ba18eff05bce4cab073b1f13fc2f145bb2b) )
-	//ROM_LOAD( "po3.c5",       0x0000, 0x0800, CRC(fadd715a) SHA1(6c5b6e8fcf77be2b0b7076dc1139760f7e4d5688) )
+	ROM_LOAD( "ba65.c5",      0x0000, 0x0100, CRC(571ee27b) SHA1(482a3ba18eff05bce4cab073b1f13fc2f145bb2b) )
 ROM_END
 
 ROM_START(r_mrdoom)
