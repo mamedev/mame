@@ -80,7 +80,6 @@ public:
 
 	void init_dkgenm72();
 	void init_dbreedm72();
-	void init_nspirit();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -137,7 +136,6 @@ protected:
 	void protection_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// game specific
-	void nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void dkgenm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void rtype2_port02_w(u8 data);
@@ -216,7 +214,7 @@ public:
 	void imgfight(machine_config &config);
 	void imgfightjb(machine_config &config);
 	void mrheli(machine_config &config);
-	void nspiritj(machine_config &config);
+	void nspirit(machine_config &config);
 
 	//void init_m72_8751();
 
@@ -241,7 +239,7 @@ private:
 
 	DECLARE_VIDEO_START(imgfight);
 	DECLARE_VIDEO_START(mrheli);
-	DECLARE_VIDEO_START(nspiritj);
+	DECLARE_VIDEO_START(nspirit);
 
 	TIMER_CALLBACK_MEMBER(delayed_ram16_w);
 	TIMER_CALLBACK_MEMBER(delayed_ram8_w);

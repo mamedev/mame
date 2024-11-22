@@ -143,7 +143,7 @@ VIDEO_START_MEMBER(m72_mcu_state,mrheli)
 	m_bg_tilemap->set_transmask(2,0x00ff,0xff00); // for Japan message
 }
 
-VIDEO_START_MEMBER(m72_mcu_state,nspiritj)
+VIDEO_START_MEMBER(m72_mcu_state,nspirit)
 {
 	VIDEO_START_CALL_MEMBER(m72);
 	m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // for Japan message

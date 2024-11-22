@@ -453,12 +453,6 @@ INTERRUPT_GEN_MEMBER(m72_state::fake_nmi)
 }
 
 
-void m72_state::nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	static const int a[9] = { 0x0000, 0x0020, 0x2020, 0, 0x5720, 0, 0x7b60, 0x9b60, 0xc360 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
-}
-
 void m72_state::dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };
@@ -510,29 +504,6 @@ running, but they have not been derived from the real 8751 code.
 #define CODE_LEN 96
 #define CRC_LEN 18
 
-
-/* Ninja Spirit (World, M72 hardware) */
-static const u8 nspirit_code[CODE_LEN] =
-{
-	0x68,0x00,0xa0,             // push 0a000h
-	0x1f,                       // pop ds
-	0xc6,0x06,0x38,0x38,0x4e,   // mov [3838h], byte 04eh
-	0xc6,0x06,0x3a,0x38,0x49,   // mov [383ah], byte 049h
-	0xc6,0x06,0x3c,0x38,0x4e,   // mov [383ch], byte 04eh
-	0xc6,0x06,0x3e,0x38,0x44,   // mov [383eh], byte 044h
-	0xc6,0x06,0x40,0x38,0x4f,   // mov [3840h], byte 04fh
-	0xc6,0x06,0x42,0x38,0x55,   // mov [3842h], byte 055h
-	0x68,0x00,0xb0,             // push 0b000h
-	0x1f,                       // pop ds
-	0xc6,0x06,0x00,0x09,0x49^0xff,  // mov [0900h], byte 049h
-	0xc6,0x06,0x00,0x0a,0x49^0xff,  // mov [0a00h], byte 049h
-	0xc6,0x06,0x00,0x0b,0x49^0xff,  // mov [0b00h], byte 049h
-	0x68,0x00,0xd0,             // push 0d000h
-	0x1f,                       // pop ds
-	0xea,0x00,0x00,0x40,0x00    // jmp  0040:$0000
-};
-static const u8 nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
-												0xf2,0xa3,0xf9,0xe1, 0xa9,0x6c,0x02,0x95, 0x00,0x00 };
 
 /* Dragon Breed (World, M72 hardware) */
 static const u8 dbreedm72_code[CODE_LEN] =
@@ -590,12 +561,6 @@ void m72_state::install_protection_handler(const u8 *code,const u8 *crc)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16s_delegate(*this, FUNC(m72_state::protection_w)));
 
 	save_pointer(NAME(m_protection_ram), 0x1000/2);
-}
-
-void m72_state::init_nspirit()
-{
-	install_protection_handler(nspirit_code,nspirit_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::nspirit_sample_trigger_w)));
 }
 
 void m72_state::init_dbreedm72()
@@ -1998,10 +1963,10 @@ void m72_mcu_state::imgfight(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,imgfight)
 }
 
-void m72_mcu_state::nspiritj(machine_config &config)
+void m72_mcu_state::nspirit(machine_config &config)
 {
 	m72_8751(config);
-	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,nspiritj)
+	MCFG_VIDEO_START_OVERRIDE(m72_mcu_state,nspirit)
 }
 
 void m72_mcu_state::mrheli(machine_config &config)
@@ -2580,7 +2545,7 @@ ROM_START( nspirit )
 	ROM_RELOAD(                         0xe0000, 0x10000 )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "nin_c-pr-b.ic1", 0x0000, 0x1000, NO_DUMP ) // i8751 MCU labeled  NIN C-PR-B  - read protected
+	ROM_LOAD( "nin_c-pr-b.ic1", 0x0000, 0x1000, CRC(0f7b2713) SHA1(d56d73dc023df65ba178e9453a17770be4286023) ) // i8751 MCU labeled  NIN C-PR-B
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "nin-r00.ic53",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )  // sprites
@@ -4691,8 +4656,8 @@ GAME( 1987, rtypeb,      rtype,    rtype,        rtype,        m72_state,      e
 GAME( 1987, bchopper,    0,        mrheli,       bchopper,     m72_mcu_state,  empty_init,      ROT0,   "Irem", "Battle Chopper (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mrheli,      bchopper, mrheli,       bchopper,     m72_mcu_state,  empty_init,      ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, nspirit,     0,        m72,          nspirit,      m72_state,      init_nspirit,    ROT0,   "Irem", "Ninja Spirit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
-GAME( 1988, nspiritj,    nspirit,  nspiritj,     nspirit,      m72_mcu_state,  empty_init,      ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nspirit,     0,        nspirit,      nspirit,      m72_mcu_state,  empty_init,      ROT0,   "Irem", "Ninja Spirit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nspiritj,    nspirit,  nspirit,      nspirit,      m72_mcu_state,  empty_init,      ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, imgfight,    0,        imgfight,     imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, imgfightj,   imgfight, imgfight,     imgfight,     m72_mcu_state,  empty_init,      ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
