@@ -963,7 +963,7 @@ void rom_load_manager::fill_rom_data(memory_region &region, const rom_entry *rom
 void rom_load_manager::copy_rom_data(memory_region &region, const rom_entry *romp)
 {
 	u8 *base = region.base() + ROM_GETOFFSET(romp);
-	const std::string &srcrgntag = romp->name();
+	const std::string srcrgntag = region.sibling(romp->name());
 	u32 numbytes = ROM_GETLENGTH(romp);
 	u32 srcoffs = u32(strtol(romp->hashdata().c_str(), nullptr, 0));  /* srcoffset in place of hashdata */
 
