@@ -4,6 +4,8 @@
 license:CC0-1.0
 
 Thanks to DCMOTO (http://dcmoto.free.fr) for info!
+
+Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually BASIC 1.0.
 -->
 <softwarelist name="to7_cass" description="Thomson TO7 &amp; TO7/70 cassettes">
 
@@ -35,6 +37,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>3D Fight</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Février 1986"/>
+		<info name="serial" value="124"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="31257">
@@ -44,9 +48,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="5emeaxe">
-		<description>Le 5eme Axe</description>
-		<year>1986</year>
+		<description>Le 5ème Axe</description>
+		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1985"/>
+		<info name="serial" value="081"/>
 		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
 		<part name="cass1" interface="to_cass">
@@ -57,9 +63,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="5emeaxea" cloneof="5emeaxe">
-		<description>Le 5eme Axe (alt)</description>
-		<year>1986</year>
+		<description>Le 5ème Axe (alt)</description>
+		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1985"/>
+		<info name="serial" value="081"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="50435">
@@ -72,6 +80,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Les 7 Magiciens</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
+		<info name="author" value="Philippe Baroin"/>
+		<info name="serial" value="MA1 009"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="16958">
@@ -84,6 +94,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>11 Microjeux - Cocktail 1</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="41 0101"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="34735">
@@ -96,6 +107,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>11 Microjeux - Cocktail 2</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="41 0102"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="39373">
@@ -108,6 +120,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>11 Microjeux - Cocktail 3</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="41 0103"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="35656">
@@ -153,7 +166,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="additrou">
-		<description>Additions a Trous</description>
+		<description>Additions à Trous</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -168,6 +181,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>L'Affaire Vera Cruz</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Gilles Blancon"/>
+		<info name="serial" value="THXF85731"/>
 		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
 		<part name="cass1" interface="to_cass">
@@ -181,6 +196,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>L'Affaire Vera Cruz (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Gilles Blancon"/>
+		<info name="serial" value="THXF85731"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="47093">
@@ -193,6 +210,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>L'Aigle d'Or</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Louis-Marie Rocques"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Février 1985"/>
+		<info name="serial" value="046"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="42943">
@@ -205,6 +225,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>L'Aigle d'Or (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Louis-Marie Rocques"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Février 1985"/>
+		<info name="serial" value="046"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="42626">
@@ -216,7 +239,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="aattack">
 		<description>Air Attack</description>
 		<year>1985</year>
-		<publisher>Microïds</publisher>
+		<publisher>Loriciels / Microïds</publisher>
+		<info name="notice" value="COPYRIGHT MICROÏDS Avril 1985"/>
+		<info name="serial" value="M1"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="50545">
@@ -238,9 +263,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="algebre">
-		<description>Algebre</description>
+		<description>Algèbre</description>
 		<year>1986</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Jean-Philippe &amp; Stéphane Rethore"/>
+		<info name="serial" value="CAMIF 335477B, CEDIC 7016142"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="24701">
@@ -250,9 +277,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="android">
-		<description>Androides</description>
+		<description>Androïdes</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="William Hennebois"/>
+		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="23506">
@@ -262,9 +291,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="androida" cloneof="android">
-		<description>Androides (alt)</description>
+		<description>Androïdes (BASIC loader)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="William Hennebois"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="22864">
@@ -274,9 +304,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="anglais1">
-		<description>Anglais - Volume 1</description>
+		<description>Anglais - Volume 1 - Tests de Niveau</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="serial" value="45 1901"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -293,9 +325,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="anglais1a" cloneof="anglais1">
-		<description>Anglais - Volume 1 (alt)</description>
+		<description>Anglais - Volume 1 - Tests de Niveau (alt)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="serial" value="45 1901"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -312,9 +346,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="anglais2">
-		<description>Anglais - Volume 2</description>
+		<description>Anglais - Volume 2 - Le Système Verbal 1</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="developer" value="CEGOS / Alpha-Langues"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -331,9 +366,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="anglais2a" cloneof="anglais2">
-		<description>Anglais - Volume 2 (alt)</description>
+		<description>Anglais - Volume 2 - Le Système Verbal 1 (alt)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="developer" value="CEGOS / Alpha-Langues"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -350,18 +386,20 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="anglais3">
-		<description>Anglais - Volume 3</description>
+		<description>Anglais - Volume 3 - Le Système Verbal 2</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="serial" value="45 1903"/>
 
 		<part name="cass1" interface="to_cass">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Tape 1 (Groupe nominal - Nom et article)"/>
 			<dataarea name="cass" size="51673">
 				<rom name="anglais - volume 3 (nathan) (cegos - alpha langues) (1984) (to7) (side 1).k7" size="51673" crc="00effe08" sha1="805cc76910b77570db829fef69e1820d2f00c206"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Tape 2 (Groupe nominal - Adjectifs)"/>
 			<dataarea name="cass" size="63249">
 				<rom name="anglais - volume 3 (nathan) (cegos - alpha langues) (1984) (to7) (side 2).k7" size="63249" crc="073efc22" sha1="8b3282c6a6fb2585b3bc09e2246be8681900af8d"/>
 			</dataarea>
@@ -369,9 +407,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="anglais4">
-		<description>Anglais - Volume 4</description>
+		<description>Anglais - Volume 4 - Le Groupe Nominal 1</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="developer" value="CEGOS / Alpha-Langues"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -391,6 +430,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Animatix</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Christian Belin &amp; Jacques Pagès"/>
+		<info name="serial" value="THKF 85081"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="27937">
@@ -412,9 +453,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="apprecri">
-		<description>Apprends-moi a Ecrire</description>
+		<description>Apprends-moi à Écrire</description>
 		<year>1986</year>
-		<publisher>Cedic/Nathan</publisher>
+		<publisher>Cedic-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -470,6 +511,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Assdesass</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="William Hennebois"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="11476">
@@ -479,9 +521,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="asterix">
-		<description>Asterix et la Potion Magique</description>
+		<description>Astérix et la Potion Magique</description>
 		<year>1987</year>
-		<publisher>Coktel Vision</publisher>
+		<publisher>VIFI-Nathan / Coktel Vision</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="46900">
@@ -506,6 +548,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Astro-Couple</description>
 		<year>1985</year>
 		<publisher>Answare-Diffusion</publisher>
+		<info name="author" value="Elizabeth Teissier"/>
+		<info name="serial" value="AS 1045"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="37511">
@@ -517,7 +561,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="attentio">
 		<description>Attention</description>
 		<year>1985</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="21012">
@@ -539,7 +583,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="autoreal">
-		<description>L'Auto: Realisation d'Un Solide a Partir du Developpement</description>
+		<description>L'Auto: Realisation d'Un Solide à Partir du Developpement</description>
 		<year>198?</year>
 		<publisher>Maurice Aujas</publisher>
 
@@ -553,7 +597,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="ainitbas">
 		<description>Auto-initiation au BASIC TO7</description>
 		<year>1984</year>
-		<publisher>Cedic/Nathan - TO TEK International</publisher>
+		<publisher>Cedic-Nathan / TO TEK International</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -572,7 +616,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="ainitbasa" cloneof="ainitbas">
 		<description>Auto-initiation au BASIC TO7 (alt)</description>
 		<year>1984</year>
-		<publisher>Cedic/Nathan - TO TEK International</publisher>
+		<publisher>Cedic-Nathan / TO TEK International</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -591,7 +635,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="ainitbas70" cloneof="ainitbas">
 		<description>Auto-initiation au BASIC TO7-70</description>
 		<year>1984</year>
-		<publisher>Cedic/Nathan - TO TEK International</publisher>
+		<publisher>Cedic-Nathan / TO TEK International</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -610,7 +654,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="ainitlog">
 		<description>Auto-initiation au LOGO</description>
 		<year>1984</year>
-		<publisher>Cedic/Nathan - TO TEK International</publisher>
+		<publisher>Cedic-Nathan / TO TEK International</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -630,6 +674,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Avenger</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="AX 1102"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="50151">
@@ -654,6 +699,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Backgammon</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="45 0204"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="17006">
@@ -697,6 +743,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Balade en Ballon</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="alt_title" value="Ballade en Ballon"/>
+		<info name="author" value="Gilbert Bérot"/>
+		<info name="serial" value="TH 008"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="29628">
@@ -706,9 +755,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="balltrap">
-		<description>Ball Trap</description>
+		<description>Ball-Trap</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="developer" value="Novasoft"/>
+		<info name="serial" value="TH 010"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="21331">
@@ -776,6 +827,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Beach Head</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="BH 1055"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="27734">
@@ -788,6 +840,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Bidul</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Antoine Leca &amp; Eric Canton"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="9587">
@@ -884,6 +937,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Brigade du Feu</description>
 		<year>1985</year>
 		<publisher>Coktel Vision</publisher>
+		<info name="author" value="Alain Mosnier"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="31979">
@@ -941,9 +995,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cao">
-		<description>C.A.O. - Conception Assistee par Ordinateur</description>
+		<description>C.A.O. - Conception Assistée par Ordinateur</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1985"/>
+		<info name="serial" value="082"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="69905">
@@ -1039,9 +1095,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="calcnume">
-		<description>Calculs Numeriques</description>
+		<description>Calculs Numériques</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Yves Biton"/>
+		<info name="serial" value="70 16130"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="24228">
@@ -1063,7 +1121,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cara">
-		<description>Cara</description>
+		<description>Cara - Calcul Rapide</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 
@@ -1090,6 +1148,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>La Carotte Malicieuse</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Christian Ardoin"/>
+		<info name="serial" value="41 1106"/><!-- Rerelease with MO5 version on B side has serial 45 1106 -->
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="24811">
@@ -1111,7 +1171,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cartfran">
-		<description>Cartable Francais</description>
+		<description>Cartable Français</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
 
@@ -1133,6 +1193,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Carte d'Europe</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Alain Beck"/>
+		<info name="serial" value="4TF 013"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="22962">
@@ -1145,6 +1207,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>La Carte de France</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Michel Oury"/>
+		<info name="serial" value="45 1701"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -1164,6 +1228,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>La Carte de France (alt)</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="45 1701"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -1183,6 +1248,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Carte du Ciel</description>
 		<year>1984</year>
 		<publisher>Answare-Diffusion</publisher>
+		<info name="author" value="Christian Colongo"/>
+		<info name="serial" value="CC 1048"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="30649">
@@ -1231,6 +1298,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Challenge Voile</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1984"/>
+		<info name="serial" value="026"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="22282">
@@ -1276,7 +1345,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="chatmort">
-		<description>Le Chateau de la Mort</description>
+		<description>Le Château de la Mort</description>
 		<year>1985</year>
 		<publisher>Cobrasoft</publisher>
 
@@ -1288,7 +1357,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sphinx">
-		<description>Le Chateau des Sphinx</description>
+		<description>Le Château des Sphinx</description>
 		<year>198?</year>
 		<publisher>Sylvain Huet</publisher>
 
@@ -1396,9 +1465,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="clechant">
-		<description>La Cle des Chants</description>
+		<description>La Clé des Chants - Exercises de Solfège</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="41 1703"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="21327">
@@ -1435,6 +1505,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Coffret Cadeau</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="CC 7592"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="47129">
@@ -1447,6 +1518,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Coliseum</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Louis-Marie Rocques"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1985"/>
+		<info name="serial" value="069"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="50289">
@@ -1459,6 +1533,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Coliseum (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Louis-Marie Rocques"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1985"/>
+		<info name="serial" value="069"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="49760">
@@ -1468,9 +1545,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="compmult">
-		<description>Complements et Multiples</description>
+		<description>Compléments et Multiples</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Jean-Pierre Girard"/>
+		<info name="serial" value="41 1101"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="32076">
@@ -1483,6 +1562,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Le Compte est Rond</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
+		<info name="author" value="Atelier Vinci"/>
+		<info name="serial" value="HA 6996"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="12847">
@@ -1495,6 +1576,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Le Compte est Rond (alt)</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
+		<info name="author" value="Atelier Vinci"/>
+		<info name="serial" value="HA 6996"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="17220">
@@ -1528,9 +1611,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="conte">
-		<description>Conte</description>
+		<description>Conte - Historie à imaginer</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="author" value="Alain Lambert"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="24691">
@@ -1540,9 +1624,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="contea" cloneof="conte">
-		<description>Conte (alt, split?)</description>
+		<description>Conte - Historie à imaginer (alt, split?)</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="author" value="Alain Lambert"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Tape 1?"/>
@@ -1591,6 +1676,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Courrier</description>
 		<year>1984</year>
 		<publisher>Answare-Diffusion</publisher>
+		<info name="serial" value="FC 7012"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="21360">
@@ -1600,9 +1686,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cregraph">
-		<description>Cregraphic</description>
+		<description>Crégraphic</description>
 		<year>1985</year>
-		<publisher>Playjeux</publisher>
+		<publisher>Playjeux Informatique</publisher>
+		<info name="author" value="René Richard"/>
+		<info name="serial" value="W11"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="13653">
@@ -1615,6 +1703,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Crystann</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="developer" value="Novasoft"/>
+		<info name="notice" value="COPYRIGHT LORICIELS et NOVASOFT Novembre 1985"/>
+		<info name="serial" value="095"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="32155">
@@ -1627,6 +1718,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Crystann (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="developer" value="Novasoft"/>
+		<info name="serial" value="095"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="19454036">
@@ -1639,6 +1732,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Cyberlab</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
+		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="serial" value="CY1 006"/>
 
 		<part name="cass2" interface="to_cass">
 			<dataarea name="cass" size="10908968">
@@ -1651,6 +1746,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Cyberlab (alt)</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
+		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="serial" value="CY1 006"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="15882">
@@ -1672,9 +1769,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dactylog">
-		<description>Dactylographie</description>
+		<description>Dactylographie - Apprentissage du clavier</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="author" value="Henri Rolland"/>
+		<info name="serial" value="EDA 1300"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="27315">
@@ -1735,6 +1834,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Des Signes dans l'Espace</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="41 1502"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="57728">
@@ -1759,6 +1859,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Dialogue avec une sauterelle</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Bernard Delarue"/>
+		<info name="serial" value="41 1001"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="23402">
@@ -1771,6 +1873,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Dialogue avec une sauterelle (alt)</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Bernard Delarue"/>
+		<info name="serial" value="41 1001"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="22568">
@@ -1783,6 +1887,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Dialogue avec une sauterelle (alt 2)</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Bernard Delarue"/>
+		<info name="serial" value="41 1001"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="18181">
@@ -1852,7 +1958,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="didact41">
-		<description>Didactimath 4eme Volume 1</description>
+		<description>Didactimath 4ème Volume 1</description>
 		<year>1985</year>
 		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
 
@@ -1864,7 +1970,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="didact42">
-		<description>Didactimath 4eme Volume 2</description>
+		<description>Didactimath 4ème Volume 2</description>
 		<year>1985</year>
 		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
 
@@ -1876,7 +1982,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="didact5">
-		<description>Didactimath 5eme</description>
+		<description>Didactimath 5ème</description>
 		<year>1985</year>
 		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
 
@@ -1888,9 +1994,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dietetiq">
-		<description>Dietetique</description>
+		<description>Diététique</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Jacques Mateos"/>
+		<info name="serial" value="41 1201"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -1907,9 +2015,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dieuxsta">
-		<description>Les Dieux du Stade</description>
+		<description>Les Dieux du Stade - Jeux Olympiques - Paris 1992</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="William Hennebois"/>
 		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
 		<part name="cass1" interface="to_cass">
@@ -1920,9 +2029,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dieuxstaa" cloneof="dieuxsta">
-		<description>Les Dieux du Stade (alt)</description>
+		<description>Les Dieux du Stade - Jeux Olympiques - Paris 1992 (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="William Hennebois"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="25526">
@@ -1932,7 +2042,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="spounz2">
-		<description>Le Docteur Spounz - a encore pique! (Hebdogiciel 124-125)</description>
+		<description>Le Docteur Spounz - à encore pique! (Hebdogiciel 124-125)</description>
 		<year>1986</year>
 		<publisher>Jean-Yves Le Friec</publisher>
 
@@ -1947,6 +2057,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Dossier Boerhaave</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Roger Granier &amp; Pierre Bayle"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="73593">
@@ -1971,6 +2082,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Dribble</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="EDR 1178"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="9741">
@@ -1980,7 +2092,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tomsonne">
-		<description>Duel a Tom Sonne Valley</description>
+		<description>Duel à Tom Sonne Valley</description>
 		<year>198?</year>
 		<publisher>Jean-Louis Cardot</publisher>
 
@@ -2016,7 +2128,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ecrito">
-		<description>Ecrito</description>
+		<description>Écrito</description>
 		<year>1983</year>
 		<publisher>Infogrames</publisher>
 
@@ -2028,8 +2140,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="educati4">
-		<description>Educatif 4 Mathasard</description>
+		<description>Éducatif 4 - Mathasard</description>
 		<year>1985</year>
+		<info name="author" value="Jean Biron, Jérôme Gelin"/>
 		<publisher>Cobrasoft</publisher>
 
 		<part name="cass1" interface="to_cass">
@@ -2040,8 +2153,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="educati5">
-		<description>Educatif 5</description>
+		<description>Éducatif 5 - Ortho-Repère</description>
 		<year>1985</year>
+		<info name="author" value="Frank Megel, H. Letzelter"/>
 		<publisher>Cobrasoft</publisher>
 
 		<part name="cass1" interface="to_cass">
@@ -2052,8 +2166,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="educati8">
-		<description>Educatif 8 Cours'Auto</description>
+		<description>Éducatif 8 - Cours'Auto</description>
 		<year>1986</year>
+		<info name="author" value="Jean-Pierre Latuilliere"/>
 		<publisher>Cobrasoft</publisher>
 
 		<part name="cass1" interface="to_cass">
@@ -2066,7 +2181,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="educndp">
 		<description>Educatifs C.N.D.P. pour TO7</description>
 		<year>1984</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -2140,6 +2255,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Eliminator</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Pascal Pellier"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1984"/>
+		<info name="serial" value="031"/>
 		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
 		<part name="cass1" interface="to_cass">
@@ -2153,6 +2271,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Eliminator (alt)</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Pascal Pellier"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1984"/>
+		<info name="serial" value="031"/>
+		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="8799">
@@ -2286,6 +2408,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Empire</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Philippe Darmagnac"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Mai 1985"/>
+		<info name="serial" value="056"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="28455">
@@ -2297,7 +2422,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="subjonct">
 		<description>Emploi du Subjonctif</description>
 		<year>198?</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="2654">
@@ -2309,7 +2434,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="subjoncta" cloneof="subjonct">
 		<description>Emploi du Subjonctif (alt)</description>
 		<year>198?</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="2654">
@@ -2322,6 +2447,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Encadrement</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Claude Brunet"/>
+		<info name="serial" value="41 1105"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -2337,7 +2464,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="enigmati">
+	<software name="enigmati"><!-- TODO: actually five individually released tapes -->
 		<description>Enigmatika</description>
 		<year>1984</year>
 		<publisher>Answare-Diffusion</publisher>
@@ -2412,7 +2539,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="enigmeox">
-		<description>Enigme a Oxford</description>
+		<description>Enigme à Oxford</description>
 		<year>1986</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -2431,9 +2558,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="monstheo">
-		<description>Les Enquetes de Monsieur Theophile</description>
+		<description>Les Enquêtes de Monsieur Theophile</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
+		<info name="author" value="A. Benoiston"/>
+		<info name="serial" value="HA 7013"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="45894">
@@ -2467,9 +2596,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="eparempr">
-		<description>Epargne - Emprunt</description>
+		<description>Épargne - Emprunt</description>
 		<year>1984</year>
 		<publisher>Answare-Diffusion</publisher>
+		<info name="serial" value="EE 5010"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="15195">
@@ -2482,6 +2612,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Equations/Inequations</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Jean-Paul Germond"/>
+		<info name="serial" value="451805"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="43347">
@@ -2503,9 +2635,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tapiocat">
-		<description>L'Evade de Tapiocatraz</description>
+		<description>L'Évadé de Tapiocatraz</description>
 		<year>1986</year>
 		<publisher>ERE Informatique</publisher>
+		<info name="author" value="André Rocques"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="48496">
@@ -2542,6 +2675,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>F.B.I.</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Philippe Nottoli"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="12126519">
@@ -2554,6 +2688,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>F.B.I. (alt)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Philippe Nottoli"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="19130">
@@ -2566,6 +2701,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>F.B.I. (alt 2)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Philippe Nottoli"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="19105">
@@ -2578,6 +2714,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>F.B.I. (alt 3)</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Philippe Nottoli"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="11426799">
@@ -2602,6 +2739,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>F-15 Strike Eagle</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="FS 1120"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="27936">
@@ -2661,9 +2799,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="feuvert">
-		<description>Feu Vert</description>
+		<description>Feu Vert - Le Village de la Prévention Rurale</description>
 		<year>1985</year>
-		<publisher>VIFI-Nathan</publisher>
+		<publisher>Agri-Nathan / La Prévention Rurale</publisher>
+		<info name="author" value="Jean-Baptiste Touchard"/>
+		<info name="serial" value="4TF 012"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="14304">
@@ -2675,7 +2815,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="animaux">
 		<description>Fichier des Animaux</description>
 		<year>198?</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="3234">
@@ -2844,7 +2984,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cemotscr">
-		<description>Français CE - Grammaire et Orthographe (1) - Mots Croises Images</description>
+		<description>Français CE - Grammaire et Orthographe (1) - Mots Croisés-Images</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2856,7 +2996,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cecmatel">
-		<description>Français CE/CM - Aide a l'Orthographe - Atelier des phrases</description>
+		<description>Français CE/CM - Aide à l'Orthographe - Atelier des phrases</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2868,7 +3008,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cecmatela" cloneof="cecmatel">
-		<description>Français CE/CM - Aide a l'Orthographe - Atelier des phrases (alt)</description>
+		<description>Français CE/CM - Aide à l'Orthographe - Atelier des phrases (alt)</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2880,7 +3020,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cecmponc">
-		<description>Français CE/CM - Aide a l'Orthographe - Ponctuation</description>
+		<description>Français CE/CM - Aide à l'Orthographe - Ponctuation</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2892,7 +3032,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cecmponca" cloneof="cecmponc">
-		<description>Français CE/CM - Aide a l'Orthographe - Ponctuation (alt)</description>
+		<description>Français CE/CM - Aide à l'Orthographe - Ponctuation (alt)</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2916,9 +3056,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cmchenil">
-		<description>Français CM - Grammaire et vocabulaire (1) - Chenille Savante</description>
+		<description>Français CM - Grammaire et Vocabulaire (1) - Chenille Savante</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="4N 4020"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="31236">
@@ -2928,7 +3069,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cmclass">
-		<description>Français CM - Grammaire et vocabulaire (2) - Classement Alphabetique</description>
+		<description>Français CM - Grammaire et Vocabulaire (2) - Classement Alphabétique</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2940,7 +3081,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cmapi">
-		<description>Français CM - Vocabulaire et orthographe - A.P.I.</description>
+		<description>Français CM - Vocabulaire et Orthographe (1) - A.P.I.</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2952,7 +3093,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cm26emem">
-		<description>Français CM2/6eme - Vocabulaire et Orthographe - Memotex</description>
+		<description>Français CM2/6ème - Vocabulaire et Orthographe (2) - Memotex</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2964,7 +3105,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cm26esyn">
-		<description>Français CM2/6eme - Vocabulaire et orthographe - Synonymes &amp; Contraires</description>
+		<description>Français CM2/6ème - Vocabulaire et Orthographe (2) - Synonymes &amp; Contraires</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2976,7 +3117,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cploto">
-		<description>Français CP - Aide a la lecture (2) - Loto</description>
+		<description>Français CP - Aide à la lecture (2) - Loto</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -2988,7 +3129,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpmemoje">
-		<description>Français CP - Aide a la Lecture (2) - Memo-Jeu</description>
+		<description>Français CP - Aide à la Lecture (2) - Memo-Jeu</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -3000,7 +3141,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpfamile">
-		<description>Français CP - Aide a la Lecture - Famille</description>
+		<description>Français CP - Aide à la Lecture - Famille</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -3012,7 +3153,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cptrain">
-		<description>Français CP - Aide a la Lecture - Le train de la Lecture</description>
+		<description>Français CP - Aide à la Lecture - Le train de la Lecture</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -3024,7 +3165,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpcealer">
-		<description>Français CP/CE - Aide a la Lecture - Alerte</description>
+		<description>Français CP/CE - Aide à la Lecture - Alerte</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -3036,7 +3177,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpcepele">
-		<description>Français CP/CE - Aide a la Lecture - Pele-Mele</description>
+		<description>Français CP/CE - Aide à la Lecture - Pêle-Mêle</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -3048,7 +3189,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpcerada">
-		<description>Français CP/CE - Aide a la Lecture - Radar</description>
+		<description>Français CP/CE - Aide à la Lecture - Radar</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -3099,6 +3240,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Galaxie Perdue</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="developer" value="Novasoft"/>
+		<info name="serial" value="TH 013"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="22529">
@@ -3132,7 +3275,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="geom5eme">
-		<description>Le Geometre 5eme</description>
+		<description>Le Géomètre 5ème</description>
 		<year>1985</year>
 		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
 
@@ -3147,6 +3290,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>La Geste d'Artillac</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="François Leger, Philippe Rabergeau, Thierry Souques, André Di Bartolo"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Liminaire Side A"/>
@@ -3201,7 +3345,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="commevou">
 		<description>Grammaire - Comme Vous Avez de Beaux Complements !</description>
 		<year>1985</year>
-		<publisher>Playjeux</publisher>
+		<publisher>Playjeux Informatique</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="33534">
@@ -3262,6 +3406,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Gravitron, Valse Galactique</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="EGR 1180"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="9878">
@@ -3274,6 +3419,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Green Beret</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="GB 1100"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="49152">
@@ -3286,6 +3432,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Green Beret (alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="GB 1100"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="33964">
@@ -3298,6 +3445,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Green Beret (alt 2)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="GB 1100"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="34234">
@@ -3307,9 +3455,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="gutentag">
-		<description>Guten Tag! Volume 1</description>
+		<description>Guten Tag! Volume 1: Déclinaison de l'Article</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Jacques Vergne, Dominique Miermont"/>
+		<info name="serial" value="41 1301"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Tape 1 Side A"/>
@@ -3365,7 +3515,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Header (Hebdogiciel no. 146)</description>
 		<year>1986</year>
 		<publisher>I.M.E. Chantejoie - Hebdogiciel</publisher>
-		<info name="usage" value="LOADM&quot;&quot; + EXEC&amp;HB600" />
+		<info name="usage" value="LOADM&quot;&quot; + EXEC&amp;HB600"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="673">
@@ -3414,15 +3564,16 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Histoire de France</description>
 		<year>1985</year>
 		<publisher>MPS Diffusion</publisher>
+		<info name="usage" value="Wait for side I to reach the end, then insert side II to continue loading"/>
 
 		<part name="cass1" interface="to_cass">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Vol. I - Période: -120 à +1450"/>
 			<dataarea name="cass" size="30035">
 				<rom name="histoire de france (mps diffusion) (gerard tramier) (1985) (to7) (side 1).k7" size="30035" crc="b7d4fdbb" sha1="332d74586a4fe47d75ae49ea49cc61223a7460c3"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="to_cass">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Vol. II - Période: 1451 à 1980"/>
 			<dataarea name="cass" size="26354">
 				<rom name="histoire de france (mps diffusion) (gerard tramier) (1985) (to7) (side 2).k7" size="26354" crc="bae7408b" sha1="f339183b93d81fcf34612bfc8da21a6e65ed1b83"/>
 			</dataarea>
@@ -3433,6 +3584,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Les Hits de Loriciels 1</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="contents" value="Pulsar II / Eliminator / Yeti"/>
+		<info name="serial" value="L5H1 / L5HE"/>
+		<!-- Also rereleased in January 1987 in a double box with Coliseum (LOF 53) -->
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="31807">
@@ -3445,6 +3599,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>L'Horloge</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Jean-Pierre Girard"/>
+		<info name="serial" value="41 1104"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="22378">
@@ -3480,7 +3636,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="imagsign" supported="partial">
 		<description>Image et Signes (Side B Missing)</description>
 		<year>1985</year>
-		<publisher>Cedic/Nathan</publisher>
+		<publisher>Cedic-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -3512,6 +3668,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Indiana Thom</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="developer" value="Novasoft"/>
+		<info name="serial" value="TH 012"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="24591">
@@ -3543,6 +3701,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Initiation au Langage Basic (CEGOS) - Volume 1</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="41 1002"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -3562,6 +3721,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Initiation au Langage Basic (CEGOS) - Volume 3</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="41 1004"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -3609,7 +3769,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="einfubas" cloneof="initbas">
-		<description>Einfuehrung in Basic (Germany)</description>
+		<description>Einführung in Basic (Germany)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
 
@@ -3660,6 +3820,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Inspecteur Gadget</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Kheirridine Chouaki"/>
+		<info name="serial" value="450022"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="63254">
@@ -3668,10 +3830,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		</part>
 	</software>
 
-	<software name="intrus">
+	<software name="intrus"><!-- TODO: released with Smurfy -->
 		<description>L'Intrus</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Pascal Pommier"/>
+		<info name="serial" value="TH 007"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="17683">
@@ -3693,7 +3857,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="isometri">
-		<description>Isometrie - Axe de Symetrie Verticale</description>
+		<description>Isométrie - Axe de Symétrie Verticale</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -3732,6 +3896,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>J'entends</description>
 		<year>1984</year>
 		<publisher>Ediciel</publisher>
+		<info name="author" value="Jean-Charles Humblot &amp; Michele Monnier"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -3750,7 +3915,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="jacquard">
 		<description>Jacquard (v1.0)</description>
 		<year>198?</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -3782,6 +3947,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Je Dessine</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Suzanne &amp; Michel Uturald"/>
+		<info name="serial" value="45 0306"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="9099">
@@ -3872,7 +4039,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="jeudict">
 		<description>Jeu du Dictionnaire</description>
 		<year>198?</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="5831">
@@ -4246,7 +4413,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="joligone">
 		<description>Joligones</description>
 		<year>1985</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="65652">
@@ -4259,6 +4426,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Judoka</description>
 		<year>1985</year>
 		<publisher>VIFI International</publisher>
+		<info name="author" value="Philippe Matet, Michel Calmet"/>
+		<info name="serial" value="4TF011"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="35199">
@@ -4319,6 +4488,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Kanicula</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
+		<info name="serial" value="KA1 016"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="13955">
@@ -4331,6 +4501,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Karate</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Eric Moffet"/>
+		<info name="serial" value="THKF 85061"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="32955">
@@ -4343,6 +4515,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Karate (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Eric Moffet"/>
+		<info name="serial" value="THKF 85061"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="21207485">
@@ -4367,6 +4541,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Katuvu</description>
 		<year>198?</year>
 		<publisher>VIFI International</publisher>
+		<info name="developer" value="Jawx"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="31815">
@@ -4463,6 +4638,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Labyrinthe Survie</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Alain Rigolot"/>
+		<info name="serial" value="450020"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="16238">
@@ -4487,6 +4664,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Las Vegas</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Roger Granier, Pierre Bayle"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -4506,6 +4684,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Las Vegas (alt)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Roger Granier, Pierre Bayle"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -4585,7 +4764,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="logospei">
 		<description>LOGO Sans Peine</description>
 		<year>1985</year>
-		<publisher>Cedic/Nathan</publisher>
+		<publisher>Cedic-Nathan</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Tape 1"/>
@@ -4617,6 +4796,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Lorann</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="developer" value="Novasoft"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Octobre 1985"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="34199">
@@ -4713,6 +4894,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Mallette de Jeu Thomson</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="MJ 1119"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Tape 1 (Arkanoid)"/>
@@ -4744,6 +4926,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Mandragore</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Marc Cecchi"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Tape 1 (Jeu)"/>
@@ -4763,6 +4946,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Mandragore (Germany)</description>
 		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Marc Cecchi"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Spielkassette Side A"/>
@@ -4803,9 +4987,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="tallymt">
-		<description>Mannesmann Tally MT80 PC</description>
+		<description>MT80 PC → TO7-70</description>
 		<year>1985</year>
-		<publisher>Mannesmann</publisher>
+		<publisher>Mannesmann Tally</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="2435">
@@ -4851,7 +5035,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cecmgeom">
-		<description>Mathématiques - Geometrie CE/CM</description>
+		<description>Mathématiques - Géométrie CE/CM</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -4870,7 +5054,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="calccarr">
-		<description>Mathématiques Calculs - Carre Magique</description>
+		<description>Mathématiques Calculs - Carré Magique</description>
 		<year>1984</year>
 		<publisher>Nathan Ecoles</publisher>
 
@@ -4918,7 +5102,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="ceavant">
-		<description>Mathématiques CE - Avant et Apres</description>
+		<description>Mathématiques CE - Avant et Après</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -5033,7 +5217,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpcesyme">
-		<description>Mathématiques CP/CE - Symetries et Translations</description>
+		<description>Mathématiques CP/CE - Symétries et Translations</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -5045,7 +5229,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="cpcetabl">
-		<description>Mathématiques CP/CE - Tables d'operations</description>
+		<description>Mathématiques CP/CE - Tables d'Opérations</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -5059,7 +5243,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="matrix">
 		<description>Matrix</description>
 		<year>198?</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="24858">
@@ -5081,9 +5265,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="premmots">
-		<description>Mes Premiers Mots Croises</description>
+		<description>Mes Premiers Mots Croisés - Français-Vocabulaire</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Jean-Paul Dupré, Bernard Delarue"/>
+		<info name="serial" value="45 1401"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Tape 1 Side A"/>
@@ -5106,9 +5292,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="meteo7">
-		<description>Meteo-7</description>
+		<description>Météo 7</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Eric Mottet"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="9586">
@@ -5144,9 +5331,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="scrabble">
-		<description>Micro-Scrabble</description>
+		<description>Micro Scrabble</description>
 		<year>1985</year>
-		<publisher>France Image Logiciel (FIL)</publisher>
+		<publisher>Leisure Genius</publisher><!-- also rereleased by FIL -->
+		<info name="serial" value="LG 190"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="40406">
@@ -5159,6 +5347,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Microjeux - Cocktail de Jeux</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="450101"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="36886">
@@ -5171,6 +5360,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Microjeux - Cocktail de Jeux (alt)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="450101"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="37218">
@@ -5183,6 +5373,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>La Mine aux Diamants</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Philippe Bruneel, Christian Lemaire"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="27222">
@@ -5195,6 +5386,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>La Mine aux Diamants (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Philippe Bruneel, Christian Lemaire"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="27250">
@@ -5243,6 +5435,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Le Minotaure</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
+		<info name="author" value="H. Bonneton, Y. Janin"/>
+		<info name="serial" value="HA 7002"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="15216">
@@ -5255,6 +5449,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Minotaure 3D</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Mai 1985"/>
+		<info name="serial" value="059"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="17760">
@@ -5267,6 +5463,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Minotaure 3D (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Mai 1985"/>
+		<info name="serial" value="059"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="17705">
@@ -5303,6 +5501,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Missions en Rafale</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="RA 1112"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="30907">
@@ -5315,6 +5514,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Missions en Rafale (alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="RA 1112"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="30904">
@@ -5327,6 +5527,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Missions en Rafale (alt 2)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="RA 1112"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="31148">
@@ -5362,7 +5563,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="monopoly">
 		<description>Monopoly</description>
 		<year>1986</year>
-		<publisher>France Image Logiciel (FIL)</publisher>
+		<publisher>Leisure Genius</publisher>
+		<info name="serial" value="LG350"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="65536">
@@ -5374,7 +5576,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="monopolya" cloneof="monopoly">
 		<description>Monopoly (alt)</description>
 		<year>1986</year>
-		<publisher>France Image Logiciel (FIL)</publisher>
+		<publisher>Leisure Genius</publisher>
+		<info name="serial" value="LG350"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="50511">
@@ -5387,6 +5590,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Monster Mine</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="EMO 1181"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="8881">
@@ -5396,9 +5600,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="motfleur">
-		<description>Mots en Fleurs</description>
+		<description>Mots en Fleurs - Construire des Mots</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Viviane &amp; Claude Barbier"/>
+		<info name="serial" value="41 1501"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -5415,7 +5621,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="multgrec">
-		<description>Multiplication a la Grecque</description>
+		<description>Multiplication à la Grecque</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -5464,7 +5670,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="mysparis">
-		<description>Le Mystere de Paris</description>
+		<description>Le Mystère de Paris</description>
 		<year>1988</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -5491,6 +5697,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Noix de Coco</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Gabriel Bois, Emmanuel Henri, Michel Jusam"/>
+		<info name="serial" value="41 1702"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="41424">
@@ -5503,6 +5711,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>La Nuit des Templiers</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="developer" value="Coktel Vision"/>
+		<info name="serial" value="NT 1053"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="32768">
@@ -5515,6 +5725,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>La Nuit des Templiers (alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="developer" value="Coktel Vision"/>
+		<info name="serial" value="NT 1053"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="29682">
@@ -5538,9 +5750,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 -->
 
 	<software name="numero10">
-		<description>Numero 10</description>
+		<description>Numéro 10</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="author" value="Albert Loridan, Bruno Duriez, Joel Sana"/>
+		<info name="developer" value="D &amp; L Research"/>
+		<info name="serial" value="PJ 7501 - FO 1050"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="22654">
@@ -5551,7 +5766,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 <!--
     <software name="numero10">
-        <description>Numero 10 (Bad)</description>
+        <description>Numéro 10 (Bad)</description>
         <year>1985</year>
         <publisher>France Image Logiciel (FIL)</publisher>
 
@@ -5576,9 +5791,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="oceania">
-		<description>Oceania</description>
+		<description>Océania</description>
 		<year>1985</year>
-		<publisher>Microïds</publisher>
+		<publisher>Microïds / Loriciels</publisher>
+		<info name="author" value="Patrick Le Nestour"/>
+		<info name="notice" value="COPYRIGHT MICROÏDS Octobre 1985"/>
+		<info name="serial" value="M2"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="35088">
@@ -5591,6 +5809,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Octogonus</description>
 		<year>1984</year>
 		<publisher>TO TEK International</publisher>
+		<info name="author" value="Pierre Berloquin"/>
+		<info name="serial" value="OC1 004"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="18846">
@@ -5624,7 +5844,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="nemo">
-		<description>Operation Nemo</description>
+		<description>Opération Némo</description>
 		<year>1986</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -5667,9 +5887,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="orthcrk1">
-		<description>Orthocrack 1</description>
+		<description>Orthocrack 1 - Masculin-Féminin</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
+		<info name="author" value="Guion"/>
+		<info name="serial" value="HA 6999"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="19388">
@@ -5679,9 +5901,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="orthcrk2">
-		<description>Orthocrack 2</description>
+		<description>Orthocrack 2 - Singulier-Pluriel</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
+		<info name="author" value="Guion"/>
+		<info name="serial" value="HA 7000"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="21929">
@@ -5691,9 +5915,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="orthcrk3">
-		<description>Orthocrack 3</description>
+		<description>Orthocrack 3 - Présent de l'Indicatif</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
+		<info name="author" value="Guion"/>
+		<info name="serial" value="HA 7014"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="22755">
@@ -5703,9 +5929,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="orthcrk3a" cloneof="orthcrk3">
-		<description>Orthocrack 3 (alt)</description>
+		<description>Orthocrack 3 - Présent de l'Indicatif (alt)</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
+		<info name="author" value="Guion"/>
+		<info name="serial" value="HA 7014"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="20981">
@@ -5914,6 +6142,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Pays du Monde</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Jean-Michel Cruells"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="67303">
@@ -5961,7 +6190,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="lependu">
 		<description>Le Pendu</description>
 		<year>1982</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="13564">
@@ -6010,6 +6239,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Phonemia</description>
 		<year>1984</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="PH 1069"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="19494">
@@ -6058,6 +6288,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Pilot</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Gilles Blanchard"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="8379">
@@ -6104,8 +6335,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<software name="pingo">
 		<description>Pingo</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Hugues Seville de Mazancourt"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="10943">
@@ -6118,6 +6350,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Pingo (alt)</description>
 		<year>1983</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Hugues Seville de Mazancourt"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="10980">
@@ -6130,6 +6363,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Pique-Fiche</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
+		<info name="serial" value="HA 7303"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="31870">
@@ -6142,6 +6376,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Les Placements d'Épargne - Gérez le Patrimoine de Tante Ursule</description>
 		<year>1984</year>
 		<publisher>Answare-Diffusion</publisher>
+		<info name="serial" value="VE 5031"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="13808">
@@ -6154,6 +6389,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>La Planète Inconnue</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="developer" value="Coktel Vision"/>
+		<info name="serial" value="PJ 7501 - PI 1052"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="31473">
@@ -6163,9 +6400,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="planetmo">
-		<description>Planete Morte</description>
+		<description>Planète Morte</description>
 		<year>1985</year>
 		<publisher>Minipuce</publisher>
+		<info name="author" value="J.F. Vassard"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="32831">
@@ -6177,7 +6415,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="pluriel">
 		<description>Pluriel des Noms Simples</description>
 		<year>198?</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="2547">
@@ -6190,6 +6428,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Plymouth-Newport</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Pascal Pommier"/>
+		<info name="serial" value="TH 006"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="32499">
@@ -6213,7 +6453,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="poeme">
 		<description>Poeme</description>
 		<year>198?</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="11390">
@@ -6307,9 +6547,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="poliecon">
-		<description>Politique Économique</description>
+		<description>Politique Économique - Devenez Ministre de l'Économie et des Finances</description>
 		<year>1984</year>
 		<publisher>Answare-Diffusion</publisher>
+		<info name="serial" value="VE 7030"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="22495">
@@ -6367,7 +6608,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="poseidon">
-		<description>Poseidon</description>
+		<description>Poseïdon</description>
 		<year>1986</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -6418,6 +6659,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Pousspan</description>
 		<year>1983</year>
 		<publisher>TO TEK Editions</publisher>
+		<info name="author" value="Philippe Descamps"/>
+		<info name="serial" value="BFLN 01"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -6437,6 +6680,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Pouvoir</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Avril 1986"/>
+		<info name="serial" value="134"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="15871665">
@@ -6449,6 +6694,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Pouvoir (alt)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Avril 1986"/>
+		<info name="serial" value="134"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="24624">
@@ -6509,6 +6756,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Pulsar II</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1984"/>
+		<info name="serial" value="032"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="12240">
@@ -6521,6 +6770,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Pulsar II (alt)</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1984"/>
+		<info name="serial" value="032"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="12198">
@@ -6531,8 +6782,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<software name="pv2000">
 		<description>PV 2000</description>
-		<year>1983</year>
+		<year>1984</year>
 		<publisher>TO TEK International</publisher>
+		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="serial" value="PV1 015"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="10727">
@@ -6545,6 +6798,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Pythagore</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
+		<info name="serial" value="HA 6994"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="24434">
@@ -6554,9 +6808,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="quellvie">
-		<description>Quelle Vie de Chene!</description>
+		<description>Quelle Vie de Chêne!</description>
 		<year>1985</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="37566">
@@ -6566,9 +6820,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="quest">
-		<description>Quest</description>
+		<description>Quest - Culture Générale</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="41 0015"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="59049">
@@ -6578,7 +6833,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="choixmlt">
-		<description>Questionnaires a Choix Multiples</description>
+		<description>Questionnaires à Choix Multiples</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -6602,9 +6857,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="regates">
-		<description>Regates</description>
+		<description>Régates</description>
 		<year>1985</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Jean-Christophe Ninet"/>
+		<info name="serial" value="450031"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="12512">
@@ -6674,9 +6931,12 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="rodeo">
-		<description>Rodeo</description>
+		<description>Rodéo</description>
 		<year>1986</year>
 		<publisher>Microïds</publisher>
+		<info name="author" value="Phase"/>
+		<info name="notice" value="COPYRIGHT MICROÏDS Février 1986"/>
+		<info name="serial" value="M7"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="44635">
@@ -6689,6 +6949,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>La Ronde de l'Eau</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="author" value="Jean Moreau"/>
+		<info name="serial" value="ERO 1121"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="11430">
@@ -6701,6 +6963,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>La Ronde des Formes</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="41 1602"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -6720,6 +6983,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Rotorwar</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="serial" value="45 0025"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="9040">
@@ -6755,7 +7019,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="runway">
 		<description>Runway</description>
 		<year>1985</year>
-		<publisher>France Image Logiciel (FIL)</publisher>
+		<publisher>France Image Logiciel (FIL) / Miclog</publisher>
+		<info name="author" value="Pierre Morel-Fourrier"/>
+		<info name="serial" value="45 0025"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="13944">
@@ -6782,6 +7048,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Runway II</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="author" value="Pierre Morel-Fourrier"/>
+		<info name="serial" value="RW 1111"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="25205">
@@ -6794,6 +7062,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Saphir</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Eric Szymkowiak"/>
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Tape 1 (Jeu)"/>
@@ -6813,6 +7082,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Sapiens</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Didier &amp; Olivier Guillion"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Juin 1986"/>
+		<info name="serial" value="146"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="30654">
@@ -6885,6 +7157,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Scrontch</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Pierre Mauvignier &amp; Philippe Barreau"/>
+		<info name="serial" value="45 0024"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="12128">
@@ -6993,6 +7267,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Smurfy</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Pascal Pommier"/>
+		<info name="serial" value="TH 007"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="22973">
@@ -7004,7 +7280,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="solenoir">
 		<description>Soleil Noir</description>
 		<year>1985</year>
-		<publisher>Microïds</publisher>
+		<publisher>Microïds / Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT MICROÏDS Octobre 1985"/>
+		<info name="serial" value="M3"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="35862">
@@ -7098,9 +7376,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sortileg">
-		<description>Sortileges</description>
+		<description>Sortilèges</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="William Hennebois, Alain Vialon, Laurent Droulez"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="27707042">
@@ -7110,9 +7389,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sortilega" cloneof="sortileg">
-		<description>Sortileges (alt)</description>
+		<description>Sortilèges (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="William Hennebois, Alain Vialon, Laurent Droulez"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="45074">
@@ -7122,9 +7402,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sortilegb" cloneof="sortileg">
-		<description>Sortileges (alt 2)</description>
+		<description>Sortilèges (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="William Hennebois, Alain Vialon, Laurent Droulez"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="45045">
@@ -7134,9 +7415,10 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sortilegc" cloneof="sortileg">
-		<description>Sortileges (alt 3)</description>
+		<description>Sortilèges (alt 3)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="William Hennebois, Alain Vialon, Laurent Droulez"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="25972442">
@@ -7209,6 +7491,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Spix</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Patrick Princ"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="8306">
@@ -7269,6 +7552,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Stratac</description>
 		<year>1983</year>
 		<publisher>TO TEK Editions</publisher>
+		<info name="author" value="Henri Diguet"/>
+		<info name="serial" value="BFLH 01"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="11544">
@@ -7314,7 +7599,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sujet">
-		<description>Sujet/Complement</description>
+		<description>Sujet/Complément</description>
 		<year>1987</year>
 		<publisher>Carraz Editions</publisher>
 
@@ -7333,7 +7618,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="sujeta" cloneof="sujet">
-		<description>Sujet/Complement (alt)</description>
+		<description>Sujet/Complément (alt)</description>
 		<year>1987</year>
 		<publisher>Carraz Editions</publisher>
 
@@ -7367,6 +7652,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Super Tennis (Answare)</description>
 		<year>1985</year>
 		<publisher>Answare-Diffusion</publisher>
+		<info name="serial" value="TE 1049"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="19774">
@@ -7400,9 +7686,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="systemet">
-		<description>Systeme Metrique</description>
+		<description>Système Métrique</description>
 		<year>1983</year>
 		<publisher>VIFI-Nathan</publisher>
+		<info name="author" value="Jean-Pierre Girard"/>
+		<info name="serial" value="41 1102"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="25770">
@@ -7436,7 +7724,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teleram1">
-		<description>Telerama No. 1</description>
+		<description>Télérama Nº1</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -7448,7 +7736,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="teleram2">
-		<description>Telerama No. 2</description>
+		<description>Télérama Nº2</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
 
@@ -7463,6 +7751,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Le Temple de Quauhtli</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Louis-Marie Rocques"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1986"/>
+		<info name="serial" value="148"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="83049">
@@ -7475,6 +7766,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Le Temple de Quauhtli (alt)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Louis-Marie Rocques"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1986"/>
+		<info name="serial" value="148"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="81404">
@@ -7484,7 +7778,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="thompuzz">
-		<description>Thom-Puzz</description>
+		<description>Thompuzz</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 
@@ -7497,8 +7791,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<software name="thomcalc">
 		<description>Thomcalc</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Gilles Blanchard"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="16697">
@@ -7583,7 +7878,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="hanoi">
 		<description>Tours de Hanoi</description>
 		<year>198?</year>
-		<publisher>Centre National de Documentation Pedagogique (CNDP)</publisher>
+		<publisher>Centre National de Documentation Pédagogique (CNDP)</publisher>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="3714">
@@ -7596,6 +7891,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Toutankhamon</description>
 		<year>1985</year>
 		<publisher>No Man's Land</publisher>
+		<info name="serial" value="013-01417"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="39852">
@@ -7608,6 +7904,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Toutankhamon (alt)</description>
 		<year>1985</year>
 		<publisher>No Man's Land</publisher>
+		<info name="serial" value="013-01417"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="39834">
@@ -7646,6 +7943,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Troff</description>
 		<year>1983</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Grégory Ruck"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="5994">
@@ -7749,6 +8047,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Vampire</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Alain Vialon, Philippe Nottoli, Dominique Girou"/>
+		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="25037735">
@@ -7761,6 +8061,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Vampire (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Alain Vialon, Philippe Nottoli, Dominique Girou"/>
+		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="40290">
@@ -7773,6 +8075,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Vampire (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Alain Vialon, Philippe Nottoli, Dominique Girou"/>
+		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="40285">
@@ -7785,6 +8089,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Vampire (alt 3)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
+		<info name="author" value="Alain Vialon, Philippe Nottoli, Dominique Girou"/>
+		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="23303135">
@@ -7797,6 +8103,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Vin sur Vin</description>
 		<year>1984</year>
 		<publisher>Infogrames</publisher>
+		<info name="developer" value="Imagiciel"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="63462">
@@ -7833,6 +8140,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Vol Solo</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="developer" value="D &amp; L Research (French version)"/>
+		<info name="serial" value="VS 1054"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="24987">
@@ -7902,9 +8211,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="wormy">
-		<description>Wormy</description>
+		<description>Wormy - Junior Computhink</description>
 		<year>1984</year>
 		<publisher>Hatier</publisher>
+		<info name="author" value="G. Nacam"/>
+		<info name="serial" value="HA 7003"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="14294">
@@ -7917,6 +8228,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>X-Ray</description>
 		<year>1986</year>
 		<publisher>Microïds</publisher>
+		<info name="author" value="M. Beziat"/>
+		<info name="notice" value="COPYRIGHT MICROÏDS Décembre 1986"/>
+		<info name="serial" value="M 505"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="20372977">
@@ -7929,6 +8243,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>X-Ray (alt)</description>
 		<year>1986</year>
 		<publisher>Microïds</publisher>
+		<info name="serial" value="M 505"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="32924">
@@ -7941,6 +8256,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Yeti</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Pascal Pellier"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1984"/>
+		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="11893">
@@ -7953,6 +8271,9 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Yeti (alt)</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Pascal Pellier"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1984"/>
+		<info name="usage" value="Load with LOADM&quot;&quot;,,R"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="11896">
@@ -7965,6 +8286,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Yie Ar Kung Fu II</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="KF 1101"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="32256">
@@ -7977,6 +8299,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Yie Ar Kung Fu II (alt)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="KF 1101"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="32514">
@@ -7989,6 +8312,8 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 		<description>Zaptrak</description>
 		<year>1983</year>
 		<publisher>TO TEK International</publisher>
+		<info name="author" value="Philippe Descamps, Marc Rolin"/>
+		<info name="serial" value="BFLN02"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="6120">
@@ -7998,9 +8323,11 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="zorro">
-		<description>Zorro</description>
+		<description>Zorro - L'alimentation du renard</description>
 		<year>1985</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="author" value="Christian Orange"/>
+		<info name="serial" value="EZO 1122"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="12127">
