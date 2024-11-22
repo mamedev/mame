@@ -45,6 +45,9 @@ Notes:
 ------------------------
 
 TODO:
+- Verify what happens if you skip an enemy, on MAME the next one may appear out of
+  thin air. MAME previously showed garbage sprites moving fast to the left and later
+  changing into an enemy character, disable the (~attr & 0x01) check to see.
 - Verify if YM2203 RD is connected. If it is, it waits too long checking the busy flag,
   while it already does soft-delays itself. This would cause too slow BGM tempo.
 
