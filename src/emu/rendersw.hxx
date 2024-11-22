@@ -1603,7 +1603,7 @@ private:
 					return ycc_to_rgb(get_texel_yuy16(prim.texture, u, v));
 				};
 		auto const rop_mul_notint =
-				[] (u32 &dest, u32 pix)
+				[] (PixelType &dest, u32 pix)
 				{
 					if ((pix & 0x00ff'ffff) != 0x00ff'ffff)
 					{
@@ -1615,7 +1615,7 @@ private:
 					}
 				};
 		auto const rop_mul_tinted =
-				[] (u32 &dest, u32 pix, u32 sr, u32 sg, u32 sb)
+				[] (PixelType &dest, u32 pix, u32 sr, u32 sg, u32 sb)
 				{
 					if ((pix & 0x00ff'ffff) != 0x00ff'ffff)
 					{
@@ -1627,7 +1627,7 @@ private:
 					}
 				};
 		auto const rop_add_notint =
-				[] (u32 &dest, u32 pix)
+				[] (PixelType &dest, u32 pix)
 				{
 					if ((pix & 0x00ff'ffff) != 0)
 					{
@@ -1642,7 +1642,7 @@ private:
 					}
 				};
 		auto const rop_add_tinted =
-				[] (u32 &dest, u32 pix, u32 sr, u32 sg, u32 sb)
+				[] (PixelType &dest, u32 pix, u32 sr, u32 sg, u32 sb)
 				{
 					if ((pix & 0x00ff'ffff) != 0)
 					{
