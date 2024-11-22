@@ -113,14 +113,15 @@ namespace {
 class zodiack_state : public driver_device
 {
 public:
-	zodiack_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_soundlatch(*this, "soundlatch")
+	zodiack_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch%u", 0)
 	{ }
 
 	void zodiack(machine_config &config);
+	void dogfight(machine_config &config);
 	void percuss(machine_config &config);
 
 protected:
@@ -129,21 +130,22 @@ protected:
 
 private:
 	void nmi_mask_w(uint8_t data);
+	void irq_mask_w(uint8_t data);
 	void sound_nmi_enable_w(uint8_t data);
-	void master_soundlatch_w(uint8_t data);
 	void control_w(uint8_t data);
 
 	// devices
 	required_device<z80_device> m_maincpu;
 	required_device<z80_device> m_audiocpu;
-	required_device<generic_latch_8_device> m_soundlatch;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
 	// state
 	uint8_t m_main_nmi_enabled = 0;
+	uint8_t m_main_irq_enabled = 0;
 	uint8_t m_sound_nmi_enabled = 0;
 
 	INTERRUPT_GEN_MEMBER(sound_nmi_gen);
-	void vblank_main_nmi_w(int state);
+	void vblank(int state);
 
 	void io_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
@@ -155,28 +157,29 @@ void zodiack_state::nmi_mask_w(uint8_t data)
 	m_main_nmi_enabled = (data & 1) ^ 1;
 }
 
+void zodiack_state::irq_mask_w(uint8_t data)
+{
+	m_main_irq_enabled = data & 1;
+}
+
 void zodiack_state::sound_nmi_enable_w(uint8_t data)
 {
 	m_sound_nmi_enabled = data & 1;
 }
 
-void zodiack_state::vblank_main_nmi_w(int state)
+void zodiack_state::vblank(int state)
 {
 	if (state && m_main_nmi_enabled)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+
+	if (state && m_main_irq_enabled)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(zodiack_state::sound_nmi_gen)
 {
 	if (m_sound_nmi_enabled)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
-
-void zodiack_state::master_soundlatch_w(uint8_t data)
-{
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 void zodiack_state::control_w(uint8_t data)
@@ -196,10 +199,11 @@ void zodiack_state::main_map(address_map &map)
 	map(0x6082, 0x6082).portr("DSW1");
 	map(0x6083, 0x6083).portr("IN0");
 	map(0x6084, 0x6084).portr("IN1");
-	map(0x6090, 0x6090).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(zodiack_state::master_soundlatch_w));
-	map(0x7000, 0x7000).nopr().w("watchdog", FUNC(watchdog_timer_device::reset_w));  // NOP???
+	map(0x6090, 0x6090).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
+	map(0x7000, 0x7000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0x7100, 0x7100).w(FUNC(zodiack_state::nmi_mask_w));
 	map(0x7200, 0x7200).w("videopcb", FUNC(orca_ovg_40c_device::flipscreen_w));
+	map(0x8000, 0x8000).w(FUNC(zodiack_state::irq_mask_w));
 	map(0x9000, 0x903f).ram().w("videopcb", FUNC(orca_ovg_40c_device::attributes_w)).share("videopcb:attributeram");
 	map(0x9040, 0x905f).ram().share("videopcb:spriteram");
 	map(0x9060, 0x907f).ram().share("videopcb:bulletsram");
@@ -214,7 +218,7 @@ void zodiack_state::sound_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
 	map(0x4000, 0x4000).w(FUNC(zodiack_state::sound_nmi_enable_w));
-	map(0x6000, 0x6000).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+	map(0x6000, 0x6000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 }
 
 void zodiack_state::io_map(address_map &map)
@@ -226,7 +230,7 @@ void zodiack_state::io_map(address_map &map)
 
 
 static INPUT_PORTS_START( zodiack )
-	PORT_START("DSW0")      // never read in this game
+	PORT_START("DSW0") // never read in this game
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -295,10 +299,10 @@ static INPUT_PORTS_START( dogfight )
 	PORT_DIPSETTING(    0x18, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )  // most likely unused
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) // most likely unused
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  // most likely unused
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) // most likely unused
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -538,14 +542,16 @@ INPUT_PORTS_END
 
 void zodiack_state::machine_start()
 {
-	save_item(NAME(m_sound_nmi_enabled));
 	save_item(NAME(m_main_nmi_enabled));
+	save_item(NAME(m_main_irq_enabled));
+	save_item(NAME(m_sound_nmi_enabled));
 }
 
 void zodiack_state::machine_reset()
 {
-	m_sound_nmi_enabled = 0;
 	m_main_nmi_enabled = 0;
+	m_main_irq_enabled = 0;
+	m_sound_nmi_enabled = 0;
 }
 
 
@@ -555,16 +561,18 @@ void zodiack_state::zodiack(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(18'432'000) / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zodiack_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(zodiack_state::irq0_line_hold), attotime::from_hz(1 * 60)); // sound related - unknown source, timing is guessed
 
 	Z80(config, m_audiocpu, XTAL(18'432'000) / 6);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zodiack_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &zodiack_state::io_map);
 	m_audiocpu->set_periodic_int(FUNC(zodiack_state::sound_nmi_gen), attotime::from_hz(8 * 60)); // sound tempo - unknown source, timing is guessed
 
+	config.set_maximum_quantum(attotime::from_hz(600));
+
 	WATCHDOG_TIMER(config, "watchdog");
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(zodiack_state::vblank_main_nmi_w));
+	// video hardware
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(zodiack_state::vblank));
 
 	orca_ovg_40c_device &videopcb(ORCA_OVG_40C(config, "videopcb", 0));
 	videopcb.set_screen("screen");
@@ -572,7 +580,10 @@ void zodiack_state::zodiack(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
+
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	AY8910(config, "aysnd", XTAL(18'432'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
@@ -585,44 +596,53 @@ void zodiack_state::percuss(machine_config &config)
 	videopcb.set_percuss_hardware(true);
 }
 
+void zodiack_state::dogfight(machine_config &config)
+{
+	zodiack(config);
+
+	m_audiocpu->set_periodic_int(FUNC(zodiack_state::sound_nmi_gen), attotime::from_hz(4 * 60)); // 4 interrupts per frame
+}
+
+
 /***************************************************************************
 
   Game driver(s)
 
 ***************************************************************************/
+
 ROM_START( zodiack )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ovg30c.2",     0x0000, 0x2000, CRC(a2125e99) SHA1(00ae4ed2c7b6895d2dc58aa2fc51c25b6428e4ba) )
-	ROM_LOAD( "ovg30c.3",     0x2000, 0x2000, CRC(aee2b77f) SHA1(2581b7a75d38663cc5ebc91a77385ca7eb9b4aba) )
-	ROM_LOAD( "ovg30c.6",     0x4000, 0x0800, CRC(1debb278) SHA1(98c9f09c5f3125ba8a1392be62fd469aa0ba4d98) )
+	ROM_LOAD( "ovg30c.2",   0x0000, 0x2000, CRC(a2125e99) SHA1(00ae4ed2c7b6895d2dc58aa2fc51c25b6428e4ba) )
+	ROM_LOAD( "ovg30c.3",   0x2000, 0x2000, CRC(aee2b77f) SHA1(2581b7a75d38663cc5ebc91a77385ca7eb9b4aba) )
+	ROM_LOAD( "ovg30c.6",   0x4000, 0x0800, CRC(1debb278) SHA1(98c9f09c5f3125ba8a1392be62fd469aa0ba4d98) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ovg20c.1",     0x0000, 0x1000, CRC(2d3c3baf) SHA1(e32937b947e591cba45da2dd456e4f655e62ddfd) )
+	ROM_LOAD( "ovg20c.1",   0x0000, 0x1000, CRC(2d3c3baf) SHA1(e32937b947e591cba45da2dd456e4f655e62ddfd) )
 
 	ROM_REGION( 0x2800, "videopcb", 0 )
-	ROM_LOAD( "ovg40c.7",     0x0000, 0x0800, CRC(ed9d3be7) SHA1(80d5906afef8b6d68fb13d41992aea208d9e3690) )
-	ROM_LOAD( "orca40c.8",    0x0800, 0x1000, CRC(88269c94) SHA1(acc27be0d27b33c2242ecf0563fe986e8dffb264) )
-	ROM_LOAD( "orca40c.9",    0x1800, 0x1000, CRC(a3bd40c9) SHA1(dcf8cbb73c081a3af85da135e8278c54e9e0de7c) )
+	ROM_LOAD( "ovg40c.7",   0x0000, 0x0800, CRC(ed9d3be7) SHA1(80d5906afef8b6d68fb13d41992aea208d9e3690) )
+	ROM_LOAD( "orca40c.8",  0x0800, 0x1000, CRC(88269c94) SHA1(acc27be0d27b33c2242ecf0563fe986e8dffb264) )
+	ROM_LOAD( "orca40c.9",  0x1800, 0x1000, CRC(a3bd40c9) SHA1(dcf8cbb73c081a3af85da135e8278c54e9e0de7c) )
 
 	ROM_REGION( 0x0040, "videopcb:proms", 0 )
-	ROM_LOAD( "ovg40c.2a",    0x0000, 0x0020, CRC(703821b8) SHA1(33dcc9b0bea5e110eb4ffd3b8b8763e32e927b22) )
-	ROM_LOAD( "ovg40c.2b",    0x0020, 0x0020, CRC(21f77ec7) SHA1(b1019afc4361aca98b7120b21743bfeb5ea2ff63) )
+	ROM_LOAD( "ovg40c.2a",  0x0000, 0x0020, CRC(703821b8) SHA1(33dcc9b0bea5e110eb4ffd3b8b8763e32e927b22) )
+	ROM_LOAD( "ovg40c.2b",  0x0020, 0x0020, CRC(21f77ec7) SHA1(b1019afc4361aca98b7120b21743bfeb5ea2ff63) )
 ROM_END
 
 ROM_START( dogfight )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "df-2.4f",      0x0000, 0x2000, CRC(ad24b28b) SHA1(5bfc24c9d176a987525c5ad3eff3308f679d4d44) )
-	ROM_LOAD( "df-3.4h",      0x2000, 0x2000, CRC(cd172707) SHA1(9d7a494006db13cbe9c895875a18d9423a0128bc) )
-	ROM_LOAD( "df-5.4n",      0x4000, 0x1000, CRC(874dc6bf) SHA1(2c34fdfb2838c41f239171bc9a14a5cc7a94a170) )
-	ROM_LOAD( "df-4.4m",      0xc000, 0x1000, CRC(d8aa3d6d) SHA1(0863d566ff4a181ae8a8d552f9768dd028254605) )
+	ROM_LOAD( "df-2.4f",    0x0000, 0x2000, CRC(ad24b28b) SHA1(5bfc24c9d176a987525c5ad3eff3308f679d4d44) )
+	ROM_LOAD( "df-3.4h",    0x2000, 0x2000, CRC(cd172707) SHA1(9d7a494006db13cbe9c895875a18d9423a0128bc) )
+	ROM_LOAD( "df-5.4n",    0x4000, 0x1000, CRC(874dc6bf) SHA1(2c34fdfb2838c41f239171bc9a14a5cc7a94a170) )
+	ROM_LOAD( "df-4.4m",    0xc000, 0x1000, CRC(d8aa3d6d) SHA1(0863d566ff4a181ae8a8d552f9768dd028254605) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "df-1.4n",      0x0000, 0x1000, CRC(dcbb1c5b) SHA1(51fa51ff64982455b00484d55f6a8cf89fc786f1) )
+	ROM_LOAD( "df-1.4n",    0x0000, 0x1000, CRC(dcbb1c5b) SHA1(51fa51ff64982455b00484d55f6a8cf89fc786f1) )
 
 	ROM_REGION( 0x2800, "videopcb", 0 )
-	ROM_LOAD( "df-6.3s",      0x0000, 0x0800, CRC(3059b515) SHA1(849e99a04ddcdfcf097cc3ac17e9edf12b51cd69) )
-	ROM_LOAD( "df-7.7n",      0x0800, 0x1000, CRC(ffe05fee) SHA1(70b9d0808defd936e2c3567f8e6996a19753de81) )
-	ROM_LOAD( "df-8.7r",      0x1800, 0x1000, CRC(2cb51793) SHA1(d90177ef28730774202a04a0846281537a1883df) )
+	ROM_LOAD( "df-6.3s",    0x0000, 0x0800, CRC(3059b515) SHA1(849e99a04ddcdfcf097cc3ac17e9edf12b51cd69) )
+	ROM_LOAD( "df-7.7n",    0x0800, 0x1000, CRC(ffe05fee) SHA1(70b9d0808defd936e2c3567f8e6996a19753de81) )
+	ROM_LOAD( "df-8.7r",    0x1800, 0x1000, CRC(2cb51793) SHA1(d90177ef28730774202a04a0846281537a1883df) )
 
 	ROM_REGION( 0x0040, "videopcb:proms", 0 )
 	ROM_LOAD( "mmi6331.2a", 0x0000, 0x0020, CRC(69a35aa5) SHA1(fe494ed1ff642f95834dfca92e9c4494e04f7b81) )
@@ -631,21 +651,21 @@ ROM_END
 
 ROM_START( moguchan )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2.5r",         0x0000, 0x1000, CRC(85d0cb7e) SHA1(20066f71d80161dff556bc86edf40fcc2ac3b993) )
-	ROM_LOAD( "4.5m",         0x1000, 0x1000, CRC(359ef951) SHA1(93e80fcd371e8d2026919d0e046b636b7c19002e) )
-	ROM_LOAD( "3.5np",        0x2000, 0x1000, CRC(c8776f77) SHA1(edc28a6a804b9573307faa25b6fdd096b7093593) )
+	ROM_LOAD( "2.5r",        0x0000, 0x1000, CRC(85d0cb7e) SHA1(20066f71d80161dff556bc86edf40fcc2ac3b993) )
+	ROM_LOAD( "4.5m",        0x1000, 0x1000, CRC(359ef951) SHA1(93e80fcd371e8d2026919d0e046b636b7c19002e) )
+	ROM_LOAD( "3.5np",       0x2000, 0x1000, CRC(c8776f77) SHA1(edc28a6a804b9573307faa25b6fdd096b7093593) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "1.7hj",        0x0000, 0x1000, CRC(1a88d35f) SHA1(d9347723c0eb6508739a6c0de4984b8244b197cf) )
+	ROM_LOAD( "1.7hj",       0x0000, 0x1000, CRC(1a88d35f) SHA1(d9347723c0eb6508739a6c0de4984b8244b197cf) )
 
 	ROM_REGION( 0x2800, "videopcb", 0 )
-	ROM_LOAD( "5.4r",         0x0000, 0x0800, CRC(1b7febd8) SHA1(4f9ce99f05e6e207bb91f831b6bee7cf72b3d05b) )
-	ROM_LOAD( "6.7p",         0x0800, 0x1000, CRC(c8060ffe) SHA1(f1f975c2638e6cdf00af4a96591529c7b6684742) )
-	ROM_LOAD( "7.7m",         0x1800, 0x1000, CRC(bfca00f4) SHA1(797b07bab2467fe00cd85cd4477db2367a3e5a40) )
+	ROM_LOAD( "5.4r",        0x0000, 0x0800, CRC(1b7febd8) SHA1(4f9ce99f05e6e207bb91f831b6bee7cf72b3d05b) )
+	ROM_LOAD( "6.7p",        0x0800, 0x1000, CRC(c8060ffe) SHA1(f1f975c2638e6cdf00af4a96591529c7b6684742) )
+	ROM_LOAD( "7.7m",        0x1800, 0x1000, CRC(bfca00f4) SHA1(797b07bab2467fe00cd85cd4477db2367a3e5a40) )
 
 	ROM_REGION( 0x0040, "videopcb:proms", 0 )
-	ROM_LOAD( "moguchan.2a",  0x0000, 0x0020, CRC(e83daab3) SHA1(58b38091dfbc3f3b4ddf6c6febd98c909be89063) )
-	ROM_LOAD( "moguchan.2b",  0x0020, 0x0020, CRC(9abfdf40) SHA1(44c4dcdd3d79af2c4a897cc003b5287dece0313e) )
+	ROM_LOAD( "moguchan.2a", 0x0000, 0x0020, CRC(e83daab3) SHA1(58b38091dfbc3f3b4ddf6c6febd98c909be89063) )
+	ROM_LOAD( "moguchan.2b", 0x0020, 0x0020, CRC(9abfdf40) SHA1(44c4dcdd3d79af2c4a897cc003b5287dece0313e) )
 ROM_END
 
 ROM_START( percuss )
@@ -687,8 +707,8 @@ ROM_START( bounty )
 	ROM_LOAD( "6.7p",      0x1800, 0x1000, CRC(43183301) SHA1(9df89479396d7847ee3325649d7264e75d413add) )
 
 	ROM_REGION( 0x0040, "videopcb:proms", 0 )
-	ROM_LOAD( "mb7051.2a",   0x0000, 0x0020, CRC(0de11a46) SHA1(3bc81571832dd78b29654e86479815ee5f97a4d3) )
-	ROM_LOAD( "mb7051.2b",   0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
+	ROM_LOAD( "mb7051.2a", 0x0000, 0x0020, CRC(0de11a46) SHA1(3bc81571832dd78b29654e86479815ee5f97a4d3) )
+	ROM_LOAD( "mb7051.2b", 0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
 ROM_END
 
 ROM_START( bounty2 ) // The PCB uses a large CPU epoxy module marked "CPU PACKII". A battery can be spotted through the epoxy.
@@ -708,16 +728,16 @@ ROM_START( bounty2 ) // The PCB uses a large CPU epoxy module marked "CPU PACKII
 	ROM_LOAD( "6.7p",      0x1800, 0x1000, CRC(43183301) SHA1(9df89479396d7847ee3325649d7264e75d413add) )
 
 	ROM_REGION( 0x0040, "videopcb:proms", 0 )
-	ROM_LOAD( "mb7051.2a",   0x0000, 0x0020, CRC(0de11a46) SHA1(3bc81571832dd78b29654e86479815ee5f97a4d3) )
-	ROM_LOAD( "mb7051.2b",   0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
+	ROM_LOAD( "mb7051.2a", 0x0000, 0x0020, CRC(0de11a46) SHA1(3bc81571832dd78b29654e86479815ee5f97a4d3) )
+	ROM_LOAD( "mb7051.2b", 0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 1983, zodiack,  0,      zodiack, zodiack,  zodiack_state, empty_init, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
-GAME( 1983, dogfight, 0,      zodiack, dogfight, zodiack_state, empty_init, ROT270, "Orca / Thunderbolt",                    "Dog Fight (Thunderbolt)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
-GAME( 1982, moguchan, 0,      percuss, moguchan, zodiack_state, empty_init, ROT270, "Orca (Eastern Commerce Inc. license)",  "Mogu Chan (bootleg?)",    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
-GAME( 1981, percuss,  0,      percuss, percuss,  zodiack_state, empty_init, ROT270, "Orca",                                  "The Percussor",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bounty,   0,      percuss, bounty,   zodiack_state, empty_init, ROT180, "Orca",                                  "The Bounty (set 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bounty2,  bounty, percuss, bounty,   zodiack_state, empty_init, ROT180, "Orca",                                  "The Bounty (set 2)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // seems to use a different memory map
+GAME( 1983, zodiack,  0,      zodiack,  zodiack,  zodiack_state, empty_init, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack",                 MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // bullet color needs to be verified
+GAME( 1983, dogfight, 0,      dogfight, dogfight, zodiack_state, empty_init, ROT270, "Orca / Thunderbolt",                    "Dog Fight (Thunderbolt)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, moguchan, 0,      percuss,  moguchan, zodiack_state, empty_init, ROT270, "Orca (Eastern Commerce Inc. license)",  "Mogu Chan (bootleg?)",    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // license copyright taken from ROM string at $0b5c
+GAME( 1981, percuss,  0,      percuss,  percuss,  zodiack_state, empty_init, ROT270, "Orca",                                  "The Percussor",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bounty,   0,      percuss,  bounty,   zodiack_state, empty_init, ROT180, "Orca",                                  "The Bounty (set 1)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bounty2,  bounty, percuss,  bounty,   zodiack_state, empty_init, ROT180, "Orca",                                  "The Bounty (set 2)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // seems to use a different memory map
