@@ -570,7 +570,7 @@ static INPUT_PORTS_START( fever13 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ukiyobx )
+static INPUT_PORTS_START( ukiyobox )
 	PORT_INCLUDE( fever13 )
 
 	PORT_MODIFY("DSW4")
@@ -721,8 +721,9 @@ ROM_START( fever13 )
 	ROM_LOAD( "2.u60", 0x00000, 0x80000, CRC(4e0da568) SHA1(6cd4d3facf8f05747d6cff03617bdfc91b5e9d67) )
 ROM_END
 
+// 浮世箱
 // ES-9410 PCB
-ROM_START( ukiyobx )
+ROM_START( ukiyobox )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "5-9d33.u9", 0x00000, 0x40000,CRC(6a567f55) SHA1(087579e420d581439788561abddfe42fdeaaaa88) )
 
@@ -762,5 +763,5 @@ ROM_END
 
 GAME( 1994, lastbank, 0,       lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1995, fever13,  0,       lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1995, ukiyobx,  fever13, lastbank, ukiyobx,  fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1995, ukiyobox, fever13, lastbank, ukiyobox, fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1996, mir7hg,   0,       lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
