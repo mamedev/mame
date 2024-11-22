@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 #include "emu.h"
+#include "emuopts.h"
+
 #include "bus/nscsi/cd.h"
 
 #include "coreutil.h"
@@ -20,6 +22,19 @@ DEFINE_DEVICE_TYPE(NSCSI_XM5401SUN, nscsi_toshiba_xm5401_sun_device, "nxm5401sun
 DEFINE_DEVICE_TYPE(NSCSI_XM5701, nscsi_toshiba_xm5701_device, "nxm5701", "XM-5701B 12x CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM5701SUN, nscsi_toshiba_xm5701_sun_device, "nxm5701sun", "XM-5701B Sun 12x CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_APPLE, nscsi_cdrom_apple_device, "scsi_cdrom_apple", "Apple SCSI CD-ROM")
+
+// ZuluSCSI/BlueSCSI toolbox commands.  All are 10 bytes as of protocol version 0.
+static constexpr uint8_t TOOLBOX_LIST_FILES     = 0xd0;
+static constexpr uint8_t TOOLBOX_GET_FILE       = 0xd1;
+static constexpr uint8_t TOOLBOX_COUNT_FILES    = 0xd2;
+static constexpr uint8_t TOOLBOX_SEND_FILE_PREP = 0xd3;
+static constexpr uint8_t TOOLBOX_SEND_FILE_10   = 0xd4;
+static constexpr uint8_t TOOLBOX_SEND_FILE_END  = 0xd5;
+static constexpr uint8_t TOOLBOX_TOGGLE_DEBUG   = 0xd6;
+static constexpr uint8_t TOOLBOX_LIST_CDS       = 0xd7;
+static constexpr uint8_t TOOLBOX_SET_NEXT_CD    = 0xd8;
+static constexpr uint8_t TOOLBOX_LIST_DEVICES   = 0xd9;
+static constexpr uint8_t TOOLBOX_COUNT_CDS      = 0xda;
 
 nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_cdrom_device(mconfig, NSCSI_CDROM, tag, owner, "Sony", "CDU-76S", "1.0", 0x00, 0x05)
@@ -94,11 +109,17 @@ void nscsi_cdrom_device::device_start()
 {
 	nscsi_full_device::device_start();
 
+	m_xfer_buffer.resize(8192);
+
 	save_item(NAME(sector_buffer));
 	save_item(NAME(lba));
 	save_item(NAME(cur_sector));
 	save_item(NAME(bytes_per_block));
 	save_item(NAME(mode_data_size));
+	save_item(NAME(m_xfer_position));
+	save_item(NAME(m_write_length));
+	save_item(NAME(m_write_offset));
+	save_item(NAME(m_write_is_setup));
 }
 
 void nscsi_cdrom_device::device_reset()
@@ -137,11 +158,26 @@ void nscsi_cdrom_device::set_block_size(u32 block_size)
 	bytes_per_block = block_size;
 };
 
+bool nscsi_cdrom_device::scsi_command_done(uint8_t command, uint8_t length)
+{
+	switch (command & 0xd0)
+	{
+	case 0xd0:  // ZuluSCSI/BlueSCSI toolbox commands
+		return length == 10;
+
+	default:
+		return nscsi_full_device::scsi_command_done(command, length);
+	}
+}
 
 uint8_t nscsi_cdrom_device::scsi_get_data(int id, int pos)
 {
+	if (id == 4)
+		return m_xfer_buffer[m_xfer_position++];
+
 	if(id != 2)
 		return nscsi_full_device::scsi_get_data(id, pos);
+
 	const int sector = (lba * bytes_per_block + pos) / bytes_per_sector;
 	const int extra_pos = (lba * bytes_per_block) % bytes_per_sector;
 	if(sector != cur_sector) {
@@ -156,6 +192,45 @@ uint8_t nscsi_cdrom_device::scsi_get_data(int id, int pos)
 
 void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
 {
+	if (id == 4) {
+		m_xfer_buffer[m_xfer_position] = data;
+		m_xfer_position++;
+		if (m_write_is_setup) {
+			if (m_xfer_position == 33) {
+				osd_file::ptr file;
+				uint64_t filesize;
+				m_write_path.clear();
+				m_write_path = machine().options().share_directory();
+				m_write_path.append(PATH_SEPARATOR);
+				m_write_path.append((char *)&m_xfer_buffer[0]);
+				if (osd_file::open(m_write_path, OPEN_FLAG_CREATE | OPEN_FLAG_WRITE, file, filesize)) {
+					LOG("Open for write/creation failed for [%s]\n", m_write_path.c_str());
+					scsi_status_complete(SS_CHECK_CONDITION);
+					sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+					return;
+				}
+			}
+		}
+		else
+		{
+			if (m_xfer_position == m_write_length) {
+				uint32_t actualWritten;
+				osd_file::ptr file;
+				uint64_t filesize;
+
+				LOG("flushing [%s] to disk at %08x\n", m_write_path.c_str(), m_write_offset * 512);
+				osd_file::open(m_write_path, OPEN_FLAG_WRITE, file, filesize);
+				file->write(&m_xfer_buffer[0], m_write_offset * 512, m_write_length, actualWritten);
+
+				if (actualWritten != m_write_length) {
+					scsi_status_complete(SS_CHECK_CONDITION);
+					sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+				}
+			}
+		}
+		return;
+	}
+
 	if(id != 2) {
 		nscsi_full_device::scsi_put_data(id, pos, data);
 		return;
@@ -186,6 +261,32 @@ void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
 					break;
 			}
 		}
+	}
+}
+
+void nscsi_cdrom_device::update_directory()
+{
+	std::string tmpPath(machine().options().share_directory());
+	osd::directory::ptr directory = osd::directory::open(tmpPath);
+
+	m_directory.clear();
+
+	if (directory != nullptr)
+	{
+		const osd::directory::entry *ourEntry;
+
+		while ((ourEntry = directory->read()) != nullptr)
+		{
+			m_directory.push_back(*ourEntry);
+
+			// API version 0 has a hard cap of 100 files
+			if (m_directory.size() >= 99)
+			{
+				break;
+			}
+		}
+
+		directory.reset();
 	}
 }
 
@@ -392,23 +493,27 @@ void nscsi_cdrom_device::scsi_command()
 			return;
 		}
 
-		int page = scsi_cmdbuf[2] & 0x3f;
-		int size = scsi_cmdbuf[4];
+		const int page = scsi_cmdbuf[2] & 0x3f;
+		const int size = scsi_cmdbuf[4];
+		const bool noBlockDesc = BIT(scsi_cmdbuf[1], 3);
 		int pos = 1;
 		scsi_cmdbuf[pos++] = 0x00; // medium type
 		scsi_cmdbuf[pos++] = 0x80; // WP, cache
 
 		// get the last used block on the disc
 		const u32 temp = image->exists() ? image->get_track_start(0xaa) * (bytes_per_sector / bytes_per_block) - 1 : 0;
-		scsi_cmdbuf[pos++] = 0x08; // Block descriptor length
+		scsi_cmdbuf[pos++] = noBlockDesc ? 0x00 : 0x08; // 0 or 8 bytes of block descriptor
 
-		scsi_cmdbuf[pos++] = 0x00; // density code
-		put_u24be(&scsi_cmdbuf[pos], temp);
-		pos += 3;
-		scsi_cmdbuf[pos++] = 0;
-		scsi_cmdbuf[pos++] = 0;
-		put_u16be(&scsi_cmdbuf[pos], bytes_per_block);
-		pos += 2;
+		if (!noBlockDesc)
+		{
+			scsi_cmdbuf[pos++] = 0x00; // density code
+			put_u24be(&scsi_cmdbuf[pos], temp);
+			pos += 3;
+			scsi_cmdbuf[pos++] = 0;
+			scsi_cmdbuf[pos++] = 0;
+			put_u16be(&scsi_cmdbuf[pos], bytes_per_block);
+			pos += 2;
+		}
 
 		bool fail = false;
 		int pmax = page == 0x3f ? 0x3e : page;
@@ -491,20 +596,38 @@ void nscsi_cdrom_device::scsi_command()
 				}
 				break;
 
-			default:
-				if (page != 0x3f) {
-					LOG("mode sense page %02x unhandled\n", p);
-					fail = true;
+			case 0x31: // magic BlueSCSI page; official clients require this to recognize a toolbox-capable device
+				{
+					// Yes this is lame for a GPLv3 project.
+					static const u8 bluescsi_magic[] =
+					{
+						"BlueSCSI is the BEST STOLEN FROM BLUESCSI\0"
+					};
+
+					scsi_cmdbuf[pos++] = 0x31; // page ID
+					scsi_cmdbuf[pos++] = 42;   // page length
+					memcpy(&scsi_cmdbuf[pos], bluescsi_magic, 42);
+					pos += 42;
 				}
 				break;
+
+				default:
+					if (page != 0x3f)
+					{
+						LOG("mode sense page %02x unhandled\n", p);
+						fail = true;
+					}
+					break;
 			}
 		}
-		scsi_cmdbuf[0] = pos;
-		if(pos > size)
-			pos = size;
+		scsi_cmdbuf[0] = pos - 1;   // return -1 for mode sense 6
 
 		if (!fail) {
-			scsi_data_in(0, pos);
+			if (size < pos)
+				scsi_data_in(0, size);
+			else
+				scsi_data_in(0, pos);
+
 			scsi_status_complete(SS_GOOD);
 		} else {
 			scsi_status_complete(SS_CHECK_CONDITION);
@@ -799,6 +922,124 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
+	case TOOLBOX_COUNT_FILES:
+		LOG("TOOLBOX_COUNT_FILES\n");
+
+		update_directory();
+
+		scsi_cmdbuf[0] = m_directory.size();
+		scsi_data_in(0, 1);
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	case TOOLBOX_LIST_FILES:
+	{
+		LOG("TOOLBOX_LIST_FILES\n");
+
+		// it's assumed clients will always do COUNT_FILES before LIST_FILES, because otherwise
+		// they'll have no idea how much data is coming.
+		int pos = 0;
+		int index = 0;
+
+		if (m_directory.size() > 0)
+		{
+			while (index < m_directory.size())
+			{
+				scsi_cmdbuf[pos] = index;
+				scsi_cmdbuf[pos + 1] = m_directory[index].type != osd::directory::entry::entry_type::DIR;
+				// There's a guaranteed null terminator one byte after the name field
+				strncpy(reinterpret_cast<char *>(&scsi_cmdbuf[pos + 2]), m_directory[index].name, 31);
+				scsi_cmdbuf[pos + 36] = (m_directory[index].size >> 24) & 0xff;
+				scsi_cmdbuf[pos + 37] = (m_directory[index].size >> 16) & 0xff;
+				scsi_cmdbuf[pos + 38] = (m_directory[index].size >> 8) & 0xff;
+				scsi_cmdbuf[pos + 39] = m_directory[index].size & 0xff;
+
+				LOG("%02d: %s %08x\n", index, m_directory[index].name, (uint32_t)m_directory[index].size);
+
+				index++;
+				pos += 40;
+			}
+		}
+
+		scsi_data_in(0, pos);
+		scsi_status_complete(SS_GOOD);
+		break;
+	}
+
+	case TOOLBOX_GET_FILE:
+	{
+		update_directory();
+
+		if (scsi_cmdbuf[1] >= m_directory.size())
+		{
+			LOG("TOOLBOX_GET_FILE: out of range file %d, %d available\n", scsi_cmdbuf[1], (int)m_directory.size());
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+			return;
+		}
+
+		uint32_t offset = scsi_cmdbuf[2] << 24 | scsi_cmdbuf[3] << 16 | scsi_cmdbuf[4] << 8 | scsi_cmdbuf[5];
+		LOG("TOOLBOX_GET_FILE: file # %d (%s), offset %08x\n", scsi_cmdbuf[1], m_directory[scsi_cmdbuf[1]].name, offset);
+
+		std::string tmpPath(machine().options().share_directory());
+		tmpPath.append(PATH_SEPARATOR);
+		tmpPath.append(m_directory[scsi_cmdbuf[1]].name);
+
+		osd_file::ptr file;
+		u64 size;
+		if (osd_file::open(tmpPath, OPEN_FLAG_READ, file, size))
+		{
+			LOG("Open failed for [%s]\n", tmpPath.c_str());
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+			return;
+		}
+		u32 actualRead;
+		file->read(&m_xfer_buffer[0], offset * 4096, 4096, actualRead);
+
+		if (actualRead == 0)
+		{
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+			return;
+		}
+
+		m_xfer_position = 0;
+		scsi_data_in(4, actualRead);
+		scsi_status_complete(SS_GOOD);
+		break;
+	}
+
+	case TOOLBOX_SEND_FILE_PREP:
+		LOG("TOOLBOX_SEND_FILE_PREP\n");
+		m_xfer_position = 0;
+		m_write_is_setup = true;
+		scsi_data_out(4, 33);
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	case TOOLBOX_SEND_FILE_10:
+		m_xfer_position = 0;
+		m_write_is_setup = false;
+		m_write_length = scsi_cmdbuf[1] << 8 | scsi_cmdbuf[2];
+		m_write_offset = scsi_cmdbuf[3] << 16 | scsi_cmdbuf[4] << 8 | scsi_cmdbuf[5];
+		LOG("TOOLBOX_SEND_FILE_10 offset %08x len %04x\n", m_write_offset, m_write_length);
+		scsi_data_out(4, m_write_length);
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	case TOOLBOX_SEND_FILE_END:
+		LOG("TOOLBOX_SEND_FILE_END\n");
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	case TOOLBOX_COUNT_CDS:
+		LOG("TOOLBOX_COUNT_CDS\n");
+		scsi_cmdbuf[0] = 0;
+		scsi_data_in(0, 1);
+		scsi_status_complete(SS_GOOD);
+		break;
+
 	default:
 		nscsi_full_device::scsi_command();
 		break;
@@ -857,7 +1098,7 @@ bool nscsi_cdrom_sgi_device::scsi_command_done(uint8_t command, uint8_t length)
 		return length == 10;
 
 	default:
-		return nscsi_full_device::scsi_command_done(command, length);
+		return nscsi_cdrom_device::scsi_command_done(command, length);
 	}
 }
 
@@ -1481,7 +1722,7 @@ bool nscsi_cdrom_apple_device::scsi_command_done(uint8_t command, uint8_t length
 			return length == 10;
 
 		default:
-			return nscsi_full_device::scsi_command_done(command, length);
+			return nscsi_cdrom_device::scsi_command_done(command, length);
 	}
 }
 
