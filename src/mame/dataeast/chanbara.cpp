@@ -48,8 +48,7 @@ TODO:
 - Verify what happens if you skip an enemy, on MAME the next one may appear out of
   thin air. MAME previously showed garbage sprites moving fast to the left and later
   changing into an enemy character, disable the (~attr & 0x01) check to see.
-- Verify if YM2203 RD is connected. If it is, it waits too long checking the busy flag,
-  while it already does soft-delays itself. This would cause too slow BGM tempo.
+- BGM tempo is too slow, what is it caused by? See https://mametesters.org/view.php?id=8024
 
 BTANB:
 - on enemies that hide behind the roof on the 3rd level, their feet are visible below
@@ -189,7 +188,7 @@ void chanbara_state::draw_sprites(screen_device &screen, bitmap_ind16& bitmap, c
 		int sx = (240 - m_spriteram[offs + 3]) & 0xff;
 		int sy = (240 - m_spriteram[offs + 2]) & 0xff;
 
-		// invalid?
+		// disabled?
 		if (~attr & 0x01)
 			continue;
 
@@ -252,7 +251,7 @@ void chanbara_state::prg_map(address_map &map)
 	map(0x2001, 0x2001).portr("SYSTEM");
 	map(0x2002, 0x2002).portr("P2");
 	map(0x2003, 0x2003).portr("P1");
-	map(0x3800, 0x3801).w("ymsnd", FUNC(ym2203_device::write)).nopr();
+	map(0x3800, 0x3801).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x4000, 0x7fff).bankr(m_rombank);
 	map(0x8000, 0xffff).rom();
 }

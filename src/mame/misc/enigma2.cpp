@@ -731,7 +731,7 @@ void enigma2_state::enigma2(machine_config &config)
 	Z80(config, m_audiocpu, CPU_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
 
-	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
+	config.set_maximum_quantum(attotime::from_hz(m_audiocpu->clock() / 4));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -760,7 +760,7 @@ void enigma2_state::enigma2a(machine_config &config)
 	Z80(config, m_audiocpu, CPU_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
 
-	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
+	config.set_maximum_quantum(attotime::from_hz(m_audiocpu->clock() / 4));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
