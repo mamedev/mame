@@ -960,10 +960,10 @@ void rom_load_manager::fill_rom_data(memory_region &region, const rom_entry *rom
     copy_rom_data - copy a region of ROM space
 -------------------------------------------------*/
 
-void rom_load_manager::copy_rom_data(memory_region &region, const rom_entry *romp)
+void rom_load_manager::copy_rom_data(device_t &device, memory_region &region, const rom_entry *romp)
 {
 	u8 *base = region.base() + ROM_GETOFFSET(romp);
-	const std::string srcrgntag = region.sibling(romp->name());
+	const std::string srcrgntag = device.subtag(romp->name());
 	u32 numbytes = ROM_GETLENGTH(romp);
 	u32 srcoffs = u32(strtol(romp->hashdata().c_str(), nullptr, 0));  /* srcoffset in place of hashdata */
 
@@ -995,6 +995,7 @@ void rom_load_manager::copy_rom_data(memory_region &region, const rom_entry *rom
 -------------------------------------------------*/
 
 void rom_load_manager::process_rom_entries(
+		device_t &device,
 		const std::vector<std::string> &searchpath,
 		u8 bios,
 		memory_region &region,
@@ -1028,7 +1029,7 @@ void rom_load_manager::process_rom_entries(
 		}
 		else if (ROMENTRY_ISCOPY(romp))
 		{
-			copy_rom_data(region, romp++);
+			copy_rom_data(device, region, romp++);
 		}
 		else if (ROMENTRY_ISFILE(romp))
 		{
@@ -1437,7 +1438,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		// now process the entries in the region
 		if (ROMREGION_ISROMDATA(region))
 		{
-			process_rom_entries(swsearch, 0U, *memregion, region, region + 1, true);
+			process_rom_entries(device, swsearch, 0U, *memregion, region, region + 1, true);
 		}
 		else if (ROMREGION_ISDISKDATA(region))
 		{
@@ -1510,7 +1511,7 @@ void rom_load_manager::process_region_list()
 				if (searchpath.empty())
 					searchpath = device.searchpath();
 				assert(!searchpath.empty());
-				process_rom_entries(searchpath, device.system_bios(), *memregion, region, region + 1, false);
+				process_rom_entries(device, searchpath, device.system_bios(), *memregion, region, region + 1, false);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
 			{

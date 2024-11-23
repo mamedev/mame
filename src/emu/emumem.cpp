@@ -1077,64 +1077,6 @@ memory_region::memory_region(running_machine &machine, std::string name, u32 len
 	assert(width == 1 || width == 2 || width == 4 || width == 8);
 }
 
-std::string memory_region::sibling(std::string_view tag) const
-{
-	std::string result;
-	if (!tag.empty() && (tag[0] == ':'))
-	{
-		// if the tag begins with a colon, ignore our path and start from the root
-		tag.remove_prefix(1);
-		result.assign(":");
-	}
-	else
-	{
-		// otherwise, start relative to current path
-		std::string::size_type lastcolon = m_name.find_last_of(':');
-		if (lastcolon != std::string::npos)
-			result.assign(m_name, 0, lastcolon + 1);
-	}
-
-	// iterate over the tag, look for special path characters to resolve
-	std::string_view::size_type delimiter;
-	while ((delimiter = tag.find_first_of("^:")) != std::string_view::npos)
-	{
-		// copy everything up to there
-		bool const parent = tag[delimiter] == '^';
-		result.append(tag, 0, delimiter);
-		tag.remove_prefix(delimiter + 1);
-
-		if (parent)
-		{
-			// strip trailing colons
-			std::string::size_type len = result.length();
-			while ((len > 1) && (result[--len] == ':'))
-				result.resize(len);
-
-			// remove the last path part, leaving the last colon
-			if (result != ":")
-			{
-				std::string::size_type lastcolon = result.find_last_of(':');
-				if (lastcolon != std::string::npos)
-					result.resize(lastcolon + 1);
-			}
-		}
-		else
-		{
-			// collapse successive colons
-			if (result.back() != ':')
-				result.append(1, ':');
-			delimiter = tag.find_first_not_of(':');
-			if (delimiter != std::string_view::npos)
-				tag.remove_prefix(delimiter);
-		}
-	}
-
-	// copy everything else
-	result.append(tag);
-
-	return result;
-}
-
 std::string memory_share::compare(u8 width, size_t bytes, endianness_t endianness) const
 {
 	if (width != m_bitwidth)

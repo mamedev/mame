@@ -201,8 +201,8 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void dorunrun(machine_config &config);
-	void docastle(machine_config &config);
+	void dorunrun(machine_config &config) ATTR_COLD;
+	void docastle(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -266,7 +266,7 @@ public:
 		m_adpcm_rom(*this, "adpcm")
 	{ }
 
-	void idsoccer(machine_config &config);
+	void idsoccer(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

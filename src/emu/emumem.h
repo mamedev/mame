@@ -2589,7 +2589,6 @@ public:
 	u8 *end() { return base() + m_buffer.size(); }
 	u32 bytes() const { return m_buffer.size(); }
 	const std::string &name() const { return m_name; }
-	std::string sibling(std::string_view tag) const;
 
 	// flag expansion
 	endianness_t endianness() const { return m_endianness; }
