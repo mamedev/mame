@@ -2142,8 +2142,8 @@ Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually B
 	<software name="educati4">
 		<description>Éducatif 4 - Mathasard</description>
 		<year>1985</year>
-		<info name="author" value="Jean Biron, Jérôme Gelin"/>
 		<publisher>Cobrasoft</publisher>
+		<info name="author" value="Jean Biron, Jérôme Gelin"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="18806">
@@ -2155,8 +2155,8 @@ Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually B
 	<software name="educati5">
 		<description>Éducatif 5 - Ortho-Repère</description>
 		<year>1985</year>
-		<info name="author" value="Frank Megel, H. Letzelter"/>
 		<publisher>Cobrasoft</publisher>
+		<info name="author" value="Frank Megel, H. Letzelter"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="16131">
@@ -2168,8 +2168,8 @@ Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually B
 	<software name="educati8">
 		<description>Éducatif 8 - Cours'Auto</description>
 		<year>1986</year>
-		<info name="author" value="Jean-Pierre Latuilliere"/>
 		<publisher>Cobrasoft</publisher>
+		<info name="author" value="Jean-Pierre Latuilliere"/>
 
 		<part name="cass1" interface="to_cass">
 			<dataarea name="cass" size="11871">

@@ -13923,9 +13923,9 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 	<software name="lorann">
 		<description>Lorann</description>
 		<year>1985</year>
+		<publisher>Loriciels</publisher>
 		<info name="developer" value="Novasoft"/>
 		<info name="notice" value="COPYRIGHT LORICIELS Octobre 1985"/>
-		<publisher>Loriciels</publisher>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="38582">
@@ -13937,8 +13937,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 	<software name="loranna" cloneof="lorann">
 		<description>Lorann (alt)</description>
 		<year>1985</year>
-		<info name="developer" value="Novasoft"/>
 		<publisher>Loriciels</publisher>
+		<info name="developer" value="Novasoft"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="38582">
@@ -13950,8 +13950,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 	<software name="lorannb" cloneof="lorann">
 		<description>Lorann (alt 2)</description>
 		<year>1985</year>
-		<info name="developer" value="Novasoft"/>
 		<publisher>Loriciels</publisher>
+		<info name="developer" value="Novasoft"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="38582">
@@ -13963,8 +13963,8 @@ Commercial MO5 software was typically released on the B-sides of TO7 cassettes (
 	<software name="lorannc" cloneof="lorann">
 		<description>Lorann (alt 3)</description>
 		<year>1985</year>
-		<info name="developer" value="Novasoft"/>
 		<publisher>Loriciels</publisher>
+		<info name="developer" value="Novasoft"/>
 
 		<part name="cass1" interface="mo_cass">
 			<dataarea name="cass" size="38582">
