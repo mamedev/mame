@@ -1239,7 +1239,8 @@ namespace
 	ROM_START(nws831)
 		ROM_REGION32_BE(0x10000, "eprom", 0)
 		ROM_SYSTEM_BIOS(0, "nws831", "SONY NET WORK STATION monitor Release 2.1")
-		ROMX_LOAD("nws831-ver2p1.bin", 0x00000, 0x10000, CRC(fb4aebcf) SHA1(312eac9833b3ebce25382e80d4e2bdf273017358), ROM_BIOS(0))
+		ROM_LOAD16_BYTE("nws831-mbm27c256-ver2p1-h.bin", 0x0000, 0x8000, CRC(11e23140) SHA1(8c87a6198f918a69f611ff7be6497552ead67b31))
+		ROM_LOAD16_BYTE("nws831-mbm27c256-ver2p1-l.bin", 0x0001, 0x8000, CRC(1ea72294) SHA1(e7edfad08e46b7dbcca5279457901ba83fbf481f))
 	ROM_END
 
 } // anonymous namespace
