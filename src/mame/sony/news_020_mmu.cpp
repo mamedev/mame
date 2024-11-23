@@ -37,6 +37,11 @@ void news_020_mmu_device::set_rom_enable(bool enabled)
 	m_romdis = !enabled;
 }
 
+void news_020_mmu_device::clear_entries(offs_t offset, uint8_t data)
+{
+	(offset & 0x10000000) ?	clear_kernel_entries() : clear_user_entries();
+}
+
 void news_020_mmu_device::clear_user_entries()
 {
 	LOGMASKED(LOG_ENTRY, "(%s) MMU clearing user entries\n", machine().describe_context());

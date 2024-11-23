@@ -717,8 +717,7 @@ namespace
 
 		// MMU mapping control
 		map(0x06000000, 0x061fffff).rw(m_mmu, FUNC(news_020_mmu_device::mmu_entry_r), FUNC(news_020_mmu_device::mmu_entry_w)).select(0x10000000); // MMU map RAM
-		map(0x04c00000, 0x04c00000).lw8([this](offs_t offset) { m_mmu->clear_user_entries(); }, "MMU_USR_CLR");
-		map(0x14c00000, 0x14c00000).lw8([this](offs_t offset) { m_mmu->clear_kernel_entries(); }, "MMU_SYS_CLR"); // TODO: the 0x1... here might not go to the bus - this is probably an MMU control bit
+		map(0x04c00000, 0x04c00000).w(m_mmu, FUNC(news_020_mmu_device::clear_entries)).select(0x10000000);
 
 		// Various platform control registers (MMU and otherwise)
 		map(0x04400000, 0x04400000).w(FUNC(news_iop_state::cpu_romdis_w));

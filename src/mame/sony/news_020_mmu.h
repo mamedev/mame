@@ -26,8 +26,7 @@ public:
 	// MMU entry accessors
 	uint32_t mmu_entry_r(offs_t offset, uint32_t mem_mask);
 	void mmu_entry_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	void clear_user_entries();
-	void clear_kernel_entries();
+	void clear_entries(offs_t offset, uint8_t data);
 
 	// MMU control register accessors
 	void set_mmu_enable(bool enabled);
@@ -65,6 +64,8 @@ private:
 	std::unique_ptr<u32[]> m_mmu_system_tag_ram; // TODO: don't do it this way, but this is OK for testing
 
 	news_020_pte unpack_mmu_entry(const uint32_t entry);
+	void clear_user_entries();
+	void clear_kernel_entries();
 };
 
 DECLARE_DEVICE_TYPE(NEWS_020_MMU, news_020_mmu_device)
