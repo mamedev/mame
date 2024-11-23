@@ -4192,10 +4192,15 @@ RAND USR 16530
 		</part>
 	</software>
 
-	<software name="jogos80_19">
+	<software name="jogos80_19" supported="partial">
 		<description>Jogos 80 - Ano 12 - Número 19 (Julho 2018) (cover tape)</description>
 		<year>2018</year>
 		<publisher>Revista Jogos 80</publisher>
+		<notes><![CDATA[
+Columbia: not working
+Defender: not working
+]]></notes>
+
 		<info name="developer" value="Manuel Fragas / Luiz Carlos Capanema" />
 		<info name="language" value="Portuguese (Brazil)" />
 		<info name="usage" value="16K" />
@@ -6581,13 +6586,13 @@ RAND USR 16530
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="A - Scorpirus"/>
 			<dataarea name="cass" size="15396">
-				<rom name="Scorpius - Side A.tzx" size="15396" crc="a08ae728" sha1="73c543bc7adf82d971b1925255165e1cac15ec3a"/>
+				<rom name="Scorpirus - Side A.tzx" size="15396" crc="a08ae728" sha1="73c543bc7adf82d971b1925255165e1cac15ec3a"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="zx81_cass">
 			<feature name="part_id" value="B - Scorpirus (carte graphique)"/>
 			<dataarea name="cass" size="17575">
-				<rom name="Scorpius - Side B.tzx" size="17575" crc="f849f579" sha1="3e5b2d9a671716d09a1cb213a9972970164eb977"/>
+				<rom name="Scorpirus - Side B.tzx" size="17575" crc="f849f579" sha1="3e5b2d9a671716d09a1cb213a9972970164eb977"/>
 			</dataarea>
 		</part>
 	</software>
