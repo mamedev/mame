@@ -496,7 +496,7 @@ uint8_t sb16_lle_device::dack_r(int line)
 		return ret;
 	}
 
-	++m_adc_fifo_tail %= 16;
+	++m_adc_fifo_tail %= FIFO_SIZE;
 
 	if(m_adc_fifo_ctrl & 4)
 	{
@@ -504,7 +504,7 @@ uint8_t sb16_lle_device::dack_r(int line)
 		return ret;
 	}
 
-	if(m_adc_fifo_head == ((m_adc_fifo_tail + 1) % 16))
+	if(m_adc_fifo_head == ((m_adc_fifo_tail + 1) % FIFO_SIZE))
 		m_isa->drq1_w(0);
 	return ret;
 }
@@ -539,7 +539,7 @@ void sb16_lle_device::dack_w(int line, uint8_t data)
 		return;
 	}
 
-	++m_dac_fifo_head %= 16;
+	++m_dac_fifo_head %= FIFO_SIZE;
 
 	if(m_dac_fifo_ctrl & 4)
 	{
@@ -573,7 +573,7 @@ uint16_t sb16_lle_device::dack16_r(int line)
 		m_isa->drq5_w(0);
 		return ret;
 	}
-	++m_adc_fifo_tail %= 16;
+	++m_adc_fifo_tail %= FIFO_SIZE;
 
 	if(m_adc_fifo_ctrl & 4)
 	{
@@ -581,7 +581,7 @@ uint16_t sb16_lle_device::dack16_r(int line)
 		return ret;
 	}
 
-	if(m_adc_fifo_head == ((m_adc_fifo_tail + 1) % 16))
+	if(m_adc_fifo_head == ((m_adc_fifo_tail + 1) % FIFO_SIZE))
 		m_isa->drq5_w(0);
 	return ret;
 }
@@ -608,7 +608,7 @@ void sb16_lle_device::dack16_w(int line, uint16_t data)
 		m_isa->drq5_w(0);
 		return;
 	}
-	++m_dac_fifo_head %= 16;
+	++m_dac_fifo_head %= FIFO_SIZE;
 
 	if(m_dac_fifo_ctrl & 4)
 	{
@@ -859,12 +859,12 @@ TIMER_CALLBACK_MEMBER(sb16_lle_device::timer_tick)
 		m_isa->drq5_w(1);
 
 	if((!(m_ctrl8 & 2) && !(m_mode & 1)) || (!(m_ctrl16 & 2) && (m_mode & 1)))
-		++m_dac_fifo_tail %= 16;
+		++m_dac_fifo_tail %= FIFO_SIZE;
 
 	if((!(m_ctrl8 & 2) && (m_mode & 1)) || (!(m_ctrl16 & 2) && !(m_mode & 1)))
 	{
 		m_adc_fifo[m_adc_fifo_head].h[0] = adcl;
 		m_adc_fifo[m_adc_fifo_head].h[1] = adcr;
-		++m_adc_fifo_head %= 16;
+		++m_adc_fifo_head %= FIFO_SIZE;
 	}
 }

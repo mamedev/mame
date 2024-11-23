@@ -108,7 +108,8 @@ private:
 		uint16_t h[2];
 		uint8_t  b[4];
 	} samples;
-	samples m_adc_fifo[16], m_dac_fifo[16];
+	static constexpr int FIFO_SIZE = 16;
+	samples m_adc_fifo[FIFO_SIZE], m_dac_fifo[FIFO_SIZE];
 	int m_adc_fifo_head, m_adc_fifo_tail, m_dac_fifo_head, m_dac_fifo_tail;
 	bool m_adc_r, m_dac_r, m_adc_h, m_dac_h, m_irq8, m_irq16, m_irq_midi;
 	bool m_dma8_done, m_dma16_done;
