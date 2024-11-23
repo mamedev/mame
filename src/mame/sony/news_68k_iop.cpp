@@ -948,7 +948,7 @@ namespace
 
 	void news_iop_state::update_dcd()
 	{
-		// the shift pin and the counter drive a multiplexer (but the trick is that the shift pin also drives the counter)
+		// the shift pin and the counter drive a multiplexer (the shift pin also drives the counter)
 		uint8_t multiplexer_value = (m_panel_shift_count & 0x3) << 1;
 		multiplexer_value |= (m_panel_shift ? 0x1 : 0x0);
 
@@ -1093,7 +1093,7 @@ namespace
 		m_scc_external->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 
 		// scc channel B
-		RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr); // keyboard?
+		RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
 		m_serial[1]->cts_handler().set(m_scc_external, FUNC(z80scc_device::ctsb_w));
 		m_serial[1]->dcd_handler().set(m_scc_external, FUNC(z80scc_device::dcdb_w));
 		m_serial[1]->rxd_handler().set(m_scc_external, FUNC(z80scc_device::rxb_w));
