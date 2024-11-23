@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli, Acho A. Tang, R. Belmont
 /*
+
 Konami 007121
 ------
 This is an interesting beast. It is an evolution of the 005885, with more
@@ -110,6 +111,7 @@ control registers
      -----x-- firq enable
      ----x--- flip screen
      ---x---- unknown (contra, labyrunr)
+
 */
 
 #include "emu.h"
@@ -172,7 +174,7 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 	case 6:
-		/* palette bank change */
+		// palette bank change
 		if ((m_ctrlram[offset] & 0x30) != (data & 0x30))
 			machine().tilemap().mark_all_dirty();
 		break;
@@ -216,7 +218,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 	//num = (k007121->ctrlram[0x03] & 0x40) ? 0x80 : 0x40; /* WRONG!!! (needed by combatsc)  */
 
 	int inc = 5;
-	/* when using priority buffer, draw front to back */
+	// when using priority buffer, draw front to back
 	if (pri_mask != (uint32_t)-1)
 	{
 		source += (num - 1)*inc;
@@ -225,13 +227,13 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 
 	for (int i = 0; i < num; i++)
 	{
-		int number = source[0];               /* sprite number */
-		int sprite_bank = source[1] & 0x0f;   /* sprite bank */
-		int sx = source[3];                   /* vertical position */
-		int sy = source[2];                   /* horizontal position */
-		int attr = source[4];             /* attributes */
-		int xflip = source[4] & 0x10;     /* flip x */
-		int yflip = source[4] & 0x20;     /* flip y */
+		int number = source[0];
+		int sprite_bank = source[1] & 0x0f;
+		int sx = source[3];
+		int sy = source[2];
+		int attr = source[4];
+		int xflip = source[4] & 0x10;
+		int yflip = source[4] & 0x20;
 		int color = base_color + ((source[1] & 0xf0) >> 4);
 		int width, height;
 		int transparent_mask;
@@ -246,8 +248,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		number = number << 2;
 		number += (sprite_bank >> 2) & 3;
 
-		/* Flak Attack doesn't use a lookup PROM, it maps the color code directly */
-		/* to a palette entry */
+		// Flak Attack doesn't use a lookup PROM, it maps the color code directly to a palette entry
 		// TODO: check if it's true or callback-ize this one and remove the per-game hack.
 		if (is_flakatck)
 			transparent_mask = 1 << 0;
@@ -258,12 +259,32 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		switch (attr & 0xe)
 		{
-			case 0x06: width = height = 1; break;
-			case 0x04: width = 1; height = 2; number &= (~2); break;
-			case 0x02: width = 2; height = 1; number &= (~1); break;
-			case 0x00: width = height = 2; number &= (~3); break;
-			case 0x08: width = height = 4; number &= (~3); break;
-			default: width = 1; height = 1;
+			case 0x06:
+				width = height = 1;
+				break;
+
+			case 0x04:
+				width = 1; height = 2;
+				number &= ~2;
+				break;
+
+			case 0x02:
+				width = 2; height = 1;
+				number &= ~1;
+				break;
+
+			case 0x00:
+				width = height = 2;
+				number &= ~3;
+				break;
+
+			case 0x08:
+				width = height = 4;
+				number &= ~0xf;
+				break;
+
+			default:
+				width = 1; height = 1;
 				//logerror("Unknown sprite size %02x\n", attr & 0xe);
 				break;
 		}
