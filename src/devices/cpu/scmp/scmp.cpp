@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
- *   scmp.c
+ *   scmp.cpp
  *
  *   National Semiconductor SC/MP CPU emulation
  *   (SC/MP = Simple-to-use, Cost-effective MicroProcessor)
