@@ -240,7 +240,7 @@ void sb16_lle_device::dac_fifo_ctrl_w(uint8_t data)
 {
 	/* port 0x0E
 	 * bit0 - reset fifo
-	 * bit1 - ?
+	 * bit1 - DAC output sw off?
 	 * bit2 - disable fifo
 	 * bit3 -
 	 * bit4 -
@@ -255,6 +255,7 @@ void sb16_lle_device::dac_fifo_ctrl_w(uint8_t data)
 		m_dac_r = false;
 		m_dac_h = false;
 	}
+	m_mixer->dac_speaker_off_cb(BIT(data, 1));
 	m_dac_fifo_ctrl = data;
 }
 
@@ -406,24 +407,7 @@ void sb16_lle_device::sb16_io(address_map &map)
 
 void sb16_lle_device::host_io(address_map &map)
 {
-    // TODO: move to own mixer core
-    map(0x4, 0x4).lrw8(
-        NAME([this] (offs_t offset) {
-            return m_mixer_index;
-        }),
-        NAME([this] (offs_t offset, u8 data) {
-            m_mixer_index = data;
-        })
-    );
-    map(0x5, 0x5).lr8(
-        NAME([this] (offs_t offset) {
-            if (m_mixer_index == 0x80)
-                return 0x12;
-            if (m_mixer_index == 0x81)
-                return 0x22;
-            return 0;
-        })
-    );
+	map(0x4, 0x5).rw(m_mixer, FUNC(ct1745_mixer_device::read), FUNC(ct1745_mixer_device::write));
 	map(0x6, 0x7).w(FUNC(sb16_lle_device::dsp_reset_w));
 	map(0xa, 0xb).r(FUNC(sb16_lle_device::host_data_r));
 	map(0xc, 0xd).rw(FUNC(sb16_lle_device::dsp_wbuf_status_r), FUNC(sb16_lle_device::host_cmd_w));
@@ -446,14 +430,25 @@ void sb16_lle_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	ymf262_device &ymf262(YMF262(config, "ymf262", XTAL(14'318'181)));
-	ymf262.add_route(0, "lspeaker", 1.00);
-	ymf262.add_route(1, "rspeaker", 1.00);
-	ymf262.add_route(2, "lspeaker", 1.00);
-	ymf262.add_route(3, "rspeaker", 1.00);
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	CT1745(config, m_mixer);
+	m_mixer->set_fm_tag("ymf262");
+	m_mixer->set_ldac_tag(m_ldac);
+	m_mixer->set_rdac_tag(m_rdac);
+	m_mixer->add_route(0, "lspeaker", 1.0);
+	m_mixer->add_route(1, "rspeaker", 1.0);
+	m_mixer->irq_status_cb().set([this] () {
+		return (m_irq8 << 0) | (m_irq16 << 1) | (m_irq_midi << 2) | (0x8 << 4);
+	});
+
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1); // unknown DAC
+
+	ymf262_device &ymf262(YMF262(config, "ymf262", XTAL(14'318'181)));
+	ymf262.add_route(0, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	ymf262.add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
+	ymf262.add_route(2, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	ymf262.add_route(3, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
 
 	PC_JOY(config, m_joy);
 }
@@ -705,6 +700,7 @@ void sb16_lle_device::mpu401_w(offs_t offset, uint8_t data)
 sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA16_SB16, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
+	m_mixer(*this, "mixer"),
 	m_ldac(*this, "ldac"),
 	m_rdac(*this, "rdac"),
 	m_joy(*this, "pc_joy"),
@@ -770,6 +766,7 @@ TIMER_CALLBACK_MEMBER(sb16_lle_device::timer_tick)
 			m_cpu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
 		return;
 	}
+
 	if(m_mode & 1)
 	{
 		switch(m_mode & 0xa0) // dac 16

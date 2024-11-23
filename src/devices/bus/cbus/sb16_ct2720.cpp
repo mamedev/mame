@@ -31,6 +31,7 @@ sb16_ct2720_device::sb16_ct2720_device(const machine_config &mconfig, const char
 	: device_t(mconfig, SB16_CT2720, tag, owner, clock)
 	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_opl3(*this, "opl3")
+	, m_mixer(*this, "mixer")
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
 {
@@ -41,19 +42,30 @@ void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	CT1745(config, m_mixer);
+	m_mixer->set_fm_tag(m_opl3);
+	m_mixer->set_ldac_tag(m_ldac);
+	m_mixer->set_rdac_tag(m_rdac);
+	m_mixer->add_route(0, "lspeaker", 1.0);
+	m_mixer->add_route(1, "rspeaker", 1.0);
+	m_mixer->irq_status_cb().set([this] () {
+		return 0;
+		//return (m_irq8 << 0) | (m_irq16 << 1) | (m_irq_midi << 2) | (0x8 << 4);
+	});
 
 //  PC_JOY(config, m_joy);
 
 //  MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(sb_device::midi_rx_w));
 //  MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1); // unknown DAC
+
 	YMF262(config, m_opl3, XTAL(14'318'181));
-	m_opl3->add_route(0, "lspeaker", 1.0);
-	m_opl3->add_route(1, "rspeaker", 1.0);
-	m_opl3->add_route(2, "lspeaker", 1.0);
-	m_opl3->add_route(3, "rspeaker", 1.0);
+	m_opl3->add_route(0, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_opl3->add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
+	m_opl3->add_route(2, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
+	m_opl3->add_route(3, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
 }
 
 void sb16_ct2720_device::device_start()
@@ -77,7 +89,15 @@ void sb16_ct2720_device::io_map(address_map &map)
 			m_opl3->write(offset >> 8, data);
 		})
 	);
-//  map(0x2400 | base, 0x2400 | base).select(0x100) CT1745 mixer ($224-$225 on AT)
+	// ($224-$225 on AT)
+	map(0x2400 | base, 0x2400 | base).select(0x100).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_mixer->read(offset >> 8);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_mixer->write(offset >> 8, data);
+		})
+	);
 //  map(0x2600 | base, 0x2600 | base) CT1741 DSP reset
 	map(0x2800 | base, 0x2800 | base).select(0x100).lrw8(
 		NAME([this] (offs_t offset) {

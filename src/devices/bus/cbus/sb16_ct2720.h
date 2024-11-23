@@ -9,6 +9,7 @@
 #include "bus/cbus/pc9801_cbus.h"
 //#include "bus/midi/midi.h"
 //#include "bus/pc_joy/pc_joy.h"
+#include "sound/ct1745.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
 //#include "diserial.h"
@@ -39,6 +40,7 @@ private:
 
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ymf262_device> m_opl3;
+	required_device<ct1745_mixer_device> m_mixer;
 	required_device<dac_16bit_r2r_device> m_ldac;
 	required_device<dac_16bit_r2r_device> m_rdac;
 };

@@ -7,6 +7,7 @@
 #include "isa.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/mcs51/mcs51.h"
+#include "sound/ct1745.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
 
@@ -88,8 +89,9 @@ private:
 
 	TIMER_CALLBACK_MEMBER(timer_tick);
 
-	required_device<dac_word_interface> m_ldac;
-	required_device<dac_word_interface> m_rdac;
+	required_device<ct1745_mixer_device> m_mixer;
+	required_device<dac_16bit_r2r_device> m_ldac;
+	required_device<dac_16bit_r2r_device> m_rdac;
 	required_device<pc_joy_device> m_joy;
 	required_device<i80c52_device> m_cpu;
 
@@ -112,8 +114,6 @@ private:
 	bool m_dma8_done, m_dma16_done;
 
 	emu_timer *m_timer;
-
-    u8 m_mixer_index;
 };
 
 // device type definition
