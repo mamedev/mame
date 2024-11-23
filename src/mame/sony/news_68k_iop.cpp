@@ -181,6 +181,7 @@ namespace
 		uint8_t iop_status_r();
 		void iop_romdis_w(uint8_t data);
 		void timereni_w(uint8_t data);
+		void min_w(uint8_t data);
 		void motoron_w(uint8_t data);
 		void scsiinte_w(uint8_t data);
 		void powoff_w(uint8_t data);
@@ -242,8 +243,6 @@ namespace
 		bool m_scsi_intst = false;
 		bool m_scsi_inte = false;
 		bool m_blame_peripheral = false;
-		bool m_ast = false;
-		bool m_ast_pending = false;
 		bool m_cpu_bus_error = false;
 		offs_t m_last_berr_pc_cpu = 0;
 		emu_timer  *m_cpu_bus_error_timer;
@@ -276,7 +275,6 @@ namespace
 		m_mmu->space(0).install_ram(0x0, m_ram->mask(), m_ram->pointer()); // TODO: should this be somewhere else?
 
 		m_iop_intst = 0;
-		m_fdc->set_rate(500000); // TODO: This is probably controlled by MIN (DD vs HD), hardcoded to HD for now
 	}
 
 	TIMER_CALLBACK_MEMBER(news_iop_state::bus_error_off_cpu)
@@ -322,6 +320,19 @@ namespace
 			m_iop_timerout = false;
 		}
 		int_check_iop();
+	}
+
+	void news_iop_state::min_w(uint8_t data)
+	{
+		// TODO: HD rate works, DD rate untested
+		constexpr int HD_RATE = 500000;
+		constexpr int DD_RATE = 250000;
+
+		// 0 = HD, 1 = DD
+		const int rate = (data > 0) ? DD_RATE : HD_RATE;
+
+		LOG("Write MIN = 0x%x, set rate to %s (%s)\n", data, rate == HD_RATE ? "HD" : "DD", machine().describe_context());
+		m_fdc->set_rate(rate);
 	}
 
 	void news_iop_state::motoron_w(uint8_t data)
@@ -374,7 +385,6 @@ namespace
 		else
 		{
 			m_cpu->suspend(SUSPEND_REASON_RESET, true);
-			m_ast = false;
 			int_check_cpu();
 		}
 	}
@@ -615,7 +625,7 @@ namespace
 
 		map(0x60000000, 0x60000000).r(FUNC(news_iop_state::iop_status_r));
 		map(0x40000000, 0x40000000).w(FUNC(news_iop_state::timereni_w));
-		map(0x40000001, 0x40000001).lw8([this](uint8_t data) { LOG("Write MIN = 0x%x\n", data); }, "MIN");
+		map(0x40000001, 0x40000001).w(FUNC(news_iop_state::min_w));
 		map(0x40000002, 0x40000002).w(FUNC(news_iop_state::motoron_w));
 		map(0x40000003, 0x40000003).w(FUNC(news_iop_state::scsiinte_w));
 		map(0x40000004, 0x40000004).w(FUNC(news_iop_state::iop_romdis_w));
@@ -687,27 +697,14 @@ namespace
 	void news_iop_state::astreset_w(uint8_t data)
 	{
 		LOG("(%s) AST_RESET 0x%x\n", machine().describe_context(), data);
-		m_ast = false;
-		m_ast_pending = false;
+		// TODO: Implement AST
 		int_check_cpu();
 	}
 
 	void news_iop_state::astset_w(uint8_t data)
 	{
 		LOG("(%s) AST_SET 0x%x as %s\n", machine().describe_context(), data, m_cpu->supervisor_mode() ? "supervisor" : "user");
-
-		// On the 1960 (fingers crossed it is the same), the AST is gated from becoming active in supervisor mode - it is only active in supervisor mode if it was set in user mode before.
-		// The below code is not correct because it needs to latch AST in case the proc enters user mode. Also, I need to check the circuit diagrams again just in case.
-		if (!m_cpu->supervisor_mode())
-		{
-			LOGMASKED(LOG_GENERAL, "Triggering ast!\n");
-			m_ast = true;
-		}
-		else
-		{
-			LOGMASKED(LOG_GENERAL, "Triggering delayed ast!\n");
-			m_ast_pending = true;
-		}
+		// TODO: Implement AST
 		int_check_cpu();
 	}
 
@@ -907,7 +904,7 @@ namespace
 			// m_cpu_timerout = false; // just in case
 		}
 
-		m_cpu->set_input_line(INPUT_LINE_IRQ1, m_ast);
+		// TODO: Implement AST (Asynchronous System Trap, IRQ1)
 	}
 
 	static void news_scsi_devices(device_slot_interface &device)
