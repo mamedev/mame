@@ -5407,4 +5407,3 @@ if (MACHINES["SCI4"]~=null) then
 		MAME_DIR .. "src/devices/machine/sci4.h",
 	}
 end
-
