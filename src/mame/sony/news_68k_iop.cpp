@@ -607,9 +607,8 @@ namespace
 	void news_iop_state::iop_map(address_map &map)
 	{
 		map.unmap_value_low();
-		map(0x03000000, 0x0300ffff).rom().region("eprom", 0);
-		map(0x03010000, 0x0301ffff).rom().region("eprom", 0); // TODO: is this right? If so, move to mirror above
-		map(0x00800000, 0x00ffffff).noprw();				  // TODO: how to handle this, lower RAM
+		map(0x03000000, 0x0300ffff).rom().region("eprom", 0).mirror(0x007f0000); // TODO: Not 100% sure this mirror is correct
+		map(0x00800000, 0x00ffffff).noprw(); // TODO: how to handle this, lower RAM
 
 		// map(0x20000000, 0x3fffffff).lrw8(NAME([this](){ iop_bus_error(); return 0xff; }), NAME([this](uint8_t data){ /*iop_bus_error();*/ }));
 		// map(0x4c000100, 0x4c0001ff).lrw8(NAME([this](){ iop_bus_error(); return 0; }), NAME([this](uint8_t data){ iop_bus_error(); }));
