@@ -8,9 +8,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_ARM7_H
+#define MAME_BUS_BBC_TUBE_TUBE_ARM7_H
 
-#ifndef MAME_BUS_BBC_TUBE_ARM7_H
-#define MAME_BUS_BBC_TUBE_ARM7_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/arm7/arm7.h"
@@ -89,5 +90,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_TUBE_ARM7, bbc_tube_arm7_device)
 
-
-#endif // MAME_BUS_BBC_TUBE_ARM7_H
+#endif // MAME_BUS_BBC_TUBE_TUBE_ARM7_H

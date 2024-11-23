@@ -31,4 +31,4 @@ extern const uint8_t   m312cn_key[0x100];
 extern const uint8_t  cjddzsp_key[0x100];
 extern const uint8_t    cjdh2_key[0x100];
 
-#endif MAME_IGS_IGS036CRYPT_H
+#endif // MAME_IGS_IGS036CRYPT_H
