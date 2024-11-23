@@ -109,6 +109,7 @@ namespace
 			  m_mmu(*this, "mmu"),
 			  m_ram(*this, "ram"),
 			  m_eprom(*this, "eprom"),
+			  m_idrom(*this, "idrom"),
 			  m_rtc(*this, "rtc"),
 			  m_interval_timer(*this, "interval_timer"),
 			  m_scc_external(*this, "scc_external"),
@@ -216,6 +217,7 @@ namespace
 		required_device<ram_device> m_ram;
 
 		required_region_ptr<u32> m_eprom;
+		required_region_ptr<u32> m_idrom;
 
 		required_device<msm58321_device> m_rtc; // actually is an Epson RTC-58321B
 		required_device<pit8253_device> m_interval_timer;
@@ -913,25 +915,6 @@ namespace
 		device.option_add("cdrom", NSCSI_CDROM); // Only the NWS-891 came with a CD-ROM as a default option, others required an external CD-ROM drive
 	}
 
-	// IDROM lives in the lower two bits of the 4-bit EPROM (Fujitsu MB7114L)
-	static uint8_t idrom_data[] = {
-		0x0, 0x3, 0x3, 0x2,
-		0x2, 0x0, 0x0, 0x2,
-		0x3, 0x3, 0x2, 0x3,
-		0x1, 0x1, 0x1, 0x3,
-		0x1, 0x1, 0x1, 0x3,
-		0x3, 0x1, 0x2, 0x3,
-		0x1, 0x3, 0x1, 0x2,
-		0x2, 0x3, 0x0, 0x0,
-		0x0, 0x3, 0x0, 0x3,
-		0x2, 0x3, 0x0, 0x0,
-		0x2, 0x0, 0x2, 0x2,
-		0x2, 0x1, 0x1, 0x0,
-		0x1, 0x0, 0x2, 0x2,
-		0x0, 0x3, 0x1, 0x2,
-		0x0, 0x2, 0x2, 0x2,
-		0x0, 0x1, 0x1, 0x3};
-
 	void news_iop_state::handle_rts(int data)
 	{
 		if (m_panel_shift != !data)
@@ -988,8 +971,15 @@ namespace
 		}
 		else // IDROM
 		{
-			uint8_t idrom_idx = (m_panel_shift_count & 0xfc) >> 2; // get IDROM address
-			dcd_state = idrom_data[idrom_idx] & (multiplexer_value == 6 ? 0x1 : 0x2);
+			// Step 1: Get IDROM word address and byte offset
+			const uint8_t idrom_idx = m_panel_shift_count >> 4;
+			const uint8_t offset = (m_panel_shift_count >> 2) % 4;
+
+			// Step 2: Get target data byte
+			const uint8_t idrom_data = m_idrom[idrom_idx] >> ((3 - offset) * 8);
+
+			// Step 3: Apply bit mask to get one of two data bits from the byte-encoded nibble and set DCD
+			dcd_state = idrom_data & (multiplexer_value == 6 ? 0x1 : 0x2);
 			LOGMASKED(LOG_PANEL, "idrom d0 [0x%02x] -> 0x%02x\n", idrom_idx, dcd_state);
 		}
 		LOGMASKED(LOG_PANEL, "mplex 0x%04x cnt 0x%04x set dcd = %d\n", multiplexer_value, m_panel_shift_count, dcd_state);
@@ -1236,6 +1226,13 @@ namespace
 		ROM_SYSTEM_BIOS(0, "nws831", "SONY NET WORK STATION monitor Release 2.1")
 		ROM_LOAD16_BYTE("nws831-mbm27c256-ver2p1-h.bin", 0x0000, 0x8000, CRC(11e23140) SHA1(8c87a6198f918a69f611ff7be6497552ead67b31))
 		ROM_LOAD16_BYTE("nws831-mbm27c256-ver2p1-l.bin", 0x0001, 0x8000, CRC(1ea72294) SHA1(e7edfad08e46b7dbcca5279457901ba83fbf481f))
+
+		// Fujitsu MB7114L 256 x 4 bit (1K) TTL PROM
+		// There is no golden dump of this PROM because it is holds per-system values
+		// The front panel addresses the idrom and only uses the bottom two bits of each nibble.
+		// The upper two bits per nibble are programmed to ones on my NWS-831
+		ROM_REGION32_BE(0x100, "idrom", 0)
+		ROM_LOAD("nws831-idrom.bin", 0x0, 0x100, CRC(167de13d) SHA1(3e46392671324e92f1e34ddd8ac3c6d94144b3d2) BAD_DUMP)
 	ROM_END
 
 } // anonymous namespace
