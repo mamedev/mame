@@ -5408,13 +5408,3 @@ if (MACHINES["SCI4"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/machine/tk10_keyboard.h,MACHINES["TK10KEYBOARD"] = true
----------------------------------------------------
-if (MACHINES["TK10KEYBOARD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/tk10_keyboard.cpp",
-		MAME_DIR .. "src/devices/machine/tk10_keyboard.h",
-	}
-end
