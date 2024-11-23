@@ -7,8 +7,8 @@
    Hewlett Packard HP48 S/SX & G/GX and HP49 G
 
 **********************************************************************/
-#ifndef MAME_HP_HP84_PORT_H
-#define MAME_HP_HP84_PORT_H
+#ifndef MAME_HP_HP48_PORT_H
+#define MAME_HP_HP48_PORT_H
 
 #pragma once
 
@@ -72,4 +72,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HP48_PORT, hp48_port_image_device)
 
-#endif // MAME_HP_HP84_PORT_H
+#endif // MAME_HP_HP48_PORT_H

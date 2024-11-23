@@ -950,7 +950,7 @@ ROM_START( makaimurb ) // 85606-A-3/85606-B-3
 ROM_END
 
 /*
-  Makaimura 
+  Makaimura
   Program is the same as set makaimurb, but different sized/arranged ROMs.
   Some GFX ROMs are different.
 */

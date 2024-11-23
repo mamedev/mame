@@ -2,11 +2,11 @@
 // copyright-holders: Luca Elia, David Haywood
 
 /*
-	Fuuki Sprite hardware
+    Fuuki Sprite hardware
 
-	Used by:
-	fuukifg2.cpp
-	fuukifg3.cpp (with sprite tile bankswitching, triple buffered)
+    Used by:
+    fuukifg2.cpp
+    fuukifg3.cpp (with sprite tile bankswitching, triple buffered)
 */
 
 

@@ -2,11 +2,11 @@
 // copyright-holders: Luca Elia, David Haywood
 
 /*
-	Fuuki Tilemap hardware
+    Fuuki Tilemap hardware
 
-	Used by:
-	fuukifg2.cpp
-	fuukifg3.cpp
+    Used by:
+    fuukifg2.cpp
+    fuukifg3.cpp
 */
 
 #include "emu.h"

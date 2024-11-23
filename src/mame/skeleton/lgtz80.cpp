@@ -402,7 +402,7 @@ void lgtz80_state::init_arthurkn()
 
 		case 0x140:
 		case 0x340:
-			rom[i] = bitswap<8>(rom[i], 3, 6, 7, 4, 5, 2, 1, 0);	
+			rom[i] = bitswap<8>(rom[i], 3, 6, 7, 4, 5, 2, 1, 0);
 			break;
 
 		case 0x180:

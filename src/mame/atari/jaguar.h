@@ -5,19 +5,27 @@
     Atari Jaguar hardware
 
 *************************************************************************/
+#ifndef MAME_ATARI_JAGUAR_H
+#define MAME_ATARI_JAGUAR_H
 
-#include "cpu/jaguar/jaguar.h"
-#include "machine/nvram.h"
-#include "sound/dac.h"
-#include "machine/eepromser.h"
-#include "machine/vt83c461.h"
-#include "imagedev/snapquik.h"
+#pragma once
+
 #include "jag_blitter.h"
-#include "cdrom.h"
+
 #include "bus/generic/slot.h"
+#include "cpu/jaguar/jaguar.h"
 #include "imagedev/cdromimg.h"
+#include "imagedev/snapquik.h"
+#include "machine/eepromser.h"
+#include "machine/nvram.h"
+#include "machine/vt83c461.h"
+#include "sound/dac.h"
+
 #include "screen.h"
 #include "emupal.h"
+
+#include "cdrom.h"
+
 
 #ifndef ENABLE_SPEEDUP_HACKS
 #define ENABLE_SPEEDUP_HACKS 1
@@ -406,3 +414,5 @@ private:
 	uint8_t m_butch_cmd_index = 0U;
 	uint8_t m_butch_cmd_size = 0U;
 };
+
+#endif // MAME_ATARI_JAGUAR_H

@@ -9,8 +9,8 @@
 
 **************************************************************************************/
 
-#ifndef DEVICE_SOUND_XT446_H
-#define DEVICE_SOUND_XT446_H
+#ifndef MAME_SOUND_XT446_H
+#define MAME_SOUND_XT446_H
 
 #pragma once
 
@@ -40,4 +40,4 @@ private:
 
 DECLARE_DEVICE_TYPE(XT446, xt446_device)
 
-#endif
+#endif // MAME_SOUND_XT446_H

@@ -1566,7 +1566,7 @@ void vt_vt1682_state::vt1682_2007_vram_data_w(uint8_t data)
 	uint16_t vram_address = get_vram_addr();
 
 	m_vram->write8(vram_address, data);
-	
+
 	if (m_2000 & 0x4)
 	{
 		// this mode is completely undocumented, but needed for many games in the cmpmx10 / cmpmx11 sets
@@ -2263,7 +2263,7 @@ void vt_vt1682_state::vt1682_2020_bk_linescroll_w(uint8_t data)
 	// cmpmx10 / cmpmx11 set a scroll bank, but don't appear to enable linescroll
 	// could this be a workaround for the scroll offset issue the hardware has?
 	//if (data & 0x30)
-	//	popmessage("linescroll unused %01x | BK2enable %d BK1enable %d PRAM addr %04x!\n", (data & 0xc0) >> 6, (data & 0x20)>> 5, (data & 0x10) >> 4, (data & 0xf) << 8);
+	//  popmessage("linescroll unused %01x | BK2enable %d BK1enable %d PRAM addr %04x!\n", (data & 0xc0) >> 6, (data & 0x20)>> 5, (data & 0x10) >> 4, (data & 0xf) << 8);
 }
 
 /*
@@ -4255,7 +4255,7 @@ void vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w(uint8_t data)
 	{
 		m_scu_to_main_irq_active = 1;
 		update_main_interrupts();
-	//	logerror("Main CPU IRQ Request from Sound CPU\n");
+	//  logerror("Main CPU IRQ Request from Sound CPU\n");
 	}
 
 
@@ -5075,7 +5075,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 					// The broken priorities in Table Tennis for exsprt48 / itvg48
 					// are unrelated (bit isn't set) but as they work in
 					// xing48 could be just a bug in those versions
-					// 
+					//
 					// does it really work on hardware? we disable it entirely
 					// in those sets for now
 					if (bk_paldepth_mode && m_allow_bk_paldepth_mode)
@@ -5266,7 +5266,7 @@ void vt_vt1682_state::rom_map(address_map &map)
 void vt1682_dance_state::rom_ram_map(address_map &map)
 {
 	rom_map(map);
- 	map(0x1000000, 0x101ffff).ram();
+	map(0x1000000, 0x101ffff).ram();
 }
 
 // 11-bits (0x800 bytes) for sprites

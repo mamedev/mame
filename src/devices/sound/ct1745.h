@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef DEVICE_SOUND_CT1745_H
-#define DEVICE_SOUND_CT1745_H
+#ifndef MAME_SOUND_CT1745_H
+#define MAME_SOUND_CT1745_H
 
 #pragma once
 
@@ -66,4 +66,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CT1745, ct1745_mixer_device)
 
-#endif // DEVICE_SOUND_CT1745_H
+#endif // MAME_SOUND_CT1745_H

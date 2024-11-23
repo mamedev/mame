@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, R. Belmont
-#ifndef MAME_SEGACONS_DCCONS_H
-#define MAME_SEGACONS_DCCONS_H
+#ifndef MAME_SEGA_DCCONS_H
+#define MAME_SEGA_DCCONS_H
 
 #pragma once
 
@@ -57,4 +57,4 @@ private:
 	int atapi_xferlen = 0, atapi_xferbase = 0, atapi_xfercomplete;
 };
 
-#endif // MAME_SEGACONS_DCCONS_H
+#endif // MAME_SEGA_DCCONS_H

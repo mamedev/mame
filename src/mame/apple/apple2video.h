@@ -2,12 +2,12 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    video/apple2.h  - Video handling for Apple II and IIgs
+    apple/apple2video.h  - Video handling for Apple II and IIgs
 
 *********************************************************************/
 
-#ifndef MAME_SHARED_APPLE2VIDEO_H
-#define MAME_SHARED_APPLE2VIDEO_H
+#ifndef MAME_APPLE_APPLE2VIDEO_H
+#define MAME_APPLE_APPLE2VIDEO_H
 
 #include "emupal.h"
 
@@ -147,4 +147,4 @@ DECLARE_DEVICE_TYPE(APPLE2_VIDEO, a2_video_device)
 DECLARE_DEVICE_TYPE(APPLE2_VIDEO_COMPOSITE, a2_video_device_composite)
 DECLARE_DEVICE_TYPE(APPLE2_VIDEO_COMPOSITE_RGB, a2_video_device_composite_rgb)
 
-#endif // MAME_SHARED_APPLE2VIDEO_H
+#endif // MAME_APPLE_APPLE2VIDEO_H

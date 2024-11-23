@@ -457,7 +457,7 @@ ROM_START(r_fairfght)
 ROM_END
 
 /* There are three different known dumps for Poker Plus:
-    (1) CRC(571ee27b) SHA1(482a3ba18eff05bce4cab073b1f13fc2f145bb2b) 
+    (1) CRC(571ee27b) SHA1(482a3ba18eff05bce4cab073b1f13fc2f145bb2b)
     (2) CRC(60a199a8) SHA1(045d61f56ea03a694722da810d465ab65d85cbfd)
     (3) CRC(fadd715a) SHA1(6c5b6e8fcf77be2b0b7076dc1139760f7e4d5688)
   (1) was tested on a real machine and works OK, (2) was also tested, but the pinball did not work with it,

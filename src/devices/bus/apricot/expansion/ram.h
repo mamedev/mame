@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_APRICOT_RAM_H
-#define MAME_BUS_APRICOT_RAM_H
+#ifndef MAME_BUS_APRICOT_EXPANSION_RAM_H
+#define MAME_BUS_APRICOT_EXPANSION_RAM_H
 
 #pragma once
 
@@ -85,4 +85,4 @@ DECLARE_DEVICE_TYPE(APRICOT_128K_RAM, apricot_128k_ram_device)
 DECLARE_DEVICE_TYPE(APRICOT_512K_RAM, apricot_512k_ram_device)
 
 
-#endif // MAME_BUS_APRICOT_RAM_H
+#endif // MAME_BUS_APRICOT_EXPANSION_RAM_H

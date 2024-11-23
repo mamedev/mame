@@ -76,9 +76,9 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-			  Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
-			  TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
-			  Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
+              Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
+              TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
+              Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
               テレビで遊び隊　韋駄天翔 激走 韋駄天バトル / トミー / 日本          Playing with TV Idaten Sho Gekisou Idaten Battle / Tommy / Japan
               Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
               東京フレンドパーク2スペシャル / エポック社 / 日本          Tokyo Friend Park 2 Special / Epochsha / Japan
@@ -2607,7 +2607,7 @@ CONS( 2001, epo_strk,  0,          0,  xavix,            epo_epp,  xavix_state, 
 CONS( 2002, epo_strkp, epo_strk,   0,  xavixp,           epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Let's Play Excite Striker (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2002, rad_socr,  epo_strk,   0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Radica / Epoch / SSD Company LTD",             "Play TV Soccer", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// まちをつくろう 工事のくるま５     
+// まちをつくろう 工事のくるま５
 CONS( 2001, tak_town,  0,          0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Machi o Tsukurou: Kouji no Kuruma 5 (Japan)", MACHINE_IMPERFECT_SOUND )
 // this is roughly based on tak_town above
 CONS( 2002, rad_jcon,  tak_town,   0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Radica / Takara / SSD Company LTD",            "Play TV Jr. Construction", MACHINE_IMPERFECT_SOUND )

@@ -1,14 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_TVGAMES_SUNPLUS_GCM394_H
-#define MAME_TVGAMES_SUNPLUS_GCM394_H
+#ifndef MAME_TVGAMES_GENERALPLUS_GPL16250_H
+#define MAME_TVGAMES_GENERALPLUS_GPL16250_H
 
 #pragma once
 
-#include "machine/generalplus_gpl16250soc.h"
 #include "generalplus_gpl16250_m.h"
-#include "bus/generic/slot.h"
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "machine/generalplus_gpl16250soc.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -177,4 +178,4 @@ private:
 };
 
 
-#endif // MAME_TVGAMES_SUNPLUS_GCM394_H
+#endif // MAME_TVGAMES_GENERALPLUS_GPL16250_H

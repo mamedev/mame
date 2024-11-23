@@ -34,7 +34,7 @@ public:
 		m_xoffs = xoffs;
 		m_xoffs_flip = xoffs_flip;
 	}
-	
+
 	void set_yoffs(int yoffs, int yoffs_flip)
 	{
 		m_yoffs = yoffs;

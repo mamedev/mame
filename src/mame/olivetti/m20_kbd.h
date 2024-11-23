@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl,Vas Crabb
-#ifndef MAME_OLIVETTI_M20KBD_H
-#define MAME_OLIVETTI_M20KBD_H
+#ifndef MAME_OLIVETTI_M20_KBD_H
+#define MAME_OLIVETTI_M20_KBD_H
+
+#pragma once
 
 #include "bus/rs232/rs232.h"
 #include "machine/keyboard.h"
@@ -24,4 +26,4 @@ private:
 
 DECLARE_DEVICE_TYPE(M20_KEYBOARD, m20_keyboard_device)
 
-#endif // MAME_OLIVETTI_M20KBD_H
+#endif // MAME_OLIVETTI_M20_KBD_H

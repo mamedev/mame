@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_HEATHKIT_SIGMASOFT_PARALLEL_PORT_H
-#define MAME_HEATHKIT_SIGMASOFT_PARALLEL_PORT_H
+#ifndef MAME_HEATHZENITH_SIGMASOFT_PARALLEL_PORT_H
+#define MAME_HEATHZENITH_SIGMASOFT_PARALLEL_PORT_H
 
 #pragma once
 
@@ -64,4 +64,4 @@ private:
 DECLARE_DEVICE_TYPE(SIGMASOFT_PARALLEL_PORT, sigmasoft_parallel_port)
 
 
-#endif // MAME_HEATHKIT_SIGMASOFT_PARALLEL_PORT_H
+#endif // MAME_HEATHZENITH_SIGMASOFT_PARALLEL_PORT_H

@@ -3190,7 +3190,7 @@ license:CC0-1.0
 
 	<!-- this one has some songs programmed into it:
 	    月光町のうた                  おじゃる丸・キス                      Gekkō Machi no Uta              Ojarumaru/Kiss
-	    詠人（うたびと）              北島三郎                              Utabito                         Kitajima Saburō 
+	    詠人（うたびと）              北島三郎                              Utabito                         Kitajima Saburō
 	    アララの呪文                  ちびまる子ちゃんwith爆チュー問題      Arara no Jumon                  Chibi Maruko-chan with Bakuchū Mondai
 	    サザエさん                    宇野ゆう子                            Sazae-san                       Uno Yūko
 	    島人ぬ宝                      BEGIN                                 Shimanchunu Takara              BEGIN -->
@@ -3204,7 +3204,7 @@ license:CC0-1.0
 				<rom name="usercart.bin" size="0x100000" crc="bc4635cd" sha1="5343b254218f85a2f9e5ae9e4646b456d82c7d27"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- this one has some songs programmed into it:
 	    世界に一つだけの花            SMAP                                  Sekai ni Hitotsu Dake no Hana   SMAP

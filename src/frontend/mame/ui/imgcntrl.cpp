@@ -306,7 +306,7 @@ void menu_control_device_image::menu_activated()
 		{
 			auto [err, msg] = m_image.load(m_midi);
 			if (err)
-                machine().popmessage(_("Error connecting to midi port: %1$s"), !msg.empty() ? msg : err.message());
+				machine().popmessage(_("Error connecting to midi port: %1$s"), !msg.empty() ? msg : err.message());
 		}
 		stack_pop();
 		break;

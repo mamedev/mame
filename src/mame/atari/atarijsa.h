@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_ATARI_ATARI_JSA_H
-#define MAME_ATARI_ATARI_JSA_H
+#ifndef MAME_ATARI_ATARIJSA_H
+#define MAME_ATARI_ATARIJSA_H
 
 #pragma once
 
@@ -264,4 +264,4 @@ protected:
 };
 
 
-#endif // MAME_ATARI_ATARI_JSA_H
+#endif // MAME_ATARI_ATARIJSA_H

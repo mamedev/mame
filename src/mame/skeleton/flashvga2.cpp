@@ -114,8 +114,8 @@ ROM_START( ruletamag )
 	ROM_LOAD( "m24256bf.u31",  0x000000, 0x008000, CRC(af9adcae) SHA1(ac6274edc4240d5cf397455868009263264ffc6e) )
 
 	/* With an unintialized NVRAM/timekeeper, the machine won't work and Will output just a "ERROR EN RELOJ" message.
-           With the included dump (corrupted), it will output the message "ERROR EN MODULO", but still won't boot.
-           Maybe there's a way to initialize the NVRAM, but there's nothing about it on the manual. */
+	       With the included dump (corrupted), it will output the message "ERROR EN MODULO", but still won't boot.
+	       Maybe there's a way to initialize the NVRAM, but there's nothing about it on the manual. */
 	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "m48t18.u38",    0x000000, 0x002000, BAD_DUMP CRC(025fb8c2) SHA1(61c90ecad8565cfd20674034a5917b0225edbfe5) ) // Corrupted
 ROM_END

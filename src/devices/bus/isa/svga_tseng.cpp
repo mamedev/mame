@@ -180,7 +180,7 @@ void isa16_svga_et4k_w32i_device::device_add_mconfig(machine_config &config)
 
 	ET4KW32I_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
-    // 1MB default, 4MB max
+	// 1MB default, 4MB max
 	m_vga->set_vram_size(1*1024*1024);
 }
 
@@ -201,7 +201,7 @@ void isa16_svga_et4k_w32i_device::remap(int space_id, offs_t start, offs_t end)
 	if (space_id == AS_PROGRAM)
 	{
 		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(tseng_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(tseng_vga_device::mem_w)));
-        // TODO: can be disabled or narrowed thru TS Auxiliary Mode
+		// TODO: can be disabled or narrowed thru TS Auxiliary Mode
 		m_isa->install_rom(this, 0xc0000, 0xc7fff, "vga_rom");
 	}
 	else if (space_id == AS_IO)
@@ -213,8 +213,8 @@ void isa16_svga_et4k_w32i_device::remap(int space_id, offs_t start, offs_t end)
 void isa16_svga_et4k_w32i_device::io_isa_map(address_map &map)
 {
 	map(0x03b0, 0x03df).m(m_vga, FUNC(et4kw32i_vga_device::io_map));
-    // IOD controls mirroring
-    map(0x210a, 0x210a).mirror(0x70).rw(m_vga, FUNC(et4kw32i_vga_device::acl_index_r), FUNC(et4kw32i_vga_device::acl_index_w));
-    map(0x210b, 0x210b).mirror(0x70).rw(m_vga, FUNC(et4kw32i_vga_device::acl_data_r), FUNC(et4kw32i_vga_device::acl_data_w));
+	// IOD controls mirroring
+	map(0x210a, 0x210a).mirror(0x70).rw(m_vga, FUNC(et4kw32i_vga_device::acl_index_r), FUNC(et4kw32i_vga_device::acl_index_w));
+	map(0x210b, 0x210b).mirror(0x70).rw(m_vga, FUNC(et4kw32i_vga_device::acl_data_r), FUNC(et4kw32i_vga_device::acl_data_w));
 }
 

@@ -404,7 +404,7 @@ INPUT_PORTS_END
 //  VIDEO
 //**************************************************************************
 
-inline uint16_t bcd_value(uint16_t val) 
+inline uint16_t bcd_value(uint16_t val)
 {
 	return
 		((val>>12) & 0xf) *  1000 +
@@ -443,7 +443,7 @@ void juku_state::screen_hblank_period(uint8_t data)
 void juku_state::screen_vblank_period(uint8_t data)
 {
 	m_pit[1]->write(0x15, data);
-	
+
 	if (m_vblank_period_lsb == -1) {
 		m_vblank_period_lsb = (int)data;
 	} else {
@@ -495,10 +495,10 @@ void juku_state::adjust_monitor_params(uint8_t monitor_bits)
 }
 
 uint32_t juku_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{	      
+{
 	int y_max = (m_vbporch < 0) ? (m_height + m_vbporch) : (m_vbporch+m_height > m_screen->height()) ? m_screen->height() : m_height;
 	int x_max = (m_hbporch < 0) ? (m_width + m_hbporch) : (m_hbporch+m_width > m_screen->width()) ? m_screen->width() : m_width;
-	
+
 	if (m_empty_screen_on_update) {
 		m_empty_screen_on_update--;
 		bitmap.fill(0);
@@ -561,7 +561,7 @@ uint8_t juku_state::fdc_data_r()
 void juku_state::fdc_data_w(uint8_t data)
 {
 	// on write commands (101xxxxx, 11110xxx) and fdc reports busy
-	if ( ((m_fdc_cur_cmd >> 5) == 0x5 || (m_fdc_cur_cmd >> 3) == 0x1e) && m_fdc->drq_r() == 0 && (m_fdc->status_r() & 0x1) == 0x1 )	{
+	if ( ((m_fdc_cur_cmd >> 5) == 0x5 || (m_fdc_cur_cmd >> 3) == 0x1e) && m_fdc->drq_r() == 0 && (m_fdc->status_r() & 0x1) == 0x1 ) {
 		// cpu tries to write data without drq, halt it and reset pc
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_maincpu->set_state_int(i8080a_cpu_device::I8085_PC, m_maincpu->pc() - 2);
@@ -600,7 +600,7 @@ void juku_state::pio0_porta_w(uint8_t data)
 	for (int i = 0; i < 6; i++)
 		m_key_encoder->input_line_w(i, BIT(col_data, i));
 	m_contrdat = (col_data & 0b1100'0000) >> 6; // decoded by 2x К555ИД7
-	
+
 	if (m_beep_level != BIT(data, 4))
 		m_speaker->level_w(m_beep_state << (m_beep_level = BIT(data, 4)));
 
@@ -731,7 +731,7 @@ void juku_state::juku(machine_config &config)
 	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate1));
 	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate2));
 	m_pit[1]->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w)); // VER RTR / FRAME INT
-	
+
 	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk1)); // VERT SYNC DSL
 	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 

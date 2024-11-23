@@ -356,7 +356,7 @@ public:
 	hd6305v0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto write_sci_tx() { return m_sci_tx.bind(); }
-    auto write_sci_clk() { return m_sci_clk.bind(); }
+	auto write_sci_clk() { return m_sci_clk.bind(); }
 
 	auto read_porta()  { return m_read_port [0].bind(); }
 	auto write_porta() { return m_write_port[0].bind(); }

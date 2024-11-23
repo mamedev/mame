@@ -782,7 +782,7 @@ protected:
 	{
 		return (3 << 6) | // unknown input
 			(31 << 1) | // unknown output
-			(BIT(m_dsw->read(), 3) << 0); // SW2:1 TODO: confirm 
+			(BIT(m_dsw->read(), 3) << 0); // SW2:1 TODO: confirm
 	}
 
 	void iocpu_port_9_w(uint8_t data)
