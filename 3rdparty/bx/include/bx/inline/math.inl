@@ -227,6 +227,20 @@ namespace bx
 		return log(_a) * kInvLogNat2;
 	}
 
+	inline BX_CONSTEXPR_FUNC float ldexp(float _a, int32_t _b)
+	{
+		const uint32_t ftob     = floatToBits(_a);
+		const uint32_t masked   = uint32_and(ftob, kFloatSignMask | kFloatExponentMask);
+		const uint32_t expsign0 = uint32_sra(masked, kFloatExponentBitShift);
+		const uint32_t tmp      = uint32_iadd(expsign0, _b);
+		const uint32_t expsign1 = uint32_sll(tmp, kFloatExponentBitShift);
+		const uint32_t mantissa = uint32_and(ftob, kFloatMantissaMask);
+		const uint32_t bits     = uint32_or(mantissa, expsign1);
+		const float    result   = bitsToFloat(bits);
+
+		return result;
+	}
+
 	template<>
 	inline BX_CONSTEXPR_FUNC uint8_t countBits(uint32_t _val)
 	{

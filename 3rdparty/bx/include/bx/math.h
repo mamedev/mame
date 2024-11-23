@@ -254,9 +254,9 @@ namespace bx
 	///
 	BX_CONST_FUNC float pow(float _a, float _b);
 
-	/// Returns the result of multiplying _a by 2 raised to the power of the exponent.
+	/// Returns the result of multiplying _a by 2 raised to the power of the exponent `_a * (2^_b)`.
 	///
-	BX_CONST_FUNC float ldexp(float _a, int32_t _b);
+	BX_CONSTEXPR_FUNC float ldexp(float _a, int32_t _b);
 
 	/// Returns decomposed given floating point value _a into a normalized fraction and
 	/// an integral power of two.

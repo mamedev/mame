@@ -457,6 +457,8 @@ TEST_CASE("fract", "[math][libm]")
 
 TEST_CASE("ldexp", "[math][libm]")
 {
+	STATIC_REQUIRE(1389.0f == bx::ldexp(86.8125, 4) );
+
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
 
