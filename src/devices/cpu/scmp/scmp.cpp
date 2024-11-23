@@ -30,7 +30,7 @@ scmp_device::scmp_device(const machine_config &mconfig, const char *tag, device_
 scmp_device::scmp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
-	, m_AC(0), m_ER(0), m_SR(0), m_icount(0)
+	, m_AC(0), m_ER(0), m_SR(0)
 	, m_flag_out_func(*this)
 	, m_sout_func(*this)
 	, m_sin_func(*this, 0)
@@ -483,23 +483,23 @@ void scmp_device::execute_run()
 
 void scmp_device::device_start()
 {
-	/* set up the state table */
-	{
-		state_add(SCMP_PC,     "PC",    m_PC.w.l);
-		state_add(STATE_GENPC, "GENPC", m_PC.w.l).noshow();
-		state_add(STATE_GENPCBASE, "CURPC", m_PC.w.l).noshow();
-		state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).noshow().formatstr("%8s");
-		state_add(SCMP_P1,     "P1",    m_P1.w.l);
-		state_add(SCMP_P2,     "P2",    m_P2.w.l);
-		state_add(SCMP_P3,     "P3",    m_P3.w.l);
-		state_add(SCMP_AC,     "AC",    m_AC);
-		state_add(SCMP_ER,     "ER",    m_ER);
-		state_add(SCMP_SR,     "SR",    m_SR);
-	}
-
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 
+	// set up the state table
+	state_add(SCMP_PC, "PC", m_PC.w.l);
+	state_add(STATE_GENPC, "GENPC", m_PC.w.l).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_PC.w.l).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).noshow().formatstr("%8s");
+
+	state_add(SCMP_P1, "P1", m_P1.w.l);
+	state_add(SCMP_P2, "P2", m_P2.w.l);
+	state_add(SCMP_P3, "P3", m_P3.w.l);
+	state_add(SCMP_AC, "AC", m_AC);
+	state_add(SCMP_ER, "ER", m_ER);
+	state_add(SCMP_SR, "SR", m_SR);
+
+	// register for savestates
 	save_item(NAME(m_PC));
 	save_item(NAME(m_P1));
 	save_item(NAME(m_P2));

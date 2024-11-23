@@ -154,11 +154,10 @@ Soundboard:
 
 
 GUN CHAMP
-Same pcb as Super Shot, but with gun hardware as 8080bw Gun Champ, no xy pots,
- seems it uses $4202 and $4206 to read gun pos
+Same PCB as Super Shot, but with gun hardware as 8080bw Gun Champ, no xy pots
 Mainboard:  CS249
 Soundboard: CS240
-Given CS numbers this is released after the other GunChamp
+Given CS numbers, this is released after the other Gun Champ
 
 */
 
@@ -173,30 +172,36 @@ Given CS numbers this is released after the other GunChamp
 
 namespace {
 
-class supershot_state : public driver_device
+class sshot_state : public driver_device
 {
 public:
-	supershot_state(const machine_config &mconfig, device_type type, const char *tag) :
+	sshot_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_videoram(*this, "videoram")
 	{ }
 
-	void supershot(machine_config &config);
+	void sshot(machine_config &config);
 
 private:
-	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t   *m_tilemap = nullptr;
-	void supershot_vidram_w(offs_t offset, uint8_t data);
-	void supershot_output0_w(uint8_t data);
-	void supershot_output1_w(uint8_t data);
-	TILE_GET_INFO_MEMBER(get_supershot_text_tile_info);
-	virtual void video_start() override ATTR_COLD;
-	uint32_t screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+	required_device<ins8060_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void supershot_map(address_map &map) ATTR_COLD;
+	required_device<screen_device> m_screen;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	tilemap_t *m_tilemap = nullptr;
+
+	void sshot_vidram_w(offs_t offset, uint8_t data);
+	void sshot_output0_w(uint8_t data);
+	void sshot_output1_w(uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_sshot_text_tile_info);
+	virtual void video_start() override ATTR_COLD;
+	uint32_t screen_update_sshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void sshot_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -206,24 +211,24 @@ private:
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(supershot_state::get_supershot_text_tile_info)
+TILE_GET_INFO_MEMBER(sshot_state::get_sshot_text_tile_info)
 {
 	uint8_t code = m_videoram[tile_index];
 	tileinfo.set(0, code, 0, 0);
 }
 
-void supershot_state::video_start()
+void sshot_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supershot_state::get_supershot_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sshot_state::get_sshot_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-uint32_t supershot_state::screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sshot_state::screen_update_sshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-void supershot_state::supershot_vidram_w(offs_t offset, uint8_t data)
+void sshot_state::sshot_vidram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -236,7 +241,7 @@ void supershot_state::supershot_vidram_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-void supershot_state::supershot_output0_w(uint8_t data)
+void sshot_state::sshot_output0_w(uint8_t data)
 {
 	/*
 	    bit     signal      description
@@ -252,7 +257,7 @@ void supershot_state::supershot_output0_w(uint8_t data)
 	*/
 }
 
-void supershot_state::supershot_output1_w(uint8_t data)
+void sshot_state::sshot_output1_w(uint8_t data)
 {
 	/*
 	    bit     signal      description
@@ -275,17 +280,17 @@ void supershot_state::supershot_output1_w(uint8_t data)
  *
  *************************************/
 
-void supershot_state::supershot_map(address_map &map)
+void sshot_state::sshot_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x23ff).ram().w(FUNC(supershot_state::supershot_vidram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(FUNC(sshot_state::sshot_vidram_w)).share("videoram");
 	map(0x4100, 0x41ff).ram();
 	map(0x4200, 0x4200).portr("GUNX");
 	map(0x4201, 0x4201).portr("GUNY");
 	map(0x4202, 0x4202).portr("IN0");
 	map(0x4203, 0x4203).portr("DSW");
-	map(0x4206, 0x4206).w(FUNC(supershot_state::supershot_output0_w));
-	map(0x4207, 0x4207).w(FUNC(supershot_state::supershot_output1_w));
+	map(0x4206, 0x4206).w(FUNC(sshot_state::sshot_output0_w));
+	map(0x4207, 0x4207).w(FUNC(sshot_state::sshot_output1_w));
 }
 
 
@@ -295,9 +300,9 @@ void supershot_state::supershot_map(address_map &map)
  *
  *************************************/
 
-static INPUT_PORTS_START( supershot )
+static INPUT_PORTS_START( sshot )
 	PORT_START("GUNX")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x7c, IPT_LIGHTGUN_X ) PORT_MINMAX(0x00, 0xf7) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("GUNY")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -312,6 +317,7 @@ static INPUT_PORTS_START( supershot )
 	PORT_DIPUNUSED( 0x01, 0x00 )
 	PORT_DIPUNUSED( 0x04, 0x00 )
 	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "Invalid" )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
@@ -319,10 +325,39 @@ static INPUT_PORTS_START( supershot )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x40, 0x00 )
-	PORT_DIPNAME( 0x82, 0x82, "Bonus" )
-	PORT_DIPSETTING(    0x02, "1" )
-	PORT_DIPSETTING(    0x80, "2" )
-	PORT_DIPSETTING(    0x82, "3" )
+	PORT_DIPNAME( 0x82, 0x82, "Bonus Game" )
+	PORT_DIPSETTING(    0x00, "Invalid" )
+	PORT_DIPSETTING(    0x02, "910-1190" )
+	PORT_DIPSETTING(    0x80, "1210-1590" )
+	PORT_DIPSETTING(    0x82, "1510-1790" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gunchamp )
+	PORT_INCLUDE( sshot )
+
+	PORT_MODIFY("GUNX") // offset by 24 pixels
+	PORT_BIT( 0xfff, 0x94, IPT_LIGHTGUN_X ) PORT_MINMAX(0x18, 0x10f) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNUSED( 0x01, 0x00 )
+	PORT_DIPUNUSED( 0x04, 0x00 )
+	PORT_DIPNAME( 0x38, 0x08, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(    0x28, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x42, 0x00, "High Score" )
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPSETTING(    0x40, "6000" )
+	PORT_DIPSETTING(    0x02, "7000" )
+	PORT_DIPSETTING(    0x42, "8000" )
+	PORT_DIPNAME( 0x80, 0x00, "Enter Initials" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 INPUT_PORTS_END
 
 
@@ -332,29 +367,30 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static GFXDECODE_START( gfx_supershot )
-	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x1,   0, 1  )
+static GFXDECODE_START( gfx_sshot )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x1, 0, 1 )
 GFXDECODE_END
 
-void supershot_state::supershot(machine_config &config)
+void sshot_state::sshot(machine_config &config)
 {
-	/* basic machine hardware */
-	INS8060(config, m_maincpu, XTAL(11'289'000)/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &supershot_state::supershot_map);
+	// basic machine hardware
+	INS8060(config, m_maincpu, 11.289_MHz_XTAL/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sshot_state::sshot_map);
+	m_maincpu->sense_a().set(m_screen, FUNC(screen_device::vblank));
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size((32)*8, (32)*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(supershot_state::screen_update_supershot));
-	screen.set_palette("palette");
+	// video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(sshot_state::screen_update_sshot));
+	m_screen->set_palette("palette");
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_supershot);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sshot);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	/* sound hardware */
+	// sound hardware
 	//...
 }
 
@@ -397,5 +433,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1979, sshot,     0,        supershot, supershot, supershot_state, empty_init, ROT0, "Model Racing", "Super Shot",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAMEL(1980, gunchamps, gunchamp, supershot, supershot, supershot_state, empty_init, ROT0, "Model Racing", "Gun Champ (newer, Super Shot hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_gunchamps )
+GAME( 1979, sshot,     0,        sshot, sshot,    sshot_state, empty_init, ROT0, "Model Racing", "Super Shot",                             MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL(1980, gunchamps, gunchamp, sshot, gunchamp, sshot_state, empty_init, ROT0, "Model Racing", "Gun Champ (newer, Super Shot hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunchamps )
