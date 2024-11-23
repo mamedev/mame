@@ -49,6 +49,7 @@ void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 	m_mixer->add_route(0, "lspeaker", 1.0);
 	m_mixer->add_route(1, "rspeaker", 1.0);
 	m_mixer->irq_status_cb().set([this] () {
+		(void)this;
 		return 0;
 		//return (m_irq8 << 0) | (m_irq16 << 1) | (m_irq_midi << 2) | (0x8 << 4);
 	});
