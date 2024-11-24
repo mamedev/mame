@@ -778,7 +778,6 @@ license:CC0-1.0
 		<year>19??</year>
 		<publisher>Proxima</publisher>
 		<info name="language" value="Czech" />
-		<info name="region" value="Czechia" />
 		<info name="usage" value="Works on Pentagon 1024SL machine" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
