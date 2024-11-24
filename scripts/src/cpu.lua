@@ -2575,7 +2575,6 @@ if CPUS["S2650"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/s2650/s2650.cpp",
 		MAME_DIR .. "src/devices/cpu/s2650/s2650.h",
-		MAME_DIR .. "src/devices/cpu/s2650/s2650cpu.h",
 	}
 end
 

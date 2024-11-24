@@ -14,7 +14,6 @@
 
 #include "emu.h"
 #include "s2650.h"
-#include "s2650cpu.h"
 
 /* define this to have some interrupt information logged */
 //#define VERBOSE 1
@@ -36,7 +35,7 @@ s2650_device::s2650_device(const machine_config &mconfig, const char *tag, devic
 	, m_flag_handler(*this)
 	, m_intack_handler(*this, 0x00)
 	, m_ppc(0), m_page(0), m_iar(0), m_ea(0), m_psl(0), m_psu(0), m_r(0)
-	, m_halt(0), m_ir(0), m_irq_state(0), m_icount(0)
+	, m_halt(0), m_ir(0), m_irq_state(0)
 	, m_debugger_temp(0)
 {
 	memset(m_reg, 0x00, sizeof(m_reg));
@@ -144,23 +143,53 @@ static const uint8_t ccc[0x200] = {
  ***************************************************************/
 static const int S2650_relative[0x100] =
 {
-		0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-		16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-		32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
-		48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+	0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+	32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+	48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
 	-64,-63,-62,-61,-60,-59,-58,-57,-56,-55,-54,-53,-52,-51,-50,-49,
 	-48,-47,-46,-45,-44,-43,-42,-41,-40,-39,-38,-37,-36,-35,-34,-33,
 	-32,-31,-30,-29,-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,
 	-16,-15,-14,-13,-12,-11,-10, -9, -8, -7, -6, -5, -4, -3, -2, -1,
-		0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-		16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-		32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
-		48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+	0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+	32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+	48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
 	-64,-63,-62,-61,-60,-59,-58,-57,-56,-55,-54,-53,-52,-51,-50,-49,
 	-48,-47,-46,-45,-44,-43,-42,-41,-40,-39,-38,-37,-36,-35,-34,-33,
 	-32,-31,-30,-29,-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,
 	-16,-15,-14,-13,-12,-11,-10, -9, -8, -7, -6, -5, -4, -3, -2, -1,
 };
+
+
+/***************************************************************
+ * macros for CPU registers/flags
+ ***************************************************************/
+#define PMSK    0x1fff          /* mask page offset */
+#define PLEN    0x2000          /* page length */
+#define PAGE    0x6000          /* mask page */
+#define AMSK    0x7fff          /* mask address range */
+
+/* processor status lower */
+#define C       0x01            /* carry flag */
+#define COM     0x02            /* compare: 0 binary, 1 2s complement */
+#define OVF     0x04            /* 2s complement overflow */
+#define WC      0x08            /* with carry: use carry in arithmetic / rotate ops */
+#define RS      0x10            /* register select 0: R0/R1/R2/R3 1: R0/R4/R5/R6 */
+#define IDC     0x20            /* inter digit carry: bit-3-to-bit-4 carry */
+#define CC      0xc0            /* condition code */
+
+/* processor status upper */
+#define SP      0x07            /* stack pointer: indexing 8 15bit words */
+#define PSU34   0x18            /* unused bits */
+#define II      0x20            /* interrupt inhibit 0: allow, 1: inhibit */
+#define FO      0x40            /* flag output */
+#define SI      0x80            /* sense input */
+
+#define R0      m_reg[0]
+#define R1      m_reg[1]
+#define R2      m_reg[2]
+#define R3      m_reg[3]
 
 
 /***************************************************************
