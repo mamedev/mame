@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
 /*
+
 Konami 007420
 ------
 Sprite generator. 8 bytes per sprite with zoom. It uses 0x200 bytes of RAM,
@@ -8,6 +9,7 @@ and a variable amount of ROM. Nothing is known about its external interface.
 
 TODO:
 - sprite X wraparound? (Rock N Rage sprites disappears on left edge of screen)
+
 */
 
 #include "emu.h"
@@ -26,6 +28,7 @@ k007420_device::k007420_device(const machine_config &mconfig, const char *tag, d
 	, device_gfx_interface(mconfig, *this)
 	, m_ram(nullptr)
 	, m_flipscreen(false)
+	, m_wrap_y(false)
 	, m_banklimit(0)
 	, m_callback(*this)
 {
@@ -40,11 +43,11 @@ void k007420_device::device_start()
 	// bind the init function
 	m_callback.resolve();
 
-	m_ram = make_unique_clear<uint8_t[]>(0x200);
+	m_ram = make_unique_clear<uint8_t[]>(K007420_SPRITERAM_SIZE);
 
-	save_pointer(NAME(m_ram), 0x200);
-	save_item(NAME(m_flipscreen));  // current one uses 7342 one
-	save_item(NAME(m_regs));        // current one uses 7342 ones
+	save_pointer(NAME(m_ram), K007420_SPRITERAM_SIZE);
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_wrap_y));
 }
 
 //-------------------------------------------------
@@ -53,9 +56,6 @@ void k007420_device::device_start()
 
 void k007420_device::device_reset()
 {
-	m_flipscreen = false;
-	for (int i = 0; i < 8; i++)
-		m_regs[i] = 0;
 }
 
 /*****************************************************************************
@@ -193,13 +193,14 @@ void k007420_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 							flipx,flipy,
 							sx,sy,0);
 
-					if (m_regs[2] & 0x80)
+					if (m_wrap_y)
 					{
+						const int dy = m_flipscreen ? +256 : -256;
 						gfx(0)->transpen(bitmap,cliprect,
 								c,
 								color,
 								flipx,flipy,
-								sx,sy-256,0);
+								sx,sy+dy,0);
 					}
 				}
 			}
@@ -239,13 +240,14 @@ void k007420_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 							sx,sy,
 							(zw << 16) / 8,(zh << 16) / 8,0);
 
-					if (m_regs[2] & 0x80)
+					if (m_wrap_y)
 					{
+						const int dy = m_flipscreen ? +256 : -256;
 						gfx(0)->zoom_transpen(bitmap,cliprect,
 								c,
 								color,
 								flipx,flipy,
-								sx,sy-256,
+								sx,sy+dy,
 								(zw << 16) / 8,(zh << 16) / 8,0);
 					}
 				}
