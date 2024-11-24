@@ -3637,7 +3637,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Eye of the Beholder (1994)(Pony Canyon)(NTSC)(JP)(Track 55 of 56)[!].wav" size="3069404" crc="b20c4c43" />
 		<rom name="Eye of the Beholder (1994)(Pony Canyon)(NTSC)(JP)(Track 56 of 56)[!].wav" size="3979628" crc="3193d019" />
 		-->
-		<description>Eye of the Beholder (Japan)</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder (Japan)</description>
 		<year>1994</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="T-75014"/>

@@ -1303,11 +1303,11 @@ void sb16_device::device_start()
 {
 	ymf262_device &ymf262 = *subdevice<ymf262_device>("ymf262");
 	m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
+	m_isa->install_device(0x0224, 0x0225, read8sm_delegate(*this, FUNC(sb16_device::mixer_r)), write8sm_delegate(*this, FUNC(sb16_device::mixer_w)));
 	m_isa->install_device(0x0226, 0x0227, read8sm_delegate(*this, FUNC(sb_device::dsp_reset_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_reset_w)));
 	m_isa->install_device(0x022a, 0x022b, read8sm_delegate(*this, FUNC(sb_device::dsp_data_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_data_w)));
 	m_isa->install_device(0x022c, 0x022d, read8sm_delegate(*this, FUNC(sb_device::dsp_wbuf_status_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_cmd_w)));
 	m_isa->install_device(0x022e, 0x022f, read8sm_delegate(*this, FUNC(sb_device::dsp_rbuf_status_r)), write8sm_delegate(*this, FUNC(sb_device::dsp_rbuf_status_w)));
-	m_isa->install_device(0x0224, 0x0225, read8sm_delegate(*this, FUNC(sb16_device::mixer_r)), write8sm_delegate(*this, FUNC(sb16_device::mixer_w)));
 	m_isa->install_device(0x0330, 0x0331, read8sm_delegate(*this, FUNC(sb16_device::mpu401_r)), write8sm_delegate(*this, FUNC(sb16_device::mpu401_w)));
 	m_isa->install_device(0x0388, 0x038b, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
 	m_isa->install_device(0x0220, 0x0223, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));

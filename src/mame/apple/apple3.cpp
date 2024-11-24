@@ -86,10 +86,10 @@ void apple3_state::apple3(machine_config &config)
 	m_a2bus->nmi_w().set(FUNC(apple3_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple3_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	A2BUS_SLOT(config, "sl1", m_a2bus, apple3_cards, nullptr);
-	A2BUS_SLOT(config, "sl2", m_a2bus, apple3_cards, nullptr);
-	A2BUS_SLOT(config, "sl3", m_a2bus, apple3_cards, nullptr);
-	A2BUS_SLOT(config, "sl4", m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl1", 14.318181_MHz_XTAL / 2, m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", 14.318181_MHz_XTAL / 2, m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", 14.318181_MHz_XTAL / 2, m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", 14.318181_MHz_XTAL / 2, m_a2bus, apple3_cards, nullptr);
 
 	/* fdc */
 	APPLEIII_FDC(config, m_fdc, 1021800*2);

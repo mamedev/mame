@@ -21,7 +21,6 @@
 
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
-#include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/k007232.h"
@@ -38,23 +37,22 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_bank0000(*this, "bank0000"),
 		m_k007232(*this, "k007232"),
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_rombank(*this, "rombank")
+		m_rombank(*this, "rombank"),
+		m_palette_view(*this, "palette_view")
 	{ }
 
 	ioport_value system_r();
 	void crimfght(machine_config &config);
 
 private:
-	/* devices */
+	// devices
 	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<address_map_bank_device> m_bank0000;
 	required_device<k007232_device> m_k007232;
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
@@ -62,25 +60,27 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank m_rombank;
 
-	void crimfght_coin_w(uint8_t data);
+	memory_view m_palette_view;
+
+	bool m_woco = false;
+	bool m_rmrd = false;
+	bool m_init = false;
+
+	void coin_w(uint8_t data);
 	void sound_w(uint8_t data);
 	uint8_t k052109_051960_r(offs_t offset);
 	void k052109_051960_w(offs_t offset, uint8_t data);
 	IRQ_CALLBACK_MEMBER(audiocpu_irq_ack);
 	void ym2151_ct_w(uint8_t data);
 	virtual void machine_start() override ATTR_COLD;
-	uint32_t screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void volume_callback(uint8_t data);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	void banking_callback(uint8_t data);
 
-	void bank0000_map(address_map &map) ATTR_COLD;
-	void crimfght_map(address_map &map) ATTR_COLD;
-	void crimfght_sound_map(address_map &map) ATTR_COLD;
-	int m_woco = 0;
-	int m_rmrd = 0;
-	int m_init = 0;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -107,21 +107,21 @@ K051960_CB_MEMBER(crimfght_state::sprite_callback)
 {
 	enum { sprite_colorbase = 256 / 16 };
 
-	/* The PROM allows for mixed priorities, where sprites would have */
-	/* priority over text but not on one or both of the other two planes. */
+	// The PROM allows for mixed priorities, where sprites would have
+	// priority over text but not on one or both of the other two planes.
 	switch (*color & 0x70)
 	{
-		case 0x10: *priority = 0x00; break;            /* over ABF */
-		case 0x00: *priority = GFX_PMASK_4          ; break;  /* over AB, not F */
-		case 0x40: *priority = GFX_PMASK_4|GFX_PMASK_2     ; break;  /* over A, not BF */
+		case 0x10: *priority = 0x00; break;            // over ABF
+		case 0x00: *priority = GFX_PMASK_4          ; break;  // over AB, not F
+		case 0x40: *priority = GFX_PMASK_4|GFX_PMASK_2     ; break;  // over A, not BF
 		case 0x20:
-		case 0x60: *priority = GFX_PMASK_4|GFX_PMASK_2|GFX_PMASK_1; break;  /* over -, not ABF */
-		case 0x50: *priority = GFX_PMASK_2     ; break;  /* over AF, not B */
+		case 0x60: *priority = GFX_PMASK_4|GFX_PMASK_2|GFX_PMASK_1; break;  // over -, not ABF
+		case 0x50: *priority = GFX_PMASK_2     ; break;  // over AF, not B
 		case 0x30:
-		case 0x70: *priority = GFX_PMASK_2|GFX_PMASK_1; break;  /* over F, not AB */
+		case 0x70: *priority = GFX_PMASK_2|GFX_PMASK_1; break;  // over F, not AB
 	}
-	/* bit 7 is on in the "Game Over" sprites, meaning unknown */
-	/* in Aliens it is the top bit of the code, but that's not needed here */
+	// bit 7 is on in the "Game Over" sprites, meaning unknown
+	// in Aliens it is the top bit of the code, but that's not needed here
 	*color = sprite_colorbase + (*color & 0x0f);
 }
 
@@ -132,12 +132,12 @@ K051960_CB_MEMBER(crimfght_state::sprite_callback)
 
 ***************************************************************************/
 
-uint32_t crimfght_state::screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t crimfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k052109->tilemap_update();
 
 	screen.priority().fill(0, cliprect);
-	/* The background color is always from layer 1 */
+	// The background color is always from layer 1
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
 
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 1);
@@ -149,10 +149,10 @@ uint32_t crimfght_state::screen_update_crimfght(screen_device &screen, bitmap_in
 }
 
 
-void crimfght_state::crimfght_coin_w(uint8_t data)
+void crimfght_state::coin_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
 uint8_t crimfght_state::k052109_051960_r(offs_t offset)
@@ -206,11 +206,12 @@ void crimfght_state::ym2151_ct_w(uint8_t data)
 	m_k007232->set_bank(bank_a, bank_b);
 }
 
-void crimfght_state::crimfght_map(address_map &map)
+void crimfght_state::main_map(address_map &map)
 {
-	map(0x0000, 0x03ff).m(m_bank0000, FUNC(address_map_bank_device::amap8));
-	map(0x0400, 0x1fff).ram();
-	map(0x2000, 0x5fff).rw(FUNC(crimfght_state::k052109_051960_r), FUNC(crimfght_state::k052109_051960_w));   /* video RAM + sprite RAM */
+	map(0x0000, 0x1fff).ram();
+	map(0x0000, 0x03ff).view(m_palette_view);
+	m_palette_view[0](0x0000, 0x03ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2000, 0x5fff).rw(FUNC(crimfght_state::k052109_051960_r), FUNC(crimfght_state::k052109_051960_w));   // video RAM + sprite RAM
 	map(0x3f80, 0x3f80).portr("SYSTEM");
 	map(0x3f81, 0x3f81).portr("P1");
 	map(0x3f82, 0x3f82).portr("P2");
@@ -219,20 +220,14 @@ void crimfght_state::crimfght_map(address_map &map)
 	map(0x3f85, 0x3f85).portr("P3");
 	map(0x3f86, 0x3f86).portr("P4");
 	map(0x3f87, 0x3f87).portr("DSW1");
-	map(0x3f88, 0x3f88).mirror(0x03).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(crimfght_state::crimfght_coin_w)); // 051550
+	map(0x3f88, 0x3f88).mirror(0x03).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(crimfght_state::coin_w)); // 051550
 	map(0x3f8c, 0x3f8c).mirror(0x03).w(FUNC(crimfght_state::sound_w));
-	map(0x6000, 0x7fff).bankr("rombank");                        /* banked ROM */
+	map(0x6000, 0x7fff).bankr(m_rombank);                        // banked ROM
 	map(0x8000, 0xffff).rom().region("maincpu", 0x18000);
 }
 
-void crimfght_state::bank0000_map(address_map &map)
-{
-	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-}
-
 // full memory map derived from schematics
-void crimfght_state::crimfght_sound_map(address_map &map)
+void crimfght_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).mirror(0x1800).ram();
@@ -397,17 +392,25 @@ void crimfght_state::machine_start()
 {
 	m_rombank->configure_entries(0, 16, memregion("maincpu")->base(), 0x2000);
 	m_rombank->set_entry(0);
+	m_palette_view.disable();
+
+	save_item(NAME(m_woco));
+	save_item(NAME(m_rmrd));
+	save_item(NAME(m_init));
 }
 
 void crimfght_state::banking_callback(uint8_t data)
 {
 	m_rombank->set_entry(data & 0x0f);
 
-	/* bit 5 = select work RAM or palette */
+	// bit 5 = select work RAM or palette
 	m_woco = BIT(data, 5);
-	m_bank0000->set_bank(m_woco);
+	if (m_woco)
+		m_palette_view.select(0);
+	else
+		m_palette_view.disable();
 
-	/* bit 6 = enable char ROM reading through the video RAM */
+	// bit 6 = enable char ROM reading through the video RAM
 	m_rmrd = BIT(data, 6);
 	m_k052109->set_rmrd_line(m_rmrd ? ASSERT_LINE : CLEAR_LINE);
 
@@ -419,34 +422,32 @@ ioport_value crimfght_state::system_r()
 	uint8_t data = 0;
 
 	data |= 1 << 4; // VCC
-	data |= m_woco << 5;
-	data |= m_rmrd << 6;
-	data |= m_init << 7;
+	data |= (m_woco ? 0x20 : 0);
+	data |= (m_rmrd ? 0x40 : 0);
+	data |= (m_init ? 0x80 : 0);
 
 	return data >> 4;
 }
 
 void crimfght_state::crimfght(machine_config &config)
 {
-	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); /* 052001 (verified on pcb) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &crimfght_state::crimfght_map);
+	// basic machine hardware
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); // 052001 (verified on pcb)
+	m_maincpu->set_addrmap(AS_PROGRAM, &crimfght_state::main_map);
 	m_maincpu->line().set(FUNC(crimfght_state::banking_callback));
 
-	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &crimfght_state::crimfght_sound_map);
+	Z80(config, m_audiocpu, XTAL(3'579'545)); // verified on pcb
+	m_audiocpu->set_addrmap(AS_PROGRAM, &crimfght_state::sound_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(crimfght_state::audiocpu_irq_ack));
-
-	ADDRESS_MAP_BANK(config, "bank0000").set_map(&crimfght_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 11, 0x400);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(24'000'000)/3, 528, 96, 416, 256, 16, 240); // measured 59.17
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
 //  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
-	screen.set_screen_update(FUNC(crimfght_state::screen_update_crimfght));
+	screen.set_screen_update(FUNC(crimfght_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 512);
@@ -463,18 +464,18 @@ void crimfght_state::crimfght(machine_config &config)
 	m_k051960->set_sprite_callback(FUNC(crimfght_state::sprite_callback));
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));  /* verified on pcb */
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));  // verified on pcb
 	ymsnd.port_write_handler().set(FUNC(crimfght_state::ym2151_ct_w));
 	ymsnd.add_route(0, "lspeaker", 1.0);
 	ymsnd.add_route(1, "rspeaker", 1.0);
 
-	K007232(config, m_k007232, XTAL(3'579'545)); /* verified on pcb */
+	K007232(config, m_k007232, XTAL(3'579'545)); // verified on pcb
 	m_k007232->port_write().set(FUNC(crimfght_state::volume_callback));
 	m_k007232->add_route(0, "lspeaker", 0.20);
 	m_k007232->add_route(0, "rspeaker", 0.20);
@@ -489,68 +490,68 @@ void crimfght_state::crimfght(machine_config &config)
 ***************************************************************************/
 
 ROM_START( crimfght )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) // code + banked roms
 	ROM_LOAD( "821r02.f24", 0x00000, 0x20000, CRC(4ecdd923) SHA1(78e5260c4bb9b18d7818fb6300d7e1d3a577fb63) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // 64k for the sound CPU
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
 
-	ROM_REGION( 0x080000, "k052109", 0 )    /* tiles */
+	ROM_REGION( 0x080000, "k052109", 0 )    // tiles
 	ROM_LOAD32_WORD( "821k06.k13", 0x000000, 0x040000, CRC(a1eadb24) SHA1(ca305b904b34e03918ad07281fda86ad63caa44f) )
 	ROM_LOAD32_WORD( "821k07.k19", 0x000002, 0x040000, CRC(060019fa) SHA1(c3bca007aaa5f1c534d2a75fe4f96d01a740dd58) )
 
-	ROM_REGION( 0x100000, "k051960", 0 )    /* sprites */
+	ROM_REGION( 0x100000, "k051960", 0 )    // sprites
 	ROM_LOAD32_WORD( "821k04.k2",  0x000000, 0x080000, CRC(00e0291b) SHA1(39d5db6cf36826e47cdf5308eff9bfa8afc82050) )
 	ROM_LOAD32_WORD( "821k05.k8",  0x000002, 0x080000, CRC(e09ea05d) SHA1(50ac9a2117ce63fe774c48d769ec445a83f1269e) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "821a08.i15", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )  /* priority encoder (not used) */
+	ROM_LOAD( "821a08.i15", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )  // priority encoder (not used)
 
-	ROM_REGION( 0x40000, "k007232", 0 ) /* data for the 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) // data for the 007232
 	ROM_LOAD( "821k03.e5",  0x00000, 0x40000, CRC(fef8505a) SHA1(5c5121609f69001838963e961cb227d6b64e4f5f) )
 ROM_END
 
 ROM_START( crimfghtj )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) // code + banked roms
 	ROM_LOAD( "821p02.f24", 0x00000, 0x20000, CRC(f33fa2e1) SHA1(00fc9e8250fa51386f3af2fca0f137bec9e1c220) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // 64k for the sound CPU
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
 
-	ROM_REGION( 0x080000, "k052109", 0 )    /* tiles */
+	ROM_REGION( 0x080000, "k052109", 0 )    // tiles
 	ROM_LOAD32_WORD( "821k06.k13", 0x000000, 0x040000, CRC(a1eadb24) SHA1(ca305b904b34e03918ad07281fda86ad63caa44f) )
 	ROM_LOAD32_WORD( "821k07.k19", 0x000002, 0x040000, CRC(060019fa) SHA1(c3bca007aaa5f1c534d2a75fe4f96d01a740dd58) )
 
-	ROM_REGION( 0x100000, "k051960", 0 )    /* sprites */
-	ROM_LOAD32_WORD( "821k04.k2",  0x000000, 0x080000, CRC(00e0291b) SHA1(39d5db6cf36826e47cdf5308eff9bfa8afc82050) )  /* sprites */
+	ROM_REGION( 0x100000, "k051960", 0 )    // sprites
+	ROM_LOAD32_WORD( "821k04.k2",  0x000000, 0x080000, CRC(00e0291b) SHA1(39d5db6cf36826e47cdf5308eff9bfa8afc82050) )  // sprites
 	ROM_LOAD32_WORD( "821k05.k8",  0x000002, 0x080000, CRC(e09ea05d) SHA1(50ac9a2117ce63fe774c48d769ec445a83f1269e) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "821a08.i15", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )  /* priority encoder (not used) */
+	ROM_LOAD( "821a08.i15", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )  // priority encoder (not used)
 
-	ROM_REGION( 0x40000, "k007232", 0 ) /* data for the 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) // data for the 007232
 	ROM_LOAD( "821k03.e5",  0x00000, 0x40000, CRC(fef8505a) SHA1(5c5121609f69001838963e961cb227d6b64e4f5f) )
 ROM_END
 
 ROM_START( crimfghtu )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) // code + banked roms
 		ROM_LOAD( "821l02.f24", 0x00000, 0x20000, CRC(588e7da6) SHA1(285febb3bcca31f82b34af3695a59eafae01cd30) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // 64k for the sound CPU
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
 
-	ROM_REGION( 0x080000, "k052109", 0 )    /* tiles */
+	ROM_REGION( 0x080000, "k052109", 0 )    // tiles
 	ROM_LOAD32_WORD( "821k06.k13", 0x000000, 0x040000, CRC(a1eadb24) SHA1(ca305b904b34e03918ad07281fda86ad63caa44f) )
 	ROM_LOAD32_WORD( "821k07.k19", 0x000002, 0x040000, CRC(060019fa) SHA1(c3bca007aaa5f1c534d2a75fe4f96d01a740dd58) )
 
-	ROM_REGION( 0x100000, "k051960", 0 )    /* sprites */
-	ROM_LOAD32_WORD( "821k04.k2",  0x000000, 0x080000, CRC(00e0291b) SHA1(39d5db6cf36826e47cdf5308eff9bfa8afc82050) )  /* sprites */
+	ROM_REGION( 0x100000, "k051960", 0 )    // sprites
+	ROM_LOAD32_WORD( "821k04.k2",  0x000000, 0x080000, CRC(00e0291b) SHA1(39d5db6cf36826e47cdf5308eff9bfa8afc82050) )  // sprites
 	ROM_LOAD32_WORD( "821k05.k8",  0x000002, 0x080000, CRC(e09ea05d) SHA1(50ac9a2117ce63fe774c48d769ec445a83f1269e) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "821a08.i15", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )  /* priority encoder (not used) */
+	ROM_LOAD( "821a08.i15", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )  // priority encoder (not used)
 
-	ROM_REGION( 0x40000, "k007232", 0 ) /* data for the 007232 */
+	ROM_REGION( 0x40000, "k007232", 0 ) // data for the 007232
 	ROM_LOAD( "821k03.e5",  0x00000, 0x40000, CRC(fef8505a) SHA1(5c5121609f69001838963e961cb227d6b64e4f5f) )
 ROM_END
 

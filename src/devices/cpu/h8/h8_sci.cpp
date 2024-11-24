@@ -99,7 +99,7 @@ void h8_sci_device::smr_w(u8 data)
 
 u8 h8_sci_device::smr_r()
 {
-	if (!machine().side_effects_disabled())
+	if(!machine().side_effects_disabled())
 		LOGMASKED(LOG_RREGS, "smr_r %02x (%06x)\n", m_smr, m_cpu->pc());
 	return m_smr;
 }
@@ -113,14 +113,14 @@ void h8_sci_device::brr_w(u8 data)
 
 u8 h8_sci_device::brr_r()
 {
-	if (!machine().side_effects_disabled())
+	if(!machine().side_effects_disabled())
 		LOGMASKED(LOG_RREGS, "brr_r %02x (%06x)\n", m_brr, m_cpu->pc());
 	return m_brr;
 }
 
 void h8_sci_device::sync_rx_start()
 {
-	if (m_rx_state == ST_IDLE && (m_smr & SMR_CA) && (m_scr & SCR_RE) && !(m_scr & SCR_TE) && !has_recv_error())
+	if(m_rx_state == ST_IDLE && (m_smr & SMR_CA) && (m_scr & SCR_RE) && !(m_scr & SCR_TE) && !has_recv_error())
 		rx_start();
 }
 
@@ -164,7 +164,7 @@ void h8_sci_device::scr_w(u8 data)
 
 u8 h8_sci_device::scr_r()
 {
-	if (!machine().side_effects_disabled())
+	if(!machine().side_effects_disabled())
 		LOGMASKED(LOG_RREGS, "scr_r %02x (%06x)\n", m_scr, m_cpu->pc());
 	return m_scr;
 }
@@ -173,7 +173,7 @@ void h8_sci_device::tdr_w(u8 data)
 {
 	LOGMASKED(LOG_REGS, "tdr_w %02x (%06x)\n", data, m_cpu->pc());
 	m_tdr = data;
-	if ((m_cpu->access_is_dma()) && (m_scr & SCR_TE)) {
+	if((m_cpu->access_is_dma()) && (m_scr & SCR_TE)) {
 		m_ssr &= ~(SSR_TDRE | SSR_TEND);
 		if(m_tx_state == ST_IDLE)
 			tx_start();
@@ -182,14 +182,14 @@ void h8_sci_device::tdr_w(u8 data)
 
 u8 h8_sci_device::tdr_r()
 {
-	if (!machine().side_effects_disabled())
+	if(!machine().side_effects_disabled())
 		LOGMASKED(LOG_RREGS, "tdr_r %02x (%06x)\n", m_tdr, m_cpu->pc());
 	return m_tdr;
 }
 
 void h8_sci_device::ssr_w(u8 data)
 {
-	if ((m_scr & SCR_TE) && (m_ssr & m_ssr_read & SSR_TDRE) && !(data & SSR_TDRE))
+	if((m_scr & SCR_TE) && (m_ssr & m_ssr_read & SSR_TDRE) && !(data & SSR_TDRE))
 		m_ssr &= ~(SSR_TDRE | SSR_TEND);
 	m_ssr = (m_ssr & (~m_ssr_read | data | SSR_TDRE | SSR_TEND | SSR_MPB) & ~SSR_MPBT) | (data & SSR_MPBT);
 	LOGMASKED(LOG_REGS, "ssr_w %02x -> %02x (%06x)\n", data, m_ssr, m_cpu->pc());
@@ -202,8 +202,7 @@ void h8_sci_device::ssr_w(u8 data)
 
 u8 h8_sci_device::ssr_r()
 {
-	if (!machine().side_effects_disabled())
-	{
+	if(!machine().side_effects_disabled()) {
 		LOGMASKED(LOG_RREGS, "ssr_r %02x (%06x)\n", m_ssr, m_cpu->pc());
 		m_ssr_read = m_ssr;
 	}
@@ -212,7 +211,7 @@ u8 h8_sci_device::ssr_r()
 
 u8 h8_sci_device::rdr_r()
 {
-	if (!machine().side_effects_disabled())
+	if(!machine().side_effects_disabled())
 		LOGMASKED(LOG_RREGS, "rdr_r %02x (%06x)\n", m_rdr, m_cpu->pc());
 
 	if(!machine().side_effects_disabled() && m_cpu->access_is_dma())
@@ -227,7 +226,7 @@ void h8_sci_device::scmr_w(u8 data)
 
 u8 h8_sci_device::scmr_r()
 {
-	if (!machine().side_effects_disabled())
+	if(!machine().side_effects_disabled())
 		LOGMASKED(LOG_RREGS, "scmr_r (%06x)\n", m_cpu->pc());
 	return 0x00;
 }

@@ -1032,7 +1032,7 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 		if (index < total)
 		{
 			rgb_t const col = indirect ? palette.indirect_color(index) : raw_color[index];
-			if (palette.indirect_entries() && indirect)
+			if (palette.indirect_entries() && !indirect)
 			{
 				util::stream_format(title_buf,
 						_("gfxview", u8" #%1$X \u2192 %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"),

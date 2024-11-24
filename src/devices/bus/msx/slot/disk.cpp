@@ -149,6 +149,7 @@ void msx_slot_tc8566_disk_device::add_mconfig(machine_config &config)
 	TC8566AF(config, m_fdc, 16'000'000);
 
 	add_drive_mconfig(config, DS);
+	m_fdc->set_ready_line_connected(false);
 }
 
 void msx_slot_tc8566_disk_device::dor_w(u8 data)

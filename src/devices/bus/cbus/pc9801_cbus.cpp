@@ -123,6 +123,7 @@ template void pc9801_slot_device::install_io<read8smo_delegate, write8smo_delega
 // boilerplate code for boards that has configurable I/O with either Jumpers or Dip-Switches
 // NB: client must have a mechanism to remember what port has been used before and after calling this,
 // in order to avoid "last instantiated wins" issues with overlapping board full configs.
+// TODO: refactor to actually be useful for PCI archs
 void pc9801_slot_device::flush_install_io(const char *client_tag, u16 old_io, u16 new_io, u16 size, read8sm_delegate rhandler, write8sm_delegate whandler)
 {
 	// initialize if client have this unmapped (such as first boot)

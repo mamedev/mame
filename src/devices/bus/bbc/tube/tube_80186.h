@@ -8,9 +8,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_80186_H
+#define MAME_BUS_BBC_TUBE_TUBE_80186_H
 
-#ifndef MAME_BUS_BBC_TUBE_80186_H
-#define MAME_BUS_BBC_TUBE_80186_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/i86/i186.h"
@@ -76,5 +77,4 @@ protected:
 DECLARE_DEVICE_TYPE(BBC_TUBE_80186, bbc_tube_80186_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_PCPLUS, bbc_tube_pcplus_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_80186_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_80186_H

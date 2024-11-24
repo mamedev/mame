@@ -2,11 +2,11 @@
 // copyright-holders:Raphael Nabet
 /*****************************************************************************
  *
- * includes/pdp1.h
+ * dec/pdp1.h
  *
  ****************************************************************************/
-#ifndef MAME_PDP1_PDP1_H
-#define MAME_PDP1_PDP1_H
+#ifndef MAME_DEC_PDP1_H
+#define MAME_DEC_PDP1_H
 
 #pragma once
 
@@ -477,4 +477,4 @@ public:
 	required_ioport m_lighty;
 };
 
-#endif // MAME_PDP1_PDP1_H
+#endif // MAME_DEC_PDP1_H

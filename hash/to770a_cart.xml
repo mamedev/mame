@@ -12,7 +12,8 @@ The Arabic BASIC 128 cartridge is useful only on an Arabic TO7/70!
 	<software name="basic128">
 		<description>BASIC 128 (Arab, v1.0)</description>
 		<year>1985</year>
-		<publisher>Thomson</publisher>
+		<publisher>Thomson / Microsoft</publisher>
+		<info name="alt_title" value="BASIC 128 Microsoft 1.0" />
 
 		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="65536">

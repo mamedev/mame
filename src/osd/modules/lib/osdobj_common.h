@@ -242,6 +242,7 @@ public:
 
 	virtual std::unique_ptr<osd::midi_input_port> create_midi_input(std::string_view name) override;
 	virtual std::unique_ptr<osd::midi_output_port> create_midi_output(std::string_view name) override;
+	virtual std::vector<osd::midi_port_info> list_midi_ports() override;
 
 	// FIXME: everything below seems to be osd specific and not part of
 	//        this INTERFACE but part of the osd IMPLEMENTATION

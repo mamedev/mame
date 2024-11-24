@@ -464,11 +464,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
 {
 	int const scanline = param;
 
-	// NMI  8 lines before vsync
+	// NMI: 8 lines before vsync
 	if (scanline == 265)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-	// IRQ  16 clocks per frame: once every 16 lines, but increases to 24 lines during vblank
+	// IRQ: 16 clocks per frame: once every 16 lines, but increases to 24 lines during vblank
 	// (lines 16,40,56,72,88,104,120,136,152,168,184,200,216,232,248,264)
 	if (scanline == 0x10 || (scanline > 0x20 && (scanline & 0xf) == 8))
 		m_maincpu->set_input_line(0, ASSERT_LINE);

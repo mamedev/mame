@@ -80,6 +80,7 @@ public:
 	// I.A.M. slots
 	void init_fruitwld();
 	void init_jumanji();
+	void init_jumanjia();
 	void init_plutus();
 	void init_pokrwild();
 
@@ -353,7 +354,8 @@ void _39in1_state::init_60in1()  { decrypt(0x00, 0x00, 0x00, 0x40, 0x10, 0x80, 0
 // I.A.M. slots
 void _39in1_state::init_fruitwld()  { decrypt(0x0a, 0x00, 0x00, 0x20, 0x80, 0x00, 0x00, 0x00, 5, 1, 7, 4, 3, 2, 0, 6); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
 void _39in1_state::init_jumanji()   { decrypt(0x00, 0x00, 0x00, 0x02, 0x00, 0x40, 0x08, 0x00, 1, 0, 6, 2, 5, 3, 4, 7); further_decrypt(0x00, 0x08, 0x10, 0x40, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
-void _39in1_state::init_plutus()    { decrypt(0x00, 0x40, 0x08, 0x01, 0x00, 0x04, 0x80, 0x02, 6, 4, 0, 5, 7, 3, 2, 1); further_decrypt(0x00, 0x00, 0x10, 0x00, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO:  >= 0x4000 XORs unverified
+void _39in1_state::init_jumanjia()  { decrypt(0x00, 0x00, 0x00, 0x40, 0x10, 0x08, 0x04, 0x00, 3, 5, 1, 4, 7, 6, 2, 0); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
+void _39in1_state::init_plutus()    { decrypt(0x00, 0x40, 0x08, 0x01, 0x00, 0x04, 0x80, 0x02, 6, 4, 0, 5, 7, 3, 2, 1); further_decrypt(0x00, 0x00, 0x10, 0x00, 0x00, 0x00); /* m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
 void _39in1_state::init_pokrwild()  { decrypt(0x20, 0x00, 0x00, 0x40, 0x08, 0x00, 0x00, 0x00, 6, 5, 3, 1, 0, 7, 2, 4); /* further_decrypt(0x00, 0x00, 0x00, 0x00, 0x00, 0x00); m_mcu_ipt_pc = 0x00000; */ } // TODO: >= 0x4000 XORs unverified
 
 void _39in1_state::base(machine_config &config)
@@ -556,6 +558,17 @@ ROM_START( jumanji ) // PCB383 - CHZ FP100 sticker on RAM under the lid. Dump wa
 	ROM_LOAD( "93c66.u32", 0x000, 0x200, NO_DUMP )
 ROM_END
 
+ROM_START( jumanjia ) // PCB383 - Jumanji FP101 sticker on RAM under the lid.
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "jumanji_113_fp101.u2", 0x00000, 0x80000, CRC(40a66c50) SHA1(8909db087a8527af8ce229b03e2f7f16160db6f0) )
+
+	ROM_REGION32_LE( 0x400000, "data", 0 )
+	ROM_LOAD( "m5m29gt320.u19", 0x000000, 0x400000, CRC(4cd694fe) SHA1(723c0ed2af994cc584654dbf0d779e1c90827c7b) )
+
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD( "at93c66.u32", 0x000, 0x200, CRC(60930a27) SHA1(9222b23d64d85f664037ba180f79045c108fed9c) )
+ROM_END
+
 ROM_START( plutus ) // PCB451 - PLUTUS FP100 sticker on PCB outside the lid
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "plutus v100.u2", 0x00000, 0x80000, CRC(3ac49895) SHA1(6de3dcac42afc4d9f927c9c9accf592b3d974fd3) )
@@ -596,5 +609,6 @@ GAME(2005, rodent,    0,        base,   39in1, _39in1_state, init_rodent,   ROT0
 GAME(2008, fruitwld,  0,        base,   39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V111)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V111.BIN 2008-04-30 15:59:21
 GAME(2007, fruitwlda, fruitwld, base,   39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V110)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V110.BIN 2007-07-26 13:46:30
 GAME(2007, jumanji,   0,        base,   39in1, _39in1_state, init_jumanji,  ROT0,  "I.A.M.",  "Jumanji (V502)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // CHZ_V502.BIN 2007-07-26 13:49:35 in clear text at the end of the main CPU ROM
+GAME(2007, jumanjia,  jumanji,  base,   39in1, _39in1_state, init_jumanjia, ROT0,  "I.A.M.",  "Jumanji (V113)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // JUMANJI_V113.BIN 2007-07-25 10:54:33
 GAME(200?, plutus,    0,        base,   39in1, _39in1_state, init_plutus,   ROT0,  "I.A.M.",  "Plutus (V100)",                                        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string
 GAME(200?, pokrwild,  0,        base,   39in1, _39in1_state, init_pokrwild, ROT0,  "I.A.M.",  "Poker's Wild (V117)",                                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string

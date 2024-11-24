@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_BARCREST_MPU4_CHARACTERISER_BL_H
-#define MAME_BARCREST_MPU4_CHARACTERISER_BL_H
+#ifndef MAME_BARCREST_MPU4_CHARACTERISER_BOOTLEG_H
+#define MAME_BARCREST_MPU4_CHARACTERISER_BOOTLEG_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ protected:
 	int m_prot_col = 0;
 };
 
-#endif // MAME_BARCREST_MPU4_CHARACTERISER_BL_H
+#endif // MAME_BARCREST_MPU4_CHARACTERISER_BOOTLEG_H

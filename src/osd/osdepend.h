@@ -16,6 +16,7 @@
 #include "emufwd.h"
 
 #include "bitmap.h"
+#include "interface/midiport.h"
 
 #include <cstdint>
 #include <memory>
@@ -97,6 +98,7 @@ public:
 	// MIDI interface
 	virtual std::unique_ptr<osd::midi_input_port> create_midi_input(std::string_view name) = 0;
 	virtual std::unique_ptr<osd::midi_output_port> create_midi_output(std::string_view name) = 0;
+	virtual std::vector<osd::midi_port_info> list_midi_ports() = 0;
 
 protected:
 	virtual ~osd_interface() { }

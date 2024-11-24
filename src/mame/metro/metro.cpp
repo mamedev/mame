@@ -3526,7 +3526,7 @@ void metro_state::puzzlet(machine_config &config)
 	maincpu.write_portb().set(FUNC(metro_state::puzzlet_portb_w));
 
 	// Coins/service
-	z8_device &coinmcu(Z86E02(config, "coinmcu", 20_MHz_XTAL/5)); // clock divider guessed
+	z8_device &coinmcu(Z86E02(config, "coinmcu", 20_MHz_XTAL / 3));
 	coinmcu.p0_in_cb().set_ioport("COIN");
 	coinmcu.p2_in_cb().set_ioport("START");
 	coinmcu.p2_out_cb().set(maincpu, FUNC(h83007_device::sci_rx_w<1>)).bit(6);
@@ -3545,8 +3545,8 @@ void metro_state::puzzlet(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, 20_MHz_XTAL/5, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.50);
-	YM2413(config, m_ymsnd, 20_MHz_XTAL/5).add_route(0, "mono", 0.90);
+	OKIM6295(config, m_oki, 4_MHz_XTAL, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.50);
+	YM2413(config, m_ymsnd, 3.58_MHz_XTAL).add_route(0, "mono", 0.90);
 }
 
 
@@ -4920,14 +4920,14 @@ VG2200-(B)
 |--------------------------------------------|
 Notes:
       H8/3007   - Hitachi HD6413007F20 CPU. Clock 20MHz
-      M6295     - Clock 4MHz [20/5]. Pin7 LOW
+      M6295     - Clock 4MHz resonator. Pin7 LOW
       I4300     - Imagetek I4300 Graphics Generator IC
       VSync     - 58Hz
       HSync     - 15.26kHz
-      Z86E02    - DIP18 surface scratched, decapping reveals Zilog Z8 MCU
+      Z86E02    - DIP18 surface scratched, decapping reveals Zilog Z8 MCU. Clock input 6.666666MHz [20/3]
       HM6216255 - Hitachi 4M high speed SRAM (256-kword x16-bit)
       CY7C199   - 32k x8 SRAM
-      YM2413B   - Clock 4MHz [20/5]
+      YM2413B   - Clock 3.58MHz resonator
       MM1035    - System Reset IC with Watchdog Timer
       TD62307   - 7 Channel Low Saturation Driver
       TD62064   - 4 Channel High Current Darlington Driver

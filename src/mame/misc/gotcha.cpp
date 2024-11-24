@@ -10,8 +10,9 @@ TODO:
 - Find out what the "Explane Type" dip switch actually does.
 - Unknown writes to 0x30000c. It changes for some levels, it's probably
   gfx related but since everything seems fine I've no idea what it might do.
-- Unknown sound writes at c00f; also, there's an NMI handler that would
-  read from c00f.
+- Unknown sound writes at c00f.
+- What is the audiocpu NMI for? It reads from c00f, and if you let NMI trigger
+  periodically, music will eventually fail.
 - Sound samples were getting chopped; I fixed this by changing sound/adpcm.cpp to
   disregard requests to play new samples until the previous one is finished*.
 
@@ -58,7 +59,7 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "gotcha.h"
+#include "decospr.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -69,8 +70,165 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "gotcha.lh"
+
+
+namespace {
+
+class gotcha_state : public driver_device
+{
+public:
+	gotcha_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_spriteram(*this, "spriteram"),
+		m_sprgen(*this, "spritegen"),
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamp_r(*this, "lamp_p%u_r", 1U),
+		m_lamp_g(*this, "lamp_p%u_g", 1U),
+		m_lamp_b(*this, "lamp_p%u_b", 1U),
+		m_lamp_s(*this, "lamp_p%u_s", 1U)
+	{
+	}
+
+	void gotcha(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	void lamps_w(uint16_t data);
+	void fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gfxbank_select_w(uint8_t data);
+	void gfxbank_w(uint8_t data);
+	void scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void oki_bank_w(uint8_t data);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	inline void get_tile_info( tile_data &tileinfo, int tile_index ,uint16_t *vram, int color_offs);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+
+	// memory pointers
+	required_shared_ptr<uint16_t> m_fgvideoram;
+	required_shared_ptr<uint16_t> m_bgvideoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_device<decospr_device> m_sprgen;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_banksel = 0U;
+	uint8_t m_gfxbank[4]{};
+	uint16_t m_scroll[4]{};
+
+	// devices
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	output_finder<3> m_lamp_r;
+	output_finder<3> m_lamp_g;
+	output_finder<3> m_lamp_b;
+	output_finder<3> m_lamp_s;
+};
+
+
+TILEMAP_MAPPER_MEMBER(gotcha_state::tilemap_scan)
+{
+	return (col & 0x1f) | (row << 5) | ((col & 0x20) << 5);
+}
+
+inline void gotcha_state::get_tile_info( tile_data &tileinfo, int tile_index ,uint16_t *vram, int color_offs)
+{
+	uint16_t data = vram[tile_index];
+	int code = (data & 0x3ff) | (m_gfxbank[(data & 0x0c00) >> 10] << 10);
+
+	tileinfo.set(0, code, (data >> 12) + color_offs, 0);
+}
+
+TILE_GET_INFO_MEMBER(gotcha_state::fg_get_tile_info)
+{
+	get_tile_info(tileinfo, tile_index, m_fgvideoram, 0);
+}
+
+TILE_GET_INFO_MEMBER(gotcha_state::bg_get_tile_info)
+{
+	get_tile_info(tileinfo, tile_index, m_bgvideoram, 16);
+}
+
+
+void gotcha_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gotcha_state::fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(gotcha_state::tilemap_scan)), 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gotcha_state::bg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(gotcha_state::tilemap_scan)), 16, 16, 64, 32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+
+	m_fg_tilemap->set_scrolldx(-1, 0);
+	m_bg_tilemap->set_scrolldx(-5, 0);
+}
+
+
+void gotcha_state::fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_fgvideoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void gotcha_state::bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_bgvideoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void gotcha_state::gfxbank_select_w(uint8_t data)
+{
+	m_banksel = data & 0x03;
+}
+
+void gotcha_state::gfxbank_w(uint8_t data)
+{
+	if (m_gfxbank[m_banksel] != (data & 0x0f))
+	{
+		m_gfxbank[m_banksel] = data & 0x0f;
+		machine().tilemap().mark_all_dirty();
+	}
+}
+
+void gotcha_state::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_scroll[offset]);
+
+	switch (offset)
+	{
+		case 0: m_fg_tilemap->set_scrollx(0, m_scroll[0]); break;
+		case 1: m_fg_tilemap->set_scrolly(0, m_scroll[1]); break;
+		case 2: m_bg_tilemap->set_scrollx(0, m_scroll[2]); break;
+		case 3: m_bg_tilemap->set_scrolly(0, m_scroll[3]); break;
+	}
+}
+
+
+uint32_t gotcha_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	return 0;
+}
 
 
 void gotcha_state::lamps_w(uint16_t data)
@@ -273,7 +431,6 @@ void gotcha_state::gotcha(machine_config &config)
 	screen.set_screen_update(FUNC(gotcha_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
-	screen.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI); // ?
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_gotcha);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 768);
@@ -410,6 +567,9 @@ ROM_START( ppchampa )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAMEL( 1997, gotcha,   0,      gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                          MACHINE_SUPPORTS_SAVE, layout_gotcha )
 GAMEL( 1997, ppchamp,  gotcha, gotcha, gotcha, gotcha_state, empty_init, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea, set 1)", MACHINE_SUPPORTS_SAVE, layout_gotcha )

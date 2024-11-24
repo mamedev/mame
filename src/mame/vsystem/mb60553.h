@@ -2,8 +2,8 @@
 // copyright-holders:David Haywood
 
 /*** MB60553 **********************************************/
-#ifndef MAME_VSYSTEM_MB60533_H
-#define MAME_VSYSTEM_MB60533_H
+#ifndef MAME_VSYSTEM_MB60553_H
+#define MAME_VSYSTEM_MB60553_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MB60553, mb60553_zooming_tilemap_device)
 
-#endif // MAME_VSYSTEM_MB60533_H
+#endif // MAME_VSYSTEM_MB60553_H

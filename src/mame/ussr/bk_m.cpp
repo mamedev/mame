@@ -42,16 +42,16 @@ uint16_t bk_state::vid_scroll_r()
 
 // SEL1 register (0010 and 0010.01)
 //
-// 15-8	R	high byte of cpu start address
-// 7	R	bitbanger cts in
-// 7	W	cassette motor control, 1: off 0: on
-// 6	R	keyboard any key down, 1: no 0: yes
-// 6	W	cassette data and speaker out
-// 5	R	cassette data in
-// 5	W	cassette data and bitbanger rts out
-// 4	R	bitbanger rx
-// 4	W	bitbanger tx
-// 2	R	updated
+// 15-8 R   high byte of cpu start address
+// 7    R   bitbanger cts in
+// 7    W   cassette motor control, 1: off 0: on
+// 6    R   keyboard any key down, 1: no 0: yes
+// 6    W   cassette data and speaker out
+// 5    R   cassette data in
+// 5    W   cassette data and bitbanger rts out
+// 4    R   bitbanger rx
+// 4    W   bitbanger tx
+// 2    R   updated
 //
 // only original 0010 has bitbanger wired to UP connector
 

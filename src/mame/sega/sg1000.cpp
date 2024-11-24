@@ -76,7 +76,6 @@ Notes:
 #include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/ram.h"
 #include "machine/upd765.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
@@ -105,7 +104,6 @@ public:
 	sg1000_state_base(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
-		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
 		m_cart(*this, "slot"),
 		m_sgexpslot(*this, "sgexp")
@@ -113,7 +111,6 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	optional_device<sega8_cart_slot_device> m_cart;
 	required_device<sg1000_expansion_slot_device> m_sgexpslot;
@@ -204,7 +201,8 @@ public:
 		sc3000_state(mconfig, type, tag),
 		m_fdc(*this, UPD765_TAG),
 		m_centronics(*this, "centronics"),
-		m_floppy0(*this, UPD765_TAG ":0:3ssdd")
+		m_floppy0(*this, UPD765_TAG ":0:3ssdd"),
+		m_romview(*this, "romview")
 	{ }
 
 	void sf7000(machine_config &config);
@@ -214,10 +212,11 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<floppy_image_device> m_floppy0;
 
+	memory_view m_romview;
+
 	int m_centronics_busy = 0;
 
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	void write_centronics_busy(int state);
 	uint8_t ppi_pa_r();
@@ -361,8 +360,9 @@ void sg1000_state::sc3000_io_map(address_map &map)
 
 void sf7000_state::sf7000_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bank1").bankw("bank2");
-	map(0x4000, 0xffff).ram();
+	map(0x0000, 0xffff).ram();
+	map(0x0000, 0x3fff).view(m_romview);
+	m_romview[0](0x0000, 0x3fff).rom().region(Z80_TAG, 0);
 }
 
 /*-------------------------------------------------
@@ -479,7 +479,7 @@ static INPUT_PORTS_START( sc3000 )
 	// keyboard keys are added by the embedded sk1100 device
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sg1000_state::trigger_nmi), 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sg1000_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
 /*-------------------------------------------------
@@ -563,13 +563,13 @@ void sf7000_state::ppi_pc_w(uint8_t data)
 	m_fdc->tc_w(BIT(data, 2));
 
 	/* FDC reset */
-	if (BIT(data, 3))
-	{
-		m_fdc->reset();
-	}
+	m_fdc->reset_w(BIT(data, 3));
 
 	/* ROM selection */
-	membank("bank1")->set_entry(BIT(data, 6));
+	if (BIT(data, 6))
+		m_romview.disable();
+	else
+		m_romview.select(0);
 
 	/* printer strobe */
 	m_centronics->write_strobe(BIT(data, 7));
@@ -660,17 +660,6 @@ void sf7000_state::machine_start()
 	sc3000_state::machine_start();
 
 	save_item(NAME(m_centronics_busy));
-
-	/* configure memory banking */
-	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_ram->pointer());
-	membank("bank2")->configure_entry(0, m_ram->pointer());
-}
-
-void sf7000_state::machine_reset()
-{
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
 }
 
 /***************************************************************************
@@ -733,9 +722,6 @@ void sg1000_state::sg1000(machine_config &config)
 
 	/* cartridge */
 	SG1000_CART_SLOT(config, m_cart, sg1000_cart, nullptr).set_must_be_loaded(true);
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("1K");
 }
 
 /*-------------------------------------------------
@@ -754,9 +740,6 @@ void omv_state::omv1000(machine_config &config)
 
 	/* cartridge */
 	OMV_CART_SLOT(config, m_cart, sg1000_cart, nullptr);
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("2K");
 }
 
 /*-------------------------------------------------
@@ -784,9 +767,6 @@ void sc3000_state::sc3000(machine_config &config)
 
 	/* cartridge */
 	SC3000_CART_SLOT(config, m_cart, sg1000_cart, nullptr).set_must_be_loaded(true);
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("2K");
 }
 
 /*-------------------------------------------------
@@ -807,6 +787,7 @@ void sf7000_state::sf7000(machine_config &config)
 	ppi.in_pa_callback().set(FUNC(sf7000_state::ppi_pa_r));
 	ppi.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi.out_pc_callback().set(FUNC(sf7000_state::ppi_pc_w));
+	ppi.tri_pc_callback().set_constant(0x8f); // /ROM SEL must be active after reset
 
 	i8251_device &upd8251(I8251(config, UPD8251_TAG, 0));
 	upd8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -828,9 +809,6 @@ void sf7000_state::sf7000(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_list").set_original("sf7000");
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("64K");
 }
 
 /***************************************************************************

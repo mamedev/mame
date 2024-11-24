@@ -1,14 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_TVGAMES_SUNPLUS_GCM394_H
-#define MAME_TVGAMES_SUNPLUS_GCM394_H
+#ifndef MAME_TVGAMES_GENERALPLUS_GPL16250_H
+#define MAME_TVGAMES_GENERALPLUS_GPL16250_H
 
 #pragma once
 
-#include "machine/generalplus_gpl16250soc.h"
 #include "generalplus_gpl16250_m.h"
-#include "bus/generic/slot.h"
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "machine/generalplus_gpl16250soc.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -154,6 +155,7 @@ public:
 	void gameu(machine_config &config);
 
 	void init_gameu();
+	void init_gameu108();
 
 protected:
 
@@ -166,6 +168,8 @@ private:
 	void gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	void decrypt_gameu();
+
 	uint32_t m_upperbase;
 	uint16_t m_porta_data;
 	uint16_t m_portb_data;
@@ -174,4 +178,4 @@ private:
 };
 
 
-#endif // MAME_TVGAMES_SUNPLUS_GCM394_H
+#endif // MAME_TVGAMES_GENERALPLUS_GPL16250_H

@@ -29,8 +29,8 @@ Hardware notes:
 - piezo, 64 LEDs, metal sensors chessboard*, 2 dials
 
 *: The chessboard technology is not with magnets (reed switches or hall effect
-sensors). There are of copper wires beneath the chessboard, each square resembles
-a metal detector. Chess pieces have aluminium washers at the bottom.
+sensors). There are lots of copper wires beneath the chessboard, each square
+resembles a metal detector. Chess pieces have aluminium washers at the bottom.
 
 TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
@@ -73,7 +73,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override { m_power = true; }
+	virtual void machine_reset() override ATTR_COLD { m_power = true; }
 
 private:
 	// devices/pointers

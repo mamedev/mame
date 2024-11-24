@@ -51,7 +51,7 @@ static void writeusage(std::wostream &output, bool write_word_usage, const struc
 // ----------------------------------------------------------------------
 
 static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
-	util::option_resolution *resolution, filter_getinfoproc *filter, const char **fork)
+	util::option_resolution *resolution, imgtool::filter_getinfoproc *filter, const char **fork)
 {
 	int i;
 	int lastunnamed = 0;
@@ -242,7 +242,6 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	if (err)
 		goto done;
 
-	memset(&ent, 0, sizeof(ent));
 	last_modified[0] = '\0';
 	total_count = 0;
 	total_size = 0;
@@ -286,7 +285,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 		total_count++;
 		total_size += ent.filesize;
 
-		memset(&ent, 0, sizeof(ent));
+		ent = imgtool_dirent();
 	}
 
 	freespace_err = partition->get_free_space(freespace);
@@ -317,7 +316,7 @@ static int cmd_get(const struct command *c, int argc, char *argv[])
 	const char *filename;
 	char *new_filename;
 	int unnamedargs = 0;
-	filter_getinfoproc filter;
+	imgtool::filter_getinfoproc filter;
 	const char *fork;
 	int partition_index = 0;
 
@@ -354,12 +353,11 @@ done:
 static int cmd_put(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	int i;
 	imgtool::image::ptr image;
 	imgtool::partition::ptr partition;
 	const char *filename = nullptr;
 	int unnamedargs;
-	filter_getinfoproc filter;
+	imgtool::filter_getinfoproc filter;
 	const imgtool_module *module;
 	std::unique_ptr<util::option_resolution> resolution;
 	const char *fork;
@@ -417,7 +415,7 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 	filename_count = unnamedargs - 3;
 
 	/* loop through the filenames, and put them */
-	for (i = 0; i < filename_count; i++)
+	for (int i = 0; i < filename_count; i++)
 	{
 		filename = filename_list[i];
 		util::stream_format(std::wcout, L"Putting file '%s'...\n", wstring_from_utf8(filename));
@@ -441,7 +439,7 @@ static int cmd_getall(const struct command *c, int argc, char *argv[])
 	imgtool::partition::ptr partition;
 	imgtool::directory::ptr imgenum;
 	imgtool_dirent ent;
-	filter_getinfoproc filter;
+	imgtool::filter_getinfoproc filter;
 	int unnamedargs;
 	const char *path = "";
 	int arg;
@@ -468,8 +466,6 @@ static int cmd_getall(const struct command *c, int argc, char *argv[])
 	err = imgtool::directory::open(*partition, path, imgenum);
 	if (err)
 		goto done;
-
-	memset(&ent, 0, sizeof(ent));
 
 	while (((err = imgenum->get_next(ent)) == 0) && !ent.eof)
 	{

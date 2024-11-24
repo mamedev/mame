@@ -205,7 +205,7 @@ static INPUT_PORTS_START( sc12_base )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12 )
-	PORT_INCLUDE( fidel_clockdiv_2 )
+	PORT_INCLUDE( fidel_clockdiv_2 ) // default for 3MHz
 	PORT_INCLUDE( sc12_base )
 
 	PORT_START("CPU")
@@ -216,7 +216,7 @@ static INPUT_PORTS_START( sc12 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12b )
-	PORT_INCLUDE( fidel_clockdiv_4 )
+	PORT_INCLUDE( fidel_clockdiv_4 ) // default for >3MHz
 	PORT_INCLUDE( sc12_base )
 
 	PORT_START("CPU")

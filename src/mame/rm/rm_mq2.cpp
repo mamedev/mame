@@ -124,14 +124,14 @@ void rmMQ2_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 rmMQ2_device::rmMQ2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, RM_MQ2, tag, owner, clock),
-		device_rs232_port_interface(mconfig, *this),
-		m_maincpu(*this, "maincpu"),
-		m_ctc(*this, "ctc"),
-		m_sio(*this, "sio"),
-		m_fdc(*this, "wd1793"),
-		m_floppy0(*this, "wd1793:0"),
-		m_floppy1(*this, "wd1793:1")
+	device_t(mconfig, RM_MQ2, tag, owner, clock),
+	device_rs232_port_interface(mconfig, *this),
+	m_maincpu(*this, "maincpu"),
+	m_ctc(*this, "ctc"),
+	m_sio(*this, "sio"),
+	m_fdc(*this, "wd1793"),
+	m_floppy0(*this, "wd1793:0"),
+	m_floppy1(*this, "wd1793:1")
 {
 }
 
@@ -241,7 +241,7 @@ uint8_t rmMQ2_device::fdc_read(offs_t offset)
 {
 	uint8_t data = m_fdc->read(offset);
 
-	/* When the 8INCH line is high the Index Pulse FDC input is connected to pin 4 of the 
+	/* When the 8INCH line is high the Index Pulse FDC input is connected to pin 4 of the
 	   floppy connector, which is unused by 5.25" drives.  This fact is used by the firmware
 	   to detect the drive type being used, i.e. it sets 8INCH high and checks to see if the IP
 	   is received within a set time.  We must therefore ensure that the INDEX bit of the

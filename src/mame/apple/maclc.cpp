@@ -74,6 +74,7 @@ public:
 		m_scc(*this, "scc"),
 		m_egret(*this, "egret"),
 		m_cuda(*this, "cuda"),
+		m_config(*this, "config"),
 		m_cur_floppy(nullptr),
 		m_hdsel(0)
 	{
@@ -102,8 +103,10 @@ private:
 	required_device<z80scc_device> m_scc;
 	optional_device<egret_device> m_egret;
 	optional_device<cuda_device> m_cuda;
+	optional_ioport m_config;
 
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u16 scc_r(offs_t offset)
 	{
@@ -157,6 +160,14 @@ void maclc_state::machine_start()
 	m_v8->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
 
 	save_item(NAME(m_hdsel));
+}
+
+void maclc_state::machine_reset()
+{
+	if (m_config)
+	{
+		m_maincpu->set_fpu_enable(BIT(m_config->read(), 0));
+	}
 }
 
 /***************************************************************************
@@ -306,6 +317,14 @@ void maclc_state::hdsel_w(int state)
 ***************************************************************************/
 
 static INPUT_PORTS_START( maclc )
+	PORT_START("config")
+	PORT_CONFNAME(0x01, 0x00, "FPU")
+	PORT_CONFSETTING(0x00, "No FPU")
+	PORT_CONFSETTING(0x01, "FPU Present")
+INPUT_PORTS_END
+
+// mactv doesn't have a way to add an FPU
+static INPUT_PORTS_START( mactv )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -386,8 +405,8 @@ void maclc_state::maclc_base(machine_config &config)
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.set_address_mask(0x80ffffff);
 	// V8 supports interrupts for slots $C, $D, and $E, but the LC, LC II, and Color Classic
-	// only hook the slot $E IRQ up to the PDS slot.
-	nubus.out_irqe_callback().set(m_v8, FUNC(v8_device::slot_irq_w<0x20>));
+	// only hook the slot $E IRQ up to the PDS slot.  ($C/$D/$E are 0/1/2 on the schematics).
+	nubus.out_irqe_callback().set(m_v8, FUNC(v8_device::slot2_irq_w));
 
 	MACADB(config, m_macadb, C15M);
 
@@ -491,6 +510,7 @@ void maclc_state::mactv(machine_config &config)
 	maclc_base(config);
 
 	M68030(config.replace(), m_maincpu, C32M);
+	m_maincpu->set_fpu_enable(false);   // this machine has no FPU and no ability to add one
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maccclassic_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -595,4 +615,4 @@ COMP(1990, maclc,  0, 0, maclc,  maclc, maclc_state, empty_init, "Apple Computer
 COMP(1991, maclc2, 0, 0, maclc2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh LC II", MACHINE_SUPPORTS_SAVE)
 COMP(1991, macclas2, 0, 0, macclas2, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE)
 COMP(1993, maccclas, 0, 0, maccclas, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh Color Classic", MACHINE_SUPPORTS_SAVE)
-COMP(1994, mactv, 0, 0, mactv, maclc, maclc_state, empty_init, "Apple Computer", "Macintosh TV", MACHINE_SUPPORTS_SAVE)
+COMP(1994, mactv, 0, 0, mactv, mactv, maclc_state, empty_init, "Apple Computer", "Macintosh TV", MACHINE_SUPPORTS_SAVE)

@@ -84,6 +84,7 @@ private:
 
 	uint8_t mmu_r(offs_t offset);
 	void mmu_w(offs_t offset, uint8_t data);
+	uint8_t vector_r(offs_t offset);
 
 	// sockets for upto 8 x SC67476, only 2 actually fitted in this machine
 	struct mmu {
@@ -98,8 +99,6 @@ private:
 	uint8_t opcode_r(offs_t offset);
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
-
-	bool m_irq_ack = 0;
 
 	required_device<mc6809_device> m_maincpu;
 	required_device<address_map_bank_device> m_mmu_bankdev;
@@ -126,7 +125,6 @@ void positron_state::machine_start()
 	m_fuse_timer = timer_alloc(FUNC(positron_state::fuse_update), this);
 	m_fuse_timer->adjust(attotime::never);
 	m_fuse_timer_running = false;
-	m_irq_ack = false;
 
 	save_item(STRUCT_MEMBER(m_mmu, access_reg));
 	save_item(STRUCT_MEMBER(m_mmu, key_value));
@@ -163,14 +161,6 @@ void positron_state::machine_reset()
 						logerror("mmu_shadow_r: switched to task %d\n", m_mmu.active_key);
 						m_mmu.sbit = false;
 						m_fuse_timer_running = false;
-					}
-					else if (m_irq_ack && offset >= 0xfff0 && offset != 0xffff)
-					{
-						m_mmu.active_key = 0;
-						logerror("irq_callback: switched to task %d\n", m_mmu.active_key);
-						m_mmu.sbit = true;
-						m_irq_ack = false;
-						data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
 					}
 				}
 			},
@@ -352,6 +342,15 @@ void positron_state::mmu_w(offs_t offset, uint8_t data)
 		offs_t mmu_addr = (m_mmu.access_reg[task_reg] << 11) | (offset & 0x7ff);
 		m_mmu_bankdev->write8(mmu_addr, data);
 	}
+}
+
+uint8_t positron_state::vector_r(offs_t offset)
+{
+	if (m_mmu.active_key != 0)
+		logerror("vector_r: switched to task 0 from task %d (vector = $%04X)\n", m_mmu.active_key, offset);
+	m_mmu.active_key = 0;
+	m_mmu.sbit = true;
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
 
@@ -825,7 +824,7 @@ void positron_state::positron(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &positron_state::positron_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &positron_state::positron_fetch);
 	m_maincpu->set_dasm_override(FUNC(positron_state::os9_dasm_override));
-	m_maincpu->set_irq_acknowledge_callback(NAME([this](device_t&, int) -> int { m_irq_ack = true; return 0; }));
+	m_maincpu->interrupt_vector_read().set(FUNC(positron_state::vector_r));
 
 	ADDRESS_MAP_BANK(config, m_mmu_bankdev); // SC67476
 	m_mmu_bankdev->set_addrmap(0, &positron_state::mmu_map);

@@ -40554,7 +40554,7 @@ List of unclassified roms
 	</software>
 
 	<software name="eyebeholj" cloneof="eyebehol">
-		<description>Eye of the Beholder (Japan)</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder (Japan)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SHVC-IB" />
@@ -40571,7 +40571,7 @@ List of unclassified roms
 	</software>
 
 	<software name="eyebehol">
-		<description>Eye of the Beholder (USA)</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder (USA)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<info name="release" value="199404xx" />

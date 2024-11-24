@@ -420,18 +420,20 @@ void lc8670_cpu_device::execute_run()
 	{
 		check_irqs();
 
-		m_ppc = m_pc;
-		debugger_instruction_hook(m_pc);
-
 		int cycles;
 
 		if (REG_PCON & HALT_MODE)
 		{
+			debugger_wait_hook();
+
 			// in HALT state the timers are still updated
 			cycles = 1;
 		}
 		else
 		{
+			m_ppc = m_pc;
+			debugger_instruction_hook(m_pc);
+
 			// instruction fetch
 			m_op = fetch();
 			int op_idx = decode_op(m_op);

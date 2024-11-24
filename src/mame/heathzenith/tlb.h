@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_HEATHKIT_TLB_H
-#define MAME_HEATHKIT_TLB_H
+#ifndef MAME_HEATHZENITH_TLB_H
+#define MAME_HEATHZENITH_TLB_H
 
 #pragma once
 
@@ -474,4 +474,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(HEATH_TLB_CONNECTOR, heath_tlb_connector)
 
-#endif // MAME_HEATHKIT_TLB_H
+#endif // MAME_HEATHZENITH_TLB_H

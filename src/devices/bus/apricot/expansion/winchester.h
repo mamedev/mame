@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_APRICOT_WINCHESTER_H
-#define MAME_BUS_APRICOT_WINCHESTER_H
+#ifndef MAME_BUS_APRICOT_EXPANSION_WINCHESTER_H
+#define MAME_BUS_APRICOT_EXPANSION_WINCHESTER_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(APRICOT_WINCHESTER, apricot_winchester_device)
 
-#endif // MAME_BUS_APRICOT_WINCHESTER_H
+#endif // MAME_BUS_APRICOT_EXPANSION_WINCHESTER_H

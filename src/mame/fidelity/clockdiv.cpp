@@ -93,7 +93,8 @@ void fidel_clockdiv_state::div_refresh(ioport_value val)
 				"program_div_w",
 				[this] (offs_t offset, u8 &data, u8 mem_mask)
 				{
-					div_prep_cpu_freq(offset & 0x6000);
+					if (!machine().side_effects_disabled())
+						div_prep_cpu_freq(offset & 0x6000);
 				},
 				&m_write_tap);
 	}

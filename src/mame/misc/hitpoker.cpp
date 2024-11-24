@@ -497,7 +497,7 @@ ROM_START( reelmtp )
 
 	ROM_REGION( 0x600, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "palce16v8h.u10", 0x000, 0x117, CRC(75ab49ba) SHA1(9060d59e92df0c6ed7b5041a98bb4ab5759e7d62) )
-	ROM_LOAD( "palce16v8h.2",   0x200, 0x117, NO_DUMP ) // U location no readable, but just over the above one
+	ROM_LOAD( "palce16v8h.u11", 0x200, 0x117, NO_DUMP ) // U location not readable, but just over the above one
 	ROM_LOAD( "pal.u26",        0x400, 0x117, NO_DUMP ) // scratched, can't read type
 ROM_END
 

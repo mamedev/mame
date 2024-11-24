@@ -117,6 +117,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
@@ -218,21 +219,18 @@ void a2bus_pcxporter_device::pc_io(address_map &map)
 
 void a2bus_pcxporter_device::device_add_mconfig(machine_config &config)
 {
-	V30(config, m_v30, A2BUS_7M_CLOCK);    // 7.16 MHz as per manual
+	V30(config, m_v30, DERIVED_CLOCK(1, 1));    // 7.16 MHz as per manual
 	m_v30->set_addrmap(AS_PROGRAM, &a2bus_pcxporter_device::pc_map);
 	m_v30->set_addrmap(AS_IO, &a2bus_pcxporter_device::pc_io);
 	m_v30->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 	m_v30->set_disable();
 
 	PIT8253(config, m_pit8253);
-	m_pit8253->set_clk<0>(A2BUS_7M_CLOCK / 6.0); // heartbeat IRQ
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
-	m_pit8253->set_clk<1>(A2BUS_7M_CLOCK / 6.0); // DRAM refresh
 	m_pit8253->out_handler<1>().set(FUNC(a2bus_pcxporter_device::pc_pit8253_out1_changed));
-	m_pit8253->set_clk<2>(A2BUS_7M_CLOCK / 6.0); // PIO port C pin 4, and speaker polling enough
 	m_pit8253->out_handler<2>().set(FUNC(a2bus_pcxporter_device::pc_pit8253_out2_changed));
 
-	PCXPORT_DMAC(config, m_dma8237, A2BUS_7M_CLOCK / 2);
+	PCXPORT_DMAC(config, m_dma8237, DERIVED_CLOCK(1, 2));
 	m_dma8237->out_hreq_callback().set(FUNC(a2bus_pcxporter_device::pc_dma_hrq_changed));
 	m_dma8237->out_eop_callback().set(FUNC(a2bus_pcxporter_device::pc_dma8237_out_eop));
 	m_dma8237->in_memr_callback().set(FUNC(a2bus_pcxporter_device::pc_dma_read_byte));
@@ -275,6 +273,14 @@ void a2bus_pcxporter_device::device_add_mconfig(machine_config &config)
 
 	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, "cga", true); // FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, "fdc_xt", true);
+}
+
+void a2bus_pcxporter_device::device_resolve_objects()
+{
+	// DERIVED_CLOCK doesn't work for this case, so do this here instead
+	m_pit8253->set_clk<0>(clock() / 6.0); // heartbeat IRQ
+	m_pit8253->set_clk<1>(clock() / 6.0); // DRAM refresh
+	m_pit8253->set_clk<2>(clock() / 6.0); // PIO port C pin 4, and speaker polling enough
 }
 
 //**************************************************************************

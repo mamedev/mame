@@ -63,6 +63,7 @@ public:
 	void gunnailb(machine_config &config);
 	void hachamf(machine_config &config);
 	void bjtwin(machine_config &config);
+	void cactus(machine_config &config);
 	void ssmissin(machine_config &config);
 	void bioship(machine_config &config);
 	void macross2(machine_config &config);

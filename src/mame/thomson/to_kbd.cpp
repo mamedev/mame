@@ -16,7 +16,7 @@
 #define LOG_KBD    (1U << 1)
 #define LOG_ERRORS (1U << 2)
 
-#define VERBOSE (LOG_KBD | LOG_ERRORS)
+//#define VERBOSE (LOG_KBD | LOG_ERRORS)
 #include "logmacro.h"
 
 

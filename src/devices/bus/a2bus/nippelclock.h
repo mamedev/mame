@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_A2BUS_A2NIPPELCLOCK_H
-#define MAME_BUS_A2BUS_A2NIPPELCLOCK_H
+#ifndef MAME_BUS_A2BUS_NIPPELCLOCK_H
+#define MAME_BUS_A2BUS_NIPPELCLOCK_H
 
 #pragma once
 
@@ -48,4 +48,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_NIPPELCLOCK, a2bus_nippelclock_device)
 
-#endif // MAME_BUS_A2BUS_A2NIPPELCLOCK_H
+#endif // MAME_BUS_A2BUS_NIPPELCLOCK_H

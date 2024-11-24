@@ -87,7 +87,7 @@ int rm380z_state_cos40_hrg::calculate_hrg_vram_index(offs_t offset) const
 	return index;
 }
 
-bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
+bool rm380z_state::get_rowcol_from_offset(int &row, int &col, offs_t offset) const
 {
 	col = offset & 0x3f;  // the 6 least significant bits give the column (0-39)
 	row = offset >> 6;    // next 5 bits give the row (0-23)
@@ -95,7 +95,7 @@ bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) con
 	return ((row < RM380Z_SCREENROWS) && (col < RM380Z_SCREENCOLS));
 }
 
-bool rm380z_state_cos40::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
+bool rm380z_state_cos40::get_rowcol_from_offset(int &row, int &col, offs_t offset) const
 {
 	if (m_videomode == RM380Z_VIDEOMODE_80COL)
 	{

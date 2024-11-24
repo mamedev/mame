@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Robin Sergeant
 
-#ifndef MAME_BUS_RM_MQ2_H
-#define MAME_BUS_RM_MQ2_H
+#ifndef MAME_RM_RM_MQ2_H
+#define MAME_RM_RM_MQ2_H
 
 #pragma once
 
@@ -50,4 +50,4 @@ private:
 
 DECLARE_DEVICE_TYPE(RM_MQ2, rmMQ2_device)
 
-#endif // MAME_BUS_RM_MQ2_H
+#endif // MAME_RM_RM_MQ2_H

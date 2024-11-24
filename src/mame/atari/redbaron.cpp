@@ -4,6 +4,9 @@
 
     Atari Red Baron sound hardware
 
+    TODO:
+    - convert to netlist
+
 *************************************************************************/
 /*
 
@@ -18,7 +21,6 @@
 
 #include "emu.h"
 #include "redbaron.h"
-#include "sound/pokey.h"
 
 #include <algorithm>
 
@@ -159,7 +161,7 @@ void redbaron_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 				/* discharge C32 (0.1u) through R26 (33k) + R27 (15k)
 				 * 0.68 * C32 * (R26 + R27) = 3264us
 				 */
-//              constexpr int C32_DISCHARGE_TIME = int(32767 / 0.003264);
+				//constexpr int C32_DISCHARGE_TIME = int(32767 / 0.003264);
 				/* I think this is to short. Is C32 really 1u? */
 				constexpr int C32_DISCHARGE_TIME = int(32767 / 0.03264);
 				m_shot_amp_counter -= C32_DISCHARGE_TIME;
@@ -201,7 +203,7 @@ void redbaron_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 				 * frequency = 1.44 / ((33k + 2*47k) * 0.01u) = 1134Hz
 				 * modulated by squeal_amp
 				 */
-				m_squeal_off_counter -= (1134 + 1134 * m_squeal_amp / 32767) / 3;
+				m_squeal_off_counter -= 2268 - 1134 * m_squeal_amp / 32767;
 				while( m_squeal_off_counter <= 0 )
 				{
 					m_squeal_off_counter += OUTPUT_RATE;
@@ -219,7 +221,7 @@ void redbaron_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 			}
 		}
 
-		/* mix sequal sound at 40% */
+		/* mix squeal sound at 40% */
 		if( m_squeal_out )
 			sum += 32767 * 40 / 100;
 
@@ -236,11 +238,4 @@ void redbaron_sound_device::sounds_w(uint8_t data)
 
 	m_channel->update();
 	m_latch = data;
-}
-
-
-void redbaron_sound_device::pokey_w(offs_t offset, uint8_t data)
-{
-	//if( m_latch & 0x20 )
-		//m_pokey->write(offset, data);
 }

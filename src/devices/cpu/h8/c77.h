@@ -2,9 +2,9 @@
 // copyright-holders:smf, Olivier Galibert
 /***************************************************************************
 
-	Namco C77
+    Namco C77
 
-	Custom H8 used on Cyberlead cabinet I/O boards
+    Custom H8 used on Cyberlead cabinet I/O boards
 
 ***************************************************************************/
 

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_COMX35_FD_H
-#define MAME_BUS_COMX35_FD_H
+#ifndef MAME_BUS_COMX35_FDC_H
+#define MAME_BUS_COMX35_FDC_H
 
 #pragma once
 
@@ -65,5 +65,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(COMX_FD, comx_fd_device)
 
-
-#endif // MAME_BUS_COMX35_FD_H
+#endif // MAME_BUS_COMX35_FDC_H

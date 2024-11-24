@@ -4163,6 +4163,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="danchits">
+		<description>Danchi Tsuma no Yuuwaku (Japan)</description>
+		<year>1985</year>
+		<publisher>KOEI</publisher>
+		<info name="alt_title" value="団地妻の誘惑"/>
+		<info name="serial" value="MXKN11006"/>
+		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system."/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="31456">
+				<rom name="the temptation of the apartment wife - koei.cas" size="31456" crc="22acc51a" sha1="038e9a56baa747530fb0c44e23838973fc6c4703"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dmouse">
 		<description>Danger Mouse in the Black Forest Chateau (Europe)</description>
 		<year>1986</year>
@@ -16400,20 +16414,6 @@ Side B
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="63390">
 				<rom name="teenage mutant hero turtles (1990)(mcm software)[passworded][run'cas-'].cas" size="63390" crc="45e1d213" sha1="8ac173faad6e9ce19613faf8f81fd6e57e27572c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="temptawf">
-		<description>The Temptation of the Apartment Wife (Japan)</description>
-		<year>1985</year>
-		<publisher>KOEI</publisher>
-		<info name="alt_title" value="団地妻の誘惑"/>
-		<info name="serial" value="MXKN11006"/>
-		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system."/>
-		<part name="cass1" interface="msx_cass">
-			<dataarea name="cass" size="31456">
-				<rom name="the temptation of the apartment wife - koei.cas" size="31456" crc="22acc51a" sha1="038e9a56baa747530fb0c44e23838973fc6c4703"/>
 			</dataarea>
 		</part>
 	</software>

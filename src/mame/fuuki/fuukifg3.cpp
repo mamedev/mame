@@ -167,7 +167,8 @@ There is an Asura Buster known to exist on a FG3-SUB-EP containing all EPROMs
 
 #include "emu.h"
 
-#include "fuukifg.h"
+#include "fuukispr.h"
+#include "fuukitmap.h"
 
 #include "cpu/m68000/m68020.h"
 #include "cpu/z80/z80.h"
@@ -190,25 +191,21 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_fuukivid(*this, "fuukivid")
+		, m_fuukispr(*this, "fuukispr")
+		, m_fuukitmap(*this, "fuukitmap")
 		, m_spriteram(*this, "spriteram", 0x2000, ENDIANNESS_BIG)
-		, m_vram(*this, "vram.%u", 0)
-		, m_vregs(*this, "vregs", 0x20, ENDIANNESS_BIG)
-		, m_priority(*this, "priority")
 		, m_tilebank(*this, "tilebank")
 		, m_shared_ram(*this, "shared_ram")
 		, m_soundbank(*this, "soundbank")
 		, m_system(*this, "SYSTEM")
 		, m_inputs(*this, "INPUTS")
-		, m_dsw1(*this, "DSW1")
-		, m_dsw2(*this, "DSW2")
+		, m_dsw(*this, "DSW%u", 1U)
 	{ }
 
 	void fuuki32(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -217,13 +214,11 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<fuukivid_device> m_fuukivid;
+	required_device<fuukispr_device> m_fuukispr;
+	required_device<fuukitmap_device> m_fuukitmap;
 
 	// memory pointers
 	memory_share_creator<u16> m_spriteram;
-	required_shared_ptr_array<u32, 4> m_vram;
-	memory_share_creator<u16> m_vregs;
-	required_shared_ptr<u32> m_priority;
 	required_shared_ptr<u32> m_tilebank;
 	required_shared_ptr<u8> m_shared_ram;
 	std::unique_ptr<u16[]> m_buf_spriteram[2];
@@ -232,43 +227,26 @@ private:
 
 	required_ioport m_system;
 	required_ioport m_inputs;
-	required_ioport m_dsw1;
-	required_ioport m_dsw2;
+	required_ioport_array<2> m_dsw;
 
 	// video-related
-	tilemap_t *m_tilemap[3]{};
 	u32 m_spr_buffered_tilebank[2]{};
-
-	// misc
-	emu_timer *m_level_1_interrupt_timer = nullptr;
-	emu_timer *m_vblank_interrupt_timer = nullptr;
-	emu_timer *m_raster_interrupt_timer = nullptr;
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(level1_interrupt);
-	TIMER_CALLBACK_MEMBER(vblank_interrupt);
-	TIMER_CALLBACK_MEMBER(raster_interrupt);
-
 	u8 snd_020_r(offs_t offset);
 	void snd_020_w(offs_t offset, u8 data, u8 mem_mask = ~0);
 	void sprram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 sprram_r(offs_t offset);
-	u16 vregs_r(offs_t offset);
-	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void sound_bw_w(u8 data);
-	template<int Layer> void vram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	template<int Layer> void vram_buffered_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	template<int Layer, int ColShift> TILE_GET_INFO_MEMBER(get_tile_info);
-
-	void tile_cb(u32 &code);
-	void colpri_cb(u32 &colour, u32 &pri_mask);
+	void spr_tile_cb(u32 &code);
+	void spr_colpri_cb(u32 &colour, u32 &pri_mask);
+	void tmap_colour_cb(u8 layer, u32 &colour);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
-	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 i, int flag, u8 pri, u8 primask = 0xff);
 };
 
 
@@ -295,33 +273,6 @@ private:
 
 ***************************************************************************/
 
-
-/***************************************************************************
-
-
-                                    Tilemaps
-
-    Offset:     Bits:                   Value:
-
-        0.w                             Code
-
-        2.w     fedc ba98 ---- ----
-                ---- ---- 7--- ----     Flip Y
-                ---- ---- -6-- ----     Flip X
-                ---- ---- --54 3210     Color
-
-
-***************************************************************************/
-
-template<int Layer, int ColShift>
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info)
-{
-	const int buffer = (Layer < 2) ? 0 : (m_vregs[0x1e / 2] & 0x40) >> 6;
-	const u16 code = (m_vram[Layer|buffer][tile_index] & 0xffff0000) >> 16;
-	const u16 attr = (m_vram[Layer|buffer][tile_index] & 0x0000ffff);
-	tileinfo.set(Layer, code, (attr & 0x3f) >> ColShift, TILE_FLIPYX(attr >> 6));
-}
-
 /***************************************************************************
 
 
@@ -336,16 +287,12 @@ void fuuki32_state::video_start()
 	m_buf_spriteram[0] = make_unique_clear<u16[]>(spriteram_size / 2);
 	m_buf_spriteram[1] = make_unique_clear<u16[]>(spriteram_size / 2);
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fuuki32_state::get_tile_info<0, 4>))), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fuuki32_state::get_tile_info<1, 4>))), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fuuki32_state::get_tile_info<2, 0>))), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_fuukitmap->set_transparent_pen(0, 0xff);    // 8 bits
+	m_fuukitmap->set_transparent_pen(1, 0xff);    // 8 bits
+	m_fuukitmap->set_transparent_pen(2, 0x0f);    // 4 bits
 
-	m_tilemap[0]->set_transparent_pen(0xff);    // 8 bits
-	m_tilemap[1]->set_transparent_pen(0xff);    // 8 bits
-	m_tilemap[2]->set_transparent_pen(0x0f);    // 4 bits
-
-	//m_gfxdecode->gfx(0)->set_granularity(16); // 256 colour tiles with palette selectable on 16 colour boundaries
-	//m_gfxdecode->gfx(1)->set_granularity(16);
+	//m_fuukitmap->gfx(0)->set_granularity(16); // 256 colour tiles with palette selectable on 16 colour boundaries
+	//m_fuukitmap->gfx(1)->set_granularity(16);
 
 	save_pointer(NAME(m_buf_spriteram[0]), spriteram_size / 2);
 	save_pointer(NAME(m_buf_spriteram[1]), spriteram_size / 2);
@@ -362,7 +309,7 @@ u16 fuuki32_state::sprram_r(offs_t offset)
 	return m_spriteram[offset];
 }
 
-void fuuki32_state::tile_cb(u32 &code)
+void fuuki32_state::spr_tile_cb(u32 &code)
 {
 	const u32 bank = (code & 0xc000) >> 14;
 
@@ -371,7 +318,7 @@ void fuuki32_state::tile_cb(u32 &code)
 	code += bank_lookedup * 0x4000;
 }
 
-void fuuki32_state::colpri_cb(u32 &colour, u32 &pri_mask)
+void fuuki32_state::spr_colpri_cb(u32 &colour, u32 &pri_mask)
 {
 	const u8 priority = (colour >> 6) & 3;
 	switch (priority)
@@ -385,95 +332,26 @@ void fuuki32_state::colpri_cb(u32 &colour, u32 &pri_mask)
 	colour &= 0x3f;
 }
 
-/***************************************************************************
-
-
-                                Screen Drawing
-
-    Video Registers (vregs):
-
-        00.w        Layer 0 Scroll Y
-        02.w        Layer 0 Scroll X
-        04.w        Layer 1 Scroll Y
-        06.w        Layer 1 Scroll X
-        08.w        Layer 2 Scroll Y
-        0a.w        Layer 2 Scroll X
-        0c.w        Layers Y Offset
-        0e.w        Layers X Offset
-
-        10-1a.w     ? 0
-        1c.w        Trigger a level 5 irq on this raster line
-        1e.w        ? $3390/$3393 (Flip Screen Off/On), $0040 is buffer for tilemap 2
-
-    Priority Register (priority):
-
-        fedc ba98 7654 3---
-        ---- ---- ---- -210     Layer Order
-
-
-    Unknown Registers ($de0000.l):
-
-        00.w        ? $0200/$0201   (Flip Screen Off/On)
-        02.w        ? $f300/$0330
-
-***************************************************************************/
-
-// Wrapper to handle bg and bg2 together
-void fuuki32_state::draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 i, int flag, u8 pri, u8 primask)
+void fuuki32_state::tmap_colour_cb(u8 layer, u32 &colour)
 {
-	m_tilemap[i]->draw(screen, bitmap, cliprect, flag, pri, primask);
+	if (layer < 2)
+		colour >>= 4;
 }
 
 u32 fuuki32_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/*
-	It's not independent bits causing layers to switch, that wouldn't make sense with 3 bits.
-	*/
-
-	static const u8 pri_table[6][3] = {
-		{ 0, 1, 2 }, // Special moves 0>1, 0>2 (0,1,2 or 0,2,1)
-		{ 0, 2, 1 }, // Two Levels - 0>1 (0,1,2 or 0,2,1 or 2,0,1)
-		{ 1, 0, 2 }, // Most Levels - 2>1 1>0 2>0 (1,0,2)
-		{ 1, 2, 0 }, // Not used?
-		{ 2, 0, 1 }, // Title etc. - 0>1 (0,1,2 or 0,2,1 or 2,0,1)
-		{ 2, 1, 0 }}; // Char Select, prison stage 1>0 (leaves 1,2,0 or 2,1,0)
-
-	const u8 tm_front  = pri_table[(m_priority[0] >> 16) & 0x0f][0];
-	const u8 tm_middle = pri_table[(m_priority[0] >> 16) & 0x0f][1];
-	const u8 tm_back   = pri_table[(m_priority[0] >> 16) & 0x0f][2];
-
-	flip_screen_set(m_vregs[0x1e / 2] & 1);
-
-	// Layers scrolling
-
-	const u16 scrolly_offs = m_vregs[0xc / 2] - (flip_screen() ? 0x103 : 0x1f3);
-	const u16 scrollx_offs = m_vregs[0xe / 2] - (flip_screen() ? 0x2c7 : 0x3f6);
-
-	const u16 layer0_scrolly = m_vregs[0x0 / 2] + scrolly_offs;
-	const u16 layer0_scrollx = m_vregs[0x2 / 2] + scrollx_offs;
-	const u16 layer1_scrolly = m_vregs[0x4 / 2] + scrolly_offs;
-	const u16 layer1_scrollx = m_vregs[0x6 / 2] + scrollx_offs;
-
-	const u16 layer2_scrolly = m_vregs[0x8 / 2];
-	const u16 layer2_scrollx = m_vregs[0xa / 2];
-
-	m_tilemap[0]->set_scrollx(0, layer0_scrollx);
-	m_tilemap[0]->set_scrolly(0, layer0_scrolly);
-	m_tilemap[1]->set_scrollx(0, layer1_scrollx);
-	m_tilemap[1]->set_scrolly(0, layer1_scrolly);
-
-	m_tilemap[2]->set_scrollx(0, layer2_scrollx);
-	m_tilemap[2]->set_scrolly(0, layer2_scrolly);
+	m_fuukitmap->prepare();
+	flip_screen_set(m_fuukitmap->flip_screen());
 
 	// The bg colour is the last pen i.e. 0x1fff
 	bitmap.fill((0x800 * 4) - 1, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	draw_layer(screen, bitmap, cliprect, tm_back,   0, 1);
-	draw_layer(screen, bitmap, cliprect, tm_middle, 0, 2);
-	draw_layer(screen, bitmap, cliprect, tm_front,  0, 4);
+	m_fuukitmap->draw_layer(screen, bitmap, cliprect, m_fuukitmap->tmap_back(),   0, 1);
+	m_fuukitmap->draw_layer(screen, bitmap, cliprect, m_fuukitmap->tmap_middle(), 0, 2);
+	m_fuukitmap->draw_layer(screen, bitmap, cliprect, m_fuukitmap->tmap_front(),  0, 4);
 
-	m_fuukivid->draw_sprites(screen, bitmap, cliprect, flip_screen(), m_buf_spriteram[1].get(), m_spriteram.bytes() / 2);
+	m_fuukispr->draw_sprites(screen, bitmap, cliprect, flip_screen(), m_buf_spriteram[1].get(), m_spriteram.bytes() / 2);
 	return 0;
 }
 
@@ -508,69 +386,23 @@ void fuuki32_state::snd_020_w(offs_t offset, u8 data, u8 mem_mask)
 	COMBINE_DATA(&m_shared_ram[offset]);
 }
 
-u16 fuuki32_state::vregs_r(offs_t offset)
-{
-	return m_vregs[offset];
-}
-
-void fuuki32_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	const u16 old = m_vregs[offset];
-	data = COMBINE_DATA(&m_vregs[offset]);
-	if (old != data)
-	{
-		if (offset == 0x1c / 2)
-		{
-			const rectangle &visarea = m_screen->visible_area();
-			attotime period = m_screen->frame_period();
-			m_raster_interrupt_timer->adjust(m_screen->time_until_pos(data, visarea.max_x + 1), 0, period);
-		}
-		if (offset == 0x1e / 2)
-		{
-			if ((old ^ data) & 0x40)
-				m_tilemap[2]->mark_all_dirty();
-		}
-	}
-}
-
-template<int Layer>
-void fuuki32_state::vram_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	COMBINE_DATA(&m_vram[Layer][offset]);
-	m_tilemap[Layer]->mark_tile_dirty(offset);
-}
-
-template<int Layer>
-void fuuki32_state::vram_buffered_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	const int buffer = (m_vregs[0x1e / 2] & 0x40) >> 6;
-	COMBINE_DATA(&m_vram[Layer][offset]);
-	if ((Layer & 1) == buffer)
-		m_tilemap[2]->mark_tile_dirty(offset);
-}
-
 void fuuki32_state::main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	map(0x400000, 0x40ffff).ram();                                                                     // Work RAM
 	map(0x410000, 0x41ffff).ram();                                                                     // Work RAM (used by asurabus)
 
-	map(0x500000, 0x501fff).ram().w(FUNC(fuuki32_state::vram_w<0>)).share(m_vram[0]);  // Tilemap 1
-	map(0x502000, 0x503fff).ram().w(FUNC(fuuki32_state::vram_w<1>)).share(m_vram[1]);  // Tilemap 2
-	map(0x504000, 0x505fff).ram().w(FUNC(fuuki32_state::vram_buffered_w<2>)).share(m_vram[2]);  // Tilemap bg
-	map(0x506000, 0x507fff).ram().w(FUNC(fuuki32_state::vram_buffered_w<3>)).share(m_vram[3]);  // Tilemap bg2
+	map(0x500000, 0x507fff).m(m_fuukitmap, FUNC(fuukitmap_device::vram_map));
 	map(0x508000, 0x517fff).ram();                                                                     // More tilemap, or linescroll? Seems to be empty all of the time
 	map(0x600000, 0x601fff).rw(FUNC(fuuki32_state::sprram_r), FUNC(fuuki32_state::sprram_w));
 	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 
 	map(0x800000, 0x800003).lr16(NAME([this] () { return u16(m_system->read()); })).nopw();  // Coin
 	map(0x810000, 0x810003).lr16(NAME([this] () { return u16(m_inputs->read()); })).nopw();  // Player inputs
-	map(0x880000, 0x880003).lr16(NAME([this] () { return u16(m_dsw1->read()); }));           // Service + DIPs
-	map(0x890000, 0x890003).lr16(NAME([this] () { return u16(m_dsw2->read()); }));           // More DIPs
+	map(0x880000, 0x880003).lr16(NAME([this] () { return u16(m_dsw[0]->read()); }));           // Service + DIPs
+	map(0x890000, 0x890003).lr16(NAME([this] () { return u16(m_dsw[1]->read()); }));           // More DIPs
 
-	map(0x8c0000, 0x8c001f).rw(FUNC(fuuki32_state::vregs_r), FUNC(fuuki32_state::vregs_w));
-	map(0x8d0000, 0x8d0003).ram();                                                                     // Flipscreen related
-	map(0x8e0000, 0x8e0003).ram().share(m_priority);                            // Controls layer order
+	map(0x8c0000, 0x8effff).m(m_fuukitmap, FUNC(fuukitmap_device::vregs_map));
 	map(0x903fe0, 0x903fff).rw(FUNC(fuuki32_state::snd_020_r), FUNC(fuuki32_state::snd_020_w)).umask32(0x00ff00ff);                                         // Shared with Z80
 	map(0xa00000, 0xa00003).writeonly().share(m_tilebank);
 }
@@ -771,47 +603,13 @@ GFXDECODE_END
 //  driver functions
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(fuuki32_state::level1_interrupt)
-{
-	m_maincpu->set_input_line(1, HOLD_LINE);
-	m_level_1_interrupt_timer->adjust(m_screen->time_until_pos(248));
-}
-
-TIMER_CALLBACK_MEMBER(fuuki32_state::vblank_interrupt)
-{
-	m_maincpu->set_input_line(3, HOLD_LINE);    // VBlank IRQ
-	m_vblank_interrupt_timer->adjust(m_screen->time_until_vblank_start());
-}
-
-TIMER_CALLBACK_MEMBER(fuuki32_state::raster_interrupt)
-{
-	m_maincpu->set_input_line(5, HOLD_LINE);    // Raster Line IRQ
-	m_screen->update_partial(m_screen->vpos());
-	m_raster_interrupt_timer->adjust(m_screen->frame_period());
-}
-
-
 void fuuki32_state::machine_start()
 {
 	u8 *rom = memregion("soundcpu")->base();
 
 	m_soundbank->configure_entries(0, 0x10, &rom[0], 0x8000);
 
-	m_level_1_interrupt_timer = timer_alloc(FUNC(fuuki32_state::level1_interrupt), this);
-	m_vblank_interrupt_timer = timer_alloc(FUNC(fuuki32_state::vblank_interrupt), this);
-	m_raster_interrupt_timer = timer_alloc(FUNC(fuuki32_state::raster_interrupt), this);
-
 	save_item(NAME(m_spr_buffered_tilebank));
-}
-
-
-void fuuki32_state::machine_reset()
-{
-	const rectangle &visarea = m_screen->visible_area();
-
-	m_level_1_interrupt_timer->adjust(m_screen->time_until_pos(248));
-	m_vblank_interrupt_timer->adjust(m_screen->time_until_vblank_start());
-	m_raster_interrupt_timer->adjust(m_screen->time_until_pos(0, visarea.max_x + 1));
 }
 
 
@@ -837,12 +635,21 @@ void fuuki32_state::fuuki32(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fuuki32);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xRGB_555, 0x4000 / 2);
 
-	FUUKI_VIDEO(config, m_fuukivid, 0);
-	m_fuukivid->set_palette(m_palette);
-	m_fuukivid->set_color_base(0x400*2);
-	m_fuukivid->set_color_num(0x40);
-	m_fuukivid->set_tile_callback(FUNC(fuuki32_state::tile_cb));
-	m_fuukivid->set_colpri_callback(FUNC(fuuki32_state::colpri_cb));
+	FUUKI_SPRITE(config, m_fuukispr, 0);
+	m_fuukispr->set_palette(m_palette);
+	m_fuukispr->set_color_base(0x400*2);
+	m_fuukispr->set_color_num(0x40);
+	m_fuukispr->set_tile_callback(FUNC(fuuki32_state::spr_tile_cb));
+	m_fuukispr->set_colpri_callback(FUNC(fuuki32_state::spr_colpri_cb));
+
+	FUUKI_TILEMAP(config, m_fuukitmap, 0, m_palette, gfx_fuuki32);
+	m_fuukitmap->set_screen(m_screen);
+	m_fuukitmap->set_colour_callback(FUNC(fuuki32_state::tmap_colour_cb));
+	m_fuukitmap->level_1_irq_callback().set_inputline(m_maincpu, 1, HOLD_LINE);
+	m_fuukitmap->vblank_irq_callback().set_inputline(m_maincpu, 3, HOLD_LINE);
+	m_fuukitmap->raster_irq_callback().set_inputline(m_maincpu, 5, HOLD_LINE);
+	m_fuukitmap->set_xoffs(0x1f3, 0x103);
+	m_fuukitmap->set_yoffs(0x3f6, 0x2c7);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -880,7 +687,7 @@ ROM_START( asurabld )
 	ROM_REGION( 0x80000, "soundcpu", 0 ) // Z80
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(bb1deb89) SHA1(b1c70abddc0b9a88beb69a592376ff69a7e091eb) )
 
-	ROM_REGION( 0x2000000, "fuukivid", 0 )
+	ROM_REGION( 0x2000000, "fuukispr", 0 )
 	// 0x0000000 - 0x03fffff empty */ /* spXX.uYY - XX is the bank number!
 	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(7df492eb) SHA1(30b88a3cd025ffc8c28fef06e0784755be37ef8e) )
 	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(1890f42a) SHA1(22254fe38fd83f4602a25e1ccba32df16edaf3f9) )
@@ -922,7 +729,7 @@ ROM_START( asurabus )
 	ROM_REGION( 0x80000, "soundcpu", 0 ) // Z80
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
 
-	ROM_REGION( 0x2000000, "fuukivid", 0 )
+	ROM_REGION( 0x2000000, "fuukispr", 0 )
 	ROM_LOAD16_WORD_SWAP( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
 	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
 	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )
@@ -957,7 +764,7 @@ ROM_START( asurabusj )
 	ROM_REGION( 0x80000, "soundcpu", 0 ) // Z80
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
 
-	ROM_REGION( 0x2000000, "fuukivid", 0 )
+	ROM_REGION( 0x2000000, "fuukispr", 0 )
 	ROM_LOAD16_WORD_SWAP( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
 	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
 	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )
@@ -992,7 +799,7 @@ ROM_START( asurabusja )
 	ROM_REGION( 0x80000, "soundcpu", 0 ) // Z80
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
 
-	ROM_REGION( 0x2000000, "fuukivid", 0 )
+	ROM_REGION( 0x2000000, "fuukispr", 0 )
 	ROM_LOAD16_WORD_SWAP( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
 	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
 	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )
@@ -1027,7 +834,7 @@ ROM_START( asurabusjr ) // ARCADIA review build
 	ROM_REGION( 0x80000, "soundcpu", 0 ) // Z80
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
 
-	ROM_REGION( 0x2000000, "fuukivid", 0 )
+	ROM_REGION( 0x2000000, "fuukispr", 0 )
 	ROM_LOAD16_WORD_SWAP( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
 	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
 	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )

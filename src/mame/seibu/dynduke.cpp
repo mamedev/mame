@@ -9,9 +9,6 @@
 
     To access test mode, reset with both start buttons held.
 
-    Coin inputs are handled by the sound CPU, so they don't work with sound
-    disabled. Just put the game in Free Play mode.
-
     The background layer is 5bpp and I'm not 100% sure the colours are
     correct on it, although the layer is 5bpp the palette data is 4bpp.
     My current implementation looks pretty good though I've never seen
@@ -24,6 +21,9 @@
     enemy patterns and drops.
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
+
+    TODO:
+    - can be moved to raiden.cpp?
 
 
         SW#1
@@ -60,11 +60,6 @@
         --------------------------------------------------------------------
         FACTORY SETTINGS                     OFF OFF OFF OFF OFF OFF OFF OFF
         --------------------------------------------------------------------
-
-
-2008-07
-Dip locations and factory settings verified with dip listing
-Also, implemented conditional port for Coin Mode (SW1:1)
 
 ***************************************************************************/
 
@@ -105,6 +100,8 @@ public:
 
 	void dynduke(machine_config &config);
 	void dbldyn(machine_config &config);
+
+	void init_dynduke();
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -184,11 +181,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_bg_tile_info)
 	uint32_t const color = tile >> 12;
 
 	tile = tile & 0xfff;
-
-	tileinfo.set(1,
-			tile + m_back_bankbase,
-			color,
-			0);
+	tileinfo.set(1, tile + m_back_bankbase, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
@@ -197,11 +190,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
 	uint32_t const color = tile >> 12;
 
 	tile = tile & 0xfff;
-
-	tileinfo.set(2,
-			tile + m_fore_bankbase,
-			color,
-			0);
+	tileinfo.set(2, tile + m_fore_bankbase, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
@@ -210,11 +199,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
 	uint32_t const color = (tile >> 8) & 0x0f;
 
 	tile = (tile & 0xff) | ((tile & 0xc000) >> 6);
-
-	tileinfo.set(0,
-			tile,
-			color,
-			0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 void dynduke_state::video_start()
@@ -266,7 +251,6 @@ void dynduke_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		// bit 0x04 unused? txt disable?
 		// bit 0x02 is used on the map screen (fore disable?)
 		// bit 0x01 set when inserting coin.. bg disable?
-
 		m_back_enable = BIT(~data, 0);
 		m_fore_enable = BIT(~data, 1);
 		m_txt_enable = BIT(~data, 2);
@@ -325,6 +309,7 @@ void dynduke_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	// The transparency / palette handling on the background layer is very strange
 	bitmap_ind16 &bm = m_bg_layer->pixmap();
+
 	// if we're disabled, don't draw
 	if (!m_back_enable)
 	{
@@ -347,7 +332,6 @@ void dynduke_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 		uint16_t const *const src = &bm.pix(realy);
 		uint16_t *const dst = &bitmap.pix(y);
 		uint8_t *const pdst = &screen.priority().pix(y);
-
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
@@ -372,8 +356,6 @@ void dynduke_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 				dst[x] = srcdat;
 				pdst[x] |= pri_mask;
 			}
-
-
 		}
 	}
 }
@@ -381,6 +363,7 @@ void dynduke_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 uint32_t dynduke_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
+
 	// Setup the tilemaps
 	m_fg_layer->set_scrolly(0, ((m_scroll_ram[0x11] & 0x30) << 4) + ((m_scroll_ram[0x12] & 0x7f) << 1) + ((m_scroll_ram[0x12] & 0x80) >> 7));
 	m_fg_layer->set_scrollx(0, ((m_scroll_ram[0x19] & 0x30) << 4) + ((m_scroll_ram[0x1a] & 0x7f) << 1) + ((m_scroll_ram[0x1a] & 0x80) >> 7));
@@ -471,10 +454,11 @@ void dynduke_state::sei80bu_encrypted_full_map(address_map &map)
 	map(0x8000, 0xffff).bankr("seibu_bank1");
 }
 
+
 // Input Ports
 
 static INPUT_PORTS_START( dynduke )
-	SEIBU_COIN_INPUTS   // coin inputs read through sound CPU
+	SEIBU_COIN_INPUTS // coin inputs read through sound CPU
 
 	PORT_START("P1_P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
@@ -495,42 +479,44 @@ static INPUT_PORTS_START( dynduke )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" )               PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, "Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Mode 2" )
-	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:2,3") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0000)
+	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) )         PORT_DIPLOCATION("SW1:2,3") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0000)
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,5") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0000)
+	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Coin_B ) )         PORT_DIPLOCATION("SW1:4,5") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0000)
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:2,3,4,5") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0001)
+	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) )        PORT_DIPLOCATION("SW1:2,3,4,5") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0001)
 	PORT_DIPSETTING(      0x0018, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x001a, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x001c, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x001e, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Starting Coin" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020, 0x0020, "Starting Coin" )           PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "X 2" )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Cabinet ) )        PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0300, 0x0300, IPT_UNUSED )  // "SW2:1,2" - Always OFF according to the manual
-	PORT_DIPNAME( 0x0c00, 0x0400, "Bonus D.Punch" ) PORT_DIPLOCATION("SW2:3,4") // smart bomb extends
+
+	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW2:1" ) // Always OFF according to the manual
+	PORT_DIPUNUSED_DIPLOC( 0x0200, 0x0200, "SW2:2" ) // "
+	PORT_DIPNAME( 0x0c00, 0x0400, "Bonus D.Punch" )           PORT_DIPLOCATION("SW2:3,4") // smart bomb extends
 	PORT_DIPSETTING(      0x0c00, "80K 100K+" )
 	PORT_DIPSETTING(      0x0800, "100K 100K+" )
 	PORT_DIPSETTING(      0x0400, "120K 100K+" )
 	PORT_DIPSETTING(      0x0000, "120K 120K+" )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )     PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
@@ -538,18 +524,19 @@ static INPUT_PORTS_START( dynduke )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) )    PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 INPUT_PORTS_END
+
 
 // Graphics Layouts
 
 static const gfx_layout charlayout =
 {
-	8,8,        // 8*8 characters
+	8,8,    // 8*8 characters
 	1024,
-	4,          // 4 bits per pixel
+	4,      // 4 bits per pixel
 	{ 4,0,(0x10000*8)+4,0x10000*8 },
 	{ 0,1,2,3,8,9,10,11 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
@@ -563,13 +550,13 @@ static const gfx_layout spritelayout =
 	4,      // 4 bits per pixel
 	{ 12, 8, 4, 0 },
 	{
-	0,1,2,3, 16,17,18,19,
-	512+0,512+1,512+2,512+3,
-	512+8+8,512+9+8,512+10+8,512+11+8,
+		0,1,2,3, 16,17,18,19,
+		512+0,512+1,512+2,512+3,
+		512+8+8,512+9+8,512+10+8,512+11+8,
 	},
 	{
-	0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
+		0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
 	},
 	1024
 };
@@ -579,9 +566,10 @@ static const gfx_layout bg_layout =
 	16,16,
 	RGN_FRAC(1,3),
 	6,
-	{ RGN_FRAC(2,3)+4, RGN_FRAC(2,3)+0,
+	{
+		RGN_FRAC(2,3)+4, RGN_FRAC(2,3)+0,
 		RGN_FRAC(1,3)+4, RGN_FRAC(1,3)+0,
-					4,               0 },
+		4,               0 },
 	{
 		0,1,2,3,8,9,10,11,
 		256+0,256+1,256+2,256+3,256+8,256+9,256+10,256+11
@@ -611,6 +599,7 @@ static const gfx_layout fg_layout =
 	512
 };
 
+
 // Graphics Decode Information
 
 static GFXDECODE_START( gfx_dynduke )
@@ -619,6 +608,7 @@ static GFXDECODE_START( gfx_dynduke )
 	GFXDECODE_ENTRY( "fgtiles", 0, fg_layout,     0x200, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout,  0x300, 32 )
 GFXDECODE_END
+
 
 // Interrupt Generator
 
@@ -631,18 +621,19 @@ void dynduke_state::vblank_irq(int state)
 	}
 }
 
+
 // Machine Driver
 
 void dynduke_state::dynduke(machine_config &config)
 {
 	// basic machine hardware
-	V30(config, m_maincpu, 16'000'000 / 2); // NEC V30-8 CPU
+	V30(config, m_maincpu, 16_MHz_XTAL / 2); // NEC V30-8 CPU
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynduke_state::master_map);
 
-	V30(config, m_slave, 16'000'000 / 2); // NEC V30-8 CPU
+	V30(config, m_slave, 16_MHz_XTAL / 2); // NEC V30-8 CPU
 	m_slave->set_addrmap(AS_PROGRAM, &dynduke_state::slave_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 14'318'180 / 4));
+	z80_device &audiocpu(Z80(config, "audiocpu", 14.318181_MHz_XTAL / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &dynduke_state::sound_map);
 	audiocpu.set_addrmap(AS_OPCODES, &dynduke_state::sound_decrypted_opcodes_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
@@ -671,11 +662,11 @@ void dynduke_state::dynduke(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14'318'180 / 4));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14.318181_MHz_XTAL / 4));
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1'320'000, okim6295_device::PIN7_LOW));
+	okim6295_device &oki(OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
@@ -691,6 +682,7 @@ void dynduke_state::dbldyn(machine_config &config)
 	dynduke(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynduke_state::masterj_map);
 }
+
 
 // ROMs
 
@@ -1058,15 +1050,28 @@ ROM_START( dbldynu )
 	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
+
+void dynduke_state::init_dynduke()
+{
+	uint8_t *rom = memregion("oki")->base();
+	const uint32_t len = memregion("oki")->bytes();
+
+	// descramble adpcm rom address lines a bit
+	std::vector<uint8_t> buf(len);
+	memcpy(&buf[0], rom, len);
+	for (int i = 0; i < len; i++)
+		rom[i] = buf[(i & 0xfff) | bitswap<4>(i,13,14,15,12) << 12];
+}
+
 } // anonymous namespace
 
 
 // Game Drivers
 
-GAME( 1989, dynduke,   0,       dynduke, dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 03SEP89)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukea,  dynduke, dynduke, dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 25JUL89)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukej,  dynduke, dynduke, dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 03SEP89)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukeja, dynduke, dynduke, dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 25JUL89)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukeu,  dynduke, dynduke, dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US, 25JUL89)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynj,   0,       dbldyn,  dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan, 13NOV89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynu,   dbldynj, dynduke, dynduke, dynduke_state, empty_init, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US, 13NOV89)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dynduke,   0,       dynduke, dynduke, dynduke_state, init_dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 03SEP89)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukea,  dynduke, dynduke, dynduke, dynduke_state, init_dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 25JUL89)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukej,  dynduke, dynduke, dynduke, dynduke_state, init_dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 03SEP89)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukeja, dynduke, dynduke, dynduke, dynduke_state, init_dynduke, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 25JUL89)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukeu,  dynduke, dynduke, dynduke, dynduke_state, init_dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US, 25JUL89)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynj,   0,       dbldyn,  dynduke, dynduke_state, init_dynduke, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan, 13NOV89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynu,   dbldynj, dynduke, dynduke, dynduke_state, init_dynduke, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US, 13NOV89)",    MACHINE_SUPPORTS_SAVE )

@@ -481,10 +481,27 @@ ROM_START( beijuehh )
 	ROM_LOAD16_WORD_SWAP( "beijeu.bin", 0x0000000, 0x8000000, CRC(e7b968af) SHA1(a39a3a70e6e0827e4395e09e55983eb9e9348e4a) ) // some address lines might be swapped
 ROM_END
 
+ROM_START( bornkidh )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "sunplus.u3", 0x0000000, 0x0800000, CRC(c4da9d0b) SHA1(5fc644ae26046677e67a01dde3fc6061e73bb60f) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_CONTINUE(0x2000000, 0x0800000)
+	ROM_CONTINUE(0x3000000, 0x0800000)
+	ROM_CONTINUE(0x2800000, 0x0800000)
+	ROM_CONTINUE(0x3800000, 0x0800000)
+ROM_END
+
 
 ROM_START( gameu50 )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "gameu.bin", 0x000000, 0x2000000, CRC(13c42bce) SHA1(f769ceabb8ab4e60c0d663dffd5cca91c6aec206) )
+ROM_END
+
+ROM_START( gameu108 )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "s29gl256.u5", 0x000000, 0x2000000, CRC(48e727a4) SHA1(7338f8e46f794ae148adb84146cd2eddf4eba98d) )
 ROM_END
 
 
@@ -711,7 +728,7 @@ void gameu_handheld_game_state::machine_reset()
 	m_upperbase = 0;
 }
 
-void gameu_handheld_game_state::init_gameu()
+void gameu_handheld_game_state::decrypt_gameu()
 {
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -727,22 +744,44 @@ void gameu_handheld_game_state::init_gameu()
 	m_maincpu->set_alt_tile_addressing_hack(0);
 	m_maincpu->set_disallow_resolution_control();
 
-	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
 
-	ROM[0x19c9a / 2] = 0xf165;
-	ROM[0x19c9c / 2] = 0xf165;
-	ROM[0x19c9e / 2] = 0xf165;
-
-	ROM[0x19cb8 / 2] = 0xf165;
-	ROM[0x19cba / 2] = 0xf165;
-	ROM[0x19cbc / 2] = 0xf165;
-
-	ROM[0x19cd4 / 2] = 0xf165;
-	ROM[0x19cd6 / 2] = 0xf165;
-	ROM[0x19cd8 / 2] = 0xf165;
 }
 
+void gameu_handheld_game_state::init_gameu()
+{
+	decrypt_gameu();
 
+	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
+	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	int base = 0x19c9a;
+	ROM[(base + 0x00) / 2] = 0xf165;
+	ROM[(base + 0x02) / 2] = 0xf165;
+	ROM[(base + 0x04) / 2] = 0xf165;
+
+	ROM[(base + 0x1e) / 2] = 0xf165;
+	ROM[(base + 0x20) / 2] = 0xf165;
+	ROM[(base + 0x22) / 2] = 0xf165;
+
+	ROM[(base + 0x3a) / 2] = 0xf165;
+	ROM[(base + 0x3c) / 2] = 0xf165;
+	ROM[(base + 0x3e) / 2] = 0xf165;
+}
+
+void gameu_handheld_game_state::init_gameu108()
+{
+	decrypt_gameu();
+
+	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+
+	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
+	ROM[(0x1aa48) / 2] = 0xf165;
+	ROM[(0x1aa4a) / 2] = 0xf165;
+	ROM[(0x1aa4c) / 2] = 0xf165;
+
+	ROM[(0x1aa82) / 2] = 0xf165;
+	ROM[(0x1aa84) / 2] = 0xf165;
+	ROM[(0x1aa86) / 2] = 0xf165;
+}
 
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -763,6 +802,7 @@ CONS(2012, imgame,    0,       0, tkmag220, tkmag220, tkmag220_game_state,  empt
 // Does the 'Helicopter' game work properly on real hardware? The function at 0x0D2BE7 uses RAM address 0x2372 for the upper bits of the tile base offset calculation
 // but that RAM address doesn't appear to be written anywhere in the code, resulting in scrolling being entirely broken.
 CONS(201?, beijuehh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "Beijue",      "Beijue 16 Bit Handheld Games 220-in-1 (Game Boy style case)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS(201?, bornkidh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  empty_init,      "BornKid",     "BornKid 16 Bit Handheld Games 100-in-1 (model GB-10X)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // die on this one is 'GCM420'
 CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -770,4 +810,6 @@ CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Gio
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
 // unit looks a bit like a knock-off Wii-U tablet, but much smaller
-CONS( 201?, gameu50,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu, "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+// was also available under other names, with different designs (PSP style)
+CONS( 201?, gameu50,       0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu,    "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, gameu108,      0,              0,      gameu, gameu, gameu_handheld_game_state, init_gameu108, "YSN", "Play Portable Color GameU+ (108-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

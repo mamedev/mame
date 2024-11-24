@@ -55,11 +55,14 @@ Konami PWB 402218 boards
  - Priorities not understood and wrong in places of GX-based games, apparently controlled by PROM
  - X/Y scroll effects not 100% handled by current K052109(TMNT tilemaps) emulation.
    Mario Roulette issues currently "resolved" using hack.
+ - Chusenoh keypad hardware is completely unknown.  It's presumed to hook up via the i8251.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
@@ -84,6 +87,7 @@ public:
 	konmedal_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_usart(*this, "upd71051"),
 		m_k056832(*this, "k056832"),
 		m_k053252(*this, "k053252"),
 		m_k052109(*this, "k052109"),
@@ -99,6 +103,7 @@ public:
 
 	void shuriboy(machine_config &config);
 	void ddboy(machine_config &config);
+	void chusenoh(machine_config &config);
 	void tsukande(machine_config &config);
 	void fuusenpn(machine_config &config);
 	void mariorou(machine_config &config);
@@ -106,6 +111,7 @@ public:
 	void tsururin(machine_config &config);
 
 	void ddboy_init();
+	void chusenoh_init();
 	void tsuka_init();
 	void buttobi_init();
 	void shuri_init();
@@ -127,8 +133,10 @@ private:
 	DECLARE_MACHINE_START(shuriboy);
 
 	uint8_t vram_r(offs_t offset);
+	uint8_t chusenoh_vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 	void bankswitch_w(uint8_t data);
+	void chusenoh_bankswitch_w(uint8_t data);
 	void scc_enable_w(uint8_t data);
 	void control2_w(uint8_t data);
 	void medalcnt_w(uint8_t data);
@@ -138,6 +146,7 @@ private:
 	uint32_t screen_update_shuriboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	K056832_CB_MEMBER(tile_callback);
+	K056832_CB_MEMBER(chusenoh_tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(konmedal_scanline);
 	void vbl_ack_w(int state) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 	void nmi_ack_w(int state) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
@@ -153,12 +162,14 @@ private:
 	void mario_scrollhack_w(uint8_t data);
 
 	void ddboy_main(address_map &map) ATTR_COLD;
+	void chusenoh_main(address_map &map) ATTR_COLD;
 	void medal_main(address_map &map) ATTR_COLD;
 	void shuriboy_main(address_map &map) ATTR_COLD;
 
 	void machine_start_common();
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<i8251_device> m_usart;
 	optional_device<k056832_device> m_k056832;
 	optional_device<k053252_device> m_k053252;
 	optional_device<k052109_device> m_k052109;
@@ -216,9 +227,11 @@ void konmedal_state::medalcnt_w(uint8_t data)
 
 void konmedal_state::lamps_w(uint8_t data)
 {
-//  CN6
+	//  CN6
 	for (int i = 0; i < 8; i++)
+	{
 		m_lamps[i] = BIT(data, i);
+	}
 }
 
 uint8_t konmedal_state::vram_r(offs_t offset)
@@ -237,6 +250,27 @@ uint8_t konmedal_state::vram_r(offs_t offset)
 	else if (m_control == 0)    // ROM readback
 	{
 		return m_k056832->konmedal_rom_r(offset);
+	}
+
+	return 0;
+}
+
+uint8_t konmedal_state::chusenoh_vram_r(offs_t offset)
+{
+	if (!(m_control & 0x80))
+	{
+		if (offset & 1)
+		{
+			return m_k056832->ram_code_hi_r(offset >> 1);
+		}
+		else
+		{
+			return m_k056832->ram_code_lo_r(offset >> 1);
+		}
+	}
+	else    // ROM readback
+	{
+		return m_k056832->chusenoh_rom_r(offset);
 	}
 
 	return 0;
@@ -269,6 +303,20 @@ void konmedal_state::ddboy_init()
 	m_layer_order[2] = 1;
 	m_layer_order[3] = 0;
 }
+
+void konmedal_state::chusenoh_init()
+{
+	m_layer_colorbase[0] = 8;
+	m_layer_colorbase[1] = 8;
+	m_layer_colorbase[2] = 0;
+	m_layer_colorbase[3] = 0;
+
+	m_layer_order[0] = 3;
+	m_layer_order[1] = 2;
+	m_layer_order[2] = 1;
+	m_layer_order[3] = 0;
+}
+
 void konmedal_state::buttobi_init()
 {
 	m_layer_colorbase[0] = 0;
@@ -309,6 +357,28 @@ K056832_CB_MEMBER(konmedal_state::tile_callback)
 	*code = bitswap<14>(*code, 8, 9, 13, 12, 11, 10, 7, 6, 5, 4, 3, 2, 1, 0);
 	*color = m_layer_colorbase[layer] + ((codebits >> 13) & 7);
 	*priority = BIT(codebits, 12);
+}
+
+K056832_CB_MEMBER(konmedal_state::chusenoh_tile_callback)
+{
+	u32 codebits = *code;
+
+	int mode, avac;
+	m_k056832->read_avac(&mode, &avac);
+	if (mode)
+		*code = (((avac >> ((codebits >> 8) & 0xc)) & 0xf) << 10) | (codebits & 0x3ff);
+	else
+		*code = codebits & 0x1fff;
+
+	*color = m_layer_colorbase[layer] + ((codebits >> 13) & 7);
+	*priority = BIT(codebits, 12);
+
+	if (layer == 3)
+	{
+		*code = 0;
+		*color = 0;
+		*priority = 0;
+	}
 }
 
 void konmedal_state::video_start()
@@ -382,9 +452,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::konmedal_scanline)
 
 void konmedal_state::bankswitch_w(uint8_t data)
 {
-	//printf("ROM bank %x (full %02x)\n", data>>4, data);
 	membank("bank1")->set_entry(data>>4);
 	m_control = data & 0xf;
+}
+
+void konmedal_state::chusenoh_bankswitch_w(uint8_t data)
+{
+	membank("bank1")->set_entry(data & 0xf);
+	m_control = data;
 }
 
 void konmedal_state::scc_enable_w(uint8_t data)
@@ -440,6 +515,26 @@ void konmedal_state::ddboy_main(address_map &map)
 	map(0xd800, 0xdfff).view(m_scc_map);
 	m_scc_map[0](0xd800, 0xd8ff).mirror(0x0700).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xe000, 0xffff).rw(FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
+}
+
+void konmedal_state::chusenoh_main(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram().share("nvram"); // work RAM
+	map(0xc000, 0xc03f).w(FUNC(konmedal_state::k056832_w));
+	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
+	map(0xc200, 0xc201).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xc300, 0xc300).w(FUNC(konmedal_state::chusenoh_bankswitch_w));
+	map(0xc500, 0xc500).portr("IN1");
+	map(0xc600, 0xc60f).w(FUNC(konmedal_state::k056832_b_w));
+	map(0xc600, 0xc600).nopr(); // watchdog reset
+	map(0xc800, 0xc80f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
+	map(0xcc00, 0xcc00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xd000, 0xd000).mirror(0x07ff).w(FUNC(konmedal_state::scc_enable_w));
+	map(0xd800, 0xdfff).view(m_scc_map);
+	m_scc_map[0](0xd800, 0xd8ff).mirror(0x0700).m("k051649", FUNC(k051649_device::scc_map));
+	map(0xe000, 0xffff).rw(FUNC(konmedal_state::chusenoh_vram_r), FUNC(konmedal_state::vram_w));
 }
 
 void konmedal_state::shuriboy_main(address_map &map)
@@ -543,6 +638,20 @@ static INPUT_PORTS_START( konmedal )
 
 	PORT_START("OUT")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( chusenoh )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Blue")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Yellow")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("White")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Setup Mode") PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Switch") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )
+
+	PORT_START("OUT")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ddboy )
@@ -908,6 +1017,28 @@ void konmedal_state::ddboy(machine_config &config)
 	K051649(config, "k051649", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 
+void konmedal_state::chusenoh(machine_config &config)
+{
+	ddboy(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::chusenoh_main);
+	m_k056832->set_tile_callback(FUNC(konmedal_state::chusenoh_tile_callback));
+
+	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64 * 8, 32 * 8);
+	screen.set_visarea(120, 360 - 1, 16, 240 - 1);
+	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
+	screen.set_palette(m_palette);
+
+	I8251(config, m_usart, XTAL(18'432'000)/8);
+
+	// I have no idea how this division happens.  There is a 74F161 4-bit counter nearby which likely is involved.
+	clock_device &clk(CLOCK(config, "clock", 18.432_MHz_XTAL / 1920));  // this gives 9600 baud, which may or may not be right
+	clk.signal_handler().set(m_usart, FUNC(i8251_device::write_txc));
+	clk.signal_handler().append(m_usart, FUNC(i8251_device::write_rxc));
+}
+
 /*
 Shuriken Boy
 While being a Z80 medal game, it runs on fairly different hardware. It might merit a new driver when emulation will be fleshed out.
@@ -1224,6 +1355,25 @@ ROM_START( buttobi )
 	ROM_LOAD( "440-a01-8b.bin", 0x000000, 0x040000, CRC(955b1bd5) SHA1(1e8130a3634972d742ba4ad103e1738e44a4e28c) )
 ROM_END
 
+ROM_START(chusenoh)
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
+	ROM_LOAD("yb200_a01.18s.bin", 0x000000, 0x020000, CRC(067dba9a) SHA1(09bf6f0fcee8b8df20d290ae8b4d91b2a28d6eb3))
+
+	ROM_REGION(0x40000, "k056832", 0) /* tilemaps */
+	ROM_LOAD32_BYTE("yb200_a03.5s.bin",  0x000002, 0x010000, CRC(870b43fd) SHA1(19816bd707314ab09c56b8a762588e307206dc30))
+	ROM_LOAD32_BYTE("yb200_a04.8s.bin",  0x000003, 0x010000, CRC(ca9ada12) SHA1(c4c41c961da8e2e6222e06b893404432e22c1afa))
+	ROM_LOAD32_BYTE("yb200_a05.10s.bin", 0x000000, 0x010000, CRC(042d02fe) SHA1(4d6d5c00b64dfc349ac69771f9411d1fcf55b48f))
+	ROM_LOAD32_BYTE("yb200_a06.12s.bin", 0x000001, 0x010000, CRC(2637ca0f) SHA1(9d63b4f56b2f54b9e426288ac08ee0ae2693cedd))
+
+	ROM_REGION(0x40000, "oki", 0)
+	ROM_LOAD("yb200_a02.5e.bin", 0x000000, 0x040000, CRC(330e4753) SHA1(3ebfe40153881d09ce9f71e2676d0e48b380da24))
+
+	ROM_REGION(0x1000, "proms", 0)
+	ROM_LOAD("r_yb200a07.16m.bin", 0x000000, 0x000800, CRC(3502ad50) SHA1(4888434c24fca982db366ceddb4d65aea1b8cb3b))
+	ROM_LOAD("g_yb200a08.14m.bin", 0x000100, 0x000800, CRC(67eb4d04) SHA1(c82cd0b597635cd6c71bf36a362735474f89665f))
+	ROM_LOAD("b_yb200a09.13m.bin", 0x000200, 0x000800, CRC(02c3b55f) SHA1(75a38c877fcfb03c0272c0af3c19900d6c15764a))
+	ROM_LOAD("pri_yb200a10.11m.bin", 0x000300, 0x000800, CRC(2bf4ae05) SHA1(dd8113f93fe17900255ff516d1dffbb08c85ee8a))
+ROM_END
 
 ROM_START( shuriboy )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
@@ -1359,6 +1509,9 @@ GAME( 1993, fuusenpn, 0,     fuusenpn, fuusenpn, konmedal_state, fuusen_init,  R
 // Konami PWB 452574A boards (GX tilemaps)
 GAME( 1994, buttobi,  0,     ddboy,    ddboy,    konmedal_state, buttobi_init, ROT0, "Konami", "Buttobi Striker", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1994, ddboy,    0,     ddboy,    ddboy,    konmedal_state, ddboy_init,   ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+
+// Konami PWB 452944A boards (GX tilemaps, TV Plug-and-Play form factor)
+GAME( 1992, chusenoh, 0,     chusenoh, chusenoh, konmedal_state, chusenoh_init,  ROT0, "Konami", "Chusenoh", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 // Konami PWB 402218 boards (GX tilemaps)
 GAME( 1994, ddboya,   ddboy, tsukande, ddboy,    konmedal_state, ddboy_init,   ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)

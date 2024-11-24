@@ -3,13 +3,13 @@
 // thanks-to:Sean Riddle, Berger
 /*******************************************************************************
 
-Saitek GK 2000 / Centurion
+Saitek GK 2000 / GK 2100 / Centurion
 
 These chess computers all have the same I/O and fit in the same driver. The chess
 engine is by Frans Morsch.
 
 TODO:
-- is the H8/3212 V03 version on the same hardware?
+- is the H8/3212 V04 ROM the same as V03, just a different package?
 - versions with the A20 ROM that don't officially support the extra options on
   the 2nd row, can still access them when turning the computer on by simultaneously
   pressing the Go/Stop button with the Option button. This doesn't work on MAME,
@@ -33,17 +33,48 @@ GK 2000 (H8/323 version):
 - LCD with 5 7segs and custom segments
 - piezo, 16 LEDs, button sensors chessboard
 
-Saitek GK 2100 is on the same hardware, but has a H8/325 instead of H8/323.
-Travel Champion 2100 has the same MCU as GK 2100.
+Radio Shack Chess Master:
+- PCB label: same as Centurion / Cougar (see below)
+- Hitachi H8/3212 MCU, 10MHz XTAL
+- rest is same as GK 2000
 
 H8/323 A13 MCU is used in:
-- Saitek GK 2000 (86071220X12)
+- Saitek GK 2000 (1992 version, 86071220X12)
 - Saitek Travel Champion 2080 (86071220X12)
 - Saitek Mephisto Mythos (86142221X34)
 - Tandy (Radio Shack) Mega 2050X (86071221X12)
 - Tandy (Radio Shack) Master 2200X (suspected)
 
 Travel Champion 2080 and Tandy Mega 2050X are 14MHz instead of 20MHz.
+
+H8/3212 V03 MCU (DIP) is used in:
+- Saitek GK 2000 (1997 version, suspected)
+- Saitek Barracuda (suspected)
+- Saitek Mephisto Montana
+- Tandy (Radio Shack) Chess Master (aka Master Chess Computer)
+
+GK 2000 was still sold in 1997. Just like the latest version of Turbo Advanced
+Trainer was fitted with a H8/3212 (see tatrain.cpp), it is assumed Saitek did
+the same with GK 2000.
+
+H8/3212 V04 MCU (QFP) is used in:
+- Saitek Mephisto Miami
+- Saitek Mephisto Diplomat Advanced Travel Chess (suspected)
+- Saitek Mephisto Explorer
+
+================================================================================
+
+Saitek GK 2100
+--------------
+
+Hardware notes:
+- PCB label: ST12-PE-009 REV1 (same as GK 2000)
+- Hitachi H8/325 MCU, 20MHz XTAL
+- rest is same as GK 2000
+
+H8/325 B40 MCU is used in:
+- Saitek GK 2100
+- Saitek Travel Champion 2100
 
 ================================================================================
 
@@ -77,8 +108,8 @@ n = 0/2/4/6 10+n MHz XTAL
 b = Playing mode options on the 2nd row
 
 All known chess computers with the A20 ROM have LEDs, and the S/t/b options are
-either configured as either St, or b. So, none of them that have the Studies
-button and teach mode officially support the extra options and vice versa.
+configured as either St, or b. So, none of them that have the Studies button and
+teach mode officially support the extra options and vice versa.
 
 H8/3214 A20 MCU is used in:
 - Saitek Centurion (config: StL0_)
@@ -128,12 +159,13 @@ public:
 	template <typename T> void cpu_config(T &maincpu);
 	void shared(machine_config &config);
 	void gk2000(machine_config &config);
+	void gk2000a(machine_config &config);
 	void gk2100(machine_config &config);
 	void centurion(machine_config &config);
 	void cougar(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
-	DECLARE_INPUT_CHANGED_MEMBER(gk2000_change_cpu_freq);
+	DECLARE_INPUT_CHANGED_MEMBER(gk2000a_change_cpu_freq);
 	DECLARE_INPUT_CHANGED_MEMBER(centurion_change_cpu_freq);
 
 protected:
@@ -182,7 +214,7 @@ void gk2000_state::machine_start()
 	save_item(NAME(m_lcd_com));
 }
 
-INPUT_CHANGED_MEMBER(gk2000_state::gk2000_change_cpu_freq)
+INPUT_CHANGED_MEMBER(gk2000_state::gk2000a_change_cpu_freq)
 {
 	// only 20MHz and 14MHz versions are known to exist, but the software supports others
 	static const int xm[9] = { 8, 20, 24, 28, 32, -1, -1, -1, 14 }; // XTAL in MHz (-1 is invalid)
@@ -325,21 +357,28 @@ static INPUT_PORTS_START( gk2000 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Black / Right")
 
 	PORT_START("IN.2")
-	PORT_CONFNAME( 0xff, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gk2000_state::gk2000_change_cpu_freq), 0) // factory set
-	PORT_CONFSETTING(    0x01, "8MHz (unofficial)" )
-	PORT_CONFSETTING(    0x00, "14MHz (Travel Champion 2080)" )
-	PORT_CONFSETTING(    0x02, "20MHz (GK 2000, GK 2100)" )
-	PORT_CONFSETTING(    0x04, "24MHz (unofficial)" )
-	PORT_CONFSETTING(    0x08, "28MHz (unofficial)" )
-	PORT_CONFSETTING(    0x10, "32MHz (unofficial)" )
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.3")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gk2000_state::go_button), 0) PORT_NAME("Go / Stop")
 	PORT_BIT(0xef, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gk2100 )
+static INPUT_PORTS_START( gk2000a )
 	PORT_INCLUDE( gk2000 )
+
+	PORT_MODIFY("IN.2")
+	PORT_CONFNAME( 0xff, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gk2000_state::gk2000a_change_cpu_freq), 0) // factory set
+	PORT_CONFSETTING(    0x01, "8MHz (unofficial)" )
+	PORT_CONFSETTING(    0x00, "14MHz (Travel Champion 2080)" )
+	PORT_CONFSETTING(    0x02, "20MHz (GK 2000, GK 2100)" )
+	PORT_CONFSETTING(    0x04, "24MHz (unofficial)" )
+	PORT_CONFSETTING(    0x08, "28MHz (unofficial)" )
+	PORT_CONFSETTING(    0x10, "32MHz (unofficial)" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gk2100 )
+	PORT_INCLUDE( gk2000a )
 
 	PORT_MODIFY("IN.1")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("White / -")
@@ -356,7 +395,6 @@ static INPUT_PORTS_START( cougar )
 	PORT_CONFSETTING(    0x00, "12MHz (Mephisto Mystery)" )
 	PORT_CONFSETTING(    0x10, "14MHz (unofficial)" )
 	PORT_CONFSETTING(    0x08, "16MHz (Cougar, Mephisto Explorer Pro)" )
-	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( centurion )
@@ -426,6 +464,14 @@ void gk2000_state::shared(machine_config &config)
 
 void gk2000_state::gk2000(machine_config &config)
 {
+	H83212(config, m_maincpu, 10_MHz_XTAL);
+	cpu_config<h83212_device>(downcast<h83212_device &>(*m_maincpu));
+
+	shared(config);
+}
+
+void gk2000_state::gk2000a(machine_config &config)
+{
 	H8323(config, m_maincpu, 20_MHz_XTAL);
 	cpu_config<h8323_device>(downcast<h8323_device &>(*m_maincpu));
 
@@ -468,6 +514,14 @@ void gk2000_state::cougar(machine_config &config)
 
 ROM_START( gk2000 )
 	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD("97_saitek_86164430826_hd6433212v03p.u1", 0x0000, 0x4000, CRC(220c80d4) SHA1(f1df2d04afeffec0a0a66036dfa2c4dcb85ae8f2) )
+
+	ROM_REGION( 68501, "screen", 0 )
+	ROM_LOAD("gk2000.svg", 0, 68501, CRC(80554c49) SHA1(88f06ec8f403eaaf7cbce4cc84807b5742ce7108) )
+ROM_END
+
+ROM_START( gk2000a )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD("92_saitek_86071220x12_3238a13p.u1", 0x0000, 0x4000, CRC(2059399c) SHA1(d99d5f86b80565e6017b19ef3f330112ac1ce685) )
 
 	ROM_REGION( 68501, "screen", 0 )
@@ -501,7 +555,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT     COMPAT  MACHINE     INPUT      CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1992, gk2000,    0,         0,      gk2000,     gk2000,    gk2000_state, empty_init, "Saitek", "Kasparov GK 2000", MACHINE_SUPPORTS_SAVE )
+SYST( 1997, gk2000,    0,         0,      gk2000,     gk2000,    gk2000_state, empty_init, "Saitek", "Kasparov GK 2000 (H8/3212 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, gk2000a,   gk2000,    0,      gk2000a,    gk2000a,   gk2000_state, empty_init, "Saitek", "Kasparov GK 2000 (H8/323 version)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1994, gk2100,    0,         0,      gk2100,     gk2100,    gk2000_state, empty_init, "Saitek", "Kasparov GK 2100", MACHINE_SUPPORTS_SAVE )
 

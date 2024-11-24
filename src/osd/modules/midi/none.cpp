@@ -30,7 +30,7 @@ public:
 
 	virtual std::unique_ptr<midi_input_port> create_input(std::string_view name) override { return nullptr; }
 	virtual std::unique_ptr<midi_output_port> create_output(std::string_view name) override { return nullptr; }
-	virtual port_info_vector list_midi_ports() override { return port_info_vector(); }
+	virtual std::vector<osd::midi_port_info> list_midi_ports() override { return std::vector<osd::midi_port_info>(); }
 };
 
 } // anonymous namespace

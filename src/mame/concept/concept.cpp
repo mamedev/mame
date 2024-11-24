@@ -170,10 +170,10 @@ void concept_state::corvus_concept(machine_config &config)
 	A2BUS(config, m_a2bus, 0).set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->nmi_w().set("iocint", FUNC(input_merger_device::in_w<0>));
 	m_a2bus->irq_w().set("iocint", FUNC(input_merger_device::in_w<1>));
-	A2BUS_SLOT(config, "sl1", m_a2bus, concept_a2_cards, nullptr);
-	A2BUS_SLOT(config, "sl2", m_a2bus, concept_a2_cards, nullptr);
-	A2BUS_SLOT(config, "sl3", m_a2bus, concept_a2_cards, nullptr);
-	A2BUS_SLOT(config, "sl4", m_a2bus, concept_a2_cards, "fdc01");
+	A2BUS_SLOT(config, "sl1", 16.364_MHz_XTAL / 2, m_a2bus, concept_a2_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", 16.364_MHz_XTAL / 2, m_a2bus, concept_a2_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", 16.364_MHz_XTAL / 2, m_a2bus, concept_a2_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", 16.364_MHz_XTAL / 2, m_a2bus, concept_a2_cards, "fdc01");
 
 	INPUT_MERGER_ANY_HIGH(config, "iocint").output_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 

@@ -2946,7 +2946,7 @@ void f2mc16_device::opcodes_ea71(u8 operand)
 			m_rmw = true;
 			m_tmp32 = doINC_32(read_32(m_tmpea));
 			write_32(m_tmpea, m_tmp32);
-			m_rmw = false;	
+			m_rmw = false;
 			m_pc += 4;
 			m_icount -= 11;
 			break;

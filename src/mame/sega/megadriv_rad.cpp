@@ -600,6 +600,14 @@ ROM_START( dgunl3227 )
 	// populated in init function
 
 	ROM_REGION( 0x400000, "rom", 0 )
+	ROM_LOAD16_WORD_SWAP( "pacmantc58fvm5t2a.bin", 0x000000, 0x400000, CRC(b09fa599) SHA1(3cc50bee7ef91608848fb34185a0723d2b82b46f) )
+ROM_END
+
+ROM_START( dgunl3227a )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	// populated in init function
+
+	ROM_REGION( 0x400000, "rom", 0 )
 	ROM_LOAD16_WORD_SWAP( "myarcadepacman_s99jl032hbt1_9991227e_as_s29jl032h55tai01.bin", 0x000000, 0x400000, CRC(ecead966) SHA1(971e8da6eb720f670f4148c7e07922e4f24eb609) )
 ROM_END
 
@@ -759,7 +767,8 @@ CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, msi_6button,  
 // It is also confirmed from real hardware videos that these units do not have the usual sprite limits (so masking effect on Sonic title screen fails)
 
 // this is the only 'Pocket Player' unit to use Genesis on a Chip tech, the others are NES on a chip.
-// some versions of this unit have an additional "Add Credits with 'A' or 'B'" screen after you select Pac-Man, this version does not.
-CONS( 2018, dgunl3227, 0,        0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", 0 )
+// the parent set has updated software explaining how to insert coins in Pac-Man as well as an updated copyright string
+CONS( 2018, dgunl3227,  0,        0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", 0 )
+CONS( 2018, dgunl3227a, dgunl3227,0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227, older)", 0 )
 
 CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           megadriv_ra145_state, init_ra145,        "<unknown>",            "Retro Arcade 16 Bits Classic Edition Mini TV Game Console - 145 Classic Games - TV Arcade Plug and Play (Mega Drive bootlegs)", MACHINE_NOT_WORKING )

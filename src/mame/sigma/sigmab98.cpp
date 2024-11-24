@@ -73,12 +73,12 @@ Games with the same cabinet, or in the Treasure Fall series, which might be on t
 2002 Shateki Yokochou             https://youtu.be/LPZLWP1x5o8
 2002 Ipponzuri Slot
 2002 Karateman                    https://youtu.be/EIrVHEAv3Sc
-2002 One-touchable
 2002 Perfect Goal (screenless)    https://youtu.be/ilneyp-8dBI
 2003 Go Go Cowboy (JP, medal)     https://youtu.be/qYDw2sxNRqE
 2003 Gun Kids
 2003 Kurukuru Train               https://youtu.be/Ef7TQX4C9fA
 2003 Safari Kingdom (screenless)
+2003 Wantouchable                 https://youtu.be/aRcTCdZZLRo
 2003 Zakuzaku Kaizokudan
 2004 Animal Punch
 2004 Dotabata Zaurus              https://youtu.be/Gxt6klOYZ9A
@@ -2150,6 +2150,19 @@ ROM_START( gunkids )
 	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, CRC(5e356b68) SHA1(0e4e28b02dcb5ff7d2a7139c5cdf31cbd08167f4) )
 ROM_END
 
+ROM_START( wantouch ) // ワンタッチャブル
+	SAMMYMDL_BIOS
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "vx2302l01.u021", 0x00000, 0x200000, CRC(fe00ac87) SHA1(97c3defafd04f48984e5f2fe34528ada024355c5) )
+
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, CRC(cd8d4478) SHA1(224e8e0e9a49f10515e0ebf9a5e97d8adc7eed13) )
+ROM_END
+
 void sammymdl_state::init_animalc()
 {
 	uint8_t *rom = memregion("mainbios")->base();
@@ -2362,4 +2375,5 @@ GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sammymdl_state, init_haekaka
 GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Taihou de Doboon",                     0 )
 GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",                     0 )
 GAME( 2002, gunkids,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Hayauchi Gun Kids",                    0 )
+GAME( 2003, wantouch, sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Wantouchable",                         0 )
 GAME( 2003, gocowboy, 0,        gocowboy, gocowboy, sammymdl_state, empty_init,    ROT0, "Sammy",             "Go Go Cowboy (English, prize)",        0 )

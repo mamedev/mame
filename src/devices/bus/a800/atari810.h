@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_A800_ATARI810
-#define MAME_BUS_A800_ATARI810 1
+#ifndef MAME_BUS_A800_ATARI810_H
+#define MAME_BUS_A800_ATARI810_H
 
 #pragma once
 
@@ -44,4 +44,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ATARI810, atari810_device)
 
-#endif // MAME_BUS_A800_ATARI810
+#endif // MAME_BUS_A800_ATARI810_H

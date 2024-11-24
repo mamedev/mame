@@ -9,8 +9,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_A2BUS_A2CORVUS_H
-#define MAME_A2BUS_A2CORVUS_H
+#ifndef MAME_BUS_A2BUS_A2CORVUS_H
+#define MAME_BUS_A2BUS_A2CORVUS_H
 
 #pragma once
 
@@ -52,4 +52,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_CORVUS, a2bus_corvus_device)
 
-#endif // MAME_A2BUS_A2CORVUS_H
+#endif // MAME_BUS_A2BUS_A2CORVUS_H

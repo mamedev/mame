@@ -201,6 +201,26 @@ ROM_START( blackbdb )
 	ROM_LOAD( "blackbeard  ru_04b.img", 0x0000, 0x3e20000, CRC(cadbaa2b) SHA1(15033bffedd173622d50ac0adf99e257c207748c) )
 ROM_END
 
+// AMD Geode CS5530A-UCE, SMC FDC37C932APM, DM9102AF, Compact Flash. Sub board with ROMs, ASTRO M and ASTRO V102PX-018 customs
+ROM_START( blackbdu )
+	// GAME NAME : BLACK BEARD GAMES
+	// TYPE = MULTI-LINER
+	// DEVELOPER   : ASTRO CORP.
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0)
+	ROM_LOAD( "phoenixbios_e686.u16", 0x0000, 0x040000, CRC(885e3cde) SHA1(ff90cda4383a119c7f54545c11fa432505e66c1b) )
+
+	ROM_REGION(0x20000, "rom", 0)
+	ROM_LOAD16_BYTE( "1_bbsh-111.rom1", 0x00000, 0x010000, CRC(4e5388a9) SHA1(929e3a03c4f94768a03f51b243d169d2991775cd) )
+	ROM_LOAD16_BYTE( "2_bbsh-111.rom2", 0x00001, 0x010000, CRC(c63e4927) SHA1(428272fd5d8eceecd878f5c82e7ce1458631c005) )
+
+	ROM_REGION(0x8000000, "drive", 0)
+	ROM_LOAD( "blackbeard_us.00.img", 0x0000, 0x3e20000, CRC(c7421ac2) SHA1(51ccafd03377e5dbdb6591292f05bc984d761d79) )
+
+	ROM_REGION(0x100, "others", 0)
+	ROM_LOAD( "at93c46.u120", 0x00, 0x80, CRC(c9330682) SHA1(0ba0635690e413a2088421ac67ea113923e73d60) )
+	ROM_LOAD( "at93c46.u24",  0x80, 0x80, CRC(cf424e35) SHA1(8ac72aec0ea212b06341686a89a7ceba1646ac5b) )
+ROM_END
+
 ROM_START( dslayrr )
 	// TITLE = DRAGON_SLAYER
 	// TYPE = MULTI-LINER
@@ -351,6 +371,7 @@ void astropc_state::init_astropc()
 GAME( 2005,  blackbd,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (Russia, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005?, blackbda, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (Russia, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005,  blackbdb, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (Russia, set 3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  blackbdu, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (US.00, 2005/03/14)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 2005,  dslayrr,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Dragon Slayer (Russia, v15.B, 2005/08/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2006,  dslayrra, dslayrr, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Dragon Slayer (Russia, v16.B, 2005/11/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

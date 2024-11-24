@@ -942,7 +942,7 @@ void adsp21062_device::compute_fabs(int rn, int rx)
 /* Rn = (unsigned)Rx * (unsigned)Ry, integer, no rounding */
 void adsp21062_device::compute_mul_uuin(int rn, int rx, int ry)
 {
-	uint64_t r = (uint64_t)(uint32_t)REG(rx) * (uint64_t)(uint32_t)REG(ry);
+	uint64_t r = mulu_32x32(REG(rx), REG(ry));
 
 	CLEAR_MULTIPLIER_FLAGS();
 	SET_FLAG_MN((uint32_t)r);
@@ -955,7 +955,7 @@ void adsp21062_device::compute_mul_uuin(int rn, int rx, int ry)
 /* Rn = (signed)Rx * (signed)Ry, integer, no rounding */
 void adsp21062_device::compute_mul_ssin(int rn, int rx, int ry)
 {
-	uint64_t r = (int64_t)(int32_t)REG(rx) * (int64_t)(int32_t)REG(ry);
+	uint64_t r = mul_32x32(REG(rx), REG(ry));
 
 	CLEAR_MULTIPLIER_FLAGS();
 	SET_FLAG_MN((uint32_t)r);
@@ -968,7 +968,7 @@ void adsp21062_device::compute_mul_ssin(int rn, int rx, int ry)
 /* MRF + (signed)Rx * (signed)Ry, integer, no rounding */
 uint32_t adsp21062_device::compute_mrf_plus_mul_ssin(int rx, int ry)
 {
-	uint64_t r = m_core->mrf + ((int64_t)(int32_t)REG(rx) * (int64_t)(int32_t)REG(ry));
+	uint64_t r = m_core->mrf + mul_32x32(REG(rx), REG(ry));
 
 	CLEAR_MULTIPLIER_FLAGS();
 	SET_FLAG_MN((uint32_t)r);
@@ -981,7 +981,7 @@ uint32_t adsp21062_device::compute_mrf_plus_mul_ssin(int rx, int ry)
 /* MRB + (signed)Rx * (signed)Ry, integer, no rounding */
 uint32_t adsp21062_device::compute_mrb_plus_mul_ssin(int rx, int ry)
 {
-	int64_t r = m_core->mrb + ((int64_t)(int32_t)REG(rx) * (int64_t)(int32_t)REG(ry));
+	int64_t r = m_core->mrb + mul_32x32(REG(rx), REG(ry));
 
 	CLEAR_MULTIPLIER_FLAGS();
 	SET_FLAG_MN((uint32_t)r);
@@ -1075,7 +1075,7 @@ void adsp21062_device::compute_dual_add_sub(int ra, int rs, int rx, int ry)
 /* Rm = (signed)Rxm * (signed)Rym, fractional, rounding,   Ra = Rxa + Rya */
 void adsp21062_device::compute_mul_ssfr_add(int rm, int rxm, int rym, int ra, int rxa, int rya)
 {
-	uint32_t r_mul = (uint32_t)(((int64_t)(REG(rxm)) * (int64_t)(REG(rym))) >> 31);
+	uint32_t r_mul = (uint32_t)mul_32x32_shift(REG(rxm), REG(rym), 31);
 	uint32_t r_add = REG(rxa) + REG(rya);
 
 	CLEAR_MULTIPLIER_FLAGS();
@@ -1100,7 +1100,7 @@ void adsp21062_device::compute_mul_ssfr_add(int rm, int rxm, int rym, int ra, in
 /* Rm = (signed)Rxm * (signed)Rym, fractional, rounding,   Ra = Rxa - Rya */
 void adsp21062_device::compute_mul_ssfr_sub(int rm, int rxm, int rym, int ra, int rxa, int rya)
 {
-	uint32_t r_mul = (uint32_t)(((int64_t)(REG(rxm)) * (int64_t)(REG(rym))) >> 31);
+	uint32_t r_mul = (uint32_t)mul_32x32_shift(REG(rxm), REG(rym), 31);
 	uint32_t r_sub = REG(rxa) - REG(rya);
 
 	CLEAR_MULTIPLIER_FLAGS();

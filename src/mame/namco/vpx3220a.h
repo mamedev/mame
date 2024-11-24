@@ -28,66 +28,8 @@ protected:
 	virtual void write_data(u16 offset, u8 data) override;
 
 private:
-	enum subaddr_t : u8
-	{
-		IDENT = 0x00,
-		IFC = 0x20,
-		FPRD = 0x26,
-		FPWR = 0x27,
-		FPDAT = 0x28,
-		FPSTA = 0x29,
-		AFEND = 0x33,
-		REFSIG = 0xd8,
-		YMAX = 0xe0,
-		YMIN = 0xe1,
-		UMAX = 0xe2,
-		UMIN = 0xe3,
-		VMAX = 0xe4,
-		VMIN = 0xe5,
-		CBM_BRI = 0xe6,
-		CBM_CON = 0xe7,
-		FORMAT = 0xe8,
-		MISC = 0xea,
-		OFIFO = 0xf0,
-		OMUX = 0xf1,
-		OENA = 0xf2,
-		DRIVER_A = 0xf8,
-		DRIVER_B = 0xf9,
-		UNKNOWN = 0xff
-	};
-
-	enum fpaddr_t : u16
-	{
-		TINT = 0x1c,
-		GAIN = 0x20,
-		XLG = 0x26,
-		HPLL = 0x4b,
-		DVCO = 0x58,
-		ADJUST = 0x59,
-		VBEG1 = 0x88,
-		VLINEI1 = 0x89,
-		VLINEO1 = 0x8a,
-		HBEG1 = 0x8b,
-		HLEN1 = 0x8c,
-		NPIX1 = 0x8d,
-		VBEG2 = 0x8e,
-		VLINEI2 = 0x8f,
-		VLINEO2 = 0x90,
-		HBEG2 = 0x91,
-		HLEN2 = 0x92,
-		NPIX2 = 0x93,
-		ACCREF = 0xa0,
-		ACCR = 0xa3,
-		ACCB = 0xa4,
-		KILVL = 0xa8,
-		AGCREF = 0xb2,
-		SGAIN = 0xbe,
-		VSDT = 0xe7,
-		CMDWD = 0xf0,
-		INFOWD = 0xf1,
-		TVSTNDWR = 0xf2,
-		TVSTNDRD = 0xf3
-	};
+	enum subaddr_t : u8;
+	enum fpaddr_t : u16;
 
 	u8 m_ifc;
 	u8 m_afend;

@@ -27,6 +27,7 @@ DECLARE_DEVICE_TYPE(M6809, m6809_device)
 class m6809_base_device : public cpu_device
 {
 public:
+	auto interrupt_vector_read() { return m_vector_read_func.bind(); }
 	auto sync_acknowledge_write() { return m_syncack_write_func.bind(); }
 protected:
 	// construction/destruction
@@ -127,6 +128,16 @@ protected:
 		VECTOR_RESET_FFFE   = 0xFFFE
 	};
 
+	// exception numbers for debugger
+	enum
+	{
+		EXCEPTION_SWI   = 1,
+		EXCEPTION_SWI2  = 2,
+		EXCEPTION_SWI3  = 3,
+		EXCEPTION_XFIRQ = 4,
+		EXCEPTION_XRES  = 5
+	};
+
 	union M6809Q
 	{
 		#ifdef LSB_FIRST
@@ -176,6 +187,7 @@ protected:
 
 	// Callbacks
 	devcb_write_line            m_lic_func;           // LIC pin on the 6809E
+	devcb_read8                 m_vector_read_func;   // Indicates interrupt/reset acknowledge cycle (BA=0, BS=1)
 	devcb_write_line            m_syncack_write_func; // Indicates sync acknowledge buscycle
 
 	// eat cycles
@@ -218,6 +230,7 @@ protected:
 	// operand reading/writing
 	uint8_t read_operand();
 	uint8_t read_operand(int ordinal);
+	uint8_t read_vector(int ordinal);
 	void write_operand(uint8_t data);
 	void write_operand(int ordinal, uint8_t data);
 
@@ -329,6 +342,5 @@ enum
 
 #define M6809_IRQ_LINE  0   /* IRQ line number */
 #define M6809_FIRQ_LINE 1   /* FIRQ line number */
-#define M6809_SWI       2   /* Virtual SWI line to be used during SWI acknowledge cycle */
 
 #endif // MAME_CPU_M6809_M6809_H

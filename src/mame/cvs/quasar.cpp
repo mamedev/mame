@@ -3,21 +3,18 @@
 
 /************************************************************************
 
-  Zaccaria S2650 '80s games
+Zaccaria Quasar
 
-  Driver by Mike Coates and Pierpaolo Prazzoli
+Driver by Mike Coates and Pierpaolo Prazzoli
 
-  TODO:
+TODO:
+- Sound (missing invader effect - still not sure all noise in correct places)
+- Phase 3 - seems awfully hard - dip settings ?
+- Hook up Coin Counter
+- Test/Service Mode - not working?
+- No attract demo? is this correct?
 
-  Quasar
-  ------
-  - Sound (missing invader effect - still not sure all noise in correct places)
-  - Phase 3 - seems awfully hard - dip settings ?
-  - Hook up Coin Counter
-  - Test/Service Mode - not working?
-  - No attract demo? is this correct?
-
-************************************************************************
+*************************************************************************
 
 Quasar by Zaccaria (1980)
 
@@ -287,10 +284,10 @@ void quasar_state::video_w(offs_t offset, uint8_t data)
 {
 	switch (m_page)
 	{
-	case 0:  m_video_ram[offset] = data; break;
-	case 1:  m_color_ram[offset] = data & 7; break; // 3 bits of ram only - 3 x 2102
-	case 2:  m_effectram[offset] = data; break;
-	case 3:  m_effectcontrol = data; break;
+	case 0: m_video_ram[offset] = data; break;
+	case 1: m_color_ram[offset] = data & 7; break; // 3 bits of ram only - 3 x 2102
+	case 2: m_effectram[offset] = data; break;
+	case 3: m_effectcontrol = data; break;
 	}
 }
 
@@ -300,10 +297,10 @@ uint8_t quasar_state::io_r()
 
 	switch (m_io_page)
 	{
-	case 0:  ans = m_in[0]->read(); break;
-	case 1:  ans = m_in[1]->read(); break;
-	case 2:  ans = m_dsw[0]->read(); break;
-	case 3:  ans = m_dsw[1]->read(); break;
+	case 0: ans = m_in[0]->read(); break;
+	case 1: ans = m_in[1]->read(); break;
+	case 2: ans = m_dsw[0]->read(); break;
+	case 3: ans = m_dsw[1]->read(); break;
 	}
 
 	return ans;
@@ -322,7 +319,7 @@ void quasar_state::sh_command_w(uint8_t data)
 	// lower nibble = command to I8035
 	// not necessarily like this, but it seems to work better than direct mapping
 	// (although schematics has it as direct - but then the schematics are wrong elsewhere to!)
-	m_soundlatch->write((data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
+	m_soundlatch->write(bitswap<4>(data,3,0,2,1));
 }
 
 uint8_t quasar_state::sh_command_r()
@@ -332,7 +329,7 @@ uint8_t quasar_state::sh_command_r()
 
 int quasar_state::audio_t1_r()
 {
-	return (m_soundlatch->read() == 0);
+	return m_soundlatch->read() == 0;
 }
 
 // memory map taken from the manual
@@ -541,6 +538,7 @@ void quasar_state::quasar(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_refresh_hz(50); // From dot clock
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(256, 256);

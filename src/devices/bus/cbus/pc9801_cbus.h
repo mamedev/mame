@@ -112,6 +112,10 @@ public:
 	address_space &io_space() const { return *m_iospace; }
 	template<int I> void int_w(bool state) { m_int_callback[I](state); }
 	template<typename R, typename W> void install_io(offs_t start, offs_t end, R rhandler, W whandler);
+	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
+	{
+		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
+	}
 
 	void flush_install_io(const char *client_tag, u16 old_io, u16 new_io, u16 size, read8sm_delegate rhandler, write8sm_delegate whandler);
 
