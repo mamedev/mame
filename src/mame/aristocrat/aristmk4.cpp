@@ -1735,7 +1735,7 @@ void aristmk4_state::aristmk4_palette(palette_device &palette) const
 	for (int i = 0; i < palette.entries(); i++)
 	{
 		const uint8_t data = color_prom[i];
-		const int b = 0x4f * BIT(data, 0) + 0xa8 * BIT(data, 1);
+		const int b = 0x52 * BIT(data, 0) + 0xad * BIT(data, 1);
 		const int g = 0x21 * BIT(data, 2) + 0x47 * BIT(data, 3) + 0x97 * BIT(data, 4);
 		const int r = 0x21 * BIT(data, 5) + 0x47 * BIT(data, 6) + 0x97 * BIT(data, 7);
 
@@ -1884,9 +1884,9 @@ void aristmk4_state::lions_palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		const int b = 0x4f * BIT(i, 0) + 0xa8 * BIT(i, 1);
-		const int g = 0x4f * BIT(i, 2) + 0xa8 * BIT(i, 3);
-		const int r = 0x4f * BIT(i, 4) + 0xa8 * BIT(i, 5);
+		const int b = 0x52 * BIT(i, 0) + 0xad * BIT(i, 1);
+		const int g = 0x52 * BIT(i, 2) + 0xad * BIT(i, 3);
+		const int r = 0x52 * BIT(i, 4) + 0xad * BIT(i, 5);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

@@ -129,7 +129,7 @@ void quasar_state::palette(palette_device &palette) const
 		// blue component
 		bit0 = BIT(i, 6);
 		bit1 = BIT(i, 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		// intensity 0
 		palette.set_indirect_color(0x100 + i, rgb_t::black());
