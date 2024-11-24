@@ -10,7 +10,7 @@ bytes of RAM, plus 0x0200 bytes for scrolling, and a variable amount of ROM.
 It cannot read the ROMs.
 
 Some of the control flags are specifically meant for other Konami chips,
-such as the sprite wraparound flag for K007420.
+such as the sprite wraparound flag for 007420.
 
 control registers
 000: ------x- INT control
@@ -30,6 +30,10 @@ control registers
 005: x scroll 2
 006: y scroll 2
 007: not used
+
+TODO:
+- device should be combined with 007420? see comment from AWJ here:
+  https://mametesters.org/view.php?id=4902
 
 */
 
