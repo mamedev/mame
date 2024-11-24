@@ -9,19 +9,19 @@
 *****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 namespace {
-
-
 
 class mjsister_state : public driver_device
 {
@@ -35,11 +35,12 @@ public:
 		m_dac(*this, "dac"),
 		m_io_key(*this, "KEY%u", 0U),
 		m_samples_region(*this, "samples"),
+		m_vram(*this, "vram", 0x10000, ENDIANNESS_LITTLE),
 		m_rombank(*this, "rombank"),
 		m_vrambank(*this, "vrambank")
 	{ }
 
-	void mjsister(machine_config &config);
+	void mjsister(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -58,10 +59,9 @@ private:
 
 	// memory
 	required_region_ptr<uint8_t> m_samples_region;
+	memory_share_creator<uint8_t> m_vram;
 	required_memory_bank m_rombank;
 	required_memory_bank m_vrambank;
-
-	std::unique_ptr<uint8_t[]> m_vram;
 
 	// video-related
 	bool    m_video_enable;
@@ -258,7 +258,7 @@ uint8_t mjsister_state::keys_r()
 
 void mjsister_state::main_map(address_map &map)
 {
-	map(0x0000, 0x77ff).rom();
+	map(0x0000, 0x77ff).rom().region("maincpu", 0);
 	map(0x7800, 0x7fff).ram();
 	map(0x8000, 0xffff).bankr(m_rombank).bankw(m_vrambank);
 }
@@ -384,17 +384,14 @@ INPUT_PORTS_END
 
 void mjsister_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	m_rombank->configure_entries(0, 4, &ROM[0x10000], 0x8000);
+	m_rombank->configure_entries(0, 4, memregion("banked")->base(), 0x8000);
 
-	m_vram = make_unique_clear<uint8_t[]>(0x10000);
-	m_vrambank->configure_entries(0, 2, m_vram.get(), 0x8000);
+	m_vrambank->configure_entries(0, 2, m_vram.target(), 0x8000);
 
 	m_dac_timer = timer_alloc(FUNC(mjsister_state::dac_callback), this);
 
 	m_irq_enable = false;
 
-	save_pointer(NAME(m_vram), 0x10000);
 	save_item(NAME(m_dac_busy));
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_colorbank));
@@ -479,10 +476,12 @@ void mjsister_state::mjsister(machine_config &config)
  *************************************/
 
 ROM_START( mjsister )
-	ROM_REGION( 0x30000, "maincpu", 0 )   // CPU
+	ROM_REGION( 0x08000, "maincpu", 0 )   // CPU
 	ROM_LOAD( "ms00.bin",  0x00000, 0x08000, CRC(9468c33b) SHA1(63aecdcaa8493d58549dfd1d217743210cf953bc) )
-	ROM_LOAD( "ms01t.bin", 0x10000, 0x10000, CRC(a7b6e530) SHA1(fda9bea214968a8814d2c43226b3b32316581050) ) // banked
-	ROM_LOAD( "ms02t.bin", 0x20000, 0x10000, CRC(7752b5ba) SHA1(84dcf27a62eb290ba07c85af155897ec72f320a8) ) // banked
+
+	ROM_REGION( 0x20000, "banked", 0 )    // banked at 0x8000
+	ROM_LOAD( "ms01t.bin", 0x00000, 0x10000, CRC(a7b6e530) SHA1(fda9bea214968a8814d2c43226b3b32316581050) )
+	ROM_LOAD( "ms02t.bin", 0x10000, 0x10000, CRC(7752b5ba) SHA1(84dcf27a62eb290ba07c85af155897ec72f320a8) )
 
 	ROM_REGION( 0x20000, "samples", 0 ) // samples
 	ROM_LOAD( "ms03.bin", 0x00000,  0x10000, CRC(10a68e5e) SHA1(a0e2fa34c1c4f34642f65fbf17e9da9c2554a0c6) )

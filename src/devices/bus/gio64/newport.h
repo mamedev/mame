@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_GIO_NEWPORT_H
-#define MAME_BUS_GIO_NEWPORT_H
+#ifndef MAME_BUS_GIO64_NEWPORT_H
+#define MAME_BUS_GIO64_NEWPORT_H
 
 #pragma once
 
@@ -547,4 +547,4 @@ protected:
 DECLARE_DEVICE_TYPE(GIO64_XL8,  gio64_xl8_device)
 DECLARE_DEVICE_TYPE(GIO64_XL24, gio64_xl24_device)
 
-#endif // MAME_BUS_GIO_NEWPORT_H
+#endif // MAME_BUS_GIO64_NEWPORT_H

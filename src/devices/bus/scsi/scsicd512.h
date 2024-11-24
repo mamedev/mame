@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef DEVICES_BUS_SCSI_SCSICD512_H
-#define DEVICES_BUS_SCSI_SCSICD512_H
+#ifndef MAME_BUS_SCSI_SCSICD512_H
+#define MAME_BUS_SCSI_SCSICD512_H
 
 #pragma once
 
@@ -83,4 +83,4 @@ DECLARE_DEVICE_TYPE(XM5401SUN, toshiba_xm5401_sun_device)
 DECLARE_DEVICE_TYPE(XM5701, toshiba_xm5701_device)
 DECLARE_DEVICE_TYPE(XM5701SUN, toshiba_xm5701_sun_device)
 
-#endif // DEVICES_BUS_SCSI_SCSICD512_H
+#endif // MAME_BUS_SCSI_SCSICD512_H

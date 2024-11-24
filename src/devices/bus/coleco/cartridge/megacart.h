@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_COLECO_MEGACART_H
-#define MAME_BUS_COLECO_MEGACART_H
+#ifndef MAME_BUS_COLECO_CARTRIDGE_MEGACART_H
+#define MAME_BUS_COLECO_CARTRIDGE_MEGACART_H
 
 #pragma once
 
@@ -46,4 +46,4 @@ private:
 DECLARE_DEVICE_TYPE(COLECOVISION_MEGACART, colecovision_megacart_cartridge_device)
 
 
-#endif // MAME_BUS_COLECO_MEGACART_H
+#endif // MAME_BUS_COLECO_CARTRIDGE_MEGACART_H
