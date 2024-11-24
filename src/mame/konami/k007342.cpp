@@ -48,9 +48,6 @@ k007342_device::k007342_device(const machine_config &mconfig, const char *tag, d
 	m_tilemap{ nullptr, nullptr },
 	m_flipscreen(false),
 	m_int_enabled(false),
-	//m_regs[8],
-	//m_scrollx[2],
-	//m_scrolly[2],
 	m_callback(*this)
 {
 }
@@ -269,11 +266,7 @@ void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, uint8_t
 	if (!m_callback.isnull())
 		m_callback(layer, m_regs[1], code, color, flags);
 
-
-	tileinfo.set(0,
-			code,
-			color,
-			flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(k007342_device::get_tile_info0)
