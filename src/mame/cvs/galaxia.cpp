@@ -77,7 +77,6 @@ TODO:
 */
 
 #include "emu.h"
-
 #include "cvs_base.h"
 
 #include "speaker.h"
@@ -139,6 +138,12 @@ private:
 	void mem_map(address_map &map) ATTR_COLD;
 };
 
+
+/***************************************************************************
+
+  Video
+
+***************************************************************************/
 
 static constexpr uint8_t SPRITE_PEN_BASE = 0x10;
 static constexpr uint8_t STAR_PEN = 0x18;
@@ -568,7 +573,7 @@ GFXDECODE_END
 void galaxia_state::galaxia(machine_config &config)
 {
 	// basic machine hardware
-	S2650(config, m_maincpu, XTAL(14'318'181) / 8);
+	S2650(config, m_maincpu, 14.318181_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxia_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &galaxia_state::io_map);
 	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::data_map);
@@ -609,7 +614,7 @@ void galaxia_state::galaxia(machine_config &config)
 void astrowar_state::astrowar(machine_config &config)
 {
 	// basic machine hardware
-	S2650(config, m_maincpu, XTAL(14'318'181) / 8);
+	S2650(config, m_maincpu, 14.318181_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrowar_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &astrowar_state::io_map);
 	m_maincpu->set_addrmap(AS_DATA, &astrowar_state::data_map);
