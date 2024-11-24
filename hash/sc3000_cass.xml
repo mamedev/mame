@@ -208,7 +208,7 @@ license:CC0-1.0
 		<part name="cass1" interface="sc3000_cass">
 			<feature name="part_id" value="Side 1: Indiana Jaune"/>
 			<dataarea name="cass" size="4107578">
-				<rom name="Indiana_Jaune.wav" size="4107578" crc="98bf965e" sha1="618f961691a4f149a68cf95eaacaa96efd44e521"/>
+				<rom name="Indiana_Jaune.wav" size="4107578" crc="68c26219" sha1="5e1a9d5d1788917b28a57dd04c06277b9c633bda"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="sc3000_cass">
