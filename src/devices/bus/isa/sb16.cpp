@@ -163,12 +163,14 @@ void sb16_lle_device::ctrl8_w(uint8_t data)
 	 * bit3 -
 	 * bit4 -
 	 * bit5 -
-	 * bit6 - ?
+	 * bit6 - ? (wolf3d)
 	 * bit7 - toggle for 8bit irq
 	*/
 	if(data & 4)
 	{
-		m_dma8_cnt = m_dma8_len;
+		m_dma8_cnt = m_dma8_len + 1;
+		if (!(BIT(m_mode, 6)))
+			m_dma8_cnt >>= 1;
 		m_dma8_done = false;
 	}
 	if(!(data & 2) || !(m_ctrl16 & 2))
@@ -209,7 +211,9 @@ void sb16_lle_device::ctrl16_w(uint8_t data)
 	*/
 	if(data & 4)
 	{
-		m_dma16_cnt = m_dma16_len;
+		m_dma16_cnt = m_dma16_len + 1;
+		if (!(BIT(m_mode, 7)))
+			m_dma16_cnt >>= 1;
 		m_dma16_done = false;
 	}
 	if(!(data & 2) || !(m_ctrl8 & 2))
@@ -382,7 +386,7 @@ void sb16_lle_device::sb16_io(address_map &map)
 	map(0x0004, 0x0004).mirror(0xff00).rw(FUNC(sb16_lle_device::mode_r), FUNC(sb16_lle_device::mode_w));
 	map(0x0005, 0x0005).mirror(0xff00).rw(FUNC(sb16_lle_device::dac_ctrl_r), FUNC(sb16_lle_device::dac_ctrl_w));
 	map(0x0006, 0x0006).mirror(0xff00).r(FUNC(sb16_lle_device::dma_stat_r));
-//  map(0x0007, 0x0007) // unknown
+//  map(0x0007, 0x0007) // unknown, readback status of stereo f/f?
 	map(0x0008, 0x0008).mirror(0xff00).rw(FUNC(sb16_lle_device::ctrl8_r), FUNC(sb16_lle_device::ctrl8_w));
 	map(0x0009, 0x0009).mirror(0xff00).w(FUNC(sb16_lle_device::rate_w));
 	map(0x000A, 0x000A).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_cnt_lo_r));
