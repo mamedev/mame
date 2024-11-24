@@ -210,8 +210,8 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
  *
  */
 
-void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect,
-		const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask, bool is_flakatck )
+void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect,
+		const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
 {
 	// TODO: sprite limit is supposed to be per-line! (check MT #00185)
 	int num = 0x40;
@@ -249,8 +249,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		number += (sprite_bank >> 2) & 3;
 
 		// Flak Attack doesn't use a lookup PROM, it maps the color code directly to a palette entry
-		// TODO: check if it's true or callback-ize this one and remove the per-game hack.
-		if (is_flakatck)
+		if (palette().indirect_entries() == 0)
 			transparent_mask = 1 << 0;
 		else
 			transparent_mask = palette().transpen_mask(*gfx(0), color, 0);
