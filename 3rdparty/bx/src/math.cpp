@@ -194,6 +194,7 @@ namespace bx
 	{
 		int32_t exp;
 		float ff = frexp(_a, &exp);
+
 		if (ff < kSqrt2*0.5f)
 		{
 			ff *= 2.0f;

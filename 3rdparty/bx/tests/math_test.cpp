@@ -431,22 +431,48 @@ TEST_CASE("mod", "[math][libm]")
 	STATIC_REQUIRE(  1.0f == bx::mod(1389.0f, 2.0f) );
 }
 
+typedef float (*MathFloatFn)(float);
+
+template<MathFloatFn BxT, MathFloatFn CrtT>
+void testMathFunc1Float(float _value)
+{
+	REQUIRE(CrtT(_value) == BxT(_value) );
+}
+
 TEST_CASE("floor", "[math][libm]")
 {
 	STATIC_REQUIRE( 13.0f == bx::floor( 13.89f) );
 	STATIC_REQUIRE(-14.0f == bx::floor(-13.89f) );
+
+	testMathFunc1Float<bx::floor, ::floorf>( 13.89f);
+	testMathFunc1Float<bx::floor, ::floorf>(-13.89f);
 }
 
 TEST_CASE("ceil", "[math][libm]")
 {
 	STATIC_REQUIRE( 14.0f == bx::ceil(  13.89f) );
 	STATIC_REQUIRE(-13.0f == bx::ceil( -13.89f) );
+
+	testMathFunc1Float<bx::ceil, ::ceilf>( 13.89f);
+	testMathFunc1Float<bx::ceil, ::ceilf>(-13.89f);
+}
+
+TEST_CASE("round", "[math][libm]")
+{
+	STATIC_REQUIRE( 14.0f == bx::round(  13.89f) );
+	STATIC_REQUIRE(-14.0f == bx::round( -13.89f) );
+
+	testMathFunc1Float<bx::round, ::roundf>( 13.89f);
+	testMathFunc1Float<bx::round, ::roundf>(-13.89f);
 }
 
 TEST_CASE("trunc", "[math][libm]")
 {
 	STATIC_REQUIRE( 13.0f == bx::trunc( 13.89f) );
 	STATIC_REQUIRE(-13.0f == bx::trunc(-13.89f) );
+
+	testMathFunc1Float<bx::trunc, ::truncf>( 13.89f);
+	testMathFunc1Float<bx::trunc, ::truncf>(-13.89f);
 }
 
 TEST_CASE("fract", "[math][libm]")
@@ -457,7 +483,13 @@ TEST_CASE("fract", "[math][libm]")
 
 TEST_CASE("ldexp", "[math][libm]")
 {
-	STATIC_REQUIRE(1389.0f == bx::ldexp(86.8125, 4) );
+	STATIC_REQUIRE(  1389.0f == bx::ldexp(86.8125, 4) );
+	STATIC_REQUIRE(0.437500f == bx::ldexp(7.0f, -4.0f) );
+	STATIC_REQUIRE(bx::isEqual(-0.0f, bx::ldexp(-0.0f, 10.0f), 0.000000001f) );
+
+	STATIC_REQUIRE(0x1p127f  == bx::ldexp(1.0f,  127.0f) );
+	STATIC_REQUIRE(0x1p-126f == bx::ldexp(1.0f, -126.0f) );
+	STATIC_REQUIRE(0x1p24f   == bx::ldexp(1.0f,   24.0f) );
 
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
@@ -487,6 +519,22 @@ TEST_CASE("exp", "[math][libm]")
 
 TEST_CASE("pow", "[math][libm]")
 {
+	REQUIRE(1.0f == bx::pow(0.0f, 0.0f) );
+	REQUIRE(1.0f == bx::pow(1.0f, 0.0f) );
+	REQUIRE(1.0f == bx::pow(3.0f, 0.0f) );
+	REQUIRE(1.0f == bx::pow(8.0f, 0.0f) );
+	REQUIRE(1.0f == bx::pow(9.0f, 0.0f) );
+	REQUIRE(0.0f == bx::pow(0.0f, 2.0f) );
+
+	REQUIRE(   4.0f == bx::pow( 2.0f,  2.0f) );
+	REQUIRE(  -4.0f == bx::pow(-2.0f,  2.0f) );
+	REQUIRE(  0.25f == bx::pow( 2.0f, -2.0f) );
+	REQUIRE( -0.25f == bx::pow(-2.0f, -2.0f) );
+	REQUIRE(   8.0f == bx::pow( 2.0f,  3.0f) );
+	REQUIRE(  -8.0f == bx::pow(-2.0f,  3.0f) );
+	REQUIRE( 0.125f == bx::pow( 2.0f, -3.0f) );
+	REQUIRE(-0.125f == bx::pow(-2.0f, -3.0f) );
+
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
 

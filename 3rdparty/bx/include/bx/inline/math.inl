@@ -110,9 +110,9 @@ namespace bx
 		return -floor(-_a);
 	}
 
-	inline BX_CONSTEXPR_FUNC float round(float _f)
+	inline BX_CONSTEXPR_FUNC float round(float _a)
 	{
-		return floor(_f + 0.5f);
+		return floor(_a + 0.5f);
 	}
 
 	inline BX_CONSTEXPR_FUNC float lerp(float _a, float _b, float _t)
@@ -214,7 +214,17 @@ namespace bx
 
 	inline BX_CONST_FUNC float pow(float _a, float _b)
 	{
-		return exp(_b * log(_a) );
+		if (abs(_b) < kFloatSmallest)
+		{
+			return 1.0f;
+		}
+
+		if (abs(_a) < kFloatSmallest)
+		{
+			return 0.0f;
+		}
+
+		return copySign(exp(_b * log(abs(_a) ) ), _a);
 	}
 
 	inline BX_CONST_FUNC float exp2(float _a)
