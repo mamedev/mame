@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 #ifndef MAME_BUS_INTERPRO_KEYBOARD_HLE_H
-#define MAME_DEBUSNTERPRO_KEYBOARD_HLE_H
+#define MAME_BUS_INTERPRO_KEYBOARD_HLE_H
 
 #pragma once
 
