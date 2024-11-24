@@ -234,15 +234,19 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		if (m_bullet_ram[offs] != 0)
 		{
-			for (int ct = 0; ct < 1; ct++)
+			for (int ct = 0; ct < 4; ct++)
 			{
-				int const bx = 255 - 9 - m_bullet_ram[offs] - ct;
+				int const bx = 255 - 8 - m_bullet_ram[offs] - (ct & 1);
+				int const by = offs - (ct >> 1);
 
-				// bullet/object Collision
-				if (s2636_0_bitmap.pix(offs, bx) != 0) m_collision_register |= 0x04;
-				if (s2636_2_bitmap.pix(offs, bx) != 0) m_collision_register |= 0x08;
+				if (cliprect.contains(bx, by))
+				{
+					// bullet/object Collision
+					if (s2636_0_bitmap.pix(by, bx) != 0) m_collision_register |= 0x04;
+					if (s2636_2_bitmap.pix(by, bx) != 0) m_collision_register |= 0x08;
 
-				bitmap.pix(offs, bx) = 7;
+					bitmap.pix(by, bx) = 7;
+				}
 			}
 		}
 	}
@@ -542,18 +546,21 @@ void quasar_state::quasar(machine_config &config)
 
 	S2636(config, m_s2636[0], 0);
 	m_s2636[0]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
+	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	S2636(config, m_s2636[1], 0);
 	m_s2636[1]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
+	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	S2636(config, m_s2636[2], 0);
 	m_s2636[2]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
+	m_s2636[2]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	// sound hardware
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // LM1408
+	SPEAKER(config, "mono").front_center();
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.2); // LM1408
 }
 
 
