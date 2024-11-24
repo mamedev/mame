@@ -239,6 +239,12 @@ protected:
 			device().debug()->privilege_hook();
 	}
 
+	void debugger_wait_hook()
+	{
+		if (device().machine().debug_flags & DEBUG_FLAG_CALL_HOOK)
+			device().debug()->wait_hook();
+	}
+
 private:
 	// internal information about the state of inputs
 	class device_input

@@ -2292,13 +2292,13 @@ ROM_START( warlords )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "037159-01.e6", 0x0000, 0x0800, CRC(ff979a08) SHA1(422053473e41e3e1f71eb28e40eedc78f22326b3) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_REGION( 0x0200, "proms", 0 ) // dumped from 3 different PCBs
 	/* Only the first 0x80 bytes are used by the hardware. A7 is grounded. */
-	/* Bytes 0x00-0x3f are used fore the color cocktail version. */
+	/* Bytes 0x00-0x3f are used for the color cocktail version. */
 	/* Bytes 0x40-0x7f are for the upright version of the cabinet with a */
 	/* mirror and painted background. */
 	ROM_LOAD( "037235-01.n7", 0x0000, 0x0100, CRC(a2c5c277) SHA1(f04de9fb6ee9619b4a4aae10c92b16b3123046cf) )
-	ROM_LOAD( "037161-01.m6", 0x0100, 0x0100, CRC(4cd24c85) SHA1(00f4876279255f3a2d136a9d916b388812cbd1fc) ) // Sync PROM
+	ROM_LOAD( "037161-01.m6", 0x0100, 0x0100, CRC(6fa3093a) SHA1(2b7aeca74c1ae4156bf1878453a047330f96f0a8) ) // Sync PROM
 ROM_END
 
 

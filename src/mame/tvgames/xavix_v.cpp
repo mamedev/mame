@@ -182,6 +182,14 @@ void xavix_state::update_pen(int pen, uint8_t shval, uint8_t lval)
 	double g1 = (g0 - z) * c + y;
 	double b1 = (b0 - z) * c + y;
 
+
+	// lower overall brightness slightly, or some palette entries in tak_gin end up washed out / with identical colours, losing details
+	// the darkest colours in certain flags still look wrong however, and appear nearly black
+	// this might suggest the overall palette conversion needs work
+	r1 = r1 * 0.92f;
+	g1 = g1 * 0.92f;
+	b1 = b1 * 0.92f;
+
 	if(r1 < 0)
 		r1 = 0;
 	else if(r1 > 1)
@@ -501,6 +509,9 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int line)
 {
 	int alt_addressing = 0;
+
+	// some games have the top bit set, why?
+	m_spritereg &= 0x7f;
 
 	if ((m_spritereg == 0x00) || (m_spritereg == 0x01))
 	{
@@ -920,7 +931,8 @@ void xavix_state::spritefragment_dma_trg_w(uint8_t data)
 
 	if (unk)
 	{
-		fatalerror("m_spritefragment_dmaparam2[1] != 0x00 (is %02x)\n", m_spritefragment_dmaparam2[1]);
+		// tak_chq triggers this, but probably due to bad xavix2000 opcodes, as many things look invalid
+		logerror("m_spritefragment_dmaparam2[1] != 0x00 (is %02x)\n", m_spritefragment_dmaparam2[1]);
 	}
 
 	if (len == 0x00)

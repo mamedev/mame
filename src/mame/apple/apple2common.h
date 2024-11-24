@@ -7,8 +7,8 @@
     Apple II stuff shared between apple2/apple2e/apple2gs.
 
 *********************************************************************/
-#ifndef MAME_APPLE_APPLE2_COMMON_H
-#define MAME_APPLE_APPLE2_COMMON_H
+#ifndef MAME_APPLE_APPLE2COMMON_H
+#define MAME_APPLE_APPLE2COMMON_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ private:
 DECLARE_DEVICE_TYPE(APPLE2_COMMON, apple2_common_device)
 
 
-#endif // MAME_APPLE_APPLE2_COMMON_H
+#endif // MAME_APPLE_APPLE2COMMON_H

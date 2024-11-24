@@ -3535,7 +3535,7 @@ static INPUT_PORTS_START( azurian )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, azurian_port_r<0>) // "linked" with bit 2 of IN2
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxian_state::azurian_port_r<0>)) // "linked" with bit 2 of IN2
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -3547,7 +3547,7 @@ static INPUT_PORTS_START( azurian )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "5000" )
 	PORT_DIPSETTING(    0x02, "7000" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, azurian_port_r<1>) // "linked" with bit 6 of IN1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxian_state::azurian_port_r<1>)) // "linked" with bit 6 of IN1
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
@@ -3947,7 +3947,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("FAKE_SELECT") // fake button to move onto next game - until select rom is understood!
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Next Game (Fake)") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, tenspot_state, tenspot_fake, 0)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Next Game (Fake)") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tenspot_state::tenspot_fake), 0)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -4186,13 +4186,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gmgalax )
 	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(gmgalax_state, port_r<0>)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(gmgalax_state::port_r<0>))
 
 	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(gmgalax_state, port_r<1>)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(gmgalax_state::port_r<1>))
 
 	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(gmgalax_state, port_r<2>)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(gmgalax_state::port_r<2>))
 
 	PORT_START("GMIN0")      // Ghost Muncher - IN0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )                                           PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
@@ -4270,7 +4270,7 @@ static INPUT_PORTS_START( gmgalax )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("GAMESEL")      // game select, toggle switch on control panel
-	PORT_DIPNAME( 0x01, 0x00, "Game Select") PORT_DIPLOCATION("SW1:1") PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, gmgalax_state, game_changed, 0)
+	PORT_DIPNAME( 0x01, 0x00, "Game Select") PORT_DIPLOCATION("SW1:1") PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gmgalax_state::game_changed), 0)
 	PORT_DIPSETTING( 0x00, "Ghost Muncher" )
 	PORT_DIPSETTING( 0x01, "Galaxian" )
 INPUT_PORTS_END
@@ -5118,14 +5118,14 @@ static INPUT_PORTS_START( kingball )
 	PORT_INCLUDE(galaxian)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(kingball_state, muxbit_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(kingball_state::muxbit_r))
 	// Relating to above port:Hack? - possibly multiplexed via writes to $b003
 	//PORT_DIPNAME( 0x40, 0x40, "Speech" )
 	//PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	//PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(kingball_state, noise_r)   // NOISE line
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(kingball_state::noise_r))   // NOISE line
 	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
@@ -5743,9 +5743,9 @@ static INPUT_PORTS_START( theend )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, theend_protection_alt_r<0>) // protection bit
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxian_state::theend_protection_alt_r<0>)) // protection bit
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, theend_protection_alt_r<1>) // protection bit
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxian_state::theend_protection_alt_r<1>)) // protection bit
 
 	PORT_START("IN3")   // need for some PPI accesses
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
@@ -5787,9 +5787,9 @@ static INPUT_PORTS_START( scramble )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, theend_protection_alt_r<0>)  // protection bit
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxian_state::theend_protection_alt_r<0>))  // protection bit
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, theend_protection_alt_r<1>)  // protection bit
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxian_state::theend_protection_alt_r<1>))  // protection bit
 
 	PORT_START("IN3")   // need for some PPI accesses
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
@@ -6289,7 +6289,7 @@ static INPUT_PORTS_START( ckongg )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(galaxian_state, ckongg_coinage_r<0x40>)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(galaxian_state::ckongg_coinage_r<0x40>))
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -6300,7 +6300,7 @@ static INPUT_PORTS_START( ckongg )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(galaxian_state, ckongg_coinage_r<0x0c>)
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(galaxian_state::ckongg_coinage_r<0x0c>))
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COINAGE")
@@ -6334,10 +6334,10 @@ static INPUT_PORTS_START( ckongmc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(galaxian_state, ckongg_coinage_r<0xc0>)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(galaxian_state::ckongg_coinage_r<0xc0>))
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(galaxian_state, ckongg_coinage_r<0x01>)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(galaxian_state::ckongg_coinage_r<0x01>))
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -6452,8 +6452,8 @@ static INPUT_PORTS_START( ckongs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, ckongs_coinage_r<0x01>)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, ckongs_coinage_r<0x02>)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxian_state::ckongs_coinage_r<0x01>))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxian_state::ckongs_coinage_r<0x02>))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -6469,7 +6469,7 @@ static INPUT_PORTS_START( ckongs )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galaxian_state, ckongs_coinage_r<0x04>)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxian_state::ckongs_coinage_r<0x04>))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -6683,7 +6683,7 @@ ioport_value moonwar_state::dial_r()
 // verified from Z80 code
 static INPUT_PORTS_START( moonwar )
 	PORT_START("IN0")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(moonwar_state, dial_r)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(moonwar_state::dial_r))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL // cocktail: p2 shield
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -8964,12 +8964,14 @@ void guttangt_state::init_guttangts3()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, &galaxian_state::guttangt_extend_sprite_info);
 
 	uint8_t *romdata = memregion("maincpu")->base();
-	uint8_t buf[0x4800];
-	memcpy(buf, romdata, 0x4800);
 
 	// descramble the content of each 0x100 block
-	for (int i = 0; i < 0x4800; i++)
-		romdata[i] = buf[i ^ 0xff];
+	for (int i = 0; i < 0x4800; i += 0x100)
+	{
+		using std::swap;
+		for (int j = 0; j < (0x100 / 2); j++)
+			swap(romdata[i | j], romdata[i | (j ^ 0xff)]);
+	}
 }
 
 void sbhoei_state::init_sbhoei()
@@ -9138,6 +9140,22 @@ void galaxian_state::init_jumpbug()
 {
 	// video extensions
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::jumpbug_draw_background, &galaxian_state::jumpbug_extend_tile_info, &galaxian_state::jumpbug_extend_sprite_info);
+}
+
+
+void galaxian_state::init_jumpbugbc()
+{
+	init_jumpbug();
+
+	uint8_t *romdata = memregion("maincpu")->base();
+
+	// descramble the content of each 0x100 block
+	for (int i = 0; i < 0x10000; i += 0x100)
+	{
+		using std::swap;
+		for (int j = 0; j < (0x100 / 2); j++)
+			swap(romdata[i | j], romdata[i | (j ^ 0xff)]);
+	}
 }
 
 
@@ -13589,6 +13607,62 @@ ROM_START( jumpbugbrf )
 	ROM_LOAD( "82s123.bin",   0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
+ROM_START( jumpbugbc ) // bootleg on an Cirsa-branded Galaxian PCB with a Novatronic NVS board (https://www.recreativas.org/novatronic-video-sistema-nvs-6072-novatronic-sa).
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "j3_2732_e0572.a3", 0x0000, 0x0200, CRC(74b16a8a) SHA1(16b15142f8cc7d8a91bbd08ae456a5e5c5733910) )
+	ROM_CONTINUE(                 0x2200, 0x0200)
+	ROM_CONTINUE(                 0x0400, 0x0200)
+	ROM_CONTINUE(                 0x2600, 0x0200)
+	ROM_CONTINUE(                 0x2800, 0x0800)
+	ROM_LOAD( "j4_2732_e0572.a2", 0x1000, 0x0200, CRC(24308e02) SHA1(8a85f3e7d95db8a692b5834d6a4186037d1d94c3) )
+	ROM_CONTINUE(                 0x3200, 0x0200)
+	ROM_CONTINUE(                 0x1400, 0x0200)
+	ROM_CONTINUE(                 0x3600, 0x0200)
+	ROM_CONTINUE(                 0x3800, 0x0800)
+	ROM_LOAD( "j1_2732_e0572.a5", 0x2000, 0x0200, CRC(b45a5ba1) SHA1(d6357ed9a4cbde2cf8865097bbfaa039ba01b614) )
+	ROM_CONTINUE(                 0x0200, 0x0200)
+	ROM_CONTINUE(                 0x2400, 0x0200)
+	ROM_CONTINUE(                 0x0600, 0x0200)
+	ROM_CONTINUE(                 0x0800, 0x0800)
+	ROM_LOAD( "j2_2732_e0572.a4", 0x3000, 0x0200, CRC(cf9085a4) SHA1(b83b5eaf8f0620370215199728b45a5578a16f64) )
+	ROM_CONTINUE(                 0x1200, 0x0200)
+	ROM_CONTINUE(                 0x3400, 0x0200)
+	ROM_CONTINUE(                 0x1600, 0x0200)
+	ROM_CONTINUE(                 0x1800, 0x0800)
+	ROM_LOAD( "j6_2732_e0572.b1", 0x8000, 0x0200, CRC(bb9049fd) SHA1(71cdada93f5e8d50520fdeb7edf48b590913dfba) )
+	ROM_CONTINUE(                 0x9200, 0x0200)
+	ROM_CONTINUE(                 0x8400, 0x0200)
+	ROM_CONTINUE(                 0x9600, 0x0200)
+	ROM_CONTINUE(                 0x8800, 0x0200)
+	ROM_CONTINUE(                 0x9a00, 0x0200)
+	ROM_CONTINUE(                 0x8c00, 0x0200)
+	ROM_CONTINUE(                 0x9e00, 0x0200)
+	ROM_LOAD( "j5_2732_e0572.a1", 0x9000, 0x0200, CRC(9c6c77bb) SHA1(d44b851f2cc6bee046d90ad4c279e658eefac91c) )
+	ROM_CONTINUE(                 0x8200, 0x0200)
+	ROM_CONTINUE(                 0x9400, 0x0200)
+	ROM_CONTINUE(                 0x8600, 0x0200)
+	ROM_CONTINUE(                 0x9800, 0x0200)
+	ROM_CONTINUE(                 0x8a00, 0x0200)
+	ROM_CONTINUE(                 0x9c00, 0x0200)
+	ROM_CONTINUE(                 0x8e00, 0x0200)
+	ROM_LOAD( "j7_2716_e0572.b2", 0xa000, 0x0800, CRC(81fdc344) SHA1(873d131a889cfbdbeb06b8652d45b6f14d0c2124) )
+	ROM_LOAD( "j8_2716_e0572.b3", 0xa800, 0x0800, CRC(a75ea283) SHA1(36e248de0af917ff4c054b788918483057c84d9b) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_LOAD( "c1_2716_sub.bin",  0x0000, 0x0800, CRC(9a091b0a) SHA1(19b88f802ee80ff8901ef99e3688f2869f1a69c5) )
+	ROM_LOAD( "c4_2532_sub.bin",  0x1000, 0x0800, CRC(e12e6f3d) SHA1(c2bf562919e3972a1569bc90b9679ef5e4108c4b) )
+	ROM_CONTINUE(                 0x0800, 0x0800)
+	ROM_LOAD( "c2_2716_sub.bin",  0x1800, 0x0800, CRC(7749b111) SHA1(55071ce04708bd52177644298f76ae79d23f6ac9) )
+	ROM_LOAD( "c3_2532_sub.bin",  0x2800, 0x0800, CRC(5d7df54f) SHA1(d1e6072625c9eaec79714489aeb67b063990cf39) )
+	ROM_CONTINUE(                 0x2000, 0x0800)
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s288.bin",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+
+	ROM_REGION( 0x0200, "nvs", 0 ) // Additional PROM on the Novatronic NVS board
+	ROM_LOAD( "82s135_e0572.a6",  0x0000, 0x0100, NO_DUMP )
+ROM_END
+
 ROM_START( olibug ) // bootleg on an original Midway Galaxian PCB
 	ROM_REGION( 0x10000, "maincpu", 0 ) // b6 and b7 differ from jumpbugb
 	ROM_LOAD( "b1.bin",  0x0000, 0x1000, CRC(415aa1b7) SHA1(4f9edd7e9720acf085dd8910849c2f2fac5cb547) )
@@ -16690,6 +16764,7 @@ GAME( 198?, timefgtr,    0,        timefgtr,   timefgtr,   galaxian_state, init_
 GAME( 1981, jumpbug,     0,        jumpbug,    jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "Hoei (Rock-Ola license)",      "Jump Bug",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // or by Alpha Denshi Co. under contract from Hoei?
 GAME( 1981, jumpbugb,    jumpbug,  jumpbug,    jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "bootleg",                      "Jump Bug (bootleg, set 1)",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // bootleg of Sega license
 GAME( 1982, jumpbugbrf,  jumpbug,  jumpbugbrf, jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "bootleg (Recreativos Franco)", "Jump Bug (bootleg, set 2)",     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg from Recreativos Franco, without AY-8910
+GAME( 1982, jumpbugbc,   jumpbug,  jumpbugbrf, jumpbug,    galaxian_state, init_jumpbugbc,  ROT90,  "bootleg (Cirsa)",              "Jump Bug (bootleg, set 3)",     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )// bootleg on Cirsa PCB, without AY-8910
 GAME( 1982, olibug,      jumpbug,  jumpbug,    jumpbug,    galaxian_state, init_jumpbug,    ROT90,  "bootleg",                      "Oli Bug (bootleg of Jump Bug)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // one bad GFX ROM, uses Galaxian color PROM?
 GAME( 1983, levers,      0,        jumpbug,    levers,     galaxian_state, init_jumpbug,    ROT90,  "Rock-Ola",                     "Levers",                        MACHINE_SUPPORTS_SAVE )
 

@@ -1733,7 +1733,7 @@ bool menu_select_launch::handle_events(u32 flags, event &ev)
 
 		// text input goes to the search field unless there's an error message displayed
 		case ui_event::type::IME_CHAR:
-			if (!pointer_idle())
+			if (have_pointer() && !pointer_idle())
 				break;
 
 			if (exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_NEXT, 0) || exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_PREV, 0))

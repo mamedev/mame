@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cd90_015.h"
+#include "formats/sap_dsk.h"
 #include "formats/thom_dsk.h"
 
 DEFINE_DEVICE_TYPE(CD90_015, cd90_015_device, "cd90_015", "Thomson CD 90-015 floppy drive controller")
@@ -78,6 +79,7 @@ void cd90_015_device::floppy_drives(device_slot_interface &device)
 void cd90_015_device::floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_THOMSON_525_FORMAT);
+	fr.add(FLOPPY_SAP_FORMAT);
 }
 
 void cd90_015_device::device_add_mconfig(machine_config &config)

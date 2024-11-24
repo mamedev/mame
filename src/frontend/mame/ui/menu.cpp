@@ -1177,13 +1177,14 @@ std::pair<int, bool> menu::handle_pointer_update(uint32_t flags, ui_event const 
 	// give derived class a chance to handle it
 	if ((track_pointer::IDLE == m_pointer_state) || (track_pointer::CUSTOM == m_pointer_state))
 	{
+		bool const wascustom(track_pointer::CUSTOM == m_pointer_state);
 		auto const [key, take, redraw] = custom_pointer_updated(changed, uievt);
 		if (take)
 		{
 			m_pointer_state = track_pointer::CUSTOM;
 			return std::make_pair(key, redraw);
 		}
-		else if (track_pointer::CUSTOM == m_pointer_state)
+		else if (wascustom)
 		{
 			if (uievt.pointer_buttons)
 			{

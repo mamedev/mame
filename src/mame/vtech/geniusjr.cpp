@@ -11,7 +11,6 @@ Other known undumped international versions:
 - Pitagorín Plus (Spanish version of Genius Junior Redstar 3)
 - PreComputer Notebook (alternate English version of Genius Leader Notebook)
 - Smart Start Animated (alternate English version of Genius Junior Redstar)
-- El Super-Ordenador Parlanchín (alternate Spanish version of Genius Junior Movie)
 - Talande Smart Start Laptop (Swedish version of Genius Junior Movie)
 - Talking Whiz-Kid Animated (English version of Genius Junior Redstar)
 - Talking Whiz-Kid Genius (English version of Genius Junior Movie)
@@ -71,8 +70,8 @@ Undumped VTech laptops possibly on similar hardware:
    07  - La palabra escondida.       The hidden word.
    08  - Trueque de letras.          Swapped letters.
    09  - La letra intrusa.           The intruder letter.
-   10  - Matematicas (+,-,x,/).      Mathematics (+,-,x,/).
-   11  - Aprendiendo los numeros.    Learning the numbers.
+   10  - Matemáticas (+,-,x,÷).      Mathematics (+,-,x,÷).
+   11  - Aprendiendo los números.    Learning the numbers.
    12  - Redondeando cifras.         Rounding numbers.
    13  - Encuentra el signo.         Find the sign.
    14  - Calculadora.                Calculator.
@@ -348,9 +347,10 @@ ROM_START( gjmovie )
 	ROM_LOAD( "lh532hlk.bin", 0x000000, 0x40000, CRC(2e64c296) SHA1(604034f902e20851cb9af60964031a508ceef83e))
 ROM_END
 
+// Same main ROM as VTech "El Super-Ordenador Parlanchín", and also same label on the TSP50C10 (probably same ROM too)
 ROM_START( pitagjr )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "hc05_internal.bin", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "hc05_internal_sp.bin", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x40000, "extrom", 0 )
 	ROM_LOAD( "lh532hjt_9811d.u3", 0x00000, 0x40000, CRC(23878b45) SHA1(8f3c41c10cfde9d76763c3a8701ec6616db4ab40) )
@@ -429,12 +429,12 @@ ROM_END
 COMP( 1996,  gj4000,   0,       0,      gj4000,   geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior 4000 (Germany)",      MACHINE_IS_SKELETON )
 COMP( 1999?, scientus, gj4000,  0,      gj4000,   geniusjr, geniusjr_state, empty_init, "C.Q.F.D", "Scientus (France)",                 MACHINE_IS_SKELETON )
 COMP( 1993,  gjmovie,  0,       0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Movie (Germany)",     MACHINE_IS_SKELETON )
-COMP( 199?,  pitagjr,  gjmovie, 0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   "Pitagorin Junior",                  MACHINE_IS_SKELETON )
+COMP( 199?,  pitagjr,  gjmovie, 0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   u8"Pitagorín Junior",                MACHINE_IS_SKELETON ) // Also sold as "El Super-Ordenador Parlanchín"
 COMP( 1996,  gjrstar,  0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar (Germany)",   MACHINE_IS_SKELETON )
 COMP( 1996,  gjrstar2, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 2 (Germany)", MACHINE_IS_SKELETON )
 COMP( 1995,  pcompelr, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Precomputer Elektronik (Russia)",   MACHINE_IS_SKELETON ) // Прекомпьютер Электроник
 COMP( 1998,  gjrstar3, 0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON )
 COMP( 1998,  gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior 5000 (Germany)",      MACHINE_IS_SKELETON )
 COMP( 1993,  gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Leader Notebook",            MACHINE_IS_SKELETON )
-COMP( 1993,  pitagor,  gln,     0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   "Pitagorin",                         MACHINE_IS_SKELETON )
+COMP( 1993,  pitagor,  gln,     0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   u8"Pitagorín",                       MACHINE_IS_SKELETON )
 COMP( 1995,  gls,      0,       0,      gls,      geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Leader Select",              MACHINE_IS_SKELETON )

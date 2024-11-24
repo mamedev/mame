@@ -36,7 +36,7 @@ namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, cons
 
 namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG),
+	device_gfx_interface(mconfig, *this),
 	m_spriteram(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -219,7 +219,7 @@ void namcos2_sprite_device::zdrawgfxzoom(
 void namcos2_sprite_device::get_tilenum_and_size(const u16 word0, const u16 word1, u32 &sprn, bool &is_32)
 {
 	sprn = (word1 >> 2) & 0x0fff;
-	is_32 = bool(word0 & 0x200);
+	is_32 = BIT(word0, 9);
 }
 
 void namcos2_sprite_finallap_device::get_tilenum_and_size(const u16 word0, const u16 word1, u32 &sprn, bool &is_32)
@@ -229,12 +229,12 @@ void namcos2_sprite_finallap_device::get_tilenum_and_size(const u16 word0, const
 	// this is needed for the title screen to look correct, in addition to various in game sparks effects etc.
 
 	sprn = (word1 >> 2) & 0x07ff;
-	is_32 = bool((word1 >> 2) & 0x800);
+	is_32 = BIT(word1, 13);
 }
 
 void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control)
 {
-	int offset = (control & 0x000f) * (128 * 4);
+	const int offset = (control & 0x000f) * (128 * 4);
 	if (pri == 0)
 	{
 		screen.priority().fill(0, cliprect);
@@ -282,24 +282,24 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 				const u32 color  = (word3 >> 4) & 0x000f;
 				const int ypos   = (0x1ff - (word0 & 0x01ff)) - 0x50 + 0x02;
 				const int xpos   = (offset4 & 0x07ff) - 0x50 + 0x07;
-				const bool flipy = word1 & 0x8000;
-				const bool flipx = word1 & 0x4000;
+				const bool flipy = BIT(word1, 15);
+				const bool flipx = BIT(word1, 14);
 				const int scalex = (sizex << 16) / (is_32 ? 0x20 : 0x10);
 				const int scaley = (sizey << 16) / (is_32 ? 0x20 : 0x10);
 				if (scalex && scaley)
 				{
-					gfx_element *gfx = m_gfxdecode->gfx(0);
+					gfx_element *sgfx = gfx(0);
 
 					if (!is_32)
-						gfx->set_source_clip((word1 & 0x0001) ? 16 : 0, 16, (word1 & 0x0002) ? 16 : 0, 16);
+						sgfx->set_source_clip(BIT(word1, 0) ? 16 : 0, 16, BIT(word1, 1) ? 16 : 0, 16);
 					else
-						gfx->set_source_clip(0, 32, 0, 32);
+						sgfx->set_source_clip(0, 32, 0, 32);
 
 					zdrawgfxzoom(
 						screen,
 						bitmap,
 						cliprect,
-						gfx,
+						sgfx,
 						sprn,
 						color,
 						flipx,flipy,
@@ -348,7 +348,7 @@ void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap
 	{
 		screen.priority().fill(0, cliprect);
 	}
-	for (int loop=0; loop < 128; loop++)
+	for (int loop = 0; loop < 128; loop++)
 	{
 		const u16 ypos  = pSource[0];
 		const u16 tile  = pSource[1];
@@ -361,19 +361,19 @@ void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap
 
 		if ((sizey - 1) && sizex && (attrs & 0xf) == pri)
 		{
-			const bool bBigSprite = flags & 0x0008;
+			const bool bBigSprite = BIT(flags, 3);
 			const u32 color  = (attrs >> 4) & 0x000f;
 			int sx           = (xpos & 0x03ff) - 0x50 + 0x07;
 			int sy           = (0x1ff - (ypos & 0x01ff)) - 0x50 + 0x02;
-			const bool flipx = flags & 0x0002;
-			const bool flipy = flags & 0x0004;
+			const bool flipx = BIT(flags, 1);
+			const bool flipy = BIT(flags, 2);
 			const int scalex = (sizex << 16) / (0x20);//(sizex << 16) / (bBigSprite ? 0x20 : 0x10); correct formula?
 			const int scaley = (sizey << 16) / (bBigSprite ? 0x20 : 0x10);
 
 			/* swap xy */
 			const int rgn = (flags & 0x0001);
 
-			gfx_element *gfx = m_gfxdecode->gfx(rgn);
+			gfx_element *sgfx = gfx(rgn);
 
 			if (bBigSprite)
 			{
@@ -385,16 +385,16 @@ void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap
 				{
 					sy += (0x20 - sizey) / 0xc;
 				}
-				gfx->set_source_clip(0, 32, 0, 32);
+				sgfx->set_source_clip(0, 32, 0, 32);
 			}
 			else
-				gfx->set_source_clip((tile & 0x0001) ? 16 : 0, 16, (tile & 0x0002) ? 16 : 0, 16);
+				sgfx->set_source_clip(BIT(tile, 0) ? 16 : 0, 16, BIT(tile, 1) ? 16 : 0, 16);
 
 			zdrawgfxzoom(
 				screen,
 				bitmap,
 				cliprect,
-				gfx,
+				sgfx,
 				sprn, color,
 				flipx,flipy,
 				sx,sy,

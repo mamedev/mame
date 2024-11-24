@@ -656,6 +656,16 @@ inline u32 m68ki_read_8_fc(u32 address, u32 fc)
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 1;
 	m_mmu_tmp_sz = M68K_SZ_BYTE;
+	// Check for reading the FPU's CIRs if this is an '020 or '030.
+	// In CPU space (FC 7), addresses 0x0002xxxx are coprocessor interface registers.
+	// Bits 15-13 are the coprocessor ID, and bits 0-4 are the register select.
+	if ((fc == 7) && CPU_TYPE_IS_020_PLUS() && !CPU_TYPE_IS_040_PLUS())
+	{
+		if ((address & 0xffffeff0) == 0x00022000)
+		{
+			return m6888x_read_cir(address);
+		}
+	}
 	return m_read8(address);
 }
 inline u32 m68ki_read_16_fc(u32 address, u32 fc)
@@ -667,6 +677,13 @@ inline u32 m68ki_read_16_fc(u32 address, u32 fc)
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 1;
 	m_mmu_tmp_sz = M68K_SZ_WORD;
+	if ((fc == 7) && CPU_TYPE_IS_020_PLUS() && !CPU_TYPE_IS_040_PLUS())
+	{
+		if ((address & 0xffffeff0) == 0x00022000)
+		{
+			return m6888x_read_cir(address);
+		}
+	}
 	return m_read16(address);
 }
 inline u32 m68ki_read_32_fc(u32 address, u32 fc)
@@ -678,6 +695,13 @@ inline u32 m68ki_read_32_fc(u32 address, u32 fc)
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 1;
 	m_mmu_tmp_sz = M68K_SZ_LONG;
+	if ((fc == 7) && CPU_TYPE_IS_020_PLUS() && !CPU_TYPE_IS_040_PLUS())
+	{
+		if ((address & 0xffffeff0) == 0x00022000)
+		{
+			return m6888x_read_cir(address);
+		}
+	}
 	return m_read32(address);
 }
 
@@ -686,6 +710,14 @@ inline void m68ki_write_8_fc(u32 address, u32 fc, u32 value)
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 0;
 	m_mmu_tmp_sz = M68K_SZ_BYTE;
+	if ((fc == 7) && CPU_TYPE_IS_020_PLUS() && !CPU_TYPE_IS_040_PLUS())
+	{
+		if ((address & 0xffffeff0) == 0x00022000)
+		{
+			m6888x_write_cir(address, value);
+			return;
+		}
+	}
 	m_write8(address, value);
 }
 inline void m68ki_write_16_fc(u32 address, u32 fc, u32 value)
@@ -697,6 +729,14 @@ inline void m68ki_write_16_fc(u32 address, u32 fc, u32 value)
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 0;
 	m_mmu_tmp_sz = M68K_SZ_WORD;
+	if ((fc == 7) && CPU_TYPE_IS_020_PLUS() && !CPU_TYPE_IS_040_PLUS())
+	{
+		if ((address & 0xffffeff0) == 0x00022000)
+		{
+			m6888x_write_cir(address, value);
+			return;
+		}
+	}
 	m_write16(address, value);
 }
 inline void m68ki_write_32_fc(u32 address, u32 fc, u32 value)
@@ -708,6 +748,14 @@ inline void m68ki_write_32_fc(u32 address, u32 fc, u32 value)
 	m_mmu_tmp_fc = fc;
 	m_mmu_tmp_rw = 0;
 	m_mmu_tmp_sz = M68K_SZ_LONG;
+	if ((fc == 7) && CPU_TYPE_IS_020_PLUS() && !CPU_TYPE_IS_040_PLUS())
+	{
+		if ((address & 0xffffeff0) == 0x00022000)
+		{
+			m6888x_write_cir(address, value);
+			return;
+		}
+	}
 	m_write32(address, value);
 }
 

@@ -1138,7 +1138,7 @@ static INPUT_PORTS_START( suprtrio )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tumbleb_state, suprtrio_prot_latch_r)
+	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(tumbleb_state::suprtrio_prot_latch_r))
 	PORT_BIT( 0xff0e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")   /* Dip switches */

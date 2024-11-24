@@ -264,7 +264,7 @@ void pda600_state::pda600_io(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( pda600 )
 	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_WRITE_LINE_MEMBER(pda600_state, power_off_w)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_WRITE_LINE_MEMBER(FUNC(pda600_state::power_off_w))
 
 	PORT_START("BATTERY")
 	PORT_CONFNAME(0x0f, 0x0f, "Main battery status")

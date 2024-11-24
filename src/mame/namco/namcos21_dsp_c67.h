@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "namco_c67.h"
+#include "namco_dsp.h"
 #include "namcos21_3d.h"
 
 #include <algorithm>

@@ -3359,7 +3359,7 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(igs011_state, igs_hopper_r) // hopper switch
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -3489,7 +3489,7 @@ static INPUT_PORTS_START( nkishusp )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(igs011_state, igs_hopper_r) // hopper switch
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -3698,7 +3698,7 @@ static INPUT_PORTS_START( wlcc )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE2  ) // shown in test mode
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)   // clear coin
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM   ) PORT_READ_LINE_MEMBER(igs011_state, igs_hopper_r)   // hopper switch
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM   ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r))   // hopper switch
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -3827,7 +3827,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(igs011_state, igs_hopper_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )   // system reset
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
@@ -4083,7 +4083,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(igs011_state, igs_hopper_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats

@@ -531,9 +531,27 @@ ROM_START( labyrunrk )
 															// there is no char lookup table
 ROM_END
 
+ROM_START( labyrunrf )
+	ROM_REGION( 0x28000, "maincpu", 0 ) // code + banked ROMs
+	ROM_LOAD( "771k04.10f", 0x10000, 0x08000, CRC(86a36806) SHA1(d1c916a24117290e890b5e14d6e1932d65943bc6) )
+	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_LOAD( "771k03.8f",  0x18000, 0x10000, CRC(6c073295) SHA1(67be17ad0c3bfd5ff8cd6ed31b217e438733ed1c) )
+
+	ROM_REGION( 0x40000, "gfx", 0 )
+	ROM_LOAD16_BYTE( "771d01a.13a", 0x00001, 0x10000, CRC(0cd1ed1a) SHA1(eac6c106de28acc54535ae1fb99f778c1ed4013e) )    // tiles + sprites
+	ROM_LOAD16_BYTE( "771d01c.13a", 0x00000, 0x10000, CRC(d75521fe) SHA1(72f0c4d9511bc70d77415f50be93293026305bd5) )
+	ROM_LOAD16_BYTE( "771d01b",     0x20001, 0x10000, CRC(07f2a71c) SHA1(63c79e75e71539e69d4d9d35e629a6021124f6d0) )
+	ROM_LOAD16_BYTE( "771d01d",     0x20000, 0x10000, CRC(f6810a49) SHA1(b40e9f0d0919188a05c1990347da8dc8ff12d65a) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "771d02.08d", 0x0000, 0x0100, CRC(3d34bb5a) SHA1(3f3c845f1197457244e7c7e4f9b2a03c278613e4) )  // sprite lookup table
+															// there is no char lookup table
+ROM_END
+
 } // anonymous namespace
 
 
 GAME( 1987, tricktrp,  0,        labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Trick Trap (World?)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1987, labyrunr,  tricktrp, labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Labyrinth Runner (Japan)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1987, labyrunrk, tricktrp, labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, labyrunrf, tricktrp, labyrunr, labyrunr, labyrunr_state, empty_init, ROT90, "Konami", "Labyrinth Runner (World Ver. F)", MACHINE_SUPPORTS_SAVE )

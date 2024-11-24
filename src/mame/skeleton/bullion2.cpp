@@ -140,4 +140,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY  FULLNAME     FLAGS
-GAME( 1984, bullion2, 0,      bullion2, bullion2, bullion2_state, empty_init, ROT0,     "Inder", "Bullion 2", MACHINE_IS_SKELETON )
+GAME( 1984, bullion2, 0,      bullion2, bullion2, bullion2_state, empty_init, ROT0,     "Inder", "Bullion 2", MACHINE_IS_SKELETON_MECHANICAL )

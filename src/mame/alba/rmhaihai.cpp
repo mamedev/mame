@@ -27,6 +27,9 @@ TODO:
 
 - visible area uncertain.
 
+- rmhaihaibl stops at RAM clear. There are various small routines changed,
+  probably to make up for missing IOX chip.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -629,6 +632,33 @@ ROM_START( rmhaihai2 )
 	ROM_LOAD( "s0-1.5g",      0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
 ROM_END
 
+ROM_START( rmhaihaibl ) // seemingly bootleg PCB
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4.11g",     0x00000, 0x2000, CRC(a31394ba) SHA1(0cba4baa2c8addd7f127b21b26715ed79ec4cab7) )
+	ROM_CONTINUE(          0x06000, 0x2000 )
+	ROM_LOAD( "3.8g",      0x04000, 0x2000, CRC(aad71f3b) SHA1(fd0a7cc8478eaa09d1ee171f3cbbaeb6b94d414f) )
+	ROM_CONTINUE(          0x02000, 0x2000 )
+	ROM_LOAD( "2.6g",      0x08000, 0x2000, CRC(9c567fd7) SHA1(0240448f093f19d66c4f4257c353498933ac4362) )
+	ROM_CONTINUE(          0x0c000, 0x2000 )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "8a",        0x00000, 0x4000, CRC(797c63d1) SHA1(2ff9c3c61b28c34de97c0117b7eadb409d79df46) )
+	ROM_LOAD( "7a",        0x04000, 0x4000, CRC(b2526747) SHA1(73d0a19a5bb83e8977e94a47abbb65f9c7788c78) )
+	ROM_LOAD( "6a",        0x08000, 0x4000, CRC(146eaa31) SHA1(0e38aab52ff9bf0d42fea24caeee6ca90d63ace2) )
+	ROM_LOAD( "5a",        0x0c000, 0x4000, CRC(be59e742) SHA1(19d253f72f760f6350f76b313cf8aca7e3f90e8d) )
+	ROM_LOAD( "11a",       0x10000, 0x4000, CRC(e4229389) SHA1(b14d7855b66fe03c1485cb735cb20f59f19f248f) )
+	ROM_LOAD( "10a",       0x14000, 0x4000, CRC(029ef909) SHA1(fd867b8e1ccd5b88f18409ff17939ec8420c6131) )
+	// 0x18000-0x1ffff empty space filled by the init function
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "13b",       0x0000, 0x0100, CRC(911d32a5) SHA1(36f2b62009918862c13f3eda05a21403b4d9607f) )
+	ROM_LOAD( "13a",       0x0100, 0x0100, CRC(e9be978a) SHA1(50c7ca7a7496cb6fe5e8ce0db693ccb82dbbb8c6) )
+	ROM_LOAD( "13c",       0x0200, 0x0100, CRC(609775a6) SHA1(70a787aec0852e106216a4ca9891d36aef60b189) )
+
+	ROM_REGION( 0x8000, "adpcm", 0 )    // ADPCM samples, read directly by the main CPU
+	ROM_LOAD( "1.5g",      0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
+ROM_END
+
 ROM_START( rmhaihib )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "s-30-6.11g",   0x00000,  0x2000, CRC(f3e13cc8) SHA1(7eb9b17ea9efb5b2891ec40a9ff9744e84c0511c) )
@@ -785,10 +815,11 @@ void rmhaihai_state::init_rmhaihai()
 } // anonymous namespace
 
 
-GAME( 1985, rmhaihai,  0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, newer)", MACHINE_SUPPORTS_SAVE ) // writes Homedata in NVRAM
-GAME( 1985, rmhaihai2, rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, rmhaihib,  rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan, medal)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rmhaijin,  0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rmhaisei,  0,        rmhaisei, rmhaihai, rmhaisei_state, init_rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, themj,     0,        themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco", "The Mah-jong (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, themj2,    themj,    themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco", "The Mah-jong (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihai,   0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",    "Real Mahjong Haihai (Japan, newer)", MACHINE_SUPPORTS_SAVE ) // writes Homedata in NVRAM
+GAME( 1985, rmhaihai2,  rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",    "Real Mahjong Haihai (Japan, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihaibl, rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "bootleg", "Real Mahjong Haihai (Japan, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihib,   rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, init_rmhaihai, ROT0, "Alba",    "Real Mahjong Haihai (Japan, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rmhaijin,   0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",    "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rmhaisei,   0,        rmhaisei, rmhaihai, rmhaisei_state, init_rmhaihai, ROT0, "Visco",   "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, themj,      0,        themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco",   "The Mah-jong (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, themj2,     themj,    themj,    rmhaihai, themj_state,    init_rmhaihai, ROT0, "Visco",   "The Mah-jong (Japan, set 2)", MACHINE_SUPPORTS_SAVE )

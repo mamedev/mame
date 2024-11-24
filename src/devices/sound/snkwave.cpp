@@ -18,15 +18,15 @@ DEFINE_DEVICE_TYPE(SNKWAVE, snkwave_device, "snkwave", "SNK Wave")
 //  snkwave_device - constructor
 //-------------------------------------------------
 
-snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SNKWAVE, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_external_clock(0),
-		m_sample_rate(0),
-		m_frequency(0),
-		m_counter(0),
-		m_waveform_position(0)
+snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SNKWAVE, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_external_clock(0),
+	m_sample_rate(0),
+	m_frequency(0),
+	m_counter(0),
+	m_waveform_position(0)
 {
 	std::fill(std::begin(m_waveform), std::end(m_waveform), 0);
 }
@@ -119,14 +119,11 @@ void snkwave_device::snkwave_w(offs_t offset, uint8_t data)
 {
 	m_stream->update();
 
-	// all registers are 6-bit
-	data &= 0x3f;
-
-	if (offset == 0)
-		m_frequency = (m_frequency & 0x03f) | (data << 6);
-	else if (offset == 1)
-		m_frequency = (m_frequency & 0xfc0) | data;
-	else if (offset <= 5)
+	if (offset == 0) // F1, high 6 bits
+		m_frequency = (m_frequency & 0x03f) | ((data & 0xfc) << 4);
+	else if (offset == 1) // F2, low 6 bits
+		m_frequency = (m_frequency & 0xfc0) | (data & 0x3f);
+	else if (offset <= 5) // W3 thru W6, low 3 bits of each nybble
 		update_waveform(offset - 2, data);
 }
 
@@ -143,7 +140,7 @@ void snkwave_device::update_waveform(unsigned int offset, uint8_t data)
 {
 	assert(offset < WAVEFORM_LENGTH/4);
 
-	m_waveform[offset * 2]     = ((data & 0x38) >> 3) << (12-CLOCK_SHIFT);
+	m_waveform[offset * 2]     = ((data & 0x70) >> 4) << (12-CLOCK_SHIFT);
 	m_waveform[offset * 2 + 1] = ((data & 0x07) >> 0) << (12-CLOCK_SHIFT);
 	m_waveform[WAVEFORM_LENGTH-2 - offset * 2] = ~m_waveform[offset * 2 + 1];
 	m_waveform[WAVEFORM_LENGTH-1 - offset * 2] = ~m_waveform[offset * 2];

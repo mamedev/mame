@@ -348,14 +348,14 @@ static INPUT_PORTS_START( advision )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 
 	PORT_START("CONF")
-	PORT_CONFNAME( 0x3f, 20, "Screen Width" ) PORT_CHANGED_MEMBER(DEVICE_SELF, advision_state, set_screensize, 0) // factors of 60
+	PORT_CONFNAME( 0x3f, 20, "Screen Width" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(advision_state::set_screensize), 0) // factors of 60
 	PORT_CONFSETTING(    60, "160" )
 	PORT_CONFSETTING(    30, "320" )
 	PORT_CONFSETTING(    20, "480" )
 	PORT_CONFSETTING(    15, "640" )
 	PORT_CONFSETTING(    12, "800" )
 	PORT_CONFSETTING(    10, "960" )
-	PORT_CONFNAME( 0xc0, 0x80, "LED Height" ) PORT_CHANGED_MEMBER(DEVICE_SELF, advision_state, set_screensize, 0)
+	PORT_CONFNAME( 0xc0, 0x80, "LED Height" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(advision_state::set_screensize), 0)
 	PORT_CONFSETTING(    0x00, "25%" )
 	PORT_CONFSETTING(    0x40, "50%" )
 	PORT_CONFSETTING(    0x80, "75%" )

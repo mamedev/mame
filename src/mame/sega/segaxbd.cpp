@@ -1086,7 +1086,7 @@ void segaxbd_rascot_state::comm_map(address_map &map)
 static INPUT_PORTS_START( xboard_generic )
 	PORT_START("mainpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )    // D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc", adc0804_device, intr_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc", FUNC(adc0804_device::intr_r))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )     // D7: (Not connected)
 
 	// I/O port: CN C pins 17,15,13,11,9,7,5,3
@@ -1523,7 +1523,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gprider )
 	PORT_START("mainpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc", adc0804_device, intr_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc", FUNC(adc0804_device::intr_r))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:IO0PORTB")
@@ -1580,7 +1580,7 @@ static INPUT_PORTS_START( gprider_double )
 
 	PORT_START("subpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("subpcb:adc", adc0804_device, intr_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("subpcb:adc", FUNC(adc0804_device::intr_r))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("subpcb:IO0PORTB")

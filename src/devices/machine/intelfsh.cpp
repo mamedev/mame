@@ -88,6 +88,7 @@ DEFINE_DEVICE_TYPE(INTEL_28F016S5,           intel_28f016s5_device,           "i
 DEFINE_DEVICE_TYPE(SHARP_LH28F016S,          sharp_lh28f016s_device,          "sharp_lh28f016s",          "Sharp LH28F016S Flash")
 DEFINE_DEVICE_TYPE(SHARP_LH28F016S_16BIT,    sharp_lh28f016s_16bit_device,    "sharp_lh28f016s_16bit",    "Sharp LH28F016S Flash (16-bit)")
 DEFINE_DEVICE_TYPE(ATMEL_29C010,             atmel_29c010_device,             "atmel_29c010",             "Atmel 29C010 Flash")
+DEFINE_DEVICE_TYPE(ATMEL_29C020,             atmel_29c020_device,             "atmel_29c020",             "Atmel 29C020 Flash")
 DEFINE_DEVICE_TYPE(AMD_29F010,               amd_29f010_device,               "amd_29f010",               "AMD 29F010 Flash")
 DEFINE_DEVICE_TYPE(AMD_29F040,               amd_29f040_device,               "amd_29f040",               "AMD 29F040 Flash")
 DEFINE_DEVICE_TYPE(AMD_29F080,               amd_29f080_device,               "amd_29f080",               "AMD 29F080 Flash")
@@ -209,6 +210,9 @@ sharp_lh28f016s_16bit_device::sharp_lh28f016s_16bit_device(const machine_config 
 
 atmel_29c010_device::atmel_29c010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, ATMEL_29C010, tag, owner, clock, 0x20000, MFG_ATMEL, 0xd5) { m_page_size = 0x80; }
+
+atmel_29c020_device::atmel_29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, ATMEL_29C020, tag, owner, clock, 0x40000, MFG_ATMEL, 0xda) { m_page_size = 0x100; }
 
 atmel_49f4096_device::atmel_49f4096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, ATMEL_49F4096, tag, owner, clock, 0x80000, MFG_ATMEL, 0x92) { m_sector_is_16k = true; }
@@ -334,8 +338,15 @@ void intelfsh_device::device_start()
 	m_timer = timer_alloc(FUNC(intelfsh_device::delay_tick), this);
 
 	save_item( NAME(m_status) );
+	save_item( NAME(m_erase_sector) );
 	save_item( NAME(m_flash_mode) );
 	save_item( NAME(m_flash_master_lock) );
+	save_item( NAME(m_bank) );
+	save_item( NAME(m_byte_count) );
+	save_item( NAME(m_sdp) );
+	save_item( NAME(m_write_buffer) );
+	save_item( NAME(m_write_buffer_start_address) );
+	save_item( NAME(m_write_buffer_count) );
 	save_item( NAME(m_fast_mode) );
 	save_pointer( &m_data[0], "m_data", m_size);
 }
@@ -699,8 +710,9 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		}
 		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0xa0 )
 		{
-			if (m_maker_id == MFG_ATMEL && m_device_id == 0xd5)
+			if (m_maker_id == MFG_ATMEL && (m_device_id == 0xd5 || m_device_id == 0xda))
 			{
+				m_sdp = true;
 				m_flash_mode = FM_WRITEPAGEATMEL;
 				m_byte_count = 0;
 			}
@@ -913,6 +925,12 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_status = 1 << 3;
 			m_flash_mode = FM_ERASEAMD4;
 		}
+		else if ((data & 0xff) == 0x20 && m_maker_id == MFG_ATMEL && (m_device_id == 0xd5 || m_device_id == 0xda))
+		{
+			m_sdp = false;
+			m_flash_mode = FM_WRITEPAGEATMEL;
+			m_byte_count = 0;
+		}
 		else
 		{
 			logerror( "unexpected %08x=%02x in FM_ERASEAMD3\n", address, data & 0xff );
@@ -995,25 +1013,35 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_flash_mode = FM_READSTATUS;
 		break;
 	case FM_WRITEPAGEATMEL:
-		switch( m_bits )
+		if (m_byte_count == 0 && !m_sdp && (address & 0xfff) == 0x555 && (data & 0xff) == 0xaa)
 		{
-		case 8:
-			m_data[address] = data;
-			break;
-		case 16:
-			m_data[address*2] = data >> 8;
-			m_data[address*2+1] = data;
-			break;
-		default:
-			logerror( "FM_WRITEPAGEATMEL not supported when m_bits == %d\n", m_bits );
-			break;
+			m_flash_mode = FM_READAMDID1;
 		}
-
-		m_byte_count++;
-
-		if (m_byte_count == m_page_size)
+		else
 		{
-			m_flash_mode = FM_NORMAL;
+			switch( m_bits )
+			{
+			case 8:
+				m_data[address] = data;
+				break;
+			case 16:
+				m_data[address*2] = data >> 8;
+				m_data[address*2+1] = data;
+				break;
+			default:
+				logerror( "FM_WRITEPAGEATMEL not supported when m_bits == %d\n", m_bits );
+				break;
+			}
+
+			m_byte_count++;
+
+			if (m_byte_count == m_page_size)
+			{
+				if (m_sdp)
+					m_flash_mode = FM_NORMAL;
+
+				m_byte_count = 0;
+			}
 		}
 		break;
 	case FM_CLEARPART1:

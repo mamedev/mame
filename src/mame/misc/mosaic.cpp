@@ -143,7 +143,6 @@ TILE_GET_INFO_MEMBER(mosaic_state::get_bg_tile_info)
 }
 
 
-
 /***************************************************************************
 
   Start the video hardware emulation.
@@ -178,7 +177,6 @@ void mosaic_state::bgvideoram_w(offs_t offset, uint8_t data)
 }
 
 
-
 uint32_t mosaic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -196,7 +194,7 @@ void mosaic_state::protection_w(uint8_t data) // TODO: hook up PIC dump and remo
 	}
 	else
 	{
-		static const int jumptable[] =
+		static const uint16_t jumptable[] =
 		{
 			0x02be, 0x0314, 0x0475, 0x0662, 0x0694, 0x08f3, 0x0959, 0x096f,
 			0x0992, 0x09a4, 0x0a50, 0x0d69, 0x0eee, 0x0f98, 0x1040, 0x1075,
@@ -213,11 +211,14 @@ void mosaic_state::protection_w(uint8_t data) // TODO: hook up PIC dump and remo
 
 uint8_t mosaic_state::protection_r()
 {
-	int const res = (m_prot_val >> 8) & 0xff;
+	uint8_t const res = (m_prot_val >> 8) & 0xff;
 
-	LOGPICSIM("%06x: protection_r %02x\n", m_maincpu->pc(), res);
+	if (!machine().side_effects_disabled())
+	{
+		LOGPICSIM("%06x: protection_r %02x\n", m_maincpu->pc(), res);
 
-	m_prot_val <<= 8;
+		m_prot_val <<= 8;
+	}
 
 	return res;
 }
@@ -226,7 +227,7 @@ void mosaic_state::gfire2_protection_w(uint8_t data)
 {
 	LOGPICSIM("%06x: protection_w %02x\n", m_maincpu->pc(), data);
 
-	switch(data)
+	switch (data)
 	{
 		case 0x01:
 			// written repeatedly; no effect??
@@ -251,18 +252,18 @@ void mosaic_state::gfire2_protection_w(uint8_t data)
 
 uint8_t mosaic_state::gfire2_protection_r()
 {
-	int const res = m_prot_val & 0xff;
+	uint8_t const res = m_prot_val & 0xff;
 
-	m_prot_val >>= 8;
+	if (!machine().side_effects_disabled())
+		m_prot_val >>= 8;
 
 	return res;
 }
 
 
-
 void mosaic_state::mosaic_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).rom();
+	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
 	map(0x20000, 0x21fff).ram();
 	map(0x22000, 0x22fff).ram().w(FUNC(mosaic_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0x23000, 0x23fff).ram().w(FUNC(mosaic_state::fgvideoram_w)).share(m_fgvideoram);
@@ -271,7 +272,7 @@ void mosaic_state::mosaic_map(address_map &map)
 
 void mosaic_state::gfire2_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).rom();
+	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
 	map(0x10000, 0x17fff).ram();
 	map(0x22000, 0x22fff).ram().w(FUNC(mosaic_state::bgvideoram_w)).share(m_bgvideoram);
 	map(0x23000, 0x23fff).ram().w(FUNC(mosaic_state::fgvideoram_w)).share(m_fgvideoram);
@@ -391,22 +392,9 @@ static INPUT_PORTS_START( gfire2 )
 INPUT_PORTS_END
 
 
-
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{   RGN_FRAC(3,4)+0, RGN_FRAC(2,4)+0, RGN_FRAC(1,4)+0, RGN_FRAC(0,4)+0,
-		RGN_FRAC(3,4)+8, RGN_FRAC(2,4)+8, RGN_FRAC(1,4)+8, RGN_FRAC(0,4)+8 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
-};
-
 static GFXDECODE_START( gfx_mosaic )
-	GFXDECODE_ENTRY( "fgtiles", 0, charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "bgtiles", 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x8_raw, 0, 1 )
+	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x8_raw, 0, 1 )
 GFXDECODE_END
 
 void mosaic_state::machine_start()
@@ -467,7 +455,6 @@ void mosaic_state::gfire2(machine_config &config)
 }
 
 
-
 /***************************************************************************
 
   Game driver(s)
@@ -475,63 +462,63 @@ void mosaic_state::gfire2(machine_config &config)
 ***************************************************************************/
 
 ROM_START( mosaic )
-	ROM_REGION( 0x100000, "maincpu", 0 )    // 1024k for Z180 address space
+	ROM_REGION( 0x10000, "maincpu", 0 )    // 1024k for Z180 address space
 	ROM_LOAD( "9.ua02", 0x00000, 0x10000, CRC(5794dd39) SHA1(28784371f4ca561e3c0fb74d1f0a204f58ccdd3a) ) // at PCB location 7F
 
 	ROM_REGION( 0x400, "pic", 0 )
 	ROM_LOAD( "pic16c55.uc02",    0x000, 0x400, CRC(62d1d85d) SHA1(167e1f39e85f0bbecc4374f3975aa0c41173f070) ) // decapped, presumed to be 16C55
 
 	ROM_REGION( 0x40000, "fgtiles", 0 )
-	ROM_LOAD( "1.u505", 0x00000, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) ) // at PCB location 1L
-	ROM_LOAD( "2.u506", 0x10000, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) ) // at PCB location 1K
-	ROM_LOAD( "3.u507", 0x20000, 0x10000, CRC(f81294cd) SHA1(9bce627bbe3940769776121fb4296f92ac4c7d1a) ) // at PCB location 1I
-	ROM_LOAD( "4.u508", 0x30000, 0x10000, CRC(fff72536) SHA1(4fc5d0a79128dd49275bc4c4cc2dd7c587096fd8) ) // at PCB location 1G
+	ROM_LOAD32_BYTE( "1.u505", 0x00003, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) ) // at PCB location 1L
+	ROM_LOAD32_BYTE( "2.u506", 0x00002, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) ) // at PCB location 1K
+	ROM_LOAD32_BYTE( "3.u507", 0x00001, 0x10000, CRC(f81294cd) SHA1(9bce627bbe3940769776121fb4296f92ac4c7d1a) ) // at PCB location 1I
+	ROM_LOAD32_BYTE( "4.u508", 0x00000, 0x10000, CRC(fff72536) SHA1(4fc5d0a79128dd49275bc4c4cc2dd7c587096fd8) ) // at PCB location 1G
 
 	ROM_REGION( 0x40000, "bgtiles", 0 )
-	ROM_LOAD( "5.u305", 0x00000, 0x10000, CRC(28513fbf) SHA1(e69051206cc3df470e7b2358c51cbbed294795f5) ) // at PCB location 1F
-	ROM_LOAD( "6.u306", 0x10000, 0x10000, CRC(1b8854c4) SHA1(d49df2565d9ccda403fafb9e219d3603776e3d34) ) // at PCB location 1D
-	ROM_LOAD( "7.u307", 0x20000, 0x10000, CRC(35674ac2) SHA1(6422a81034b6d34aefc8ca5d2926d3d3c3d7ff77) ) // at PCB location 1C
-	ROM_LOAD( "8.u308", 0x30000, 0x10000, CRC(6299c376) SHA1(eb64b20268c06c97c4201c8004a759b6de42fab6) ) // at PCB location 1A
+	ROM_LOAD32_BYTE( "5.u305", 0x00003, 0x10000, CRC(28513fbf) SHA1(e69051206cc3df470e7b2358c51cbbed294795f5) ) // at PCB location 1F
+	ROM_LOAD32_BYTE( "6.u306", 0x00002, 0x10000, CRC(1b8854c4) SHA1(d49df2565d9ccda403fafb9e219d3603776e3d34) ) // at PCB location 1D
+	ROM_LOAD32_BYTE( "7.u307", 0x00001, 0x10000, CRC(35674ac2) SHA1(6422a81034b6d34aefc8ca5d2926d3d3c3d7ff77) ) // at PCB location 1C
+	ROM_LOAD32_BYTE( "8.u308", 0x00000, 0x10000, CRC(6299c376) SHA1(eb64b20268c06c97c4201c8004a759b6de42fab6) ) // at PCB location 1A
 ROM_END
 
 ROM_START( mosaica )
-	ROM_REGION( 0x100000, "maincpu", 0 )    // 1024k for Z180 address space
+	ROM_REGION( 0x10000, "maincpu", 0 )    // 1024k for Z180 address space
 	ROM_LOAD( "mosaic_9.a02", 0x00000, 0x10000, CRC(ecb4f8aa) SHA1(e45c074bac92d1d079cf1bcc0a6a081beb3dbb8e) ) // at PCB location 7F
 
 	ROM_REGION( 0x400, "pic", 0 )
 	ROM_LOAD( "pic16c55.uc02",    0x000, 0x400, CRC(62d1d85d) SHA1(167e1f39e85f0bbecc4374f3975aa0c41173f070) ) // decapped, presumed to be 16C55
 
 	ROM_REGION( 0x40000, "fgtiles", 0 )
-	ROM_LOAD( "1.u505", 0x00000, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) ) // at PCB location 1L
-	ROM_LOAD( "2.u506", 0x10000, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) ) // at PCB location 1K
-	ROM_LOAD( "3.u507", 0x20000, 0x10000, CRC(f81294cd) SHA1(9bce627bbe3940769776121fb4296f92ac4c7d1a) ) // at PCB location 1I
-	ROM_LOAD( "4.u508", 0x30000, 0x10000, CRC(fff72536) SHA1(4fc5d0a79128dd49275bc4c4cc2dd7c587096fd8) ) // at PCB location 1G
+	ROM_LOAD32_BYTE( "1.u505", 0x00003, 0x10000, CRC(05f4cc70) SHA1(367cfa716b5d24663efcd98a4a80bf02ef28f2f8) ) // at PCB location 1L
+	ROM_LOAD32_BYTE( "2.u506", 0x00002, 0x10000, CRC(78907875) SHA1(073b90e0303f7812e7e8f66bb798a7734cb36bb9) ) // at PCB location 1K
+	ROM_LOAD32_BYTE( "3.u507", 0x00001, 0x10000, CRC(f81294cd) SHA1(9bce627bbe3940769776121fb4296f92ac4c7d1a) ) // at PCB location 1I
+	ROM_LOAD32_BYTE( "4.u508", 0x00000, 0x10000, CRC(fff72536) SHA1(4fc5d0a79128dd49275bc4c4cc2dd7c587096fd8) ) // at PCB location 1G
 
 	ROM_REGION( 0x40000, "bgtiles", 0 )
-	ROM_LOAD( "5.u305", 0x00000, 0x10000, CRC(28513fbf) SHA1(e69051206cc3df470e7b2358c51cbbed294795f5) ) // at PCB location 1F
-	ROM_LOAD( "6.u306", 0x10000, 0x10000, CRC(1b8854c4) SHA1(d49df2565d9ccda403fafb9e219d3603776e3d34) ) // at PCB location 1D
-	ROM_LOAD( "7.u307", 0x20000, 0x10000, CRC(35674ac2) SHA1(6422a81034b6d34aefc8ca5d2926d3d3c3d7ff77) ) // at PCB location 1C
-	ROM_LOAD( "8.u308", 0x30000, 0x10000, CRC(6299c376) SHA1(eb64b20268c06c97c4201c8004a759b6de42fab6) ) // at PCB location 1A
+	ROM_LOAD32_BYTE( "5.u305", 0x00003, 0x10000, CRC(28513fbf) SHA1(e69051206cc3df470e7b2358c51cbbed294795f5) ) // at PCB location 1F
+	ROM_LOAD32_BYTE( "6.u306", 0x00002, 0x10000, CRC(1b8854c4) SHA1(d49df2565d9ccda403fafb9e219d3603776e3d34) ) // at PCB location 1D
+	ROM_LOAD32_BYTE( "7.u307", 0x00001, 0x10000, CRC(35674ac2) SHA1(6422a81034b6d34aefc8ca5d2926d3d3c3d7ff77) ) // at PCB location 1C
+	ROM_LOAD32_BYTE( "8.u308", 0x00000, 0x10000, CRC(6299c376) SHA1(eb64b20268c06c97c4201c8004a759b6de42fab6) ) // at PCB location 1A
 ROM_END
 
 ROM_START( gfire2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )    // 1024k for Z180 address space
+	ROM_REGION( 0x10000, "maincpu", 0 )    // 1024k for Z180 address space
 	ROM_LOAD( "goldf2_i.7e",         0x00000, 0x10000, CRC(a102f7d0) SHA1(cfde51d0e9e69e9653fdfd70d4e4f4649b662005) )
 
 	ROM_REGION( 0x400, "pic", 0 )
 	ROM_LOAD( "pic16c55.uc02",    0x000, 0x400, NO_DUMP ) // same sanded off chip as mosaic, verified on PCB pic
 
 	ROM_REGION( 0x100000, "fgtiles", 0 )
-	ROM_LOAD( "goldf2_a.1k",         0x00000, 0x40000, CRC(1f086472) SHA1(c776a734869b6bab317627bd15457a9fb18e1159) )
-	ROM_LOAD( "goldf2_b.1j",         0x40000, 0x40000, CRC(edb0d40c) SHA1(624a71b42a2e6c7c55cf455395aa0ad9b3eaeb9e) )
-	ROM_LOAD( "goldf2_c.1i",         0x80000, 0x40000, CRC(d0ebd486) SHA1(ff2bfc84bc622b437913e1861f7acb373c7844c8) )
-	ROM_LOAD( "goldf2_d.1h",         0xc0000, 0x40000, CRC(2b56ae2c) SHA1(667f9093ed28ba1804583fb201c7e3b37f1a9927) )
+	ROM_LOAD32_BYTE( "goldf2_a.1k",         0x00003, 0x40000, CRC(1f086472) SHA1(c776a734869b6bab317627bd15457a9fb18e1159) )
+	ROM_LOAD32_BYTE( "goldf2_b.1j",         0x00002, 0x40000, CRC(edb0d40c) SHA1(624a71b42a2e6c7c55cf455395aa0ad9b3eaeb9e) )
+	ROM_LOAD32_BYTE( "goldf2_c.1i",         0x00001, 0x40000, CRC(d0ebd486) SHA1(ff2bfc84bc622b437913e1861f7acb373c7844c8) )
+	ROM_LOAD32_BYTE( "goldf2_d.1h",         0x00000, 0x40000, CRC(2b56ae2c) SHA1(667f9093ed28ba1804583fb201c7e3b37f1a9927) )
 
 	ROM_REGION( 0x80000, "bgtiles", 0 )
-	ROM_LOAD( "goldf2_e.1e",         0x00000, 0x20000, CRC(61b8accd) SHA1(d6317b8b7ab33a2a78d388b87ddb8946e6c6df29) )
-	ROM_LOAD( "goldf2_f.1d",         0x20000, 0x20000, CRC(49f77e53) SHA1(6e7c8f86cb368bf1a32f02f72e7b418684c847dc) )
-	ROM_LOAD( "goldf2_g.1b",         0x40000, 0x20000, CRC(aa79f3bf) SHA1(c0b62f5de7e36ce1ef1de92ee6f63d8286815566) )
-	ROM_LOAD( "goldf2_h.1a",         0x60000, 0x20000, CRC(a3519259) SHA1(9e1edb50ade4a4ddcd628a897f6fa712075a888b) )
+	ROM_LOAD32_BYTE( "goldf2_e.1e",         0x00003, 0x20000, CRC(61b8accd) SHA1(d6317b8b7ab33a2a78d388b87ddb8946e6c6df29) )
+	ROM_LOAD32_BYTE( "goldf2_f.1d",         0x00002, 0x20000, CRC(49f77e53) SHA1(6e7c8f86cb368bf1a32f02f72e7b418684c847dc) )
+	ROM_LOAD32_BYTE( "goldf2_g.1b",         0x00001, 0x20000, CRC(aa79f3bf) SHA1(c0b62f5de7e36ce1ef1de92ee6f63d8286815566) )
+	ROM_LOAD32_BYTE( "goldf2_h.1a",         0x00000, 0x20000, CRC(a3519259) SHA1(9e1edb50ade4a4ddcd628a897f6fa712075a888b) )
 ROM_END
 
 } // anonymous namespace

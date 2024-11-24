@@ -395,9 +395,9 @@ static INPUT_PORTS_START( common )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<0>))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<1>))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<2>))
 INPUT_PORTS_END
 
 /* verified from M68000 code */

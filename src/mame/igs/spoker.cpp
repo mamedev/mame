@@ -537,10 +537,10 @@ void jinhulu2_state::portmap(address_map &map)
 	map(0x4001, 0x4001).portr("DSW2");
 	map(0x4002, 0x4002).portr("DSW3");
 	map(0x5001, 0x5001).portr("SERVICE");
+	map(0x5010, 0x5010).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//map(0x5030, 0x5030).w(FUNC()); // TODO: almost surely same protections as seen in igspoker.cpp and igs011.cpp. Probably the IGS003
 	//map(0x5031, 0x5031).r(FUNC()); // TODO: "
 	map(0x5031, 0x5031).w(FUNC(jinhulu2_state::nmi_w));
-	//map(0x????, 0x????).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x7000, 0x77ff).ram().w(FUNC(jinhulu2_state::fg_tile_w)).share(m_fg_tile_ram);
 	map(0x7800, 0x7fff).ram().w(FUNC(jinhulu2_state::fg_color_w)).share(m_fg_color_ram);
 }
@@ -671,8 +671,8 @@ static INPUT_PORTS_START( spoker ) // this has every hold key which also does an
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Memory Clear") // stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(spoker_state, hopper_r) PORT_NAME("HPSW")   // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // stats, memory
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(FUNC(spoker_state::hopper_r)) PORT_NAME("HPSW")   // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
@@ -766,7 +766,7 @@ static INPUT_PORTS_START( 3super8 )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(spoker_state, hopper_r) PORT_NAME("HPSW")   // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(FUNC(spoker_state::hopper_r)) PORT_NAME("HPSW")   // hopper sensor
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1   )
@@ -940,8 +940,8 @@ static INPUT_PORTS_START( jb )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Memory Clear")    // stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(spoker_state, hopper_r) PORT_NAME("HPSW")   // hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )    // stats, memory
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(FUNC(spoker_state::hopper_r)) PORT_NAME("HPSW")   // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // test (press during boot)

@@ -227,11 +227,15 @@ public:
 		std::locale const lcl;
 		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 		auto const compare_names =
-				[&coll] (std::string const &x, std::string const &y) -> bool
+				[&coll] (std::string const &xl, std::string const &xd, std::string const &yl, std::string const &yd) -> bool
 				{
-					std::wstring const wx = wstring_from_utf8(x);
-					std::wstring const wy = wstring_from_utf8(y);
-					return 0 > coll.compare(wx.data(), wx.data() + wx.size(), wy.data(), wy.data() + wy.size());
+					std::wstring const wx = wstring_from_utf8(xd);
+					std::wstring const wy = wstring_from_utf8(yd);
+					auto const cmp(coll.compare(wx.data(), wx.data() + wx.size(), wy.data(), wy.data() + wy.size()));
+					if (cmp)
+						return 0 > cmp;
+					else
+						return xl < yl;
 				};
 		std::stable_sort(
 				m_swinfo.begin() + 1,
@@ -243,29 +247,29 @@ public:
 
 					if (!clonex && !cloney)
 					{
-						return compare_names(a.longname, b.longname);
+						return compare_names(a.listname, a.longname, b.listname, b.longname);
 					}
 					else if (!clonex && cloney)
 					{
-						if ((a.shortname == b.parentname) && (a.instance == b.instance))
+						if ((a.shortname == b.parentname) && (a.listname == b.listname))
 							return true;
 						else
-							return compare_names(a.longname, b.parentlongname);
+							return compare_names(a.listname, a.longname, b.listname, b.parentlongname);
 					}
 					else if (clonex && !cloney)
 					{
-						if ((a.parentname == b.shortname) && (a.instance == b.instance))
+						if ((a.parentname == b.shortname) && (a.listname == b.listname))
 							return false;
 						else
-							return compare_names(a.parentlongname, b.longname);
+							return compare_names(a.listname, a.parentlongname, b.listname, b.longname);
 					}
-					else if ((a.parentname == b.parentname) && (a.instance == b.instance))
+					else if ((a.parentname == b.parentname) && (a.listname == b.listname))
 					{
-						return compare_names(a.longname, b.longname);
+						return compare_names(a.listname, a.longname, b.listname, b.longname);
 					}
 					else
 					{
-						return compare_names(a.parentlongname, b.parentlongname);
+						return compare_names(a.listname, a.parentlongname, b.listname, b.parentlongname);
 					}
 				});
 

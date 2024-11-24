@@ -97,7 +97,7 @@ static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
@@ -214,7 +214,7 @@ void tim100_state::tim100(machine_config &config)
 	uart_u18.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
 	uart_u18.rxrdy_handler().set_inputline(m_maincpu, I8085_RST55_LINE);
 
-	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "loopback"));
 	rs232a.rxd_handler().set("uart_u18", FUNC(i8251_device::write_rxd));
 	rs232a.dsr_handler().set("uart_u18", FUNC(i8251_device::write_dsr));
 	rs232a.cts_handler().set("uart_u18", FUNC(i8251_device::write_cts));

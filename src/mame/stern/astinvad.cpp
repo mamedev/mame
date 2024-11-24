@@ -628,7 +628,7 @@ static INPUT_PORTS_START( spaceint )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, spaceint_state, coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spaceint_state::coin_inserted), 0)
 
 	PORT_START("CABINET")
 	PORT_DIPNAME( 0xff, 0x00, DEF_STR( Cabinet ) )
@@ -857,8 +857,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980,  kamikaze,  0,        kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "Leijac Corporation", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980,  astinvad,  kamikaze, kamikaze, astinvad,  kamikaze_state, empty_init, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  kamikaze,  0,        kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "Konami (Leijac Corporation license)", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980,  astinvad,  kamikaze, kamikaze, astinvad,  kamikaze_state, empty_init, ROT270, "Konami (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980?, kosmokil,  kamikaze, kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "bootleg (BEM)", "Kosmo Killer", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, different revision of game tho.
 GAME( 1980?, betafrce,  kamikaze, kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "bootleg (Omni)", "Beta Force", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979,  spcking2,  0,        spcking2, spcking2,  spcking2_state, empty_init, ROT270, "Konami", "Space King 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

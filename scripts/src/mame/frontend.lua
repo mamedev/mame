@@ -139,6 +139,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/mainmenu.h",
 	MAME_DIR .. "src/frontend/mame/ui/menu.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/menu.h",
+	MAME_DIR .. "src/frontend/mame/ui/midiinout.cpp",
+	MAME_DIR .. "src/frontend/mame/ui/midiinout.h",
 	MAME_DIR .. "src/frontend/mame/ui/miscmenu.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/miscmenu.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/miscmenu.h",

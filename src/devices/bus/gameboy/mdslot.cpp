@@ -126,7 +126,7 @@ std::pair<std::error_condition, std::string> megaduck_cart_slot_device::load_ima
 		memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), len, 1, ENDIANNESS_LITTLE);
 		auto const [err, actual] = read_at(file, 0, romregion->base(), len);
 		if (err || (len != actual))
-			std::make_pair(err ? err : std::errc::io_error, "Error reading cartridge file");
+			return std::make_pair(err ? err : std::errc::io_error, "Error reading cartridge file");
 	}
 
 	return std::make_pair(std::error_condition(), std::string());

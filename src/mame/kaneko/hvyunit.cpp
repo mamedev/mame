@@ -765,8 +765,11 @@ ROM_START( hvyunitja )
 	ROM_LOAD( "b73_20.0k",  0x1e0000, 0x020000, CRC(0662d0dd) SHA1(323b3f1d8fc034e22e8ac8dcc17b080ecaeaf3ed) ) // == 4/4 b73_08.2f - M5M27C101P mask ROM
 
 	ROM_REGION( 0x80000, "tiles", 0 )
-	ROM_LOAD( "b73_23.2p",  0x000000, 0x080000, NO_DUMP )
-	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
+	/* For the B73 23 ROM: Two 27C2001 EPROMs were piggybacked and soldered together with a flying wire tied from the socket
+	pin 31 (A18) to the bottom EPROM pin 24 (/OE) and a 7404 inverter input.  The bottom EPROM chip was selected when A18=0
+	and the top EPROM chip was selected when A18=1. However, it's been verified the actual data matches the other sets.
+	*/
+	ROM_LOAD( "b73_23.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
 
 ROM_START( hvyunitjo )

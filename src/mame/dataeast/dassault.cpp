@@ -306,10 +306,7 @@ private:
 
   Also, some priorities are still a little questionable.
 
-
 ****************************************************************************/
-
-/******************************************************************************/
 
 void dassault_state::video_start()
 {
@@ -366,7 +363,8 @@ void dassault_state::mix_layer(bitmap_rgb32 &bitmap, bitmap_ind16 *sprite_bitmap
 	}
 }
 
-// are the priorities 100% correct? they're the same as they were before conversion to DECO52 sprite device, but if (for example) you walk to the side of the crates in the first part of the game you appear over them...
+// are the priorities 100% correct? they're the same as they were before conversion to DECO52 sprite device,
+// but if (for example) you walk to the side of the crates in the first part of the game you appear over them...
 uint32_t dassault_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint16_t const flip = m_deco_tilegen[0]->pf_control_r(0);
@@ -546,7 +544,7 @@ static INPUT_PORTS_START( thndzone )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )           // Adds 4 credits/coins !
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Adds 4 credits/coins !
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -580,19 +578,19 @@ static INPUT_PORTS_START( thndzone )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )   // OFF & Not to be changed, according to manual
-	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" )   // OFF & Not to be changed, according to manual
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" ) // OFF & Not to be changed, according to manual
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" ) // OFF & Not to be changed, according to manual
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )   // OFF & Not to be changed, according to manual
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" ) // OFF & Not to be changed, according to manual
 	PORT_DIPNAME( 0x20, 0x20, "Max Players" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )   // OFF & Not to be changed, according to manual
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")    // Check code at 0x001490
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" ) // OFF & Not to be changed, according to manual
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8") // Check code at 0x001490
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -723,8 +721,6 @@ void dassault_state::sound_bankswitch_w(uint8_t data)
 	m_oki2->set_rom_bank(data & 1);
 }
 
-/**********************************************************************************/
-
 DECO16IC_BANK_CB_MEMBER(dassault_state::bank_callback)
 {
 	return ((bank >> 4) & 0xf) << 12;
@@ -738,21 +734,20 @@ void dassault_state::machine_reset()
 void dassault_state::dassault(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(28'000'000) / 2);   // 14MHz - Accurate
+	M68000(config, m_maincpu, XTAL(28'000'000) / 2); // 14MHz - Accurate
 	m_maincpu->set_addrmap(AS_PROGRAM, &dassault_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dassault_state::irq4_line_assert));
 
-	M68000(config, m_subcpu, XTAL(28'000'000) / 2);   // 14MHz - Accurate
+	M68000(config, m_subcpu, XTAL(28'000'000) / 2); // 14MHz - Accurate
 	m_subcpu->set_addrmap(AS_PROGRAM, &dassault_state::sub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(dassault_state::irq5_line_assert));
 
-	H6280(config, m_audiocpu, XTAL(32'220'000) / 8);    // Accurate
+	H6280(config, m_audiocpu, XTAL(32'220'000) / 8); // Accurate
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dassault_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-//  config.set_maximum_quantum(attotime::from_hz(8400)); // 140 CPU slices per frame
-	config.set_perfect_quantum(m_maincpu); // I was seeing random lockups.. let's see if this helps
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4)); // I was seeing random lockups.. let's see if this helps
 
 	mb8421_mb8431_16_device &sharedram(MB8421_MB8431_16BIT(config, "sharedram"));
 	sharedram.intl_callback().set_inputline("maincpu", M68K_IRQ_5);
@@ -760,7 +755,7 @@ void dassault_state::dassault(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);  // same as robocop2(cninja.cpp)? verify this from real PCB.
+	screen.set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248); // same as robocop2(cninja.cpp)? verify this from real PCB.
 	screen.set_screen_update(FUNC(dassault_state::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dassault);

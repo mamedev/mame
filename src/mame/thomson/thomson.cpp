@@ -92,12 +92,13 @@
 #include "bus/thomson/speech.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
-#include "machine/wd_fdc.h"
+#include "machine/thmfc1.h"
 
+#include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "formats/basicdsk.h"
+#include "formats/sap_dsk.h"
 #include "formats/thom_cas.h"
 #include "formats/thom_dsk.h"
 
@@ -221,6 +222,12 @@ static INPUT_PORTS_START( thom_lightpen )
 
 INPUT_PORTS_END
 
+#define TO7_LIGHTPEN_DECAL 17 /* horizontal lightpen shift, stored in $60D2 */
+#define MO5_LIGHTPEN_DECAL 12
+#define TO9_LIGHTPEN_DECAL 8
+#define TO8_LIGHTPEN_DECAL 16
+#define MO6_LIGHTPEN_DECAL 12
+
 /************************** T9000 / TO7 *******************************
 
 TO7 (1982)
@@ -328,7 +335,8 @@ void thomson_state::to7_map(address_map &map)
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe800, 0xffff).rom();       /* system bios  */
+	map(0xe800, 0xefff).rom().region("mc6846", 0);
+	map(0xf000, 0xffff).rom().region("monitor", 0);
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 18 KB floppy / network ROM controllers */
@@ -346,20 +354,25 @@ void thomson_state::to7_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( to7 )
-	ROM_REGION ( 0x10000, "maincpu", 0 )
-	ROM_LOAD ( "to7.rom", 0xe800, 0x1800,
-		CRC(0e7826da)
-		SHA1(23a2f84b03c01d385cc1923c8ece95c43756297a) )
+	ROM_REGION ( 0x1000, "monitor", 0 )
+	ROM_LOAD ( "to7.u3", 0x0000, 0x1000, CRC(99f73da8) SHA1(416981860b44934b2ebf0192080b2cdd79c2c8d5) )
+
+	ROM_REGION ( 0x800, "mc6846", 0 )
+	ROM_LOAD ( "tha010_ef6846p.u1", 0x000, 0x800, CRC(39d74cec) SHA1(6428fe9439a1f09c2864697d40da9c0b72a52ca1) )
+
+	ROM_REGION ( 0x20, "proms", 0 )
+	ROM_LOAD ( "6331-1.u11", 0x00, 0x20, NO_DUMP ) // address decode
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
 	ROM_FILL ( 0x00000, 0x10000, 0x39 )
 ROM_END
 
 ROM_START ( t9000 )
-	ROM_REGION ( 0x10000, "maincpu", 0 )
-	ROM_LOAD ( "t9000.rom", 0xe800, 0x1800,
-		CRC(daa8cfbf)
-		SHA1(a5735db1ad4e529804fc46603f838d3f4ccaf5cf) )
+	ROM_REGION ( 0x1000, "monitor", 0 )
+	ROM_LOAD ( "t9000.bin", 0x0000, 0x1000, CRC(5cd41431) SHA1(8bf1a40964b76584ee8c83e62be6635de8d1ccd0) )
+
+	ROM_REGION ( 0x800, "mc6846", 0 )
+	ROM_LOAD ( "t9000_mc6846.bin", 0x000, 0x800, CRC(8987b838) SHA1(9fee6bb31dc3b39265e7ebc73b44943d4115a516) )
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
 	ROM_FILL ( 0x00000, 0x10000, 0x39 )
@@ -374,21 +387,6 @@ static INPUT_PORTS_START ( to7_config )
 	PORT_CONFNAME ( 0x01, 0x00, "Game Port" )
 	PORT_CONFSETTING ( 0x00, DEF_STR( Joystick ) )
 	PORT_CONFSETTING ( 0x01, "Mouse" )
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START ( to7_vconfig )
-	PORT_START ( "vconfig" )
-
-	PORT_CONFNAME ( 0x03, 0x00, "Border" )
-	PORT_CONFSETTING ( 0x00, "Normal (56x47)" )
-	PORT_CONFSETTING ( 0x01, "Small (16x16)" )
-	PORT_CONFSETTING ( 0x02, DEF_STR ( None ) )
-
-	PORT_CONFNAME ( 0x0c, 0x08, "Resolution" )
-	PORT_CONFSETTING ( 0x00, DEF_STR ( Low ) )
-	PORT_CONFSETTING ( 0x04, DEF_STR ( High  ) )
-	PORT_CONFSETTING ( 0x08, "Auto"  )
 
 INPUT_PORTS_END
 
@@ -460,10 +458,6 @@ static INPUT_PORTS_START ( to7_keyboard )
 		KEY ( 6, "7 ' \302\264", 7 )     PORT_CHAR('7') PORT_CHAR('\'')
 		KEY ( 7, "6 &", 6 )              PORT_CHAR('6') PORT_CHAR('&')
 
-		/* unused */
-	PORT_START ( "keyboard.8" )
-	PORT_START ( "keyboard.9" )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( to7 )
@@ -471,12 +465,29 @@ static INPUT_PORTS_START ( to7 )
 	PORT_INCLUDE ( thom_game_port )
 	PORT_INCLUDE ( to7_keyboard )
 	PORT_INCLUDE ( to7_config )
-	PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( t9000 )
 	PORT_INCLUDE ( to7 )
 INPUT_PORTS_END
+
+static void to9_floppy_drives(device_slot_interface &device)
+{
+	device.option_add("dd90_352", FLOPPY_35_DD);
+}
+
+static void to8_floppy_drives(device_slot_interface &device)
+{
+	device.option_add("dd90_352", FLOPPY_35_DD);
+	//  device.option_add("qd90_280", FLOPPY_28_QDD);
+}
+
+static void to35_floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_THOMSON_35_FORMAT);
+	fr.add(FLOPPY_SAP_FORMAT);
+}
 
 /* ------------ driver ------------ */
 
@@ -493,14 +504,19 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainfirq").output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
+	if (!is_mo)
+	{
+		/* timer */
+		MC6846(config, m_mc6846, 16_MHz_XTAL / 16);
+		m_mc6846->out_port().set(FUNC(thomson_state::to7_timer_port_out));
+		m_mc6846->in_port().set(FUNC(thomson_state::to7_timer_port_in));
+		m_mc6846->cp2().set("buzzer", FUNC(dac_bit_interface::write));
+		m_mc6846->cto().set(FUNC(thomson_state::to7_set_cassette));
+		m_mc6846->irq().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	}
+
 /* video */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(/*50*/ 1./0.019968);
-	m_screen->set_size(THOM_TOTAL_WIDTH * 2, THOM_TOTAL_HEIGHT);
-	m_screen->set_visarea(0, THOM_TOTAL_WIDTH * 2 - 1, 0, THOM_TOTAL_HEIGHT - 1);
-	m_screen->set_screen_update(FUNC(thomson_state::screen_update_thom));
-	m_screen->screen_vblank().set(FUNC(thomson_state::thom_vblank));
-	m_screen->set_palette("palette");
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(thomson_state::thom_palette), 4097); // 12-bit color + transparency
 
@@ -568,13 +584,16 @@ void thomson_state::to7(machine_config &config)
 {
 	to7_base(config, false);
 
-	/* timer */
-	MC6846(config, m_mc6846, 16_MHz_XTAL / 16);
-	m_mc6846->out_port().set(FUNC(thomson_state::to7_timer_port_out));
-	m_mc6846->in_port().set(FUNC(thomson_state::to7_timer_port_in));
-	m_mc6846->cp2().set("buzzer", FUNC(dac_bit_interface::write));
-	m_mc6846->cto().set(FUNC(thomson_state::to7_set_cassette));
-	m_mc6846->irq().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	MC6809(config.replace(), m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &thomson_state::to7_map);
+
+	TO7_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(TO7_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(3);
+	m_video->set_vram_page_cb(FUNC(thomson_state::get_vram_page));
+	m_video->set_lightpen_step_cb(FUNC(thomson_state::to7_lightpen_cb));
+	m_video->init_cb().set(m_pia_sys, FUNC(pia6821_device::ca1_w));
 }
 
 void thomson_state::t9000(machine_config &config)
@@ -639,7 +658,6 @@ In arabic mode, Ctrl+E / Ctrl+X to start / stop typing in-line latin.
 
 void thomson_state::to770_map(address_map &map)
 {
-
 	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(thomson_state::to7_cartridge_w)); /* 4 * 16 KB */
 	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(FUNC(thomson_state::to770_vram_w));
 	map(0x6000, 0x9fff).bankrw(THOM_BASE_BANK); /* 16 KB */
@@ -647,8 +665,9 @@ void thomson_state::to770_map(address_map &map)
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7e4, 0xe7e7).rw(FUNC(thomson_state::to770_gatearray_r), FUNC(thomson_state::to770_gatearray_w));
-	map(0xe800, 0xffff).rom();       /* system bios  */
+	map(0xe7e4, 0xe7e7).rw(m_video, FUNC(to770_video_device::gatearray_r), FUNC(to770_video_device::gatearray_w));
+	map(0xe800, 0xefff).rom().region("mc6846", 0);
+	map(0xf000, 0xffff).rom().region("monitor", 0);
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 18 KB floppy / network ROM controllers */
@@ -666,20 +685,28 @@ void thomson_state::to770_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( to770 )
-	ROM_REGION ( 0x10000, "maincpu", 0 )
-	ROM_LOAD ( "to770.rom", 0xe800, 0x1800, /* BIOS */
-		CRC(89518862)
-		SHA1(cd34474c0bcc758f6d71c90fbd40cef379d61374) )
+	ROM_REGION ( 0x1000, "monitor", 0 )
+	ROM_LOAD ( "to770.i29", 0x0000, 0x1000, CRC(1ede9310) SHA1(264f0167b3e64a894f347ae5e9123f38b993ead1) )
+
+	ROM_REGION ( 0x800, "mc6846", 0 )
+	ROM_LOAD ( "tha010_ef6846p.i33", 0x000, 0x800, CRC(39d74cec) SHA1(6428fe9439a1f09c2864697d40da9c0b72a52ca1) )
+
+	ROM_REGION ( 0x20, "proms", 0 )
+	ROM_LOAD ( "a2.i23", 0x00, 0x20, NO_DUMP ) // palette
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
 	ROM_FILL ( 0x00000, 0x10000, 0x39 )
 ROM_END
 
 ROM_START ( to770a )
-	ROM_REGION ( 0x10000, "maincpu", 0 )
-	ROM_LOAD ( "to770a.rom", 0xe800, 0x1800,
-		CRC(378ea808)
-		SHA1(f4575b537dfdb46ff2a0e7cbe8dfe4ba63161b8e) )
+	ROM_REGION ( 0x1000, "monitor", 0 )
+	ROM_LOAD ( "to770a.bin", 0x0000, 0x1000, CRC(de30bee8) SHA1(5f9bf37979d35a0fa7fa36538a0e2633065b1639) )
+
+	ROM_REGION ( 0x800, "mc6846", 0 )
+	ROM_LOAD ( "to770a_mc6846.bin", 0x000, 0x800, CRC(2bf67c9c) SHA1(6bb97045b591bd279c7b93616e703c85e0a5c9b5) )
+
+	ROM_REGION ( 0x20, "proms", 0 )
+	ROM_LOAD ( "a2.i23", 0x00, 0x20, NO_DUMP ) // palette
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
 	ROM_FILL ( 0x00000, 0x10000, 0x39 )
@@ -739,7 +766,7 @@ INPUT_PORTS_END
 
 void thomson_state::to770(machine_config &config)
 {
-	to7(config);
+	to7_base(config, false);
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to770 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to770 )
 
@@ -754,6 +781,14 @@ void thomson_state::to770(machine_config &config)
 
 	/* internal ram */
 	m_ram->set_default_size("128K").set_extra_options("64K");
+
+	TO770_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(TO7_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(3);
+	m_video->set_vram_page_cb(FUNC(thomson_state::get_vram_page));
+	m_video->set_lightpen_step_cb(FUNC(thomson_state::to7_lightpen_cb));
+	m_video->init_cb().set(m_pia_sys, FUNC(pia6821_device::ca1_w));
 
 	SOFTWARE_LIST(config, "t770_cart_list").set_original("to770_cart");
 	SOFTWARE_LIST(config.replace(), "to7_cart_list").set_compatible("to7_cart");
@@ -838,9 +873,9 @@ void mo5_state::mo5_map(address_map &map)
 	map(0xa7c0, 0xa7c3).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xa7cb, 0xa7cb).w(FUNC(mo5_state::mo5_ext_w));
 	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xa7e4, 0xa7e7).rw(FUNC(mo5_state::mo5_gatearray_r), FUNC(mo5_state::mo5_gatearray_w));
+	map(0xa7e4, 0xa7e7).rw(m_video, FUNC(to770_video_device::gatearray_r), FUNC(to770_video_device::gatearray_w));
 	map(0xb000, 0xefff).bankr(THOM_CART_BANK).w(FUNC(mo5_state::mo5_cartridge_w));
-	map(0xf000, 0xffff).rom();       /* system bios */
+	map(0xf000, 0xffff).rom().region("basic", 0x4000);
 
 /* 0x10000 - 0x1ffff: 16 KB integrated BASIC / 64 KB external cartridge */
 /* 18 KB floppy / network ROM controllers */
@@ -858,26 +893,22 @@ void mo5_state::mo5_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo5 )
-	ROM_REGION ( 0x14000, "maincpu", 0 )
-	ROM_LOAD ( "mo5.rom", 0xf000, 0x1000,
-		CRC(f0ea9140)
-		SHA1(36ce2d3df1866ec2fe368c1c28757e2f5401cf44) )
-	ROM_LOAD ( "basic5.rom", 0x11000, 0x3000,
-		CRC(c2c11b9d)
-		SHA1(512dd40fb45bc2b51a24c84b3723a32bc8e80c06) )
+	ROM_REGION ( 0x5000, "basic", 0 )
+	ROM_LOAD ( "mo5.i04", 0x1000, 0x4000, CRC(237c60bf) SHA1(8d2865996a1a8d8a13fc9965c1bcf490f9621399) )
+
+	ROM_REGION ( 0x20, "proms", 0 )
+	ROM_LOAD ( "7603-5.i03", 0x00, 0x20, NO_DUMP ) // palette
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
 	ROM_FILL( 0x00000, 0x10000, 0x39 )
 ROM_END
 
 ROM_START ( mo5e )
-	ROM_REGION ( 0x14000, "maincpu", 0 )
-	ROM_LOAD ( "mo5e.rom", 0xf000, 0x1000,
-		CRC(6520213a)
-		SHA1(f17a7a59baf2819ec80991b34b204795536a5e01) )
-	ROM_LOAD ( "basic5e.rom", 0x11000, 0x3000,
-		CRC(934a72b2)
-		SHA1(b37e2b1afbfba368c19be87b3bf61dfe6ad8b0bb) )
+	ROM_REGION ( 0x5000, "basic", 0 )
+	ROM_LOAD ( "mo5e.bin", 0x1000, 0x4000, CRC(56f11cf3) SHA1(0f60c8ad391c48b2e7d02b646509586ad34b7417) )
+
+	ROM_REGION ( 0x20, "proms", 0 )
+	ROM_LOAD ( "7603-5.i03", 0x00, 0x20, NO_DUMP ) // palette
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
 	ROM_FILL( 0x00000, 0x10000, 0x39 )
@@ -959,6 +990,15 @@ void mo5_state::mo5(machine_config &config)
 
 	/* internal ram */
 	m_ram->set_default_size("112K");
+
+	TO770_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_screen("screen");
+	m_video->set_is_mo(true);
+	m_video->set_lightpen_decal(MO5_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(3);
+	m_video->set_vram_page_cb(FUNC(mo5_state::get_vram_page));
+	m_video->set_lightpen_step_cb(FUNC(mo5_state::mo5_lightpen_cb));
+	m_video->int_50hz_cb().set(m_pia_sys, FUNC(pia6821_device::cb1_w));
 }
 
 void mo5_state::mo5e(machine_config &config)
@@ -1035,7 +1075,7 @@ It was replaced quickly with the improved TO9+.
   - MD 90-120: MODEM extension (identical to the TO7)
   - IEEE extension ? (unemulated)
   - floppy:
-    . integrated floppy controller, based on WD2793
+    . integrated floppy controller, based on WD1770 or WD2793
     . integrated one-sided double-density 3''1/2
     . external two-sided double-density 3''1/2, 5''1/4 or QDD (extension)
     . floppies are TO7 and MO5 compatible
@@ -1051,14 +1091,19 @@ void to9_state::to9_map(address_map &map)
 	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(FUNC(to9_state::to770_vram_w));
 	map(0x6000, 0x9fff).bankrw(THOM_BASE_BANK); /* 16 KB */
 	map(0xa000, 0xdfff).bankrw(THOM_RAM_BANK);  /* 10 * 16 KB */
+	map(0xe000, 0xe7af).rom().region("monitor", 0);
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to9_vreg_r), FUNC(to9_state::to9_vreg_w));
-	map(0xe7de, 0xe7df).rw(FUNC(to9_state::to9_kbd_r), FUNC(to9_state::to9_kbd_w));
-	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to9_gatearray_r), FUNC(to9_state::to9_gatearray_w));
+	map(0xe7d0, 0xe7d3).mirror(4).rw(m_fdc, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));
+	map(0xe7d8, 0xe7d8).rw(FUNC(to9_state::to9_floppy_control_r), FUNC(to9_state::to9_floppy_control_w));
+	map(0xe7da, 0xe7db).rw(FUNC(to9_state::to9_vreg_r), FUNC(to9_state::to9_vreg_w));
+	map(0xe7dc, 0xe7dc).w(m_video, FUNC(to9_video_device::video_mode_w));
+	map(0xe7dd, 0xe7dd).w(m_video, FUNC(to9_video_device::border_color_w));
+	map(0xe7de, 0xe7df).rw(m_to9_kbd, FUNC(to9_keyboard_device::kbd_acia_r), FUNC(to9_keyboard_device::kbd_acia_w));
+	map(0xe7e4, 0xe7e7).rw(m_video, FUNC(to9_video_device::gatearray_r), FUNC(to9_video_device::gatearray_w));
 /*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
-	map(0xe800, 0xffff).rom();       /* system bios  */
+	map(0xe800, 0xffff).rom().region("monitor", 0x800);
 
 /* 0x10000 - 0x1ffff:  64 KB external ROM cartridge */
 /* 0x20000 - 0x3ffff: 128 KB internal software ROM */
@@ -1082,36 +1127,17 @@ void to9_state::to9_map(address_map &map)
  */
 
 ROM_START ( to9 )
-	ROM_REGION ( 0x30000, "maincpu", 0 )
-	ROM_LOAD ( "to9.rom", 0xe000, 0x2000, /* BIOS & floppy controller */
+	ROM_REGION ( 0x2000, "monitor", 0 )
+	ROM_LOAD ( "monitor.i42", 0x0000, 0x2000, /* BIOS & floppy controller */
 		CRC(f9278bf7)
 		SHA1(9e99e6ae0285950f007b19161de642a4031fe46e) )
 
 		/* BASIC & software */
-	ROM_LOAD ( "basic9-0.rom", 0x10000, 0x4000,
-		CRC(c7bac620)
-		SHA1(4b2a8b30cf437858ce978ba7b0dfa2bbd57eb38a) )
-	ROM_LOAD ( "basic9-1.rom", 0x14000, 0x4000,
-		CRC(ea5f3e43)
-		SHA1(5e58a29c2d117fcdb1f5e7ca31dbfffa0f9218f2) )
-	ROM_LOAD ( "basic9-2.rom", 0x18000, 0x4000,
-		CRC(0f5581b3)
-		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
-	ROM_LOAD ( "basic9-3.rom", 0x1c000, 0x4000,
-		CRC(6b5b19e3)
-		SHA1(0e832670c185694d9abbcebcc3ad90e94eed585d) )
-	ROM_LOAD ( "soft9-0a.rom", 0x20000, 0x4000,
-		CRC(8cee157e)
-		SHA1(f32fc39b95890c00571e9f3fbcc2d8e0596fc4a1) )
-	ROM_LOAD ( "soft9-1a.rom", 0x24000, 0x4000,
-		CRC(cf39ac93)
-		SHA1(b97e6b7389398e5706624973c11ee7ddba323ce1) )
-	ROM_LOAD ( "soft9-0b.rom", 0x28000, 0x4000,
-		CRC(033aee3f)
-		SHA1(f3604e500329ec0489b05dbab05530322e9463c5) )
-	ROM_LOAD ( "soft9-1b.rom", 0x2c000, 0x4000,
-		CRC(214fe527)
-		SHA1(0d8e3f1ca347026e906c3d00a0371e8238c44a60) )
+	ROM_REGION ( 0x20000, "basic", 0 )
+	ROM_LOAD ( "basic128.i39",   0x00000, 0x8000, CRC(c9bc204f) SHA1(e4c2a684e9186f49c8092d16f0f74764f51ad86c) )
+	ROM_LOAD ( "basic1.i56",     0x08000, 0x8000, CRC(b1469ffc) SHA1(548c631d1272dfa25e3e925adc08f6eeb8e4448e) )
+	ROM_LOAD ( "fiches.i38",     0x10000, 0x8000, CRC(3eba1a1a) SHA1(e8ed04d30fb70fda37ac31dd5c2c2e59248cd395) )
+	ROM_LOAD ( "paragraphe.i40", 0x18000, 0x8000, CRC(1ff9e47e) SHA1(381c493c07271e3259be13bf9edfbf2b2c81a059) )
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
 	ROM_FILL( 0x00000, 0x10000, 0x39 )
@@ -1120,117 +1146,36 @@ ROM_END
 
 /* ------------ inputs   ------------ */
 
-static INPUT_PORTS_START ( to9_keyboard )
-	PORT_START ( "keyboard.0" )
-		KEY ( 0, "F2 F7", F2 )           PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR(UCHAR_MAMEKEY(F7))
-		KEY ( 1, "_ 6", 6 )              PORT_CHAR('_') PORT_CHAR('6')
-		KEY ( 2, "Y", Y )                PORT_CHAR('Y')
-		KEY ( 3, "H \302\250", H )       PORT_CHAR('H')
-		KEY ( 4, UTF8_UP, UP )    PORT_CHAR(UCHAR_MAMEKEY(UP))
-		KEY ( 5, UTF8_RIGHT, RIGHT ) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-		KEY ( 6, "Home Clear", HOME )    PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CHAR(UCHAR_MAMEKEY(ESC))
-		KEY ( 7, "N", N )                PORT_CHAR('N')
-	PORT_START ( "keyboard.1" )
-		KEY ( 0, "F3 F8", F3 )           PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F8))
-		KEY ( 1, "( 5", 5 )              PORT_CHAR('(') PORT_CHAR('5')
-		KEY ( 2, "T", T )                PORT_CHAR('T')
-		KEY ( 3, "G", G )                PORT_CHAR('G')
-		KEY ( 4, "= +", EQUALS )         PORT_CHAR('=') PORT_CHAR('+')
-		KEY ( 5, UTF8_LEFT, LEFT )  PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-		KEY ( 6, "Insert", INSERT )      PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-		KEY ( 7, "B \302\264", B )       PORT_CHAR('B')
-	PORT_START ( "keyboard.2" )
-		KEY ( 0, "F4 F9", F4 )           PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR(UCHAR_MAMEKEY(F9))
-		KEY ( 1, "' 4", 4 )              PORT_CHAR('\'') PORT_CHAR('4')
-		KEY ( 2, "R", R )                PORT_CHAR('R')
-		KEY ( 3, "F", F )                PORT_CHAR('F')
-		KEY ( 4, "Accent", END )         PORT_CHAR(UCHAR_MAMEKEY(END))
-		KEY ( 5, "Keypad 1", 1_PAD )     PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-		KEY ( 6, "Delete Backspace", DEL ) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
-		KEY ( 7, "V", V )                PORT_CHAR('V')
-	PORT_START ( "keyboard.3" )
-		KEY ( 0, "F5 F10", F5 )          PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F10))
-		KEY ( 1, "\" 3", 3 )             PORT_CHAR('"') PORT_CHAR('3')
-		KEY ( 2, "E", E )                PORT_CHAR('E')
-		KEY ( 3, "D", D )                PORT_CHAR('D')
-		KEY ( 4, "Keypad 7", 7_PAD )     PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
-		KEY ( 5, "Keypad 4", 4_PAD )     PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-		KEY ( 6, "Keypad 0", 0_PAD )     PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-		KEY ( 7, "C \136", C )           PORT_CHAR('C')
-	PORT_START ( "keyboard.4" )
-		KEY ( 0, "F1 F6", F1 )           PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F6))
-		KEY ( 1, "\303\251 2", 2 )       PORT_CHAR( 0xe9 ) PORT_CHAR('2')
-		KEY ( 2, "Z", Z )                PORT_CHAR('Z')
-		KEY ( 3, "S", S )                PORT_CHAR('S')
-		KEY ( 4, "Keypad 8", 8_PAD )     PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-		KEY ( 5, "Keypad 2", 2_PAD )     PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-		KEY ( 6, "Keypad .", DEL_PAD )   PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-		KEY ( 7, "X", X )                PORT_CHAR('X')
-	PORT_START ( "keyboard.5" )
-		KEY ( 0, "# @", TILDE )          PORT_CHAR('#') PORT_CHAR('@')
-		KEY ( 1, "* 1", 1 )              PORT_CHAR('*') PORT_CHAR('1')
-		KEY ( 2, "A \140", A )           PORT_CHAR('A')
-		KEY ( 3, "Q", Q )                PORT_CHAR('Q')
-		KEY ( 4, "[ {", QUOTE )          PORT_CHAR('[') PORT_CHAR('{')
-		KEY ( 5, "Keypad 5", 5_PAD )     PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-		KEY ( 6, "Keypad 6", 6_PAD )     PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-		KEY ( 7, "W", W )                PORT_CHAR('W')
-	PORT_START ( "keyboard.6" )
-		KEY ( 0, "Stop", TAB )           PORT_CHAR(27)
-		KEY ( 1, "\303\250 7", 7 )       PORT_CHAR( 0xe8 ) PORT_CHAR('7')
-		KEY ( 2, "U", U )                PORT_CHAR('U')
-		KEY ( 3, "J", J )                PORT_CHAR('J')
-		KEY ( 4, "Space", SPACE )        PORT_CHAR(' ')
-		KEY ( 5, "Keypad 9", 9_PAD )     PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-		KEY ( 6, "Keypad Enter", ENTER_PAD ) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-		KEY ( 7, ", ?", COMMA )          PORT_CHAR(',') PORT_CHAR('?')
-	PORT_START ( "keyboard.7" )
-		KEY ( 0, "Control", LCONTROL )   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-		KEY ( 1, "! 8", 8 )              PORT_CHAR('!') PORT_CHAR('8')
-		KEY ( 2, "I", I )                PORT_CHAR('I')
-		KEY ( 3, "K", K )                PORT_CHAR('K')
-		KEY ( 4, "$ &", CLOSEBRACE )     PORT_CHAR('$') PORT_CHAR('&')
-		KEY ( 5, UTF8_DOWN, DOWN )  PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-		KEY ( 6, "] }", BACKSLASH )      PORT_CHAR(']') PORT_CHAR('}')
-		KEY ( 7, "; .", STOP )           PORT_CHAR(';') PORT_CHAR('.')
-	PORT_START ( "keyboard.8" )
-		KEY ( 0, "Caps-Lock", CAPSLOCK ) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-		KEY ( 1, "\303\247 9", 9 )       PORT_CHAR( 0xe7 ) PORT_CHAR('9')
-		KEY ( 2, "O", O )                PORT_CHAR('O')
-		KEY ( 3, "L", L )                PORT_CHAR('L')
-		KEY ( 4, "- \\", BACKSPACE )     PORT_CHAR('-') PORT_CHAR('\\')
-		KEY ( 5, "\303\271 %", COLON )   PORT_CHAR( 0xf9 ) PORT_CHAR('%')
-		KEY ( 6, "Enter", ENTER )        PORT_CHAR(13)
-		KEY ( 7, ": /", SLASH )          PORT_CHAR(':') PORT_CHAR('/')
-	PORT_START ( "keyboard.9" )
-		KEY ( 0, "Shift", LSHIFT )  PORT_CODE ( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
-		KEY ( 1, "\303\240 0", 0 )       PORT_CHAR( 0xe0 ) PORT_CHAR('0')
-		KEY ( 2, "P", P )                PORT_CHAR('P')
-		KEY ( 3, "M", M )                PORT_CHAR('M')
-		KEY ( 4, ") \302\260", MINUS )   PORT_CHAR(')') PORT_CHAR( 0xb0 )
-		KEY ( 5, "\342\206\221 \302\250", OPENBRACE )  PORT_CHAR('^') PORT_CHAR( 0xa8 )
-		KEY ( 6, "Keypad 3", 3_PAD )     PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-		KEY ( 7, "> <", BACKSLASH2 )     PORT_CHAR('>') PORT_CHAR('<')
-INPUT_PORTS_END
-
 static INPUT_PORTS_START ( to9 )
 	PORT_INCLUDE ( thom_lightpen )
 	PORT_INCLUDE ( thom_game_port )
-	PORT_INCLUDE ( to9_keyboard )
-	PORT_INCLUDE ( to7_config )
-	PORT_INCLUDE ( to7_vconfig )
+
+	PORT_START ( "config" )
+	PORT_BIT ( 0x01, 0x00, IPT_UNUSED )
+
+	PORT_MODIFY ( "mouse_x" )
+	PORT_BIT ( 0xffff, 0x00, IPT_UNUSED )
+
+	PORT_MODIFY ( "mouse_y" )
+	PORT_BIT ( 0xffff, 0x00, IPT_UNUSED )
+
+	PORT_MODIFY ( "mouse_button" )
+	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
 void to9_state::to9(machine_config &config)
 {
-	to7(config);
-
+	to7_base(config, false);
 	MCFG_MACHINE_START_OVERRIDE( to9_state, to9 )
 	MCFG_MACHINE_RESET_OVERRIDE( to9_state, to9 )
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &to9_state::to9_map);
+
+	TO9_KEYBOARD(config, m_to9_kbd);
+	m_to9_kbd->irq_cb().set(m_mainirq, FUNC(input_merger_device::in_w<4>));
 
 	m_pia_sys->readpa_handler().set(FUNC(to9_state::to9_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
@@ -1241,11 +1186,28 @@ void to9_state::to9(machine_config &config)
 
 	m_mc6846->out_port().set(FUNC(to9_state::to9_timer_port_out));
 
+	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
+	FLOPPY_CONNECTOR(config, m_floppy[0], to9_floppy_drives, "dd90_352", to35_floppy_formats, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], to9_floppy_drives, nullptr,    to35_floppy_formats, false).enable_sound(true);
+
+	m_extension->option_remove("cd90_015");
+	m_extension->option_remove("cq90_028");
+	m_extension->option_remove("cd90_351");
+	m_extension->option_remove("cd90_640");
+	m_extension->option_remove("nanoreseau");
+
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(to9_state::write_centronics_busy));
 
 	/* internal ram */
 	m_ram->set_default_size("192K").set_extra_options("128K");
+
+	TO9_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(TO9_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(3);
+	m_video->set_vram_page_cb(FUNC(to9_state::get_vram_page));
+	m_video->set_lightpen_step_cb(FUNC(to9_state::to7_lightpen_cb));
 }
 
 
@@ -1315,22 +1277,23 @@ The TO8D is simply a TO8 with an integrated 3"1/2 floppy drive.
 **********************************************************************/
 
 
-void to9_state::to8_map(address_map &map)
+void to8_state::to8_map(address_map &map)
 {
-
-	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(to9_state::to8_cartridge_w)); /* 4 * 16 KB */
-	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(FUNC(to9_state::to770_vram_w));
-	map(0x6000, 0x7fff).bankr(TO8_SYS_LO).w(FUNC(to9_state::to8_sys_lo_w));
-	map(0x8000, 0x9fff).bankr(TO8_SYS_HI).w(FUNC(to9_state::to8_sys_hi_w));
-	map(0xa000, 0xbfff).bankr(TO8_DATA_LO).w(FUNC(to9_state::to8_data_lo_w));
-	map(0xc000, 0xdfff).bankr(TO8_DATA_HI).w(FUNC(to9_state::to8_data_hi_w));
+	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(to8_state::to8_cartridge_w)); /* 4 * 16 KB */
+	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(FUNC(to8_state::to770_vram_w));
+	map(0x6000, 0x7fff).bankr(TO8_SYS_LO).w(FUNC(to8_state::to8_sys_lo_w));
+	map(0x8000, 0x9fff).bankr(TO8_SYS_HI).w(FUNC(to8_state::to8_sys_hi_w));
+	map(0xa000, 0xbfff).bankr(TO8_DATA_LO).w(FUNC(to8_state::to8_data_lo_w));
+	map(0xc000, 0xdfff).bankr(TO8_DATA_HI).w(FUNC(to8_state::to8_data_hi_w));
+	map(0xe000, 0xffff).bankr(TO8_BIOS_BANK);
+	map(0xe7c0, 0xe7ff).unmaprw();
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to8_vreg_r), FUNC(to9_state::to8_vreg_w));
-	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to8_gatearray_r), FUNC(to9_state::to8_gatearray_w));
-/*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
-	map(0xe800, 0xffff).bankr(TO8_BIOS_BANK); /* 2 * 6 KB */
+	map(0xe7d0, 0xe7d7).m("thmfc1", FUNC(thmfc1_device::map));
+	map(0xe7da, 0xe7dd).rw(FUNC(to8_state::to8_vreg_r), FUNC(to8_state::to8_vreg_w));
+	map(0xe7e4, 0xe7e7).rw(m_video, FUNC(to8_video_device::gatearray_r), FUNC(to8_video_device::gatearray_w));
+/*  map(0xe7f0, 0xe7f7).rw(FUNC(to8_state::to9_ieee_r), FUNC(to8_state::to9_ieee_w )); */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
@@ -1345,58 +1308,27 @@ void to9_state::to8_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( to8 )
-	ROM_REGION ( 0x24000, "maincpu", 0 )
-
 		/* BIOS & floppy */
-	ROM_LOAD ( "to8-0.rom", 0x20000, 0x2000,
-		CRC(3c4a640a)
-		SHA1(0a4952f0ca002d82ac83755e1f694d56399413b2) )
-	ROM_LOAD ( "to8-1.rom", 0x22000, 0x2000,
-		CRC(cb9bae2d)
-		SHA1(a4a55a6e2c74bca15951158c5164970e922fc1c1) )
+	ROM_REGION ( 0x4000, "monitor", 0 )
+	ROM_LOAD ( "to8.iw17", 0x0000, 0x4000, CRC(c2610c13) SHA1(75fffd10494d1ebb78e9068e1b232ede6641ad8c) )
 
 		/* BASIC */
-	ROM_LOAD ( "basic8-0.rom", 0x10000, 0x4000,
-		CRC(e5a00fb3)
-		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
-	ROM_LOAD ( "basic8-1.rom", 0x14000, 0x4000,
-		CRC(4b241e63)
-		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
-	ROM_LOAD ( "basic8-2.rom", 0x18000, 0x4000,
-		CRC(0f5581b3)
-		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
-	ROM_LOAD ( "basic8-3.rom", 0x1c000, 0x4000,
-		CRC(f552e7e3)
-		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
+	ROM_REGION ( 0x10000, "basic", 0 )
+	ROM_LOAD ( "basic512.iw16", 0x0000, 0x8000, CRC(f45e3592) SHA1(8fd98973bd33f88fb63278a7fba86329076b473f) )
+	ROM_LOAD ( "basic1.iw15",   0x8000, 0x8000, CRC(2f4f61fc) SHA1(e0eea9c941113c550ba0c55a5c15f55a64c39060) )
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
 	ROM_FILL( 0x00000, 0x10000, 0x39 )
 ROM_END
 
 ROM_START ( to8d )
-	ROM_REGION ( 0x24000, "maincpu", 0 )
-
 		/* BIOS & floppy */
-	ROM_LOAD ( "to8d-0.rom", 0x20000, 0x2000,
-		CRC(30ea4950)
-		SHA1(6705100cd337fffb26ce999302b55fb71557b128) )
-	ROM_LOAD ( "to8d-1.rom", 0x22000, 0x2000,
-		CRC(926cf0ca)
-		SHA1(8521613ac00e04dd94b69e771aeaefbf4fe97bf7) )
+	ROM_REGION ( 0x4000, "monitor", 0 )
+	ROM_LOAD ( "to8d.iw17", 0x0000, 0x4000, CRC(15fd82d5) SHA1(dd90c326abfec1d28ffc4fe974615870e33a597d) )
 
 		/* BASIC */
-	ROM_LOAD ( "basic8-0.rom", 0x10000, 0x4000,
-		CRC(e5a00fb3)
-		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
-	ROM_LOAD ( "basic8-1.rom", 0x14000, 0x4000,
-		CRC(4b241e63)
-		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
-	ROM_LOAD ( "basic8-2.rom", 0x18000, 0x4000,
-		CRC(0f5581b3)
-		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
-	ROM_LOAD ( "basic8-3.rom", 0x1c000, 0x4000,
-		CRC(f552e7e3)
-		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
+	ROM_REGION ( 0x10000, "basic", 0 )
+	ROM_LOAD ( "basic.iw15", 0x00000, 0x10000, CRC(ffff0512) SHA1(c474d74a1e315d61e21c74c6a1b26af499b385ea) )
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
 	ROM_FILL( 0x00000, 0x10000, 0x39 )
@@ -1405,26 +1337,10 @@ ROM_END
 
 /* ------------ inputs   ------------ */
 
-static INPUT_PORTS_START ( to8_config )
-	PORT_START ( "config" )
-
-	PORT_CONFNAME ( 0x01, 0x00, "Game Port" )
-	PORT_CONFSETTING ( 0x00, DEF_STR( Joystick ) )
-	PORT_CONFSETTING ( 0x01, "Mouse" )
-
-	PORT_CONFNAME ( 0x02, 0x00, "Keyboard" )
-	PORT_CONFSETTING ( 0x00, "Enabled" )
-	PORT_CONFSETTING ( 0x02, "Disabled" )
-
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START ( to8 )
 	PORT_INCLUDE ( thom_lightpen )
 	PORT_INCLUDE ( thom_game_port )
-	PORT_INCLUDE ( to9_keyboard )
-	PORT_INCLUDE ( to8_config )
-	PORT_INCLUDE ( to7_vconfig )
+	PORT_INCLUDE ( to7_config )
 INPUT_PORTS_END
 
 
@@ -1434,32 +1350,52 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-void to9_state::to8(machine_config &config)
+void to8_state::to8(machine_config &config)
 {
-	to7(config);
-	MCFG_MACHINE_START_OVERRIDE( to9_state, to8 )
-	MCFG_MACHINE_RESET_OVERRIDE( to9_state, to8 )
+	to7_base(config, false);
+	MCFG_MACHINE_START_OVERRIDE( to8_state, to8 )
+	MCFG_MACHINE_RESET_OVERRIDE( to8_state, to8 )
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &to9_state::to8_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &to8_state::to8_map);
 
-	//MC6804(config, "kbdmcu", 11_MHz_XTAL);
+	TO8_KEYBOARD(config, m_to8_kbd);
+	m_to8_kbd->data_cb().set(m_mc6846, FUNC(mc6846_device::set_input_cp1));
 
-	m_pia_sys->readpa_handler().set(FUNC(to9_state::to8_sys_porta_in));
+	m_pia_sys->readpa_handler().set(FUNC(to8_state::to8_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
-	m_pia_sys->writepa_handler().set(FUNC(to9_state::to9_sys_porta_out));
-	m_pia_sys->writepb_handler().set(FUNC(to9_state::to8_sys_portb_out));
+	m_pia_sys->writepa_handler().set(FUNC(to8_state::to8_sys_porta_out));
+	m_pia_sys->writepb_handler().set(FUNC(to8_state::to8_sys_portb_out));
 	m_pia_sys->cb2_handler().set_nop();
 	m_pia_sys->irqa_handler().set_nop();
 
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(to9_state::write_centronics_busy));
+	THMFC1(config, "thmfc1", 16_MHz_XTAL);
+	FLOPPY_CONNECTOR(config, "thmfc1:0", to8_floppy_drives, "dd90_352", to35_floppy_formats, false).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "thmfc1:1", to8_floppy_drives, nullptr,    to35_floppy_formats, false).enable_sound(true);
 
-	m_mc6846->out_port().set(FUNC(to9_state::to8_timer_port_out));
-	m_mc6846->in_port().set(FUNC(to9_state::to8_timer_port_in));
-	m_mc6846->cp2().set(FUNC(to9_state::to8_timer_cp2_out));
+	m_extension->option_remove("cd90_015");
+	m_extension->option_remove("cq90_028");
+	m_extension->option_remove("cd90_351");
+	m_extension->option_remove("cd90_640");
+	m_extension->option_remove("nanoreseau");
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(to8_state::write_centronics_busy));
+
+	m_mc6846->out_port().set(FUNC(to8_state::to8_timer_port_out));
+	m_mc6846->in_port().set(FUNC(to8_state::to8_timer_port_in));
+	m_mc6846->cp2().set(FUNC(to8_state::to8_timer_cp2_out));
 
 	/* internal ram */
 	m_ram->set_default_size("512K").set_extra_options("256K");
+
+	TO8_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(TO8_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(4);
+	m_video->set_vram_page_cb(FUNC(to8_state::get_vram_page));
+	m_video->set_update_ram_bank_cb(FUNC(to8_state::to8_update_ram_bank));
+	m_video->set_update_cart_bank_cb(FUNC(to8_state::to8_update_cart_bank));
+	m_video->lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
 
 	SOFTWARE_LIST(config, "to8_cass_list").set_original("to8_cass");
 	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
@@ -1467,15 +1403,16 @@ void to9_state::to8(machine_config &config)
 	SOFTWARE_LIST(config.replace(), "to7_qd_list").set_compatible("to7_qd");
 }
 
-void to9_state::to8d(machine_config &config)
+void to8_state::to8d(machine_config &config)
 {
 	to8(config);
+	subdevice<floppy_connector>("thmfc1:0")->set_fixed(true);
 }
 
 
-COMP( 1986, to8, 0, 0, to8, to8, to9_state, empty_init, "Thomson", "TO8", 0 )
+COMP( 1986, to8, 0, 0, to8, to8, to8_state, empty_init, "Thomson", "TO8", 0 )
 
-COMP( 1987, to8d, to8, 0, to8d, to8d, to9_state, empty_init, "Thomson", "TO8D", 0 )
+COMP( 1987, to8d, to8, 0, to8d, to8d, to8_state, empty_init, "Thomson", "TO8D", 0 )
 
 
 /******************************** TO9+ *******************************
@@ -1515,23 +1452,25 @@ The differences with the TO8 are:
 
 **********************************************************************/
 
-void to9_state::to9p_map(address_map &map)
+void to8_state::to9p_map(address_map &map)
 {
 
-	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(to9_state::to8_cartridge_w)); /* 4 * 16 KB */
-	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(FUNC(to9_state::to770_vram_w));
-	map(0x6000, 0x7fff).bankr(TO8_SYS_LO).w(FUNC(to9_state::to8_sys_lo_w));
-	map(0x8000, 0x9fff).bankr(TO8_SYS_HI).w(FUNC(to9_state::to8_sys_hi_w));
-	map(0xa000, 0xbfff).bankr(TO8_DATA_LO).w(FUNC(to9_state::to8_data_lo_w));
-	map(0xc000, 0xdfff).bankr(TO8_DATA_HI).w(FUNC(to9_state::to8_data_hi_w));
+	map(0x0000, 0x3fff).bankr(THOM_CART_BANK).w(FUNC(to8_state::to8_cartridge_w)); /* 4 * 16 KB */
+	map(0x4000, 0x5fff).bankr(THOM_VRAM_BANK).w(FUNC(to8_state::to770_vram_w));
+	map(0x6000, 0x7fff).bankr(TO8_SYS_LO).w(FUNC(to8_state::to8_sys_lo_w));
+	map(0x8000, 0x9fff).bankr(TO8_SYS_HI).w(FUNC(to8_state::to8_sys_hi_w));
+	map(0xa000, 0xbfff).bankr(TO8_DATA_LO).w(FUNC(to8_state::to8_data_lo_w));
+	map(0xc000, 0xdfff).bankr(TO8_DATA_HI).w(FUNC(to8_state::to8_data_hi_w));
+	map(0xe000, 0xffff).bankr(TO8_BIOS_BANK);
+	map(0xe7c0, 0xe7ff).unmaprw();
 	map(0xe7c0, 0xe7c7).rw(m_mc6846, FUNC(mc6846_device::read), FUNC(mc6846_device::write));
 	map(0xe7c8, 0xe7cb).rw("pia_0", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xe7cc, 0xe7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
-	map(0xe7da, 0xe7dd).rw(FUNC(to9_state::to8_vreg_r), FUNC(to9_state::to8_vreg_w));
-	map(0xe7de, 0xe7df).rw(FUNC(to9_state::to9_kbd_r), FUNC(to9_state::to9_kbd_w));
-	map(0xe7e4, 0xe7e7).rw(FUNC(to9_state::to8_gatearray_r), FUNC(to9_state::to8_gatearray_w));
-/*  map(0xe7f0, 0xe7f7).rw(FUNC(to9_state::to9_ieee_r), FUNC(to9_state::to9_ieee_w )); */
-	map(0xe800, 0xffff).bankr(TO8_BIOS_BANK); /* 2 * 6 KB */
+	map(0xe7d0, 0xe7d7).m("thmfc1", FUNC(thmfc1_device::map));
+	map(0xe7da, 0xe7dd).rw(FUNC(to8_state::to8_vreg_r), FUNC(to8_state::to8_vreg_w));
+	map(0xe7de, 0xe7df).rw(m_to9_kbd, FUNC(to9_keyboard_device::kbd_acia_r), FUNC(to9_keyboard_device::kbd_acia_w));
+	map(0xe7e4, 0xe7e7).rw(m_video, FUNC(to8_video_device::gatearray_r), FUNC(to8_video_device::gatearray_w));
+/*  map(0xe7f0, 0xe7f7).rw(FUNC(to8_state::to9_ieee_r), FUNC(to8_state::to9_ieee_w )); */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x2ffff: 64 KB internal software ROM */
@@ -1546,29 +1485,14 @@ void to9_state::to9p_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( to9p )
-	ROM_REGION ( 0x24000, "maincpu", 0 )
-
 		/* BIOS & floppy */
-	ROM_LOAD ( "to9p-0.rom", 0x20000, 0x2000,
-		CRC(a2731296)
-		SHA1(b30e06127d6e99d4ac5a5bb67881df27bbd9a7e5) )
-	ROM_LOAD ( "to9p-1.rom", 0x22000, 0x2000,
-		CRC(c52ce315)
-		SHA1(7eacbd796e76bc72b872f9700c9b90414899ea0f) )
+	ROM_REGION ( 0x4000, "monitor", 0 )
+	ROM_LOAD ( "monitor.iw12", 0x0000, 0x4000, CRC(9e007126) SHA1(bd37a8099f5015c27fb49682559e68fddd532ddc) )
 
 		/* BASIC */
-	ROM_LOAD ( "basicp-0.rom", 0x10000, 0x4000,
-		CRC(e5a00fb3)
-		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
-	ROM_LOAD ( "basicp-1.rom", 0x14000, 0x4000,
-		CRC(4b241e63)
-		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
-	ROM_LOAD ( "basicp-2.rom", 0x18000, 0x4000,
-		CRC(0f5581b3)
-		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
-	ROM_LOAD ( "basicp-3.rom", 0x1c000, 0x4000,
-		CRC(ebe9c8d9)
-		SHA1(b667ad09a1181f65059a2cbb4c95421bc544a334) )
+	ROM_REGION ( 0x10000, "basic", 0 )
+	ROM_LOAD ( "basic512.iw13", 0x0000, 0x8000, CRC(f45e3592) SHA1(8fd98973bd33f88fb63278a7fba86329076b473f) )
+	ROM_LOAD ( "basic1.iw14",   0x8000, 0x8000, CRC(31f44ec6) SHA1(f7cf04d6560ea207672a6b611a5af5bac8ba3e13) )
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
 	ROM_FILL( 0x00000, 0x10000, 0x39 )
@@ -1580,38 +1504,58 @@ ROM_END
 static INPUT_PORTS_START ( to9p )
 	PORT_INCLUDE ( thom_lightpen )
 	PORT_INCLUDE ( thom_game_port )
-	PORT_INCLUDE ( to9_keyboard )
 	PORT_INCLUDE ( to7_config )
-	PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-void to9_state::to9p(machine_config &config)
+void to8_state::to9p(machine_config &config)
 {
-	to7(config);
-	MCFG_MACHINE_START_OVERRIDE( to9_state, to9p )
-	MCFG_MACHINE_RESET_OVERRIDE( to9_state, to9p )
+	to7_base(config, false);
+	MCFG_MACHINE_START_OVERRIDE( to8_state, to9p )
+	MCFG_MACHINE_RESET_OVERRIDE( to8_state, to8 )
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &to9_state::to9p_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &to8_state::to9p_map);
 
-	m_pia_sys->readpa_handler().set(FUNC(to9_state::to8_sys_porta_in));
+	TO9P_KEYBOARD(config, m_to9_kbd);
+	m_to9_kbd->irq_cb().set(m_mainirq, FUNC(input_merger_device::in_w<4>));
+
+	m_pia_sys->readpa_handler().set(FUNC(to8_state::to9p_sys_porta_in));
 	m_pia_sys->readpb_handler().set_constant(0);
-	m_pia_sys->writepa_handler().set(FUNC(to9_state::to9_sys_porta_out));
-	m_pia_sys->writepb_handler().set(FUNC(to9_state::to8_sys_portb_out));
+	m_pia_sys->writepa_handler().set(FUNC(to8_state::to8_sys_porta_out));
+	m_pia_sys->writepb_handler().set(FUNC(to8_state::to8_sys_portb_out));
 	m_pia_sys->cb2_handler().set_nop();
 	m_pia_sys->irqa_handler().set_nop();
 	m_pia_sys->irqb_handler().set("mainfirq", FUNC(input_merger_device::in_w<1>));
 
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(to9_state::write_centronics_busy));
+	THMFC1(config, "thmfc1", 16_MHz_XTAL);
+	FLOPPY_CONNECTOR(config, "thmfc1:0", to8_floppy_drives, "dd90_352", to35_floppy_formats, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "thmfc1:1", to8_floppy_drives, nullptr,    to35_floppy_formats, false).enable_sound(true);
 
-	m_mc6846->out_port().set(FUNC(to9_state::to9p_timer_port_out));
-	m_mc6846->in_port().set(FUNC(to9_state::to9p_timer_port_in));
-	m_mc6846->cp2().set(FUNC(to9_state::to8_timer_cp2_out));
+	m_extension->option_remove("cd90_015");
+	m_extension->option_remove("cq90_028");
+	m_extension->option_remove("cd90_351");
+	m_extension->option_remove("cd90_640");
+	m_extension->option_remove("nanoreseau");
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(to8_state::write_centronics_busy));
+
+	m_mc6846->out_port().set(FUNC(to8_state::to9p_timer_port_out));
+	m_mc6846->in_port().set(FUNC(to8_state::to9p_timer_port_in));
+	m_mc6846->cp2().set(FUNC(to8_state::to8_timer_cp2_out));
 
 	/* internal ram */
 	m_ram->set_default_size("512K");
+
+	TO8_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(TO8_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(4);
+	m_video->set_vram_page_cb(FUNC(to8_state::get_vram_page));
+	m_video->set_update_ram_bank_cb(FUNC(to8_state::to8_update_ram_bank));
+	m_video->set_update_cart_bank_cb(FUNC(to8_state::to8_update_cart_bank));
+	m_video->lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
 
 	SOFTWARE_LIST(config, "to8_cass_list").set_original("to8_cass");
 	SOFTWARE_LIST(config, "to8_qd_list").set_original("to8_qd");
@@ -1619,7 +1563,7 @@ void to9_state::to9p(machine_config &config)
 	SOFTWARE_LIST(config.replace(), "to7_qd_list").set_compatible("to7_qd");
 }
 
-COMP( 1986, to9p, 0, 0, to9p, to9p, to9_state, empty_init, "Thomson", "TO9+", 0 )
+COMP( 1986, to9p, 0, 0, to9p, to9p, to8_state, empty_init, "Thomson", "TO9+", 0 )
 
 
 
@@ -1683,7 +1627,6 @@ a PC XT.
 
 void mo6_state::mo6_map(address_map &map)
 {
-
 	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(FUNC(mo6_state::to770_vram_w));
 	map(0x2000, 0x3fff).bankr(TO8_SYS_LO).w(FUNC(mo6_state::to8_sys_lo_w));
 	map(0x4000, 0x5fff).bankr(TO8_SYS_HI).w(FUNC(mo6_state::to8_sys_hi_w));
@@ -1693,7 +1636,7 @@ void mo6_state::mo6_map(address_map &map)
 	map(0xa7cb, 0xa7cb).w(FUNC(mo6_state::mo6_ext_w));
 	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xa7da, 0xa7dd).rw(FUNC(mo6_state::mo6_vreg_r), FUNC(mo6_state::mo6_vreg_w));
-	map(0xa7e4, 0xa7e7).rw(FUNC(mo6_state::mo6_gatearray_r), FUNC(mo6_state::mo6_gatearray_w));
+	map(0xa7e4, 0xa7e7).rw(m_video, FUNC(to8_video_device::gatearray_r), FUNC(to8_video_device::gatearray_w));
 /*  map(0xa7f0, 0xa7f7).rw(FUNC(mo6_state::to9_ieee_r), FUNC(homson_state::to9_ieee_w));*/
 	map(0xb000, 0xbfff).bankr(MO6_CART_LO).w(FUNC(mo6_state::mo6_cartridge_w));
 	map(0xc000, 0xefff).bankr(MO6_CART_HI).w(FUNC(mo6_state::mo6_cartridge_w));
@@ -1711,58 +1654,20 @@ void mo6_state::mo6_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo6 )
-	ROM_REGION ( 0x20000, "maincpu", 0 )
-
-		/* BIOS */
-	ROM_LOAD ( "mo6-0.rom", 0x13000, 0x1000,
-		CRC(0446eef6)
-		SHA1(b57fcda69c95f0c97c5cb0605d17c49a0c630300) )
-	ROM_LOAD ( "mo6-1.rom", 0x17000, 0x1000,
-		CRC(eb6df8d4)
-		SHA1(24e2232f582ce04f260acd8e9ec710468a81505c) )
-
-		/* BASIC */
-	ROM_LOAD ( "basic6-0.rom", 0x10000, 0x3000,
-		CRC(18789833)
-		SHA1(fccbf69cbc6deba45a767a26cd6454cf0eedfc2b) )
-	ROM_LOAD ( "basic6-1.rom", 0x14000, 0x3000,
-		CRC(c9b4d6f4)
-		SHA1(47487d2bc4c9a9c09c733bd89c49693c52e262de) )
-	ROM_LOAD ( "basic6-2.rom", 0x18000, 0x4000,
-		CRC(08eac9bb)
-		SHA1(c0231fdb3bcccbbb10c1f93cc529fc3b96dd3f4d) )
-	ROM_LOAD ( "basic6-3.rom", 0x1c000, 0x4000,
-		CRC(19d66dc4)
-		SHA1(301b6366269181b74cb5d7ccdf5455b7290ae99b) )
+		/* BASIC & BIOS */
+	ROM_REGION ( 0x10000, "basic", 0 )
+	ROM_LOAD ( "basic1.iw01",   0x0000, 0x8000, CRC(e04c98fc) SHA1(55a9c91a4da0ce455bf0402e6a86e8abdb3c93a0) )
+	ROM_LOAD ( "basic128.iw02", 0x8000, 0x8000, CRC(f523ba0e) SHA1(e747a5310d5c137918e033e67b2dd83d12ec75c1) )
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
 	ROM_FILL ( 0x00000, 0x10000, 0x39 )
 ROM_END
 
 ROM_START ( pro128 )
-	ROM_REGION ( 0x20000, "maincpu", 0 )
-
-		/* BIOS */
-	ROM_LOAD ( "pro128-0.rom", 0x13000, 0x1000,
-		CRC(a8aef291)
-		SHA1(2685cca841f405a37ef48b0115f90c865ce79d0f) )
-	ROM_LOAD ( "pro128-1.rom", 0x17000, 0x1000,
-		CRC(5b3340ec)
-		SHA1(269f2eb3e3452014b8d1f0f9e1c63fe56375a863) )
-
-		/* BASIC */
-	ROM_LOAD ( "basico-0.rom", 0x10000, 0x3000,
-		CRC(98b10d5e)
-		SHA1(d6b77e694fa85e1114293448e5a64f6e2cf46c22) )
-	ROM_LOAD ( "basico-1.rom", 0x14000, 0x3000,
-		CRC(721d2124)
-		SHA1(51db1cd03b3891e212a24aa6563b09968930d897) )
-	ROM_LOAD ( "basico-2.rom", 0x18000, 0x4000,
-		CRC(135438ab)
-		SHA1(617d4e4979842bea2c21ef7f8c50f3b08b15239a) )
-	ROM_LOAD ( "basico-3.rom", 0x1c000, 0x4000,
-		CRC(2c2befa6)
-		SHA1(3e94e182bacbb55bb07be2af4c76c0b0df47b3bf) )
+		/* BASIC & BIOS */
+	ROM_REGION ( 0x10000, "basic", 0 )
+	ROM_LOAD ( "pro128.iw01", 0x0000, 0x8000, CRC(c5896603) SHA1(f0410456de778e650db7130f45e05fcd5bfd2024) )
+	ROM_LOAD ( "basico.iw02", 0x8000, 0x8000, CRC(7c9a0174) SHA1(65f85edece4a88f3b5d5ed1f83df180705fa3d20) )
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
 	ROM_FILL ( 0x00000, 0x10000, 0x39 )
@@ -1853,9 +1758,6 @@ static INPUT_PORTS_START ( mo6_keyboard )
 		KEY ( 4, "\303\271 %", COLON )      PORT_CHAR( 0xf9 ) PORT_CHAR('%')
 	PORT_BIT  ( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-		/* unused */
-	PORT_START ( "keyboard.9" )
-
 INPUT_PORTS_END
 
 /* QWERTY version */
@@ -1909,7 +1811,6 @@ static INPUT_PORTS_START ( mo6 )
 	PORT_INCLUDE ( thom_game_port )
 	PORT_INCLUDE ( mo6_keyboard )
 	PORT_INCLUDE ( to7_config )
-	PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( pro128 )
@@ -1917,7 +1818,6 @@ static INPUT_PORTS_START ( pro128 )
 	PORT_INCLUDE ( thom_game_port )
 	PORT_INCLUDE ( pro128_keyboard )
 	PORT_INCLUDE ( to7_config )
-	PORT_INCLUDE ( to7_vconfig )
 INPUT_PORTS_END
 
 
@@ -1955,6 +1855,17 @@ void mo6_state::mo6(machine_config &config)
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
+
+	TO8_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_is_mo(true);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(MO6_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(3);
+	m_video->set_vram_page_cb(FUNC(mo6_state::get_vram_page));
+	m_video->set_update_ram_bank_cb(FUNC(mo6_state::mo6_update_ram_bank));
+	m_video->set_update_cart_bank_cb(FUNC(mo6_state::mo6_update_cart_bank));
+	m_video->lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
+	m_video->int_50hz_cb().set(m_pia_sys, FUNC(pia6821_device::cb1_w));
 
 	config.device_remove("to7_cart_list");
 	config.device_remove("to7_cass_list");
@@ -2023,7 +1934,6 @@ Here are the differences between the MO6 and MO5NR:
 
 void mo5nr_state::mo5nr_map(address_map &map)
 {
-
 	map(0x0000, 0x1fff).bankr(THOM_VRAM_BANK).w(FUNC(mo5nr_state::to770_vram_w));
 	map(0x2000, 0x3fff).bankr(TO8_SYS_LO).w(FUNC(mo5nr_state::to8_sys_lo_w));
 	map(0x4000, 0x5fff).bankr(TO8_SYS_HI).w(FUNC(mo5nr_state::to8_sys_hi_w));
@@ -2035,7 +1945,7 @@ void mo5nr_state::mo5nr_map(address_map &map)
 	map(0xa7cc, 0xa7cf).rw("pia_1", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	m_extension_view[1](0xa7d8, 0xa7d9).r(FUNC(mo5nr_state::id_r));
 	map(0xa7da, 0xa7dd).rw(FUNC(mo5nr_state::mo6_vreg_r), FUNC(mo5nr_state::mo6_vreg_w));
-	map(0xa7e4, 0xa7e7).rw(FUNC(mo5nr_state::mo6_gatearray_r), FUNC(mo5nr_state::mo6_gatearray_w));
+	map(0xa7e4, 0xa7e7).rw(m_video, FUNC(to8_video_device::gatearray_r), FUNC(to8_video_device::gatearray_w));
 /*  map(0xa7f0, 0xa7f7).rw(FUNC(mo5nr_state::to9_ieee_r), FUNC(homson_state::to9_ieee_w));*/
 	map(0xb000, 0xbfff).bankr(MO6_CART_LO).w(FUNC(mo5nr_state::mo6_cartridge_w));
 	map(0xc000, 0xefff).bankr(MO6_CART_HI).w(FUNC(mo5nr_state::mo6_cartridge_w));
@@ -2053,32 +1963,19 @@ void mo5nr_state::mo5nr_map(address_map &map)
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo5nr )
-	ROM_REGION ( 0x20000, "maincpu", 0 )
+		/* BASIC & BIOS */
+	ROM_REGION ( 0x10000, "basic", 0 )
+	ROM_LOAD ( "mo5nr.iw01",  0x0000, 0x8000, CRC(ade3c46d) SHA1(64bede6ecb58ad7409b2c546259773af097f162d) )
+	ROM_LOAD ( "basicn.iw02", 0x8000, 0x8000, CRC(3a6981c3) SHA1(6d22e3f2ff2a19383401f950c5ace72e1560816c) )
 
-		/* BIOS */
-	ROM_LOAD ( "mo5nr-0.rom", 0x13000, 0x1000,
-		CRC(06e31115)
-		SHA1(7429cc0c15475398b5ab514cb3d3efdc71cf082f) )
-	ROM_LOAD ( "mo5nr-1.rom", 0x17000, 0x1000,
-		CRC(7cda17c9)
-		SHA1(2ff6480ce9e30acc4c89b6113d7c8ea6095d90a5) )
+	ROM_REGION ( 0x2000, "nr", 0 ) /* TODO: network ROM */
+	ROM_LOAD ( "nr.iw20", 0x0000, 0x2000, NO_DUMP )
 
-		/* BASIC */
-	ROM_LOAD ( "basicn-0.rom", 0x10000, 0x3000,
-		CRC(fae9e691)
-		SHA1(62fbfd6d4ca837f6cb8ed37f828eca97f80e6200) )
-	ROM_LOAD ( "basicn-1.rom", 0x14000, 0x3000,
-		CRC(cf134dd7)
-		SHA1(1bd961314e16e460d37a65f5e7f4acf5604fbb17) )
-	ROM_LOAD ( "basicn-2.rom", 0x18000, 0x4000,
-		CRC(b69d2e0d)
-		SHA1(ea3220bbae991e08259d38a7ea24533b2bb86418) )
-	ROM_LOAD ( "basicn-3.rom", 0x1c000, 0x4000,
-		CRC(7785610f)
-		SHA1(c38b0be404d8af6f409a1b52cb79a4e10fc33177) )
+	ROM_REGION ( 0x100, "proms", 0 )
+	ROM_LOAD ( "an-r.iw21", 0x000, 0x100, NO_DUMP ) // unknown purpose (N82S129AN)
 
 	ROM_REGION ( 0x10000, "cartridge", 0 )
-	ROM_FILL ( 0x00000, 0x10000, 0x39 ) /* TODO: network ROM */
+	ROM_FILL ( 0x00000, 0x10000, 0x39 )
 ROM_END
 
 
@@ -2161,10 +2058,6 @@ static INPUT_PORTS_START ( mo5nr_keyboard )
 		KEY ( 6, "Stop", TAB )                PORT_CHAR(27)
 	PORT_BIT  ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-		/* unused */
-	PORT_START ( "keyboard.8" )
-	PORT_START ( "keyboard.9" )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( mo5nr )
@@ -2172,7 +2065,6 @@ static INPUT_PORTS_START ( mo5nr )
 	PORT_INCLUDE ( thom_game_port )
 	PORT_INCLUDE ( mo5nr_keyboard )
 	PORT_INCLUDE ( to7_config )
-	PORT_INCLUDE ( to7_vconfig )
 
 	PORT_START ( "nanoreseau_config" )
 	PORT_DIPNAME(0x01, 0x01, "Extension selection") PORT_DIPLOCATION("SW03:1")
@@ -2244,6 +2136,17 @@ void mo5nr_state::mo5nr(machine_config &config)
 
 	/* internal ram */
 	m_ram->set_default_size("128K");
+
+	TO8_VIDEO(config, m_video, 16_MHz_XTAL);
+	m_video->set_is_mo(true);
+	m_video->set_screen("screen");
+	m_video->set_lightpen_decal(MO6_LIGHTPEN_DECAL);
+	m_video->set_lightpen_steps(3);
+	m_video->set_vram_page_cb(FUNC(mo5nr_state::get_vram_page));
+	m_video->set_update_ram_bank_cb(FUNC(mo5nr_state::mo6_update_ram_bank));
+	m_video->set_update_cart_bank_cb(FUNC(mo5nr_state::mo6_update_cart_bank));
+	m_video->lightpen_intr_cb().set(m_mainfirq, FUNC(input_merger_device::in_w<2>));
+	m_video->int_50hz_cb().set(m_pia_sys, FUNC(pia6821_device::cb1_w));
 
 	config.device_remove("to7_cart_list");
 	config.device_remove("to7_cass_list");

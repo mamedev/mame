@@ -10,8 +10,9 @@
 
 #pragma once
 
-#include "imagedev/floppy.h"
 #include "fdc_pll.h"
+
+class floppy_image_device;
 
 class mc6843_device : public device_t
 {
@@ -180,6 +181,7 @@ private:
 	void command_start();
 	void run(bool timeout, bool ready, bool index);
 	void isr_raise(u8 flag);
+	void isr_lower(u8 flag);
 	void delay(int);
 	void live_start(int state, bool start_writing = false);
 	void checkpoint();

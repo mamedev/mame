@@ -212,6 +212,7 @@ void minx_cpu_device::execute_run()
 
 		if ( m_halted )
 		{
+			debugger_wait_hook();
 			m_icount -= insnminx_cycles_CE[0xAE];
 		}
 		else

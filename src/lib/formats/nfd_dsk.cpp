@@ -277,7 +277,7 @@ bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		if (mfm[track * 26])
 			build_pc_track_mfm(track / 2, track % 2, image, cell_count, num_secs[track], sects, calc_default_pc_gap3_size(form_factor, (128 << sec_sizes[track * 26])));
 		else
-			build_pc_track_fm(track / 2, track % 2, image, cell_count, num_secs[track], sects, calc_default_pc_gap3_size(form_factor, (128 << sec_sizes[track * 26])));
+			build_pc_track_fm(track / 2, track % 2, image, cell_count / 2, num_secs[track], sects, calc_default_pc_gap3_size(form_factor, (128 << sec_sizes[track * 26])));
 	}
 
 	return true;

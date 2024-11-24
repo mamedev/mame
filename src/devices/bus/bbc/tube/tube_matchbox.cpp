@@ -314,7 +314,7 @@ void bbc_tube_matchbox_device::ns32016_mem(address_map &map)
 
 static INPUT_PORTS_START(matchbox)
 	PORT_START("DIPSW")
-	PORT_DIPNAME(0x0f, 0x00, "Co-Processor") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_tube_matchbox_device, dip_changed, 0)
+	PORT_DIPNAME(0x0f, 0x00, "Co-Processor") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_tube_matchbox_device::dip_changed), 0)
 	PORT_DIPSETTING(0x00, "65C102 3 MHz")
 	PORT_DIPSETTING(0x01, "65C102 4 MHz")
 	PORT_DIPSETTING(0x02, "65C102 16 MHz")

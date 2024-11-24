@@ -549,11 +549,11 @@ static INPUT_PORTS_START( opwolf )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(opwolf_state, opwolf_gun_x_r)
+	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(opwolf_state::opwolf_gun_x_r))
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(opwolf_state, opwolf_gun_y_r)
+	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(opwolf_state::opwolf_gun_y_r))
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START(P1X_PORT_TAG)  /* P1X (span allows you to shoot enemies behind status bar) */

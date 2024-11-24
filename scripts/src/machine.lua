@@ -3322,6 +3322,17 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/sc16is741.h,MACHINES["SC16IS741"] = true
+---------------------------------------------------
+if (MACHINES["SC16IS741"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sc16is741.cpp",
+		MAME_DIR .. "src/devices/machine/sc16is741.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/scc66470.h,MACHINES["SCC66470"] = true
 ---------------------------------------------------
 if (MACHINES["SCC66470"]~=null) then
@@ -3580,6 +3591,18 @@ if (MACHINES["TE7750"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/te7750.cpp",
 		MAME_DIR .. "src/devices/machine/te7750.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/thmfc1.h,MACHINES["THMFC1"] = true
+---------------------------------------------------
+
+if (MACHINES["THMFC1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/thmfc1.cpp",
+		MAME_DIR .. "src/devices/machine/thmfc1.h",
 	}
 end
 
@@ -4471,6 +4494,18 @@ if (MACHINES["PC87306"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/pc87306.cpp",
 		MAME_DIR .. "src/devices/machine/pc87306.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/pc97338.h,MACHINES["PC97338"] = true
+---------------------------------------------------
+
+if (MACHINES["PC97338"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pc97338.cpp",
+		MAME_DIR .. "src/devices/machine/pc97338.h",
 	}
 end
 

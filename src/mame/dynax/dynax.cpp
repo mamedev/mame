@@ -38,7 +38,7 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 91 Mj Angels               D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205       RAM
 91 Mj Comic Gekijou V.1    D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
 91 Mj Tenkaigen                                      TLCS  AY8910        YM2413       M6242 RAM   Protection, Battery
-91 Mj Ougon no Hai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
+91 Mj Ougon no Pai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
 92 Quiz TV Gassyuukoku     D5512068L1-2 D6410288L-1  Z80   AY8912        YM2413 M5205       RAM
 92 Hanafuda Hana Tengoku   D6502208L1   D6107068L-1  Z80   AY8910        YM2413       M6242 RAM
 94 Castle Of Dracula                                 Z80   M6295                            PROM  Blitter is an FPGA
@@ -1040,9 +1040,9 @@ void dynax_state::tenkai_ip_w(uint8_t data)
 	switch (m_input_sel)
 	{
 	case 0x0c:
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		// bit 2?
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+		m_hopper->motor_w(BIT(data, 2));
 		// bit 3?
 //          popmessage("%02x", data);
 		return;
@@ -1052,7 +1052,7 @@ void dynax_state::tenkai_ip_w(uint8_t data)
 			break;
 		return;
 	}
-	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", m_maincpu->pc(), m_input_sel, data);
+	logerror("%s: unmapped ip_sel=%02x written with %02x\n", machine().describe_context(), m_input_sel, data);
 }
 
 uint8_t dynax_state::tenkai_ip_r(offs_t offset)
@@ -1070,8 +1070,13 @@ uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 				case 0x80:
 					return ioport("COINS")->read(); // coins
 
+				case 0x02:
+				case 0x82:
+					// do other bits do anything?
+					return m_hopper->line_r() ? 0xbf : 0xff;
+
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", m_maincpu->pc(), m_input_sel, offset);
+					logerror("%s: unmapped ip_sel=%02x read from offs %x\n", machine().describe_context(), m_input_sel, offset);
 					return 0xff;
 			}
 		}
@@ -1086,7 +1091,7 @@ uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 				// player 2
 				case 0x81:
 					if (m_keyb >= 5)
-						logerror("%04x: unmapped keyb=%02x read\n", m_maincpu->pc(), m_keyb);
+						logerror("%s: unmapped keyb=%02x read\n", machine().describe_context(), m_keyb);
 					return 0xff;//ioport(keynames1[m_keyb++])->read();
 
 				// player 1
@@ -1095,13 +1100,13 @@ uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 						return 0x00;
 					if (m_keyb >= 5)
 					{
-						logerror("%04x: unmapped keyb=%02x read\n", m_maincpu->pc(), m_keyb);
+						logerror("%s: unmapped keyb=%02x read\n", machine().describe_context(), m_keyb);
 						return 0x00;
 					}
 					return ioport(keynames0[m_keyb++])->read();
 
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", m_maincpu->pc(), m_input_sel, offset);
+					logerror("%s: unmapped ip_sel=%02x read from offs %x\n", machine().describe_context(), m_input_sel, offset);
 					return 0xff;
 			}
 		}
@@ -1227,7 +1232,7 @@ void dynax_state::tenkai_blit_romregion_w(uint8_t data)
 		case 0x83:  dynax_blit_romregion_w(1);    return;
 		case 0x80:  dynax_blit_romregion_w(2);    return;
 	}
-	logerror("%04x: unmapped romregion=%02X\n", m_maincpu->pc(), data);
+	logerror("%s: unmapped romregion=%02X\n", machine().describe_context(), data);
 }
 
 void dynax_state::tenkai_map(address_map &map)
@@ -1981,7 +1986,7 @@ static INPUT_PORTS_START( hanamai )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2046,7 +2051,7 @@ static INPUT_PORTS_START( hnkochou )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )    // Test (there isn't a dip switch)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )      // Note
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
@@ -2111,7 +2116,7 @@ static INPUT_PORTS_START( hnoridur )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2278,7 +2283,7 @@ static INPUT_PORTS_START( hjingi )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE4 )   // 18B
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Key In
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2438,7 +2443,7 @@ static INPUT_PORTS_START( mjfriday )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "17B"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "18B"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )    // Test (there isn't a dip switch)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "06B"
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2504,7 +2509,7 @@ static INPUT_PORTS_START( mjdialq2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "17B"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "18B"
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)     // Test (there isn't a dip switch)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "06B"
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2569,7 +2574,7 @@ static INPUT_PORTS_START( yarunara )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "17B"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "18B"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test ))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "06B"
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
@@ -2615,7 +2620,7 @@ static INPUT_PORTS_START( warahana )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "17B"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "18B"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test ))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "06B"
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
@@ -2679,7 +2684,7 @@ static INPUT_PORTS_START( hanayara )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "17B"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "18B"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test ))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // "06B"
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
@@ -2842,7 +2847,7 @@ static INPUT_PORTS_START( mcnpshnt )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )    // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2908,7 +2913,7 @@ static INPUT_PORTS_START( nanajign )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )    // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -3106,7 +3111,7 @@ static INPUT_PORTS_START( jantouki )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -3267,29 +3272,29 @@ static INPUT_PORTS_START( mjembase )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )      // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
 
 
-// dip locations verified on mjelctrb pcb
+// DIP switch locations verified on mjelctrb PCB
 static INPUT_PORTS_START( mjelct3 )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )     // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )     // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 
@@ -3412,13 +3417,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mjelctrn )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )      // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 
@@ -3594,13 +3599,13 @@ static INPUT_PORTS_START( majxtal7 )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )      // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 
@@ -3721,7 +3726,7 @@ static INPUT_PORTS_START( neruton )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // 17B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // 18B
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // 06B
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )  // Coin
@@ -3738,148 +3743,233 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( tenkai )
+	// The manual provides two sets of standard settings:
+	//       標準設定　シングル向け                        標準設定　コーナー向け
+	// SW 1  OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF       OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF
+	// SW 2  OFF OFF OFF OFF  ON  ON OFF  ON  ON  ON       OFF OFF OFF OFF OFF OFF OFF OFF  ON  ON
+	// SW 3  OFF OFF  ON  ON  ON  ON  ON  ON OFF  ON       OFF OFF  ON  ON  ON  ON  ON  ON OFF  ON
+	// SW 4  OFF  ON  ON  ON OFF OFF OFF OFF OFF OFF        ON  ON  ON  ON OFF OFF OFF OFF OFF OFF
+
+	// The odds rate table entries correspond to the following hands:
+	// * １ハン  1  han
+	// * ２ハン  2  han
+	// * ３ハン  3  han
+	// * 満　貫  mangan
+	// * 跳　満  haneman
+	// * 倍　満  baiman
+	// * 三倍満  sanbaiman
+	// * 役　満  yakuman
+
+	// Setting Gal Pose to Type B shows moles on the gals' faces, and inserts screens
+	// in the stage 2 and 5 win animations implying that they've been censored by being
+	// cut short.  However, the animations are complete - nothing shown for Type A is
+	// actually cut.
+
+	// There is an additional 4-switch bank (SW 5) for selecting the wiring options.
+
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPSETTING(    0x01, "53" )
-	PORT_DIPSETTING(    0x02, "56" )
-	PORT_DIPSETTING(    0x03, "59" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x05, "65" )
-	PORT_DIPSETTING(    0x06, "68" )
-	PORT_DIPSETTING(    0x07, "71" )
-	PORT_DIPSETTING(    0x08, "75" )
-	PORT_DIPSETTING(    0x09, "78" )
-	PORT_DIPSETTING(    0x0a, "81" )
-	PORT_DIPSETTING(    0x0b, "84" )
-	PORT_DIPSETTING(    0x0c, "87" )
-	PORT_DIPSETTING(    0x0d, "90" )
-	PORT_DIPSETTING(    0x0e, "93" )
-	PORT_DIPSETTING(    0x0f, "96" )
-	PORT_DIPNAME( 0x30, 0x10, "Odds Rate" )
+	PORT_DIPNAME( 0x0f, 0x07, "Payout Rate" )                   PORT_DIPLOCATION("SW 1:1,2,3,4")  // ＰＡＹ－ＯＵＴ　ＲＡＴＥ
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPSETTING(    0x01, "53%" )
+	PORT_DIPSETTING(    0x02, "56%" )
+	PORT_DIPSETTING(    0x03, "59%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x06, "68%" )
+	PORT_DIPSETTING(    0x07, "71%" )
+	PORT_DIPSETTING(    0x08, "75%" )
+	PORT_DIPSETTING(    0x09, "78%" )
+	PORT_DIPSETTING(    0x0a, "81%" )
+	PORT_DIPSETTING(    0x0b, "84%" )
+	PORT_DIPSETTING(    0x0c, "87%" )
+	PORT_DIPSETTING(    0x0d, "90%" )
+	PORT_DIPSETTING(    0x0e, "93%" )
+	PORT_DIPSETTING(    0x0f, "96%" )
+	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" )                     PORT_DIPLOCATION("SW 1:5,6")      // ＯＤＤＳ　ＲＡＴＥ
 	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
 	PORT_DIPSETTING(    0x20, "1 2 3 5 10 50 100 200" )
-	PORT_DIPNAME( 0xc0, 0x40, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )                   PORT_DIPLOCATION("SW 1:7,8")      // ＢＥＴ－ＭＡＸ
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Unknown 1-0&1" )
-	PORT_DIPSETTING(    0x03, "1:1" )
-	PORT_DIPSETTING(    0x02, "1:2" )
-	PORT_DIPSETTING(    0x01, "1:5" )
-	PORT_DIPSETTING(    0x00, "1:10" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" )
-	PORT_DIPSETTING(    0x0c, "1" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )
-	PORT_DIPSETTING(    0x70, "Cut" )
-	PORT_DIPSETTING(    0x60, "1 T" )
-	PORT_DIPSETTING(    0x50, "300" )
-	PORT_DIPSETTING(    0x40, "500" )
-	PORT_DIPSETTING(    0x30, "700" )
-	PORT_DIPSETTING(    0x20, "1000" )
-//  PORT_DIPSETTING(    0x10, "1000" )
-//  PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 1-7" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )                PORT_DIPLOCATION("SW 2:1,2")      // ＣＯＩＮ　ＲＡＴＥ
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )                                                    // １コイン　　１プレイ
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )                                                    // １コイン　　２プレイ
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_5C) )                                                    // １コイン　　５プレイ
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )                                               // １コイン　１０プレイ
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                   PORT_DIPLOCATION("SW 2:3,4")      // ゲーム・スタート時の最低レート数
+	PORT_DIPSETTING(    0x0c, "1" )                                                               // レート　１
+	PORT_DIPSETTING(    0x08, "2" )                                                               // レート　２
+	PORT_DIPSETTING(    0x04, "3" )                                                               // レート　３
+	PORT_DIPSETTING(    0x00, "5" )                                                               // レート　５
+	PORT_DIPNAME( 0x70, 0x40, "Yakuman Bonus Cycle" )           PORT_DIPLOCATION("SW 2:5,6,7")    // 役満ボーナスの設定周期
+	PORT_DIPSETTING(    0x70, "None" )                                                            // 無し
+	PORT_DIPSETTING(    0x60, "First time only" )                                                 // 初回のみ
+	PORT_DIPSETTING(    0x50, "Every 300 coins" )                                                 // ３００コイン毎
+	PORT_DIPSETTING(    0x40, "Every 500 coins" )                                                 // ５００コイン毎
+	PORT_DIPSETTING(    0x30, "Every 700 coins" )                                                 // ７００コイン毎
+	PORT_DIPSETTING(    0x20, "Every 1000 coins" )                                                // １０００コイン毎
+//  PORT_DIPSETTING(    0x10, "Every 1000 coins" )
+//  PORT_DIPSETTING(    0x00, "Every 1000 coins" )
+	PORT_DIPNAME( 0x80, 0x00, "Yakuman Bonuses Per Cycle" )     PORT_DIPLOCATION("SW 2:8")        // 役満ボーナスの回数設定周期毎に
+	PORT_DIPSETTING(    0x00, "1" )                                                               // １回
+	PORT_DIPSETTING(    0x80, "2" )                                                               // ２回
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 2-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Girls (Demo)" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "In-Game Bet?" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 2-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Auto Tsumo after Reach" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Last Chance" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DonDen Key" )
-	PORT_DIPSETTING(    0x80, "Start" )
-	PORT_DIPSETTING(    0x00, "Flip Flop" )
+	PORT_DIPNAME( 0x01, 0x01, "Payout Mode" )                   PORT_DIPLOCATION("SW 3:1")        // ゲーム・タイプ
+	PORT_DIPSETTING(    0x01, "Key-out" )                                                         // クレジット・タイプ
+	PORT_DIPSETTING(    0x00, "Hopper" )                                                          // ホッパー・タイプ
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Polarity" )               PORT_DIPLOCATION("SW 3:2")        // ホッパー・アクティブ
+	PORT_DIPSETTING(    0x02, DEF_STR(Normal) )                                                   // 通常
+	PORT_DIPSETTING(    0x00, "Inverted" )                                                        // 反転
+	PORT_DIPNAME( 0x04, 0x00, "Tenkaigen Day" )                 PORT_DIPLOCATION("SW 3:3")        // 天開眼の日
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x08, 0x00, "Double Up" )                     PORT_DIPLOCATION("SW 3:4")        // Ｗ－ＢＥＴ
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x10, 0x00, "Renchan Rate" )                  PORT_DIPLOCATION("SW 3:5")        // 連荘レート
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x20, 0x00, "Auto Reach" )                    PORT_DIPLOCATION("SW 3:6")        // オート・リーチ
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x40, 0x00, "Last Chance" )                   PORT_DIPLOCATION("SW 3:7")        // ラスト・チャンス
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x80, 0x00, "Don Den Button" )                PORT_DIPLOCATION("SW 3:8")        // Ｄｏｎ・Ｄｅｎ　機能ボタン変更
+	PORT_DIPSETTING(    0x80, "Start" )                                                           // スタート・ボタ
+	PORT_DIPSETTING(    0x00, "Flip Flop" )                                                       // Ｆ／Ｆ・ボタン
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Select Girl" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Moles On Gal's Face" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 3-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 3-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 3-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Set Date" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds ))            PORT_DIPLOCATION("SW 4:1")        // デモ・サウンド
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )                 PORT_DIPLOCATION("SW 4:2")        // ゲーム・サウンド
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x04, 0x00, "Gal Select" )                    PORT_DIPLOCATION("SW 4:3")        // ギャル・セレクト
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x08, 0x00, "Gal Pose" )                      PORT_DIPLOCATION("SW 4:4")        // ギャル・ポーズ
+	PORT_DIPSETTING(    0x00, "Type A" )                                                          // Ａタイプ
+	PORT_DIPSETTING(    0x08, "Type B" )                                                          // Ｂタイプ
+	PORT_DIPNAME( 0x10, 0x10, "Demo Message Language" )         PORT_DIPLOCATION("SW 4:5")        // デモメッセージ
+	PORT_DIPSETTING(    0x10, DEF_STR(Japanese) )                                                 // 日本語メッセージ
+	PORT_DIPSETTING(    0x00, DEF_STR(Taiwan) )                                                   // 台湾メッセージ
+	PORT_DIPNAME( 0x20, 0x20, "SP Express Frequency" )          PORT_DIPLOCATION("SW 4:6")        // 特急便ＳＰの頻度
+	PORT_DIPSETTING(    0x00, DEF_STR(Low) )                                                      // 少ない
+	PORT_DIPSETTING(    0x20, DEF_STR(Normal) )                                                   // 普通
+	PORT_DIPNAME( 0x40, 0x40, "Tenkaigen Day Frequency")        PORT_DIPLOCATION("SW 4:7")        // 天開眼の日頻度
+	PORT_DIPSETTING(    0x00, DEF_STR(Low) )                                                      // 少ない
+	PORT_DIPSETTING(    0x40, DEF_STR(Normal) )                                                   // 普通
+	PORT_DIPNAME( 0x80, 0x80, "Time Settings Mode" )            PORT_DIPLOCATION("SW 4:8")        // 時間設定モード
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
 
 	PORT_START("DSW4")  /* (top) */
-	PORT_DIPNAME( 0x01, 0x01, "Credits Per Note" )
-	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown top-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown top-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown top-4" )
-	PORT_DIPSETTING(    0x10, "8" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown top-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Subtitle" )
-	PORT_DIPSETTING(    0x40, DEF_STR( None ) )
-	PORT_DIPSETTING(    0x00, "Part 2" )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown top-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "Credits Per Note" )              PORT_DIPLOCATION("SW 1:9")        // ＮＯＴＥ　ＲＡＴＥ
+	PORT_DIPSETTING(    0x01, "5" )                             PORT_CONDITION("DSW1", 0x03, EQUALS, 0x03) // ＣＯＩＮ×５
+	PORT_DIPSETTING(    0x01, "10" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x01, "25" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x01, "50" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "10" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x03) // ＣＯＩＮ×１０
+	PORT_DIPSETTING(    0x00, "20" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, "50" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, "100" )                           PORT_CONDITION("DSW1", 0x03, EQUALS, 0x00)
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW 1:10")       // モニター画面反転
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                      // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 反転
+	PORT_DIPNAME( 0x04, 0x00, "Computer Strength" )             PORT_DIPLOCATION("SW 2:9")        // コンピューターの強さ
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                   // 普通
+	PORT_DIPSETTING(    0x04, "Strong" )                                                          // 強い
+	PORT_DIPNAME( 0x08, 0x00, "Service Count" )                 PORT_DIPLOCATION("SW 2:10")       // サービス・カウント
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x10, 0x10, "Don Den Count" )                 PORT_DIPLOCATION("SW 3:9")        // Ｄｏｎ・Ｄｅｎ　回数
+	PORT_DIPSETTING(    0x00, "5 times" )                                                         // ５回
+	PORT_DIPSETTING(    0x10, "8 times" )                                                         // ８回
+	PORT_DIPNAME( 0x20, 0x00, "Show In-Game Clock" )            PORT_DIPLOCATION("SW 3:10")       // ゲーム中の時計表示
+	PORT_DIPSETTING(    0x20, DEF_STR(No) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                      // 有
+	PORT_DIPNAME( 0x40, 0x40, "Game Title" )                    PORT_DIPLOCATION("SW 4:9")        // ＯＦＦ固定
+	PORT_DIPSETTING(    0x40, "Mahjong Tenkaigen" )
+	PORT_DIPSETTING(    0x00, "Mahjong Tenkaigen Part 2" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                PORT_DIPLOCATION("SW 4:10") PORT_CONDITION("DSW4", 0x40, EQUALS, 0x40) // ＯＦＦ固定
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x80, "Show Yakuman Table" )            PORT_DIPLOCATION("SW 4:10") PORT_CONDITION("DSW4", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) // Pay (default assignment conflicts with I)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                                       // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE                                                           // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                   // Analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                                  // Memory Reset
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BILL1 )         PORT_CODE(KEYCODE_6)                                            // Note (default assignment conflicts with Small)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                                                                         // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                                                                      // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( ougonhai )
+	// The manual provides two sets of standard settings:
+	//       標準設定　シングル向け                        標準設定　コーナー向け
+	// SW 1  OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF       OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF
+	// SW 2  OFF OFF OFF OFF  ON  ON OFF  ON  ON  ON       OFF OFF OFF OFF  ON OFF  ON  ON  ON  ON
+	// SW 3  OFF OFF  ON  ON  ON  ON OFF OFF               OFF OFF OFF  ON  ON  ON  ON OFF
+	// SW 4  OFF  ON  ON OFF OFF OFF OFF OFF                ON  ON  ON OFF OFF OFF OFF OFF
+
+	PORT_INCLUDE( tenkai )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x04, 0x00, "Don Den Button" )                PORT_DIPLOCATION("SW 3:3")        // Ｄｏｎ・Ｄｅｎ　機能ボタン変更
+	PORT_DIPSETTING(    0x04, "Start" )                                                           // スタート・ボタ
+	PORT_DIPSETTING(    0x00, "Flip Flop" )                                                       // Ｆ／Ｆ・ボタン
+	PORT_DIPNAME( 0x10, 0x00, "Auto Reach" )                    PORT_DIPLOCATION("SW 3:5")        // オート・リーチ
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x20, 0x00, "Slot Last Chance" )              PORT_DIPLOCATION("SW 3:6")        // スロット　ラスト・チャンス
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x40, 0x40, "Show Yakuman Table" )            PORT_DIPLOCATION("SW 3:7")        // 役満ウインポイントの表示
+	PORT_DIPSETTING(    0x40, DEF_STR(No) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                      // 有
+	PORT_DIPNAME( 0x80, 0x80, "Gold Rush Payout Rate" )         PORT_DIPLOCATION("SW 3:8")        // ＧＯＬＤ　ＲＵＳＨ　出率
+	PORT_DIPSETTING(    0x80, DEF_STR(Normal) )                                                   // 普通
+	PORT_DIPSETTING(    0x00, DEF_STR(High) )                                                     // 多い
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x04, 0x00, "Show Renchan Gal" )              PORT_DIPLOCATION("SW 4:3")        // 連荘ギャル表示
+	PORT_DIPSETTING(    0x04, DEF_STR(No) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                      // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW 4:4" )                                                // ＯＦＦ固定
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Language) )               PORT_DIPLOCATION("SW 4:5")        // ＯＦＦ固定
+	PORT_DIPSETTING(    0x10, DEF_STR(Japanese) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Chinese) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW 4:6" )                                                // ＯＦＦ固定
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Service_Mode) )           PORT_DIPLOCATION("SW 4:7")        // ＯＦＦ固定
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x80, "Show Statistics (Debug)" )       PORT_DIPLOCATION("SW 4:8" )       // ＯＦＦ固定
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x08, 0x00, "Renchan Rate" )                  PORT_DIPLOCATION("SW 2:10")       // 連荘レート
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -4016,13 +4106,13 @@ static INPUT_PORTS_START( mjreach )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )      // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
@@ -4140,13 +4230,13 @@ static INPUT_PORTS_START( gekisha )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  )   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
@@ -4922,13 +5012,15 @@ void dynax_state::tenkai(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	LS259(config, m_mainlatch); // 10C on Ougon no Hai
+	LS259(config, m_mainlatch); // 10C on Ougon no Pai
 	m_mainlatch->q_out_cb<0>().set(FUNC(dynax_state::flipscreen_w)).invert();
 	m_mainlatch->q_out_cb<1>().set(FUNC(dynax_state::layer_half_w));
 	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w));
 	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_state::tenkai_6c_w));
 	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_state::tenkai_70_w));
 	m_mainlatch->q_out_cb<7>().set(FUNC(dynax_state::tenkai_blitter_ack_w));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -5129,6 +5221,10 @@ ROM_START( cdracula )
 	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
 	ROM_LOAD( "82s147an.u26", 0x000, 0x200, CRC(1a3fe146) SHA1(7d1b4dd66fc95ea5ed584f0bb571cca09fe519b0) ) // FIXED BITS (00xxxxxx)
 	ROM_LOAD( "82s147an.u25", 0x200, 0x200, CRC(31791990) SHA1(526c0d516f290dc6cc2ec76d9bcec8c900e2ae10) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "pal16l8acn.u47",  0x000, 0x117, CRC(fab530ca) SHA1(1cf8bd6e72f8a85dbf103a13478d31a36564517c) )
+	ROM_LOAD( "pal16l8acn.u246", 0x200, 0x117, CRC(f65ec383) SHA1(38c2678c6b9cfa44f2ba35b21d1177a2939bac76) )
 ROM_END
 
 
@@ -7048,7 +7144,7 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Ougon no Hai
+Mahjong 黄金の牌 (Ougon no Pai)
 DYNAX D6209038L1-0
 
 AY-3-8910A, YM2413, rest of the chips are scratched
@@ -7072,7 +7168,7 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Ougon no Hai (bootleg, PCB is not working)
+Mahjong 黄金の牌 (Ougon no Pai) (bootleg, PCB is not working)
 
 PCB Layout
 ----------
@@ -7443,10 +7539,10 @@ GAME( 1991, tenkai2b,   tenkai,   tenkai,     tenkai,   dynax_state,       empty
 GAME( 1991, tenkaibb,   tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Tenkaigen (Japan bootleg b)",                           MACHINE_SUPPORTS_SAVE ) // FIXME: check if "b" is a PCB rev. letter
 GAME( 1991, tenkaicb,   tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Tenkaigen (Japan bootleg c)",                           MACHINE_SUPPORTS_SAVE ) // FIXME: check if "c" is a PCB rev. letter
 GAME( 1991, tenkaie,    tenkai,   tenkai,     tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tenkaigen (Japan set 2)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhai,   0,        ougonhai,   tenkai,   dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Ougon no Hai (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // FIXME: correct TMP90840 hookup, confirm being a medal game as well
-GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, tenkai,   dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Hai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhai,   0,        ougonhai,   ougonhai, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Ougon no Pai (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // FIXME: correct TMP90840 hookup, confirm being a medal game as well
+GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreach,    0,        mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00)",                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver. 1.00, bootleg)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachp2,  mjreach,  mjreachp2,  mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach Part II (Ver. D88)",                              MACHINE_SUPPORTS_SAVE )

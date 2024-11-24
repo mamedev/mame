@@ -145,6 +145,7 @@ DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "MC6809 (legacy)")
 m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, int divider) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_lic_func(*this),
+	m_vector_read_func(*this, 0),
 	m_syncack_write_func(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16),
 	m_sprogram_config("decrypted_opcodes", ENDIANNESS_BIG, 8, 16),

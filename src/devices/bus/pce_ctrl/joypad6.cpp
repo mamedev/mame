@@ -134,7 +134,7 @@ INPUT_PORTS_START( pce_joypad6 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("%p Button VI")
 
 	PORT_START("JOY_MODE")
-	PORT_CONFNAME( 0x01, 0x00, "Joypad Mode" ) PORT_CHANGED_MEMBER(DEVICE_SELF, pce_joypad6_base_device, joypad_mode_changed, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Joypad Mode" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pce_joypad6_base_device::joypad_mode_changed), 0)
 	PORT_CONFSETTING( 0x00, "2-buttons mode" ) // A at avenue pad 6
 	PORT_CONFSETTING( 0x01, "6-buttons mode" ) // B at avenue pad 6
 INPUT_PORTS_END

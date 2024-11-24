@@ -201,6 +201,26 @@ ROM_START( blackbdb )
 	ROM_LOAD( "blackbeard  ru_04b.img", 0x0000, 0x3e20000, CRC(cadbaa2b) SHA1(15033bffedd173622d50ac0adf99e257c207748c) )
 ROM_END
 
+// AMD Geode CS5530A-UCE, SMC FDC37C932APM, DM9102AF, Compact Flash. Sub board with ROMs, ASTRO M and ASTRO V102PX-018 customs
+ROM_START( blackbdu )
+	// GAME NAME : BLACK BEARD GAMES
+	// TYPE = MULTI-LINER
+	// DEVELOPER   : ASTRO CORP.
+	ROM_REGION32_LE(0x40000, "pci:12.0", 0)
+	ROM_LOAD( "phoenixbios_e686.u16", 0x0000, 0x040000, CRC(885e3cde) SHA1(ff90cda4383a119c7f54545c11fa432505e66c1b) )
+
+	ROM_REGION(0x20000, "rom", 0)
+	ROM_LOAD16_BYTE( "1_bbsh-111.rom1", 0x00000, 0x010000, CRC(4e5388a9) SHA1(929e3a03c4f94768a03f51b243d169d2991775cd) )
+	ROM_LOAD16_BYTE( "2_bbsh-111.rom2", 0x00001, 0x010000, CRC(c63e4927) SHA1(428272fd5d8eceecd878f5c82e7ce1458631c005) )
+
+	ROM_REGION(0x8000000, "drive", 0)
+	ROM_LOAD( "blackbeard_us.00.img", 0x0000, 0x3e20000, CRC(c7421ac2) SHA1(51ccafd03377e5dbdb6591292f05bc984d761d79) )
+
+	ROM_REGION(0x100, "others", 0)
+	ROM_LOAD( "at93c46.u120", 0x00, 0x80, CRC(c9330682) SHA1(0ba0635690e413a2088421ac67ea113923e73d60) )
+	ROM_LOAD( "at93c46.u24",  0x80, 0x80, CRC(cf424e35) SHA1(8ac72aec0ea212b06341686a89a7ceba1646ac5b) )
+ROM_END
+
 ROM_START( dslayrr )
 	// TITLE = DRAGON_SLAYER
 	// TYPE = MULTI-LINER
@@ -309,7 +329,7 @@ ROM_END
 // Astro ROHS (GFX chip?) and 2x LY621024SL RAMs.
 
 
-// main PCB: unmarked with AMD Geode CS5536AD, W83627HG-AW IOC, RTL8100C ethernet controller, big heat-sinked chip,
+// main PCB: unmarked with AMD Geode CS5536AD, W83627HG-AW IOC, RTL8100C ethernet controller, AMD GEODE ALXD800EEXJ2VD (heat-sinked),
 // 4x HY5DU121622CTP SRAM (mounted on SO-DIMM), Realtek ALC203 + Yamaha YDA138-E (mounted on Yamaha_Audio_A riser board)
 // with 24.576 MHz XTAL, Trascend Compact Flash
 ROM_START( carnivac )
@@ -324,8 +344,8 @@ ROM_START( carnivac )
 	ROM_LOAD( "carnival_us.004.d.img", 0x0000, 0xf618000, CRC(566b9fbf) SHA1(14364b05151db60b1882c2230d896ac8c632395b) )
 ROM_END
 
-// main PCB: Astro AS-LX800 A5 with AMD Geode CS5536AD, big heat-sinked chip, 4x HY5DU121622CTP SRAM (directly on PCB),
-// Realtek ALC203 + Yamaha YDA138-E with 24.576 MHz XTAL (directly on PCB), Trascend Compact Flash
+// main PCB: Astro AS-LX800 A5 with AMD Geode CS5536AD, RTL8100C ethernet controller, AMD GEODE ALXD800EEXJ2VD (heat-sinked),
+// 4x HY5DU121622CTP SRAM (directly on PCB), Realtek ALC203 + Yamaha YDA138-E with 24.576 MHz XTAL (directly on PCB), Trascend Compact Flash
 ROM_START( santacl )
 	ROM_REGION32_LE(0x80000, "pci:12.0", 0)
 	ROM_LOAD( "phoenixbios.u30", 0x00000, 0x80000, CRC(4e24ffdb) SHA1(8b4bba02183da5eae27755b86eca830d06fe05ae) )
@@ -351,6 +371,7 @@ void astropc_state::init_astropc()
 GAME( 2005,  blackbd,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (Russia, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005?, blackbda, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (Russia, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005,  blackbdb, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (Russia, set 3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005,  blackbdu, blackbd, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Black Beard (US.00, 2005/03/14)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 2005,  dslayrr,  0,       astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Dragon Slayer (Russia, v15.B, 2005/08/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2006,  dslayrra, dslayrr, astropc, astropc, astropc_state, init_astropc, ROT0, "Astro Corp.", "Dragon Slayer (Russia, v16.B, 2005/11/10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

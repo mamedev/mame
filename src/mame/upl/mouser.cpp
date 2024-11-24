@@ -6,6 +6,8 @@
 
      Driver by Frank Palazzolo (palazzol@comcast.net)
 
+     Hardware is extremely similar to nichibutsu/cclimber.cpp (possibly derived)
+
     - This driver was done with only flyer shots to go by.
     - Colors are a good guess (might be perfect)
     - Clock and interrupt speeds for the sound CPU is a guess, but seem

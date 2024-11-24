@@ -74,7 +74,7 @@ void cle68k_state::video_start()
 
 void cle68k_state::program_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();
+	map(0x000000, 0x07ffff).rom();
 	map(0x180000, 0x180fff).ram();
 	map(0x181000, 0x181fff).ram();
 	map(0x182000, 0x182fff).ram();
@@ -230,7 +230,7 @@ void cle68k_state::cle68k(machine_config &config)
 
 
 ROM_START( dmndhrt )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "diamond_heart_u.s.a_u8.u8", 0x00000, 0x20000, CRC(d1f340ce) SHA1(7567448c8694bb24f7957bb461d3be51d138634a) )
 	ROM_LOAD16_BYTE( "diamond_heart_u.s.a_u3.u3", 0x00001, 0x20000, CRC(78885bb8) SHA1(51e360036d32b609b4036be086549c011ab41fe3) )
 
@@ -249,8 +249,50 @@ ROM_START( dmndhrt )
 	ROM_LOAD( "palce20v8h_4", 0x600, 0x157, NO_DUMP )
 ROM_END
 
+ROM_START( dmndhrtn ) // u51 was scratched for this set but believed to be AT90S4414, too
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "w27e010.u8", 0x00000, 0x20000, CRC(2a1ba91e) SHA1(af340d9e0aa7874669557067a9e043eecdf5301b) ) // no sticker
+	ROM_LOAD16_BYTE( "w27e010.u3", 0x00001, 0x20000, CRC(cdb26ff2) SHA1(33ddda977a5f6436a690fa53763f36c7e6acfb94) ) // no sticker
+
+	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_LOAD( "diamond_heart_new_mon_v20.0_u10.u10", 0x00000, 0x80000, CRC(7525bd95) SHA1(b34ab59bde9ecdfe03489a6eceda2c95afdee6c8) )
+	ROM_LOAD( "diamond_heart_new_mon_v20.0_u11.u11", 0x80000, 0x80000, CRC(1ffc66a6) SHA1(fd5bfa9ec01ad7aa3060929dbce417babe241700) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "f29c51002t.u33", 0x00000, 0x40000, CRC(97f774cd) SHA1(7c5a1c4a0e7cfb71e24d174c43a83735abfc59c8) ) // no sticker
+
+	// PAL locations not readable
+	ROM_REGION( 0x800, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal20v8b_1", 0x000, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b_2", 0x200, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b_3", 0x400, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b_4", 0x600, 0x157, NO_DUMP )
+ROM_END
+
+ROM_START( honeybee ) // u51 was scratched for this set but believed to be AT90S4414, too
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "honey_bee_hb_tw_u8.u8", 0x00000, 0x40000, CRC(1e7e53a3) SHA1(30d426cca499adf82338ba6cc1391f754e908a5b) )
+	ROM_LOAD16_BYTE( "honey_bee_hb_tw_u3.u3", 0x00001, 0x40000, CRC(0ed5f0cc) SHA1(f64c27f04f74162027070f889daaec6f1847f19e) )
+
+	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_LOAD( "honey_bee_hb_tw_u10.u10", 0x00000, 0x80000, CRC(40526fe1) SHA1(58a3a16c4dc0fa6527571b924f43377657f0cc76) )
+	ROM_LOAD( "honey_bee_hb_tw_u11.u11", 0x80000, 0x80000, CRC(3036a082) SHA1(16393fac3ccd5c2fc6ab9fd11f8530aace94e4fc) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "honey_bee_hb_tw_u33.u33", 0x00000, 0x40000, CRC(a85f1bfc) SHA1(c2b83a2570280a43241b89fdb21e87c8cf033409) )
+
+	// PAL locations not readable
+	ROM_REGION( 0x800, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal20v8b_1", 0x000, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b_2", 0x200, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b_3", 0x400, 0x157, NO_DUMP )
+	ROM_LOAD( "gal20v8b_4", 0x600, 0x157, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
 // TODO: possibly licensed to LSE, verify once it works
-GAME( 2001, dmndhrt, 0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "CLE", "Diamond Heart (v1.0)", MACHINE_IS_SKELETON ) // 2001/02/15
+GAME( 2001, dmndhrt,  0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "LSE", "Diamond Heart (v1.06)",     MACHINE_IS_SKELETON ) // 2001/02/15
+GAME( 2003, dmndhrtn, 0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "CLE", "Diamond Heart New (v20.0)", MACHINE_IS_SKELETON ) // 2003/04/25
+GAME( 2004, honeybee, 0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "LSE", "Honey-Bee (v3.0)",          MACHINE_IS_SKELETON ) // 2004/07/01

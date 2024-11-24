@@ -101,6 +101,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_alpha_8201(*this, "alpha_8201"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
+		m_dsw(*this, "DSW"),
 		m_videoram(*this, "videoram")
 	{ }
 
@@ -124,6 +127,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<alpha_8201_device> m_alpha_8201;
+	required_ioport m_p1, m_p2, m_dsw;
 
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -260,9 +264,9 @@ void shougi_state::main_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram(); /* 2114 x 2 (0x400 x 4bit each) */
 	map(0x4800, 0x480f).w("mainlatch", FUNC(ls259_device::write_a3));
-	map(0x4800, 0x4800).portr("DSW");
-	map(0x5000, 0x5000).portr("P1");
-	map(0x5800, 0x5800).portr("P2").w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* game won't boot if watchdog doesn't work */
+	map(0x4800, 0x4800).portr(m_dsw);
+	map(0x5000, 0x5000).portr(m_p1);
+	map(0x5800, 0x5800).portr(m_p2).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* game won't boot if watchdog doesn't work */
 	map(0x6000, 0x6000).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x6800, 0x6800).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x7000, 0x73ff).rw(m_alpha_8201, FUNC(alpha_8201_device::ext_ram_r), FUNC(alpha_8201_device::ext_ram_w));

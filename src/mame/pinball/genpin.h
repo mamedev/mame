@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-#ifndef GENPIN_H_
-#define GENPIN_H_
+#ifndef MAME_PINBALL_GENPIN_H
+#define MAME_PINBALL_GENPIN_H
 
+#pragma once
 
 #include "sound/samples.h"
 #include "machine/nvram.h"
@@ -46,4 +47,4 @@ public:
 };
 
 
-#endif /* GENPIN_H_ */
+#endif // MAME_PINBALL_GENPIN_H

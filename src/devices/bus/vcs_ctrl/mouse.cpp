@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(VCS_MOUSE, vcs_mouse_device, "vcs_mouse", "Atari / CBM Mouse"
 static INPUT_PORTS_START( vcs_mouse )
 	PORT_START("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_WRITE_LINE_MEMBER(vcs_mouse_device, trigger_w)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_WRITE_LINE_MEMBER(FUNC(vcs_mouse_device::trigger_w))
 	PORT_BIT( 0xde, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("POTX")

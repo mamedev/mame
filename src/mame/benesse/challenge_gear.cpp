@@ -4,6 +4,7 @@
 #include "emu.h"
 
 #include "cpu/olms66k/msm665xx.h"
+#include "video/sed1520.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -54,12 +55,13 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 private:
-	uint32_t screen_update_challenge_gear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	NT7502_UPDATE_CB(lcd_update);
+
 	void program_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	//required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -76,18 +78,21 @@ DEVICE_IMAGE_LOAD_MEMBER( challenge_gear_state::cart_load )
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-void challenge_gear_state::video_start()
+NT7502_UPDATE_CB( challenge_gear_state::lcd_update )
 {
-}
-
-uint32_t challenge_gear_state::screen_update_challenge_gear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
+	// TODO
 	return 0;
 }
 
 void challenge_gear_state::program_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom().region("maincpu", 0);
+}
+
+void challenge_gear_state::data_map(address_map &map)
+{
+	map.global_mask(0xffff);
+	map(0x8000, 0x8001).rw("lcdc", FUNC(nt7502_device::read), FUNC(nt7502_device::write));
 }
 
 static INPUT_PORTS_START( challenge_gear )
@@ -105,16 +110,28 @@ void challenge_gear_state::machine_reset()
 void challenge_gear_state::challenge_gear(machine_config &config)
 {
 	/* basic machine hardware */
-	msm665xx_device &maincpu(MSM66573(config, "maincpu", 14'000'000));
+	msm665xx_device &maincpu(MSM66573(config, "maincpu", 4_MHz_XTAL)); // 100-lead square glob (type guessed); XL2 = 4.00H
+	//maincpu.set_xtclk(32.768_kHz_XTAL);
 	maincpu.set_addrmap(AS_PROGRAM, &challenge_gear_state::program_map);
+	maincpu.set_addrmap(AS_DATA, &challenge_gear_state::data_map);
+	// P6.5 <-> I2C SDA
+	// P6.6 -> I2C SCL
+	// P8 -> key matrix -> P10
 
-	/* video hardware - this is incorrect, but it does have a screen */
+	//I2C_24C16(config, "eeprom"); // "BR24C16FV" silkscreened on PCB
+
+	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 256-1, 16, 256-16-1);
-	screen.set_screen_update(FUNC(challenge_gear_state::screen_update_challenge_gear));
+	screen.set_size(100, 64);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
+	screen.set_screen_update("lcdc", FUNC(nt7502_device::screen_update));
+
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+
+	NT7502(config, "lcdc").set_screen_update_cb(FUNC(challenge_gear_state::lcd_update));
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "challenge_gear_cart", "bin"));
 	cartslot.set_device_load(FUNC(challenge_gear_state::cart_load));

@@ -172,7 +172,8 @@ template<int N>
 void royal_state::lcd_segs_w(u8 data)
 {
 	// R0x,R6x-R8x: LCD segment data
-	m_lcd_segs = (m_lcd_segs & ~(0xf << (N*4))) | (data << (N*4));
+	const u8 shift = N * 4;
+	m_lcd_segs = (m_lcd_segs & ~(0xf << shift)) | (data << shift);
 	update_lcd();
 }
 
@@ -268,7 +269,7 @@ static INPUT_PORTS_START( granada )
 	PORT_INCLUDE( royal )
 
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x01, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, royal_state, granada_change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x01, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(royal_state::granada_change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3.58MHz (1992 version)" )
 	PORT_CONFSETTING(    0x01, "4MHz (1988 version)" )
 INPUT_PORTS_END
@@ -277,7 +278,7 @@ static INPUT_PORTS_START( supra )
 	PORT_INCLUDE( royal )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, royal_state, supra_on_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(royal_state::supra_on_button), 0)
 INPUT_PORTS_END
 
 

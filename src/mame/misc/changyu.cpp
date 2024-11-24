@@ -47,6 +47,7 @@ main PCB (marked 9101):
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
 #include "sound/ymopl.h"
@@ -108,6 +109,7 @@ public:
 	changyu2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: changyu_state(mconfig, type, tag)
 		, m_mcu_response_latch(*this, "mcu_response")
+		, m_hopper(*this, "hopper")
 	{
 	}
 
@@ -129,6 +131,7 @@ private:
 	TIMER_CALLBACK_MEMBER(set_mcu_cmd);
 
 	required_device<generic_latch_8_device> m_mcu_response_latch;
+	required_device<hopper_device> m_hopper;
 
 	u8 m_mcu_cmd = 0;
 };
@@ -188,6 +191,7 @@ void changyu2_state::mcu_cmd_w(u8 data)
 void changyu2_state::mcu_ctrl_w(u8 data)
 {
 	// other bits unknown
+	m_hopper->motor_w(BIT(data, 4));
 	m_mcu->set_input_line(MCS51_INT0_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -367,7 +371,7 @@ static INPUT_PORTS_START( changyu2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Bet 2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Bet 3")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 
 	PORT_START("IN3")
@@ -473,6 +477,8 @@ void changyu2_state::changyu2(machine_config &config)
 	mcu.port_in_cb<0>().set(FUNC(changyu2_state::mcu_p1_r));
 
 	GENERIC_LATCH_8(config, m_mcu_response_latch);
+
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.9);
 }

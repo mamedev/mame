@@ -1,0 +1,327 @@
+// license:BSD-3-Clause
+// copyright-holders:AJR
+/**********************************************************************
+
+    TIM-011 94-key keyboard
+
+    This detached serial keyboard uses a Serbo-Croatian QWERTY layout.
+    Diagrams show a row of 8 LEDs above the function keys.
+
+    The host transmits and receives data at 9600 bps, 8 data bits,
+    even parity. Schematics suggest that EIA logic levels are used.
+    Key repeat and click are programmable.
+
+    Most ASCII codes are supported, including NUL and DEL, except for
+    a few punctuation symbols that the host has to regenerate. The
+    non-ASCII codes sent by the keyboard are as follows:
+
+        80       Set Up
+        AD       Ć
+        B0       Ž
+        BB       Š
+        BC       Đ
+        BD*      ć
+        BE       Č
+        C0*      ž
+        C1       ↑
+        C2       ↓
+        C3       →
+        C4       ←
+        CB*      š
+        CC*      đ
+        CD       Enter (keypad)
+        CE*      č
+        D0       PF1
+        D1       PF2
+        D2       PF3
+        D3       PF4
+        D4       F1
+        D5       F2
+        D6       F3
+        D7       F4
+        D8       F5
+        D9       F6
+        DA       F7
+        DB       F8
+        DC       F9
+        DD       F10
+        DE       F11
+        DF       Ctl+Copy
+        EC       , (keypad)
+        ED       - (keypad)
+        EE       . (keypad)
+        F0       0 (keypad)
+        F1       1 (keypad)
+        F2       2 (keypad)
+        F3       3 (keypad)
+        F4       4 (keypad)
+        F5       5 (keypad)
+        F6       6 (keypad)
+        F7       7 (keypad)
+        F8       8 (keypad)
+        F9       9 (keypad)
+        FA       Brk
+        FB       Ctl+Brk
+
+    Codes marked with * are replaced with ordinary ASCII codes when
+    Caps is on (which is the default state after reset).
+
+    The Copy key transmits no code except when pressed with Ctl.
+
+    TIM-100 may have a similar though not quite compatible keyboard.
+
+    TODO: Keyclick is not adequately understood.
+
+**********************************************************************/
+
+#include "emu.h"
+#include "tim011_kbd.h"
+
+#include "cpu/cosmac/cosmac.h"
+#include "speaker.h"
+
+
+// device type definition
+DEFINE_DEVICE_TYPE(TIM011_KEYBOARD, tim011_keyboard_device, "tim011_kbd", "TIM-011 Keyboard")
+
+tim011_keyboard_device::tim011_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, TIM011_KEYBOARD, tag, owner, clock)
+	, m_keybcpu(*this, "keybcpu")
+	, m_speaker(*this, "speaker")
+	, m_leds(*this, "led%d", 0U)
+	, m_txd_callback(*this)
+	, m_shifter(0)
+{
+}
+
+void tim011_keyboard_device::device_resolve_objects()
+{
+	m_leds.resolve();
+}
+
+void tim011_keyboard_device::device_start()
+{
+	save_item(NAME(m_shifter));
+}
+
+void tim011_keyboard_device::write_rxd(int state)
+{
+	m_keybcpu->set_input_line(COSMAC_INPUT_LINE_INT, !state);
+	m_keybcpu->set_input_line(COSMAC_INPUT_LINE_EF1, !state);
+}
+
+void tim011_keyboard_device::q_w(int state)
+{
+	m_txd_callback(!state);
+}
+
+void tim011_keyboard_device::shift_w(u8 data)
+{
+	if (std::exchange(m_shifter, m_shifter >> 1 | data << 7) & 0x01)
+	{
+		for (int i = 0; i < 8; i++)
+			m_leds[i] = !BIT(m_shifter, i);
+		m_shifter = 0x80;
+	}
+}
+
+void tim011_keyboard_device::reset_w(u8 data)
+{
+	m_shifter = 0x80;
+}
+
+void tim011_keyboard_device::speaker_off_w(u8 data)
+{
+	m_speaker->level_w(0);
+}
+
+void tim011_keyboard_device::speaker_on_w(u8 data)
+{
+	m_speaker->level_w(1);
+}
+
+void tim011_keyboard_device::keyboard_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom().region("keyboard", 0);
+	map(0x0800, 0x0fff).nopr(); // only used during initial sound output; possibly mirrors ROM
+	map(0x8000, 0x8000).mirror(0x7f00).portr("KEY0");
+	map(0x8001, 0x8001).mirror(0x7f00).portr("KEY1");
+	map(0x8002, 0x8002).mirror(0x7f00).portr("KEY2");
+	map(0x8003, 0x8003).mirror(0x7f00).portr("KEY3");
+	map(0x8004, 0x8004).mirror(0x7f00).portr("KEY4");
+	map(0x8005, 0x8005).mirror(0x7f00).portr("KEY5");
+	map(0x8006, 0x8006).mirror(0x7f00).portr("KEY6");
+	map(0x8007, 0x8007).mirror(0x7f00).portr("KEY7");
+	map(0x8008, 0x8008).mirror(0x7f00).portr("KEY8");
+	map(0x8009, 0x8009).mirror(0x7f00).portr("KEY9");
+	map(0x800a, 0x800a).mirror(0x7f00).portr("KEYA");
+	map(0x800b, 0x800b).mirror(0x7f00).portr("KEYB");
+	map(0x800c, 0x800c).mirror(0x7f00).portr("KEYC");
+	map(0x800d, 0x800f).mirror(0x7f00).lr8(NAME([] () { return 0xff; }));
+	map(0x0000, 0x0000).mirror(0xffff).w(FUNC(tim011_keyboard_device::shift_w));
+}
+
+void tim011_keyboard_device::keyboard_io(address_map &map)
+{
+	map(1, 1).w(FUNC(tim011_keyboard_device::speaker_on_w));
+	map(2, 2).w(FUNC(tim011_keyboard_device::reset_w));
+	map(6, 6).w(FUNC(tim011_keyboard_device::speaker_off_w));
+}
+
+static INPUT_PORTS_START(tim011_keyboard)
+	PORT_START("KEY0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Đ") PORT_CHAR('\\', U'đ') PORT_CHAR('|', U'Đ') PORT_CHAR(0x1c) PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('+') PORT_CHAR('*') PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-  _") PORT_CHAR('-') PORT_CHAR('_') PORT_CHAR(0x1f) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Č") PORT_CHAR('^', U'č') PORT_CHAR('~', U'Č') PORT_CHAR(0x1e) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Š") PORT_CHAR('[', U'š') PORT_CHAR('{', U'Š') PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('/') PORT_CHAR('?') PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F11)) PORT_CODE(KEYCODE_F11)
+
+	PORT_START("KEY1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Brk") PORT_CODE(KEYCODE_INSERT)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('.') PORT_CHAR(':') PORT_CODE(KEYCODE_STOP)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR(0x0c) PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P") PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR(0x10) PORT_CODE(KEYCODE_P)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('0') PORT_CHAR('=') PORT_CODE(KEYCODE_0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CODE(KEYCODE_F10)
+
+	PORT_START("KEY2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) // excluded from scan
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Ž") PORT_CHAR('@', U'ž') PORT_CHAR('`', U'Ž') PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Ć") PORT_CHAR(']', U'ć') PORT_CHAR('}', U'Ć') PORT_CHAR(0x1d) PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(',') PORT_CHAR(';') PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K") PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR(0x0b) PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O") PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(0x0f) PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('9') PORT_CHAR(')') PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F9)) PORT_CODE(KEYCODE_F9)
+
+	PORT_START("KEY3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LF") PORT_CHAR(0x0a) PORT_CODE(KEYCODE_RALT)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED) // excluded from scan
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CHAR('m') PORT_CHAR('M') PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J") PORT_CHAR('j') PORT_CHAR('J') PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CHAR('i') PORT_CHAR('I') PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('8') PORT_CHAR('(') PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F8)) PORT_CODE(KEYCODE_F8)
+
+	PORT_START("KEY4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BS") PORT_CHAR(0x08) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED) // scanned but produces no code
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N") PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(0x0e) PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H") PORT_CHAR('h') PORT_CHAR('H') PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U") PORT_CHAR('u') PORT_CHAR('U') PORT_CHAR(0x15) PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('7') PORT_CHAR('\'') PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_CODE(KEYCODE_F7)
+
+	PORT_START("KEY5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED) // excluded from scan
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ret") PORT_CHAR(0x0d) PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(0x20) PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR(0x02) PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CHAR('g') PORT_CHAR('G') PORT_CHAR(0x07) PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y") PORT_CHAR('y') PORT_CHAR('Y') PORT_CHAR(0x19) PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F6)) PORT_CODE(KEYCODE_F6)
+
+	PORT_START("KEY6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy") PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED) // excluded from scan
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V") PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR(0x16) PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CHAR('f') PORT_CHAR('F') PORT_CHAR(0x06) PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T") PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR(0x14) PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('6') PORT_CHAR('&') PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CODE(KEYCODE_F5)
+
+	PORT_START("KEY7")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF1") PORT_CODE(KEYCODE_NUMLOCK)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD)) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR(0x03) PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CHAR('d') PORT_CHAR('D') PORT_CHAR(0x04) PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR(0x12) PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('5') PORT_CHAR('%') PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CODE(KEYCODE_F4)
+
+	PORT_START("KEY8")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF2") PORT_CODE(KEYCODE_EQUALS_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(5_PAD)) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('4') PORT_CHAR('$') PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CHAR('e') PORT_CHAR('E') PORT_CHAR(0x05) PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S") PORT_CHAR('s') PORT_CHAR('S') PORT_CHAR(0x13) PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X") PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0x18) PORT_CODE(KEYCODE_X)
+
+	PORT_START("KEY9")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) // excluded from scan
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('3') PORT_CHAR('#') PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W") PORT_CHAR('w') PORT_CHAR('W') PORT_CHAR(0x17) PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CHAR('a') PORT_CHAR('A') PORT_CHAR(0x01) PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z") PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(0x1a) PORT_CODE(KEYCODE_Z)
+
+	PORT_START("KEYA")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) PORT_CODE(KEYCODE_DEL_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD)) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('<') PORT_CHAR('>') PORT_CODE(KEYCODE_BACKSLASH2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_CODE(KEYCODE_CAPSLOCK)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q") PORT_CHAR('q') PORT_CHAR('Q') PORT_CHAR(0x11) PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('2') PORT_CHAR('"') PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CODE(KEYCODE_F1)
+
+	PORT_START("KEYB")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF3") PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Set Up") PORT_CODE(KEYCODE_ESC)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('1') PORT_CHAR('!') PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CHAR(0x09) PORT_CODE(KEYCODE_TAB)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED) // excluded from scan
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CHAR(UCHAR_SHIFT_1) PORT_CODE(KEYCODE_LSHIFT)
+
+	PORT_START("KEYC")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("PF4") PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) PORT_CODE(KEYCODE_MINUS_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD)) PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED) // scanned but produces no code
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctl") PORT_CHAR(UCHAR_SHIFT_2) PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // excluded from scan
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CHAR(0x1b) PORT_CODE(KEYCODE_TILDE)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) // excluded from scan
+INPUT_PORTS_END
+
+ioport_constructor tim011_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(tim011_keyboard);
+}
+
+void tim011_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	cdp1802_device &keybcpu(CDP1802(config, m_keybcpu, 2'000'000)); // unknown clock (208 * baud rate)
+	keybcpu.set_addrmap(AS_PROGRAM, &tim011_keyboard_device::keyboard_mem);
+	keybcpu.set_addrmap(AS_IO, &tim011_keyboard_device::keyboard_io);
+	keybcpu.q_cb().set(FUNC(tim011_keyboard_device::q_w));
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+ROM_START(tim011_kbd)
+	ROM_REGION(0x1000, "keyboard", 0)
+	ROM_LOAD("keyb_tim011.bin", 0x0000, 0x1000, CRC(a99c40a6) SHA1(d6d505271d91df4e079ec3c0a4abbe75ae9d649b)) // 1st and 2nd halves identical
+ROM_END
+
+const tiny_rom_entry *tim011_keyboard_device::device_rom_region() const
+{
+	return ROM_NAME(tim011_kbd);
+}

@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef MAME_BUS_ISA_S3VIRGE_H
-#define MAME_BUS_ISA_S3VIRGE_H
+#ifndef MAME_VIDEO_S3VIRGE_H
+#define MAME_VIDEO_S3VIRGE_H
 
 #pragma once
 
@@ -230,4 +230,4 @@ DECLARE_DEVICE_TYPE(S3VIRGE,    s3virge_vga_device)
 DECLARE_DEVICE_TYPE(S3VIRGEDX,  s3virgedx_vga_device)
 DECLARE_DEVICE_TYPE(S3VIRGEDX1, s3virgedx_rev1_vga_device)
 
-#endif // MAME_BUS_ISA_S3VIRGE_H
+#endif // MAME_VIDEO_S3VIRGE_H

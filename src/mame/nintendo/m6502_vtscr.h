@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_M6502_VTSCR_H
-#define MAME_CPU_M6502_VTSCR_H
+#ifndef MAME_NINTENDO_M6502_VTSCR_H
+#define MAME_NINTENDO_M6502_VTSCR_H
 
 #pragma once
 
@@ -55,4 +55,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(M6502_VTSCR, m6502_vtscr)
 
-#endif // MAME_CPU_M6502_VTSCR_H
+#endif // MAME_NINTENDO_M6502_VTSCR_H

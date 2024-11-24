@@ -151,8 +151,8 @@ static INPUT_PORTS_START( honooinv ) // no dips on PCB, game options selectable 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("Crt-Key") // in I/O test
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW ) // 'Operate Sw' in test mode
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3) PORT_NAME("All Clear Sw") // in I/O test
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_h_r)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::opto_h_r))
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::opto_l_r))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // in I/O test
 
 	PORT_START("IN3")
@@ -166,7 +166,7 @@ static INPUT_PORTS_START( honooinv ) // no dips on PCB, game options selectable 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4) PORT_NAME("Open-R") // in pinpanel test
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::coin_sense_w))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bubbroul )
@@ -185,13 +185,13 @@ static INPUT_PORTS_START( bubbroul )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON7 ) PORT_NAME("100 Yen Switch")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_h_r)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::opto_h_r))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::opto_l_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::coin_sense_w))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( packysts )
@@ -210,13 +210,13 @@ static INPUT_PORTS_START( packysts )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_NAME("100 Yen Switch")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_h_r)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::opto_h_r))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::opto_l_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::coin_sense_w))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sbmjb ) // no dips on PCB, game options selectable in test mode
@@ -235,13 +235,13 @@ static INPUT_PORTS_START( sbmjb ) // no dips on PCB, game options selectable in 
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) // Hopper Sensor, active high or it will stop booting due to hopper related problems
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON7 ) PORT_NAME("100 Yen Switch")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_h_r)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::opto_h_r))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::opto_l_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // No effect in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // No effect in test mode
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::coin_sense_w))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rendfgtr )
@@ -260,13 +260,13 @@ static INPUT_PORTS_START( rendfgtr )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_NAME("100 Yen Switch")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_h_r)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::opto_h_r))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::opto_l_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::coin_sense_w))
 INPUT_PORTS_END
 
 

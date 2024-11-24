@@ -1520,16 +1520,16 @@ static INPUT_PORTS_START( amiga )
 	PORT_CONFSETTING(0x20, DEF_STR(Joystick) )
 
 	PORT_START("cia_0_port_a")
-	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(amiga_state, floppy_drive_status)
+	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(amiga_state::floppy_drive_status))
 	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_BUTTON1) PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_BUTTON1) PORT_PLAYER(2)
 
 	PORT_START("joy_0_dat")
-	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(amiga_state, amiga_joystick_convert<0>)
+	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(amiga_state::amiga_joystick_convert<0>))
 	PORT_BIT(0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("joy_1_dat")
-	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(amiga_state, amiga_joystick_convert<1>)
+	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(amiga_state::amiga_joystick_convert<1>))
 	PORT_BIT(0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("potgo")
@@ -1570,19 +1570,19 @@ INPUT_PORTS_START( cd32 )
 	PORT_MODIFY("cia_0_port_a")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM )
 	// this is the regular port for reading a single button joystick on the Amiga, many CD32 games require this to mirror the pad start button!
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cd32_state, cd32_sel_mirror_input<0>)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cd32_state, cd32_sel_mirror_input<1>)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(cd32_state::cd32_sel_mirror_input<0>))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(cd32_state::cd32_sel_mirror_input<1>))
 
 	PORT_MODIFY("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(amiga_state, amiga_joystick_convert<0>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(amiga_state::amiga_joystick_convert<0>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(amiga_state, amiga_joystick_convert<1>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(amiga_state::amiga_joystick_convert<1>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("potgo")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cd32_state, cd32_input)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(cd32_state::cd32_input))
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	// CD32 '11' button pad (4 dpad directions + 7 buttons), not read directly

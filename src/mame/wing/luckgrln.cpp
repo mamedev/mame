@@ -41,7 +41,7 @@
 
  2x 06B53P          28-pin PDIP     Unknown
  1x 06B30P          40-pin PDIP     Unknown
- 1x 101810P         64-pin SDIP     Unknown
+ 1x 101B10P         64-pin SDIP     Unknown
  1x HG62E11B10P     64-pin SDIP     Hitachi gate array (custom)
  1x CPU module      90-pin SDIP
 

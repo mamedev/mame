@@ -3,32 +3,33 @@
 // thanks-to:Richard Bush
 /***************************************************************************
 
-  Data East 16 bit games - Bryan McPhail, mish@tendril.co.uk
+Data East 16 bit games - Bryan McPhail, mish@tendril.co.uk
 
-    Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome use the 'MEC-M1'
+Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome use the 'MEC-M1'
 motherboard and varying game boards.  Sly Spy, Midnight Resistance and
 Boulder Dash use the same graphics chips but are different pcbs.
 
-    Bandit (USA) is almost certainly a field test prototype, the software runs
-    on a Heavy Barrel board with the original Heavy Barrel MCU (which is effectively
-    not used).  There is also Japanese version known to run on a DE-0321-1 top board.
+Bandit (USA) is almost certainly a field test prototype, the software runs
+on a Heavy Barrel board with the original Heavy Barrel MCU (which is effectively
+not used).  There is also Japanese version known to run on a DE-0321-1 top board.
 
-    There are Secret Agent (bootleg) and Robocop (bootleg) sets to add.
+There are Secret Agent (bootleg) and Robocop (bootleg) sets to add.
 
-    Thanks to Gouky & Richard Bush for information along the way, especially
-    Gouky's patch for Bad Dudes & YM3812 information!
-    Thanks to JC Alexander for fix to Robocop ending!
+Thanks to Gouky & Richard Bush for information along the way, especially
+Gouky's patch for Bad Dudes & YM3812 information!
+Thanks to JC Alexander for fix to Robocop ending!
 
-    All games' Dip Switches (except Boulder Dash) have been verified against
+All games' Dip Switches (except Boulder Dash) have been verified against
 Original Service Manuals and Service Mode (when available).
 
 
-ToDo:
+TODO:
 - Fix remaining graphical problems in Automat (bootleg);
 - Fix remaining sound problems in Secret Agent (bootleg);
 - graphics are completely broken in Secret Agent (bootleg);
 - Fighting Fantasy (bootleg) doesn't move on when killing the Lamia, is the MCU involved?
-- Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
+- Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover
+  from the Fighting Fantasy bootleg on the same PCB?)
 - Get rid of ROM patch in Hippodrome;
 - background pen in Birdie Try is presumably wrong;
 - Unemulated coin counter, manuals mentions it but nowhere to be found, HW triggered?
@@ -57,8 +58,6 @@ $3B), $07 (return table index if parameter matches table, otherwise reset), and
 $09 (set table index to zero).  Dragonninja only seems to use commands $03 (on
 startup), $07 (same function as Bad Dudes) and $09 (same function as Bad Dudes).
 Most of the MCU program isn't utilised.
-
-
 
 ***************************************************************************
 
@@ -374,11 +373,13 @@ Notes:
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m68705.h"
+#include "machine/input_merger.h"
 #include "machine/mb8421.h"
 #include "machine/upd4701.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
+
 #include "speaker.h"
 
 
@@ -1828,6 +1829,9 @@ void dec0_state::dec0(machine_config &config)
 	M6502(config, m_audiocpu, XTAL(12'000'000) / 8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec0_state::dec0_s_map);
 
+	input_merger_device &audio_irq(INPUT_MERGER_ANY_HIGH(config, "audio_irq"));
+	audio_irq.output_handler().set_inputline(m_audiocpu, 0);
+
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0)
 
@@ -1841,10 +1845,11 @@ void dec0_state::dec0(machine_config &config)
 	ym1.add_route(1, "mono", 0.81);
 	ym1.add_route(2, "mono", 0.81);
 	ym1.add_route(3, "mono", 0.32);
-	ym1.irq_handler().set_inputline(m_audiocpu, 0); // Schematics show both ym2203 and ym3812 can trigger IRQ, but Bandit is the only game to program 2203 to do so
+	// Schematics show both ym2203 and ym3812 can trigger IRQ, but Bandit is the only game to program 2203 to do so
+	ym1.irq_handler().set("audio_irq", FUNC(input_merger_device::in_w<0>));
 
 	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000) / 4));
-	ym2.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2.irq_handler().set("audio_irq", FUNC(input_merger_device::in_w<1>));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.72);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(20'000'000) / 2 / 10, okim6295_device::PIN7_HIGH));
@@ -4382,7 +4387,6 @@ GAME( 1990, bouldashj,  bouldash, slyspy,     bouldash,   slyspy_state,   init_s
 // more or less just an unprotected versions of the game, everything intact
 GAME( 1988, robocopb,   robocop,  robocopb,   robocop,    dec0_state, empty_init,      ROT0, "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, drgninjab,  baddudes, drgninjab,  drgninja,   dec0_state, init_drgninja,   ROT0, "bootleg", "Dragonninja (bootleg)", MACHINE_SUPPORTS_SAVE )
-
 
 // this is a common bootleg board
 GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state, empty_init,      ROT0, "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)

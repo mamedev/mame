@@ -69,6 +69,18 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="airbattl">
+		<description>Air Battle</description>
+		<year>2000</year>
+		<publisher>Daniel Bienvenu</publisher>
+		<info name="version" value="v0.4" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="23808">
+				<rom name="Air Battle V0.4 by Daniel Bienvenu (July 10) (2000) (PD).rom" size="23808" crc="7c66aba6" sha1="b3f191439440e9682183e703f9018f29fd1355f0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="antiair">
 		<description>AntiAir</description>
 		<year>2024</year>
@@ -180,6 +192,17 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="bejeweld_01" cloneof="bejeweld">
+		<description>Bejeweled (v2001)</description>
+		<year>2001</year>
+		<publisher>Daniel Bienvenu</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16640">
+				<rom name="bejeweled.rom" size="16640" crc="1ba0688f" sha1="031dc3902f6880e3b6ca043c74de6ba1f306237c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blackonx">
 		<description>The Black Onyx</description>
 		<year>2013</year>
@@ -231,6 +254,7 @@ Unoffical software releases for the Coleco Colecovision
 		<description>Breakout</description>
 		<year>1999</year>
 		<publisher>Amy Marie Bienvenu</publisher>
+		<info name="language" value="French" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="13696">
 				<rom name="breakout-1999.rom" size="13696" crc="b05fb3ec" sha1="2b25dc2ea0e2791662209537590886598b7ec85c" />
@@ -251,6 +275,17 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="bunny">
+		<description>Bunny</description>
+		<year>20??</year>
+		<publisher>Daniel Bienvenu</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bunny.rom" size="4096" crc="fd27e856" sha1="7cdb1b050f3ef25ab048ee1d64e99f1c5493fbea" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="burnrubb">
 		<description>Burn Rubber</description>
 		<year>2012</year>
@@ -258,6 +293,28 @@ Unoffical software releases for the Coleco Colecovision
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="burn-rubber-2012.rom" size="32768" crc="b278ebde" sha1="0c323ec9a9d1058e849de39256d1914cec778bdc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bustinv1">
+		<description>BUsTin-Out Volume 1</description>
+		<year>2000</year>
+		<publisher>Daniel Bienvenu</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="BUsTin-Out Volume 1 by Daniel Bienvenu (2000) (PD).rom" size="32768" crc="97b601a2" sha1="d12f48fa0352c57deeb4aec9790f6af2ab50afca" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bustinv2">
+		<description>BUsTin-Out Volume 2</description>
+		<year>2000</year>
+		<publisher>Daniel Bienvenu</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32640">
+				<rom name="BUsTin-Out Volume 2 by Daniel Bienvenu (2000) (PD).rom" size="32640" crc="e12ccc1e" sha1="de429b3e17d1dd8f3c3172490de669b10a89a3e5" />
 			</dataarea>
 		</part>
 	</software>
@@ -331,6 +388,18 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="chatdrag">
+		<description>Le Château du Dragon</description>
+		<year>2001</year>
+		<publisher>Daniel Bienvenu</publisher>
+		<info name="language" value="French" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="9088">
+				<rom name="Chateau du Dragon by Daniel Bienvenu (2001) (PD).rom" size="9088" crc="43478adf" sha1="0029fe15165165e95db2a5702cb162c770170637" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="childotn">
 		<description>Children of the Night</description>
 		<year>2018</year>
@@ -363,6 +432,17 @@ Unoffical software releases for the Coleco Colecovision
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="cold-blood-2017.rom" size="32768" crc="960f7086" sha1="3449c1aabdcfc64fe672f393be017f7c6faafc04" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comretrn">
+		<description>Commando Returns (demo)</description>
+		<year>20??</year>
+		<publisher>Michel Louvet</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="18014">
+				<rom name="CommandoWIP.rom" size="18014" crc="e97a69e1" sha1="2ad1b4ff8d6f8c2cb086530807391c4b4d599619" />
 			</dataarea>
 		</part>
 	</software>
@@ -466,6 +546,17 @@ Unoffical software releases for the Coleco Colecovision
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="diamond-dash-2-2021.rom" size="32768" crc="5576dec3" sha1="518f352bd73974edf86ee8f958774844c17b7487" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dblbrout">
+		<description>Double Breakout</description>
+		<year>2001</year>
+		<publisher>Daniel Bienvenu</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="doublebreakout_23_03_2001.rom" size="32768" crc="1229e811" sha1="699915e4158b2c3d127e5924a14146a3c71d6a8e" />
 			</dataarea>
 		</part>
 	</software>
@@ -575,8 +666,19 @@ Unoffical software releases for the Coleco Colecovision
 	</software>
 
 	<software name="ghostbla">
-		<description>Ghostblaster</description>
-		<year>2006</year>
+		<description>Ghostblaster (rev. B)</description>
+		<year>2009</year>
+		<publisher>Amy Marie Bienvenu</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32563">
+				<rom name="gb_pal_20100311.rom" size="32563" crc="cf4ed5e0" sha1="7f2e577f2144e1a457d0f65500a2370566ee8b56" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghostbla_a" cloneof="ghostbla">
+		<description>Ghostblaster (rev. A)</description>
+		<year>2009</year>
 		<publisher>Amy Marie Bienvenu</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32658">
@@ -1133,6 +1235,17 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="osotos">
+		<description>Osotos</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="9398">
+				<rom name="osotos.rom" size="9398" crc="8c5b9d1f" sha1="7b6b2a2f75c30cd07b56d03d11f8022748abddc8" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pacar">
 		<description>Pacar</description>
 		<year>2017</year>
@@ -1291,6 +1404,17 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="quizwiz">
+		<description>Quiz Wiz</description>
+		<year>20??</year>
+		<publisher>Michel Louvet</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="13288">
+				<rom name="quizwiz.rom" size="13288" crc="1beb45b5" sha1="89753ab9ba96b82a65e470b61c26510182df0f60" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rallyx">
 		<description>Rally-X</description>
 		<year>2016</year>
@@ -1347,13 +1471,46 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<software name="search1">
+		<description>Search for the Stolen Crown Jewels 1 (demo)</description>
+		<year>2006</year>
+		<publisher>Phillipp Klaus Krause</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="29013">
+				<rom name="SCJDemo.rom" size="29013" crc="e339d9cc" sha1="1e2e883604e3b8559bd36c88313567dabd8444ac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="search2">
+		<description>Search for the Stolen Crown Jewels 2 (demo)</description>
+		<year>2007</year>
+		<publisher>Phillipp Klaus Krause</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="29256">
+				<rom name="SCJ2Demo.rom" size="29256" crc="eaf7d6dc" sha1="0d144f191629570213694fd63b54e651338c89e3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="search3">
-		<description>Search for the Stolen Crown Jewels 3 (Demo)</description>
-		<year>2013</year>
-		<publisher>Good Deal Games</publisher>
+		<description>Search for the Stolen Crown Jewels 3 (demo v2011)</description>
+		<year>2011</year>
+		<publisher>Phillipp Klaus Krause</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="31249">
+				<rom name="SCJ3Demo.rom" size="31249" crc="81a8def4" sha1="6a8ac08fac29d535aaffae31b776c1a85c8e8e19" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="search3_d08" cloneof="search3">
+		<description>Search for the Stolen Crown Jewels 3 (demo v2008)</description>
+		<year>2008</year>
+		<publisher>Phillipp Klaus Krause</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="31303">
-				<rom name="search-for-the-stolen-crown-jewels-3-2013.rom" size="31303" crc="23988ef9" sha1="19c574aa12ce727e7d620f0c9a38864cc1f13e9e" />
+				<rom name="search-for-the-stolen-crown-jewels-3-demo.rom" size="31303" crc="23988ef9" sha1="19c574aa12ce727e7d620f0c9a38864cc1f13e9e" />
 			</dataarea>
 		</part>
 	</software>

@@ -44,6 +44,7 @@ void pc_hyper98_state::pc_h98_io(address_map &map)
 {
 	pc_hyper98_state::pc9801bx2_io(map);
 	// ...
+//  map(0x4*a*, 0x4*a*) μPD72120 "AGDC"
 }
 
 // TODO: backported from pc9801_epson.cpp, needs mods

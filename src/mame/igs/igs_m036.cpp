@@ -418,6 +418,31 @@ ROM_START( lhzbgqb )
 ROM_END
 
 
+// this PCB has IGS036 MCU, R5F21256SN MCU, TT5665, ALTERA EPM3032ALC44-10N (stickered IS U15)
+// ROM labels actually are written "super 70's..."
+ROM_START( super70s )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "f9_igs036.u28", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x8000, "mcu", 0 )
+	ROM_LOAD( "r5f21256sn.u32", 0x0000, 0x8000, NO_DUMP )
+
+	// this seems to be dumped half sized if compared to other dumps in the driver of this same kind of ROM
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "super_70s_v-100us.u31", 0x000000, 0x100000, BAD_DUMP CRC(60020aa3) SHA1(f6be4f9588192ef1e57182e5a61228440e5cfa64) ) // EV29LV160, BADADDR    xxxxxxxxxxxxxxxxxx-x
+
+	// this seems to be dumped half sized if compared to other dumps in the driver of this same kind of ROM
+	ROM_REGION( 0x400000, "tt5665", 0 ) // samples
+	ROM_LOAD( "super_70s_v100us_u27.u27", 0x000000, 0x400000, BAD_DUMP CRC(a57fbc1c) SHA1(c7b0c72e678cd4120f576283eca8d718c058994c) ) // EV29LV640, 11xxxxxxxxxxxxxxxxxxxx = 0x00
+
+	// these seem to be dumped half sized if compared to other dumps in the driver of this same kind of ROM
+	ROM_REGION( 0x800000, "gfx", 0 )
+	ROM_LOAD( "super_70s_v100us_u25.u25", 0x000000, 0x400000, BAD_DUMP CRC(41baefa5) SHA1(1817bf43b3f72df35d50ef1ceb151d77ecfb988b) ) // EV29LV640
+	ROM_LOAD( "super_70s_v100us_u26.u26", 0x400000, 0x400000, BAD_DUMP CRC(39bb6c75) SHA1(bc52e51f1ad3588253cb42eb61baa11d0720c5a5) ) // EV29LV640
+ROM_END
+
+
 void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 {
 	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
@@ -546,6 +571,8 @@ GAME( 2009, lhtb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp
 GAME( 200?, lhzb3in1, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_IS_SKELETON ) // 龙虎争霸三合一
 
 GAME( 200?, igsm312,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_IS_SKELETON ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
+
+GAME( 200?, super70s, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Super 70's (V100US)", MACHINE_IS_SKELETON )
 
 GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_IS_SKELETON )
 

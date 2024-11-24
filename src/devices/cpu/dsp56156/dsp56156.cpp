@@ -465,6 +465,7 @@ void dsp56156_device::execute_run()
 	/* If reset line is asserted, do nothing */
 	if (m_core.reset_state)
 	{
+		debugger_wait_hook();
 		m_core.icount = 0;
 		return;
 	}
@@ -472,6 +473,7 @@ void dsp56156_device::execute_run()
 	/* HACK - if you're in bootstrap mode, simply pretend you ate up all your cycles waiting for data. */
 	if (m_core.bootstrap_mode != BOOTSTRAP_OFF)
 	{
+		debugger_wait_hook();
 		m_core.icount = 0;
 		return;
 	}

@@ -1687,6 +1687,46 @@ ROM_START( ldrun3j )
 	ROM_LOAD( "lr3-b-6f",     0x000, 0x100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )    // video timing - common to the other games
 ROM_END
 
+ROM_START( ldrun3jc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lr3-a-4e-c",   0x0000, 0x4000, CRC(9cdd7c9f) SHA1(355b0b31947ac0a6c87d013384c151e1555ccd11) )
+	ROM_LOAD( "lr3-a-4d-c",   0x4000, 0x4000, CRC(858b339f) SHA1(9f879eec5153ed8d777faa650394c546e91aa1d0) )
+	ROM_LOAD( "lr3-a-4b-c",   0x8000, 0x4000, CRC(63052776) SHA1(59e887304ca3921a97bb98551d40b4e5e4396f26) )
+
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   // 64k for the audio CPU (6803)
+	ROM_LOAD( "lr3-a-3d",     0x8000, 0x4000, CRC(28be68cd) SHA1(1e48cdf649bc861066fbef0293466091092045f3) )
+	ROM_LOAD( "lr3-a-3f",     0xc000, 0x4000, CRC(cb7186b7) SHA1(cc99821f3f1523523598e4b7d68b95eee6c84e69) )
+
+	ROM_REGION( 0xc000, "gfx1", 0 )
+	ROM_LOAD( "lr3-n-2a",     0x00000, 0x4000, CRC(f9b74dee) SHA1(f4407024aea05d0c698f8a7a6a20cbbcbd8baf44) )   // characters
+	ROM_LOAD( "lr3-n-2c",     0x04000, 0x4000, CRC(fef707ba) SHA1(ff6e64eeda6a9be672a1b8778a051886c38bd8f6) )
+	ROM_LOAD( "lr3-n-2b",     0x08000, 0x4000, CRC(af3d27b9) SHA1(2eda0bf7ffd7bcb7b7dcd2ffb1482f748ee2edfc) )
+
+	ROM_REGION( 0xc000, "gfx2", 0 )
+	ROM_LOAD( "lr3-b-4k",     0x00000, 0x4000, CRC(63f070c7) SHA1(beeb13dbba228827cf18e4c23deac041acbb2903) )   // sprites
+	ROM_LOAD( "lr3-b-3n",     0x04000, 0x4000, CRC(eab7ad91) SHA1(c4e8dec38f6df27c0309172232aa8056be7982c4) )
+	ROM_LOAD( "lr3-b-4c",     0x08000, 0x4000, CRC(1a460a46) SHA1(2f9e85ab45e8ec7a08edb9c1f82bce694cc2bc99) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "lr3-n-4f",     0x000, 0x100, CRC(df674be9) SHA1(4d8c5378234bc24fac62dc227d8cd72f1ab7a35c) )    // unknown
+
+	ROM_REGION( 0x20, "spr_height_prom", 0 )
+	ROM_LOAD( "lr3-b-5p",     0x00, 0x20, CRC(e01f69e2) SHA1(0d00ef348025ea4a9c274a7e3dbb006217d8449d) )    // sprite height, one entry per 32
+
+	ROM_REGION( 0x300, "spr_color_proms", 0 )
+	ROM_LOAD( "lr3-b-1m",     0x0000, 0x0100, CRC(f02d7167) SHA1(385a9179143e3dcccd7052e70c7cc71473caaaca) ) // sprite palette red component
+	ROM_LOAD( "lr3-b-1n",     0x0100, 0x0100, CRC(9e37f181) SHA1(8e36eb8f4aefcc6d21dfbb2e86dcb4875bcf82cd) ) // sprite palette green component
+	ROM_LOAD( "lr3-b-1l",     0x0200, 0x0100, CRC(5b11c41d) SHA1(186ca7bfa2894311fc573f3f5882da677e029f2a) ) // sprite palette blue component
+
+	ROM_REGION( 0x300, "chr_color_proms", 0 )
+	ROM_LOAD( "lr3-n-2l",     0x0000, 0x0100, CRC(e880b86b) SHA1(3934f37dc45b725af1c7d862086249256366d572) ) // character palette red component
+	ROM_LOAD( "lr3-n-2k",     0x0100, 0x0100, CRC(047ee051) SHA1(7c18a223d37ccc5fea20f8f856fba20335c75ea4) ) // character palette green component
+	ROM_LOAD( "lr3-n-2m",     0x0200, 0x0100, CRC(69ad8678) SHA1(96134aa530cb93a5e3b56fffa996aefa08a666a2) ) // character palette blue component
+
+	ROM_REGION( 0x100, "timing", 0 )
+	ROM_LOAD( "lr3-b-6f",     0x000, 0x100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )    // video timing - common to the other games
+ROM_END
+
 ROM_START( ldrun4 )
 	ROM_REGION( 0x18000, "maincpu", 0 ) // 64k for code + 32k for banked ROM
 	ROM_LOAD( "lr4-a-4e",     0x00000, 0x4000, CRC(5383e9bf) SHA1(01f6f76b768107b389d7240bd15a5e0720defcb6) )
@@ -2427,8 +2467,9 @@ GAME( 1984, ldruna,    ldrun,    ldrun,    ldrun,    m62_state, empty_init,    R
 
 GAME( 1984, ldrun2,    0,        ldrun2,   ldrun2,   m62_state, init_ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // Japanese version is called Bangeringu Teikoku no Gyakushuu
 
-GAME( 1985, ldrun3,    0,        ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1985, ldrun3j,   ldrun3,   ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin no Fukkatsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, ldrun3,    0,        ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, ldrun3j,   ldrun3,   ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin no Fukkatsu (Japan, rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, ldrun3jc,  ldrun3,   ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin no Fukkatsu (Japan, rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1986, ldrun4,    0,        ldrun4,   ldrun4,   m62_state, init_ldrun4,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner IV - Teikoku Karano Dasshutsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 

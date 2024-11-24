@@ -747,6 +747,35 @@ ROM_START( mystjag )
 	ROM_LOAD( "snd_1h5152xx.u6",  0x000000, 0x100000, CRC(e459e0be) SHA1(21089fd03a1ea8e4ca3963988647fa4414390d0c) )
 ROM_END
 
+/*
+  Triple Play (M0000230, Spanish)
+  (c) IGT 1993-1999
+
+  ROMs u47 and u48 are m27c4001.
+  ROMs u8 and keychip are m27c4002.
+  ROMS u4, u5, u20 and u21 are m27c801.
+
+*/
+ROM_START( tripplay )  // M0000230, Spanish
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "base_4002_67aa.u8",  0x000000, 0x080000, CRC(87728fb8) SHA1(4b40503bc8314883039a3a719842f7f75e04b96f) )
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "gme1_801_2a29.u21", 0x000000, 0x100000, CRC(0340a568) SHA1(e7dcff8d35c065d7c9e544995bac2d873ea72475) )
+	ROM_LOAD16_BYTE( "gme2_801_e9bf.u5",  0x000001, 0x100000, CRC(8137e9da) SHA1(aa4405d3107be26673054eac2066337113594bc7) )
+
+	ROM_REGION( 0x100000, "cg", 0 )
+	ROM_LOAD16_BYTE( "cg1_4001_0f8b.u48", 0x000000, 0x080000, CRC(1842e0bd) SHA1(625f99eece1a89a102156a7f7371c2296ea31d85) )
+	ROM_LOAD16_BYTE( "cg2_4001_a0f0.u47", 0x000001, 0x080000, CRC(9b409d86) SHA1(e4a434f110484691042be608ed69017d649d6c12) )
+
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "pxl1_801_6206.u20", 0x000000, 0x100000, CRC(35e7f52e) SHA1(9517d513fd75aefdbf2a91ecad5f1f4865a6547d) )
+	ROM_LOAD16_BYTE( "pxl2_801_d371.u4",  0x000001, 0x100000, CRC(809cb731) SHA1(00728be2a490d2c86c43224f54c0e9f035ab7cb9) )
+
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
+	ROM_LOAD( "snd.u6",  0x000000, 0x080000, NO_DUMP )  // no devices...
+ROM_END
+
 
 ROM_START( gkigt4 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -956,19 +985,20 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1997, ms14,      0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 14", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, bmoonii,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Blue Moon II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, dblheart,  0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Double Hearts", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1998, ms5,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 5", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, mystjag,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Mystic Jaguar", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2000, ms72c,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt4,    0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt4ms,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt43,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt43n,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3, NJ)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigtez,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigtezms, gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt5p,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Triple-Five Play)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, igtsc,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Super Cherry", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // SIMM dumps are bad.
-GAME( 2003, gkkey,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Set Chips)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // only 2 are good dumps
+GAME( 1997, ms14,      0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 14",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, bmoonii,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Blue Moon II",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, dblheart,  0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Double Hearts",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, ms5,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 5",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, mystjag,   0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Mystic Jaguar",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, tripplay,  0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Triple Play (M0000230, Spanish)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // sound is undumped
+GAME( 2000, ms72c,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt4,    0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt4ms,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x, MS)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt43,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt43n,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3, NJ)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigtez,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigtezms, gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0, MS)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt5p,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Triple-Five Play)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, igtsc,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Super Cherry",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // SIMM dumps are bad.
+GAME( 2003, gkkey,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Set Chips)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // only 2 are good dumps

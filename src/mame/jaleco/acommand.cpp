@@ -102,11 +102,14 @@ private:
 	void ext_devices_1_w(uint16_t data);
 	void ext_devices_2_w(uint16_t data);
 
+	uint8_t m_drawmode_table[16]{};
+	void draw_sprites(bitmap_ind16 &bitmap , const rectangle &cliprect, int priority1, int priority2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
 	void main_map(address_map &map) ATTR_COLD;
 
+	virtual void video_start() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
@@ -122,8 +125,6 @@ private:
 	uint16_t m_7seg1 = 0;
 	uint16_t m_ufo_lane[5]{};
 	uint8_t m_boss_door = 0;
-
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
 };
 
 void acommand_state::machine_start()
@@ -131,67 +132,120 @@ void acommand_state::machine_start()
 	m_digits.resolve();
 }
 
-void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask)
+// TODO: copied over from cischeat_draw_sprites, merge in common device
+void acommand_state::video_start()
 {
-	uint16_t *spriteram16 = m_spriteram;
-	int offs;
+	for (int i = 0; i < 16; i++)
+		m_drawmode_table[i] = DRAWMODE_SOURCE;
 
-	for (offs = 0;offs < m_spriteram.bytes()/2;offs += 8)
+	m_drawmode_table[ 0] = DRAWMODE_SHADOW;
+	m_drawmode_table[15] = DRAWMODE_NONE;
+}
+
+#define SHRINK(_org_,_fact_) ( ( ( (_org_) << 16 ) * (_fact_ & 0x01ff) ) / 0x80 )
+
+void acommand_state::draw_sprites(bitmap_ind16 &bitmap , const rectangle &cliprect, int priority1, int priority2)
+{
+	int x, sx, flipx, xzoom, xscale, xdim, xnum, xstart, xend, xinc;
+	int y, sy, flipy, yzoom, yscale, ydim, ynum, ystart, yend, yinc;
+	int code, attr, color, size, shadow;
+
+	int min_priority, max_priority, high_sprites;
+
+	uint16_t      *source =   m_spriteram;
+	const uint16_t    *finish =   source + 0x1000/2;
+
+	/* Move the priority values in place */
+	high_sprites = (priority1 >= 16) | (priority2 >= 16);
+	priority1 = (priority1 & 0x0f) * 0x100;
+	priority2 = (priority2 & 0x0f) * 0x100;
+
+	if (priority1 < priority2)  {   min_priority = priority1;   max_priority = priority2; }
+	else                        {   min_priority = priority2;   max_priority = priority1; }
+
+	for (; source < finish; source += 0x10/2 )
 	{
-		if (!(spriteram16[offs+0] & 0x1000))
+		size    =   source[ 0 ];
+		if (size & 0x1000)  continue;
+
+		/* number of tiles */
+		xnum    =   ( (size & 0x0f) >> 0 ) + 1;
+		ynum    =   ( (size & 0xf0) >> 4 ) + 1;
+
+		xzoom   =   source[ 1 ];
+		yzoom   =   source[ 2 ];
+		flipx   =   xzoom & 0x1000;
+		flipy   =   yzoom & 0x1000;
+
+		sx      =   source[ 3 ];
+		sy      =   source[ 4 ];
+		// TODO: was & 0x1ff with 0x200 as sprite wrap sign, looks incorrect with Grand Prix Star
+		//       during big car on side view in attract mode (a tyre gets stuck on the right of the screen)
+		//       this arrangement works with both games (otherwise Part 2 gets misaligned bleachers sprites)
+		sx      =   (sx & 0x7ff);
+		sy      =   (sy & 0x7ff);
+		if(sx & 0x400)
+			sx -= 0x800;
+		if(sy & 0x400)
+			sy -= 0x800;
+
+		/* use fixed point values (16.16), for accuracy */
+		sx <<= 16;
+		sy <<= 16;
+
+		/* dimension of a tile after zoom */
 		{
-			int sx = (spriteram16[offs+3] & 0x0ff);
-			int code = spriteram16[offs+6];
-			int color = spriteram16[offs+7];
-			int w = (spriteram16[offs+0] & 0x0f);
-			int h = ((spriteram16[offs+0] & 0xf0) >> 4);
-			int sy = (spriteram16[offs+4] & 0x0ff) - ((h+1)*0x10);
-/**/        int pri = spriteram16[offs+5];
-/**/        int flipy = ((spriteram16[offs+1] & 0x2000) >> 13);
-			// "this is the boss" uses flip x
-			int flipx = ((spriteram16[offs+1] & 0x1000) >> 12);
+			xdim    =   SHRINK(16,xzoom);
+			ydim    =   SHRINK(16,yzoom);
+		}
 
-			int xx,yy,x;
-			int delta = 16;
+		if ( ( (xdim / 0x10000) == 0 ) || ( (ydim / 0x10000) == 0) )    continue;
 
-			flipx ^= flip_screen();
-			flipy ^= flip_screen();
+		/* the y pos passed to the hardware is the that of the last line,
+		   we need the y pos of the first line  */
+		sy -= (ydim * ynum);
 
-			if ((pri&pri_mask)!=priority) continue;
+		code    =   source[ 6 ];
+		attr    =   source[ 7 ];
+		color   =   attr & 0x007f;
+		shadow  =   attr & 0x1000;
 
-			if (flip_screen())
+		/* high byte is a priority information */
+		if ( ((attr & 0x700) < min_priority) || ((attr & 0x700) > max_priority) )
+			continue;
+
+		if ( high_sprites && !(color & 0x80) )
+			continue;
+
+		xscale = xdim / 16;
+		yscale = ydim / 16;
+
+
+		/* let's approximate to the nearest greater integer value
+		   to avoid holes in between tiles */
+		if (xscale & 0xffff)    xscale += (1<<16)/16;
+		if (yscale & 0xffff)    yscale += (1<<16)/16;
+
+
+		if (flipx)  { xstart = xnum-1;  xend = -1;    xinc = -1; }
+		else        { xstart = 0;       xend = xnum;  xinc = +1; }
+
+		if (flipy)  { ystart = ynum-1;  yend = -1;    yinc = -1; }
+		else        { ystart = 0;       yend = ynum;  yinc = +1; }
+
+		m_drawmode_table[ 0] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+
+		for (y = ystart; y != yend; y += yinc)
+		{
+			for (x = xstart; x != xend; x += xinc)
 			{
-				sx = 368 - sx;
-				sy = 240 - sy;
-				delta = -16;
+				m_gfxdecode->gfx(0)->zoom_transtable(bitmap,cliprect,code++,color,flipx,flipy,
+							(sx + x * xdim) / 0x10000, (sy + y * ydim) / 0x10000,
+							xscale, yscale, m_drawmode_table);
 			}
-
-			yy = h;
-			do
-			{
-				x = flipx ? sx + w*16 : sx;
-				xx = w;
-				do
-				{
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-							code,
-							color,
-							flipx, flipy,
-							((x + 16) & 0x1ff) - 16,sy & 0x1ff,15);
-
-					code++;
-					if(flipx)
-						x -= delta;
-					else
-						x += delta;
-				} while (--xx >= 0);
-
-				sy += delta;
-			} while (--yy >= 0);
 		}
 	}
 }
-
 
 uint32_t acommand_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -199,7 +253,11 @@ uint32_t acommand_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_bgtmap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap,cliprect,0,0);
+	// TODO: isn't this supposed to use pdrawgfx?
+	draw_sprites(bitmap,cliprect,15,3);
+	draw_sprites(bitmap,cliprect,2,2);
+	draw_sprites(bitmap,cliprect,1,0);
+	draw_sprites(bitmap,cliprect,0+16,0+16);
 	m_txtmap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;

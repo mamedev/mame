@@ -298,7 +298,7 @@ u16 mu100_state::adc_battery_r()
 // model detect.  pulled to GND (0) on MU100, to 0.5Vcc on the card version, to Vcc on MU100R
 u16 mu100_state::adc_type_r()
 {
-	return 0;
+	return m_lcd ? 0 : 0x200;
 }
 
 u16 mu100r_state::adc_type_r()

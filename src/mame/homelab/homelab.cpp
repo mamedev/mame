@@ -251,10 +251,10 @@ u8 homelab2_state::memE000_r(offs_t offset)
 		u8 gfx;
 		if (m_screenshadow_is_text_mode)
 		{
-			const int vramRelIndex0 = offset % 0x400;     // Character address in video ram First character in 0x001
-			const int row8_index0 = (offset - 1) / 0x400; // Row index in char [0-7]
-			u8 const chr = m_vram[vramRelIndex0];         // get char in videoram
-			gfx = m_p_chargen[chr | (row8_index0 << 8)];  // get dot pattern in chargen
+			const int vramRelIndex0 = offset & 0x3ff; // Character address in video ram First character in 0x001
+			const int row8_index0 = ((offset - 1) & 0x1c00) >> 10; // Row index in char [0-7]
+			u8 const chr = m_vram[vramRelIndex0]; // get char in videoram
+			gfx = m_p_chargen[chr | (row8_index0 << 8)]; // get dot pattern in chargen
 		}
 		else
 		{
@@ -544,7 +544,7 @@ INPUT_PORTS_END
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(homelab3_state, cass3_r)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(homelab3_state::cass3_r))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -657,7 +657,7 @@ static INPUT_PORTS_START(brailab4) // F4 to F8 are foreign characters
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(homelab3_state, cass3_r)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(homelab3_state::cass3_r))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)

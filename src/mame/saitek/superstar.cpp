@@ -211,7 +211,7 @@ static INPUT_PORTS_START( tstar432 )
 	PORT_INCLUDE( sstar28k )
 
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, star_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(star_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "2MHz (Superstar 36K)" )
 	PORT_CONFSETTING(    0x01, "4MHz (Turbostar 432)" )
 	PORT_CONFSETTING(    0x02, "5.53MHz (Turbostar 540+)" )

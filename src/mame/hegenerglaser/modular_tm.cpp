@@ -177,7 +177,7 @@ static INPUT_PORTS_START( mmtm_t )
 	PORT_INCLUDE( mmtm_v )
 
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mmtm_state, change_cpu_freq, 0)
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mmtm_state::change_cpu_freq), 0)
 	PORT_CONFSETTING(    0x00, "50MHz" )
 	PORT_CONFSETTING(    0x01, "60MHz" )
 	PORT_CONFSETTING(    0x02, "66MHz" )

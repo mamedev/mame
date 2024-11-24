@@ -163,7 +163,7 @@ private:
 		fdc_pll_t pll;
 	};
 
-	required_device_array<floppy_connector, 4> m_connectors;
+	optional_device_array<floppy_connector, 4> m_connectors;
 	devcb_read16 m_read_ds;
 
 	std::string ttsn() const;

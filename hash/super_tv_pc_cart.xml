@@ -4,10 +4,6 @@
 license:CC0-1.0
 -->
 
-<!-- also known to exist
-ドラえもんエキサイトピンポン (Doraemon Excite Ping-Pong)
--->
-
 <softwarelist name="super_tv_pc_cart" description="Epoch Super TV-PC cartridges">
 
 	<!-- these appear to require the system BIOS as they access above the 4MB mark for audio during the boot screen -->
@@ -71,7 +67,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- C-06 -->
+	<software name="doraepp" supported="no">
+		<description>Doraemon Excite Ping-Pong</description>
+		<year>2006</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ドラえもんエキサイトピンポン" />
+		<part name="cart" interface="super_tv_pc_cart">
+			<dataarea name="prg" size="0x200000">
+				<rom name="c-06.u1" size="0x200000" crc="bdf25763" sha1="f3f20e8476d086d26152cdd46164b4cad736e3ed" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="link" supported="no">
 		<description>Pet Keitai Link</description>

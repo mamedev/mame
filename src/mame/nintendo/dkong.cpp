@@ -1011,7 +1011,7 @@ static INPUT_PORTS_START( dkong_in2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* not connected - held to high */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* not connected - held to high */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("virtual_p2", latch8_device, bit4_q_r) /* status from sound cpu */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("virtual_p2", FUNC(latch8_device::bit4_q_r)) /* status from sound cpu */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("SERVICE1")
@@ -1098,7 +1098,7 @@ static INPUT_PORTS_START( dkongike )
 	PORT_INCLUDE( dkongx )
 
 	PORT_START("GAME")
-	PORT_CONFNAME(0x01, 0x00, "Game") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, dkong_state, dk_braze_a15)
+	PORT_CONFNAME(0x01, 0x00, "Game") PORT_WRITE_LINE_MEMBER(FUNC(dkong_state::dk_braze_a15))
 	PORT_CONFSETTING(0x00, "1")
 	PORT_CONFSETTING(0x01, "2")
 INPUT_PORTS_END
