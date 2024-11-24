@@ -337,7 +337,7 @@ int quasar_state::audio_t1_r()
 void quasar_state::program(address_map &map)
 {
 	map(0x0000, 0x13ff).rom();
-	map(0x1400, 0x14ff).ram().w(FUNC(quasar_state::bullet_w)).share(m_bullet_ram);
+	map(0x1400, 0x14ff).mirror(0x6000).ram().w(FUNC(quasar_state::bullet_w)).share(m_bullet_ram);
 	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1600, 0x16ff).mirror(0x6000).rw(m_s2636[1], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1700, 0x17ff).mirror(0x6000).rw(m_s2636[2], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
