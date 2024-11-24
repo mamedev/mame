@@ -4,7 +4,7 @@
 license:CC0-1.0
 -->
 
-<softwarelist name="sc3000_cart" description="Sega Computer 3000 cartridges">
+<softwarelist name="sc3000_cart" description="Sega SC-3000 cartridges">
 
 	<software name="basic3">
 		<description>BASIC Level III (Jpn)</description>
