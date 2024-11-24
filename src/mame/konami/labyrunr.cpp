@@ -137,7 +137,7 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info)
 			code + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
-	tileinfo.category = Which ? (attr & 0x40) >> 6 : 0;
+	tileinfo.category = Which ? 0 : (attr & 0x40) >> 6;
 }
 
 
@@ -248,7 +248,6 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			}
 
 			finalclip1.max_x = cliprect.max_x - ctrl_0 + 8;
-
 		}
 		else
 		{
@@ -284,7 +283,7 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		if (use_clip3[0])
 			m_layer[0]->draw(screen, bitmap, finalclip3, TILEMAP_DRAW_CATEGORY(0), 0);
 
-		m_k007121->sprites_draw(bitmap, cliprect, m_spriteram, (m_k007121->ctrlram_r(6) & 0x30) * 2,40,0,screen.priority(),(m_k007121->ctrlram_r(3) & 0x40) >> 5);
+		m_k007121->sprites_draw(bitmap, cliprect, m_spriteram, (m_k007121->ctrlram_r(6) & 0x30) * 2, 40, 0, screen.priority(), (m_k007121->ctrlram_r(3) & 0x40) >> 5);
 
 		m_layer[0]->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_CATEGORY(1), 0);
 		if (use_clip3[0])
@@ -293,8 +292,8 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_layer[1]->draw(screen, bitmap, finalclip1, 0, 0);
 		if (use_clip3[1])
 			m_layer[1]->draw(screen, bitmap, finalclip3, 0, 0);
-
 	}
+
 	return 0;
 }
 

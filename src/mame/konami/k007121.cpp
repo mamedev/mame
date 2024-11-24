@@ -215,7 +215,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 {
 	// TODO: sprite limit is supposed to be per-line! (check MT #00185)
 	int num = 0x40;
-	//num = (k007121->ctrlram[0x03] & 0x40) ? 0x80 : 0x40; /* WRONG!!! (needed by combatsc)  */
+	//num = (m_ctrlram[0x03] & 0x40) ? 0x80 : 0x40; // WRONG!!! (needed by combatsc)
 
 	int inc = 5;
 	// when using priority buffer, draw front to back
