@@ -16932,6 +16932,7 @@ oscaru                          // (c) 1987 Data East USA (US)
 shackled                        // (c) 1986 Data East USA (US)
 srdarwin                        // (c) 1987 Data East Corporation (World)
 srdarwinj                       // (c) 1987 Data East Corporation (Japan)
+srdarwinb                       // bootleg
 
 @source:dataeast/deco156.cpp
 hvysmsh                         // MBG (c) 1993 Data East Corporation (World)
