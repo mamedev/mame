@@ -57,14 +57,13 @@ public:
 	void dt7(machine_config &config);
 
 protected:
+	virtual void video_start() override;
 
 private:
 	void toaplan2_dt7_reset(int state);
 
 	u32 screen_update_dt7_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_dt7_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_VIDEO_START(dt7);
 
 	void tx_videoram_dt7_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
@@ -96,7 +95,6 @@ private:
 	static constexpr unsigned T2PALETTE_LENGTH = 0x10000;
 
 	void screen_vblank(int state);
-	DECLARE_VIDEO_START(toaplan2);
 
 	tilemap_t *m_tx_tilemap[2];    /* Tilemap for extra-text-layer */
 
@@ -469,8 +467,6 @@ void toaplan2_dt7_state::dt7(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode[1], m_palette[1], gfx_textrom_double_1);
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_dt7_state,dt7)
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -505,16 +501,13 @@ static INPUT_PORTS_START( dt7 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
 
-
-// This is taken from toaplan2.cpp, it might not be the same here, needs verifying!
 u16 toaplan2_dt7_state::video_count_r()
 {
 	int vpos = m_screen[0]->vpos();
@@ -553,7 +546,7 @@ TILE_GET_INFO_MEMBER(toaplan2_dt7_state::get_text_dt7_tile_info)
 			0);
 }
 
-VIDEO_START_MEMBER(toaplan2_dt7_state,dt7)
+void toaplan2_dt7_state::video_start()
 {
 	/* our current VDP implementation needs this bitmap to work with */
 	m_screen[0]->register_screen_bitmap(m_custom_priority_bitmap);
