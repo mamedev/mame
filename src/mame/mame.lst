@@ -788,13 +788,19 @@ apple1                          // Jul 1976 Apple 1
 @source:apple/apple2.cpp
 ace100                          // ??? 1982 Franklin Ace 100
 ace1000                         // 1982 Franklin ACE 1000
+albert                          // Albert
+am100                           // ASEM AM100
 am64                            // 1985 ASEM AM 64 (motherboard is marked AM-100 but it boots as "AM 64")
 apple2                          // Apr 1977 Apple ][
 apple2jp                        // ??? ???? Apple ][j+
 apple2p                         // Jun 1979 Apple ][+
 basis108                        // 1982 Germany Basis 108
+craft2p                         // 1982 Craft?
+dodo                            // GTAC Do-Do
 elppa                           // 198? Victor do Brasil Elppa II+
+hkc8800a                        // 1984 HKC 8800A
 ivelultr                        // Ivasim Ivel Ultra
+laser2c                         // 1985? Laser //c (Brazil)
 maxxi                           // 1982 Polymax Maxxi
 microeng                        // 1982 Micro Engenho (Brazilian Apple2 clone) - Spectrum/SCOPUS
 prav82                          // Pravetz 82
@@ -803,51 +809,56 @@ space84                         // 1985 IBS/ComputerTechnik Space 84
 uniap2en                        // 1982 Unitron AP II (in English)
 uniap2pt                        // 1982 Unitron AP II (in Brazilian Portuguese)
 uniap2ti                        // 1982 Unitron AP II+ (Teclado Inteligente)
-craft2p                         // 1982 Craft?
-laser2c                         // 1985? Laser //c (Brazil)
-hkc8800a                        // 1984 HKC 8800A
-albert                          // Albert
-am100                           // ASEM AM100
-dodo                            // GTAC Do-Do
 
 @source:apple/apple2e.cpp
+ace2200                         // 1985 Franklin Ace 2200
+ace500                          // 1986 Franklin Ace 500
 apple2c                         // Apr 1984 Apple //c
 apple2c0                        // ??? 1985 Apple //c (3.5 ROM)
+apple2c0uk                      // ??? 1985 Apple //c (3.5 ROM) (UK)
+apple2c0fr                      // ??? 1985 Apple //c (3.5 ROM) (France)
 apple2c3                        // Sep 1986 Apple //c (Original Mem. Exp.)
+apple2c3uk                      // Sep 1986 Apple //c (Original Mem. Exp.) (UK)
+apple2c3fr                      // Sep 1986 Apple //c (Original Mem. Exp.) (France)
 apple2c4                        // ??? 198? Apple //c (rev 4)
+apple2c4uk                      // ??? 198? Apple //c (rev 4) (UK)
+apple2c4fr                      // ??? 198? Apple //c (rev 4) (France)
+apple2cfr                       // Apr 1984 Apple //c (France)
 apple2cp                        // Sep 1988 Apple //c+
+apple2cuk                       // Apr 1984 Apple //c (UK)
 apple2e                         // Jan 1983 Apple //e
 apple2ee                        // Mar 1985 Apple //e Enhanced
-apple2eeuk                      // Mar 1985 Apple //e Enhanced (UK)
 apple2eefr                      // Mar 1985 Apple //e Enhanced (France)
 apple2ees                       // Mar 1985 Apple //e Enhanced (Spain)
+apple2eeuk                      // Mar 1985 Apple //e Enhanced (UK)
+apple2efr                       // Jan 1983 Apple //e (France)
 apple2ep                        // Jan 1987 Apple //e Platinum
+apple2epfr                      // Jan 1987 Apple //e Platinum (France)
+apple2epuk                      // Jan 1987 Apple //e Platinum (UK)
 apple2euk                       // Jan 1983 Apple //e (UK)
+cec2000                         // China Education Computer-2000
+cece                            // China Education Computer-E
+cecg                            // China Education Computer-G
+ceci                            // China Education Computer-I
+cecm                            // China Education Computer-M
 las128e2                        // ??? Laser 128 EX2
 las128ex                        // ??? 1988 Laser 128 EX
 laser128                        // ??? 1987 Laser 128
 laser128o                       //
 mprof3                          // Microprofessor III
 prav8c                          // Pravetz 8C
-tk3000                          // Microdigital TK3000
 spectred
-ceci                            // China Education Computer-I
-cece                            // China Education Computer-E
-cecg                            // China Education Computer-G
-cecm                            // China Education Computer-M
-cec2000                         // China Education Computer-2000
+tk3000                          // Microdigital TK3000
 zijini                          // 1989 Zi Jin I
-ace2200                         // 1985 Franklin Ace 2200
-ace500                          // 1986 Franklin Ace 500
 
 @source:apple/apple2gs.cpp
 apple2gs                        // Aug 1989 Apple IIgs ROM03
+apple2gsmt                      // 1991 "Mark Twain" prototype
 apple2gsr0                      // Sep 1986 Apple IIgs ROM00
 apple2gsr0p                     // June 19, 1986 Apple IIgs ROM00 prototype
 apple2gsr0p2                    // March 10, 1986 Apple IIgs ROM00 prototype
 apple2gsr1                      // Sep 1987 Apple IIgs ROM01
 apple2gsr3p                     // ??? 198? Apple IIgs ROM03 prototype
-apple2gsmt                      // 1991 "Mark Twain" prototype
 
 @source:apple/apple3.cpp
 apple3                          // May 1980 Apple ///
