@@ -2288,6 +2288,7 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 ]]></notes>
 		<info name="version" value="1.1" />
 		<info name="language" value="English" />
+		<sharedfeat name="platform" value="Linux" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
