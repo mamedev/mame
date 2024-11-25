@@ -5,10 +5,11 @@
 * Model Racing's Super Shot
 * Model Racing's Gun Champ on Super Shot hardware
 
-  Driver by Mariusz Wojcieszek
+Driver by Mariusz Wojcieszek
 
-  Todo:
-  - Discrete sound
+TODO:
+- Discrete sound
+
 
 SUPER SHOT
 Mainboard:
@@ -380,7 +381,7 @@ void sshot_state::sshot(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
+	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
