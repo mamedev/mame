@@ -177,8 +177,8 @@ private:
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
 	}
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_IPLK = 0U;
 	uint8_t m_GMODE = 0U;
@@ -186,8 +186,8 @@ private:
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	attotime m_time;
 	bool m_centronics_busy = false;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cassette_image_device> m_cass;

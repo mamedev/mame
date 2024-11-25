@@ -28,7 +28,7 @@ loosely based on tranz330.lay
 
 	<element name="hl" defstate="0">
 		<rect state="1">
-			<color red="0.0" green="0.0" blue="0.5" alphe="0.2" />
+			<color red="0.0" green="0.0" blue="0.5" alpha="0.2" />
 		</rect>
 	</element>
 

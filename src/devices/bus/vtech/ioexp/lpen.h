@@ -29,9 +29,9 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::CONTROLS; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual void io_map(address_map &map) override;
+	virtual void io_map(address_map &map) override ATTR_COLD;
 
 private:
 	uint8_t lpen_r(offs_t offset);

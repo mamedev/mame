@@ -2,12 +2,12 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    video/apple2.h  - Video handling for Apple II and IIgs
+    apple/apple2video.h  - Video handling for Apple II and IIgs
 
 *********************************************************************/
 
-#ifndef MAME_SHARED_APPLE2VIDEO_H
-#define MAME_SHARED_APPLE2VIDEO_H
+#ifndef MAME_APPLE_APPLE2VIDEO_H
+#define MAME_APPLE_APPLE2VIDEO_H
 
 #include "emupal.h"
 
@@ -74,8 +74,8 @@ public:
 protected:
 	a2_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_reset() override;
-	virtual void device_start() override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual uint32_t palette_entries() const noexcept override;
 	void init_palette();
@@ -130,7 +130,7 @@ class a2_video_device_composite : public a2_video_device
 public:
 	a2_video_device_composite(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 // a2_video_device with composite settings plus Video-7 RGB card option
@@ -139,7 +139,7 @@ class a2_video_device_composite_rgb : public a2_video_device
 public:
 	a2_video_device_composite_rgb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 // device type definition
@@ -147,4 +147,4 @@ DECLARE_DEVICE_TYPE(APPLE2_VIDEO, a2_video_device)
 DECLARE_DEVICE_TYPE(APPLE2_VIDEO_COMPOSITE, a2_video_device_composite)
 DECLARE_DEVICE_TYPE(APPLE2_VIDEO_COMPOSITE_RGB, a2_video_device_composite_rgb)
 
-#endif // MAME_SHARED_APPLE2VIDEO_H
+#endif // MAME_APPLE_APPLE2VIDEO_H

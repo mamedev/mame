@@ -250,7 +250,7 @@ ROM_END
 	/* TC544000AF-150, 1xxxxxxxxxxxxxxxxxx = 0xFF */ \
 	ROM_LOAD( "saot_rom2.bin", 0x000000, 0x80000, CRC(b832da9a) SHA1(520d3d1b5897800af47f92efd2444a26b7a7dead) )  \
 	ROM_REGION32_BE( 0x200000, "overlay", 0 ) \
-	ROM_COPY( "bios", 0, 0, 0x200000 ) \
+	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 
 ROM_START(alg3do)

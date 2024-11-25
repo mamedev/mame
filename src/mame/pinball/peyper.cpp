@@ -63,7 +63,7 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
-	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
+	template <int Mask> ioport_value wolfman_replay_hs_r();
 	void init_0() { m_game = 0; }
 	void init_1() { m_game = 1; }
 	void init_2() { m_game = 2; }
@@ -73,8 +73,8 @@ public:
 	void petaco(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 sw_r();
@@ -88,10 +88,10 @@ private:
 	void p2a_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[56U+i] = BIT(data, i); }
 	void p2b_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[64U+i] = BIT(data, i); }
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void petaco_map(address_map &map);
-	void petaco_io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void petaco_map(address_map &map) ATTR_COLD;
+	void petaco_io_map(address_map &map) ATTR_COLD;
 
 	void petaco_sol0(u8 data) {}
 	void petaco_sol1(u8 data) {}
@@ -213,7 +213,7 @@ void peyper_state::sol_w(u8 data)
 
 
 template <int Mask>
-CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
+ioport_value peyper_state::wolfman_replay_hs_r()
 {
 	switch (Mask)
 	{
@@ -560,14 +560,14 @@ static INPUT_PORTS_START( wolfman )
 	PORT_DIPSETTING(    0x20, "01" )
 //  PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a69 - tables at 0x0b30 (4 * 3) - credits BCD stored at 0x6151
 //  PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0a5c - stored at 0x60bd
-	PORT_BIT( 0x03, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(peyper_state, wolfman_replay_hs_r<0x03>)
+	PORT_BIT( 0x03, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(peyper_state::wolfman_replay_hs_r<0x03>))
 
 	/* DSW1 : port 0x24 - DSW1-1 is bit 7 ... DSW1-8 is bit 0 */
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x80, 0x00, "Adjust Replay" )             // Premios por Puntuacion - code at 0x0aa3 - stored at 0x60c4 and 0x60cc (0x00 NO / 0x05 YES)
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-	PORT_BIT( 0x40, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(peyper_state, wolfman_replay_hs_r<0x40>)
+	PORT_BIT( 0x40, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(peyper_state::wolfman_replay_hs_r<0x40>))
 	PORT_DIPNAME( 0x20, 0x00, "Clear RAM on Reset" )        // Borrador RAM - code at 0x0ace - range 0x6141..0x616f - 0x616d = 0x5a and 0x616e = 0xa5
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )

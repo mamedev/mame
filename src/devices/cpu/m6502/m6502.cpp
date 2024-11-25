@@ -140,11 +140,6 @@ uint32_t m6502_device::execute_max_cycles() const noexcept
 	return 10;
 }
 
-uint32_t m6502_device::execute_input_lines() const noexcept
-{
-	return NMI_LINE+1;
-}
-
 bool m6502_device::execute_input_edge_triggered(int inputnum) const noexcept
 {
 	return inputnum == NMI_LINE || inputnum == V_LINE;

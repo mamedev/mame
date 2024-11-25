@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "memorywindow.h"
 
+#include "debugger.h"
 #include "debug/dvmemory.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
@@ -24,10 +25,6 @@
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QToolTip>
 #include <QtWidgets/QVBoxLayout>
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 11, 0)
-#define horizontalAdvance width
-#endif
 
 
 namespace osd::debugger::qt {

@@ -92,9 +92,9 @@ public:
 	void gotya(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -127,11 +127,9 @@ private:
 	void draw_status_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int col);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_status(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -294,8 +292,6 @@ uint32_t gotya_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-// audio
-
 static const char *const sample_names[] =
 {                                               // Address triggered at
 	"*thehand",
@@ -398,8 +394,6 @@ void gotya_state::soundlatch_w(uint8_t data)
 	}
 }
 
-
-// machine
 
 void gotya_state::prg_map(address_map &map)
 {

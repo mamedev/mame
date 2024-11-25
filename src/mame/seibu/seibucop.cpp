@@ -192,9 +192,6 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	memset(cop_itoa_digits, 0, sizeof(uint8_t)*10);
 
 	memset(cop_regs, 0, sizeof(uint32_t)*8);
-
-
-	memset(cop_collision_info, 0, sizeof(colinfo)*2);
 }
 
 

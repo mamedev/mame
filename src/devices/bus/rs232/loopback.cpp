@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "loopback.h"
 
-DEFINE_DEVICE_TYPE(RS232_LOOPBACK, rs232_loopback_device, "rs232_loopback", "RS232 Loopback")
+DEFINE_DEVICE_TYPE(RS232_LOOPBACK, rs232_loopback_device, "rs232_loopback", "RS-232 Loopback")
 
 rs232_loopback_device::rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RS232_LOOPBACK, tag, owner, clock)
@@ -43,7 +43,7 @@ void rs232_loopback_device::input_dtr(int state)
 	}
 }
 
-DEFINE_DEVICE_TYPE(DEC_RS232_LOOPBACK, dec_rs232_loopback_device, "dec_rs232_loopback", "RS232 Loopback (DEC 12-15336-00)")
+DEFINE_DEVICE_TYPE(DEC_RS232_LOOPBACK, dec_rs232_loopback_device, "dec_rs232_loopback", "RS-232 Loopback (DEC 12-15336-00)")
 
 dec_rs232_loopback_device::dec_rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DEC_RS232_LOOPBACK, tag, owner, clock)

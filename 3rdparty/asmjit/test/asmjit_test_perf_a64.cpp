@@ -582,7 +582,7 @@ static void generateGpSequence(BaseEmitter& emitter, bool emitPrologEpilog) {
 
     if (emitPrologEpilog) {
       FuncDetail func;
-      func.init(FuncSignatureT<void, void*, const void*, size_t>(CallConvId::kHost), cc.environment());
+      func.init(FuncSignature::build<void, void*, const void*, size_t>(), cc.environment());
 
       FuncFrame frame;
       frame.init(func);
@@ -608,7 +608,7 @@ static void generateGpSequence(BaseEmitter& emitter, bool emitPrologEpilog) {
 
     if (emitPrologEpilog) {
       FuncDetail func;
-      func.init(FuncSignatureT<void, void*, const void*, size_t>(CallConvId::kHost), cc.environment());
+      func.init(FuncSignature::build<void, void*, const void*, size_t>(), cc.environment());
 
       FuncFrame frame;
       frame.init(func);
@@ -633,7 +633,7 @@ static void generateGpSequence(BaseEmitter& emitter, bool emitPrologEpilog) {
     a64::Gp c = cc.newIntPtr("c");
     a64::Gp d = cc.newIntPtr("d");
 
-    cc.addFunc(FuncSignatureT<void>(CallConvId::kHost));
+    cc.addFunc(FuncSignature::build<void>());
     generateGpSequenceInternal(cc, a, b, c, d);
     cc.endFunc();
   }
@@ -645,42 +645,50 @@ static void benchmarkA64Function(Arch arch, uint32_t numIterations, const char* 
   CodeHolder code;
   printf("%s:\n", description);
 
-  bench<a64::Assembler>(code, arch, numIterations, "[raw]", [&](a64::Assembler& cc) {
+  uint32_t instCount = 0;
+
+#ifndef ASMJIT_NO_BUILDER
+  instCount = asmjit_perf_utils::calculateInstructionCount<a64::Builder>(code, arch, [&](a64::Builder& cc) {
+    emitterFn(cc, false);
+  });
+#endif
+
+  asmjit_perf_utils::bench<a64::Assembler>(code, arch, numIterations, "[raw]", instCount, [&](a64::Assembler& cc) {
     emitterFn(cc, false);
   });
 
-  bench<a64::Assembler>(code, arch, numIterations, "[validated]", [&](a64::Assembler& cc) {
+  asmjit_perf_utils::bench<a64::Assembler>(code, arch, numIterations, "[validated]", instCount, [&](a64::Assembler& cc) {
     cc.addDiagnosticOptions(DiagnosticOptions::kValidateAssembler);
     emitterFn(cc, false);
   });
 
-  bench<a64::Assembler>(code, arch, numIterations, "[prolog/epilog]", [&](a64::Assembler& cc) {
+  asmjit_perf_utils::bench<a64::Assembler>(code, arch, numIterations, "[prolog/epilog]", instCount, [&](a64::Assembler& cc) {
     cc.addDiagnosticOptions(DiagnosticOptions::kValidateAssembler);
     emitterFn(cc, true);
   });
 
 #ifndef ASMJIT_NO_BUILDER
-  bench<a64::Builder>(code, arch, numIterations, "[no-asm]", [&](a64::Builder& cc) {
+  asmjit_perf_utils::bench<a64::Builder>(code, arch, numIterations, "[no-asm]", instCount, [&](a64::Builder& cc) {
     emitterFn(cc, false);
   });
 
-  bench<a64::Builder>(code, arch, numIterations, "[finalized]", [&](a64::Builder& cc) {
+  asmjit_perf_utils::bench<a64::Builder>(code, arch, numIterations, "[finalized]", instCount, [&](a64::Builder& cc) {
     emitterFn(cc, false);
     cc.finalize();
   });
 
-  bench<a64::Builder>(code, arch, numIterations, "[prolog/epilog]", [&](a64::Builder& cc) {
+  asmjit_perf_utils::bench<a64::Builder>(code, arch, numIterations, "[prolog/epilog]", instCount, [&](a64::Builder& cc) {
     emitterFn(cc, true);
     cc.finalize();
   });
 #endif
 
 #ifndef ASMJIT_NO_COMPILER
-  bench<a64::Compiler>(code, arch, numIterations, "[no-asm]", [&](a64::Compiler& cc) {
+  asmjit_perf_utils::bench<a64::Compiler>(code, arch, numIterations, "[no-asm]", instCount, [&](a64::Compiler& cc) {
     emitterFn(cc, true);
   });
 
-  bench<a64::Compiler>(code, arch, numIterations, "[finalized]", [&](a64::Compiler& cc) {
+  asmjit_perf_utils::bench<a64::Compiler>(code, arch, numIterations, "[finalized]", instCount, [&](a64::Compiler& cc) {
     emitterFn(cc, true);
     cc.finalize();
   });

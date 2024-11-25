@@ -602,7 +602,7 @@ static INPUT_PORTS_START( hanamomo )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -675,7 +675,7 @@ static INPUT_PORTS_START( mjcamerb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -741,7 +741,7 @@ static INPUT_PORTS_START( mmcamera )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -784,7 +784,7 @@ static INPUT_PORTS_START( msjiken )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -869,7 +869,7 @@ static INPUT_PORTS_START( gionbana )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -935,7 +935,7 @@ static INPUT_PORTS_START( mgion )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1001,7 +1001,7 @@ static INPUT_PORTS_START( omotesnd )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1066,7 +1066,7 @@ static INPUT_PORTS_START( abunai )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1110,7 +1110,7 @@ static INPUT_PORTS_START( mgmen89 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1152,7 +1152,7 @@ static INPUT_PORTS_START( mjfocus )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1216,7 +1216,7 @@ static INPUT_PORTS_START( mjfocusm )
 	PORT_DIPSETTING(    0x00, "B" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1261,7 +1261,7 @@ static INPUT_PORTS_START( scandal )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1325,7 +1325,7 @@ static INPUT_PORTS_START( scandalm )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1391,7 +1391,7 @@ static INPUT_PORTS_START( mjnanpas )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1457,7 +1457,7 @@ static INPUT_PORTS_START( mjnanpaa )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1526,7 +1526,7 @@ static INPUT_PORTS_START( bananadr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1568,7 +1568,7 @@ static INPUT_PORTS_START( club90s )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1635,7 +1635,7 @@ static INPUT_PORTS_START( lovehous )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1648,7 +1648,7 @@ static INPUT_PORTS_START( lovehous )
 
 	PORT_START("PORT0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(nbmj8891_state, nb1413m3_outcoin_flag_r)    // OUT COIN
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(nbmj8891_state::nb1413m3_outcoin_flag_r))    // OUT COIN
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1687,7 +1687,7 @@ static INPUT_PORTS_START( mladyhtr )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1730,7 +1730,7 @@ static INPUT_PORTS_START( chinmoku )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1796,7 +1796,7 @@ static INPUT_PORTS_START( maiko )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )         //
@@ -1809,7 +1809,7 @@ static INPUT_PORTS_START( maiko )
 
 	PORT_START("PORT0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         //
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(nbmj8891_state, nb1413m3_outcoin_flag_r)    // OUT COIN
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(nbmj8891_state::nb1413m3_outcoin_flag_r))    // OUT COIN
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )         //
@@ -1872,7 +1872,7 @@ static INPUT_PORTS_START( mmaiko )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1885,7 +1885,7 @@ static INPUT_PORTS_START( mmaiko )
 
 	PORT_START("PORT0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(nbmj8891_state, nb1413m3_outcoin_flag_r)    // OUT COIN
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(nbmj8891_state::nb1413m3_outcoin_flag_r))    // OUT COIN
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1948,7 +1948,7 @@ static INPUT_PORTS_START( hanaoji )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )         //
@@ -1961,7 +1961,7 @@ static INPUT_PORTS_START( hanaoji )
 
 	PORT_START("PORT0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         //
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(nbmj8891_state, nb1413m3_outcoin_flag_r)    // OUT COIN
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(nbmj8891_state::nb1413m3_outcoin_flag_r))    // OUT COIN
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )         //
@@ -2023,7 +2023,7 @@ static INPUT_PORTS_START( pairsnb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2126,7 +2126,7 @@ static INPUT_PORTS_START( taiwanmb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -3531,32 +3531,32 @@ GAME( 1988, hanamomo,  0,        hanamomo, hanamomo, nbmj8891_state, empty_init,
 GAME( 1988, hanamomb,  hanamomo, hanamomo, hanamomo, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong Hana no Momoko gumi (Japan 881125)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, telmahjn,  0,        telmahjn, msjiken,  nbmj8891_state, init_telmahjn, ROT270, "Nichibutsu", "Telephone Mahjong (Japan 890111)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gionbana,  0,        gionbana, gionbana, nbmj8891_state, init_gionbana, ROT0,   "Nichibutsu", "Gionbana (Japan 890120)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mgion,     0,        mgion,    mgion,    nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Gionbana [BET] (Japan 890207)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mgion,     0,        mgion,    mgion,    nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Gionbana (Japan 890207, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, omotesnd,  0,        omotesnd, omotesnd, nbmj8891_state, init_omotesnd, ROT0,   "Anime Tec", "Omotesandou (Japan 890215)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, abunai,    0,        abunai,   abunai,   nbmj8891_state, empty_init,    ROT0,   "Green Soft", "Abunai Houkago - Mou Matenai (Japan 890325)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjfocus,   0,        mjfocus,  mjfocus,  nbmj8891_state, init_mjfocus,  ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890313)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjfocusm,  mjfocus,  mjfocusm, mjfocusm, nbmj8891_state, init_mjfocusm, ROT0,   "Nichibutsu", "Mahjong Focus [BET] (Japan 890510)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjfocusm,  mjfocus,  mjfocusm, mjfocusm, nbmj8891_state, init_mjfocusm, ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890510, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, peepshow,  mjfocus,  mjfocus,  mjfocus,  nbmj8891_state, init_mjfocus,  ROT0,   "AC", "Nozokimeguri Mahjong Peep Show (Japan 890404)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjcamerb,  0,        mjcamerb, mjcamerb, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou (set 2) (Japan 881109)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mmcamera,  mjcamerb, mmcamera, mmcamera, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou [BET] (Japan 890509)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mmcamera,  mjcamerb, mmcamera, mmcamera, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Mahjong Camera Kozou (Japan 890509, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, scandal,   0,        scandal,  scandal,  nbmj8891_state, init_scandal,  ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890213)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, scandalm,  scandal,  scandalm, scandalm, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Scandal Mahjong [BET] (Japan 890217)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, scandalm,  scandal,  scandalm, scandalm, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890217, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mgmen89,   0,        mgmen89,  mgmen89,  nbmj8891_state, init_mgmen89,  ROT0,   "Nichibutsu", "Mahjong G-MEN'89 (Japan 890425)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnanpas,  0,        mjnanpas, mjnanpas, nbmj8891_state, init_mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Japan 890713)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnanpaa,  mjnanpas, mjnanpas, mjnanpaa, nbmj8891_state, init_mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Japan 890712)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnanpau,  mjnanpas, mjnanpas, mjnanpas, nbmj8891_state, init_mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Ura) (Japan 890805)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bananadr,  0,        bananadr, bananadr, nbmj8891_state, empty_init,    ROT0,   "Digital Soft", "Mahjong Banana Dream [BET] (Japan 891124)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bananadr,  0,        bananadr, bananadr, nbmj8891_state, empty_init,    ROT0,   "Digital Soft", "Mahjong Banana Dream (Japan 891124)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mladyhtr,  0,        mladyhtr, mladyhtr, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong The Lady Hunter (Japan 900509)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, chinmoku,  0,        chinmoku, chinmoku, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong Chinmoku no Hentai (Japan 900511)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, maiko,     0,        maiko,    maiko,    nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Maikobana (Japan 900802)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mmaiko,    0,        mmaiko,   mmaiko,   nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Maikobana [BET] (Japan 900911)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mmaiko,    0,        mmaiko,   mmaiko,   nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Maikobana (Japan 900911, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hnxmasev,  0,        hnxmasev, maiko,    nbmj8891_state, empty_init,    ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Christmas Eve (Japan 901204)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hnageman,  0,        hnageman, maiko,    nbmj8891_state, empty_init,    ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Ageman (Japan 900716)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, club90s,   0,        club90s,  club90s,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 1) (Japan 900919)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, club90sa,  club90s,  club90s,  club90s,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 2) (Japan 900919)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lovehous,  club90s,  lovehous, lovehous, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong Love House [BET] (Japan 901024)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hanaoji,   0,        hanaoji,  hanaoji,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.01, 1991/12/09)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hanaojia,  hanaoji,  hanaoji,  hanaoji,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.00, 1991/08/23)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, taiwanmb,  0,        taiwanmb, taiwanmb, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Taiwan Mahjong [BET] (Japan 881208)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lovehous,  club90s,  lovehous, lovehous, nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong Love House (Japan 901024)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hanaoji,   0,        hanaoji,  hanaoji,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Hana to Ojisan (ver 1.01, 1991/12/09)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hanaojia,  hanaoji,  hanaoji,  hanaoji,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Hana to Ojisan (ver 1.00, 1991/08/23)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, taiwanmb,  0,        taiwanmb, taiwanmb, nbmj8891_state, empty_init,    ROT0,   "Miki Syouji", "Taiwan Mahjong (Japan 881208)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pairsnb,   0,        pairsnb,  pairsnb,  nbmj8891_state, init_pairsnb,  ROT0,   "Nichibutsu", "Pairs (Nichibutsu) (Japan 890822)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pairsten,  pairsnb,  pairsten, pairsnb,  nbmj8891_state, init_pairsten, ROT0,   "System Ten", "Pairs (System Ten) (Japan 890826)", MACHINE_SUPPORTS_SAVE )

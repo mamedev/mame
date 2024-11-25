@@ -93,8 +93,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 port1a_r();
@@ -104,7 +104,7 @@ private:
 	void port2b_w(u8 data);
 	void port3a_w(u8 data);
 	void port3b_w(u8 data);
-	void gts80a_map(address_map &map);
+	void gts80a_map(address_map &map) ATTR_COLD;
 
 	u8 m_segment = 0U;
 	u8 m_lamprow = 0U;
@@ -327,7 +327,7 @@ static INPUT_PORTS_START( gts80a )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X8")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam") PORT_CHANGED_MEMBER(DEVICE_SELF, gts80a_state, slam_w, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gts80a_state::slam_w), 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( gts80a_state::slam_w )
@@ -596,8 +596,8 @@ public:
 
 private:
 	uint32_t screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void video_io_map(address_map &map);
-	void video_map(address_map &map);
+	void video_io_map(address_map &map) ATTR_COLD;
+	void video_map(address_map &map) ATTR_COLD;
 	required_device<cpu_device> m_videocpu;
 	required_shared_ptr<uint8_t> m_vram;
 };

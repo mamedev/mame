@@ -48,13 +48,13 @@ public:
 	void jvh3(machine_config &config);
 
 private:
-	void escape_io(address_map &map);
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
-	void movmastr_io(address_map &map);
+	void escape_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void movmastr_io(address_map &map) ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	output_finder<50> m_digits;
 	output_finder<80> m_io_outputs; // ?? solenoids + ?? lamps
 };

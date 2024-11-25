@@ -7,15 +7,8 @@
 
 #include "m68kcommon.h"
 
-// SoftFloat 2 lacks an include guard
-#ifndef softfloat2_h
-#define softfloat2_h 1
-#include "softfloat/milieu.h"
-#include "softfloat/softfloat.h"
-#endif
-
-extern flag floatx80_is_nan(floatx80 a);
-
+#include "softfloat3/source/include/softfloat.h"
+#include "softfloat3/bochs_ext/softfloat3_ext.h"
 
 /* MMU constants */
 constexpr int MMU_ATC_ENTRIES = (22);    // 68851 has 64, 030 has 22
@@ -107,9 +100,9 @@ protected:
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == M68K_LINE_BUSERROR || (m_interrupt_mixer ? inputnum == M68K_IRQ_7 : false); }
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual void device_pre_save() override;
 	virtual void device_post_load() override;
 
@@ -128,6 +121,7 @@ public:
 	void set_emmu_enable(bool enable);
 	bool get_pmmu_enable() const {return m_pmmu_enabled;}
 	void set_fpu_enable(bool enable);
+	bool get_fpu_enable() const { return m_has_fpu; }
 	void set_buserror_details(u32 fault_addr, u8 rw, u8 fc, bool rerun = false);
 	void restart_this_instruction();
 
@@ -152,7 +146,7 @@ protected:
 	u32 m_cacr;         /* Cache Control Register (m68020, unemulated) */
 	u32 m_caar;         /* Cache Address Register (m68020, unemulated) */
 	u32 m_ir;           /* Instruction Register */
-	floatx80 m_fpr[8];     /* FPU Data Register (m68030/040) */
+	extFloat80_t m_fpr[8]; /* FPU Data Register (m68030/040) */
 	u32 m_fpiar;        /* FPU Instruction Address Register (m68040) */
 	u32 m_fpsr;         /* FPU Status Register (m68040) */
 	u32 m_fpcr;         /* FPU Control Register (m68040) */
@@ -178,7 +172,7 @@ protected:
 	bool m_pmmu_enabled; /* Indicates if the PMMU is enabled */
 	int m_hmmu_enabled;  /* Indicates if the HMMU is enabled */
 	bool m_emmu_enabled; /* Indicates if external MMU is enabled */
-	bool m_instruction_restart; /* Save DA regs for potential instruction restart */
+	bool m_can_instruction_restart; /* Save DA regs for potential instruction restart */
 	bool m_fpu_just_reset; /* Indicates the FPU was just reset */
 	bool m_restart_instruction; /* Indicates the instruction should be restarted */
 
@@ -226,7 +220,9 @@ protected:
 	void init8(address_space &space, address_space &ospace);
 	void init16(address_space &space, address_space &ospace);
 	void init32(address_space &space, address_space &ospace);
+	void init32_no_smear(address_space &space, address_space &ospace);
 	void init32mmu(address_space &space, address_space &ospace);
+	void init32mmu_no_smear(address_space &space, address_space &ospace);
 	void init32hmmu(address_space &space, address_space &ospace);
 
 	std::function<u16 (offs_t)> m_readimm16;      // Immediate read 16 bit
@@ -302,7 +298,7 @@ protected:
 	void init_cpu_scc68070(void);
 	void init_cpu_coldfire(void);
 
-	void default_autovectors_map(address_map &map);
+	void default_autovectors_map(address_map &map) ATTR_COLD;
 
 	void m68ki_exception_interrupt(u32 int_level);
 
@@ -329,48 +325,45 @@ protected:
 #include "m68kops.h"
 #include "m68kmmu.h"
 
-	static double fx80_to_double(floatx80 fx)
+	static double fx80_to_double(extFloat80_t fx)
 	{
-		u64 d;
-		double *foo;
-
-		foo = (double *)&d;
-
-		d = floatx80_to_float64(fx);
+		const float64_t d = extF80_to_f64(fx);
+		const double *foo = (double *)&d;
 
 		return *foo;
 	}
 
-	static floatx80 double_to_fx80(double in)
+	static extFloat80_t double_to_fx80(double in)
 	{
-		u64 *d;
+		float64_t *d = (float64_t *)&in;
 
-		d = (u64 *)&in;
-
-		return float64_to_floatx80(*d);
+		return f64_to_extF80(*d);
 	}
 
 	// defined in m68kfpu.cpp
 	static const u32 pkmask2[18];
 	static const u32 pkmask3[18];
-	inline floatx80 load_extended_float80(u32 ea);
-	inline void store_extended_float80(u32 ea, floatx80 fpr);
-	inline floatx80 load_pack_float80(u32 ea);
-	inline void store_pack_float80(u32 ea, int k, floatx80 fpr);
-	inline void SET_CONDITION_CODES(floatx80 reg);
-	inline int TEST_CONDITION(int condition);
+	inline extFloat80_t load_extended_float80(u32 ea);
+	inline void store_extended_float80(u32 ea, extFloat80_t fpr);
+	inline extFloat80_t load_pack_float80(u32 ea);
+	inline void store_pack_float80(u32 ea, int k, extFloat80_t fpr);
+	void set_condition_codes(extFloat80_t reg);
+	int test_condition(int condition);
+	void clear_exception_flags();
+	void sync_exception_flags(extFloat80_t op1, extFloat80_t op2, u32 enables);
+	s32 convert_to_int(extFloat80_t source, s32 lowerLimit, s32 upperLimit);
 	u8 READ_EA_8(int ea);
 	u16 READ_EA_16(int ea);
 	u32 READ_EA_32(int ea);
 	u64 READ_EA_64(int ea);
-	floatx80 READ_EA_FPE(int mode, int reg, uint32 di_mode_ea);
-	floatx80 READ_EA_PACK(int ea);
+	extFloat80_t READ_EA_FPE(int mode, int reg, uint32_t di_mode_ea);
+	extFloat80_t READ_EA_PACK(int ea);
 	void WRITE_EA_8(int ea, u8 data);
 	void WRITE_EA_16(int ea, u16 data);
 	void WRITE_EA_32(int ea, u32 data);
 	void WRITE_EA_64(int ea, u64 data);
-	void WRITE_EA_FPE(int mode, int reg, floatx80 fpr, uint32 di_mode_ea);
-	void WRITE_EA_PACK(int ea, int k, floatx80 fpr);
+	void WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, uint32_t di_mode_ea);
+	void WRITE_EA_PACK(int ea, int k, extFloat80_t fpr);
 	void fpgen_rm_reg(u16 w2);
 	void fmove_reg_mem(u16 w2);
 	void fmove_fpcr(u16 w2);
@@ -385,6 +378,8 @@ protected:
 	void m68040_do_frestore(u32 addr, int reg);
 	void m68040_fpu_op1();
 	void m68881_ftrap();
+	u32 m6888x_read_cir(offs_t offset);
+	void m6888x_write_cir(offs_t offset, u32 data);
 };
 
 #endif // MAME_CPU_M68000_M68KMUSASHI_H

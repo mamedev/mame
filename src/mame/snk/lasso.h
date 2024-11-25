@@ -46,9 +46,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -101,16 +101,16 @@ private:
 	void wwjgtin_set_last_four_colors();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse);
 	void draw_lasso(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void chameleo_audio_map(address_map &map);
-	void chameleo_main_map(address_map &map);
-	void lasso_audio_map(address_map &map);
-	void lasso_coprocessor_map(address_map &map);
-	void lasso_main_map(address_map &map);
-	void pinbo_audio_io_map(address_map &map);
-	void pinbo_audio_map(address_map &map);
-	void pinbo_main_map(address_map &map);
-	void wwjgtin_audio_map(address_map &map);
-	void wwjgtin_main_map(address_map &map);
+	void chameleo_audio_map(address_map &map) ATTR_COLD;
+	void chameleo_main_map(address_map &map) ATTR_COLD;
+	void lasso_audio_map(address_map &map) ATTR_COLD;
+	void lasso_coprocessor_map(address_map &map) ATTR_COLD;
+	void lasso_main_map(address_map &map) ATTR_COLD;
+	void pinbo_audio_io_map(address_map &map) ATTR_COLD;
+	void pinbo_audio_map(address_map &map) ATTR_COLD;
+	void pinbo_main_map(address_map &map) ATTR_COLD;
+	void wwjgtin_audio_map(address_map &map) ATTR_COLD;
+	void wwjgtin_main_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SNK_LASSO_H

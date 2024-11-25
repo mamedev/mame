@@ -58,7 +58,7 @@ public:
 	{
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual u8 read() override
 	{
@@ -188,7 +188,7 @@ public:
 	{
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual u8 read() override
 	{

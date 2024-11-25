@@ -67,8 +67,8 @@ protected:
 			device_t *owner,
 			u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 
 	// flip latching (set when declaring device in MCFG )  probably needs figuring out properly, only brapboys wants it?
@@ -85,13 +85,12 @@ protected:
 	// them in a different order
 	virtual void get_sprite_attributes(struct tempsprite_t *s, u16 attr) =0;
 
-	required_memory_region m_gfx_region;
 	u16 m_colbase;
 
 private:
 	// registers
-	u16 m_sprite_flipx;
-	u16 m_sprite_flipy;
+	bool m_sprite_flipx;
+	bool m_sprite_flipy;
 	std::unique_ptr<u16[]> m_sprites_regs;
 
 	std::unique_ptr<struct tempsprite_t[]> m_first_sprite;
@@ -127,7 +126,10 @@ public:
 	int get_sprite_type(void) override{ return 0; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 };
 
 DECLARE_DEVICE_TYPE(KANEKO_VU002_SPRITE, kaneko_vu002_sprite_device)
@@ -146,7 +148,10 @@ public:
 	int get_sprite_type(void) override{ return 1; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 };
 
 DECLARE_DEVICE_TYPE(KANEKO_KC002_SPRITE, kaneko_kc002_sprite_device)

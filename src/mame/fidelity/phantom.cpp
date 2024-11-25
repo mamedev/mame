@@ -5,13 +5,22 @@
 
 Fidelity Phantom (model 6100)
 
-Fidelity licensed the design of the Milton/Phantom motorized chessboard and released
-their own version. It has a small LCD panel added, the rest looks nearly the same from
-the outside. After Fidelity was taken over by H+G, it was rereleased in 1990 as the
-Mephisto Phantom. This is assumed to be identical.
+Fidelity licensed (or perhaps bought) the design of Milton Bradley's Grand·Master
+motorized chessboard and released their own version. It has a small LCD panel added,
+the rest looks nearly the same from the outside. After Fidelity was taken over by H+G,
+it was rereleased in 1990 as the Mephisto Phantom. This is assumed to be identical.
+
+At boot-up, the computer will do a self-test, the user can start playing after the
+motor has moved to the upper-right corner. The computer will continue positioning
+pieces though, so it may be a bit distracting. Or, just hold INSERT (on PC) for a
+while to speed up MAME before starting a new game.
+
+After the user captures a piece, select the captured piece from the MAME sensorboard
+spawn block and place it anywhere on a free spot at the designated box at the
+edge of the chessboard.
 
 Hardware notes:
-- PCB label 510.1128A01
+- PCB label: 510.1128A01
 - R65C02P4, XTAL marked 4.915200
 - 2*32KB ROM 27C256-15, 8KB RAM MS6264L-10
 - LCD driver, display panel for digits
@@ -24,18 +33,8 @@ daughterboard, the housing is the same as model 6100, except for button labels.
 Model 6126 has a dedicated PCB, this version also has a motion sensor at the front
 and 2 leds to mimic eyes, and the housing color theme is green instead of beige.
 
-At boot-up, the computer will do a self-test, the user can start playing after the
-motor has moved to the upper-right corner. The computer will continue positioning
-pieces though, so it may be a bit distracting. Or, just hold INSERT (on PC) for a
-while to speed up MAME before starting a new game.
-
-After the user captures a piece, select the captured piece from the MAME sensorboard
-spawn block and place it anywhere on a free spot at the designated box at the
-edge of the chessboard.
-
 TODO:
 - sensorboard undo buffer goes out of control, probably not worth solving this issue
-- cphantom artwork should be green instead of beige
 
 BTANB:
 - cphantom: As the manual suggests, the computer's move should be displayed on the
@@ -84,13 +83,13 @@ public:
 	void init_phantom();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
-	optional_device<dac_bit_interface> m_dac;
+	optional_device<dac_1bit_device> m_dac;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	optional_ioport_array<2> m_inputs;
@@ -112,7 +111,7 @@ protected:
 	u8 m_pieces_map[0x80][0x80] = { };
 
 	// address maps
-	virtual void main_map(address_map &map);
+	virtual void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_lcd(u8 select);
@@ -125,7 +124,8 @@ protected:
 	u8 hmotor_ff_clear_r();
 	u8 vmotor_ff_clear_r();
 
-	void clear_board(int state);
+	void init_board(u8 data);
+	void clear_board(u8 data);
 	void check_rotation();
 	TIMER_DEVICE_CALLBACK_MEMBER(motors_timer);
 	void update_pieces_position(int state);
@@ -162,11 +162,27 @@ void phantom_state::machine_reset()
 	output_magnet_pos();
 }
 
-void phantom_state::clear_board(int state)
+void phantom_state::init_board(u8 data)
+{
+	m_board->preset_chess(data);
+
+	// reposition pieces if board will be rotated
+	if (data & 2)
+	{
+		for (int y = 0; y < 8; y++)
+			for (int x = 7; x >= 0; x--)
+			{
+				m_board->write_piece(x + 4, y, m_board->read_piece(x, y));
+				m_board->write_piece(x, y, 0);
+			}
+	}
+}
+
+void phantom_state::clear_board(u8 data)
 {
 	memset(m_pieces_map, 0, sizeof(m_pieces_map));
 	m_piece_hand = 0;
-	m_board->clear_board();
+	m_board->clear_board(data);
 }
 
 void phantom_state::init_phantom()
@@ -175,6 +191,7 @@ void phantom_state::init_phantom()
 	m_rombank->configure_entries(0, numbanks, memregion("rombank")->base(), 0x4000);
 }
 
+
 // Chesster Phantom
 
 class chessterp_state : public phantom_state
@@ -182,18 +199,21 @@ class chessterp_state : public phantom_state
 public:
 	chessterp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		phantom_state(mconfig, type, tag),
+		m_speech(*this, "speech"),
 		m_eye_led(*this, "eye_led")
 	{ }
 
 	void cphantom(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	required_device<dac_8bit_r2r_device> m_speech;
 	output_finder<> m_eye_led;
 
-	virtual void main_map(address_map &map) override;
+	virtual void main_map(address_map &map) override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 	virtual void control_w(offs_t offset, u8 data) override;
@@ -208,6 +228,12 @@ void chessterp_state::machine_start()
 
 	m_eye_led.resolve();
 	save_item(NAME(m_select2));
+}
+
+void chessterp_state::machine_reset()
+{
+	phantom_state::machine_reset();
+	m_speech->write(0x80);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(chessterp_state::nmi_timer)
@@ -531,14 +557,14 @@ void phantom_state::main_map(address_map &map)
 	map(0x2500, 0x2500).mirror(0x00ff).r(FUNC(phantom_state::hmotor_ff_clear_r));
 	map(0x2600, 0x2600).mirror(0x00ff).r(FUNC(phantom_state::vmotor_ff_clear_r));
 	map(0x2700, 0x2700).mirror(0x00ff).r(FUNC(phantom_state::irq_ack_r));
-	map(0x4000, 0x7fff).bankr("rombank");
+	map(0x4000, 0x7fff).bankr(m_rombank);
 	map(0x8000, 0xffff).rom();
 }
 
 void chessterp_state::main_map(address_map &map)
 {
 	phantom_state::main_map(map);
-	map(0x2300, 0x2300).mirror(0x00ff).w("speech", FUNC(dac_byte_interface::data_w));
+	map(0x2300, 0x2300).mirror(0x00ff).w(m_speech, FUNC(dac_8bit_r2r_device::data_w));
 }
 
 
@@ -597,7 +623,7 @@ void phantom_state::phantom(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->set_size(8+4, 8);
 	m_board->clear_cb().set(FUNC(phantom_state::clear_board));
-	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->init_cb().set(FUNC(phantom_state::init_board));
 	m_board->set_delay(attotime::from_msec(100));
 
 	// video hardware
@@ -625,7 +651,7 @@ void chessterp_state::cphantom(machine_config &config)
 
 	// sound hardware
 	config.device_remove("dac");
-	DAC_8BIT_R2R(config, "speech").add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_8BIT_R2R(config, m_speech).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -660,6 +686,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT          COMPANY, FULLNAME, FLAGS
-SYST( 1988, fphantom, 0,      0,      phantom,  phantom,  phantom_state,   init_phantom, "Fidelity Electronics", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1988, fphantom, 0,      0,      phantom,  phantom,  phantom_state,   init_phantom, "Fidelity International", "Phantom (Fidelity)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
 
-SYST( 1991, cphantom, 0,      0,      cphantom, cphantom, chessterp_state, init_phantom, "Fidelity Electronics", "Chesster Phantom (model 6126)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1991, cphantom, 0,      0,      cphantom, cphantom, chessterp_state, init_phantom, "Fidelity Electronics International", "Chesster Phantom (model 6126)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )

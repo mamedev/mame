@@ -1046,7 +1046,7 @@ static NETLIST_START(TTL_7474_DIP)
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://ia800608.us.archive.org/5/items/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
+//-   https://archive.org/download/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
 //-
 //-         +---+---++---+----+
 //-         | D | G || Q | QQ |
@@ -1088,7 +1088,7 @@ static NETLIST_START(TTL_7475_DIP)
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-   https://ia800608.us.archive.org/5/items/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
+//-   https://archive.org/download/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
 //-
 //-         +---+---++---+----+
 //-         | D | G || Q | QQ |
@@ -2831,7 +2831,7 @@ static NETLIST_START(SN74LS629_DIP)
 //- Package: DIP
 //- NamingConvention: Naming conventions follow National Semiconductor datasheet
 //- FunctionTable:
-//-    https://ia800608.us.archive.org/5/items/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
+//-    https://archive.org/download/bitsavers_nationaldaTTLDatabook_40452765/1976_National_TTL_Databook.pdf
 //-
 static NETLIST_START(TTL_9310_DIP)
 {
@@ -3355,23 +3355,23 @@ static TRUTH_TABLE(TTL_74148_GATE, 9, 5, "")
 static TRUTH_TABLE(TTL_74151_GATE, 12, 2, "")
 {
 	TT_HEAD("C,B,A,G,D0,D1,D2,D3,D4,D5,D6,D7|Y,W")
-	TT_LINE( "X,X,X,1,X,X,X,X,X,X,X,X|0,1|38,30")
-	TT_LINE( "0,0,0,0,1,X,X,X,X,X,X,X|1,0|38,30")
-	TT_LINE( "0,0,0,0,0,X,X,X,X,X,X,X|0,1|38,30")
-	TT_LINE( "0,0,1,0,X,1,X,X,X,X,X,X|1,0|38,30")
-	TT_LINE( "0,0,1,0,X,0,X,X,X,X,X,X|0,1|38,30")
-	TT_LINE( "0,1,0,0,X,X,1,X,X,X,X,X|1,0|38,30")
-	TT_LINE( "0,1,0,0,X,X,0,X,X,X,X,X|0,1|38,30")
-	TT_LINE( "0,1,1,0,X,X,X,1,X,X,X,X|1,0|38,30")
-	TT_LINE( "0,1,1,0,X,X,X,0,X,X,X,X|0,1|38,30")
-	TT_LINE( "1,0,0,0,X,X,X,X,1,X,X,X|1,0|38,30")
-	TT_LINE( "1,0,0,0,X,X,X,X,0,X,X,X|0,1|38,30")
-	TT_LINE( "1,0,1,0,X,X,X,X,X,1,X,X|1,0|38,30")
-	TT_LINE( "1,0,1,0,X,X,X,X,X,0,X,X|0,1|38,30")
-	TT_LINE( "1,1,0,0,X,X,X,X,X,X,1,X|1,0|38,30")
-	TT_LINE( "1,1,0,0,X,X,X,X,X,X,0,X|0,1|38,30")
-	TT_LINE( "1,1,1,0,X,X,X,X,X,X,X,1|1,0|38,30")
-	TT_LINE( "1,1,1,0,X,X,X,X,X,X,X,0|0,1|38,30")
+	TT_LINE( "X,X,X,1,X,X,X,X,X,X,X,X|0,1|12,10")
+	TT_LINE( "0,0,0,0,1,X,X,X,X,X,X,X|1,0|12,10")
+	TT_LINE( "0,0,0,0,0,X,X,X,X,X,X,X|0,1|12,10")
+	TT_LINE( "0,0,1,0,X,1,X,X,X,X,X,X|1,0|12,10")
+	TT_LINE( "0,0,1,0,X,0,X,X,X,X,X,X|0,1|12,10")
+	TT_LINE( "0,1,0,0,X,X,1,X,X,X,X,X|1,0|12,10")
+	TT_LINE( "0,1,0,0,X,X,0,X,X,X,X,X|0,1|12,10")
+	TT_LINE( "0,1,1,0,X,X,X,1,X,X,X,X|1,0|12,10")
+	TT_LINE( "0,1,1,0,X,X,X,0,X,X,X,X|0,1|12,10")
+	TT_LINE( "1,0,0,0,X,X,X,X,1,X,X,X|1,0|12,10")
+	TT_LINE( "1,0,0,0,X,X,X,X,0,X,X,X|0,1|12,10")
+	TT_LINE( "1,0,1,0,X,X,X,X,X,1,X,X|1,0|12,10")
+	TT_LINE( "1,0,1,0,X,X,X,X,X,0,X,X|0,1|12,10")
+	TT_LINE( "1,1,0,0,X,X,X,X,X,X,1,X|1,0|12,10")
+	TT_LINE( "1,1,0,0,X,X,X,X,X,X,0,X|0,1|12,10")
+	TT_LINE( "1,1,1,0,X,X,X,X,X,X,X,1|1,0|12,10")
+	TT_LINE( "1,1,1,0,X,X,X,X,X,X,X,0|0,1|12,10")
 	TT_FAMILY("74XX")
 }
 
@@ -3473,23 +3473,23 @@ static TRUTH_TABLE(TTL_74279B, 4, 1, "")
 static TRUTH_TABLE(TTL_74368_GATE, 5, 4, "")
 {
 	TT_HEAD("OE,A1,A2,A3,A4|Y1,Y2,Y3,Y4")
-	TT_LINE("1,X,X,X,X|0,0,0,0|45")
-	TT_LINE("0,0,0,0,0|1,1,1,1|45")
-	TT_LINE("0,0,0,0,1|1,1,1,0|45")
-	TT_LINE("0,0,0,1,0|1,1,0,1|45")
-	TT_LINE("0,0,0,1,1|1,1,0,0|45")
-	TT_LINE("0,0,1,0,0|1,0,1,1|45")
-	TT_LINE("0,0,1,0,1|1,0,1,0|45")
-	TT_LINE("0,0,1,1,0|1,0,0,1|45")
-	TT_LINE("0,0,1,1,1|1,0,0,0|45")
-	TT_LINE("0,1,0,0,0|0,1,1,1|45")
-	TT_LINE("0,1,0,0,1|0,1,1,0|45")
-	TT_LINE("0,1,0,1,0|0,1,0,1|45")
-	TT_LINE("0,1,0,1,1|0,1,0,0|45")
-	TT_LINE("0,1,1,0,0|0,0,1,1|45")
-	TT_LINE("0,1,1,0,1|0,0,1,0|45")
-	TT_LINE("0,1,1,1,0|0,0,0,1|45")
-	TT_LINE("0,1,1,1,1|0,0,0,0|45")
+	TT_LINE("1,X,X,X,X|0,0,0,0|12")
+	TT_LINE("0,0,0,0,0|1,1,1,1|12")
+	TT_LINE("0,0,0,0,1|1,1,1,0|12")
+	TT_LINE("0,0,0,1,0|1,1,0,1|12")
+	TT_LINE("0,0,0,1,1|1,1,0,0|12")
+	TT_LINE("0,0,1,0,0|1,0,1,1|12")
+	TT_LINE("0,0,1,0,1|1,0,1,0|12")
+	TT_LINE("0,0,1,1,0|1,0,0,1|12")
+	TT_LINE("0,0,1,1,1|1,0,0,0|12")
+	TT_LINE("0,1,0,0,0|0,1,1,1|12")
+	TT_LINE("0,1,0,0,1|0,1,1,0|12")
+	TT_LINE("0,1,0,1,0|0,1,0,1|12")
+	TT_LINE("0,1,0,1,1|0,1,0,0|12")
+	TT_LINE("0,1,1,0,0|0,0,1,1|12")
+	TT_LINE("0,1,1,0,1|0,0,1,0|12")
+	TT_LINE("0,1,1,1,0|0,0,0,1|12")
+	TT_LINE("0,1,1,1,1|0,0,0,0|12")
 	TT_FAMILY("74XX")
 }
 

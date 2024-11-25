@@ -50,6 +50,12 @@ const thomson_525_format::format thomson_525_format::formats[] = {
 	{}
 };
 
+int thomson_525_format::get_image_offset(const format &f, int head, int track) const
+{
+	return (track + (head ? f.track_count : 0)) * compute_track_size(f);
+}
+
+
 
 thomson_35_format::thomson_35_format() : wd177x_format(formats)
 {
@@ -70,6 +76,8 @@ const char *thomson_35_format::extensions() const noexcept
 	return "fd";
 }
 
+// 1280K .fd images exist but are not supported. They represent a notional type
+// of 4-sided disk that can be inserted into 2 drives at once.
 const thomson_35_format::format thomson_35_format::formats[] = {
 	{
 		floppy_image::FF_35, floppy_image::SSDD, floppy_image::MFM,
@@ -89,6 +97,11 @@ const thomson_35_format::format thomson_35_format::formats[] = {
 	},
 	{}
 };
+
+int thomson_35_format::get_image_offset(const format &f, int head, int track) const
+{
+	return (track + (head ? f.track_count : 0)) * compute_track_size(f);
+}
 
 const thomson_525_format FLOPPY_THOMSON_525_FORMAT;
 const thomson_35_format FLOPPY_THOMSON_35_FORMAT;

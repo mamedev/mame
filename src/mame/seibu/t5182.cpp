@@ -149,17 +149,17 @@ rom.
 #include "emu.h"
 #include "t5182.h"
 
-#define T5182_CLOCK     XTAL(14'318'181)/4
-
 DEFINE_DEVICE_TYPE(T5182, t5182_device, "t5182", "T5182 MCU")
 
 t5182_device::t5182_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, T5182, tag, owner, clock),
-	m_ourcpu(*this, "t5182_z80"),
-	m_sharedram(*this, "sharedram"),
-	m_irqstate(0),
-	m_semaphore_main(0),
-	m_semaphore_snd(0)
+	: device_t(mconfig, T5182, tag, owner, clock)
+	, m_ourcpu(*this, "t5182_z80")
+	, m_sharedram(*this, "sharedram")
+	, m_ym_read_cb(*this, 0)
+	, m_ym_write_cb(*this)
+	, m_irqstate(0)
+	, m_semaphore_main(false)
+	, m_semaphore_snd(false)
 {
 }
 
@@ -185,12 +185,12 @@ void t5182_device::sharedram_w(offs_t offset, uint8_t data)
 	m_sharedram[offset] = data;
 }
 
-TIMER_CALLBACK_MEMBER( t5182_device::setirq_callback )
+TIMER_CALLBACK_MEMBER(t5182_device::setirq_callback)
 {
-	switch(param)
+	switch (param)
 	{
 		case YM2151_ASSERT:
-			m_irqstate |= 1|4;
+			m_irqstate |= 1 | 4;
 			break;
 
 		case YM2151_CLEAR:
@@ -213,10 +213,10 @@ TIMER_CALLBACK_MEMBER( t5182_device::setirq_callback )
 	if (m_ourcpu == nullptr)
 		return;
 
-	if (m_irqstate == 0)  /* no IRQs pending */
-		m_ourcpu->set_input_line(0,CLEAR_LINE);
-	else    /* IRQ pending */
-		m_ourcpu->set_input_line(0,ASSERT_LINE);
+	if (m_irqstate == 0)  // no IRQs pending
+		m_ourcpu->set_input_line(0, CLEAR_LINE);
+	else    // IRQ pending
+		m_ourcpu->set_input_line(0, ASSERT_LINE);
 }
 
 void t5182_device::sound_irq_w(uint8_t data)
@@ -244,32 +244,42 @@ void t5182_device::ym2151_irq_handler(int state)
 
 uint8_t t5182_device::sharedram_semaphore_snd_r()
 {
-	return m_semaphore_snd;
+	return m_semaphore_snd ? 1 : 0;
 }
 
 void t5182_device::sharedram_semaphore_main_acquire_w(uint8_t data)
 {
-	m_semaphore_main = 1;
+	m_semaphore_main = true;
 }
 
 void t5182_device::sharedram_semaphore_main_release_w(uint8_t data)
 {
-	m_semaphore_main = 0;
+	m_semaphore_main = false;
 }
 
 void t5182_device::sharedram_semaphore_snd_acquire_w(uint8_t data)
 {
-	m_semaphore_snd = 1;
+	m_semaphore_snd = true;
 }
 
 void t5182_device::sharedram_semaphore_snd_release_w(uint8_t data)
 {
-	m_semaphore_snd = 0;
+	m_semaphore_snd = false;
 }
 
 uint8_t t5182_device::sharedram_semaphore_main_r()
 {
-	return m_semaphore_main | (m_irqstate & 2);
+	return (m_semaphore_main ? 1 : 0) | (m_irqstate & 2);
+}
+
+uint8_t t5182_device::ym_r(offs_t offset)
+{
+	return m_ym_read_cb(offset);
+}
+
+void t5182_device::ym_w(offs_t offset, uint8_t data)
+{
+	m_ym_write_cb(offset, data);
 }
 
 // ROM definition for the Toshiba T5182 Custom CPU internal program ROM
@@ -325,8 +335,8 @@ void t5182_device::t5182_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("cpu", 0); // internal ROM
 	map(0x2000, 0x27ff).ram().mirror(0x1800); // internal RAM
-	map(0x4000, 0x40ff).ram().mirror(0x3F00).share("sharedram"); // 2016 with four 74ls245s, one each for main and t5182 address and data. pins 23, 22, 20, 19, 18 are all tied low so only 256 bytes are usable
-	map(0x8000, 0xffff).rom().region(":t5182_z80", 0); // external ROM
+	map(0x4000, 0x40ff).ram().mirror(0x3f00).share(m_sharedram); // 2016 with four 74ls245s, one each for main and t5182 address and data. pins 23, 22, 20, 19, 18 are all tied low so only 256 bytes are usable
+	map(0x8000, 0xffff).rom().region("external", 0); // external ROM
 }
 
 
@@ -343,7 +353,7 @@ void t5182_device::t5182_map(address_map &map)
 void t5182_device::t5182_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).rw(":ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x00, 0x01).rw(FUNC(t5182_device::ym_r), FUNC(t5182_device::ym_w));
 	map(0x10, 0x10).w(FUNC(t5182_device::sharedram_semaphore_snd_acquire_w));
 	map(0x11, 0x11).w(FUNC(t5182_device::sharedram_semaphore_snd_release_w));
 	map(0x12, 0x12).w(FUNC(t5182_device::ym2151_irq_ack_w));
@@ -359,7 +369,7 @@ void t5182_device::t5182_io(address_map &map)
 
 void t5182_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_ourcpu, T5182_CLOCK);
+	Z80(config, m_ourcpu, DERIVED_CLOCK(1, 1));
 	m_ourcpu->set_addrmap(AS_PROGRAM, &t5182_device::t5182_map);
 	m_ourcpu->set_addrmap(AS_IO, &t5182_device::t5182_io);
 }

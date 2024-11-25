@@ -1,0 +1,230 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+
+<mamelayout version="2">
+	<element name="bg"><rect><color red="0.06" green="0.06" blue="0.06" /></rect></element>
+	<element name="grey"><rect><color red="0.04" green="0.04" blue="0.04" /></rect></element>
+	<element name="yellow"><rect><color red="0.9" green="0.85" blue="0.45" /></rect></element>
+
+	<element name="led" defstate="0">
+		<rect state="0"><color red="0.2" green="0" blue="0" /></rect>
+		<rect state="1"><color red="1" green="0.1" blue="0" /></rect>
+	</element>
+
+	<!-- text elements -->
+	<element name="copy"><text string="COPY" /></element>
+	<element name="edit"><text string="EDIT" /></element>
+	<element name="insert"><text string="INSERT" /></element>
+	<element name="delete"><text string="DELETE" /></element>
+
+	<element name="midi"><text string="MIDI" /></element>
+	<element name="repeat"><text string="REPEAT" /></element>
+	<element name="track"><text string="TRACK" /></element>
+	<element name="track1"><text string="1" /></element>
+	<element name="track2"><text string="2" /></element>
+	<element name="track3"><text string="3" /></element>
+	<element name="track4"><text string="4" /></element>
+	<element name="cartridge"><text string="CARTRIDGE" /></element>
+	<element name="mt"><text string="/MT" /></element>
+
+	<element name="note4"><text string="1/4" /></element>
+	<element name="note2"><text string="1/2" /></element>
+	<element name="note1"><text string="1/1" /></element>
+	<element name="note8"><text string="1/8" /></element>
+	<element name="note16"><text string="1/16" /></element>
+	<element name="note32"><text string="1/32" /></element>
+	<element name="rest"><text string="REST" /></element>
+	<element name="dot"><text string="DOT" /></element>
+	<element name="triplet"><text string="TRIPLET" /></element>
+	<element name="tie"><text string="TIE" /></element>
+	<element name="manual_data"><text string="MANUAL DATA" /></element>
+
+	<element name="metronome"><text string="METRONOME" /></element>
+	<element name="enter"><text string="/ENTER" /></element>
+	<element name="tempo"><text string="TEMPO" /></element>
+	<element name="down"><text string="DOWN" /></element>
+	<element name="up"><text string="UP" /></element>
+
+	<element name="record_track"><text string="RECORD TRACK" /></element>
+	<element name="realtime"><text string="REAL TIME" /></element>
+	<element name="manual"><text string="MANUAL" /></element>
+	<element name="record"><text string="RECORD" /></element>
+	<element name="reset"><text string="RESET" /></element>
+
+	<element name="rev"><text string="REV" /></element>
+	<element name="fwd"><text string="FWD" /></element>
+	<element name="play"><text string="PLAY" /></element>
+	<element name="stop"><text string="STOP" /></element>
+	<element name="save"><text string="SAVE" /></element>
+	<element name="load"><text string="LOAD" /></element>
+	<element name="check"><text string="CHECK" /></element>
+
+	<!-- button primitives -->
+	<element name="button_black" defstate="0">
+		<rect><color red="0.05" green="0.05" blue="0.05" /><bounds x="0" y="0" width="15" height="15" /></rect>
+		<rect state="0"><color red="0.14" green="0.14" blue="0.14" /><bounds xc="7.5" yc="7.5" width="13.5" height="13.5" /></rect>
+		<rect state="1"><color red="0.08" green="0.08" blue="0.08" /><bounds xc="7.5" yc="7.5" width="13.5" height="13.5" /></rect>
+	</element>
+	<element name="button_black_small" defstate="0">
+		<rect><color red="0.05" green="0.05" blue="0.05" /><bounds x="0" y="0" width="10" height="15" /></rect>
+		<rect state="0"><color red="0.14" green="0.14" blue="0.14" /><bounds xc="5" yc="7.5" width="8.5" height="13.5" /></rect>
+		<rect state="1"><color red="0.08" green="0.08" blue="0.08" /><bounds xc="5" yc="7.5" width="8.5" height="13.5" /></rect>
+	</element>
+
+	<element name="button_tempo" defstate="0">
+		<rect><color red="0.05" green="0.05" blue="0.05" /><bounds x="0" y="0" width="15" height="15" /></rect>
+		<rect state="0"><color red="0.11" green="0.1" blue="0.1" /><bounds xc="7.5" yc="7.5" width="13.5" height="13.5" /></rect>
+		<rect state="1"><color red="0.075" green="0.07" blue="0.07" /><bounds xc="7.5" yc="7.5" width="13.5" height="13.5" /></rect>
+	</element>
+
+	<element name="button_track" defstate="0">
+		<rect><color red="0.05" green="0.05" blue="0.05" /><bounds x="0" y="0" width="15" height="15" /></rect>
+		<rect state="0"><color red="0.45" green="0.45" blue="0.45" /><bounds xc="7.5" yc="7.5" width="13.5" height="13.5" /></rect>
+		<rect state="1"><color red="0.3" green="0.3" blue="0.3" /><bounds xc="7.5" yc="7.5" width="13.5" height="13.5" /></rect>
+	</element>
+	<element name="button_track_small" defstate="0">
+		<rect><color red="0.05" green="0.05" blue="0.05" /><bounds x="0" y="0" width="10" height="15" /></rect>
+		<rect state="0"><color red="0.45" green="0.45" blue="0.45" /><bounds xc="5" yc="7.5" width="8.5" height="13.5" /></rect>
+		<rect state="1"><color red="0.3" green="0.3" blue="0.3" /><bounds xc="5" yc="7.5" width="8.5" height="13.5" /></rect>
+	</element>
+
+	<element name="button_blue" defstate="0">
+		<rect><color red="0.05" green="0.05" blue="0.05" /><bounds x="0" y="0" width="15" height="15" /></rect>
+		<rect state="0"><color red="0.35" green="0.45" blue="0.92" /><bounds xc="7.5" yc="7.5" width="13.5" height="13.5" /></rect>
+		<rect state="1"><color red="0.2" green="0.3" blue="0.75" /><bounds xc="7.5" yc="7.5" width="13.5" height="13.5" /></rect>
+	</element>
+
+	<element name="button_record" defstate="0">
+		<rect><color red="0.05" green="0.05" blue="0.05" /><bounds x="0" y="0" width="15" height="15" /></rect>
+		<rect state="0"><color red="0.55" green="0.6" blue="0.8" /><bounds xc="7.5" yc="7.5" width="13.5" height="13.5" /></rect>
+		<rect state="1"><color red="0.42" green="0.45" blue="0.6" /><bounds xc="7.5" yc="7.5" width="13.5" height="13.5" /></rect>
+	</element>
+	<element name="button_copy" defstate="0">
+		<rect><color red="0.05" green="0.05" blue="0.05" /><bounds x="0" y="0" width="10" height="15" /></rect>
+		<rect state="0"><color red="0.55" green="0.6" blue="0.8" /><bounds xc="5" yc="7.5" width="8.5" height="13.5" /></rect>
+		<rect state="1"><color red="0.42" green="0.45" blue="0.6" /><bounds xc="5" yc="7.5" width="8.5" height="13.5" /></rect>
+	</element>
+
+	<view name="Normal">
+		<element ref="bg"><bounds x="-15" y="30" width="215" height="110" /></element>
+		<element ref="grey"><bounds x="-15" y="30" width="215" height="2" /></element>
+		<element ref="grey"><bounds x="-15" y="45" width="215" height="2" /></element>
+
+		<screen index="0"><bounds x="15" y="33" width="50" height="10.93" /></screen>
+
+		<!-- copy/insert/delete -->
+		<element ref="button_copy" inputtag="KC3" inputmask="0x01"><bounds xc="22.5" y="60" width="10" height="15" /></element>
+		<element ref="copy"><bounds xc="22.5" yc="67.5" width="8" height="3" /></element>
+		<element ref="edit"><bounds xc="45" yc="52" width="20" height="3" /></element>
+		<element ref="yellow"><bounds xc="45" y="54" width="24" height="0.5" /></element>
+		<element ref="button_black_small" inputtag="KC3" inputmask="0x02"><bounds xc="37.5" y="60" width="10" height="15" /></element>
+		<element ref="insert"><bounds xc="37.5" yc="67.5" width="8" height="3" /></element>
+		<element ref="button_black_small" inputtag="KC3" inputmask="0x04"><bounds xc="52.5" y="60" width="10" height="15" /></element>
+		<element ref="delete"><bounds xc="52.5" yc="67.5" width="8" height="3" /></element>
+
+		<!-- manual data -->
+		<element ref="yellow"><bounds xc="30" y="84" width="58" height="1" /></element>
+		<element ref="yellow"><bounds xc="30" y="138" width="58" height="1" /></element>
+
+		<element ref="button_black" inputtag="KC2" inputmask="0x01"><bounds x="15" y="90" width="15" height="15" /></element>
+		<element ref="note4"><bounds xc="22.5" yc="97.5" width="13" height="4" /></element>
+		<element ref="button_black" inputtag="KC2" inputmask="0x02"><bounds x="30" y="90" width="15" height="15" /></element>
+		<element ref="note2"><bounds xc="37.5" yc="97.5" width="10" height="4" /></element>
+		<element ref="button_black" inputtag="KC2" inputmask="0x04"><bounds x="45" y="90" width="15" height="15" /></element>
+		<element ref="note1"><bounds xc="52.5" yc="97.5" width="10" height="4" /></element>
+
+		<element ref="button_black" inputtag="KC1" inputmask="0x01"><bounds x="15" y="105" width="15" height="15" /></element>
+		<element ref="note8"><bounds xc="22.5" yc="112.5" width="13" height="4" /></element>
+		<element ref="button_black" inputtag="KC1" inputmask="0x02"><bounds x="30" y="105" width="15" height="15" /></element>
+		<element ref="note16"><bounds xc="37.5" yc="112.5" width="13" height="4" /></element>
+		<element ref="button_black" inputtag="KC1" inputmask="0x04"><bounds x="45" y="105" width="15" height="15" /></element>
+		<element ref="note32"><bounds xc="52.5" yc="112.5" width="13" height="4" /></element>
+
+		<element ref="button_black" inputtag="KC0" inputmask="0x01"><bounds x="0" y="120" width="15" height="15" /></element>
+		<element ref="rest"><bounds xc="7.5" yc="127.5" width="13" height="3" /></element>
+		<element ref="button_black" inputtag="KC0" inputmask="0x02"><bounds x="15" y="120" width="15" height="15" /></element>
+		<element ref="dot"><bounds xc="22.5" yc="127.5" width="13" height="3" /></element>
+		<element ref="button_black" inputtag="KC0" inputmask="0x04"><bounds x="30" y="120" width="15" height="15" /></element>
+		<element ref="triplet"><bounds xc="37.5" yc="127.5" width="13" height="3" /></element>
+		<element ref="button_black" inputtag="KC0" inputmask="0x08"><bounds x="45" y="120" width="15" height="15" /></element>
+		<element ref="tie"><bounds xc="52.5" yc="127.5" width="13" height="3" /></element>
+		<element ref="manual_data"><bounds xc="30" y="135" width="30" height="3" /></element>
+
+		<!-- midi / repeat -->
+		<element ref="led" name="led1.3"><bounds xc="82.5" yc="57" width="4" height="2" /></element>
+		<element ref="led" name="led1.4"><bounds xc="102.5" yc="57" width="4" height="2" /></element>
+		<element ref="button_track" inputtag="KC4" inputmask="0x04"><bounds x="75" y="60" width="15" height="15" /></element>
+		<element ref="midi"><bounds xc="82.5" yc="67.5" width="13" height="3" /></element>
+		<element ref="button_track" inputtag="KC4" inputmask="0x02"><bounds x="95" y="60" width="15" height="15" /></element>
+		<element ref="repeat"><bounds xc="102.5" yc="67.5" width="13" height="3" /></element>
+
+		<!-- metronome -->
+		<element ref="led" name="led1.5"><bounds xc="92.5" yc="87" width="4" height="2" /></element>
+		<element ref="button_tempo" inputtag="KC3" inputmask="0x08"><bounds xc="92.5" y="90" width="15" height="15" /></element>
+		<element ref="metronome"><bounds xc="92.5" yc="96" width="13" height="3" /></element>
+		<element ref="enter"><bounds xc="92.5" yc="99" width="13" height="3" /></element>
+
+		<!-- tempo -->
+		<element ref="button_tempo" inputtag="KC1" inputmask="0x08"><bounds x="75" y="120" width="15" height="15" /></element>
+		<element ref="down"><bounds xc="82.5" yc="127.5" width="13" height="4" /></element>
+		<element ref="button_tempo" inputtag="KC2" inputmask="0x08"><bounds x="95" y="120" width="15" height="15" /></element>
+		<element ref="up"><bounds xc="102.5" yc="127.5" width="13" height="4" /></element>
+
+		<!-- tracks, cartridge/mt -->
+		<element ref="led" name="led0.7"><bounds xc="130" yc="57" width="4" height="2" /></element>
+		<element ref="led" name="led1.0"><bounds xc="140" yc="57" width="4" height="2" /></element>
+		<element ref="led" name="led1.1"><bounds xc="150" yc="57" width="4" height="2" /></element>
+		<element ref="led" name="led1.2"><bounds xc="160" yc="57" width="4" height="2" /></element>
+		<element ref="track"><bounds xc="145" yc="52" width="20" height="3" /></element>
+		<element ref="yellow"><bounds xc="145" y="54" width="38" height="0.5" /></element>
+		<element ref="button_track_small" inputtag="KC2" inputmask="0x10"><bounds x="125" y="60" width="10" height="15" /></element>
+		<element ref="track1"><bounds xc="130" yc="67.5" width="8" height="4" /></element>
+		<element ref="button_track_small" inputtag="KC2" inputmask="0x20"><bounds x="135" y="60" width="10" height="15" /></element>
+		<element ref="track2"><bounds xc="140" yc="67.5" width="8" height="4" /></element>
+		<element ref="button_track_small" inputtag="KC2" inputmask="0x40"><bounds x="145" y="60" width="10" height="15" /></element>
+		<element ref="track3"><bounds xc="150" yc="67.5" width="8" height="4" /></element>
+		<element ref="button_track_small" inputtag="KC2" inputmask="0x80"><bounds x="155" y="60" width="10" height="15" /></element>
+		<element ref="track4"><bounds xc="160" yc="67.5" width="8" height="4" /></element>
+
+		<element ref="led" name="led1.6"><bounds xc="177.5" yc="57" width="4" height="2" /></element>
+		<element ref="button_track" inputtag="KC4" inputmask="0x80"><bounds x="170" y="60" width="15" height="15" /></element>
+		<element ref="cartridge"><bounds xc="177.5" yc="66" width="13" height="3" /></element>
+		<element ref="mt"><bounds xc="177.5" yc="69" width="13" height="3" /></element>
+
+		<element ref="yellow"><bounds xc="155" y="84" width="58" height="1" /></element>
+		<element ref="yellow"><bounds xc="155" y="138" width="58" height="1" /></element>
+		<!-- real time/manual/record/reset -->
+		<element ref="led" name="led0.4"><bounds xc="132.5" yc="87" width="4" height="2" /></element>
+		<element ref="led" name="led0.5"><bounds xc="147.5" yc="87" width="4" height="2" /></element>
+		<element ref="led" name="led0.6"><bounds xc="162.5" yc="87" width="4" height="2" /></element>
+		<element ref="button_blue" inputtag="KC1" inputmask="0x10"><bounds x="125" y="90" width="15" height="15" /></element>
+		<element ref="realtime"><bounds xc="132.5" yc="97.5" width="13" height="3" /></element>
+		<element ref="button_blue" inputtag="KC1" inputmask="0x20"><bounds x="140" y="90" width="15" height="15" /></element>
+		<element ref="manual"><bounds xc="147.5" yc="97.5" width="13" height="3" /></element>
+		<element ref="button_record" inputtag="KC1" inputmask="0x40"><bounds x="155" y="90" width="15" height="15" /></element>
+		<element ref="record"><bounds xc="162.5" yc="97.5" width="13" height="3" /></element>
+		<element ref="button_blue" inputtag="KC1" inputmask="0x80"><bounds x="170" y="90" width="15" height="15" /></element>
+		<element ref="reset"><bounds xc="177.5" yc="97.5" width="13" height="3" /></element>
+		<element ref="yellow"><bounds xc="140" y="106" width="28" height="0.5" /></element>
+		<element ref="record_track"><bounds xc="140" yc="109" width="20" height="3" /></element>
+
+		<!-- rev/fwd/play/stop -->
+		<element ref="led" name="led0.0"><bounds xc="132.5" yc="117" width="4" height="2" /></element>
+		<element ref="led" name="led0.1"><bounds xc="147.5" yc="117" width="4" height="2" /></element>
+		<element ref="led" name="led0.2"><bounds xc="162.5" yc="117" width="4" height="2" /></element>
+		<element ref="led" name="led0.3"><bounds xc="177.5" yc="117" width="4" height="2" /></element>
+		<element ref="button_blue" inputtag="KC0" inputmask="0x10"><bounds x="125" y="120" width="15" height="15" /></element>
+		<element ref="rev"><bounds xc="132.5" yc="127.5" width="13" height="3" /></element>
+		<element ref="save"><bounds xc="132.5" y="135" width="13" height="3" /></element>
+		<element ref="button_blue" inputtag="KC0" inputmask="0x20"><bounds x="140" y="120" width="15" height="15" /></element>
+		<element ref="fwd"><bounds xc="147.5" yc="127.5" width="13" height="3" /></element>
+		<element ref="load"><bounds xc="147.5" y="135" width="13" height="3" /></element>
+		<element ref="button_blue" inputtag="KC0" inputmask="0x40"><bounds x="155" y="120" width="15" height="15" /></element>
+		<element ref="play"><bounds xc="162.5" yc="127.5" width="13" height="3" /></element>
+		<element ref="check"><bounds xc="162.5" y="135" width="13" height="3" /></element>
+		<element ref="button_blue" inputtag="KC0" inputmask="0x80"><bounds x="170" y="120" width="15" height="15" /></element>
+		<element ref="stop"><bounds xc="177.5" yc="127.5" width="13" height="3" /></element>
+	</view>
+</mamelayout>

@@ -39,10 +39,10 @@ public:
 	void gscpm(machine_config &config);
 
 protected:
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 
-	void gscpm_mem(address_map &map);
-	void gscpm_io(address_map &map);
+	void gscpm_mem(address_map &map) ATTR_COLD;
+	void gscpm_io(address_map &map) ATTR_COLD;
 
 	uint8_t cflash_r(offs_t offset);
 	void cflash_w(offs_t offset, uint8_t data);

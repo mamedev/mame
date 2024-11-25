@@ -89,7 +89,7 @@ license:CC0-1.0
 		</element>
 		<element name="led_23" ref="led">
 			<bounds x="470" y="610" width="10" height="10" />
-		</element>a
+		</element>
 		<element name="led_24" ref="led">
 			<bounds x="10" y="630" width="10" height="10" />
 		</element>

@@ -46,6 +46,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef softfloat_h
 #define softfloat_h 1
 
+// copy config #defines from 3rdparty.lua to match the build configuration
+#ifndef SOFTFLOAT_FAST_INT64
+#define SOFTFLOAT_FAST_INT64
+#define SOFTFLOAT_FAST_DIV32TO16
+#define SOFTFLOAT_FAST_DIV64TO32
+#define SOFTFLOAT_ROUND_ODD
+#endif
+
+#ifndef INLINE_LEVEL
+#define INLINE_LEVEL (5)
+#endif
+
+#ifndef INLINE
+#define INLINE static inline
+#endif
+
 #include <stdbool.h>
 #include <stdint.h>
 #include "softfloat_types.h"
@@ -59,8 +75,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *----------------------------------------------------------------------------*/
 extern THREAD_LOCAL uint_fast8_t softfloat_detectTininess;
 enum {
-    softfloat_tininess_beforeRounding = 0,
-    softfloat_tininess_afterRounding  = 1
+	softfloat_tininess_beforeRounding = 0,
+	softfloat_tininess_afterRounding  = 1
 };
 
 /*----------------------------------------------------------------------------
@@ -69,12 +85,12 @@ enum {
 *----------------------------------------------------------------------------*/
 extern THREAD_LOCAL uint_fast8_t softfloat_roundingMode;
 enum {
-    softfloat_round_near_even   = 0,
-    softfloat_round_minMag      = 1,
-    softfloat_round_min         = 2,
-    softfloat_round_max         = 3,
-    softfloat_round_near_maxMag = 4,
-    softfloat_round_odd         = 6
+	softfloat_round_near_even   = 0,
+	softfloat_round_minMag      = 1,
+	softfloat_round_min         = 2,
+	softfloat_round_max         = 3,
+	softfloat_round_near_maxMag = 4,
+	softfloat_round_odd         = 6
 };
 
 /*----------------------------------------------------------------------------
@@ -82,11 +98,11 @@ enum {
 *----------------------------------------------------------------------------*/
 extern THREAD_LOCAL uint_fast8_t softfloat_exceptionFlags;
 enum {
-    softfloat_flag_inexact   =  1,
-    softfloat_flag_underflow =  2,
-    softfloat_flag_overflow  =  4,
-    softfloat_flag_infinite  =  8,
-    softfloat_flag_invalid   = 16
+	softfloat_flag_inexact   =  1,
+	softfloat_flag_underflow =  2,
+	softfloat_flag_overflow  =  4,
+	softfloat_flag_infinite  =  8,
+	softfloat_flag_invalid   = 16
 };
 
 /*----------------------------------------------------------------------------
@@ -290,7 +306,7 @@ float64_t extF80M_to_f64( const extFloat80_t * );
 void extF80M_to_f128M( const extFloat80_t *, float128_t * );
 void
  extF80M_roundToInt(
-     const extFloat80_t *, uint_fast8_t, bool, extFloat80_t * );
+	 const extFloat80_t *, uint_fast8_t, bool, extFloat80_t * );
 void extF80M_add( const extFloat80_t *, const extFloat80_t *, extFloat80_t * );
 void extF80M_sub( const extFloat80_t *, const extFloat80_t *, extFloat80_t * );
 void extF80M_mul( const extFloat80_t *, const extFloat80_t *, extFloat80_t * );
@@ -355,7 +371,7 @@ void f128M_sub( const float128_t *, const float128_t *, float128_t * );
 void f128M_mul( const float128_t *, const float128_t *, float128_t * );
 void
  f128M_mulAdd(
-     const float128_t *, const float128_t *, const float128_t *, float128_t *
+	 const float128_t *, const float128_t *, const float128_t *, float128_t *
  );
 void f128M_div( const float128_t *, const float128_t *, float128_t * );
 void f128M_rem( const float128_t *, const float128_t *, float128_t * );

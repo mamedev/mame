@@ -69,9 +69,9 @@ public:
 	void armada(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -90,9 +90,9 @@ private:
 
 	void seabattl_palette(palette_device &palette) const;
 	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void seabattl_data_map(address_map &map);
-	void seabattl_map(address_map &map);
-	void armada_map(address_map &map);
+	void seabattl_data_map(address_map &map) ATTR_COLD;
+	void seabattl_map(address_map &map) ATTR_COLD;
+	void armada_map(address_map &map) ATTR_COLD;
 
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;

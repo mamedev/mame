@@ -65,11 +65,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void emu3_map(address_map &map);
+	void emu3_map(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
 
@@ -251,7 +251,7 @@ void emu3_state::emu3(machine_config &config)
 	SCC85230(config, m_scc, 16_MHz_XTAL / 4);
 	m_scc->out_int_callback().set(*this, FUNC(emu3_state::irq_w<SCCINT>)).invert();
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(4, 20);
 
 	PALETTE(config, "palette", FUNC(emu3_state::palette_init), 2);
@@ -283,7 +283,7 @@ INPUT_CHANGED_MEMBER(emu3_state::nmi_button)
 
 static INPUT_PORTS_START(emu3)
 	PORT_START("ddt")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D') PORT_CHANGED_MEMBER(DEVICE_SELF, emu3_state, nmi_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(emu3_state::nmi_button), 0)
 INPUT_PORTS_END
 
 ROM_START(emu3)

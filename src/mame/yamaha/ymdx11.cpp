@@ -35,7 +35,7 @@ public:
 	void dx11(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -43,7 +43,7 @@ private:
 
 	void cartridge_bank_w(u8 data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<hd6301y_cpu_device> m_maincpu;
 	required_device<hd6301y_cpu_device> m_subcpu;
@@ -113,7 +113,7 @@ void yamaha_dx11_state::dx11(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(yamaha_dx11_state::palette_init), 2);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 250'000)); // TODO: clock not measured, datasheet typical clock used
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(yamaha_dx11_state::lcd_pixel_update));
 

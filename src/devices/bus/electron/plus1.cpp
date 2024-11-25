@@ -65,7 +65,7 @@ ROM_START( ap6 )
 
 	ROM_SYSTEM_BIOS(1, "ap6", "RH Plus 1 1.33")
 	ROMX_LOAD("ap6v133t.rom", 0x0000, 0x4000, CRC(364591eb) SHA1(316a25aeeda0266dae510eea52324b087875740f), ROM_BIOS(1))
-	ROM_END
+ROM_END
 
 //-------------------------------------------------
 //  INPUT_PORTS( plus1 )

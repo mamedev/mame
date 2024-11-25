@@ -26,7 +26,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "video/ppu2c0x.h"
+#include "ppu2c0x.h"
 
 #include "screen.h"
 

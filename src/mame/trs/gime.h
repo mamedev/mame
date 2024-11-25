@@ -64,18 +64,18 @@ protected:
 	gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, bool pal);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_pre_save() override;
 	virtual void device_post_load() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// other overrides
 	virtual void new_frame() override;
 	virtual TIMER_CALLBACK_MEMBER(horizontal_sync_changed) override;
 	virtual void enter_bottom_border() override;
 	virtual void record_border_scanline(uint16_t physical_scanline) override;
-	virtual void record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) override;
+	virtual void record_full_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) override;
 	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) override;
 
 protected:

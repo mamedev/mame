@@ -68,12 +68,12 @@ private:
 	void i8155_b_w(uint8_t data);
 	void i8155_c_w(uint8_t data);
 	void i8155_timer_out(int state);
-	void paranoia_8085_io_map(address_map &map);
-	void paranoia_8085_map(address_map &map);
-	void paranoia_z80_io_map(address_map &map);
-	void paranoia_z80_map(address_map &map);
-	void pce_io(address_map &map);
-	void pce_mem(address_map &map);
+	void paranoia_8085_io_map(address_map &map) ATTR_COLD;
+	void paranoia_8085_map(address_map &map) ATTR_COLD;
+	void paranoia_z80_io_map(address_map &map) ATTR_COLD;
+	void paranoia_z80_map(address_map &map) ATTR_COLD;
+	void pce_io(address_map &map) ATTR_COLD;
+	void pce_mem(address_map &map) ATTR_COLD;
 };
 
 

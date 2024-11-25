@@ -104,7 +104,6 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual bool handle(event const *ev) override;
 };
 
 
@@ -119,7 +118,6 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual bool handle(event const *ev) override;
 };
 
 

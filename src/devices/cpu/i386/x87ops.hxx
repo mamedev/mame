@@ -143,7 +143,7 @@ int i386_device::x87_ck_over_stack()
 
 int i386_device::x87_mf_fault()
 {
-	if ((m_x87_sw & X87_SW_ES) && (m_cr[0] & 0x20)) // FIXME: 486 and up only
+	if ((m_x87_sw & X87_SW_ES) && (m_cr[0] & CR0_NE)) // FIXME: 486 and up only
 	{
 		m_ext = 1;
 		i386_trap(FAULT_MF, 0, 0);
@@ -4809,7 +4809,7 @@ void i386_device::x87_fldenv(uint8_t modrm)
 
 	x87_check_exceptions();
 
-	CYCLES((m_cr[0] & 1) ? 34 : 44);
+	CYCLES((m_cr[0] & CR0_PE) ? 34 : 44);
 }
 
 void i386_device::x87_fstenv(uint8_t modrm)
@@ -4857,7 +4857,7 @@ void i386_device::x87_fstenv(uint8_t modrm)
 	}
 	m_x87_cw |= 0x3f;   // set all masks
 
-	CYCLES((m_cr[0] & 1) ? 56 : 67);
+	CYCLES((m_cr[0] & CR0_PE) ? 56 : 67);
 }
 
 void i386_device::x87_fsave(uint8_t modrm)
@@ -4912,7 +4912,7 @@ void i386_device::x87_fsave(uint8_t modrm)
 		WRITE80(ea + i*10, ST(i));
 	x87_reset();
 
-	CYCLES((m_cr[0] & 1) ? 56 : 67);
+	CYCLES((m_cr[0] & CR0_PE) ? 56 : 67);
 }
 
 void i386_device::x87_frstor(uint8_t modrm)
@@ -4978,7 +4978,7 @@ void i386_device::x87_frstor(uint8_t modrm)
 	for (int i = 0; i < 8; ++i)
 		x87_write_stack(i, READ80(ea + i*10), false);
 
-	CYCLES((m_cr[0] & 1) ? 34 : 44);
+	CYCLES((m_cr[0] & CR0_PE) ? 34 : 44);
 }
 
 void i386_device::x87_fxch(uint8_t modrm)
@@ -5070,7 +5070,7 @@ void i386_device::x87_invalid(uint8_t modrm)
 
 void i386_device::i386_x87_group_d8()
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
@@ -5081,7 +5081,7 @@ void i386_device::i386_x87_group_d8()
 
 void i386_device::i386_x87_group_d9()
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
@@ -5092,7 +5092,7 @@ void i386_device::i386_x87_group_d9()
 
 void i386_device::i386_x87_group_da()
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
@@ -5103,7 +5103,7 @@ void i386_device::i386_x87_group_da()
 
 void i386_device::i386_x87_group_db()
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
@@ -5114,7 +5114,7 @@ void i386_device::i386_x87_group_db()
 
 void i386_device::i386_x87_group_dc()
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
@@ -5125,7 +5125,7 @@ void i386_device::i386_x87_group_dc()
 
 void i386_device::i386_x87_group_dd()
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
@@ -5136,7 +5136,7 @@ void i386_device::i386_x87_group_dd()
 
 void i386_device::i386_x87_group_de()
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;
@@ -5147,7 +5147,7 @@ void i386_device::i386_x87_group_de()
 
 void i386_device::i386_x87_group_df()
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
 		i386_trap(FAULT_NM, 0, 0);
 		return;

@@ -14,26 +14,26 @@
 #include "screen.h"
 
 
-void k1ge_device::k1ge_palette(palette_device &palette) const
+void k1ge_device::palette_init()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		int const j = pal3bit(i);
+		const u8 j = pal3bit(i);
 
-		palette.set_pen_color(7 - i, j, j, j);
+		set_pen_color(7 - i, j, j, j);
 	}
 }
 
 
-void k2ge_device::k2ge_palette(palette_device &palette) const
+void k2ge_device::palette_init()
 {
-	for (int b = 0; b < 16; b++ )
+	for (int b = 0; b < 16; b++)
 	{
-		for (int g = 0; g < 16; g++ )
+		for (int g = 0; g < 16; g++)
 		{
-			for (int r = 0; r < 16; r++ )
+			for (int r = 0; r < 16; r++)
 			{
-				palette.set_pen_color((b << 8) | (g << 4) | r, (r << 4) | r, (g << 4) | g, (b << 4) | b);
+				set_pen_color((b << 8) | (g << 4) | r, (r << 4) | r, (g << 4) | g, (b << 4) | b);
 			}
 		}
 	}
@@ -802,6 +802,8 @@ void k1ge_device::device_start()
 	save_item(NAME(m_wba_v));
 	save_item(NAME(m_wsi_h));
 	save_item(NAME(m_wsi_v));
+
+	palette_init();
 }
 
 
@@ -863,19 +865,10 @@ k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_
 k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, device_palette_interface(mconfig, *this)
 	, m_vblank_pin_w(*this)
 	, m_hblank_pin_w(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void k1ge_device::device_add_mconfig(machine_config &config)
-{
-	PALETTE(config, "palette", FUNC(k1ge_device::k1ge_palette), 8);
 }
 
 
@@ -884,13 +877,4 @@ DEFINE_DEVICE_TYPE(K2GE, k2ge_device, "k2ge", "K2GE Color Graphics + LCD")
 k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: k1ge_device(mconfig, K2GE, tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void k2ge_device::device_add_mconfig(machine_config &config)
-{
-	PALETTE(config, "palette", FUNC(k2ge_device::k2ge_palette), 4096);
 }

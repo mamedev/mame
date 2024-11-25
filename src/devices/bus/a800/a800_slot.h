@@ -60,8 +60,8 @@ public:
 	// construction/destruction
 	virtual ~device_a800_cart_interface();
 
-	virtual void cart_map(address_map &map);
-	virtual void cctl_map(address_map &map);
+	virtual void cart_map(address_map &map) ATTR_COLD;
+	virtual void cctl_map(address_map &map) ATTR_COLD;
 
 	// TODO: remove all of this
 	void rom_alloc(uint32_t size);
@@ -142,7 +142,7 @@ protected:
 	//a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -169,7 +169,7 @@ public:
 	// construction/destruction
 	virtual ~device_a5200_cart_interface();
 
-	virtual void cart_map(address_map &map);
+	virtual void cart_map(address_map &map) ATTR_COLD;
 
 	// TODO: remove all of this
 	void rom_alloc(uint32_t size);
@@ -225,7 +225,7 @@ public:
 	void write_cart(offs_t offset, u8 data);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:

@@ -1277,6 +1277,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="hotmariop" cloneof="hotmario">
+		<!--
+		Origin: Redump
+		<rom name="Hotel Mario (USA) (Beta) (1993-11-23).bin" size="367217760" crc="05ccadda" md5="8fb67e208d6ca91d83415566db5b7d15" sha1="183b2efd1f5b926757a8fb514cc861fdf7a244c5" />
+		<rom name="Hotel Mario (USA) (Beta) (1993-11-23).cue" size="101" crc="e577f8e3" md5="83f41478963317af4e44bdd2dcb89c0c" sha1="6d3a84b2333dd6f3ebb382ce896c067ddaf077aa" />
+		-->
+		<description>Hotel Mario (prototype v0.09, 19931123)</description>
+		<year>1994</year>
+		<publisher>Philips</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="hotel mario (prototype v 0.09, 19931123)" sha1="3f0375fb2c74b9abc7c4eb8ef0b3f907b70307cb"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="hotmariou" cloneof="hotmario">
 		<!--
 		Origin: TOSEC

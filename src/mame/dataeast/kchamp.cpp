@@ -149,6 +149,7 @@ void kchamp_state::kchampvs_sound_io_map(address_map &map)
 /********************
 * 1 Player Version  *
 ********************/
+
 uint8_t kchamp_state::sound_reset_r()
 {
 	if (!machine().side_effects_disabled())
@@ -160,12 +161,12 @@ void kchamp_state::kc_sound_control_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		m_sound_nmi_enable = ((data >> 7) & 1);
+		m_sound_nmi_enable = BIT(data, 7);
 		if (!m_sound_nmi_enable)
 			m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 	else
-		m_dac->set_output_gain(0, BIT(data,0) ? 1.0 : 0);
+		m_dac->set_output_gain(0, BIT(data, 0) ? 1.0 : 0);
 }
 
 void kchamp_state::kchamp_map(address_map &map)
@@ -417,7 +418,7 @@ void kchamp_state::kchampvs(machine_config &config)
 	// NMIs from MSM5205
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 8C
-	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set(FUNC(kchamp_state::nmi_enable_w));
 	mainlatch.q_out_cb<2>().set(FUNC(kchamp_state::sound_reset_w));
 
@@ -473,7 +474,7 @@ void kchamp_state::kchamp(machine_config &config)
 	// NMIs from 125Hz clock
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC71
-	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set(FUNC(kchamp_state::nmi_enable_w));
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)

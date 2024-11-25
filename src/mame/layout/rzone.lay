@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
-	<!-- define elements -->
+<!-- define elements -->
 
 	<element name="backlight" defstate="0">
 		<rect state="1"><color red="1.0" green="0.2" blue="0.23" /></rect>
@@ -12,7 +13,7 @@ license:CC0-1.0
 	</element>
 
 
-	<!-- build screen -->
+<!-- build screen -->
 
 	<view name="Internal Layout">
 		<screen index="0"><bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" /></screen>

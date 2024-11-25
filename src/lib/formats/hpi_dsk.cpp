@@ -162,9 +162,10 @@ bool hpi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	image.set_variant(heads == 2 ? floppy_image::DSDD : floppy_image::SSDD);
 
 	// Suck in the whole image
-	std::vector<uint8_t> image_data(size);
-	size_t actual;
-	io.read_at(0, image_data.data(), size, actual);
+	auto const [err, image_data, actual] = read_at(io, 0, size);
+	if (err || (actual != size)) {
+		return false;
+	}
 
 	// Get interleave factor from image
 	unsigned il = (unsigned)image_data[ IL_OFFSET ] * 256 + image_data[ IL_OFFSET + 1 ];
@@ -209,8 +210,7 @@ bool hpi_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			while (get_next_sector(bitstream , pos , track_no , head_no , sector_no , sector_data)) {
 				if (track_no == cyl && head_no == head && sector_no < HPI_SECTORS) {
 					unsigned offset_in_image = chs_to_lba(cyl, head, sector_no, heads) * HPI_SECTOR_SIZE;
-					size_t actual;
-					io.write_at(offset_in_image, sector_data, HPI_SECTOR_SIZE, actual);
+					/*auto const [err, actual] =*/ write_at(io, offset_in_image, sector_data, HPI_SECTOR_SIZE); // FIXME: check for errors
 				}
 			}
 		}

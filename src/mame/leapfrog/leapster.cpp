@@ -221,8 +221,8 @@ public:
 	void init_leapster();
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -254,8 +254,8 @@ private:
 	void leapster_aux001a_w(uint32_t data);
 	uint32_t leapster_aux001b_r();
 
-	void leapster_aux(address_map &map);
-	void leapster_map(address_map &map);
+	void leapster_aux(address_map &map) ATTR_COLD;
+	void leapster_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_1a_data[0x800];
 	int m_1a_pointer;

@@ -24,6 +24,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <new>
+#include <tuple>
 
 
 namespace util {
@@ -452,7 +453,7 @@ private:
 		std::uint8_t tempbuff[4];
 
 		// fetch the length of this chunk
-		err = fp.read(tempbuff, 4, actual);
+		std::tie(err, actual) = read(fp, tempbuff, 4);
 		if (err)
 			return err;
 		else if (4 != actual)
@@ -460,7 +461,7 @@ private:
 		length = fetch_32bit(tempbuff);
 
 		// fetch the type of this chunk
-		err = fp.read(tempbuff, 4, actual);
+		std::tie(err, actual) = read(fp, tempbuff, 4);
 		if (err)
 			return err;
 		else if (4 != actual)
@@ -477,13 +478,8 @@ private:
 		// read the chunk itself into an allocated memory buffer
 		if (length)
 		{
-			// allocate memory for this chunk
-			data.reset(new (std::nothrow) std::uint8_t [length]);
-			if (!data)
-				return std::errc::not_enough_memory;
-
-			// read the data from the file
-			err = fp.read(data.get(), length, actual);
+			// allocate memory and read the data from the file
+			std::tie(err, data, actual) = read(fp, length);
 			if (err)
 			{
 				data.reset();
@@ -500,7 +496,7 @@ private:
 		}
 
 		// read the CRC
-		err = fp.read(tempbuff, 4, actual);
+		std::tie(err, actual) = read(fp, tempbuff, 4);
 		if (err)
 		{
 			data.reset();
@@ -789,8 +785,7 @@ public:
 		std::uint8_t signature[sizeof(PNG_SIGNATURE)];
 
 		// read 8 bytes
-		std::size_t actual;
-		std::error_condition err = fp.read(signature, sizeof(signature), actual);
+		auto const [err, actual] = read(fp, signature, sizeof(signature));
 		if (err)
 			return err;
 		else if (sizeof(signature) != actual)
@@ -941,7 +936,6 @@ std::error_condition png_info::add_text(std::string_view keyword, std::string_vi
 static std::error_condition write_chunk(write_stream &fp, const uint8_t *data, uint32_t type, uint32_t length) noexcept
 {
 	std::error_condition err;
-	std::size_t written;
 	std::uint8_t tempbuff[8];
 	std::uint32_t crc;
 
@@ -951,30 +945,24 @@ static std::error_condition write_chunk(write_stream &fp, const uint8_t *data, u
 	crc = crc32(0, tempbuff + 4, 4);
 
 	// write that data
-	err = fp.write(tempbuff, 8, written);
+	std::tie(err, std::ignore) = write(fp, tempbuff, 8);
 	if (err)
 		return err;
-	else if (8 != written)
-		return std::errc::io_error;
 
 	// append the actual data
 	if (length > 0)
 	{
-		err = fp.write(data, length, written);
+		std::tie(err, std::ignore) = write(fp, data, length);
 		if (err)
 			return err;
-		else if (length != written)
-			return std::errc::io_error;
 		crc = crc32(crc, data, length);
 	}
 
 	// write the CRC
 	put_32bit(tempbuff, crc);
-	err = fp.write(tempbuff, 4, written);
+	std::tie(err, std::ignore) = write(fp, tempbuff, 4);
 	if (err)
 		return err;
-	else if (4 != written)
-		return std::errc::io_error;
 
 	return std::error_condition();
 }
@@ -993,7 +981,6 @@ static std::error_condition write_deflated_chunk(random_write &fp, uint8_t *data
 	if (err)
 		return err;
 
-	std::size_t written;
 	std::uint8_t tempbuff[8192];
 	std::uint32_t zlength = 0;
 	z_stream stream;
@@ -1006,11 +993,9 @@ static std::error_condition write_deflated_chunk(random_write &fp, uint8_t *data
 	crc = crc32(0, tempbuff + 4, 4);
 
 	// write that data
-	err = fp.write(tempbuff, 8, written);
+	std::tie(err, std::ignore) = write(fp, tempbuff, 8);
 	if (err)
 		return err;
-	else if (8 != written)
-		return std::errc::io_error;
 
 	// initialize the stream
 	memset(&stream, 0, sizeof(stream));
@@ -1036,16 +1021,11 @@ static std::error_condition write_deflated_chunk(random_write &fp, uint8_t *data
 		if (stream.avail_out < sizeof(tempbuff))
 		{
 			int bytes = sizeof(tempbuff) - stream.avail_out;
-			err = fp.write(tempbuff, bytes, written);
+			std::tie(err, std::ignore) = write(fp, tempbuff, bytes);
 			if (err)
 			{
 				deflateEnd(&stream);
 				return err;
-			}
-			else if (bytes != written)
-			{
-				deflateEnd(&stream);
-				return std::errc::io_error;
 			}
 			crc = crc32(crc, tempbuff, bytes);
 			zlength += bytes;
@@ -1079,22 +1059,18 @@ static std::error_condition write_deflated_chunk(random_write &fp, uint8_t *data
 
 	// write the CRC
 	put_32bit(tempbuff, crc);
-	err = fp.write(tempbuff, 4, written);
+	std::tie(err, std::ignore) = write(fp, tempbuff, 4);
 	if (err)
 		return err;
-	else if (4 != written)
-		return std::errc::io_error;
 
 	// seek back and update the length
 	err = fp.seek(lengthpos, SEEK_SET);
 	if (err)
 		return err;
 	put_32bit(tempbuff + 0, zlength);
-	err = fp.write(tempbuff, 4, written);
+	std::tie(err, std::ignore) = write(fp, tempbuff, 4);
 	if (err)
 		return err;
-	else if (4 != written)
-		return std::errc::io_error;
 
 	// return to the end
 	return fp.seek(lengthpos + 8 + zlength + 4, SEEK_SET);
@@ -1326,12 +1302,9 @@ std::error_condition png_write_bitmap(random_write &fp, png_info *info, bitmap_t
 		info = &pnginfo;
 
 	// write the PNG signature
-	std::size_t written;
-	std::error_condition err = fp.write(PNG_SIGNATURE, sizeof(PNG_SIGNATURE), written);
+	auto const [err, written] = write(fp, PNG_SIGNATURE, sizeof(PNG_SIGNATURE));
 	if (err)
 		return err;
-	else if (sizeof(PNG_SIGNATURE) != written)
-		return std::errc::io_error;
 
 	// write the rest of the PNG data
 	return write_png_stream(fp, *info, bitmap, palette_length, palette);
@@ -1347,12 +1320,9 @@ std::error_condition png_write_bitmap(random_write &fp, png_info *info, bitmap_t
 
 std::error_condition mng_capture_start(random_write &fp, bitmap_t const &bitmap, unsigned rate) noexcept
 {
-	std::size_t written;
-	std::error_condition err = fp.write(MNG_Signature, 8, written);
+	auto const [err, written] = write(fp, MNG_Signature, 8);
 	if (err)
 		return err;
-	else if (8 != written)
-		return std::errc::io_error;
 
 	uint8_t mhdr[28];
 	memset(mhdr, 0, 28);

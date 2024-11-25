@@ -42,7 +42,7 @@ public:
 	void pylo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -223,4 +223,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1988, pylo, 0,      0,      pylo,    pylo,  pylo_state, empty_init, "Tiger", "Punch Your Lights Out", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, pylo, 0,      0,      pylo,    pylo,  pylo_state, empty_init, "Tiger", "Punch Your Lights Out", MACHINE_SUPPORTS_SAVE )

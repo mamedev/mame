@@ -66,10 +66,10 @@ private:
 
 	void usart_clock_tick(int state);
 
-	void isbc8010_io(address_map &map);
-	void isbc8010_mem(address_map &map);
-	void isbc8010a_mem(address_map &map);
-	void isbc8010b_mem(address_map &map);
+	void isbc8010_io(address_map &map) ATTR_COLD;
+	void isbc8010_mem(address_map &map) ATTR_COLD;
+	void isbc8010a_mem(address_map &map) ATTR_COLD;
+	void isbc8010b_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;

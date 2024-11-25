@@ -51,15 +51,15 @@ protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 
-	void rom_map(address_map &map);
+	void rom_map(address_map &map) ATTR_COLD;
 
 	required_device<address_map_bank_device> m_rombank;
 	memory_region *m_cart_region;

@@ -43,14 +43,14 @@ public:
 	// explicit decryption helpers
 	void decrypt(offs_t baseaddr, uint32_t size, offs_t regionoffs, uint16_t *opcodesptr, uint16_t *dataptr) { decrypt(baseaddr, size, &m_plaintext[regionoffs/2], opcodesptr, dataptr); }
 
-	void decrypted_opcodes_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 protected:
 	// construction/destruction
 	fd1089_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// internal helpers
 	uint8_t rearrange_key(uint8_t table, bool opcode);

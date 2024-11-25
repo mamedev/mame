@@ -293,7 +293,7 @@ INPUT_PORTS_START( psion )
 		PORT_CONFSETTING( 0x01, "Low Battery" )
 
 	PORT_START("ON")
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON/CLEAR") PORT_CODE(KEYCODE_MINUS)  PORT_CHANGED_MEMBER(DEVICE_SELF, psion_state, psion_on, 0)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON/CLEAR") PORT_CODE(KEYCODE_MINUS)  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion_state::psion_on), 0)
 
 	PORT_START("K1")
 		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MODE") PORT_CODE(KEYCODE_EQUALS)
@@ -352,7 +352,7 @@ INPUT_PORTS_START( psion1 )
 	PORT_CONFSETTING( 0x01, "Low Battery" )
 
 	PORT_START("ON")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON/CLEAR") PORT_CODE(KEYCODE_MINUS)  PORT_CHANGED_MEMBER(DEVICE_SELF, psion_state, psion_on, 0)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON/CLEAR") PORT_CODE(KEYCODE_MINUS)  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion_state::psion_on), 0)
 
 	PORT_START("K1")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT)
@@ -548,7 +548,7 @@ void psion_state::psion_2lines(machine_config &config)
 	PALETTE(config, "palette", FUNC(psion_state::psion_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_psion);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: Wrong device? Custom? clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device? Custom? clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */

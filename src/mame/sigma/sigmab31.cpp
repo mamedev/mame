@@ -112,11 +112,11 @@ public:
 	void sigmab31(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device>     m_maincpu;
 };

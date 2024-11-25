@@ -279,18 +279,22 @@ uint32_t sttechno_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			break;
 		}
 
-		for (int tile_x = 0; tile_x < tiles_h; tile_x++) {
-			for (int tile_y = 0; tile_y < tiles_w; tile_y++) {
+		for (int tile_y = 0; tile_y < tiles_h; tile_y++) {
+			for (int tile_x = 0; tile_x < tiles_w; tile_x++) {
 				for (int pix_y = 0; pix_y < 16; pix_y++) {
 					for (int pix_x = 0; pix_x < 16; pix_x++) {
-						const int ty = (y + tile_x * 16 + pix_y) % 512; // 512x512 framebuffer size, must be wrapped
-						const int tx = (x + (tile_y * 16) + pix_x) % 512;
+						const int tx = xflip
+								? ((x + ((tiles_w - tile_x - 1) * 16) + (15 - pix_x)) % 512) // 512x512 framebuffer size, must be wrapped
+								: ((x + (tile_x * 16) + pix_x) % 512);
+						const int ty = yflip
+								? ((y + (tiles_h - tile_y - 1) * 16 + (15 - pix_y)) % 512)
+								: ((y + tile_y * 16 + pix_y) % 512);
 
 						if (!cliprect.contains(tx, ty))
 							continue;
 
 						uint16_t *const pix = &bitmap.pix(ty, tx);
-						const uint32_t char_offset = char_offset_base + (tile_x * (0x100 * tiles_w)) + (tile_y * 0x100) + (pix_y * 16) + pix_x;
+						const uint32_t char_offset = char_offset_base + (tile_y * (0x100 * tiles_w)) + (tile_x * 0x100) + (pix_y * 16) + pix_x;
 						const uint16_t char_data = m_video_flash->read_raw(char_offset / 2);
 						const int colidx = BIT(char_data, 8 * (1 - (char_offset & 1)), 8);
 						uint16_t color = m_sttga1_ram_pal[palidx * 0x100 + colidx];
@@ -331,8 +335,8 @@ void sttechno_state::bank_write_enable_w(uint16_t data)
 
 void sttechno_state::data_w(offs_t offset, uint16_t data)
 {
-	if (m_bank >= 0 && m_bank <= 2) {
-		const offs_t offs = offset + (0x100000 * m_bank);
+	if (m_bank <= 2) {
+		const offs_t offs = offset + (0x10'0000 * m_bank);
 		if (offs < 0x100 / 2)
 			m_sound->write(offs, data);
 		else
@@ -348,8 +352,8 @@ void sttechno_state::data_w(offs_t offset, uint16_t data)
 
 uint16_t sttechno_state::data_r( offs_t offset)
 {
-	if (m_bank >= 0 && m_bank <= 2) {
-		const offs_t offs = offset + (0x100000 * m_bank);
+	if (m_bank <= 2) {
+		const offs_t offs = offset + (0x10'0000 * m_bank);
 		if (offs < 0x100 / 2)
 			return m_sound->read(offs);
 		else
@@ -466,7 +470,7 @@ uint16_t sttechno_state::sttga1_video_flash_r(offs_t offset)
 
 void sttechno_state::sttga1_video_flash_write_enable_w(offs_t offset, uint16_t data)
 {
-	// If it's set to 1 then 0xa00000 addresses flash, and if it's 0 then it addresses RAM?
+	// If it's set to 1 then 0xa0'0000 addresses flash, and if it's 0 then it addresses RAM?
 	m_sttga1_video_flash_write_enable = data != 0;
 }
 

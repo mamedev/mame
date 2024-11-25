@@ -37,6 +37,10 @@ device_sdlc_consumer_interface::device_sdlc_consumer_interface(machine_config co
 {
 }
 
+device_sdlc_consumer_interface::~device_sdlc_consumer_interface()
+{
+}
+
 void device_sdlc_consumer_interface::interface_post_start()
 {
 	device().save_item(NAME(m_line_active));
@@ -136,6 +140,10 @@ sdlc_logger_device::sdlc_logger_device(machine_config const &mconfig, char const
 	m_frame_bits(0U),
 	m_expected_fcs(0U),
 	m_buffer()
+{
+}
+
+sdlc_logger_device::~sdlc_logger_device()
 {
 }
 

@@ -55,8 +55,8 @@ public:
 private:
 	u8 pic_slave_ack(offs_t offset);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pic8259_device, 2> m_pic;

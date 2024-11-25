@@ -2,12 +2,12 @@
 // copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
- * audio/specimx.h
+ * ussr/specialsound.h
  *
  ****************************************************************************/
 
-#ifndef MAME_USSR_SPECIAL_H
-#define MAME_USSR_SPECIAL_H
+#ifndef MAME_USSR_SPECIALSOUND_H
+#define MAME_USSR_SPECIALSOUND_H
 
 #pragma once
 
@@ -23,7 +23,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -35,4 +35,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SPECIMX_SND, specimx_sound_device)
 
-#endif // MAME_USSR_SPECIAL_H
+#endif // MAME_USSR_SPECIALSOUND_H

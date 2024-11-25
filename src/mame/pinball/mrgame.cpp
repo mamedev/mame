@@ -97,8 +97,8 @@ public:
 	void wcup90(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void mrgame_palette(palette_device &palette) const;
@@ -128,15 +128,15 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void audio1_io(address_map &map);
-	void audio1_map(address_map &map);
-	void audio2_io(address_map &map);
-	void audio2_map(address_map &map);
-	void main_map(address_map &map);
-	void video_map(address_map &map);
-	void macattck_video_map(address_map &map);
-	void macattck_audio1_map(address_map &map);
-	void wcup90_audio2_map(address_map &map);
+	void audio1_io(address_map &map) ATTR_COLD;
+	void audio1_map(address_map &map) ATTR_COLD;
+	void audio2_io(address_map &map) ATTR_COLD;
+	void audio2_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void video_map(address_map &map) ATTR_COLD;
+	void macattck_video_map(address_map &map) ATTR_COLD;
+	void macattck_audio1_map(address_map &map) ATTR_COLD;
+	void wcup90_audio2_map(address_map &map) ATTR_COLD;
 
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_p_videoram;
@@ -728,7 +728,7 @@ void mrgame_state::mrgame(machine_config &config)
 	dacvol.add_route(0, "rdac", -1.0, DAC_INPUT_RANGE_LO);
 
 	tms5220_device &tms(TMS5220(config, "tms", 672000)); // uses a RC combination. 672k copied from jedi.h
-	tms.ready_cb().set_inputline("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT);
+	tms.ready_cb().set_inputline("audiocpu2", Z80_INPUT_LINE_WAIT);
 	tms.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	tms.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
@@ -856,7 +856,7 @@ ROM_START(motrshowb)
 	ROM_LOAD("vid_ic14.rom", 0x0000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
 
 	ROM_REGION(0x10000, "chargen", 0)
-	ROM_LOAD("vid_ic55.rom", 0x0000, 0x8000, CRC(c27a4ded) SHA1(9c2c9b17f1e71afb74bdfbdcbabb99ef935d32db))
+	ROM_LOAD("vid_ic55.rom", 0x0000, 0x8000, CRC(c27a4ded) SHA1(9c2c9b17f1e71afb74bdfbdcbabb99ef935d32db)) // a PCB has been found with this ROM edited to blank the Zaccaria copyright
 	ROM_LOAD("vid_ic56.rom", 0x8000, 0x8000, CRC(1664ec8d) SHA1(e7b15acdac7dfc51b668e908ca95f02a2b569737))
 
 	ROM_REGION(0x0020, "proms", 0)
@@ -974,10 +974,10 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1988,  dakar,     0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Dakar",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  fasttrack, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Fast Track",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  motrshow,  0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  motrshowa, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  motrshowb, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 3)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  macattck,  0,         macattck,  mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  wcup90,    0,         wcup90,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "World Cup 90",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1988,  dakar,     0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "Dakar",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  fasttrack, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "Fast Track",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  motrshow,  0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Zaccaria / Mr Game", "Motor Show (set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  motrshowa, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Zaccaria / Mr Game", "Motor Show (set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  motrshowb, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Zaccaria / Mr Game", "Motor Show (set 3)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  macattck,  0,         macattck,  mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  wcup90,    0,         wcup90,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game",            "World Cup 90",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

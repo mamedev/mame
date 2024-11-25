@@ -26,10 +26,10 @@ DEFINE_DEVICE_TYPE(BBC_USERPORT_SLOT, bbc_userport_slot_device, "bbc_userport_sl
 //  device_bbc_userport_interface - constructor
 //-------------------------------------------------
 
-device_bbc_userport_interface::device_bbc_userport_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "bbcuserport")
+device_bbc_userport_interface::device_bbc_userport_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "bbcuserport")
+	, m_slot(dynamic_cast<bbc_userport_slot_device *>(device.owner()))
 {
-	m_slot = dynamic_cast<bbc_userport_slot_device *>(device.owner());
 }
 
 
@@ -128,6 +128,7 @@ void bbc_userport_slot_device::write_cb2(int state)
 //#include "digitiser.h"
 //#include "ev1.h"
 #include "lcd.h"
+#include "lvlecho.h"
 #include "m4000.h"
 #include "palext.h"
 #include "pointer.h"
@@ -149,6 +150,7 @@ void bbc_userport_devices(device_slot_interface &device)
 	//device.option_add("ev1",        BBC_EV1);             /* Micro-Robotics EV1 */
 	//device.option_add("hobbit",     BBC_HOBBIT);          /* Hobbit Floppy Tape System (Ikon) */
 	device.option_add("lcd",        BBC_LCD);             /* Sprow LCD Display */
+	device.option_add("lvlecho",    BBC_LVLECHO);         /* LVL Echo Keyboard */
 	device.option_add("m4000",      BBC_M4000);           /* Hybrid Music 4000 Keyboard */
 	device.option_add("m512mouse",  BBC_M512MOUSE);       /* Acorn Mouse (provided with Master 512) */
 	device.option_add("sdcard",     BBC_SDCARD);          /* SD Card */

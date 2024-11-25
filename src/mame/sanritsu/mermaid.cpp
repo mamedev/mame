@@ -436,8 +436,8 @@ void mermaid_state::mermaid(machine_config &config)
 	m_latch[0]->q_out_cb<2>().set([this](int state){ logerror("02 = %d\n", state); }); // plays sample
 	m_latch[0]->q_out_cb<3>().set([this](int state){ logerror("03 = %d\n", state); }); // ???
 	m_latch[0]->q_out_cb<4>().set([this](int state){ logerror("04 = %d\n", state); }); // ???
-	m_latch[0]->q_out_cb<5>().set(FUNC(mermaid_state::flip_screen_x_w));
-	m_latch[0]->q_out_cb<6>().set(FUNC(mermaid_state::flip_screen_y_w));
+	m_latch[0]->q_out_cb<5>().set(FUNC(mermaid_state::flip_screen_x_set));
+	m_latch[0]->q_out_cb<6>().set(FUNC(mermaid_state::flip_screen_y_set));
 	m_latch[0]->q_out_cb<7>().set(FUNC(mermaid_state::nmi_mask_w));
 
 	LS259(config, m_latch[1]);

@@ -34,16 +34,16 @@ public:
 	void korgz3(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void p5_w(u8 data);
 	u8 adc_port_r();
 	void adc_port_w(u8 data);
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
-	void synth_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void synth_map(address_map &map) ATTR_COLD;
 
 	required_device<v30_device> m_maincpu;
 	required_device<hd6301y_cpu_device> m_synthcpu;

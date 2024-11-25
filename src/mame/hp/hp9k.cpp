@@ -166,7 +166,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<gfxdecode_device> m_gfxdecode;
-	void hp9k_mem(address_map &map);
+	void hp9k_mem(address_map &map) ATTR_COLD;
 };
 
 //

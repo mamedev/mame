@@ -125,8 +125,8 @@ private:
 
 	uint8_t m_input_select = 0;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t s3c2440_gpio_port_r(offs_t offset);
 	void s3c2440_gpio_port_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t s3c2440_core_pin_r(offs_t offset);
@@ -137,7 +137,7 @@ private:
 	void s3c2440_i2s_data_w(offs_t offset, uint16_t data);
 	uint32_t s3c2440_adc_data_r();
 
-	void hapyfish_map(address_map &map);
+	void hapyfish_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************

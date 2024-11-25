@@ -74,8 +74,8 @@ private:
 	void kansas_w(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t *m_p_vram = nullptr;
 	uint8_t *m_p_wram = nullptr;
@@ -91,9 +91,9 @@ private:
 	uint16_t m_knj_addr = 0;
 	u8 m_cass_data[4]{};
 	bool m_cassbit = 0, m_cassold = 0;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<i8255_device> m_ppi;

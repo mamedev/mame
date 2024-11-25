@@ -214,7 +214,7 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 
 	// process everything else
 	default:
-		winwindow_dispatch_message(*m_machine, &message);
+		winwindow_dispatch_message(*m_machine, message);
 		break;
 	}
 

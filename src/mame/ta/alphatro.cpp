@@ -83,8 +83,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t bicom_r(offs_t offset);
@@ -104,11 +104,11 @@ private:
 	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
 
-	void alphatro_io(address_map &map);
-	void alphatro_map(address_map &map);
-	void cartbank_map(address_map &map);
-	void monbank_map(address_map &map);
-	void rombank_map(address_map &map);
+	void alphatro_io(address_map &map) ATTR_COLD;
+	void alphatro_map(address_map &map) ATTR_COLD;
+	void cartbank_map(address_map &map) ATTR_COLD;
+	void monbank_map(address_map &map) ATTR_COLD;
+	void rombank_map(address_map &map) ATTR_COLD;
 	void update_banking();
 
 	const bool m_is_ntsc;
@@ -619,7 +619,7 @@ static INPUT_PORTS_START( alphatro )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 
 	PORT_START("other")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_MEMBER(DEVICE_SELF,alphatro_state,alphatro_break,0)
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(alphatro_state::alphatro_break), 0)
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x01, 0x00, "FDD Unit installed")

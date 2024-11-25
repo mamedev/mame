@@ -81,8 +81,8 @@ public:
 	void funybubl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -116,15 +116,13 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_program_map(address_map &map);
-	void main_io_map(address_map &map);
-	void oki_map(address_map &map);
-	void sound_map(address_map &map);
-	void vrambank_map(address_map &map);
+	void main_program_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void vrambank_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 rgb_t funybubl_state::r6b6g6(uint32_t raw)
 {
@@ -215,8 +213,6 @@ uint32_t funybubl_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void funybubl_state::vidram_bank_w(uint8_t data)
 {

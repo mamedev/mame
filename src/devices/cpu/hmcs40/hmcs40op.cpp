@@ -36,16 +36,15 @@ void hmcs40_cpu_device::push_stack()
 }
 
 
-
 // instruction set
 
 void hmcs40_cpu_device::op_illegal()
 {
-	logerror("unknown opcode $%03X at $%04X\n", m_op, m_prev_pc);
+	logerror("unknown opcode $%03X @ $%04X\n", m_op, m_prev_pc);
 }
 
 
-// Register-to-Register Instruction
+// register-to-register instructions
 
 void hmcs40_cpu_device::op_lab()
 {
@@ -86,7 +85,7 @@ void hmcs40_cpu_device::op_xamr()
 
 	// HMCS42: MR0 on file 0, MR4-MR15 on file 4 (there is no file 1-3)
 	// HMCS43: MR0-MR3 on file 0-3, MR4-MR15 on file 4
-	if (m_family == HMCS40_FAMILY_HMCS42 || m_family == HMCS40_FAMILY_HMCS43)
+	if (m_family == HMCS42_FAMILY || m_family == HMCS43_FAMILY)
 		address |= (address < 4) ? (address << 4) : 0x40;
 
 	// HMCS44/45/46/47: all on last file
@@ -100,7 +99,7 @@ void hmcs40_cpu_device::op_xamr()
 }
 
 
-// RAM Address Instruction
+// RAM address instructions
 
 void hmcs40_cpu_device::op_lxa()
 {
@@ -144,7 +143,7 @@ void hmcs40_cpu_device::op_ayy()
 {
 	// AYY: Add A to Y
 	m_y += m_a;
-	m_s = m_y >> 4 & 1;
+	m_s = BIT(m_y, 4);
 	m_y &= 0xf;
 }
 
@@ -152,13 +151,13 @@ void hmcs40_cpu_device::op_syy()
 {
 	// SYY: Subtract A from Y
 	m_y -= m_a;
-	m_s = ~m_y >> 4 & 1;
+	m_s = BIT(~m_y, 4);
 	m_y &= 0xf;
 }
 
 void hmcs40_cpu_device::op_xsp()
 {
-	// XSP (XY): Exchange X and SPX, Y and SPY, or NOP if 0
+	// XSP(XY): Exchange X and SPX, Y and SPY, or NOP if 0
 	if (m_op & 1)
 	{
 		u8 old_x = m_x;
@@ -174,25 +173,25 @@ void hmcs40_cpu_device::op_xsp()
 }
 
 
-// RAM Register Instruction
+// RAM register instructions
 
 void hmcs40_cpu_device::op_lam()
 {
-	// LAM (XY): Load A from Memory
+	// LAM(XY): Load A from Memory
 	m_a = ram_r();
 	op_xsp();
 }
 
 void hmcs40_cpu_device::op_lbm()
 {
-	// LBM (XY): Load B from Memory
+	// LBM(XY): Load B from Memory
 	m_b = ram_r();
 	op_xsp();
 }
 
 void hmcs40_cpu_device::op_xma()
 {
-	// XMA (XY): Exchange Memory and A
+	// XMA(XY): Exchange Memory and A
 	u8 old_a = m_a;
 	m_a = ram_r();
 	ram_w(old_a);
@@ -201,7 +200,7 @@ void hmcs40_cpu_device::op_xma()
 
 void hmcs40_cpu_device::op_xmb()
 {
-	// XMB (XY): Exchange Memory and B
+	// XMB(XY): Exchange Memory and B
 	u8 old_b = m_b;
 	m_b = ram_r();
 	ram_w(old_b);
@@ -210,7 +209,7 @@ void hmcs40_cpu_device::op_xmb()
 
 void hmcs40_cpu_device::op_lmaiy()
 {
-	// LMAIY (X): Load Memory from A, Increment Y
+	// LMAIY(X): Load Memory from A, Increment Y
 	ram_w(m_a);
 	op_iy();
 	op_xsp();
@@ -218,14 +217,14 @@ void hmcs40_cpu_device::op_lmaiy()
 
 void hmcs40_cpu_device::op_lmady()
 {
-	// LMADY (X): Load Memory from A, Decrement Y
+	// LMADY(X): Load Memory from A, Decrement Y
 	ram_w(m_a);
 	op_dy();
 	op_xsp();
 }
 
 
-// Immediate Instruction
+// immediate instructions
 
 void hmcs40_cpu_device::op_lmiiy()
 {
@@ -247,13 +246,13 @@ void hmcs40_cpu_device::op_lbi()
 }
 
 
-// Arithmetic Instruction
+// arithmetic instructions
 
 void hmcs40_cpu_device::op_ai()
 {
 	// AI i: Add Immediate to A
 	m_a += m_i;
-	m_s = m_a >> 4 & 1;
+	m_s = BIT(m_a, 4);
 	m_a &= 0xf;
 }
 
@@ -275,7 +274,7 @@ void hmcs40_cpu_device::op_amc()
 {
 	// AMC: Add A to Memory with Carry
 	m_a += ram_r() + m_c;
-	m_c = m_a >> 4 & 1;
+	m_c = BIT(m_a, 4);
 	m_s = m_c;
 	m_a &= 0xf;
 }
@@ -284,7 +283,7 @@ void hmcs40_cpu_device::op_smc()
 {
 	// SMC: Subtract A from Memory with Carry
 	m_a = ram_r() - m_a - (m_c ^ 1);
-	m_c = ~m_a >> 4 & 1;
+	m_c = BIT(~m_a, 4);
 	m_s = m_c;
 	m_a &= 0xf;
 }
@@ -293,7 +292,7 @@ void hmcs40_cpu_device::op_am()
 {
 	// AM: Add A to Memory
 	m_a += ram_r();
-	m_s = m_a >> 4 & 1;
+	m_s = BIT(m_a, 4);
 	m_a &= 0xf;
 }
 
@@ -351,7 +350,7 @@ void hmcs40_cpu_device::op_rotl()
 {
 	// ROTL: Rotate Left A with Carry
 	m_a = m_a << 1 | m_c;
-	m_c = m_a >> 4 & 1;
+	m_c = BIT(m_a, 4);
 	m_a &= 0xf;
 }
 
@@ -365,17 +364,17 @@ void hmcs40_cpu_device::op_rotr()
 
 void hmcs40_cpu_device::op_or()
 {
-	// OR: OR A with B
+	// OR: Or A with B
 	m_a |= m_b;
 }
 
 
-// Compare Instruction
+// compare instructions
 
 void hmcs40_cpu_device::op_mnei()
 {
 	// MNEI i: Memory Not Equal to Immediate
-	m_s = (ram_r() != m_i);
+	m_s = (m_i != ram_r());
 }
 
 void hmcs40_cpu_device::op_ynei()
@@ -415,7 +414,7 @@ void hmcs40_cpu_device::op_blem()
 }
 
 
-// RAM Bit Manipulation Instruction
+// RAM bit manipulation instructions
 
 void hmcs40_cpu_device::op_sem()
 {
@@ -432,11 +431,11 @@ void hmcs40_cpu_device::op_rem()
 void hmcs40_cpu_device::op_tm()
 {
 	// TM n: Test Memory Bit
-	m_s = ram_r() >> (m_op & 3) & 1;
+	m_s = BIT(ram_r(), m_op & 3);
 }
 
 
-// ROM Address Instruction
+// ROM address instructions
 
 void hmcs40_cpu_device::op_br()
 {
@@ -466,7 +465,11 @@ void hmcs40_cpu_device::op_lpu()
 	if (m_s)
 	{
 		m_block_int = true;
-		m_page = m_op & 0x1f;
+		m_pc_upper = m_op & 0x1f;
+
+		// on HMCS46/47, also latches bank from R70
+		if (m_family == HMCS46_FAMILY || m_family == HMCS47_FAMILY)
+			m_pc_upper |= ~m_r[7] << 5 & 0x20;
 	}
 	else
 		m_op |= 0x400; // indicate unhandled LPU
@@ -486,7 +489,7 @@ void hmcs40_cpu_device::op_rtn()
 }
 
 
-// Interrupt Instruction
+// interrupt instructions
 
 void hmcs40_cpu_device::op_seie()
 {
@@ -606,7 +609,7 @@ void hmcs40_cpu_device::op_rtni()
 }
 
 
-// Input/Output Instruction
+// input/output instructions
 
 void hmcs40_cpu_device::op_sed()
 {
@@ -664,24 +667,24 @@ void hmcs40_cpu_device::op_lrb()
 
 void hmcs40_cpu_device::op_p()
 {
+	// P p: Pattern Generation
 	cycle();
 
-	// P p: Pattern Generation
 	u16 address = m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9 | (m_pc & ~0x3f);
-	u16 o = m_program->read_word(address & m_prgmask);
+	u16 data = m_program->read_word(address & m_prgmask);
 
 	// destination is determined by the 2 highest bits
-	if (o & 0x100)
+	if (data & 0x100)
 	{
 		// B3 B2 B1 B0 A0 A1 A2 A3
-		m_a = bitswap<4>(o,0,1,2,3);
-		m_b = o >> 4 & 0xf;
+		m_a = bitswap<4>(data,0,1,2,3);
+		m_b = data >> 4 & 0xf;
 	}
-	if (o & 0x200)
+	if (data & 0x200)
 	{
 		// R20 R21 R22 R23 R30 R31 R32 R33
-		o = bitswap<8>(o,0,1,2,3,4,5,6,7);
-		write_r(2, o & 0xf);
-		write_r(3, o >> 4 & 0xf);
+		data = bitswap<8>(data,0,1,2,3,4,5,6,7);
+		write_r(2, data & 0xf);
+		write_r(3, data >> 4 & 0xf);
 	}
 }

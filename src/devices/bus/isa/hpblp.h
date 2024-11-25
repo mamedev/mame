@@ -20,16 +20,16 @@ public:
 	isa8_hpblp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	// ISA part
-	void isamap(address_map &map);
+	void isamap(address_map &map) ATTR_COLD;
 
 	uint8_t datal_r(offs_t offset);
 	uint8_t datah_r(offs_t offset);
@@ -57,7 +57,7 @@ private:
 
 	// M68000 part
 	void gpib_irq(int state);
-	void m68map(address_map &map);
+	void m68map(address_map &map) ATTR_COLD;
 
 	uint16_t bus_r(offs_t offset, uint16_t mem_mask);
 	void bus_w(offs_t offset, uint16_t data, uint16_t mem_mask);

@@ -14,10 +14,10 @@ I/O:    2x 8255, 4x 8-dip banks, 1x single dip switch (at position 11m)
 OSC:    20MHz
 
 Notes:
-- Loosely based off rmhaihai.cpp.
-  Changes needed for merging both implementations seems too trivial to warrant a
+- Loosely based off alba/rmhaihai.cpp.
+  Changes needed for merging both implementations seems too non-trivial to warrant a
   driver merge, basically just the video HW, the CRTC (448x224 clocked at 20 MHz?)
-  and a few I/O bits looks very similar, the odd screen size is also a thing in srmp2.cpp
+  and a few I/O bits looks similar, the odd screen size is also a thing in srmp2.cpp
   and probably other Seta HWs.
 - CPU seems a bit too slow when deciding about what tile to discard,
   it also takes a bit too much to sync when a player takes a tile from the pond in
@@ -68,9 +68,9 @@ public:
 	void init_vsmjtria();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device_array<cpu_device, 2> m_cpu;
@@ -96,10 +96,10 @@ private:
 	template <uint8_t Which> void colorram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_prg_map(address_map &map);
-	void main_io_map(address_map &map);
-	void sub_prg_map(address_map &map);
-	void sub_io_map(address_map &map);
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void sub_prg_map(address_map &map) ATTR_COLD;
+	void sub_io_map(address_map &map) ATTR_COLD;
 };
 
 /*

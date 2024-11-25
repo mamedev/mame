@@ -151,7 +151,7 @@ public:
 		, m_banksel(1)
 	{ }
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 	uint8_t syspia_A_r();
@@ -161,7 +161,7 @@ public:
 	void usrpia_cb2_w(int state);
 	void write_acia_clock(int state);
 	void can09t(machine_config &config);
-	void can09t_map(address_map &map);
+	void can09t_map(address_map &map) ATTR_COLD;
 protected:
 	required_device<pia6821_device> m_syspia;
 	required_device<pia6821_device> m_usrpia;
@@ -518,15 +518,15 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	uint8_t pia1_A_r();
 	void pia1_A_w(uint8_t data);
 	uint8_t pia1_B_r();
 	void pia1_B_w(uint8_t data);
 	void pia1_cb2_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void can09_map(address_map &map);
+	void can09_map(address_map &map) ATTR_COLD;
 	required_device<pia6821_device> m_pia1;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_bank1;

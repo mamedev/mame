@@ -44,7 +44,7 @@ license:CC0-1.0
 
 	<element name="SteppersReel2" defstate="0">
 	<reel stateoffset="682" symbollist="Fruit1,Fruit2,Fruit3,Fruit4,Fruit5,Fruit6,Fruit7,Fruit8,Fruit9,Fruit10,Fruit11,Fruit12,Fruit13,Fruit14,Fruit15,Fruit16">
-		"<color red="1.0" green="1.0" blue="1.0" />
+		<color red="1.0" green="1.0" blue="1.0" />
 		<bounds x="0" y="0" width="1" height="1" />
 	</reel>
 	</element>

@@ -32,7 +32,7 @@ public:
 	void ps400(machine_config &config);
 
 private:
-	void ps400_map(address_map &map);
+	void ps400_map(address_map &map) ATTR_COLD;
 
 	required_device<i8039_device> m_maincpu;
 };

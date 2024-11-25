@@ -112,8 +112,8 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_timer_callback);
@@ -148,9 +148,9 @@ private:
 	uint8_t alpha_lock_r();
 	void alpha_lock_w(uint8_t data);
 
-	void einstein_io(address_map &map);
-	void einstein_mem(address_map &map);
-	void einst256_io(address_map &map);
+	void einstein_io(address_map &map) ATTR_COLD;
+	void einstein_mem(address_map &map) ATTR_COLD;
+	void einst256_io(address_map &map) ATTR_COLD;
 
 	void einstein_scan_keyboard();
 
@@ -776,8 +776,8 @@ static INPUT_PORTS_START( einstein )
 
 	// fire buttons for analogue joysticks
 	PORT_START("BUTTONS")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Joystick 1 Button 1") PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, einstein_state, joystick_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Joystick 2 Button 1") PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, einstein_state, joystick_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Joystick 1 Button 1") PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(einstein_state::joystick_button), 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Joystick 2 Button 1") PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(einstein_state::joystick_button), 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("analogue_1_x")
@@ -812,14 +812,14 @@ static INPUT_PORTS_START( einst256 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, einstein_state, joystick_button, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(einstein_state::joystick_button), 0)
 
 	PORT_START("PORTB_JOY")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, einstein_state, joystick_button, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(einstein_state::joystick_button), 0)
 
 	PORT_START("DIPS")
 	PORT_DIPNAME(0x01, 0x00, "Line Standard") PORT_DIPLOCATION("S:1")

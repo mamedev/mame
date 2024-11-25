@@ -37,13 +37,13 @@ public:
 	void bert(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void portb_w(u8 data);
 	void portd_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<z8_device> m_mpu;
 	required_device<ram_device> m_ram;

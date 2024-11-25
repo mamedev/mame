@@ -63,20 +63,20 @@ private:
 	void update_foreground();
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
+	virtual void video_start() override ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	/* microcode state */
 	struct micro_t
 	{
-		uint16_t    i;
-		uint16_t    pc;
-		uint8_t     r,g,b;
-		uint8_t     xp,yp;
-		uint8_t     cmd,cmdlo;
-		emu_timer * timer;
-		uint8_t     timer_active;
+		uint16_t    i = 0;
+		uint16_t    pc = 0;
+		uint8_t     r = 0, g = 0, b = 0;
+		uint8_t     xp = 0, yp = 0;
+		uint8_t     cmd = 0, cmdlo = 0;
+		emu_timer * timer = nullptr;
+		uint8_t     timer_active = 0;
 		attotime    endtime;
 
 		void count_states(int states);

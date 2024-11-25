@@ -419,24 +419,24 @@ void rtc3430042_device::nvram_default()
 
 bool rtc3430042_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_pram, 0x100, actual) && actual == 0x100;
+	auto const [err, actual] = read(file, m_pram, 0x100);
+	return !err && (actual == 0x100);
 }
 
 bool rtc3430042_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_pram, 0x100, actual) && actual == 0x100;
+	auto const [err, actual] = write(file, m_pram, 0x100);
+	return !err;
 }
 
 bool rtc3430040_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_pram, 20, actual) && actual == 20;
+	auto const [err, actual] = read(file, m_pram, 20);
+	return !err && (actual == 20);
 }
 
 bool rtc3430040_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_pram, 20, actual) && actual == 20;
+	auto const [err, actual] = write(file, m_pram, 20);
+	return !err;
 }

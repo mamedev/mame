@@ -27,13 +27,13 @@ public:
 	hp9895_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_ieee488_interface overrides
 	virtual void ieee488_eoi(int state) override;
@@ -100,8 +100,8 @@ private:
 	void read_bit(bool crc_upd);
 	void write_bit(bool data_bit , bool clock_bit);
 
-	void z80_io_map(address_map &map);
-	void z80_program_map(address_map &map);
+	void z80_io_map(address_map &map) ATTR_COLD;
+	void z80_program_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_cpu;
 	required_device<phi_device> m_phi;

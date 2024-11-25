@@ -18,16 +18,16 @@
 namespace ui {
 
 // get number of images in icon file (-1 on error)
-int images_in_ico(util::core_file &fp);
+int images_in_ico(util::random_read &fp);
 
 // load specified icon from file (zero-based)
-void render_load_ico(util::core_file &fp, unsigned index, bitmap_argb32 &bitmap);
+void render_load_ico(util::random_read &fp, unsigned index, bitmap_argb32 &bitmap);
 
 // load first supported icon from file
-void render_load_ico_first(util::core_file &fp, bitmap_argb32 &bitmap);
+void render_load_ico_first(util::random_read &fp, bitmap_argb32 &bitmap);
 
 // load highest detail supported icon from file
-void render_load_ico_highest_detail(util::core_file &fp, bitmap_argb32 &bitmap);
+void render_load_ico_highest_detail(util::random_read &fp, bitmap_argb32 &bitmap);
 
 } // namespace ui
 

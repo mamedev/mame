@@ -45,9 +45,9 @@ public:
 	void fourx4(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	void mem_map(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	required_device<m6502_device> m_maincpu;
 	output_finder<68> m_digits;  // don't know how many
 	output_finder<80> m_io_outputs;   // ?? solenoids + ?? lamps

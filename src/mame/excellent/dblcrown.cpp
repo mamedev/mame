@@ -1,43 +1,41 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese, Roberto Fresca
-/***************************************************************************
+/**************************************************************************************************
 
-    Double Crown (c) 1997 Cadence Technology / Dyna
+Double Crown (c) 1997 Cadence Technology / Dyna
 
-    Driver by Angelo Salese
-    Additional work by Roberto Fresca.
+TODO:
+- Is the background pen really black?
+- Pinpoint optional hopper line_r hookup, via dip4:8.
+- Lots of unmapped I/Os (game doesn't make much use of the HW);
+- video / irq timings;
 
-    TODO:
-    - Bogus "Hole" in main screen display;
-    - Is the background pen really black?
-    - Lots of unmapped I/Os (game doesn't make much use of the HW);
-    - video / irq timings;
+Notes:
+- at POST the SW tries to write to the palette RAM in a banking fashion. HW left-over?
+- there are various $0030-$0033 ROM checks across the SW, changing these values to non-zero
+  effectively changes game functionality (cfr. matrix mode at POST), ROM overlay or just
+  different ROM versions?
+- Topmost 2 rows are intended to be seen, cfr. analyzer "5 of a kind" and "royal flush" drawn there.
+  Whatever these rows are supposed to indicate in gameplay (scoring cards for a fever bonus?)
+  is untested.
 
-    Notes:
-    - at POST the SW tries to write to the palette RAM in a banking fashion.
-      I think it's just an HW left-over.
-    - there are various bogus checks to ROM region throughout the whole SW
-      (0x0030-0x0033? O.o), trying to change the values of these ones changes
-      the functionality of the game, almost like that the DSWs are tied to
-      these ...
+===================================================================================================
 
-============================================================================
+Excellent System
+boardlabel: ES-9411B
 
-    Excellent System
-    boardlabel: ES-9411B
+28.6363 xtal
+ES-9409 QFP is 208 pins.. for graphics only?
+Z0840006PSC Zilog z80, is rated 6.17 MHz
+OKI M82C55A-2
+65764H-5 .. 64kbit ram CMOS
+2 * N341256P-25 - CMOS SRAM 256K-BIT(32KX8)
+4 * dipsw 8pos
+YMZ284-D (ay8910, but without i/o ports)
+MAXIM MAX693ACPE is a "Microprocessor Supervisory Circuit", for watchdog
+and for nvram functions.
 
-    28.6363 xtal
-    ES-9409 QFP is 208 pins.. for graphics only?
-    Z0840006PSC Zilog z80, is rated 6.17 MHz
-    OKI M82C55A-2
-    65764H-5 .. 64kbit ram CMOS
-    2 * N341256P-25 - CMOS SRAM 256K-BIT(32KX8)
-    4 * dipsw 8pos
-    YMZ284-D (ay8910, but without i/o ports)
-    MAXIM MAX693ACPE is a "Microprocessor Supervisory Circuit", for watchdog
-    and for nvram functions.
-
-***************************************************************************/
+**************************************************************************************************/
 
 
 #define MAIN_CLOCK          XTAL(28'636'363)
@@ -46,21 +44,23 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
+#include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "dblcrown.lh"
 
 
 namespace {
-
-#define DEBUG_VRAM
 
 class dblcrown_state : public driver_device
 {
@@ -69,6 +69,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_watchdog(*this, "watchdog")
+		, m_hopper(*this, "hopper")
+		, m_vram(*this, "vram")
+		, m_vram_bank(*this, "vram_bank%u", 0U)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_inputs(*this, "IN%u", 0U)
@@ -78,14 +81,20 @@ public:
 	void dblcrown(machine_config &config);
 
 private:
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<ticket_dispenser_device> m_hopper;
+	required_shared_ptr<u8> m_vram;
+	required_device_array<address_map_bank_device, 2> m_vram_bank;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_ioport_array<4> m_inputs;
+	output_finder<8> m_lamps;
 
 	void bank_w(uint8_t data);
 	uint8_t irq_source_r();
@@ -96,80 +105,72 @@ private:
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t vram_bank_r(offs_t offset);
 	void vram_bank_w(offs_t offset, uint8_t data);
-	void mux_w(uint8_t data);
-	uint8_t in_mux_r();
-	uint8_t in_mux_type_r();
+	void key_select_w(uint8_t data);
+	uint8_t key_matrix_r();
+	uint8_t key_pending_r();
 	void output_w(uint8_t data);
 	void lamps_w(uint8_t data);
 	void watchdog_w(uint8_t data);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
-	void dblcrown_palette(palette_device &palette) const;
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
-	void dblcrown_io(address_map &map);
-	void dblcrown_map(address_map &map);
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<watchdog_timer_device> m_watchdog;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_ioport_array<4> m_inputs;
-	output_finder<8> m_lamps;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
+	void vram_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_bank = 0;
 	uint8_t m_irq_src = 0;
+	uint8_t m_key_select = 0;
+
 	std::unique_ptr<uint8_t[]> m_pal_ram;
-	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t m_vram_bank[2]{};
-	uint8_t m_mux_data = 0;
+	uint8_t m_vram_bank_entry[2]{};
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
+
+TILE_GET_INFO_MEMBER(dblcrown_state::get_bg_tile_info)
+{
+	const u8 *rambase = (const u8 *)tilemap.user_data();
+	const u16 code = (rambase[tile_index * 2 + 0] | (rambase[tile_index * 2 + 1] << 8)) & 0xfff;
+	const u8 color = (rambase[tile_index * 2 + 1] >> 4);
+
+	tileinfo.set(0, code, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(dblcrown_state::get_fg_tile_info)
+{
+	const u8 *rambase = (const u8 *)tilemap.user_data();
+	const u16 code = (rambase[tile_index * 2 + 0] | (rambase[tile_index * 2 + 1] << 8)) & 0x7ff;
+	const u8 color = (rambase[tile_index * 2 + 1] >> 4);
+
+	tileinfo.set(1, code, color, 0);
+}
 
 void dblcrown_state::video_start()
 {
-	m_pal_ram = std::make_unique<uint8_t[]>(0x200 * 2);
-	m_vram = std::make_unique<uint8_t[]>(0x1000 * 0x10);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dblcrown_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_bg_tilemap->set_user_data(&m_vram[0xa000]);
 
-	save_pointer(NAME(m_vram), 0x1000 * 0x10);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dblcrown_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_user_data(&m_vram[0xb000]);
+
+	m_fg_tilemap->set_transparent_pen(0);
+
+	m_pal_ram = std::make_unique<uint8_t[]>(0x200 * 2);
+	// NOTE: set_source alone will crash with 0-length gfxdecoding
+	// need to explicitly use a fn otherwise unused by the rest of
+	// the MAME ecosystem at the time of this writing.
+	m_gfxdecode->gfx(1)->set_source_and_total(m_vram, m_vram.length() / 32);
 }
 
 uint32_t dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-	gfx_element *gfx_2 = m_gfxdecode->gfx(1);
-	int x,y;
-	int count;
-
-	count = 0xa000;
-
-	for (y = 0; y < 16; y++)
-	{
-		for (x = 0; x < 32; x++)
-		{
-			uint16_t tile = ((m_vram[count]) | (m_vram[count+1] << 8)) & 0xfff;
-			uint8_t col = (m_vram[count+1] >> 4);
-
-			gfx_2->opaque(bitmap, cliprect, tile, col, 0, 0, x * 16, y * 16);
-
-			count += 2;
-		}
-	}
-
-	count = 0xb000;
-
-	for (y = 0; y < 32; y++)
-	{
-		for (x = 0; x < 64; x++)
-		{
-			uint16_t tile = ((m_vram[count]) | (m_vram[count + 1] << 8)) & 0xfff;
-			uint8_t col = (m_vram[count + 1] >> 4); // ok?
-
-			gfx->transpen(bitmap, cliprect, tile, col, 0, 0, x * 8, y * 8, 0);
-
-			count += 2;
-		}
-	}
-
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -216,64 +217,52 @@ void dblcrown_state::palette_w(offs_t offset, uint8_t data)
 	m_palette->set_pen_color(offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-
-uint8_t dblcrown_state::vram_r(offs_t offset)
-{
-	uint32_t hi_offs;
-	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
-
-	return m_vram[(offset & 0xfff) | hi_offs];
-}
-
 void dblcrown_state::vram_w(offs_t offset, uint8_t data)
 {
-	uint32_t hi_offs;
-	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
+	m_vram[offset] = data;
 
-	m_vram[(offset & 0xfff) | hi_offs] = data;
+	if ((offset & 0xf000) == 0xa000)
+		m_bg_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
 
-	#ifdef DEBUG_VRAM
-	{
-		uint8_t *VRAM = memregion("vram")->base();
+	if ((offset & 0xf000) == 0xb000)
+		m_fg_tilemap->mark_tile_dirty((offset & 0xfff) >> 1);
 
-		VRAM[(offset & 0xfff) | hi_offs] = data;
-		m_gfxdecode->gfx(0)->mark_dirty(((offset & 0xfff) | hi_offs) / 32);
-	}
-	#endif
+	m_gfxdecode->gfx(1)->mark_dirty(offset / 32);
 }
 
 uint8_t dblcrown_state::vram_bank_r(offs_t offset)
 {
-	return m_vram_bank[offset];
+	return m_vram_bank_entry[offset];
 }
 
 void dblcrown_state::vram_bank_w(offs_t offset, uint8_t data)
 {
-	m_vram_bank[offset] = data & 0xf;
+	m_vram_bank_entry[offset] = data & 0xf;
+	m_vram_bank[offset]->set_bank(m_vram_bank_entry[offset]);
 
 	if(data & 0xf0)
-		printf("vram bank = %02x\n",data);
+		logerror("Upper vram bank write = %02x\n",data);
 }
 
-void dblcrown_state::mux_w(uint8_t data)
+void dblcrown_state::key_select_w(uint8_t data)
 {
-	m_mux_data = data;
+	m_key_select = data;
 }
 
-uint8_t dblcrown_state::in_mux_r()
+uint8_t dblcrown_state::key_matrix_r()
 {
 	uint8_t res = 0;
 
 	for(int i = 0; i < 4; i++)
 	{
-		if(m_mux_data & 1 << i)
+		if(m_key_select & 1 << i)
 			res |= m_inputs[i]->read();
 	}
 
 	return res;
 }
 
-uint8_t dblcrown_state::in_mux_type_r()
+uint8_t dblcrown_state::key_pending_r()
 {
 	uint8_t res = 0xff;
 
@@ -286,47 +275,43 @@ uint8_t dblcrown_state::in_mux_type_r()
 	return res;
 }
 
+/*  bits
+ * 7654 3210
+ * ---- -x--  coin lockout
+ * ---- x---  Payout counter pulse
+ * ---x ----  Coin In counter pulse
+ * -x-- ----  unknown (active after deal)
+ * x-x- --xx  unknown
+ */
 void dblcrown_state::output_w(uint8_t data)
 {
-/*  bits
-  7654 3210
-  ---- -x--  unknown (active after deal)
-  ---- x---  Payout counter pulse
-  ---x ----  Coin In counter pulse
-  -x-- ----  unknown (active after deal)
-  x-x- --xx  unknown
-*/
-
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* Coin In counter pulse */
-	machine().bookkeeping().coin_counter_w(1 ,data & 0x08);  /* Payout counter pulse */
-//  popmessage("out: %02x", data);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
+	m_hopper->motor_w(BIT(data, 3));
+	machine().bookkeeping().coin_lockout_global_w(!BIT(data, 2));
 }
 
-
+/*  bits
+ * 7654 3210
+ * ---- ---x  Deal
+ * ---- --x-  Bet
+ * ---- -x--  Cancel
+ * ---- x---  Hold 5
+ * ---x ----  Hold 4
+ * --x- ----  Hold 3
+ * -x-- ----  Hold 2
+ * x--- ----  Hold 1
+ */
 void dblcrown_state::lamps_w(uint8_t data)
 {
-/*  bits
-  7654 3210
-  ---- ---x  Deal
-  ---- --x-  Bet
-  ---- -x--  Cancel
-  ---- x---  Hold 5
-  ---x ----  Hold 4
-  --x- ----  Hold 3
-  -x-- ----  Hold 2
-  x--- ----  Hold 1
-*/
-
 	for (int n = 0; n < 8; n++)
 		m_lamps[n] = BIT(data, n);
 }
 
+// MAX693A
 void dblcrown_state::watchdog_w(uint8_t data)
-/*
-  Always 0x01...
-*/
 {
-	if (data & 0x01)      /* check for refresh value (0x01) */
+	// check for refresh value (0x01)
+	if (data & 0x01)
 	{
 		m_watchdog->watchdog_reset();
 	}
@@ -337,23 +322,23 @@ void dblcrown_state::watchdog_w(uint8_t data)
 }
 
 
-void dblcrown_state::dblcrown_map(address_map &map)
+void dblcrown_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("rom_bank");
 	map(0xa000, 0xb7ff).ram(); // work ram
 	map(0xb800, 0xbfff).ram().share("nvram");
-	map(0xc000, 0xdfff).rw(FUNC(dblcrown_state::vram_r), FUNC(dblcrown_state::vram_w));
+	map(0xc000, 0xcfff).m(m_vram_bank[0], FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xdfff).m(m_vram_bank[1], FUNC(address_map_bank_device::amap8));
 	map(0xf000, 0xf1ff).rw(FUNC(dblcrown_state::palette_r), FUNC(dblcrown_state::palette_w));
 	map(0xfe00, 0xfeff).ram(); // ???
 	map(0xff00, 0xffff).ram(); // ???, intentional fall-through
 	map(0xff00, 0xff01).rw(FUNC(dblcrown_state::vram_bank_r), FUNC(dblcrown_state::vram_bank_w));
 	map(0xff04, 0xff04).rw(FUNC(dblcrown_state::irq_source_r), FUNC(dblcrown_state::irq_source_w));
-
 }
 
-void dblcrown_state::dblcrown_io(address_map &map)
+void dblcrown_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
@@ -361,12 +346,17 @@ void dblcrown_state::dblcrown_io(address_map &map)
 	map(0x01, 0x01).portr("DSWB");
 	map(0x02, 0x02).portr("DSWC");
 	map(0x03, 0x03).portr("DSWD");
-	map(0x04, 0x04).r(FUNC(dblcrown_state::in_mux_r));
-	map(0x05, 0x05).r(FUNC(dblcrown_state::in_mux_type_r));
+	map(0x04, 0x04).r(FUNC(dblcrown_state::key_matrix_r));
+	map(0x05, 0x05).r(FUNC(dblcrown_state::key_pending_r));
 	map(0x10, 0x13).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x21).w("ymz", FUNC(ymz284_device::address_data_w));
 	map(0x30, 0x30).w(FUNC(dblcrown_state::watchdog_w));
 	map(0x40, 0x40).w(FUNC(dblcrown_state::output_w));
+}
+
+void dblcrown_state::vram_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram().w(FUNC(dblcrown_state::vram_w)).share("vram");
 }
 
 static INPUT_PORTS_START( dblcrown )
@@ -381,7 +371,7 @@ static INPUT_PORTS_START( dblcrown )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Payout")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
@@ -445,9 +435,9 @@ static INPUT_PORTS_START( dblcrown )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Card Reveal Animation" )
+	PORT_DIPSETTING(    0x40, "Normal" )
+	PORT_DIPSETTING(    0x00, "Fast" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -468,39 +458,45 @@ static INPUT_PORTS_START( dblcrown )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xe0, 0xe0, "Credit Limit" )
+	PORT_DIPSETTING(    0xe0, "1000" )
+	PORT_DIPSETTING(    0xc0, "3000")
+	PORT_DIPSETTING(    0xa0, "5000" )
+	PORT_DIPSETTING(    0x80, "10000" )
+	PORT_DIPSETTING(    0x60, "20000" )
+	PORT_DIPSETTING(    0x40, "30000" )
+	PORT_DIPSETTING(    0x20, "40000" )
+	PORT_DIPSETTING(    0x00, "50000" )
 
 	PORT_START("DSWD")
-	PORT_DIPNAME( 0x01, 0x01, "DSWD" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x02, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x01, "1 Coin/1 Credit (again 1)" )
+	PORT_DIPSETTING(    0x07, "1 Coin/1 Credit (again 2)" )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0b, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x0a, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0x09, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x08, "1 Coin/50 Credits" )
+	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Coin_B ) ) // Coinage for note in
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x40, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x30, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x20, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Coin/100 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/500 Credits" )
+	// TODO: game will error blink if On at payout time
+	PORT_DIPNAME( 0x80, 0x80, "Hopper Status?" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -518,10 +514,8 @@ static const gfx_layout char_16x16_layout =
 
 
 static GFXDECODE_START( gfx_dblcrown )
-#ifdef DEBUG_VRAM
-	GFXDECODE_ENTRY( "vram", 0, gfx_8x8x4_packed_lsb, 0, 0x10 )
-#endif
 	GFXDECODE_ENTRY( "gfx1", 0, char_16x16_layout, 0, 0x10 )
+	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4_packed_lsb, 0, 0x10 )
 GFXDECODE_END
 
 
@@ -536,14 +530,12 @@ void dblcrown_state::machine_start()
 
 void dblcrown_state::machine_reset()
 {
+	m_vram_bank[0]->set_bank(0);
+	m_vram_bank[1]->set_bank(0);
 }
 
 
-void dblcrown_state::dblcrown_palette(palette_device &palette) const
-{
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_state::dblcrown_irq_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_state::scanline_cb)
 {
 	int scanline = param;
 
@@ -588,35 +580,38 @@ It needs at least 64 instances because 0xa05b will be eventually nuked by the vb
 
 void dblcrown_state::dblcrown(machine_config &config)
 {
-	/* basic machine hardware */
 	Z80(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dblcrown_state::dblcrown_map);
-	m_maincpu->set_addrmap(AS_IO, &dblcrown_state::dblcrown_io);
-	TIMER(config, "scantimer").configure_scanline(FUNC(dblcrown_state::dblcrown_irq_scanline), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dblcrown_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &dblcrown_state::main_io);
+	TIMER(config, "scantimer").configure_scanline(FUNC(dblcrown_state::scanline_cb), "screen", 0, 1);
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));   /* 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator) */
+	// 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator)
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_screen_update(FUNC(dblcrown_state::screen_update));
-	screen.set_size(64*8, 64*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	screen.set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dblcrown);
-
-	PALETTE(config, m_palette, FUNC(dblcrown_state::dblcrown_palette), 0x100);
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(dblcrown_state::lamps_w));
 	ppi.out_pb_callback().set(FUNC(dblcrown_state::bank_w));
-	ppi.out_pc_callback().set(FUNC(dblcrown_state::mux_w));
+	ppi.out_pc_callback().set(FUNC(dblcrown_state::key_select_w));
 
-	/* sound hardware */
+	for (auto bank : m_vram_bank)
+		ADDRESS_MAP_BANK(config, bank).set_map(&dblcrown_state::vram_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x1000);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(dblcrown_state::screen_update));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dblcrown);
+
+	PALETTE(config, m_palette).set_entries(0x100);
+
 	SPEAKER(config, "mono").front_center();
 	YMZ284(config, "ymz", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
@@ -636,10 +631,6 @@ ROM_START( dblcrown )
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD("2.u43", 0x00000, 0x80000, CRC(58200bd4) SHA1(2795cfc41056111f66bfb82916343d1c733baa83) )
 
-#ifdef DEBUG_VRAM
-	ROM_REGION( 0x1000*0x10, "vram", ROMREGION_ERASE00 )
-#endif
-
 	ROM_REGION( 0x0bf1, "plds", 0 )
 	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0117, CRC(c74231ee) SHA1(f1b9e98f1fde53eee64d5da38fb8a6c22b6333e2) )
 ROM_END
@@ -647,5 +638,4 @@ ROM_END
 } // anonymous namespace
 
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT    COMPANY                FULLNAME                FLAGS                    LAYOUT  */
 GAMEL( 1997, dblcrown, 0,      dblcrown, dblcrown, dblcrown_state, empty_init, ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", MACHINE_IMPERFECT_GRAPHICS, layout_dblcrown ) // 1997 DYNA copyright in tile GFX

@@ -34,15 +34,15 @@ public:
 	void init_nes_clone();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual uint8_t in0_r();
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_clone_basemap(address_map &map);
+	void nes_clone_basemap(address_map &map) ATTR_COLD;
 
 	uint8_t* m_mainrom;
 	int m_mainromsize;
@@ -59,7 +59,7 @@ protected:
 
 private:
 
-	void nes_clone_map(address_map &map);
+	void nes_clone_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -76,7 +76,7 @@ public:
 	void nes_clone_dancexpt(machine_config &config);
 
 private:
-	void nes_clone_dancexpt_map(address_map &map);
+	void nes_clone_dancexpt_map(address_map &map) ATTR_COLD;
 	memory_bank_array_creator<4> m_nametables;
 	required_memory_bank m_prgrom;
 	memory_bank_creator m_gfxrom;
@@ -84,8 +84,8 @@ private:
 
 	std::unique_ptr<u8[]> m_nt_ram;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void mapper_5000_w(offs_t offset, uint8_t data);
 	void mapper_5100_w(offs_t offset, uint8_t data);
@@ -112,9 +112,9 @@ public:
 	void nes_clone_dnce2000(machine_config& config);
 
 private:
-	void nes_clone_dnce2000_map(address_map& map);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void nes_clone_dnce2000_map(address_map &map) ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint8_t rom_r(offs_t offset);
 	void bank_w(uint8_t data);
 	uint8_t m_rombase = 0;
@@ -131,7 +131,7 @@ public:
 	void init_vtvppong();
 
 private:
-	void nes_clone_vtvppong_map(address_map& map);
+	void nes_clone_vtvppong_map(address_map &map) ATTR_COLD;
 };
 
 class nes_clone_sudoku_state : public nes_clone_state
@@ -146,9 +146,9 @@ public:
 	void nes_clone_sudoku(machine_config& config);
 
 private:
-	void nes_clone_sudoku_map(address_map& map);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void nes_clone_sudoku_map(address_map &map) ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint8_t rom_r(offs_t offset);
 	void bank_w(uint8_t data);
 	uint8_t m_rombase = 0;
@@ -164,9 +164,9 @@ public:
 	void nes_clone_vtvsocr(machine_config& config);
 
 private:
-	void nes_clone_vtvsocr_map(address_map& map);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void nes_clone_vtvsocr_map(address_map &map) ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint8_t rom_r(offs_t offset);
 	void bank_w(offs_t offset, uint8_t data);
 	uint8_t m_bankregs[4];
@@ -188,14 +188,14 @@ public:
 	void nes_clone_afbm7800(machine_config& config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 protected:
 	// configured at startup
 	uint16_t m_maxchrbank = 0;
 
-	void nes_clone_afbm7800_map(address_map &map);
+	void nes_clone_afbm7800_map(address_map &map) ATTR_COLD;
 
 	void mapper_6000_w(uint8_t data);
 	void mapper_6001_w(uint8_t data);
@@ -239,9 +239,9 @@ protected:
 	void update_nt_mirroring();
 	std::vector<u8> m_nt_ram;
 
-	void vram_map(address_map &map);
-	void ntram_map(address_map &map);
-	void romarea_map(address_map &map);
+	void vram_map(address_map &map) ATTR_COLD;
+	void ntram_map(address_map &map) ATTR_COLD;
+	void romarea_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank_array<4> m_prgbank;
 	required_memory_bank_array<6> m_cbank;
@@ -264,7 +264,7 @@ protected:
 	virtual void vram_w(offs_t offset, uint8_t data) override;
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 // Standard NES style inputs (not using bus device as there are no real NES controller ports etc. these are all-in-one units and can be custom
@@ -1311,6 +1311,11 @@ ROM_START( dnce2000 ) // use Mapper 241 if you want to run this in a NES emulato
 	ROM_LOAD( "dance.bin", 0x00000, 0x40000, CRC(0982bb50) SHA1(bd608159d7e624ea345f2a188de51cb1aa116421) )
 ROM_END
 
+ROM_START( croaky )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "croakykaraoke_16in1.bin", 0x00000, 0x80000, CRC(5f939fd6) SHA1(9dd56b1ee5f27a7d9b42c2638c6a06fac5554c9b) )
+ROM_END
+
 ROM_START( vtvppong )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 ) // high bit is never set in the first 0x28000 bytes of this ROM, probably 7-bit sound data? code might need opcode bits swapping
 	ROM_LOAD( "vtvpongcpu.bin", 0x00000, 0x40000, CRC(52df95fa) SHA1(3015bcc90eee862b3568f122b402c9defa566aab) )
@@ -1369,12 +1374,14 @@ CONS( 2004, afbm7800,  0,  0,  nes_clone_afbm7800,    nes_clone, nes_clone_afbm7
 
 CONS( 200?, dnce2000, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_state, init_nes_clone, "Shenzhen Soyin Electric Appliance Ind. Co., Ltd.", "Dance 2000 / Hot 2000 (Jin Bao TV Dancing Carpet, SY-2000-04)", 0 )
 
+CONS( 2002, croaky,   0, 0, nes_clone_dnce2000, nes_clone, nes_clone_dnce2000_state, init_nes_clone, "<unknown>", "Croaky Karaoke 16-in-1", MACHINE_NOT_WORKING ) // no inputs
+
 // Black pad marked 'SUDOKU' with tails on the S and U characters looping over the logo.  Box says "Plug and Play Sudoku"
 // Has 2 sets of 4 buttons in circular 'direction pad' layouts (on the left for directions, on the right for functions) and 9 red numbered buttons with red power LED on left of them, and reset button on right
 // Alt. version was released with 'New York Times' titlescreen
 CONS( 200?, papsudok,     0,  0,  nes_clone_sudoku, papsudok, nes_clone_sudoku_state, init_sudoku, "Nice Code", "Plug and Play Sudoku Game (NES based)", 0 ) // plays, but unclear how 'save' feature is meant to work, is it meant to save after shutdown or not? no obvious writes
 
-CONS( 200?, nytsudo,      0,  0,  nes_clone_sudoku, papsudok, nes_clone_sudoku_state, init_sudoku, "Excalibur / Nice Code", "The New York Times Sudoku", 0 ) // based on the above
+CONS( 200?, nytsudo,      0,  0,  nes_clone_sudoku, papsudok, nes_clone_sudoku_state, init_sudoku, "Excalibur Electronics / Nice Code", "The New York Times Sudoku", 0 ) // based on the above
 
 CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
 

@@ -15,17 +15,14 @@
 
 DEFINE_DEVICE_TYPE(GEEBEE_SOUND, geebee_sound_device, "geebee_sound", "Gee Bee Custom Sound")
 
-geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GEEBEE_SOUND, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_decay(nullptr),
-		m_channel(nullptr),
-		m_sound_latch(0),
-		m_sound_signal(0),
-		m_volume(0),
-		m_volume_timer(nullptr),
-		m_noise(0),
-		m_vcount(0)
+geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, GEEBEE_SOUND, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_sound_latch(0),
+	m_sound_signal(0),
+	m_volume(0),
+	m_noise(0),
+	m_vcount(0)
 {
 }
 
@@ -41,9 +38,8 @@ void geebee_sound_device::device_start()
 	for (int i = 0; i < 0x8000; i++)
 		m_decay[0x7fff - i] = (int16_t) (0x7fff/exp(1.0*i/4096));
 
-	/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
+	// 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz
 	m_channel = stream_alloc(0, 1, clock() / 3 / 2 / 384);
-	m_vcount = 0;
 
 	m_volume_timer = timer_alloc(FUNC(geebee_sound_device::volume_decay_tick), this);
 
@@ -56,18 +52,22 @@ void geebee_sound_device::device_start()
 
 TIMER_CALLBACK_MEMBER(geebee_sound_device::volume_decay_tick)
 {
-	if (--m_volume < 0)
-		m_volume = 0;
+	if (m_volume > 0)
+	{
+		m_channel->update();
+		m_volume--;
+	}
 }
 
 void geebee_sound_device::sound_w(u8 data)
 {
 	m_channel->update();
 	m_sound_latch = data;
-	m_volume = 0x7fff; /* set volume */
-	m_noise = 0x0000;  /* reset noise shifter */
-	/* faster decay enabled? */
-	if( m_sound_latch & 8 )
+	m_volume = 0x7fff; // set volume
+	m_noise = 0x0000; // reset noise shifter
+
+	// faster decay enabled?
+	if (m_sound_latch & 8)
 	{
 		/*
 		 * R24 is 10k, Rb is 0, C57 is 1uF
@@ -94,6 +94,7 @@ void geebee_sound_device::sound_w(u8 data)
 	}
 }
 
+
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
@@ -105,46 +106,47 @@ void geebee_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		buffer.put_int(sampindex, m_sound_signal, 32768);
-		/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
-		{
-			m_vcount++;
-			/* noise clocked with raising edge of 2V */
-			if ((m_vcount & 3) == 2)
-			{
-				/* bit0 = bit0 ^ !bit10 */
-				if ((m_noise & 1) == ((m_noise >> 10) & 1))
-					m_noise = ((m_noise << 1) & 0xfffe) | 1;
-				else
-					m_noise = (m_noise << 1) & 0xfffe;
-			}
-			switch (m_sound_latch & 7)
-			{
-			case 0: /* 4V */
-				m_sound_signal = (m_vcount & 0x04) ? m_decay[m_volume] : 0;
-				break;
-			case 1: /* 8V */
-				m_sound_signal = (m_vcount & 0x08) ? m_decay[m_volume] : 0;
-				break;
-			case 2: /* 16V */
-				m_sound_signal = (m_vcount & 0x10) ? m_decay[m_volume] : 0;
-				break;
-			case 3: /* 32V */
-				m_sound_signal = (m_vcount & 0x20) ? m_decay[m_volume] : 0;
-				break;
-			case 4: /* TONE1 */
-				m_sound_signal = !(m_vcount & 0x01) && !(m_vcount & 0x10) ? m_decay[m_volume] : 0;
-				break;
-			case 5: /* TONE2 */
-				m_sound_signal = !(m_vcount & 0x02) && !(m_vcount & 0x20) ? m_decay[m_volume] : 0;
-				break;
-			case 6: /* TONE3 */
-				m_sound_signal = !(m_vcount & 0x04) && !(m_vcount & 0x40) ? m_decay[m_volume] : 0;
-				break;
-			default: /* NOISE */
-				/* QH of 74164 #4V */
-				m_sound_signal = (m_noise & 0x8000) ? m_decay[m_volume] : 0;
-			}
 
+		// 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz
+		m_vcount++;
+
+		// noise clocked with rising edge of 2V
+		if ((m_vcount & 3) == 2)
+		{
+			// bit0 = bit0 ^ !bit10
+			if ((m_noise & 1) == ((m_noise >> 10) & 1))
+				m_noise = ((m_noise << 1) & 0xfffe) | 1;
+			else
+				m_noise = (m_noise << 1) & 0xfffe;
+		}
+
+		switch (m_sound_latch & 7)
+		{
+		case 0: // 4V
+			m_sound_signal = (m_vcount & 0x04) ? m_decay[m_volume] : 0;
+			break;
+		case 1: // 8V
+			m_sound_signal = (m_vcount & 0x08) ? m_decay[m_volume] : 0;
+			break;
+		case 2: // 16V
+			m_sound_signal = (m_vcount & 0x10) ? m_decay[m_volume] : 0;
+			break;
+		case 3: // 32V
+			m_sound_signal = (m_vcount & 0x20) ? m_decay[m_volume] : 0;
+			break;
+		case 4: // TONE1
+			m_sound_signal = !(m_vcount & 0x01) && !(m_vcount & 0x10) ? m_decay[m_volume] : 0;
+			break;
+		case 5: // TONE2
+			m_sound_signal = !(m_vcount & 0x02) && !(m_vcount & 0x20) ? m_decay[m_volume] : 0;
+			break;
+		case 6: // TONE3
+			m_sound_signal = !(m_vcount & 0x04) && !(m_vcount & 0x40) ? m_decay[m_volume] : 0;
+			break;
+		default: // NOISE
+			// QH of 74164 #4V
+			m_sound_signal = (m_noise & 0x8000) ? m_decay[m_volume] : 0;
+			break;
 		}
 	}
 }

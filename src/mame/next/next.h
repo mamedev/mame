@@ -74,8 +74,8 @@ private:
 	optional_device<n82077aa_device> fdc; // 040 only
 	optional_device<floppy_connector> floppy0; // 040 only
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -147,17 +147,17 @@ private:
 	void vblank_w(int state);
 
 	void ncr53c90(device_t *device);
-	void next_0b_m_mem(address_map &map);
-	void next_0b_m_mo_mem(address_map &map);
-	void next_0b_m_nofdc_mem(address_map &map);
-	void next_0c_c_mem(address_map &map);
-	void next_0c_m_mem(address_map &map);
-	void next_0c_c_mo_mem(address_map &map);
-	void next_0c_m_mo_mem(address_map &map);
-	void next_2c_c_mem(address_map &map);
-	void next_fdc_mem(address_map &map);
-	void next_mo_mem(address_map &map);
-	void next_mem(address_map &map);
+	void next_0b_m_mem(address_map &map) ATTR_COLD;
+	void next_0b_m_mo_mem(address_map &map) ATTR_COLD;
+	void next_0b_m_nofdc_mem(address_map &map) ATTR_COLD;
+	void next_0c_c_mem(address_map &map) ATTR_COLD;
+	void next_0c_m_mem(address_map &map) ATTR_COLD;
+	void next_0c_c_mo_mem(address_map &map) ATTR_COLD;
+	void next_0c_m_mo_mem(address_map &map) ATTR_COLD;
+	void next_2c_c_mem(address_map &map) ATTR_COLD;
+	void next_fdc_mem(address_map &map) ATTR_COLD;
+	void next_mo_mem(address_map &map) ATTR_COLD;
+	void next_mem(address_map &map) ATTR_COLD;
 
 	struct dma_slot {
 		uint32_t start = 0;

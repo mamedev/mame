@@ -9,8 +9,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_A2BUS_A2SSPRITE_H
-#define MAME_BUS_A2BUS_A2SSPRITE_H
+#ifndef MAME_BUS_A2BUS_SSPRITE_H
+#define MAME_BUS_A2BUS_SSPRITE_H
 
 #pragma once
 
@@ -19,4 +19,4 @@
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_SSPRITE, device_a2bus_card_interface)
 
-#endif  // MAME_BUS_A2BUS_SSPRITE_H
+#endif // MAME_BUS_A2BUS_SSPRITE_H

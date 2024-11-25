@@ -262,8 +262,7 @@ bool wd177x_format::load(util::random_read &io, uint32_t form_factor, const std:
 
 			build_sector_description(tf, sectdata, sectors, track, head);
 			int track_size = compute_track_size(tf);
-			size_t actual;
-			io.read_at(get_image_offset(f, head, track), sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, get_image_offset(f, head, track), sectdata, track_size); // FIXME: check for errors and premature EOF
 			generate_track(desc, track, head, sectors, tf.sector_count, total_size, image);
 		}
 
@@ -389,8 +388,7 @@ bool wd177x_format::save(util::random_read_write &io, const std::vector<uint32_t
 			build_sector_description(tf, sectdata, sectors, track, head);
 			extract_sectors(image, tf, sectors, track, head);
 			int track_size = compute_track_size(tf);
-			size_t actual;
-			io.write_at(get_image_offset(f, head, track), sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ write_at(io, get_image_offset(f, head, track), sectdata, track_size); // FIXME: check for errors
 		}
 	}
 

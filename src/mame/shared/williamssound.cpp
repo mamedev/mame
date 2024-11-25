@@ -933,7 +933,7 @@ INPUT_PORTS_START( williams_s4 )
 	PORT_DIPNAME( 0x40, 0x00, "Sounds" )
 	PORT_DIPSETTING(    0x00, "Set 1" )
 	PORT_DIPSETTING(    0x40, "Set 2" )
-	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s4_sound_device, audio_nmi, 1)
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(williams_s4_sound_device::audio_nmi), 1)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( williams_s4_sound_device::audio_nmi )
@@ -1053,7 +1053,7 @@ INPUT_PORTS_START( williams_s6 )
 	PORT_DIPNAME( 0x40, 0x40, "Sounds" )
 	PORT_DIPSETTING(    0x00, "Tones" )
 	PORT_DIPSETTING(    0x40, "Synth" )
-	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s6_sound_device, audio_nmi, 1)
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(williams_s6_sound_device::audio_nmi), 1)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( williams_s6_sound_device::audio_nmi )
@@ -1157,7 +1157,7 @@ void williams_s9_sound_device::device_reset()
 
 INPUT_PORTS_START( williams_s9 )
 	PORT_START("S9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s9_sound_device, audio_nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(williams_s9_sound_device::audio_nmi), 1)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( williams_s9_sound_device::audio_nmi )
@@ -1279,7 +1279,7 @@ void williams_s11_sound_device::device_reset()
 
 INPUT_PORTS_START( williams_s11 )
 	PORT_START("S11")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, williams_s11_sound_device, audio_nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(williams_s11_sound_device::audio_nmi), 1)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( williams_s11_sound_device::audio_nmi )

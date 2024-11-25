@@ -57,8 +57,8 @@ public:
 	void usg185(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -79,8 +79,8 @@ private:
 
 	void palette(palette_device &palette) const;
 
-	void usg185_map(address_map &map);
-	void usgames_map(address_map &map);
+	void usg185_map(address_map &map) ATTR_COLD;
+	void usgames_map(address_map &map) ATTR_COLD;
 	MC6845_UPDATE_ROW(update_row);
 };
 

@@ -551,12 +551,12 @@ void spectrum_state::spectrum_map(address_map &map)
 
 void spectrum_state::spectrum_opcodes(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(spectrum_state::spectrum_data_r), FUNC(spectrum_state::spectrum_data_w));
+	map(0x0000, 0xffff).r(FUNC(spectrum_state::pre_opcode_fetch_r));
 }
 
 void spectrum_state::spectrum_data(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(spectrum_state::pre_opcode_fetch_r));
+	map(0x0000, 0xffff).rw(FUNC(spectrum_state::spectrum_data_r), FUNC(spectrum_state::spectrum_data_w));
 }
 
 // The ula is usually accessed with port 0xfe but is only partially decoded with a single address line (A0),
@@ -635,7 +635,7 @@ INPUT_PORTS_START( spectrum )
 	PORT_START("LINE1") /* 0xFDFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("a    A    STOP   READ      ~     NEW") PORT_CODE(KEYCODE_A)      PORT_CHAR('a') PORT_CHAR('A')// PORT_CHAR('~')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s    S    NOT    RESTORE   |     SAVE") PORT_CODE(KEYCODE_S)     PORT_CHAR('s') PORT_CHAR('S')// PORT_CHAR('|')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d    D    STEP   DATA      \\    DIM") PORT_CODE(KEYCODE_D)      PORT_CHAR('d') PORT_CHAR('D')// PORT_CHAR('\\')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d    D    STEP   DATA      \\     DIM") PORT_CODE(KEYCODE_D)     PORT_CHAR('d') PORT_CHAR('D')// PORT_CHAR('\\')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("f    F    TO     SGN       {     FOR") PORT_CODE(KEYCODE_F)      PORT_CHAR('f') PORT_CHAR('F')// PORT_CHAR('{')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g    G    THEN   ABS       }     GOTO") PORT_CODE(KEYCODE_G)     PORT_CHAR('g') PORT_CHAR('G')// PORT_CHAR('}')
 
@@ -648,22 +648,22 @@ INPUT_PORTS_START( spectrum )
 
 	/* interface II uses this port for joystick */
 	PORT_START("LINE3") /* 0xF7FE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1   EDIT       !    BLUE     DEF FN") PORT_CODE(KEYCODE_1)   PORT_CHAR('1') PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR('!')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2   CAPS LOCK  @    RED      FN") PORT_CODE(KEYCODE_2)       PORT_CHAR('2') PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR('@')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3   TRUE VID   #    MAGENTA  LINE") PORT_CODE(KEYCODE_3)     PORT_CHAR('3') PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR('#')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4   INV VID    $    GREEN    OPEN#") PORT_CODE(KEYCODE_4)    PORT_CHAR('4') PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR('$')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1   EDIT       !    BLUE     DEF FN") PORT_CODE(KEYCODE_1)   PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2   CAPS LOCK  @    RED      FN") PORT_CODE(KEYCODE_2)       PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3   TRUE VID   #    MAGENTA  LINE") PORT_CODE(KEYCODE_3)     PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4   INV VID    $    GREEN    OPEN#") PORT_CODE(KEYCODE_4)    PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5   Left       %    CYAN     CLOSE#") PORT_CODE(KEYCODE_5)   PORT_CHAR('5') PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_CHAR('%')
 
 	/* protek clashes with interface II! uses 5 = left, 6 = down, 7 = up, 8 = right, 0 = fire */
 	PORT_START("LINE4") /* 0xEFFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0   DEL        _    BLACK    FORMAT") PORT_CODE(KEYCODE_0)   PORT_CHAR('0') PORT_CHAR(8) PORT_CHAR('_')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   GRAPH      )             POINT") PORT_CODE(KEYCODE_9)    PORT_CHAR('9') PORT_CHAR(UCHAR_MAMEKEY(F9)) PORT_CHAR(')')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   GRAPH      )             POINT") PORT_CODE(KEYCODE_9)    PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8   Right      (             CAT") PORT_CODE(KEYCODE_8)      PORT_CHAR('8') PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR('(')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7   Up         '    WHITE    ERASE") PORT_CODE(KEYCODE_7)    PORT_CHAR('7') PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR('\'')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6   Down       &    YELLOW   MOVE") PORT_CODE(KEYCODE_6)     PORT_CHAR('6') PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR('&')
 
 	PORT_START("LINE5") /* 0xDFFE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p    P    \"     TAB      (c)    PRINT") PORT_CODE(KEYCODE_P)    PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR('"')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p    P    \"      TAB      (c)    PRINT") PORT_CODE(KEYCODE_P)   PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR('"')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o    O    ;      PEEK     OUT    POKE") PORT_CODE(KEYCODE_O)     PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(';')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i    I    AT     CODE     IN     INPUT") PORT_CODE(KEYCODE_I)    PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("u    U    OR     CHR$     ]      IF") PORT_CODE(KEYCODE_U)       PORT_CHAR('u') PORT_CHAR('U')// PORT_CHAR(']')
@@ -720,7 +720,7 @@ INPUT_PORTS_START( spec128 )
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("PLUS3") /* Spectrum+ Keys (Same as SYMBOL SHIFT + O/P) */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\"") PORT_CODE(KEYCODE_F4)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\"") PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -796,9 +796,9 @@ void spectrum_state::spectrum_common(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, X1 / 4);        /* This is verified only for the ZX Spectrum. Other clones are reported to have different clocks */
-	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_opcodes);
-	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_data);
-	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_io);
+	m_maincpu->set_m1_map(&spectrum_state::spectrum_opcodes);
+	m_maincpu->set_memory_map(&spectrum_state::spectrum_data);
+	m_maincpu->set_io_map(&spectrum_state::spectrum_io);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_state::spectrum_nomreq));
 
@@ -864,7 +864,7 @@ void spectrum_state::spectrum_clone(machine_config &config)
 	spectrum(config);
 
 	// no floating bus
-	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_clone_io);
+	m_maincpu->set_io_map(&spectrum_state::spectrum_clone_io);
 	m_exp->fb_r_handler().set([]() { return 0xff; });
 }
 
@@ -1115,11 +1115,6 @@ ROM_START(blitzs)
 	ROM_LOAD("blitz.rom",0x0000,0x4000, CRC(91e535a8) SHA1(14f09d45dc3803cbdb05c33adb28eb12dbad9dd0))
 ROM_END
 
-ROM_START(byte)
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("byte.rom",0x0000,0x4000, CRC(c13ba473) SHA1(99f40727185abbb2413f218d69df021ae2e99e45))
-ROM_END
-
 ROM_START(orizon)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("orizon.rom",0x0000,0x4000, CRC(ed4d9787) SHA1(3e8b29862e06be03344393c320a64a109fd9aff5))
@@ -1156,6 +1151,17 @@ ROM_START(zvezda)
 	ROM_LOAD( "2764-far-cpu_blue.bin", 0x2000, 0x2000, CRC(ebab64bc) SHA1(8c98a8b6e927b02cf602c20a1b50838e60f7785b))
 ROM_END
 
+ROM_START(santaka2)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD( "01.01.d29", 0x0000, 0x0800, CRC(537db879) SHA1(601c69c8f9c77cb00ccd653a0ac0922044c13c86))
+	ROM_LOAD( "01.02.d30", 0x0800, 0x0800, CRC(6b5178bc) SHA1(ef5417e24cb80b3f417054a3ef89af5bbef94598))
+	ROM_LOAD( "01.03.d31", 0x1000, 0x0800, CRC(379c0032) SHA1(a10ebcd8b990ce26ec54dadf5c70b9c6eab7d314))
+	ROM_LOAD( "01.04.d32", 0x1800, 0x0800, CRC(765fc052) SHA1(40085c34fccb9b2274fe0887efa532e3771ffaf7))
+	ROM_LOAD( "01.05.d33", 0x2000, 0x0800, CRC(c177cd1e) SHA1(8dc8f0e086bdcdc1c60b9e7a1b4a1a6799e8f0bd))
+	ROM_LOAD( "01.06.d34", 0x2800, 0x0800, CRC(69072150) SHA1(0edd6db5e5b6f65921ec5c87d6d0d4ef3b3a9c03))
+	ROM_LOAD( "01.07.d35", 0x3000, 0x0800, CRC(2cb5126d) SHA1(1b951ca8172ce2e7912df9ab3713f48d247311a4))
+	ROM_LOAD( "01.08.d36", 0x3800, 0x0800, CRC(4d6e54cb) SHA1(7f01b9b0790064024012430fe47710e4fb905360))
+ROM_END
 
 /*  Any clone known to have the same "floating bus" behaviour as official Sinclair models should be changed to use the "spectrum" machine  */
 
@@ -1187,7 +1193,6 @@ COMP( 1993, didakm93, spectrum, 0,      spectrum_clone, spec_plus, spectrum_stat
 COMP( 1988, mistrum,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Amaterske RADIO",       "Mistrum",               0 )  // keyboard could be spectrum in some models (since it was a build-yourself design)
 COMP( 198?, bk08,     spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Orel",                  "BK-08",                 0 )
 COMP( 1990, blitzs,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Blic",                  0 )  // no keyboard images found
-COMP( 1990, byte,     spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "BEMZ",                  "PEVM Byte",             0 )  // no keyboard images found
 COMP( 199?, orizon,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Orizon-Micro",          0 )  // no keyboard images found
 COMP( 1993, quorum48, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Kvorum 48K",            MACHINE_NOT_WORKING )
 COMP( 1993, magic6,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Magic 6",               MACHINE_NOT_WORKING )   // keyboard should be spectrum, but image was not clear
@@ -1195,3 +1200,4 @@ COMP( 1990, compani1, spectrum, 0,      spectrum_clone, spectrum,  spectrum_stat
 COMP( 1990, spektrbk, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Spektr BK-001",         0 )
 COMP( 1989, sintez2,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Signal",                "Sintez 2",              0 )
 COMP( 1990, zvezda,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Zvezda",                0 )
+COMP( 1991, santaka2, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Santaka-002",           0 )

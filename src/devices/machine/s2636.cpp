@@ -119,7 +119,7 @@
 *************************************************************/
 
 #include "emu.h"
-#include "machine/s2636.h"
+#include "s2636.h"
 
 #include "screen.h"
 
@@ -178,6 +178,10 @@ s2636_device::s2636_device(const machine_config &mconfig, const char *tag, devic
 	for (auto &elem : m_obj_cnt) elem = 0;
 	for (auto &elem : m_obj_disp) elem = false;
 	for (auto &elem : m_obj_dup) elem = false;
+}
+
+s2636_device::~s2636_device()
+{
 }
 
 //-------------------------------------------------

@@ -6,9 +6,8 @@
 
 ***************************************************************************/
 
-
-#ifndef MAME_NABUPC_KEYBOARD_DEVICE_H
-#define MAME_NABUPC_KEYBOARD_DEVICE_H
+#ifndef MAME_MISC_NABUPC_KBD_H
+#define MAME_MISC_NABUPC_KBD_H
 
 #pragma once
 
@@ -29,14 +28,14 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	void nabu_kb_mem(address_map &map);
+	void nabu_kb_mem(address_map &map) ATTR_COLD;
 
 	uint8_t port1_r();
 	void port1_w(uint8_t data);
@@ -63,4 +62,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NABUPC_KEYBOARD, nabupc_keyboard_device)
 
-#endif // MAME_NABUPC_KEYBOARD_DEVICE_H
+#endif // MAME_MISC_NABUPC_KBD_H

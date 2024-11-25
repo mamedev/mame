@@ -18,6 +18,7 @@
 #include "ioprocs.h"
 #include "strformat.h"
 
+
 const nabupc_format::format nabupc_format::formats[] =
 {
 	{ // 200k 40 track single sided double density (nabu)
@@ -167,8 +168,7 @@ bool nabupc_format::load(util::random_read &io, uint32_t form_factor, const std:
 		for (int head = 0; head < f.head_count; head++) {
 			desc_pc_sector sects[sector_count];
 			uint8_t sectdata[sector_count * sector_size];
-			size_t actual;
-			io.read_at((track * f.head_count + head) * sector_count * sector_size, sectdata, sector_count * sector_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, (track * f.head_count + head) * sector_count * sector_size, sectdata, sector_count * sector_size); // FIXME: check for errors and premature EOF
 			for (int i = 0; i < sector_count; i++) {
 				sects[i].track = track;
 				sects[i].head = head;
@@ -196,8 +196,7 @@ bool nabupc_format::save(util::random_read_write &io, const std::vector<uint32_t
 			auto bitstream = generate_bitstream_from_track(track, head, 2000, image);
 			auto sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 			for (int i = 0; i < sector_count; i++) {
-				size_t actual;
-				io.write_at(file_offset, sectors[i + 1].data(), sector_size, actual);
+				/*auto const [err, actual] =*/ write_at(io, file_offset, sectors[i + 1].data(), sector_size); // FIXME: check for errors
 				file_offset += sector_size;
 			}
 		}

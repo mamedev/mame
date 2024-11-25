@@ -54,8 +54,8 @@ public:
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap) override;
 	virtual void read_extra_sprite_bits(int sprite_index) override;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void set_201x_reg(int reg, uint8_t data);
 	uint8_t get_201x_reg(int reg);

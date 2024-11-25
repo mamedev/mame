@@ -15,6 +15,8 @@
 
 #include "diserial.h"
 
+#include "interface/midiport.h"
+
 #include <memory>
 #include <string>
 #include <system_error>
@@ -52,9 +54,9 @@ public:
 
 protected:
 	// device_t implementation
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_serial_interface implementation
 	virtual void tra_complete() override;    // Tx completed sending byte
@@ -67,7 +69,7 @@ private:
 
 	void xmit_char(uint8_t data);
 
-	std::unique_ptr<osd_midi_device> m_midi;
+	std::unique_ptr<osd::midi_input_port> m_midi;
 	required_ioport m_config;
 	emu_timer *m_timer;
 	devcb_write_line        m_input_cb;

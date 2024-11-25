@@ -69,9 +69,9 @@ private:
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void flyball_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -80,7 +80,7 @@ private:
 	TIMER_CALLBACK_MEMBER(pot_clear_callback);
 	TIMER_CALLBACK_MEMBER(quarter_callback);
 
-	void flyball_map(address_map &map);
+	void flyball_map(address_map &map) ATTR_COLD;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

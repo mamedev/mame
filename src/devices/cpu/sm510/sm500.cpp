@@ -232,7 +232,7 @@ void sm500_device::execute_one()
 			}
 			break; // 0xfc
 
-	} // big switch
+	} // 0xf0
 }
 
 bool sm500_device::op_argument()

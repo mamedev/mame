@@ -89,11 +89,11 @@ private:
 	{
 		return m_p_chargen[(ch * 16 + line) & 0xfff];
 	}
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// graphics signals
 	uint8_t m_ag = 0U;

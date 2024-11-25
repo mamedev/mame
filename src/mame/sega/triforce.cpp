@@ -479,11 +479,11 @@ private:
 	void gc_pi_w(uint64_t data);
 	uint64_t gc_exi_r();
 	void gc_exi_w(uint64_t data);
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<ppc_device> m_maincpu;
-	void gc_map(address_map &map);
+	void gc_map(address_map &map) ATTR_COLD;
 };
 
 uint64_t triforce_state::gc_pi_r()

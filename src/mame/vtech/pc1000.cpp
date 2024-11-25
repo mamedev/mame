@@ -39,8 +39,8 @@ public:
 	void pc1000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t kb_r(offs_t offset);
 	void lcdc_data_w(uint8_t data);
@@ -55,8 +55,8 @@ protected:
 	void pc1000_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void pc1000_mem(address_map &map);
-	void pc1000_io(address_map &map);
+	void pc1000_mem(address_map &map) ATTR_COLD;
+	void pc1000_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<sed1200_device> m_lcdc;

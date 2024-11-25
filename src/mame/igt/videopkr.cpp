@@ -325,8 +325,8 @@ public:
 	void fortune1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 //private:
 	uint8_t videopkr_io_r(offs_t offset);
@@ -349,10 +349,10 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_t1_callback);
 	void count_7dig(unsigned long data, uint8_t index);
 
-	void i8039_io_port(address_map &map);
-	void i8039_map(address_map &map);
-	void i8039_sound_mem(address_map &map);
-	void i8039_sound_port(address_map &map);
+	void i8039_io_port(address_map &map) ATTR_COLD;
+	void i8039_map(address_map &map) ATTR_COLD;
+	void i8039_sound_mem(address_map &map) ATTR_COLD;
+	void i8039_sound_port(address_map &map) ATTR_COLD;
 
 	memory_share_creator<uint8_t> m_data_ram;
 	memory_share_creator<uint8_t> m_video_ram;
@@ -406,7 +406,7 @@ public:
 	void bpoker(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t baby_sound_p0_r();
@@ -415,10 +415,10 @@ private:
 	void baby_sound_p3_w(uint8_t data);
 	void babypkr_palette(palette_device &palette) const;
 
-	void i8751_map(address_map &map);
-	void i8751_io_port(address_map &map);
-	void i8051_sound_mem(address_map &map);
-	void i8051_sound_port(address_map &map);
+	void i8751_map(address_map &map) ATTR_COLD;
+	void i8751_io_port(address_map &map) ATTR_COLD;
+	void i8051_sound_mem(address_map &map) ATTR_COLD;
+	void i8051_sound_port(address_map &map) ATTR_COLD;
 
 	required_device<ay8910_device> m_aysnd;
 	output_finder<3> m_top_lamps;
@@ -1609,7 +1609,7 @@ ROM_END
 //     YEAR  NAME      PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY                                FULLNAME                          FLAGS                LAYOUT
 GAMEL( 1984, videopkr, 0,        videopkr, videopkr, videopkr_state, empty_init, ROT0, "InterFlip",                           "Video Poker",                    0,                   layout_videopkr )
 GAMEL( 1984, fortune1, videopkr, fortune1, videopkr, videopkr_state, empty_init, ROT0, "IGT - International Game Technology", "Fortune I (PK485-S) Draw Poker", 0,                   layout_videopkr )
-GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, videopkr_state, empty_init, ROT0, "InterFlip",                           "Black Jack",                     0,                   layout_blckjack )
+GAMEL( 1984, blckjack, videopkr, blckjack, blckjack, videopkr_state, empty_init, ROT0, "InterFlip",                           "Black Jack (InterFlip)",         0,                   layout_blckjack )
 GAMEL( 1987, videodad, videopkr, videodad, videodad, videopkr_state, empty_init, ROT0, "InterFlip",                           "Video Dado",                     0,                   layout_videodad )
 GAMEL( 1987, videocba, videopkr, videodad, videocba, videopkr_state, empty_init, ROT0, "InterFlip",                           "Video Cordoba",                  0,                   layout_videocba )
 GAMEL( 1987, babypkr,  videopkr, babypkr,  babypkr,  babypkr_state,  empty_init, ROT0, "Recreativos Franco",                  "Baby Poker",                     0,                   layout_babypkr  )

@@ -25,10 +25,10 @@ public:
 
 private:
 	required_shared_ptr<uint16_t> m_bitmapram;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void hotstuff_map(address_map &map);
+	void hotstuff_map(address_map &map) ATTR_COLD;
 };
 
 

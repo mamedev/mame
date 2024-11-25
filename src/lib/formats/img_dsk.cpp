@@ -72,9 +72,10 @@ bool img_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	image.set_variant(is_dd ? floppy_image::SSDD : floppy_image::SSSD);
 
 	// Suck in the whole image
-	std::vector<uint8_t> image_data(size);
-	size_t actual;
-	io.read_at(0, image_data.data(), size, actual);
+	auto const [err, image_data, actual] = read_at(io, 0, size);
+	if (err || (actual != size)) {
+		return false;
+	}
 
 	for (unsigned cyl = 0; cyl < TRACKS; cyl++) {
 		if (is_dd) {
@@ -134,7 +135,7 @@ bool img_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[ sector ].sector = real_sector;
 				sects[ sector ].bad_crc = false;
 				sects[ sector ].deleted = false;
-				sects[ sector ].data = image_data.data() + offset_in_image;
+				sects[ sector ].data = &image_data[offset_in_image];
 			}
 			build_pc_track_fm(cyl, 0, image, 83333, SECTORS_FM, sects, 33, 46, 32, 11);
 		}
@@ -155,8 +156,7 @@ bool img_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			while (get_next_sector(bitstream , pos , track_no , sector_no , sector_data)) {
 				if (track_no == cyl && sector_no >= 1 && sector_no <= SECTORS) {
 					unsigned offset_in_image = (cyl * SECTORS + sector_no - 1) * SECTOR_SIZE;
-					size_t actual;
-					io.write_at(offset_in_image, sector_data, SECTOR_SIZE, actual);
+					/*auto const [err, actual] =*/ write_at(io, offset_in_image, sector_data, SECTOR_SIZE); // FIXME: check for errors
 				}
 			}
 		} else {
@@ -164,8 +164,7 @@ bool img_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			auto sects = extract_sectors_from_bitstream_fm_pc(bitstream);
 			for (unsigned s = 1; s <= SECTORS_FM; s++) {
 				unsigned offset_in_image = (cyl * SECTORS_FM + s - 1) * SECTOR_SIZE;
-				size_t actual;
-				io.write_at(offset_in_image, sects[ s ].data(), SECTOR_SIZE, actual);
+				/*auto const [err, actual] =*/ write_at(io, offset_in_image, sects[ s ].data(), SECTOR_SIZE); // FIXME: check for errors and premature EOF
 			}
 		}
 	}

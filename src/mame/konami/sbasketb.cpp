@@ -88,7 +88,7 @@ public:
 	void sbasketbu(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -119,7 +119,6 @@ private:
 	void irq_mask_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	void flipscreen_w(int state);
 	void spriteram_select_w(int state);
 	void konami_sn76496_latch_w(uint8_t data) { m_sn76496_latch = data; }
 	void konami_sn76496_w(uint8_t data) { m_sn->write(m_sn76496_latch); }
@@ -129,12 +128,10 @@ private:
 	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -226,12 +223,6 @@ void sbasketb_state::colorram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void sbasketb_state::flipscreen_w(int state)
-{
-	flip_screen_set(state);
-	machine().tilemap().mark_all_dirty();
-}
-
 void sbasketb_state::spriteram_select_w(int state)
 {
 	m_spriteram_select = state;
@@ -299,8 +290,6 @@ uint32_t sbasketb_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void sbasketb_state::sh_irqtrigger_w(uint8_t data)
 {
@@ -419,7 +408,7 @@ void sbasketb_state::sbasketb(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sbasketb_state::sound_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // B3
-	mainlatch.q_out_cb<0>().set(FUNC(sbasketb_state::flipscreen_w)); // FLIP
+	mainlatch.q_out_cb<0>().set(FUNC(sbasketb_state::flip_screen_set)); // FLIP
 	mainlatch.q_out_cb<1>().set(FUNC(sbasketb_state::irq_mask_w)); // INTST
 	mainlatch.q_out_cb<2>().set_nop(); // MUT - not used?
 	mainlatch.q_out_cb<3>().set(FUNC(sbasketb_state::coin_counter_w<0>)); // COIN 1

@@ -7,6 +7,7 @@
 #include "isa.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/mcs51/mcs51.h"
+#include "sound/ct1745.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
 
@@ -24,12 +25,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	uint8_t dack_r(int line) override;
 	void dack_w(int line, uint8_t data) override;
@@ -81,15 +82,16 @@ private:
 	uint8_t dsp_wbuf_status_r(offs_t offset);
 	uint8_t dsp_rbuf_status_r(offs_t offset);
 
-	void sb16_io(address_map &map);
-	void host_io(address_map &map);
+	void sb16_io(address_map &map) ATTR_COLD;
+	void host_io(address_map &map) ATTR_COLD;
 
 	void control_timer(bool start);
 
 	TIMER_CALLBACK_MEMBER(timer_tick);
 
-	required_device<dac_word_interface> m_ldac;
-	required_device<dac_word_interface> m_rdac;
+	required_device<ct1745_mixer_device> m_mixer;
+	required_device<dac_16bit_r2r_device> m_ldac;
+	required_device<dac_16bit_r2r_device> m_rdac;
 	required_device<pc_joy_device> m_joy;
 	required_device<i80c52_device> m_cpu;
 
@@ -106,7 +108,8 @@ private:
 		uint16_t h[2];
 		uint8_t  b[4];
 	} samples;
-	samples m_adc_fifo[16], m_dac_fifo[16];
+	static constexpr int FIFO_SIZE = 16;
+	samples m_adc_fifo[FIFO_SIZE], m_dac_fifo[FIFO_SIZE];
 	int m_adc_fifo_head, m_adc_fifo_tail, m_dac_fifo_head, m_dac_fifo_tail;
 	bool m_adc_r, m_dac_r, m_adc_h, m_dac_h, m_irq8, m_irq16, m_irq_midi;
 	bool m_dma8_done, m_dma16_done;

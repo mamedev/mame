@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -75,7 +76,7 @@ license:CC0-1.0
 	<element name="cwhite"><rect><color red="0.1" green="0.65" blue="0.35" /></rect></element>
 
 	<element name="hlbb" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
+		<rect><color alpha="0" /></rect> <!-- force unit square element bounds -->
 		<disk state="1">
 			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
 			<color red="1" green="1" blue="1" />
@@ -83,7 +84,7 @@ license:CC0-1.0
 	</element>
 
 	<element name="piece" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
+		<rect><color alpha="0" /></rect> <!-- force unit square element bounds -->
 		<disk state="1">
 			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
 			<color red="0" green="0" blue="0" />

@@ -253,13 +253,13 @@ private:
 	void ppi0_b_w(uint8_t data);
 	DECLARE_MACHINE_START(sureshot);
 	uint32_t screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sms_map(address_map &map);
-	void sub_map(address_map &map);
-	void sureshot_map(address_map &map);
+	void sms_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void sureshot_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint8_t m_communication_port[4]{};
 	uint8_t m_communication_port_status = 0;

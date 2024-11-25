@@ -715,8 +715,8 @@ static INPUT_PORTS_START( tokio )
 	PORT_INCLUDE( tokio_base )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", taito68705_mcu_device, host_semaphore_r)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", taito68705_mcu_device, mcu_semaphore_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", FUNC(taito68705_mcu_device::host_semaphore_r))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", FUNC(taito68705_mcu_device::mcu_semaphore_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bublboblp )
@@ -990,7 +990,7 @@ void bublbobl_state::bublbobl(machine_config &config)
 	mcu.in_p3_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port3_r));
 	mcu.out_p4_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port4_w));
 
-	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
+	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ1_LINE); // same clock latches the INT pin on the second Z80
 }
 
 MACHINE_START_MEMBER(bublbobl_state,boblbobl)

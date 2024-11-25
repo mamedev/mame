@@ -14,6 +14,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/cdp1869.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define SCREEN_TAG          "screen"
@@ -63,7 +64,7 @@ private:
 	required_ioport m_run;
 	required_ioport_array<8> m_key_row;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint8_t  rtc_r();
 	void printer_w(uint8_t data);
@@ -92,9 +93,11 @@ private:
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
 	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
 
-	void cdp1869_page_ram(address_map &map);
-	void tmc600_io_map(address_map &map);
-	void tmc600_map(address_map &map);
+	void cdp1869_page_ram(address_map &map) ATTR_COLD;
+	void tmc600_io_map(address_map &map) ATTR_COLD;
+	void tmc600_map(address_map &map) ATTR_COLD;
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 };
 
 #endif // MAME_TELERCAS_TMC600_H

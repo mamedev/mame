@@ -72,7 +72,7 @@
  */
 
 #include "emu.h"
-#include "sound/spkrdev.h"
+#include "spkrdev.h"
 
 // The default is 1-bit, but can be customized with set_levels.
 static constexpr double default_levels[2] = { 0.0, 1.0 };

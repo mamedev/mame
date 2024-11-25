@@ -47,15 +47,15 @@ public:
 	virtual void data_w(uint8_t data) override;
 	virtual void enter_w(int state) override { }
 	virtual uint8_t data_r() override { return m_status; }
-	virtual int status_strobe_r() override { static int old_val = 0; int value = BIT(m_portc1, 5); if (value != old_val) { old_val = value; printf("status_strobe_r: %d\n", value); } return value; }
-	virtual int ready_r() override { static int old_val = 0; int value = BIT(m_portc1, 4); if (value != old_val) { old_val = value; printf("ready_r: %d\n", value); } return value; }
+	virtual int status_strobe_r() override { return BIT(m_portc1, 5); }
+	virtual int ready_r() override { return BIT(m_portc1, 4); }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// subclass overrides
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
@@ -88,8 +88,8 @@ private:
 	void ppi1_portb_w(uint8_t data);
 	void ppi1_portc_w(uint8_t data);
 
-	void ldv1000_map(address_map &map);
-	void ldv1000_portmap(address_map &map);
+	void ldv1000_map(address_map &map) ATTR_COLD;
+	void ldv1000_portmap(address_map &map) ATTR_COLD;
 
 	// internal state
 	required_device<z80_device> m_z80_cpu;            /* CPU index of the Z80 */

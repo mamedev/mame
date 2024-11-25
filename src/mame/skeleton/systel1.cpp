@@ -42,8 +42,8 @@ public:
 	void systel1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void hrq_w(int state);
@@ -55,8 +55,8 @@ private:
 
 	I8275_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dmac;
@@ -105,8 +105,9 @@ void systel1_state::memory_w(offs_t offset, u8 data)
 
 I8275_DRAW_CHARACTER_MEMBER(systel1_state::draw_character)
 {
-	u8 dots = lten ? 0xff : vsp ? 0 : m_chargen[(charcode << 4) | linecount];
-	if (rvv)
+	using namespace i8275_attributes;
+	u8 dots = BIT(attrcode, LTEN) ? 0xff : BIT(attrcode, VSP) ? 0 : m_chargen[(charcode << 4) | linecount];
+	if (BIT(attrcode, RVV))
 		dots ^= 0xff;
 
 	for (int i = 0; i < 7; i++)

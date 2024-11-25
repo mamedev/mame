@@ -29,8 +29,8 @@ public:
 	void busicom(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t keyboard_r();
@@ -44,11 +44,11 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	uint8_t get_bit_selected(uint32_t val,int num);
 
-	void busicom_mem(address_map &map);
-	void busicom_mp(address_map &map);
-	void busicom_rom(address_map &map);
-	void busicom_rp(address_map &map);
-	void busicom_stat(address_map &map);
+	void busicom_mem(address_map &map) ATTR_COLD;
+	void busicom_mp(address_map &map) ATTR_COLD;
+	void busicom_rom(address_map &map) ATTR_COLD;
+	void busicom_rp(address_map &map) ATTR_COLD;
+	void busicom_stat(address_map &map) ATTR_COLD;
 
 	uint8_t m_drum_index = 0U;
 	uint16_t m_keyboard_shifter = 0U;

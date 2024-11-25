@@ -134,11 +134,24 @@ to all kinds of changes):
   steps to evade them.  If you enable GitHub Actions, consider not
   pushing individual commits if you don’t need them to be automatically
   built, or cancelling workflow runs when you don’t need the results.
+* If your submission is a computer or other device such as a synthesizer
+  or sampler which requires a disk, tape, cartridge, or other media to
+  start up and run, please consider creating a software list containing
+  at least one example of that media.  This helps everyone making changes
+  to shared MAME components to easily verify if the changes negatively
+  impact your code.
+* When submitting any new non-arcade machine, but especially a machine
+  which does not auto-boot and requires some interaction to start up
+  and be usable, consider adding usage instructions to the
+  `System-Specific Setup and Information <https://wiki.mamedev.org/index.php/System-Specific_Setup_and_Information>`_
+  page of the `MAME Wiki <https://wiki.mamedev.org>`_.  Anyone can edit
+  the wiki after creating an account, and sub-pages for your system
+  which discuss technical details of the system are also welcome.
 
 We have guidelines for specific parts of the source:
 
 .. toctree::
-    :titlesonly:
+	:titlesonly:
 
-    cxx
-    softlist
+	cxx
+	softlist

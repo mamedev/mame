@@ -49,7 +49,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void frenzyxprss_map(address_map &map);
+	void frenzyxprss_map(address_map &map) ATTR_COLD;
 };
 
 

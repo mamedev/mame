@@ -25,22 +25,7 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 protected:
-	enum e_mnemonics
-	{
-		mILL = 0,
-		mAC0AC, mAC1AC, mACACC, mACNAA, mALEC, mALEM, mAMAAC, mBRANCH,
-		mCALL, mCCLA, mCLA, mCLO, mCOMC, mCOMX, mCOMX8, mCPAIZ, mCTMDYN,
-		mDAN, mDMAN, mDMEA, mDNAA, mDYN, mHALT,
-		mIA, mIMAC, mINTDIS, mINTEN, mINTRTN, mIYC,
-		mKNEZ, mLDP, mLDX2, mLDX3, mLDX4, mMNEA, mMNEZ,
-		mNDMEA, mOFF, mRBIT, mREAC, mRETN, mRSTR,
-		mSAL, mSAMAN, mSBIT, mSBL, mSEAC, mSELIN, mSETR,
-		mTAC, mTADM, mTAM, mTAMACS, mTAMDYN, mTAMIY, mTAMIYC, mTAMZA,
-		mTASR, mTAX, mTAY, mTBIT, mTCA, mTCMIY, mTCY, mTDO, mTKA,
-		mTKM, mTMA, mTMSET, mTMY, mTPC, mTRA, mTSG, mTXA, mTYA,
-		mXDA, mXMA, mYMCY, mYNEA, mYNEC
-	};
-
+	enum e_mnemonics : unsigned;
 	static const char *const s_mnemonic[];
 	static const u32 s_flags[];
 	static const u8 s_bits[];

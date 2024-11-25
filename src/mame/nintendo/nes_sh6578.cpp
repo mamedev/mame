@@ -54,9 +54,9 @@ public:
 	void init_nes_sh6578();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void io_w(uint8_t data);
 	virtual void extio_w(uint8_t data);
@@ -125,8 +125,8 @@ private:
 
 	void do_dma();
 
-	void rom_map(address_map& map);
-	void nes_sh6578_map(address_map& map);
+	void rom_map(address_map &map) ATTR_COLD;
+	void nes_sh6578_map(address_map &map) ATTR_COLD;
 
 	//uint16_t get_tileaddress(uint8_t x, uint8_t y, bool ishigh);
 
@@ -161,7 +161,7 @@ public:
 
 protected:
 	virtual void extio_w(uint8_t data) override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 uint8_t nes_sh6578_state::bank_r(int bank, uint16_t offset)

@@ -44,8 +44,8 @@ public:
 	void init_icatel();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	[[maybe_unused]] uint8_t magic_string(offs_t offset);
@@ -70,9 +70,9 @@ private:
 
 	HD44780_PIXEL_UPDATE(icatel_pixel_update);
 
-	void i80c31_data(address_map &map);
-	void i80c31_io(address_map &map);
-	void i80c31_prg(address_map &map);
+	void i80c31_data(address_map &map) ATTR_COLD;
+	void i80c31_io(address_map &map) ATTR_COLD;
+	void i80c31_prg(address_map &map) ATTR_COLD;
 
 	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
@@ -263,7 +263,7 @@ void icatel_state::icatel(machine_config &config)
 	PALETTE(config, "palette", FUNC(icatel_state::icatel_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_icatel);
 
-	HD44780(config, m_lcdc, 250'000); /* TODO: clock not measured, datasheet typical clock used */
+	HD44780(config, m_lcdc, 270'000); /* TODO: clock not measured, datasheet typical clock used */
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(icatel_state::icatel_pixel_update));
 }

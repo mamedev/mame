@@ -67,8 +67,8 @@ public:
 	void spectra(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 porta_r();
@@ -77,7 +77,7 @@ private:
 	void portb_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
-	void spectra_map(address_map &map);
+	void spectra_map(address_map &map) ATTR_COLD;
 
 	u8 m_porta = 0U;
 	u8 m_portb = 0U;

@@ -100,8 +100,8 @@ protected:
 	// driver_device overrides
 //  virtual void video_start();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_f0000_ram;
@@ -112,7 +112,7 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_smram;
 
-	required_device<s3_vga_device> m_vga;
+	required_device<s3trio64_vga_device> m_vga;
 	required_device<voodoo_2_device> m_voodoo;
 
 	int m_haspind = 0;
@@ -148,8 +148,8 @@ private:
 	uint8_t smram_r(offs_t offset);
 	void smram_w(offs_t offset, uint8_t data);
 
-	void savquest_io(address_map &map);
-	void savquest_map(address_map &map);
+	void savquest_io(address_map &map) ATTR_COLD;
+	void savquest_map(address_map &map) ATTR_COLD;
 
 	void intel82439tx_init();
 	void vid_3dfx_init();
@@ -788,7 +788,7 @@ void savquest_state::savquest_io(address_map &map)
 	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
 	map(0x0378, 0x037b).rw(FUNC(savquest_state::parallel_port_r), FUNC(savquest_state::parallel_port_w));
-	map(0x03b0, 0x03df).m("vga", FUNC(s3_vga_device::io_map));
+	map(0x03b0, 0x03df).m("vga", FUNC(s3trio64_vga_device::io_map));
 	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 
@@ -871,9 +871,9 @@ void savquest_state::savquest(machine_config &config)
 	// TODO: map to ISA bus, make sure that the Voodoo can override s3 in screen update
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(s3_vga_device::screen_update));
+	screen.set_screen_update("vga", FUNC(s3trio64_vga_device::screen_update));
 
-	s3_vga_device &vga(S3_VGA(config, "vga", 0));
+	s3trio64_vga_device &vga(S3_TRIO64_VGA(config, "vga", 0));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x100000);
 

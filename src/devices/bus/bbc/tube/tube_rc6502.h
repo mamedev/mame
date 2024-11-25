@@ -8,9 +8,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_RC6502_H
+#define MAME_BUS_BBC_TUBE_TUBE_RC6502_H
 
-#ifndef MAME_BUS_BBC_TUBE_RC6502_H
-#define MAME_BUS_BBC_TUBE_RC6502_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/m6502/w65c02s.h"
@@ -37,13 +38,13 @@ protected:
 	bbc_tube_rc6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	void add_common_devices(machine_config &config);
 
@@ -53,7 +54,7 @@ protected:
 	uint8_t config_r();
 	void register_w(uint8_t data);
 
-	void tube_rc6502_bank(address_map &map);
+	void tube_rc6502_bank(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
@@ -66,7 +67,7 @@ protected:
 	void prst_w(int state);
 
 private:
-	void tube_rc6502_mem(address_map &map);
+	void tube_rc6502_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_default;
 	uint8_t m_divider;
@@ -82,11 +83,11 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void tube_rc65816_mem(address_map &map);
+	void tube_rc65816_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -94,5 +95,4 @@ private:
 DECLARE_DEVICE_TYPE(BBC_TUBE_RC6502, bbc_tube_rc6502_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_RC65816, bbc_tube_rc65816_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_RC6502_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_RC6502_H

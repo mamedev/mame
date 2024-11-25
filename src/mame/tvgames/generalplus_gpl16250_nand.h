@@ -38,8 +38,8 @@ public:
 	void nand_kiugames();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t read_nand(offs_t offset);
 	std::vector<uint16_t> m_sdram;

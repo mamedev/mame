@@ -799,8 +799,7 @@ std::string nes_cart_slot_device::get_default_card_software(get_default_card_sof
 		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
 
-		size_t actual;
-		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
+		read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
 
 		const char *slot_string = "nrom";
 		if ((rom[0] == 'N') && (rom[1] == 'E') && (rom[2] == 'S'))

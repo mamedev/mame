@@ -62,7 +62,7 @@ public:
 	void comquest(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -73,7 +73,7 @@ private:
 	[[maybe_unused]] void comquest_write(offs_t offset, uint8_t data);
 
 	uint32_t screen_update_comquest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void comquest_mem(address_map &map);
+	void comquest_mem(address_map &map) ATTR_COLD;
 };
 
 

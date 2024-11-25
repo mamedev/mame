@@ -33,8 +33,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<digitalker_device> m_digitalker;
 
-	void program_map(address_map &map);
-	void io_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 

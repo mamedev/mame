@@ -110,12 +110,12 @@ private:
 	void jr200_border_col_w(uint8_t data);
 	uint8_t mn1271_io_r(offs_t offset);
 	void mn1271_io_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_d_callback);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
@@ -543,7 +543,7 @@ static INPUT_PORTS_START( jr200 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KANA OFF") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KANA ON") PORT_CODE(KEYCODE_RALT)
 	// This key does a soft reset, so needs a proper NMI handler
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BREAK") PORT_CODE(KEYCODE_PGDN) PORT_CHANGED_MEMBER(DEVICE_SELF, jr200_state, nmi_button, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BREAK") PORT_CODE(KEYCODE_PGDN) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(jr200_state::nmi_button), 0)
 
 	PORT_START("X8")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) // reserved for Joystick 1

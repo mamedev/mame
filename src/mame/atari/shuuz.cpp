@@ -54,7 +54,7 @@ public:
 	void shuuz(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -79,11 +79,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /*************************************
  *
@@ -196,16 +194,14 @@ uint32_t shuuz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						if (mo[x] & 0x0e)       // solid colors
 							pf[x] = mo[x];
 						else if (mo[x] & 0x01)  // shadows
-						    pf[x] |= 0x200;
-				    }
+							pf[x] |= 0x200;
+					}
 				}
 			}
 		}
 	return 0;
 }
 
-
-// machine
 
 void shuuz_state::machine_start()
 {

@@ -16,8 +16,8 @@ public:
 	void draw_starfield(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t get_next_lfsr_state(uint16_t lfsr);

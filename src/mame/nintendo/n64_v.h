@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef _VIDEO_N64_H_
-#define _VIDEO_N64_H_
+#ifndef MAME_NINTENDO_N64_V_H
+#define MAME_NINTENDO_N64_V_H
 
 #include "video/poly.h"
 #include "pin64.h"
+
+#include <algorithm>
 
 /*****************************************************************************/
 
@@ -150,7 +152,7 @@ public:
 			m_norm_slope_rom[i] = (normslope[(i << 1) + 1] << 8) | normslope[i << 1];
 		}
 
-		memset(m_tiles, 0, 8 * sizeof(n64_tile_t));
+		std::fill(std::begin(m_tiles), std::end(m_tiles), n64_tile_t());
 		memset(m_cmd_data, 0, sizeof(m_cmd_data));
 
 		for (int32_t i = 0; i < 8; i++)
@@ -396,4 +398,4 @@ public:
 	bool dolog;
 };
 
-#endif // _VIDEO_N64_H_
+#endif // MAME_NINTENDO_N64_V_H

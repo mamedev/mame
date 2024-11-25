@@ -42,10 +42,10 @@ private:
 	void control_w(u8 data);
 	u8 attr_r(offs_t offset);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void chars_map(address_map &map);
-	void attrs_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void chars_map(address_map &map) ATTR_COLD;
+	void attrs_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainnmi;

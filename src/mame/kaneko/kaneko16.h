@@ -121,7 +121,7 @@ protected:
 
 	DECLARE_MACHINE_RESET(gtmr);
 	DECLARE_MACHINE_RESET(mgcrystl);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	template<class BitmapClass>
@@ -132,8 +132,8 @@ protected:
 	template<class BitmapClass>
 	void fill_bitmap(BitmapClass &bitmap, const rectangle &cliprect);
 
-	void gtmr_oki1_map(address_map &map);
-	void gtmr_oki2_map(address_map &map);
+	void gtmr_oki1_map(address_map &map) ATTR_COLD;
+	void gtmr_oki2_map(address_map &map) ATTR_COLD;
 
 private:
 	optional_device<z80_device> m_audiocpu;
@@ -143,13 +143,13 @@ private:
 	void eeprom_w(u8 data);
 	void eeprom_cs_w(u8 data);
 
-	void bakubrkr_map(address_map &map);
-	void bakubrkr_oki1_map(address_map &map);
-	void blazeon_map(address_map &map);
-	void blazeon_soundmem(address_map &map);
-	void blazeon_soundport(address_map &map);
-	void mgcrystl_map(address_map &map);
-	void wingforc_soundport(address_map &map);
+	void bakubrkr_map(address_map &map) ATTR_COLD;
+	void bakubrkr_oki1_map(address_map &map) ATTR_COLD;
+	void blazeon_map(address_map &map) ATTR_COLD;
+	void blazeon_soundmem(address_map &map) ATTR_COLD;
+	void blazeon_soundport(address_map &map) ATTR_COLD;
+	void mgcrystl_map(address_map &map) ATTR_COLD;
+	void wingforc_soundport(address_map &map) ATTR_COLD;
 };
 
 class kaneko16_gtmr_state : public kaneko16_state
@@ -175,10 +175,10 @@ private:
 	u16 gtmr2_wheel_r();
 	u16 gtmr2_IN1_r();
 
-	void bloodwar_map(address_map &map);
-	void bonkadv_map(address_map &map);
-	void gtmr2_map(address_map &map);
-	void gtmr_map(address_map &map);
+	void bloodwar_map(address_map &map) ATTR_COLD;
+	void bonkadv_map(address_map &map) ATTR_COLD;
+	void gtmr2_map(address_map &map) ATTR_COLD;
+	void gtmr_map(address_map &map) ATTR_COLD;
 };
 
 class kaneko16_berlwall_state : public kaneko16_state
@@ -198,7 +198,7 @@ public:
 	void berlwall(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	optional_shared_ptr<u16> m_bg15_scroll;
@@ -225,7 +225,7 @@ private:
 	void render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void patch_protection(u32 bra_offset,u16 bra_value,u16 checksum);
-	void berlwall_map(address_map &map);
+	void berlwall_map(address_map &map) ATTR_COLD;
 };
 
 class kaneko16_shogwarr_state : public kaneko16_state
@@ -249,8 +249,8 @@ private:
 
 	void shogwarr_oki_bank_w(u8 data);
 
-	void brapboys_oki2_map(address_map &map);
-	void shogwarr_map(address_map &map);
+	void brapboys_oki2_map(address_map &map) ATTR_COLD;
+	void shogwarr_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_KANEKO_KANEKO16_H

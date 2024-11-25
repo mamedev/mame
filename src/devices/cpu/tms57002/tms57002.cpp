@@ -1023,11 +1023,6 @@ u32 tms57002_device::execute_max_cycles() const noexcept
 	return 3;
 }
 
-u32 tms57002_device::execute_input_lines() const noexcept
-{
-	return 0;
-}
-
 device_memory_interface::space_config_vector tms57002_device::memory_space_config() const
 {
 	return space_config_vector {

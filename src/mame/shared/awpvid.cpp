@@ -17,11 +17,9 @@
 #include "machine/steppers.h"
 
 
-void awp_draw_reel(running_machine &machine, const char* reeltag, stepper_device &reel)
+void awp_draw_reel(running_machine &machine, const char *reeltag, stepper_device &reel)
 {
-	char rg[16];
-
-	int reelpos =  reel.get_position();
+	int reelpos = reel.get_position();
 	if (reelpos == machine.output().get_value(reeltag))
 	{
 		// Not moved, no need to update.
@@ -33,11 +31,12 @@ void awp_draw_reel(running_machine &machine, const char* reeltag, stepper_device
 		// if the reel isn't configured don't do this, otherwise you'll get DIV0
 		if (reel.get_max())
 		{
+			char rg[16];
 			sprintf(rg,"s%s", reeltag); // our new scrolling reels are called 'sreel'
 			// normalize the value
 			int sreelpos = (reelpos * 0x10000) / reel.get_max();
 
-			machine.output().set_value(rg,sreelpos);
+			machine.output().set_value(rg, sreelpos);
 		}
 	}
 }

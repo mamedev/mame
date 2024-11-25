@@ -17,6 +17,8 @@
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
+#include <regex>
+
 #define LOG_WARN          (1U << 1)   // Warnings
 #define LOG_DETAIL        (1U << 2)   // Details
 
@@ -258,6 +260,16 @@ std::pair<std::error_condition, std::string> cassette_image_device::call_load()
 	return std::make_pair(internal_load(false), std::string());
 }
 
+bool cassette_image_device::has_any_extension(std::string_view candidate_extensions) const
+{
+	const char separator = ',';
+	std::istringstream extension_stream(std::string{candidate_extensions});
+	for (std::string extension; std::getline(extension_stream, extension, separator);)
+		if (is_filetype(extension))
+			return true;
+	return false;
+}
+
 std::error_condition cassette_image_device::internal_load(bool is_create)
 {
 	cassette_image::error err;
@@ -270,10 +282,9 @@ std::error_condition cassette_image_device::internal_load(bool is_create)
 		auto io = util::random_read_write_fill(image_core_file(), 0x00);
 		if (io)
 		{
-			// creating an image
 			err = cassette_image::create(
 					std::move(io),
-					&cassette_image::wavfile_format,
+					has_any_extension(cassette_image::flacfile_format.extensions) ? &cassette_image::flacfile_format : &cassette_image::wavfile_format,
 					m_create_opts,
 					cassette_image::FLAG_READWRITE|cassette_image::FLAG_SAVEONEXIT,
 					m_cassette);

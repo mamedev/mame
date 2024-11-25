@@ -91,7 +91,7 @@ public:
 	void out_w(u8 data, u8 mem_mask);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	optional_device<screen_device> m_screen;

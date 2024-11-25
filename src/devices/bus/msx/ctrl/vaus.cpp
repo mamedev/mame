@@ -31,8 +31,8 @@ public:
 	virtual void pin_8_w(int state) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(msx_vaus); }
 	TIMER_CALLBACK_MEMBER(copy_counter);
@@ -112,4 +112,4 @@ TIMER_CALLBACK_MEMBER(msx_vaus_device::copy_counter)
 } // anonymous namespace
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(MSX_VAUS, device_msx_general_purpose_port_interface, msx_vaus_device, "msx_vaus", "MSX Arkanoid Vaus")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_VAUS, device_msx_general_purpose_port_interface, msx_vaus_device, "msx_vaus", "Taito Arkanoid Vaus Controller (MSX)")

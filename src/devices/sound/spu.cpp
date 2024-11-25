@@ -11,8 +11,13 @@
 #include "emu.h"
 #include "spu.h"
 #include "spureverb.h"
+
 #include "cpu/psx/psx.h"
+
 #include "corestr.h"
+
+#include <algorithm>
+
 
 //
 //
@@ -360,24 +365,19 @@ struct spu_device::cache_pointer
 	signed short *ptr;
 	sample_cache *cache;
 
-	cache_pointer()
-		: ptr(nullptr),
-			cache(nullptr)
+	cache_pointer() : ptr(nullptr), cache(nullptr)
 	{
 	}
 
-	cache_pointer(const cache_pointer &other)
-		: ptr(nullptr),
-			cache(nullptr)
+	cache_pointer(const cache_pointer &other) : cache_pointer()
 	{
-		operator =(other);
+		operator=(other);
 	}
 
-	cache_pointer(signed short *_ptr, sample_cache *_cache)
-		: ptr(_ptr),
-			cache(_cache)
+	cache_pointer(signed short *_ptr, sample_cache *_cache) : ptr(_ptr), cache(_cache)
 	{
-		if (cache) cache->add_ref();
+		if (cache)
+			cache->add_ref();
 	}
 
 	~cache_pointer()
@@ -386,23 +386,20 @@ struct spu_device::cache_pointer
 	}
 
 	void reset();
-	cache_pointer &operator =(const cache_pointer &other);
+	cache_pointer &operator=(const cache_pointer &other);
 	bool update(spu_device *spu);
 
 	unsigned int get_address() const
 	{
 		if (cache)
-		{
 			return cache->get_sample_address(ptr);
-		} else
-		{
+		else
 			return -1;
-		}
 	}
 
 	operator bool() const { return cache!=nullptr; }
 
-	bool is_valid() const { return ((cache) && (cache->is_valid_pointer(ptr))); }
+	bool is_valid() const { return cache && cache->is_valid_pointer(ptr); }
 };
 
 //
@@ -411,35 +408,34 @@ struct spu_device::cache_pointer
 
 struct spu_device::voiceinfo
 {
-	cache_pointer play,loop;
-	sample_loop_cache *loop_cache;
-	unsigned int dptr,
-								lcptr;
+	cache_pointer play, loop;
+	sample_loop_cache *loop_cache = nullptr;
+	unsigned int dptr = 0, lcptr = 0;
 
-	int env_state;
-	float env_ar,
-				env_dr,
-				env_sr,
-				env_rr,
-				env_sl,
-				env_level,
-				env_delta,
+	int env_state = 0;
+	float env_ar = 0.0F,
+				env_dr = 0.0F,
+				env_sr = 0.0F,
+				env_rr = 0.0F,
+				env_sl = 0.0F,
+				env_level = 0.0F,
+				env_delta = 0.0F,
 
 				//>>
-				sweep_vol[2],
-				sweep_rate[2];
-	int vol[2];
+				sweep_vol[2] = { 0.0F, 0.0F },
+				sweep_rate[2] = { 0.0F, 0.0F };
+	int vol[2] = { 0, 0 };
 				//<<
 
-	unsigned int pitch,
-								samplestoend,
-								samplestoirq,
-								envsamples;
-	bool hitirq,
-				inloopcache,
-				forceloop,
-				_pad;
-	int64_t keyontime;
+	unsigned int pitch = 0,
+								samplestoend = 0,
+								samplestoirq = 0,
+								envsamples = 0;
+	bool hitirq = false,
+				inloopcache = false,
+				forceloop = false,
+				_pad = false;
+	int64_t keyontime = 0;
 };
 
 //
@@ -970,11 +966,11 @@ void spu_device::device_start()
 	generate_linear_release_rate_table();
 	generate_exp_release_rate_table();
 
-	voice=new voiceinfo [24];
-	spu_ram=std::make_unique<unsigned char []>(spu_ram_size);
+	voice = new voiceinfo [24];
+	spu_ram = std::make_unique<unsigned char []>(spu_ram_size);
 
-	xa_buffer=new spu_stream_buffer(xa_sector_size,xa_buffer_sectors);
-	cdda_buffer=new spu_stream_buffer(cdda_sector_size,cdda_buffer_sectors);
+	xa_buffer = new spu_stream_buffer(xa_sector_size, xa_buffer_sectors);
+	cdda_buffer = new spu_stream_buffer(cdda_sector_size, cdda_buffer_sectors);
 
 	init_stream();
 
@@ -1037,7 +1033,7 @@ void spu_device::device_reset()
 
 	memset(spu_ram.get(),0,spu_ram_size);
 	memset(reg,0,0x200);
-	memset(voice,0,sizeof(voiceinfo)*24);
+	std::fill_n(voice, 24, voiceinfo());
 
 	spureg.status|=(1<<7)|(1<<10);
 
@@ -1087,7 +1083,7 @@ void spu_device::device_stop()
 	cache.reset();
 	delete xa_buffer;
 	delete cdda_buffer;
-	delete [] voice;
+	delete[] voice;
 }
 //
 //

@@ -13,7 +13,7 @@ Electronics Australia Car Computer
 	<element name="red_led">
 		<disk state="0"><color red="1.0" green="0.0" blue="0.0" /></disk>
 	</element>
-	<element name="red_button" state="0">
+	<element name="red_button" defstate="0">
 		<rect state="0"><color red="0.75" green="0.25" blue="0.25" /></rect>
 		<rect state="1"><color red="1.0" green="0.25" blue="0.25" /></rect>
 	</element>

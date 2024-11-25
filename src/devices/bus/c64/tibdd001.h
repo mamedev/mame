@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_C64_TIB_DD_001_H
-#define MAME_BUS_C64_TIB_DD_001_H
+#ifndef MAME_BUS_C64_TIBDD001_H
+#define MAME_BUS_C64_TIBDD001_H
 
 #pragma once
 
@@ -33,11 +33,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_c64_expansion_card_interface overrides
 	virtual uint8_t c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
@@ -57,4 +57,4 @@ private:
 DECLARE_DEVICE_TYPE(C64_TIB_DD_001, c64_tib_dd_001_device)
 
 
-#endif // MAME_BUS_C64_TIB_DD_001_H
+#endif // MAME_BUS_C64_TIBDD001_H

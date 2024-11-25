@@ -45,7 +45,7 @@ public:
 private:
 	MC6845_UPDATE_ROW(update_row);
 
-	void qvt190_mem_map(address_map &map);
+	void qvt190_mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;

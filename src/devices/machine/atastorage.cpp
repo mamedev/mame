@@ -5,15 +5,16 @@
 
 #include "multibyte.h"
 
+//#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_debug
+#include "logmacro.h"
+
+
 /***************************************************************************
     DEBUGGING
 ***************************************************************************/
 
-#define VERBOSE                     0
-#define PRINTF_IDE_COMMANDS         0
 #define PRINTF_IDE_PASSWORD         0
-
-#define LOGPRINT(x) do { if (VERBOSE) logerror x; if (PRINTF_IDE_COMMANDS) osd_printf_debug x; } while (0)
 
 #define TIME_PER_SECTOR_WRITE               (attotime::from_usec(100))
 #define TIME_PER_ROTATION                   (attotime::from_hz(5400/60))
@@ -534,19 +535,17 @@ void ata_mass_storage_device_base::process_buffer()
 	{
 		if (m_user_password_enable && memcmp(&m_buffer[0], m_user_password, 2 + 32) == 0)
 		{
-			LOGPRINT(("IDE Unlocked user password\n"));
+			LOG("IDE Unlocked user password\n");
 			m_user_password_enable = 0;
 		}
 		if (m_master_password_enable && memcmp(&m_buffer[0], m_master_password, 2 + 32) == 0)
 		{
-			LOGPRINT(("IDE Unlocked master password\n"));
+			LOG("IDE Unlocked master password\n");
 			m_master_password_enable = 0;
 		}
 		if (PRINTF_IDE_PASSWORD)
 		{
-			int i;
-
-			for (i = 0; i < 34; i += 2)
+			for (int i = 0; i < 34; i += 2)
 			{
 				if (i % 8 == 2)
 					osd_printf_debug("\n");
@@ -562,7 +561,7 @@ void ata_mass_storage_device_base::process_buffer()
 	}
 	else if (m_command == IDE_COMMAND_SECURITY_DISABLE_PASSWORD)
 	{
-		LOGPRINT(("IDE Done unimplemented SECURITY_DISABLE_PASSWORD command\n"));
+		LOG("IDE Done unimplemented SECURITY_DISABLE_PASSWORD command\n");
 	}
 	else if (m_command == IDE_COMMAND_WRITE_BUFFER)
 	{
@@ -666,8 +665,12 @@ void ata_mass_storage_device_base::process_command()
 	{
 	case IDE_COMMAND_READ_SECTORS:
 	case IDE_COMMAND_READ_SECTORS_NORETRY:
-		LOGPRINT(("IDE Read multiple: C=%u H=%d S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+		LOG("IDE Read multiple: C=%u H=%d S=%u LBA=%u count=%u\n",
+				(m_cylinder_high << 8) | m_cylinder_low,
+				m_device_head & IDE_DEVICE_HEAD_HS,
+				m_sector_number,
+				lba_address(),
+				m_sector_count);
 
 		m_sectors_until_int = 1;
 
@@ -676,7 +679,7 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_READ_BUFFER:
-		LOGPRINT(("IDE Read Buffer\n"));
+		LOG("IDE Read Buffer\n");
 
 		m_sectors_until_int = 1;
 		m_buffer_offset = 0;
@@ -686,8 +689,12 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_READ_MULTIPLE:
-		LOGPRINT(("IDE Read multiple block: C=%u H=%u S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+		LOG("IDE Read multiple block: C=%u H=%u S=%u LBA=%u count=%u\n",
+				(m_cylinder_high << 8) | m_cylinder_low,
+				m_device_head & IDE_DEVICE_HEAD_HS,
+				m_sector_number,
+				lba_address(),
+				m_sector_count);
 
 		m_sectors_until_int = 1;
 
@@ -697,8 +704,12 @@ void ata_mass_storage_device_base::process_command()
 
 	case IDE_COMMAND_VERIFY_SECTORS:
 	case IDE_COMMAND_VERIFY_SECTORS_NORETRY:
-		LOGPRINT(("IDE Read verify multiple with/without retries: C=%u H=%u S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+		LOG("IDE Read verify multiple with/without retries: C=%u H=%u S=%u LBA=%u count=%u\n",
+				(m_cylinder_high << 8) | m_cylinder_low,
+				m_device_head & IDE_DEVICE_HEAD_HS,
+				m_sector_number,
+				lba_address(),
+				m_sector_count);
 
 		/* reset the buffer */
 		m_sectors_until_int = m_sector_count;
@@ -708,8 +719,12 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_READ_DMA:
-		LOGPRINT(("IDE Read multiple DMA: C=%u H=%u S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+		LOG("IDE Read multiple DMA: C=%u H=%u S=%u LBA=%u count=%u\n",
+				(m_cylinder_high << 8) | m_cylinder_low,
+				m_device_head & IDE_DEVICE_HEAD_HS,
+				m_sector_number,
+				lba_address(),
+				m_sector_count);
 
 		/* reset the buffer */
 		m_sectors_until_int = m_sector_count;
@@ -720,8 +735,12 @@ void ata_mass_storage_device_base::process_command()
 
 	case IDE_COMMAND_WRITE_SECTORS:
 	case IDE_COMMAND_WRITE_SECTORS_NORETRY:
-		LOGPRINT(("IDE Write multiple: C=%u H=%u S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+		LOG("IDE Write multiple: C=%u H=%u S=%u LBA=%u count=%u\n",
+				(m_cylinder_high << 8) | m_cylinder_low,
+				m_device_head & IDE_DEVICE_HEAD_HS,
+				m_sector_number,
+				lba_address(),
+				m_sector_count);
 
 		/* reset the buffer */
 		m_sectors_until_int = 1;
@@ -731,7 +750,7 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_WRITE_BUFFER:
-		LOGPRINT(("IDE Write Buffer\n"));
+		LOG("IDE Write Buffer\n");
 
 		/* reset the buffer */
 		m_sectors_until_int = 1;
@@ -742,8 +761,12 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_WRITE_MULTIPLE:
-		LOGPRINT(("IDE Write multiple block: C=%u H=%u S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+		LOG("IDE Write multiple block: C=%u H=%u S=%u LBA=%u count=%u\n",
+				(m_cylinder_high << 8) | m_cylinder_low,
+				m_device_head & IDE_DEVICE_HEAD_HS,
+				m_sector_number,
+				lba_address(),
+				m_sector_count);
 
 		/* reset the buffer */
 		m_sectors_until_int = m_block_count;
@@ -753,8 +776,12 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_WRITE_DMA:
-		LOGPRINT(("IDE Write multiple DMA: C=%u H=%u S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+		LOG("IDE Write multiple DMA: C=%u H=%u S=%u LBA=%u count=%u\n",
+				(m_cylinder_high << 8) | m_cylinder_low,
+				m_device_head & IDE_DEVICE_HEAD_HS,
+				m_sector_number,
+				lba_address(),
+				m_sector_count);
 
 		/* reset the buffer */
 		m_sectors_until_int = m_sector_count;
@@ -767,7 +794,7 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_SECURITY_UNLOCK:
-		LOGPRINT(("IDE Security Unlock\n"));
+		LOG("IDE Security Unlock\n");
 
 		/* mark the buffer ready */
 		m_status |= IDE_STATUS_DRQ;
@@ -776,7 +803,7 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_SECURITY_DISABLE_PASSWORD:
-		LOGPRINT(("IDE Unimplemented SECURITY DISABLE PASSWORD command\n"));
+		LOG("IDE Unimplemented SECURITY DISABLE PASSWORD command\n");
 
 		/* mark the buffer ready */
 		m_status |= IDE_STATUS_DRQ;
@@ -785,7 +812,7 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_IDENTIFY_DEVICE:
-		LOGPRINT(("IDE Identify device\n"));
+		LOG("IDE Identify device\n");
 
 		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
 		break;
@@ -800,20 +827,26 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_SET_CONFIG:
-		LOGPRINT(("IDE Set configuration (%u heads, %u sectors)\n", (m_device_head & IDE_DEVICE_HEAD_HS) + 1, m_sector_count));
+		LOG("IDE Set configuration (%u heads, %u sectors)\n",
+				(m_device_head & IDE_DEVICE_HEAD_HS) + 1,
+				m_sector_count);
 
 		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
 		break;
 
 	case IDE_COMMAND_SET_MAX:
-		LOGPRINT(("IDE Set max (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_sector_number, m_cylinder_low, m_cylinder_high));
+		LOG("IDE Set max (%02X %02X %02X %02X %02X)\n",
+				m_feature,
+				m_sector_count & 0xff,
+				m_sector_number,
+				m_cylinder_low, m_cylinder_high);
 
 		/* signal an interrupt */
 		set_irq(ASSERT_LINE);
 		break;
 
 	case IDE_COMMAND_SET_BLOCK_COUNT:
-		LOGPRINT(("IDE Set block count (%u)\n", m_sector_count));
+		LOG("IDE Set block count (%u)\n", m_sector_count);
 
 		m_block_count = m_sector_count;
 
@@ -872,8 +905,11 @@ void ide_hdd_device_base::device_reset()
 			m_num_cylinders = hdinfo.cylinders;
 			m_num_sectors = hdinfo.sectors;
 			m_num_heads = hdinfo.heads;
-			if (PRINTF_IDE_COMMANDS) osd_printf_debug("CHS: %u %u %u\n", m_num_cylinders, m_num_heads, m_num_sectors);
-			osd_printf_debug("CHS: %u %u %u\n", m_num_cylinders, m_num_heads, m_num_sectors);
+			osd_printf_verbose("%s: Mounted disk image CHS: %u %u %u\n",
+					tag(),
+					m_num_cylinders,
+					m_num_heads,
+					m_num_sectors);
 		}
 
 		// build the features page

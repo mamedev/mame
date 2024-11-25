@@ -50,8 +50,11 @@ int sdf_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		return 0;
 	}
 
-	size_t actual;
-	io.read_at(0, header, HEADER_SIZE, actual);
+	auto const [err, actual] = read_at(io, 0, header, HEADER_SIZE);
+	if (err || (HEADER_SIZE != actual))
+	{
+		return 0;
+	}
 
 	int tracks = header[4];
 	int heads = header[5];
@@ -79,12 +82,11 @@ int sdf_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	size_t actual;
 	uint8_t header[HEADER_SIZE];
 	std::vector<uint8_t> track_data(TOTAL_TRACK_SIZE);
 	std::vector<uint32_t> raw_track_data;
 
-	io.read_at(0, header, HEADER_SIZE, actual);
+	read_at(io, 0, header, HEADER_SIZE); // FIXME: check for errors and premature EOF
 
 	const int tracks = header[4];
 	const int heads = header[5];
@@ -108,7 +110,7 @@ bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			raw_track_data.clear();
 
 			// Read track
-			io.read_at(HEADER_SIZE + (heads * track + head) * TOTAL_TRACK_SIZE, &track_data[0], TOTAL_TRACK_SIZE, actual);
+			read_at(io, HEADER_SIZE + (heads * track + head) * TOTAL_TRACK_SIZE, &track_data[0], TOTAL_TRACK_SIZE); // FIXME: check for errors and premature EOF
 
 			int sector_count = track_data[0];
 

@@ -60,7 +60,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void os214_prg_map(address_map &map);
+	void os214_prg_map(address_map &map) ATTR_COLD;
 };
 
 void os214_state::os214_prg_map(address_map &map)

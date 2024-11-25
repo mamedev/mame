@@ -98,7 +98,7 @@ u16 pgm_arm_type3_state::svg_68k_nmi_r()
 
 void pgm_arm_type3_state::svg_68k_nmi_w(u16 data)
 {
-	m_prot->pulse_input_line(ARM7_FIRQ_LINE, m_prot->minimum_quantum_time());
+	m_prot->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_prot->minimum_quantum_time());
 }
 
 void pgm_arm_type3_state::svg_latch_68k_w(offs_t offset, u16 data, u16 mem_mask)
@@ -840,23 +840,23 @@ INPUT_PORTS_END
 
 void pgm_arm_type3_state::init_happy6()
 {
-	u8 *src = (u8 *)(machine().root_device().memregion("tiles")->base()) + 0x180000;
+	u8 *src = (u8 *)(memregion("igs023")->base()) + 0x180000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
-	src = (u8 *)(machine().root_device().memregion("sprcol")->base()) + 0x000000;
+	src = (u8 *)(memregion("igs023:sprcol")->base()) + 0x000000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
-	src = (u8 *)(machine().root_device().memregion("sprcol")->base()) + 0x0800000;
+	src = (u8 *)(memregion("igs023:sprcol")->base()) + 0x0800000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
-	src = (u8 *)(machine().root_device().memregion("sprmask")->base());
+	src = (u8 *)(memregion("igs023:sprmask")->base());
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
-	src = (u8 *)(machine().root_device().memregion("ics")->base()) + 0x400000;
+	src = (u8 *)(memregion("ics")->base()) + 0x400000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 

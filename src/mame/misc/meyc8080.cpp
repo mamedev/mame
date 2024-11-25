@@ -93,7 +93,7 @@ private:
 	void meyc8080_dac_3_w(uint8_t data);
 	void meyc8080_dac_4_w(uint8_t data);
 	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void meyc8080_map(address_map &map);
+	void meyc8080_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_lamps.resolve(); }
 

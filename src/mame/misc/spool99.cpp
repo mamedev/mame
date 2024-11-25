@@ -123,7 +123,7 @@ public:
 	void init_spool99();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -147,8 +147,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void spool99_map(address_map &map);
-	void vcarn_map(address_map &map);
+	void spool99_map(address_map &map) ATTR_COLD;
+	void vcarn_map(address_map &map) ATTR_COLD;
 };
 
 TILE_GET_INFO_MEMBER(spool99_state::get_tile_info)

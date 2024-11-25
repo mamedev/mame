@@ -64,8 +64,8 @@ public:
 	sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 
 protected:
-	void program_2_7k(address_map &map);
-	void data_96_32x4(address_map &map);
+	void program_2_7k(address_map &map) ATTR_COLD;
+	void data_96_32x4(address_map &map) ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_one() override;

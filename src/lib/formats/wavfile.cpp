@@ -170,7 +170,6 @@ static cassette_image::error wavfile_identify(cassette_image *cassette, cassette
 static cassette_image::error wavfile_load(cassette_image *cassette)
 {
 	cassette_image::Options opts;
-	memset(&opts, 0, sizeof(opts));
 	return wavfile_process(cassette, &opts, true);
 }
 

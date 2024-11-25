@@ -50,7 +50,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	void coco_vhd_readwrite(uint8_t data);
 

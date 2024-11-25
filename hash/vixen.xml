@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="vixen" description="Osborne 4 Vixen Disk Images">
+<softwarelist name="vixen" description="Osborne 4 Vixen disk images">
 	<software name="system12">
 		<description>OSBORNE 4 System Disk</description>
 		<year>1985</year>

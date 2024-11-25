@@ -533,7 +533,7 @@ bool i82586_base_device::address_filter(u8 *mac)
 	}
 
 	// individual address
-	if (!memcmp(mac, get_mac(), cfg_address_length()))
+	if (!memcmp(mac, &get_mac()[0], cfg_address_length()))
 	{
 		LOGMASKED(LOG_FILTER, "address_filter accepted: individual address match\n");
 
@@ -950,7 +950,7 @@ bool i82586_device::cu_transmit(u32 command)
 	// optionally insert source, destination address and length (14 bytes)
 	if (!cfg_no_src_add_ins())
 	{
-		const char *mac = get_mac();
+		const std::array<u8, 6> &mac = get_mac();
 		u32 data;
 
 		// insert destination address (6 bytes)
@@ -1054,7 +1054,7 @@ bool i82586_device::cu_dump()
 	memcpy(&buf[0x00], &m_cfg_bytes[0], CFG_SIZE);
 
 	// individual address
-	memcpy(&buf[0x0c], get_mac(), 6);
+	memcpy(&buf[0x0c], &get_mac()[0], 6);
 
 	// hash register
 	*(u64 *)&buf[0x24] = m_mac_multi;
@@ -1584,7 +1584,7 @@ bool i82596_device::cu_transmit(u32 command)
 		// optionally insert destination, source and length (14 bytes)
 		if (!cfg_no_src_add_ins())
 		{
-			const char *mac = get_mac();
+			const std::array<u8, 6> &mac = get_mac();
 			u32 data;
 
 			// insert destination address (6 bytes)
@@ -1719,7 +1719,7 @@ bool i82596_device::cu_dump()
 		memcpy(&buf[0x02], &m_cfg_bytes[2], 9);
 
 		// individual address
-		memcpy(&buf[0x0c], get_mac(), 6);
+		memcpy(&buf[0x0c], &get_mac()[0], 6);
 
 		// hash register
 		*(u64 *)&buf[0x24] = m_mac_multi;
@@ -1730,7 +1730,7 @@ bool i82596_device::cu_dump()
 		memcpy(&buf[0x00], &m_cfg_bytes[2], 12);
 
 		// individual address
-		memcpy(&buf[0x0e], get_mac(), 6);
+		memcpy(&buf[0x0e], &get_mac()[0], 6);
 
 		// hash register
 		*(u64 *)&buf[0x26] = m_mac_multi;
@@ -1827,7 +1827,7 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 	// TODO: increment alignment error counter
 
 	// set multicast status
-	if (mode() != MODE_82586 && memcmp(buf, get_mac(), cfg_address_length()))
+	if (mode() != MODE_82586 && memcmp(buf, &get_mac()[0], cfg_address_length()))
 		status |= RFD_S_MULTICAST;
 
 	// fetch initial rbd address from rfd

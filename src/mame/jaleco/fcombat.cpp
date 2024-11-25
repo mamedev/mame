@@ -68,8 +68,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -113,12 +113,10 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void fcombat_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 // this is copied from Exerion, but it should be correct
 static constexpr XTAL MASTER_CLOCK = 20_MHz_XTAL;
@@ -357,8 +355,6 @@ u32 fcombat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-// machine
-
 INPUT_CHANGED_MEMBER(fcombat_state::coin_inserted)
 {
 	// coin insertion causes an NMI
@@ -532,7 +528,7 @@ static INPUT_PORTS_START( fcombat )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, fcombat_state, coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fcombat_state::coin_inserted), 0)
 INPUT_PORTS_END
 
 

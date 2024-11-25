@@ -54,7 +54,7 @@ public:
 	void init_schick();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void coin_counter_1_w(int state);
@@ -97,11 +97,11 @@ private:
 	required_device<palette_device> m_palette;
 	required_device_array<ay8910_device, 3> m_ay;
 
-	void schick_portmap(address_map &map);
-	void schick_decrypted_opcodes_map(address_map &map);
-	void schick_map(address_map &map);
-	void schick_audio_map(address_map &map);
-	void schick_audio_io_map(address_map &map);
+	void schick_portmap(address_map &map) ATTR_COLD;
+	void schick_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void schick_map(address_map &map) ATTR_COLD;
+	void schick_audio_map(address_map &map) ATTR_COLD;
+	void schick_audio_io_map(address_map &map) ATTR_COLD;
 
 	uint8_t soundlatch_read_and_clear();
 
@@ -164,16 +164,12 @@ void schick_state::machine_start()
 
 TILEMAP_MAPPER_MEMBER(schick_state::schick_scan_rows)
 {
-	int offs;
-
 	row += 2;
 	col -= 2;
 	if (col & 0x20)
-		offs = row + ((col & 0x1f) << 5);
+		return row + ((col & 0x1f) << 5);
 	else
-		offs = col + (row << 5);
-
-	return offs;
+		return col + (row << 5);
 }
 
 TILE_GET_INFO_MEMBER(schick_state::schick_get_tile_info)

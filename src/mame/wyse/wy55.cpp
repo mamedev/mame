@@ -37,7 +37,7 @@ public:
 	void wy185es(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void driver_start() override;
 
 private:
@@ -47,10 +47,10 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
-	void wy65_ext_map(address_map &map);
-	void wy185es_ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
+	void wy65_ext_map(address_map &map) ATTR_COLD;
+	void wy185es_ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	optional_device<scn_pci_device> m_epci;

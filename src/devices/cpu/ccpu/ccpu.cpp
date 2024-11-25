@@ -203,6 +203,7 @@ void ccpu_cpu_device::execute_run()
 {
 	if (m_waiting)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}

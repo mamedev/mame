@@ -52,7 +52,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void rbowlorama_map(address_map &map);
+	void rbowlorama_map(address_map &map) ATTR_COLD;
 };
 
 void rbowlorama_state::rbowlorama_map(address_map &map)

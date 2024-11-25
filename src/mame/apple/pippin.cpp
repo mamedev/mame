@@ -74,12 +74,12 @@ public:
 	required_device<ram_device> m_ram;
 
 private:
-	void pippin_map(address_map &map);
-	void cdmcu_mem(address_map &map);
-	void cdmcu_data(address_map &map);
+	void pippin_map(address_map &map) ATTR_COLD;
+	void cdmcu_mem(address_map &map) ATTR_COLD;
+	void cdmcu_data(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void cuda_reset_w(int state)
 	{
@@ -181,7 +181,6 @@ void pippin_state::pippin(machine_config &config)
 
 	grandcentral_device &grandcentral(GRAND_CENTRAL(config, "pci:0d.0", 0));
 	grandcentral.set_maincpu_tag("maincpu");
-	grandcentral.set_pci_root_tag(":pci:00.0", AS_DATA);
 	grandcentral.irq_callback().set(FUNC(pippin_state::irq_w));
 
 	awacs_macrisc_device &awacs(AWACS_MACRISC(config, "codec", 45.1584_MHz_XTAL / 2));

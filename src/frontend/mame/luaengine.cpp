@@ -445,8 +445,8 @@ int sol_lua_push(sol::types<screen_type_enum>, lua_State *L, screen_type_enum &&
 	case SCREEN_TYPE_INVALID:   return sol::stack::push(L, "invalid");
 	case SCREEN_TYPE_RASTER:    return sol::stack::push(L, "raster");
 	case SCREEN_TYPE_VECTOR:    return sol::stack::push(L, "vector");
-	case SCREEN_TYPE_LCD:       return sol::stack::push(L, "svg");
-	case SCREEN_TYPE_SVG:       return sol::stack::push(L, "none");
+	case SCREEN_TYPE_LCD:       return sol::stack::push(L, "lcd");
+	case SCREEN_TYPE_SVG:       return sol::stack::push(L, "svg");
 	}
 	return sol::stack::push(L, "unknown");
 }
@@ -889,6 +889,7 @@ void lua_engine::initialize()
 	// TODO: stuff below here needs to be rationalised
 	emu["app_name"] = &emulator_info::get_appname_lower;
 	emu["app_version"] = &emulator_info::get_bare_build_version;
+	emu["app_build"] = &emulator_info::get_build_version;
 	emu["gamename"] = [this] () { return machine().system().type.fullname(); };
 	emu["romname"] = [this] () { return machine().basename(); };
 	emu["softname"] = [this] () { return machine().options().software_name(); };
@@ -1502,7 +1503,6 @@ void lua_engine::initialize()
 	game_driver_type["no_cocktail"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NO_COCKTAIL) != 0; });
 	game_driver_type["is_bios_root"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::IS_BIOS_ROOT) != 0; });
 	game_driver_type["requires_artwork"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::REQUIRES_ARTWORK) != 0; });
-	game_driver_type["clickable_artwork"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::CLICKABLE_ARTWORK) != 0; });
 	game_driver_type["unofficial"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::UNOFFICIAL) != 0; });
 	game_driver_type["no_sound_hw"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NO_SOUND_HW) != 0; });
 	game_driver_type["mechanical"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::MECHANICAL) != 0; });

@@ -351,7 +351,7 @@ public:
 	void sstrangr(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -369,8 +369,8 @@ private:
 
 	uint32_t screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void sstrangr_io_map(address_map &map);
-	void sstrangr_map(address_map &map);
+	void sstrangr_io_map(address_map &map) ATTR_COLD;
+	void sstrangr_map(address_map &map) ATTR_COLD;
 };
 
 

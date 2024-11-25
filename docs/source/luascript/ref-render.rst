@@ -754,6 +754,10 @@ manager.machine.video.snapshot_target
 Properties
 ~~~~~~~~~~
 
+target.ui_container (read-only)
+    The :ref:`render container <luascript-ref-rendercontainer>` for drawing user
+    interface elements over this render target, or ``nil`` for hidden render
+    targets (targets that are not shown to the user directly).
 target.index (read-only)
     The 1-based index of the render target.  This has O(n) complexity.
 target.width (read-only)
@@ -810,6 +814,9 @@ Instantiation
 manager.machine.render.ui_container
     Gets the render container used to draw the user interface, including menus,
     sliders and pop-up messages.
+manager.machine.render.targets[index].ui_container
+    Gets the render container used to draw user interface elements over a
+    particular render target.
 manager.machine.screens[tag].container
     Gets the render container used to draw a given screen.
 
@@ -1057,6 +1064,66 @@ view:set_recomputed_callback(cb)
     View coordinates are recomputed in various events, including the window
     being resized, entering or leaving full-screen mode, and changing the zoom
     to screen area setting.
+view:set_pointer_updated_callback(cb)
+    Set a function to receive notifications when a pointer enters, moves or
+    changes button states over the view.  The function must accept nine
+    arguments:
+
+    * The pointer type (``mouse``, ``pen``, ``touch`` or ``unknown``).
+    * The pointer ID (a non-negative integer that will not change for the
+      lifetime of a pointer).
+    * The device ID for grouping pointers to recognise multi-touch gestures
+      (non-negative integer).
+    * Horizontal position in layout coordinates.
+    * Vertical position in layout coordinates.
+    * A bit mask representing the currently pressed buttons.
+    * A bit mask representing the buttons that were pressed in this update.
+    * A bit mask representing the buttons that were released in this update.
+    * The click count (positive for multi-click actions, or negative if a click
+      is turned into a hold or drag).
+
+    Call with ``nil`` to remove the callback.
+view:set_pointer_left_callback(cb)
+    Set a function to receive notifications when a pointer leaves the view
+    normally.  The function must accept seven arguments:
+
+    * The pointer type (``mouse``, ``pen``, ``touch`` or ``unknown``).
+    * The pointer ID (a non-negative integer that will not change for the
+      lifetime of a pointer).  The ID may be reused for a new pointer after
+      receiving this notification.
+    * The device ID for grouping pointers to recognise multi-touch gestures
+      (non-negative integer).
+    * Horizontal position in layout coordinates.
+    * Vertical position in layout coordinates.
+    * A bit mask representing the buttons that were released in this update.
+    * The click count (positive for multi-click actions, or negative if a click
+      is turned into a hold or drag).
+
+    Call with ``nil`` to remove the callback.
+view:set_pointer_aborted_callback(cb)
+    Set a function to receive notifications when a pointer leaves the view
+    abnormally.  The function must accept seven arguments:
+
+    * The pointer type (``mouse``, ``pen``, ``touch`` or ``unknown``).
+    * The pointer ID (a non-negative integer that will not change for the
+      lifetime of a pointer).  The ID may be reused for a new pointer after
+      receiving this notification.
+    * The device ID for grouping pointers to recognise multi-touch gestures
+      (non-negative integer).
+    * Horizontal position in layout coordinates.
+    * Vertical position in layout coordinates.
+    * A bit mask representing the buttons that were released in this update.
+    * The click count (positive for multi-click actions, or negative if a click
+      is turned into a hold or drag).
+
+    Call with ``nil`` to remove the callback.
+view:set_forget_pointers_callback(cb)
+    Set a function to receive notifications when the view should stop processing
+    pointer input.  The function must accept no arguments.  Call with ``nil`` to
+    remove the callback.
+
+    This can happen in a number of situations, including the view configuration
+    changing or a menu taking over input handling.
 
 Properties
 ~~~~~~~~~~
@@ -1085,10 +1152,16 @@ view.bounds (read-only)
     effective bounds of the view in its current configuration.  The coordinates
     are in view units, which are arbitrary but assumed to have square aspect
     ratio.
-view.has_art
+view.has_art (read-only)
     A Boolean indicating whether the view has any non-screen items, including
     items that are not visible because the user has hidden the item collection
     that they belong to.
+view.show_pointers (read/write)
+    A Boolean that sets whether mouse and pen pointers should be displayed for
+    the view.
+view.hide_inactive_pointers (read/write)
+    A Boolean that sets whether mouse pointers for the view should be hidden
+    after a period of inactivity.
 
 
 .. _luascript-ref-renderlayitem:

@@ -53,12 +53,12 @@ public:
 protected:
 	ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(hblank_onoff_tick);
 
@@ -100,8 +100,8 @@ private:
 	void serial_speed_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(ie15_beepoff);
 
-	void ie15_io(address_map &map);
-	void ie15_mem(address_map &map);
+	void ie15_io(address_map &map) ATTR_COLD;
+	void ie15_mem(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint32_t[]> m_tmpbmp;
 

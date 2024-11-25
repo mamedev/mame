@@ -57,7 +57,7 @@ public:
 	void vindictr(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -85,11 +85,9 @@ private:
 	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	static const atari_motion_objects_config s_mob_config;
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /*************************************
  *
@@ -357,8 +355,6 @@ uint32_t vindictr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

@@ -513,11 +513,6 @@ void tmp68301_device::ieir_w(u8 data)
 }
 
 
-u32 tmp68301_device::execute_input_lines() const noexcept
-{
-	return 10;
-}
-
 void tmp68301_device::execute_set_input(int inputnum, int state)
 {
 	int prev_state = (m_external_interrupt_state >> inputnum) & 1;
@@ -688,7 +683,7 @@ void tmp68301_device::pmr_w(u8 data)
 
 u16 tmp68301_device::pdr_r()
 {
-	if(m_parallel_mode == 0) {
+	if(m_parallel_mode == 0 || m_parallel_mode == 1) {
 		if(m_pdir == 0xffff)
 			return m_pdr;
 		return (m_pdr & m_pdir) | (m_parallel_r_cb() & ~m_pdir);
@@ -704,7 +699,7 @@ void tmp68301_device::pdr_w(offs_t, u16 data, u16 mem_mask)
 	if(m_pdr == old)
 		return;
 	//  logerror("parallel data %04x\n", m_pdr);
-	if(m_parallel_mode == 0) {
+	if(m_parallel_mode == 0 || m_parallel_mode == 1) {
 		if(m_pdir == 0x0000)
 			return;
 		m_parallel_w_cb(m_pdr & m_pdir);
@@ -1099,8 +1094,15 @@ void tmp68301_device::serial_tx_update(int ch)
 		nstate = m_smr[ch] & SMR_PEN ? SR_PARITY : SR_STOP;
 		break;
 
-	case SR_PARITY:
-		abort();
+	case SR_PARITY: {
+		u32 parity = m_smr[ch] & SMR_PEO ? 0 : 1;
+		for(u32 i = 0; i != 5 + ((m_smr[ch] >> SMR_CL_SFT) & 3); i++)
+			if((m_serial_tx[ch] >> i) & 1)
+				parity = parity ^ 1;
+		m_tx_cb[ch](parity);
+		nstate = SR_STOP;
+		break;
+	}
 
 	case SR_STOP:
 		m_tx_cb[ch](1);

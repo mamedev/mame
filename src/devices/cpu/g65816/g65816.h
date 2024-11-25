@@ -6,7 +6,6 @@
 #pragma once
 
 #include "g65816ds.h"
-#include "g65816cm.h"
 
 /* ======================================================================== */
 /* =============================== COPYRIGHT ============================== */
@@ -71,13 +70,12 @@ protected:
 	g65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 20; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -157,18 +155,25 @@ protected:
 	unsigned g65816i_read_16_normal(unsigned address);
 	unsigned g65816i_read_16_immediate(unsigned address);
 	unsigned g65816i_read_16_direct(unsigned address);
+	unsigned g65816i_read_16_direct_x(unsigned address);
 	unsigned g65816i_read_16_vector(unsigned address);
 	void g65816i_write_16_normal(unsigned address, unsigned value);
 	void g65816i_write_16_direct(unsigned address, unsigned value);
 	unsigned g65816i_read_24_normal(unsigned address);
 	unsigned g65816i_read_24_immediate(unsigned address);
-	unsigned g65816i_read_24_direct(unsigned address);
 	void g65816i_push_8(unsigned value);
 	unsigned g65816i_pull_8();
 	void g65816i_push_16(unsigned value);
 	unsigned g65816i_pull_16();
 	void g65816i_push_24(unsigned value);
 	unsigned g65816i_pull_24();
+	void g65816i_push_8_native(unsigned value);
+	unsigned g65816i_pull_8_native();
+	void g65816i_push_16_native(unsigned value);
+	unsigned g65816i_pull_16_native();
+	void g65816i_push_24_native(unsigned value);
+	unsigned g65816i_pull_24_native();
+	void g65816i_update_reg_s();
 	void g65816i_jump_16(unsigned address);
 	void g65816i_jump_24(unsigned address);
 	void g65816i_branch_8(unsigned offset);
@@ -1565,11 +1570,11 @@ public:
 
 	void set_5a22_map();
 
-	void _5a22_map(address_map &map);
+	void _5a22_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;

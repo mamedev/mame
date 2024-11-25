@@ -149,4 +149,4 @@ void null_modem_device::rcv_complete()
 	}
 }
 
-DEFINE_DEVICE_TYPE(NULL_MODEM, null_modem_device, "null_modem", "RS232 Null Modem")
+DEFINE_DEVICE_TYPE(NULL_MODEM, null_modem_device, "null_modem", "RS-232 Null Modem")

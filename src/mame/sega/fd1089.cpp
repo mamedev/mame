@@ -458,7 +458,7 @@ uint16_t fd1089_base_device::decrypt_one(offs_t addr, uint16_t val, const uint8_
 					((addr & 0x000200) >> 6) |
 					((addr & 0xff0000) >> 12);
 
-	uint16_t src =    ((val & 0x0008) >> 3) |
+	uint16_t src =  ((val & 0x0008) >> 3) |
 					((val & 0x0040) >> 5) |
 					((val & 0xfc00) >> 8);
 

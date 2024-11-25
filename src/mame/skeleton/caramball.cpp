@@ -63,7 +63,7 @@ private:
 	void i8155_pb_w(u8 data);
 	void i8155_pc_w(u8 data);
 	void f000_w(u8 data);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<i8085a_cpu_device> m_maincpu;
 };

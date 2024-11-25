@@ -3,6 +3,9 @@
 license:CC0-1.0
 -->
 <mamelayout version="2">
+
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
+
 	<element name="shifter" defstate="0">
 		<rect>
 			<bounds left="0" right="32" top="0" bottom="64" />
@@ -51,44 +54,162 @@ license:CC0-1.0
 		</disk>
 	</element>
 
-	<view name="Upright (4:3), Shifter-R">
+
+	<view name="Upright (4:3) + Shifter-R Overlay" showpointers="no">
 		<screen index="0">
 			<bounds left="0" top="0" right="640" bottom="480" />
 		</screen>
-		<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
-			<bounds x="606" y="414" width="32" height="64" />
-			<color alpha="0.6" />
-		</element>
+		<collection name="Shifter">
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="606" y="414" width="32" height="64" />
+			</element>
+			<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+				<bounds x="606" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="606" y="414" width="32" height="64" />
+				</element>
+			</collection>
+		</collection>
 	</view>
-	<view name="Upright (4:3), Shifter-L">
+	<view name="Upright (4:3) + Shifter-R Off-Screen" showpointers="no">
 		<screen index="0">
 			<bounds left="0" top="0" right="640" bottom="480" />
 		</screen>
-		<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
-			<bounds x="2" y="414" width="32" height="64" />
-			<color alpha="0.6" />
-		</element>
+		<collection name="Shifter">
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="648" y="414" width="32" height="64" />
+			</element>
+			<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+				<bounds x="648" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="648" y="414" width="32" height="64" />
+				</element>
+			</collection>
+		</collection>
+	</view>
+	<view name="Upright (4:3) + Shifter-L Overlay" showpointers="no">
+		<screen index="0">
+			<bounds left="0" top="0" right="640" bottom="480" />
+		</screen>
+		<collection name="Shifter">
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="2" y="414" width="32" height="64" />
+			</element>
+			<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+				<bounds x="2" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="2" y="414" width="32" height="64" />
+				</element>
+			</collection>
+		</collection>
+	</view>
+	<view name="Upright (4:3) + Shifter-L Off-Screen" showpointers="no">
+		<screen index="0">
+			<bounds left="0" top="0" right="640" bottom="480" />
+		</screen>
+		<collection name="Shifter">
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="-40" y="414" width="32" height="64" />
+			</element>
+			<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+				<bounds x="-40" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="-40" y="414" width="32" height="64" />
+				</element>
+			</collection>
+		</collection>
 	</view>
 
-	<!-- Super Chase (Deluxe/Cockpit cab) used a widescreen monitor, see http://flyers.arcade-museum.com/?page=thumbs&db=videodb&id=1118 -->
 
-	<view name="Deluxe (16:9), Shifter-R">
+<!-- Super Chase (Deluxe/Cockpit cab) used a widescreen monitor, see http://flyers.arcade-museum.com/?page=thumbs&db=videodb&id=1118 -->
+
+	<view name="Deluxe (16:9) + Shifter-R Overlay" showpointers="no">
 		<screen index="0">
-			<bounds left="0" top="0" right="800" bottom="450" />
+			<bounds x="0" y="0" width="853.333" height="480" />
 		</screen>
-		<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
-			<bounds x="766" y="384" width="32" height="64" />
-			<color alpha="0.6" />
-		</element>
+		<collection name="Shifter">
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="819.333" y="414" width="32" height="64" />
+			</element>
+			<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+				<bounds x="819.333" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="819.333" y="414" width="32" height="64" />
+				</element>
+			</collection>
+		</collection>
 	</view>
-	<view name="Deluxe (16:9), Shifter-L">
+	<view name="Deluxe (16:9) + Shifter-R Off-Screen" showpointers="no">
 		<screen index="0">
-			<bounds left="0" top="0" right="800" bottom="450" />
+			<bounds x="0" y="0" width="853.333" height="480" />
 		</screen>
-		<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
-			<bounds x="2" y="384" width="32" height="64" />
-			<color alpha="0.6" />
-		</element>
+		<collection name="Shifter">
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="861.333" y="414" width="32" height="64" />
+			</element>
+			<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+				<bounds x="861.333" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="861.333" y="414" width="32" height="64" />
+				</element>
+			</collection>
+		</collection>
+	</view>
+	<view name="Deluxe (16:9) + Shifter-L Overlay" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="853.333" height="480" />
+		</screen>
+		<collection name="Shifter">
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="2" y="414" width="32" height="64" />
+			</element>
+			<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+				<bounds x="2" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="2" y="414" width="32" height="64" />
+				</element>
+			</collection>
+		</collection>
+	</view>
+	<view name="Deluxe (16:9) + Shifter-L Off-Screen" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="853.333" height="480" />
+		</screen>
+		<collection name="Shifter">
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="-40" y="414" width="32" height="64" />
+			</element>
+			<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+				<bounds x="-40" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="SWITCHES" inputmask="0x20">
+					<bounds x="-40" y="414" width="32" height="64" />
+				</element>
+			</collection>
+		</collection>
 	</view>
 
 </mamelayout>

@@ -10,7 +10,7 @@ Imgtool is part of the MAME project. It shares large portions of code with MAME,
 **Some portions of Imgtool are Copyright (c) 1989, 1993 The Regents of the University of California.  All rights reserved.**
 
 Using Imgtool
-=============
+-------------
 
 Imgtool is a command line program that contains several "subcommands" that actually do all of the work.  Most commands are invoked in a manner along the lines of this:
 
@@ -32,7 +32,7 @@ Further details vary with each subcommand.  Also note that not all subcommands a
 
 
 Imgtool Subcommands
-===================
+-------------------
 
 **create**
 
@@ -151,7 +151,7 @@ Imgtool Subcommands
 
 
 Imgtool Filters
-===============
+---------------
 
 Filters are a means to process data being written into or read out of an image in a certain way.  Filters can be specified on the get, put, and getall commands by specifying --filter=xxxx on the command line.  Currently, the following filters are supported:
 

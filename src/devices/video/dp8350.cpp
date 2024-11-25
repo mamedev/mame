@@ -44,7 +44,8 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "video/dp8350.h"
+#include "dp8350.h"
+
 #include "screen.h"
 
 //#define VERBOSE 1

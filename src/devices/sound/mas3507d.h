@@ -23,13 +23,11 @@ public:
 
 	void sid_w(uint8_t byte);
 
-	void update_stream() { stream->update(); }
-
 	void reset_playback();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
@@ -89,8 +87,6 @@ private:
 
 	bool is_muted;
 	float gain_ll, gain_rr;
-
-	uint32_t playback_status;
 
 	std::unique_ptr<mp3_audio> mp3dec;
 };

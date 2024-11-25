@@ -599,13 +599,12 @@ protected:
 	std::unique_ptr<uint8_t[]> m_shift_flag_cache;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 4; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -784,14 +783,14 @@ protected:
 	typedef delegate<void (void)> timer_func;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_run() override;
 
 	// address maps
-	void base_internal_map(address_map &map);
+	void base_internal_map(address_map &map) ATTR_COLD;
 
 	// Miscellaneous registers
 	void wdtcsr_w(uint8_t data);
@@ -1102,7 +1101,7 @@ class atmega88_device : public avr8_device<3>
 public:
 	// construction/destruction
 	atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void atmega88_internal_map(address_map &map);
+	void atmega88_internal_map(address_map &map) ATTR_COLD;
 };
 
 // ======================> atmega168_device
@@ -1114,7 +1113,7 @@ public:
 	atmega168_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void update_interrupt(int source) override;
-	void atmega168_internal_map(address_map &map);
+	void atmega168_internal_map(address_map &map) ATTR_COLD;
 };
 
 // ======================> atmega328_device
@@ -1126,7 +1125,7 @@ public:
 	atmega328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void update_interrupt(int source) override;
-	void atmega328_internal_map(address_map &map);
+	void atmega328_internal_map(address_map &map) ATTR_COLD;
 };
 
 // ======================> atmega644_device
@@ -1138,7 +1137,7 @@ public:
 	atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void update_interrupt(int source) override;
-	void atmega644_internal_map(address_map &map);
+	void atmega644_internal_map(address_map &map) ATTR_COLD;
 };
 
 // ======================> atmega1280_device
@@ -1150,7 +1149,7 @@ public:
 	atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void update_interrupt(int source) override;
-	void atmega1280_internal_map(address_map &map);
+	void atmega1280_internal_map(address_map &map) ATTR_COLD;
 };
 
 // ======================> atmega2560_device
@@ -1162,7 +1161,7 @@ public:
 	atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void update_interrupt(int source) override;
-	void atmega2560_internal_map(address_map &map);
+	void atmega2560_internal_map(address_map &map) ATTR_COLD;
 };
 
 // ======================> attiny15_device
@@ -1172,7 +1171,7 @@ class attiny15_device : public avr8_device<2>
 public:
 	// construction/destruction
 	attiny15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void attiny15_internal_map(address_map &map);
+	void attiny15_internal_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************

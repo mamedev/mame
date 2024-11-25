@@ -1957,4 +1957,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="zonx">
+		<description>Zonx (The Rainbow)</description>
+		<year>1985</year>
+		<publisher>Falsoft</publisher>
+		<info name="author" value="David Billen" />
+		<info name="usage" value="LOADM&quot;ZONX&quot;:EXEC" />
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="161280">
+				<rom name="ZONX.DSK" size="161280" crc="da6a8b6c" sha1="fdd3ef04a6e2fcc854a467ae735f2af43c838af2" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

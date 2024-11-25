@@ -37,7 +37,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
@@ -65,9 +65,9 @@ public:
 	void ax80(machine_config &config);
 
 private:
-	void ax80_map(address_map &map);
+	void ax80_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<upd7810_device> m_maincpu;
 };
 

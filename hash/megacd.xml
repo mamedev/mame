@@ -1787,7 +1787,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<rom name="Eye of the Beholder (1994)(Sega)(PAL)(Track 55 of 56)[!].wav" size="3069404" crc="c12da15d" />
 		<rom name="Eye of the Beholder (1994)(Sega)(PAL)(Track 56 of 56)[!].wav" size="3981980" crc="ccb7a029" />
 		-->
-		<description>Eye of the Beholder (Europe)</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4655"/>

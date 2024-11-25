@@ -39,8 +39,8 @@ protected:
 
 	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// state
 	std::unique_ptr<simh_tape_file> m_file; // tape image file

@@ -39,7 +39,6 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_deco_irq(*this, "irq")
-		, m_decobsmt(*this, "decobsmt")
 		, m_eeprom(*this, "eeprom")
 		, m_ioprot(*this, "ioprot")
 		, m_ym2151(*this, "ymsnd")
@@ -53,10 +52,10 @@ public:
 	void sound_bankswitch_w(u8 data);
 
 protected:
-	void h6280_sound_custom_latch_map(address_map &map);
-	void h6280_sound_map(address_map &map);
-	void z80_sound_io(address_map &map);
-	void z80_sound_map(address_map &map);
+	void h6280_sound_custom_latch_map(address_map &map) ATTR_COLD;
+	void h6280_sound_map(address_map &map) ATTR_COLD;
+	void z80_sound_io(address_map &map) ATTR_COLD;
+	void z80_sound_map(address_map &map) ATTR_COLD;
 
 	// common
 	u16 ioprot_r(offs_t offset);
@@ -85,7 +84,6 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<deco_irq_device> m_deco_irq;
-	optional_device<decobsmt_device> m_decobsmt;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<deco_146_base_device> m_ioprot;
 	optional_device<ym2151_device> m_ym2151;
@@ -97,7 +95,7 @@ protected:
 	void allocate_buffered_palette();
 	void allocate_rowscroll(int size1, int size2, int size3, int size4);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	std::unique_ptr<u8[]> m_dirty_palette{}; // all but captaven
 	int m_pri = 0; // all but dragngun
@@ -123,12 +121,13 @@ public:
 
 	void init_captaven();
 
+protected:
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	required_ioport_array<3> m_io_dsw;
 	u32 _71_r();
 	u8 captaven_soundcpu_status_r();
-
-	virtual void video_start() override;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -136,7 +135,7 @@ private:
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
 
-	void captaven_map(address_map &map);
+	void captaven_map(address_map &map) ATTR_COLD;
 };
 
 class fghthist_state : public deco32_state
@@ -153,24 +152,25 @@ public:
 
 	void init_fghthist();
 
+protected:
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	required_ioport_array<2> m_io_in;
 //  void sound_w(u32 data);
 	u32 unk_status_r();
-
-	virtual void video_start() override;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(fghthist_pri_callback);
 
-	void fghthist_map(address_map &map);
-	void fghthsta_memmap(address_map &map);
+	void fghthist_map(address_map &map) ATTR_COLD;
+	void fghthsta_memmap(address_map &map) ATTR_COLD;
 private:
 };
 
-// nslasher, tattass
+// nslasher
 class nslasher_state : public deco32_state
 {
 public:
@@ -180,38 +180,58 @@ public:
 	{ }
 
 	void nslasheru(machine_config &config);
-	void tattass(machine_config &config);
 	void nslasher(machine_config &config);
 
-	void init_tattass();
 	void init_nslasher();
 
-private:
+protected:
+	virtual void video_start() override ATTR_COLD;
+
 	required_device<deco_ace_device> m_deco_ace;
 
 	void tilemap_color_bank_w(u8 data);
 	void sprite1_color_bank_w(u8 data);
 	void sprite2_color_bank_w(u8 data);
-	void tattass_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void tattass_sound_irq_w(int state);
 	u16 nslasher_debug_r();
 
-	virtual void video_start() override;
-
 	u32 screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	u32 screen_update_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	u16 port_b_tattass();
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	u16 mix_callback(u16 p, u16 p2);
 
-	void nslasher_map(address_map &map);
-	void tattass_map(address_map &map);
+	void nslasher_map(address_map &map) ATTR_COLD;
 
 	void mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
-	void mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 
 	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap;
+};
+
+// tattass
+class tattass_state : public nslasher_state
+{
+public:
+	tattass_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nslasher_state(mconfig, type, tag)
+		, m_decobsmt(*this, "decobsmt")
+	{ }
+
+	void tattass(machine_config &config);
+
+	void init_tattass();
+
+private:
+	required_device<decobsmt_device> m_decobsmt;
+
+	void tattass_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void tattass_sound_irq_w(int state);
+
+	u32 screen_update_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	u16 port_b_tattass();
+
+	void tattass_map(address_map &map) ATTR_COLD;
+
+	void mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 
 	int m_tattass_eprom_bit = 0;
 	int m_last_clock = 0;
@@ -251,6 +271,9 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(lockload_gun_trigger);
 
+protected:
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	required_device<namco_c355spr_device> m_sprgenzoom;
 	required_device<buffered_spriteram32_device> m_spriteram;
@@ -289,8 +312,6 @@ private:
 	void lockload_okibank_lo_w(u8 data);
 	void lockload_okibank_hi_w(u8 data); // lockload
 
-	virtual void video_start() override;
-
 	int sprite_bank_callback(int sprite);
 	u16 read_spritetile(int lookupram_offset);
 	u16 read_spriteformat(int spriteformatram_offset, u8 attr);
@@ -309,12 +330,12 @@ private:
 
 	void namco_sprites(machine_config &config);
 
-	void namcosprite_map(address_map &map);
-	void dragngun_map(address_map &map);
-	void lockload_map(address_map &map);
-	void lockloadu_map(address_map &map);
-	void lockload_sound_map(address_map &map);
-	void lockloadu_sound_map(address_map &map);
+	void namcosprite_map(address_map &map) ATTR_COLD;
+	void dragngun_map(address_map &map) ATTR_COLD;
+	void lockload_map(address_map &map) ATTR_COLD;
+	void lockloadu_map(address_map &map) ATTR_COLD;
+	void lockload_sound_map(address_map &map) ATTR_COLD;
+	void lockloadu_sound_map(address_map &map) ATTR_COLD;
 	bool m_gun_speaker_disabled;
 };
 

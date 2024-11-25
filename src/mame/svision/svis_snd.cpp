@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "svis_snd.h"
 
+#include <algorithm>
+
 // configurable logging
 #define LOG_DMA     (1U << 1)
 #define LOG_NOISE   (1U << 2)
@@ -50,9 +52,9 @@ svision_sound_device::svision_sound_device(const machine_config &mconfig, const 
 
 void svision_sound_device::device_start()
 {
-	memset(&m_dma, 0, sizeof(m_dma));
-	memset(&m_noise, 0, sizeof(m_noise));
-	memset(m_channel, 0, sizeof(m_channel));
+	m_dma = DMA();
+	m_noise = NOISE();
+	std::fill(std::begin(m_channel), std::end(m_channel), CHANNEL());
 
 	m_mixer_channel = stream_alloc(0, 2, machine().sample_rate());
 

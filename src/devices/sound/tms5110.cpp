@@ -277,11 +277,11 @@ static void printbits(long data, int num)
 
 /******************************************************************************************
 
-     extract_bits -- extract a specific number of bits from the VSM
+     read_bits -- read a specific number of bits from the VSM
 
 ******************************************************************************************/
 
-int tms5110_device::extract_bits(int count)
+int tms5110_device::read_bits(int count)
 {
 	int val = 0;
 	if (DEBUG_5110) logerror("requesting %d bits", count);
@@ -846,7 +846,7 @@ void tms5110_device::PDC_set(int data)
 						fprintf(stderr,"actually reading a bit now\n");
 #endif
 						m_CTL_buffer >>= 1;
-						m_CTL_buffer |= (extract_bits(1)<<3);
+						m_CTL_buffer |= (read_bits(1)<<3);
 						m_CTL_buffer &= 0xF;
 					}
 					break;
@@ -924,7 +924,7 @@ void tms5110_device::parse_frame()
 	m_uv_zpar = m_zpar = 0;
 
 	// attempt to extract the energy index
-	m_new_frame_energy_idx = extract_bits(m_coeff->energy_bits);
+	m_new_frame_energy_idx = read_bits(m_coeff->energy_bits);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(m_new_frame_energy_idx,m_coeff->energy_bits);
 	fprintf(stderr," ");
@@ -934,13 +934,13 @@ void tms5110_device::parse_frame()
 	if ((m_new_frame_energy_idx == 0) || (m_new_frame_energy_idx == 15))
 		return;
 
-	rep_flag = extract_bits(1);
+	rep_flag = read_bits(1);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(rep_flag, 1);
 	fprintf(stderr," ");
 #endif
 
-	m_new_frame_pitch_idx = extract_bits(m_coeff->pitch_bits);
+	m_new_frame_pitch_idx = read_bits(m_coeff->pitch_bits);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(m_new_frame_pitch_idx,m_coeff->pitch_bits);
 	fprintf(stderr," ");
@@ -954,7 +954,7 @@ void tms5110_device::parse_frame()
 	// extract first 4 K coefficients
 	for (i = 0; i < 4; i++)
 	{
-		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+		m_new_frame_k_idx[i] = read_bits(m_coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
 		fprintf(stderr," ");
@@ -971,7 +971,7 @@ void tms5110_device::parse_frame()
 	// If we got here, we need the remaining 6 K's
 	for (i = 4; i < m_coeff->num_k; i++)
 	{
-		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+		m_new_frame_k_idx[i] = read_bits(m_coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
 		fprintf(stderr," ");

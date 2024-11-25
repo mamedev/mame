@@ -79,6 +79,8 @@
 
     POP*STAR PILOT: Timer is synchronized with scanlines.
 
+    Cloud Kingdoms: 512K bank switch on scanline.
+
 **********************************************************************/
 
 
@@ -587,14 +589,11 @@ void gime_device::update_memory(int bank)
 		is_read_only = false;
 	}
 
-	// compensate for offset
-	memory += offset;
-
 	// set the banks
 	if (memory)
 	{
-		read_bank->set_base(memory);
-		write_bank->set_base(is_read_only ? m_dummy_bank : memory);
+		read_bank->set_base(memory + offset);
+		write_bank->set_base(is_read_only ? m_dummy_bank : memory + offset);
 	}
 	else
 	{
@@ -1220,8 +1219,7 @@ inline offs_t gime_device::get_video_base()
 	}
 
 	result += ((offs_t) (m_gime_registers[0x0E] & ff9e_mask)    * 0x00008)
-			| ((offs_t) (m_gime_registers[0x0D] & ff9d_mask)    * 0x00800)
-			| ((offs_t) (m_gime_registers[0x0B] & 0x0F)         * 0x80000);
+			| ((offs_t) (m_gime_registers[0x0D] & ff9d_mask)    * 0x00800);
 	return result;
 }
 
@@ -1283,22 +1281,20 @@ void gime_device::update_border(uint16_t physical_scanline)
 	if (m_legacy_video)
 	{
 		/* legacy video */
-		switch(border_value(m_ff22_value, true))
+		if (m_ff22_value & MODE_AG)
 		{
-			case BORDER_COLOR_GREEN:
-				border = 0x12;      /* green */
-				break;
-			case BORDER_COLOR_WHITE:
-				border = 0x3F;      /* white */
-				break;
-			case BORDER_COLOR_BLACK:
-				border = 0x00;      /* black */
-				break;
-			case BORDER_COLOR_ORANGE:
-				border = 0x26;      /* orange */
-				break;
-			default:
-				fatalerror("Should not get here\n");
+			// graphics, green or white
+			border = (~m_ff22_value & MODE_CSS) ? 0x12 : 0x3F;
+		}
+		else if (m_ff22_value & MODE_GM2)
+		{
+			// text, green or orange
+			border = (~m_ff22_value & MODE_CSS) ? 0x12 : 0x26;
+		}
+		else
+		{
+			// text, black
+			border = 0x00;
 		}
 	}
 	else
@@ -1414,6 +1410,8 @@ template<uint8_t xres, gime_device::get_data_func get_data, bool record_mode>
 inline uint32_t gime_device::record_scanline_res(int scanline)
 {
 	int column;
+	/* capture 512K memory bank per scan line */
+	uint32_t bank_512k = (m_gime_registers[0x0B] & 0x0F) * 0x80000;
 	uint32_t base_offset = m_legacy_video ? 0 : (m_gime_registers[0x0F] & 0x7F) * 2;
 	uint32_t offset = 0;
 
@@ -1422,7 +1420,7 @@ inline uint32_t gime_device::record_scanline_res(int scanline)
 	{
 		/* input data */
 		uint8_t data, mode;
-		offset += ((*this).*(get_data))(m_video_position + ((base_offset + offset) & 0xFF), &data, &mode);
+		offset += ((*this).*(get_data))((m_video_position + ((base_offset + offset) & 0xFF)) | bank_512k, &data, &mode);
 
 		/* and record the pertinent values */
 		if (record_mode)
@@ -1502,7 +1500,7 @@ uint32_t gime_device::get_data_with_attributes(uint32_t video_position, uint8_t 
 //  record_body_scanline
 //-------------------------------------------------
 
-void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline)
+void gime_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline)
 {
 	/* update the border first */
 	update_border(physical_scanline);

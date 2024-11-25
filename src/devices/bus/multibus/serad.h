@@ -22,15 +22,15 @@ public:
 
 protected:
 	// device_t overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
-	void pio_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void pio_map(address_map &map) ATTR_COLD;
 
 	template <unsigned S> void rst55_w(u8 data) { m_cpu->set_input_line(I8085_RST55_LINE, S); }
 	void apzint_w(u8 data) { int_w(2, 0); }

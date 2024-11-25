@@ -16,7 +16,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/cs8221.h"
+#include "cs8221.h"
+
 #include "machine/ram.h"
 
 #define LOG_REGISTER    (1U << 1)

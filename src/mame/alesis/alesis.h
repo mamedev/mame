@@ -32,9 +32,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(dac_update);
 
@@ -132,8 +132,8 @@ public:
 
 protected:
 	void alesis_palette(palette_device &palette) const;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t y, uint8_t x, int state);
 	void led_w(uint8_t data);
@@ -149,11 +149,11 @@ protected:
 	void sr16_lcd_w(uint8_t data);
 	HD44780_PIXEL_UPDATE(sr16_pixel_update);
 
-	void hr16_io(address_map &map);
-	void hr16_mem(address_map &map);
-	void mmt8_io(address_map &map);
-	void sr16_io(address_map &map);
-	void sr16_mem(address_map &map);
+	void hr16_io(address_map &map) ATTR_COLD;
+	void hr16_mem(address_map &map) ATTR_COLD;
+	void mmt8_io(address_map &map) ATTR_COLD;
+	void sr16_io(address_map &map) ATTR_COLD;
+	void sr16_mem(address_map &map) ATTR_COLD;
 
 private:
 	uint8_t       m_kb_matrix = 0;

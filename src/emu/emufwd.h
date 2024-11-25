@@ -38,7 +38,6 @@ class output_module;
 // declared in osdepend.h
 class osd_font;
 class osd_interface;
-class osd_midi_device;
 
 
 

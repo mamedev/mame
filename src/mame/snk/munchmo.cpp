@@ -64,8 +64,8 @@ public:
 	void mnchmobl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void nmi_enable_w(int state);
@@ -88,8 +88,8 @@ private:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr<u8> m_sprite_xpos;
@@ -119,8 +119,6 @@ private:
 };
 
 
-// video
-
 void munchmo_state::palette(palette_device &palette) const
 {
 	u8 const *const color_prom = memregion("proms")->base();
@@ -144,7 +142,7 @@ void munchmo_state::palette(palette_device &palette) const
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -268,8 +266,6 @@ u32 munchmo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

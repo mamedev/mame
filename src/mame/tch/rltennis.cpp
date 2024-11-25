@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
-/****************************************************************************************
+/**************************************************************************************************
 Reality Tennis - (c) 1993 TCH
 
  driver by Tomasz Slanina
@@ -55,11 +55,13 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
  TODO:
 - proper timing and interrupts (remove extra hacky blitter int generation @ vblank)
 - fix various gfx glitches here and there, mostly related to wrong size of data
- (what's the correct size? based on src or dest rectangle ? is there some kind of zoom? or just rect clipping?)
+  (what's the correct size? based on src or dest rectangle ? is there some kind of zoom?
+  or just rect clipping?)
 - what the 70000a blitter reg is for ?
+- awfully similar to littlerb;
 
 
-****************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "rltennis.h"
@@ -73,7 +75,6 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
 #define RLT_REFRESH_RATE   60
 #define RLT_TIMER_FREQ     (RLT_REFRESH_RATE*256)
-#define RLT_XTAL           XTAL(32'000'000)
 
 uint16_t rltennis_state::io_r()
 {
@@ -182,7 +183,7 @@ void rltennis_state::ramdac_map(address_map &map)
 
 void rltennis_state::rltennis(machine_config &config)
 {
-	M68000(config, m_maincpu, RLT_XTAL/8); // MC68000P8, divider is a guess
+	M68000(config, m_maincpu, XTAL(32'000'000) / 4); // MC68000P8, divider is a guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &rltennis_state::rltennis_main);
 	m_maincpu->set_vblank_int("screen", FUNC(rltennis_state::interrupt));
 
@@ -264,5 +265,5 @@ ROM_START( rltennisa )
 	ROM_LOAD( "gal22v10.ic2", 0x117, 0x2e5, CRC(b5a7cb92) SHA1(05d6e8c8208ac486e849de3322f049bcd38561e1) )
 ROM_END
 
-GAME( 1993, rltennis,         0, rltennis, rltennis, rltennis_state, empty_init, ROT0, "TCH", "Reality Tennis (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, rltennisa, rltennis, rltennis, rltennis, rltennis_state, empty_init, ROT0, "TCH", "Reality Tennis (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, rltennis,         0, rltennis, rltennis, rltennis_state, empty_init, ROT0, "TCH", "Reality Tennis (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, rltennisa, rltennis, rltennis, rltennis, rltennis_state, empty_init, ROT0, "TCH", "Reality Tennis (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )

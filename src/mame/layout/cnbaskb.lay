@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
-	<!-- define elements -->
+<!-- define elements -->
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
 	<element name="static_white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
@@ -25,7 +26,7 @@ license:CC0-1.0
 	<element name="text_score"><text string="SCORE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 
 
-	<!-- build screen -->
+<!-- build screen -->
 
 	<view name="Internal Layout">
 		<bounds left="2.05" right="19.95" top="0" bottom="16.95" />
@@ -37,7 +38,6 @@ license:CC0-1.0
 		<element ref="text_score"><bounds x="12.666" y="1" width="6" height="2" /></element>
 
 		<!-- bezel -->
-
 		<element ref="static_white"><bounds x="2" y="4" width="18.1" height="13" /></element>
 		<element ref="static_black"><bounds x="2.2" y="4.2" width="17.6" height="12.6" /></element>
 
@@ -58,7 +58,6 @@ license:CC0-1.0
 		<element ref="static_black"><bounds x="20" y="3" width="5" height="15" /></element>
 
 		<!-- leds -->
-
 		<element name="6.0" ref="led"><bounds x="3.15"  y="5.15" width="0.7" height="0.7" /></element>
 		<element name="6.1" ref="led"><bounds x="6.15"  y="5.15" width="0.7" height="0.7" /></element>
 		<element name="6.2" ref="led"><bounds x="9.15"  y="5.15" width="0.7" height="0.7" /></element>

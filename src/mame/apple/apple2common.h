@@ -7,8 +7,8 @@
     Apple II stuff shared between apple2/apple2e/apple2gs.
 
 *********************************************************************/
-#ifndef MAME_APPLE_APPLE2_COMMON_H
-#define MAME_APPLE_APPLE2_COMMON_H
+#ifndef MAME_APPLE_APPLE2COMMON_H
+#define MAME_APPLE_APPLE2COMMON_H
 
 #pragma once
 
@@ -29,7 +29,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
@@ -51,4 +51,4 @@ private:
 DECLARE_DEVICE_TYPE(APPLE2_COMMON, apple2_common_device)
 
 
-#endif // MAME_APPLE_APPLE2_COMMON_H
+#endif // MAME_APPLE_APPLE2COMMON_H

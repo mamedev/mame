@@ -57,13 +57,13 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); };
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 
-	void io_map(address_map &map);
-	void program_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -73,24 +73,24 @@ private:
 	void bgvideoram_w(u16 dst, u16 tile_code, u8 tile_color);
 
 	// Video processor
-	void vp_reg_0x00(offs_t offs, u8 data);
-	void vp_reg_0x01(offs_t offs, u8 data);
-	void vp_reg_0x02(offs_t offs, u8 data);
-	void vp_reg_0x04(offs_t offs, u8 data);
-	void vp_reg_0x05(offs_t offs, u8 data);
-	void vp_reg_0x07(offs_t offs, u8 data);
-	void vp_reg_0x08(offs_t offs, u8 data);
-	void vp_reg_0x0f(offs_t offs, u8 data);
-	void vp_reg_0x10(offs_t offs, u8 data);
-	void vp_reg_0x12(offs_t offs, u8 data);
-	void vp_reg_0x13(offs_t offs, u8 data);
-	void vp_reg_0x14(offs_t offs, u8 data);
-	void vp_reg_0x15(offs_t offs, u8 data);
-	void vp_reg_0x16(offs_t offs, u8 data);
-	void vp_reg_0x17(offs_t offs, u8 data);
-	void vp_reg_0x18(offs_t offs, u8 data);
-	void vp_reg_0x1a(offs_t offs, u8 data);
-	void vp_reg_0x1b(offs_t offs, u8 data);
+	void vp_reg_0x00(u8 data);
+	void vp_reg_0x01(u8 data);
+	void vp_reg_0x02(offs_t offset, u8 data);
+	void vp_reg_0x04(u8 data);
+	void vp_reg_0x05(offs_t offset, u8 data);
+	void vp_reg_0x07(u8 data);
+	void vp_reg_0x08(u8 data);
+	void vp_reg_0x0f(u8 data);
+	void vp_reg_0x10(u8 data);
+	void vp_reg_0x12(u8 data);
+	void vp_reg_0x13(u8 data);
+	void vp_reg_0x14(u8 data);
+	void vp_reg_0x15(u8 data);
+	void vp_reg_0x16(u8 data);
+	void vp_reg_0x17(u8 data);
+	void vp_reg_0x18(u8 data);
+	void vp_reg_0x1a(u8 data);
+	void vp_reg_0x1b(u8 data);
 	void vp_exec(u8 data);
 	void vp_playfield(u8 data);
 
@@ -236,7 +236,7 @@ void jackhouse_state::vp_playfield(u8 data)
 
 // Video Processor handlers
 
-void jackhouse_state::vp_reg_0x00(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x00(u8 data)
 {
 	m_fgt_addr = data; // fg tiles address register
 	m_bgt_addr = data; // bg tiles address register
@@ -245,7 +245,7 @@ void jackhouse_state::vp_reg_0x00(offs_t offs, u8 data)
 
 }
 
-void jackhouse_state::vp_reg_0x01(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x01(u8 data)
 {
 	m_fgt_addr |= data << 6; // fg tiles address register
 	m_bgt_addr |= data << 6; // bg tiles address register
@@ -255,16 +255,16 @@ void jackhouse_state::vp_reg_0x01(offs_t offs, u8 data)
 
 
 // fg tiles
-void jackhouse_state::vp_reg_0x02(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x02(offs_t offset, u8 data)
 {
-	m_fgvideoram[offs][m_fgt_addr] = data;
+	m_fgvideoram[offset][m_fgt_addr] = data;
 	m_fg_tilemap->mark_tile_dirty(m_fgt_addr);
-	if (offs == 1)
+	if (offset == 1)
 		m_fgt_addr += 1;
 }
 
 // fg color
-void jackhouse_state::vp_reg_0x04(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x04(u8 data)
 {
 	m_fgvideoram[2][m_fgc_addr] = data;
 	m_fg_tilemap->mark_tile_dirty(m_fgc_addr);
@@ -272,81 +272,81 @@ void jackhouse_state::vp_reg_0x04(offs_t offs, u8 data)
 }
 
 // bg tiles
-void jackhouse_state::vp_reg_0x05(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x05(offs_t offset, u8 data)
 {
-	m_bgvideoram[offs][m_fgt_addr] = data;
+	m_bgvideoram[offset][m_fgt_addr] = data;
 	m_bg_tilemap->mark_tile_dirty(m_fgt_addr);
-	if (offs == 1)
+	if (offset == 1)
 		m_bgt_addr++;
 }
 
 // bg color
-void jackhouse_state::vp_reg_0x07(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x07(u8 data)
 {
 	m_bgvideoram[2][m_bgc_addr] = data;
 	m_bg_tilemap->mark_tile_dirty(m_bgc_addr);
 	m_bgc_addr++;
 }
 
-void jackhouse_state::vp_reg_0x08(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x08(u8 data)
 {
 	m_cont++;
 	if (m_cont == 0x3f)
 		vp_playfield(m_color_dst);
 }
 
-void jackhouse_state::vp_reg_0x0f(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x0f(u8 data)
 {
 	m_gfxA_src_low = data;
 }
 
-void jackhouse_state::vp_reg_0x10(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x10(u8 data)
 {
 	m_gfxA_src_high = data;
 }
 
-void jackhouse_state::vp_reg_0x12(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x12(u8 data)
 {
 	m_color_dst = data;
 }
 
-void jackhouse_state::vp_reg_0x13(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x13(u8 data)
 {
 	m_gfxB_src_low = data;
 }
 
-void jackhouse_state::vp_reg_0x14(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x14(u8 data)
 {
 	m_gfxB_src_high = data;
 }
 
-void jackhouse_state::vp_reg_0x15(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x15(u8 data)
 {
 	m_vram_dest_col = data;
 }
 
-void jackhouse_state::vp_reg_0x16(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x16(u8 data)
 {
 	m_vram_dest_row = data;
 }
 
-void jackhouse_state::vp_reg_0x17(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x17(u8 data)
 {
 	m_col_end = data;
 }
 
-void jackhouse_state::vp_reg_0x18(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x18(u8 data)
 {
 	m_row_end = data;
 	vp_exec(data);
 }
 
-void jackhouse_state::vp_reg_0x1a(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x1a(u8 data)
 {
 	m_cont = 0;
 }
 
-void jackhouse_state::vp_reg_0x1b(offs_t offs, u8 data)
+void jackhouse_state::vp_reg_0x1b(u8 data)
 {
 	m_cmd_mode = data;
 }
@@ -520,7 +520,7 @@ static INPUT_PORTS_START( jackhouse )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_J)              // unknown
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_K)              // unknown
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-4") PORT_CODE(KEYCODE_M)              // unknown
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                                            // attendant pay key
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                            // hopper payout button
@@ -707,7 +707,7 @@ void jackhouse_state::jackhouse(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackhouse);
 	config.set_default_layout(layout_jackhouse);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	SPEAKER(config, "speaker").front_center();
 

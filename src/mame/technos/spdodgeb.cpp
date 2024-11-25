@@ -64,9 +64,9 @@ public:
 	int mcu_busy_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -116,13 +116,11 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void mcu_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 
 void spdodgeb_state::palette(palette_device &palette) const
@@ -327,8 +325,6 @@ uint32_t spdodgeb_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-// machine
-
 void spdodgeb_state::adpcm_w(offs_t offset, uint8_t data)
 {
 	int chip = offset & 1;
@@ -443,7 +439,7 @@ int spdodgeb_state::mcu_busy_r()
 static INPUT_PORTS_START( spdodgeb )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(spdodgeb_state, mcu_busy_r) // mcu63701_busy flag
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(spdodgeb_state::mcu_busy_r)) // mcu63701_busy flag
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -559,7 +555,7 @@ void spdodgeb_state::machine_reset()
 {
 	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
 	m_adpcm_end[0] = m_adpcm_end[1] = 0;
-	m_adpcm_idle[0] = m_adpcm_data[1] = 0;
+	m_adpcm_idle[0] = m_adpcm_idle[1] = 0;
 	m_adpcm_data[0] = m_adpcm_data[1] = -1;
 	m_mcu_status = 0;
 	memset(m_inputs, 0, sizeof(m_inputs));

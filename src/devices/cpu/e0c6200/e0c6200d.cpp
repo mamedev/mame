@@ -9,6 +9,27 @@
 #include "emu.h"
 #include "e0c6200d.h"
 
+
+// common lookup tables
+
+enum e0c6200_disassembler::e_mnemonics : unsigned
+{
+	em_JP, em_RETD, em_CALL, em_CALZ,
+	em_LD, em_LBPX, em_ADC, em_CP, em_ADD, em_SUB, em_SBC, em_AND, em_OR, em_XOR,
+	em_RLC, em_FAN, em_PSET, em_LDPX, em_LDPY, em_SET, em_RST, em_INC, em_DEC,
+	em_RRC, em_ACPX, em_ACPY, em_SCPX, em_SCPY, em_PUSH, em_POP,
+	em_RETS, em_RET, em_JPBA, em_HALT, em_SLP, em_NOP5, em_NOP7,
+	em_NOT, em_SCF, em_SZF, em_SDF, em_EI, em_DI, em_RDF, em_RZF, em_RCF, em_ILL
+};
+
+enum e0c6200_disassembler::e_params : unsigned
+{
+	ep_S, ep_E, ep_I, ep_R0, ep_R2, ep_R4, ep_Q,
+	ep_cC, ep_cNC, ep_cZ, ep_cNZ,
+	ep_A, ep_B, ep_X, ep_Y, ep_MX, ep_MY, ep_XP, ep_XH, ep_XL, ep_YP, ep_YH, ep_YL,
+	ep_P, ep_F, ep_MN, ep_SP, ep_SPH, ep_SPL
+};
+
 const char *const e0c6200_disassembler::em_name[] =
 {
 	"JP", "RETD", "CALL", "CALZ",
@@ -52,6 +73,8 @@ const char *const e0c6200_disassembler::ep_name[] =
 	" ", "F", " ", "SP", "SPH", "SPL"
 };
 
+
+// disasm
 
 std::string e0c6200_disassembler::decode_param(u16 opcode, int param)
 {
@@ -670,24 +693,4 @@ offs_t e0c6200_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	}
 
 	return 1 | ((op & 0xf00) == 0 ? 0 : em_flags[m]) | SUPPORTED;
-}
-
-u32 e0c6200_disassembler::opcode_alignment() const
-{
-	return 1;
-}
-
-u32 e0c6200_disassembler::interface_flags() const
-{
-	return PAGED2LEVEL;
-}
-
-u32 e0c6200_disassembler::page_address_bits() const
-{
-	return 8;
-}
-
-u32 e0c6200_disassembler::page2_address_bits() const
-{
-	return 4;
 }

@@ -30,10 +30,10 @@ class coco_midi_device :
 
 	protected:
 		coco_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-		virtual void device_start() override;
+		virtual void device_start() override ATTR_COLD;
 
 		// optional information overrides
-		virtual void device_add_mconfig(machine_config &config) override;
+		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 		required_device<acia6850_device> m_acia;
 		void acia_irq_w(int state);
 
@@ -49,7 +49,7 @@ class dragon_midi_device : public coco_midi_device
 
 	protected:
 		dragon_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-		virtual void device_start() override;
+		virtual void device_start() override ATTR_COLD;
 };
 
 coco_midi_device::coco_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)

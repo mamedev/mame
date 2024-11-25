@@ -406,7 +406,7 @@ uint32_t mips3_disassembler::dasm_idt(uint32_t pc, uint32_t op, std::ostream &st
 	{
 		case 0: util::stream_format(stream, "mad       %s,%s", reg[rs], reg[rt]); break;
 		case 1: util::stream_format(stream, "madu      %s,%s", reg[rs], reg[rt]); break;
-		case 2: util::stream_format(stream, "mul       %s,%s,%s", reg[rs], reg[rt], reg[rd]); break;
+		case 2: util::stream_format(stream, "mul       %s,%s,%s", reg[rd], reg[rs], reg[rt]); break;
 		case 4: util::stream_format(stream, "msub      %s,%s", reg[rs], reg[rt]); break;
 		default:util::stream_format(stream, "dc.l      $%08x [invalid]", op);  break;
 	}

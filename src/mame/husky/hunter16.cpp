@@ -43,9 +43,9 @@ public:
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
-	void io_16_map(address_map &map);
-	void io_1680_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_16_map(address_map &map) ATTR_COLD;
+	void io_1680_map(address_map &map) ATTR_COLD;
 
 	required_device<v25_device> m_maincpu;
 	required_device<screen_device> m_screen;

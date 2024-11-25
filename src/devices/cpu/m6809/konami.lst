@@ -522,13 +522,14 @@ LSRD:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 
-	while(m_bcount--)
+	do
 	{
 		@eat(1);
 		m_cc &= ~CC_C;
 		m_cc |= (m_temp.w & 1) ? CC_C : 0;
 		m_temp.w = set_flags<uint16_t>(CC_NZ, m_temp.w >> 1);
-	}
+	} while (--m_bcount);
+
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;
@@ -540,11 +541,12 @@ ASLD:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 
-	while(m_bcount--)
+	do
 	{
 		@eat(1);
 		m_temp.w = set_flags<uint16_t>(CC_NZVC, m_temp.w, m_temp.w, m_temp.w << 1);
-	}
+	} while (--m_bcount);
+
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;
@@ -556,13 +558,14 @@ ASRD:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 
-	while(m_bcount--)
+	do
 	{
 		@eat(1);
 		m_cc &= ~CC_C;
 		m_cc |= (m_temp.w & 1) ? CC_C : 0;
 		m_temp.w = set_flags<uint16_t>(CC_NZ, ((int16_t) m_temp.w) >> 1);
-	}
+	} while (--m_bcount);
+
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;
@@ -574,11 +577,12 @@ ROLD:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 
-	while(m_bcount--)
+	do
 	{
 		@eat(1);
 		m_temp.w = set_flags<uint16_t>(CC_NZV, rotate_left(m_temp.w));
-	}
+	} while (--m_bcount);
+
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;
@@ -590,11 +594,12 @@ RORD:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 
-	while(m_bcount--)
+	do
 	{
 		@eat(1);
 		m_temp.w = set_flags<uint16_t>(CC_NZ, rotate_right(m_temp.w));
-	}
+	} while (--m_bcount);
+
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;

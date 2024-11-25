@@ -21,6 +21,8 @@
 
 #include "divtlb.h"
 
+#include <algorithm>
+
 
 /***************************************************************************
     CONSTANTS
@@ -250,14 +252,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -469,22 +470,30 @@ protected:
 
 	/* architectural distinctions */
 	powerpc_flavor  m_flavor;
-	uint32_t          m_cap;
-	uint8_t           m_cache_line_size;
-	uint32_t          m_tb_divisor;
+	uint32_t        m_cap;
+	uint8_t         m_cache_line_size;
+	uint32_t        m_tb_divisor;
 
 	/* PowerPC 4xx-specific state */
 	/* PowerPC 4XX-specific serial port state */
 	struct ppc4xx_spu_state
 	{
-		ppc4xx_spu_state(device_t &owner) : tx_cb(owner) { }
+		ppc4xx_spu_state(device_t &owner) : timer(nullptr), tx_cb(owner) { }
 
-		uint8_t           regs[9];
-		uint8_t           txbuf;
-		uint8_t           rxbuf;
+		void clear()
+		{
+			std::fill(std::begin(regs), std::end(regs), 0);
+			txbuf = rxbuf = 0;
+			std::fill(std::begin(rxbuffer), std::end(rxbuffer), 0);
+			rxin = rxout = 0;
+		}
+
+		uint8_t         regs[9];
+		uint8_t         txbuf;
+		uint8_t         rxbuf;
 		emu_timer *     timer;
-		uint8_t           rxbuffer[256];
-		uint32_t          rxin, rxout;
+		uint8_t         rxbuffer[256];
+		uint32_t        rxin, rxout;
 		write8smo_delegate tx_cb;
 	};
 
@@ -492,8 +501,8 @@ protected:
 	emu_timer *     m_fit_timer;
 	emu_timer *     m_pit_timer;
 	emu_timer *     m_wdog_timer;
-	uint32_t          m_pit_reload;
-	uint32_t          m_irqstate;
+	uint32_t        m_pit_reload;
+	uint32_t        m_irqstate;
 	emu_timer *     m_buffered_dma_timer[4];
 	int             m_buffered_dma_rate[4];
 
@@ -693,9 +702,6 @@ private:
 //{
 //public:
 //  ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-//
-//protected:
-//  virtual uint32_t execute_input_lines() const noexcept { return 8; }
 //};
 //
 //
@@ -703,9 +709,6 @@ private:
 //{
 //public:
 //  ppc405_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-//
-//protected:
-//  virtual uint32_t execute_input_lines() const noexcept { return 8; }
 //};
 
 
@@ -783,11 +786,10 @@ public:
 	uint8_t ppc4xx_spu_r(offs_t offset);
 	void ppc4xx_spu_w(offs_t offset, uint8_t data);
 
-	void internal_ppc4xx(address_map &map);
+	void internal_ppc4xx(address_map &map) ATTR_COLD;
 protected:
 	ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor);
 
-	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_set_input(int inputnum, int state) override;
 };
 

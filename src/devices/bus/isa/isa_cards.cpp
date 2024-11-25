@@ -105,8 +105,6 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("ega", ISA8_EGA);
 	device.option_add("pgc", ISA8_PGC);
 	device.option_add("vga", ISA8_VGA);
-	device.option_add("svga_et4k", ISA8_SVGA_ET4K);
-	device.option_add("svga_et4k_kasan16", ISA8_SVGA_ET4K_KASAN16);
 	device.option_add("wd90c90_jk", ISA8_WD90C90_JK);
 	device.option_add("num9rev",ISA8_NUM_9_REV);
 	device.option_add("com", ISA8_COM);
@@ -160,8 +158,6 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("ega", ISA8_EGA);
 	device.option_add("pgc", ISA8_PGC);
 	device.option_add("vga", ISA8_VGA);
-	device.option_add("svga_et4k", ISA8_SVGA_ET4K);
-	device.option_add("svga_et4k_kasan16", ISA8_SVGA_ET4K_KASAN16);
 	device.option_add("wd90c90_jk", ISA8_WD90C90_JK);
 	device.option_add("num9rev",ISA8_NUM_9_REV);
 	device.option_add("com", ISA8_COM);
@@ -211,9 +207,6 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("gus",ISA16_GUS);
 	device.option_add("sblaster_16", ISA16_SOUND_BLASTER_16);
 	device.option_add("svga_s3", ISA16_SVGA_S3);
-	device.option_add("s3virge", ISA16_S3VIRGE);
-	device.option_add("s3virgedx", ISA16_S3VIRGEDX);
-	device.option_add("dms3d2kp", ISA16_DMS3D2KPRO);
 	device.option_add("svga_dm",ISA16_SVGA_CIRRUS);
 	device.option_add("clgd542x",ISA16_SVGA_CIRRUS_GD542X);
 	device.option_add("gfxultra", ISA16_VGA_GFXULTRA);
@@ -222,6 +215,9 @@ void pc_isa16_cards(device_slot_interface &device)
 //  device.option_add("tgui9680",ISA16_SVGA_TGUI9680);
 	device.option_add("pvga1a", ISA16_PVGA1A);
 	device.option_add("pvga1a_jk", ISA16_PVGA1A_JK);
+	device.option_add("svga_et4k", ISA16_SVGA_ET4K);
+	device.option_add("svga_et4k_kasan16", ISA16_SVGA_ET4K_KASAN16);
+	device.option_add("svga_et4kw32i", ISA16_SVGA_ET4K_W32I);
 	device.option_add("wd90c00_jk", ISA16_WD90C00_JK);
 	device.option_add("wd90c11_lr", ISA16_WD90C11_LR);
 	device.option_add("wd90c30_lr", ISA16_WD90C30_LR);

@@ -12,7 +12,7 @@
 
 #define LOGWARN(...)           LOGMASKED(LOG_WARN, __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(ATI_VGA,    ati_vga_device,    "ati_vga",    "ATi VGA")
+DEFINE_DEVICE_TYPE(ATI_VGA,    ati_vga_device,    "ati_vga",    "ATi VGA i/f")
 
 ati_vga_device::ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ati_vga_device(mconfig, ATI_VGA, tag, owner, clock)

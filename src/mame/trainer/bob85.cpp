@@ -48,8 +48,8 @@ public:
 	void bob85(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	uint8_t bob85_keyboard_r();
 	void bob85_7seg_w(offs_t offset, uint8_t data);
 	void sod_w(int state);
@@ -59,7 +59,7 @@ private:
 	uint8_t m_count_key = 0;
 	u16 m_casscnt = 0;
 	bool m_cassold = false, m_cassbit = false;
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_ioport m_line0;

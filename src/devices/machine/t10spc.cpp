@@ -97,7 +97,7 @@ void t10spc::ReadData( uint8_t *data, int dataLength )
 		if (command[4] == 0)
 		{
 			data[0] = m_sense_asc & 0x7f;
-			put_u24be(&data[1], m_sense_information);
+			put_u24be(&data[1], m_sense_information & 0x1fffff);
 		}
 		else
 		{

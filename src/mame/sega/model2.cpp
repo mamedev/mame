@@ -1623,7 +1623,7 @@ u8 model2_state::in0_r()
 */
 
 // Used by Sega Rally and Daytona USA, others might be different
-CUSTOM_INPUT_MEMBER(model2_state::daytona_gearbox_r)
+ioport_value model2_state::daytona_gearbox_r()
 {
 	u8 res = m_gears.read_safe(0);
 	int i;
@@ -1746,7 +1746,7 @@ static INPUT_PORTS_START( daytona )
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON9)  PORT_NAME("VR4 (Green)")
 	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(model2_state, daytona_gearbox_r)
+	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(FUNC(model2_state::daytona_gearbox_r))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_MODIFY("IN2")
@@ -1885,7 +1885,7 @@ static INPUT_PORTS_START( srallyc )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(model2_state, daytona_gearbox_r)
+	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(model2_state::daytona_gearbox_r))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
 	PORT_MODIFY("IN2")
@@ -2544,7 +2544,7 @@ void model2o_state::model2o(machine_config &config)
 	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
 	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 16_MHz_XTAL / 2 / 16)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
@@ -4548,7 +4548,7 @@ ROM_START( stcc ) /* Sega Touring Car Championship, Model 2C - Defaults to Japan
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP("epr-19274.31", 0x000000, 0x020000, CRC(2dcc08ae) SHA1(bad26e2c994f2d4db5d9be0e34cf21a8bf5aa7e9) )
 
-	ROM_REGION( 0x20000, "mpegcpu", 0) // Z80 DSB program
+	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0) // Z80 DSB program
 	ROM_LOAD("epr-19275.2s", 0x000000,  0x20000, CRC(ee809d3f) SHA1(347080858fbfe9955002f382603a1b86a52d26d5) )
 
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
@@ -4558,7 +4558,7 @@ ROM_START( stcc ) /* Sega Touring Car Championship, Model 2C - Defaults to Japan
 	ROM_LOAD16_WORD_SWAP("mpr-19259.32", 0x000000, 0x400000, CRC(4d55dbfc) SHA1(6e57e6e6e785b0f14bb5e221a44d518dbde7ad65) )
 	ROM_LOAD16_WORD_SWAP("mpr-19261.34", 0x400000, 0x400000, CRC(b88878ff) SHA1(4bebcfba68b0cc2fa0bcacfaaf2d2e8af3625c5d) )
 
-	ROM_REGION( 0x800000, "mpeg", 0 ) // MPEG audio data
+	ROM_REGION( 0x800000, "dsbz80:mpeg", 0 ) // MPEG audio data
 	ROM_LOAD("mpr-19262.57s", 0x000000, 0x200000, CRC(922aed7a) SHA1(8d6872bdd46eaf2076c10d18c10af8ccbd3b10e8) )
 	ROM_LOAD("mpr-19263.58s", 0x200000, 0x200000, CRC(a256f4cd) SHA1(a17b49050f1ecf1970477b12201cc3b58b31d89c) )
 	ROM_LOAD("mpr-19264.59s", 0x400000, 0x200000, CRC(b6c51d0f) SHA1(9e0969a1e49ec1462f69cd0f0f9ce630d66174ce) )
@@ -4613,7 +4613,7 @@ ROM_START( stccb ) /* Sega Touring Car Championship Revision B, Model 2C - Defau
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP("epr-19274.31", 0x000000, 0x020000, CRC(2dcc08ae) SHA1(bad26e2c994f2d4db5d9be0e34cf21a8bf5aa7e9) )
 
-	ROM_REGION( 0x20000, "mpegcpu", 0) // Z80 DSB program
+	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0) // Z80 DSB program
 	ROM_LOAD("epr-19275.2s", 0x000000,  0x20000, CRC(ee809d3f) SHA1(347080858fbfe9955002f382603a1b86a52d26d5) )
 
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
@@ -4623,7 +4623,7 @@ ROM_START( stccb ) /* Sega Touring Car Championship Revision B, Model 2C - Defau
 	ROM_LOAD16_WORD_SWAP("mpr-19259.32", 0x000000, 0x400000, CRC(4d55dbfc) SHA1(6e57e6e6e785b0f14bb5e221a44d518dbde7ad65) )
 	ROM_LOAD16_WORD_SWAP("mpr-19261.34", 0x400000, 0x400000, CRC(b88878ff) SHA1(4bebcfba68b0cc2fa0bcacfaaf2d2e8af3625c5d) )
 
-	ROM_REGION( 0x800000, "mpeg", 0 ) // MPEG audio data
+	ROM_REGION( 0x800000, "dsbz80:mpeg", 0 ) // MPEG audio data
 	ROM_LOAD("mpr-19262.57s", 0x000000, 0x200000, CRC(922aed7a) SHA1(8d6872bdd46eaf2076c10d18c10af8ccbd3b10e8) )
 	ROM_LOAD("mpr-19263.58s", 0x200000, 0x200000, CRC(a256f4cd) SHA1(a17b49050f1ecf1970477b12201cc3b58b31d89c) )
 	ROM_LOAD("mpr-19264.59s", 0x400000, 0x200000, CRC(b6c51d0f) SHA1(9e0969a1e49ec1462f69cd0f0f9ce630d66174ce) )
@@ -4678,7 +4678,7 @@ ROM_START( stcca ) /* Sega Touring Car Championship Revision A, Model 2C - Defau
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP("epr-19274.31", 0x000000, 0x020000, CRC(2dcc08ae) SHA1(bad26e2c994f2d4db5d9be0e34cf21a8bf5aa7e9) )
 
-	ROM_REGION( 0x20000, "mpegcpu", 0) // Z80 DSB program
+	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0) // Z80 DSB program
 	ROM_LOAD("epr-19275.2s", 0x000000,  0x20000, CRC(ee809d3f) SHA1(347080858fbfe9955002f382603a1b86a52d26d5) )
 
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
@@ -4688,7 +4688,7 @@ ROM_START( stcca ) /* Sega Touring Car Championship Revision A, Model 2C - Defau
 	ROM_LOAD16_WORD_SWAP("mpr-19259.32", 0x000000, 0x400000, CRC(4d55dbfc) SHA1(6e57e6e6e785b0f14bb5e221a44d518dbde7ad65) )
 	ROM_LOAD16_WORD_SWAP("mpr-19261.34", 0x400000, 0x400000, CRC(b88878ff) SHA1(4bebcfba68b0cc2fa0bcacfaaf2d2e8af3625c5d) )
 
-	ROM_REGION( 0x800000, "mpeg", 0 ) // MPEG audio data
+	ROM_REGION( 0x800000, "dsbz80:mpeg", 0 ) // MPEG audio data
 	ROM_LOAD("mpr-19262.57s", 0x000000, 0x200000, CRC(922aed7a) SHA1(8d6872bdd46eaf2076c10d18c10af8ccbd3b10e8) )
 	ROM_LOAD("mpr-19263.58s", 0x200000, 0x200000, CRC(a256f4cd) SHA1(a17b49050f1ecf1970477b12201cc3b58b31d89c) )
 	ROM_LOAD("mpr-19264.59s", 0x400000, 0x200000, CRC(b6c51d0f) SHA1(9e0969a1e49ec1462f69cd0f0f9ce630d66174ce) )
@@ -4743,7 +4743,7 @@ ROM_START( stcco ) /* Sega Touring Car Championship, Model 2C - Defaults to Japa
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP("epr-19274.31", 0x000000, 0x020000, CRC(2dcc08ae) SHA1(bad26e2c994f2d4db5d9be0e34cf21a8bf5aa7e9) )
 
-	ROM_REGION( 0x20000, "mpegcpu", 0) // Z80 DSB program
+	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0) // Z80 DSB program
 	ROM_LOAD("epr-19275.2s", 0x000000,  0x20000, CRC(ee809d3f) SHA1(347080858fbfe9955002f382603a1b86a52d26d5) )
 
 	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
@@ -4753,7 +4753,7 @@ ROM_START( stcco ) /* Sega Touring Car Championship, Model 2C - Defaults to Japa
 	ROM_LOAD16_WORD_SWAP("mpr-19259.32", 0x000000, 0x400000, CRC(4d55dbfc) SHA1(6e57e6e6e785b0f14bb5e221a44d518dbde7ad65) )
 	ROM_LOAD16_WORD_SWAP("mpr-19261.34", 0x400000, 0x400000, CRC(b88878ff) SHA1(4bebcfba68b0cc2fa0bcacfaaf2d2e8af3625c5d) )
 
-	ROM_REGION( 0x800000, "mpeg", 0 ) // MPEG audio data
+	ROM_REGION( 0x800000, "dsbz80:mpeg", 0 ) // MPEG audio data
 	ROM_LOAD("mpr-19262.57s", 0x000000, 0x200000, CRC(922aed7a) SHA1(8d6872bdd46eaf2076c10d18c10af8ccbd3b10e8) )
 	ROM_LOAD("mpr-19263.58s", 0x200000, 0x200000, CRC(a256f4cd) SHA1(a17b49050f1ecf1970477b12201cc3b58b31d89c) )
 	ROM_LOAD("mpr-19264.59s", 0x400000, 0x200000, CRC(b6c51d0f) SHA1(9e0969a1e49ec1462f69cd0f0f9ce630d66174ce) )
@@ -4989,7 +4989,7 @@ ROM_START( hotdp )
 	ROM_LOAD32_WORD("tgp5.23", 0x1000002, 0x400000, CRC(29f311f3) SHA1(2f89767aaefeb2650091b37c4d505701681bb375) )
 
 	ROM_REGION( 0x1000000, "textures", 0 ) // Textures, Flash ROM modules instead if DIP ROMs
-	ROM_LOAD32_WORD("tex1.27", 0x0000000, 0x400000, BAD_DUMP CRC(86ef3ee4) SHA1(8ad2aa98d94e9a4f1abb61a02aba95064e533a61) ) // one of flash ROMs had broken most significant address pin, dump contains only half of even-bytes data mirrored 2x, correct sum should be 28DA
+	ROM_LOAD32_WORD("tex1.27", 0x0000000, 0x400000, CRC(eea00bdf) SHA1(5e04c19b544c6483252adaba3c92080d4750fde0) )
 	ROM_LOAD32_WORD("tex0.25", 0x0000002, 0x400000, CRC(fb10366a) SHA1(189389f84fa5f04c586953c54254f7bd09dd8d92) )
 	ROM_LOAD32_WORD("tex3.28", 0x0800000, 0x400000, CRC(9a61d7e8) SHA1(d9a563f74e485df5bdf149afaed69811b5536712) )
 	ROM_LOAD32_WORD("tex2.26", 0x0800002, 0x400000, CRC(84ec2923) SHA1(daea23864fbc48c14177e77cd783f73621472708) )
@@ -6733,8 +6733,8 @@ ROM_START( daytona93 ) /* Daytona USA, Deluxe cabinet, '93 version, ROM board ID
 	ROM_LOAD( "epr-16726.bin", 0x000000, 0x020000, CRC(c179b8c7) SHA1(86d3e65c77fb53b1d380b629348f4ab5b3d39228) )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
-	ROM_LOAD16_WORD_SWAP("epr-16720.7", 0x000000, 0x020000, CRC(8e73cffd) SHA1(9933ccc0757e8c86e0adb938d1c89210b26841ea) )
-	ROM_LOAD16_WORD_SWAP("epr-16721.8", 0x020000, 0x020000, CRC(1bb3b7b7) SHA1(ee2fd1480e535fc37e9932e6fe4e31344559fc87) )
+	ROM_LOAD16_WORD_SWAP("epr-16489.7", 0x000000, 0x020000, CRC(c20e543e) SHA1(ab5bf3c6d82c08317d6be73729185ce54963aa8a) )
+	ROM_LOAD16_WORD_SWAP("epr-16490.8", 0x020000, 0x020000, CRC(c24edaab) SHA1(693e9fdf958a90c722a78daf48140788fa6a2f30) )
 
 	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) // Samples
 	ROM_LOAD("mpr-16491.32", 0x000000, 0x200000, CRC(89920903) SHA1(06d1d55470ae99f8de0f8c88c694f34c4eb13668) )
@@ -7200,9 +7200,9 @@ ROM_START( desert ) /* Desert Tank, Model 2, Sega Game ID# 833-11002, ROM board 
 
 	ROM_REGION( 0x800000, "polygons", 0 ) // Models
 	ROM_LOAD32_WORD("mpr-16968.16", 0x000000, 0x200000, CRC(4a16f465) SHA1(411214ed65ce966040d4299b50bfaa40f7f5f266) )
-	ROM_LOAD32_WORD("mpr-16964.21", 0x000002, 0x200000, CRC(d4a769b6) SHA1(845c34f95a49e06e3996b0c67aa73b4886fa8996) )
+	ROM_LOAD32_WORD("mpr-16964.20", 0x000002, 0x200000, CRC(d4a769b6) SHA1(845c34f95a49e06e3996b0c67aa73b4886fa8996) )
 	ROM_LOAD32_WORD("mpr-16969.17", 0x400000, 0x200000, CRC(887380ac) SHA1(03a9f601764d06cb0b2daaadf4f8433f327abd4a) )
-	ROM_LOAD32_WORD("mpr-16965.20", 0x400002, 0x200000, CRC(9ba7645f) SHA1(c04f369961f908bac16fad8e32b863202390c205) )
+	ROM_LOAD32_WORD("mpr-16965.21", 0x400002, 0x200000, CRC(9ba7645f) SHA1(c04f369961f908bac16fad8e32b863202390c205) )
 
 	ROM_REGION( 0x1000000, "textures", 0 ) // Textures
 	ROM_LOAD32_WORD("mpr-16967.25", 0x000000, 0x200000, CRC(b8b84c9d) SHA1(00ef320988609e98c8af383b68d845e3be8d0a03) )
@@ -7459,7 +7459,7 @@ GAME( 1997, zeroguna,   zerogun,  zeroguna,     zerogun,   model2a_state, init_z
 GAME( 1997, zerogunaj,  zerogun,  zeroguna,     zerogun,   model2a_state, init_zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, motoraid,   0,        manxtt,       motoraid,  model2a_state, empty_init,    ROT0, "Sega",   "Motor Raid - Twin", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, motoraiddx, motoraid, manxtt,       motoraid,  model2a_state, empty_init,    ROT0, "Sega",   "Motor Raid - Twin/DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, airwlkrs,   0,        model2a,      vf2,       model2a_state, empty_init,    ROT0, "Data East", "Air Walkers", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, airwlkrs,   0,        model2a,      vf2,       model2a_state, empty_init,    ROT0, "Data East Corporation", "Air Walkers", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dynamcop,   0,        model2a_5881, dynamcop,  model2a_state, empty_init,    ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndeka2,   dynamcop, model2a_5881, dynamcop,  model2a_state, empty_init,    ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkidsa,   pltkids,  model2a_5881, pltkids,   model2a_state, init_pltkids,  ROT0, "Psikyo", "Pilot Kids (Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

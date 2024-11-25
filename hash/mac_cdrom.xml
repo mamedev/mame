@@ -6,6 +6,7 @@ license:CC0-1.0
 Compatibility tags:
 MC68000 - 68000 CPU
 MC68020 - 68020 CPU
+MC68020_32 - 68020 CPU with 32-bit clean ROMs (orignal LC)
 MC68030 - 68030 CPU
 MC68030_32 - 68030 CPU with 32-bit clean ROMs (IIci and later)
 MC68040 - 68040 CPU
@@ -20,11 +21,49 @@ PPC750 - PowerPC 750 (G3) CPU
 		<description>Apple Legacy Recovery</description>
 		<year>1998</year>
 		<publisher>Apple</publisher>
-		<info name="usage" value="Runs on any 68030 with 32-bit clean ROMs, 68040, or PowerPC" />
-		<sharedfeat name="compatibility" value="MC68030_32,MC68040,PPC601,PPC603,PPC604" />
+		<info name="usage" value="Runs on any 68020+ with 32-bit clean ROMs, 68040, or PowerPC" />
+		<sharedfeat name="compatibility" value="MC68020_32,MC68030_32,MC68040,PPC601,PPC603,PPC604" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="aplegrec" sha1="888ceee315e0f11f9a5f1a0db527f296470c80ea"/>
+			</diskarea>
+		</part>
+	</software>
+	<!-- Chex Quest duplicated in ibm5170_cdrom.xml -->
+	<software name="chexquest">
+		<description>Chex Quest</description>
+		<year>1996</year>
+		<publisher>General Mills</publisher>
+		<info name="developer" value="Digital Café" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="chex quest" sha1="c90476cc54dfee86bf358c2eb06091ac5859d63a" />
+			</diskarea>
+		</part>
+	</software>
+	<software name="hexen">
+		<description>Hexen: Beyond Heretic</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="Raven Software" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="hexen" sha1="5a77d58f1a7e648779d681ca9136539104e8b6ae" />
+			</diskarea>
+		</part>
+	</software>
+	<software name="idanthol">
+		<description>id Anthology</description>
+		<year>1996</year>
+		<publisher>id Software</publisher>
+		<notes><![CDATA[
+		Discs 1, 2, 3 are in the ibm5170_cdrom.xml software list as they are PC software.
+		]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<part name="cdrom4" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 4) (Mac)" sha1="d9c3e998e17fa56fcb5abbdd0a924de78dacb2e8" />
 			</diskarea>
 		</part>
 	</software>
@@ -87,8 +126,8 @@ PPC750 - PowerPC 750 (G3) CPU
 		<description>Mac OS 7.6 (US English)</description>
 		<year>1997</year>
 		<publisher>Apple</publisher>
-		<info name="usage" value="Runs on any 68030 with 32-bit clean ROMs, 68040, or PowerPC" />
-		<sharedfeat name="compatibility" value="MC68030_32,MC68040,PPC601,PPC603,PPC604" />
+		<info name="usage" value="Runs on any 68020+ with 32-bit clean ROMs, 68040, or PowerPC" />
+		<sharedfeat name="compatibility" value="MC68020_32,MC68030_32,MC68040,PPC601,PPC603,PPC604" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mac76" sha1="dd400ae4776f9258dbebc2a5d06ce58e7a10d54f"/>
@@ -99,8 +138,8 @@ PPC750 - PowerPC 750 (G3) CPU
 		<description>Mac OS 7.6 (German)</description>
 		<year>1997</year>
 		<publisher>Apple</publisher>
-		<info name="usage" value="Runs on any 68030 with 32-bit clean ROMs, 68040, or PowerPC" />
-		<sharedfeat name="compatibility" value="MC68030_32,MC68040,PPC601,PPC603,PPC604" />
+		<info name="usage" value="Runs on any 68020+ with 32-bit clean ROMs, 68040, or PowerPC" />
+		<sharedfeat name="compatibility" value="MC68020_32,MC68030_32,MC68040,PPC601,PPC603,PPC604" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mac76_de" sha1="b5a0d5a826a130808c07473f78fe205d92eb3151"/>
@@ -111,8 +150,8 @@ PPC750 - PowerPC 750 (G3) CPU
 		<description>Mac OS 7.6.1 (US English)</description>
 		<year>1997</year>
 		<publisher>Apple</publisher>
-		<info name="usage" value="Runs on any 68030 with 32-bit clean ROMs, 68040, or PowerPC" />
-		<sharedfeat name="compatibility" value="MC68030_32,MC68040,PPC601,PPC603,PPC604" />
+		<info name="usage" value="Runs on any 68020+ with 32-bit clean ROMs, 68040, or PowerPC" />
+		<sharedfeat name="compatibility" value="MC68020_32,MC68030_32,MC68040,PPC601,PPC603,PPC604" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mac761" sha1="ce0c2c7810be05a033c80cdf36bae0e5a5b3d22a"/>
@@ -143,6 +182,18 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+	<!-- Mac OS 7.0.1-9.x -->
+	<software name="mfma_addsub">
+		<description>My First Math Adventure: Adding and Subtracting</description>
+		<year>1998</year>
+		<publisher>Global Software Publishing</publisher>
+		<info name="developer" value="Dorling Kindersley" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="my first math adventure - adding and subtracting" sha1="860fe59ec122aff801de2c724e40a5f0045f88be" />
+			</diskarea>
+		</part>
+	</software>
 	<software name="pwrmaccd">
 		<description>Power Macintosh 6100/7100/8100 CD (System Software 7.1.2P) (US English)</description>
 		<year>1994</year>
@@ -152,6 +203,17 @@ PPC750 - PowerPC 750 (G3) CPU
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pwrmaccd" sha1="8fd11f42298af430a4b7e3b056336f2e6eec5ce2"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="ultdoom">
+		<description>The Ultimate Doom</description>
+		<year>1995</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ultimate doom" sha1="145cbe5e43e7d4eb223602e7be6009e09c051f94" />
 			</diskarea>
 		</part>
 	</software>

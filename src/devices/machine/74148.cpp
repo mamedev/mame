@@ -41,7 +41,7 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "machine/74148.h"
+#include "74148.h"
 
 
 DEFINE_DEVICE_TYPE(TTL74148, ttl74148_device, "74148", "74148 TTL")

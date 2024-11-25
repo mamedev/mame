@@ -99,8 +99,8 @@ protected:
 
 	void mpu12_base(machine_config &config);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
 	TIMER_CALLBACK_MEMBER(change_pia2a_bit7);
@@ -115,7 +115,7 @@ protected:
 	void meter_tick_w(int meter, bool state);
 	void coin_lockout_w(bool state);
 
-	void mpu1_map(address_map &map);
+	void mpu1_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_lamp_relay;
 	lamp_flags m_lamp_flags_pia2b[8];
@@ -189,7 +189,7 @@ public:
 	void mpu2_em_lg(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	template <unsigned Digit> TIMER_DEVICE_CALLBACK_MEMBER(clear_digit) { m_digits[Digit] = 0; };
 
@@ -203,7 +203,7 @@ private:
 	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset] = data & 0xf; }
 	virtual void update_pia_lamps() override;
 
-	void mpu2_em_map(address_map &map);
+	void mpu2_em_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_disp_digit;
 
@@ -233,7 +233,7 @@ public:
 	void mpu2_stepper_triple(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	template <unsigned N> void opto_cb(int state) { m_optos[N] = state; }
@@ -251,7 +251,7 @@ private:
 	void reel_w(int reel, uint8_t data);
 	virtual void update_pia_lamps() override;
 
-	void mpu2_stepper_map(address_map &map);
+	void mpu2_stepper_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_optos[3];
 	uint8_t m_reel1;
@@ -763,24 +763,24 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( coin_5p_10p_10pt_50p )
 	PORT_MODIFY("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 0) PORT_IMPULSE(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 1) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("10p Token") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 2) PORT_IMPULSE(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 3) PORT_IMPULSE(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 0) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 1) PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("10p Token") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 2) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 3) PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( coin_10p_10pt_50p )
 	PORT_MODIFY("COIN")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 1) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p Token") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 2) PORT_IMPULSE(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 3) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 1) PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p Token") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 2) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 3) PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( coin_dutch )
 	PORT_MODIFY("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Fl 0,25") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 0) PORT_IMPULSE(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Fl 1") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 1) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Fl 2,50") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 2) PORT_IMPULSE(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Fl 0,25") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 0) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Fl 1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 1) PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Fl 2,50") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 2) PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( m_gndgit )

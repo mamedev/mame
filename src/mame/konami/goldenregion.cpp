@@ -65,9 +65,9 @@ public:
 	void gs761(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int i);
 
@@ -97,7 +97,7 @@ private:
 	K053246_CB_MEMBER(sprite_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	void gs761_map(address_map &map);
+	void gs761_map(address_map &map) ATTR_COLD;
 
 	static constexpr int NUM_LAYERS = 4;
 };

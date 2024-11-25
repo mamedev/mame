@@ -116,8 +116,7 @@ void vrc4373_device::device_start()
 	pci_host_device::device_start();
 
 	m_cpu_space = &m_cpu->space(AS_PCI_CONFIG);
-	memory_space = &space(AS_PCI_MEM);
-	io_space = &space(AS_PCI_IO);
+	set_spaces(&space(AS_PCI_MEM), &space(AS_PCI_IO));
 	is_multifunction_device = false;
 
 	std::fill(std::begin(m_cpu_regs), std::end(m_cpu_regs), 0);

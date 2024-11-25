@@ -28,9 +28,9 @@ public:
 	void zaccaria(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t dsw_r();
@@ -43,7 +43,6 @@ private:
 	uint8_t read_attr(offs_t offset, int which);
 	void update_colscroll();
 	void flip_screen_x_w(int state);
-	void flip_screen_y_w(int state);
 	void dsw_sel_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
@@ -51,7 +50,7 @@ private:
 	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, int color, int section);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device>                 m_maincpu;
 	required_device<gfxdecode_device>           m_gfxdecode;

@@ -314,7 +314,7 @@ public:
 	std::vector<std::unique_ptr<cheat_entry>> const &entries() const { return m_cheatlist; }
 
 	// setters
-	void set_enable(bool enable);
+	void set_enable(bool enable, bool show);
 
 	// actions
 	void reload();

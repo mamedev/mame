@@ -416,7 +416,7 @@ static const char *const monsterb_sample_names[] =
 monsterb_sound_device::monsterb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MONSTERB_SOUND, tag, owner, clock)
 	, m_audiocpu(*this, "audiocpu")
-	, m_audiocpu_region(*this, "n7751")
+	, m_audiocpu_region(*this, "upd7751")
 	, m_music(*this, "music")
 	, m_samples(*this, "samples")
 	, m_i8243(*this, "i8243")
@@ -425,8 +425,8 @@ monsterb_sound_device::monsterb_sound_device(const machine_config &mconfig, cons
 
 void monsterb_sound_device::device_start()
 {
-	save_item(NAME(m_n7751_command));
-	save_item(NAME(m_n7751_busy));
+	save_item(NAME(m_upd7751_command));
+	save_item(NAME(m_upd7751_busy));
 	save_item(NAME(m_sound_state));
 	save_item(NAME(m_sound_addr));
 }
@@ -474,17 +474,17 @@ void monsterb_sound_device::sound_b_w(uint8_t data)
 
 /*************************************
  *
- *  N7751 connections
+ *  D7751 connections
  *
  *************************************/
 
-uint8_t monsterb_sound_device::n7751_status_r()
+uint8_t monsterb_sound_device::upd7751_status_r()
 {
-	return m_n7751_busy << 4;
+	return m_upd7751_busy << 4;
 }
 
 
-void monsterb_sound_device::n7751_command_w(uint8_t data)
+void monsterb_sound_device::upd7751_command_w(uint8_t data)
 {
 	/*
 	    Z80 7751 control port
@@ -492,14 +492,14 @@ void monsterb_sound_device::n7751_command_w(uint8_t data)
 	    D0-D2 = connected to 7751 port C
 	    D3    = /INT line
 	*/
-	m_n7751_command = data & 0x07;
+	m_upd7751_command = data & 0x07;
 	m_audiocpu->set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
 	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 
 template<int Shift>
-void monsterb_sound_device::n7751_rom_addr_w(uint8_t data)
+void monsterb_sound_device::upd7751_rom_addr_w(uint8_t data)
 {
 	// P4 - address lines 0-3
 	// P5 - address lines 4-7
@@ -508,7 +508,7 @@ void monsterb_sound_device::n7751_rom_addr_w(uint8_t data)
 }
 
 
-void monsterb_sound_device::n7751_rom_select_w(uint8_t data)
+void monsterb_sound_device::upd7751_rom_select_w(uint8_t data)
 {
 	// P7 - ROM selects
 	m_sound_addr &= 0xfff;
@@ -521,29 +521,29 @@ void monsterb_sound_device::n7751_rom_select_w(uint8_t data)
 }
 
 
-uint8_t monsterb_sound_device::n7751_rom_r()
+uint8_t monsterb_sound_device::upd7751_rom_r()
 {
 	/* read from BUS */
 	return m_audiocpu_region->base()[m_sound_addr];
 }
 
 
-uint8_t monsterb_sound_device::n7751_command_r()
+uint8_t monsterb_sound_device::upd7751_command_r()
 {
 	/* read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048) */
 	/* bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used */
-	return 0x80 | ((m_n7751_command & 0x07) << 4);
+	return 0x80 | ((m_upd7751_command & 0x07) << 4);
 }
 
 
-void monsterb_sound_device::n7751_p2_w(uint8_t data)
+void monsterb_sound_device::upd7751_p2_w(uint8_t data)
 {
 	/* write to P2; low 4 bits go to 8243 */
 	m_i8243->p2_w(data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
-	m_n7751_busy = data >> 7;
+	m_upd7751_busy = data >> 7;
 }
 
 
@@ -557,19 +557,19 @@ void monsterb_sound_device::n7751_p2_w(uint8_t data)
 void monsterb_sound_device::device_add_mconfig(machine_config &config)
 {
 	/* basic machine hardware */
-	N7751(config, m_audiocpu, 6000000);
+	UPD7751(config, m_audiocpu, 6000000);
 	m_audiocpu->t1_in_cb().set_constant(0); // labelled as "TEST", connected to ground
-	m_audiocpu->p2_in_cb().set(FUNC(monsterb_sound_device::n7751_command_r));
-	m_audiocpu->bus_in_cb().set(FUNC(monsterb_sound_device::n7751_rom_r));
+	m_audiocpu->p2_in_cb().set(FUNC(monsterb_sound_device::upd7751_command_r));
+	m_audiocpu->bus_in_cb().set(FUNC(monsterb_sound_device::upd7751_rom_r));
 	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
-	m_audiocpu->p2_out_cb().set(FUNC(monsterb_sound_device::n7751_p2_w));
+	m_audiocpu->p2_out_cb().set(FUNC(monsterb_sound_device::upd7751_p2_w));
 	m_audiocpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
 	I8243(config, m_i8243);
-	m_i8243->p4_out_cb().set(FUNC(monsterb_sound_device::n7751_rom_addr_w<0>));
-	m_i8243->p5_out_cb().set(FUNC(monsterb_sound_device::n7751_rom_addr_w<4>));
-	m_i8243->p6_out_cb().set(FUNC(monsterb_sound_device::n7751_rom_addr_w<8>));
-	m_i8243->p7_out_cb().set(FUNC(monsterb_sound_device::n7751_rom_select_w));
+	m_i8243->p4_out_cb().set(FUNC(monsterb_sound_device::upd7751_rom_addr_w<0>));
+	m_i8243->p5_out_cb().set(FUNC(monsterb_sound_device::upd7751_rom_addr_w<4>));
+	m_i8243->p6_out_cb().set(FUNC(monsterb_sound_device::upd7751_rom_addr_w<8>));
+	m_i8243->p7_out_cb().set(FUNC(monsterb_sound_device::upd7751_rom_select_w));
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(2);

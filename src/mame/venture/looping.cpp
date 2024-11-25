@@ -109,9 +109,9 @@ public:
 	void init_looping();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void flip_screen_x_w(int state);
@@ -142,10 +142,10 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr<uint8_t> m_videoram;

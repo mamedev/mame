@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves, Angelo Salese, David Haywood, Tomasz Slanina, Carlos A. Lozano, Bryan McPhail, Pierpaolo Prazzoli
-#ifndef MAME_VIDEO_SEI021X_SEI0220_SPR_H
-#define MAME_VIDEO_SEI021X_SEI0220_SPR_H
+#ifndef MAME_SEIBU_SEI021X_SEI0220_SPR_H
+#define MAME_SEIBU_SEI021X_SEI0220_SPR_H
 
 #pragma once
 
@@ -35,8 +35,8 @@ public:
 protected:
 	sei0210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual s32 get_coordinate(s32 coordinate)
 	{
@@ -77,4 +77,4 @@ protected:
 DECLARE_DEVICE_TYPE(SEI0210, sei0210_device)
 DECLARE_DEVICE_TYPE(SEI0211, sei0211_device)
 
-#endif // MAME_VIDEO_SEI021X_SEI0220_SPR_H
+#endif // MAME_SEIBU_SEI021X_SEI0220_SPR_H

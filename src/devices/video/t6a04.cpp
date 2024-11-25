@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/t6a04.h"
+#include "t6a04.h"
 
 // devices
 DEFINE_DEVICE_TYPE(T6A04, t6a04_device, "t6a04", "Toshiba T6A04 LCD Controller")

@@ -9,6 +9,7 @@ template<int AddrWidth, int DataWidth, int AddrShift, endianness_t Endian>
 device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::device_rom_interface(const machine_config &mconfig, device_t &device) :
 	device_memory_interface(mconfig, device),
 	m_rom_region(device, DEVICE_SELF),
+	m_rom_space(device, finder_base::DUMMY_TAG, -1),
 	m_rom_config("rom", Endian, 8 << DataWidth, AddrWidth, AddrShift),
 	m_bank(device, "bank"),
 	m_cur_bank(-1)
@@ -108,6 +109,11 @@ template<int AddrWidth, int DataWidth, int AddrShift, endianness_t Endian>
 void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::interface_pre_start()
 {
 	device_memory_interface::interface_pre_start();
+
+	if(m_rom_space.spacenum() != -1) {
+		m_rom_space->cache(m_rom_cache);
+		return;
+	}
 
 	if(!has_space(0))
 		return;

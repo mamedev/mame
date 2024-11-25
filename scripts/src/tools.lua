@@ -469,7 +469,7 @@ includedirs {
 }
 
 defines {
-  "NL_DISABLE_DYNAMIC_LOAD=1",
+	"NL_DISABLE_DYNAMIC_LOAD=1",
 }
 
 files {
@@ -747,7 +747,7 @@ if _OPTIONS["targetos"] == "macosx" then
 		}
 
 		dependency {
-			{ "aueffectutil",  MAME_DIR .. "src/tools/aueffectutil-Info.plist", true  },
+			{ "aueffectutil", MAME_DIR .. "src/tools/aueffectutil-Info.plist", true },
 		}
 
 		links {

@@ -2,7 +2,7 @@
 // detail/impl/handler_tracking.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,7 +29,7 @@
 
 #if defined(ASIO_HAS_BOOST_DATE_TIME)
 # include "asio/time_traits.hpp"
-#elif defined(ASIO_HAS_CHRONO)
+#else // defined(ASIO_HAS_BOOST_DATE_TIME)
 # include "asio/detail/chrono.hpp"
 # include "asio/detail/chrono_time_traits.hpp"
 # include "asio/wait_traits.hpp"
@@ -57,12 +57,12 @@ struct handler_tracking_timestamp
     boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
     boost::posix_time::time_duration now =
       boost::posix_time::microsec_clock::universal_time() - epoch;
-#elif defined(ASIO_HAS_CHRONO)
+#else // defined(ASIO_HAS_BOOST_DATE_TIME)
     typedef chrono_time_traits<chrono::system_clock,
-        asio::wait_traits<chrono::system_clock> > traits_helper;
+        asio::wait_traits<chrono::system_clock>> traits_helper;
     traits_helper::posix_time_duration now(
         chrono::system_clock::now().time_since_epoch());
-#endif
+#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
     seconds = static_cast<uint64_t>(now.total_seconds());
     microseconds = static_cast<uint64_t>(now.total_microseconds() % 1000000);
   }
@@ -365,7 +365,9 @@ void handler_tracking::write_line(const char* format, ...)
   va_start(args, format);
 
   char line[256] = "";
-#if defined(ASIO_HAS_SECURE_RTL)
+#if defined(ASIO_HAS_SNPRINTF)
+  int length = vsnprintf(line, sizeof(line), format, args);
+#elif defined(ASIO_HAS_SECURE_RTL)
   int length = vsprintf_s(line, sizeof(line), format, args);
 #else // defined(ASIO_HAS_SECURE_RTL)
   int length = vsprintf(line, format, args);

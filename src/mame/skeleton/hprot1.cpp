@@ -87,16 +87,16 @@ public:
 	void init_hprot1();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void henry_p1_w(uint8_t data);
 	void henry_p3_w(uint8_t data);
 	void hprot1_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
-	void i80c31_io(address_map &map);
-	void i80c31_prg(address_map &map);
+	void i80c31_io(address_map &map) ATTR_COLD;
+	void i80c31_prg(address_map &map) ATTR_COLD;
 
 	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
@@ -272,7 +272,7 @@ void hprot1_state::hprot1(machine_config &config)
 	PALETTE(config, "palette", FUNC(hprot1_state::hprot1_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_hprot1);
 
-	HD44780(config, m_lcdc, 250'000); /* TODO: clock not measured, datasheet typical clock used */
+	HD44780(config, m_lcdc, 270'000); /* TODO: clock not measured, datasheet typical clock used */
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(hprot1_state::hprot1_pixel_update));
 

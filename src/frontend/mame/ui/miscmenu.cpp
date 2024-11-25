@@ -200,19 +200,21 @@ bool menu_network_devices::handle(event const *ev)
 	}
 	else if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 	{
+		// FIXME: this conflates presumably arbitrary interface ID numbers with 0-based indices
 		device_network_interface *const network = (device_network_interface *)ev->itemref;
+		auto const &interfaces = get_netdev_list();
 		int curr = network->get_interface();
 		if (ev->iptkey == IPT_UI_LEFT)
 			curr--;
 		else
 			curr++;
 		if (curr == -2)
-			curr = netdev_count() - 1;
+			curr = interfaces.size() - 1;
 		network->set_interface(curr);
 
 		curr = network->get_interface();
 		const char *title = nullptr;
-		for (auto &entry : get_netdev_list())
+		for (auto &entry : interfaces)
 		{
 			if (entry->id == curr)
 			{
@@ -309,7 +311,7 @@ bool menu_bookkeeping::handle(event const *ev)
 	}
 	else
 	{
-		return ev && handle_key(ev->iptkey);
+		return menu_textbox::handle(ev);
 	}
 }
 

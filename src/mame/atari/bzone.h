@@ -40,15 +40,15 @@ protected:
 	void bzone_coin_counter_w(offs_t offset, uint8_t data);
 	uint8_t analog_data_r();
 	void analog_select_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(bzone_interrupt);
 	void bzone_sounds_w(uint8_t data);
 
 	void bzone_base(machine_config &config);
 	void bzone_audio(machine_config &config);
-	void bzone_map(address_map &map);
-	void bradley_map(address_map &map);
-	void dsrtwars_map(address_map &map);
+	void bzone_map(address_map &map) ATTR_COLD;
+	void bradley_map(address_map &map) ATTR_COLD;
+	void dsrtwars_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
@@ -80,10 +80,10 @@ protected:
 	void earom_write(offs_t offset, uint8_t data);
 	void earom_control_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void redbaron_map(address_map &map);
+	void redbaron_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<er2055_device> m_earom;

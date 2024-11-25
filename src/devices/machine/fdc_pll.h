@@ -17,8 +17,8 @@ public:
 
 	attotime write_start_time;
 	attotime write_buffer[32];
-	int write_position;
-	int freq_hist;
+	int write_position = 0;
+	int freq_hist = 0;
 
 	void set_clock(const attotime &period);
 	void reset(const attotime &when);

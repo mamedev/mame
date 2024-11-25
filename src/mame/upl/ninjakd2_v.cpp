@@ -61,13 +61,13 @@ TILE_GET_INFO_MEMBER(mnight_state::mnight_get_bg_tile_info)
 
 TILEMAP_MAPPER_MEMBER(robokid_state::robokid_bg_scan)
 {
-	/* logical (col,row) -> memory offset */
+	// logical (col,row) -> memory offset
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x10) << 5);
 }
 
 TILEMAP_MAPPER_MEMBER(omegaf_state::omegaf_bg_scan)
 {
-	/* logical (col,row) -> memory offset */
+	// logical (col,row) -> memory offset
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x70) << 5);
 }
 
@@ -99,8 +99,8 @@ void ninjakd2_state::video_init_common()
 
 	m_screen->register_screen_bitmap(m_sprites_bitmap);
 
-	m_sprites_updated = 0;
-	m_robokid_sprites = 0;
+	m_sprites_updated = false;
+	m_robokid_sprites = false;
 	m_vram_bank_mask = 0;
 
 	// register for save states
@@ -162,7 +162,7 @@ VIDEO_START_MEMBER(robokid_state,robokid)
 {
 	video_init_common();
 	video_init_banked(0x0800);
-	m_robokid_sprites = 1;
+	m_robokid_sprites = true;
 
 	m_robokid_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(robokid_state::robokid_get_bg_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(robokid_state::robokid_bg_scan)), 16, 16, 32, 32);
 	m_robokid_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(robokid_state::robokid_get_bg_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(robokid_state::robokid_bg_scan)), 16, 16, 32, 32);
@@ -178,7 +178,7 @@ VIDEO_START_MEMBER(omegaf_state,omegaf)
 {
 	video_init_common();
 	video_init_banked(0x2000);
-	m_robokid_sprites = 1;
+	m_robokid_sprites = true;
 
 	m_robokid_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(omegaf_state::robokid_get_bg_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(omegaf_state::omegaf_bg_scan)), 16, 16, 128, 32);
 	m_robokid_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(omegaf_state::robokid_get_bg_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(omegaf_state::omegaf_bg_scan)), 16, 16, 128, 32);
@@ -205,7 +205,7 @@ void ninjakd2_state::ninjakd2_bgvideoram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-void ninjakd2_state::ninjakd2_fgvideoram_w(offs_t offset, uint8_t data)
+void ninjakd2_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
@@ -222,7 +222,7 @@ void ninjakd2_state::bg_ctrl(int offset, int data, tilemap_t* tilemap)
 		case 1: scrollx = ((scrollx &  0xff) | (data << 8)); break;
 		case 2: scrolly = ((scrolly & ~0xff) | data);        break;
 		case 3: scrolly = ((scrolly &  0xff) | (data << 8)); break;
-		case 4: tilemap->enable(data & 1); break;
+		case 4: tilemap->enable(BIT(data, 0)); break;
 	}
 
 	tilemap->set_scrollx(0, scrollx);
@@ -234,9 +234,9 @@ void ninjakd2_state::ninjakd2_bg_ctrl_w(offs_t offset, uint8_t data)
 	bg_ctrl(offset, data, m_bg_tilemap);
 }
 
-void ninjakd2_state::ninjakd2_sprite_overdraw_w(uint8_t data)
+void ninjakd2_state::sprite_overdraw_w(uint8_t data)
 {
-	m_next_sprite_overdraw_enabled = data & 1;
+	m_next_sprite_overdraw_enabled = BIT(data, 0);
 }
 
 
@@ -247,13 +247,13 @@ void ninjakd2_state::ninjakd2_sprite_overdraw_w(uint8_t data)
  *
  *************************************/
 
-void ninjakd2_state::draw_sprites( bitmap_ind16 &bitmap)
+void ninjakd2_state::draw_sprites(bitmap_ind16 &bitmap)
 {
-	gfx_element* const gfx = m_gfxdecode->gfx(1);
+	gfx_element *const gfx = m_gfxdecode->gfx(1);
 	int const big_xshift = m_robokid_sprites ? 1 : 0;
 	int const big_yshift = m_robokid_sprites ? 0 : 1;
 
-	uint8_t* sprptr = &m_spriteram[11];
+	uint8_t const *sprptr = &m_spriteram[11];
 	int sprites_drawn = 0;
 
 	/* The sprite generator draws exactly 96 16x16 sprites per frame. When big
@@ -267,22 +267,22 @@ void ninjakd2_state::draw_sprites( bitmap_ind16 &bitmap)
 
 	for (;;)
 	{
-		if (sprptr[2] & 0x02)
+		if (BIT(sprptr[2], 1))
 		{
 			int sx = sprptr[1] - ((sprptr[2] & 0x01) << 8);
 			int sy = sprptr[0];
 			// Ninja Kid II doesn't use the topmost bit (it has smaller ROMs) so it might not be connected on the board
-			int code = sprptr[3] + ((sprptr[2] & 0xc0) << 2) + ((sprptr[2] & 0x08) << 7);
-			int flipx = (sprptr[2] & 0x10) >> 4;
-			int flipy = (sprptr[2] & 0x20) >> 5;
+			int code = sprptr[3] | (bitswap<3>(sprptr[2], 3, 7, 6) << 8);
+			int flipx = BIT(sprptr[2], 4);
+			int flipy = BIT(sprptr[2], 5);
 			int const color = sprptr[4] & 0x0f;
 			// Ninja Kid II doesn't use the 'big' feature so it might not be available on the board
-			int const big = (sprptr[2] & 0x04) >> 2;
+			int const big = BIT(sprptr[2], 2);
 
 			if (flip_screen())
 			{
-				sx = 240 - 16*big - sx;
-				sy = 240 - 16*big - sy;
+				sx = 240 - 16 * big - sx;
+				sy = 240 - 16 * big - sy;
 				flipx ^= 1;
 				flipy ^= 1;
 			}
@@ -298,13 +298,13 @@ void ninjakd2_state::draw_sprites( bitmap_ind16 &bitmap)
 			{
 				for (int x = 0; x <= big; ++x)
 				{
-					int const tile = code ^ (x << big_xshift) ^ (y << big_yshift);
+					uint32_t const tile = code ^ (x << big_xshift) ^ (y << big_yshift);
 
 						gfx->transpen(bitmap,bitmap.cliprect(),
-							tile,
-							color,
-							flipx,flipy,
-							sx + 16*x, sy + 16*y, 0xf);
+								tile,
+								color,
+								flipx, flipy,
+								sx + 16*x, sy + 16*y, 0xf);
 
 					++sprites_drawn;
 					if (sprites_drawn >= 96)
@@ -323,11 +323,11 @@ void ninjakd2_state::draw_sprites( bitmap_ind16 &bitmap)
 	}
 }
 
-static bool stencil_ninjakd2( uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
-static bool stencil_mnight(   uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
-static bool stencil_arkarea(  uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
-static bool stencil_robokid(  uint16_t pal ) { return( (pal & 0xf0) <  0xe0 ); }
-static bool stencil_omegaf(   uint16_t pal ) { return( true ); }
+static bool stencil_ninjakd2( uint16_t pal ) { return (pal & 0xf0) == 0xf0; }
+static bool stencil_mnight(   uint16_t pal ) { return (pal & 0xf0) == 0xf0; }
+static bool stencil_arkarea(  uint16_t pal ) { return (pal & 0xf0) == 0xf0; }
+static bool stencil_robokid(  uint16_t pal ) { return (pal & 0xf0) <  0xe0; }
+static bool stencil_omegaf(   uint16_t pal ) { return true; }
 //////            OVERDRAW     STENCIL     UNKNOWN
 //////  NINJAKD2  023459ABCDE  F           1678
 //////    MNIGHT  0134568ABCDE F           279
@@ -339,7 +339,7 @@ static bool stencil_omegaf(   uint16_t pal ) { return( true ); }
 // This is very hackish.
 // (Is there a possibility that software can't select it but hardware can?)
 
-void ninjakd2_state::erase_sprites( bitmap_ind16 &bitmap)
+void ninjakd2_state::erase_sprites(bitmap_ind16 &bitmap)
 {
 	// if sprite overdraw is disabled, clear the sprite framebuffer
 	if (!m_next_sprite_overdraw_enabled)
@@ -353,7 +353,8 @@ void ninjakd2_state::erase_sprites( bitmap_ind16 &bitmap)
 			for (int x = 0; x < m_sprites_bitmap.width(); ++x)
 			{
 				uint16_t *const ptr = &m_sprites_bitmap.pix(y, x);
-				if ( (*m_stencil_compare_function)(*ptr) ) *ptr = 0xf;
+				if ((*m_stencil_compare_function)(*ptr))
+					*ptr = 0xf;
 			}
 		}
 	}
@@ -377,7 +378,7 @@ uint32_t ninjakd2_state::screen_update_ninjakd2(screen_device &screen, bitmap_in
 	// updating sprites here instead than in screen_vblank avoids a palette glitch
 	// at the end of the "rainbow sky" screens.
 	update_sprites();
-	m_sprites_updated = 1;
+	m_sprites_updated = true;
 
 	bitmap.fill(0, cliprect);
 
@@ -391,7 +392,7 @@ uint32_t ninjakd2_state::screen_update_ninjakd2(screen_device &screen, bitmap_in
 uint32_t robokid_state::screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_sprites();
-	m_sprites_updated = 1;
+	m_sprites_updated = true;
 
 	bitmap.fill(0, cliprect);
 
@@ -407,7 +408,7 @@ uint32_t robokid_state::screen_update_robokid(screen_device &screen, bitmap_ind1
 uint32_t omegaf_state::screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_sprites();
-	m_sprites_updated = 1;
+	m_sprites_updated = true;
 
 	bitmap.fill(0, cliprect);
 
@@ -421,7 +422,7 @@ uint32_t omegaf_state::screen_update_omegaf(screen_device &screen, bitmap_ind16 
 }
 
 
-void ninjakd2_state::screen_vblank_ninjakd2(int state)
+void ninjakd2_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
@@ -429,8 +430,8 @@ void ninjakd2_state::screen_vblank_ninjakd2(int state)
 		if (!m_sprites_updated)
 			update_sprites();
 
-		m_sprites_updated = 0;
+		m_sprites_updated = false;
 
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
 	}
 }

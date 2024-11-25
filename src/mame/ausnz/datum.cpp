@@ -82,11 +82,11 @@ private:
 	uint8_t pa_r();
 	void pa_w(uint8_t data);
 	void pb_w(uint8_t data);
-	void datum_mem(address_map &map);
+	void datum_mem(address_map &map) ATTR_COLD;
 	uint8_t m_digit = 0U;
 	uint8_t m_seg = 0U;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	required_device<acia6850_device> m_acia;
@@ -142,8 +142,8 @@ static INPUT_PORTS_START( datum )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, datum_state, trigger_reset, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC)  PORT_CHAR('Z') PORT_CHANGED_MEMBER(DEVICE_SELF, datum_state, trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(datum_state::trigger_reset), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC)  PORT_CHAR('Z') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(datum_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( datum_state::trigger_reset )

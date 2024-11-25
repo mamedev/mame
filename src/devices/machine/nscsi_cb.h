@@ -50,8 +50,8 @@ public:
 	void bsy_w(int state) { scsi_bus->ctrl_w(scsi_refid, state ? S_BSY : 0, S_BSY); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	devcb_write_line m_write_rst;
 	devcb_write_line m_write_atn;

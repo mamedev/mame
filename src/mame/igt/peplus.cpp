@@ -266,11 +266,11 @@ public:
 	void init_pepluss64();
 	void init_peplussbw();
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(input_r);
+	template <int N> ioport_value input_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<i80c32_device> m_maincpu;
@@ -357,8 +357,8 @@ private:
 	void peplus_palette(palette_device &palette) const;
 	void handle_lightpen();
 
-	void main_iomap(address_map &map);
-	void main_map(address_map &map);
+	void main_iomap(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 static const uint8_t  id_022[8] = { 0x00, 0x01, 0x04, 0x09, 0x13, 0x16, 0x18, 0x00 };
@@ -1085,7 +1085,7 @@ void peplus_state::main_iomap(address_map &map)
 *************************/
 
 template <int N>
-CUSTOM_INPUT_MEMBER(peplus_state::input_r)
+ioport_value peplus_state::input_r()
 {
 	uint8_t inp_ret = 0x00;
 	uint8_t inp_read = m_inp_bank[N]->read();
@@ -1162,9 +1162,9 @@ static INPUT_PORTS_START( peplus_schip )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<0>))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<1>))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1190,9 +1190,9 @@ static INPUT_PORTS_START( nonplus_poker )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<0>))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<1>))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 
 	PORT_MODIFY("SW1")
@@ -1240,9 +1240,9 @@ static INPUT_PORTS_START( peplus_poker )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<0>))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<1>))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1268,9 +1268,9 @@ static INPUT_PORTS_START( peplus_bjack )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<0>))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<1>))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1301,9 +1301,9 @@ static INPUT_PORTS_START( peplus_keno )
 	PORT_BIT( 0xffff, 0x200, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 1024) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<0>))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Light Pen") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<1>))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1329,9 +1329,9 @@ static INPUT_PORTS_START( peplus_slots )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<0>))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<1>))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1358,9 +1358,9 @@ static INPUT_PORTS_START( peplus_fantasy )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<0>)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<0>))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(peplus_state, input_r<1>)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(peplus_state::input_r<1>))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Diverter Input") PORT_CODE(KEYCODE_M)
 
 	PORT_MODIFY("SW1")
@@ -16196,19 +16196,19 @@ GAMEL( 1994, pebe0014,  pebe0013, peplus, peplus_bjack,  peplus_state, init_pepl
 GAMEL( 1994, pebe0014a, pebe0013, peplus, peplus_bjack,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (BE0014) Blackjack (International English/Spanish)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_pe_bjack ) // Needs CG1339 graphics roms
 
 // Normal board Keno
-GAMEL( 1994, peke0004,  0,        peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0004) Keno (set 1)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1994, peke0004a, peke0004, peplus, peplus_keno,   peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0004) Keno (set 2)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1994, peke0004b, peke0004, peplus, peplus_keno,   peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0004) Keno (set 3)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1994, peke0017,  peke0004, peplus, peplus_keno,   peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0017) Keno (set 1)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1994, peke0017a, peke0004, peplus, peplus_keno,   peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0017) Keno (set 2)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1994, peke0026,  peke0004, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0026) Keno",                          MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno ) // Needs printer support
-GAMEL( 1994, peke1001,  0,        peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1001) Keno",                          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1994, peke1006,  peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1006) Keno",                          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1994, peke1012,  peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 1)",                  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1994, peke1012a, peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1994, peke1012b, peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 3)",                  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1994, peke1013,  peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1013) Keno (set 1)",                  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1994, peke1013a, peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1013) Keno (set 2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
+GAMEL( 1994, peke0004,  0,        peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0004) Keno (set 1)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE , layout_pe_keno )
+GAMEL( 1994, peke0004a, peke0004, peplus, peplus_keno,   peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0004) Keno (set 2)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE , layout_pe_keno )
+GAMEL( 1994, peke0004b, peke0004, peplus, peplus_keno,   peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0004) Keno (set 3)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE , layout_pe_keno )
+GAMEL( 1994, peke0017,  peke0004, peplus, peplus_keno,   peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0017) Keno (set 1)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE , layout_pe_keno )
+GAMEL( 1994, peke0017a, peke0004, peplus, peplus_keno,   peplus_state, init_nonplus,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0017) Keno (set 2)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE , layout_pe_keno )
+GAMEL( 1994, peke0026,  peke0004, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE0026) Keno",                          MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE , layout_pe_keno ) // Needs printer support
+GAMEL( 1994, peke1001,  0,        peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1001) Keno",                          MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1006,  peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1006) Keno",                          MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1012,  peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 1)",                  MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1012a, peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 2)",                  MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1012b, peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 3)",                  MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1013,  peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1013) Keno (set 1)",                  MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1994, peke1013a, peke1001, peplus, peplus_keno,   peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (KE1013) Keno (set 2)",                  MACHINE_SUPPORTS_SAVE, layout_pe_keno )
 
 // Normal board Slots machine
 GAMEL( 1996, peps0014,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0014) Super Joker Slots",                MACHINE_SUPPORTS_SAVE, layout_pe_slots )
@@ -16489,9 +16489,9 @@ GAMEL( 1995, pexmp026,  0,        peplus, peplus_poker,  peplus_state, init_pepl
 GAMEL( 1995, pexmp030,  0,        peplus, peplus_poker,  peplus_state, init_peplussbw, ROT0, "IGT - International Game Technology", "Player's Edge Plus (XMP00030) 5-in-1 Wingboard (CG2451)",   MACHINE_SUPPORTS_SAVE, layout_pe_poker )
 
 // Superboard : Keno
-GAMEL( 1995, pex0006k,  0,        peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000006K+XK000001) Keno",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1995, pex0013k,  pex0006k, peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000013K+XK000011) Keno",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
-GAMEL( 1995, pex0013ka, pex0006k, peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000013K+XK000012) Keno",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_pe_keno )
+GAMEL( 1995, pex0006k,  0,        peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000006K+XK000001) Keno",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1995, pex0013k,  pex0006k, peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000013K+XK000011) Keno",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_keno )
+GAMEL( 1995, pex0013ka, pex0006k, peplus,  peplus_keno,  peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000013K+XK000012) Keno",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_keno )
 
 // Superboard : Slots machine
 GAMEL( 1997, pex0827s,  0,        peplus,  peplus_slots, peplus_state, init_peplussb,  ROT0, "IGT - International Game Technology", "Player's Edge Plus (X000827S+XS000002) Red, White & Blue Slots",          MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE, layout_pe_slots ) // Wrong CG graphics and CAPX color chip

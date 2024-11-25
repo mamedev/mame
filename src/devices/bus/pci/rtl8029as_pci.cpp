@@ -28,7 +28,7 @@ TODO:
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(RTL8029AS_PCI, rtl8029as_pci_device,   "rtl8029as_pci",   "Realtek RTL8029AS PCI Full-Duplex Ethernet card")
+DEFINE_DEVICE_TYPE(RTL8029AS_PCI, rtl8029as_pci_device,   "rtl8029as_pci",   "Realtek RTL8029AS Full-Duplex Ethernet")
 
 
 
@@ -55,7 +55,7 @@ void rtl8029as_pci_device::device_start()
 	// TODO: verify 16 being of the right size
 	// documentation puts 3 bits in BAR0 as size but then all the "pages" are 16,
 	// then one note also claims 32 bytes wtf
-//	add_map( 16, M_IO, FUNC(rtl8029as_pci_device::map));
+//  add_map( 16, M_IO, FUNC(rtl8029as_pci_device::map));
 
 	// INTA#
 	intr_pin = 1;

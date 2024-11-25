@@ -97,7 +97,7 @@ public:
 	void hp9k382(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void driver_start() override;
 
 private:
@@ -115,15 +115,15 @@ private:
 
 	void led_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void hp9k310_map(address_map &map);
-	void hp9k320_map(address_map &map);
-	void hp9k330_map(address_map &map);
-	void hp9k332_map(address_map &map);
-	void hp9k360_map(address_map &map);
-	void hp9k370_map(address_map &map);
-	void hp9k380_map(address_map &map);
-	void hp9k382_map(address_map &map);
-	void hp9k3xx_common(address_map &map);
+	void hp9k310_map(address_map &map) ATTR_COLD;
+	void hp9k320_map(address_map &map) ATTR_COLD;
+	void hp9k330_map(address_map &map) ATTR_COLD;
+	void hp9k332_map(address_map &map) ATTR_COLD;
+	void hp9k360_map(address_map &map) ATTR_COLD;
+	void hp9k370_map(address_map &map) ATTR_COLD;
+	void hp9k380_map(address_map &map) ATTR_COLD;
+	void hp9k382_map(address_map &map) ATTR_COLD;
+	void hp9k3xx_common(address_map &map) ATTR_COLD;
 
 	void add_dio16_bus(machine_config &mconfig);
 	void add_dio32_bus(machine_config &mconfig);

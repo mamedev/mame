@@ -1102,6 +1102,86 @@ static INPUT_PORTS_START( cookbib3 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sutjarod )
+	PORT_START("DSW1")  /* 500000.w */
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // probably all buttons, not a joystick
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW2")  /* 500002.w */
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)  // jump
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)  // fire
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)  // test mode only?
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")    /* 500004.w */
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( moremore )
 	PORT_START("DSW1")  /* 500000.w */
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
@@ -2388,7 +2468,7 @@ ROM_START( twinkle )
 	ROM_LOAD( "u1.bin", 0x00000, 0x10000 , CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2433,7 +2513,7 @@ ROM_START( pzlbreak )
 	ROM_LOAD( "0.u1", 0x00000, 0x10000 , CRC(1ad646b7) SHA1(0132baa097e48df2450afdcd316375dc546ea4d0) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", ROMREGION_ERASEFF ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2481,7 +2561,7 @@ ROM_START( toppyrap )
 	ROM_LOAD( "u1.bin", 0x00000, 0x10000 , CRC(07f50947) SHA1(83740655ab5f677bd009191bb0de60e237aaa11c) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this contains the code for 2 of the IRQ functions, but the game only uses one of them, the other is
@@ -2508,7 +2588,7 @@ ROM_START( moremore )
 	ROM_LOAD( "u35.bin", 0x00000, 0x10000 , CRC(92dc95fc) SHA1(f04e63cc680835458246989532faf5657e28db13) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2534,7 +2614,7 @@ ROM_START( moremorp )
 	ROM_LOAD( "mmp_u35.bin", 0x00000, 0x10000 , CRC(4d098cad) SHA1(a79d417e7525a25dd6697da9f3d1de269e759d2e) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2560,7 +2640,7 @@ ROM_START( 3in1semi ) /* SemiCom Ser-4331-4 PCB */
 	ROM_LOAD( "u35", 0x00000, 0x10000 , CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2631,7 +2711,7 @@ ROM_START( mcheonru ) /* SemiCom Ser-4331-4 PCB */
 	ROM_LOAD( "u35", 0x00000, 0x10000 , CRC(79e965b4) SHA1(268df67ec6ea828ae01a6e4d2da9ad2a08a837f1) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2769,7 +2849,7 @@ ROM_START( cookbib3 )
 	ROM_CONTINUE(0x0000,0x4000)
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2884,7 +2964,7 @@ ROM_START( finalttr )
 	ROM_LOAD( "12.5r",    0x00000, 0x10000, CRC(4bc21361) SHA1(dab9bea665c0f2fd7cee8ab7f3762e427911bcca) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
@@ -2916,7 +2996,7 @@ ROM_START( suhosong )
 	ROM_LOAD( "su_ho_sung.u1", 0x00000, 0x10000 ,  CRC(509ce74e) SHA1(a93add5ab674671078b55128281dcf9b0db46617) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
 
 	ROM_REGION16_BE( 0x200, "user1", ROMREGION_ERASE00 ) /* Data from Shared RAM */
 	ROM_LOAD16_WORD( "protdata.bin", 0x000, 0x200 , CRC(4478e251) SHA1(08489d6bfe5503c8eb62909e56a07193a922b4c1) )
@@ -2949,6 +3029,36 @@ ROM_START( yutnori )
 
 	ROM_REGION(0x40000, "oki2", 0 )
 	ROM_LOAD("voice_rom", 0x000000, 0x040000, CRC(25e85201) SHA1(6c0001e2942f49b62e1bbf3a68c59abad1e2f94c) )
+ROM_END
+
+
+ROM_START( sutjarod ) // 숫자로 해요 Deluxe
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "ul12_am27c512.bin",    0x00000, 0x10000, CRC(50e2563c) SHA1(d02e0805ae5aa5058e8c096f4265603006de2a6d) )
+	ROM_LOAD16_BYTE( "uh12_am27c512.bin",    0x00001, 0x10000, CRC(dc7e036c) SHA1(90a9b29b3f776e26303ccfa74800501152e05ceb) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "u1_am27c512.bin",    0x00000, 0x10000, CRC(c6e31c4a) SHA1(178e10432d9d1096ac0d11b0da9e5441279f5ffe) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
+
+	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
+	/* this is not a real ROM but instead the data extracted from
+	   shared RAM - the MCU puts it there
+
+	   this is taken from cookbib3, the key in the program ROM is
+	   patched in our init function to decrypt it, real data is
+	   still needed.
+	   */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200, BAD_DUMP CRC(c819b9a8) SHA1(1d425e8c9940c0e691149e5406dd71808bd73832) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "uj15_tms27c010a.bin",    0x00000, 0x20000, CRC(da9dea73) SHA1(b72da82686054dbbe423724fecf0e58966b0ea45) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "ua4_am27c040.bin",     0x00000, 0x80000, CRC(1e87d377) SHA1(b4b076026ff60bfb25172d5cc3b2b410599583ea) )
+	ROM_LOAD( "ua5_am27c040.bin",     0x80000, 0x80000, CRC(b286427d) SHA1(ee7f98a9d451b901c211326bff6b3ed4e2c1b76f) )
 ROM_END
 
 
@@ -3039,6 +3149,18 @@ void snowbros_state::init_cookbib3()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16smo_delegate(*this, FUNC(snowbros_state::cookbib3_read)));
 }
 
+void snowbros_state::init_sutjarod()
+{
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+	// patch RAM decrypt key in ROM to be the same as cookbib3
+	rom[0xb994 / 2] = 0x434b;
+	rom[0xb996 / 2] = 0x3345;
+
+	// anti-tamper checksum - keep checksum the same by putting a value in an unused area at the start of ROM
+	// (the game does a ROM checksum between scenes, expects result to be 0, or goes off the rails)
+	rom[0x54 / 2] = 0x2508;
+}
+
 void snowbros_state::init_pzlbreak()
 {
 	m_pandora->set_bg_pen(0xc0);
@@ -3091,6 +3213,7 @@ void snowbros_state::init_yutnori()
 	save_item(NAME(m_yutnori_prot_val));
 }
 
+
 GAME( 1990, snowbros,   0,        snowbros,    snowbros, snowbros_state, empty_init,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, snowbrosa,  snowbros, snowbros,    snowbros, snowbros_state, empty_init,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, snowbrosb,  snowbros, snowbros,    snowbros, snowbros_state, empty_init,    ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 3)", MACHINE_SUPPORTS_SAVE )
@@ -3113,6 +3236,7 @@ GAME( 1996, cookbib2a,  cookbib2, semicom_mcu, cookbib2, snowbros_state, init_co
 GAME( 1996, cookbib2b,  cookbib2, semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (English, set 3)", MACHINE_SUPPORTS_SAVE ) // older? test mode looks even worse on this, but neither shows the correct dip info anyway
 GAME( 1996, cookbib2c,  cookbib2, semiprot,    cookbib2c,snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (English / Korean)", MACHINE_SUPPORTS_SAVE ) // in this set the language switch actually works but its effects are inverted to what test mode shows. Sticker on PCB shows 95 so maybe earliest set?
 GAME( 1996, toppyrap,   0,        semiprot,    toppyrap, snowbros_state, empty_init,    ROT0, "SemiCom",              "Toppy & Rappy", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sutjarod,   0,        semiprot,    sutjarod, snowbros_state, init_sutjarod, ROT0, "SemiCom",              "Sutjaro Haeyo Deluxe", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cookbib3,   0,        semiprot,    cookbib3, snowbros_state, init_cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, pzlbreak,   0,        semiprot,    pzlbreak, snowbros_state, init_pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, pzlbreaka,  pzlbreak, semiprot,    pzlbreak, snowbros_state, init_pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break (set 2)", MACHINE_SUPPORTS_SAVE )

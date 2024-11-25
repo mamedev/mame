@@ -3,45 +3,6 @@
 license:CC0-1.0
 -->
 <mamelayout version="2">
-	<!-- Lua script (-plugin layout) -->
-	<!-- this adds support for combining outputs to make an aggregated output -->
-	<script><![CDATA[
-		local ledlamps = {
-			{ 88, 89, 90, 91, 92, 93, 94     },
-			{ 80, 81, 82, 83, 84, 85, 86, 87 },
-			{ 72, 73, 74, 75, 76, 77, 78     },
-			{ 64, 65, 66, 67, 68, 69, 70     } }
-
-		function configure_view(view)
-			local led_items = {
-					view.items["compoundled0"],
-					view.items["compoundled1"],
-					view.items["compoundled2"],
-					view.items["compoundled3"] }
-			view:set_prepare_items_callback(
-					function ()
-						for ledno, lamps in pairs(ledlamps) do
-							local ledstate = 0
-							for bit, lampno in pairs(lamps) do
-								if machine.output:get_indexed_value("lamp", lampno) > 0 then
-									ledstate = ledstate | (1 << (bit - 1))
-								end
-							end
-							if led_items[ledno] ~= nil then
-								led_items[ledno]:set_state(ledstate)
-							end
-						end
-					end)
-		end
-
-		file:set_resolve_tags_callback(
-				function ()
-					for k, view in pairs(file.views) do
-						configure_view(view)
-					end
-				end)
-	]]></script>
-
 	<element name="£">
 		<text string="£">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -225,4 +186,43 @@ license:CC0-1.0
 			<bounds x="505" y="250" width="40" height="15"/>
 		</element>
 	</view>
+
+	<!-- Lua script (-plugin layout) -->
+	<!-- this adds support for combining outputs to make an aggregated output -->
+	<script><![CDATA[
+		local ledlamps = {
+			{ 88, 89, 90, 91, 92, 93, 94     },
+			{ 80, 81, 82, 83, 84, 85, 86, 87 },
+			{ 72, 73, 74, 75, 76, 77, 78     },
+			{ 64, 65, 66, 67, 68, 69, 70     } }
+
+		local function configure_view(view)
+			local led_items = {
+					view.items["compoundled0"],
+					view.items["compoundled1"],
+					view.items["compoundled2"],
+					view.items["compoundled3"] }
+			view:set_prepare_items_callback(
+					function ()
+						for ledno, lamps in pairs(ledlamps) do
+							local ledstate = 0
+							for bit, lampno in pairs(lamps) do
+								if machine.output:get_indexed_value("lamp", lampno) > 0 then
+									ledstate = ledstate | (1 << (bit - 1))
+								end
+							end
+							if led_items[ledno] ~= nil then
+								led_items[ledno]:set_state(ledstate)
+							end
+						end
+					end)
+		end
+
+		file:set_resolve_tags_callback(
+				function ()
+					for k, view in pairs(file.views) do
+						configure_view(view)
+					end
+				end)
+	]]></script>
 </mamelayout>

@@ -50,7 +50,7 @@ public:
 	uint16_t reset_high_r(offs_t offset, uint16_t mem_mask = ~0);
 	void reset_high_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void iocpu_map(address_map &map);
+	void iocpu_map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

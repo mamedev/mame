@@ -88,7 +88,7 @@
 */
 
 #include "emu.h"
-#include "machine/upd71071.h"
+#include "upd71071.h"
 
 
 DEFINE_DEVICE_TYPE(UPD71071, upd71071_device, "upd71071", "NEC uPD71071 DMA Controller")

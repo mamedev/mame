@@ -230,7 +230,7 @@ void rocknms_state::rocknms_main2sub_w(offs_t offset, u16 data, u16 mem_mask)
 		m_rocknms_main2sub = (data ^ 0xffff);
 }
 
-CUSTOM_INPUT_MEMBER(rocknms_state::rocknms_main2sub_status_r)
+ioport_value rocknms_state::rocknms_main2sub_status_r()
 {
 	return m_rocknms_sub2main & 0x0003;
 }
@@ -939,11 +939,10 @@ void stepstag_state::stepstag_sub_map(address_map &map)
 	map(0x400000, 0x43ffff).ram().w(FUNC(stepstag_state::stepstag_palette_mid_w)).share("paletteram2");
 	map(0x500000, 0x53ffff).ram().w(FUNC(stepstag_state::stepstag_palette_right_w)).share("paletteram3");
 
-	// rgb brightness?
-	map(0x700000, 0x700001).nopw(); // 0-f
-	map(0x700002, 0x700003).nopw(); // 0-f
-	map(0x700004, 0x700005).nopw(); // 0-f
-	map(0x700006, 0x700007).nopw(); // 0-3f (high bits?)
+	map(0x700000, 0x700001).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::video_mix_w<0>));
+	map(0x700002, 0x700003).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::video_mix_w<1>));
+	map(0x700004, 0x700005).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::video_mix_w<2>));
+	map(0x700006, 0x700007).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::video_control_w));
 
 	// left screen sprites
 	map(0x800000, 0x8007ff).ram().share("spriteram1");      // Object RAM
@@ -1327,7 +1326,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rocknms )
 	PORT_START("PLAYERS")   // IN0 - $be0002.w
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(rocknms_state, rocknms_main2sub_status_r) // MAIN -> SUB Communication
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(rocknms_state::rocknms_main2sub_status_r)) // MAIN -> SUB Communication
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)

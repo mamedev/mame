@@ -20,16 +20,16 @@
 template<int VRAM, int Layer>
 TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_tile_info)
 {
-	int tile  = (m_videoram[VRAM][Layer][tile_index] & 0x3fff) | (m_gfxbank[VRAM][Layer] << 14);
-	int color = (m_videoram[VRAM][Layer][tile_index] & 0xc000) >> 14;
+	int const tile  = (m_videoram[VRAM][Layer][tile_index] & 0x3fff) | (m_gfxbank[VRAM][Layer] << 14);
+	int const color = (m_videoram[VRAM][Layer][tile_index] & 0xc000) >> 14;
 
 	tileinfo.set(Layer, tile, color, 0);
 }
 
 template<int VRAM, int Layer>
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_tile_info)
+TILE_GET_INFO_MEMBER(fromanc2_base_state::fromancr_get_tile_info)
 {
-	int tile = m_videoram[VRAM][Layer][tile_index] | (m_gfxbank[VRAM][Layer] << 16);
+	int const tile = m_videoram[VRAM][Layer][tile_index] | (m_gfxbank[VRAM][Layer] << 16);
 
 	tileinfo.set(Layer, tile, 0, 0);
 }
@@ -133,7 +133,7 @@ void fromanc2_state::fromanc2_gfxbank_1_w(uint16_t data)
 
 inline void fromanc2_state::fromancr_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int layer )
 {
-	int vram = (offset < 0x1000) ? 0 : 1;
+	int const vram = (offset < 0x1000) ? 0 : 1;
 
 	COMBINE_DATA(&m_videoram[vram][layer][offset & 0x0fff]);
 	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
@@ -182,19 +182,19 @@ void fromanc2_state::fromancr_gfxbank_w( int data )
 }
 
 
-inline void fromanc2_state::fromanc4_vram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int layer )
+inline void fromanc4_state::fromanc4_vram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int layer )
 {
-	int vram = (offset < 0x4000) ? 0 : 1;
+	int const vram = (offset < 0x4000) ? 0 : 1;
 
 	COMBINE_DATA(&m_videoram[vram][layer][offset & 0x3fff]);
 	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x3fff);
 }
 
-void fromanc2_state::fromanc4_videoram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 2); }
-void fromanc2_state::fromanc4_videoram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 1); }
-void fromanc2_state::fromanc4_videoram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 0); }
+void fromanc4_state::fromanc4_videoram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 2); }
+void fromanc4_state::fromanc4_videoram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 1); }
+void fromanc4_state::fromanc4_videoram_2_w(offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 0); }
 
-void fromanc2_state::fromanc4_gfxreg_0_w(offs_t offset, uint16_t data)
+void fromanc4_state::fromanc4_gfxreg_0_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -202,17 +202,18 @@ void fromanc2_state::fromanc4_gfxreg_0_w(offs_t offset, uint16_t data)
 		case 0x01:  m_scrolly[0][2] = -(data - 0x1e4); break;
 		case 0x02:  m_scrollx[1][2] = -(data - 0xfbb); break;
 		case 0x03:  m_scrolly[1][2] = -(data - 0x1e4); break;
-		case 0x05:  m_gfxbank[0][2] = (data & 0x000f) >> 0;
-				m_gfxbank[1][2] = (data & 0x0f00) >> 8;
-				m_tilemap[0][2]->mark_all_dirty();
-				m_tilemap[1][2]->mark_all_dirty();
-				break;
+		case 0x05:
+			m_gfxbank[0][2] = (data & 0x000f) >> 0;
+			m_gfxbank[1][2] = (data & 0x0f00) >> 8;
+			m_tilemap[0][2]->mark_all_dirty();
+			m_tilemap[1][2]->mark_all_dirty();
+			break;
 		// offset 0x04, 0x06 - 0x11 unknown
 		default:    break;
 	}
 }
 
-void fromanc2_state::fromanc4_gfxreg_1_w(offs_t offset, uint16_t data)
+void fromanc4_state::fromanc4_gfxreg_1_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -220,17 +221,18 @@ void fromanc2_state::fromanc4_gfxreg_1_w(offs_t offset, uint16_t data)
 		case 0x01:  m_scrolly[0][1] = -(data - 0x1e4); break;
 		case 0x02:  m_scrollx[1][1] = -(data - 0xfba); break;
 		case 0x03:  m_scrolly[1][1] = -(data - 0x1e4); break;
-		case 0x05:  m_gfxbank[0][1] = (data & 0x000f) >> 0;
-				m_gfxbank[1][1] = (data & 0x0f00) >> 8;
-				m_tilemap[0][1]->mark_all_dirty();
-				m_tilemap[1][1]->mark_all_dirty();
-				break;
+		case 0x05:
+			m_gfxbank[0][1] = (data & 0x000f) >> 0;
+			m_gfxbank[1][1] = (data & 0x0f00) >> 8;
+			m_tilemap[0][1]->mark_all_dirty();
+			m_tilemap[1][1]->mark_all_dirty();
+			break;
 		// offset 0x04, 0x06 - 0x11 unknown
 		default:    break;
 	}
 }
 
-void fromanc2_state::fromanc4_gfxreg_2_w(offs_t offset, uint16_t data)
+void fromanc4_state::fromanc4_gfxreg_2_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -238,11 +240,12 @@ void fromanc2_state::fromanc4_gfxreg_2_w(offs_t offset, uint16_t data)
 		case 0x01:  m_scrolly[0][0] = -(data - 0x1e4); break;
 		case 0x02:  m_scrollx[1][0] = -(data - 0xfbb); break;
 		case 0x03:  m_scrolly[1][0] = -(data - 0x1e4); break;
-		case 0x05:  m_gfxbank[0][0] = (data & 0x000f) >> 0;
-				m_gfxbank[1][0] = (data & 0x0f00) >> 8;
-				m_tilemap[0][0]->mark_all_dirty();
-				m_tilemap[1][0]->mark_all_dirty();
-				break;
+		case 0x05:
+			m_gfxbank[0][0] = (data & 0x000f) >> 0;
+			m_gfxbank[1][0] = (data & 0x0f00) >> 8;
+			m_tilemap[0][0]->mark_all_dirty();
+			m_tilemap[1][0]->mark_all_dirty();
+			break;
 		// offset 0x04, 0x06 - 0x11 unknown
 		default:    break;
 	}
@@ -285,12 +288,9 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc2)
 	save_pointer(NAME(m_videoram[1][1]), (64 * 64));
 	save_pointer(NAME(m_videoram[1][2]), (64 * 64));
 	save_pointer(NAME(m_videoram[1][3]), (64 * 64));
-	save_item(NAME(m_scrollx[0]));
-	save_item(NAME(m_scrollx[1]));
-	save_item(NAME(m_scrolly[0]));
-	save_item(NAME(m_scrolly[1]));
-	save_item(NAME(m_gfxbank[0]));
-	save_item(NAME(m_gfxbank[1]));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_gfxbank));
 }
 
 VIDEO_START_MEMBER(fromanc2_state,fromancr)
@@ -321,12 +321,9 @@ VIDEO_START_MEMBER(fromanc2_state,fromancr)
 	save_pointer(NAME(m_videoram[1][0]), (64 * 64));
 	save_pointer(NAME(m_videoram[1][1]), (64 * 64));
 	save_pointer(NAME(m_videoram[1][2]), (64 * 64));
-	save_item(NAME(m_scrollx[0]));
-	save_item(NAME(m_scrollx[1]));
-	save_item(NAME(m_scrolly[0]));
-	save_item(NAME(m_scrolly[1]));
-	save_item(NAME(m_gfxbank[0]));
-	save_item(NAME(m_gfxbank[1]));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_gfxbank));
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -335,15 +332,15 @@ VIDEO_START_MEMBER(fromanc2_state,fromancr)
 	}
 }
 
-VIDEO_START_MEMBER(fromanc2_state,fromanc4)
+void fromanc4_state::video_start()
 {
-	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<0, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<0, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_tilemap[0][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<0, 2>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc4_state::fromancr_get_tile_info<0, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc4_state::fromancr_get_tile_info<0, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_tilemap[0][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc4_state::fromancr_get_tile_info<0, 2>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	m_tilemap[0][3] = nullptr;
-	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<1, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<1, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
-	m_tilemap[1][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc2_state::fromancr_get_tile_info<1, 2>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc4_state::fromancr_get_tile_info<1, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc4_state::fromancr_get_tile_info<1, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
+	m_tilemap[1][2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&fromanc4_state::fromancr_get_tile_info<1, 2>))), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	m_tilemap[1][3] = nullptr;
 
 	for (int screen = 0; screen < 2; screen++)
@@ -363,12 +360,9 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc4)
 	save_pointer(NAME(m_videoram[1][0]), (256 * 64));
 	save_pointer(NAME(m_videoram[1][1]), (256 * 64));
 	save_pointer(NAME(m_videoram[1][2]), (256 * 64));
-	save_item(NAME(m_scrollx[0]));
-	save_item(NAME(m_scrollx[1]));
-	save_item(NAME(m_scrolly[0]));
-	save_item(NAME(m_scrolly[1]));
-	save_item(NAME(m_gfxbank[0]));
-	save_item(NAME(m_gfxbank[1]));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_gfxbank));
 }
 
 /******************************************************************************
@@ -377,11 +371,9 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc4)
 
 ******************************************************************************/
 
-uint32_t fromanc2_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fromanc2_base_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		if (m_tilemap[0][i])
 		{
@@ -394,11 +386,9 @@ uint32_t fromanc2_state::screen_update_left(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-uint32_t fromanc2_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fromanc2_base_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		if (m_tilemap[1][i])
 		{

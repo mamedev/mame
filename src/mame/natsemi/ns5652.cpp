@@ -26,7 +26,7 @@ public:
 	void ns5652(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<pace_device> m_maincpu;
 	required_region_ptr<u8> m_ecprom;

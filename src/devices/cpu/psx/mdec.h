@@ -27,8 +27,8 @@ public:
 	void dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:

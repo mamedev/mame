@@ -22,15 +22,15 @@ public:
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
-	virtual void io_3bx_3dx_map(address_map &map) override;
+	virtual void io_3bx_3dx_map(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void crtc_map(address_map &map) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual uint16_t offset() override;
 
 private:

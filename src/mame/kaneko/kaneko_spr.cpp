@@ -40,11 +40,9 @@ kaneko16_sprite_device::kaneko16_sprite_device(
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, device_video_interface(mconfig, *this)
-	, m_gfx_region(*this, DEVICE_SELF)
 	, m_colbase(0)
 {
 	m_keep_sprites = 0; // default disabled for games not using it
-
 
 	m_sprite_xoffs = 0;
 	m_sprite_yoffs = 0;
@@ -81,54 +79,51 @@ void kaneko16_sprite_device::device_start()
 }
 
 
+GFXDECODE_MEMBER(kaneko_vu002_sprite_device::gfxinfo)
+	GFXDECODE_DEVICE(DEVICE_SELF, 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x40)
+GFXDECODE_END
+
+
 void kaneko_vu002_sprite_device::device_start()
 {
-	/*
-	    16x16x4 made of 4 8x8x4 blocks arrenged like:   01
-	                                                    23
-	*/
-	gfx_layout layout_16x16x4 =
-	{
-		16,16,
-		0,
-		4,
-		{ STEP4(0,1) },
-		{ STEP8(8*8*4*0,4),   STEP8(8*8*4*1,4)   },
-		{ STEP8(8*8*4*0,8*4), STEP8(8*8*4*2,8*4) },
-		16*16*4
-	};
-	layout_16x16x4.total = m_gfx_region->bytes() / ((16*16*4) / 8);
+	decode_gfx(gfxinfo);
+	gfx(0)->set_colorbase(m_colbase);
 	kaneko16_sprite_device::device_start();
-	set_gfx(0, std::make_unique<gfx_element>(&palette(), layout_16x16x4, m_gfx_region->base(), 0, 0x40, m_colbase));
 }
+
+
+/*
+    16x16x8 made of 4 8x8x8 blocks arrenged like:   01
+                                                    23
+*/
+static gfx_layout layout_16x16x8 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP8(0,8),   STEP8(8*8*8*1,8)   },
+	{ STEP8(0,8*8), STEP8(8*8*8*2,8*8) },
+	16*16*8
+};
+
+GFXDECODE_MEMBER(kaneko_kc002_sprite_device::gfxinfo)
+	GFXDECODE_DEVICE(DEVICE_SELF, 0, layout_16x16x8, 0, 0x40)
+GFXDECODE_END
 
 
 void kaneko_kc002_sprite_device::device_start()
 {
-	/*
-	    16x16x8 made of 4 8x8x8 blocks arrenged like:   01
-	                                                    23
-	*/
-	gfx_layout layout_16x16x8 =
-	{
-		16,16,
-		0,
-		8,
-		{ STEP8(0,1) },
-		{ STEP8(0,8),   STEP8(8*8*8*1,8)   },
-		{ STEP8(0,8*8), STEP8(8*8*8*2,8*8) },
-		16*16*8
-	};
-	layout_16x16x8.total = m_gfx_region->bytes() / ((16*16*8) / 8);
+	decode_gfx(gfxinfo);
+	gfx(0)->set_colorbase(m_colbase);
 	kaneko16_sprite_device::device_start();
-	set_gfx(0, std::make_unique<gfx_element>(&palette(), layout_16x16x8, m_gfx_region->base(), 0, 0x40, m_colbase));
 }
 
 
 void kaneko16_sprite_device::device_reset()
 {
-	m_sprite_flipx = 0;
-	m_sprite_flipy = 0;
+	m_sprite_flipx = false;
+	m_sprite_flipy = false;
 }
 
 /***************************************************************************
@@ -189,15 +184,15 @@ void kaneko_kc002_sprite_device::get_sprite_attributes(struct tempsprite_t *s, u
 {
 	s->color    = (attr & 0x003f);
 	s->priority = (attr & 0x00c0) >> 6;
-	s->flipy    = (attr & 0x0100);
-	s->flipx    = (attr & 0x0200);
+	s->flipy    = BIT(attr, 8);
+	s->flipx    = BIT(attr, 9);
 	s->code    += (s->y & 1) << 16;   // bloodwar
 }
 
 void kaneko_vu002_sprite_device::get_sprite_attributes(struct tempsprite_t *s, u16 attr)
 {
-	s->flipy    = (attr & 0x0001);
-	s->flipx    = (attr & 0x0002);
+	s->flipy    = BIT(attr, 0);
+	s->flipx    = BIT(attr, 1);
 	s->color    = (attr & 0x00fc) >> 2;
 	s->priority = (attr & 0x0300) >> 8;
 }
@@ -232,9 +227,9 @@ int kaneko16_sprite_device::parse_sprite_type012(int i, struct tempsprite_t *s, 
 		s->yoffs += screen().visible_area().min_y << 6;
 	}
 
-	return  ((attr & 0x2000) ? USE_LATCHED_XY    : 0) |
-			((attr & 0x4000) ? USE_LATCHED_COLOR : 0) |
-			((attr & 0x8000) ? USE_LATCHED_CODE  : 0) ;
+	return  (BIT(attr, 13) ? USE_LATCHED_XY    : 0) |
+			(BIT(attr, 14) ? USE_LATCHED_COLOR : 0) |
+			(BIT(attr, 15) ? USE_LATCHED_CODE  : 0) ;
 }
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
@@ -352,8 +347,8 @@ void kaneko16_sprite_device::draw_sprites(const rectangle &cliprect, u16* sprite
 	int priority    =   0;
 	int xoffs       =   0;
 	int yoffs       =   0;
-	int flipx       =   0;
-	int flipy       =   0;
+	bool flipx      =   false;
+	bool flipy      =   false;
 
 	while (1)
 	{
@@ -374,7 +369,7 @@ void kaneko16_sprite_device::draw_sprites(const rectangle &cliprect, u16* sprite
 			s->xoffs    = xoffs;
 			s->yoffs    = yoffs;
 
-			if (m_sprite_fliptype==0)
+			if (m_sprite_fliptype == 0)
 			{
 				s->flipx = flipx;
 				s->flipy = flipy;
@@ -387,7 +382,7 @@ void kaneko16_sprite_device::draw_sprites(const rectangle &cliprect, u16* sprite
 			xoffs    = s->xoffs;
 			yoffs    = s->yoffs;
 
-			if (m_sprite_fliptype==0)
+			if (m_sprite_fliptype == 0)
 			{
 				flipx = s->flipx;
 				flipy = s->flipy;
@@ -395,7 +390,7 @@ void kaneko16_sprite_device::draw_sprites(const rectangle &cliprect, u16* sprite
 		}
 
 		// brap boys explicitly doesn't want the flip to be latched, maybe there is a different bit to enable that behavior?
-		if (m_sprite_fliptype==1)
+		if (m_sprite_fliptype == 1)
 		{
 			flipx = s->flipx;
 			flipy = s->flipy;
@@ -529,11 +524,11 @@ void kaneko16_sprite_device::regs_w(offs_t offset, u16 data, u16 mem_mask)
 		case 0:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_sprite_flipx = new_data & 2;
-				m_sprite_flipy = new_data & 1;
+				m_sprite_flipx = BIT(new_data, 1);
+				m_sprite_flipy = BIT(new_data, 0);
 
 				if (get_sprite_type() == 0)
-					m_keep_sprites = ~new_data & 4;
+					m_keep_sprites = BIT(~new_data, 2);
 			}
 
 			break;
@@ -610,8 +605,8 @@ void kaneko16_sprite_device::bootleg_draw_sprites(bitmap_ind16 &bitmap, const re
 	{
 		const u32 code   =  spriteram16[offs + 1] & 0x1fff;
 		const u32 color  = (spriteram16[offs] & 0x003c) >> 2;
-		const bool flipx =  spriteram16[offs] & 0x0002;
-		const bool flipy =  spriteram16[offs] & 0x0001;
+		const bool flipx =  BIT(spriteram16[offs], 1);
+		const bool flipy =  BIT(spriteram16[offs], 0);
 
 		if ((spriteram16[offs] & 0x6000) == 0x6000) /* Link bits */
 		{

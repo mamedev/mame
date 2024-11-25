@@ -52,9 +52,9 @@ public:
 	void votrtnt(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<votrax_sc01_device> m_votrax;

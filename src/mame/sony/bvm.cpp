@@ -46,7 +46,7 @@ public:
 	void bvm(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<h8536_device> m_maincpu;
 };

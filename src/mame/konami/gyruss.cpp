@@ -113,8 +113,8 @@ public:
 	void init_gyruss();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -155,16 +155,14 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	template <uint8_t Which> void filter_w(uint8_t data);
 
-	void audio_cpu1_io_map(address_map &map);
-	void audio_cpu1_map(address_map &map);
-	void audio_cpu2_io_map(address_map &map);
-	void audio_cpu2_map(address_map &map);
-	void main_cpu1_map(address_map &map);
-	void main_cpu2_map(address_map &map);
+	void audio_cpu1_io_map(address_map &map) ATTR_COLD;
+	void audio_cpu1_map(address_map &map) ATTR_COLD;
+	void audio_cpu2_io_map(address_map &map) ATTR_COLD;
+	void audio_cpu2_map(address_map &map) ATTR_COLD;
+	void main_cpu1_map(address_map &map) ATTR_COLD;
+	void main_cpu2_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -320,8 +318,6 @@ uint32_t gyruss_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 /* The timer clock which feeds the upper 4 bits of                      */
 /* AY-3-8910 port A is based on the same clock                          */

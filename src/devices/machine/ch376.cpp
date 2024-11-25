@@ -26,7 +26,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "machine/ch376.h"
+#include "ch376.h"
 
 #include "multibyte.h"
 

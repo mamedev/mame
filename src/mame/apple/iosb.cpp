@@ -81,6 +81,7 @@ void iosb_base::device_add_mconfig(machine_config &config)
 
 	R65NC22(config, m_via2, C7M / 10);
 	m_via2->readpa_handler().set(FUNC(iosb_base::via2_in_a));
+	m_via2->writepb_handler().set(FUNC(iosb_base::via2_out_b));
 	m_via2->irq_handler().set(FUNC(iosb_base::via2_irq));
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -115,6 +116,9 @@ iosb_base::iosb_base(const machine_config &mconfig, device_type type, const char
 	m_adb_st(*this),
 	m_cb1(*this),
 	m_cb2(*this),
+	m_dfac_clock_w(*this),
+	m_dfac_data_w(*this),
+	m_dfac_latch_w(*this),
 	m_pa1(*this, 0),
 	m_pa2(*this, 0),
 	m_pa4(*this, 0),
@@ -266,6 +270,13 @@ void iosb_base::via1_irq(int state)
 {
 	m_via_interrupt = state;
 	field_interrupts();
+}
+
+void iosb_base::via2_out_b(uint8_t data)
+{
+	m_dfac_latch_w(BIT(data, 0));
+	m_dfac_data_w(BIT(data, 3));
+	m_dfac_clock_w(BIT(data, 4));
 }
 
 void iosb_base::via2_irq(int state)

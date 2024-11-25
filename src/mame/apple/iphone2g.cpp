@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/vic_pl192.h"
 #include "screen.h"
 
@@ -21,14 +20,14 @@ public:
 
 	auto out_irq_cb() { return m_out_irq_func.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	iphone2g_spi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -123,15 +122,15 @@ public:
 
 	auto out_irq_cb() { return m_out_irq_func.bind(); }
 
-	void map(address_map &map);
-	void timer_map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
+	void timer_map(address_map &map) ATTR_COLD;
 
 protected:
 	iphone2g_timer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -217,8 +216,8 @@ public:
 	void iphone2g(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t clock1_r(offs_t offset);
 
@@ -234,7 +233,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t iphone2g_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -283,8 +282,8 @@ void iphone2g_state::iphone2g(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &iphone2g_state::mem_map);
 
 	PL192_VIC(config, m_vic0);
-	m_vic0->out_irq_cb().set_inputline("maincpu", ARM7_IRQ_LINE);
-	m_vic0->out_fiq_cb().set_inputline("maincpu", ARM7_FIRQ_LINE);
+	m_vic0->out_irq_cb().set_inputline("maincpu", arm7_cpu_device::ARM7_IRQ_LINE);
+	m_vic0->out_fiq_cb().set_inputline("maincpu", arm7_cpu_device::ARM7_FIRQ_LINE);
 
 	IPHONE2G_SPI(config, m_spi[0], XTAL(12'000'000));
 	m_spi[0]->out_irq_cb().set(m_vic0, FUNC(vic_pl192_device::irq_w<0x09>));

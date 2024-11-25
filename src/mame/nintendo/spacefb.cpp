@@ -143,9 +143,9 @@ public:
 	void spacefb_audio(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 // SPACEFB_PIXEL_CLOCK clocks the star generator circuit.  The rest of the graphics
@@ -166,9 +166,9 @@ private:
 	static constexpr int NUM_STARFIELD_PENS          = 0x40;
 	static constexpr int NUM_SPRITE_PENS             = 0x40;
 
-	void spacefb_main_map(address_map &map);
-	void spacefb_main_io_map(address_map &map);
-	void spacefb_audio_map(address_map &map);
+	void spacefb_main_map(address_map &map) ATTR_COLD;
+	void spacefb_main_io_map(address_map &map) ATTR_COLD;
+	void spacefb_audio_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8035_device> m_audiocpu;
@@ -206,8 +206,6 @@ private:
 	void draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-
-// audio
 
 u8 spacefb_state::audio_p2_r()
 {
@@ -281,8 +279,6 @@ void spacefb_state::spacefb_audio(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
-
-// video
 
 /*************************************
  *
@@ -622,8 +618,6 @@ u32 spacefb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

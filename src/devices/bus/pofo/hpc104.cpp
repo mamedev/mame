@@ -141,6 +141,25 @@ void pofo_hpc104_device::device_reset()
 }
 
 
+void pofo_hpc104_device::nvram_default()
+{
+}
+
+
+bool pofo_hpc104_device::nvram_read(util::read_stream &file)
+{
+	auto const [err, actual] = read(file, m_nvram, 0x40000);
+	return !err && (actual == 0x40000);
+}
+
+
+bool pofo_hpc104_device::nvram_write(util::write_stream &file)
+{
+	auto const [err, actual] = write(file, m_nvram, 0x40000);
+	return !err;
+}
+
+
 //-------------------------------------------------
 //  nrdi_r - read
 //-------------------------------------------------

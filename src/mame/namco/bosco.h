@@ -21,7 +21,7 @@ public:
 	void bosco(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_bosco_radarattr;
@@ -51,7 +51,7 @@ private:
 	void bosco_scrollx_w(uint8_t data);
 	void bosco_scrolly_w(uint8_t data);
 	void bosco_starclr_w(uint8_t data);
-	void bosco_map(address_map &map);
+	void bosco_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NAMCO_BOSCO_H

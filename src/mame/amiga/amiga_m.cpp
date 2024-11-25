@@ -1048,7 +1048,7 @@ void amiga_state::gayle_cia_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	cia_w(offset, data, mem_mask);
 }
 
-CUSTOM_INPUT_MEMBER( amiga_state::floppy_drive_status )
+ioport_value amiga_state::floppy_drive_status()
 {
 	return m_fdc->ciaapra_r();
 }

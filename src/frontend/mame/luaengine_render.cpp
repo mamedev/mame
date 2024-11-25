@@ -18,6 +18,7 @@
 #include "rendlay.h"
 #include "rendutil.h"
 
+#include "interface/uievents.h"
 #include "ioprocs.h"
 
 #include <algorithm>
@@ -447,6 +448,33 @@ public:
 };
 
 } // namespace sol
+
+
+//-------------------------------------------------
+//  sol_lua_push - automatically convert
+//  osd::ui_event_handler::pointer to a string
+//-------------------------------------------------
+
+int sol_lua_push(sol::types<osd::ui_event_handler::pointer>, lua_State *L, osd::ui_event_handler::pointer &&value)
+{
+	const char *typestr = "invalid";
+	switch (value)
+	{
+	case osd::ui_event_handler::pointer::UNKNOWN:
+		typestr = "unknown";
+		break;
+	case osd::ui_event_handler::pointer::MOUSE:
+		typestr = "mouse";
+		break;
+	case osd::ui_event_handler::pointer::PEN:
+		typestr = "pen";
+		break;
+	case osd::ui_event_handler::pointer::TOUCH:
+		typestr = "touch";
+		break;
+	}
+	return sol::stack::push(L, typestr);
+}
 
 
 template <typename T>
@@ -931,6 +959,34 @@ void lua_engine::initialize_render(sol::table &emu)
 					nullptr,
 					"set_recomputed_callback",
 					"recomputed"));
+	layout_view_type.set_function(
+			"set_pointer_updated_callback",
+			make_simple_callback_setter(
+					&layout_view::set_pointer_updated_callback,
+					nullptr,
+					"set_pointer_updated_callback",
+					"pointer updated"));
+	layout_view_type.set_function(
+			"set_pointer_left_callback",
+			make_simple_callback_setter(
+					&layout_view::set_pointer_left_callback,
+					nullptr,
+					"set_pointer_left_callback",
+					"pointer left"));
+	layout_view_type.set_function(
+			"set_pointer_aborted_callback",
+			make_simple_callback_setter(
+					&layout_view::set_pointer_aborted_callback,
+					nullptr,
+					"set_pointer_aborted_callback",
+					"pointer aborted"));
+	layout_view_type.set_function(
+			"set_forget_pointers_callback",
+			make_simple_callback_setter(
+					&layout_view::set_forget_pointers_callback,
+					nullptr,
+					"set_forget_pointers_callback",
+					"forget pointers"));
 	layout_view_type["items"] = sol::property([] (layout_view &v) { return layout_view_items(v); });
 	layout_view_type["name"] = sol::property(&layout_view::name);
 	layout_view_type["unqualified_name"] = sol::property(&layout_view::unqualified_name);
@@ -938,6 +994,8 @@ void lua_engine::initialize_render(sol::table &emu)
 	layout_view_type["effective_aspect"] = sol::property(&layout_view::effective_aspect);
 	layout_view_type["bounds"] = sol::property(&layout_view::bounds);
 	layout_view_type["has_art"] = sol::property(&layout_view::has_art);
+	layout_view_type["show_pointers"] = sol::property(&layout_view::show_pointers, &layout_view::set_show_pointers);
+	layout_view_type["hide_inactive_pointers"] = sol::property(&layout_view::hide_inactive_pointers, &layout_view::set_hide_inactive_pointers);
 
 
 	auto layout_view_item_type = sol().registry().new_usertype<layout_view_item>("layout_item", sol::no_constructor);
@@ -1044,6 +1102,7 @@ void lua_engine::initialize_render(sol::table &emu)
 
 
 	auto target_type = sol().registry().new_usertype<render_target>("target", sol::no_constructor);
+	target_type["ui_container"] = sol::property(&render_target::ui_container);
 	target_type["index"] = sol::property([] (render_target const &t) { return t.index() + 1; });
 	target_type["width"] = sol::property(&render_target::width);
 	target_type["height"] = sol::property(&render_target::height);

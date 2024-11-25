@@ -58,10 +58,10 @@ public:
 	void qdrmfgp(machine_config &config);
 	void qdrmfgp2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(battery_sensor_r);
+	ioport_value battery_sensor_r();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -107,9 +107,9 @@ private:
 	K056832_CB_MEMBER(qdrmfgp_tile_callback);
 	K056832_CB_MEMBER(qdrmfgp2_tile_callback);
 
-	void qdrmfgp2_map(address_map &map);
-	void qdrmfgp_k054539_map(address_map &map);
-	void qdrmfgp_map(address_map &map);
+	void qdrmfgp2_map(address_map &map) ATTR_COLD;
+	void qdrmfgp_k054539_map(address_map &map) ATTR_COLD;
+	void qdrmfgp_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -178,7 +178,7 @@ uint16_t qdrmfgp_state::inputs_r()
 	return m_control & 0x0080 ? m_inputs_port->read() : m_dsw_port->read();
 }
 
-CUSTOM_INPUT_MEMBER(qdrmfgp_state::battery_sensor_r)
+ioport_value qdrmfgp_state::battery_sensor_r()
 {
 	/* bit 0-1  battery power sensor: 3=good, 2=low, other=bad */
 	return 0x0003;
@@ -519,7 +519,7 @@ static INPUT_PORTS_START( qdrmfgp )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 
 	PORT_START("SENSOR")
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(qdrmfgp_state, battery_sensor_r)   /* battery power sensor */
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(qdrmfgp_state::battery_sensor_r))   /* battery power sensor */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -599,7 +599,7 @@ static INPUT_PORTS_START( qdrmfgp2 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 
 	PORT_START("SENSOR")
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(qdrmfgp_state, battery_sensor_r)   /* battery power sensor */
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(qdrmfgp_state::battery_sensor_r))   /* battery power sensor */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )

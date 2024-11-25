@@ -44,8 +44,8 @@ public:
 protected:
 	TIMER_DEVICE_CALLBACK_MEMBER( bartop_interrupt );
 
-	virtual void machine_reset() override;
-	void a5200_mem(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	void a5200_mem(address_map &map) ATTR_COLD;
 };
 
 

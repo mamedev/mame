@@ -101,8 +101,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mos6560_colorram_map(address_map &map);
-	void mos6560_videoram_map(address_map &map);
+	void mos6560_colorram_map(address_map &map) ATTR_COLD;
+	void mos6560_videoram_map(address_map &map) ATTR_COLD;
 protected:
 	enum
 	{
@@ -114,8 +114,8 @@ protected:
 	mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

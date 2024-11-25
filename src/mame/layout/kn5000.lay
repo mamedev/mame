@@ -1,0 +1,887 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="vector_art">
+		<image><data><![CDATA[
+<svg width="1280" height="640" viewBox="0 0 338.6 169.3">
+<g transform="translate(47.95,-15.32)">
+<path style="stroke:#222;stroke-width:0.2;" d="m 189.36,21.12 v 5.13 m 0.69,-5.17 v 5.20 M 51.92,21.12 v 5.13 m 0.69,-5.17 v 5.20 m 125.41,-2.17 -0.03,2.19 h 1.67 l -0.66,-2.18 -0.97,-0 z M 69.13,165.59 c -0.21,1.74 -0.34,3.5 -0.38,5.26 0.036,1.76 0.16,3.51 0.38,5.26 H 172.72 c 0.21,-1.74 0.34,-3.5 0.38,-5.26 -0,-1.76 -0.09,-3.51 -0.27,-5.26 h -41.75 c -3.15,2.10 -6.85,3.23 -10.63,3.23 -3.78,-0 -7.48,-1.13 -10.63,-3.23 z M 290.58,26.85 C 258.15,24.17 225.69,21.81 193.14,21.16 H 49.61 c -32.55,0.44 -65,3.19 -97.44,5.7 m 0,101.11 H 290.58 m -83.17,0.03 -7.89,-96.95 c -0.21,-2.62 -2.11,-4.74 -4.74,-4.74 H 47.6 c -2.62,0 -4.54,2.1 -4.74,4.74 l -7.1,96.95" />
+<path style="fill:#cba47d" d="m 184,28 v 0.6 h -3 v 0.46 h 5.43 v -0.3 l -1.82,-0.73 z M -32.27,74.75 c -0.1,0 -0.09,0.06 -0.09,0.13 v 1.92 c 0,0 -0.05,0 -0.09,0 -0.29,-0.02 -0.61,0.2 -0.64,0.5 -0.03,0.24 0.22,0.44 0.45,0.41 0.29,-0.03 0.5,-0.32 0.46,-0.61 v -1.52 c 0.02,-0.02 0.06,0.03 0.08,0.03 0.23,0.14 0.43,0.36 0.45,0.65 0.02,0.22 -0.05,0.44 -0.13,0.64 0.25,-0.31 0.33,-0.76 0.16,-1.13 -0.09,-0.21 -0.29,-0.34 -0.4,-0.54 a 1.08,1.08 0 0 1 -0.16,-0.44 c -0.02,-0.03 -0.06,-0.04 -0.09,-0.04 z m 54.37,105 0.97,2.56 1.07,-2.6 z m 44.4,0 0.97,2.56 1.07,-2.56 z m 54.5,0 0.97,2.6 1.1,-2.6 z" />
+</g></svg>
+		]]></data></image>
+	</element>
+
+	<element name="red_led" defstate="0">
+		<disk state="1">
+			<color red="1" green="0.0" blue="0.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+		</disk>
+	</element>
+
+	<element name="green_led" defstate="0">
+		<disk state="1">
+			<color red="0.0" green="1.0" blue="0.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.0" green="0.2" blue="0.0"/>
+		</disk>
+	</element>
+
+	<element name="light_grey_round_button">
+		<disk><color red="0.2" green="0.2" blue="0.2"/></disk>
+	</element>
+
+	<element name="dark_grey_round_button">
+		<disk><color red="0.1" green="0.1" blue="0.1"/></disk>
+	</element>
+
+	<element name="blueish_gray_button">
+		<rect><color red="0.36" green="0.39" blue="0.41"/></rect>
+	</element>
+
+	<element name="light_grey_pill_button">
+		<disk><color red="0.2" green="0.2" blue="0.2"/></disk>
+	</element>
+
+	<element name="dark_grey_pill_button">
+		<disk><color red="0.1" green="0.1" blue="0.1"/></disk>
+	</element>
+
+	<element name="dark_grey_button">
+		<rect><color red="0.1" green="0.1" blue="0.1"/></rect>
+	</element>
+
+	<element name="light_grey_button">
+		<rect><color red="0.2" green="0.2" blue="0.2"/></rect>
+	</element>
+
+	<element name="button_split">
+		<rect><color red="0" green="0" blue="0"/></rect>
+	</element>
+
+	<element name="line">
+		<rect><color red="0.79" green="0.64" blue="0.49" /></rect>
+	</element>
+
+	<element name="screen_border">
+		<rect><color red="0.05" green="0.05" blue="0.05"/></rect>
+	</element>
+
+	<element name="maincpu_text"><text string="MAIN CPU"><color red="0.3" green="0.3" blue="0.3" /></text></element>
+	<element name="subcpu_text"><text string="SUB CPU"><color red="0.3" green="0.3" blue="0.3" /></text></element>
+
+	<element name="msp_title"><text string="MANUAL SEQUENCE PADS"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="demo_text"><text string="DEMO"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="msp_bank_text"><text string="BANK"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="msp_menu_text"><text string="MENU"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="msp_stop_record_text"><text string="STOP/RECORD"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="msp_1_text"><text string="1"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="msp_2_text"><text string="2"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="msp_3_text"><text string="3"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="msp_4_text"><text string="4"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="msp_5_text"><text string="5"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="msp_6_text"><text string="6"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="screen_display_angle_text1"><text string="DISPLAY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="screen_display_angle_text2"><text string=" ANGLE "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="screen_contrast_text"><text string="CONTRAST"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="screen_help_text"><text string="HELP"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="screen_other_parts_text1"><text string=" OTHER "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="screen_other_parts_text2"><text string="PARTS/TR"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="screen_mute_text"><text string="MUTE"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="screen_page_text"><text string="PAGE"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="screen_display_hold_text1"><text string="DISPLAY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="screen_display_hold_text2"><text string=" HOLD "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="screen_exit_text"><text string="EXIT"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="sequencer_title"><text string="SEQUENCER"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="sequencer_play_text"><text string="PLAY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="sequencer_easy_rec_text"><text string="EASY REC"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="sequencer_menu_text"><text string="MENU"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="menu_title"><text string="MENU"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="menu_sound_text"><text string="SOUND"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="menu_control_text"><text string="CONTROL"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="menu_midi_text"><text string="MIDI"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="menu_disk_text"><text string="DISK"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="menu_disk_load_text"><text string="LOAD"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="pm_set_text"><text string="SET"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="pm_next_bank_text"><text string="NEXT BANK"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="pm_bank_view_text"><text string="BANKVIEW"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="panel_memory_title"><text string="PANEL MEMORY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="pm_1_text"><text string="1"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="pm_2_text"><text string="2"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="pm_3_text"><text string="3"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="pm_4_text"><text string="4"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="pm_5_text"><text string="5"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="pm_6_text"><text string="6"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="pm_7_text"><text string="7"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="pm_8_text"><text string="8"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="rhythm_group_title"><text string="RHYTHM GROUP"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="standard_rock_text1"><text string="STANDARD"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="standard_rock_text2"><text string="  ROCK  "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="r_n_rool_n_blues_text1"><text string="R &amp; ROLL"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="r_n_rool_n_blues_text2"><text string="&amp; BLUES"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="pop_n_ballad_text1"><text string="POP &amp;"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="pop_n_ballad_text2"><text string="BALLAD"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="funk_n_fusion_text1"><text string="FUNK &amp;"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="funk_n_fusion_text2"><text string="FUSION"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="soul_n_modern_dance_text1"><text string="  SOUL &amp;  "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="soul_n_modern_dance_text2"><text string="MODERN DANCE"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="big_band_n_swing_text1"><text string="BIG BAND"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="big_band_n_swing_text2"><text string=" &amp; SWING "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="jazz_combo_text1"><text string=" JAZZ "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="jazz_combo_text2"><text string="COMBO"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="us_trad_text"><text string="U.S. TRAD"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="country_text"><text string="COUNTRY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="latin_text"><text string="LATIN"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="march_n_waltz_text1"><text string="MARCH &amp;"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="march_n_waltz_text2"><text string="WALTZ"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="party_time_text1"><text string="PARTY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="party_time_text2"><text string=" TIME "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="showtime_n_trad_dance_text1"><text string="SHOWTIME &amp;"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="showtime_n_trad_dance_text2"><text string="TRAD DANCE"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="world_text"><text string="WORLD"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="custom_text"><text string="CUSTOM"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="composer_title"><text string="COMPOSER"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="sound_arranger_title"><text string="SOUND ARRANGER"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="composer_memory_text"><text string="MEMORY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="composer_menu_text"><text string="MENU"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="sound_arranger_set_text"><text string="SET"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="sound_arranger_on_off_text"><text string="ON/OFF"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="music_style_arranger_text1"><text string="MUSIC STYLE"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="music_style_arranger_text2"><text string=" ARRANGER "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="split_point_text1"><text string="SPLIT"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="split_point_text2"><text string="POINT"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="auto_play_chord_text1"><text string="AUTO PLAY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="auto_play_chord_text2"><text string="  CHORD  "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="variation_n_msa_title"><text string="VARIATION &amp; MSA"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="variation_1_text"><text string="1"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="variation_2_text"><text string="2"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="variation_3_text"><text string="3"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="variation_4_text"><text string="4"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="music_stylist_text"><text string="MUSIC STYLIST"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="one_touch_play_text"><text string="ONE TOUCH PLAY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="fade_text"><text string="FADE"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="fade_in_text"><text string="IN"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="fade_out_text"><text string="OUT"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="tempo_program_text1"><text string="TEMPO/"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="tempo_program_text2"><text string="PROGRAM"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="transpose_text"><text string="TRANSPOSE"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="transpose_minus_text"><text string="-"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="transpose_plus_text"><text string="+"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="r1_r2_octave_text"><text string="R1/R2 OCTAVE"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="octave_minus_text"><text string="-"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="octave_plus_text"><text string="+"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="fill_in_text"><text string="FILL IN"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="fill_in_text1"><text string="1"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="fill_in_text2"><text string="2"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="intro_n_ending_text"><text string="INTRO &amp; ENDING"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="intro_n_ending_text1"><text string="1"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="intro_n_ending_text2"><text string="2"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="sequencer_reset_text1"><text string="SEQUENCER"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="sequencer_reset_text2"><text string="  RESET  "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="count_intro_text1"><text string="COUNT"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="count_intro_text2"><text string="INTRO"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="start_stop_text"><text string="START/STOP"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="1234beat_text1"><text string="1"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="1234beat_text2"><text string="2"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="1234beat_text3"><text string="3"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="1234beat_text4"><text string="4 BEAT"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="synchro_n_break_text1"><text string="SYNCHRO &amp;"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="synchro_n_break_text2"><text string=" BREAK "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="tap_tempo_text1"><text string=" TAP "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="tap_tempo_text2"><text string="TEMPO"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="effect_title"><text string="EFFECT"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="sustain_text"><text string="SUSTAIN"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="digital_effect_text1"><text string="DIGITAL"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="digital_effect_text2"><text string="EFFECT"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="dsp_effect_text1"><text string="DSP"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="dsp_effect_text2"><text string="EFFECT"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="digital_reverb_text1"><text string="DIGITAL"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="digital_reverb_text2"><text string="REVERB"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="acoustic_illusion_text1"><text string="ACOUSTIC"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="acoustic_illusion_text2"><text string="ILLUSION"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="part_select_title"><text string="PART SELECT"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="part_select_left_text"><text string="LEFT"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="part_select_right_2_text"><text string="RIGHT 2"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="part_select_right_1_text"><text string="RIGHT 1"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="conductor_title"><text string="CONDUCTOR"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="entertainer_text"><text string="ENTERTAINER"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="techni_chord_text1"><text string="TECHNI-"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="techni_chord_text2"><text string="CHORD"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="sound_group_title"><text string="SOUND GROUP"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="piano_text"><text string="PIANO"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="guitar_text"><text string="GUITAR"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="strings_n_vocal_text1"><text string="STRINGS &amp;"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="strings_n_vocal_text2"><text string="  VOCAL  "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="brass_text"><text string="BRASS"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="flute_text"><text string="FLUTE"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="sax_n_reed_text1"><text string="SAX &amp;"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="sax_n_reed_text2"><text string="REED"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="mallet_n_orch_perc_text1"><text string=" MALLET &amp; "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="mallet_n_orch_perc_text2"><text string="ORCH PERC"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="world_perc_text1"><text string="WORLD"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="world_perc_text2"><text string=" PERC "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="organ_n_accordion_text1"><text string=" ORGAN &amp; "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="organ_n_accordion_text2"><text string="ACCORDION"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="orchestral_pad_text1"><text string="ORCHESTRAL"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="orchestral_pad_text2"><text string="   PAD   "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="synth_text"><text string="SYNTH"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="bass_text"><text string="BASS"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+	<element name="digital_drawbar_text1"><text string=" DIGITAL "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="digital_drawbar_text2"><text string="DRAWBAR"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="accordion_register_text1"><text string="ACCORDION"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="accordion_register_text2"><text string=" REGISTER "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="gm_special_text1"><text string="  GM  "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="gm_special_text2"><text string="SPECIAL"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="drum_kits_text1"><text string="DRUM"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="drum_kits_text2"><text string=" KITS "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="memory_a_text1"><text string="MEMORY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="memory_a_text2"><text string="  A  "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="memory_b_text1"><text string="MEMORY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="memory_b_text2"><text string="  B  "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+	<bounds left="0" right="1280" top="0" bottom="640"/>
+	<element ref="vector_art"><bounds left="0" right="1280" top="0" bottom="640"/></element>
+	<element ref="screen_border"><bounds x="449" y="63" width="380" height="275"/></element>
+	<screen index="0"><bounds x="480" y="82" width="320" height="240"/></screen>
+
+<!-- Buttons and LEDs -->
+
+	<element name="screen_button_left_1" ref="dark_grey_button" inputtag="CPL_SEG10" inputmask="0x02"><bounds x="394" y="108" width="36" height="21"/></element>
+	<element name="screen_button_left_2" ref="dark_grey_button" inputtag="CPL_SEG10" inputmask="0x01"><bounds x="394" y="150" width="36" height="21"/></element>
+	<element name="screen_button_left_3" ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x04"><bounds x="394" y="191" width="36" height="21"/></element>
+	<element name="screen_button_left_4" ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x02"><bounds x="394" y="232" width="36" height="21"/></element>
+	<element name="screen_button_left_5" ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x01"><bounds x="394" y="274" width="36" height="21"/></element>
+
+	<element name="screen_button_right_1" ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x04"><bounds x="849" y="108" width="36" height="21"/></element>
+	<element name="screen_button_right_2" ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x02"><bounds x="849" y="150" width="36" height="21"/></element>
+	<element name="screen_button_right_3" ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x01"><bounds x="849" y="191" width="36" height="21"/></element>
+	<element name="screen_button_right_4" ref="dark_grey_button" inputtag="CPL_SEG7" inputmask="0x02"><bounds x="849" y="232" width="36" height="21"/></element>
+	<element name="screen_button_right_5" ref="dark_grey_button" inputtag="CPL_SEG7" inputmask="0x01"><bounds x="849" y="274" width="36" height="21"/></element>
+
+	<element name="screen_button_up_1" ref="dark_grey_button" inputtag="CPL_SEG10" inputmask="0x20"><bounds x="491" y="349" width="29" height="25"/></element>
+	<element name="screen_button_up_2" ref="dark_grey_button" inputtag="CPL_SEG10" inputmask="0x80"><bounds x="529" y="349" width="29" height="25"/></element>
+	<element name="screen_button_up_3" ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x20"><bounds x="567" y="349" width="29" height="25"/></element>
+	<element name="screen_button_up_4" ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x80"><bounds x="605" y="349" width="29" height="25"/></element>
+	<element name="screen_button_up_5" ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x20"><bounds x="643" y="349" width="29" height="25"/></element>
+	<element name="screen_button_up_6" ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x80"><bounds x="681" y="349" width="29" height="25"/></element>
+	<element name="screen_button_up_7" ref="dark_grey_button" inputtag="CPL_SEG7" inputmask="0x20"><bounds x="720" y="349" width="29" height="25"/></element>
+	<element name="screen_button_up_8" ref="dark_grey_button" inputtag="CPL_SEG7" inputmask="0x80"><bounds x="758" y="349" width="29" height="25"/></element>
+	<element name="screen_button_page_up" ref="dark_grey_button" inputtag="CPL_SEG2" inputmask="0x80"><bounds x="804" y="350" width="29" height="24"/></element>
+
+	<element name="screen_button_down_1" ref="dark_grey_button" inputtag="CPL_SEG10" inputmask="0x10"><bounds x="491" y="378" width="29" height="25"/></element>
+	<element name="screen_button_down_2" ref="dark_grey_button" inputtag="CPL_SEG10" inputmask="0x40"><bounds x="529" y="378" width="29" height="25"/></element>
+	<element name="screen_button_down_3" ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x10"><bounds x="567" y="378" width="29" height="25"/></element>
+	<element name="screen_button_down_4" ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x40"><bounds x="605" y="378" width="29" height="25"/></element>
+	<element name="screen_button_down_5" ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x10"><bounds x="643" y="378" width="29" height="25"/></element>
+	<element name="screen_button_down_6" ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x40"><bounds x="681" y="378" width="29" height="25"/></element>
+	<element name="screen_button_down_7" ref="dark_grey_button" inputtag="CPL_SEG7" inputmask="0x10"><bounds x="720" y="378" width="29" height="25"/></element>
+	<element name="screen_button_down_8" ref="dark_grey_button" inputtag="CPL_SEG7" inputmask="0x40"><bounds x="758" y="378" width="29" height="25"/></element>
+	<element name="screen_button_page_down" ref="dark_grey_button" inputtag="CPL_SEG2" inputmask="0x40"><bounds x="804" y="378" width="29" height="24"/></element>
+
+	<element name="screen_help" ref="dark_grey_round_button" inputtag="CPL_SEG10" inputmask="0x04"><bounds x="379" y="362" width="29" height="29"/></element>
+	<element name="screen_other_parts_tr" ref="dark_grey_round_button" inputtag="CPL_SEG10" inputmask="0x08"><bounds x="417" y="362" width="29" height="29"/></element>
+	<element name="screen_display_hold" ref="dark_grey_round_button" inputtag="CPL_SEG7" inputmask="0x04"><bounds x="851" y="362" width="29" height="29"/></element>
+	<element name="screen_exit" ref="dark_grey_round_button" inputtag="CPL_SEG7" inputmask="0x08"><bounds x="889" y="362" width="29" height="29"/></element>
+
+	<element name="composer_memory" ref="dark_grey_button" inputtag="CPL_SEG1" inputmask="0x01"><bounds x="229" y="477" width="33" height="21"/></element>
+	<element name="CPL_1" ref="green_led"><!-- COMPOSER: MEMORY --><bounds x="242" y="469" width="5" height="5"/></element>
+
+	<element name="composer_menu" ref="dark_grey_button" inputtag="CPL_SEG1" inputmask="0x02"><bounds x="264" y="477" width="33" height="21"/></element>
+	<element name="CPL_2" ref="green_led"><!-- COMPOSER: MENU --><bounds x="277" y="469" width="5" height="5"/></element>
+
+	<element name="sounds_arranger_set" ref="dark_grey_button" inputtag="CPL_SEG1" inputmask="0x04"><bounds x="299" y="477" width="33" height="21"/></element>
+	<element name="CPL_3" ref="green_led"><!-- SOUND ARRANGER: SET --><bounds x="312" y="469" width="5" height="5"/></element>
+
+	<element name="sounds_arranger_on_off" ref="dark_grey_button" inputtag="CPL_SEG1" inputmask="0x08"><bounds x="334" y="477" width="33" height="21"/></element>
+	<element name="CPL_4" ref="green_led"><!-- SOUND ARRANGER: ON/OFF --><bounds x="348" y="469" width="5" height="5"/></element>
+
+	<element name="tempo_program_encoder" ref="dark_grey_round_button"><bounds x="591" y="460" width="90" height="90"/></element>
+	<element name="tempo_program_encoder_finger" ref="light_grey_round_button"><bounds x="641" y="512" width="27" height="27"/></element>
+
+	<element name="music_stylist" ref="light_grey_round_button" inputtag="CPL_SEG1" inputmask="0x10"><bounds x="444" y="455" width="81" height="23"/></element>
+	<element name="CPL_5" ref="green_led"><!-- MUSIC STYLIST --><bounds x="483" y="448" width="5" height="5"/></element>
+
+	<element ref="dark_grey_round_button"><bounds x="444" y="501" width="81" height="23"/></element>
+	<element ref="button_split"><bounds x="483" y="501" width="2" height="23"/></element>
+	<element name="fade_in" ref="dark_grey_round_button" inputtag="CPL_SEG1" inputmask="0x20"><bounds x="448" y="503" width="35" height="18"/></element>
+	<element name="CPL_6" ref="green_led"><!-- FADE IN --><bounds x="452" y="497" width="5" height="5"/></element>
+	<element name="fade_out" ref="dark_grey_round_button" inputtag="CPL_SEG1" inputmask="0x40"><bounds x="485" y="503" width="35" height="18"/></element>
+	<element name="CPL_7" ref="green_led"><!-- FADE OUT --><bounds x="513" y="497" width="5" height="5"/></element>
+
+	<element name="CPL_8" ref="red_led"><!-- DISPLAY HOLD --><bounds x="863" y="354" width="5" height="5"/></element>
+
+
+	<element name="u_s_trad" ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x01"><bounds x="97" y="529" width="33" height="21"/></element>
+	<element name="CPL_9" ref="red_led"><!-- U.S. TRAD --><bounds x="111" y="521" width="5" height="5"/></element>
+
+	<element name="country" ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x02"><bounds x="132" y="529" width="33" height="21"/></element>
+	<element name="CPL_10" ref="red_led"><!-- COUNTRY --><bounds x="146" y="521" width="5" height="5"/></element>
+
+	<element name="latin" ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x04"><bounds x="167" y="529" width="33" height="21"/></element>
+	<element name="CPL_11" ref="red_led"><!-- LATIN --><bounds x="181" y="521" width="5" height="5"/></element>
+
+
+	<element name="march_n_waltz" ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x08"><bounds x="27" y="582" width="33" height="21"/></element>
+	<element name="CPL_12" ref="red_led"><!-- MARCH & WALTZ --><bounds x="41" y="573" width="5" height="5"/></element>
+
+	<element name="party_time" ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x10"><bounds x="62" y="582" width="33" height="21"/></element>
+	<element name="CPL_13" ref="red_led"><!-- PARTY TIME --><bounds x="76" y="573" width="5" height="5"/></element>
+
+	<element name="showtime_n_trad_dance" ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x20"><bounds x="97" y="582" width="33" height="21"/></element>
+	<element name="CPL_14" ref="red_led"><!-- SHOWTIME & TRAD DANCE --><bounds x="111" y="573" width="5" height="5"/></element>
+
+	<element name="world" ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x40"><bounds x="132" y="582" width="33" height="21"/></element>
+	<element name="CPL_15" ref="red_led"><!-- WORLD --><bounds x="146" y="573" width="5" height="5"/></element>
+
+	<element name="custom" ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x80"><bounds x="167" y="582" width="33" height="21"/></element>
+	<element name="CPL_16" ref="green_led"><!-- CUSTOM --><bounds x="181" y="573" width="5" height="5"/></element>
+
+
+	<element name="standard_rock" ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x01"><bounds x="27" y="477" width="33" height="21"/></element>
+	<element name="CPL_17" ref="red_led"><!-- STANDARD ROCK --><bounds x="41" y="469" width="5" height="5"/></element>
+
+	<element name="r_n_roll_n_blues" ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x02"><bounds x="62" y="477" width="33" height="21"/></element>
+	<element name="CPL_18" ref="red_led"><!-- R & ROLL & BLUES --><bounds x="76" y="469" width="5" height="5"/></element>
+
+	<element name="pop_n_ballad" ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x04"><bounds x="97" y="477" width="33" height="21"/></element>
+	<element name="CPL_19" ref="red_led"><!-- POP & BALLAD --><bounds x="111" y="469" width="5" height="5"/></element>
+
+	<element name="funk_n_fusion" ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x08"><bounds x="132" y="477" width="33" height="21"/></element>
+	<element name="CPL_20" ref="red_led"><!-- FUNK & FUSION --><bounds x="146" y="469" width="5" height="5"/></element>
+
+	<element name="soul_modern_dance" ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x10"><bounds x="167" y="477" width="33" height="21"/></element>
+	<element name="CPL_21" ref="red_led"><!-- SOUL & MODERN DANCE --><bounds x="181" y="469" width="5" height="5"/></element>
+
+
+	<element name="big_band_n_swing" ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x20"><bounds x="27" y="529" width="33" height="21"/></element>
+	<element name="CPL_22" ref="red_led"><!-- BIG BAND & SWING --><bounds x="41" y="521" width="5" height="5"/></element>
+
+	<element name="jazz_combo" ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x40"><bounds x="62" y="529" width="33" height="21"/></element>
+	<element name="CPL_23" ref="red_led"><!-- JAZZ COMBO --><bounds x="76" y="521" width="5" height="5"/></element>
+
+
+	<element name="demo" ref="light_grey_pill_button" inputtag="CPL_SEG3" inputmask="0x01"><bounds x="25" y="247" width="37" height="21"/></element>
+
+	<element name="msp_bank" ref="dark_grey_pill_button" inputtag="CPL_SEG3" inputmask="0x02"><bounds x="111" y="247" width="37" height="21"/></element>
+	<element name="msp_menu" ref="dark_grey_pill_button" inputtag="CPL_SEG3" inputmask="0x04"><bounds x="184" y="247" width="37" height="21"/></element>
+
+	<element name="msp_stop_record" ref="dark_grey_pill_button" inputtag="CPL_SEG3" inputmask="0x08"><bounds x="260" y="247" width="37" height="21"/></element>
+	<element name="CPL_24" ref="green_led"><!-- MSP: MENU --><bounds x="200" y="236" width="5" height="5"/></element>
+
+	<element name="msp_1" ref="blueish_gray_button" inputtag="CPL_SEG5" inputmask="0x01"><bounds x="112" y="300" width="60" height="36"/></element>
+	<element name="msp_2" ref="blueish_gray_button" inputtag="CPL_SEG5" inputmask="0x02"><bounds x="174" y="300" width="60" height="36"/></element>
+	<element name="msp_3" ref="blueish_gray_button" inputtag="CPL_SEG5" inputmask="0x04"><bounds x="236" y="300" width="60" height="36"/></element>
+	<element name="msp_4" ref="blueish_gray_button" inputtag="CPL_SEG5" inputmask="0x08"><bounds x="112" y="338" width="60" height="36"/></element>
+	<element name="msp_5" ref="blueish_gray_button" inputtag="CPL_SEG5" inputmask="0x10"><bounds x="174" y="338" width="60" height="36"/></element>
+	<element name="msp_6" ref="blueish_gray_button" inputtag="CPL_SEG5" inputmask="0x20"><bounds x="236" y="338" width="60" height="36"/></element>
+
+	<element ref="line"><bounds x="221" y="537" width="11" height="1"/></element>
+	<element ref="line"><bounds x="221" y="537" width="1" height="52"/></element>
+	<element ref="line"><bounds x="221" y="589" width="6" height="1"/></element>
+
+	<element name="variation_n_msa_1" ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x01"><bounds x="228" y="572" width="31" height="31"/></element>
+	<element name="CPL_25" ref="red_led"><!-- VARIATION & MSA 1 --><bounds x="241" y="563" width="5" height="5"/></element>
+
+	<element name="variation_n_msa_2" ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x02"><bounds x="264" y="572" width="31" height="31"/></element>
+	<element name="CPL_26" ref="red_led"><!-- VARIATION & MSA 2 --><bounds x="277" y="563" width="5" height="5"/></element>
+
+	<element name="variation_n_msa_3" ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x04"><bounds x="300" y="572" width="31" height="31"/></element>
+	<element name="CPL_27" ref="red_led"><!-- VARIATION & MSA 3 --><bounds x="312" y="563" width="5" height="5"/></element>
+
+	<element name="variation_n_msa_4" ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x08"><bounds x="336" y="572" width="31" height="31"/></element>
+	<element name="CPL_28" ref="red_led"><!-- VARIATION & MSA 4 --><bounds x="348" y="563" width="5" height="5"/></element>
+
+	<element name="music_style_arranger" ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x10"><bounds x="233" y="529" width="21" height="21"/></element>
+	<element name="CPL_29" ref="red_led"><!-- MUSIC STYLE ARRANGER --><bounds x="241" y="521" width="5" height="5"/></element>
+
+	<element name="split_point" ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x20"><bounds x="299" y="529" width="33" height="21"/></element>
+
+	<element name="auto_play_chord" ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x40"><bounds x="334" y="529" width="33" height="21"/></element>
+	<element name="CPL_30" ref="green_led"><!-- AUTO PLAY CHORD --><bounds x="348" y="521" width="5" height="5"/></element>
+
+	<element name="fill_in_1" ref="dark_grey_button" inputtag="CPL_SEG2" inputmask="0x01"><bounds x="444" y="571" width="30" height="34"/></element>
+	<element name="CPL_33" ref="red_led"><!-- FILL IN 1 --><bounds x="455" y="558" width="5" height="5"/></element>
+
+	<element name="fill_in_2" ref="dark_grey_button" inputtag="CPL_SEG2" inputmask="0x02"><bounds x="479" y="571" width="30" height="34"/></element>
+	<element name="CPL_34" ref="red_led"><!-- FILL IN 2 --><bounds x="490" y="558" width="5" height="5"/></element>
+
+	<element name="intro_n_ending_1" ref="dark_grey_button" inputtag="CPL_SEG2" inputmask="0x04"><bounds x="520" y="571" width="30" height="34"/></element>
+	<element name="CPL_35" ref="red_led"><!-- INTRO & ENDING 1 --><bounds x="533" y="558" width="5" height="5"/></element>
+
+	<element name="intro_n_ending_2" ref="dark_grey_button" inputtag="CPL_SEG2" inputmask="0x08"><bounds x="555" y="571" width="30" height="34"/></element>
+	<element name="CPL_36" ref="red_led"><!-- INTRO & ENDING 2 --><bounds x="569" y="558" width="5" height="5"/></element>
+
+	<element name="CPL_37" ref="red_led"><!-- SPLIT POINT INDICATOR (LEFT) --><bounds x="266" y="612" width="5" height="5"/></element>
+	<element name="CPL_38" ref="red_led"><!-- SPLIT POINT INDICATOR (CENTER) --><bounds x="434" y="612" width="5" height="5"/></element>
+	<element name="CPL_39" ref="red_led"><!-- SPLIT POINT INDICATOR (RIGHT) --><bounds x="640" y="612" width="5" height="5"/></element>
+	<element name="CPL_40" ref="green_led"><!-- TEMPO/PROGRAM --><bounds x="636" y="448" width="5" height="5"/></element>
+
+	<element name="CPL_49" ref="red_led"><!-- OTHER PARTS/TR --><bounds x="430" y="354" width="5" height="5"/></element>
+
+	<element name="effect_sustain" ref="dark_grey_button" inputtag="CPR_SEG3" inputmask="0x01"><bounds x="857" y="476" width="33" height="21"/></element>
+	<element name="CPR_1" ref="red_led"><!-- EFFECT: SUSTAIN --><bounds x="872" y="469" width="5" height="5"/></element>
+
+	<element name="effect_digital_effect" ref="dark_grey_button" inputtag="CPR_SEG3" inputmask="0x02"><bounds x="892" y="476" width="33" height="21"/></element>
+	<element name="CPR_2" ref="red_led"><!-- EFFECT: DIGITAL EFFECT --><bounds x="907" y="469" width="5" height="5"/></element>
+
+	<element name="effect_dsp_effect" ref="dark_grey_button" inputtag="CPR_SEG3" inputmask="0x04"><bounds x="927" y="476" width="33" height="21"/></element>
+	<element name="CPR_3" ref="red_led"><!-- EFFECT: DSP EFFECT --><bounds x="942" y="469" width="5" height="5"/></element>
+
+	<element name="effect_digital_reverb" ref="dark_grey_button" inputtag="CPR_SEG3" inputmask="0x08"><bounds x="962" y="476" width="33" height="21"/></element>
+	<element name="CPR_4" ref="red_led"><!-- EFFECT: DIGITAL REVERB --><bounds x="977" y="469" width="5" height="5"/></element>
+
+	<element name="effect_acoustic_illusion" ref="dark_grey_button" inputtag="CPR_SEG3" inputmask="0x10"><bounds x="997" y="476" width="33" height="21"/></element>
+	<element name="CPR_5" ref="red_led"><!-- EFFECT: ACOUSTIC ILLUSION --><bounds x="1013" y="469" width="5" height="5"/></element>
+
+
+	<element name="sequencer_play" ref="light_grey_button" inputtag="CPR_SEG5" inputmask="0x08"><bounds x="981" y="233" width="33" height="21"/></element>
+	<element name="CPR_6" ref="green_led"><!-- SEQUENCER: PLAY --><bounds x="996" y="226" width="5" height="5"/></element>
+
+	<element name="sequencer_easy_rec" ref="dark_grey_button" inputtag="CPR_SEG5" inputmask="0x10"><bounds x="1032" y="233" width="33" height="21"/></element>
+	<element name="CPR_7" ref="green_led"><!-- SEQUENCER: EASY REC --><bounds x="1047" y="226" width="5" height="5"/></element>
+
+	<element name="sequencer_menu" ref="dark_grey_button" inputtag="CPR_SEG5" inputmask="0x20"><bounds x="1067" y="233" width="33" height="21"/></element>
+	<element name="CPR_8" ref="green_led"><!-- SEQUENCER: MENU --><bounds x="1082" y="226" width="5" height="5"/></element>
+
+	<element name="piano" ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x01"><bounds x="1054" y="476" width="33" height="21"/></element>
+	<element name="CPR_9" ref="red_led"><!-- PIANO --><bounds x="1067" y="469" width="5" height="5"/></element>
+
+	<element name="guitar" ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x02"><bounds x="1089" y="476" width="33" height="21"/></element>
+	<element name="CPR_10" ref="red_led"><!-- GUITAR --><bounds x="1103" y="469" width="5" height="5"/></element>
+
+	<element name="strings_n_vocal" ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x04"><bounds x="1124" y="476" width="33" height="21"/></element>
+	<element name="CPR_11" ref="red_led"><!-- STRINGS & VOCAL --><bounds x="1138" y="469" width="5" height="5"/></element>
+
+	<element name="brass" ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x08"><bounds x="1159" y="476" width="33" height="21"/></element>
+	<element name="CPR_12" ref="red_led"><!-- BRASS --><bounds x="1173" y="469" width="5" height="5"/></element>
+
+	<element name="flute" ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x10"><bounds x="1194" y="476" width="33" height="21"/></element>
+	<element name="CPR_13" ref="red_led"><!-- FLUTE --><bounds x="1208" y="469" width="5" height="5"/></element>
+
+	<element name="sax_n_reed" ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x20"><bounds x="1229" y="476" width="33" height="21"/></element>
+	<element name="CPR_14" ref="red_led"><!-- SAX & REED --><bounds x="1243" y="469" width="5" height="5"/></element>
+
+
+	<element name="mallet_n_orch_perc" ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x40"><bounds x="1054" y="528" width="33" height="21"/></element>
+	<element name="CPR_15" ref="red_led"><!-- MALLET & ORCH PERC --><bounds x="1067" y="521" width="5" height="5"/></element>
+
+	<element name="world_perc" ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x80"><bounds x="1089" y="528" width="33" height="21"/></element>
+	<element name="CPR_16" ref="red_led"><!-- WORLD PERC --><bounds x="1103" y="521" width="5" height="5"/></element>
+
+	<element name="organ_n_accordion" ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x01"><bounds x="1124" y="528" width="33" height="21"/></element>
+	<element name="CPR_17" ref="red_led"><!-- ORGAN & ACCORDION --><bounds x="1138" y="521" width="5" height="5"/></element>
+
+	<element name="orchestral_pad" ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x02"><bounds x="1159" y="528" width="33" height="21"/></element>
+	<element name="CPR_18" ref="red_led"><!-- ORCHESTRAL PAD --><bounds x="1173" y="521" width="5" height="5"/></element>
+
+	<element name="synth" ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x04"><bounds x="1194" y="528" width="33" height="21"/></element>
+	<element name="CPR_19" ref="red_led"><!-- SYNTH --><bounds x="1208" y="521" width="5" height="5"/></element>
+
+	<element name="bass" ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x08"><bounds x="1229" y="528" width="33" height="21"/></element>
+	<element name="CPR_20" ref="red_led"><!-- BASS --><bounds x="1243" y="521" width="5" height="5"/></element>
+
+
+	<element name="digital_drawbar" ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x10"><bounds x="1054" y="581" width="33" height="21"/></element>
+	<element ref="line"><bounds x="1061" y="589" width="19" height="4"/></element>
+	<element name="CPR_21" ref="red_led"><!-- DIGITAL DRAWBAR --><bounds x="1067" y="573" width="5" height="5"/></element>
+
+	<element name="accordion_register" ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x20"><bounds x="1089" y="581" width="33" height="21"/></element>
+	<element ref="line"><bounds x="1096" y="589" width="19" height="4"/></element>
+	<element name="CPR_22" ref="red_led"><!-- ACCORDION REGISTER --><bounds x="1103" y="573" width="5" height="5"/></element>
+
+	<element name="gm_special" ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x40"><bounds x="1124" y="581" width="33" height="21"/></element>
+	<element name="CPR_23" ref="red_led"><!-- GM SPECIAL --><bounds x="1138" y="573" width="5" height="5"/></element>
+
+	<element name="drum_kits" ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x80"><bounds x="1159" y="581" width="33" height="21"/></element>
+	<element name="CPR_24" ref="red_led"><!-- DRUM KITS --><bounds x="1173" y="573" width="5" height="5"/></element>
+
+	<element ref="line"><bounds x="973" y="296" width="7" height="1"/></element>
+	<element ref="line"><bounds x="973" y="296" width="1" height="52"/></element>
+	<element ref="line"><bounds x="973" y="348" width="7" height="1"/></element>
+
+	<element name="panel_memory_1" ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x01"><bounds x="980" y="335" width="25" height="25"/></element>
+	<element name="CPR_25" ref="green_led"><!-- PANEL MEMORY 1 --><bounds x="988" y="327" width="5" height="5"/></element>
+
+	<element name="panel_memory_2" ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x02"><bounds x="1017" y="335" width="25" height="25"/></element>
+	<element name="CPR_26" ref="green_led"><!-- PANEL MEMORY 2 --><bounds x="1024" y="327" width="5" height="5"/></element>
+
+	<element name="panel_memory_3" ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x04"><bounds x="1054" y="335" width="25" height="25"/></element>
+	<element name="CPR_27" ref="green_led"><!-- PANEL MEMORY 3 --><bounds x="1061" y="327" width="5" height="5"/></element>
+
+	<element name="panel_memory_4" ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x08"><bounds x="1090" y="335" width="25" height="25"/></element>
+	<element name="CPR_28" ref="green_led"><!-- PANEL MEMORY 4 --><bounds x="1098" y="327" width="5" height="5"/></element>
+
+	<element name="panel_memory_5" ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x10"><bounds x="1127" y="335" width="25" height="25"/></element>
+	<element name="CPR_29" ref="green_led"><!-- PANEL MEMORY 5 --><bounds x="1135" y="327" width="5" height="5"/></element>
+
+	<element name="panel_memory_6" ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x20"><bounds x="1164" y="335" width="25" height="25"/></element>
+	<element name="CPR_30" ref="green_led"><!-- PANEL MEMORY 6 --><bounds x="1172" y="327" width="5" height="5"/></element>
+
+	<element name="panel_memory_7" ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x40"><bounds x="1201" y="335" width="25" height="25"/></element>
+	<element name="CPR_31" ref="green_led"><!-- PANEL MEMORY 7 --><bounds x="1209" y="327" width="5" height="5"/></element>
+
+	<element name="panel_memory_8" ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x80"><bounds x="1238" y="335" width="25" height="25"/></element>
+	<element name="CPR_32" ref="green_led"><!-- PANEL MEMORY 8 --><bounds x="1245" y="327" width="5" height="5"/></element>
+
+
+	<element name="part_select_left" ref="light_grey_button" inputtag="CPR_SEG4" inputmask="0x01"><bounds x="864" y="529" width="21" height="21"/></element>
+	<element name="CPR_33" ref="red_led"><!-- PART SELECT: LEFT --><bounds x="872" y="521" width="5" height="5"/></element>
+
+	<element name="part_select_right_2" ref="light_grey_button" inputtag="CPR_SEG4" inputmask="0x02"><bounds x="899" y="529" width="21" height="21"/></element>
+	<element name="CPR_34" ref="red_led"><!-- PART SELECT: RIGHT 2 --><bounds x="907" y="521" width="5" height="5"/></element>
+
+	<element name="part_select_right_1" ref="light_grey_button" inputtag="CPR_SEG4" inputmask="0x04"><bounds x="933" y="529" width="21" height="21"/></element>
+	<element name="CPR_35" ref="red_led"><!-- PART SELECT: RIGHT 1 --><bounds x="941" y="521" width="5" height="5"/></element>
+
+
+	<element name="entertainer" ref="dark_grey_pill_button" inputtag="CPR_SEG4" inputmask="0x08"><bounds x="994" y="528" width="37" height="21"/></element>
+	<element name="CPR_36" ref="green_led"><!-- ENTERTAINER --><bounds x="1010" y="521" width="5" height="5"/></element>
+
+
+	<element name="conductor_left" ref="light_grey_button" inputtag="CPR_SEG4" inputmask="0x10"><bounds x="859" y="574" width="31" height="31"/></element>
+	<element name="CPR_37" ref="red_led"><!-- CONDUCTOR: LEFT --><bounds x="872" y="564" width="5" height="5"/></element>
+
+	<element name="conductor_right_2" ref="light_grey_button" inputtag="CPR_SEG4" inputmask="0x20"><bounds x="893" y="574" width="31" height="31"/></element>
+	<element name="CPR_38" ref="red_led"><!-- CONDUCTOR: RIGHT 2 --><bounds x="907" y="564" width="5" height="5"/></element>
+
+	<element name="conductor_right_1" ref="light_grey_button" inputtag="CPR_SEG4" inputmask="0x40"><bounds x="927" y="574" width="31" height="31"/></element>
+	<element name="CPR_39" ref="red_led"><!-- CONDUCTOR: RIGHT 1 --><bounds x="941" y="564" width="5" height="5"/></element>
+
+
+	<element name="techni_chord" ref="dark_grey_pill_button" inputtag="CPR_SEG4" inputmask="0x80"><bounds x="994" y="580" width="37" height="21"/></element>
+	<element name="CPR_40" ref="red_led"><!-- TECHNI CHORD --><bounds x="1010" y="573" width="5" height="5"/></element>
+
+
+	<element name="menu_sound" ref="dark_grey_button" inputtag="CPR_SEG10" inputmask="0x04"><bounds x="1123" y="233" width="33" height="21"/></element>
+	<element name="CPR_49" ref="green_led"><!-- MENU: SOUND --><bounds x="1138" y="226" width="5" height="5"/></element>
+
+	<element name="menu_control" ref="dark_grey_button" inputtag="CPR_SEG10" inputmask="0x08"><bounds x="1158" y="233" width="33" height="21"/></element>
+	<element name="CPR_50" ref="green_led"><!-- MENU: CONTROL --><bounds x="1173" y="226" width="5" height="5"/></element>
+
+	<element name="menu_midi" ref="dark_grey_button" inputtag="CPR_SEG10" inputmask="0x10"><bounds x="1193" y="233" width="33" height="21"/></element>
+	<element name="CPR_51" ref="green_led"><!-- MENU: MIDI --><bounds x="1208" y="226" width="5" height="5"/></element>
+
+	<element name="menu_disk" ref="dark_grey_button" inputtag="CPR_SEG10" inputmask="0x20"><bounds x="1228" y="233" width="33" height="21"/></element>
+	<element name="CPR_52" ref="green_led"><!-- MENU: DISK --><bounds x="1244" y="226" width="5" height="5"/></element>
+
+
+	<element name="memory_a" ref="dark_grey_button" inputtag="CPR_SEG9" inputmask="0x40"><bounds x="1194" y="581" width="33" height="21"/></element>
+	<element name="CPR_57" ref="green_led"><!-- MEMORY A --><bounds x="1208" y="573" width="5" height="5"/></element>
+
+	<element name="memory_b" ref="dark_grey_button" inputtag="CPR_SEG9" inputmask="0x80"><bounds x="1229" y="581" width="33" height="21"/></element>
+	<element name="CPR_58" ref="green_led"><!-- MEMORY B --><bounds x="1243" y="573" width="5" height="5"/></element>
+
+	<element name="synchro_n_break" ref="dark_grey_button" inputtag="CPR_SEG8" inputmask="0x40"><bounds x="774" y="571" width="18" height="34"/></element>
+	<element name="CPR_61" ref="red_led"><!-- SYNCHRO & BREAK --><bounds x="780" y="558" width="5" height="5"/></element>
+
+	<element name="tap_tempo" ref="dark_grey_button" inputtag="CPR_SEG8" inputmask="0x80"><bounds x="805" y="571" width="27" height="34"/></element>
+
+	<element ref="dark_grey_round_button"><bounds x="748" y="455" width="81" height="23"/></element>
+	<element ref="button_split"><bounds x="787" y="455" width="2" height="23"/></element>
+	<element name="transpose_minus" ref="dark_grey_round_button" inputtag="CPR_SEG0" inputmask="0x20"><bounds x="752" y="457" width="35" height="17"/></element>
+	<element name="transpose_plus" ref="dark_grey_round_button" inputtag="CPR_SEG0" inputmask="0x40"><bounds x="789" y="457" width="35" height="17"/></element>
+
+	<element ref="dark_grey_round_button"><bounds x="748" y="501" width="81" height="23"/></element>
+	<element ref="button_split"><bounds x="787" y="501" width="2" height="23"/></element>
+	<element name="octave_minus" ref="dark_grey_round_button" inputtag="CPR_SEG8" inputmask="0x08"><bounds x="752" y="503" width="35" height="17"/></element>
+	<element name="CPR_62" ref="red_led"><!-- R1/R2 OCTAVE MINUS --><bounds x="756" y="497" width="5" height="5"/></element>
+	<element name="octave_plus" ref="dark_grey_round_button" inputtag="CPR_SEG8" inputmask="0x10"><bounds x="789" y="503" width="35" height="17"/></element>
+	<element name="CPR_63" ref="red_led"><!-- R1/R2 OCTAVE PLUS --><bounds x="817" y="497" width="5" height="5"/></element>
+
+	<element name="sequencer_set" ref="dark_grey_pill_button" inputtag="CPR_SEG7" inputmask="0x01"><bounds x="979" y="284" width="37" height="21"/></element>
+	<element name="sequencer_next_bank" ref="dark_grey_pill_button" inputtag="CPR_SEG7" inputmask="0x02"><bounds x="1031" y="284" width="37" height="21"/></element>
+	<element name="sequencer_bank_view" ref="dark_grey_pill_button" inputtag="CPR_SEG7" inputmask="0x04"><bounds x="1082" y="284" width="37" height="21"/></element>
+	<element name="CPR_64" ref="green_led"><!-- BANK VIEW --><bounds x="1098" y="277" width="5" height="5"/></element>
+
+	<element name="start_stop" ref="light_grey_button" inputtag="CPR_SEG8" inputmask="0x20"><bounds x="687" y="571" width="53" height="34"/></element>
+	<element name="CPR_65" ref="red_led"><!-- START/STOP 1 BEAT --><bounds x="685" y="558" width="5" height="5"/></element>
+	<element name="CPR_66" ref="green_led"><!-- START/STOP 2 BEAT --><bounds x="700" y="558" width="5" height="5"/></element>
+	<element name="CPR_67" ref="green_led"><!-- START/STOP 3 BEAT --><bounds x="716" y="558" width="5" height="5"/></element>
+	<element name="CPR_68" ref="green_led"><!-- START/STOP 4 BEAT --><bounds x="732" y="558" width="5" height="5"/></element>
+
+	<element name="checking_device_led_cn11" ref="red_led"><!-- MAINCPU CHECK LED --><bounds x="1270" y="10" width="5" height="5"/></element>
+	<element name="checking_device_led_cn12" ref="red_led"><!-- SUBCPU CHECK LED --><bounds x="1270" y="20" width="5" height="5"/></element>
+
+<!-- Labels -->
+
+	<element ref="maincpu_text"><bounds x="1235" y="8" width="30" height="8"/></element>
+	<element ref="subcpu_text"><bounds x="1235" y="18" width="30" height="8"/></element>
+
+	<element ref="demo_text"><bounds x="34" y="228" width="20" height="8"/></element>
+
+	<element ref="line"><bounds x="106" y="210" width="45" height="1"/></element>
+	<element ref="msp_title"><bounds x="155" y="207" width="101" height="8"/></element>
+	<element ref="line"><bounds x="259" y="210" width="45" height="1"/></element>
+
+	<element ref="msp_bank_text"><bounds x="119" y="227" width="21" height="8"/></element>
+	<element ref="msp_menu_text"><bounds x="192" y="227" width="22" height="8"/></element>
+	<element ref="msp_stop_record_text"><bounds x="250" y="227" width="56" height="8"/></element>
+
+	<element ref="msp_1_text"><bounds x="140" y="314" width="6" height="10"/></element>
+	<element ref="msp_2_text"><bounds x="200" y="314" width="6" height="10"/></element>
+	<element ref="msp_3_text"><bounds x="264" y="314" width="6" height="10"/></element>
+	<element ref="msp_4_text"><bounds x="140" y="350" width="6" height="10"/></element>
+	<element ref="msp_5_text"><bounds x="200" y="350" width="6" height="10"/></element>
+	<element ref="msp_6_text"><bounds x="264" y="350" width="6" height="10"/></element>
+
+	<element ref="screen_display_angle_text1"><bounds x="864" y="56" width="22" height="7"/></element>
+	<element ref="screen_display_angle_text2"><bounds x="864" y="64" width="22" height="7"/></element>
+
+	<element ref="screen_contrast_text"><bounds x="329" y="329" width="42" height="7"/></element>
+	<element ref="dark_grey_button"><bounds x="348" y="338" width="5" height="69"/></element>
+	<element ref="light_grey_button"><bounds x="346" y="378" width="9" height="9"/></element>
+
+	<element ref="screen_help_text"><bounds x="385" y="347" width="20" height="8"/></element>
+	<element ref="screen_other_parts_text1"><bounds x="414" y="337" width="36" height="7"/></element>
+	<element ref="screen_other_parts_text2"><bounds x="414" y="346" width="36" height="7"/></element>
+	<element ref="line"><bounds x="475" y="362" width="13" height="1"/></element>
+	<element ref="line"><bounds x="475" y="362" width="1" height="9"/></element>
+	<element ref="line"><bounds x="475" y="382" width="1" height="9"/></element>
+	<element ref="line"><bounds x="475" y="391" width="13" height="1"/></element>
+	<element ref="screen_mute_text"><bounds x="465" y="373" width="21" height="7"/></element>
+	<element ref="screen_page_text"><bounds x="809" y="342" width="19" height="7"/></element>
+	<element ref="screen_display_hold_text1"><bounds x="850" y="337" width="31" height="7"/></element>
+	<element ref="screen_display_hold_text2"><bounds x="850" y="345" width="31" height="7"/></element>
+	<element ref="screen_exit_text"><bounds x="895" y="346" width="20" height="8"/></element>
+
+	<element ref="line"><bounds x="980" y="200" width="34" height="1"/></element>
+	<element ref="sequencer_title"><bounds x="1006" y="197" width="68" height="8"/></element>
+	<element ref="line"><bounds x="1066" y="200" width="34" height="1"/></element>
+
+	<element ref="sequencer_play_text"><bounds x="991" y="217" width="14" height="8"/></element>
+	<element ref="sequencer_easy_rec_text"><bounds x="1034" y="217" width="29" height="8"/></element>
+	<element ref="sequencer_menu_text"><bounds x="1076" y="217" width="17" height="8"/></element>
+
+	<element ref="line"><bounds x="1123" y="200" width="54" height="1"/></element>
+	<element ref="menu_title"><bounds x="1170" y="197" width="44" height="8"/></element>
+	<element ref="line"><bounds x="1206" y="200" width="54" height="1"/></element>
+
+	<element ref="menu_sound_text"><bounds x="1130" y="217" width="22" height="8"/></element>
+	<element ref="menu_control_text"><bounds x="1161" y="217" width="30" height="8"/></element>
+	<element ref="menu_midi_text"><bounds x="1205" y="217" width="13" height="8"/></element>
+	<element ref="menu_disk_text"><bounds x="1239" y="217" width="14" height="8"/></element>
+	<element ref="menu_disk_load_text"><bounds x="1240" y="257" width="13" height="6"/></element>
+
+	<element ref="pm_set_text"><bounds x="992" y="268" width="11" height="8"/></element>
+	<element ref="pm_next_bank_text"><bounds x="1032" y="268" width="35" height="8"/></element>
+	<element ref="pm_bank_view_text"><bounds x="1084" y="268" width="34" height="8"/></element>
+
+	<element ref="panel_memory_title"><bounds x="1090" y="314" width="61" height="8"/></element>
+
+	<element ref="pm_1_text"><bounds x="996" y="325" width="5" height="8"/></element>
+	<element ref="pm_2_text"><bounds x="1033" y="325" width="5" height="8"/></element>
+	<element ref="pm_3_text"><bounds x="1070" y="325" width="5" height="8"/></element>
+	<element ref="pm_4_text"><bounds x="1106" y="325" width="5" height="8"/></element>
+	<element ref="pm_5_text"><bounds x="1142" y="325" width="5" height="8"/></element>
+	<element ref="pm_6_text"><bounds x="1179" y="325" width="5" height="8"/></element>
+	<element ref="pm_7_text"><bounds x="1216" y="325" width="5" height="8"/></element>
+	<element ref="pm_8_text"><bounds x="1254" y="325" width="5" height="8"/></element>
+
+	<element ref="line"><bounds x="26" y="441" width="51" height="2"/></element>
+	<element ref="rhythm_group_title"><bounds x="82" y="438" width="63" height="8"/></element>
+	<element ref="line"><bounds x="149" y="441" width="52" height="2"/></element>
+
+	<element ref="standard_rock_text1"><bounds x="27" y="450" width="33" height="7"/></element>
+	<element ref="standard_rock_text2"><bounds x="27" y="458" width="33" height="7"/></element>
+	<element ref="r_n_rool_n_blues_text1"><bounds x="65" y="450" width="28" height="7"/></element>
+	<element ref="r_n_rool_n_blues_text2"><bounds x="65" y="458" width="28" height="7"/></element>
+	<element ref="pop_n_ballad_text1"><bounds x="102" y="450" width="23" height="7"/></element>
+	<element ref="pop_n_ballad_text2"><bounds x="102" y="458" width="23" height="7"/></element>
+	<element ref="funk_n_fusion_text1"><bounds x="137" y="450" width="23" height="7"/></element>
+	<element ref="funk_n_fusion_text2"><bounds x="137" y="458" width="23" height="7"/></element>
+	<element ref="soul_n_modern_dance_text1"><bounds x="164" y="450" width="39" height="7"/></element>
+	<element ref="soul_n_modern_dance_text2"><bounds x="164" y="458" width="39" height="7"/></element>
+
+	<element ref="big_band_n_swing_text1"><bounds x="29" y="503" width="30" height="7"/></element>
+	<element ref="big_band_n_swing_text2"><bounds x="29" y="511" width="30" height="7"/></element>
+	<element ref="jazz_combo_text1"><bounds x="67" y="503" width="23" height="7"/></element>
+	<element ref="jazz_combo_text2"><bounds x="67" y="511" width="23" height="7"/></element>
+	<element ref="us_trad_text"><bounds x="98" y="511" width="30" height="7"/></element>
+	<element ref="country_text"><bounds x="134" y="511" width="29" height="7"/></element>
+	<element ref="latin_text"><bounds x="175" y="511" width="16" height="7"/></element>
+
+	<element ref="march_n_waltz_text1"><bounds x="29" y="556" width="28" height="7"/></element>
+	<element ref="march_n_waltz_text2"><bounds x="29" y="564" width="28" height="7"/></element>
+	<element ref="party_time_text1"><bounds x="69" y="556" width="18" height="7"/></element>
+	<element ref="party_time_text2"><bounds x="69" y="564" width="18" height="7"/></element>
+	<element ref="showtime_n_trad_dance_text1"><bounds x="95" y="556" width="36" height="7"/></element>
+	<element ref="showtime_n_trad_dance_text2"><bounds x="95" y="564" width="36" height="7"/></element>
+	<element ref="world_text"><bounds x="137" y="564" width="23" height="7"/></element>
+	<element ref="custom_text"><bounds x="170" y="564" width="26" height="7"/></element>
+
+	<element ref="composer_title"><bounds x="241" y="438" width="43" height="8"/></element>
+	<element ref="sound_arranger_title"><bounds x="297" y="438" width="73" height="8"/></element>
+
+	<element ref="composer_memory_text"><bounds x="234" y="460" width="27" height="7"/></element>
+	<element ref="composer_menu_text"><bounds x="273" y="460" width="17" height="7"/></element>
+	<element ref="sound_arranger_set_text"><bounds x="310" y="460" width="11" height="7"/></element>
+	<element ref="sound_arranger_on_off_text"><bounds x="339" y="460" width="23" height="7"/></element>
+
+	<element ref="music_style_arranger_text1"><bounds x="225" y="504" width="40" height="7"/></element>
+	<element ref="music_style_arranger_text2"><bounds x="225" y="512" width="40" height="7"/></element>
+
+	<element ref="split_point_text1"><bounds x="306" y="504" width="18" height="7"/></element>
+	<element ref="split_point_text2"><bounds x="306" y="512" width="18" height="7"/></element>
+	<element ref="auto_play_chord_text1"><bounds x="333" y="504" width="34" height="7"/></element>
+	<element ref="auto_play_chord_text2"><bounds x="333" y="512" width="34" height="7"/></element>
+
+	<element ref="variation_n_msa_title"><bounds x="263" y="554" width="70" height="8"/></element>
+
+	<element ref="variation_1_text"><bounds x="250" y="562" width="4" height="7"/></element>
+	<element ref="variation_2_text"><bounds x="285" y="562" width="4" height="7"/></element>
+	<element ref="variation_3_text"><bounds x="322" y="562" width="4" height="7"/></element>
+	<element ref="variation_4_text"><bounds x="357" y="562" width="4" height="7"/></element>
+
+	<element ref="music_stylist_text"><bounds x="457" y="439" width="58" height="8"/></element>
+	<element ref="one_touch_play_text"><bounds x="458" y="480" width="54" height="6"/></element>
+
+	<element ref="fade_text"><bounds x="476" y="491" width="19" height="8"/></element>
+	<element ref="fade_in_text"><bounds x="443" y="496" width="6" height="7"/></element>
+	<element ref="fade_out_text"><bounds x="522" y="496" width="14" height="7"/></element>
+
+	<element ref="tempo_program_text1"><bounds x="603" y="448" width="30" height="8"/></element>
+	<element ref="tempo_program_text2"><bounds x="645" y="448" width="34" height="8"/></element>
+
+	<element ref="transpose_text"><bounds x="766" y="445" width="45" height="8"/></element>
+	<element ref="transpose_minus_text"><bounds x="748" y="448" width="6" height="9"/></element>
+	<element ref="transpose_plus_text"><bounds x="826" y="448" width="6" height="9"/></element>
+
+	<element ref="r1_r2_octave_text"><bounds x="763" y="491" width="51" height="8"/></element>
+	<element ref="octave_minus_text"><bounds x="748" y="497" width="6" height="9"/></element>
+	<element ref="octave_plus_text"><bounds x="826" y="497" width="6" height="9"/></element>
+
+	<element ref="fill_in_text"><bounds x="463" y="548" width="24" height="7"/></element>
+	<element ref="fill_in_text1"><bounds x="463" y="557" width="4" height="7"/></element>
+	<element ref="fill_in_text2"><bounds x="498" y="557" width="4" height="7"/></element>
+	<element ref="intro_n_ending_text"><bounds x="521" y="548" width="64" height="7"/></element>
+	<element ref="intro_n_ending_text1"><bounds x="540" y="557" width="4" height="7"/></element>
+	<element ref="intro_n_ending_text2"><bounds x="577" y="557" width="4" height="7"/></element>
+	<element ref="sequencer_reset_text1"><bounds x="444" y="610" width="30" height="6"/></element>
+	<element ref="sequencer_reset_text2"><bounds x="444" y="618" width="30" height="6"/></element>
+	<element ref="count_intro_text1"><bounds x="485" y="610" width="17" height="6"/></element>
+	<element ref="count_intro_text2"><bounds x="485" y="618" width="17" height="6"/></element>
+
+	<element ref="start_stop_text"><bounds x="690" y="547" width="50" height="8"/></element>
+	<element ref="1234beat_text1"><bounds x="692" y="557" width="4" height="7"/></element>
+	<element ref="1234beat_text2"><bounds x="707" y="557" width="4" height="7"/></element>
+	<element ref="1234beat_text3"><bounds x="723" y="557" width="4" height="7"/></element>
+	<element ref="1234beat_text4"><bounds x="739" y="557" width="22" height="7"/></element>
+
+	<element ref="synchro_n_break_text1"><bounds x="765" y="539" width="38" height="7"/></element>
+	<element ref="synchro_n_break_text2"><bounds x="765" y="547" width="38" height="7"/></element>
+
+	<element ref="tap_tempo_text1"><bounds x="809" y="539" width="22" height="7"/></element>
+	<element ref="tap_tempo_text2"><bounds x="809" y="547" width="22" height="7"/></element>
+
+	<element ref="line"><bounds x="857" y="441" width="68" height="1"/></element>
+	<element ref="effect_title"><bounds x="928" y="438" width="28" height="8"/></element>
+	<element ref="line"><bounds x="959" y="441" width="73" height="1"/></element>
+
+	<element ref="sustain_text"><bounds x="862" y="461" width="25" height="7"/></element>
+	<element ref="digital_effect_text1"><bounds x="898" y="453" width="23" height="7"/></element>
+	<element ref="digital_effect_text2"><bounds x="898" y="461" width="23" height="7"/></element>
+	<element ref="dsp_effect_text1"><bounds x="934" y="453" width="23" height="7"/></element>
+	<element ref="dsp_effect_text2"><bounds x="934" y="461" width="23" height="7"/></element>
+	<element ref="digital_reverb_text1"><bounds x="968" y="453" width="24" height="7"/></element>
+	<element ref="digital_reverb_text2"><bounds x="968" y="461" width="24" height="7"/></element>
+	<element ref="acoustic_illusion_text1"><bounds x="1000" y="453" width="31" height="7"/></element>
+	<element ref="acoustic_illusion_text2"><bounds x="1000" y="461" width="31" height="7"/></element>
+
+	<element ref="line"><bounds x="857" y="513" width="24" height="1"/></element>
+	<element ref="part_select_title"><bounds x="883" y="510" width="50" height="8"/></element>
+	<element ref="line"><bounds x="935" y="513" width="24" height="1"/></element>
+
+	<element ref="part_select_left_text"><bounds x="868" y="556" width="14" height="7"/></element>
+	<element ref="part_select_right_2_text"><bounds x="897" y="556" width="24" height="7"/></element>
+	<element ref="part_select_right_1_text"><bounds x="932" y="556" width="24" height="7"/></element>
+
+	<element ref="line"><bounds x="857" y="611" width="25" height="1"/></element>
+	<element ref="conductor_title"><bounds x="884" y="608" width="49" height="8"/></element>
+	<element ref="line"><bounds x="934" y="611" width="25" height="1"/></element>
+
+	<element ref="entertainer_text"><bounds x="992" y="513" width="41" height="7"/></element>
+	<element ref="techni_chord_text1"><bounds x="1000" y="557" width="25" height="7"/></element>
+	<element ref="techni_chord_text2"><bounds x="1000" y="565" width="25" height="7"/></element>
+
+	<element ref="line"><bounds x="1055" y="441" width="68" height="2"/></element>
+	<element ref="sound_group_title"><bounds x="1129" y="438" width="58" height="8"/></element>
+	<element ref="line"><bounds x="1193" y="441" width="68" height="2"/></element>
+
+	<element ref="piano_text"><bounds x="1060" y="461" width="18" height="7"/></element>
+	<element ref="guitar_text"><bounds x="1094" y="461" width="22" height="7"/></element>
+	<element ref="strings_n_vocal_text1"><bounds x="1124" y="453" width="33" height="7"/></element>
+	<element ref="strings_n_vocal_text2"><bounds x="1124" y="461" width="33" height="7"/></element>
+	<element ref="brass_text"><bounds x="1166" y="461" width="19" height="7"/></element>
+	<element ref="flute_text"><bounds x="1202" y="461" width="18" height="7"/></element>
+	<element ref="sax_n_reed_text1"><bounds x="1237" y="453" width="18" height="7"/></element>
+	<element ref="sax_n_reed_text2"><bounds x="1237" y="461" width="18" height="7"/></element>
+
+	<element ref="mallet_n_orch_perc_text1"><bounds x="1052" y="505" width="35" height="7"/></element>
+	<element ref="mallet_n_orch_perc_text2"><bounds x="1052" y="513" width="35" height="7"/></element>
+	<element ref="world_perc_text1"><bounds x="1094" y="505" width="23" height="7"/></element>
+	<element ref="world_perc_text2"><bounds x="1094" y="513" width="23" height="7"/></element>
+	<element ref="organ_n_accordion_text1"><bounds x="1122" y="505" width="37" height="7"/></element>
+	<element ref="organ_n_accordion_text2"><bounds x="1122" y="513" width="37" height="7"/></element>
+	<element ref="orchestral_pad_text1"><bounds x="1160" y="505" width="32" height="7"/></element>
+	<element ref="orchestral_pad_text2"><bounds x="1160" y="513" width="32" height="7"/></element>
+	<element ref="synth_text"><bounds x="1201" y="513" width="20" height="7"/></element>
+	<element ref="bass_text"><bounds x="1238" y="513" width="15" height="7"/></element>
+
+	<element ref="digital_drawbar_text1"><bounds x="1055" y="557" width="31" height="7"/></element>
+	<element ref="digital_drawbar_text2"><bounds x="1055" y="565" width="31" height="7"/></element>
+	<element ref="accordion_register_text1"><bounds x="1091" y="557" width="29" height="7"/></element>
+	<element ref="accordion_register_text2"><bounds x="1091" y="565" width="29" height="7"/></element>
+	<element ref="gm_special_text1"><bounds x="1128" y="557" width="25" height="7"/></element>
+	<element ref="gm_special_text2"><bounds x="1128" y="565" width="25" height="7"/></element>
+	<element ref="drum_kits_text1"><bounds x="1167" y="557" width="18" height="7"/></element>
+	<element ref="drum_kits_text2"><bounds x="1167" y="565" width="18" height="7"/></element>
+	<element ref="memory_a_text1"><bounds x="1198" y="557" width="26" height="7"/></element>
+	<element ref="memory_a_text2"><bounds x="1198" y="565" width="26" height="7"/></element>
+	<element ref="memory_b_text1"><bounds x="1233" y="557" width="26" height="7"/></element>
+	<element ref="memory_b_text2"><bounds x="1233" y="565" width="26" height="7"/></element>
+
+	</view>
+</mamelayout>

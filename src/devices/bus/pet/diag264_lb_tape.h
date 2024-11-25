@@ -30,7 +30,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_pet_datassette_port_interface overrides
 	virtual int datassette_read() override;

@@ -41,7 +41,7 @@ DASM notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/stvcd.h"
+#include "stvcd.h"
 
 #include "coreutil.h"
 #include "multibyte.h"

@@ -2,7 +2,7 @@
 // detail/timer_queue_ptime.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,7 +31,7 @@ struct forwarding_posix_time_traits : time_traits<boost::posix_time::ptime> {};
 
 // Template specialisation for the commonly used instantation.
 template <>
-class timer_queue<time_traits<boost::posix_time::ptime> >
+class timer_queue<time_traits<boost::posix_time::ptime>>
   : public timer_queue_base
 {
 public:

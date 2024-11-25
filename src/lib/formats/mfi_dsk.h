@@ -45,13 +45,13 @@ private:
 	static const char sign[16];
 
 	struct header {
-		char sign[16];
-		unsigned int cyl_count, head_count;
-		unsigned int form_factor, variant;
+		uint8_t sign[16];
+		uint32_t cyl_count, head_count;
+		uint32_t form_factor, variant;
 	};
 
 	struct entry {
-		unsigned int offset, compressed_size, uncompressed_size, write_splice;
+		uint32_t offset, compressed_size, uncompressed_size, write_splice;
 	};
 };
 

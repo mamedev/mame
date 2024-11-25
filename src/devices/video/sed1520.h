@@ -21,6 +21,7 @@
 #define SED1520_UPDATE_CB(name) uint32_t name(bitmap_ind16 &bitmap, const rectangle &cliprect, bool lcd_on, uint8_t *dram, uint8_t start_line, uint8_t adc, uint8_t duty)
 #define SED1560_UPDATE_CB(name) uint32_t name(bitmap_ind16 &bitmap, const rectangle &cliprect, bool lcd_on, uint8_t *dram, uint8_t start_line, uint8_t adc, uint8_t duty, bool reverse, bool fill, uint8_t contrast, bool line_inv, uint8_t line_inv_num)
 #define EPL43102_UPDATE_CB(name) uint32_t name(bitmap_ind16 &bitmap, const rectangle &cliprect, bool lcd_on, uint8_t *dram, uint8_t start_line, uint8_t adc, uint8_t duty, bool reverse, bool fill, uint8_t contrast, bool line_inv, uint8_t line_inv_num)
+#define NT7502_UPDATE_CB(name) uint32_t name(bitmap_ind16 &bitmap, const rectangle &cliprect, bool lcd_on, uint8_t *dram, uint8_t start_line, uint8_t adc, uint8_t duty, bool reverse, bool fill, uint8_t contrast, bool line_inv, uint8_t line_inv_num)
 
 
 // ======================> sed15xx_device_base
@@ -41,8 +42,8 @@ protected:
 	sed15xx_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t ddr_size, uint32_t page_size);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 protected:
 	const uint32_t m_ddr_size;
@@ -83,9 +84,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	sed1520_update_delegate m_screen_update_cb;
@@ -116,9 +117,9 @@ protected:
 	sed1560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t ddr_size, uint32_t page_size);
 
 	// device-level overrides
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	sed1560_update_delegate m_screen_update_cb;
@@ -145,6 +146,26 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// internal state
+	uint8_t m_last_command;
+};
+
+
+// ======================> nt7502_device
+
+class nt7502_device : public sed1560_device
+{
+public:
+	// construction/destruction
+	nt7502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	virtual void control_write(uint8_t data) override;
+
+protected:
+	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -157,5 +178,6 @@ protected:
 DECLARE_DEVICE_TYPE(SED1520, sed1520_device)
 DECLARE_DEVICE_TYPE(SED1560, sed1560_device)
 DECLARE_DEVICE_TYPE(EPL43102, epl43102_device)
+DECLARE_DEVICE_TYPE(NT7502, nt7502_device)
 
 #endif // MAME_VIDEO_SED1520_H

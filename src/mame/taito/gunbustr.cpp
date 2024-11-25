@@ -99,10 +99,10 @@ public:
 	void init_gunbustr();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(trigger_irq5);
 
@@ -144,8 +144,6 @@ private:
 	emu_timer *m_interrupt5_timer = nullptr;
 };
 
-
-// video
 
 /************************************************************/
 
@@ -377,8 +375,6 @@ u32 gunbustr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 
-// machine
-
 /*********************************************************************/
 
 TIMER_CALLBACK_MEMBER(gunbustr_state::trigger_irq5)
@@ -461,7 +457,7 @@ static INPUT_PORTS_START( gunbustr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)

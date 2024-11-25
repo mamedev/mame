@@ -29,13 +29,13 @@ different compared to Stratos/Turbo King.
 
 namespace {
 
-// note: sub-class of saitek_stratos_state (see stratos.h, stratos.cpp)
+// note: sub-class of stratos_base_state (see stratos.h, stratos.cpp)
 
-class corona_state : public saitek_stratos_state
+class corona_state : public stratos_base_state
 {
 public:
 	corona_state(const machine_config &mconfig, device_type type, const char *tag) :
-		saitek_stratos_state(mconfig, type, tag),
+		stratos_base_state(mconfig, type, tag),
 		m_rombank(*this, "rombank"),
 		m_board(*this, "board"),
 		m_dac(*this, "dac"),
@@ -46,14 +46,14 @@ public:
 	void corona(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
 	memory_view m_rombank;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<8+1> m_inputs;
 
 	u8 m_control1 = 0;
@@ -63,7 +63,7 @@ private:
 	u8 m_led_data1 = 0;
 	u8 m_led_data2 = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_leds();
@@ -81,7 +81,7 @@ private:
 
 void corona_state::machine_start()
 {
-	saitek_stratos_state::machine_start();
+	stratos_base_state::machine_start();
 
 	// register for savestates
 	save_item(NAME(m_control1));
@@ -94,7 +94,7 @@ void corona_state::machine_start()
 
 void corona_state::machine_reset()
 {
-	saitek_stratos_state::machine_reset();
+	stratos_base_state::machine_reset();
 
 	m_control2 = 0;
 	m_rombank.select(0);
@@ -317,6 +317,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1990, corona,   0,       0,      corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. D+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka Corona II
-SYST( 1988, coronaa,  corona,  0,      corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. C, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, coronab,  corona,  0,      corona,  corona, corona_state, empty_init, "Saitek", "Kasparov Corona (ver. C, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, corona,   0,       0,      corona,  corona, corona_state, empty_init, "Saitek / Heuristic Software", "Kasparov Corona (ver. D+)", MACHINE_SUPPORTS_SAVE ) // aka Corona II
+SYST( 1988, coronaa,  corona,  0,      corona,  corona, corona_state, empty_init, "Saitek / Heuristic Software", "Kasparov Corona (ver. C, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, coronab,  corona,  0,      corona,  corona, corona_state, empty_init, "Saitek / Heuristic Software", "Kasparov Corona (ver. C, set 2)", MACHINE_SUPPORTS_SAVE )

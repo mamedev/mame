@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="intvecs" description="Intellivision ECS cartridges">
+<softwarelist name="intvecs" description="Mattel Intellivision ECS cartridges">
 
 	<software name="jetsons">
 		<description>The Jetsons - Ways With Words</description>
@@ -110,7 +110,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="factory">
-		<description>Game Factory (Unreleased)</description>
+		<description>Game Factory (unreleased)</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="usage" value="Requires ECS and Keyboard"/>
@@ -134,7 +134,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jumble">
-		<description>Number Jumble (Unreleased)</description>
+		<description>Number Jumble (unreleased)</description>
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="usage" value="Requires ECS and Keyboard"/>
@@ -154,7 +154,7 @@ license:CC0-1.0
 
 
 	<software name="flintkf">
-		<description>Flintstones Keyboard Fun (Unreleased)</description>
+		<description>Flintstones Keyboard Fun (unreleased)</description>
 		<year>200?</year>
 		<publisher>IntelligentVision</publisher>
 		<info name="usage" value="Requires ECS and Keyboard"/>

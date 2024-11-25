@@ -203,8 +203,7 @@ void vrc5074_device::device_start()
 {
 	pci_host_device::device_start();
 	m_cpu_space = &m_cpu->space(AS_PROGRAM);
-	memory_space = &space(AS_DATA);
-	io_space = &space(AS_IO);
+	set_spaces(&space(AS_DATA), &space(AS_IO));
 
 	memory_window_start = 0;
 	memory_window_end   = 0xffffffff;

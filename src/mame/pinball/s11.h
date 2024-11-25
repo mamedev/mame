@@ -75,11 +75,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void s11_main_map(address_map &map);
-	void s11_audio_map(address_map &map);
+	void s11_main_map(address_map &map) ATTR_COLD;
+	void s11_audio_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer);
 
@@ -210,8 +210,8 @@ public:
 	void init_s11bi7();  // invert and 7seg34
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	bool m_invert = false;  // later System 11B games expect inverted data to the display LED segments.
 	void set_invert(bool i) { m_invert = i; }
 	bool m_is7seg34 = false;  // some games use 7-segment displays for players 3 and 4
@@ -237,7 +237,7 @@ public:
 	void init_s11c7();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 

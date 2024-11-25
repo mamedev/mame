@@ -30,8 +30,8 @@ public:
 	void generalplus_gpspi_direct(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t cs0_r(offs_t offset) override;
 

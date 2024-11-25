@@ -1,29 +1,28 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
-/***************************************************************************
+// copyright-holders: Angelo Salese
+/**************************************************************************************************
 
-    Fruit Dream (c) 1993 Nippon Data Kiki / Star Fish
-    Gemcrush (c) 1996 Star Fish
+Fruit Dream (c) 1993 Nippon Data Kiki / Star Fish
+Gemcrush (c) 1996 Star Fish
 
-    driver by Angelo Salese
+Uses a TC0091LVC, a variant of the one used on Taito L HW
 
-    Uses a TC0091LVC, a variant of the one used on Taito L HW
+TODO:
+- inputs are grossly mapped, lack of any input test doesn't help at all;
+- lamps?
+- service mode?
+- nvram?
+- dfruit: has an X on top-left corner after POST, is it supposed to be disabled somehow?
 
-    TODO:
-    - inputs are grossly mapped, lack of any input test doesn't help at all;
-    - lamps?
-    - service mode?
-    - nvram?
-    - dfruit: (possible bug) has an X on top-left corner after POST,
-              is it supposed to be disabled somehow?
-
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
+
 #include "machine/i8255.h"
 #include "machine/tc009xlvc.h"
 #include "machine/timer.h"
 #include "sound/ymopn.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -47,9 +46,9 @@ private:
 
 	void output_w(uint8_t data);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
-	void dfruit_map(address_map &map);
-	void tc0091lvc_map(address_map &map);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+	void main_map(address_map &map) ATTR_COLD;
+	void tc0091lvc_map(address_map &map) ATTR_COLD;
 };
 
 void dfruit_state::screen_vblank(int state)
@@ -72,7 +71,7 @@ void dfruit_state::tc0091lvc_map(address_map &map)
 	map(0xff08, 0xff08).rw(m_maincpu, FUNC(tc0091lvc_device::rom_bank_r), FUNC(tc0091lvc_device::rom_bank_w));
 }
 
-void dfruit_state::dfruit_map(address_map &map)
+void dfruit_state::main_map(address_map &map)
 {
 	tc0091lvc_map(map);
 	map(0xa000, 0xa003).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -241,7 +240,7 @@ static INPUT_PORTS_START( gemcrush )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DS1:4,5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) ) /* Manual states "Somewhat Hard" */
+	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) ) // Manual states "Somewhat Hard"
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x20, 0x00, "Nudity" ) PORT_DIPLOCATION("DS1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -249,12 +248,12 @@ static INPUT_PORTS_START( gemcrush )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DS1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DS1:8") /* Manual states Not Used */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DS1:8") // Manual states Not Used
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::scanline_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::scanline_cb)
 {
 	int scanline = param;
 
@@ -282,17 +281,17 @@ void dfruit_state::output_w(uint8_t data)
 	machine().bookkeeping().coin_lockout_w(1, data & 8);
 }
 
-#define MASTER_CLOCK XTAL(14'000'000)
-
 void dfruit_state::dfruit(machine_config &config)
 {
-	/* basic machine hardware */
-	TC0091LVC(config, m_maincpu, MASTER_CLOCK/2); //!!! TC0091LVC !!!
-	m_maincpu->set_addrmap(AS_PROGRAM, &dfruit_state::dfruit_map);
+	constexpr XTAL MASTER_CLOCK = 14_MHz_XTAL;
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(dfruit_state::scanline_callback), "screen", 0, 1);
+	// basic machine hardware
+	TC0091LVC(config, m_maincpu, MASTER_CLOCK / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dfruit_state::main_map);
 
-	/* video hardware */
+	TIMER(config, "scantimer").configure_scanline(FUNC(dfruit_state::scanline_cb), "screen", 0, 1);
+
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -307,9 +306,9 @@ void dfruit_state::dfruit(machine_config &config)
 	ppi.in_pb_callback().set_ioport("IN1");
 	ppi.in_pc_callback().set_ioport("IN2");
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ym2203_device &opn(YM2203(config, "opn", MASTER_CLOCK/4));
+	ym2203_device &opn(YM2203(config, "opn", MASTER_CLOCK / 4));
 	//opn.port_a_read_callback().set_ioport("IN4");
 	opn.port_b_read_callback().set_ioport("DSW");
 	opn.port_a_write_callback().set(FUNC(dfruit_state::output_w));
@@ -330,16 +329,25 @@ ROM_START( dfruit )
 	ROM_LOAD( "c2.ic10", 0x00000, 0x80000, CRC(d869ab24) SHA1(382e874a846855a7f6f8811625aaa30d9dfa1ce2) )
 ROM_END
 
+ROM_START( dfruita ) // 'PB-1451' PCB
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "fruit_dream_ver.1.10.ic2", 0x00000, 0x40000, CRC(bbd41424) SHA1(917143261e1a4526f24f43ddaea55998084cb4b5) ) // actual handwritten label says: title フルーツドリーム Ver. 1.10 Date 94.4.15
+
+	ROM_REGION( 0x80000, "maincpu:gfx", 0 )
+	ROM_LOAD( "c2.ic10", 0x00000, 0x80000, CRC(d869ab24) SHA1(382e874a846855a7f6f8811625aaa30d9dfa1ce2) ) // handwritten label
+ROM_END
+
 ROM_START( gemcrush )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "gcj_00.ic2",   0x000000, 0x040000, CRC(e1431390) SHA1(f1f63e23d4b73cc099adddeadcf1ea3e27688bcd) ) /* ST M27C2001 EPROM */
+	ROM_LOAD( "gcj_00.ic2",   0x000000, 0x040000, CRC(e1431390) SHA1(f1f63e23d4b73cc099adddeadcf1ea3e27688bcd) ) // ST M27C2001 EPROM
 
 	ROM_REGION( 0x80000, "maincpu:gfx", ROMREGION_ERASE00 )
-	ROM_LOAD( "gcj_01.ic10",  0x000000, 0x080000, CRC(5b9e7a6e) SHA1(345357feed8e80e6a06093fcb69f2b38063d057a) ) /* HN27C4096 EPROM */
+	ROM_LOAD( "gcj_01.ic10",  0x000000, 0x080000, CRC(5b9e7a6e) SHA1(345357feed8e80e6a06093fcb69f2b38063d057a) ) // HN27C4096 EPROM
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 1993, dfruit,    0,   dfruit,  dfruit,   dfruit_state, empty_init, ROT0,   "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", 0 )
-GAME( 1996, gemcrush,  0,   dfruit,  gemcrush, dfruit_state, empty_init, ROT270, "Star Fish", "Gemcrush (Japan, prototype)", MACHINE_NO_COCKTAIL )
+GAME( 1993, dfruit,    0,      dfruit,  dfruit,   dfruit_state, empty_init, ROT0,   "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan, Ver. 1.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dfruita,   dfruit, dfruit,  dfruit,   dfruit_state, empty_init, ROT0,   "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan, Ver. 1.10)", MACHINE_SUPPORTS_SAVE ) // program ROM label says 1994, but title screen is still 1993
+GAME( 1996, gemcrush,  0,      dfruit,  gemcrush, dfruit_state, empty_init, ROT270, "Star Fish",                    "Gemcrush (Japan, prototype)",    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

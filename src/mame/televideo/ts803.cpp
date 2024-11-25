@@ -92,14 +92,14 @@ private:
 	void crtc_controlreg_w(uint8_t data);
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ts803_io(address_map &map);
-	void ts803_mem(address_map &map);
+	void ts803_io(address_map &map) ATTR_COLD;
+	void ts803_mem(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_56kram;
 	bool m_graphics_mode;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<palette_device> m_palette;
 	required_device<z80_device> m_maincpu;
 	required_device<fd1793_device> m_fdc;

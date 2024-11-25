@@ -44,8 +44,8 @@ public:
 	void photon(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t _80_portb_r();
@@ -57,8 +57,8 @@ private:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void set_bank(uint8_t data);
 
-	void pk8000_io(address_map &map);
-	void pk8000_mem(address_map &map);
+	void pk8000_io(address_map &map) ATTR_COLD;
+	void pk8000_mem(address_map &map) ATTR_COLD;
 
 	required_device<speaker_sound_device> m_speaker;
 	required_memory_bank_array<8> m_banks;

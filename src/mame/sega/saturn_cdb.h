@@ -16,11 +16,11 @@ public:
 	// construction/destruction
 	saturn_cdb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void saturn_cdb_map(address_map &map);
+	void saturn_cdb_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 

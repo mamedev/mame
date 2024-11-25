@@ -2,17 +2,17 @@
 // copyright-holders:Olivier Galibert, R. Belmont, MetalliC
 /***************************************************************************
 
-    Yamaha YMZ770C "AMMS-A" and YMZ774 "AMMS2C"
+    Yamaha YMZ770B "AMMSL", YMZ770C "AMMS-A" and YMZ774 "AMMS2C"
 
     Emulation by R. Belmont and MetalliC
     AMM decode by Olivier Galibert
 
 -----
 TODO:
-- What does channel ATBL mean?
 - Simple Access mode. SACs is register / data lists same as SEQ. in 770C, when both /SEL and /CS pins goes low - will be run SAC with number set at data bus.
   can not be used in CV1K (/SEL pin is NC, internally pulled to VCC), probably not used in PGM2 too.
  770:
+- Configurable clock (currently hardcoded at 16kHz)
 - sequencer timers implemented but seems unused, presumably because of design flaws or bugs, likely due to lack of automatic adding of sequencer # to register offset.
   in result sequences uses very long chains of 32-sample wait commands instead, wasting a lot of ROM space.
 - sequencer triggers not implemented, not sure how they works (Deathsmiles ending tune starts sequence with TGST = 01h, likely a bug and don't affect tune playback)
@@ -23,7 +23,7 @@ TODO:
 - sequencer off trigger (not used in games)
 
  known SPUs in this series:
-  YMZ770B  AMMSL    Capcom medal hardware (alien.cpp), sample format is not AMM, in other parts looks like 770C
+  YMZ770B  AMMSL    Capcom medal hardware (alien.cpp)
   YMZ770C  AMMS-A   Cave CV1000
   YMZ771   SSGS3
   YMZ773   AMMS2    Cron corp. video slots
@@ -236,7 +236,7 @@ retry:
 				{
 					// next block
 					int sample_rate, channel_count;
-					if (!channel.decoder->decode_buffer(channel.pptr, m_rom.bytes()*8, channel.output_data, channel.output_remaining, sample_rate, channel_count) || channel.output_remaining == 0)
+					if (!channel.decoder->decode_buffer(channel.pptr, m_rom.bytes()*8, channel.output_data, channel.output_remaining, sample_rate, channel_count, channel.atbl) || channel.output_remaining == 0)
 					{
 						channel.is_playing = !channel.last_block; // detect infinite retry loop
 						channel.last_block = true;

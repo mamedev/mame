@@ -32,8 +32,8 @@ protected:
 	msx_cart_kanji_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	std::error_condition validate_kanji_regions(std::string &message);
 	void install_kanji_handlers();
@@ -85,8 +85,8 @@ void msx_cart_kanji_device::install_kanji_handlers()
 	m_kanji_mask = cart_kanji_region()->bytes() - 1;
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0xd8, 0xd9, emu::rw_delegate(*this, FUNC(msx_cart_kanji_device::kanji_w)));
-	io_space().install_read_handler(0xd9, 0xd9, emu::rw_delegate(*this, FUNC(msx_cart_kanji_device::kanji_r)));
+	io_space().install_write_tap(0xd8, 0xd9, "kanji_w", [this] (offs_t ofs, u8 &data, u8) { this->kanji_w(ofs, data); });
+	io_space().install_read_tap(0xd9, 0xd9, "kanji_r", [this] (offs_t ofs, u8 &data, u8) { data &= this->kanji_r(ofs); });
 }
 
 std::error_condition msx_cart_kanji_device::initialize_cartridge(std::string &message)
@@ -113,7 +113,7 @@ u8 msx_cart_kanji_device::kanji_r(offs_t offset)
 
 void msx_cart_kanji_device::kanji_w(offs_t offset, u8 data)
 {
-	if (offset)
+	if (BIT(offset, 0))
 		m_kanji_address = (m_kanji_address & 0x007e0) | ((data & 0x3f) << 11);
 	else
 		m_kanji_address = (m_kanji_address & 0x1f800) | ((data & 0x3f) << 5);
@@ -137,8 +137,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	static constexpr size_t BANK_SIZE = 0x4000;

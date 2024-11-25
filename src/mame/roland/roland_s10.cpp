@@ -53,9 +53,9 @@ protected:
 	void sw_scan_w(offs_t offset, u8 data);
 	void led_latch_w(u8 data);
 
-	void prog_map(address_map &map);
-	void s10_ext_map(address_map &map);
-	void mks100_ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void s10_ext_map(address_map &map) ATTR_COLD;
+	void mks100_ext_map(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
 
@@ -84,7 +84,7 @@ private:
 	void led_latch1_w(u8 data);
 	void led_latch2_w(u8 data);
 
-	void s220_ext_map(address_map &map);
+	void s220_ext_map(address_map &map) ATTR_COLD;
 
 	required_device<bu3905_device> m_outctrl;
 };
@@ -238,7 +238,7 @@ void roland_s10_state::s10(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(roland_s10_state::palette_init), 2);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(roland_s10_state::lcd_pixel_update));
 	m_lcdc->set_busy_factor(0.005f);

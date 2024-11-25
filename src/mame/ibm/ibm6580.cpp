@@ -219,8 +219,8 @@ public:
 	void ibm6580(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void pic_latch_w(uint16_t data);
@@ -254,11 +254,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ibm6580_io(address_map &map);
-	void ibm6580_mem(address_map &map);
+	void ibm6580_io(address_map &map) ATTR_COLD;
+	void ibm6580_mem(address_map &map) ATTR_COLD;
 
-	void mcu_io(address_map &map);
-	void mcu_mem(address_map &map);
+	void mcu_io(address_map &map) ATTR_COLD;
+	void mcu_mem(address_map &map) ATTR_COLD;
 
 	uint16_t m_gate = 0;
 	uint8_t m_dma0pg = 0;
@@ -1015,7 +1015,7 @@ void ibm6580_state::ibm6580(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &ibm6580_state::mcu_mem);
 	m_mcu->set_addrmap(AS_IO, &ibm6580_state::mcu_io);
 	m_mcu->p1_in_cb().set([this] () {
-		return (m_mcu_p1 & ~0x18) | \
+		return (m_mcu_p1 & ~0x18) |
 			(!m_floppy[0].image->idx_r() << 3) | (!m_floppy[1].image->idx_r() << 4);
 	});
 	m_mcu->p1_out_cb().set([this] (uint8_t data) { m_mcu_p1 = data; });

@@ -60,11 +60,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void audio_io_map(address_map &map);
-	void audio_opcodes_map(address_map &map);
-	void audio_prg_map(address_map &map);
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void audio_opcodes_map(address_map &map) ATTR_COLD;
+	void audio_prg_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t cointek_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

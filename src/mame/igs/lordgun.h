@@ -94,20 +94,20 @@ private:
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void lorddgun_calc_gun_scr(int i);
 	void lordgun_update_gun(int i);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void aliencha_map(address_map &map);
-	void aliencha_soundio_map(address_map &map);
-	void common_map(address_map &map);
-	void lordgun_map(address_map &map);
-	void lordgun_soundio_map(address_map &map);
-	void soundmem_map(address_map &map);
-	void ymf278_map(address_map &map);
+	void aliencha_map(address_map &map) ATTR_COLD;
+	void aliencha_soundio_map(address_map &map) ATTR_COLD;
+	void common_map(address_map &map) ATTR_COLD;
+	void lordgun_map(address_map &map) ATTR_COLD;
+	void lordgun_soundio_map(address_map &map) ATTR_COLD;
+	void soundmem_map(address_map &map) ATTR_COLD;
+	void ymf278_map(address_map &map) ATTR_COLD;
 };
 
 /*----------- defined in video/lordgun.c -----------*/

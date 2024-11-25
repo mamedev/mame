@@ -11,7 +11,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/7200fifo.h"
+#include "7200fifo.h"
 
 
 DEFINE_DEVICE_TYPE(IDT7200, idt7200_device, "idt7200", "IDT7200 FIFO (256x9)")

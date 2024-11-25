@@ -25,7 +25,7 @@ public:
 	template <unsigned IRQ> void irq(int state) { set_irq_line(IRQ, state); }
 	template <unsigned DRQ> void drq(int state) { set_drq_line(DRQ, state); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u64 r4k_r(offs_t offset, u64 mem_mask) { return space(0).read_qword(offset << 3, mem_mask); }
 	void r4k_w(offs_t offset, u64 data, u64 mem_mask) { space(0).write_qword(offset << 3, data, mem_mask); }
@@ -36,8 +36,8 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -47,7 +47,7 @@ protected:
 	void dma_w(offs_t offset, u32 data, u32 mem_mask);
 
 private:
-	void dma(address_map &map);
+	void dma(address_map &map) ATTR_COLD;
 
 	void set_irq_line(int number, int state);
 	void set_drq_line(int channel, int state);

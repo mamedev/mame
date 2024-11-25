@@ -29,7 +29,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	template <int Bank> void bank_w(u8 data);
@@ -108,9 +108,9 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	template <int Bank> void bank_w(u8 data);
@@ -217,10 +217,10 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { save_item(NAME(m_selected_bank)); }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	template <int Bank> u8 flash_r(offs_t offset);
@@ -345,9 +345,7 @@ public:
 		, msx_cart_interface(mconfig, *this)
 		, m_rombank(*this, "rombank%u", 0U)
 		, m_rambank(*this, "rambank%u", 0U)
-		, m_view0(*this, "view0")
-		, m_view1(*this, "view1")
-		, m_view2(*this, "view2")
+		, m_view{ {*this, "view0"}, {*this, "view1"}, {*this, "view2"} }
 	{ }
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
@@ -355,16 +353,14 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	template <int Bank> void bank_w(u8 data);
 
 	memory_bank_array_creator<3> m_rombank;
 	memory_bank_array_creator<3> m_rambank;
-	memory_view m_view0;
-	memory_view m_view1;
-	memory_view m_view2;
+	memory_view m_view[3];
 };
 
 void msx_cart_gamemaster2_device::device_reset()
@@ -372,9 +368,8 @@ void msx_cart_gamemaster2_device::device_reset()
 	m_rombank[0]->set_entry(1);
 	m_rombank[1]->set_entry(1);
 	m_rombank[2]->set_entry(2);
-	m_view0.select(0);
-	m_view1.select(0);
-	m_view2.select(0);
+	for (int i = 0; i < 3; i++)
+		m_view[i].select(0);
 }
 
 std::error_condition msx_cart_gamemaster2_device::initialize_cartridge(std::string &message)
@@ -414,24 +409,24 @@ std::error_condition msx_cart_gamemaster2_device::initialize_cartridge(std::stri
 
 	page(1)->install_rom(0x4000, 0x5fff, cart_rom_region()->base());
 
-	page(1)->install_view(0x6000, 0x7fff, m_view0);
-	m_view0[0].install_read_bank(0x6000, 0x7fff, m_rombank[0]);
-	m_view0[0].install_write_handler(0x6000, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<0>)));
-	m_view0[1].install_read_bank(0x6000, 0x6fff, 0x1000, m_rambank[0]);
-	m_view0[1].install_write_handler(0x6000, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<0>)));
+	page(1)->install_view(0x6000, 0x7fff, m_view[0]);
+	m_view[0][0].install_read_bank(0x6000, 0x7fff, m_rombank[0]);
+	m_view[0][0].install_write_handler(0x6000, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<0>)));
+	m_view[0][1].install_read_bank(0x6000, 0x6fff, 0x1000, m_rambank[0]);
+	m_view[0][1].install_write_handler(0x6000, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<0>)));
 
-	page(2)->install_view(0x8000, 0x9fff, m_view1);
-	m_view1[0].install_read_bank(0x8000, 0x9fff, m_rombank[1]);
-	m_view1[0].install_write_handler(0x8000, 0x8fff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<1>)));
-	m_view1[1].install_read_bank(0x8000, 0x8fff, 0x1000, m_rambank[1]);
-	m_view1[1].install_write_handler(0x8000, 0x8fff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<1>)));
+	page(2)->install_view(0x8000, 0x9fff, m_view[1]);
+	m_view[1][0].install_read_bank(0x8000, 0x9fff, m_rombank[1]);
+	m_view[1][0].install_write_handler(0x8000, 0x8fff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<1>)));
+	m_view[1][1].install_read_bank(0x8000, 0x8fff, 0x1000, m_rambank[1]);
+	m_view[1][1].install_write_handler(0x8000, 0x8fff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<1>)));
 
-	page(2)->install_view(0xa000, 0xbfff, m_view2);
-	m_view2[0].install_read_bank(0xa000, 0xbfff, m_rombank[2]);
-	m_view2[0].install_write_handler(0xa000, 0xafff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<2>)));
-	m_view2[1].install_read_bank(0xa000, 0xafff, m_rambank[2]);
-	m_view2[1].install_write_handler(0xa000, 0xafff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<2>)));
-	m_view2[1].install_readwrite_bank(0xb000, 0xbfff, m_rambank[2]);
+	page(2)->install_view(0xa000, 0xbfff, m_view[2]);
+	m_view[2][0].install_read_bank(0xa000, 0xbfff, m_rombank[2]);
+	m_view[2][0].install_write_handler(0xa000, 0xafff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<2>)));
+	m_view[2][1].install_read_bank(0xa000, 0xafff, m_rambank[2]);
+	m_view[2][1].install_write_handler(0xa000, 0xafff, emu::rw_delegate(*this, FUNC(msx_cart_gamemaster2_device::bank_w<2>)));
+	m_view[2][1].install_readwrite_bank(0xb000, 0xbfff, m_rambank[2]);
 
 	return std::error_condition();
 }
@@ -441,12 +436,7 @@ void msx_cart_gamemaster2_device::bank_w(u8 data)
 {
 	m_rombank[Bank]->set_entry(data & 0x0f);
 	m_rambank[Bank]->set_entry(BIT(data, 5) ? 1 : 0);
-	if (Bank == 0)
-		m_view0.select(BIT(data, 4) ? 1 : 0);
-	if (Bank == 1)
-		m_view1.select(BIT(data, 4) ? 1 : 0);
-	if (Bank == 2)
-		m_view2.select(BIT(data, 4) ? 1 : 0);
+	m_view[Bank].select(BIT(data, 4) ? 1 : 0);
 }
 
 
@@ -468,7 +458,7 @@ protected:
 	// device_t implementation
 	virtual void device_start() override { }
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<dac_8bit_r2r_device> m_dac;
@@ -516,10 +506,7 @@ protected:
 		, msx_cart_interface(mconfig, *this)
 		, m_k052539(*this, "k052539")
 		, m_rambank(*this, "rambank%u", 0U)
-		, m_view0(*this, "view0")
-		, m_view1(*this, "view1")
-		, m_view2(*this, "view2")
-		, m_view3(*this, "view3")
+		, m_view{ {*this, "view0"}, {*this, "view1"}, {*this, "view2"}, {*this, "view3"} }
 		, m_min_rambank(min_rambank)
 		, m_max_rambank(max_rambank)
 		, m_selected_bank{0, 0, 0, 0}
@@ -527,10 +514,10 @@ protected:
 	{ }
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static constexpr u8 VIEW_READ = 0;
@@ -545,10 +532,7 @@ private:
 	// This is actually a K052539
 	required_device<k051649_device> m_k052539;
 	memory_bank_array_creator<4> m_rambank;
-	memory_view m_view0;
-	memory_view m_view1;
-	memory_view m_view2;
-	memory_view m_view3;
+	memory_view m_view[4];
 
 	u8 m_min_rambank;
 	u8 m_max_rambank;
@@ -591,79 +575,79 @@ std::error_condition msx_cart_konami_sound_device::initialize_cartridge(std::str
 
 	// TODO Mirrors at 0000-3fff and c000-ffff
 
-	page(1)->install_view(0x4000, 0x5fff, m_view0);
-	m_view0[VIEW_READ].install_read_bank(0x4000, 0x5fff, m_rambank[0]);
-	m_view0[VIEW_READ].install_write_handler(0x5000, 0x57ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<0>)));
-	m_view0[VIEW_RAM].install_readwrite_bank(0x4000, 0x5fff, m_rambank[0]);
-	m_view0[VIEW_INVALID].install_write_handler(0x5000, 0x57ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<0>)));
-	m_view0[VIEW_INVALID | VIEW_RAM];
+	page(1)->install_view(0x4000, 0x5fff, m_view[0]);
+	m_view[0][VIEW_READ].install_read_bank(0x4000, 0x5fff, m_rambank[0]);
+	m_view[0][VIEW_READ].install_write_handler(0x5000, 0x57ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<0>)));
+	m_view[0][VIEW_RAM].install_readwrite_bank(0x4000, 0x5fff, m_rambank[0]);
+	m_view[0][VIEW_INVALID].install_write_handler(0x5000, 0x57ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<0>)));
+	m_view[0][VIEW_INVALID | VIEW_RAM];
 
-	page(1)->install_view(0x6000, 0x7fff, m_view1);
-	m_view1[VIEW_READ].install_read_bank(0x6000, 0x7fff, m_rambank[1]);
-	m_view1[VIEW_READ].install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<1>)));
-	m_view1[VIEW_RAM].install_readwrite_bank(0x6000, 0x7fff, m_rambank[1]);
-	m_view1[VIEW_INVALID].install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<1>)));
-	m_view1[VIEW_INVALID | VIEW_RAM];
+	page(1)->install_view(0x6000, 0x7fff, m_view[1]);
+	m_view[1][VIEW_READ].install_read_bank(0x6000, 0x7fff, m_rambank[1]);
+	m_view[1][VIEW_READ].install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<1>)));
+	m_view[1][VIEW_RAM].install_readwrite_bank(0x6000, 0x7fff, m_rambank[1]);
+	m_view[1][VIEW_INVALID].install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<1>)));
+	m_view[1][VIEW_INVALID | VIEW_RAM];
 
-	page(2)->install_view(0x8000, 0x9fff, m_view2);
-	m_view2[VIEW_READ].install_read_bank(0x8000, 0x9fff, m_rambank[2]);
-	m_view2[VIEW_READ].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
-	m_view2[VIEW_RAM].install_readwrite_bank(0x8000, 0x9fff, m_rambank[2]);
-	m_view2[VIEW_INVALID].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
-	m_view2[VIEW_INVALID | VIEW_RAM];
-	m_view2[VIEW_SCC | VIEW_READ].install_read_bank(0x8000, 0x9fff, m_rambank[2]);
-	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
-	m_view2[VIEW_SCC | VIEW_READ].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
-	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_w)));
-	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
-	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
-	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
-	m_view2[VIEW_SCC | VIEW_READ].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
-	m_view2[VIEW_SCC | VIEW_READ].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
-	m_view2[VIEW_SCC | VIEW_RAM].install_readwrite_bank(0x8000, 0x9fff, m_rambank[2]);
-	m_view2[VIEW_SCC | VIEW_RAM].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
-	m_view2[VIEW_SCC | VIEW_RAM].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_w)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
-	m_view2[VIEW_SCC | VIEW_INVALID].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
-	m_view2[VIEW_SCC | VIEW_INVALID | VIEW_RAM];
-	m_view2[VIEW_SCC | VIEW_INVALID | VIEW_RAM].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
-	m_view2[VIEW_SCC | VIEW_INVALID | VIEW_RAM].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	page(2)->install_view(0x8000, 0x9fff, m_view[2]);
+	m_view[2][VIEW_READ].install_read_bank(0x8000, 0x9fff, m_rambank[2]);
+	m_view[2][VIEW_READ].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
+	m_view[2][VIEW_RAM].install_readwrite_bank(0x8000, 0x9fff, m_rambank[2]);
+	m_view[2][VIEW_INVALID].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
+	m_view[2][VIEW_INVALID | VIEW_RAM];
+	m_view[2][VIEW_SCC | VIEW_READ].install_read_bank(0x8000, 0x9fff, m_rambank[2]);
+	m_view[2][VIEW_SCC | VIEW_READ].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
+	m_view[2][VIEW_SCC | VIEW_READ].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
+	m_view[2][VIEW_SCC | VIEW_READ].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_w)));
+	m_view[2][VIEW_SCC | VIEW_READ].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
+	m_view[2][VIEW_SCC | VIEW_READ].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
+	m_view[2][VIEW_SCC | VIEW_READ].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_view[2][VIEW_SCC | VIEW_READ].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view[2][VIEW_SCC | VIEW_READ].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
+	m_view[2][VIEW_SCC | VIEW_RAM].install_readwrite_bank(0x8000, 0x9fff, m_rambank[2]);
+	m_view[2][VIEW_SCC | VIEW_RAM].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
+	m_view[2][VIEW_SCC | VIEW_RAM].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view[2][VIEW_SCC | VIEW_INVALID].install_write_handler(0x9000, 0x97ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<2>)));
+	m_view[2][VIEW_SCC | VIEW_INVALID].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
+	m_view[2][VIEW_SCC | VIEW_INVALID].install_write_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_w)));
+	m_view[2][VIEW_SCC | VIEW_INVALID].install_write_handler(0x9880, 0x9889, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
+	m_view[2][VIEW_SCC | VIEW_INVALID].install_write_handler(0x988a, 0x988e, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
+	m_view[2][VIEW_SCC | VIEW_INVALID].install_write_handler(0x988f, 0x988f, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_view[2][VIEW_SCC | VIEW_INVALID].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view[2][VIEW_SCC | VIEW_INVALID].install_write_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
+	m_view[2][VIEW_SCC | VIEW_INVALID | VIEW_RAM];
+	m_view[2][VIEW_SCC | VIEW_INVALID | VIEW_RAM].install_read_handler(0x9800, 0x987f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_waveform_r)));
+	m_view[2][VIEW_SCC | VIEW_INVALID | VIEW_RAM].install_read_handler(0x98c0, 0x98c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
 
-	page(2)->install_view(0xa000, 0xbfff, m_view3);
-	m_view3[VIEW_READ].install_read_bank(0xa000, 0xbfff, m_rambank[3]);
-	m_view3[VIEW_READ].install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
-	m_view3[VIEW_RAM].install_readwrite_bank(0xa000, 0xbfff, m_rambank[3]);
-	m_view3[VIEW_INVALID].install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
-	m_view3[VIEW_INVALID | VIEW_RAM];
-	m_view3[VIEW_SCC | VIEW_READ].install_read_bank(0xa000, 0xbfff, m_rambank[3]);
-	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
-	m_view3[VIEW_SCC | VIEW_READ].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
-	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_w)));
-	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8a0, 0xb8a9, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
-	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8aa, 0xb8ae, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
-	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8af, 0xb8af, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
-	m_view3[VIEW_SCC | VIEW_READ].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
-	m_view3[VIEW_SCC | VIEW_READ].install_write_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
-	m_view3[VIEW_SCC | VIEW_RAM].install_readwrite_bank(0xa000, 0xbfff, m_rambank[3]);
-	m_view3[VIEW_SCC | VIEW_RAM].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
-	m_view3[VIEW_SCC | VIEW_RAM].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_w)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8a0, 0xb8a9, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8aa, 0xb8ae, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8af, 0xb8af, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
-	m_view3[VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
-	m_view3[VIEW_SCC | VIEW_INVALID | VIEW_RAM];
-	m_view3[VIEW_SCC | VIEW_INVALID| VIEW_RAM].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
-	m_view3[VIEW_SCC | VIEW_INVALID| VIEW_RAM].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	page(2)->install_view(0xa000, 0xbfff, m_view[3]);
+	m_view[3][VIEW_READ].install_read_bank(0xa000, 0xbfff, m_rambank[3]);
+	m_view[3][VIEW_READ].install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
+	m_view[3][VIEW_RAM].install_readwrite_bank(0xa000, 0xbfff, m_rambank[3]);
+	m_view[3][VIEW_INVALID].install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
+	m_view[3][VIEW_INVALID | VIEW_RAM];
+	m_view[3][VIEW_SCC | VIEW_READ].install_read_bank(0xa000, 0xbfff, m_rambank[3]);
+	m_view[3][VIEW_SCC | VIEW_READ].install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
+	m_view[3][VIEW_SCC | VIEW_READ].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
+	m_view[3][VIEW_SCC | VIEW_READ].install_write_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_w)));
+	m_view[3][VIEW_SCC | VIEW_READ].install_write_handler(0xb8a0, 0xb8a9, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
+	m_view[3][VIEW_SCC | VIEW_READ].install_write_handler(0xb8aa, 0xb8ae, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
+	m_view[3][VIEW_SCC | VIEW_READ].install_write_handler(0xb8af, 0xb8af, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_view[3][VIEW_SCC | VIEW_READ].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view[3][VIEW_SCC | VIEW_READ].install_write_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
+	m_view[3][VIEW_SCC | VIEW_RAM].install_readwrite_bank(0xa000, 0xbfff, m_rambank[3]);
+	m_view[3][VIEW_SCC | VIEW_RAM].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
+	m_view[3][VIEW_SCC | VIEW_RAM].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view[3][VIEW_SCC | VIEW_INVALID].install_write_handler(0xb000, 0xb7ff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::bank_w<3>)));
+	m_view[3][VIEW_SCC | VIEW_INVALID].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
+	m_view[3][VIEW_SCC | VIEW_INVALID].install_write_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_w)));
+	m_view[3][VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8a0, 0xb8a9, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_frequency_w)));
+	m_view[3][VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8aa, 0xb8ae, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_volume_w)));
+	m_view[3][VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8af, 0xb8af, 0, 0x0710, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_keyonoff_w)));
+	m_view[3][VIEW_SCC | VIEW_INVALID].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
+	m_view[3][VIEW_SCC | VIEW_INVALID].install_write_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_w)));
+	m_view[3][VIEW_SCC | VIEW_INVALID | VIEW_RAM];
+	m_view[3][VIEW_SCC | VIEW_INVALID| VIEW_RAM].install_read_handler(0xb800, 0xb89f, 0, 0x0700, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k052539_waveform_r)));
+	m_view[3][VIEW_SCC | VIEW_INVALID| VIEW_RAM].install_read_handler(0xb8c0, 0xb8c0, 0, 0x071f, 0, emu::rw_delegate(m_k052539, FUNC(k051649_device::k051649_test_r)));
 
 	page(2)->install_write_handler(0xbffe, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_konami_sound_device::control_w)));
 
@@ -702,14 +686,7 @@ void msx_cart_konami_sound_device::switch_bank()
 	if (Bank == 3 && BIT(m_control, 5) && BIT(m_selected_bank[3], 7))
 		view |= VIEW_SCC;
 
-	if (Bank == 0)
-		m_view0.select(view);
-	if (Bank == 1)
-		m_view1.select(view);
-	if (Bank == 2)
-		m_view2.select(view);
-	if (Bank == 3)
-		m_view3.select(view);
+	m_view[Bank].select(view);
 }
 
 template <int Bank>
@@ -791,9 +768,9 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -804,7 +781,7 @@ private:
 	void io_20_w(uint8_t data);
 	uint8_t io_00_r();
 
-	void vlm_map(address_map &map);
+	void vlm_map(address_map &map) ATTR_COLD;
 };
 
 void msx_cart_keyboard_master_device::vlm_map(address_map &map)
@@ -888,7 +865,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 

@@ -635,14 +635,6 @@ static const z80_daisy_config super80_daisy_chain[] =
 //  Z80DMA
 //-------------------------------------------------
 
-void super80v_state::busreq_w(int state)
-{
-// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
-	m_dma->bai_w(state); // tell dma that bus has been granted
-}
-
 uint8_t super80v_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
@@ -788,6 +780,7 @@ void super80v_state::super80v(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &super80v_state::super80v_map);
 	m_maincpu->set_addrmap(AS_IO, &super80v_state::super80v_io);
 	m_maincpu->set_daisy_config(super80_daisy_chain);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	Z80PIO(config, m_pio, MASTER_CLOCK/6);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -844,7 +837,7 @@ void super80v_state::super80v(machine_config &config)
 	TIMER(config, "timer_k").configure_periodic(FUNC(super80v_state::timer_k), attotime::from_hz(300)); // keyb scan
 
 	Z80DMA(config, m_dma, MASTER_CLOCK/6);
-	m_dma->out_busreq_callback().set(FUNC(super80v_state::busreq_w));
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	//ba0 - not connected
 	m_dma->in_mreq_callback().set(FUNC(super80v_state::memory_read_byte));

@@ -483,16 +483,12 @@ TIMER_CALLBACK_MEMBER(sa1111_device::audio_tx_dma_callback)
 		return;
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint32_t count;
-	for (count = 0; count < remaining && count < avail; count++)
-	{
-		const uint32_t data = space.read_dword(m_audio_regs.sadta);
-		LOGMASKED(LOG_AUDIO_DMA, "audio_tx_dma_callback: read data %08x from %08x, pushing to FIFO\n", data, m_audio_regs.sadta);
-		audio_tx_fifo_push(data);
-		m_audio_regs.sadta += 4;
-	}
+	const uint32_t data = space.read_dword(m_audio_regs.sadta);
+	LOGMASKED(LOG_AUDIO_DMA, "audio_tx_dma_callback: read data %08x from %08x, pushing to FIFO\n", data, m_audio_regs.sadta);
+	audio_tx_fifo_push(data);
+	m_audio_regs.sadta += 4;
 
-	m_audio_regs.sadtcc = (remaining - count) << 2;
+	m_audio_regs.sadtcc = (remaining - 1) << 2;
 	if (!m_audio_regs.sadtcc)
 	{
 		static constexpr uint32_t s_start_masks[2] = { (1 << SADTCS_TDSTA_BIT), (1 << SADTCS_TDSTB_BIT) };
@@ -723,7 +719,7 @@ void sa1111_device::audio_tx_fifo_push(uint32_t data)
 		{
 			const uint32_t divisor = ((m_sk_regs.skaud & SKAUD_ACD_MASK) >> SKAUD_ACD_BIT) + 1;
 			const uint32_t pll_clock = clock() * 39;
-			attotime clock_period = attotime::from_ticks(divisor * 256, pll_clock);
+			attotime clock_period = attotime::from_ticks(divisor * 96, pll_clock);
 			m_audio_regs.tx_timer->adjust(clock_period, 0, clock_period);
 		}
 	}
@@ -1094,13 +1090,13 @@ void sa1111_device::sadtcs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	if (BIT(data, SADTCS_TDBDA_BIT) || BIT(data, SADTCS_TDSTA_BIT))
 	{
-		LOGMASKED(LOG_AUDIO_DMA, "%s: sadtcs_w: Clearing done A bit, lowering AUDTXA IRQ\n");
+		LOGMASKED(LOG_AUDIO_DMA, "%s: sadtcs_w: Clearing done A bit, lowering AUDTXA IRQ\n", machine().describe_context());
 		m_audio_regs.sadtcs &= ~(1 << SADTCS_TDBDA_BIT);
 		set_irq_line(INT_AUDTXA, 0);
 	}
 	if (BIT(data, SADTCS_TDBDB_BIT) || BIT(data, SADTCS_TDSTB_BIT))
 	{
-		LOGMASKED(LOG_AUDIO_DMA, "%s: sadtcs_w: Clearing done B bit, lowering AUDTXB IRQ\n");
+		LOGMASKED(LOG_AUDIO_DMA, "%s: sadtcs_w: Clearing done B bit, lowering AUDTXB IRQ\n", machine().describe_context());
 		m_audio_regs.sadtcs &= ~(1 << SADTCS_TDBDB_BIT);
 		set_irq_line(INT_AUDTXB, 0);
 	}

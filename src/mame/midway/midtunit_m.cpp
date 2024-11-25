@@ -8,15 +8,24 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/m6809/m6809.h"
 #include "midtunit.h"
 
+#include "cpu/m6809/m6809.h"
+#include "cpu/tms34010/tms34010.h"
 
-/* constant definitions */
-#define SOUND_ADPCM                 1
-#define SOUND_ADPCM_LARGE           2
-#define SOUND_DCS                   3
+
+#define LOG_PROT    (1U << 1)
+#define LOG_CMOS    (1U << 2)
+#define LOG_SOUND   (1U << 3)
+
+#define LOG_ALL     (LOG_PROT | LOG_CMOS | LOG_SOUND)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGPROT(...)  LOGMASKED(LOG_PROT,  __VA_ARGS__)
+#define LOGCMOS(...)  LOGMASKED(LOG_CMOS,  __VA_ARGS__)
+#define LOGSOUND(...) LOGMASKED(LOG_SOUND, __VA_ARGS__)
 
 
 /*************************************
@@ -25,16 +34,31 @@
  *
  *************************************/
 
-void midtunit_state::register_state_saving()
+void midtunit_base_state::machine_start()
 {
+	// register for state saving
 	save_item(NAME(m_cmos_write_enable));
+}
+
+void midtunit_adpcm_state::machine_start()
+{
+	midtunit_base_state::machine_start();
+
+	// register for state saving
 	save_item(NAME(m_fake_sound_state));
 	save_item(NAME(m_mk_prot_index));
-	save_item(NAME(m_mk2_prot_data));
 	save_item(NAME(m_nbajam_prot_queue));
 	save_item(NAME(m_nbajam_prot_index));
 	save_item(NAME(m_jdredd_prot_index));
 	save_item(NAME(m_jdredd_prot_max));
+}
+
+void mk2_state::machine_start()
+{
+	midtunit_base_state::machine_start();
+
+	// register for state saving
+	save_item(NAME(m_mk2_prot_data));
 }
 
 
@@ -45,28 +69,28 @@ void midtunit_state::register_state_saving()
  *
  *************************************/
 
-void midtunit_state::midtunit_cmos_enable_w(uint16_t data)
+void midtunit_base_state::cmos_enable_w(uint16_t data)
 {
 	m_cmos_write_enable = 1;
 }
 
 
-void midtunit_state::midtunit_cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midtunit_base_state::cmos_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (1)/*m_cmos_write_enable*/
+	if (1)// m_cmos_write_enable
 	{
 		COMBINE_DATA(m_nvram+offset);
 		m_cmos_write_enable = 0;
 	}
 	else
 	{
-		logerror("%08X:Unexpected CMOS W @ %05X\n", m_maincpu->pc(), offset);
+		LOGCMOS("%08X:Unexpected CMOS W @ %05X\n", m_maincpu->pc(), offset);
 		popmessage("Bad CMOS write");
 	}
 }
 
 
-uint16_t midtunit_state::midtunit_cmos_r(offs_t offset)
+uint16_t midtunit_base_state::cmos_r(offs_t offset)
 {
 	return m_nvram[offset];
 }
@@ -90,28 +114,34 @@ static const uint8_t mk_prot_values[] =
 	0xff
 };
 
-uint16_t midtunit_state::mk_prot_r(offs_t offset)
+uint16_t midtunit_adpcm_state::mk_prot_r(offs_t offset)
 {
-	logerror("%s:Protection R @ %05X = %04X\n", machine().describe_context(), offset, mk_prot_values[m_mk_prot_index] << 9);
+	if (!machine().side_effects_disabled())
+		LOGPROT("%s:Protection R @ %05X = %04X\n", machine().describe_context(), offset, mk_prot_values[m_mk_prot_index] << 9);
 
-	/* just in case */
+	// just in case
 	if (m_mk_prot_index >= sizeof(mk_prot_values))
 	{
-		logerror("%s:Unexpected protection R @ %05X\n", machine().describe_context(), offset);
+		if (!machine().side_effects_disabled())
+			LOGPROT("%s:Unexpected protection R @ %05X\n", machine().describe_context(), offset);
 		m_mk_prot_index = 0;
 	}
 
-	return mk_prot_values[m_mk_prot_index++] << 9;
+	uint16_t const result = mk_prot_values[m_mk_prot_index] << 9;
+	if (!machine().side_effects_disabled())
+		m_mk_prot_index++;
+
+	return result;
 }
 
-void midtunit_state::mk_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midtunit_adpcm_state::mk_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		int first_val = (data >> 9) & 0x3f;
+		int const first_val = (data >> 9) & 0x3f;
 		int i;
 
-		/* find the desired first value and stop then */
+		// find the desired first value and stop then
 		for (i = 0; i < sizeof(mk_prot_values); i++)
 			if (mk_prot_values[i] == first_val)
 			{
@@ -119,14 +149,14 @@ void midtunit_state::mk_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				break;
 			}
 
-		/* just in case */
+		// just in case
 		if (i == sizeof(mk_prot_values))
 		{
-			logerror("%s:Unhandled protection W @ %05X = %04X\n", machine().describe_context(), offset, data);
+			LOGPROT("%s:Unhandled protection W @ %05X = %04X\n", machine().describe_context(), offset, data);
 			m_mk_prot_index = 0;
 		}
 
-		logerror("%s:Protection W @ %05X = %04X\n", machine().describe_context(), offset, data);
+		LOGPROT("%s:Protection W @ %05X = %04X\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -138,10 +168,10 @@ void midtunit_state::mk_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
  *
  *************************************/
 
-uint16_t midtunit_state::mkturbo_prot_r()
+uint16_t midtunit_adpcm_state::mkturbo_prot_r()
 {
-	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM &space.
-	 * A startup protection check expects to read back two different values in succession */
+	// the security GAL overlays a counter of some sort at 0xfffff400 in ROM &space.
+	// A startup protection check expects to read back two different values in succession
 	return machine().rand();
 }
 
@@ -153,22 +183,22 @@ uint16_t midtunit_state::mkturbo_prot_r()
  *
  *************************************/
 
-uint16_t midtunit_state::mk2_prot_const_r()
+uint16_t mk2_state::mk2_prot_const_r()
 {
 	return 2;
 }
 
-uint16_t midtunit_state::mk2_prot_r()
+uint16_t mk2_state::mk2_prot_r()
 {
 	return m_mk2_prot_data;
 }
 
-uint16_t midtunit_state::mk2_prot_shift_r()
+uint16_t mk2_state::mk2_prot_shift_r()
 {
 	return m_mk2_prot_data >> 1;
 }
 
-void midtunit_state::mk2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void mk2_state::mk2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mk2_prot_data);
 }
@@ -221,18 +251,21 @@ static const uint32_t nbajamte_prot_values[128] =
 	0x381c2e17, 0x393c3e3f, 0x3a3d1e0f, 0x3b1d0e27, 0x3c3e1f2f, 0x3d1e0f07, 0x3e1f2f37, 0x3f3f3f1f
 };
 
-uint16_t midtunit_state::nbajam_prot_r()
+uint16_t midtunit_adpcm_state::nbajam_prot_r()
 {
-	int result = m_nbajam_prot_queue[m_nbajam_prot_index];
-	if (m_nbajam_prot_index < 4)
-		m_nbajam_prot_index++;
+	uint16_t const result = m_nbajam_prot_queue[m_nbajam_prot_index];
+	if (!machine().side_effects_disabled())
+	{
+		if (m_nbajam_prot_index < 4)
+			m_nbajam_prot_index++;
+	}
 	return result;
 }
 
-void midtunit_state::nbajam_prot_w(offs_t offset, uint16_t data)
+void midtunit_adpcm_state::nbajam_prot_w(offs_t offset, uint16_t data)
 {
-	int table_index = (offset >> 6) & 0x7f;
-	uint32_t protval = m_nbajam_prot_table[table_index];
+	int const table_index = (offset >> 6) & 0x7f;
+	uint32_t const protval = m_nbajam_prot_table[table_index];
 
 	m_nbajam_prot_queue[0] = data;
 	m_nbajam_prot_queue[1] = ((protval >> 24) & 0xff) << 9;
@@ -292,9 +325,9 @@ static const uint8_t jdredd_prot_values_80020[] =
 	0x39,0x33,0x00,0x00,0x00,0x00,0x00,0x00
 };
 
-void midtunit_state::jdredd_prot_w(offs_t offset, uint16_t data)
+void midtunit_adpcm_state::jdredd_prot_w(offs_t offset, uint16_t data)
 {
-	logerror("%s:jdredd_prot_w(%04X,%04X)\n", machine().describe_context(), offset*16, data);
+	LOGPROT("%s:jdredd_prot_w(%04X,%04X)\n", machine().describe_context(), offset*16, data);
 
 	switch (offset)
 	{
@@ -302,67 +335,54 @@ void midtunit_state::jdredd_prot_w(offs_t offset, uint16_t data)
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_10740;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_10740);
-			logerror("-- reset prot table 10740\n");
+			LOGPROT("-- reset prot table 10740\n");
 			break;
 
 		case 0x1324:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_13240;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_13240);
-			logerror("-- reset prot table 13240\n");
+			LOGPROT("-- reset prot table 13240\n");
 			break;
 
 		case 0x7654:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_76540;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_76540);
-			logerror("-- reset prot table 76540\n");
+			LOGPROT("-- reset prot table 76540\n");
 			break;
 
 		case 0x7776:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_77760;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_77760);
-			logerror("-- reset prot table 77760\n");
+			LOGPROT("-- reset prot table 77760\n");
 			break;
 
 		case 0x8002:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_80020;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_80020);
-			logerror("-- reset prot table 80020\n");
+			LOGPROT("-- reset prot table 80020\n");
 			break;
 	}
 }
 
-uint16_t midtunit_state::jdredd_prot_r(offs_t offset)
+uint16_t midtunit_adpcm_state::jdredd_prot_r(offs_t offset)
 {
 	uint16_t result = 0xffff;
 
 	if (m_jdredd_prot_table && m_jdredd_prot_index < m_jdredd_prot_max)
-		result = m_jdredd_prot_table[m_jdredd_prot_index++] << 9;
+	{
+		result = m_jdredd_prot_table[m_jdredd_prot_index] << 9;
+		if (!machine().side_effects_disabled())
+			m_jdredd_prot_index++;
+	}
 
-	logerror("%s:jdredd_prot_r(%04X) = %04X\n", machine().describe_context(), offset*16, result);
+	if (!machine().side_effects_disabled())
+		LOGPROT("%s:jdredd_prot_r(%04X) = %04X\n", machine().describe_context(), offset*16, result);
 	return result;
 }
-
-
-
-/*************************************
- *
- *  Generic driver init
- *
- *************************************/
-
-void midtunit_state::init_tunit_generic(int sound)
-{
-	/* register for state saving */
-	register_state_saving();
-
-	/* load sound ROMs and set up sound handlers */
-	m_chip_type = sound;
-}
-
 
 
 /*************************************
@@ -373,86 +393,78 @@ void midtunit_state::init_tunit_generic(int sound)
  *
  *************************************/
 
-void midtunit_state::init_mktunit()
+void midtunit_adpcm_state::init_mktunit()
 {
-	/* common init */
-	init_tunit_generic(SOUND_ADPCM);
-
-	/* protection */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b00000, 0x1b6ffff, read16sm_delegate(*this, FUNC(midtunit_state::mk_prot_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1b00000, 0x1b6ffff, write16s_delegate(*this, FUNC(midtunit_state::mk_prot_w)));
+	// protection
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b00000, 0x1b6ffff, read16sm_delegate(*this, FUNC(midtunit_adpcm_state::mk_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1b00000, 0x1b6ffff, write16s_delegate(*this, FUNC(midtunit_adpcm_state::mk_prot_w)));
 
 	m_hidden_ram = std::make_unique<uint8_t[]>(43);
 	save_pointer(NAME(m_hidden_ram), 43);
 
-	/* sound chip protection (hidden RAM) */
+	// sound chip protection (hidden RAM)
 	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfb9c, 0xfbc6, m_hidden_ram.get());
 }
 
-void midtunit_state::init_mkturbo()
+void midtunit_adpcm_state::init_mkturbo()
 {
-	/* protection */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16smo_delegate(*this, FUNC(midtunit_state::mkturbo_prot_r)));
+	// protection
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16smo_delegate(*this, FUNC(midtunit_adpcm_state::mkturbo_prot_r)));
 
 	init_mktunit();
 }
 
 
-void midtunit_state::init_nbajam_common(int te_protection)
+void midtunit_adpcm_state::init_nbajam_common(int te_protection)
 {
-	/* common init */
-	init_tunit_generic(SOUND_ADPCM_LARGE);
-	/* protection */
+	// protection
 	if (!te_protection)
 	{
 		m_nbajam_prot_table = nbajam_prot_values;
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b14020, 0x1b2503f, read16smo_delegate(*this, FUNC(midtunit_state::nbajam_prot_r)));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x1b14020, 0x1b2503f, write16sm_delegate(*this, FUNC(midtunit_state::nbajam_prot_w)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b14020, 0x1b2503f, read16smo_delegate(*this, FUNC(midtunit_adpcm_state::nbajam_prot_r)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x1b14020, 0x1b2503f, write16sm_delegate(*this, FUNC(midtunit_adpcm_state::nbajam_prot_w)));
 	}
 	else
 	{
 		m_nbajam_prot_table = nbajamte_prot_values;
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b15f40, 0x1b37f5f, read16smo_delegate(*this, FUNC(midtunit_state::nbajam_prot_r)));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x1b15f40, 0x1b37f5f, write16sm_delegate(*this, FUNC(midtunit_state::nbajam_prot_w)));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b95f40, 0x1bb7f5f, read16smo_delegate(*this, FUNC(midtunit_state::nbajam_prot_r)));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x1b95f40, 0x1bb7f5f, write16sm_delegate(*this, FUNC(midtunit_state::nbajam_prot_w)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b15f40, 0x1b37f5f, read16smo_delegate(*this, FUNC(midtunit_adpcm_state::nbajam_prot_r)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x1b15f40, 0x1b37f5f, write16sm_delegate(*this, FUNC(midtunit_adpcm_state::nbajam_prot_w)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b95f40, 0x1bb7f5f, read16smo_delegate(*this, FUNC(midtunit_adpcm_state::nbajam_prot_r)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x1b95f40, 0x1bb7f5f, write16sm_delegate(*this, FUNC(midtunit_adpcm_state::nbajam_prot_w)));
 	}
 
 	m_hidden_ram = std::make_unique<uint8_t[]>(43);
 	save_pointer(NAME(m_hidden_ram), 43);
 
-	/* sound chip protection (hidden RAM) */
+	// sound chip protection (hidden RAM)
 	if (!te_protection)
 		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4, m_hidden_ram.get());
 	else
 		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbec, 0xfc16, m_hidden_ram.get());
 }
 
-void midtunit_state::init_nbajam()
+void midtunit_adpcm_state::init_nbajam()
 {
 	init_nbajam_common(0);
 }
 
-void midtunit_state::init_nbajamte()
+void midtunit_adpcm_state::init_nbajamte()
 {
 	init_nbajam_common(1);
 }
 
-void midtunit_state::init_jdreddp()
+void midtunit_adpcm_state::init_jdreddp()
 {
-	/* common init */
-	init_tunit_generic(SOUND_ADPCM_LARGE);
-
-	/* looks like the watchdog needs to be disabled */
+	// looks like the watchdog needs to be disabled
 	m_maincpu->space(AS_PROGRAM).nop_write(0x01d81060, 0x01d8107f);
 
-	/* protection */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1bfffff, read16sm_delegate(*this, FUNC(midtunit_state::jdredd_prot_r)), write16sm_delegate(*this, FUNC(midtunit_state::jdredd_prot_w)));
+	// protection
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1bfffff, read16sm_delegate(*this, FUNC(midtunit_adpcm_state::jdredd_prot_r)), write16sm_delegate(*this, FUNC(midtunit_adpcm_state::jdredd_prot_w)));
 
 	m_hidden_ram = std::make_unique<uint8_t[]>(43);
 	save_pointer(NAME(m_hidden_ram), 43);
 
-	/* sound chip protection (hidden RAM) */
+	// sound chip protection (hidden RAM)
 	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbcf, 0xfbf9, m_hidden_ram.get());
 }
 
@@ -466,20 +478,16 @@ void midtunit_state::init_jdreddp()
  *
  *************************************/
 
-void midtunit_state::init_mk2()
+void mk2_state::init_mk2()
 {
-	/* common init */
-	init_tunit_generic(SOUND_DCS);
-	m_video->set_gfx_rom_large(true);
-
-	/* protection */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00f20c60, 0x00f20c7f, write16s_delegate(*this, FUNC(midtunit_state::mk2_prot_w)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00f42820, 0x00f4283f, write16s_delegate(*this, FUNC(midtunit_state::mk2_prot_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01a190e0, 0x01a190ff, read16smo_delegate(*this, FUNC(midtunit_state::mk2_prot_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01a191c0, 0x01a191df, read16smo_delegate(*this, FUNC(midtunit_state::mk2_prot_shift_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01a3d0c0, 0x01a3d0ff, read16smo_delegate(*this, FUNC(midtunit_state::mk2_prot_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01d9d1e0, 0x01d9d1ff, read16smo_delegate(*this, FUNC(midtunit_state::mk2_prot_const_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01def920, 0x01def93f, read16smo_delegate(*this, FUNC(midtunit_state::mk2_prot_const_r)));
+	// protection
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00f20c60, 0x00f20c7f, write16s_delegate(*this, FUNC(mk2_state::mk2_prot_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00f42820, 0x00f4283f, write16s_delegate(*this, FUNC(mk2_state::mk2_prot_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01a190e0, 0x01a190ff, read16smo_delegate(*this, FUNC(mk2_state::mk2_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01a191c0, 0x01a191df, read16smo_delegate(*this, FUNC(mk2_state::mk2_prot_shift_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01a3d0c0, 0x01a3d0ff, read16smo_delegate(*this, FUNC(mk2_state::mk2_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01d9d1e0, 0x01d9d1ff, read16smo_delegate(*this, FUNC(mk2_state::mk2_prot_const_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01def920, 0x01def93f, read16smo_delegate(*this, FUNC(mk2_state::mk2_prot_const_r)));
 }
 
 
@@ -490,22 +498,22 @@ void midtunit_state::init_mk2()
  *
  *************************************/
 
-void midtunit_state::machine_reset()
+void midtunit_adpcm_state::machine_reset()
 {
-	/* reset sound */
-	switch (m_chip_type)
-	{
-		case SOUND_ADPCM:
-		case SOUND_ADPCM_LARGE:
-			m_adpcm_sound->reset_write(1);
-			m_adpcm_sound->reset_write(0);
-			break;
+	midtunit_base_state::machine_reset();
 
-		case SOUND_DCS:
-			m_dcs->reset_w(0);
-			m_dcs->reset_w(1);
-			break;
-	}
+	// reset sound
+	m_adpcm_sound->reset_write(1);
+	m_adpcm_sound->reset_write(0);
+}
+
+void mk2_state::machine_reset()
+{
+	midtunit_base_state::machine_reset();
+
+	// reset sound
+	m_dcs->reset_w(0);
+	m_dcs->reset_w(1);
 }
 
 
@@ -516,59 +524,76 @@ void midtunit_state::machine_reset()
  *
  *************************************/
 
-uint16_t midtunit_state::midtunit_sound_state_r()
+uint16_t midtunit_adpcm_state::sound_state_r()
 {
-/*  logerror("%s:Sound status read\n", machine().describe_context());*/
-
-	if (m_chip_type == SOUND_DCS)
-		return m_dcs->control_r() >> 4;
+//  LOGSOUND("%s:Sound status read\n", machine().describe_context());
 
 	if (m_fake_sound_state)
 	{
-		m_fake_sound_state--;
+		if (!machine().side_effects_disabled())
+			m_fake_sound_state--;
 		return 0;
 	}
 	return ~0;
 }
 
-uint16_t midtunit_state::midtunit_sound_r()
+uint16_t midtunit_adpcm_state::sound_r()
 {
-	logerror("%08X:Sound data read\n", m_maincpu->pc());
-
-	if (m_chip_type == SOUND_DCS)
-		return m_dcs->data_r() & 0xff;
+	if (!machine().side_effects_disabled())
+		LOGSOUND("%08X:Sound data read\n", m_maincpu->pc());
 
 	return ~0;
 }
 
-void midtunit_state::midtunit_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midtunit_adpcm_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* check for out-of-bounds accesses */
+	// check for out-of-bounds accesses
 	if (!offset)
 	{
-		logerror("%08X:Unexpected write to sound (lo) = %04X\n", m_maincpu->pc(), data);
+		LOGSOUND("%08X:Unexpected write to sound (lo) = %04X\n", m_maincpu->pc(), data);
 		return;
 	}
 
-	/* call through based on the sound type */
+	// call through based on the sound type
 	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
-		switch (m_chip_type)
-		{
-			case SOUND_ADPCM:
-			case SOUND_ADPCM_LARGE:
-				m_adpcm_sound->reset_write(~data & 0x100);
-				m_adpcm_sound->write(data & 0xff);
+	{
+		m_adpcm_sound->reset_write(~data & 0x100);
+		m_adpcm_sound->write(data & 0xff);
 
-				/* the games seem to check for $82 loops, so this should be just barely enough */
-				m_fake_sound_state = 128;
-				break;
+		// the games seem to check for $82 loops, so this should be just barely enough
+		m_fake_sound_state = 128;
+	}
+}
 
-			case SOUND_DCS:
-				logerror("%08X:Sound write = %04X\n", m_maincpu->pc(), data);
-				m_dcs->reset_w(data & 0x100);
-				m_dcs->data_w(data & 0xff);
-				/* the games seem to check for $82 loops, so this should be just barely enough */
-				m_fake_sound_state = 128;
-				break;
-		}
+uint16_t mk2_state::dcs_state_r()
+{
+//  LOGSOUND("%s:Sound status read\n", machine().describe_context());
+
+	return m_dcs->control_r() >> 4;
+}
+
+uint16_t mk2_state::dcs_r()
+{
+	if (!machine().side_effects_disabled())
+		LOGSOUND("%08X:Sound data read\n", m_maincpu->pc());
+
+	return m_dcs->data_r() & 0xff;
+}
+
+void mk2_state::dcs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// check for out-of-bounds accesses
+	if (!offset)
+	{
+		LOGSOUND("%08X:Unexpected write to sound (lo) = %04X\n", m_maincpu->pc(), data);
+		return;
+	}
+
+	// call through based on the sound type
+	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
+	{
+		LOGSOUND("%08X:Sound write = %04X\n", m_maincpu->pc(), data);
+		m_dcs->reset_w(data & 0x100);
+		m_dcs->data_w(data & 0xff);
+	}
 }

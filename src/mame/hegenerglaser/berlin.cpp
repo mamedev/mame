@@ -5,6 +5,22 @@
 Mephisto Berlin 68000 / Berlin Professional 68020
 Berlin Professional has the same engine as Mephisto Genius.
 
+Hardware notes:
+
+Berlin 68000:
+- MC68HC000FN12 @ 12.288MHz
+- 128KB ROM (2*M27C512-15XF1)
+- 512KB DRAM (4*TC514256AP-80)
+- 8KB SRAM (HM6264ALP-12 or equivalent), CR2032 battery
+- HD44780, 2-line LCD display (small daughterboard)
+- 8*8 chessboard buttons, 64 leds, piezo
+
+Berlin Professional 68020:
+- MC68EC020RP25 @ 24.576MHz
+- 256KB ROM (D27C020-200V10)
+- 1MB DRAM (8*MCM514256AP70)
+- rest is similar to Berlin 68000
+
 Undocumented buttons:
 - holding ENTER and LEFT cursor on boot runs diagnostics
 - holding CLEAR on boot clears battery backed RAM
@@ -33,13 +49,13 @@ namespace {
 class berlin_state : public driver_device
 {
 public:
-	berlin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG)
-		, m_board(*this, "board")
-		, m_display(*this, "display")
-		, m_keys(*this, "KEY")
+	berlin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG),
+		m_board(*this, "board"),
+		m_display(*this, "display"),
+		m_keys(*this, "KEY")
 	{ }
 
 	void berlin(machine_config &config);
@@ -52,8 +68,8 @@ private:
 	required_device<mephisto_display2_device> m_display;
 	required_ioport m_keys;
 
-	void berlin_mem(address_map &map);
-	void berlinp_mem(address_map &map);
+	void berlin_mem(address_map &map) ATTR_COLD;
+	void berlinp_mem(address_map &map) ATTR_COLD;
 
 	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
 	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
@@ -121,9 +137,6 @@ static INPUT_PORTS_START( berlin )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Right")           PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("New Game (1/2)")  PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("New Game (2/2)")  PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_F1) // "
-
-	PORT_START("CLICKABLE") // helper for clickable artwork
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
@@ -205,9 +218,9 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1992, berl16,   0,       0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1992, berl16a,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.02)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1996, berl16l,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Richard Lang", "Mephisto Berlin 68000 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1992, berl16,   0,       0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.03)", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, berl16a,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin 68000 (v0.02)", MACHINE_SUPPORTS_SAVE )
+SYST( 1996, berl16l,  berl16,  0,      berlin,  berlin, berlin_state, empty_init, "Richard Lang", "Mephisto Berlin 68000 (London upgrade)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1994, berlinp,  0,       0,      berlinp, berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin Professional 68020", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1996, berlinpl, berlinp, 0,      berlinp, berlin, berlin_state, empty_init, "Richard Lang", "Mephisto Berlin Professional 68020 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1994, berlinp,  0,       0,      berlinp, berlin, berlin_state, empty_init, "Hegener + Glaser", "Mephisto Berlin Professional 68020", MACHINE_SUPPORTS_SAVE )
+SYST( 1996, berlinpl, berlinp, 0,      berlinp, berlin, berlin_state, empty_init, "Richard Lang", "Mephisto Berlin Professional 68020 (London upgrade)", MACHINE_SUPPORTS_SAVE )

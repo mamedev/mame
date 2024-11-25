@@ -95,9 +95,9 @@ Stephh's notes (based on the games Z80 code and some tests) :
   access some hidden options. (thanks bnathan)
 
 - cafebrk and cafepara share the same internal TMP91640 code, while
-  cafedoll and mjvegas share the same internal TMP90840 code. Curiously,
-  cafetime has the same internal TMP90840 code as cafedoll and mjvegas,
-  but it's configured to run in external ROM mode.
+  cafedoll, mjvegas and ougonhai (dynax.cpp) share the same internal TMP90840
+  code. Curiously, cafetime has the same internal TMP90840 code as cafedoll
+  and mjvegas, but it's configured to run in external ROM mode.
 
 ****************************************************************************/
 
@@ -275,6 +275,7 @@ public:
 	void init_daisyari() ATTR_COLD;
 	void init_mjtensin() ATTR_COLD;
 	void init_cafedoll() ATTR_COLD;
+	void init_cafepara() ATTR_COLD;
 	void init_cafetime() ATTR_COLD;
 	void init_mjvegas() ATTR_COLD;
 	void init_mjvegasa() ATTR_COLD;
@@ -1500,14 +1501,15 @@ void royalmah_prgbank_state::cafetime_map(address_map &map)
 void royalmah_prgbank_state::cafepara_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x7eff).ram().share("nvram");
+	map(0x6000, 0x6fff).bankrw("bank3").share("nvram");    // nvram
+	map(0x7000, 0x7fff).bankrw(m_rambank);  // banked nvram
 	map(0x7fe1, 0x7fe1).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x7fe2, 0x7fe3).w(m_ay, FUNC(ay8910_device::data_address_w));
 	map(0x7ff0, 0x7ff0).w(FUNC(royalmah_prgbank_state::janptr96_coin_counter_w));
 	map(0x7ff1, 0x7ff1).portr("SYSTEM").nopw();
 	map(0x7ff3, 0x7ff3).w(FUNC(royalmah_prgbank_state::input_port_select_w));
 	map(0x7ff4, 0x7ff4).lw8(NAME([this] (uint8_t data) { m_mainbank->set_entry(data); if (data >= 0x10) logerror("mainbank_w: %02x\n", data); }));
-	map(0x7ff5, 0x7ff5).lw8(NAME([this] (uint8_t data) { logerror("0x7ff5 write: %02x\n", data); })); // bit 1 seems coin counter but it's actually at 0x7ff0
+	map(0x7ff5, 0x7ff5).w(FUNC(royalmah_prgbank_state::janptr96_rambank_w));
 	map(0x7ff6, 0x7ff6).w(FUNC(royalmah_prgbank_state::mjderngr_palbank_w));
 	map(0x7ff7, 0x7ff7).w(FUNC(royalmah_prgbank_state::cafetime_7fe3_w));
 	map(0x8000, 0xffff).bankr(m_mainbank);
@@ -4393,6 +4395,21 @@ ROM_START( janputer )
 	ROM_LOAD( "82s123.prm", 0x00, 0x20, BAD_DUMP CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
 ROM_END
 
+ROM_START( janputera ) // FRM-03 + PS-101 PCBs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1",     0x0000, 0x1000, CRC(84bb36c2) SHA1(9981794deda728494c1112d9a85b4c92edb6b767) )
+	ROM_LOAD( "2",     0x1000, 0x1000, CRC(13bc62bd) SHA1(68645456a249da1de0677ea0785914fd866b86bb) )
+	ROM_LOAD( "3",     0x2000, 0x1000, CRC(61d9caa2) SHA1(96530f28db7e3955bb07ea025eb1df696365051d) )
+	ROM_LOAD( "4",     0x3000, 0x1000, CRC(538cbe03) SHA1(8634332d883033a5800901be664036c08fced61b) )
+	ROM_LOAD( "5",     0x4000, 0x1000, CRC(16c09c73) SHA1(ea712f9ca3200ca27434e4200187b488e24f4c65) )
+	ROM_LOAD( "6.sub", 0x5000, 0x1000, CRC(29a2377d) SHA1(42685519b6022173e4d32341c378da61377ac6d9) )
+	ROM_LOAD( "7.sub", 0x6000, 0x1000, CRC(cc33c951) SHA1(cdf55efe533ea02e606120858970116119b1da2c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom",  0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
+ROM_END
+
+
 /***************************************************************************
 Janyou Part II
 (c)1984 Cosmo Denshi
@@ -4422,6 +4439,18 @@ ROM_START( janyoup2 )
 	ROM_LOAD( "2.c109",       0x2000, 0x2000, CRC(324426d4) SHA1(409244c8458d9bafa325746c37de9e7b955b3787) )
 	ROM_LOAD( "3.c108",       0x4000, 0x2000, CRC(e98b6d34) SHA1(e27ab9a03aff750df78c5db52a112247bdd31328) )
 	ROM_LOAD( "4.c107",       0x6000, 0x1000, CRC(377b8ce9) SHA1(a5efc517ae975e54af5325b8b3f4867e9f449d4c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "n82s123n.c98", 0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
+ROM_END
+
+// on an original Cosmo Corporation PCB
+ROM_START( janyoup2a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.110", 0x0000, 0x2000, CRC(83b612d4) SHA1(6627b2bdf9119ed19516c19fc0ea519e1ac78d83) )
+	ROM_LOAD( "2.109", 0x2000, 0x2000, CRC(ddc669cd) SHA1(8611374b03ee836d07a119736c4ca8fc85b26b9d) )
+	ROM_LOAD( "3.108", 0x4000, 0x2000, CRC(e98b6d34) SHA1(e27ab9a03aff750df78c5db52a112247bdd31328) )
+	ROM_LOAD( "4.107", 0x6000, 0x1000, CRC(7c5ae13b) SHA1(4e8d9fd010f30f6bbfce85e5c9ff0406d07188fb) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "n82s123n.c98", 0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
@@ -4466,6 +4495,19 @@ ROM_START( ippatsu )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123an", 0x00, 0x20, CRC(3bde1bbd) SHA1(729498483943f960e38c4ada992b099b698b497a) )
 ROM_END
+
+// has NEW DOUBLE BET MOJHONG (sic) in ROM but title screen shows 赤麻雀 (Red Mahjong)
+ROM_START( akamj )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "b3.bin",  0x00000, 0x8000, CRC(fb2e5a3e) SHA1(6a06b36dd3baa4c0aba339aaf2e00d82d08cbb22) )
+	ROM_LOAD( "bc2.bin", 0x08000, 0x8000, CRC(38d2aa91) SHA1(b0469803265c6359dc5680e669324a41b84548d7) )
+	ROM_LOAD( "bc1.bin", 0x10000, 0x8000, CRC(38d2aa91) SHA1(b0469803265c6359dc5680e669324a41b84548d7) ) // yes, same ROM 2 times
+
+	ROM_REGION( 0x20, "proms", 0 )
+	// taken from Royal Mahjong, might or might not be the same.
+	ROM_LOAD( "82s123.prm", 0x00, 0x20, BAD_DUMP CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
+ROM_END
+
 
 ROM_START( suzume )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -4863,6 +4905,9 @@ ROM_START( mjtensin )
 
 	ROM_LOAD( "1003.3e", 0x210000, 0x80000, CRC(876081bf) SHA1(fe962cfa9318a9444123bcaf3406e22fb08e8c4e) )
 
+	ROM_REGION( 0x2000, "internal_rom", 0 ) // the MCU is configured for external ROM usage, but does have the internal ROM. Let's load it for completeness' sake.
+	ROM_LOAD( "mjtensin-mcu.3c", 0x0000, 0x2000, CRC(13804e4f) SHA1(34b5072528ad42c78ecae344da09182b850b4db1) )
+
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "d100-2.7e",  0x000, 0x200, CRC(6edeed23) SHA1(f4420c473ebbe3df92b0f5b1f0e4d5495fcb9fda) )
 	ROM_LOAD( "d100-1.6e",  0x200, 0x200, CRC(88befd59) SHA1(cbcb437f9f6b5e542dc69f5c9e85ccbae47080af) )
@@ -5181,6 +5226,19 @@ ROM_START( cafedoll )
 	ROM_COPY( "maincpu", 0x000000, 0x010000, 0x80000 )
 	ROM_LOAD( "7602",              0x090000, 0x80000, CRC(f472960c) SHA1(cc2feb4374ba94035101114c73e1690cfeac9b91) )
 	ROM_LOAD( "7603",              0x110000, 0x80000, CRC(c4293019) SHA1(afd717844e9e681ada14e80cd10dce0ed60d4259) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "d76-2_82s147.9f", 0x000, 0x200, CRC(9c1d0512) SHA1(3ca82d4271badc890701ecc76b97e80b16509b50) )
+	ROM_LOAD( "d76-1_82s147.7f", 0x200, 0x200, CRC(9a75349c) SHA1(2071132267aafd8facf1d7841093d9a45c30a8d3) )
+ROM_END
+
+ROM_START( cafedollg ) // カフェドール グレート (Cafe Doll Great) sticker on PCB, G appended to the main program ROM, but still boots as standard Cafe Doll?
+	ROM_REGION( 0x190000, "maincpu", 0 )
+	ROM_LOAD( "7601g",             0x000000, 0x080000, CRC(e42779bf) SHA1(0a0d8f74da8c0d3b6349f3528b008642aa3efe9c) )
+	ROM_LOAD( "76xx.tmp90840",     0x000000, 0x002000, BAD_DUMP CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // internal ROM, MCU has pins 10 & 12 to 16 stripped out, not dumped for this set but verified on PCB that it works
+	// bank switched ROMs follow
+	ROM_COPY( "maincpu", 0x000000, 0x010000, 0x080000 )
+	ROM_LOAD( "7602",              0x090000, 0x100000, CRC(23fd53c4) SHA1(af75b6e9bf5efe77574861bfc0595824abe99d18) ) // same data of 7602 + 7603 of the parent set
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "d76-2_82s147.9f", 0x000, 0x200, CRC(9c1d0512) SHA1(3ca82d4271badc890701ecc76b97e80b16509b50) )
@@ -5936,6 +5994,18 @@ ROM_START( ichiban ) // TODO: how does the banking work?
 	ROM_LOAD( "mjb.u38", 0x400, 0x200, CRC(0ef881cb) SHA1(44b61a443d683f5cb2d1b1a4f74d8a8f41021de5) )
 ROM_END
 
+ROM_START( dragonmj ) // MJ911 PCB, as ichiban. TODO: how does the banking work?
+	ROM_REGION( 0x60000, "maincpu", 0 ) // opcodes in first half are mixed with pseudo-random garbage
+	ROM_LOAD( "oct3.u15", 0x00000, 0x20000, CRC(87ac834d) SHA1(ab98406a008b566aff95da9ecb11d238e2f472ca) )
+	ROM_LOAD( "oct1.u28", 0x20000, 0x20000, CRC(0142aed1) SHA1(1ee627d6cbddeafbe1407fd569704ec511874c60) )
+	ROM_LOAD( "oct2.u14", 0x40000, 0x20000, CRC(40310894) SHA1(072418ed995e8dda1b47b59483a5139d731ed542) )
+
+	ROM_REGION( 0x600, "proms", 0 )
+	ROM_LOAD( "r.u36", 0x000, 0x200, CRC(1c5d555b) SHA1(cc9bc20d3ef5397acf3f3e195d59c7a633e6500e) )
+	ROM_LOAD( "g.u37", 0x200, 0x200, CRC(eb40711b) SHA1(2ed08fd86dc4f578536ebf65f377c63c8fdc6e07) )
+	ROM_LOAD( "b.u38", 0x400, 0x200, CRC(6b2fa97a) SHA1(7f8e33f2132348eaca1af55062b280e0a9234ac9) )
+ROM_END
+
 
 /*
 Pong Boo! 2 by OCT
@@ -6018,6 +6088,18 @@ void royalmah_prgbank_state::init_cafedoll()
 	init_cafetime();
 
 	save_item(NAME(m_mjvegas_p5_val));
+}
+
+void royalmah_prgbank_state::init_cafepara()
+{
+	m_mainbank->configure_entries(0, 80, memregion("maincpu")->base() + 0x10000, 0x8000);
+
+	save_item(NAME(m_rombank));
+
+	m_janptr96_nvram = std::make_unique<uint8_t[]>(0x1000 * 9);
+	membank("bank3")->set_base(m_janptr96_nvram.get());
+	subdevice<nvram_device>("nvram")->set_base(m_janptr96_nvram.get(), 0x1000 * 9);
+	m_rambank->configure_entries(0, 8, m_janptr96_nvram.get() + 0x1000, 0x1000);
 }
 
 void royalmah_prgbank_state::init_mjvegasa()
@@ -6145,50 +6227,55 @@ void royalmah_prgbank_state::init_pongboo2()
 
 // the original Janputer (Sanritsu) is not yet dumped, basically Royal Mahjong but non-BET type
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
-GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
+GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "Sapporo Mechanic",           "Open Mahjong (Japan)",                  0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1984?, chalgirl, 0,        chalgirl, royalmah, royalmah_prgbank_state, init_chalgirl, ROT0,   "bootleg",                    "Challenge Girl (Falcon bootleg)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // verify ROM loading / banking, bad girl colors
-GAME( 1983,  seljan,   0,        seljan,   seljan,   royalmah_state,         empty_init,    ROT0,   "Jem / Dyna Corp",            "Sel-Jan [BET] (Japan)", 0 )
+GAME( 1983,  seljan,   0,        seljan,   seljan,   royalmah_state,         empty_init,    ROT0,   "Jem / Dyna Corp",            "Sel-Jan (Japan)",                       0 )
 GAME( 1983,  janyoup2, royalmj,  janyoup2, janyoup2, royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
+GAME( 1983,  janyoup2a,royalmj,  janyoup2, janyoup2, royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983, no title screen)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  royalmah_prgbank_state, init_tahjong,  ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
-GAME( 1981,  janputer, 0,        royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong) [BET]", 0 ) // MT #05392
+GAME( 1981,  janputer, 0,        royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong, set 1)", 0 ) // MT #05392
+GAME( 1981,  janputera,janputer, royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Ever Denshi)", "New Double Bet Mahjong (bootleg of Royal Mahjong, set 2)", 0 )
+GAME( 1990,  akamj,    0,        ippatsu,  ippatsu,  royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Electronics)", "Aka Mahjong (Double Bet, ver 1 16)", 0 )
 GAME( 1984,  rkjanoh2, 0,        rkjanoh2, royalmah, royalmah_prgbank_state, init_chalgirl, ROT0,   "SNK / Dyna Corp",            "Royal King Jang Oh 2 (v4.00 1984 Jun 10th)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // never seems to set the palette bank?
 GAME( 1984,  janoh,    0,        janoh,    royalmah, royalmah_state,         empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        MACHINE_NOT_WORKING )
 GAME( 1984,  janoha,   janoh,    janoha,   royalmah, royalmah_state,         empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        MACHINE_NOT_WORKING ) // this one is complete?
 GAME( 1985,  jansou,   0,        jansou,   jansou,   royalmah_state,         init_jansou,   ROT0,   "Dyna Computer",              "Jansou (set 1)",                        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1985,  jansoua,  jansou,   jansou,   jansou,   royalmah_state,         init_jansou,   ROT0,   "Dyna Computer",              "Jansou (V 1.1)",                        0 )
 GAME( 1986,  jangtaku, 0,        jansou,   jansou,   royalmah_state,         init_jansou,   ROT0,   "Dyna Computer",              "Jang Taku (V 1.3)",                     0 )
-GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, royalmah_prgbank_state, init_dynax,    ROT0,   "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
-GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  royalmah_state,         empty_init,    ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
+GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, royalmah_prgbank_state, init_dynax,    ROT0,   "Dyna Electronics",           "Don Den Mahjong (Japan)",               0 )
+GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  royalmah_state,         empty_init,    ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten (Japan)",              0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   royalmah_prgbank_state, init_suzume,   ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
 GAME( 1986,  jongshin, 0,        jongshin, jongshin, royalmah_prgbank_state, init_jongshin, ROT0,   "Dyna Electronics",           "Jong Shin (Japan)",                     0 )
 GAME( 1986,  mjsiyoub, 0,        mjsiyoub, mjyarou,  royalmah_prgbank_state, init_mjsiyoub, ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // MSM5205 isn't hooked up, colors need to be verified against original
 GAME( 1986,  mjsenka,  0,        mjsenka,  mjyarou,  royalmah_prgbank_state, init_mjsenka,  ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // never seems to set the palette bank?
-GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 1)",    MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
-GAME( 1986,  mjyarou2, mjyarou,  mjyarou,  mjyarou,  royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 2)",    MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
-GAME( 1986?, mjclub,   0,        mjclub,   mjclub,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Xex",                        "Mahjong Club [BET] (Japan)",            0 )
-GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat [BET] (Japan)",        0 )
-GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton [BET] (Japan, set 1)",           0 )
-GAME( 1987,  makaijan, 0,        makaijan, makaijan, royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Makaijan [BET] (Japan)",                0 )
-GAME( 1988,  majs101b, 0,        majs101b, majs101b, royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )
-GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Almond Pinky [BET] (Japan)",            0 )
+GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou (Japan, set 1)",          MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
+GAME( 1986,  mjyarou2, mjyarou,  mjyarou,  mjyarou,  royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou (Japan, set 2)",          MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
+GAME( 1986?, mjclub,   0,        mjclub,   mjclub,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Xex",                        "Mahjong Club (Japan)",                  0 )
+GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan)",              0 )
+GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan)",                        0 )
+GAME( 1987,  makaijan, 0,        makaijan, makaijan, royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Makaijan (Japan)",                      0 )
+GAME( 1988,  majs101b, 0,        majs101b, majs101b, royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Mahjong Studio 101 (Japan)",            0 )
+GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Almond Pinky (Japan)",                  0 )
 GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu (Japan)",     MACHINE_NOT_WORKING ) // MT #00964
 GAME( 1989,  mjdejav2, mjdejavu, mjdejavu, mjdejavu, royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu 2 (Japan)",   MACHINE_NOT_WORKING )
 GAME( 1989,  mjderngr, 0,        mjderngr, mjderngr, royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Mahjong Derringer (Japan)",             0 )
-GAME( 1989,  daisyari, 0,        daisyari, daisyari, royalmah_prgbank_state, init_daisyari, ROT0,   "Best System",                "Daisyarin [BET] (Japan)",               0 )
-GAME( 1990,  mjifb,    0,        mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET]",                  0 )
-GAME( 1990,  mjifb2,   mjifb,    mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET](2921)",            0 )
-GAME( 1990,  mjifb3,   mjifb,    mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? [BET](2931)",            0 )
+GAME( 1989,  daisyari, 0,        daisyari, daisyari, royalmah_prgbank_state, init_daisyari, ROT0,   "Best System",                "Daisyarin (Japan)",                     0 )
+GAME( 1990,  mjifb,    0,        mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...?",                        0 )
+GAME( 1990,  mjifb2,   mjifb,    mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? (2921)",                 0 )
+GAME( 1990,  mjifb3,   mjifb,    mjifb,    mjifb,    royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? (2931)",                 0 )
 GAME( 1991,  mjvegasa, 0,        mjvegasa, mjvegasa, royalmah_prgbank_state, init_mjvegasa, ROT0,   "Dynax",                      "Mahjong Vegas (Japan, unprotected)",    0 )
 GAME( 1991,  mjvegas,  mjvegasa, mjvegas,  mjvegasa, royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 0 )
 GAME( 1992,  cafetime, 0,        cafetime, cafetime, royalmah_prgbank_state, init_cafetime, ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
 GAME( 1993,  cafedoll, 0,        cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
+GAME( 1993,  cafedollg,cafedoll, cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll Great (Japan, Ver. 1.00)", MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
 GAME( 1993,  ichiban,  0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // ROM banking is wrong, causing several GFX problems
+GAME( 1993,  dragonmj, 0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "OCT",                        "Dragon Mahjong (Ver 1.20)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // " - DRAGON Ver1.20 1993/11/09
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             MACHINE_NOT_WORKING )
 GAME( 1996,  majrjhdx, 0,        majrjh,   mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Raijinhai DX (Ver. D105)",      0 )
 GAME( 1996,  majrjh,   majrjhdx, majrjh,   mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Raijinhai (Ver. D105)",         0 )
 GAME( 1996,  janptr96, 0,        janptr96, janptr96, royalmah_prgbank_state, init_janptr96, ROT0,   "Dynax",                      "Janputer '96 (Japan)",                  0 )
 GAME( 1997,  janptrsp, 0,        janptr96, janptr96, royalmah_prgbank_state, init_janptr96, ROT0,   "Dynax",                      "Janputer Special (Japan)",              0 )
 GAME( 1997,  pongboo2, 0,        pongboo2, ichiban,  royalmah_prgbank_state, init_pongboo2, ROT0,   "OCT",                        "Pong Boo! 2 (Ver. 1.31)",               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // banking, palette, inputs
-GAME( 1999,  cafebrk,  0,        cafepara, cafetime, royalmah_prgbank_state, init_mjtensin, ROT0,   "Nakanihon / Dynax",          "Mahjong Cafe Break (Ver. 1.01J)",       MACHINE_NOT_WORKING ) // needs correct banking and / or 1d ROM descrambling
-GAME( 1999,  cafepara, 0,        cafepara, cafetime, royalmah_prgbank_state, init_mjtensin, ROT0,   "Techno-Top",                 "Mahjong Cafe Paradise (Ver. 1.00)",     MACHINE_NOT_WORKING ) // needs correct banking and / or 1d ROM descrambling
+GAME( 1999,  cafebrk,  0,        cafepara, cafetime, royalmah_prgbank_state, init_cafepara, ROT0,   "Nakanihon / Dynax",          "Mahjong Cafe Break (Ver. 1.01J)",       MACHINE_NOT_WORKING ) // needs correct banking and / or 1d ROM descrambling
+GAME( 1999,  cafepara, 0,        cafepara, cafetime, royalmah_prgbank_state, init_cafepara, ROT0,   "Techno-Top",                 "Mahjong Cafe Paradise (Ver. 1.00)",     MACHINE_NOT_WORKING ) // needs correct banking and / or 1d ROM descrambling

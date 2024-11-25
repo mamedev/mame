@@ -51,16 +51,16 @@ public:
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void screen_eof();
 
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 protected:
 	tc0090lvc_device(const machine_config &mconfig, device_type &type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_post_load() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -86,7 +86,7 @@ protected:
 	template<unsigned Offset> TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	void vram_map(address_map &map);
+	void vram_map(address_map &map) ATTR_COLD;
 
 	u8 m_bg_scroll[2][4];
 

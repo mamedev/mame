@@ -228,7 +228,7 @@ void mm5799_device::op_ret()
 
 void mm5799_device::op_rets()
 {
-	// RET: return from subroutine, skip next
+	// RETS: return from subroutine, skip next
 	op_ret();
 	m_skip = true;
 }

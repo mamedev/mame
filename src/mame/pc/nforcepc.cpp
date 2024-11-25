@@ -97,8 +97,7 @@ void crush11_host_device::device_start()
 {
 	pci_host_device::device_start();
 	set_multifunction_device(true);
-	memory_space = &cpu->space(AS_DATA);
-	io_space = &cpu->space(AS_IO);
+	set_spaces(&cpu->space(AS_DATA), &cpu->space(AS_IO));
 
 	memory_window_start = 0;
 	memory_window_end = 0xffffffff;
@@ -1091,14 +1090,14 @@ public:
 	nforcepc_state(const machine_config &mconfig, device_type type, const char *tag);
 
 private:
-	void nforce_map(address_map &map);
-	void nforce_map_io(address_map &map);
+	void nforce_map(address_map &map) ATTR_COLD;
+	void nforce_map_io(address_map &map) ATTR_COLD;
 	void boot_state_award_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void maincpu_interrupt(int state);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mcpx_isalpc_device> isalpc;

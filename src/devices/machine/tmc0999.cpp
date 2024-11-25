@@ -14,7 +14,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "machine/tmc0999.h"
+#include "tmc0999.h"
 
 
 DEFINE_DEVICE_TYPE(TMC0999, tmc0999_device, "tmc0999", "TI TMC0999 RAM")

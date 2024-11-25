@@ -37,13 +37,13 @@ protected:
 	static constexpr u16 PEN_RAMNROM_MASK = 1 << 14; // 1-RAM, 0-ROM
 	static constexpr u16 PEN_DOS7FFD_MASK = 1 << 15;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void atm_io(address_map &map);
-	void atm_mem(address_map &map);
-	void atm_switch(address_map &map);
+	void atm_io(address_map &map) ATTR_COLD;
+	void atm_mem(address_map &map) ATTR_COLD;
+	void atm_switch(address_map &map) ATTR_COLD;
 	template <u8 Bank> void atm_ram_w(offs_t offset, u8 data);
 
 	u8 beta_neutral_r(offs_t offset);
@@ -63,7 +63,7 @@ protected:
 	u16 &pen_page(u8 bank) { return m_pages_map[BIT(m_port_7ffd_data, 4)][bank]; }
 	void atm_update_memory();
 	virtual u8 merge_ram_with_7ffd(u8 ram_page) { return (ram_page & ~0x07) | (m_port_7ffd_data & 0x07); }
-	virtual bool is_port_7ffd_locked() { return BIT(m_port_7ffd_data, 5); };
+	virtual bool is_port_7ffd_locked() { return BIT(m_port_7ffd_data, 5); }
 	bool is_dos_active() { return !m_cpm_n || m_beta->is_active(); }
 
 	virtual void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;

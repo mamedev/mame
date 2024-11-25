@@ -496,6 +496,7 @@ void segag80v_state::main_portmap(address_map &map)
 void segag80v_state::spacfurybl_speech_prg_map(address_map &map) // TODO: everything
 {
 	map(0x0000, 0x03ff).rom();
+	map(0x0800, 0x087f).ram();
 }
 
 void segag80v_state::spacfurybl_speech_io_map(address_map &map) // TODO: everything
@@ -511,17 +512,17 @@ void segag80v_state::spacfurybl_speech_io_map(address_map &map) // TODO: everyth
 
 static INPUT_PORTS_START( g80v_generic )
 	PORT_START("D7D6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<0>) // P1.5
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_MEMBER(FUNC(segag80v_state::coin_w<0>)) // P1.5
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<1>) // P1.8
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(segag80v_state, draw_r)   // P1.13
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_MEMBER(FUNC(segag80v_state::coin_w<1>)) // P1.8
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(segag80v_state::draw_r))   // P1.13
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.14
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
 
 	PORT_START("D5D4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<2>) // P1.10
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_MEMBER(FUNC(segag80v_state::coin_w<2>)) // P1.10
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )                 // P1.15
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.16
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.17
@@ -587,7 +588,7 @@ static INPUT_PORTS_START( g80v_generic )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )                // P1.30
 
 	PORT_START("SERVICESW")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_WRITE_LINE_MEMBER(segag80v_state, service_switch_w)
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_WRITE_LINE_MEMBER(FUNC(segag80v_state::service_switch_w))
 INPUT_PORTS_END
 
 
@@ -662,7 +663,7 @@ static INPUT_PORTS_START( elim4 )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D7D6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(segag80v_state, elim4_joint_coin_r)   // combination of all four coin inputs
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(segag80v_state::elim4_joint_coin_r))   // combination of all four coin inputs
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
@@ -946,11 +947,11 @@ void segag80v_state::spacfurybl(machine_config &config)
 {
 	g80v_base(config);
 
-	z80_device &speechcpu(Z80(config, "speechcpu", 4000000)); // clock not verified
+	z80_device &speechcpu(Z80(config, "speechcpu", 15.46848_MHz_XTAL / 4)); // divider not verified
 	speechcpu.set_addrmap(AS_PROGRAM, &segag80v_state::spacfurybl_speech_prg_map);
 	speechcpu.set_addrmap(AS_IO, &segag80v_state::spacfurybl_speech_io_map);
 
-	TMS5100(config, "tms5100", 640000).add_route(ALL_OUTPUTS, "speaker", 0.5); // clock not verified TODO: hook up
+	TMS5100(config, "tms5100", 640'000).add_route(ALL_OUTPUTS, "speaker", 0.5); // clock not verified TODO: hook up
 
 	SPACE_FURY_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
@@ -1206,23 +1207,23 @@ Laying the cage with metal side down, components all facing upwards, numbering f
 */
 ROM_START( spacfurybl )
 	ROM_REGION( 0xc000, "maincpu", 0 )
-	ROM_LOAD( "pcb5.u25", 0x0000, 0x0800, CRC(abad45c2) SHA1(d7999e9320189b217e6e8a220dcf7c4f39b9c8e4) )
-	ROM_LOAD( "pcb4.u17", 0x0800, 0x0800, CRC(a757a577) SHA1(abc630107e69e4a6d6a935928f4be7da7fa10b04) )
-	ROM_LOAD( "pcb4.u2",  0x1000, 0x1000, CRC(1fa35e34) SHA1(7c817d67114190f893a5b89340afd9e3b5fd0661) )
-	ROM_LOAD( "pcb4.u1",  0x2000, 0x1000, CRC(264a8ce9) SHA1(b076bbc28d8fca62da3c5d7c4dd41a458f582262) )
-	ROM_LOAD( "pcb4.u3",  0x3000, 0x1000, CRC(223f191e) SHA1(8504bccc94932eb82eeee81f52284977e5dc3572) )
-	ROM_LOAD( "pcb4.u4",  0x4000, 0x1000, CRC(78981cf5) SHA1(0d73a4608411230ebb12aef6418f13583101d6aa) )
+	ROM_LOAD( "adv_u25.u25", 0x0000, 0x0800, CRC(abad45c2) SHA1(d7999e9320189b217e6e8a220dcf7c4f39b9c8e4) ) // on 1023-B PCB
+	ROM_LOAD( "adv_u17.u17", 0x0800, 0x0800, CRC(a757a577) SHA1(abc630107e69e4a6d6a935928f4be7da7fa10b04) ) // on 1024-B PCB
+	ROM_LOAD( "adv_u1.u1",   0x1000, 0x1000, CRC(1fa35e34) SHA1(7c817d67114190f893a5b89340afd9e3b5fd0661) ) // "
+	ROM_LOAD( "adv_u2.u2",   0x2000, 0x1000, CRC(264a8ce9) SHA1(b076bbc28d8fca62da3c5d7c4dd41a458f582262) ) // "
+	ROM_LOAD( "adv_u3.u3",   0x3000, 0x1000, CRC(223f191e) SHA1(8504bccc94932eb82eeee81f52284977e5dc3572) ) // "
+	ROM_LOAD( "adv_u4.u4",   0x4000, 0x1000, CRC(78981cf5) SHA1(0d73a4608411230ebb12aef6418f13583101d6aa) ) // "
 
 	ROM_REGION( 0x400, "speechcpu", 0 )
-	ROM_LOAD( "pcb6cpu.1", 0x0000, 0x0400, CRC(cb4f9737) SHA1(4ad61b1611560479308b602342279aee34cd7d09) )
+	ROM_LOAD( "advsp_u16.u16", 0x0000, 0x0400, CRC(cb4f9737) SHA1(4ad61b1611560479308b602342279aee34cd7d09) ) // on 1047-B PCB
 
-	ROM_REGION( 0x1000, "tms5100", 0 )
-	ROM_LOAD( "pcb6.2", 0x0000, 0x0800, CRC(2a4d4fcd) SHA1(905299874843514f671f7dc7d0677a142608cf21) )
-	ROM_LOAD( "pcb6.3", 0x0800, 0x0800, CRC(44a54f89) SHA1(0c36e573d6f42236fcacd3f729522b1994f21aa4) )
+	ROM_REGION( 0x2000, "tms5100", 0 )
+	ROM_LOAD( "advsp_u4.u4", 0x0000, 0x1000, CRC(805a070e) SHA1(187e09b9866d3aab9fbfa3e253b27854bd7417b7) ) // on 1047-B PCB
+	ROM_LOAD( "advsp_u3.u3", 0x1000, 0x1000, CRC(155d8269) SHA1(3e8ea22a3d169c270d6f914db9e027f609a0b174) ) // "
 
 	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "pcb2.u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table
-	ROM_LOAD( "pcb5.u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
+	ROM_LOAD( "advisor_u39.u39", 0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table, on 1039-B PCB
+	ROM_LOAD( "dm74s288n.u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing, on 1023-B PCB
 ROM_END
 
 

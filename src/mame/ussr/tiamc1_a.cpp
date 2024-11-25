@@ -74,8 +74,8 @@ void tiamc1_sound_device::device_start()
 {
 	int i, j;
 
-	timer8253_reset(&m_timer0);
-	timer8253_reset(&m_timer1);
+	m_timer0 = timer8253struct();
+	m_timer1 = timer8253struct();
 
 	m_channel = stream_alloc(0, 1, clock() / CLOCK_DIVIDER);
 
@@ -144,12 +144,6 @@ void tiamc1_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 			orval = 0;
 		}
 	}
-}
-
-
-void tiamc1_sound_device::timer8253_reset(struct timer8253struct *t)
-{
-	memset(t,0,sizeof(struct timer8253struct));
 }
 
 

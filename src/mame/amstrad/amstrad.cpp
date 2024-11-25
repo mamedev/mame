@@ -321,7 +321,7 @@ As far as I know, the KC compact used HD6845S only.
 //  PORT_CONFSETTING(M6845_PERSONALITY_PREASIC, "Type 4 - Pre-ASIC")
 
 	PORT_START("green_display")
-	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, amstrad_state,  cpc_monitor_changed, 0 )
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(amstrad_state::cpc_monitor_changed), 0)
 	PORT_CONFSETTING(0x00, "CTM640 Colour Monitor" )
 	PORT_CONFSETTING(0x01, "GT64 Green Monitor" )
 
@@ -1310,6 +1310,6 @@ COMP( 1985, cpc6128sp, cpc464, 0,     cpc6128, cpc6128sp, amstrad_state, empty_i
 COMP( 1990, cpc464p,   0,      0,     cpcplus, plus,      amstrad_state, empty_init, "Amstrad plc", "Amstrad CPC464+",                           0 )
 COMP( 1990, cpc6128p,  0,      0,     cpcplus, plus,      amstrad_state, empty_init, "Amstrad plc", "Amstrad CPC6128+",                          0 )
 CONS( 1990, gx4000,    0,      0,     gx4000,  gx4000,    amstrad_state, empty_init, "Amstrad plc", "Amstrad GX4000",                            0 )
-COMP( 1989, kccomp,    cpc464, 0,     kccomp,  kccomp,    amstrad_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" M?hlhausen",
+COMP( 1989, kccomp,    cpc464, 0,     kccomp,  kccomp,    amstrad_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen",
 																									"KC Compact",                                0 )
 COMP( 1993, al520ex,   cpc464, 0,     aleste,  aleste,    amstrad_state, empty_init, "Patisonic",   "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )

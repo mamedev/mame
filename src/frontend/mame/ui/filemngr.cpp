@@ -74,7 +74,7 @@ void menu_file_manager::recompute_metrics(uint32_t width, uint32_t height, float
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
-void menu_file_manager::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_file_manager::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// access the path
 	std::string_view path = m_selected_device && m_selected_device->exists() ? m_selected_device->filename() : std::string_view();

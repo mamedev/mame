@@ -89,11 +89,10 @@ const abc800i_format FLOPPY_ABC800I_FORMAT;
 int abc800i_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[1];
-	size_t actual;
-	io.read_at(0x810, h, 1, actual);
+	auto const [err, actual] = read_at(io, 0x810, h, 1);
 
 	// start of directory
-	if (h[0] == 0x03)
+	if (!err && (actual == 1) && (h[0] == 0x03))
 		return FIFID_SIGN;
 
 	return 0;

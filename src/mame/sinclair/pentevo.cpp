@@ -72,13 +72,13 @@ public:
 	void pentevo(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
-	void video_start() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	void video_start() override ATTR_COLD;
 
 private:
 	void init_mem_write();
-	void pentevo_io(address_map &map);
+	void pentevo_io(address_map &map) ATTR_COLD;
 
 	void atm_port_ff_w(offs_t offset, u8 data) override;
 	void pentevo_port_7f7_w(offs_t offset, u8 data);
@@ -121,7 +121,7 @@ private:
 	memory_view m_io_dos_view;
 
 	required_device<glukrs_device> m_glukrs;
-	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	required_device<spi_sdcard_device> m_sdcard;
 	required_device<at_keyboard_device> m_keyboard;
 	required_ioport_array<3> m_io_mouse;
 	required_device_array<ym2149_device, 2> m_ay;
@@ -765,6 +765,7 @@ void pentevo_state::pentevo(machine_config &config)
 
 	GLUKRS(config, m_glukrs);
 	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(pentevo_state::spi_miso_w));
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -792,17 +793,21 @@ void pentevo_state::pentevo(machine_config &config)
 
 ROM_START( pentevo )
 	ROM_REGION(0x090000, "maincpu", ROMREGION_ERASEFF)
-	ROM_DEFAULT_BIOS("v0.59.12")
+	ROM_DEFAULT_BIOS("v0.59.13fe")
 
-	// http://svn.zxevo.ru/revision.php?repname=pentevo&path=%2From%2Fzxevo_fe.rom&rev=1012&peg=1021
-	ROM_SYSTEM_BIOS(0, "v0.59.12", "ERS v0.59.12, NEO-DOS v0.57")
-	ROMX_LOAD( "zxevo_05912.rom", 0x010000, 0x80000, CRC(e0e95f9f) SHA1(b27b9d61aaf47a73bdd07027df0aad5b88be0fb9), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "v0.59.12fe", "ERS v0.59.12 (FE), NEO-DOS v0.57")
-	ROMX_LOAD( "zxevo_05912fe.rom", 0x010000, 0x80000, CRC(4c9300b1) SHA1(b6511f1c24a094930a559f3673b322b24b848a03), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "v0.59.04", "ERS v0.59.04, NEO-DOS v0.53")
-	ROMX_LOAD( "zxevo_05904.rom", 0x010000, 0x80000, CRC(8cae52eb) SHA1(992a0dc17fc7283bbfad5c5ebe254cab68bf0d9a), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "v0.59.02fe", "ERS v0.59.02 (FE), NEO-DOS v0.53")
-	ROMX_LOAD( "zxevo_05902fe.rom", 0x010000, 0x80000, CRC(df144c82) SHA1(e48b8a95576e0123764ff8cc34d9373dc95159bf), ROM_BIOS(3))
+	// http://svn.zxevo.ru/revision.php?repname=pentevo&path=%2From%2Fzxevo_fe.rom
+	ROM_SYSTEM_BIOS(0, "v0.59.02fe", "ERS v0.59.02 (FE), NEO-DOS v0.53")
+	ROMX_LOAD( "zxevo_05902fe.rom", 0x010000, 0x80000, CRC(df144c82) SHA1(e48b8a95576e0123764ff8cc34d9373dc95159bf), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v0.59.04", "ERS v0.59.04, NEO-DOS v0.53")
+	ROMX_LOAD( "zxevo_05904.rom", 0x010000, 0x80000, CRC(8cae52eb) SHA1(992a0dc17fc7283bbfad5c5ebe254cab68bf0d9a), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "v0.59.12", "ERS v0.59.12, NEO-DOS v0.57")
+	ROMX_LOAD( "zxevo_05912.rom", 0x010000, 0x80000, CRC(e0e95f9f) SHA1(b27b9d61aaf47a73bdd07027df0aad5b88be0fb9), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "v0.59.12fe", "ERS v0.59.12 (FE), NEO-DOS v0.57")
+	ROMX_LOAD( "zxevo_05912fe.rom", 0x010000, 0x80000, CRC(4c9300b1) SHA1(b6511f1c24a094930a559f3673b322b24b848a03), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "v0.59.13", "ERS v0.59.13, NEO-DOS v0.58")
+	ROMX_LOAD( "zxevo_05913.rom", 0x010000, 0x80000, CRC(b75bf957) SHA1(6880493ee248cad1f82683f8b9cc69fb78fe5682), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "v0.59.13fe", "ERS v0.59.13 (FE), NEO-DOS v0.58")
+	ROMX_LOAD( "zxevo_05913fe.rom", 0x010000, 0x80000, CRC(a4de8eb8) SHA1(508667d5ef42a1d0353866f3a1de4e61a230fc86), ROM_BIOS(5))
 
 	// http://svn.zxevo.ru/revision.php?repname=pentevo&path=%2Fcfgs%2Fstandalone_base_trdemu%2Ftrunk%2Fzxevo_fw.bin&rev=994&peg=1021
 	ROM_REGION(0x0C280, "fw", ROMREGION_ERASEFF)

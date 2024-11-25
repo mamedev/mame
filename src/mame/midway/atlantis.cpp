@@ -57,6 +57,7 @@
 #include "video/zeus2.h"
 
 #include "emupal.h"
+#include "speaker.h"
 
 #define LOG_RTC         (1U << 1)
 #define LOG_PORT        (1U << 2)
@@ -131,8 +132,8 @@ public:
 	void mwskins(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(adc_ready);
 
@@ -187,7 +188,7 @@ private:
 
 	void duart_irq_callback(int state);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
+	ioport_value port_mod_r();
 	uint16_t port_ctrl_r(offs_t offset);
 	void port_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t m_port_data = 0;
@@ -202,10 +203,10 @@ private:
 	uint8_t parallel_r(offs_t offset);
 	void parallel_w(offs_t offset, uint8_t data);
 
-	void map0(address_map &map);
-	void map1(address_map &map);
-	void map2(address_map &map);
-	void map3(address_map &map);
+	void map0(address_map &map) ATTR_COLD;
+	void map1(address_map &map) ATTR_COLD;
+	void map2(address_map &map) ATTR_COLD;
+	void map3(address_map &map) ATTR_COLD;
 };
 
 // Parallel Port
@@ -362,7 +363,6 @@ uint8_t atlantis_state::cmos_r(offs_t offset)
 
 void atlantis_state::cmos_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	system_time systime;
 	// User I/O 0 = Allow write to cmos[0]. Serial Write Enable?
 	if (offset == 0 && (m_user_io_state & 0x1)) {
 		// Data written is shifted by 1 bit each time.  Maybe a serial line output?
@@ -759,7 +759,7 @@ static INPUT_PORTS_START( mwskins )
 	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
-	//PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(atlantis_state, port_mod_r)
+	//PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(atlantis_state::port_mod_r))
 	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("AN.0")
@@ -839,12 +839,23 @@ void atlantis_state::mwskins(machine_config &config)
 	m_screen->set_screen_update("zeus2", FUNC(zeus2_device::screen_update));
 
 	/* sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
 	DCS2_AUDIO_DENVER_2CH(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(4);
 	m_dcs->set_polling_offset(0xe33);
+	m_dcs->add_route(0, "rspeaker", 1.0);
+	m_dcs->add_route(1, "lspeaker", 1.0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
-	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
+	m_ioasic->in_port_cb<1>().set_ioport("SYSTEM");
+	m_ioasic->in_port_cb<2>().set_ioport("IN1");
+	m_ioasic->in_port_cb<3>().set_ioport("IN2");
+	m_ioasic->set_dcs_tag(m_dcs);
+	m_ioasic->set_shuffle(midway_ioasic_device::SHUFFLE_STANDARD);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->set_upper(342); // 325
 	m_ioasic->irq_handler().set(FUNC(atlantis_state::ioasic_irq));

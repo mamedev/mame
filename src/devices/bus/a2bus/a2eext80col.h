@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_A2BUS_A2EEXT809COL_H
-#define MAME_BUS_A2BUS_A2EEXT809COL_H
+#ifndef MAME_BUS_A2BUS_A2EEXT80COL_H
+#define MAME_BUS_A2BUS_A2EEXT80COL_H
 
 #pragma once
 
@@ -30,8 +30,8 @@ public:
 protected:
 	a2eaux_ext80col_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual u8 read_auxram(uint16_t offset) override;
 	virtual void write_auxram(uint16_t offset, u8 data) override;
@@ -47,4 +47,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(A2EAUX_EXT80COL, a2eaux_ext80col_device)
 
-#endif // MAME_BUS_A2BUS_A2EEXT809COL_H
+#endif // MAME_BUS_A2BUS_A2EEXT80COL_H

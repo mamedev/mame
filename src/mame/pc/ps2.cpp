@@ -34,12 +34,12 @@ public:
 	void ps2386(machine_config &config);
 	void ps2386sx(machine_config &config);
 	void at_softlists(machine_config &config);
-	void ps2_16_io(address_map &map);
-	void ps2_16_map(address_map &map);
-	void ps2_32_io(address_map &map);
-	void ps2_32_map(address_map &map);
+	void ps2_16_io(address_map &map) ATTR_COLD;
+	void ps2_16_map(address_map &map) ATTR_COLD;
+	void ps2_32_io(address_map &map) ATTR_COLD;
+	void ps2_32_map(address_map &map) ATTR_COLD;
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 };
 
 void ps2_state::at_softlists(machine_config &config)

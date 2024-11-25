@@ -183,13 +183,13 @@ public:
 	void replicator(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void palette_init(palette_device &palette) const;
 
-	void prg_map(address_map &map);
-	void data_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	uint8_t port_a_r();
 	uint8_t port_b_r();
@@ -734,7 +734,7 @@ void replicator_state::replicator(machine_config &config)
 	PALETTE(config, "palette", FUNC(replicator_state::palette_init), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_replicator);
 
-	HD44780(config, "hd44780", 250'000).set_lcd_size(4, 20); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, "hd44780", 270'000).set_lcd_size(4, 20); // TODO: clock not measured, datasheet typical clock used
 
 	/* sound hardware */
 	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */

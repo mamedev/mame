@@ -185,10 +185,10 @@ public:
 	void nomcu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 private:
 	// memory pointers
@@ -209,8 +209,8 @@ private:
 	void videoram_write(uint16_t offset, uint8_t data, uint8_t mask);
 	void blitter_execute();
 
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -224,8 +224,8 @@ public:
 	void mcu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// MCU simulation (for now)
@@ -234,7 +234,7 @@ private:
 	uint8_t mcu_sim_r();
 	void mcu_sim_w(uint8_t data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

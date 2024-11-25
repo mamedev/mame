@@ -77,23 +77,21 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { set_cpu_freq(); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override { set_cpu_freq(); }
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { set_cpu_freq(); }
 
 private:
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 
 	bool m_kp_select = false;
 	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 
 	// I/O handlers
-	void update_display();
 	void mux_w(u8 data);
 	void control_w(u8 data);
 	u8 input_r();
@@ -101,12 +99,17 @@ private:
 	void set_cpu_freq();
 };
 
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
 void micro2_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_kp_select));
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_select));
 }
 
 void micro2_state::set_cpu_freq()
@@ -124,18 +127,11 @@ void micro2_state::set_cpu_freq()
     I/O
 *******************************************************************************/
 
-// MCU ports/generic
-
-void micro2_state::update_display()
-{
-	m_display->matrix(m_led_select, m_inp_mux);
-}
-
 void micro2_state::mux_w(u8 data)
 {
 	// D0-D7: input mux, led data
 	m_inp_mux = ~data;
-	update_display();
+	m_display->write_mx(m_inp_mux);
 }
 
 void micro2_state::control_w(u8 data)
@@ -147,15 +143,14 @@ void micro2_state::control_w(u8 data)
 	m_dac->write(BIT(data, 2) & BIT(~data, 3));
 
 	// P24-P26: led select
-	m_led_select = ~data >> 4 & 7;
-	update_display();
+	m_display->write_my(~data >> 4 & 7);
 }
 
 u8 micro2_state::input_r()
 {
+	// P10-P17: multiplexed inputs
 	u8 data = 0;
 
-	// P10-P17: multiplexed inputs
 	// read chessboard buttons
 	for (int i = 0; i < 8; i++)
 		if (BIT(m_inp_mux, i))
@@ -186,7 +181,7 @@ static INPUT_PORTS_START( micro2 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
 
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, micro2_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(micro2_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "6MHz (original)" )
 	PORT_CONFSETTING(    0x01, "15MHz (newer)" )
 INPUT_PORTS_END
@@ -237,4 +232,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, nmicro2, 0,       0,      micro2,  micro2, micro2_state, empty_init, "Novag", "Micro II (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, nmicro2, 0,       0,      micro2,  micro2, micro2_state, empty_init, "Novag Industries / Heuristic Software", "Micro II (Novag)", MACHINE_SUPPORTS_SAVE )

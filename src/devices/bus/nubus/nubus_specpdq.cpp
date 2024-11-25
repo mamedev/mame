@@ -23,7 +23,6 @@
 
   TODO:
   * Having no alternate oscillator installed is not emulated.
-  * Work out how active line length is configured.
   * Alternate oscillator calibration is currently failing.  Fixing this
     probably requires a complete cycle-accurate Mac II.
 
@@ -69,13 +68,13 @@ protected:
 	nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// palette implementation
 	virtual uint32_t palette_entries() const noexcept override;
@@ -108,7 +107,7 @@ private:
 
 	uint16_t m_stride;
 	uint16_t m_vint;
-	uint8_t m_hdelay;
+	uint8_t m_hdelay, m_hadjust;
 	uint8_t m_osc;
 
 	uint16_t m_blit_stride;
@@ -231,6 +230,7 @@ void nubus_specpdq_device::device_start()
 	save_item(NAME(m_stride));
 	save_item(NAME(m_vint));
 	save_item(NAME(m_hdelay));
+	save_item(NAME(m_hadjust));
 	save_item(NAME(m_osc));
 	save_item(NAME(m_blit_stride));
 	save_item(NAME(m_blit_src));
@@ -261,6 +261,7 @@ void nubus_specpdq_device::device_reset()
 	m_stride = 0;
 	m_vint = 0;
 	m_hdelay = 0;
+	m_hadjust = 0;
 	m_osc = 0;
 
 	m_blit_stride = 0;
@@ -326,22 +327,15 @@ void nubus_specpdq_device::update_crtc()
 	// for some reason you temporarily get invalid screen parameters - ignore them
 	if (m_crtc.valid(*this))
 	{
-		rectangle active(
+		// FIXME: there's still something missing in the active width calculation
+		// With the Apple RGB (640*480) monitor selected, the active width is 16 pixels
+		// too wide in black and white mode, and 16 pixels too narrow in greyscale or
+		// colour modes.
+		rectangle const active(
 				m_crtc.h_start(16) + (m_hdelay * 4),
-				m_crtc.h_end(16) - 1,
+				m_crtc.h_end(16) + (m_hdelay * 4) - m_hadjust - 1,
 				m_crtc.v_start(),
 				m_crtc.v_end() - 1);
-
-		// FIXME: work out how it actually configures the RAMDAC end-of-line
-		// this is a horrible hack
-		if (active.width() < 832)
-			active.set_width(640);
-		else if (active.width() < 1024)
-			active.set_width(832);
-		else if (active.width() < 1152)
-			active.set_width(1024);
-		else
-			active.set_width(1152);
 
 		screen().configure(
 				m_crtc.h_total(16),
@@ -516,6 +510,12 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 			break;
 
 		case 0xc005e:   // not sure, interrupt related?
+			break;
+
+		case 0xc0066:
+			LOG("%s: %u to hadjust\n", machine().describe_context(), ~data & 0xff);
+			m_hadjust = ~data & 0xff;
+			update_crtc();
 			break;
 
 		case 0xc006a:

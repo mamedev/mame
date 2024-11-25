@@ -51,12 +51,12 @@ public:
 protected:
 	u8 tms5501_status_r();
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	void mcb216_io(address_map &map);
+	void mcb216_io(address_map &map) ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<tms5501_device> m_tms5501;
 
 private:
-	void mcb216_mem(address_map &map);
+	void mcb216_mem(address_map &map) ATTR_COLD;
 };
 
 class cb308_state : public mcb216_state
@@ -66,8 +66,8 @@ public:
 	void cb308(machine_config &config);
 
 private:
-	void cb308_mem(address_map &map);
-	void machine_reset() override;
+	void cb308_mem(address_map &map) ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 };
 
 u8 mcb216_state::tms5501_status_r()

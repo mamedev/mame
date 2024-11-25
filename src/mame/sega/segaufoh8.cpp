@@ -40,14 +40,14 @@ public:
 	segaufoh8_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
-	{}
+	{ }
 
 	void segaufoh8(machine_config &config);
 
 private:
 	required_device<h83007_device> m_maincpu;
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -56,7 +56,6 @@ void segaufoh8_state::program_map(address_map &map)
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	//map(0x?00000, 0x?0007f).rw("315_5296", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0xff00);
 	//map(0x400000, 0x40001f).rw("315_5338a", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask16(0xff00);
-	//map(0xfe0000, 0xffffff).ram();
 }
 
 
@@ -134,4 +133,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2001, ufo7, 0, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 (V20011112)", MACHINE_IS_SKELETON_MECHANICAL ) // UFO Catch 7 in string in ROM
+GAME( 2001, ufo7, 0, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7", MACHINE_IS_SKELETON_MECHANICAL ) // UFO Catch 7 V20011112 in string in ROM

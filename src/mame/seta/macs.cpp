@@ -89,8 +89,8 @@ public:
 	void init_macs2();
 
 protected:
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t m_mux_data = 0;
@@ -113,8 +113,8 @@ private:
 	required_memory_bank_array<2> m_rombank;
 	required_memory_bank_array<2> m_rambank;
 
-	void macs_io(address_map &map);
-	void macs_mem(address_map &map);
+	void macs_io(address_map &map) ATTR_COLD;
+	void macs_mem(address_map &map) ATTR_COLD;
 };
 
 

@@ -376,6 +376,8 @@ STOP            01001000  10111011          12  stop
 
 DEFINE_DEVICE_TYPE(UPD7810,  upd7810_device,  "upd7810",  "NEC uPD7810")
 DEFINE_DEVICE_TYPE(UPD78C10, upd78c10_device, "upd78c10", "NEC uPD78C10")
+DEFINE_DEVICE_TYPE(UPD7811,  upd7811_device,  "upd7811",  "NEC uPD7811")
+DEFINE_DEVICE_TYPE(UPD78C11, upd78c11_device, "upd78c11", "NEC uPD78C11")
 DEFINE_DEVICE_TYPE(UPD7807,  upd7807_device,  "upd7807",  "NEC uPD7807")
 DEFINE_DEVICE_TYPE(UPD7801,  upd7801_device,  "upd7801",  "NEC uPD7801")
 DEFINE_DEVICE_TYPE(UPD78C05, upd78c05_device, "upd78c05", "NEC uPD78C05")
@@ -389,7 +391,8 @@ void upd7810_device::upd_internal_128_ram_map(address_map &map)
 
 void upd7810_device::upd_internal_256_ram_map(address_map &map)
 {
-	map(0xff00, 0xffff).ram();
+	map(0xff00, 0xffff).view(m_ram_view);
+	m_ram_view[0](0xff00, 0xffff).ram();
 }
 
 void upd7810_device::upd_internal_4096_rom_128_ram_map(address_map &map)
@@ -401,7 +404,8 @@ void upd7810_device::upd_internal_4096_rom_128_ram_map(address_map &map)
 void upd7810_device::upd_internal_4096_rom_256_ram_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0xff00, 0xffff).ram();
+	map(0xff00, 0xffff).view(m_ram_view);
+	m_ram_view[0](0xff00, 0xffff).ram();
 }
 
 upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
@@ -424,6 +428,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 	, m_pf_out_cb(*this)
 	, m_pt_in_cb(*this, 0) // TODO: uPD7807 only
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
+	, m_ram_view(*this, "ram_view")
 	, m_pa_pullups(0xff)
 	, m_pb_pullups(0xff)
 	, m_pc_pullups(0xff)
@@ -456,6 +461,16 @@ upd78c10_device::upd78c10_device(const machine_config &mconfig, device_type type
 
 upd78c10_device::upd78c10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd78c10_device(mconfig, UPD78C10, tag, owner, clock, address_map_constructor(FUNC(upd78c10_device::upd_internal_256_ram_map), this))
+{
+}
+
+upd7811_device::upd7811_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd7810_device(mconfig, UPD7811, tag, owner, clock, address_map_constructor(FUNC(upd7811_device::upd_internal_4096_rom_256_ram_map), this))
+{
+}
+
+upd78c11_device::upd78c11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: upd78c10_device(mconfig, UPD78C11, tag, owner, clock, address_map_constructor(FUNC(upd78c11_device::upd_internal_4096_rom_256_ram_map), this))
 {
 }
 
@@ -608,25 +623,7 @@ uint8_t upd7810_device::RP(offs_t port)
 		data = (m_pb_in & m_mb) | (m_pb_out & ~m_mb);
 		break;
 	case UPD7810_PORTC:
-		if (m_mc && !m_pc_in_cb.isunset())  // NS20031301 no need to read if the port is set as output
-			m_pc_in = m_pc_in_cb(0, m_mc);
-		data = (m_pc_in & m_mc) | (m_pc_out & ~m_mc);
-		if (m_mcc & 0x01)   /* PC0 = TxD output */
-			data = (data & ~0x01) | (m_txd & 1 ? 0x01 : 0x00);
-		if (m_mcc & 0x02)   /* PC1 = RxD input */
-			data = (data & ~0x02) | (m_rxd & 1 ? 0x02 : 0x00);
-		if (m_mcc & 0x04)   /* PC2 = SCK input/output */
-			data = (data & ~0x04) | (m_sck & 1 ? 0x04 : 0x00);
-		if (m_mcc & 0x08)   /* PC3 = TI/INT2 input */
-			data = (data & ~0x08) | (m_int2 & 1 ? 0x08 : 0x00);
-		if (m_mcc & 0x10)   /* PC4 = TO output */
-			data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
-		if (m_mcc & 0x20)   /* PC5 = CI input */
-			data = (data & ~0x20) | (m_ci & 1 ? 0x20 : 0x00);
-		if (m_mcc & 0x40)   /* PC6 = CO0 output */
-			data = (data & ~0x40) | (m_co0 & 1 ? 0x40 : 0x00);
-		if (m_mcc & 0x80)   /* PC7 = CO1 output */
-			data = (data & ~0x80) | (m_co1 & 1 ? 0x80 : 0x00);
+		data = read_pc();
 		break;
 	case UPD7810_PORTD:
 		if (!m_pd_in_cb.isunset())
@@ -674,6 +671,42 @@ uint8_t upd7810_device::RP(offs_t port)
 	return data;
 }
 
+uint8_t upd7810_device::read_pc()
+{
+	if (m_mc && !m_pc_in_cb.isunset())  // NS20031301 no need to read if the port is set as output
+		m_pc_in = m_pc_in_cb(0, m_mc);
+	uint8_t data = (m_pc_in & m_mc) | (m_pc_out & ~m_mc);
+	if (m_mcc & 0x01)   /* PC0 = TxD output */
+		data = (data & ~0x01) | (m_txd & 1 ? 0x01 : 0x00);
+	if (m_mcc & 0x02)   /* PC1 = RxD input */
+		data = (data & ~0x02) | (m_rxd & 1 ? 0x02 : 0x00);
+	if (m_mcc & 0x04)   /* PC2 = SCK input/output */
+		data = (data & ~0x04) | (m_sck & 1 ? 0x04 : 0x00);
+	if (m_mcc & 0x08)   /* PC3 = TI/INT2 input */
+		data = (data & ~0x08) | (m_int2 & 1 ? 0x08 : 0x00);
+	if (m_mcc & 0x10)   /* PC4 = TO output */
+		data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
+	if (m_mcc & 0x20)   /* PC5 = CI input */
+		data = (data & ~0x20) | (m_ci & 1 ? 0x20 : 0x00);
+	if (m_mcc & 0x40)   /* PC6 = CO0 output */
+		data = (data & ~0x40) | (m_co0 & 1 ? 0x40 : 0x00);
+	if (m_mcc & 0x80)   /* PC7 = CO1 output */
+		data = (data & ~0x80) | (m_co1 & 1 ? 0x80 : 0x00);
+	return data;
+}
+
+uint8_t upd7801_device::read_pc()
+{
+	if ((m_mc & 0x87) && !m_pc_in_cb.isunset())  // NS20031301 no need to read if the port is set as output
+		m_pc_in = m_pc_in_cb(0, 0x84 | (m_mc & 0x03));
+	uint8_t data = (m_pc_in & 0x87) | (m_pc_out & ~0x87);
+	if (!BIT(m_mc, 2))  /* TODO PC2 = -SCS input */
+		data = (data & ~0x04) | 0x04;
+	if (!BIT(m_mc, 7))  /* TODO PC7 = HOLD input */
+		data = (data & ~0x80);
+	return data;
+}
+
 void upd7810_device::WP(offs_t port, uint8_t data)
 {
 	switch (port)
@@ -690,24 +723,7 @@ void upd7810_device::WP(offs_t port, uint8_t data)
 		break;
 	case UPD7810_PORTC:
 		m_pc_out = data;
-		data = (data & ~m_mc) | (m_pc_pullups & m_mc);
-		if (m_mcc & 0x01)   /* PC0 = TxD output */
-			data = (data & ~0x01) | (m_txd & 1 ? 0x01 : 0x00);
-		if (m_mcc & 0x02)   /* PC1 = RxD input */
-			data = (data & ~0x02) | (m_rxd & 1 ? 0x02 : 0x00);
-		if (m_mcc & 0x04)   /* PC2 = SCK input/output */
-			data = (data & ~0x04) | (m_sck & 1 ? 0x04 : 0x00);
-		if (m_mcc & 0x08)   /* PC3 = TI/INT2 input */
-			data = (data & ~0x08) | (m_int2 & 1 ? 0x08 : 0x00);
-		if (m_mcc & 0x10)   /* PC4 = TO output */
-			data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
-		if (m_mcc & 0x20)   /* PC5 = CI input */
-			data = (data & ~0x20) | (m_ci & 1 ? 0x20 : 0x00);
-		if (m_mcc & 0x40)   /* PC6 = CO0 output */
-			data = (data & ~0x40) | (m_co0 & 1 ? 0x40 : 0x00);
-		if (m_mcc & 0x80)   /* PC7 = CO1 output */
-			data = (data & ~0x80) | (m_co1 & 1 ? 0x80 : 0x00);
-		m_pc_out_cb(data);
+		write_pc(data);
 		break;
 	case UPD7810_PORTD:
 		m_pd_out = data;
@@ -746,6 +762,42 @@ void upd7810_device::WP(offs_t port, uint8_t data)
 	default:
 		logerror("uPD7810 internal error: RP() called with invalid port number\n");
 	}
+}
+
+void upd7810_device::write_pc(uint8_t data)
+{
+	data = (data & ~m_mc) | (m_pc_pullups & m_mc);
+	if (m_mcc & 0x01)   /* PC0 = TxD output */
+		data = (data & ~0x01) | (m_txd & 1 ? 0x01 : 0x00);
+	if (m_mcc & 0x02)   /* PC1 = RxD input */
+		data = (data & ~0x02) | (m_rxd & 1 ? 0x02 : 0x00);
+	if (m_mcc & 0x04)   /* PC2 = SCK input/output */
+		data = (data & ~0x04) | (m_sck & 1 ? 0x04 : 0x00);
+	if (m_mcc & 0x08)   /* PC3 = TI/INT2 input */
+		data = (data & ~0x08) | (m_int2 & 1 ? 0x08 : 0x00);
+	if (m_mcc & 0x10)   /* PC4 = TO output */
+		data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
+	if (m_mcc & 0x20)   /* PC5 = CI input */
+		data = (data & ~0x20) | (m_ci & 1 ? 0x20 : 0x00);
+	if (m_mcc & 0x40)   /* PC6 = CO0 output */
+		data = (data & ~0x40) | (m_co0 & 1 ? 0x40 : 0x00);
+	if (m_mcc & 0x80)   /* PC7 = CO1 output */
+		data = (data & ~0x80) | (m_co1 & 1 ? 0x80 : 0x00);
+	m_pc_out_cb(data);
+}
+
+void upd7801_device::write_pc(uint8_t data)
+{
+	data = (data & 0x78) | (m_pc_pullups & ~0x78);
+	if (!BIT(m_mc, 3))  /* TODO PC3 = SAK output */
+		data = (data & ~0x08);
+	if (!BIT(m_mc, 4))  /* PC4 = TO output */
+		data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
+	if (!BIT(m_mc, 5))  /* TODO PC5 = IO/-M input */
+		data = (data & ~0x20);
+	if (!BIT(m_mc, 6))  /* TODO PC6 = HLDA output */
+		data = (data & ~0x40);
+	m_pc_out_cb(data);
 }
 
 void upd7810_device::upd7810_take_irq()
@@ -1696,6 +1748,9 @@ void upd7810_device::device_start()
 {
 	base_device_start();
 
+	MM = 8;
+	m_ram_view.select(0);
+
 	state_add( UPD7810_PC,   "PC",   m_pc.w.l).formatstr("%04X");
 	state_add( UPD7810_SP,   "SP",   m_sp.w.l).formatstr("%04X");
 	state_add( UPD7810_PSW,  "PSW",  m_psw).formatstr("%02X");
@@ -1750,6 +1805,31 @@ void upd7810_device::device_start()
 	state_add( UPD7810_LV1,  "LV1",  m_lv1).formatstr("%3u");
 	state_add( UPD7810_CO0,  "CO0",  m_co0).formatstr("%3u");
 	state_add( UPD7810_CO1,  "CO1",  m_co1).formatstr("%3u");
+
+	state_add( STATE_GENPC, "GENPC", m_pc.w.l ).formatstr("%04X").noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_ppc.w.l ).formatstr("%04X").noshow();
+	state_add( STATE_GENFLAGS, "GENFLAGS", m_psw ).formatstr("%17s").noshow();
+}
+
+void upd7801_device::device_start()
+{
+	base_device_start();
+
+	state_add( UPD7810_PC,   "PC",   m_pc.w.l).formatstr("%04X");
+	state_add( UPD7810_SP,   "SP",   m_sp.w.l).formatstr("%04X");
+	state_add( UPD7810_PSW,  "PSW",  m_psw).formatstr("%02X");
+	state_add( UPD7810_A,    "A",    m_va.b.l).formatstr("%02X");
+	state_add( UPD7810_V,    "V",    m_va.b.h).formatstr("%02X");
+	state_add( UPD7810_EA,   "EA",   m_ea.w.l).formatstr("%04X");
+	state_add( UPD7810_BC,   "BC",   m_bc.w.l).formatstr("%04X");
+	state_add( UPD7810_DE,   "DE",   m_de.w.l).formatstr("%04X");
+	state_add( UPD7810_HL,   "HL",   m_hl.w.l).formatstr("%04X");
+	state_add( UPD7810_CNT0, "CNT0", m_cnt.b.l).formatstr("%02X");
+	state_add( UPD7810_CNT1, "CNT1", m_cnt.b.h).formatstr("%02X");
+	state_add( UPD7810_TM0,  "TM0",  m_tm.b.l).formatstr("%02X");
+	state_add( UPD7810_TM1,  "TM1",  m_tm.b.h).formatstr("%02X");
+	state_add( UPD7810_MB,   "MB",   m_mb).formatstr("%02X");
+	state_add( UPD7810_MKL,  "MKL",  m_mkl).formatstr("%02X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc.w.l ).formatstr("%04X").noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_ppc.w.l ).formatstr("%04X").noshow();
@@ -1828,9 +1908,9 @@ void upd7810_device::device_reset()
 	m_etm.d = 0;
 	MA = 0xff;
 	MB = 0xff;
-	m_mcc = 0;
+	MCC = 0;
 	MC = 0xff;
-	m_mm = 0;
+	MM &= 8;
 	MF = 0xff;
 	m_mt = 0;
 	TMM = 0xff;

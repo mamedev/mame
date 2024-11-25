@@ -24,12 +24,12 @@
  *
  *************************************/
 
-uint8_t midxunit_state::midxunit_cmos_r(offs_t offset)
+uint8_t midxunit_state::cmos_r(offs_t offset)
 {
 	return m_nvram_data[offset];
 }
 
-void midxunit_state::midxunit_cmos_w(offs_t offset, uint8_t data)
+void midxunit_state::cmos_w(offs_t offset, uint8_t data)
 {
 	m_nvram_data[offset] = data;
 }
@@ -41,19 +41,17 @@ void midxunit_state::midxunit_cmos_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-void midxunit_state::midxunit_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midxunit_state::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int oldword, newword;
-
 	offset = (offset / 2) % 8;
-	oldword = m_iodata[offset];
-	newword = oldword;
+	uint16_t const oldword = m_iodata[offset];
+	uint16_t newword = oldword;
 	COMBINE_DATA(&newword);
 
 	switch (offset)
 	{
 		case 2:
-			/* watchdog reset */
+			// watchdog reset
 //          watchdog_reset_w(0,0);
 			break;
 
@@ -75,15 +73,15 @@ void midxunit_state::midxunit_io_w(offs_t offset, uint16_t data, uint16_t mem_ma
 }
 
 
-void midxunit_state::midxunit_unknown_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void midxunit_state::unknown_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int offs = offset / 0x40000;
+	int const offs = offset / 0x40000;
 
 	if (offs == 1 && ACCESSING_BITS_0_7)
 		m_dcs->reset_w(~data & 2);
 
 	if (ACCESSING_BITS_0_7 && offset % 0x40000 == 0)
-		LOGMASKED(LOG_UNKNOWN, "%s: midxunit_unknown_w @ %d = %02X\n", machine().describe_context(), offs, data & 0xff);
+		LOGMASKED(LOG_UNKNOWN, "%s: unknown_w @ %d = %02X\n", machine().describe_context(), offs, data & 0xff);
 }
 
 
@@ -100,9 +98,9 @@ void midxunit_state::adc_int_w(int state)
  *
  *************************************/
 
-uint32_t midxunit_state::midxunit_status_r()
+uint32_t midxunit_state::status_r()
 {
-	/* low bit indicates whether the ADC is done reading the current input */
+	// low bit indicates whether the ADC is done reading the current input
 	return (m_pic_status << 1) | (m_adc_int ? 1 : 0);
 }
 
@@ -114,32 +112,32 @@ uint32_t midxunit_state::midxunit_status_r()
  *
  *************************************/
 
-void midxunit_state::midxunit_dcs_output_full(int state)
+void midxunit_state::dcs_output_full(int state)
 {
-	/* only signal if not in loopback state */
+	// only signal if not in loopback state
 	if (m_uart[1] != 0x66)
 		m_maincpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-uint8_t midxunit_state::midxunit_uart_r(offs_t offset)
+uint8_t midxunit_state::uart_r(offs_t offset)
 {
 	uint8_t result = 0;
 
-	/* switch off the offset */
+	// switch off the offset
 	switch (offset)
 	{
-		case 0: /* register 0 must return 0x13 in order to pass the self test */
+		case 0: // register 0 must return 0x13 in order to pass the self test
 			result = 0x13;
 			break;
 
-		case 1: /* register 1 contains the status */
+		case 1: // register 1 contains the status
 
-			/* loopback case: data always ready, and always ok to send */
+			// loopback case: data always ready, and always ok to send
 			if (m_uart[1] == 0x66)
 				result |= 5;
 
-			/* non-loopback case: bit 0 means data ready, bit 2 means ok to send */
+			// non-loopback case: bit 0 means data ready, bit 2 means ok to send
 			else
 			{
 				int temp = m_dcs->control_r();
@@ -149,28 +147,29 @@ uint8_t midxunit_state::midxunit_uart_r(offs_t offset)
 			}
 			break;
 
-		case 3: /* register 3 contains the data read */
+		case 3: // register 3 contains the data read
 
-			/* loopback case: feed back last data wrtten */
+			// loopback case: feed back last data wrtten
 			if (m_uart[1] == 0x66)
 				result = m_uart[3];
 
-			/* non-loopback case: read from the DCS system */
+			// non-loopback case: read from the DCS system
 			else
 			{
-				LOGMASKED(LOG_SOUND, "%08X:Sound read\n", m_maincpu->pc());
+				if (!machine().side_effects_disabled())
+					LOGMASKED(LOG_SOUND, "%08X:Sound read\n", m_maincpu->pc());
 
 				result = m_dcs->data_r();
 			}
 			break;
 
-		case 5: /* register 5 seems to be like 3, but with in/out swapped */
+		case 5: // register 5 seems to be like 3, but with in/out swapped
 
-			/* loopback case: data always ready, and always ok to send */
+			// loopback case: data always ready, and always ok to send
 			if (m_uart[1] == 0x66)
 				result |= 5;
 
-			/* non-loopback case: bit 0 means data ready, bit 2 means ok to send */
+			// non-loopback case: bit 0 means data ready, bit 2 means ok to send
 			else
 			{
 				int temp = m_dcs->control_r();
@@ -180,37 +179,38 @@ uint8_t midxunit_state::midxunit_uart_r(offs_t offset)
 			}
 			break;
 
-		default: /* everyone else reads themselves */
+		default: // everyone else reads themselves
 			result = m_uart[offset];
 			break;
 	}
 
-	LOGMASKED(LOG_UART, "%s: UART R @ %X = %02X\n", machine().describe_context(), offset, result);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_UART, "%s: UART R @ %X = %02X\n", machine().describe_context(), offset, result);
 	return result;
 }
 
 
-void midxunit_state::midxunit_uart_w(offs_t offset, uint8_t data)
+void midxunit_state::uart_w(offs_t offset, uint8_t data)
 {
-	/* switch off the offset */
+	// switch off the offset
 	switch (offset)
 	{
-		case 3: /* register 3 contains the data to be sent */
+		case 3: // register 3 contains the data to be sent
 
-			/* loopback case: don't feed through */
+			// loopback case: don't feed through
 			if (m_uart[1] == 0x66)
 				m_uart[3] = data;
 
-			/* non-loopback case: send to the DCS system */
+			// non-loopback case: send to the DCS system
 			else
 				m_dcs->data_w(data);
 			break;
 
-		case 5: /* register 5 write seems to reset things */
+		case 5: // register 5 write seems to reset things
 			m_dcs->data_r();
 			break;
 
-		default: /* everyone else just stores themselves */
+		default: // everyone else just stores themselves
 			m_uart[offset] = data;
 			break;
 	}
@@ -258,7 +258,7 @@ void midxunit_state::machine_start()
 
 void midxunit_state::machine_reset()
 {
-	/* reset sound */
+	// reset sound
 	m_dcs->reset_w(0);
 	m_dcs->reset_w(1);
 
@@ -267,7 +267,7 @@ void midxunit_state::machine_reset()
 	m_pic_clk = 0;
 	m_pic_status = 0;
 
-	m_dcs->set_io_callbacks(write_line_delegate(*this, FUNC(midxunit_state::midxunit_dcs_output_full)), write_line_delegate(*this));
+	m_dcs->set_io_callbacks(write_line_delegate(*this, FUNC(midxunit_state::dcs_output_full)), write_line_delegate(*this));
 }
 
 
@@ -278,19 +278,19 @@ void midxunit_state::machine_reset()
  *
  *************************************/
 
-uint32_t midxunit_state::midxunit_security_r()
+uint32_t midxunit_state::security_r()
 {
 	return m_pic_data;
 }
 
-void midxunit_state::midxunit_security_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void midxunit_state::security_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_pic_command = data & 0x0f;
 }
 
 
-void midxunit_state::midxunit_security_clock_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void midxunit_state::security_clock_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_pic_clk = BIT(data, 1);
@@ -304,23 +304,23 @@ void midxunit_state::midxunit_security_clock_w(offs_t offset, uint32_t data, uin
  *
  *************************************/
 
-uint32_t midxunit_state::midxunit_dma_r(offs_t offset, uint32_t mem_mask)
+uint32_t midxunit_state::dma_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
 	if (ACCESSING_BITS_16_31)
-		result |= m_video->midtunit_dma_r(offset * 2);
+		result |= m_video->dma_r(offset * 2);
 	if (ACCESSING_BITS_0_15)
-		result |= uint32_t(m_video->midtunit_dma_r(offset * 2 + 1)) << 16;
+		result |= uint32_t(m_video->dma_r(offset * 2 + 1)) << 16;
 
 	return result;
 }
 
 
-void midxunit_state::midxunit_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void midxunit_state::dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
-		m_video->midtunit_dma_w(offset * 2, data & 0xffff);
+		m_video->dma_w(offset * 2, data & 0xffff);
 	if (ACCESSING_BITS_0_15)
-		m_video->midtunit_dma_w(offset * 2 + 1, data >> 16);
+		m_video->dma_w(offset * 2 + 1, data >> 16);
 }

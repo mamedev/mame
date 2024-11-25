@@ -42,8 +42,6 @@ public:
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
-	void pci_irq_w(offs_t line, u8 state);
-
 	void pc_pirqa_w(int state);
 	void pc_pirqb_w(int state);
 	void pc_pirqc_w(int state);
@@ -72,7 +70,8 @@ protected:
 
 	virtual void device_add_mconfig(machine_config & config) override;
 	virtual void device_config_complete() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -80,7 +79,7 @@ protected:
 
 	virtual bool map_first() const override { return true; }
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	void at_pit8254_out0_changed(int state);
@@ -116,7 +115,7 @@ private:
 	void pc_dma_write_word(offs_t offset, uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
 
-	void internal_io_map(address_map &map);
+	void internal_io_map(address_map &map) ATTR_COLD;
 
 	void boot_state_w(uint8_t data);
 	void nop_w(uint8_t data);
@@ -215,6 +214,9 @@ private:
 
 	void pc_select_dma_channel(int channel, bool state);
 	void redirect_irq(int irq, int state);
+
+	int pin_mapper(int pin);
+	void irq_handler(int line, int state);
 };
 
 DECLARE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device)
@@ -240,16 +242,16 @@ public:
 protected:
 	i82371sb_ide_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	void primary_int(int state);
 	void secondary_int(int state);
@@ -276,7 +278,7 @@ private:
 	uint8_t ide2_read_cs1_r();
 	void ide2_write_cs1_w(uint8_t data);
 
-	void internal_io_map(address_map &map);
+	void internal_io_map(address_map &map) ATTR_COLD;
 
 	uint8_t latency_timer;
 	uint32_t bmiba;

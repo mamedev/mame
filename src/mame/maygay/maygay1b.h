@@ -137,12 +137,12 @@ private:
 
 	uint8_t m_main_to_mcu;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void cpu0_firq(int data);
 	void cpu0_nmi();
-	void m1_memmap(address_map &map);
-	void m1_nec_memmap(address_map &map);
+	void m1_memmap(address_map &map) ATTR_COLD;
+	void m1_nec_memmap(address_map &map) ATTR_COLD;
 };
 
 INPUT_PORTS_EXTERN( maygay_m1 );

@@ -146,13 +146,12 @@ OBJDIRS = $(OBJ) \
 			$(OBJ)/solver \
 			$(OBJ)/devices \
 			$(OBJ)/plib \
-			$(OBJ)/devices \
 			$(OBJ)/macro \
 			$(OBJ)/macro/modules \
 			$(OBJ)/tests \
 			$(OBJ)/tools \
 			$(OBJ)/prg \
-			$(OBJ)/generated \
+			$(OBJ)/generated
 
 MODULESOURCES += $(wildcard $(SRC)/macro/modules/*.cpp)
 DEVSOURCES =  $(SRC)/solver/nld_solver.cpp
@@ -171,7 +170,7 @@ CORESOURCES := \
 	$(SRC)/nl_setup.cpp \
 	$(SRC)/nl_factory.cpp \
 	$(SRC)/tools/nl_convert.cpp \
-	$(SRC)/generated/static_solvers.cpp \
+	$(SRC)/generated/static_solvers.cpp
 
 MAINSOURCES = $(SRC)/prg/nltool.cpp $(SRC)/prg/nlwav.cpp
 
@@ -196,7 +195,7 @@ PSOURCES := \
 	$(PSRC)/ppmf.cpp \
 	$(PSRC)/ppreprocessor.cpp \
 	$(PSRC)/ptokenizer.cpp \
-	$(PSRC)/putil.cpp \
+	$(PSRC)/putil.cpp
 
 NLOBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(CORESOURCES:.cpp=.o))
 NLDEVOBJS = $(patsubst $(SRC)%, $(OBJ)%, $(DEVSOURCES:.cpp=.o))
@@ -213,7 +212,7 @@ VSFILES = \
 	$(VSBUILD)/nltool.vcxproj.filters \
 	$(VSBUILD)/nlwav.vcxproj \
 	$(VSBUILD)/nlwav.vcxproj.filters \
-	$(VSBUILD)/netlist.sln \
+	$(VSBUILD)/netlist.sln
 
 OTHERFILES = makefile
 
@@ -223,7 +222,7 @@ DOCS = \
 	$(DOC)/mainpage.dox.h \
 	$(DOC)/primer_1.dox.h \
 	$(DOC)/structure.dox.h \
-	$(DOC)/test1-50r.svg \
+	$(DOC)/test1-50r.svg
 
 ALL_OBJS = $(OBJS) $(MAINOBJS)
 

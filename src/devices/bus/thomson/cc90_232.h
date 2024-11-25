@@ -13,12 +13,12 @@ class cc90_232_device : public device_t, public thomson_extension_interface
 public:
 	cc90_232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void rom_map(address_map &map) override;
-	virtual void io_map(address_map &map) override;
+	virtual void rom_map(address_map &map) override ATTR_COLD;
+	virtual void io_map(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// read data register

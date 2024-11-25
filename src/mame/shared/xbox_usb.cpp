@@ -45,9 +45,7 @@ static const char *const usbregnames[] = {
 
 ohci_usb_controller::ohci_usb_controller()
 {
-	memset(&ohcist, 0, sizeof(ohcist));
 	m_maincpu = nullptr;
-	irq_callback = nullptr;
 }
 
 void ohci_usb_controller::start()

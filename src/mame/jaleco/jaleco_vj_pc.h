@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "jaleco_vj_qtaro.h"
 #include "jaleco_vj_sound.h"
 
 #include "cpu/i386/i386.h"
@@ -23,6 +24,9 @@ public:
 	void comm_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_sound->comm_w(offset, data, mem_mask); }
 	void ymz_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_sound->ymz_w(offset, data, mem_mask); }
 
+	template <int DeviceId> void video_mix_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_king_qtaro->video_mix_w<DeviceId>(offset, data); }
+	void video_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_king_qtaro->video_control_w(offset, data); }
+
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -35,6 +39,7 @@ private:
 	void boot_state_w(uint8_t data);
 
 	required_device<pentium_device> m_maincpu;
+	required_device<jaleco_vj_king_qtaro_device> m_king_qtaro;
 	required_device<jaleco_vj_isa16_sound_device> m_sound;
 	bool m_is_steppingstage;
 };

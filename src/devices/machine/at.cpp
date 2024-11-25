@@ -7,9 +7,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/at.h"
+#include "at.h"
+
 #include "cpu/i86/i286.h"
 #include "cpu/i386/i386.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -132,6 +134,7 @@ void at_mb_device::device_add_mconfig(machine_config &config)
 	m_isabus->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
 	m_isabus->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
 	m_isabus->iochck_callback().set(FUNC(at_mb_device::iochck_w));
+	m_isabus->iochrdy_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	MC146818(config, m_mc146818, 32.768_kHz_XTAL);
 	m_mc146818->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));

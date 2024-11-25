@@ -79,8 +79,8 @@ public:
 	void mc68000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68000_device> m_maincpu;
@@ -108,8 +108,8 @@ private:
 	bool m_ibmkbd_data;
 	uint8_t m_ibmkbd_bits;
 
-	void mem_map(address_map &map);
-	void vector_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void vector_map(address_map &map) ATTR_COLD;
 	uint16_t memory_r(offs_t offset, uint16_t mem_mask = ~0);
 	void memory_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -553,8 +553,13 @@ void mc68000_state::mc68000(machine_config &config)
 
 ROM_START( mc68000 )
 	ROM_REGION16_BE(0x8000, "eprom0", 0)
-	ROM_LOAD16_BYTE("mc68000_system_1.41_upper.bin", 0x00000, 0x4000, CRC(e57f246f) SHA1(89e59e307ced22f243c4f6619dc07948e714fe71))
-	ROM_LOAD16_BYTE("mc68000_system_1.41_lower.bin", 0x00001, 0x4000, CRC(9183494d) SHA1(3be47d956d03e4f89c7ff17e027cd2fe8334d64a))
+	ROM_DEFAULT_BIOS("v143")
+	ROM_SYSTEM_BIOS(0, "v141",  "V1.41")
+	ROMX_LOAD("mc68000_system_1.41_upper.bin", 0x00000, 0x4000, CRC(e57f246f) SHA1(89e59e307ced22f243c4f6619dc07948e714fe71), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("mc68000_system_1.41_lower.bin", 0x00001, 0x4000, CRC(9183494d) SHA1(3be47d956d03e4f89c7ff17e027cd2fe8334d64a), ROM_SKIP(1) | ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v143",  "V1.43")
+	ROMX_LOAD("mc68000_system_1.43_upper.bin", 0x00000, 0x4000, CRC(5d73ae54) SHA1(38a594de605d63ba13ee963b004d3175a98e669a), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("mc68000_system_1.43_lower.bin", 0x00001, 0x4000, CRC(296434e5) SHA1(74416aebf3ccfa9b57d8d778b3689971f354d87c), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_REGION16_BE(0x8000, "eprom1", 0)
 	ROM_LOAD16_BYTE("mc68000_cpm_2.0_upper.bin", 0x00000, 0x4000, CRC(9dbe197a) SHA1(a26dcbbf567cdccf026ce5cebb248e52b5a8b24a))

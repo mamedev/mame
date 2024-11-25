@@ -14,7 +14,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/pic8259.h"
+#include "pic8259.h"
 
 #define LOG_ICW     (1U << 1)
 #define LOG_OCW     (1U << 2)

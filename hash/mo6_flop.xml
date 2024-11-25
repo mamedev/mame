@@ -27,7 +27,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="action1">
 		<description>Action Volume 1</description>
 		<year>1989</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -41,7 +41,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="action1a" cloneof="action1">
 		<description>Action Volume 1 (SAP Format)</description>
 		<year>1989</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -128,7 +128,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="simpack">
 		<description>Simulation Pack</description>
 		<year>1988</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -148,7 +148,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="simpacka" cloneof="simpack">
 		<description>Simulation Pack (SAP Format)</description>
 		<year>1988</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -162,7 +162,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="simpackb" cloneof="simpack" supported="no">
 		<description>Simulation Pack (640K Disk)</description>
 		<year>1988</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -337,7 +337,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="chicago">
 		<description>Chicago 90</description>
 		<year>1989</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -390,7 +390,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="gp500cc">
 		<description>Grand Prix 500cc</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -469,7 +469,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="quad">
 		<description>Quad</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -483,7 +483,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="quada" cloneof="quad">
 		<description>Quad (Alt)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -497,7 +497,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="quadb" cloneof="quad">
 		<description>Quad (SAP Format)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -511,7 +511,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="superski">
 		<description>Super Ski</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -525,7 +525,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	<software name="superskia" cloneof="superski">
 		<description>Super Ski (640K Disk)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">

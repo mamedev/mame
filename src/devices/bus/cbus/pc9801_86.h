@@ -12,8 +12,10 @@
 #pragma once
 
 #include "bus/cbus/pc9801_cbus.h"
+#include "machine/input_merger.h"
 #include "sound/dac.h"
 #include "sound/ymopn.h"
+
 #include "pc9801_snd.h"
 
 //**************************************************************************
@@ -29,18 +31,23 @@ public:
 	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void sound_irq(int state);
+	static constexpr feature_type unemulated_features() { return feature::MICROPHONE; }
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 protected:
+	void io_map(address_map &map) ATTR_COLD;
+	u8 pcm_control_r();
+	void pcm_control_w(u8 data);
+
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	void opna_reset_routes_config(machine_config &config);
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	void pc9801_86_config(machine_config &config);
 	virtual u16 read_io_base() override;
 
@@ -48,15 +55,14 @@ protected:
 
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2608_device>  m_opna;
+	required_device<input_merger_device> m_irqs;
 
-	void opna_map(address_map &map);
+	void opna_map(address_map &map) ATTR_COLD;
 
 	u8 opna_r(offs_t offset);
 	void opna_w(offs_t offset, u8 data);
 	virtual u8 id_r();
 	void mask_w(u8 data);
-	u8 pcm_r(offs_t offset);
-	void pcm_w(offs_t offset, u8 data);
 
 	u8 m_mask;
 
@@ -66,11 +72,13 @@ private:
 
 	u8 m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
 	uint16_t m_head, m_tail, m_count, m_irq_rate;
-	bool m_pcmirq, m_fmirq, m_pcm_clk, m_init;
-	required_device<dac_word_interface> m_ldac;
-	required_device<dac_word_interface> m_rdac;
+	bool m_pcmirq, m_pcm_clk, m_init;
+	required_device<dac_16bit_r2r_twos_complement_device> m_ldac;
+	required_device<dac_16bit_r2r_twos_complement_device> m_rdac;
 	std::vector<u8> m_queue;
 	emu_timer *m_dac_timer;
+
+	void dac_transfer();
 };
 
 class pc9801_speakboard_device : public pc9801_86_device
@@ -85,10 +93,10 @@ public:
 	void opna_slave_w(offs_t offset, u8 data);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	required_device<ym2608_device>  m_opna_slave;
@@ -106,10 +114,10 @@ public:
 	void opn2c_w(offs_t offset, u8 data);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	required_device<ym3438_device>  m_opn2c;

@@ -28,12 +28,12 @@ public:
 	void port4_w(uint8_t data);
 	void ym2203_irq_handler(int irq);
 
-	void nmk004_sound_mem_map(address_map &map);
+	void nmk004_sound_mem_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// internal state

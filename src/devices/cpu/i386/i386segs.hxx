@@ -216,7 +216,7 @@ void i386_device::i386_check_sreg_validity(int reg)
 	}
 }
 
-int i386_device::i386_limit_check(int seg, uint32_t offset)
+int i386_device::i386_limit_check(int seg, uint32_t offset, int size)
 {
 	if(PROTECTED_MODE && !V8086_MODE)
 	{
@@ -231,7 +231,7 @@ int i386_device::i386_limit_check(int seg, uint32_t offset)
 		}
 		else
 		{
-			if(offset > m_sreg[seg].limit)
+			if((offset + size - 1) > m_sreg[seg].limit)
 			{
 				LOGMASKED(LOG_LIMIT_CHECK, "Limit check at 0x%08x failed. Segment %04x, limit %08x, offset %08x\n",m_pc,m_sreg[seg].selector,m_sreg[seg].limit,offset);
 				//machine().debug_break();
@@ -435,18 +435,6 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 		segment = (v1 >> 16) & 0xffff;
 		type = (v2>>8) & 0x1F;
 		flags = (v2>>8) & 0xf0ff;
-
-		if(trap_level == 2)
-		{
-			LOGMASKED(LOG_PM_FAULT_DF, "IRQ: Double fault.\n");
-			FAULT_EXP(FAULT_DF,0);
-		}
-		if(trap_level >= 3)
-		{
-			LOGMASKED(LOG_PM_EVENTS, "IRQ: Triple fault. CPU reset.\n");
-			pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-			return;
-		}
 
 		/* segment privilege checks */
 		if(entry >= m_idtr.limit)
@@ -778,30 +766,50 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 
 void i386_device::i386_trap_with_error(int irq, int irq_gate, int trap_level, uint32_t error)
 {
-	i386_trap(irq,irq_gate,trap_level);
-	if(irq == 8 || irq == 10 || irq == 11 || irq == 12 || irq == 13 || irq == 14)
+	try
 	{
-		// for these exceptions, an error code is pushed onto the stack by the processor.
-		// no error code is pushed for software interrupts, either.
-		if(PROTECTED_MODE)
+		i386_trap(irq,irq_gate,trap_level);
+		if(irq == 8 || irq == 10 || irq == 11 || irq == 12 || irq == 13 || irq == 14)
 		{
-			uint32_t entry = irq * 8;
-			uint32_t v2,type;
-			v2 = READ32PL(m_idtr.base + entry + 4, 0);
-			type = (v2>>8) & 0x1F;
-			if(type == 5)
+			// for these exceptions, an error code is pushed onto the stack by the processor.
+			// no error code is pushed for software interrupts, either.
+			if(PROTECTED_MODE)
 			{
-				v2 = READ32PL(m_idtr.base + entry, 0);
-				v2 = READ32PL(m_gdtr.base + ((v2 >> 16) & 0xfff8) + 4, 0);
+				uint32_t entry = irq * 8;
+				uint32_t v2,type;
+				v2 = READ32PL(m_idtr.base + entry + 4, 0);
 				type = (v2>>8) & 0x1F;
+				if(type == 5)
+				{
+					v2 = READ32PL(m_idtr.base + entry, 0);
+					v2 = READ32PL(m_gdtr.base + ((v2 >> 16) & 0xfff8) + 4, 0);
+					type = (v2>>8) & 0x1F;
+				}
+				if(type >= 9)
+					PUSH32(error);
+				else
+					PUSH16(error);
 			}
-			if(type >= 9)
-				PUSH32(error);
 			else
 				PUSH16(error);
 		}
-		else
-			PUSH16(error);
+	}
+	catch(uint64_t e)
+	{
+		trap_level++;
+		if(trap_level == 1)
+		{
+			m_ext = 1;
+			LOGMASKED(LOG_PM_FAULT_DF, "IRQ: Double fault.\n");
+			i386_trap_with_error(FAULT_DF,0,trap_level,0);
+			return;
+		}
+		if(trap_level >= 2)
+		{
+			LOGMASKED(LOG_PM_EVENTS, "IRQ: Triple fault. CPU reset.\n");
+			pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+			return;
+		}
 	}
 }
 
@@ -859,7 +867,7 @@ void i386_device::i286_task_switch(uint16_t selector, uint8_t nested)
 	m_task.flags = seg.flags;
 
 	/* Set TS bit in CR0 */
-	m_cr[0] |= 0x08;
+	m_cr[0] |= CR0_TS;
 
 	/* Load incoming task state from the new task's TSS */
 	tss = m_task.base;
@@ -972,7 +980,7 @@ void i386_device::i386_task_switch(uint16_t selector, uint8_t nested)
 	m_task.flags = seg.flags;
 
 	/* Set TS bit in CR0 */
-	m_cr[0] |= 0x08;
+	m_cr[0] |= CR0_TS;
 
 	/* Load incoming task state from the new task's TSS */
 	tss = m_task.base;

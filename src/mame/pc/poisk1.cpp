@@ -91,9 +91,9 @@ public:
 	void fdc_config(device_t *device);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void vsync_changed(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hsync_changed);
@@ -157,8 +157,8 @@ private:
 	void p1_ppi2_portb_w(uint8_t data);
 	uint8_t p1_ppi2_portc_r();
 
-	void poisk1_io(address_map &map);
-	void poisk1_map(address_map &map);
+	void poisk1_io(address_map &map) ATTR_COLD;
+	void poisk1_map(address_map &map) ATTR_COLD;
 };
 
 /*
@@ -429,7 +429,7 @@ void p1_state::video_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	memset(&m_video, 0, sizeof(m_video));
+	m_video = decltype(m_video)();
 	m_video.videoram_base = std::make_unique<uint8_t[]>(0x8000);
 	m_video.videoram = m_video.videoram_base.get();
 	m_video.stride = 80;

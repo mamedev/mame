@@ -50,14 +50,14 @@ private:
 	void portc_w(u8 data);
 	void tape_w(u8 data);
 	u8 tape_r();
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	u32 screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void kristall_io(address_map &map);
-	void mikro80_io(address_map &map);
-	void mikro80_mem(address_map &map);
-	void radio99_io(address_map &map);
+	void kristall_io(address_map &map) ATTR_COLD;
+	void mikro80_io(address_map &map) ATTR_COLD;
+	void mikro80_mem(address_map &map) ATTR_COLD;
+	void radio99_io(address_map &map) ATTR_COLD;
 
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_shared_ptr<uint8_t> m_aram;

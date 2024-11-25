@@ -34,7 +34,7 @@ public:
 
 protected:
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_write_line m_rxd_handler;
@@ -67,14 +67,14 @@ public:
 	virtual void write_txd(int state) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	virtual void map_mem(address_map &map);
-	virtual void map_pio(address_map &map);
+	virtual void map_mem(address_map &map) ATTR_COLD;
+	virtual void map_pio(address_map &map) ATTR_COLD;
 
 	void scan_matrix(int state);
 	void led_w(u8 data);

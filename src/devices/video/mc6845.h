@@ -62,7 +62,9 @@ public:
 	// construction/destruction
 	mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// HACK: show the full screen_device htotal/vtotal if true (regulate with UI slider controls)
 	void set_show_border_area(bool show) { m_show_border_area = show; }
+	// HACK: a static alternative of above, potentially unsafe.
 	void set_visarea_adjust(int min_x, int max_x, int min_y, int max_y)
 	{
 		m_visarea_adjust_min_x = min_x;
@@ -129,8 +131,8 @@ protected:
 	mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
@@ -202,8 +204,8 @@ protected:
 	/* These computed are used to define the screen parameters for a driver */
 	uint16_t  m_horiz_pix_total;
 	uint16_t  m_vert_pix_total;
-	uint16_t  m_visible_width;
-	uint16_t  m_visible_height;
+	uint16_t  m_max_visible_x;
+	uint16_t  m_max_visible_y;
 	uint16_t  m_hsync_on_pos;
 	uint16_t  m_hsync_off_pos;
 	uint16_t  m_vsync_on_pos;
@@ -298,8 +300,8 @@ public:
 	mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class r6545_1_device : public mc6845_device
@@ -308,8 +310,8 @@ public:
 	r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class c6545_1_device : public mc6845_device
@@ -318,8 +320,8 @@ public:
 	c6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class hd6845s_device : public mc6845_device
@@ -330,8 +332,8 @@ public:
 protected:
 	hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual bool check_cursor_visible(uint16_t ra, uint16_t line_addr) override;
 };
 
@@ -341,8 +343,8 @@ public:
 	sy6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class sy6845e_device : public mc6845_device
@@ -351,8 +353,8 @@ public:
 	sy6845e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class hd6345_device : public hd6845s_device
@@ -365,8 +367,8 @@ public:
 	void register_w(uint8_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	/* register file */
 	uint8_t   m_disp2_pos;            /* 0x12 */
@@ -396,8 +398,8 @@ public:
 	ams40489_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 

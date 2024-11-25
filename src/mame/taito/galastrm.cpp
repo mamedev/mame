@@ -101,7 +101,7 @@ public:
 	int frame_counter_r();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -151,7 +151,7 @@ private:
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const u32 *primasks, int priority);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -765,7 +765,7 @@ void galastrm_state::main_map(address_map &map)
 static INPUT_PORTS_START( galastrm )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(galastrm_state, frame_counter_r)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galastrm_state::frame_counter_r))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -781,7 +781,7 @@ static INPUT_PORTS_START( galastrm )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN2")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
@@ -918,6 +918,17 @@ ROM_START( galastrm )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-galastrm.bin", 0x0000, 0x0080, CRC(94efa7a6) SHA1(5870b988cb364065e8bd779efbdadca8d3ffc17c) )
+
+	ROM_REGION( 0x1200, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "c99-16.bin", 0x0000, 0x0104, CRC(9340e376) SHA1(3795063e44a1da5947e8695532b6d6277af5e873) )
+	ROM_LOAD( "c99-17.bin", 0x0200, 0x0144, CRC(81d55be5) SHA1(dc7302eced7c5a519aa882a1e11cf44809c2fc50) )
+	ROM_LOAD( "c99-18.bin", 0x0400, 0x0149, CRC(eca1501d) SHA1(d62823a77d1a76921a07889d8ded593b03cc3eca) )
+	ROM_LOAD( "c99-19.bin", 0x0600, 0x0104, CRC(6310ef1d) SHA1(cb61b0a5fe9aca42a06090c0332b8e013f1c4d8f) )
+	ROM_LOAD( "c99-20.bin", 0x0800, 0x0144, CRC(5d527b8b) SHA1(7e7d8a5c37d602b4e802e4d18edafb31f6182b1a) )
+	ROM_LOAD( "c99-21.bin", 0x0a00, 0x0104, CRC(eb2407a1) SHA1(bfe2a06ccadac3205ae6d9cd85d434ab12088ce9) )
+	ROM_LOAD( "c99-24.bin", 0x0c00, 0x0144, CRC(a0ec9b49) SHA1(2f283a271a4f47d28a9421c7dadf272a6b4d167e) )
+	ROM_LOAD( "c99-25.bin", 0x0e00, 0x0144, CRC(d7cbb8be) SHA1(daeb1cb3b5a5c0445be8b18f9e80f048e1818fda) )
+	ROM_LOAD( "c99-26.bin", 0x1000, 0x0144, CRC(d65cbcb9) SHA1(e4579d15d9fbc300b736948dbc322c1c6aa4aa2a) )
 ROM_END
 
 } // anonymous namespace

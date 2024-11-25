@@ -177,9 +177,9 @@ public:
 	void liberatr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// vector and early raster EAROM interface
@@ -262,8 +262,8 @@ private:
 	void earom_w(offs_t offset, uint8_t data);
 	void earom_control_w(uint8_t data);
 
-	void liberatp_map(address_map &map);
-	void liberatr_map(address_map &map);
+	void liberatp_map(address_map &map) ATTR_COLD;
+	void liberatr_map(address_map &map) ATTR_COLD;
 
 	void init_planet(planet &liberatr_planet, uint8_t *planet_rom);
 	void get_pens(pen_t *pens);
@@ -271,8 +271,6 @@ private:
 	void draw_bitmap(bitmap_rgb32 &bitmap, pen_t *pens);
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -541,8 +539,6 @@ uint32_t liberatr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-
-// machine
 
 void liberatr_state::machine_start()
 {

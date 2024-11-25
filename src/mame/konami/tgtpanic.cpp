@@ -1,15 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett
-/***************************************************************************
+/*******************************************************************************
 
-    Konami Target Panic (cabinet test PCB)
+Konami Target Panic (cabinet test PCB)
+It takes a while to boot up, just hold INS for a bit to fast forward.
 
-    driver by Phil Bennett
+driver by Phil Bennett
 
-    TODO: Determine correct clock frequencies, fix 'stuck' inputs in
-    test mode
+Hardware notes:
+- PCB label: KONAMI PWB402613
+- Z84C0008PEC Z80 CPU, 4.0MHz ceramic resonator
+- 32KB ROM (M27C256B), 64KB RAM (MB8464C-70L)
+- simple bitmap video, no sound
 
-***************************************************************************/
+TODO:
+- Determine correct IRQ and video timing, for some reason inputs may behave
+  erratically in test mode with different IRQ timing
+
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -21,13 +29,17 @@ namespace {
 class tgtpanic_state : public driver_device
 {
 public:
-	tgtpanic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tgtpanic_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_ram(*this, "ram") { }
+		m_ram(*this, "ram")
+	{ }
 
 	void tgtpanic(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -37,20 +49,18 @@ private:
 
 	uint8_t m_color = 0;
 
-	void color_w(uint8_t data);
-
-	virtual void machine_start() override;
+	void color_w(uint8_t data) { m_color = data; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
-
 
 void tgtpanic_state::machine_start()
 {
 	save_item(NAME(m_color));
 }
+
 
 /*************************************
  *
@@ -74,27 +84,16 @@ uint32_t tgtpanic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		uint32_t const y = (offs & 0x7f) << 1;
 		uint32_t const x = (offs >> 7) << 2;
 
-		/* I'm guessing the hardware doubles lines */
-		bitmap.pix(y + 0, x + 0) = colors[val & 3];
-		bitmap.pix(y + 1, x + 0) = colors[val & 3];
-		val >>= 2;
-		bitmap.pix(y + 0, x + 1) = colors[val & 3];
-		bitmap.pix(y + 1, x + 1) = colors[val & 3];
-		val >>= 2;
-		bitmap.pix(y + 0, x + 2) = colors[val & 3];
-		bitmap.pix(y + 1, x + 2) = colors[val & 3];
-		val >>= 2;
-		bitmap.pix(y + 0, x + 3) = colors[val & 3];
-		bitmap.pix(y + 1, x + 3) = colors[val & 3];
+		for (int i = 0; i < 4; i++)
+		{
+			// I'm guessing the hardware doubles lines
+			bitmap.pix(y + 0, x + i) = colors[val & 3];
+			bitmap.pix(y + 1, x + i) = colors[val & 3];
+			val >>= 2;
+		}
 	}
 
 	return 0;
-}
-
-void tgtpanic_state::color_w(uint8_t data)
-{
-	m_screen->update_partial(m_screen->vpos());
-	m_color = data;
 }
 
 
@@ -107,7 +106,7 @@ void tgtpanic_state::color_w(uint8_t data)
 void tgtpanic_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).ram().share("ram");
+	map(0x8000, 0xbfff).ram().share(m_ram);
 }
 
 void tgtpanic_state::io_map(address_map &map)
@@ -155,27 +154,29 @@ INPUT_PORTS_END
 
 void tgtpanic_state::tgtpanic(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config,m_maincpu, XTAL(4'000'000));
+	// basic machine hardware
+	Z80(config,m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tgtpanic_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &tgtpanic_state::io_map);
-	m_maincpu->set_periodic_int(FUNC(tgtpanic_state::irq0_line_hold), attotime::from_hz(20)); /* Unverified */
 
-	/* video hardware */
+	const attotime irq_period = attotime::from_hz(300); // Unverified
+	m_maincpu->set_periodic_int(FUNC(tgtpanic_state::irq0_line_hold), irq_period);
+
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60); /* Unverified */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* Unverified */
+	m_screen->set_refresh_hz(60); // Unverified
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Unverified
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 192 - 1, 0, 192 - 1);
 	m_screen->set_screen_update(FUNC(tgtpanic_state::screen_update));
 }
 
 
-	/*************************************
-	*
-	*  ROM definition
-	*
-	*************************************/
+/*************************************
+*
+*  ROM definition
+*
+*************************************/
 
 ROM_START( tgtpanic )
 	ROM_REGION( 0x10000, "maincpu", 0 )

@@ -14,6 +14,8 @@
 #include "util/path.h"
 #include "util/unzip.h"
 
+#include <tuple>
+
 //#define VERBOSE 1
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
@@ -531,9 +533,10 @@ u32 emu_file::read(void *buffer, u32 length)
 		return 0;
 
 	// read the data if we can
+	std::error_condition err;
 	size_t actual = 0;
 	if (m_file)
-		m_file->read(buffer, length, actual);
+		std::tie(err, actual) = util::read(*m_file, buffer, length);
 
 	return actual;
 }
@@ -601,9 +604,10 @@ u32 emu_file::write(const void *buffer, u32 length)
 {
 	// FIXME: need better interface to report errors
 	// write the data if we can
+	std::error_condition err;
 	size_t actual = 0;
 	if (m_file)
-		m_file->write(buffer, length, actual);
+		std::tie(err, actual) = util::write(*m_file, buffer, length);
 
 	return actual;
 }

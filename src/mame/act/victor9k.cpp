@@ -148,8 +148,8 @@ private:
 	required_memory_region m_rom;
 	required_shared_ptr<uint8_t> m_video_ram;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void via1_pa_w(uint8_t data);
 	void write_nfrd(int state);
@@ -201,7 +201,7 @@ private:
 
 	void update_kback();
 
-	void victor9k_mem(address_map &map);
+	void victor9k_mem(address_map &map) ATTR_COLD;
 };
 
 

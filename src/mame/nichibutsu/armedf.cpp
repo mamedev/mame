@@ -1240,7 +1240,7 @@ void armedf_state::kozure(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
 	/* sound hardware */
-	sound_config(config);
+	sound_config_3812(config);
 }
 
 void armedf_state::armedf(machine_config &config)
@@ -1329,6 +1329,7 @@ void bigfghtr_state::bigfghtr(machine_config &config)
 
 	sound_config_3812(config);
 }
+
 
 /*************************************
  *

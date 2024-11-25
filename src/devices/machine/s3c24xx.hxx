@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "coreutil.h"
 
 /*******************************************************************************
@@ -883,10 +882,10 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
 	uint32_t width = 0;
 	switch (pnrmode)
 	{
-		case S3C24XX_PNRMODE_STN_04_SS: width = ((hozval + 1) * 4); break;
-		case S3C24XX_PNRMODE_STN_04_DS: width = ((hozval + 1) * 4); break;
-		case S3C24XX_PNRMODE_STN_08_SS: width = ((hozval + 1) * 8 / 3); break;
-		default: break;
+	case S3C24XX_PNRMODE_STN_04_SS: width = ((hozval + 1) * 4); break;
+	case S3C24XX_PNRMODE_STN_04_DS: width = ((hozval + 1) * 4); break;
+	case S3C24XX_PNRMODE_STN_08_SS: width = ((hozval + 1) * 8 / 3); break;
+	default: break;
 	}
 
 	uint32_t height = lineval + 1;
@@ -953,12 +952,10 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_w(offs_t offset, uint32_t data, uint32_t mem_
 	COMBINE_DATA(&((uint32_t*)&m_lcd.regs)[offset]);
 	switch (offset)
 	{
-		case S3C24XX_LCDCON1 :
+	case S3C24XX_LCDCON1 :
+		if ((old_value & (1 << 0)) != (data & (1 << 0)))
 		{
-			if ((old_value & (1 << 0)) != (data & (1 << 0)))
-			{
-				s3c24xx_lcd_recalc();
-			}
+			s3c24xx_lcd_recalc();
 		}
 		break;
 	}
@@ -1128,7 +1125,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 			{
 				LOGMASKED(LOG_IRQS, "triggering IRQ line\n");
 				m_cpu->resume(SUSPEND_REASON_HALT);
-				m_cpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+				m_cpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 				m_irq.line_irq = ASSERT_LINE;
 			}
 		}
@@ -1138,7 +1135,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 			{
 				LOGMASKED(LOG_IRQS, "IRQ: srcpnd %08X intmsk %08X intmod %08X\n", m_irq.regs.srcpnd, m_irq.regs.intmsk, m_irq.regs.intmod);
 				LOGMASKED(LOG_IRQS, "clearing IRQ line\n");
-				m_cpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+				m_cpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 				m_irq.line_irq = CLEAR_LINE;
 			}
 		}
@@ -1152,7 +1149,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 		{
 			LOGMASKED(LOG_IRQS, "asserting FIQ line\n");
 			m_cpu->resume(SUSPEND_REASON_HALT);
-			m_cpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
+			m_cpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, ASSERT_LINE);
 			m_irq.line_fiq = ASSERT_LINE;
 		}
 	}
@@ -1161,7 +1158,7 @@ void S3C24_CLASS_NAME::s3c24xx_check_pending_irq()
 		if (m_irq.line_fiq != CLEAR_LINE)
 		{
 			LOGMASKED(LOG_IRQS, "clearing FIQ line\n");
-			m_cpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+			m_cpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 			m_irq.line_fiq = CLEAR_LINE;
 		}
 	}
@@ -1241,35 +1238,35 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_irq_r(offs_t offset, uint32_t mem_mask)
 	const uint32_t data = ((uint32_t*)&m_irq.regs)[offset];
 	switch (offset)
 	{
-		case S3C24XX_SRCPND:
-			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: SRCPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			break;
-		case S3C24XX_INTMOD:
-			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTMOD = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			break;
-		case S3C24XX_INTMSK:
-			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTMSK = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			break;
-		case S3C24XX_PRIORITY:
-			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: PRIORITY = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			break;
-		case S3C24XX_INTPND:
-			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			break;
-		case S3C24XX_INTOFFSET:
-			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTOFFSET = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			break;
+	case S3C24XX_SRCPND:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq read: SRCPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case S3C24XX_INTMOD:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTMOD = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case S3C24XX_INTMSK:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTMSK = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case S3C24XX_PRIORITY:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq read: PRIORITY = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case S3C24XX_INTPND:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case S3C24XX_INTOFFSET:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTOFFSET = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
-		case S3C24XX_SUBSRCPND:
-			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: SUBSRCPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			break;
-		case S3C24XX_INTSUBMSK:
-			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTSUBMSK = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			break;
+	case S3C24XX_SUBSRCPND:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq read: SUBSRCPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	case S3C24XX_INTSUBMSK:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq read: INTSUBMSK = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
 #endif
-		default:
-			LOGMASKED(LOG_IRQ_REGS, "%s: irq read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_INT + (offset << 2), data, mem_mask);
-			break;
+	default:
+		LOGMASKED(LOG_IRQ_REGS, "%s: irq read: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_INT + (offset << 2), data, mem_mask);
+		break;
 	}
 	return data;
 }
@@ -1394,8 +1391,7 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_start(int timer)
 		auto_reload = BIT(m_pwm.regs.tcon, 22);
 		break;
 	default:
-		cnt = cmp = auto_reload = 0;
-		break;
+		fatalerror("Invalid timer index %d!", timer);
 	}
 //  hz = freq / (cnt - cmp + 1);
 	if (cnt < 2)
@@ -2290,8 +2286,8 @@ void S3C24_CLASS_NAME::iic_start()
 	int mode_selection = BITS(m_iic.regs.iicstat, 7, 6);
 	switch (mode_selection)
 	{
-		case 2: i2c_send_byte(m_iic.regs.iicds | 0x01); break;
-		case 3: i2c_send_byte(m_iic.regs.iicds & 0xFE); break;
+	case 2: i2c_send_byte(m_iic.regs.iicds | 0x01); break;
+	case 3: i2c_send_byte(m_iic.regs.iicds & 0xFE); break;
 	}
 	m_iic.timer->adjust( attotime::from_usec( 1));
 }
@@ -2309,8 +2305,8 @@ void S3C24_CLASS_NAME::iic_resume()
 	int mode_selection = BITS(m_iic.regs.iicstat, 7, 6);
 	switch (mode_selection)
 	{
-		case 2: m_iic.regs.iicds = i2c_receive_byte(BIT(m_iic.regs.iiccon, 7)); break;
-		case 3: i2c_send_byte(m_iic.regs.iicds & 0xFF); break;
+	case 2: m_iic.regs.iicds = i2c_receive_byte(BIT(m_iic.regs.iiccon, 7)); break;
+	case 3: i2c_send_byte(m_iic.regs.iicds & 0xFF); break;
 	}
 	m_iic.timer->adjust(attotime::from_usec(1));
 }
@@ -2338,51 +2334,23 @@ void S3C24_CLASS_NAME::s3c24xx_iic_w(offs_t offset, uint32_t data, uint32_t mem_
 	switch (offset)
 	{
 	case S3C24XX_IICCON:
-		{
-			LOGMASKED(LOG_I2C, "%s: i2c write: IICCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	{
+		LOGMASKED(LOG_I2C, "%s: i2c write: IICCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 #if 0
-			static constexpr int div_table[] = { 16, 512 };
-			int transmit_clock_value = (data >> 0) & 0xF;
-			int tx_clock_source_selection = (data >> 6) & 1;
-			int enable_interrupt = (data >> 5) & 1;
-			double clock = (double)s3c24xx_get_pclk() / div_table[tx_clock_source_selection] / (transmit_clock_value + 1);
+		static constexpr int div_table[] = { 16, 512 };
+		int transmit_clock_value = (data >> 0) & 0xF;
+		int tx_clock_source_selection = (data >> 6) & 1;
+		int enable_interrupt = (data >> 5) & 1;
+		double clock = (double)s3c24xx_get_pclk() / div_table[tx_clock_source_selection] / (transmit_clock_value + 1);
 #endif
-			int interrupt_pending_flag = BIT(old_value, 4);
-			if (interrupt_pending_flag != 0)
-			{
-				interrupt_pending_flag = BIT(data, 4);
-				if (interrupt_pending_flag == 0)
-				{
-					int start_stop_condition;
-					start_stop_condition = BIT(m_iic.regs.iicstat, 5);
-					if (start_stop_condition != 0)
-					{
-						if (m_iic.count == 0)
-						{
-							iic_start();
-
-						}
-						else
-						{
-							iic_resume();
-						}
-					}
-					else
-					{
-						iic_stop();
-					}
-				}
-			}
-		}
-		break;
-	case S3C24XX_IICSTAT:
+		int interrupt_pending_flag = BIT(old_value, 4);
+		if (interrupt_pending_flag != 0)
 		{
-			LOGMASKED(LOG_I2C, "%s: i2c write: IICSTAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			m_iic.count = 0;
-			int interrupt_pending_flag = BIT(m_iic.regs.iiccon, 4);
+			interrupt_pending_flag = BIT(data, 4);
 			if (interrupt_pending_flag == 0)
 			{
-				int start_stop_condition = BIT(data, 5);
+				int start_stop_condition;
+				start_stop_condition = BIT(m_iic.regs.iicstat, 5);
 				if (start_stop_condition != 0)
 				{
 					if (m_iic.count == 0)
@@ -2402,6 +2370,34 @@ void S3C24_CLASS_NAME::s3c24xx_iic_w(offs_t offset, uint32_t data, uint32_t mem_
 			}
 		}
 		break;
+	}
+	case S3C24XX_IICSTAT:
+	{
+		LOGMASKED(LOG_I2C, "%s: i2c write: IICSTAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_iic.count = 0;
+		int interrupt_pending_flag = BIT(m_iic.regs.iiccon, 4);
+		if (interrupt_pending_flag == 0)
+		{
+			int start_stop_condition = BIT(data, 5);
+			if (start_stop_condition != 0)
+			{
+				if (m_iic.count == 0)
+				{
+					iic_start();
+
+				}
+				else
+				{
+					iic_resume();
+				}
+			}
+			else
+			{
+				iic_stop();
+			}
+		}
+		break;
+	}
 	default:
 		LOGMASKED(LOG_I2C, "%s: i2c write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_IIC + (offset << 2), data, mem_mask);
 		break;
@@ -2628,16 +2624,16 @@ void S3C24_CLASS_NAME::s3c24xx_adc_w(offs_t offset, uint32_t data, uint32_t mem_
 	COMBINE_DATA(&((uint32_t*)&m_adc.regs)[offset]);
 	switch (offset)
 	{
-		case S3C24XX_ADCCON:
-			if (((old_value & (1 << 0)) == 0) && ((data & (1 << 0)) != 0))
-			{
-				s3c24xx_adc_start();
-			}
-			LOGMASKED(LOG_ADC, "%s: ADC write: ADCCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			break;
-		default:
-			LOGMASKED(LOG_ADC, "%s: ADC write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_ADC + (offset << 2), data, mem_mask);
-			break;
+	case S3C24XX_ADCCON:
+		if (((old_value & (1 << 0)) == 0) && ((data & (1 << 0)) != 0))
+		{
+			s3c24xx_adc_start();
+		}
+		LOGMASKED(LOG_ADC, "%s: ADC write: ADCCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		break;
+	default:
+		LOGMASKED(LOG_ADC, "%s: ADC write: %08x = %08x & %08x\n", machine().describe_context(), S3C24XX_BASE_ADC + (offset << 2), data, mem_mask);
+		break;
 	}
 }
 

@@ -67,7 +67,7 @@ public:
 	void init_skullxbo();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<atari_jsa_ii_device> m_jsa;
@@ -98,11 +98,9 @@ private:
 	void yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void mobmsb_w(offs_t offset, uint16_t data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /*************************************
  *
@@ -391,8 +389,6 @@ uint32_t skullxbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

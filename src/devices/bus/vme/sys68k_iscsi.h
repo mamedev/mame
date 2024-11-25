@@ -21,12 +21,12 @@ public:
 protected:
 	vme_sys68k_iscsi1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void update_irq_to_maincpu();
 
@@ -54,8 +54,8 @@ private:
 	uint8_t scsi_r(offs_t offset);
 	void scsi_w(offs_t offset, uint8_t data);
 
-	void fcscsi1_mem(address_map &map);
-	void cpu_space_map(address_map &map);
+	void fcscsi1_mem(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;

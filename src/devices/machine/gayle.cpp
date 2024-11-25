@@ -57,7 +57,9 @@ gayle_device::gayle_device(const machine_config &mconfig, const char *tag, devic
 	m_ide_cs_r_cb(*this, 0xffff),
 	m_ide_cs_w_cb(*this),
 	m_gayle_id(0xff),
-	m_gayle_id_count(0)
+	m_gayle_id_count(0),
+	m_line_state(0),
+	m_cd{1,1}
 {
 }
 
@@ -70,6 +72,7 @@ void gayle_device::device_start()
 	save_item(NAME(m_gayle_id_count));
 	save_item(NAME(m_gayle_reg));
 	save_item(NAME(m_line_state));
+	save_item(NAME(m_cd));
 }
 
 //-------------------------------------------------
@@ -205,10 +208,11 @@ void gayle_device::status_w(uint16_t data)
 	// pcmcia interface re-enabled?
 	if (BIT(previous, 0) == 1 && BIT(data, 0) == 0)
 	{
-		cc_cd_w(BIT(m_line_state, 6));
-		cc_bvd1_w(BIT(m_line_state, 5));
-		cc_bvd2_w(BIT(m_line_state, 4));
-		cc_wp_w(BIT(m_line_state, 3));
+		cc_cd1_w(m_cd[0]);
+		cc_cd2_w(m_cd[1]);
+		cc_bvd1_w(!BIT(m_line_state, 5));
+		cc_bvd2_w(!BIT(m_line_state, 4));
+		cc_wp_w(!BIT(m_line_state, 3));
 	}
 }
 
@@ -364,28 +368,36 @@ void gayle_device::ide_interrupt_w(int state)
 //  CREDIT CARD
 //**************************************************************************
 
-void gayle_device::cc_cd_w(int state)
+void gayle_device::cc_cd1_w(int state)
 {
-	LOGMASKED(LOG_CC, "cc_cd_w: %d\n", state);
-	line_change(LINE_CC_DET, state, 6);
+	LOGMASKED(LOG_CC, "cc1_cd1_w: %d\n", state);
+	m_cd[0] = state;
+	line_change(LINE_CC_DET, !(m_cd[0] || m_cd[1]), 6);
+}
+
+void gayle_device::cc_cd2_w(int state)
+{
+	LOGMASKED(LOG_CC, "cc1_cd2_w: %d\n", state);
+	m_cd[1] = state;
+	line_change(LINE_CC_DET, !(m_cd[0] || m_cd[1]), 6);
 }
 
 void gayle_device::cc_bvd1_w(int state)
 {
 	LOGMASKED(LOG_CC, "cc_bvd1_w: %d\n", state);
-	line_change(LINE_CC_BVD1_SC, state, BIT(m_gayle_reg[REG_INT], 1) ? 6 : 2);
+	line_change(LINE_CC_BVD1_SC, !state, BIT(m_gayle_reg[REG_INT], 1) ? 6 : 2);
 }
 
 void gayle_device::cc_bvd2_w(int state)
 {
 	LOGMASKED(LOG_CC, "cc_bvd2_w: %d\n", state);
-	line_change(LINE_CC_BVD2_DA, state, BIT(m_gayle_reg[REG_INT], 1) ? 6 : 2);
+	line_change(LINE_CC_BVD2_DA, !state, BIT(m_gayle_reg[REG_INT], 1) ? 6 : 2);
 }
 
 void gayle_device::cc_wp_w(int state)
 {
 	LOGMASKED(LOG_CC, "cc_wp_w: %d\n", state);
-	line_change(LINE_CC_WP, state, 2);
+	line_change(LINE_CC_WP, !state, 2);
 }
 
 

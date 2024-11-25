@@ -274,12 +274,12 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="2aswbat">
-		<description>Air-Sea War / Battle (Europe, US)</description>
+		<description>Air-Sea War / Battle (Europe, USA)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Armored Encounter! / Sub Chase!" />
 		<info name="usage" value="Press A for Armored Encounter / Air-Sea War, press 1 for Sub Chase / Battle" />
-		<info name="serial" value="4 (Europe) ~ AJ9403 (US)" />
+		<info name="serial" value="4 (Europe) ~ AJ9403 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -289,11 +289,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="football">
-		<description>American Football (Europe, US)</description>
+		<description>American Football (Europe, USA)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Football!" />
-		<info name="serial" value="3 (Europe) ~ AJ9402 (US)" />
+		<info name="serial" value="3 (Europe) ~ AJ9402 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -303,7 +303,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="timelord">
-		<description>Attack of the Timelord! (US)</description>
+		<description>Attack of the Timelord! (USA)</description>
 		<year>1983</year>
 		<publisher>Magnavox</publisher>
 		<info name="serial" value="AC9445" />
@@ -391,10 +391,10 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="baseball">
-		<description>Baseball (Europe, US)</description>
+		<description>Baseball (Europe, USA)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
-		<info name="serial" value="8 (Europe) ~ AJ9408 (US)" />
+		<info name="serial" value="8 (Europe) ~ AJ9408 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -404,12 +404,12 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="baskgame">
-		<description>Basket Game (Europe, US)</description>
+		<description>Basket Game (Europe, USA)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Pachinko!" />
 		<info name="programmer" value="Ed Averett" />
-		<info name="serial" value="26 (Europe) ~ AA9425 (US)" />
+		<info name="serial" value="26 (Europe) ~ AA9425 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -419,11 +419,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="battlef">
-		<description>Battlefield (Europe, US)</description>
+		<description>Battlefield (Europe, USA)</description>
 		<year>1979</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="War of Nerves!" />
-		<info name="serial" value="30 (Europe) ~ AK9417 (US)" />
+		<info name="serial" value="30 (Europe) ~ AK9417 (USA)" />
 		<info name="programmer" value="Ed Averett" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -434,11 +434,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="blackjck">
-		<description>Blackjack (Europe, US)</description>
+		<description>Blackjack (Europe, USA)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Las Vegas Blackjack!" />
-		<info name="serial" value="5 (Europe) ~ AJ9401 (US)" />
+		<info name="serial" value="5 (Europe) ~ AJ9401 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -616,7 +616,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="compintr" cloneof="compprog">
-		<description>Computer Intro! (US)</description>
+		<description>Computer Intro! (USA)</description>
 		<year>1980</year>
 		<publisher>Magnavox</publisher>
 		<info name="serial" value="AJ9406" />
@@ -630,10 +630,10 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 
 	<software name="conquest">
 		<!-- board game -->
-		<description>Conquest of the World (Europe, US)</description>
+		<description>Conquest of the World (Europe, USA)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
-		<info name="serial" value="41 (Europe) ~ AB9431 (US)" />
+		<info name="serial" value="41 (Europe) ~ AB9431 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x1000">
@@ -683,7 +683,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="cosmicu" cloneof="cosmic">
-		<description>Cosmic Conflict! (US)</description>
+		<description>Cosmic Conflict! (USA)</description>
 		<year>1980</year>
 		<publisher>Magnavox</publisher>
 		<info name="usage" value="Uses the 2nd joystick" />
@@ -697,11 +697,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="crazyc">
-		<description>Crazy Chase (Europe, US)</description>
+		<description>Crazy Chase (Europe, USA)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="K.C.'s Krazy Chase!" />
-		<info name="serial" value="44 (Europe) ~ AC9442 (US)" />
+		<info name="serial" value="44 (Europe) ~ AC9442 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x1000">
@@ -711,12 +711,12 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="dambust">
-		<description>Dam Buster (Europe, US)</description>
+		<description>Dam Buster (Europe, USA)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Blockout! / Breakdown!" />
 		<info name="usage" value="Press 0 then 1 for Blockout / Dam Buster, press 0 then 2 for Breakdown" />
-		<info name="serial" value="29 (Europe) ~ AA9427 (US)" />
+		<info name="serial" value="29 (Europe) ~ AA9427 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -765,12 +765,12 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="billiard">
-		<description>Electronic Billiards (Europe, US)</description>
+		<description>Electronic Billiards (Europe, USA)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Pocket Billiards!" />
 		<info name="programmer" value="Ed Averett" />
-		<info name="serial" value="35 (Europe) ~ AA9424 (US)" />
+		<info name="serial" value="35 (Europe) ~ AA9424 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -793,7 +793,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="2hckyscr">
-		<description>Electronic Ice Hockey / Electronic Soccer (Europe, US)</description>
+		<description>Electronic Ice Hockey / Electronic Soccer (Europe, USA)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Hockey! / Soccer!" />
@@ -821,11 +821,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="tablefb">
-		<description>Electronic Table Football (Europe, US)</description>
+		<description>Electronic Table Football (Europe, USA)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Electronic Table Soccer!" />
-		<info name="serial" value="27 (Europe) ~ AA9423 (US)" />
+		<info name="serial" value="27 (Europe) ~ AA9423 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -835,12 +835,12 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="volley" supported="partial">
-		<description>Electronic Volleyball (Europe, US)</description>
+		<description>Electronic Volleyball (Europe, USA)</description>
 		<year>1979</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Volleyball!" />
 		<info name="programmer" value="Ed Averett" />
-		<info name="serial" value="28 (Europe) ~ AA9422 (US)" />
+		<info name="serial" value="28 (Europe) ~ AA9422 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -863,11 +863,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="flipper">
-		<description>Flipper Game (Europe, US)</description>
+		<description>Flipper Game (Europe, USA)</description>
 		<year>1979</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Thunderball!" />
-		<info name="serial" value="24 (Europe) ~ AK9415 (US)" />
+		<info name="serial" value="24 (Europe) ~ AK9415 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -889,10 +889,10 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="freedom">
-		<description>Freedom Fighters (Europe, US)</description>
+		<description>Freedom Fighters (Europe, USA)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
-		<info name="serial" value="39 (Europe) ~ AC9436 (US)" />
+		<info name="serial" value="39 (Europe) ~ AC9436 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x1000">
@@ -915,7 +915,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="compgolf" cloneof="golf">
-		<description>Computer Golf! (US)</description>
+		<description>Computer Golf! (USA)</description>
 		<year>1980</year>
 		<publisher>Magnavox</publisher>
 		<info name="serial" value="AJ9410" />
@@ -941,7 +941,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="showdown" cloneof="gunfight">
-		<description>Showdown in 2100 A.D. (US)</description>
+		<description>Showdown in 2100 A.D. (USA)</description>
 		<year>1980</year>
 		<publisher>Magnavox</publisher>
 		<info name="serial" value="AK9416" />
@@ -982,7 +982,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="ptbarnum" cloneof="acrobat">
-		<description>P.T. Barnum's Acrobats! (US)</description>
+		<description>P.T. Barnum's Acrobats! (USA)</description>
 		<year>1982</year>
 		<publisher>Magnavox</publisher>
 		<info name="programmer" value="Jim Butler" />
@@ -996,7 +996,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="bees">
-		<description>Killer Bees! (US)</description>
+		<description>Killer Bees! (USA)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Robert S. Harris" />
@@ -1010,7 +1010,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="beesp" cloneof="bees">
-		<description>Killer Bees! (US, prototype, set 1)</description>
+		<description>Killer Bees! (USA, prototype, set 1)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Robert S. Harris" />
@@ -1023,7 +1023,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="beespa" cloneof="bees">
-		<description>Killer Bees! (US, prototype, set 2)</description>
+		<description>Killer Bees! (USA, prototype, set 2)</description>
 		<year>1982</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Robert S. Harris" />
@@ -1036,11 +1036,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="lasvegas">
-		<description>Las Vegas Gambling (Europe, US)</description>
+		<description>Las Vegas Gambling (Europe, USA)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Casino Slot Machine!" />
-		<info name="serial" value="23 (Europe) ~ AA9426 (US)" />
+		<info name="serial" value="23 (Europe) ~ AA9426 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -1087,7 +1087,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="invaders" cloneof="laser">
-		<description>Invaders from Hyperspace! (US)</description>
+		<description>Invaders from Hyperspace! (USA)</description>
 		<year>1980</year>
 		<publisher>Magnavox</publisher>
 		<info name="serial" value="AK9414" />
@@ -1100,12 +1100,12 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="2mthecho">
-		<description>Mathematician / Echo (Europe, US)</description>
+		<description>Mathematician / Echo (Europe, USA)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Math-A-Magic! / Echo!" />
 		<info name="usage" value="Press 1 for Mathematician / Math-A-Magic, press 2 for Echo" />
-		<info name="serial" value="7 (Europe) ~ AJ9405 (US)" />
+		<info name="serial" value="7 (Europe) ~ AJ9405 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -1128,11 +1128,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="monkey">
-		<description>Monkeyshines (Europe, US)</description>
+		<description>Monkeyshines (Europe, USA)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Ed Averett" />
-		<info name="serial" value="37 (Europe) ~ AB9432 (US)" />
+		<info name="serial" value="37 (Europe) ~ AB9432 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x1000">
@@ -1181,7 +1181,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="kcmunch" cloneof="munchkin">
-		<description>K.C. Munchkin! (US)</description>
+		<description>K.C. Munchkin! (USA)</description>
 		<year>1981</year>
 		<publisher>Magnavox</publisher>
 		<info name="programmer" value="Ed Averett" />
@@ -1221,7 +1221,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="keyboard" cloneof="newscast">
-		<description>Keyboard Creations! (US)</description>
+		<description>Keyboard Creations! (USA)</description>
 		<year>1980</year>
 		<publisher>Magnavox</publisher>
 		<info name="serial" value="AC9433" />
@@ -1234,7 +1234,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="nimble">
-		<description>Nimble Numbers Ned! (US)</description>
+		<description>Nimble Numbers Ned! (USA)</description>
 		<year>1982</year>
 		<publisher>Magnavox</publisher>
 		<info name="programmer" value="Robert S. Harris" />
@@ -1248,7 +1248,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="2wrldrsc">
-		<description>Out of this World! / Helicopter Rescue! (US)</description>
+		<description>Out of this World! / Helicopter Rescue! (USA)</description>
 		<year>1979</year>
 		<publisher>Magnavox</publisher>
 		<info name="usage" value="Press 3 for Out of this World, press 1 for Helicopter Rescue" />
@@ -1276,7 +1276,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="3mkrbzlg" cloneof="3prspclg">
-		<description>Matchmaker! / Buzzword! / Logix! (US)</description>
+		<description>Matchmaker! / Buzzword! / Logix! (USA)</description>
 		<year>1978</year>
 		<publisher>Magnavox</publisher>
 		<info name="usage" value="Press 1 for Matchmaker 1 player, press 2 for Matchmaker 2 players, press 3 for Buzzword, press 4 for Logix" />
@@ -1302,11 +1302,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="pickaxe">
-		<description>Pickaxe Pete (Europe, US)</description>
+		<description>Pickaxe Pete (Europe, USA)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Pick Axe Pete!" />
-		<info name="serial" value="43 (Europe) ~ AC9437 (US)" />
+		<info name="serial" value="43 (Europe) ~ AC9437 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x1000">
@@ -1316,11 +1316,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="psmaths">
-		<description>Playschool Maths (Europe, US)</description>
+		<description>Playschool Maths (Europe, USA)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="I've Got Your Number!" />
-		<info name="serial" value="13 (Europe) ~ AK9413 (US)" />
+		<info name="serial" value="13 (Europe) ~ AK9413 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -1330,7 +1330,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="powerlrd">
-		<description>Power Lords (US, set 1)</description>
+		<description>Power Lords (USA, set 1)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Uses the 2nd joystick" />
@@ -1345,7 +1345,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 
 	<software name="powerlrda" cloneof="powerlrd">
 		<!-- could also be a romhack, or prototype of official PAL version, not sure -->
-		<description>Power Lords (US, set 2)</description>
+		<description>Power Lords (USA, set 2)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Uses the 2nd joystick" />
@@ -1359,12 +1359,12 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="3rcsocpt">
-		<description>Race / Spin-Out / Cryptogram (Europe, US)</description>
+		<description>Race / Spin-Out / Cryptogram (Europe, USA)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Speedway! / Spin-Out! / Crypto-Logic!" />
 		<info name="usage" value="Press 1 for Race/Speedway, press 2 for 3-lap Spin-Out, press 4 for 15-lap Spin-Out, press 5 for Cryptogram/Crypto-Logic" />
-		<info name="serial" value="1 (Europe) ~ AJ9400 (US)" />
+		<info name="serial" value="1 (Europe) ~ AJ9400 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -1401,7 +1401,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="dynasty" cloneof="samurai">
-		<description>Dynasty! (US)</description>
+		<description>Dynasty! (USA)</description>
 		<year>1979</year>
 		<publisher>Magnavox</publisher>
 		<info name="programmer" value="Ed Averett" />
@@ -1429,7 +1429,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="ufo" cloneof="satellit">
-		<description>UFO! (US)</description>
+		<description>UFO! (USA)</description>
 		<year>1982</year>
 		<publisher>Magnavox</publisher>
 		<info name="programmer" value="Ed Averett" />
@@ -1468,7 +1468,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="sidspell">
-		<description>Sid the Spellbinder! (US)</description>
+		<description>Sid the Spellbinder! (USA)</description>
 		<year>1982</year>
 		<publisher>Magnavox</publisher>
 		<info name="programmer" value="Sam Overton" />
@@ -1485,11 +1485,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="ski">
-		<description>Skiing (Europe, US)</description>
+		<description>Skiing (Europe, USA)</description>
 		<year>1979</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Alpine Skiing!" />
-		<info name="serial" value="25 (Europe) ~ AK9418 (US)" />
+		<info name="serial" value="25 (Europe) ~ AK9418 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -1511,11 +1511,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="spacemon">
-		<description>Space Monster (Europe, US)</description>
+		<description>Space Monster (Europe, USA)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Alien Invaders - Plus!" />
-		<info name="serial" value="22 (Europe) ~ AA9428 (US)" />
+		<info name="serial" value="22 (Europe) ~ AA9428 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -1539,7 +1539,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="smither" cloneof="stone">
-		<description>Smithereens! (US)</description>
+		<description>Smithereens! (USA)</description>
 		<year>1982</year>
 		<publisher>Magnavox</publisher>
 		<info name="programmer" value="Robert L. Cheezem" />
@@ -1581,11 +1581,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="moneyrun">
-		<description>Take the Money and Run (Europe, US)</description>
+		<description>Take the Money and Run (Europe, USA)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Ed Averett" />
-		<info name="serial" value="12 (Europe) ~ AJ9412 (US)" />
+		<info name="serial" value="12 (Europe) ~ AJ9412 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -1608,10 +1608,10 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="gtwallst">
-		<description>The Great Wall Street Fortune Hunt (Europe, US)</description>
+		<description>The Great Wall Street Fortune Hunt (Europe, USA)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
-		<info name="serial" value="46 (Europe) ~ AC9434 (US)" />
+		<info name="serial" value="46 (Europe) ~ AC9434 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x1000">
@@ -1659,11 +1659,11 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 
 	<software name="quest">
 		<!-- board game -->
-		<description>The Quest for the Rings (Europe, US)</description>
+		<description>The Quest for the Rings (Europe, USA)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Ed Averett" />
-		<info name="serial" value="42 (Europe) ~ AB9429 (US)" />
+		<info name="serial" value="42 (Europe) ~ AB9429 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x1000">
@@ -1687,7 +1687,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="voice">
-		<description>The Voice (US)</description>
+		<description>The Voice (USA)</description>
 		<year>1979?</year>
 		<publisher>Magnavox</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -1701,12 +1701,12 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="2bwlbskt">
-		<description>Ten Pin Bowling / Basketball (Europe, US)</description>
+		<description>Ten Pin Bowling / Basketball (Europe, USA)</description>
 		<year>1978</year>
 		<publisher>Philips</publisher>
 		<info name="alt_title" value="Bowling! / Basketball!" />
 		<info name="usage" value="Press 1 for League Night Bowling, press 2 for Tournament Play Bowling, press 3 for Basketball" />
-		<info name="serial" value="6 (Europe) ~ AJ9404 (US)" />
+		<info name="serial" value="6 (Europe) ~ AJ9404 (USA)" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
@@ -1744,7 +1744,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="turtlesu" cloneof="turtles">
-		<description>Turtles! (US)</description>
+		<description>Turtles! (USA)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Jim Butler" />
@@ -1759,7 +1759,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="typetell">
-		<description>Type &amp; Tell! (US)</description>
+		<description>Type &amp; Tell! (USA)</description>
 		<year>1982</year>
 		<publisher>Magnavox</publisher>
 		<info name="programmer" value="Robert L. Cheezem" />
@@ -1777,7 +1777,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 <!-- VP/O2, 3rd-party (some of them were actually subcontracted to Philips) -->
 
 	<software name="atlantis">
-		<description>Atlantis (Europe, US)</description>
+		<description>Atlantis (Europe, USA)</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
 		<info name="programmer" value="Jeff Ronnie" />
@@ -1803,7 +1803,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="demon">
-		<description>Demon Attack (Europe, US)</description>
+		<description>Demon Attack (Europe, USA)</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
 		<info name="programmer" value="Dave Johnson" />
@@ -2062,7 +2062,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 
 	<software name="pinball">
 		<!-- re-released at Classic Games Expo (2004 in Philadelphia) with Ralph Baer's autograph (as he was the designer) -->
-		<description>Pinball! (US, prototype)</description>
+		<description>Pinball! (USA, prototype)</description>
 		<year>1979</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Don McGuiness" />
@@ -2180,7 +2180,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 
 	<software name="sherlock">
 		<!-- board game (game rules are a mystery) -->
-		<description>The Adventures of Sherlock Holmes (US, prototype)</description>
+		<description>The Adventures of Sherlock Holmes (USA, prototype)</description>
 		<year>198?</year>
 		<publisher>Magnavox</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -2637,7 +2637,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 <!-- Odyssey³ prototypes, they won't work properly on European VP+ consoles -->
 
 	<software name="timelordpl" cloneof="timelord">
-		<description>Attack of the Timelord! (US, plus, prototype)</description>
+		<description>Attack of the Timelord! (USA, plus, prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -2650,7 +2650,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="baseballpl" cloneof="baseball">
-		<description>Baseball! (US, plus, prototype)</description>
+		<description>Baseball! (USA, plus, prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -2663,7 +2663,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="flashp">
-		<description>Flash Point (US, prototype)</description>
+		<description>Flash Point (USA, prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -2676,7 +2676,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="freedomplu" cloneof="freedom">
-		<description>Freedom Fighters! (US, plus, prototype)</description>
+		<description>Freedom Fighters! (USA, plus, prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -2689,7 +2689,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="beesplu" cloneof="bees">
-		<description>Killer Bees! (US, plus, prototype)</description>
+		<description>Killer Bees! (USA, plus, prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -2702,7 +2702,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="terminal">
-		<description>Terminal Program (US, prototype)</description>
+		<description>Terminal Program (USA, prototype)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -2745,7 +2745,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="deathrac">
-		<description>Death Race (US)</description>
+		<description>Death Race (USA)</description>
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="Ivan Machado" />

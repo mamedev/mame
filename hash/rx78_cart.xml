@@ -9,9 +9,10 @@ tape through audio line-in ports to use with tape recorders; these ports were pr
 Animation Graphics, Creative Graphics, Japanese Word Processor, Music Master and Z80 Assembler carts.
 The system could use up to two carts or devices at the same time.
 
-There were a total of 20 games released for the system, plus educational and productivity software, and peripheral
-devices. One additional game and three expansion cards were announced but never released. The official translations
-printed in the game carts or tapes are used below where available. Names in brackets are unofficial translations.
+There were a total of 20 games released for the system, plus educational and productivity software, peripheral
+devices, and one in-store demonstration cart. An additional game and three expansion carts were announced,
+but never released. The official translations printed in the game carts or tapes are used below where available.
+Names in brackets are unofficial translations.
 
 +========+=========+=======+=========+==============================================================================+
 | Format | Serial  | Type  | Overlay | Title                                                                        |
@@ -28,6 +29,7 @@ printed in the game carts or tapes are used below where available. Names in brac
 |  Cart  | 0201011 | Game  | No      | ハンバーガー ショップ / Hamburger Shop
 |  Cart  | 0201012 | Game  | Yes     | 戦え！ウルトラマン / Tatakae! Ultraman
 |  Cart  | 0201013 | Game  | No      | ザ・プロレス / The Pro Wrestling
+|  Cart  | 0201014 | Learn | Yes     | ABC 単語ゲーム / ABC Word Game
 |  Cart  | 0201016 | Tool  | No      | RX-78 P.I/F / Printer Interface
 |  Cart  | 0201018 | Game  | Yes     | 連合艦隊 / Rengo Kantai
 |  Cart  | 0201019 | Game  | Yes     | スペースエネミー / Space Enemy
@@ -46,14 +48,14 @@ printed in the game carts or tapes are used below where available. Names in brac
 |  Tape  | 0201041 | Game  | Unknown | ドンジャラ [Donjara] (**)
 |  Cart  | 02010?? | Game  | Yes     | カード・ワールド / Card World
 |  Tape  | 02010?? | Game  | Unknown | ひつじや～い [Hitsujiya~i]
-|  Cart  | 02010?? | Learn | Yes     | ABC 単語ゲーム / ABC Word Game
 |  ?     | 02010?? | Learn | Unknown | 算数つまづき [Sansu Tsuma Zuki]
-|  Cart  | 02010?? | Tool  | Yes     | BS-BASIC Version 1.0
+|  Cart  | None    | Tool  | Yes     | BS-BASIC Version 1.0
 |  Cart  | 02010?? | Tool  | Yes     | 漢字ワープロ / Japanese Word Processor
 |  ?     | 02010?? | Tool  | Unknown | Z-80 アセンブラー (RX-78 Z-80 用アセンブラー)
 |  Cart  | ??????? | Tool  | Unknown | バッテリーバックアップ RAM [Battery Backup RAM] (Announced)
 |  Cart  | ??????? | Tool  | Unknown | ミュージック・インターフェイス [Music Interface] (Announced)
 |  Cart  | ??????? | Tool  | Unknown | 専用フロッピイ・ヂイスクドライブ [Floppy Disk Drive] (Announced)
+|  Cart  | None    | Demo  | No      | デモンストレーション 店頭用非売品 No. 1 [Demonstration - Not For Resale]
 |  ?     | ??????? | Game  | Unknown | キム・キム・ダン・ダン [Kim Kim Dan Dan] (Announced)
 |========+=========+=======+========================================================================================+
 
@@ -100,6 +102,8 @@ The monitor will expect you to load a program from cassette.
 		<description>ABC Word Game</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201014"/>
+		<info name="alt_title" value="ABC 単語ゲーム"/>
 		<info name="usage" value="Press 1. Press Home twice. Press Space." /><!-- Incomplete -->
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
@@ -109,14 +113,16 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
-	<software name="burger">
-		<description>Burger Shop</description>
+	<software name="cannonbl">
+		<description>Cannon Ball</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
-		<info name="usage" value="Z and X to start and move; Space to pick up and put down" />
+		<info name="serial" value="0201028"/>
+		<info name="alt_title" value="キャノンボール"/>
+		<info name="usage" value="Press A for single player or D for two players. In game, press A or D to move, and Spacebar to Shoot; the same controls are used by both players." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="burgershop.bin" size="8192" crc="2428ad88" sha1="a773125aeb85646a6e3d15c4c2f2685d9e5232c9" />
+				<rom name="rx78cannonball.bin" size="8192" crc="49601d95" sha1="0ad4ae7a1f9e667b3aa9f8cbefa0d1cdb7cd8de3" />
 			</dataarea>
 		</part>
 	</software>
@@ -125,6 +131,8 @@ The monitor will expect you to load a program from cassette.
 		<description>Challenge Golf</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201006"/>
+		<info name="alt_title" value="チャレンジ ゴルフ"/>
 		<info name="usage" value="Q1 = Home or Backspace; Q2 = \ or End; ZXCV to rotate player; Arrows to adjust view; Middle row or Ctrl to choose a club; Alt or Space to shoot; Enter to abandon hole." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
@@ -138,6 +146,8 @@ The monitor will expect you to load a program from cassette.
 		<description>Champion Racer</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201005"/>
+		<info name="alt_title" value="チャンピオン レーサー"/>
 		<info name="usage" value="PgUp = 1 or \ = 2. Space to start; Ctrl to accelerate; Left-Right to move" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
@@ -150,6 +160,8 @@ The monitor will expect you to load a program from cassette.
 		<description>Creative Graphics</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201009"/>
+		<info name="alt_title" value="クリエイティブ グラフィックス"/>
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="0x2000">
 				<rom name="364c94-3j1.ic2.bin" size="0x2000" crc="80873b44" sha1="38b7aadf16cc0273f7fd735867d4d3987d0772aa" />
@@ -161,6 +173,8 @@ The monitor will expect you to load a program from cassette.
 		<description>Excite Baseball</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201007"/>
+		<info name="alt_title" value="エキサイト ベースボール"/>
 		<info name="usage" value="Blue player uses arrows; Red player uses R,D,F,G" /><!-- difficult to hit the ball -->
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
@@ -174,6 +188,8 @@ The monitor will expect you to load a program from cassette.
 		<description>Excite Tennis</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201023"/>
+		<info name="alt_title" value="エキサイト テニス"/>
 		<info name="usage" value="1 to start, then Backspace or Home. / to serve" /><!-- incomplete -->
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
@@ -183,10 +199,25 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
+	<software name="hamburgr">
+		<description>Hamburger Shop</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="0201011"/>
+		<info name="alt_title" value="ハンバーガー ショップ"/>
+		<info name="usage" value="Z and X to start and move; Space to pick up and put down" />
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="burgershop.bin" size="8192" crc="2428ad88" sha1="a773125aeb85646a6e3d15c4c2f2685d9e5232c9" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gundam">
 		<description>Mobile Suit Gundam: Lunar 2 no Tatakai</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201004"/>
 		<info name="alt_title" value="Mobile Suit ガンダム ルナ・ツーの戦い" /><!-- used on box art -->
 		<info name="alt_title" value="Mobil Suit ガンダム ルナ・ツーのタタカイ" /><!-- title screen really spells it "MOBIL SUIT" -->
 		<info name="usage" value="Use either Z,X,Space; or Left,Right,Alt" />
@@ -201,6 +232,8 @@ The monitor will expect you to load a program from cassette.
 		<description>Perfect Mah-jongg</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201008"/>
+		<info name="alt_title" value="パーフェクト マージャン"/>
 		<info name="usage" value="Home = Yes; Backspace = No;Q4 = - or 9; Q5 = \ or pgDn or PgUp; Space to start" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
@@ -213,6 +246,8 @@ The monitor will expect you to load a program from cassette.
 		<description>Rengo Kantai</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201018"/>
+		<info name="alt_title" value="連合艦隊"/>
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="3256d53-4b3.ic1.bin" size="0x2000" crc="23bd3075" sha1="a58b91d62d2e062130ff974b763ebc28867c629c" offset="0x6000" />
@@ -227,6 +262,8 @@ The monitor will expect you to load a program from cassette.
 		<description>Sekigahara</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201027"/>
+		<info name="alt_title" value="関ヶ原"/>
 		<info name="usage" value="Wait for small beep. Press Space(keyboard) or S(joystick). Press G." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
@@ -242,6 +279,8 @@ The monitor will expect you to load a program from cassette.
 		<description>Super Motocross</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201024"/>
+		<info name="alt_title" value="スーパー モトクロス"/>
 		<info name="usage" value="Press Enter. Answer questions. Press Space to begin. Arrows to drive" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
@@ -255,6 +294,8 @@ The monitor will expect you to load a program from cassette.
 		<description>Space Enemy</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201019"/>
+		<info name="alt_title" value="スペースエネミー"/>
 		<info name="usage" value="Press Space to begin and fire. QWEADZXC to steer. S toggle guidance system." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
@@ -265,9 +306,11 @@ The monitor will expect you to load a program from cassette.
 	</software>
 
 	<software name="theprowr">
-		<description>The Prowrestling</description>
+		<description>The Pro-Wrestling</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201013"/>
+		<info name="alt_title" value="ザ・プロレス"/>
 		<info name="usage" value="Ctrl to attack; Arrows to move" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
@@ -277,9 +320,11 @@ The monitor will expect you to load a program from cassette.
 	</software>
 
 	<software name="ultraman">
-		<description>Ultraman</description>
+		<description>Tatakae! Ultraman</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201012"/>
+		<info name="alt_title" value="戦え！ウルトラマン"/>
 		<info name="usage" value="1 player: Use P[];./ticPGDN to move, Space to fire. 2 players: P1 use Arrows,Ctrl,Alt; P2 use RDFGAS" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="8192">
@@ -292,6 +337,8 @@ The monitor will expect you to load a program from cassette.
 		<description>Zerosen</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="serial" value="0201026"/>
+		<info name="alt_title" value="零戦 (ぜろせん)"/>
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="84.ic2.bin" size="0x2000" crc="a569048f" sha1="7d9a37b7347dddca7e16b14689d0bbbc9079afbd" offset="0x4000" />
@@ -299,6 +346,8 @@ The monitor will expect you to load a program from cassette.
 			</dataarea>
 		</part>
 	</software>
+
+<!-- Homebrew -->
 
 	<software name="aerial">
 		<description>Aerial</description>
@@ -310,6 +359,7 @@ The monitor will expect you to load a program from cassette.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="battlot">
 		<description>Battlot</description>
 		<year>2021</year>
@@ -320,6 +370,7 @@ The monitor will expect you to load a program from cassette.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="bootskell">
 		<description>Bootskell</description>
 		<year>2021</year>
@@ -330,6 +381,7 @@ The monitor will expect you to load a program from cassette.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="cavit">
 		<description>Cavit</description>
 		<year>2021</year>
@@ -340,6 +392,7 @@ The monitor will expect you to load a program from cassette.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="lift">
 		<description>Lift</description>
 		<year>2021</year>
@@ -350,6 +403,7 @@ The monitor will expect you to load a program from cassette.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="neuras">
 		<description>Neuras</description>
 		<year>2021</year>
@@ -360,6 +414,7 @@ The monitor will expect you to load a program from cassette.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="ruptus">
 		<description>Ruptus</description>
 		<year>2021</year>
@@ -370,6 +425,7 @@ The monitor will expect you to load a program from cassette.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="xchase">
 		<description>Xchase</description><!-- issues on the title screen, but i think it's a bug in the game -->
 		<year>2021</year>

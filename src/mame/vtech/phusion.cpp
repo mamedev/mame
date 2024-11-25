@@ -40,7 +40,7 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void phusion_map(address_map &map);
+	void phusion_map(address_map &map) ATTR_COLD;
 
 	required_device<cr16b_device> m_maincpu;
 };

@@ -33,9 +33,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	const address_space_config m_io_space_config;
 	const address_space_config m_space_config;
@@ -102,9 +102,9 @@ private:
 	u8 m_vregs[0xc0];
 	u8 m_ramgfx;
 
-	void cpu_internal_io_map(address_map &map);
-	void cpu_internal_map(address_map &map);
-	void charam_map(address_map &map);
+	void cpu_internal_io_map(address_map &map) ATTR_COLD;
+	void cpu_internal_map(address_map &map) ATTR_COLD;
+	void charam_map(address_map &map) ATTR_COLD;
 };
 
 

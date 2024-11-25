@@ -144,8 +144,8 @@ public:
 	void lwriter2nt(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// A guess based on not very much
@@ -174,7 +174,7 @@ private:
 	TIMER_CALLBACK_MEMBER(pb6_tick);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	//void scc_int(int state);
-	void maincpu_map(address_map &map);
+	void maincpu_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;

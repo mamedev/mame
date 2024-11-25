@@ -36,8 +36,8 @@ protected:
 	void sb_config(device_t *device);
 	void superio_config(device_t *device);
 
-	void at586_io(address_map &map);
-	void at586_map(address_map &map);
+	void at586_io(address_map &map) ATTR_COLD;
+	void at586_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

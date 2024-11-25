@@ -99,12 +99,12 @@ private:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void svi3x8_io(address_map &map);
-	void svi3x8_io_bank(address_map &map);
-	void svi3x8_mem(address_map &map);
+	void svi3x8_io(address_map &map) ATTR_COLD;
+	void svi3x8_io_bank(address_map &map) ATTR_COLD;
+	void svi3x8_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -560,6 +560,7 @@ void svi3x8_state::svi318(machine_config &config)
 	m_expander->ctrl1_handler().set(FUNC(svi3x8_state::ctrl1_w));
 	m_expander->excsr_handler().set(m_vdp, FUNC(tms9928a_device::read));
 	m_expander->excsw_handler().set(m_vdp, FUNC(tms9928a_device::write));
+	m_expander->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void svi3x8_state::svi318p(machine_config &config)

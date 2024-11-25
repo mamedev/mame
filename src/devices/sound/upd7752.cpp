@@ -9,8 +9,7 @@ skeleton device
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/upd7752.h"
-
+#include "upd7752.h"
 
 
 /* status flags */

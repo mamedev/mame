@@ -24,8 +24,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_serial_interface implementation
 	virtual void tra_callback() override;
@@ -33,7 +33,7 @@ protected:
 	virtual void rcv_complete() override;
 
 	// ROM region (unused, as the device is HLE'd)
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_output);
 

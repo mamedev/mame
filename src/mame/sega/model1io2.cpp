@@ -96,7 +96,7 @@ static INPUT_PORTS_START( model1io2 )
 	PORT_DIPNAME(0x20, 0x20, "MODE") // JP3
 	PORT_DIPSETTING(   0x00, DEF_STR(On))
 	PORT_DIPSETTING(   0x20, DEF_STR(Off))
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) // eeprom nc
 INPUT_PORTS_END
 
@@ -199,7 +199,7 @@ void model1io2_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(model1io2_device::lcd_palette), 3);
 
-	HD44780(config, m_lcd, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcd, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcd->set_lcd_size(2, 20);
 	m_lcd->set_pixel_update_cb(FUNC(model1io2_device::lcd_pixel_update));
 }

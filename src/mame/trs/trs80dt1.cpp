@@ -78,13 +78,13 @@ private:
 	void rx_w(int state);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
 
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 
 	bool m_bow = false;
 	bool m_cent_busy = false;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<i8051_device> m_maincpu;
@@ -296,9 +296,9 @@ static INPUT_PORTS_START( trs80dt1 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED) // Jumper - LOW for 60Hz, high for 50Hz
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED) // No Connect
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", rs232_port_device, dcd_r)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", rs232_port_device, cts_r)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", rs232_port_device, dsr_r)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", FUNC(rs232_port_device::dcd_r))
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", FUNC(rs232_port_device::cts_r))
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", FUNC(rs232_port_device::dsr_r))
 INPUT_PORTS_END
 
 void trs80dt1_state::machine_start()
@@ -335,18 +335,19 @@ I8275_DRAW_CHARACTER_MEMBER( trs80dt1_state::crtc_update_row )
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = 0;
 
-	if (lten) // underline attr
+	using namespace i8275_attributes;
+	if (BIT(attrcode, LTEN)) // underline attr
 		gfx = 0xff;
-	else
-	if ((gpa | vsp)==0) // blinking and invisible attributes
+	else if (BIT(attrcode, GPA0, 2) == 0 && !BIT(attrcode, VSP)) // blinking and invisible attributes
 		gfx = m_p_chargen[linecount | (charcode << 4)];
 
-	if (rvv) // reverse video attr
+	if (BIT(attrcode, RVV)) // reverse video attr
 		gfx ^= 0xff;
 
 	if (m_bow) // black-on-white
 		gfx ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(u8 i=0; i<8; i++)
 		bitmap.pix(y, x + i) = palette[BIT(gfx, 7-i) ? (hlgt ? 2 : 1) : 0];
 }

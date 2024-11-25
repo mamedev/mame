@@ -65,8 +65,8 @@ public:
 	void argo(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void argo_videoram_w(offs_t offset, u8 data);
 	u8 argo_io_r(offs_t offset);
 	void argo_io_w(offs_t offset, u8 data);
@@ -77,8 +77,8 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
@@ -257,19 +257,22 @@ I8275_DRAW_CHARACTER_MEMBER(argo_state::display_pixels)
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = m_p_chargen[(linecount & 15) | (charcode << 4)];
 
-	if (vsp)
+	using namespace i8275_attributes;
+
+	if (BIT(attrcode, VSP))
 		gfx = 0;
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 	{
 		gfx = 0xff;
 		if (x > 6)
 			x-=6; // hack to fix cursor position
 	}
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		gfx ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(u8 i=0;i<7;i++)
 		bitmap.pix(y, x + i) = palette[BIT(gfx, 6-i) ? (hlgt ? 2 : 1) : 0];
 }

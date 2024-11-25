@@ -348,8 +348,8 @@ void msm58321_device::nvram_default()
 
 bool msm58321_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (file.read(m_reg.data(), m_reg.size(), actual) || actual != m_reg.size())
+	auto const [err, actual] = read(file, m_reg.data(), m_reg.size());
+	if (err || (actual != m_reg.size()))
 		return false;
 
 	clock_updated();
@@ -364,8 +364,8 @@ bool msm58321_device::nvram_read(util::read_stream &file)
 
 bool msm58321_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_reg.data(), m_reg.size(), actual) && actual == m_reg.size();
+	auto const [err, actual] = write(file, m_reg.data(), m_reg.size());
+	return !err;
 }
 
 //-------------------------------------------------

@@ -64,9 +64,9 @@ public:
 	void maclc475(machine_config &config);
 	void maclc575(machine_config &config);
 
-	void quadra605_map(address_map &map);
-	void lc475_map(address_map &map);
-	void lc575_map(address_map &map);
+	void quadra605_map(address_map &map) ATTR_COLD;
+	void lc475_map(address_map &map) ATTR_COLD;
+	void lc575_map(address_map &map) ATTR_COLD;
 
 	void init_macqd605();
 
@@ -81,8 +81,8 @@ private:
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c96_device> m_ncr1;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u16 mac_scc_r(offs_t offset)
 	{

@@ -10,8 +10,10 @@
 #include "cpu/sh/sh7604.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
+
 
 class sega_32x_device : public device_t, public device_palette_interface, public device_sound_interface, public device_video_interface
 {
@@ -92,18 +94,18 @@ public:
 	void check_irqs();
 	void interrupt_cb(int scanline, int irq6);
 
-	void sh2_main_map(address_map &map);
-	void sh2_slave_map(address_map &map);
-	void sh2_common_map(address_map &map);
+	void sh2_main_map(address_map &map) ATTR_COLD;
+	void sh2_slave_map(address_map &map) ATTR_COLD;
+	void sh2_common_map(address_map &map) ATTR_COLD;
 
 protected:
 	sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	required_shared_ptr<uint32_t> m_sh2_shared;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const noexcept override { return 32*32*32/**2*/; }
@@ -213,7 +215,7 @@ public:
 	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 };
 
@@ -231,7 +233,7 @@ public:
 	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 

@@ -40,7 +40,7 @@ public:
 	void hazl1420(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void p1_w(u8 data);
@@ -56,9 +56,9 @@ private:
 	void crtc_lbre_w(int state);
 	void crtc_vblank_w(int state);
 
-	void prog_map(address_map &map);
-	void io_map(address_map &map);
-	void bank_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void bank_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

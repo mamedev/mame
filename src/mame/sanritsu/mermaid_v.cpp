@@ -72,16 +72,6 @@ void mermaid_state::mermaid_colorram_w(offs_t offset, uint8_t data)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-void mermaid_state::flip_screen_x_w(int state)
-{
-	flip_screen_x_set(state);
-}
-
-void mermaid_state::flip_screen_y_w(int state)
-{
-	flip_screen_y_set(state);
-}
-
 void mermaid_state::mermaid_bg_scroll_w(offs_t offset, uint8_t data)
 {
 	m_bg_scrollram[offset] = data;

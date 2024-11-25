@@ -118,8 +118,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_rst65);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void i8155_porta_w(uint8_t data);
 	uint8_t i8155_portb_r();
@@ -155,12 +155,12 @@ public:
 	void hektor2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void hektor_mem(address_map &map);
-	void hektor_io(address_map &map);
-	void hektor2_mem(address_map &map);
+	void hektor_mem(address_map &map) ATTR_COLD;
+	void hektor_io(address_map &map) ATTR_COLD;
+	void hektor2_mem(address_map &map) ATTR_COLD;
 
 	void i8155_portc_w(uint8_t data);
 
@@ -186,11 +186,11 @@ public:
 	void hektor3(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void hektor3_mem(address_map &map);
-	void hektor3_io(address_map &map);
+	void hektor3_mem(address_map &map) ATTR_COLD;
+	void hektor3_io(address_map &map) ATTR_COLD;
 
 	void i8155_portc_w(uint8_t data);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -429,8 +429,8 @@ static INPUT_PORTS_START(hektor)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, hektor_base_state, trigger_reset, 0)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_TAB) PORT_CHANGED_MEMBER(DEVICE_SELF, hektor_base_state, trigger_rst65, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hektor_base_state::trigger_reset), 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_TAB) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hektor_base_state::trigger_rst65), 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(hektor_base_state::trigger_reset)
@@ -459,7 +459,7 @@ static INPUT_PORTS_START(hektor3)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 _") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('_')
 
 	PORT_MODIFY("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_CHANGED_MEMBER(DEVICE_SELF, hektor_base_state, trigger_reset, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hektor_base_state::trigger_reset), 0)
 INPUT_PORTS_END
 
 

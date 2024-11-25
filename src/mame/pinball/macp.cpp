@@ -52,10 +52,10 @@ public:
 
 	void mac16k(machine_config &config);
 	void mac32k(machine_config &config);
-	void mem16k_map(address_map &map);
-	void io16k_map(address_map &map);
-	void mem32k_map(address_map &map);
-	void io32k_map(address_map &map);
+	void mem16k_map(address_map &map) ATTR_COLD;
+	void io16k_map(address_map &map) ATTR_COLD;
+	void mem32k_map(address_map &map) ATTR_COLD;
+	void io32k_map(address_map &map) ATTR_COLD;
 
 private:
 	void clock_tick(int state);
@@ -73,8 +73,8 @@ private:
 	u8 m_ay1_b = 0U;
 	u8 m_ay1_a = 0U;
 	u8 m_relay_ctrl = 0U;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device_array<ay8910_device, 2> m_ay8910;
 	required_ioport_array<8> m_io_keyboard;

@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/upc82c711.h"
+#include "upc82c711.h"
 
 #define LOG_CFG (1U << 1)
 #define LOG_FDC (1U << 2)

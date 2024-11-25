@@ -693,13 +693,13 @@ u8 megasys1_state::oki_status_r()
 		return m_oki[Chip]->read();
 }
 
-void megasys1_typea_state::p47b_adpcm_w(offs_t offset, u8 data)
+void megasys1_typea_state::p47bl_adpcm_w(offs_t offset, u8 data)
 {
 	// bit 6 is always set
-	m_p47b_adpcm[offset]->reset_w(BIT(data, 7));
-	m_p47b_adpcm[offset]->data_w(data & 0x0f);
-	m_p47b_adpcm[offset]->vclk_w(1);
-	m_p47b_adpcm[offset]->vclk_w(0);
+	m_p47bl_adpcm[offset]->reset_w(BIT(data, 7));
+	m_p47bl_adpcm[offset]->data_w(data & 0x0f);
+	m_p47bl_adpcm[offset]->vclk_w(1);
+	m_p47bl_adpcm[offset]->vclk_w(0);
 }
 
 /***************************************************************************
@@ -731,7 +731,7 @@ void megasys1_typea_state::kickoffb_sound_map(address_map &map)
 	map(0x0e0000, 0x0fffff).ram();
 }
 
-void megasys1_typea_state::p47b_sound_map(address_map &map)
+void megasys1_typea_state::p47bl_sound_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x040000, 0x040001).r(m_soundlatch[0], FUNC(generic_latch_16_device::read));
@@ -743,15 +743,15 @@ void megasys1_typea_state::p47b_sound_map(address_map &map)
 	map(0x0e0000, 0x0fffff).ram();
 }
 
-void megasys1_typea_state::p47b_extracpu_prg_map(address_map &map) // TODO
+void megasys1_typea_state::p47bl_extracpu_prg_map(address_map &map) // TODO
 {
 	map(0x0000, 0xffff).rom().nopw();
 }
 
-void megasys1_typea_state::p47b_extracpu_io_map(address_map &map)
+void megasys1_typea_state::p47bl_extracpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w(FUNC(megasys1_typea_state::p47b_adpcm_w));
+	map(0x00, 0x01).w(FUNC(megasys1_typea_state::p47bl_adpcm_w));
 	map(0x01, 0x01).r("soundlatch3", FUNC(generic_latch_8_device::read));
 }
 
@@ -910,7 +910,7 @@ static INPUT_PORTS_START( 64street )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0060, 0x0020, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0060, 0x0060, DEF_STR( Lives ) )
 	PORT_DIPSETTING(      0x0040, "1" )
 	PORT_DIPSETTING(      0x0060, "2" )
 	PORT_DIPSETTING(      0x0020, "3" )
@@ -1995,11 +1995,11 @@ void megasys1_typea_state::system_A_kickoffb(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.80);
 }
 
-void megasys1_typea_state::system_A_p47b(machine_config &config)
+void megasys1_typea_state::system_A_p47bl(machine_config &config)
 {
 	system_A_kickoffb(config);
 	m_audiocpu->set_clock(7.2_MHz_XTAL);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_typea_state::p47b_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_typea_state::p47bl_sound_map);
 
 	config.device_remove("oki1");
 
@@ -2008,21 +2008,21 @@ void megasys1_typea_state::system_A_p47b(machine_config &config)
 	// probably for driving the OKI M5205
 	z80_device &extracpu(Z80(config, "extracpu", 7.2_MHz_XTAL / 2)); // divisor not verified
 	extracpu.set_periodic_int(FUNC(megasys1_state::irq0_line_hold), attotime::from_hz(8000));
-	extracpu.set_addrmap(AS_PROGRAM, &megasys1_typea_state::p47b_extracpu_prg_map);
-	extracpu.set_addrmap(AS_IO, &megasys1_typea_state::p47b_extracpu_io_map);
+	extracpu.set_addrmap(AS_PROGRAM, &megasys1_typea_state::p47bl_extracpu_prg_map);
+	extracpu.set_addrmap(AS_IO, &megasys1_typea_state::p47bl_extracpu_io_map);
 
 	GENERIC_LATCH_8(config, "soundlatch3");
 
 	// OKI M5205
-	MSM5205(config, m_p47b_adpcm[0], 384000);
-	m_p47b_adpcm[0]->set_prescaler_selector(msm5205_device::SEX_4B);
-	m_p47b_adpcm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_p47b_adpcm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	MSM5205(config, m_p47bl_adpcm[0], 384000);
+	m_p47bl_adpcm[0]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_p47bl_adpcm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_p47bl_adpcm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MSM5205(config, m_p47b_adpcm[1], 384000);
-	m_p47b_adpcm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
-	m_p47b_adpcm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_p47b_adpcm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	MSM5205(config, m_p47bl_adpcm[1], 384000);
+	m_p47bl_adpcm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_p47bl_adpcm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_p47bl_adpcm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
 void megasys1_bc_iosim_state::system_B(machine_config &config)
@@ -2410,9 +2410,6 @@ ROM_START( astyanax )  // EPROM version
 	ROM_LOAD16_BYTE( "astyan5.bin",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
 	ROM_LOAD16_BYTE( "astyan6.bin",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "astyan11.bin", 0x000000, 0x020000, CRC(5593fec9) SHA1(8fa5bfa8921c6f03ddf485276207978e345887d5) )
 	ROM_LOAD( "astyan12.bin", 0x020000, 0x020000, CRC(e8b313ec) SHA1(ee690e284ab05db858aad4f0a0b24681c14f93c8) )
@@ -2457,9 +2454,6 @@ ROM_START( astyanaxa ) // mask ROM version, same content as the EPROM version, h
 	ROM_LOAD16_BYTE( "astyan5.bin",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
 	ROM_LOAD16_BYTE( "astyan6.bin",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) // M50747 MCU Code
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x80000, "scroll0", 0 )
 	ROM_LOAD( "14.bin", 0x00000, 0x80000, CRC(37388363) SHA1(13526b60cf1a1189c8783a4f802dcb63deacbed0) )
 
@@ -2494,9 +2488,6 @@ ROM_START( lordofk )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "astyan5.bin",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
 	ROM_LOAD16_BYTE( "astyan6.bin",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "astyan11.bin", 0x000000, 0x020000, CRC(5593fec9) SHA1(8fa5bfa8921c6f03ddf485276207978e345887d5) )
@@ -2932,8 +2923,8 @@ ROM_START( chimerab )
 	ROM_LOAD16_BYTE( "prg8.bin", 0x000000, 0x010000, CRC(a682b1ca) SHA1(66f5d5a73f5e8cba87eac09c55eee59117d94f7b) )
 	ROM_LOAD16_BYTE( "prg7.bin", 0x000001, 0x010000, CRC(83b9982d) SHA1(68e7d344ebfffe19822c4cf9f7b13cb51f23537a) )
 
-	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "chimerab.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code - using Cybattler program, label not confirmed */
+	ROM_LOAD( "mo-91028.mcu", 0x00000, 0x04000, BAD_DUMP CRC(a72e04a7) SHA1(0bd96272e37b0e23793ca47b98a966540e2e2df9) )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "s1.bin",   0x000000, 0x080000, CRC(e4c2ac77) SHA1(db4bff3c02f22cc59a67b103fd176f4d88531f93) )
@@ -3055,7 +3046,7 @@ ROM_START( cybattlr )
 	ROM_LOAD16_BYTE( "cb_07.rom", 0x000001, 0x010000, CRC(85d219d7) SHA1(a9628efc5eddefad739363ff0b2f37a2d095df86) )
 
 	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "mo-91028.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "mo-91028.mcu", 0x00000, 0x04000, CRC(a72e04a7) SHA1(0bd96272e37b0e23793ca47b98a966540e2e2df9) )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "cb_m01.rom", 0x000000, 0x080000, CRC(1109337f) SHA1(ab294d87c9b4eb54401da5ad6ea171e4c0a700b5) )
@@ -3333,9 +3324,6 @@ ROM_START( hachoo )
 	ROM_LOAD16_BYTE( "hacho05.rom", 0x000000, 0x010000, CRC(6271f74f) SHA1(2fe0f8adf3cdafe13a9107c36f24f1a525d06a05) )
 	ROM_LOAD16_BYTE( "hacho06.rom", 0x000001, 0x010000, CRC(db9e743c) SHA1(77a3691b48eed389bfcdead5f307415dce47247e) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "hacho14.rom", 0x000000, 0x080000, CRC(10188483) SHA1(43bf08ac777c42351b04e2c35b1a119f524b4388) )
 
@@ -3370,16 +3358,14 @@ ROM_START( hachooa )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	// This set had 2nd half of the ROMs blank (bad dumps, wrong device type used)
 	// It has been repaired to boot using 2nd half of other set but still fails service mode (START1+START2 on startup) ROM check
-	// so is marked as bad dump.  It's clearly a different revision though.
+	// so is marked as bad dump.  It's very close to the hachooj set otherwise, so likely the only issue is the checksum stored
+	// in the 2nd half of the ROMs
 	ROM_LOAD16_BYTE( "rom-2", 0x000000, 0x020000, BAD_DUMP CRC(3ea2f1cd) SHA1(5196a7c6b51c54f9b39e76fb1c5e081e1927ff59) )
 	ROM_LOAD16_BYTE( "rom-1", 0x000001, 0x020000, BAD_DUMP CRC(3cdffa03) SHA1(9fa6dd64ebff7170875ab1cd012f59698b7ecbc8) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "hacho05.rom", 0x000000, 0x010000, CRC(6271f74f) SHA1(2fe0f8adf3cdafe13a9107c36f24f1a525d06a05) )
 	ROM_LOAD16_BYTE( "hacho06.rom", 0x000001, 0x010000, CRC(db9e743c) SHA1(77a3691b48eed389bfcdead5f307415dce47247e) )
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "hacho14.rom", 0x000000, 0x080000, CRC(10188483) SHA1(43bf08ac777c42351b04e2c35b1a119f524b4388) )
@@ -3410,6 +3396,47 @@ ROM_START( hachooa )
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
 	ROM_LOAD( "ht.14m",      0x0000, 0x0200, CRC(85302b15) SHA1(8184c1184a71706cdb981e3c4f90a08521413e72) )
 ROM_END
+
+ROM_START( hachooj )
+	// very similar to the hachooa set, but with code to display the scrolling text during the intro
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_LOAD16_BYTE( "02", 0x000000, 0x020000, CRC(df5fe8f8) SHA1(52e8562c93feb8195ba5659e8e2a8db557e81856) )
+	ROM_LOAD16_BYTE( "01", 0x000001, 0x020000, CRC(adc13eb9) SHA1(6f16f587426cf6a011638772916615a16ff0d0b8) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
+	ROM_LOAD16_BYTE( "hacho05.rom", 0x000000, 0x010000, CRC(6271f74f) SHA1(2fe0f8adf3cdafe13a9107c36f24f1a525d06a05) )
+	ROM_LOAD16_BYTE( "hacho06.rom", 0x000001, 0x010000, CRC(db9e743c) SHA1(77a3691b48eed389bfcdead5f307415dce47247e) )
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
+	ROM_LOAD( "hacho14.rom", 0x000000, 0x080000, CRC(10188483) SHA1(43bf08ac777c42351b04e2c35b1a119f524b4388) )
+
+	ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1 */
+	ROM_LOAD( "hacho15.rom", 0x000000, 0x020000, CRC(e559347e) SHA1(1d71c83f4946af80083bbd059e55c2d57f2f9647) )
+	ROM_LOAD( "hacho16.rom", 0x020000, 0x020000, CRC(105fd8b5) SHA1(41aafcf6e29417a39ca0945f47a90646da2cbf3c) )
+	ROM_LOAD( "hacho17.rom", 0x040000, 0x020000, CRC(77f46174) SHA1(81d923069191c153773aaeb2d0eab6ab0076a386) )
+	ROM_LOAD( "hacho18.rom", 0x060000, 0x020000, CRC(0be21111) SHA1(45beb7e9f6cfe56893e0c5b052a1922e3d73275b) )
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2 */
+	ROM_LOAD( "hacho19.rom", 0x000000, 0x020000, CRC(33bc9de3) SHA1(8bbfda0fea742177e00dd5fff226f85233537cb3) )
+
+	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD( "hacho20.rom", 0x000000, 0x020000, CRC(2ae2011e) SHA1(f294ebfd87816c7b179fcaba3869e3402b2560a9) )
+	ROM_LOAD( "hacho21.rom", 0x020000, 0x020000, CRC(6dcfb8d5) SHA1(a478fea81acf1f317fe82ec84d4d21227db7432b) )
+	ROM_LOAD( "hacho22.rom", 0x040000, 0x020000, CRC(ccabf0e0) SHA1(3b9d95d8dee6155b484d85cc3f12e20a8ae3c9be) )
+	ROM_LOAD( "hacho23.rom", 0x060000, 0x020000, CRC(ff5f77aa) SHA1(e9fc71ac3499ee5b4636a3bdf1f3fbbe2623b0db) )
+
+	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "hacho09.rom", 0x000000, 0x020000, CRC(e9f35c90) SHA1(1a1dd6a7777bbad1475ad65f8797818c9b4f0937) )
+	ROM_LOAD( "hacho10.rom", 0x020000, 0x020000, CRC(1aeaa188) SHA1(40827435c948a2fd448137eb3f8c33fc84da3b82) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
+	ROM_LOAD( "hacho07.rom", 0x000000, 0x020000, CRC(06e6ca7f) SHA1(a15a1b754b0d47285a023ecfc4b762ab592f8262) )
+	ROM_LOAD( "hacho08.rom", 0x020000, 0x020000, CRC(888a6df1) SHA1(71d70633ecf7255287e55e92f8d2f186fe58f4b4) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
+	ROM_LOAD( "ht.14m",      0x0000, 0x0200, CRC(85302b15) SHA1(8184c1184a71706cdb981e3c4f90a08521413e72) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -3514,9 +3541,6 @@ ROM_START( kazan )
 	ROM_LOAD16_BYTE( "iga_05.bin", 0x000000, 0x010000, CRC(13580868) SHA1(bfcd11b294b64af81a0403a3e9370c42a9859b6b) )
 	ROM_LOAD16_BYTE( "iga_06.bin", 0x000001, 0x010000, CRC(7904d5dd) SHA1(4cd9fdab601a90c997a041a9f7966a9a233e897b) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "kazan.11", 0x000000, 0x020000, CRC(08e54137) SHA1(1e3298a896ae0de64f0fc2dab6b32c8bf875f50b) )
 	ROM_LOAD( "kazan.12", 0x020000, 0x020000, CRC(e89d58bd) SHA1(a4f2530fb544af48f66b3402c5162639745ab11d) )
@@ -3559,9 +3583,6 @@ ROM_START( iganinju )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "iga_05.bin", 0x000000, 0x010000, CRC(13580868) SHA1(bfcd11b294b64af81a0403a3e9370c42a9859b6b) )
 	ROM_LOAD16_BYTE( "iga_06.bin", 0x000001, 0x010000, CRC(7904d5dd) SHA1(4cd9fdab601a90c997a041a9f7966a9a233e897b) )
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "iga_14.bin", 0x000000, 0x040000, CRC(c707d513) SHA1(b0067a444385809a7dfd11fea27b1add318d5225) )
@@ -3647,9 +3668,6 @@ ROM_START( inyourfa )
 	ROM_LOAD16_BYTE( "05.27c512", 0x000000, 0x010000, CRC(1737ed64) SHA1(20be59c43d7975fcc5048f1ee9ed5af893bdef85) )
 	ROM_LOAD16_BYTE( "06.27c512", 0x000001, 0x010000, CRC(9f12bcb9) SHA1(7c5faf6a295b2124e16823f50e57b234b6127a38) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "11.27c1001", 0x000000, 0x020000, CRC(451a1428) SHA1(c017ef4dd3dffd26a93f5b926d80fd5e7bd7dea1) )
 	ROM_LOAD( "12.27c1001", 0x020000, 0x020000, CRC(9ead7432) SHA1(0690b640ebe9d1461f44040a33236705a303dc7e) )
@@ -3715,9 +3733,6 @@ ROM_START( jitsupro )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "jp_5.bin", 0x000000, 0x010000, CRC(84454e9e) SHA1(a506d44349a670e57d9dba3ec6a9de2597ba2cdb) ) // 11xxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "jp_6.bin", 0x000001, 0x010000, CRC(1fa9b75b) SHA1(d0e3640333f737658542ed4a8758d62f6d64ae05) ) // 11xxxxxxxxxxxxxx = 0xFF
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "jp_14.bin", 0x000000, 0x080000, CRC(db112abf) SHA1(fd8c510934241b7923660acca6122ca3e63bf934) )
@@ -4020,6 +4035,43 @@ ROM_START( p47 )
 	ROM_LOAD( "p-47.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
+// on original PCB with original ROMs. Has Freedom instead of Phantom.
+ROM_START( p47a )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_LOAD16_BYTE( "jaleco_export_p-47_3.rom2", 0x000000, 0x020000, CRC(022e58b8) SHA1(87db59e409977358d9a7b689f2d69bef056328d9) )
+	ROM_LOAD16_BYTE( "jaleco_export_p-47_1.rom1", 0x000001, 0x020000, CRC(ed926bd8) SHA1(5cf3e7b9b23667eaa8ebcff0803a7b881c7b83cf) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
+	ROM_LOAD16_BYTE( "jaleco_p-47_9.rom8",  0x000000, 0x010000, CRC(ffcf318e) SHA1(c675968c931a7e8e00ae83e49e8cef3fd193da57) )
+	ROM_LOAD16_BYTE( "jaleco_p-47_19.rom7", 0x000001, 0x010000, CRC(adb8c12e) SHA1(31590b037133f81a52779dbd4f2b5ac5b59198ae) )
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
+	ROM_LOAD( "hn62312ap_c42.rom4",  0x000000, 0x040000, CRC(8a75e0c3) SHA1(1d550fd24bc05d4636ba7206247efe65c681494f) )
+	ROM_LOAD( "jaleco_p-47_7.rom3",  0x040000, 0x010000, CRC(f3b1850a) SHA1(d12c61f647aaad53d745ba66d50d22cdf8065c00) )
+
+	ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1 */
+	ROM_LOAD( "jaleco_p-47_23.rom5", 0x000000, 0x020000, CRC(6e9bc864) SHA1(f56ea2dd638a8f6952796535eb549ddd55573bcf) )
+	ROM_RELOAD(                      0x020000, 0x020000 )   /* why? */
+	ROM_LOAD( "jaleco_p-47_12.rom6", 0x040000, 0x020000, CRC(5268395f) SHA1(de0cba1e7a7d4acc27467d1b553e8f39bea7282e) )
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2 */
+	ROM_LOAD( "jaleco_p-47_16.rom12", 0x000000, 0x010000, CRC(30e44375) SHA1(62a4bb217b6aad5fd4760a0f4999cb63559549a5) ) // "freedom" instead of "phantom" in the logo
+
+	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD( "hn62312ap_c45.rom11",  0x000000, 0x040000, CRC(a239baf4) SHA1(127e9ae02a87b3074300ebda68f00ed1a6e51dfb) )
+	ROM_LOAD( "jaleco_p-47_26.rom13", 0x040000, 0x020000, CRC(4d07581a) SHA1(768693e1fcb822b8284ba14c9a5c3d6b00f73383) )
+	ROM_RELOAD(                       0x060000, 0x020000 )   /* why? */
+
+	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "hn62312ap_c44.rom9", 0x000000, 0x040000, CRC(a5f6da1f) SHA1(a876bd4f966e45e702879a834fc9344bea85d3fa) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
+	ROM_LOAD( "hn62312ap_c43.rom10", 0x000000, 0x040000, CRC(9149286b) SHA1(f6c66c5cd50b72c4d401a263c65a8d4ef8cf9221) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM  (N82S131N compatible type BPROM) */
+	ROM_LOAD( "p-47.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+ROM_END
+
 
 /*
 The Japanese version of P-47 can be found in 2 different ROM board configurations:
@@ -4145,7 +4197,7 @@ ROM_START( p47je )
 	ROM_LOAD( "p-47.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
-ROM_START( p47b ) // very similar to original hardware but for the sound system (a YM2203 with a Y3014B DAC with unpopulated spaces for another pair + an OKI M5205) and an extra Z80
+ROM_START( p47bl ) // very similar to original hardware but for the sound system (a YM2203 with a Y3014B DAC with unpopulated spaces for another pair + an OKI M5205) and an extra Z80
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code, identical to p47 set but with smaller ROMs */
 	ROM_LOAD16_BYTE( "12.bin", 0x000000, 0x010000, CRC(cc81abd8) SHA1(223d205ee5120d16b997b0788fcb81c0de52da04) )
 	ROM_LOAD16_BYTE( "13.bin", 0x020000, 0x010000, CRC(f3ea8a3e) SHA1(b2ea6661f7a3653ac6d92e07176546a41178eaff) )
@@ -4360,9 +4412,6 @@ ROM_START( plusalph )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "pa-rom5.bin", 0x000000, 0x010000, CRC(ddc2739b) SHA1(dee31660428baea44c73dec238ed7f39a6771fe6) )
 	ROM_LOAD16_BYTE( "pa-rom6.bin", 0x000001, 0x010000, CRC(f6f8a167) SHA1(60d5c9db18d8f6704b68ccde5d026174679cec36) )
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "pa-rom11.bin", 0x000000, 0x020000, CRC(eb709ae7) SHA1(434c9da3c79a97ddd9be77908ce65e9efe6c8106) )
@@ -4699,9 +4748,6 @@ ROM_START( stdragon )
 	ROM_LOAD16_BYTE( "jsd-05.bin", 0x000000, 0x010000, CRC(8c04feaa) SHA1(57e86fd88dc72d123a41f0dee80a16be38ac2e81) )
 	ROM_LOAD16_BYTE( "jsd-06.bin", 0x000001, 0x010000, CRC(0bb62f3a) SHA1(68d9f161ba2568f8e046b1a40127bbb973d7a884) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "jsd-11.bin", 0x000000, 0x020000, CRC(2783b7b1) SHA1(4edde596cf26afb33b247cf5b1420d86f8f0c104) )
 	ROM_LOAD( "jsd-12.bin", 0x020000, 0x020000, CRC(89466ab7) SHA1(8de42f2828e48e4fe3c6d078f6b9d48498933d72) )
@@ -4766,9 +4812,6 @@ ROM_START( stdragona )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "jsd-05.bin", 0x000000, 0x010000, CRC(8c04feaa) SHA1(57e86fd88dc72d123a41f0dee80a16be38ac2e81) )
 	ROM_LOAD16_BYTE( "jsd-06.bin", 0x000001, 0x010000, CRC(0bb62f3a) SHA1(68d9f161ba2568f8e046b1a40127bbb973d7a884) )
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 - scrambled */
 	ROM_LOAD( "e71-14.bin", 0x000000, 0x080000, CRC(8e26ff92) SHA1(06985056027facb1d3df08cf04277492c1be6102) )
@@ -4963,9 +5006,6 @@ ROM_START( tshingena )
 	ROM_LOAD16_BYTE( "takeda5.bin", 0x000000, 0x010000, CRC(fbdc51c0) SHA1(bc6036c556275f7eccd7741d23437a98b0aa13bb) )
 	ROM_LOAD16_BYTE( "takeda6.bin", 0x000001, 0x010000, CRC(8fa65b69) SHA1(23a2d60435f235366f877ac79ac1506a99cfae9c) )
 
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
-
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "takeda11.bin", 0x000000, 0x020000, CRC(bf0b40a6) SHA1(3634b8700b6cfb71d3796847eab50fd2714d4726) )
 	ROM_LOAD( "takeda12.bin", 0x020000, 0x020000, CRC(07987d89) SHA1(54f0fcbac6ec9c27b70a04a192db2874d38e91d8) )
@@ -5005,9 +5045,6 @@ ROM_START( tshingen )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "takeda5.bin", 0x000000, 0x010000, CRC(fbdc51c0) SHA1(bc6036c556275f7eccd7741d23437a98b0aa13bb) )
 	ROM_LOAD16_BYTE( "takeda6.bin", 0x000001, 0x010000, CRC(8fa65b69) SHA1(23a2d60435f235366f877ac79ac1506a99cfae9c) )
-
-	// ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
-	// ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP ) // appears to be a UPD65006 gate array, not an MCU
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "takeda11.bin", 0x000000, 0x020000, CRC(bf0b40a6) SHA1(3634b8700b6cfb71d3796847eab50fd2714d4726) )
@@ -5179,11 +5216,6 @@ void megasys1_bc_iosim_state::init_chimeraba() // Type C
 	m_ip_select_values = chimeraba_seq;
 }
 
-void megasys1_bc_iosim_state::init_cybattlr() // Type C
-{
-	m_ip_select_values = cybattler_seq;
-}
-
 // Type D
 void megasys1_typed_state::init_peekaboo()
 {
@@ -5227,9 +5259,10 @@ GAME( 1988, makaiden,   lomakai,  system_Z,          lomakai,  megasys1_typez_st
 
 // Type A
 GAME( 1988, p47,        0,        system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47a,       p47,      system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, p47j,       p47,      system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, p47je,      p47,      system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, p47b,       p47,      system_A_p47b,            p47,      megasys1_typea_state,        empty_init,        ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47bl,      p47,      system_A_p47bl,           p47,      megasys1_typea_state,        empty_init,        ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kickoff,    0,        system_A,                 kickoff,  megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Kick Off - Jaleco Cup (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kickoffb,   kickoff,  system_A_kickoffb,        kickoff,  megasys1_typea_state,        empty_init,        ROT0,   "bootleg (Comodo)", "Kick Off - World Cup (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
 GAME( 1988, tshingen,   0,        system_A_d65006,          tshingen, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
@@ -5242,8 +5275,9 @@ GAME( 1989, astyanaxa,  astyanax, system_A_gs88000,         astyanax, megasys1_t
 GAME( 1989, lordofk,    astyanax, system_A_gs88000,         astyanax, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofkb,   astyanax, system_A,                 astyanax, megasys1_typea_state,        empty_init,        ROT0,   "bootleg","The Lord of King (bootleg, not protected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofkbp,  astyanax, system_A,                 astyanax, megasys1_typea_state,        init_lordofkbp,    ROT0,   "bootleg","The Lord of King (bootleg, protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hachoo,     0,        system_A_gs88000,         hachoo,   megasys1_typea_hachoo_state, empty_init,        ROT0,   "Jaleco", "Hachoo! (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, hachooa,    hachoo,   system_A_gs88000,         hachoo,   megasys1_typea_hachoo_state, empty_init,        ROT0,   "Jaleco", "Hachoo! (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachoo,     0,        system_A_gs88000,         hachoo,   megasys1_typea_hachoo_state, empty_init,        ROT0,   "Jaleco", "Hachoo! (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachooa,    hachoo,   system_A_gs88000,         hachoo,   megasys1_typea_hachoo_state, empty_init,        ROT0,   "Jaleco", "Hachoo! (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, hachooj,    hachoo,   system_A_gs88000,         hachoo,   megasys1_typea_hachoo_state, empty_init,        ROT0,   "Jaleco", "Hachoo! (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, jitsupro,   0,        system_A_gs88000,         jitsupro, megasys1_typea_state,        init_jitsupro_gfx, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, plusalph,   0,        system_A_gs88000,         plusalph, megasys1_typea_state,        empty_init,        ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, stdragon,   0,        system_A_d65006,          stdragon, megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Saint Dragon (set 1)", MACHINE_SUPPORTS_SAVE )
@@ -5275,9 +5309,9 @@ GAME( 1991, 64street,   0,        system_C_iomcu,          64street, megasys1_bc
 GAME( 1991, 64streetj,  64street, system_C_iomcu,          64street, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, 64streetja, 64street, system_C_iomcu,          64street, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bigstrik,   0,        system_C_iomcu,          bigstrik, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, chimerab,   0,        system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_cybattlr, ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, chimerab,   0,        system_C_iomcu,          chimerab, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, chimeraba,  chimerab, system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimeraba,ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, cybattlr,   0,        system_C_iosim,          cybattlr, megasys1_bc_iosim_state, init_cybattlr, ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cybattlr,   0,        system_C_iomcu,          cybattlr, megasys1_bc_iomcu_state, empty_init,    ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
 
 // Type D
 GAME( 1993, peekaboo,   0,        system_D,                peekaboo, megasys1_typed_state,    init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )

@@ -67,14 +67,13 @@ protected:
 	jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 version, bool isdsp, address_map_constructor io_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 1; }
-	virtual u32 execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
@@ -235,7 +234,7 @@ protected:
 	void init_tables();
 
 	// I/O internal regs
-	void io_common_map(address_map &map);
+	void io_common_map(address_map &map) ATTR_COLD;
 	// TODO: the m_io* stubs are conventionally given for allowing a correct register setup from vanilla 68k.
 	// This is yet another reason about needing a bus device dispatcher for this system.
 	u32 m_io_end;
@@ -272,7 +271,7 @@ public:
 	// construction/destruction
 	jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void execute_run() override;
@@ -289,10 +288,9 @@ public:
 	// construction/destruction
 	jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual u32 execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

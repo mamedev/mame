@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-#ifndef MAME_NETWORK_RTL8029AS_PCI_H
-#define MAME_NETWORK_RTL8029AS_PCI_H
+#ifndef MAME_BUS_PCI_RTL8029AS_PCI_H
+#define MAME_BUS_PCI_RTL8029AS_PCI_H
 
 #pragma once
 
@@ -18,16 +18,16 @@ public:
 protected:
 	rtl8029as_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-//	virtual const tiny_rom_entry *device_rom_region() const override;
+//  virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-//	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-//						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+//  virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+//                         uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	// ...

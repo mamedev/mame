@@ -97,15 +97,15 @@ private:
 	void common_video_start(bool split);
 	void common_video_allocate_ptr();
 
-	void cupsoc_map(address_map &map);
-	void cupsocs_map(address_map &map);
-	void denjinmk_map(address_map &map);
-	void godzilla_map(address_map &map);
-	void grainbow_map(address_map &map);
-	void heatbrl_map(address_map &map);
-	void legionna_cop_map(address_map &map);
-	void legionna_map(address_map &map);
-	void godzilla_sound_io_map(address_map &map);
+	void cupsoc_map(address_map &map) ATTR_COLD;
+	void cupsocs_map(address_map &map) ATTR_COLD;
+	void denjinmk_map(address_map &map) ATTR_COLD;
+	void godzilla_map(address_map &map) ATTR_COLD;
+	void grainbow_map(address_map &map) ATTR_COLD;
+	void heatbrl_map(address_map &map) ATTR_COLD;
+	void legionna_cop_map(address_map &map) ATTR_COLD;
+	void legionna_map(address_map &map) ATTR_COLD;
+	void godzilla_sound_io_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<u16> m_spriteram;
 	optional_shared_ptr<u16> m_swappal;

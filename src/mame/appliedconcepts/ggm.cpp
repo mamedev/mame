@@ -3,12 +3,14 @@
 // thanks-to:bataais, Berger
 /*******************************************************************************
 
-Applied Concepts Great Game Machine (GGM), electronic board game computer.
-2nd source distribution: Modular Game System (MGS), by Chafitz.
+Applied Concepts Great Game Machine (GGM), electronic board game computer,
+in cooperation with Chafitz, who marketed it as Modular Game System (MGS).
+After a legal dispute with Chafitz, all rights went to Applied Concepts.
 
 Hardware notes:
 - 6502A 2MHz, SYP6522 VIA
-- 2KB battery-backed RAM(4*HM472114AP-2 or 1*M58725P), no ROM on main PCB
+- 2KB RAM (1*M58725P battery-backed, or 4*2114 / 2*2114 + 2*2114L of which
+  only the first 1KB is battery-backed), no ROM on main PCB
 - 2*74164 shift register, 3*6118P VFD driver
 - 8-digit 14seg VFD panel (same one as in Speak & Spell)
 - 5*4 keypad(unlabeled by default), 1-bit sound
@@ -93,11 +95,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
 	DECLARE_INPUT_CHANGED_MEMBER(overlay_switch) { update_overlay(); }
-	DECLARE_CUSTOM_INPUT_MEMBER(overlay_r);
+	ioport_value overlay_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -119,7 +121,7 @@ private:
 	bool m_extram_enabled = false;
 	u8 m_overlay = 0;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void update_reset(ioport_value state);
 	void update_overlay();
@@ -188,7 +190,7 @@ void ggm_state::update_reset(ioport_value state)
     Keypad Overlay
 *******************************************************************************/
 
-CUSTOM_INPUT_MEMBER(ggm_state::overlay_r)
+ioport_value ggm_state::overlay_r()
 {
 	u8 data = m_inputs[5]->read() & 0xf;
 	return (data == 0xf) ? m_overlay : data;
@@ -463,7 +465,7 @@ static INPUT_PORTS_START( overlay_lasvegas )
 
 	PORT_MODIFY("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_L) PORT_NAME("Split")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_U) PORT_NAME("Shuffle Point")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_P) PORT_NAME("Shuffle Point")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_A) PORT_NAME("Audio")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_T) PORT_NAME("Total")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
@@ -485,7 +487,7 @@ static INPUT_PORTS_START( overlay_odin )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_U) PORT_NAME("Audio")
 
 	PORT_MODIFY("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_Y) PORT_NAME("Play / -")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_P) PORT_NAME("Play / -")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_W) PORT_NAME("B/W")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_K) PORT_NAME("Rank")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_T) PORT_NAME("Time")
@@ -538,10 +540,10 @@ static INPUT_PORTS_START( ggm )
 	PORT_CONFNAME( 0x01, 0x00, "Version" ) // factory-set
 	PORT_CONFSETTING(    0x00, "GGM (Applied Concepts)" )
 	PORT_CONFSETTING(    0x01, "MGS (Chafitz)" )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, ggm_state, reset_switch, 0) PORT_NAME("Memory Switch")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ggm_state::reset_switch), 0) PORT_NAME("Memory Switch")
 
 	PORT_START("IN.5")
-	PORT_CONFNAME( 0x0f, 0x0f, "Keypad Overlay" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ggm_state, overlay_switch, 0)
+	PORT_CONFNAME( 0x0f, 0x0f, "Keypad Overlay" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ggm_state::overlay_switch), 0)
 	PORT_CONFSETTING(    0x00, "None" )
 	PORT_CONFSETTING(    0x0f, "Auto" ) // get param from softwarelist
 	PORT_CONFSETTING(    0x01, "Boris 2.5" )
@@ -551,7 +553,7 @@ static INPUT_PORTS_START( ggm )
 	PORT_CONFSETTING(    0x03, "Steinitz" )
 
 	PORT_START("IN.6")
-	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(ggm_state, overlay_r)
+	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(ggm_state::overlay_r))
 INPUT_PORTS_END
 
 
@@ -616,4 +618,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, ggm,  0,      0,      ggm,     ggm,   ggm_state, empty_init, "Applied Concepts", "Great Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, ggm,  0,      0,      ggm,     ggm,   ggm_state, empty_init, "Applied Concepts / Chafitz", "Great Game Machine", MACHINE_SUPPORTS_SAVE )

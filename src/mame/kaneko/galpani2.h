@@ -68,8 +68,8 @@ private:
 	void galpani2_oki1_bank_w(uint8_t data);
 	void galpani2_oki2_bank_w(uint8_t data);
 	void subdatabank_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_galpani2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void copybg8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer);
 	void copybg15(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -78,8 +78,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt2);
 	void galpani2_mcu_nmi1();
 	void galpani2_mcu_nmi2();
-	void galpani2_mem1(address_map &map);
-	void galpani2_mem2(address_map &map);
+	void galpani2_mem1(address_map &map) ATTR_COLD;
+	void galpani2_mem2(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_KANEKO_GALPANI2_H

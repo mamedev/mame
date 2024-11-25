@@ -411,8 +411,8 @@ public:
 	void hp9808a(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
@@ -435,11 +435,11 @@ private:
 	[[maybe_unused]] void irq_6(int state);
 	void irq_7(int state);
 
-	void hp_ipc_mem_inner_base(address_map &map);
-	void hp_ipc_mem_inner_9807a(address_map &map);
-	void hp_ipc_mem_outer(address_map &map);
+	void hp_ipc_mem_inner_base(address_map &map) ATTR_COLD;
+	void hp_ipc_mem_inner_9807a(address_map &map) ATTR_COLD;
+	void hp_ipc_mem_outer(address_map &map) ATTR_COLD;
 
-	void hp_ipc_mem_inner_9808a(address_map &map);
+	void hp_ipc_mem_inner_9808a(address_map &map) ATTR_COLD;
 
 	required_device<m68000_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;

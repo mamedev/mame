@@ -75,23 +75,23 @@ public:
 	void mm1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { m_reset = true; }
 
 private:
 	// devices/pointers
 	required_device<cdp1806_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_inputs;
 
 	bool m_reset = false;
 	u8 m_kp_mux = 0;
 
 	// address maps
-	void mirage_map(address_map &map);
-	void mm1_map(address_map &map);
-	void mm1_io(address_map &map);
+	void mirage_map(address_map &map) ATTR_COLD;
+	void mm1_map(address_map &map) ATTR_COLD;
+	void mm1_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
@@ -107,11 +107,6 @@ void mm1_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_reset));
 	save_item(NAME(m_kp_mux));
-}
-
-void mm1_state::machine_reset()
-{
-	m_reset = true;
 }
 
 
@@ -193,7 +188,7 @@ static INPUT_PORTS_START( mm1 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("E / 5 / Rook")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("INFO")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right / White / 0")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("POS")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("POS")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H / 8")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("LEV")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("G / 7 / King")
@@ -232,7 +227,7 @@ static INPUT_PORTS_START( mirage )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H / 8")
 
 	PORT_START("FAKE") // module came with buttons sensorboard by default
-	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mm1_state, mirage_switch_sensor_type, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mm1_state::mirage_switch_sensor_type), 0)
 	PORT_CONFSETTING(    0x00, "Buttons (Mirage)" )
 	PORT_CONFSETTING(    0x01, "Magnets (Modular)" )
 INPUT_PORTS_END
@@ -296,13 +291,13 @@ void mm1_state::mm1(machine_config &config)
 
 ROM_START( mm1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("114", 0x0000, 0x4000, CRC(208b4c43) SHA1(48f891d614fa643f47d099f94aff15a44c2efc07) ) // D27128
-	ROM_LOAD("214", 0x4000, 0x4000, CRC(93734e49) SHA1(9ad6c191074c4122300f059e2ef9cfeff7b81463) ) // "
+	ROM_LOAD("mm1b.bin", 0x0000, 0x8000, CRC(90bf840e) SHA1(cdec6b02c1352b2a00d66964989a17c2b81ec79e) ) // HN613256P
 ROM_END
 
-ROM_START( mm1b )
+ROM_START( mm1a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("mm1b.bin", 0x0000, 0x8000, CRC(90bf840e) SHA1(cdec6b02c1352b2a00d66964989a17c2b81ec79e) ) // HN613256P
+	ROM_LOAD("114", 0x0000, 0x4000, CRC(208b4c43) SHA1(48f891d614fa643f47d099f94aff15a44c2efc07) ) // D27128
+	ROM_LOAD("214", 0x4000, 0x4000, CRC(93734e49) SHA1(9ad6c191074c4122300f059e2ef9cfeff7b81463) ) // "
 ROM_END
 
 
@@ -319,8 +314,8 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT   CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1983, mm1,     0,      0,      mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, mm1b,    mm1,    0,      mm1,    mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1983, mm1,     0,      0,      mm1,     mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, mm1a,    mm1,    0,      mm1,     mm1,    mm1_state, empty_init, "Hegener + Glaser", "Mephisto MM I (ver. A)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1984, mmirage, 0,      0,      mirage, mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, mmirage, 0,      0,      mirage,  mirage, mm1_state, empty_init, "Hegener + Glaser", "Mephisto Mirage", MACHINE_SUPPORTS_SAVE )

@@ -39,7 +39,7 @@ public:
 	void tc2048(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u8 port_ff_r();
 
@@ -52,8 +52,8 @@ protected:
 private:
 	void port_ff_w(offs_t offset, u8 data);
 
-	void tc2048_io(address_map &map);
-	void tc2048_mem(address_map &map);
+	void tc2048_io(address_map &map) ATTR_COLD;
+	void tc2048_mem(address_map &map) ATTR_COLD;
 
 	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 };
@@ -71,8 +71,8 @@ public:
 	void uk2086(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void ts2068_update_memory() override;
 
@@ -93,8 +93,8 @@ private:
 	int m_dock_cart_type = 0, m_ram_chunks = 0;
 	memory_region *m_dock_crt = nullptr;
 
-	void ts2068_io(address_map &map);
-	void ts2068_mem(address_map &map);
+	void ts2068_io(address_map &map) ATTR_COLD;
+	void ts2068_mem(address_map &map) ATTR_COLD;
 
 	required_device<generic_slot_device> m_dock;
 };

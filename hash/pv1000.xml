@@ -19,8 +19,8 @@ Undumped carts:
 		<info name="serial" value="GPA-101"/>
 		<info name="alt_title" value="プーヤン"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="pooyan.bin" size="8192" crc="bd6edc48" sha1="606b7d603da23e70012b361d7ffb53ea026f88f5" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="pooyan.bin" size="0x2000" crc="bd6edc48" sha1="606b7d603da23e70012b361d7ffb53ea026f88f5" />
 			</dataarea>
 		</part>
 	</software>
@@ -32,8 +32,8 @@ Undumped carts:
 		<info name="serial" value="GPA-102"/>
 		<info name="alt_title" value="スーパーコブラ"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="scobra.bin" size="8192" crc="cdffc2cd" sha1="9e748050ccb0fa948b06346d241dfcd11868e8e2" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="scobra.bin" size="0x2000" crc="cdffc2cd" sha1="9e748050ccb0fa948b06346d241dfcd11868e8e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -45,8 +45,8 @@ Undumped carts:
 		<info name="serial" value="GPA-103"/>
 		<info name="alt_title" value="ツターンカーム"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="tutnkham.bin" size="8192" crc="a0b606d8" sha1="56efa2ab7c4a6db7b44714e46c5bf2ba71983ee8" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="tutnkham.bin" size="0x2000" crc="a0b606d8" sha1="56efa2ab7c4a6db7b44714e46c5bf2ba71983ee8" />
 			</dataarea>
 		</part>
 	</software>
@@ -58,8 +58,8 @@ Undumped carts:
 		<info name="serial" value="GPA-104"/>
 		<info name="alt_title" value="アミダー"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="amidar.bin" size="8192" crc="c82628cc" sha1="00322d4025fef19728194442f9e06a4cccd01933" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="amidar.bin" size="0x2000" crc="c82628cc" sha1="00322d4025fef19728194442f9e06a4cccd01933" />
 			</dataarea>
 		</part>
 	</software>
@@ -71,8 +71,8 @@ Undumped carts:
 		<info name="serial" value="GPA-105"/>
 		<info name="alt_title" value="ディグダグ"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="digdug.bin" size="16384" crc="a94f02fa" sha1="502a163c1ae88eccc7e9782261d86d4090cb41e1" offset="0000" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="digdug.bin" size="0x4000" crc="a94f02fa" sha1="502a163c1ae88eccc7e9782261d86d4090cb41e1" />
 			</dataarea>
 		</part>
 	</software>
@@ -84,8 +84,8 @@ Undumped carts:
 		<info name="serial" value="GPA-106"/>
 		<info name="alt_title" value="ワープ&amp;ワープ"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="warpwarp.bin" size="8192" crc="2a0d4ad9" sha1="f9ffca3a1d85b116dd92f118f9ea940bf2449db5" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="warpwarp.bin" size="0x2000" crc="2a0d4ad9" sha1="f9ffca3a1d85b116dd92f118f9ea940bf2449db5" />
 			</dataarea>
 		</part>
 	</software>
@@ -97,8 +97,8 @@ Undumped carts:
 		<info name="serial" value="GPA-107"/>
 		<info name="alt_title" value="ターピン"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="07-turpin.bin" size="8192" crc="a3aef98d" sha1="1f49371b0ebf4fe6c5fb606fd9744f3bb15a619b" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="07-turpin.bin" size="0x2000" crc="a3aef98d" sha1="1f49371b0ebf4fe6c5fb606fd9744f3bb15a619b" />
 			</dataarea>
 		</part>
 	</software>
@@ -110,8 +110,8 @@ Undumped carts:
 		<info name="serial" value="GPA-109"/>
 		<info name="alt_title" value="パチンコUFO"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="pchnkufo.bin" size="16384" crc="9ee981ab" sha1="d6ca45430a34ce0090ba882ade5a2268a862d4f4" offset="0000" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="pchnkufo.bin" size="0x4000" crc="9ee981ab" sha1="d6ca45430a34ce0090ba882ade5a2268a862d4f4" />
 			</dataarea>
 		</part>
 	</software>
@@ -123,8 +123,8 @@ Undumped carts:
 		<info name="serial" value="GPA-110"/>
 		<info name="alt_title" value="ファイティング バグ"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="fightbug.bin" size="8192" crc="84986255" sha1="7202641a387da90323d149e2f327a5c828856556" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="fightbug.bin" size="0x2000" crc="84986255" sha1="7202641a387da90323d149e2f327a5c828856556" />
 			</dataarea>
 		</part>
 	</software>
@@ -136,8 +136,8 @@ Undumped carts:
 		<info name="serial" value="GPA-111"/>
 		<info name="alt_title" value="スペースパニック"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="11-space_panic.bin" size="8192" crc="23547111" sha1="b16dbea89ba9f934a08c274d8bb6cce06da13193" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="11-space_panic.bin" size="0x2000" crc="23547111" sha1="b16dbea89ba9f934a08c274d8bb6cce06da13193" />
 			</dataarea>
 		</part>
 	</software>
@@ -149,8 +149,8 @@ Undumped carts:
 		<info name="serial" value="GPA-112"/>
 		<info name="alt_title" value="ノーティーボーイ"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="naugtboy.bin" size="8192" crc="43a13e99" sha1="a72e8606b8b6c8d10050d6d7b1ff87455b623004" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="naugtboy.bin" size="0x2000" crc="43a13e99" sha1="a72e8606b8b6c8d10050d6d7b1ff87455b623004" />
 			</dataarea>
 		</part>
 	</software>
@@ -162,8 +162,8 @@ Undumped carts:
 		<info name="serial" value="GPA-114"/>
 		<info name="alt_title" value="ダーティー カメレオン"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="dirtychm.bin" size="8192" crc="8e7fb358" sha1="63e94cc01410aefd59b465105e701330dc13c398" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="dirtychm.bin" size="0x2000" crc="8e7fb358" sha1="63e94cc01410aefd59b465105e701330dc13c398" />
 			</dataarea>
 		</part>
 	</software>
@@ -175,8 +175,8 @@ Undumped carts:
 		<info name="serial" value="GPA-115"/>
 		<info name="alt_title" value="エキサイト麻雀"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="excitemj.bin" size="16384" crc="0d2f829c" sha1="6cc9e5d234bc1b483108ae4dc79d644802a64ef0" offset="0000" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="excitemj.bin" size="0x4000" crc="0d2f829c" sha1="6cc9e5d234bc1b483108ae4dc79d644802a64ef0" />
 			</dataarea>
 		</part>
 	</software>

@@ -41,8 +41,8 @@ public:
 	void fb01(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void ym2164_irq_w(int state);
@@ -52,8 +52,8 @@ private:
 	void fb01_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
 
-	void fb01_io(address_map &map);
-	void fb01_mem(address_map &map);
+	void fb01_io(address_map &map) ATTR_COLD;
+	void fb01_mem(address_map &map) ATTR_COLD;
 
 	void update_int();
 
@@ -182,8 +182,8 @@ void fb01_state::fb01(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(fb01_state::fb01_palette), 2);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 250'000)); // TODO: clock not measured, datasheet typical clock used
-	hd44780.set_lcd_size(2, 8);   // 2x8 displayed as 1x16
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // TODO: clock not measured, datasheet typical clock used
+	hd44780.set_lcd_size(2, 8); // 2x8 displayed as 1x16
 	hd44780.set_pixel_update_cb(FUNC(fb01_state::fb01_pixel_update));
 
 	I8251(config, m_upd71051, XTAL(4'000'000));

@@ -57,16 +57,16 @@ private:
 
 	void sound_bankswitch_w(uint8_t data);
 	void priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint16_t boogwing_protection_region_0_104_r(offs_t offset);
-	void boogwing_protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ioprot_r(offs_t offset);
+	void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_callback2);
-	void audio_map(address_map &map);
-	void boogwing_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void boogwing_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 };

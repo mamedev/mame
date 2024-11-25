@@ -54,8 +54,8 @@ private:
 	void unknown_w(u8 data);
 	u8 keyboard_r(offs_t offset);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device_array<z80pio_device, 2> m_pio;

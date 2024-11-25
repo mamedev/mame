@@ -70,8 +70,8 @@ protected:
 
 	required_ioport_array<7> m_kb_lines;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	uint8_t kb_read();
@@ -88,12 +88,12 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 
 	HD44780_PIXEL_UPDATE(lz_pixel_update);
-	void psion_int_reg(address_map &map);
-	void psioncm_mem(address_map &map);
-	void psionla_mem(address_map &map);
-	void psionlam_mem(address_map &map);
-	void psionlz_mem(address_map &map);
-	void psionp350_mem(address_map &map);
+	void psion_int_reg(address_map &map) ATTR_COLD;
+	void psioncm_mem(address_map &map) ATTR_COLD;
+	void psionla_mem(address_map &map) ATTR_COLD;
+	void psionlam_mem(address_map &map) ATTR_COLD;
+	void psionlz_mem(address_map &map) ATTR_COLD;
+	void psionp350_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -107,14 +107,14 @@ public:
 	void psion1(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t reset_kb_counter_r();
 	uint8_t inc_kb_counter_r();
 	uint8_t switchoff_r();
 
 	HD44780_PIXEL_UPDATE(psion1_pixel_update);
-	void psion1_mem(address_map &map);
+	void psion1_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_PSION_PSION_H

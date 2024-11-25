@@ -13,6 +13,8 @@
 #include "ioprocs.h"
 
 #include <cstring>
+#include <tuple>
+
 
 dim_format::dim_format()
 {
@@ -36,9 +38,9 @@ const char *dim_format::extensions() const noexcept
 int dim_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[16];
-
-	size_t actual;
-	io.read_at(0xab, h, 16, actual);
+	auto const [err, actual] = read_at(io, 0xab, h, 16);
+	if(err || (16 != actual))
+		return 0;
 
 	if(strncmp((const char *)h, "DIFC HEADER", 11) == 0)
 		return FIFID_SIGN;
@@ -48,13 +50,16 @@ int dim_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 bool dim_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
+	std::error_condition err;
 	size_t actual;
 	int offset = 0x100;
 	uint8_t h;
 	uint8_t track_total = 77;
 	int cell_count = form_factor == floppy_image::FF_35 ? 200000 : 166666;
 
-	io.read_at(0, &h, 1, actual);
+	std::tie(err, actual) = read_at(io, 0, &h, 1);
+	if (err || (1 != actual))
+		return false;
 
 	int spt, gap3, bps, size;
 	switch(h) {
@@ -114,7 +119,7 @@ bool dim_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[i].deleted     = false;
 				sects[i].bad_crc     = false;
 				sects[i].data        = &sect_data[sdatapos];
-				io.read_at(offset, sects[i].data, bps, actual);
+				std::tie(err, actual) = read_at(io, offset, sects[i].data, bps); // FIXME: check for errors and premature EOF
 				offset += bps;
 				sdatapos += bps;
 			}

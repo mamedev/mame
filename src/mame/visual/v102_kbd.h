@@ -18,13 +18,13 @@ public:
 protected:
 	visual_mcs48_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	u8 p1_r();
 	void p2_w(u8 data);
 	void prog_w(int state);
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	devcb_write_line m_txd_callback;
 	required_device<mcs48_cpu_device> m_kbdc;
@@ -40,9 +40,9 @@ public:
 	v102_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 class v550_keyboard_device : public visual_mcs48_keyboard_device
@@ -51,9 +51,9 @@ public:
 	v550_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(V102_KEYBOARD, v102_keyboard_device)

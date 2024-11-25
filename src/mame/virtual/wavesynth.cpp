@@ -21,7 +21,7 @@ public:
 
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<waveblaster_connector> m_waveblaster;
 };

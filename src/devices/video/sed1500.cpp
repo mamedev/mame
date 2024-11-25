@@ -22,7 +22,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/sed1500.h"
+#include "sed1500.h"
 
 
 DEFINE_DEVICE_TYPE(SED1500, sed1500_device, "sed1500", "Epson SED1500 LCD Driver")

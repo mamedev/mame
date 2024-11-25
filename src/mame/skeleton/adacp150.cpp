@@ -42,7 +42,7 @@ public:
 	void adacp150(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -52,10 +52,10 @@ private:
 	void bcp_ram_w(offs_t offset, u8 data);
 	void output_control_w(u8 data);
 
-	void z80_mem_map(address_map &map);
-	void z80_io_map(address_map &map);
-	void bcp_prog_map(address_map &map);
-	void bcp_data_map(address_map &map);
+	void z80_mem_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
+	void bcp_prog_map(address_map &map) ATTR_COLD;
+	void bcp_data_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<dp8344_device> m_bcp;
@@ -216,7 +216,7 @@ void adacp150_state::adacp150(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(adacp150_state::pixel_update));
 

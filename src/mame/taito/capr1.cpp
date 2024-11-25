@@ -53,7 +53,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	void cspin2(machine_config &config);
-	void cspin2_map(address_map &map);
+	void cspin2_map(address_map &map) ATTR_COLD;
 };
 
 void capr1_state::output_w(u8 data)

@@ -1022,7 +1022,7 @@ static INPUT_PORTS_START( nstocker )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "G1:7" )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(balsente_state, nstocker_bits_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(balsente_state::nstocker_bits_r))
 
 	/* cheese alert -- we have to map this to player 2 so that it doesn't interfere with
 	   the crosshair controls */
@@ -2806,7 +2806,7 @@ ROM_START( triviaes4 )
 	ROM_LOAD( "tpe-57.ic57", 0x08000, 0x4000, CRC(90c8948a) SHA1(4b19bed71889756162dfe226eb531084603cf76f) )
 	ROM_LOAD( "tpe-73.ic73", 0x0c000, 0x4000, CRC(b15bc90b) SHA1(dc84717178a177904eb3ddbeeaae5fc9b19b4a12) )
 
-	ROM_REGION( 0x208, "motherbrd_pals", 0) /* Motherboard PAL's */ \
+	ROM_REGION( 0x208, "motherbrd_pals", 0) /* Motherboard PAL's */
 	ROM_LOAD( "pal16l8a.ic31", 0x000, 0x104, NO_DUMP ) /* PAL16L8 */
 	ROM_LOAD( "pal16l8a.ic51", 0x104, 0x104, NO_DUMP ) /* PAL16L8 */
 ROM_END
@@ -2857,7 +2857,7 @@ ROM_START( triviaes5 )
 	ROM_LOAD( "tpe-57.ic57", 0x08000, 0x4000, CRC(90c8948a) SHA1(4b19bed71889756162dfe226eb531084603cf76f) )
 	ROM_LOAD( "tpe-73.ic73", 0x0c000, 0x4000, CRC(b15bc90b) SHA1(dc84717178a177904eb3ddbeeaae5fc9b19b4a12) )
 
-	ROM_REGION( 0x30c, "motherbrd_pals", 0) /* Motherboard PAL's */ \
+	ROM_REGION( 0x30c, "motherbrd_pals", 0) /* Motherboard PAL's */
 	ROM_LOAD( "pal16l8a-tpe-v.ic31", 0x000, 0x104, NO_DUMP ) /* PAL16L8 */
 	ROM_LOAD( "pal16l8a.ic61",       0x104, 0x104, NO_DUMP ) /* PAL16L8 */
 	ROM_LOAD( "pal16l8a.ic96",       0x208, 0x104, NO_DUMP ) /* PAL16L8 */

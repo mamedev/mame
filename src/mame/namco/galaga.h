@@ -41,7 +41,6 @@ public:
 	{ }
 
 	uint8_t bosco_dsw_r(offs_t offset);
-	void flip_screen_w(int state);
 	void irq1_clear_w(int state);
 	void irq2_clear_w(int state);
 	void nmion_w(int state);
@@ -66,15 +65,15 @@ public:
 	void galaga(machine_config &config);
 	void gatsbee(machine_config &config);
 	void galagab(machine_config &config);
-	void dzigzag_mem4(address_map &map);
-	void galaga_map(address_map &map);
-	void galaga_mem4(address_map &map);
-	void gatsbee_main_map(address_map &map);
+	void dzigzag_mem4(address_map &map) ATTR_COLD;
+	void galaga_map(address_map &map) ATTR_COLD;
+	void galaga_mem4(address_map &map) ATTR_COLD;
+	void gatsbee_main_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	/* memory pointers, devices */
 	optional_shared_ptr<uint8_t> m_videoram;

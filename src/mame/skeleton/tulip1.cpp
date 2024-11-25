@@ -58,7 +58,7 @@ public:
 	void tulip1(machine_config &config);
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 private:
 	required_device<i8086_cpu_device> m_cpu;
@@ -70,8 +70,8 @@ private:
 	required_shared_ptr<uint16_t> m_vram;
 	required_region_ptr<uint8_t> m_chargen;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 };

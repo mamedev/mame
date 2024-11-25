@@ -56,7 +56,7 @@ public:
 	void transfer_byte_from_external_device(uint8_t channel, uint8_t data);
 	void set_iodev_status(uint8_t channel, bool status) { m_iodev_status[channel] = status; }
 
-	void prog_8bit(address_map &map);
+	void prog_8bit(address_map &map) ATTR_COLD;
 protected:
 
 	virtual void execute_run() override;
@@ -107,8 +107,8 @@ protected:
 	address_space *m_program;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }

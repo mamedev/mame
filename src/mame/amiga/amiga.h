@@ -442,8 +442,8 @@ public:
 	TIMER_CALLBACK_MEMBER( blitter_process_callback );
 	void update_irqs();
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
-	DECLARE_CUSTOM_INPUT_MEMBER( floppy_drive_status );
+	template <int P> ioport_value amiga_joystick_convert();
+	ioport_value floppy_drive_status();
 
 	void m68k_reset(int state);
 	void kbreset_w(int state);
@@ -511,11 +511,11 @@ public:
 	void amiga_base(machine_config &config);
 	void pal_video(machine_config &config);
 	void ntsc_video(machine_config &config);
-	void overlay_1mb_map(address_map &map);
-	void overlay_1mb_map32(address_map &map);
-	void overlay_2mb_map16(address_map &map);
-	void overlay_2mb_map32(address_map &map);
-	void overlay_512kb_map(address_map &map);
+	void overlay_1mb_map(address_map &map) ATTR_COLD;
+	void overlay_1mb_map32(address_map &map) ATTR_COLD;
+	void overlay_2mb_map16(address_map &map) ATTR_COLD;
+	void overlay_2mb_map32(address_map &map) ATTR_COLD;
+	void overlay_512kb_map(address_map &map) ATTR_COLD;
 protected:
 	// A bit of a trick here: some registers are 32-bit. In order to efficiently
 	// read them on both big-endian and little-endian systems, we store the custom
@@ -554,8 +554,8 @@ protected:
 	bool IS_AGA() const { return m_denise_id == 0xf8; }
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void custom_chip_reset();
 
@@ -615,9 +615,9 @@ protected:
 	uint16_t m_custom_regs[256]{};
 	static const char *const s_custom_reg_names[0x100];
 
-	void ocs_map(address_map &map);
-	void ecs_map(address_map &map);
-	void aga_map(address_map &map);
+	void ocs_map(address_map &map) ATTR_COLD;
+	void ecs_map(address_map &map) ATTR_COLD;
+	void aga_map(address_map &map) ATTR_COLD;
 
 	// TODO: move to Agnus/Alice
 	u16 vposr_r();

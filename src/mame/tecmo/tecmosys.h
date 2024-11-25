@@ -51,8 +51,8 @@ public:
 	void init_tkdensho();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -116,10 +116,10 @@ private:
 	void do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void descramble();
 
-	void io_map(address_map &map);
-	void main_map(address_map &map);
-	void oki_map(address_map &map);
-	void sound_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TECMO_TECMOSYS_H

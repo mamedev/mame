@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<!--
+
+Cartridge:
+FRONT:                BACK:
++~~~~~~~~~~~~~~~~~+   +~~~~~~~~~~~~~~~~~+
+|                 |   |                 |
+|    +~~~~~~~+    |   |                 |
+|    |TSOP 32|    |   |                 |
+|    +~~~~~~~+    |   |                 |
++~~+20       01+~~+   +~~+21       40+~~+
+   |___________|         |___________|
+
+
+01 | GND        21 | GND
+02 | D01        22 | D02
+03 | D00        23 | D03
+04 | OE         24 | D04
+05 | NC         25 | GND
+06 | A01        26 | D05
+07 | NC         27 | D06
+08 | NC         28 | D07
+09 | VCC        29 | A00
+10 | VCC        30 | A17
+11 | A02        31 | A16
+12 | A03        32 | A15
+13 | A04        33 | A14
+14 | A05        34 | A13
+15 | A06        35 | A12
+16 | CE         36 | A11
+17 | A07        37 | A10
+18 | A08        38 | A09
+19 | A18        39 | WE / NC
+20 | GND        40 | GND
+
+-->
+
+<!--
+
+The following are known to exist
+
+2002 4th Grade: Penta no Daibouken (ぺんたのだいぼうけん)
+2002 5th Grade: Angel Guard (エンジェルガード）
+2003 5th Grade: Sky Kight (スカイナイト)
+Extra: Nihon kaitaku no tabi Game (日本かいたくの旅ゲーム）
+
+-->
+
+<softwarelist name="challenge_gear_cart" description="Benesse Challenge Gear cartridges">
+
+	<software name="6grade" supported="no">
+		<description>Challenge 6-nensei</description>
+		<year>2003</year>
+		<publisher>Benesse Corporation</publisher>
+		<info name="alt_title" value="チャレンジ6年生" />
+		<part name="cart" interface="challenge_gear_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="MS040601.ic1" size="0x80000" crc="487ecb9c" sha1="bc89468aff7f06f1694eed17f15cab46c0d1638e" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

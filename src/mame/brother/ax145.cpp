@@ -269,7 +269,7 @@ void ax145_state::ax145(machine_config &config) {
 
 	PALETTE(config, "palette", FUNC(ax145_state::palette), 2);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: Wrong device type, should be HD44780-B02 custom character set mask; clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: Wrong device type, should be HD44780-B02 custom character set mask; clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 40);
 }
 

@@ -43,7 +43,7 @@ private:
 	uint8_t keyboard_r();
 	void duart_out_w(uint8_t data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainnmi;

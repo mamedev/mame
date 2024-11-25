@@ -103,9 +103,9 @@ public:
 	void ginganin(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -141,12 +141,10 @@ private:
 	TILE_GET_INFO_MEMBER(get_txt_tile_info);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /**************************************************************************
 
@@ -414,8 +412,6 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	return 0;
 }
 
-
-// machine
 
 void ginganin_state::main_map(address_map &map)
 {

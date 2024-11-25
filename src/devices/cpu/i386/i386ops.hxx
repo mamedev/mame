@@ -1278,7 +1278,7 @@ void i386_device::i386_repeat(int invert_flag)
 			count = --REG32(ECX);
 		else
 			count = --REG16(CX);
-		if (m_cycles <= 0)
+		if (count && (m_cycles <= 0))
 			goto outofcycles;
 	}
 	while( count && (!flag || (invert_flag ? !*flag : *flag)) );
@@ -2493,7 +2493,7 @@ void i386_device::i386_clts()              // Opcode 0x0f 0x06
 	// Privileged instruction, CPL must be zero.  Can be used in real or v86 mode.
 	if(PROTECTED_MODE && m_CPL != 0)
 		FAULT(FAULT_GP,0)
-	m_cr[0] &= ~0x08;   /* clear TS bit */
+	m_cr[0] &= ~CR0_TS;   /* clear TS bit */
 	CYCLES(CYCLES_CLTS);
 }
 

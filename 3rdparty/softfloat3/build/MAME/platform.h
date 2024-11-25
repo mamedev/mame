@@ -33,7 +33,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
-
+#
 /*----------------------------------------------------------------------------
 Softfloat 3 MAME modifications
 *----------------------------------------------------------------------------*/
@@ -45,11 +45,7 @@ Softfloat 3 MAME modifications
 
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
-#ifdef __GNUC_STDC_INLINE__
-#define INLINE inline
-#else
-#define INLINE extern inline
-#endif
+#define INLINE static inline
 
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
@@ -78,4 +74,4 @@ Softfloat 3 MAME modifications
 
 #endif // defined(_MSC_VER)
 
-#include "opts-GCC.h"
+#include "../../source/include/opts-GCC.h"

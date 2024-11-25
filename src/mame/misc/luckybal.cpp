@@ -306,8 +306,8 @@ public:
 	void init_luckybald();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void csio_cks_w(int state);
@@ -334,8 +334,8 @@ private:
 	required_device_array<cd4099_device, 3> m_latch;
 	required_ioport_array<6> m_keymx;
 
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	output_finder<38> m_lamps;
 };

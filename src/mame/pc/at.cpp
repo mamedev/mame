@@ -193,16 +193,16 @@ protected:
 	static void cfg_single_1200K(device_t *device);
 	static void cfg_single_1440K(device_t *device);
 	static void cfg_dual_1440K(device_t *device);
-	void at16_io(address_map &map);
-	void at16_map(address_map &map);
-	void at16l_map(address_map &map);
-	void at32_io(address_map &map);
-	void at32_map(address_map &map);
-	void at32l_map(address_map &map);
-	void ficpio_io(address_map &map);
-	void ficpio_map(address_map &map);
-	void neat_io(address_map &map);
-	void ps1_16_io(address_map &map);
+	void at16_io(address_map &map) ATTR_COLD;
+	void at16_map(address_map &map) ATTR_COLD;
+	void at16l_map(address_map &map) ATTR_COLD;
+	void at32_io(address_map &map) ATTR_COLD;
+	void at32_map(address_map &map) ATTR_COLD;
+	void at32l_map(address_map &map) ATTR_COLD;
+	void ficpio_io(address_map &map) ATTR_COLD;
+	void ficpio_map(address_map &map) ATTR_COLD;
+	void neat_io(address_map &map) ATTR_COLD;
+	void ps1_16_io(address_map &map) ATTR_COLD;
 };
 
 class at_vrom_fix_state : public at_state
@@ -216,7 +216,7 @@ public:
 	void megapcpla(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 class megapc_state : public driver_device
@@ -249,10 +249,10 @@ private:
 	void wd7600_hold(int state);
 	void wd7600_tc(offs_t offset, uint8_t data) { m_isabus->eop_w(offset, data); }
 	void wd7600_spkr(int state) { m_speaker->level_w(state); }
-	void megapc_io(address_map &map);
-	void megapc_map(address_map &map);
-	void megapcpl_io(address_map &map);
-	void megapcpl_map(address_map &map);
+	void megapc_io(address_map &map) ATTR_COLD;
+	void megapc_map(address_map &map) ATTR_COLD;
+	void megapcpl_io(address_map &map) ATTR_COLD;
+	void megapcpl_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -2798,7 +2798,7 @@ ROM_START( prolite286 ) // Initialises graphics card, then dies
 	ROM_LOAD16_BYTE( "caf_prolite_odd.bin", 0x10001, 0x8000, CRC(7c2f6f9f) SHA1(6e72f1458308e521e5715cedb83f40ebe0cc4ad7))
 ROM_END
 
-// AEG Olympia Olyport 40-21 aka Zenith SuperSport - CPU: AMD N80L286-12/8 - Chipset: Chips P82C2185, P82C211C, P82C206 F-1, P82C212B, P82C604, WD37C65BFM, Hitachi HD6305VOP
+// AEG Olympia Olyport 40-21 aka Zenith SuperSport - CPU: AMD N80L286-12/8 - Chipset: Chips P82C2185, P82C211C, P82C206 F-1, P82C212B, P82C604, WD37C65BFM, Hitachi HD6305V0P
 // OSC: 22.500, 24.000 - Video: CGA, LCD with 16 grey intensities - Connectors: CRT, Ext. Bus, RS232C, Printer, Ext.FDD - Mass storage: FDD 1.44MB, HD: Conner CP-323 (IDE with detached controller PCB)
 ROM_START( olyport40 ) // "+++ ERROR: Fatal Slushware RAM Error +++" / "--- Fatal Error: Cannot Continue! ---" - slushware is a ROM shadowing concept cropping up in Zenith brochures
 	ROM_REGION16_LE(0x20000, "bios", 0)
@@ -3839,6 +3839,15 @@ ROM_START( opti495xlc )
 	// 3: BIOS: AMI; 08/08/93; AA2740000 - hangs
 	ROM_SYSTEM_BIOS(3, "mao13", "MAO13 Rev. A")
 	ROMX_LOAD( "3opm002.bin", 0x10000, 0x10000, CRC(2d9dcbd1) SHA1(d8b0d1411b09767e10e66b455ebc74295bd1b896), ROM_BIOS(3) )
+ROM_END
+
+// Tandy 4000
+
+ROM_START( t4000 )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "v010301", "01.03.01")
+	ROMX_LOAD( "t4000_even.u32", 0x18000, 0x4000, CRC(f728ae11) SHA1(3bc151b8d704dde7c340a66072c1a418b7eab7db), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "t4000_odd.u25",  0x18001, 0x4000, CRC(6bedcf61) SHA1(df08347f163d6e45bdf9e1b64a811222bffba80a), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 
@@ -5963,6 +5972,7 @@ COMP( 199?, op82c381,  ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 199?, op82c391,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "386 motherboards using the OPTi 82C391 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, opti495slc,ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards using a OPTi 82C495SLC chipset", MACHINE_NOT_WORKING )
 COMP( 199?, opti495xlc,ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards using a OPTi 82C495XLC chipset", MACHINE_NOT_WORKING )
+COMP( 1987, t4000,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "Tandy Radio Shack", "Tandy 4000", MACHINE_NOT_WORKING )
 COMP( 199?, op386wb,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "OPTi", "OPTi 386WB VER.1.0", MACHINE_NOT_WORKING )
 COMP( 199?, p386dx40,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Peacock", "P386DX-40", MACHINE_NOT_WORKING )
 COMP( 1989, pc2386,    ibm5170, 0,       at386l,    0,     at_state,     init_at,        "Amstrad plc", "PC2386", MACHINE_NOT_WORKING )

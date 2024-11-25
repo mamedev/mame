@@ -134,8 +134,8 @@ void memory_array::write8_to_32le(int index, u32 data) { reinterpret_cast<u8 *>(
 u32 memory_array::read8_from_32be(int index) const { return reinterpret_cast<u8 *>(m_base)[BYTE4_XOR_BE(index)]; }
 void memory_array::write8_to_32be(int index, u32 data) { reinterpret_cast<u8 *>(m_base)[BYTE4_XOR_BE(index)] = data; }
 
-u32 memory_array::read8_from_64le(int index) const { return reinterpret_cast<u8 *>(m_base)[BYTE8_XOR_BE(index)]; }
-void memory_array::write8_to_64le(int index, u32 data) { reinterpret_cast<u8 *>(m_base)[BYTE8_XOR_BE(index)] = data; }
+u32 memory_array::read8_from_64le(int index) const { return reinterpret_cast<u8 *>(m_base)[BYTE8_XOR_LE(index)]; }
+void memory_array::write8_to_64le(int index, u32 data) { reinterpret_cast<u8 *>(m_base)[BYTE8_XOR_LE(index)] = data; }
 u32 memory_array::read8_from_64be(int index) const { return reinterpret_cast<u8 *>(m_base)[BYTE8_XOR_BE(index)]; }
 void memory_array::write8_to_64be(int index, u32 data) { reinterpret_cast<u8 *>(m_base)[BYTE8_XOR_BE(index)] = data; }
 

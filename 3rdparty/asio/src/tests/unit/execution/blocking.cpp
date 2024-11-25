@@ -2,7 +2,7 @@
 // blocking.cpp
 // ~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -35,12 +35,12 @@ struct ex_nq_nr
   {
   }
 
-  friend bool operator==(const ex_nq_nr&, const ex_nq_nr&) ASIO_NOEXCEPT
+  friend bool operator==(const ex_nq_nr&, const ex_nq_nr&) noexcept
   {
     return true;
   }
 
-  friend bool operator!=(const ex_nq_nr&, const ex_nq_nr&) ASIO_NOEXCEPT
+  friend bool operator!=(const ex_nq_nr&, const ex_nq_nr&) noexcept
   {
     return false;
   }
@@ -64,7 +64,7 @@ struct is_executor<ex_nq_nr> : asio::true_type
 template <typename ResultType, typename ParamType, typename Result>
 struct ex_cq_nr
 {
-  static ASIO_CONSTEXPR ResultType query(ParamType) ASIO_NOEXCEPT
+  static constexpr ResultType query(ParamType) noexcept
   {
     return Result();
   }
@@ -74,12 +74,12 @@ struct ex_cq_nr
   {
   }
 
-  friend bool operator==(const ex_cq_nr&, const ex_cq_nr&) ASIO_NOEXCEPT
+  friend bool operator==(const ex_cq_nr&, const ex_cq_nr&) noexcept
   {
     return true;
   }
 
-  friend bool operator!=(const ex_cq_nr&, const ex_cq_nr&) ASIO_NOEXCEPT
+  friend bool operator!=(const ex_cq_nr&, const ex_cq_nr&) noexcept
   {
     return false;
   }
@@ -114,12 +114,12 @@ struct query_static_constexpr_member<
     asio::is_convertible<Param, ParamType>::value
   >::type>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = true);
+  static constexpr bool is_valid = true;
+  static constexpr bool is_noexcept = true;
 
   typedef Result result_type; // Must return raw result type.
 
-  static ASIO_CONSTEXPR result_type value()
+  static constexpr result_type value()
   {
     return Result();
   }
@@ -133,7 +133,7 @@ struct query_static_constexpr_member<
 template <typename ResultType, typename ParamType, typename Result>
 struct ex_mq_nr
 {
-  ResultType query(ParamType) const ASIO_NOEXCEPT
+  ResultType query(ParamType) const noexcept
   {
     return Result();
   }
@@ -143,12 +143,12 @@ struct ex_mq_nr
   {
   }
 
-  friend bool operator==(const ex_mq_nr&, const ex_mq_nr&) ASIO_NOEXCEPT
+  friend bool operator==(const ex_mq_nr&, const ex_mq_nr&) noexcept
   {
     return true;
   }
 
-  friend bool operator!=(const ex_mq_nr&, const ex_mq_nr&) ASIO_NOEXCEPT
+  friend bool operator!=(const ex_mq_nr&, const ex_mq_nr&) noexcept
   {
     return false;
   }
@@ -183,8 +183,8 @@ struct query_member<
     asio::is_convertible<Param, ParamType>::value
   >::type>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = true);
+  static constexpr bool is_valid = true;
+  static constexpr bool is_noexcept = true;
 
   typedef ResultType result_type;
 };
@@ -197,7 +197,7 @@ struct query_member<
 template <typename ResultType, typename ParamType, typename Result>
 struct ex_fq_nr
 {
-  friend ResultType query(const ex_fq_nr&, ParamType) ASIO_NOEXCEPT
+  friend ResultType query(const ex_fq_nr&, ParamType) noexcept
   {
     return Result();
   }
@@ -207,12 +207,12 @@ struct ex_fq_nr
   {
   }
 
-  friend bool operator==(const ex_fq_nr&, const ex_fq_nr&) ASIO_NOEXCEPT
+  friend bool operator==(const ex_fq_nr&, const ex_fq_nr&) noexcept
   {
     return true;
   }
 
-  friend bool operator!=(const ex_fq_nr&, const ex_fq_nr&) ASIO_NOEXCEPT
+  friend bool operator!=(const ex_fq_nr&, const ex_fq_nr&) noexcept
   {
     return false;
   }
@@ -247,8 +247,8 @@ struct query_free<
     asio::is_convertible<Param, ParamType>::value
   >::type>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = true);
+  static constexpr bool is_valid = true;
+  static constexpr bool is_noexcept = true;
 
   typedef ResultType result_type;
 };
@@ -261,24 +261,24 @@ struct query_free<
 template <typename CurrentType, typename OtherType>
 struct ex_mq_mr
 {
-  CurrentType query(CurrentType) const ASIO_NOEXCEPT
+  CurrentType query(CurrentType) const noexcept
   {
     return CurrentType();
   }
 
-  CurrentType query(OtherType) const ASIO_NOEXCEPT
+  CurrentType query(OtherType) const noexcept
   {
     return CurrentType();
   }
 
   ex_mq_mr<CurrentType, OtherType> require(
-      CurrentType) const ASIO_NOEXCEPT
+      CurrentType) const noexcept
   {
     return ex_mq_mr<CurrentType, OtherType>();
   }
 
   ex_mq_mr<OtherType, CurrentType> require(
-      OtherType) const ASIO_NOEXCEPT
+      OtherType) const noexcept
   {
     return ex_mq_mr<OtherType, CurrentType>();
   }
@@ -288,12 +288,12 @@ struct ex_mq_mr
   {
   }
 
-  friend bool operator==(const ex_mq_mr&, const ex_mq_mr&) ASIO_NOEXCEPT
+  friend bool operator==(const ex_mq_mr&, const ex_mq_mr&) noexcept
   {
     return true;
   }
 
-  friend bool operator!=(const ex_mq_mr&, const ex_mq_mr&) ASIO_NOEXCEPT
+  friend bool operator!=(const ex_mq_mr&, const ex_mq_mr&) noexcept
   {
     return false;
   }
@@ -302,13 +302,13 @@ struct ex_mq_mr
 template <typename CurrentType>
 struct ex_mq_mr<CurrentType, CurrentType>
 {
-  CurrentType query(CurrentType) const ASIO_NOEXCEPT
+  CurrentType query(CurrentType) const noexcept
   {
     return CurrentType();
   }
 
   ex_mq_mr<CurrentType, CurrentType> require(
-      CurrentType) const ASIO_NOEXCEPT
+      CurrentType) const noexcept
   {
     return ex_mq_mr<CurrentType, CurrentType>();
   }
@@ -318,12 +318,12 @@ struct ex_mq_mr<CurrentType, CurrentType>
   {
   }
 
-  friend bool operator==(const ex_mq_mr&, const ex_mq_mr&) ASIO_NOEXCEPT
+  friend bool operator==(const ex_mq_mr&, const ex_mq_mr&) noexcept
   {
     return true;
   }
 
-  friend bool operator!=(const ex_mq_mr&, const ex_mq_mr&) ASIO_NOEXCEPT
+  friend bool operator!=(const ex_mq_mr&, const ex_mq_mr&) noexcept
   {
     return false;
   }
@@ -358,8 +358,8 @@ struct query_member<
       || asio::is_convertible<Param, OtherType>::value
   >::type>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = true);
+  static constexpr bool is_valid = true;
+  static constexpr bool is_noexcept = true;
 
   typedef CurrentType result_type;
 };
@@ -375,8 +375,8 @@ struct require_member<
     asio::is_convertible<Param, CurrentType>::value
   >::type>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = true);
+  static constexpr bool is_valid = true;
+  static constexpr bool is_noexcept = true;
 
   typedef ex_mq_mr<CurrentType, OtherType> result_type;
 };
@@ -389,8 +389,8 @@ struct require_member<
       && !asio::is_same<CurrentType, OtherType>::value
   >::type>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = true);
+  static constexpr bool is_valid = true;
+  static constexpr bool is_noexcept = true;
 
   typedef ex_mq_mr<OtherType, CurrentType> result_type;
 };
@@ -403,36 +403,36 @@ struct require_member<
 template <typename CurrentType, typename OtherType>
 struct ex_fq_fr
 {
-  friend CurrentType query(const ex_fq_fr&, CurrentType) ASIO_NOEXCEPT
+  friend CurrentType query(const ex_fq_fr&, CurrentType) noexcept
   {
     return CurrentType();
   }
 
-  friend CurrentType query(const ex_fq_fr&, OtherType) ASIO_NOEXCEPT
+  friend CurrentType query(const ex_fq_fr&, OtherType) noexcept
   {
     return CurrentType();
   }
 
   friend ex_fq_fr<CurrentType, OtherType> require(
-      const ex_fq_fr&, CurrentType) ASIO_NOEXCEPT
+      const ex_fq_fr&, CurrentType) noexcept
   {
     return ex_fq_fr<CurrentType, OtherType>();
   }
 
   friend ex_fq_fr<OtherType, CurrentType> require(
-      const ex_fq_fr&, OtherType) ASIO_NOEXCEPT
+      const ex_fq_fr&, OtherType) noexcept
   {
     return ex_fq_fr<OtherType, CurrentType>();
   }
 
   friend ex_fq_fr<CurrentType, OtherType> prefer(
-      const ex_fq_fr&, CurrentType) ASIO_NOEXCEPT
+      const ex_fq_fr&, CurrentType) noexcept
   {
     return ex_fq_fr<CurrentType, OtherType>();
   }
 
   friend ex_fq_fr<OtherType, CurrentType> prefer(
-      const ex_fq_fr&, OtherType) ASIO_NOEXCEPT
+      const ex_fq_fr&, OtherType) noexcept
   {
     return ex_fq_fr<OtherType, CurrentType>();
   }
@@ -442,12 +442,12 @@ struct ex_fq_fr
   {
   }
 
-  friend bool operator==(const ex_fq_fr&, const ex_fq_fr&) ASIO_NOEXCEPT
+  friend bool operator==(const ex_fq_fr&, const ex_fq_fr&) noexcept
   {
     return true;
   }
 
-  friend bool operator!=(const ex_fq_fr&, const ex_fq_fr&) ASIO_NOEXCEPT
+  friend bool operator!=(const ex_fq_fr&, const ex_fq_fr&) noexcept
   {
     return false;
   }
@@ -456,19 +456,19 @@ struct ex_fq_fr
 template <typename CurrentType>
 struct ex_fq_fr<CurrentType, CurrentType>
 {
-  friend CurrentType query(const ex_fq_fr&, CurrentType) ASIO_NOEXCEPT
+  friend CurrentType query(const ex_fq_fr&, CurrentType) noexcept
   {
     return CurrentType();
   }
 
   friend ex_fq_fr<CurrentType, CurrentType> require(
-      const ex_fq_fr&, CurrentType) ASIO_NOEXCEPT
+      const ex_fq_fr&, CurrentType) noexcept
   {
     return ex_fq_fr<CurrentType, CurrentType>();
   }
 
   friend ex_fq_fr<CurrentType, CurrentType> prefer(
-      const ex_fq_fr&, CurrentType) ASIO_NOEXCEPT
+      const ex_fq_fr&, CurrentType) noexcept
   {
     return ex_fq_fr<CurrentType, CurrentType>();
   }
@@ -478,12 +478,12 @@ struct ex_fq_fr<CurrentType, CurrentType>
   {
   }
 
-  friend bool operator==(const ex_fq_fr&, const ex_fq_fr&) ASIO_NOEXCEPT
+  friend bool operator==(const ex_fq_fr&, const ex_fq_fr&) noexcept
   {
     return true;
   }
 
-  friend bool operator!=(const ex_fq_fr&, const ex_fq_fr&) ASIO_NOEXCEPT
+  friend bool operator!=(const ex_fq_fr&, const ex_fq_fr&) noexcept
   {
     return false;
   }
@@ -518,8 +518,8 @@ struct query_free<
       || asio::is_convertible<Param, OtherType>::value
   >::type>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = true);
+  static constexpr bool is_valid = true;
+  static constexpr bool is_noexcept = true;
 
   typedef CurrentType result_type;
 };
@@ -535,8 +535,8 @@ struct require_free<
     asio::is_convertible<Param, CurrentType>::value
   >::type>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = true);
+  static constexpr bool is_valid = true;
+  static constexpr bool is_noexcept = true;
 
   typedef ex_fq_fr<CurrentType, OtherType> result_type;
 };
@@ -549,8 +549,8 @@ struct require_free<
       && !asio::is_same<CurrentType, OtherType>::value
   >::type>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = true);
+  static constexpr bool is_valid = true;
+  static constexpr bool is_noexcept = true;
 
   typedef ex_fq_fr<OtherType, CurrentType> result_type;
 };
@@ -566,8 +566,8 @@ struct prefer_free<
     asio::is_convertible<Param, CurrentType>::value
   >::type>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = true);
+  static constexpr bool is_valid = true;
+  static constexpr bool is_noexcept = true;
 
   typedef ex_fq_fr<CurrentType, OtherType> result_type;
 };
@@ -580,8 +580,8 @@ struct prefer_free<
       && !asio::is_same<CurrentType, OtherType>::value
   >::type>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = true);
+  static constexpr bool is_valid = true;
+  static constexpr bool is_noexcept = true;
 
   typedef ex_fq_fr<OtherType, CurrentType> result_type;
 };
@@ -594,19 +594,19 @@ struct prefer_free<
 template <typename Executor, typename Param, bool ExpectedResult>
 void test_can_query()
 {
-  ASIO_CONSTEXPR bool b1 =
+  constexpr bool b1 =
     asio::can_query<Executor, Param>::value;
   ASIO_CHECK(b1 == ExpectedResult);
 
-  ASIO_CONSTEXPR bool b2 =
+  constexpr bool b2 =
     asio::can_query<const Executor, Param>::value;
   ASIO_CHECK(b2 == ExpectedResult);
 
-  ASIO_CONSTEXPR bool b3 =
+  constexpr bool b3 =
     asio::can_query<Executor&, Param>::value;
   ASIO_CHECK(b3 == ExpectedResult);
 
-  ASIO_CONSTEXPR bool b4 =
+  constexpr bool b4 =
     asio::can_query<const Executor&, Param>::value;
   ASIO_CHECK(b4 == ExpectedResult);
 }
@@ -629,29 +629,27 @@ void test_query()
 template <typename Executor, typename Param, typename ExpectedResult>
 void test_constexpr_query()
 {
-#if defined(ASIO_HAS_CONSTEXPR)
   constexpr Executor ex1 = {};
   constexpr exec::blocking_t result1 = asio::query(ex1, Param());
   ASIO_CHECK(result1 == ExpectedResult());
-#endif // defined(ASIO_HAS_CONSTEXPR)
 }
 
 template <typename Executor, typename Param, bool ExpectedResult>
 void test_can_require()
 {
-  ASIO_CONSTEXPR bool b1 =
+  constexpr bool b1 =
     asio::can_require<Executor, Param>::value;
   ASIO_CHECK(b1 == ExpectedResult);
 
-  ASIO_CONSTEXPR bool b2 =
+  constexpr bool b2 =
     asio::can_require<const Executor, Param>::value;
   ASIO_CHECK(b2 == ExpectedResult);
 
-  ASIO_CONSTEXPR bool b3 =
+  constexpr bool b3 =
     asio::can_require<Executor&, Param>::value;
   ASIO_CHECK(b3 == ExpectedResult);
 
-  ASIO_CONSTEXPR bool b4 =
+  constexpr bool b4 =
     asio::can_require<const Executor&, Param>::value;
   ASIO_CHECK(b4 == ExpectedResult);
 }
@@ -680,19 +678,19 @@ void test_require()
 template <typename Executor, typename Param, bool ExpectedResult>
 void test_can_prefer()
 {
-  ASIO_CONSTEXPR bool b1 =
+  constexpr bool b1 =
     asio::can_prefer<Executor, Param>::value;
   ASIO_CHECK(b1 == ExpectedResult);
 
-  ASIO_CONSTEXPR bool b2 =
+  constexpr bool b2 =
     asio::can_prefer<const Executor, Param>::value;
   ASIO_CHECK(b2 == ExpectedResult);
 
-  ASIO_CONSTEXPR bool b3 =
+  constexpr bool b3 =
     asio::can_prefer<Executor&, Param>::value;
   ASIO_CHECK(b3 == ExpectedResult);
 
-  ASIO_CONSTEXPR bool b4 =
+  constexpr bool b4 =
     asio::can_prefer<const Executor&, Param>::value;
   ASIO_CHECK(b4 == ExpectedResult);
 }
@@ -721,9 +719,18 @@ void test_prefer()
 void test_vars()
 {
   ASIO_CHECK(s() == exec::blocking);
+  ASIO_CHECK(s() != exec::blocking.possibly);
+  ASIO_CHECK(s() != exec::blocking.always);
+  ASIO_CHECK(s() != exec::blocking.never);
   ASIO_CHECK(n1() == exec::blocking.possibly);
+  ASIO_CHECK(n1() != exec::blocking.always);
+  ASIO_CHECK(n1() != exec::blocking.never);
   ASIO_CHECK(n2() == exec::blocking.always);
+  ASIO_CHECK(n2() != exec::blocking.possibly);
+  ASIO_CHECK(n2() != exec::blocking.never);
   ASIO_CHECK(n3() == exec::blocking.never);
+  ASIO_CHECK(n3() != exec::blocking.possibly);
+  ASIO_CHECK(n3() != exec::blocking.always);
 }
 
 ASIO_TEST_SUITE

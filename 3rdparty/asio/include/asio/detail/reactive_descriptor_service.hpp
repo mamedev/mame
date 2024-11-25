@@ -2,7 +2,7 @@
 // detail/reactive_descriptor_service.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,9 +19,11 @@
 
 #if !defined(ASIO_WINDOWS) \
   && !defined(ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(__CYGWIN__) \
+  && !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 
 #include "asio/associated_cancellation_slot.hpp"
+#include "asio/associated_immediate_executor.hpp"
 #include "asio/buffer.hpp"
 #include "asio/cancellation_type.hpp"
 #include "asio/execution_context.hpp"
@@ -87,7 +89,7 @@ public:
 
   // Move-construct a new descriptor implementation.
   ASIO_DECL void move_construct(implementation_type& impl,
-      implementation_type& other_impl) ASIO_NOEXCEPT;
+      implementation_type& other_impl) noexcept;
 
   // Move-assign from another descriptor implementation.
   ASIO_DECL void move_assign(implementation_type& impl,
@@ -121,6 +123,14 @@ public:
   // Release ownership of the native descriptor representation.
   ASIO_DECL native_handle_type release(implementation_type& impl);
 
+  // Release ownership of the native descriptor representation.
+  native_handle_type release(implementation_type& impl,
+      asio::error_code& ec)
+  {
+    ec = success_ec_;
+    return release(impl);
+  }
+
   // Cancel all operations associated with the descriptor.
   ASIO_DECL asio::error_code cancel(implementation_type& impl,
       asio::error_code& ec);
@@ -132,6 +142,7 @@ public:
   {
     descriptor_ops::ioctl(impl.descriptor_, impl.state_,
         command.name(), static_cast<ioctl_arg_type*>(command.data()), ec);
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -147,6 +158,7 @@ public:
   {
     descriptor_ops::set_user_non_blocking(
         impl.descriptor_, impl.state_, mode, ec);
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -186,6 +198,7 @@ public:
       break;
     }
 
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -199,7 +212,7 @@ public:
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -215,19 +228,20 @@ public:
     switch (w)
     {
     case posix::descriptor_base::wait_read:
-        op_type = reactor::read_op;
-        break;
+      op_type = reactor::read_op;
+      break;
     case posix::descriptor_base::wait_write:
-        op_type = reactor::write_op;
-        break;
+      op_type = reactor::write_op;
+      break;
     case posix::descriptor_base::wait_error:
-        op_type = reactor::except_op;
-        break;
-      default:
-        p.p->ec_ = asio::error::invalid_argument;
-        reactor_.post_immediate_completion(p.p, is_continuation);
-        p.v = p.p = 0;
-        return;
+      op_type = reactor::except_op;
+      break;
+    default:
+      p.p->ec_ = asio::error::invalid_argument;
+      start_op(impl, reactor::read_op, p.p,
+          is_continuation, false, true, &io_ex, 0);
+      p.v = p.p = 0;
+      return;
     }
 
     // Optionally register for per-operation cancellation.
@@ -238,7 +252,7 @@ public:
             &reactor_, &impl.reactor_data_, impl.descriptor_, op_type);
     }
 
-    start_op(impl, op_type, p.p, is_continuation, false, false);
+    start_op(impl, op_type, p.p, is_continuation, false, false, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -250,9 +264,10 @@ public:
     typedef buffer_sequence_adapter<asio::const_buffer,
         ConstBufferSequence> bufs_type;
 
+    size_t n;
     if (bufs_type::is_single_buffer)
     {
-      return descriptor_ops::sync_write1(impl.descriptor_,
+      n = descriptor_ops::sync_write1(impl.descriptor_,
           impl.state_, bufs_type::first(buffers).data(),
           bufs_type::first(buffers).size(), ec);
     }
@@ -260,9 +275,12 @@ public:
     {
       bufs_type bufs(buffers);
 
-      return descriptor_ops::sync_write(impl.descriptor_, impl.state_,
+      n = descriptor_ops::sync_write(impl.descriptor_, impl.state_,
           bufs.buffers(), bufs.count(), bufs.all_empty(), ec);
     }
+
+    ASIO_ERROR_LOCATION(ec);
+    return n;
   }
 
   // Wait until data can be written without blocking.
@@ -271,7 +289,7 @@ public:
   {
     // Wait for descriptor to become ready.
     descriptor_ops::poll_write(impl.descriptor_, impl.state_, ec);
-
+    ASIO_ERROR_LOCATION(ec);
     return 0;
   }
 
@@ -285,7 +303,7 @@ public:
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -308,7 +326,7 @@ public:
 
     start_op(impl, reactor::write_op, p.p, is_continuation, true,
         buffer_sequence_adapter<asio::const_buffer,
-          ConstBufferSequence>::all_empty(buffers));
+          ConstBufferSequence>::all_empty(buffers), &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -320,7 +338,7 @@ public:
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -341,7 +359,8 @@ public:
     ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "descriptor",
           &impl, impl.descriptor_, "async_write_some(null_buffers)"));
 
-    start_op(impl, reactor::write_op, p.p, is_continuation, false, false);
+    start_op(impl, reactor::write_op, p.p,
+        is_continuation, false, false, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -353,9 +372,10 @@ public:
     typedef buffer_sequence_adapter<asio::mutable_buffer,
         MutableBufferSequence> bufs_type;
 
+    size_t n;
     if (bufs_type::is_single_buffer)
     {
-      return descriptor_ops::sync_read1(impl.descriptor_,
+      n = descriptor_ops::sync_read1(impl.descriptor_,
           impl.state_, bufs_type::first(buffers).data(),
           bufs_type::first(buffers).size(), ec);
     }
@@ -363,9 +383,12 @@ public:
     {
       bufs_type bufs(buffers);
 
-      return descriptor_ops::sync_read(impl.descriptor_, impl.state_,
+      n = descriptor_ops::sync_read(impl.descriptor_, impl.state_,
           bufs.buffers(), bufs.count(), bufs.all_empty(), ec);
     }
+
+    ASIO_ERROR_LOCATION(ec);
+    return n;
   }
 
   // Wait until data can be read without blocking.
@@ -374,7 +397,7 @@ public:
   {
     // Wait for descriptor to become ready.
     descriptor_ops::poll_read(impl.descriptor_, impl.state_, ec);
-
+    ASIO_ERROR_LOCATION(ec);
     return 0;
   }
 
@@ -389,7 +412,7 @@ public:
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -412,7 +435,7 @@ public:
 
     start_op(impl, reactor::read_op, p.p, is_continuation, true,
         buffer_sequence_adapter<asio::mutable_buffer,
-          MutableBufferSequence>::all_empty(buffers));
+          MutableBufferSequence>::all_empty(buffers), &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -424,7 +447,7 @@ public:
     bool is_continuation =
       asio_handler_cont_helpers::is_continuation(handler);
 
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -445,14 +468,47 @@ public:
     ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "descriptor",
           &impl, impl.descriptor_, "async_read_some(null_buffers)"));
 
-    start_op(impl, reactor::read_op, p.p, is_continuation, false, false);
+    start_op(impl, reactor::read_op, p.p,
+        is_continuation, false, false, &io_ex, 0);
     p.v = p.p = 0;
   }
 
 private:
   // Start the asynchronous operation.
-  ASIO_DECL void start_op(implementation_type& impl, int op_type,
-      reactor_op* op, bool is_continuation, bool is_non_blocking, bool noop);
+  ASIO_DECL void do_start_op(implementation_type& impl, int op_type,
+      reactor_op* op, bool is_continuation, bool is_non_blocking, bool noop,
+      void (*on_immediate)(operation* op, bool, const void*),
+      const void* immediate_arg);
+
+  // Start the asynchronous operation for handlers that are specialised for
+  // immediate completion.
+  template <typename Op>
+  void start_op(implementation_type& impl, int op_type, Op* op,
+      bool is_continuation, bool is_non_blocking, bool noop,
+      const void* io_ex, ...)
+  {
+    return do_start_op(impl, op_type, op, is_continuation,
+        is_non_blocking, noop, &Op::do_immediate, io_ex);
+  }
+
+  // Start the asynchronous operation for handlers that are not specialised for
+  // immediate completion.
+  template <typename Op>
+  void start_op(implementation_type& impl, int op_type, Op* op,
+      bool is_continuation, bool is_non_blocking, bool noop, const void*,
+      enable_if_t<
+        is_same<
+          typename associated_immediate_executor<
+            typename Op::handler_type,
+            typename Op::io_executor_type
+          >::asio_associated_immediate_executor_is_unspecialised,
+          void
+        >::value
+      >*)
+  {
+    return do_start_op(impl, op_type, op, is_continuation, is_non_blocking,
+        noop, &reactor::call_post_immediate_completion, &reactor_);
+  }
 
   // Helper class used to implement per-operation cancellation
   class reactor_op_cancellation
@@ -505,5 +561,6 @@ private:
 #endif // !defined(ASIO_WINDOWS)
        //   && !defined(ASIO_WINDOWS_RUNTIME)
        //   && !defined(__CYGWIN__)
+       //   && !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 
 #endif // ASIO_DETAIL_REACTIVE_DESCRIPTOR_SERVICE_HPP

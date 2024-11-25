@@ -9,7 +9,7 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/upd78k/upd78k3.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
 //#include "screen.h"
@@ -30,8 +30,8 @@ public:
 	void vx600(machine_config &config);
 
 private:
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	required_device<upd78310_device> m_maincpu;
 	required_device<upd78c11_device> m_subcpu;

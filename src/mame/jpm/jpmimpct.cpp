@@ -105,6 +105,7 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 #include "speaker.h"
 
 #include "jpmimpct.lh"
+#include "cluedo.lh"
 
 
 DEFINE_DEVICE_TYPE(JPM_TOUCHSCREEN, jpmtouch_device, "jpmtouch", "JPM Touchscreen")
@@ -679,7 +680,7 @@ INPUT_CHANGED_MEMBER(jpmimpct_video_state::touch_port_changed)
 
 static INPUT_PORTS_START( touchscreen )
 	PORT_START("TOUCH")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_video_state, touch_port_changed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(jpmimpct_video_state::touch_port_changed), 0)
 
 	PORT_START("TOUCH_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
@@ -691,22 +692,22 @@ INPUT_PORTS_END
 INPUT_PORTS_START( jpmimpct_coins )
 
 	PORT_START("COIN_SENSE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<0>)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<1>)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<2>)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<3>)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<4>)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, coinsense_r<5>)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmimpct_state::coinsense_r<0>))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmimpct_state::coinsense_r<1>))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmimpct_state::coinsense_r<2>))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmimpct_state::coinsense_r<3>))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmimpct_state::coinsense_r<4>))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmimpct_state::coinsense_r<5>))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME( "Coin: 1 pound" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME( "Coin: 50p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME( "Coin: 20p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME( "Coin: 10p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 3)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME( "Token: 20" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_NAME( "Coin: 5p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, jpmimpct_state, coin_changed, 5)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME( "Coin: 1 pound" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(jpmimpct_state::coin_changed), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME( "Coin: 50p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(jpmimpct_state::coin_changed), 1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME( "Coin: 20p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(jpmimpct_state::coin_changed), 2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME( "Coin: 10p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(jpmimpct_state::coin_changed), 3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME( "Token: 20" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(jpmimpct_state::coin_changed), 4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_NAME( "Coin: 5p" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(jpmimpct_state::coin_changed), 5)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(jpmimpct_state::coin_changed)
@@ -958,14 +959,14 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Test/Demo" )
 
 	PORT_START("PIA_PORTB")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_b_0_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmimpct_state::hopper_b_0_r))
 	PORT_DIPNAME( 0x02, 0x00, "PIA_PORTB: 0x02")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "PIA_PORTB: 0x04")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_b_3_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmimpct_state::hopper_b_3_r))
 	PORT_DIPNAME( 0x10, 0x10, "PIA_PORTB: 0x10")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -992,12 +993,12 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_DIPNAME( 0x08, 0x00, "PIA_PORTC: 0x08")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_c_4_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmimpct_state::hopper_c_4_r))
 	PORT_DIPNAME( 0x20, 0x20, "Top Up Switch 0x20")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_c_6_r)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmimpct_state, hopper_c_7_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmimpct_state::hopper_c_6_r))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmimpct_state::hopper_c_7_r))
 
 	PORT_INCLUDE( jpmimpct_coins )
 INPUT_PORTS_END
@@ -1839,10 +1840,10 @@ ROM_END
  *************************************/
 
 // Touchscreen
-GAME( 1995, cluedo,    0,        impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedod,   cluedo,   impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2c,  cluedo,   impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, cluedo2,   cluedo,   impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1995, cluedo,    0,        impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_cluedo )
+GAMEL( 1995, cluedod,   cluedo,   impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2D) (Protocol)",MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_cluedo )
+GAMEL( 1995, cluedo2c,  cluedo,   impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2C)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_cluedo )
+GAMEL( 1995, cluedo2,   cluedo,   impact_video_touch, cluedo,   jpmimpct_video_state, empty_init, ROT0, "JPM", "Cluedo (prod. 2)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_cluedo )
 GAME( 1996, trivialp,  0,        impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, trivialpd, trivialp, impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit (New Edition) (prod. 1D) (Protocol)",MACHINE_SUPPORTS_SAVE )
 GAME( 1996, trivialpo, trivialp, impact_video_touch, trivialp, jpmimpct_video_state, empty_init, ROT0, "JPM", "Trivial Pursuit",  MACHINE_SUPPORTS_SAVE )

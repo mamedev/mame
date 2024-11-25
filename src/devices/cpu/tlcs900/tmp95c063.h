@@ -13,39 +13,53 @@ DECLARE_DEVICE_TYPE(TMP95C063, tmp95c063_device)
 
 class tmp95c063_device : public tlcs900h_device
 {
+	static constexpr uint8_t PORT_1 = 0; // 8 bit I/O. Shared with d8-d15
+	static constexpr uint8_t PORT_2 = 1; // 8 bit output only. Shared with a16-a23
+	static constexpr uint8_t PORT_5 = 2; // 6 bit I/O
+	static constexpr uint8_t PORT_6 = 3; // 8 bit I/O. Shared with cs1, cs3 & dram control
+	static constexpr uint8_t PORT_7 = 4; // 8 bit I/O
+	static constexpr uint8_t PORT_8 = 5; // 8 bit I/O. Shared with SCOUT, WAIT, NMI2, INT0-INT3
+	static constexpr uint8_t PORT_9 = 6; // 8 bit I/O. Shared with clock input and output for the 8-bit timers
+	static constexpr uint8_t PORT_A = 7; // 8 bit I/O. Shared with serial channels 0/1
+	static constexpr uint8_t PORT_B = 8; // 8 bit I/O. Shared with 16bit timers
+	static constexpr uint8_t PORT_C = 9; // 8 bit input only. Shared with analogue inputs
+	static constexpr uint8_t PORT_D = 10; // 5 bit I/O. Shared with INT8
+	static constexpr uint8_t PORT_E = 11; // 8 bit I/O.
+	static constexpr uint8_t NUM_PORTS = 12;
+
 public:
 	// construction/destruction
 	tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	auto port1_read()  { return m_port1_read.bind(); }
-	auto port1_write() { return m_port1_write.bind(); }
-	auto port2_write() { return m_port2_write.bind(); }
-	auto port5_read()  { return m_port5_read.bind(); }
-	auto port5_write() { return m_port5_write.bind(); }
-	auto port6_read()  { return m_port6_read.bind(); }
-	auto port6_write() { return m_port6_write.bind(); }
-	auto port7_read()  { return m_port7_read.bind(); }
-	auto port7_write() { return m_port7_write.bind(); }
-	auto port8_read()  { return m_port8_read.bind(); }
-	auto port8_write() { return m_port8_write.bind(); }
-	auto port9_read()  { return m_port9_read.bind(); }
-	auto port9_write() { return m_port9_write.bind(); }
-	auto porta_read()  { return m_porta_read.bind(); }
-	auto porta_write() { return m_porta_write.bind(); }
-	auto portb_read()  { return m_portb_read.bind(); }
-	auto portb_write() { return m_portb_write.bind(); }
-	auto portc_read()  { return m_portc_read.bind(); }
-	auto portd_read()  { return m_portd_read.bind(); }
-	auto portd_write() { return m_portd_write.bind(); }
-	auto porte_read()  { return m_porte_read.bind(); }
-	auto porte_write() { return m_porte_write.bind(); }
+	auto port1_read()  { return m_port_read[PORT_1].bind(); }
+	auto port1_write() { return m_port_write[PORT_1].bind(); }
+	auto port2_write() { return m_port_write[PORT_2].bind(); }
+	auto port5_read()  { return m_port_read[PORT_5].bind(); }
+	auto port5_write() { return m_port_write[PORT_5].bind(); }
+	auto port6_read()  { return m_port_read[PORT_6].bind(); }
+	auto port6_write() { return m_port_write[PORT_6].bind(); }
+	auto port7_read()  { return m_port_read[PORT_7].bind(); }
+	auto port7_write() { return m_port_write[PORT_7].bind(); }
+	auto port8_read()  { return m_port_read[PORT_8].bind(); }
+	auto port8_write() { return m_port_write[PORT_8].bind(); }
+	auto port9_read()  { return m_port_read[PORT_9].bind(); }
+	auto port9_write() { return m_port_write[PORT_9].bind(); }
+	auto porta_read()  { return m_port_read[PORT_A].bind(); }
+	auto porta_write() { return m_port_write[PORT_A].bind(); }
+	auto portb_read()  { return m_port_read[PORT_B].bind(); }
+	auto portb_write() { return m_port_write[PORT_B].bind(); }
+	auto portc_read()  { return m_port_read[PORT_C].bind(); }
+	auto portd_read()  { return m_port_read[PORT_D].bind(); }
+	auto portd_write() { return m_port_write[PORT_D].bind(); }
+	auto porte_read()  { return m_port_read[PORT_E].bind(); }
+	auto porte_write() { return m_port_write[PORT_E].bind(); }
 	template <size_t Bit> auto an_read() { return m_an_read[Bit].bind(); }
 
 protected:
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual void tlcs900_check_hdma() override;
@@ -54,46 +68,10 @@ protected:
 	virtual void tlcs900_handle_timers() override;
 
 private:
-	uint8_t p1_r();
-	void p1_w(uint8_t data);
-	void p1cr_w(uint8_t data);
-	uint8_t p2_r();
-	void p2_w(uint8_t data);
-	void p2fc_w(uint8_t data);
-	uint8_t p5_r();
-	void p5_w(uint8_t data);
-	void p5cr_w(uint8_t data);
-	void p5fc_w(uint8_t data);
-	uint8_t p6_r();
-	void p6_w(uint8_t data);
-	void p6fc_w(uint8_t data);
-	uint8_t p7_r();
-	void p7_w(uint8_t data);
-	void p7cr_w(uint8_t data);
-	void p7fc_w(uint8_t data);
-	uint8_t p8_r();
-	void p8_w(uint8_t data);
-	void p8cr_w(uint8_t data);
-	void p8fc_w(uint8_t data);
-	uint8_t p9_r();
-	void p9_w(uint8_t data);
-	void p9cr_w(uint8_t data);
-	void p9fc_w(uint8_t data);
-	uint8_t pa_r();
-	void pa_w(uint8_t data);
-	void pacr_w(uint8_t data);
-	void pafc_w(uint8_t data);
-	uint8_t pb_r();
-	void pb_w(uint8_t data);
-	void pbcr_w(uint8_t data);
-	void pbfc_w(uint8_t data);
-	uint8_t pc_r();
-	uint8_t pd_r();
-	void pd_w(uint8_t data);
-	void pdcr_w(uint8_t data);
-	uint8_t pe_r();
-	void pe_w(uint8_t data);
-	void pecr_w(uint8_t data);
+	template <uint8_t> uint8_t port_r();
+	template <uint8_t> void port_w(uint8_t data);
+	template <uint8_t> void port_cr_w(uint8_t data);
+	template <uint8_t> void port_fc_w(uint8_t data);
 	uint8_t t8run_r();
 	void t8run_w(uint8_t data);
 	void treg01_w(offs_t offset, uint8_t data);
@@ -180,61 +158,17 @@ private:
 	void dadrv_w(uint8_t data);
 	void dareg_w(offs_t offset, uint8_t data);
 
-	void internal_mem(address_map &map);
-
-	// Port 1: 8 bit I/O. Shared with d8-d15
-	devcb_read8    m_port1_read;
-	devcb_write8   m_port1_write;
-
-	// Port 2: 8 bit output only. Shared with a16-a23
-	devcb_write8   m_port2_write;
-
-	// Port 5: 6 bit I/O
-	devcb_read8    m_port5_read;
-	devcb_write8   m_port5_write;
-
-	// Port 6: 8 bit I/O. Shared with cs1, cs3 & dram control
-	devcb_read8    m_port6_read;
-	devcb_write8   m_port6_write;
-
-	// Port 7: 8 bit I/O
-	devcb_read8    m_port7_read;
-	devcb_write8   m_port7_write;
-
-	// Port 8: 8 bit I/O. Shared with SCOUT, WAIT, NMI2, INT0-INT3
-	devcb_read8    m_port8_read;
-	devcb_write8   m_port8_write;
-
-	// Port 9: 8 bit I/O. Shared with clock input and output for the 8-bit timers
-	devcb_read8    m_port9_read;
-	devcb_write8   m_port9_write;
-
-	// Port A: 8 bit I/O. Shared with serial channels 0/1
-	devcb_read8    m_porta_read;
-	devcb_write8   m_porta_write;
-
-	// Port B: 8 bit I/O. Shared with 16bit timers
-	devcb_read8    m_portb_read;
-	devcb_write8   m_portb_write;
-
-	// Port C: 8 bit input only. Shared with analogue inputs
-	devcb_read8    m_portc_read;
-
-	// Port D: 5 bit I/O. Shared with int8_t
-	devcb_read8    m_portd_read;
-	devcb_write8   m_portd_write;
-
-	// Port E: 8 bit I/O.
-	devcb_read8    m_porte_read;
-	devcb_write8   m_porte_write;
+	void internal_mem(address_map &map) ATTR_COLD;
 
 	// analogue inputs, sampled at 10 bits
 	devcb_read16::array<8> m_an_read;
 
-	// I/O Port Control
-	uint8_t   m_port_latch[0xf];
-	uint8_t   m_port_control[0xf];
-	uint8_t   m_port_function[0xf];
+	// I/O Ports
+	devcb_read8::array<NUM_PORTS> m_port_read;
+	devcb_write8::array<NUM_PORTS> m_port_write;
+	uint8_t   m_port_latch[NUM_PORTS];
+	uint8_t   m_port_control[NUM_PORTS];
+	uint8_t   m_port_function[NUM_PORTS];
 
 	// Timer Control
 	uint8_t   m_t8run;

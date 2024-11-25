@@ -19,7 +19,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -41,10 +41,10 @@ private:
 	};
 
 	// internal state
-	struct c_state      m_c24_state;
-	struct c_state      m_c25_state;
-	struct n_state      m_noise_state;
-	uint8_t               m_sound_latch_a = 0;
+	c_state             m_c24_state;
+	c_state             m_c25_state;
+	n_state             m_noise_state;
+	uint8_t             m_sound_latch_a = 0;
 	sound_stream *      m_channel = nullptr;
 	std::unique_ptr<uint32_t[]> m_poly18;
 	required_device<discrete_device> m_discrete;

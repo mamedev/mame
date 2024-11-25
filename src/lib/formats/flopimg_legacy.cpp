@@ -349,16 +349,14 @@ util::random_read_write &floppy_get_io(floppy_image_legacy *floppy)
 
 void floppy_image_read(floppy_image_legacy *floppy, void *buffer, uint64_t offset, size_t length)
 {
-	size_t actual;
-	floppy->io->read_at(offset, buffer, length, actual);
+	/*auto const [err, actual] =*/ read_at(*floppy->io, offset, buffer, length); // FIXME: check for errors and premature EOF
 }
 
 
 
 void floppy_image_write(floppy_image_legacy *floppy, const void *buffer, uint64_t offset, size_t length)
 {
-	size_t actual;
-	floppy->io->write_at(offset, buffer, length, actual);
+	/*auto const [err, actual] =*/ write_at(*floppy->io, offset, buffer, length); // FIXME: check for errors
 }
 
 
@@ -371,8 +369,7 @@ void floppy_image_write_filler(floppy_image_legacy *floppy, uint8_t filler, uint
 	while (length)
 	{
 		size_t const block = std::min(sizeof(buffer), length);
-		size_t actual;
-		floppy->io->write_at(offset, buffer, block, actual);
+		/*auto const [err, actual] =*/ write_at(*floppy->io, offset, buffer, block); // FIXME: check for errors
 		offset += block;
 		length -= block;
 	}

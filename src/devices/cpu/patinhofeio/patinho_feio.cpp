@@ -155,9 +155,9 @@ void patinho_feio_cpu_device::execute_run() {
 		m_ext = READ_ACC_EXTENSION_REG();
 		m_idx = READ_INDEX_REG();
 		m_update_panel_cb(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
-		debugger_instruction_hook(PC);
 
 		if (!m_run){
+			debugger_wait_hook();
 			if (!m_buttons_read_cb.isunset()){
 				uint16_t buttons = m_buttons_read_cb(0);
 				if (buttons & BUTTON_PARTIDA){
@@ -180,6 +180,7 @@ void patinho_feio_cpu_device::execute_run() {
 			}
 			m_icount = 0;   /* if processor is stopped, just burn cycles */
 		} else {
+			debugger_instruction_hook(PC);
 			execute_instruction();
 			m_icount --;
 		}
@@ -322,7 +323,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x90:
 			//ST 0 = "Se T=0, Pula"
 			//       If T is zero, skip the next instruction
-						if ((FLAGS & T) == 0)
+			if ((FLAGS & T) == 0)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x91:
@@ -337,7 +338,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x92:
 			//ST 1 = "Se T=1, Pula"
 			//       If T is one, skip the next instruction
-						if ((FLAGS & T) == T)
+			if ((FLAGS & T) == T)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x93:
@@ -352,7 +353,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x94:
 			//SV 0 = "Se V=0, Pula"
 			//       If V is zero, skip the next instruction
-						if ((FLAGS & V) == 0)
+			if ((FLAGS & V) == 0)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x95:
@@ -367,7 +368,7 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x96:
 			//SV 1 = "Se V=1, Pula"
 			//       If V is one, skip the next instruction
-						if ((FLAGS & V) == 1)
+			if ((FLAGS & V) == 1)
 				INCREMENT_PC_4K; //skip
 			return;
 		case 0x97:
@@ -382,15 +383,15 @@ void patinho_feio_cpu_device::execute_instruction()
 		case 0x98:
 			//PUL="Pula para /002 a limpa estado de interrupcao"
 			//     Jump to address /002 and disables interrupts
-						PC = 0x002;
+			PC = 0x002;
 			m_interrupts_enabled = false;
 			return;
 		case 0x99:
 			//TRE="Troca conteudos de ACC e EXT"
 			//     Exchange the value of the accumulator with the ACC extension register
-						value = ACC;
-						ACC = READ_ACC_EXTENSION_REG();
-						WRITE_ACC_EXTENSION_REG(value);
+			value = ACC;
+			ACC = READ_ACC_EXTENSION_REG();
+			WRITE_ACC_EXTENSION_REG(value);
 			return;
 		case 0x9A:
 			//INIB="Inibe"
@@ -683,7 +684,7 @@ void patinho_feio_cpu_device::execute_instruction()
 							if (channel==0xE){
 								//TODO: Implement-me!
 							} else {
-								printf("Function 8 of the /FNC instruction can only be used with"\
+								printf("Function 8 of the /FNC instruction can only be used with "
 										"the papertape reader device at channel /E.\n");
 							}
 							break;
@@ -694,7 +695,7 @@ void patinho_feio_cpu_device::execute_instruction()
 				case 0x20:
 					//SAL="Salta"
 					//    Skips a couple bytes if a condition is met
-										skip = false;
+					skip = false;
 					switch(function)
 					{
 						case 1:

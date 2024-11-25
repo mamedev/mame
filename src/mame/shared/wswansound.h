@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_SHARED_WSWAN_H
-#define MAME_SHARED_WSWAN_H
+#ifndef MAME_SHARED_WSWANSOUND_H
+#define MAME_SHARED_WSWANSOUND_H
 
 #pragma once
 
 #include "dirom.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -47,9 +48,9 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void rom_bank_pre_change() override;
 
@@ -83,4 +84,4 @@ private:
 
 DECLARE_DEVICE_TYPE(WSWAN_SND, wswan_sound_device)
 
-#endif // MAME_SHARED_WSWAN_H
+#endif // MAME_SHARED_WSWANSOUND_H

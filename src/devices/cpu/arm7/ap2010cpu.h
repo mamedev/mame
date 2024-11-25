@@ -12,7 +12,6 @@
 #pragma once
 
 #include "arm7.h"
-#include "arm7core.h"
 
 class ap2010cpu_device : public arm7_cpu_device
 {

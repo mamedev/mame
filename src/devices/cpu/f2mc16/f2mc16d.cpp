@@ -416,7 +416,7 @@ offs_t f2mc16_disassembler::dasm_cstrop(std::ostream &stream, offs_t pc, u32 byt
 	}
 	else if ((op2 & 0xcc) == 0x80)
 		util::stream_format(stream, "%-8s%s", s_sceq_ops[BIT(op2, 4, 2)], s_segment_prefixes[BIT(op2, 0, 2)]);
-	else if ((op2 & 0xec) == 0xc0)
+	else if ((op2 & 0xdc) == 0xc0)
 		util::stream_format(stream, "%-8s%s", op2 >= 0xe0 ? "FILSWI" : "FILSI", s_segment_prefixes[BIT(op2, 0, 2)]);
 	else
 	{
@@ -1322,17 +1322,9 @@ offs_t f2mc16_disassembler::disassemble(std::ostream &stream, offs_t pc, const f
 		break;
 
 	case 0x30: case 0x31:
-	{
-		u8 operand = opcodes.r8(pc + bytes++);
-		if (operand == 0x01)
-			util::stream_format(stream, "%-8sA", BIT(op, 0) ? "DEC" : "INC");
-		else
-		{
-			util::stream_format(stream, "%-8sA, ", BIT(op, 0) ? "SUB" : "ADD");
-			format_imm_signed(stream, s32(s8(operand)));
-		}
+		util::stream_format(stream, "%-8sA, ", BIT(op, 0) ? "SUB" : "ADD");
+		format_imm_signed(stream, s32(s8(opcodes.r8(pc + bytes++))));
 		break;
-	}
 
 	case 0x32:
 		util::stream_format(stream, "%-8sA", "SUBC");

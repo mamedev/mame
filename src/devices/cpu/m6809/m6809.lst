@@ -663,7 +663,7 @@ XANDCC:
 
 XRES:
 	set_ea(VECTOR_RESET_FFFE);
-	standard_irq_callback(M6809_SWI, m_pc.w);
+	debugger_exception_hook(EXCEPTION_XRES);
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
 	@dummy_read_opcode_arg(0);
@@ -724,7 +724,7 @@ XST16:
 
 XSWI2:
 	set_ea(VECTOR_SWI2);
-	standard_irq_callback(M6809_SWI, m_pc.w);
+	debugger_exception_hook(EXCEPTION_SWI2);
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
 	@dummy_read_opcode_arg(0);
@@ -745,7 +745,7 @@ XADD16:
 
 XFIRQ:
 	set_ea(VECTOR_FIRQ);
-	standard_irq_callback(M6809_SWI, m_pc.w);
+	debugger_exception_hook(EXCEPTION_XFIRQ);
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
 	@dummy_read_opcode_arg(0);

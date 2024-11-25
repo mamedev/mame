@@ -349,6 +349,7 @@ public:
 		m_screen(*this, "screen"),
 		m_alpha_8201(*this, "alpha_8201"),
 		m_mainlatch(*this, "mainlatch"),
+		m_in(*this, "IN%u", 0U),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram", 0x800, ENDIANNESS_BIG),
 		m_spriteram(*this, "spriteram")
@@ -366,14 +367,15 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<alpha_8201_device> m_alpha_8201;
 	required_device<ls259_device> m_mainlatch;
+	required_ioport_array<2> m_in;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_bg_videoram;
 	memory_share_creator<uint8_t> m_fg_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint16_t spriteram_kludge_r();
 	uint8_t fg_videoram_r(offs_t offset);
@@ -385,15 +387,15 @@ protected:
 	TILE_GET_INFO_MEMBER(bg_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	void draw_sprites_block(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void unpack_block(const char *region, int offset, int size);
 	void unpack_region(const char *region);
 
-	void bngotime_map(address_map &map);
-	void equites_map(address_map &map);
-	void common_map(address_map &map);
+	void bngotime_map(address_map &map) ATTR_COLD;
+	void equites_map(address_map &map) ATTR_COLD;
+	void common_map(address_map &map) ATTR_COLD;
 
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -412,10 +414,10 @@ public:
 	void gekisou(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void gekisou_map(address_map &map);
+	void gekisou_map(address_map &map) ATTR_COLD;
 	void unknown_bit_w(offs_t offset, uint16_t data);
 
 	int m_unknown_bit = 0;
@@ -551,15 +553,17 @@ uint32_t equites_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 /******************************************************************************/
 // Interrupt Handlers
 
-TIMER_DEVICE_CALLBACK_MEMBER(equites_state::scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(equites_state::scanline_cb)
 {
 	int scanline = param;
 
-	if(scanline == 232) // vblank-out irq
-		m_maincpu->set_input_line(1, HOLD_LINE);
-
-	if(scanline == 24) // vblank-in irq
+	// all games but bullfgtr have both valid
+	// bullfgtr definitely expects to vblank from 2, reversing will make it to run at half speed.
+	if(scanline == 232) // vblank-in irq
 		m_maincpu->set_input_line(2, HOLD_LINE);
+
+	if(scanline == 24) // vblank-out irq or sprite DMA done
+		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
 
@@ -633,9 +637,9 @@ void equites_state::common_map(address_map &map)
 	map(0x100000, 0x1001ff).ram().share("spriteram");
 	map(0x100000, 0x100001).r(FUNC(equites_state::spriteram_kludge_r));
 	map(0x140000, 0x1407ff).rw(m_alpha_8201, FUNC(alpha_8201_device::ext_ram_r), FUNC(alpha_8201_device::ext_ram_w)).umask16(0x00ff);
-	map(0x180000, 0x180001).portr("IN1");
+	map(0x180000, 0x180001).portr(m_in[1]);
 	map(0x180000, 0x180000).select(0x03c000).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); }));
-	map(0x1c0000, 0x1c0001).portr("IN0").w(FUNC(equites_state::scrollreg_w));
+	map(0x1c0000, 0x1c0001).portr(m_in[0]).w(FUNC(equites_state::scrollreg_w));
 	map(0x380000, 0x380000).w(FUNC(equites_state::bgcolor_w));
 	map(0x780000, 0x780001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 }
@@ -739,7 +743,7 @@ static INPUT_PORTS_START( gekisou )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gekisou_state, unknown_bit_r)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(gekisou_state::unknown_bit_r))
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)
@@ -912,7 +916,7 @@ void equites_state::equites(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 12_MHz_XTAL/4); // 68000P8 running at 3mhz! verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &equites_state::equites_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(equites_state::scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(equites_state::scanline_cb), "screen", 0, 1);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<1>().set(FUNC(equites_state::flip_screen_set));

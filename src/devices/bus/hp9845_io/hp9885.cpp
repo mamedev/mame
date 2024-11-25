@@ -56,7 +56,7 @@
     | 1  1|Unit#|  Track # [0..76]   |Sector#[0..29]|
     +-----+-----+--------------------+--------------+
 
-    *FORMAT TRACK* (not implemented yet)
+    *FORMAT TRACK*
 
     +-----------------------------------------------+
     |15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0|
@@ -116,20 +116,20 @@
     =====================
 
     Images can be in two formats: MFI & HPI.
-    A pre-formatted image must be used as formatting is not supported.
-    It's not possible to format images for two reasons: the format
-    command is not implemented yet and no dump of the disk system tape
-    cartridge (HP part no. 09885-90035) is available.
-    The latter is needed during format operation to create the so-called
-    bootstraps on disk, which in turn are needed by 9825 systems.
+    9825 systems with 98217 mass storage ROM store the code of most disk commands
+    on the disk itself in the so-called bootstrap area. Initializing this area
+    during formatting is not supported at the moment as no dump of the disk system
+    tape cartridge (HP part no. 09885-90035) is available. This tape holds the
+    code to be copied into the bootstrap area.
     A pre-formatted image (9825_empty.hpi) is available here:
     http://www.hpmuseum.net/software/9825_discs.zip
+    Other combinations of system and mass storage ROM (e.g. 9825 with 98228 ROM)
+    do not use bootstrap area at all.
 
     TODO
     ====
 
-    + Implement missing commands
-    + PRESET
+    + Implement missing command
 
     Acknowledgments
     ===============
@@ -185,13 +185,6 @@ namespace {
 // device type definition
 DEFINE_DEVICE_TYPE(HP9885, hp9885_device, "hp9885" , "HP9885 floppy drive")
 
-// Timers
-enum {
-	FSM_TMR_ID,
-	HEAD_TMR_ID,
-	BIT_BYTE_TMR_ID
-};
-
 // Constants
 constexpr unsigned MAX_TRACK    = 76;   // Maximum valid track
 constexpr unsigned MAX_SECTOR   = 29;   // Maximum valid sector
@@ -204,6 +197,7 @@ constexpr uint16_t PASSWORD     = 0xae87;   // "Password" to enable commands
 constexpr unsigned HALF_CELL_US = 1;    // Half bit cell duration (µs)
 constexpr unsigned STATUS_DELAY_US  = 100;  // Status delay (µs)
 constexpr unsigned MISSED_ID_REVS   = 2;    // Disk rotations to stop ID search
+constexpr uint16_t FORMAT_DATA  = 0xc6c6;   // Data written into sectors when formatting
 
 // Bits in status word
 constexpr unsigned STS_DISK_CHANGED = 2;    // Disk changed
@@ -269,7 +263,9 @@ void hp9885_device::output_w(uint16_t data)
 void hp9885_device::ext_control_w(uint8_t data)
 {
 	LOG_HS("EXT CTRL %u\n" , data);
-	if (BIT(data , 0) &&
+	if (BIT(data, 1)) {
+		device_reset();
+	} else if (BIT(data , 0) &&
 		!BIT(m_status , STS_XFER_COMPLETE) &&
 		(m_op == OP_READ || m_op == OP_WRITE)) {
 		// CTL0 terminates current data transfer
@@ -302,6 +298,9 @@ void hp9885_device::io_w(int state)
 void hp9885_device::preset_w(int state)
 {
 	LOG("PRESET = %d\n" , state);
+	if (state) {
+		device_reset();
+	}
 }
 
 static void hp9885_floppy_formats(format_registration &fr)
@@ -337,6 +336,7 @@ void hp9885_device::device_start()
 	save_item(NAME(m_sector_cnt));
 	save_item(NAME(m_word_cnt));
 	save_item(NAME(m_rev_cnt));
+	save_item(NAME(m_format_track));
 	save_item(NAME(m_am_detector));
 	save_item(NAME(m_crc));
 
@@ -352,6 +352,7 @@ void hp9885_device::device_start()
 
 void hp9885_device::device_reset()
 {
+	LOG("Reset\n");
 	eir_w(0);
 	psts_w(1);
 	m_dskchg = true;
@@ -360,33 +361,36 @@ void hp9885_device::device_reset()
 	m_seek_track = 0;
 	m_seek_sector = 0;
 	m_fsm_state = FSM_RECALIBRATING;
+	m_head_state = HEAD_UNLOADED;
+	m_head_timer->reset();
+	m_op = OP_NONE;
 	set_state(FSM_IDLE);
 }
 
 TIMER_CALLBACK_MEMBER(hp9885_device::fsm_tick)
 {
-	LOG_TIMER("Tmr %.06f ID %d FSM %d HD %d\n" , machine().time().as_double() , FSM_TMR_ID , m_fsm_state , m_head_state);
+	LOG_TIMER("FSM Tmr %s %d HD %d\n" , machine().time().as_string(6) , m_fsm_state , m_head_state);
 	do_FSM();
 }
 
 TIMER_CALLBACK_MEMBER(hp9885_device::head_tick)
 {
-	LOG_TIMER("Tmr %.06f ID %d FSM %d HD %d\n" , machine().time().as_double() , HEAD_TMR_ID , m_fsm_state , m_head_state);
+	LOG_TIMER("HD Tmr %s FSM %d HD %d\n" , machine().time().as_string(6) , m_fsm_state , m_head_state);
 	if (m_head_state == HEAD_SETTLING) {
-		LOG_HEAD("%.06f Head loaded\n" , machine().time().as_double());
+		LOG_HEAD("%s Head loaded\n" , machine().time().as_string(6));
 		m_head_state = HEAD_LOADED;
 		// Trigger actions to be done on head loading
 		do_FSM();
 		m_head_timer->adjust(attotime::from_msec(HEAD_TO_MS - HD_SETTLE_MS));
 	} else {
-		LOG_HEAD("%.06f Head unloaded\n" , machine().time().as_double());
+		LOG_HEAD("%s Head unloaded\n" , machine().time().as_string(6));
 		m_head_state = HEAD_UNLOADED;
 	}
 }
 
 TIMER_CALLBACK_MEMBER(hp9885_device::bit_byte_tick)
 {
-	LOG_TIMER("Tmr %.06f ID %d FSM %d HD %d\n" , machine().time().as_double() , BIT_BYTE_TMR_ID , m_fsm_state , m_head_state);
+	LOG_TIMER("BIT Tmr %s FSM %d HD %d\n" , machine().time().as_string(6) , m_fsm_state , m_head_state);
 
 	switch (m_fsm_state) {
 	case FSM_WAIT_ID_AM:
@@ -521,6 +525,79 @@ TIMER_CALLBACK_MEMBER(hp9885_device::bit_byte_tick)
 		}
 		break;
 
+	case FSM_FORMATTING:
+		{
+			// m_word_cnt when formatting one sector
+			// =================
+			// 168  Sync    0000
+			// 167  Sync    0000
+			// 166  Sync    FFFF
+			// 165  Sync    FFFF
+			// 164  ID AM   70/0E
+			// 163  Sec/Trk
+			// 162  ID CRC
+			// 161  ID post-amble
+			// 160..153
+			//      Gap 1   0000
+			// 152  Sync    0000
+			// 151  Sync    0000
+			// 150  Sync    FFFF
+			// 149  Sync    FFFF
+			// 148  DATA AM 50/0E
+			// 147..20
+			//      Sector  C6C6
+			// 19   Data CRC
+			// 18   Data post-amble
+			// 17..1
+			//      Gap 2   0000
+			if (m_word_cnt == 164) {
+				wr_byte(0x70, 0x0e);
+			} else if (m_word_cnt == 148) {
+				wr_byte(0x50, 0x0e);
+			} else {
+				uint16_t word = 0;
+				if (m_word_cnt == 163 ||
+					m_word_cnt == 147) {
+					preset_crc();
+				}
+				if (m_word_cnt == 166 ||
+					m_word_cnt == 165 ||
+					m_word_cnt == 150 ||
+					m_word_cnt == 149) {
+					word = 0xffff;
+				} else if (m_word_cnt == 163) {
+					// Get sector # from CPU
+					LOG("Format: sector %u\n" , m_input);
+					word = ((m_input & 0xff) << 8) | (m_format_track & 0xff);
+					if (m_sector_cnt < MAX_SECTOR) {
+						set_ibf(false);
+					}
+				} else if (m_word_cnt == 162 ||
+						   m_word_cnt == 19) {
+					word = m_crc;
+				} else if (20 <= m_word_cnt &&
+						   m_word_cnt <= 147) {
+					word = FORMAT_DATA;
+				}
+				wr_word(word);
+			}
+			if (--m_word_cnt == 0) {
+				if (++m_sector_cnt > MAX_SECTOR) {
+					LOG("Format: final gap\n");
+					set_state(FSM_FORMAT_END);
+				} else {
+					// Next sector
+					m_word_cnt = 168;
+				}
+			}
+		}
+		break;
+
+	case FSM_FORMAT_END:
+		// Keep writing 0s until index pulse comes
+		wr_word(0);
+		break;
+
 	default:
 		LOG("Invalid FSM state %d\n" , m_fsm_state);
 		set_state(FSM_IDLE);
@@ -540,19 +617,39 @@ void hp9885_device::floppy_ready_cb(floppy_image_device *floppy , int state)
 
 void hp9885_device::floppy_index_cb(floppy_image_device *floppy , int state)
 {
-	if (state && m_rev_cnt && --m_rev_cnt == 0) {
-		// Sector not found
-		LOG("Sector not found\n");
-		stop_rdwr();
-		set_error(ERR_ID_ERROR);
-		output_status(true);
+	if (state) {
+		if (m_fsm_state == FSM_WAIT_INDEX) {
+			LOG("Format: got index\n");
+			set_state(FSM_FORMATTING);
+			// See bit_byte_tick function
+			m_word_cnt = 167;
+			m_pll.set_clock(attotime::from_usec(HALF_CELL_US));
+			m_pll.start_writing(machine().time());
+			m_pll.read_reset(machine().time());
+			m_had_transition = false;
+			// Start by writing 1st sync word
+			wr_word(0);
+			m_sector_cnt = 0;
+			m_bit_byte_timer->adjust(m_pll.ctime - machine().time());
+		} else if (m_fsm_state == FSM_FORMAT_END) {
+			LOG("Format: ended\n");
+			m_pll.stop_writing(m_drive , m_pll.ctime);
+			BIT_SET(m_status , STS_XFER_COMPLETE);
+			output_status();
+		} else if (m_rev_cnt && --m_rev_cnt == 0) {
+			// Sector not found
+			LOG("Sector not found\n");
+			stop_rdwr();
+			set_error(ERR_ID_ERROR);
+			output_status(true);
+		}
 	}
 }
 
 void hp9885_device::set_state(int new_state)
 {
 	if (m_fsm_state != new_state) {
-		LOG("%.06f FSM %d->%d\n" , machine().time().as_double() , m_fsm_state , new_state);
+		LOG("%s FSM %d->%d\n" , machine().time().as_string(6) , m_fsm_state , new_state);
 		m_fsm_state = new_state;
 		if (m_fsm_state == FSM_IDLE) {
 			m_op = OP_NONE;
@@ -673,8 +770,20 @@ void hp9885_device::new_word()
 					uint8_t sect_no = m_input & 0x1f;
 					if (sect_no == 0x1e) {
 						// Format
-						LOG("Format\n");
-						// TODO:
+						LOG("Format track %u\n", track_no);
+						init_status(unit_no);
+						if (!BIT(m_status , STS_NOT_RDY) && !BIT(m_status , STS_WRITE_PROTECT)) {
+							m_op = OP_FORMAT;
+							m_format_track = track_no;
+							set_state(FSM_POSITIONING);
+							if (load_head()) {
+								m_fsm_timer->adjust(attotime::zero);
+							}
+							set_ibf(false);
+						} else {
+							encode_error(true);
+							output_status(true);
+						}
 					} else if (sect_no == 0x1f) {
 						switch (track_no) {
 						case 0x7c:
@@ -748,7 +857,7 @@ void hp9885_device::new_word()
 		break;
 
 	default:
-		if (m_op != OP_WRITE) {
+		if (m_op != OP_WRITE && m_op != OP_FORMAT) {
 			LOG("Got data in state %d!\n" , m_fsm_state);
 		}
 	}
@@ -785,6 +894,10 @@ void hp9885_device::do_FSM()
 			// Set seek complete
 			BIT_SET(m_status , STS_SEEK_COMPLETE);
 			output_status();
+		} else if (m_op == OP_FORMAT) {
+			// Format
+			LOG("Format: waiting for index\n");
+			set_state(FSM_WAIT_INDEX);
 		} else {
 			// Get status
 			output_status();
@@ -830,13 +943,13 @@ bool hp9885_device::load_head()
 	switch (m_head_state) {
 	case HEAD_UNLOADED:
 	case HEAD_SETTLING:
-		LOG_HEAD("%.06f Loading head..\n" , machine().time().as_double());
+		LOG_HEAD("%s Loading head..\n" , machine().time().as_string(6));
 		m_head_state = HEAD_SETTLING;
 		m_head_timer->adjust(attotime::from_msec(HD_SETTLE_MS));
 		return false;
 
 	case HEAD_LOADED:
-		LOG_HEAD("%.06f Keep head loaded\n" , machine().time().as_double());
+		LOG_HEAD("%s Keep head loaded\n" , machine().time().as_string(6));
 		m_head_timer->adjust(attotime::from_msec(HEAD_TO_MS));
 		return true;
 
@@ -863,7 +976,7 @@ void hp9885_device::one_step(bool outward)
 			m_track++;
 		}
 	}
-	LOG_HEAD("%.06f Step to trk %u\n" , machine().time().as_double() , m_track);
+	LOG_HEAD("%s Step to trk %u\n" , machine().time().as_string(6) , m_track);
 	m_drive->dir_w(outward);
 	m_drive->stp_w(0);
 	m_drive->stp_w(1);
@@ -913,11 +1026,11 @@ uint16_t hp9885_device::rd_word()
 	return word;
 }
 
-void hp9885_device::wr_word(uint16_t word)
+void hp9885_device::wr_byte(uint8_t data, uint8_t clock)
 {
-	for (unsigned i = 0; i < 16; ++i) {
-		bool data_bit = BIT(word , i);
-		bool clock_bit = !data_bit && !m_had_transition;
+	for (unsigned i = 0; i < 8; ++i) {
+		bool data_bit = BIT(data , i);
+		bool clock_bit = !data_bit && (BIT(clock, i) || !m_had_transition);
 		m_had_transition = data_bit || clock_bit;
 		attotime dummy;
 
@@ -926,6 +1039,12 @@ void hp9885_device::wr_word(uint16_t word)
 		update_crc(data_bit);
 	}
 	m_pll.commit(m_drive , m_pll.ctime);
+}
+
+void hp9885_device::wr_word(uint16_t word)
+{
+	wr_byte(uint8_t(word & 0xff), 0);
+	wr_byte(uint8_t(word >> 8), 0);
 }
 
 void hp9885_device::preset_crc()

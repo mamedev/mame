@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_BUS_PC8801_23_H
-#define MAME_BUS_PC8801_23_H
+#ifndef MAME_BUS_PC8801_PC8801_23_H
+#define MAME_BUS_PC8801_PC8801_23_H
 
 #pragma once
 
@@ -16,15 +16,15 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::SOUND; }
 
-	virtual void io_map(address_map &map) override;
+	virtual void io_map(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void int4_w(int state) override;
 
 private:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<ym2608_device> m_opna;
 
@@ -34,10 +34,9 @@ private:
 	bool m_irq_mask = false;
 	bool m_irq_pending = false;
 
-	void opna_map(address_map &map);
+	void opna_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(PC8801_23, pc8801_23_device)
 
-
-#endif // MAME_BUS_PC8801_23_H
+#endif // MAME_BUS_PC8801_PC8801_23_H

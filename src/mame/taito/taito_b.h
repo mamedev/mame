@@ -56,7 +56,7 @@ public:
 protected:
 	void player_12_coin_ctrl_w(uint8_t data);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 
 	void bankswitch_w(uint8_t data);
 	template<int Player> uint16_t tracky_hi_r();
@@ -69,29 +69,29 @@ protected:
 	void player_34_coin_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void spacedxo_tc0220ioc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void mb87078_gain_changed(offs_t offset, uint8_t data);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void crimec_map(address_map &map);
-	void masterw_map(address_map &map);
-	void masterw_sound_map(address_map &map);
-	void pbobble_map(address_map &map);
-	void qzshowby_map(address_map &map);
-	void rambo3_map(address_map &map);
-	void rastsag2_map(address_map &map);
+	void crimec_map(address_map &map) ATTR_COLD;
+	void masterw_map(address_map &map) ATTR_COLD;
+	void masterw_sound_map(address_map &map) ATTR_COLD;
+	void pbobble_map(address_map &map) ATTR_COLD;
+	void qzshowby_map(address_map &map) ATTR_COLD;
+	void rambo3_map(address_map &map) ATTR_COLD;
+	void rastsag2_map(address_map &map) ATTR_COLD;
 
-	void sbm_map(address_map &map);
-	void selfeena_map(address_map &map);
-	void silentd_map(address_map &map);
-	void spacedx_map(address_map &map);
-	void spacedxo_map(address_map &map);
-	void tetrist_map(address_map &map);
-	void tetrista_map(address_map &map);
-	void viofight_map(address_map &map);
-	void viofight_sound_map(address_map &map);
+	void sbm_map(address_map &map) ATTR_COLD;
+	void selfeena_map(address_map &map) ATTR_COLD;
+	void silentd_map(address_map &map) ATTR_COLD;
+	void spacedx_map(address_map &map) ATTR_COLD;
+	void spacedxo_map(address_map &map) ATTR_COLD;
+	void tetrist_map(address_map &map) ATTR_COLD;
+	void tetrista_map(address_map &map) ATTR_COLD;
+	void viofight_map(address_map &map) ATTR_COLD;
+	void viofight_sound_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_pixel_bitmap;
@@ -136,10 +136,10 @@ protected:
 	void realpunc_output_w(uint16_t data);
 	void realpunc_video_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void realpunc_map(address_map &map);
-	void realpunc_hd63484_map(address_map &map);
+	void realpunc_map(address_map &map) ATTR_COLD;
+	void realpunc_hd63484_map(address_map &map) ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
@@ -158,14 +158,14 @@ public:
 	void hitice(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 private:
 	void pixelram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void pixel_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void hitice_map(address_map &map);
+	void hitice_map(address_map &map) ATTR_COLD;
 
 	void clear_pixel_bitmap();
 

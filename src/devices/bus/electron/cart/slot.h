@@ -91,8 +91,8 @@
    22      0V - Zero volts.
 
 **********************************************************************/
-#ifndef MAME_BUS_ELECTRON_CARTSLOT_H
-#define MAME_BUS_ELECTRON_CARTSLOT_H
+#ifndef MAME_BUS_ELECTRON_CART_SLOT_H
+#define MAME_BUS_ELECTRON_CART_SLOT_H
 
 #pragma once
 
@@ -161,7 +161,7 @@ protected:
 	electron_cartslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	device_electron_cart_interface *m_cart;
 
@@ -211,5 +211,4 @@ DECLARE_DEVICE_TYPE(ELECTRON_CARTSLOT, electron_cartslot_device)
 
 void electron_cart(device_slot_interface &device);
 
-
-#endif // MAME_BUS_ELECTRON_CARTSLOT_H
+#endif // MAME_BUS_ELECTRON_CART_SLOT_H

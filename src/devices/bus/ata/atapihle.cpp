@@ -106,7 +106,8 @@ void atapi_hle_device::fill_buffer()
 	case IDE_COMMAND_PACKET:
 		if (m_buffer_size >= m_data_size)
 		{
-			m_buffer_size = m_data_size;
+			// MSCDEX/SHSUCDX PC drivers wants the clamp for CD audio playback (29 bytes).
+			m_buffer_size = m_data_size & 0xfffe;
 		}
 		else
 		{
@@ -236,8 +237,8 @@ void atapi_hle_device::process_command()
 
 		for( int w = 0; w < 256; w++ )
 		{
-			m_buffer[w * 2] = m_identify_buffer[ w ] & 0xff;
-			m_buffer[(w * 2) + 1] = m_identify_buffer[ w ] >> 8;
+			m_buffer[w * 2] = m_identify_buffer[w] & 0xff;
+			m_buffer[(w * 2) + 1] = m_identify_buffer[w] >> 8;
 		}
 
 		m_buffer_size = 512;

@@ -63,7 +63,7 @@ license:CC0-1.0
 		<info name="release" value="19940708"/>
 		<info name="alt_title" value="サザン アイズ 3X3EYES ~三只眼燮成~"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="3 x 3 eyes - sanjiyan hensei (acd, scd)(jpn)" sha1="f31323d30474ba046ba9944c3ac3c1470bc0c126"/>
@@ -374,7 +374,7 @@ https://www.unseen64.net/2021/01/04/angelus2-holynight-pcengine-cancelled/
 		<info name="release" value="19941125"/>
 		<info name="alt_title" value="バトルフィールド 新日本プロレスリング'94 BATTLEFIELD IN 闘強導夢"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="battlefield '94 in tokyo dome (acd)(jpn)" sha1="866e90f08cee3c5820b148f6c2c0791f5972ff51"/>
@@ -535,7 +535,7 @@ https://www.unseen64.net/2021/01/04/angelus2-holynight-pcengine-cancelled/
 		<info name="release" value="19940617"/>
 		<info name="alt_title" value="ブランディッシ"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="brandish (acd, scd)(jpn)" sha1="e0c0c55ca145c2e0f1a1efa7a4d5f2f59d34c913"/>
@@ -902,6 +902,7 @@ Intro shows several horizontal black/transparent strips over GFXs
 		<description>Cotton - Fantastic Night Dreams (Japan)</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>
+		<info name="language" value="Japanese"/>
 		<info name="serial" value="HCD3043"/>
 		<info name="release" value="19930212"/>
 		<info name="alt_title" value="コットン"/>
@@ -1413,7 +1414,7 @@ Returns to intro when pressing Run button on title (player has to hold start in 
 		<info name="release" value="19940715"/>
 		<info name="alt_title" value="栄冠は君に"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="eikan ha kimini - koukou yakyuu zenkoku taikai (acd, scd)(jpn)" sha1="4920b87a8ee81abafcdf568ffa3a6761d7c97ac8"/>
@@ -1675,7 +1676,7 @@ Cheat: Up, up, up, down, down, down, II, II, II, I, I, I during intro for "debug
 		<info name="release" value="19950203"/>
 		<info name="alt_title" value="ファイプロ女子憧夢超女大戦 全女vsJWP"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="fire pro joshi - dome choujo taisen (acd)(jpn)" sha1="a2a2e4108eed453e95f080b746b0797117b886e9"/>
@@ -1740,7 +1741,7 @@ Uses sound LFO FM
 		<info name="release" value="19950407"/>
 		<info name="alt_title" value="フォ-メ-ションサッカ-95 デッラセリエA"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="formation soccer '95 - della serie a (acd, scd)(jpn)" sha1="e907f2f637eed0a1f0ea52371f51f9dcb6042a6f"/>
@@ -1941,7 +1942,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19940212"/>
 		<info name="alt_title" value="餓狼伝説2 体験版"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="garou densetsu ii - aratanaru tatakai - sample disc (acd)(jpn)" sha1="978720b488736828bff3d7ecf2f738aec4aa3f36"/>
@@ -1957,7 +1958,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19940312"/>
 		<info name="alt_title" value="餓狼伝説2"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="garou densetsu ii - aratanaru tatakai [imperfect] (acd)(jpn)" sha1="b5d2dedf90a5b90c4d2b588e5f6985b8f38e18b5"/>
@@ -1973,7 +1974,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19941202"/>
 		<info name="alt_title" value="餓狼伝説スペシャル"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="garou densetsu special (acd)(jpn)" sha1="3d43a9d59e3a894580a4bbabc85ee0757b09d84a"/>
@@ -2037,7 +2038,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19951124"/>
 		<info name="alt_title" value="銀河婦警伝説サファイア"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ginga fukei densetsu sapphire (acd)(jpn)" sha1="5fe3b477286a60e47c367f8dd4d662557a62588b"/>
@@ -2453,6 +2454,7 @@ New game intro sports glitchy portraits
 		<description>J. B. Harold Satsujin Club (Japan)</description>
 		<year>1990</year>
 		<publisher>Hudson</publisher>
+		<info name="language" value="Japanese" />
 		<info name="serial" value="HCD0013"/>
 		<info name="release" value="19901123"/>
 		<info name="alt_title" value="J. B. ハロルド 殺人クラブ"/>
@@ -2473,7 +2475,7 @@ New game intro sports glitchy portraits
 		<info name="release" value="19941223"/>
 		<info name="alt_title" value="Jリーグ トリメンダスサッカー'94"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="j. league tremendous soccer '94 (acd, scd)(jpn)" sha1="a5ed925bc880ab8a9546973b88e8cb32bfac50de"/>
@@ -2505,7 +2507,7 @@ New game intro sports glitchy portraits
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="雀神伝説"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="janshin densetsu - quest of jongmaster (acd)(jpn)" sha1="afade5dd161d71ae646f3d2361aef56100362160"/>
@@ -3058,7 +3060,7 @@ Hangs after first attack turn (shoot to the foe behind the tree) (fixed)
 		<info name="release" value="19951013"/>
 		<info name="alt_title" value="リンダキューブ"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="linda (acd, scd)(jpn)" sha1="dc0ae10710aa7ba4f49a3e2606d939230891a340"/>
@@ -3197,7 +3199,7 @@ Verify [redbook] lip sync and repeat (uses track mode)
 		<info name="release" value="19940915"/>
 		<info name="alt_title" value="マッドストーカー フルメタルフォース"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mad stalker - full metal force (acd)(jpn)" sha1="c2c1fdb935068405154eca2ab6a4ed68985353dd"/>
@@ -3210,7 +3212,7 @@ Verify [redbook] lip sync and repeat (uses track mode)
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mad stalker - full metal force - sample disc (acd)(jpn)" sha1="3ee9dd98aa62dac638dc20f22f67029120a1d6d6"/>
@@ -3226,7 +3228,7 @@ Verify [redbook] lip sync and repeat (uses track mode)
 		<info name="release" value="19961213"/>
 		<info name="alt_title" value="魔導物語I 炎の卒園児"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="madou monogatari i - honou no sotsuenji [imperfect] (acd)(jpn)" sha1="b0af74f366ca5284fb9447df1a456e7f624250f0"/>
@@ -3246,7 +3248,7 @@ Crashes on (skippable) new game intro, [SCSI] timing sensitive
 		<info name="release" value="19940812"/>
 		<info name="alt_title" value="ぽっぷるメイル"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="magical fantasy adventure - popful mail (acd, scd)(jpn)" sha1="fce1f8fc9fd82e7b918178450846e1fc7e6d432e"/>
@@ -3342,7 +3344,7 @@ Crashes on (skippable) new game intro, [SCSI] timing sensitive
 		<info name="release" value="19950811"/>
 		<info name="alt_title" value="麻雀ソード プリンセスクエスト外伝"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mahjong sword - princess quest gaiden (acd, scd)(jpn)" sha1="6ce6561a7f6bf2c2508e1c1c442fc3810ad7db71"/>
@@ -4251,7 +4253,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19950616"/>
 		<info name="alt_title" value="プリンセスメーカー2"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="princess maker ii (acd, scd)(jpn)" sha1="6aa2c991496a68302daf297f23b96819d63ebefa"/>
@@ -4284,7 +4286,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19950811"/>
 		<info name="alt_title" value="プライベート アイドル"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="private eyedol (acd, scd)(jpn)" sha1="a80b9c9178b60efd84a9ec5de4dddc59e8f621e3"/>
@@ -4908,11 +4910,12 @@ Hangs on technique screen after level select (assuming you pick them up in stage
 		<description>Ryuuko no Ken (Japan)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
+		<info name="language" value="English/Japanese/Spanish"/>
 		<info name="serial" value="HCD4061"/>
 		<info name="release" value="19940326"/>
 		<info name="alt_title" value="龍虎の拳"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ryuuko no ken (acd)(jpn)" sha1="50c2a68d3b1ab99802ec865af901e8454df62fc4"/>
@@ -4924,8 +4927,9 @@ Hangs on technique screen after level select (assuming you pick them up in stage
 		<description>Ryuuko no Ken - Sample Disc (Japan)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
+		<info name="language" value="Japanese"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ryuuko no ken - sample disc (acd)(jpn)" sha1="d1c5f36592565e3284bdc970b673fd7b577ad784"/>
@@ -5100,7 +5104,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<info name="release" value="19940916"/>
 		<info name="alt_title" value="セクシーアイドル麻雀 ファッション物語"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sexy idol mahjong fashion monogatari (acd, scd)(jpn)" sha1="a640c7241a0c041eb25f73656545b32da310d020"/>
@@ -5539,7 +5543,7 @@ Offset [CRTC] screen
 		<info name="release" value="19941223"/>
 		<info name="alt_title" value="卒業2"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="sotsugyou ii - neo generation (acd, scd)(jpn)" sha1="df09e386502dc040c1fea86025a3f7da4f38f682"/>
@@ -5738,7 +5742,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<info name="release" value="19940922"/>
 		<info name="alt_title" value="ストライダー飛竜"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="strider hiryuu (acd)(jpn)" sha1="55730fca43667b79ca69a22092ddeb9e47f8eac4"/>
@@ -5914,7 +5918,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<info name="release" value="19940805"/>
 		<info name="alt_title" value="スーパーリアル麻雀PII・PIIIカスタム"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="super real mahjong p ii iii custom (acd, scd)(jpn)" sha1="3f3b4e7c5c2ae0faabf139eb95e5e6002162928b"/>
@@ -5946,7 +5950,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<info name="release" value="19950303"/>
 		<info name="alt_title" value="スーパーリアル麻雀P.Vカスタム"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="super real mahjong p v custom (acd, scd)(jpn)" sha1="248e967c4069bf047b1a114a7768bb2110f430a4"/>
@@ -6087,7 +6091,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<info name="release" value="19940922"/>
 		<info name="alt_title" value="誕生～デビュー～"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tanjou debut (acd, scd)(jpn)" sha1="859060b5ada85083f5e262309f5f1b7ec7e3998c"/>
@@ -6183,7 +6187,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="カブキ一刀涼談"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="tengai makyou - kabuki ittou ryoudan (acd)(jpn)" sha1="0ebc331c4d7d963f4a6553e6f2020fa5a1031753"/>
@@ -6295,7 +6299,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<info name="release" value="19940304"/>
 		<info name="alt_title" value="アトラスRenaissance Voyager"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="the atlas - renaissance voyager (acd, scd)(jpn)" sha1="a3b7b45550eef37f2f85fe2d98334341ccd67840"/>
@@ -6778,7 +6782,7 @@ Cuts off [ADPCM] playback, enables half irq
 		<info name="release" value="19940708"/>
 		<info name="alt_title" value="バスティール2"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="vasteel ii (acd, scd)(jpn)" sha1="fa01d9a03416d35a313740728a797f8792ddfda1"/>
@@ -6809,6 +6813,7 @@ Cuts off [ADPCM] playback, enables half irq
 		<notes><![CDATA[
 Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 ]]></notes>
+		<info name="language" value="English/Japanese"/>
 		<info name="serial" value="PVCD0001"/>
 		<info name="release" value="19900330"/>
 		<info name="alt_title" value="カルメンサンディエゴを追え! 世界編"/>
@@ -6893,7 +6898,7 @@ Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 		<info name="release" value="19940604"/>
 		<info name="alt_title" value="ワールドヒーローズ2"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="world heroes ii (acd)(jpn)" sha1="67e7c559c1be2034502cb63efea6881fcc6b8e5a"/>
@@ -6907,7 +6912,7 @@ Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 		<publisher>Hudson</publisher>
 		<info name="alt_title" value="ワールドヒーローズ2 体験版"/>
 		<info name="usage" value="CD-ROM² Arcade System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="world heroes ii - sample disc (acd)(jpn)" sha1="b3b8bcd66f58ee57f0e7473df1549f51e9096ade"/>
@@ -6923,7 +6928,7 @@ Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 		<info name="release" value="19950519"/>
 		<info name="alt_title" value="レッスルエンジェルス ダブルインパクト"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
+		<sharedfeat name="requirement" value="pce:acardpro"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
 				<disk name="wrestling angels - double impact (acd, scd)(jpn)" sha1="d79ce768849f21a9010c221d8dd7817a4a1b94f9"/>
@@ -7291,6 +7296,7 @@ https://mametesters.org/view.php?id=7262
 		<description>Cotton - Fantastic Night Dreams (USA)</description>
 		<year>1993</year>
 		<publisher>Success</publisher>
+		<info name="language" value="English"/>
 		<info name="serial" value="TGXCD1038"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -7448,6 +7454,7 @@ https://mametesters.org/view.php?id=7972 (fixed)
 		<description>J. B. Harold Murder Club (USA)</description>
 		<year>1991</year>
 		<publisher>Riverhill Soft</publisher>
+		<info name="language" value="English" />
 		<info name="serial" value="TGXCD1012"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
@@ -7458,6 +7465,20 @@ https://mametesters.org/view.php?id=7972 (fixed)
 		</part>
 	</software>
 
+	<!--
+	Source: http://redump.org/disc/62014/
+	<rom name="Implode (USA) (Unl).cue" size="1145" crc="7db10cbb" sha1="40cce6acd42b6df5670cc1b0f13fc67c1f1ecf1b"/>
+	<rom name="Implode (USA) (Unl) (Track 01).bin" size="2217936" crc="ca38443a" sha1="e6ac208247b025508ccce5d755ecab68c937ee49"/>
+	<rom name="Implode (USA) (Unl) (Track 02).bin" size="2751840" crc="d7ec6479" sha1="66aaafb28d277baab10330b01ae5977b6b73977f"/>
+	<rom name="Implode (USA) (Unl) (Track 03).bin" size="38455200" crc="008017b0" sha1="ab0a9e61f38bbe1855639f29ebf11e0be725f51c"/>
+	<rom name="Implode (USA) (Unl) (Track 04).bin" size="39062016" crc="e538d5f3" sha1="8c883e7ee2028626100824315a54c53a8c2fa630"/>
+	<rom name="Implode (USA) (Unl) (Track 05).bin" size="39640608" crc="5e8a3218" sha1="e71a33905c1bb396cd89772e9700c21a5a9c230a"/>
+	<rom name="Implode (USA) (Unl) (Track 06).bin" size="38455200" crc="f832f486" sha1="eb056b55a9aebeb3180c1f33709b321de229785e"/>
+	<rom name="Implode (USA) (Unl) (Track 07).bin" size="39513600" crc="6a61b09a" sha1="77b8140e606b9918bf3504c27c12186f1a8f6eae"/>
+	<rom name="Implode (USA) (Unl) (Track 08).bin" size="31714368" crc="4dc3dd44" sha1="5cf7917cca3185ec8b90a6aa07798017f3a9d67e"/>
+	<rom name="Implode (USA) (Unl) (Track 09).bin" size="35632800" crc="6a684b2b" sha1="4e04a1bfb6ee58762d5fb60f5cddb462c09bc4ac"/>
+	<rom name="Implode (USA) (Unl) (Track 10).bin" size="33633600" crc="96e0c495" sha1="147577dc0d20624b55e580217062f3d6a9dae6ad"/>
+	-->
 	<software name="implode">
 		<description>Implode (USA)</description>
 		<year>2002</year>
@@ -7465,10 +7486,9 @@ https://mametesters.org/view.php?id=7972 (fixed)
 		<info name="serial" value="BTCD0201"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
-		<!-- baddump: This disc has a copy protection scheme (also mentioned with [bad toc] moniker) -->
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="implode (scd)(usa)[bad toc]" sha1="e408fad0a69bb6c7329e218ef6bb26165de616b6" status="baddump"/>
+				<disk name="Implode (USA) (Unl)" sha1="eb21d22cd706137f0fbba68d6bdc8e36c7cba7a7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7865,17 +7885,80 @@ Offset [CRTC] screen
 
 	<!-- Unlicensed Discs -->
 
+	<!--
+	Source: http://redump.org/disc/62035/
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease).cue" size="2861" crc="b85fc202" sha1="4de4ee2bd60b9f8de25dbe2108393ddb8b1a5cd7"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 01).bin" size="9800784" crc="efc2ee90" sha1="a1b09680b012a47996eada11fe85b7bfd3b1a437"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 02).bin" size="36105552" crc="c70deb95" sha1="6653419696ee19c61255c9116de51e891723ee0c"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 03).bin" size="40181568" crc="ea95cdef" sha1="0ecc22e91a584cb8668ca5915e64e0a742834565"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 04).bin" size="32034240" crc="657ee650" sha1="80675bc2888417562349c8e6f057ff6f21544c06"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 05).bin" size="50805552" crc="92d7be68" sha1="8d9971089bd0dca29935b9fb665052ee69e44ed2"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 06).bin" size="35282352" crc="80fe04ab" sha1="b4809b70fa0b5f18050483326a42d4dfe1079a80"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 07).bin" size="28000560" crc="5d9c831f" sha1="ed09e6f4e70954721f76676997dd54aa418c3544"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 08).bin" size="42350112" crc="2d859b2f" sha1="21a8bef6219fcaf40b54684834556469043fe060"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 09).bin" size="33516000" crc="f91f8104" sha1="727ad8f66823e1335d59d23420270fda08d21449"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 10).bin" size="32441136" crc="a7a33e4a" sha1="d22331428d647bc89e9f909cddc5358d6a329d49"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 11).bin" size="41435184" crc="35c35cdd" sha1="1cd187097d730937b9d1e2d3f0e7c18a348dd101"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 12).bin" size="39866400" crc="ed91cc47" sha1="ebc8c351f454700ee65ca0a2fd7924ad9ef2a9a6"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 13).bin" size="48187776" crc="179a8296" sha1="4d4a207b9b004adc80cc47b9a85ff79e1262450c"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 14).bin" size="40572000" crc="4852e697" sha1="cfaf3ccd84a9ae7101a9dedbba4ffe5eca0a2eca"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 15).bin" size="40541424" crc="ca9a472c" sha1="8e6a4d80d1e14d1fa34fa34c838f073948f44307"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 16).bin" size="42336000" crc="c8f2ad71" sha1="ce0738b05e75a6b120e9659a74ea08ae48c44092"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 17).bin" size="37984800" crc="fde8b145" sha1="5e33de759110aac050c07d2ae9961b8aadbd6934"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 18).bin" size="38455200" crc="fe1cce67" sha1="c7d25ff634bf137b5dd6d5ad8f0edf4d533e914c"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 19).bin" size="39062016" crc="06c2c6fc" sha1="a19bcd79d6555458788da8500dbcf32b0ff0e314"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 20).bin" size="39513600" crc="d19d5d18" sha1="e31c8e9ee8de588bed5ab9219891f4c392530ada"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Rerelease) (Track 21).bin" size="27880608" crc="97d70891" sha1="5f5b7232b3481723dec7269d1ef018179e24a331"/>
+	-->
 	<software name="meteorbl">
+		<description>Meteor Blaster DX (USA, re-release)</description>
+		<year>2013</year>
+		<publisher>MindRec</publisher>
+		<info name="serial" value="BTCD0402"/>
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Meteor Blaster DX (USA) (Unl) (Rerelease)" sha1="50c376ddcc738428d1971a2208eec213a5f331c4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Source: http://redump.org/disc/62015/
+	<rom name="Meteor Blaster DX (USA) (Unl).cue" size="2609" crc="703dbcdc" sha1="5aaa4f2679d33b4639680f6cc2c2cb6eb1c8f3c8"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 01).bin" size="5049744" crc="84c37434" sha1="b85752342c9f2f3df82c21806555e9dc0086c236"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 02).bin" size="36105552" crc="aba046ac" sha1="078e2779cd32d397cab223ff411f1c56ffbfb91e"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 03).bin" size="40181568" crc="37d1d887" sha1="75c7dea34c601d6e457a0c3fdfaf764123436558"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 04).bin" size="32034240" crc="2efd4881" sha1="fca63d86755677555fb1244a5c4de3e73c2da24f"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 05).bin" size="50805552" crc="7d506dc3" sha1="3b12ffe3cc548587cfa959fe565ad42a7b39690a"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 06).bin" size="35282352" crc="180285d9" sha1="b7157aa75d7183bd6540b5d71af319be9ce4cd7a"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 07).bin" size="28000560" crc="cd400ff0" sha1="a53d76eefd60880965b37ffb9dd1462a6a143008"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 08).bin" size="42350112" crc="8a54f05f" sha1="1fcb732678b41dbbb7fa19016522b0e2e4df5ad3"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 09).bin" size="33516000" crc="f1673732" sha1="8bce31bf6f032efd7ab66fd39a6ee0e7879d4c4b"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 10).bin" size="32441136" crc="4fba4c87" sha1="e2692ccded80ab74d696f68c3ba67225ade19e9c"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 11).bin" size="41435184" crc="186b76bc" sha1="ff1643c5584b14e53490ebe4dcb0a7d9f73df68a"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 12).bin" size="39866400" crc="be62bdcd" sha1="6eb53eee8f65f1f127336b24947cc60260e2b006"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 13).bin" size="48187776" crc="71c57e30" sha1="68c9511e3af2a270a87410beb920f78c03e3b55a"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 14).bin" size="40572000" crc="f2374557" sha1="ff966f519897b7ceac16735846e3c77ecb249a67"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 15).bin" size="40541424" crc="8afe1996" sha1="da826bf0f7d97feeb2345d48cbc7e06fcc8df4c4"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 16).bin" size="42336000" crc="1ca0fb93" sha1="e185e844d507114befc28eee543132c85a1766d5"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 17).bin" size="37984800" crc="df6a0963" sha1="758fa6402400d431c31a9f07ec9c5b9531bd6932"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 18).bin" size="38455200" crc="0c49c79d" sha1="87af6362927916df0b775a39825271599bc922da"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 19).bin" size="39062016" crc="e538d5f3" sha1="8c883e7ee2028626100824315a54c53a8c2fa630"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 20).bin" size="39513600" crc="6a61b09a" sha1="77b8140e606b9918bf3504c27c12186f1a8f6eae"/>
+	<rom name="Meteor Blaster DX (USA) (Unl) (Track 21).bin" size="27880608" crc="715dc737" sha1="2fc290e18b528405c2232767e8d0d6345d5a6d88"/>
+	-->
+	<software name="meteorbl_10" cloneof="meteorbl">
 		<description>Meteor Blaster DX (USA)</description>
 		<year>2004</year>
 		<publisher>MindRec</publisher>
 		<info name="serial" value="BTCD0402"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
-		<!-- baddump: This disc has a copy protection scheme (also mentioned with [bad toc] moniker) -->
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="meteor blaster dx (scd)(usa)[bad toc]" sha1="d6a3d3a6c6305b7a7137ac330388fa327d9da066" status="baddump"/>
+				<disk name="Meteor Blaster DX (USA) (Unl)" sha1="4ce00644e49b7e0e7bbbd9c73bff500068f9aa30"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7922,21 +8005,37 @@ Offset [CRTC] screen
 		</part>
 	</software>
 
-
+	<!--
+	Source: http://redump.org/disc/78660/
+	<rom name="Hi-Leg Fantasy (Japan) (Unl).cue" size="1581" crc="e5857401" sha1="5326c8a4044caf0639f6c090ef48a5cc0ee0150f"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 01).bin" size="9678480" crc="f7bb332c" sha1="c9c862eab7fcb1e0edeaae566b3ec79f65897028"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 02).bin" size="20490624" crc="2f6aa10f" sha1="532a66c9d5bd053144b4e18b492e92f1fe7764ab"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 03).bin" size="56596176" crc="3f5661ad" sha1="96da0c0288e4849827b1ac5fddd6dec37787658b"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 04).bin" size="52830624" crc="0ed4725f" sha1="436d38d88211585e8188e25368ea31e6de28b488"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 05).bin" size="55949376" crc="db77a9b3" sha1="7c4b97bfd0cc2ef7a8ce9d61bcf5021f9ad69e61"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 06).bin" size="58534224" crc="4eeef735" sha1="5f647db22e44a817fd257a6944f7f2f7badff307"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 07).bin" size="55213200" crc="1e0e0258" sha1="f366c33dcdeb826276e26e0400a9740c52d88018"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 08).bin" size="22638000" crc="81e774ed" sha1="223262164e7eb9674348386400f7cc51aac8a8b1"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 09).bin" size="57184176" crc="32c082cb" sha1="c46cc4be826a2dbfb0c30ab124fa9359bf21fcc2"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 10).bin" size="2956464" crc="9ab77c00" sha1="0e2e1c2fe0f4883a4d8852aaf48b8f9ebe168afd"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 11).bin" size="2688336" crc="0b786578" sha1="88c15fb75ff0906c673e6a92711cf7c475b009ed"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 12).bin" size="2587200" crc="e7f729bf" sha1="293d94db439ea1363a47ba945c53add9b7befcad"/>
+	<rom name="Hi-Leg Fantasy (Japan) (Unl) (Track 13).bin" size="2086224" crc="a7cd0f1c" sha1="de9322ad608b7d4da5205e0f56bcb3237b308fbf"/>
+	-->
 	<software name="hilegfan" supported="no">
 		<description>Hi-Leg Fantasy (GECD)(Japan)</description>
 		<year>1994</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GED-1011"/>
 		<info name="release" value="19940916"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hi-leg fantasy (gecd)(jpn)" sha1="a3740084259f3bad73669ed663f57bbf5a608951"/>
+				<disk name="Hi-Leg Fantasy (Japan) (Unl)" sha1="404a5a8b73ad1b77714cb6f65b20be225ae183ff"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7944,12 +8043,12 @@ Offset [CRTC] screen
 	<software name="avtanjo" supported="no">
 		<description>AV Tanjou (GECD)(Japan)</description>
 		<year>1995</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GED-1015"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -7961,13 +8060,13 @@ Offset [CRTC] screen
 	<software name="idolpai" supported="no">
 		<description>Bishoujo Janshi Idol Pai (GECD)(Japan)</description>
 		<year>1995</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GED-1016"/>
 		<info name="release" value="19951110"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -7977,15 +8076,15 @@ Offset [CRTC] screen
 	</software>
 
 	<software name="pachinko" supported="no">
-		<description>CD Bishoujo Pachinko Kyuuma Yon Shimai (Japan)(Jpn)</description>
+		<description>CD Bishoujo Pachinko Kyuuma Yon Shimai (Japan)</description>
 		<year>1995</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GECD-1014"/>
 		<info name="release" value="19950105"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -7997,13 +8096,13 @@ Offset [CRTC] screen
 	<software name="hanafuda" supported="no">
 		<description>CD Hanafuda Bishoujo Fan Club (GECD)(Japan)</description>
 		<year>1994</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GED-1013"/>
 		<info name="release" value="19941125"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -8015,13 +8114,13 @@ Offset [CRTC] screen
 	<software name="mahjong" supported="no">
 		<description>CD Mahjong Bishoujo Chuushinha (GECD)(Japan)</description>
 		<year>1993</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GECD-1010"/>
 		<info name="release" value="19930730"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -8033,13 +8132,13 @@ Offset [CRTC] screen
 	<software name="pachislt" supported="no">
 		<description>CD Pachisuro Bishoujo Gambler (GECD)(Japan)</description>
 		<year>1994</year>
-		<publisher>Game Express</publisher>
+		<publisher>Games Express</publisher>
 		<notes><![CDATA[
-[Game Express] title, using unemulated HW slot features
+[Games Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GECD-1012"/>
 		<info name="release" value="19940729"/>
-		<info name="usage" value="Game Express CD Card required" />
+		<info name="usage" value="Games Express CD Card required" />
 		<sharedfeat name="requirement" value="pce:gecd"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
@@ -8048,5 +8147,397 @@ Offset [CRTC] screen
 		</part>
 	</software>
 
+	<!--
+	Source: http://redump.org/disc/109174/
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl).cue" size="1851" crc="17dfe61a" sha1="6367a535dd507cf7e2e408fdf0e68e5c26516b6a"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 01).bin" size="910224" crc="ecd234b8" sha1="80baf55be618f17a73fac830b64d3d2c23d631cd"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 02).bin" size="3370416" crc="f917f093" sha1="1d999569b014bc5d44bbc54937bf778e1bce66a6"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 03).bin" size="34520304" crc="d6ddb667" sha1="1c09e86b34212c87ac8b60b050166716b5d187aa"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 04).bin" size="38669232" crc="b24fd4f5" sha1="7e53e8039020790203ee8787bea410ffbc271e60"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 05).bin" size="34275696" crc="dde9b347" sha1="92837c876481a317f2ffb09173ebbf2e7a7a568a"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 06).bin" size="33443088" crc="180d59d4" sha1="9fd3e8879e37ceaad07bc219b7ecf6e23ef8e4ea"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 07).bin" size="34061664" crc="c19e3e3d" sha1="1a5eb369b44905a728e966effa7b6f709ffa3627"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 08).bin" size="38010672" crc="170ad6b6" sha1="2052df430ad0618fadc08efede0372dd3bf13d8b"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 09).bin" size="40955376" crc="55194680" sha1="4e379b51dcad60015abcbb21949d1fcf76440b8a"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 10).bin" size="39007920" crc="5cffeb67" sha1="1920c4457fac969855e9cb25cb3937ac6d2f15c0"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 11).bin" size="45694656" crc="67023e47" sha1="004d47041559237f0d1d0abc65514bd89530025e"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 12).bin" size="6148128" crc="43451f2c" sha1="98d024f2534dbb52d454be95ff9d0aebe554a1a6"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 13).bin" size="30933504" crc="b9c55c8c" sha1="834d2e32cfce1fab36cf2e3fcb38235b5c0644c1"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 14).bin" size="2443728" crc="09cd217f" sha1="b17ae5e8aa7530fa530ce668d6b5965092902624"/>
+	<rom name="Jessie Jaeger in Cleopatra's Curse (World) (Unl) (Track 15).bin" size="42354816" crc="30d7ce04" sha1="aa322da0e0cf9eb23d4092f5985dd2e47ab031b0"/>
+	-->
+	<software name="jjcleopa">
+		<description>Jessie Jaeger in Cleopatra's Curse</description>
+		<year>2021</year>
+		<publisher>Bold Game Studio</publisher>
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Jessie Jaeger in Cleopatra's Curse (World) (Unl)" sha1="06a011388ff2a243c2d22a2c92022816acb0536b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<rom name="CleopatrasCurse.cue" size="624" crc="5222018a" sha1="b43ba96337226c03737513103edb347b8024b633"/>
+	<rom name="expgirl.iso" size="2637824" crc="b01e544c" sha1="4186f8da1781c47f4ea61319998ac2fb49f6b522"/>
+	<rom name="Boss.wav" size="2443040" crc="fa22fab6" sha1="776d6658290f144d6981bca866d3e2041d86622b"/>
+	<rom name="cantbelieve.wav" size="6146144" crc="72843989" sha1="c606679b11b575795724ef2eaf3d11d245513207"/>
+	<rom name="GemstoneCaves2.wav" size="34165454" crc="93ea55ec" sha1="16332a4e2096f7fa35abc2097493886ffb2eff3c"/>
+	<rom name="Intro.wav" size="6146144" crc="72843989" sha1="c606679b11b575795724ef2eaf3d11d245513207"/>
+	<rom name="Thoth2.wav" size="38008966" crc="415ff93f" sha1="88cceaa2a29ee05478eb92b6e4c100176620f5ad"/>
+	<rom name="Warriors.wav" size="33441858" crc="b0694a27" sha1="b4db0c50a9460005bc9079223e1b4be0eae2f447"/>
+	-->
+	<software name="jjcleopa_d" cloneof="jjcleopa">
+		<description>Jessie Jaeger in Cleopatra's Curse (demo)</description>
+		<year>2021</year>
+		<publisher>Bold Game Studio</publisher>
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="CleopatrasCurseDemo" sha1="31a98a477683cc503817b4403213251d4b64a189"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Source: http://redump.org/disc/69150/
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease).cue" size="3147" crc="a24f8fec" sha1="21cc965155214be45f08bc62e8bae34b6e614922"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 01).bin" size="7117152" crc="5959676e" sha1="d14926b16640860c6e175da44e30903f48666b1a"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 02).bin" size="10118304" crc="a32370bd" sha1="763870e0c0d0a38d4271019770596c92f8838758"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 03).bin" size="20368320" crc="5d1d6928" sha1="91a0cfe545b695385a440660daa9382e4d50a6c3"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 04).bin" size="18714864" crc="8015e9d9" sha1="06ec3830957ad4e45c5f974cef6f098094141d98"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 05).bin" size="1886304" crc="ae308010" sha1="2ece9cc5a1be95797eba3de7feeccf5cf80c5f9b"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 06).bin" size="1655808" crc="6801ba39" sha1="5747695185a6f4e90a9e6f9cd70486935be73348"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 07).bin" size="43751904" crc="16fab8ef" sha1="596c7860c522119b587346a838a62eb95f2fd112"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 08).bin" size="16816800" crc="c221404a" sha1="aac0b54e58e8e2468d89036d2e3de573d76d8393"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 09).bin" size="40219200" crc="9dbb27e2" sha1="2e48dedfd68aff3baa5d3f771e19ce398a22d270"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 10).bin" size="39541824" crc="79c7cd8b" sha1="3f3dd8561ec1f605486871898398401b70878c2b"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 11).bin" size="38085936" crc="d861a789" sha1="9e4254343b0c79dc4192ef2f04058c1a02450686"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 12).bin" size="39866400" crc="7b1cef35" sha1="3e20521c050d38d9333ee9d4d48b96b94339b8de"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 13).bin" size="13168848" crc="162a1ec0" sha1="a534380ca0d0858a18e2d62bab365c216c879d66"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 14).bin" size="45424176" crc="eaac1ef9" sha1="e0f9ae4a577081f56ed9f9b39f3ad0d3f60b8494"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 15).bin" size="54756912" crc="7fbdbd9d" sha1="a86bc203c028df9c41aa7f920c0e74a9c3855b41"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 16).bin" size="50502144" crc="9c9007c3" sha1="12e664ba5cf20a47685b8fe650a04493cc295cf8"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 17).bin" size="43631952" crc="1e486400" sha1="658bafa12d8daca55f34014c0dc177418636c9d4"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 18).bin" size="49803600" crc="75999a12" sha1="d8092bb876da1e173ba0c7d14c05426856808013"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 19).bin" size="37220400" crc="ea306ddd" sha1="551156fdc8ce0091fd1a4191090ec8b466de6282"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 20).bin" size="47275200" crc="1197545f" sha1="f9c8c67ee8f63f55702847bf7b312164713b9454"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 21).bin" size="34750800" crc="00409221" sha1="6104cd3a4a8f4d44d2ff49121331e81953f6397f"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 22).bin" size="39337200" crc="a21773f5" sha1="71ddb922b8d86da33faf4e7aacf5cc587b398a6a"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 23).bin" size="21257376" crc="3535cb2a" sha1="799acd9b8bbf93013515c8c5f270f587f57cc81c"/>
+	<rom name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease) (Track 24).bin" size="19933200" crc="dffd3814" sha1="7f55c15533823da2f5144ae2686c29652952823d"/>
+	-->
+	<software name="henshin">
+		<description>FX Unit Yuki: The Henshin Engine (re-release)</description>
+		<year>2018</year>
+		<publisher>Pixel Heart</publisher>
+		<info name="developer" value="SaruPro" />
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="FX Unit Yuki - The Henshin Engine (USA) (Unl) (Rerelease)" sha1="d92198bb9f3ab1463ba3f3544d1b357c9cdad5ef"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<rom name="Henshin Engine (USA) (Demo) (Unl).cue" size="467" crc="ef985c1f" sha1="d2dc4ad639e05878504a1b8a2f1546878313ea9d"/>
+	<rom name="Henshin Engine (USA) (Demo) (Unl) (Track 1).bin" size="13333488" crc="fc8234b8" sha1="a11aa17a89f7e59f9b29e3d32fc93b479049e59f"/>
+	<rom name="Henshin Engine (USA) (Demo) (Unl) (Track 2).bin" size="1587600" crc="38ca9be9" sha1="765be764eed10a9d89e06c56d3d64ee83a87fedc"/>
+	<rom name="Henshin Engine (USA) (Demo) (Unl) (Track 3).bin" size="12804288" crc="b7edc65a" sha1="0da6b12b29590bba5a1ae3814e288f70828c11a9"/>
+	<rom name="Henshin Engine (USA) (Demo) (Unl) (Track 4).bin" size="41616288" crc="73ea3430" sha1="6be7029f26451568b87a1302e678e0b8909e89ad"/>
+	-->
+	<software name="henshin_d" cloneof="henshin">
+		<description>Henshin Engine (demo)</description>
+		<year>2016</year>
+		<publisher>The Sarumaru Company</publisher>
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Henshin Engine (USA) (Demo) (Unl)" sha1="91399fe89ed5ec2da6c0410ee97d2809741276d1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Source: http://redump.org/disc/62036/
+	<rom name="Hypernova Blast (USA) (Unl).cue" size="2933" crc="fb155243" sha1="8ca7766ae60c26dd5422c31b68d8b7c8ea800ecb"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 01).bin" size="21518448" crc="ebcc7a88" sha1="b4ab4a9cd33c648c0cbc285c23e07bc9b63abb01"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 02).bin" size="2347296" crc="c70d41ff" sha1="8ff57b3975bbed99ccf8c3467e59073c2520ab5a"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 03).bin" size="40767216" crc="42ae3473" sha1="3c085e87ec8819ae6178f9d8b1bca824d47b8e6e"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 04).bin" size="27125616" crc="bd19c54b" sha1="626a1a12ee2bcebcb8aceee73e1cf1c810837359"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 05).bin" size="25048800" crc="915569c8" sha1="2964c7575583e7296ad711c6141ea52a91ffaa07"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 06).bin" size="33567744" crc="9f9d3318" sha1="ad57ce6c6a5249c4f3cfba0f6ca667ea0dd2bd32"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 07).bin" size="26812800" crc="e574783a" sha1="e5e6e2031bb38c962b282d4247f28687b66e6932"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 08).bin" size="35809200" crc="0f218067" sha1="6afa2ecef661da966faa24220e94cfa911b42069"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 09).bin" size="24312624" crc="b413a1d4" sha1="1d5a1a7e3c82ff1138efead02de36f0312d9b4c4"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 10).bin" size="27784176" crc="6927b2b5" sha1="1fe6172a5ecba3fd9623809c8120df9625cdbee5"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 11).bin" size="31752000" crc="5085b9c3" sha1="6bdc1bfa7bcf5290879216d576b87250362fbb6a"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 12).bin" size="35632800" crc="df1c348e" sha1="9f1f4876d2c1762b7662d934d04024194a30a237"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 13).bin" size="43123920" crc="5033367b" sha1="283f882c9034719df95c41b4d4e94718862e3aaa"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 14).bin" size="26525856" crc="4a76409a" sha1="dcaa30d3b3a4ff89063d7585ffe1b625d1a55a3b"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 15).bin" size="27426672" crc="bbc7f587" sha1="adb9541e1727064f9a879643202ce072e420e1a5"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 16).bin" size="30340800" crc="71afc0b1" sha1="30deaa00ee987a4bedf154c3457dc5f91f5af4a9"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 17).bin" size="32104800" crc="f263bcdd" sha1="bd9e29defd1001038c2289828fac933cc05a58c1"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 18).bin" size="28224000" crc="3e71a991" sha1="9ea8a744226cc59601f38b26e975699f98db7d82"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 19).bin" size="32104800" crc="1893deb1" sha1="2240949f8be941cd9471e05ca5d0304c9ee07b4b"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 20).bin" size="23559984" crc="dc41111e" sha1="d60f9f8588439939407b675dc1d1d48c6f94412c"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 21).bin" size="18228000" crc="ed04018c" sha1="1ba704e94dbe4e303d460df895f1522e7bbeb730"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 22).bin" size="32102448" crc="6812c421" sha1="6f34565f5ea1313d38d9189cc3639727999a208c"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 23).bin" size="23336544" crc="7c6e339d" sha1="d484a08cc8238a2af69e38a7d4ce723aa3bac4dd"/>
+	<rom name="Hypernova Blast (USA) (Unl) (Track 24).bin" size="34927200" crc="b41275ce" sha1="a93e35f96063617ebf66d7b4911e214faf897271"/>
+	-->
+	<software name="hypernov">
+		<description>Hypernova Blast (USA)</description>
+		<year>2014</year>
+		<publisher>MindRec &amp; VodSound</publisher>
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Hypernova Blast (USA) (Unl)" sha1="2d5059fc38ba24d9ee434a33eb76bf3d3a919b02"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Source: http://redump.org/disc/70359/
+	<rom name="Insanity (USA) (Unl).cue" size="1477" crc="ce8a2d65" sha1="bc833516704d72122d4c647d7e549e31c8072781"/>
+	<rom name="Insanity (USA) (Unl) (Track 01).bin" size="4120704" crc="e2992aca" sha1="c07eb25a6a181edc1313e508f11240d95e8be3db"/>
+	<rom name="Insanity (USA) (Unl) (Track 02).bin" size="2935296" crc="6859fb0d" sha1="80ef3d4572761d37429e6ca2c2364c51f29b2afa"/>
+	<rom name="Insanity (USA) (Unl) (Track 03).bin" size="32438784" crc="91172fac" sha1="8c4c606100af905c77dfd332f9ad8bd4dbc9df23"/>
+	<rom name="Insanity (USA) (Unl) (Track 04).bin" size="15170400" crc="c732bfb6" sha1="2d532caaa27b1a0b47b67e68d29ed4d4edfab1ef"/>
+	<rom name="Insanity (USA) (Unl) (Track 05).bin" size="18799536" crc="dc86fc68" sha1="bcedb043276f40c06998d757c8d426f923a56e95"/>
+	<rom name="Insanity (USA) (Unl) (Track 06).bin" size="16983792" crc="e6ac6d71" sha1="b1ff38bf7893ec6357d99a8896f0346faa8243e4"/>
+	<rom name="Insanity (USA) (Unl) (Track 07).bin" size="14641200" crc="57021cbe" sha1="8c7788c70c60084ccede560f6c4290f457e527a8"/>
+	<rom name="Insanity (USA) (Unl) (Track 08).bin" size="29080128" crc="b951a6cd" sha1="57817652b0980aa8f3b577608244484620bdd370"/>
+	<rom name="Insanity (USA) (Unl) (Track 09).bin" size="16405200" crc="8d52c2cc" sha1="5850d2053ab7404f5ad3a26247ef1a1b5cc84d7b"/>
+	<rom name="Insanity (USA) (Unl) (Track 10).bin" size="16078272" crc="2f8177ff" sha1="d657638b8e72058ecb23acc873344913290448b9"/>
+	<rom name="Insanity (USA) (Unl) (Track 11).bin" size="4755744" crc="dc7cbeb0" sha1="b08b7832505300f6d0e67e8b434b8a599d49755c"/>
+	<rom name="Insanity (USA) (Unl) (Track 12).bin" size="25592112" crc="832f8e76" sha1="695c976523d0a61aa456a3b9610a4dd0e810477b"/>
+	<rom name="Insanity (USA) (Unl) (Track 13).bin" size="25453344" crc="a2e1675c" sha1="70b5c75b8ab5007b3d42db9a5b9ecdacb1b00a06"/>
+	-->
+	<software name="insanity">
+		<description>Insanity</description>
+		<year>2009</year>
+		<publisher>Aetherbyte Studios</publisher>
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Insanity (USA) (Unl)" sha1="fdd2bc51e3342093dd395becd9a21321dec8894b"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Source: http://redump.org/disc/60281/
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease).cue" size="3589" crc="da073a3d" sha1="9936b139ed5a668b1c8d97a22e35e639712bf77b"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 01).bin" size="13408752" crc="29c8be3f" sha1="16bab1d94660b6e8b7417dbdaeb3a42ebf9b7755"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 02).bin" size="7954464" crc="bb5bfef1" sha1="73493cb719204c822e1d82aa17bb84c53db77f6b"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 03).bin" size="23425920" crc="5ac301c2" sha1="f8cda215684e0a3bfb7306c9eade9fc7ac3ff606"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 04).bin" size="25060560" crc="142eac63" sha1="ccadff314df9f44dba1d39dd992d782b93a8e373"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 05).bin" size="11371920" crc="4ae22ed9" sha1="9b1c24c6d1af10bb7d28d04ce1bfa08100954442"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 06).bin" size="14834064" crc="0655d245" sha1="52c8c5d5f34003d96ddf7f7bf1ae3ea3072c13f0"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 07).bin" size="19248768" crc="1b3c2f2b" sha1="7c03f031aa04e441f3c3575b16e1612762219d15"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 08).bin" size="35242368" crc="52493205" sha1="325b087acb6779d6cee4aa0fd3a69d5e4f6b0dc4"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 09).bin" size="50243424" crc="cb9a149a" sha1="192c39e765323f345ae7e177c672a4beaa47d28e"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 10).bin" size="44276400" crc="f2169941" sha1="897956415521da57fa0ec7de6884dce5f0ca4412"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 11).bin" size="28924896" crc="4d489013" sha1="e43d1ce8bd12f017a67ddafcdbb5b5588c4a28d6"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 12).bin" size="23120160" crc="b63ca457" sha1="621d597ad88318c00ee370374c2ed5f33eea3a9d"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 13).bin" size="21972384" crc="93df1689" sha1="f024e688ecbe14c6e85a0d85accecd0f37aa643c"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 14).bin" size="28541520" crc="72863838" sha1="724744be7bd10f59dc141d8dbf6303ce0fb07b74"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 15).bin" size="1373568" crc="7661ef1a" sha1="77d34db5be55807ff14f3d34cc64057226087bcc"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 16).bin" size="18002208" crc="f7cd601b" sha1="727a44576c9ab3e6d5a0af1b392e9163fb5082c3"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 17).bin" size="6785520" crc="02ac065a" sha1="5b0f0ffe97443f82c9a913d158a1d54b4371757a"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 18).bin" size="13563984" crc="bec6949d" sha1="58e563beafb86ff6273f99b06607ffe8ad0b09e1"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 19).bin" size="24352608" crc="10851632" sha1="b4825547c77807eb2ca8dac473dce92f7c5cce87"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 20).bin" size="11470704" crc="c309f9e6" sha1="747d41f8dcbd2d2085b391fc114d9a4d2d4f9487"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 21).bin" size="13074768" crc="1b153518" sha1="125dcc5d006c50abdf3a8453146bc3aa93bef2d0"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 22).bin" size="9483264" crc="1734561b" sha1="69f510668ab5d00d9ab3c70e0f1910fff9af1ac2"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 23).bin" size="6787872" crc="286e053e" sha1="acd269194374a75b6fc38b4fa9dd0af76e0e14ae"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 24).bin" size="9993648" crc="4e14006b" sha1="4015a951336adb124455a2c7253c198869bedfc1"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 25).bin" size="23037840" crc="06066a35" sha1="218ead5a53b6e85780b33ab3ba1947a0c3783a85"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 26).bin" size="33805296" crc="130e007a" sha1="55ad27a143af5b6d8443a417d021081cbf93a882"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 27).bin" size="5498976" crc="66fdba30" sha1="0908788204ba2f3960884de3defac97e9902e46c"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 28).bin" size="12884256" crc="275cbd32" sha1="82820d385709d73a73f95a40ec79dded59474ee3"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease) (Track 29).bin" size="41275248" crc="974fd527" sha1="91bbf80254acfdcb3f4e5c790e68739c1648659f"/>
+	-->
+	<software name="mystsong">
+		<description>Mysterious Song (re-release)</description>
+		<year>2014</year>
+		<publisher>Frozen Utopia</publisher>
+		<info name="language" value="English/French/Spanish" />
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Rerelease)" sha1="32310aa49eed1c6cdf1219606446bb6d0ead7bcd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Source: http://redump.org/disc/49375/
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl).cue" size="3241" crc="4052cbd1" sha1="d96a39018c95b3370d7b0c387bbc7950df1e9f66"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 01).bin" size="13331136" crc="e9387df0" sha1="d433df05628ed3cb3273f74829a917175b174eee"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 02).bin" size="8104992" crc="29cb97c5" sha1="1f10986f682bd1891d4252e4f747ef0bd3ac8204"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 03).bin" size="23423568" crc="908f9f2f" sha1="c7f044e46f4d66331beb524e9091f2e6b62fbdea"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 04).bin" size="25058208" crc="afb17882" sha1="b19050f092428ca01379551f1ee25c5b86a33d48"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 05).bin" size="11369568" crc="fe9855b3" sha1="9778ff0cce2be9d0a2d503c6200d600465dc6d61"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 06).bin" size="14831712" crc="2bf9ecc9" sha1="367d5df31283459b83b80913f27a8700f15267f1"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 07).bin" size="19246416" crc="4bddaade" sha1="56816560e77e94be00f243f0ac04ee9f9a1140c5"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 08).bin" size="35240016" crc="2020e1d3" sha1="ed94cee92c2d05bf94d224139ead0a62b7e4cbf1"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 09).bin" size="50241072" crc="b879c281" sha1="27a394fd4c96db34afe61a35fba80d427444b64f"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 10).bin" size="44274048" crc="1721995a" sha1="2c6dacaf4f3f1c91a40cc2adb16a5ce8dbc8ff38"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 11).bin" size="28922544" crc="e0be632d" sha1="c5b3c8dab430f00e721848e16b3f12c204a92255"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 12).bin" size="23117808" crc="57bc0e8e" sha1="fa7c635d192a993d33a72678aeff9c4083cbdeb9"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 13).bin" size="21970032" crc="cbf22611" sha1="3825e45f13da97b32866bbf53858538cc09a0255"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 14).bin" size="28539168" crc="9fac01d2" sha1="11db59f7ece8d26ed7d2c488dbcef732e6ffdd4f"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 15).bin" size="1371216" crc="fa3f9fbf" sha1="a3ca3a416afebb5afd8b7dcc41fa1114fda8ede2"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 16).bin" size="17999856" crc="0e9c265c" sha1="1c8f2833274a4ac056216cabe3755bcc8535c4c5"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 17).bin" size="6783168" crc="8a49ad47" sha1="c06784db2193aa497019d5158153964b4f2d7a42"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 18).bin" size="13561632" crc="9528a830" sha1="a95f8ca93ab30177c133ea38bdc1ca9545badadc"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 19).bin" size="24350256" crc="0d503573" sha1="cfc142417167d195e5bb539f3b52af9951f0277e"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 20).bin" size="11468352" crc="b066ab56" sha1="2dbcf9cd8c886ae90db75924148b97568c0361b2"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 21).bin" size="13072416" crc="67bb3973" sha1="49e5d55cc76da05624f923ebdc95bfab20b981c0"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 22).bin" size="9483264" crc="b51b8552" sha1="29bd9a0f0087f9b4dfe97e0190d608ded68c10e9"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 23).bin" size="6785520" crc="075b82c3" sha1="688a036706288aafb14e0a359888b0718a6aa735"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 24).bin" size="9991296" crc="e32c1de0" sha1="c7e2de5fb6c6ec11b20ea7484ea52bd27f0f9623"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 25).bin" size="23035488" crc="eca6165d" sha1="f087774264f048cebee2f4c8ed21ae1f1ba1d0ee"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 26).bin" size="33802944" crc="7b488398" sha1="cfce21d94c4f45803d4a193a2b5f2bcc2f4665b2"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 27).bin" size="41272896" crc="e689e127" sha1="4d149b74d84cf34b20e29122d062cbcb402b47bf"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 28).bin" size="12881904" crc="4df44ce4" sha1="cf132ccf5f35d6fea00b54afd16893c90cd85233"/>
+	<rom name="Mysterious Song (USA) (En,Fr,Es) (Unl) (Track 29).bin" size="5496624" crc="2a7bacc9" sha1="cd6620e5149ac1513536bc2dd8d1c948c9f196a0"/>
+	-->
+	<software name="mystsong_a" cloneof="mystsong">
+		<description>Mysterious Song</description>
+		<year>2012</year>
+		<publisher>Frozen Utopia</publisher>
+		<info name="language" value="English/French/Spanish" />
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Mysterious Song (USA) (En,Fr,Es) (Unl)" sha1="cbd8792348d26d5ee04eb07187cb17ccb7cb5eed"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Source: http://redump.org/disc/49374/
+	<rom name="Pyramid Plunder (USA) (Unl).cue" size="93" crc="c1241fca" sha1="d28ed142dbcb48e1cf1d0f6f4225049719d823c6"/>
+	<rom name="Pyramid Plunder (USA) (Unl).bin" size="2349648" crc="5d0a060d" sha1="bba6e8c5bdf41cbfb4bcf395a8900dc8153bbda4"/>
+	-->
+	<software name="pyrplund">
+		<description>Pyramid Plunder</description>
+		<year>2013</year>
+		<publisher>Aetherbyte Studios</publisher>
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Pyramid Plunder (USA) (Unl)" sha1="2c6e16fdec3aaa22ab276d50d94db6508365b318"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	Source: http://redump.org/disc/49376/
+	<rom name="Revival Chase (USA) (En,Fr) (Unl).cue" size="1518" crc="3f6da1a3" sha1="f7481fb27806322080d2b57aa36c4604fa6262fd"/>
+	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 01).bin" size="5115600" crc="6ffad6a2" sha1="405d4fad91304a0de94ef36bc10bec082bf3404d"/>
+	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 02).bin" size="24733632" crc="efb59ee7" sha1="fbe108459e04b2744dc5d2e0cdcc796ff25bb62f"/>
+	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 03).bin" size="12348000" crc="0765a3e5" sha1="48abd54e5c4a948045902674cd205a61d612b3fc"/>
+	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 04).bin" size="3880800" crc="b8cd000c" sha1="bde111daac1bd77214a0fe2f0ffd182cba06801b"/>
+	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 05).bin" size="11642400" crc="c1aa24e3" sha1="33d0a1a85d564702babc64bfb98e72b5bde8fd66"/>
+	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 06).bin" size="14817600" crc="14c9926d" sha1="f3c7067b7625120e821948ec3869e8c9de0917e3"/>
+	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 07).bin" size="25930800" crc="15cd52c6" sha1="6e60015936ed5982c50bc26856a3fbd832c44e65"/>
+	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 08).bin" size="23284800" crc="9cd7ca50" sha1="46de2e1f1119449bc4dcf0ebb18bc07a92b02d00"/>
+	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 09).bin" size="1411200" crc="c7116ea8" sha1="5cef71d1c142700be03293d94ef2be04352d983c"/>
+	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 10).bin" size="33516000" crc="a6ede8d6" sha1="728fd313377d0463e49ad9813c1a6b165625077b"/>
+	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 11).bin" size="27518400" crc="6590a53d" sha1="eece8b0cf9a150a6a6ee9c95937bf434f566f8d4"/>
+	<rom name="Revival Chase (USA) (En,Fr) (Unl) (Track 12).bin" size="27845328" crc="3b0939c2" sha1="be3ba047fe2f442efed44bcd35f245062f0cf05c"/>
+	-->
+	<software name="revchase">
+		<description>Revival Chase</description>
+		<year>2013</year>
+		<publisher>Revival Games</publisher>
+		<info name="language" value="English/French" />
+		<info name="serial" value="VOC3628"/>
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Revival Chase (USA) (En,Fr) (Unl)" sha1="0fd96d24add088d1fea93e600bab7de724d21479"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<rom name="Space Ava 201.cue" size="2279" crc="24d1bf09" sha1="9cf6623368d72412de9ed00e93a216b6359825a0"/>
+	<rom name="Space Ava 201 - Track 2.iso" size="1771520" crc="1179d744" sha1="7c5e9e4d6d79e240e7637b5dfa9bf1ec60ebb0e9"/>
+	<rom name="Space Ava 201 - 01 - Warning.wav" size="5648948" crc="d088cad0" sha1="393eff2f00e68673d4bfb4fcc47fc70e2dceea37"/>
+	<rom name="Space Ava 201 - 03 - Fantasy World Title.wav" size="3386824" crc="5dbce0f3" sha1="e64e2ab0243ea2db450fec3a5025719cc29c9e6f"/>
+	<rom name="Space Ava 201 - 04 - Space Space Ava!.wav" size="10592300" crc="458e9fe2" sha1="86ea4c17595dc45bc574b492a4d0b762cdb6a1c4"/>
+	<rom name="Space Ava 201 - 05 - Ballad of St. Janet.wav" size="14405676" crc="6cf94cca" sha1="b957f9f8d095b583a8df8fc8052c317e6a40d47e"/>
+	<rom name="Space Ava 201 - 06 - Evan S. Sense.wav" size="11833388" crc="ea91b095" sha1="9674140b67be319493607f24d08990738c90796f"/>
+	<rom name="Space Ava 201 - 07 - Spaceful.wav" size="16224300" crc="b35caf19" sha1="9d761e120cbac45f7a91708c2b0aeb4a540ac438"/>
+	<rom name="Space Ava 201 - 08 - Chime 2020.wav" size="10367020" crc="66abda04" sha1="964ed9a72c63ac82569b91d7a00f10a8b3f2a110"/>
+	<rom name="Space Ava 201 - 09 - Impossibly Bossy.wav" size="17854508" crc="51886ffb" sha1="e2e905b79108d5ae0ef5173a7ebadf77ecce9194"/>
+	<rom name="Space Ava 201 - 10 - Nothing is Hope.wav" size="16900140" crc="6330af98" sha1="854e540ff3caa0a0191dee146b122f12fa352de6"/>
+	<rom name="Space Ava 201 - 11 - Lacked Even a Daisy.wav" size="18591788" crc="f3f0714c" sha1="0abf8f7fe942c32dac496c91c8a3e475ab9ddfe4"/>
+	<rom name="Space Ava 201 - 12 - Your Soul is Lava.wav" size="14872620" crc="df3e89d6" sha1="44e4f129d3c270cfaff93240ad68dac6c07f52c7"/>
+	<rom name="Space Ava 201 - 13 - Parasol Gently Down.wav" size="20279340" crc="413da118" sha1="d2a22fc32e5eca3c483ff95720d805e8438eeb5f"/>
+	<rom name="Space Ava 201 - 14 - Seventeen Crowns.wav" size="21180460" crc="63eb8a94" sha1="ac98abcda60c98f01b44672e8b6af18715939511"/>
+	<rom name="Space Ava 201 - 15 - This Penance.wav" size="19943468" crc="fdf3b151" sha1="f7c040c21f4833585b47e0d0b140f725843f0c87"/>
+	<rom name="Space Ava 201 - 16 - Straining to Chime.wav" size="18141228" crc="9c34fd8f" sha1="7c35da938fde12b1eb31636f808a410fb5502e49"/>
+	<rom name="Space Ava 201 - 17 - Harsh Memories.wav" size="29515820" crc="e42b99ae" sha1="359773a929f828438daaffb6f90bc4705bbab813"/>
+	<rom name="Space Ava 201 - 18 - Never-Ending Carousel.wav" size="8467244" crc="eaf13a6a" sha1="9ad601bda86726c906a7cb39d8886b03fad8445d"/>
+	<rom name="Space Ava 201 - 19 - Can't Die Boing.wav" size="16089132" crc="7395837b" sha1="8fb27761ea14636831b30c87f87733e68638bb12"/>
+	<rom name="Space Ava 201 - 20 - Digi-Ballad 9000.wav" size="14516268" crc="498beaff" sha1="7a3185a56ac7969840b645c14410dce5629c1101"/>
+	<rom name="Space Ava 201 - 21 - Scandal of Nullity.wav" size="15548460" crc="d349848f" sha1="9811e222b6c2788e39f65e8c3dcffc7bd592b666"/>
+	<rom name="Space Ava 201 - 22 - Even More Spaceless.wav" size="11289644" crc="9b9b5c30" sha1="ebe625e72f57c00c16974273f3a5c6d0e0d78c97"/>
+	<rom name="Space Ava 201 - 23 - Yes! We Have No Bananas.wav" size="26195936" crc="bdd2b900" sha1="900778d371ef50e2b6c86fb72af0695a757f8793"/>
+	-->
+	<software name="spaceava">
+		<description>Space Ava 201: Quantum Field Theory</description>
+		<year>2021</year>
+		<publisher>Nicole Express</publisher>
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<info name="version" value="release v1.01" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="Space Ava 201" sha1="cc53657fd7f2a8fa8e7ca01796eb377854fd5014"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<rom name="urc.cue" size="426" crc="6e087059" sha1="a8ae19aadbe81b2c9a45f108d721bbbd92236732"/>
+	<rom name="urc.iso" size="530432" crc="f3e2af75" sha1="fefe08ca8f3723b45e099533f82d723b87ec06a5"/>
+	<rom name="urc0.wav" size="35910188" crc="8c3d4001" sha1="e38be5267dbde66ee3bd6ab14717fe08d4a919e4"/>
+	<rom name="urc1.wav" size="47347244" crc="4afaf33a" sha1="3cce1960c0b51bda585a7759ddf1e28a88ec7ffd"/>
+	<rom name="urc2.wav" size="35891756" crc="cfe56d0c" sha1="7636dee698ac65f4f20d4b4099d10a1f8d2f6533"/>
+	<rom name="urc3.wav" size="63005228" crc="7efb7aaf" sha1="22c37e2a7e7b9a785020d36b24238af8b825317b"/>
+	<rom name="urc4.wav" size="46883444" crc="cc821b7e" sha1="dd04ee580ddac865669d1662ed09a959ba7f936d"/>
+	-->
+	<software name="urclub">
+		<description>Ultimate Rally Club</description>
+		<year>2011</year>
+		<publisher>Orion / Arm / Gregg</publisher>
+		<info name="usage" value="CD-ROM² Super System Card required" />
+		<sharedfeat name="requirement" value="scdsys"/>
+		<part name="cdrom" interface="pce_cdrom">
+			<diskarea name="cdrom">
+				<disk name="urc" sha1="d136fe98240dbaf5bb3016d87dd20eb65e13e8c5"/>
+			</diskarea>
+		</part>
+	</software>
 
 </softwarelist>

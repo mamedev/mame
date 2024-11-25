@@ -18,9 +18,9 @@ No known undumped carts
 		<info name="serial" value="GPB-110"/>
 		<part name="cart" interface="pv2000_cart">
 			<feature name="pcb" value="P115-1A"/>
-			<dataarea name="rom" size="16384">
-				<rom name="Rom1.bin" size="8192" crc="2671b9d8" sha1="9a5972c35e144904f5267e8ef94798ee38ac6fef" offset="0" /> <!-- 2764, desoldered and dumped -->
-				<rom name="Rom2.bin" size="8192" crc="bf6945fd" sha1="349a5a4153eda5239d6b9b7801ca6ed67f94db4c" offset="8192" /> <!-- 2764, desoldered and dumped -->
+			<dataarea name="rom" size="0x4000">
+				<rom name="Rom1.bin" size="0x2000" crc="2671b9d8" sha1="9a5972c35e144904f5267e8ef94798ee38ac6fef" offset="0x0000" /> <!-- 2764, desoldered and dumped -->
+				<rom name="Rom2.bin" size="0x2000" crc="bf6945fd" sha1="349a5a4153eda5239d6b9b7801ca6ed67f94db4c" offset="0x2000" /> <!-- 2764, desoldered and dumped -->
 			</dataarea>
 		</part>
 	</software>
@@ -30,8 +30,8 @@ No known undumped carts
 		<year>1983</year>
 		<publisher>Casio / Taito</publisher>
 		<part name="cart" interface="pv2000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="frntline.bin" size="8192" crc="86692c58" sha1="5891483952658589102f396b260fadf33ce9c32b" offset="0" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="frntline.bin" size="0x2000" crc="86692c58" sha1="5891483952658589102f396b260fadf33ce9c32b" />
 			</dataarea>
 		</part>
 	</software>
@@ -41,8 +41,8 @@ No known undumped carts
 		<year>1981</year>
 		<publisher>Casio / Namco</publisher>
 		<part name="cart" interface="pv2000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="galaga.bin" size="8192" crc="e5befcf6" sha1="e3b4c7b1dc1a741eb098709ac41297a2c91ea444" offset="0" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="galaga.bin" size="0x2000" crc="e5befcf6" sha1="e3b4c7b1dc1a741eb098709ac41297a2c91ea444" />
 			</dataarea>
 		</part>
 	</software>
@@ -52,8 +52,8 @@ No known undumped carts
 		<year>1983</year>
 		<publisher>Casio</publisher>
 		<part name="cart" interface="pv2000_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="pachiufo.bin" size="16384" crc="1261e766" sha1="0c7a3f865e72fc8b3f39f66c0b48bf60cd2de599" offset="0" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="pachiufo.bin" size="0x4000" crc="1261e766" sha1="0c7a3f865e72fc8b3f39f66c0b48bf60cd2de599" />
 			</dataarea>
 		</part>
 	</software>
@@ -63,8 +63,8 @@ No known undumped carts
 		<year>1982</year>
 		<publisher>Casio</publisher>
 		<part name="cart" interface="pv2000_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="pooyan.bin" size="16384" crc="3c16027b" sha1="a0bdf3160b61342cdc1611d866aa8c4b39da4506" offset="0" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="pooyan.bin" size="0x4000" crc="3c16027b" sha1="a0bdf3160b61342cdc1611d866aa8c4b39da4506" />
 			</dataarea>
 		</part>
 	</software>
@@ -74,8 +74,8 @@ No known undumped carts
 		<year>1982</year>
 		<publisher>Casio / Namco</publisher>
 		<part name="cart" interface="pv2000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="mrpackn.bin" size="8192" crc="ee0d3948" sha1="fd311a46b87ddd6263c4f12e88178d9e2150ea5a" offset="0" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="mrpackn.bin" size="0x2000" crc="ee0d3948" sha1="fd311a46b87ddd6263c4f12e88178d9e2150ea5a" />
 			</dataarea>
 		</part>
 	</software>
@@ -87,9 +87,9 @@ No known undumped carts
 		<info name="serial" value="GPB-109"/>
 		<part name="cart" interface="pv2000_cart">
 			<feature name="pcb" value="P115-1A"/>
-			<dataarea name="rom" size="16384">
-				<rom name="Rom1.bin" size="8192" crc="08704dda" sha1="038decee4f74f01e37882175cf0aa8f101f2ff7d" offset="0" /> <!-- 2764, desoldered and dumped -->
-				<rom name="Rom2.bin" size="8192" crc="c1b3e57d" sha1="10df247dc6084ebd3c4e21a09ee5e7be0c5ff85e" offset="8192" /> <!-- 2764, desoldered and dumped -->
+			<dataarea name="rom" size="0x4000">
+				<rom name="Rom1.bin" size="0x2000" crc="08704dda" sha1="038decee4f74f01e37882175cf0aa8f101f2ff7d" offset="0x0000" /> <!-- 2764, desoldered and dumped -->
+				<rom name="Rom2.bin" size="0x2000" crc="c1b3e57d" sha1="10df247dc6084ebd3c4e21a09ee5e7be0c5ff85e" offset="0x2000" /> <!-- 2764, desoldered and dumped -->
 			</dataarea>
 		</part>
 	</software>
@@ -99,8 +99,8 @@ No known undumped carts
 		<year>1983</year>
 		<publisher>Casio / Konami</publisher>
 		<part name="cart" interface="pv2000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="rocnrope.bin" size="8192" crc="f8c9c2d9" sha1="2744e448f9537fbca1e65cbd3646678100777de3" offset="0" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="rocnrope.bin" size="0x2000" crc="f8c9c2d9" sha1="2744e448f9537fbca1e65cbd3646678100777de3" />
 			</dataarea>
 		</part>
 	</software>
@@ -110,8 +110,8 @@ No known undumped carts
 		<year>198?</year>
 		<publisher>Casio</publisher>
 		<part name="cart" interface="pv2000_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="skicmmnd.bin" size="16384" crc="07bf1f44" sha1="5608311721d486b0cffccdfef40d51443a283490" offset="0" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="skicmmnd.bin" size="0x4000" crc="07bf1f44" sha1="5608311721d486b0cffccdfef40d51443a283490" />
 			</dataarea>
 		</part>
 	</software>
@@ -121,8 +121,8 @@ No known undumped carts
 		<year>1981</year>
 		<publisher>Casio</publisher>
 		<part name="cart" interface="pv2000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="suprcobr.bin" size="8192" crc="c382390f" sha1="fd8b85e5a58d0449908ae8f1bf7a32230a39d5eb" offset="0" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="suprcobr.bin" size="0x2000" crc="c382390f" sha1="fd8b85e5a58d0449908ae8f1bf7a32230a39d5eb" />
 			</dataarea>
 		</part>
 	</software>
@@ -135,8 +135,8 @@ No known undumped carts
 		<info name="alt_title" value="大障害競馬"/>
 		<part name="cart" interface="pv2000_cart">
 			<feature name="pcb" value="P109-1A"/>
-			<dataarea name="rom" size="16384">
-				<rom name="Exciting Jockey.bin" size="16384" crc="450174c3" sha1="97a5200f801ffd800b2328f0e1a224d5ed6904e0" offset="0" /> <!-- 27128, desoldered and dumped -->
+			<dataarea name="rom" size="0x4000">
+				<rom name="Exciting Jockey.bin" size="0x4000" crc="450174c3" sha1="97a5200f801ffd800b2328f0e1a224d5ed6904e0" /> <!-- 27128, desoldered and dumped -->
 			</dataarea>
 		</part>
 	</software>
@@ -148,9 +148,9 @@ No known undumped carts
 		<info name="alt_title" value="実数Basic"/>
 		<part name="cart" interface="pv2000_cart">
 			<feature name="pcb" value="P115-1A"/>
-			<dataarea name="rom" size="16384">
-				<rom name="Rom1.bin" size="8192" crc="43ac2c5b" sha1="a56989d02db54974a64136a6abe0cd1861b38245" offset="0" /> <!-- 2764, desoldered and dumped -->
-				<rom name="Rom2.bin" size="8192" crc="4725e98d" sha1="3e55de11c66ae91eb40c586c73c3035fd7bcffac" offset="8192" /> <!-- 2764, desoldered and dumped -->
+			<dataarea name="rom" size="0x4000">
+				<rom name="Rom1.bin" size="0x2000" crc="43ac2c5b" sha1="a56989d02db54974a64136a6abe0cd1861b38245" offset="0x0000" /> <!-- 2764, desoldered and dumped -->
+				<rom name="Rom2.bin" size="0x2000" crc="4725e98d" sha1="3e55de11c66ae91eb40c586c73c3035fd7bcffac" offset="0x2000" /> <!-- 2764, desoldered and dumped -->
 			</dataarea>
 		</part>
 	</software>

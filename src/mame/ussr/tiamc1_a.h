@@ -22,7 +22,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -49,7 +49,6 @@ private:
 	};
 
 
-	void timer8253_reset(struct timer8253struct *t);
 	void timer8253_tick(struct timer8253struct *t,int chn);
 	void timer8253_wr(struct timer8253struct *t, int reg, uint8_t val);
 	char timer8253_get_output(struct timer8253struct *t, int chn);

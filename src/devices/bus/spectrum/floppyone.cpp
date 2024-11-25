@@ -49,7 +49,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_FLPONE, spectrum_flpone_device, "spectrum_flpone", "
 
 INPUT_PORTS_START(flpone)
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Snapshot Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_flpone_device, snapshot_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Snapshot Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spectrum_flpone_device::snapshot_button), 0)
 
 	PORT_START("SW1")
 	PORT_CONFNAME(0x01, 0x01, "Disc Interface")
@@ -195,9 +195,9 @@ void spectrum_flpone_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_flpone_device::romcs()
+bool spectrum_flpone_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_flpone_device::post_opcode_fetch(offs_t offset)

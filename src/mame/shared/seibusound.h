@@ -24,21 +24,23 @@
     * = encrypted
 
 ***************************************************************************/
-#ifndef MAME_SHARED_SEIBU_H
-#define MAME_SHARED_SEIBU_H
+#ifndef MAME_SHARED_SEIBUSOUND_H
+#define MAME_SHARED_SEIBUSOUND_H
 
 #pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
+
 #include "dirom.h"
+
 
 class seibu_sound_common {
 public:
 	virtual ~seibu_sound_common() = default;
 
 protected:
-	void seibu_sound_map(address_map &map);
+	void seibu_sound_map(address_map &map) ATTR_COLD;
 };
 
 class seibu_sound_device : public device_t
@@ -74,8 +76,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void update_irq_lines(s32 param);
@@ -151,8 +153,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// internal state
@@ -192,4 +194,4 @@ DECLARE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device)
 
 /**************************************************************************/
 
-#endif // MAME_SHARED_SEIBU_H
+#endif // MAME_SHARED_SEIBUSOUND_H

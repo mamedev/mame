@@ -54,11 +54,11 @@ public:
 private:
 	uint8_t input_r();
 	void input_select_w(uint8_t data);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	uint8_t m_input_select = 0U;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_z80pio;
 	required_ioport_array<3> m_buttons;

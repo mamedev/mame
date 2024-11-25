@@ -112,7 +112,7 @@ public:
 	void goodejan(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -160,10 +160,10 @@ private:
 	uint32_t pri_cb(uint8_t pri, uint8_t ext);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void common_io_map(address_map &map);
-	void goodejan_io_map(address_map &map);
-	void goodejan_map(address_map &map);
-	void totmejan_io_map(address_map &map);
+	void common_io_map(address_map &map) ATTR_COLD;
+	void goodejan_io_map(address_map &map) ATTR_COLD;
+	void goodejan_map(address_map &map) ATTR_COLD;
+	void totmejan_io_map(address_map &map) ATTR_COLD;
 };
 
 /*******************************

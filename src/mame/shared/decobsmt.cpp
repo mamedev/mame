@@ -13,13 +13,10 @@
 #include "decobsmt.h"
 #include "speaker.h"
 
-#define M6809_TAG   "soundcpu"
-#define BSMT_TAG    "bsmt"
-
 void decobsmt_device::decobsmt_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0xffff).rom().region(":soundcpu", 0x2000);
+	map(0x2000, 0xffff).rom().region("soundcpu", 0x2000);
 	map(0x2000, 0x2001).w(FUNC(decobsmt_device::bsmt_reset_w));
 	map(0x2002, 0x2003).r(FUNC(decobsmt_device::bsmt_comms_r));
 	map(0x2006, 0x2007).r(FUNC(decobsmt_device::bsmt_status_r));
@@ -29,12 +26,12 @@ void decobsmt_device::decobsmt_map(address_map &map)
 
 void decobsmt_device::bsmt_map(address_map &map)
 {
-	map(0x000000, 0xffffff).rom().region(":bsmt", 0);
+	map(0x000000, 0xffffff).rom().region("bsmt", 0);
 }
 
 void decobsmt_device::bsmt_ready_callback()
 {
-	m_ourcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE); /* BSMT is ready */
+	m_ourcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE); // BSMT is ready
 }
 
 //**************************************************************************
@@ -52,15 +49,13 @@ void decobsmt_device::device_add_mconfig(machine_config &config)
 {
 	MC6809E(config, m_ourcpu, XTAL(24'000'000) / 12); // 68B09E U6 (E & Q = 2 MHz according to manual)
 	m_ourcpu->set_addrmap(AS_PROGRAM, &decobsmt_device::decobsmt_map);
-	m_ourcpu->set_periodic_int(FUNC(decobsmt_device::decobsmt_firq_interrupt), attotime::from_hz(489)); /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
+	m_ourcpu->set_periodic_int(FUNC(decobsmt_device::decobsmt_firq_interrupt), attotime::from_hz(489)); // Fixed FIRQ of 489Hz as measured on real (pinball) machine
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
 	BSMT2000(config, m_bsmt, XTAL(24'000'000));
 	m_bsmt->set_addrmap(0, &decobsmt_device::bsmt_map);
 	m_bsmt->set_ready_callback(FUNC(decobsmt_device::bsmt_ready_callback));
-	m_bsmt->add_route(0, "lspeaker", 1.0);
-	m_bsmt->add_route(1, "rspeaker", 1.0);
+	m_bsmt->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_bsmt->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 }
 
 //**************************************************************************
@@ -73,8 +68,12 @@ void decobsmt_device::device_add_mconfig(machine_config &config)
 
 decobsmt_device::decobsmt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECOBSMT, tag, owner, clock)
-	, m_ourcpu(*this, M6809_TAG)
-	, m_bsmt(*this, BSMT_TAG)
+	, device_mixer_interface(mconfig, *this, 2)
+	, m_ourcpu(*this, "soundcpu")
+	, m_bsmt(*this, "bsmt")
+	, m_bsmt_latch(0)
+	, m_bsmt_reset(0)
+	, m_bsmt_comms(0)
 {
 }
 
@@ -84,6 +83,9 @@ decobsmt_device::decobsmt_device(const machine_config &mconfig, const char *tag,
 
 void decobsmt_device::device_start()
 {
+	save_item(NAME(m_bsmt_latch));
+	save_item(NAME(m_bsmt_reset));
+	save_item(NAME(m_bsmt_comms));
 }
 
 //-------------------------------------------------
@@ -99,7 +101,7 @@ void decobsmt_device::device_reset()
 
 void decobsmt_device::bsmt_reset_w(u8 data)
 {
-	uint8_t diff = data ^ m_bsmt_reset;
+	uint8_t const diff = data ^ m_bsmt_reset;
 	m_bsmt_reset = data;
 	if ((diff & 0x80) && !(data & 0x80))
 		m_bsmt->reset();
@@ -114,7 +116,7 @@ void decobsmt_device::bsmt1_w(offs_t offset, u8 data)
 {
 	m_bsmt->write_reg(offset ^ 0xff);
 	m_bsmt->write_data((m_bsmt_latch << 8) | data);
-	m_ourcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); /* BSMT is not ready */
+	m_ourcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); // BSMT is not ready
 }
 
 u8 decobsmt_device::bsmt_status_r()

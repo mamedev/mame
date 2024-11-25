@@ -24,6 +24,8 @@
 
 #include "softlist_dev.h"
 
+#include <tuple>
+
 
 namespace {
 
@@ -69,18 +71,17 @@ enum
 */
 std::error_condition smartmedia_image_device::smartmedia_format_1()
 {
+	std::error_condition err;
+	size_t bytes_read;
+
 	SM_disk_image_header custom_header;
 
-	const int bytes_read = fread(&custom_header, sizeof(custom_header));
-	if (bytes_read != sizeof(custom_header))
-	{
-		return std::errc::io_error;
-	}
+	std::tie(err, bytes_read) = read(image_core_file(), &custom_header, sizeof(custom_header));
+	if (err || (bytes_read != sizeof(custom_header)))
+		return err ? err : std::errc::io_error;
 
 	if (custom_header.version > 1)
-	{
 		return image_error::INVALIDIMAGE;
-	}
 
 	m_page_data_size = get_UINT32BE(custom_header.page_data_size);
 	m_page_total_size = get_UINT32BE(custom_header.page_total_size);
@@ -116,7 +117,10 @@ std::error_condition smartmedia_image_device::smartmedia_format_1()
 		fread(&m_mp_opcode, 1);
 		fread(m_data_uid_ptr.get(), 256 + 16);
 	}
-	fread(m_feeprom_data, m_page_total_size*m_num_pages);
+
+	std::tie(err, m_feeprom_data, bytes_read) = read(image_core_file(), m_page_total_size * m_num_pages);
+	if (err || (bytes_read != (m_page_total_size * m_num_pages)))
+		return err ? err : std::errc::io_error;
 
 #ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 1;
@@ -163,23 +167,20 @@ int smartmedia_image_device::detect_geometry( uint8_t id1, uint8_t id2)
 
 std::error_condition smartmedia_image_device::smartmedia_format_2()
 {
+	std::error_condition err;
+	size_t bytes_read;
+
 	disk_image_format_2_header custom_header;
 
-	const int bytes_read = fread(&custom_header, sizeof(custom_header));
-	if (bytes_read != sizeof(custom_header))
-	{
-		return std::errc::io_error;
-	}
+	std::tie(err, bytes_read) = read(image_core_file(), &custom_header, sizeof(custom_header));
+	if (err || (bytes_read != sizeof(custom_header)))
+		return err ? err : std::errc::io_error;
 
 	if ((custom_header.data1[0] != 0xEC) && (custom_header.data1[0] != 0x98))
-	{
 		return image_error::INVALIDIMAGE;
-	}
 
 	if (!detect_geometry(custom_header.data1[0], custom_header.data1[1]))
-	{
 		return image_error::INVALIDIMAGE;
-	}
 
 	m_feeprom_data = std::make_unique<uint8_t[]>(m_page_total_size*m_num_pages);
 	m_data_uid_ptr = std::make_unique<uint8_t[]>(256 + 16);
@@ -207,7 +208,9 @@ std::error_condition smartmedia_image_device::smartmedia_format_2()
 	}
 	memcpy(m_data_uid_ptr.get() + 256, custom_header.data3, 16);
 
-	fread(m_feeprom_data, m_page_total_size*m_num_pages);
+	std::tie(err, m_feeprom_data, bytes_read) = read(image_core_file(), m_page_total_size * m_num_pages);
+	if (err || (bytes_read != (m_page_total_size * m_num_pages)))
+		return err ? err : std::errc::io_error;
 
 #ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 2;

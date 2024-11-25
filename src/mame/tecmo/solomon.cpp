@@ -41,7 +41,7 @@ public:
 	void solomon(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -71,13 +71,11 @@ private:
 	void vblank_w(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 template <uint8_t Which>
 void solomon_state::videoram_w(offs_t offset, uint8_t data)
@@ -167,8 +165,6 @@ uint32_t solomon_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void solomon_state::sh_command_w(uint8_t data)
 {

@@ -4,7 +4,7 @@
 license:CC0-1.0
 -->
 
-<softwarelist name="ampro" description="Ampro Little Z80 Board Disk Images">
+<softwarelist name="ampro" description="Ampro Little Z80 Board disk images">
 
 	<software name="system">
 		<description>Ampro Z-80 System Software (Rev G)</description>

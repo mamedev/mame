@@ -92,10 +92,10 @@ protected:
 	u32 screen_update_rockntread(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init_rockn_timer();
 
-	void nndmseal_map(address_map &map);
-	void rockn1_map(address_map &map);
-	void rockn2_map(address_map &map);
-	void tetrisp2_map(address_map &map);
+	void nndmseal_map(address_map &map) ATTR_COLD;
+	void rockn1_map(address_map &map) ATTR_COLD;
+	void rockn2_map(address_map &map) ATTR_COLD;
+	void tetrisp2_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_leds.resolve(); }
 
@@ -162,7 +162,7 @@ public:
 
 	void rocknms(machine_config &config);
 	void init_rocknms();
-	DECLARE_CUSTOM_INPUT_MEMBER(rocknms_main2sub_status_r);
+	ioport_value rocknms_main2sub_status_r();
 
 private:
 	required_device<cpu_device> m_subcpu;
@@ -181,8 +181,8 @@ private:
 
 	u32 screen_update_rocknms_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update_rocknms_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void rocknms_main_map(address_map &map);
-	void rocknms_sub_map(address_map &map);
+	void rocknms_main_map(address_map &map) ATTR_COLD;
+	void rocknms_sub_map(address_map &map) ATTR_COLD;
 
 	u16 rocknms_main2sub_r();
 	void rocknms_main2sub_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -241,8 +241,8 @@ public:
 	DECLARE_VIDEO_START(stepstag);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u16 stepstag_coins_r();
@@ -278,9 +278,9 @@ private:
 
 	u32 screen_update_nop(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void stepstag_map(address_map &map);
-	void stepstag_sub_map(address_map &map);
-	void vjdash_map(address_map &map);
+	void stepstag_map(address_map &map) ATTR_COLD;
+	void stepstag_sub_map(address_map &map) ATTR_COLD;
+	void vjdash_map(address_map &map) ATTR_COLD;
 
 	void field_cb(int state);
 	void setup_non_sysctrl_screen(machine_config &config, screen_device *screen, const XTAL xtal);

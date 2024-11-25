@@ -48,8 +48,8 @@ protected:
 
 	ins8250_uart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, dev_type device_type);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void rcv_complete() override;
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
@@ -115,8 +115,8 @@ class ns16550_device : public ins8250_uart_device
 public:
 	ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void rcv_complete() override;
 	virtual void tra_complete() override;
@@ -145,7 +145,7 @@ public:
 	void write(offs_t offset, u8 data) { ((offset & 8) ? m_chan1 : m_chan0)->ins8250_w(offset & 7, data); }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	ns16550_device *m_chan0;

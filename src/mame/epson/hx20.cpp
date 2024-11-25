@@ -60,7 +60,7 @@ void hx20_state::update_interrupt()
 {
 	int irq = m_rtc_irq || m_kbrequest;
 
-	m_maincpu->set_input_line(HD6301_IRQ_LINE, irq);
+	m_maincpu->set_input_line(HD6301_IRQ1_LINE, irq);
 }
 
 

@@ -49,9 +49,9 @@ protected:
 			char const *tag,
 			device_t *owner,
 			u32 clock);
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void send_byte(u8 code);
 	void key_changed(int x, int y, bool down);
 	void update_modifiers(int y, bool down);
@@ -83,7 +83,7 @@ public:
 		 device_t *owner,
 		 u32 clock);
 private:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 class stepone_keyboard_device : public myb3k_keyboard_device
@@ -95,7 +95,7 @@ public:
 		 device_t *owner,
 		 u32 clock);
 private:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 #endif // MAME_MACHINE_MYB3K_KBD_H

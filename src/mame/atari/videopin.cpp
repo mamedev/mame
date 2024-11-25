@@ -54,9 +54,9 @@ public:
 	void videopin(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -78,7 +78,7 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 	emu_timer *m_interrupt_timer = nullptr;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint8_t misc_r();
 	void led_w(uint8_t data);
@@ -98,8 +98,6 @@ private:
 	double calc_plunger_pos();
 };
 
-
-// video
 
 TILEMAP_MAPPER_MEMBER(videopin_state::get_memory_offset)
 {
@@ -184,8 +182,6 @@ void videopin_state::video_ram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-
-// machine
 
 void videopin_state::update_plunger()
 {

@@ -19,7 +19,7 @@ SD card slot
 
 #include "emu.h"
 
-#include "cpu/se3208/se3208.h"
+#include "cpu/arm7/arm7.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -86,7 +86,7 @@ INPUT_PORTS_END
 
 void anyworks_state::unkanyw(machine_config &config)
 {
-	SE3208(config, m_maincpu, 14'318'100); // placeholder for unemulated SoC
+	ARM9(config, m_maincpu, 14'318'100); // placeholder for unemulated SoC
 	m_maincpu->set_addrmap(AS_PROGRAM, &anyworks_state::program_map);
 
 	// all wrong

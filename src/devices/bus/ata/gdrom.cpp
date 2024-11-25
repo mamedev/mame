@@ -191,7 +191,7 @@ void gdrom_device::ExecCommand()
 		case 0x10:
 		{
 			transferOffset = command[2];
-			u8 allocation_length = SCSILengthFromUINT8( &command[ 4 ] );
+			u8 allocation_length = SCSILengthFromUINT8( &command[4] );
 			// any game that enables [redbook]
 			LOGCMD("REQ_STAT 10h offset %02x length %02x\n", transferOffset, allocation_length);
 
@@ -209,9 +209,9 @@ void gdrom_device::ExecCommand()
 			m_phase = SCSI_PHASE_DATAIN;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
 
-//          if (SCSILengthFromUINT8( &command[ 4 ] ) < 32) return -1;
+//          if (SCSILengthFromUINT8( &command[4] ) < 32) return -1;
 			transferOffset = command[2];
-			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+			m_transfer_length = SCSILengthFromUINT8( &command[4] );
 			if (transferOffset & 1)
 				throw emu_fatalerror("GDROM: REQ_MODE with odd offset %02x %02x", transferOffset, m_transfer_length);
 			break;
@@ -222,7 +222,7 @@ void gdrom_device::ExecCommand()
 			m_phase = SCSI_PHASE_DATAOUT;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
 			//transferOffset = command[2];
-			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+			m_transfer_length = SCSILengthFromUINT8( &command[4] );
 			if (command[2])
 				throw emu_fatalerror("GDROM: SET_MODE with offset %02x %02x", transferOffset, m_transfer_length);
 
@@ -246,7 +246,7 @@ void gdrom_device::ExecCommand()
 			// TODO: it's supposed to write a single and a double density TOC request
 			//if (command[1])
 			//  throw emu_fatalerror("Double density unsupported");
-			u16 allocation_length = SCSILengthFromUINT16( &command[ 3 ] );
+			u16 allocation_length = SCSILengthFromUINT16( &command[3] );
 			LOGCMD("READ_TOC 14h %02x %02x %d\n",
 				command[1], command[2], allocation_length
 			);
@@ -272,7 +272,7 @@ void gdrom_device::ExecCommand()
 		{
 			m_phase = SCSI_PHASE_DATAIN;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
-			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+			m_transfer_length = SCSILengthFromUINT8( &command[4] );
 			LOGCMD("REQ_SES 15h %02x %02x\n", command[2], m_transfer_length);
 			break;
 		}
@@ -431,7 +431,7 @@ void gdrom_device::ExecCommand()
 
 		case 0x40:
 		{
-			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+			m_transfer_length = SCSILengthFromUINT8( &command[4] );
 			//LOGCMD("CD_SCD 40h %02x %d\n", command[1] & 0xf, m_transfer_length);
 
 			switch(command[1] & 0xf)
@@ -439,7 +439,7 @@ void gdrom_device::ExecCommand()
 				case 0x00:
 					m_phase = SCSI_PHASE_DATAIN;
 					m_status_code = SCSI_STATUS_CODE_GOOD;
-					m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+					m_transfer_length = SCSILengthFromUINT8( &command[4] );
 					break;
 				case 0x01:
 					m_phase = SCSI_PHASE_DATAIN;
@@ -753,7 +753,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 
 void gdrom_device::WriteData( uint8_t *data, int dataLength )
 {
-	switch (command[ 0 ])
+	switch (command[0])
 	{
 		case 0x12: // SET_MODE
 			memcpy(&GDROM_Cmd11_Reply[transferOffset], data, (dataLength >= 32-transferOffset) ? 32-transferOffset : dataLength);

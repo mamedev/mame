@@ -106,8 +106,8 @@ public:
 	}
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void speedfrk_start_led_w(int state);
 
@@ -118,12 +118,12 @@ protected:
 	void cinemat_jmi_16k(machine_config &config);
 	void cinemat_jmi_32k(machine_config &config);
 
-	void program_map_4k(address_map &map);
-	void program_map_8k(address_map &map);
-	void program_map_16k(address_map &map);
-	void program_map_32k(address_map &map);
-	void data_map(address_map &map);
-	void io_map(address_map &map);
+	void program_map_4k(address_map &map) ATTR_COLD;
+	void program_map_8k(address_map &map) ATTR_COLD;
+	void program_map_16k(address_map &map) ATTR_COLD;
+	void program_map_32k(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -192,8 +192,8 @@ protected:
 
 	void demon_sound(machine_config &config);
 
-	void demon_sound_map(address_map &map);
-	void demon_sound_ports(address_map &map);
+	void demon_sound_map(address_map &map) ATTR_COLD;
+	void demon_sound_ports(address_map &map) ATTR_COLD;
 
 private:
 	u8 m_sound_fifo[16]{};
@@ -222,8 +222,8 @@ protected:
 
 	void qb3_sound(machine_config &config);
 
-	void data_map_qb3(address_map &map);
-	void io_map_qb3(address_map &map);
+	void data_map_qb3(address_map &map) ATTR_COLD;
+	void io_map_qb3(address_map &map) ATTR_COLD;
 
 private:
 	int m_qb3_lastx = 0;

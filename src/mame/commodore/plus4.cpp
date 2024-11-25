@@ -101,8 +101,8 @@ protected:
 	required_ioport_array<8> m_row;
 	required_ioport m_lock;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);
 	uint8_t read_memory(offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
@@ -148,8 +148,8 @@ protected:
 	// keyboard state
 	uint8_t m_kb;
 
-	void plus4_mem(address_map &map);
-	void ted_videoram_map(address_map &map);
+	void plus4_mem(address_map &map) ATTR_COLD;
+	void ted_videoram_map(address_map &map) ATTR_COLD;
 };
 
 

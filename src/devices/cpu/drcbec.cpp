@@ -209,17 +209,17 @@ enum
 // union to simplify accessing data via the instruction stream
 union drcbec_instruction
 {
-	uint32_t              i;
+	uint32_t            i;
 	void *              v;
 	char *              c;
-	uint8_t *             puint8;
-	int8_t *              pint8;
-	uint16_t *            puint16;
-	int16_t *             pint16;
-	uint32_t *            puint32;
-	int32_t *             pint32;
-	uint64_t *            puint64;
-	int64_t *             pint64;
+	uint8_t *           puint8;
+	int8_t *            pint8;
+	uint16_t *          puint16;
+	int16_t *           pint16;
+	uint32_t *          puint32;
+	int32_t *           pint32;
+	uint64_t *          puint64;
+	int64_t *           pint64;
 	float *             pfloat;
 	double *            pdouble;
 	void                (*cfunc)(void *);
@@ -950,13 +950,13 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULU, 4, 0):      // MULU    dst,edst,src1,src2[,f]
-				temp64 = (uint64_t)(uint32_t)PARAM2 * (uint64_t)(uint32_t)PARAM3;
+				temp64 = mulu_32x32(PARAM2, PARAM3);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULU, 4, 1):
-				temp64 = (uint64_t)(uint32_t)PARAM2 * (uint64_t)(uint32_t)PARAM3;
+				temp64 = mulu_32x32(PARAM2, PARAM3);
 				flags = FLAGS64_NZ(temp64);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
@@ -965,13 +965,13 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 4, 0):      // MULS    dst,edst,src1,src2[,f]
-				temp64 = (int64_t)(int32_t)PARAM2 * (int64_t)(int32_t)PARAM3;
+				temp64 = mul_32x32(PARAM2, PARAM3);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 4, 1):
-				temp64 = (int64_t)(int32_t)PARAM2 * (int64_t)(int32_t)PARAM3;
+				temp64 = mul_32x32(PARAM2, PARAM3);
 				temp32 = (int32_t)temp64;
 				flags = FLAGS32_NZ(temp32);
 				PARAM1 = temp64 >> 32;

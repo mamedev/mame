@@ -14,7 +14,7 @@ All PlayCenter machines:
          -PCI Ethernet card (RTL8029AS chipset, PCI).
          -Trident Blade3D/MVP4 AGP video.
          -56K Modem (S56MR, HAMR5603 + Si3014-KS).
-         -Elo Touch CTR-231000 touch screen (87C51-based, undumped) or custom touch I/O PCB named 
+         -Elo Touch CTR-231000 touch screen (87C51-based, undumped) or custom touch I/O PCB named
           "Touch Presas" with unknown (and undumped) MCU.
       "K6" version:
          -Unknown AMD K6 CPU based hardware.
@@ -71,7 +71,7 @@ public:
 	void playcenter(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };

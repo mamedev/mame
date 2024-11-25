@@ -14,6 +14,7 @@
 #include "ui/ui.h"
 #include "ui/icorender.h"
 #include "ui/inifile.h"
+#include "ui/miscmenu.h"
 #include "ui/selector.h"
 
 #include "drivenum.h"
@@ -226,11 +227,15 @@ public:
 		std::locale const lcl;
 		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 		auto const compare_names =
-				[&coll] (std::string const &x, std::string const &y) -> bool
+				[&coll] (std::string const &xl, std::string const &xd, std::string const &yl, std::string const &yd) -> bool
 				{
-					std::wstring const wx = wstring_from_utf8(x);
-					std::wstring const wy = wstring_from_utf8(y);
-					return 0 > coll.compare(wx.data(), wx.data() + wx.size(), wy.data(), wy.data() + wy.size());
+					std::wstring const wx = wstring_from_utf8(xd);
+					std::wstring const wy = wstring_from_utf8(yd);
+					auto const cmp(coll.compare(wx.data(), wx.data() + wx.size(), wy.data(), wy.data() + wy.size()));
+					if (cmp)
+						return 0 > cmp;
+					else
+						return xl < yl;
 				};
 		std::stable_sort(
 				m_swinfo.begin() + 1,
@@ -242,29 +247,29 @@ public:
 
 					if (!clonex && !cloney)
 					{
-						return compare_names(a.longname, b.longname);
+						return compare_names(a.listname, a.longname, b.listname, b.longname);
 					}
 					else if (!clonex && cloney)
 					{
-						if ((a.shortname == b.parentname) && (a.instance == b.instance))
+						if ((a.shortname == b.parentname) && (a.listname == b.listname))
 							return true;
 						else
-							return compare_names(a.longname, b.parentlongname);
+							return compare_names(a.listname, a.longname, b.listname, b.parentlongname);
 					}
 					else if (clonex && !cloney)
 					{
-						if ((a.parentname == b.shortname) && (a.instance == b.instance))
+						if ((a.parentname == b.shortname) && (a.listname == b.listname))
 							return false;
 						else
-							return compare_names(a.parentlongname, b.longname);
+							return compare_names(a.listname, a.parentlongname, b.listname, b.longname);
 					}
-					else if ((a.parentname == b.parentname) && (a.instance == b.instance))
+					else if ((a.parentname == b.parentname) && (a.listname == b.listname))
 					{
-						return compare_names(a.longname, b.longname);
+						return compare_names(a.listname, a.longname, b.listname, b.longname);
 					}
 					else
 					{
-						return compare_names(a.parentlongname, b.parentlongname);
+						return compare_names(a.listname, a.parentlongname, b.listname, b.parentlongname);
 					}
 				});
 
@@ -423,7 +428,7 @@ menu_select_software::~menu_select_software()
 
 bool menu_select_software::handle(event const *ev)
 {
-	if (m_prev_selected == nullptr && item_count() > 0)
+	if (!m_prev_selected && (item_count() > 0))
 		m_prev_selected = item(0).ref();
 
 	// FIXME: everything above here used run before events were processed
@@ -442,68 +447,6 @@ bool menu_select_software::handle(event const *ev)
 		case IPT_UI_SELECT:
 			if ((get_focus() == focused_menu::MAIN) && ev->itemref)
 				changed = inkey_select(ev);
-			break;
-
-		case IPT_UI_LEFT:
-			if (right_panel() == RP_IMAGES)
-			{
-				// Images
-				changed = previous_image_view();
-			}
-			else if (right_panel() == RP_INFOS && ui_globals::cur_sw_dats_view > 0)
-			{
-				// Infos
-				ui_globals::cur_sw_dats_view--;
-				m_topline_datsview = 0;
-				changed = true;
-			}
-			break;
-
-		case IPT_UI_RIGHT:
-			if (right_panel() == RP_IMAGES)
-			{
-				// Images
-				changed = next_image_view();
-			}
-			else if (right_panel() == RP_INFOS && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
-			{
-				// Infos
-				ui_globals::cur_sw_dats_view++;
-				m_topline_datsview = 0;
-				changed = true;
-			}
-			break;
-
-		case IPT_UI_UP:
-			if ((get_focus() == focused_menu::LEFT) && (software_filter::FIRST < m_filter_highlight))
-			{
-				--m_filter_highlight;
-				changed = true;
-			}
-			break;
-
-		case IPT_UI_DOWN:
-			if ((get_focus() == focused_menu::LEFT) && (software_filter::LAST > m_filter_highlight))
-			{
-				++m_filter_highlight;
-				changed = true;
-			}
-			break;
-
-		case IPT_UI_HOME:
-			if (get_focus() == focused_menu::LEFT)
-			{
-				m_filter_highlight = software_filter::FIRST;
-				changed = true;
-			}
-			break;
-
-		case IPT_UI_END:
-			if (get_focus() == focused_menu::LEFT)
-			{
-				m_filter_highlight = software_filter::LAST;
-				changed = true;
-			}
 			break;
 
 		case IPT_UI_DATS:
@@ -538,8 +481,6 @@ bool menu_select_software::handle(event const *ev)
 		}
 	}
 
-	// if we're in an error state, overlay an error message
-	draw_error_text();
 	return changed;
 }
 
@@ -552,7 +493,7 @@ void menu_select_software::recompute_metrics(uint32_t width, uint32_t height, fl
 	menu_select_launch::recompute_metrics(width, height, aspect);
 
 	// configure the custom rendering
-	set_custom_space(4.0F * line_height() + 5.0F * tb_border(), 4.0F * line_height() + 4.0F * tb_border());
+	set_custom_space(4.0F * line_height() + 5.0F * tb_border(), 4.0F * line_height() + 3.0F * tb_border());
 }
 
 //-------------------------------------------------
@@ -704,9 +645,9 @@ bool menu_select_software::inkey_select(const event *menu_event)
 //  draw left box
 //-------------------------------------------------
 
-float menu_select_software::draw_left_panel(float x1, float y1, float x2, float y2)
+void menu_select_software::draw_left_panel(u32 flags)
 {
-	return menu_select_launch::draw_left_panel<software_filter>(m_data->filter_type(), m_data->filters(), x1, y1, x2, y2);
+	return menu_select_launch::draw_left_panel<software_filter>(flags, m_data->filter_type(), m_data->filters());
 }
 
 
@@ -771,6 +712,12 @@ void menu_select_software::get_selection(ui_software_info const *&software, ui_s
 }
 
 
+void menu_select_software::show_config_menu(int index)
+{
+	menu::stack_push<menu_machine_configure>(ui(), container(), m_system, nullptr);
+}
+
+
 void menu_select_software::make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const
 {
 	// determine the text for the header
@@ -794,29 +741,28 @@ std::string menu_select_software::make_software_description(ui_software_info con
 }
 
 
-void menu_select_software::filter_selected()
+void menu_select_software::filter_selected(int index)
 {
-	if ((software_filter::FIRST <= m_filter_highlight) && (software_filter::LAST >= m_filter_highlight))
-	{
-		m_data->get_filter(software_filter::type(m_filter_highlight)).show_ui(
-				ui(),
-				container(),
-				[this] (software_filter &filter)
+	assert((software_filter::FIRST <= index) && (software_filter::LAST >= index));
+
+	m_data->get_filter(software_filter::type(index)).show_ui(
+			ui(),
+			container(),
+			[this] (software_filter &filter)
+			{
+				software_filter::type const new_type(filter.get_type());
+				if (software_filter::CUSTOM == new_type)
 				{
-					software_filter::type const new_type(filter.get_type());
-					if (software_filter::CUSTOM == new_type)
+					emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+					if (!file.open(util::string_format("custom_%s_filter.ini", m_system.driver->name)))
 					{
-						emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-						if (!file.open(util::string_format("custom_%s_filter.ini", m_system.driver->name)))
-						{
-							filter.save_ini(file, 0);
-							file.close();
-						}
+						filter.save_ini(file, 0);
+						file.close();
 					}
-					m_data->set_filter_type(new_type);
-					reset(reset_options::REMEMBER_REF);
-				});
-	}
+				}
+				m_data->set_filter_type(new_type);
+				reset(reset_options::REMEMBER_REF);
+			});
 }
 
 } // namespace ui

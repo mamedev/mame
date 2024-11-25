@@ -112,10 +112,18 @@ void dp83932c_device::device_reset()
 
 int dp83932c_device::recv_start_cb(u8 *buf, int length)
 {
-	unsigned const width = (m_reg[DCR] & DCR_DW) ? 4 : 2;
-
-	if (!(m_reg[CR] & CR_RXEN))
+	// check for receiver disabled or overflow condition
+	if (!(m_reg[CR] & CR_RXEN) || (m_reg[ISR] & (ISR_RDE | ISR_RBE)))
 		return -1;
+
+	// reload receive descriptor address after end of list encountered
+	if (BIT(m_reg[CRDA], 0))
+	{
+		m_reg[CRDA] = read_bus_word(EA(m_reg[URDA], m_reg[LLFA]));
+
+		if (BIT(m_reg[CRDA], 0))
+			return -2;
+	}
 
 	m_reg[RCR] &= ~(RCR_MC | RCR_BC | RCR_LPKT | RCR_CRCR | RCR_FAER | RCR_LBK | RCR_PRX);
 
@@ -137,24 +145,11 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	else
 		m_reg[RCR] |= RCR_PRX;
 
-	LOG("recv_start_cb %d\n", length);
-
 	// loopback
 	if (m_reg[RCR] & RCR_LB)
 		m_reg[RCR] |= RCR_LBK;
 
 	dump_bytes(buf, length);
-
-	if (m_reg[CRDA] & 1)
-	{
-		// re-read the previous descriptor link field
-		m_reg[CRDA] = read_bus_word(EA(m_reg[URDA], m_reg[LLFA]));
-		if (m_reg[CRDA] & 1)
-		{
-			logerror("no receive descriptor available\n");
-			return -2;
-		}
-	}
 
 	// save rba pointer registers
 	m_reg[TRBA0] = m_reg[CRBA0];
@@ -172,6 +167,7 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 
 	// update remaining buffer word count
 	u32 const rbwc = ((u32(m_reg[RBWC1]) << 16) | m_reg[RBWC0]) - (length + 1) / 2;
+	LOG("recv_start_cb length %d buffer %d remaining %d\n", length, ((u32(m_reg[RBWC1]) << 16) | m_reg[RBWC0]) * 2, rbwc * 2);
 	m_reg[RBWC1] = rbwc >> 16;
 	m_reg[RBWC0] = u16(rbwc);
 
@@ -180,6 +176,7 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 
 	// write status to rda
 	// TODO: don't write the rda if rba limit exceeded (buffer overflow)
+	unsigned const width = (m_reg[DCR] & DCR_DW) ? 4 : 2;
 	offs_t const rda = EA(m_reg[URDA], m_reg[CRDA]);
 	write_bus_word(rda + 0 * width, m_reg[RCR]);
 	write_bus_word(rda + 1 * width, length);
@@ -190,8 +187,11 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	m_reg[CRDA] = read_bus_word(rda + 5 * width);
 
 	// check for end of list
-	if (m_reg[CRDA] & 1)
+	if (BIT(m_reg[CRDA], 0))
+	{
+		LOG("recv_start_cb end of list\n");
 		m_reg[ISR] |= ISR_RDE;
+	}
 	else
 		write_bus_word(rda + 6 * width, 0);
 
@@ -209,6 +209,7 @@ void dp83932c_device::recv_complete_cb(int result)
 	if (result > 0)
 	{
 		m_reg[ISR] |= ISR_PKTRX;
+
 		update_interrupts();
 	}
 }
@@ -268,8 +269,11 @@ void dp83932c_device::reg_w(offs_t offset, u16 data)
 		break;
 
 	case ISR:
+		// reload rra when rbe is cleared
+		if ((m_reg[offset] & ISR_RBE) && (data & ISR_RBE))
+			read_rra();
+
 		m_reg[offset] &= ~(data & regmask[offset]);
-		// TODO: reload rra after RBE cleared
 		update_interrupts();
 		break;
 
@@ -359,6 +363,8 @@ void dp83932c_device::transmit()
 	m_reg[TPS] = read_bus_word(tda + word++ * width);
 	m_reg[TFC] = read_bus_word(tda + word++ * width);
 
+	LOG("transmit tda 0x%08x tps %d tfc %d\n", tda, m_reg[TPS], m_reg[TFC]);
+
 	// check for programmable interrupt
 	if ((m_reg[TCR] & TCR_PINT) && !(tcr & TCR_PINT))
 		m_reg[ISR] |= ISR_PINT;
@@ -376,6 +382,7 @@ void dp83932c_device::transmit()
 		m_reg[TFS] = read_bus_word(tda + word++ * width);
 
 		offs_t const tsa = EA(m_reg[TSA1], m_reg[TSA0]);
+		LOG("transmit tsa 0x%08x tfs %d\n", tsa, m_reg[TFS]);
 
 		// FIXME: word/dword transfers (allow unaligned)
 		for (unsigned byte = 0; byte < m_reg[TFS]; byte++)
@@ -394,6 +401,8 @@ void dp83932c_device::transmit()
 
 	// advance ctda to the link field
 	m_reg[CTDA] += word * width;
+
+	LOG("transmit length %d word %d tda 0x%08x\n", length, word, EA(m_reg[UTDA], m_reg[CTDA]));
 
 	// transmit data
 	dump_bytes(buf, length);
@@ -420,7 +429,7 @@ void dp83932c_device::send_complete_cb(int result)
 		m_reg[CTDA] = read_bus_word(EA(m_reg[UTDA], m_reg[CTDA]));
 
 		// check for end of list
-		if (m_reg[CTDA] & 1)
+		if (BIT(m_reg[CTDA], 0))
 		{
 			m_reg[ISR] |= ISR_TXDN;
 			m_reg[CR] &= ~CR_TXP;

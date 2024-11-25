@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_PC_KB_MSNAT_H
-#define MAME_BUS_PC_KB_MSNAT_H
+#ifndef MAME_BUS_PC_KBD_MSNAT_H
+#define MAME_BUS_PC_KBD_MSNAT_H
 
 #pragma once
 
@@ -27,13 +27,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void clock_write(int state) override;
 	virtual void data_write(int state) override;
@@ -61,4 +61,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PC_KBD_MICROSOFT_NATURAL, pc_kbd_microsoft_natural_device)
 
-#endif // MAME_BUS_PC_KB_MSNAT_H
+#endif // MAME_BUS_PC_KBD_MSNAT_H

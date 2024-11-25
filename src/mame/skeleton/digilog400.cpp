@@ -35,17 +35,17 @@ public:
 	void digilog400(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i80186_cpu_device> m_subcpu;
 
-	void main_mem_map(address_map &map);
-	void main_io_map(address_map &map);
-	void sub_mem_map(address_map &map);
-	void sub_io_map(address_map &map);
+	void main_mem_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void sub_mem_map(address_map &map) ATTR_COLD;
+	void sub_io_map(address_map &map) ATTR_COLD;
 };
 
 

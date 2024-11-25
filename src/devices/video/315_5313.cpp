@@ -12,7 +12,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/315_5313.h"
+#include "315_5313.h"
 
 /*  The VDP occupies addresses C00000h to C0001Fh.
 

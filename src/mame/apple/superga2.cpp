@@ -63,8 +63,8 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<addressable_latch_device> m_softlatch;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
@@ -74,7 +74,7 @@ public:
 	uint8_t reset_r(offs_t offset);
 
 	void superga2(machine_config &config);
-	void superga2_map(address_map &map);
+	void superga2_map(address_map &map) ATTR_COLD;
 
 private:
 	int m_speaker_state = 0;

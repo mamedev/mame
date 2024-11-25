@@ -79,12 +79,12 @@ public:
 	void tmpz84c011_dir_pd_w(uint8_t data) { m_pio_dir[3] = data; }
 	void tmpz84c011_dir_pe_w(uint8_t data) { m_pio_dir[4] = data; }
 
-	void tmpz84c011_internal_io_map(address_map &map);
+	void tmpz84c011_internal_io_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	const address_space_config m_io_space_config;
 

@@ -41,8 +41,8 @@ public:
 	void rd100(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -52,7 +52,7 @@ private:
 	int shift_r();
 	int ctrl_r();
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<9> m_keys;
@@ -264,7 +264,7 @@ void rd100_state::rd100(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 250'000)); // TODO: clock not measured, datasheet typical clock used
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(rd100_state::pixel_update));
 
