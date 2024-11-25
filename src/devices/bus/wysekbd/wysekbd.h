@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_WYSEKBD_KEYBOARD_H
-#define MAME_BUS_WYSEKBD_KEYBOARD_H
+#ifndef MAME_BUS_WYSEKBD_WYSEKBD_H
+#define MAME_BUS_WYSEKBD_WYSEKBD_H
 
 #pragma once
 
@@ -91,4 +91,4 @@ inline int wyse_keyboard_port_device::data_r()
 		return 1;
 }
 
-#endif // MAME_BUS_WYSEKBD_KEYBOARD_H
+#endif // MAME_BUS_WYSEKBD_WYSEKBD_H

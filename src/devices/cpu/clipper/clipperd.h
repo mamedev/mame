@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_CPU_CLIPPER_CLIPPERDASM_H
-#define MAME_CPU_CLIPPER_CLIPPERDASM_H
+#ifndef MAME_CPU_CLIPPER_CLIPPERD_H
+#define MAME_CPU_CLIPPER_CLIPPERD_H
 
 #pragma once
 
@@ -20,4 +20,4 @@ private:
 	std::string address (offs_t pc, const data_buffer &opcodes);
 };
 
-#endif
+#endif // MAME_CPU_CLIPPER_CLIPPERD_H

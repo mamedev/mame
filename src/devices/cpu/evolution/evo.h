@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_CPU_EVO_EVO_H
-#define MAME_CPU_EVO_EVO_H
+#ifndef MAME_CPU_EVOLUTION_EVO_H
+#define MAME_CPU_EVOLUTION_EVO_H
 
 #pragma once
 
@@ -36,4 +36,4 @@ private:
 
 DECLARE_DEVICE_TYPE(EVOLUTION_CPU, evo_cpu_device)
 
-#endif // MAME_CPU_EVO_EVO_H
+#endif // MAME_CPU_EVOLUTION_EVO_H
