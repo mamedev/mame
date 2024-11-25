@@ -5049,9 +5049,7 @@ void apple2e_state::apple2e(machine_config &config)
 void apple2e_state::apple2epal(machine_config &config)
 {
 	apple2e(config);
-	M6502(config.replace(), m_maincpu, 1016966);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
-	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+	m_maincpu->set_clock(1016966);
 	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
@@ -5070,10 +5068,7 @@ void apple2e_state::apple2ee(machine_config &config)
 void apple2e_state::apple2eepal(machine_config &config)
 {
 	apple2ee(config);
-	M65C02(config.replace(), m_maincpu, 1016966);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
-	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
-
+	m_maincpu->set_clock(1016966);
 	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
@@ -5106,10 +5101,7 @@ void apple2e_state::apple2ep(machine_config &config)
 void apple2e_state::apple2eppal(machine_config &config)
 {
 	apple2ee(config);
-	M65C02(config.replace(), m_maincpu, 1016966);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
-	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
-
+	m_maincpu->set_clock(1016966);
 	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
@@ -5118,9 +5110,7 @@ void apple2e_state::apple2c(machine_config &config)
 	apple2e_common(config, true, false);
 	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
 
-	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_map);
-	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
 	// IIc and friends have no cassette port
 	config.device_remove(A2_CASSETTE_TAG);
@@ -5168,19 +5158,15 @@ void apple2e_state::apple2c(machine_config &config)
 void apple2e_state::apple2cpal(machine_config &config)
 {
 	apple2c(config);
-	M65C02(config.replace(), m_maincpu, 1016966);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
-	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
-
+	m_maincpu->set_clock(1016966);
 	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
 void apple2e_state::apple2cp(machine_config &config)
 {
 	apple2c(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_memexp_map);
-	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
@@ -5202,29 +5188,23 @@ void apple2e_state::apple2c_iwm(machine_config &config)
 {
 	apple2c(config);
 
-	config.device_remove("sl6");
-	A2BUS_IWM(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_IWM(config.replace(), "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 }
 
 void apple2e_state::apple2c_iwm_pal(machine_config &config)
 {
 	apple2c_iwm(config);
-	M65C02(config.replace(), m_maincpu, 1016966);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_map);
-	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
-
+	m_maincpu->set_clock(1016966);
 	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
 void apple2e_state::apple2c_mem(machine_config &config)
 {
 	apple2c(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_memexp_map);
-	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
-	config.device_remove("sl6");
-	A2BUS_IWM(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_memexp_map);
+
+	A2BUS_IWM(config.replace(), "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 }
@@ -5232,10 +5212,7 @@ void apple2e_state::apple2c_mem(machine_config &config)
 void apple2e_state::apple2c_mem_pal(machine_config &config)
 {
 	apple2c_mem(config);
-	M65C02(config.replace(), m_maincpu, 1016966);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_memexp_map);
-	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
-
+	m_maincpu->set_clock(1016966);
 	m_screen->set_raw(1016966 * 14, (65 * 7) * 2, 0, (40 * 7) * 2, 312, 0, 192);
 }
 
