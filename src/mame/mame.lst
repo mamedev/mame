@@ -38898,6 +38898,7 @@ mc50mk2                         //
 
 @source:roland/roland_mt32.cpp
 cm32l                           //
+mt100                           //
 mt32                            //
 
 @source:roland/roland_mt80s.cpp
