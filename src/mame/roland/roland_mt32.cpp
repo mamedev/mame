@@ -21,6 +21,10 @@
     with a MPU-401 frontend added to communicate with the synth.  All
     the roms are identical with the CM32L.
 
+	MT-100 is a desktop digital synthesizer which shares functionality
+	and main board with the MT-32, but extends it with a sequencer
+	and a Quick Disk drive.
+
     Some special tricks:
     - pressing 3+V (Part 3 + Volume) at boot time starts the test mode
 
@@ -436,6 +440,23 @@ ROM_START( mt32 )
 	ROM_LOAD(        "r15179857.ic13.bin",           0,   0x8000, CRC(cb219d85) SHA1(c2933cb7ad86e51904aa1c3bc12fa234e73a337f) )
 ROM_END
 
+ROM_START( mt100 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_DEFAULT_BIOS( "203" )
+
+	ROM_SYSTEM_BIOS( 0, "203", "Firmware 2.0.3" )
+	ROMX_LOAD(       "mt32_2.0.3.ic28",              0,  0x10000, CRC(6af6b774) SHA1(5837064c9df4741a55f7c4d8787ac158dff2d3ce), ROM_BIOS(0) )
+
+	ROM_REGION( 0x80000, "la32", 0 )
+	ROM_LOAD(        "r15449121.ic37.bin",           0,  0x80000, CRC(573e31cc) SHA1(f6b1eebc4b2d200ec6d3d21d51325d5b48c60252) )  // Same as c32l
+
+	ROM_REGION( 0x8000, "boss", 0 )
+	ROM_LOAD(        "r15179917.ic13.bin",           0,   0x8000, CRC(236c87a6) SHA1(e1c03905c46e962d1deb15eeed92eb61b42bba4a) )  // Same as c32l
+
+	ROM_REGION( 0x10000, "prboard", 0 )
+	ROM_LOAD(        "mt100_4.0.0.bin",              0,   0x8000, CRC(0e3bffbb) SHA1(aeef44d56f0026243b4a6415ee5c60a8de9cea0f) )  // Roland MC-03 PR-100 Ver 4.00
+ROM_END
+
 ROM_START( cm32l )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS( "102" )
@@ -463,4 +484,5 @@ ROM_END
 
 
 CONS( 1987, mt32,  0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "MT-32",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1988, mt100, 0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "MT-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 1989, cm32l, 0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "CM-32L", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
