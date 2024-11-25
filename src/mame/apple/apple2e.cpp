@@ -3882,7 +3882,7 @@ static INPUT_PORTS_START( laser128_sysconfig )
 	PORT_CONFSETTING(0x40, "40 columns")
 
 	PORT_START("kbd_lang_select")
-	PORT_CONFNAME(0x11, 0x00, "Keyboard")
+	PORT_CONFNAME(0xff, 0x00, "Keyboard")
 	PORT_CONFSETTING(0x00, "QWERTY")
 	PORT_CONFSETTING(0x10, "DVORAK") // Only switch keyboard offset - second half of character ROM "laser 128 video rom vt27-0706-0.bin" has French characters
 INPUT_PORTS_END
@@ -4585,7 +4585,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2cus_sysconfig )
 	PORT_START("kbd_lang_select")
-	PORT_CONFNAME(0x12, 0x00, "Keyboard")
+	PORT_CONFNAME(0xff, 0x00, "Keyboard")
 	PORT_CONFSETTING(0x00, "QWERTY")
 	PORT_CONFSETTING(0x12, "DVORAK")
 INPUT_PORTS_END
@@ -4598,7 +4598,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2euk_sysconfig )
 	PORT_START("kbd_lang_select")
-	PORT_CONFNAME(0x12, 0x00, "Keyboard")
+	PORT_CONFNAME(0xff, 0x00, "Keyboard")
 	PORT_CONFSETTING(0x00, "UK English")
 	PORT_CONFSETTING(0x12, "US English")
 INPUT_PORTS_END
@@ -4630,7 +4630,7 @@ static INPUT_PORTS_START( ace_common )
 	PORT_INCLUDE( apple2e_nam_us_kbd )
 
 	PORT_START("kbd_lang_select")
-	PORT_CONFNAME(0x02, 0x00, "Character Set") // Franklin ACE's switch changes video ROM character output without affecting the keyboard
+	PORT_CONFNAME(0xff, 0x00, "Character Set") // Franklin ACE's switch changes video ROM character output without affecting the keyboard
 	PORT_CONFSETTING(0x00, "Mouse")
 	PORT_CONFSETTING(0x02, "Std")
 
@@ -4705,7 +4705,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2eus_sysconfig )
 	PORT_START("kbd_lang_select")
-	PORT_CONFNAME(0x10, 0x00, "Dvorak keyboard layout mod")
+	PORT_CONFNAME(0xff, 0x00, "Dvorak keyboard layout mod")
 	PORT_CONFSETTING(0x00, "Not installed")
 	PORT_CONFSETTING(0x10, "Installed")
 INPUT_PORTS_END
@@ -4719,7 +4719,7 @@ static INPUT_PORTS_START( tk3000 )
 	PORT_INCLUDE( apple2e )
 
 	PORT_START("kbd_lang_select")
-	PORT_CONFNAME(0x01, 0x00, "Character Set")
+	PORT_CONFNAME(0xff, 0x00, "Character Set")
 	PORT_CONFSETTING(0x00, "Portuguese")
 	PORT_CONFSETTING(0x01, "US English")
 INPUT_PORTS_END
@@ -4728,7 +4728,7 @@ static INPUT_PORTS_START( spectred )
 	PORT_INCLUDE( apple2e )
 
 	PORT_START("kbd_lang_select")
-	PORT_CONFNAME(0x01, 0x00, "Character Set")
+	PORT_CONFNAME(0xff, 0x00, "Character Set")
 	PORT_CONFSETTING(0x00, "Portuguese without MouseText")
 	PORT_CONFSETTING(0x01, "US English with MouseText")
 INPUT_PORTS_END
@@ -4737,7 +4737,7 @@ static INPUT_PORTS_START( prav8c )
 	PORT_INCLUDE( apple2e )
 
 	PORT_START("kbd_lang_select")
-	PORT_CONFNAME(0x02, 0x00, "Character Set")
+	PORT_CONFNAME(0xff, 0x00, "Character Set")
 	PORT_CONFSETTING(0x00, "Cyrilic")
 	PORT_CONFSETTING(0x02, "US English")
 INPUT_PORTS_END
