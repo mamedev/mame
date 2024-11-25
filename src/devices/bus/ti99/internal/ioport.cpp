@@ -86,7 +86,7 @@ namespace bus::ti99::internal {
 
 ioport_device::ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, TI99_IOPORT, tag, owner, clock),
-		device_slot_interface(mconfig, *this),
+		device_single_card_slot_interface<ioport_attached_device>(mconfig, *this),
 		m_console_extint(*this),
 		m_console_ready(*this),
 		m_connected(nullptr)
@@ -155,7 +155,7 @@ void ioport_device::device_start()
 
 void ioport_device::device_config_complete()
 {
-	m_connected = static_cast<ioport_attached_device*>(subdevices().first());
+	m_connected = get_card_device();
 }
 
 

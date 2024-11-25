@@ -53,8 +53,9 @@ void x68k_neptune_device::device_start()
 	m_slot->space().install_readwrite_handler(0xece000,0xece3ff, read16s_delegate(*this, FUNC(x68k_neptune_device::x68k_neptune_port_r)), write16s_delegate(*this, FUNC(x68k_neptune_device::x68k_neptune_port_w)), 0xffffffff);
 }
 
-void x68k_neptune_device::device_reset() {
-	memcpy(m_prom, m_dp8390->get_mac(), 6);
+void x68k_neptune_device::device_reset()
+{
+	memcpy(m_prom, &m_dp8390->get_mac()[0], 6);
 }
 
 uint16_t x68k_neptune_device::x68k_neptune_port_r(offs_t offset, uint16_t mem_mask)

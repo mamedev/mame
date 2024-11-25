@@ -23,7 +23,7 @@ public:
 	void mpu5(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint16_t mpu5_mem_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -37,7 +37,7 @@ private:
 	uint16_t pic_r(offs_t offset);
 	void pic_w(offs_t offset, uint16_t data);
 
-	void mpu5_map(address_map &map);
+	void mpu5_map(address_map &map) ATTR_COLD;
 
 	uint16_t* m_cpuregion = nullptr;
 	std::unique_ptr<uint16_t[]> m_mainram;

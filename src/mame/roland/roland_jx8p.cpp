@@ -41,8 +41,8 @@ private:
 	u8 switches_r(offs_t offset);
 	void leds_w(u8 data);
 
-	void jx8p_assigner_map(address_map &map);
-	void superjx_assigner_map(address_map &map);
+	void jx8p_assigner_map(address_map &map) ATTR_COLD;
+	void superjx_assigner_map(address_map &map) ATTR_COLD;
 
 	required_device<hd6303r_cpu_device> m_assignercpu;
 	required_ioport_array<8> m_sw_scan;

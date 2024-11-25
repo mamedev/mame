@@ -11,7 +11,7 @@ Hardware notes:
 - 256x4 RAM (SCM5101E-8)
 - 9-digit 7seg led panel (3 unused), piezo
 
-The hardware has similarities with Omar.
+The hardware has similarities with Omar I.
 
 The user interface resembles CompuChess. At the "L" prompt, enter level (1-8).
 At "bP", press A for new game, B for empty board, C to continue. At "0", press
@@ -51,14 +51,14 @@ public:
 	void tchess(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<f38t56_device> m_psu;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<5> m_inputs;
 
 	std::unique_ptr<u8[]> m_ram;
@@ -67,8 +67,8 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_digit_data = 0;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	u8 read_inputs();
 	void p0_w(u8 data);
@@ -283,4 +283,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, tchess, 0,      0,      tchess,  tchess, chess_state, empty_init, "Tryom", "Electronic Chess (Tryom)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, tchess, 0,      0,      tchess,  tchess, chess_state, empty_init, "Tryom", "Electronic Chess (Tryom)", MACHINE_SUPPORTS_SAVE )

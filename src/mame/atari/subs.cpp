@@ -55,8 +55,8 @@ public:
 	void subs(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -90,11 +90,9 @@ private:
 
 	template <uint8_t Which> int steering();
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 template <uint8_t Pen>
 void subs_state::invert_w(int state)
@@ -196,8 +194,6 @@ void subs_state::palette(palette_device &palette) const
 	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff)); // WHITE - modified on video invert
 }
 
-
-// machine
 
 /***************************************************************************
 machine initialization

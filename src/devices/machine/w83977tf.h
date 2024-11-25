@@ -8,6 +8,7 @@
 #include "bus/isa/isa.h"
 #include "machine/8042kbdc.h"
 #include "machine/ds128x.h"
+#include "machine/pc_lpt.h"
 
 class w83977tf_device : public device_t,
 						 public device_isa16_card_interface,
@@ -32,17 +33,18 @@ public:
 //  auto nrts2() { return m_nrts2_callback.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	const address_space_config m_space_config;
 
 	required_device<kbdc8042_device> m_kbdc;
 	required_device<ds12885_device> m_rtc;
+	required_device<pc_lpt_device> m_lpt;
 	memory_view m_logical_view;
 
 	devcb_write_line m_gp20_reset_callback;
@@ -67,14 +69,18 @@ private:
 	u8 m_keyb_irq_line;
 	u8 m_mouse_irq_line;
 	u8 m_rtc_irq_line;
+	u8 m_lpt_irq_line;
+	u8 m_lpt_drq_line;
+	u8 m_lpt_mode;
 	u16 m_keyb_address[2];
+	u16 m_lpt_address;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, u8 data);
 	u8 cr26_r();
 	void cr26_w(offs_t offset, u8 data);
 
-	void config_map(address_map &map);
+	void config_map(address_map &map) ATTR_COLD;
 
 	void logical_device_select_w(offs_t offset, u8 data);
 	template <unsigned N> u8 activate_r(offs_t offset);
@@ -104,6 +110,7 @@ private:
 	void irq_keyboard_w(int state);
 	void irq_mouse_w(int state);
 	void irq_rtc_w(int state);
+	void irq_parallel_w(int state);
 
 	void request_irq(int irq, int state);
 };

@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef DSP56156_PCU_H
-#define DSP56156_PCU_H
+#ifndef MAME_CPU_DSP56156_DSP56PCU_H
+#define MAME_CPU_DSP56156_DSP56PCU_H
+
+#pragma once
 
 #include "dsp56156.h"
 
-namespace DSP_56156
-{
+namespace DSP_56156 {
+
 /***************************************************************************
     PCU
 ***************************************************************************/
@@ -148,4 +150,4 @@ int8_t dsp56156_get_irq_priority(dsp56156_core* cpustate, int index);
 
 } // namespace DSP_56156
 
-#endif
+#endif // MAME_CPU_DSP56156_DSP56PCU_H

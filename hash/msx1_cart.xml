@@ -14935,6 +14935,18 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		</part>
 	</software>
 
+	<software name="hb8kdemo">
+		<description>Hotbit HB-8000 Demo (Brazil)</description> <!-- The cartridge says Vendedor Eletrônico -->
+		<year>19??</year>
+		<publisher>Sharp-Epcom</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="vendedor electronico - sharp-epcom.rom" size="0x4000" crc="c1cb6973" sha1="c1af87d32eb5816c1d4fec436154f19df327df04" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="joytelop">
 		<description>Joytelop (Japan)</description>
 		<year>1985</year>
@@ -15058,6 +15070,19 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 				<rom name="game master ii (japan) (alt 1).rom" size="0x20000" crc="2d93f9cc" sha1="fe74b4df9698a61dffd3ac88f47619675514ba1c" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="liguesee">
+		<description>Ligue-se ao Expert (Brazil)</description>
+		<year>19??</year>
+		<publisher>Gradiente</publisher>
+		<notes>Demo cartridge that came with the Gradiente Expert system.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="ligue-se ao expert - gradiente.rom" size="0x4000" crc="5c7cf05b" sha1="91e22b727002ceeb0cf5fb1019a0c907c3cd24a5" />
 			</dataarea>
 		</part>
 	</software>
@@ -17773,18 +17798,17 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<!-- Software does not start -->
-	<software name="xy" supported="no">
+	<software name="xy">
 		<description>X &amp; Y (Arab)</description>
 		<year>1987</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="alt_title" value="س و ص"/>
-		<info name="serial" value="M022" />
-		<info name="usage" value="Requires an Arabic MSX" />
+		<info name="serial" value="M022"/>
+		<info name="usage" value="Does not work on all MSX models. Systems known to work include: ax170, hx10, phc23."/>
 		<part name="cart" interface="msx_cart">
-			<feature name="start_page" value="2"/>
-			<dataarea name="rom" size="0x8000">
-				<rom name="x y (1987)(al alamiah).rom" size="0x8000" crc="a2541660" sha1="4666e2fe5d8ed47c990a39cc345c744202228924" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="x y - al alamiah.rom" size="0x8000" crc="a2541660" sha1="4666e2fe5d8ed47c990a39cc345c744202228924"/>
+				<rom size="0x8000" offset="0x8000" loadflag="reload"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19222,6 +19246,18 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="4mastmel">
+		<description>The 4 Masters of Melody</description>
+		<year>2019</year>
+		<publisher>Clube MSX</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="the 4 masters of melody - matra.rom" size="0x4000" crc="56dc456b" sha1="74094836d6deeebd70ead949553b8d7918716ab2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="acegun">
 		<description>Ace Gun</description>
 		<year>2020</year>
@@ -19537,6 +19573,18 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="balloon city - ag software (2007).rom" size="0x4000" crc="e442c99a" sha1="c46f85f21f780f126a0d61848071fcdcf84f15b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlgojo">
+		<description>The Battle on Gojo Ohashi</description>
+		<year>2020</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="the battle on gojo ohashi - matra.rom" size="0x10000" crc="5d1e5d4e" sha1="1086d8795f344753d55cf358e3c274f14e408751"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21810,6 +21858,18 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="ghost">
+		<description>Ghost</description>
+		<year>2017</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="ghost - matra.rom" size="0x10000" crc="48efb417" sha1="d26ea45f0b84f65df21fe54573ef2c37e21bc591"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gniffel">
 		<description>Gniffel</description>
 		<year>2004</year>
@@ -22899,6 +22959,19 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="magtower">
+		<description>Magical Tower Adventure</description>
+		<year>2017</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="Timmy"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="magical tower adventure - timmy.rom" size="0x8000" crc="273c07c7" sha1="50cc78e08fcb36ce9fb1c57d77c8758f439ba525" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magnet">
 		<description>Magnet</description>
 		<year>19??</year>
@@ -23483,6 +23556,18 @@ legacy FM implementations cannot find it.
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="monster hunter - nerlaska studio (2006) (spanish).rom" size="0x20000" crc="b876a92f" sha1="ca45da2f9cd8edf4ab04ffd542b9c60ef6a9a254" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moodland">
+		<description>Mood Land</description>
+		<year>2018</year>
+		<publisher>GameCast Entertainment</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="mood land - gamecast entertainment.rom" size="0x10000" crc="22fb60c5" sha1="6b10823a397e027f1745fda6487c01232414d438" />
 			</dataarea>
 		</part>
 	</software>
@@ -24449,6 +24534,31 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="pretty kingdom - nerlaska studio (2014) [msxdev14] (older).rom" size="0x8000" crc="1d14e338" sha1="cb07324ae94c2546156badbcb5c1ff3c5ff4d041" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prncsqst">
+		<description>Princess Quest</description>
+		<year>2012</year>
+		<publisher>Matra</publisher>
+		<info name="developer" value="Óscar Toledo Gutiérrez"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="princess quest - matra.rom" size="0x10000" crc="aa31ac36" sha1="405db36a0b57fa4871a7991ebe72695793d3b7c9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prsnrwar">
+		<description>Prisoner of War</description>
+		<year>2018</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="prisoner of war - matra.rom" size="0x10000" crc="49efb097" sha1="f07f68e873689e1d7083e21b805b8a5b174f50d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25983,21 +26093,21 @@ legacy FM implementations cannot find it.
 			<feature name="part_id" value="Part 1"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="the queens footsteps  - davide bucci (2020) [part 1] v1.1.1.rom" size="0x8000" crc="d33c34ea" sha1="7a32d06b0c51da09d2ccb33d5ed9cf33df6fcf32" />
+				<rom name="the queens footsteps - davide bucci (2020) [part 1] v1.1.1.rom" size="0x8000" crc="d33c34ea" sha1="7a32d06b0c51da09d2ccb33d5ed9cf33df6fcf32" />
 			</dataarea>
 		</part>
 		<part name="cart2" interface="msx_cart">
 			<feature name="part_id" value="Part 2"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="the queens footsteps  - davide bucci (2020) [part 2] v1.1.1.rom" size="0x8000" crc="4ef9e5da" sha1="9477b1f2b22a2acdfe2d162abe8daea5961a6128" />
+				<rom name="the queens footsteps - davide bucci (2020) [part 2] v1.1.1.rom" size="0x8000" crc="4ef9e5da" sha1="9477b1f2b22a2acdfe2d162abe8daea5961a6128" />
 			</dataarea>
 		</part>
 		<part name="cart3" interface="msx_cart">
 			<feature name="part_id" value="Part 3"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="the queens footsteps  - davide bucci (2020) [part 3] v1.1.1.rom" size="0x8000" crc="3513159a" sha1="d214330e49fa7fa8d05a904d3eb1cca994d5222c" />
+				<rom name="the queens footsteps - davide bucci (2020) [part 3] v1.1.1.rom" size="0x8000" crc="3513159a" sha1="d214330e49fa7fa8d05a904d3eb1cca994d5222c" />
 			</dataarea>
 		</part>
 	</software>
@@ -26010,21 +26120,21 @@ legacy FM implementations cannot find it.
 			<feature name="part_id" value="Part 1"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="the queens footsteps  - davide bucci (2020) [part 1] v1.0.rom" size="0x8000" crc="8137ae26" sha1="e01b59ce50743372440dd7e38e2fc2f92d653414" />
+				<rom name="the queens footsteps - davide bucci (2020) [part 1] v1.0.rom" size="0x8000" crc="8137ae26" sha1="e01b59ce50743372440dd7e38e2fc2f92d653414" />
 			</dataarea>
 		</part>
 		<part name="cart2" interface="msx_cart">
 			<feature name="part_id" value="Part 2"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="the queens footsteps  - davide bucci (2020) [part 2] v1.0.rom" size="0x8000" crc="9a8fba69" sha1="b0138ea39dc8eedd51907b18b2cef6696e5e8776" />
+				<rom name="the queens footsteps - davide bucci (2020) [part 2] v1.0.rom" size="0x8000" crc="9a8fba69" sha1="b0138ea39dc8eedd51907b18b2cef6696e5e8776" />
 			</dataarea>
 		</part>
 		<part name="cart3" interface="msx_cart">
 			<feature name="part_id" value="Part 3"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="the queens footsteps  - davide bucci (2020) [part 3] v1.0.rom" size="0x8000" crc="3266f9ed" sha1="a090c258bcd16ddfc2d818a7c6a650a0f1016b2b" />
+				<rom name="the queens footsteps - davide bucci (2020) [part 3] v1.0.rom" size="0x8000" crc="3266f9ed" sha1="a090c258bcd16ddfc2d818a7c6a650a0f1016b2b" />
 			</dataarea>
 		</part>
 	</software>
@@ -26986,7 +27096,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.1 -  patriks retro tech (2022)(en).rom" size="0x8000" crc="4b608d0c" sha1="d5486e703ffebaaad873e38f57498f2b4a87c190"/>
+				<rom name="word v1.1 - patriks retro tech (2022)(en).rom" size="0x8000" crc="4b608d0c" sha1="d5486e703ffebaaad873e38f57498f2b4a87c190"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26999,7 +27109,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.1 -  patriks retro tech (2022)(es).rom" size="0x8000" crc="f8eef078" sha1="7a88578fafae461a2268420f17d709977f58d911"/>
+				<rom name="word v1.1 - patriks retro tech (2022)(es).rom" size="0x8000" crc="f8eef078" sha1="7a88578fafae461a2268420f17d709977f58d911"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27012,7 +27122,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.1 -  patriks retro tech (2022)(nl).rom" size="0x8000" crc="94013997" sha1="84ed9f4e514bbc6d2801773acbe5d6db0e2c9ed8"/>
+				<rom name="word v1.1 - patriks retro tech (2022)(nl).rom" size="0x8000" crc="94013997" sha1="84ed9f4e514bbc6d2801773acbe5d6db0e2c9ed8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27025,7 +27135,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.1 -  patriks retro tech (2022)(se).rom" size="0x8000" crc="d8766aaf" sha1="9aa70aa7b8e5aa454383ce1b81f809c2e5162b6c"/>
+				<rom name="word v1.1 - patriks retro tech (2022)(se).rom" size="0x8000" crc="d8766aaf" sha1="9aa70aa7b8e5aa454383ce1b81f809c2e5162b6c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27038,7 +27148,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.0 -  patriks retro tech (2022)(en).rom" size="0x8000" crc="fe57e6a8" sha1="1bf4c71293c6ecf65862eca858baec8189963c86"/>
+				<rom name="word v1.0 - patriks retro tech (2022)(en).rom" size="0x8000" crc="fe57e6a8" sha1="1bf4c71293c6ecf65862eca858baec8189963c86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27051,7 +27161,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.0 -  patriks retro tech (2022)(es).rom" size="0x8000" crc="4237621f" sha1="68cfebaba6fb99930986cf61393143d88d493b6d"/>
+				<rom name="word v1.0 - patriks retro tech (2022)(es).rom" size="0x8000" crc="4237621f" sha1="68cfebaba6fb99930986cf61393143d88d493b6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27064,7 +27174,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.0 -  patriks retro tech (2022)(nl).rom" size="0x8000" crc="fcec5a00" sha1="f90ca2098052dee403452c4f36af74b37ee53756"/>
+				<rom name="word v1.0 - patriks retro tech (2022)(nl).rom" size="0x8000" crc="fcec5a00" sha1="f90ca2098052dee403452c4f36af74b37ee53756"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27077,7 +27187,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.0 -  patriks retro tech (2022)(se).rom" size="0x8000" crc="6af9a4a0" sha1="68ba3b6adb31fcc713a436ed7c33cb90c2aa6eb7"/>
+				<rom name="word v1.0 - patriks retro tech (2022)(se).rom" size="0x8000" crc="6af9a4a0" sha1="68ba3b6adb31fcc713a436ed7c33cb90c2aa6eb7"/>
 			</dataarea>
 		</part>
 	</software>

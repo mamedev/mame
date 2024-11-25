@@ -132,7 +132,7 @@ void share_write(memory_share &share, offs_t address, T val)
 int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&value)
 {
 	const char *typestr;
-	switch(value)
+	switch (value)
 	{
 	case AMH_NONE:
 		typestr = "none";

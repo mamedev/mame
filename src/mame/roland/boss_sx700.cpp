@@ -25,8 +25,8 @@ public:
 	void gx700(machine_config &config);
 
 private:
-	void sx700_map(address_map &map);
-	void gx700_map(address_map &map);
+	void sx700_map(address_map &map) ATTR_COLD;
+	void gx700_map(address_map &map) ATTR_COLD;
 
 	required_device<h83002_device> m_maincpu;
 };

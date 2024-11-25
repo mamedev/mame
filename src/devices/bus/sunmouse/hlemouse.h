@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_DEVICES_SUNMOUSE_HLEMOUSE_H
-#define MAME_DEVICES_SUNMOUSE_HLEMOUSE_H
+#ifndef MAME_BUS_SUNMOUSE_HLEMOUSE_H
+#define MAME_BUS_SUNMOUSE_HLEMOUSE_H
 
 #pragma once
 
@@ -32,9 +32,9 @@ protected:
 			unsigned multiplier);
 
 	// device overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
@@ -79,4 +79,4 @@ public:
 DECLARE_DEVICE_TYPE_NS(SUN_1200BAUD_HLE_MOUSE, bus::sunmouse, hle_1200baud_device)
 DECLARE_DEVICE_TYPE_NS(SUN_4800BAUD_HLE_MOUSE, bus::sunmouse, hle_4800baud_device)
 
-#endif // MAME_DEVICES_SUNMOUSE_HLEMOUSE_H
+#endif // MAME_BUS_SUNMOUSE_HLEMOUSE_H

@@ -33,11 +33,11 @@ public:
 	void drgnmst(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void drgnmst_main_map(address_map &map);
+	void drgnmst_main_map(address_map &map) ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 
 	/* video-related */
@@ -91,8 +91,8 @@ public:
 	void drgnmst_with_pic(machine_config& config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	optional_device<pic16c55_device> m_audiocpu;
@@ -119,9 +119,9 @@ private:
 	void oki_w(uint8_t data);
 	void snd_control_w(uint8_t data);
 
-	void drgnmst_main_map_with_pic(address_map& map);
+	void drgnmst_main_map_with_pic(address_map &map) ATTR_COLD;
 
-	void drgnmst_oki1_map(address_map &map);
+	void drgnmst_oki1_map(address_map &map) ATTR_COLD;
 };
 
 class drgnmst_ym_state : public drgnmst_base_state
@@ -135,12 +135,12 @@ public:
 	void drgnmst_ym(machine_config& config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<okim6295_device> m_oki;
 
-	void drgnmst_main_map_with_ym(address_map& map);
+	void drgnmst_main_map_with_ym(address_map &map) ATTR_COLD;
 };
 
 

@@ -20,9 +20,9 @@ public:
 	virtual void midi_rx(int state) override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<ks0164_device> m_ks0164;
@@ -34,7 +34,7 @@ omniwave_device::omniwave_device(const machine_config &mconfig, const char *tag,
 	m_ks0164(*this, "ks0164")
 {
 }
-	
+
 omniwave_device::~omniwave_device()
 {
 }

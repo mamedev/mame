@@ -88,8 +88,8 @@ protected:
 	uint8_t y_r(uint8_t line);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void update();

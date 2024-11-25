@@ -82,7 +82,7 @@ private:
 
 	bool m_dma_scsi_a_in_step = false, m_dma_floppy_in_step = false, m_floppy_drq = false;
 
-	void pdm_map(address_map &map);
+	void pdm_map(address_map &map) ATTR_COLD;
 
 	void nmi_irq(int state);
 	void dma_irq(int state);

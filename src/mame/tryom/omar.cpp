@@ -60,20 +60,20 @@ public:
 	void omar1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 protected:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<f38t56_device> m_psu;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<5> m_inputs;
 
 	u8 m_inp_mux = 0;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	void input1_w(u8 data);
 	void input2_w(u8 data);
@@ -90,6 +90,7 @@ void omar_state::machine_start()
 	save_item(NAME(m_inp_mux));
 }
 
+
 // Omar II
 
 class omar2_state : public omar_state
@@ -102,7 +103,7 @@ public:
 	void omar2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 m_lcd_com = 0;
@@ -377,5 +378,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, omar1, 0,      0,      omar1,   omar,  omar_state,  empty_init, "Tryom", "Omar I", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, omar2, 0,      0,      omar2,   omar,  omar2_state, empty_init, "Tryom", "Omar II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, omar1, 0,      0,      omar1,   omar,  omar_state,  empty_init, "Tryom", "Omar I", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, omar2, 0,      0,      omar2,   omar,  omar2_state, empty_init, "Tryom", "Omar II", MACHINE_SUPPORTS_SAVE )

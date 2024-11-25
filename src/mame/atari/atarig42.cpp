@@ -17,8 +17,8 @@
           routing game link data through the ADSP's serial port.
         * The dedicated twin cab version uses dual port RAM to bridge the two PCBs together (not
           networked).
-    
-	TODO:
+
+    TODO:
         * ASIC65 for Road Riot tests bad with a "TIMEOUT ERROR" for the internal RAM test. Comm port and checksum test ok
         * Hook com-link board ADSP-2105 (and serial port) for roadriot and roadriota
         * Hook dual port RAM and dual PCB comms for roadriotb
@@ -366,7 +366,7 @@ static INPUT_PORTS_START( roadriot )
 
 	PORT_START("IN2")       /* e00010 */
 	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", FUNC(adc0808_device::eoc_r))
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )

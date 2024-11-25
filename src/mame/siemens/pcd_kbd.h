@@ -15,13 +15,13 @@ public:
 
 	void t0_w(int state);
 
-	void pcd_keyboard_map(address_map &map);
+	void pcd_keyboard_map(address_map &map) ATTR_COLD;
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 
 private:
 	required_ioport_array<17> m_rows;

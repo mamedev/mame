@@ -2,7 +2,7 @@
 // detail/push_options.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +28,15 @@
 #   pragma GCC visibility push (default)
 #  endif // !defined(ASIO_DISABLE_VISIBILITY)
 # endif // (__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)
+
+# pragma push_macro ("emit")
+# undef emit
+
+# pragma push_macro ("signal")
+# undef signal
+
+# pragma push_macro ("slot")
+# undef slot
 
 #elif defined(__clang__)
 
@@ -163,12 +172,13 @@
 //
 // Must remain the last #elif since some other vendors (Metrowerks, for example)
 // also #define _MSC_VER
-
 # pragma warning (disable:4103)
 # pragma warning (push)
+# pragma warning (disable:4619) // suppress 'there is no warning number XXXX'
 # pragma warning (disable:4127)
 # pragma warning (disable:4180)
 # pragma warning (disable:4244)
+# pragma warning (disable:4265)
 # pragma warning (disable:4355)
 # pragma warning (disable:4510)
 # pragma warning (disable:4512)

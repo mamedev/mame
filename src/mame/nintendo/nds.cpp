@@ -839,8 +839,8 @@ void nds_state::request_irq(int cpu, uint32_t int_type)
 		{
 			if (cpu == 0)
 			{
-				m_arm9->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
-				m_arm9->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+				m_arm9->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
+				m_arm9->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 			}
 			else
 			{
@@ -851,8 +851,8 @@ void nds_state::request_irq(int cpu, uint32_t int_type)
 					m_arm7halted = false;
 				}
 
-				m_arm7->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
-				m_arm7->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+				m_arm7->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
+				m_arm7->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 			}
 		}
 	}

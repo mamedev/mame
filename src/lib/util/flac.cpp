@@ -18,6 +18,7 @@
 #include <cstring>
 #include <iterator>
 #include <new>
+#include <tuple>
 
 
 //**************************************************************************
@@ -84,6 +85,8 @@ bool flac_encoder::reset()
 	FLAC__stream_encoder_set_blocksize(m_encoder, m_block_size);
 
 	// re-start processing
+	if (m_file)
+		return (FLAC__stream_encoder_init_stream(m_encoder, write_callback_static, seek_callback_static, tell_callback_static, nullptr, this) == FLAC__STREAM_ENCODER_INIT_STATUS_OK);
 	return (FLAC__stream_encoder_init_stream(m_encoder, write_callback_static, nullptr, nullptr, nullptr, this) == FLAC__STREAM_ENCODER_INIT_STATUS_OK);
 }
 
@@ -266,8 +269,7 @@ FLAC__StreamEncoderWriteStatus flac_encoder::write_callback(const FLAC__byte buf
 			int count = bytes - offset;
 			if (m_file)
 			{
-				size_t actual;
-				m_file->write(buffer, count, actual); // TODO: check for errors
+				/*auto const [err, actual] =*/ write(*m_file, buffer, count); // FIXME: check for errors
 			}
 			else
 			{
@@ -279,6 +281,38 @@ FLAC__StreamEncoderWriteStatus flac_encoder::write_callback(const FLAC__byte buf
 		}
 	}
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
+}
+
+FLAC__StreamEncoderSeekStatus flac_encoder::seek_callback_static(const FLAC__StreamEncoder *encoder, FLAC__uint64 absolute_byte_offset, void *client_data)
+{
+	return reinterpret_cast<flac_encoder *>(client_data)->seek_callback(absolute_byte_offset);
+}
+
+FLAC__StreamEncoderSeekStatus flac_encoder::seek_callback(FLAC__uint64 absolute_byte_offset)
+{
+	if (m_file)
+	{
+		if (!m_file->seek(absolute_byte_offset, SEEK_SET))
+			return FLAC__STREAM_ENCODER_SEEK_STATUS_OK;
+		return FLAC__STREAM_ENCODER_SEEK_STATUS_ERROR;
+	}
+	return FLAC__STREAM_ENCODER_SEEK_STATUS_UNSUPPORTED;
+}
+
+FLAC__StreamEncoderTellStatus flac_encoder::tell_callback_static(const FLAC__StreamEncoder *encoder, FLAC__uint64 *absolute_byte_offset, void *client_data)
+{
+	return reinterpret_cast<flac_encoder *>(client_data)->tell_callback(absolute_byte_offset);
+}
+
+FLAC__StreamEncoderTellStatus flac_encoder::tell_callback(FLAC__uint64 *absolute_byte_offset)
+{
+	if (m_file)
+	{
+		if (!m_file->tell(*absolute_byte_offset))
+			return FLAC__STREAM_ENCODER_TELL_STATUS_OK;
+		return FLAC__STREAM_ENCODER_TELL_STATUS_ERROR;
+	}
+	return FLAC__STREAM_ENCODER_TELL_STATUS_UNSUPPORTED;
 }
 
 
@@ -537,7 +571,8 @@ FLAC__StreamDecoderReadStatus flac_decoder::read_callback(FLAC__byte buffer[], s
 
 	if (m_file) // if a file, just read
 	{
-		m_file->read(buffer, expected, *bytes); // TODO: check for errors
+		std::error_condition err;
+		std::tie(err, *bytes) = read(*m_file, buffer, expected); // FIXME: check for errors
 	}
 	else // otherwise, copy from memory
 	{
@@ -601,12 +636,12 @@ FLAC__StreamDecoderTellStatus flac_decoder::tell_callback_static(const FLAC__Str
 //  stream
 //-------------------------------------------------
 
-FLAC__StreamDecoderWriteStatus flac_decoder::write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
+FLAC__StreamDecoderWriteStatus flac_decoder::write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[], void *client_data)
 {
 	return reinterpret_cast<flac_decoder *>(client_data)->write_callback(frame, buffer);
 }
 
-FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[])
+FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[])
 {
 	assert(frame->header.channels == channels());
 
@@ -633,7 +668,7 @@ FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame 
 	}
 }
 
-template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[])
+template <flac_decoder::DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWriteStatus flac_decoder::write_callback(const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[])
 {
 	const int blocksize = frame->header.blocksize;
 	const int shift = (Mode == SCALE_DOWN) ? frame->header.bits_per_sample - m_bits_per_sample : (Mode == SCALE_UP) ? m_bits_per_sample - frame->header.bits_per_sample : 0;

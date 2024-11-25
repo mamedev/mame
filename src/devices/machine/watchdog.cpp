@@ -144,14 +144,7 @@ void watchdog_timer_device::watchdog_enable(int state)
 
 void watchdog_timer_device::watchdog_fired()
 {
-	logerror("Reset caused by the watchdog!!!\n");
-
-	bool verbose = machine().options().verbose();
-#ifdef MAME_DEBUG
-	verbose = true;
-#endif
-	if (verbose)
-		popmessage("Reset caused by the watchdog!!!\n");
+	logerror("watchdog_fired: reset issued\n");
 
 	machine().schedule_soft_reset();
 }

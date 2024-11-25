@@ -74,8 +74,8 @@ protected:
 	saa5240_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -103,7 +103,7 @@ private:
 
 	enum { STATE_IDLE, STATE_DEVSEL, STATE_ADDRESS, STATE_DATAIN, STATE_DATAOUT };
 
-	void saa5240_vram(address_map &map);
+	void saa5240_vram(address_map &map) ATTR_COLD;
 
 	enum
 	{
@@ -186,7 +186,7 @@ public:
 	saa5240a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -199,7 +199,7 @@ public:
 	saa5240b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -212,7 +212,7 @@ public:
 	saa5243e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 

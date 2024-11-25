@@ -20,7 +20,7 @@ public:
 	a5900_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	void program_512x8(address_map &map);
+	void program_512x8(address_map &map) ATTR_COLD;
 
 	// opcode handlers
 	virtual void op_read() override;

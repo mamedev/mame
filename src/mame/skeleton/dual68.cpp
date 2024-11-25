@@ -37,10 +37,10 @@ private:
 	uint8_t sio_status_r();
 	uint8_t fdc_status_r();
 
-	void dual68_mem(address_map &map);
-	void sio4_io(address_map &map);
-	void sio4_mem(address_map &map);
-	virtual void machine_reset() override;
+	void dual68_mem(address_map &map) ATTR_COLD;
+	void sio4_io(address_map &map) ATTR_COLD;
+	void sio4_mem(address_map &map) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device_array<scn_pci_device, 4> m_usart;
 	required_shared_ptr<uint16_t> m_p_ram;

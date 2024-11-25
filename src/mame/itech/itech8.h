@@ -13,6 +13,7 @@
 #include "machine/nvram.h"
 #include "video/tlc34076.h"
 #include "video/tms34061.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -56,7 +57,7 @@ public:
 	void init_hstennis();
 
 	int special_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
+	ioport_value gtg_mux();
 
 protected:
 	static constexpr u32 VRAM_SIZE = 0x40000;
@@ -67,7 +68,7 @@ protected:
 	required_device<nvram_device> m_nvram;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<tms34061_device> m_tms34061;
-	required_device<tlc34076_device> m_tlc34076;
+	optional_device<tlc34076_device> m_tlc34076;
 	required_device<screen_device> m_screen;
 	required_device<ticket_dispenser_device> m_ticket;
 	required_region_ptr<u8> m_grom;
@@ -113,9 +114,9 @@ protected:
 	void pia_porta_out(u8 data);
 	void ym2203_portb_out(u8 data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	u32 screen_update_2layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -145,15 +146,15 @@ protected:
 	void itech8_core_devices(machine_config &config);
 	void itech8_core_lo(machine_config &config);
 	void itech8_core_hi(machine_config &config);
-	void common_hi_map(address_map &map);
-	void common_lo_map(address_map &map);
-	void gtg2_map(address_map &map);
-	void ninclown_map(address_map &map);
-	void rimrockn_map(address_map &map);
-	void sound2203_map(address_map &map);
-	void sound2608b_map(address_map &map);
-	void sound3812_external_map(address_map &map);
-	void sound3812_map(address_map &map);
+	void common_hi_map(address_map &map) ATTR_COLD;
+	void common_lo_map(address_map &map) ATTR_COLD;
+	void gtg2_map(address_map &map) ATTR_COLD;
+	void ninclown_map(address_map &map) ATTR_COLD;
+	void rimrockn_map(address_map &map) ATTR_COLD;
+	void sound2203_map(address_map &map) ATTR_COLD;
+	void sound2608b_map(address_map &map) ATTR_COLD;
+	void sound3812_external_map(address_map &map) ATTR_COLD;
+	void sound3812_map(address_map &map) ATTR_COLD;
 };
 
 // with sensor hardware
@@ -172,7 +173,7 @@ public:
 	void slikshot_hi(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	optional_device<cpu_device> m_subcpu;
@@ -192,12 +193,12 @@ private:
 	u8 m_curx = 0;
 	s8 m_xbuffer[YBUFFER_COUNT]{};
 	s8 m_ybuffer[YBUFFER_COUNT]{};
-	int m_ybuffer_next = 0;
-	int m_curxpos = 0;
-	int m_last_ytotal = 0;
+	u8 m_ybuffer_next = 0;
+	s32 m_curxpos = 0;
+	s32 m_last_ytotal = 0;
 	u8 m_crosshair_vis = 0;
 
-	/*----------- defined in machine/itech8.cpp -----------*/
+	//----------- defined in itech/itech8_m.cpp -----------
 
 	u8 z80_port_r();
 	void z80_port_w(u8 data);
@@ -207,23 +208,23 @@ private:
 	void z80_control_w(u8 data);
 
 	void inters_to_vels(u16 inter1, u16 inter2, u16 inter3, u8 beams,
-							u8 *xres, u8 *vxres, u8 *vyres);
+							u8 &xres, u8 &vxres, u8 &vyres);
 	void vels_to_inters(u8 x, u8 vx, u8 vy,
-							u16 *inter1, u16 *inter2, u16 *inter3, u8 *beams);
-	void inters_to_words(u16 inter1, u16 inter2, u16 inter3, u8 *beams,
-							u16 *word1, u16 *word2, u16 *word3);
+							u16 &inter1, u16 &inter2, u16 &inter3, u8 &beams);
+	void inters_to_words(u16 inter1, u16 inter2, u16 inter3, u8 &beams,
+							u16 &word1, u16 &word2, u16 &word3);
 
 	void words_to_sensors(u16 word1, u16 word2, u16 word3, u8 beams,
-							u16 *sens0, u16 *sens1, u16 *sens2, u16 *sens3);
+							u16 &sens0, u16 &sens1, u16 &sens2, u16 &sens3);
 	void compute_sensors();
 	TIMER_CALLBACK_MEMBER(delayed_z80_control_w);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mem_hi_map(address_map &map);
-	void mem_lo_map(address_map &map);
-	void z80_io_map(address_map &map);
-	void z80_mem_map(address_map &map);
+	void mem_hi_map(address_map &map) ATTR_COLD;
+	void mem_lo_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
+	void z80_mem_map(address_map &map) ATTR_COLD;
 };
 
 // with additional timer
@@ -236,7 +237,7 @@ public:
 	}
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	emu_timer *m_behind_beam_update_timer = nullptr;
@@ -249,6 +250,7 @@ class grmatch_state : public itech8_state
 public:
 	grmatch_state(const machine_config &mconfig, device_type type, const char *tag) :
 		itech8_state(mconfig, type, tag),
+		m_palette(*this, "palette_%u", 0U),
 		m_palette_timer(nullptr)
 	{
 	}
@@ -256,8 +258,14 @@ public:
 	void grmatch(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device_array<palette_device, 2> m_palette;
+	emu_timer *m_palette_timer = nullptr;
+	u8 m_palcontrol = 0U;
+	u8 m_xscroll = 0U;
 
 	void palette_w(u8 data);
 	void xscroll_w(u8 data);
@@ -266,10 +274,5 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(palette_update);
 
-	emu_timer *m_palette_timer = nullptr;
-	u8 m_palcontrol = 0U;
-	u8 m_xscroll = 0U;
-	rgb_t m_palette[2][16]{};
-
-	void grmatch_map(address_map &map);
+	void grmatch_map(address_map &map) ATTR_COLD;
 };

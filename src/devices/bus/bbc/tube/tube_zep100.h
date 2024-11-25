@@ -8,9 +8,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_ZEP100_H
+#define MAME_BUS_BBC_TUBE_TUBE_ZEP100_H
 
-#ifndef MAME_BUS_BBC_TUBE_ZEP100_H
-#define MAME_BUS_BBC_TUBE_ZEP100_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/z80/z80.h"
@@ -35,12 +36,12 @@ protected:
 	bbc_tube_zep100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual uint8_t host_r(offs_t offset) override;
 	virtual void host_w(offs_t offset, uint8_t data) override;
@@ -66,8 +67,8 @@ private:
 	uint8_t ppi_pb_r();
 	void ppi_pc_w(uint8_t data);
 
-	void tube_zep100_io(address_map &map);
-	void tube_zep100_mem(address_map &map);
+	void tube_zep100_io(address_map &map) ATTR_COLD;
+	void tube_zep100_mem(address_map &map) ATTR_COLD;
 };
 
 class bbc_tube_zep100l_device : public bbc_tube_zep100_device
@@ -76,7 +77,7 @@ public:
 	bbc_tube_zep100l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 class bbc_tube_zep100w_device : public bbc_tube_zep100_device
@@ -85,7 +86,7 @@ public:
 	bbc_tube_zep100w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 class bbc_tube_zep100m_device : public bbc_tube_zep100_device
@@ -94,7 +95,7 @@ public:
 	bbc_tube_zep100m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -104,5 +105,4 @@ DECLARE_DEVICE_TYPE(BBC_TUBE_ZEP100L, bbc_tube_zep100l_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_ZEP100W, bbc_tube_zep100w_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_ZEP100M, bbc_tube_zep100m_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_ZEP100_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_ZEP100_H

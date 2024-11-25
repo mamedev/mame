@@ -85,11 +85,11 @@ public:
 	void io_write_byte(offs_t offset, uint8_t data);
 
 	void bullet(machine_config &config);
-	void bullet_io(address_map &map);
-	void bullet_mem(address_map &map);
+	void bullet_io(address_map &map) ATTR_COLD;
+	void bullet_mem(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void update_dma_rdy();
 
@@ -166,11 +166,11 @@ private:
 	void cstrb_w(int state);
 	void req_w(int state);
 
-	void bulletf_io(address_map &map);
-	void bulletf_mem(address_map &map);
+	void bulletf_io(address_map &map) ATTR_COLD;
+	void bulletf_mem(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void update_dma_rdy();
 

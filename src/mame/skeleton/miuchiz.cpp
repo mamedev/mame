@@ -41,7 +41,7 @@ public:
 	void miuchiz(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<st2205u_device> m_maincpu;
 	required_device<screen_device> m_screen;

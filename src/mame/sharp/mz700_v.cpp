@@ -7,7 +7,7 @@
  *
  *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
  *
- *  Reference: http://sharpmz.computingmuseum.com
+ *  Reference: https://original.sharpmz.org/
  *
  ***************************************************************************/
 

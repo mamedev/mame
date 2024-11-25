@@ -342,13 +342,13 @@ private:
 	uint8_t memread(offs_t offset);
 	void memwrite(offs_t offset, uint8_t data);
 
-	void crumap(address_map &map);
-	void memmap(address_map &map);
-	void memmap_setaddress(address_map &map);
+	void crumap(address_map &map) ATTR_COLD;
+	void memmap(address_map &map) ATTR_COLD;
+	void memmap_setaddress(address_map &map) ATTR_COLD;
 
 	// General device lifecycle
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// Members
 	int  m_inta = 0;
@@ -399,7 +399,7 @@ void geneve_state::crumap(address_map &map)
 static INPUT_PORTS_START(geneve_common)
 
 	PORT_START( "BOOTROM" )
-	PORT_CONFNAME( 0x03, GENEVE_EPROM, "Boot from" ) PORT_CHANGED_MEMBER(DEVICE_SELF, geneve_state, settings_changed, 3)
+	PORT_CONFNAME( 0x03, GENEVE_EPROM, "Boot from" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(geneve_state::settings_changed), 3)
 		PORT_CONFSETTING( GENEVE_EPROM, "EPROM" )
 		PORT_CONFSETTING( GENEVE_PFM512, "PFM 512" )
 		PORT_CONFSETTING( GENEVE_PFM512A, "PFM 512A" )
@@ -425,10 +425,10 @@ static INPUT_PORTS_START(genmod)
 	PORT_INCLUDE(geneve_common)
 
 	PORT_START( "GENMODDIPS" )
-	PORT_DIPNAME( GENEVE_GM_TURBO, GENEVE_GM_TURBO, "Genmod Turbo mode") PORT_CHANGED_MEMBER(DEVICE_SELF, geneve_state, setgm_changed, 1)
+	PORT_DIPNAME( GENEVE_GM_TURBO, GENEVE_GM_TURBO, "Genmod Turbo mode") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(geneve_state::setgm_changed), 1)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GENEVE_GM_TURBO, DEF_STR( On ))
-	PORT_DIPNAME( GENEVE_GM_TIM, 0, "Genmod TI mode") PORT_CHANGED_MEMBER(DEVICE_SELF, geneve_state, setgm_changed, 2)
+	PORT_DIPNAME( GENEVE_GM_TIM, 0, "Genmod TI mode") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(geneve_state::setgm_changed), 2)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GENEVE_GM_TIM, DEF_STR( On ))
 
@@ -1185,12 +1185,12 @@ void geneve_state::geneve_common(machine_config &config)
 	video.int_cb().set(FUNC(geneve_state::int2_from_v9938));
 	video.set_screen(GENEVE_SCREEN_TAG);
 	screen_device& screen(SCREEN(config, GENEVE_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(21'477'272), \
-		v99x8_device::HTOTAL, \
-		0, \
-		v99x8_device::HVISIBLE - 1, \
-		v99x8_device::VTOTAL_NTSC * 2, \
-		v99x8_device::VERTICAL_ADJUST * 2, \
+	screen.set_raw(XTAL(21'477'272),
+		v99x8_device::HTOTAL,
+		0,
+		v99x8_device::HVISIBLE - 1,
+		v99x8_device::VTOTAL_NTSC * 2,
+		v99x8_device::VERTICAL_ADJUST * 2,
 		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2);
 	screen.set_screen_update(TIGEN_V9938_TAG, FUNC(v99x8_device::screen_update));
 

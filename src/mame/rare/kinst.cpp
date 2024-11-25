@@ -193,6 +193,7 @@ Notes:
 
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -218,7 +219,7 @@ public:
 	void kinst(machine_config &config);
 	void kinst2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r) { return BIT(m_dcs->control_r(), 11); }
+	ioport_value sound_status_r() { return BIT(m_dcs->control_r(), 11); }
 
 protected:
 	required_device<mips3_device> m_maincpu;
@@ -226,11 +227,11 @@ protected:
 	required_device<dcs_audio_2k_device> m_dcs;
 	required_device<palette_device> m_palette;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void kinst_map(address_map &map);
-	void kinst2_map(address_map &map);
+	void kinst_map(address_map &map) ATTR_COLD;
+	void kinst2_map(address_map &map) ATTR_COLD;
 
 	uint32_t ide_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ide_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -269,9 +270,9 @@ public:
 	void kinst2uk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void kinst2uk_map(address_map &map);
+	void kinst2uk_map(address_map &map) ATTR_COLD;
 
 	uint32_t cpld_r(offs_t offset, uint32_t mem_mask);
 	void cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask);
@@ -598,7 +599,7 @@ static INPUT_PORTS_START( kinst )
 
 	PORT_START("VOLUME")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(kinst_state, sound_status_r)
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(kinst_state::sound_status_r))
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0000fff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -704,7 +705,11 @@ void kinst_state::kinst(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BGR_555);
 
 	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
 	DCS_AUDIO_2K(config, m_dcs, 0);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->add_route(0, "mono", 1.0);
 }
 
 

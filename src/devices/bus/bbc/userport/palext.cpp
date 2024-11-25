@@ -16,6 +16,9 @@
 #include "emu.h"
 #include "palext.h"
 
+#include <algorithm>
+
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -76,9 +79,9 @@ bbc_cpalette_device::bbc_cpalette_device(const machine_config &mconfig, const ch
 
 void bbc_palext_device::device_start()
 {
-	memset(m_palette_ram, 0, sizeof(m_palette_ram));
+	std::fill(std::begin(m_palette_ram), std::end(m_palette_ram), rgb_t(0));
 
-	/* register for save states */
+	// register for save states
 	save_item(NAME(m_colour));
 	save_item(NAME(m_palette_ram));
 }

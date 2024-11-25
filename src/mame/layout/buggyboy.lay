@@ -3,6 +3,9 @@
 license:CC0-1.0
 -->
 <mamelayout version="2">
+
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
+
 	<element name="shifter" defstate="0">
 		<rect>
 			<bounds left="0" right="32" top="0" bottom="64" />
@@ -51,7 +54,7 @@ license:CC0-1.0
 		</disk>
 	</element>
 
-	<view name="Triple-Screen Shifter-R">
+	<view name="Triple-Screen (Gapless) + Shifter-R Overlay" showpointers="no">
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
@@ -62,12 +65,21 @@ license:CC0-1.0
 			<bounds x="1280" y="0" width="640" height="480" />
 		</screen>
 
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="1886" y="414" width="32" height="64" />
+		</element>
 		<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
 			<bounds x="1886" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</element>
+		<collection name="Opaque Shifter" visible="no">
+			<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
+				<bounds x="1886" y="414" width="32" height="64" />
+			</element>
+		</collection>
 	</view>
-	<view name="Triple-Screen Shifter-L">
+
+	<view name="Triple-Screen (Gapless) + Shifter-R Off-Screen" showpointers="no">
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
@@ -78,29 +90,144 @@ license:CC0-1.0
 			<bounds x="1280" y="0" width="640" height="480" />
 		</screen>
 
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="1928" y="414" width="32" height="64" />
+		</element>
+		<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
+			<bounds x="1928" y="414" width="32" height="64" />
+			<color alpha="0.6" />
+		</element>
+		<collection name="Opaque Shifter" visible="no">
+			<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
+				<bounds x="1928" y="414" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+
+	<view name="Triple-Screen (Gapless) + Shifter-L Overlay" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+		<screen index="1">
+			<bounds x="640" y="0" width="640" height="480" />
+		</screen>
+		<screen index="2">
+			<bounds x="1280" y="0" width="640" height="480" />
+		</screen>
+
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="2" y="414" width="32" height="64" />
+		</element>
 		<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</element>
+		<collection name="Opaque Shifter" visible="no">
+			<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
+				<bounds x="2" y="414" width="32" height="64" />
+			</element>
+		</collection>
 	</view>
-	<view name="Single-Screen Shifter-R">
+
+	<view name="Triple-Screen (Gapless) + Shifter-L Off-Screen" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+		<screen index="1">
+			<bounds x="640" y="0" width="640" height="480" />
+		</screen>
+		<screen index="2">
+			<bounds x="1280" y="0" width="640" height="480" />
+		</screen>
+
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="-40" y="414" width="32" height="64" />
+		</element>
+		<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
+			<bounds x="-40" y="414" width="32" height="64" />
+			<color alpha="0.6" />
+		</element>
+		<collection name="Opaque Shifter" visible="no">
+			<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
+				<bounds x="-40" y="414" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+
+	<view name="Single-Screen + Shifter-R Overlay" showpointers="no">
 		<screen index="1">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
 
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="606" y="414" width="32" height="64" />
+		</element>
 		<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
 			<bounds x="606" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</element>
+		<collection name="Opaque Shifter" visible="no">
+			<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
+				<bounds x="606" y="414" width="32" height="64" />
+			</element>
+		</collection>
 	</view>
-	<view name="Single-Screen Shifter-L">
+
+	<view name="Single-Screen + Shifter-R Off-Screen" showpointers="no">
 		<screen index="1">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
 
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="648" y="414" width="32" height="64" />
+		</element>
+		<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
+			<bounds x="648" y="414" width="32" height="64" />
+			<color alpha="0.6" />
+		</element>
+		<collection name="Opaque Shifter" visible="no">
+			<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
+				<bounds x="648" y="414" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+
+	<view name="Single-Screen + Shifter-L Overlay" showpointers="no">
+		<screen index="1">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="2" y="414" width="32" height="64" />
+		</element>
 		<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />
 		</element>
+		<collection name="Opaque Shifter" visible="no">
+			<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
+				<bounds x="2" y="414" width="32" height="64" />
+			</element>
+		</collection>
 	</view>
+
+	<view name="Single-Screen + Shifter-L Off-Screen" showpointers="no">
+		<screen index="1">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="-40" y="414" width="32" height="64" />
+		</element>
+		<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
+			<bounds x="-40" y="414" width="32" height="64" />
+			<color alpha="0.6" />
+		</element>
+		<collection name="Opaque Shifter" visible="no">
+			<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
+				<bounds x="-40" y="414" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+
 </mamelayout>

@@ -111,8 +111,8 @@ void at29x_device::nvram_default()
 
 bool at29x_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_eememory.get(), m_memory_size+2, actual) && actual == m_memory_size+2;
+	auto const [err, actual] = util::read(file, m_eememory.get(), m_memory_size+2);
+	return !err && (actual == m_memory_size+2);
 }
 
 //-------------------------------------------------
@@ -126,8 +126,8 @@ bool at29x_device::nvram_write(util::write_stream &file)
 	LOGMASKED(LOG_PRG, "Write to NVRAM file\n");
 	m_eememory[0] = m_version;
 
-	size_t actual;
-	return !file.write(m_eememory.get(), m_memory_size+2, actual) && actual == m_memory_size+2;
+	auto const [err, actual] = util::write(file, m_eememory.get(), m_memory_size+2);
+	return !err;
 }
 
 /*

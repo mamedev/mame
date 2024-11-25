@@ -194,8 +194,7 @@ std::string vectrex_cart_slot_device::get_default_card_software(get_default_card
 		std::uint64_t size;
 		hook.image_file()->length(size);
 		std::vector<uint8_t> rom(size);
-		std::size_t actual;
-		hook.image_file()->read(&rom[0], size, actual);
+		read(*hook.image_file(), &rom[0], size);
 
 		int type = VECTREX_STD;
 		if (!memcmp(&rom[0x06], "SRAM", 4)) // FIXME: bounds check!

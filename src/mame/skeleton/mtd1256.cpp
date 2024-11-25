@@ -37,7 +37,7 @@ public:
 	void mtd1256(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -45,8 +45,8 @@ private:
 	u8 porta_r();
 	void portd_w(u8 data);
 
-	void bank0_map(address_map &map);
-	void mem_map(address_map &map);
+	void bank0_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bank0;
@@ -138,7 +138,7 @@ void mtd1256_state::mtd1256(machine_config &config)
 	screen.set_visarea(0, 20*6-1, 0, 32-1);
 	screen.set_palette("palette");
 
-	hd44780_device &hd44780(HD44780(config, "lcdc", 250'000)); // TODO: clock not measured, datasheet typical clock used
+	hd44780_device &hd44780(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(mtd1256_state::pixel_update));
 

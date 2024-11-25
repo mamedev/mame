@@ -769,6 +769,12 @@ public:
 		, m_p1(*this, "P1")
 		, m_p2(*this, "P2")
 		, m_extra_ports(*this, "EXTRA")
+		, m_p3(*this, "P3")
+		, m_p4(*this, "P4")
+		, m_p5(*this, "P5")
+		, m_p6(*this, "P6")
+		, m_dsw1(*this, "DSW1")
+		, m_dsw2(*this, "DSW2")
 		, m_lamps(*this, "lamp%u", 0U)
 	 { }
 
@@ -782,8 +788,8 @@ public:
 	void init_aristmk5();
 
 	INPUT_CHANGED_MEMBER(coin_start);
-	CUSTOM_INPUT_MEMBER(coin_r);
-	CUSTOM_INPUT_MEMBER(coin_usa_r);
+	ioport_value coin_r();
+	ioport_value coin_usa_r();
 	int hopper_r();
 
 private:
@@ -810,15 +816,15 @@ private:
 	void spi_int_ack_w(uint8_t data);
 	uint8_t spi_data_r();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(mk5_2KHz_callback);
 	TIMER_CALLBACK_MEMBER(spi_timer);
 
-	void aristmk5_arm_map(address_map &map);
-	void aristmk5_drame_map(address_map &map);
-	void aristmk5_map(address_map &map);
-	void aristmk5_usa_map(address_map &map);
+	void aristmk5_arm_map(address_map &map) ATTR_COLD;
+	void aristmk5_drame_map(address_map &map) ATTR_COLD;
+	void aristmk5_map(address_map &map) ATTR_COLD;
+	void aristmk5_usa_map(address_map &map) ATTR_COLD;
 
 	required_device<arm_cpu_device> m_maincpu;
 	required_device<acorn_ioc_device> m_ioc;
@@ -831,6 +837,7 @@ private:
 	required_ioport m_p1;
 	required_ioport m_p2;
 	required_ioport m_extra_ports;
+	optional_ioport m_p3, m_p4, m_p5, m_p6, m_dsw1, m_dsw2;
 
 	output_finder<64> m_lamps;
 
@@ -1094,7 +1101,7 @@ uint8_t aristmk5_state::ldor_r()
 	if (m_extra_ports->read() & 0x01)
 		m_ldor_shift_reg = 0;   // open the Logic door clears the shift register
 
-	return (m_ldor_shift_reg & 0x80) | 0x60 | ((m_hopper_test && m_hopper->line_r()) ? 0x10 : 0x00);
+	return (m_ldor_shift_reg & 0x80) | 0x60 | ((m_hopper_test && !m_hopper->line_r()) ? 0x10 : 0x00);
 }
 
 void aristmk5_state::ldor_clk_w(uint8_t data)
@@ -1197,11 +1204,11 @@ void aristmk5_state::aristmk5_map(address_map &map)
 
 	map(0x03010480, 0x0301049f).rw("uart_0a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 	map(0x03010500, 0x0301051f).rw("uart_0b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
-	map(0x03010580, 0x03010583).portr("P3");
+	map(0x03010580, 0x03010583).portr(m_p3);
 	map(0x03010600, 0x0301061f).rw("uart_1a", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 	map(0x03010680, 0x0301069f).rw("uart_1b", FUNC(ins8250_uart_device::ins8250_r), FUNC(ins8250_uart_device::ins8250_w)).umask32(0x000000ff);
 
-	map(0x03010700, 0x03010703).portr("P6");
+	map(0x03010700, 0x03010703).portr(m_p6);
 	map(0x03010800, 0x03010800).r(FUNC(aristmk5_state::eeprom_r));
 	map(0x03010810, 0x03010813).rw("watchdog", FUNC(watchdog_timer_device::reset32_r), FUNC(watchdog_timer_device::reset32_w)); //MK-5 specific, watchdog
 
@@ -1226,15 +1233,15 @@ void aristmk5_state::aristmk5_usa_map(address_map &map)
 	map(0x03010440, 0x03010440).w(FUNC(aristmk5_state::rtc_usa_w));
 	map(0x03010450, 0x03010450).w(FUNC(aristmk5_state::eeprom_usa_w));
 
-	map(0x03012000, 0x03012003).portr("P1");
-	map(0x03012010, 0x03012013).portr("P2");
-	map(0x03012200, 0x03012203).portr("DSW1");
-	map(0x03012210, 0x03012213).portr("DSW2");
-	map(0x03010584, 0x03010587).portr("P4");
+	map(0x03012000, 0x03012003).portr(m_p1);
+	map(0x03012010, 0x03012013).portr(m_p2);
+	map(0x03012200, 0x03012203).portr(m_dsw1);
+	map(0x03012210, 0x03012213).portr(m_dsw2);
+	map(0x03010584, 0x03010587).portr(m_p4);
 
 	map(0x03012020, 0x03012020).r(FUNC(aristmk5_state::ldor_r));
 	map(0x03012070, 0x03012070).w(FUNC(aristmk5_state::ldor_clk_w));
-	map(0x03012184, 0x03012187).portr("P5");
+	map(0x03012184, 0x03012187).portr(m_p5);
 
 	map(0x03012000, 0x0301201f).w(FUNC(aristmk5_state::buttons_lamps_w)).umask32(0x000000ff);
 	map(0x03012030, 0x0301203f).w(FUNC(aristmk5_state::other_lamps_w)).umask32(0x000000ff);
@@ -1280,10 +1287,10 @@ void aristmk5_state::aristmk5_drame_map(address_map &map)
 
 int aristmk5_state::hopper_r()
 {
-	return (m_hopper_test && m_hopper->line_r()) ? 0 : 1;
+	return (m_hopper_test && !m_hopper->line_r()) ? 0 : 1;
 }
 
-CUSTOM_INPUT_MEMBER(aristmk5_state::coin_usa_r)
+ioport_value aristmk5_state::coin_usa_r()
 {
 	//  ---x  Coin Acceptor
 	//  --x-  Credit Sense
@@ -1313,7 +1320,7 @@ CUSTOM_INPUT_MEMBER(aristmk5_state::coin_usa_r)
 	return data;
 }
 
-CUSTOM_INPUT_MEMBER(aristmk5_state::coin_r)
+ioport_value aristmk5_state::coin_r()
 {
 	uint8_t data = 0x01;
 
@@ -1344,17 +1351,20 @@ INPUT_CHANGED_MEMBER(aristmk5_state::coin_start)
 }
 
 static INPUT_PORTS_START( aristmk5_usa )
-	/* This simulates the ROM swap */
+	// This simulates the ROM swap
 	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x07, 0x07, "System Mode" )
-	PORT_CONFSETTING(    0x00, "Set Chip v4.04.09" )
-	PORT_CONFSETTING(    0x01, "Set Chip v4.04.08" )
-	PORT_CONFSETTING(    0x02, "Set Chip v4.04.05" )
-	PORT_CONFSETTING(    0x03, "Set Chip v4.04.00" )
-	PORT_CONFSETTING(    0x04, "Set Chip v4.03.07" )
-	PORT_CONFSETTING(    0x05, "Set Chip v4.02.04" )
-	PORT_CONFSETTING(    0x06, "RAM Clear EPROM v1.0" )
-	PORT_CONFSETTING(    0x07, "Game Mode" )
+	PORT_CONFNAME( 0x0f, 0x0a, "System Mode" )
+	PORT_CONFSETTING(    0x00, "Set Chip v4.04.09 alt" )
+	PORT_CONFSETTING(    0x01, "Set Chip v4.04.09" )
+	PORT_CONFSETTING(    0x02, "Set Chip v4.04.08" )
+	PORT_CONFSETTING(    0x03, "Set Chip v4.04.05" )
+	PORT_CONFSETTING(    0x04, "Set Chip v4.04.01" )
+	PORT_CONFSETTING(    0x05, "Set Chip v4.04.00" )
+	PORT_CONFSETTING(    0x06, "Set Chip v4.03.07" )
+	PORT_CONFSETTING(    0x07, "Set Chip v4.02.04 alt" )
+	PORT_CONFSETTING(    0x08, "Set Chip v4.02.04" )
+	PORT_CONFSETTING(    0x09, "RAM Clear EPROM v1.0" )
+	PORT_CONFSETTING(    0x0a, "Game Mode" )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME(0x0f, 0x0f, "Bank 1 - Denomination Values: Coin Value")
@@ -1453,7 +1463,7 @@ static INPUT_PORTS_START( aristmk5_usa )
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
 
 	PORT_START("P4")
-	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(aristmk5_state, coin_usa_r)
+	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(aristmk5_state::coin_usa_r))
 
 	PORT_START("P5")
 	PORT_BIT(0x00000008, IP_ACTIVE_LOW,  IPT_OTHER)   // Meters
@@ -1463,7 +1473,7 @@ static INPUT_PORTS_START( aristmk5_usa )
 
 	PORT_START("EXTRA")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_TOGGLE PORT_CODE(KEYCODE_L)   PORT_NAME("Logic door")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, 0)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(aristmk5_state::coin_start), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aristmk5 )
@@ -1507,14 +1517,14 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_BIT(0x00c00000, IP_ACTIVE_HIGH, IPT_UNUSED)  // Unused mechanical security switch
 
 PORT_START("P3")
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_READ_LINE_MEMBER(aristmk5_state, hopper_r)
-	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(aristmk5_state, coin_r)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_READ_LINE_MEMBER(FUNC(aristmk5_state::hopper_r))
+	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(aristmk5_state::coin_r))
 
 	PORT_START("P6")
 	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_OTHER)    // Battery
 
 	PORT_START("EXTRA")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, 0)
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(aristmk5_state::coin_start), 0)
 INPUT_PORTS_END
 
 /********** Game-specific button labels **********/
@@ -2330,11 +2340,11 @@ void aristmk5_state::machine_reset()
 
 		if (ioport("ROM_LOAD") != nullptr)
 		{
-			static const char *const rom_region[] = { "set_4.04.09", "set_4.04.08", "set_4.04.05", "set_4.04.00", "set_4.03.07", "set_4.02.04", "set_1.0", "game_prg" };
+			static const char *const rom_region[] = { "set_4.04.09_alt", "set_4.04.09", "set_4.04.08", "set_4.04.05", "set_4.04.01", "set_4.04.00", "set_4.03.07", "set_4.02.04_alt", "set_4.02.04", "set_1.0", "game_prg" };
 
 			uint8_t op_mode = ioport("ROM_LOAD")->read();
 
-			PRG = memregion(rom_region[op_mode & 7])->base();
+			PRG = memregion(rom_region[op_mode & 0x0f])->base();
 
 			m_memc->space(0).install_rom(0x03400000, 0x037fffff, PRG);
 			m_memc->space(0).install_rom(0x03800000, 0x03bfffff, PRG);
@@ -2419,7 +2429,7 @@ void aristmk5_state::aristmk5(machine_config &config)
 
 	DS1302(config, m_rtc, 32.768_kHz_XTAL);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	// some games (jungjuic, penpir2) use the IOC KART interface for debug
 	rs232_port_device &rs232(RS232_PORT(config, "kart", default_rs232_devices, nullptr));
@@ -2466,6 +2476,9 @@ void aristmk5_state::aristmk5_usa_touch(machine_config &config)
 	ROM_REGION( 0x400000, "set_4.04.05", ROMREGION_ERASEFF ) /* setchip v4.04.05 */ \
 	ROM_LOAD32_WORD( "setchip v4.04.05.u7",  0x000000, 0x80000, CRC(e7b39a73) SHA1(e826d717a0871383394e15634896fcb2e2bdeb75) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.05.u11", 0x000002, 0x80000, CRC(2fc9b2a0) SHA1(89191f02c4ec8089e26989430806650d14e13e5a) ) \
+	ROM_REGION( 0x400000, "set_4.04.01", ROMREGION_ERASEFF ) /* setchip v4.04.01. u7 doesn't match the checksum16 written in the sticker */ \
+	ROM_LOAD32_WORD( "setchip v4.04.01 cs 1358.u7",  0x000000, 0x80000, BAD_DUMP CRC(1d564c2c) SHA1(2e47917138c682393a61676da6fccba90463229a) ) \
+	ROM_LOAD32_WORD( "setchip v4.04.01 cs ed54.u11", 0x000002, 0x80000, CRC(199bacff) SHA1(a2ef556b42d505af077a2db983caebdd611d98fd) ) \
 	ROM_REGION( 0x400000, "set_4.04.00", ROMREGION_ERASEFF ) /* setchip v4.04.00 */ \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u7",  0x000000, 0x80000, CRC(2453137e) SHA1(b59998e75ae3924da16faf47b9cfe9afd60d810c) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u11", 0x000002, 0x80000, CRC(82dfa12a) SHA1(86fd0f0ad8d5d1bc503392a40bbcdadb055b2765) ) \

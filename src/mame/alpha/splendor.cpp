@@ -20,9 +20,9 @@ splndrbt:
 
 hvoltage:
 - There is sort of "debug mode" that you can access if 0x000038.w returns 0x0000
-  instead of 0xffff. To enable it, use the MAME debugger or cheats.
-- When you are in "debug mode", the Inputs and Dip Switches have special features.
-  Here is IMO the full list :
+  instead of 0xffff under irq 1. To enable it, use the MAME debugger or cheats.
+  This also applies to all non-parent splndrbt sets, at least for the freeze part.
+- When you are in "debug mode", the Inputs and Dip Switches have special features:
 
   * pressing IPT_JOYSTICK_DOWN of player 2 freezes the game
   * pressing IPT_JOYSTICK_UP of player 2 unfreezes the game
@@ -91,6 +91,7 @@ public:
 		m_screen(*this, "screen"),
 		m_alpha_8201(*this, "alpha_8201"),
 		m_mainlatch(*this, "mainlatch"),
+		m_in(*this, "IN%u", 0U),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram", 0x800, ENDIANNESS_BIG),
 		m_spriteram(*this, "spriteram%u", 1U),
@@ -101,8 +102,8 @@ public:
 	void splndrbt(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -112,6 +113,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<alpha_8201_device> m_alpha_8201;
 	required_device<ls259_device> m_mainlatch;
+	required_ioport_array<2> m_in;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_bg_videoram;
@@ -130,11 +132,11 @@ private:
 	TILE_GET_INFO_MEMBER(bg_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void copy_bg(bitmap_ind16 &dst_bitmap, const rectangle &cliprect);
 
-	void splndrbt_map(address_map &map);
+	void splndrbt_map(address_map &map) ATTR_COLD;
 
 	void unpack_block(const char *region, int offset, int size);
 	void unpack_region(const char *region);
@@ -395,15 +397,19 @@ uint32_t splendor_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 /******************************************************************************/
 // Interrupt Handlers
 
-TIMER_DEVICE_CALLBACK_MEMBER(splendor_state::scanline)
+// Same as alpha/equites.cpp, including the almost empty irq 1 service observed with bullfgtr
+TIMER_DEVICE_CALLBACK_MEMBER(splendor_state::scanline_cb)
 {
 	int scanline = param;
 
-	if(scanline == 224) // vblank-out irq
-		m_maincpu->set_input_line(1, HOLD_LINE);
-
-	if(scanline == 32) // vblank-in irq
+	// vblank-in irq
+	if(scanline == 224)
 		m_maincpu->set_input_line(2, HOLD_LINE);
+
+	// vblank-out irq or sprite DMA end, applies bg scroll writes
+	// and checks debug flag (if available) for screen freeze.
+	if(scanline == 32)
+		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
 
@@ -461,8 +467,8 @@ void splendor_state::splndrbt_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).rom();
 	map(0x040000, 0x040fff).ram();
-	map(0x080000, 0x080001).portr("IN0");
-	map(0x0c0000, 0x0c0001).portr("IN1");
+	map(0x080000, 0x080001).portr(m_in[0]);
+	map(0x0c0000, 0x0c0001).portr(m_in[1]);
 	map(0x0c0000, 0x0c0000).select(0x020000).w(FUNC(splendor_state::bgcolor_w));
 	map(0x0c0001, 0x0c0001).select(0x03c000).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); }));
 	map(0x100000, 0x100001).w(FUNC(splendor_state::bg_scrollx_w));
@@ -635,7 +641,7 @@ void splendor_state::splndrbt(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 24_MHz_XTAL/4); // 68000P8 running at 6mhz, verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &splendor_state::splndrbt_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(splendor_state::scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(splendor_state::scanline_cb), "screen", 0, 1);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(splendor_state::flip_screen_set));

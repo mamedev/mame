@@ -26,6 +26,7 @@
 #include <optional>
 #include <sstream>
 #include <string_view>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -551,10 +552,8 @@ bool is_m161(std::string_view tag, util::random_read &file, u64 length, u64 offs
 
 	// look for a valid header in the second page
 	u8 header2[0x50];
-	size_t actual;
-	if (file.read_at(offset + 0x8000 + 0x0100, header2, sizeof(header2), actual) || (sizeof(header2) != actual))
-		return false;
-	if (!cartheader::verify_header_checksum(header2))
+	auto const [err, actual] = read_at(file, offset + 0x8000 + 0x0100, header2, sizeof(header2));
+	if (err || (sizeof(header2) != actual) || !cartheader::verify_header_checksum(header2))
 		return false;
 
 	// make sure it fits with the cartridge RAM size declaration
@@ -614,10 +613,8 @@ bool read_gbx_footer_trailer(util::random_read &file, u64 length, gbxfile::trail
 	if (sizeof(trailer) >= length)
 		return false;
 
-	size_t actual;
-	if (file.read_at(length - sizeof(trailer), &trailer, sizeof(trailer), actual))
-		return false;
-	if (sizeof(trailer) != actual)
+	auto const [err, actual] = read_at(file, length - sizeof(trailer), &trailer, sizeof(trailer));
+	if (err || (sizeof(trailer) != actual))
 		return false;
 
 	trailer.swap();
@@ -635,9 +632,11 @@ std::optional<char const *> probe_gbx_footer(std::string_view tag, util::random_
 		return std::nullopt;
 
 	// need to read the footer leader
-	gbxfile::leader_1_0 leader;
+	std::error_condition err;
 	size_t actual;
-	if (file.read_at(length - trailer.size, &leader, sizeof(leader), actual) || (sizeof(leader) != actual))
+	gbxfile::leader_1_0 leader;
+	std::tie(err, actual) = read_at(file, length - trailer.size, &leader, sizeof(leader));
+	if (err || (sizeof(leader) != actual))
 	{
 		osd_printf_warning(
 				"[%s] Error reading GBX trailer leader - assuming file is not GBX format\n",
@@ -709,7 +708,8 @@ std::optional<char const *> probe_gbx_footer(std::string_view tag, util::random_
 			// need to probe for EEPROM size
 			// TODO: does the GBX footer declare the EEPROM size as cartridge RAM size?
 			u8 header[0x50];
-			if (!file.read_at(offset + 0x100, header, sizeof(header), actual) && (sizeof(header) == actual))
+			std::tie(err, actual) = read_at(file, offset + 0x100, header, sizeof(header));
+			if (!err && (sizeof(header) == actual))
 			{
 				result = guess_mbc7_type(tag, file, length, offset, header);
 			}
@@ -816,8 +816,8 @@ bool detect_mmm01(std::string_view tag, util::random_read &file, u64 length, u64
 	// now check for a valid cartridge header
 	u32 const lastpage(get_mmm01_initial_low_page(length));
 	u8 backheader[0x50];
-	size_t actual;
-	if (file.read_at(lastpage + 0x100, backheader, sizeof(backheader), actual) || (sizeof(backheader) != actual))
+	auto const [err, actual] = read_at(file, lastpage + 0x100, backheader, sizeof(backheader));
+	if (err || (sizeof(backheader) != actual))
 	{
 		osd_printf_warning(
 				"[%s] Error reading last page of program ROM - assuming cartridge does not use MMM01 controller\n",
@@ -1005,8 +1005,8 @@ std::string gb_cart_slot_device::get_default_card_software(get_default_card_soft
 			return guess;
 
 		u8 header[0x50];
-		size_t actual;
-		if (hook.image_file()->read_at(offset + 0x0100, header, sizeof(header), actual) || (sizeof(header) != actual))
+		auto const [err, actual] = read_at(*hook.image_file(), offset + 0x0100, header, sizeof(header));
+		if (err || (sizeof(header) != actual))
 		{
 			// reading header failed - guess based on size
 			if (0x8000 >= len)
@@ -1128,7 +1128,6 @@ std::pair<std::error_condition, std::string> gb_cart_slot_device::load_image_fil
 	bool proberam = true;
 	auto len = length();
 	u64 offset;
-	size_t actual;
 
 	// probe for GBX format
 	memory_region *gbxregion = nullptr;
@@ -1139,7 +1138,7 @@ std::pair<std::error_condition, std::string> gb_cart_slot_device::load_image_fil
 		std::unique_ptr<u8 []> const footer(new (std::nothrow) u8 [gbxtrailer.size]);
 		if (!footer)
 			return std::make_pair(std::errc::not_enough_memory, "Error allocating memory to read GBX file footer");
-		std::error_condition const err = file.read_at(len - gbxtrailer.size, footer.get(), gbxtrailer.size, actual);
+		auto const [err, actual] = read_at(file, len - gbxtrailer.size, footer.get(), gbxtrailer.size);
 		if (err || (gbxtrailer.size != actual))
 			return std::make_pair(err ? err : std::errc::io_error, "Error reading GBX file footer");
 		if (1 != gbxtrailer.ver_maj)
@@ -1241,7 +1240,7 @@ std::pair<std::error_condition, std::string> gb_cart_slot_device::load_image_fil
 	{
 		LOG("Allocating %u byte cartridge ROM region\n", len);
 		memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), len, 1, ENDIANNESS_LITTLE);
-		std::error_condition const err = file.read_at(offset, romregion->base(), len, actual);
+		auto const [err, actual] = read_at(file, offset, romregion->base(), len);
 		if (err || (len != actual))
 			return std::make_pair(err ? err : std::errc::io_error, "Error reading ROM data from cartridge file");
 

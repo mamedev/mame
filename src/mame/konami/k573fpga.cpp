@@ -230,40 +230,44 @@ void k573fpga_device::update_mp3_decode_state()
 	mas3507d->reset_playback();
 }
 
-uint16_t k573fpga_device::decrypt_default(uint16_t v)
+uint16_t k573fpga_device::decrypt_common(uint16_t data, uint16_t key)
 {
-	uint16_t m = crypto_key1 ^ crypto_key2;
-
-	v = bitswap<16>(
-		v,
-		15 - BIT(m, 0xF),
-		14 + BIT(m, 0xF),
-		13 - BIT(m, 0xE),
-		12 + BIT(m, 0xE),
-		11 - BIT(m, 0xB),
-		10 + BIT(m, 0xB),
-		9 - BIT(m, 0x9),
-		8 + BIT(m, 0x9),
-		7 - BIT(m, 0x8),
-		6 + BIT(m, 0x8),
-		5 - BIT(m, 0x5),
-		4 + BIT(m, 0x5),
-		3 - BIT(m, 0x3),
-		2 + BIT(m, 0x3),
-		1 - BIT(m, 0x2),
-		0 + BIT(m, 0x2)
+	// In both variants of the decryption algorithm, a 16-bit key is derived
+	// from the current key state and treated as a set of 8 pairs of bits. Bit 1
+	// of each pair (i.e. bits 1, 3, 5, etc. of the key) controls whether the
+	// respective bit pair of the data is swapped or not.
+	data = bitswap<16>(
+		data,
+		15 - BIT(key, 15), 14 + BIT(key, 15),
+		13 - BIT(key, 13), 12 + BIT(key, 13),
+		11 - BIT(key, 11), 10 + BIT(key, 11),
+		9 - BIT(key,  9),  8 + BIT(key,  9),
+		7 - BIT(key,  7),  6 + BIT(key,  7),
+		5 - BIT(key,  5),  4 + BIT(key,  5),
+		3 - BIT(key,  3),  2 + BIT(key,  3),
+		1 - BIT(key,  1),  0 + BIT(key,  1)
 	);
 
-	v ^= (BIT(m, 0xD) << 14) ^
-		(BIT(m, 0xC) << 12) ^
-		(BIT(m, 0xA) << 10) ^
-		(BIT(m, 0x7) << 8) ^
-		(BIT(m, 0x6) << 6) ^
-		(BIT(m, 0x4) << 4) ^
-		(BIT(m, 0x1) << 2) ^
-		(BIT(m, 0x0) << 0);
+	// Bit 0 of each pair (bits 0, 2, 4, etc. of the key) controls whether the
+	// respective data bit is inverted after performing the swap.
+	data ^= key & 0x5555;
 
-	v ^= bitswap<16>(
+	return data;
+}
+
+uint16_t k573fpga_device::decrypt_default(uint16_t data)
+{
+	const uint16_t derived_key = bitswap<16>(
+		crypto_key1 ^ crypto_key2,
+		15, 13, 14, 12,
+		11, 10,  9,  7,
+		8,  6,  5,  4,
+		3,  1,  2,  0
+	);
+
+	data = decrypt_common(data, derived_key);
+
+	data ^= bitswap<16>(
 		(uint16_t)crypto_key3,
 		7, 0, 6, 1,
 		5, 2, 4, 3,
@@ -271,60 +275,20 @@ uint16_t k573fpga_device::decrypt_default(uint16_t v)
 		1, 6, 0, 7
 	);
 
-	crypto_key1 = (crypto_key1 & 0x8000) | ((crypto_key1 << 1) & 0x7FFE) | ((crypto_key1 >> 14) & 1);
-
-	if(((crypto_key1 >> 15) ^ crypto_key1) & 1)
+	if (BIT(crypto_key1, 14) ^ BIT(crypto_key1, 15))
 		crypto_key2 = (crypto_key2 << 1) | (crypto_key2 >> 15);
 
+	crypto_key1 = (crypto_key1 & 0x8000) | ((crypto_key1 << 1) & 0x7ffe) | ((crypto_key1 >> 14) & 1);
 	crypto_key3++;
 
-	return v;
+	return data;
 }
 
 uint16_t k573fpga_device::decrypt_ddrsbm(uint16_t data)
 {
-	// TODO: Work out the proper decryption algorithm.
-	// Similar to the other games, ddrsbm is capable of sending a pre-mutated key that is used to simulate seeking by starting MP3 playback from a non-zero offset.
-	// The MP3 seeking functionality doesn't appear to be used so the game doesn't break from lack of support from what I can tell.
-	// The proper key mutation found in game code is: crypto_key1 = rol(crypto_key1, offset & 0x0f)
-
-	uint8_t key[16] = {0};
-	uint16_t key_state = bitswap<16>(
-		crypto_key1,
-		13, 11, 9, 7,
-		5, 3, 1, 15,
-		14, 12, 10, 8,
-		6, 4, 2, 0
-	);
-
-	for(int i = 0; i < 8; i++) {
-		key[i * 2] = key_state & 0xff;
-		key[i * 2 + 1] = (key_state >> 8) & 0xff;
-		key_state = ((key_state & 0x8080) >> 7) | ((key_state & 0x7f7f) << 1);
-	}
-
-	uint16_t output_word = 0;
-	for(int cur_bit = 0; cur_bit < 8; cur_bit++) {
-		int even_bit_shift = cur_bit * 2;
-		int odd_bit_shift = cur_bit * 2 + 1;
-		bool is_even_bit_set = data & (1 << even_bit_shift);
-		bool is_odd_bit_set = data & (1 << odd_bit_shift);
-		bool is_key_bit_set = key[crypto_key3 & 15] & (1 << cur_bit);
-		bool is_scramble_bit_set = key[(crypto_key3 - 1) & 15] & (1 << cur_bit);
-
-		if(is_scramble_bit_set)
-			std::swap(is_even_bit_set, is_odd_bit_set);
-
-		if(is_even_bit_set ^ is_key_bit_set)
-			output_word |= 1 << even_bit_shift;
-
-		if(is_odd_bit_set)
-			output_word |= 1 << odd_bit_shift;
-	}
-
-	crypto_key3++;
-
-	return output_word;
+	data = decrypt_common(data, crypto_key1);
+	crypto_key1 = (crypto_key1 << 1) | (crypto_key1 >> 15);
+	return data;
 }
 
 TIMER_CALLBACK_MEMBER(k573fpga_device::update_stream)

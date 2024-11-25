@@ -37,9 +37,9 @@ public:
 	void gyrodine(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void nmi_mask_w(int state);
@@ -51,24 +51,23 @@ private:
 	void scroll_x_lo_w(uint8_t data);
 	void gfxctrl_w(uint8_t data);
 	void scroll_y_w(uint8_t data);
-	void flipscreen_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	void flashgala_sub_map(address_map &map);
-	void flashgala_sub_portmap(address_map &map);
-	void gyrodine_main_map(address_map &map);
-	void gyrodine_sub_map(address_map &map);
-	void gyrodine_sub_portmap(address_map &map);
-	void kyugo_main_map(address_map &map);
-	void kyugo_main_portmap(address_map &map);
-	void srdmissn_main_map(address_map &map);
-	void legend_sub_map(address_map &map);
-	void repulse_sub_map(address_map &map);
-	void repulse_sub_portmap(address_map &map);
-	void srdmissn_sub_map(address_map &map);
-	void srdmissn_sub_portmap(address_map &map);
+	void flashgala_sub_map(address_map &map) ATTR_COLD;
+	void flashgala_sub_portmap(address_map &map) ATTR_COLD;
+	void gyrodine_main_map(address_map &map) ATTR_COLD;
+	void gyrodine_sub_map(address_map &map) ATTR_COLD;
+	void gyrodine_sub_portmap(address_map &map) ATTR_COLD;
+	void kyugo_main_map(address_map &map) ATTR_COLD;
+	void kyugo_main_portmap(address_map &map) ATTR_COLD;
+	void srdmissn_main_map(address_map &map) ATTR_COLD;
+	void legend_sub_map(address_map &map) ATTR_COLD;
+	void repulse_sub_map(address_map &map) ATTR_COLD;
+	void repulse_sub_portmap(address_map &map) ATTR_COLD;
+	void srdmissn_sub_map(address_map &map) ATTR_COLD;
+	void srdmissn_sub_portmap(address_map &map) ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr<uint8_t> m_fgvideoram;

@@ -10,8 +10,6 @@
     TODO:
     - verify cycle timing
     - verify status flag handling
-    - what happens with block/shift opcodes when count is 0? maybe a full loop?
-      parodius does an indexed LSRD and checks for A==0 to jump over the opcode
 
     References:
 

@@ -79,10 +79,10 @@ private:
 	void tomcat_nvram_w(offs_t offset, uint8_t data);
 	int dsp_bio_r();
 	void soundlatches_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	void dsp_map(address_map &map);
-	void sound_map(address_map &map);
-	void tomcat_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void dsp_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void tomcat_map(address_map &map) ATTR_COLD;
 
 	required_device<tms5220_device> m_tms;
 	required_shared_ptr<uint16_t> m_shared_ram;
@@ -279,7 +279,7 @@ void tomcat_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( tomcat )
 	PORT_START("IN0")   /* INPUTS */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", FUNC(avg_device::done_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNUSED ) // SPARE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON5 ) // DIAGNOSTIC
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )

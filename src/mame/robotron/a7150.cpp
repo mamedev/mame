@@ -34,6 +34,7 @@ To do:
 
 #include "bus/multibus/multibus.h"
 #include "bus/multibus/robotron_k7070.h"
+#include "bus/multibus/robotron_k7071.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "machine/i8087.h"
@@ -63,8 +64,8 @@ public:
 	void a7150(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void ppi_c_w(uint8_t data);
@@ -78,11 +79,11 @@ private:
 	required_device<pic8259_device> m_pic8259;
 	required_device<rs232_port_device> m_rs232;
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
-    u8 bus_pio_r(offs_t offset) { return m_bus->space(AS_IO).read_byte(offset); }
-    void bus_pio_w(offs_t offset, u8 data) { m_bus->space(AS_IO).write_byte(offset, data); }
+	u8 bus_pio_r(offs_t offset) { return m_bus->space(AS_IO).read_byte(offset); }
+	void bus_pio_w(offs_t offset, u8 data) { m_bus->space(AS_IO).write_byte(offset, data); }
 };
 
 
@@ -107,15 +108,15 @@ void a7150_state::io_map(address_map &map)
 	map.unmap_value_high();
 	// map PIO to Multibus by default
 	map(0x0000, 0xffff).rw(FUNC(a7150_state::bus_pio_r), FUNC(a7150_state::bus_pio_w));
-//	map(0x0000, 0x0003).unmaprw(); // memory parity 1-2
-//	map(0x0040, 0x0043).unmaprw(); // memory parity 3-4
+//  map(0x0000, 0x0003).unmaprw(); // memory parity 1-2
+//  map(0x0040, 0x0043).unmaprw(); // memory parity 3-4
 	map(0x004a, 0x004a).w("isbc_215g", FUNC(isbc_215g_device::write)); // KES board
 	map(0x00c0, 0x00c3).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00d0, 0x00d7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
-//	map(0x0300, 0x031f).unmaprw(); // ASP board #1
-//	map(0x0320, 0x033f).unmaprw(); // ASP board #2
+//  map(0x0300, 0x031f).unmaprw(); // ASP board #1
+//  map(0x0320, 0x033f).unmaprw(); // ASP board #2
 }
 
 static DEVICE_INPUT_DEFAULTS_START( kbd_rs232_defaults )
@@ -140,6 +141,7 @@ void a7150_state::machine_start()
 static void a7150_cards(device_slot_interface &device)
 {
 	device.option_add("kgs", ROBOTRON_K7070);
+	device.option_add("abs", ROBOTRON_K7071);
 }
 
 /*

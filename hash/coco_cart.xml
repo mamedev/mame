@@ -1119,7 +1119,7 @@ Laggy keyboard presses (verify)
 		<part name="cart" interface="coco_cart">
 			<feature name="slot" value="banked_16k" />
 			<dataarea name="rom" size="65536">
-				<rom name="predator (1989) (26-3165) (activision).rom" size="65536" crc="a9680ede" sha1="551d8d95fd310b2d72b1e22028a517c325fe9ab4"/>
+				<rom name="predator (1989) (26-3165) (activision).rom" size="65536" crc="bf4ad8f8" sha1="d181e74428003549282dd0ef167ee2280c760525"/>
 			</dataarea>
 		</part>
 	</software>

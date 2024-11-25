@@ -134,10 +134,10 @@ private:
 	DECLARE_MACHINE_START(astra_37);
 	DECLARE_MACHINE_START(astra_57);
 
-	void astra_map(address_map &map);
-	void astrafr_master_alt_map(address_map &map);
-	void astrafr_master_map(address_map &map);
-	void astrafr_slave_map(address_map &map);
+	void astra_map(address_map &map) ATTR_COLD;
+	void astrafr_master_alt_map(address_map &map) ATTR_COLD;
+	void astrafr_master_map(address_map &map) ATTR_COLD;
+	void astrafr_slave_map(address_map &map) ATTR_COLD;
 };
 
 

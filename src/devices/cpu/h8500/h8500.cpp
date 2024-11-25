@@ -15,8 +15,8 @@
 h8500_device::h8500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int addrbits, int buswidth, int ramsize, int defmode, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, buswidth, addrbits, 0, map)
-	, m_ram_config("intram", ENDIANNESS_BIG, 16, ramsize, 0, address_map_constructor(FUNC(h8500_device::ram_map), this))
 	, m_mode_control(defmode)
+	, m_ram_size((1 << ramsize) - 1)
 	, m_pc(0)
 	, m_ppc(0)
 	, m_sr(0)
@@ -43,17 +43,9 @@ std::unique_ptr<util::disasm_interface> h8500_device::create_disassembler()
 
 device_memory_interface::space_config_vector h8500_device::memory_space_config() const
 {
-	return m_ram_config.addr_width() == 0 ? space_config_vector {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
-	} : space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA, &m_ram_config)
 	};
-}
-
-void h8500_device::ram_map(address_map &map)
-{
-	map(0, (1 << m_ram_config.addr_width()) - 1).ram();
 }
 
 void h8500_device::debug_set_pc(offs_t pc) noexcept
@@ -66,8 +58,6 @@ void h8500_device::debug_set_pc(offs_t pc) noexcept
 void h8500_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	if (has_space(AS_DATA))
-		space(AS_DATA).cache(m_ram_cache);
 
 	set_icountptr(m_icount);
 

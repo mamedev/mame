@@ -46,18 +46,18 @@ public:
 	}
 
 	void flashbeats(machine_config &config);
-	void flashbeats_map(address_map &map);
-	void main_scsp_map(address_map &map);
-	void scsp_mem(address_map &map);
+	void flashbeats_map(address_map &map) ATTR_COLD;
+	void main_scsp_map(address_map &map) ATTR_COLD;
+	void scsp_mem(address_map &map) ATTR_COLD;
 
 	[[maybe_unused]] uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void scsp_irq(offs_t offset, uint8_t data);
-	uint16_t p6_r();
-	void p6_w(uint16_t data);
+	uint8_t p6_r();
+	void p6_w(uint8_t data);
 
 	required_device<h83007_device> m_maincpu;
 	required_device<m68000_device> m_scspcpu;
@@ -82,12 +82,12 @@ uint32_t flashbeats_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-uint16_t flashbeats_state::p6_r()
+uint8_t flashbeats_state::p6_r()
 {
 	return (m_eeprom->do_read() << 3);
 }
 
-void flashbeats_state::p6_w(uint16_t data)
+void flashbeats_state::p6_w(uint8_t data)
 {
 	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write((data >> 2) & 1);

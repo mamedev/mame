@@ -40,34 +40,34 @@ public:
 	{ }
 
 protected:
-	void _8bpm_portmap(address_map &map);
-	void alibaba_map(address_map &map);
-	void bigbucks_map(address_map &map);
-	void bigbucks_portmap(address_map &map);
-	void birdiy_map(address_map &map);
-	void cannonbp_map(address_map &map);
-	void crushs_map(address_map &map);
-	void crushs_portmap(address_map &map);
-	void dremshpr_map(address_map &map);
-	void dremshpr_portmap(address_map &map);
-	void drivfrcp_portmap(address_map &map);
-	void mspacii_portmap(address_map &map);
-	void mschamp_map(address_map &map);
-	void mschamp_portmap(address_map &map);
-	void mspacman_map(address_map &map);
-	void nmouse_portmap(address_map &map);
-	void numcrash_map(address_map &map);
-	void pacman_map(address_map &map);
-	void pengojpm_map(address_map &map);
-	void piranha_portmap(address_map &map);
-	void porky_portmap(address_map &map);
-	void rocktrv2_map(address_map &map);
-	void s2650games_dataport(address_map &map);
-	void s2650games_map(address_map &map);
-	void superabc_map(address_map &map);
-	void vanvan_portmap(address_map &map);
-	void woodpek_map(address_map &map);
-	void writeport(address_map &map);
+	void _8bpm_portmap(address_map &map) ATTR_COLD;
+	void alibaba_map(address_map &map) ATTR_COLD;
+	void bigbucks_map(address_map &map) ATTR_COLD;
+	void bigbucks_portmap(address_map &map) ATTR_COLD;
+	void birdiy_map(address_map &map) ATTR_COLD;
+	void cannonbp_map(address_map &map) ATTR_COLD;
+	void crushs_map(address_map &map) ATTR_COLD;
+	void crushs_portmap(address_map &map) ATTR_COLD;
+	void dremshpr_map(address_map &map) ATTR_COLD;
+	void dremshpr_portmap(address_map &map) ATTR_COLD;
+	void drivfrcp_portmap(address_map &map) ATTR_COLD;
+	void mspacii_portmap(address_map &map) ATTR_COLD;
+	void mschamp_map(address_map &map) ATTR_COLD;
+	void mschamp_portmap(address_map &map) ATTR_COLD;
+	void mspacman_map(address_map &map) ATTR_COLD;
+	void nmouse_portmap(address_map &map) ATTR_COLD;
+	void numcrash_map(address_map &map) ATTR_COLD;
+	void pacman_map(address_map &map) ATTR_COLD;
+	void pengojpm_map(address_map &map) ATTR_COLD;
+	void piranha_portmap(address_map &map) ATTR_COLD;
+	void porky_portmap(address_map &map) ATTR_COLD;
+	void rocktrv2_map(address_map &map) ATTR_COLD;
+	void s2650games_dataport(address_map &map) ATTR_COLD;
+	void s2650games_map(address_map &map) ATTR_COLD;
+	void superabc_map(address_map &map) ATTR_COLD;
+	void vanvan_portmap(address_map &map) ATTR_COLD;
+	void woodpek_map(address_map &map) ATTR_COLD;
+	void writeport(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<ls259_device> m_mainlatch;
@@ -133,16 +133,10 @@ protected:
 	void rocktrv2_question_bank_w(uint8_t data);
 	uint8_t rocktrv2_question_r(offs_t offset);
 	uint8_t pacman_read_nop();
-	uint8_t mspacman_disable_decode_r_0x0038(offs_t offset);
-	uint8_t mspacman_disable_decode_r_0x03b0(offs_t offset);
-	uint8_t mspacman_disable_decode_r_0x1600(offs_t offset);
-	uint8_t mspacman_disable_decode_r_0x2120(offs_t offset);
-	uint8_t mspacman_disable_decode_r_0x3ff0(offs_t offset);
-	uint8_t mspacman_disable_decode_r_0x8000(offs_t offset);
-	uint8_t mspacman_disable_decode_r_0x97f0(offs_t offset);
-	void mspacman_disable_decode_w(uint8_t data);
-	uint8_t mspacman_enable_decode_r_0x3ff8(offs_t offset);
-	void mspacman_enable_decode_w(uint8_t data);
+	template<unsigned Delta> uint8_t mspacman_disable_decode_r(offs_t offset);
+	void mspacman_disable_decode_w(uint8_t data = 0);
+	template<unsigned Delta> uint8_t mspacman_enable_decode_r(offs_t offset);
+	void mspacman_enable_decode_w(uint8_t data = 0);
 	void irq_mask_w(int state);
 	void nmi_mask_w(int state);
 	uint8_t mspacii_protection_r(offs_t offset);
@@ -192,6 +186,7 @@ protected:
 	TILE_GET_INFO_MEMBER(jrpacman_get_tile_info);
 	DECLARE_VIDEO_START(pacman);
 	void pacman_palette(palette_device &palette) const;
+	void pacman_rbg_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(birdiy);
 	DECLARE_VIDEO_START(s2650games);
 	DECLARE_MACHINE_RESET(mschamp);
@@ -224,6 +219,7 @@ public:
 	void vanvan(machine_config &config);
 	void s2650games(machine_config &config);
 	void woodpek(machine_config &config);
+	void woodpek_rbg(machine_config &config);
 	void crushs(machine_config &config);
 	void superabc(machine_config &config);
 	void numcrash(machine_config &config);
@@ -240,11 +236,11 @@ public:
 	void piranha(machine_config &config);
 
 private:
-	// pacplus.c
+	// pacplus.cpp
 	uint8_t pacplus_decrypt(int addr, uint8_t e);
 	void pacplus_decode();
 
-	// jumpshot.c
+	// jumpshot.cpp
 	uint8_t jumpshot_decrypt(int addr, uint8_t e);
 	void jumpshot_decode();
 };
@@ -259,7 +255,9 @@ public:
 	void theglobp(machine_config &config);
 	void eeekkp(machine_config &config);
 
-protected:
+	void init_sprglobp2();
+
+private:
 	uint8_t epos_decryption_w(offs_t offset);
 	DECLARE_MACHINE_START(theglobp);
 	DECLARE_MACHINE_RESET(theglobp);
@@ -268,8 +266,8 @@ protected:
 	DECLARE_MACHINE_START(acitya);
 	DECLARE_MACHINE_RESET(acitya);
 
-	void epos_map(address_map &map);
-	void epos_portmap(address_map &map);
+	void epos_map(address_map &map) ATTR_COLD;
+	void epos_portmap(address_map &map) ATTR_COLD;
 };
 
 class clubpacm_state : public pacman_state
@@ -283,12 +281,12 @@ public:
 
 	void clubpacm(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(clubpacm_input_r);
+	ioport_value clubpacm_input_r();
 
 	void init_clubpacma();
 
 protected:
-	void clubpacm_map(address_map &map);
+	void clubpacm_map(address_map &map) ATTR_COLD;
 
 	required_device<generic_latch_8_device> m_sublatch;
 	required_ioport_array<2> m_players;
@@ -314,8 +312,8 @@ private:
 	required_device<screen_device> m_screen;
 
 protected:
-	void mspactwin_map(address_map &map);
-	void mspactwin_decrypted_map(address_map &map);
+	void mspactwin_map(address_map &map) ATTR_COLD;
+	void mspactwin_decrypted_map(address_map &map) ATTR_COLD;
 
 	void mspactwin_videoram_w(offs_t offset, uint8_t data);
 

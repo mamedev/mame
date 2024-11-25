@@ -2,32 +2,33 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    NEC PC-9801-86 sound card
-    NEC PC-9801-SpeakBoard sound card
-    Mad Factory Otomi-chan Kai sound card
+NEC PC-9801-86 sound card
+NEC PC-9801-SpeakBoard sound card
+Mad Factory Otomi-chan Kai sound card
 
-    Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
-    additional DAC port
+Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
+additional DAC port
 
-    SpeakBoard sound card seems to be derived design from -86, with an additional
-    OPNA mapped at 0x58*
+SpeakBoard sound card seems to be derived design from -86, with an additional
+OPNA mapped at 0x58*
 
-    Otomi-chan Kai is a doujinshi sound card based off SpeakBoard design.
-    It uses YM3438 OPL2C mapped at 0x78*, and anything that uses the nax.exe sound driver
-    expects this to be installed as default (cfr. datsumj).
-    To fallback to a regular -26/-86 board user needs to add parameter switches "-2" or "-3"
-    respectively, cfr. "nax -?" for additional details.
+Otomi-chan Kai is a doujinshi sound card based off SpeakBoard design.
+It uses YM3438 OPL2C mapped at 0x78*, and anything that uses the nax.exe sound driver
+expects this to be installed as default (cfr. datsumj).
+To fallback to a regular -26/-86 board user needs to add parameter switches "-2" or "-3"
+respectively, cfr. "nax -?" for additional details.
 
-    TODO:
-    - Test all pcm modes;
-    - Make volume work;
-    - Recording;
-    - SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?
-      "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM";
-    - Otomi-chan Kai: find a manual (マニュアル), it's mentioned with nax usage.
-      Very low-res scan of the PCB sports a 4-bit dip-sw bank at very least;
-    - Otomi-chan Kai: unknown ID port readback;
-    - verify sound irq;
+TODO:
+- Test all pcm modes;
+- Fix PCM overflow bug properly (CPUENB signal yield host CPU until DAC catches up?)
+- Make volume work;
+- Recording;
+- SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?
+    "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM";
+- Otomi-chan Kai: find a manual (マニュアル), it's mentioned with nax usage.
+    Very low-res scan of the PCB sports a 4-bit dip-sw bank at very least;
+- Otomi-chan Kai: unknown ID port readback;
+- verify sound irq;
 
 **************************************************************************************************/
 
@@ -43,13 +44,6 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "NEC PC-9801-86")
-
-void pc9801_86_device::sound_irq(int state)
-{
-	m_fmirq = state ? true : false;
-	// TODO: sometimes misfired irq causes sound or even host hang
-	m_bus->int_w<5>(state || (m_pcmirq ? ASSERT_LINE : CLEAR_LINE));
-}
 
 // only for derived designs?
 void pc9801_86_device::opna_map(address_map &map)
@@ -74,12 +68,14 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 	// TC55257CFL-10 (U15)
 	// unknown chip (most likely surface scratched) U3)
 
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set([this](int state) { m_bus->int_w<5>(state); });
+
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	YM2608(config, m_opna, 7.987_MHz_XTAL); // actually YM2608B
 	// shouldn't have one
 //  m_opna->set_addrmap(0, &pc9801_86_device::opna_map);
-	m_opna->irq_handler().set(FUNC(pc9801_86_device::sound_irq));
+	m_opna->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 	m_opna->port_a_read_callback().set(FUNC(pc9801_86_device::opn_porta_r));
 	//m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
 	//m_opna->port_a_write_callback().set(FUNC(pc8801_state::opn_porta_w));
@@ -138,7 +134,6 @@ static INPUT_PORTS_START( pc9801_86 )
 	PORT_INCLUDE( pc9801_joy_port )
 
 	// Single 8-bit DSW bank
-	// TODO: how HW really reads these?
 	PORT_START("OPNA_DSW")
 	PORT_DIPNAME( 0x01, 0x00, "PC-9801-86: Port Base" ) PORT_DIPLOCATION("OPNA_SW:!1")
 	PORT_DIPSETTING(    0x00, "0x188" )
@@ -154,6 +149,7 @@ static INPUT_PORTS_START( pc9801_86 )
 	PORT_DIPNAME( 0x10, 0x00, "PC-9801-86: Interrupt enable") PORT_DIPLOCATION("OPNA_SW:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	// TODO: how HW really read this?
 	PORT_DIPNAME( 0xe0, 0x80, "PC-9801-86: ID number") PORT_DIPLOCATION("OPNA_SW:!6,!7,!8")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x20, "1" )
@@ -182,6 +178,7 @@ pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type ty
 	: pc9801_snd_device(mconfig, type, tag, owner, clock)
 	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_opna(*this, "opna")
+	, m_irqs(*this, "irqs")
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
 	, m_queue(QUEUE_SIZE)
@@ -193,7 +190,6 @@ pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *ta
 {
 
 }
-
 
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
@@ -213,7 +209,6 @@ u16 pc9801_86_device::read_io_base()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-
 void pc9801_86_device::device_start()
 {
 	// TODO: uninstall option from dip
@@ -222,10 +217,19 @@ void pc9801_86_device::device_start()
 		0xcffff,
 		memregion(this->subtag("sound_bios").c_str())->base()
 	);
-	m_bus->install_io(0xa460, 0xa463, read8smo_delegate(*this, FUNC(pc9801_86_device::id_r)), write8smo_delegate(*this, FUNC(pc9801_86_device::mask_w)));
-	m_bus->install_io(0xa464, 0xa46f, read8sm_delegate(*this, FUNC(pc9801_86_device::pcm_r)), write8sm_delegate(*this, FUNC(pc9801_86_device::pcm_w)));
-	m_bus->install_io(0xa66c, 0xa66f, read8sm_delegate(*this, [this](offs_t o){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
-								   write8sm_delegate(*this, [this](offs_t o, u8 d){ if(o == 2) m_pcm_mute = d; }, "pc9801_86_mute_w"));
+	// TODO: who wins if 2+ PC-9801-86 or mixed -73/-86 are mounted?
+	m_bus->install_device(0xa460, 0xa46f, *this, &pc9801_86_device::io_map);
+	m_bus->install_io(0xa66c, 0xa66f,
+		read8sm_delegate(*this, [this](offs_t o){ return o == 2 ? m_pcm_mute : 0xff; }, "pcm_mute_r"),
+		write8sm_delegate(*this, [this](offs_t o, u8 d){
+			if(o == 2)
+			{
+				m_pcm_mute = d;
+				m_ldac->set_output_gain(ALL_OUTPUTS, BIT(m_pcm_mute, 0) ? 0.0 : 1.0);
+				m_rdac->set_output_gain(ALL_OUTPUTS, BIT(m_pcm_mute, 0) ? 0.0 : 1.0);
+			}
+		}, "pcm_mute_w")
+	);
 
 	m_io_base = 0;
 
@@ -255,10 +259,14 @@ void pc9801_86_device::device_reset()
 
 	m_mask = 0;
 	m_head = m_tail = m_count = 0;
-	m_fmirq = m_pcmirq = m_init = false;
+	m_pcmirq = m_init = false;
 	m_irq_rate = 0;
 	m_pcm_ctrl = m_pcm_mode = 0;
-	m_pcm_mute = 0;
+	// Starts off with DACs muted (os2warp3 will burp a lot while initializing OS)
+	m_pcm_mute = 0x01;
+	m_ldac->set_output_gain(ALL_OUTPUTS, 0.0);
+	m_rdac->set_output_gain(ALL_OUTPUTS, 0.0);
+
 	m_pcm_clk = false;
 	memset(&m_queue[0], 0, QUEUE_SIZE);
 }
@@ -288,6 +296,121 @@ void pc9801_86_device::opna_w(offs_t offset, u8 data)
 		logerror("%s: Write to undefined port [%02x] %02x\n", machine().describe_context(), offset + m_io_base, data);
 }
 
+u8 pc9801_86_device::pcm_control_r()
+{
+	return m_pcm_ctrl | (m_pcmirq ? 0x10 : 0);
+}
+
+void pc9801_86_device::pcm_control_w(u8 data)
+{
+	const u32 rate = (25.4_MHz_XTAL).value() / 16;
+	const int divs[8] = {36, 48, 72, 96, 144, 192, 288, 384};
+
+	if(((data & 7) != (m_pcm_ctrl & 7)) || !m_init)
+		m_dac_timer->adjust(attotime::from_ticks(divs[data & 7], rate), 0, attotime::from_ticks(divs[data & 7], rate));
+	if(data & 8)
+		m_head = m_tail = m_count = 0;
+	if(!(data & 0x10))
+	{
+		//m_bus->int_w<5>(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
+		if(!(queue_count() < m_irq_rate) || !(data & 0x80))
+		{
+			//TODO: this needs research
+			m_pcmirq = false;
+			m_irqs->in_w<1>(CLEAR_LINE);
+		}
+	}
+	m_init = true;
+	m_pcm_ctrl = data & ~0x10;
+}
+
+// $a460 base
+void pc9801_86_device::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).rw(FUNC(pc9801_86_device::id_r), FUNC(pc9801_86_device::mask_w));
+//  map(0x02, 0x02) μPD6380 for PC9801-73 control
+//  map(0x04, 0x04) μPD6380 for PC9801-73 data
+	map(0x06, 0x06).lrw8(
+		NAME([this] () {
+			u8 res = 0;
+			// FIFO full
+			res |= (queue_count() == QUEUE_SIZE) << 7;
+			// FIFO empty
+			res |= !queue_count() << 6;
+			// recording overflow
+			res |= 0 << 5;
+			// DAC clock
+			res |= m_pcm_clk << 0;
+			return res;
+		}),
+		NAME([this] (u8 data) {
+			const u8 line_select = data >> 5;
+			m_vol[line_select] = data & 0x0f;
+			logerror("$a466 volume control [%02x] %02x\n", line_select, data & 0xf);
+		})
+	);
+	map(0x08, 0x08).rw(FUNC(pc9801_86_device::pcm_control_r), FUNC(pc9801_86_device::pcm_control_w));
+	map(0x0a, 0x0a).lrw8(
+		NAME([this] () {
+			return m_pcm_mode;
+		}),
+		NAME([this] (u8 data) {
+			if(m_pcm_ctrl & 0x20)
+			{
+				// TODO: may fall over with the irq logic math
+				// queue_count() < (0xff + 1) << 7 = 0x8000 -> always true
+				if (data == 0xff)
+					popmessage("pc9801_86: $a46a irq_rate == 0xff");
+				m_irq_rate = (data + 1) * 128;
+			}
+			else
+				m_pcm_mode = data;
+		})
+	);
+	map(0x0c, 0x0c).lrw8(
+		NAME([this] () {
+			// TODO: recording mode
+			(void)this;
+			return 0;
+		}),
+		NAME([this] (u8 data) {
+			// HACK: on overflow make sure to single step the FIFO enough to claim some space back
+			// os2warp3 initializes the full buffer with 0x00 then quickly pretends
+			// that DAC already catched up by the time the actual startup/shutdown chimes are sent.
+			if (queue_count() == QUEUE_SIZE)
+			{
+				dac_transfer();
+				logerror("Warning: $a46c write with FIFO overflow %02x\n", m_pcm_mode);
+			}
+
+			if(queue_count() < QUEUE_SIZE)
+			{
+				m_queue[m_head++] = data;
+				m_head %= QUEUE_SIZE;
+				m_count++;
+			}
+		})
+	);
+}
+
+/*
+ * xxxx ---- ID
+ * 0000 ---- PC-90DO+ built-in
+ * 0001 ---- PC-98GS built-in
+ * 0010 ---- PC-9801-73/-76, I/O base $188
+ * 0011 ---- PC-9801-73/-76, I/O base $288
+ * 0100 ---- PC-9801-86, I/O base $188, PC-9821 Multi/A Mate/early CanBe (Ce/Cs2/Ce2)
+ * 0101 ---- PC-9801-86, I/O base $288
+ * 0110 ---- PC-9821Nf/Np built-in
+ * 0111 ---- PC-9821 X Mate (as PC-9821XE10-B?)
+ * 1000 ---- PC-9821 later CanBe/Na7/Nx built-in
+ * 1111 ---- <unsupported or PC-9801-26>
+ * ---- --x- (1) OPNA force volume to 0
+ * ---- ---x select OPN base
+ * ---- ---1 OPNA
+ * ---- ---0 OPN
+ */
 u8 pc9801_86_device::id_r()
 {
 	// either a -86 or 9821 MATE A uses this id (built-in)
@@ -297,76 +420,9 @@ u8 pc9801_86_device::id_r()
 
 void pc9801_86_device::mask_w(u8 data)
 {
-	m_mask = data & 1;
+	m_mask = data & 3;
 	// TODO: bit 1 totally cuts off OPNA output
 	logerror("%s: OPNA mask setting %02x\n", machine().describe_context(), data);
-}
-
-u8 pc9801_86_device::pcm_r(offs_t offset)
-{
-	if((offset & 1) == 0)
-	{
-		switch(offset >> 1)
-		{
-			case 1:
-				return ((queue_count() == QUEUE_SIZE) ? 0x80 : 0) |
-						(!queue_count() ? 0x40 : 0) | (m_pcm_clk ? 1 : 0);
-			case 2:
-				return m_pcm_ctrl | (m_pcmirq ? 0x10 : 0);
-			case 3:
-				return m_pcm_mode;
-			case 4:
-				return 0;
-		}
-	}
-	else // odd
-		logerror("PC9801-86: Read to undefined port [%02x]\n",offset+0xa464);
-	return 0xff;
-}
-
-void pc9801_86_device::pcm_w(offs_t offset, u8 data)
-{
-	const u32 rate = (25.4_MHz_XTAL).value() / 16;
-	const int divs[8] = {36, 48, 72, 96, 144, 192, 288, 384};
-	if((offset & 1) == 0)
-	{
-		switch(offset >> 1)
-		{
-			case 1:
-				m_vol[data >> 5] = data & 0x0f;
-				break;
-			case 2:
-				if(((data & 7) != (m_pcm_ctrl & 7)) || !m_init)
-					m_dac_timer->adjust(attotime::from_ticks(divs[data & 7], rate), 0, attotime::from_ticks(divs[data & 7], rate));
-				if(data & 8)
-					m_head = m_tail = m_count = 0;
-				if(!(data & 0x10))
-				{
-					m_bus->int_w<5>(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
-					if(!(queue_count() < m_irq_rate) || !(data & 0x80))
-						m_pcmirq = false; //TODO: this needs research
-				}
-				m_init = true;
-				m_pcm_ctrl = data & ~0x10;
-				break;
-			case 3:
-				if(m_pcm_ctrl & 0x20)
-					m_irq_rate = (data + 1) * 128;
-				else
-					m_pcm_mode = data;
-				break;
-			case 4:
-				if(queue_count() < QUEUE_SIZE)
-				{
-					m_queue[m_head++] = data;
-					m_head %= QUEUE_SIZE;
-					m_count++;
-				}
-				break;
-		}
-	}
-	else // odd
-		logerror("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0xa464,data);
 }
 
 int pc9801_86_device::queue_count()
@@ -382,12 +438,8 @@ u8 pc9801_86_device::queue_pop()
 	return ret;
 }
 
-TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
+void pc9801_86_device::dac_transfer()
 {
-	m_pcm_clk = !m_pcm_clk;
-	if((m_pcm_ctrl & 0x40) || !(m_pcm_ctrl & 0x80))
-		return;
-
 	switch(m_pcm_mode & 0x70)
 	{
 		case 0x70: // 8bit stereo
@@ -419,10 +471,25 @@ TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 			m_rdac->write(rsample);
 		}   break;
 	}
+}
+
+TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
+{
+	m_pcm_clk = !m_pcm_clk;
+	if((m_pcm_ctrl & 0x40) || !(m_pcm_ctrl & 0x80))
+		return;
+
+	// TODO: verify underflow
+	// should leave the DACs in whatever state they are or ...?
+	if (!queue_count())
+		return;
+
+	dac_transfer();
 	if((queue_count() < m_irq_rate) && (m_pcm_ctrl & 0x20))
 	{
 		m_pcmirq = true;
-		m_bus->int_w<5>(ASSERT_LINE);
+		//m_bus->int_w<5>(ASSERT_LINE);
+		m_irqs->in_w<1>(ASSERT_LINE);
 	}
 }
 
@@ -432,7 +499,7 @@ TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 //
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device, "pc9801_spb", "NEC PC9801 SpeakBoard")
+DEFINE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device, "pc9801_spb", "NEC PC-9801 SpeakBoard")
 
 ROM_START( pc9801_spb )
 	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )

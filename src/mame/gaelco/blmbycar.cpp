@@ -12,19 +12,22 @@ Main  CPU    :  68000
 Video Chips  :  TI TPC1020AFN-084 (= Actel A1020A PL84C 9548)
 Sound Chips  :  K-665 9546 (= M6295)
 
+Blomby Car is effectively a bootleg/hack of Gaelco's World Rally given how:
+- HW is very similar, down to dip-switches;
+- How the game is a straight (inferior) clone;
+- rips off most fonts;
+
+Ranking screen BGM is a rip-off of Vapor Trail attract mode.
+
+Service mode claims "Press P1 and P2 buttons to Exit", but that doesn't work.
+The effective procedure is to hold P1 start and button 1 then release b1
+and finally start;
+
 To Do:
 
 - Flip screen unused ?
 - Better driving wheel(s) support, merge with World Rally implementation
-
-Blomby Car is said to be a bootleg of Gaelco's World Rally and uses many
-of the same fonts
-(Update: it actually is a bootleg of World Rally by looking how much
-similar the two HWs are, down to the dipswitches!)
-
-Waterball
-
-Check game speed, it depends on a bit we toggle..
+- watrball: Check game speed, it depends on a bit we toggle.
 
 ***************************************************************************/
 
@@ -62,12 +65,12 @@ public:
 	void base(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_okibank;
 
-	void common_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
 
 private:
 	// devices
@@ -89,7 +92,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	void oki_map(address_map &map);
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
 class blmbycar_state : public base_state
@@ -107,8 +110,8 @@ public:
 	void init_blmbycar();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_ioport m_pot_wheel_io;
@@ -123,7 +126,7 @@ private:
 	uint16_t pot_wheel_r();
 	uint16_t opt_wheel_r();
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 class watrball_state : public base_state
@@ -137,19 +140,17 @@ public:
 	void watrball(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_retvalue = 0;
 
 	uint16_t unk_r();
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -258,8 +259,6 @@ uint32_t base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
 
@@ -454,7 +453,8 @@ static INPUT_PORTS_START( blmbycar )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x18, NOTEQUALS, 0x18)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Gear Shift") PORT_TOGGLE PORT_CONDITION("DSW", 0x18, NOTEQUALS, 0x18)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
+	// Service mode only, unused in-game
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CONDITION("DSW", 0x18, EQUALS, 0x18)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Accelerator")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1  )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2  )
@@ -767,4 +767,4 @@ void blmbycar_state::init_blmbycar()
 
 GAME( 1994, blmbycar,  0,        blmbycar, blmbycar, blmbycar_state, init_blmbycar, ROT0, "ABM & Gecas", "Blomby Car (Version 1P0)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, blmbycar_state, empty_init,    ROT0, "ABM & Gecas", "Blomby Car (Version 1P0, not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, watrball,  0,        watrball, watrball, watrball_state, empty_init,    ROT0, "ABM",         "Water Balls",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1996, watrball,  0,        watrball, watrball, watrball_state, empty_init,    ROT0, "ABM",         "Water Balls",                        MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )

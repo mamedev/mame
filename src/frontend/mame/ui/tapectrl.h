@@ -13,8 +13,12 @@
 
 #pragma once
 
-#include "imagedev/cassette.h"
 #include "ui/devctrl.h"
+
+#include "imagedev/cassette.h"
+
+#include "notifier.h"
+
 
 namespace ui {
 
@@ -28,7 +32,8 @@ private:
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	static void get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos);
+	util::notifier_subscription m_notifier;
+	int m_slider_item_index;
 };
 
 } // namespace ui

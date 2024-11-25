@@ -19,6 +19,8 @@
 class input_merger_device : public device_t
 {
 public:
+	virtual ~input_merger_device() override;
+
 	// configuration
 	auto output_handler() { return m_output_handler.bind(); }
 
@@ -38,10 +40,9 @@ protected:
 			u32 initval,
 			u32 xorval,
 			int active);
-	virtual ~input_merger_device() override;
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_state);
 

@@ -20,7 +20,7 @@ public:
 	auto drq_out_cb() { return m_drq_out_cb.bind(); }
 	auto port_out_cb() { return m_port_out_cb.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	// dma and port handlers
 	u8 dma_r();
@@ -29,8 +29,8 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// ncsci_device overrides
 	virtual void scsi_ctrl_changed() override;
@@ -111,13 +111,21 @@ private:
 	}
 	m_state;
 
+	enum dma_direction : u8
+	{
+		DMA_NONE,
+		DMA_IN,
+		DMA_OUT
+	};
+
 	// internal state
 	bool m_irq_asserted;
 	bool m_drq_asserted;
-	util::fifo <u8, 16> m_fifo;
+	util::fifo<u8, 16> m_fifo;
 	bool m_pio_data_mode;
 	bool m_pio_ctrl_mode;
 	u32 m_scsi_ctrl_state;
+	dma_direction m_last_dma_direction;
 
 	enum status_mask : u8
 	{

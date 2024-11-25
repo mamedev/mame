@@ -197,7 +197,7 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// screen updates
@@ -210,7 +210,7 @@ private:
 	uint8_t m_addr_high, m_addr_low;
 	uint16_t m_addr_mask, m_addr_latch;
 
-	void hc_map(address_map &map);
+	void hc_map(address_map &map) ATTR_COLD;
 	void bankswitch_w(uint8_t data);
 
 	//inports

@@ -80,8 +80,8 @@ public:
 	void pn8800fxb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80180_device> m_maincpu;
@@ -111,8 +111,8 @@ private:
 
 	uint8_t m_mem_change;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t keyboard_r();
 	void keyboard_w(uint8_t data);
@@ -211,7 +211,7 @@ void pn8800fxb_state::io_map(address_map &map)
 static INPUT_PORTS_START( pn8800fxb )
 	PORT_START("misc")
 	// 0x01 sp3
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(pn8800fxb_state, floppy_index_r)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(pn8800fxb_state::floppy_index_r))
 	PORT_CONFNAME(0x04, 0x00, "AC Adaptor")
 	PORT_CONFSETTING(   0x00, "Good")
 	PORT_CONFSETTING(   0x04, "Not Good")

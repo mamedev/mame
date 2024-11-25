@@ -14,7 +14,7 @@ public:
 	rgb_t palette_lookup(u8 index) const { return pen_color(index & m_read_mask); }
 	rgb_t overlay_lookup(u8 index) const { return pen_color(m_palette_colors + index); }
 
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 	virtual u8 read(offs_t offset);
 	virtual void write(offs_t offset, u8 data);
 
@@ -22,7 +22,7 @@ protected:
 	bt47x_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, unsigned const palette_colors, unsigned const overlay_colors, unsigned const color_bits);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_palette_interface implementation
 	virtual u32 palette_entries() const noexcept override { return m_palette_colors + m_overlay_colors; }
@@ -59,7 +59,7 @@ private:
 class bt475_device_base : public bt47x_device_base
 {
 public:
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 	virtual u8 read(offs_t offset) override;
 	virtual void write(offs_t offset, u8 data) override;
 
@@ -67,7 +67,7 @@ protected:
 	bt475_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, unsigned const palette_colors, unsigned const overlay_colors, unsigned const color_bits);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	u8 command_r();
 	void command_w(u8 data);
@@ -124,12 +124,12 @@ class bt479_device : public bt47x_device_base
 public:
 	bt479_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 	virtual u8 read(offs_t offset) override;
 	virtual void write(offs_t offset, u8 data) override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual unsigned address() const override { return BIT(m_command[0], 4, 2) * 0x100 + bt47x_device_base::address(); };
 	virtual unsigned color_bits() const override { return BIT(m_command[1], 1) ? 8 : 6; }

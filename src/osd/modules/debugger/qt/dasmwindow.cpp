@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "dasmwindow.h"
 
+#include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/dvdisasm.h"

@@ -40,7 +40,7 @@ const char *const m680x_disassembler::op_name_str[] = {
  * 2    invalid opcode for 1:6800/6802/6808, 2:6801/6803, 4:HD63701
  */
 
-const uint8_t m680x_disassembler::table[0x104][3] = {
+const u8 m680x_disassembler::table[0x104][3] = {
 	{ill, inh,7},{nop, inh,0},{ill, inh,7},{ill, inh,7},/* 00 */
 	{lsrd,inh,1},{asld,inh,1},{tap, inh,0},{tpa, inh,0},
 	{inx, inh,0},{dex, inh,0},{clv, inh,0},{sev, inh,0},
@@ -130,7 +130,7 @@ offs_t m680x_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	offs_t flags = 0;
 	int invalid_mask;
 	int code = opcodes.r8(pc);
-	uint8_t opcode, args, invalid;
+	u8 opcode, args, invalid;
 
 	switch( m_subtype )
 	{
@@ -179,7 +179,7 @@ offs_t m680x_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	switch( args )
 	{
 		case rel:  /* relative */
-			util::stream_format(stream, "$%04X", pc + (int8_t)params.r8(pc+1) + 2);
+			util::stream_format(stream, "$%04X", pc + (s8)params.r8(pc+1) + 2);
 			return 2 | flags | SUPPORTED;
 		case imb:  /* immediate (byte) */
 			util::stream_format(stream, "#$%02X", params.r8(pc+1));

@@ -56,7 +56,7 @@ public:
 	void init_esh();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
@@ -78,8 +78,8 @@ private:
 	required_device<beep_device> m_beep;
 	required_device<palette_device> m_palette;
 
-	void z80_0_io(address_map &map);
-	void z80_0_mem(address_map &map);
+	void z80_0_io(address_map &map) ATTR_COLD;
+	void z80_0_mem(address_map &map) ATTR_COLD;
 };
 
 

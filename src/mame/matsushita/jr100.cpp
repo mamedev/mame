@@ -93,8 +93,8 @@ public:
 	void jr100(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_keyboard_line = 0U;
@@ -108,7 +108,7 @@ private:
 	void cb2_w(int state);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_pcg;

@@ -158,15 +158,15 @@ protected:
 	required_device<screen_device> m_screen;
 
 	void common(machine_config &config);
-	void cpu_space_map(address_map &map);
-	void st_super_map(address_map &map);
-	void st_user_map(address_map &map);
-	void megast_super_map(address_map &map);
+	void cpu_space_map(address_map &map) ATTR_COLD;
+	void st_super_map(address_map &map) ATTR_COLD;
+	void st_user_map(address_map &map) ATTR_COLD;
+	void megast_super_map(address_map &map) ATTR_COLD;
 
 	uint16_t fpu_r();
 	void fpu_w(uint16_t data);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 class megast_state : public st_state
@@ -236,9 +236,9 @@ public:
 	void tt030(machine_config &config);
 	void falcon(machine_config &config);
 	void ste(machine_config &config);
-	void ste_super_map(address_map &map);
+	void ste_super_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 class megaste_state : public ste_state
@@ -253,10 +253,10 @@ public:
 
 	uint16_t m_cache = 0;
 	void megaste(machine_config &config);
-	void megaste_super_map(address_map &map);
+	void megaste_super_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 class stbook_state : public ste_state
@@ -274,9 +274,9 @@ public:
 
 	[[maybe_unused]] void psg_pa_w(uint8_t data);
 	uint8_t mfp_gpio_r();
-	void stbook_map(address_map &map);
+	void stbook_map(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 
@@ -1012,7 +1012,7 @@ void stbook_state::stbook_map(address_map &map)
 
 static INPUT_PORTS_START( st )
 	PORT_START("config")
-	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, st_state, write_monochrome)
+	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(st_state::write_monochrome))
 	PORT_CONFSETTING( 0x00, "Monochrome (Atari SM124)" )
 	PORT_CONFSETTING( 0x80, "Color (Atari SC1224)" )
 INPUT_PORTS_END
@@ -1024,7 +1024,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ste )
 	PORT_START("config")
-	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ste_state, write_monochrome)
+	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(ste_state::write_monochrome))
 	PORT_CONFSETTING( 0x00, "Monochrome (Atari SM124)" )
 	PORT_CONFSETTING( 0x80, "Color (Atari SC1435)" )
 

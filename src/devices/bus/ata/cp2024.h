@@ -16,9 +16,9 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual u16 read_dma() override;
 	virtual u16 read_cs0(offs_t offset, u16 mem_mask = 0xffff) override;
@@ -32,7 +32,7 @@ protected:
 	virtual void write_pdiag(int state) override;
 
 private:
-	void mcu_map(address_map &map);
+	void mcu_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(CP2024, cp2024_device)

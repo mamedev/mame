@@ -581,6 +581,7 @@ be induced by cutoff currents from the 15 FETs.
 
 #define LOG_IGNORED_WRITES (1U << 1)
 #define LOG_WARNINGS       (1U << 2)
+#define LOG_OUTPUT_CONFIG  (1U << 3)
 #define VERBOSE (LOG_WARNINGS)
 #include "logmacro.h"
 
@@ -955,20 +956,18 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			m_envelope[0].set_period(m_regs[AY_EAFINE], m_regs[AY_EACOARSE]);
 			break;
 		case AY_ENABLE:
-			if ((m_last_enable == -1) ||
-				((m_last_enable & 0x40) != (m_regs[AY_ENABLE] & 0x40)))
+			if (u8 enable = m_regs[AY_ENABLE] & 0x40; enable != (m_last_enable & 0x40))
 			{
-				// write out 0xff if port set to input
+				// output is high-impedance if port is set to input
 				if (!m_port_a_write_cb.isunset())
-					m_port_a_write_cb((offs_t)0, (m_regs[AY_ENABLE] & 0x40) ? m_regs[AY_PORTA] : 0xff);
+					m_port_a_write_cb(0, enable ? m_regs[AY_PORTA] : 0xff, enable ? 0xff : 0);
 			}
 
-			if ((m_last_enable == -1) ||
-				((m_last_enable & 0x80) != (m_regs[AY_ENABLE] & 0x80)))
+			if (u8 enable = m_regs[AY_ENABLE] & 0x80; enable != (m_last_enable & 0x80))
 			{
-				// write out 0xff if port set to input
+				// output is high-impedance if port is set to input
 				if (!m_port_b_write_cb.isunset())
-					m_port_b_write_cb((offs_t)0, (m_regs[AY_ENABLE] & 0x80) ? m_regs[AY_PORTB] : 0xff);
+					m_port_b_write_cb(0, enable ? m_regs[AY_PORTB] : 0xff, enable ? 0xff : 0);
 			}
 			m_last_enable = m_regs[AY_ENABLE];
 			break;
@@ -997,7 +996,7 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			if (m_regs[AY_ENABLE] & 0x40)
 			{
 				if (!m_port_a_write_cb.isunset())
-					m_port_a_write_cb((offs_t)0, m_regs[AY_PORTA]);
+					m_port_a_write_cb(m_regs[AY_PORTA]);
 				else
 					LOGMASKED(LOG_WARNINGS, "%s: warning: unmapped write %02x to %s Port A\n", machine().describe_context(), v, name());
 			}
@@ -1010,7 +1009,7 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			if (m_regs[AY_ENABLE] & 0x80)
 			{
 				if (!m_port_b_write_cb.isunset())
-					m_port_b_write_cb((offs_t)0, m_regs[AY_PORTB]);
+					m_port_b_write_cb(m_regs[AY_PORTB]);
 				else
 					LOGMASKED(LOG_WARNINGS, "%s: warning: unmapped write %02x to %s Port B\n", machine().describe_context(), v, name());
 			}
@@ -1215,7 +1214,7 @@ void ay8910_device::build_mixer_table()
 
 	if ((m_flags & AY8910_LEGACY_OUTPUT) != 0)
 	{
-		LOGMASKED(LOG_WARNINGS, "%s using legacy output levels!\n", name());
+		LOGMASKED(LOG_OUTPUT_CONFIG, "%s using legacy output levels!\n", name());
 		normalize = 1;
 	}
 
@@ -1295,7 +1294,7 @@ void ay8910_device::device_start()
 
 	if ((m_flags & AY8910_SINGLE_OUTPUT) != 0)
 	{
-		LOGMASKED(LOG_WARNINGS, "%s device using single output!\n", name());
+		LOGMASKED(LOG_OUTPUT_CONFIG, "%s device using single output!\n", name());
 		m_streams = 1;
 	}
 
@@ -1327,7 +1326,7 @@ void ay8910_device::ay8910_reset_ym()
 	m_noise_value = 0;
 	m_count_noise = 0;
 	m_prescale_noise = 0;
-	m_last_enable = -1;  // force a write
+	m_last_enable = 0xc0; // force a write
 	for (int i = 0; i < AY_PORTA; i++)
 		ay8910_write_reg(i,0);
 	m_ready = 1;
@@ -1418,7 +1417,7 @@ u8 ay8910_device::ay8910_read_ym()
 	switch (r)
 	{
 	case AY_PORTA:
-		if ((m_regs[AY_ENABLE] & 0x40) != 0)
+		if (m_regs[AY_ENABLE] & 0x40)
 			LOGMASKED(LOG_WARNINGS, "%s: warning - read from %s Port A set as output\n", machine().describe_context(), name());
 		/*
 		   even if the port is set as output, we still need to return the external
@@ -1431,15 +1430,15 @@ u8 ay8910_device::ay8910_read_ym()
 		   case were it makes a difference in comparison to a standard TTL output.
 		*/
 		if (!m_port_a_read_cb.isunset())
-			m_regs[AY_PORTA] = m_port_a_read_cb(0);
+			m_regs[AY_PORTA] = m_port_a_read_cb();
 		else
 			LOGMASKED(LOG_WARNINGS, "%s: warning - read 8910 Port A\n", machine().describe_context());
 		break;
 	case AY_PORTB:
-		if ((m_regs[AY_ENABLE] & 0x80) != 0)
+		if (m_regs[AY_ENABLE] & 0x80)
 			LOGMASKED(LOG_WARNINGS, "%s: warning - read from 8910 Port B set as output\n", machine().describe_context());
 		if (!m_port_b_read_cb.isunset())
-			m_regs[AY_PORTB] = m_port_b_read_cb(0);
+			m_regs[AY_PORTB] = m_port_b_read_cb();
 		else
 			LOGMASKED(LOG_WARNINGS, "%s: warning - read 8910 Port B\n", machine().describe_context());
 		break;

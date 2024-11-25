@@ -5,6 +5,17 @@ license:CC0-1.0
 -->
 <softwarelist name="ibm5150_hdd" description="IBM PC hard disk images">
 
+	<software name="freedos13_8086">
+		<description>FreeDOS 1.3 8086 Minimized</description>
+		<year>2022</year>
+		<publisher>AkBKukU</publisher>
+		<part name="hdd" interface="st_hdd">
+			<diskarea name="harddriv">
+				<disk name="freedos13_8086" sha1="3dbb02c6d051d6de1647e20a4639512775f58c78" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="msdos211">
 		<description>AT&amp;T Personal Computer 6300 DOS Release 2.0 (MS-DOS 2.11)</description>
 		<year>1984</year>

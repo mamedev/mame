@@ -14,8 +14,8 @@
 
 ******************************************************************************/
 
-#ifndef MAME_DATAEAST_DECORMC3_H
-#define MAME_DATAEAST_DECORMC3_H
+#ifndef MAME_DATAEAST_DECRMC3_H
+#define MAME_DATAEAST_DECRMC3_H
 
 #pragma once
 
@@ -83,7 +83,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_palette_interface overrides
 	virtual u32 palette_entries() const noexcept override { return m_entries; }
@@ -110,4 +110,4 @@ private:
 	memory_array        m_paletteram_ext;       // extended memory
 };
 
-#endif  // MAME_DATAEAST_DECORMC3_H
+#endif  // MAME_DATAEAST_DECRMC3_H

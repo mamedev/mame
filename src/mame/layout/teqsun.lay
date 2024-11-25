@@ -320,7 +320,7 @@ license:CC0-1.0
 		<element name="lamp7" ref="BET5" inputtag="500d" inputmask="0x02">
 			<bounds x="2.32" y="3.02" width="0.3" height="0.3" />
 		</element>
-		<element name="lamp12" ref="GAMBLE" inputtag="500d" inputmask="0x01"> gamble
+		<element name="lamp12" ref="GAMBLE" inputtag="500d" inputmask="0x01">
 			<bounds x="2.73" y="3.02" width="0.3" height="0.3" />
 		</element>
 
@@ -339,7 +339,7 @@ license:CC0-1.0
 		<element name="lamp4" ref="5LINES" inputtag="500e" inputmask="0x08">
 			<bounds x="2.32" y="3.43" width="0.3" height="0.3" />
 		</element>
-		<element name="lamp9" ref="TAKE_WIN" inputtag="500e" inputmask="0x20">take win
+		<element name="lamp9" ref="TAKE_WIN" inputtag="500e" inputmask="0x20">
 			<bounds x="2.73" y="3.43" width="0.3" height="0.3" />
 		</element>
 

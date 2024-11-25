@@ -49,7 +49,7 @@ public:
 	void data_w(int state);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_write_line m_clock_cb;

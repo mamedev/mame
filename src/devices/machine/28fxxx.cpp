@@ -105,14 +105,14 @@ void base_28fxxx_device::nvram_default()
 
 bool base_28fxxx_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_data.get(), m_size, actual) && actual == m_size;
+	auto const [err, actual] = util::read(file, m_data.get(), m_size);
+	return !err && (actual == m_size);
 }
 
 bool base_28fxxx_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_data.get(), m_size, actual) && actual == m_size;
+	auto const [err, actual] = util::write(file, m_data.get(), m_size);
+	return !err;
 }
 
 void base_28fxxx_device::erase()

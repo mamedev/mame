@@ -87,7 +87,7 @@ public:
 	void interact_common(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void hector_hr(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
@@ -179,17 +179,17 @@ private:
 	void hector_80c(bitmap_ind16 &bitmap, uint8_t *page, int ymax, int yram);
 	void hector_disc2_reset();
 	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void interact_mem(address_map &map);
+	void interact_mem(address_map &map) ATTR_COLD;
 
-	void hec2hrp_io(address_map &map);
-	void hec2hrp_mem(address_map &map);
-	void hec2hrx_io(address_map &map);
-	void hec2hrx_mem(address_map &map);
-	void hec2mdhrx_io(address_map &map);
-	void hec2mx40_io(address_map &map);
-	void hec2mx80_io(address_map &map);
-	void hecdisc2_io(address_map &map);
-	void hecdisc2_mem(address_map &map);
+	void hec2hrp_io(address_map &map) ATTR_COLD;
+	void hec2hrp_mem(address_map &map) ATTR_COLD;
+	void hec2hrx_io(address_map &map) ATTR_COLD;
+	void hec2hrx_mem(address_map &map) ATTR_COLD;
+	void hec2mdhrx_io(address_map &map) ATTR_COLD;
+	void hec2mx40_io(address_map &map) ATTR_COLD;
+	void hec2mx80_io(address_map &map) ATTR_COLD;
+	void hecdisc2_io(address_map &map) ATTR_COLD;
+	void hecdisc2_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;

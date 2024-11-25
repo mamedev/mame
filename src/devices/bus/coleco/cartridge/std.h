@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_COLECO_STD_H
-#define MAME_BUS_COLECO_STD_H
+#ifndef MAME_BUS_COLECO_CARTRIDGE_STD_H
+#define MAME_BUS_COLECO_CARTRIDGE_STD_H
 
 #pragma once
 
@@ -30,15 +30,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_colecovision_expansion_card_interface overrides
-	virtual uint8_t bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000) override;
+	virtual uint8_t read(offs_t offset, int _8000, int _a000, int _c000, int _e000) override;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(COLECOVISION_STANDARD, colecovision_standard_cartridge_device)
 
-
-#endif // MAME_BUS_COLECO_STD_H
+#endif // MAME_BUS_COLECO_CARTRIDGE_STD_H

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -32,8 +33,7 @@ license:CC0-1.0
 	<view name="Internal Layout">
 		<bounds left="-1" right="67.9" top="-1" bottom="16" />
 
-	<!-- 3*2 neon digits, separated by colons -->
-
+		<!-- 3*2 neon digits, separated by colons -->
 		<element name="nixie0" ref="digit"><bounds x="0" y="0" width="10" height="15" /></element>
 		<element name="nixie1" ref="digit"><bounds x="10.3" y="0" width="10" height="15" /></element>
 		<element name="nixie2" ref="digit"><bounds x="23.3" y="0" width="10" height="15" /></element>

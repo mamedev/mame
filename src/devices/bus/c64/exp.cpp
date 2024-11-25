@@ -11,6 +11,8 @@
 
 #include "formats/cbm_crt.h"
 
+#include <tuple>
+
 
 
 //**************************************************************************
@@ -110,11 +112,16 @@ std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_loa
 
 		if (!loaded_through_softlist())
 		{
+			util::core_file &file = image_core_file();
 			size = length();
 
 			if (is_filetype("80"))
 			{
-				fread(m_card->m_roml, size);
+				std::size_t actual;
+				std::tie(err, m_card->m_roml, actual) = read(file, size);
+				if (!err && (actual != size))
+					err = std::errc::io_error;
+
 				m_card->m_roml_size = size;
 				m_card->m_exrom = 0;
 
@@ -125,7 +132,11 @@ std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_loa
 			}
 			else if (is_filetype("a0"))
 			{
-				fread(m_card->m_romh, 0x2000);
+				std::size_t actual;
+				std::tie(err, m_card->m_roml, actual) = read(file, 0x2000);
+				if (!err && (actual != 0x2000))
+					err = std::errc::io_error;
+
 				m_card->m_romh_size = 0x2000;
 
 				m_card->m_exrom = 0;
@@ -133,14 +144,18 @@ std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_loa
 			}
 			else if (is_filetype("e0"))
 			{
-				fread(m_card->m_romh, 0x2000);
+				std::size_t actual;
+				std::tie(err, m_card->m_roml, actual) = read(file, 0x2000);
+				if (!err && (actual != 0x2000))
+					err = std::errc::io_error;
+
 				m_card->m_romh_size = 0x2000;
 
 				m_card->m_game = 0;
 			}
 			else if (is_filetype("crt"))
 			{
-				if (cbm_crt_read_header(image_core_file(), &m_card->m_roml_size, &m_card->m_romh_size, &m_card->m_exrom, &m_card->m_game))
+				if (cbm_crt_read_header(file, &m_card->m_roml_size, &m_card->m_romh_size, &m_card->m_exrom, &m_card->m_game))
 				{
 					uint8_t *roml = nullptr;
 					uint8_t *romh = nullptr;
@@ -151,7 +166,7 @@ std::pair<std::error_condition, std::string> c64_expansion_slot_device::call_loa
 					if (m_card->m_roml_size) roml = m_card->m_roml.get();
 					if (m_card->m_romh_size) romh = m_card->m_romh.get();
 
-					cbm_crt_read_data(image_core_file(), roml, romh);
+					cbm_crt_read_data(file, roml, romh);
 				}
 			}
 			else

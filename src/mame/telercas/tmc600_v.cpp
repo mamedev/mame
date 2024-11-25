@@ -30,7 +30,7 @@ uint8_t tmc600_state::get_color(uint16_t pma)
 
 	if (BIT(color, 3) && m_blink)
 	{
-		color ^= 0x07;
+		color = 0;
 	}
 
 	return color;
@@ -121,7 +121,7 @@ void tmc600_state::tmc600_video(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	CDP1869(config, m_vis, cdp1869_device::DOT_CLK_PAL, &tmc600_state::cdp1869_page_ram);
+	CDP1869(config, m_vis, 3.57_MHz_XTAL, &tmc600_state::cdp1869_page_ram);
 	m_vis->add_pal_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL);
 	m_vis->set_color_clock(cdp1869_device::COLOR_CLK_PAL);
 	m_vis->set_pcb_read_callback(FUNC(tmc600_state::tmc600_pcb_r));
@@ -129,5 +129,5 @@ void tmc600_state::tmc600_video(machine_config &config)
 	m_vis->pal_ntsc_callback().set_constant(1);
 	m_vis->prd_callback().set(FUNC(tmc600_state::prd_w));
 	m_vis->set_screen(SCREEN_TAG);
-	m_vis->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_vis->add_route(ALL_OUTPUTS, "mono", 0.1);
 }

@@ -178,7 +178,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_as2888)
 
 static INPUT_PORTS_START(as3022)
 		PORT_START("SW1")
-		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Sound Test") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_as3022_device, sw1, 0)
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Sound Test") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bally_as3022_device::sw1), 0)
 INPUT_PORTS_END
 
 ioport_constructor bally_as3022_device::device_input_ports() const
@@ -441,7 +441,7 @@ void bally_sounds_plus_device::vocalizer_pia_portb_w(uint8_t data)
 //--------------------------------------------------------------------------
 static INPUT_PORTS_START(cheap_squeak)
 		PORT_START("SW1")
-		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Sound Test") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_cheap_squeak_device, sw1, 0)
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Sound Test") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bally_cheap_squeak_device::sw1), 0)
 INPUT_PORTS_END
 
 bally_cheap_squeak_device::bally_cheap_squeak_device(
@@ -624,7 +624,7 @@ bally_squawk_n_talk_ay_device::bally_squawk_n_talk_ay_device(
 //--------------------------------------------------------------------------
 static INPUT_PORTS_START(squawk_n_talk)
 	PORT_START("SW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("SW1") PORT_CHANGED_MEMBER(DEVICE_SELF, bally_squawk_n_talk_device, sw1, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("SW1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bally_squawk_n_talk_device::sw1), 0)
 INPUT_PORTS_END
 
 ioport_constructor bally_squawk_n_talk_device::device_input_ports() const

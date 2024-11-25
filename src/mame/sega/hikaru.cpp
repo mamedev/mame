@@ -414,10 +414,10 @@ public:
 	void hikaru(machine_config &config);
 
 private:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void hikaru_map(address_map &map);
-	void hikaru_map_slave(address_map &map);
+	void hikaru_map(address_map &map) ATTR_COLD;
+	void hikaru_map_slave(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

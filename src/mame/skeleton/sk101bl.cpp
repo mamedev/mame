@@ -41,8 +41,8 @@ public:
 	void sk101bl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -53,8 +53,8 @@ private:
 	u8 scan_shift_r();
 	void lcd_control_w(u8 data);
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
@@ -170,7 +170,7 @@ void sk101bl_state::sk101bl(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 10-1);
 	screen.set_palette("palette");
 
-	HD44780(config, m_lcdc, 250'000).set_lcd_size(1, 16); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000).set_lcd_size(1, 16); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_pixel_update_cb(FUNC(sk101bl_state::pixel_update));
 
 	PALETTE(config, "palette").set_entries(2);

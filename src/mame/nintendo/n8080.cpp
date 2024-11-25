@@ -1259,7 +1259,7 @@ ROM_START( spacefev )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // for color video hw
 	ROM_LOAD( "f5-i-.bin",   0x0000, 0x0020, CRC(c5914ec1) SHA1(198875fcab36d09c8726bb21e2fdff9882f6721a) ) // "F5?C"
-	ROM_END
+ROM_END
 
 ROM_START( spacefevo )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -1276,7 +1276,7 @@ ROM_START( spacefevo )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // for color video hw
 	ROM_LOAD( "f5-i-.bin",   0x0000, 0x0020, CRC(c5914ec1) SHA1(198875fcab36d09c8726bb21e2fdff9882f6721a) ) // "F5?C"
-	ROM_END
+ROM_END
 
 ROM_START( spacefevo2 )
 	ROM_REGION( 0x8000, "maincpu", 0 )

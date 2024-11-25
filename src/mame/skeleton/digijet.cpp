@@ -43,7 +43,7 @@ private:
 
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 void digijet_state::io_map(address_map &map)

@@ -26,10 +26,10 @@ public:
 	void segapm(machine_config &config);
 
 private:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_segapm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void segapm_map(address_map &map);
+	void segapm_map(address_map &map) ATTR_COLD;
 };
 
 

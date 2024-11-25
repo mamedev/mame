@@ -108,11 +108,14 @@ Unreleased (possibly no prototypes exist):
 -->
 
 <softwarelist name="jaguar" description="Atari Jaguar cartridges">
-	<!-- boot OK, gameplay graphics are in shades of blue, pause message gets cut off -->
 	<software name="aircars" supported="no">
 		<description>Air Cars</description>
 		<year>1997</year>
 		<publisher>ICD</publisher>
+		<notes><![CDATA[
+Gameplay graphics are in shades of blue, pause message gets cut off
+]]></notes>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<!-- The original dump, released in a custom .j01 format, was the following one
@@ -126,11 +129,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, gameplay graphics are in shades of blue, pause message gets cut off -->
 	<software name="aircars94" cloneof="aircars" supported="no">
 		<description>Air Cars (1994 version)</description>
 		<year>1994</year>
 		<publisher>Midnite Entertainment Group</publisher>
+		<notes><![CDATA[
+Gameplay graphics are in shades of blue, pause message gets cut off
+]]></notes>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="0x200000" width="32" endianness="big">
 				<rom name="aircars94.u1" size="0x100000" crc="bbd4c4bd" sha1="4f9c914b43208eb100fb25b8be87dec370fd205d" offset="0x000000" loadflag="load32_word"/>
@@ -139,11 +145,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, several HUD elements have wrong pitch, HUD automap is incorrectly drawn as a big quadrilateral, HUD blending looks ugly -->
 	<software name="avsp" supported="no">
 		<description>Alien vs Predator</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Several HUD elements have wrong pitch, HUD automap is incorrectly drawn as a big quadrilateral, HUD blending looks ugly
+]]></notes>
+
 		<info name="serial" value="J9008E 800108-022"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -152,12 +161,15 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- "licensed by Atari" then black screen -->
 	<software name="fball95" supported="no">
 		<description>Arena Football '95</description>
 		<!-- Made in 1995 but released in 2006 -->
 		<year>2006</year>
 		<publisher>B&amp;C Computervision</publisher>
+		<notes><![CDATA[
+"licensed by Atari" then black screen
+]]></notes>
+
 		<info name="serial" value="J9003E 800108-006"/>
 		<part name="cart" interface="jaguar_cart">
 			<!-- 4MB Alpine ROM with Universal Header -->
@@ -167,11 +179,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, gameplay graphics have clipping/alignment issues, eventually throws an exception, no sound -->
 	<software name="atarikrt" supported="no">
 		<description>Atari Karts</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Gameplay graphics have clipping/alignment issues, eventually throws an exception, no sound
+]]></notes>
+
 		<info name="serial" value="J9091E 705091-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -180,11 +195,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, title screen foreground layer not drawn properly, no sound -->
 	<software name="mutntpng" supported="partial">
 		<description>Attack of the Mutant Penguins</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Title screen foreground layer not drawn properly, no sound
+]]></notes>
+
 		<info name="serial" value="J9072E 705072-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -193,11 +211,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- no sound, hangs after choosing a game mode, title screen has black dots of garbage on top (btanb) -->
 	<software name="barkley" supported="no">
 		<description>Barkley Shut Up and Jam!</description>
 		<year>2002</year>
 		<publisher>B&amp;C Computervision</publisher>
+		<notes><![CDATA[
+No sound, hangs after choosing a game mode, title screen has black dots of garbage on top (btanb)
+]]></notes>
+
 		<info name="serial" value="J9018E 705018-001"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -206,11 +227,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- black screen -->
 	<software name="battlesp" supported="no">
 		<description>Battle Sphere</description>
 		<year>2000</year>
 		<publisher>ScatoLOGIC</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+
 		<info name="serial" value="J9807E"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -219,11 +243,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- black screen -->
 	<software name="battlesg" supported="no">
 		<description>Battle Sphere Gold</description>
 		<year>2002</year>
 		<publisher>ScatoLOGIC</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+
 		<info name="serial" value="J0201G"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -232,11 +259,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- no sound, has severe RMW issues in both versions of the game when breaking blocks -->
 	<software name="breakout" supported="no">
 		<description>Breakout 2000</description>
 		<year>1996</year>
 		<publisher>Telegames</publisher>
+		<notes><![CDATA[
+No sound, has severe RMW issues in both versions of the game when breaking blocks
+]]></notes>
+
 		<info name="serial" value="J9093E"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -245,11 +275,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- no sound, hardlocks then eventually throws an exception after the Dyna Cam logo -->
 	<software name="bretth" supported="no">
 		<description>Brett Hull NHL Hockey</description>
 		<year>2004</year>
 		<publisher>B&amp;C Computervision</publisher>
+		<notes><![CDATA[
+No sound, hardlocks then eventually throws an exception after the Dyna Cam logo
+]]></notes>
+
 		<info name="serial" value="J9021E 705021-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -258,12 +291,15 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- switching items in main menu causes a glitch on the text -->
-	<!-- rightmost column of gameplay has odd "overscan" area -->
 	<software name="brutalsp" supported="no">
 		<description>Brutal Sports Football</description>
 		<year>1994</year>
 		<publisher>Telegames</publisher>
+		<notes><![CDATA[
+Switching items in main menu causes a glitch on the text
+Rightmost column of gameplay has odd "overscan" area
+]]></notes>
+
 		<info name="serial" value="JA100"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -272,7 +308,6 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="bubsy">
 		<description>Bubsy in Fractured Furry Tales</description>
 		<year>1994</year>
@@ -285,7 +320,6 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="cfodder">
 		<description>Cannon Fodder</description>
 		<year>1995</year>
@@ -298,11 +332,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- has serious 3D GFX pitch issues -->
 	<software name="chekflag" supported="no">
 		<description>Checkered Flag</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Has serious 3D GFX pitch issues
+]]></notes>
+
 		<info name="serial" value="J9007E 700707-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -311,11 +348,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- no sound, title screen cuts off background, gameplay GFX pop-ups, eventually black screens -->
 	<software name="clubdriv" supported="no">
 		<description>Club Drive</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+No sound, title screen cuts off background, gameplay GFX pop-ups, eventually black screens
+]]></notes>
+
 		<info name="serial" value="J9003E 800103-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -324,11 +364,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- no sound, huge GFX issues (mostly related with pitch) -->
 	<software name="cybermor" supported="no">
-		<description>Cybermorph (Rev. B)</description>
+		<description>Cybermorph (rev. B)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+No sound, huge GFX issues (mostly related with pitch)
+]]></notes>
+
 		<info name="serial" value="J9000E 700700-3"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="1048576" width="32" endianness="big">
@@ -337,11 +380,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- no sound, huge GFX issues (mostly related with pitch) -->
 	<software name="cybermor1" cloneof="cybermor" supported="no">
-		<description>Cybermorph (Rev. A)</description>
+		<description>Cybermorph (rev. A)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+No sound, huge GFX issues (mostly related with pitch)
+]]></notes>
+
 		<info name="serial" value="J9000E 700700-2"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -350,13 +396,16 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, Defender 2000 and Defender Plus both crashes after some few seconds in gameplay -->
-	<!-- Defender 2000 have misplaced GFX portions -->
-	<!-- "paused" GFX upper part incorrectly placed in Defender Classic -->
 	<software name="defender" supported="no">
 		<description>Defender 2000</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Defender 2000 and Defender Plus both crashes after some few seconds in gameplay.
+Defender 2000 have misplaced GFX portions.
+"paused" GFX upper part incorrectly placed in Defender Classic
+]]></notes>
+
 		<info name="serial" value="J9041E 705041-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -365,12 +414,15 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, sound farts, GFX status bar is stretched in horizontal direction (screen mode changes mid-frame) -->
-	<!-- automap becomes blue a few frames after being called -->
 	<software name="doom" supported="no">
 		<description>Doom</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Sound farts, GFX status bar is stretched in horizontal direction (screen mode changes mid-frame)
+Automap becomes blue a few frames after being called
+]]></notes>
+
 		<info name="serial" value="J9029E 800129-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -379,11 +431,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, no BGMs -->
 	<software name="ddragon5" supported="partial">
 		<description>Double Dragon V - The Shadow Falls</description>
 		<year>1995</year>
 		<publisher>Tradewest</publisher>
+		<notes><![CDATA[
+No BGMs
+]]></notes>
+
 		<info name="serial" value="21941"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -392,11 +447,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, gameplay backgrounds are missing or garbled -->
 	<software name="dragon" supported="partial">
 		<description>Dragon - The Bruce Lee Story</description>
 		<year>1994</year>
 		<publisher>Virgin Interactibe</publisher>
+		<notes><![CDATA[
+Gameplay backgrounds are missing or garbled
+]]></notes>
+
 		<info name="serial" value="J9036E 700128-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -405,11 +463,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, gameplay area is cut off to the right, status bar even moreso (screen mode changes mid-frame) -->
 	<software name="dinodude" supported="no">
 		<description>Evolution - Dino Dudes</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Gameplay area is cut off to the right, status bar even moreso (screen mode changes mid-frame)
+]]></notes>
+
 		<info name="serial" value="J9006 700706-001"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -418,11 +479,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- "licensed by Atari" then black screen -->
 	<software name="feverpit" supported="no">
 		<description>Fever Pitch Soccer</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+"licensed by Atari" then black screen
+]]></notes>
+
 		<info name="serial" value="J9106E 705106-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -431,11 +495,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- no sound, heavy pitch GFX issues -->
 	<software name="fforlife" supported="no">
 		<description>Fight for Life</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+No sound, heavy pitch GFX issues
+]]></notes>
+
 		<info name="serial" value="J9037E 705037-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -444,11 +511,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- RSoD on Jaguar logo -->
 	<software name="fforlife1" cloneof="fforlife" supported="no">
 		<description>Fight for Life (alt)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+RSoD on Jaguar logo
+]]></notes>
+
 		<info name="serial" value="J9037E 705037-002"/><!-- could be different -->
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -457,11 +527,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, gameplay area is cut off to the right (especially noticeable when pausing game), no color fill for cutscenes -->
 	<software name="flashb" supported="no">
 		<description>Flashback - The Quest for Identity</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
+		<notes><![CDATA[
+Gameplay area is cut off to the right (especially noticeable when pausing game), no color fill for cutscenes
+]]></notes>
+
 		<info name="serial" value="43175-79126"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -470,11 +543,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- "Another Great Game" then black screen -->
 	<software name="flipout" supported="no">
 		<description>Flip Out!</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+"Another Great Game" then black screen
+]]></notes>
+
 		<info name="serial" value="J9040E 700740-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -486,11 +562,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- huge GFX issues (mostly related with pitch) -->
 	<software name="hstrike" supported="no">
 		<description>Hover Strike</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Huge GFX issues (mostly related with pitch)
+]]></notes>
+
 		<info name="serial" value="J9009E 700709-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -499,11 +578,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, reload after saving doesn't work -->
 	<software name="hyperfrc" supported="partial">
 		<description>Hyper Force</description>
 		<year>2000</year>
 		<publisher>Songboard Productions</publisher>
+		<notes><![CDATA[
+Reload after saving doesn't work
+]]></notes>
+
 		<info name="serial" value="CF3003"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -512,11 +594,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, has heavy pitch GFX issues -->
 	<software name="iwar" supported="no">
 		<description>I-War</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Has heavy pitch GFX issues
+]]></notes>
+
 		<info name="serial" value="J9043E 705043-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -525,11 +610,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- no sound, black screen after briefing -->
 	<software name="ironsold" supported="no">
 		<description>Iron Soldier (v1.04)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+No sound, black screen after briefing
+]]></notes>
+
 		<info name="serial" value="J9026E 700726-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -538,11 +626,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- no sound, black screen after title (with incorrect width too) -->
 	<software name="ironsol2" supported="no">
 		<description>Iron Soldier 2</description>
 		<year>1997</year>
 		<publisher>Telegames</publisher>
+		<notes><![CDATA[
+No sound, black screen after title (with incorrect width too)
+]]></notes>
+
 		<info name="serial" value="JA810"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -551,11 +642,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- black screen with heavy logs -->
 	<software name="kasumi" supported="no">
 		<description>Kasumi Ninja</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Black screen with heavy logs
+]]></notes>
+
 		<info name="serial" value="J9012E 700712-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -564,12 +658,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- technically a Jaguar CD cartridge -->
-	<!-- draws an incorrect pitch GFX, doesn't do much else -->
 	<software name="memtrack" supported="no">
 		<description>Memory Track</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Technically a Jaguar CD cartridge draws an incorrect pitch GFX, doesn't do much else
+]]></notes>
+
 		<info name="serial" value="J8911 700140"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="131072" width="32" endianness="big">
@@ -578,11 +674,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, text GFXs are solid filled, no BGMs -->
 	<software name="missil3d" supported="no">
 		<description>Missile Command 3D</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Text GFXs are solid filled, no BGMs
+]]></notes>
+
 		<info name="serial" value="J9097 705097-001"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -591,12 +690,15 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- exception on non-debug, on debug gameplay sports no sprite GFXs -->
-	<!-- minor glitch on team box when selecting one (blitter not filling properly) -->
 	<software name="nbajamte" supported="no">
 		<description>NBA Jam T.E. - Tournament Edition</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Exception on non-debug, on debug gameplay sports no sprite GFXs
+Minor glitch on team box when selecting one (blitter not filling properly)
+]]></notes>
+
 		<info name="serial" value="J9089E 705089-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -605,11 +707,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, "Enter Combat" has ground textures with black, "Enter Network" causes a black screen after loading, no BGMs -->
 	<software name="phase0" supported="no">
 		<description>Phase Zero</description>
 		<year>2002</year>
 		<publisher>Songbird Productions</publisher>
+		<notes><![CDATA[
+"Enter Combat" has ground textures with black, "Enter Network" causes a black screen after loading, no BGMs
+]]></notes>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="phase zero.j64" size="2097152" crc="7168b143" sha1="3ec9524921d07647f527e0a82a831f794a7d6d9b" offset="000000" />
@@ -617,11 +722,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, no sound -->
 	<software name="pbfant" supported="partial">
 		<description>Pinball Fantasies</description>
 		<year>1995</year>
 		<publisher>21st Century Entertainment</publisher>
+		<notes><![CDATA[
+No sound
+]]></notes>
+
 		<info name="serial" value="J0144E 700709-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -630,11 +738,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, hangs after few seconds of gameplay -->
 	<software name="pitfall" supported="no">
 		<description>Pitfall - The Mayan Adventure</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Hangs after few seconds of gameplay
+]]></notes>
+
 		<info name="serial" value="J9101 700701-001"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -643,11 +754,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, no BGMs, water background in stage 1 is in Black and white, eventually crashes if bumping into road edges -->
 	<software name="pdrive" supported="no">
 		<description>Power Drive Rally</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
+		<notes><![CDATA[
+No BGMs, water background in stage 1 is in Black and white, eventually crashes if bumping into road edges
+]]></notes>
+
 		<info name="serial" value="31763-11153"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -656,11 +770,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- black screen -->
 	<software name="protect" supported="no">
 		<description>Protector</description>
 		<year>1999</year>
 		<publisher>Songbird Productions</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+
 		<info name="serial" value="CF3004"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -669,11 +786,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- black screen -->
 	<software name="protctse" supported="no">
 		<description>Protector - Special Edition</description>
 		<year>2002</year>
 		<publisher>Songbird Productions</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+
 		<info name="serial" value="CF3004"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -682,11 +802,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, ranking screen cuts off text on 9th and 10th places -->
 	<software name="raiden" supported="partial">
-		<description>Raiden (Rev. A)</description>
+		<description>Raiden (rev. A)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Ranking screen cuts off text on 9th and 10th places
+]]></notes>
+
 		<info name="serial" value="J9005E 700705-2"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -695,11 +818,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, ranking screen cuts off text on 9th and 10th places -->
 	<software name="raiden1" cloneof="raiden" supported="partial">
 		<description>Raiden</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Ranking screen cuts off text on 9th and 10th places
+]]></notes>
+
 		<info name="serial" value="J9005 700705-1"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -708,11 +834,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, saves reports error, no sound -->
 	<software name="rayman" supported="partial">
 		<description>Rayman</description>
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
+		<notes><![CDATA[
+Saves reports error, no sound
+]]></notes>
+
 		<info name="serial" value="C3669T"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -721,11 +850,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- black screen -->
 	<software name="ruinerp" supported="no">
 		<description>Ruiner Pinball</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+
 		<info name="serial" value="J9061 7005061-001"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -734,11 +866,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, no BGMs -->
 	<software name="sensible" supported="partial">
 		<description>Sensible Soccer - International Edition</description>
 		<year>1995</year>
 		<publisher>Telegames</publisher>
+		<notes><![CDATA[
+No BGMs
+]]></notes>
+
 		<info name="alt_title" value="International Sensible Soccer (box, cart); Soccer (manual)"/>
 		<info name="serial" value="JA250"/>
 		<part name="cart" interface="jaguar_cart">
@@ -748,11 +883,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, hangs after loading a stage -->
 	<software name="skyhamm" supported="no">
 		<description>Skyhammer</description>
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
+		<notes><![CDATA[
+Hangs after loading a stage
+]]></notes>
+
 		<info name="serial" value="CF3001"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -773,12 +911,15 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- RSoD on Jaguar logo -->
 	<software name="soccerkd1" cloneof="soccerkd" supported="no">
 		<!-- uses BIOS security skipping hardware -->
 		<description>Soccer Kid (re-release)</description>
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
+		<notes><![CDATA[
+RSoD on Jaguar logo
+]]></notes>
+
 		<info name="serial" value="CF3002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -791,7 +932,6 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="soccerkd1h" cloneof="soccerkd">
 		<!-- uses universal header, only way to boot this at moment -->
 		<description>Soccer Kid (re-release, hacked)</description>
@@ -805,11 +945,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- gets to title screen (with wrong GFX width) then hangs -->
 	<software name="spacewar" supported="no">
 		<description>Space War 2000</description>
 		<year>2001</year>
 		<publisher>B&amp;C Computervisions</publisher>
+		<notes><![CDATA[
+Gets to title screen (with wrong GFX width) then hangs
+]]></notes>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="space war 2000.j64" size="2097152" crc="d821f5eb" sha1="6b010477155f30f1ecec7eab2c9a7544242bbd19" offset="000000" />
@@ -817,11 +960,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- gets to title screen (with wrong GFX width) then hangs -->
 	<software name="spacewarp" cloneof="spacewar" supported="no">
 		<description>Space War 2000 (prototype)</description>
 		<year>19??</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Gets to title screen (with wrong GFX width) then hangs
+]]></notes>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<!-- below dump contains 2M of "00"
@@ -832,11 +978,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- crashes when coin is input (P1 Pause) -->
 	<software name="speedst2" supported="no">
 		<description>Speedster II</description>
 		<year>1995?</year>
 		<publisher>Carousel Entertainment</publisher>
+		<notes><![CDATA[
+Crashes when coin is input (P1 Pause)
+]]></notes>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="speedster_ii.j64" size="2097152" crc="f7cfe6e6" sha1="508692e1b9bb57cdec35bb95829b23e49d6ec17e" offset="000000" />
@@ -844,11 +993,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- draws a cutted off Super Burnout copyright text then black screen -->
 	<software name="sburnout" supported="no">
 		<description>Super Burnout</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Draws a cutted off Super Burnout copyright text then black screen
+]]></notes>
+
 		<info name="serial" value="J9052E 700752-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -857,11 +1009,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- gets to title screen (with wrong GFX width) then hangs -->
 	<software name="superx3d" supported="no">
 		<description>SuperCross 3D</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Gets to title screen (with wrong GFX width) then hangs
+]]></notes>
+
 		<info name="serial" value="J9044E 705044-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -870,11 +1025,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, OSD full of pitch imperfections (name entry chars) -->
 	<software name="syndicat" supported="no">
 		<description>Syndicate</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+OSD full of pitch imperfections (name entry chars)
+]]></notes>
+
 		<info name="serial" value="L8002-SYNJAG"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -883,7 +1041,6 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="tempst2k" supported="no">
 		<description>Tempest 2000</description>
 		<year>1994</year>
@@ -896,11 +1053,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, background has pitch glitch -->
 	<software name="themeprk" supported="no">
 		<description>Theme Park</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Background has pitch glitch
+]]></notes>
+
 		<info name="serial" value="L8001-TPKJAG"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -909,11 +1069,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, no sprites, main menu with incorrect width, no sound (btanb) -->
 	<software name="ttoonadv" supported="no">
-		<description>Tiny Toon Adventures (Ver. 1)</description>
+		<description>Tiny Toon Adventures (ver. 1)</description>
 		<year>2010</year>
 		<publisher>Team Jaguar</publisher>
+		<notes><![CDATA[
+No sprites, main menu with incorrect width, no sound (btanb)
+]]></notes>
+
 		<info name="serial" value="J6004E 110403-110"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -922,11 +1085,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- heavy GFX issues, black screen if left on title screen -->
 	<software name="totalcar" supported="no">
 		<description>Total Carnage</description>
 		<year>2005</year>
 		<publisher>Songbird Productions</publisher>
+		<notes><![CDATA[
+Heavy GFX issues, black screen if left on title screen
+]]></notes>
+
 		<info name="serial" value="CF3006"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -935,11 +1101,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, gameplay screen flickers -->
 	<software name="towers2" supported="partial">
 		<description>Towers II - Plight of the Stargazer</description>
 		<year>1996</year>
 		<publisher>Telegames</publisher>
+		<notes><![CDATA[
+Gameplay screen flickers
+]]></notes>
+
 		<info name="serial" value="JA256"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -951,11 +1120,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, no sound, GFXs missing on gameplay and title screen -->
 	<software name="trevmcfr" supported="no">
-		<description>Trevor McFur in the Crescent Galaxy (Rev. A)</description>
+		<description>Trevor McFur in the Crescent Galaxy (rev. A)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+No sound, GFXs missing on gameplay and title screen
+]]></notes>
+
 		<info name="serial" value="J9001E 700701-2"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -964,11 +1136,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, no sound, GFXs missing on gameplay and title screen -->
 	<software name="trevmcfr1" cloneof="trevmcfr" supported="no">
 		<description>Trevor McFur in the Crescent Galaxy</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+No sound, GFXs missing on gameplay and title screen
+]]></notes>
+
 		<info name="serial" value="J9001E 700701"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -977,11 +1152,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, no BGMs, has minor GFX pitch issue when action summary message pops up after a play -->
 	<software name="troyaik" supported="partial">
 		<description>Troy Aikman NFL Football</description>
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
+		<notes><![CDATA[
+No BGMs, has minor GFX pitch issue when action summary message pops up after a play
+]]></notes>
+
 		<info name="serial" value="21942"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -990,11 +1168,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- black screen -->
 	<software name="ultravor" supported="no">
 		<description>Ultra Vortek</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+
 		<info name="serial" value="J9082E 700782-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -1003,11 +1184,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- RSoD on Jaguar logo -->
 	<software name="ultravor1" cloneof="ultravor" supported="no">
 		<description>Ultra Vortek (v0.94, prototype)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+RSoD on Jaguar logo
+]]></notes>
+
 		<info name="serial" value="J9082E 700782-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -1016,11 +1200,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, sound farts, missing/wrong GFXs on menus and gameplay -->
 	<software name="valdiser" supported="no">
 		<description>Val d'Isère Skiing and Snowboarding</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Sound farts, missing/wrong GFXs on menus and gameplay
+]]></notes>
+
 		<info name="serial" value="J9060E 700760-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1029,11 +1216,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, black screen after title screen, no sound -->
 	<software name="whitemen" supported="no">
 		<description>White Men Can't Jump</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Black screen after title screen, no sound
+]]></notes>
+
 		<info name="serial" value="J9070E 700770-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -1042,11 +1232,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, sound buzz when selecting new game, can eventually black screen or throw an exception -->
 	<software name="wolfn3d" supported="no">
 		<description>Wolfenstein 3D</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Sound buzz when selecting new game, can eventually black screen or throw an exception
+]]></notes>
+
 		<info name="serial" value="J9028 700128-001"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1055,11 +1248,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, pen corruption on background during gameplay, layers are slightly cut off -->
 	<software name="worms" supported="partial">
 		<description>Worms</description>
 		<year>1998</year>
 		<publisher>Telegames</publisher>
+		<notes><![CDATA[
+Pen corruption on background during gameplay, layers are slightly cut off
+]]></notes>
+
 		<info name="serial" value="JA103"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1068,11 +1264,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, minor GFX pitch issues, no sound -->
 	<software name="zero5" supported="partial">
 		<description>Zero 5</description>
 		<year>1997</year>
 		<publisher>Telegames</publisher>
+		<notes><![CDATA[
+Minor GFX pitch issues, no sound
+]]></notes>
+
 		<info name="serial" value="J4011"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1081,11 +1280,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- boot OK, sound metrics menu has glitchy bars (pause menu then press 'B') -->
 	<software name="zool2">
 		<description>Zool 2</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Sound metrics menu has glitchy bars (pause menu then press 'B')
+]]></notes>
+
 		<info name="serial" value="J9042E 700742-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1094,11 +1296,14 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
-	<!-- "licensed by Atari" screen then resets to Jaguar logo -->
 	<software name="zoop" supported="no">
 		<description>Zoop!</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+"licensed by Atari" screen then resets to Jaguar logo
+]]></notes>
+
 		<info name="serial" value="J9109E 705109-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="1048576" width="32" endianness="big">
@@ -1114,6 +1319,7 @@ These have been converted to j64 format with the universal header -->
 		<description>Atari Karts (prototype)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
 				<rom name="atari karts (beta).j64" size="4194304" crc="52c996e0" sha1="1bdaaa42b38f4c93a4aba34930e3ca406ac976c9" offset="000000" status="baddump" />
@@ -1125,6 +1331,7 @@ These have been converted to j64 format with the universal header -->
 		<description>Barkley Shut Up and Jam! (prototype)</description>
 		<year>1994</year>
 		<publisher>Accolade</publisher>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="barkley shut up and jam (prototype).j64" size="2097152" crc="3a3b1fd2" sha1="988897fd517ebd86742971205f3b29f9d70b5686" offset="000000" status="baddump" />
@@ -1136,6 +1343,7 @@ These have been converted to j64 format with the universal header -->
 		<description>Brett Hull NHL Hockey (prototype)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
 				<rom name="brett hull hockey (cart version).j64" size="4194304" crc="a4b819e4" sha1="77a9277a9b064c2f83c14c101368967ca50a50e4" offset="000000" status="baddump" />
@@ -1147,6 +1355,7 @@ These have been converted to j64 format with the universal header -->
 		<description>Breakout 2000 (prototype, xx0327)</description>
 		<year>1996</year>
 		<publisher>Telegames</publisher>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="breakout2000 (prototype) 3-27.j64" size="2097152" crc="20dbff9f" sha1="c8f29d04dacce1a83a1c93ab351737795d0f55db" offset="000000" status="baddump" />
@@ -1158,6 +1367,7 @@ These have been converted to j64 format with the universal header -->
 		<description>Cybermorph (prototype)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="1048576" width="32" endianness="big">
 				<rom name="cybermorph (early prototype).j64" size="1048576" crc="9eb389f9" sha1="589efbc772360fa51eddc096a162c8d9fe7838d3" offset="000000" status="baddump" />
@@ -1165,11 +1375,14 @@ These have been converted to j64 format with the universal header -->
 		</part>
 	</software>
 
-	<!-- black screen -->
 	<software name="cybrgolf" supported="no">
 		<description>Jack Nicklaus Cyber Golf examples (prototype, v0.01, 19940704)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="cyber golf v.001 (1994).j64" size="2097152" crc="7733f701" sha1="271e9411eb9e6c74240d254bdd7bab9a039bc6d9" offset="000000" status="baddump" />
@@ -1177,11 +1390,14 @@ These have been converted to j64 format with the universal header -->
 		</part>
 	</software>
 
-	<!-- black screen -->
 	<software name="cybrgolfa" cloneof="cybrgolf" supported="no">
 		<description>Cyber Golf (prototype)</description>
 		<year>199?</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="1048576" width="32" endianness="big">
 				<rom name="cyber golf v0.03 (19xx)(atari)[prototype].j64" size="1048576" crc="e20f0eef" sha1="89306ada943c87da740e6166f1f53837566513e2" offset="000000" status="baddump" />
@@ -1189,11 +1405,14 @@ These have been converted to j64 format with the universal header -->
 		</part>
 	</software>
 
-	<!-- black screen -->
 	<software name="cybrgolfb" cloneof="cybrgolf" supported="no">
 		<description>Cyber Golf (prototype, alt)</description>
 		<year>199?</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="1048576" width="32" endianness="big">
 				<rom name="cyber golf v0.04 (19xx)(atari)[prototype].j64" size="1048576" crc="be5e9ef1" sha1="cecec725301d7540f9392618f4fc948def88d398" offset="000000" status="baddump" />
@@ -1205,6 +1424,7 @@ These have been converted to j64 format with the universal header -->
 		<description>Defender 2000 (prototype)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
 				<rom name="defender 2000 (prototype).j64" size="4194304" crc="952d07f0" sha1="ae497f4839bde6c12c87c651a80633a23d6d0713" offset="000000" status="baddump" />
@@ -1216,6 +1436,7 @@ These have been converted to j64 format with the universal header -->
 		<description>Fight for Life (prototype, xx0907)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
 				<rom name="fight for life (beta 9-7).j64" size="4194304" crc="036a25e6" sha1="c92f1ff8ec83ebbe0f77f5a665169408df53b528" offset="000000" status="baddump" />
@@ -1227,6 +1448,7 @@ These have been converted to j64 format with the universal header -->
 		<description>Fight for Life (prototype, xx0322)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
 				<rom name="fight for life (beta 3-22).j64" size="4194304" crc="59458199" sha1="37fe344383d7991d19bf2c862d29a20eaf1da8ef" offset="000000" status="baddump" />
@@ -1234,11 +1456,14 @@ These have been converted to j64 format with the universal header -->
 		</part>
 	</software>
 
-	<!-- black screen -->
 	<software name="gorf2k" supported="no">
-		<description>Gorf 2000 (Demo)</description>
+		<description>Gorf 2000 (demo)</description>
 		<year>2008</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="131072" width="32" endianness="big">
 				<rom name="gorf 2000 (2008).j64" size="131072" crc="74bdcb91" sha1="cfc87be2e43032ce3902b5073e63e3c6ff0e6018" offset="000000" status="baddump" />
@@ -1246,12 +1471,15 @@ These have been converted to j64 format with the universal header -->
 		</part>
 	</software>
 
-	<!-- boot OK, text GFXs are solid filled, no BGMs, GFXs are cut off during gameplay -->
 	<software name="missilvr" supported="no">
 		<!-- this was intended to be released with the VR headset -->
 		<description>Missile Command VR</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Text GFXs are solid filled, no BGMs, GFXs are cut off during gameplay
+]]></notes>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="missile command vr (not 3d).j64" size="2097152" crc="5810cadb" sha1="0e95613020d1b3a0ac76d994423c6f15ddfe9703" offset="000000" status="baddump" />
@@ -1263,6 +1491,7 @@ These have been converted to j64 format with the universal header -->
 		<description>Rayman (prototype)</description>
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="rayman (early prototype).j64" size="2097152" crc="254dd949" sha1="ba34de71a8d278ba76bad19964d2d886ddb94a2e" offset="000000" status="baddump" />
@@ -1274,6 +1503,7 @@ These have been converted to j64 format with the universal header -->
 		<description>Tiny Toon Adventures (prototype)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="tiny toons plucky duck (unreleased tech demo).j64" size="2097152" crc="4e77a83c" sha1="032aa31cef116bfba8632c14bc2fce5bc44ff137" offset="000000" status="baddump" />
@@ -1281,11 +1511,14 @@ These have been converted to j64 format with the universal header -->
 		</part>
 	</software>
 
-	<!-- black screen -->
 	<software name="ultbrain" supported="no">
 		<description>Ultimate Brain Games (prototype)</description>
 		<year>199?</year>
 		<publisher>Crazy Ace</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
+
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="braingames (unreleased).j64" size="2097152" crc="9aaf8efd" sha1="b0026e73787c7a901f0b7e71418acdaf54981d17" offset="000000" status="baddump" />

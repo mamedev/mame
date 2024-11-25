@@ -19,8 +19,8 @@ TODO:
 #include "emu.h"
 
 #include "cpu/cops1/mm5799.h"
-#include "machine/ds8874.h"
 #include "sound/spkrdev.h"
+#include "video/ds8874.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -51,8 +51,8 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<cops1_base_device> m_maincpu;

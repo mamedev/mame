@@ -863,6 +863,7 @@ void running_machine::handle_saveload()
 	if (!m_saveload_pending_file.empty())
 	{
 		const char *const opname = (m_saveload_schedule == saveload_schedule::LOAD) ? "load" : "save";
+		const char *const preposname = (m_saveload_schedule == saveload_schedule::LOAD) ? "from" : "to";
 
 		// if there are anonymous timers, we can't save just yet, and we can't load yet either
 		// because the timers might overwrite data we have loaded
@@ -870,7 +871,7 @@ void running_machine::handle_saveload()
 		{
 			// if more than a second has passed, we're probably screwed
 			if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
-				popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
+				popmessage("Error: Unable to %s state %s %s due to pending anonymous timers. See error.log for details.", opname, preposname, m_saveload_pending_file);
 			else
 				return; // return without cancelling the operation
 		}
@@ -883,39 +884,36 @@ void running_machine::handle_saveload()
 			auto const filerr = file.open(m_saveload_pending_file);
 			if (!filerr)
 			{
-				const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
-
 				// read/write the save state
 				save_error saverr = (m_saveload_schedule == saveload_schedule::LOAD) ? m_save.read_file(file) : m_save.write_file(file);
 
 				// handle the result
 				switch (saverr)
 				{
-				case STATERR_ILLEGAL_REGISTRATIONS:
-					popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
-					break;
-
 				case STATERR_INVALID_HEADER:
-					popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this machine.", opname);
+					popmessage("Error: Unable to %s state %s %s due to an invalid header. Make sure the save state is correct for this system.", opname, preposname, m_saveload_pending_file);
 					break;
 
 				case STATERR_READ_ERROR:
-					popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
+					popmessage("Error: Unable to %s state %s %s due to a read error (file is likely corrupt).", opname, preposname, m_saveload_pending_file);
 					break;
 
 				case STATERR_WRITE_ERROR:
-					popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
+					popmessage("Error: Unable to %s state %s %s due to a write error. Verify there is enough disk space.", opname, preposname, m_saveload_pending_file);
 					break;
 
 				case STATERR_NONE:
+				{
+					const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "Loaded" : "Saved";
 					if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
-						popmessage("State successfully %s.\nWarning: Save states are not officially supported for this machine.", opnamed);
+						popmessage("%s state %s %s.\nWarning: Save states are not officially supported for this system.", opnamed, preposname, m_saveload_pending_file);
 					else
-						popmessage("State successfully %s.", opnamed);
+						popmessage("%s state %s %s.", opnamed, preposname, m_saveload_pending_file);
 					break;
+				}
 
 				default:
-					popmessage("Error: Unknown error during state %s.", opnamed);
+					popmessage("Error: Unknown error during %s state %s %s.", opname, preposname, m_saveload_pending_file);
 					break;
 				}
 
@@ -926,11 +924,11 @@ void running_machine::handle_saveload()
 			else if ((openflags == OPEN_FLAG_READ) && (std::errc::no_such_file_or_directory == filerr))
 			{
 				// attempt to load a non-existent savestate, report empty slot
-				popmessage("Error: No savestate file to load.", opname);
+				popmessage("Error: Load state file %s not found.", m_saveload_pending_file);
 			}
 			else
 			{
-				popmessage("Error: Failed to open file for %s operation.", opname);
+				popmessage("Error: Failed to open %s for %s state operation.", m_saveload_pending_file, opname);
 			}
 		}
 	}
@@ -1160,8 +1158,17 @@ void running_machine::nvram_save()
 			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			if (!file.open(nvram_filename(nvram.device())))
 			{
+				bool error = false;
+
 				if (!nvram.nvram_save(file))
+				{
+					error = true;
 					osd_printf_error("Error writing NVRAM file %s\n", file.filename());
+				}
+
+				// close and perhaps delete the file
+				if (error || file.size() == 0)
+					file.remove_on_close();
 				file.close();
 			}
 		}

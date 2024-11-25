@@ -17,7 +17,8 @@ TODO
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/exorterm.h"
+#include "exorterm.h"
+
 #include "speaker.h"
 
 #include "exorterm155.lh"

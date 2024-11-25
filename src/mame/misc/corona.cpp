@@ -358,7 +358,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void blitter_y_w(uint8_t data);
@@ -377,22 +377,22 @@ private:
 	void corona_palette(palette_device &palette) const;
 	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void luckyrlt_cpu_io_map(address_map &map);
-	void luckyrlt_map(address_map &map);
-	void luckyrlt_sound_cpu_io_map(address_map &map);
-	void luckyrlt_sound_map(address_map &map);
-	void re800_cpu_io_map(address_map &map);
-	void re800_map(address_map &map);
-	void re800_sound_cpu_io_map(address_map &map);
-	void re800_sound_map(address_map &map);
-	void winner81_cpu_io_map(address_map &map);
-	void winner81_map(address_map &map);
-	void winner81_sound_cpu_io_map(address_map &map);
-	void winner81_sound_map(address_map &map);
-	void winner82_cpu_io_map(address_map &map);
-	void winner82_map(address_map &map);
-	void winner82_sound_cpu_io_map(address_map &map);
-	void winner82_sound_map(address_map &map);
+	void luckyrlt_cpu_io_map(address_map &map) ATTR_COLD;
+	void luckyrlt_map(address_map &map) ATTR_COLD;
+	void luckyrlt_sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void luckyrlt_sound_map(address_map &map) ATTR_COLD;
+	void re800_cpu_io_map(address_map &map) ATTR_COLD;
+	void re800_map(address_map &map) ATTR_COLD;
+	void re800_sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void re800_sound_map(address_map &map) ATTR_COLD;
+	void winner81_cpu_io_map(address_map &map) ATTR_COLD;
+	void winner81_map(address_map &map) ATTR_COLD;
+	void winner81_sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void winner81_sound_map(address_map &map) ATTR_COLD;
+	void winner82_cpu_io_map(address_map &map) ATTR_COLD;
+	void winner82_map(address_map &map) ATTR_COLD;
+	void winner82_sound_cpu_io_map(address_map &map) ATTR_COLD;
+	void winner82_sound_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_blitter_x_reg = 0;
 	uint8_t m_blitter_y_reg = 0;
@@ -1701,6 +1701,18 @@ ROM_START(re800v1)
 	ROM_LOAD( "promcoro.123",   0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
+ROM_START(re800v1a)  // same version, but with some registers changed.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("76b1.bin", 0x0000, 0x4000, CRC(622b57dd) SHA1(90ac6b845e97ace34d26c250c4e4533b601156d3) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD("re800snd.16", 0x0000, 0x0800, CRC(54d312fa) SHA1(6ed31f091362f7baa59afef91410fe946894e2ee) )
+	ROM_RELOAD(             0x0800, 0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "promcoro.123",   0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+ROM_END
+
 
 ROM_START(re800v3)
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1781,7 +1793,8 @@ GAME(  1981, winner81,  winner82, winner81, winner81, corona_state, empty_init, 
 GAME(  1981, winner81b, winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
 GAME(  198?, legrandc,  0,        winner82, winner82, corona_state, empty_init, ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           0 )
 GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                        layout_re800 )
-GAMEL( 1991, re800v1,   0,        re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                        layout_re800 )
+GAMEL( 1991, re800v1,   0,        re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0, set 1)",              0,                        layout_re800 )
+GAMEL( 1991, re800v1a,  re800v1,  re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0, set 2)",              0,                        layout_re800 )
 GAMEL( 1991, re800v3,   0,        re800,    re800v3,  corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS, layout_re800 )
 GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                        layout_re800 )
 GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                        layout_luckyrlt )

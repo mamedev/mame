@@ -605,18 +605,22 @@ bool text_layout::hit_test(float x, float y, size_t &start, size_t &span)
 //  restyle
 //-------------------------------------------------
 
-void text_layout::restyle(size_t start, size_t span, rgb_t *fgcolor, rgb_t *bgcolor)
+void text_layout::restyle(size_t start, size_t span, rgb_t const *fgcolor, rgb_t const *bgcolor)
 {
 	for (const auto &line : m_lines)
 	{
 		for (size_t i = 0; i < line->character_count(); i++)
 		{
 			auto &ch = line->character(i);
-			if (ch.source.start >= start && ch.source.start + ch.source.span <= start + span)
+			if ((ch.source.start + ch.source.span) > (start + span))
 			{
-				if (fgcolor != nullptr)
+				return;
+			}
+			else if (ch.source.start >= start)
+			{
+				if (fgcolor)
 					ch.style.fgcolor = *fgcolor;
-				if (bgcolor != nullptr)
+				if (bgcolor)
 					ch.style.bgcolor = *bgcolor;
 			}
 		}

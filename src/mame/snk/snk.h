@@ -64,14 +64,14 @@ public:
 	void madcrush(machine_config &config);
 
 	int sound_busy_r();
-	template <int Which> DECLARE_CUSTOM_INPUT_MEMBER(gwar_rotary);
-	template <int Which> DECLARE_CUSTOM_INPUT_MEMBER(gwarb_rotary);
-	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_x);
-	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_y);
-	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
+	template <int Which> ioport_value gwar_rotary();
+	template <int Which> ioport_value gwarb_rotary();
+	ioport_value countryc_trackball_x();
+	ioport_value countryc_trackball_y();
+	template <int Mask> ioport_value snk_bonus_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -247,46 +247,46 @@ private:
 	int turbofront_check8(int small, int num);
 	void ymirq_callback_1(int state);
 
-	void Y8950_sound_map(address_map &map);
-	void YM3526_Y8950_sound_map(address_map &map);
-	void YM3526_YM3526_sound_map(address_map &map);
-	void YM3812_Y8950_sound_map(address_map &map);
-	void YM3812_sound_map(address_map &map);
-	void aso_YM3526_sound_map(address_map &map);
-	void aso_cpuA_map(address_map &map);
-	void aso_cpuB_map(address_map &map);
-	void bermudat_cpuA_map(address_map &map);
-	void bermudat_cpuB_map(address_map &map);
-	void countryc_cpuA_map(address_map &map);
-	void gwar_cpuA_map(address_map &map);
-	void gwar_cpuB_map(address_map &map);
-	void gwara_cpuA_map(address_map &map);
-	void gwara_cpuB_map(address_map &map);
-	void hal21_cpuA_map(address_map &map);
-	void hal21_cpuB_map(address_map &map);
-	void hal21_sound_map(address_map &map);
-	void hal21_sound_portmap(address_map &map);
-	void ikari_cpuA_map(address_map &map);
-	void ikari_cpuB_map(address_map &map);
-	void jcross_cpuA_map(address_map &map);
-	void jcross_cpuB_map(address_map &map);
-	void jcross_sound_map(address_map &map);
-	void jcross_sound_portmap(address_map &map);
-	void madcrash_cpuA_map(address_map &map);
-	void madcrash_cpuB_map(address_map &map);
-	void madcrush_cpuA_map(address_map &map);
-	void madcrush_cpuB_map(address_map &map);
-	void marvins_cpuA_map(address_map &map);
-	void marvins_cpuB_map(address_map &map);
-	void marvins_sound_map(address_map &map);
-	void marvins_sound_portmap(address_map &map);
-	void sgladiat_cpuA_map(address_map &map);
-	void sgladiat_cpuB_map(address_map &map);
-	void tdfever_cpuA_map(address_map &map);
-	void tdfever_cpuB_map(address_map &map);
-	void tnk3_YM3526_sound_map(address_map &map);
-	void tnk3_cpuA_map(address_map &map);
-	void tnk3_cpuB_map(address_map &map);
+	void Y8950_sound_map(address_map &map) ATTR_COLD;
+	void YM3526_Y8950_sound_map(address_map &map) ATTR_COLD;
+	void YM3526_YM3526_sound_map(address_map &map) ATTR_COLD;
+	void YM3812_Y8950_sound_map(address_map &map) ATTR_COLD;
+	void YM3812_sound_map(address_map &map) ATTR_COLD;
+	void aso_YM3526_sound_map(address_map &map) ATTR_COLD;
+	void aso_cpuA_map(address_map &map) ATTR_COLD;
+	void aso_cpuB_map(address_map &map) ATTR_COLD;
+	void bermudat_cpuA_map(address_map &map) ATTR_COLD;
+	void bermudat_cpuB_map(address_map &map) ATTR_COLD;
+	void countryc_cpuA_map(address_map &map) ATTR_COLD;
+	void gwar_cpuA_map(address_map &map) ATTR_COLD;
+	void gwar_cpuB_map(address_map &map) ATTR_COLD;
+	void gwara_cpuA_map(address_map &map) ATTR_COLD;
+	void gwara_cpuB_map(address_map &map) ATTR_COLD;
+	void hal21_cpuA_map(address_map &map) ATTR_COLD;
+	void hal21_cpuB_map(address_map &map) ATTR_COLD;
+	void hal21_sound_map(address_map &map) ATTR_COLD;
+	void hal21_sound_portmap(address_map &map) ATTR_COLD;
+	void ikari_cpuA_map(address_map &map) ATTR_COLD;
+	void ikari_cpuB_map(address_map &map) ATTR_COLD;
+	void jcross_cpuA_map(address_map &map) ATTR_COLD;
+	void jcross_cpuB_map(address_map &map) ATTR_COLD;
+	void jcross_sound_map(address_map &map) ATTR_COLD;
+	void jcross_sound_portmap(address_map &map) ATTR_COLD;
+	void madcrash_cpuA_map(address_map &map) ATTR_COLD;
+	void madcrash_cpuB_map(address_map &map) ATTR_COLD;
+	void madcrush_cpuA_map(address_map &map) ATTR_COLD;
+	void madcrush_cpuB_map(address_map &map) ATTR_COLD;
+	void marvins_cpuA_map(address_map &map) ATTR_COLD;
+	void marvins_cpuB_map(address_map &map) ATTR_COLD;
+	void marvins_sound_map(address_map &map) ATTR_COLD;
+	void marvins_sound_portmap(address_map &map) ATTR_COLD;
+	void sgladiat_cpuA_map(address_map &map) ATTR_COLD;
+	void sgladiat_cpuB_map(address_map &map) ATTR_COLD;
+	void tdfever_cpuA_map(address_map &map) ATTR_COLD;
+	void tdfever_cpuB_map(address_map &map) ATTR_COLD;
+	void tnk3_YM3526_sound_map(address_map &map) ATTR_COLD;
+	void tnk3_cpuA_map(address_map &map) ATTR_COLD;
+	void tnk3_cpuB_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SNK_SNK_H

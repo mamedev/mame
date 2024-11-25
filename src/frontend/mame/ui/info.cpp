@@ -230,7 +230,7 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 	, m_has_analog(false)
 {
 	ioport_list local_ports;
-	std::string sink;
+	std::ostringstream sink;
 	for (device_t &device : device_enumerator(config.root_device()))
 	{
 		// the "no sound hardware" warning doesn't make sense when you plug in a sound card
@@ -576,11 +576,6 @@ void menu_game_info::populate()
 {
 }
 
-bool menu_game_info::handle(event const *ev)
-{
-	return ev && handle_key(ev->iptkey);
-}
-
 
 /*-------------------------------------------------
   menu_warn_info - handle the emulation warnings menu
@@ -638,11 +633,6 @@ void menu_warn_info::populate_text(std::optional<text_layout> &layout, float &wi
 
 void menu_warn_info::populate()
 {
-}
-
-bool menu_warn_info::handle(event const *ev)
-{
-	return ev && handle_key(ev->iptkey);
 }
 
 

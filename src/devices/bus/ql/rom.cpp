@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "rom.h"
 
+#include <tuple>
+
 
 
 //**************************************************************************
@@ -87,11 +89,17 @@ void ql_rom_cartridge_slot_device::device_start()
 
 std::pair<std::error_condition, std::string> ql_rom_cartridge_slot_device::call_load()
 {
+	std::error_condition err;
+
 	if (m_card)
 	{
 		if (!loaded_through_softlist())
 		{
-			fread(m_card->m_rom, length());
+			size_t const size = length();
+			size_t actual;
+			std::tie(err, m_card->m_rom, actual) = util::read(image_core_file(), size);
+			if (!err && (actual != size))
+				err = std::errc::io_error;
 		}
 		else
 		{
@@ -99,7 +107,7 @@ std::pair<std::error_condition, std::string> ql_rom_cartridge_slot_device::call_
 		}
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return std::make_pair(err, std::string());
 }
 
 

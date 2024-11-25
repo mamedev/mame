@@ -8,7 +8,7 @@ TODO:
 - KBDC, not from super I/O;
 - Don't recognize an attached HDD, check default CMOS settings;
 - loops at PC=eda2d, reads the NMI vector;
-- game roms looks encrypted or bad, may require a missing boot device;
+- game ROMs are encrypted (currently at least partially decrypted), may require a missing boot device;
 
 Hardware consists of:
 
@@ -30,19 +30,15 @@ Unpopulated spaces marked for: DS5002FP, PIC16C54, 93C56 EEPROM, a couple more u
 #include "emu.h"
 
 #include "bus/isa/isa_cards.h"
-#include "bus/pci/rivatnt.h"
 #include "cpu/i386/i386.h"
 #include "machine/8042kbdc.h"
 #include "machine/mc146818.h"
 #include "machine/mediagx_cs5530_bridge.h"
 #include "machine/mediagx_cs5530_ide.h"
+#include "machine/mediagx_cs5530_video.h"
 #include "machine/mediagx_host.h"
 #include "machine/pci.h"
 #include "machine/zfmicro_usb.h"
-
-#include "screen.h"
-
-#define ENABLE_VGA 0
 
 namespace {
 
@@ -58,12 +54,14 @@ public:
 
 	void matrix(machine_config &config);
 
+	void init_decryption();
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ds1287_device> m_rtc;
 	required_device<kbdc8042_device> m_kbdc;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -77,7 +75,6 @@ INPUT_PORTS_END
 
 void matrix_state::matrix(machine_config &config)
 {
-	// basic machine hardware
 	MEDIAGX(config, m_maincpu, 233'000'000); // Cyrix MediaGX GXm-266GP
 	m_maincpu->set_addrmap(AS_PROGRAM, &matrix_state::main_map);
 	m_maincpu->set_irq_acknowledge_callback("pci:12.0:pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -106,10 +103,6 @@ void matrix_state::matrix(machine_config &config)
 	// Tries to initialize MediaGX F4 -> ISA -> PCI
 	// May actually be a ZFMicro PCI Bridge (0x10780400)?
 	PCI_BRIDGE(config, "pci:01.0", 0, 0x10780000, 0);
-#if ENABLE_VGA
-	// NOTE: most MediaGX boards don't even provide an AGP port, at best you get PCI slots.
-	PCI_SLOT(config, "pci:01.0:1", pci_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
-#endif
 
 	// "pci:12.0" or "pci:10.0" depending on pin H26 (readable in bridge thru PCI index $44)
 	mediagx_cs5530_bridge_device &isa(MEDIAGX_CS5530_BRIDGE(config, "pci:12.0", 0, "maincpu", "pci:12.2"));
@@ -127,7 +120,7 @@ void matrix_state::matrix(machine_config &config)
 	ide.irq_sec().set("pci:12.0", FUNC(mediagx_cs5530_bridge_device::pc_irq15_w));
 
 	// "pci:12.3" XpressAUDIO
-	// "pci:12.4" XpressVIDEO
+	MEDIAGX_CS5530_VIDEO(config, "pci:12.4", 0);
 
 	ZFMICRO_USB(config, "pci:13.0", 0);
 
@@ -150,7 +143,23 @@ ROM_START( matrix )
 	ROM_LOAD( "matrix_031203u20.bin", 0x280000, 0x080000, CRC(f87ac4ae) SHA1(ef9b730a1113d36ef6a041fe36d77edfa255ad98) )
 ROM_END
 
+
+void matrix_state::init_decryption() // at least enough to see strings from various programs like DOS-C, PMODE/W, UPX, etc
+{
+	uint8_t *rom = memregion("unsorted")->base();
+	std::vector<uint8_t> buffer(0x300000);
+
+	memcpy(&buffer[0], rom, 0x300000);
+
+
+	for (int i = 0; i < 0x300000; i++)
+	{
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 0, 9, 8, 7, 6, 5, 4, 3, 1, 10, 2)];
+		rom[i] = bitswap<8>(rom[i] ^ 0xda, 7, 6, 5, 4, 1, 2, 0, 3);
+	}
+}
+
 } // anonymous namespace
 
 
-GAME( 200?, matrix, 0, matrix, matrix, matrix_state, empty_init, ROT0, "<unknown>", "Matrix", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, matrix, 0, matrix, matrix, matrix_state, init_decryption, ROT0, "<unknown>", "Matrix", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

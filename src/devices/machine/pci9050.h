@@ -26,12 +26,12 @@ public:
 	void set_map(int id, const address_map_constructor &map, device_t *device);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	// PCI9050 I/O register space handlers
 	uint32_t lasrr_r(offs_t offset);

@@ -41,7 +41,7 @@
 //**************************************************************************
 
 #define UPD7220_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int x, uint32_t address)
-#define UPD7220_DRAW_TEXT_LINE_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)
+#define UPD7220_DRAW_TEXT_LINE_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top)
 
 
 //**************************************************************************
@@ -57,10 +57,18 @@ class upd7220_device :  public device_t,
 {
 public:
 	using display_pixels_delegate = device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, uint32_t address)>;
-	using draw_text_delegate = device_delegate<void (bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)>;
+	using draw_text_delegate = device_delegate<void (bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top)>;
 
 	// construction/destruction
 	upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T>
+	upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&screen_tag)
+		: upd7220_device(mconfig, tag, owner, clock)
+	{
+		set_screen(std::forward<T>(screen_tag));
+	}
+
 
 	template <typename... T> void set_display_pixels(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_draw_text(T &&... args) { m_draw_text_cb.set(std::forward<T>(args)...); }
@@ -79,15 +87,22 @@ public:
 	void ext_sync_w(int state);
 	void lpen_w(int state);
 
+	std::tuple<u32, u16, u8> get_area_partition_props(int line);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	upd7220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
+
+	virtual int translate_command(uint8_t data);
+	virtual void device_clock_changed() override;
 
 	TIMER_CALLBACK_MEMBER(hsync_update);
 	TIMER_CALLBACK_MEMBER(vsync_update);
@@ -124,14 +139,13 @@ private:
 	void draw_rectangle();
 	void draw_arc();
 	void draw_char();
-	int translate_command(uint8_t data);
 	void process_fifo();
 	void continue_command();
 	void update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int mixed);
 	void update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap);
 
-	void upd7220_vram(address_map &map);
+	void upd7220_vram(address_map &map) ATTR_COLD;
 
 	display_pixels_delegate     m_display_cb;
 	draw_text_delegate          m_draw_text_cb;
@@ -149,45 +163,45 @@ private:
 	uint32_t m_dma_transfer_length;   // DMA transfer length in bytes
 
 	uint16_t m_mask;                  // mask register
-	uint8_t m_pitch;                  // number of word addresses in display memory in the horizontal direction
+	uint16_t m_pitch;                 // number of word addresses in display memory in the horizontal direction
 	uint32_t m_ead;                   // execute word address
 	uint32_t m_lad;                   // light pen address
 
 	uint8_t m_ra[16];                 // parameter RAM
-	int m_ra_addr;                  // parameter RAM address
+	int m_ra_addr;                    // parameter RAM address
 
 	uint8_t m_sr;                     // status register
 	uint8_t m_cr;                     // command register
 	uint8_t m_pr[17];                 // parameter byte register
-	int m_param_ptr;                // parameter pointer
+	int m_param_ptr;                  // parameter pointer
 
 	uint8_t m_fifo[16];               // FIFO data queue
-	int m_fifo_flag[16];            // FIFO flag queue
-	int m_fifo_ptr;                 // FIFO pointer
-	int m_fifo_dir;                 // FIFO direction
+	int m_fifo_flag[16];              // FIFO flag queue
+	int m_fifo_ptr;                   // FIFO pointer
+	int m_fifo_dir;                   // FIFO direction
 
 	uint8_t m_mode;                   // mode of operation
 
-	int m_de;                       // display enabled
-	int m_m;                        // 0 = accept external vertical sync (slave mode) / 1 = generate & output vertical sync (master mode)
-	int m_aw;                       // active display words per line - 2 (must be even number with bit 0 = 0)
-	int m_al;                       // active display lines per video field
-	int m_vs;                       // vertical sync width - 1
-	int m_vfp;                      // vertical front porch width - 1
-	int m_vbp;                      // vertical back porch width - 1
-	int m_hs;                       // horizontal sync width - 1
-	int m_hfp;                      // horizontal front porch width - 1
-	int m_hbp;                      // horizontal back porch width - 1
+	int m_de;                         // display enabled
+	int m_m;                          // 0 = accept external vertical sync (slave mode) / 1 = generate & output vertical sync (master mode)
+	int m_aw;                         // active display words per line - 2 (must be even number with bit 0 = 0)
+	int m_al;                         // active display lines per video field
+	int m_vs;                         // vertical sync width - 1
+	int m_vfp;                        // vertical front porch width - 1
+	int m_vbp;                        // vertical back porch width - 1
+	int m_hs;                         // horizontal sync width - 1
+	int m_hfp;                        // horizontal front porch width - 1
+	int m_hbp;                        // horizontal back porch width - 1
 
-	int m_dc;                       // display cursor
-	int m_sc;                       // 0 = blinking cursor / 1 = steady cursor
-	int m_br;                       // blink rate
-	int m_ctop;                     // cursor top line number in the row
-	int m_cbot;                     // cursor bottom line number in the row (CBOT < LR)
-	int m_lr;                       // lines per character row - 1
+	int m_dc;                         // display cursor
+	int m_sc;                         // 0 = blinking cursor / 1 = steady cursor
+	int m_br;                         // blink rate
+	int m_ctop;                       // cursor top line number in the row
+	int m_cbot;                       // cursor bottom line number in the row (CBOT < LR)
+	int m_lr;                         // lines per character row - 1
 
-	int m_disp;                     // display zoom factor
-	int m_gchr;                     // zoom factor for graphics character writing and area filling
+	int m_disp;                       // display zoom factor
+	int m_gchr;                       // zoom factor for graphics character writing and area filling
 
 	uint8_t m_bitmap_mod;
 
@@ -211,7 +225,23 @@ private:
 };
 
 
+// ======================> upd7220a_device
+
+class upd7220a_device : public upd7220_device
+{
+public:
+	// construction/destruction
+	upd7220a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual int translate_command(uint8_t data) override;
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(UPD7220, upd7220_device)
+DECLARE_DEVICE_TYPE(UPD7220A, upd7220a_device)
 
 #endif // MAME_VIDEO_UPD7220_H

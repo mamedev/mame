@@ -63,9 +63,9 @@ public:
 	void goldart(machine_config& config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<ds5002fp_device> m_mcu;
@@ -77,8 +77,8 @@ private:
 
 
 	uint32_t screen_update_goldart(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
-	void dallas_rom(address_map& map);
-	void dallas_ram(address_map& map);
+	void dallas_rom(address_map &map) ATTR_COLD;
+	void dallas_ram(address_map &map) ATTR_COLD;
 
 	uint8_t m_ram[0x10000];
 	uint8_t m_ram2[0x10000];

@@ -45,7 +45,7 @@ void mn1400_cpu_device::op_illegal()
 
 // opcodes
 
-// load/store instructions
+// data transfer instructions
 
 void mn1400_cpu_device::op_l()
 {

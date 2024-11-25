@@ -183,11 +183,6 @@ void zaccaria_state::flip_screen_x_w(int state)
 	update_colscroll();
 }
 
-void zaccaria_state::flip_screen_y_w(int state)
-{
-	flip_screen_y_set(state);
-}
-
 
 
 /***************************************************************************

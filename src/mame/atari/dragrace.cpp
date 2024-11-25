@@ -50,9 +50,9 @@ public:
 	void dragrace(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -93,11 +93,9 @@ private:
 	TIMER_CALLBACK_MEMBER(scanline_irq);
 	TIMER_CALLBACK_MEMBER(irq_off);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 TILE_GET_INFO_MEMBER(dragrace_state::get_tile_info)
 {
@@ -158,8 +156,6 @@ uint32_t dragrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::frame_callback)
 {

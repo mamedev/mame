@@ -4,7 +4,7 @@
 // Menu controller, stores / increments menu position etc. used on handhelds that typically have BL on the boot screen (BaoBaoLong?)
 
 #include "emu.h"
-#include "machine/bl_handhelds_menucontrol.h"
+#include "bl_handhelds_menucontrol.h"
 
 DEFINE_DEVICE_TYPE(BL_HANDHELDS_MENUCONTROL, bl_handhelds_menucontrol_device, "blhandheldmenu", "BaoBaoLong Handhelds Menu Controller")
 

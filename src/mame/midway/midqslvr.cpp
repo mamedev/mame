@@ -275,6 +275,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/pci-smbus.h"
@@ -319,7 +320,7 @@ private:
 	// optional for debugging ...
 	optional_device<voodoo_2_pci_device> m_voodoo2;
 
-	void midqslvr_map(address_map &map);
+	void midqslvr_map(address_map &map) ATTR_COLD;
 
 	static void superio_config(device_t *device);
 };
@@ -337,7 +338,7 @@ public:
 private:
 	required_device<pentium3_device> m_maincpu;
 
-	void graphite_map(address_map &map);
+	void graphite_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -377,6 +378,8 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	//m_maincpu->set_addrmap(AS_IO, &midway_quicksilver2_state::midqslvr_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
+
+	P87C552(config, "iocpu", 16'000'000).set_disable();
 
 	PCI_ROOT(config, "pci", 0);
 	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);

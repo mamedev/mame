@@ -2,7 +2,6 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   z180.c
  *   Portable Z180 emulator V0.3
  *
  *****************************************************************************/
@@ -13,8 +12,8 @@
         - HALT processing is not yet perfect. The manual states that
           during HALT, all dma and internal i/o incl. timers continue to
           work. Currently, only timers are implemented. Ideally, the
-          burn_cycles routine would go away and halt processing be
-          implemented in cpu_execute.
+          (currently unused) burn_cycles routine would go away and halt
+          processing be implemented in execute_run.
 
         - Documentation for RXS/CTS1 pin is contradictory.
 
@@ -1919,7 +1918,7 @@ again:
 		if ((m_dstat & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
 			(m_dmode & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
 		{
-			debugger_instruction_hook(_PCD);
+			debugger_wait_hook();
 
 			/* FIXME z180_dma0 should be handled in handle_io_timers */
 			curcycles = z180_dma0(m_icount);
@@ -1935,18 +1934,21 @@ again:
 				handle_io_timers(curcycles);
 				m_after_EI = 0;
 
-				_PPC = _PCD;
-				debugger_instruction_hook(_PCD);
-
 				if (!m_HALT)
 				{
+					_PPC = _PCD;
+					debugger_instruction_hook(_PCD);
+
 					m_R++;
 					m_extra_cycles = 0;
 					curcycles = exec_op(ROP());
 					curcycles += m_extra_cycles;
 				}
 				else
+				{
+					debugger_wait_hook();
 					curcycles = 3;
+				}
 
 				m_icount -= curcycles;
 
@@ -1993,18 +1995,21 @@ again:
 			handle_io_timers(curcycles);
 			m_after_EI = 0;
 
-			_PPC = _PCD;
-			debugger_instruction_hook(_PCD);
-
 			if (!m_HALT)
 			{
+				_PPC = _PCD;
+				debugger_instruction_hook(_PCD);
+
 				m_R++;
 				m_extra_cycles = 0;
 				curcycles = exec_op(ROP());
 				curcycles += m_extra_cycles;
 			}
 			else
+			{
+				debugger_wait_hook();
 				curcycles = 3;
+			}
 
 			m_icount -= curcycles;
 			handle_io_timers(curcycles);
@@ -2015,7 +2020,7 @@ again:
 /****************************************************************************
  * Burn 'cycles' T-states. Adjust R register for the lost time
  ****************************************************************************/
-void z180_device::execute_burn(int32_t cycles)
+void z180_device::burn_cycles(int32_t cycles)
 {
 	int extra_cycles = memory_wait_states();
 

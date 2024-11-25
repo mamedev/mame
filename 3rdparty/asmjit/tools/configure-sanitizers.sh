@@ -11,3 +11,7 @@ echo ""
 echo "== [Configuring Build - Release_UBSAN] =="
 eval cmake "${CURRENT_DIR}/.." -B "${BUILD_DIR}/Release_UBSAN" ${BUILD_OPTIONS} -DCMAKE_BUILD_TYPE=Release -DASMJIT_SANITIZE=undefined
 echo ""
+
+echo "== [Configuring Build - Release_MSAN] =="
+eval cmake "${CURRENT_DIR}/.." -B "${BUILD_DIR}/Release_MSAN" ${BUILD_OPTIONS} -DCMAKE_BUILD_TYPE=Release -DASMJIT_SANITIZE=memory
+echo ""

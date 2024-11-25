@@ -33,8 +33,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void i82439tx_configure_memory(uint8_t val, offs_t begin, offs_t end);
 	void update_smram_mappings();

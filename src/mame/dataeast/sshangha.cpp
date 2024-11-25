@@ -134,7 +134,7 @@ public:
 	void init_sshangha();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -172,13 +172,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void sshangha_main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sshanghab_main_map(address_map &map);
+	void sshangha_main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sshanghab_main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -248,8 +246,6 @@ uint32_t sshangha_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-
-// machine
 
 /******************************************************************************/
 
@@ -511,7 +507,13 @@ static const gfx_layout tilelayout =
 static GFXDECODE_START( gfx_sshangha )
 	GFXDECODE_ENTRY( "tiles",    0, charlayout,  0x000, 64 ) // 8x8
 	GFXDECODE_ENTRY( "tiles",    0, tilelayout,  0x000, 64 ) // 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_sshangha_spr1 )
 	GFXDECODE_ENTRY( "sprites1", 0, tilelayout,  0x000, 64 ) // 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_sshangha_spr2 )
 	GFXDECODE_ENTRY( "sprites2", 0, tilelayout,  0x000, 64 ) // 16x16
 GFXDECODE_END
 
@@ -567,13 +569,8 @@ void sshangha_state::sshangha(machine_config &config)
 	m_tilegen->set_pf12_16x16_bank(1);
 	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_gfx_region(2);
-	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
-
-	DECO_SPRITE(config, m_sprgen[1], 0);
-	m_sprgen[1]->set_gfx_region(3);
-	m_sprgen[1]->set_gfxdecode_tag("gfxdecode");
+	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_sshangha_spr1);
+	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_sshangha_spr2);
 
 	DECO146PROT(config, m_deco146, 0);
 	m_deco146->port_a_cb().set_ioport(m_inputs);

@@ -42,8 +42,8 @@ public:
 protected:
 	jpmtouch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
@@ -110,7 +110,7 @@ protected:
 	uint16_t unk_r();
 	void unk_w(uint16_t data);
 
-	void common_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
 
 	int m_lamp_strobe = 0;
 
@@ -122,8 +122,8 @@ protected:
 
 	virtual void update_irqs();
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
@@ -153,7 +153,7 @@ private:
 
 
 	void duart_irq_handler(int state);
-	void impact_non_video_map(address_map &map);
+	void impact_non_video_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_Lamps[256]{};
 	uint8_t m_optic_pattern = 0;
@@ -198,14 +198,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(touch_port_changed);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void impact_video_map(address_map &map);
+	void impact_video_map(address_map &map) ATTR_COLD;
 
 	void slides_video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void tms_program_map(address_map &map);
+	void tms_program_map(address_map &map) ATTR_COLD;
 
 	void tms_irq(int state);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);

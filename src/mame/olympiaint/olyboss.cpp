@@ -85,8 +85,8 @@ public:
 	void olybossd(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(toggle_tim);
 
@@ -112,9 +112,9 @@ private:
 	void vchrram_w(offs_t offset, u8 data);
 	void vchrram85_w(offs_t offset, u8 data);
 	void ppic_w(u8 data);
-	void olyboss_io(address_map &map);
-	void olyboss_mem(address_map &map);
-	void olyboss85_io(address_map &map);
+	void olyboss_io(address_map &map) ATTR_COLD;
+	void olyboss_mem(address_map &map) ATTR_COLD;
+	void olyboss85_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dma;

@@ -38,7 +38,7 @@ public:
 	void tr707(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void misc_select_w(u8 data);
@@ -48,7 +48,7 @@ private:
 	void ga_trigger_w(offs_t offset, u8 data);
 	void voice_select_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<hd6303x_cpu_device> m_maincpu;
 	required_device<mb63h114_device> m_mac;

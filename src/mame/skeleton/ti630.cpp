@@ -62,16 +62,16 @@ public:
 	void init_ti630();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void i80c31_p1_w(uint8_t data);
 	void i80c31_p3_w(uint8_t data);
 	uint8_t i80c31_p1_r();
 	void ti630_palette(palette_device &palette) const;
-	void i80c31_io(address_map &map);
-	void i80c31_prg(address_map &map);
+	void i80c31_io(address_map &map) ATTR_COLD;
+	void i80c31_prg(address_map &map) ATTR_COLD;
 
 	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
@@ -162,7 +162,7 @@ void ti630_state::ti630(machine_config &config)
 	PALETTE(config, "palette", FUNC(ti630_state::ti630_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ti630);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 }
 

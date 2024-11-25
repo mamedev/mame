@@ -164,8 +164,8 @@ public:
 	void init_apollo();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m68000_musashi_device> m_maincpu;
@@ -238,7 +238,7 @@ private:
 	DECLARE_MACHINE_RESET(apollo);
 	DECLARE_MACHINE_START(apollo);
 
-	void cpu_space_map(address_map &map);
+	void cpu_space_map(address_map &map) ATTR_COLD;
 	u16 apollo_irq_acknowledge(offs_t offset);
 	u16 apollo_pic_get_vector();
 	void apollo_bus_error();
@@ -288,12 +288,12 @@ private:
 	void apollo(machine_config &config);
 	void apollo_terminal(machine_config &config);
 
-	void dn3000_map(address_map &map);
-	void dn3500_map(address_map &map);
-	void dn5500_map(address_map &map);
-	void dsp3000_map(address_map &map);
-	void dsp3500_map(address_map &map);
-	void dsp5500_map(address_map &map);
+	void dn3000_map(address_map &map) ATTR_COLD;
+	void dn3500_map(address_map &map) ATTR_COLD;
+	void dn5500_map(address_map &map) ATTR_COLD;
+	void dsp3000_map(address_map &map) ATTR_COLD;
+	void dsp3500_map(address_map &map) ATTR_COLD;
+	void dsp5500_map(address_map &map) ATTR_COLD;
 
 	uint32_t ptm_counter = 0U;
 	uint8_t sio_output_data = 0U;
@@ -359,7 +359,7 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_csrb = 0U;
@@ -400,8 +400,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	optional_device<omti8621_apollo_device> m_wdc;
@@ -450,9 +450,9 @@ protected:
 	apollo_graphics_15i(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 protected:
 	class lut_fifo;
@@ -658,9 +658,9 @@ public:
 	apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// internal state
@@ -690,8 +690,8 @@ public:
 
 private:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// serial overrides
 	virtual void rcv_complete() override; // Rx completed receiving byte

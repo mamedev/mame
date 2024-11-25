@@ -33,8 +33,8 @@ public:
 	void partner(machine_config &config);
 
 protected:
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 private:
 	u8 floppy_r(offs_t offset);
@@ -46,7 +46,7 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void window_1(uint8_t bank_num, uint16_t offset,uint8_t *rom);
 	void window_2(uint8_t bank_num, uint16_t offset,uint8_t *rom);

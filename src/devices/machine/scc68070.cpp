@@ -23,7 +23,7 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
-#include "machine/scc68070.h"
+#include "scc68070.h"
 
 #define LOG_I2C         (1U << 1)
 #define LOG_UART        (1U << 2)

@@ -30,12 +30,4 @@ public:
   }
 };
 
-static inline double mbps(double duration, uint64_t outputSize) noexcept {
-  if (duration == 0)
-    return 0.0;
-
-  double bytesTotal = double(outputSize);
-  return (bytesTotal * 1000) / (duration * 1024 * 1024);
-}
-
 #endif // PERFORMANCETIMER_H_INCLUDED

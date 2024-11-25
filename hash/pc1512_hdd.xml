@@ -10,7 +10,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Amstrad</publisher>
 
-		<part name="hdd" interface="scsi_hdd">
+		<part name="hdd" interface="st_hdd">
 			<diskarea name="harddriv">
 				<disk name="hd20" sha1="f341f9ef8f6a47fd66b6977cacaa93e155c699aa" writeable="yes" />
 			</diskarea>

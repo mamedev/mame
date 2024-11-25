@@ -116,8 +116,8 @@ public:
 	void nmi_w(int state) { m_nmi_handler(state); }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
 
 	device_bbc_1mhzbus_interface *m_card;
 
@@ -140,7 +140,7 @@ public:
 protected:
 	device_bbc_1mhzbus_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_1mhzbus_slot_device *m_slot;
+	bbc_1mhzbus_slot_device *const m_slot;
 };
 
 

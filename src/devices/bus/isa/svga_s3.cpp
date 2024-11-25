@@ -4,8 +4,25 @@
 
   ISA SVGA S3 wrapper
 
+  ISA16
+  - P86C911
+  - P86C911A
+  - P86C924
+  - P86C801
+  - 86C801-R
+  ISA16 / VL-Bus
+  - P86C928
+  - P86C805 / 86C805-P / 86C805-Q
+  - 86C805i
+  VL-Bus / PCI
+  - Vision864
+  - Vision868
+  - Vision964
+  - Vision968
+  - Trio64 (Spea V7-MIRAGE P64, probably last card before full transition to PCI)
+
   TODO:
-  - All these cards are really PCI and needs to be moved to video/virge_pci.cpp.
+  - all s3_764 roms are really PCI and needs to be moved to video/virge_pci.cpp.
 
 **************************************************************************************************/
 
@@ -58,9 +75,9 @@ void isa16_svga_s3_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(s3_vga_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(s3trio64_vga_device::screen_update));
 
-	S3_VGA(config, m_vga, 0);
+	S3_TRIO64_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x100000);
 }
@@ -91,7 +108,7 @@ isa16_svga_s3_device::isa16_svga_s3_device(const machine_config &mconfig, const 
 
 void isa16_svga_s3_device::io_isa_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(s3_vga_device::io_map));
+	map(0x00, 0x2f).m(m_vga, FUNC(s3trio64_vga_device::io_map));
 }
 
 //-------------------------------------------------
@@ -124,7 +141,7 @@ void isa16_svga_s3_device::device_start()
 	m_isa->install16_device(0xbee8, 0xbeeb, read16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_multifunc_r)), write16smo_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_multifunc_w)));
 	m_isa->install16_device(0xe2e8, 0xe2eb, read16sm_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_pixel_xfer_r)), write16sm_delegate(*m_8514, FUNC(ibm8514a_device::ibm8514_pixel_xfer_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(s3_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(s3_vga_device::mem_w)));
+	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(s3trio64_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(s3trio64_vga_device::mem_w)));
 }
 
 //-------------------------------------------------
@@ -132,323 +149,5 @@ void isa16_svga_s3_device::device_start()
 //-------------------------------------------------
 
 void isa16_svga_s3_device::device_reset()
-{
-}
-
-
-/*
- *  S3 Virge 2D/3D accelerator
- */
-
-ROM_START( s3virge )
-	ROM_REGION(0x8000,"s3virge", 0)
-	ROM_DEFAULT_BIOS("virge")
-
-	ROM_SYSTEM_BIOS( 0, "virge", "PCI S3 ViRGE v1.00-10" )
-	ROMX_LOAD("pci_m-v_virge-4s3.bin", 0x00000, 0x8000, CRC(d0a0f1de) SHA1(b7b41081974762a199610219bdeab149b7c7143d), ROM_BIOS(0) )
-
-	ROM_SYSTEM_BIOS( 1, "virgeo", "PCI S3 ViRGE v1.00-05" )
-	ROMX_LOAD("s3virge.bin", 0x00000, 0x8000, CRC(a7983a85) SHA1(e885371816d3237f7badd57ccd602cd863c9c9f8), ROM_BIOS(1) )
-	ROM_IGNORE( 0x8000 )
-ROM_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(ISA16_S3VIRGE, isa16_s3virge_device, "s3virge", "S3 ViRGE Graphics Card")
-
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void isa16_s3virge_device::device_add_mconfig(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(s3virge_vga_device::screen_update));
-
-	S3VIRGE(config, m_vga, 0);
-	m_vga->set_screen("screen");
-	m_vga->set_vram_size(0x400000);
-	m_vga->linear_config_changed().set(FUNC(isa16_s3virge_device::linear_config_changed_w));
-}
-
-//-------------------------------------------------
-//  linear_config_changed_w - callback to indicate
-//  enabling, disabling, or changig of the linear
-//  framebuffer configuration.
-//-------------------------------------------------
-
-void isa16_s3virge_device::linear_config_changed_w(int state)
-{
-}
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *isa16_s3virge_device::device_rom_region() const
-{
-	return ROM_NAME( s3virge );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  isa16_vga_device - constructor
-//-------------------------------------------------
-
-isa16_s3virge_device::isa16_s3virge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA16_S3VIRGE, tag, owner, clock),
-	device_isa16_card_interface(mconfig, *this),
-	m_vga(*this, "vga")
-{
-}
-
-void isa16_s3virge_device::io_isa_map(address_map &map)
-{
-	map(0x00, 0x2f).m(m_vga, FUNC(s3virge_vga_device::io_map));
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-uint8_t isa16_s3virge_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
-
-void isa16_s3virge_device::device_start()
-{
-	set_isa_device();
-
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "s3virge");
-
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_s3virge_device::io_isa_map);
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::mem_w)));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void isa16_s3virge_device::device_reset()
-{
-}
-
-/*
- *  S3 ViRGE/DX
- */
-
-ROM_START( s3virgedx )
-	ROM_REGION(0x8000,"s3virgedx", 0)
-	ROM_LOAD("s3virgedx.bin", 0x00000, 0x8000, CRC(0da83bd3) SHA1(228a2d644e1732cb5a2eb1291608c7050cf39229) )
-ROM_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(ISA16_S3VIRGEDX, isa16_s3virgedx_device, "s3virgedx", "S3 ViRGE/DX Graphics Card")
-
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void isa16_s3virgedx_device::device_add_mconfig(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(s3virgedx_vga_device::screen_update));
-
-	S3VIRGEDX(config, m_vga, 0);
-	m_vga->set_screen("screen");
-	m_vga->set_vram_size(0x400000);
-	m_vga->linear_config_changed().set(FUNC(isa16_s3virgedx_device::linear_config_changed_w));
-}
-
-//-------------------------------------------------
-//  linear_config_changed_w - callback to indicate
-//  enabling, disabling, or changig of the linear
-//  framebuffer configuration.
-//-------------------------------------------------
-
-void isa16_s3virgedx_device::linear_config_changed_w(int state)
-{
-	const bool old = m_lfb_enable;
-	m_lfb_enable = state;
-	if (state)
-	{
-		if (old)
-		{
-			m_isa->unmap_readwrite(m_lfb_start, m_lfb_end);
-		}
-		m_lfb_start = m_vga->get_linear_address();
-		m_lfb_end = m_lfb_start + m_vga->get_linear_address_size_full() - 1;
-		m_isa->install_memory(m_lfb_start, m_lfb_end, read8sm_delegate(*m_vga, FUNC(s3virge_vga_device::fb_r)), write8sm_delegate(*m_vga, FUNC(s3virge_vga_device::fb_w)));
-	}
-	else
-	{
-		m_isa->unmap_readwrite(m_lfb_start, m_lfb_end);
-	}
-}
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *isa16_s3virgedx_device::device_rom_region() const
-{
-	return ROM_NAME( s3virgedx );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  isa16_vga_device - constructor
-//-------------------------------------------------
-
-isa16_s3virgedx_device::isa16_s3virgedx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA16_S3VIRGEDX, tag, owner, clock),
-	device_isa16_card_interface(mconfig, *this),
-	m_vga(*this, "vga")
-{
-}
-
-void isa16_s3virgedx_device::io_isa_map(address_map &map)
-{
-	map(0x00, 0x2f).m(m_vga, FUNC(s3virgedx_vga_device::io_map));
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-uint8_t isa16_s3virgedx_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
-
-void isa16_s3virgedx_device::device_start()
-{
-	set_isa_device();
-
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "s3virgedx");
-
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_s3virgedx_device::io_isa_map);
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(s3virgedx_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(s3virgedx_vga_device::mem_w)));
-
-	save_item(NAME(m_lfb_enable));
-	save_item(NAME(m_lfb_start));
-	save_item(NAME(m_lfb_end));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void isa16_s3virgedx_device::device_reset()
-{
-	m_lfb_enable = m_vga->is_linear_address_active();
-	m_lfb_start = m_vga->get_linear_address();
-	m_lfb_end = m_lfb_start + m_vga->get_linear_address_size_full() - 1;
-}
-
-
-/*
- *  Diamond Stealth 3D 2000 Pro
- */
-
-ROM_START( stealth3d2kpro )
-	ROM_REGION(0x8000,"stealth3d", 0)
-	ROM_LOAD("virgedxdiamond.bin", 0x00000, 0x8000, CRC(58b0dcda) SHA1(b13ae6b04db6fc05a76d924ddf2efe150b823029) )
-ROM_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(ISA16_DMS3D2KPRO, isa16_stealth3d2kpro_device, "dms3d2kp", "Diamond Stealth 3D 2000 Pro")
-
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void isa16_stealth3d2kpro_device::device_add_mconfig(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(s3virgedx_rev1_vga_device::screen_update));
-
-	S3VIRGEDX1(config, m_vga, 0);
-	m_vga->set_screen("screen");
-	m_vga->set_vram_size(0x400000);
-	m_vga->linear_config_changed().set(FUNC(isa16_stealth3d2kpro_device::linear_config_changed_w));
-}
-
-//-------------------------------------------------
-//  linear_config_changed_w - callback to indicate
-//  enabling, disabling, or changig of the linear
-//  framebuffer configuration.
-//-------------------------------------------------
-
-void isa16_stealth3d2kpro_device::linear_config_changed_w(int state)
-{
-}
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *isa16_stealth3d2kpro_device::device_rom_region() const
-{
-	return ROM_NAME( stealth3d2kpro );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  isa16_vga_device - constructor
-//-------------------------------------------------
-
-isa16_stealth3d2kpro_device::isa16_stealth3d2kpro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ISA16_DMS3D2KPRO, tag, owner, clock),
-	device_isa16_card_interface(mconfig, *this),
-	m_vga(*this, "vga")
-{
-}
-
-void isa16_stealth3d2kpro_device::io_isa_map(address_map &map)
-{
-	map(0x00, 0x2f).m(m_vga, FUNC(s3virgedx_vga_device::io_map));
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-uint8_t isa16_stealth3d2kpro_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
-
-void isa16_stealth3d2kpro_device::device_start()
-{
-	set_isa_device();
-
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "stealth3d");
-
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa16_stealth3d2kpro_device::io_isa_map);
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(s3virgedx_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(s3virgedx_vga_device::mem_w)));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void isa16_stealth3d2kpro_device::device_reset()
 {
 }

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_TANBUS_KEYBOARD_H
-#define MAME_BUS_TANBUS_KEYBOARD_H
+#ifndef MAME_BUS_TANBUS_KEYBOARD_KEYBOARD_H
+#define MAME_BUS_TANBUS_KEYBOARD_KEYBOARD_H
 
 #pragma once
 
@@ -48,7 +48,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	device_microtan_kbd_interface *m_kbd;
@@ -79,4 +79,4 @@ DECLARE_DEVICE_TYPE(MICROTAN_KBD_SLOT, microtan_kbd_slot_device)
 void microtan_kbd_devices(device_slot_interface &device);
 
 
-#endif // MAME_BUS_TANBUS_KEYBOARD_H
+#endif // MAME_BUS_TANBUS_KEYBOARD_KEYBOARD_H

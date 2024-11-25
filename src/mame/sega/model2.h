@@ -51,7 +51,7 @@ public:
 		m_bufferram(*this, "bufferram"),
 		m_soundram(*this, "soundram"),
 		m_maincpu(*this,"maincpu"),
-		m_dsbz80(*this, DSBZ80_TAG),
+		m_dsbz80(*this, "dsbz80"),
 		m_m1audio(*this, M1AUDIO_TAG),
 		m_uart(*this, "uart"),
 		m_m2comm(*this, "m2comm"),
@@ -83,7 +83,7 @@ public:
 	std::unique_ptr<model2_renderer> m_poly;
 
 	/* Public for access by the ioports */
-	DECLARE_CUSTOM_INPUT_MEMBER(daytona_gearbox_r);
+	ioport_value daytona_gearbox_r();
 
 	/* Public for access by MCFG */
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
@@ -103,8 +103,8 @@ public:
 	void init_powsledm();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_shared_ptr<u32> m_workram;
 	required_shared_ptr<u32> m_bufferram;
@@ -197,7 +197,7 @@ protected:
 	void vertical_sync_w(u16 data);
 	u32 doa_prot_r(offs_t offset, u32 mem_mask = ~0);
 	u32 doa_unk_r();
-	void sega_0229_map(address_map &map);
+	void sega_0229_map(address_map &map) ATTR_COLD;
 	int m_prot_a = 0;
 
 	void raster_init(memory_region *texture_rom);
@@ -238,14 +238,14 @@ protected:
 
 	void sj25_0207_01(machine_config &config);
 
-	void drive_io_map(address_map &map);
-	void drive_map(address_map &map);
-	void geo_sharc_map(address_map &map);
-	void model2_base_mem(address_map &map);
-	void model2_5881_mem(address_map &map);
-	void model2_0229_mem(address_map &map);
-	void model2_snd(address_map &map);
-	void scsp_map(address_map &map);
+	void drive_io_map(address_map &map) ATTR_COLD;
+	void drive_map(address_map &map) ATTR_COLD;
+	void geo_sharc_map(address_map &map) ATTR_COLD;
+	void model2_base_mem(address_map &map) ATTR_COLD;
+	void model2_5881_mem(address_map &map) ATTR_COLD;
+	void model2_0229_mem(address_map &map) ATTR_COLD;
+	void model2_snd(address_map &map) ATTR_COLD;
+	void scsp_map(address_map &map) ATTR_COLD;
 
 	void debug_init();
 	void debug_commands(const std::vector<std::string_view> &params);
@@ -253,7 +253,7 @@ protected:
 	void debug_tri_dump_command(const std::vector<std::string_view> &params);
 	void debug_help_command(const std::vector<std::string_view> &params);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	u32 m_intreq = 0;
 	u32 m_intena = 0;
@@ -335,8 +335,8 @@ public:
 	{}
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<mb86234_device> m_copro_tgp;
 	required_shared_ptr<u32> m_copro_tgp_program;
@@ -368,12 +368,12 @@ protected:
 	void copro_atan_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 copro_atan_r();
 
-	void model2_tgp_mem(address_map &map);
+	void model2_tgp_mem(address_map &map) ATTR_COLD;
 
-	void copro_tgp_prog_map(address_map &map);
-	void copro_tgp_data_map(address_map &map);
-	void copro_tgp_io_map(address_map &map);
-	void copro_tgp_rf_map(address_map &map);
+	void copro_tgp_prog_map(address_map &map) ATTR_COLD;
+	void copro_tgp_data_map(address_map &map) ATTR_COLD;
+	void copro_tgp_io_map(address_map &map) ATTR_COLD;
+	void copro_tgp_rf_map(address_map &map) ATTR_COLD;
 
 	virtual void copro_halt() override;
 	virtual void copro_boot() override;
@@ -403,7 +403,7 @@ protected:
 	void desert_output_w(u8 data);
 	void vcop_output_w(u8 data);
 
-	void model2o_mem(address_map &map);
+	void model2o_mem(address_map &map) ATTR_COLD;
 };
 
 /*****************************
@@ -421,7 +421,7 @@ public:
 
 	u32 maxx_r(offs_t offset, u32 mem_mask = ~0);
 	void daytona_maxx(machine_config &config);
-	void model2o_maxx_mem(address_map &map);
+	void model2o_maxx_mem(address_map &map) ATTR_COLD;
 
 private:
 	int m_maxxstate = 0;
@@ -443,13 +443,13 @@ public:
 	void daytona_gtx(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	int m_gtx_state = 0;
 
 	u8 gtx_r(offs_t offset);
-	void model2o_gtx_mem(address_map &map);
+	void model2o_gtx_mem(address_map &map) ATTR_COLD;
 };
 
 /*****************************
@@ -477,11 +477,11 @@ public:
 	void zeroguna(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void model2a_crx_mem(address_map &map);
-	void model2a_5881_mem(address_map &map);
-	void model2a_0229_mem(address_map &map);
+	void model2a_crx_mem(address_map &map) ATTR_COLD;
+	void model2a_5881_mem(address_map &map) ATTR_COLD;
+	void model2a_0229_mem(address_map &map) ATTR_COLD;
 
 private:
 	required_device<sega_billboard_device> m_billboard;
@@ -514,8 +514,8 @@ public:
 	void zerogun(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<adsp21062_device> m_copro_adsp;
 
@@ -526,14 +526,14 @@ protected:
 	u32 copro_sharc_buffer_r(offs_t offset);
 	void copro_sharc_buffer_w(offs_t offset, u32 data);
 
-	void model2b_crx_mem(address_map &map);
-	void model2b_5881_mem(address_map &map);
-	void model2b_0229_mem(address_map &map);
+	void model2b_crx_mem(address_map &map) ATTR_COLD;
+	void model2b_5881_mem(address_map &map) ATTR_COLD;
+	void model2b_0229_mem(address_map &map) ATTR_COLD;
 	// TODO: split into own class
-	void rchase2_iocpu_map(address_map &map);
-	void rchase2_ioport_map(address_map &map);
+	void rchase2_iocpu_map(address_map &map) ATTR_COLD;
+	void rchase2_ioport_map(address_map &map) ATTR_COLD;
 
-	void copro_sharc_map(address_map &map);
+	void copro_sharc_map(address_map &map) ATTR_COLD;
 
 	virtual void copro_halt() override;
 	virtual void copro_boot() override;
@@ -569,8 +569,8 @@ public:
 	void topskatr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<mb86235_device> m_copro_tgpx4;
 	required_shared_ptr<u64> m_copro_tgpx4_program;
@@ -581,10 +581,10 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
 
-	void model2c_crx_mem(address_map &map);
-	void model2c_5881_mem(address_map &map);
-	void copro_tgpx4_map(address_map &map);
-	void copro_tgpx4_data_map(address_map &map);
+	void model2c_crx_mem(address_map &map) ATTR_COLD;
+	void model2c_5881_mem(address_map &map) ATTR_COLD;
+	void copro_tgpx4_map(address_map &map) ATTR_COLD;
+	void copro_tgpx4_data_map(address_map &map) ATTR_COLD;
 
 	virtual void copro_halt() override;
 	virtual void copro_boot() override;

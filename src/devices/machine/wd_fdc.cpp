@@ -919,6 +919,7 @@ void wd_fdc_device_base::write_track_continue()
 				format_description_string += buf;
 			}
 			LOGDESC("track description %s\n", format_description_string.c_str());
+			drop_drq();
 			command_end();
 			return;
 

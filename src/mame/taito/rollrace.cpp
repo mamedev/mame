@@ -54,8 +54,8 @@ public:
 	void rollace(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -111,12 +111,10 @@ private:
 
 	void vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 TILE_GET_INFO_MEMBER(rollrace_state::get_fg_tile_info)
 {
@@ -316,8 +314,6 @@ uint32_t rollrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void rollrace_state::machine_start()
 {

@@ -11,7 +11,7 @@ license:CC0-1.0
 -->
 
 
-<softwarelist name="intv" description="Intellivision cartridges">
+<softwarelist name="intv" description="Mattel Intellivision cartridges">
 
 	<software name="backgamm">
 		<description>ABPA Backgammon</description>

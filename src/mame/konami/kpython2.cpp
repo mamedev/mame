@@ -444,8 +444,8 @@ public:
 	void kpython2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -473,8 +473,8 @@ protected:
 
 	void iop_timer_irq(int state);
 
-	void mem_map(address_map &map);
-	void iop_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void iop_map(address_map &map) ATTR_COLD;
 
 	required_device<r5900le_device> m_maincpu;
 	required_device<iop_device>     m_iop;

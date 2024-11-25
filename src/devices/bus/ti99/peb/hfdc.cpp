@@ -102,6 +102,8 @@ myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *
 	m_motor_on_timer(nullptr),
 	m_hdc9234(*this, FDC_TAG),
 	m_clock(*this, CLOCK_TAG),
+	m_floppy(*this, "f%u", 1),
+	m_harddisk(*this, "h%u", 1),
 	m_current_floppy(nullptr),
 	m_current_harddisk(nullptr),
 	m_current_floppy_index(NONE),
@@ -727,7 +729,7 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 		LOGMASKED(LOG_LINES, "Select floppy drive DSK%d\n", index+1);
 
 		// Connect new drive
-		m_current_floppy = m_floppy_unit[index];
+		m_current_floppy = m_floppy[index]->get_device();
 		m_current_floppy_index = index;
 
 		// We don't use the READY line of floppy drives.
@@ -757,7 +759,7 @@ void myarc_hfdc_device::connect_harddisk_unit(int index)
 		LOGMASKED(LOG_LINES, "Select hard disk WDS%d\n", index+1);
 
 		// Connect new drive
-		m_current_harddisk = m_harddisk_unit[index];
+		m_current_harddisk = m_harddisk[index]->get_device();
 		m_current_hd_index = index;
 
 		LOGMASKED(LOG_LINES, "Connect index callback WDS%d\n", index+1);
@@ -819,8 +821,8 @@ void myarc_hfdc_device::set_floppy_motors_running(bool run)
 	}
 
 	// Set all motors
-	for (auto & elem : m_floppy_unit)
-		if (elem != nullptr) elem->mon_w((run)? 0 : 1);
+	for (auto & elem : m_floppy)
+		if (elem->get_device() != nullptr) elem->get_device()->mon_w((run)? 0 : 1);
 }
 
 /*
@@ -943,48 +945,25 @@ void myarc_hfdc_device::device_reset()
 	m_lastval = 0;
 	m_readyflags = 0;
 
-	for (int i=0; i < 4; i++)
+	for (auto &flop : m_floppy)
 	{
-		if (m_floppy_unit[i] != nullptr)
-			LOGMASKED(LOG_CONFIG, "FD connector %d with %s\n", i+1, m_floppy_unit[i]->name());
+		if (flop->get_device() != nullptr)
+			LOGMASKED(LOG_CONFIG, "FD connector %d with %s\n", flop->basetag(), flop->get_device()->name());
 		else
-			LOGMASKED(LOG_CONFIG, "FD connector %d has no floppy attached\n", i+1);
+			LOGMASKED(LOG_CONFIG, "FD connector %d has no floppy attached\n", flop->basetag());
 	}
 
-	for (int i=0; i < 3; i++)
+	for (auto &hard : m_harddisk)
 	{
-		if (m_harddisk_unit[i] != nullptr)
-			LOGMASKED(LOG_CONFIG, "HD connector %d with %s\n", i+1, m_harddisk_unit[i]->name());
+		if (hard->get_device() != nullptr)
+			LOGMASKED(LOG_CONFIG, "HD connector %d with %s\n", hard->basetag(), hard->get_device()->name());
 		else
-			LOGMASKED(LOG_CONFIG, "HD connector %d has no drive attached\n", i+1);
+			LOGMASKED(LOG_CONFIG, "HD connector %d has no floppy attached\n", hard->basetag());
 	}
 
 	// Disconnect all units
 	disconnect_floppy_drives();
 	disconnect_hard_drives();
-}
-
-void myarc_hfdc_device::device_config_complete()
-{
-	for (int i=0; i < 3; i++)
-	{
-		m_floppy_unit[i] = nullptr;
-		m_harddisk_unit[i] = nullptr;
-	}
-	m_floppy_unit[3] = nullptr;
-
-	// Seems to be null when doing a "-listslots"
-	if (subdevice("f1")!=nullptr)
-	{
-		m_floppy_unit[0] = static_cast<floppy_connector*>(subdevice("f1"))->get_device();
-		m_floppy_unit[1] = static_cast<floppy_connector*>(subdevice("f2"))->get_device();
-		m_floppy_unit[2] = static_cast<floppy_connector*>(subdevice("f3"))->get_device();
-		m_floppy_unit[3] = static_cast<floppy_connector*>(subdevice("f4"))->get_device();
-
-		m_harddisk_unit[0] = static_cast<mfm_harddisk_connector*>(subdevice("h1"))->get_device();
-		m_harddisk_unit[1] = static_cast<mfm_harddisk_connector*>(subdevice("h2"))->get_device();
-		m_harddisk_unit[2] = static_cast<mfm_harddisk_connector*>(subdevice("h3"))->get_device();
-	}
 }
 
 /*
@@ -1080,15 +1059,15 @@ void myarc_hfdc_device::device_add_mconfig(machine_config& config)
 	m_hdc9234->dmaout_cb().set(FUNC(myarc_hfdc_device::write_buffer));
 
 	// First two floppy drives shall be connected by default
-	FLOPPY_CONNECTOR(config, "f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "f2", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "f3", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "f4", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound(true);
 
 	// Hard disks don't go without image (other than floppy drives)
-	MFM_HD_CONNECTOR(config, "h1", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
-	MFM_HD_CONNECTOR(config, "h2", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
-	MFM_HD_CONNECTOR(config, "h3", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
+	MFM_HD_CONNECTOR(config, m_harddisk[0], hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
+	MFM_HD_CONNECTOR(config, m_harddisk[1], hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
+	MFM_HD_CONNECTOR(config, m_harddisk[2], hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
 
 	MM58274C(config, CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
 

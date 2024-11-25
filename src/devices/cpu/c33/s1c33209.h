@@ -4,8 +4,8 @@
     Epson S1C33209/221/222 CMOS 32-bit single chip microcomputer
 */
 
-#ifndef MAME_CPU_C33_S2C33209_H
-#define MAME_CPU_C33_S2C33209_H
+#ifndef MAME_CPU_C33_S1C33209_H
+#define MAME_CPU_C33_S1C33209_H
 
 #pragma once
 
@@ -26,13 +26,13 @@ protected:
 			u32 clock,
 			address_map_constructor internal_map);
 
-	template <offs_t RomBytes> void memory_map(address_map &map);
+	template <offs_t RomBytes> void memory_map(address_map &map) ATTR_COLD;
 
 protected:
-	void device_reset() override;
+	void device_reset() override ATTR_COLD;
 
 private:
-	void peripheral_map(address_map &map);
+	void peripheral_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -54,4 +54,4 @@ DECLARE_DEVICE_TYPE(S1C33209, s1c33209_device)
 DECLARE_DEVICE_TYPE(S1C33221, s1c33221_device)
 DECLARE_DEVICE_TYPE(S1C33222, s1c33222_device)
 
-#endif // MAME_CPU_C33_S2C33209_H
+#endif // MAME_CPU_C33_S1C33209_H

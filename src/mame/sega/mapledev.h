@@ -23,7 +23,7 @@ protected:
 	uint32_t reply_buffer[256]{};
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(reply_ready);
 	void reply_ready_with_delay();

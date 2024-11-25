@@ -49,8 +49,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(int_button);
 
 private:
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	void porta_w(u8);
 	void portc_w(u8);
@@ -67,7 +67,7 @@ private:
 	u16 m_irqs = 0U;
 	bool m_dlart_maintmode = 0;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<t11_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
@@ -244,8 +244,8 @@ static INPUT_PORTS_START( dct11em )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("BPT")       PORT_CODE(KEYCODE_B) // Breakpoint
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("FNC")       PORT_CODE(KEYCODE_LALT) // Function
 	PORT_START("X5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("HALT")      PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, dct11em_state, halt_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("INT")       PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, dct11em_state, int_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("HALT")      PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dct11em_state::halt_button), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("INT")       PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dct11em_state::int_button), 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(dct11em_state::halt_button)

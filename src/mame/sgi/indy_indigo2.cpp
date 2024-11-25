@@ -111,8 +111,8 @@ public:
 	void indy_4610(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	template <uint32_t addr_base> uint64_t bus_error_r(offs_t offset, uint64_t mem_mask = ~0);
 	template <uint32_t addr_base> void bus_error_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
@@ -120,14 +120,14 @@ protected:
 	uint8_t volume_r(offs_t offset);
 	void volume_w(offs_t offset, uint8_t data);
 
-	void ip24_map(address_map &map);
-	void ip24_base_map(address_map &map);
-	void pio0_map(address_map &map);
-	void pio1_map(address_map &map);
-	void pio2_map(address_map &map);
-	void pio3_map(address_map &map);
-	void pio5_map(address_map &map);
-	void pio6_map(address_map &map);
+	void ip24_map(address_map &map) ATTR_COLD;
+	void ip24_base_map(address_map &map) ATTR_COLD;
+	void pio0_map(address_map &map) ATTR_COLD;
+	void pio1_map(address_map &map) ATTR_COLD;
+	void pio2_map(address_map &map) ATTR_COLD;
+	void pio3_map(address_map &map) ATTR_COLD;
+	void pio5_map(address_map &map) ATTR_COLD;
+	void pio6_map(address_map &map) ATTR_COLD;
 
 	void wd33c93(device_t *device);
 
@@ -169,9 +169,9 @@ private:
 
 	void wd33c93_2(device_t *device);
 
-	void ip22_map(address_map &map);
-	void pio4_map(address_map &map);
-	void pio6_map(address_map &map);
+	void ip22_map(address_map &map) ATTR_COLD;
+	void pio4_map(address_map &map) ATTR_COLD;
+	void pio6_map(address_map &map) ATTR_COLD;
 
 	required_device<wd33c93b_device> m_scsi_ctrl2;
 };
@@ -522,9 +522,9 @@ ROM_END
 
 ROM_START( indigo2_4415 )
 	ROM_REGION64_BE( 0x80000, "user1", 0 )
-	ROM_SYSTEM_BIOS( 0, "e", "Version 5.3 Rev E R4X00 Jan 29, 1996" ) \
+	ROM_SYSTEM_BIOS( 0, "e", "Version 5.3 Rev E R4X00 Jan 29, 1996" )
 	ROMX_LOAD( "ip22prom.070-1367-012.bin", 0x000000, 0x080000, CRC(54460c16) SHA1(330d87b3a02a05fb49c85a569f6f84904587cb35), ROM_GROUPDWORD | ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "b4", "Version 5.1.2 Rev B4 R4X00 Dec 9, 1993" ) \
+	ROM_SYSTEM_BIOS( 1, "b4", "Version 5.1.2 Rev B4 R4X00 Dec 9, 1993" )
 	ROMX_LOAD( "ip22prom.070-1367-002.bin", 0x000000, 0x080000, CRC(ae5ecd08) SHA1(422568ae95282ee23b2fe123267f9b915a1dc3dc), ROM_GROUPDWORD | ROM_BIOS(1) )
 ROM_END
 

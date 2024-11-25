@@ -32,13 +32,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="freedos13rc4">
-		<description>FreeDOS 1.3 Release Candidate 4</description>
-		<year>2021</year>
+	<software name="freedos13">
+		<description>FreeDOS 1.3</description>
+		<year>2022</year>
 		<publisher>The FreeDOS Project</publisher>
+		<notes><![CDATA[
+		See https://gitlab.com/FreeDOS/issue-reporting/-/issues/26 for the upstream
+		issue report about VINFO.]]></notes>
+		<info name="usage" value="FreeDOS contains a CPU detection bug in VINFO.COM, always reporting a 80186.  Edit C:\FDAUTO.BAT to remove calls to VINFO and always run Support286 or Support386 routines to work around the problem." />
 		<part name="hdd" interface="ide_hdd">
 			<diskarea name="harddriv">
-				<disk name="freedos13rc4" sha1="bb81d708746f4e5cfd4207af598cd7691a8e33bf" writeable="yes"/>
+				<disk name="freedos13" sha1="72eef7bf0ad53b8a240ce05244173df54db923f0" writeable="yes"/>
 			</diskarea>
 		</part>
 	</software>

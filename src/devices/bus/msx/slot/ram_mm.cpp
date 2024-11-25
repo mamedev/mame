@@ -30,9 +30,8 @@ void msx_slot_ram_mm_device::device_start()
 		default: fatalerror("Invalid memory mapper size specified\n");
 	}
 
-	m_ram.resize(m_total_size);
-
-	save_item(NAME(m_ram));
+	m_ram = std::make_unique<u8[]>(m_total_size);
+	save_pointer(NAME(m_ram), m_total_size);
 
 	// Install IO read/write handlers using taps to prevent overwriting taps
 	// installed by other (external) memory mapper devices.
@@ -41,7 +40,7 @@ void msx_slot_ram_mm_device::device_start()
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_rambank[i]->configure_entries(0, u32(m_bank_mask) + 1, m_ram.data(), 0x4000);
+		m_rambank[i]->configure_entries(0, u32(m_bank_mask) + 1, &m_ram[0], 0x4000);
 		page(i)->install_readwrite_bank(0x4000 * i, (0x4000 * i) + 0x3fff, m_rambank[i]);
 	}
 }

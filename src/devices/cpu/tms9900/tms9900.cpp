@@ -1346,6 +1346,12 @@ void tms99xx_device::service_interrupt()
 
 		m_reset = false;
 		LOG("** RESET triggered\n");
+
+		// RESET could occur during a data derivation sequence, so we have to
+		// prevent the execution loop to return into that sequence by
+		// clearing the return index. This fixes a bug that leads to undefined
+		// behaviour in that situation.
+		m_caller_index = NOPRG;
 	}
 	else
 	{
@@ -2764,15 +2770,6 @@ uint32_t tms99xx_device::execute_max_cycles() const noexcept
 {
 	return 124;
 }
-
-uint32_t tms99xx_device::execute_input_lines() const noexcept
-{
-	return 2;
-}
-
-// clocks to cycles, cycles to clocks = id
-// execute_default_irq_vector = 0
-// execute_burn = nop
 
 // device_disasm_interface overrides
 

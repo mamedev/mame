@@ -17,11 +17,11 @@ class a800_supercharger_device : public device_t,
 public:
 	a800_supercharger_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void cctl_map(address_map &map) override;
+	virtual void cctl_map(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u8 m_data[3]{};
 	u8 m_status;

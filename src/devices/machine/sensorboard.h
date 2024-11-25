@@ -34,14 +34,14 @@ public:
 	sensorboard_device &set_ui_enable(bool b) { if (!b) m_maxspawn = 0; m_ui_enabled = (b) ? 7 : 0; return *this; } // enable UI inputs
 	sensorboard_device &set_mod_enable(bool b) { if (b) m_ui_enabled |= 1; else m_ui_enabled &= ~1; return *this; } // enable modifier keys
 
-	auto clear_cb() { return m_clear_cb.bind(); } // 0 = internal clear, 1 = user presses clear
+	auto clear_cb() { return m_clear_cb.bind(); } // d0: 0 = internal clear, 1 = user presses clear, d1: rotate
 	auto init_cb() { return m_init_cb.bind(); } // for setting pieces starting position
 	auto remove_cb() { return m_remove_cb.bind(); } // user removes piece from hand
 	auto sensor_cb() { return m_sensor_cb.bind(); } // x = offset & 0xf, y = offset >> 4 & 0xf
 	auto spawn_cb() { return m_spawn_cb.bind(); } // spawnpoint/piece = offset, retval = new piece id
 	auto output_cb() { return m_output_cb.bind(); } // pos = offset(A8 for ui/board, A9 for count), id = data
 
-	void preset_chess(int state = 0); // init_cb() preset for chessboards
+	void preset_chess(u8 data = 0); // init_cb() preset for chessboards
 
 	// read sensors
 	u8 read_sensor(u8 x, u8 y);
@@ -53,7 +53,7 @@ public:
 	// handle board state
 	u8 read_piece(u8 x, u8 y) { return m_curstate[y * m_width + x]; }
 	void write_piece(u8 x, u8 y, u8 id) { m_curstate[y * m_width + x] = id; }
-	void clear_board(int state = 0) { memset(m_curstate, 0, sizeof(m_curstate)); } // default clear_cb()
+	void clear_board(u8 data = 0) { memset(m_curstate, 0, sizeof(m_curstate)); } // default clear_cb()
 
 	void refresh();
 	void cancel_sensor();
@@ -76,18 +76,18 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ui_init);
 	DECLARE_INPUT_CHANGED_MEMBER(ui_refresh) { refresh(); }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(check_sensor_busy) { return (m_sensorpos == -1) ? 0 : 1; }
-	DECLARE_CUSTOM_INPUT_MEMBER(check_bs_mask) { return m_bs_mask; }
-	DECLARE_CUSTOM_INPUT_MEMBER(check_ss_mask) { return m_ss_mask; }
-	DECLARE_CUSTOM_INPUT_MEMBER(check_ui_enabled) { return m_ui_enabled; }
+	ioport_value check_sensor_busy() { return (m_sensorpos == -1) ? 0 : 1; }
+	ioport_value check_bs_mask() { return m_bs_mask; }
+	ioport_value check_ss_mask() { return m_ss_mask; }
+	ioport_value check_ui_enabled() { return m_ui_enabled; }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override { refresh(); }
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -104,8 +104,8 @@ private:
 	required_ioport m_inp_ui;
 	required_ioport m_inp_conf;
 
-	devcb_write_line m_clear_cb;
-	devcb_write_line m_init_cb;
+	devcb_write8 m_clear_cb;
+	devcb_write8 m_init_cb;
 	devcb_read8 m_remove_cb;
 	devcb_read8 m_sensor_cb;
 	devcb_read8 m_spawn_cb;

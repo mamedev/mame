@@ -66,8 +66,8 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t line_printer_r();
 	void disk_control_w(uint8_t data);
@@ -92,7 +92,7 @@ private:
 
 	void wd1010_intrq_w(int state);
 
-	void unixpc_mem(address_map &map);
+	void unixpc_mem(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

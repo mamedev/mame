@@ -9,7 +9,7 @@ license:CC0-1.0
 	<software name="rastan">
 		<description>Rastan</description>
 		<year>1990</year>
-		<publisher>Taito America Corp</publisher>
+		<publisher>Taito America</publisher>
 		<info name="programmer" value="John Brooks" />
 		<info name="usage" value="Requires a 1MB Apple IIgs. (Music requires 1.25MB.)" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -64,7 +64,7 @@ license:CC0-1.0
 	<software name="qix">
 		<description>Qix</description>
 		<year>1990</year>
-		<publisher>Taito America Corp</publisher>
+		<publisher>Taito America</publisher>
 		<info name="programmer" value="Ryan Ridges and John Lund" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -628,7 +628,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bridge6">
-		<description>Bridge 6.0 (Version 2.49B)</description>
+		<description>Bridge 6.0 (version 2.49B)</description>
 		<year>1989</year>
 		<publisher>Artworx</publisher>
 		<info name="programmer" value="Robert Harnish and Arthur Walsh" />
@@ -645,9 +645,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="qustron2">
-		<description>Questron II (Version 1.1)</description>
+		<description>Questron II (version 1.1)</description>
 		<year>1988</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="developer" value="Westwood Associates" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<info name="version" value="1.1" />
@@ -677,10 +677,10 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="roadwr2k">
+	<software name="roadwar2k">
 		<description>Roadwar 2000</description>
 		<year>1987</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Simulations Inc. (SSI)</publisher>
 		<info name="developer" value="Westwood Associates" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -774,7 +774,7 @@ license:CC0-1.0
 	<software name="arknoid2">
 		<description>Arkanoid II: Revenge of Doh</description>
 		<year>1989</year>
-		<publisher>Taito America Corp</publisher>
+		<publisher>Taito America</publisher>
 		<info name="programmer" value="Ryan Ridges and John Lund" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM01 or later." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -930,7 +930,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="photonix">
-		<description>Photonix (Version 1.46)</description>
+		<description>Photonix (version 1.46)</description>
 		<year>1989</year>
 		<publisher>Free Tools Association</publisher>
 		<info name="developer" value="El Mathos, Pad, and ACS" />
@@ -1038,7 +1038,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmnwld">
+	<software name="carmwrld">
 		<description>Where in the World is Carmen Sandiego?</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
@@ -1385,7 +1385,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="starsg1">
-		<description>Star Saga: One - Beyond The Boundary (Version 1.1)</description>
+		<description>Star Saga: One - Beyond The Boundary (version 1.1)</description>
 		<year>1987</year>
 		<publisher>Masterplay Publishing Corporation</publisher>
 		<info name="programmer" value="Richard Dutton, Walter Freitag, Andrew C. Greenberg, and Michael Massimilla" />
@@ -1588,7 +1588,7 @@ license:CC0-1.0
 	<software name="arkanoid">
 		<description>Arkanoid</description>
 		<year>1988</year>
-		<publisher>Taito America Corp</publisher>
+		<publisher>Taito America</publisher>
 		<info name="programmer" value="Ryan Ridges and John Lund" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM 01." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -1656,7 +1656,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmnusa">
+	<software name="carmusa">
 		<description>Where in the U.S.A. is Carmen Sandiego?</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
@@ -1712,7 +1712,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dreamzne">
-		<description>Dream Zone (Version 3.2)</description>
+		<description>Dream Zone (version 3.2)</description>
 		<year>1987</year>
 		<publisher>Baudville</publisher>
 		<info name="programmer" value="Andy Gavin, Jason Rubin, and Sarah Sidman" />
@@ -1845,11 +1845,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="hallsmzm">
-		<description>Halls of Montezuma</description>
+		<description>Halls of Montezuma (version 1.0 07-1990)</description>
 		<year>1990</year>
-		<publisher>Strategic Simulations</publisher>
+		<publisher>Strategic Studies Group (SSG)</publisher>
 		<info name="programmer" value="Roger Keating, Ian Trout, Allan Bell, Sue Bell, and Steven Hart" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
+		<info name="version" value="1.0 07-1990" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-06-04 -->
 		<!-- simulation game -->
@@ -2024,7 +2025,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="thexder">
-		<description>Thexder (Version 2.7)</description>
+		<description>Thexder (version 2.7)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="H. Godai, S. Uesaka, Michael D. Branham, Robert C. Clardy, John P. Conley, Lloyd Ollmann Jr., and Michael Ormsby" />
@@ -2041,7 +2042,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tunarmg">
-		<description>Tunnels of Armageddon (Version 1.0)</description>
+		<description>Tunnels of Armageddon (version 1.0)</description>
 		<year>1989</year>
 		<publisher>California Dreams</publisher>
 		<info name="programmer" value="Adam Skorupiński, Mirek Zabłocki, Krzysiek Koziarski, Zbych Dąbrowski, Dorota Błaszczak, Marcin Grzegorzewski, Dick Vohlers, Tomek Meuś" />
@@ -2081,7 +2082,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="revo76">
-		<description>Revolution '76 (Version June 27, 1989)</description>
+		<description>Revolution '76 (version June 27, 1989)</description>
 		<year>1989</year>
 		<publisher>Britannica Software</publisher>
 		<info name="programmer" value="Edward Bever, Patricia Bever, Susan Barr, Sandra Lakin, David Craft, Andy Kanakares, and Ezra Sidran" />
@@ -2111,7 +2112,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="printshp">
-		<description>The Print Shop (Version 1.0)</description>
+		<description>The Print Shop (version 1.0)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="David Balsam, Martin Kahn, Corey Kosak, Ann E. Kronen, Susan E. Schlangen, Richard Whittaker, Michelle McBride, Don Albrecht, and Leila Bronstein" />
@@ -2212,7 +2213,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="drawplus">
-		<description>Draw Plus (Version 1.1)</description>
+		<description>Draw Plus (version 1.1)</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
 		<info name="programmer" value="H. Lamiraux" />
@@ -2284,7 +2285,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="816paint">
-		<description>816/Paint (Version 3.1)</description>
+		<description>816/Paint (version 3.1)</description>
 		<year>1987</year>
 		<publisher>Baudville</publisher>
 		<info name="programmer" value="Michael Darooge, Robert Barris, and Gregory C. Miller" />
@@ -2301,7 +2302,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="begldraw">
-		<description>BeagleDraw (Version 1.3)</description>
+		<description>BeagleDraw (version 1.3)</description>
 		<year>1987</year>
 		<publisher>Beagle Bros.</publisher>
 		<info name="programmer" value="Robert Hearn and Jeff Erickson" />
@@ -2318,7 +2319,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="drmgrafx">
-		<description>DreamGrafix (Version 1.06)</description>
+		<description>DreamGrafix (version 1.06)</description>
 		<year>1992</year>
 		<publisher>DreamWorld Software</publisher>
 		<info name="programmer" value="Jason Anderson, Steve Chiang, Shawn Martin, and Yong Su Kim" />
@@ -2335,7 +2336,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="platpnt">
-		<description>Platinum Paint (Version 2.01)</description>
+		<description>Platinum Paint (version 2.01)</description>
 		<year>1992</year>
 		<publisher>Beagle Bros.</publisher>
 		<info name="programmer" value="Matthew Reimer" />
@@ -2359,7 +2360,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pwplus">
-		<description>Paintworks Plus (Version 1.2)</description>
+		<description>Paintworks Plus (version 1.2)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
 		<info name="programmer" value="Henri Lamiraux, B. Gallet, L. Barthelet, R. Danais, and S. Cavril" />
@@ -2376,7 +2377,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pwksgold">
-		<description>Paintworks Gold (Version 1.5)</description>
+		<description>Paintworks Gold (version 1.5)</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
 		<info name="programmer" value="Luc Barthelet, Henri Lamiraux, Paul Zuzelo, and Sydney Williams" />
@@ -2400,7 +2401,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="imgmst12">
-		<description>ImageMaster: Basic Paint (Version 1.2)</description>
+		<description>ImageMaster: Basic Paint (version 1.2)</description>
 		<year>1992</year>
 		<publisher>JADA Graphics</publisher>
 		<info name="programmer" value="Larry Jackson" />
@@ -2417,7 +2418,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="grphsmkt">
-		<description>Graphics Supermarket (Version 1.1)</description>
+		<description>Graphics Supermarket (version 1.1)</description>
 		<year>1987</year>
 		<publisher>Abracadata</publisher>
 		<info name="programmer" value="Rodger Smith, Joe Hebling, Mary Carol Smith, and Connie Holvey" />
@@ -2434,7 +2435,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gwrit310">
-		<description>GraphicWriter III (Version 1.0)</description>
+		<description>GraphicWriter III (version 1.0)</description>
 		<year>1990</year>
 		<publisher>Seven Hills Software</publisher>
 		<info name="programmer" value="Gary Crandall and Richard Bennett" />
@@ -2464,7 +2465,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dpaint2">
-		<description>DeluxePaint II (Version 2.01)</description>
+		<description>DeluxePaint II (version 2.01)</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Daniel Silva, Brent Iverson, David Grady, Greg Riker, Shelley Day, Jeff Johnnigman, Happy Keller, Nicholas Lavroff, Carolyn McFarlane, Richard Antaki, Paul Reiche III, Stu Roberson, Avril Harrison, Judy Campbell, and Frank Wing" />
@@ -2504,7 +2505,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mavisbcn">
-		<description>Mavis Beacon Teaches Typing (Version 1.8)</description>
+		<description>Mavis Beacon Teaches Typing (version 1.8)</description>
 		<year>1987</year>
 		<publisher>The Software Toolworks</publisher>
 		<info name="usage" value="Requires a 512K Apple IIgs." />
@@ -2527,7 +2528,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mathnme">
-		<description>Math and Me (Version 1.0 08/01/88)</description>
+		<description>Math and Me (version 1.0 08/01/88)</description>
 		<year>1988</year>
 		<publisher>Davidson &amp; Associates</publisher>
 		<info name="programmer" value="C.K. Haun" />
@@ -2558,8 +2559,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="stckybsh">
-		<description>Stickybear Shapes</description>
+	<software name="sbshapes">
+		<description>Stickybear Shapes IIgs</description>
 		<year>1988</year>
 		<publisher>Optimum Resource</publisher>
 		<info name="programmer" value="Richard Hefter, David Cunningham, and Susan Dubicki" />
@@ -2591,7 +2592,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="fmplanet">
-		<description>Full Metal Planete (Version 1.0)</description>
+		<description>Full Metal Planete (version 1.0)</description>
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
 		<info name="programmer" value="François Uhrich, Nicolas Bergeret, Louis van Proosdij Duport, Etienne Petitjean, and Pascal Wassong" />
@@ -2630,8 +2631,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mcs">
-		<description>Music Construction Set (Version 1.0)</description>
+	<software name="musicons">
+		<description>Music Construction Set (version 1.0)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Will Harvey, Jim Nitchals, and Doug Fulton" />
@@ -2648,7 +2649,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="instsynt">
-		<description>Instant Synthesizer (Version 1.0)</description>
+		<description>Instant Synthesizer (version 1.0)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Larry Reed" />
@@ -2672,7 +2673,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mtrkspro">
-		<description>Master Tracks Pro (Version 1.04)</description>
+		<description>Master Tracks Pro (version 1.04)</description>
 		<year>1989</year>
 		<publisher>Passport Designs</publisher>
 		<info name="programmer" value="Dave Kusek, Don Williams, and Dave Howell" />
@@ -2689,7 +2690,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="musstdio">
-		<description>The Music Studio (Version 2.0)</description>
+		<description>The Music Studio (version 2.0)</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 		<info name="programmer" value="Ric Forrester, Rick Parfitt, Peter Wickman, Paul Zuzelo, Sally Froud, Jeff Cable, Carl Bacani, Jim Inscore, Sydney Williams Lewis, Nancy Waisanen, Steve Young, and Laura E. Singer" />
@@ -2713,7 +2714,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jamsessn">
-		<description>Jam Session (Version 1.0)</description>
+		<description>Jam Session (version 1.0)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Steve Capps, Neil Cormia, Ty Roberts, Ed Bogas, Edward Badasov, Latricia Turner, and Avril Harrison" />
@@ -2737,7 +2738,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="muswrv23">
-		<description>Pyware Music Writer (Version 2.03)</description>
+		<description>Pyware Music Writer (version 2.03)</description>
 		<year>1990</year>
 		<publisher>Pyware</publisher>
 		<info name="developer" value="Pygraphics" />
@@ -2761,7 +2762,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mtrksjr">
-		<description>Master Tracks Jr. (Version 1.03)</description>
+		<description>Master Tracks Jr. (version 1.03)</description>
 		<year>1988</year>
 		<publisher>Passport Designs</publisher>
 		<info name="programmer" value="Dave Kusek, Don Williams, and Dave Howell" />
@@ -2778,7 +2779,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="salvatns">
-		<description>Salvation Supreme (Version 2.0)</description>
+		<description>Salvation Supreme (version 2.0)</description>
 		<year>1993</year>
 		<publisher>Vitesse Software</publisher>
 		<info name="programmer" value="Christopher Warner, Robert Morgan, Joe Jaworski, and Jonah Stich" />
@@ -2802,7 +2803,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ntgs">
-		<description>NoiseTracker (Version 1.00)</description>
+		<description>NoiseTracker (version 1.00)</description>
 		<year>1992</year>
 		<publisher>FTA</publisher>
 		<info name="programmer" value="Olivier Goguel, Olivier Bailly-Maitre, Pascal Watel, Lionel Picanelot, and Michael Guitton" />
@@ -2819,7 +2820,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="hypst31c">
-		<description>HyperStudio (Version 3.1c)</description>
+		<description>HyperStudio (version 3.1c)</description>
 		<year>1989</year>
 		<publisher>Roger Wagner Publishing</publisher>
 		<info name="programmer" value="Michael O'Keefe, Dave Klimas, Eric Mueller, Roy Bannon, Ken Kashmarek, and Garrick Toubassi" />
@@ -2889,7 +2890,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="wordpfct">
-		<description>WordPerfect (Version 2.1e)</description>
+		<description>WordPerfect (version 2.1e)</description>
 		<year>1987</year>
 		<publisher>WordPerfect Corporation</publisher>
 		<info name="programmer" value="Dale T. Taylor, Daniel P. Burton, Barry Watts, Todd J. Wood, Scott B. Mitchell, Brent D. Hauvel, David Woodbury, Douglas L. Davies, and Kyle W. Erickson" />
@@ -2958,7 +2959,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="readrhym">
-		<description>Read and Rhyme</description>
+		<description>Read &amp; Rhyme IIgs</description>
 		<year>1988</year>
 		<publisher>Unicorn Software</publisher>
 		<info name="programmer" value="William Demas" />
@@ -3066,7 +3067,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="showoff">
-		<description>ShowOff (Version 1.1)</description>
+		<description>ShowOff (version 1.1)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Serge Hervy and Jean-Claude Lévy" />
@@ -3096,16 +3097,16 @@ license:CC0-1.0
 	</software>
 
 	<software name="calcraft">
-		<description>Calendar Crafter (Version 1.2)</description>
+		<description>Calendar Crafter (A-194 version 1.2)</description>
 		<year>1987</year>
 		<publisher>MECC</publisher>
-		<info name="partno" value="A194" />
+		<info name="partno" value="A-194" />
 		<info name="programmer" value="Gene Breault, Charolyn Kapplinger, Diane Portner, Steven D. Splinter, and Paul R. Wenker" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.2" />
 		<sharedfeat name="compatibility" value="A2GS" />
-		<!-- Dump released: 2021-06-25 -->
-		<!-- productivity program -->
+		<!--Dump released: 2021-06-25-->
+		<!--productivity program-->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1345411">
 				<rom name="calendar crafter iigs.woz" size="1345411" crc="6308e6ba" sha1="b127dfaaa517b49636854de03540602d7c698e1b" />
@@ -3114,10 +3115,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgnprnt">
-		<description>Designer Prints (Version 1.0)</description>
+		<description>Designer Prints (A-252 version 1.0)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
-		<info name="partno" value="A252" />
+		<info name="partno" value="A-252" />
 		<info name="programmer" value="Diane Portner, Michael Stein, Brian Walker, and Paul Wenker" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.0" />
@@ -3139,7 +3140,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgnpuzl">
-		<description>Designer Puzzles (Version 1.0)</description>
+		<description>Designer Puzzles (A-223 version 1.0)</description>
 		<year>1990</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A223" />
@@ -3164,7 +3165,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mercury">
-		<description>Mercury (Version 1.0)</description>
+		<description>Mercury (version 1.0)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A249" />
@@ -3214,7 +3215,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="strywvwa">
-		<description>Storybook Weaver: World of Adventure (Version 1.0)</description>
+		<description>Storybook Weaver: World of Adventure (version 1.0)</description>
 		<year>1991</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A276" />
@@ -3239,7 +3240,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="strywvmb">
-		<description>Storybook Weaver: World of Make-Believe (Version 1.0)</description>
+		<description>Storybook Weaver: World of Make-Believe (version 1.0)</description>
 		<year>1991</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A298" />
@@ -3335,7 +3336,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="rrbit23">
-		<description>Reader Rabbit (Version 2.3)</description>
+		<description>Reader Rabbit (version 2.3)</description>
 		<year>1987</year>
 		<publisher>The Learning Company</publisher>
 		<info name="programmer" value="Pete Rowe and Aaron Weiss" />
@@ -3352,7 +3353,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="madlibs">
-		<description>Mad Libs (Version 1.0)</description>
+		<description>Mad Libs (version 1.0)</description>
 		<year>1987</year>
 		<publisher>First Byte</publisher>
 		<info name="usage" value="Requires a 512K Apple IIgs." />
@@ -3368,7 +3369,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tarabn">
-		<description>Tales From The Arabian Nights</description>
+		<description>Tales From The Arabian Nights IIgs</description>
 		<year>1988</year>
 		<publisher>Unicorn Software</publisher>
 		<info name="programmer" value="Stanley Brewster and June Stark" />
@@ -3420,7 +3421,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="readnme">
-		<description>Reading and Me (Version 1.0)</description>
+		<description>Reading and Me (version 1.0)</description>
 		<year>1988</year>
 		<publisher>Davidson &amp; Associates</publisher>
 		<info name="programmer" value="Louis X. Savain and C. K. Haun" />
@@ -3444,7 +3445,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kquest2">
-		<description>King's Quest II: Romancing the Throne (Version 2.0A)</description>
+		<description>King's Quest II: Romancing the Throne (version 2.0A)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Roberta Williams, Jeff Stephenson, Chris Iden, Robert Heitman, Ken Williams, Sol Ackerman, Scott Murphy, Doug MacNeill, Mark Crowe, and Al Lowe" />
@@ -3468,7 +3469,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sltroyal">
-		<description>Solitaire Royale (Version 1.0)</description>
+		<description>Solitaire Royale (version 1.0)</description>
 		<year>1989</year>
 		<publisher>Spectrum Holobyte</publisher>
 		<info name="programmer" value="Jake Hoelter, Jody Sather, Ilan (The Zipper) Zipkin, and Brad Fregger" />
@@ -3532,7 +3533,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="logicm15">
-		<description>The Logic Master (Version 1.5)</description>
+		<description>The Logic Master (version 1.5)</description>
 		<year>1990</year>
 		<publisher>Unicorn Software</publisher>
 		<info name="programmer" value="William Demas and June Stark" />
@@ -3556,7 +3557,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mixdupmg20a">
-		<description>Mixed-Up Mother Goose (Version 2.0A)</description>
+		<description>Mixed-Up Mother Goose (version 2.0A)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Roberta Williams, Jerry Moore, David Slayback, and Amenda-Lombardo" />
@@ -4045,7 +4046,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mthbpl11">
-		<description>Math Blaster Plus! (Version 1.1)</description>
+		<description>Math Blaster Plus! (version 1.1)</description>
 		<year>1989</year>
 		<publisher>Davidson and Associates</publisher>
 		<info name="author" value="Jan Davidson and Cathy Johnson" />
@@ -4063,7 +4064,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="frltwrd">
-		<description>First Letters and Words (Version 1.0)</description>
+		<description>First Letters and Words (version 1.0)</description>
 		<year>????</year>
 		<publisher>First Byte</publisher>
 		<info name="usage" value="Requires a 768K Apple IIgs." />
@@ -4079,7 +4080,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="frshapes">
-		<description>First Shapes (Version 1.0)</description>
+		<description>First Shapes (version 1.0)</description>
 		<year>????</year>
 		<publisher>First Byte</publisher>
 		<info name="usage" value="Requires a 768K Apple IIgs." />
@@ -4258,6 +4259,135 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1345297">
 				<rom name="strip poker ii iigs.woz" size="1345297" crc="835d6724" sha1="05a280b8663ee6add694e0f7d2900745bd53fdad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepilot12" cloneof="timepilot">
+		<description>Time Pilot (version 1.2)</description>
+		<year>2024</year>
+		<publisher>Stefan Wessels</publisher>
+		<info name="programmer" value="Stefan Wessels and Antoine Vignau" />
+		<info name="usage" value="Requires an Apple IIgs." />
+		<info name="version" value="1.2" />
+		<!--First Apple IIgs version.  No icon or audio.-->
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 07-09-2024-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot_v1.2.po" size="819200" crc="dfd6b004" sha1="7094438f4c089eb3474c495344e10a93ab3240ff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepilot13" cloneof="timepilot">
+		<description>Time Pilot (version 1.3)</description>
+		<year>2024</year>
+		<publisher>Stefan Wessels and Brutal Deluxe Software</publisher>
+		<info name="programmer" value="Stefan Wessels and Antoine Vignau" />
+		<info name="usage" value="Requires an Apple IIgs." />
+		<info name="version" value="1.3" />
+		<!--Version 1.3 Adds sound.  Audio code supplied by Brutal Deluxe Software.-->
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 07-09-2024-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot_v1.3.po" size="819200" crc="6b974655" sha1="1ad93f9ea15e058137c80eac6e202242171363d4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepilot14" cloneof="timepilot">
+		<description>Time Pilot (version 1.4)</description>
+		<year>2024</year>
+		<publisher>Stefan Wessels and Brutal Deluxe Software</publisher>
+		<info name="programmer" value="Stefan Wessels and Antoine Vignau" />
+		<info name="usage" value="Requires an Apple IIgs." />
+		<info name="version" value="1.4" />
+		<!--Fixed audio corruption and clipping issues at the top of the screen.-->
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 07-09-2024-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot_v1.4.po" size="819200" crc="5481abc5" sha1="e9dd9c7e881730b8692d2edaa0c36cfbd08c6a52" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepilot15" cloneof="timepilot">
+		<description>Time Pilot (version 1.5)</description>
+		<year>2024</year>
+		<publisher>Stefan Wessels and Brutal Deluxe Software</publisher>
+		<info name="programmer" value="Stefan Wessels and Antoine Vignau" />
+		<info name="usage" value="Requires an Apple IIgs." />
+		<info name="version" value="1.5" />
+		<!--Scores are now saved and loaded, press ESC to stop a game, external RAM sounds at 22kHz, enemy explosion bug fixed, loader with splash screen.-->
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 07-18-2024-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot1_v1.5.po" size="819200" crc="8dde5067" sha1="8ae4f9f143c153a58a569c05eb0ad0f451a47bcf" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot2_v1.5.po" size="819200" crc="8a1ae6ff" sha1="05c55a40898fcd16a987f162146fe86b670d2229" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepilot15a" cloneof="timepilot">
+		<description>Time Pilot (version 1.5.A)</description>
+		<year>2024</year>
+		<publisher>Stefan Wessels and Brutal Deluxe Software</publisher>
+		<info name="programmer" value="Stefan Wessels and Antoine Vignau" />
+		<info name="usage" value="Requires an Apple IIgs." />
+		<info name="version" value="1.5.A" />
+		<!--Fixed bad bug in game ending with high score and skip waiting for Game Over screen.-->
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 07-19-2024-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot1_v1.5.a.po" size="819200" crc="9abe07ea" sha1="76c19e628861aa917ab270a07531759f89b10bdf" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot2_v1.5.a.po" size="819200" crc="34334279" sha1="d4efa41c20fe8979aeb0651e8667fd24a8566ccd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timepilot">
+		<description>Time Pilot (version 1.6)</description>
+		<year>2024</year>
+		<publisher>Stefan Wessels and Brutal Deluxe Software</publisher>
+		<info name="programmer" value="Stefan Wessels and Antoine Vignau" />
+		<info name="usage" value="Requires an Apple IIgs." />
+		<info name="version" value="1.6" />
+		<!--Code optimizations, splash screen has credits, and softer bomb sound.-->
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 08-15-2024-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot_gs1_v1.6.po" size="819200" crc="b4c4e971" sha1="d9a8f0766eeb102e0a91cd6f664a4155c21c0116" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="819200">
+				<rom name="timepilot_gs2_v1.6.po" size="819200" crc="24c0c3c0" sha1="8c06eca43aef35dfa68094696ace3de05036f5e0" />
 			</dataarea>
 		</part>
 	</software>

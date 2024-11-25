@@ -110,17 +110,17 @@ private:
 	uint8_t bg_rmw_r(offs_t offset);
 	void bg_rmw_w(offs_t offset, uint8_t data);
 
-	void master_liblrabl_map(address_map &map);
-	void master_toypop_map(address_map &map);
-	void namcos16_master_base_map(address_map &map);
-	void slave_map(address_map &map);
-	void sound_map(address_map &map);
+	void master_liblrabl_map(address_map &map) ATTR_COLD;
+	void master_toypop_map(address_map &map) ATTR_COLD;
+	void namcos16_master_base_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-//  virtual void machine_start() override;
-	virtual void machine_reset() override;
+//  virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-//  virtual void video_start() override;
+//  virtual void video_start() override ATTR_COLD;
 
 	bool m_master_irq_enable = false;
 	bool m_slave_irq_enable = false;

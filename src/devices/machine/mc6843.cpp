@@ -6,6 +6,18 @@
 #include "emu.h"
 #include "mc6843.h"
 
+#include "imagedev/floppy.h"
+
+#define LOG_SETUP   (1U << 1)
+#define LOG_IRQ     (1U << 2)
+#define LOG_COMMAND (1U << 3)
+#define LOG_STATUS  (1U << 4)
+#define LOG_LIVE    (1U << 5)
+#define LOG_RW      (1U << 6)
+
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP | LOG_IRQ | LOG_COMMAND | LOG_STATUS | LOG_LIVE | LOG_RW)
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(MC6843, mc6843_device, "mc6843", "Motorola MC6843 FDC")
 
 mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -70,6 +82,8 @@ void mc6843_device::device_reset()
 	m_stra = 0x00;
 	m_sar  = 0x00;
 	m_strb = 0x00;
+
+	m_irq(CLEAR_LINE);
 }
 
 void mc6843_device::map(address_map &map)
@@ -98,7 +112,7 @@ void mc6843_device::set_floppy(floppy_image_device *floppy)
 
 	m_floppy = floppy;
 
-	logerror("floppy %s\n", m_floppy ? m_floppy->tag() : "-");
+	LOGMASKED(LOG_SETUP, "floppy %s\n", m_floppy ? m_floppy->tag() : "-");
 
 	int next_ready = m_floppy ? m_floppy->ready_r() : 1;
 
@@ -115,7 +129,7 @@ u8 mc6843_device::dir_r()
 {
 	if(!machine().side_effects_disabled()) {
 		m_dir_loaded = false;
-		logerror("dir_r %02x\n", m_dir);
+		LOG("dir_r %02x\n", m_dir);
 	}
 	return m_dir;
 }
@@ -124,37 +138,65 @@ void mc6843_device::dor_w(u8 data)
 {
 	m_dor = data;
 	m_dor_loaded = true;
-	logerror("dor_w %02x\n", m_dor);
+	LOG("dor_w %02x\n", m_dor);
 
 	m_strb &= ~SB_DTERR;
-	if(m_strb == 0)
-		m_isr &= 0x7;
 }
 
 u8 mc6843_device::ctar_r()
 {
 	if(!machine().side_effects_disabled())
-		logerror("ctar_r %02x\n", m_ctar);
+		LOG("ctar_r %02x\n", m_ctar);
 	return m_ctar;
 }
 
 void mc6843_device::ctar_w(u8 data)
 {
 	m_ctar = data;
-	logerror("ctar_w %02x\n", m_ctar);
+	LOG("ctar_w %02x\n", m_ctar);
 }
 
 void mc6843_device::isr_raise(u8 flag)
 {
-	m_isr |= flag;
+	if((m_isr & flag) != flag) {
+		LOGMASKED(LOG_IRQ, "isr_raise%s%s%s%s\n",
+			(flag & I_RWCE) ? " RWCE" : "",
+			(flag & I_SCE) ? " SCE" : "",
+			(flag & I_SSR) ? " SSR" : "",
+			(flag & I_STRB) ? " STRB" : "");
+		m_isr |= flag;
+		if(!(m_cmr & 0x80) && !((m_cmr & 0x40) && flag == I_STRB)) {
+			LOGMASKED(LOG_IRQ, "IRQ asserted\n");
+			m_irq(ASSERT_LINE);
+		}
+	}
+}
+
+void mc6843_device::isr_lower(u8 flag)
+{
+	flag &= m_isr;
+	if(flag != 0) {
+		LOGMASKED(LOG_IRQ, "isr_lower%s%s%s%s\n",
+			(flag & I_RWCE) ? " RWCE" : "",
+			(flag & I_SCE) ? " SCE" : "",
+			(flag & I_SSR) ? " SSR" : "",
+			(flag & I_STRB) ? " STRB" : "");
+		m_isr &= ~flag;
+		if(!(m_cmr & 0x80) && !((m_cmr & 0x40) ? (m_isr & 0x7) : m_isr)) {
+			LOGMASKED(LOG_IRQ, "IRQ cleared\n");
+			m_irq(CLEAR_LINE);
+		}
+	}
 }
 
 u8 mc6843_device::isr_r()
 {
 	u8 res = m_isr;
+	if(m_strb & SB_DTERR)
+		m_isr |= I_STRB;
 	if(!machine().side_effects_disabled()) {
-		logerror("isr_r %02x\n", m_isr);
-		m_isr &= 0x8;
+		LOG("isr_r %02x\n", m_isr);
+		isr_lower(I_RWCE | I_SCE | I_SSR);
 	}
 	return res;
 }
@@ -175,18 +217,22 @@ void mc6843_device::cmr_w(u8 data)
 			live_abort();
 			m_state = S_IDLE;
 		} else {
-			logerror("cmr_w %02x - dropped busy\n", data);
+			LOGMASKED(LOG_COMMAND, "cmr_w %02x - dropped busy\n", data);
 			return;
 		}
 	}
 
 	m_cmr = data;
-	logerror("cmr_w %02x - isr=%s isr3=%s %s fwf=%d %s\n", m_cmr,
+	LOGMASKED(LOG_COMMAND, "cmr_w %02x - isr=%s isr3=%s %s fwf=%d %s\n", m_cmr,
 			 m_cmr & 0x80 ? "off" : "on",
 			 m_cmr & 0x40 ? "off" : "on",
 			 m_cmr & 0x20 ? "dma" : "pio",
 			 m_cmr & 0x10 ? 1 : 0,
 			 cmds[m_cmr & 0xf]);
+	if(((m_cmr & 0x80) && m_isr) || ((m_cmr & 0x40) && (m_isr == I_STRB))) {
+		LOGMASKED(LOG_IRQ, "IRQ inhibited (cmr=%02x)\n", m_cmr);
+		m_irq(CLEAR_LINE);
+	}
 	command_start();
 }
 
@@ -218,7 +264,7 @@ u8 mc6843_device::stra_r()
 	if(!machine().side_effects_disabled()) {
 		static int prev = -1;
 		if(prev != res) {
-			logerror("stra_r %02x -%s%s%s%s%s%s%s%s\n", res,
+			LOGMASKED(LOG_STATUS, "stra_r %02x -%s%s%s%s%s%s%s%s\n", res,
 					 res & SA_BUSY ? " busy" : "",
 					 res & SA_IDX  ? " idx" : "",
 					 res & SA_TNEQ ? " tneq" : "",
@@ -236,14 +282,16 @@ u8 mc6843_device::stra_r()
 void mc6843_device::sur_w(u8 data)
 {
 	m_sur = data;
-	logerror("sur_w %02x\n", m_sur);
+	LOGMASKED(LOG_SETUP, "sur_w %02x (%.03f ms head settling, %.03f ms track to track seek)\n", m_sur,
+		clocks_to_attotime(4096 * (data & 0xf)).as_attoseconds() / double(ATTOSECONDS_PER_MILLISECOND),
+		clocks_to_attotime(1024 * (data >> 4)).as_attoseconds() / double(ATTOSECONDS_PER_MILLISECOND));
 }
 
 u8 mc6843_device::strb_r()
 {
 	u8 strb = m_strb;
 	if(!machine().side_effects_disabled()) {
-		logerror("strb_r %02x -%s%s%s%s%s%s%s%s\n", strb,
+		LOGMASKED(LOG_STATUS, "strb_r %02x -%s%s%s%s%s%s%s%s\n", strb,
 				 strb & SB_HERR  ? " herr" : "",
 				 strb & SB_WERR  ? " werr" : "",
 				 strb & SB_FI    ? " fi" : "",
@@ -252,9 +300,11 @@ u8 mc6843_device::strb_r()
 				 strb & SB_DMERR ? " dmerr" : "",
 				 strb & SB_CRC   ? " crc" : "",
 				 strb & SB_DTERR ? " dterr" : "");
-		m_strb &= ~(SB_HERR|SB_WERR|SB_SERR|SB_SAERR|SB_DMERR|SB_CRC|SB_DTERR);
+		m_strb &= ~(SB_HERR|SB_WERR|SB_SERR|SB_DMERR|SB_CRC|SB_DTERR);
+		if(!(m_stra & SA_BUSY))
+			m_strb &= ~SB_SAERR;
 		if(m_strb == 0)
-			m_isr &= 0x7;
+			isr_lower(I_STRB);
 	}
 	return strb;
 }
@@ -262,34 +312,34 @@ u8 mc6843_device::strb_r()
 void mc6843_device::sar_w(u8 data)
 {
 	m_sar = data & 0x1f;
-	logerror("sar_w %02x\n", m_sar);
+	LOGMASKED(LOG_SETUP, "sar_w %02x\n", m_sar);
 }
 
 void mc6843_device::gcr_w(u8 data)
 {
 	m_gcr = data & 0x7f;
-	logerror("gcr_w %02x\n", m_gcr);
+	LOGMASKED(LOG_SETUP, "gcr_w %02x\n", m_gcr);
 }
 
 void mc6843_device::ccr_w(u8 data)
 {
 	m_ccr = data & 3;
-	logerror("ccr_w %02x\n", m_ccr);
+	LOGMASKED(LOG_SETUP, "ccr_w %02x\n", m_ccr);
 }
 
 void mc6843_device::ltar_w(u8 data)
 {
 	m_ltar = data & 0x7f;
-	logerror("ltar_w %02x\n", m_ltar);
+	LOGMASKED(LOG_SETUP, "ltar_w %02x\n", m_ltar);
 }
 
 void mc6843_device::index_callback(floppy_image_device *floppy, int state)
 {
 	if(state) {
 		live_sync();
-		logerror("idam %d\n", m_idam_turns);
 		if(m_idam_turns) {
 			m_idam_turns --;
+			LOGMASKED(LOG_LIVE, "idam %d\n", m_idam_turns);
 			if(!m_idam_turns) {
 				live_abort();
 				m_state = S_IDAM_NOT_FOUND;
@@ -319,7 +369,7 @@ void mc6843_device::command_start()
 	switch(m_cmr & 0xf) {
 
 	case C_STZ:
-		logerror("Seek to track 0\n");
+		LOGMASKED(LOG_COMMAND, "Seek to track 0\n");
 		if(m_floppy)
 			m_floppy->dir_w(1);
 		m_stra |= SA_BUSY;
@@ -328,7 +378,7 @@ void mc6843_device::command_start()
 		break;
 
 	case C_SEK:
-		logerror("Seek from track %d to %d\n", m_ctar, m_gcr);
+		LOGMASKED(LOG_COMMAND, "Seek from track %u to %u\n", m_ctar, m_gcr);
 		if(m_gcr > m_ctar) {
 			if(m_floppy)
 				m_floppy->dir_w(0);
@@ -351,7 +401,7 @@ void mc6843_device::command_start()
 		m_stra &= ~(SA_DDM|SA_TNEQ);
 		m_strb &= ~SB_DMERR;
 		if(m_strb == 0)
-			m_isr &= 0x7;
+			isr_lower(I_STRB);
 		m_state = S_SRW_WAIT_READY;
 		break;
 
@@ -401,14 +451,20 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 
 		switch(m_state) {
 		case S_IDLE:
+			if(timeout) {
+				LOGMASKED(LOG_LIVE, "%s: Head unloaded (idle timeout)\n", machine().time().to_string());
+				m_head_loaded = false;
+			}
 			return;
 
 		case S_STZ_STEP:
-			if(m_floppy && !m_floppy->trk00_r()) {
+			if(m_floppy && m_floppy->trk00_r()) {
 				m_floppy->stp_w(0);
 				m_floppy->stp_w(1);
 			}
 			m_step_count --;
+			if(m_floppy)
+				LOGMASKED(LOG_LIVE, "%s: %s track 0; %d steps left\n", machine().time().to_string(), m_floppy->trk00_r() ? "Seek" : "Found", m_step_count);
 			m_state = S_STZ_STEP_WAIT;
 			delay(1024 * (m_sur >> 4));
 			return;
@@ -418,7 +474,13 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 				return;
 			if(m_step_count)
 				m_state = S_STZ_STEP;
-			else {
+			else if(!m_floppy || m_floppy->trk00_r()) {
+				m_strb |= SB_SERR;
+				m_stra &= ~SA_BUSY;
+				m_state = S_IDLE;
+				isr_raise(I_SCE | I_STRB);
+				return;
+			} else {
 				m_ctar = m_gcr = 0;
 				m_state = S_STZ_HEAD_SETTLING;
 				delay(4096 * (m_sur & 15));
@@ -441,6 +503,7 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 				m_floppy->stp_w(1);
 			}
 			m_step_count --;
+			LOGMASKED(LOG_LIVE, "%s: Seek: %d steps left\n", machine().time().to_string(), m_step_count);
 			m_state = S_SEEK_STEP_WAIT;
 			delay(1024 * (m_sur >> 4));
 			return;
@@ -518,6 +581,7 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 			m_stra &= ~SA_BUSY;
 			m_state = S_IDLE;
 			isr_raise(I_RWCE);
+			delay(4096 * (m_sur & 15));
 			return;
 
 		case S_IDAM_BAD_CRC:
@@ -525,10 +589,11 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 			m_stra &= ~SA_BUSY;
 			m_state = S_IDLE;
 			isr_raise(I_RWCE | I_STRB);
+			delay(4096 * (m_sur & 15));
 			return;
 
 		case S_IDAM_FOUND:
-			if(m_cmr & 0x20)
+			if(!(m_cmr & 0x20))
 				isr_raise(I_SSR);
 			if((m_cmr & 0xf) == C_SSR || (m_cmr & 0xf) == C_MSR || (m_cmr & 0xf) == C_RCR)
 				live_start(L_DAM_SEARCH);
@@ -544,7 +609,8 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 			m_strb |= SB_SAERR;
 			m_state = S_IDLE;
 			isr_raise(I_RWCE | I_STRB);
-			logerror("not found\n");
+			LOGMASKED(LOG_LIVE, "not found\n");
+			delay(4096 * (m_sur & 15));
 			return;
 
 		case S_DAM_NOT_FOUND:
@@ -552,6 +618,7 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 			m_stra &= ~SA_BUSY;
 			m_state = S_IDLE;
 			isr_raise(I_RWCE | I_STRB);
+			delay(4096 * (m_sur & 15));
 			return;
 
 		case S_DAM_BAD_CRC:
@@ -559,6 +626,7 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 			m_stra &= ~SA_BUSY;
 			m_state = S_IDLE;
 			isr_raise(I_RWCE | I_STRB);
+			delay(4096 * (m_sur & 15));
 			return;
 
 		case S_DAM_DONE:
@@ -574,6 +642,7 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 			m_stra &= ~SA_BUSY;
 			m_state = S_IDLE;
 			isr_raise(I_RWCE);
+			delay(4096 * (m_sur & 15));
 			return;
 		}
 	}
@@ -621,14 +690,12 @@ void mc6843_device::live_sync()
 {
 	if(m_cur_live.state != L_IDLE && !m_cur_live.tm.is_never()) {
 		if(m_cur_live.tm > machine().time()) {
-			if(0)
-				logerror("%s: Rolling back and replaying (%s)\n", machine().time().to_string(), m_cur_live.tm.to_string());
+			LOGMASKED(LOG_LIVE, "%s: Rolling back and replaying (%s)\n", machine().time().to_string(), m_cur_live.tm.to_string());
 			rollback();
 			live_run(machine().time());
 			m_cur_live.pll.commit(m_floppy, m_cur_live.tm);
 		} else {
-			if(0)
-				logerror("%s: Committing (%s)\n", machine().time().to_string(), m_cur_live.tm.to_string());
+			LOGMASKED(LOG_LIVE, "%s: Committing (%s)\n", machine().time().to_string(), m_cur_live.tm.to_string());
 			m_cur_live.pll.commit(m_floppy, m_cur_live.tm);
 			if(m_cur_live.next_state != -1) {
 				m_cur_live.state = m_cur_live.next_state;
@@ -717,8 +784,7 @@ void mc6843_device::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			if(0)
-			logerror("%s: shift = %04x data=%02x c=%d\n", m_cur_live.tm.to_string(), m_cur_live.shift_reg,
+			LOGMASKED(LOG_LIVE, "%s: shift = %04x data=%02x c=%d\n", m_cur_live.tm.to_string(), m_cur_live.shift_reg,
 					(m_cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
 					(m_cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
 					(m_cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
@@ -742,10 +808,11 @@ void mc6843_device::live_run(attotime limit)
 				return;
 
 			if(m_cur_live.bit_counter == 16) {
-				logerror("%s IDAM track %d\n", m_cur_live.tm.to_string(), m_cur_live.data_reg);
+				LOGMASKED(LOG_RW, "%s IDAM track %u (ctar=%u)\n", m_cur_live.tm.to_string(), m_cur_live.data_reg, m_ctar);
 				if(m_cur_live.data_reg != m_ltar) {
 					m_state = S_IDAM_BAD_TRACK;
 					live_delay(L_IDLE);
+					m_idam_turns = 0;
 					return;
 
 				} else
@@ -758,7 +825,7 @@ void mc6843_device::live_run(attotime limit)
 				return;
 
 			if(m_cur_live.bit_counter == 48) {
-				logerror("%s IDAM sector %d\n", m_cur_live.tm.to_string(), m_cur_live.data_reg);
+				LOGMASKED(LOG_RW, "%s IDAM sector %u (sar=%u)\n", m_cur_live.tm.to_string(), m_cur_live.data_reg, m_sar);
 				if(m_cur_live.data_reg != m_sar)
 					m_cur_live.state = L_IDAM_SEARCH;
 				else
@@ -771,11 +838,12 @@ void mc6843_device::live_run(attotime limit)
 				return;
 
 			if(m_cur_live.bit_counter == 96) {
-				logerror("IDAM crc remainder %04x\n", m_cur_live.crc);
+				LOGMASKED(LOG_RW, "IDAM crc remainder %04x\n", m_cur_live.crc);
 				if(m_cur_live.crc)
 					m_state = S_IDAM_BAD_CRC;
 				else
 					m_state = S_IDAM_FOUND;
+				m_idam_turns = 0;
 				live_delay(L_IDLE);
 				return;
 			}
@@ -788,13 +856,13 @@ void mc6843_device::live_run(attotime limit)
 			if(m_cur_live.shift_reg == 0xf56a || m_cur_live.shift_reg == 0xf56f) {
 				m_cur_live.data_separator_phase = false;
 				m_cur_live.bit_counter = 0;
-				logerror("DAM mark %02x\n", m_cur_live.data_reg);
+				LOGMASKED(LOG_RW, "DAM mark %02x\n", m_cur_live.data_reg);
 				if(m_cur_live.shift_reg == 0xf56f) {
-					logerror("DAM found\n");
+					LOGMASKED(LOG_RW, "DAM found\n");
 					m_cur_live.crc = 0xbf84;
 					m_cur_live.state = L_DAM_READ;
 				} else {
-					logerror("DDAM found\n");
+					LOGMASKED(LOG_RW, "DDAM found\n");
 					m_cur_live.crc = 0x8fe7;
 					live_delay(L_DAM_DELETED);
 					return;
@@ -819,7 +887,7 @@ void mc6843_device::live_run(attotime limit)
 
 		case L_DAM_READ_BYTE: {
 			int byte = m_cur_live.bit_counter >> 4;
-			logerror("byte %02x = %02x crc %04x\n", byte, m_cur_live.data_reg, m_cur_live.crc);
+			LOGMASKED(LOG_RW, "byte %02x = %02x crc %04x\n", byte, m_cur_live.data_reg, m_cur_live.crc);
 			if(byte <= 128) {
 				if((m_cmr & 0xf) != C_RCR) {
 					if(m_dir_loaded)
@@ -919,7 +987,7 @@ void mc6843_device::live_run(attotime limit)
 			if(!m_dor_loaded)
 				m_strb |= SB_DTERR;
 			m_dor_loaded = false;
-			logerror("write %02x\n", m_dor);
+			LOGMASKED(LOG_RW, "write %02x\n", m_dor);
 			if(m_cmr & 0x10) {
 				m_cur_live.shift_reg = m_dor << 8;
 				m_cur_live.bit_counter = 8;

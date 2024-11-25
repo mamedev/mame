@@ -49,7 +49,7 @@ protected:
 	a26_rom_f6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	void install_super_chip_handlers(address_space *space);
 
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	virtual uint8_t get_start_bank() { return 0; }
 	void switch_bank(offs_t offset, uint8_t data);
 
@@ -119,8 +119,8 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	void trigger_bank();
 	void switch_bank(uint8_t data);
 
@@ -140,7 +140,7 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	void select_ram_bank(offs_t offset, uint8_t data);
 	void select_rom_bank(offs_t offset, uint8_t data);
 
@@ -162,7 +162,7 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	void select_bank(offs_t offset, uint8_t data);
 
 	memory_bank_creator m_bank;
@@ -180,7 +180,7 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	template <uint8_t Bank> void switch_bank(offs_t offset, uint8_t data);
 
 	memory_bank_array_creator<3> m_bank;
@@ -197,7 +197,7 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	void switch_rom_bank(offs_t offset, uint8_t data);
 	void switch_ram_bank(offs_t offset, uint8_t data);
 
@@ -218,7 +218,7 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	void change_bank(offs_t offset);
 
 	memory_bank_creator m_bank;
@@ -246,7 +246,7 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	uint8_t read_current_bank(offs_t offset);
 	void switch_bank(offs_t offset, uint8_t data);
 
@@ -264,7 +264,7 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	void switch_bank(offs_t offset, uint8_t data);
 
 	memory_bank_creator m_bank;
@@ -281,7 +281,7 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	void change_bank();
 
 	memory_bank_creator m_bank;
@@ -298,8 +298,8 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	memory_bank_creator m_bank;
 	uint8_t m_current_game;
@@ -316,8 +316,8 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	void switch_bank(offs_t offset, uint8_t data);
 
 	memory_bank_creator m_bank;
@@ -335,8 +335,8 @@ public:
 	virtual void install_memory_handlers(address_space *space) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	memory_bank_creator m_bank;
 	uint8_t m_current_game;

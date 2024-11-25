@@ -23,7 +23,7 @@ protected:
 	dmv_ram_device_base(const machine_config &mconfig, device_type type, uint32_t size, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// dmvcart_interface overrides
 	virtual void ram_read(uint8_t cas, offs_t offset, uint8_t &data) override;

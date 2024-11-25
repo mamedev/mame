@@ -40,8 +40,8 @@ public:
 	void pwrview(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_tmr0);
 	TIMER_CALLBACK_MEMBER(update_kbd);
@@ -71,10 +71,10 @@ private:
 	u8 err_r();
 	MC6845_UPDATE_ROW(update_row);
 
-	void bios_bank(address_map &map);
-	void pwrview_fetch_map(address_map &map);
-	void pwrview_io(address_map &map);
-	void pwrview_map(address_map &map);
+	void bios_bank(address_map &map) ATTR_COLD;
+	void pwrview_fetch_map(address_map &map) ATTR_COLD;
+	void pwrview_io(address_map &map) ATTR_COLD;
+	void pwrview_map(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;

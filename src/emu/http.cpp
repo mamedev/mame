@@ -144,28 +144,28 @@ public:
 	virtual ~http_request_impl() = default;
 
 	/** Retrieves the requested resource. */
-	virtual const std::string get_resource() {
+	virtual const std::string get_resource() override {
 		// The entire resource: path, query and fragment.
 		return m_request->path;
 	}
 
 	/** Returns the path part of the requested resource. */
-	virtual const std::string get_path() {
+	virtual const std::string get_path() override {
 		return m_request->path.substr(0, m_path_end);
 	}
 
 	/** Returns the query part of the requested resource. */
-	virtual const std::string get_query() {
+	virtual const std::string get_query() override {
 		return m_query == std::string::npos ? "" : m_request->path.substr(m_query, m_query_end);
 	}
 
 	/** Returns the fragment part of the requested resource. */
-	virtual const std::string get_fragment() {
+	virtual const std::string get_fragment() override {
 		return m_fragment == std::string::npos ? "" : m_request->path.substr(m_fragment);
 	}
 
 	/** Retrieves a header from the HTTP request. */
-	virtual const std::string get_header(const std::string &header_name) {
+	virtual const std::string get_header(const std::string &header_name) override {
 		auto i = m_request->header.find(header_name);
 		if (i != m_request->header.end()) {
 			return (*i).second;
@@ -175,7 +175,7 @@ public:
 	}
 
 	/** Retrieves a header from the HTTP request. */
-	virtual const std::list<std::string> get_headers(const std::string &header_name) {
+	virtual const std::list<std::string> get_headers(const std::string &header_name) override {
 		std::list<std::string> result;
 		auto range = m_request->header.equal_range(header_name);
 		for (auto i = range.first; i != range.second; i++) {
@@ -185,7 +185,7 @@ public:
 	}
 
 	/** Returns the body that was submitted with the HTTP request. */
-	virtual const std::string get_body() {
+	virtual const std::string get_body() override {
 		// TODO(cbrunschen): What to return here - http_server::Request has a 'content' feld that is never filled in!
 		return "";
 	}
@@ -204,23 +204,23 @@ struct http_response_impl : public http_manager::http_response {
 	virtual ~http_response_impl() = default;
 
 	/** Sets the HTTP status to be returned to the client. */
-	virtual void set_status(int status) {
+	virtual void set_status(int status) override {
 		m_status = status;
 	}
 
 	/** Sets the HTTP content type to be returned to the client. */
-	virtual void set_content_type(const std::string &content_type) {
+	virtual void set_content_type(const std::string &content_type) override {
 		m_content_type = content_type;
 	}
 
 	/** Sets the body to be sent to the client. */
-	virtual void set_body(const std::string &body) {
+	virtual void set_body(const std::string &body) override {
 		m_body.str("");
 		append_body(body);
 	}
 
 	/** Appends something to the body to be sent to the client. */
-	virtual void append_body(const std::string &body) {
+	virtual void append_body(const std::string &body) override {
 		m_body << body;
 	}
 
@@ -258,7 +258,7 @@ struct websocket_connection_impl : public http_manager::websocket_connection {
 		: m_wsserver(server), m_connection(connection) { }
 
 	/** Sends a message to the client that is connected on the other end of this Websocket connection. */
-	virtual void send_message(const std::string &payload, int opcode) {
+	virtual void send_message(const std::string &payload, int opcode) override {
 		if (auto connection = m_connection.lock()) {
 			std::shared_ptr<webpp::ws_server::SendStream> message_stream = std::make_shared<webpp::ws_server::SendStream>();
 			(*message_stream) << payload;
@@ -267,7 +267,7 @@ struct websocket_connection_impl : public http_manager::websocket_connection {
 	}
 
 	/** Closes this open Websocket connection. */
-	virtual void close() {
+	virtual void close() override {
 		if (auto connection = m_connection.lock()) {
 			m_wsserver->send_close(connection, 1000 /* normal close */);
 		}

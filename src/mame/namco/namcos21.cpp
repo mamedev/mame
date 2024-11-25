@@ -329,9 +329,9 @@ public:
 	void winrun(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -392,12 +392,12 @@ private:
 
 	void configure_c65_namcos21(machine_config &config);
 
-	void winrun_master_map(address_map &map);
-	void winrun_slave_map(address_map &map);
-	void winrun_gpu_map(address_map &map);
+	void winrun_master_map(address_map &map) ATTR_COLD;
+	void winrun_slave_map(address_map &map) ATTR_COLD;
+	void winrun_gpu_map(address_map &map) ATTR_COLD;
 
-	void sound_map(address_map &map);
-	void c140_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void c140_map(address_map &map) ATTR_COLD;
 };
 
 void namcos21_state::video_start()

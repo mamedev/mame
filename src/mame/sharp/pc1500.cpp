@@ -54,8 +54,8 @@ public:
 	void pc1500(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<lh5801_cpu_device> m_maincpu;
@@ -91,8 +91,8 @@ private:
 
 	uint8_t pc1500_kb_r();
 	void pc1500_palette(palette_device &palette) const;
-	void pc1500_mem(address_map &map);
-	void pc1500_mem_io(address_map &map);
+	void pc1500_mem(address_map &map) ATTR_COLD;
+	void pc1500_mem_io(address_map &map) ATTR_COLD;
 };
 
 void pc1500_state::pc1500_mem(address_map &map)

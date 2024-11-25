@@ -101,8 +101,8 @@ public:
 	void basf7100(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -126,11 +126,11 @@ private:
 		INT_CENTRONICS = 0x40
 	};
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
-	void fdc_mem_map(address_map &map);
-	void fdc_io_map(address_map &map);
+	void fdc_mem_map(address_map &map) ATTR_COLD;
+	void fdc_io_map(address_map &map) ATTR_COLD;
 
 	uint8_t mmio_r(offs_t offset);
 	void mmio_w(offs_t offset, uint8_t data);

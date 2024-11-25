@@ -181,9 +181,8 @@ std::pair<std::error_condition, std::string> z88_impexp_device::call_load()
 	std::error_condition err;
 	while (true)
 	{
-		size_t actual;
 		uint8_t b;
-		err = file.read(&b, 1, actual);
+		auto const [err, actual] = read(file, &b, 1);
 		if (err || actual != 1)
 			break;
 

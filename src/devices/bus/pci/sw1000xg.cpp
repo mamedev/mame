@@ -44,6 +44,11 @@ void sw1000xg_device::swp30_map(address_map &map)
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 	ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
+// a0 cards had firmware 1.00.00
+// b0 cards are known to exist but not dumped yet
+// c0 cards are not proven existing
+// d0 cards started with 1.04.00 and the firmware was upgradeable from the PC
+
 ROM_START( sw1000xg )
 	ROM_REGION(  0x100000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("v166")
@@ -57,6 +62,8 @@ ROM_START( sw1000xg )
 	ROM_LOAD16_WORD_SWAP_BIOS( 3, "1.05.00_xv561d0.ic102", 0x000000, 0x100000, CRC(36e199df) SHA1(efe2d3000b49a4a93705fee5ffd5456953ef5a22) )
 	ROM_SYSTEM_BIOS( 4, "v140", "v1.04.00" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 4, "1.04.00_xv561d0.ic102", 0x000000, 0x100000, CRC(9f5bfec8) SHA1(4ced122c8cac7a9c022d86fffe121042ad4be6a2) )
+	ROM_SYSTEM_BIOS( 5, "v100", "v1.00.00" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "1.00.00_xv561a0.ic102", 0x000000, 0x100000, CRC(9b6d8700) SHA1(0bb6c60572b9ed1628fa9e6678e03bd1e47f2a06) )
 
 	ROM_REGION( 0x1400000, "swp30", 0 )
 	ROM_LOAD32_WORD( "xv389a0.ic122", 0x0000000, 0x800000, CRC(92e11205) SHA1(72ec39e03e4e5ddf6137faa798c0ec3c23905855) )

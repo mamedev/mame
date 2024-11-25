@@ -19,7 +19,7 @@ Not much can be done until the MCU is somehow dumped.
 
 #include "emu.h"
 
-#include "cpu/h8/h8s2320.h"
+#include "cpu/h8/h8s2319.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -42,7 +42,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t novadesitec_fr009_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -91,7 +91,7 @@ INPUT_PORTS_END
 void novadesitec_fr009_state::fr009(machine_config &config)
 {
 	// basic machine hardware
-	H8S2328(config, m_maincpu, 32_MHz_XTAL); // actually H8S2318, divisor?
+	H8S2318(config, m_maincpu, 32_MHz_XTAL); // divisor?
 	m_maincpu->set_addrmap(AS_PROGRAM, &novadesitec_fr009_state::main_map);
 
 	// video hardware

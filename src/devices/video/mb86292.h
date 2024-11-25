@@ -22,16 +22,16 @@ public:
 
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
-	virtual void vregs_map(address_map &map);
+	virtual void vregs_map(address_map &map) ATTR_COLD;
 
 protected:
 	mb86292_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
-	virtual void draw_io_map(address_map &map);
+	virtual void draw_io_map(address_map &map) ATTR_COLD;
 
 	address_space_config m_draw_io_space_config;
 	required_device<screen_device> m_screen;

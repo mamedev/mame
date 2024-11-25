@@ -72,8 +72,8 @@ public:
 	void init_hyprduel();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void subcpu_control_w(uint16_t data);
@@ -88,10 +88,10 @@ private:
 
 	void i4220_config(machine_config &config);
 
-	void hyprduel_map(address_map &map);
-	void hyprduel_map2(address_map &map);
-	void magerror_map(address_map &map);
-	void magerror_map2(address_map &map);
+	void hyprduel_map(address_map &map) ATTR_COLD;
+	void hyprduel_map2(address_map &map) ATTR_COLD;
+	void magerror_map(address_map &map) ATTR_COLD;
+	void magerror_map2(address_map &map) ATTR_COLD;
 
 	/* memory pointers */
 	required_shared_ptr_array<uint16_t, 3> m_sharedram;

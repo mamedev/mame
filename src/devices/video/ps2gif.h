@@ -44,8 +44,8 @@ public:
 	bool path3_available() const { return m_path3_available; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
 	void fetch_path1(uint64_t &hi, uint64_t &lo);

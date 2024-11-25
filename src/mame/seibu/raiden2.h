@@ -93,7 +93,7 @@ protected:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void common_save_state();
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void tilemap_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void tile_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -139,7 +139,7 @@ protected:
 
 	bitmap_ind16 m_tile_bitmap, m_sprite_bitmap;
 
-	void zeroteam_sound_map(address_map &map);
+	void zeroteam_sound_map(address_map &map) ATTR_COLD;
 
 private:
 	void raiden2_bank_w(u8 data);
@@ -167,7 +167,7 @@ private:
 	u16 m_sprcpt_flags2 = 0;
 	u32 m_sprcpt_data_1[0x100], m_sprcpt_data_2[0x40], m_sprcpt_data_3[6], m_sprcpt_data_4[4];
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	DECLARE_MACHINE_RESET(raiden2);
 	DECLARE_MACHINE_RESET(zeroteam);
 	DECLARE_MACHINE_RESET(xsedae);
@@ -175,12 +175,12 @@ private:
 
 	void combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask);
 	void sprcpt_init();
-	void raiden2_cop_mem(address_map &map);
-	void raiden2_mem(address_map &map);
-	void raiden2_sound_map(address_map &map);
-	void raidendx_mem(address_map &map);
-	void xsedae_mem(address_map &map);
-	void zeroteam_mem(address_map &map);
+	void raiden2_cop_mem(address_map &map) ATTR_COLD;
+	void raiden2_mem(address_map &map) ATTR_COLD;
+	void raiden2_sound_map(address_map &map) ATTR_COLD;
+	void raidendx_mem(address_map &map) ATTR_COLD;
+	void xsedae_mem(address_map &map) ATTR_COLD;
+	void zeroteam_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SEIBU_RAIDEN2_H

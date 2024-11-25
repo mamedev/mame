@@ -11,8 +11,8 @@
 
 *****************************************************************************/
 
-#ifndef MAME_BUS_TI99_PED_BWG_H
-#define MAME_BUS_TI99_PED_BWG_H
+#ifndef MAME_BUS_TI99_PEB_BWG_H
+#define MAME_BUS_TI99_PEB_BWG_H
 
 #pragma once
 
@@ -39,13 +39,12 @@ public:
 	void cruwrite(offs_t offset, uint8_t data) override;
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	void device_config_complete() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -113,7 +112,7 @@ private:
 	required_device<ram_device> m_buffer_ram;
 
 	// Link to the attached floppy drives
-	floppy_image_device*    m_floppy[4];
+	required_device_array<floppy_connector, 4> m_floppy;
 
 	// Currently selected floppy drive (1-4, 0=none)
 	int m_sel_floppy;
@@ -136,4 +135,4 @@ private:
 
 DECLARE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device)
 
-#endif // MAME_BUS_TI99_PED_BWG_H
+#endif // MAME_BUS_TI99_PEB_BWG_H

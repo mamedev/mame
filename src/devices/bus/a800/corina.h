@@ -15,14 +15,14 @@ public:
 	a800_rom_corina_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	a800_rom_corina_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void cart_map(address_map &map) override;
-	virtual void cctl_map(address_map &map) override;
+	virtual void cart_map(address_map &map) override ATTR_COLD;
+	virtual void cctl_map(address_map &map) override ATTR_COLD;
 	virtual std::tuple<int, int> get_initial_rd_state() override { return std::make_tuple(1, 1); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	std::unique_ptr<uint8_t[]> m_nvram_ptr;
 
@@ -44,7 +44,7 @@ public:
 
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual uint8_t read_view_1(offs_t offset) override;
 	virtual void write_view_1(offs_t offset, u8 data) override;

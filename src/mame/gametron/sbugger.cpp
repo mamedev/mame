@@ -128,7 +128,7 @@ public:
 	void sbugger(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -147,12 +147,10 @@ private:
 	void palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 TILE_GET_INFO_MEMBER(sbugger_state::get_tile_info)
 {
@@ -200,8 +198,6 @@ void sbugger_state::palette(palette_device &palette) const
 	}
 }
 
-
-// machine
 
 void sbugger_state::prg_map(address_map &map)
 {

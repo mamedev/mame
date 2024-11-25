@@ -44,14 +44,14 @@ public:
 	void leapfrog_didj(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void didj_arm9_map(address_map &map);
+	void didj_arm9_map(address_map &map) ATTR_COLD;
 
 	required_device<arm9_cpu_device> m_maincpu;
 	optional_device<generic_slot_device> m_cart;

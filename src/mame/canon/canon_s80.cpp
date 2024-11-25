@@ -169,7 +169,7 @@ public:
 	void canons80(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 keyboard_r();
@@ -177,7 +177,7 @@ private:
 
 	HD44780_PIXEL_UPDATE(pixel_update);
 
-	void canons80_map(address_map &map);
+	void canons80_map(address_map &map) ATTR_COLD;
 
 	optional_ioport_array<16> m_keyboard;
 	u8 m_keyscan;
@@ -319,7 +319,7 @@ void canons80_state::canons80(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	hd44780_device &hd44780(HD44780(config, "lcdc", 250'000)); // TODO: Wrong device type, should be T1719A; clock not measured, datasheet typical clock used
+	hd44780_device &hd44780(HD44780(config, "lcdc", 270'000)); // TODO: Wrong device type, should be T1719A; clock not measured, datasheet typical clock used
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(canons80_state::pixel_update));
 

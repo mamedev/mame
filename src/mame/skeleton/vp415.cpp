@@ -75,8 +75,8 @@ public:
 	static const char *const SWITCHES_TAG;
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(drive_2ppr_tick);
 
@@ -214,22 +214,22 @@ private:
 		DRIVE_P1_TP2_BIT    = 7
 	};
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void z80_program_map(address_map &map);
-	void z80_io_map(address_map &map);
-	void datamcu_program_map(address_map &map);
+	void z80_program_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
+	void datamcu_program_map(address_map &map) ATTR_COLD;
 	void set_int_line(uint8_t line, uint8_t value);
 	void update_cpu_int();
 
-	void ctrl_program_map(address_map &map);
-	void ctrl_io_map(address_map &map);
-	void ctrlmcu_program_map(address_map &map);
+	void ctrl_program_map(address_map &map) ATTR_COLD;
+	void ctrl_io_map(address_map &map) ATTR_COLD;
+	void ctrlmcu_program_map(address_map &map) ATTR_COLD;
 	void sd_w(uint8_t data);
 	uint8_t sd_r();
 
-	void drive_program_map(address_map &map);
-	void drive_io_map(address_map &map);
+	void drive_program_map(address_map &map) ATTR_COLD;
+	void drive_io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_datacpu;
 	required_device<i8041a_device> m_datamcu;
@@ -421,7 +421,7 @@ void vp415_state::z80_program_map(address_map &map)
 void vp415_state::z80_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).rw(SCSI_TAG, FUNC(ncr5385_device::read), FUNC(ncr5385_device::write));
+	map(0x00, 0x0f).m(SCSI_TAG, FUNC(ncr5385_device::map));
 	// 0x20, 0x21: Connected to A0 + D0..D7 of SLAVE i8041
 	map(0x34, 0x34).w(FUNC(vp415_state::sel34_w));
 	map(0x37, 0x37).r(FUNC(vp415_state::sel37_r));

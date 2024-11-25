@@ -97,10 +97,10 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void apricot_io(address_map &map);
-	void apricot_mem(address_map &map);
+	void apricot_io(address_map &map) ATTR_COLD;
+	void apricot_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<i8086_cpu_device> m_cpu;
 	required_device<i8089_device> m_iop;

@@ -8,7 +8,7 @@ Driver by Angelo Salese
 LaserDisc and artwork hookup by Ryan Holtz
 
 TODO:
-- Unemulated Sony LDP-1450 player, and Pioneer LD-V4200 is HLE; needs a dump of the BIOSes and
+- Sony LDP-1450 player (not hooked up) and Pioneer LD-V4200 are HLE; needs a dump of the BIOSes and
   proper hook-up.
 
 ==================================================================================================
@@ -57,10 +57,10 @@ public:
 	void timetrv(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void timetrv_map(address_map &map);
-	void timetrv_io(address_map &map);
+	void timetrv_map(address_map &map) ATTR_COLD;
+	void timetrv_io(address_map &map) ATTR_COLD;
 
 	void ppi1_pc_w(uint8_t data);
 

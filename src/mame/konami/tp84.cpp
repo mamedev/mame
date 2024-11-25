@@ -111,8 +111,8 @@ public:
 	void tp84b(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -157,14 +157,12 @@ private:
 	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void audio_map(address_map &map);
-	void cpu2_map(address_map &map);
-	void tp84_cpu1_map(address_map &map);
-	void tp84b_cpu1_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void tp84_cpu1_map(address_map &map) ATTR_COLD;
+	void tp84b_cpu1_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /*
 -The colortable is divided in 2 part:
@@ -349,8 +347,6 @@ uint32_t tp84_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-
-// machine
 
 void tp84_state::machine_start()
 {

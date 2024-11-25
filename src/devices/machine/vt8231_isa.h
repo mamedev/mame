@@ -37,27 +37,27 @@ public:
 	void com1_cts_w(int state) { m_com1->cts_w(state); };
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	uint8_t function_control_1_r();
 	void function_control_1_w(uint8_t data);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t superio_cfg_idx_r();
 	void superio_cfg_idx_w(uint8_t data);
 	uint8_t superio_cfg_data_r();
 	void superio_cfg_data_w(uint8_t data);
 
-	void com1_map(address_map &map);
+	void com1_map(address_map &map) ATTR_COLD;
 	uint16_t com1_baud_r();
 	void com1_baud_w(uint16_t data);
 

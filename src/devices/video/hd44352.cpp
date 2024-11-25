@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/hd44352.h"
+#include "hd44352.h"
 
 #define     LCD_BYTE_INPUT          0x01
 #define     LCD_BYTE_OUTPUT         0x02

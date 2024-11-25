@@ -6,8 +6,8 @@
 
  **********************************************************************/
 
-#ifndef MAME_BUS_ISA_LBA_ENHANCER_H
-#define MAME_BUS_ISA_LBA_ENHANCER_H
+#ifndef MAME_BUS_ISA_LBAENHANCER_H
+#define MAME_BUS_ISA_LBAENHANCER_H
 
 #pragma once
 
@@ -26,14 +26,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 private:
 	uint32_t m_current_rom_start;
 };
@@ -41,4 +41,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ISA8_LBA_ENHANCER, lba_enhancer_device)
 
-#endif // MAME_BUS_ISA_LBA_ENHANCER_H
+#endif // MAME_BUS_ISA_LBAENHANCER_H

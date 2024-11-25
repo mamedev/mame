@@ -20,14 +20,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	enum dac_registers {
+	enum dac_registers
+	{
 		VCF,
 		VCQ,
 		VCA,
@@ -36,8 +37,8 @@ private:
 
 	struct biquad
 	{
-		double a0, a1, a2;      /* Numerator coefficients */
-		double b0, b1, b2;      /* Denominator coefficients */
+		double a0, a1, a2;      // Numerator coefficients
+		double b0, b1, b2;      // Denominator coefficients
 	};
 
 	struct lp_filter

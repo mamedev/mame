@@ -177,3 +177,8 @@ void galaxold_state::init_bullsdrtg()
 		gfxrom[0x1000 + i] = 0;
 	}
 }
+
+void galaxold_state::init_superbikg()
+{
+	save_item(NAME(m_superbikg_latch));
+}

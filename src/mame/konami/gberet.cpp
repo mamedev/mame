@@ -218,7 +218,7 @@ public:
 	{ }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr<uint8_t> m_colorram;
@@ -254,10 +254,10 @@ public:
 	void gberet(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 
 private:
 	// memory pointers
@@ -292,14 +292,14 @@ public:
 	void mrgoemon(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// memory pointers
 	required_memory_bank m_mainbank;
 
 	void coin_counter_w(uint8_t data);
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 class gberetb_state : public gberet_base_state
@@ -318,11 +318,9 @@ private:
 	void scroll_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -524,8 +522,6 @@ uint32_t gberetb_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *

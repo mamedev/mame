@@ -4,7 +4,7 @@
 license:CC0-1.0
 -->
 
-<softwarelist name="wicat" description="Millennium Systems Wicat">
+<softwarelist name="wicat" description="Millennium Systems Wicat disk images">
 
 	<software name="asembler">
 		<description>Wicat M68000 Assembler (Ver. 1.0)</description>

@@ -49,7 +49,7 @@ protected:
 	void update();
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	// device_image_interface implementation

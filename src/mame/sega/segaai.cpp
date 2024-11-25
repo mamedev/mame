@@ -160,7 +160,7 @@ public:
 	void segaai(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	static constexpr u8 VECTOR_V9938 = 0xf8;
@@ -178,8 +178,8 @@ private:
 	static constexpr u8 UPD7759_MODE = 0x01;
 	static constexpr u8 UPD7759_BANK = 0x02;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 	void update_irq_state();
 	u32 get_vector() { return m_vector; }
 	void vdp_interrupt(int state);
@@ -216,6 +216,7 @@ private:
 
 	u8 m_i8255_portb;
 	u8 m_upd7759_ctrl;
+	u8 m_upd7759_bank_ff;
 	u8 m_port_1c;
 	u8 m_port_1d;
 	u8 m_port_1e;
@@ -340,7 +341,7 @@ static INPUT_PORTS_START(ai_kbd)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("PL")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("RL")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("upd7759", upd7759_device, busy_r)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("upd7759", FUNC(upd7759_device::busy_r))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) // Microphone sensor
 
 	PORT_START("PORT5")
@@ -544,13 +545,25 @@ void segaai_state::upd7759_ctrl_w(u8 data)
 {
 	LOG("I/O Port $0b write: $%02x\n", data);
 
+	u8 prev_upd7759_ctrl = m_upd7759_ctrl;
 	m_upd7759_ctrl = data;
 
 	// bit0 is connected to /md line of the uPD7759
 	m_upd7759->md_w((m_upd7759_ctrl & UPD7759_MODE) ? 0 : 1);
 
-	// bit1 selects which ROM should be used?
-	m_upd7759->set_rom_bank((m_upd7759_ctrl & UPD7759_BANK) >> 1);
+	if (BIT(prev_upd7759_ctrl, 0))
+	{
+		if (!BIT(m_upd7759_ctrl, 0))
+		{
+			m_upd7759_bank_ff = 0;
+			m_upd7759->set_rom_bank(m_upd7759_bank_ff);
+		}
+	}
+	else
+	{
+		m_upd7759_bank_ff ^= 0x01;
+		m_upd7759->set_rom_bank(m_upd7759_bank_ff);
+	}
 }
 
 
@@ -632,6 +645,7 @@ void segaai_state::machine_start()
 {
 	m_i8255_portb = 0x7f;
 	m_upd7759_ctrl = 0;
+	m_upd7759_bank_ff = 0;
 	m_port_1c = 0;
 	m_port_1d = 0;
 	m_port_1e = 0;
@@ -645,6 +659,7 @@ void segaai_state::machine_start()
 
 	save_item(NAME(m_i8255_portb));
 	save_item(NAME(m_upd7759_ctrl));
+	save_item(NAME(m_upd7759_bank_ff));
 	save_item(NAME(m_port_1c));
 	save_item(NAME(m_port_1d));
 	save_item(NAME(m_port_1e));

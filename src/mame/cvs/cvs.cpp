@@ -97,7 +97,6 @@ Todo & FIXME:
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "cvs_base.h"
 
 #include "speaker.h"
@@ -364,7 +363,6 @@ uint32_t cvs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				x, y);
 	}
 
-
 	// Update screen - 8 regions, fixed scrolling area
 	int scroll[8];
 
@@ -394,21 +392,23 @@ uint32_t cvs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			{
 				int const bx = 255 - 7 - m_bullet_ram[offs] - ct;
 
-				// Bullet/Object Collision
-				if ((s2636_0_bitmap.pix(offs, bx) != 0) ||
-					(s2636_1_bitmap.pix(offs, bx) != 0) ||
-					(s2636_2_bitmap.pix(offs, bx) != 0))
-					m_collision_register |= 0x08;
+				if (cliprect.contains(bx, offs))
+				{
+					// Bullet/Object Collision
+					if ((s2636_0_bitmap.pix(offs, bx) != 0) ||
+						(s2636_1_bitmap.pix(offs, bx) != 0) ||
+						(s2636_2_bitmap.pix(offs, bx) != 0))
+						m_collision_register |= 0x08;
 
-				// Bullet/Background Collision
-				if (m_palette->pen_indirect(m_scrolled_collision_background.pix(offs, bx)))
-					m_collision_register |= 0x80;
+					// Bullet/Background Collision
+					if (m_palette->pen_indirect(m_scrolled_collision_background.pix(offs, bx)))
+						m_collision_register |= 0x80;
 
-				bitmap.pix(offs, bx) = BULLET_STAR_PEN;
+					bitmap.pix(offs, bx) = BULLET_STAR_PEN;
+				}
 			}
 		}
 	}
-
 
 	// mix and copy the S2636 images into the main bitmap, also check for collision
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)

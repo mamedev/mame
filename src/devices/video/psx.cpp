@@ -8,8 +8,9 @@
  */
 
 #include "emu.h"
+#include "psx.h"
+
 #include "cpu/psx/psx.h"
-#include "video/psx.h"
 
 #include "screen.h"
 

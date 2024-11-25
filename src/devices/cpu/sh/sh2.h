@@ -36,13 +36,12 @@ protected:
 	void check_pending_irq(const char *message);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 4; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 16; }
 	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;

@@ -58,8 +58,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
@@ -82,7 +82,7 @@ private:
 	uint8_t    m_has_extra_video_ram;
 	int32_t    m_rmrd_line;
 	uint8_t    m_irq_enabled;
-	uint8_t    m_romsubbank, m_scrollctrl;
+	uint8_t    m_romsubbank, m_scrollctrl, m_addrmap;
 
 	int        m_dx, m_dy;
 

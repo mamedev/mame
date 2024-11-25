@@ -1320,7 +1320,7 @@ TIM_BORROWOUT   EQU %00000001
 
 void lynx_state::timer_init(int which)
 {
-	memset(&m_timer[which], 0, sizeof(LYNX_TIMER));
+	m_timer[which] = LYNX_TIMER();
 	m_timer[which].timer = timer_alloc(FUNC(lynx_state::timer_shot), this);
 
 	save_item(NAME(m_timer[which].bakup), which);
@@ -1557,7 +1557,7 @@ void lynx_state::update_screen_timing()
 
 void lynx_state::uart_reset()
 {
-	memset(&m_uart, 0, sizeof(m_uart));
+	m_uart = UART();
 }
 
 TIMER_CALLBACK_MEMBER(lynx_state::uart_loopback_timer)
@@ -1879,8 +1879,8 @@ void lynx_state::machine_reset()
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	m_maincpu->set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
 
-	memset(&m_suzy, 0, sizeof(m_suzy));
-	memset(&m_mikey, 0, sizeof(m_mikey));
+	m_suzy = SUZY();
+	m_mikey = MIKEY();
 
 	m_suzy.data[0x88]  = 0x01;
 	m_suzy.data[0x90]  = 0x00;

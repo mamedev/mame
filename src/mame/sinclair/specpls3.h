@@ -30,9 +30,9 @@ public:
 	void spectrum_plus3(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void plus3_update_memory() override;
 	virtual bool is_contended(offs_t offset) override;
 
@@ -46,8 +46,8 @@ private:
 	void port_1ffd_w(offs_t offset, uint8_t data);
 	void plus3_us_w(uint8_t data);
 
-	void plus3_io(address_map &map);
-	void plus3_mem(address_map &map);
+	void plus3_io(address_map &map) ATTR_COLD;
+	void plus3_mem(address_map &map) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 

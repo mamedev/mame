@@ -237,7 +237,7 @@ mips1_device_base::mips1_device_base(machine_config const &mconfig, device_type 
 }
 
 r2000_device::r2000_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, size_t icache_size, size_t dcache_size)
-	: mips1_device_base(mconfig, R2000, tag, owner, clock, 0x0100, icache_size, dcache_size, false)
+	: mips1_device_base(mconfig, R2000, tag, owner, clock, 0x0120, icache_size, dcache_size, false)
 {
 }
 

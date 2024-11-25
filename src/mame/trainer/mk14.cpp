@@ -66,7 +66,7 @@ protected:
 	void port_a_w(uint8_t data);
 	void cass_w(int state);
 	int cass_r();
-	void mk14_map(address_map &map);
+	void mk14_map(address_map &map) ATTR_COLD;
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
@@ -92,7 +92,7 @@ public:
 	void mk14vdu(machine_config &config);
 
 private:
-	void mk14vdu_map(address_map &map);
+	void mk14vdu_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_page_character(int page, uint16_t addr, int invert, bitmap_rgb32 &bitmap);

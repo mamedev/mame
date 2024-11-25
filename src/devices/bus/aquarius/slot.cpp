@@ -118,9 +118,8 @@ std::string aquarius_cartridge_slot_device::get_default_card_software(get_defaul
 		{
 			uint8_t header[16];
 
-			size_t actual;
 			hook.image_file()->seek(len - 0x2000, SEEK_SET); // FIXME: check error return
-			hook.image_file()->read(&header[0], 16, actual); // FIXME: check error return or read returning short
+			read(*hook.image_file(), &header[0], 16); // FIXME: check error return or read returning short
 
 			// detect SuperCart header
 			if (!memcmp(&header[0], SC08_HEADER, 16) || !memcmp(&header[0], SC16_HEADER, 16))

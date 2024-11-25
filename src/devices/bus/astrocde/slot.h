@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef MAME_BUS_ASTROCADE_SLOT_H
-#define MAME_BUS_ASTROCADE_SLOT_H
+#ifndef MAME_BUS_ASTROCDE_SLOT_H
+#define MAME_BUS_ASTROCDE_SLOT_H
 
 #pragma once
 
@@ -84,7 +84,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	int m_type;
 	device_astrocade_cart_interface *m_cart;
@@ -93,4 +93,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(ASTROCADE_CART_SLOT, astrocade_cart_slot_device)
 
-#endif // MAME_BUS_ASTROCADE_SLOT_H
+#endif // MAME_BUS_ASTROCDE_SLOT_H

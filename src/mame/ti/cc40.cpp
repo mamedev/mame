@@ -126,8 +126,8 @@ public:
 	void cc40p(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
@@ -177,8 +177,8 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	HD44780_PIXEL_UPDATE(cc40_pixel_update);
 
-	void cc40_map(address_map &map);
-	void cc40p_map(address_map &map);
+	void cc40_map(address_map &map) ATTR_COLD;
+	void cc40p_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -511,11 +511,11 @@ INPUT_CHANGED_MEMBER(cc40_state::sysram_size_changed)
 
 static INPUT_PORTS_START( cc40 )
 	PORT_START("RAMSIZE")
-	PORT_CONFNAME( 0x07, 0x01, "RAM Chip 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, 0)
+	PORT_CONFNAME( 0x07, 0x01, "RAM Chip 1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cc40_state::sysram_size_changed), 0)
 	PORT_CONFSETTING(    0x00, "None" )
 	PORT_CONFSETTING(    0x01, "2KB" )
 	PORT_CONFSETTING(    0x04, "8KB" )
-	PORT_CONFNAME( 0x70, 0x10, "RAM Chip 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, 1)
+	PORT_CONFNAME( 0x70, 0x10, "RAM Chip 2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cc40_state::sysram_size_changed), 1)
 	PORT_CONFSETTING(    0x00, "None" ) // note: invalid configuration, unless Chip 1 is also 0x00
 	PORT_CONFSETTING(    0x10, "2KB" )
 	PORT_CONFSETTING(    0x40, "8KB" )

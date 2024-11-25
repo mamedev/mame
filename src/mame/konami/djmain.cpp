@@ -131,9 +131,9 @@ public:
 	void init_bmclubmx();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void sndram_bank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -159,11 +159,11 @@ private:
 	void ide_interrupt(int state);
 	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	K056832_CB_MEMBER(tile_callback);
-	void k054539_map(address_map &map);
-	void maincpu_djmain(address_map &map);
-	void maincpu_djmaina(address_map &map);
-	void maincpu_djmainj(address_map &map);
-	void maincpu_djmainu(address_map &map);
+	void k054539_map(address_map &map) ATTR_COLD;
+	void maincpu_djmain(address_map &map) ATTR_COLD;
+	void maincpu_djmaina(address_map &map) ATTR_COLD;
+	void maincpu_djmainj(address_map &map) ATTR_COLD;
+	void maincpu_djmainu(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint32_t> m_obj_ram;
 	required_device<cpu_device> m_maincpu;

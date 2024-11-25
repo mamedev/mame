@@ -9,7 +9,7 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/fdc37c93x.h"
+#include "fdc37c93x.h"
 
 #include "machine/pckeybrd.h"
 

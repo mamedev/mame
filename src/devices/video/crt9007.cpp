@@ -950,3 +950,13 @@ void crt9007_device::set_character_width(unsigned value)
 	if (started())
 		recompute_parameters();
 }
+
+
+//-------------------------------------------------
+//  cursor_active - is cursor active at location
+//-------------------------------------------------
+
+bool crt9007_device::cursor_active(unsigned x, unsigned y)
+{
+	return (x == HORIZONTAL_CURSOR && y == VERTICAL_CURSOR);
+}

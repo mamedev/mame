@@ -53,7 +53,7 @@ public:
 	void ctvboy(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<m6801u4_cpu_device> m_maincpu;
@@ -71,7 +71,7 @@ private:
 
 	void speaker_decay_sim(s32 param);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void p1_w(u8 data);
@@ -149,7 +149,7 @@ void ctvboy_state::p1_w(u8 data)
 u8 ctvboy_state::p1_r()
 {
 	// P17: MC6847 HS
-	return m_mc6847->hs_r() ? 0 : 0x80;
+	return m_mc6847->hs_r() ? 0x80 : 0;
 }
 
 u8 ctvboy_state::p2_r()

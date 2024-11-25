@@ -122,8 +122,8 @@ public:
 	void init_jrpacman();
 
 private:
-	void main_map(address_map &map);
-	void port_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
 };
 
 

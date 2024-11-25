@@ -63,10 +63,10 @@ private:
 	required_ioport m_modifiers;
 	emu_timer *m_reset_done_timer = nullptr;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(reset_done);
 
@@ -90,9 +90,9 @@ private:
 	CDP1869_CHAR_RAM_WRITE_MEMBER(comx35_charram_w);
 	CDP1869_PCB_READ_MEMBER(comx35_pcb_r);
 
-	void cdp1869_page_ram(address_map &map);
-	void comx35_io(address_map &map);
-	void comx35_mem(address_map &map);
+	void cdp1869_page_ram(address_map &map) ATTR_COLD;
+	void comx35_io(address_map &map) ATTR_COLD;
+	void comx35_mem(address_map &map) ATTR_COLD;
 	// processor state
 	int m_clear = 0;                // CPU mode
 	int m_q = 0;                    // Q flag

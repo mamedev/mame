@@ -344,7 +344,7 @@ void pgm_arm_type1_state::init_kovshxas()
 
 void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
 {
-	u16 *src = (u16 *)(memregion("tiles")->base() + 0x180000);
+	u16 *src = (u16 *)(memregion("igs023")->base() + 0x180000);
 	std::vector<u16> dst(0x800000);
 
 	for (int i = 0; i < 0x800000 / 2; i++)
@@ -418,14 +418,14 @@ void pgm_arm_type1_state::init_kovlsqh2()
 	pgm_decode_kovqhsgs2_program();
 	pgm_decode_kovlsqh2_tiles();
 
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x1000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x1800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x2000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x2800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprmask")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprmask")->base() + 0x0800000);
 
 	pgm_decode_kovlsqh2_samples();
 	pgm_basic_init();
@@ -439,14 +439,14 @@ void pgm_arm_type1_state::init_kovqhsgs()
 	pgm_decode_kovqhsgs_program();
 	pgm_decode_kovlsqh2_tiles();
 
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x1000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x1800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x2000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x2800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprmask")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprmask")->base() + 0x0800000);
 
 	pgm_decode_kovlsqh2_samples();
 	pgm_basic_init();
@@ -2388,6 +2388,7 @@ INPUT_PORTS_START( sango )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
@@ -2401,6 +2402,7 @@ INPUT_PORTS_START( sango_ch )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
@@ -2415,6 +2417,7 @@ INPUT_PORTS_START( oldsplus )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0001, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) )
@@ -2428,6 +2431,7 @@ INPUT_PORTS_START( pstar )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
@@ -2441,6 +2445,7 @@ INPUT_PORTS_START( py2k2 )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0003, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( Taiwan ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( China ) )
@@ -2455,6 +2460,7 @@ INPUT_PORTS_START( pgm3in1 )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0003, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
@@ -2467,6 +2473,7 @@ INPUT_PORTS_START( puzzli2 )
 	PORT_INCLUDE ( pgm )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
+	PORT_BIT(      0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( Taiwan ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( China ) )

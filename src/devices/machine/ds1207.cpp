@@ -33,6 +33,8 @@
 #include "emu.h"
 #include "ds1207.h"
 
+#include <tuple>
+
 #define LOG_LINES    (1U << 1)
 #define LOG_STATE    (1U << 2)
 #define LOG_DATA     (1U << 3)
@@ -138,28 +140,62 @@ void ds1207_device::nvram_default()
 
 bool ds1207_device::nvram_read(util::read_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	bool result = !file.read(m_unique_pattern, sizeof(m_unique_pattern), actual) && actual == sizeof(m_unique_pattern);
-	result = result && !file.read(m_identification, sizeof(m_identification), actual) && actual == sizeof(m_identification);
-	result = result && !file.read(m_security_match, sizeof(m_security_match), actual) && actual == sizeof(m_security_match);
-	result = result && !file.read(m_secure_memory, sizeof(m_secure_memory), actual) && actual == sizeof(m_secure_memory);
-	result = result && !file.read(m_days_left, sizeof(m_days_left), actual) && actual == sizeof(m_days_left);
-	result = result && !file.read(m_start_time, sizeof(m_start_time), actual) && actual == sizeof(m_start_time);
-	result = result && !file.read(&m_device_state, sizeof(m_device_state), actual) && actual == sizeof(m_device_state);
-	return result;
+
+	std::tie(err, actual) = read(file, m_unique_pattern, sizeof(m_unique_pattern));
+	if (err || (sizeof(m_unique_pattern) != actual))
+		return false;
+	std::tie(err, actual) = read(file, m_identification, sizeof(m_identification));
+	if (err || (sizeof(m_identification) != actual))
+		return false;
+	std::tie(err, actual) = read(file, m_security_match, sizeof(m_security_match));
+	if (err || (sizeof(m_security_match) != actual))
+		return false;
+	std::tie(err, actual) = read(file, m_secure_memory, sizeof(m_secure_memory));
+	if (err || (sizeof(m_secure_memory) != actual))
+		return false;
+	std::tie(err, actual) = read(file, m_days_left, sizeof(m_days_left));
+	if (err || (sizeof(m_days_left) != actual))
+		return false;
+	std::tie(err, actual) = read(file, m_start_time, sizeof(m_start_time));
+	if (err || (sizeof(m_start_time) != actual))
+		return false;
+	std::tie(err, actual) = read(file, &m_device_state, sizeof(m_device_state));
+	if (err || (sizeof(m_device_state) != actual))
+		return false;
+
+	return true;
 }
 
 bool ds1207_device::nvram_write(util::write_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	bool result = !file.write(m_unique_pattern, sizeof(m_unique_pattern), actual) && actual == sizeof(m_unique_pattern);
-	result = result && !file.write(m_identification, sizeof(m_identification), actual) && actual == sizeof(m_identification);
-	result = result && !file.write(m_security_match, sizeof(m_security_match), actual) && actual == sizeof(m_security_match);
-	result = result && !file.write(m_secure_memory, sizeof(m_secure_memory), actual) && actual == sizeof(m_secure_memory);
-	result = result && !file.write(m_days_left, sizeof(m_days_left), actual) && actual == sizeof(m_days_left);
-	result = result && !file.write(m_start_time, sizeof(m_start_time), actual) && actual == sizeof(m_start_time);
-	result = result && !file.write(&m_device_state, sizeof(m_device_state), actual) && actual == sizeof(m_device_state);
-	return result;
+
+	std::tie(err, actual) = write(file, m_unique_pattern, sizeof(m_unique_pattern));
+	if (err)
+		return false;
+	std::tie(err, actual) = write(file, m_identification, sizeof(m_identification));
+	if (err)
+		return false;
+	std::tie(err, actual) = write(file, m_security_match, sizeof(m_security_match));
+	if (err)
+		return false;
+	std::tie(err, actual) = write(file, m_secure_memory, sizeof(m_secure_memory));
+	if (err)
+		return false;
+	std::tie(err, actual) = write(file, m_days_left, sizeof(m_days_left));
+	if (err)
+		return false;
+	std::tie(err, actual) = write(file, m_start_time, sizeof(m_start_time));
+	if (err)
+		return false;
+	std::tie(err, actual) = write(file, &m_device_state, sizeof(m_device_state));
+	if (err)
+		return false;
+
+	return true;
 }
 
 void ds1207_device::new_state(uint8_t state)

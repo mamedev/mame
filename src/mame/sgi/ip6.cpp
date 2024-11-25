@@ -109,7 +109,7 @@ public:
 	void pi4d25(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<mips1_device_base> m_cpu;
@@ -136,7 +136,7 @@ private:
 	output_finder<5> m_leds;
 
 	void common(machine_config &config);
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	template <unsigned N> void lio_interrupt(int state) { lio_interrupt(N, state); }
 	void lio_interrupt(unsigned number, int state);

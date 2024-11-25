@@ -88,7 +88,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	int m_type, m_vec3d;
 	device_vectrex_cart_interface *m_cart;

@@ -137,7 +137,7 @@
 #include "ssv.h"
 
 
-void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow, int realline, int line)
+void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, bool flipx, bool flipy, int base_sx, int base_sy, int shadow, int realline, int line)
 {
 	gfx_element *gfxelement = m_gfxdecode->gfx(0);
 
@@ -193,18 +193,16 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 	}
 }
 
-void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow)
+void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, bool flipx, bool flipy, int base_sx, int base_sy, int shadow)
 {
 	for (int line = 0; line < 8; line++)
-	{
 		drawgfx_line(bitmap, cliprect, gfx, code, color, flipx, flipy, base_sx, base_sy, shadow, base_sy+line, line);
-	}
 }
 
 
 void ssv_state::video_start()
 {
-	m_gfxdecode->gfx(0)->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
+	m_gfxdecode->gfx(0)->set_granularity(64); // 256 colour sprites with palette selectable on 64 colour boundaries
 
 	save_item(NAME(m_enable_video));
 	save_item(NAME(m_shadow_pen_mask));
@@ -215,16 +213,16 @@ void eaglshot_state::video_start()
 {
 	ssv_state::video_start();
 
-	m_gfxram       =   std::make_unique<uint16_t[]>(16 * 0x40000 / 2);
+	m_gfxram = std::make_unique<uint16_t[]>(16 * 0x40000 / 2);
 
 	m_gfxdecode->gfx(0)->set_source((uint8_t *)m_gfxram.get());
 
 	save_pointer(NAME(m_gfxram), 16 * 0x40000 / 2);
 }
 
-TILE_GET_INFO_MEMBER(gdfs_state::get_tile_info_0)
+TILE_GET_INFO_MEMBER(gdfs_state::get_tile_info)
 {
-	uint16_t tile = m_tmapram[tile_index];
+	const uint16_t tile = m_tmapram[tile_index];
 
 	tileinfo.set(1, tile, 0, TILE_FLIPXY( tile >> 14 ));
 }
@@ -239,7 +237,7 @@ void gdfs_state::video_start()
 {
 	ssv_state::video_start();
 
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gdfs_state::get_tile_info_0)), TILEMAP_SCAN_ROWS, 16,16, 0x100,0x100);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gdfs_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 0x100,0x100);
 
 	m_tmap->set_transparent_pen(0);
 }
@@ -403,9 +401,7 @@ void ssv_state::scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_screen->update_partial(m_screen->vpos() - 1); // pastelis FOR USE IN JAPAN screen polls the vblank / hblank to do a raster effect
 	COMBINE_DATA(m_scroll + offset);
 
-/*  offsets 60-7f: CRT Controller   */
-//  if(((offset*2) & 0x70) == 0x60)
-//      printf("%04x %04x\n",data,offset*2);
+//  offsets 60-7f: CRT Controller
 }
 
 /***************************************************************************
@@ -594,12 +590,12 @@ From the above some noteworthy cases are:
 
 **************************************************************************/
 
-/* Draw a tilemap sprite */
+// Draw a tilemap sprite
 
 
-void ssv_state::draw_16x16_tile_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int flipx, int flipy, int mode, int code, int color, int sx, int sy, int realline, int line)
+void ssv_state::draw_16x16_tile_line(bitmap_ind16 &bitmap, const rectangle &cliprect, bool flipx, bool flipy, int mode, int code, int color, int sx, int sy, int realline, int line)
 {
-	/* Force 16x16 tiles ? */
+	// Force 16x16 tiles ?
 	int realcode;
 	if (flipy)
 	{
@@ -615,52 +611,50 @@ void ssv_state::draw_16x16_tile_line(bitmap_ind16 &bitmap, const rectangle &clip
 		else
 			realcode = code;
 	}
-	int tileline = line & 7;
+	const int tileline = line & 7;
 
-	int shadow = (mode & 0x0800);
-	/* Select 256 or 64 color tiles */
-	int gfx = ((mode & 0x0700) >> 8);
+	const int shadow = BIT(mode, 11);
+	// Select 256 or 64 color tiles
+	const int gfx = ((mode & 0x0700) >> 8);
 
 	drawgfx_line(bitmap, cliprect, gfx, realcode, color, flipx, flipy, sx, sy, shadow, realline, tileline);
 
 }
 
-inline void ssv_state::get_tile(int x, int y, int size, int page, int& code, int& attr, int& flipx, int& flipy)
+inline void ssv_state::get_tile(int x, int y, int size, int page, int& code, int& attr, bool& flipx, bool& flipy)
 {
-	uint16_t* s3 = &m_spriteram[page * (size * ((0x1000 / 0x200) / 2)) +
+	const uint16_t *const s3 = &m_spriteram[page * (size * ((0x1000 / 0x200) / 2)) +
 		((x & ((size - 1) & ~0xf)) << 2) +
 		((y & ((0x200 - 1) & ~0xf)) >> 3)];
 
 	code = s3[0];  // code high bits
 	attr = s3[1];  // code low  bits + color
 
-	/* Code's high bits are scrambled */
+	// Code's high bits are scrambled
 	code += m_tile_code[(attr & 0x3c00) >> 10];
-	flipy = (attr & 0x4000);
-	flipx = (attr & 0x8000);
+	flipy = BIT(attr, 14);
+	flipx = BIT(attr, 15);
 
-	if ((m_scroll[0x74 / 2] & 0x1000) && ((m_scroll[0x74 / 2] & 0x2000) == 0))
-	{
-		if (flipx == 0) flipx = 1; else flipx = 0;
-	}
-	if ((m_scroll[0x74 / 2] & 0x4000) && ((m_scroll[0x74 / 2] & 0x2000) == 0))
-	{
-		if (flipy == 0) flipy = 1; else flipy = 0;
-	}
+	if (BIT(m_scroll[0x74 / 2], 12) && BIT(~m_scroll[0x74 / 2], 13))
+		flipx = !flipx;
+
+	if (BIT(m_scroll[0x74 / 2], 14) && BIT(~m_scroll[0x74 / 2], 13))
+		flipy = !flipy;
+
 }
 
 void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sy, int scrollreg)
 {
 	scrollreg &= 0x7;      // scroll register index
 
-	/* in_sy will always be 0x00, 0x40, 0x80, 0xc0 in 'draw layer' */
+	// in_sy will always be 0x00, 0x40, 0x80, 0xc0 in 'draw layer'
 	in_sy = (in_sy & 0x1ff) - (in_sy & 0x200);
 
-	/* Set up a clipping region for the tilemap slice .. */
+	// Set up a clipping region for the tilemap slice ..
 	rectangle outclip;
 	outclip.set(0, 0x20/*width in tiles*/ * 0x10, in_sy, in_sy + 0x8/*height in tiles, always 64 pixels*/ * 0x8);
 
-	/* .. and clip it against the visible screen */
+	// .. and clip it against the visible screen
 
 	if (outclip.min_x > cliprect.max_x)    return;
 	if (outclip.min_y > cliprect.max_y)    return;
@@ -675,71 +669,72 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 		rectangle clip;
 		clip.set(outclip.min_x, outclip.max_x, line, line);
 
-		/* Get the scroll data */
+		// Get the scroll data
 		int tilemap_scrollx = m_scroll[scrollreg * 4 + 0];    // x scroll
 		int tilemap_scrolly = m_scroll[scrollreg * 4 + 1];    // y scroll
-		int unknown = m_scroll[scrollreg * 4 + 2];    // ???
-		int mode = m_scroll[scrollreg * 4 + 3];    // layer disabled, shadow, depth etc.
+		const int unknown = m_scroll[scrollreg * 4 + 2];    // ???
+		const int mode = m_scroll[scrollreg * 4 + 3];    // layer disabled, shadow, depth etc.
 
-		/* Background layer disabled */
+		// Background layer disabled
 		if ((mode & 0xe000) == 0)
 			return;
 
-		/* Decide the actual size of the tilemap */
-		int size = 1 << (8 + ((mode & 0xe000) >> 13));
-		int page = (tilemap_scrollx & 0x7fff) / size;
+		// Decide the actual size of the tilemap
+		const int size = 1 << (8 + ((mode & 0xe000) >> 13));
+		const int page = (tilemap_scrollx & 0x7fff) / size;
 
-		/* Given a fixed scroll value, the portion of tilemap displayed changes with the sprite position */
+		// Given a fixed scroll value, the portion of tilemap displayed changes with the sprite position
 		tilemap_scrolly += in_sy;
 
-		/* Tweak the scroll values */
+		// Tweak the scroll values
 		tilemap_scrolly += ((m_scroll[0x70 / 2] & 0x1ff) - (m_scroll[0x70 / 2] & 0x200) + m_scroll[0x6a / 2] + 2);
 
 		// Kludge for eaglshot
 		if ((unknown & 0x05ff) == 0x0440) tilemap_scrollx += -0x10;
 		if ((unknown & 0x05ff) == 0x0401) tilemap_scrollx += -0x20;
 
-		int realy = tilemap_scrolly + (line - in_sy);
+		const int realy = tilemap_scrolly + (line - in_sy);
 
-		if ((mode & 0x1000))
+		if (BIT(mode, 12))
 		{
-			uint32_t scrolltable_base = ((mode & 0x00ff) * 0x400 ) /2;
+			const uint32_t scrolltable_base = ((mode & 0x00ff) * 0x400) / 2;
 			//logerror("line %d realy %04x: scrolltable base is %08x\n", line,realy&0x1ff, scrolltable_base*2);
-			tilemap_scrollx += m_spriteram[(scrolltable_base+(realy&0x1ff)) & 0x1ffff];
+			tilemap_scrollx += m_spriteram[(scrolltable_base + (realy & 0x1ff)) & 0x1ffff];
 		}
 
-		/* Draw the rows */
-		int sx1 = 0 - (tilemap_scrollx & 0xf);
+		// Draw the rows
+		const int sx1 = 0 - (tilemap_scrollx & 0xf);
 		int x = tilemap_scrollx;
 		for (int sx = sx1; sx <= clip.max_x; sx += 0x10)
 		{
-			int code, attr, flipx, flipy;
+			int code, attr;
+			bool flipx, flipy;
 			get_tile(x, realy, size, page, code, attr, flipx, flipy);
 			draw_16x16_tile_line(bitmap, clip, flipx, flipy, mode, code, attr, sx, realy, line,realy & 0xf);
 			x += 0x10;
-		} /* sx */
-	} /* line */
+		} // sx
+	} // line
 }
 
-/* Draw the "background layer" using multiple tilemap sprites */
+// Draw the "background layer" using multiple tilemap sprites
 
-void ssv_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr)
+void ssv_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int nr)
 {
-	for ( int sy = 0; sy <= m_screen->visible_area().max_y; sy += 0x40 )
+	for (int sy = 0; sy <= m_screen->visible_area().max_y; sy += 0x40)
 		draw_row_64pixhigh(bitmap, cliprect, sy, nr);
 }
 
-void ssv_state::draw_sprites_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int code, int flipx, int flipy, int gfx, int shadow, int color, int sx, int sy, int xnum, int ynum)
+void ssv_state::draw_sprites_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int code, bool flipx, bool flipy, int gfx, int shadow, int color, int sx, int sy, int xnum, int ynum)
 {
 	int xstart, xend, xinc;
 	int ystart, yend, yinc;
 
-	/* Draw the tiles */
+	// Draw the tiles
 	if (flipx) { xstart = xnum - 1;  xend = -1;    xinc = -1; }
-	else { xstart = 0;       xend = xnum;  xinc = +1; }
+	else       { xstart = 0;         xend = xnum;  xinc = +1; }
 
 	if (flipy) { ystart = ynum - 1;  yend = -1;    yinc = -1; }
-	else { ystart = 0;       yend = ynum;  yinc = +1; }
+	else       { ystart = 0;         yend = ynum;  yinc = +1; }
 
 	for (int x = xstart; x != xend; x += xinc)
 	{
@@ -756,60 +751,58 @@ void ssv_state::draw_sprites_tiles(bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 
-/* Draw sprites in the sprites list */
+// Draw sprites in the sprites list
 
 void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* Sprites list */
-	uint16_t *spritelist_global = m_spriteram;
-	uint16_t *spritelist_global_end = m_spriteram + 0x02000 / 2;
+	// Sprites list
+	const uint16_t *spritelist_global = m_spriteram;
+	const uint16_t *spritelist_global_end = m_spriteram + 0x02000 / 2;
 
 	for (; spritelist_global < spritelist_global_end; spritelist_global += 4)
 	{
-		int sprite = spritelist_global[1];
+		const int sprite = spritelist_global[1];
 
-		/* Last sprite */
-		if (sprite & 0x8000) break;
+		// Last sprite
+		if (BIT(sprite, 15)) break;
 
-		/* Single-sprite address */
-		uint16_t* spritelist_local = &m_spriteram[(sprite & 0x7fff) * 4];
+		// Single-sprite address
+		const uint16_t *spritelist_local = &m_spriteram[(sprite & 0x7fff) * 4];
 		int tilemaps_offsy = ((spritelist_local[3] & 0x1ff) - (spritelist_local[3] & 0x200));
 
-		int mode = spritelist_global[0];
+		const int mode = spritelist_global[0];
 
-		/* Number of single-sprites int local list (1-32) */
-		int local_num = (mode & 0x001f);
+		// Number of single-sprites int local list (1-32)
+		const int local_num = (mode & 0x001f);
 
 		for (int count = 0; count <= local_num; count++, spritelist_local += 4)
 		{
-			uint16_t *spritelist_local_end = m_spriteram + 0x40000 / 2;
+			const uint16_t *spritelist_local_end = m_spriteram + 0x40000 / 2;
 
 			if (spritelist_local >= spritelist_local_end) break;
 
 			int sx = spritelist_local[2];
 			int sy = spritelist_local[3];
 
-			/* do we use local sizes (set here) or global ones (set in previous list) */
-			int use_local = m_scroll[0x76 / 2] & 0x4000;
+			// do we use local sizes (set here) or global ones (set in previous list)
+			const int use_local = BIT(m_scroll[0x76 / 2], 14);
 
 			int xnum = use_local ? (sx & 0x0c00) : (mode & 0x0c00);
 			int ynum = use_local ? (sy & 0x0c00) : (mode & 0x0300) << 2;
-			int depth = use_local ? (sx & 0xf000) : (mode & 0xf000);
+			const int depth = use_local ? (sx & 0xf000) : (mode & 0xf000);
 
 			if (spritelist_local[0] <= 7 && spritelist_local[1] == 0 && xnum == 0 && ynum == 0x0c00)
 			{
 				// Tilemap Sprite
-				int scroll;
+				const int scroll = spritelist_local[0];    // scroll index
 
-				scroll = spritelist_local[0];    // scroll index
-
-				if (m_scroll[0x76 / 2] & 0x1000)
+				if (BIT(m_scroll[0x76 / 2], 12))
 					sy -= 0x20;                     // eaglshot
 				else
 				{
-					if (m_scroll[0x7a / 2] & 0x0800)
+					if (BIT(m_scroll[0x7a / 2], 11))
 					{
-						if (m_scroll[0x7a / 2] & 0x1000)    // drifto94, dynagear, keithlcy, mslider, stmblade, gdfs, ultrax, twineag2
+						if (BIT(m_scroll[0x7a / 2], 12))    // drifto94, dynagear, keithlcy, mslider, stmblade, gdfs, ultrax, twineag2
 							sy -= tilemaps_offsy;
 						else                        // srmp4
 							sy += tilemaps_offsy;
@@ -819,9 +812,7 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				if (local_num != 0)
 				{
 					if (spritelist_local[0] != 0) // index 0 is the 'always automatically drawn background layer' so don't draw it twice even if it's specified later?
-					{
 						draw_row_64pixhigh(bitmap, cliprect, sy, scroll);
-					}
 				}
 			}
 			else
@@ -837,58 +828,53 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				*/
 
 				int code = spritelist_local[0];  // code high bits
-				int attr = spritelist_local[1];  // code low  bits + color
+				const int attr = spritelist_local[1];  // code low  bits + color
 
-				/* Code's high bits are scrambled */
+				// Code's high bits are scrambled
 				code += m_tile_code[(attr & 0x3c00) >> 10];
-				int flipy = (attr & 0x4000);
-				int flipx = (attr & 0x8000);
+				bool flipy = BIT(attr, 14);
+				bool flipx = BIT(attr, 15);
 
-				if ((m_scroll[0x74 / 2] & 0x1000) && ((m_scroll[0x74 / 2] & 0x2000) == 0))
-				{
-					if (flipx == 0) flipx = 1; else flipx = 0;
-				}
-				if ((m_scroll[0x74 / 2] & 0x4000) && ((m_scroll[0x74 / 2] & 0x2000) == 0))
-				{
-					if (flipy == 0) flipy = 1; else flipy = 0;
-				}
+				if (BIT(m_scroll[0x74 / 2], 12) && BIT(~m_scroll[0x74 / 2], 13))
+					flipx = !flipx;
 
-				/* Select 256 or 64 color tiles */
-				int gfx = (depth & 0x7000) >>12;
-				int shadow = (depth & 0x8000);
+				if (BIT(m_scroll[0x74 / 2], 14) && BIT(~m_scroll[0x74 / 2], 13))
+					flipy = !flipy;
+
+				// Select 256 or 64 color tiles
+				const int gfx = (depth & 0x7000) >> 12;
+				const int shadow = BIT(depth, 15);
 
 				/* Every single sprite is offset by x & yoffs, and additionally
 				by one of the 8 x & y offsets in the 1c0040-1c005f area   */
 
-				/* Apply global offsets */
-				int scrollreg = ((mode & 0x00e0) >> 4);
+				// Apply global offsets
+				const int scrollreg = ((mode & 0x00e0) >> 4);
 
 				sx += spritelist_global[2] + m_scroll[scrollreg + (0x40 / 2)];
 				sy += spritelist_global[3] + m_scroll[scrollreg + (0x42 / 2)];
 
-				/* Sign extend the position */
+				// Sign extend the position
 				sx = (sx & 0x1ff) - (sx & 0x200);
 				sy = (sy & 0x1ff) - (sy & 0x200);
 
-				int sprites_offsx = ((m_scroll[0x74 / 2] & 0x7f) - (m_scroll[0x74 / 2] & 0x80));
+				const int sprites_offsx = ((m_scroll[0x74 / 2] & 0x7f) - (m_scroll[0x74 / 2] & 0x80));
 
-				int sprites_offsy = -((m_scroll[0x70 / 2] & 0x1ff) - (m_scroll[0x70 / 2] & 0x200) + m_scroll[0x6a / 2] + 1);
+				const int sprites_offsy = -((m_scroll[0x70 / 2] & 0x1ff) - (m_scroll[0x70 / 2] & 0x200) + m_scroll[0x6a / 2] + 1);
 
-				if (m_scroll[0x74 / 2] & 0x4000) // flipscreen y
+				if (BIT(m_scroll[0x74 / 2], 14)) // flipscreen y
 				{
 					sy = -sy;
-					if (m_scroll[0x74 / 2] & 0x8000)
+					if (BIT(m_scroll[0x74 / 2], 15))
 						sy += 0x00;         //
 					else
 						sy -= 0x10;         // vasara (hack)
 				}
 
-				if (m_scroll[0x74 / 2] & 0x1000) // flipscreen x
-				{
+				if (BIT(m_scroll[0x74 / 2], 12)) // flipscreen x
 					sx = -sx + 0x100;
-				}
 
-				/* Single-sprite tile size */
+				// Single-sprite tile size
 				xnum = 1 << (xnum >> 10);   // 1, 2, 4 or 8 tiles
 				ynum = 1 << (ynum >> 10);   // 1, 2, 4 tiles (8 means tilemap sprite?)
 
@@ -900,7 +886,7 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					sx = sprites_offsx + sx;
 					sy = sprites_offsy - sy;
 				}
-				else if (m_scroll[0x7a / 2] & 0x0800)
+				else if (BIT(m_scroll[0x7a / 2], 11))
 				{
 					// dynagear, drifto94, eaglshot, keithlcy, mslider, srmp4, stmblade, twineag2, ultrax
 					sx = sprites_offsx + sx - (xnum * 8);
@@ -914,19 +900,14 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				}
 
 
-				/* Sprite code masking */
+				// Sprite code masking
 				if (xnum == 2 && ynum == 4) // needed by hypreact
-				{
 					code &= ~7;
-				}
 
 				draw_sprites_tiles(bitmap, cliprect, code, flipx, flipy, gfx, shadow, attr, sx, sy, xnum, ynum);
-
-			}       /* sprite type */
-
-		}   /* single-sprites */
-
-	}   /* sprites list */
+			}       // sprite type
+		}   // single-sprites
+	}   // sprites list
 }
 
 
@@ -957,7 +938,7 @@ uint32_t gdfs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-void ssv_state::enable_video(int enable)
+void ssv_state::enable_video(bool enable)
 {
 	m_enable_video = enable;
 }
@@ -965,7 +946,6 @@ void ssv_state::enable_video(int enable)
 uint32_t ssv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
-
 
 	// Shadow
 	if (m_scroll[0x76/2] & 0x0080)
@@ -980,7 +960,7 @@ uint32_t ssv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 	m_shadow_pen_mask = (1 << m_shadow_pen_shift) - 1;
 
-	/* The background color is the first one in the palette */
+	// The background color is the first one in the palette
 	bitmap.fill(0, cliprect);
 
 	// used by twineag2 and ultrax
@@ -999,7 +979,6 @@ uint32_t ssv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	draw_layer(bitmap, clip, 0); // "background layer"
 
 	draw_sprites(bitmap, clip);  // sprites list
-
 
 	return 0;
 }

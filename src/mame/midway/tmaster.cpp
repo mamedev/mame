@@ -90,6 +90,9 @@ Chips:
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "microtouchlayout.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/ds1204.h"
 #include "machine/mc68681.h"
@@ -99,6 +102,7 @@ Chips:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -145,8 +149,8 @@ private:
 	uint16_t rtc_r(offs_t offset);
 	void rtc_w(offs_t offset, uint16_t data);
 
-	void tmaster_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	void tmaster_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -315,7 +319,7 @@ static INPUT_PORTS_START( tm )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, tmaster_state, read_rand )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(FUNC(tmaster_state::read_rand))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_COIN1    )    // "E. Coin 1" (ECA?) tmaster defaults to e. coin,
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_COIN2    )    // "E. Coin 2" (ECA?) rather than m. coin
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN3    )    // "E. Coin 3" (ECA?) so they're coin1-coin4
@@ -323,8 +327,8 @@ static INPUT_PORTS_START( tm )
 
 	PORT_START("OUT")
 	//0800?
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( DEVICE_SELF, tmaster_state, write_oki_bank1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( DEVICE_SELF, tmaster_state, write_oki_bank0 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(tmaster_state::write_oki_bank1))
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(tmaster_state::write_oki_bank0))
 	//0002?
 INPUT_PORTS_END
 
@@ -344,12 +348,12 @@ static INPUT_PORTS_START( tm4k )
 	PORT_INCLUDE( tm2k )
 
 	PORT_MODIFY("COIN")
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "ds1204", ds1204_device, read_dq )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ds1204", FUNC(ds1204_device::read_dq))
 
 	PORT_MODIFY( "OUT" )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "ds1204", ds1204_device, write_rst )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "ds1204", ds1204_device, write_dq )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "ds1204", ds1204_device, write_clk )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("ds1204", FUNC(ds1204_device::write_rst))
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("ds1204", FUNC(ds1204_device::write_dq))
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("ds1204", FUNC(ds1204_device::write_clk))
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -410,11 +414,14 @@ void tmaster_state::tm(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6295(config, m_oki, XTAL(24'000'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* 1.5Mhz? clock frequency & pin 7 not verified */
+
+	config.set_default_layout(layout_microtouch);
 }
 
 void tmaster_state::tmds1204(machine_config &config)
 {
 	tm(config);
+
 	DS1204(config, "ds1204", 0);
 }
 

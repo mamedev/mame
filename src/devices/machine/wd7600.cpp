@@ -13,7 +13,7 @@
  */
 
 #include "emu.h"
-#include "machine/wd7600.h"
+#include "wd7600.h"
 
 #define VERBOSE 1
 #include "logmacro.h"

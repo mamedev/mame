@@ -43,9 +43,9 @@ public:
 	void tgate2_w(int state){ m_timer[1]->tgate_w(state); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	void reset_peripherals(int state);
@@ -55,7 +55,7 @@ private:
 	required_device_array<mc68340_timer_module_device, 2> m_timer;
 
 	void update_ipl();
-	void internal_vectors_r(address_map &map);
+	void internal_vectors_r(address_map &map) ATTR_COLD;
 	uint8_t int_ack(offs_t offset);
 
 	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
@@ -97,7 +97,7 @@ private:
 	void set_modck(int state);
 	void extal_w(int state);
 
-	void m68340_internal_map(address_map &map);
+	void m68340_internal_map(address_map &map) ATTR_COLD;
 
 	/* 68340 peripheral modules */
 	m68340_sim*    m_m68340SIM;

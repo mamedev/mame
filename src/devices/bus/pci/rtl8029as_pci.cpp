@@ -28,7 +28,7 @@ TODO:
 #define LOGWARN(...)            LOGMASKED(LOG_WARN, __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(RTL8029AS_PCI, rtl8029as_pci_device,   "rtl8029as_pci",   "Realtek RTL8029AS PCI Full-Duplex Ethernet card")
+DEFINE_DEVICE_TYPE(RTL8029AS_PCI, rtl8029as_pci_device,   "rtl8029as_pci",   "Realtek RTL8029AS Full-Duplex Ethernet")
 
 
 

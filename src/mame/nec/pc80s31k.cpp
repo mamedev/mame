@@ -452,8 +452,9 @@ ROM_START( pc80s31k )
 	ROMX_LOAD( "ma_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "mk2mr",    "mkIIMR disk BIOS" )
 	ROMX_LOAD( "m2mr_disk.rom", 0x0000, 0x2000, CRC(2447516b) SHA1(1492116f15c426f9796dc2bb6fcccf2656c0ca75), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "mh",       "MH disk BIOS" )
-	ROMX_LOAD( "mh_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004), ROM_BIOS(2) )
+	// same as MA BIOS
+//  ROM_SYSTEM_BIOS( 2, "mh",       "MH disk BIOS" )
+//  ROMX_LOAD( "mh_disk.rom", 0x0000, 0x2000, CRC(a222ecf0) SHA1(79e9c0786a14142f7a83690bf41fb4f60c5c1004), ROM_BIOS(2) )
 ROM_END
 
 const tiny_rom_entry *pc80s31k_device::device_rom_region() const

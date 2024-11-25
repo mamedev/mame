@@ -48,8 +48,8 @@ public:
 	void parodius(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices
@@ -81,13 +81,11 @@ private:
 	K052109_CB_MEMBER(tile_callback);
 	void banking_callback(uint8_t data);
 
-	void bank0000_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void bank0000_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -160,8 +158,6 @@ uint32_t parodius_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void parodius_state::videobank_w(uint8_t data)
 {

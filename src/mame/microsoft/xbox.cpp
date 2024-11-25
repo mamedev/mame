@@ -38,12 +38,12 @@ public:
 
 	void xbox(machine_config &config);
 protected:
-	void xbox_map(address_map &map);
+	void xbox_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void hack_eeprom() override;
 
@@ -194,13 +194,13 @@ ROM_START( xbox )
 	ROM_LOAD( "mcpx_1_1.bin", 0x200, 0x200, CRC(94ce376b) SHA1(6c875f17f773aaec51eb434068bb6c657c4343c0) )
 
 	ROM_REGION32_LE( 0x100000, "bios", 0)
-	ROM_SYSTEM_BIOS(0, "bios0", "XBOX BIOS 4134 1024k") \
-	ROM_LOAD_BIOS(0, "4134_1024k.bin", 0x000000, 0x100000, CRC(49d8055a) SHA1(d46cef771a63dc8024fe36d7ab5b959087ac999f)) \
-	ROM_SYSTEM_BIOS(1, "bios1", "XBOX BIOS 3944 1024k") \
-	ROM_LOAD_BIOS(1, "3944_1024k.bin", 0x000000, 0x100000, CRC(32a9ecb6) SHA1(67054fc88bda94e33e86f1b19be60efec0724fb6)) \
-	ROM_SYSTEM_BIOS(2, "bios2", "XBOX BIOS 4034 1024k") \
-	ROM_LOAD_BIOS(2, "4034_1024k.bin", 0x000000, 0x100000, CRC(0d6fc88f) SHA1(ab676b712204fb1728bf89f9cd541a8f5a64ab97)) \
-	ROM_SYSTEM_BIOS(3, "bios3", "XBOX BIOS 4817 1024k") \
+	ROM_SYSTEM_BIOS(0, "bios0", "XBOX BIOS 4134 1024k")
+	ROM_LOAD_BIOS(0, "4134_1024k.bin", 0x000000, 0x100000, CRC(49d8055a) SHA1(d46cef771a63dc8024fe36d7ab5b959087ac999f))
+	ROM_SYSTEM_BIOS(1, "bios1", "XBOX BIOS 3944 1024k")
+	ROM_LOAD_BIOS(1, "3944_1024k.bin", 0x000000, 0x100000, CRC(32a9ecb6) SHA1(67054fc88bda94e33e86f1b19be60efec0724fb6))
+	ROM_SYSTEM_BIOS(2, "bios2", "XBOX BIOS 4034 1024k")
+	ROM_LOAD_BIOS(2, "4034_1024k.bin", 0x000000, 0x100000, CRC(0d6fc88f) SHA1(ab676b712204fb1728bf89f9cd541a8f5a64ab97))
+	ROM_SYSTEM_BIOS(3, "bios3", "XBOX BIOS 4817 1024k")
 	ROM_LOAD_BIOS(3, "4817_1024k.bin", 0x000000, 0x100000, CRC(3f30863a) SHA1(dc955bd4d3ca71e01214a49e5d0aba615270c03c))
 	ROM_COPY( "mcpx", 0, 0x3fe00, 0x200)
 	ROM_COPY( "mcpx", 0, 0x7fe00, 0x200)

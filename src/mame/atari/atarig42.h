@@ -34,8 +34,8 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void video_int_ack_w(uint16_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	void a2d_select_w(offs_t offset, uint8_t data);
@@ -47,7 +47,7 @@ protected:
 	TILEMAP_MAPPER_MEMBER(atarig42_playfield_scan);
 	uint32_t screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void atarig42(machine_config &config);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<atari_jsa_iii_device> m_jsa;
 

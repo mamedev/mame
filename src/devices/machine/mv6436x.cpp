@@ -1137,8 +1137,7 @@ void mv64361_pci_host_device::device_start()
 {
 	pci_host_device::device_start();
 
-	memory_space = &space(AS_PCI_MEM);
-	io_space = &space(AS_PCI_IO);
+	set_spaces(&space(AS_PCI_MEM), &space(AS_PCI_IO));
 
 	memory_window_start = 0;
 	memory_window_end = 0xffffffff;

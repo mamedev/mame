@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NSCSI_S1410_H
-#define MAME_MACHINE_NSCSI_S1410_H
+#ifndef MAME_BUS_NSCSI_S1410_H
+#define MAME_BUS_NSCSI_S1410_H
 
 #pragma once
 
@@ -71,7 +71,7 @@ protected:
 		SK_FORMAT_ERROR         = 0x1a
 	};
 
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 	virtual void scsi_command() override;

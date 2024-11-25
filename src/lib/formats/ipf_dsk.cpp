@@ -8,6 +8,72 @@
 #include <cstring>
 
 
+struct ipf_format::ipf_decode {
+	struct track_info {
+		uint32_t cylinder = 0, head = 0, type = 0;
+		uint32_t sigtype = 0, process = 0, reserved[3] = { 0, 0, 0 };
+		uint32_t size_bytes = 0, size_cells = 0;
+		uint32_t index_bytes = 0, index_cells = 0;
+		uint32_t datasize_cells = 0, gapsize_cells = 0;
+		uint32_t block_count = 0, weak_bits = 0;
+
+		uint32_t data_size_bits = 0;
+
+		bool info_set = false;
+
+		const uint8_t *data = nullptr;
+		uint32_t data_size = 0;
+	};
+
+	std::vector<track_info> tinfos;
+	uint32_t tcount = 0;
+
+	uint32_t type = 0, release = 0, revision = 0;
+	uint32_t encoder_type = 0, encoder_revision = 0, origin = 0;
+	uint32_t min_cylinder = 0, max_cylinder = 0, min_head = 0, max_head = 0;
+	uint32_t credit_day = 0, credit_time = 0;
+	uint32_t platform[4] = {}, extra[5] = {};
+
+	uint32_t crc32r(const uint8_t *data, uint32_t size);
+
+	bool parse_info(const uint8_t *info);
+	bool parse_imge(const uint8_t *imge);
+	bool parse_data(const uint8_t *data, uint32_t &pos, uint32_t max_extra_size);
+
+	bool scan_one_tag(uint8_t *data, size_t size, uint32_t &pos, uint8_t *&tag, uint32_t &tsize);
+	bool scan_all_tags(uint8_t *data, size_t size);
+	static uint32_t rb(const uint8_t *&p, int count);
+
+	track_info *get_index(uint32_t idx);
+
+	void track_write_raw(std::vector<uint32_t>::iterator &tpos, const uint8_t *data, uint32_t cells, bool &context);
+	void track_write_mfm(std::vector<uint32_t>::iterator &tpos, const uint8_t *data, uint32_t start_offset, uint32_t patlen, uint32_t cells, bool &context);
+	void track_write_weak(std::vector<uint32_t>::iterator &tpos, uint32_t cells);
+	bool generate_block_data(const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, std::vector<uint32_t>::iterator tlimit, bool &context);
+
+	bool gap_description_to_reserved_size(const uint8_t *&data, const uint8_t *dlimit, uint32_t &res_size);
+	bool generate_gap_from_description(const uint8_t *&data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, uint32_t size, bool pre, bool &context);
+	bool generate_block_gap_0(uint32_t gap_cells, uint8_t pattern, uint32_t &spos, uint32_t ipos, std::vector<uint32_t>::iterator &tpos, bool &context);
+	bool generate_block_gap_1(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos, bool &context);
+	bool generate_block_gap_2(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos, bool &context);
+	bool generate_block_gap_3(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos, bool &context);
+	bool generate_block_gap(uint32_t gap_type, uint32_t gap_cells, uint8_t pattern, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, bool &context);
+
+	bool generate_block(const track_info &t, uint32_t idx, uint32_t ipos, std::vector<uint32_t> &track, uint32_t &pos, uint32_t &dpos, uint32_t &gpos, uint32_t &spos, bool &context);
+	uint32_t block_compute_real_size(const track_info &t);
+
+	void timing_set(std::vector<uint32_t> &track, uint32_t start, uint32_t end, uint32_t time);
+	bool generate_timings(const track_info &t, std::vector<uint32_t> &track, const std::vector<uint32_t> &data_pos, const std::vector<uint32_t> &gap_pos);
+
+	void rotate(std::vector<uint32_t> &track, uint32_t offset, uint32_t size);
+	void mark_track_splice(std::vector<uint32_t> &track, uint32_t offset, uint32_t size);
+	bool generate_track(track_info &t, floppy_image &image);
+	bool generate_tracks(floppy_image &image);
+
+	bool parse(uint8_t *data, size_t size, floppy_image &image);
+};
+
+
 const ipf_format FLOPPY_IPF_FORMAT;
 
 const char *ipf_format::name() const noexcept
@@ -34,8 +100,9 @@ int ipf_format::identify(util::random_read &io, uint32_t form_factor, const std:
 {
 	static const uint8_t refh[12] = { 0x43, 0x41, 0x50, 0x53, 0x00, 0x00, 0x00, 0x0c, 0x1c, 0xd5, 0x73, 0xba };
 	uint8_t h[12];
-	size_t actual;
-	io.read_at(0, h, 12, actual);
+	auto const [err, actual] = read_at(io, 0, h, 12);
+	if(err || (12 != actual))
+		return 0;
 
 	if(!memcmp(h, refh, 12))
 		return FIFID_SIGN;
@@ -46,13 +113,13 @@ int ipf_format::identify(util::random_read &io, uint32_t form_factor, const std:
 bool ipf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
 	uint64_t size;
-	if (io.length(size))
+	if(io.length(size))
 		return false;
-	std::vector<uint8_t> data(size);
-	size_t actual;
-	io.read_at(0, &data[0], size, actual);
+	auto const [err, data, actual] = read_at(io, 0, size);
+	if(err || (actual != size))
+		return false;
 	ipf_decode dec;
-	return dec.parse(data, image);
+	return dec.parse(data.get(), size, image);
 }
 
 
@@ -79,12 +146,12 @@ uint32_t ipf_format::ipf_decode::crc32r(const uint8_t *data, uint32_t size)
 	return ~crc;
 }
 
-bool ipf_format::ipf_decode::parse(std::vector<uint8_t> &data, floppy_image &image)
+bool ipf_format::ipf_decode::parse(uint8_t *data, size_t size, floppy_image &image)
 {
 	image.set_variant(floppy_image::DSDD); // Not handling anything else yet
 	tcount = 84*2+1; // Usual max
 	tinfos.resize(tcount);
-	bool res = scan_all_tags(data);
+	bool res = scan_all_tags(data, size);
 	if(res)
 		res = generate_tracks(image);
 	tinfos.clear();
@@ -177,13 +244,13 @@ bool ipf_format::ipf_decode::parse_data(const uint8_t *data, uint32_t &pos, uint
 	return true;
 }
 
-bool ipf_format::ipf_decode::scan_one_tag(std::vector<uint8_t> &data, uint32_t &pos, uint8_t *&tag, uint32_t &tsize)
+bool ipf_format::ipf_decode::scan_one_tag(uint8_t *data, size_t size, uint32_t &pos, uint8_t *&tag, uint32_t &tsize)
 {
-	if(data.size()-pos < 12)
+	if(size-pos < 12)
 		return false;
 	tag = &data[pos];
 	tsize = get_u32be(tag+4);
-	if(data.size()-pos < tsize)
+	if(size-pos < tsize)
 		return false;
 	uint32_t crc = get_u32be(tag+8);
 	tag[8] = tag[9] = tag[10] = tag[11] = 0;
@@ -193,15 +260,14 @@ bool ipf_format::ipf_decode::scan_one_tag(std::vector<uint8_t> &data, uint32_t &
 	return true;
 }
 
-bool ipf_format::ipf_decode::scan_all_tags(std::vector<uint8_t> &data)
+bool ipf_format::ipf_decode::scan_all_tags(uint8_t *data, size_t size)
 {
 	uint32_t pos = 0;
-	uint32_t size = data.size();
 	while(pos != size) {
 		uint8_t *tag;
 		uint32_t tsize;
 
-		if(!scan_one_tag(data, pos, tag, tsize))
+		if(!scan_one_tag(data, size, pos, tag, tsize))
 			return false;
 
 		switch(get_u32be(tag)) {

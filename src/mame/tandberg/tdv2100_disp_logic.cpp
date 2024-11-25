@@ -2,86 +2,86 @@
 // copyright-holders:Frode van der Meeren
 /***************************************************************************
 
-	Tandberg TDV-2115 Terminal module, "Display Logic" version
+    Tandberg TDV-2115 Terminal module, "Display Logic" version
 
-	The "Display Logic" module provided the terminal functionality for
-	most of Tandbergs TDV-2100 series products. Most notably, standalone
-	it was available as the digital portion of the TDV-2115L terminal.
-	Being divided across two boards, Tandberg order-numbers for the module
-	is 960309 and 960310. These were connected together in reserved slots
-	on a bigger backplane.
+    The "Display Logic" module provided the terminal functionality for
+    most of Tandbergs TDV-2100 series products. Most notably, standalone
+    it was available as the digital portion of the TDV-2115L terminal.
+    Being divided across two boards, Tandberg order-numbers for the module
+    is 960309 and 960310. These were connected together in reserved slots
+    on a bigger backplane.
 
-	Being a 1976-design, the module does not feature any CPU, but it does
-	have an interface to an optional CPU module through the backplane of
-	the machines it was installed in. For instance, the TDV-2114 computer
-	or the TDV-2116 advanced terminal both has a CPU module featuring the
-	Intel 8080 along with 2KB of RAM and up to 8KB of ROM. More could be
-	added using additional memory modules. While the TDV-2115/16 only has
-	enough space for two extra modules besides the terminal module, the
-	TDV-2114 can fit up to 8 extra modules.
+    Being a 1976-design, the module does not feature any CPU, but it does
+    have an interface to an optional CPU module through the backplane of
+    the machines it was installed in. For instance, the TDV-2114 computer
+    or the TDV-2116 advanced terminal both has a CPU module featuring the
+    Intel 8080 along with 2KB of RAM and up to 8KB of ROM. More could be
+    added using additional memory modules. While the TDV-2115/16 only has
+    enough space for two extra modules besides the terminal module, the
+    TDV-2114 can fit up to 8 extra modules.
 
-	The terminal module has circuit to beep a dynamic speaker. The volume
-	is selectable using a potentiometer on the front. This beeps a 2KHz
-	short tone on manual typing at column 72, as well as on the BEL ASCII
-	control-code. It is not possible to turn this entirely off.
+    The terminal module has circuit to beep a dynamic speaker. The volume
+    is selectable using a potentiometer on the front. This beeps a 2KHz
+    short tone on manual typing at column 72, as well as on the BEL ASCII
+    control-code. It is not possible to turn this entirely off.
 
-	For characters, the terminal uses up to four font-ROMs, each containing
-	thirty-two 14x8 bitmaps. Typically three of these ROM slots will be filled,
-	for ASCII character 0x20 to 0x7f. There is also two PROM used as logic-
-	function lookup-tables for deriving at the correct RAM addresses.
+    For characters, the terminal uses up to four font-ROMs, each containing
+    thirty-two 14x8 bitmaps. Typically three of these ROM slots will be filled,
+    for ASCII character 0x20 to 0x7f. There is also two PROM used as logic-
+    function lookup-tables for deriving at the correct RAM addresses.
 
-	The UART on the board is the AY-5-1013, and the keyboard has priority
-	over the UART in TTY CPU-less mode. All symbols received from keyboard
-	and UART are considered chars, and control characters will be proccessed
-	if sent to local. The path from keyboard/UART Rx to local is toggeled by
-	the LINE key. Likewise, the path from keyboard to UART Tx is controlled
-	by the TRANS key. In CPU mode, automatic paths are disabled and the code
-	running on the CPU module will ultimately control the data-flow. This is
-	done using strobes from the IO-port address-decoder on the CPU module
-	itself. An interrupt is used to request action from the CPU, and there
-	is also another interrupt triggering on the 50Hz VSync.
+    The UART on the board is the AY-5-1013, and the keyboard has priority
+    over the UART in TTY CPU-less mode. All symbols received from keyboard
+    and UART are considered chars, and control characters will be proccessed
+    if sent to local. The path from keyboard/UART Rx to local is toggeled by
+    the LINE key. Likewise, the path from keyboard to UART Tx is controlled
+    by the TRANS key. In CPU mode, automatic paths are disabled and the code
+    running on the CPU module will ultimately control the data-flow. This is
+    done using strobes from the IO-port address-decoder on the CPU module
+    itself. An interrupt is used to request action from the CPU, and there
+    is also another interrupt triggering on the 50Hz VSync.
 
-	It is also worth noting that the terminal module provides the clock base
-	for the CPU module on actual hardware.
-
-
-	Input stobes:
-
-	      Function:                         Hook:
-	    * Get Rx char from UART             CPU module, IO E4 Read
-	    * Send Tx data to UART              CPU module, IO E4 Write
-	    * Get data from local at cursor++   CPU module, IO E5 Read
-	    * Send char to local at cursor++    CPU module, IO E5 Write
-	    * Get char from keyboard            CPU module, IO E6 Read
-	    * Send data to local at cursor++    CPU module, IO E6 Write
-	    * Get Terminal status               CPU module, IO E7 Read
-	    * Set Terminal control              CPU module, IO E7 Write
-	    * Get Interrupt status              CPU module, IO F6 Read
-	    * Get UART status                   CPU module, IO F7 Read
-	    * Process pending keyboard char     Keyboard, pending character
-	    * Clear screen                      Keyboard, CLEAR keyswitch
-	    * Toggle TRANSMIT                   Keyboard, TRANS keyswitch
-	    * Toggle ON-LINE                    Keyboard, LINE keyswitch
-	    * Force UART out high               Keyboard, BREAK keyswitch
-
-	Output strobes:
-
-	      Function:                         Hook:
-	    * VSync                             CPU module, Interrupt 1
-	    * State change                      CPU module, Interrupt 3
-	    * WAIT lamp                         Keyboard, WAIT indicator
-	    * ON LINE lamp                      Keyboard, ON LINE indicator
-	    * CARRIER lamp                      Keyboard, CARRIER indicator
-	    * ERROR lamp                        Keyboard, ERROR indicator
-	    * ENQUIRE lamp                      Keyboard, ENQUIRE indicator
-	    * ACK lamp                          Keyboard, ACK indicator
-	    * NAK lamp                          Keyboard, NAK indicator
+    It is also worth noting that the terminal module provides the clock base
+    for the CPU module on actual hardware.
 
 
-	TODO:
+    Input stobes:
 
-	    * Add CPU interface and strobes
-	    * Add CPU interrupts
+          Function:                         Hook:
+        * Get Rx char from UART             CPU module, IO E4 Read
+        * Send Tx data to UART              CPU module, IO E4 Write
+        * Get data from local at cursor++   CPU module, IO E5 Read
+        * Send char to local at cursor++    CPU module, IO E5 Write
+        * Get char from keyboard            CPU module, IO E6 Read
+        * Send data to local at cursor++    CPU module, IO E6 Write
+        * Get Terminal status               CPU module, IO E7 Read
+        * Set Terminal control              CPU module, IO E7 Write
+        * Get Interrupt status              CPU module, IO F6 Read
+        * Get UART status                   CPU module, IO F7 Read
+        * Process pending keyboard char     Keyboard, pending character
+        * Clear screen                      Keyboard, CLEAR keyswitch
+        * Toggle TRANSMIT                   Keyboard, TRANS keyswitch
+        * Toggle ON-LINE                    Keyboard, LINE keyswitch
+        * Force UART out high               Keyboard, BREAK keyswitch
+
+    Output strobes:
+
+          Function:                         Hook:
+        * VSync                             CPU module, Interrupt 1
+        * State change                      CPU module, Interrupt 3
+        * WAIT lamp                         Keyboard, WAIT indicator
+        * ON LINE lamp                      Keyboard, ON LINE indicator
+        * CARRIER lamp                      Keyboard, CARRIER indicator
+        * ERROR lamp                        Keyboard, ERROR indicator
+        * ENQUIRE lamp                      Keyboard, ENQUIRE indicator
+        * ACK lamp                          Keyboard, ACK indicator
+        * NAK lamp                          Keyboard, NAK indicator
+
+
+    TODO:
+
+        * Add CPU interface and strobes
+        * Add CPU interrupts
 
 ****************************************************************************/
 
@@ -992,7 +992,7 @@ static INPUT_PORTS_START( tdv2115l )
 			PORT_CONFSETTING(0x0, DEF_STR( On ))
 
 	PORT_START("sw_rs232_baud")
-		PORT_CONFNAME(0x7, 0x6, "SPEED SELECT [Note: Baud-rate]")                                PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
+		PORT_CONFNAME(0x7, 0x6, "SPEED SELECT [Note: Baud-rate]")                                PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::uart_changed), 0)
 			PORT_CONFSETTING(0x0, "0: 110")
 			PORT_CONFSETTING(0x1, "1: 300")
 			PORT_CONFSETTING(0x2, "2: 600")
@@ -1003,22 +1003,22 @@ static INPUT_PORTS_START( tdv2115l )
 			PORT_CONFSETTING(0x7, "7: 19200")
 
 	PORT_START("sw_rs232_settings")
-		PORT_CONFNAME(0x01, 0x01, "RS-232 Parity checking")                                     PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)   // NO PARITY [YES/NO]
+		PORT_CONFNAME(0x01, 0x01, "RS-232 Parity checking")                                     PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::uart_changed), 0)   // NO PARITY [YES/NO]
 			PORT_CONFSETTING(0x01, DEF_STR( Off ))
 			PORT_CONFSETTING(0x00, DEF_STR( On ))
-		PORT_CONFNAME(0x02, 0x02, "RS-232 Parity type")                                         PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)   // EVEN PARITY [NO/YES]
+		PORT_CONFNAME(0x02, 0x02, "RS-232 Parity type")                                         PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::uart_changed), 0)   // EVEN PARITY [NO/YES]
 			PORT_CONFSETTING(0x00, "Odd")
 			PORT_CONFSETTING(0x02, "Even")
-		PORT_CONFNAME(0x04, 0x04, "RS-232 Number of stop bits")                                 PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)   // TWO STOP BITS [NO/YES]
+		PORT_CONFNAME(0x04, 0x04, "RS-232 Number of stop bits")                                 PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::uart_changed), 0)   // TWO STOP BITS [NO/YES]
 			PORT_CONFSETTING(0x00, "One")
 			PORT_CONFSETTING(0x04, "Two")
-		PORT_CONFNAME(0x08, 0x08, "RS-232 Internal local echo when on-line (for half duplex)")  PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)  // EXT. ECHO [YES/NO]
+		PORT_CONFNAME(0x08, 0x08, "RS-232 Internal local echo when on-line (for half duplex)")  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)  // EXT. ECHO [YES/NO]
 			PORT_CONFSETTING(0x08, DEF_STR( Off ))
 			PORT_CONFSETTING(0x00, DEF_STR( On ))
-		PORT_CONFNAME(0x10, 0x00, "RS-232 Automatic RTS with CTS")                              PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)  // AUTO RFS [NO/YES]
+		PORT_CONFNAME(0x10, 0x00, "RS-232 Automatic RTS with CTS")                              PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)  // AUTO RFS [NO/YES]
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x10, DEF_STR( Yes ))
-		PORT_CONFNAME(0x20, 0x00, "RS-232 Automatic DSR with DTR")                              PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)  // AUTO DSR [NO/YES]
+		PORT_CONFNAME(0x20, 0x00, "RS-232 Automatic DSR with DTR")                              PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)  // AUTO DSR [NO/YES]
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x20, DEF_STR( Yes ))
 
@@ -1026,22 +1026,22 @@ static INPUT_PORTS_START( tdv2115l )
 		PORT_DIPNAME(0x003, 0x001, "ACK/NACK/ENQUIRY lamps")
 			PORT_DIPSETTING(0x001, "Reset with CLEAR key")                      // 1: OFF 2: ON
 			PORT_DIPSETTING(0x002, "Reset with SYN ctrl-char (^V)")             // 1: ON  2: OFF
-		PORT_DIPNAME(0x00c, 0x004, "Rx handshake source")                                       PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)
+		PORT_DIPNAME(0x00c, 0x004, "Rx handshake source")                                       PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)
 			PORT_DIPSETTING(0x004, "DSR")                                       // 3: OFF 4: ON
 			PORT_DIPSETTING(0x008, "DCD")                                       // 3: ON  4: Off
 		PORT_DIPNAME(0x010, 0x010, "Operating mode")
 			PORT_DIPSETTING(0x010, "TTY mode (no CPU)")                         // 5: OFF
 			PORT_DIPSETTING(0x000, "CPU mode (CPU module required)")            // 5: ON
-		PORT_DIPNAME(0x020, 0x020, "DTR/RTS signals")                                           PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_lock_changed, 0)
+		PORT_DIPNAME(0x020, 0x020, "DTR/RTS signals")                                           PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_lock_changed), 0)
 			PORT_DIPSETTING(0x020, "Permanently asserted")                      // 6: OFF
 			PORT_DIPSETTING(0x000, "Affected by LINE/TRANS keys")               // 6: ON
-		PORT_DIPNAME(0x0c0, 0x040, "Require RTS + CTS for ON LINE lamp")                        PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)
+		PORT_DIPNAME(0x0c0, 0x040, "Require RTS + CTS for ON LINE lamp")                        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)
 			PORT_DIPSETTING(0x040, DEF_STR( Off ))                              // 7: OFF 8: ON
 			PORT_DIPSETTING(0x080, DEF_STR( On ))                               // 7: ON  8: OFF
 		PORT_DIPNAME(0x100, 0x000, "Automatic page-roll after end of page")
 			PORT_DIPSETTING(0x100, DEF_STR( Off ))                              // 9: OFF
 			PORT_DIPSETTING(0x000, DEF_STR( On ))                               // 9: ON
-		PORT_DIPNAME(0x200, 0x000, "RS-232 data length")                                        PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
+		PORT_DIPNAME(0x200, 0x000, "RS-232 data length")                                        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::uart_changed), 0)
 			PORT_DIPSETTING(0x200, "8 data bits")                               // 10: OFF
 			PORT_DIPSETTING(0x000, "7 data bits")                               // 10: ON
 

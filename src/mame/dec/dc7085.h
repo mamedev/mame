@@ -21,8 +21,8 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_serial overrides
 	virtual void rcv_complete() override;
@@ -51,7 +51,7 @@ class dc7085_device : public device_t
 public:
 	dc7085_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	auto int_cb() { return m_int_cb.bind(); }
 
@@ -61,9 +61,9 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// register accessors
 	u16 csr_r() { return m_csr; }

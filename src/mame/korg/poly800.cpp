@@ -30,12 +30,12 @@ public:
 	void poly800mdk(machine_config &config);
 
 protected:
-	void common_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
-	void mdk_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void mdk_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<i8085a_cpu_device> m_maincpu;
@@ -52,7 +52,7 @@ public:
 	void poly800ii(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 void poly800_state::common_map(address_map &map)

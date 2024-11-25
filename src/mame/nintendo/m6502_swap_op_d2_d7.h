@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_M6502_SWAP_OP_D2_D7_H
-#define MAME_M6502_SWAP_OP_D2_D7_H
+#ifndef MAME_NINTENDO_M6502_SWAP_OP_D2_D7_H
+#define MAME_NINTENDO_M6502_SWAP_OP_D2_D7_H
 
 #pragma once
 
@@ -43,11 +43,11 @@ protected:
 		virtual u8 decrypt8(u8 value, offs_t pc, bool opcode) const override;
 	};
 
-	virtual void device_reset() override;
-	virtual void device_start() override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 DECLARE_DEVICE_TYPE(M6502_SWAP_OP_D2_D7, m6502_swap_op_d2_d7)
 
-#endif // MAME_M6502_SWAP_OP_D2_D7_H
+#endif // MAME_NINTENDO_M6502_SWAP_OP_D2_D7_H

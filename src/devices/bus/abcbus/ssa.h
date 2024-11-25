@@ -33,15 +33,15 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_nvram_interface implementation
-	virtual void nvram_default() override { }
-	virtual bool nvram_read(util::read_stream &file) override { size_t actual; return !file.read(m_nvram, m_nvram.bytes(), actual) && actual == m_nvram.bytes(); }
-	virtual bool nvram_write(util::write_stream &file) override { size_t actual; return !file.write(m_nvram, m_nvram.bytes(), actual) && actual == m_nvram.bytes(); }
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 	// device_abcbus_interface implementation
 	virtual void abcbus_cs(uint8_t data) override { m_bus->write_cs(data); }

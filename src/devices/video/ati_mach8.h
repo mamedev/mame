@@ -58,7 +58,7 @@ public:
 
 protected:
 	mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	struct
 	{
 		uint16_t scratch0;

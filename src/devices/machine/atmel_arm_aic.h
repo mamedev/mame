@@ -20,13 +20,13 @@ public:
 
 	auto irq_callback() { return m_irq_out.bind(); }
 
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 
 	void set_irq(int line, int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint32_t m_irqs_enabled;

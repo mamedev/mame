@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
-#include "emu.h"
 #include "osdnet.h"
 
-#include "dinetwork.h"
+#include "interface/nethandler.h"
 
-static class std::vector<std::unique_ptr<osd_netdev::entry_t>> netdev_list;
+
+static std::vector<std::unique_ptr<osd_network_device::entry_t>> netdev_list;
 
 void add_netdev(const char *name, const char *description, create_netdev func)
 {
-	auto entry = std::make_unique<osd_netdev::entry_t>();
+	auto entry = std::make_unique<osd_network_device::entry_t>();
 	entry->id = netdev_list.size();
 	strncpy(entry->name, name, 255);
 	entry->name[255] = '\0';
@@ -25,56 +25,50 @@ void clear_netdev()
 	netdev_list.clear();
 }
 
-const std::vector<std::unique_ptr<osd_netdev::entry_t>>& get_netdev_list()
+const std::vector<std::unique_ptr<osd_network_device::entry_t>>& get_netdev_list()
 {
 	return netdev_list;
 }
 
-class osd_netdev *open_netdev(int id, class device_network_interface *ifdev, int rate)
+osd_network_device *open_netdev(int id, osd::network_handler &ifdev)
 {
 	for(auto &entry : netdev_list)
 		if(entry->id==id)
-			return entry->func(entry->name, ifdev, rate);
+			return entry->func(entry->name, ifdev);
 	return nullptr;
 }
 
-osd_netdev::osd_netdev(class device_network_interface *ifdev, int rate)
-{
-	m_dev = ifdev;
-	m_timer = ifdev->device().timer_alloc(FUNC(osd_netdev::recv), this);
-	m_timer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
-}
-
-osd_netdev::~osd_netdev()
+osd_network_device::osd_network_device(osd::network_handler &ifdev)
+	: m_dev(ifdev)
+	, m_stopped(true)
 {
 }
 
-void osd_netdev::start()
+osd_network_device::~osd_network_device()
 {
-	m_timer->enable(true);
 }
 
-void osd_netdev::stop()
+void osd_network_device::start()
 {
-	m_timer->enable(false);
+	m_stopped = false;
 }
 
-int osd_netdev::send(uint8_t *buf, int len)
+void osd_network_device::stop()
 {
-	return 0;
+	m_stopped = true;
 }
 
-void osd_netdev::recv(int32_t param)
+void osd_network_device::poll()
 {
 	uint8_t *buf;
 	int len;
 	//const char atalkmac[] = { 0x09, 0x00, 0x07, 0xff, 0xff, 0xff };
-	while(m_timer->enabled() && (len = recv_dev(&buf)))
+	while(!m_stopped && (len = recv_dev(&buf)))
 	{
 #if 0
 		if(buf[0] & 1)
 		{
-			if(memcmp("\xff\xff\xff\xff\xff\xff", buf, 6) && memcmp(atalkmac, buf, 6) && !m_dev->mcast_chk(buf, len)) continue;
+			if(memcmp("\xff\xff\xff\xff\xff\xff", buf, 6) && memcmp(atalkmac, buf, 6) && !m_dev.mcast_chk(buf, len)) continue;
 		}
 		else {
 			//const unsigned char *ourmac = (const unsigned char *)get_mac();
@@ -83,60 +77,34 @@ void osd_netdev::recv(int32_t param)
 		}
 #endif
 
-		m_dev->recv_cb(buf, len);
+		m_dev.recv_cb(buf, len);
 	}
 }
 
-int osd_netdev::recv_dev(uint8_t **buf)
+int osd_network_device::send(uint8_t *buf, int len)
 {
 	return 0;
 }
 
-void osd_netdev::set_mac(const char *mac)
+int osd_network_device::recv_dev(uint8_t **buf)
+{
+	return 0;
+}
+
+void osd_network_device::set_mac(const uint8_t *mac)
 {
 }
 
-void osd_netdev::set_promisc(bool promisc)
+void osd_network_device::set_promisc(bool promisc)
 {
 }
 
-bool osd_netdev::get_promisc()
+bool osd_network_device::get_promisc()
 {
-	if(m_dev)
-		return m_dev->get_promisc();
-	return false;
+	return m_dev.get_promisc();
 }
 
-const char *osd_netdev::get_mac()
+const std::array<uint8_t, 6> &osd_network_device::get_mac()
 {
-	if(m_dev)
-		return m_dev->get_mac();
-	return "\0\0\0\0\0\0";
-}
-
-int netdev_count()
-{
-	return netdev_list.size();
-}
-
-void osd_list_network_adapters()
-{
-	#ifdef USE_NETWORK
-	int num_devs = netdev_list.size();
-
-	if (num_devs == 0)
-	{
-		printf("No network adapters were found\n");
-		return;
-	}
-
-	printf("Available network adapters:\n");
-	for (auto &entry : netdev_list)
-	{
-		printf("    %s\n", entry->description);
-	}
-
-	#else
-	printf("Network is not supported in this build\n");
-	#endif
+	return m_dev.get_mac();
 }

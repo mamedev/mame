@@ -51,7 +51,7 @@ private:
 	void output_req_w(uint8_t data);
 	void output_data_w(uint8_t data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -61,8 +61,8 @@ private:
 	uint8_t m_out_req_last = 0U; // old value at 0xFFFE before the most recent write
 	uint8_t m_out_ack = 0U; // byte written to 0xFFFC
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 

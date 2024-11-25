@@ -159,4 +159,4 @@ TIMER_CALLBACK_MEMBER(pseudo_terminal_device::update_queue)
 	}
 }
 
-DEFINE_DEVICE_TYPE(PSEUDO_TERMINAL, pseudo_terminal_device, "pseudo_terminal", "Pseudo terminal")
+DEFINE_DEVICE_TYPE(PSEUDO_TERMINAL, pseudo_terminal_device, "pseudo_terminal", "Pseudo Terminal")

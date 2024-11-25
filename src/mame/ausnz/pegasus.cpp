@@ -79,8 +79,8 @@ public:
 	void init_pegasus();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 pegasus_keyboard_r();
@@ -101,8 +101,8 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0c_load) { return load_cart(image, m_exp_0c, "c000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0d_load) { return load_cart(image, m_exp_0d, "d000"); }
 
-	void pegasus_mem(address_map &map);
-	void pegasusm_mem(address_map &map);
+	void pegasus_mem(address_map &map) ATTR_COLD;
+	void pegasusm_mem(address_map &map) ATTR_COLD;
 
 	u8 m_kbd_row = 0U;
 	u8 m_control_bits = 0U;

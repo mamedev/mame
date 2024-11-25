@@ -257,7 +257,7 @@ public:
 	void configure(mfmhd_enc_t encoding, int spinupms, int cache, mfmhd_format_type format);
 
 protected:
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 	void device_config_complete() override;
 
 private:

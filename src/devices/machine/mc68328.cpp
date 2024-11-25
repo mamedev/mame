@@ -9,7 +9,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/mc68328.h"
+#include "mc68328.h"
 
 #define LOG_SCR         (1U << 1)
 #define LOG_CS_GRP      (1U << 2)

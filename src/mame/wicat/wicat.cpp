@@ -69,14 +69,14 @@ public:
 	void wicat(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void main_mem(address_map &map);
-	void video_io(address_map &map);
-	void video_mem(address_map &map);
-	void wd1000_io(address_map &map);
-	void wd1000_mem(address_map &map);
+	void main_mem(address_map &map) ATTR_COLD;
+	void video_io(address_map &map) ATTR_COLD;
+	void video_mem(address_map &map) ATTR_COLD;
+	void wd1000_io(address_map &map) ATTR_COLD;
+	void wd1000_mem(address_map &map) ATTR_COLD;
 
 	uint16_t memmap_r();
 	void memmap_w(uint16_t data);
@@ -456,12 +456,13 @@ void wicat_state::crtc_irq_clear_w(int state)
 
 I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 {
-	uint16_t romdata = lten ? 0x3ff : vsp ? 0 : m_chargen->base()[(charcode << 4) | linecount];
+	using namespace i8275_attributes;
+	uint16_t romdata = BIT(attrcode, LTEN) ? 0x3ff : BIT(attrcode, VSP) ? 0 : m_chargen->base()[(charcode << 4) | linecount];
 	pen_t const *const pen = m_palette->pens();
 
 	for (int i = 0; i < 10; i++)
 	{
-		int color = ((romdata & 0x300) != 0) ^ rvv;
+		int color = ((romdata & 0x300) != 0) ^ BIT(attrcode, RVV);
 
 		bitmap.pix(y, x + i) = pen[color];
 		romdata <<= 1;

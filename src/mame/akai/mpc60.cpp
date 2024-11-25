@@ -9,7 +9,7 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/i86/i186.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "machine/clock.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
@@ -34,17 +34,17 @@ public:
 	void mpc60(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
 	void fdc_tc_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void panel_map(address_map &map);
-	void lcd_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void panel_map(address_map &map) ATTR_COLD;
+	void lcd_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7810_device> m_panelcpu;

@@ -33,17 +33,17 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 	uint8_t buffer_r() { return m_char_buffer; }
-	void buffer_w(offs_t offset, uint8_t data) { m_char_buffer = data; }
+	void buffer_w(uint8_t data) { m_char_buffer = data; }
 	uint8_t attr_buffer_r() { return m_attr_buffer; }
-	void attr_buffer_w(offs_t offset, uint8_t data) { m_attr_buffer = data; }
+	void attr_buffer_w(uint8_t data) { m_attr_buffer = data; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extend_addressing);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -62,6 +62,7 @@ protected:
 	uint8_t m_IR_pointer;
 	uint16_t m_screen1_address;
 	uint16_t m_screen2_address;
+	uint16_t m_screen2_address_start;
 	uint16_t m_cursor_address;
 	uint8_t m_irq_register;
 	uint8_t m_status_register;
@@ -123,7 +124,7 @@ protected:
 
 	void recompute_parameters();
 
-	void scn2674_vram(address_map &map);
+	void scn2674_vram(address_map &map) ATTR_COLD;
 
 	draw_character_delegate m_display_cb;
 	emu_timer *m_scanline_timer;

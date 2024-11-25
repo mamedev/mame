@@ -42,7 +42,7 @@ public:
 protected:
 	ata_mass_storage_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual int read_sector(uint32_t lba, void *buffer) = 0;
 	virtual int write_sector(uint32_t lba, const void *buffer) = 0;
@@ -97,9 +97,9 @@ protected:
 	ide_hdd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual int read_sector(uint32_t lba, void *buffer) override { return !m_image->exists() ? 0 : m_image->read(lba, buffer); }
 	virtual int write_sector(uint32_t lba, const void *buffer) override { return !m_image->exists() ? 0 : m_image->write(lba, buffer); }
@@ -121,7 +121,7 @@ protected:
 	cf_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void ide_build_identify_device() override;
 	virtual attotime seek_time() override;

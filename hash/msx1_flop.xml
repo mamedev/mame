@@ -44,6 +44,31 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="nms1210" supported="no">
+		<description>Serial Interface (Netherlands)</description>
+		<year>1986</year>
+		<publisher>Philips</publisher>
+		<notes>Included with NMS 1210, NMS 1211, and NMS 1212 RS-232C packages. These serial interfaces are not supported.</notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="serial interface - philips.dsk" size="368640" crc="79be477c" sha1="1430621ebdd80799675ef51178b66fbcb0085009"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nms1250" supported="no">
+		<description>MSX Data Communications (Netherlands)</description>
+		<year>1987</year>
+		<publisher>Philips</publisher>
+		<notes>Included with NMS 1250 Modem package. NMS 1250 is not supported.</notes>
+		<info name="serial" value="NMS 8961"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="msx data communications - philips.dsk" size="368640" crc="97c92b4f" sha1="3e0c14006484a427726d11263434dd98f90b0f3c" />
+			</dataarea>
+		</part>
+	</software>
+
 
 
 	<software name="msxdos">
@@ -207,6 +232,23 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="aackotext22">
+		<description>Aackotext II (Netherlands, v2.2)</description>
+		<year>1985</year>
+		<publisher>Aackosoft</publisher>
+		<info name="serial" value="831"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="aackotext ii - aackosoft (v2.2).dsk" size="368640" crc="c93b783e" sha1="e086c3cddbfbc5efa0d3dc78d906460e3f5dd03a"/>
+			</dataarea>
+		</part>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="1">
+				<rom name="aackotext ii - aackosoft (v2.2).wav" size="0" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- According to generation-msx this was (part of) the MSX Magazine cover disk for issue 92. -->
 	<software name="adonis">
 		<description>Adonis (Japan)</description>
@@ -342,6 +384,18 @@ The following floppies came with the machines.
 			<dataarea name="flop" size="737280">
 				<!-- According to generation-msx this was released on a single sided floppy -->
 				<rom name="booty (1988)(eurosoft)(nl).dsk" size="737280" crc="78cef13f" sha1="5cab1cbee756e656349791b968956b0485a4c280" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brasilg">
+		<description>Brasil Geográfico (Brazil)</description>
+		<year>1991</year>
+		<publisher>Discovery Informática</publisher>
+		<info name="usage" value="Hold CTRL at boot until the beep."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="brasil geografico - discovery informatica.dsk" size="368640" crc="f5d4981c" sha1="be2a87db4636770451b9f2efa570a927b8e3dd99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -520,6 +574,18 @@ The following floppies came with the machines.
 			<dataarea name="flop" size="737280">
 				<!-- According to generation-msx this was released on a single sided floppy -->
 				<rom name="dawn patrol (1986)(eaglesoft)(nl).dsk" size="737280" crc="da04542f" sha1="75e46ea92fcd86806b753c1105b54cd16987dcd5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbase2">
+		<description>dBASE II (Netherlands)</description>
+		<year>1983</year>
+		<publisher>C.U.C.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<!-- According to generation-msx this was released on a single sided floppy -->
+				<rom name="dbase ii - c.u.c..dsk" size="737280" crc="d189961f" sha1="a88cb3f7f9d998eb32b3847ba0918ee17a8b157a" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1253,6 +1319,37 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="mstext">
+		<description>MS Text (Netherlands)</description>
+		<year>1985</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="VG 8503/23"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="ms text - philips.dsk" size="368640" crc="3089bfce" sha1="1164fe45c3296edf6fe6c5bd7469a22de21f8ead"/>
+			</dataarea>
+		</part>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="1">
+				<rom name="ms text - philips.wav" size="0" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxaudse">
+		<description>Score Editor (Japan)</description>
+		<year>1987</year>
+		<publisher>Toshiba-EMI Ltd.</publisher>
+		<info name="alt_title" value="ズスコア・エディタ"/>
+		<info name="serial" value="PS-3009S"/>
+		<info name="barcode" value="4988006014817"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="score editor - toshiba-emi.dsk" size="368640" crc="db18b408" sha1="25f1650f78e0842599d2adf730864dbec5281107"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msxcomp5">
 		<description>MSX Compilation 5 (Netherlands)</description>
 		<year>1986</year>
@@ -1299,6 +1396,17 @@ The following floppies came with the machines.
 		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="msx pagemaker deluxe - print-shop - nemesis software.dsk" size="737280" crc="3fc6cd12" sha1="1456e1f28212844cb66c410a7f326d9fc160aec5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxaids">
+		<description>MSX-AIDS (Japan, v1.1)</description>
+		<year>1988</year>
+		<publisher>Sansai Books</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="msx-aids - sansai books (v1.1).dsk" size="737280" crc="92699102" sha1="fd25d4b01971bccb2374231aac7da8885d2da991"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1362,6 +1470,28 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="368640">
 				<rom name="navy moves (1988)(dinamic software)(es)[h msx games box][code 53817].dsk" size="368640" crc="7ebf4dcc" sha1="911c6837e5d84fa64087d75c354d2563731435a0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kanjukut">
+		<description>Nihongo Waupuro Kan-juku Tomato (Japan)</description>
+		<year>1985</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="日本語ワープロ漢熟トマト"/>
+		<info name="serial" value="HBS-B004D"/>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk - ブログラムディスク"/>
+			<dataarea name="flop" size="737280">
+				<!-- According to generation-msx this was released on a single sided floppy -->
+				<rom name="nihongo waupuro kan-juku tomato - sony (program disk).dsk" size="737280" crc="69099c1f" sha1="fe7aa0f89e7892820634d9d4deceee483d79747c" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Bunreishuu - 文例集"/>
+			<dataarea name="flop" size="368640">
+				<rom name="nihongo waupuro kan-juku tomato - sony (bunreishuu).dsk" size="368640" crc="9a36f990" sha1="aa8512a2c8759588c2caa5862aec9164028d60ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1951,9 +2081,8 @@ The following floppies came with the machines.
 		<publisher>Methodic Solutions</publisher>
 		<info name="serial" value="8908" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<!-- According to generation-msx this was released on a single sided floppy -->
-				<rom name="tt racer (1987)(methodic solutions)(nl).dsk" size="737280" crc="1004f71e" sha1="9d622dc148586f5307ca41b1084ded26b21b75eb" status="baddump" />
+			<dataarea name="flop" size="1049616">
+				<rom name="tt racer - methodic solutions.dmk" size="1049616" crc="f07155c9" sha1="6edc6acc1967738c521d42d5abd0f86dabf61352"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2075,6 +2204,17 @@ The following floppies came with the machines.
 			<dataarea name="flop" size="737280">
 				<!-- According to generation-msx this was released on a single sided floppy -->
 				<rom name="wordstore - aackosoft (cracked).dsk" size="737280" crc="4a265d7a" sha1="0116f018830f88d5579eb9620643a82473dc9adf" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zanac">
+		<description>Zanac (Netherlands)</description>
+		<year>1986</year>
+		<publisher>Eaglesoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="729600">
+				<rom name="zanac - eaglesoft.dmk" size="729600" crc="17b8d570" sha1="55b37f5ffcb155b60bd966db9f1540342c1e641e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2291,6 +2431,18 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="koroshiam.dsk" size="737280" crc="c5af7e10" sha1="c4d0bf325574d745a12f346eebb40d1ea221922f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cucjub">
+		<description>JUBILEUM Diskette (Netherlands)</description>
+		<year>1989</year>
+		<publisher>Stichting C.U.C.</publisher>
+		<info name="serial" value="FM-13"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="jubileum diskette - stichting c.u.c..dsk" size="368640" crc="3c26d1c0" sha1="742534d1af81c0de6dbaa6d80a66a5e7254556b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5116,6 +5268,19 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
+	<software name="psr6300d" supported="no">
+		<description>Yamaha Portatone PSR-6300 Demonstration</description>
+		<year>19??</year>
+		<publisher>Yamaha</publisher>
+		<notes>Midi connection to PSR-6300 has not been tested.</notes>
+		<info name="usage" value="Requires a SFG-01 or SFG-05. Requires a system with a V9938."/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="yamaha portatone psr-6300 demonstration - yamaha.dsk" size="737280" crc="7c7356e7" sha1="eb1e19747a6cd0ecb0dc8d1e6addc5081f12eda1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zeta2000">
 		<description>Zeta 2000 (Japan, disk conversion)</description>
 		<year>19??</year>
@@ -5874,19 +6039,6 @@ The following floppies came with the machines.
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="wreck, the (1984)(electric software)(gb).dsk" size="737280" crc="f8b5344f" sha1="8575535b1415b8c538ce0a7e77f2a7befc5496fa" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zanac">
-		<description>Zanac (Netherlands)</description>
-		<year>1986</year>
-		<publisher>Eaglesoft</publisher>
-		<info name="serial" value="8425" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<!-- According to generation-msx this was released on a single sided floppy. -->
-				<rom name="zanac (1986)(pony canyon)(jp).dsk" size="737280" crc="f4fd8a99" sha1="3576937c461d5ef5c25d749b46d035c33deb23d4" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

@@ -65,13 +65,13 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cpu1_map(address_map &map);
+	void cpu1_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -108,13 +108,13 @@ protected:
 
 	void gsword_palette(palette_device &palette) const;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void cpu1_io_map(address_map &map);
-	void cpu2_io_map(address_map &map);
-	void cpu2_map(address_map &map);
-	void cpu3_map(address_map &map);
+	void cpu1_io_map(address_map &map) ATTR_COLD;
+	void cpu2_io_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cpu3_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -158,12 +158,12 @@ protected:
 
 	void josvolly_palette(palette_device &palette) const;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void josvolly_cpu1_io_map(address_map &map);
-	void josvolly_cpu2_io_map(address_map &map);
-	void josvolly_cpu2_map(address_map &map);
+	void josvolly_cpu1_io_map(address_map &map) ATTR_COLD;
+	void josvolly_cpu2_io_map(address_map &map) ATTR_COLD;
+	void josvolly_cpu2_map(address_map &map) ATTR_COLD;
 
 private:
 	required_ioport_array<2> m_dip_switches;

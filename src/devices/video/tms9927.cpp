@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "video/tms9927.h"
+#include "tms9927.h"
 
 #include "screen.h"
 

@@ -58,8 +58,8 @@ public:
 	void subhuntr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void txtram_w(offs_t offset, u8 data);
@@ -77,7 +77,7 @@ private:
 	void set_intreq(unsigned bit, u8 mask);
 	void clr_intreq(unsigned bit);
 
-	void subhuntr_map(address_map &map);
+	void subhuntr_map(address_map &map) ATTR_COLD;
 
 	required_device<s2650_device>       m_maincpu;
 	required_device<screen_device>      m_screen;

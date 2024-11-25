@@ -47,7 +47,7 @@ license:CC0-1.0
 
 	<element name="button-text-play">
 		<rect></rect>
-		<text align="0" valign="0" string="PLAY">
+		<text align="0" string="PLAY">
 			<color red="0.15" green="0.15" blue="0.15" />
 		</text>
 	</element>
@@ -953,7 +953,7 @@ license:CC0-1.0
 			<bounds x="88" y="0" width="72" height="208" />
 		</element>
 		<element ref="slider-nub">
-			<animate inputtag="AN3" inputmask="0xFF" />
+			<animate inputtag="AN3" mask="0xff" />
 			<bounds state="0" x="90" y="156" width="68" height="6" />
 			<bounds state="255" x="90" y="44" width="68" height="6" />
 		</element>

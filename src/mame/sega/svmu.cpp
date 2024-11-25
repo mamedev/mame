@@ -49,8 +49,8 @@ public:
 	void svmu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	LC8670_LCD_UPDATE(svmu_lcd_update);
@@ -63,8 +63,8 @@ private:
 	uint8_t p7_r();
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void svmu_io_mem(address_map &map);
-	void svmu_mem(address_map &map);
+	void svmu_io_mem(address_map &map) ATTR_COLD;
+	void svmu_mem(address_map &map) ATTR_COLD;
 
 	required_device<lc8670_cpu_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;

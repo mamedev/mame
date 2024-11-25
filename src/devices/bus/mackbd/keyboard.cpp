@@ -189,6 +189,7 @@
     * M0110 (U.S. - ANSI)
     * M0110B (British - ISO)
     * M0110F (French - ISO)
+    * M0110J (Japanese - ANSI)
     * M0110T (Italian - ISO)
     * M0120 (keypad - English)
     * M0120P (keypad - European)
@@ -197,9 +198,6 @@
     text for Backspace, Tab, Caps Lock, Shift, Return, Shift, Option,
     Enter and Clear (all variants use icons for command and the cursor
     arrows).
-
-    Also known to exist:
-    * Japanese - ANSI (U.S. with different key caps)
 
     TODO:
     * Determine whether P00 or P01 actually feeds the keypad watchdog
@@ -237,7 +235,7 @@ template <unsigned Rows>
 class peripheral_base : public device_t, public device_mac_keyboard_interface
 {
 public:
-	CUSTOM_INPUT_MEMBER(columns_r)
+	ioport_value columns_r()
 	{
 		ioport_value result(make_bitmask<ioport_value>(Rows));
 		for (unsigned i = 0U; Rows > i; ++i)
@@ -249,7 +247,7 @@ public:
 		return result ^ make_bitmask<ioport_value>(Rows);
 	}
 
-	CUSTOM_INPUT_MEMBER(host_data_r)
+	ioport_value host_data_r()
 	{
 		return m_host_data_in ^ 0x01;
 	}
@@ -404,12 +402,12 @@ protected:
 class keypad_base : public peripheral_base<3>
 {
 public:
-	CUSTOM_INPUT_MEMBER(keyboard_clock_r)
+	ioport_value keyboard_clock_r()
 	{
 		return m_keyboard_clock_in ^ 0x01;
 	}
 
-	CUSTOM_INPUT_MEMBER(keyboard_data_r)
+	ioport_value keyboard_data_r()
 	{
 		return m_keyboard_data_in ^ 0x01;
 	}
@@ -563,12 +561,12 @@ INPUT_PORTS_START(keyboard_us)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P0")
-	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(keyboard_base, columns_r)
+	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keyboard_base::columns_r))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK)                         PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_NAME("Caps Lock") PORT_TOGGLE
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("P2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(keyboard_base, host_data_r)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keyboard_base::host_data_r))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)           PORT_NAME("Shift")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)                                                            PORT_NAME("Command")
@@ -717,6 +715,75 @@ INPUT_PORTS_START(keyboard_it)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
 INPUT_PORTS_END
 
+INPUT_PORTS_START(keyboard_jp)
+	PORT_INCLUDE(keyboard_us)
+
+	PORT_MODIFY("ROW0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('a')  PORT_CHAR('A')    PORT_NAME(u8"A  \u30c1")             // チ
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)          PORT_CHAR('s')  PORT_CHAR('S')    PORT_NAME(u8"S  \u30c8")             // ト
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)          PORT_CHAR('d')  PORT_CHAR('D')    PORT_NAME(u8"D  \u30b7")             // シ
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)          PORT_CHAR('f')  PORT_CHAR('F')    PORT_NAME(u8"F  \u30cf")             // ハ
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)          PORT_CHAR('h')  PORT_CHAR('H')    PORT_NAME(u8"H  \u30af")             // ク
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)          PORT_CHAR('g')  PORT_CHAR('G')    PORT_NAME(u8"G  \u30ad")             // キ
+
+	PORT_MODIFY("ROW1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)          PORT_CHAR('z')  PORT_CHAR('Z')    PORT_NAME(u8"Z  \u30c4  \u30c3")     // ツ ッ
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)          PORT_CHAR('x')  PORT_CHAR('X')    PORT_NAME(u8"X  \u30b5")             // サ
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)          PORT_CHAR('c')  PORT_CHAR('C')    PORT_NAME(u8"C  \u30bd")             // ソ
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)          PORT_CHAR('v')  PORT_CHAR('V')    PORT_NAME(u8"V  \u30d2")             // ヒ
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)          PORT_CHAR('b')  PORT_CHAR('B')    PORT_NAME(u8"B  \u30b3")             // コ
+
+	PORT_MODIFY("ROW2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)          PORT_CHAR('q')  PORT_CHAR('Q')    PORT_NAME(u8"Q  \u30bf")             // タ
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)          PORT_CHAR('w')  PORT_CHAR('W')    PORT_NAME(u8"W  \u30c6")             // テ
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)          PORT_CHAR('e')  PORT_CHAR('E')    PORT_NAME(u8"E  \u30a4  \u30a3")     // イ ィ
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)          PORT_CHAR('r')  PORT_CHAR('R')    PORT_NAME(u8"R  \u30b9")             // ス
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)          PORT_CHAR('y')  PORT_CHAR('Y')    PORT_NAME(u8"Y  \u30f3")             // ン
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)          PORT_CHAR('t')  PORT_CHAR('T')    PORT_NAME(u8"T  \u30ab")             // カ
+
+	PORT_MODIFY("ROW3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)          PORT_CHAR('1')  PORT_CHAR('!')    PORT_NAME(u8"1  !  \u30cc")          // ヌ
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)          PORT_CHAR('2')  PORT_CHAR('@')    PORT_NAME(u8"2  @  \u30d5")          // フ
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)          PORT_CHAR('3')  PORT_CHAR('#')    PORT_NAME(u8"3  #  \u30a2  \u30a1")  // ア ァ
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)          PORT_CHAR('4')  PORT_CHAR('$')    PORT_NAME(u8"4  $  \u30a6  \u30a5")  // ウ ゥ
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)          PORT_CHAR('6')  PORT_CHAR('^')    PORT_NAME(u8"6  ^  \u30aa  \u30a9")  // オ ォ
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)          PORT_CHAR('5')  PORT_CHAR('%')    PORT_NAME(u8"5  %  \u30a8  \u30a7")  // エ ェ
+
+	PORT_MODIFY("ROW4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=')  PORT_CHAR('+')    PORT_NAME(u8"=  +  \u309c  \u300c")  // ゜ 「
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)          PORT_CHAR('9')  PORT_CHAR('(')    PORT_NAME(u8"9  (  \u30e8  \u30e7")  // ヨ ョ
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)          PORT_CHAR('7')  PORT_CHAR('&')    PORT_NAME(u8"7  &  \u30e4  \u30e3")  // ヤ ャ
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-')  PORT_CHAR('_')    PORT_NAME(u8"-  _  \u30db")          // ホ
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)          PORT_CHAR('8')  PORT_CHAR('*')    PORT_NAME(u8"8  *  \u30e6  \u30e5")  // ユ ュ
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)          PORT_CHAR('0')  PORT_CHAR(')')    PORT_NAME(u8"0  )  \u30ef  \u30f2")  // ワ ヲ
+
+	PORT_MODIFY("ROW5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')  PORT_CHAR('}')    PORT_NAME(u8"]  }  \u30e0  \u30fc")  // ム ー
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)          PORT_CHAR('o')  PORT_CHAR('O')    PORT_NAME(u8"O  \u30e9")             // ラ
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)          PORT_CHAR('u')  PORT_CHAR('U')    PORT_NAME(u8"U  \u30ca")             // ナ
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[')  PORT_CHAR('{')    PORT_NAME(u8"[  {  \u309b  \u300d")  // ゛ 」
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)          PORT_CHAR('i')  PORT_CHAR('I')    PORT_NAME(u8"I  \u30cb")             // ニ
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)          PORT_CHAR('p')  PORT_CHAR('P')    PORT_NAME(u8"P  \u30bb")             // セ
+
+	PORT_MODIFY("ROW6")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)          PORT_CHAR('l')  PORT_CHAR('L')    PORT_NAME(u8"L  \u30ea")             // リ
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)          PORT_CHAR('j')  PORT_CHAR('J')    PORT_NAME(u8"J  \u30de")             // マ
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('"')    PORT_NAME(u8"'  \"  \u30b1  \u30ed") // ケ ロ
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)          PORT_CHAR('k')  PORT_CHAR('K')    PORT_NAME(u8"K  \u30ce")             // ノ
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';')  PORT_CHAR(':')    PORT_NAME(u8";  :  \u30ec")          // レ
+
+	PORT_MODIFY("ROW7")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(U'¥') PORT_CHAR('|')    PORT_NAME(u8"¥  |  \u30d8")          // ヘ
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',')  PORT_CHAR('<')    PORT_NAME(u8",  <  \u30cd  \u3001")  // ネ 、
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/')  PORT_CHAR('?')    PORT_NAME(u8"/  ?  \u30e1  \u30fb")  // メ ・
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)          PORT_CHAR('n')  PORT_CHAR('N')    PORT_NAME(u8"N  \u30df")             // ミ
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)          PORT_CHAR('m')  PORT_CHAR('M')    PORT_NAME(u8"M  \u30e2")             // モ
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')  PORT_CHAR('>')    PORT_NAME(u8".  >  \u30eb  \u3002")  // ル 。
+
+	PORT_MODIFY("P0")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_NAME(u8"\u30ab\u30ca (Kana)") PORT_TOGGLE // カナ
+INPUT_PORTS_END
+
 
 class m0110_device : public keyboard_base
 {
@@ -784,6 +851,23 @@ protected:
 	}
 };
 
+class m0110j_device : public keyboard_base
+{
+public:
+	m0110j_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+		: keyboard_base(mconfig, MACKBD_M0110J, tag, owner, clock)
+	{
+	}
+
+	static auto parent_rom_device_type() { return &MACKBD_M0110; }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(keyboard_jp);
+	}
+};
+
 
 INPUT_PORTS_START(keypad)
 	PORT_START("ROW0")
@@ -806,7 +890,7 @@ INPUT_PORTS_START(keypad)
 	PORT_BIT(0x08, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))     PORT_NAME("Keypad 8")
 	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))     PORT_NAME("Keypad 9")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM)
-	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(keypad_base, keyboard_clock_r)
+	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keypad_base::keyboard_clock_r))
 	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_UNUSED)
 
 	PORT_START("P1")
@@ -820,9 +904,9 @@ INPUT_PORTS_START(keypad)
 	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))     PORT_NAME("Keypad 7")
 
 	PORT_START("P2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(keypad_base, host_data_r)
-	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(keypad_base, keyboard_data_r)
-	PORT_BIT(0x0c, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(keypad_base, columns_r)
+	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keypad_base::host_data_r))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keypad_base::keyboard_data_r))
+	PORT_BIT(0x0c, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keypad_base::columns_r))
 INPUT_PORTS_END
 
 INPUT_PORTS_START(keypad_eu)
@@ -884,6 +968,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0110,  device_mac_keyboard_interface, m0110_d
 DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0110B, device_mac_keyboard_interface, m0110b_device, "mackbd_m0110b", "Macintosh Keyboard (British - M0110B)")
 DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0110F, device_mac_keyboard_interface, m0110f_device, "mackbd_m0110f", "Macintosh Keyboard (French - M0110F)")
 DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0110T, device_mac_keyboard_interface, m0110t_device, "mackbd_m0110t", "Macintosh Keyboard (Italian - M0110T)")
+DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0110J, device_mac_keyboard_interface, m0110j_device, "mackbd_m0110j", "Macintosh Keyboard (Japanese - M0110J)")
 
 DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0120,  device_mac_keyboard_interface, m0120_device,  "mackbd_m0120",  "Macintosh Numeric Keypad (English - M0120)")
 DEFINE_DEVICE_TYPE_PRIVATE(MACKBD_M0120P, device_mac_keyboard_interface, m0120p_device, "mackbd_m0120p", "Macintosh Numeric Keypad (European - M0120P)")

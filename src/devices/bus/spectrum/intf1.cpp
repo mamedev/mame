@@ -105,9 +105,9 @@ void spectrum_intf1_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_intf1_device::romcs()
+bool spectrum_intf1_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 // the Interface 1 looks for specific bus conditions to enable / disable the expansion overlay ROM

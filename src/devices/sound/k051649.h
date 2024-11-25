@@ -29,12 +29,12 @@ public:
 	void k052539_waveform_w(offs_t offset, u8 data);
 	u8 k052539_waveform_r(offs_t offset);
 
-	void scc_map(address_map &map);
+	void scc_map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 

@@ -58,6 +58,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD DEBUGGING OPTIONS" },
 	{ OSDOPTION_DEBUGGER,                        OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "debugger used: " },
+	{ OSDOPTION_DEBUGGER_HOST,                   "localhost",      core_options::option_type::STRING,    "address to bind to for gdbstub debugger" },
 	{ OSDOPTION_DEBUGGER_PORT,                   "23946",          core_options::option_type::INTEGER,   "port to use for gdbstub debugger" },
 	{ OSDOPTION_DEBUGGER_FONT ";dfont",          OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "font to use for debugger views" },
 	{ OSDOPTION_DEBUGGER_FONT_SIZE ";dfontsize", "0",              core_options::option_type::FLOAT,     "font size to use for debugger views" },
@@ -308,6 +309,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, MOUSE_NONE);
 
+	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_SDL);
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_X11);
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_WIN32);
@@ -462,9 +464,6 @@ void osd_common_t::update(bool skip_redraw)
 	//
 	if (m_watchdog != nullptr)
 		m_watchdog->reset();
-
-	update_slider_list();
-
 }
 
 
@@ -567,6 +566,31 @@ void osd_common_t::customize_input_type_list(std::vector<input_type_entry> &type
 
 std::vector<ui::menu_item> osd_common_t::get_slider_list()
 {
+	// check if any window has dirty sliders
+	bool dirty = false;
+	for (const auto &window : window_list())
+	{
+		if (window->has_renderer() && window->renderer().sliders_dirty())
+		{
+			dirty = true;
+			break;
+		}
+	}
+
+	if (dirty)
+	{
+		m_sliders.clear();
+
+		for (const auto &window : osd_common_t::window_list())
+		{
+			if (window->has_renderer())
+			{
+				std::vector<ui::menu_item> window_sliders = window->renderer().get_slider_list();
+				m_sliders.insert(m_sliders.end(), window_sliders.begin(), window_sliders.end());
+			}
+		}
+	}
+
 	return m_sliders;
 }
 
@@ -592,7 +616,19 @@ bool osd_common_t::execute_command(const char *command)
 	if (strcmp(command, OSDCOMMAND_LIST_NETWORK_ADAPTERS) == 0)
 	{
 		osd_module &om = select_module_options<osd_module>(OSD_NETDEV_PROVIDER);
-		osd_list_network_adapters();
+		auto const &interfaces = get_netdev_list();
+		if (interfaces.empty())
+		{
+			printf("No supported network interfaces were found\n");
+		}
+		else
+		{
+			printf("Available network interfaces:\n");
+			for (auto &entry : interfaces)
+			{
+				printf("    %s\n", entry->description);
+			}
+		}
 		om.exit();
 
 		return true;
@@ -600,7 +636,27 @@ bool osd_common_t::execute_command(const char *command)
 	else if (strcmp(command, OSDCOMMAND_LIST_MIDI_DEVICES) == 0)
 	{
 		osd_module &om = select_module_options<osd_module>(OSD_MIDI_PROVIDER);
-		dynamic_cast<midi_module &>(om).list_midi_devices();
+		auto const ports = dynamic_cast<midi_module &>(om).list_midi_ports();
+		if (ports.empty())
+		{
+			printf("No MIDI ports were found\n");
+		}
+		else
+		{
+			printf("MIDI input ports:\n");
+			for (auto const &port : ports)
+			{
+				if (port.input)
+					printf(port.default_input ? "%s (default)\n" : "%s\n", port.name.c_str());
+			}
+
+			printf("\nMIDI output ports:\n");
+			for (auto const &port : ports)
+			{
+				if (port.output)
+					printf(port.default_output ? "%s (default)\n" : "%s\n", port.name.c_str());
+			}
+		}
 		om.exit();
 
 		return true;
@@ -717,7 +773,18 @@ bool osd_common_t::get_font_families(std::string const &font_path, std::vector<s
 	return m_font_module->get_font_families(font_path, result);
 }
 
-std::unique_ptr<osd_midi_device> osd_common_t::create_midi_device()
+std::unique_ptr<osd::midi_input_port> osd_common_t::create_midi_input(std::string_view name)
 {
-	return m_midi->create_midi_device();
+	return m_midi->create_input(name);
 }
+
+std::unique_ptr<osd::midi_output_port> osd_common_t::create_midi_output(std::string_view name)
+{
+	return m_midi->create_output(name);
+}
+
+std::vector<osd::midi_port_info> osd_common_t::list_midi_ports()
+{
+	return m_midi->list_midi_ports();
+}
+

@@ -81,8 +81,8 @@ public:
 	void proteus3(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void ca2_w(int state);
@@ -110,7 +110,7 @@ private:
 	void write_f14_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F14, state); }
 	void write_f15_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F15, state); }
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_video_data = 0U;
 	u8 m_flashcnt = 0U;

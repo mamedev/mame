@@ -249,7 +249,7 @@ void astrocde_state::sparkle_w(int state)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(ebases_state::trackball_r)
+ioport_value ebases_state::trackball_r()
 {
 	return (m_trackball[m_input_select]->read() - m_trackball_last) & 0xff;
 }
@@ -301,7 +301,7 @@ void demndrgn_state::input_select_w(int state)
 	m_input_select = state;
 }
 
-CUSTOM_INPUT_MEMBER(demndrgn_state::trackball_r)
+ioport_value demndrgn_state::trackball_r()
 {
 	return (m_trackball[m_input_select]->read() - m_trackball_last) & 0xff;
 }
@@ -732,7 +732,7 @@ static INPUT_PORTS_START( ebases )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S1:8" )
 
 	PORT_START("P4HANDLE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ebases_state, trackball_r)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ebases_state::trackball_r))
 
 	PORT_START("TRACKX1")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -749,7 +749,7 @@ static INPUT_PORTS_START( ebases )
 	PORT_START("FAKE")
 	/* Cocktail cabinets had a B/W monitor with color overlay (same one as Space Zap!),
 	   upright cabinets at factory default had a B/W monitor too, with a baseball stadium background. */
-	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrocde_state,spacezap_monitor, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(astrocde_state::spacezap_monitor), 0)
 	PORT_CONFSETTING(    0x00, "B/W" )
 	PORT_CONFSETTING(    0x01, "Color" )
 INPUT_PORTS_END
@@ -813,7 +813,7 @@ static INPUT_PORTS_START( spacezap )
 	PORT_START("FAKE")
 	/* Dedicated cabinets had a B/W monitor and color overlay,
 	   some (unofficial/repaired?) cabinets had a color monitor. */
-	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrocde_state,spacezap_monitor, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(astrocde_state::spacezap_monitor), 0)
 	PORT_CONFSETTING(    0x00, "B/W" )
 	PORT_CONFSETTING(    0x01, "Color" )
 INPUT_PORTS_END
@@ -849,7 +849,7 @@ static INPUT_PORTS_START( wow )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(astrocde_state, votrax_speech_status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(astrocde_state::votrax_speech_status_r))
 
 	PORT_START("P4HANDLE")
 	/* "If S1:1,2,3 are all ON or all OFF, only coin meter number 1 will count." */
@@ -919,7 +919,7 @@ static INPUT_PORTS_START( gorf )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(astrocde_state, votrax_speech_status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(astrocde_state::votrax_speech_status_r))
 
 	PORT_START("P4HANDLE")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("S1:1")
@@ -963,6 +963,15 @@ static INPUT_PORTS_START( gorfpgm1g )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("S1:4") /* Default it to Foreign because this set has the German ROM */
 	PORT_DIPSETTING(    0x08, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, "Foreign (German ROM)" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gorfirec )
+	PORT_INCLUDE(gorf)
+
+	PORT_MODIFY("P4HANDLE")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )     PORT_DIPLOCATION("S1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Spanish ) )
+	PORT_DIPSETTING(    0x00, "Foreign (NEED ROM)" )    // "Requires A082-91374-A000"
 INPUT_PORTS_END
 
 
@@ -1074,7 +1083,7 @@ static INPUT_PORTS_START( demndrgn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2HANDLE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(demndrgn_state, trackball_r)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(demndrgn_state::trackball_r))
 
 	PORT_START("P3HANDLE")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1647,6 +1656,20 @@ ROM_START( gorfpgm1g )
 	ROM_LOAD( "german.x11",   0xc000, 0x1000, CRC(3a3dbdcb) SHA1(e20895d41d66d1a23cc445e4ae4628b16ebf83f2) )
 ROM_END
 
+/* PCB engraved as "MIDWAY MFC  A IRECSA".
+   ROM test fails in test mode, it seems Irecsa didn't bother to change the checksums. */
+ROM_START( gorfirec )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a.bin", 0x0000, 0x1000, CRC(97cb4a6a) SHA1(efdae9a437c665fb861665a38c6cb13fd848ad91) )
+	ROM_LOAD( "b.bin", 0x1000, 0x1000, CRC(e35701c0) SHA1(30794aa97e1ec1c949f74e20a830224e1b5ae8b8) )
+	ROM_LOAD( "c.bin", 0x2000, 0x1000, CRC(16b0638b) SHA1(65e1e2e4df80140976915e0982ce3219b14beece) )
+	ROM_LOAD( "d.bin", 0x3000, 0x1000, CRC(0dccdfc4) SHA1(f55217e98169df41b8906f880ac78a2d0d56f68a) )
+	ROM_LOAD( "e.bin", 0x8000, 0x1000, CRC(8e82804b) SHA1(24250edb30efa63c80514629c86c9372b7ca3020) )
+	ROM_LOAD( "f.bin", 0x9000, 0x1000, CRC(715fb4d9) SHA1(c9f33162093e6ed7e3cb6bb716419e5bc43c0381) )
+	ROM_LOAD( "g.bin", 0xa000, 0x1000, CRC(fb5b7131) SHA1(865ec4f912418f08ff08910ddd61ac7ebd7b30d5) )
+	ROM_LOAD( "h.bin", 0xb000, 0x1000, CRC(578ade88) SHA1(78a27e08aeef7acb648ab9db62a3e87720792aff) )
+ROM_END
+
 
 ROM_START( robby )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1844,31 +1867,33 @@ void astrocde_state::init_tenpindx()
  *
  *************************************/
 
-/* 90002 CPU board + 90700 game board + 91312 "characterization card" */
+// 90002 CPU board + 90700 game board + 91312 "characterization card"
 GAMEL( 1978, seawolf2,  0,    seawolf2, seawolf2,  seawolf2_state, init_seawolf2, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf2 )
 
-/* 91354 CPU board + 90700 game board + 91356 RAM board */
+// 91354 CPU board + 90700 game board + 91356 RAM board
 GAMEL( 1980, ebases,    0,    ebases,   ebases,    ebases_state,   init_ebases,   ROT0,   "Dave Nutting Associates / Midway", "Extra Bases", MACHINE_SUPPORTS_SAVE, layout_spacezap )
 
-/* 91354 CPU board + 90706 game board + 91356 RAM board + 91355 pattern board */
+// 91354 CPU board + 90706 game board + 91356 RAM board + 91355 pattern board
 GAMEL( 1980, spacezap,  0,    spacezap, spacezap,  astrocde_state, init_spacezap, ROT0,   "Midway", "Space Zap (Midway)", MACHINE_SUPPORTS_SAVE, layout_spacezap ) // there's also an older version by Game-A-Tron on different hardware
 
-/* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91397 memory board */
-GAME(  1980, wow,       0,    wow,      wow,       astrocde_state, init_wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1980, wowg,      wow,  wow,      wowg,      astrocde_state, init_wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor (with German Language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+// 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91397 memory board
+GAME(  1980, wow,       0,    wow,      wow,       astrocde_state, init_wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor",                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1980, wowg,      wow,  wow,      wowg,      astrocde_state, init_wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor (with German language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-/* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91364 ROM/RAM board */
-GAMEL( 1981, gorf,      0,    gorf,     gorf,      astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf  )
-GAMEL( 1981, gorfpgm1,  gorf, gorf,     gorf,      astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
-GAMEL( 1981, gorfpgm1f, gorf, gorf,     gorfpgm1f, astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1, with French Language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
-GAMEL( 1981, gorfpgm1g, gorf, gorf,     gorfpgm1g, astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1, with German Language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
+// 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91364 ROM/RAM board
+GAMEL( 1981, gorf,      0,    gorf,     gorf,      astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway",                  "Gorf",                                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
+GAMEL( 1981, gorfpgm1,  gorf, gorf,     gorf,      astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway",                  "Gorf (program 1)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
+GAMEL( 1981, gorfpgm1f, gorf, gorf,     gorfpgm1f, astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway",                  "Gorf (program 1, with French language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
+GAMEL( 1981, gorfpgm1g, gorf, gorf,     gorfpgm1g, astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway",                  "Gorf (program 1, with German language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
+GAMEL( 1981, gorfirec,  gorf, gorf,     gorfirec,  astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway (Irecsa license)", "Gorf (Spain, Irecsa license)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
 
-/* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91423 memory board */
+
+// 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91423 memory board
 GAME(  1981, robby,     0,    robby,    robby,     astrocde_state, init_robby,    ROT0,   "Dave Nutting Associates / Bally Midway", "The Adventures of Robby Roto!", MACHINE_SUPPORTS_SAVE )
 
-/* 91465 CPU board + 91469 game board + 91466 RAM board + 91488 pattern board + 91467 memory board + 91846 EPROM board */
+// 91465 CPU board + 91469 game board + 91466 RAM board + 91488 pattern board + 91467 memory board + 91846 EPROM board
 GAME(  1983, profpac,   0,    profpac,  profpac,   astrocde_state, init_profpac,  ROT0,   "Dave Nutting Associates / Bally Midway", "Professor Pac-Man", MACHINE_SUPPORTS_SAVE )
 
-/* 91465 CPU board + 91699 game board + 91466 RAM board + 91488 pattern board + 91467 memory board */
+// 91465 CPU board + 91699 game board + 91466 RAM board + 91488 pattern board + 91467 memory board
 GAME(  1982, demndrgn,  0,    demndrgn, demndrgn,  demndrgn_state, init_demndrgn, ROT0,   "Dave Nutting Associates / Bally Midway", "Demons & Dragons (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1983, tenpindx,  0,    tenpindx, tenpindx,  tenpindx_state, init_tenpindx, ROT0,   "Dave Nutting Associates / Bally Midway", "Ten Pin Deluxe", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL, layout_tenpindx )
+GAMEL( 1983, tenpindx,  0,    tenpindx, tenpindx,  tenpindx_state, init_tenpindx, ROT0,   "Dave Nutting Associates / Bally Midway", "Ten Pin Deluxe",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL, layout_tenpindx )

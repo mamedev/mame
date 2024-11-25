@@ -34,8 +34,8 @@ private:
 
 	u8 ga_hack_r();
 
-	void mem_map(address_map &map);
-	void program_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

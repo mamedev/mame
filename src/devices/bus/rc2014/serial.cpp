@@ -29,9 +29,9 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void irq_w(int state) { m_bus->int_w(state); }
 	void tx_w(int state) { m_bus->tx_w(state); }
@@ -101,10 +101,10 @@ protected:
 	dual_serial_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void irq_w(int state) = 0;
 	virtual void tx_w(int state) = 0;
@@ -182,8 +182,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
-	virtual void device_resolve_objects() override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	// base-class overrides
 	void irq_w(int state) override { m_bus->int_w(state); }
@@ -229,8 +229,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
-	virtual void device_resolve_objects() override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	// base-class overrides
 	void irq_w(int state) override { m_bus->int_w(state); }

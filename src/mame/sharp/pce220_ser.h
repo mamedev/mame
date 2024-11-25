@@ -57,8 +57,8 @@ protected:
 	int get_next_state();
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(send_tick);
 	TIMER_CALLBACK_MEMBER(receive_tick);

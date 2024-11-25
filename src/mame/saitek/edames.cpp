@@ -16,9 +16,9 @@ fidelity/dames.cpp. It will give an error beep if the user removes a captured
 piece from the board, but it doesn't matter.
 
 Two versions were sold, each should have the same MCU and ROM: a tabletop model
-(Electronic Dames, 8MHz or 12MHz), and a portable model (Compact Dames Computer,
-8MHz). As with SciSys/Saitek chess computers, they were also licensed to Tandy.
-The program engine is DIOS by Eric van Riet Paap.
+(Electronic Dames, 8MHz or 12MHz, model 660), and a portable model (Compact Dames
+Computer, 8MHz, model 661). As with SciSys/Saitek chess computers, they were also
+licensed to Tandy. The program engine is DIOS by Eric van Riet Paap.
 
 According to the second hand market, the tabletop French version is much more
 common than the English one. The manual and a LED label incorrectly call crowned
@@ -64,14 +64,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
 	required_device<hd6301y0_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<4> m_inputs;
 
 	u16 m_inp_mux = 0;
@@ -79,7 +79,7 @@ private:
 	u16 m_led_data[2] = { };
 	bool m_enable_reset = false;
 
-	void init_board(int state);
+	void init_board(u8 data);
 
 	// I/O handlers
 	void update_display();
@@ -107,7 +107,7 @@ void edames_state::machine_start()
 	save_item(NAME(m_enable_reset));
 }
 
-void edames_state::init_board(int state)
+void edames_state::init_board(u8 data)
 {
 	for (int i = 0; i < 20; i++)
 	{
@@ -235,13 +235,15 @@ static INPUT_PORTS_START( edames ) // see comments for French version labels
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Stop")       // Stop
 
 	PORT_START("IN.3")
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, edames_state, change_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x02, "8MHz (original)" )
-	PORT_CONFSETTING(    0x00, "12MHz (newer)" )
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(edames_state::change_cpu_freq), 0) // factory set
+	PORT_CONFSETTING(    0x03, "6MHz (unofficial)" )
+	PORT_CONFSETTING(    0x02, "8MHz (original version)" )
+	PORT_CONFSETTING(    0x01, "10MHz (unofficial)" )
+	PORT_CONFSETTING(    0x00, "12MHz (newer version)" )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Swap Side")   // Tourne Damier
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, edames_state, go_button, 0) PORT_NAME("Go") // Go
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(edames_state::go_button), 0) PORT_NAME("Go") // Go
 INPUT_PORTS_END
 
 
@@ -300,4 +302,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT    COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1988, edames, 0,        0,      edames,  edames, edames_state, empty_init, "Saitek", "Electronic Dames", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, edames, 0,        0,      edames,  edames, edames_state, empty_init, "Saitek", "Electronic Dames", MACHINE_SUPPORTS_SAVE )

@@ -60,8 +60,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	bool m_cassold;
@@ -134,9 +134,9 @@ private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
-	void mtx_io(address_map &map);
-	void mtx_mem(address_map &map);
-	void rs128_io(address_map &map);
+	void mtx_io(address_map &map) ATTR_COLD;
+	void mtx_mem(address_map &map) ATTR_COLD;
+	void rs128_io(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_MEMOTECH_MTX_H

@@ -7,16 +7,31 @@ Support for Heathkit H8 H8T cassette images
 
 Standard Kansas City format (300 baud)
 
+TODO - investigate 1200 buad support, H8 should support it, but H88 does not.
+
 We output a leader, followed by the contents of the H8T file.
 
 ********************************************************************/
 
 #include "h8_cas.h"
 
-#define WAVEENTRY_LOW  -32768
-#define WAVEENTRY_HIGH  32767
+#include <algorithm>
 
-#define H8_WAV_FREQUENCY   9600
+
+static constexpr uint16_t WAVEENTRY_LOW         = -32768;
+static constexpr uint16_t WAVEENTRY_HIGH        = 32767;
+static constexpr uint16_t SILENCE               = 0;
+
+// using a multiple of 4800 will ensure an integer multiple of samples for each wave.
+static constexpr uint16_t H8_WAV_FREQUENCY      = 9600;
+static constexpr uint16_t TAPE_BAUD_RATE        = 300;
+static constexpr uint16_t SAMPLES_PER_BIT       = H8_WAV_FREQUENCY / TAPE_BAUD_RATE;
+static constexpr uint16_t SAMPLES_PER_HALF_WAVE = SAMPLES_PER_BIT / 2;
+
+static constexpr uint16_t ONE_FREQ              = 1200;
+static constexpr uint16_t ZERO_FREQ             = 2400;
+static constexpr uint16_t ONE_CYCLES            = H8_WAV_FREQUENCY / ONE_FREQ;
+static constexpr uint16_t ZERO_CYCLES           = H8_WAV_FREQUENCY / ZERO_FREQ;
 
 // image size
 static int h8_image_size; // FIXME: global variable prevents multiple instances
@@ -25,8 +40,7 @@ static int h8_put_samples(int16_t *buffer, int sample_pos, int count, int level)
 {
 	if (buffer)
 	{
-		for (int i=0; i<count; i++)
-			buffer[sample_pos + i] = level;
+		std::fill_n(&buffer[sample_pos], count, level);
 	}
 
 	return count;
@@ -36,57 +50,48 @@ static int h8_output_bit(int16_t *buffer, int sample_pos, bool bit)
 {
 	int samples = 0;
 
-	for (uint8_t i = 0; i < 4; i++)
+	const int loops = bit ? ONE_CYCLES : ZERO_CYCLES;
+	const int samplePerValue = SAMPLES_PER_HALF_WAVE / loops;
+
+	for (int i = 0; i < loops; i++)
 	{
-		if (bit)
-		{
-			samples += h8_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_LOW);
-			samples += h8_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_HIGH);
-			samples += h8_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_LOW);
-			samples += h8_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_HIGH);
-		}
-		else
-		{
-			samples += h8_put_samples(buffer, sample_pos + samples, 4, WAVEENTRY_LOW);
-			samples += h8_put_samples(buffer, sample_pos + samples, 4, WAVEENTRY_HIGH);
-		}
+		samples += h8_put_samples(buffer, sample_pos + samples, samplePerValue, WAVEENTRY_LOW);
+		samples += h8_put_samples(buffer, sample_pos + samples, samplePerValue, WAVEENTRY_HIGH);
 	}
 
 	return samples;
 }
 
-static int h8_output_byte(int16_t *buffer, int sample_pos, uint8_t byte)
+static int h8_output_byte(int16_t *buffer, int sample_pos, uint8_t data)
 {
 	int samples = 0;
-	uint8_t i;
 
 	// start bit
-	samples += h8_output_bit (buffer, sample_pos + samples, 0);
+	samples += h8_output_bit(buffer, sample_pos + samples, 0);
 
 	// data bits
-	for (i = 0; i<8; i++)
-		samples += h8_output_bit (buffer, sample_pos + samples, (byte >> i) & 1);
+	for (int i = 0; i < 8; i++)
+	{
+		samples += h8_output_bit(buffer, sample_pos + samples, data & 1);
+		data >>= 1;
+	}
 
-	// stop bits
-	for (i = 0; i<2; i++)
-		samples += h8_output_bit (buffer, sample_pos + samples, 1);
+	// stop bit
+	samples += h8_output_bit(buffer, sample_pos + samples, 1);
 
 	return samples;
 }
 
 static int h8_handle_cassette(int16_t *buffer, const uint8_t *bytes)
 {
-	uint32_t sample_count = 0;
-	uint32_t byte_count = 0;
-	uint32_t i;
+	int sample_count = 0;
 
-
-	// leader
-	for (i=0; i<2000; i++)
+	// leader - 1 second
+	for (int i = 0; i < TAPE_BAUD_RATE; i++)
 		sample_count += h8_output_bit(buffer, sample_count, 1);
 
 	// data
-	for (i=byte_count; i<h8_image_size; i++)
+	for (int i = 0; i < h8_image_size; i++)
 		sample_count += h8_output_byte(buffer, sample_count, bytes[i]);
 
 	return sample_count;

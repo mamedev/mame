@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/nt7534.h"
+#include "nt7534.h"
 
 #define VERBOSE 0
 #include "logmacro.h"

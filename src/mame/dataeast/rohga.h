@@ -90,14 +90,14 @@ private:
 
 	void rohga_base(machine_config &config);
 
-	void rohga_map(address_map &map);
-	void wizdfire_map(address_map &map);
-	void nitrobal_map(address_map &map);
-	void hotb_base_map(address_map &map);
-	void schmeisr_map(address_map &map);
-	void hangzo_map(address_map &map);
+	void rohga_map(address_map &map) ATTR_COLD;
+	void wizdfire_map(address_map &map) ATTR_COLD;
+	void nitrobal_map(address_map &map) ATTR_COLD;
+	void hotb_base_map(address_map &map) ATTR_COLD;
+	void schmeisr_map(address_map &map) ATTR_COLD;
+	void hangzo_map(address_map &map) ATTR_COLD;
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_DATAEAST_ROHGA_H

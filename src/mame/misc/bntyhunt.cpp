@@ -52,7 +52,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void bntyhunt_map(address_map &map);
+	void bntyhunt_map(address_map &map) ATTR_COLD;
 };
 
 void bntyhunt_state::bntyhunt_map(address_map &map)

@@ -2,7 +2,7 @@
 // detail/strand_executor_service.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -90,33 +90,33 @@ public:
   // Request invocation of the given function.
   template <typename Executor, typename Function>
   static void execute(const implementation_type& impl, Executor& ex,
-      ASIO_MOVE_ARG(Function) function,
-      typename enable_if<
-        can_query<Executor, execution::allocator_t<void> >::value
-      >::type* = 0);
+      Function&& function,
+      enable_if_t<
+        can_query<Executor, execution::allocator_t<void>>::value
+      >* = 0);
 
   // Request invocation of the given function.
   template <typename Executor, typename Function>
   static void execute(const implementation_type& impl, Executor& ex,
-      ASIO_MOVE_ARG(Function) function,
-      typename enable_if<
-        !can_query<Executor, execution::allocator_t<void> >::value
-      >::type* = 0);
+      Function&& function,
+      enable_if_t<
+        !can_query<Executor, execution::allocator_t<void>>::value
+      >* = 0);
 
   // Request invocation of the given function.
   template <typename Executor, typename Function, typename Allocator>
   static void dispatch(const implementation_type& impl, Executor& ex,
-      ASIO_MOVE_ARG(Function) function, const Allocator& a);
+      Function&& function, const Allocator& a);
 
   // Request invocation of the given function and return immediately.
   template <typename Executor, typename Function, typename Allocator>
   static void post(const implementation_type& impl, Executor& ex,
-      ASIO_MOVE_ARG(Function) function, const Allocator& a);
+      Function&& function, const Allocator& a);
 
   // Request invocation of the given function and return immediately.
   template <typename Executor, typename Function, typename Allocator>
   static void defer(const implementation_type& impl, Executor& ex,
-      ASIO_MOVE_ARG(Function) function, const Allocator& a);
+      Function&& function, const Allocator& a);
 
   // Determine whether the strand is running in the current thread.
   ASIO_DECL static bool running_in_this_thread(
@@ -141,7 +141,7 @@ private:
   // Helper function to request invocation of the given function.
   template <typename Executor, typename Function, typename Allocator>
   static void do_execute(const implementation_type& impl, Executor& ex,
-      ASIO_MOVE_ARG(Function) function, const Allocator& a);
+      Function&& function, const Allocator& a);
 
   // Mutex to protect access to the service-wide state.
   mutex mutex_;

@@ -38,7 +38,7 @@ public:
 	void jpmsys7(machine_config &config);
 
 private:
-	void jpmsys7_map(address_map &map);
+	void jpmsys7_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

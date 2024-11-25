@@ -89,9 +89,9 @@ public:
 	void twocrude(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -115,12 +115,10 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	static rgb_t xbgr_888(u32 raw);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /******************************************************************************/
 
@@ -191,8 +189,6 @@ u32 cbuster_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	return 0;
 }
 
-
-// machine
 
 void cbuster_state::prot_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -382,6 +378,9 @@ static GFXDECODE_START( gfx_cbuster )
 	GFXDECODE_ENTRY( "tiles1",  0, charlayout,     0, 128 )  // Characters 8x8
 	GFXDECODE_ENTRY( "tiles1",  0, tilelayout,     0, 128 )  // Tiles 16x16
 	GFXDECODE_ENTRY( "tiles2",  0, tilelayout,     0, 128 )  // Tiles 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_cbuster_spr )
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100,  80 )  // Sprites 16x16
 GFXDECODE_END
 
@@ -454,9 +453,7 @@ void cbuster_state::twocrude(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(3);
-	m_sprgen->set_gfxdecode_tag("gfxdecode");
+	DECO_SPRITE(config, m_sprgen, 0, m_palette, gfx_cbuster_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

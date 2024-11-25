@@ -155,7 +155,7 @@ public:
 	void tecfri(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -175,7 +175,6 @@ protected:
 	void vblank_irq(int state);
 	void irq_reset_w(int state);
 	template <uint8_t Which> void coin_w(int state);
-	void flip_screen_w(int state);
 	void bg_videoram_w(offs_t offset, uint8_t data);
 	void bg_colorram_w(offs_t offset, uint8_t data);
 	void scroll_bg_w(uint8_t data);
@@ -193,13 +192,13 @@ public:
 	void trckydoc(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 class sauro_state : public base_state
@@ -216,7 +215,7 @@ public:
 	void saurobl(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -239,14 +238,12 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_io_map(address_map &map);
-	void main_prg_map(address_map &map);
-	void sauro_sound_map(address_map &map);
-	void saurobl_sound_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void sauro_sound_map(address_map &map) ATTR_COLD;
+	void saurobl_sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 // General
 
@@ -466,8 +463,6 @@ uint32_t trckydoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
 void base_state::machine_start()
 {
 	save_item(NAME(m_irq_enable));
@@ -503,11 +498,6 @@ template <uint8_t Which>
 void base_state::coin_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
-}
-
-void base_state::flip_screen_w(int state)
-{
-	flip_screen_set(state);
 }
 
 void sauro_state::main_prg_map(address_map &map)
@@ -807,7 +797,7 @@ void trckydoc_state::trckydoc(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &trckydoc_state::prg_map);
 
-	m_mainlatch->q_out_cb<1>().set(FUNC(trckydoc_state::flip_screen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(trckydoc_state::flip_screen_set));
 	m_mainlatch->q_out_cb<2>().set(FUNC(trckydoc_state::coin_w<0>));
 	m_mainlatch->q_out_cb<3>().set(FUNC(trckydoc_state::coin_w<1>));
 
@@ -824,7 +814,7 @@ void sauro_state::saurobl(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sauro_state::main_io_map);
 
 	// Z3
-	m_mainlatch->q_out_cb<0>().set(FUNC(sauro_state::flip_screen_w));
+	m_mainlatch->q_out_cb<0>().set(FUNC(sauro_state::flip_screen_set));
 	m_mainlatch->q_out_cb<1>().set(FUNC(sauro_state::coin_w<0>));
 	m_mainlatch->q_out_cb<2>().set(FUNC(sauro_state::coin_w<1>));
 	m_mainlatch->q_out_cb<3>().set_nop(); // sound IRQ trigger?

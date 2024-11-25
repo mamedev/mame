@@ -47,7 +47,7 @@ public:
 	void cromptons(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 port_r();
@@ -57,8 +57,8 @@ private:
 	required_device_array<hc259_device, 4> m_outlatch;
 	required_ioport_array<4> m_inputs;
 
-	void prg_map(address_map &map);
-	void io_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	u8 m_port_select = 0;
 };

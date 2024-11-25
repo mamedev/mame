@@ -20,7 +20,7 @@ sega_315_6154_device::sega_315_6154_device(const machine_config &mconfig, const 
 void sega_315_6154_device::device_start()
 {
 	pci_host_device::device_start();
-	memory_space = &space(AS_PCI_MEMORY);
+	set_spaces(&space(AS_PCI_MEMORY));
 	// never unmap addresses lower than start
 	memory_window_start = 0x80000000;
 	memory_window_end =   0xffffffff;
@@ -28,7 +28,6 @@ void sega_315_6154_device::device_start()
 
 	m_configuration = &space(AS_PCI_CONFIG);
 
-	io_space = memory_space;
 	io_window_start = 0xc0000000;
 	io_window_end = 0xc000ffff;
 	io_offset = 0xc0000000;
@@ -112,7 +111,7 @@ void sega_315_6154_device::registers_w(offs_t offset, u32 data, u32 mem_mask)
 			logerror("got dma transfer request from 0x%08x to 0x%08x size 0x%08x bytes\n", s, d, l << 2);
 			while (l != 0)
 			{
-				memory_space->write_dword(d, memory_space->read_dword(s));
+				space(AS_PCI_MEMORY).write_dword(d, space(AS_PCI_MEMORY).read_dword(s));
 				s += 4;
 				d += 4;
 				l--;
@@ -123,7 +122,7 @@ void sega_315_6154_device::registers_w(offs_t offset, u32 data, u32 mem_mask)
 }
 
 template<int Aperture>
-u32 sega_315_6154_device::aperture_r(address_space &space, offs_t offset, u32 mem_mask)
+u32 sega_315_6154_device::aperture_r(offs_t offset, u32 mem_mask)
 {
 	const u32 destination_offset = offset & 0x3fffff;
 	const int destination = (offset >> 22) & 3;
@@ -133,15 +132,15 @@ u32 sega_315_6154_device::aperture_r(address_space &space, offs_t offset, u32 me
 		return m_configuration->read_dword(destination_offset << 2, mem_mask);
 	if ((Aperture == 1) && (destination == 0) && (m_useconfig_18x == true))
 		return m_configuration->read_dword(destination_offset << 2, mem_mask);
-	return memory_space->read_dword(m_bases[index] + (destination_offset << 2), mem_mask);
+	return space(AS_PCI_MEMORY).read_dword(m_bases[index] + (destination_offset << 2), mem_mask);
 }
 
-template u32 sega_315_6154_device::aperture_r<0>(address_space &space, offs_t offset, u32 mem_mask);
-template u32 sega_315_6154_device::aperture_r<1>(address_space &space, offs_t offset, u32 mem_mask);
-template u32 sega_315_6154_device::aperture_r<2>(address_space &space, offs_t offset, u32 mem_mask);
+template u32 sega_315_6154_device::aperture_r<0>(offs_t offset, u32 mem_mask);
+template u32 sega_315_6154_device::aperture_r<1>(offs_t offset, u32 mem_mask);
+template u32 sega_315_6154_device::aperture_r<2>(offs_t offset, u32 mem_mask);
 
 template<int Aperture>
-void sega_315_6154_device::aperture_w(address_space &space, offs_t offset, u32 data, u32 mem_mask)
+void sega_315_6154_device::aperture_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	const u32 destination_offset = offset & 0x3fffff;
 	const int destination = (offset >> 22) & 3;
@@ -157,9 +156,9 @@ void sega_315_6154_device::aperture_w(address_space &space, offs_t offset, u32 d
 		m_configuration->write_dword(destination_offset << 2, data, mem_mask);
 		return;
 	}
-	memory_space->write_dword(m_bases[index] + (destination_offset << 2), data, mem_mask);
+	space(AS_PCI_MEMORY).write_dword(m_bases[index] + (destination_offset << 2), data, mem_mask);
 }
 
-template void sega_315_6154_device::aperture_w<0>(address_space &space, offs_t offset, u32 data, u32 mem_mask);
-template void sega_315_6154_device::aperture_w<1>(address_space &space, offs_t offset, u32 data, u32 mem_mask);
-template void sega_315_6154_device::aperture_w<2>(address_space &space, offs_t offset, u32 data, u32 mem_mask);
+template void sega_315_6154_device::aperture_w<0>(offs_t offset, u32 data, u32 mem_mask);
+template void sega_315_6154_device::aperture_w<1>(offs_t offset, u32 data, u32 mem_mask);
+template void sega_315_6154_device::aperture_w<2>(offs_t offset, u32 data, u32 mem_mask);

@@ -145,14 +145,14 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint16_t port7_r()
+	uint8_t port7_r()
 	{
 		auto row = keyboard & 0x0f;
 		if(row <= 8)
 			return io_kbrow[row]->read();
 
 		// seems to be able to control power-on self test if not 0xff
-		return 0xffff;
+		return 0xff;
 	}
 	uint16_t keyboard_r()
 	{

@@ -84,7 +84,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="systemf" cloneof="system">
-		<description>System Disks (Fra)</description>
+		<description>System Disks (France)</description>
 		<year>19??</year>
 		<publisher>Amstrad</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -117,7 +117,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="systems" cloneof="system">
-		<description>System Disks (Spa)</description>
+		<description>System Disks (Spain)</description>
 		<year>19??</year>
 		<publisher>Amstrad</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -151,7 +151,7 @@ license:CC0-1.0
 
 <!-- were there more disks? were they different from the above? -->
 	<software name="systems1" cloneof="system">
-		<description>System Disks (Spa, Newer, Only disks 1 &amp; 2)</description>
+		<description>System Disks (Spain, newer, only disks 1 &amp; 2)</description>
 		<year>1985</year>
 		<publisher>Amstrad</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -181,7 +181,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpmplusg" cloneof="cpmplus">
-		<description>CP/M Plus v1.4 (Ger)</description>
+		<description>CP/M Plus v1.4 (Germany)</description>
 		<year>1985</year>
 		<publisher>Amstrad</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -192,7 +192,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpmpluss" cloneof="cpmplus">
-		<description>CP/M Plus v1.4 (Spa) Duplicate</description>
+		<description>CP/M Plus v1.4 (Spain) Duplicate</description>
 		<year>1985</year>
 		<publisher>Amstrad</publisher>
 		<part name="flop1" interface="floppy_3"><!-- Duplicate of sistema1b.dsk -->
@@ -203,7 +203,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpmplswe" cloneof="cpmplus"><!-- Adds swedish keyboard and localized error messages for some system applications -->
-		<description>CP/M Plus v1.4 (Swe) work copy</description>
+		<description>CP/M Plus v1.4 (Sweden) work copy</description>
 		<year>1985</year>
 		<publisher>Amstrad</publisher>
 		<part name="flop1" interface="floppy_3"><!-- The image is a dump of a work copy with some files deleted and some added/customized -->
@@ -490,7 +490,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="supcalc2">
-		<description>SuperCalc2 v1.00 (Spa?)</description>
+		<description>SuperCalc2 v1.00 (Spain?)</description>
 		<year>1983</year>
 		<publisher>SORCIM</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -552,7 +552,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="3dcchess">
-		<description>3D Clock Chess (Spa)</description>
+		<description>3D Clock Chess (Spain)</description>
 		<year>1985</year>
 		<publisher>ACE Software</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -576,7 +576,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="nieto500">
-		<description>Angel Nieto Pole 500 (Spa)</description>
+		<description>Angel Nieto Pole 500 (Spain)</description>
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -675,7 +675,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="buran">
-		<description>Buran (Spa)</description>
+		<description>Buran (Spain)</description>
 		<year>1990</year>
 		<publisher>OMK</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -773,7 +773,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="conecta4">
-		<description>Conecta 4 (Spa)</description>
+		<description>Conecta 4 (Spain)</description>
 		<year>1990</year>
 		<publisher>Mix Software</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -785,7 +785,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="coronmag">
-		<description>La Corona Mágica (Spa)</description>
+		<description>La Corona Mágica (Spain)</description>
 		<year>1990</year>
 		<publisher>OMK</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -796,7 +796,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="corsar">
-		<description>Corsarios (Spa)</description>
+		<description>Corsarios (Spain)</description>
 		<year>1989</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -807,7 +807,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cyrus2ch">
-		<description>Cyrus II Chess (Fra)</description>
+		<description>Cyrus II Chess (France)</description>
 		<year>1986</year>
 		<publisher>Intelligent Chess Software</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -869,7 +869,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="f1">
-		<description>Formula 1 (Spa)</description>
+		<description>Formula 1 (Spain)</description>
 		<year>19??</year>
 		<publisher>OMK</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -909,7 +909,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="granger1" cloneof="granger">
-		<description>Gnome Ranger (UK, Alt)</description>
+		<description>Gnome Ranger (UK, alt)</description>
 		<year>1987</year>
 		<publisher>Level 9 Computing?</publisher> <!-- not sure if the also published it -->
 		<info name="usage" value="Requires CP/M"/>
@@ -928,7 +928,7 @@ license:CC0-1.0
 
 	<!-- needs passwords -->
 	<software name="goldbask">
-		<description>Golden Basket (Spa)</description>
+		<description>Golden Basket (Spain)</description>
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -939,7 +939,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gonzalez">
-		<description>Gonzalezz (Spa)</description>
+		<description>Gonzalezz (Spain)</description>
 		<year>1989</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -950,7 +950,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="goody">
-		<description>Goody (Spa)</description>
+		<description>Goody (Spain)</description>
 		<year>1988</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -961,7 +961,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gstenis">
-		<description>Grand Slam Tenis (Spa)</description>
+		<description>Grand Slam Tenis (Spain)</description>
 		<year>1989</year>
 		<publisher>OMK</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1014,7 +1014,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="herbert">
-		<description>Herbert (Ger, v4.0)</description>
+		<description>Herbert (Germany, v4.0)</description>
 		<year>1989</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -1080,7 +1080,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="inhumano">
-		<description>Los Inhumanos (Spa)</description>
+		<description>Los Inhumanos (Spain)</description>
 		<year>1990</year>
 		<publisher>Delta Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1092,7 +1092,7 @@ license:CC0-1.0
 
 	<!-- needs passwords -->
 	<software name="jaialai">
-		<description>Jai Alai (Spa)</description>
+		<description>Jai Alai (Spain)</description>
 		<year>1991</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1151,7 +1151,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="krom">
-		<description>Krom - El Guerrero Invencible (Spa)</description>
+		<description>Krom - El Guerrero Invencible (Spain)</description>
 		<year>1989</year>
 		<publisher>OMK</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1192,7 +1192,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lastmiss">
-		<description>The Last Mission (Spa)</description>
+		<description>The Last Mission (Spain)</description>
 		<year>1987</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1238,7 +1238,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="livingst">
-		<description>Livingstone Supongo (Spa)</description>
+		<description>Livingstone Supongo (Spain)</description>
 		<year>1986</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1249,7 +1249,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="livings2">
-		<description>Livingstone II (Spa)</description>
+		<description>Livingstone II (Spain)</description>
 		<year>1989</year>
 		<publisher>Opera Soft</publisher>
 		<info name="alt_title" value="Livingstone Supongo II (Box)"/>
@@ -1303,7 +1303,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mastmind">
-		<description>Master Mind (Spa)</description>
+		<description>Master Mind (Spain)</description>
 		<year>1990</year>
 		<publisher>Mix Software</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -1338,7 +1338,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mortadl2">
-		<description>Mortadelo y Filemón 2 (Spa)</description>
+		<description>Mortadelo y Filemón 2 (Spain)</description>
 		<year>1990</year>
 		<publisher>Drosoft</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -1350,7 +1350,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mot">
-		<description>Mot (Spa)</description>
+		<description>Mot (Spain)</description>
 		<year>1989</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3"><!-- Dump has excess tracks that will not fit a real SD floppy -->
@@ -1361,7 +1361,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mundial">
-		<description>Mundial de Fútbol (Spa)</description>
+		<description>Mundial de Fútbol (Spain)</description>
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1372,7 +1372,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mutnzone">
-		<description>Mutant Zone (Spa)</description>
+		<description>Mutant Zone (Spain)</description>
 		<year>1988</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1383,7 +1383,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mythos">
-		<description>Mythos (Spa)</description>
+		<description>Mythos (Spain)</description>
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<info name="alt_title" value="Mithos (Box)"/>
@@ -1438,7 +1438,7 @@ license:CC0-1.0
 
 	<!-- needs passwords -->
 	<software name="polidiaz">
-		<description>Poli Díaz Boxeo (Spa)</description>
+		<description>Poli Díaz Boxeo (Spain)</description>
 		<year>1991</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1449,7 +1449,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="polidiaz9512" cloneof="polidiaz" supported="no">
-		<description>Poli Díaz Boxeo (Spa, PCW9512)</description>
+		<description>Poli Díaz Boxeo (Spain, PCW9512)</description>
 		<year>1991</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1473,7 +1473,7 @@ license:CC0-1.0
 
 	<!-- needs passwords -->
 	<software name="rescateg">
-		<description>Rescate en el Golfo (Spa)</description>
+		<description>Rescate en el Golfo (Spain)</description>
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1527,7 +1527,7 @@ license:CC0-1.0
 
 <!--
     <software name="sirlance">
-        <description>Sir Lancelot (Spa)</description>
+        <description>Sir Lancelot (Spain)</description>
         <year>1985</year>
         <publisher>OMK</publisher>
         <part name="flop1" interface="floppy_3">
@@ -1539,7 +1539,7 @@ license:CC0-1.0
 -->
 
 	<software name="sirperce">
-		<description>Sir Perceval (Spa)</description>
+		<description>Sir Perceval (Spain)</description>
 		<year>1985</year>
 		<publisher>OMK</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1550,7 +1550,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="skywar">
-		<description>Sky War (Spa)</description>
+		<description>Sky War (Spain)</description>
 		<year>1988</year>
 		<publisher>OMK</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1573,7 +1573,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="solnegro">
-		<description>Sol Negro (Spa)</description>
+		<description>Sol Negro (Spain)</description>
 		<year>1988</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1584,7 +1584,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="solitar">
-		<description>Solitario (Spa)</description>
+		<description>Solitario (Spain)</description>
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -1608,7 +1608,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="soviet">
-		<description>Soviet (Spa)</description>
+		<description>Soviet (Spain)</description>
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1764,7 +1764,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="templos">
-		<description>Los Templos Sagrados (Spa)</description>
+		<description>Los Templos Sagrados (Spain)</description>
 		<year>1991</year>
 		<publisher>Aventuras AD</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -1825,7 +1825,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="trivial">
-		<description>Trivial Pursuit (Spa)</description>
+		<description>Trivial Pursuit (Spain)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -1843,7 +1843,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="troglo">
-		<description>Troglo (Spa)</description>
+		<description>Troglo (Spain)</description>
 		<year>1986</year>
 		<publisher>ACE Software</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -1855,7 +1855,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tuma7">
-		<description>Tuma-7 (Spa)</description>
+		<description>Tuma-7 (Spain)</description>
 		<year>1990</year>
 		<publisher>Delta Soft</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -1867,7 +1867,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ulises">
-		<description>Ulises (Spa)</description>
+		<description>Ulises (Spain)</description>
 		<year>1987</year>
 		<publisher>Opera Soft</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1971,7 +1971,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="scrabble1" cloneof="scrabble" supported="no">
-		<description>Computer Scrabble (Alt?)</description>
+		<description>Computer Scrabble (alt?)</description>
 		<year>1986</year>
 		<publisher>Leisure Genius</publisher>
 		<info name="usage" value="Requires CP/M"/>
@@ -1983,7 +1983,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tomahawk1" cloneof="tomahawk" supported="no">
-		<description>Tomahawk (Alt?)</description>
+		<description>Tomahawk (alt?)</description>
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3"><!-- This dump is missing the copy protection track 41 and will not work -->

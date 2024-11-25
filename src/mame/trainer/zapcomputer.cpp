@@ -53,11 +53,11 @@ private:
 	uint8_t keyboard_r();
 	void display_7seg_w(offs_t offset, uint8_t data);
 
-	void zapcomp_io(address_map &map);
-	void zapcomp_mem(address_map &map);
+	void zapcomp_io(address_map &map) ATTR_COLD;
+	void zapcomp_mem(address_map &map) ATTR_COLD;
 
 	uint8_t decode7seg(uint8_t data);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	output_finder<6> m_digits;
 };

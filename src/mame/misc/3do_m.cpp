@@ -62,7 +62,7 @@ Expansion bus stuff:
 #include "emu.h"
 #include "3do.h"
 
-#include "cpu/arm7/arm7core.h"
+#include "cpu/arm7/arm7.h"
 
 #include "debugger.h"
 #include "screen.h"
@@ -121,7 +121,7 @@ void _3do_state::m_request_fiq(uint32_t irq_req, uint8_t type)
 	if((m_clio.irq0 & m_clio.irq0_enable) || (m_clio.irq1 & m_clio.irq1_enable))
 	{
 		//printf("Go irq %08x & %08x %08x & %08x\n",m_clio.irq0, m_clio.irq0_enable, m_clio.irq1, m_clio.irq1_enable);
-		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+		m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
 
@@ -1099,7 +1099,7 @@ uint32_t _3do_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 void _3do_state::m_madam_init( void )
 {
-	memset( &m_madam, 0, sizeof(MADAM) );
+	m_madam = MADAM();
 	m_madam.revision = 0x01020000;
 	m_madam.msysbits = 0x51;
 }
@@ -1112,7 +1112,7 @@ void _3do_state::m_slow2_init( void )
 
 void _3do_state::m_clio_init()
 {
-	memset( &m_clio, 0, sizeof(CLIO) );
+	m_clio = CLIO();
 	m_clio.screen = m_screen;
 	m_clio.revision = 0x02022000 /* 0x04000000 */;
 	m_clio.unclerev = 0x03800000;

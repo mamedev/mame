@@ -17,7 +17,7 @@ public:
 	template<unsigned IRQ>
 	void irq_w(int state) { set_irq_line(IRQ, state); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u32 irq_status_r();
 	u32 fiq_status_r();
@@ -53,8 +53,8 @@ protected:
 	vic_pl190_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -88,7 +88,7 @@ class vic_upd800468_device : public vic_pl190_device
 public:
 	vic_upd800468_device(const machine_config &mconfig, const char* tag, device_t *owner, uint32_t clock = 0);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	void int_clear_w(u32 data);
 };
@@ -98,7 +98,7 @@ class vic_pl192_device : public vic_pl190_device
 public:
 	vic_pl192_device(const machine_config &mconfig, const char* tag, device_t *owner, uint32_t clock = 0);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u16 sw_priority_r();
 	void sw_priority_w(u16 data);
@@ -111,8 +111,8 @@ protected:
 	virtual void update_vector() override;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u16 sw_priority_mask;

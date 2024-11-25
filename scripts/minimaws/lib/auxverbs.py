@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ##
 ## license:BSD-3-Clause
 ## copyright-holders:Vas Crabb
@@ -17,7 +17,7 @@ import zlib
 
 class _Identifier(object):
     def __init__(self, dbcurs, **kwargs):
-        super(_Identifier, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.dbcurs = dbcurs
         self.shortnamewidth = 0
         self.pathwidth = 0

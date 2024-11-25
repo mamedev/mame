@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_BUS_VME_IP4_H
-#define MAME_BUS_VME_IP4_H
+#ifndef MAME_SGI_IP4_H
+#define MAME_SGI_IP4_H
 
 #pragma once
 
@@ -25,14 +25,14 @@ public:
 	sgi_ip4_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	template <unsigned N> void lio_irq(int state) { lio_irq(N, state); }
 	void lio_irq(unsigned number, int state);
@@ -82,4 +82,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SGI_IP4, sgi_ip4_device)
 
-#endif // MAME_BUS_VME_IP4_H
+#endif // MAME_SGI_IP4_H

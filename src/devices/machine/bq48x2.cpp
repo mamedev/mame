@@ -537,8 +537,8 @@ void bq48x2_device::nvram_default()
 
 bool bq48x2_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (file.read(m_sram.get(), m_memsize, actual) || actual != m_memsize)
+	auto const [err, actual] = util::read(file, m_sram.get(), m_memsize);
+	if (err || (actual != m_memsize))
 		return false;
 
 	transfer_to_access();  // Transfer the system time into the readable registers
@@ -553,6 +553,6 @@ bool bq48x2_device::nvram_write(util::write_stream &file)
 {
 	transfer_to_access();
 
-	size_t actual;
-	return !file.write(m_sram.get(), m_memsize, actual) && actual == m_memsize;
+	auto const [err, actual] = util::write(file, m_sram.get(), m_memsize);
+	return !err;
 }

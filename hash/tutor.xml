@@ -82,7 +82,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 <softwarelist name="tutor" description="Tomy Tutor &amp; Pyuuta cartridges">
 
 	<software name="4ninmj">
-		<description>4-nin Mahjan (Jpn, set 1)</description>
+		<description>4-nin Mahjan (Japan, set 1)</description>
 		<year>1984</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="四人麻雀"/>
@@ -95,7 +95,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="4ninmja" cloneof="4ninmj">
-		<description>4-nin Mahjan (Jpn, set 2)</description>
+		<description>4-nin Mahjan (Japan, set 2)</description>
 		<year>1984</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="四人麻雀"/>
@@ -108,7 +108,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="baseball">
-		<description>Baseball [3D] (Jpn)</description>
+		<description>Baseball [3D] (Japan)</description>
 		<year>1984</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ベースボール"/>
@@ -121,7 +121,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="batlfght">
-		<description>Battle Fighter [3D] (Jpn)</description>
+		<description>Battle Fighter [3D] (Japan)</description>
 		<year>1985</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="バトルファイター"/>
@@ -134,7 +134,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="bombman">
-		<description>Bombman (Jpn)</description>
+		<description>Bombman (Japan)</description>
 		<year>1982</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ボンブマン"/>
@@ -161,7 +161,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	<!-- Crawlers and Maze Patrol are confirmed as using the exact same ROM data -->
 	<software name="crawlers">
 	<!-- Stock No: 8100, Clone of Maze Patrol (Japanese 017E)-->
-		<description>Cave Crawlers (USA) / Maze Patrol (Jpn)</description>
+		<description>Cave Crawlers (USA) / Maze Patrol (Japan)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="メイズ パトロール"/>
@@ -186,7 +186,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="donpan">
-		<description>DonPan (Jpn)</description>
+		<description>DonPan (Japan)</description>
 		<year>1982</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ドンバン"/>
@@ -199,7 +199,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="frogger">
-		<description>Frogger (Jpn)</description>
+		<description>Frogger (Japan)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="フロッガー"/>
@@ -224,7 +224,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="tron" cloneof="hyperspc">
-		<description>Tron (Jpn)</description>
+		<description>Tron (Japan)</description>
 		<year>1983</year>
 		<publisher>Tomy / Walt Disney Productions</publisher>
 		<part name="cart" interface="tutor_cart">
@@ -248,7 +248,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 	<software name="locomotn"> <!-- US and Japan confirmed to be the same -->
 	<!-- Stock No: 8203, Clone of Guttang Gottong (Japanese 016E)-->
-		<description>Loco-motion (USA) / Guttang Gottong (Jpn)</description>
+		<description>Loco-motion (USA) / Guttang Gottong (Japan)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="8203"/>
@@ -260,7 +260,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="marinadv">
-		<description>Marine Adventure (Jpn)</description>
+		<description>Marine Adventure (Japan)</description>
 		<year>1982</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="マリン アドベンチャー"/>
@@ -273,7 +273,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="athland">
-		<description>Mickey Athletic Land (Jpn)</description>
+		<description>Mickey Athletic Land (Japan)</description>
 		<year>198?</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ミッキー アスレチックランド"/>
@@ -286,7 +286,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="misattck">
-		<description>Mission Attack (Jpn)</description>
+		<description>Mission Attack (Japan)</description>
 		<year>1982</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ミッション アタック"/>
@@ -299,7 +299,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="mnstrinn">
-		<description>Monster Inn (Jpn)</description>
+		<description>Monster Inn (Japan)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="モンスターイン"/>
@@ -312,7 +312,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="mysteryg">
-		<description>Mystery Gold (Jpn)</description>
+		<description>Mystery Gold (Japan)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ミステリー ゴールド"/>
@@ -325,7 +325,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="mrdo">
-		<description>Mr. Do! (Jpn)</description>
+		<description>Mr. Do! (Japan)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="Mr.DO!"/>
@@ -338,7 +338,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="nflight">
-		<description>Night Flight (Jpn)</description>
+		<description>Night Flight (Japan)</description>
 		<year>1982</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ナイトフライト"/>
@@ -363,7 +363,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="rescue3d">
-		<description>Rescue Copter [3D] (Jpn)</description>
+		<description>Rescue Copter [3D] (Japan)</description>
 		<year>1984</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="レスキュー コプター"/>
@@ -376,7 +376,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="saurus">
-		<description>Saurusland (Jpn)</description>
+		<description>Saurusland (Japan)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ザウルスランド"/>
@@ -401,7 +401,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="scramblej" cloneof="scramble">
-		<description>Scramble (Jpn)</description>
+		<description>Scramble (Japan)</description>
 		<year>1981</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="スクランブル"/>
@@ -414,7 +414,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="superbik">
-		<description>Super Bike (Jpn)</description>
+		<description>Super Bike (Japan)</description>
 		<year>1984</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="スーパーバイク"/>
@@ -429,7 +429,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	<!-- Torpedo and Bermuda Triangle are confirmed as using the exact same ROM data -->
 	<software name="torpedo">
 	<!-- Stock No: 8101, Clone of Bermuda Triangle (Japanese 020E)-->
-		<description>Torpedo Terror (USA) / Bermuda Triangle (Jpn)</description>
+		<description>Torpedo Terror (USA) / Bermuda Triangle (Japan)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="バミューダ・ トライアングル"/>
@@ -443,7 +443,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 
 	<software name="trafjam">
 	<!-- Stock No: 8103, (Japanese 010E)-->
-		<description>Traffic Jam (Jpn)</description>
+		<description>Traffic Jam (Japan)</description>
 		<year>1982</year>
 		<publisher>Tomy</publisher>
 		<part name="cart" interface="tutor_cart">
@@ -466,7 +466,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="tripcomm">
-		<description>Triple Command (Jpn)</description>
+		<description>Triple Command (Japan)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="トリプルコマンド"/>
@@ -479,7 +479,7 @@ Battlefighter (Original) (Unreleased - Prototype Stage)
 	</software>
 
 	<software name="turpin">
-		<description>Turpin (Jpn)</description>
+		<description>Turpin (Japan)</description>
 		<year>1983</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="ターピン"/>

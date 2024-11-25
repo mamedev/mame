@@ -65,19 +65,17 @@ real hardware video of Astro Wars can be seen here: youtu.be/eSrQFBMeDlM
 TODO:
 - go through everything in the schematics for astrowar / galaxia
 - video rewrite to:
-   * support RAW_PARAMS, blanking is much like how laserbat hardware does it
-   and is needed to correct the speed in all machines
-   * improve bullets
-   * provide correct color/star generation, using info from Galaxia technical
-   manual and schematics
-   * provide accurate sprite/bg sync in astrowar
+  * support RAW_PARAMS, blanking is much like how laserbat hardware does it
+    and is needed to correct the speed in all machines
+  * provide correct color/star generation, using info from Galaxia technical
+    manual and schematics
+  * provide accurate sprite/bg sync in astrowar
 - what is the PROM for? schematics are too burnt to tell anything
 - add sound board emulation
 
 */
 
 #include "emu.h"
-
 #include "cvs_base.h"
 
 #include "speaker.h"
@@ -140,7 +138,11 @@ private:
 };
 
 
-// video
+/***************************************************************************
+
+  Video
+
+***************************************************************************/
 
 static constexpr uint8_t SPRITE_PEN_BASE = 0x10;
 static constexpr uint8_t STAR_PEN = 0x18;
@@ -169,7 +171,7 @@ void galaxia_state::palette(palette_device &palette) const
 
 	// stars/bullets
 	palette.set_pen_color(STAR_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
-	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
+	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
 }
 
 void astrowar_state::palette(palette_device &palette) const
@@ -189,7 +191,7 @@ void astrowar_state::palette(palette_device &palette) const
 
 	// stars/bullets
 	palette.set_pen_color(STAR_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
-	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
+	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
 }
 
 TILE_GET_INFO_MEMBER(galaxia_state::get_bg_tile_info)
@@ -256,15 +258,18 @@ uint32_t galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			bool const bullet = m_bullet_ram[y] && x == (m_bullet_ram[y] ^ 0xff);
 			bool const background = (bitmap.pix(y, x) & 3) != 0;
 
-			// draw bullets (guesswork)
+			// draw bullets
 			if (bullet)
 			{
 				// background vs. bullet collision detection
 				if (background) m_collision_register |= 0x80;
 
-				// bullet size/color/priority is guessed
-				bitmap.pix(y, x) = BULLET_PEN;
-				if (x) bitmap.pix(y, x - 1) = BULLET_PEN;
+				// draw white 1x4-size bullet
+				for (int bx = 0; bx < 4; bx++)
+				{
+					if (cliprect.contains(x - bx, y))
+						bitmap.pix(y, x - bx) = BULLET_PEN;
+				}
 			}
 
 			// copy the S2636 images into the main bitmap and check collision
@@ -314,7 +319,7 @@ uint32_t astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		// draw bullets (guesswork)
+		// draw bullets
 		if (m_bullet_ram[y])
 		{
 			uint8_t const pos = m_bullet_ram[y] ^ 0xff;
@@ -323,9 +328,12 @@ uint32_t astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			if (m_temp_bitmap.pix(y, pos) & 1)
 				m_collision_register |= 0x02;
 
-			// bullet size/color/priority is guessed
-			bitmap.pix(y, pos) = BULLET_PEN;
-			if (pos) bitmap.pix(y, pos - 1) = BULLET_PEN;
+			// draw white 1x4-size bullet
+			for (int bx = 0; bx < 4; bx++)
+			{
+				if (cliprect.contains(pos - bx, y))
+					bitmap.pix(y, pos - bx) = BULLET_PEN;
+			}
 		}
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
@@ -356,8 +364,6 @@ uint32_t astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void galaxia_state::vblank_irq(int state)
 {
@@ -572,7 +578,7 @@ GFXDECODE_END
 void galaxia_state::galaxia(machine_config &config)
 {
 	// basic machine hardware
-	S2650(config, m_maincpu, XTAL(14'318'181) / 8);
+	S2650(config, m_maincpu, 14.318181_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxia_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &galaxia_state::io_map);
 	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::data_map);
@@ -583,7 +589,7 @@ void galaxia_state::galaxia(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_refresh_hz(60); // wrong
+	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0*8, 30*8-1, 2*8, 32*8-1);
@@ -613,7 +619,7 @@ void galaxia_state::galaxia(machine_config &config)
 void astrowar_state::astrowar(machine_config &config)
 {
 	// basic machine hardware
-	S2650(config, m_maincpu, XTAL(14'318'181) / 8);
+	S2650(config, m_maincpu, 14.318181_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrowar_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &astrowar_state::io_map);
 	m_maincpu->set_addrmap(AS_DATA, &astrowar_state::data_map);
@@ -624,7 +630,7 @@ void astrowar_state::astrowar(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_refresh_hz(60);
+	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(1*8, 31*8-1, 2*8, 32*8-1);

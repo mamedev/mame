@@ -43,8 +43,8 @@ protected:
 	// construction/destruction
 	generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	bool has_separate_acknowledge() const { return m_separate_acknowledge; }
 	bool is_latch_written() const { return m_latch_written; }
@@ -76,7 +76,7 @@ public:
 	void clear(int state);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	void sync_callback(s32 param);
 
@@ -102,7 +102,7 @@ public:
 	void clear(int state);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	void sync_callback(s32 param);
 

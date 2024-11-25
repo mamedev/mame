@@ -14,7 +14,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/hd61603.h"
+#include "hd61603.h"
 
 
 DEFINE_DEVICE_TYPE(HD61603, hd61603_device, "hd61603", "Hitachi HD61603 LCD Driver")

@@ -199,6 +199,7 @@ void e0c6200_cpu_device::execute_run()
 		// core cpu not running (peripherals still work)
 		if (m_halt || m_sleep)
 		{
+			debugger_wait_hook();
 			m_icount = 0;
 			break;
 		}

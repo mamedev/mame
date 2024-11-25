@@ -66,12 +66,12 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void cpu_map(address_map &map);
-	void cpu_autovector_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void cpu_autovector_map(address_map &map) ATTR_COLD;
 
 	// machine config
 	void common(machine_config &config);

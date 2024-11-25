@@ -31,7 +31,7 @@
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/msm6200.h"
@@ -85,17 +85,17 @@ public:
 	int sync49_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void cz1_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
-	void mz1_main_map(address_map &map);
-	void cz1_main_map(address_map &map);
-	void sub_map(address_map &map);
-	void mcu_map(address_map &map);
+	void mz1_main_map(address_map &map) ATTR_COLD;
+	void cz1_main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
 
 	// main CPU r/w methods
 	u8 keys_r();
@@ -328,23 +328,23 @@ static INPUT_PORTS_START( mz1 )
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KC12")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("cart", casio_ram_cart_device, exists)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("cart", FUNC(casio_ram_cart_device::sense))
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) // low = MZ-1, high = CZ-1
 	PORT_BIT(0xfc, IP_ACTIVE_LOW,  IPT_UNUSED)
 
 	PORT_START("MAIN_PB")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(cz1_state, sync_r)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(cz1_state::sync_r))
 	PORT_BIT(0xfe, IP_ACTIVE_LOW,  IPT_UNUSED)
 
 	PORT_START("SUB_PB")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("upd933_0", upd933_device, rq_r)
-	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("upd933_1", upd933_device, rq_r)
+	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("upd933_0", FUNC(upd933_device::rq_r))
+	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("upd933_1", FUNC(upd933_device::rq_r))
 	PORT_BIT(0xfc, IP_ACTIVE_LOW,  IPT_UNUSED)
 
 	PORT_START("SUB_PC")
 	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(cz1_state, sync_r)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(cz1_state, cont_r)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(cz1_state::sync_r))
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(cz1_state::cont_r))
 	PORT_BIT(0xf8, IP_ACTIVE_LOW,  IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -496,8 +496,8 @@ static INPUT_PORTS_START( cz1 )
 
 	PORT_START("MAIN_PC")
 	PORT_BIT(0x0f, IP_ACTIVE_LOW,  IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(cz1_state, cont49_r)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(cz1_state, sync49_r)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(cz1_state::cont49_r))
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(cz1_state::sync49_r))
 	PORT_BIT(0xc0, IP_ACTIVE_LOW,  IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -869,7 +869,7 @@ void cz1_state::mz1(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(cz1_state::cz1_palette), 3);
 
-	HD44780(config, m_hd44780, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_hd44780, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_hd44780->set_lcd_size(2, 16);
 	m_hd44780->set_function_set_at_any_time();
 	m_hd44780->set_pixel_update_cb(FUNC(cz1_state::lcd_pixel_update));
@@ -946,5 +946,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME            FLAGS
-SYST( 1986, cz1,    0,      0,      cz1,     cz1,    cz1_state,    empty_init, "Casio", "CZ-1",             MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
-SYST( 1986, mz1,    cz1,    0,      mz1,     mz1,    cz1_state,    empty_init, "Casio", "MZ-1 (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
+SYST( 1986, cz1,    0,      0,      cz1,     cz1,    cz1_state,    empty_init, "Casio", "CZ-1",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+SYST( 1986, mz1,    cz1,    0,      mz1,     mz1,    cz1_state,    empty_init, "Casio", "MZ-1 (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

@@ -34,11 +34,11 @@ protected:
 	compis_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_compis_graphics_card_interface overrides
 	virtual uint8_t pcs6_6_r(offs_t offset) override;
@@ -53,7 +53,7 @@ protected:
 private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );
 
-	void hrg_map(address_map &map);
+	void hrg_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -67,12 +67,12 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );
 
-	void uhrg_map(address_map &map);
+	void uhrg_map(address_map &map) ATTR_COLD;
 };
 
 

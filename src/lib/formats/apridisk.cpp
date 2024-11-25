@@ -38,8 +38,9 @@ const char *apridisk_format::extensions() const noexcept
 int apridisk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[APR_HEADER_SIZE];
-	size_t actual;
-	io.read_at(0, header, APR_HEADER_SIZE, actual);
+	auto const [err, actual] = read_at(io, 0, header, APR_HEADER_SIZE);
+	if (err || (APR_HEADER_SIZE != actual))
+		return 0;
 
 	const char magic[] = "ACT Apricot disk image\x1a\x04";
 
@@ -64,11 +65,9 @@ bool apridisk_format::load(util::random_read &io, uint32_t form_factor, const st
 
 	while (file_offset < file_size)
 	{
-		size_t actual;
-
 		// read sector header
 		uint8_t sector_header[16];
-		io.read_at(file_offset, sector_header, 16, actual);
+		read_at(io, file_offset, sector_header, 16); // FIXME: check for errors and premature EOF
 
 		uint32_t type = get_u32le(&sector_header[0]);
 		uint16_t compression = get_u16le(&sector_header[4]);
@@ -103,7 +102,7 @@ bool apridisk_format::load(util::random_read &io, uint32_t form_factor, const st
 			case APR_COMPRESSED:
 				{
 					uint8_t comp[3];
-					io.read_at(file_offset, comp, 3, actual);
+					read_at(io, file_offset, comp, 3); // FIXME: check for errors and premature EOF
 					uint16_t length = get_u16le(&comp[0]);
 
 					if (length != SECTOR_SIZE)
@@ -117,7 +116,7 @@ bool apridisk_format::load(util::random_read &io, uint32_t form_factor, const st
 				break;
 
 			case APR_UNCOMPRESSED:
-				io.read_at(file_offset, data_ptr, SECTOR_SIZE, actual);
+				read_at(io, file_offset, data_ptr, SECTOR_SIZE); // FIXME: check for errors and premature EOF
 				break;
 
 			default:

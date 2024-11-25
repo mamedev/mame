@@ -110,7 +110,7 @@ public:
 	void speedbsk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -123,10 +123,10 @@ private:
 	output_finder<24> m_lamps;
 	output_finder<> m_start_lamp;
 
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
-	void audio_io_map(address_map &map);
-	void pcm_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void pcm_map(address_map &map) ATTR_COLD;
 
 	void lcd_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -203,9 +203,9 @@ static INPUT_PORTS_START( speedbsk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("service_panel")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Service A \xe2\x86\x91 INC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", upd4701_device, right_w)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Service B \xe2\x86\x93 DEC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", upd4701_device, left_w)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Service C \xe2\x86\xb2 ENT") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_1", upd4701_device, right_w)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Service A \xe2\x86\x91 INC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", FUNC(upd4701_device::right_w))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Service B \xe2\x86\x93 DEC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", FUNC(upd4701_device::left_w))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Service C \xe2\x86\xb2 ENT") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_1", FUNC(upd4701_device::right_w))
 
 	PORT_START("unk")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_PGDN) PORT_CODE_INC(KEYCODE_PGUP)
@@ -452,7 +452,7 @@ void speedbsk_state::speedbsk(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(speedbsk_state::lcd_palette), 3);
 
-	HD44780(config, m_lcd, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcd, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcd->set_lcd_size(2, 20);
 	m_lcd->set_pixel_update_cb(FUNC(speedbsk_state::lcd_pixel_update));
 

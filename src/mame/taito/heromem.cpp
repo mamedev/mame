@@ -57,11 +57,11 @@ private:
 	required_device<tc0091lvc_device> m_tc0091lvc_l;
 	required_device<tc0091lvc_device> m_tc0091lvc_r;
 
-	void maincpu_prg_map(address_map &map);
-	void audiocpu_l_prg_map(address_map &map);
-	void audiocpu_r_prg_map(address_map &map);
-	void tc0091lvc_l_prg_map(address_map &map);
-	void tc0091lvc_r_prg_map(address_map &map);
+	void maincpu_prg_map(address_map &map) ATTR_COLD;
+	void audiocpu_l_prg_map(address_map &map) ATTR_COLD;
+	void audiocpu_r_prg_map(address_map &map) ATTR_COLD;
+	void tc0091lvc_l_prg_map(address_map &map) ATTR_COLD;
+	void tc0091lvc_r_prg_map(address_map &map) ATTR_COLD;
 
 	void screen_vblank_l(int state) { if (state) { m_tc0091lvc_l->screen_eof(); } }
 	void screen_vblank_r(int state) { if (state) { m_tc0091lvc_l->screen_eof(); } }

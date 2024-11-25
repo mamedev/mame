@@ -25,6 +25,7 @@ LK-3100: English-Polish
 LK-3110: English-Portuguese
 LK-3120: English-Russian
 LK-3130: English-Greek
+LK-3160: English-Japanese
 LK-3200: English-Spanish-French-German-Italian-Greek
 LK-3500: Electronic Notebook
 LK-3900: Calculator
@@ -33,12 +34,11 @@ unreleased?:
 
 LK-3140: English-Arabic
 LK-3150: English-Hebrew
-LK-3160: English-Japanese
 LK-3170: English-Chinese
 
 -->
 
-<softwarelist name="lk3000" description="LK-3000 Cartridges">
+<softwarelist name="lk3000" description="LK-3000 cartridges">
 
 	<software name="calc">
 		<description>Calculator</description>

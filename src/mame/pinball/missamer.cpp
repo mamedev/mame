@@ -64,7 +64,7 @@ public:
 	void missamer(machine_config &config);
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 private:
 	required_device<i8085a_cpu_device> m_maincpu;
@@ -74,8 +74,8 @@ private:
 	output_finder<8, 18> m_lamps;
 	output_finder<4> m_digits;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void ramio0_pa_w(uint8_t data);
 	void ramio0_pb_w(uint8_t data);

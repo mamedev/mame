@@ -141,12 +141,12 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void iocc_mem_map(address_map &map) { map.unmap_value_high(); }
-	template <bool SCC> void iocc_pio_map(address_map &map);
-	void mcu_pgm_map(address_map &map);
+	template <bool SCC> void iocc_pio_map(address_map &map) ATTR_COLD;
+	void mcu_pgm_map(address_map &map) ATTR_COLD;
 
 	void common(machine_config &config);
 

@@ -106,7 +106,7 @@ license:CC0-1.0
 		</element>
 		<element name="lamp3" ref="HOLD" inputtag="IN0" inputmask="0x0008">
 			<bounds x="1.50" y="3.05" width="0.30" height="0.15" />
-		</element>4
+		</element>
 		<element name="lamp4" ref="HOLD" inputtag="IN0" inputmask="0x0010">
 			<bounds x="1.85" y="3.05" width="0.30" height="0.15" />
 		</element>

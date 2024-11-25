@@ -3,10 +3,10 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="tiki100" description="TIKI-100 Disk Images">
+<softwarelist name="tiki100" description="TIKI-100 disk images">
 
 	<software name="assist">
-		<description>Assistent (Nor)</description>
+		<description>Assistent (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -28,7 +28,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="basis">
-		<description>Basiskunskap om Tiki-100 (Nor)</description>
+		<description>Basiskunskap om Tiki-100 (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -39,7 +39,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bjelker">
-		<description>Boyepakjente Bjelker v1.02 (Nor)</description>
+		<description>Boyepakjente Bjelker v1.02 (Norway)</description>
 		<year>198?</year>
 		<publisher>Dimensjonering</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -50,7 +50,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="brage">
-		<description>BRAGE v1.3 (Nor)</description>
+		<description>BRAGE v1.3 (Norway)</description>
 		<year>1986</year>
 		<publisher>Gisle Hannemyr</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -61,7 +61,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="brok">
-		<description>Brøk v1.3 (Nor)</description>
+		<description>Brøk v1.3 (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -72,7 +72,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="brum2">
-		<description>Brum-II (Nor)</description>
+		<description>Brum-II (Norway)</description>
 		<year>1985</year>
 		<publisher>H. Wiig</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -90,7 +90,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cbeks">
-		<description>CB-eksempler (Nor)</description>
+		<description>CB-eksempler (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -101,7 +101,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="conset">
-		<description>Conset Oppsettingsprogram for Concept Keyboard (Nor)</description>
+		<description>Conset Oppsettingsprogram for Concept Keyboard (Norway)</description>
 		<year>198?</year>
 		<publisher>Daisy</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -112,7 +112,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dataflor">
-		<description>Dataflora (Nor)</description>
+		<description>Dataflora (Norway)</description>
 		<year>1985</year>
 		<publisher>Gisle Hannemyr</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -123,7 +123,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dbase2">
-		<description>Dbase II v2.4 (Nor)</description>
+		<description>Dbase II v2.4 (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -134,7 +134,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dgraf">
-		<description>Daisygraf v3.0 (Nor)</description>
+		<description>Daisygraf v3.0 (Norway)</description>
 		<year>198?</year>
 		<publisher>Daisy</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -145,7 +145,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dosgbib">
-		<description>DOS-GBIB (Nor)</description>
+		<description>DOS-GBIB (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -156,7 +156,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dosml">
-		<description>DOS ML (Nor)</description>
+		<description>DOS ML (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -178,7 +178,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgbib">
-		<description>KP/M GBIB (Nor)</description>
+		<description>KP/M GBIB (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -189,7 +189,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dyr">
-		<description>Dyr i skogen (Nor)</description>
+		<description>Dyr i skogen (Norway)</description>
 		<year>1990</year>
 		<publisher>LoM-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -200,7 +200,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="engheis">
-		<description>Engelsk-heis (Nor)</description>
+		<description>Engelsk-heis (Norway)</description>
 		<year>198?</year>
 		<publisher>Kjølshun-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -211,7 +211,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="engsvoop">
-		<description>Engelsk-svoop (Nor)</description>
+		<description>Engelsk-svoop (Norway)</description>
 		<year>198?</year>
 		<publisher>Kjølshun-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -222,7 +222,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="eurogeo">
-		<description>Euro-geo (Nor)</description>
+		<description>Euro-geo (Norway)</description>
 		<year>1985</year>
 		<publisher>L. Benestad</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -233,7 +233,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="europa">
-		<description>Europa v1 (Nor)</description>
+		<description>Europa v1 (Norway)</description>
 		<year>1990</year>
 		<publisher>Kjølshun-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -244,7 +244,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="farge">
-		<description>Farge (Nor)</description>
+		<description>Farge (Norway)</description>
 		<year>1990</year>
 		<publisher>LoM-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -255,7 +255,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="feilfinn">
-		<description>Feilfinn v1.0 (Nor)</description>
+		<description>Feilfinn v1.0 (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -266,7 +266,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="femten">
-		<description>Femten-Spill v1.2 (Nor)</description>
+		<description>Femten-Spill v1.2 (Norway)</description>
 		<year>1986</year>
 		<publisher>Datalauget</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -277,7 +277,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="fgraf">
-		<description>Funksjonsgraf (Nor)</description>
+		<description>Funksjonsgraf (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -288,7 +288,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="fls">
-		<description>Fix lix smx (Nor)</description>
+		<description>Fix lix smx (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -299,7 +299,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="flytte">
-		<description>Flytte-Tegne (Nor)</description>
+		<description>Flytte-Tegne (Norway)</description>
 		<year>1988</year>
 		<publisher>LoM-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -310,7 +310,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="grammatk">
-		<description>Grammatikk (Nor)</description>
+		<description>Grammatikk (Norway)</description>
 		<year>1990</year>
 		<publisher>LoM-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -321,7 +321,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="heisinst">
-		<description>Heis-install (Nor)</description>
+		<description>Heis-install (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -337,7 +337,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="husk">
-		<description>Husk (Nor)</description>
+		<description>Husk (Norway)</description>
 		<year>1989</year>
 		<publisher>LoM-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -348,7 +348,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="invaders">
-		<description>Tiki-Invaders v2 (Nor)</description>
+		<description>Tiki-Invaders v2 (Norway)</description>
 		<year>1985</year>
 		<publisher>Kim G.S. Oyhus</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -359,7 +359,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jeg">
-		<description>Jeg (Nor)</description>
+		<description>Jeg (Norway)</description>
 		<year>1989</year>
 		<publisher>LoM-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -370,7 +370,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kermit">
-		<description>Kermit-80 v4.05 (Nor)</description>
+		<description>Kermit-80 v4.05 (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -381,7 +381,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kom">
-		<description>Kommunikasjonsprogram (Nor)</description>
+		<description>Kommunikasjonsprogram (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -392,7 +392,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kpm11">
-		<description>KP/M 1.1 (Nor)</description>
+		<description>KP/M 1.1 (Norway)</description>
 		<year>198?</year>
 		<publisher>Orkim Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -403,7 +403,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kpm115" cloneof="kpm11">
-		<description>KP/M 1.15 (Nor)</description>
+		<description>KP/M 1.15 (Norway)</description>
 		<year>198?</year>
 		<publisher>Orkim Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -414,7 +414,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kpm117" cloneof="kpm11">
-		<description>KP/M 1.17 (Nor)</description>
+		<description>KP/M 1.17 (Norway)</description>
 		<year>198?</year>
 		<publisher>Orkim Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -425,7 +425,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kryssord">
-		<description>Kryssord Generator (Nor)</description>
+		<description>Kryssord Generator (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -436,7 +436,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kud">
-		<description>KUD Programmepakke (Nor)</description>
+		<description>KUD Programmepakke (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -457,7 +457,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="legge">
-		<description>Legge sammen (Nor)</description>
+		<description>Legge sammen (Norway)</description>
 		<year>1990</year>
 		<publisher>LoM-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -468,7 +468,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lese">
-		<description>Lesetreningsprogram med Hogfrekvente Ord v1.0 (Nor)</description>
+		<description>Lesetreningsprogram med Hogfrekvente Ord v1.0 (Norway)</description>
 		<year>1990</year>
 		<publisher>Magnimaster</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -479,7 +479,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="matemat1">
-		<description>Matematikk 1 (Nor)</description>
+		<description>Matematikk 1 (Norway)</description>
 		<year>198?</year>
 		<publisher>Kjølshun-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -490,7 +490,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="matemat2">
-		<description>Matematikk 2 (Nor)</description>
+		<description>Matematikk 2 (Norway)</description>
 		<year>198?</year>
 		<publisher>Kjølshun-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -501,7 +501,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="matemat3">
-		<description>Matematikk 3 (Nor)</description>
+		<description>Matematikk 3 (Norway)</description>
 		<year>198?</year>
 		<publisher>Kjølshun-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -512,7 +512,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="matte">
-		<description>Matte (Nor)</description>
+		<description>Matte (Norway)</description>
 		<year>1990</year>
 		<publisher>LoM-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -523,7 +523,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="matemati">
-		<description>Matematikk (Nor)</description>
+		<description>Matematikk (Norway)</description>
 		<year>198?</year>
 		<publisher>Rogalandsdata Programvare</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -534,7 +534,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mscopy">
-		<description>MS-DOS - TIKO Filoverføring vC80 (Nor)</description>
+		<description>MS-DOS - TIKO Filoverføring vC80 (Norway)</description>
 		<year>1987</year>
 		<publisher>Egel Kvaleberg</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -545,7 +545,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="msdos">
-		<description>MS-DOS v2.11 (Nor)</description>
+		<description>MS-DOS v2.11 (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="requirement" value="slot1:8088"/>
@@ -557,7 +557,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="muslyd">
-		<description>Musedrivere og lydmodul for PASCAL (Nor)</description>
+		<description>Musedrivere og lydmodul for PASCAL (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -568,7 +568,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="norgeo">
-		<description>Norge geografi-test (Nor)</description>
+		<description>Norge geografi-test (Norway)</description>
 		<year>1985</year>
 		<publisher>L. Benestad</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -579,7 +579,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="norskdag">
-		<description>Norsk-dagros (Nor)</description>
+		<description>Norsk-dagros (Norway)</description>
 		<year>198?</year>
 		<publisher>Kjolshunn-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -590,7 +590,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="norskgeo">
-		<description>Norsk geo-heis (Nor)</description>
+		<description>Norsk geo-heis (Norway)</description>
 		<year>198?</year>
 		<publisher>Kjolshunn-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -601,7 +601,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="norsktri">
-		<description>Norsk-trim 1 (Nor)</description>
+		<description>Norsk-trim 1 (Norway)</description>
 		<year>198?</year>
 		<publisher>Kjolshunn-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -612,7 +612,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="norsklom">
-		<description>Norsk (LoM-Data, Nor)</description>
+		<description>Norsk (LoM-Data, Norway)</description>
 		<year>1988</year>
 		<publisher>LoM-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -623,7 +623,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="norskrog">
-		<description>Norsk (Rogalandsdata Programvare, Nor)</description>
+		<description>Norsk (Rogalandsdata Programvare, Norway)</description>
 		<year>198?</year>
 		<publisher>Rogalandsdata Programvare</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -634,7 +634,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="nsdstat">
-		<description>NSD-Stat (Nor)</description>
+		<description>NSD-Stat (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -645,7 +645,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ofag">
-		<description>O-fag (Nor)</description>
+		<description>O-fag (Norway)</description>
 		<year>198?</year>
 		<publisher>Rogalandsdata Programvare</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -656,7 +656,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="oppgaver">
-		<description>Utskrift av Oppgaver (Nor)</description>
+		<description>Utskrift av Oppgaver (Norway)</description>
 		<year>198?</year>
 		<publisher>LoM-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -667,7 +667,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="orac">
-		<description>Utviklingspakke for Orac Dreiebenk (Nor)</description>
+		<description>Utviklingspakke for Orac Dreiebenk (Norway)</description>
 		<year>198?</year>
 		<publisher>Bache Maskin</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -678,7 +678,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ord1">
-		<description>Ord1 (Nor)</description>
+		<description>Ord1 (Norway)</description>
 		<year>198?</year>
 		<publisher>Kjolshunn-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -689,7 +689,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ord2">
-		<description>Ord2 (Nor)</description>
+		<description>Ord2 (Norway)</description>
 		<year>198?</year>
 		<publisher>Kjolshunn-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -700,7 +700,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ordklass">
-		<description>Ordklasser-II v1.2 (Nor)</description>
+		<description>Ordklasser-II v1.2 (Norway)</description>
 		<year>198?</year>
 		<publisher>Datalauget</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -711,7 +711,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ovtast">
-		<description>Øv-tastatur (Nor)</description>
+		<description>Øv-tastatur (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -722,7 +722,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="regnetre">
-		<description>Regnetrener (Nor)</description>
+		<description>Regnetrener (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -733,7 +733,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="rettulf">
-		<description>Rettulf (Nor)</description>
+		<description>Rettulf (Norway)</description>
 		<year>1986</year>
 		<publisher>Datalauget</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -744,7 +744,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="refk">
-		<description>Ruter Ess og formel-kalkulator (Nor)</description>
+		<description>Ruter Ess og formel-kalkulator (Norway)</description>
 		<year>1989</year>
 		<publisher>Anders Frederiksen</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -755,7 +755,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="skjuler">
-		<description>Skjulte Farger v2.5 (Nor)</description>
+		<description>Skjulte Farger v2.5 (Norway)</description>
 		<year>1986</year>
 		<publisher>Datalauget</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -766,7 +766,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="spill1">
-		<description>Spill (Nor)</description>
+		<description>Spill (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -777,7 +777,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="storbrum">
-		<description>Stor brum (Nor)</description>
+		<description>Stor brum (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -788,7 +788,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tartist">
-		<description>Tiki-Artist v2.0 (Nor)</description>
+		<description>Tiki-Artist v2.0 (Norway)</description>
 		<year>1987</year>
 		<publisher>Jan Vehusheia</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -799,7 +799,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tast">
-		<description>Tast (Nor)</description>
+		<description>Tast (Norway)</description>
 		<year>198?</year>
 		<publisher>Daisy</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -810,7 +810,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tegne">
-		<description>Tegneprogram (Nor)</description>
+		<description>Tegneprogram (Norway)</description>
 		<year>1988</year>
 		<publisher>LoM-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -821,7 +821,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="telle">
-		<description>Telle (Nor)</description>
+		<description>Telle (Norway)</description>
 		<year>1988</year>
 		<publisher>LoM-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -832,7 +832,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tikibas">
-		<description>Tiki-bas (Nor)</description>
+		<description>Tiki-bas (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -843,7 +843,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tkjer208">
-		<description>TIKO-Kjerne v2.08r (Nor)</description>
+		<description>TIKO-Kjerne v2.08r (Norway)</description>
 		<year>198?</year>
 		<publisher>Tiki-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -859,7 +859,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tikos20">
-		<description>TIKOS systemdiskett v2.0/24 (Nor)</description>
+		<description>TIKOS systemdiskett v2.0/24 (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="requirement" value="slot1:8088"/>
@@ -871,7 +871,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="timeplan">
-		<description>Timeplanlegger v2.0 (Nor)</description>
+		<description>Timeplanlegger v2.0 (Norway)</description>
 		<year>198?</year>
 		<publisher>Marcus Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -882,7 +882,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tkjer401">
-		<description>TIKO-Kjerne v4.01 (Nor)</description>
+		<description>TIKO-Kjerne v4.01 (Norway)</description>
 		<year>198?</year>
 		<publisher>Tiki-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -915,7 +915,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="trespill">
-		<description>Tre-Spill II (Nor)</description>
+		<description>Tre-Spill II (Norway)</description>
 		<year>1986</year>
 		<publisher>Datalauget</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -926,7 +926,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="uni2">
-		<description>Uni2 (Nor)</description>
+		<description>Uni2 (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -937,7 +937,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="verdgeo">
-		<description>Verdensgeografi (Nor)</description>
+		<description>Verdensgeografi (Norway)</description>
 		<year>1983</year>
 		<publisher>Tiki-Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -948,7 +948,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="wcsys">
-		<description>Tiki-100 System for Winchester Harddisk (Nor)</description>
+		<description>Tiki-100 System for Winchester Harddisk (Norway)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -959,7 +959,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="wordstar">
-		<description>Wordstar v3.00 (Nor)</description>
+		<description>Wordstar v3.00 (Norway)</description>
 		<year>1981</year>
 		<publisher>MicroPro</publisher>
 		<part name="flop1" interface="floppy_5_25">

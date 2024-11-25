@@ -1115,18 +1115,17 @@ void cli_frontend::verifysamples(const std::vector<std::string> &args)
 	if (matched == 0)
 		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
-	// if we didn't get anything at all, display a generic end message
 	if (matched > 0 && correct == 0 && incorrect == 0)
 	{
+		// if we didn't get anything at all, display a generic end message
 		if (notfound > 0)
 			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "sampleset \"%s\" not found!\n", gamename);
 		else
 			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "sampleset \"%s\" not required!\n", gamename);
 	}
-
-	// otherwise, print a summary
 	else
 	{
+		// otherwise, print a summary
 		if (incorrect > 0)
 			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u samplesets found, %u were OK.\n", correct + incorrect, correct);
 		osd_printf_info("%u samplesets found, %u were OK.\n", correct, correct);
@@ -1134,63 +1133,63 @@ void cli_frontend::verifysamples(const std::vector<std::string> &args)
 }
 
 const char cli_frontend::s_softlist_xml_dtd[] =
-				"<?xml version=\"1.0\"?>\n" \
-				"<!DOCTYPE softwarelists [\n" \
-				"<!ELEMENT softwarelists (softwarelist*)>\n" \
-				"\t<!ELEMENT softwarelist (notes?, software+)>\n" \
-				"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n" \
-				"\t\t<!ATTLIST softwarelist description CDATA #IMPLIED>\n" \
-				"\t\t<!ELEMENT notes (#PCDATA)>\n" \
-				"\t\t<!ELEMENT software (description, year, publisher, notes?, info*, sharedfeat*, part*)>\n" \
-				"\t\t\t<!ATTLIST software name CDATA #REQUIRED>\n" \
-				"\t\t\t<!ATTLIST software cloneof CDATA #IMPLIED>\n" \
-				"\t\t\t<!ATTLIST software supported (yes|partial|no) \"yes\">\n" \
-				"\t\t\t<!ELEMENT description (#PCDATA)>\n" \
-				"\t\t\t<!ELEMENT year (#PCDATA)>\n" \
-				"\t\t\t<!ELEMENT publisher (#PCDATA)>\n" \
-				"\t\t\t<!ELEMENT notes (#PCDATA)>\n" \
-				"\t\t\t<!ELEMENT info EMPTY>\n" \
-				"\t\t\t\t<!ATTLIST info name CDATA #REQUIRED>\n" \
-				"\t\t\t\t<!ATTLIST info value CDATA #IMPLIED>\n" \
-				"\t\t\t<!ELEMENT sharedfeat EMPTY>\n" \
-				"\t\t\t\t<!ATTLIST sharedfeat name CDATA #REQUIRED>\n" \
-				"\t\t\t\t<!ATTLIST sharedfeat value CDATA #IMPLIED>\n" \
-				"\t\t\t<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>\n" \
-				"\t\t\t\t<!ATTLIST part name CDATA #REQUIRED>\n" \
-				"\t\t\t\t<!ATTLIST part interface CDATA #REQUIRED>\n" \
-				"\t\t\t\t<!ELEMENT feature EMPTY>\n" \
-				"\t\t\t\t\t<!ATTLIST feature name CDATA #REQUIRED>\n" \
-				"\t\t\t\t\t<!ATTLIST feature value CDATA #IMPLIED>\n" \
-				"\t\t\t\t<!ELEMENT dataarea (rom*)>\n" \
-				"\t\t\t\t\t<!ATTLIST dataarea name CDATA #REQUIRED>\n" \
-				"\t\t\t\t\t<!ATTLIST dataarea size CDATA #REQUIRED>\n" \
-				"\t\t\t\t\t<!ATTLIST dataarea databits (8|16|32|64) \"8\">\n" \
-				"\t\t\t\t\t<!ATTLIST dataarea endian (big|little) \"little\">\n" \
-				"\t\t\t\t\t<!ELEMENT rom EMPTY>\n" \
-				"\t\t\t\t\t\t<!ATTLIST rom name CDATA #IMPLIED>\n" \
-				"\t\t\t\t\t\t<!ATTLIST rom size CDATA #IMPLIED>\n" \
-				"\t\t\t\t\t\t<!ATTLIST rom length CDATA #IMPLIED>\n" \
-				"\t\t\t\t\t\t<!ATTLIST rom crc CDATA #IMPLIED>\n" \
-				"\t\t\t\t\t\t<!ATTLIST rom sha1 CDATA #IMPLIED>\n" \
-				"\t\t\t\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n" \
-				"\t\t\t\t\t\t<!ATTLIST rom value CDATA #IMPLIED>\n" \
-				"\t\t\t\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n" \
-				"\t\t\t\t\t\t<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload|fill|continue|reload_plain) #IMPLIED>\n" \
-				"\t\t\t\t<!ELEMENT diskarea (disk*)>\n" \
-				"\t\t\t\t\t<!ATTLIST diskarea name CDATA #REQUIRED>\n" \
-				"\t\t\t\t\t<!ELEMENT disk EMPTY>\n" \
-				"\t\t\t\t\t\t<!ATTLIST disk name CDATA #REQUIRED>\n" \
-				"\t\t\t\t\t\t<!ATTLIST disk sha1 CDATA #IMPLIED>\n" \
-				"\t\t\t\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n" \
-				"\t\t\t\t\t\t<!ATTLIST disk writeable (yes|no) \"no\">\n" \
-				"\t\t\t\t<!ELEMENT dipswitch (dipvalue*)>\n" \
-				"\t\t\t\t\t<!ATTLIST dipswitch name CDATA #REQUIRED>\n" \
-				"\t\t\t\t\t<!ATTLIST dipswitch tag CDATA #REQUIRED>\n" \
-				"\t\t\t\t\t<!ATTLIST dipswitch mask CDATA #REQUIRED>\n" \
-				"\t\t\t\t\t<!ELEMENT dipvalue EMPTY>\n" \
-				"\t\t\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n" \
-				"\t\t\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n" \
-				"\t\t\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n" \
+				"<?xml version=\"1.0\"?>\n"
+				"<!DOCTYPE softwarelists [\n"
+				"<!ELEMENT softwarelists (softwarelist*)>\n"
+				"\t<!ELEMENT softwarelist (notes?, software+)>\n"
+				"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
+				"\t\t<!ATTLIST softwarelist description CDATA #IMPLIED>\n"
+				"\t\t<!ELEMENT notes (#PCDATA)>\n"
+				"\t\t<!ELEMENT software (description, year, publisher, notes?, info*, sharedfeat*, part*)>\n"
+				"\t\t\t<!ATTLIST software name CDATA #REQUIRED>\n"
+				"\t\t\t<!ATTLIST software cloneof CDATA #IMPLIED>\n"
+				"\t\t\t<!ATTLIST software supported (yes|partial|no) \"yes\">\n"
+				"\t\t\t<!ELEMENT description (#PCDATA)>\n"
+				"\t\t\t<!ELEMENT year (#PCDATA)>\n"
+				"\t\t\t<!ELEMENT publisher (#PCDATA)>\n"
+				"\t\t\t<!ELEMENT notes (#PCDATA)>\n"
+				"\t\t\t<!ELEMENT info EMPTY>\n"
+				"\t\t\t\t<!ATTLIST info name CDATA #REQUIRED>\n"
+				"\t\t\t\t<!ATTLIST info value CDATA #IMPLIED>\n"
+				"\t\t\t<!ELEMENT sharedfeat EMPTY>\n"
+				"\t\t\t\t<!ATTLIST sharedfeat name CDATA #REQUIRED>\n"
+				"\t\t\t\t<!ATTLIST sharedfeat value CDATA #IMPLIED>\n"
+				"\t\t\t<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>\n"
+				"\t\t\t\t<!ATTLIST part name CDATA #REQUIRED>\n"
+				"\t\t\t\t<!ATTLIST part interface CDATA #REQUIRED>\n"
+				"\t\t\t\t<!ELEMENT feature EMPTY>\n"
+				"\t\t\t\t\t<!ATTLIST feature name CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ATTLIST feature value CDATA #IMPLIED>\n"
+				"\t\t\t\t<!ELEMENT dataarea (rom*)>\n"
+				"\t\t\t\t\t<!ATTLIST dataarea name CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ATTLIST dataarea size CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ATTLIST dataarea databits (8|16|32|64) \"8\">\n"
+				"\t\t\t\t\t<!ATTLIST dataarea endian (big|little) \"little\">\n"
+				"\t\t\t\t\t<!ELEMENT rom EMPTY>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom name CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom size CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom length CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom crc CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom sha1 CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom value CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n"
+				"\t\t\t\t\t\t<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload|fill|continue|reload_plain) #IMPLIED>\n"
+				"\t\t\t\t<!ELEMENT diskarea (disk*)>\n"
+				"\t\t\t\t\t<!ATTLIST diskarea name CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ELEMENT disk EMPTY>\n"
+				"\t\t\t\t\t\t<!ATTLIST disk name CDATA #REQUIRED>\n"
+				"\t\t\t\t\t\t<!ATTLIST disk sha1 CDATA #IMPLIED>\n"
+				"\t\t\t\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
+				"\t\t\t\t\t\t<!ATTLIST disk writeable (yes|no) \"no\">\n"
+				"\t\t\t\t<!ELEMENT dipswitch (dipvalue*)>\n"
+				"\t\t\t\t\t<!ATTLIST dipswitch name CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ATTLIST dipswitch tag CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ATTLIST dipswitch mask CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ELEMENT dipvalue EMPTY>\n"
+				"\t\t\t\t\t\t<!ATTLIST dipvalue name CDATA #REQUIRED>\n"
+				"\t\t\t\t\t\t<!ATTLIST dipvalue value CDATA #REQUIRED>\n"
+				"\t\t\t\t\t\t<!ATTLIST dipvalue default (yes|no) \"no\">\n"
 				"]>\n\n";
 
 void cli_frontend::output_single_softlist(std::ostream &out, software_list_device &swlistdev)
@@ -1362,27 +1361,24 @@ void cli_frontend::listsoftware(const std::vector<std::string> &args)
 -------------------------------------------------*/
 void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 {
-	const char *gamename = args.empty() ? "*" : args[0].c_str();
+	char const *const gamename = args.empty() ? "*" : args[0].c_str();
+
+	// determine which drivers to process; return an error if none found
+	driver_enumerator drivlist(m_options, gamename);
+	if (!drivlist.count())
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	std::unordered_set<std::string> list_map;
 
 	unsigned correct = 0;
 	unsigned incorrect = 0;
 	unsigned notfound = 0;
-	unsigned matched = 0;
 	unsigned nrlists = 0;
-
-	// determine which drivers to process; return an error if none found
-	driver_enumerator drivlist(m_options, gamename);
-	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	media_auditor auditor(drivlist);
 	util::ovectorstream summary_string;
 	while (drivlist.next())
 	{
-		matched++;
-
 		for (software_list_device &swlistdev : software_list_device_enumerator(drivlist.config()->root_device()))
 		{
 			if (swlistdev.is_original())
@@ -1412,18 +1408,19 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 	util::archive_file::cache_clear();
 
 	// return an error if none found
-	if (matched == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
-
-	// if we didn't get anything at all, display a generic end message
-	if (matched > 0 && correct == 0 && incorrect == 0)
+	if (!nrlists)
 	{
-		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no software entries defined!\n", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No software list items are defined for systems matching '%s'", gamename);
 	}
-	// otherwise, print a summary
+	else if (!correct && !incorrect)
+	{
+		// if we didn't get anything at all, display a generic end message
+		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "No software items found for systems matching '%s'", gamename);
+	}
 	else
 	{
-		if (incorrect > 0)
+		// otherwise, print a summary
+		if (incorrect)
 			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u romsets found in %u software lists, %u were OK.\n", correct + incorrect, nrlists, correct);
 		osd_printf_info("%u romsets found in %u software lists, %u romsets were OK.\n", correct, nrlists, correct);
 	}

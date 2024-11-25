@@ -109,9 +109,9 @@ public:
 	void pturn(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -144,7 +144,6 @@ private:
 	void bg_scrolly_w(uint8_t data);
 	void fgbank_w(int state);
 	void bgbank_w(int state);
-	void flip_w(int state);
 	uint8_t custom_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -154,8 +153,8 @@ private:
 
 	INTERRUPT_GEN_MEMBER(sub_intgen);
 	INTERRUPT_GEN_MEMBER(main_intgen);
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -303,11 +302,6 @@ void pturn_state::bgbank_w(int state)
 {
 	m_bgbank = state;
 	m_bgmap->mark_all_dirty();
-}
-
-void pturn_state::flip_w(int state)
-{
-	flip_screen_set(state);
 }
 
 
@@ -518,7 +512,7 @@ void pturn_state::pturn(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(pturn_state::sub_intgen), attotime::from_hz(3*60));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
-	mainlatch.q_out_cb<0>().set(FUNC(pturn_state::flip_w));
+	mainlatch.q_out_cb<0>().set(FUNC(pturn_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set(FUNC(pturn_state::nmi_main_enable_w));
 	mainlatch.q_out_cb<2>().set(FUNC(pturn_state::coin_counter_1_w));
 	mainlatch.q_out_cb<3>().set(FUNC(pturn_state::coin_counter_2_w));

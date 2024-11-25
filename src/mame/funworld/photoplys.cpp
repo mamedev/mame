@@ -34,7 +34,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void photoplays_map(address_map &map);
+	void photoplays_map(address_map &map) ATTR_COLD;
 };
 
 void photoplays_state::photoplays_map(address_map &map)

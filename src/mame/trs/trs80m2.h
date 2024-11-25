@@ -94,14 +94,14 @@ public:
 	void write_centronics_perror(int state);
 
 	void trs80m2(machine_config &config);
-	void m68000_mem(address_map &map);
-	void z80_io(address_map &map);
-	void z80_mem(address_map &map);
+	void m68000_mem(address_map &map) ATTR_COLD;
+	void z80_io(address_map &map) ATTR_COLD;
+	void z80_mem(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -161,9 +161,9 @@ public:
 	void tcl_w(uint8_t data);
 
 	void trs80m16(machine_config &config);
-	void m16_z80_io(address_map &map);
+	void m16_z80_io(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_subcpu;
 	required_device<am9519_device> m_uic;

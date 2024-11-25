@@ -36,7 +36,7 @@ private:
 	void output_1520(uint8_t data);
 	void output_1540(offs_t offset, uint8_t data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };

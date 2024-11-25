@@ -106,8 +106,8 @@ public:
 	void init_pc238();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -179,12 +179,12 @@ private:
 	void rx_sel_w(u8 data);
 	u8 rx_rdy_r();
 
-	void inst_map(address_map &map);
-	void data_map(address_map &map);
-	void pc278_io_map(address_map &map);
-	void pc238_io_map(address_map &map);
-	void devctl_map(address_map &map);
-	void rx_map(address_map &map);
+	void inst_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
+	void pc278_io_map(address_map &map) ATTR_COLD;
+	void pc238_io_map(address_map &map) ATTR_COLD;
+	void devctl_map(address_map &map) ATTR_COLD;
+	void rx_map(address_map &map) ATTR_COLD;
 
 	required_device<hd6120_device> m_maincpu;
 	required_device<i8051_device> m_rxcpu;

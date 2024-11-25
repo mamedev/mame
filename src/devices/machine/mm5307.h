@@ -43,8 +43,8 @@ protected:
 	mm5307_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const std::array<u16, 16> &divisors_x2);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// timed update callback

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_BFG_GU96X8M_K657C2_H
-#define MAME_MACHINE_BFG_GU96X8M_K657C2_H
+#ifndef MAME_BFM_BFM_GU96X8M_K657C2_H
+#define MAME_BFM_BFM_GU96X8M_K657C2_H
 
 #pragma once
 
@@ -24,13 +24,13 @@ public:
 	void set_char(int data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
 	TIMER_CALLBACK_MEMBER(frame_update_callback);
-	
+
 	emu_timer *m_frame_timer;
 
 	output_finder<1> m_vfd_background;
@@ -74,4 +74,4 @@ private:
 
 DECLARE_DEVICE_TYPE(BFM_GU96X8M_K657C2, bfm_gu96x8m_k657c2_device)
 
-#endif // MAME_MACHINE_BFG_GU96X8M_K657C2_H
+#endif // MAME_BFM_BFM_GU96X8M_K657C2_H

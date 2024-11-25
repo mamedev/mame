@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="jaminator" description="Jaminator cartridges">
+
+	<!--
+	Worlds of Wonder carts:
+	251141-00 - Hard Rock I
+	251142-00 - Hard Rock II
+	251143-00 - Modern Rock
+	251144-00 - Classic Rock II
+	251145-00 - Classic Rock I
+	251146-00 - Lead Rock Guitarists
+	(numbering taken from front labels; back labels have separate numbering)
+
+	Arrow Micro-Techs carts:
+	71001 - Classic Rock 1
+	71002 - American Hard Rock 1
+	71003 - Classic Rock 2
+	71004 - Heavy Metal 1
+	71005 - Southern Rock 1
+	71006 - Japanese Rock 1
+	MRA-6 - Deep Purple 1
+	MRA-7 - Eric Clapton 1
+	MRA-8? - Jeff Beck 1
+
+	(AMT "Classic Rock" carts have different tracks than the corresponding WoW carts)
+
+	Yamaha carts:
+	MRY-1 - Furi Kaereba Ore ga Ita - Special-hen (振り返れば俺がいた・スペシャル編)
+	MRY-2 - Anta ga Shuyaku - Narikiri-hen (あんたが主役・ナリキリ編)
+	MRY-3 - ??
+	MRY-4 - Zutto Guitar ga Suki Datta (ずっとギターが好きだった)
+	MRY-5 - Kyokugen Battle - Nanda Nanda-hen (極限バトル・なんだなんだ編)
+
+	Cart pinout (from front, left to right):
+	1   GND
+	2   /WR
+	3   D3
+	4   D4
+	5   D5
+	6   D6
+	7   D7
+	8   A16
+	9   A10
+	10  /CE
+	11  A11
+	12  A9
+	13  A8
+	14  A13
+	15  A14
+	16  Vcc
+	17  A15
+	18  A12
+	19  A7
+	20  A6
+	21  A5
+	22  A4
+	23  A3
+	24  A2
+	25  A1
+	26  A0
+	27  D0
+	28  D1
+	29  D2
+	30  GND
+
+	Pin 2 (/WR) is connected to the write line on the 8039, but is normally unused by the cart.
+	-->
+
+	<software name="classic1">
+		<!--
+		1. "Start Me Up" (The Rolling Stones)
+		2. "Black Magic Woman" (Santana)
+		3. "Money" (Pink Floyd)
+		4. "Don't Stop Believin'" (Journey)
+		5. "The Old Man Down the Road" (John Fogerty)
+
+		btanb(?): "Start Me Up" and "Money" both occasionally try to play a bogus sample at address 0,
+		including on the real unit - faulty cart or is it just always like this?
+		-->
+		<description>Classic Rock I (USA)</description>
+		<year>1990</year>
+		<publisher>Worlds of Wonder</publisher>
+		<info name="serial" value="251145-00 / 251171-00" /> <!-- front label / back label -->
+		<info name="version" value="Rev 1 6/90" />
+		<part name="cart" interface="jaminator">
+			<dataarea name="rom" size="0x10000">
+				<rom name="classic rock i.bin" size="0x10000" crc="c88dc030" sha1="88f8439ff7563c676a2aad88787f7e92881bf11b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="classic2">
+		<!--
+		1. "After Midnight" (Eric Clapton)
+		2. "Smoke on the Water" (Deep Purple)
+		3. "You Really Got Me" (The Kinks)
+		4. "Whole Lotta Love" (Led Zeppelin)
+		5. "I Can't Explain" (The Who)
+		-->
+		<description>Classic Rock II (USA)</description>
+		<year>1990</year>
+		<publisher>Worlds of Wonder</publisher>
+		<info name="serial" value="251144-00 / 251172-00" /> <!-- front label / back label -->
+		<info name="version" value="Rev 1 6/90" />
+		<part name="cart" interface="jaminator">
+			<dataarea name="rom" size="0x10000">
+				<rom name="classic rock ii.bin" size="0x10000" crc="b408c1ea" sha1="ed9f9fa2e7b37e3a7e7f8ee04eef6d907877aab8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardrock1">
+		<!--
+		1. "Nothin' But a Good Time" (Poison)
+		2. "Fool for Your Loving" (Whitesnake)
+		3. "Sharp Dressed Man" (ZZ Top)
+		4. "Best of Both Worlds" (Van Halen)
+		5. "You Don't Remember, I'll Never Forget" (Yngwie Malmsteen)
+		-->
+		<description>Hard Rock I (USA)</description>
+		<year>1990</year>
+		<publisher>Worlds of Wonder</publisher>
+		<info name="serial" value="251141-00 / 251167-00" /> <!-- front label / back label -->
+		<info name="version" value="Rev 1 6/90" />
+		<part name="cart" interface="jaminator">
+			<dataarea name="rom" size="0x10000">
+				<rom name="hard rock i.bin" size="0x10000" crc="6ba37cc4" sha1="568f69777ec4d20b7358b39d92b0c6ddf4c864c7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardrock2">
+		<!--
+		1. "You Give Love a Bad Name" (Bon Jovi)
+		2. "Rock You Like a Hurricane" (Scorpions)
+		3. "Pour Some Sugar on Me" (Def Leppard)
+		4. "Dude (Looks Like a Lady)" (Aerosmith)
+		5. "The Crush of Love" (Joe Satriani)
+		-->
+		<description>Hard Rock II (USA)</description>
+		<year>1990</year>
+		<publisher>Worlds of Wonder</publisher>
+		<info name="serial" value="251142-00 / 251168-00" /> <!-- front label / back label -->
+		<info name="version" value="Rev 1 6/90" />
+		<part name="cart" interface="jaminator">
+			<dataarea name="rom" size="0x10000">
+				<rom name="hard rock ii.bin" size="0x10000" crc="cdf1e627" sha1="17b5820396e1d39657ab764a6aefd5bff227dd14" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leadguit">
+		<!--
+		1. "Johnny B. Goode" (Chuck Berry)
+		2. "Crossfire" (Stevie Ray Vaughan)
+		3. "Foxy Lady" (Jimi Hendrix)
+		4. "Hey! Bo Diddley" (Bo Diddley)
+		5. "Beck's Bolero" (Jeff Beck)
+		-->
+		<description>Lead Rock Guitarists (USA)</description>
+		<year>1990</year>
+		<publisher>Worlds of Wonder</publisher>
+		<info name="serial" value="251146-00 / 251170-00" /> <!-- front label / back label -->
+		<info name="version" value="Rev 1 6/90" />
+		<part name="cart" interface="jaminator">
+			<dataarea name="rom" size="0x10000">
+				<rom name="lead rock guitarists.bin" size="0x10000" crc="33e8bf07" sha1="a2b90388b914cebeaa41b8ba5c9f5be0683360bc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="modern">
+		<!--
+		1. "Sunday Bloody Sunday" (U2)
+		2. "Money for Nothing" (Dire Straits)
+		3. "Let's Go" (The Cars)
+		4. "Roxanne" (The Police)
+		5. "Stand" (REM)
+		-->
+		<description>Modern Rock (USA)</description>
+		<year>1990</year>
+		<publisher>Worlds of Wonder</publisher>
+		<info name="serial" value="251143-00 / 251169-00" /> <!-- front label / back label -->
+		<info name="version" value="Rev 1 6/90" />
+		<part name="cart" interface="jaminator">
+			<dataarea name="rom" size="0x10000">
+				<rom name="modern rock.bin" size="0x10000" crc="80adacae" sha1="b82f3464c809e0adf82e1b5a213ee50968e69641" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -20,7 +20,7 @@ public:
 
 	void generate_custom_interrupt(int level);
 
-	virtual void map(address_map& map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 	uint8_t nmi_vector_r(offs_t offset);
 	uint8_t irq_vector_r(offs_t offset);
@@ -29,8 +29,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(unknown_timer_tick);
 

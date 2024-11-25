@@ -42,7 +42,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void skopro_map(address_map &map);
+	void skopro_map(address_map &map) ATTR_COLD;
 };
 
 void skopro_state::skopro_map(address_map &map)
@@ -70,7 +70,7 @@ void skopro_state::skopro(machine_config &config)
 ***************************************************************************/
 
 ROM_START( drgdance )
-	ROM_REGION(0x20000, "bios", 0) \
+	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD("mbbios", 0x10000, 0x10000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd" )

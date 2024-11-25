@@ -62,8 +62,8 @@ private:
 	void duart_txb(int state);
 	void duart_output(uint8_t data);
 	required_shared_ptr<uint16_t> m_ram;
-	void machine_reset() override;
-	void mem_map(address_map &map);
+	void machine_reset() override ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 

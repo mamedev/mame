@@ -730,11 +730,6 @@ uint8_t galaga_state::bosco_dsw_r(offs_t offset)
 	return bit0 | (bit1 << 1);
 }
 
-void galaga_state::flip_screen_w(int state)
-{
-	flip_screen_set(state);
-}
-
 void galaga_state::irq1_clear_w(int state)
 {
 	m_main_irq_mask = state;
@@ -1621,7 +1616,7 @@ void bosco_state::bosco(machine_config &config)
 	n06xx_1.chip_select_callback<1>().set("52xx", FUNC(namco_52xx_device::chip_select));
 
 	LS259(config, m_videolatch); // 1B on video board
-	m_videolatch->q_out_cb<0>().set(FUNC(galaga_state::flip_screen_w)).invert();
+	m_videolatch->q_out_cb<0>().set(FUNC(bosco_state::flip_screen_set)).invert();
 	// Q4-Q5 to 05XX for starfield blink
 	m_videolatch->q_out_cb<7>().set("50xx_2", FUNC(namco_50xx_device::reset));
 	m_videolatch->q_out_cb<7>().append("52xx", FUNC(namco_52xx_device::reset));
@@ -1701,7 +1696,7 @@ void galaga_state::galaga(machine_config &config)
 
 	LS259(config, m_videolatch); // 5K on video board
 	// Q0-Q5 to 05XX for starfield control
-	m_videolatch->q_out_cb<7>().set(FUNC(galaga_state::flip_screen_w));
+	m_videolatch->q_out_cb<7>().set(FUNC(galaga_state::flip_screen_set));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
@@ -1935,7 +1930,7 @@ void digdug_state::digdug(machine_config &config)
 	m_videolatch->parallel_out_cb().set(FUNC(digdug_state::bg_select_w)).mask(0x33);
 	m_videolatch->q_out_cb<2>().set(FUNC(digdug_state::tx_color_mode_w));
 	m_videolatch->q_out_cb<3>().set(FUNC(digdug_state::bg_disable_w));
-	m_videolatch->q_out_cb<7>().set(FUNC(digdug_state::flip_screen_w));
+	m_videolatch->q_out_cb<7>().set(FUNC(digdug_state::flip_screen_set));
 
 	ER2055(config, m_earom);
 
@@ -2402,6 +2397,17 @@ Notes:
                     0400 (DIP28): Motion Object and Scratch RAM to CPU Bus Interface IC
                     0702 (DIP28): Sync Generator/Clock Divider IC
 
+There's also a Sidam version of Galaga (Sidam PCB 11200, official license for the Italian market),
+but, unlike Sidam's Dig Dug, this one does not use any unique ROM, but a mix between the two Namco sets:
+     bottom-10_2532.4d  = gg1_11.4d  galaga   Galaga (Namco rev. B)
+     bottom-8_2532.4h   = gg1_9.4l   galaga   Galaga (Namco rev. B)
+     bottom-9_2532.4f   = gg1_10.4f  galaga   Galaga (Namco rev. B)
+     top-0_2532.3n      = gg1-1.3p   galagao  Galaga (Namco)
+     top-1_2532.3m      = gg1-2.3m   galagao  Galaga (Namco)
+     top-2_2532.3l      = gg1_3.2m   galaga   Galaga (Namco rev. B)
+     top-3_2532.3k      = gg1-4.2l   galagao  Galaga (Namco)
+     top-4_2532.3j      = gg1_5b.3f  galaga   Galaga (Namco rev. B)
+     top-6_2532.3e      = gg1_7b.2c  galaga   Galaga (Namco rev. B)
 */
 
 ROM_START( galaga )

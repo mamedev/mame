@@ -700,12 +700,12 @@ void naomi_gdrom_board::sh4_control_w(uint32_t data)
 	dimm_control = data;
 	if (dimm_control & 2)
 	{
-		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
+		space_6154->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
 		logerror("Activated 'load mode register' command mode\n");
 	}
 	else
 	{
-		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
+		space_6154->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
 	}
 	if (((old & 1) == 0) && ((dimm_control & 1) == 1))
 		set_reset_out();
@@ -808,30 +808,18 @@ void naomi_gdrom_board::i2cmem_dimm_w(uint64_t data)
 	}
 }
 
-void naomi_gdrom_board::pic_map(address_map &map)
+uint8_t naomi_gdrom_board::pic_dimm_r()
 {
-	map(0x00, 0x1f).rw(FUNC(naomi_gdrom_board::pic_dimm_r), FUNC(naomi_gdrom_board::pic_dimm_w));
+	return picbus | picbus_pullup;
 }
 
-uint8_t naomi_gdrom_board::pic_dimm_r(offs_t offset)
+void naomi_gdrom_board::pic_dimm_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	if (offset == 1)
-		return picbus | picbus_pullup;
-	return 0;
-}
+	picbus = data;
+	m_securitycpu->abort_timeslice();
 
-void naomi_gdrom_board::pic_dimm_w(offs_t offset, uint8_t data)
-{
-	if (offset == 1)
-	{
-		picbus = data;
-		m_securitycpu->abort_timeslice();
-	}
-	if (offset == 3)
-	{
-		picbus_io[1] = data; // for each bit specify direction, 0 out 1 in
-		picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
-	}
+	picbus_io[1] = ~mem_mask; // for each bit specify direction, 0 out 1 in
+	picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
 }
 
 void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, uint32_t &file_start, uint32_t &file_size)
@@ -1036,7 +1024,7 @@ void naomi_gdrom_board::device_reset()
 		dimm_offsetl = 0;
 		dimm_parameterl = 0;
 		dimm_parameterh = 0;
-		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
+		space_6154->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
 		if (work_mode == 2) // invalidate dimm memory contents by setting the first 2048 bytes to 0
 			memset(dimm_des_data.get(), 0, 2048);
 	}
@@ -1044,7 +1032,7 @@ void naomi_gdrom_board::device_reset()
 	{
 		m_maincpu->set_disable();
 		m_securitycpu->set_disable();
-		m_315_6154->memory()->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
+		space_6154->unmap_readwrite(0x10000000, 0x10000000 + dimm_data_size - 1);
 	}
 
 	dimm_cur_address = 0;
@@ -1098,7 +1086,8 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	IDE_GDROM(config, m_idegdrom, 0, image_tag, m_315_6154->tag(), sega_315_6154_device::AS_PCI_MEMORY);
 	m_idegdrom->irq_callback().set_inputline(m_maincpu, SH4_IRL2);
 	PIC16C622(config, m_securitycpu, PIC_CLOCK);
-	m_securitycpu->set_addrmap(AS_IO, &naomi_gdrom_board::pic_map);
+	m_securitycpu->read_b().set(FUNC(naomi_gdrom_board::pic_dimm_r));
+	m_securitycpu->write_b().set(FUNC(naomi_gdrom_board::pic_dimm_w));
 	m_securitycpu->set_config(0x3fff - 0x04);
 	I2C_24C01(config, m_i2c0, 0);
 	m_i2c0->set_e0(0);
@@ -1114,10 +1103,10 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 // Net-DIMM firmwares:
 // all VxWorkx based, can be updated up to 4.0x, actually 1MB in size, must have CRC32 FFFFFFFF, 1st MB of flash ROM contain stock version, 2nd MB have some updated version
 //  ?          - 2.03 factory only, introduced ALL.net features, so far was seen only as stock firmware in 1st half of flash ROM, factory updated to some newer ver in 2nd ROM half
-//  FPR23718   - 2.06 factory only, most common version of NAOMI Net-DIMMs, have stock 2.03, IC label need verification
+//  FPR23718   - 2.06 factory only, most common version of NAOMI Net-DIMMs, have stock 2.03
 //  ?            2.13 factory or update (NAOMI VF4)
 //  ?            2.17 factory or update (NAOMI VF4 Evolution)
-//  ?          - 3.01 added network boot support, supports Triforce and Chihiro
+//  FPR23905C  - 3.01 factory, added network boot support, supports Triforce and Chihiro
 //  FPR23905   - 3.03 factory or update (NAOMI WCCF)
 //  ?            3.12 factory only
 //  ?            3.17 latest known 3.xx version, factory or update (NAOMI VF4 Final Tuned or statndalone disks for Chihiro and Triforce)
@@ -1150,12 +1139,14 @@ ROM_START( dimm )
 	ROMX_LOAD( "213_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(17131f318632610b87bc095156ffad4597fed4ca), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "217_203.bin", "BIOS 4")
 	ROMX_LOAD( "217_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(e5a229ae7ed48b2955cad63529fd938c6db555e5), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(5, "fpr23905.ic36", "BIOS 5")
-	ROMX_LOAD( "fpr23905.ic36",   0x000000, 0x200000, CRC(ffffffff) SHA1(acade4362807c7571b1c2a48ed6067e4bddd404b), ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(6, "317_312.bin", "BIOS 6")
-	ROMX_LOAD( "317_312.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(31d698cd659446ee09a2eeedec6e4bc6a19d05e8), ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(7, "401_203.bin", "BIOS 7")
-	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(7))
+	ROM_SYSTEM_BIOS(5, "3.01", "BIOS 5")
+	ROMX_LOAD( "fpr23905c.ic36",  0x000000, 0x200000, CRC(ffffffff) SHA1(972b3b73aa1eabb1091e9096b57a7e5e1d0436d8), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "3.03", "BIOS 6")
+	ROMX_LOAD( "fpr23905.ic36",   0x000000, 0x200000, CRC(ffffffff) SHA1(acade4362807c7571b1c2a48ed6067e4bddd404b), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(7, "317_312.bin", "BIOS 7")
+	ROMX_LOAD( "317_312.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(31d698cd659446ee09a2eeedec6e4bc6a19d05e8), ROM_BIOS(7))
+	ROM_SYSTEM_BIOS(8, "401_203.bin", "BIOS 8")
+	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(8))
 
 	// dynamically filled with data
 	ROM_REGION(0x1000, "pic", ROMREGION_ERASE00)

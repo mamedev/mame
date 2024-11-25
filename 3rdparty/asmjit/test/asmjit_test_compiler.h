@@ -29,33 +29,41 @@ public:
 //! A test case interface for testing AsmJit's Compiler.
 class TestCase {
 public:
-  TestCase(const char* name = nullptr) {
+  TestCase(const char* name, asmjit::Arch arch) {
     if (name)
       _name.assign(name);
+    _arch = arch;
   }
 
   virtual ~TestCase() {}
 
   inline const char* name() const { return _name.data(); }
+  inline asmjit::Arch arch() const { return _arch; }
 
   virtual void compile(asmjit::BaseCompiler& cc) = 0;
   virtual bool run(void* func, asmjit::String& result, asmjit::String& expect) = 0;
 
   asmjit::String _name;
+  asmjit::Arch _arch;
 };
 
 class TestApp {
 public:
   std::vector<std::unique_ptr<TestCase>> _tests;
 
-  unsigned _nFailed = 0;
-  size_t _outputSize = 0;
-
+  const char* _arch = nullptr;
+  const char* _filter = nullptr;
+  bool _helpOnly = false;
   bool _verbose = false;
   bool _dumpAsm = false;
   bool _dumpHex = false;
 
-  TestApp() noexcept {}
+  unsigned _numTests = 0;
+  unsigned _numFailed = 0;
+  size_t _outputSize = 0;
+
+  TestApp() noexcept
+    : _arch("all") {}
   ~TestApp() noexcept {}
 
   void add(TestCase* test) noexcept {
@@ -67,6 +75,8 @@ public:
 
   int handleArgs(int argc, const char* const* argv);
   void showInfo();
+
+  bool shouldRun(const TestCase* tc);
   int run();
 };
 

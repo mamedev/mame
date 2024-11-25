@@ -668,7 +668,7 @@ void drcbe_x86::reset()
 	a.bind(a.newNamedLabel("entry_point"));
 
 	FuncDetail entry_point;
-	entry_point.init(FuncSignatureT<uint32_t, x86code *>(CallConvId::kHost), Environment::host());
+	entry_point.init(FuncSignature::build<uint32_t, x86code *>(CallConvId::kHost), Environment::host());
 
 	FuncFrame frame;
 	frame.init(entry_point);

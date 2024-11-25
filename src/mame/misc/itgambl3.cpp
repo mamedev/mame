@@ -65,8 +65,8 @@ public:
 	void itgambl3(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	int m_test_x = 0;
@@ -77,7 +77,7 @@ private:
 
 	void itgambl3_palette(palette_device &palette) const;
 	uint32_t screen_update_itgambl3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void itgambl3_map(address_map &map);
+	void itgambl3_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -6,18 +6,18 @@
 
     Bell Fruit Games 96x8 Dot matrix VFD module interface and emulation.
 
-	This was a replacement for the previous 5 x 7 x 16 display.
-	The two displays are meant to be compatible although there are some
-	differences in behaviour when sending undocumented commands or
-	commands with "don't care" bits.
+    This was a replacement for the previous 5 x 7 x 16 display.
+    The two displays are meant to be compatible although there are some
+    differences in behaviour when sending undocumented commands or
+    commands with "don't care" bits.
 
     TODO: Scrolling text
-		  Test sequence
-		  Background character
-		  Background colour enable/disable/protection
-		  LED backlight isn't visually correct. The area outside the 96x8
-		  matrix should be brighter than that shining through the gap
-		  between the digits.
+          Test sequence
+          Background character
+          Background colour enable/disable/protection
+          LED backlight isn't visually correct. The area outside the 96x8
+          matrix should be brighter than that shining through the gap
+          between the digits.
 **********************************************************************/
 
 #include "emu.h"
@@ -318,20 +318,20 @@ void bfm_gu96x8m_k657c2_device::update_display()
 		uint8_t const *char_data;
 		bool dp = false;
 		bool blanked = false;
-		
+
 		switch(m_blank_control)
 		{
 			case 0:
 				blanked = true;
 				break;
-			
+
 			case 1:
 				if(m_window_size == 0 || pos < m_window_start || pos > m_window_end)
 				{
 					blanked = true;
 				}
 				break;
-				
+
 			case 2:
 				if(m_window_size > 0 && (pos >= m_window_start && pos <= m_window_end))
 				{
@@ -398,7 +398,7 @@ void bfm_gu96x8m_k657c2_device::write_char(int data)
 				if(m_extra_data_count == 0)
 				{
 					uint8_t *udf = &m_udf[m_extra_data[6] & 0x0f][0];
-					
+
 					std::fill(udf,udf + 6,0);
 
 					m_charset_offset[m_extra_data[5] & 0x7f] = (m_extra_data[6] & 0x0f) | (1 << CHAR_AT_UDF);
@@ -952,7 +952,7 @@ void bfm_gu96x8m_k657c2_device::set_char(int data)
 {
 	m_chars[m_cursor_pos]=m_charset_offset[data];
 	m_attributes[m_cursor_pos]=0;
-	
+
 	if(m_ascii_charset == 0 && (data == 0x6c || data == 0x6e))
 	{
 		m_attributes[m_cursor_pos] |= (1 << AT_DP);
@@ -995,7 +995,7 @@ TIMER_CALLBACK_MEMBER(bfm_gu96x8m_k657c2_device::frame_update_callback)
 	{
 		m_led_flash_blank=0;
 	}
-		
+
 	update_display();
 }
 

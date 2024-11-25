@@ -6,7 +6,7 @@ license:CC0-1.0
 Software from here: http://rainbow-100.com
 -->
 
-<softwarelist name="rainbow" description="DEC Rainbow 100 Disk Images">
+<softwarelist name="rainbow" description="DEC Rainbow 100 disk images">
 	<software name="concpm86">
 		<description>Concurrent CP/M-86</description>
 		<year>198?</year>

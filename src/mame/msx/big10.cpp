@@ -50,16 +50,14 @@
 
 ***************************************************************************/
 
-
-#define MASTER_CLOCK        XTAL(21'477'272)     // Dumper notes poorly refers to a 21.?727 Xtal.
-
-
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "video/v9938.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "sound/ay8910.h"
+#include "video/v9938.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -89,16 +87,12 @@ private:
 	required_ioport_array<6> m_in;
 	output_finder<> m_lamp;
 
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint8_t mux_r();
 	void mux_w(uint8_t data);
 };
-
-
-#define HOPPER_PULSE        40          // time between hopper pulses in milliseconds
-#define VDP_MEM             0x40000
 
 
 /****************************************
@@ -108,7 +102,7 @@ private:
 void big10_state::mux_w(uint8_t data)
 {
 	m_mux_data = ~data;
-	m_hopper->motor_w(BIT(data, 6));
+	m_hopper->motor_w(BIT(~data, 6));
 	m_lamp = BIT(~data, 7); // maybe a coin counter?
 }
 
@@ -232,6 +226,8 @@ INPUT_PORTS_END
 
 void big10_state::big10(machine_config &config)
 {
+	constexpr XTAL MASTER_CLOCK = 21.477272_MHz_XTAL; // Dumper notes poorly refers to a 21.?727 Xtal.
+
 	// basic machine hardware
 	Z80(config, m_maincpu, MASTER_CLOCK/6); // guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &big10_state::main_map);
@@ -239,12 +235,12 @@ void big10_state::big10(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(40));
 
 	// video hardware
 	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
 	v9938.set_screen_ntsc("screen");
-	v9938.set_vram_size(VDP_MEM);
+	v9938.set_vram_size(0x40000);
 	v9938.int_cb().set_inputline("maincpu", 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
@@ -269,6 +265,14 @@ ROM_START( big10 )
 	ROM_LOAD( "3", 0x8000, 0x4000, CRC(8d15da74) SHA1(0e114de6fcf79beac800575bfb739e6a6bf35660) )
 ROM_END
 
+// PCB marked SYSTEM MAKE3 with Cosmo Corporation sticker
+ROM_START( big10a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "auto.big-10-1.ic4", 0x0000, 0x4000, CRC(51bbc509) SHA1(86ba9e1a3a572f8c101b9e2866768836cb7fc1e0) )
+	ROM_LOAD( "auto.big-10-2.ic3", 0x4000, 0x4000, CRC(9267f841) SHA1(ad7b32e92b2d81fc147b5d5c348961229f7f4f1c) )
+	ROM_LOAD( "auto.big-10-3.ic2", 0x8000, 0x4000, CRC(6ab10d37) SHA1(0ea137d08de3c72ef9e72126114f9da2be7602ab) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -276,5 +280,6 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-//    YEAR  NAME   PARENT    MACHINE   INPUT     STATE        INIT        ROT     COMPANY     FULLNAME   FLAGS
-GAME( 1985, big10, 0,        big10,    big10,    big10_state, empty_init, ROT0,   "Success",  "Big 10",  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT    MACHINE   INPUT     STATE        INIT        ROT     COMPANY         FULLNAME                      FLAGS
+GAME( 1985, big10,  0,        big10,    big10,    big10_state, empty_init, ROT0,   "Success",      "Big 10 (1985, Success)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, big10a, big10,    big10,    big10,    big10_state, empty_init, ROT0,   "System Make",  "Big 10 (1986, System Make)", MACHINE_SUPPORTS_SAVE )

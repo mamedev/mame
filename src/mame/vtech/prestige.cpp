@@ -137,7 +137,7 @@ public:
 	void gl7007sl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -185,9 +185,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	IRQ_CALLBACK_MEMBER(prestige_int_ack);
 
-	void glcolor_io(address_map &map);
-	void prestige_io(address_map &map);
-	void prestige_mem(address_map &map);
+	void glcolor_io(address_map &map) ATTR_COLD;
+	void prestige_io(address_map &map) ATTR_COLD;
+	void prestige_mem(address_map &map) ATTR_COLD;
 };
 
 

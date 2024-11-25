@@ -8,9 +8,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_80186_H
+#define MAME_BUS_BBC_TUBE_TUBE_80186_H
 
-#ifndef MAME_BUS_BBC_TUBE_80186_H
-#define MAME_BUS_BBC_TUBE_80186_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/i86/i186.h"
@@ -35,12 +36,12 @@ protected:
 	bbc_tube_80186_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual uint8_t host_r(offs_t offset) override;
 	virtual void host_w(offs_t offset, uint8_t data) override;
@@ -50,8 +51,8 @@ protected:
 	required_device<ram_device> m_ram;
 	required_memory_region m_bootstrap;
 
-	void tube_80186_io(address_map &map);
-	void tube_80186_mem(address_map &map);
+	void tube_80186_io(address_map &map) ATTR_COLD;
+	void tube_80186_mem(address_map &map) ATTR_COLD;
 
 	void prst_w(int state);
 };
@@ -64,11 +65,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
@@ -76,5 +77,4 @@ protected:
 DECLARE_DEVICE_TYPE(BBC_TUBE_80186, bbc_tube_80186_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_PCPLUS, bbc_tube_pcplus_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_80186_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_80186_H

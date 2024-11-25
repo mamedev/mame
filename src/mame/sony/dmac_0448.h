@@ -21,12 +21,12 @@ public:
 	template <unsigned IRQ> void irq(int state) { set_irq_line(IRQ, state); }
 	template <unsigned DRQ> void drq(int state) { set_drq_line(DRQ, state); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void set_irq_line(int number, int state);
 	void set_drq_line(int channel, int state);

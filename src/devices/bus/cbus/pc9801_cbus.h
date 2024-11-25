@@ -58,8 +58,8 @@
                             <B>          <A>
 
 **********************************************************************/
-#ifndef MAME_MACHINE_PC9801_CBUS_H
-#define MAME_MACHINE_PC9801_CBUS_H
+#ifndef MAME_BUS_CBUS_PC9801_CBUS_H
+#define MAME_BUS_CBUS_PC9801_CBUS_H
 
 #pragma once
 
@@ -112,12 +112,16 @@ public:
 	address_space &io_space() const { return *m_iospace; }
 	template<int I> void int_w(bool state) { m_int_callback[I](state); }
 	template<typename R, typename W> void install_io(offs_t start, offs_t end, R rhandler, W whandler);
+	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
+	{
+		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
+	}
 
 	void flush_install_io(const char *client_tag, u16 old_io, u16 new_io, u16 size, read8sm_delegate rhandler, write8sm_delegate whandler);
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 private:
@@ -131,4 +135,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801CBUS_SLOT, pc9801_slot_device)
 
-#endif // MAME_MACHINE_PC9801_CBUS_H
+#endif // MAME_BUS_CBUS_PC9801_CBUS_H

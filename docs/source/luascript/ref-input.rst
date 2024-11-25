@@ -750,16 +750,6 @@ uiinput:reset()
     Clears pending events and UI input states.  Should be called when leaving a
     modal state where input is handled directly (e.g. configuring an input
     combination).
-uiinput:find_mouse()
-    Returns host system mouse pointer X position, Y position, button state, and
-    the :ref:`render target <luascript-ref-rendertarget>` it falls in.  The
-    position is in host pixels, where zero is at the top/left.  The button state
-    is a Boolean indicating whether the primary mouse button is pressed.
-
-    If the mouse pointer is not over one of MAME’s windows, this may return the
-    position and render target from when the mouse pointer was most recently
-    over one of MAME’s windows.  The render target may be ``nil`` if the mouse
-    pointer is not over one of MAME’s windows.
 uiinput:pressed(type)
     Returns a Boolean indicating whether the specified UI input has been
     pressed.  The input type is an enumerated value.

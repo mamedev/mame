@@ -105,7 +105,7 @@ void crtc_ega_device::register_w(uint8_t data)
 					m_vert_blank_start  = ((data & 0x08) << 5) | (m_vert_blank_start & 0x00ff);
 					m_line_compare      = ((data & 0x10) << 4) | (m_line_compare & 0x00ff);
 					break;
-		case 0x08:  m_preset_row_scan   =   data & 0x1f;
+		case 0x08:  m_preset_row_latch  =   data & 0x1f;
 					break;
 		case 0x09:  m_max_ras_addr      =   data & 0x1f;
 					break;
@@ -272,7 +272,10 @@ void crtc_ega_device::set_vblank(int state)
 		if (!m_irq_enable)
 			m_res_out_irq_cb(m_vblank);
 		if (state)
+		{
 			m_disp_start_addr = m_start_addr_latch;
+			m_preset_row_scan = m_preset_row_latch;
+		}
 	}
 }
 

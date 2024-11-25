@@ -67,7 +67,7 @@ public:
 	void init_suprloco();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -107,13 +107,11 @@ private:
 	inline void draw_pixel(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, int color, int flip);
 	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int spr_number);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void decrypted_opcodes_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -334,8 +332,6 @@ uint32_t suprloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void suprloco_state::main_map(address_map &map)
 {

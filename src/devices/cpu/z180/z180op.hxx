@@ -33,7 +33,7 @@ OP(op,17) { RLA;                                                    } /* RLA    
 OP(op,18) { JR();                                                   } /* JR   o           */
 OP(op,19) { ADD16(HL,DE);                                           } /* ADD  HL,DE       */
 OP(op,1a) { _A = RM(_DE);                                         } /* LD   A,(DE)      */
-OP(op,1b) { _DE--;                ;                                   } /* DEC  DE          */
+OP(op,1b) { _DE--;                                                    } /* DEC  DE          */
 OP(op,1c) { _E = INC(_E);                                         } /* INC  E           */
 OP(op,1d) { _E = DEC(_E);                                         } /* DEC  E           */
 OP(op,1e) { _E = ARG();                                           } /* LD   E,n         */

@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
 #include "emu.h"
-#include "machine/terminal.h"
+#include "terminal.h"
+
 #include "screen.h"
 #include "speaker.h"
 

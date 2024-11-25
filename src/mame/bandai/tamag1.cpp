@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:digshadow, segher
+// thanks-to:digshadow, Segher
 /*******************************************************************************
 
 Bandai Tamagotchi generation 1 hardware
@@ -10,6 +10,10 @@ Hardware notes:
 - Seiko Epson E0C6S46 MCU under epoxy
 - 32*16 LCD screen + 8 custom segments
 - 1-bit sound
+
+TODO:
+- change to SVG screen
+- add the Mothra version that was recently dumped (has a E0C6S48)
 
 *******************************************************************************/
 
@@ -41,7 +45,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void tama_palette(palette_device &palette) const;
@@ -64,8 +68,7 @@ void tamag1_state::machine_start()
 
 E0C6S46_PIXEL_UPDATE(tamag1_state::pixel_update)
 {
-	// 16 COM(common) pins, 40 SEG(segment) pins from MCU,
-	// 32x16 LCD screen:
+	// 16 COM(common) pins, 40 SEG(segment) pins from MCU, 32x16 LCD screen:
 	static const int seg2x[0x28] =
 	{
 		0, 1, 2, 3, 4, 5, 6, 7,
@@ -102,18 +105,15 @@ void tamag1_state::tama_palette(palette_device &palette) const
 
 INPUT_CHANGED_MEMBER(tamag1_state::input_changed)
 {
-	// inputs are hooked up backwards here, because MCU input
-	// ports are all tied to its interrupt controller
-	int line = param;
-	int state = newval ? ASSERT_LINE : CLEAR_LINE;
-	m_maincpu->set_input_line(line, state);
+	// inputs are hooked up backwards here, because MCU input ports are all tied to its interrupt controller
+	m_maincpu->set_input_line(param, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( tama )
 	PORT_START("K0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tamag1_state, input_changed, E0C6S46_LINE_K00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tamag1_state, input_changed, E0C6S46_LINE_K01)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tamag1_state, input_changed, E0C6S46_LINE_K02)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tamag1_state::input_changed), E0C6S46_LINE_K00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tamag1_state::input_changed), E0C6S46_LINE_K01)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tamag1_state::input_changed), E0C6S46_LINE_K02)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -169,5 +169,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY,  FULLNAME,           FLAGS
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY   FULLNAME            FLAGS
 SYST( 1997, tama, 0,      0,      tama,    tama,  tamag1_state, empty_init, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )

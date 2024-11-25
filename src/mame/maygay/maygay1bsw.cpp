@@ -85,7 +85,7 @@
 #include "m1wotwa.lh"
 
 
-#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL|MACHINE_CLICKABLE_ARTWORK
+#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL
 
 // I assume all sets have this, or is M1B different? We don't use it right now anyway.
 // TODO: Add these to appropriate boards as a BIOS or similar, for now we expect all sets to have them

@@ -141,8 +141,8 @@ public:
 	void hazl1500(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -168,8 +168,8 @@ private:
 	NETDEV_ANALOG_CALLBACK_MEMBER(vblank_cb);
 	NETDEV_ANALOG_CALLBACK_MEMBER(tvinterq_cb);
 
-	void hazl1500_io(address_map &map);
-	void hazl1500_mem(address_map &map);
+	void hazl1500_io(address_map &map) ATTR_COLD;
+	void hazl1500_mem(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_iowq);
 

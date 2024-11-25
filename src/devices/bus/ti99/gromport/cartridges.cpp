@@ -30,7 +30,7 @@
 #define LOG_RPK          (1U << 8)   // RPK handler
 #define LOG_WARNW        (1U << 9)   // Warn when writing to cartridge space
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_CONFIG)
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_CONFIG | LOG_CHANGE)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TI99_CART, bus::ti99::gromport::ti99_cartridge_device, "ti99cart", "TI-99 cartridge")
@@ -94,7 +94,6 @@ ti99_cartridge_device::ti99_cartridge_device(const machine_config &mconfig, cons
 :   device_t(mconfig, TI99_CART, tag, owner, clock),
 	device_cartrom_image_interface(mconfig, *this),
 	m_pcbtype(0),
-	m_slot(0),
 	m_pcb(nullptr),
 	m_connector(nullptr)
 {
@@ -274,7 +273,8 @@ int ti99_cartridge_device::get_index_from_tagname()
 std::pair<std::error_condition, std::string> ti99_cartridge_device::call_load()
 {
 	// File name is in m_basename
-	LOGMASKED(LOG_CHANGE, "Loading %s in slot %s\n", basename());
+	int slot = get_index_from_tagname() + 1;
+	LOGMASKED(LOG_CHANGE, "Loading %s in slot %d\n", basename(), slot);
 
 	if (loaded_through_softlist())
 	{
@@ -363,8 +363,7 @@ std::pair<std::error_condition, std::string> ti99_cartridge_device::call_load()
 	prepare_cartridge();
 	m_pcb->set_cartridge(this);
 	m_pcb->set_tag(tag());
-	m_slot = get_index_from_tagname();
-	m_connector->insert(m_slot, this);
+	m_connector->insert();
 	return std::make_pair(std::error_condition(), std::string());
 }
 
@@ -387,13 +386,21 @@ void ti99_cartridge_device::call_unload()
 		}
 	}
 
-	m_pcb = nullptr;
-	m_connector->remove(m_slot);
-}
+	// If we don't clear this, swapping cartridges may make old contents reappear
+	if (memregion("grom"))
+		machine().memory().region_free(memregion("grom")->name());
 
-void ti99_cartridge_device::set_slot(int i)
-{
-	m_slot = i;
+	if (memregion("rom"))
+		machine().memory().region_free(memregion("rom")->name());
+
+	if (memregion("nvram"))
+		machine().memory().region_free(memregion("nvram")->name());
+
+	if (memregion("ram"))
+		machine().memory().region_free(memregion("ram")->name());
+
+	m_pcb = nullptr;
+	m_connector->remove();
 }
 
 void ti99_cartridge_device::readz(offs_t offset, uint8_t *value)
@@ -448,11 +455,6 @@ void ti99_cartridge_device::gclock_in(int state)
 bool ti99_cartridge_device::is_grom_idle()
 {
 	return (m_pcb != nullptr)? m_pcb->is_grom_idle() : false;
-}
-
-void ti99_cartridge_device::device_config_complete()
-{
-	m_connector = static_cast<cartridge_connector_device*>(owner());
 }
 
 /*

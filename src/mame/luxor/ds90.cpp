@@ -69,12 +69,12 @@ private:
 	required_device_array<floppy_connector, 3> m_floppy;
 	required_device<nscsi_callback_device> m_sasi;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 
-	void program_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 };
 
 void x37_state::program_map(address_map &map)

@@ -37,10 +37,10 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_prg_map(address_map &map);
-	void sub_prg_map(address_map &map);
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void sub_prg_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 uint32_t namcos1b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

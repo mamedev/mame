@@ -67,7 +67,7 @@ to be upgraded with an EMI PCB (power supply related, meaningless for emulation)
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -101,8 +101,8 @@ public:
 	void galileo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -111,7 +111,7 @@ private:
 	required_device<input_merger_device> m_stb;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<speaker_sound_device> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<9> m_inputs;
 
@@ -120,7 +120,7 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_led_data[2] = { };
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void update_display();
 	void mux_w(u8 data);
@@ -173,7 +173,7 @@ INPUT_CHANGED_MEMBER(leo_state::go_button)
 void leo_state::update_display()
 {
 	m_display->matrix_partial(0, 8, 1 << (m_inp_mux & 0xf), m_led_data[0]);
-	m_display->matrix_partial(8, 2, 1 << BIT(m_inp_mux, 5), (~m_inp_mux << 2 & 0x300) | m_led_data[1]);
+	m_display->matrix_partial(8, 2, 1 << BIT(m_inp_mux, 5), (m_inp_mux << 2 & 0x300) | m_led_data[1]);
 }
 
 void leo_state::mux_w(u8 data)
@@ -181,16 +181,16 @@ void leo_state::mux_w(u8 data)
 	// d0-d3: input/chessboard led mux
 	// d5: button led select
 	// d6,d7: button led data
-	m_inp_mux = data;
+	m_inp_mux = data ^ 0xc0;
 	update_display();
 
 	// d4: speaker out
-	m_dac->level_w(BIT(data, 4));
+	m_dac->write(BIT(data, 4));
 }
 
 void leo_state::leds_w(u8 data)
 {
-	// button led data
+	// d0-d7: button led data
 	m_led_data[1] = ~data;
 	update_display();
 }
@@ -222,8 +222,8 @@ u8 leo_state::p2_r()
 	u8 data = 0;
 
 	// P20-P22: multiplexed inputs
-	u8 mux = (m_inp_mux & 8) ? 8 : (m_inp_mux & 7);
-	data = m_inputs[mux]->read();
+	if ((m_inp_mux & 0xf) <= 8)
+		data = m_inputs[m_inp_mux & 0xf]->read();
 
 	// P23: serial rx
 	data |= m_rs232->rxd_r() << 3;
@@ -291,8 +291,8 @@ void leo_state::main_map(address_map &map)
 {
 	map(0x0002, 0x0002).rw(FUNC(leo_state::p1_r), FUNC(leo_state::p1_w)); // external
 	map(0x4000, 0x5fff).ram().share("nvram");
-	map(0x6000, 0x6000).w(FUNC(leo_state::mux_w));
-	map(0x7000, 0x7000).w(FUNC(leo_state::leds_w));
+	map(0x6000, 0x6000).mirror(0x0fff).w(FUNC(leo_state::mux_w));
+	map(0x7000, 0x7000).mirror(0x0fff).w(FUNC(leo_state::leds_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -351,7 +351,7 @@ static INPUT_PORTS_START( leonardo )
 	PORT_CONFSETTING(    0x04, DEF_STR( Normal ) )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, leo_state, go_button, 0) PORT_NAME("Go")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(leo_state::go_button), 0) PORT_NAME("Go")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( galileo ) // same buttons, but different locations
@@ -384,7 +384,7 @@ static INPUT_PORTS_START( galileo ) // same buttons, but different locations
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Set Up")
 
 	PORT_MODIFY("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, leo_state, go_button, 0) PORT_NAME("Go")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(leo_state::go_button), 0) PORT_NAME("Go")
 INPUT_PORTS_END
 
 
@@ -426,7 +426,7 @@ void leo_state::leonardo(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	// expansion module (configure after video)
 	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
@@ -484,8 +484,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, leonardo,  0,        0,      leonardo,  leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, leonardoa, leonardo, 0,      leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, leonardob, leonardo, 0,      leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (v1.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, leonardo,  0,        0,      leonardo,  leonardo,  leo_state, empty_init, "SciSys / Heuristic Software", "Kasparov Leonardo (v1.4)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, leonardoa, leonardo, 0,      leonardoa, leonardo,  leo_state, empty_init, "SciSys / Heuristic Software", "Kasparov Leonardo (v1.2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, leonardob, leonardo, 0,      leonardoa, leonardo,  leo_state, empty_init, "SciSys / Heuristic Software", "Kasparov Leonardo (v1.0)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1988, galileo,   leonardo, 0,      galileo,   galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo (v1.4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, galileo,   leonardo, 0,      galileo,   galileo,   leo_state, empty_init, "Saitek / Heuristic Software", "Kasparov Galileo (v1.4)", MACHINE_SUPPORTS_SAVE )

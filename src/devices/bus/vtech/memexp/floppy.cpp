@@ -11,8 +11,11 @@
 
 #include "emu.h"
 #include "floppy.h"
-#include "formats/vt_dsk.h"
+
 #include "formats/fs_vtech.h"
+#include "formats/vt_dsk.h"
+
+#include <algorithm>
 
 
 //**************************************************************************
@@ -143,7 +146,7 @@ void vtech_floppy_controller_device::device_reset()
 	m_last_latching_inverter_update_time = machine().time();
 	m_write_start_time = attotime::never;
 	m_write_position = 0;
-	memset(m_write_buffer, 0, sizeof(m_write_buffer));
+	std::fill(std::begin(m_write_buffer), std::end(m_write_buffer), attotime::zero);
 }
 
 
@@ -309,13 +312,13 @@ void vtech_floppy_controller_device::flush_writes(bool keep_margin)
 	m_write_position -= kept_count;
 	if(m_write_position && m_write_buffer[0] == m_write_start_time) {
 		if(m_write_position)
-			memmove(m_write_buffer, m_write_buffer+1, sizeof(m_write_buffer[0])*(m_write_position-1));
+			std::copy_n(m_write_buffer + 1, m_write_position - 1, m_write_buffer);
 		m_write_position--;
 	}
 	m_selected_floppy->write_flux(m_write_start_time, limit, m_write_position, m_write_buffer);
 	m_write_start_time = limit;
 
 	if(kept_count != 0)
-		memmove(m_write_buffer, m_write_buffer+kept_pos, kept_count*sizeof(m_write_buffer[0]));
+		std::copy_n(m_write_buffer + kept_pos, kept_count, m_write_buffer);
 	m_write_position = kept_count;
 }

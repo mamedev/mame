@@ -27,6 +27,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstring>
+#include <tuple>
 
 // need to set LOG_OUTPUT_FUNC or LOG_OUTPUT_STREAM because there's no logerror outside devices
 #define LOG_OUTPUT_FUNC osd_printf_verbose
@@ -182,7 +183,7 @@ bool load_ico_image(util::random_read &fp, unsigned count, unsigned index, bitma
 	icon_dir_entry_t dir;
 	err = fp.seek(sizeof(icon_dir_t) + (sizeof(icon_dir_entry_t) * index), SEEK_SET);
 	if (!err)
-		err = fp.read(&dir, sizeof(dir), actual);
+		std::tie(err, actual) = read(fp, &dir, sizeof(dir));
 	if (err || (sizeof(dir) != actual))
 	{
 		LOG("Failed to read ICO file directory entry %u\n", index);
@@ -215,7 +216,7 @@ int images_in_ico(util::random_read &fp)
 	icon_dir_t header;
 	err = fp.seek(0, SEEK_SET);
 	if (!err)
-		err = fp.read(&header, sizeof(header), actual);
+		std::tie(err, actual) = read(fp, &header, sizeof(header));
 	if (err || (sizeof(header) != actual))
 	{
 		LOG("Failed to read ICO file header\n");
@@ -278,53 +279,65 @@ void render_load_ico_highest_detail(util::random_read &fp, bitmap_argb32 &bitmap
 {
 	// read and check the icon file header - logs a message on error
 	int const count(images_in_ico(fp));
-	if (0 <= count)
+	if (0 > count)
 	{
-		// now load all the directory entries
-		size_t const dir_bytes(sizeof(icon_dir_entry_t) * count);
-		std::unique_ptr<icon_dir_entry_t []> dir(new (std::nothrow) icon_dir_entry_t [count]);
-		std::unique_ptr<unsigned []> index(new (std::nothrow) unsigned [count]);
-		size_t actual;
-		if (count && (!dir || !index || fp.read(dir.get(), dir_bytes, actual) || (dir_bytes != actual)))
+		bitmap.reset();
+		return;
+	}
+
+	// now load all the directory entries
+	size_t const dir_bytes(sizeof(icon_dir_entry_t) * count);
+	std::unique_ptr<icon_dir_entry_t []> dir(new (std::nothrow) icon_dir_entry_t [count]);
+	std::unique_ptr<unsigned []> index(new (std::nothrow) unsigned [count]);
+	if (count)
+	{
+		if (!dir || !index)
+		{
+			LOG("Failed to allocate memory for ICO file directory entries\n");
+			bitmap.reset();
+			return;
+		}
+		auto const [err, actual] = read(fp, dir.get(), dir_bytes);
+		if (err || (dir_bytes != actual))
 		{
 			LOG("Failed to read ICO file directory entries\n");
+			bitmap.reset();
+			return;
 		}
-		else
-		{
-			// byteswap and sort by (pixels, depth)
-			for (int i = 0; count > i; ++i)
-			{
-				dir[i].byteswap();
-				index[i] = i;
-			}
-			std::stable_sort(
-					index.get(),
-					index.get() + count,
-					[&dir] (unsigned x, unsigned y)
-					{
-						unsigned const x_pixels(dir[x].get_width() * dir[x].get_height());
-						unsigned const y_pixels(dir[y].get_width() * dir[y].get_height());
-						if (x_pixels > y_pixels)
-							return true;
-						else if (x_pixels < y_pixels)
-							return false;
-						else
-							return dir[x].bpp > dir[y].bpp;
-					});
+	}
 
-			// walk down until something works
-			for (int i = 0; count > i; ++i)
+	// byteswap and sort by (pixels, depth)
+	for (int i = 0; count > i; ++i)
+	{
+		dir[i].byteswap();
+		index[i] = i;
+	}
+	std::stable_sort(
+			index.get(),
+			index.get() + count,
+			[&dir] (unsigned x, unsigned y)
 			{
-				LOG(
-						"Try loading ICO file entry %u: %u*%u, %u bits per pixel\n",
-						index[i],
-						dir[index[i]].get_width(),
-						dir[index[i]].get_height(),
-						dir[index[i]].bpp);
-				if (load_ico_image(fp, index[i], dir[index[i]], bitmap))
-					return;
-			}
-		}
+				unsigned const x_pixels(dir[x].get_width() * dir[x].get_height());
+				unsigned const y_pixels(dir[y].get_width() * dir[y].get_height());
+				if (x_pixels > y_pixels)
+					return true;
+				else if (x_pixels < y_pixels)
+					return false;
+				else
+					return dir[x].bpp > dir[y].bpp;
+			});
+
+	// walk down until something works
+	for (int i = 0; count > i; ++i)
+	{
+		LOG(
+				"Try loading ICO file entry %u: %u*%u, %u bits per pixel\n",
+				index[i],
+				dir[index[i]].get_width(),
+				dir[index[i]].get_height(),
+				dir[index[i]].bpp);
+		if (load_ico_image(fp, index[i], dir[index[i]], bitmap))
+			return;
 	}
 	bitmap.reset();
 }

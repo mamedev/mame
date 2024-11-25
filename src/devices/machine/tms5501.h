@@ -63,7 +63,7 @@ public:
 
 	uint8_t get_vector();
 
-	virtual void io_map(address_map &map);
+	virtual void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t rb_r();
 	uint8_t xi_r();
@@ -78,8 +78,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;

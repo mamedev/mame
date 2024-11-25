@@ -273,7 +273,7 @@ public:
 	void t4490(machine_config &config);
 
 private:
-	void t4490_map(address_map &map);
+	void t4490_map(address_map &map) ATTR_COLD;
 	required_device<m6800_cpu_device> m_maincpu;
   //    virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
 	required_device<pia6821_device> m_pia1;

@@ -23,7 +23,7 @@ public:
 	pinsnd88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// overrides
-	virtual void device_reset() override; // power up reset
+	virtual void device_reset() override ATTR_COLD; // power up reset
 
 	// note to keep synchronization working, the host machine should have synchronization timer expired delegates
 	// if possible, before writing to the following things:
@@ -34,15 +34,15 @@ public:
 	// callbacks
 	auto syncq_cb() { return m_syncq_cb.bind(); }
 
-	void pinsnd88_map(address_map &map);
+	void pinsnd88_map(address_map &map) ATTR_COLD;
 
 protected:
 	// constructor with overridable type for subclass, in case we want to put NARC's sound board in here eventually
 	//pinsnd88_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(deferred_sync_w);
 

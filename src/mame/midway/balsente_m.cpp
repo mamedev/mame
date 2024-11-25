@@ -360,7 +360,7 @@ void balsente_state::teamht_multiplex_select_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(balsente_state::nstocker_bits_r)
+ioport_value balsente_state::nstocker_bits_r()
 {
 	return m_nstocker_bits;
 }

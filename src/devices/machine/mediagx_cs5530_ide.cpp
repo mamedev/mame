@@ -43,10 +43,10 @@ void mediagx_cs5530_ide_device::device_add_mconfig(machine_config &config)
 void mediagx_cs5530_ide_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-//	index 0x24-0xff reserved
+//  index 0x24-0xff reserved
 }
 
-// 
+//
 void mediagx_cs5530_ide_device::primary_ide_map(address_map &map)
 {
 	map(0x01f0, 0x01f7).rw(FUNC(mediagx_cs5530_ide_device::ide1_read32_cs0_r), FUNC(mediagx_cs5530_ide_device::ide1_write32_cs0_w));
@@ -121,8 +121,8 @@ void mediagx_cs5530_ide_device::io_map(address_map &map)
 {
 	map(0x00, 0x07).rw(m_ide1, FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
 	map(0x08, 0x0f).rw(m_ide2, FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
-//	map(0x20, 0x23).select(0x18) Channel # (bit 5) Drive # (bit 3) PIO
-//	map(0x24, 0x27).select(0x18) Channel # (bit 5) Drive # (bit 3) DMA Control
+//  map(0x20, 0x23).select(0x18) Channel # (bit 5) Drive # (bit 3) PIO
+//  map(0x24, 0x27).select(0x18) Channel # (bit 5) Drive # (bit 3) DMA Control
 }
 
 void mediagx_cs5530_ide_device::device_start()

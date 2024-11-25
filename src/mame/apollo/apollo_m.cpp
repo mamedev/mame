@@ -131,8 +131,8 @@ public:
 	apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 private:
 	// internal state
 };
@@ -748,7 +748,7 @@ uint8_t apollo_sio::read(offs_t offset)
 	}
 
 	// omit logging if sio is being polled from the boot rom
-	if ((offset != last_read8_offset[1] || data != last_read8_value[1]) && \
+	if ((offset != last_read8_offset[1] || data != last_read8_value[1]) &&
 		(offset != last_read8_offset[0] || data != last_read8_value[0]))
 	{
 		last_read8_offset[0] = last_read8_offset[1];

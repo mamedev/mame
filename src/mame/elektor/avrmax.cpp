@@ -74,7 +74,7 @@ public:
 	void atm18mcc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -88,8 +88,8 @@ private:
 	int m_shift_clk = 0;
 
 	// address maps
-	void main_map(address_map &map);
-	void data_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void input_w(u8 data);
@@ -370,8 +370,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 2009, avrmax,    0,        0,      avrmax,   avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max Chess Computer (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-SYST( 2009, avrmaxg,   avrmax,   0,      avrmax,   avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max-Schachzwerg (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // German 'text'
+SYST( 2009, avrmax,    0,        0,      avrmax,   avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max Chess Computer (English)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 2009, avrmaxg,   avrmax,   0,      avrmax,   avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max-Schachzwerg (German)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // German 'text'
 
-SYST( 2009, atm18mcc,  0,        0,      atm18mcc, avrmax, avrmax_state, empty_init, "Elektor", "ATM18 Mini Chess Computer (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-SYST( 2009, cc2schach, atm18mcc, 0,      atm18mcc, avrmax, avrmax_state, empty_init, "Elektor", "CC2-Schachzwerg (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+SYST( 2009, atm18mcc,  0,        0,      atm18mcc, avrmax, avrmax_state, empty_init, "Elektor", "ATM18 Mini Chess Computer (English)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 2009, cc2schach, atm18mcc, 0,      atm18mcc, avrmax, avrmax_state, empty_init, "Elektor", "CC2-Schachzwerg (German)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

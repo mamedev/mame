@@ -53,7 +53,7 @@ public:
 	void prof80(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(motor_off);
 
@@ -93,9 +93,9 @@ private:
 	// timers
 	emu_timer   *m_floppy_motor_off_timer = nullptr;
 
-	void prof80_io(address_map &map);
-	void prof80_mem(address_map &map);
-	void prof80_mmu(address_map &map);
+	void prof80_io(address_map &map) ATTR_COLD;
+	void prof80_mem(address_map &map) ATTR_COLD;
+	void prof80_mmu(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_CONITEC_PROF80_H

@@ -88,8 +88,8 @@ void pasopia_rampac2_device::device_start()
 
 bool pasopia_rampac2_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(&m_ram[0], m_ram_size, actual) && actual == m_ram_size;
+	auto const [err, actual] = read(file, &m_ram[0], m_ram_size);
+	return !err && (actual == m_ram_size);
 }
 
 
@@ -99,8 +99,8 @@ bool pasopia_rampac2_device::nvram_read(util::read_stream &file)
 
 bool pasopia_rampac2_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_ram[0], m_ram_size, actual) && actual == m_ram_size;
+	auto const [err, actual] = write(file, &m_ram[0], m_ram_size);
+	return !err;
 }
 
 

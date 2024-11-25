@@ -98,7 +98,7 @@ void joyport_device::device_start()
 
 void joyport_device::device_config_complete()
 {
-	m_connected = dynamic_cast<device_ti99_joyport_interface*>(subdevices().first());
+	m_connected = get_card_device();
 }
 
 /*****************************************************************************/

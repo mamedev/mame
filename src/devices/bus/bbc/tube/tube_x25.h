@@ -8,9 +8,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_X25_H
+#define MAME_BUS_BBC_TUBE_TUBE_X25_H
 
-#ifndef MAME_BUS_BBC_TUBE_X25_H
-#define MAME_BUS_BBC_TUBE_X25_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/z80/z80.h"
@@ -36,11 +37,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual uint8_t host_r(offs_t offset) override;
 	virtual void host_w(offs_t offset, uint8_t data) override;
@@ -53,15 +54,14 @@ private:
 	required_memory_bank_array<2> m_bank;
 	std::unique_ptr<uint8_t[]> m_ram;
 
-	void primary_mem(address_map &map);
-	void primary_io(address_map &map);
-	void secondary_mem(address_map &map);
-	void secondary_io(address_map &map);
+	void primary_mem(address_map &map) ATTR_COLD;
+	void primary_io(address_map &map) ATTR_COLD;
+	void secondary_mem(address_map &map) ATTR_COLD;
+	void secondary_io(address_map &map) ATTR_COLD;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_TUBE_X25, bbc_tube_x25_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_X25_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_X25_H

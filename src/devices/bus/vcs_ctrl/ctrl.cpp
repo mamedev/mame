@@ -65,12 +65,14 @@ void vcs_control_port_device::device_start()
 //  SLOT_INTERFACE( vcs_control_port_devices )
 //-------------------------------------------------
 
+#include "cx85.h"
 #include "joybooster.h"
 #include "joystick.h"
 #include "keypad.h"
 #include "lightpen.h"
 #include "mouse.h"
 #include "paddles.h"
+#include "trakball.h"
 #include "wheel.h"
 
 void vcs_control_port_devices(device_slot_interface &device)
@@ -82,6 +84,8 @@ void vcs_control_port_devices(device_slot_interface &device)
 	device.option_add("joybstr", VCS_JOYSTICK_BOOSTER);
 	device.option_add("wheel", VCS_WHEEL);
 	device.option_add("keypad", VCS_KEYPAD);
+	device.option_add("cx85", ATARI_CX85);
+	device.option_add("trakball", ATARI_TRAKBALL);
 }
 
 void a800_control_port_devices(device_slot_interface &device)

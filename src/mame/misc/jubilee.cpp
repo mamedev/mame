@@ -231,11 +231,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_jubileep(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
-	void jubileep_cru_map(address_map &map);
-	void jubileep_map(address_map &map);
+	void jubileep_cru_map(address_map &map) ATTR_COLD;
+	void jubileep_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint8_t mux_sel = 0;
 	uint8_t muxlamps = 0;

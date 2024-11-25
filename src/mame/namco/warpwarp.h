@@ -95,10 +95,9 @@ private:
 	void lock_out_w(int state);
 	void geebee_bgw_w(int state);
 	void ball_on_w(int state);
-	void inv_w(int state);
 	void geebee_videoram_w(offs_t offset, uint8_t data);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	DECLARE_MACHINE_RESET(kaitei);
 
 	DECLARE_VIDEO_START(geebee);
@@ -120,10 +119,10 @@ private:
 
 	void vblank_irq(int state);
 
-	void bombbee_map(address_map &map);
-	void geebee_map(address_map &map);
-	void geebee_port_map(address_map &map);
-	void warpwarp_map(address_map &map);
+	void bombbee_map(address_map &map) ATTR_COLD;
+	void geebee_map(address_map &map) ATTR_COLD;
+	void geebee_port_map(address_map &map) ATTR_COLD;
+	void warpwarp_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NAMCO_WARPWARP_H

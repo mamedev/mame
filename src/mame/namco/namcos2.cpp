@@ -570,14 +570,14 @@ C102 - Controls CPU access to ROZ Memory Area.
 /* 68000/6809/63705 Shared memory area - DUAL PORT Memory    */
 /*************************************************************/
 
-uint16_t namcos2_state::dpram_word_r(offs_t offset)
+u16 namcos2_state::dpram_word_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-void namcos2_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void namcos2_state::dpram_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if( ACCESSING_BITS_0_7 )
+	if (ACCESSING_BITS_0_7)
 	{
 		m_dpram[offset] = data & 0xff;
 
@@ -586,9 +586,9 @@ void namcos2_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	}
 }
 
-void gollygho_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gollygho_state::dpram_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if( ACCESSING_BITS_0_7 )
+	if (ACCESSING_BITS_0_7)
 	{
 		m_dpram[offset] = data & 0xff;
 
@@ -636,10 +636,10 @@ void gollygho_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mas
 			{
 				// output 7segs
 				// 6/9 have no roof/tail, so presume 7448
-				static const uint8_t ls48_map[0x10] =
+				static const u8 ls48_map[0x10] =
 					{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-				int group = (offset * 2) - 0xc4;
+				int group = (offset << 1) - 0xc4;
 				m_out_digit[group | 0] = ls48_map[data >> 4 & 0xf];
 				m_out_digit[group | 1] = ls48_map[data & 0xf];
 				break;
@@ -652,12 +652,12 @@ void gollygho_state::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mas
 }
 
 
-uint8_t namcos2_state::dpram_byte_r(offs_t offset)
+u8 namcos2_state::dpram_byte_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-void namcos2_state::dpram_byte_w(offs_t offset, uint8_t data)
+void namcos2_state::dpram_byte_w(offs_t offset, u8 data)
 {
 	m_dpram[offset] = data;
 }
@@ -694,7 +694,7 @@ void namcos2_state::namcos2_68k_default_cpu_board_am(address_map &map)
 void namcos2_state::common_default_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
-	map(0xc00000, 0xc03fff).ram().share("spriteram");
+	map(0xc00000, 0xc03fff).ram().share(m_spriteram);
 	map(0xc40000, 0xc40001).rw(FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w));
 	map(0xc80000, 0xc9ffff).ram().w(m_ns2roz, FUNC(namcos2_roz_device::rozram_word_w)).share("rozram");
 	map(0xcc0000, 0xcc000f).ram().share("rozctrl");
@@ -735,7 +735,7 @@ void namcos2_state::common_finallap_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
 	map(0x300000, 0x33ffff).r(FUNC(namcos2_state::namcos2_finallap_prot_r));
-	map(0x800000, 0x80ffff).ram().share("spriteram");
+	map(0x800000, 0x80ffff).ram().share(m_spriteram);
 	map(0x840000, 0x840001).rw(FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w));
 	map(0x880000, 0x89ffff).rw(m_c45_road, FUNC(namco_c45_road_device::read), FUNC(namco_c45_road_device::write));
 	map(0x8c0000, 0x8c0001).nopw();
@@ -780,7 +780,7 @@ void namcos2_state::slave_sgunner_am(address_map &map)
 void namcos2_state::common_metlhawk_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
-	map(0xc00000, 0xc03fff).ram().share("spriteram");
+	map(0xc00000, 0xc03fff).ram().share(m_spriteram);
 	map(0xc40000, 0xc4ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
 	map(0xd00000, 0xd0001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
 	map(0xe00000, 0xe00001).rw(FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w)); /* ??? */
@@ -1572,16 +1572,7 @@ static const gfx_layout obj_layout =
 	32*32*8 /* sprite offset */
 };
 
-static const gfx_layout metlhawk_sprite_layout =
-{
-	32,32,
-	RGN_FRAC(1,1), /* number of sprites */
-	8, /* bits per pixel */
-	{ STEP8(0,1) },
-	{ STEP32(0,8) },
-	{ STEP32(0,8*32) },
-	32*32*8
-};
+static GFXLAYOUT_RAW(metlhawk_sprite_layout, 32, 32, 32*8, 32*32*8);
 
 static const gfx_layout metlhawk_sprite_layout_swapped =
 {
@@ -1594,12 +1585,12 @@ static const gfx_layout metlhawk_sprite_layout_swapped =
 	32*32*8
 };
 
-static GFXDECODE_START( gfx_metlhawk )
+static GFXDECODE_START( gfx_metlhawk_spr )
 	GFXDECODE_ENTRY( "sprite", 0x000000, metlhawk_sprite_layout,         0, 16 )
 	GFXDECODE_ENTRY( "sprite", 0x000000, metlhawk_sprite_layout_swapped, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_namcos2 )
+static GFXDECODE_START( gfx_namcos2_spr )
 	GFXDECODE_ENTRY( "sprite", 0x000000, obj_layout, 0, 16 )
 GFXDECODE_END
 
@@ -1727,8 +1718,8 @@ void namcos2_state::configure_common_standard(machine_config &config)
 // TODO: temp
 TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 {
-	int scanline = param;
-	int cur_posirq = get_pos_irq_scanline();
+	const int scanline = param;
+	const int cur_posirq = get_pos_irq_scanline();
 
 	if (scanline == 200) // triggering this a bit before Vblank allows the Assault Plus mode select screen to work without overclocking the IO MCU, exact timings unknown.
 	{
@@ -1743,7 +1734,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 	{
 		m_master_intc->vblank_irq_trigger();
 		m_slave_intc->vblank_irq_trigger();
-
 	}
 
 	if(scanline == cur_posirq)
@@ -1751,7 +1741,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 		m_master_intc->pos_irq_trigger();
 		m_slave_intc->pos_irq_trigger();
 		// TODO: should be when video registers are updated (and/or latched) but that makes things worse
-		m_screen->update_partial(m_update_to_line_before_posirq ? param-1 : param);
+		m_screen->update_partial(m_update_to_line_before_posirq ? param - 1 : param);
 	}
 }
 
@@ -1792,8 +1782,7 @@ void namcos2_state::configure_c45road_standard(machine_config &config)
 
 void namcos2_state::configure_namcos2_sprite_standard(machine_config &config)
 {
-	NAMCOS2_SPRITE(config, m_ns2sprite, 0);
-	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
+	NAMCOS2_SPRITE(config, m_ns2sprite, 0, m_c116, gfx_namcos2_spr);
 	m_ns2sprite->set_spriteram_tag("spriteram");
 }
 
@@ -1820,8 +1809,6 @@ void namcos2_state::base_noio(machine_config &config)
 	configure_c116_standard(config);
 
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update));
-
-	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
 
 	configure_namcos2_sprite_standard(config);
 	configure_c123tmap_standard(config);
@@ -1890,8 +1877,6 @@ void namcos2_state::finallap_noio(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_finallap));
 
-	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos2);
-
 	configure_namcos2_sprite_standard(config);
 	configure_c123tmap_standard(config);
 	configure_c45road_standard(config);
@@ -1912,8 +1897,7 @@ void namcos2_state::finallap(machine_config &config)
 {
 	base_fl(config);
 
-	NAMCOS2_SPRITE_FINALLAP(config.replace(), m_ns2sprite, 0);
-	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
+	NAMCOS2_SPRITE_FINALLAP(config.replace(), m_ns2sprite, 0, m_c116, gfx_namcos2_spr);
 	m_ns2sprite->set_spriteram_tag("spriteram");
 }
 
@@ -2062,10 +2046,7 @@ void namcos2_state::metlhawk(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_metlhawk));
 
-	GFXDECODE(config, m_gfxdecode, m_c116, gfx_metlhawk);
-
-	NAMCOS2_SPRITE_METALHAWK(config, m_ns2sprite, 0);
-	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
+	NAMCOS2_SPRITE_METALHAWK(config, m_ns2sprite, 0, m_c116, gfx_metlhawk_spr);
 	m_ns2sprite->set_spriteram_tag("spriteram");
 
 	configure_c123tmap_standard(config);
@@ -2426,6 +2407,9 @@ ROM_START( cosmogng )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "co2voi1.bin",  0x000000, 0x080000, CRC(5a301349) SHA1(e333ea5955a66ac8d7c94cd50047efaf6fa95b15) )
 	ROM_LOAD16_BYTE( "co2voi2.bin",  0x100000, 0x080000, CRC(a27cb45a) SHA1(08ccaaf43369e8358e31b213877829bdfd61479e) )
+
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6n", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* COSMO GANG THE VIDEO (JAPAN) */
@@ -2469,6 +2453,9 @@ ROM_START( cosmogngj )
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "co1voi1.bin",  0x000000, 0x080000, CRC(b5ba8f15) SHA1(9e54b9ba1cd44353782adf337376dff9eec4e937) )
 	ROM_LOAD16_BYTE( "co1voi2.bin",  0x100000, 0x080000, CRC(b566b105) SHA1(b5530b0f3dea0135f28419044aee923d855f382c) )
+
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6n", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
 /* DIRT FOX (JAPAN) */
@@ -2896,8 +2883,8 @@ ROM_START( finalap2 )
 	ROM_LOAD16_BYTE( "fls2mp1b",  0x000001, 0x020000, CRC(c9f3e0e7) SHA1(4127e373239e4ca31b5fa8b71d8f10b7d7ed93c2) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
-	ROM_LOAD16_BYTE( "fls2sp0b",  0x000000, 0x020000, CRC(8bf15d9c) SHA1(b6c14a9d06e99d03636fd6eb2163a18e2bbcc4b1) )
-	ROM_LOAD16_BYTE( "fls2sp1b",  0x000001, 0x020000, CRC(c1a31086) SHA1(55317b72a219ffbfe00bf62ad2a635790d56f84e) )
+	ROM_LOAD16_BYTE( "fls1sp0b",  0x000000, 0x020000, CRC(8bf15d9c) SHA1(b6c14a9d06e99d03636fd6eb2163a18e2bbcc4b1) )
+	ROM_LOAD16_BYTE( "fls1sp1b",  0x000001, 0x020000, CRC(c1a31086) SHA1(55317b72a219ffbfe00bf62ad2a635790d56f84e) )
 
 	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound CPU (Banked) */
 	ROM_LOAD( "flss0",  0x000000, 0x020000, CRC(c07cc10a) SHA1(012f19a8014a77fdf0409241c0223b2c0c247357) )
@@ -2950,8 +2937,8 @@ ROM_START( finalap2j )
 	ROM_LOAD16_BYTE( "fls1_mp1.bin",  0x000001, 0x020000, CRC(fb189f50) SHA1(9436aea727adf9e11e8061d0ded4e4b00df90b70) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
-	ROM_LOAD16_BYTE( "fls2sp0b",  0x000000, 0x020000, CRC(8bf15d9c) SHA1(b6c14a9d06e99d03636fd6eb2163a18e2bbcc4b1) )
-	ROM_LOAD16_BYTE( "fls2sp1b",  0x000001, 0x020000, CRC(c1a31086) SHA1(55317b72a219ffbfe00bf62ad2a635790d56f84e) )
+	ROM_LOAD16_BYTE( "fls1sp0b",  0x000000, 0x020000, CRC(8bf15d9c) SHA1(b6c14a9d06e99d03636fd6eb2163a18e2bbcc4b1) )
+	ROM_LOAD16_BYTE( "fls1sp1b",  0x000001, 0x020000, CRC(c1a31086) SHA1(55317b72a219ffbfe00bf62ad2a635790d56f84e) )
 
 	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound CPU (Banked) */
 	ROM_LOAD( "flss0",  0x000000, 0x020000, CRC(c07cc10a) SHA1(012f19a8014a77fdf0409241c0223b2c0c247357) )
@@ -5546,7 +5533,7 @@ void namcos2_state::init_finalap3()
 	m_finallap_prot_count = 0;
 }
 
-uint16_t namcos2_state::finalap3bl_prot_r()
+u16 namcos2_state::finalap3bl_prot_r()
 {
 	// code at 0x3f22 expects this to be 0x4d00 or it sets a value in NVRAM which prevents booting
 	// address 0x180020 (0x10 in NVRAM) must also be 0x6b (machine ID code first byte) or the same will occur
@@ -5583,44 +5570,44 @@ void namcos2_state::init_marvland()
 void namcos2_state::init_metlhawk()
 {
 	/* unscramble sprites */
-	uint8_t *data = memregion("sprite")->base();
+	u8 *data = memregion("sprite")->base();
 	int size = memregion("sprite")->bytes();
-	for (int i=0; i<size; i+=32*32)
+	for (int i = 0; i < size; i += 32 * 32)
 	{
-		for (int j=0; j<32*32; j+=32*4)
+		for (int j = 0; j < 32 * 32; j += 32 * 4)
 		{
-			for (int k=0; k<32; k+=4)
+			for (int k = 0; k < 32; k += 4)
 			{
-				uint8_t v;
+				u8 v;
 				int a;
 
-				a = i+j+k+32;
+				a = i + j + k + 32;
 				v = data[a];
-				data[a]   = data[a+3];
-				data[a+3] = data[a+2];
-				data[a+2] = data[a+1];
-				data[a+1] = v;
+				data[a]     = data[a + 3];
+				data[a + 3] = data[a + 2];
+				data[a + 2] = data[a + 1];
+				data[a + 1] = v;
 
 				a += 32;
 				v = data[a];
-				data[a]   = data[a+2];
-				data[a+2] = v;
-				v = data[a+1];
-				data[a+1] = data[a+3];
-				data[a+3] = v;
+				data[a]     = data[a + 2];
+				data[a + 2] = v;
+				v = data[a + 1];
+				data[a + 1] = data[a + 3];
+				data[a + 3] = v;
 
 				a += 32;
-				data[a]   = data[a+1];
-				data[a+1] = data[a+2];
-				data[a+2] = data[a+3];
-				data[a+3] = v;
+				data[a]     = data[a+1];
+				data[a + 1] = data[a + 2];
+				data[a + 2] = data[a + 3];
+				data[a + 3] = v;
 
-				a = i+j+k;
-				for (int l=0; l<4; l++)
+				a = i + j + k;
+				for (int l = 0; l < 4; l++)
 				{
-					v = data[a+l+32];
-					data[a+l+32] = data[a+l+32*3];
-					data[a+l+32*3] = v;
+					v = data[a + l + 32];
+					data[a + l + 32] = data[a + l + 32 * 3];
+					data[a + l + 32 * 3] = v;
 				} /* next l */
 			} /* next k */
 		} /* next j */
@@ -5709,12 +5696,11 @@ void namcos2_state::init_bubbletr()
 
 void namcos2_state::init_luckywld()
 {
-	uint8_t *pData = (uint8_t *)memregion( "c169roz:mask" )->base();
-	int i;
-	for( i=0; i<32*0x4000; i++ )
+	u8 *data = (u8 *)memregion("c169roz:mask")->base();
+	for (int i = 0; i< 32 * 0x4000; i++)
 	{ /* unscramble gfx mask */
-		int code = pData[i];
-		pData[i] = bitswap<8>(code, 0, 1, 2, 3, 4, 5, 6, 7);
+		const int code = data[i];
+		data[i] = bitswap<8>(code, 0, 1, 2, 3, 4, 5, 6, 7);
 	}
 	m_gametype = NAMCOS2_LUCKY_AND_WILD;
 }

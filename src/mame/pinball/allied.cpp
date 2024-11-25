@@ -77,8 +77,8 @@ public:
 	void allied(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void ic1_b_w(u8 data);
@@ -100,7 +100,7 @@ private:
 	u8 ic7_a_r();
 	void ic8_cb2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u32 m_player_score[6]{};
 	u8 m_display = 0U;

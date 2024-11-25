@@ -31,9 +31,9 @@ public:
 	void mc50mk2(machine_config &config);
 
 private:
-	void mem_map_mc300(address_map &map);
-	void mem_map_mc50(address_map &map);
-	void io_map(address_map &map);
+	void mem_map_mc300(address_map &map) ATTR_COLD;
+	void mem_map_mc50(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z180_device> m_mpu;
 	optional_device<wd1772_device> m_wdfdc;

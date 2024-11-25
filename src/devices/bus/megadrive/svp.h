@@ -22,12 +22,12 @@ public:
 protected:
 	md_rom_svp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 
 	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) override;
 
@@ -72,8 +72,8 @@ private:
 	uint8_t m_iram[0x800]; // IRAM (0-0x7ff)
 	uint8_t m_dram[0x20000]; // [0x20000];
 
-	void md_svp_ext_map(address_map &map);
-	void md_svp_ssp_map(address_map &map);
+	void md_svp_ext_map(address_map &map) ATTR_COLD;
+	void md_svp_ssp_map(address_map &map) ATTR_COLD;
 };
 
 

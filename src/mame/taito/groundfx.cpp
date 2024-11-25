@@ -103,7 +103,7 @@ public:
 	void init_groundfx();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<u32> m_ram;
@@ -141,11 +141,9 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int do_hack, int x_offs, int y_offs);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /******************************************************************/
 
@@ -407,8 +405,6 @@ u32 groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-
-// machine
 
 /**********************************************************
             GAME INPUTS

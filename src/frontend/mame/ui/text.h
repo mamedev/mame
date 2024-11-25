@@ -66,7 +66,7 @@ public:
 	bool empty() const { return m_lines.empty(); }
 	size_t lines() const { return m_lines.size(); }
 	bool hit_test(float x, float y, size_t &start, size_t &span);
-	void restyle(size_t start, size_t span, rgb_t *fgcolor, rgb_t *bgcolor);
+	void restyle(size_t start, size_t span, rgb_t const *fgcolor, rgb_t const *bgcolor);
 	void emit(render_container &container, float x, float y);
 	void emit(render_container &container, size_t start, size_t lines, float x, float y);
 	void add_text(std::string_view text, rgb_t fgcolor = rgb_t::white(), rgb_t bgcolor = rgb_t::transparent(), float size = 1.0)

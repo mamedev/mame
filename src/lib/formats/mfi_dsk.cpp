@@ -8,6 +8,7 @@
 
 #include <cstring>
 #include <functional>
+#include <tuple>
 
 
 /*
@@ -41,8 +42,10 @@
   - 2, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
   - 3, MG_E -> End of zone
 
-  Tracks data is aligned so that the index pulse is at the start,
-  whether the disk is hard-sectored or not.
+  Tracks data is aligned so that the index pulse is at the start for soft-
+  sectored disks. For hard-sectored disks, the sector hole for the first
+  sector is at the start and the index hole is half a sector from the end
+  of the track.
 
   The position is the angular position in units of 1/200,000,000th of
   a turn.  A size in such units, not coincidentally at all, is also
@@ -58,7 +61,9 @@
   if you try to rewrite a physical disk with the data.  Some
   preservation formats encode that information, it is guessed for
   others.  The write track function of fdcs should set it.  The
-  representation is the angular position relative to the index.
+  representation is the angular position relative to the index, for
+  soft-sectored disks, and the first sector hole for hard-sectored
+  disks.
 
   The media type is divided in two parts.  The first half
   indicate the physical form factor, i.e. all medias with that
@@ -99,38 +104,46 @@ bool mfi_format::supports_save() const noexcept
 int mfi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	header h;
+	auto const [err, actual] = read_at(io, 0, &h, sizeof(header));
+	if (err || (sizeof(header) != actual))
+		return 0;
 
-	size_t actual;
-	io.read_at(0, &h, sizeof(header), actual);
-	if((memcmp( h.sign, sign, 16) == 0 || memcmp( h.sign, sign_old, 16) == 0) &&
+	if((!memcmp(h.sign, sign, 16) || !memcmp(h.sign, sign_old, 16)) &&
 		(h.cyl_count & CYLINDER_MASK) <= 84 &&
 		(h.cyl_count >> RESOLUTION_SHIFT) < 3 &&
 		h.head_count <= 2 &&
 		(!form_factor || !h.form_factor || h.form_factor == form_factor))
 		return FIFID_SIGN|FIFID_STRUCT;
+
 	return 0;
 }
 
 bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
+	std::error_condition err;
 	size_t actual;
-	header h;
-	entry entries[84*2*4];
-	io.read_at(0, &h, sizeof(header), actual);
-	int resolution = h.cyl_count >> RESOLUTION_SHIFT;
-	h.cyl_count &= CYLINDER_MASK;
 
-	io.read_at(sizeof(header), &entries, (h.cyl_count << resolution)*h.head_count*sizeof(entry), actual);
+	header h;
+	std::tie(err, actual) = read_at(io, 0, &h, sizeof(header));
+	if(err || (sizeof(header) != actual))
+		return false;
+	int const resolution = h.cyl_count >> RESOLUTION_SHIFT;
+	h.cyl_count &= CYLINDER_MASK;
 
 	image.set_form_variant(h.form_factor, h.variant);
 
 	if(!h.cyl_count)
 		return true;
 
+	entry entries[84*2*4];
+	std::tie(err, actual) = read_at(io, sizeof(header), &entries, (h.cyl_count << resolution)*h.head_count*sizeof(entry));
+	if(err || (((h.cyl_count << resolution)*h.head_count*sizeof(entry)) != actual))
+		return false;
+
 	std::function<void (const std::vector<uint32_t> &src, std::vector<uint32_t> &track)> converter;
 
-	if(!memcmp( h.sign, sign, 16)) {
-		converter = [](const std::vector<uint32_t> &src, std::vector<uint32_t> &track) -> void {
+	if(!memcmp(h.sign, sign, 16)) {
+		converter = [] (const std::vector<uint32_t> &src, std::vector<uint32_t> &track) {
 			uint32_t ctime = 0;
 			for(uint32_t mg : src) {
 				ctime += mg & TIME_MASK;
@@ -139,7 +152,7 @@ bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		};
 
 	} else {
-		converter = [](const std::vector<uint32_t> &src, std::vector<uint32_t> &track) -> void {
+		converter = [] (const std::vector<uint32_t> &src, std::vector<uint32_t> &track) {
 			unsigned int cell_count = src.size();
 			uint32_t mg = src[0] & MG_MASK;
 			uint32_t wmg = src[cell_count - 1] & MG_MASK;
@@ -184,7 +197,7 @@ bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			compressed.resize(ent->compressed_size);
 			uncompressed.resize(cell_count);
 
-			io.read_at(ent->offset, &compressed[0], ent->compressed_size, actual);
+			std::tie(err, actual) = read_at(io, ent->offset, &compressed[0], ent->compressed_size); // FIXME: check for errors and premature EOF
 
 			uLongf size = ent->uncompressed_size;
 			if(uncompress((Bytef *)uncompressed.data(), &size, &compressed[0], ent->compressed_size) != Z_OK) {
@@ -204,7 +217,6 @@ bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 bool mfi_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
-	size_t actual;
 	int tracks, heads;
 	image.get_actual_geometry(tracks, heads);
 	int resolution = image.get_resolution();
@@ -224,7 +236,7 @@ bool mfi_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	h.form_factor = image.get_form_factor();
 	h.variant = image.get_variant();
 
-	io.write_at(0, &h, sizeof(header), actual);
+	write_at(io, 0, &h, sizeof(header)); // FIXME: check for errors
 
 	memset(entries, 0, sizeof(entries));
 
@@ -258,11 +270,11 @@ bool mfi_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 			entries[epos].write_splice = image.get_write_splice_position(track >> 2, head, track & 3);
 			epos++;
 
-			io.write_at(pos, postcomp.get(), csize, actual);
+			write_at(io, pos, postcomp.get(), csize); // FIXME: check for errors
 			pos += csize;
 		}
 
-	io.write_at(sizeof(header), entries, (tracks << resolution)*heads*sizeof(entry), actual);
+	write_at(io, sizeof(header), entries, (tracks << resolution)*heads*sizeof(entry)); // FIXME: check for errors
 	return true;
 }
 

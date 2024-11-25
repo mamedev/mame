@@ -230,7 +230,7 @@ private:
 	// optional for making the compile switch to work
 	optional_device<voodoo_3_pci_device> m_voodoo3;
 
-	void comebaby_map(address_map &map);
+	void comebaby_map(address_map &map) ATTR_COLD;
 
 	static void superio_config(device_t *device);
 };

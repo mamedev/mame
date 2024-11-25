@@ -73,12 +73,12 @@ public:
 	void sleic(machine_config &config);
 
 private:
-	void main_map(address_map &map);
-	void cpu2_map(address_map &map);
-	void cpu2_io(address_map &map);
-	void cpu3_map(address_map &map);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void main_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cpu2_io(address_map &map) ATTR_COLD;
+	void cpu3_map(address_map &map) ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u8 cpu2_in00() { return 0; }   // communications + handshake
 	u8 cpu2_in01() { return 0; }   // communications + handshake
 	u8 cpu2_in02() { u8 data = 0U; for (u8 i = 0; i < 6; i++) if (BIT(m_row, i)) data |= m_io_keyboard[i]->read(); return data; }   // contactors

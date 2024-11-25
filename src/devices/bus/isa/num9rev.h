@@ -26,11 +26,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_display_pixels);
@@ -50,7 +50,7 @@ private:
 	uint8_t read8(offs_t offset);
 	void write8(offs_t offset, uint8_t data);
 
-	void upd7220_map(address_map &map);
+	void upd7220_map(address_map &map) ATTR_COLD;
 
 	required_device<upd7220_device> m_upd7220;
 	required_device<palette_device> m_palette;

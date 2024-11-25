@@ -43,7 +43,7 @@ public:
 	void get_irq_map(std::array<u8, 4> &map) const { map = m_irq; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	std::array<u8, 4> m_irq;
@@ -76,8 +76,8 @@ protected:
 	u8 m_pin_state;
 	std::array<u8, 4> m_irq_map;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	pci_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -87,5 +87,6 @@ protected:
 DECLARE_DEVICE_TYPE(PCI_SLOT, pci_slot_device)
 
 void pci_cards(device_slot_interface &device);
+void agp_cards(device_slot_interface &device);
 
 #endif

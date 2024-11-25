@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /***************************************************************************
+
     Casio GT913 (uPD913)
 
     This chip powers several late-90s/early-2000s Casio keyboards.
@@ -25,11 +26,12 @@
 
 DEFINE_DEVICE_TYPE(GT913, gt913_device, "gt913", "Casio GT913F")
 
-gt913_device::gt913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+gt913_device::gt913_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	h8_device(mconfig, GT913, tag, owner, clock, address_map_constructor(FUNC(gt913_device::map), this)),
 	device_mixer_interface(mconfig, *this, 2),
 	m_rom(*this, DEVICE_SELF),
 	m_data_config("data", ENDIANNESS_BIG, 16, 22, 0),
+	m_write_ple(*this),
 	m_intc(*this, "intc"),
 	m_sound(*this, "gt_sound"),
 	m_kbd(*this, "kbd"),
@@ -53,7 +55,7 @@ void gt913_device::map(address_map &map)
 	/* ctk530 writes here to latch LED matrix data, which generates an active high strobe on pin 99 (PLE/P16)
 	   there's otherwise no external address decoding (or the usual read/write strobes) used for the LED latches.
 	   just treat as a 16-bit write-only port for now */
-	map(0xe000, 0xe001).lw16(NAME([this](uint16_t data) { do_write_port(h8_device::PORT_4, data); }));
+	map(0xe000, 0xe001).lw16(NAME([this](u16 data) { m_write_ple(data); }));
 
 	map(0xfac0, 0xffbf).ram();
 
@@ -87,7 +89,7 @@ void gt913_device::map(address_map &map)
 	map(0xfff0, 0xfff0).rw(m_port[0], FUNC(h8_port_device::ddr_r), FUNC(h8_port_device::ddr_w));
 	// port 2 DDR - ctk601 and gz70sp both seem to use only bit 0 to indicate either all inputs or all outputs
 //  map(0xfff1, 0xfff1).rw(m_port[1], FUNC(h8_port_device::ddr_r), FUNC(h8_port_device::ddr_w));
-	map(0xfff1, 0xfff1).lw8(NAME([this](uint8_t data) { m_port[1]->ddr_w(BIT(data, 0) ? 0xff : 0x00); }));
+	map(0xfff1, 0xfff1).lw8(NAME([this](u8 data) { m_port[1]->ddr_w(BIT(data, 0) ? 0xff : 0x00); }));
 	map(0xfff2, 0xfff2).rw(m_port[0], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xfff3, 0xfff3).rw(m_port[1], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xfff4, 0xfff4).rw(m_port[2], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
@@ -120,7 +122,7 @@ void gt913_device::device_add_mconfig(machine_config &config)
 }
 
 
-void gt913_device::uart_rate_w(uint8_t data)
+void gt913_device::uart_rate_w(u8 data)
 {
 	// TODO: how is SCI1 baud rate actually selected?
 	// gz70sp writes 0x7e to ffe4 to select 31250 baud for MIDI, which doesn't seem right
@@ -128,7 +130,7 @@ void gt913_device::uart_rate_w(uint8_t data)
 	m_sci[1]->brr_w(data >> 2);
 }
 
-void gt913_device::uart_control_w(offs_t offset, uint8_t data)
+void gt913_device::uart_control_w(offs_t offset, u8 data)
 {
 	const unsigned num = BIT(offset, 2);
 	/*
@@ -139,37 +141,36 @@ void gt913_device::uart_control_w(offs_t offset, uint8_t data)
 	m_sci[num]->scr_w((data & 0x0f) << 4);
 }
 
-uint8_t gt913_device::uart_control_r(offs_t offset)
+u8 gt913_device::uart_control_r(offs_t offset)
 {
 	const unsigned num = BIT(offset, 2);
 	return (m_sci[num]->ssr_r() & 0xf0) | (m_sci[num]->scr_r() >> 4);
 }
 
-void gt913_device::syscr_w(uint8_t data)
+void gt913_device::syscr_w(u8 data)
 {
-	if(BIT(m_syscr ^ data, 2))
-		// NMI active edge has changed
-		m_intc->set_input(INPUT_LINE_NMI, CLEAR_LINE);
+	// NMI active edge
+	m_intc->set_nmi_edge(BIT(data, 2));
 
 	m_syscr = data;
 }
 
-uint8_t gt913_device::syscr_r()
+u8 gt913_device::syscr_r()
 {
 	return m_syscr;
 }
 
-void gt913_device::data_w(offs_t offset, uint8_t data)
+void gt913_device::data_w(offs_t offset, u8 data)
 {
 	m_data.write_byte(offset | (m_banknum & 0xff) << 14, data);
 }
 
-uint8_t gt913_device::data_r(offs_t offset)
+u8 gt913_device::data_r(offs_t offset)
 {
 	return m_data.read_byte(offset | (m_banknum & 0xff) << 14);
 }
 
-uint8_t gt913_device::read8ib(uint32_t adr)
+u8 gt913_device::read8ib(u32 adr)
 {
 	if(BIT(m_syscr, 0))
 		// indirect bank disabled
@@ -182,7 +183,7 @@ uint8_t gt913_device::read8ib(uint32_t adr)
 		return m_data.read_byte(adr | ((m_banknum & 0x3f) << 16));
 }
 
-void gt913_device::write8ib(uint32_t adr, uint8_t data)
+void gt913_device::write8ib(u32 adr, u8 data)
 {
 	if(BIT(m_syscr, 0))
 		// indirect bank disabled
@@ -195,7 +196,7 @@ void gt913_device::write8ib(uint32_t adr, uint8_t data)
 		m_data.write_byte(adr | ((m_banknum & 0x3f) << 16), data);
 }
 
-uint16_t gt913_device::read16ib(uint32_t adr)
+u16 gt913_device::read16ib(u32 adr)
 {
 	adr &= ~1;
 
@@ -210,7 +211,7 @@ uint16_t gt913_device::read16ib(uint32_t adr)
 		return m_data.read_word(adr | ((m_banknum & 0x3f) << 16));
 }
 
-void gt913_device::write16ib(uint32_t adr, uint16_t data)
+void gt913_device::write16ib(u32 adr, u16 data)
 {
 	adr &= ~1;
 
@@ -243,9 +244,9 @@ void gt913_device::interrupt_taken()
 	standard_irq_callback(m_intc->interrupt_taken(m_taken_irq_vector), m_NPC);
 }
 
-void gt913_device::internal_update(uint64_t current_time)
+void gt913_device::internal_update(u64 current_time)
 {
-	uint64_t event_time = 0;
+	u64 event_time = 0;
 
 	add_event(event_time, m_sci[0]->internal_update(current_time));
 	add_event(event_time, m_sci[1]->internal_update(current_time));
@@ -253,13 +254,14 @@ void gt913_device::internal_update(uint64_t current_time)
 	recompute_bcount(event_time);
 }
 
+void gt913_device::notify_standby(int state)
+{
+	m_sci[0]->notify_standby(state);
+	m_sci[1]->notify_standby(state);
+}
+
 void gt913_device::execute_set_input(int inputnum, int state)
 {
-	if(inputnum == INPUT_LINE_NMI) {
-		if(BIT(m_syscr, 2))
-			state ^= ASSERT_LINE;
-	}
-
 	m_intc->set_input(inputnum, state);
 }
 

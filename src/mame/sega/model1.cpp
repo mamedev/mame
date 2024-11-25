@@ -14,6 +14,7 @@ Known functional issues:
 
 Sega Model 1 Hardware Overview
 ------------------------------
+Documented by Guru
 
 Note! This document is a Work-In-Progress and covers all the dumped Sega Model 1 games, including...
 
@@ -485,7 +486,8 @@ Notes:
       TMP68000N-10- Toshiba TMP68000N-10 CPU, running at 10.000MHz (SDIP64, clock 20 / 2)
       82C51       - Toshiba 82C51AM-10 Programmable 8-bit I/O Serial Interface (SOP28)
       DSW1        - 4 position Dip Switch
-      MB8464      - Fujitsu MB8464 8k x8 SRAM (DIP28)
+      MB8464      - Fujitsu MB8464 8k x8 SRAM (DIP28). Jumpers JP5 and JP6 next to the RAMs are tied to A13 and A14 on the CPU
+                    buffers to allow larger RAMs to be used but both jumpers are set to VCC so only 8kB RAMs are actually used on the sound board.
       3771        - Fujitsu MB3771 Master Reset IC (DIP8)
       TL062       - ST Microelectronics Dual Low Power Operational Amplifier (DIP8)
       PC910       - Sharp PC910 opto-isolator (DIP8)
@@ -1369,10 +1371,10 @@ ROM_START( swa )
 	ROM_LOAD( "mpr-16484.4", 0x000000, 0x200000, CRC(9d4c334d) SHA1(8b4d903f14559fed425d225bb23ccfe8da23cbd3) )
 	ROM_LOAD( "mpr-16485.5", 0x200000, 0x200000, CRC(95aadcad) SHA1(4276db655db9834692c3843eb96a3e3a89cb7252) )
 
-	ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 DSB code */
+	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0 ) /* Z80 DSB code */
 	ROM_LOAD( "epr-16471.2", 0x000000, 0x020000, CRC(f4ee84a4) SHA1(f12b214e6f195b0e5f49ba9f41d8e54bfcea9acc) )
 
-	ROM_REGION( 0x800000, "mpeg", 0 ) /* DSB MPEG data */
+	ROM_REGION( 0x800000, "dsbz80:mpeg", 0 ) /* DSB MPEG data */
 	ROM_LOAD( "mpr-16514.57", 0x000000, 0x200000, CRC(3175b0be) SHA1(63649d053c8c17ce1746d16d0cc8202be20c302f) )
 	ROM_LOAD( "mpr-16515.58", 0x200000, 0x200000, CRC(3114d748) SHA1(9ef090623cdd2a1d06b5d1bc4b9a07ab4eff5b76) )
 
@@ -1417,10 +1419,10 @@ ROM_START( swaj )
 	ROM_LOAD( "mpr-16484.4", 0x000000, 0x200000, CRC(9d4c334d) SHA1(8b4d903f14559fed425d225bb23ccfe8da23cbd3) )
 	ROM_LOAD( "mpr-16485.5", 0x200000, 0x200000, CRC(95aadcad) SHA1(4276db655db9834692c3843eb96a3e3a89cb7252) )
 
-	ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 DSB code */
+	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0 ) /* Z80 DSB code */
 	ROM_LOAD( "epr-16471.2", 0x000000, 0x020000, CRC(f4ee84a4) SHA1(f12b214e6f195b0e5f49ba9f41d8e54bfcea9acc) )
 
-	ROM_REGION( 0x400000, "mpeg", 0 ) /* DSB MPEG data */
+	ROM_REGION( 0x400000, "dsbz80:mpeg", 0 ) /* DSB MPEG data */
 	ROM_LOAD( "mpr-16514.57", 0x000000, 0x200000, CRC(3175b0be) SHA1(63649d053c8c17ce1746d16d0cc8202be20c302f) )
 	ROM_LOAD( "mpr-16515.58", 0x200000, 0x200000, CRC(3114d748) SHA1(9ef090623cdd2a1d06b5d1bc4b9a07ab4eff5b76) )
 
@@ -1752,7 +1754,7 @@ void model1_state::model1(machine_config &config)
 	I8251(config, m_m1uart, 8000000); // uPD71051C, clock unknown
 	m_m1uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
 
-	clock_device &m1uart_clock(CLOCK(config, "m1uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	clock_device &m1uart_clock(CLOCK(config, "m1uart_clock", 16_MHz_XTAL / 2 / 16)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
 	m1uart_clock.signal_handler().set(m_m1uart, FUNC(i8251_device::write_txc));
 	m1uart_clock.signal_handler().append(m_m1uart, FUNC(i8251_device::write_rxc));
 }

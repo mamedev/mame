@@ -73,8 +73,8 @@ public:
 	void d110(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void bank_w(uint8_t data);
@@ -91,10 +91,10 @@ private:
 	void d10_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void d10_map(address_map &map);
-	void d10_bank_map(address_map &map);
-	void d110_map(address_map &map);
-	void d110_bank_map(address_map &map);
+	void d10_map(address_map &map) ATTR_COLD;
+	void d10_bank_map(address_map &map) ATTR_COLD;
+	void d110_map(address_map &map) ATTR_COLD;
+	void d110_bank_map(address_map &map) ATTR_COLD;
 
 	uint8_t  m_lcd_data_buffer[256]{};
 	int      m_lcd_data_buffer_pos = 0;

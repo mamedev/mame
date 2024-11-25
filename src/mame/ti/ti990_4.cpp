@@ -61,8 +61,8 @@ public:
 	void ti990_4(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t panel_read(offs_t offset);
 	void panel_write(offs_t offset, uint8_t data);
@@ -73,9 +73,9 @@ private:
 	void vdtkey_interrupt(int state);
 	void line_interrupt(int state);
 
-	void crumap(address_map &map);
-	void crumap_v(address_map &map);
-	void memmap(address_map &map);
+	void crumap(address_map &map) ATTR_COLD;
+	void crumap_v(address_map &map) ATTR_COLD;
+	void memmap(address_map &map) ATTR_COLD;
 
 	void        hold_load();
 	TIMER_CALLBACK_MEMBER(clear_load);

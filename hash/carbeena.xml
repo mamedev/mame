@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+This cartridge is inserted into the mainboard slot, enclosed inside the console.
+-->
+<softwarelist name="carbeena" description="Car Beena cartridge">
+
+	<software name="carbeena" supported="yes">
+		<description>Car Beena Tentou-you Demo 1</description>
+		<year>2009</year>
+		<publisher>Sega Toys</publisher>
+		<notes>Info from header</notes>
+		<info name="alt_title" value="カービーナてんとうデモよう1"/>
+		<info name="serial" value="T-150002-1000"/>
+		<part name="rom" interface="carbeena_cart">
+			<dataarea name="rom" size="0x800000">
+				<rom name="en29lv640.ic10" size="0x800000" crc="bf210b18" sha1="7cb3de21ee704fdc836662a41d38698135572c0d"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

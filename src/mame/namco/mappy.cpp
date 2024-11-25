@@ -603,11 +603,6 @@ void mappy_state::int_on_3_w(int state)
 		m_subcpu2->set_input_line(0, CLEAR_LINE);
 }
 
-void mappy_state::mappy_flip_w(int state)
-{
-	flip_screen_set(state);
-}
-
 
 template<uint8_t Chip>
 TIMER_CALLBACK_MEMBER(mappy_state::namcoio_run_timer)
@@ -1492,7 +1487,7 @@ void mappy_state::mappy_common(machine_config &config)
 	ls259_device &mainlatch(LS259(config, "mainlatch"));    // 2M on CPU board
 	mainlatch.q_out_cb<0>().set(FUNC(mappy_state::int_on_2_w));
 	mainlatch.q_out_cb<1>().set(FUNC(mappy_state::int_on_w));
-	mainlatch.q_out_cb<2>().set(FUNC(mappy_state::mappy_flip_w));
+	mainlatch.q_out_cb<2>().set(FUNC(mappy_state::flip_screen_set));
 	mainlatch.q_out_cb<3>().set(m_namco_15xx, FUNC(namco_15xx_device::sound_enable_w));
 	mainlatch.q_out_cb<4>().set(m_namcoio[0], FUNC(namcoio_device::set_reset_line)).invert();
 	mainlatch.q_out_cb<4>().append(m_namcoio[1], FUNC(namcoio_device::set_reset_line)).invert();

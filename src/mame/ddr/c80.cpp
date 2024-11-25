@@ -102,7 +102,7 @@ private:
 	required_ioport m_row2;
 	output_finder<8> m_digits;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t pio1_pa_r();
 	void pio1_pa_w(uint8_t data);
@@ -116,8 +116,8 @@ private:
 	u8 m_digit = 0;
 	bool m_pio1_a5 = false;
 	u8 m_pio1_brdy = 0;
-	void c80_io(address_map &map);
-	void c80_mem(address_map &map);
+	void c80_io(address_map &map) ATTR_COLD;
+	void c80_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -182,8 +182,8 @@ static INPUT_PORTS_START( c80 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MEM") PORT_CODE(KEYCODE_M) PORT_CHAR('-')
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, c80_state, trigger_reset, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BRK") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, c80_state, trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(c80_state::trigger_reset), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BRK") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(c80_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
 /* Z80-PIO Interface */

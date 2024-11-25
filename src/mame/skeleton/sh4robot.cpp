@@ -47,8 +47,8 @@ public:
 	void sh4robot(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<sh4_device> m_maincpu;
 };

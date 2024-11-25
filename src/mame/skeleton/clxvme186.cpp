@@ -28,14 +28,14 @@ public:
 	void clxvme186(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void unknown_w(u16 data);
 	u8 sasi_status_r();
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 };
@@ -88,7 +88,7 @@ static INPUT_PORTS_START(clxvme186)
 	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) // Printer busy
 	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN) // Printer paper empty
 	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN) // /SYSFAIL
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("rtc", m3000_device, busy_r)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("rtc", FUNC(m3000_device::busy_r))
 	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN) // Colex use only
 	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN) // Colex use only
 	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN) // /ACFAIL

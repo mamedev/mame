@@ -36,7 +36,8 @@ inline void zn_state::psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, ui
 
 uint8_t zn_state::znsecsel_r(offs_t offset, uint8_t mem_mask)
 {
-	LOG("%s: znsecsel_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
+	if (!machine().side_effects_disabled())
+		LOG("%s: znsecsel_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
 	return m_n_znsecsel;
 }
 
@@ -100,7 +101,8 @@ uint8_t zn_state::boardconfig_r()
 
 uint16_t zn_state::unknown_r(offs_t offset, uint16_t mem_mask)
 {
-	logerror("%s: unknown_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
+	if (!machine().side_effects_disabled())
+		logerror("%s: unknown_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
 	return 0xffff;
 }
 
@@ -352,7 +354,8 @@ Notes:
 uint16_t capcom_zn_state::kickharness_r(offs_t offset, uint16_t mem_mask)
 {
 	/* required for buttons 4,5&6 */
-	LOG("%s: capcom_kickharness_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
+	if (!machine().side_effects_disabled())
+		LOG("%s: capcom_kickharness_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
 	return 0xffff;
 }
 
@@ -1131,7 +1134,8 @@ uint16_t primrag2_state::vt83c461_16_r(offs_t offset, uint16_t mem_mask)
 	}
 	else
 	{
-		logerror( "unhandled 16 bit read %04x %04x\n", offset, mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror( "unhandled 16 bit read %04x %04x\n", offset, mem_mask);
 		return 0xffff;
 	}
 }
@@ -1172,7 +1176,8 @@ uint16_t primrag2_state::vt83c461_32_r(offs_t offset, uint16_t mem_mask)
 	}
 	else
 	{
-		logerror("%s: unhandled 32 bit read %04x %04x\n", machine().describe_context(), offset, mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror("%s: unhandled 32 bit read %04x %04x\n", machine().describe_context(), offset, mem_mask);
 		return 0xffff;
 	}
 }
@@ -1536,11 +1541,13 @@ uint16_t bam2_state::mcu_r(offs_t offset, uint16_t mem_mask)
 	switch (offset)
 	{
 	case 0:
-		logerror("BAM2 MCU port 0 read @ PC %08x mask %08x\n", m_maincpu->pc(), mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror("BAM2 MCU port 0 read @ PC %08x mask %08x\n", m_maincpu->pc(), mem_mask);
 		break;
 
 	case 2:
-		logerror("BAM2 MCU status read @ PC %08x mask %08x\n", m_maincpu->pc(), mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror("BAM2 MCU status read @ PC %08x mask %08x\n", m_maincpu->pc(), mem_mask);
 
 		switch (m_mcu_command)
 		{
@@ -1810,8 +1817,8 @@ void nbajamex_state::bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	m_curr_rombank[offset] = data;
 
-	uint32_t bankbase0 = ((m_curr_rombank[0] & 0x10) ? 1 : 0) | ((m_curr_rombank[0] & 7) << 1);
-	uint32_t bankbase1 = ((m_curr_rombank[1] & 0x10) ? 0 : 1) | ((m_curr_rombank[1] & 7) << 1);
+	uint32_t const bankbase0 = (BIT(m_curr_rombank[0], 4)) | ((m_curr_rombank[0] & 7) << 1);
+	uint32_t const bankbase1 = (BIT(~m_curr_rombank[1], 4)) | ((m_curr_rombank[1] & 7) << 1);
 
 	if (offset == 0)
 	{
@@ -1850,13 +1857,15 @@ void nbajamex_state::sound_80_w(uint16_t data)
 uint16_t nbajamex_state::sound_08_r(offs_t offset, uint16_t mem_mask)
 {
 	// Sound related
-	logerror("%s: nbajamex_08_r( %08x, %08x, %08x )\n", machine().describe_context(), offset, 0, mem_mask);
+	if (!machine().side_effects_disabled())
+		logerror("%s: sound_08_r( %08x, %08x, %08x )\n", machine().describe_context(), offset, 0, mem_mask);
 	return 0x400;
 }
 
 uint16_t nbajamex_state::sound_80_r(offs_t offset, uint16_t mem_mask)
 {
-	logerror("%s: nbajamex_80_r( %08x, %08x, %08x )\n", machine().describe_context(), offset, 0, mem_mask);
+	if (!machine().side_effects_disabled())
+		logerror("%s: sound_80_r( %08x, %08x, %08x )\n", machine().describe_context(), offset, 0, mem_mask);
 	return 0xffff;
 }
 
@@ -1952,6 +1961,8 @@ void nbajamex_state::nbajamex(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nbajamex_bankmap").set_map(&nbajamex_state::bank_map).set_options(ENDIANNESS_LITTLE, 32, 24, 0x800000);
 
 	ACCLAIM_RAX(config, m_rax, 0);
+	m_rax->add_route(0, "lspeaker", 1.0);
+	m_rax->add_route(1, "rspeaker", 1.0);
 }
 
 void jdredd_state::jdredd(machine_config &config)
@@ -2618,7 +2629,7 @@ static INPUT_PORTS_START( jdredd )
 	PORT_BIT( 0x6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jdredd_state, gun_mux_r)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jdredd_state::gun_mux_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
@@ -5307,7 +5318,7 @@ ROM_END
 
 /* Capcom ZN1 */
 GAME( 1995, coh1000c,  0,        coh1000c,    zn,       zn1_state,     empty_init, ROT0, "Capcom",          "ZN1",                                                     MACHINE_IS_BIOS_ROOT )
-GAME( 1995, ts2,       coh1000c, coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Euro 951124)",                  MACHINE_IMPERFECT_SOUND )
+GAME( 1995, ts2,       coh1000c, coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Europe 951124)",                MACHINE_IMPERFECT_SOUND )
 GAME( 1995, ts2u,      ts2,      coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124)",                   MACHINE_IMPERFECT_SOUND )
 GAME( 1995, ts2ua,     ts2,      coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124, 32Mb mask ROMs)",   MACHINE_IMPERFECT_SOUND )
 GAME( 1995, ts2j,      ts2,      coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Japan 951124)",                 MACHINE_IMPERFECT_SOUND )
@@ -5316,7 +5327,7 @@ GAME( 1996, starglad,  coh1000c, coh1000c,    zn6b,     zn1_state,     empty_ini
 GAME( 1996, stargladj, starglad, coh1000c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom",          "Star Gladiator Episode I: Final Crusade (Japan 960627)",  MACHINE_IMPERFECT_SOUND )
 GAME( 1996, glpracr,   coh1000c, coh1000c,    zn,       glpracr_state, empty_init, ROT0, "Tecmo",           "Gallop Racer (English Ver 10.17.K)",                      MACHINE_IMPERFECT_SOUND )
 GAME( 1996, glpracrj,  glpracr,  coh1000c,    zn,       glpracr_state, empty_init, ROT0, "Tecmo",           "Gallop Racer (Japanese Ver 9.01.12)",                     MACHINE_IMPERFECT_SOUND )
-GAME( 1996, sfex,      coh1000c, coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (Euro 961219)",                         MACHINE_IMPERFECT_SOUND )
+GAME( 1996, sfex,      coh1000c, coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (Europe 961219)",                       MACHINE_IMPERFECT_SOUND )
 GAME( 1996, sfexu,     sfex,     coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (USA 961219)",                          MACHINE_IMPERFECT_SOUND )
 GAME( 1996, sfexa,     sfex,     coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (Asia 961219)",                         MACHINE_IMPERFECT_SOUND )
 GAME( 1996, sfexj,     sfex,     coh1002c,    zn6b,     zn1_state,     empty_init, ROT0, "Capcom / Arika",  "Street Fighter EX (Japan 961130)",                        MACHINE_IMPERFECT_SOUND )
@@ -5327,12 +5338,12 @@ GAME( 1997, sfexpj1,   sfexp,    coh1002c,    zn6b,     zn1_state,     empty_ini
 
 /* Capcom ZN2 */
 GAME( 1997, coh3002c,  0,        coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "ZN2",                                                      MACHINE_IS_BIOS_ROOT )
-GAME( 1997, rvschool,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (Euro 971117)",              MACHINE_IMPERFECT_SOUND )
+GAME( 1997, rvschool,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (Europe 971117)",            MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rvschoolu, rvschool, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (USA 971117)",               MACHINE_IMPERFECT_SOUND )
 GAME( 1997, rvschoola, rvschool, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Rival Schools: United By Fate (Asia 971117)",              MACHINE_IMPERFECT_SOUND )
 GAME( 1997, jgakuen,   rvschool, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971216)", MACHINE_IMPERFECT_SOUND )
 GAME( 1997, jgakuen1,  rvschool, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971117)", MACHINE_IMPERFECT_SOUND )
-GAME( 1998, sfex2,     coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (Euro 980312)",                         MACHINE_IMPERFECT_SOUND )
+GAME( 1998, sfex2,     coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (Europe 980312)",                       MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2u,    sfex2,    coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980526)",                          MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2u1,   sfex2,    coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980312)",                          MACHINE_IMPERFECT_SOUND )
 GAME( 1998, sfex2a,    sfex2,    coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 (Asia 980312)",                         MACHINE_IMPERFECT_SOUND )
@@ -5342,16 +5353,16 @@ GAME( 1998, plsmaswd,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, R
 GAME( 1998, plsmaswda, plsmaswd, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Plasma Sword: Nightmare of Bilstein (Asia 980316)",        MACHINE_IMPERFECT_SOUND )
 GAME( 1998, stargld2,  plsmaswd, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Star Gladiator 2: Nightmare of Bilstein (Japan 980316)",   MACHINE_IMPERFECT_SOUND )
 GAME( 1998, tgmj,      coh3002c, coh3002c,    tgm,      zn2_state, empty_init, ROT0, "Arika / Capcom", "Tetris: The Grand Master (Japan 980710)",                  MACHINE_IMPERFECT_SOUND )
-GAME( 1998, techromn,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (Euro 980914)",                              MACHINE_IMPERFECT_SOUND )
+GAME( 1998, techromn,  coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (Europe 980914)",                            MACHINE_IMPERFECT_SOUND )
 GAME( 1998, techromnu, techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (USA 980914)",                               MACHINE_IMPERFECT_SOUND )
 GAME( 1998, techromna, techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Tech Romancer (Asia 980914)",                              MACHINE_IMPERFECT_SOUND )
 GAME( 1998, kikaioh,   techromn, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom",         "Choukou Senki Kikaioh (Japan 980914)",                     MACHINE_IMPERFECT_SOUND )
-GAME( 1999, sfex2p,    coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Euro 990611)",                    MACHINE_IMPERFECT_SOUND )
+GAME( 1999, sfex2p,    coh3002c, coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Europe 990611)",                  MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2pu,   sfex2p,   coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (USA 990611)",                     MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2pa,   sfex2p,   coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Asia 990611)",                    MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2ph,   sfex2p,   coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Hispanic 990611)",                MACHINE_IMPERFECT_SOUND )
 GAME( 1999, sfex2pj,   sfex2p,   coh3002c,    zn6b,     zn2_state, empty_init, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Japan 990611)",                   MACHINE_IMPERFECT_SOUND )
-GAME( 1999, strider2,  coh3002c, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider 2 (Euro 991213)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // random hangs / crashes
+GAME( 1999, strider2,  coh3002c, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider 2 (Europe 991213)",                                MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // random hangs / crashes
 GAME( 1999, strider2u, strider2, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider 2 (USA 991213)",                                   MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, strider2a, strider2, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider 2 (Asia 991213)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, shiryu2,   strider2, coh3002c,    zn,       zn2_state, empty_init, ROT0, "Capcom",         "Strider Hiryu 2 (Japan 991213)",                           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

@@ -36,8 +36,8 @@ public:
 	void pdt3100(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<v25_device> m_maincpu;
 };

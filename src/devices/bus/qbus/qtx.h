@@ -25,9 +25,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	u8 asc_r(offs_t offset);
@@ -38,8 +38,8 @@ private:
 
 	void asc_config(device_t *device);
 
-	void prg_map(address_map &map);
-	void fc7_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void fc7_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_localcpu;
 	required_device<mc68901_device> m_mfp;

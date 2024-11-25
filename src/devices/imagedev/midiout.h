@@ -15,6 +15,8 @@
 
 #include "diserial.h"
 
+#include "interface/midiport.h"
+
 #include <memory>
 #include <string>
 #include <system_error>
@@ -52,14 +54,14 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_serial_interface implementation
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 
 private:
-	std::unique_ptr<osd_midi_device> m_midi;
+	std::unique_ptr<osd::midi_output_port> m_midi;
 };
 
 // device type definition

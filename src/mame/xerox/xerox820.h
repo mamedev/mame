@@ -93,12 +93,12 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 
-	void mk83_mem(address_map &map);
-	void xerox820_io(address_map &map);
-	void xerox820_mem(address_map &map);
+	void mk83_mem(address_map &map) ATTR_COLD;
+	void xerox820_io(address_map &map) ATTR_COLD;
+	void xerox820_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_kbpio;
@@ -145,7 +145,7 @@ public:
 
 	void bigboard(machine_config &config);
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 
@@ -176,11 +176,11 @@ public:
 
 	void xerox168(machine_config &config);
 	void xerox820ii(machine_config &config);
-	void xerox168_mem(address_map &map);
-	void xerox820ii_io(address_map &map);
-	void xerox820ii_mem(address_map &map);
+	void xerox168_mem(address_map &map) ATTR_COLD;
+	void xerox820ii_io(address_map &map) ATTR_COLD;
+	void xerox820ii_mem(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<speaker_sound_device> m_speaker;
 	required_device<scsi_port_device> m_sasibus;

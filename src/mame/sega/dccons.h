@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, R. Belmont
-#ifndef MAME_SEGACONS_DCCONS_H
-#define MAME_SEGACONS_DCCONS_H
+#ifndef MAME_SEGA_DCCONS_H
+#define MAME_SEGA_DCCONS_H
 
 #pragma once
 
@@ -45,10 +45,10 @@ public:
 	void dc_base(machine_config &config);
 	void dc(machine_config &config);
 	void dc_fish(machine_config &config);
-	void aica_map(address_map &map);
-	void dc_audio_map(address_map &map);
-	void dc_map(address_map &map);
-	void dc_port(address_map &map);
+	void aica_map(address_map &map) ATTR_COLD;
+	void dc_audio_map(address_map &map) ATTR_COLD;
+	void dc_map(address_map &map) ATTR_COLD;
+	void dc_port(address_map &map) ATTR_COLD;
 private:
 	uint32_t g1bus_regs[0x100/4]{}; // DC-only
 
@@ -57,4 +57,4 @@ private:
 	int atapi_xferlen = 0, atapi_xferbase = 0, atapi_xfercomplete;
 };
 
-#endif // MAME_SEGACONS_DCCONS_H
+#endif // MAME_SEGA_DCCONS_H

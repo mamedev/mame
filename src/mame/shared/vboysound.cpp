@@ -221,8 +221,8 @@ void vboysnd_device::device_start()
 	for (int i=0; i<8; i++)
 		waveEnv2LenTbl[i] = (i + 1) * 4 * 120;
 
-	for (int i = 0; i < 5; i++)
-		memset(&snd_channel[i], 0, sizeof(s_snd_channel));
+	for (auto &chan : snd_channel)
+		chan = s_snd_channel();
 
 	memset(m_aram, 0, 0x600);
 }

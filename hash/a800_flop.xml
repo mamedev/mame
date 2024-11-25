@@ -314,7 +314,7 @@ Often crashes at the end of an attract game sequence, which in turn desyncs
 	<!-- Looks more polished than retail version, with title screen etc. -->
 	<!-- except it's missing content (cfr. file sizes) and unwinnable. -->
 	<software name="montzump" cloneof="montzuma">
-		<description>Montezuma's Revenge! (Prototype)</description>
+		<description>Montezuma's Revenge! (prototype)</description>
 		<year>1983</year>
 		<publisher>Utopia Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -438,7 +438,7 @@ Runs too fast
 
 	<software name="koalapnt" supported="no">
 		<!-- Flippy disk, c64 version on side A -->
-		<description>KoalaPainter (Light Pen)</description>
+		<description>KoalaPainter (light pen)</description>
 		<year>1984</year>
 		<publisher>Koala Technologies</publisher>
 		<info name="serial" value="00626-001" />
@@ -906,7 +906,7 @@ Prints "STEREO NOT DETECTED" on main menu, refers to unofficial [POKEY] extra ch
 	</software>
 
 	<software name="zybex" supported="partial">
-		<description>Zybex (Ned)</description>
+		<description>Zybex (Netherlands)</description>
 		<year>1994</year>
 		<publisher>A.N.G. Software</publisher>
 		<notes><![CDATA[
@@ -922,7 +922,7 @@ Garbage row strip at bottom of screen
 	</software>
 
 	<software name="mbasic2x">
-		<description>Microsoft BASIC II Programming Language (Extensions)</description>
+		<description>Microsoft BASIC II Programming Language (extensions)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<sharedfeat name="requirement" value="a800:msbasic2"/>
@@ -935,7 +935,7 @@ Garbage row strip at bottom of screen
 	</software>
 
 	<software name="basxe41x">
-		<description>Basic XE Programming Language v4.1 (Extensions)</description>
+		<description>Basic XE Programming Language v4.1 (extensions)</description>
 		<year>1986</year>
 		<publisher>OSS</publisher>
 		<sharedfeat name="compatibility" value="XL/XE"/>

@@ -21,9 +21,9 @@ public:
 	void set_rom_start(const char *region, u32 offset) { m_rom_region.set_tag(region); m_region_offset = offset; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	template <int Bank> void bank_w(u8 data);
@@ -31,8 +31,7 @@ private:
 	required_memory_region m_rom_region;
 	required_ioport m_switch_port;
 	memory_bank_array_creator<2> m_rombank;
-	memory_view m_view1;
-	memory_view m_view2;
+	memory_view m_view[2];
 	u32 m_region_offset;
 	bool m_enabled;
 };

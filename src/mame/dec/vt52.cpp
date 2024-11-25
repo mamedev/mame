@@ -55,8 +55,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(data_sw_changed);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void update_serial_settings();
@@ -71,8 +71,8 @@ private:
 	int xrdy_eoc_r();
 	u8 chargen_r(offs_t offset);
 
-	void rom_1k(address_map &map);
-	void ram_2k(address_map &map);
+	void rom_1k(address_map &map) ATTR_COLD;
+	void ram_2k(address_map &map) ATTR_COLD;
 
 	required_device<vt5x_cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
@@ -354,10 +354,10 @@ static INPUT_PORTS_START(vt52)
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CHAR(UCHAR_SHIFT_1) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) // S49(L)/S60(R)
 
 	PORT_START("BREAK") // on keyboard but divorced from matrix (position taken over by Caps Lock) and not readable by CPU
-	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_PAUSE) PORT_WRITE_LINE_MEMBER(vt52_state, break_w) // S16
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_PAUSE) PORT_WRITE_LINE_MEMBER(FUNC(vt52_state::break_w)) // S16
 
 	PORT_START("BAUD") // 7-position rotary switches under keyboard, set in combination (positions on SW2 are actually labeled A through G)
-	PORT_DIPNAME(0x03f1, 0x01f1, "Transmitting Speed") PORT_DIPLOCATION("S1:7,4,5,6,2,3,1") PORT_CHANGED_MEMBER(DEVICE_SELF, vt52_state, data_sw_changed, 0)
+	PORT_DIPNAME(0x03f1, 0x01f1, "Transmitting Speed") PORT_DIPLOCATION("S1:7,4,5,6,2,3,1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vt52_state::data_sw_changed), 0)
 	PORT_DIPSETTING(0x01f1, "Off-Line (XCLK = RCLK)") // S1:1
 	PORT_DIPSETTING(0x02f1, "Full Duplex (XCLK = RCLK)") // S1:3
 	PORT_DIPSETTING(0x0371, "Full Duplex, Local Copy (XCLK = RCLK)") // S1:2
@@ -365,7 +365,7 @@ static INPUT_PORTS_START(vt52)
 	PORT_DIPSETTING(0x03d1, "150 Baud") // S1:5
 	PORT_DIPSETTING(0x03e1, "300 Baud") // S1:4
 	PORT_DIPSETTING(0x03f0, "4800 Baud") // S1:7
-	PORT_DIPNAME(0x3c0e, 0x1c0e, "Receiving Speed") PORT_DIPLOCATION("S2:6,5,4,2,1,3,7") PORT_CHANGED_MEMBER(DEVICE_SELF, vt52_state, data_sw_changed, 0)
+	PORT_DIPNAME(0x3c0e, 0x1c0e, "Receiving Speed") PORT_DIPLOCATION("S2:6,5,4,2,1,3,7") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vt52_state::data_sw_changed), 0)
 	PORT_DIPSETTING(0x2c0e, "Match (Bell 103) (RCLK = XCLK)") // S2:C
 	PORT_DIPSETTING(0x340e, "Match (Bell 103), Local Copy (RCLK = XCLK)") // S2:A
 	PORT_DIPSETTING(0x380e, "110 Baud with 2 Stop Bits") // S2:B
@@ -376,13 +376,13 @@ static INPUT_PORTS_START(vt52)
 	// Any combination of XCLK = RCLK with RCLK = XCLK is illegal (both lines are pulled up, halting the UART)
 
 	PORT_START("DATABITS")
-	PORT_DIPNAME(0x1, 0x1, "Data Bits") PORT_DIPLOCATION("S3:1") PORT_CHANGED_MEMBER(DEVICE_SELF, vt52_state, data_sw_changed, 0)
+	PORT_DIPNAME(0x1, 0x1, "Data Bits") PORT_DIPLOCATION("S3:1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vt52_state::data_sw_changed), 0)
 	PORT_DIPSETTING(0x0, "7 (with parity)")
 	PORT_DIPSETTING(0x1, "8 (no parity)")
-	PORT_DIPNAME(0x2, 0x2, "Parity") PORT_DIPLOCATION("W6:1") PORT_CHANGED_MEMBER(DEVICE_SELF, vt52_state, data_sw_changed, 0)
+	PORT_DIPNAME(0x2, 0x2, "Parity") PORT_DIPLOCATION("W6:1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vt52_state::data_sw_changed), 0)
 	PORT_DIPSETTING(0x2, "Even")
 	PORT_DIPSETTING(0x0, "Odd")
-	PORT_DIPNAME(0x4, 0x0, "Data Bit 7") PORT_DIPLOCATION("W5:1") PORT_CHANGED_MEMBER(DEVICE_SELF, vt52_state, data_sw_changed, 0)
+	PORT_DIPNAME(0x4, 0x0, "Data Bit 7") PORT_DIPLOCATION("W5:1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vt52_state::data_sw_changed), 0)
 	PORT_DIPSETTING(0x0, "Spacing")
 	PORT_DIPSETTING(0x4, "Marking") // actually the hardware default, but not as good for modern use
 

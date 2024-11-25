@@ -211,6 +211,7 @@ void i8086_cpu_device::execute_run()
 
 			if(m_halt)
 			{
+				debugger_wait_hook();
 				m_icount = 0;
 				return;
 			}
@@ -669,6 +670,14 @@ uint16_t i8086_common_cpu_device::read_port_word(uint16_t port)
 void i8086_common_cpu_device::write_port_byte(uint16_t port, uint8_t data)
 {
 	m_io->write_byte(port, data);
+}
+
+void i8086_common_cpu_device::write_port_byte_al(uint16_t port)
+{
+	if (port & 1)
+		m_io->write_word(port-1, swapendian_int16(m_regs.w[AX]), 0xff00);
+	else
+		m_io->write_word(port, m_regs.w[AX], 0x00ff);
 }
 
 void i8086_common_cpu_device::write_port_word(uint16_t port, uint16_t data)
@@ -2068,7 +2077,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 			break;
 
 		case 0xe6: // i_outal
-			write_port_byte( fetch(), m_regs.b[AL]);
+			write_port_byte_al(fetch());
 			CLK(OUT_IMM8);
 			break;
 
@@ -2139,7 +2148,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 			break;
 
 		case 0xee: // i_outdxal
-			write_port_byte(m_regs.w[DX], m_regs.b[AL]);
+			write_port_byte_al(m_regs.w[DX]);
 			CLK(OUT_DX8);
 			break;
 

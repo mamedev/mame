@@ -36,8 +36,8 @@ protected:
 	upd78k0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 iram_size, address_map_constructor mem_map, address_map_constructor sfr_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_run() override;
@@ -50,7 +50,7 @@ protected:
 
 private:
 	// internal memory map
-	void iram_map(address_map &map);
+	void iram_map(address_map &map) ATTR_COLD;
 
 	// internal helpers
 	inline u16 register_base() const noexcept;
@@ -97,8 +97,8 @@ protected:
 
 private:
 	// type-specific internal memory maps
-	void mem_map(address_map &map);
-	void sfr_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void sfr_map(address_map &map) ATTR_COLD;
 };
 
 // device type declaration

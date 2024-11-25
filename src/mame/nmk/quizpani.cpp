@@ -77,7 +77,7 @@ public:
 	void quizpani(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -101,11 +101,9 @@ private:
 	TILE_GET_INFO_MEMBER(txt_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 TILEMAP_MAPPER_MEMBER(quizpani_state::bg_scan)
 {
@@ -187,8 +185,6 @@ uint32_t quizpani_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void quizpani_state::program_map(address_map &map)
 {

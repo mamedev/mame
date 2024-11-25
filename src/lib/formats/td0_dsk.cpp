@@ -20,6 +20,7 @@
 #include "multibyte.h"
 
 #include <cstring>
+#include <tuple>
 
 
 #define BUFSZ           512     // new input buffer
@@ -330,8 +331,7 @@ int td0dsk_t::data_read(uint8_t *buf, uint16_t size)
 	if (size > image_size - floppy_file_offset) {
 		size = image_size - floppy_file_offset;
 	}
-	size_t actual;
-	floppy_file.read_at(floppy_file_offset, buf, size, actual);
+	/*auto const [err, actual] =*/ read_at(floppy_file, floppy_file_offset, buf, size); // FIXME: check for errors and premature EOF
 	floppy_file_offset += size;
 	return size;
 }
@@ -810,10 +810,13 @@ const char *td0_format::extensions() const noexcept
 
 int td0_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	size_t actual;
 	uint8_t h[7];
+	auto const [err, actual] = read_at(io, 0, h, 7); // FIXME: does this need to read 7 bytes?  it only check 2 bytes.  Also check for premature EOF.
+	if(err)
+	{
+		return 0;
+	}
 
-	io.read_at(0, h, 7, actual);
 	if(((h[0] == 'T') && (h[1] == 'D')) || ((h[0] == 't') && (h[1] == 'd')))
 	{
 		return FIFID_SIGN;
@@ -823,6 +826,7 @@ int td0_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
+	std::error_condition err;
 	size_t actual;
 	int track_count = 0;
 	int head_count = 0;
@@ -830,9 +834,10 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	int offset = 0;
 	const int max_size = 4*1024*1024; // 4MB ought to be large enough for any floppy
 	std::vector<uint8_t> imagebuf(max_size);
-	uint8_t header[12];
 
-	if(io.read_at(0, header, 12, actual) || actual != 12)
+	uint8_t header[12];
+	std::tie(err, actual) = read_at(io, 0, header, 12);
+	if(err || (actual != 12))
 		return false;
 	head_count = header[9];
 
@@ -849,7 +854,8 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		uint64_t image_size;
 		if(io.length(image_size))
 			return false;
-		if(io.read_at(12, &imagebuf[0], image_size - 12, actual) || actual != (image_size - 12))
+		std::tie(err, actual) = read_at(io, 12, &imagebuf[0], image_size - 12);
+		if(err || (actual != (image_size - 12)))
 			return false;
 	}
 

@@ -52,8 +52,8 @@ public:
 	void play_1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 port07_r();
@@ -70,9 +70,9 @@ private:
 	int ef4_r();
 	void clock_w(int state);
 
-	void chance_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void chance_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_resetcnt = 0U;
 	u16 m_clockcnt = 0U;

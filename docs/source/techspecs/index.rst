@@ -16,6 +16,7 @@ MAME’s source or working on scripts that run within the MAME framework.
     device_rom_interface
     device_disasm_interface
     memory
+    cpu_device
     floppy
     nscsi
     m6502

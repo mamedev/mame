@@ -12,6 +12,8 @@
 #include "emuopts.h"
 #include "unzip.h"
 
+#include <tuple>
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -93,7 +95,7 @@ std::error_condition network_adapter::segment_file::parse_segment(char *data, si
 	current.tier[3]       = 0xff;
 	current.mbytes[0]     = 0x7f;
 	current.mbytes[1]     = 0x80;
-	err = fd->read_at(offset, current.data, 991, actual);
+	std::tie(err, actual) = read_at(*fd, offset, current.data, 991);
 	do {
 		crc = 0xffff;
 		if (err) {
@@ -119,7 +121,7 @@ std::error_condition network_adapter::segment_file::parse_segment(char *data, si
 			pak_list.push_back(current);
 			offset = (++npak * 991);
 			memset(current.data, 0, 991);
-			err = fd->read_at(offset, current.data, 991, actual);
+			std::tie(err, actual) = read_at(*fd, offset, current.data, 991);
 		}
 	} while(actual > 0);
 

@@ -9,6 +9,65 @@ It's unknown if this is a disk or emulation problem.
 -->
 <softwarelist name="mm1_flop" description="MikroMikko 1 floppies">
 
+	<software name="m4">
+		<description>Nokia CP/M 2.2 (M4)</description>
+		<year>1981</year>
+		<publisher>Nokia Data</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Käyttöjärjestelmä"/>
+			<dataarea name="flop" size="126120">
+				<rom name="kjnn320k.imd" size="126120" crc="4e4645e9" sha1="ef8d4df279bee329b5911b2fbeb88e8625b53ba4"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Esittelyohjelmat"/>
+			<dataarea name="flop" size="70878">
+				<rom name="eo320k.imd" size="70878" crc="702174ea" sha1="082e519eae90d522cb814d1c2cf48d732e81703c"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Grafiikkarutiinit"/>
+			<dataarea name="flop" size="250240">
+				<rom name="gr320k.imd" size="250240" crc="0fd48595" sha1="c50d47e91b9d426417a88a30ec2b9299047dc337"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="m6">
+		<description>Nokia CP/M 2.2 (M6)</description>
+		<year>1981</year>
+		<publisher>Nokia Data</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Käyttöjärjestelmä"/>
+			<dataarea name="flop" size="128440">
+				<rom name="kjnn640k.imd" size="128440" crc="29d31322" sha1="e87855076ed0535c5b7b94b9fbacd8298fd93937"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Esittelyohjelmat"/>
+			<dataarea name="flop" size="73198">
+				<rom name="eo640k.imd" size="73198" crc="67f30e57" sha1="5118d62fa9918393c4e5eabb8d5d39cd449c82e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="formula">
+		<description>Formula</description>
+		<year>????</year>
+		<publisher>Kari Rauta</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1038275">
+				<rom name="formula.mfi" size="1038275" crc="61568c28" sha1="0d2a95583909113857bea378791c74f7d7c9c3fb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="boot">
 		<description>Boot disk</description>
 		<year>2013</year>

@@ -116,8 +116,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
@@ -158,7 +158,7 @@ public:
 	void albert(machine_config &config);
 	void ivelultr(machine_config &config);
 	void apple2p(machine_config &config);
-	void apple2_map(address_map &map);
+	void apple2_map(address_map &map) ATTR_COLD;
 
 private:
 	int m_speaker_state, m_cassette_state;
@@ -1155,7 +1155,7 @@ void apple2_state::apple2_common(machine_config &config)
 	m_softlatch->q_out_cb<6>().append(m_video, FUNC(a2_video_device::an2_w));
 	m_softlatch->q_out_cb<7>().set(m_gameio, FUNC(apple2_gameio_device::an3_w));
 
-	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::iiandplus_options, nullptr);
+	APPLE2_GAMEIO(config, m_gameio, m_screen, apple2_gameio_device::iiandplus_options, nullptr);
 
 	/* keyboard controller */
 	AY3600(config, m_ay3600, 0);
@@ -1183,14 +1183,14 @@ void apple2_state::apple2_common(machine_config &config)
 	m_a2bus->nmi_w().set(FUNC(apple2_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	A2BUS_SLOT(config, "sl0", m_a2bus, apple2_slot0_cards, "lang");
-	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
-	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
-	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
-	A2BUS_SLOT(config, "sl4", m_a2bus, apple2_cards, "mockingboard");
-	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
-	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, "diskiing");
-	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl0", XTAL(14'318'181) / 2, m_a2bus, apple2_slot0_cards, "lang");
+	A2BUS_SLOT(config, "sl1", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, "mockingboard");
+	A2BUS_SLOT(config, "sl5", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, "diskiing");
+	A2BUS_SLOT(config, "sl7", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
 
 	/* Set up the softlists: clean cracks priority, originals second, others last */
 	SOFTWARE_LIST(config, "flop_a2_clean").set_original("apple2_flop_clcracked");

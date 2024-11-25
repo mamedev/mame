@@ -120,7 +120,7 @@ char sound_pulse::get_main()
 {
 	pollfd pfds[1];
 	pfds[0].fd = m_pipe_to_main[0];
-	pfds[0].events = POLL_IN;
+	pfds[0].events = POLLIN;
 	pfds[0].revents = 0;
 	int err = poll(pfds, 1, -1);
 	if(err < 0)

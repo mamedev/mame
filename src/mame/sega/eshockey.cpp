@@ -50,8 +50,8 @@ private:
 	void pit_out1(int state);
 	void pit_out2(int state);
 
-	void prg_map(address_map &map);
-	void io_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 

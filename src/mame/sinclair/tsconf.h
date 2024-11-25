@@ -16,10 +16,10 @@
 #include "tsconfdma.h"
 
 #include "beta_m.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 #include "tilemap.h"
 
 
@@ -39,7 +39,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_cram(*this, "cram")
 		, m_sfile(*this, "sfile")
-		, m_centronics(*this, "centronics")
+		, m_dac(*this, "dac")
 		, m_ay(*this, "ay%u", 0U)
 		, m_mod_ay(*this, "MOD_AY")
 	{
@@ -51,11 +51,12 @@ public:
 	static constexpr u16 with_vblank(u16 pixclocks) { return 32 + pixclocks; }
 
 protected:
-	void video_start() override;
-	void machine_start() override;
-	void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(irq_off) override;
+	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(irq_frame);
 	TIMER_CALLBACK_MEMBER(irq_scanline);
 
@@ -136,6 +137,17 @@ private:
 		T1_Y_OFFSET_H = 0x47
 	};
 
+	struct sprite_data
+	{
+		u32 code;
+		u32 color;
+		int flipx;
+		int flipy;
+		s32 destx;
+		s32 desty;
+		u32 pmask;
+	};
+
 	void update_frame_timer();
 	emu_timer *m_frame_irq_timer = nullptr;
 	emu_timer *m_scanline_irq_timer = nullptr;
@@ -149,14 +161,15 @@ private:
 	template <u8 Layer>
 	TILE_GET_INFO_MEMBER(get_tile_info_16c);
 
-	u8 get_border_color(u16 hpos = ~0, u16 vpos = ~0) override;
+	virtual u8 get_border_color(u16 hpos = ~0, u16 vpos = ~0) override;
 	u32 get_vpage_offset();
-	rectangle get_screen_area() override;
-	void spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	void tsconf_UpdateZxScreenBitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tsconf_UpdateTxtBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tsconf_UpdateGfxBitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual rectangle get_screen_area() override;
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tsconf_update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tsconf_draw_zx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tsconf_draw_txt(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tsconf_draw_gfx(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tsconf_palette(palette_device &palette) const;
 	void tsconf_update_video_mode();
 
@@ -179,9 +192,9 @@ private:
 	u8 beta_enable_r(offs_t offset);
 	u8 beta_disable_r(offs_t offset);
 
-	void tsconf_io(address_map &map);
-	void tsconf_mem(address_map &map);
-	void tsconf_switch(address_map &map);
+	void tsconf_io(address_map &map) ATTR_COLD;
+	void tsconf_mem(address_map &map) ATTR_COLD;
+	void tsconf_switch(address_map &map) ATTR_COLD;
 
 	u8 mem_bank_read(u8 bank, offs_t offset);
 	template <u8 Bank>
@@ -207,7 +220,7 @@ private:
 
 	required_device<beta_disk_device> m_beta;
 	required_device<tsconfdma_device> m_dma;
-	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	required_device<spi_sdcard_device> m_sdcard;
 	u8 m_zctl_di = 0;
 	u8 m_zctl_cs = 0;
 
@@ -220,8 +233,9 @@ private:
 	tilemap_t *m_ts_tilemap[3]{};
 	required_device<ram_device> m_cram;
 	required_device<ram_device> m_sfile;
-	required_device<centronics_device> m_centronics;
+	std::vector<sprite_data> m_sprites_cache;
 
+	required_device<dac_byte_interface> m_dac;
 	required_device_array<ym2149_device, 2> m_ay;
 	u8 m_ay_selected;
 	required_ioport m_mod_ay;

@@ -71,7 +71,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	int m_wram_enable;
 	uint8_t m_mmc6_reg;

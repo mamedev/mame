@@ -13,7 +13,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "video/md4330b.h"
+#include "md4330b.h"
 
 
 DEFINE_DEVICE_TYPE(MD4330B, md4330b_device, "md4330b", "Mitel MD4330B LCD Driver")

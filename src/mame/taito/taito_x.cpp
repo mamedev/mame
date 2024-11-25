@@ -13,15 +13,15 @@ video merged with video/seta.cpp
 
 
 Supported games:
-----------------------------------------------------
- Name                    Company               Year
-  Superman                Taito Corp.           1988
-  Twin Hawk (World)       Taito Corp. Japan     1988
-  Twin Hawk (US)          Taito America Corp.   1988
-  Daisenpu (Japan)        Taito Corp.           1988
-  Gigandes                East Technology Corp. 1989
-  Last Striker            East Technology Corp. 1989
-  Balloon Brothers        East Technology Corp. 199?
+-------------------------------------------------------------------------
+ Name                    Company               Year    PCB ref.
+  Superman                Taito Corp.           1988    P0-039A
+  Twin Hawk (World)       Taito Corp. Japan     1988    P0-051A
+  Twin Hawk (US)          Taito America Corp.   1988    P0-051A
+  Daisenpu (Japan)        Taito Corp.           1988    P0-051A
+  Gigandes                East Technology Corp. 1989    P0-057A
+  Last Striker            East Technology Corp. 1989    P0-057A + P1-046A
+  Balloon Brothers        East Technology Corp. 199?    P0-057A + P1-046A
 
 
 This file contains routines to interface with the Taito Controller Chip
@@ -209,7 +209,7 @@ P0-057A
 
 Notes:
         All M-8-x ROMs are held on a plug-in sub-board.
-        The sub-board has printed on it "East Technology" and has PCB Number P0-046A
+        The sub-board has printed on it "East Technology" and has PCB Number P1-046A
 
          68000 clock: 8.000MHz
            Z80 clock: 4.000MHz
@@ -473,14 +473,14 @@ public:
 	void daisenpu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u16 dsw_input_r(offs_t offset);
 
-	void taito_x_base_map(address_map &map);
-	void sound_map(address_map &map);
+	void taito_x_base_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -493,11 +493,11 @@ private:
 	void kyustrkr_input_w(offs_t offset, u16 data);
 	void sound_bankswitch_w(u8 data);
 
-	void ballbros_map(address_map &map);
-	void daisenpu_map(address_map &map);
-	void daisenpu_sound_map(address_map &map);
-	void gigandes_map(address_map &map);
-	void kyustrkr_map(address_map &map);
+	void ballbros_map(address_map &map) ATTR_COLD;
+	void daisenpu_map(address_map &map) ATTR_COLD;
+	void daisenpu_sound_map(address_map &map) ATTR_COLD;
+	void gigandes_map(address_map &map) ATTR_COLD;
+	void kyustrkr_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_z80bank;
 	required_ioport m_dswa_io;
@@ -522,7 +522,7 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
-	void superman_map(address_map &map);
+	void superman_map(address_map &map) ATTR_COLD;
 
 	required_device<taito_cchip_device> m_cchip;
 	required_device<timer_device> m_cchip_irq_clear;

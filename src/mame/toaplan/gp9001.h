@@ -32,7 +32,7 @@ public:
 
 	bitmap_ind8 *custom_priority_bitmap;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	// game-specific hack stuff
 	void disable_sprite_buffer() { m_sp.use_sprite_buffer = 0; }
@@ -59,9 +59,9 @@ public:
 	void bootleg_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 

@@ -15,14 +15,14 @@ protected:
 	m68hc16z_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	void sim_map(address_map &map);
-	void sram_map(address_map &map);
-	void adc_map(address_map &map);
-	void qsm_map(address_map &map);
-	void gpt_map(address_map &map);
+	void sim_map(address_map &map) ATTR_COLD;
+	void sram_map(address_map &map) ATTR_COLD;
+	void adc_map(address_map &map) ATTR_COLD;
+	void qsm_map(address_map &map) ATTR_COLD;
+	void gpt_map(address_map &map) ATTR_COLD;
 
 private:
 	void simcr_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
@@ -95,7 +95,7 @@ public:
 	mc68hc16z1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 private:
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 };
 
 // device type declaration

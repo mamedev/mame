@@ -311,13 +311,14 @@ bool dsk_format::supports_save() const noexcept
 int dsk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[16];
-
-	size_t actual;
-	io.read_at(0, &header, sizeof(header), actual);
-	if ( memcmp( header, DSK_FORMAT_HEADER, 8 ) ==0) {
+	auto const [err, actual] = read_at(io, 0, &header, sizeof(header));
+	if (err) {
+		return 0;
+	}
+	if ((8 <= actual) && !memcmp(header, DSK_FORMAT_HEADER, 8)) {
 		return FIFID_SIGN;
 	}
-	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
+	if ((16 <= actual) && !memcmp(header, EXT_FORMAT_HEADER, 16)) {
 		return FIFID_SIGN;
 	}
 	return 0;
@@ -356,8 +357,6 @@ struct sector_header
 
 bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	size_t actual;
-
 	uint8_t header[0x100];
 	bool extendformat = false;
 
@@ -365,7 +364,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	if (io.length(image_size))
 		return false;
 
-	io.read_at(0, &header, sizeof(header), actual);
+	read_at(io, 0, &header, sizeof(header)); // FIXME: check for errors and premature EOF
 	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
 		extendformat = true;
 	}
@@ -431,7 +430,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			if(track_offsets[(track<<1)+side] >= image_size)
 				continue;
 			track_header tr;
-			io.read_at(track_offsets[(track<<1)+side], &tr, sizeof(tr), actual);
+			read_at(io, track_offsets[(track<<1)+side], &tr, sizeof(tr)); // FIXME: check for errors and premature EOF
 
 			// skip if there are no sectors in this track
 			if (tr.number_of_sector == 0)
@@ -441,7 +440,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			int first_sector_code = -1;
 			for(int j=0;j<tr.number_of_sector;j++) {
 				sector_header sector;
-				io.read_at(track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector), actual);
+				read_at(io, track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector)); // FIXME: check for errors and premature EOF
 
 				if (j == 0)
 					first_sector_code = sector.sector_size_code;
@@ -460,7 +459,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 			for(int j=0;j<tr.number_of_sector;j++) {
 				sector_header sector;
-				io.read_at(track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector), actual);
+				read_at(io, track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector)); // FIXME: check for errors and premature EOF
 
 				sects[j].track       = sector.track;
 				sects[j].head        = sector.side;
@@ -483,7 +482,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 				if(!(sector.fdc_status_reg1 & 0x04)) {
 					sects[j].data = sect_data + sdatapos;
-					io.read_at(pos, sects[j].data, sects[j].actual_size, actual);
+					read_at(io, pos, sects[j].data, sects[j].actual_size); // FIXME: check for errors and premature EOF
 					sdatapos += sects[j].actual_size;
 
 				} else

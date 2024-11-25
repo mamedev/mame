@@ -92,9 +92,9 @@ protected:
 	};
 	keyb_t m_keyb;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void palette_init(palette_device &palette) const;
 
 private:
@@ -249,12 +249,12 @@ private:
 	void execute_sprsw_cmd();
 	void execute_spwr_cmd(u8 data);
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
-	void sysbank_map(address_map &map);
-	void opna_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void sysbank_map(address_map &map) ATTR_COLD;
+	void opna_map(address_map &map) ATTR_COLD;
 
-	void sgp_map(address_map &map);
+	void sgp_map(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;

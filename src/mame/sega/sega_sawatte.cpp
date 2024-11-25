@@ -52,8 +52,8 @@ public:
 	void sawatte(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	TIMER_CALLBACK_MEMBER(irq3_timer);
@@ -70,7 +70,7 @@ private:
 	u8 data_bank_r(offs_t offset);
 	u8 prog_bank_r(offs_t offset);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cartslot;

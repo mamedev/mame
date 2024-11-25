@@ -12,7 +12,7 @@
 #pragma once
 
 
-// I/O ports setup
+// input lines
 
 enum
 {
@@ -81,6 +81,8 @@ enum
 class hmcs40_cpu_device : public cpu_device
 {
 public:
+	virtual ~hmcs40_cpu_device();
+
 	// max 8 4-bit R ports
 	template <std::size_t N> auto read_r() { return m_read_r[N].bind(); }
 	template <std::size_t N> auto write_r() { return m_write_r[N].bind(); }
@@ -92,42 +94,42 @@ public:
 protected:
 	enum
 	{
-		HMCS40_FAMILY_HMCS42 = 0,
-		HMCS40_FAMILY_HMCS43,
-		HMCS40_FAMILY_HMCS44,
-		HMCS40_FAMILY_HMCS45,
-		HMCS40_FAMILY_HMCS46,
-		HMCS40_FAMILY_HMCS47
+		HMCS42_FAMILY = 0,
+		HMCS43_FAMILY,
+		HMCS44_FAMILY,
+		HMCS45_FAMILY,
+		HMCS46_FAMILY,
+		HMCS47_FAMILY
 	};
 
-	// construction/destruction
+	// construction
 	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int family, u16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); } // "
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 2+1; } // max 2 + interrupt
-	virtual u32 execute_input_lines() const noexcept override { return 2+1; } // 3rd one is internal
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// memorymaps
-	void program_1k(address_map &map);
-	void program_2k(address_map &map);
-	void data_160x4(address_map &map);
-	void data_80x4(address_map &map);
+	// memory maps
+	void program_1k(address_map &map) ATTR_COLD;
+	void program_2k(address_map &map) ATTR_COLD;
+	void data_80x4(address_map &map) ATTR_COLD;
+	void data_160x4(address_map &map) ATTR_COLD;
+	void data_256x4(address_map &map) ATTR_COLD;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -137,45 +139,47 @@ protected:
 	int m_icount;
 	int m_state_count;
 
-	int const m_pcwidth;        // Program Counter bit-width
-	int const m_prgwidth;
-	int const m_datawidth;
-	int const m_family;         // MCU family (42-47)
-	u16 const m_polarity;       // i/o polarity (pmos vs cmos)
-	int const m_stack_levels;   // number of callstack levels
+	const int m_pcwidth;      // program counter bit-width
+	const int m_prgwidth;
+	const int m_datawidth;
+	const int m_family;       // MCU family (42-47)
+	const u16 m_polarity;     // i/o polarity (pmos vs cmos)
+	const int m_stack_levels; // number of callstack levels
 	int m_pcmask;
 	int m_prgmask;
 	int m_datamask;
-	u16 m_stack[4];     // max 4
-	u16 m_op;           // current opcode
-	u16 m_prev_op;
-	u8 m_i;             // 4-bit immediate opcode param
-	int m_eint_line;    // which input_line caused an interrupt
-	int m_halt;         // internal HLT state
-	u8 m_prescaler;     // internal timer prescaler
-	bool m_block_int;   // block interrupt on next cycle
 
-	u16 m_pc;           // Program Counter
+	u16 m_stack[4];           // max 4
+	u16 m_op;                 // current opcode
+	u16 m_prev_op;
+	u8 m_i;                   // 4-bit immediate opcode param
+	int m_eint_line;          // which input_line caused an interrupt
+	int m_halt;               // internal HLT state
+	u8 m_prescaler;           // internal timer prescaler
+	bool m_block_int;         // block interrupt on next cycle
+
+	u16 m_pc;                 // program counter
 	u16 m_prev_pc;
-	u8 m_page;          // LPU prepared page
-	u8 m_a;             // 4-bit Accumulator
-	u8 m_b;             // 4-bit B register
-	u8 m_x;             // 1/3/4-bit X register
-	u8 m_spx;           // 1/3/4-bit SPX register
-	u8 m_y;             // 4-bit Y register
-	u8 m_spy;           // 4-bit SPY register
-	u8 m_s;             // Status F/F (F/F = flip-flop)
-	u8 m_c;             // Carry F/F
-	u8 m_tc;            // Timer/Counter
-	u8 m_cf;            // CF F/F (timer mode or counter mode)
-	u8 m_ie;            // I/E(Interrupt Enable) F/F
-	u8 m_iri;           // external interrupt pending I/RI F/F
-	u8 m_irt;           // timer interrupt pending I/RT F/F
-	u8 m_if[2];         // external interrupt mask IF0,1 F/F
-	u8 m_tf;            // timer interrupt mask TF F/F
-	u8 m_int[2];        // INT0/1 pins state
-	u8 m_r[8];          // R outputs state
-	u16 m_d;            // D pins state
+	u8 m_pc_upper;            // LPU prepared upper bits of PC
+	u8 m_a;                   // 4-bit accumulator
+	u8 m_b;                   // 4-bit B register
+	u8 m_x;                   // 1/3/4-bit X register
+	u8 m_spx;                 // 1/3/4-bit SPX register
+	u8 m_y;                   // 4-bit Y register
+	u8 m_spy;                 // 4-bit SPY register
+	u8 m_s;                   // status F/F (F/F = flip-flop)
+	u8 m_c;                   // carry F/F
+
+	u8 m_tc;                  // timer/counter
+	u8 m_cf;                  // CF F/F (timer mode or counter mode)
+	u8 m_ie;                  // I/E (interrupt enable) F/F
+	u8 m_iri;                 // external interrupt pending I/RI F/F
+	u8 m_irt;                 // timer interrupt pending I/RT F/F
+	u8 m_if[2];               // external interrupt mask IF0,1 F/F
+	u8 m_tf;                  // timer interrupt mask TF F/F
+	u8 m_int[2];              // INT0/1 pins state
+	u8 m_r[8];                // R outputs state
+	u16 m_d;                  // D pins state
 
 	// I/O handlers
 	devcb_read8::array<8> m_read_r;
@@ -185,20 +189,22 @@ protected:
 
 	// misc internal helpers
 	void increment_pc();
+	void cycle();
 
 	u8 ram_r();
 	void ram_w(u8 data);
 	void pop_stack();
 	void push_stack();
 
-	virtual u8 read_r(int index);
-	virtual void write_r(int index, u8 data);
-	virtual int read_d(int index);
-	virtual void write_d(int index, int state);
+	virtual void reset_io();
+	virtual u8 read_r(u8 index);
+	virtual void write_r(u8 index, u8 data);
+	virtual int read_d(u8 index);
+	virtual void write_d(u8 index, int state);
 
-	void cycle();
-	void increment_tc();
-	void do_interrupt();
+	void take_interrupt();
+	void clock_timer();
+	void clock_prescaler();
 
 	// opcode handlers
 	void op_illegal();
@@ -305,9 +311,9 @@ protected:
 	hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
 
 	// overrides
-	virtual u8 read_r(int index) override;
-	virtual void write_r(int index, u8 data) override;
-	virtual int read_d(int index) override;
+	virtual u8 read_r(u8 index) override;
+	virtual void write_r(u8 index, u8 data) override;
+	virtual int read_d(u8 index) override;
 };
 
 class hd38750_device : public hmcs43_cpu_device
@@ -341,8 +347,8 @@ protected:
 	hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
 
 	// overrides
-	virtual u8 read_r(int index) override;
-	virtual void write_r(int index, u8 data) override;
+	virtual u8 read_r(u8 index) override;
+	virtual void write_r(u8 index, u8 data) override;
 };
 
 class hd38800_device : public hmcs44_cpu_device
@@ -376,8 +382,8 @@ protected:
 	hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
 
 	// overrides
-	virtual u8 read_r(int index) override;
-	virtual void write_r(int index, u8 data) override;
+	virtual u8 read_r(u8 index) override;
+	virtual void write_r(u8 index, u8 data) override;
 };
 
 class hd38820_device : public hmcs45_cpu_device
@@ -405,6 +411,56 @@ public:
 };
 
 
+class hmcs46_cpu_device : public hmcs40_cpu_device
+{
+protected:
+	hmcs46_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
+
+	// overrides
+	virtual u8 read_r(u8 index) override;
+	virtual void write_r(u8 index, u8 data) override;
+};
+
+class hd44840_device : public hmcs46_cpu_device
+{
+public:
+	hd44840_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd44848_device : public hmcs46_cpu_device
+{
+public:
+	hd44848_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
+class hmcs47_cpu_device : public hmcs40_cpu_device
+{
+protected:
+	hmcs47_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 polarity);
+
+	// overrides
+	virtual u8 read_r(u8 index) override;
+};
+
+class hd38870_device : public hmcs47_cpu_device
+{
+public:
+	hd38870_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd44860_device : public hmcs47_cpu_device
+{
+public:
+	hd44860_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd44868_device : public hmcs47_cpu_device
+{
+public:
+	hd44868_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 
 DECLARE_DEVICE_TYPE(HD38750, hd38750_device)
 DECLARE_DEVICE_TYPE(HD38755, hd38755_device)
@@ -420,5 +476,13 @@ DECLARE_DEVICE_TYPE(HD38820, hd38820_device)
 DECLARE_DEVICE_TYPE(HD38825, hd38825_device)
 DECLARE_DEVICE_TYPE(HD44820, hd44820_device)
 DECLARE_DEVICE_TYPE(HD44828, hd44828_device)
+
+DECLARE_DEVICE_TYPE(HD44840, hd44840_device)
+DECLARE_DEVICE_TYPE(HD44848, hd44848_device)
+
+DECLARE_DEVICE_TYPE(HD38870, hd38870_device)
+DECLARE_DEVICE_TYPE(HD44860, hd44860_device)
+DECLARE_DEVICE_TYPE(HD44868, hd44868_device)
+
 
 #endif // MAME_CPU_HMCS40_HMCS40_H

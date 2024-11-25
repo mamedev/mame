@@ -12,7 +12,6 @@
 #include "dvmemory.h"
 
 #include "debugcpu.h"
-#include "debugger.h"
 
 #include <algorithm>
 #include <cctype>

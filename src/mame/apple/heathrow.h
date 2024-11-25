@@ -32,7 +32,6 @@ public:
 	auto codec_w_callback() { return write_codec.bind(); }
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
-	template <typename... T> void set_pci_root_tag(T &&... args) { m_pci_memory.set_tag(std::forward<T>(args)...); }
 
 	void cb1_w(int state);
 	void cb2_w(int state);
@@ -48,11 +47,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual void base_map(address_map &map);
-	virtual void config_map(address_map &map) override;
+	virtual void base_map(address_map &map) ATTR_COLD;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	void common_init();
 
@@ -86,7 +85,6 @@ protected:
 	required_device<z80scc_device> m_scc;
 	required_device<dbdma_device> m_dma_scsi, m_dma_floppy, m_dma_sccatx, m_dma_sccarx;
 	required_device<dbdma_device> m_dma_sccbtx, m_dma_sccbrx, m_dma_audio_in, m_dma_audio_out;
-	required_address_space m_pci_memory;
 
 private:
 	floppy_image_device *m_cur_floppy = nullptr;
@@ -117,12 +115,12 @@ public:
 	// construction/destruction
 	grandcentral_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<dbdma_device> m_dma_scsi1;
 };
@@ -134,12 +132,12 @@ public:
 	ohare_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	ohare_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -165,7 +163,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class paddington_device : public heathrow_device
@@ -176,7 +174,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 // device type definition

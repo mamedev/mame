@@ -109,8 +109,7 @@ bool ds9_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	{
 		for (int head = 0; head < head_count; head++)
 		{
-			size_t actual;
-			io.read_at((track * head_count + head) * track_size, sectdata, track_size, actual);
+			/*auto const [err, actual] =*/ read_at(io, (track * head_count + head) * track_size, sectdata, track_size); // FIXME: check for errors and premature EOF
 			generate_track(ds9_desc, track, head, sectors, sector_count, 104000, image);
 		}
 	}

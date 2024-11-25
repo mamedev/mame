@@ -20,12 +20,13 @@
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/h8/h83003.h"
-#include "mulcd.h"
-#include "sound/swp00.h"
 #include "machine/nvram.h"
+#include "sound/swp00.h"
 
-#include "debugger.h"
+#include "mulcd.h"
 #include "speaker.h"
+
+#include "mu50.lh"
 
 
 namespace {
@@ -89,31 +90,33 @@ private:
 	required_ioport m_ioport_o2;
 	required_shared_ptr<u16> m_ram;
 
-	u8 cur_p6, cur_pa, cur_pb, cur_pc;
+	u8 cur_p6, cur_p9, cur_pa, cur_pb, cur_pc;
 
 	u16 adc_ar_r();
 	u16 adc_al_r();
 	u16 adc_midisw_r();
 	u16 adc_battery_r();
 
-	void p6_w(u16 data);
-	u16 p6_r();
-	void pa_w(u16 data);
-	u16 pa_r();
-	void pb_w(u16 data);
-	u16 pb_r();
-	void pc_w(u16 data);
-	u16 pc_r();
+	void p6_w(u8 data);
+	u8 p6_r();
+	void p9_w(u8 data);
+	void pa_w(u8 data);
+	u8 pa_r();
+	void pb_w(u8 data);
+	u8 pb_r();
+	void pc_w(u8 data);
+	u8 pc_r();
+	void update_contrast();
 
-	void mu50_map(address_map &map);
+	void mu50_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 void mu50_state::machine_start()
 {
-	cur_p6 = cur_pa = cur_pb = cur_pc = 0xff;
+	cur_p6 = cur_p9 = cur_pa = cur_pb = cur_pc = 0xff;
 }
 
 void mu50_state::machine_reset()
@@ -157,10 +160,10 @@ u16 mu50_state::adc_battery_r()
 	return 0x200;
 }
 
-void mu50_state::p6_w(u16 data)
+void mu50_state::p6_w(u8 data)
 {
 	data ^= P6_LCD_ENABLE;
-	if(!(cur_p6 & P6_LCD_ENABLE) && (data & P6_LCD_ENABLE)) {
+	if((cur_p6 & P6_LCD_ENABLE) && !(data & P6_LCD_ENABLE)) {
 		if(!(cur_p6 & P6_LCD_RW)) {
 			if(cur_p6 & P6_LCD_RS)
 				m_lcd->data_write(cur_pa);
@@ -172,32 +175,45 @@ void mu50_state::p6_w(u16 data)
 	cur_p6 = data;
 }
 
-u16 mu50_state::p6_r()
+u8 mu50_state::p6_r()
 {
 	return cur_p6;
 }
 
-u16 mu50_state::pb_r()
+void mu50_state::p9_w(u8 data)
+{
+	cur_p9 = data;
+	update_contrast();
+}
+
+u8 mu50_state::pb_r()
 {
 	return cur_pb;
 }
 
-void mu50_state::pb_w(u16 data)
+void mu50_state::update_contrast()
 {
-	cur_pb = data;
+	m_lcd->set_contrast(((~cur_p9 >> 3) & 0x6) | (BIT(~cur_pb, 1)));
 }
 
-void mu50_state::pa_w(u16 data)
+void mu50_state::pb_w(u8 data)
+{
+	cur_pb = data;
+	m_lcd->set_leds((~data >> 2) & 0x1f);
+	update_contrast();
+}
+
+void mu50_state::pa_w(u8 data)
 {
 	cur_pa = data;
 }
 
-void mu50_state::pc_w(u16 data)
+void mu50_state::pc_w(u8 data)
 {
 	cur_pc = data;
 }
 
-u16 mu50_state::pa_r()
+u8 mu50_state::pa_r()
 {
 	if((cur_p6 & P6_LCD_ENABLE)) {
 		if(cur_p6 & P6_LCD_RW)
@@ -212,9 +228,9 @@ u16 mu50_state::pa_r()
 	return cur_pa;
 }
 
-u16 mu50_state::pc_r()
+u8 mu50_state::pc_r()
 {
-	u16 res = cur_pc | 0x7c;
+	u8 res = cur_pc | 0x7c;
 	if(!(cur_pc & 0x01))
 		res &= m_ioport_o0->read();
 	if(!(cur_pc & 0x02))
@@ -238,6 +254,7 @@ void mu50_state::mu50(machine_config &config)
 	m_mu50cpu->read_adc<7>().set_constant(0);
 	m_mu50cpu->read_port6().set(FUNC(mu50_state::p6_r));
 	m_mu50cpu->write_port6().set(FUNC(mu50_state::p6_w));
+	m_mu50cpu->write_port9().set(FUNC(mu50_state::p9_w));
 	m_mu50cpu->read_porta().set(FUNC(mu50_state::pa_r));
 	m_mu50cpu->write_porta().set(FUNC(mu50_state::pa_w));
 	m_mu50cpu->read_portb().set(FUNC(mu50_state::pb_r));
@@ -266,6 +283,8 @@ void mu50_state::mu50(machine_config &config)
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
 	m_mu50cpu->write_sci_tx<1>().set(mdout, FUNC(midi_port_device::write_txd));
+
+	config.set_default_layout(layout_mu50);
 }
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

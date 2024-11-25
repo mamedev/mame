@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ivan Vangelista
+// copyright-holders:
 /*
     Uniana PC hardware (shared by other Korean companies)
 
@@ -47,7 +47,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void unianapc_map(address_map &map);
+	void unianapc_map(address_map &map) ATTR_COLD;
 };
 
 void unianapc_state::unianapc_map(address_map &map)

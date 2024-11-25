@@ -71,8 +71,8 @@ public:
 	void informer_207_376(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -87,7 +87,7 @@ private:
 	required_shared_ptr<uint8_t> m_ram;
 	required_region_ptr<uint8_t> m_chargen;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void unk_8400_w(uint8_t data);
 	void crt_brightness_w(uint8_t data);

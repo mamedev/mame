@@ -56,7 +56,7 @@ public:
 	void cit1500(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<upd78053_device> m_cit1500;
 };

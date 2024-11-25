@@ -68,9 +68,9 @@ void phoenix_sound_device::device_start()
 	uint32_t shiftreg;
 
 	m_sound_latch_a = 0;
-	memset(&m_c24_state, 0, sizeof(m_c24_state));
-	memset(&m_c25_state, 0, sizeof(m_c25_state));
-	memset(&m_noise_state, 0, sizeof(m_noise_state));
+	m_c24_state = c_state();
+	m_c25_state = c_state();
+	m_noise_state = n_state();
 
 	m_poly18 = std::make_unique<uint32_t[]>(1ul << (18-5));
 

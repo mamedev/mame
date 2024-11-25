@@ -48,16 +48,16 @@ namespace {
 class smondialb_state : public driver_device
 {
 public:
-	smondialb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_lcd_latch(*this, "lcd_latch")
-		, m_led_pwm(*this, "led_pwm")
-		, m_lcd(*this, "lcd%u", 0)
-		, m_dac(*this, "dac")
-		, m_keys(*this, "KEY.%u", 0)
-		, m_digits(*this, "digit%u", 0U)
+	smondialb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_lcd_latch(*this, "lcd_latch"),
+		m_led_pwm(*this, "led_pwm"),
+		m_lcd(*this, "lcd%u", 0),
+		m_dac(*this, "dac"),
+		m_keys(*this, "KEY.%u", 0),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
 	// machine configs
@@ -66,7 +66,7 @@ public:
 	void smondialb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -74,7 +74,7 @@ protected:
 	required_device<hc259_device> m_lcd_latch;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device_array<pcf2112_device, 2> m_lcd;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<4> m_keys;
 	output_finder<8> m_digits;
 
@@ -82,8 +82,8 @@ protected:
 	u8 m_board_mux = 0;
 
 	// address maps
-	void smondialb_mem(address_map &map);
-	void smondial2_mem(address_map &map);
+	void smondialb_mem(address_map &map) ATTR_COLD;
+	void smondial2_mem(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	template<int N> void lcd_output_w(u32 data);
@@ -102,6 +102,7 @@ void smondialb_state::machine_start()
 	save_item(NAME(m_board_mux));
 }
 
+
 // Super Mondial A
 
 class smondiala_state : public smondialb_state
@@ -114,7 +115,7 @@ public:
 	void smondiala(machine_config &config);
 
 private:
-	void smondiala_mem(address_map &map);
+	void smondiala_mem(address_map &map) ATTR_COLD;
 
 	// led row/column is switched around, do a trampoline here instead of making a different .lay file
 	virtual void led_w(u8 data) override { smondialb_state::led_w(bitswap<8>(data, 7,6,3,2,5,4,1,0)); }
@@ -235,7 +236,7 @@ static INPUT_PORTS_START( smondial )
 	PORT_START("KEY.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Knight / 2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("King / 6")   PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS / 0")    PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS / 0")    PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("LEV")        PORT_CODE(KEYCODE_L)
 
 	PORT_START("KEY.2")
@@ -263,7 +264,7 @@ static INPUT_PORTS_START( smondial2 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("CL")         PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_MODIFY("KEY.2")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS")        PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS")        PORT_CODE(KEYCODE_P)
 
 	PORT_MODIFY("KEY.3")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("MEM")        PORT_CODE(KEYCODE_M)
@@ -400,11 +401,11 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, smondial,   0,        0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. A)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, smondialab, smondial, 0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. AB)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, smondialb,  smondial, 0,      smondialb, smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. B)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, smondial,   0,        0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. A)",  MACHINE_SUPPORTS_SAVE )
+SYST( 1986, smondialab, smondial, 0,      smondiala, smondial,  smondiala_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. AB)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, smondialb,  smondial, 0,      smondialb, smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial (ver. B)",  MACHINE_SUPPORTS_SAVE )
 
-SYST( 1988, smondial2,  0,        0,      smondial2, smondial2, smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, smondial2,  0,        0,      smondial2, smondial2, smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Super Mondial II", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1988, mega4,      0,        0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 1)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1988, mega4a,     mega4,    0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 2)",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, mega4,      0,        0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 1)",  MACHINE_SUPPORTS_SAVE )
+SYST( 1988, mega4a,     mega4,    0,      mega4,     smondial,  smondialb_state, empty_init, "Hegener + Glaser", "Mephisto Mega IV (set 2)",  MACHINE_SUPPORTS_SAVE )

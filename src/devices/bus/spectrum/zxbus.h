@@ -72,7 +72,7 @@ public:
 protected:
 	zxbus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	required_device<zxbus_device> m_zxbus_bus;
 };
@@ -96,7 +96,7 @@ public:
 protected:
 	zxbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_address_space m_iospace;

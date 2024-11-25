@@ -53,8 +53,8 @@ public:
 	void anes(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void vram_offset_w(offs_t offset, uint8_t data);
@@ -108,9 +108,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
-	void opcodes_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
+	void opcodes_map(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 };
@@ -797,5 +797,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2001, sanma,  0, anes, sanma,  anes_state, empty_init, ROT0, "ANES", "Sanma - San-nin Uchi Mahjong [BET] (Japan, version 2.60)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // flyer says 2000, manual says 2001 version 2.60
-GAME( 200?, tonpuu, 0, anes, tonpuu, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong Version 2.0 RX [BET] (Japan)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE  )
+GAME( 2001, sanma,  0, anes, sanma,  anes_state, empty_init, ROT0, "ANES", "Sanma - San-nin Uchi Mahjong (Japan, version 2.60)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // flyer says 2000, manual says 2001 version 2.60
+GAME( 1997, tonpuu, 0, anes, tonpuu, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong Version 2.0 RX (Japan)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE  )

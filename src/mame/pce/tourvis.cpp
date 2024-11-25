@@ -214,9 +214,9 @@ private:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void pce_io(address_map &map);
-	void pce_mem(address_map &map);
-	void tourvision_8085_map(address_map &map);
+	void pce_io(address_map &map) ATTR_COLD;
+	void pce_mem(address_map &map) ATTR_COLD;
+	void tourvision_8085_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;

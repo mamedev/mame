@@ -1047,9 +1047,7 @@ void avr8_base_device::op_neg(uint16_t op)
 	const uint8_t res = 0 - rd;
 	m_r[SREG] &= ~(SREG_MASK_C | SREG_MASK_Z | SREG_MASK_N | SREG_MASK_V | SREG_MASK_S | SREG_MASK_H);
 	if (res == 0)
-	{
 		m_r[SREG] |= SREG_MASK_Z;
-	}
 	else
 	{
 		m_r[SREG] |= SREG_MASK_C;
@@ -1122,7 +1120,7 @@ void avr8_base_device::op_clrf(uint16_t op)
 
 void avr8_base_device::op_ijmp(uint16_t op)
 {
-	m_pc = (ZREG - 1) << 1;
+	m_pc = (ZREG << 1) - 2;
 }
 
 void avr8_base_device::op_eijmp(uint16_t op)
@@ -1135,12 +1133,12 @@ void avr8_base_device::op_dec(uint16_t op)
 	const uint8_t rd = m_r[RD5(op)];
 	const uint8_t res = rd - 1;
 	m_r[SREG] &= ~(SREG_MASK_V | SREG_MASK_N | SREG_MASK_S | SREG_MASK_Z);
-	if (rd == 0x7f)
+	if (res == 0)
+		m_r[SREG] |= SREG_MASK_Z;
+	else if (res == 0x7f)
 		m_r[SREG] |= SREG_MASK_V | SREG_MASK_S;
 	else if (BIT(res, 7))
 		m_r[SREG] |= SREG_MASK_N | SREG_MASK_S;
-	else if (res == 0)
-		m_r[SREG] |= SREG_MASK_Z;
 	m_r[RD5(op)] = res;
 }
 
@@ -1148,8 +1146,7 @@ void avr8_base_device::op_jmp(uint16_t op)
 {
 	uint32_t offs = KCONST22(op) << 16;
 	m_pc += 2;
-	uint16_t wordval = m_program->read_word(m_pc);
-	offs |= wordval;
+	offs |= m_program->read_word(m_pc);
 	m_pc = offs << 1;
 	m_pc -= 2;
 }
@@ -1234,18 +1231,21 @@ void avr8_base_device::op_adiw(uint16_t op)
 	const uint8_t rr = m_r[25 + (DCONST(op) << 1)];
 	const uint16_t pd = ((rr << 8) | rd) + KCONST6(op);
 	m_r[SREG] &= ~(SREG_MASK_V | SREG_MASK_N | SREG_MASK_S | SREG_MASK_Z | SREG_MASK_C);
-	if (pd == 0)
-		m_r[SREG] |= SREG_MASK_Z;
-	else if (BIT(pd, 15))
+	if (BIT(pd, 15))
 	{
 		m_r[SREG] |= SREG_MASK_N;
-		if (!BIT(rr, 7))
-			m_r[SREG] |= SREG_MASK_V;
-		else
+		if (BIT(rr, 7))
 			m_r[SREG] |= SREG_MASK_S;
+		else
+			m_r[SREG] |= SREG_MASK_V;
 	}
-	if (BIT(rr, 7) && !BIT(pd, 15))
-		m_r[SREG] |= SREG_MASK_C;
+	else
+	{
+		if (pd == 0)
+			m_r[SREG] |= SREG_MASK_Z;
+		if (BIT(rr, 7))
+			m_r[SREG] |= SREG_MASK_C;
+	}
 	m_r[24 + (DCONST(op) << 1)] = pd & 0x00ff;
 	m_r[25 + (DCONST(op) << 1)] = (pd >> 8) & 0x00ff;
 }
@@ -1256,16 +1256,19 @@ void avr8_base_device::op_sbiw(uint16_t op)
 	const uint8_t rr = m_r[25 + (DCONST(op) << 1)];
 	const uint16_t pd = ((rr << 8) | rd) - KCONST6(op);
 	m_r[SREG] &= ~(SREG_MASK_V | SREG_MASK_N | SREG_MASK_S | SREG_MASK_Z | SREG_MASK_C);
-	m_r[SREG] |= (pd == 0) ? SREG_MASK_Z : 0;
 	if (BIT(pd, 15))
 	{
-		if (BIT(rr, 7))
-			m_r[SREG] |= SREG_MASK_N | SREG_MASK_S | SREG_MASK_C;
-		else
-			m_r[SREG] |= SREG_MASK_N | SREG_MASK_S;
+		m_r[SREG] |= SREG_MASK_N | SREG_MASK_S;
+		if (!BIT(rr, 7))
+			m_r[SREG] |= SREG_MASK_C;
 	}
-	else if (BIT(rr, 7))
-		m_r[SREG] |= SREG_MASK_V | SREG_MASK_S;
+	else
+	{
+		if (pd == 0)
+			m_r[SREG] |= SREG_MASK_Z;
+		if (BIT(rr, 7))
+			m_r[SREG] |= SREG_MASK_V | SREG_MASK_S;
+	}
 	m_r[24 + (DCONST(op) << 1)] = pd & 0x00ff;
 	m_r[25 + (DCONST(op) << 1)] = (pd >> 8) & 0x00ff;
 }

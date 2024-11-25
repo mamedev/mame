@@ -740,17 +740,6 @@ uint32_t cosmac_device::execute_max_cycles() const noexcept
 
 
 //-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t cosmac_device::execute_input_lines() const noexcept
-{
-	return 7;
-}
-
-
-//-------------------------------------------------
 //  execute_set_input -
 //-------------------------------------------------
 
@@ -823,11 +812,13 @@ void cosmac_device::execute_run()
 			break;
 
 		case cosmac_mode::RESET:
+			debugger_wait_hook();
 			reset_state();
 			m_icount--;
 			break;
 
 		case cosmac_mode::PAUSE:
+			debugger_wait_hook();
 			m_icount--;
 			break;
 

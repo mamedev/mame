@@ -54,7 +54,7 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vdp_timer);
 
-	void vram_map(address_map &map);
+	void vram_map(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<i8x9x_device> m_maincpu;
@@ -82,8 +82,8 @@ public:
 	void s50(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void p2_w(u8 data);
 	void floppy_select_w(u8 data);
@@ -91,7 +91,7 @@ protected:
 private:
 	void ioga_out_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 protected:
 	required_memory_bank m_sram_bank;
@@ -113,12 +113,12 @@ public:
 	void s550(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void sram_bank_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_lowram_bank;
 	memory_view m_lowmem_view;
@@ -143,8 +143,8 @@ public:
 	[[maybe_unused]] void s330(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 psram_bank_r();
@@ -152,10 +152,10 @@ private:
 	void floppy_select_w(u8 data);
 	u8 unknown_status_r();
 
-	void w30_mem_map(address_map &map);
-	[[maybe_unused]] void s330_mem_map(address_map &map);
-	void psram1_map(address_map &map);
-	void psram2_map(address_map &map);
+	void w30_mem_map(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void s330_mem_map(address_map &map) ATTR_COLD;
+	void psram1_map(address_map &map) ATTR_COLD;
+	void psram2_map(address_map &map) ATTR_COLD;
 
 	memory_view m_bank1_view;
 	memory_view m_bank2_view;

@@ -22,9 +22,9 @@ public:
 	uint32_t data_r() const;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_resolve_objects() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 private:
 	struct dev_t {
@@ -61,7 +61,7 @@ public:
 	nscsi_device *get_device();
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class nscsi_slot_card_interface : public device_interface
@@ -133,7 +133,7 @@ public:
 protected:
 	nscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	int scsi_id;
 	int scsi_refid;
@@ -645,8 +645,8 @@ protected:
 
 	nscsi_full_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void scsi_message();
 	virtual void scsi_command();

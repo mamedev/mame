@@ -34,11 +34,11 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void v0bowl_map(address_map &map);
+	void v0bowl_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<se3208_device> m_maincpu;

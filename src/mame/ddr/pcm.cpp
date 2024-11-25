@@ -96,13 +96,13 @@ private:
 	void port94_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_cone = 0;
 	u8 m_port85 = 0U;
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<z80pio_device> m_pio_s;

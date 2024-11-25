@@ -2,20 +2,17 @@
 // copyright-holders:Curt Coder
 /*
 
-
-ToDo:
+TODO:
 - peripheral interfaces
 
 - Fix floppy. It needs to WAIT the cpu whenever port 0x14 is read, wait
   for either DRQ or INTRQ to assert, then release the cpu and then do the
-  actual port read. Our Z80 cannot do that.
+  actual port read. But it doesn't work properly at the moment. It gets stuck
+  if you load up the cpm disk (from software list). The other disks are useless.
+
   The schematic isn't clear, but it seems the 2 halves of U16 (as shown) have
   a common element, so that activity on one side can affect what happens on
   the other side.
-  If you uncomment the line in fdc_intrq_w, and change the BOGUSWAIT to WAIT
-  in fdc_r, then load up the cpm disk (from software list), it will read the
-  CP/M boot track into memory and attempt to run it. However, it has an issue
-  and returns to the monitor. The other disks are useless.
 
 */
 
@@ -201,7 +198,16 @@ uint8_t super6_state::fdc_r()
 
 	*/
 
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		if (!m_z80_wait)
+		{
+			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+			m_maincpu->retry_access();
+		}
+
+		m_z80_wait = !m_z80_wait;
+	}
 
 	return m_fdc->intrq_r() ? 0x7f : 0xff;
 }
@@ -279,7 +285,7 @@ void super6_state::super6_io(address_map &map)
 	map(0x0c, 0x0f).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0x10, 0x10).mirror(0x03).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x14, 0x14).rw(FUNC(super6_state::fdc_r), FUNC(super6_state::fdc_w));
-	map(0x15, 0x15).portr("J7").w(FUNC(super6_state::s100_w));
+	map(0x15, 0x15).portr(m_j7).w(FUNC(super6_state::s100_w));
 	map(0x16, 0x16).w(FUNC(super6_state::bank0_w));
 	map(0x17, 0x17).w(FUNC(super6_state::bank1_w));
 	map(0x18, 0x18).mirror(0x03).w(BR1945_TAG, FUNC(com8116_device::stt_str_w));
@@ -384,7 +390,6 @@ void super6_state::fdc_intrq_w(int state)
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 
 	m_ctc->trg3(state);   // J6 pin 7-8
-	// m_maincpu->set_state_int(Z80_AF, 0x7f00);   // hack, see notes
 }
 
 void super6_state::fdc_drq_w(int state)
@@ -420,6 +425,7 @@ void super6_state::fdc_drq_w(int state)
 void super6_state::machine_start()
 {
 	// state saving
+	save_item(NAME(m_z80_wait));
 	save_item(NAME(m_s100));
 	save_item(NAME(m_bank0));
 	save_item(NAME(m_bank1));
@@ -428,6 +434,7 @@ void super6_state::machine_start()
 
 void super6_state::machine_reset()
 {
+	m_z80_wait = false;
 	m_bank0 = m_bank1 = 0;
 
 	bankswitch();
@@ -450,6 +457,7 @@ void super6_state::super6(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &super6_state::super6_mem);
 	m_maincpu->set_addrmap(AS_IO, &super6_state::super6_io);
 	//m_maincpu->set_daisy_config(super6_daisy_chain);
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	// devices
 	Z80CTC(config, m_ctc, 24_MHz_XTAL / 4);
@@ -458,7 +466,7 @@ void super6_state::super6(machine_config &config)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80DMA(config, m_dma, 24_MHz_XTAL / 6);
-	m_dma->out_busreq_callback().set(m_dma, FUNC(z80dma_device::bai_w));
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set(m_ctc, FUNC(z80ctc_device::trg2));
 	m_dma->in_mreq_callback().set(FUNC(super6_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(super6_state::memory_write_byte));

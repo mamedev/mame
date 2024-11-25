@@ -1960,6 +1960,7 @@ void sh34_base_device::execute_run()
 
 	if (m_sh2_state->m_cpu_off)
 	{
+		debugger_wait_hook();
 		m_sh2_state->icount = 0;
 		return;
 	}
@@ -2003,6 +2004,7 @@ void sh3be_device::execute_run()
 
 	if (m_sh2_state->m_cpu_off)
 	{
+		debugger_wait_hook();
 		m_sh2_state->icount = 0;
 		return;
 	}
@@ -2043,6 +2045,7 @@ void sh4be_device::execute_run()
 
 	if (m_sh2_state->m_cpu_off)
 	{
+		debugger_wait_hook();
 		m_sh2_state->icount = 0;
 		return;
 	}

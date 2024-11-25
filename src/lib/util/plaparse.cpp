@@ -68,11 +68,14 @@ static uint32_t suck_number(util::random_read &src)
 	uint32_t value = 0;
 
 	// find first digit
-	uint8_t ch;
-	std::size_t actual;
 	bool found = false;
-	while (!src.read(&ch, 1, actual) && actual == 1)
+	while (true)
 	{
+		uint8_t ch;
+		auto const [err, actual] = read(src, &ch, 1);
+		if (err || (1 != actual))
+			break;
+
 		// loop over and accumulate digits
 		if (isdigit(ch))
 		{
@@ -189,8 +192,8 @@ static bool process_terms(jed_data *data, util::random_read &src, uint8_t ch, pa
 			curoutput = 0;
 		}
 
-		std::size_t actual;
-		if (src.read(&ch, 1, actual))
+		auto const [err, actual] = read(src, &ch, 1);
+		if (err)
 			return false;
 		if (actual != 1)
 			return true;
@@ -227,9 +230,11 @@ static bool process_field(jed_data *data, util::random_read &src, parse_info *pi
 	int destptr = 0;
 
 	uint8_t seek;
-	std::size_t actual;
-	while (!src.read(&seek, 1, actual) && actual == 1 && isalpha(seek))
+	while (true)
 	{
+		auto const [err, actual] = read(src, &seek, 1);
+		if (err || (actual != 1) || !isalpha(seek))
+			break;
 		dest[destptr++] = tolower(seek);
 		if (destptr == sizeof(dest))
 			break;
@@ -275,8 +280,11 @@ static bool process_field(jed_data *data, util::random_read &src, parse_info *pi
 	// output polarity (optional)
 	case KW_PHASE:
 		if (LOG_PARSE) printf("Phase...\n");
-		while (!src.read(&seek, 1, actual) && actual == 1 && !iscrlf(seek) && pinfo->xorptr < (JED_MAX_FUSES/2))
+		while (true)
 		{
+			auto const [err, actual] = read(src, &seek, 1);
+			if (err || (actual != 1) || iscrlf(seek) || (pinfo->xorptr >= (JED_MAX_FUSES / 2)))
+				break;
 			if (seek == '0' || seek == '1')
 			{
 				// 0 is negative
@@ -322,19 +330,23 @@ int pla_parse(util::random_read &src, jed_data *result)
 	result->numfuses = 0;
 	memset(result->fusemap, 0, sizeof(result->fusemap));
 
-	uint8_t ch;
-	std::size_t actual;
-	while (!src.read(&ch, 1, actual) && actual == 1)
+	while (true)
 	{
+		std::error_condition err;
+		size_t actual;
+		uint8_t ch;
+		std::tie(err, actual) = read(src, &ch, 1);
+		if (err || (actual != 1))
+			break;
 		switch (ch)
 		{
 		// comment line
 		case '#':
-			while (!src.read(&ch, 1, actual) && actual == 1)
+			do
 			{
-				if (iscrlf(ch))
-					break;
+				std::tie(err, actual) = read(src, &ch, 1);
 			}
+			while (!err && (actual == 1) && !iscrlf(ch));
 			break;
 
 		// keyword

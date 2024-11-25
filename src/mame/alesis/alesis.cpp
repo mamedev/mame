@@ -431,7 +431,7 @@ void alesis_state::hr16(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("hr16_cass");
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */

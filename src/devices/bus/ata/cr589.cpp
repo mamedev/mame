@@ -29,8 +29,8 @@ void matsushita_cr589_device::nvram_default()
 
 bool matsushita_cr589_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(buffer, sizeof(buffer), actual) && actual == sizeof(buffer);
+	auto const [err, actual] = read(file, buffer, sizeof(buffer));
+	return !err && (actual == sizeof(buffer));
 }
 
 
@@ -42,8 +42,8 @@ bool matsushita_cr589_device::nvram_read(util::read_stream &file)
 
 bool matsushita_cr589_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(buffer, sizeof(buffer), actual) && actual == sizeof(buffer);
+	auto const [err, actual] = write(file, buffer, sizeof(buffer));
+	return !err;
 }
 
 

@@ -68,16 +68,16 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect ) const;
 
 	void gaplus_base(machine_config &config);
-	void cpu1_map(address_map &map);
-	void cpu2_map(address_map &map);
-	void cpu3_map(address_map &map);
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cpu3_map(address_map &map) ATTR_COLD;
 
 	void driver_init();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -145,7 +145,7 @@ public:
 	void gaplus(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void out_lamps0(uint8_t data);
 	void out_lamps1(uint8_t data);

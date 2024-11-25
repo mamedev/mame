@@ -51,7 +51,7 @@ public:
 	void gameking1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<st2204_device> m_maincpu;
@@ -71,8 +71,8 @@ private:
 	uint32_t screen_update_gameking3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void gameking_mem(address_map &map);
-	void gameking3_mem(address_map &map);
+	void gameking_mem(address_map &map) ATTR_COLD;
+	void gameking3_mem(address_map &map) ATTR_COLD;
 
 	emu_timer *m_timer1;
 	emu_timer *m_timer2;

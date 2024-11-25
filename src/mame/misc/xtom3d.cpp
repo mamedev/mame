@@ -22,8 +22,6 @@ TODO:
 - Both games keep repeating YMZ samples in sound test (verify);
 - Pump it Up: every CD after pumpit1 are really multisession disks, which is unsupported
   by chdman at the time of this writing (and doesn't seem worth converting atm);
-- Pump it Up: CAT702 ZN protection for later games;
-- MAS 3507D MP3 decoder for pumpito and beyond;
 
 Notes:
 - Oksan is the old company name that became Andamiro.
@@ -61,10 +59,68 @@ ROM BOARD
 ---------
 MX29F1610MC 16M FlashROM (x7)
 
+
+---
+
+Pump It Up MK-III
+SPACE11_3 board (front plane PCB)
+-----------
+6 pin and 4 pin power connectors (+12V and +5V on both) on back side of PCB
+2x 4 pin power headers on front
+2 pin COMM header on back side
+3 pin PCM header on back side, connects to CN5 on SPACE12_1 board?
+2x HD34PIN header on back side, connects to CN2 and CN3 of SPACE12_1 board
+2x5 pin header on back side
+6 pin Video header (R, G, B, GND, HSYNC, VSYNC) from back side, connecting to VGA header on front side
+HS10PIN labeled 1P on front
+HS10PIN labeled LAMP on front
+HS10PIN labeled 2P on front
+3x HS3PIN on front
+TEST, SERV, CLR buttons on front
+4 pin header unlabeled on front
+CN5 JAMMA(?) connector
+
+
+
+SPACE12_1 board
+-----------
+A40MX04 QFP84 CPLD
+U6 CSI CAT93C46P 1KB eeproom
+U7 Unpopulated 8 pin socket
+U8 KS74HCTLS125N
+U5, U9, U10, U11, U12, U13, U14 HD74LS14P
+U15, U16, U17, U18 ULN2803A
+U19, U20, U21, U22 HD74LS245P
+U23, U26 L9940 LTV847CD
+U24, U25 L9944 LTV847
+U27 Sharp PC817
+U28 Yamaha YMZ280B-F
+U29 Yamaha YAC516
+U31, U32 HA17558
+U101 SN75176BP
+U100 Unpopulated socket
+U102 Unpopulated MAX232
+
+J1 connects to main PCB
+CN1 PCN96, connects to PIU10
+CN2 34 pin connector
+CN3 34 pin connector
+CN5 3 pin connector, audio?
+CN100 2 pin connector
+Unnamed 5 pin connector
+DB25PIN Unpopulated header near A40MX04
+HS3PIN  Unpopulated header near A40MX04
+
+1.8432MHz XTAL near A40MX04
+169NDK19 XTAL (16.9344MHz) near Yamaha YMZ280B-F
+
 **************************************************************************************************/
 
 
 #include "emu.h"
+
+#include "xtom3d_piu10.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
@@ -119,8 +175,8 @@ public:
 	template <typename T> void set_rom_tag(T &&tag) { m_flash_rom.set_tag(std::forward<T>(tag)); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_memory_region m_flash_rom;
@@ -251,11 +307,11 @@ public:
 protected:
 	isa16_xtom3d_io_sound(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 private:
 	required_device<ymz280b_device> m_ymz;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -265,7 +321,7 @@ private:
 	required_ioport m_in2;
 
 	void remap(int space_id, offs_t start, offs_t end) override;
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 class isa16_pumpitup_io_sound : public isa16_xtom3d_io_sound
@@ -274,7 +330,7 @@ public:
 	isa16_pumpitup_io_sound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(ISA16_XTOM3D_IO_SOUND, isa16_xtom3d_io_sound, "isa16_xtom3d_io_sound", "ISA16 X-Tom 3d I/O & Sound board")
@@ -382,6 +438,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pumpitup )
 	PORT_INCLUDE( xtom3d )
 
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Clear")
+
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Top-Left step") PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Top-Right step") PORT_PLAYER(1)
@@ -397,6 +456,9 @@ static INPUT_PORTS_START( pumpitup )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Bottom-Left step") PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Bottom-Right step") PORT_PLAYER(2)
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
 ioport_constructor isa16_xtom3d_io_sound::device_input_ports() const
@@ -423,6 +485,7 @@ void isa16_xtom3d_io_sound::io_map(address_map &map)
 {
 	// $2a0-$2a3 sound
 	map(0x00, 0x03).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
+	// map(0x04, 0x07).noprw(); // lights/outputs?
 	map(0x08, 0x09).lr8(
 		NAME([this] (offs_t offset) {
 			return offset & 1 ? m_system->read() : m_in0->read();
@@ -474,14 +537,14 @@ public:
 	required_device<kbdc8042_device> m_kbdc;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	void remap(int space_id, offs_t start, offs_t end) override;
 
-	void device_map(address_map &map);
+	void device_map(address_map &map) ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(ISA16_OKSAN_LPC, isa16_oksan_lpc, "isa16_oksan_lpc", "ISA16 Oksan Virtual LPC")
@@ -565,12 +628,13 @@ private:
 	required_device<i82371eb_isa_device> m_pci_isa;
 	required_device<i82371eb_ide_device> m_pci_ide;
 
-	void xtom3d_map(address_map &map);
-//  void xtom3d_io(address_map &map);
+	void xtom3d_map(address_map &map) ATTR_COLD;
+//  void xtom3d_io(address_map &map) ATTR_COLD;
 
 //  void vblank_assert(int state);
 
 	static void romdisk_config(device_t *device);
+	static void piu10_config(device_t *device);
 //  static void cdrom_config(device_t *device);
 };
 
@@ -586,12 +650,20 @@ void xtom3d_isa_cards(device_slot_interface &device)
 	device.option_add_internal("oksan_lpc", ISA16_OKSAN_LPC);
 	device.option_add_internal("xtom3d_io_sound", ISA16_XTOM3D_IO_SOUND);
 	device.option_add_internal("pumpitup_io_sound", ISA16_PUMPITUP_IO_SOUND);
+	device.option_add_internal("pumpitup_piu10", ISA16_PIU10);
 }
 
 void xtom3d_state::romdisk_config(device_t *device)
 {
 	isa16_oksan_rom_disk &romdisk = *downcast<isa16_oksan_rom_disk *>(device);
 	romdisk.set_rom_tag("game_rom");
+}
+
+void xtom3d_state::piu10_config(device_t *device)
+{
+	isa16_piu10 &piu10 = *downcast<isa16_piu10 *>(device);
+	piu10.add_route(0, ":lmicrophone", 0.25);
+	piu10.add_route(1, ":rmicrophone", 0.25);
 }
 
 // TODO: unverified PCI config space
@@ -671,7 +743,8 @@ void xtom3d_state::pumpitup(machine_config &config)
 	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
 	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_option_machine_config("cdrom", cdrom_config);
 
-	ISA16_SLOT(config.replace(), "isa1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "pumpitup_io_sound", true);
+	subdevice<isa16_slot_device>("board1")->set_default_option("pumpitup_piu10").set_option_machine_config("pumpitup_piu10", piu10_config);
+	subdevice<isa16_slot_device>("isa1")->set_default_option("pumpitup_io_sound");
 }
 
 ROM_START( xtom3d )
@@ -690,20 +763,69 @@ ROM_START( xtom3d )
 	ROM_LOAD( "u20", 0x200000, 0x200000, CRC(452131d9) SHA1(f62a0f1a7da9025ac1f7d5de4df90166871ac1e5) )
 ROM_END
 
-// provided dump is half size and definitely don't seem sane,
-// just assume they didn't change that part
-//  ROM_LOAD( "bios.u22", 0x000000, 0x010000, BAD_DUMP CRC(574bb327) SHA1(c24484e9b304b9d570c5ead6be768f563d5c389f) )
-
 #define PUMPITUP_BIOS \
-	ROM_REGION32_LE(0x20000, "pci:07.0", 0) \
-	ROM_LOAD( "bios.u22", 0x000000, 0x020000, CRC(f7c58044) SHA1(fd967d009e0d3c8ed9dd7be852946f2b9dee7671) ) \
-	ROM_REGION32_LE(0x1000000, "board1:game_rom", ROMREGION_ERASEFF ) \
+	ROM_SYSTEM_BIOS( 0, "mk3v10", "mk3 v1.0" ) \
+	ROM_SYSTEM_BIOS( 1, "mk3v11", "mk3 v1.1" ) \
+	ROM_REGION32_LE( 0x20000, "pci:07.0", 0 ) \
+	ROMX_LOAD( "mk3_1.0_bios.u22", 0x000000, 0x020000, CRC(a2b5546b) SHA1(d99d29615e2b9c8784e03d4270cf7bb6569f389d), ROM_BIOS(0) ) \
+	ROMX_LOAD( "mk3_1.1_bios.u22", 0x000000, 0x020000, CRC(4540c23f) SHA1(bba697dbe234e4f14c23aac126ea36df216f8c93), ROM_BIOS(1) ) \
+	ROM_REGION( 0x200000, "board1:pumpitup_piu10:flash_u8", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "piu10.u8",  0x000000, 0x200000, CRC(5911e31a)  SHA1(295723b9b7da9e55b5dd5586b23b06355f4837ef) ) \
-	ROM_REGION(0x400000, "isa1:pumpitup_io_sound:ymz", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x400000, "isa1:pumpitup_io_sound:ymz", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "piu10.u9",  0x000000, 0x200000, CRC(9c436cfa) SHA1(480ea52e74721d1963ced41be5c482b7b913ccd2) )
 
 ROM_START( pumpitup )
 	PUMPITUP_BIOS
+ROM_END
+
+ROM_START( pumpipx2 )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpipx2.cat702", 0x000000, 0x000008, CRC(aa6e4b97) SHA1(909ee86dcedd4e19b90cf2570446837e5000632a) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20021014 the prex 2", 0, NO_DUMP ) // [057623DB] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpipx2p )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpipx2.cat702", 0x000000, 0x000008, CRC(aa6e4b97) SHA1(909ee86dcedd4e19b90cf2570446837e5000632a) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20021014 extra", 0, NO_DUMP ) // [92A26C89] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpipx3 )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpipx3.cat702", 0x000000, 0x000008, CRC(38bab3dd) SHA1(716e16303bfff05370bebf217f78e7664941c30b) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20031014 the prex 3", 0, NO_DUMP ) // [D6FC1F72] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpipx3a )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpipx3.cat702", 0x000000, 0x000008, CRC(38bab3dd) SHA1(716e16303bfff05370bebf217f78e7664941c30b) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20030801 the prex 3 int", 0, NO_DUMP ) // [856799FC] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpipx3b )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpipx3.cat702", 0x000000, 0x000008, CRC(38bab3dd) SHA1(716e16303bfff05370bebf217f78e7664941c30b) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20030801 the prex 3 korea", 0, NO_DUMP ) // [CE17422F] dumped, but requires multi session
 ROM_END
 
 ROM_START( pumpit1 )
@@ -713,24 +835,186 @@ ROM_START( pumpit1 )
 	DISK_IMAGE_READONLY( "19990930", 0, BAD_DUMP SHA1(a848061806c56ba30c75a24233300f175fb3eb9d) )
 ROM_END
 
+ROM_START( pumpit2 )
+	PUMPITUP_BIOS
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20000228 the 2nd dancefloor", 0, NO_DUMP ) // [BE92B92D] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpit2a )
+	PUMPITUP_BIOS
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "19991228 the 2nd dancefloor", 0, NO_DUMP ) // [7C336784] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpit3 )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpit3.cat702", 0x000000, 0x000008, CRC(d389a56b) SHA1(5a7c12842f474e01c4fc561887d98b6f1a1622a7) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20000603 the o-b-g", 0, NO_DUMP ) // [150B9A95] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpit3a )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpit3.cat702", 0x000000, 0x000008, CRC(d389a56b) SHA1(5a7c12842f474e01c4fc561887d98b6f1a1622a7) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20000508 the o-b-g", 0, NO_DUMP ) // [809AC2FB] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpit8 )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpit8.cat702", 0x000000, 0x000008, CRC(432fb331) SHA1(4e3265ba4964a1fe486464615b553a20b6946201) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20020311 the rebirth", 0, NO_DUMP ) // [F612CF71] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpitc )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpitc.cat702", 0x000000, 0x000008, CRC(d389a56b) SHA1(5a7c12842f474e01c4fc561887d98b6f1a1622a7) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20001114 the collection", 0, NO_DUMP ) // [978FB691] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpite )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpite.cat702", 0x000000, 0x000008, CRC(49183f5a) SHA1(7f7a569efe042e3f8501d4108f25ee37efda9993) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20010221 extra", 0, NO_DUMP ) // [3BD1B750] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpitea )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpite.cat702", 0x000000, 0x000008, CRC(49183f5a) SHA1(7f7a569efe042e3f8501d4108f25ee37efda9993) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20010209 extra", 0, NO_DUMP ) // [EE278C6E] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpito )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpito.cat702", 0x000000, 0x000008, CRC(d389a56b) SHA1(5a7c12842f474e01c4fc561887d98b6f1a1622a7) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20000827 the o-b-g", 0, NO_DUMP ) // [E73667FA] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpitp2 )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpitp2.cat702", 0x000000, 0x000008, CRC(1d28419e) SHA1(7f27cc202a3e1a80f98cd1887b275ac6853ad05c) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20020311 the premiere 2", 0, NO_DUMP ) // [434BB61C] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpitp3 )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpitp3.cat702", 0x000000, 0x000008, CRC(75f80a89) SHA1(0216dd982e3e013d7a934cd8d3cb52ca6695800a) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20030328 the premiere 3", 0, NO_DUMP ) // [A7F90117] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpitp3a )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpitp3.cat702", 0x000000, 0x000008, CRC(75f80a89) SHA1(0216dd982e3e013d7a934cd8d3cb52ca6695800a) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20030317 the premiere 3", 0, NO_DUMP ) // [95AEA730] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpitpc )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpitpc.cat702", 0x000000, 0x000008, CRC(d389a56b) SHA1(5a7c12842f474e01c4fc561887d98b6f1a1622a7) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20001219 the perfect collection", 0, NO_DUMP ) // [0B096F7F] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpitpr )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpitpr.cat702", 0x000000, 0x000008, CRC(1f039c12) SHA1(8248e62d9992635986671695a641c832f4e71f4a) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20010222 the premiere", 0, NO_DUMP ) // [E20F9C77] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpitpru )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpitpr.cat702", 0x000000, 0x000008, CRC(1f039c12) SHA1(8248e62d9992635986671695a641c832f4e71f4a) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20010305 the premiere", 0, NO_DUMP ) // [39033486] dumped, but requires multi session
+ROM_END
+
+ROM_START( pumpitpx )
+	PUMPITUP_BIOS
+
+	ROM_REGION( 0x000008, "board1:pumpitup_piu10:cat702", 0 )
+	ROM_LOAD( "pumpitpx.cat702", 0x000000, 0x000008, CRC(1f039c12) SHA1(8248e62d9992635986671695a641c832f4e71f4a) )
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom" )
+	DISK_IMAGE_READONLY( "20010901 the prex", 0, NO_DUMP ) // [24395294] dumped, but requires multi session
+ROM_END
+
 } // anonymous namespace
 
-GAME(1999, xtom3d, 0, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro / Jamie System Development", "X Tom 3D", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME(1999, pumpitup, 0,        pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up BIOS", MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
-GAME(1999, pumpit1,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up: The 1st Dance Floor (ver 0.53.1999.9.31)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )
-//GAME(1999, pumpit2,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The 2nd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(1999, pumpit3,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The 3rd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(2000, pumpito,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The Season Evolution Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(2000, pumpitc,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Collection", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(2000, pumpitpc, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Perfect Collection", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(2001, pumpite,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up Extra", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(2001, pumpitpr, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro","Pump it Up The Premiere: The International Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(2001, pumpitpx, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX: The International Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(2002, pumpit8,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Rebirth: The 8th Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(2002, pumpitp2, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 2: The International 2nd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(2002, pumpipx2, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(2003, pumpitp3, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 3: The International 3rd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//GAME(2003, pumpipx3, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 3: The International 4th Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1999, xtom3d, 0, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro / Jamie System Development", "X Tom 3D", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+GAME(1999, pumpitup, 0,        pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up BIOS", MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT)
+GAME(1999, pumpit1,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up: The 1st Dance Floor (ver 0.53.1999.9.31)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING)
+GAME(1999, pumpit2,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The 2nd Dance Floor (Feb 28 2000)", MACHINE_NOT_WORKING)
+GAME(2000, pumpit2a, pumpit2,  pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The 2nd Dance Floor (Dec 27 1999)", MACHINE_NOT_WORKING)
+GAME(2000, pumpit3,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The 3rd Dance Floor (v3.04 - Jun 02 2000)", MACHINE_NOT_WORKING)
+GAME(2000, pumpit3a, pumpit3,  pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The 3rd Dance Floor (v3.03 - May 07 2000)", MACHINE_NOT_WORKING)
+GAME(2000, pumpito,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The Season Evolution Dance Floor (R4/v3.25 - Aug 27 2000)", MACHINE_NOT_WORKING)
+GAME(2000, pumpitc,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Collection (R5/v3.43 - Nov 14 2000)", MACHINE_NOT_WORKING)
+GAME(2000, pumpitpc, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Perfect Collection (R5/v3.52 - Dec 18 2000)", MACHINE_NOT_WORKING)
+GAME(2001, pumpitpr, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere: The International Dance Floor (R6/v4.01 - Feb 22 2001)", MACHINE_NOT_WORKING)
+GAME(2001, pumpitpru,pumpitpr, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere: The International Dance Floor (R6/v4.01 - Feb 22 2001 USA)", MACHINE_NOT_WORKING)
+GAME(2001, pumpite,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up Extra (Mar 21 2001)", MACHINE_NOT_WORKING)
+GAME(2001, pumpitea, pumpite,  pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up Extra (Mar 08 2001)", MACHINE_NOT_WORKING)
+GAME(2001, pumpitpx, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX: The International Dance Floor (REV2 / 101)", MACHINE_NOT_WORKING)
+GAME(2002, pumpit8,  pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Rebirth: The 8th Dance Floor (Rebirth/2002)", MACHINE_NOT_WORKING)
+GAME(2002, pumpitp2, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 2: The International 2nd Dance Floor (Premiere 2/2002)", MACHINE_NOT_WORKING)
+GAME(2002, pumpipx2, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 2 (Premiere 2/2003)", MACHINE_NOT_WORKING)
+GAME(2002, pumpipx2p,pumpipx2, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up EXTRA + Plus (Premiere 2/2003)", MACHINE_NOT_WORKING)
+GAME(2003, pumpitp3, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 3: The International 3rd Dance Floor (Premiere 3/2003 - 28th Mar 2003)", MACHINE_NOT_WORKING)
+GAME(2003, pumpitp3a,pumpitp3, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 3: The International 3rd Dance Floor (Premiere 3/2003 - 17th Mar 2003)", MACHINE_NOT_WORKING)
+GAME(2003, pumpipx3, pumpitup, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 3: The International 4th Dance Floor (X3.2MK3)", MACHINE_NOT_WORKING)
+GAME(2003, pumpipx3a,pumpipx3, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 3: The International 4th Dance Floor (INT X3.1MK3)", MACHINE_NOT_WORKING)
+GAME(2003, pumpipx3b,pumpipx3, pumpitup, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 3: The International 4th Dance Floor (Korea X3.1MK3)", MACHINE_NOT_WORKING)
 
 // GAME(1999, "family production,inc", "N3 Heartbreakers Advanced" known to exist on this HW
 // https://namu.wiki/w/%ED%95%98%ED%8A%B8%20%EB%B8%8C%EB%A0%88%EC%9D%B4%EC%BB%A4%EC%A6%88

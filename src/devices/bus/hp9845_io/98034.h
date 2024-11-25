@@ -25,13 +25,13 @@ public:
 	virtual ~hp98034_io_card_device();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual uint16_t reg_r(address_space &space, offs_t offset) override;
 	virtual void reg_w(address_space &space, offs_t offset, uint16_t data) override;
@@ -51,8 +51,8 @@ private:
 	void mode_reg_clear_w(uint8_t data);
 	uint8_t switch_r();
 
-	void np_io_map(address_map &map);
-	void np_program_map(address_map &map);
+	void np_io_map(address_map &map) ATTR_COLD;
+	void np_program_map(address_map &map) ATTR_COLD;
 
 	void ieee488_ctrl_w(int state);
 

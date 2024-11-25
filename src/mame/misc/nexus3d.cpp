@@ -15,7 +15,6 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/nandflash.h"
 #include "emupal.h"
 #include "screen.h"
@@ -57,12 +56,12 @@ private:
 //  void nexus3d_unk2_w(uint32_t data);
 //  void nexus3d_unk3_w(uint32_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
-	void nexus3d_map(address_map &map);
+	void nexus3d_map(address_map &map) ATTR_COLD;
 
 	uint32_t m_intpend = 0, m_intmask = 0, m_intlevel = 0;
 	uint32_t int_pending_r();
@@ -125,9 +124,9 @@ void nexus3d_state::IntReq(int level)
 	uint32_t inten = m_intmask ^ 0xffffffff;
 
 	if (m_intpend & inten)
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 }
 
 

@@ -55,7 +55,7 @@ public:
 	required_device<pc_noppi_mb_device> m_mb;
 	required_ioport m_dsw0;
 
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 
 	u8 pioiii_portc_r();
 	void pioiii_portc_w(u8 data);
@@ -64,9 +64,9 @@ public:
 	void compc(machine_config &config);
 	void pc10iii(machine_config &config);
 	void compc1(machine_config &config);
-	void compc_io(address_map &map);
-	void compc_map(address_map &map);
-	void compciii_io(address_map &map);
+	void compc_io(address_map &map) ATTR_COLD;
+	void compc_map(address_map &map) ATTR_COLD;
+	void compciii_io(address_map &map) ATTR_COLD;
 private:
 	u8 m_dips = 0;
 };

@@ -66,8 +66,8 @@ protected:
 	};
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	std::vector<daisy_entry> m_device_list;
 
@@ -99,7 +99,7 @@ public:
 	}
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// inline configuration
 	template <typename T> void set_econet_tag(T &&tag) { m_econet.set_tag(std::forward<T>(tag)); }
