@@ -15250,6 +15250,7 @@ cawingr1                        // 09/10/1990 (c) 1990 (World)
 cawingu                         // 30/11/1990 (c) 1990 (USA)
 cawingur1                       // 12/10/1990 (c) 1990 (USA)
 chikij                          // 19/06/1990 (c) 1990 (Japan)
+cps1mult                        // bootleg
 cworld2j                        // 11/06/1992 (c) 1992 (Japan)
 cworld2ja                       // 11/06/1992 (c) 1992 (Japan)
 cworld2jb                       // 11/06/1992 (c) 1992 (Japan)
@@ -29153,6 +29154,7 @@ fairyl2bl                       //
 ldrink                          //
 ldrinka                         //
 merryjn                         //
+unkbel                          //
 
 @source:misc/bingoman.cpp
 bingoman                        //
