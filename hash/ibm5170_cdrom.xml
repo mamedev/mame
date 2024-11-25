@@ -7058,9 +7058,9 @@ Installation and Open Circulation CDs are bootable.
 			</diskarea>
 		</part>
 		<part name="flop1" interface="floppy_3_5">
-		<!-- Floppy image extracted from Installation CD-ROM, located in BOOT\BOOT1440.IMG -->
+		<!-- Package included a boot floppy for non El-Torito systems, but could not be dumped. This image was extracted from the Installation CD-ROM, located in BOOT\BOOT1440.IMG -->
 			<dataarea name="flop" size="1474560">
-				<rom name="corel_linux_boot_floppy.img" size="1474560" crc="4ac616ea" sha1="2f7999a3fd24b59b6939b94af47cf6cc599f3da0" />
+				<rom name="corel_linux_boot_floppy.img" size="1474560" crc="4ac616ea" sha1="2f7999a3fd24b59b6939b94af47cf6cc599f3da0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
