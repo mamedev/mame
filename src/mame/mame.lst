@@ -45231,6 +45231,9 @@ gizmondo                        //
 kontiki                         //
 tiki100                         //
 
+@source:toaplan/dt7.cpp
+dt7
+
 @source:toaplan/mjsister.cpp
 mjsister                        // (c) 1986 Toaplan
 
