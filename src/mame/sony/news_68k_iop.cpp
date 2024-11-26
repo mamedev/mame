@@ -205,6 +205,7 @@ namespace
 		void astreset_w(uint8_t data);
 		void astset_w(uint8_t data);
 
+		void interval_timer_tick(uint8_t data);
 		TIMER_CALLBACK_MEMBER(bus_error_off_cpu);
 		TIMER_CALLBACK_MEMBER(bus_error_off_iop);
 
@@ -221,7 +222,7 @@ namespace
 		required_region_ptr<u32> m_idrom;
 
 		required_device<msm58321_device> m_rtc; // actually is an Epson RTC-58321B
-		required_device<pit8253_device> m_interval_timer;
+		required_device<upd8253_pit_device> m_interval_timer;
 		required_device<z80scc_device> m_scc_external;
 		required_device<z80scc_device> m_scc_peripheral;
 		required_device<am7990_device> m_net;
@@ -278,6 +279,25 @@ namespace
 		m_mmu->space(0).install_ram(0x0, m_ram->mask(), m_ram->pointer());
 
 		m_iop_intst = 0;
+	}
+
+	void news_iop_state::interval_timer_tick(uint8_t data)
+	{
+		// TODO: On the NWS-1960, the 8253 uses channel 0 for the 100Hz CPU timer, channel 1 for main memory refresh, and channel 2 for the IOP timeout
+		//       On the 831, using the same assignment breaks things because channel 2 is too fast for the IOP (apparently). The 1850 (same design as 1960)
+		//		 loads channels 0 and 2 with count 0x4e20, whereas the 831 loads channel 0 with 0x4e20 and channel 2 with 0x2. Therefore, because the 831
+		//       seems to behave with 0x4e20 driving the IOP as well as the CPU (100Hz), they both hook off of channel 0 for now. However, one or both could be
+		//       generated elsewhere (or some other trickery is afoot) on the real system, so this needs more investigation in the future.
+		//		 Math: 0x4e20 cycles * 500ns = 10ms period, 1 / 10ms = 100Hz
+
+		m_iop_timerout = (data > 0) && m_iop_timereni;
+		int_check_iop();
+
+		if (data > 0)
+		{
+			m_cpu_timerout = true;
+		}
+		int_check_cpu();
 	}
 
 	TIMER_CALLBACK_MEMBER(news_iop_state::bus_error_off_cpu)
@@ -1050,28 +1070,12 @@ namespace
 		m_ram->set_default_value(0);
 
 		// NEC uPD8253 programmable interval timer
-		PIT8253(config, m_interval_timer, 0);
-
-		// TODO: On the NWS-1960, the 8253 uses channel 0 for the 100Hz CPU timer, channel 1 for main memory refresh, and channel 2 for the IOP timeout
-		//       On the 831, using the same assignment breaks things because channel 2 is too fast for the IOP (apparently). The 1850 (same design as 1960)
-		//		 loads channels 0 and 2 with count 0x4e20, whereas the 831 loads channel 0 with 0x4e20 and channel 2 with 0x2. Therefore, because the 831
-		//       seems to behave with 0x4e20 driving the IOP as well as the CPU, they both hook off of channel 0 for now. However, one or both could be
-		//       generated elsewhere (or some other trickery is afoot) on the real system, so this needs more investigation in the future.
-		constexpr XTAL PIT_INPUT_FREQUENCY = XTAL(2'000'000);
+		UPD8253_PIT(config, m_interval_timer, 0);
+		constexpr XTAL PIT_INPUT_FREQUENCY = XTAL(2'000'000); // Assume same as 1960 for now
 		m_interval_timer->set_clk<0>(PIT_INPUT_FREQUENCY);
 		m_interval_timer->set_clk<1>(PIT_INPUT_FREQUENCY);
 		m_interval_timer->set_clk<2>(PIT_INPUT_FREQUENCY);
-		m_interval_timer->out_handler<0>().set([this](uint8_t data)
-												{
-													m_iop_timerout = (data > 0) && m_iop_timereni;
-													int_check_iop();
-													
-													if (data > 0)
-													{
-														m_cpu_timerout = true;
-													}
-													int_check_cpu();
-												});
+		m_interval_timer->out_handler<0>().set(FUNC(news_iop_state::interval_timer_tick));
 
 		// 2x Sharp LH8530A Z8530A-SCC
 		SCC8530N(config, m_scc_external, (16_MHz_XTAL / 4));

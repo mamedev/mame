@@ -45,6 +45,7 @@ DEFINE_DEVICE_TYPE(PIT_COUNTER, pit_counter_device, "pit_counter", "PIT Counter"
 DEFINE_DEVICE_TYPE(PIT8253, pit8253_device, "pit8253", "Intel 8253 PIT")
 DEFINE_DEVICE_TYPE(PIT8254, pit8254_device, "pit8254", "Intel 8254 PIT")
 DEFINE_DEVICE_TYPE(FE2010_PIT, fe2010_pit_device, "fe2010_pit", "Faraday FE2010 PIT")
+DEFINE_DEVICE_TYPE(UPD8253_PIT, upd8253_pit_device, "upd8253_pit", "NEC uPD8253 PIT")
 
 pit_counter_device::pit_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PIT_COUNTER, tag, owner, clock)
@@ -73,6 +74,11 @@ pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, d
 
 fe2010_pit_device::fe2010_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pit8253_device(mconfig, FE2010_PIT, tag, owner, clock, pit_type::FE2010)
+{
+}
+
+upd8253_pit_device::upd8253_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pit8253_device(mconfig, UPD8253_PIT, tag, owner, clock, pit_type::I8253)
 {
 }
 
