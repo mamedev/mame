@@ -168,9 +168,10 @@ void sb16_lle_device::ctrl8_w(uint8_t data)
 	*/
 	if(data & 4)
 	{
-		m_dma8_cnt = m_dma8_len + 1;
+		m_dma8_cnt = m_dma8_len;
 		if (!(BIT(m_mode, 6)))
 			m_dma8_cnt >>= 1;
+		m_dma8_cnt ++;
 		m_dma8_done = false;
 	}
 	if(!(data & 2) || !(m_ctrl16 & 2))
@@ -211,9 +212,10 @@ void sb16_lle_device::ctrl16_w(uint8_t data)
 	*/
 	if(data & 4)
 	{
-		m_dma16_cnt = m_dma16_len + 1;
+		m_dma16_cnt = m_dma16_len;
 		if (!(BIT(m_mode, 7)))
 			m_dma16_cnt >>= 1;
+		m_dma16_cnt ++;
 		m_dma16_done = false;
 	}
 	if(!(data & 2) || !(m_ctrl8 & 2))
