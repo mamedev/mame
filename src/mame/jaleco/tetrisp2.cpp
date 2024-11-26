@@ -82,20 +82,12 @@ u16 rockn_state::rockn_adpcmbank_r()
 void rockn_state::rockn_adpcmbank_w(u16 data)
 {
 	m_rockn_adpcmbank = data;
-	int bank = ((data & 0x001f) >> 2);
-
-	if (bank > 7)
-	{
-		popmessage("!!!!! ADPCM BANK OVER:%01X (%04X) !!!!!", bank, data);
-		bank = 0;
-	}
-
-	m_ymzbank[0]->set_entry(bank);
+	m_ymzbank[0]->set_entry((data >> 2) & 0x07);
 }
 
 void rockn_state::rockn2_adpcmbank_w(u16 data)
 {
-	char banktable[9][3]=
+	const uint8_t banktable[9][3]=
 	{
 		{  0,  1,  2 },     // bank $00
 		{  3,  4,  5 },     // bank $04
