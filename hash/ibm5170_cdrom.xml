@@ -2267,6 +2267,35 @@ Offset [CDDA] audio, does not stop when exiting game (including getting to Windo
 		</part>
 	</software>
 
+	<!-- Linux -->
+	<!-- Source: http://redump.org/disc/118951/ -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition).cue" size="1368" crc="66417039" sha1="b7eab95eb3fbf42cbd2bec4a433ed1214d16039f" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 1).bin" size="418517232" crc="e7a144e7" sha1="539d5a0ea16970d6e9420a0a077e741d2f0ff6c3" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 2).bin" size="22407504" crc="b3d73bca" sha1="ffdb673f3c697176500dd6c5e5cee4c76cc83cc6" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 3).bin" size="21525504" crc="6e0add33" sha1="e53db937c7f84afb9e3c743a17fb753ada608738" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 4).bin" size="29816304" crc="e6510dc0" sha1="4d545259bf8eadad87e736c756704776829396d9" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 5).bin" size="20819904" crc="9bc13589" sha1="b3fd40f818bbfd84c5a05c838266d427eaeba3d8" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 6).bin" size="27346704" crc="e4693d9a" sha1="df1ecb36df0f18ef7004b1b726d1d3e1c05d572a" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 7).bin" size="27875904" crc="4c42650b" sha1="5a4e8291c1b0b3ec7d95a499c8b450bbd10b7d2c" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 8).bin" size="27875904" crc="b96b7527" sha1="38cacd012fcd4c023a7707cf2d0598ff76456650" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 9).bin" size="36872304" crc="1ef537ec" sha1="0a6a40a00c27a1c4f30c0738c3bfc07532c40245" /> -->
+	<software name="civctple" supported="partial">
+		<description>Civilization: Call to Power (Limited Edition, v1.1)</description>
+		<year>1996</year>
+		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Full game, but with netplay and map editing disabled. Bundled with Corel Linux OS Deluxe.
+]]></notes>
+		<info name="version" value="1.1" />
+		<info name="language" value="English" />
+		<sharedfeat name="platform" value="Linux" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="civilization_call_to_power_le" sha1="94ad4b9e24bec7b32e32d1efe801c45025f673f5" />
+			</diskarea>
+		</part>
+	</software>
 
 	<software name="civilwar">
 		<description>The Civil War</description>
@@ -7005,6 +7034,59 @@ Incredibly slow in tearing down even on pcipcs7 (bypass with fast forward)
 			<diskarea name="cdrom">
 				<disk name="beos_be_operating_system_4_5" sha1="d3331402b036b0dd2f4ca99dfa67cecfc8bee393"/>
 			</diskarea>
+		</part>
+	</software>
+
+	<software name="corellindx" supported="partial">
+		<description>Corel Linux Deluxe</description>
+		<year>1999</year>
+		<publisher>Corel</publisher>
+		<notes><![CDATA[
+RTM date: November 15, 1999
+Linux Kernel: 2.2.12 + Base Packages
+CHDs generated from retail CDs
+Installation and Open Circulation CDs are bootable.
+]]></notes>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Installation CD-ROM"/>
+			<feature name="part_number" value="JB#44675"/>
+			<diskarea name="cdrom">
+				<disk name="corel_linux_os_deluxe_install" sha1="dc70d14ee57d2c78a419d7422de8f9ffd498a4a9" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Application CD-ROM"/>
+			<feature name="part_number" value="JB#44675"/>
+			<diskarea name="cdrom">
+				<disk name="corel_linux_os_deluxe_applications" sha1="89e7862346f3a0db5b877c4732b6311cad50f11c" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Open Circulation CD-ROM"/>
+			<feature name="part_number" value="JB#44150"/>
+			<diskarea name="cdrom">
+				<disk name="corel_linux_os_deluxe_open_circulation" sha1="99d02e94329115568afef4cc2c9e9583a34729f5" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_id" value="Open Circulation CD-ROM (Alt)"/>
+			<feature name="part_number" value="JB#44150"/>
+			<diskarea name="cdrom">
+				<disk name="corel_linux_os_deluxe_open_circulation_alt" sha1="e66def04fb73155594a946cbee131aea35b79767" />
+			</diskarea>
+		</part>
+		<part name="cdrom5" interface="cdrom">
+			<feature name="part_id" value="Source Code CD-ROM"/>
+			<feature name="part_number" value="JB#44150"/>
+			<diskarea name="cdrom">
+				<disk name="corel_linux_os_deluxe_source_code" sha1="f435e52979b833c3ac00aaa05ddfdaf41bee5d8a"/>
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+		<!-- Package included a boot floppy for non El-Torito systems, but could not be dumped. This image was extracted from the Installation CD-ROM, located in BOOT\BOOT1440.IMG -->
+			<dataarea name="flop" size="1474560">
+				<rom name="corel_linux_boot_floppy.img" size="1474560" crc="4ac616ea" sha1="2f7999a3fd24b59b6939b94af47cf6cc599f3da0" status="baddump" />
+			</dataarea>
 		</part>
 	</software>
 
