@@ -1050,29 +1050,28 @@ namespace
 		m_ram->set_default_value(0);
 
 		// NEC uPD8253 programmable interval timer
-		PIT8253(config, m_interval_timer, 0);		   // TODO: which clock is divided to get the 2MHz input?
-		m_interval_timer->set_clk<0>(XTAL(2'000'000)); // CPU time slice?
-		m_interval_timer->set_clk<1>(XTAL(2'000'000)); // main memory refresh
-		m_interval_timer->set_clk<2>(XTAL(200));	   // IOP timeout TODO: why does everything work better when slowing this down?? What is the real input freq?
-													   // 					Using the input clock from the NWS-19xx schematic causes issues.
+		PIT8253(config, m_interval_timer, 0);
 
+		// TODO: On the NWS-1960, the 8253 uses channel 0 for the 100Hz CPU timer, channel 1 for main memory refresh, and channel 2 for the IOP timeout
+		//       On the 831, using the same assignment breaks things because channel 2 is too fast for the IOP (apparently). The 1850 (same design as 1960)
+		//		 loads channels 0 and 2 with count 0x4e20, whereas the 831 loads channel 0 with 0x4e20 and channel 2 with 0x2. Therefore, because the 831
+		//       seems to behave with 0x4e20 driving the IOP as well as the CPU, they both hook off of channel 0 for now. However, one or both could be
+		//       generated elsewhere (or some other trickery is afoot) on the real system, so this needs more investigation in the future.
+		constexpr XTAL PIT_INPUT_FREQUENCY = XTAL(2'000'000);
+		m_interval_timer->set_clk<0>(PIT_INPUT_FREQUENCY);
+		m_interval_timer->set_clk<1>(PIT_INPUT_FREQUENCY);
+		m_interval_timer->set_clk<2>(PIT_INPUT_FREQUENCY);
 		m_interval_timer->out_handler<0>().set([this](uint8_t data)
 												{
-													// LOG("cpu timerout tick\n");
+													m_iop_timerout = (data > 0) && m_iop_timereni;
+													int_check_iop();
+													
 													if (data > 0)
 													{
 														m_cpu_timerout = true;
 													}
-													// m_cpu_timerout = (data > 0) && m_cpu_timerenc;
 													int_check_cpu();
 												});
-
-		m_interval_timer->out_handler<2>().set([this](uint8_t data) { //
-			// this signal drives the clock of a D Flip-Flop with the input tied to high and clear tied to TIMERENI
-			// LOG("got iop timeout cb 0x%x\n", data);
-			m_iop_timerout = (data > 0) && m_iop_timereni;
-			int_check_iop();
-		});
 
 		// 2x Sharp LH8530A Z8530A-SCC
 		SCC8530N(config, m_scc_external, (16_MHz_XTAL / 4));
