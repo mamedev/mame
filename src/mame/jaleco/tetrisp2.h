@@ -40,15 +40,15 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void tetrisp2(machine_config &config);
-
+	void tetrisp2(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_leds.resolve(); }
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
+	virtual void video_start() override ATTR_COLD;
 
-	void setup_main_sysctrl(machine_config &config, const XTAL clock);
-	void setup_main_sprite(machine_config &config, const XTAL clock);
+	void setup_main_sysctrl(machine_config &config, const XTAL clock) ATTR_COLD;
+	void setup_main_sprite(machine_config &config, const XTAL clock) ATTR_COLD;
+
 	void flipscreen_w(int state);
 	void timer_irq_w(int state);
 	void vblank_irq_w(int state);
@@ -114,11 +114,11 @@ public:
 		, m_okibank(*this, "okibank%u", 0U)
 	{ }
 
-	void nndmseal(machine_config &config);
+	void nndmseal(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void nndmseal_sound_bank_w(u8 data);
@@ -144,16 +144,16 @@ public:
 		, m_ymzbank(*this, "ymzbank_%u", 0U)
 	{ }
 
-	void rockn(machine_config &config);
-	void rockn2(machine_config &config);
+	void rockn(machine_config &config) ATTR_COLD;
+	void rockn2(machine_config &config) ATTR_COLD;
 
-	void init_rockn();
-	void init_rockn2();
-	void init_rockn3();
+	void init_rockn() ATTR_COLD;
+	void init_rockn2() ATTR_COLD;
+	void init_rockn3() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	u16 rockn_adpcmbank_r();
 	void rockn_adpcmbank_w(u16 data);
@@ -199,13 +199,15 @@ public:
 		, m_sub_gfxdecode(*this, "sub_gfxdecode")
 	{ }
 
-	void rocknms(machine_config &config);
-	void init_rocknms();
+	void rocknms(machine_config &config) ATTR_COLD;
+
 	ioport_value main2sub_status_r();
 
+	void init_rocknms() ATTR_COLD;
+
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_subcpu;
@@ -225,6 +227,7 @@ private:
 
 	u32 screen_update_top(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bottom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void rocknms_main_map(address_map &map) ATTR_COLD;
 	void rocknms_sub_map(address_map &map) ATTR_COLD;
 
@@ -253,14 +256,13 @@ private:
 	tilemap_t *m_tilemap_sub_bg = nullptr;
 	tilemap_t *m_tilemap_sub_fg = nullptr;
 	tilemap_t *m_tilemap_sub_rot = nullptr;
-
 };
 
 class stepstag_state : public rockn_state
 {
 public:
-	stepstag_state(const machine_config &mconfig, device_type type, const char *tag) :
-		rockn_state(mconfig, type, tag)
+	stepstag_state(const machine_config &mconfig, device_type type, const char *tag)
+		: rockn_state(mconfig, type, tag)
 		, m_subcpu(*this, "sub")
 		, m_vj_sprite_l(*this, "sprite_l")
 		, m_vj_sprite_m(*this, "sprite_m")
@@ -280,8 +282,8 @@ public:
 		, m_io_coins(*this, "COINS")
 	{ }
 
-	void stepstag(machine_config &config);
-	void vjdash(machine_config &config);
+	void stepstag(machine_config &config) ATTR_COLD;
+	void vjdash(machine_config &config) ATTR_COLD;
 
 	DECLARE_VIDEO_START(stepstag);
 
@@ -291,8 +293,6 @@ protected:
 
 private:
 	u16 stepstag_coins_r();
-	u16 m_vj_upload_idx = 0;
-	bool m_vj_upload_fini = false;
 	void stepstag_b00000_w(u16 data);
 	void stepstag_b20000_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 stepstag_sprite_status_status_r();
@@ -354,6 +354,9 @@ private:
 	std::unique_ptr<uint16_t[]> m_spriteram1_data;
 	std::unique_ptr<uint16_t[]> m_spriteram2_data;
 	std::unique_ptr<uint16_t[]> m_spriteram3_data;
+
+	u16 m_vj_upload_idx = 0;
+	bool m_vj_upload_fini = false;
 
 	uint8_t m_adv7176a_sclock;
 	uint8_t m_adv7176a_sdata;
