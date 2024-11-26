@@ -162,8 +162,8 @@ inline void msm58321_device::write_counter(int address, int data)
 //  msm58321_device - constructor
 //-------------------------------------------------
 
-msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MSM58321, tag, owner, clock),
+msm58321_device::msm58321_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_rtc_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
 	m_year0(0),
@@ -195,8 +195,13 @@ msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	msm58321_device(mconfig, MSM58321, tag, owner, clock)
+{
+}
+
 rtc58321_device::rtc58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	msm58321_device(mconfig, tag, owner, clock)
+	msm58321_device(mconfig, RTC58321, tag, owner, clock)
 {
 }
 

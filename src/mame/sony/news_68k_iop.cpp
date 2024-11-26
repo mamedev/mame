@@ -117,7 +117,7 @@ namespace
 			  m_scc_peripheral(*this, "scc_peripheral"),
 			  m_net(*this, "net"),
 			  m_fdc(*this, "fdc"),
-			  m_scsi(*this, "scsi:7:ncr5380"),
+			  m_scsi(*this, "scsi:7:am5380"),
 			  m_dip_switch(*this, "FRONT_PANEL"),
 			  m_serial(*this, "serial%u", 0U)
 		{
@@ -142,14 +142,14 @@ namespace
 
 		enum iop_irq_number : unsigned
 		{
-			CPIRQ_3_1 = 1,
+			CPIRQ_3_1 = 1, // VME bus interrupts
 			SCSI = 2,
 			LANCE = 3,
-			CPU = 4,
+			CPU = 4, // Interrupt for interprocessor communication from CPU
 			SCC = 5,
-			TIMEOUT_FDCIRQ = 6,
+			TIMEOUT_FDCIRQ = 6, // Both timer and FDCIRQ feed IRQ6
 			FDCDRQ = 7,
-			SCC_PERIPHERAL = 99 // hack
+			SCC_PERIPHERAL = 99 // hack to differentiate SCC interrupts better
 		};
 		template <iop_irq_number Number>
 		void iop_irq_w(int state);
@@ -157,11 +157,11 @@ namespace
 
 		enum cpu_irq_number : unsigned
 		{
-			AST = 1,
-			CPIRQ1 = 2,
-			IOPIRQ3 = 3,
-			CPIRQ3 = 4,
-			IOPIRQ5 = 5,
+			AST = 1, // Asynchronous System Trap
+			CPIRQ1 = 2, // VME bus interrupt
+			IOPIRQ3 = 3, // low-priority interrupts from IOP
+			CPIRQ3 = 4, // VME bus interrupt
+			IOPIRQ5 = 5, // high-priority interrupts from IOP
 			TIMER = 6,
 			PERR = 7
 		};
@@ -211,23 +211,23 @@ namespace
 
 	private:
 		// CPUs (2x 68020, but only the main processor has an FPU)
-		required_device<m68020_device> m_iop;	 // I/O Processor
+		required_device<m68020_device> m_iop;	 // I/O Processor (BSP, brings up system)
 		required_device<m68020fpu_device> m_cpu; // Main Processor
 
-		// Main CPU MMU
+		// Memory devices and main CPU's MMU
 		required_device<news_020_mmu_device> m_mmu;
 		required_device<ram_device> m_ram;
-
 		required_region_ptr<u32> m_eprom;
 		required_region_ptr<u32> m_idrom;
 
+		// Platform hardware
 		required_device<rtc58321_device> m_rtc;
 		required_device<upd8253_pit_device> m_interval_timer;
 		required_device<lh8530_device> m_scc_external;
 		required_device<lh8530_device> m_scc_peripheral;
 		required_device<am7990_device> m_net;
 		required_device<upd765a_device> m_fdc;
-		required_device<ncr5380_device> m_scsi; // actually an AMD AM5380PC
+		required_device<am5380_device> m_scsi;
 		required_ioport m_dip_switch;
 
 		required_device_array<rs232_port_device, 2> m_serial;
@@ -1117,9 +1117,8 @@ namespace
 		m_fdc->drq_wr_callback().set(FUNC(news_iop_state::iop_irq_w<FDCDRQ>));
 		FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
-		// scsi bus and devices
+		// SCSI bus and devices
 		NSCSI_BUS(config, "scsi");
-
 		NSCSI_CONNECTOR(config, "scsi:0", news_scsi_devices, "harddisk");
 		NSCSI_CONNECTOR(config, "scsi:1", news_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:2", news_scsi_devices, nullptr);
@@ -1128,10 +1127,10 @@ namespace
 		NSCSI_CONNECTOR(config, "scsi:5", news_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, nullptr);
 
-		// scsi host adapter
-		NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR5380).machine_config([this](device_t *device)
+		// AMD Am5380PC SCSI interface
+		NSCSI_CONNECTOR(config, "scsi:7").option_set("am5380", AM5380).machine_config([this](device_t *device)
 		{
-			ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
+			am5380_device &adapter = downcast<am5380_device &>(*device);
 			adapter.irq_handler().set(*this, FUNC(news_iop_state::iop_irq_w<SCSI>));
 			adapter.drq_handler().set(*this, FUNC(news_iop_state::scsi_drq_handler));
 		});
