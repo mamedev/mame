@@ -101,9 +101,9 @@ void cave_state::vh_start(u16 sprcol_granularity)
 	m_row_effect_offs_n = -1;
 	m_row_effect_offs_f = 1;
 
-	m_background_pen[0] = m_gfxdecode[0]->gfx(0)->colorbase() +
-							(m_gfxdecode[0]->gfx(0)->colors() - 1) *
-							m_gfxdecode[0]->gfx(0)->granularity();
+	m_background_pen[0] = m_tilemap[0]->gfx(0)->colorbase() +
+							(m_tilemap[0]->gfx(0)->colors() - 1) *
+							m_tilemap[0]->gfx(0)->granularity();
 
 	switch (m_kludge)
 	{
@@ -112,10 +112,10 @@ void cave_state::vh_start(u16 sprcol_granularity)
 			m_row_effect_offs_f = -1;
 			break;
 		case 2: /* uopoko dfeveron */
-			m_background_pen[0] = m_gfxdecode[0]->gfx(0)->colorbase() - m_gfxdecode[0]->gfx(0)->granularity();
+			m_background_pen[0] = m_tilemap[0]->gfx(0)->colorbase() - m_tilemap[0]->gfx(0)->granularity();
 			break;
 		case 4: /* pwrinst2 */
-			m_background_pen[0] = m_gfxdecode[0]->gfx(0)->colorbase() - m_gfxdecode[0]->gfx(0)->granularity();
+			m_background_pen[0] = m_tilemap[0]->gfx(0)->colorbase() - m_tilemap[0]->gfx(0)->granularity();
 			m_layers_offs_y++;
 			break;
 	}
@@ -139,15 +139,15 @@ void ppsatan_state::video_start()
 	vh_start(16);
 	for (int chip = 1; chip < 3; chip++)
 	{
-		m_background_pen[chip] = m_gfxdecode[chip]->gfx(0)->colorbase() +
-							(m_gfxdecode[chip]->gfx(0)->colors() - 1) *
-							m_gfxdecode[chip]->gfx(0)->granularity();
+		m_background_pen[chip] = m_tilemap[chip]->gfx(0)->colorbase() +
+							(m_tilemap[chip]->gfx(0)->colors() - 1) *
+							m_tilemap[chip]->gfx(0)->granularity();
 
 		switch (m_kludge)
 		{
 			case 2: /* uopoko dfeveron */
 			case 4: /* pwrinst2 */
-				m_background_pen[chip] = m_gfxdecode[chip]->gfx(0)->colorbase() - m_gfxdecode[chip]->gfx(0)->granularity();
+				m_background_pen[chip] = m_tilemap[chip]->gfx(0)->colorbase() - m_tilemap[chip]->gfx(0)->granularity();
 				break;
 		}
 	}

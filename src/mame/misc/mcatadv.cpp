@@ -179,7 +179,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
 		, m_watchdog(*this, "watchdog")
-		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_tilemap(*this, "tilemap_%u", 0U)
 		, m_spriteram(*this, "spriteram")
@@ -205,7 +204,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<watchdog_timer_device> m_watchdog;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device_array<tilemap038_device, 2> m_tilemap;
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -685,8 +683,11 @@ INPUT_PORTS_END
 
 /*** GFX Decode ***/
 
-static GFXDECODE_START( gfx_mcatadv )
+static GFXDECODE_START( gfx_mcatadv_0 )
 	GFXDECODE_ENTRY( "bg0", 0, gfx_8x8x4_packed_msb, 0, 0x200 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_mcatadv_1 )
 	GFXDECODE_ENTRY( "bg1", 0, gfx_8x8x4_packed_msb, 0, 0x200 )
 GFXDECODE_END
 
@@ -723,17 +724,12 @@ void mcatadv_state::mcatadv(machine_config &config)
 	screen.screen_vblank().append(m_vidregs, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcatadv);
 	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x2000 / 2);
 
-	TMAP038(config, m_tilemap[0]);
-	m_tilemap[0]->set_gfxdecode_tag(m_gfxdecode);
-	m_tilemap[0]->set_gfx(0);
+	TMAP038(config, m_tilemap[0], m_palette, gfx_mcatadv_0);
 	m_tilemap[0]->set_tile_callback(FUNC(mcatadv_state::get_banked_color<0>));
 
-	TMAP038(config, m_tilemap[1]);
-	m_tilemap[1]->set_gfxdecode_tag(m_gfxdecode);
-	m_tilemap[1]->set_gfx(1);
+	TMAP038(config, m_tilemap[1], m_palette, gfx_mcatadv_1);
 	m_tilemap[1]->set_tile_callback(FUNC(mcatadv_state::get_banked_color<1>));
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);

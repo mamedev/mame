@@ -2009,15 +2009,6 @@ static GFXDECODE_START( gfx_common_spr )
 GFXDECODE_END
 
 /***************************************************************************
-                                Dangun Feveron
-***************************************************************************/
-
-static GFXDECODE_START( gfx_dfeveron )
-	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [1] Layer 1
-GFXDECODE_END
-
-/***************************************************************************
                                 Dodonpachi
 ***************************************************************************/
 
@@ -2026,20 +2017,28 @@ static GFXDECODE_START( gfx_ddonpach_spr )
 	GFXDECODE_ENTRY( "sprites0", 0, layout_sprites_msb, 0x0000, 0x40 )
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_ddonpach )
+static GFXDECODE_START( gfx_ddonpach_0 )
 	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x4000, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x4000, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x8,         0x4000, 0x40 ) // [2] Layer 2
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_ddonpach_1 )
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x4000, 0x40 ) // [0] Layer 1
 GFXDECODE_END
 
 /***************************************************************************
                                 Donpachi
 ***************************************************************************/
 
-static GFXDECODE_START( gfx_donpachi )
+static GFXDECODE_START( gfx_donpachi_0 )
 	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [2] Layer 2
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_donpachi_1 )
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [0] Layer 1
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_donpachi_2 )
+	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [0] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -2050,20 +2049,32 @@ static GFXDECODE_START( gfx_esprade_spr )
 	GFXDECODE_ENTRY( "sprites0", 0, layout_sprites_8bpp, 0x0000, 0x40 )
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_esprade )
+static GFXDECODE_START( gfx_esprade_0 )
 	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x8, 0x4000, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x8, 0x4000, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x8, 0x4000, 0x40 ) // [2] Layer 2
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_esprade_1 )
+	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x8, 0x4000, 0x40 ) // [0] Layer 1
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_esprade_2 )
+	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x8, 0x4000, 0x40 ) // [0] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
                                 Hotdog Storm
 ***************************************************************************/
 
-static GFXDECODE_START( gfx_hotdogst )
+static GFXDECODE_START( gfx_hotdogst_0 )
 	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [2] Layer 2
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_hotdogst_1 )
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [0] Layer 1
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_hotdogst_2 )
+	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [0] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -2075,33 +2086,24 @@ static GFXDECODE_START( gfx_korokoro_spr )
 	GFXDECODE_ENTRY( "sprites0", 0, layout_sprites, 0x3c00, 0x40 )
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_korokoro )
-	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [0] Layer 0
-GFXDECODE_END
-
 /***************************************************************************
                                 Mazinger Z
 ***************************************************************************/
 
-static GFXDECODE_START( gfx_mazinger )
-	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x6,         0x0400, 0x10 ) // [1] Layer 1
+static GFXDECODE_START( gfx_mazinger_1 )
+	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x6, 0x0400, 0x10 ) // [0] Layer 1
 GFXDECODE_END
 
 /***************************************************************************
                                Poka Poka Satan
 ***************************************************************************/
 
-static GFXDECODE_START( gfx_ppsatan_0 )
-	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [0] Layer 0
-GFXDECODE_END
-
 static GFXDECODE_START( gfx_ppsatan_spr_1 )
 	GFXDECODE_ENTRY( "sprites1", 0, layout_sprites, 0x3c00, 0x40 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ppsatan_1 )
-	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [0] Layer 1
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ppsatan_spr_2 )
@@ -2109,7 +2111,7 @@ static GFXDECODE_START( gfx_ppsatan_spr_2 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_ppsatan_2 )
-	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_packed_msb, 0x0000, 0x40 ) // [0] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -2121,11 +2123,20 @@ static GFXDECODE_START( gfx_pwrinst2_spr )
 	GFXDECODE_ENTRY( "sprites0", 0, layout_sprites_msb, 0x0000, 0x80 )
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_pwrinst2 )
+static GFXDECODE_START( gfx_pwrinst2_0 )
 	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0800, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x1000, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_packed_msb, 0x1800, 0x40 ) // [2] Layer 2
-	GFXDECODE_ENTRY( "layer3", 0, gfx_8x8x4_packed_msb, 0x2000, 0x40 ) // [3] Layer 3
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_pwrinst2_1 )
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x1000, 0x40 ) // [0] Layer 1
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_pwrinst2_2 )
+	GFXDECODE_ENTRY( "layer2", 0, gfx_8x8x4_packed_msb, 0x1800, 0x40 ) // [0] Layer 2
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_pwrinst2_3 )
+	GFXDECODE_ENTRY( "layer3", 0, gfx_8x8x4_packed_msb, 0x2000, 0x40 ) // [0] Layer 3
 GFXDECODE_END
 
 
@@ -2133,19 +2144,12 @@ GFXDECODE_END
                                 Sailor Moon
 ***************************************************************************/
 
-static GFXDECODE_START( gfx_sailormn )
-	GFXDECODE_ENTRY( "layer0", 0, gfx_8x8x4_packed_msb, 0x0400, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0800, 0x40 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x6_2,       0x0c00, 0x10 ) // [2] Layer 2
+static GFXDECODE_START( gfx_sailormn_1 )
+	GFXDECODE_ENTRY( "layer1", 0, gfx_8x8x4_packed_msb, 0x0800, 0x40 ) // [0] Layer 1
 GFXDECODE_END
 
-
-/***************************************************************************
-                                Uo Poko
-***************************************************************************/
-
-static GFXDECODE_START( gfx_uopoko )
-	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x8, 0x4000, 0x40 ) // [0] Layer 0
+static GFXDECODE_START( gfx_sailormn_2 )
+	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x6_2, 0x0c00, 0x10 ) // [0] Layer 2
 GFXDECODE_END
 
 
@@ -2225,8 +2229,7 @@ void cave_state::add_base_config(machine_config &config, int layer)
 	for (int i = 0; i < layer; i++)
 	{
 		TMAP038(config, m_tilemap[i]);
-		m_tilemap[i]->set_gfxdecode_tag(m_gfxdecode[0]);
-		m_tilemap[i]->set_gfx(i);
+		m_tilemap[i]->set_palette(m_palette[0]);
 	}
 }
 
@@ -2254,7 +2257,9 @@ void cave_state::dfeveron(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_dfeveron);
+	m_tilemap[0]->set_info(gfx_donpachi_0);
+	m_tilemap[1]->set_info(gfx_donpachi_1);
+
 	m_palette[0]->set_entries(0x1000/2);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_4bpp)
@@ -2279,7 +2284,9 @@ void cave_state::ddonpach(machine_config &config)
 
 	/* video hardware */
 	m_spr_gfxdecode[0]->set_info(gfx_ddonpach_spr);
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_ddonpach);
+	m_tilemap[0]->set_info(gfx_ddonpach_0);
+	m_tilemap[1]->set_info(gfx_ddonpach_1);
+	m_tilemap[2]->set_info(gfx_esprade_2);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_8bpp)
 
@@ -2303,7 +2310,10 @@ void cave_state::donpachi(machine_config &config)
 
 	/* video hardware */
 	m_spr_gfxdecode[0]->set_info(gfx_ddonpach_spr);
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_donpachi);
+	m_tilemap[0]->set_info(gfx_donpachi_0);
+	m_tilemap[1]->set_info(gfx_donpachi_1);
+	m_tilemap[2]->set_info(gfx_donpachi_2);
+
 	m_palette[0]->set_entries(0x1000/2);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_4bpp)
@@ -2339,7 +2349,9 @@ void cave_state::esprade(machine_config &config)
 
 	/* video hardware */
 	m_spr_gfxdecode[0]->set_info(gfx_esprade_spr);
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_esprade);
+	m_tilemap[0]->set_info(gfx_esprade_0);
+	m_tilemap[1]->set_info(gfx_esprade_1);
+	m_tilemap[2]->set_info(gfx_esprade_2);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_8bpp)
 
@@ -2364,7 +2376,9 @@ void cave_state::gaia(machine_config &config)
 	/* video hardware */
 	m_screen[0]->set_visarea(0, 320-1, 0, 224-1);
 
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_esprade);
+	m_tilemap[0]->set_info(gfx_esprade_0);
+	m_tilemap[1]->set_info(gfx_esprade_1);
+	m_tilemap[2]->set_info(gfx_esprade_2);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_8bpp)
 
@@ -2391,7 +2405,9 @@ void cave_state::guwange(machine_config &config)
 
 	/* video hardware */
 	m_spr_gfxdecode[0]->set_info(gfx_esprade_spr);
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_esprade);
+	m_tilemap[0]->set_info(gfx_esprade_0);
+	m_tilemap[1]->set_info(gfx_esprade_1);
+	m_tilemap[2]->set_info(gfx_esprade_2);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_8bpp)
 
@@ -2421,7 +2437,10 @@ void cave_z80_state::hotdogst(machine_config &config)
 	m_screen[0]->set_size(384, 240);
 	m_screen[0]->set_visarea(0, 384-1, 0, 240-1);
 
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_hotdogst);
+	m_tilemap[0]->set_info(gfx_hotdogst_0);
+	m_tilemap[1]->set_info(gfx_hotdogst_1);
+	m_tilemap[2]->set_info(gfx_hotdogst_2);
+
 	m_palette[0]->set_entries(0x1000/2);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_z80_state,spr_4bpp)
@@ -2462,7 +2481,8 @@ void cave_state::korokoro(machine_config &config)
 	m_screen[0]->set_visarea(0, 320-1-2, 0, 240-1-1);
 
 	m_spr_gfxdecode[0]->set_info(gfx_korokoro_spr);
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_korokoro);
+	m_tilemap[0]->set_info(gfx_donpachi_0);
+
 	m_palette[0]->set_entries(0x8000/2);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_4bpp)
@@ -2501,7 +2521,9 @@ void cave_z80_state::mazinger(machine_config &config)
 	m_screen[0]->set_size(384, 240);
 	m_screen[0]->set_visarea(0, 384-1, 0, 240-1);
 
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_mazinger);
+	m_tilemap[0]->set_info(gfx_hotdogst_0);
+	m_tilemap[1]->set_info(gfx_mazinger_1);
+
 	m_palette[0]->set_entries(0x8000/2);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_z80_state,spr_4bpp)
@@ -2549,7 +2571,10 @@ void cave_z80_state::metmqstr(machine_config &config)
 	m_screen[0]->set_size(0x200, 240);
 	m_screen[0]->set_visarea(0x7d, 0x7d + 0x180-1, 0, 240-1);
 
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_donpachi);
+	m_tilemap[0]->set_info(gfx_donpachi_0);
+	m_tilemap[1]->set_info(gfx_donpachi_1);
+	m_tilemap[2]->set_info(gfx_donpachi_2);
+
 	m_palette[0]->set_entries(0x1000/2);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_z80_state,spr_4bpp)
@@ -2596,7 +2621,7 @@ void cave_state::pacslot(machine_config &config)
 	m_screen[0]->set_size(0x200, 240);
 	m_screen[0]->set_visarea(0x80, 0x80 + 0x140-1, 0, 240-1);
 
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_uopoko);
+	m_tilemap[0]->set_info(gfx_esprade_0);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_8bpp)
 
@@ -2691,20 +2716,14 @@ void ppsatan_state::ppsatan(machine_config &config)
 	m_spr_gfxdecode[0]->set_info(gfx_korokoro_spr);
 	GFXDECODE(config, m_spr_gfxdecode[1], m_palette[1], gfx_ppsatan_spr_1);
 	GFXDECODE(config, m_spr_gfxdecode[2], m_palette[2], gfx_ppsatan_spr_2);
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_ppsatan_0);
-	GFXDECODE(config, m_gfxdecode[1], m_palette[1], gfx_ppsatan_1);
-	GFXDECODE(config, m_gfxdecode[2], m_palette[2], gfx_ppsatan_2);
 
+	m_tilemap[0]->set_info(gfx_hotdogst_0);
 	m_tilemap[0]->set_xoffs(2, 0);
 
-	TMAP038(config, m_tilemap[1]);
-	m_tilemap[1]->set_gfxdecode_tag(m_gfxdecode[1]);
-	m_tilemap[1]->set_gfx(0);
+	TMAP038(config, m_tilemap[1], m_palette[1], gfx_ppsatan_1);
 	m_tilemap[1]->set_xoffs(1, 0);
 
-	TMAP038(config, m_tilemap[2]);
-	m_tilemap[2]->set_gfxdecode_tag(m_gfxdecode[2]);
-	m_tilemap[2]->set_gfx(0);
+	TMAP038(config, m_tilemap[2], m_palette[2], gfx_ppsatan_2);
 	m_tilemap[2]->set_xoffs(0, -57);
 
 	m_palette[0]->set_entries(0x9000/2);
@@ -2745,7 +2764,11 @@ void cave_z80_state::pwrinst2(machine_config &config)
 	m_screen[0]->set_visarea(0x70, 0x70 + 0x140-1, 0, 240-1);
 
 	m_spr_gfxdecode[0]->set_info(gfx_pwrinst2_spr);
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_pwrinst2);
+	m_tilemap[0]->set_info(gfx_pwrinst2_0);
+	m_tilemap[1]->set_info(gfx_pwrinst2_1);
+	m_tilemap[2]->set_info(gfx_pwrinst2_2);
+	m_tilemap[3]->set_info(gfx_pwrinst2_3);
+
 	m_palette[0]->set_entries(0x5000/2);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_z80_state,spr_4bpp)
@@ -2813,10 +2836,13 @@ void cave_z80_state::sailormn(machine_config &config)
 	m_screen[0]->set_size(320+1, 240);
 	m_screen[0]->set_visarea(0+1, 320+1-1, 0, 240-1);
 
+	// 4 bit sprites, 6 bit tiles
+	m_tilemap[0]->set_info(gfx_donpachi_0);
+	m_tilemap[1]->set_info(gfx_sailormn_1);
+	m_tilemap[2]->set_info(gfx_sailormn_2);
 	/* Layer 2 (8x8) needs to be handled differently */
 	m_tilemap[2]->set_tile_callback(FUNC(cave_z80_state::sailormn_get_banked_code)); /* Layer 2 has 1 banked ROM */
 
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_sailormn); // 4 bit sprites, 6 bit tiles
 	m_palette[0]->set_entries(0x4000/2);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_z80_state,spr_4bpp)
@@ -2865,7 +2891,7 @@ void cave_state::tekkencw(machine_config &config)
 	m_screen[0]->set_size(0x200, 240);
 	m_screen[0]->set_visarea(0x80, 0x80 + 0x140-1, 0, 240-1);
 
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_uopoko);
+	m_tilemap[0]->set_info(gfx_esprade_0);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_8bpp)
 
@@ -2907,7 +2933,7 @@ void cave_state::tjumpman(machine_config &config)
 	m_screen[0]->set_size(0x200, 240);
 	m_screen[0]->set_visarea(0x80, 0x80 + 0x140-1, 0, 240-1);
 
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_uopoko);
+	m_tilemap[0]->set_info(gfx_esprade_0);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_8bpp)
 
@@ -2935,7 +2961,7 @@ void cave_state::uopoko(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_uopoko);
+	m_tilemap[0]->set_info(gfx_esprade_0);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,spr_8bpp)
 
@@ -5462,8 +5488,8 @@ void cave_state::init_ddonpach()
 	m_time_vblank_irq = 90;
 
 	/* 4bpp but Only first 16 colors are used in palette index for Layer 0, 1. */
-	m_gfxdecode[0]->gfx(0)->set_granularity(256);
-	m_gfxdecode[0]->gfx(1)->set_granularity(256);
+	m_tilemap[0]->gfx(0)->set_granularity(256);
+	m_tilemap[1]->gfx(0)->set_granularity(256);
 }
 
 void cave_state::init_donpachi()

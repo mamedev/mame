@@ -29,7 +29,6 @@ public:
 		, m_oki(*this, "oki%u", 1)
 		, m_int_timer(*this, "int_timer")
 		, m_eeprom(*this, "eeprom")
-		, m_gfxdecode(*this, "gfxdecode.%u", 0U)
 		, m_spr_gfxdecode(*this, "spr_gfxdecode.%u", 0U)
 		, m_screen(*this, "screen.%u", 0U)
 		, m_palette(*this, "palette.%u", 0U)
@@ -88,7 +87,6 @@ protected:
 	optional_device_array<okim6295_device, 2> m_oki;
 	required_device<timer_device> m_int_timer;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device_array<gfxdecode_device, 4> m_gfxdecode;
 	optional_device_array<gfxdecode_device, 4> m_spr_gfxdecode;
 	optional_device_array<screen_device, 4> m_screen;
 	optional_device_array<palette_device, 4> m_palette;

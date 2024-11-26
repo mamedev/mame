@@ -30,11 +30,12 @@
 
     Offset:     Bits:                   Value:
 
-    0.w         fe-- ---- ---- ---      Priority
+    0.w         fe-- ---- ---- ----     Priority
                 --dc ba98 ---- ----     Color
-                ---- ---- 7654 3210
+                ---- ---- 7654 32--
+                ---- ---- ---- --10     Code hi bits
 
-    2.w                                 Code
+    2.w                                 Code low bits
 
 
     When a row-scroll / row-select effect is enabled, the scroll values are
@@ -130,13 +131,12 @@ DEFINE_DEVICE_TYPE(TMAP038, tilemap038_device, "tmap038", "038 Tilemap generator
 
 tilemap038_device::tilemap038_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TMAP038, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this)
 	, m_vram_8x8(*this, "vram_8x8")
 	, m_vram_16x16(*this, "vram_16x16")
 	, m_lineram(*this, "lineram")
 	, m_vregs(nullptr)
 	, m_tiledim(false)
-	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
-	, m_gfxno(0)
 	, m_038_cb(*this)
 	, m_xoffs(0)
 	, m_flipped_xoffs(0)
@@ -174,7 +174,7 @@ TILE_GET_INFO_MEMBER(tilemap038_device::get_tile_info)
 		m_038_cb(false, color, pri, code);
 	}
 
-	tileinfo.set(m_gfxno, code, color, 0);
+	tileinfo.set(0, code, color, 0);
 	tileinfo.category = pri;
 }
 
@@ -188,7 +188,7 @@ void tilemap038_device::device_start()
 		fatalerror("Tilemap 038 %s: VRAM not found",this->tag());
 
 	m_tmap = &machine().tilemap().create(
-			*m_gfxdecode,
+			*this,
 			tilemap_get_info_delegate(*this, FUNC(tilemap038_device::get_tile_info)),
 			TILEMAP_SCAN_ROWS,
 			8,8, 512 / 8,512 / 8);

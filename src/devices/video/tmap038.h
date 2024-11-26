@@ -7,7 +7,7 @@
 
 #include "tilemap.h"
 
-class tilemap038_device : public device_t
+class tilemap038_device : public device_t, public device_gfx_interface
 {
 public:
 	typedef device_delegate<void (bool tiledim, u32 &color, u32 &pri, u32 &code)> tmap038_cb_delegate;
@@ -19,10 +19,15 @@ public:
 
 	tilemap038_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	template <typename T> tilemap038_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: tilemap038_device(mconfig, tag, owner)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
+
 	// configurations
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	template <typename... T> void set_tile_callback(T &&... args) { m_038_cb.set(std::forward<T>(args)...); }
-	void set_gfx(u16 no) { m_gfxno = no; }
 	void set_xoffs(int xoffs, int flipped_xoffs) { m_xoffs = xoffs; m_flipped_xoffs = flipped_xoffs; }
 	void set_yoffs(int yoffs, int flipped_yoffs) { m_yoffs = yoffs; m_flipped_yoffs = flipped_yoffs; }
 
@@ -96,10 +101,6 @@ private:
 	optional_shared_ptr<u16> m_lineram;
 	std::unique_ptr<u16[]> m_vregs;
 	bool m_tiledim;
-
-	// set when creating device
-	required_device<gfxdecode_device> m_gfxdecode;
-	u16 m_gfxno;
 
 	tmap038_cb_delegate m_038_cb;
 	tilemap_t* m_tmap = nullptr;
