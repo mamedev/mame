@@ -3930,6 +3930,11 @@ INPUT_PORTS_START( ougonhai )
 	// SW 3  OFF OFF  ON  ON  ON  ON OFF OFF               OFF OFF OFF  ON  ON  ON  ON OFF
 	// SW 4  OFF  ON  ON OFF OFF OFF OFF OFF                ON  ON  ON OFF OFF OFF OFF OFF
 
+	// The manual implies SW 3 and SW 4 are banks of eight DIP switches, however
+	// the board has pads for banks of ten DIP switches, and ten DIP switches
+	// are shown in the input test.  Boards have been found populated with banks
+	// of eight DIP switches or ten DIP switches.
+
 	PORT_INCLUDE( tenkai )
 
 	PORT_MODIFY("DSW2")
@@ -3969,7 +3974,10 @@ INPUT_PORTS_START( ougonhai )
 	PORT_DIPNAME( 0x08, 0x00, "Renchan Rate" )                  PORT_DIPLOCATION("SW 2:10")       // 連荘レート
 	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW 3:9" )                                                // not documented
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW 3:10" )                                               // not documented
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW 4:9" )                                                // not documented
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW 4:10" )                                               // not documented
 INPUT_PORTS_END
 
 

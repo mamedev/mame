@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_CASSETTE_H
-#define MAME_DEVICES_IMAGEDEV_CASSETTE_H
+#ifndef MAME_IMAGEDEV_CASSETTE_H
+#define MAME_IMAGEDEV_CASSETTE_H
+
+#pragma once
 
 #include "formats/cassimg.h"
 
@@ -142,4 +144,4 @@ DECLARE_DEVICE_TYPE(CASSETTE, cassette_image_device)
 // device iterator
 typedef device_type_enumerator<cassette_image_device> cassette_device_enumerator;
 
-#endif // MAME_DEVICES_IMAGEDEV_CASSETTE_H
+#endif // MAME_IMAGEDEV_CASSETTE_H
