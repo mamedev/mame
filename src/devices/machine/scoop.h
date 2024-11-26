@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_SCOOP
-#define MAME_MACHINE_SCOOP
+#ifndef MAME_MACHINE_SCOOP_H
+#define MAME_MACHINE_SCOOP_H
 
 #pragma once
 
@@ -39,4 +39,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SCOOP, scoop_device)
 
-#endif // MAME_MACHINE_SCOOP
+#endif // MAME_MACHINE_SCOOP_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_DEVICES_MACHINE_BANKDEV_H
-#define MAME_DEVICES_MACHINE_BANKDEV_H
+#ifndef MAME_MACHINE_BANKDEV_H
+#define MAME_MACHINE_BANKDEV_H
 
 #pragma once
 
@@ -77,4 +77,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ADDRESS_MAP_BANK, address_map_bank_device)
 
-#endif // MAME_DEVICES_MACHINE_BANKDEV_H
+#endif // MAME_MACHINE_BANKDEV_H

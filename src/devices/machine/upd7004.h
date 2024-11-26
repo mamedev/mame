@@ -24,8 +24,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_UPD7004_H
-#define MAME_DEVICES_MACHINE_UPD7004_H
+#ifndef MAME_MACHINE_UPD7004_H
+#define MAME_MACHINE_UPD7004_H
 
 #pragma once
 
@@ -78,4 +78,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(UPD7004, upd7004_device)
 
-#endif // MAME_DEVICES_MACHINE_UPD7004_H
+#endif // MAME_MACHINE_UPD7004_H

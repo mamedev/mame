@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_SA1111
-#define MAME_MACHINE_SA1111
+#ifndef MAME_MACHINE_SA1111_H
+#define MAME_MACHINE_SA1111_H
 
 #pragma once
 
@@ -685,4 +685,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SA1111, sa1111_device)
 
-#endif // MAME_MACHINE_SA1111
+#endif // MAME_MACHINE_SA1111_H
