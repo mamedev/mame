@@ -21,6 +21,7 @@ The main components are:
 The BPSC-2006KG PCB adds a TPA3004D2 audio amplifier.
 
 
+** means not dumped
 *** means not dumped nor identified
 
 Banpresto "Chara Medal Island" series:
@@ -32,7 +33,7 @@ Banpresto "Chara Medal Island" series:
 almost surely more
 
 Takara / Tomy "VS medal" series (games show produced by Amodio and Tomy copyright on title screen):
-*** TM-01 - ??? - ???
+**  TM-01 - Kurohige Kiki Ippatsu - 黒ひげ危機一発
 *** TM-02 - ??? - ???
     TM-03 - Zoids (may not be complete title) - ゾイド
 *** TM-04 - ??? - ???

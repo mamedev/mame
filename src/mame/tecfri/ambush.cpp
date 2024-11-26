@@ -737,7 +737,7 @@ void ambush_state::ambush(machine_config &config)
 	m_outlatch[1]->q_out_cb<7>().set(FUNC(ambush_state::coin_counter_2_w));
 }
 
-void ambush_state::mariobla(machine_config &config)
+void ambush_state::mariobl(machine_config &config)
 {
 	ambush_base(config);
 	subdevice<z80_device>("maincpu")->set_addrmap(AS_PROGRAM, &ambush_state::bootleg_map);
@@ -745,7 +745,7 @@ void ambush_state::mariobla(machine_config &config)
 	// To be verified: do these bootlegs only have one LS259?
 	ls259_device &outlatch(LS259(config, "outlatch"));
 	outlatch.q_out_cb<4>().set(FUNC(ambush_state::coin_counter_1_w));
-	outlatch.q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
+	outlatch.q_out_cb<6>().set(FUNC(ambush_state::color_bank_1_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, mariobl)
 
@@ -764,13 +764,13 @@ void ambush_state::mariobla(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
-void ambush_state::mariobl(machine_config &config)
+void ambush_state::mariobla(machine_config &config)
 {
-	mariobla(config);
+	mariobl(config);
 
 	auto &outlatch(*subdevice<ls259_device>("outlatch"));
-	outlatch.q_out_cb<5>().set_nop();
-	outlatch.q_out_cb<6>().set(FUNC(ambush_state::color_bank_1_w));
+	outlatch.q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
+	outlatch.q_out_cb<6>().set_nop();
 }
 
 void ambush_state::dkong3abl(machine_config &config)
