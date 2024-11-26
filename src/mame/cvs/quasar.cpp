@@ -10,9 +10,12 @@ Driver by Mike Coates and Pierpaolo Prazzoli
 TODO:
 - Missing enemy shooting sound effect, needs netlist?
 - Where is the flipscreen signal?
-- Phase 3 seems awfully hard, or is it normal? Even with cheats enabled, it is
-  very hard to complete this level.
 - Test/service input isn't working?
+
+It's picky about vblank duration: If it's too short, parts of the game run too
+slow. Or if it's too long, parts of the game run too fast, and eg. the 3rd level
+becomes nearly unbeatable. The implemented duration of 3500us approximately
+matches what was seen on a PCB video.
 
 ********************************************************************************
 
@@ -310,26 +313,26 @@ void quasar_state::video_w(offs_t offset, uint8_t data)
 {
 	switch (m_page)
 	{
-	case 0: m_video_ram[offset] = data; break;
-	case 1: m_color_ram[offset] = data & 7; break; // 3 bits of ram only - 3 x 2102
-	case 2: m_effectram[offset] = data; break;
-	case 3: m_effectcontrol = data; break;
+		case 0: m_video_ram[offset] = data; break;
+		case 1: m_color_ram[offset] = data & 7; break; // 3 bits of ram only - 3 x 2102
+		case 2: m_effectram[offset] = data; break;
+		case 3: m_effectcontrol = data; break;
 	}
 }
 
 uint8_t quasar_state::io_r()
 {
-	uint8_t ans = 0;
+	uint8_t data = 0;
 
 	switch (m_io_page)
 	{
-	case 0: ans = m_in[0]->read(); break;
-	case 1: ans = m_in[1]->read(); break;
-	case 2: ans = m_dsw[0]->read(); break;
-	case 3: ans = m_dsw[1]->read(); break;
+		case 0: data = m_in[0]->read(); break;
+		case 1: data = m_in[1]->read(); break;
+		case 2: data = m_dsw[0]->read(); break;
+		case 3: data = m_dsw[1]->read(); break;
 	}
 
-	return ans;
+	return data;
 }
 
 void quasar_state::bullet_w(offs_t offset, uint8_t data)
@@ -362,7 +365,7 @@ void quasar_state::io(address_map &map)
 void quasar_state::data(address_map &map)
 {
 	map(S2650_CTRL_PORT, S2650_CTRL_PORT).r(FUNC(quasar_state::collision_r)).nopw();
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(quasar_state::collision_clear), FUNC(quasar_state::sh_command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(quasar_state::collision_clear_r), FUNC(quasar_state::sh_command_w));
 }
 
 
@@ -517,7 +520,7 @@ GFXDECODE_END
 void quasar_state::quasar(machine_config &config)
 {
 	// basic machine hardware
-	S2650(config, m_maincpu, 14.318181_MHz_XTAL / 4); // 14.31818 MHz crystal divide by 4 on board
+	S2650(config, m_maincpu, 14.318181_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quasar_state::program);
 	m_maincpu->set_addrmap(AS_IO, &quasar_state::io);
 	m_maincpu->set_addrmap(AS_DATA, &quasar_state::data);
@@ -525,7 +528,7 @@ void quasar_state::quasar(machine_config &config)
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x0a; });
 
-	i8035_device &audiocpu(I8035(config, "audiocpu", 6_MHz_XTAL)); // 6 MHz crystal divide by 15 in CPU
+	i8035_device &audiocpu(I8035(config, "audiocpu", 6_MHz_XTAL));
 	audiocpu.set_addrmap(AS_PROGRAM, &quasar_state::sound_map);
 	audiocpu.set_addrmap(AS_IO, &quasar_state::sound_portmap);
 	audiocpu.t1_in_cb().set(FUNC(quasar_state::audio_t1_r));
@@ -534,8 +537,8 @@ void quasar_state::quasar(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_refresh_hz(50); // From dot clock
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_refresh_hz(50); // from dot clock
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3500));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(1*8+1, 29*8-1, 2*8, 32*8-1);
 	m_screen->set_screen_update(FUNC(quasar_state::screen_update));

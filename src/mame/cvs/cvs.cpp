@@ -715,7 +715,7 @@ void cvs_state::main_cpu_io_map(address_map &map)
 void cvs_state::main_cpu_data_map(address_map &map)
 {
 	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(cvs_state::collision_r), FUNC(cvs_state::audio_command_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(cvs_state::collision_clear), FUNC(cvs_state::video_fx_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(cvs_state::collision_clear_r), FUNC(cvs_state::video_fx_w));
 }
 
 /*************************************
@@ -1211,7 +1211,7 @@ void cvs_state::cvs(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &cvs_state::main_cpu_data_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cvs_state::main_cpu_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
-	m_maincpu->flag_handler().set(FUNC(cvs_state::write_s2650_flag));
+	m_maincpu->flag_handler().set([this] (int state) { m_ram_view.select(state); });
 	m_maincpu->intack_handler().set_constant(0x03);
 
 	S2650(config, m_audiocpu, XTAL(14'318'181) / 16);

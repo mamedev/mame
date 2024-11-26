@@ -518,7 +518,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			flags = STEP_COND;
 			break;
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3:
-			util::stream_format(stream, z80 ? "cp   r0,%d" : "comz,%d", rv);
+			util::stream_format(stream, z80 ? "cp   r0,r%d" : "comz,%d", rv);
 			break;
 		case 0xe4: case 0xe5: case 0xe6: case 0xe7:
 			util::stream_format(stream, z80 ? "cp   r%d,%s" : "comi,%d %s", rv, IMM(pc, params));

@@ -29,8 +29,10 @@ horizontal/vertical sync pulse.
 */
 
 #include "emu.h"
+
 #include "cpu/s2650/s2650.h"
 #include "machine/s2636.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -206,16 +208,13 @@ TIMER_CALLBACK_MEMBER(subhuntr_state::video_callback)
 
 	if (!y)
 	{
-		m_pvi1_h5->render_first_line();
-		m_pvi2_l5->render_first_line();
-		m_pvi3_n5->render_first_line();
+		m_pvi1_h5->start_new_frame();
+		m_pvi2_l5->start_new_frame();
+		m_pvi3_n5->start_new_frame();
 	}
-	else
-	{
-		m_pvi1_h5->render_next_line();
-		m_pvi2_l5->render_next_line();
-		m_pvi3_n5->render_next_line();
-	}
+	m_pvi1_h5->render_next_line();
+	m_pvi2_l5->render_next_line();
+	m_pvi3_n5->render_next_line();
 
 	u16 const *src1 = &m_pvi1_h5->bitmap().pix(y);
 	u16 const *src2 = &m_pvi2_l5->bitmap().pix(y);

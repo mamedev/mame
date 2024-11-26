@@ -73,9 +73,8 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void write_s2650_flag(int state);
 	uint8_t collision_r();
-	uint8_t collision_clear();
+	uint8_t collision_clear_r();
 	void scroll_start();
 	void init_stars() ATTR_COLD;
 	void update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always);

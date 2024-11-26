@@ -60,7 +60,16 @@ http://www.opdenkelder.com/Astrowars_manual.zip
 
 HW has many similarities with quasar.cpp / cvs.cpp / zac2650.cpp
 real hardware video of Astro Wars can be seen here: youtu.be/eSrQFBMeDlM
----
+
+--------------------------------------------------------------------------------
+
+About the 1-bit different 13H ROM in "galaxiab" compared to the one in "galaxia"
+and "galaxiaa": The change is a RAM address from $1CD5(unknown) to $1CC5(player X
+position). When an alien is diving down, it reads from there. Set "galaxiac" also
+reads from $1CC5.
+
+Also note that "galaxiab" 13H was dumped from 2 boards, so that should take away
+remaining suspicion that it might be a bad dump.
 
 TODO:
 - go through everything in the schematics for astrowar / galaxia
@@ -109,8 +118,6 @@ private:
 	void scroll_w(uint8_t data);
 	void ctrlport_w(uint8_t data);
 	void dataport_w(uint8_t data);
-	uint8_t collision_r();
-	uint8_t collision_clear();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -138,11 +145,11 @@ private:
 };
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Video
 
-***************************************************************************/
+*******************************************************************************/
 
 static constexpr uint8_t SPRITE_PEN_BASE = 0x10;
 static constexpr uint8_t STAR_PEN = 0x18;
@@ -375,11 +382,11 @@ void galaxia_state::vblank_irq(int state)
 }
 
 
-/***************************************************************************
+/*******************************************************************************
 
   I/O
 
-***************************************************************************/
+*******************************************************************************/
 
 template <uint8_t Which>
 void galaxia_state::video_w(offs_t offset, uint8_t data)
@@ -390,8 +397,6 @@ void galaxia_state::video_w(offs_t offset, uint8_t data)
 
 void galaxia_state::scroll_w(uint8_t data)
 {
-	m_screen->update_partial(m_screen->vpos());
-
 	// fixed scrolling area
 	for (int i = 1; i < 6; i++)
 		m_bg_tilemap->set_scrolly(i, data);
@@ -410,19 +415,6 @@ void galaxia_state::ctrlport_w(uint8_t data)
 void galaxia_state::dataport_w(uint8_t data)
 {
 	// seems to be related to sound board comms
-}
-
-uint8_t galaxia_state::collision_r()
-{
-	m_screen->update_partial(m_screen->vpos());
-	return m_collision_register;
-}
-
-uint8_t galaxia_state::collision_clear()
-{
-	m_screen->update_partial(m_screen->vpos());
-	m_collision_register = 0;
-	return 0xff;
 }
 
 void galaxia_state::mem_map(address_map &map)
@@ -466,15 +458,15 @@ void galaxia_state::io_map(address_map &map)
 void galaxia_state::data_map(address_map &map)
 {
 	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(galaxia_state::collision_r), FUNC(galaxia_state::ctrlport_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(galaxia_state::collision_clear), FUNC(galaxia_state::dataport_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(galaxia_state::collision_clear_r), FUNC(galaxia_state::dataport_w));
 }
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Inputs
 
-***************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( galaxia )
 	PORT_START("IN0")
@@ -549,11 +541,11 @@ static INPUT_PORTS_START( galaxia )
 INPUT_PORTS_END
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Machine Configs
 
-***************************************************************************/
+*******************************************************************************/
 
 static const gfx_layout tiles8x8x2_layout =
 {
@@ -583,14 +575,14 @@ void galaxia_state::galaxia(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &galaxia_state::io_map);
 	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::data_map);
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
-	m_maincpu->flag_handler().set(FUNC(galaxia_state::write_s2650_flag));
+	m_maincpu->flag_handler().set([this] (int state) { m_ram_view.select(state); });
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3500));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0*8, 30*8-1, 2*8, 32*8-1);
 	m_screen->set_screen_update(FUNC(galaxia_state::screen_update));
@@ -624,14 +616,14 @@ void astrowar_state::astrowar(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &astrowar_state::io_map);
 	m_maincpu->set_addrmap(AS_DATA, &astrowar_state::data_map);
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
-	m_maincpu->flag_handler().set(FUNC(astrowar_state::write_s2650_flag));
+	m_maincpu->flag_handler().set([this] (int state) { m_ram_view.select(state); });
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3500));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(1*8, 31*8-1, 2*8, 32*8-1);
 	m_screen->set_screen_update(FUNC(astrowar_state::screen_update));
@@ -650,11 +642,11 @@ void astrowar_state::astrowar(machine_config &config)
 }
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Game drivers
 
-***************************************************************************/
+*******************************************************************************/
 
 ROM_START( galaxia )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -703,7 +695,7 @@ ROM_START( galaxiab )
 	ROM_LOAD( "galaxia.8h",  0x00000, 0x0400, CRC(f3b4ffde) SHA1(15b004e7821bfc145158b1e9435f061c524f6b86) )
 	ROM_LOAD( "galaxia.10h", 0x00400, 0x0400, CRC(6d07fdd4) SHA1(d7d4b345a055275d59951788569db370bccd5195) )
 	ROM_LOAD( "galaxia.11h", 0x00800, 0x0400, CRC(1520eb3d) SHA1(3683174da701e1124af0f9c2ee4a9a84f3fea33a) )
-	ROM_LOAD( "galaxia.13h", 0x00c00, 0x0400, CRC(1d22219b) SHA1(6ab8ea8c78db30d80de98879018726d0420d30fe) ) // sldh - only 1 bit difference compared with set 1/2, however not considered a bad dump since it was found on two boards
+	ROM_LOAD( "galaxia.13h", 0x00c00, 0x0400, CRC(1d22219b) SHA1(6ab8ea8c78db30d80de98879018726d0420d30fe) ) // sldh - only 1 bit difference compared with to galaxiaa, not a bad dump, see notes above
 	ROM_LOAD( "galaxia.8i",  0x01000, 0x0400, CRC(45b88599) SHA1(3b79c21db1aa9d80fac81ac5a554e438805febd1) )
 	ROM_LOAD( "galaxia.10i", 0x02000, 0x0400, CRC(76bd9fe3) SHA1(1abc8e40063aaa9140ea5e0341127eb0a7e86c88) ) // sldh
 	ROM_LOAD( "galaxia.11i", 0x02400, 0x0400, CRC(4456808a) SHA1(f9e8cfdde0e17f13f1be297b2b4503ccc959b33c) )
