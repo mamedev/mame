@@ -1041,6 +1041,7 @@ end
 			end
 			buildoptions {
 				"-fdiagnostics-show-note-include-stack",
+				"-Wno-error=tautological-compare",
 				"-Wno-cast-align",
 				"-Wno-constant-logical-operand",
 				"-Wno-extern-c-compat",
