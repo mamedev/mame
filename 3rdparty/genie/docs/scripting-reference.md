@@ -341,6 +341,19 @@ configuration "not windows"
     defines { "NOT_WINDOWS" }
 ```
 
+Define a symbol based on custom command line option
+
+```lua
+newoption {
+    trigger     = "gfxapi",
+    description = "Choose a particular 3D API for rendering",
+    allowed     = { { "opengl", "OpenGL Renderer" } }
+}
+
+configuration "opengl"
+    defines { "OPENGL" }
+```
+
 Reset the configuration filter
 
 ```lua
@@ -349,7 +362,7 @@ configuration {}
 
 #### Caveats
 
-- Argument chaining:
+- Argument chaining:  
   `configuration` can take multiple arguments, e.g.,
   ```lua
   configuration {"StaticLib", "xcode*", "osx or ios*"}
@@ -357,29 +370,29 @@ configuration {}
   These arguments will be combined as an `AND` clause,
   i.e. if one of the keywords does _not_ match the actual configuration terms,
   the following settings will not be applied.
-
-- Condition evaluation:
+  
+- Condition evaluation:  
   The arguments are **not** evaluated as Lua. They are merely regex-matched against the configuration terms.
   The implications of this are that parentheses have no effect outside of regular expression groups.
   A condition like `"not (osx or ios*)"` will not be equivalent to `{"not osx", "not ios*}"`.
   Furthermore, a condition like `"not osx or ios*"` will be evaluated as the negation of `"osx or ios*"`.
-
-- `and` is **not** a valid keyword for configuration combinations.
+  
+- `and` is **not** a valid keyword for configuration combinations.  
   However, several keywords will be combined as an `AND` clause.
-
-- Limits of Lua's regular expressions:
+  
+- Limits of Lua's regular expressions:  
   Each passed keyword is matched against each configuration terms from the project/solution type being built
   using [Lua's regular expression mechanism](https://www.lua.org/manual/5.3/manual.html#6.4).
   This means that keyword matching is subject to the same limits as regular Lua regex matching.
   This implies that regexes like `"(osx|ios)"` do not work.
-
-- Wildcard expansion:
+  
+- Wildcard expansion:  
   Wildcards will get expanded following the same rules as paths.
   Similarly, special characters such as `()` will get escaped (i.e. converted to `%(%)`) before being matched.
   This means that `"not (osx or ios*)"` will in fact get expanded to `"not %(osx or ios[^/]*)"` and then checked as
   `not` _result of_ `"%(osx or ios[^/]*)"`, which in turn gets broken down to `"%(osx"` and `"ios[^/]*)"`.
-
-- `"win*"` matchings:
+  
+- `"win*"` matchings:  
   Intuitively, the configuration keyword to match "Windows" ("Win32", "Win64" or "WinCE") configuration would be
   `"win*"`. However **`"win*"` also matches "WindowedApp"**. Prefer using the term `"vs*"` to check for configurations
   targeting Windows.
@@ -428,10 +441,10 @@ for rule listed commands are executed.
 **Scope:** solutions, projects, configurations
 
 #### Arguments
-*input_file* - source file that should be "compiled" with custom task
-*output_file* - generated file name
-*dependency* - additional dependencies, that can be used as parameters to commands
-*command* - command list, special functions in commands are :
+*input_file* - source file that should be "compiled" with custom task  
+*output_file* - generated file name  
+*dependency* - additional dependencies, that can be used as parameters to commands  
+*command* - command list, special functions in commands are :  
     $(<) - input file  
     $(@) - output file  
     $(1) - $(9) - additional dependencies
@@ -537,7 +550,7 @@ GMAKE specific. Adds dependency between source file and any other file.
 **Scope:** solutions, projects, configurations
 
 #### Arguments
-*main_file* - name of source file that depends of other file
+*main_file* - name of source file that depends of other file  
 *depending_of* - name of dependency file
 
 #### Examples
@@ -630,7 +643,16 @@ Specifies build flags to modify the compiling or linking process. Multiple calls
 #### Arguments
 _flags_ - List of flag names from list below. Names are case-insensitive and ignored if not supported on a platform.
 
+* _AntBuildDebuggable_ - Enables Visual Studio projects targetting Android to be debugged using the NVIDIA Nsight Tegra tools. ([#321](https://github.com/bkaradzic/GENie/pull/321))
 * _C7DebugInfo_ - Enables C7 compatible debug info for MSVC builds.
+* _Cpp11_ - Enable usage of C++11 features.
+* _Cpp14_ - Enable usage of C++14 features.
+* _Cpp17_ - Enable usage of C++17 features.
+* _Cpp20_ - Enable usage of C++20 features.
+* _CppLatest_ - Enable usage of latest C++ features.
+* _DebugEnvsDontMerge_ - Cause Visual Studio projects to not merge debug environment with the one inherited from the parent process. (i.e. sets `Project Properties > Debugging > Merge Environment` to `false`)
+* _DebugEnvsInherit_ - Cause Visual Studio projects to inherit debug environment. (i.e. sets in `Project Properties > Debugging > Environment > Edit > Inherit from parent of project defaults` to `true`)
+* _DeploymentContent_ - Mark files with `DeploymentContent` flag in the project file. (For C++ Win Store apps) ([#139](https://github.com/bkaradzic/GENie/pull/139))
 * _EnableMinimalRebuild_ - Enable Visual Studio's minimal rebuild feature.
 * _EnableSSE, EnableSSE2, EnableAVX, EnableAVX2_ - Enable SSE/AVX instruction sets
 * _ExtraWarnings_ - Sets compiler's max warning level.
@@ -641,7 +663,6 @@ _flags_ - List of flag names from list below. Names are case-insensitive and ign
 * _GenerateMapFiles_ - Enable .map file outputs from the Visual Studio linker.
 * _LinkSupportCircularDependencies_ - Enables the linker to iterate over provided libs in order to resolve circular dependencies (make and ninja only).
 * _Managed_ - Enable Managed C++ (.NET).
-* _MFC_ - Enable support for Microsoft Foundation Classes.
 * _MinimumWarnings_ - - Sets compiler's minimum warning level (Visual Studio only).
 * _NativeWChar, NoNativeWChar_ - Toggle support for the wchar data type.
 * _No64BitChecks_ - Disable 64-bit portability warnings.
@@ -651,6 +672,7 @@ _flags_ - List of flag names from list below. Names are case-insensitive and ign
 * _NoFramePointer_ - Disable the generation of stack frame pointers.
 * _NoImportLib_ - Prevent the generation of an import library for a Windows DLL.
 * _NoIncrementalLink_ - Disable support for Visual Studio's incremental linking feature.
+* _NoJMC_ - Disable Visual Studio's 'Just my Code' feature.
 * _NoManifest_ - Prevent the generation of a manifest for Windows executables and shared libraries.
 * _NoMultiProcessorCompilation_ - Disables Visual Studio's and FastBuild's multiprocessor compilation.
 * _NoPCH_ - Disable precompiled headers.
@@ -671,8 +693,8 @@ _flags_ - List of flag names from list below. Names are case-insensitive and ign
 * _Unsafe_ - Enable the use of unsafe code in .NET applications.
 * _UnsignedChar_ - Force `char`s to be `unsigned` by default.
 * _UseFullPaths_ - Enable absolute paths for `__FILE__`. 
-* _UseLDResponseFile_ - Enable use of response file (aka @file) for linking lib dependencies (make only).
-* _UseObjectResponseFile_ - Enable use of response file (aka @file) for linking objects (make only).
+* _UseLDResponseFile_ - Enable use of response file (aka @file) for linking lib dependencies (make and ninja).
+* _UseObjectResponseFile_ - Enable use of response file (aka @file) for linking objects (make and ninja).
 * _WinMain_ - Use WinMain() as the entry point for Windows applications, rather than main().
 
 **Note:** When not set, options will default to the tool default.
@@ -903,7 +925,7 @@ Sets the kind of binary object being created by the project, such as a console o
 _kind_ - project kind identifier. One of:
 
 * _ConsoleApp_ - console executable
-* _WindowedApp_ - application that runs in a desktop window. Does not apply on Linux.
+* _WindowedApp_ - application that runs in a window (Windows, Android, MacOS and iOS). Does not apply on Linux.
 * _StaticLib_ - static library
 * _SharedLib_ - shared library or DLL
 * _Bundle_ - Xcode: Cocoa Bundle, everywhere else: alias to _SharedLib_
@@ -1287,8 +1309,11 @@ _identifiers_ - list of hardware platform specifiers from this list:
 * _Xbox360_ - Xbox 360 compiler and linker under Visual Studio
 * _PowerPC_ - PowerPC processors
 * _ARM_ - ARM-based processors
+* _ARM64_ - ARM64-based processors
 * _Orbis_ - Playstation 4
 * _Durango_ - Xbox One
+* _NX32_ - Nintendo Switch 32-bit
+* _NX64_ - Nintendo Switch 64-bit
 
 #### Return Value
 Current list of target platforms for the active solution
@@ -1899,11 +1924,11 @@ xcodetargetopts {
 ---
 ### xcodescriptphases({{_cmd_, {_inputpaths_, ...}}})
 #### XCode only
-Adds a script phase to the generated XCode project file.
+Adds a script phase to the generated XCode project file.  
 One tag can contain several commands with different inputpaths.
 
 #### Arguments
-_cmd_ - The actual command to run. (This can be a shell script file or direct shell code).
+_cmd_ - The actual command to run. (This can be a shell script file or direct shell code).  
 _inputpaths_ - The paths passed to the command
 
 #### Examples
@@ -1948,11 +1973,11 @@ done
 ---
 ### xcodecopyresources({{_targetpath_, {_inputfiles_, ...}}})
 #### XCode only
-Adds a 'Copy Files' phase to the generated XCode project file.
+Adds a 'Copy Files' phase to the generated XCode project file.  
 One tag can contain several target paths with different input files.
 
 #### Arguments
-_targetpath_ - The target path relative to the _Resource_ folder in the resulting `.app` structure.
+_targetpath_ - The target path relative to the _Resource_ folder in the resulting `.app` structure.  
 _inputfiles_ - The input files to be copied.
 
 #### Examples

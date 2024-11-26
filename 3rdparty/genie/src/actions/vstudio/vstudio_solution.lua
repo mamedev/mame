@@ -85,8 +85,10 @@
 	function sln2005.header(sln)
 		local action = premake.action.current()
 		_p('Microsoft Visual Studio Solution File, Format Version %d.00', action.vstudio.solutionVersion)
-		if(_ACTION:sub(3) == "2015" or  _ACTION:sub(3) == "2017" or  _ACTION:sub(3) == "llvm") then
+		if(_ACTION:sub(3) == "2015" or  _ACTION:sub(3) == "2017") then
 			_p('# Visual Studio %s', action.vstudio.toolsVersion:sub(1,2))
+		elseif(_ACTION:sub(3) == "2019") then
+			_p('# Visual Studio Version %s', action.vstudio.toolsVersion:sub(1,2))
 		else
 			_p('# Visual Studio %s', _ACTION:sub(3))
 		end
@@ -198,6 +200,10 @@
 
 			    if premake.vstudio.iswinrt() and prj.kind == "WindowedApp" then
    				    _p('\t\t{%s}.%s.Deploy.0 = %s|%s',  prj.uuid, cfg.name, cfg.buildcfg, mapped)
+			    end
+
+			    if premake.vstudio.isgdk(cfg) and prj.kind == "WindowedApp" then
+				    _p('\t\t{%s}.%s.Deploy.0 = %s|%s',  prj.uuid, cfg.name, cfg.buildcfg, mapped)
 			    end
 			end
 		end
