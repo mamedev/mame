@@ -1254,5 +1254,5 @@ ROM_END
 } // anonymous namespace
 
 // Machine definitions
-//   YEAR  NAME      P  CM MACHINE   INPUT    CLASS           INIT        COMPANY FULLNAME                      FLAGS
-COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, empty_init, "Sony", "NET WORK STATION NWS-5000X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND)
+//   YEAR  NAME      P  CM MACHINE   INPUT    CLASS           INIT        COMPANY FULLNAME     FLAGS
+COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, empty_init, "Sony", "NWS-5000X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND)

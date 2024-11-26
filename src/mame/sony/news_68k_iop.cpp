@@ -1238,5 +1238,6 @@ namespace
 
 } // anonymous namespace
 
-/*   YEAR  NAME    P  C  MACHINE INPUT   CLASS           INIT         COMPANY FULLNAME                    FLAGS */
-COMP(1987, nws831, 0, 0, nws831, nws8xx, news_iop_state, init_common, "Sony", "NET WORK STATION NWS-831", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+// Machine definitions
+//   YEAR  NAME    P  C  MACHINE INPUT   CLASS           INIT         COMPANY FULLNAME   FLAGS
+COMP(1987, nws831, 0, 0, nws831, nws8xx, news_iop_state, init_common, "Sony", "NWS-831", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
