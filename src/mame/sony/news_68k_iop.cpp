@@ -223,8 +223,8 @@ namespace
 
 		required_device<msm58321_device> m_rtc; // actually is an Epson RTC-58321B
 		required_device<upd8253_pit_device> m_interval_timer;
-		required_device<z80scc_device> m_scc_external;
-		required_device<z80scc_device> m_scc_peripheral;
+		required_device<lh8530_device> m_scc_external;
+		required_device<lh8530_device> m_scc_peripheral;
 		required_device<am7990_device> m_net;
 		required_device<upd765a_device> m_fdc;
 		required_device<ncr5380_device> m_scsi; // actually an AMD AM5380PC
@@ -1078,8 +1078,8 @@ namespace
 		m_interval_timer->out_handler<0>().set(FUNC(news_iop_state::interval_timer_tick));
 
 		// 2x Sharp LH8530A Z8530A-SCC
-		SCC8530N(config, m_scc_external, (16_MHz_XTAL / 4));
-		SCC8530N(config, m_scc_peripheral, (16_MHz_XTAL / 4));
+		LH8530(config, m_scc_external, (16_MHz_XTAL / 4));
+		LH8530(config, m_scc_peripheral, (16_MHz_XTAL / 4));
 		m_scc_external->out_int_callback().set(FUNC(news_iop_state::iop_irq_w<SCC>));
 		m_scc_peripheral->out_int_callback().set(FUNC(news_iop_state::iop_irq_w<SCC_PERIPHERAL>));
 
