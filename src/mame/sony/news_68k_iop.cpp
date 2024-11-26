@@ -45,7 +45,6 @@
  *   - System cache emulation
  *   - Networking is very flaky - XDMCP doesn't work, repeated telnet sessions eventually cause the network stack to hang, etc.
  *   - Graphics, kbms, and parallel port emulation
- *   - floppy drive testing
  *   - The '020 and '030 machines have a lot of similarities but the only service docs I have are for
  *     an '030 machine (NWS-1960) so there are some accuracy improvements needed for the '020 machines,
  *     especially since the '020 machines have a custom MMU. The '030 machines don't need it, so there
