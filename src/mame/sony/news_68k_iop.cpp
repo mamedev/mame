@@ -60,6 +60,7 @@
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
 
 #include "cpu/m68000/m68020.h"
@@ -274,7 +275,7 @@ namespace
 		m_net_ram = std::make_unique<u16[]>(8192); // 16K RAM
 		save_pointer(NAME(m_net_ram), 8192);
 
-		m_mmu->space(0).install_ram(0x0, m_ram->mask(), m_ram->pointer()); // TODO: should this be somewhere else?
+		m_mmu->space(0).install_ram(0x0, m_ram->mask(), m_ram->pointer());
 
 		m_iop_intst = 0;
 	}
@@ -294,7 +295,7 @@ namespace
 	{
 		// Assume no CPIRQ3/CPIRQ1 for now
 		const uint8_t status = ((m_scsi_intst ? 0x10 : 0) | ((m_iop_intst & (1 << 6)) ? 0x80 : 0));
-		// LOG("Read IOPSTATUS = 0x%x\n", status);
+		LOGMASKED(LOG_ALL_INTERRUPT, "Read IOPSTATUS = 0x%x\n", status);
 		return status;
 	}
 
@@ -307,8 +308,8 @@ namespace
 		}
 		else
 		{
+			// TODO: also unmap RAM?
 			m_iop->space(0).install_rom(0x00000000, 0x0000ffff, m_eprom);
-			// TODO: unmap RAM?
 		}
 		m_panel_shift_count = 0; // hack, clear state from init
 	}
@@ -381,7 +382,6 @@ namespace
 		if (data > 0)
 		{
 			m_cpu->resume(SUSPEND_REASON_RESET);
-			// machine().debug_break();
 			// m_cpu->spin_until_time(attotime::from_msec(500)); // Debug: delay CPU start. If you slow down the IOP timeout timer, this statement isn't needed. Why???
 		}
 		else
@@ -609,7 +609,6 @@ namespace
 
 		// CPU doesn't run until the IOP tells it to
 		m_cpu->suspend(SUSPEND_REASON_RESET, true);
-		m_iop->set_emmu_enable(true); // for instruction restart only, the IOP does not have an MMU
 	}
 
 	void news_iop_state::init_common()
@@ -913,6 +912,7 @@ namespace
 	{
 		device.option_add("harddisk", NSCSI_HARDDISK);
 		device.option_add("cdrom", NSCSI_CDROM); // Only the NWS-891 came with a CD-ROM as a default option, others required an external CD-ROM drive
+		device.option_add("tape", NSCSI_TAPE);
 	}
 
 	void news_iop_state::handle_rts(int data)
