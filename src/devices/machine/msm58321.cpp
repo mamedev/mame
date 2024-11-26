@@ -22,8 +22,9 @@
 
 
 
-// device type definition
+// device type definitions
 DEFINE_DEVICE_TYPE(MSM58321, msm58321_device, "msm58321", "OKI MSM58321 RTC")
+DEFINE_DEVICE_TYPE(RTC58321, rtc58321_device, "rtc58321", "Seiko Epson RTC-58321")
 
 
 //**************************************************************************
@@ -194,6 +195,10 @@ msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+rtc58321_device::rtc58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	msm58321_device(mconfig, tag, owner, clock)
+{
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

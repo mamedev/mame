@@ -221,7 +221,7 @@ namespace
 		required_region_ptr<u32> m_eprom;
 		required_region_ptr<u32> m_idrom;
 
-		required_device<msm58321_device> m_rtc; // actually is an Epson RTC-58321B
+		required_device<rtc58321_device> m_rtc;
 		required_device<upd8253_pit_device> m_interval_timer;
 		required_device<lh8530_device> m_scc_external;
 		required_device<lh8530_device> m_scc_peripheral;
@@ -1136,9 +1136,8 @@ namespace
 			adapter.drq_handler().set(*this, FUNC(news_iop_state::scsi_drq_handler));
 		});
 
-		// Epson RTC-48321B
-		// TODO: any other RTC connections or settings needed?
-		MSM58321(config, m_rtc, 32.768_kHz_XTAL);
+		// Epson RTC-58321B
+		RTC58321(config, m_rtc, 32.768_kHz_XTAL);
 		m_rtc->d0_handler().set([this](int data)
 								{ m_rtc_data = (m_rtc_data & ~0x1) | (data ? 0x1 : 0x0); }); // TODO: clean this up - move shared data into a func
 		m_rtc->d1_handler().set([this](int data)

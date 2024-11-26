@@ -131,8 +131,14 @@ private:
 	int m_khz_ctr;
 };
 
+class rtc58321_device : public msm58321_device
+{
+public:
+	rtc58321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
-// device type definition
+// device type definitions
 DECLARE_DEVICE_TYPE(MSM58321, msm58321_device)
+DECLARE_DEVICE_TYPE(RTC58321, rtc58321_device)
 
 #endif
