@@ -32599,6 +32599,20 @@ multi16                         //
 @source:mitsubishi/trium.cpp
 triumec                         //
 
+@source:modelracing/dribling.cpp
+dribling                        // (c) 1983 Model Racing
+driblinga                       // (c) 1983 Model Racing
+driblingam                      // bootleg (Automave)
+driblingo                       // (c) 1983 Olympia
+driblingvm                      // bootleg (Videomac)
+
+@source:modelracing/sshot.cpp
+gunchamps                       // (c) 1980 Model Racing (sshot.cpp)
+sshot                           // (c) 1979 Model Racing
+
+@source:modelracing/subhuntr.cpp
+subhuntr                        // 1979 Model Racing
+
 @source:morrow/microdec.cpp
 md2                             //
 md3                             //
@@ -32659,20 +32673,6 @@ sys1121                         // (c) 1984 Motorola
 
 @source:motorola/uchroma68.cpp
 uchroma68                       // 1980 Motorola evaluation board for the MC6847
-
-@source:mr/dribling.cpp
-dribling                        // (c) 1983 Model Racing
-driblinga                       // (c) 1983 Model Racing
-driblingam                      // bootleg (Automave)
-driblingo                       // (c) 1983 Olympia
-driblingvm                      // bootleg (Videomac)
-
-@source:mr/sshot.cpp
-gunchamps                       // (c) 1980 Model Racing (sshot.cpp)
-sshot                           // (c) 1979 Model Racing
-
-@source:mr/subhuntr.cpp
-subhuntr                        // 1979 Model Racing
 
 @source:msx/big10.cpp
 big10                           //
