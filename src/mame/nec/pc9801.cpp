@@ -1066,9 +1066,15 @@ void pc9801vm_state::dma_access_ctrl_w(offs_t offset, u8 data)
 
 // ARTIC device
 
+/*
+ * [0] read bits 15-0 of the counter device
+ * [1] read bits 23-8 of the counter device
+ *
+ * FreeDOS(98) Kernel will test [1] a whole lot during HMA allocation
+ */
 uint16_t pc9801vm_state::timestamp_r(offs_t offset)
 {
-	return (m_maincpu->total_cycles() >> (16 * offset));
+	return (m_maincpu->total_cycles() >> (8 * offset));
 }
 
 void pc9801vm_state::artic_wait_w(u8 data)
