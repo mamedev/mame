@@ -16143,6 +16143,11 @@ casloopy                        //
 cfx9850                         // Casio CFX-9850
 cfx9850gb                       // Casio CFX-9850GB Plus
 
+@source:casio/ct8000.cpp
+ct8000                          //
+ctfk1                           //
+ctmb1                           //
+
 @source:casio/ctk2000.cpp
 ctk2100                         //
 

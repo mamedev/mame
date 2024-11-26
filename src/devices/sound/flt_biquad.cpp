@@ -17,7 +17,7 @@
     * Optional direct control of the 5 normalized biquad parameters for a custom/raw parameter filter.
 
     Possibly useful features which aren't implemented because nothing uses them yet:
-    * More Sallen-Key filter variations (band-pass, high-pass)
+    * More Sallen-Key filter variations (band-pass)
 
 */
 #include "emu.h"
@@ -202,7 +202,56 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_sk_lowpass_calc(
 	return r;
 }
 
-// TODO when needed: Sallen-Key high-pass filter
+/* Setup a biquad filter structure based on a single op-amp Sallen-Key high-pass filter circuit.
+*
+*                   .----------------------------.
+*                   |                            |
+*                   Z   r1                       |
+*                   Z                            |
+*                   Z                            |
+*            c1     |   c2                |\     |
+*   In >-----||-----+---||----+--------+  | \    |
+*                             |        '--|+ \   |
+*                             Z   r2      |   >--+------> out
+*                             Z        .--|- /   |
+*                             Z        |  | /    |
+*                             |        |  |/     |
+*                            gnd       |         |
+*                                      |   r4    |
+*                                      +--ZZZZ---'
+*                                      |
+*                                      Z
+*                                      Z r3
+*                                      Z
+*                                      |
+*                                     gnd
+*/
+filter_biquad_device& filter_biquad_device::opamp_sk_highpass_setup(double r1, double r2, double r3, double r4, double c1, double c2)
+{
+	filter_biquad_device::biquad_params p = opamp_sk_highpass_calc(r1, r2, r3, r4, c1, c2);
+	return setup(p);
+}
+
+void filter_biquad_device::opamp_sk_highpass_modify(double r1, double r2, double r3, double r4, double c1, double c2)
+{
+	filter_biquad_device::biquad_params p = opamp_sk_highpass_calc(r1, r2, r3, r4, c1, c2);
+	modify(p);
+}
+
+filter_biquad_device::biquad_params filter_biquad_device::opamp_sk_highpass_calc(double r1, double r2, double r3, double r4, double c1, double c2)
+{
+	filter_biquad_device::biquad_params r;
+	if ((r1 == 0) || (r2 == 0) || (r3 == 0) || (r4 == 0) || (c1 == 0) || (c2 == 0))
+	{
+		fatalerror("filter_biquad_device::opamp_sk_highpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, r3: %f, r4: %f, c1: %f, c2: %f", r1, r2, r3, r4, c1, c2); /* Filter can not be setup.  Undefined results. */
+	}
+	r.type = biquad_type::HIGHPASS;
+	r.gain = 1.0 + (r4 / r3); // == (r3 + r4) / r3
+	r.fc = 1.0 / (2 * M_PI * sqrt(r1 * r2 * c1 * c2));
+	r.q = sqrt(r1 * r2 * c1 * c2) / ((r1 * c1) + (r1 * c2) + ((r2 * c2) * (1.0 - r.gain)));
+	LOGMASKED(LOG_SETUP,"filter_biquad_device::opamp_sk_highpass_calc(%f, %f, %f, %f, %f, %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, r3, r4, c1*1000000, c2*1000000, r.fc, r.q, r.gain);
+	return r;
+}
 
 
 // Multiple-Feedback filters
