@@ -1046,7 +1046,6 @@ end
 				"-Wno-extern-c-compat",
 				"-Wno-ignored-qualifiers",
 				"-Wno-pragma-pack", -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
-				"-Wno-tautological-compare",
 				"-Wno-unknown-attributes",
 				"-Wno-unknown-warning-option",
 				"-Wno-unused-value",
