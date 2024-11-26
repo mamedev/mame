@@ -187,6 +187,7 @@ public:
 	{ }
 
 	void sc3000(machine_config &config);
+	void sc3000pal(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -479,7 +480,8 @@ static INPUT_PORTS_START( sc3000 )
 	// keyboard keys are added by the embedded sk1100 device
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sg1000_state::trigger_nmi), 0)
+	// This is actually part of the main keyboard, though emulated separately here
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sg1000_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
 /*-------------------------------------------------
@@ -541,7 +543,7 @@ void sf7000_state::ppi_pc_w(uint8_t data)
 	/*
 	    Signal  Description
 
-	    PC0     /INUSE signal to FDD
+	    PC0     /INUSE signal to FDD (drives LED?)
 	    PC1     /MOTOR ON signal to FDD
 	    PC2     TC signal to FDC
 	    PC3     RESET signal to FDC
@@ -669,10 +671,10 @@ void sf7000_state::machine_start()
 void sg1000_state_base::sg1000_base(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(10'738'635) / 3); // LH0080A
+	Z80(config, m_maincpu, 10.738635_MHz_XTAL / 3); // LH0080A
 
 	/* video hardware */
-	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
+	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, 10.738635_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -682,7 +684,7 @@ void sg1000_state_base::sg1000_base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, SN76489AN_TAG, XTAL(10'738'635) / 3).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SN76489A(config, SN76489AN_TAG, 10.738635_MHz_XTAL / 3).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sg1000");
@@ -769,6 +771,22 @@ void sc3000_state::sc3000(machine_config &config)
 	SC3000_CART_SLOT(config, m_cart, sg1000_cart, nullptr).set_must_be_loaded(true);
 }
 
+void sc3000_state::sc3000pal(machine_config &config)
+{
+	sc3000(config);
+
+	tms9929a_device &vdp(TMS9929A(config.replace(), TMS9918A_TAG, 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	// Z80A and SN76489AN are clocked by a separate ceramic oscillator since TMS9929A has no CPUCLK output
+	m_maincpu->set_clock(3.58_MHz_XTAL);
+	subdevice(SN76489AN_TAG)->set_clock(3.58_MHz_XTAL);
+
+	m_sgexpslot->set_default_option("sk1100e");
+}
+
 /*-------------------------------------------------
     machine_config( sf7000 )
 -------------------------------------------------*/
@@ -789,16 +807,19 @@ void sf7000_state::sf7000(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(sf7000_state::ppi_pc_w));
 	ppi.tri_pc_callback().set_constant(0x8f); // /ROM SEL must be active after reset
 
-	i8251_device &upd8251(I8251(config, UPD8251_TAG, 0));
+	i8251_device &upd8251(I8251(config, UPD8251_TAG, 4.9152_MHz_XTAL / 2));
 	upd8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	upd8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	upd8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(UPD8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(UPD8251_TAG, FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set(UPD8251_TAG, FUNC(i8251_device::write_dsr));
 
-	UPD765A(config, m_fdc, 8'000'000, false, false);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 4); // clocked through SED9420C
+	m_fdc->set_ready_line_connected(true); // or disconnected by split pad?
+	m_fdc->set_select_lines_connected(false); // FIXME: actually connected according to schematics
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -823,7 +844,7 @@ ROM_END
 
 #define rom_sc3000 rom_sg1000
 
-#define rom_sc3000h rom_sg1000
+#define rom_sc3000pal rom_sg1000
 
 ROM_START( sf7000 )
 	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
@@ -847,11 +868,14 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME                                    FLAGS
-CONS( 1983, sg1000,   0,      0,      sg1000,  sg1000,  sg1000_state,  empty_init, "Sega",             "SG-1000",                                  MACHINE_SUPPORTS_SAVE )
-CONS( 1984, sg1000m2, sg1000, 0,      sc3000,  sc3000,  sc3000_state,  empty_init, "Sega",             "SG-1000 II",                               MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sc3000,   0,      sg1000, sc3000,  sc3000,  sc3000_state,  empty_init, "Sega",             "SC-3000",                                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sc3000h,  sc3000, 0,      sc3000,  sc3000,  sc3000_state,  empty_init, "Sega",             "SC-3000H",                                 MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sf7000,   sc3000, 0,      sf7000,  sf7000,  sf7000_state,  empty_init, "Sega",             "SC-3000/Super Control Station SF-7000",    MACHINE_SUPPORTS_SAVE )
-CONS( 1984, omv1000,  sg1000, 0,      omv1000, omv1000, omv_state,     empty_init, "Tsukuda Original", "Othello Multivision FG-1000",              MACHINE_SUPPORTS_SAVE )
-CONS( 1984, omv2000,  sg1000, 0,      omv2000, omv2000, omv2000_state, empty_init, "Tsukuda Original", "Othello Multivision FG-2000",              MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT    CLASS          INIT        COMPANY             FULLNAME                                    FLAGS
+CONS( 1983, sg1000,    0,      0,      sg1000,    sg1000,  sg1000_state,  empty_init, "Sega",             "SG-1000",                                  MACHINE_SUPPORTS_SAVE )
+CONS( 1984, sg1000m2,  sg1000, 0,      sc3000,    sc3000,  sc3000_state,  empty_init, "Sega",             "SG-1000 II",                               MACHINE_SUPPORTS_SAVE )
+CONS( 1984, omv1000,   sg1000, 0,      omv1000,   omv1000, omv_state,     empty_init, "Tsukuda Original", "Othello Multivision FG-1000",              MACHINE_SUPPORTS_SAVE )
+CONS( 1984, omv2000,   sg1000, 0,      omv2000,   omv2000, omv2000_state, empty_init, "Tsukuda Original", "Othello Multivision FG-2000",              MACHINE_SUPPORTS_SAVE )
+
+// SC-3000 and SC-3000H are identical except for key mechanism.
+// PAL/SECAM versions of SC-3000 were distributed by Yeno in France, by John Sands Electronics in Australia and by Grandstand Leisure in New Zealand.
+COMP( 1983, sc3000,    0,      sg1000, sc3000,    sc3000,  sc3000_state,  empty_init, "Sega",             "SC-3000 (NTSC)",                           MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sc3000pal, sc3000, 0,      sc3000pal, sc3000,  sc3000_state,  empty_init, "Sega",             "SC-3000 (PAL)",                            MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sf7000,    sc3000, 0,      sf7000,    sf7000,  sf7000_state,  empty_init, "Sega",             "SC-3000/Super Control Station SF-7000",    MACHINE_SUPPORTS_SAVE )
