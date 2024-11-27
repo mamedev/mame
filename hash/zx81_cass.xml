@@ -602,6 +602,7 @@ RAND USR 16530
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
 		<info name="language" value="French" />
+		<info name="notice" value="COPYRIGHT LORICIELS Avril 1984" /><!-- "(C) LORICIELS JUIN 1984" on title screen -->
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15927">
@@ -1506,7 +1507,9 @@ RAND USR 16530
 		<description>Le Chateau Hanté</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Christian &amp; Frederic Moussaly" />
 		<info name="language" value="French" />
+		<info name="serial" value="ZX 005" />
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="16283">
@@ -8115,6 +8118,7 @@ Defender: not working
 		<description>Traffic</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1984" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7030">
 				<rom name="Traffic.tzx" size="7030" crc="be09c247" sha1="44626d460f9c918c4bc9e0611737b50215c73a3c"/>
