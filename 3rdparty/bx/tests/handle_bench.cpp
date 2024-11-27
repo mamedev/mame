@@ -5,7 +5,6 @@
 
 #include <bx/timer.h>
 #include <bx/handlealloc.h>
-#include <bx/maputil.h>
 
 #include <tinystl/allocator.h>
 #include <tinystl/unordered_map.h>
@@ -14,6 +13,19 @@
 
 #include <stdio.h>
 #include <assert.h>
+
+template<typename MapType>
+bool mapRemove(MapType& _map, const typename MapType::value_type::first_type& _first)
+{
+	typename MapType::const_iterator it = _map.find(_first);
+	if (it != _map.end() )
+	{
+		_map.erase(it);
+		return true;
+	}
+
+	return false;
+}
 
 int main()
 {
@@ -37,7 +49,7 @@ int main()
 
 			for (uint32_t jj = 0; jj < numElements; ++jj)
 			{
-				bool ok = bx::mapRemove(map, uint64_t(jj) );
+				bool ok = mapRemove(map, uint64_t(jj) );
 				assert(ok); BX_UNUSED(ok);
 			}
 
@@ -65,7 +77,7 @@ int main()
 
 			for (uint32_t jj = 0; jj < numElements; ++jj)
 			{
-				bool ok = bx::mapRemove(map, uint64_t(jj) );
+				bool ok = mapRemove(map, uint64_t(jj) );
 				assert(ok); BX_UNUSED(ok);
 			}
 

@@ -484,12 +484,12 @@ TEST_CASE("fract", "[math][libm]")
 TEST_CASE("ldexp", "[math][libm]")
 {
 	STATIC_REQUIRE(  1389.0f == bx::ldexp(86.8125, 4) );
-	STATIC_REQUIRE(0.437500f == bx::ldexp(7.0f, -4.0f) );
-	STATIC_REQUIRE(bx::isEqual(-0.0f, bx::ldexp(-0.0f, 10.0f), 0.000000001f) );
+	STATIC_REQUIRE(0.437500f == bx::ldexp(7.0f, -4) );
+	STATIC_REQUIRE(bx::isEqual(-0.0f, bx::ldexp(-0.0f, 10), 0.000000001f) );
 
-	STATIC_REQUIRE(0x1p127f  == bx::ldexp(1.0f,  127.0f) );
-	STATIC_REQUIRE(0x1p-126f == bx::ldexp(1.0f, -126.0f) );
-	STATIC_REQUIRE(0x1p24f   == bx::ldexp(1.0f,   24.0f) );
+	STATIC_REQUIRE(0x1p127f  == bx::ldexp(1.0f,  127) );
+	STATIC_REQUIRE(0x1p-126f == bx::ldexp(1.0f, -126) );
+	STATIC_REQUIRE(0x1p24f   == bx::ldexp(1.0f,   24) );
 
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
