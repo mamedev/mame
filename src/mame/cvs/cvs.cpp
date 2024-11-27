@@ -24,6 +24,8 @@ MAIN BOARD:
 * Note the upper two address lines are latched using an I/O read. The I/O map only has
   space for 128 character bit maps
 
+None of the games use the 2636 sound.
+
 The CPU CANNOT read the character PROMs
         ------
 
@@ -81,16 +83,13 @@ Driver by
     Mike Coates
 
 Hardware Info
- Malcolm & Darren
+    Malcolm & Darren
 
 Additional work
-    2009 Couriersud
+    Couriersud, 2009
 
-Todo & FIXME:
-
+TODO:
 - Emulate protection properly in later games (reads area 0x73fx);
-- Superbike hangs indefinitely when collecting balloon bonus the
-  second time around, protection or s2650 core bug?
 - the board most probably has discrete circuits. The 393Hz tone used
   for shots (superbike) and collisions (8ball) is just a guess.
 
@@ -104,7 +103,7 @@ Todo & FIXME:
 
 namespace {
 
-/* Turn to 1 so all inputs are always available (this shall only be a debug feature) */
+// Turn to 1 so all inputs are always available (this shall only be a debug feature)
 #define CVS_SHOW_ALL_INPUTS 0
 
 
@@ -189,7 +188,7 @@ private:
 	uint8_t superbik_prot_r();
 	uint8_t hero_prot_r(offs_t offset);
 	int speech_rom_read_bit();
-	void slave_cpu_interrupt(int state);
+	void audio_cpu_interrupt(int state);
 	uint8_t input_r(offs_t offset);
 	void speech_rom_address_lo_w(uint8_t data);
 	void speech_rom_address_hi_w(uint8_t data);
@@ -209,7 +208,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(main_cpu_interrupt);
 	void set_pens();
-	void dac_cpu_map(address_map &map) ATTR_COLD;
+	void audio_cpu_map(address_map &map) ATTR_COLD;
 	void main_cpu_data_map(address_map &map) ATTR_COLD;
 	void main_cpu_io_map(address_map &map) ATTR_COLD;
 	void main_cpu_map(address_map &map) ATTR_COLD;
@@ -485,7 +484,7 @@ INTERRUPT_GEN_MEMBER(cvs_state::main_cpu_interrupt)
 }
 
 
-void cvs_state::slave_cpu_interrupt(int state)
+void cvs_state::audio_cpu_interrupt(int state)
 {
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -528,6 +527,7 @@ uint8_t cvs_state::input_r(offs_t offset)
  *  Timing
  *
  *************************************/
+
 #if 0
 int cvs_state::cvs_393hz_clock_r()
 {
@@ -592,6 +592,7 @@ void cvs_state::unknown_w(offs_t offset, uint8_t data)
 	{
 		if (VERBOSE && offset != 2)
 			popmessage("Unknown: %02x %02x\n", offset, data);
+
 		m_dac3_state[offset] = data;
 	}
 }
@@ -602,7 +603,6 @@ void cvs_state::unknown_w(offs_t offset, uint8_t data)
  *  Speech hardware
  *
  *************************************/
-
 
 void cvs_state::speech_rom_address_lo_w(uint8_t data)
 {
@@ -675,7 +675,7 @@ void cvs_state::audio_command_w(uint8_t data)
 	LOG(("data %02x\n", data));
 	// cause interrupt on audio CPU if bit 7 set
 	m_soundlatch->write(data);
-	slave_cpu_interrupt(data & 0x80 ? 1 : 0);
+	audio_cpu_interrupt(data & 0x80 ? 1 : 0);
 }
 
 
@@ -718,13 +718,15 @@ void cvs_state::main_cpu_data_map(address_map &map)
 	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(cvs_state::collision_clear_r), FUNC(cvs_state::video_fx_w));
 }
 
+
+
 /*************************************
  *
  *  DAC driving CPU memory/IO handlers
  *
  *************************************/
 
-void cvs_state::dac_cpu_map(address_map &map)
+void cvs_state::audio_cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x0fff).rom();
@@ -1172,7 +1174,6 @@ GFXDECODE_END
  *
  *************************************/
 
-
 void cvs_state::machine_start()
 {
 	cvs_base_state::machine_start();
@@ -1185,6 +1186,7 @@ void cvs_state::machine_start()
 	save_item(NAME(m_character_ram_page_start));
 	save_item(NAME(m_character_banking_mode));
 	save_item(NAME(m_393hz_clock));
+	save_item(NAME(m_protection_counter));
 	save_item(NAME(m_speech_rom_bit_address));
 	save_item(NAME(m_stars_on));
 	save_item(NAME(m_scroll_reg));
@@ -1198,6 +1200,7 @@ void cvs_state::machine_reset()
 	m_character_banking_mode = 0;
 	m_speech_rom_bit_address = 0;
 	m_393hz_clock = 0;
+	m_protection_counter = 0;
 	m_stars_on = 0;
 	m_scroll_reg = 0;
 }
@@ -1215,7 +1218,7 @@ void cvs_state::cvs(machine_config &config)
 	m_maincpu->intack_handler().set_constant(0x03);
 
 	S2650(config, m_audiocpu, XTAL(14'318'181) / 16);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::dac_cpu_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::audio_cpu_map);
 	m_audiocpu->intack_handler().set([this] { m_audiocpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 	// doesn't look like it is used at all
 	//m_audiocpu->sense_handler().set(FUNC(cvs_state::cvs_393hz_clock_r));
@@ -1270,15 +1273,15 @@ void cvs_state::cvs(machine_config &config)
  *
  *************************************/
 
-#define CVS_COMMON_ROMS                                                                                             \
+#define CVS_COMMON_ROMS                                                                                    \
 	ROM_REGION( 0x8000, "speechcpu", 0 )                                                                   \
-	ROM_LOAD( "5b.bin",     0x0000, 0x0800, CRC(f055a624) SHA1(5dfe89d7271092e665cdd5cd59d15a2b70f92f43) )  \
-																											\
-	ROM_REGION( 0x0820, "proms", 0 )                                                                    \
-	ROM_LOAD( "82s185.10h", 0x0000, 0x0800, CRC(c205bca6) SHA1(ec9bd220e75f7b067ede6139763ef8aca0fb7a29) )  \
+	ROM_LOAD( "5b.bin",     0x0000, 0x0800, CRC(f055a624) SHA1(5dfe89d7271092e665cdd5cd59d15a2b70f92f43) ) \
+	\
+	ROM_REGION( 0x0820, "proms", 0 )                                                                       \
+	ROM_LOAD( "82s185.10h", 0x0000, 0x0800, CRC(c205bca6) SHA1(ec9bd220e75f7b067ede6139763ef8aca0fb7a29) ) \
 	ROM_LOAD( "82s123.10k", 0x0800, 0x0020, CRC(b5221cec) SHA1(71d9830b33b1a8140b0fe1a2ba8024ba8e6e48e0) )
 #define CVS_ROM_REGION_SPEECH_DATA(name, len, hash) \
-	ROM_REGION( 0x1000, "speechdata", 0 )   \
+	ROM_REGION( 0x1000, "speechdata", 0 )           \
 	ROM_LOAD( name, 0x0000, len, hash )
 
 #define ROM_LOAD_STAGGERED(name, offs, hash)        \
@@ -1288,23 +1291,23 @@ void cvs_state::cvs(machine_config &config)
 	ROM_CONTINUE(   0x6000 + offs, 0x0400 )
 
 
-ROM_START( huncholy )
+ROM_START( cosmos )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "ho-gp1.bin", 0x0000, CRC(4f17cda7) SHA1(ae6fe495c723042c6e060d4ada50aaef1019d5eb) )
-	ROM_LOAD_STAGGERED( "ho-gp2.bin", 0x0400, CRC(70fa52c7) SHA1(179813fdc204870d72c0bfa8cd5dbf277e1f67c4) )
-	ROM_LOAD_STAGGERED( "ho-gp3.bin", 0x0800, CRC(931934b1) SHA1(08fe5ad3459862246e9ea845abab4e01e1dbd62d) )
-	ROM_LOAD_STAGGERED( "ho-gp4.bin", 0x0c00, CRC(af5cd501) SHA1(9a79b173aa41a82faa9f19210d3e18bfa6c593fa) )
-	ROM_LOAD_STAGGERED( "ho-gp5.bin", 0x1000, CRC(658e8974) SHA1(30d0ada1cce99a842bad8f5a58630bc1b7048b03) )
+	ROM_LOAD_STAGGERED( "cs-gp1.bin", 0x0000, CRC(7eb96ddf) SHA1(f7456ee1ace03ab98c4e8128d375464122c4df01) )
+	ROM_LOAD_STAGGERED( "cs-gp2.bin", 0x0400, CRC(6975a8f7) SHA1(13192d4eedd843c0c1d7e5c54a3086f71b09fbcb) )
+	ROM_LOAD_STAGGERED( "cs-gp3.bin", 0x0800, CRC(76904b13) SHA1(de219999e4a1b72142e71ea707b6250f4732ccb3) )
+	ROM_LOAD_STAGGERED( "cs-gp4.bin", 0x0c00, CRC(bdc89719) SHA1(668267d0b05990ff83a9e38a62950d3d725a53b3) )
+	ROM_LOAD_STAGGERED( "cs-gp5.bin", 0x1000, CRC(94be44ea) SHA1(e496ea79d177c6d2d79d59f7d45c86b547469c6f) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "ho-sdp1.bin", 0x0000, 0x1000, CRC(3efb3ffd) SHA1(be4807c8b4fe23f2247aa3b6ac02285bee1a0520) )
+	ROM_LOAD( "cs-sdp1.bin", 0x0000, 0x0800, CRC(b385b669) SHA1(79621d3fb3eb4ea6fa8a733faa6f21edeacae186) )
 
-	CVS_ROM_REGION_SPEECH_DATA( "ho-sp1.bin", 0x1000, CRC(3fd39b1e) SHA1(f5d0b2cfaeda994762403f039a6f7933c5525234) )
+	CVS_ROM_REGION_SPEECH_DATA( "cs-sp1.bin", 0x1000, CRC(3c7fe86d) SHA1(9ae0b63b231a7092820650a196cde60588bc6b58) )
 
 	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "ho-cp1.bin",  0x0000, 0x0800, CRC(c6c73d46) SHA1(63aba92f77105fedf46337b591b074020bec05d0) )
-	ROM_LOAD( "ho-cp2.bin",  0x0800, 0x0800, CRC(e596371c) SHA1(93a0d0ccdf830ae72d070b03b7e2222f4a737ead) )
-	ROM_LOAD( "ho-cp3.bin",  0x1000, 0x0800, CRC(11fae1cf) SHA1(5ceabfb1ff1a6f76d1649512f57d7151f5258ecb) )
+	ROM_LOAD( "cs-cp1.bin", 0x0000, 0x0800, CRC(6a48c898) SHA1(c27f7bcdb2fe042ec52d1b9b4b9a4e47c288862d) )
+	ROM_LOAD( "cs-cp2.bin", 0x0800, 0x0800, CRC(db0dfd8c) SHA1(f2b0dd43f0e514fdae54e4066606187f45b98e38) )
+	ROM_LOAD( "cs-cp3.bin", 0x1000, 0x0800, CRC(01eee875) SHA1(6c41d716b5795f085229d855518862fb85f395a4) )
 
 	CVS_COMMON_ROMS
 ROM_END
@@ -1326,6 +1329,27 @@ ROM_START( darkwar )
 	ROM_LOAD( "dw-cp1.bin", 0x0000, 0x0800, CRC(7a0f9f3e) SHA1(0aa787923fbb614f15016d99c03093a59a0bfb88) )
 	ROM_LOAD( "dw-cp2.bin", 0x0800, 0x0800, CRC(232e5120) SHA1(76e4d6d17e8108306761604bd56d6269bfc431e1) )
 	ROM_LOAD( "dw-cp3.bin", 0x1000, 0x0800, CRC(573e0a17) SHA1(9c7991eac625b287bafb6cf722ffb405a9627e09) )
+
+	CVS_COMMON_ROMS
+ROM_END
+
+ROM_START( spacefrt )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "sf-gp1.bin", 0x0000, CRC(1158fc3a) SHA1(c1f470324b6ec65c3061f78a6ff8620154f20c09) )
+	ROM_LOAD_STAGGERED( "sf-gp2.bin", 0x0400, CRC(8b4e1582) SHA1(5b92082d67f32197c0c61ddd8e1e3feb742195f4) )
+	ROM_LOAD_STAGGERED( "sf-gp3.bin", 0x0800, CRC(48f05102) SHA1(72d40cdd0bbc4cfeb6ddf550de0dafc61270d382) )
+	ROM_LOAD_STAGGERED( "sf-gp4.bin", 0x0c00, CRC(c5b14631) SHA1(360bed649185a090f7c96adadd7f045ef574865a) )
+	ROM_LOAD_STAGGERED( "sf-gp5.bin", 0x1000, CRC(d7eca1b6) SHA1(8444e61827f0153d04c4f9c08416e7ab753d6918) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "sf-sdp1.bin", 0x0000, 0x0800, CRC(339a327f) SHA1(940887cd4660e37537fd9b57aa1ec3a4717ea0cf) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "sf-sp1.bin", 0x1000, CRC(c5628d30) SHA1(d29a5852a1762cbd5f3eba29ae2bf49b3a26f894) )
+
+	ROM_REGION( 0x1800, "tiles", 0 )
+	ROM_LOAD( "sf-cp1.bin", 0x0000, 0x0800, CRC(da194a68) SHA1(4215267e91644cf1e1f32f898bc9562bfba711f3) )
+	ROM_LOAD( "sf-cp2.bin", 0x0800, 0x0800, CRC(b96977c7) SHA1(8f0fab044f16787bce83562e2b22d962d0a2c209) )
+	ROM_LOAD( "sf-cp3.bin", 0x1000, 0x0800, CRC(f5d67b9a) SHA1(a492b41c53b1f28ac5f70969e5f06afa948c1a7d) )
 
 	CVS_COMMON_ROMS
 ROM_END
@@ -1372,65 +1396,44 @@ ROM_START( 8ball1 )
 	CVS_COMMON_ROMS
 ROM_END
 
-ROM_START( hunchbak ) // actual ROM label has "Century Elect. Ltd. (c)1981", and some label has HB/HB2 handwritten
+ROM_START( logger ) // actual ROM label has "Century Elect. Ltd. (c)1981", and LOG3 is handwritten
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "hb-gp1.bin", 0x0000, CRC(af801d54) SHA1(68e31561e98f7e2caa337dd764941d08f075b559) )
-	ROM_LOAD_STAGGERED( "hb-gp2.bin", 0x0400, CRC(b448cc8e) SHA1(ed94f662c0e08a3a0aca073fbec29ae1fbd0328e) )
-	ROM_LOAD_STAGGERED( "hb-gp3.bin", 0x0800, CRC(57c6ea7b) SHA1(8c3ba01ab1917a8c24180ed1c0011dbfed36d406) )
-	ROM_LOAD_STAGGERED( "hb-gp4.bin", 0x0c00, CRC(7f91287b) SHA1(9383d885c142417de73879905cbce272ba9514c7) )
-	ROM_LOAD_STAGGERED( "hb-gp5.bin", 0x1000, CRC(1dd5755c) SHA1(b1e158d52bd9a238e3e32ed3024e495df2292dcb) )
+	ROM_LOAD_STAGGERED( "1clog3.gp1", 0x0000, CRC(0022b9ed) SHA1(4b94d2663f802a8140e8eae1b66ee78fdfa654f5) )
+	ROM_LOAD_STAGGERED( "2clog3.gp2", 0x0400, CRC(23c5c8dc) SHA1(37fb6a62cb798d96de20078fe4a3af74a2be0e66) )
+	ROM_LOAD_STAGGERED( "3clog3.gp3", 0x0800, CRC(f9288f74) SHA1(8bb588194186fc0e0c2d61ed2746542c978ebb76) )
+	ROM_LOAD_STAGGERED( "4clog3.gp4", 0x0c00, CRC(e52ef7bf) SHA1(df5509b6847d6b9520a9d83b15083546898a981e) )
+	ROM_LOAD_STAGGERED( "5clog3.gp5", 0x1000, CRC(4ee04359) SHA1(a592d4b280ac0ad5f06d68a7809092548261f123) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "6c.sdp1", 0x0000, 0x1000, CRC(f9ba2854) SHA1(d041198e2e8b8c3e668bd1610310f8d25c5b1119) )
+	ROM_LOAD( "6clog3.sdp1", 0x0000, 0x1000, CRC(5af8da17) SHA1(357f02cdf38c6659aca51fa0a8534542fc29623c) )
 
-	CVS_ROM_REGION_SPEECH_DATA( "8a.sp1", 0x0800, CRC(ed1cd201) SHA1(6cc3842dda1bfddc06ffb436c55d14276286bd67) )
+	CVS_ROM_REGION_SPEECH_DATA( "8clog3.sp1", 0x0800, CRC(74f67815) SHA1(6a26a16c27a7e4d58b611e5127115005a60cff91) )
 
 	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "11a.cp1", 0x0000, 0x0800, CRC(f256b047) SHA1(02d79882bad37ffdd58ef478e2658a1369c32ebc) )
-	ROM_LOAD( "10a.cp2", 0x0800, 0x0800, CRC(b870c64f) SHA1(ce4f8de87568782ce02bba754edff85df7f5c393) )
-	ROM_LOAD( "9a.cp3",  0x1000, 0x0800, CRC(9a7dab88) SHA1(cd39a9d4f982a7f49c478db1408d7e07335f2ddc) )
+	ROM_LOAD( "11clog3.cp1", 0x0000, 0x0800, CRC(e4ede80e) SHA1(62f2bc78106a057b6a8420d40421908df609bf29) )
+	ROM_LOAD( "10clog3.cp2", 0x0800, 0x0800, CRC(d3de8e5b) SHA1(f95320e001869c42e51195d9cc11e4f2555e153f) )
+	ROM_LOAD( "9clog3.cp3",  0x1000, 0x0800, CRC(9b8d1031) SHA1(87ef12aeae80cc0f240dead651c6222848f8dccc) )
 
 	CVS_COMMON_ROMS
 ROM_END
 
-ROM_START( hunchbaka )
+ROM_START( loggerr2 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "1b.gp1", 0x0000, CRC(c816860b) SHA1(1109639645496d4644564d21c816b8baf8c84cf7) )
-	ROM_LOAD_STAGGERED( "2a.gp2", 0x0400, CRC(cab1e524) SHA1(c3fd7ac9ce5893fd2602a15ad0f6e3267a4ca122) )
-	ROM_LOAD_STAGGERED( "3a.gp3", 0x0800, CRC(b2adcfeb) SHA1(3090e2c6b945857c1e48dea395015a05c6165cd9) )
-	ROM_LOAD_STAGGERED( "4c.gp4", 0x0c00, CRC(229a8b71) SHA1(ea3815eb69d4927da356eada0add8382735feb48) )
-	ROM_LOAD_STAGGERED( "5a.gp5", 0x1000, CRC(cb4f0313) SHA1(1ef63cbe62e7a54d45e0afbc398c9d9b601e6403) )
+	ROM_LOAD_STAGGERED( "logger_r2_gp1_11ce.1", 0x0000, CRC(02b0a75e) SHA1(06fbfa3a31e104da86f21ef8f600715224b7f332) ) // hand written LOGGER R2 GP1 11CE
+	ROM_LOAD_STAGGERED( "logger_r2_gp2_5265.2", 0x0400, CRC(3285aa08) SHA1(f5c8496b2d33229572d4442f703a2aaf93f1403f) ) // hand written LOGGER R2 GP2 5265
+	ROM_LOAD_STAGGERED( "logger_r2_gp3_da04.3", 0x0800, CRC(d6a2a442) SHA1(7da009f8d3d4fb0b6624cd46ecae08675c317905) ) // hand written LOGGER R2 GP3 DA04
+	ROM_LOAD_STAGGERED( "logger_r2_gp4_657b.4", 0x0c00, CRC(608b551c) SHA1(f2fde14860606f501ab0046fbe4dca0b97eb2481) ) // hand written LOGGER R2 GP4 657B
+	ROM_LOAD_STAGGERED( "logger_r2_gp5_c2d5.5", 0x1000, CRC(3d8ecdcd) SHA1(c9ea38aee898a4ac6cb6409da819d1a053088526) ) // hand written LOGGER R2 GP5 C2D5
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "6c.sdp1", 0x0000, 0x1000, CRC(f9ba2854) SHA1(d041198e2e8b8c3e668bd1610310f8d25c5b1119) )
+	ROM_LOAD( "logger_sdp1_414a.6", 0x0000, 0x1000, CRC(5af8da17) SHA1(357f02cdf38c6659aca51fa0a8534542fc29623c) ) // hand written LOGGER SDP1 414A
 
-	CVS_ROM_REGION_SPEECH_DATA( "8a.sp1", 0x0800, CRC(ed1cd201) SHA1(6cc3842dda1bfddc06ffb436c55d14276286bd67) )
-
-	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "11a.cp1", 0x0000, 0x0800, CRC(f256b047) SHA1(02d79882bad37ffdd58ef478e2658a1369c32ebc) )
-	ROM_LOAD( "10a.cp2", 0x0800, 0x0800, CRC(b870c64f) SHA1(ce4f8de87568782ce02bba754edff85df7f5c393) )
-	ROM_LOAD( "9a.cp3",  0x1000, 0x0800, CRC(9a7dab88) SHA1(cd39a9d4f982a7f49c478db1408d7e07335f2ddc) )
-
-	CVS_COMMON_ROMS
-ROM_END
-
-ROM_START( wallst )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "ws-gp1.bin", 0x0000, CRC(bdac81b6) SHA1(6ce865d8902e815742a9ecf10d6f9495f376dede) )
-	ROM_LOAD_STAGGERED( "ws-gp2.bin", 0x0400, CRC(9ca67cdd) SHA1(575a4d8d037d2a3c07a8f49d93c7cf6781349ec1) )
-	ROM_LOAD_STAGGERED( "ws-gp3.bin", 0x0800, CRC(c2f407f2) SHA1(8208064fd0138a6ccacf03275b8d28793245bfd9) )
-	ROM_LOAD_STAGGERED( "ws-gp4.bin", 0x0c00, CRC(1e4b2fe1) SHA1(28eda70cc9cf619452729092e68734ab1a5dc7fb) )
-	ROM_LOAD_STAGGERED( "ws-gp5.bin", 0x1000, CRC(eec7bfd0) SHA1(6485e9e2e1624118e38892e74f80431820fd9672) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "ws-sdp1.bin", 0x0000, 0x1000, CRC(faed2ac0) SHA1(c2c48e24a560d918531e5c17fb109d68bdec850f) )
-
-	CVS_ROM_REGION_SPEECH_DATA( "ws-sp1.bin",  0x0800, CRC(84b72637) SHA1(9c5834320f39545403839fb7088c37177a6c8861) )
+	CVS_ROM_REGION_SPEECH_DATA( "logger_sp1_4626.8", 0x0800, CRC(74f67815) SHA1(6a26a16c27a7e4d58b611e5127115005a60cff91) ) // hand written LOGGER SP1 4626
 
 	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "ws-cp1.bin", 0x0000, 0x0800, CRC(5aca11df) SHA1(5ef815b5b09445515ff8b958c4ea29f1a221cee1) )
-	ROM_LOAD( "ws-cp2.bin", 0x0800, 0x0800, CRC(ca530d85) SHA1(e5a78667c3583d06d8387848323b11e4a91091ec) )
-	ROM_LOAD( "ws-cp3.bin", 0x1000, 0x0800, CRC(1e0225d6) SHA1(410795046c64c24de6711b167315308808b54291) )
+	ROM_LOAD( "logger_r2_cp1_d9cf.11", 0x0000, 0x0800, CRC(a1c1eb8c) SHA1(9fa2495b1b245f5889006cfc8857f51e57379cef) ) // hand written LOGGER R2 CP1 D9CF
+	ROM_LOAD( "logger_r2_cp2_cd1e.10", 0x0800, 0x0800, CRC(432d28d0) SHA1(30b9ec84fe04c5e48f4a1f9f7ab86a6a222db4cf) ) // hand written LOGGER R2 CP2 CD1E
+	ROM_LOAD( "logger_r2_cp3_5535.9",  0x1000, 0x0800, CRC(c87fcfcd) SHA1(eb937a6aa04ebe873cf46c4b3abf7bb02766eedf) ) // hand written LOGGER R2 CP3 5535
 
 	CVS_COMMON_ROMS
 ROM_END
@@ -1452,6 +1455,27 @@ ROM_START( dazzler )
 	ROM_LOAD( "dz-cp1.bin", 0x0000, 0x0800, CRC(0a8a9034) SHA1(9df3d4f387bd5ce3d3580ba678aeda1b65634ac2) )
 	ROM_LOAD( "dz-cp2.bin", 0x0800, 0x0800, CRC(3868dd82) SHA1(844584c5a80fb8f1797b4aa4e22024e75726293d) )
 	ROM_LOAD( "dz-cp3.bin", 0x1000, 0x0800, CRC(755d9ed2) SHA1(a7165a1d12a5a81d8bb941d8ad073e2097c90beb) )
+
+	CVS_COMMON_ROMS
+ROM_END
+
+ROM_START( wallst )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "ws-gp1.bin", 0x0000, CRC(bdac81b6) SHA1(6ce865d8902e815742a9ecf10d6f9495f376dede) )
+	ROM_LOAD_STAGGERED( "ws-gp2.bin", 0x0400, CRC(9ca67cdd) SHA1(575a4d8d037d2a3c07a8f49d93c7cf6781349ec1) )
+	ROM_LOAD_STAGGERED( "ws-gp3.bin", 0x0800, CRC(c2f407f2) SHA1(8208064fd0138a6ccacf03275b8d28793245bfd9) )
+	ROM_LOAD_STAGGERED( "ws-gp4.bin", 0x0c00, CRC(1e4b2fe1) SHA1(28eda70cc9cf619452729092e68734ab1a5dc7fb) )
+	ROM_LOAD_STAGGERED( "ws-gp5.bin", 0x1000, CRC(eec7bfd0) SHA1(6485e9e2e1624118e38892e74f80431820fd9672) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "ws-sdp1.bin", 0x0000, 0x1000, CRC(faed2ac0) SHA1(c2c48e24a560d918531e5c17fb109d68bdec850f) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "ws-sp1.bin",  0x0800, CRC(84b72637) SHA1(9c5834320f39545403839fb7088c37177a6c8861) )
+
+	ROM_REGION( 0x1800, "tiles", 0 )
+	ROM_LOAD( "ws-cp1.bin", 0x0000, 0x0800, CRC(5aca11df) SHA1(5ef815b5b09445515ff8b958c4ea29f1a221cee1) )
+	ROM_LOAD( "ws-cp2.bin", 0x0800, 0x0800, CRC(ca530d85) SHA1(e5a78667c3583d06d8387848323b11e4a91091ec) )
+	ROM_LOAD( "ws-cp3.bin", 0x1000, 0x0800, CRC(1e0225d6) SHA1(410795046c64c24de6711b167315308808b54291) )
 
 	CVS_COMMON_ROMS
 ROM_END
@@ -1582,111 +1606,6 @@ ROM_START( diggerc )
 	CVS_COMMON_ROMS
 ROM_END
 
-ROM_START( superbik )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "sb-gp1.bin", 0x0000, CRC(f0209700) SHA1(7843e8ebcbecb93814863ddd135f5acb0d481043) )
-	ROM_LOAD_STAGGERED( "sb-gp2.bin", 0x0400, CRC(1956d687) SHA1(00e261c5b1e1414b45661310c47daeceb3d5f4bf) )
-	ROM_LOAD_STAGGERED( "sb-gp3.bin", 0x0800, CRC(ceb27b75) SHA1(56fecc72746113a6611c18663d1b9e0e2daf57b4) )
-	ROM_LOAD_STAGGERED( "sb-gp4.bin", 0x0c00, CRC(430b70b3) SHA1(207c4939331c1561d145cbee0538da072aa51f5b) )
-	ROM_LOAD_STAGGERED( "sb-gp5.bin", 0x1000, CRC(013615a3) SHA1(1795a4dcc98255ad185503a99f48b7bacb5edc9d) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "sb-sdp1.bin", 0x0000, 0x0800, CRC(e977c090) SHA1(24bd4165434c745c1514d49cc90bcb621fb3a0f8) )
-
-	CVS_ROM_REGION_SPEECH_DATA( "sb-sp1.bin", 0x0800, CRC(0aeb9ccd) SHA1(e7123eed21e4e758bbe1cebfd5aad44a5de45c27) )
-
-	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "sb-cp1.bin", 0x0000, 0x0800, CRC(03ba7760) SHA1(4ed252e2c4ec7cea2199524f7c35a1dc7c44f8d8) )
-	ROM_LOAD( "sb-cp2.bin", 0x0800, 0x0800, CRC(04de69f2) SHA1(3ef3b3c159d47230622b6cc45baad8737bd93a90) )
-	ROM_LOAD( "sb-cp3.bin", 0x1000, 0x0800, CRC(bb7d0b9a) SHA1(94c72d6961204be9cab351ac854ac9c69b51e79a) )
-
-	CVS_COMMON_ROMS
-ROM_END
-
-ROM_START( hero )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "hr-gp1.bin", 0x0000, CRC(82f39788) SHA1(44217dc2312d10fceeb35adf3999cd6f240b60be) )
-	ROM_LOAD_STAGGERED( "hr-gp2.bin", 0x0400, CRC(79607812) SHA1(eaab829a2f5bcb8ec92c3f4122cffae31a4a77cb) )
-	ROM_LOAD_STAGGERED( "hr-gp3.bin", 0x0800, CRC(2902715c) SHA1(cf63f72681d1dcbdabdf7673ad8f61b5969e4bd1) )
-	ROM_LOAD_STAGGERED( "hr-gp4.bin", 0x0c00, CRC(696d2f8e) SHA1(73dd57f0f84e37ae707a89e17253aa3dd0c8b48b) )
-	ROM_LOAD_STAGGERED( "hr-gp5.bin", 0x1000, CRC(936a4ba6) SHA1(86cddcfafbd93dcdad3a1f26e280ceb96f779ab0) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "hr-sdp1.bin", 0x0000, 0x0800, CRC(c34ecf79) SHA1(07c96283410b1e7401140094db95800708cf310f) )
-
-	CVS_ROM_REGION_SPEECH_DATA( "hr-sp1.bin", 0x0800, CRC(a5c33cb1) SHA1(447ffb193b0dc4985bae5d8c214a893afd08664b) )
-
-	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "hr-cp1.bin", 0x0000, 0x0800, CRC(2d201496) SHA1(f195aa1b231a0e1752c7da824a10321f0527f8c9) )
-	ROM_LOAD( "hr-cp2.bin", 0x0800, 0x0800, CRC(21b61fe3) SHA1(31882003f0557ffc4ec38ae6ee07b5d294b4162c) )
-	ROM_LOAD( "hr-cp3.bin", 0x1000, 0x0800, CRC(9c8e3f9e) SHA1(9d949a4d12b45da12b434677670b2b109568564a) )
-
-	CVS_COMMON_ROMS
-ROM_END
-
-ROM_START( logger ) // actual ROM label has "Century Elect. Ltd. (c)1981", and LOG3 is handwritten
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "1clog3.gp1", 0x0000, CRC(0022b9ed) SHA1(4b94d2663f802a8140e8eae1b66ee78fdfa654f5) )
-	ROM_LOAD_STAGGERED( "2clog3.gp2", 0x0400, CRC(23c5c8dc) SHA1(37fb6a62cb798d96de20078fe4a3af74a2be0e66) )
-	ROM_LOAD_STAGGERED( "3clog3.gp3", 0x0800, CRC(f9288f74) SHA1(8bb588194186fc0e0c2d61ed2746542c978ebb76) )
-	ROM_LOAD_STAGGERED( "4clog3.gp4", 0x0c00, CRC(e52ef7bf) SHA1(df5509b6847d6b9520a9d83b15083546898a981e) )
-	ROM_LOAD_STAGGERED( "5clog3.gp5", 0x1000, CRC(4ee04359) SHA1(a592d4b280ac0ad5f06d68a7809092548261f123) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "6clog3.sdp1", 0x0000, 0x1000, CRC(5af8da17) SHA1(357f02cdf38c6659aca51fa0a8534542fc29623c) )
-
-	CVS_ROM_REGION_SPEECH_DATA( "8clog3.sp1", 0x0800, CRC(74f67815) SHA1(6a26a16c27a7e4d58b611e5127115005a60cff91) )
-
-	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "11clog3.cp1", 0x0000, 0x0800, CRC(e4ede80e) SHA1(62f2bc78106a057b6a8420d40421908df609bf29) )
-	ROM_LOAD( "10clog3.cp2", 0x0800, 0x0800, CRC(d3de8e5b) SHA1(f95320e001869c42e51195d9cc11e4f2555e153f) )
-	ROM_LOAD( "9clog3.cp3",  0x1000, 0x0800, CRC(9b8d1031) SHA1(87ef12aeae80cc0f240dead651c6222848f8dccc) )
-
-	CVS_COMMON_ROMS
-ROM_END
-
-ROM_START( loggerr2 )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "logger_r2_gp1_11ce.1", 0x0000, CRC(02b0a75e) SHA1(06fbfa3a31e104da86f21ef8f600715224b7f332) ) // hand written LOGGER R2 GP1 11CE
-	ROM_LOAD_STAGGERED( "logger_r2_gp2_5265.2", 0x0400, CRC(3285aa08) SHA1(f5c8496b2d33229572d4442f703a2aaf93f1403f) ) // hand written LOGGER R2 GP2 5265
-	ROM_LOAD_STAGGERED( "logger_r2_gp3_da04.3", 0x0800, CRC(d6a2a442) SHA1(7da009f8d3d4fb0b6624cd46ecae08675c317905) ) // hand written LOGGER R2 GP3 DA04
-	ROM_LOAD_STAGGERED( "logger_r2_gp4_657b.4", 0x0c00, CRC(608b551c) SHA1(f2fde14860606f501ab0046fbe4dca0b97eb2481) ) // hand written LOGGER R2 GP4 657B
-	ROM_LOAD_STAGGERED( "logger_r2_gp5_c2d5.5", 0x1000, CRC(3d8ecdcd) SHA1(c9ea38aee898a4ac6cb6409da819d1a053088526) ) // hand written LOGGER R2 GP5 C2D5
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "logger_sdp1_414a.6", 0x0000, 0x1000, CRC(5af8da17) SHA1(357f02cdf38c6659aca51fa0a8534542fc29623c) ) // hand written LOGGER SDP1 414A
-
-	CVS_ROM_REGION_SPEECH_DATA( "logger_sp1_4626.8", 0x0800, CRC(74f67815) SHA1(6a26a16c27a7e4d58b611e5127115005a60cff91) ) // hand written LOGGER SP1 4626
-
-	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "logger_r2_cp1_d9cf.11", 0x0000, 0x0800, CRC(a1c1eb8c) SHA1(9fa2495b1b245f5889006cfc8857f51e57379cef) ) // hand written LOGGER R2 CP1 D9CF
-	ROM_LOAD( "logger_r2_cp2_cd1e.10", 0x0800, 0x0800, CRC(432d28d0) SHA1(30b9ec84fe04c5e48f4a1f9f7ab86a6a222db4cf) ) // hand written LOGGER R2 CP2 CD1E
-	ROM_LOAD( "logger_r2_cp3_5535.9",  0x1000, 0x0800, CRC(c87fcfcd) SHA1(eb937a6aa04ebe873cf46c4b3abf7bb02766eedf) ) // hand written LOGGER R2 CP3 5535
-
-	CVS_COMMON_ROMS
-ROM_END
-
-ROM_START( cosmos )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "cs-gp1.bin", 0x0000, CRC(7eb96ddf) SHA1(f7456ee1ace03ab98c4e8128d375464122c4df01) )
-	ROM_LOAD_STAGGERED( "cs-gp2.bin", 0x0400, CRC(6975a8f7) SHA1(13192d4eedd843c0c1d7e5c54a3086f71b09fbcb) )
-	ROM_LOAD_STAGGERED( "cs-gp3.bin", 0x0800, CRC(76904b13) SHA1(de219999e4a1b72142e71ea707b6250f4732ccb3) )
-	ROM_LOAD_STAGGERED( "cs-gp4.bin", 0x0c00, CRC(bdc89719) SHA1(668267d0b05990ff83a9e38a62950d3d725a53b3) )
-	ROM_LOAD_STAGGERED( "cs-gp5.bin", 0x1000, CRC(94be44ea) SHA1(e496ea79d177c6d2d79d59f7d45c86b547469c6f) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "cs-sdp1.bin", 0x0000, 0x0800, CRC(b385b669) SHA1(79621d3fb3eb4ea6fa8a733faa6f21edeacae186) )
-
-	CVS_ROM_REGION_SPEECH_DATA( "cs-sp1.bin", 0x1000, CRC(3c7fe86d) SHA1(9ae0b63b231a7092820650a196cde60588bc6b58) )
-
-	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "cs-cp1.bin", 0x0000, 0x0800, CRC(6a48c898) SHA1(c27f7bcdb2fe042ec52d1b9b4b9a4e47c288862d) )
-	ROM_LOAD( "cs-cp2.bin", 0x0800, 0x0800, CRC(db0dfd8c) SHA1(f2b0dd43f0e514fdae54e4066606187f45b98e38) )
-	ROM_LOAD( "cs-cp3.bin", 0x1000, 0x0800, CRC(01eee875) SHA1(6c41d716b5795f085229d855518862fb85f395a4) )
-
-	CVS_COMMON_ROMS
-ROM_END
-
 ROM_START( heartatk )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD_STAGGERED( "ha-gp1.bin", 0x0000, CRC(e8297c23) SHA1(e79ae7e99f904afe90b43a54df7b0e257d65ac0b) )
@@ -1708,23 +1627,65 @@ ROM_START( heartatk )
 	CVS_COMMON_ROMS
 ROM_END
 
-ROM_START( spacefrt )
+ROM_START( hunchbak ) // actual ROM label has "Century Elect. Ltd. (c)1981", and some label has HB/HB2 handwritten
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "sf-gp1.bin", 0x0000, CRC(1158fc3a) SHA1(c1f470324b6ec65c3061f78a6ff8620154f20c09) )
-	ROM_LOAD_STAGGERED( "sf-gp2.bin", 0x0400, CRC(8b4e1582) SHA1(5b92082d67f32197c0c61ddd8e1e3feb742195f4) )
-	ROM_LOAD_STAGGERED( "sf-gp3.bin", 0x0800, CRC(48f05102) SHA1(72d40cdd0bbc4cfeb6ddf550de0dafc61270d382) )
-	ROM_LOAD_STAGGERED( "sf-gp4.bin", 0x0c00, CRC(c5b14631) SHA1(360bed649185a090f7c96adadd7f045ef574865a) )
-	ROM_LOAD_STAGGERED( "sf-gp5.bin", 0x1000, CRC(d7eca1b6) SHA1(8444e61827f0153d04c4f9c08416e7ab753d6918) )
+	ROM_LOAD_STAGGERED( "hb-gp1.bin", 0x0000, CRC(af801d54) SHA1(68e31561e98f7e2caa337dd764941d08f075b559) )
+	ROM_LOAD_STAGGERED( "hb-gp2.bin", 0x0400, CRC(b448cc8e) SHA1(ed94f662c0e08a3a0aca073fbec29ae1fbd0328e) )
+	ROM_LOAD_STAGGERED( "hb-gp3.bin", 0x0800, CRC(57c6ea7b) SHA1(8c3ba01ab1917a8c24180ed1c0011dbfed36d406) )
+	ROM_LOAD_STAGGERED( "hb-gp4.bin", 0x0c00, CRC(7f91287b) SHA1(9383d885c142417de73879905cbce272ba9514c7) )
+	ROM_LOAD_STAGGERED( "hb-gp5.bin", 0x1000, CRC(1dd5755c) SHA1(b1e158d52bd9a238e3e32ed3024e495df2292dcb) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "sf-sdp1.bin", 0x0000, 0x0800, CRC(339a327f) SHA1(940887cd4660e37537fd9b57aa1ec3a4717ea0cf) )
+	ROM_LOAD( "6c.sdp1", 0x0000, 0x1000, CRC(f9ba2854) SHA1(d041198e2e8b8c3e668bd1610310f8d25c5b1119) )
 
-	CVS_ROM_REGION_SPEECH_DATA( "sf-sp1.bin", 0x1000, CRC(c5628d30) SHA1(d29a5852a1762cbd5f3eba29ae2bf49b3a26f894) )
+	CVS_ROM_REGION_SPEECH_DATA( "8a.sp1", 0x0800, CRC(ed1cd201) SHA1(6cc3842dda1bfddc06ffb436c55d14276286bd67) )
 
 	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "sf-cp1.bin", 0x0000, 0x0800, CRC(da194a68) SHA1(4215267e91644cf1e1f32f898bc9562bfba711f3) )
-	ROM_LOAD( "sf-cp2.bin", 0x0800, 0x0800, CRC(b96977c7) SHA1(8f0fab044f16787bce83562e2b22d962d0a2c209) )
-	ROM_LOAD( "sf-cp3.bin", 0x1000, 0x0800, CRC(f5d67b9a) SHA1(a492b41c53b1f28ac5f70969e5f06afa948c1a7d) )
+	ROM_LOAD( "11a.cp1", 0x0000, 0x0800, CRC(f256b047) SHA1(02d79882bad37ffdd58ef478e2658a1369c32ebc) )
+	ROM_LOAD( "10a.cp2", 0x0800, 0x0800, CRC(b870c64f) SHA1(ce4f8de87568782ce02bba754edff85df7f5c393) )
+	ROM_LOAD( "9a.cp3",  0x1000, 0x0800, CRC(9a7dab88) SHA1(cd39a9d4f982a7f49c478db1408d7e07335f2ddc) )
+
+	CVS_COMMON_ROMS
+ROM_END
+
+ROM_START( hunchbaka )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "1b.gp1", 0x0000, CRC(c816860b) SHA1(1109639645496d4644564d21c816b8baf8c84cf7) )
+	ROM_LOAD_STAGGERED( "2a.gp2", 0x0400, CRC(cab1e524) SHA1(c3fd7ac9ce5893fd2602a15ad0f6e3267a4ca122) )
+	ROM_LOAD_STAGGERED( "3a.gp3", 0x0800, CRC(b2adcfeb) SHA1(3090e2c6b945857c1e48dea395015a05c6165cd9) )
+	ROM_LOAD_STAGGERED( "4c.gp4", 0x0c00, CRC(229a8b71) SHA1(ea3815eb69d4927da356eada0add8382735feb48) )
+	ROM_LOAD_STAGGERED( "5a.gp5", 0x1000, CRC(cb4f0313) SHA1(1ef63cbe62e7a54d45e0afbc398c9d9b601e6403) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "6c.sdp1", 0x0000, 0x1000, CRC(f9ba2854) SHA1(d041198e2e8b8c3e668bd1610310f8d25c5b1119) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "8a.sp1", 0x0800, CRC(ed1cd201) SHA1(6cc3842dda1bfddc06ffb436c55d14276286bd67) )
+
+	ROM_REGION( 0x1800, "tiles", 0 )
+	ROM_LOAD( "11a.cp1", 0x0000, 0x0800, CRC(f256b047) SHA1(02d79882bad37ffdd58ef478e2658a1369c32ebc) )
+	ROM_LOAD( "10a.cp2", 0x0800, 0x0800, CRC(b870c64f) SHA1(ce4f8de87568782ce02bba754edff85df7f5c393) )
+	ROM_LOAD( "9a.cp3",  0x1000, 0x0800, CRC(9a7dab88) SHA1(cd39a9d4f982a7f49c478db1408d7e07335f2ddc) )
+
+	CVS_COMMON_ROMS
+ROM_END
+
+ROM_START( superbik )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "sb-gp1.bin", 0x0000, CRC(f0209700) SHA1(7843e8ebcbecb93814863ddd135f5acb0d481043) )
+	ROM_LOAD_STAGGERED( "sb-gp2.bin", 0x0400, CRC(1956d687) SHA1(00e261c5b1e1414b45661310c47daeceb3d5f4bf) )
+	ROM_LOAD_STAGGERED( "sb-gp3.bin", 0x0800, CRC(ceb27b75) SHA1(56fecc72746113a6611c18663d1b9e0e2daf57b4) )
+	ROM_LOAD_STAGGERED( "sb-gp4.bin", 0x0c00, CRC(430b70b3) SHA1(207c4939331c1561d145cbee0538da072aa51f5b) )
+	ROM_LOAD_STAGGERED( "sb-gp5.bin", 0x1000, CRC(013615a3) SHA1(1795a4dcc98255ad185503a99f48b7bacb5edc9d) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "sb-sdp1.bin", 0x0000, 0x0800, CRC(e977c090) SHA1(24bd4165434c745c1514d49cc90bcb621fb3a0f8) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "sb-sp1.bin", 0x0800, CRC(0aeb9ccd) SHA1(e7123eed21e4e758bbe1cebfd5aad44a5de45c27) )
+
+	ROM_REGION( 0x1800, "tiles", 0 )
+	ROM_LOAD( "sb-cp1.bin", 0x0000, 0x0800, CRC(03ba7760) SHA1(4ed252e2c4ec7cea2199524f7c35a1dc7c44f8d8) )
+	ROM_LOAD( "sb-cp2.bin", 0x0800, 0x0800, CRC(04de69f2) SHA1(3ef3b3c159d47230622b6cc45baad8737bd93a90) )
+	ROM_LOAD( "sb-cp3.bin", 0x1000, 0x0800, CRC(bb7d0b9a) SHA1(94c72d6961204be9cab351ac854ac9c69b51e79a) )
 
 	CVS_COMMON_ROMS
 ROM_END
@@ -1771,7 +1732,47 @@ ROM_START( raidersr3 )
 	CVS_COMMON_ROMS
 ROM_END
 
+ROM_START( hero )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "hr-gp1.bin", 0x0000, CRC(82f39788) SHA1(44217dc2312d10fceeb35adf3999cd6f240b60be) )
+	ROM_LOAD_STAGGERED( "hr-gp2.bin", 0x0400, CRC(79607812) SHA1(eaab829a2f5bcb8ec92c3f4122cffae31a4a77cb) )
+	ROM_LOAD_STAGGERED( "hr-gp3.bin", 0x0800, CRC(2902715c) SHA1(cf63f72681d1dcbdabdf7673ad8f61b5969e4bd1) )
+	ROM_LOAD_STAGGERED( "hr-gp4.bin", 0x0c00, CRC(696d2f8e) SHA1(73dd57f0f84e37ae707a89e17253aa3dd0c8b48b) )
+	ROM_LOAD_STAGGERED( "hr-gp5.bin", 0x1000, CRC(936a4ba6) SHA1(86cddcfafbd93dcdad3a1f26e280ceb96f779ab0) )
 
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "hr-sdp1.bin", 0x0000, 0x0800, CRC(c34ecf79) SHA1(07c96283410b1e7401140094db95800708cf310f) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "hr-sp1.bin", 0x0800, CRC(a5c33cb1) SHA1(447ffb193b0dc4985bae5d8c214a893afd08664b) )
+
+	ROM_REGION( 0x1800, "tiles", 0 )
+	ROM_LOAD( "hr-cp1.bin", 0x0000, 0x0800, CRC(2d201496) SHA1(f195aa1b231a0e1752c7da824a10321f0527f8c9) )
+	ROM_LOAD( "hr-cp2.bin", 0x0800, 0x0800, CRC(21b61fe3) SHA1(31882003f0557ffc4ec38ae6ee07b5d294b4162c) )
+	ROM_LOAD( "hr-cp3.bin", 0x1000, 0x0800, CRC(9c8e3f9e) SHA1(9d949a4d12b45da12b434677670b2b109568564a) )
+
+	CVS_COMMON_ROMS
+ROM_END
+
+ROM_START( huncholy )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "ho-gp1.bin", 0x0000, CRC(4f17cda7) SHA1(ae6fe495c723042c6e060d4ada50aaef1019d5eb) )
+	ROM_LOAD_STAGGERED( "ho-gp2.bin", 0x0400, CRC(70fa52c7) SHA1(179813fdc204870d72c0bfa8cd5dbf277e1f67c4) )
+	ROM_LOAD_STAGGERED( "ho-gp3.bin", 0x0800, CRC(931934b1) SHA1(08fe5ad3459862246e9ea845abab4e01e1dbd62d) )
+	ROM_LOAD_STAGGERED( "ho-gp4.bin", 0x0c00, CRC(af5cd501) SHA1(9a79b173aa41a82faa9f19210d3e18bfa6c593fa) )
+	ROM_LOAD_STAGGERED( "ho-gp5.bin", 0x1000, CRC(658e8974) SHA1(30d0ada1cce99a842bad8f5a58630bc1b7048b03) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "ho-sdp1.bin", 0x0000, 0x1000, CRC(3efb3ffd) SHA1(be4807c8b4fe23f2247aa3b6ac02285bee1a0520) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "ho-sp1.bin", 0x1000, CRC(3fd39b1e) SHA1(f5d0b2cfaeda994762403f039a6f7933c5525234) )
+
+	ROM_REGION( 0x1800, "tiles", 0 )
+	ROM_LOAD( "ho-cp1.bin",  0x0000, 0x0800, CRC(c6c73d46) SHA1(63aba92f77105fedf46337b591b074020bec05d0) )
+	ROM_LOAD( "ho-cp2.bin",  0x0800, 0x0800, CRC(e596371c) SHA1(93a0d0ccdf830ae72d070b03b7e2222f4a737ead) )
+	ROM_LOAD( "ho-cp3.bin",  0x1000, 0x0800, CRC(11fae1cf) SHA1(5ceabfb1ff1a6f76d1649512f57d7151f5258ecb) )
+
+	CVS_COMMON_ROMS
+ROM_END
 
 
 /*************************************
@@ -1780,30 +1781,10 @@ ROM_END
  *
  *************************************/
 
-uint8_t cvs_state::huncholy_prot_r(offs_t offset)
-{
-	if (offset == 1)
-	{
-		m_protection_counter++;
-		if ((m_protection_counter & 0x0f) == 0x01) return 0x00;
-		return 0xff;
-	}
-
-	return 0; // offset 0
-}
-
-void cvs_state::init_huncholy()
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8sm_delegate(*this, FUNC(cvs_state::huncholy_prot_r)));
-
-	save_item(NAME(m_protection_counter));
-	m_protection_counter = 0;
-}
-
-
 void cvs_state::init_hunchbaka()
 {
 	uint8_t *rom = memregion("maincpu")->base();
+
 	// data lines D2 and D5 swapped
 	for (offs_t offs = 0; offs < 0x7400; offs++)
 		rom[offs] = bitswap<8>(rom[offs], 7, 6, 2, 4, 3, 5, 1, 0);
@@ -1812,17 +1793,28 @@ void cvs_state::init_hunchbaka()
 
 uint8_t cvs_state::superbik_prot_r()
 {
-	m_protection_counter++;
-	if ((m_protection_counter & 0x0f) == 0x02) return 0;
-	return 0xff;
+	if (!machine().side_effects_disabled())
+		m_protection_counter++;
+
+	return ((m_protection_counter & 0x0f) == 0x02) ? 0 : 0xff;
 }
 
 void cvs_state::init_superbik()
 {
-	m_protection_counter = 0;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f1, 0x73f2, read8smo_delegate(*this, FUNC(cvs_state::superbik_prot_r)));
+}
 
-	save_item(NAME(m_protection_counter));
+
+void cvs_state::init_raiders()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	// data lines D1 and D6 swapped
+	for (offs_t offs = 0; offs < 0x7400; offs++)
+		rom[offs] = bitswap<8>(rom[offs], 7, 1, 5, 4, 3, 2, 6, 0);
+
+	// partially remove mirroring on $3xxx/$7xxx (protection)
+	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x3400, 0x3bff, 0x4000);
 }
 
 
@@ -1857,19 +1849,24 @@ void cvs_state::init_hero()
 }
 
 
-void cvs_state::init_raiders()
+uint8_t cvs_state::huncholy_prot_r(offs_t offset)
 {
-	uint8_t *rom = memregion("maincpu")->base();
+	if (offset == 1)
+	{
+		if (!machine().side_effects_disabled())
+			m_protection_counter++;
 
-	// data lines D1 and D6 swapped
-	for (offs_t offs = 0; offs < 0x7400; offs++)
-		rom[offs] = bitswap<8>(rom[offs], 7, 1, 5, 4, 3, 2, 6, 0);
+		return ((m_protection_counter & 0x0f) == 0x01) ? 0 : 0xff;
+	}
 
-	// patch out protection
-	rom[0x010a] = 0xc0;
-	rom[0x010b] = 0xc0;
-	rom[0x010c] = 0xc0;
+	return 0; // offset 0
 }
+
+void cvs_state::init_huncholy()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8sm_delegate(*this, FUNC(cvs_state::huncholy_prot_r)));
+}
+
 
 } // anonymous namespace
 
@@ -1899,7 +1896,7 @@ GAME( 1983, heartatk,  0,        cvs, heartatk, cvs_state, empty_init,     ROT90
 GAME( 1983, hunchbak,  0,        cvs, hunchbak, cvs_state, empty_init,     ROT90, "Century Electronics", "Hunchback (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbaka, hunchbak, cvs, hunchbak, cvs_state, init_hunchbaka, ROT90, "Century Electronics", "Hunchback (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, superbik,  0,        cvs, superbik, cvs_state, init_superbik,  ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raiders,   0,        cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION| MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raidersr3, raiders,  cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION| MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raiders,   0,        cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raidersr3, raiders,  cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, hero,      0,        cvs, hero,     cvs_state, init_hero,      ROT90, "Seatongrove UK, Ltd.", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
 GAME( 1984, huncholy,  0,        cvs, huncholy, cvs_state, init_huncholy,  ROT90, "Seatongrove UK, Ltd.", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
