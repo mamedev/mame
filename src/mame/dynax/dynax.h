@@ -270,9 +270,6 @@ protected:
 	void adpcm_reset_w(uint8_t data);
 
 private:
-	// input/output
-	uint8_t m_hopper = 0U; // hjingi
-
 	// misc
 	int m_toggle = 0;
 
@@ -285,8 +282,6 @@ private:
 	void nanajign_palette_hi_w(offs_t offset, uint8_t data);
 	void nanajign_palette_update(offs_t offset);
 	void hjingi_lockout_w(int state);
-	void hjingi_hopper_w(int state);
-	uint8_t hjingi_hopper_bit();
 	uint8_t hjingi_keyboard_0_r();
 	uint8_t hjingi_keyboard_1_r();
 	void yarunara_input_w(offs_t offset, uint8_t data);

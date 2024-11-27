@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_I4100_H
-#define MAME_VIDEO_I4100_H
+#ifndef MAME_VIDEO_IMAGETEK_I4100_H
+#define MAME_VIDEO_IMAGETEK_I4100_H
 
 #pragma once
 
@@ -266,11 +266,4 @@ DECLARE_DEVICE_TYPE(I4100, imagetek_i4100_device)
 DECLARE_DEVICE_TYPE(I4220, imagetek_i4220_device)
 DECLARE_DEVICE_TYPE(I4300, imagetek_i4300_device)
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-#endif // MAME_VIDEO_I4100_H
+#endif // MAME_VIDEO_IMAGETEK_I4100_H

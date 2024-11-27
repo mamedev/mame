@@ -7,8 +7,8 @@
 //
 // Disassembler
 
-#ifndef DEVICES_SOUND_SWP30D_H
-#define DEVICES_SOUND_SWP30D_H
+#ifndef MAME_SOUND_SWP30D_H
+#define MAME_SOUND_SWP30D_H
 
 #pragma once
 
@@ -36,4 +36,4 @@ private:
 	static inline void append(std::string &r, const std::string &e);
 };
 
-#endif
+#endif // MAME_SOUND_SWP30D_H

@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_MB90082DEV_H
-#define MAME_VIDEO_MB90082DEV_H
+#ifndef MAME_VIDEO_MB90082_H
+#define MAME_VIDEO_MB90082_H
 
 #pragma once
 
@@ -68,4 +68,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MB90082, mb90082_device)
 
-#endif // MAME_VIDEO_MB90082DEV_H
+#endif // MAME_VIDEO_MB90082_H

@@ -4,8 +4,8 @@
 /*    SEGA 8bit PCM                                      */
 /*********************************************************/
 
-#ifndef MAMESOUND_SEGAPCM_H
-#define MAMESOUND_SEGAPCM_H
+#ifndef MAME_SOUND_SEGAPCM_H
+#define MAME_SOUND_SEGAPCM_H
 
 #pragma once
 
@@ -56,4 +56,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEGAPCM, segapcm_device)
 
-#endif // MAMESOUND_SEGAPCM_H
+#endif // MAME_SOUND_SEGAPCM_H

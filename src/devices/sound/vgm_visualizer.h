@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_SOUND_VGMVIZ_H
-#define MAME_SOUND_VGMVIZ_H
+#ifndef MAME_SOUND_VGM_VISUALIZER_H
+#define MAME_SOUND_VGM_VISUALIZER_H
 
 #pragma once
 
@@ -137,4 +137,4 @@ protected:
 	static const bool NEEDS_FFT[VIZ_COUNT];
 };
 
-#endif // MAME_SOUND_VGMVIZ_H
+#endif // MAME_SOUND_VGM_VISUALIZER_H
