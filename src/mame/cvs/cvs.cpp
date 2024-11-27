@@ -90,13 +90,15 @@ Additional work
 
 TODO:
 - Emulate protection properly in later games (reads area 0x73fx);
-- the board most probably has discrete circuits. The 393Hz tone used
-  for shots (superbike) and collisions (8ball) is just a guess.
+- The board most probably has discrete circuits. Possibly 2 beepers (current
+  frequency is completely guessed), and a pitch sweep sound.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cvs_base.h"
+
+#include "sound/beep.h"
 
 #include "speaker.h"
 
@@ -120,17 +122,16 @@ public:
 		, m_character_ram(*this, "character_ram", 3 * 0x800, ENDIANNESS_BIG)
 		, m_4_bit_dac_data(*this, "4bit_dac")
 		, m_tms5110_ctl_data(*this, "tms5110_ctl")
-		, m_dac3_state(*this, "dac3_state")
+		, m_sh_trigger(*this, "sh_trigger")
 		, m_speech_data_rom(*this, "speechdata")
 		, m_audiocpu(*this, "audiocpu")
 		, m_speechcpu(*this, "speechcpu")
 		, m_dac2(*this, "dac2")
-		, m_dac3(*this, "dac3")
+		, m_beep(*this, "beep%u", 0)
 		, m_tms5110(*this, "tms")
 		, m_soundlatch(*this, "soundlatch")
 		, m_in(*this, "IN%u", 0U)
-		, m_dsw2(*this, "DSW2")
-		, m_dsw3(*this, "DSW3")
+		, m_dsw(*this, "DSW%u", 1U)
 		, m_lamps(*this, "lamp%u", 1U)
 	{ }
 
@@ -146,6 +147,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+	virtual void device_post_load() override { m_gfxdecode->gfx(1)->mark_all_dirty(); }
 
 private:
 	// memory pointers
@@ -155,7 +157,7 @@ private:
 	                                                    we can use the same gfx_layout */
 	required_shared_ptr<uint8_t> m_4_bit_dac_data;
 	required_shared_ptr<uint8_t> m_tms5110_ctl_data;
-	required_shared_ptr<uint8_t> m_dac3_state;
+	required_shared_ptr<uint8_t> m_sh_trigger;
 	required_region_ptr<uint8_t> m_speech_data_rom;
 
 	bitmap_ind16 m_background_bitmap = 0;
@@ -165,9 +167,6 @@ private:
 
 	// misc
 	uint8_t m_protection_counter = 0U;
-	emu_timer *m_393hz_timer = nullptr;
-	uint8_t m_393hz_clock = 0U;
-
 	uint16_t m_character_ram_page_start = 0U;
 	uint8_t m_character_banking_mode = 0U;
 	uint16_t m_speech_rom_bit_address = 0U;
@@ -176,12 +175,11 @@ private:
 	required_device<s2650_device> m_audiocpu;
 	required_device<s2650_device> m_speechcpu;
 	required_device<dac_byte_interface> m_dac2;
-	required_device<dac_bit_interface> m_dac3;
+	required_device_array<beep_device, 2> m_beep;
 	required_device<tms5110_device> m_tms5110;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport_array<4> m_in;
-	required_ioport m_dsw2;
-	required_ioport m_dsw3;
+	required_ioport_array<3> m_dsw;
 	output_finder<2> m_lamps;
 
 	uint8_t huncholy_prot_r(offs_t offset);
@@ -199,11 +197,9 @@ private:
 	void video_fx_w(uint8_t data);
 	void scroll_w(uint8_t data);
 	void _4_bit_dac_data_w(offs_t offset, uint8_t data);
-	void unknown_w(offs_t offset, uint8_t data);
+	void sh_trigger_w(offs_t offset, uint8_t data);
 	void tms5110_ctl_w(offs_t offset, uint8_t data);
 	void tms5110_pdc_w(offs_t offset, uint8_t data);
-	TIMER_CALLBACK_MEMBER(_393hz_timer_cb);
-	void start_393hz_timer() ATTR_COLD;
 	void palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(main_cpu_interrupt);
@@ -309,6 +305,10 @@ void cvs_state::scroll_w(uint8_t data)
 void cvs_state::video_start()
 {
 	init_stars();
+
+	// cosmos relies on non-0 initial character RAM for the title screen
+	for (int i = 0; i < 0x1800; i++)
+		m_character_ram[i | 0x400] = 0xff;
 
 	// create helper bitmaps
 	m_screen->register_screen_bitmap(m_background_bitmap);
@@ -512,42 +512,12 @@ uint8_t cvs_state::input_r(offs_t offset)
 	case 0x02:  ret = m_in[1]->read(); break;
 	case 0x03:  ret = m_in[2]->read(); break;
 	case 0x04:  ret = m_in[3]->read(); break;
-	case 0x06:  ret = m_dsw3->read(); break;
-	case 0x07:  ret = m_dsw2->read(); break;
+	case 0x06:  ret = m_dsw[2]->read(); break;
+	case 0x07:  ret = m_dsw[1]->read(); break;
 	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", m_maincpu->pc(), offset & 0x0f); break;
 	}
 
 	return ret;
-}
-
-
-
-/*************************************
- *
- *  Timing
- *
- *************************************/
-
-#if 0
-int cvs_state::cvs_393hz_clock_r()
-{
-	return m_393hz_clock;
-}
-#endif
-
-TIMER_CALLBACK_MEMBER(cvs_state::_393hz_timer_cb)
-{
-	m_393hz_clock = !m_393hz_clock;
-
-	if (m_dac3_state[2])
-		m_dac3->write(m_393hz_clock);
-}
-
-
-void cvs_state::start_393hz_timer()
-{
-	m_393hz_timer = timer_alloc(FUNC(cvs_state::_393hz_timer_cb), this);
-	m_393hz_timer->adjust(attotime::from_hz(30*393), 0, attotime::from_hz(30*393));
 }
 
 
@@ -560,14 +530,13 @@ void cvs_state::start_393hz_timer()
 
 void cvs_state::_4_bit_dac_data_w(offs_t offset, uint8_t data)
 {
-	static int old_data[4] = {0,0,0,0};
+	data = BIT(data, 7);
 
-	if (data != old_data[offset])
+	if (data != m_4_bit_dac_data[offset])
 	{
-		LOG(("4BIT: %02x %02x\n", offset, data));
-		old_data[offset] = data;
+		LOG(("4BIT: %d %d\n", offset, data));
+		m_4_bit_dac_data[offset] = data;
 	}
-	m_4_bit_dac_data[offset] = data >> 7;
 
 	// merge into D0-D3
 	uint8_t const dac_value = (m_4_bit_dac_data[0] << 0) |
@@ -579,22 +548,25 @@ void cvs_state::_4_bit_dac_data_w(offs_t offset, uint8_t data)
 	m_dac2->write(dac_value);
 }
 
-void cvs_state::unknown_w(offs_t offset, uint8_t data)
+void cvs_state::sh_trigger_w(offs_t offset, uint8_t data)
 {
-	/* offset 2 is used in 8ball
-	 * offset 0 is used in spacefrt
-	 * offset 3 is used in darkwar
+	/* offset 0 is used in darkwar, spacefrt, logger, raiders
+	 * offset 2 is used in darkwar, spacefrt, 8ball, superbik, raiders
+	 * offset 3 is used in cosmos, darkwar, superbik, raiders
 	 *
-	 * offset 1 is not used (no trace in disassembly)
+	 * offset 1 is only used inadvertedly by logger
 	 */
 
-	if (data != m_dac3_state[offset])
-	{
-		if (VERBOSE && offset != 2)
-			popmessage("Unknown: %02x %02x\n", offset, data);
+	data &= 1;
 
-		m_dac3_state[offset] = data;
+	if (data != m_sh_trigger[offset])
+	{
+		LOG(("TRIG: %d %d\n", offset, data));
+		m_sh_trigger[offset] = data;
 	}
+
+	if (offset == 2 || offset == 3)
+		m_beep[offset & 1]->set_state(data);
 }
 
 
@@ -734,7 +706,7 @@ void cvs_state::audio_cpu_map(address_map &map)
 	map(0x1800, 0x1800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1840, 0x1840).w("dac1", FUNC(dac_byte_interface::data_w));
 	map(0x1880, 0x1883).w(FUNC(cvs_state::_4_bit_dac_data_w)).share(m_4_bit_dac_data);
-	map(0x1884, 0x1887).w(FUNC(cvs_state::unknown_w)).share(m_dac3_state);  // ???? not connected to anything
+	map(0x1884, 0x1887).w(FUNC(cvs_state::sh_trigger_w)).share(m_sh_trigger);
 }
 
 
@@ -798,15 +770,8 @@ static INPUT_PORTS_START( cvs )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW3")
-	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
-	PORT_DIPUNUSED( 0x02, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
-	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
-	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_START("DSW1")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
@@ -823,10 +788,26 @@ static INPUT_PORTS_START( cvs )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+
+	PORT_START("DSW3")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cvs_registration )
 	PORT_INCLUDE(cvs)
+
+	PORT_MODIFY("DSW2")
+	// Told to be "Meter Pulses" but I don't know what this means
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )          // has an effect when COIN2 is pressed (when COIN1 is pressed, value always 1)
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x20, "5" )
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, "Registration" )              // can't tell what shall be the default value
@@ -836,12 +817,6 @@ static INPUT_PORTS_START( cvs_registration )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x00, "10" )
 	// bits 2 and 3 determine bonus life settings but they might change from game to game - they are sometimes unused
-
-	PORT_MODIFY("DSW2")
-	// Told to be "Meter Pulses" but I don't know what this means
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )          // has an effect when COIN2 is pressed (when COIN1 is pressed, value always 1)
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x20, "5" )
 INPUT_PORTS_END
 
 
@@ -929,6 +904,8 @@ static INPUT_PORTS_START( 8ball )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x1d93 - code at 0x0858 ('8ball') or 0x08c0 ('8ball1') - read back code at 0x0073
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
@@ -938,8 +915,6 @@ static INPUT_PORTS_START( 8ball )
 	PORT_DIPNAME( 0x20, 0x00, "Colors" )                    // stored at 0x1ed4 - code at 0x0847 ('8ball') or 0x08af ('8ball1')
 	PORT_DIPSETTING(    0x00, "Palette 1" )                 // table at 0x0781 ('8ball') or 0x07e9 ('8ball1') - 16 bytes
 	PORT_DIPSETTING(    0x20, "Palette 2" )                 // table at 0x0791 ('8ball') or 0x07f9 ('8ball1') - 16 bytes
-
-	// DSW2 bit 5 stored at 0x1d93 - code at 0x0858 ('8ball') or 0x08c0 ('8ball1') - read back code at 0x0073
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( logger )
@@ -951,6 +926,8 @@ static INPUT_PORTS_START( logger )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x7da1 - code at 0x6ec7 - read back code at 0x0073
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
@@ -958,8 +935,6 @@ static INPUT_PORTS_START( logger )
 	PORT_DIPSETTING(    0x04, "40k only" )                  // displays "40000"
 	PORT_DIPSETTING(    0x00, "80k only" )                  // displays "80000"
 	// DSW3 bit 5 stored at 0x7dc8 - code at 0x6eb6 - not read back
-
-	// DSW2 bit 5 stored at 0x7da1 - code at 0x6ec7 - read back code at 0x0073
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dazzler )
@@ -971,14 +946,14 @@ static INPUT_PORTS_START( dazzler )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x7d9c - code at 0x6b51 - read back code at 0x0099
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
 	PORT_DIPSETTING(    0x04, "20k only" )                  // displays "20000"
 	PORT_DIPSETTING(    0x08, "40k only" )                  // displays "40000"
 	PORT_DIPSETTING(    0x00, "80k only" )                  // displays "80000"
-
-	// DSW2 bit 5 stored at 0x7d9c - code at 0x6b51 - read back code at 0x0099
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wallst )
@@ -990,14 +965,14 @@ static INPUT_PORTS_START( wallst )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x1e95 - code at 0x1232 - read back code at 0x6054
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
 	PORT_DIPSETTING(    0x04, "20k only" )                  // displays "20000"
 	PORT_DIPSETTING(    0x08, "40k only" )                  // displays "40000"
 	PORT_DIPSETTING(    0x00, "80k only" )                  // displays "80000"
-
-	// DSW2 bit 5 stored at 0x1e95 - code at 0x1232 - read back code at 0x6054
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( radarzon )
@@ -1009,14 +984,14 @@ static INPUT_PORTS_START( radarzon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x3d6e - code at 0x22aa - read back code at 0x00e4
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "100k only" )                 // displays "100000"
 	PORT_DIPSETTING(    0x04, "200k only" )                 // displays "200000"
 	PORT_DIPSETTING(    0x08, "400k only" )                 // displays "400000"
 	PORT_DIPSETTING(    0x00, "800k only" )                 // displays "800000"
-
-	// DSW2 bit 5 stored at 0x3d6e - code at 0x22aa - read back code at 0x00e4
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( goldbug )
@@ -1028,14 +1003,14 @@ static INPUT_PORTS_START( goldbug )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x3d89 - code at 0x3377 - read back code at 0x6054
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "100k only" )                 // displays "100000"
 	PORT_DIPSETTING(    0x04, "200k only" )                 // displays "200000"
 	PORT_DIPSETTING(    0x08, "400k only" )                 // displays "400000"
 	PORT_DIPSETTING(    0x00, "800k only" )                 // displays "800000"
-
-	// DSW2 bit 5 stored at 0x3d89 - code at 0x3377 - read back code at 0x6054
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( diggerc )
@@ -1047,23 +1022,23 @@ static INPUT_PORTS_START( diggerc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x3db3 - code at 0x22ad - read back code at 0x00e4
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "50k only" )                  // displays "50000"
 	PORT_DIPSETTING(    0x04, "100k only" )                 // displays "100000"
 	PORT_DIPSETTING(    0x08, "150k only" )                 // displays "150000"
 	PORT_DIPSETTING(    0x00, "200k only" )                 // displays "200000"
-
-	// DSW2 bit 5 stored at 0x3db3 - code at 0x22ad - read back code at 0x00e4
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( heartatk )
 	PORT_INCLUDE(cvs_registration)
 
+	// DSW2 bit 5 stored at 0x1e76 - code at 0x0c5c - read back code at 0x00e4
+
 	// DSW3 bits 2 and 3 stored at 0x1c61 (0, 2, 1, 3) - code at 0x0c52
 	// read back code at 0x2197 but untested value : bonus life always at 100000
-
-	// DSW2 bit 5 stored at 0x1e76 - code at 0x0c5c - read back code at 0x00e4
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hunchbak )
@@ -1095,19 +1070,19 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( superbik )
 	PORT_INCLUDE(cvs_registration)
 
-	// DSW3 bits 2 and 3 are not read : bonus life always at 5000
-
 	// DSW2 bit 5 stored at 0x1e79 - code at 0x060f - read back code at 0x25bf
+
+	// DSW3 bits 2 and 3 are not read : bonus life always at 5000
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( raiders )
 	PORT_INCLUDE(cvs_registration)
 
-	// DSW3 bits 2 and 3 are not read : bonus life always at 100000
-
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  // always 4 lives - table at 0x4218 - 2 bytes
 	// DSW2 bit 5 stored at 0x1e79 - code at 0x1307 - read back code at 0x251d
+
+	// DSW3 bits 2 and 3 are not read : bonus life always at 100000
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hero )
@@ -1119,11 +1094,11 @@ static INPUT_PORTS_START( hero )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
-	// DSW3 bits 2 and 3 are not read : bonus life always at 150000
-
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  // always 3 lives - table at 0x4ebb - 2 bytes
 	// DSW2 bit 5 stored at 0x1e99 - code at 0x0fdd - read back code at 0x0352
+
+	// DSW3 bits 2 and 3 are not read : bonus life always at 150000
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( huncholy )
@@ -1135,11 +1110,11 @@ static INPUT_PORTS_START( huncholy )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
-	// DSW3 bits 2 and 3 are not read : bonus life always at 20000
-
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  // always 3 lives - table at 0x4531 - 2 bytes
 	// DSW2 bit 5 stored at 0x1e7c - code at 0x067d - read back code at 0x2f95
+
+	// DSW3 bits 2 and 3 are not read : bonus life always at 20000
 INPUT_PORTS_END
 
 
@@ -1180,12 +1155,9 @@ void cvs_state::machine_start()
 
 	m_lamps.resolve();
 
-	start_393hz_timer();
-
 	// register state save
 	save_item(NAME(m_character_ram_page_start));
 	save_item(NAME(m_character_banking_mode));
-	save_item(NAME(m_393hz_clock));
 	save_item(NAME(m_protection_counter));
 	save_item(NAME(m_speech_rom_bit_address));
 	save_item(NAME(m_stars_on));
@@ -1199,7 +1171,6 @@ void cvs_state::machine_reset()
 	m_character_ram_page_start = 0;
 	m_character_banking_mode = 0;
 	m_speech_rom_bit_address = 0;
-	m_393hz_clock = 0;
 	m_protection_counter = 0;
 	m_stars_on = 0;
 	m_scroll_reg = 0;
@@ -1220,13 +1191,10 @@ void cvs_state::cvs(machine_config &config)
 	S2650(config, m_audiocpu, XTAL(14'318'181) / 16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::audio_cpu_map);
 	m_audiocpu->intack_handler().set([this] { m_audiocpu->set_input_line(0, CLEAR_LINE); return 0x03; });
-	// doesn't look like it is used at all
-	//m_audiocpu->sense_handler().set(FUNC(cvs_state::cvs_393hz_clock_r));
 
 	S2650(config, m_speechcpu, XTAL(14'318'181) / 16);
 	m_speechcpu->set_addrmap(AS_PROGRAM, &cvs_state::speech_cpu_map);
 	// romclk is much more probable, 393 Hz results in timing issues
-	//m_speechcpu->sense_handler().set(FUNC(cvs_state::cvs_393hz_clock_r));
 	m_speechcpu->sense_handler().set("tms", FUNC(tms5110_device::romclk_hack_r));
 
 	// video hardware
@@ -1257,13 +1225,15 @@ void cvs_state::cvs(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
+	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.20); // unknown DAC
+
+	BEEP(config, m_beep[0], 600).add_route(ALL_OUTPUTS, "speaker", 0.15); // placeholder
+	BEEP(config, m_beep[1], 150).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
 
 	TMS5100(config, m_tms5110, XTAL(640'000));
 	m_tms5110->data().set(FUNC(cvs_state::speech_rom_read_bit));
-	m_tms5110->add_route(ALL_OUTPUTS, "speaker", 0.5);
+	m_tms5110->add_route(ALL_OUTPUTS, "speaker", 0.30);
 }
 
 
