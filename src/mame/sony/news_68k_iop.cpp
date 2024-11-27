@@ -401,7 +401,6 @@ namespace
 		if (data > 0)
 		{
 			m_cpu->resume(SUSPEND_REASON_RESET);
-			// m_cpu->spin_until_time(attotime::from_msec(500)); // Debug: delay CPU start. If you slow down the IOP timeout timer, this statement isn't needed. Why???
 		}
 		else
 		{
@@ -1123,7 +1122,7 @@ namespace
 		NSCSI_CONNECTOR(config, "scsi:2", news_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:3", news_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:4", news_scsi_devices, nullptr);
-		NSCSI_CONNECTOR(config, "scsi:5", news_scsi_devices, nullptr);
+		NSCSI_CONNECTOR(config, "scsi:5", news_scsi_devices, nullptr); // ID 5 is the default for tape devices
 		NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, nullptr);
 
 		// AMD Am5380PC SCSI interface
