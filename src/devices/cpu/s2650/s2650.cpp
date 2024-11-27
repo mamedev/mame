@@ -19,6 +19,9 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
+// define this to enable Z80 mnemonics in the debugger
+#define DEBUG_Z80   0
+
 // define this to expand all EA calculations inline
 #define INLINE_EA   1
 
@@ -43,8 +46,7 @@ s2650_device::s2650_device(const machine_config &mconfig, const char *tag, devic
 
 bool s2650_device::get_z80_mnemonics_mode() const
 {
-	// Needs to become configurable live
-	return true;
+	return bool(DEBUG_Z80);
 }
 
 std::unique_ptr<util::disasm_interface> s2650_device::create_disassembler()
