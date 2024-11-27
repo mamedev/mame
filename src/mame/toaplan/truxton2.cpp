@@ -8,6 +8,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "toaplan_coincounter.h"
 #include "toaplipt.h"
 #include "gp9001.h"
 
@@ -58,7 +59,6 @@ private:
 	required_shared_ptr<u16> m_tx_lineselect;
 	required_shared_ptr<u16> m_tx_linescroll;
 	required_shared_ptr<u16> m_tx_gfxram;
-	void coin_w(u8 data);
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<gp9001vdp_device> m_vdp;
@@ -68,32 +68,6 @@ private:
 	required_device<palette_device> m_palette;
 	bitmap_ind8 m_custom_priority_bitmap;
 };
-
-
-
-void truxton2_state::coin_w(u8 data) // MOVE TO DEVICE!
-{
-	/* +----------------+------ Bits 7-5 not used ------+--------------+ */
-	/* | Coin Lockout 2 | Coin Lockout 1 | Coin Count 2 | Coin Count 1 | */
-	/* |     Bit 3      |     Bit 2      |     Bit 1    |     Bit 0    | */
-
-	if (data & 0x0f)
-	{
-		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
-		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
-		machine().bookkeeping().coin_counter_w(0, BIT( data, 0));
-		machine().bookkeeping().coin_counter_w(1, BIT( data, 1));
-	}
-	else
-	{
-		machine().bookkeeping().coin_lockout_global_w(1);    // Lock all coin slots
-	}
-	if (data & 0xf0)
-	{
-		logerror("Writing unknown upper bits (%02x) to coin control\n",data);
-	}
-}
-
 
 /*
  Extra-text RAM format
@@ -310,7 +284,7 @@ void truxton2_state::truxton2_68k_mem(address_map &map)
 	map(0x70000a, 0x70000b).portr("SYS");
 	map(0x700011, 0x700011).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700014, 0x700017).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x70001f, 0x70001f).w(FUNC(truxton2_state::coin_w));
+	map(0x70001f, 0x70001f).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
 }
 
 #define XOR(a) WORD_XOR_LE(a)
@@ -338,6 +312,8 @@ void truxton2_state::truxton2(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &truxton2_state::truxton2_68k_mem);
+
+	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

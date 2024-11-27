@@ -8,6 +8,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "toaplan_coincounter.h"
 #include "toaplipt.h"
 #include "gp9001.h"
 
@@ -45,7 +46,6 @@ private:
 	template<unsigned Which> u16 ghox_h_analog_r();
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
 	void shared_ram_w(offs_t offset, u8 data) { m_shared_ram[offset] = data; }
-	void coin_w(u8 data);
 	void reset(int state);
 
 	s8 m_old_paddle_h[2] = {0};
@@ -65,29 +65,6 @@ void ghox_state::reset(int state)
 {
 	if (m_audiocpu != nullptr)
 		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-}
-
-void ghox_state::coin_w(u8 data) // MOVE TO DEVICE!
-{
-	/* +----------------+------ Bits 7-5 not used ------+--------------+ */
-	/* | Coin Lockout 2 | Coin Lockout 1 | Coin Count 2 | Coin Count 1 | */
-	/* |     Bit 3      |     Bit 2      |     Bit 1    |     Bit 0    | */
-
-	if (data & 0x0f)
-	{
-		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
-		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
-		machine().bookkeeping().coin_counter_w(0, BIT( data, 0));
-		machine().bookkeeping().coin_counter_w(1, BIT( data, 1));
-	}
-	else
-	{
-		machine().bookkeeping().coin_lockout_global_w(1);    // Lock all coin slots
-	}
-	if (data & 0xf0)
-	{
-		logerror("Writing unknown upper bits (%02x) to coin control\n",data);
-	}
 }
 
 
@@ -254,7 +231,7 @@ void ghox_state::ghox_68k_mem(address_map &map)
 	map(0x100000, 0x100001).r(FUNC(ghox_state::ghox_h_analog_r<0>));
 	map(0x140000, 0x14000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x180000, 0x180fff).rw(FUNC(ghox_state::shared_ram_r), FUNC(ghox_state::shared_ram_w)).umask16(0x00ff);
-	map(0x181001, 0x181001).w(FUNC(ghox_state::coin_w));
+	map(0x181001, 0x181001).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
 	map(0x18100c, 0x18100d).portr("JMPR");
 }
 
@@ -283,6 +260,8 @@ void ghox_state::ghox(machine_config &config)
 
 	HD647180X(config, m_audiocpu, 10_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ghox_state::ghox_hd647180_mem_map);
+
+	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 

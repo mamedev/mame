@@ -8,6 +8,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "toaplan_coincounter.h"
 #include "toaplan_v25_tables.h"
 #include "toaplipt.h"
 #include "gp9001.h"
@@ -74,7 +75,6 @@ protected:
 	optional_shared_ptr<u16> m_tx_lineselect;
 	optional_shared_ptr<u16> m_tx_linescroll;
 	optional_shared_ptr<u16> m_tx_gfxram;
-	void coin_w(u8 data);
 	void reset(int state);
 
 	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
@@ -120,29 +120,6 @@ public:
 void fixeight_state::reset(int state)
 {
 	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-}
-
-void fixeight_state::coin_w(u8 data) // MOVE TO DEVICE!
-{
-	/* +----------------+------ Bits 7-5 not used ------+--------------+ */
-	/* | Coin Lockout 2 | Coin Lockout 1 | Coin Count 2 | Coin Count 1 | */
-	/* |     Bit 3      |     Bit 2      |     Bit 1    |     Bit 0    | */
-
-	if (data & 0x0f)
-	{
-		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
-		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
-		machine().bookkeeping().coin_counter_w(0, BIT( data, 0));
-		machine().bookkeeping().coin_counter_w(1, BIT( data, 1));
-	}
-	else
-	{
-		machine().bookkeeping().coin_lockout_global_w(1);    // Lock all coin slots
-	}
-	if (data & 0xf0)
-	{
-		logerror("Writing unknown upper bits (%02x) to coin control\n",data);
-	}
 }
 
 
@@ -425,7 +402,7 @@ void fixeight_state::fixeight_68k_mem(address_map &map)
 	map(0x200004, 0x200005).portr("IN2");
 	map(0x200008, 0x200009).portr("IN3");
 	map(0x200010, 0x200011).portr("SYS");
-	map(0x20001d, 0x20001d).w(FUNC(fixeight_state::coin_w));
+	map(0x20001d, 0x20001d).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
 	map(0x280000, 0x28ffff).rw(FUNC(fixeight_state::shared_ram_r), FUNC(fixeight_state::shared_ram_w)).umask16(0x00ff);
 	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -519,6 +496,8 @@ void fixeight_state::fixeight(machine_config &config)
 	audiocpu.p0_in_cb().set_ioport("EEPROM");
 	audiocpu.p0_out_cb().set_ioport("EEPROM");
 
+	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
+
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
@@ -557,6 +536,8 @@ void fixeight_bootleg_state::fixeightbl(machine_config &config)
 	M68000(config, m_maincpu, XTAL(10'000'000));         /* 10MHz Oscillator */
 	m_maincpu->set_addrmap(AS_PROGRAM, &fixeight_bootleg_state::fixeightbl_68k_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &fixeight_bootleg_state::cpu_space_fixeightbl_map);
+
+	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
