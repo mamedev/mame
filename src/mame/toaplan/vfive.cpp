@@ -8,6 +8,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "toaplan_coincounter.h"
 #include "toaplan_v25_tables.h"
 #include "toaplipt.h"
 #include "gp9001.h"
@@ -27,6 +28,7 @@ public:
 		, m_vdp(*this, "gp9001")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_coincounter(*this, "coincounter")
 	{ }
 	void vfive(machine_config &config);
 
@@ -40,7 +42,6 @@ private:
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
 	void shared_ram_w(offs_t offset, u8 data) { m_shared_ram[offset] = data; }
 	void coin_sound_reset_w(u8 data);
-	void coin_w(u8 data);
 	void reset(int state);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -52,6 +53,7 @@ private:
 	required_device<gp9001vdp_device> m_vdp;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<toaplan_coincounter_device> m_coincounter;
 	bitmap_ind8 m_custom_priority_bitmap;
 };
 
@@ -83,32 +85,9 @@ void vfive_state::reset(int state)
 	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-void vfive_state::coin_w(u8 data) // MOVE TO DEVICE!
-{
-	/* +----------------+------ Bits 7-5 not used ------+--------------+ */
-	/* | Coin Lockout 2 | Coin Lockout 1 | Coin Count 2 | Coin Count 1 | */
-	/* |     Bit 3      |     Bit 2      |     Bit 1    |     Bit 0    | */
-
-	if (data & 0x0f)
-	{
-		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
-		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
-		machine().bookkeeping().coin_counter_w(0, BIT( data, 0));
-		machine().bookkeeping().coin_counter_w(1, BIT( data, 1));
-	}
-	else
-	{
-		machine().bookkeeping().coin_lockout_global_w(1);    // Lock all coin slots
-	}
-	if (data & 0xf0)
-	{
-		logerror("Writing unknown upper bits (%02x) to coin control\n",data);
-	}
-}
-
 void vfive_state::coin_sound_reset_w(u8 data)
 {
-	coin_w(data & ~0x10);
+	m_coincounter->coin_w(data & ~0x10);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -275,6 +254,8 @@ void vfive_state::vfive(machine_config &config)
 	audiocpu.p0_in_cb().set_ioport("DSWB").exor(0xff);
 	audiocpu.p1_in_cb().set_ioport("JMPR").exor(0xff);
 	audiocpu.p2_out_cb().set_nop();  // bit 0 is FAULT according to kbash schematic
+
+	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

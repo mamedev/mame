@@ -8,6 +8,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "toaplan_coincounter.h"
 #include "toaplipt.h"
 #include "gp9001.h"
 
@@ -42,7 +43,6 @@ public:
 
 	void pipibibs_68k_mem(address_map &map) ATTR_COLD;
 	void pipibibs_sound_z80_mem(address_map &map) ATTR_COLD;
-	void coin_w(u8 data);
 	void reset(int state);
 
 	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
@@ -76,30 +76,6 @@ void pipibibi_state::reset(int state)
 {
 	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
-
-void pipibibi_state::coin_w(u8 data) // MOVE TO DEVICE!
-{
-	/* +----------------+------ Bits 7-5 not used ------+--------------+ */
-	/* | Coin Lockout 2 | Coin Lockout 1 | Coin Count 2 | Coin Count 1 | */
-	/* |     Bit 3      |     Bit 2      |     Bit 1    |     Bit 0    | */
-
-	if (data & 0x0f)
-	{
-		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
-		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
-		machine().bookkeeping().coin_counter_w(0, BIT( data, 0));
-		machine().bookkeeping().coin_counter_w(1, BIT( data, 1));
-	}
-	else
-	{
-		machine().bookkeeping().coin_lockout_global_w(1);    // Lock all coin slots
-	}
-	if (data & 0xf0)
-	{
-		logerror("Writing unknown upper bits (%02x) to coin control\n",data);
-	}
-}
-
 
 void pipibibi_state::video_start()
 {
@@ -243,7 +219,7 @@ void pipibibi_state::pipibibs_68k_mem(address_map &map)
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x140000, 0x14000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x190000, 0x190fff).rw(FUNC(pipibibi_state::shared_ram_r), FUNC(pipibibi_state::shared_ram_w)).umask16(0x00ff);
-	map(0x19c01d, 0x19c01d).w(FUNC(pipibibi_state::coin_w));
+	map(0x19c01d, 0x19c01d).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
 	map(0x19c020, 0x19c021).portr("DSWA");
 	map(0x19c024, 0x19c025).portr("DSWB");
 	map(0x19c028, 0x19c029).portr("JMPR");
@@ -266,7 +242,7 @@ void pipibibi_bootleg_state::pipibibi_bootleg_68k_mem(address_map &map)
 	map(0x188000, 0x18800f).w(m_vdp, FUNC(gp9001vdp_device::bootleg_scroll_w));
 	map(0x190003, 0x190003).r(FUNC(pipibibi_state::shared_ram_r));  // Z80 ready ?
 	map(0x190011, 0x190011).w(FUNC(pipibibi_state::shared_ram_w)); // Z80 task to perform
-	map(0x19c01d, 0x19c01d).w(FUNC(pipibibi_state::coin_w));
+	map(0x19c01d, 0x19c01d).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
 	map(0x19c020, 0x19c021).portr("DSWA");
 	map(0x19c024, 0x19c025).portr("DSWB");
 	map(0x19c028, 0x19c029).portr("JMPR");
@@ -298,6 +274,8 @@ void pipibibi_state::pipibibs(machine_config &config)
 
 	Z80(config, m_audiocpu, 27_MHz_XTAL/8);         // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pipibibi_state::pipibibs_sound_z80_mem);
+
+	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -334,6 +312,8 @@ void pipibibi_bootleg_state::pipibibsbl(machine_config &config)
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // GoldStar Z8400B; clock source and divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pipibibi_bootleg_state::pipibibs_sound_z80_mem);
+
+	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 

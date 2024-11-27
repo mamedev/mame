@@ -8,6 +8,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "toaplan_coincounter.h"
 #include "toaplipt.h"
 #include "gp9001.h"
 
@@ -48,7 +49,6 @@ private:
 
 	void tekipaki_68k_mem(address_map &map) ATTR_COLD;
 	void hd647180_io_map(address_map &map) ATTR_COLD;
-	void coin_w(u8 data);
 	void reset(int state);
 
 	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
@@ -65,34 +65,8 @@ private:
 
 void tekipaki_state::reset(int state)
 {
-	if (m_audiocpu != nullptr)
-		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
-
-void tekipaki_state::coin_w(u8 data) // MOVE TO DEVICE!
-{
-	/* +----------------+------ Bits 7-5 not used ------+--------------+ */
-	/* | Coin Lockout 2 | Coin Lockout 1 | Coin Count 2 | Coin Count 1 | */
-	/* |     Bit 3      |     Bit 2      |     Bit 1    |     Bit 0    | */
-
-	if (data & 0x0f)
-	{
-		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
-		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
-		machine().bookkeeping().coin_counter_w(0, BIT( data, 0));
-		machine().bookkeeping().coin_counter_w(1, BIT( data, 1));
-	}
-	else
-	{
-		machine().bookkeeping().coin_lockout_global_w(1);    // Lock all coin slots
-	}
-	if (data & 0xf0)
-	{
-		logerror("Writing unknown upper bits (%02x) to coin control\n",data);
-	}
-}
-
-
 
 void tekipaki_state::video_start()
 {
@@ -118,7 +92,7 @@ void tekipaki_state::screen_vblank(int state)
 }
 
 
-static INPUT_PORTS_START( 2b )
+static INPUT_PORTS_START( base )
 	PORT_START("IN1")
 	TOAPLAN_JOY_UDLR_2_BUTTONS( 1 )
 
@@ -148,7 +122,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( tekipaki )
-	PORT_INCLUDE( 2b )
+	PORT_INCLUDE( base )
 
 	PORT_MODIFY("DSWA")
 	// Various features on bit mask 0x000f - see above
@@ -199,7 +173,7 @@ static INPUT_PORTS_START( tekipaki )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( whoopee )
-	PORT_INCLUDE( 2b )
+	PORT_INCLUDE( base )
 
 	PORT_MODIFY("DSWA")
 	// Various features on bit mask 0x000f - see above
@@ -242,10 +216,8 @@ INPUT_PORTS_END
 
 int tekipaki_state::c2map_r()
 {
-	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready
 	// bit 5 is tested low before V-Blank bit ???
-
 	return m_soundlatch->pending_r() ? 0x00 : 0x01;
 }
 
@@ -267,7 +239,7 @@ void tekipaki_state::tekipaki_68k_mem(address_map &map)
 	map(0x180010, 0x180011).portr("DSWB");
 	map(0x180020, 0x180021).portr("SYS");
 	map(0x180030, 0x180031).portr("JMPR");           // CPU 2 busy and Region Jumper block
-	map(0x180041, 0x180041).w(FUNC(tekipaki_state::coin_w));
+	map(0x180041, 0x180041).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
 	map(0x180050, 0x180051).portr("IN1");
 	map(0x180060, 0x180061).portr("IN2");
 	map(0x180071, 0x180071).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -296,6 +268,8 @@ void tekipaki_state::tekipaki(machine_config &config)
 	// 16k byte ROM and 512 byte RAM are internal
 	audiocpu.set_addrmap(AS_IO, &tekipaki_state::hd647180_io_map);
 	audiocpu.in_pa_callback().set(FUNC(tekipaki_state::tekipaki_cmdavailable_r));
+
+	TOAPLAN_COINCOUNTER(config, "coincounter", 0);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 

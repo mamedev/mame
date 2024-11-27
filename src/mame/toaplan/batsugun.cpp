@@ -8,6 +8,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "toaplan_coincounter.h"
 #include "toaplipt.h"
 #include "gp9001.h"
 
@@ -28,6 +29,7 @@ public:
 		, m_shared_ram(*this, "shared_ram")
 		, m_audiocpu(*this, "audiocpu")
 		, m_screen(*this, "screen")
+		, m_coincounter(*this, "coincounter")
 	{ }
 
 	void batsugun(machine_config &config);
@@ -53,12 +55,12 @@ private:
 	void screen_vblank(int state);
 
 	void sound_reset_w(u8 data);
-	void coin_w(u8 data);
 	void reset(int state);
 
 	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
+	required_device<toaplan_coincounter_device> m_coincounter;
 	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
 };
@@ -168,28 +170,6 @@ void batsugun_state::screen_vblank(int state)
 	}
 }
 
-void batsugun_state::coin_w(u8 data) // MOVE TO DEVICE!
-{
-	/* +----------------+------ Bits 7-5 not used ------+--------------+ */
-	/* | Coin Lockout 2 | Coin Lockout 1 | Coin Count 2 | Coin Count 1 | */
-	/* |     Bit 3      |     Bit 2      |     Bit 1    |     Bit 0    | */
-
-	if (data & 0x0f)
-	{
-		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
-		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
-		machine().bookkeeping().coin_counter_w(0, BIT( data, 0));
-		machine().bookkeeping().coin_counter_w(1, BIT( data, 1));
-	}
-	else
-	{
-		machine().bookkeeping().coin_lockout_global_w(1);    // Lock all coin slots
-	}
-	if (data & 0xf0)
-	{
-		logerror("Writing unknown upper bits (%02x) to coin control\n",data);
-	}
-}
 
 void batsugun_state::reset(int state)
 {
@@ -220,9 +200,7 @@ void batsugun_bootleg_state::fixeightbl_oki(address_map &map)
 
 void batsugun_state::coin_sound_reset_w(u8 data)
 {
-	logerror("coin_sound_reset_w %02x\n",data);
-
-	coin_w(data & ~0x20);
+	m_coincounter->coin_w(data & ~0x20);
 	sound_reset_w(data & 0x20);
 }
 
@@ -399,6 +377,8 @@ void batsugun_state::batsugun(machine_config &config)
 	audiocpu.p0_in_cb().set_ioport("DSWB").exor(0xff);
 	audiocpu.p1_in_cb().set_ioport("JMPR").exor(0xff);
 	audiocpu.p2_out_cb().set_nop();  // bit 0 is FAULT according to kbash schematic
+
+	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

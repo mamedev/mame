@@ -8,6 +8,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "toaplan_coincounter.h"
 #include "toaplan_v25_tables.h"
 #include "toaplipt.h"
 #include "gp9001.h"
@@ -31,6 +32,7 @@ public:
 		, m_vdp(*this, "gp9001_%u", 0U)
 		, m_oki(*this, "oki")
 		, m_palette(*this, "palette")
+		, m_coincounter(*this, "coincounter")
 		, m_screen(*this, "screen")
 	{ }
 
@@ -44,7 +46,7 @@ protected:
 
 	void coin_sound_reset_w(u8 data);
 
-	u8 m_sound_reset_bit = 0; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
+	u8 m_sound_reset_bit = 0;
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -59,9 +61,9 @@ private:
 	void screen_vblank(int state);
 
 	void sound_reset_w(u8 data);
-	void coin_w(u8 data);
 	void reset(int state);
 
+	required_device<toaplan_coincounter_device> m_coincounter;
 	required_device<screen_device> m_screen;
 	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
@@ -104,30 +106,6 @@ void dogyuun_base_state::reset(int state)
 	if (m_audiocpu != nullptr)
 		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
-
-void dogyuun_base_state::coin_w(u8 data) // MOVE TO DEVICE!
-{
-	/* +----------------+------ Bits 7-5 not used ------+--------------+ */
-	/* | Coin Lockout 2 | Coin Lockout 1 | Coin Count 2 | Coin Count 1 | */
-	/* |     Bit 3      |     Bit 2      |     Bit 1    |     Bit 0    | */
-
-	if (data & 0x0f)
-	{
-		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
-		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
-		machine().bookkeeping().coin_counter_w(0, BIT( data, 0));
-		machine().bookkeeping().coin_counter_w(1, BIT( data, 1));
-	}
-	else
-	{
-		machine().bookkeeping().coin_lockout_global_w(1);    // Lock all coin slots
-	}
-	if (data & 0xf0)
-	{
-		logerror("Writing unknown upper bits (%02x) to coin control\n",data);
-	}
-}
-
 
 void dogyuun_base_state::sound_reset_w(u8 data)
 {
@@ -296,7 +274,7 @@ INPUT_PORTS_END
 
 void dogyuun_base_state::coin_sound_reset_w(u8 data)
 {
-	coin_w(data & ~m_sound_reset_bit);
+	m_coincounter->coin_w(data & ~m_sound_reset_bit);
 	sound_reset_w(data & m_sound_reset_bit);
 }
 
@@ -353,6 +331,8 @@ void dogyuun_base_state::dogyuun_base(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 25_MHz_XTAL/2);           /* verified on pcb */
 	m_maincpu->reset_cb().set(FUNC(dogyuun_base_state::reset));
+
+	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
