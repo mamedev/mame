@@ -207,7 +207,7 @@ ROM_START( unkbel )
 	ROM_LOAD( "at90s2313.dd16", 0x000, 0x800, NO_DUMP ) // protected
 
 	ROM_REGION( 0x117, "plds", ROMREGION_ERASE00 )
-	ROM_LOAD( "palce16v8.dd21", 0x000, 0x117, NO_DUMP ) // dumped as 27C020, needs reduction
+	ROM_LOAD( "palce16v8.dd21", 0x000, 0x117, CRC(8bafb445) SHA1(5249747c958e14e622361002fd5bfbb1403f0d67) )
 ROM_END
 
 } // anonymous namespace

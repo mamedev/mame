@@ -15125,6 +15125,6 @@ CONS( 1995, sfach,  sfzch, 0, cps1_12MHz, sfzch, cps_state, init_cps1, "Capcom",
 CONS( 1995, sfzbch, sfzch, 0, cps1_12MHz, sfzch, cps_state, init_cps1, "Capcom", "Street Fighter Zero (CPS Changer, Brazil 950727)", MACHINE_SUPPORTS_SAVE )
 
 /* CPS1 multi game bootleg */
-GAME( 199?, cps1mult, 0,  cps1_12MHz, sf2,   cps_state,   init_cps1mult, ROT0,   "bootleg", "CPS1 Multi Game", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs game selection support via DIP switches
+GAME( 20??, cps1mult, 0,  cps1_12MHz, sf2,   cps_state,   init_cps1mult, ROT0,   "bootleg", "CPS1 Multi Game", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs game selection support via DIP switches
 
 // Ken Sei Mogura: Street Fighter II - see capcom/kenseim.cpp
