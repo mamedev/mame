@@ -50,6 +50,7 @@ public:
 	int hsync_r();
 	int vsync_r();
 	int fblank_r();
+	u16 vdpcount_r();
 
 	// these bootlegs have strange access
 	u16 bootleg_videoram16_r(offs_t offset);
@@ -57,6 +58,8 @@ public:
 	u16 bootleg_spriteram16_r(offs_t offset);
 	void bootleg_spriteram16_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void bootleg_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	static constexpr unsigned VDP_PALETTE_LENGTH = 0x10000;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -137,9 +140,9 @@ private:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	void voffs_w(u16 data, u16 mem_mask = ~0);
-	int videoram16_r(void);
+	int videoram16_r();
 	void videoram16_w(u16 data, u16 mem_mask = ~0);
-	u16 vdpstatus_r(void);
+	u16 vdpstatus_r();
 	void scroll_reg_select_w(u16 data, u16 mem_mask = ~0);
 	void scroll_reg_data_w(u16 data, u16 mem_mask = ~0);
 
