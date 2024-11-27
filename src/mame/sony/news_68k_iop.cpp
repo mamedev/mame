@@ -6,9 +6,23 @@
  *
  * The NWS-800 series was the first model of NEWS workstation. The design was also turned into the NWS-900 series for
  * server use. The later NWS-1800 and NWS-3800 models use the same system design concept as the 800 series (dual-CPU).
- * The NWS-1800 series is especially similar to the NWS-800 series in terms of overall design, even though some peripheral
- * chips are different and the custom MMU is not needed because the 1800 uses the 030.
+ * The NWS-1800/1900 series is especially similar to the NWS-800/900 series in terms of overall design, even though some peripheral
+ * chips are different and the custom MMU is not needed because the 1800/1900 design uses the '030.
  *
+ * The NWS-800 series uses one '020 as the I/O Processor (IOP). This processor is responsible for booting the system
+ * and also runs a small OS (called iopboot) with processes for handling DMA and interrupts for data-intensive peripherals
+ * like SCSI, Ethernet, etc. The Main Processor (often referred to, confusingly, as the CPU) runs NEWS-OS (BSD derivative), 
+ * and uses a block of main memory allocated for CPU<->IOP interprocessor communication. The CPU and IOP interrupt each other 
+ * whenever they need to communicate, after populating main memory with whatever data is needed.
+ * The CPU delegates almost all I/O to the IOP (as the DMA controller), only handling I/O for some VME bus peripherals. 
+ * The CPU bus (on the NWS-800, this is routed through the MMU) is often called the Hyperbus. The NWS-1800/1900 series and the single-CPU
+ * 68k and R3000 models explictly call this the Hyperbus, but it is unclear if the NWS-800's CPU bus was only referred to that retroactively or not.
+ * There are a couple of mentions of the Hyperbus in NEWS-OS 4 related to even the NWS-800, but the NWS-1xxx/3xxx series was already
+ * released by the time NEWS-OS 4 was.
+ * The Hyperbus is directly connected to main memory, the system ROM, and the VME bus interface. Everything else is connected to the I/O
+ * bus. The IOP, CPU/MMU, and VME bus can all access the Hyperbus through a buffer. As far as I can tell, nothing on the Hyperbus
+ * can talk to the I/O bus, only the IOP is able to do that.
+ * 
  *  Supported:
  * 	 - NWS-831
  *
@@ -57,6 +71,7 @@
 
 #include "news_hid.h"
 #include "news_020_mmu.h"
+#include "news_iop_scsi.h"
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
@@ -118,6 +133,7 @@ namespace
               m_net(*this, "net"),
               m_fdc(*this, "fdc"),
               m_scsi(*this, "scsi:7:am5380"),
+              m_scsi_dma(*this, "scsi_dma"),
               m_dip_switch(*this, "FRONT_PANEL"),
               m_serial(*this, "serial%u", 0U)
         {
@@ -169,15 +185,13 @@ namespace
         void cpu_irq_w(int state);
         void int_check_cpu();
 
-        [[maybe_unused]] u32 bus_error_r();
-        [[maybe_unused]] void bus_error_w(offs_t offset, uint8_t data);
+        void iop_bus_error(uint8_t data);
 
         void handle_rts(int data);
         void handle_dtr(int data);
         void update_dcd();
 
-        void bus_error(offs_t offset, uint32_t mem_mask, bool write, uint8_t status);
-        [[maybe_unused]] void iop_bus_error(offs_t offset, uint32_t mem_mask, bool write, uint8_t status);
+        void cpu_bus_error(offs_t offset, uint32_t mem_mask, bool write, uint8_t status);
 
         // Platform hardware used by the IOP
         uint8_t iop_status_r();
@@ -192,7 +206,7 @@ namespace
         uint8_t rtcreg_r();
         void rtcreg_w(uint8_t data);
         void rtcsel_w(uint8_t data);
-        void scsi_reg_w(offs_t offset, uint8_t data);
+        // void scsi_reg_w(offs_t offset, uint8_t data);
         uint32_t scsi_dma_r(offs_t offset, uint32_t mem_mask);
         void scsi_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask);
         void scsi_drq_handler(int status);
@@ -207,7 +221,7 @@ namespace
 
         void interval_timer_tick(uint8_t data);
         TIMER_CALLBACK_MEMBER(bus_error_off_cpu);
-        TIMER_CALLBACK_MEMBER(bus_error_off_iop);
+        // TIMER_CALLBACK_MEMBER(bus_error_off_iop);
 
     private:
         // CPUs (2x 68020, but only the main processor has an FPU)
@@ -228,6 +242,7 @@ namespace
         required_device<am7990_device> m_net;
         required_device<upd765a_device> m_fdc;
         required_device<am5380_device> m_scsi;
+        required_device<news_iop_scsi_helper_device> m_scsi_dma;
         required_ioport m_dip_switch;
 
         required_device_array<rs232_port_device, 2> m_serial;
@@ -251,9 +266,9 @@ namespace
         offs_t m_last_berr_pc_cpu = 0;
         emu_timer  *m_cpu_bus_error_timer;
 
-        bool m_iop_bus_error = false;
-        offs_t m_last_berr_pc_iop = 0;
-        emu_timer  *m_iop_bus_error_timer;
+        // bool m_iop_bus_error = false;
+        // offs_t m_last_berr_pc_iop = 0;
+        // emu_timer  *m_iop_bus_error_timer;
 
         int m_sw1_first_read = 0;
 
@@ -261,7 +276,7 @@ namespace
         bool m_panel_shift = false;
         int m_panel_shift_count = 0;
         uint8_t m_cpu_bus_error_status = 0;
-        uint8_t m_iop_bus_error_status = 0;
+        // uint8_t m_iop_bus_error_status = 0;
         uint8_t m_rtc_data = 0;
 
         std::queue<uint8_t> scsi_dma_buffer;
@@ -271,7 +286,7 @@ namespace
     void news_iop_state::machine_start()
     {
         m_cpu_bus_error_timer = timer_alloc(FUNC(news_iop_state::bus_error_off_cpu), this);
-        m_iop_bus_error_timer = timer_alloc(FUNC(news_iop_state::bus_error_off_iop), this);
+        // m_iop_bus_error_timer = timer_alloc(FUNC(news_iop_state::bus_error_off_iop), this);
 
         m_net_ram = std::make_unique<u16[]>(8192); // 16K RAM
         save_pointer(NAME(m_net_ram), 8192);
@@ -307,10 +322,10 @@ namespace
         // m_cpu_bus_error_status = 0; TODO: might be better to remove this, in case the status is checked after this timer is fired
     }
 
-    TIMER_CALLBACK_MEMBER(news_iop_state::bus_error_off_iop)
-    {
-        m_iop_bus_error = false;
-    }
+    // TIMER_CALLBACK_MEMBER(news_iop_state::bus_error_off_iop)
+    // {
+    //     m_iop_bus_error = false;
+    // }
 
     uint8_t news_iop_state::iop_status_r()
     {
@@ -411,12 +426,14 @@ namespace
         LOG("Write CPURESET = 0x%x\n", data);
         if (data > 0)
         {
-            m_cpu->resume(SUSPEND_REASON_RESET);
+            // m_cpu->resume(SUSPEND_REASON_RESET);
+            m_cpu->set_input_line(INPUT_LINE_HALT, 0);
         }
         else
         {
-            m_cpu->suspend(SUSPEND_REASON_RESET, true);
-            int_check_cpu();
+            // m_cpu->suspend(SUSPEND_REASON_RESET, true);
+            m_cpu->set_input_line(INPUT_LINE_HALT, 1);
+            // int_check_cpu();
         }
     }
 
@@ -466,138 +483,184 @@ namespace
         m_rtc->cs2_w(0);
     }
 
-    void news_iop_state::scsi_reg_w(offs_t offset, uint8_t data)
-    {
-        if (offset == 7)
-        {
-            // starting read transaction, pause IOP and prime the read buffer to avoid BERRs
-            // Things go off the rails if a BERR happens, even though the iopboot bus error
-            // handler has some SCSI code in it. The bus error mechanism relies on many details
-            // from how the 68020 handles 32 bit read/writes on 8 bit devices, so this avoids the issue.
-            LOGMASKED(LOG_SCSI, "Starting SCSI DMA trx! (%s)\n", machine().describe_context());
-            scsi_trx_width = 4;
-            m_iop->suspend(SUSPEND_REASON_HALT, true);
-        }
-        else if (offset == 2)
-        {
-            // Reset trx width on dma stop
-            if (!BIT(data, 1))
-            {
-                scsi_trx_width = 0;
-                if (scsi_dma_buffer.size() != 0)
-                {
-                    LOGMASKED(LOG_SCSI, "Warning: Data left in buffer! (%s)\n", machine().describe_context());
-                    std::queue<unsigned char>().swap(scsi_dma_buffer);
-                }
-            }
-        }
-        m_scsi->write(offset, data);
-    }
+    // void news_iop_state::scsi_reg_w(offs_t offset, uint8_t data)
+    // {
+    //     if (offset == 7)
+    //     {
+    //         // starting read transaction, pause IOP and prime the read buffer to avoid BERRs
+    //         // Things go off the rails if a BERR happens, even though the iopboot bus error
+    //         // handler has some SCSI code in it. The bus error mechanism relies on many details
+    //         // from how the 68020 handles 32 bit read/writes on 8 bit devices, so this avoids the issue.
+    //         LOGMASKED(LOG_SCSI, "Starting SCSI DMA trx! (%s)\n", machine().describe_context());
+    //         scsi_trx_width = 4;
+    //         m_iop->suspend(SUSPEND_REASON_HALT, true);
+    //     }
+    //     else if (offset == 2)
+    //     {
+    //         // Reset trx width on dma stop
+    //         if (!BIT(data, 1))
+    //         {
+    //             scsi_trx_width = 0;
+    //             if (scsi_dma_buffer.size() != 0)
+    //             {
+    //                 LOGMASKED(LOG_SCSI, "Warning: Data left in buffer! (%s)\n", machine().describe_context());
+    //                 std::queue<unsigned char>().swap(scsi_dma_buffer);
+    //             }
+    //         }
+    //     }
+    //     m_scsi->write(offset, data);
+    // }
 
     uint32_t news_iop_state::scsi_dma_r(offs_t offset, uint32_t mem_mask)
     {
+        uint32_t result = 0;
+        switch (mem_mask)
+        {
+        case 0xff000000:
+            result = m_scsi_dma->read_wrapper(true, 6) << 24;
+            break;
+
+        case 0xffff0000:
+            result = (m_scsi_dma->read_wrapper(true, 6) << 24) | 
+                     (m_scsi_dma->read_wrapper(true, 6) << 16);
+            break;
+
+        case 0xffffffff:
+            result = (m_scsi_dma->read_wrapper(true, 6) << 24) | 
+                     (m_scsi_dma->read_wrapper(true, 6) << 16) | 
+                     (m_scsi_dma->read_wrapper(true, 6) << 8) | 
+                     m_scsi_dma->read_wrapper(true, 6);
+            break;
+
+        default:
+            fatalerror("scsi_dma_r: unknown mem_mask %08x\n", mem_mask);
+        }
+        return result;
+
         // LOG("read offset 0x%x mem_mask 0x%x mem_mask_count = 0x%x\n", offset, mem_mask, std::bitset<32>(mem_mask).count());
-        if (mem_mask == 0xff000000)
-        {
-            // byte access
-            if (scsi_trx_width == 0)
-            {
-                fatalerror("scsi dma: wrong mode");
-                return 0u;
-            }
-            else if (scsi_trx_width == 4 || scsi_dma_buffer.size() > 0)
-            {
-                LOGMASKED(LOG_SCSI, "Flushing buffer before switching to byte access...\n");
-                scsi_trx_width = 1; // switch to byte access mode - one at a time for timing purposes
-                uint32_t data = scsi_dma_buffer.front();
-                scsi_dma_buffer.pop();
-                return data << 24;
-            }
-            else
-            {
-                if (!(m_scsi->read(5) & 0x40)) // bas_r
-                {
-                    fatalerror("scsi dma: no data!");
-                }
+        // if (mem_mask == 0xff000000)
+        // {
+        //     // byte access
+        //     if (scsi_trx_width == 0)
+        //     {
+        //         fatalerror("scsi dma: wrong mode");
+        //         return 0u;
+        //     }
+        //     else if (scsi_trx_width == 4 || scsi_dma_buffer.size() > 0)
+        //     {
+        //         LOGMASKED(LOG_SCSI, "Flushing buffer before switching to byte access...\n");
+        //         scsi_trx_width = 1; // switch to byte access mode - one at a time for timing purposes
+        //         uint32_t data = scsi_dma_buffer.front();
+        //         scsi_dma_buffer.pop();
+        //         return data << 24;
+        //     }
+        //     else
+        //     {
+        //         if (!(m_scsi->read(5) & 0x40)) // bas_r
+        //         {
+        //             fatalerror("scsi dma: no data!");
+        //         }
 
-                LOGMASKED(LOG_SCSI, "Getting DMA byte!\n");
-                uint32_t data = m_scsi->dma_r();
-                return data << 24;
-            }
-        }
-        else if (mem_mask == 0xffffffff)
-        {
-            // This nasty-looking function is to deal with the way the 68020 and SCSI signals are abused in NEWS-OS 4's iopboot routines
-            if (scsi_dma_buffer.size() == 3)
-            {
-                uint32_t data = scsi_dma_buffer.front() << 24;
-                scsi_dma_buffer.pop();
-                data |= (scsi_dma_buffer.front() << 16);
-                scsi_dma_buffer.pop();
-                data |= (scsi_dma_buffer.front() << 8);
-                scsi_dma_buffer.pop();
-                data |= m_scsi->dma_r(); // TODO: guard this with appropriate status check
+        //         LOGMASKED(LOG_SCSI, "Getting DMA byte!\n");
+        //         uint32_t data = m_scsi->dma_r();
+        //         return data << 24;
+        //     }
+        // }
+        // else if (mem_mask == 0xffffffff)
+        // {
+        //     // This nasty-looking function is to deal with the way the 68020 and SCSI signals are abused in NEWS-OS 4's iopboot routines
+        //     if (scsi_dma_buffer.size() == 3)
+        //     {
+        //         uint32_t data = scsi_dma_buffer.front() << 24;
+        //         scsi_dma_buffer.pop();
+        //         data |= (scsi_dma_buffer.front() << 16);
+        //         scsi_dma_buffer.pop();
+        //         data |= (scsi_dma_buffer.front() << 8);
+        //         scsi_dma_buffer.pop();
+        //         data |= m_scsi->dma_r(); // TODO: guard this with appropriate status check
 
-                // scsi_trx_width = 0;
-                m_scsi_intst = m_scsi->read(5) & 0x40; // bas_r
-                int_check_iop();
-                return data;
-            }
-            else
-            {
-                fatalerror("scsi_dma_r: invalid buffer count 0x%x", scsi_dma_buffer.size());
-            }
-        }
-        else
-        {
-            fatalerror("scsi_dma_r: unexpected transaction width");
-        }
-        return 0u;
+        //         // scsi_trx_width = 0;
+        //         m_scsi_intst = m_scsi->read(5) & 0x40; // bas_r
+        //         int_check_iop();
+        //         return data;
+        //     }
+        //     else
+        //     {
+        //         fatalerror("scsi_dma_r: invalid buffer count 0x%x", scsi_dma_buffer.size());
+        //     }
+        // }
+        // else
+        // {
+        //     fatalerror("scsi_dma_r: unexpected transaction width");
+        // }
     }
 
     void news_iop_state::scsi_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
     {
         // LOG("(%s) scsi_dma_w(0x%x, 0x%x, 0x%x) called\n", machine().describe_context(), offset, data, mem_mask);
-        if (mem_mask == 0xff000000)
+        switch (mem_mask)
         {
-            // byte access
-            if (scsi_trx_width == 0)
-            {
-                m_scsi->dma_w((data >> 24) & 0xff);
-            }
-            else
-            {
-                fatalerror("scsi_dma_w: tried to switch from 32 to 8 in the middle of a transfer");
-            }
+        case 0xff000000:
+            m_scsi_dma->write_wrapper(true, 0, data >> 24);
+            break;
+
+        case 0xffff0000:
+            m_scsi_dma->write_wrapper(true, 0, data >> 24);
+            m_scsi_dma->write_wrapper(true, 0, data >> 16);
+            break;
+
+        case 0xffffffff:
+            m_scsi_dma->write_wrapper(true, 0, data >> 24);
+            m_scsi_dma->write_wrapper(true, 0, data >> 16);
+            m_scsi_dma->write_wrapper(true, 0, data >> 8);
+            m_scsi_dma->write_wrapper(true, 0, data & 0xff);
+            break;
+
+        default:
+            fatalerror("scsi_drq_w: unknown mem_mask %08x\n", mem_mask);
+            break;
         }
-        else if (mem_mask == 0xffffffff)
-        {
-            if (scsi_trx_width > 0 || scsi_dma_buffer.size() != 0)
-            {
-                fatalerror("scsi_dma_w: tried to switch from read to write");
-            }
+        
+        // if (mem_mask == 0xff000000)
+        // {
+        //     // byte access
+        //     if (scsi_trx_width == 0)
+        //     {
+        //         m_scsi->dma_w((data >> 24) & 0xff);
+        //     }
+        //     else
+        //     {
+        //         fatalerror("scsi_dma_w: tried to switch from 32 to 8 in the middle of a transfer");
+        //     }
+        // }
+        // else if (mem_mask == 0xffffffff)
+        // {
+        //     if (scsi_trx_width > 0 || scsi_dma_buffer.size() != 0)
+        //     {
+        //         fatalerror("scsi_dma_w: tried to switch from read to write");
+        //     }
 
-            if (!(m_scsi->read(5) & 0x40)) // bas_r
-            {
-                fatalerror("scsi_dma_w: not ready for data");
-            }
+        //     if (!(m_scsi->read(5) & 0x40)) // bas_r
+        //     {
+        //         fatalerror("scsi_dma_w: not ready for data");
+        //     }
 
-            // Halt I/O Processor to avoid having to deal with the bus error synchronization
-            m_iop->suspend(SUSPEND_REASON_HALT, true);
+        //     // Halt I/O Processor to avoid having to deal with the bus error synchronization
+        //     m_iop->suspend(SUSPEND_REASON_HALT, true);
 
-            // Setup DMA buffer
-            scsi_trx_width = -3;
-            scsi_dma_buffer.push((data >> 16) & 0xff);
-            scsi_dma_buffer.push((data >> 8) & 0xff);
-            scsi_dma_buffer.push(data & 0xff);
+        //     // Setup DMA buffer
+        //     scsi_trx_width = -3;
+        //     scsi_dma_buffer.push((data >> 16) & 0xff);
+        //     scsi_dma_buffer.push((data >> 8) & 0xff);
+        //     scsi_dma_buffer.push(data & 0xff);
 
-            // Send byte
-            m_scsi->dma_w((data >> 24) & 0xff);
-        }
-        else
-        {
-            fatalerror("scsi_dma_w: unexpected transaction width");
-        }
+        //     // Send byte
+        //     m_scsi->dma_w((data >> 24) & 0xff);
+        // }
+        // else
+        // {
+        //     fatalerror("scsi_dma_w: unexpected transaction width");
+        // }
     }
 
     void news_iop_state::scsi_drq_handler(int status)
@@ -628,6 +691,7 @@ namespace
         }
 
         m_scsi_intst = status; // can be masked, unlike SCSI IRQ
+        m_scsi_dma->drq_w(status);
         int_check_iop();
     }
 
@@ -637,7 +701,8 @@ namespace
         m_iop->space(0).install_rom(0x00000000, 0x0000ffff, m_eprom);
 
         // CPU doesn't run until the IOP tells it to
-        m_cpu->suspend(SUSPEND_REASON_RESET, true);
+        m_cpu->set_input_line(INPUT_LINE_HALT, 1);
+        // m_cpu->suspend(SUSPEND_REASON_RESET, true);
     }
 
     void news_iop_state::init_common()
@@ -675,7 +740,11 @@ namespace
         map(0x4c000000, 0x4c000003).rw(m_scc_external, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));	  // rs232
 
         map(0x4e000000, 0x4e000007).r(m_scsi, FUNC(ncr5380_device::read));
-        map(0x4e000000, 0x4e000007).w(FUNC(news_iop_state::scsi_reg_w)); // Write is patched for SCSI pseudo-DMA implementation
+        map(0x4e000000, 0x4e000007).lrw8(NAME([this](offs_t offset) {
+            return m_scsi_dma->read_wrapper(false, offset);
+        }), NAME([this](offs_t offset, uint8_t data) {
+            m_scsi_dma->write_wrapper(false, offset, data);
+        }));
 
         map(0x6a000001, 0x6a000001).lw8(NAME([this](uint8_t data) { cpu_irq_w<IOPIRQ5>(data > 0); }));
         map(0x6a000002, 0x6a000002).lw8(NAME([this](uint8_t data) { cpu_irq_w<IOPIRQ3>(data > 0); }));
@@ -1015,7 +1084,7 @@ namespace
         m_scc_peripheral->dcdb_w(dcd_state);
     }
 
-    void news_iop_state::bus_error(offs_t offset, uint32_t mem_mask, bool write, uint8_t status)
+    void news_iop_state::cpu_bus_error(offs_t offset, uint32_t mem_mask, bool write, uint8_t status)
     {
         if (machine().side_effects_disabled() || (m_cpu_bus_error && m_cpu->pc() == m_last_berr_pc_cpu))
         {
@@ -1038,24 +1107,29 @@ namespace
         m_cpu_bus_error_timer->adjust(m_cpu->cycles_to_attotime(16)); // 16 is shamelessly stolen from hcpu30 - is that right?
     }
 
-    // TODO: for this and the CPU, can we count on the MROM and OS to always read BERR? If so, can we populate/clear that accordingly to ensure better timing? maybe.
-    void news_iop_state::iop_bus_error(offs_t offset, uint32_t mem_mask, bool write, uint8_t status)
+    void news_iop_state::iop_bus_error(uint8_t data)
     {
-        if (machine().side_effects_disabled() || (m_iop_bus_error && m_iop->pc() == m_last_berr_pc_iop))
+        // TODO: fancy bus error
+        if (!machine().side_effects_disabled())
         {
-            LOGMASKED(LOG_GENERAL, "Suppressing iop bus error at offset 0x%x mask 0x%x r/w %s status 0x%x pc 0x%x\n", offset, mem_mask, write ? "w" : "r", status, m_iop->pc());
-            return;
+            m_iop->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
         }
 
-        // LOGMASKED(LOG_GENERAL, "Applying iop bus error at offset 0x%x mask 0x%x r/w %s status 0x%x pc 0x%x\n", offset, mem_mask, write ? "w" : "r", status, m_iop->pc());
-        // machine().debug_break();
-        m_last_berr_pc_iop = m_iop->pc();
-        m_iop_bus_error = true;
-        m_iop_bus_error_status = status;
-        m_iop->set_buserror_details(offset, !write, m_iop->get_fc(), true);
-        // m_iop->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-        // m_iop->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-        m_iop_bus_error_timer->adjust(m_cpu->cycles_to_attotime(16));
+            //     if (machine().side_effects_disabled() || (m_iop_bus_error && m_iop->pc() == m_last_berr_pc_iop))
+    //     {
+    //         LOGMASKED(LOG_GENERAL, "Suppressing iop bus error at offset 0x%x mask 0x%x r/w %s status 0x%x pc 0x%x\n", offset, mem_mask, write ? "w" : "r", status, m_iop->pc());
+    //         return;
+    //     }
+
+    //     // LOGMASKED(LOG_GENERAL, "Applying iop bus error at offset 0x%x mask 0x%x r/w %s status 0x%x pc 0x%x\n", offset, mem_mask, write ? "w" : "r", status, m_iop->pc());
+    //     // machine().debug_break();
+    //     m_last_berr_pc_iop = m_iop->pc();
+    //     m_iop_bus_error = true;
+    //     m_iop_bus_error_status = status;
+    //     m_iop->set_buserror_details(offset, !write, m_iop->get_fc(), true);
+    //     // m_iop->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+    //     // m_iop->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+    //     m_iop_bus_error_timer->adjust(m_cpu->cycles_to_attotime(16));
     }
 
     void news_iop_state::common(machine_config &config)
@@ -1069,7 +1143,7 @@ namespace
 
         NEWS_020_MMU(config, m_mmu, 0);
         m_mmu->set_addrmap(AS_PROGRAM, &news_iop_state::mmu_map);
-        m_mmu->set_bus_error_callback(FUNC(news_iop_state::bus_error));
+        m_mmu->set_bus_error_callback(FUNC(news_iop_state::cpu_bus_error));
 
         ADDRESS_MAP_BANK(config, "mainbus").set_map(&news_iop_state::mmu_map).set_options(ENDIANNESS_BIG, 32, 32); // TODO: is the address length here actually 32? It might be, but it might not.
 
@@ -1154,6 +1228,16 @@ namespace
             adapter.drq_handler().set(*this, FUNC(news_iop_state::scsi_drq_handler));
         });
 
+        // Virtual device for handling SCSI DMA
+        // (workaround for 68k bus access limitiations; normally iopboot's BERR handler would deal with SCSI DMA stuff)
+        NEWS_IOP_SCSI_HELPER(config, m_scsi_dma);
+        m_scsi_dma->scsi_read_callback().set(m_scsi, FUNC(ncr53c80_device::read));
+        m_scsi_dma->scsi_write_callback().set(m_scsi, FUNC(ncr53c80_device::write));
+        m_scsi_dma->scsi_dma_read_callback().set(m_scsi, FUNC(ncr53c80_device::dma_r));
+        m_scsi_dma->scsi_dma_write_callback().set(m_scsi, FUNC(ncr53c80_device::dma_w));
+        m_scsi_dma->iop_halt_callback().set_inputline(m_iop, INPUT_LINE_HALT);
+        m_scsi_dma->timeout_error_callback().set(FUNC(news_iop_state::iop_bus_error));
+
         // Epson RTC-58321B
         RTC58321(config, m_rtc, 32.768_kHz_XTAL);
         m_rtc->d0_handler().set([this](int data)
@@ -1202,20 +1286,6 @@ namespace
     void news_iop_state::nws831(machine_config &config)
     {
         common(config);
-    }
-
-    u32 news_iop_state::bus_error_r()
-    {
-        if (!machine().side_effects_disabled())
-            m_iop->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-
-        return 0;
-    }
-
-    void news_iop_state::bus_error_w(offs_t offset, uint8_t data)
-    {
-        if (!machine().side_effects_disabled())
-            m_iop->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
     }
 
     static INPUT_PORTS_START(nws8xx)
