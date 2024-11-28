@@ -23,7 +23,6 @@ class tekipaki_state : public driver_device
 public:
 	tekipaki_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_shared_ram(*this, "shared_ram")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_vdp(*this, "gp9001")
@@ -40,9 +39,6 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
-	void shared_ram_w(offs_t offset, u8 data) { m_shared_ram[offset] = data; }
-
 	u32 screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	u8 tekipaki_cmdavailable_r();
@@ -50,8 +46,6 @@ private:
 	void tekipaki_68k_mem(address_map &map) ATTR_COLD;
 	void hd647180_io_map(address_map &map) ATTR_COLD;
 	void reset(int state);
-
-	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
