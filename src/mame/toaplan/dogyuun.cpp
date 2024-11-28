@@ -19,7 +19,7 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
-
+namespace {
 
 class dogyuun_base_state : public driver_device
 {
@@ -503,6 +503,8 @@ ROM_START( dogyuunto )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "2m.u29", 0x00000, 0x40000, CRC(5e7a77d8) SHA1(da6beb5e8e015965ff42fd52f5aa0c0ae5bcee4f) ) // '2M' hand-written
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1992, dogyuun,     0,        dogyuun,      dogyuun,    dogyuun_state, empty_init,  ROT270, "Toaplan",         "Dogyuun",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1992, dogyuuna,    dogyuun,  dogyuun,      dogyuuna,   dogyuun_state, empty_init,  ROT270, "Toaplan",         "Dogyuun (older set)",               MACHINE_SUPPORTS_SAVE )

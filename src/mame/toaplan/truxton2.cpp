@@ -16,8 +16,9 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
-
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
+
+namespace {
 
 class truxton2_state : public driver_device
 {
@@ -350,6 +351,7 @@ void truxton2_state::truxton2(machine_config &config)
 #endif
 }
 
+} // anonymous namespace
 
 ROM_START( truxton2 )
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */

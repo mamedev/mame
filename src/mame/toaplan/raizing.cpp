@@ -1560,7 +1560,6 @@ ROM_START( bgareggablj ) // fixed on Japanese region
 ROM_END
 
 
-
 GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   sstriker_state, empty_init,      ROT270, "Raizing",                         "Sorcer Striker",           MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
 GAME( 1993, sstrikerk,   sstriker, mahoudai,   sstrikerk,  sstriker_state, empty_init,      ROT270, "Raizing (Unite Trading license)", "Sorcer Striker (Korea)",   MACHINE_SUPPORTS_SAVE ) // Although the region jumper is functional, it's a Korean board / version
 GAME( 1993, mahoudai,    sstriker, mahoudai,   mahoudai,   sstriker_state, empty_init,      ROT270, "Raizing (Able license)",          "Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -17,7 +17,7 @@
 #include "sound/ymopm.h"
 #include "sound/ymopl.h"
 
-
+namespace {
 
 class pipibibi_state : public driver_device
 {
@@ -470,6 +470,7 @@ ROM_START( pipibibsbl3 )
 	ROM_LOAD( "8.bin", 0x0000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) ) // 1xxxxxxxxxxxxxx = 0xFF, same data as komocomo in oneshot.cpp
 ROM_END
 
+} // anonymous namespace
 
 GAME( 1991, pipibibs,    0,        pipibibs,     pipibibs,   pipibibi_state, empty_init,    ROT0,   "Toaplan",         "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, pipibibsa,   pipibibs, pipibibs,     pipibibs,   pipibibi_state, empty_init,    ROT0,   "Toaplan",         "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", MACHINE_SUPPORTS_SAVE )

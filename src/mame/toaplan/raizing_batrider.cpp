@@ -5,6 +5,8 @@
 
 #include "raizing.h"
 
+namespace {
+
 class batrider_state : public raizing_base_state
 {
 public:
@@ -1269,6 +1271,7 @@ ROM_START( probowl2 ) // identical to New Pro Bowl but for slight mods to the GF
 	ROM_LOAD( "probowl2.adpcm1.u0835", 0x80000, 0x80000, CRC(8c191e60) SHA1(f81c2849ffc553d921fc680cd50c2997b834c44a) )
 ROM_END
 
+} // anonymous namespace
 
 // these are all based on Version B, even if only the Japan version states 'version B'
 GAME( 1998, batrider,    0,        batrider,   batrider,   batrider_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)",           MACHINE_SUPPORTS_SAVE )

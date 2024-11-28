@@ -18,6 +18,7 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
+namespace {
 
 class kbash_state : public driver_device
 {
@@ -494,6 +495,7 @@ ROM_START( kbash2 )
 	ROM_LOAD( "050917-10", 0x0000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) )
 ROM_END
 
+} // anonymous namespace
 
 GAME( 1993, kbash,       0,        kbash,        kbash,      kbash_state, empty_init,    ROT0,   "Toaplan / Atari", "Knuckle Bash",                 MACHINE_SUPPORTS_SAVE ) // Atari license shown for some regions.
 GAME( 1993, kbashk,      kbash,    kbash,        kbashk,     kbash_state, empty_init,    ROT0,   "Toaplan / Taito", "Knuckle Bash (Korean PCB)",    MACHINE_SUPPORTS_SAVE ) // Japan region has optional Taito license, maybe the original Japan release?

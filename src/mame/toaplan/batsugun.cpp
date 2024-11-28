@@ -17,6 +17,8 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
+namespace {
+
 class batsugun_state : public driver_device
 {
 public:
@@ -582,8 +584,7 @@ void batsugun_bootleg_state::init_batsugunbl()
 	m_okibank->configure_entries(0, 5, &ROM[0x30000], 0x10000);
 }
 
-
-
+} // anonymous namespace
 
 GAME( 1993, batsugun,    0,        batsugun,   batsugun,   batsugun_state, empty_init,    ROT270, "Toaplan", "Batsugun", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, batsuguna,   batsugun, batsugun,   batsugun,   batsugun_state, empty_init,    ROT270, "Toaplan", "Batsugun (older, set 1)", MACHINE_SUPPORTS_SAVE )

@@ -15,6 +15,8 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
+namespace {
+
 class enmadaio_state : public driver_device
 {
 public:
@@ -395,5 +397,7 @@ ROM_START( enmadaio )
 	ROM_LOAD( "rom16_u71.a18", 0x1400000, 0x0200000, CRC(efd02b0d) SHA1(b23fa3298fc29086f9ab05bc58775ff47b4cb7a9) )
 	ROM_LOAD( "rom17_u72.a19", 0x1600000, 0x0200000, CRC(6b8717c3) SHA1(b5b7e35deaa2f34bccd1e83844d4bc0be845d0b8) )
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1993, enmadaio,    0,        enmadaio,     enmadaio,   enmadaio_state, init_enmadaio, ROT0,   "Toaplan / Taito",  "Enma Daio (Japan)", 0 ) // TP-031

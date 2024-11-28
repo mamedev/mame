@@ -16,6 +16,8 @@
 #include "cpu/z180/hd647180x.h"
 #include "sound/ymopm.h"
 
+namespace {
+
 class ghox_state : public driver_device
 {
 public:
@@ -325,6 +327,8 @@ ROM_START( ghoxjo ) /* older version (with fewer regions) of the 8-way joystick 
 	ROM_LOAD( "tp021-03.u36", 0x000000, 0x080000, CRC(a15d8e9d) SHA1(640a33997bdce8e84bea6a944139716379839037) )
 	ROM_LOAD( "tp021-04.u37", 0x080000, 0x080000, CRC(26ed1c9a) SHA1(37da8af86ea24327444c2d4ad3dfbd936208d43d) )
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1991, ghox,        0,        ghox,         ghox,       ghox_state,     empty_init,    ROT270, "Toaplan",         "Ghox (spinner)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ghoxj,       ghox,     ghox,         ghox,       ghox_state,     empty_init,    ROT270, "Toaplan",         "Ghox (joystick)",           MACHINE_SUPPORTS_SAVE )

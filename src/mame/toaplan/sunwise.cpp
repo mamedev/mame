@@ -31,6 +31,7 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 
 *****************************************************************************/
 
+namespace {
 
 class sunwise_state : public driver_device
 {
@@ -580,7 +581,7 @@ ROM_START( othldrby ) // Sunwise S951060-VGP PCB - JAMMA compliant (components i
 	ROM_LOAD( "sunwise_db0_4.u33", 0x00000, 0x80000, CRC(a9701868) SHA1(9ee89556666d358e8d3915622573b3ba660048b8) )
 ROM_END
 
-
+} // anonymous namespace
 
 GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Power Kick (Japan)",    0 )
 GAME( 1995, burgkids,    0,        pwrkick,    burgkids,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Burger Kids (Japan)",   0 )

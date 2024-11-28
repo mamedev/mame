@@ -17,6 +17,7 @@
 #include "machine/gen_latch.h"
 #include "sound/ymopl.h"
 
+namespace {
 
 class tekipaki_state : public driver_device
 {
@@ -330,6 +331,8 @@ ROM_START( whoopee )
 	ROM_LOAD( "tp025-4.bin", 0x000000, 0x100000, CRC(ab97f744) SHA1(c1620e614345dbd5c6567e4cb6f55c61b900d0ee) )
 	ROM_LOAD( "tp025-3.bin", 0x100000, 0x100000, CRC(7b16101e) SHA1(ae0119bbfa0937d18c4fbb0a3ef7cdc3b9fa6b56) )
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1991, tekipaki,    0,        tekipaki,     tekipaki,   tekipaki_state, empty_init,    ROT0,   "Toaplan",         "Teki Paki",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tekipakit,   tekipaki, tekipaki,     tekipaki,   tekipaki_state, empty_init,    ROT0,   "Toaplan",         "Teki Paki (location test)", MACHINE_SUPPORTS_SAVE )

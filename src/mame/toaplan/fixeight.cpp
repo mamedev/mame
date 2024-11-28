@@ -20,7 +20,7 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
-
+namespace {
 
 class fixeight_state : public driver_device
 {
@@ -725,6 +725,7 @@ void fixeight_bootleg_state::init_fixeightbl()
 	m_okibank->configure_entries(0, 5, &ROM[0x30000], 0x10000);
 }
 
+} // anonymous namespace
 
 // region is in eeprom (and also requires correct return value from a v25 mapped address??)
 GAME( 1992, fixeight,    0,        fixeight,   fixeight,   fixeight_state, empty_init,   ROT270, "Toaplan",                 "FixEight (Europe)",                                          MACHINE_SUPPORTS_SAVE )

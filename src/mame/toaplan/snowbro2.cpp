@@ -16,6 +16,8 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
+namespace {
+
 class snowbro2_state : public driver_device
 {
 public:
@@ -432,6 +434,8 @@ ROM_START( snowbro2ny ) // Nyanko
 	ROM_LOAD( "14_gal16v8-25lnc.u92", 0x117, 0x117, NO_DUMP ) // Protected
 	ROM_LOAD( "15_gal16v8-25lnc.u93", 0x22e, 0x117, NO_DUMP ) // Protected
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   snowbro2_state, empty_init,      ROT0,   "Hanafram",         "Snow Bros. 2 - With New Elves / Otenki Paradise (Hanafram)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1994, snowbro2ny,  snowbro2, snowbro2,   snowbro2,   snowbro2_state, empty_init,      ROT0,   "Nyanko",           "Snow Bros. 2 - With New Elves / Otenki Paradise (Nyanko)",         MACHINE_SUPPORTS_SAVE ) // not a bootleg, has original parts (the "GP9001 L7A0498 TOA PLAN" IC and the three mask ROMs)

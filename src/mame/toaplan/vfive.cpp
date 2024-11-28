@@ -17,6 +17,8 @@
 #include "cpu/nec/v25.h"
 #include "sound/ymopm.h"
 
+namespace {
+
 class vfive_state : public driver_device
 {
 public:
@@ -316,6 +318,8 @@ ROM_START( vfive )
 	ROM_LOAD( "tp027_02.bin", 0x000000, 0x100000, CRC(877b45e8) SHA1(b3ed8d8dbbe51a1919afc55d619d2b6771971493) )
 	ROM_LOAD( "tp027_03.bin", 0x100000, 0x100000, CRC(b1fc6362) SHA1(5e97e3cce31be57689d394a50178cda4d80cce5f) )
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1992, grindstm,    0,        vfive,      grindstm,   vfive_state, empty_init,      ROT270, "Toaplan", "Grind Stormer",             MACHINE_SUPPORTS_SAVE )
 GAME( 1992, grindstma,   grindstm, vfive,      grindstma,  vfive_state, empty_init,      ROT270, "Toaplan", "Grind Stormer (older set)", MACHINE_SUPPORTS_SAVE )
