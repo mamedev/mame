@@ -47,7 +47,7 @@ void cvs_base_state::scroll_start(int state)
 
 void cvs_base_state::init_stars()
 {
-	int generator = 0;
+	uint32_t generator = 0;
 	m_total_stars = 0;
 
 	// precalculate the star background
@@ -56,28 +56,20 @@ void cvs_base_state::init_stars()
 		for (int x = 511; x >= 0; x--)
 		{
 			generator <<= 1;
-			int const bit1 = BIT(~generator, 17);
-			int const bit2 = BIT(generator, 5);
+			generator |= BIT(~generator, 17) ^ BIT(generator, 5);
 
-			if (bit1 ^ bit2)
-				generator |= 1;
-
-			if (BIT(~generator, 16) && (generator & 0xfe) == 0xfe)
+			if ((generator & 0x130fe) == 0xfe)
 			{
-				if (BIT(~generator, 12) && BIT(~generator, 13))
-				{
-					if (m_total_stars < CVS_MAX_STARS)
-					{
-						m_stars[m_total_stars].x = x;
-						m_stars[m_total_stars].y = y;
-						m_stars[m_total_stars].code = 1;
+				m_stars[m_total_stars].x = x;
+				m_stars[m_total_stars].y = y;
+				m_stars[m_total_stars].code = 1;
 
-						m_total_stars++;
-					}
-				}
+				m_total_stars++;
 			}
 		}
 	}
+
+	assert(m_total_stars == 128);
 }
 
 void cvs_base_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always)
@@ -95,8 +87,7 @@ void cvs_base_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (flip_screen_y())
 				y = ~y;
 
-			if ((y >= cliprect.top()) && (y <= cliprect.bottom()) &&
-					(update_always || (m_palette->pen_indirect(bitmap.pix(y, x)) == 0)))
+			if (cliprect.contains(x, y) && (update_always || (m_palette->pen_indirect(bitmap.pix(y, x)) == 0)))
 				bitmap.pix(y, x) = star_pen;
 		}
 	}

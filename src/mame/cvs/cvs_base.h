@@ -38,7 +38,7 @@ protected:
 		, m_ram_view(*this, "video_color_ram_view")
 	{ }
 
-	static inline constexpr uint8_t CVS_MAX_STARS = 250;
+	static inline constexpr uint8_t CVS_MAX_STARS = 128;
 	static inline constexpr int8_t CVS_S2636_Y_OFFSET = -5;
 	static inline constexpr int8_t CVS_S2636_X_OFFSET = -26;
 
