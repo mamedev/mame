@@ -12,7 +12,7 @@
 
 #include "emu.h"
 
-#include "tlb.h"
+#include "bus/heathzenith/h19/tlb.h"
 #include "bus/rs232/rs232.h"
 
 #include "h19.lh"

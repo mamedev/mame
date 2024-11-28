@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, Mark Garlanger
 /***************************************************************************
 
   h89bus.cpp - Heath/Zenith H-89/Z-90 bus
@@ -175,8 +175,7 @@ const tiny_rom_entry *h89bus_device::device_rom_region() const
 
 void h89bus_device::device_start()
 {
-	// don't claim I/O below 0x10 for now
-	m_io_space->install_readwrite_handler(0x0010, 0x00ff, emu::rw_delegate(*this, FUNC(h89bus_device::io_dispatch_r)), emu::rw_delegate(*this, FUNC(h89bus_device::io_dispatch_w)));
+	m_io_space->install_readwrite_handler(0x0000, 0x00ff, emu::rw_delegate(*this, FUNC(h89bus_device::io_dispatch_r)), emu::rw_delegate(*this, FUNC(h89bus_device::io_dispatch_w)));
 }
 
 void h89bus_device::add_h89bus_left_card(device_h89bus_left_card_interface &card)
@@ -242,37 +241,33 @@ u8 h89bus_device::io_dispatch_r(offs_t offset)
 {
 	u8 retval = 0;
 
-	offset += 0x10;
-	if (m_decode_prom[offset] != 0xff)
-	{
-		u16 decode = m_decode_prom[offset] ^ 0xff;
+	u16 decode = m_decode_prom[offset] ^ 0xff;
 
+	if (decode)
+	{
 		if ((decode & H89_GPP) && ((offset & 7) == 2)) return m_in_gpp_cb(offset);
 		if (decode & H89_NMI) return m_in_nmi_cb(offset);
 		if (decode & H89_TERM) return m_in_tlb_cb(offset & 7);
 
-		if (decode)
+		for (device_h89bus_right_card_interface &entry : m_right_device_list)
 		{
-			for (device_h89bus_right_card_interface &entry : m_right_device_list)
+			if (entry.m_p506_signals)
 			{
-				if (entry.m_p506_signals)
-				{
-					// p506 does not have CASS or LP
-					retval |= entry.read(decode & ~(H89_CASS | H89_LP), offset & 7);
-				}
-				else
-				{
-					// p504/p505 does not have FLPY
-					retval |= entry.read(decode & ~H89_FLPY , offset & 7);
-				}
+				// p506 does not have CASS or LP
+				retval |= entry.read(decode & ~(H89_CASS | H89_LP), offset & 7);
+			}
+			else
+			{
+				// p504/p505 does not have FLPY
+				retval |= entry.read(decode & ~H89_FLPY , offset & 7);
 			}
 		}
+	}
 
-		// service left-slot cards that have a motherboard connection to snoop the I/O space
-		for (device_h89bus_left_card_interface &entry : m_left_device_list)
-		{
-			retval |= entry.read(H89_IO, offset);
-		}
+	// service left-slot cards that have a motherboard connection to snoop the I/O space
+	for (device_h89bus_left_card_interface &entry : m_left_device_list)
+	{
+		retval |= entry.read(H89_IO, offset & 0x1fff);
 	}
 
 	return retval;
@@ -280,37 +275,33 @@ u8 h89bus_device::io_dispatch_r(offs_t offset)
 
 void h89bus_device::io_dispatch_w(offs_t offset, u8 data)
 {
-	offset += 0x10;
-	if (m_decode_prom[offset] != 0xff)
-	{
-		u16 decode = m_decode_prom[offset] ^ 0xff;
+	u16 decode = m_decode_prom[offset] ^ 0xff;
 
+	if (decode)
+	{
 		if (decode & H89_GPP) m_out_gpp_cb(offset, data);
 		if (decode & H89_NMI) { m_out_nmi_cb(offset, data); return; }
 		if (decode & H89_TERM) { m_out_tlb_cb(offset & 7, data); return; }
 
-		if (decode)
+		for (device_h89bus_right_card_interface &entry : m_right_device_list)
 		{
-			for (device_h89bus_right_card_interface &entry : m_right_device_list)
+			if (entry.m_p506_signals)
 			{
-				if (entry.m_p506_signals)
-				{
-					// p506 does not have CASS or LP
-					entry.write(decode &  ~(H89_CASS | H89_LP), offset & 7, data);
-				}
-				else
-				{
-					// p504/p505 does not have FLPY
-					entry.write(decode & ~H89_FLPY, offset & 7, data);
-				}
+				// p506 does not have CASS or LP
+				entry.write(decode &  ~(H89_CASS | H89_LP), offset & 7, data);
+			}
+			else
+			{
+				// p504/p505 does not have FLPY
+				entry.write(decode & ~H89_FLPY, offset & 7, data);
 			}
 		}
+	}
 
-		// service left-slot cards that have a motherboard connection to snoop the I/O space
-		for (device_h89bus_left_card_interface &entry : m_left_device_list)
-		{
-			entry.write(H89_IO, offset, data);
-		}
+	// service left-slot cards that have a motherboard connection to snoop the I/O space
+	for (device_h89bus_left_card_interface &entry : m_left_device_list)
+	{
+		entry.write(H89_IO, offset, data);
 	}
 }
 
