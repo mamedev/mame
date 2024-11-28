@@ -365,7 +365,6 @@ public:
 			{ *this, "raizing_okibank0_%u", 0U },
 			{ *this, "raizing_okibank1_%u", 0U } }
 		, m_shared_ram(*this, "shared_ram")
-		, m_mainram(*this, "mainram")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_vdp(*this, "gp9001")
@@ -374,24 +373,20 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_soundlatch(*this, "soundlatch%u", 1U)
-		, m_z80_rom(*this, "audiocpu")
 		, m_oki_rom(*this, "oki%u", 1U)
 	{ }
 
 protected:
-	u32 screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void device_post_load() override;
-	virtual void machine_start() override ATTR_COLD;
 
 	void bgaregga_common_video_start();
 
 	// used by everything
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 
-	void shippumd_coin_w(u8 data);
 	void raizing_z80_bankswitch_w(u8 data);
 	void raizing_oki_bankswitch_w(offs_t offset, u8 data);
-	u8 bgaregga_E01D_r();
 
 
 	// used by bgaregga and batrider
@@ -400,36 +395,30 @@ protected:
 
 	u32 screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
 	DECLARE_MACHINE_RESET(bgaregga);
 	template<unsigned Chip> void raizing_oki(address_map &map) ATTR_COLD;
 
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
 	void shared_ram_w(offs_t offset, u8 data) { m_shared_ram[offset] = data; }
 
-	u32 screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_base(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
 	void tx_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
-	u8 m_sndirq_line = 0;        /* IRQ4 for batrider, IRQ2 for bbakraid */
-	u8 m_z80_busreq = 0;
-
-
 	tilemap_t *m_tx_tilemap = nullptr;    /* Tilemap for extra-text-layer */
 	required_shared_ptr<u16> m_tx_videoram;
 	optional_shared_ptr<u16> m_tx_lineselect;
 	optional_shared_ptr<u16> m_tx_linescroll;
 	optional_shared_ptr<u16> m_tx_gfxram;
-	optional_memory_bank m_audiobank;
+	optional_memory_bank m_audiobank; // batrider and bgaregga
 	optional_memory_bank_array<8> m_raizing_okibank[2];
 	void coin_w(u8 data);
 	void reset(int state);
 
 	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
-	optional_shared_ptr<u16> m_mainram;
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -439,7 +428,6 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device_array<generic_latch_8_device, 4> m_soundlatch; // tekipaki, batrider, bgaregga, batsugun
-	optional_region_ptr<u8> m_z80_rom;
 	optional_region_ptr_array<u8, 2> m_oki_rom;
 	bitmap_ind8 m_custom_priority_bitmap;
 };
@@ -450,6 +438,8 @@ public:
 	batrider_state(const machine_config &mconfig, device_type type, const char *tag)
 		: raizing_base_state(mconfig, type, tag)
 		, m_dma_space(*this, "dma_space")
+		, m_mainram(*this, "mainram")
+		, m_z80_rom(*this, "audiocpu")
 	{ }
 
 	void batrider(machine_config &config);
@@ -457,6 +447,7 @@ public:
 	void init_batrider();
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	void batrider_68k_mem(address_map &map) ATTR_COLD;
@@ -479,10 +470,14 @@ protected:
 	void batrider_objectbank_w(offs_t offset, u8 data);
 	void batrider_bank_cb(u8 layer, u32 &code);
 
-	u16 m_gfxrom_bank[8]{};       /* Batrider object bank */
 
-	// used by batrider, bbakraid, nprobowl
-	optional_device<address_map_bank_device> m_dma_space;
+	required_device<address_map_bank_device> m_dma_space;
+	required_shared_ptr<u16> m_mainram;
+	optional_region_ptr<u8> m_z80_rom;
+
+	u16 m_gfxrom_bank[8]{};       /* Batrider object bank */
+	u8 m_sndirq_line = 0;        /* IRQ4 for batrider, IRQ2 for bbakraid */
+	u8 m_z80_busreq = 0;
 };
 
 
@@ -504,6 +499,8 @@ private:
 	void bbakraid_68k_mem(address_map &map) ATTR_COLD;
 	void bbakraid_sound_z80_mem(address_map &map) ATTR_COLD;
 	void bbakraid_sound_z80_port(address_map &map) ATTR_COLD;
+
+	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
 
 	u16 bbakraid_eeprom_r();
 	void bbakraid_eeprom_w(u8 data);
@@ -545,6 +542,7 @@ private:
 	void bgaregga_68k_mem(address_map &map) ATTR_COLD;
 	void bgaregga_sound_z80_mem(address_map &map) ATTR_COLD;
 
+	u8 bgaregga_E01D_r();
 };
 
 class bgaregga_bootleg_state : public bgaregga_state
@@ -579,6 +577,8 @@ private:
 	void mahoudai_68k_mem(address_map &map) ATTR_COLD;
 	void shippumd_68k_mem(address_map &map) ATTR_COLD;
 	void raizing_sound_z80_mem(address_map &map) ATTR_COLD;
+
+	void shippumd_coin_w(u8 data);
 };
 
 
@@ -648,7 +648,7 @@ void raizing_base_state::device_post_load()
 }
 
 
-u32 raizing_base_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 raizing_base_state::screen_update_base(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
@@ -666,9 +666,9 @@ void raizing_base_state::screen_vblank(int state)
 	}
 }
 
-u32 raizing_base_state::screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 raizing_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen_update_toaplan2(screen, bitmap, cliprect);
+	screen_update_base(screen, bitmap, cliprect);
 
 	rectangle clip = cliprect;
 
@@ -798,7 +798,7 @@ void batrider_state::video_start()
 
 u32 raizing_base_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen_update_toaplan2(screen, bitmap, cliprect);
+	screen_update_base(screen, bitmap, cliprect);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0);
 	return 0;
 }
@@ -1416,7 +1416,7 @@ void raizing_base_state::raizing_oki_bankswitch_w(offs_t offset, u8 data)
 }
 
 
-u8 raizing_base_state::bgaregga_E01D_r()
+u8 bgaregga_state::bgaregga_E01D_r()
 {
 	// the Z80 reads this address during its IRQ routine,
 	// and reads the soundlatch only if the lowest bit is clear.
@@ -1512,13 +1512,13 @@ void bbakraid_state::bbakraid_eeprom_w(u8 data)
 	m_z80_busreq = data & 0x10; // see bbakraid_eeprom_r above
 }
 
-void raizing_base_state::shippumd_coin_w(u8 data)
+void sstriker_state::shippumd_coin_w(u8 data)
 {
 	coin_w(data & ~0x10);
 	m_oki[0]->set_rom_bank(BIT(data, 4));
 }
 
-INTERRUPT_GEN_MEMBER(raizing_base_state::bbakraid_snd_interrupt)
+INTERRUPT_GEN_MEMBER(bbakraid_state::bbakraid_snd_interrupt)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }
@@ -1536,9 +1536,8 @@ MACHINE_RESET_MEMBER(raizing_base_state, bgaregga)
 	}
 }
 
-void raizing_base_state::machine_start()
+void batrider_state::machine_start()
 {
-	driver_device::machine_start();
 	save_item(NAME(m_z80_busreq));
 }
 
@@ -1826,7 +1825,7 @@ void sstriker_state::mahoudai(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(sstriker_state::screen_update_truxton2));
+	m_screen->set_screen_update(FUNC(sstriker_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(sstriker_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
@@ -1871,7 +1870,7 @@ void bgaregga_state::bgaregga(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(bgaregga_state::screen_update_truxton2));
+	m_screen->set_screen_update(FUNC(bgaregga_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(bgaregga_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
@@ -1930,7 +1929,7 @@ void batrider_state::batrider(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(batrider_state::screen_update_truxton2));
+	m_screen->set_screen_update(FUNC(batrider_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(batrider_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
@@ -1990,7 +1989,7 @@ void bbakraid_state::bbakraid(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(bbakraid_state::screen_update_truxton2));
+	m_screen->set_screen_update(FUNC(bbakraid_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(bbakraid_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
@@ -2034,7 +2033,7 @@ void nprobowl_state::nprobowl(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(nprobowl_state::screen_update_truxton2));
+	m_screen->set_screen_update(FUNC(nprobowl_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(nprobowl_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
