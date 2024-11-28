@@ -3,8 +3,8 @@
 
 // Yamaha SCI4 / XV833A00, 7-lines serial chip with 4 multiplexed on one and the other 3 separated
 
-#ifndef DEVICES_MACHINE_SCI4_H
-#define DEVICES_MACHINE_SCI4_H
+#ifndef MAME_MACHINE_SCI4_H
+#define MAME_MACHINE_SCI4_H
 
 #pragma once
 
@@ -71,4 +71,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SCI4, sci4_device)
 
-#endif
+#endif // MAME_MACHINE_SCI4_H

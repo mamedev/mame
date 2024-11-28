@@ -22,7 +22,7 @@ menu_midi_inout::menu_midi_inout(mame_ui_manager &mui, render_container &contain
 	, m_channel(channel)
 	, m_is_input(is_input)
 {
-	set_heading(m_is_input ? _("Midi input channel") : _("Midi output channel"));
+	set_heading(m_is_input ? _("MIDI input channel") : _("MIDI output channel"));
 }
 
 menu_midi_inout::~menu_midi_inout()
@@ -67,8 +67,6 @@ void menu_midi_inout::populate()
 void menu_midi_inout::recompute_metrics(uint32_t width, uint32_t height, float aspect)
 {
 	menu::recompute_metrics(width, height, aspect);
-
-	//	set_custom_space(0.0f, 2.0f * line_height() + 2.0f * tb_border());
 }
 
 

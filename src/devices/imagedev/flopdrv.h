@@ -2,8 +2,8 @@
 // copyright-holders:Nathan Woods, Miodrag Milanovic
 /* flopdrv provides simple emulation of a disc drive */
 
-#ifndef MAME_DEVICES_IMAGEDV_FLOPDRV_H
-#define MAME_DEVICES_IMAGEDV_FLOPDRV_H
+#ifndef MAME_IMAGEDEV_FLOPDRV_H
+#define MAME_IMAGEDEV_FLOPDRV_H
 
 #pragma once
 
@@ -224,4 +224,4 @@ protected:
 	char            m_extension_list[256];
 };
 
-#endif // MAME_DEVICES_IMAGEDV_FLOPDRV_H
+#endif // MAME_IMAGEDEV_FLOPDRV_H

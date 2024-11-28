@@ -21,22 +21,21 @@ void cvs_base_state::machine_reset()
 	m_stars_scroll = 0;
 }
 
-void cvs_base_state::write_s2650_flag(int state) // TODO: remove once set_memview is available via devcb
-{
-	m_ram_view.select(state);
-}
+
+// collision register accesors
 
 uint8_t cvs_base_state::collision_r()
 {
 	return m_collision_register;
 }
 
-uint8_t cvs_base_state::collision_clear()
+uint8_t cvs_base_state::collision_clear_r()
 {
 	if (!machine().side_effects_disabled())
 		m_collision_register = 0;
 	return 0;
 }
+
 
 // cvs stars hardware
 
@@ -48,11 +47,9 @@ void cvs_base_state::scroll_start()
 void cvs_base_state::init_stars()
 {
 	int generator = 0;
-
-	// precalculate the star background
-
 	m_total_stars = 0;
 
+	// precalculate the star background
 	for (int y = 255; y >= 0; y--)
 	{
 		for (int x = 511; x >= 0; x--)
@@ -98,7 +95,7 @@ void cvs_base_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprec
 				y = ~y;
 
 			if ((y >= cliprect.top()) && (y <= cliprect.bottom()) &&
-				(update_always || (m_palette->pen_indirect(bitmap.pix(y, x)) == 0)))
+					(update_always || (m_palette->pen_indirect(bitmap.pix(y, x)) == 0)))
 				bitmap.pix(y, x) = star_pen;
 		}
 	}

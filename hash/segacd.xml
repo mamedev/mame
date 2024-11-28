@@ -3252,7 +3252,7 @@ Requires [disc swap]
 		<rom name="Sonic CD (USA) (Track 34).bin" size="16233504" crc="b9f018f8" />
 		<rom name="Sonic CD (USA) (Track 35).bin" size="32111856" crc="4194928d" />
 		-->
-		<description>Sonic the Hedgehog CD (USA)</description>
+		<description>Sonic the Hedgehog CD (USA, R1C)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4407"/>
@@ -3305,7 +3305,7 @@ Requires [disc swap]
 		<rom name="Sonic CD (USA) (RE125) (Track 34).bin" size="16405200" crc="393386fd" md5="d798e31b863cf5e31ef6e1b242aabe86" sha1="b52aa2b587cd4682e95a56e087cd15e215afa316"/>
 		<rom name="Sonic CD (USA) (RE125) (Track 35).bin" size="31940160" crc="9cebd39d" md5="dcfce720b4e4cb2236cc54537eb551c5" sha1="f3113ef9547a9242fc93bd6654adeb860f22dc27"/>
 		-->
-		<description>Sonic the Hedgehog CD (USA, alt)</description>
+		<description>Sonic the Hedgehog CD (USA, R7D)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4407"/>
@@ -3359,7 +3359,7 @@ Requires [disc swap]
 		<rom name="Sonic CD (USA) (RE125) (Alt) (Track 34).bin" size="16405200" crc="393386fd" md5="d798e31b863cf5e31ef6e1b242aabe86" sha1="b52aa2b587cd4682e95a56e087cd15e215afa316"/>
 		<rom name="Sonic CD (USA) (RE125) (Alt) (Track 35).bin" size="31940160" crc="9cebd39d" md5="dcfce720b4e4cb2236cc54537eb551c5" sha1="f3113ef9547a9242fc93bd6654adeb860f22dc27"/>
 		-->
-		<description>Sonic the Hedgehog CD (USA, alt 2)</description>
+		<description>Sonic the Hedgehog CD (USA, R8C)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="Sonic CD (Box)" />
@@ -3368,6 +3368,58 @@ Requires [disc swap]
 			<feature name="cd_matrix" value="SEGA4407RE125 R8C MFD BY JVC"/>
 			<diskarea name="cdrom">
 				<disk name="sonic cd (usa, alt 2)" sha1="824b78678ce7aa0b845d14de3e7df737105329f4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="soniccdc" cloneof="soniccd">
+		<!-- Source: redump.org - http://redump.org/disc/119465/
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 01).bin" size="139381872" crc="a6184e05" md5="ed96420538f989e94480f810d5f90685" sha1="3c316af52cc9ee8c30976a1cdb66339545dda3bd" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 02).bin" size="1086624" crc="15012c2f" md5="db67c23a4edadb89bf1c527c230f1fb9" sha1="4aa8d5356ca9208d12a1e52a1b161a5d9a5ba354" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 03).bin" size="19618032" crc="38ca5b03" md5="9c4f328f0ea9ade89b463a6c4e521bd7" sha1="e3e6fddaa2e6bd83b425fc26c6c71742b5fb8e9f" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 04).bin" size="14471856" crc="9596c858" md5="36488d42bd88651d030a3726ae8438f0" sha1="351c357c64c6154aecb294ab10a682129d3ae4cc" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 05).bin" size="15193920" crc="dd5b4a12" md5="b4ce562be53929d0ca5a312f63224b52" sha1="bc17b3525feec2aa4182ca47aa9b33d6e123d5e9" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 06).bin" size="17828160" crc="84cdcb09" md5="ebf995c5795f3b4fcc39eebf48eed8e2" sha1="c52af58f0fba84ae14043a70ed780e3a139bbea9" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 07).bin" size="14300160" crc="da492afe" md5="7dc11ada8a0cb09b2468ee0e3a0ba4e6" sha1="cf61e1285a46c32741e863e1bb7fca3ba82a4d97" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 08).bin" size="14638848" crc="df5f4c71" md5="edcf5aba504576c78bbe4b6f7d01b8ff" sha1="f578e3607ef043bd4c42b206e7225c6cb03729da" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 09).bin" size="20490624" crc="3cb45cc3" md5="3446c43b7c5b149cd48c4ef88340d789" sha1="b6912c3d97f52d5b239e04d89bde5aca3e862749" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 10).bin" size="14297808" crc="6493039b" md5="9bf6515ee47eafbf3d3b52c4cd6c916b" sha1="485571c87178c1dc8f730f9a8958b4daba8ce3b7" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 11).bin" size="13945008" crc="8331bffb" md5="42ad3a9bbbfd16cd5c425df525ddd7b1" sha1="233d9149e3d5eab4a1788f02036a4dd26cf4b662" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 12).bin" size="18350304" crc="b1fc067e" md5="6d494c48ef460e87bf759ce32312b0af" sha1="acf6116d3223f690351e4dfec3e686aee7d602c2" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 13).bin" size="14013216" crc="50722cff" md5="e7d986be93530c173cfbc54fff1dc3a8" sha1="2a69c0a2503e08f2822e5ccecd7ed8b4ded88ba0" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 14).bin" size="11670624" crc="e3010652" md5="57f445fb464017e263e94b2c026bb074" sha1="e3d5be3bf65d2cb9ca962e6cc1b59a2f154cb35a" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 15).bin" size="16412256" crc="8c72e30c" md5="fd94adef4eec0364820d6679c566d4dc" sha1="ddde7a71d5167ac691905db051ae50fb0067edf9" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 16).bin" size="11136720" crc="d86a29bf" md5="2208836a9535d566cdc3d5833805c0c2" sha1="1ecf5dc836236379aa04b5a65d57c20ebdbd2d7b" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 17).bin" size="14307216" crc="f6ad9d89" md5="b909869e98fb083f5fdca2cb07b18781" sha1="503fedd4729e134e8ec3933efd1acea8ba3d2e29" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 18).bin" size="20485920" crc="3bda218e" md5="f7ecd93d5d2421e4f861d92893f3c4a0" sha1="778abcb3b2d18f025d9a2005f86c52d63f6b838b" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 19).bin" size="13077120" crc="a2880ca8" md5="ff09f9f05338616da58cf827606b5fef" sha1="3399cac7294d7d228740a5b82dc7f6070a1759a8" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 20).bin" size="12004608" crc="4afee7cc" md5="ba9f5f384f070ffb5d86639f78a39dfb" sha1="227505a70368f426dc89b8ca6cf03b9d428c70cd" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 21).bin" size="15191568" crc="e197a84f" md5="4a42c02bb02ae07305fbe3298d858c6c" sha1="1dccb491151e6e140eae2e46d532fa8bbcb1e990" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 22).bin" size="11835264" crc="b2b7a147" md5="d30d92ba1870aa254101274aecde4bf3" sha1="7b1d1891513d1734c353ff5d2b1f66e1f7b69335" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 23).bin" size="13063008" crc="837ebc3d" md5="79aee8e5f27c5c8ff9f8ee2326740871" sha1="953641db3fa2444cddd008bb71aa07ca29dd8abf" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 24).bin" size="14302512" crc="cdeeb57b" md5="0b870bd8daa4af884be9e09528a81f1b" sha1="385b09d98e716db3995de1deee735e713eeefc18" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 25).bin" size="14991648" crc="9b67a0a9" md5="6b6bc3af605b7ae3bc279bafbb1b757d" sha1="7c4923dab1c55efb533ee0e21c6e4f073acd18e3" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 26).bin" size="5475456" crc="f1548317" md5="e0e0490753c1836b531955415b6a263e" sha1="aa8409b6f3f6b7fa78caff67df4a4ed46874f0d5" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 27).bin" size="5470752" crc="ff0f89ff" md5="7f69419b70260956761403730dc81d70" sha1="a701571355dfea136b09782de2e18b1b4458319a" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 28).bin" size="1846320" crc="26c43f90" md5="e1377f9cbcd3c2cc75731fec69fe0665" sha1="e039d42fd374285bce4c972e7f3c484bfc604b24" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 29).bin" size="4231248" crc="3e973838" md5="404b198c1d0b75fbd3e28fdf292da6f6" sha1="91e087a9a3928a23cb8a06599c47f83bf52ff75b" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 30).bin" size="4151280" crc="edd38cac" md5="7c9dcc225186c240ba6c07024b1b912f" sha1="17467bfd1755abceb6e4107877619e18bc902bbb" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 31).bin" size="2295552" crc="5c6cabb7" md5="94f8d5b1d5179b5f9b011817023e7896" sha1="8aab036e35e904b2c0041fa75ac96726348db70b" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 32).bin" size="21720720" crc="ea02fb52" md5="cce356cf67f14bd702c7c25dce4296be" sha1="021e6d22476ccf1ae112e3bfb83851d341538d31" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 33).bin" size="22071168" crc="a2288429" md5="f278a27c3c762d5591a97f0acf7909f2" sha1="91b2a0f494af86caa05d3b8412aa7547decb62e4" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 34).bin" size="16405200" crc="393386fd" md5="d798e31b863cf5e31ef6e1b242aabe86" sha1="b52aa2b587cd4682e95a56e087cd15e215afa316" />
+		<rom name="Sonic CD (USA) (RE125) (Alt 2) (Track 35).bin" size="31940160" crc="9cebd39d" md5="dcfce720b4e4cb2236cc54537eb551c5" sha1="f3113ef9547a9242fc93bd6654adeb860f22dc27" />
+		-->
+		<description>Sonic the Hedgehog CD (USA, R4C)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="4407"/>
+		<info name="alt_title" value="Sonic CD (Box)" />
+		<info name="release" value="19931119" />
+		<part name="cdrom" interface="scd_cdrom">
+			<feature name="cd_matrix" value="SEGA4407RE125 R4C MFG BY JVC"/>
+			<diskarea name="cdrom">
+				<disk name="sonic cd (usa, alt 3)" sha1="8a7259600b583a8dda57fec95ff146fdb83b6ac3"/>
 			</diskarea>
 		</part>
 	</software>

@@ -45,9 +45,7 @@
 	[expressionField sizeToFit];
 
 	// create the subview popup
-	subviewButton = [[NSPopUpButton alloc] initWithFrame:NSOffsetRect(expressionFrame,
-																	  expressionFrame.size.width,
-																	  0)];
+	subviewButton = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(0, 0, 100, 19)];
 	[subviewButton setAutoresizingMask:(NSViewWidthSizable | NSViewMinXMargin | NSViewMinYMargin)];
 	[subviewButton setBezelStyle:NSBezelStyleShadowlessSquare];
 	[subviewButton setFocusRingType:NSFocusRingTypeNone];

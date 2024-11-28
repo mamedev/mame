@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett
-#pragma once
+#ifndef MAME_CPU_I386_I386PRIV_H
+#define MAME_CPU_I386_I386PRIV_H
 
-#ifndef __I386_H__
-#define __I386_H__
+#pragma once
 
 #include "i386dasm.h"
 
@@ -724,4 +724,4 @@ enum X86_CYCLES
 #define OP_4BYTE3AF2    0x00400000
 #define OP_4BYTE38F3    0x00200000
 
-#endif /* __I386_H__ */
+#endif // MAME_CPU_I386_I386PRIV_H

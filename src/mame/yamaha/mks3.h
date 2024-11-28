@@ -1,16 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-// HLE emulation of the MKS3 keyboard scanning PCB used in the psr340
-// and psr540 among others.
-
-// Uses a 63B05 with a not-yet-dumped internal rom
-
+// Emulation of the MKS3 keyboard scanning PCB used in the psr340 and
+// psr540 among others.
 
 #ifndef MAME_YAMAHA_MKS3_H
 #define MAME_YAMAHA_MKS3_H
 
 #pragma once
+
+#include "cpu/m6805/m6805.h"
 
 DECLARE_DEVICE_TYPE(MKS3, mks3_device)
 
@@ -28,26 +27,25 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	required_ioport_array<4> m_port;
+	required_device<hd6305v0_device> m_cpu;
+	required_ioport_array<11> m_port_a, m_port_b;
 	devcb_write_line m_write_da;
 	devcb_write_line m_write_clk;
-	emu_timer *m_scan_timer, *m_transmit_timer;
 
-	std::array<u8, 3> m_bytes;
-
-	std::array<u32, 4> m_sent_state;
-	std::array<u32, 4> m_current_state;
-
+	u8 m_port_c, m_port_d;
 	int m_ic, m_req;
-	u8 m_step, m_byte, m_byte_count;
 
-	u32 find_next();
-	void send_next();
-	void transmit_next();
-	TIMER_CALLBACK_MEMBER(transmit_tick);
-	TIMER_CALLBACK_MEMBER(scan_tick);
+	void da_w(int state);
+	void clk_w(int state);
+
+	u8 pa_r();
+	u8 pb_r();
+	void pc_w(u8 data);
+	void pd_w(u8 data);
 };
 
 #endif

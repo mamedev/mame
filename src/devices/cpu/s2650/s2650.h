@@ -69,17 +69,17 @@ private:
 	devcb_write_line m_flag_handler;
 	devcb_read8 m_intack_handler;
 
-	uint16_t  m_ppc;    /* previous program counter (page + iar) */
-	uint16_t  m_page;   /* 8K page select register (A14..A13) */
-	uint16_t  m_iar;    /* instruction address register (A12..A0) */
-	uint16_t  m_ea;     /* effective address (A14..A0) */
-	uint8_t   m_psl;    /* processor status lower */
-	uint8_t   m_psu;    /* processor status upper */
-	uint8_t   m_r;      /* absolute addressing dst/src register */
-	uint8_t   m_reg[7]; /* 7 general purpose registers */
-	uint8_t   m_halt;   /* 1 if cpu is halted */
-	uint8_t   m_ir;     /* instruction register */
-	uint16_t  m_ras[8]; /* 8 return address stack entries */
+	uint16_t  m_ppc;    // previous program counter (page + iar)
+	uint16_t  m_page;   // 8K page select register (A14..A13)
+	uint16_t  m_iar;    // instruction address register (A12..A0)
+	uint16_t  m_ea;     // effective address (A14..A0)
+	uint8_t   m_psl;    // processor status lower
+	uint8_t   m_psu;    // processor status upper
+	uint8_t   m_r;      // absolute addressing dst/src register
+	uint8_t   m_reg[7]; // 7 general purpose registers
+	uint8_t   m_halt;   // 1 if cpu is halted
+	uint8_t   m_ir;     // instruction register
+	uint16_t  m_ras[8]; // 8 return address stack entries
 	uint8_t   m_irq_state;
 
 	int     m_icount;

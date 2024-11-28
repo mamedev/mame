@@ -25,6 +25,19 @@
 class cvs_base_state : public driver_device
 {
 protected:
+	cvs_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_bullet_ram(*this, "bullet_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_s2636(*this, "s2636%u", 0U)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_BIG)
+		, m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_BIG)
+		, m_ram_view(*this, "video_color_ram_view")
+	{ }
+
 	static inline constexpr uint8_t CVS_MAX_STARS = 250;
 	static inline constexpr int8_t CVS_S2636_Y_OFFSET = -5;
 	static inline constexpr int8_t CVS_S2636_X_OFFSET = -26;
@@ -57,25 +70,11 @@ protected:
 
 	memory_view m_ram_view;
 
-	cvs_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_bullet_ram(*this, "bullet_ram")
-		, m_maincpu(*this, "maincpu")
-		, m_s2636(*this, "s2636%u", 0U)
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_screen(*this, "screen")
-		, m_palette(*this, "palette")
-		, m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_BIG)
-		, m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_BIG)
-		, m_ram_view(*this, "video_color_ram_view")
-	{ }
-
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void write_s2650_flag(int state);
 	uint8_t collision_r();
-	uint8_t collision_clear();
+	uint8_t collision_clear_r();
 	void scroll_start();
 	void init_stars() ATTR_COLD;
 	void update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always);

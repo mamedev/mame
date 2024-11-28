@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_FLOPPY_H
-#define MAME_DEVICES_IMAGEDEV_FLOPPY_H
+#ifndef MAME_IMAGEDEV_FLOPPY_H
+#define MAME_IMAGEDEV_FLOPPY_H
 
 #pragma once
 
@@ -488,4 +488,4 @@ DECLARE_DEVICE_TYPE(FLOPPY_CONNECTOR, floppy_connector)
 extern template class device_finder<floppy_connector, false>;
 extern template class device_finder<floppy_connector, true>;
 
-#endif // MAME_DEVICES_IMAGEDEV_FLOPPY_H
+#endif // MAME_IMAGEDEV_FLOPPY_H

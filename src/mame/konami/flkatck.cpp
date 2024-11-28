@@ -242,7 +242,7 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	// draw the graphics
 	m_k007121_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, &m_spriteram[sprite_buffer], 0, 40, 0, screen.priority(), (uint32_t)-1, true);
+	m_k007121->sprites_draw(bitmap, cliprect, &m_spriteram[sprite_buffer], 0, 40, 0, screen.priority(), (uint32_t)-1);
 	m_k007121_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 	return 0;
 }

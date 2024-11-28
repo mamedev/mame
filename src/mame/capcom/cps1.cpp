@@ -13898,7 +13898,6 @@ ROM_START( pang3b5 )
 	ROM_LOAD( "c632.ic1",     0x0200, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
-
 /* B-Board 91635B-2 */
 /* Note that this USA set seems to be the only one where GFX are stored into EPROMs instead of the usual mask ROMs. */
 ROM_START( megaman )
@@ -14431,6 +14430,43 @@ ROM_START( sfzbch )
 	ROM_LOAD( "sfz63b.1a",   0x0000, 0x0104, CRC(f5a351da) SHA1(a867947d784167b5284efb76a8634ca5713dafdb) )
 ROM_END
 
+ROM_START( cps1mult )
+	ROM_REGION( 0x4000000, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "prg_0.bin", 0x0000000, 0x800000, CRC(cbb4062c) SHA1(468bd4c381da299491807daad0a2f1a4128d8fce) )
+	ROM_LOAD16_WORD_SWAP( "prg_1.bin", 0x0800000, 0x800000, CRC(e434b882) SHA1(d66c92aaaf43e37fc224013e4c93dc02550616e6) )
+	ROM_LOAD16_WORD_SWAP( "prg_2.bin", 0x1000000, 0x800000, CRC(2ce2fc75) SHA1(0fc038f0188e91e3490c127877a17b57f5bb10fd) )
+	ROM_LOAD16_WORD_SWAP( "prg_3.bin", 0x1800000, 0x800000, CRC(0a93b43e) SHA1(bf3669c3970beacabbe4876d6d302ddcb531aa21) )
+	ROM_LOAD16_WORD_SWAP( "prg_4.bin", 0x2000000, 0x800000, CRC(80b6dfb3) SHA1(332daea56d4dc00cceea8b84d9a0872de7f5f48d) )
+	ROM_LOAD16_WORD_SWAP( "prg_5.bin", 0x2800000, 0x800000, CRC(bfa503e7) SHA1(0efecaf34832e6db5aad429513df1188a1086e6a) )
+	ROM_LOAD16_WORD_SWAP( "prg_6.bin", 0x3000000, 0x800000, CRC(977d2d34) SHA1(1b9ed488f600aa3352ad6a4ce88b385a44f5b598) )
+	ROM_LOAD16_WORD_SWAP( "prg_7.bin", 0x3800000, 0x800000, CRC(65b0d8fd) SHA1(1ae4bf558c5884b4429a6bd1b3130076bf0de47a) )
+
+	ROM_REGION( 0x8000000, "gfx", 0 )
+	ROM_LOAD( "ca_0.bin", 0x0000000, 0x0800000, CRC(6819f572) SHA1(08026fe527a3e3e98c4b490f677a6daad9013752) )
+	ROM_LOAD( "ca_1.bin", 0x0800000, 0x0800000, CRC(f18256d2) SHA1(0ba49b2f1abc67a08965e43df70aed42b3bc1c31) )
+	ROM_LOAD( "ca_2.bin", 0x1000000, 0x0800000, CRC(1f474165) SHA1(c0c3632c1dbadeaea1334cfe8954d091458d773a) )
+	ROM_LOAD( "ca_3.bin", 0x1800000, 0x0800000, CRC(1f7f36a7) SHA1(33fb5e280111ce7f1dcf18093285d8834ac76be9) )
+	ROM_LOAD( "ca_4.bin", 0x2000000, 0x0800000, CRC(b6c2ae5c) SHA1(e7769bb593d37934280bf7d16d95b867854d4a4b) )
+	ROM_LOAD( "ca_5.bin", 0x2800000, 0x0800000, CRC(68e7b97e) SHA1(f2457e0341d8571a81f31497f7a54c6b9b312276) )
+	ROM_LOAD( "ca_6.bin", 0x3000000, 0x0800000, CRC(d7df2079) SHA1(ab1ae0fa4b8f3db1390b7504e62b2db2540ab003) )
+	ROM_LOAD( "ca_7.bin", 0x3800000, 0x0800000, CRC(76c35a1f) SHA1(8139a759ba9edaad44962a73f494e2af20a49787) )
+	ROM_LOAD( "cb_0.bin", 0x4000000, 0x0800000, CRC(c9ca6efc) SHA1(7c2c8b62fd2e10e968e7f739536ba0bc99826ffe) )
+	ROM_LOAD( "cb_1.bin", 0x4800000, 0x0800000, CRC(c53de0e5) SHA1(518407210e3afcc43dea776f0cafe735f5b1d0fb) )
+	ROM_LOAD( "cb_2.bin", 0x5000000, 0x0800000, CRC(2934a28c) SHA1(ab0a800adee07d485fd2b93be3f56d49cf18078f) )
+	ROM_LOAD( "cb_3.bin", 0x5800000, 0x0800000, CRC(ca41ae19) SHA1(ef8fc3b2f7027be4431bcd5954490392b40af329) )
+	ROM_LOAD( "cb_4.bin", 0x6000000, 0x0800000, CRC(b9ea6163) SHA1(9759ee1ec434406c1640743266a8576ca112dd92) )
+	ROM_LOAD( "cb_5.bin", 0x6800000, 0x0800000, CRC(74a402f2) SHA1(1d04ae19d0ed81532a01c8c069267fc6474fabdd) )
+	ROM_LOAD( "cb_6.bin", 0x7000000, 0x0800000, CRC(73f471e1) SHA1(d0a56fb43c0b8f37d60c728bd4fc8abeeb294774) )
+	ROM_LOAD( "cb_7.bin", 0x7800000, 0x0800000, CRC(7570e1f0) SHA1(e19243d21ee126c62f5e96150dd04c1ff8a18868) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 )
+	ROM_LOAD( "m1_074733.bin",  0x000000, 0x100000, CRC(fbb43b64) SHA1(099e02ba2e3e2b04bb99144009927dac584f89f0) )
+
+	ROM_REGION( 0x400000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "mx29f1610mcpsop44.u18",  0x000000, 0x200000, CRC(69cd2a53) SHA1(f5d78d7f4a807d5124cc8d48e57d283c3ddf972b) )
+	ROM_LOAD( "mx29f1610mcpsop44.u19a", 0x200000, 0x200000, CRC(4a0cebaa) SHA1(9384780fad82310122ac930bafe2e2c48b562676) )
+ROM_END
+
 
 uint16_t cps_state::sf2rb_prot_r(offs_t offset)
 {
@@ -14661,8 +14697,28 @@ void cps_state::init_pang3()
 	init_pang3b();
 }
 
+void cps_state::init_cps1mult()
+{
+	init_cps1();
+
+	uint8_t *rom = memregion("maincpu")->base();
+	int rom_size = memregion("maincpu")->bytes();
+	std::vector<uint8_t> buffer(rom_size);
+	memcpy(&buffer[0], rom, rom_size);
+
+	for (int i = 0; i < rom_size; i++)
+		rom[i] = buffer[bitswap<28>(i, 27, 26, 18, 23, 16, 17, 21, 24, 19, 25, 22, 20, 5, 6, 7, 8, 13, 15, 14, 9, 10, 12, 11, 1, 2, 3, 4, 0)];
+
+	uint8_t *gfxrom = memregion("gfx")->base();
+	rom_size = memregion("gfx")->bytes();
+	std::vector<uint8_t> gfxbuffer(rom_size);
+	memcpy(&gfxbuffer[0], gfxrom, rom_size);
+	for (int i = 0; i < rom_size; i++)
+		gfxrom[i] = gfxbuffer[bitswap<28>(i, 27, 1, 20, 21, 18, 19, 23, 25, 2, 26, 24, 22, 7, 8, 9, 10, 15, 17, 16, 11, 12, 14, 13, 3, 4, 5, 6, 0)]; // TODO: 25 and 26 to be verified
+}
+
 /*
-Pang 3b4 - code accesso to $5762b0 and $57a2b0 (PIC)
+Pang 3b4 - code access to $5762b0 and $57a2b0 (PIC)
 
 --------- Dip switch decoding ---------
 0E001A: move.b  $80001c.l, D0    ; !Dip switch B
@@ -15067,5 +15123,8 @@ CONS( 1995, sfzch,  0,     0, cps1_12MHz, sfzch, cps_state, init_cps1, "Capcom",
 // are these 2 legit sets, or did somebody region hack it?
 CONS( 1995, sfach,  sfzch, 0, cps1_12MHz, sfzch, cps_state, init_cps1, "Capcom", "Street Fighter Alpha: Warriors' Dreams (CPS Changer, Publicity USA 950727)", MACHINE_SUPPORTS_SAVE )
 CONS( 1995, sfzbch, sfzch, 0, cps1_12MHz, sfzch, cps_state, init_cps1, "Capcom", "Street Fighter Zero (CPS Changer, Brazil 950727)", MACHINE_SUPPORTS_SAVE )
+
+/* CPS1 multi game bootleg */
+GAME( 20??, cps1mult, 0,  cps1_12MHz, sf2,   cps_state,   init_cps1mult, ROT0,   "bootleg", "CPS1 Multi Game", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs game selection support via DIP switches
 
 // Ken Sei Mogura: Street Fighter II - see capcom/kenseim.cpp

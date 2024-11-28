@@ -5,8 +5,8 @@
     Sega Master System "Sports Pad" (Japanese model) emulation
 
 **********************************************************************/
-#ifndef MAME_BUS_SMS_CTROL_SPORTSJP_H
-#define MAME_BUS_SMS_CTROL_SPORTSJP_H
+#ifndef MAME_BUS_SMS_CTRL_SPORTSJP_H
+#define MAME_BUS_SMS_CTRL_SPORTSJP_H
 
 #pragma once
 
@@ -15,4 +15,4 @@
 
 DECLARE_DEVICE_TYPE(SMS_SPORTS_PAD_JP, device_sms_control_interface)
 
-#endif // MAME_BUS_SMS_CTROL_SPORTSJP_H
+#endif // MAME_BUS_SMS_CTRL_SPORTSJP_H

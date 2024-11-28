@@ -53,6 +53,8 @@
 #include "bus/cbus/pc9801_118.h"
 #include "bus/cbus/mpu_pc98.h"
 #include "bus/cbus/pc9801_cbus.h"
+#include "bus/cbus/sb16_ct2720.h"
+
 #include "pc9801_kbd.h"
 #include "pc9801_cd.h"
 
@@ -431,6 +433,7 @@ protected:
 	void dmapg8_w(offs_t offset, uint8_t data);
 
 	uint16_t timestamp_r(offs_t offset);
+	void artic_wait_w(u8 data);
 
 	void ppi_sys_dac_portc_w(uint8_t data);
 	virtual u8 ppi_prn_portb_r() override;

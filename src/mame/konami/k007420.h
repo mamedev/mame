@@ -28,6 +28,10 @@ public:
 	void write(offs_t offset, uint8_t data);
 	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	// signals from paired chip (commonly K007342)
+	void set_flipscreen(int flip) { m_flipscreen = bool(flip); }
+	void set_wrap_y(int wrap) { m_wrap_y = bool(wrap); }
+
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -37,8 +41,8 @@ private:
 	// internal state
 	std::unique_ptr<uint8_t[]> m_ram;
 
-	bool            m_flipscreen;   // current code uses the 7342 flipscreen!!
-	uint8_t         m_regs[8];      // current code uses the 7342 regs!! (only [2])
+	bool            m_flipscreen;
+	bool            m_wrap_y;
 	uint32_t        m_banklimit;
 	sprite_delegate m_callback;
 };

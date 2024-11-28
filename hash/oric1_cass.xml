@@ -20,6 +20,8 @@ license:CC0-1.0
 		<description>3D Fongus</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Janvier 1985" />
+		<info name="serial" value="036" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="48016">
 				<rom name="3D Fongus (1985-01)(Loriciels)(FR).tap" size="48016" crc="e53a85d5" sha1="2ae70d5051613971ebe4146a454a825a36eaf8bb"/>
@@ -31,6 +33,8 @@ license:CC0-1.0
 		<description>3D Fongus (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Janvier 1985" />
+		<info name="serial" value="036" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="48016">
 				<rom name="3D Fongus (1985-01)(Loriciels)(FR)[a].tap" size="48016" crc="a132e45c" sha1="88408d8e0dd839c6dae27055ec668cef60ef5b40"/>
@@ -134,6 +138,7 @@ license:CC0-1.0
 		<description>Acheron's Rage</description>
 		<year>1983</year>
 		<publisher>Softek</publisher>
+		<info name="author" value="Steven Chapman" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="43360">
 				<rom name="Acheron's Rage (1983)(Softek)(GB).tap" size="43360" crc="5e105553" sha1="61c60d7b44e3247c5551d5910df48d328c5243c0"/>
@@ -186,9 +191,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="aigledor">
-		<description>L'Aigle D'Or</description>
+		<description>L'Aigle d'Or</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Mars 1984" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="54630">
 				<rom name="Aigle D'Or, L' (1984)(Loriciels)(FR).tap" size="54630" crc="76de857c" sha1="e8b5d417d482809a5145e1d160d01064721fe4e7"/>
@@ -598,6 +604,7 @@ Type-in from magazine
 		<description>Challenge Voile</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1984" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="37356">
 				<rom name="Challenge Voile (1984-06)(Loriciels)(FR).tap" size="37356" crc="2c7dcdd1" sha1="5121c51c6755618bcc4fba5fe98dd4046dbb2106"/>
@@ -1170,7 +1177,9 @@ The side B (the game) doesn't work.
 		<description>Le Diamant de Kheops</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Alain Fernandes, Olivier Waltispurger" />
 		<info name="language" value="French" />
+		<info name="serial" value="AT 011" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="47322">
 				<rom name="Diamant de Kheops, Le (1984)(Sprites)(FR).tap" size="47322" crc="8ad535ea" sha1="ae71295b96de16552d1325aa5ba45bac6cfa16c2"/>
@@ -1179,9 +1188,11 @@ The side B (the game) doesn't work.
 	</software>
 
 	<software name="diamantm">
-		<description>Le Diamant de l'île Maudite</description>
+		<description>Le Diamant de l'Île Maudite</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1984" />
+		<info name="serial" value="007" />
 		<part name="cass1" interface="oric1_cass">
 			<dataarea name="cass" size="41598">
 				<rom name="Diamant de l'ile Maudite, Le (1984-07)(Loriciels)(FR)[1e partie].tap" size="41598" crc="5d5f05f8" sha1="a996d3c7b827f4a7a20b3eae96cb363b1dd567ae"/>
@@ -1200,7 +1211,7 @@ The side B (the game) doesn't work.
 	</software>
 
 	<software name="diamantm_d" cloneof="diamantm" supported="no">
-		<description>Le Diamant de l'île Maudite (demo)</description>
+		<description>Le Diamant de l'Île Maudite (demo)</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1247,6 +1258,7 @@ The side B (the game) doesn't work.
 		<description>Doggy</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1984" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="39685">
 				<rom name="Doggy (1984)(Loriciels)(FR).tap" size="39685" crc="d6469e8b" sha1="2390ac4333b995b060fa1100c11cc9d8fa9bd590"/>
@@ -1336,6 +1348,7 @@ The side B (the game) doesn't work.
 		<description>Dracula's Revenge</description>
 		<year>1983</year>
 		<publisher>Softek</publisher>
+		<info name="author" value="Steven Chapman" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="44303">
 				<rom name="Dracula's Revenge (1983)(Softek).tap" size="44303" crc="7cb74ad0" sha1="ab048e26c6d13fa2bd58329727e11f383289c272"/>
@@ -1347,6 +1360,7 @@ The side B (the game) doesn't work.
 		<description>Dracula's Revenge (alt)</description>
 		<year>1983</year>
 		<publisher>Softek</publisher>
+		<info name="author" value="Steven Chapman" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="42521">
 				<rom name="Dracula's Revenge (1983)(Softek)[a].tap" size="42521" crc="2935818a" sha1="7ca0b104af18338345e927029a0964367e3e3beb"/>
@@ -1644,6 +1658,8 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 		<description>Frelon</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Novembre 1984" />
+		<info name="serial" value="034" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="27057">
 				<rom name="Frelon (1984)(Loriciels)(FR).tap" size="27057" crc="fa50e53b" sha1="48b6b1fe141df7d40b1305b1821a85ca9c3ce327"/>
@@ -1688,6 +1704,7 @@ Tape 2 Side B - VOYAGES: Which is loaded when you go from one town to another
 		<description>Galaxians</description>
 		<year>19??</year>
 		<publisher>Softek Software</publisher>
+		<info name="author" value="Gordon Russell" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10784">
 				<rom name="Galaxians (19xx)(Softek Software)(Atmos).tap" size="10784" crc="6c38e071" sha1="bdda1a9d5fd2da9f62a37bef0142a6e26d3db95b"/>
@@ -1724,6 +1741,7 @@ Only has the "Galaxy" game. Missing "Lunar", "Astro-War", "Space-Chase", "Astero
 		<description>Gastronon</description>
 		<year>1983</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="C. Perconti" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="25746">
 				<rom name="Gastronon (1983)(Loriciels)(FR).tap" size="25746" crc="1dc3daee" sha1="286418ff6ba7c562424c3cd68c0e4405ec0553f4"/>
@@ -1986,6 +2004,8 @@ Only has the "Galaxy" game. Missing "Lunar", "Astro-War", "Space-Chase", "Astero
 		<description>Honey-Kong</description>
 		<year>19??</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Vincent Nicolas" />
+		<info name="serial" value="AT 005" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="26588">
 				<rom name="Honey-Kong (19xx)(Sprites)(FR).tap" size="26588" crc="3a4e7cec" sha1="e9cfcbe138bc8eb2de7799b08d2a71bc1675ad10"/>
@@ -2027,7 +2047,7 @@ Only has the "Galaxy" game. Missing "Lunar", "Astro-War", "Space-Chase", "Astero
 	</software>
 
 	<software name="hubert">
-		<description>Hu-Bert</description>
+		<description>Hu*Bert</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2085,6 +2105,7 @@ Only has the "Galaxy" game. Missing "Lunar", "Astro-War", "Space-Chase", "Astero
 		<description>Ice Giant</description>
 		<year>1983</year>
 		<publisher>Softek</publisher>
+		<info name="author" value="Steven Chapman" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="42515">
 				<rom name="Ice Giant (1983)(Softek).tap" size="42515" crc="ad6197c9" sha1="1833a871e88eb8e8e596e1b03a544da606547bd0"/>
@@ -2405,6 +2426,8 @@ Only has the "Galaxy" game. Missing "Lunar", "Astro-War", "Space-Chase", "Astero
 		<description>Lancelot</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Eric Caen" />
+		<info name="serial" value="AT 001" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="29242">
 				<rom name="Lancelot (1984)(Sprites)(FR).tap" size="29242" crc="879b23f1" sha1="8d5b2db2532784afa750a8fcd3dfc76f49c4ba45"/>
@@ -2416,6 +2439,8 @@ Only has the "Galaxy" game. Missing "Lunar", "Astro-War", "Space-Chase", "Astero
 		<description>Lancelot (alt)</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Eric Caen" />
+		<info name="serial" value="AT 001" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="29208">
 				<rom name="Lancelot (1984)(Sprites)(FR)[a].tap" size="29208" crc="daee1d1c" sha1="8417a260e49717268f88f9caeaad4a4f74982343"/>
@@ -2661,7 +2686,7 @@ The cassette stops during the game loading
 	</software>
 
 	<software name="meurtregv">
-		<description>Meurtre a Grande Vitesse</description>
+		<description>Meurtre à Grande Vitesse</description>
 		<year>1985</year>
 		<publisher>Cobra Soft</publisher>
 		<notes>Side A: Game / Side B: Audio tape</notes>
@@ -2669,7 +2694,7 @@ The cassette stops during the game loading
 		<info name="developer" value="Bertrand Brocard" />
 		<info name="language" value="French" />
 		<part name="cass1" interface="oric1_cass">
-			<feature name="part_id" value="Meurtre a Grande Vitesse" />
+			<feature name="part_id" value="Meurtre à Grande Vitesse" />
 			<dataarea name="cass" size="2849891">
 				<rom name="mgv.wav" size="2849891" crc="88b90d3d" sha1="26c2556529747ee82277b90a3c946166a896ef8b"/>
 			</dataarea>
@@ -2881,7 +2906,7 @@ The cassette stops during the game loading
 	</software>
 
 	<software name="mystere">
-		<description>Le Mystere de Kikekankoi</description>
+		<description>Le Mystère de Kikekankoi</description>
 		<year>1983</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3417,6 +3442,8 @@ The cassette stops during the game loading
 		<description>Psychiatric</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Aure Bernard" />
+		<info name="serial" value="AT 015" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="33838">
 				<rom name="Psychiatric (1984)(Sprites)(FR).tap" size="33838" crc="1c17288b" sha1="90a4bdadc47fe96c63fefd89d18519eb7e4d25b1"/>
@@ -3428,6 +3455,8 @@ The cassette stops during the game loading
 		<description>Psychiatric (alt 1)</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Aure Bernard" />
+		<info name="serial" value="AT 015" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="36387">
 				<rom name="Psychiatric (1984)(Sprites)(FR)[a].tap" size="36387" crc="4a1fb4e1" sha1="38eeb572602c299a104829496a2e87317d05946b"/>
@@ -3439,6 +3468,8 @@ The cassette stops during the game loading
 		<description>Psychiatric (alt 2)</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Aure Bernard" />
+		<info name="serial" value="AT 015" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="33845">
 				<rom name="Psychiatric (1984)(Sprites)(FR)[a2].tap" size="33845" crc="f3d2a03d" sha1="3481e02ee107c4f2b1a6d94e5830c7877cc3639f"/>
@@ -3524,9 +3555,10 @@ The cassette stops during the game loading
 	</software>
 
 	<software name="rendezvous">
-		<description>Rendez-vous de la Terreur</description>
+		<description>Le Rendez-vous de la Terreur</description>
 		<year>1984</year>
 		<publisher>ERE Informatique</publisher>
+		<info name="author" value="R. Piechaud" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="34094">
 				<rom name="Rendez-vous de la Terreur (1984)(ERE Informatique)(FR).tap" size="34094" crc="78039d6f" sha1="77906b7398d5e2e77f8ce4d2741e55a7807442dc"/>
@@ -3535,9 +3567,10 @@ The cassette stops during the game loading
 	</software>
 
 	<software name="rendezvous1" cloneof="rendezvous">
-		<description>Rendez-vous de la Terreur (demo)</description>
+		<description>Le Rendez-vous de la Terreur (demo)</description>
 		<year>1984</year>
 		<publisher>ERE Informatique</publisher>
+		<info name="author" value="R. Piechaud" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10179">
 				<rom name="Rendez-vous de la Terreur (demo-playable) (1984)(ERE Informatique)(FR).tap" size="10179" crc="d3e4c5b2" sha1="1fe67e0dcc02f656b8454cdec34ad1e03aaafadb"/>
@@ -3549,6 +3582,7 @@ The cassette stops during the game loading
 		<description>Le Retour du Dr Genius</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1984" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="40805">
 				<rom name="Retour du Dr Genius, Le (1984-08)(Loriciels)(FR).tap" size="40805" crc="0e306195" sha1="4f30add8ddff6448370118e9065d19d7df550901"/>
@@ -3626,6 +3660,8 @@ The cassette stops during the game loading
 		<description>Roland Garros</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Aure Bernard" />
+		<info name="serial" value="AT 009" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="40209">
 				<rom name="Roland Garros (1985)(Sprites)(FR).tap" size="40209" crc="e145e62d" sha1="810324ab821d2b552054e6d093f6efdd7f5200fa"/>
@@ -3728,6 +3764,8 @@ The cassette stops during the game loading
 		<publisher>Loriciels</publisher>
 		<info name="alt_title" value="Le Tombeau d'Axayacatl"/>
 		<info name="language" value="French" />
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1985" />
+		<info name="serial" value="067" />
 		<part name="cass1" interface="oric1_cass">
 			<feature name="part_id" value="A - PRESENTATION"/>
 			<dataarea name="cass" size="37183">
@@ -3856,6 +3894,7 @@ The cassette stops during the game loading
 		<description>Sorvivor</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Nguyen Jean Michel" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="36034">
 				<rom name="Sorvivor (1984)(Loriciels)(FR).tap" size="36034" crc="8bc75157" sha1="f6c1c12722a86742e6f60784e17f49bfb22c9a19"/>
@@ -4076,6 +4115,7 @@ The cassette stops during the game loading
 		<description>Super Jeep</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1984" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="33866">
 				<rom name="Super Jeep (1984-06)(Loriciels)(FR).tap" size="33866" crc="e395b81d" sha1="9bdad43afe2f134eca54f4990dda95f1ac985ce2"/>
@@ -4087,6 +4127,7 @@ The cassette stops during the game loading
 		<description>Super Meteors</description>
 		<year>1983</year>
 		<publisher>Softek</publisher>
+		<info name="author" value="Gordon Russell" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10729">
 				<rom name="Super Meteors (1983)(Softek)(GB).tap" size="10729" crc="c1f8485b" sha1="6d23c9af8b8eaf17d7b4e2b024c1abbc6e52945c"/>
@@ -4164,6 +4205,8 @@ The cassette stops during the game loading
 		<description>Tendre Poulet</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Olivier Espeche" />
+		<info name="serial" value="AT 003" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="26619">
 				<rom name="Tendre Poulet (1984)(Sprites)(FR).tap" size="26619" crc="d1588421" sha1="2031b6bcf3fb77b19b0515582e63fda57e5b3a4a"/>
@@ -4297,6 +4340,7 @@ Side A with the game's rule, side B with the game.
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 		<info name="language" value="French" />
+		<info name="serial" value="0625" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="40928">
 				<rom name="transat.tap" size="40928" crc="8cce352f" sha1="5f634986ccb7883007b163891c02613fd2eb89c1"/>
@@ -4374,6 +4418,7 @@ Side A with the game's rule, side B with the game.
 		<description>Le Trident de Neptune</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
+		<info name="serial" value="0751" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="24516">
 				<rom name="Trident De Neptune, Le (1984)(No Man's Land)(FR)[b].tap" size="24516" crc="9df9c6bb" sha1="dab98d1c70696219a5f9205530e512c9fcca915d"/>
@@ -4470,6 +4515,8 @@ Side A with the game's rule, side B with the game.
 		<description>Video Flipper</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1984" />
+		<info name="serial" value="030" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="22567">
 				<rom name="Video Flipper (1984)(Loriciels)(FR).tap" size="22567" crc="dcd79a05" sha1="bdd3f05963047a079930799e44ddff85db594926"/>
@@ -4635,7 +4682,7 @@ Works only on Oric Atmos
 	</software>
 
 	<software name="leyiking">
-		<description>Le Yi-King</description>
+		<description>Le Yi-King - L'Oracle Chinois des Empereurs Tcheou</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 		<info name="language" value="French" />

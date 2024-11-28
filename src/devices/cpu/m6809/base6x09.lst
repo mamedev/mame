@@ -445,14 +445,8 @@ SYNC:
 	m_syncack_write_func(1);
 	while(!m_nmi_asserted && !m_firq_line && !m_irq_line)
 	{
-		// massaging the PC this way makes the debugger's behavior more
-		// intuitive
-		m_pc.w--;
-
 		@eat_remaining();
-
-		// unmassage...
-		m_pc.w++;
+		;
 	}
 	m_syncack_write_func(0);
 	@eat(1);
@@ -595,14 +589,8 @@ CWAI:
 
 	while((m_ea.w = get_pending_interrupt()) == 0)
 	{
-		// massaging the PC this way makes the debugger's behavior more
-		// intuitive
-		m_pc.w -= 2;
-
 		@eat_remaining();
-
-		// unmassage...
-		m_pc.w += 2;
+		;
 	}
 
 	if (m_nmi_asserted)

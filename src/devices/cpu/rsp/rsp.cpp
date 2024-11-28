@@ -2840,6 +2840,7 @@ void rsp_device::execute_run()
 {
 	if (m_sr & (RSP_STATUS_HALT | RSP_STATUS_BROKE))
 	{
+		debugger_wait_hook();
 		m_ideduct = 0;
 		m_scalar_busy = false;
 		m_vector_busy = false;

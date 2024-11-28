@@ -21,6 +21,7 @@
 
 void vtech_common_format::wbit(std::vector<uint32_t> &buffer, uint32_t &pos, bool bit)
 {
+	buffer.push_back(pos | floppy_image::MG_F);
 	if(bit) {
 		pos += 2237;
 		buffer.push_back(pos | floppy_image::MG_F);
@@ -115,7 +116,11 @@ std::vector<uint8_t> vtech_common_format::flux_to_image(const floppy_image &imag
 			int dt = (buffer[npos] & floppy_image::TIME_MASK) - (buffer[cpos] & floppy_image::TIME_MASK);
 			if(dt < 0)
 				cpos += 200000000;
-			bitstream.push_back(dt < 9187 - 143);
+			int t = dt >= 9187 - 143 ? 0 :
+				dt >= 2237 - 143 && dt <= 2237 + 143 ? 1 :
+				2;
+			if(t <= 1)
+				bitstream.push_back(t);
 			if(npos <= cpos)
 				break;
 			cpos = npos;

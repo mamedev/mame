@@ -508,14 +508,9 @@ u8 leland_80186_sound_device::response_r()
 		   is also ineffective. In order to make sure the master CPU gets the real response,
 		   we force a synchronize on the read like this. */
 		if (!m_response_sync)
-		{
-			machine().scheduler().synchronize();
-			m_master->defer_access();
-		}
+			m_master->retry_access();
 		else
-		{
 			LOGMASKED(LOG_COMM, "%s:Read sound response latch = %02X\n", machine().describe_context(), m_sound_response);
-		}
 
 		m_response_sync = !m_response_sync;
 	}

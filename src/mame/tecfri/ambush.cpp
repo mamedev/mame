@@ -81,8 +81,7 @@ public:
 
 private:
 	void ambush_palette(palette_device &palette) const;
-	void mario_palette(palette_device &palette) const;
-	void mariobla_palette(palette_device &palette) const;
+	void mariobl_palette(palette_device &palette) const;
 	void dkong3_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -337,36 +336,7 @@ void ambush_state::ambush_palette(palette_device &palette) const
 	}
 }
 
-void ambush_state::mario_palette(palette_device &palette) const
-{
-	uint8_t const *const color_prom = memregion("colors")->base();
-
-	for (int i = 0; i < palette.entries(); i++)
-	{
-		int bit0, bit1, bit2;
-
-		// red component
-		bit0 = BIT(color_prom[i], 5);
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int const r = 255 - (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
-
-		// green component
-		bit0 = BIT(color_prom[i], 2);
-		bit1 = BIT(color_prom[i], 3);
-		bit2 = BIT(color_prom[i], 4);
-		int const g = 255 - (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
-
-		// blue component
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		int const b = 255 - (0x55 * bit0 + 0xaa * bit1);
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
-	}
-}
-
-void ambush_state::mariobla_palette(palette_device &palette) const
+void ambush_state::mariobl_palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("colors")->base();
 
@@ -783,7 +753,7 @@ void ambush_state::mariobl(machine_config &config)
 
 	m_gfxdecode->set_info(gfx_mariobl);
 
-	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::mario_palette));
+	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::mariobl_palette));
 
 	ay8910_device &ay1(AY8910(config.replace(), "ay1", XTAL(18'432'000)/6/2));
 	ay1.port_a_read_callback().set_ioport("buttons");
@@ -797,8 +767,6 @@ void ambush_state::mariobl(machine_config &config)
 void ambush_state::mariobla(machine_config &config)
 {
 	mariobl(config);
-
-	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::mariobla_palette));
 
 	auto &outlatch(*subdevice<ls259_device>("outlatch"));
 	outlatch.q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
@@ -923,10 +891,19 @@ ROM_START( mariobl )
 	ROM_LOAD("mbjba-1.3l",  0x4000, 0x2000, CRC(c772cb8f) SHA1(7fd6dd9888928fad5c50d96b4ecff954ea8975ce))
 
 	ROM_REGION(0x200, "colors", 0)
-	ROM_LOAD("a.bpr", 0x000, 0x100, NO_DUMP)
-	ROM_LOAD("b.bpr", 0x100, 0x100, NO_DUMP)
-	// taken from mario
-	ROM_LOAD("tma1-c-4p.4p", 0x000, 0x200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801))
+	ROM_LOAD("n82s147n.15", 0x000, 0x200, CRC(6a109f4b) SHA1(b117f85728afc6d3efeff0a7075b797996916f6e))
+
+	ROM_REGION(0x200, "other_prom", 0)
+	ROM_LOAD("n82s147n.13", 0x000, 0x200, CRC(a334e4f3) SHA1(b15e3d9851b43976e98c47e3365c1b69022b0a7d))
+
+	ROM_REGION(0xb00, "plds", ROMREGION_ERASE00)
+	ROM_LOAD("82s153.2",     0x000, 0x0eb, CRC(3b6ec269) SHA1(447cb00549b606f870f8b7a78aa241acacd4dc5c))
+	ROM_LOAD("82s153.4",     0x100, 0x0eb, CRC(8e227b3e) SHA1(6ff6c705269de46a8498fbcc13dd09e92e45b732))
+	ROM_LOAD("82s153.11",    0x200, 0x0eb, CRC(9da5e80d) SHA1(3bd1a55e68a7e6b7590fe3c15ae2e3a36b298fa6))
+	ROM_LOAD("pal16x4cj.10", 0x300, 0x104, CRC(d2731879) SHA1(81d4719f0a93d8bf8fb113693fc3ffb67c12248b))
+	ROM_LOAD("pal16r4cn.1",  0x500, 0x104, NO_DUMP ) // read protected
+	ROM_LOAD("pal16r4cn.5",  0x700, 0x104, NO_DUMP ) // read protected
+	ROM_LOAD("pal16r4cn.6",  0x900, 0x104, NO_DUMP ) // read protected
 ROM_END
 
 ROM_START( mariobla )

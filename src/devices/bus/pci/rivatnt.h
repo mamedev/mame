@@ -1,8 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: Angelo Salese
-
-#ifndef MAME_BUS_VIDEO_RIVATNT_H
-#define MAME_BUS_VIDEO_RIVATNT_H
+#ifndef MAME_BUS_PCI_RIVATNT_H
+#define MAME_BUS_PCI_RIVATNT_H
 
 #pragma once
 
@@ -69,5 +68,4 @@ DECLARE_DEVICE_TYPE(RIVATNT2_ULTRA, rivatnt2_ultra_device)
 DECLARE_DEVICE_TYPE(VANTA, vanta_device)
 DECLARE_DEVICE_TYPE(RIVATNT2_M64, rivatnt2_model64_device)
 
-
-#endif
+#endif // MAME_BUS_PCI_RIVATNT_H

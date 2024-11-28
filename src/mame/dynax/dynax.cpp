@@ -553,19 +553,9 @@ void dynax_adpcm_state::hjingi_lockout_w(int state)
 	machine().bookkeeping().coin_lockout_w(0, !state);
 }
 
-void dynax_adpcm_state::hjingi_hopper_w(int state)
-{
-	m_hopper = state;
-}
-
-uint8_t dynax_adpcm_state::hjingi_hopper_bit()
-{
-	return (m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6);
-}
-
 uint8_t dynax_adpcm_state::hjingi_keyboard_0_r()
 {
-	return hanamai_keyboard_0_r() | hjingi_hopper_bit();
+	return hanamai_keyboard_0_r() | (m_hopper->line_r() ? 0 : (1 << 6));
 }
 
 uint8_t dynax_adpcm_state::hjingi_keyboard_1_r()
@@ -999,7 +989,7 @@ void dynax_adpcm_state::mjembase_io_map(address_map &map)
 	map(0x20, 0x20).w(FUNC(dynax_adpcm_state::hanamai_keyboard_w));         // keyboard row select
 	map(0x21, 0x21).portr("COINS");                                         // Coins
 	map(0x22, 0x22).r(FUNC(dynax_adpcm_state::mjelctrn_keyboard_1_r));      // P2
-	map(0x23, 0x23).r(FUNC(dynax_adpcm_state::hanamai_keyboard_0_r));       // P1
+	map(0x23, 0x23).r(FUNC(dynax_adpcm_state::hjingi_keyboard_0_r));        // P1
 	map(0x24, 0x24).portr("DSW3");
 //  map(0x40, 0x40).nopw();                                                 // CRT Controller
 //  map(0x41, 0x41).nopw();                                                 // CRT Controller
@@ -1520,83 +1510,23 @@ static INPUT_PORTS_START( MAHJONG_KEYS )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( MAHJONG_KEYS_BET )
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_INCLUDE( MAHJONG_KEYS )
 
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(1)
+	PORT_MODIFY("KEY1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(1)
 
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(1) // "l"
+	PORT_MODIFY("KEY4")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(1)   // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(1)   // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(1)   // "f"
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(1) // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(1)   // "s"
 
-	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("KEY6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
+	PORT_MODIFY("KEY6")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
 
-	PORT_START("KEY7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
+	PORT_MODIFY("KEY9")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)   // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // "f"
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2) // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)   // "s"
 INPUT_PORTS_END
@@ -1684,173 +1614,63 @@ static INPUT_PORTS_START( HANAFUDA_KEYS )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( HANAFUDA_KEYS_BET )
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_INCLUDE( HANAFUDA_KEYS )
 
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(1)
 
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )    // "l"
+	PORT_MODIFY("KEY4")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )          // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )      // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )      // "f"
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )            // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )          // "s"
 
-	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("KEY6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY6")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
 
-	PORT_START("KEY7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
+	PORT_MODIFY("KEY9")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)       // "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // "f"
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2)         // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)       // "s"
 INPUT_PORTS_END
-/*
+
+#if 0
 [[maybe_unused]] static INPUT_PORTS_START( HANAFUDA_KEYS_BET_ALT )
-    PORT_START("KEY0")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(1)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(1)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(1)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )          // "t"
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_INCLUDE( HANAFUDA_KEYS )
 
-    PORT_START("KEY1")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(1)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(1)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(1)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )          // "s"
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY0")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )          // "t"
 
-    PORT_START("KEY2")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(1)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(1)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )            // "b"
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )          // "s"
 
-    PORT_START("KEY3")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(1)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(1)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )      // "w"
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )            // "b"
 
-    PORT_START("KEY4")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )      // "w"
 
-    PORT_START("KEY5")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)       // "t"
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_MODIFY("KEY4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-    PORT_START("KEY6")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)       // "s"
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY5")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)       // "t"
 
-    PORT_START("KEY7")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(2)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2)         // "b"
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY6")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)       // "s"
 
-    PORT_START("KEY8")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(2)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY7")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2)         // "b"
 
-    PORT_START("KEY9")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY8")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
+
+	PORT_MODIFY("KEY9")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
-*/
+#endif
+
 static INPUT_PORTS_START( cdracula )
 	PORT_START("P1")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -3161,124 +2981,131 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjembase )
 	PORT_START("DSW2")  /* DIP1, 7c20 (port $1e) */
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPSETTING(    0x01, "53" )
-	PORT_DIPSETTING(    0x02, "56" )
-	PORT_DIPSETTING(    0x03, "59" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x05, "65" )
-	PORT_DIPSETTING(    0x06, "68" )
-	PORT_DIPSETTING(    0x07, "71" )
-	PORT_DIPSETTING(    0x08, "75" )
-	PORT_DIPSETTING(    0x09, "78" )
-	PORT_DIPSETTING(    0x0a, "81" )
-	PORT_DIPSETTING(    0x0b, "84" )
-	PORT_DIPSETTING(    0x0c, "87" )
-	PORT_DIPSETTING(    0x0d, "90" )
-	PORT_DIPSETTING(    0x0e, "93" )
-	PORT_DIPSETTING(    0x0f, "96" )
-	PORT_DIPNAME( 0x30, 0x30, "Max Bet" )
+	PORT_DIPNAME( 0x0f, 0x07, "Payout Rate" )                   PORT_DIPLOCATION("SW 1:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPSETTING(    0x01, "53%" )
+	PORT_DIPSETTING(    0x02, "56%" )
+	PORT_DIPSETTING(    0x03, "59%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x06, "68%" )
+	PORT_DIPSETTING(    0x07, "71%" )
+	PORT_DIPSETTING(    0x08, "75%" )
+	PORT_DIPSETTING(    0x09, "78%" )
+	PORT_DIPSETTING(    0x0a, "81%" )
+	PORT_DIPSETTING(    0x0b, "84%" )
+	PORT_DIPSETTING(    0x0c, "87%" )
+	PORT_DIPSETTING(    0x0d, "90%" )
+	PORT_DIPSETTING(    0x0e, "93%" )
+	PORT_DIPSETTING(    0x0f, "96%" )
+	PORT_DIPNAME( 0x30, 0x10, "Maximum Bet" )                   PORT_DIPLOCATION("SW 1:5,6")
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Credits Per Note" )              PORT_DIPLOCATION("SW 1:7")
+	PORT_DIPSETTING(    0x40, "5" )                             PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
+	PORT_DIPSETTING(    0x40, "10" )                            PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x40, "25" )                            PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x40, "50" )                            PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "10" )                            PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
+	PORT_DIPSETTING(    0x00, "20" )                            PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x00, "50" )                            PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x00, "100" )                           PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x00)
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Flip_Screen) )            PORT_DIPLOCATION("SW 1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_START("DSW1")  /* DIP2, 7c21 (port $1c) */
-	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
-	PORT_DIPSETTING(    0x03, "0" ) // 20
-	PORT_DIPSETTING(    0x00, "1" ) // 32
-	PORT_DIPSETTING(    0x01, "2" ) // 64
-	PORT_DIPSETTING(    0x02, "3" ) // c8
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x03, 0x00, "Odds Rate" )                     PORT_DIPLOCATION("SW 2:1,2")
+	PORT_DIPSETTING(    0x03, "1 2 4 8 12 16 24 32" )
+	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
+	PORT_DIPSETTING(    0x01, "1 2 3 5 10 25 50 100" )
+	PORT_DIPSETTING(    0x02, "1 2 3 5 10 50 100 200" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR(Coinage) )                PORT_DIPLOCATION("SW 2:3,4")
+	PORT_DIPSETTING(    0x0c, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x08, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x04, DEF_STR(1C_5C) )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x30, "Min Pay?" )
+	PORT_DIPNAME( 0x30, 0x30, "Minimum Bet" )                   PORT_DIPLOCATION("SW 2:5,6")
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, "Allow Coin Out" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Win A Prize?" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Payout Mode" )                   PORT_DIPLOCATION("SW 2:7")
+	PORT_DIPSETTING(    0x40, "Key-out" )
+	PORT_DIPSETTING(    0x00, "Hopper" )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper Polarity" )               PORT_DIPLOCATION("SW 2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Normal) )
+	PORT_DIPSETTING(    0x00, "Inverted" )
 
 	PORT_START("DSW0")  /* DIP3, 7c22 (port $06, AY) */ /* note that these are in reverse order wrt the others */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DonDen Key" )
+	PORT_DIPNAME( 0x01, 0x01, "Disable H Pose" )                PORT_DIPLOCATION("SW 3:8")
+	PORT_DIPSETTING(    0x01, DEF_STR(No) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )   // win sequences show scrolling images of gals wearing bikinis irrespective of SW 4-8 setting
+	PORT_DIPNAME( 0x02, 0x00, "Don Den Button" )                PORT_DIPLOCATION("SW 3:7")
 	PORT_DIPSETTING(    0x02, "A" )
 	PORT_DIPSETTING(    0x00, "Flip Flop" )
-	PORT_DIPNAME( 0x04, 0x04, "Draw New Tile" )
-	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPSETTING(    0x04, "Manual" )
-	PORT_DIPNAME( 0x08, 0x08, "Win Rate?" )
-	PORT_DIPSETTING(    0x08, DEF_STR( High ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
-	PORT_DIPNAME( 0x10, 0x10, "YAKU times" )
+	PORT_DIPNAME( 0x04, 0x00, "Service Count" )                 PORT_DIPLOCATION("SW 3:6")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x08, 0x00, "Computer Strength" )             PORT_DIPLOCATION("SW 3:5")
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )
+	PORT_DIPSETTING(    0x08, "Strong" )
+	PORT_DIPNAME( 0x10, 0x10, "Yakuman Bonuses Per Cycle" )     PORT_DIPLOCATION("SW 3:4")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0xe0, 0xe0, "YAKUMAN Bonus" )
-	PORT_DIPSETTING(    0xe0, "Cut" )
-	PORT_DIPSETTING(    0x60, "1 T" )
-	PORT_DIPSETTING(    0xa0, "300" )
-	PORT_DIPSETTING(    0x20, "500" )
-	PORT_DIPSETTING(    0xc0, "700" )
-	PORT_DIPSETTING(    0x40, "1000" )
-//  PORT_DIPSETTING(    0x80, "1000" )
-//  PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPNAME( 0xe0, 0xc0, "Yakuman Bonus Cycle" )           PORT_DIPLOCATION("SW 3:3,2,1")
+	PORT_DIPSETTING(    0xe0, "None" )
+	PORT_DIPSETTING(    0x60, "First time only" )
+	PORT_DIPSETTING(    0xa0, "Every 300 coins" )
+	PORT_DIPSETTING(    0x20, "Every 500 coins" )
+	PORT_DIPSETTING(    0xc0, "Every 700 coins" )
+	PORT_DIPSETTING(    0x40, "Every 1000 coins" )
+//  PORT_DIPSETTING(    0x80, "Every 1000 coins" )
+//  PORT_DIPSETTING(    0x00, "Every 1000 coins" )
 
 	PORT_START("DSW3")  /* DIP4, 7c23 (port $24) */
-	PORT_DIPNAME( 0x01, 0x01, "Last Chance" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Pay Rate?" )
-	PORT_DIPSETTING(    0x02, DEF_STR( High ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
-	PORT_DIPNAME( 0x04, 0x04, "Choose Bonus" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "In-Game Bet?" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "In-Game Music" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Select Girl" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Nudity" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )   // Moles On Gal's Face
+	PORT_DIPNAME( 0x01, 0x01, "Last Chance" )                   PORT_DIPLOCATION("SW 4:1")
+	PORT_DIPSETTING(    0x01, "Free" )
+	PORT_DIPSETTING(    0x00, "Paid" )
+	PORT_DIPNAME( 0x02, 0x00, "Renchan Rate" )                  PORT_DIPLOCATION("SW 4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x04, 0x00, "Auto Tsumo" )                    PORT_DIPLOCATION("SW 4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x08, 0x00, "Double Up" )                     PORT_DIPLOCATION("SW 4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )    // press Bet during game to double the bet
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR(Demo_Sounds) )            PORT_DIPLOCATION("SW 4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x20, 0x00, "In-Game Music" )                 PORT_DIPLOCATION("SW 4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x40, 0x40, "Gal Selectt" )                   PORT_DIPLOCATION("SW 4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x80, "Gal H Pose" )                    PORT_DIPLOCATION("SW 4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )   // shows moles on gals' faces, win sequences show scrolling images of gals wearing bikinis
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )    // win sequences show "interaction" with gals if SW 3-8 is off
 
 	PORT_START("FAKE")  /* IN10 - Fake DSW */
-	PORT_DIPNAME( 0xff, 0xff, "Allow Bets" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0xff, DEF_STR( On ) )
+	PORT_CONFNAME( 0xff, 0xff, "Allow Bets" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0xff, DEF_STR( On ) )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )      // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00) // Pay
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                                       // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE                                                           // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                   // Analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                                  // Memory Reset
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BILL1 )         PORT_CODE(KEYCODE_6)                                            // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                                                                         // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                                                                      // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
@@ -3417,13 +3244,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mjelctrn )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )      // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )                            // 18B
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE                // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                        // Analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                       // Memory Reset
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BILL1 )         PORT_CODE(KEYCODE_6) // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                              // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                           // Service
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 
@@ -3437,12 +3264,12 @@ static INPUT_PORTS_START( mjelctrn )
 	PORT_DIPSETTING(    0x00, "1" ) // 32
 	PORT_DIPSETTING(    0x01, "2" ) // 64
 	PORT_DIPSETTING(    0x02, "3" ) // c8
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )              PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR(Coinage) )               PORT_DIPLOCATION("SW3:3,4")
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x30, "Min Pay?" )                     PORT_DIPLOCATION("SW3:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Minimum Bet" )                  PORT_DIPLOCATION("SW3:5,6")
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
@@ -3455,46 +3282,52 @@ static INPUT_PORTS_START( mjelctrn )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")  /* 7c20 (select = 40) */
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )                 PORT_DIPLOCATION("SW4:1,2,3,4")
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPSETTING(    0x01, "53" )
-	PORT_DIPSETTING(    0x02, "56" )
-	PORT_DIPSETTING(    0x03, "59" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x05, "65" )
-	PORT_DIPSETTING(    0x06, "68" )
-	PORT_DIPSETTING(    0x07, "71" )
-	PORT_DIPSETTING(    0x08, "75" )
-	PORT_DIPSETTING(    0x09, "78" )
-	PORT_DIPSETTING(    0x0a, "81" )
-	PORT_DIPSETTING(    0x0b, "84" )
-	PORT_DIPSETTING(    0x0c, "87" )
-	PORT_DIPSETTING(    0x0d, "90" )
-	PORT_DIPSETTING(    0x0e, "93" )
-	PORT_DIPSETTING(    0x0f, "96" )
-	PORT_DIPNAME( 0x30, 0x30, "Max Bet" )                      PORT_DIPLOCATION("SW4:5,6")
+	PORT_DIPNAME( 0x0f, 0x07, "Payout Rate" )                  PORT_DIPLOCATION("SW4:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPSETTING(    0x01, "53%" )
+	PORT_DIPSETTING(    0x02, "56%" )
+	PORT_DIPSETTING(    0x03, "59%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x06, "68%" )
+	PORT_DIPSETTING(    0x07, "71%" )
+	PORT_DIPSETTING(    0x08, "75%" )
+	PORT_DIPSETTING(    0x09, "78%" )
+	PORT_DIPSETTING(    0x0a, "81%" )
+	PORT_DIPSETTING(    0x0b, "84%" )
+	PORT_DIPSETTING(    0x0c, "87%" )
+	PORT_DIPSETTING(    0x0d, "90%" )
+	PORT_DIPSETTING(    0x0e, "93%" )
+	PORT_DIPSETTING(    0x0f, "96%" )
+	PORT_DIPNAME( 0x30, 0x10, "Maximum Bet" )                  PORT_DIPLOCATION("SW4:5,6")
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coin_B ) )              PORT_DIPLOCATION("SW4:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x40, 0x00, "Credits Per Note" )             PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x40, "5" )                            PORT_CONDITION("DSW0", 0x0c, EQUALS, 0x0c)
+	PORT_DIPSETTING(    0x40, "10" )                           PORT_CONDITION("DSW0", 0x0c, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x40, "25" )                           PORT_CONDITION("DSW0", 0x0c, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x40, "50" )                           PORT_CONDITION("DSW0", 0x0c, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "10" )                           PORT_CONDITION("DSW0", 0x0c, EQUALS, 0x0c)
+	PORT_DIPSETTING(    0x00, "20" )                           PORT_CONDITION("DSW0", 0x0c, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x00, "50" )                           PORT_CONDITION("DSW0", 0x0c, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x00, "100" )                          PORT_CONDITION("DSW0", 0x0c, EQUALS, 0x00)
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )         PORT_DIPLOCATION("SW4:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")  /* 7c22 (select = 80) */
-	PORT_DIPNAME( 0x07, 0x07, "YAKUMAN Bonus" )                PORT_DIPLOCATION("SW2:1,2,3")
-	PORT_DIPSETTING(    0x07, "Cut" )
-	PORT_DIPSETTING(    0x06, "1 T" )
-	PORT_DIPSETTING(    0x05, "300" )
-	PORT_DIPSETTING(    0x04, "500" )
-	PORT_DIPSETTING(    0x03, "700" )
-	PORT_DIPSETTING(    0x02, "1000" )
-//  PORT_DIPSETTING(    0x01, "1000" )
-//  PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x08, 0x08, "YAKU times" )                   PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x07, 0x04, "Yakuman Bonus Cycle" )          PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(    0x07, "None" )
+	PORT_DIPSETTING(    0x06, "First time only" )
+	PORT_DIPSETTING(    0x05, "Every 300 coins" )
+	PORT_DIPSETTING(    0x04, "Every 500 coins" )
+	PORT_DIPSETTING(    0x03, "Every 700 coins" )
+	PORT_DIPSETTING(    0x02, "Every 1000 coins" )
+//  PORT_DIPSETTING(    0x01, "Every 1000 coins" )
+//  PORT_DIPSETTING(    0x00, "Every 1000 coins" )
+	PORT_DIPNAME( 0x08, 0x08, "Yakuman Bonuses Per Cycle" )    PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPNAME( 0x10, 0x10, "Win Rate?" )                    PORT_DIPLOCATION("SW2:5")
@@ -3930,6 +3763,11 @@ INPUT_PORTS_START( ougonhai )
 	// SW 3  OFF OFF  ON  ON  ON  ON OFF OFF               OFF OFF OFF  ON  ON  ON  ON OFF
 	// SW 4  OFF  ON  ON OFF OFF OFF OFF OFF                ON  ON  ON OFF OFF OFF OFF OFF
 
+	// The manual implies SW 3 and SW 4 are banks of eight DIP switches, however
+	// the board has pads for banks of ten DIP switches, and ten DIP switches
+	// are shown in the input test.  Boards have been found populated with banks
+	// of eight DIP switches or ten DIP switches.
+
 	PORT_INCLUDE( tenkai )
 
 	PORT_MODIFY("DSW2")
@@ -3969,7 +3807,10 @@ INPUT_PORTS_START( ougonhai )
 	PORT_DIPNAME( 0x08, 0x00, "Renchan Rate" )                  PORT_DIPLOCATION("SW 2:10")       // 連荘レート
 	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW 3:9" )                                                // not documented
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW 3:10" )                                               // not documented
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW 4:9" )                                                // not documented
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW 4:10" )                                               // not documented
 INPUT_PORTS_END
 
 
@@ -4300,7 +4141,6 @@ void dynax_adpcm_state::machine_start()
 
 	save_item(NAME(m_msm5205next));
 	save_item(NAME(m_resetkludge));
-	save_item(NAME(m_hopper));
 	save_item(NAME(m_toggle));
 }
 
@@ -4310,7 +4150,6 @@ void dynax_adpcm_state::machine_reset()
 
 	m_msm5205next = 0;
 	m_resetkludge = 0;
-	m_hopper = 0;
 	m_toggle = 0;
 
 	// start with the MSM5205 reset
@@ -4544,8 +4383,10 @@ void dynax_adpcm_state::hjingi(machine_config &config)
 	ls259_device &outlatch(LS259(config, "outlatch"));
 	outlatch.q_out_cb<0>().set(FUNC(dynax_adpcm_state::coincounter_0_w));
 	outlatch.q_out_cb<1>().set(FUNC(dynax_adpcm_state::coincounter_1_w));
-	outlatch.q_out_cb<2>().set(FUNC(dynax_adpcm_state::hjingi_hopper_w));
+	outlatch.q_out_cb<2>().set(m_hopper, FUNC(hopper_device::motor_w));
 	outlatch.q_out_cb<3>().set(FUNC(dynax_adpcm_state::hjingi_lockout_w));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4951,8 +4792,11 @@ void dynax_adpcm_state::mjembase(machine_config &config)
 	// 13C
 	m_mainlatch->q_out_cb<3>().set(FUNC(dynax_adpcm_state::coincounter_0_w));
 	m_mainlatch->q_out_cb<4>().set(FUNC(dynax_adpcm_state::coincounter_1_w));
+	m_mainlatch->q_out_cb<5>().set(m_hopper, FUNC(hopper_device::motor_w));
 
 	config.device_remove("outlatch");
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_adpcm_state, mjembase)
 }
@@ -5221,6 +5065,10 @@ ROM_START( cdracula )
 	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
 	ROM_LOAD( "82s147an.u26", 0x000, 0x200, CRC(1a3fe146) SHA1(7d1b4dd66fc95ea5ed584f0bb571cca09fe519b0) ) // FIXED BITS (00xxxxxx)
 	ROM_LOAD( "82s147an.u25", 0x200, 0x200, CRC(31791990) SHA1(526c0d516f290dc6cc2ec76d9bcec8c900e2ae10) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "pal16l8acn.u47",  0x000, 0x117, CRC(fab530ca) SHA1(1cf8bd6e72f8a85dbf103a13478d31a36564517c) )
+	ROM_LOAD( "pal16l8acn.u246", 0x200, 0x117, CRC(f65ec383) SHA1(38c2678c6b9cfa44f2ba35b21d1177a2939bac76) )
 ROM_END
 
 

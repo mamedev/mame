@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
-#ifndef MAME_CPU_E132XS_XS32DEFS_H
-#define MAME_CPU_E132XS_XS32DEFS_H
+#ifndef MAME_CPU_E132XS_32XSDEFS_H
+#define MAME_CPU_E132XS_32XSDEFS_H
+
+#pragma once
 
 /***************************************************************************
     COMPILE-TIME DEFINITIONS
@@ -225,6 +227,4 @@
 //other bits are reversed, in particular 7 - 5 for the operating system.
 //the user program can only change the above 2 flags
 
-
-#endif // MAME_CPU_E132XS_XS32DEFS_H
-
+#endif // MAME_CPU_E132XS_32XSDEFS_H

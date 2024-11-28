@@ -10,8 +10,8 @@
 
 *****************************************************************************/
 
-#ifndef MAME_BUS_TI99_PEB_SCSI_H
-#define MAME_BUS_TI99_PEB_SCSI_H
+#ifndef MAME_BUS_TI99_PEB_SCSICARD_H
+#define MAME_BUS_TI99_PEB_SCSICARD_H
 
 #pragma once
 
@@ -142,4 +142,4 @@ private:
 DECLARE_DEVICE_TYPE_NS(TI99_WHTSCSI, bus::ti99::peb, whtech_scsi_card_device)
 DECLARE_DEVICE_TYPE_NS(WHTSCSI_PLD, bus::ti99::peb, whtscsi_pld_device)
 
-#endif // MAME_BUS_TI99_PEB_SCSI_H
+#endif // MAME_BUS_TI99_PEB_SCSICARD_H

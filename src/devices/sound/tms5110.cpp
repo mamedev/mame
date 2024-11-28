@@ -237,6 +237,7 @@ void tms5110_device::register_for_save_states()
 	save_item(NAME(m_romclk_hack_state));
 }
 
+
 /**********************************************************************************************
 
       printbits helper function: takes a long int input and prints the resulting bits to stderr
@@ -304,7 +305,6 @@ void tms5110_device::perform_dummy_read()
 		m_schedule_dummy_read = false;
 	}
 }
-
 
 
 
@@ -585,6 +585,7 @@ void tms5110_device::process(int16_t *buffer, unsigned int size)
 	}
 }
 
+
 /**********************************************************************************************
 
      clip_analog -- clips the 14 bit return value from the lattice filter to its final 10 bit value (-512 to 511), and upshifts/range extends this to 16 bits
@@ -595,7 +596,8 @@ static int16_t clip_analog(int16_t cliptemp)
 {
 	/* clipping, just like the patent shows:
 	 * the top 10 bits of this result are visible on the digital output IO pin.
-	 * next, if the top 3 bits of the 14 bit result are all the same, the lowest of those 3 bits plus the next 7 bits are the signed analog output, otherwise the low bits are all forced to match the inverse of the topmost bit, i.e.:
+	 * next, if the top 3 bits of the 14 bit result are all the same, the lowest of those 3 bits plus the next 7 bits are the signed analog output,
+	 * otherwise the low bits are all forced to match the inverse of the topmost bit, i.e.:
 	 * 1x xxxx xxxx xxxx -> 0b10000000
 	 * 11 1bcd efgh xxxx -> 0b1bcdefgh
 	 * 00 0bcd efgh xxxx -> 0b0bcdefgh
@@ -633,6 +635,7 @@ static int16_t clip_analog(int16_t cliptemp)
      output, this makes almost no difference in the computation.
 
 **********************************************************************************************/
+
 static int32_t matrix_multiply(int32_t a, int32_t b)
 {
 	int32_t result;
@@ -647,6 +650,7 @@ static int32_t matrix_multiply(int32_t a, int32_t b)
 #endif
 	return result;
 }
+
 
 /**********************************************************************************************
 
@@ -721,7 +725,6 @@ int32_t tms5110_device::lattice_filter()
 #endif
 		return m_u[0];
 }
-
 
 
 
@@ -984,29 +987,6 @@ void tms5110_device::parse_frame()
 }
 
 
-#if 0
-/*This is an example word TEN taken from the TMS5110A datasheet*/
-static const unsigned int example_word_TEN[619]={
-/* 1*/1,0,0,0,  0,  0,0,0,0,0,  1,1,0,0,0,  0,0,0,1,0,  0,1,1,1,    0,1,0,1,
-/* 2*/1,0,0,0,  0,  0,0,0,0,0,  1,0,0,1,0,  0,0,1,1,0,  0,0,1,1,    0,1,0,1,
-/* 3*/1,1,0,0,  0,  1,0,0,0,0,  1,0,1,0,0,  0,1,0,1,0,  0,1,0,0,    1,0,1,0,    1,0,0,0,    1,0,0,1,    0,1,0,1,    0,0,1,  0,1,0,  0,1,1,
-/* 4*/1,1,1,0,  0,  0,1,1,1,1,  1,0,1,0,1,  0,1,1,1,0,  0,1,0,1,    0,1,1,1,    0,1,1,1,    1,0,1,1,    1,0,1,0,    0,1,1,  0,1,0,  0,1,1,
-/* 5*/1,1,1,0,  0,  1,0,0,0,0,  1,0,1,0,0,  0,1,1,1,0,  0,1,0,1,    1,0,1,0,    1,0,0,0,    1,1,0,0,    1,0,1,1,    1,0,0,  0,1,0,  0,1,1,
-/* 6*/1,1,1,0,  0,  1,0,0,0,1,  1,0,1,0,1,  0,1,1,0,1,  0,1,1,0,    0,1,1,1,    0,1,1,1,    1,0,1,0,    1,0,1,0,    1,1,0,  0,0,1,  1,0,0,
-/* 7*/1,1,1,0,  0,  1,0,0,1,0,  1,0,1,1,1,  0,1,1,1,0,  0,1,1,1,    0,1,1,1,    0,1,0,1,    0,1,1,0,    1,0,0,1,    1,1,0,  0,1,0,  0,1,1,
-/* 8*/1,1,1,0,  1,  1,0,1,0,1,
-/* 9*/1,1,1,0,  0,  1,1,0,0,1,  1,0,1,1,1,  0,1,0,1,1,  1,0,1,1,    0,1,1,1,    0,1,0,0,    1,0,0,0,    1,0,0,0,    1,1,0,  0,1,1,  0,1,1,
-/*10*/1,1,0,1,  0,  1,1,0,1,0,  1,0,1,0,1,  0,1,1,0,1,  1,0,1,1,    0,1,0,1,    0,1,0,0,    1,0,0,0,    1,0,1,0,    1,1,0,  0,1,0,  1,0,0,
-/*11*/1,0,1,1,  0,  1,1,0,1,1,  1,0,0,1,1,  1,0,0,1,0,  0,1,1,0,    0,0,1,1,    0,1,0,1,    1,0,0,1,    1,0,1,0,    1,0,0,  0,1,1,  0,1,1,
-/*12*/1,0,0,0,  0,  1,1,1,0,0,  1,0,0,1,1,  0,0,1,1,0,  0,1,0,0,    0,1,1,0,    1,1,0,0,    0,1,0,1,    1,0,0,0,    1,0,0,  0,1,0,  1,0,1,
-/*13*/0,1,1,1,  1,  1,1,1,0,1,
-/*14*/0,1,1,1,  0,  1,1,1,1,0,  1,0,0,1,1,  0,0,1,1,1,  0,1,0,1,    0,1,0,1,    1,1,0,0,    0,1,1,1,    1,0,0,0,    1,0,0,  0,1,0,  1,0,1,
-/*15*/0,1,1,0,  0,  1,1,1,1,0,  1,0,1,0,1,  0,0,1,1,0,  0,1,0,0,    0,0,1,1,    1,1,0,0,    1,0,0,1,    0,1,1,1,    1,0,1,  0,1,0,  1,0,1,
-/*16*/1,1,1,1
-};
-#endif
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -1109,7 +1089,8 @@ void tms5110_device::device_reset()
 /******************************************************************************
 
      tms5110_ctl_w -- write Control Command to the sound chip
-commands like Speech, Reset, etc., are loaded into the chip via the CTL pins
+
+     commands like Speech, Reset, etc., are loaded into the chip via the CTL pins
 
 ******************************************************************************/
 
@@ -1178,7 +1159,7 @@ uint8_t m58817_device::status_r()
 {
 	/* bring up to date first */
 	m_stream->update();
-	return (TALK_STATUS() << 0); /*CTL1 = still talking ? */
+	return (TALK_STATUS() << 0); /* CTL1 = still talking ? */
 }
 
 TIMER_CALLBACK_MEMBER(tms5110_device::romclk_hack_toggle)
@@ -1207,13 +1188,9 @@ int tms5110_device::romclk_hack_r()
 
 /******************************************************************************
 
-     tms5110_update -- update the sound chip so that it is in sync with CPU execution
+     sound_stream_update -- update the sound chip so that it is in sync with CPU execution
 
 ******************************************************************************/
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
 
 void tms5110_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
@@ -1238,7 +1215,7 @@ void tms5110_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 /******************************************************************************
 
-     tms5110_set_frequency -- adjusts the playback frequency
+     device_clock_changed -- adjusts the playback frequency
 
 ******************************************************************************/
 
@@ -1493,18 +1470,18 @@ m58817_device::m58817_device(const machine_config &mconfig, const char *tag, dev
 DEFINE_DEVICE_TYPE(TMSPROM, tmsprom_device, "tmsprom", "TMSPROM")
 
 tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TMSPROM, tag, owner, clock),
-		m_rom(*this, DEVICE_SELF),
-		m_prom(*this, finder_base::DUMMY_TAG),
-		m_rom_size(0),
-		m_pdc_bit(0),
-		m_ctl1_bit(0),
-		m_ctl2_bit(0),
-		m_ctl4_bit(0),
-		m_ctl8_bit(0),
-		m_reset_bit(0),
-		m_stop_bit(0),
-		m_pdc_cb(*this),
-		m_ctl_cb(*this)
+	: device_t(mconfig, TMSPROM, tag, owner, clock)
+	, m_rom(*this, DEVICE_SELF)
+	, m_prom(*this, finder_base::DUMMY_TAG)
+	, m_rom_size(0)
+	, m_pdc_bit(0)
+	, m_ctl1_bit(0)
+	, m_ctl2_bit(0)
+	, m_ctl4_bit(0)
+	, m_ctl8_bit(0)
+	, m_reset_bit(0)
+	, m_stop_bit(0)
+	, m_pdc_cb(*this)
+	, m_ctl_cb(*this)
 {
 }

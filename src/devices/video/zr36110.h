@@ -3,8 +3,8 @@
 
 // Zoran ZR36110 mpeg video decoder
 
-#ifndef MAME_VIDEO_ZR36110
-#define MAME_VIDEO_ZR36110
+#ifndef MAME_VIDEO_ZR36110_H
+#define MAME_VIDEO_ZR36110_H
 
 #pragma once
 
@@ -95,5 +95,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ZR36110, zr36110_device)
 
-#endif
-
+#endif // MAME_VIDEO_ZR36110_H

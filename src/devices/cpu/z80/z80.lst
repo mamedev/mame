@@ -40,9 +40,9 @@ macro   wm16
 
 macro   wm16_sp
 	SP--;
-	m_memrq_cycles !! data_write(SP, TDAT_H);
+	m_memrq_cycles !! stack_write(SP, TDAT_H);
 	SP--;
-	m_memrq_cycles !! data_write(SP, TDAT_L);
+	m_memrq_cycles !! stack_write(SP, TDAT_L);
 
 macro   rop
 	m_m1_cycles-2 !! TDAT8 = opcode_read();
@@ -73,9 +73,9 @@ macro   eay
 	m_ea = (u16)(IY + (s8)TDAT8); WZ = m_ea;
 
 macro   pop
-	m_memrq_cycles !! TDAT_L = data_read(SP);
+	m_memrq_cycles !! TDAT_L = stack_read(SP);
 	SP++;
-	m_memrq_cycles !! TDAT_H = data_read(SP);
+	m_memrq_cycles !! TDAT_H = stack_read(SP);
 	SP++;
 
 macro   push
@@ -85,11 +85,13 @@ macro   push
 macro   jp
 	call arg16
 	PC = TDAT; WZ = PC;
+	m_branch_cb(true);
 
 macro   jp_cond
 	if (TDAT8) {
 		call arg16
 		PC = TDAT; WZ = PC;
+		m_branch_cb(true);
 	} else {
 		// implicit do PC += 2
 		call arg16
@@ -101,6 +103,7 @@ macro   jr
 	TADR = PC-1;
 	5 * call nomreq_addr
 	PC += (s8)TDAT8; WZ = PC;
+	m_branch_cb(true);
 
 macro   r800:jr
 	call arg
@@ -163,7 +166,9 @@ macro   z80n:retn
 
 macro   reti
 	call pop
-	PC = TDAT; WZ = PC; m_iff1 = m_iff2; daisy_call_reti_device();
+	PC = TDAT; WZ = PC; m_iff1 = m_iff2;
+	m_reti_cb(true);
+	daisy_call_reti_device();
 
 macro   ld_r_a
 	call nomreq_ir 1
@@ -534,6 +539,7 @@ macro   take_interrupt
 	m_r++;
 	{
 		// fetch the IRQ vector
+		m_irqfetch_cb(true);
 		device_z80daisy_interface *intf = daisy_get_irq_device();
 		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
 		LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
@@ -678,14 +684,16 @@ ffff
 	call check_interrupts
 	m_after_ei = false;
 	m_after_ldair = false;
-	PRVPC = PC;
-	debugger_instruction_hook(PC);
-	call rop
 	if (m_halt) {
+		debugger_wait_hook();
+		call rop
 		PC--;
 		m_ref = 0xffff00;
 		return;
 	} else {
+		PRVPC = PC;
+		debugger_instruction_hook(PC);
+		call rop
 		m_ref = (0x00 << 16) | (TDAT8 << 8);
 		return;
 	}

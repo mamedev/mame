@@ -104,8 +104,8 @@ private:
   The palette PROMs are connected to the RGB output this way:
 
   bit 7 -- 220  ohm resistor  -- \
-        -- 470  ohm resistor  -- | -- 470 ohm pulldown resistor -- GREEN
-        -- 1   kohm resistor  -- |
+        -- 1   kohm resistor  -- | -- 470 ohm pulldown resistor -- GREEN
+        -- 470  ohm resistor  -- |
         -- 2.2 kohm resistor  -- /
         -- 220  ohm resistor  -- \
         -- 470  ohm resistor  -- | -- 470 ohm pulldown resistor -- RED
@@ -146,8 +146,8 @@ void finalizr_state::palette(palette_device &palette) const
 
 		// green component
 		bit0 = BIT(color_prom[i], 4);
-		bit1 = BIT(color_prom[i], 5);
-		bit2 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 5);
 		bit3 = BIT(color_prom[i], 7);
 		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
 

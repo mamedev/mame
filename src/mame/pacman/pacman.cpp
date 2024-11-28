@@ -975,22 +975,35 @@ void pacman_state::superabc_bank_w(uint8_t data)
   Furthermore the ROM encryption bit flip is not used.
 */
 
-#define mspacman_enable_decode_latch(m)  m.root_device().membank("bank1")->set_entry(1)
-#define mspacman_disable_decode_latch(m) m.root_device().membank("bank1")->set_entry(0)
+// any access to these ROM addresses enables the decoder, and you'll see the Ms. Pac-Man code
+
+void pacman_state::mspacman_enable_decode_w(uint8_t data)
+{
+	membank("bank1")->set_entry(1);
+}
+
+template<unsigned Delta>
+uint8_t pacman_state::mspacman_enable_decode_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		mspacman_enable_decode_w();
+	return memregion("maincpu")->base()[offset + Delta];
+}
 
 // any access to these ROM addresses disables the decoder, and all you see is the original Pac-Man code
-uint8_t pacman_state::mspacman_disable_decode_r_0x0038(offs_t offset){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x0038]; }
-uint8_t pacman_state::mspacman_disable_decode_r_0x03b0(offs_t offset){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x03b0]; }
-uint8_t pacman_state::mspacman_disable_decode_r_0x1600(offs_t offset){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x1600]; }
-uint8_t pacman_state::mspacman_disable_decode_r_0x2120(offs_t offset){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x2120]; }
-uint8_t pacman_state::mspacman_disable_decode_r_0x3ff0(offs_t offset){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x3ff0]; }
-uint8_t pacman_state::mspacman_disable_decode_r_0x8000(offs_t offset){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x8000]; }
-uint8_t pacman_state::mspacman_disable_decode_r_0x97f0(offs_t offset){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x97f0]; }
-void pacman_state::mspacman_disable_decode_w(uint8_t data){ mspacman_disable_decode_latch(machine()); }
 
-// any access to these ROM addresses enables the decoder, and you'll see the Ms. Pac-Man code
-uint8_t pacman_state::mspacman_enable_decode_r_0x3ff8(offs_t offset){ mspacman_enable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x3ff8+0x10000]; }
-void pacman_state::mspacman_enable_decode_w(uint8_t data){ mspacman_enable_decode_latch(machine()); }
+void pacman_state::mspacman_disable_decode_w(uint8_t data)
+{
+	membank("bank1")->set_entry(0);
+}
+
+template<unsigned Delta>
+uint8_t pacman_state::mspacman_disable_decode_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		mspacman_disable_decode_w();
+	return memregion("maincpu")->base()[offset + Delta];
+}
 
 
 uint8_t pacman_state::pacman_read_nop()
@@ -1084,14 +1097,14 @@ void pacman_state::mspacman_map(address_map &map)
 	map(0x50c0, 0x50c0).mirror(0xaf3f).portr("DSW2");
 
 	/* overlay decode enable/disable on top */
-	map(0x0038, 0x003f).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x0038), FUNC(pacman_state::mspacman_disable_decode_w));
-	map(0x03b0, 0x03b7).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x03b0), FUNC(pacman_state::mspacman_disable_decode_w));
-	map(0x1600, 0x1607).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x1600), FUNC(pacman_state::mspacman_disable_decode_w));
-	map(0x2120, 0x2127).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x2120), FUNC(pacman_state::mspacman_disable_decode_w));
-	map(0x3ff0, 0x3ff7).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x3ff0), FUNC(pacman_state::mspacman_disable_decode_w));
-	map(0x3ff8, 0x3fff).rw(FUNC(pacman_state::mspacman_enable_decode_r_0x3ff8), FUNC(pacman_state::mspacman_enable_decode_w));
-	map(0x8000, 0x8007).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x8000), FUNC(pacman_state::mspacman_disable_decode_w));
-	map(0x97f0, 0x97f7).rw(FUNC(pacman_state::mspacman_disable_decode_r_0x97f0), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x0038, 0x003f).rw(FUNC(pacman_state::mspacman_disable_decode_r<0x0038>), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x03b0, 0x03b7).rw(FUNC(pacman_state::mspacman_disable_decode_r<0x03b0>), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x1600, 0x1607).rw(FUNC(pacman_state::mspacman_disable_decode_r<0x1600>), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x2120, 0x2127).rw(FUNC(pacman_state::mspacman_disable_decode_r<0x2120>), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x3ff0, 0x3ff7).rw(FUNC(pacman_state::mspacman_disable_decode_r<0x3ff0>), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x3ff8, 0x3fff).rw(FUNC(pacman_state::mspacman_enable_decode_r<0x3ff8>), FUNC(pacman_state::mspacman_enable_decode_w));
+	map(0x8000, 0x8007).rw(FUNC(pacman_state::mspacman_disable_decode_r<0x8000>), FUNC(pacman_state::mspacman_disable_decode_w));
+	map(0x97f0, 0x97f7).rw(FUNC(pacman_state::mspacman_disable_decode_r<0x97f0>), FUNC(pacman_state::mspacman_disable_decode_w));
 }
 
 

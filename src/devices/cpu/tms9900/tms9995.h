@@ -7,8 +7,8 @@
   Also see tms9900.h for types of TMS99xx processors.
 */
 
-#ifndef MAME_CPU_TMS9995_TMS9995_H
-#define MAME_CPU_TMS9995_TMS9995_H
+#ifndef MAME_CPU_TMS9900_TMS9995_H
+#define MAME_CPU_TMS9900_TMS9995_H
 
 #pragma once
 
@@ -416,4 +416,4 @@ public:
 	}
 };
 
-#endif // MAME_CPU_TMS9995_TMS9995_H
+#endif // MAME_CPU_TMS9900_TMS9995_H

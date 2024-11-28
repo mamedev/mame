@@ -1,23 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders: Mike Coates, Pierpaolo Prazzoli
 
-/************************************************************************
+/*******************************************************************************
 
-  Zaccaria S2650 '80s games
+Zaccaria Quasar
 
-  Driver by Mike Coates and Pierpaolo Prazzoli
+Driver by Mike Coates and Pierpaolo Prazzoli
 
-  TODO:
+TODO:
+- Missing enemy shooting sound effect, needs netlist?
+- Where is the flipscreen signal?
+- Test/service input isn't working?
 
-  Quasar
-  ------
-  - Sound (missing invader effect - still not sure all noise in correct places)
-  - Phase 3 - seems awfully hard - dip settings ?
-  - Hook up Coin Counter
-  - Test/Service Mode - not working?
-  - No attract demo? is this correct?
+It's picky about vblank duration: If it's too short, parts of the game run too
+slow. Or if it's too long, parts of the game run too fast, and eg. the 3rd level
+becomes nearly unbeatable. The implemented duration of 3500us approximately
+matches what was seen on a PCB video.
 
-************************************************************************
+********************************************************************************
 
 Quasar by Zaccaria (1980)
 
@@ -29,11 +29,10 @@ Quasar by Zaccaria (1980)
 
 I8085 Sound Board
 
-************************************************************************/
+*******************************************************************************/
 
 
 #include "emu.h"
-
 #include "cvs_base.h"
 
 #include "cpu/mcs48/mcs48.h"
@@ -48,6 +47,7 @@ class quasar_state : public cvs_base_state
 public:
 	quasar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cvs_base_state(mconfig, type, tag)
+		, m_audiocpu(*this, "audiocpu")
 		, m_soundlatch(*this, "soundlatch")
 		, m_in(*this, "IN%u", 0U)
 		, m_dsw(*this, "DSW%u", 0U)
@@ -56,12 +56,16 @@ public:
 
 	void quasar(machine_config &config) ATTR_COLD;
 
+	// sound test switch is tied to mcu interrupt pin
+	DECLARE_INPUT_CHANGED_MEMBER(soundtest_switch) { m_audiocpu->set_input_line(0, newval ? CLEAR_LINE : ASSERT_LINE); }
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	required_device<i8035_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_ioport_array<2> m_in;
@@ -91,8 +95,27 @@ private:
 	void sound_portmap(address_map &map) ATTR_COLD;
 };
 
+void quasar_state::machine_start()
+{
+	cvs_base_state::machine_start();
 
-/***************************************************************************
+	// register state save
+	save_item(NAME(m_effectcontrol));
+	save_item(NAME(m_page));
+	save_item(NAME(m_io_page));
+}
+
+void quasar_state::machine_reset()
+{
+	cvs_base_state::machine_reset();
+
+	m_effectcontrol = 0;
+	m_page = 0;
+	m_io_page = 8;
+}
+
+
+/*******************************************************************************
 
   Zaccaria S2650 games share various levels of design with the Century Video
   System (CVS) games, and hence some routines are shared from there.
@@ -102,7 +125,7 @@ private:
 
   Zaccaria are an Italian company, Century were based in Manchester UK
 
-***************************************************************************/
+*******************************************************************************/
 
 void quasar_state::palette(palette_device &palette) const
 {
@@ -118,33 +141,29 @@ void quasar_state::palette(palette_device &palette) const
 		int bit0, bit1, bit2;
 
 		// red component
-		bit0 = BIT(i, 0);
-		bit1 = BIT(i, 1);
-		bit2 = BIT(i, 2);
+		bit0 = BIT(i, 7);
+		bit1 = BIT(i, 6);
+		bit2 = BIT(i, 5);
 		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// green component
-		bit0 = BIT(i, 3);
-		bit1 = BIT(i, 4);
-		bit2 = BIT(i, 5);
+		bit0 = BIT(i, 4);
+		bit1 = BIT(i, 3);
+		bit2 = BIT(i, 2);
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = BIT(i, 6);
-		bit1 = BIT(i, 7);
+		bit0 = BIT(i, 1);
+		bit1 = BIT(i, 0);
 		int const b = 0x4f * bit0 + 0xa8 * bit1;
 
-		// intensity 0
-		palette.set_indirect_color(0x100 + i, rgb_t::black());
-
-		// intensity 1
-		palette.set_indirect_color(0x200 + i, rgb_t(r >> 2, g >> 2, b >> 2));
-
-		// intensity 2
-		palette.set_indirect_color(0x300 + i, rgb_t((r >> 2) + (r >> 3), (g >> 2) + (g >> 3), (b >> 2) + (b >> 2)));
-
-		// intensity 3
-		palette.set_indirect_color(0x400 + i, rgb_t(r >> 1, g >> 1, b >> 1));
+		// 4 intensities
+		float level = 0.0f;
+		for (int j = 0; j < 4; j++)
+		{
+			palette.set_indirect_color(0x100 * (j + 1) + i, rgb_t(r * level, g * level, b * level));
+			level += 0.2f;
+		}
 	}
 
 	// Address 0-2 from graphic ROM
@@ -184,7 +203,6 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 		// While we have the current character code, draw the effects layer
 		// intensity / on and off controlled by latch
-
 		int const forecolor = 0x208 + m_effectram[offs] + (256 * (((m_effectcontrol >> 4) ^ 3) & 3));
 
 		for (int ox = 0; ox < 8; ox++)
@@ -197,7 +215,6 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				m_color_ram[offs] & 0x3f,
 				0, 0,
 				x, y, 0);
-
 
 		// background for Collision Detection (it can only hit certain items)
 		if ((m_color_ram[offs] & 7) == 0)
@@ -220,19 +237,22 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		if (m_bullet_ram[offs] != 0)
 		{
-			for (int ct = 0; ct < 1; ct++)
+			for (int ct = 0; ct < 4; ct++)
 			{
-				int const bx = 255 - 9 - m_bullet_ram[offs] - ct;
+				int const bx = 255 - 8 - m_bullet_ram[offs] - (ct & 1);
+				int const by = offs - (ct >> 1);
 
-				// bullet/object Collision
-				if (s2636_0_bitmap.pix(offs, bx) != 0) m_collision_register |= 0x04;
-				if (s2636_2_bitmap.pix(offs, bx) != 0) m_collision_register |= 0x08;
+				if (cliprect.contains(bx, by))
+				{
+					// bullet/object Collision
+					if (s2636_0_bitmap.pix(by, bx) != 0) m_collision_register |= 0x04;
+					if (s2636_2_bitmap.pix(by, bx) != 0) m_collision_register |= 0x08;
 
-				bitmap.pix(offs, bx) = 7;
+					bitmap.pix(by, bx) = 7;
+				}
 			}
 		}
 	}
-
 
 	// mix and copy the S2636 images into the main bitmap, also check for collision
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
@@ -263,15 +283,14 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-/************************************************************************
+/*******************************************************************************
 
   Quasar memory layout
 
   Paging for screen is controlled by OUT to 0,1,2 or 3
-
   Paging for IO ports is controlled by OUT to 8,9,A or B
 
-************************************************************************/
+*******************************************************************************/
 
 void quasar_state::video_page_select_w(offs_t offset, uint8_t data)
 {
@@ -281,58 +300,44 @@ void quasar_state::video_page_select_w(offs_t offset, uint8_t data)
 void quasar_state::io_page_select_w(offs_t offset, uint8_t data)
 {
 	m_io_page = offset & 0x03;
+
+	if (offset == 0)
+	{
+		// coincounters are here, they keep triggering if the coin is held active (hence the PORT_IMPULSE)
+		machine().bookkeeping().coin_counter_w(0, BIT(~data, 3));
+		machine().bookkeeping().coin_counter_w(1, BIT(~data, 2));
+	}
 }
 
 void quasar_state::video_w(offs_t offset, uint8_t data)
 {
 	switch (m_page)
 	{
-	case 0:  m_video_ram[offset] = data; break;
-	case 1:  m_color_ram[offset] = data & 7; break; // 3 bits of ram only - 3 x 2102
-	case 2:  m_effectram[offset] = data; break;
-	case 3:  m_effectcontrol = data; break;
+		case 0: m_video_ram[offset] = data; break;
+		case 1: m_color_ram[offset] = data & 7; break; // 3 bits of ram only - 3 x 2102
+		case 2: m_effectram[offset] = data; break;
+		case 3: m_effectcontrol = data; break;
 	}
 }
 
 uint8_t quasar_state::io_r()
 {
-	uint8_t ans = 0;
+	uint8_t data = 0;
 
 	switch (m_io_page)
 	{
-	case 0:  ans = m_in[0]->read(); break;
-	case 1:  ans = m_in[1]->read(); break;
-	case 2:  ans = m_dsw[0]->read(); break;
-	case 3:  ans = m_dsw[1]->read(); break;
+		case 0: data = m_in[0]->read(); break;
+		case 1: data = m_in[1]->read(); break;
+		case 2: data = m_dsw[0]->read(); break;
+		case 3: data = m_dsw[1]->read(); break;
 	}
 
-	return ans;
+	return data;
 }
 
 void quasar_state::bullet_w(offs_t offset, uint8_t data)
 {
-	m_bullet_ram[offset] = (data ^ 0xff);
-}
-
-void quasar_state::sh_command_w(uint8_t data)
-{
-	// bit 4 = Sound Invader : Linked to an NE555V circuit
-	// Not handled yet
-
-	// lower nibble = command to I8035
-	// not necessarily like this, but it seems to work better than direct mapping
-	// (although schematics has it as direct - but then the schematics are wrong elsewhere to!)
-	m_soundlatch->write((data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
-}
-
-uint8_t quasar_state::sh_command_r()
-{
-	return m_soundlatch->read() + (m_dsw[2]->read() & 0x30);
-}
-
-int quasar_state::audio_t1_r()
-{
-	return (m_soundlatch->read() == 0);
+	m_bullet_ram[offset] = data ^ 0xff;
 }
 
 // memory map taken from the manual
@@ -340,7 +345,7 @@ int quasar_state::audio_t1_r()
 void quasar_state::program(address_map &map)
 {
 	map(0x0000, 0x13ff).rom();
-	map(0x1400, 0x14ff).ram().w(FUNC(quasar_state::bullet_w)).share(m_bullet_ram);
+	map(0x1400, 0x14ff).mirror(0x6000).ram().w(FUNC(quasar_state::bullet_w)).share(m_bullet_ram);
 	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1600, 0x16ff).mirror(0x6000).rw(m_s2636[1], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
 	map(0x1700, 0x17ff).mirror(0x6000).rw(m_s2636[2], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
@@ -360,14 +365,35 @@ void quasar_state::io(address_map &map)
 void quasar_state::data(address_map &map)
 {
 	map(S2650_CTRL_PORT, S2650_CTRL_PORT).r(FUNC(quasar_state::collision_r)).nopw();
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(quasar_state::collision_clear), FUNC(quasar_state::sh_command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(quasar_state::collision_clear_r), FUNC(quasar_state::sh_command_w));
 }
 
-/*************************************
- *
- *  Sound board memory handlers
- *
- *************************************/
+
+/*******************************************************************************
+
+  Sound board memory handlers
+
+*******************************************************************************/
+
+void quasar_state::sh_command_w(uint8_t data)
+{
+	// bit 4 = Sound Invader : Linked to an NE555V circuit
+	// Not handled yet
+
+	// lower nibble = command to I8035
+	m_soundlatch->write(data & 0xf);
+}
+
+uint8_t quasar_state::sh_command_r()
+{
+	return m_soundlatch->read() | (m_dsw[2]->read() & 0x30);
+}
+
+int quasar_state::audio_t1_r()
+{
+	// all 4 sound bits are NANDed together
+	return m_soundlatch->read() == 0;
+}
 
 void quasar_state::sound_map(address_map &map)
 {
@@ -380,104 +406,91 @@ void quasar_state::sound_portmap(address_map &map)
 	map(0x80, 0x80).r(FUNC(quasar_state::sh_command_r));
 }
 
-/************************************************************************
 
-  Inputs
+/*******************************************************************************
 
-************************************************************************/
+  Input Ports
+
+*******************************************************************************/
 
 static INPUT_PORTS_START( quasar )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )            // test switch
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) // test switch?
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            // table (from manual)
+	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Upright ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )            // count enable (from manual)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // count enable (from manual)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coin_A ) )           // confirmed
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )           // confirmed
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) )     PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x30, 0x00, "Number of Rockets" )         // confirmed
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coin_A ) )     PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) )      PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Free_Play ) ) // requires initial coin, but doesn't decrease coins on game over
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Free_Play ) )  PORT_DIPLOCATION("SW1:7") // requires initial coin, but doesn't decrease coins on game over
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )                 // confirmed
-	PORT_DIPSETTING(    0x00, "Collisions excluded" )
-	PORT_DIPSETTING(    0x80, "Collisions included" )
+	PORT_DIPNAME( 0x80, 0x80, "Collision Detection" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x01, "High Score" )
-	PORT_DIPSETTING(    0x00, "No H.S." ) // this option only wants bit 0 OFF
-	PORT_DIPSETTING(    0x01, "Normal H.S." )
-	PORT_DIPSETTING(    0x03, "Low H.S." )
-	PORT_DIPSETTING(    0x05, "Medium H.S." )
-	PORT_DIPSETTING(    0x07, "High H.S." )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Difficult ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x60, 0x20, "Extended Play" )
-	PORT_DIPSETTING(    0x20, "5500" )                      // confirmed
+	PORT_DIPNAME( 0x01, 0x01, "High Score" )          PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, "Random" )
+	PORT_DIPNAME( 0x06, 0x04, "Random H.S." )         PORT_DIPLOCATION("SW2:2,3") // only if high score is set to random
+	PORT_DIPSETTING(    0x02, DEF_STR( Low ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x06, "Medium-High" )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x60, 0x40, "Extended Play" )       PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x20, "5500" )
 	PORT_DIPSETTING(    0x40, "7500" )
 	PORT_DIPSETTING(    0x60, "9500" )
-	PORT_DIPSETTING(    0x00, "17500" )
-	PORT_DIPNAME( 0x80, 0x80, "Full Screen Rocket" )        // confirmed
-	PORT_DIPSETTING(    0x80, "Stop at edge" )
-	PORT_DIPSETTING(    0x00, "Wrap Around" )
+	PORT_DIPNAME( 0x80, 0x80, "Rocket At Edge" )      PORT_DIPLOCATION("SW2:8") // only for phase 2 (the Asteroids style level)
+	PORT_DIPSETTING(    0x80, "Stop" )
+	PORT_DIPSETTING(    0x00, "Wrap" )
 
 	PORT_START("DSW2")
-#if 0
-	PORT_DIPNAME( 0x0f, 0x00, "Noise to play" )
-	PORT_DIPSETTING(    0x00, "00" )
-	PORT_DIPSETTING(    0x01, "01" )
-	PORT_DIPSETTING(    0x02, "02" )
-	PORT_DIPSETTING(    0x03, "03" )
-	PORT_DIPSETTING(    0x04, "04" )
-	PORT_DIPSETTING(    0x05, "05" )
-	PORT_DIPSETTING(    0x06, "06" )
-	PORT_DIPSETTING(    0x07, "07" )
-	PORT_DIPSETTING(    0x08, "08" )
-	PORT_DIPSETTING(    0x09, "09" )
-	PORT_DIPSETTING(    0x0a, "0A" )
-	PORT_DIPSETTING(    0x0b, "0B" )
-	PORT_DIPSETTING(    0x0c, "0C" )
-	PORT_DIPSETTING(    0x0d, "0D" )
-	PORT_DIPSETTING(    0x0e, "0E" )
-	PORT_DIPSETTING(    0x0f, "0F" )
-#endif
-	PORT_DIPNAME( 0x10, 0x10, "Sound Test" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x01, 0x01, "Sound Test" )          PORT_DIPLOCATION("SOUND:1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(quasar_state::soundtest_switch), 0)
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
+	PORT_DIPNAME( 0x30, 0x20, "Sound Program" )       PORT_DIPLOCATION("SOUND:3,4")
+	PORT_DIPSETTING(    0x00, "Invalid 1" )
+//  PORT_DIPSETTING(    0x10, "Invalid 1" )
+	PORT_DIPSETTING(    0x30, "Invalid 2" )
+	PORT_DIPSETTING(    0x20, "Quasar" )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -497,52 +510,35 @@ static GFXDECODE_START( gfx_quasar )
 	GFXDECODE_ENTRY( "tiles", 0x0000, charlayout, 0, 64+1 )
 GFXDECODE_END
 
-// ****************************************
-// Quasar S2650 Main CPU, I8035 sound board
-// ****************************************
 
-void quasar_state::machine_start()
-{
-	cvs_base_state::machine_start();
+/*******************************************************************************
 
-	// register state save
-	save_item(NAME(m_effectcontrol));
-	save_item(NAME(m_page));
-	save_item(NAME(m_io_page));
-}
+  Machine Configuration
 
-void quasar_state::machine_reset()
-{
-	cvs_base_state::machine_reset();
-
-	m_effectcontrol = 0;
-	m_page = 0;
-	m_io_page = 8;
-}
+*******************************************************************************/
 
 void quasar_state::quasar(machine_config &config)
 {
 	// basic machine hardware
-	S2650(config, m_maincpu, 14'318'000 / 4);  // 14 mhz crystal divide by 4 on board
+	S2650(config, m_maincpu, 14.318181_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quasar_state::program);
 	m_maincpu->set_addrmap(AS_IO, &quasar_state::io);
 	m_maincpu->set_addrmap(AS_DATA, &quasar_state::data);
 	m_maincpu->set_vblank_int("screen", FUNC(quasar_state::irq0_line_assert));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
-	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
+	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x0a; });
 
-	i8035_device &soundcpu(I8035(config, "soundcpu", 6'000'000)); // 6MHz crystal divide by 15 in CPU
-	soundcpu.set_addrmap(AS_PROGRAM, &quasar_state::sound_map);
-	soundcpu.set_addrmap(AS_IO, &quasar_state::sound_portmap);
-	soundcpu.t1_in_cb().set(FUNC(quasar_state::audio_t1_r));
-	soundcpu.p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
-
-	config.set_maximum_quantum(attotime::from_hz(6000));
+	i8035_device &audiocpu(I8035(config, "audiocpu", 6_MHz_XTAL));
+	audiocpu.set_addrmap(AS_PROGRAM, &quasar_state::sound_map);
+	audiocpu.set_addrmap(AS_IO, &quasar_state::sound_portmap);
+	audiocpu.t1_in_cb().set(FUNC(quasar_state::audio_t1_r));
+	audiocpu.p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(50); // From dot clock
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_refresh_hz(50); // from dot clock
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3500));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(1*8+1, 29*8-1, 2*8, 32*8-1);
 	m_screen->set_screen_update(FUNC(quasar_state::screen_update));
@@ -553,19 +549,29 @@ void quasar_state::quasar(machine_config &config)
 
 	S2636(config, m_s2636[0], 0);
 	m_s2636[0]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
+	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	S2636(config, m_s2636[1], 0);
 	m_s2636[1]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
+	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	S2636(config, m_s2636[2], 0);
 	m_s2636[2]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
+	m_s2636[2]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	// sound hardware
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	SPEAKER(config, "mono").front_center();
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.2); // LM1408
 }
+
+
+/*******************************************************************************
+
+  ROM Definitions
+
+*******************************************************************************/
 
 ROM_START( quasar )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -585,7 +591,7 @@ ROM_START( quasar )
 	ROM_LOAD( "3c_09.bin",    0x2c00, 0x0400, CRC(ef87c2cb) SHA1(1ba10dd3996c047e595c54a37c1abb44df3b63c6) )
 	ROM_LOAD( "2c_10.bin",    0x3000, 0x0400, CRC(be6c4f84) SHA1(b3a779457bd0d33ccb23c21a7e7cd4a6fc78bb7f) )
 
-	ROM_REGION( 0x1000, "soundcpu", 0 )
+	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "quasar.snd",   0x0000, 0x0800, CRC(9e489768) SHA1(a9f01ef0a6512543bbdfec56037f37a0440b2b94) )
 
 	ROM_REGION( 0x1800, "tiles", 0 )
@@ -615,7 +621,7 @@ ROM_START( quasara )
 	ROM_LOAD( "3c_09.bin",    0x2c00, 0x0400, CRC(ef87c2cb) SHA1(1ba10dd3996c047e595c54a37c1abb44df3b63c6) )
 	ROM_LOAD( "2c_10a.bin",   0x3000, 0x0400, CRC(a31c0435) SHA1(48e1c5da455610145310dfe4c6b6e4302b531876) ) // different from quasar set
 
-	ROM_REGION( 0x1000, "soundcpu", 0 )
+	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "quasar.snd",   0x0000, 0x0800, CRC(9e489768) SHA1(a9f01ef0a6512543bbdfec56037f37a0440b2b94) )
 
 	ROM_REGION( 0x1800, "tiles", 0 )
@@ -630,5 +636,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1980, quasar,   0,      quasar,   quasar, quasar_state, empty_init, ROT90, "Zaccaria / Zelco", "Quasar (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, quasara,  quasar, quasar,   quasar, quasar_state, empty_init, ROT90, "Zaccaria / Zelco", "Quasar (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, quasar,   0,      quasar,   quasar, quasar_state, empty_init, ROT90, "Zaccaria / Zelco", "Quasar (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, quasara,  quasar, quasar,   quasar, quasar_state, empty_init, ROT90, "Zaccaria / Zelco", "Quasar (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

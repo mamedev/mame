@@ -6,7 +6,7 @@
 
 ****************************************************************************/
 
-#ifndef MAME__Z37_FDC_H
+#ifndef MAME_BUS_HEATHZENITH_H89_Z37_FDC_H
 #define MAME_BUS_HEATHZENITH_H89_Z37_FDC_H
 
 #pragma once

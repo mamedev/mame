@@ -163,6 +163,7 @@ public:
 	airraid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_seibu_sound(*this, "seibu_sound")
 		, m_mainram(*this, "mainram")
 		, m_palette(*this, "palette")
@@ -179,6 +180,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<seibu_sound_device> m_seibu_sound;
 	required_shared_ptr<uint8_t> m_mainram;
 	required_device<palette_device> m_palette;
@@ -422,16 +424,16 @@ INPUT_PORTS_END
 void airraid_state::airraid(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(12'000'000) / 2);        // verified on PCB
+	Z80(config, m_maincpu, XTAL(12'000'000) / 2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &airraid_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(airraid_state::scanline), "airraid_vid:screen", 0, 1);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181) / 4));      // verified on PCB
-	audiocpu.set_addrmap(AS_PROGRAM, &airraid_state::sound_map);
-	audiocpu.set_addrmap(AS_OPCODES, &airraid_state::sound_decrypted_opcodes_map);
-	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
+	Z80(config, m_audiocpu, XTAL(14'318'181) / 4); // verified on PCB
+	m_audiocpu->set_addrmap(AS_PROGRAM, &airraid_state::sound_map);
+	m_audiocpu->set_addrmap(AS_OPCODES, &airraid_state::sound_decrypted_opcodes_map);
+	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 
@@ -446,7 +448,7 @@ void airraid_state::airraid(machine_config &config)
 	ymsnd.add_route(1, "mono", 0.50);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
-	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->set_rom_tag("audiocpu");
 	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));

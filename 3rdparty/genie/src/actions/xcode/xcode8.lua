@@ -68,21 +68,7 @@
 		end
 
 		local action = premake.action.current()
-		local get_opt = function(opt, def)
-			return (opt and #opt > 0) and opt or def
-		end
-
-		local iosversion = get_opt(cfg.iostargetplatformversion, action.xcode.iOSTargetPlatformVersion)
-		local macosversion = get_opt(cfg.macostargetplatformversion, action.xcode.macOSTargetPlatformVersion)
-		local tvosversion = get_opt(cfg.tvostargetplatformversion, action.xcode.tvOSTargetPlatformVersion)
-
-		if iosversion then
-			options.IPHONEOS_DEPLOYMENT_TARGET = iosversion
-		elseif macosversion then
-			options.MACOSX_DEPLOYMENT_TARGET = macosversion
-		elseif tvosversion then
-			options.TVOS_DEPLOYMENT_TARGET = tvosversion
-		end
+		xcode.setdeploymenttarget(cfg, action.xcode, options)
 
 		if cfg.kind == "Bundle" and not cfg.options.SkipBundling then
 			options.PRODUCT_BUNDLE_IDENTIFIER = "genie." .. cfg.buildtarget.basename:gsub("%s+", ".") --replace spaces with .

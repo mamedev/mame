@@ -42616,7 +42616,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="DX Okuman Chouja Game II - The Money Battle (Japan) [SLPS-01586].bin" size="169757952" crc="09b04af3" sha1="d0f17c077f741416b194cc89b39c7d367b4caaeb"/>
 		<rom name="DX Okuman Chouja Game II - The Money Battle (Japan) [SLPS-01586].cue" size="130" crc="67a26e81" sha1="c2ae62a84bccfa5052917a9c37679a1d86541f8f"/>
 		-->
-		<description>DX Okuman Chouja Game II - The Money Battle (Japan)</description>
+		<description>DX Okumanchouja Game II - The Money Battle (Japan)</description>
 		<year>1998</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="SLPS-01586" />

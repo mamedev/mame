@@ -22,9 +22,9 @@ public:
 	uint8_t ctrlram_r(offs_t offset);
 	void ctrl_w(offs_t offset, uint8_t data);
 
-	/* shall we move source in the interface? */
-	/* also notice that now we directly pass *gfx[chip] instead of **gfx !! */
-	void sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask, bool is_flakatck = false );
+	// shall we move source in the interface?
+	// also notice that now we directly pass *gfx[chip] instead of **gfx !!
+	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask);
 
 protected:
 	// device-level overrides

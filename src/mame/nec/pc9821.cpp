@@ -45,6 +45,11 @@
 #include "emu.h"
 #include "pc9821.h"
 
+// TODO: remove me, cfr. pc9801.cpp; verify that 9801 clocks are correct for 9821 series as well
+#define BASE_CLOCK      XTAL(31'948'800)    // verified for PC-9801RS/FA
+#define MAIN_CLOCK_X1   (BASE_CLOCK / 16)   // 1.9968 MHz
+#define MAIN_CLOCK_X2   (BASE_CLOCK / 13)   // 2.4576 MHz
+
 uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
@@ -394,6 +399,26 @@ void pc9821_state::pegc_mmio_map(address_map &map)
 //  map(0x120, 0x19f) pattern register (image_xfer? relates to bit 15 of $108)
 }
 
+// make sure the latch read doesn't occur mid cycle, 8253 needs this?
+void pc9821_state::pit_latch_delay(offs_t offset, uint8_t data)
+{
+	if((offset == 3) && !(data & 0x30))
+	{
+
+		m_pit_delay->adjust(attotime::from_hz(MAIN_CLOCK_X1/2));
+		m_maincpu->spin_until_time(attotime::from_hz(MAIN_CLOCK_X1/2));
+		m_maincpu->abort_timeslice();
+		m_pit_latch_cmd = data;
+		return;
+	}
+	m_pit->write(offset, data);
+}
+
+TIMER_CALLBACK_MEMBER(pc9821_state::pit_delay)
+{
+	m_pit->write(3, m_pit_latch_cmd);
+}
+
 void pc9821_state::pc9821_map(address_map &map)
 {
 	pc9801bx2_map(map);
@@ -422,13 +447,15 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0040, 0x0043).rw(m_sio_kbd, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); //i8255 printer port / i8251 keyboard
 //  map(0x0050, 0x0053).w(FUNC(pc9821_state::nmi_ctrl_w)).umask32(0x00ff00ff);
 //  map(0x005c, 0x005f).r(FUNC(pc9821_state::timestamp_r)).nopw(); // artic
+	map(0x005c, 0x005f).lw8([this](offs_t o) { m_maincpu->spin_until_time(attotime::from_hz(MAIN_CLOCK_X1/3)); m_maincpu->abort_timeslice();}, "bus delay"); // simulate bus delay
 //  map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask32(0x00ff00ff); //upd7220 character ports / <undefined>
 //  map(0x0060, 0x0063).r(FUNC(pc9821_state::unk_r)).umask32(0xff00ff00); // mouse related (unmapped checking for AT keyb controller\PS/2 mouse?)
 //  map(0x0064, 0x0064).w(FUNC(pc9821_state::vrtc_clear_w));
 	map(0x0068, 0x006b).w(FUNC(pc9821_state::pc9821_video_ff_w)).umask32(0x00ff00ff); //mode FF / <undefined>
 	map(0x006c, 0x006d).w(FUNC(pc9821_state::border_color_w)).umask16(0x00ff);
 	map(0x006e, 0x006f).w(FUNC(pc9821_state::pc9821_mode_ff_w)).umask16(0x00ff);
-//  map(0x0070, 0x007f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00);
+	map(0x0070, 0x007f).r(m_pit, FUNC(pit8253_device::read)).umask16(0xff00);
+	map(0x0070, 0x007f).w(FUNC(pc9821_state::pit_latch_delay)).umask16(0xff00);
 //  map(0x0070, 0x007f).rw(FUNC(pc9821_state::grcg_r), FUNC(pc9821_state::grcg_w)).umask32(0x00ff00ff); //display registers "GRCG" / i8253 pit
 	map(0x0090, 0x0093).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
 	map(0x0094, 0x0094).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
@@ -466,7 +493,8 @@ void pc9821_state::pc9821_io(address_map &map)
 //  map(0x0cfc, 0x0cff) PCI bus
 	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
 	map(0x2ed0, 0x2edf).lr8(NAME([] (address_space &s, offs_t o, u8 mm) { return 0xff; })).umask32(0xffffffff); // unknown sound related
-//  map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
+	map(0x3fd8, 0x3fdf).r(m_pit, FUNC(pit8253_device::read)).umask16(0xff00);
+	map(0x3fd8, 0x3fdf).w(FUNC(pc9821_state::pit_latch_delay)).umask16(0xff00);
 //  map(0x7fd8, 0x7fdf).rw(m_ppi_mouse, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
 //  map(0x841c, 0x8f1f).rw(FUNC(pc9821_state::sdip_r<0x0>), FUNC(pc9821_state::sdip_w<0x0>));
 //  map(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
@@ -721,6 +749,7 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(pc9821_state,pc9821)
 {
+	m_pit_delay = timer_alloc(FUNC(pc9821_state::pit_delay), this);
 	MACHINE_START_CALL_MEMBER(pc9801bx2);
 
 	// ...
@@ -749,11 +778,6 @@ MACHINE_RESET_MEMBER(pc9821_state,pc9821)
 }
 
 // TODO: setter for DMAC clock should follow up whatever is the CPU clock
-
-// TODO: remove me, cfr. pc9801.cpp; verify that 9801 clocks are correct for 9821 series as well
-#define BASE_CLOCK      XTAL(31'948'800)    // verified for PC-9801RS/FA
-#define MAIN_CLOCK_X1   (BASE_CLOCK / 16)   // 1.9968 MHz
-#define MAIN_CLOCK_X2   (BASE_CLOCK / 13)   // 2.4576 MHz
 
 void pc9821_state::pc9821(machine_config &config)
 {
@@ -806,7 +830,7 @@ void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_a_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
+	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 }
@@ -820,7 +844,7 @@ void pc9821_canbe_state::pc9821ce2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
+	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 	m_cbus[0]->set_default_option("pc9801_118");
 
@@ -836,7 +860,7 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_canbe_state::pc9821cx3_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
+	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 //  m_cbus[0]->set_default_option(nullptr);
 	m_cbus[0]->set_default_option("pc9801_118");

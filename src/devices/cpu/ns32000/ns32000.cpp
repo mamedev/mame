@@ -999,6 +999,7 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 	{
 		if (m_wait)
 		{
+			debugger_wait_hook();
 			m_icount = 0;
 			continue;
 		}

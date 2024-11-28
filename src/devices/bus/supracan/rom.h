@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:
-#ifndef MAME_BUS_SUPERACAN_ROM_H
-#define MAME_BUS_SUPERACAN_ROM_H
+#ifndef MAME_BUS_SUPRACAN_ROM_H
+#define MAME_BUS_SUPRACAN_ROM_H
 
 #pragma once
 
@@ -43,4 +43,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SUPERACAN_ROM_STD,   superacan_rom_device)
 
-#endif // MAME_BUS_SUPERACAN_ROM_H
+#endif // MAME_BUS_SUPRACAN_ROM_H

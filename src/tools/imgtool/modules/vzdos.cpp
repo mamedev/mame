@@ -19,6 +19,7 @@
 #include "multibyte.h"
 #include "opresolv.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
@@ -51,20 +52,21 @@ as track map, with one bit for each sector used.
 /* vzdos directry entry */
 struct vzdos_dirent
 {
-	char ftype;
-	char delimitor;
-	char fname[8];
+	struct {
+		char ftype;
+		char delimitor;
+		char fname[8];
+	} node;
 	uint8_t start_track;
 	uint8_t start_sector;
 	uint16_t start_address;
 	uint16_t end_address;
 
-	vzdos_dirent()
+	vzdos_dirent() :
+		start_track(0), start_sector(0),
+		start_address(0), end_address(0)
 	{
-	   ftype = delimitor = '\0';
-	   fname[0] = '\0';
-	   start_track = start_sector = 0;
-	   start_address = end_address = 0;
+		memset(&node, 0, sizeof(node));
 	}
 };
 
@@ -160,8 +162,7 @@ static imgtoolerr_t vzdos_write_sector_data(imgtool::image &img, int track, int 
 static imgtoolerr_t vzdos_clear_sector(imgtool::image &img, int track, int sector)
 {
 	uint8_t data[DATA_SIZE + 2];
-
-	memset(data, 0x00, sizeof(data));
+	std::fill(std::begin(data), std::end(data), 0x00);
 
 	return vzdos_write_sector_data(img, track, sector, data);
 }
@@ -169,21 +170,21 @@ static imgtoolerr_t vzdos_clear_sector(imgtool::image &img, int track, int secto
 /* return a directory entry for an index */
 static imgtoolerr_t vzdos_get_dirent(imgtool::image &img, int index, vzdos_dirent *ent)
 {
-	int ret, entry;
 	uint8_t buffer[DATA_SIZE + 2];
 
-	ret = vzdos_read_sector_data(img, 0, (int) index / 8, buffer);
-	if (ret) return (imgtoolerr_t)ret;
+	imgtoolerr_t const ret = vzdos_read_sector_data(img, 0, int(index) / 8, buffer);
+	if (IMGTOOLERR_SUCCESS != ret)
+		return ret;
 
-	entry = ((index % 8) * sizeof(vzdos_dirent));
+	int const entry = ((index % 8) * sizeof(vzdos_dirent));
 
-	memcpy(ent, &buffer[entry], 10);
+	memcpy(&ent->node, &buffer[entry], 10);
 	ent->start_track   = buffer[entry + 10];
 	ent->start_sector  = buffer[entry + 11];
 	ent->start_address = get_u16le(&buffer[entry + 12]);
 	ent->end_address   = get_u16le(&buffer[entry + 14]);
 
-	if (ent->ftype == 0x00)
+	if (ent->node.ftype == 0x00)
 		return IMGTOOLERR_FILENOTFOUND;
 
 	/* check values */
@@ -224,20 +225,12 @@ static imgtoolerr_t vzdos_set_dirent(imgtool::image &img, int index, vzdos_diren
 /* clear a directory entry */
 static imgtoolerr_t vzdos_clear_dirent(imgtool::image &img, int index)
 {
-	int ret;
 	vzdos_dirent entry;
-
-	memset(&entry, 0x00, sizeof(vzdos_dirent));
-
-	ret = vzdos_set_dirent(img, index, entry);
-	if (ret) return (imgtoolerr_t)ret;
-
-	return IMGTOOLERR_SUCCESS;
+	return vzdos_set_dirent(img, index, entry);
 }
 
 /* search the index for a directory entry */
 static imgtoolerr_t vzdos_searchentry(imgtool::image &image, const char *fname, int *entry) {
-	int i, len, ret;
 	vzdos_dirent ent;
 	char filename[9];
 
@@ -249,23 +242,23 @@ static imgtoolerr_t vzdos_searchentry(imgtool::image &image, const char *fname, 
 
 	*entry = -1;
 
-	for (i = 0; i < MAX_DIRENTS; i++) {
-		ret = vzdos_get_dirent(image, i, &ent);
-		if (ret) return (imgtoolerr_t)ret;
+	for (int i = 0; i < MAX_DIRENTS; i++) {
+		imgtoolerr_t const ret = vzdos_get_dirent(image, i, &ent);
+		if (IMGTOOLERR_SUCCESS != ret)
+			return ret;
 
-		len = vzdos_get_fname_len(ent.fname) + 1;
+		int const len = vzdos_get_fname_len(ent.node.fname) + 1;
 
 		if (strlen(fname) != len)
 			continue;
 
-		memset(filename, 0x00, sizeof(filename));
-		memcpy(filename, ent.fname, len);
+		std::fill(std::begin(filename), std::end(filename), 0x00);
+		memcpy(filename, ent.node.fname, len);
 
 		if (!core_stricmp(fname, filename)) {
 			*entry = i;
 			break;
 		}
-
 	}
 
 	if (*entry == -1)
@@ -362,7 +355,6 @@ static imgtoolerr_t vzdos_free_trackmap(imgtool::image &img, int *track, int *se
 
 static imgtoolerr_t vzdos_write_formatted_sector(imgtool::image &img, int track, int sector)
 {
-	int ret;
 	uint8_t sector_data[DATA_SIZE + 4 + 24];
 
 	static const uint8_t sector_header[24] = {
@@ -371,15 +363,16 @@ static imgtoolerr_t vzdos_write_formatted_sector(imgtool::image &img, int track,
 		0x80, 0x80, 0x80, 0x00, 0xC3, 0x18, 0xE7, 0xFE
 	};
 
-	memset(sector_data, 0x00, sizeof(sector_data));
+	std::fill(std::begin(sector_data), std::end(sector_data), 0x00);
 	memcpy(sector_data, sector_header, sizeof(sector_header));
 
 	sector_data[10] = (uint8_t) track;            /* current track */
 	sector_data[11] = (uint8_t) sector;           /* current sector */
 	sector_data[12] = (uint8_t) track + sector;   /* checksum-8 */
 
-	ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], 0, sector_data, sizeof(sector_data), 0); /* TODO: pass ddam argument from imgtool */
-	if (ret) return (imgtoolerr_t)ret;
+	floperr_t const ret = floppy_write_sector(imgtool_floppy(img), 0, track, sector_order[sector], 0, sector_data, sizeof(sector_data), 0); /* TODO: pass ddam argument from imgtool */
+	if (FLOPPY_ERROR_SUCCESS != ret)
+		return IMGTOOLERR_WRITEERROR;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -427,15 +420,15 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool::directory &enumeration, im
 
 		/* kill trailing spaces */
 		for (len = 7; len > 0; len--) {
-			if (dirent.fname[len] != 0x20) {
+			if (dirent.node.fname[len] != 0x20) {
 				break;
 			}
 		}
 
-		memcpy(ent.filename, &dirent.fname, len + 1);
+		memcpy(ent.filename, &dirent.node.fname, len + 1);
 		ent.filesize = dirent.end_address - dirent.start_address;
 
-		switch (dirent.ftype)
+		switch (dirent.node.ftype)
 		{
 		case 0x01: type = "Deleted";    break;
 		case 'T':  type = "Basic";      break;
@@ -620,8 +613,8 @@ static imgtoolerr_t vzdos_writefile(imgtool::partition &partition, int offset, i
 		return IMGTOOLERR_READONLY;
 
 	/* check for already existing filename -> overwrite */
-	strcpy(filename, entry->fname);
-	filename[vzdos_get_fname_len(entry->fname) + 1] = 0x00;
+	strcpy(filename, entry->node.fname);
+	filename[vzdos_get_fname_len(entry->node.fname) + 1] = 0x00;
 	ret = vzdos_get_dirent_fname(img, filename, &temp_entry);
 	if (!ret) {
 		/* file already exists, delete it */
@@ -705,8 +698,6 @@ static imgtoolerr_t vzdos_writefile(imgtool::partition &partition, int offset, i
 /* create a new file or overwrite a file */
 static imgtoolerr_t vzdos_diskimage_writefile(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
-	imgtoolerr_t ret;
-	int ftype;
 	vzdos_dirent entry;
 
 	/* TODO: check for leading spaces and strip */
@@ -714,34 +705,31 @@ static imgtoolerr_t vzdos_diskimage_writefile(imgtool::partition &partition, con
 		return IMGTOOLERR_BADFILENAME;
 
 	/* prepare directory entry */
-	ftype = opts->lookup_int('T');
+	int const ftype = opts->lookup_int('T');
 
 	switch (ftype) {
 		case 0:
-			entry.ftype         = 'T';
+			entry.node.ftype    = 'T';
 			entry.start_address = 31465;
 			break;
 		case 1:
-			entry.ftype         = 'B';
+			entry.node.ftype    = 'B';
 			entry.start_address = 31465; /* ??? */
 			break;
 		case 2:
-			entry.ftype         = 'D';
+			entry.node.ftype    = 'D';
 			entry.start_address = 31465; /* ??? */
 			break;
 		default:
 			break;
 	}
 
-	entry.delimitor = ':';
-	memset(&entry.fname, 0x20, 8); /* pad with spaces */
-	memcpy(&entry.fname, filename, strlen(filename));
+	entry.node.delimitor = ':';
+	memset(&entry.node.fname, 0x20, 8); /* pad with spaces */
+	memcpy(&entry.node.fname, filename, strlen(filename));
 
 	/* write file to disk */
-	ret = vzdos_writefile(partition, 0, sourcef, &entry);
-	if (ret) return ret;
-
-	return IMGTOOLERR_SUCCESS;
+	return vzdos_writefile(partition, 0, sourcef, &entry);
 }
 
 static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool::partition &partition, const char *fname, imgtool::transfer_suggestion *suggestions, size_t suggestions_length)
@@ -754,7 +742,7 @@ static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool::partition &partitio
 		ret = vzdos_get_dirent_fname(image, fname, &entry);
 		if (ret) return ret;
 
-		switch (entry.ftype) {
+		switch (entry.node.ftype) {
 			case 'B':
 				suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
 				suggestions[0].filter = filter_vzsnapshot_getinfo;
@@ -827,7 +815,7 @@ static imgtoolerr_t vzsnapshot_readfile(imgtool::partition &partition, const cha
 	header[1] = 'Z';
 	header[2] = 'F';
 
-	switch (entry.ftype) {
+	switch (entry.node.ftype) {
 		case 'B':
 			header[3] = '1';
 			header[21] = 0xF1;
@@ -842,7 +830,7 @@ static imgtoolerr_t vzsnapshot_readfile(imgtool::partition &partition, const cha
 	}
 
 	memset(header + 4, 0x00, 17);
-	memcpy(header + 4, entry.fname, vzdos_get_fname_len(entry.fname) + 1);
+	memcpy(header + 4, entry.node.fname, vzdos_get_fname_len(entry.node.fname) + 1);
 	put_u16le(&header[22], entry.start_address);
 
 	/* write header to file */
@@ -866,21 +854,21 @@ static imgtoolerr_t vzsnapshot_writefile(imgtool::partition &partition, const ch
 	sourcef.read(header, sizeof(header));
 
 	/* prepare directory entry */
-	entry.ftype         = header[21] == 0xF1 ? 'B' : 'T';
-	entry.delimitor     = ':';
-	entry.start_address = get_u16le(&header[22]);
+	entry.node.ftype     = (header[21] == 0xF1) ? 'B' : 'T';
+	entry.node.delimitor = ':';
+	entry.start_address  = get_u16le(&header[22]);
 
 	/* filename from header or directly? */
 	fnameopt = opts->lookup_int('F');
 
 	if (fnameopt == 0) {
-		memcpy(&entry.fname, &header[4], 8);
+		memcpy(&entry.node.fname, &header[4], 8);
 	} else {
 		/* TODO: check for leading spaces and strip */
 		if (strlen(filename) > 8 || strlen(filename) < 1)
 		return IMGTOOLERR_BADFILENAME;
 
-		memcpy(&entry.fname, filename, strlen(filename) - 3);
+		memcpy(&entry.node.fname, filename, strlen(filename) - 3);
 	}
 
 	/* write file to disk */

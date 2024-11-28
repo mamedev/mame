@@ -1030,6 +1030,7 @@ public:
 
 	void wildcard(machine_config &config);
 	void wildcrdb(machine_config &config);
+	void wildcrde(machine_config &config);
 	void witchcrd(machine_config &config);
 	void mondial(machine_config &config);
 	void wcfalcon(machine_config &config);
@@ -4795,14 +4796,6 @@ void goldnpkr_state::wildcrdb(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::wildcrdb_map);
 
-	sega_315_5018_device &mcu(SEGA_315_5018(config, "mcu", MASTER_CLOCK / 8));    // guess
-	mcu.set_addrmap(AS_PROGRAM, &goldnpkr_state::wildcrdb_mcu_map);
-	mcu.set_addrmap(AS_IO, &goldnpkr_state::wildcrdb_mcu_io_map);
-	mcu.set_addrmap(AS_OPCODES, &goldnpkr_state::wildcrdb_mcu_decrypted_opcodes_map);
-	mcu.set_decrypted_tag(":decrypted_opcodes");
-	mcu.set_size(0x1000);
-	mcu.set_vblank_int("screen", FUNC(goldnpkr_state::irq0_line_hold));
-
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::ay8910_control_w));
 	m_pia[1]->readpa_handler().set(FUNC(goldnpkr_state::ay8910_data_r));
@@ -4816,6 +4809,19 @@ void goldnpkr_state::wildcrdb(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_ay8910, MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);    // guess, seems ok
+}
+
+void goldnpkr_state::wildcrde(machine_config &config)
+{
+	wildcrdb(config);
+
+	sega_315_5018_device &mcu(SEGA_315_5018(config, "mcu", MASTER_CLOCK / 8));    // guess
+	mcu.set_addrmap(AS_PROGRAM, &goldnpkr_state::wildcrdb_mcu_map);
+	mcu.set_addrmap(AS_IO, &goldnpkr_state::wildcrdb_mcu_io_map);
+	mcu.set_addrmap(AS_OPCODES, &goldnpkr_state::wildcrdb_mcu_decrypted_opcodes_map);
+	mcu.set_decrypted_tag(":decrypted_opcodes");
+	mcu.set_size(0x1000);
+	mcu.set_vblank_int("screen", FUNC(goldnpkr_state::irq0_line_hold));
 }
 
 void goldnpkr_state::genie(machine_config &config)
@@ -5736,7 +5742,7 @@ ROM_END
 ROM_START( potnpkrn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7.sub",  0x6000, 0x1000, CRC(3dd65452) SHA1(f4641160ad8472b8446603c1102a42b818aee430) )
-	ROM_LOAD( "8.sub ", 0x7000, 0x0800, CRC(2f09b647) SHA1(8d5c069c2ecf07ca1f3f04a580e11860ea728b38) )
+	ROM_LOAD( "8.sub",  0x7000, 0x0800, CRC(2f09b647) SHA1(8d5c069c2ecf07ca1f3f04a580e11860ea728b38) )
 	ROM_CONTINUE(       0x5800, 0x0800 )
 	ROM_LOAD( "9.sub",  0x5000, 0x0800, CRC(cb988f21) SHA1(4d70de07ea41d23a3da13dd5ad6bd4fc54a239f3) )
 	ROM_CONTINUE(       0x7800, 0x0800 )
@@ -10946,6 +10952,33 @@ ROM_START( falcnwldc )
 	ROM_LOAD( "falcon_1.bin",   0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+ROM_START( falcnwldd ) // "831 1.1 MADE IN JAPAN" without extra MCU
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4.b6",   0x3000, 0x1000, CRC(85952a14) SHA1(dbe2f3abcafe326f24e1bc09b0ec6149f7abfe8d) )
+	ROM_LOAD( "5.b8",   0x4000, 0x1000, CRC(3d33f10b) SHA1(14aee52a297adeccde7ce97870939cdbc9410710) )
+	ROM_LOAD( "6.b9",   0x5000, 0x1000, CRC(aaed1a0a) SHA1(4cb3eb4f0cb007e7f05107c3bc5c5c2afb020cd9) )
+	ROM_LOAD( "7.b11",  0x6000, 0x1000, CRC(0f4fd589) SHA1(236931fd7e4551424e806a65a43e46fee5609b29) )
+	ROM_LOAD( "8.b13",  0x7000, 0x1000, CRC(aa284f03) SHA1(ae2450f9b30370871cb20aa30810ab4fa831817f) )
+
+	ROM_REGION( 0x6000, "temp", 0 )
+	ROM_LOAD( "1.b1",   0x0000, 0x1000, CRC(fd95955d) SHA1(e5c029bc5683d06c2e5250c1271613232a058fcd) )
+	ROM_LOAD( "2.b3",   0x1000, 0x0800, CRC(9ad3c578) SHA1(a69385a807e3270d90040c44721bfff21e95706a) )
+	ROM_LOAD( "3.b4",   0x1800, 0x0800, CRC(d9246780) SHA1(4ceb24131ec6208b742ba80373201aa53c50732d) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0x0000 )    // filling bitplanes
+	ROM_COPY( "temp",   0x0800, 0x1000, 0x0800 )    // second half of 1.b1
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x1800, 0x0000, 0x0800 )    // first half of 3.b4
+	ROM_COPY( "temp",   0x1000, 0x0800, 0x0800 )    // whole 2.b3
+	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    // first half of 1.b1
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "falcon_1.bin",   0x0000, 0x0100, CRC(3db3b9e0) SHA1(c956493d5d754665d214b416e6a473d73c22716c) )
+ROM_END
+
+
 
 /**************************************** OTHER SETS ****************************************/
 
@@ -12810,7 +12843,8 @@ GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, goldnpkr_state, empty_init
 GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",        0,                layout_goldnpkr )
 GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,      layout_goldnpkr )
 GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,      layout_goldnpkr )
-GAME(  1983, falcnwldc, falcnwld, wildcrdb, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)",    MACHINE_NOT_WORKING ) // MCU hook up incomplete, currently game runs only after a soft reset. Then you can coin up but bet doesn't work
+GAME(  1983, falcnwldc, falcnwld, wildcrde, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original, protected)", MACHINE_NOT_WORKING ) // MCU hook up incomplete, currently game runs only after a soft reset. Then you can coin up but bet doesn't work
+GAMEL( 1983, falcnwldd, falcnwld, wildcrdb, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)", 0,         layout_goldnpkr )
 
 GAMEL( 1991, witchcrd,  0,        witchcrd, witchcrd, goldnpkr_state, init_vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)",    0,                   layout_goldnpkr )
 GAME(  1991, witchcrda, witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)",    0 )

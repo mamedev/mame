@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_MACHINE_ATAFLASH_H
-#define MAME_MACHINE_ATAFLASH_H
+#ifndef MAME_BUS_PCCARD_ATAFLASH_H
+#define MAME_BUS_PCCARD_ATAFLASH_H
 
 #pragma once
 
@@ -101,4 +101,4 @@ DECLARE_DEVICE_TYPE(TAITO_PCCARD2, taito_pccard2_device)
 DECLARE_DEVICE_TYPE(TAITO_COMPACT_FLASH, taito_compact_flash_device)
 DECLARE_DEVICE_TYPE(ATA_FLASH_PCCARD, ata_flash_pccard_device)
 
-#endif // MAME_MACHINE_ATAFLASH_H
+#endif // MAME_BUS_PCCARD_ATAFLASH_H

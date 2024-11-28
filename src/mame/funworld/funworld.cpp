@@ -3742,8 +3742,8 @@ uint8_t jokercrd_state::jokercrd_opcode_r(offs_t offset)
 	// it should be noted, however, that the subroutine @c0da seems to be called just from here:
 	//  c044: 64 6a     stz $6a
 	//  c046: 20 da c0  jsr $c0da
-	// and, if no interrupt is messing with the accesed data, the STZ @c044 should make the BEQ @c0ef
-	// become an inconditional jump, converting the opcode @c0f1 in dead code
+	// and, if no interrupt is messing with the accessed data, the STZ @c044 should make the BEQ @c0ef
+	// become an unconditional jump, converting the opcode @c0f1 in dead code
 
 
 	constexpr uint8_t UNKN {0xfc};
@@ -7164,11 +7164,11 @@ ROM_END
   Program roms are encrypted. Seems to be a Big Deal clone, running in
   Fun World Multi Win hardware.
 
-  Unfortunatelly, the graphics ROM vesely_zg_1.ic10 has address 8 line (leg 25) shorted.
+  Unfortunately, the graphics ROM vesely_zg_1.ic10 has address 8 line (leg 25) shorted.
   Seems that the protection diode was blown due to a bad handling.
 
   With forensics techniques, a special device was constructed to process
-  the faulty ROM and try to read the contents. Fortunatelly after all these
+  the faulty ROM and try to read the contents. Fortunately after all these
   efforts, we got a perfect and complete dump.
 
 
@@ -7236,6 +7236,22 @@ ROM_START( jokercrd )
 	ROM_LOAD( "ic13.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
+ROM_START( jokercrdf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bc4_t.ic38", 0x4000, 0x4000, CRC(2c1701b2) SHA1(1457bc1c0c7845173ebb930dfe3d313a4866b9ad) )
+	ROM_LOAD( "bc4_p.ic12", 0xc000, 0x4000, CRC(b5fde2a2) SHA1(508c881267447c06d0d65e9ca2517574d2b73fcc) )
+
+	ROM_REGION( 0x0800, "decode", 0 )   // inside of the custom CPU
+	ROM_LOAD( "internal_table.bin",  0x0000, 0x0800, CRC(f1d8f35d) SHA1(2b5f9222a81a627d43fd8448385f85c71c24b914) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2.ic11", 0x0000, 0x8000, CRC(ba994fc3) SHA1(95d2a802c38d7249f10eb2bbe46edfb9b14b6faa) )
+	ROM_LOAD( "1.ic10", 0x8000, 0x8000, CRC(367db105) SHA1(400b82dc9e0be4c17a02add009aab3c43dd901f8) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	// PROM was broken beyond repair on this PCB, using the one from jokcrdep since GFX ROMs match 100%
+	ROM_LOAD( "ic13.bin", 0x0000, 0x0200, BAD_DUMP CRC(f990a9ae) SHA1(f7133798b5f20dd5b8dbe5d1a6876341710d93a8) )
+ROM_END
 
 /*
     Mongolfier New
@@ -8981,6 +8997,7 @@ GAME(  2001, multiwinb,  multiwin, fw2ndpal, funworld,  funworld_state, empty_in
 GAME(  1993, powercrd,   0,        multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Power Card (Ver 0263, encrypted)",                0 ) // clone of Bonus Card.
 GAME(  1993, megacard,   0,        multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Mega Card (Ver.0210, encrypted)",                 0 )
 GAME(  1993, megacarda,  megacard, multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Mega Card (Ver.0053, encrypted)",                 0 )
+GAME(  1993, jokercrdf,  0,        multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Joker Card (encrypted)",                          0 )
 GAME(  1993, jokercrd,   0,        jokercrd, funworld,  jokercrd_state, empty_init,    ROT0, "Amatic Trading",    "Joker Card 300 (Ver.A267BC, encrypted)",          0 )
 GAME(  1991, royalcrdf,  royalcrd, royalcrdf,royalcrdf, royalcrdf_state,driver_init,   ROT0, "Evona Electronic",  "Royal Card (Evona, Polish, encrypted)",           0 )
 GAME(  198?, saloon,     0,        saloon,   saloon,    funworld_state, init_saloon,   ROT0, "<unknown>",         "Saloon (French, encrypted)",                      0 )

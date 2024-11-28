@@ -563,6 +563,7 @@ void dsp32c_device::execute_run()
 	// skip if halted
 	if ((m_pcr & PCR_RESET) == 0)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}

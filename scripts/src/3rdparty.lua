@@ -29,7 +29,7 @@ project "expat"
 		"PACKAGE=\"expat\"",
 		"PACKAGE_BUGREPORT=\"expat-bugs@libexpat.org\"",
 		"PACKAGE_NAME=\"expat\"",
-		"PACKAGE_STRING=\"expat 2.2.10\"",
+		"PACKAGE_STRING=\"expat-2.2.10\"",
 		"PACKAGE_TARNAME=\"expat\"",
 		"PACKAGE_URL=\"\"",
 		"PACKAGE_VERSION=\"2.2.10\"",

@@ -1672,6 +1672,7 @@ static const gfx_layout sr_sprites =
 	{ 16*8, 1+(16*8), 2+(16*8), 3+(16*8), 4+(16*8), 5+(16*8), 6+(16*8), 7+(16*8),
 		0,1,2,3,4,5,6,7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+//	{ 0*8, 2*8, 1*8, 3*8, 4*8, 6*8, 5*8, 7*8 ,8*8,10*8,9*8,11*8,12*8,14*8,13*8,15*8 }, bootleg decode
 	16*16
 };
 
@@ -3658,6 +3659,45 @@ ROM_START( srdarwinj )
 	ROM_LOAD( "dy_12.f4",  0x00000,  0x100,  CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) )    /* Priority (Not yet used) */
 ROM_END
 
+ROM_START( srdarwinb )
+	ROM_REGION( 0x28000, "maincpu", 0 )
+	ROM_LOAD( "3.bin",  0x20000, 0x08000, CRC(7942b43f) SHA1(15de0c02d45d06c145fba48ef05baae793a1cb46) )
+	ROM_CONTINUE(       0x08000, 0x08000 )
+	ROM_LOAD( "4.bin",  0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
+
+	ROM_REGION( 2*0x10000, "audiocpu", 0 )    // 64K for sound CPU + 64k for decrypted opcodes
+	ROM_LOAD( "5.bin", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )    // PCB lacks of i8751 microcontroller
+	ROM_LOAD( "mcu.bin", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x8000, "char", 0 )
+	ROM_LOAD( "12.bin",  0x0000, 0x4000, CRC(f5c835cd) SHA1(8b41862dc18ba2e2677c94ecef45a40467aa89ad) )
+	ROM_CONTINUE(        0x0000, 0x4000 )  // all data in the 2nd half
+
+	ROM_REGION( 0x30000, "sprites", 0 )
+	ROM_LOAD( "6.bin",   0x00000, 0x8000, CRC(3c84a2c6) SHA1(558a7d9acb5af06a7728d010262e3a35c3cdbe25) )
+	ROM_LOAD( "7.bin",   0x08000, 0x8000, CRC(990cfc7b) SHA1(84ab42010a483e8a4cd86357898f55e644d1b11e) )
+	ROM_LOAD( "10.bin",  0x10000, 0x8000, CRC(cf7dcdc1) SHA1(a94a970ff564da0fef8cd7cdcbf9aee5f83b596c) )
+	ROM_LOAD( "11.bin",  0x18000, 0x8000, CRC(3674e392) SHA1(d91387c2412bf950993751c2e4764f818489316f) )
+	ROM_LOAD( "8.bin",   0x20000, 0x8000, CRC(cc39b73f) SHA1(8cdbef67526f29ccf77c04aec5e34253bcdf96c3) )
+	ROM_LOAD( "9.bin",   0x28000, 0x8000, CRC(d15aaa08) SHA1(69649f0cb2f11107b37ae7914dd90f4c6269316f) )
+
+	ROM_REGION( 0x40000, "tiles1", 0 )
+	ROM_LOAD( "1.bin",  0x00000, 0x4000, CRC(44f2a4f9) SHA1(97368dd112451cd630f2fa5ba54679e84e7d4d97) )
+	ROM_CONTINUE(       0x10000, 0x4000 )
+	ROM_CONTINUE(       0x20000, 0x4000 )
+	ROM_CONTINUE(       0x30000, 0x4000 )
+	ROM_LOAD( "2.bin",  0x08000, 0x4000, CRC(522d9a9e) SHA1(248274ed6df604357cad386fcf0521b26810aa0e) )
+	ROM_CONTINUE(       0x18000, 0x4000 )
+	ROM_CONTINUE(       0x28000, 0x4000 )
+	ROM_CONTINUE(       0x38000, 0x4000 )
+
+	ROM_REGION( 256, "proms", 0 )
+	ROM_LOAD( "82s123.bin",  0x00000,  0x100,  NO_DUMP )  // Priority (Not yet used)
+ROM_END
+
+
 ROM_START( cobracom )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "el11-5.5j", 0x08000, 0x08000, CRC(af0a8b05) SHA1(096e4e7f2785a20bfaec14277413ce4e20e90214) )
@@ -3863,6 +3903,22 @@ void lastmisn_state::init_meikyuhbl()
 	m_palette->update();
 }
 
+void srdarwin_state::init_srdarwinb()
+{
+	// this bootleg has the sprite ROMs with bytes swapped.
+	// just worked here to avoid a new gfxdecode and machine driver.
+
+	u8 *rom = memregion("sprites")->base();
+	uint8_t byte1;
+	
+	for (int i = 0; i < 0x30000; i += 4)
+	{
+		byte1 = rom[i + 1];
+
+		rom[i + 1] = rom[i + 2];
+		rom[i + 2] = byte1;
+	}
+}
 
 /******************************************************************************/
 
@@ -3892,6 +3948,7 @@ GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    oscar_state,    empty_ini
 GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  srdarwin_state, empty_init,     ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, srdarwin_state, empty_init,     ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwinb,  srdarwin, srdarwin, srdarwinj, srdarwin_state, init_srdarwinb, ROT270, "bootleg",               "Super Real Darwin (Japan, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Unlike most Deco games of this period Cobra Command does not seem to have a Data East USA release.  Instead the Data East Corporation release
 // was used in the US as evidenced by boards with the EL romset bearing AAMA seal stickers (American Amusement Machine Association)

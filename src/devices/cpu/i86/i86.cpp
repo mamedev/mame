@@ -211,6 +211,7 @@ void i8086_cpu_device::execute_run()
 
 			if(m_halt)
 			{
+				debugger_wait_hook();
 				m_icount = 0;
 				return;
 			}

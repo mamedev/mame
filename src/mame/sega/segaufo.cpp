@@ -258,9 +258,10 @@ TIMER_CALLBACK_MEMBER(ufo_state::simulate_xyz)
 #if 0
 	// show io2 outputs
 	std::ostringstream msg;
+	msg << std::uppercase << std::hex << std::setfill('0');
 	for (int i = 0; i < 8; i++)
 	{
-		msg << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << +m_io[1]->debug_peek_output(i);
+		msg << std::setw(2) << +m_io[1]->debug_peek_output(i);
 		if (i != 7) msg << " ";
 	}
 	popmessage("%s", std::move(msg).str());

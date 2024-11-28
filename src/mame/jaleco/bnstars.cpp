@@ -107,6 +107,7 @@ public:
 	ms32_bnstars_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ms32_base_state(mconfig, type, tag)
 		, m_sysctrl(*this, "sysctrl")
+		, m_ymf(*this, "ymf.%u", 1U)
 		, m_screen(*this, "screen.%u", 0U)
 		, m_gfxdecode(*this, "gfxdecode.%u", 0U)
 		, m_palette(*this, "palette.%u", 0U)
@@ -121,7 +122,6 @@ public:
 		, m_object_vram(*this, "objram_%u", 0U, 0x10000U, ENDIANNESS_LITTLE)
 		, m_p1_keys(*this, "P1KEY.%u", 0)
 		, m_p2_keys(*this, "P2KEY.%u", 0)
-		, m_ymf(*this, "ymf.%u", 1U)
 	{ }
 
 	void bnstars(machine_config &config);
@@ -135,6 +135,7 @@ private:
 	// TODO: subclass this device for dual screen config
 	required_device<jaleco_ms32_sysctrl_device> m_sysctrl;
 
+	required_device_array<ymf271_device, 2> m_ymf;
 	required_device_array<screen_device, 2> m_screen;
 
 	required_device_array<gfxdecode_device, 2> m_gfxdecode;
@@ -181,8 +182,6 @@ private:
 	void bnstars_sound_map(address_map &map) ATTR_COLD;
 
 	void bnstars1_mahjong_select_w(u32 data);
-
-	required_device_array<ymf271_device, 2> m_ymf;
 };
 
 
@@ -462,15 +461,15 @@ void ms32_bnstars_state::bnstars_map(address_map &map)
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
 
 	map(0xfce00000, 0xfce0005f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
-	map(0xfce00200, 0xfce0027f).ram().share("sprite_ctrl");
+	map(0xfce00200, 0xfce0027f).ram().share(m_sprite_ctrl);
 //  map(0xfce00280, 0xfce0028f) // left screen brightness control
 //  map(0xfce00300, 0xfce0030f) // right screen brightness control
-	map(0xfce00400, 0xfce0045f).writeonly().share("rotate_ctrl.0");
-	map(0xfce00700, 0xfce0075f).writeonly().share("rotate_ctrl.1"); // guess
-	map(0xfce00a00, 0xfce00a17).writeonly().share("ascii_ctrl.0");
-	map(0xfce00a20, 0xfce00a37).writeonly().share("scroll_ctrl.0");
-	map(0xfce00c00, 0xfce00c17).writeonly().share("ascii_ctrl.1");
-	map(0xfce00c20, 0xfce00c37).writeonly().share("scroll_ctrl.1");
+	map(0xfce00400, 0xfce0045f).writeonly().share(m_rotate_ctrl[0]);
+	map(0xfce00700, 0xfce0075f).writeonly().share(m_rotate_ctrl[1]); // guess
+	map(0xfce00a00, 0xfce00a17).writeonly().share(m_ascii_ctrl[0]);
+	map(0xfce00a20, 0xfce00a37).writeonly().share(m_scroll_ctrl[0]);
+	map(0xfce00c00, 0xfce00c17).writeonly().share(m_ascii_ctrl[1]);
+	map(0xfce00c20, 0xfce00c37).writeonly().share(m_scroll_ctrl[1]);
 
 	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_bnstars_state::bnstars1_mahjong_select_w));
 
@@ -652,19 +651,16 @@ static INPUT_PORTS_START( bnstars )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )   // Unused?
 INPUT_PORTS_END
 
-static GFXLAYOUT_RAW( bglayout, 16, 16, 16*8, 16*16*8 )
-static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
-
 static GFXDECODE_START( gfx_bnstars_left )
-	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x5000, 0x10 ) /* Roz scr1 */
-	GFXDECODE_ENTRY( "gfx4", 0, bglayout,     0x1000, 0x10 ) /* Bg scr1 */
-	GFXDECODE_ENTRY( "gfx5", 0, txlayout,     0x6000, 0x10 ) /* Tx scr1 */
+	GFXDECODE_ENTRY( "roztiles_l", 0, gfx_16x16x8_raw, 0x5000, 0x10 ) /* Roz scr1 */
+	GFXDECODE_ENTRY( "bgtiles_l",  0, gfx_16x16x8_raw, 0x1000, 0x10 ) /* Bg scr1 */
+	GFXDECODE_ENTRY( "txtiles_l",  0, gfx_8x8x8_raw,   0x6000, 0x10 ) /* Tx scr1 */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_bnstars_right )
-	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x5000, 0x10 ) /* Roz scr2 */
-	GFXDECODE_ENTRY( "gfx6", 0, bglayout,     0x1000, 0x10 ) /* Bg scr2 */
-	GFXDECODE_ENTRY( "gfx7", 0, txlayout,     0x6000, 0x10 ) /* Tx scr2 */
+	GFXDECODE_ENTRY( "roztiles_r", 0, gfx_16x16x8_raw, 0x5000, 0x10 ) /* Roz scr2 */
+	GFXDECODE_ENTRY( "bgtiles_r",  0, gfx_16x16x8_raw, 0x1000, 0x10 ) /* Bg scr2 */
+	GFXDECODE_ENTRY( "txtiles_r",  0, gfx_8x8x8_raw,   0x6000, 0x10 ) /* Tx scr2 */
 GFXDECODE_END
 
 void ms32_bnstars_state::bnstars(machine_config &config)
@@ -755,27 +751,27 @@ ROM_START( bnstars1 )
 	ROM_COPY( "sprite.0", 0, 0, 0x1000000)
 
 	/* Roz Tiles #1 (Screen 1) */
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles_l", 0 ) /* roz tiles */
 	ROM_LOAD( "mr96004-09.1", 0x000000, 0x400000, CRC(7f8ea9f0) SHA1(f1fe682dcb884f1aa4a5536e17ab94157a99f519) )
 
 	/* Roz Tiles #2 (Screen 2) */
-	ROM_REGION( 0x400000, "gfx3", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles_r", 0 ) /* roz tiles */
 	ROM_LOAD( "mr96004-09.7", 0x000000, 0x400000, CRC(7f8ea9f0) SHA1(f1fe682dcb884f1aa4a5536e17ab94157a99f519) )
 
 	/* BG Tiles #1 (Screen 1?) */
-	ROM_REGION( 0x200000, "gfx4", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles_l", 0 ) /* bg tiles */
 	ROM_LOAD( "mr96004-11.11", 0x000000, 0x200000,  CRC(e6da552c) SHA1(69a5af3015883793c7d1343243ccae23db9ef77c) )
 
 	/* TX Tiles #1 (Screen 1?) */
-	ROM_REGION( 0x080000, "gfx5", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles_l", 0 ) /* tx tiles */
 	ROM_LOAD( "vsjanshi6.5", 0x000000, 0x080000, CRC(fdbbac21) SHA1(c77d852e53126cc8ebfe1e79d1134e42b54d1aab) )
 
 	/* BG Tiles #2 (Screen 2?) */
-	ROM_REGION( 0x200000, "gfx6", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles_r", 0 ) /* bg tiles */
 	ROM_LOAD( "mr96004-11.13", 0x000000, 0x200000, CRC(e6da552c) SHA1(69a5af3015883793c7d1343243ccae23db9ef77c) )
 
 	/* TX Tiles #2 (Screen 2?) */
-	ROM_REGION( 0x080000, "gfx7", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles_r", 0 ) /* tx tiles */
 	ROM_LOAD( "vsjanshi5.6", 0x000000, 0x080000, CRC(fdbbac21) SHA1(c77d852e53126cc8ebfe1e79d1134e42b54d1aab) )
 
 	/* Sound Program (one, driving both screen sound) */
@@ -795,10 +791,10 @@ ROM_END
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi1 */
 void ms32_bnstars_state::init_bnstars()
 {
-	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx5");
-	decrypt_ms32_bg(machine(), 0x00001,0x9b, "gfx4");
-	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx7");
-	decrypt_ms32_bg(machine(), 0x00001,0x9b, "gfx6");
+	decrypt_ms32_tx(machine(), 0x00020,0x7e, "txtiles_l");
+	decrypt_ms32_bg(machine(), 0x00001,0x9b, "bgtiles_l");
+	decrypt_ms32_tx(machine(), 0x00020,0x7e, "txtiles_r");
+	decrypt_ms32_bg(machine(), 0x00001,0x9b, "bgtiles_r");
 
 	configure_banks();
 }

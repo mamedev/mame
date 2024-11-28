@@ -50,7 +50,7 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
 		m_rombank(*this, "rombank"),
-		m_view5800(*this, "view5800")
+		m_palette_view(*this, "palette_view")
 	{ }
 
 	void blockhl(machine_config &config);
@@ -64,11 +64,11 @@ private:
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
 	required_memory_bank m_rombank;
-	memory_view m_view5800;
+	memory_view m_palette_view;
 
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	uint32_t screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t k052109_051960_r(offs_t offset);
 	void k052109_051960_w(offs_t offset, uint8_t data);
 
@@ -96,11 +96,10 @@ void blockhl_state::main_map(address_map &map)
 	map(0x1f96, 0x1f96).portr("P2");
 	map(0x1f97, 0x1f97).portr("DSW1");
 	map(0x1f98, 0x1f98).portr("DSW2");
-	map(0x4000, 0x57ff).ram();
-	map(0x5800, 0x5fff).view(m_view5800);
-	m_view5800[0](0x5800, 0x5fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
-	m_view5800[1](0x5800, 0x5fff).ram();
-	map(0x6000, 0x7fff).bankr("rombank");
+	map(0x4000, 0x5fff).ram();
+	map(0x5800, 0x5fff).view(m_palette_view);
+	m_palette_view[0](0x5800, 0x5fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0x6000, 0x7fff).bankr(m_rombank);
 	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
 }
 
@@ -134,7 +133,7 @@ K051960_CB_MEMBER(blockhl_state::sprite_callback)
 	*color = sprite_colorbase + (*color & 0x0f);
 }
 
-uint32_t blockhl_state::screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t blockhl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
@@ -193,7 +192,7 @@ void blockhl_state::machine_start()
 	// the first 0x8000 are banked, the remaining 0x8000 are directly accessible
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 
-	m_view5800.select(0);
+	m_palette_view.select(0);
 }
 
 void blockhl_state::banking_callback(uint8_t data)
@@ -204,11 +203,14 @@ void blockhl_state::banking_callback(uint8_t data)
 	// bit 2, unknown (always 0)
 
 	// bits 3/4 = coin counters
-	machine().bookkeeping().coin_counter_w(0, data & 0x08);
-	machine().bookkeeping().coin_counter_w(1, data & 0x10);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 4));
 
 	// bit 5 = select palette RAM or work RAM at 5800-5fff
-	m_view5800.select(BIT(data, 5));
+	if (BIT(data, 5))
+		m_palette_view.disable();
+	else
+		m_palette_view.select(0);
 
 	// bit 6 = enable char ROM reading through the video RAM
 	m_k052109->set_rmrd_line(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
@@ -298,7 +300,7 @@ void blockhl_state::blockhl(machine_config &config)
 	screen.set_raw(XTAL(24'000'000) / 3, 528, 112, 400, 256, 16, 240);
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
 //  screen.set_raw(XTAL(24'000'000) / 4, 396, hbend, hbstart, 256, 16, 240);
-	screen.set_screen_update(FUNC(blockhl_state::screen_update_blockhl));
+	screen.set_screen_update(FUNC(blockhl_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024).enable_shadows();

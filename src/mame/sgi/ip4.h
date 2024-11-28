@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_BUS_VME_IP4_H
-#define MAME_BUS_VME_IP4_H
+#ifndef MAME_SGI_IP4_H
+#define MAME_SGI_IP4_H
 
 #pragma once
 
@@ -82,4 +82,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SGI_IP4, sgi_ip4_device)
 
-#endif // MAME_BUS_VME_IP4_H
+#endif // MAME_SGI_IP4_H

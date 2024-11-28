@@ -484,31 +484,15 @@ Notes from Charles MacDonald
 
 ioport_value ms32_state::mahjong_ctrl_r()
 {
-	u32 mj_input;
+	u32 mj_input = 0xff;
 
-	switch (m_mahjong_input_select[0])
+	for (int i = 0; i < m_io_mj.size(); i++)
 	{
-		case 0x01:
-			mj_input = ioport("MJ0")->read();
-			break;
-		case 0x02:
-			mj_input = ioport("MJ1")->read();
-			break;
-		case 0x04:
-			mj_input = ioport("MJ2")->read();
-			break;
-		case 0x08:
-			mj_input = ioport("MJ3")->read();
-			break;
-		case 0x10:
-			mj_input = ioport("MJ4")->read();
-			break;
-		default:
-			mj_input = 0;
-
+		if (BIT(m_mahjong_input_select[0], i))
+			mj_input &= m_io_mj[i]->read();
 	}
 
-	return  mj_input & 0xff;
+	return mj_input;
 }
 
 void ms32_base_state::sound_command_w(u32 data)
@@ -523,7 +507,7 @@ u32 ms32_base_state::sound_result_r()
 {
 	// tp2m32 never pings the sound ack, so irq ack is most likely done here
 	irq_raise(1, false);
-	return m_to_main^0xff;
+	return m_to_main ^ 0xff;
 }
 
 u8 ms32_state::ms32_nvram_r8(offs_t offset)
@@ -564,7 +548,7 @@ u16 ms32_state::ms32_rozram_r16(offs_t offset)
 void ms32_state::ms32_rozram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_rozram[offset]);
-	m_roz_tilemap->mark_tile_dirty(offset/2);
+	m_roz_tilemap->mark_tile_dirty(offset / 2);
 }
 
 u16 ms32_state::ms32_lineram_r16(offs_t offset)
@@ -595,7 +579,7 @@ u16 ms32_state::ms32_txram_r16(offs_t offset)
 void ms32_state::ms32_txram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_txram[offset]);
-	m_tx_tilemap->mark_tile_dirty(offset/2);
+	m_tx_tilemap->mark_tile_dirty(offset / 2);
 }
 
 u16 ms32_state::ms32_bgram_r16(offs_t offset)
@@ -606,8 +590,8 @@ u16 ms32_state::ms32_bgram_r16(offs_t offset)
 void ms32_state::ms32_bgram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bgram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset/2);
-	m_bg_tilemap_alt->mark_tile_dirty(offset/2);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_tilemap_alt->mark_tile_dirty(offset / 2);
 }
 
 void ms32_state::bgmode_w(u32 data)
@@ -622,8 +606,8 @@ void ms32_state::coin_counter_w(u32 data)
 {
 	// desertwr/p47aces sets 4 here
 	// f1superb sets 2
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);
-	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
 }
 
 void ms32_state::ms32_map(address_map &map)
@@ -681,12 +665,12 @@ void ms32_state::ms32_map(address_map &map)
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
 	// System Registers
 	map(0xfce00000, 0xfce0005f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap)).umask32(0x0000ffff);
-	map(0xfce00200, 0xfce0027f).ram().share("sprite_ctrl");
+	map(0xfce00200, 0xfce0027f).ram().share(m_sprite_ctrl);
 	map(0xfce00280, 0xfce0028f).w(FUNC(ms32_state::ms32_brightness_w));         // global brightness control
 //  map(0xfce00400, 0xfce0045f)                                                 // ROZ0 control registers
-/**/map(0xfce00600, 0xfce0065f).ram().share("roz_ctrl");                        // ROZ1 control registers
-/**/map(0xfce00a00, 0xfce00a17).ram().share("tx_scroll");                       // ASCII layer scroll
-/**/map(0xfce00a20, 0xfce00a37).ram().share("bg_scroll");                       // Background layer scroll
+/**/map(0xfce00600, 0xfce0065f).ram().share(m_roz_ctrl);                        // ROZ1 control registers
+/**/map(0xfce00a00, 0xfce00a17).ram().share(m_tx_scroll);                       // ASCII layer scroll
+/**/map(0xfce00a20, 0xfce00a37).ram().share(m_bg_scroll);                       // Background layer scroll
 	map(0xfce00a7c, 0xfce00a7f).w(FUNC(ms32_state::bgmode_w));
 //  map(0xfce00c00, 0xfce00c1f)                                                 // ???
 	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::coin_counter_w));            // coin counters + something else
@@ -695,7 +679,7 @@ void ms32_state::ms32_map(address_map &map)
 //  map(0xfd040000, 0xfd040003)
 //  map(0xfd080000, 0xfd080003)
 //  map(0xfd0c0000, 0xfd0c0003)
-	map(0xfd1c0000, 0xfd1c0003).writeonly().share("mahjong_select");
+	map(0xfd1c0000, 0xfd1c0003).writeonly().share(m_mahjong_input_select);
 }
 
 
@@ -705,7 +689,7 @@ void ms32_state::ms32_map(address_map &map)
 void ms32_f1superbattle_state::road_vram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_road_vram[offset]);
-	m_extra_tilemap->mark_tile_dirty(offset/2);
+	m_extra_tilemap->mark_tile_dirty(offset / 2);
 }
 
 u16 ms32_f1superbattle_state::road_vram_r16(offs_t offset)
@@ -726,10 +710,10 @@ void ms32_f1superbattle_state::ms32_irq5_guess_w(u32 data)
 u32 ms32_f1superbattle_state::analog_r()
 {
 	int a,b,c,d;
-	a = ioport("AN2")->read(); // unused?
-	b = ioport("AN2")->read(); // unused?
-	c = ioport("AN1")->read();
-	d = (ioport("AN0")->read() - 0xb0) & 0xff;
+	a = m_io_analog[2]->read(); // unused?
+	b = m_io_analog[2]->read(); // unused?
+	c = m_io_analog[1]->read();
+	d = (m_io_analog[0]->read() - 0xb0) & 0xff;
 	return a << 24 | b << 16 | c << 8 | d << 0;
 }
 
@@ -1595,23 +1579,20 @@ INPUT_PORTS_END
 
 /********** GFX DECODE **********/
 
-static GFXLAYOUT_RAW( bglayout, 16, 16, 16*8, 16*16*8 )
-static GFXLAYOUT_RAW( txlayout, 8, 8, 8*8, 8*8*8 )
-
 static GFXLAYOUT_RAW( f1layout, 2048, 1, 2048*8, 2048*8 )
 
 
 static GFXDECODE_START( gfx_ms32 )
-	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
-	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
-	GFXDECODE_ENTRY( "gfx4", 0, txlayout,     0x6000, 0x10 )
+	GFXDECODE_ENTRY( "roztiles", 0, gfx_16x16x8_raw, 0x2000, 0x10 )
+	GFXDECODE_ENTRY( "bgtiles",  0, gfx_16x16x8_raw, 0x1000, 0x10 )
+	GFXDECODE_ENTRY( "txtiles",  0, gfx_8x8x8_raw,   0x6000, 0x10 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_f1superb )
-	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
-	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
-	GFXDECODE_ENTRY( "gfx4", 0, txlayout,     0x6000, 0x10 )
-	GFXDECODE_ENTRY( "gfx5", 0, f1layout,     0x0000, 0x80 ) // not tilemap data?
+	GFXDECODE_ENTRY( "roztiles", 0, gfx_16x16x8_raw, 0x2000, 0x10 )
+	GFXDECODE_ENTRY( "bgtiles",  0, gfx_16x16x8_raw, 0x1000, 0x10 )
+	GFXDECODE_ENTRY( "txtiles",  0, gfx_8x8x8_raw,   0x6000, 0x10 )
+	GFXDECODE_ENTRY( "gfx5",     0, f1layout,        0x0000, 0x80 ) // not tilemap data?
 GFXDECODE_END
 
 
@@ -1629,7 +1610,7 @@ IRQ_CALLBACK_MEMBER(ms32_base_state::irq_callback)
 {
 	int i;
 	// TODO: confirm irq priority
-	for(i=15; i>=0 && !(m_irqreq & (1<<i)); i--);
+	for (i = 15; i >= 0 && !(m_irqreq & (1 << i)); i--) { }
 	return i;
 }
 
@@ -1642,9 +1623,9 @@ void ms32_base_state::irq_init()
 void ms32_base_state::irq_raise(int level, bool state)
 {
 	if (state == true)
-		m_irqreq |= (1<<level);
+		m_irqreq |= (1 << level);
 	else
-		m_irqreq &= ~(1<<level);
+		m_irqreq &= ~(1 << level);
 
 	if (m_irqreq)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -1699,7 +1680,7 @@ void ms32_base_state::sound_reset_line_w(int state)
 
 u8 ms32_base_state::latch_r()
 {
-	return m_soundlatch->read()^0xff;
+	return m_soundlatch->read() ^ 0xff;
 }
 
 void ms32_base_state::ms32_snd_bank_w(u8 data)
@@ -1733,8 +1714,8 @@ void ms32_base_state::base_sound_map(address_map &map)
 	map(0x3f70, 0x3f70).nopw();   // watchdog? banking? very noisy
 	map(0x3f80, 0x3f80).w(FUNC(ms32_state::ms32_snd_bank_w));
 	map(0x4000, 0x7fff).ram();
-	map(0x8000, 0xbfff).bankr("z80bank1");
-	map(0xc000, 0xffff).bankr("z80bank2");
+	map(0x8000, 0xbfff).bankr(m_z80bank[0]);
+	map(0xc000, 0xffff).bankr(m_z80bank[1]);
 }
 
 void ms32_state::ms32_sound_map(address_map &map)
@@ -1765,7 +1746,7 @@ void ms32_base_state::machine_reset()
 void ms32_state::ms32(machine_config &config)
 {
 	/* basic machine hardware */
-	V70(config, m_maincpu, XTAL(40'000'000)/2); // D70632GD-20 20MHz (40MHz / 2)
+	V70(config, m_maincpu, XTAL(40'000'000) / 2); // D70632GD-20 20MHz (40MHz / 2)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
 
@@ -1785,14 +1766,14 @@ void ms32_state::ms32(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// dot clock is 48/8 MHz, settable with /6 thru system register [0]
-	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
+	m_screen->set_raw(XTAL(48'000'000) / 8, 384, 0, 320, 263, 0, 224); // default CRTC setup
 	m_screen->set_screen_update(FUNC(ms32_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(ms32_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ms32);
 	PALETTE(config, m_palette).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8);
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000) / 8);
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
@@ -1851,13 +1832,13 @@ ROM_START( bbbxing )
 	ROM_LOAD32_WORD( "mb93138a_5_ver1.0.5",   0x1000002, 0x080000, CRC(64989edf) SHA1(033eab0e8a53607b2bb420f6356804b2cfa1544c) )
 	ROM_LOAD32_WORD( "mb93138a_17_ver1.0.17", 0x1000000, 0x080000, CRC(1d7ebaf0) SHA1(5aac7cb01013ce3be206318678aced5812bff9a9) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr92042-05.9",   0x000000, 0x200000, CRC(a41cb650) SHA1(1c55a4afe55c1250806f2d93c25842dc3fb7f987) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr92042-04.11",  0x000000, 0x200000, CRC(85238ca9) SHA1(1ce32d585fe66764d621c11882ef9d2abaea6256) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "mr92042-01.32",0x000000, 0x080000, CRC(3ffdae75) SHA1(2b837d28f7ecdd49e8525bd5c249e83021d5fe9f) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -1888,13 +1869,13 @@ ROM_START( suchie2 )
 	ROM_LOAD32_WORD( "mb94019-08.4",  0xc00002, 0x200000, CRC(4b07edc9) SHA1(22aaa923a94a7bec997d2adabc8ec2c7696c33a5) )
 	ROM_LOAD32_WORD( "mb94019-07.16", 0xc00000, 0x200000, CRC(34f471a8) SHA1(4c9c358a9bfdb436a211caa14d085e631609681d) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "94019-09.11", 0x000000, 0x200000, CRC(cde7bb6f) SHA1(47454dac4ce67ce8d7e0c5ef3a732477ac8170a7) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x100000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mb94019-12.10", 0x000000, 0x100000, CRC(15ae05d9) SHA1(ac00d3766c42ccba4585b9acfacc81bcb940ac26) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "mb-93166-30_ver1.0.30", 0x000000, 0x080000, CRC(0c738883) SHA1(e552c1842d759e5e617eb9c6cc178620a461b4dd) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -1925,13 +1906,13 @@ ROM_START( suchie2o )
 	ROM_LOAD32_WORD( "mb94019-08.4",  0xc00002, 0x200000, CRC(4b07edc9) SHA1(22aaa923a94a7bec997d2adabc8ec2c7696c33a5) )
 	ROM_LOAD32_WORD( "mb94019-07.16", 0xc00000, 0x200000, CRC(34f471a8) SHA1(4c9c358a9bfdb436a211caa14d085e631609681d) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mb94019-09.11", 0x000000, 0x200000, CRC(cde7bb6f) SHA1(47454dac4ce67ce8d7e0c5ef3a732477ac8170a7) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x100000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mb94019-12.10", 0x000000, 0x100000, CRC(15ae05d9) SHA1(ac00d3766c42ccba4585b9acfacc81bcb940ac26) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "mb-93166-30_ver1.0.30", 0x000000, 0x080000, CRC(0c738883) SHA1(e552c1842d759e5e617eb9c6cc178620a461b4dd) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -1962,15 +1943,15 @@ ROM_START( desertwr )
 	ROM_LOAD32_WORD( "mb94038-07.16", 0xc00000, 0x200000, CRC(426f4193) SHA1(98a16a70c225d7cd061fcd6e88992d393e6ef9fd) )
 	ROM_LOAD32_WORD( "mb94038-08.4",  0xc00002, 0x200000, CRC(f4088399) SHA1(9d53880996f85776815840bca1f8c3958de4c275) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mb94038-11.11", 0x000000, 0x200000, CRC(bf2ec3a3) SHA1(904cd5ab2e855bdb94bc70efa6db42af672337d7) )
 	ROM_LOAD( "mb94038-12.12", 0x200000, 0x200000, CRC(d0e113da) SHA1(57f27cbd58421a0afe724fec5628c4a29aad8868) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x400000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mb94038-09.10", 0x000000, 0x200000, CRC(72ec1ce7) SHA1(88bd9ca3aa7a6410e8fcf6fd70304f12724653bb) ) /* YES, the ROM number & socket number are backwards - it's correct */
 	ROM_LOAD( "mb94038-10.9",  0x200000, 0x200000, CRC(1e17f2a9) SHA1(19e6be1daa157593fbab84149f1f739dd39c9226) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "mb93166_ver1.0-29.30", 0x000000, 0x080000, CRC(980ab89c) SHA1(8468fc13a5988e25750e8d99ff464f46e86ab412) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2009,16 +1990,16 @@ ROM_START( f1superb )
 	ROM_LOAD32_WORD( "f1sb8.bin",  0x1c00002, 0x200000, CRC(ba3f1533) SHA1(3ff1c4cca8358fc8daf0d2c381672569085ac9ae) )
 	ROM_LOAD32_WORD( "f1sb20.bin", 0x1c00000, 0x200000, CRC(fa349897) SHA1(31e08aa2821e409057e3094333b9ecbe04a6a38a) )
 
-	ROM_REGION( 0x800000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x800000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "f1sb9.bin",  0x000000, 0x200000, CRC(66b12e1f) SHA1(4dc3f162a5116403cc0c491af335208672c8e9af) )
 	ROM_LOAD( "f1sb10.bin", 0x200000, 0x200000, CRC(893d7f4b) SHA1(b2734f20f703a0dcf8b1fdaebf2b6198b2fb0f51) )
 	ROM_LOAD( "f1sb11.bin", 0x400000, 0x200000, CRC(0b848bb5) SHA1(e4c0e434add151112352d6068e5de1a7098e6346) )
 	ROM_LOAD( "f1sb12.bin", 0x600000, 0x200000, CRC(edecd5f4) SHA1(9b86802d08e5c8ec1a6dcea75dc8f050d3e96970) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "f1sb31.bin", 0x000000, 0x200000, CRC(1d0d2efd) SHA1(e6446ef9c71be9316c286157f71e0043347c6a5c) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "f1sb32.bin", 0x000000, 0x080000, CRC(1b31fcce) SHA1(354cc6f43cd3bf3ba921ac8c5631ab993bedf563) )
 
 	ROM_REGION( 0x800000, "gfx5", 0 ) /* extra data? doesn't seem to be tiles */
@@ -2053,14 +2034,14 @@ ROM_START( gratia )
 	ROM_LOAD32_WORD( "mr94019-05.15", 0x800000, 0x200000, CRC(a16994df) SHA1(9170b1fd9252d7a9601c3b2e6b1ba86686730b86) )
 	ROM_LOAD32_WORD( "mr94019-06.3",  0x800002, 0x200000, CRC(01d52ef1) SHA1(1585c7eb3729bab78467f627b7b671d619451a74) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr94019-08.12", 0x000000, 0x200000, CRC(abd124e0) SHA1(2da1d818c909e4abbb79ed03f3dbf15d744439ce) )
 	ROM_LOAD( "mr94019-09.11", 0x200000, 0x200000, CRC(711ab08b) SHA1(185b80b965ac3aba4857b4f83637008c2c1cc6ff) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "94019_2.07", 0x000000, 0x200000, CRC(043f969b) SHA1(ad10339e561c1a65451a2e9a8e79ceda3787674a) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "94019_2.030",0x000000, 0x080000, CRC(f9543fcf) SHA1(8466c7893bc6c43e2a80b8f91a776fd0a345ea6c) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2089,14 +2070,14 @@ ROM_START( gratiaa )
 	ROM_LOAD32_WORD( "mr94019-05.15", 0x800000, 0x200000, CRC(a16994df) SHA1(9170b1fd9252d7a9601c3b2e6b1ba86686730b86) )
 	ROM_LOAD32_WORD( "mr94019-06.3",  0x800002, 0x200000, CRC(01d52ef1) SHA1(1585c7eb3729bab78467f627b7b671d619451a74) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr94019-08.12", 0x000000, 0x200000, CRC(abd124e0) SHA1(2da1d818c909e4abbb79ed03f3dbf15d744439ce) )
 	ROM_LOAD( "mr94019-09.11", 0x200000, 0x200000, CRC(711ab08b) SHA1(185b80b965ac3aba4857b4f83637008c2c1cc6ff) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, CRC(561a786b) SHA1(23df08d50801bd6e4a2f12dd3bb50632ff77f0f2) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "94019_30ver1.0.30",0x000000, 0x080000, CRC(026b5379) SHA1(b9237477f1bf8ae83174e8231492fe667e6d6a13) ) /* Labeled 94019  (21)Ver1,0  with the Kanji version of the game name before "(30)" */
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2127,15 +2108,15 @@ ROM_START( gametngk )
 	ROM_LOAD32_WORD( "mr94041-07.16", 0x0c00000, 0x200000, CRC(a6966af5) SHA1(3a65824f3f325af39d8e9932357ce9f8878f0321) )
 	ROM_LOAD32_WORD( "mr94041-08.4",  0x0c00002, 0x200000, CRC(d7d2f73a) SHA1(0eb28f4cdea73aa8fed0b62cbac6cd7d7694c2ee) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr94041-11.11", 0x000000, 0x200000, CRC(00dcdbc3) SHA1(f7e34bc9f714ea81fc9855d90db792dd1e99bae8) )
 	ROM_LOAD( "mr94041-12.12", 0x200000, 0x200000, CRC(0ce48329) SHA1(9c198cef998eb3b9c33123bd8cc02210498f82d9) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x400000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr94041-09.10", 0x000000, 0x200000, CRC(a33e6051) SHA1(d6e34b022eb36dcfa8cfe6d6d1254f994b3b3dca) ) /* YES, the ROM number & socket number are backwards - it's correct */
 	ROM_LOAD( "mr94041-10.9",  0x200000, 0x200000, CRC(b3497147) SHA1(df7d8ea7ec3e3df5e0c6658f14995df5479181bf) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "mb94166_ver1.0-30.30", 0x000000, 0x080000, CRC(c0f27b7f) SHA1(874fe80aa4b46520f844ef6efa61f28eabccbc4f) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2164,13 +2145,13 @@ ROM_START( hayaosi2 )
 	ROM_LOAD32_WORD( "mb93138a.15", 0x800000, 0x080000, CRC(a5f64d87) SHA1(11bf017f700faba57a5a2edced7a5d81a581bc50) )
 	ROM_LOAD32_WORD( "mb93138a.3",  0x800002, 0x080000, CRC(a2ae2b21) SHA1(65cee4e5e0a9b8dcac578e34210e1af7d7b2e6f7) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr93038.03",  0x000000, 0x200000, CRC(6999dec9) SHA1(eb4c6ba200cd08b41509314c659feb3af12117ee) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x100000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr93038.08",  0x000000, 0x100000, CRC(21282cb0) SHA1(52ea94a6457f7684674783c362052bcc40086dd0) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "mb93138a.32", 0x000000, 0x080000, CRC(f563a144) SHA1(14d86e4992329811857e1faf282cd9ec530a364c) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2268,13 +2249,13 @@ ROM_START( hayaosi3 )
 	ROM_LOAD32_WORD( "mr94027.07",  0xc00000, 0x200000, CRC(c66099c4) SHA1(5a6edffa39a98f38cc3cffbad9191fb2e794a812) )
 	ROM_LOAD32_WORD( "mr94027.08",  0xc00002, 0x200000, CRC(753b05e0) SHA1(0424e92b32a73c27ecb549e6e9449446ea938e40) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr94027.09",  0x000000, 0x200000, CRC(32ead437) SHA1(b94175cf186b4ebcc180a4c092d2ffcdd9ff3b1d) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr94027.11",  0x000000, 0x200000, CRC(b65d5096) SHA1(2c4e1e3e9f96be8369cb2de142a82f94506f85c0) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "mb93138_32_ver1.0.32", 0x000000, 0x080000, CRC(df5d00b4) SHA1(2bbbcd546d5b5170d81bf33b37b46b70b417c9c7) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2305,13 +2286,13 @@ ROM_START( hayaosi3a )
 	ROM_LOAD32_WORD( "mr94027.07",  0xc00000, 0x200000, CRC(c66099c4) SHA1(5a6edffa39a98f38cc3cffbad9191fb2e794a812) )
 	ROM_LOAD32_WORD( "mr94027.08",  0xc00002, 0x200000, CRC(753b05e0) SHA1(0424e92b32a73c27ecb549e6e9449446ea938e40) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr94027.09",  0x000000, 0x200000, CRC(32ead437) SHA1(b94175cf186b4ebcc180a4c092d2ffcdd9ff3b1d) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr94027.11",  0x000000, 0x200000, CRC(b65d5096) SHA1(2c4e1e3e9f96be8369cb2de142a82f94506f85c0) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "mb93138_32_ver1.0.32", 0x000000, 0x080000, CRC(df5d00b4) SHA1(2bbbcd546d5b5170d81bf33b37b46b70b417c9c7) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2342,14 +2323,14 @@ ROM_START( kirarast )
 	ROM_LOAD32_WORD( "mr95025.07",  0xc00000, 0x200000, CRC(0263a010) SHA1(b9c85647b406c89f0e839eac93eaf5d2e6963f7d) )
 	ROM_LOAD32_WORD( "mr95025.08",  0xc00002, 0x200000, CRC(8efc00d6) SHA1(f750e0e21310ceceeae3ad80eb2fe2920f5a0076) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr95025.10",  0x000000, 0x200000, CRC(ba7ad413) SHA1(b1f1c218dea3217f21d5e2f44db3786055ed879a) )
 	ROM_LOAD( "mr95025.11",  0x200000, 0x200000, CRC(11557299) SHA1(6efa56f897ab026f965376a0d4032f7a0d20cafe) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr95025.09",  0x000000, 0x200000, CRC(ca6cbd17) SHA1(9d16ef187b062590315066218e89bdf33cfd9865) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "mr95025.30",  0x000000, 0x080000, CRC(aee6e0c2) SHA1(dee985f7a9773ba7a4d31a3833a7775d778bbe5a) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2380,13 +2361,13 @@ ROM_START( akiss )
 	ROM_LOAD32_WORD( "mb95008-07.16", 0xc00000, 0x200000, CRC(bf47747e) SHA1(b97121953f41039182e25ea023802df4524cf9bd) )
 	ROM_LOAD32_WORD( "mb95008-08.4",  0xc00002, 0x200000, CRC(34829a09) SHA1(7229c56fee53a9d4d29cf0c9dec471b6cc4dc30b) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mb95008-10.11",  0x000000, 0x200000, CRC(52da2e9e) SHA1(d7a29bdd1c6801aa8d36bc098e75091c63ba0766) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mb95008-09.10",  0x000000, 0x200000,CRC(7236f6a0) SHA1(98dbb55f08d669ef3bf69394bb9739d0e6137fcb) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "mb93166_ver1.0-30.30",  0x000000, 0x080000, CRC(1807c1ea) SHA1(94696b8319c4982cb5d33423f56e2348f210cdb5) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2422,15 +2403,15 @@ ROM_START( p47aces )
 	ROM_LOAD32_WORD( "mr94020-08.4",  0xc00002, 0x100000, CRC(4b3372be) SHA1(cdc7d7615b6b5d45ca071b2967980dc6c6294ac0) )
 	ROM_LOAD32_WORD( "mr94020-07.16", 0xc00000, 0x100000, CRC(c23c5467) SHA1(5ff51ecb86ccbae2af160599890e13a7cc70072d) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr94020-11.11", 0x000000, 0x200000, CRC(c1fe16b3) SHA1(8b9d2483ba06ab8072676e73d949c696535b3d26) )
 	ROM_LOAD( "mr94020-12.12", 0x200000, 0x200000, CRC(75871325) SHA1(9191263a52ec6ac325cf6130b35be7cdd1ec2f50) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x400000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr94020-10.10", 0x000000, 0x200000, CRC(a44e9e06) SHA1(ff51796e160d996e931b92049e6214982f270caa) ) /* unlike other sets, the ROM number & socket number match - it's correct */
 	ROM_LOAD( "mr94020-09.9",  0x200000, 0x200000, CRC(226014a6) SHA1(090bdc1f6d2b9d33b431dbb49a457a4bb36cd3ad) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "p-47_ver1.0-30.30", 0x000000, 0x080000, CRC(7ba90fad) SHA1(c0a3d4458816f00b8f5eb4b6d4531d1abeaccbe5) ) /* Labeled "P-47 Ver1.0 -30" */
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2461,15 +2442,15 @@ ROM_START( p47acesa )
 	ROM_LOAD32_WORD( "mr94020-08.4",  0xc00002, 0x100000, CRC(4b3372be) SHA1(cdc7d7615b6b5d45ca071b2967980dc6c6294ac0) )
 	ROM_LOAD32_WORD( "mr94020-07.16", 0xc00000, 0x100000, CRC(c23c5467) SHA1(5ff51ecb86ccbae2af160599890e13a7cc70072d) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr94020-11.11", 0x000000, 0x200000, CRC(c1fe16b3) SHA1(8b9d2483ba06ab8072676e73d949c696535b3d26) )
 	ROM_LOAD( "mr94020-12.12", 0x200000, 0x200000, CRC(75871325) SHA1(9191263a52ec6ac325cf6130b35be7cdd1ec2f50) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x400000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr94020-10.10", 0x000000, 0x200000, CRC(a44e9e06) SHA1(ff51796e160d996e931b92049e6214982f270caa) ) /* unlike other sets, the ROM number & socket number match - it's correct */
 	ROM_LOAD( "mr94020-09.9",  0x200000, 0x200000, CRC(226014a6) SHA1(090bdc1f6d2b9d33b431dbb49a457a4bb36cd3ad) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "p-47_ver1.0-30.30", 0x000000, 0x080000, CRC(7ba90fad) SHA1(c0a3d4458816f00b8f5eb4b6d4531d1abeaccbe5) ) /* Labeled "P-47 Ver1.0 -30" */
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2494,13 +2475,13 @@ ROM_START( tetrisp )
 	ROM_LOAD32_WORD( "mr95024-01.01", 0x000002, 0x200000, CRC(cb0e92b9) SHA1(179cc9e2d819d7f6238e924184e8a383d172aa72) )
 	ROM_LOAD32_WORD( "mr95024-02.13", 0x000000, 0x200000, CRC(4a825990) SHA1(f99ba9f88f5582259ba0e50480451d4e9d1d03b7) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr95024-04.11", 0x000000, 0x200000, CRC(c0d5246f) SHA1(413285f6b40001281c4fcec1ce73400c3ae610ed) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr95024-03.10", 0x000000, 0x200000, CRC(a03e4a8d) SHA1(d52c78d5e9d874dce514ffb035f2424409d8fb7a) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "mb93166_ver1.0-30.30", 0x000000, 0x080000, CRC(cea7002d) SHA1(5462edaeb9339790b95ed15a4bfaab8fae655b12) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2525,13 +2506,13 @@ ROM_START( tp2m32 )
 	ROM_LOAD32_WORD( "mr96019-01.13", 0x000000, 0x400000, CRC(06f7dc64) SHA1(722c51b707b9854c0293afdff18b27ec7cae6719) )
 	ROM_LOAD32_WORD( "mr96019-02.1",  0x000002, 0x400000, CRC(3e613bed) SHA1(038b5e43fa3d69654107c8093126eeb2e8fa4ddc) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr96019-04.11", 0x000000, 0x200000, CRC(b5a03129) SHA1(a50d8b70615c49216f647534d1658c1a6d58a783) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x400000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr96019-03.10", 0x000000, 0x400000, CRC(94af8057) SHA1(e3bc6e02fe4c503ae51284770a76abbeff989147) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "mp2_30.ver1.0.30", 0x000000, 0x080000, CRC(6845e476) SHA1(61c33714db2e2b5ccdcef0e0d3efdc391fe6aba2) ) /* labeled M  P2 30 Ver1.0  - game name in Kanji between M and P2 */
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2563,13 +2544,13 @@ ROM_START( bnstars ) /* ver 1.1 */
 	ROM_LOAD32_WORD( "mr96004-07.16", 0xc00000, 0x200000, CRC(177e32fa) SHA1(3ca1f397dc28f1fa3a4136705b92c63e4e438f05) )
 	ROM_LOAD32_WORD( "mr96004-08.4",  0xc00002, 0x200000, CRC(f6df27b2) SHA1(60590976020d86bdccd4eaf57b349ea31bec6830) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr96004-09.11",  0x000000, 0x400000, CRC(7f8ea9f0) SHA1(f1fe682dcb884f1aa4a5536e17ab94157a99f519) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr96004-11.10", 0x000000, 0x200000,  CRC(e6da552c) SHA1(69a5af3015883793c7d1343243ccae23db9ef77c) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "vsjanshi_30_ver1.0.30",  0x000000, 0x080000, CRC(fdbbac21) SHA1(c77d852e53126cc8ebfe1e79d1134e42b54d1aab) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2635,13 +2616,13 @@ ROM_START( wpksocv2 )
 	ROM_LOAD32_WORD( "mr95033-05.15", 0x800000, 0x200000, CRC(cc5b8d0b) SHA1(70a5b9db600fc168d13ad54653cf1c8d2a45d991) )
 	ROM_LOAD32_WORD( "mr95033-06.3",  0x800002, 0x200000, CRC(2f79942f) SHA1(73417d10f37bcd539b8081312226cf142a5a0d3d) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* roz tiles */
+	ROM_REGION( 0x200000, "roztiles", 0 ) /* roz tiles */
 	ROM_LOAD( "mr95033-07.9", 0x000000, 0x200000, CRC(76cd2e0b) SHA1(41aa18dfb4e06547d1f6d7ce49e5225027d16bbb) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
+	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr95033-09.11", 0x000000, 0x200000, CRC(8a6dae81) SHA1(e235f2865a9a003330bff1e4d0a017e5d10efd2a) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
+	ROM_REGION( 0x080000, "txtiles", 0 ) /* tx tiles */
 	ROM_LOAD( "pk_soccer_v2_rom_32_ver._1.1.32", 0x000000, 0x080000, CRC(becc25c2) SHA1(4ae7665cd45ebd9586068e99327145194ba216fc) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
@@ -2674,32 +2655,32 @@ void ms32_state::init_ms32_common()
 void ms32_state::init_ss91022_10()
 {
 	init_ms32_common();
-	decrypt_ms32_tx(machine(), 0x00000,0x35, "gfx4");
-	decrypt_ms32_bg(machine(), 0x00000,0xa3, "gfx3");
+	decrypt_ms32_tx(machine(), 0x00000,0x35, "txtiles");
+	decrypt_ms32_bg(machine(), 0x00000,0xa3, "bgtiles");
 }
 
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi2 */
 void ms32_state::init_ss92046_01()
 {
 	init_ms32_common();
-	decrypt_ms32_tx(machine(), 0x00020,0x7e, "gfx4");
-	decrypt_ms32_bg(machine(), 0x00001,0x9b, "gfx3");
+	decrypt_ms32_tx(machine(), 0x00020,0x7e, "txtiles");
+	decrypt_ms32_bg(machine(), 0x00001,0x9b, "bgtiles");
 }
 
 /* SS92047-01: gratia, kirarast */
 void ms32_state::init_ss92047_01()
 {
 	init_ms32_common();
-	decrypt_ms32_tx(machine(), 0x24000,0x18, "gfx4");
-	decrypt_ms32_bg(machine(), 0x24000,0x55, "gfx3");
+	decrypt_ms32_tx(machine(), 0x24000,0x18, "txtiles");
+	decrypt_ms32_bg(machine(), 0x24000,0x55, "bgtiles");
 }
 
 /* SS92048-01: p47aces, suchie2, suchie2o */
 void ms32_state::init_ss92048_01()
 {
 	init_ms32_common();
-	decrypt_ms32_tx(machine(), 0x20400,0xd6, "gfx4");
-	decrypt_ms32_bg(machine(), 0x20400,0xd4, "gfx3");
+	decrypt_ms32_tx(machine(), 0x20400,0xd6, "txtiles");
+	decrypt_ms32_bg(machine(), 0x20400,0xd4, "bgtiles");
 }
 
 void ms32_state::init_kirarast()
@@ -2732,24 +2713,24 @@ void ms32_state::init_bnstars()
 
 
 // TODO: inputs in akiss, bnstars (former has no dip display in service mode)
-GAME( 1994, hayaosi2,  0,        ms32, hayaosi2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, hayaosi3,  0,        ms32, hayaosi3, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, hayaosi3a, hayaosi3, ms32, hayaosi3, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.2)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, bbbxing,   0,        ms32, bbbxing,  ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1994, suchie2,   0,        ms32, suchie2,  ms32_state, init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, desertwr,  0,        ms32, desertwr, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gametngk,  0,        ms32, gametngk, ms32_state, init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, tetrisp,   0,        ms32, tetrisp,  ms32_state, init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47aces,   0,        ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47acesa,  p47aces,  ms32, p47aces,  ms32_state, init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akiss,     0,        ms32, suchie2,  ms32_state, init_kirarast,   ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratia,    0,        ms32, gratia,   ms32_state, init_ss92047_01, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratiaa,   gratia,   ms32, gratia,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kirarast,  0,        ms32, kirarast, ms32_state, init_kirarast,   ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tp2m32,    tetrisp2, ms32_invert_lines, tp2m32,   ms32_state, init_ss91022_10, ROT0,   "Jaleco",        "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, init_bnstars,    ROT0,   "Jaleco",        "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hayaosi2,  0,        ms32,              hayaosi2, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, hayaosi3,  0,        ms32,              hayaosi3, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, hayaosi3a, hayaosi3, ms32,              hayaosi3, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.2)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, bbbxing,   0,        ms32,              bbbxing,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1994, suchie2,   0,        ms32,              suchie2,  ms32_state,               init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, suchie2o,  suchie2,  ms32,              suchie2,  ms32_state,               init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, desertwr,  0,        ms32,              desertwr, ms32_state,               init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gametngk,  0,        ms32,              gametngk, ms32_state,               init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, tetrisp,   0,        ms32,              tetrisp,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47aces,   0,        ms32,              p47aces,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47acesa,  p47aces,  ms32,              p47aces,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akiss,     0,        ms32,              suchie2,  ms32_state,               init_kirarast,   ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratia,    0,        ms32,              gratia,   ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratiaa,   gratia,   ms32,              gratia,   ms32_state,               init_ss91022_10, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kirarast,  0,        ms32,              kirarast, ms32_state,               init_kirarast,   ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tp2m32,    tetrisp2, ms32_invert_lines, tp2m32,   ms32_state,               init_ss91022_10, ROT0,   "Jaleco",        "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bnstars,   bnstars1, ms32,              suchie2,  ms32_state,               init_bnstars,    ROT0,   "Jaleco",        "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */
-GAMEL( 1994, f1superb, 0,        f1superb, f1superb, ms32_f1superbattle_state, init_f1superb, ROT0,   "Jaleco",       "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )
+GAMEL( 1994, f1superb, 0,        f1superb,          f1superb, ms32_f1superbattle_state, init_f1superb,   ROT0,   "Jaleco",       "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )

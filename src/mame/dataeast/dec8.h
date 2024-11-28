@@ -147,6 +147,7 @@ public:
 	}
 
 	void srdarwin(machine_config &config);
+	void init_srdarwinb();
 
 protected:
 	virtual void video_start() override ATTR_COLD;

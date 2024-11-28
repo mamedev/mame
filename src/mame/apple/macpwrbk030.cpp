@@ -2,132 +2,132 @@
 // copyright-holders:R. Belmont
 /****************************************************************************
 
-	drivers/macpwrbk030.cpp
-	Mac PowerBooks with a 68030 CPU and M50753 PMU
-	By R. Belmont
+    drivers/macpwrbk030.cpp
+    Mac PowerBooks with a 68030 CPU and M50753 PMU
+    By R. Belmont
 
-	These are basically late-period Mac IIs without NuBus and with
-	Egret/Cuda replaced with the PMU.
+    These are basically late-period Mac IIs without NuBus and with
+    Egret/Cuda replaced with the PMU.
 
-	Generation 1:
-	PowerBook 140: 16 MHz 68030, 2 MiB RAM, no FPU, passive-matrix screen
-	PowerBook 145: 140 with 25 MHz 68030
-	PowerBook 145B: 140 with 25 MHz 68030 and 4 MiB of RAM standard
-	PowerBook 170: 140, with 25 MHz 68030, 68881 FPU, active-matrix screen
+    Generation 1:
+    PowerBook 140: 16 MHz 68030, 2 MiB RAM, no FPU, passive-matrix screen
+    PowerBook 145: 140 with 25 MHz 68030
+    PowerBook 145B: 140 with 25 MHz 68030 and 4 MiB of RAM standard
+    PowerBook 170: 140, with 25 MHz 68030, 68881 FPU, active-matrix screen
 
-	Generation 2: (all models include external monitor support)
-	PowerBook 160: 25 MHz 68030, no FPU, passive-matrix screen with 2 bits per pixel grayscale
-	PowerBook 180: 33 MHz 68030, 68881 FPU, active-matrix screen with 2 bits per pixel grayscale
-	PowerBook 165: 160 with 33 MHz 68030
-	PowerBook 165c: 160 with 33 MHz 68030, FPU, color 640x400 display
-	PowerBook 180c: 165c with color 640x480 display
+    Generation 2: (all models include external monitor support)
+    PowerBook 160: 25 MHz 68030, no FPU, passive-matrix screen with 2 bits per pixel grayscale
+    PowerBook 180: 33 MHz 68030, 68881 FPU, active-matrix screen with 2 bits per pixel grayscale
+    PowerBook 165: 160 with 33 MHz 68030
+    PowerBook 165c: 160 with 33 MHz 68030, FPU, color 640x400 display
+    PowerBook 180c: 165c with color 640x480 display
 
-	Driver features:
-	- Display, audio, floppy, SCSI, and ADB all work.  You can boot compatible System versions
-	  and run arbitrary software.
-	- FPU presence and Jaws/Niagra CPU speed readback are supported so that Gestalt properly
-	  identifies all models (except the 145B is shown as a 145; Apple documents this as also
-	  occuring on hardware).
-	- 165c/180c use of a VGA GPIO feature bit to determine the correct model is supported.
+    Driver features:
+    - Display, audio, floppy, SCSI, and ADB all work.  You can boot compatible System versions
+      and run arbitrary software.
+    - FPU presence and Jaws/Niagra CPU speed readback are supported so that Gestalt properly
+      identifies all models (except the 145B is shown as a 145; Apple documents this as also
+      occuring on hardware).
+    - 165c/180c use of a VGA GPIO feature bit to determine the correct model is supported.
 
-	Driver TODOs:
-	- Shutting down or restarting from Finder freezes the machine.  Something related
-	  to power management presumably, but the cause is not clear.  This is why the driver is MACHINE_NOT_WORKING.
-	- External video interface on 160/165/165c/180/180c.
+    Driver TODOs:
+    - Shutting down or restarting from Finder freezes the machine.  Something related
+      to power management presumably, but the cause is not clear.  This is why the driver is MACHINE_NOT_WORKING.
+    - External video interface on 160/165/165c/180/180c.
 
     ============================================================================
-	Technical info
+    Technical info
 
-	VIA 1 connections: (PowerBook 140/170, 160/180/180C are similar)
-	Port A: 0: VIA_TEST
-			1: CPU_ID0
-			2: CPU_ID1
-			3: MODEM
-			4: CPU_ID2
-			5: HDSEL (floppy head select)
-			6: CPU_ID3
-			7: SCC REQ
+    VIA 1 connections: (PowerBook 140/170, 160/180/180C are similar)
+    Port A: 0: VIA_TEST
+            1: CPU_ID0
+            2: CPU_ID1
+            3: MODEM
+            4: CPU_ID2
+            5: HDSEL (floppy head select)
+            6: CPU_ID3
+            7: SCC REQ
 
-	Port B: 0: RTC DATA
-			1: RTC CLOCK
-			2: RTC
-			3: LINK SEL
-			4: N/C
-			5: N/C
-			6: N/C
-			7: N/C
+    Port B: 0: RTC DATA
+            1: RTC CLOCK
+            2: RTC
+            3: LINK SEL
+            4: N/C
+            5: N/C
+            6: N/C
+            7: N/C
 
-	CA1: 60 Hz clock
-	CA2: 1 second clock
-	CB1: PMU IRQ
-	CB2: MODEM SND EN
+    CA1: 60 Hz clock
+    CA2: 1 second clock
+    CB1: PMU IRQ
+    CB2: MODEM SND EN
 
-	VIA 2 connections: (VIA2 is a pseudo-VIA inside the "Peripheral Glue" ASIC)
-	Port A: bi-directional PMU data bus
+    VIA 2 connections: (VIA2 is a pseudo-VIA inside the "Peripheral Glue" ASIC)
+    Port A: bi-directional PMU data bus
 
-	Port B: 0: SV1
-			1: PMACK
-			2: PMREQ
-			3: SV0
-			4: SV2
-			5: HMMU
-			6: N/C
-			7: MODEM RESET
+    Port B: 0: SV1
+            1: PMACK
+            2: PMREQ
+            3: SV0
+            4: SV2
+            5: HMMU
+            6: N/C
+            7: MODEM RESET
 
-	PMU (M50753) connections:
-	IN port: 0: BRITE SENSE
-			 1: A/D BATT     (battery charge level)
-			 2: SND CNTL
-			 3: MODEM BUSY
-			 4: PWR ON       (input, 1 = system power on)
-			 5: TEMP A/D     (battery temperature)
-			 6: NICAD SLA
-			 7: TABLE SEL    (A/D input, some kind of battery state)
+    PMU (M50753) connections:
+    IN port: 0: BRITE SENSE
+             1: A/D BATT     (battery charge level)
+             2: SND CNTL
+             3: MODEM BUSY
+             4: PWR ON       (input, 1 = system power on)
+             5: TEMP A/D     (battery temperature)
+             6: NICAD SLA
+             7: TABLE SEL    (A/D input, some kind of battery state)
 
-	Port 0: 0: SWIM CNTL
-			1: SCC CNTL
-			2: HD PWR
-			3: MODEM PWR
-			4: N/C
-			5: SOUND PWR
-			6: MODEM PWROUT
-			7: SYS_PWR
+    Port 0: 0: SWIM CNTL
+            1: SCC CNTL
+            2: HD PWR
+            3: MODEM PWR
+            4: N/C
+            5: SOUND PWR
+            6: MODEM PWROUT
+            7: SYS_PWR
 
-	Port 1: 0: CCFL PWR CNTL
-			1: AKD              (input, works like the high bit of $C000 on the Apple II, except includes the modifiers)
-			2: STOP CLK
-			3: CHRG ON          (input, 1 = charger is on, 7.1.1 Battery applet shows charging symbol on )
-			4: KBD RST          (output, resets keyboard M50740)
-			5: HICHG            (output)
-			6: RING DETECT
-			7: CHG OFF          (output)
+    Port 1: 0: CCFL PWR CNTL
+            1: AKD              (input, works like the high bit of $C000 on the Apple II, except includes the modifiers)
+            2: STOP CLK
+            3: CHRG ON          (input, 1 = charger is on, 7.1.1 Battery applet shows charging symbol on )
+            4: KBD RST          (output, resets keyboard M50740)
+            5: HICHG            (output)
+            6: RING DETECT
+            7: CHG OFF          (output)
 
-	Port 2: bi-directional data bus, connected to VIA port A
+    Port 2: bi-directional data bus, connected to VIA port A
 
-	Port 3: 0: PWR OFF
-			1: SYS RST
-			2: VIA TEST
-			3: SOUND OFF
-			4: 1 SEC        (input from Mac Plus RTC/PRAM chip, never read by the PMU program)
-			5: PMINT
-			6: PMACK
-			7: PMREQ
+    Port 3: 0: PWR OFF
+            1: SYS RST
+            2: VIA TEST
+            3: SOUND OFF
+            4: 1 SEC        (input from Mac Plus RTC/PRAM chip, never read by the PMU program)
+            5: PMINT
+            6: PMACK
+            7: PMREQ
 
-	Port 4: 0: PMGR_ADB (ADB out)
-			1: ADB (ADB in)
-			2: DISP BLANK
-			3: MODEM_INS
+    Port 4: 0: PMGR_ADB (ADB out)
+            1: ADB (ADB in)
+            2: DISP BLANK
+            3: MODEM_INS
 
-	INT1: 60 Hz clock
-	INT2: INT2 PULLUP (pulled up and otherwise N/C)
+    INT1: 60 Hz clock
+    INT2: INT2 PULLUP (pulled up and otherwise N/C)
 
-	PG&E (68HC05 PMU) version spotting:
-	(find the text "BORG" in the system ROM, the next 32768 bytes are the PG&E image.
-	 offset +4 in the image is the version byte).
-	01 - PowerBook Duo 210/230/250
-	02 - PowerBook 540c, PBDuo 270C, PBDuo 280/280C
-	03 - PowerBook 150
-	08 - PB190cs, PowerBook 540c PPC update, all PowerPC PowerBooks through WallStreet G3s
+    PG&E (68HC05 PMU) version spotting:
+    (find the text "BORG" in the system ROM, the next 32768 bytes are the PG&E image.
+     offset +4 in the image is the version byte).
+    01 - PowerBook Duo 210/230/250
+    02 - PowerBook 540c, PBDuo 270C, PBDuo 280/280C
+    03 - PowerBook 150
+    08 - PB190cs, PowerBook 540c PPC update, all PowerPC PowerBooks through WallStreet G3s
 
 ****************************************************************************/
 

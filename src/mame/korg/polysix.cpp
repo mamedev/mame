@@ -361,7 +361,7 @@ u8 polysix_sound_block::get_control_low()
 void polysix_sound_block::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	for(int sample=0; sample != outputs[0].samples(); sample++) {
-		//		u8 trigger = m_gates & ~m_current_gates;
+		//      u8 trigger = m_gates & ~m_current_gates;
 		float out = 0;
 
 		// Step the pwm phase (common to all channels)
@@ -411,7 +411,7 @@ void polysix_sound_block::sound_stream_update(sound_stream &stream, std::vector<
 			else
 				// When gate is off, discharge a 0.047uF cap through a 230K resistor
 				m_organ_eg[channel] -= m_organ_eg[channel]*0.00192537196422815;   // 1-exp(-1/(230e3 * 0.047e-6 * 48000))
-			
+
 			out += wave * m_organ_eg[channel];
 		}
 
@@ -442,7 +442,7 @@ public:
 	virtual void machine_start() override ATTR_COLD;
 	void polysix(machine_config &config);
 
- 	INPUT_CHANGED_MEMBER(tape_enable_w);
+	INPUT_CHANGED_MEMBER(tape_enable_w);
 
 private:
 	required_device<mcs48_cpu_device> m_progmcu;
@@ -573,7 +573,7 @@ void polysix_state::prog_p1_w(u8 data)
 		case 0xc: m_sound->set_mg_delay(m_prog_bus); break;
 		case 0xd: m_sound->set_mg_level(m_prog_bus); break;
 		}
-	}	
+	}
 }
 
 void polysix_state::prog_p2_w(u8 data)
@@ -625,7 +625,7 @@ int polysix_state::prog_t0_r()
 
 int polysix_state::prog_t1_r()
 {
-	//	logerror("prog t1 %f\n", m_tape->input());
+	//  logerror("prog t1 %f\n", m_tape->input());
 	return m_tape->input() >= 0;
 }
 
@@ -689,7 +689,7 @@ void polysix_state::key_p2_w(u8 data)
 	if(BIT(chg, 7))
 		logerror("cn12-16=%d\n", BIT(m_key_p2, 7));
 
-	//	logerror("key_p2_w row=%x l1=%d l2=%d inh=%d cn12=%d\n", BIT(data, 0, 3), BIT(data, 3), BIT(data, 4), BIT(data, 5), BIT(data, 7));
+	//  logerror("key_p2_w row=%x l1=%d l2=%d inh=%d cn12=%d\n", BIT(data, 0, 3), BIT(data, 3), BIT(data, 4), BIT(data, 5), BIT(data, 7));
 }
 
 int polysix_state::key_t0_r()

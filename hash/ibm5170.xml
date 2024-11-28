@@ -13423,7 +13423,7 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 	</software>
 
 	<software name="eyebeho3fr" cloneof="eyebeho3">
-        <!-- Prints regular AD&D with translated subtitle on box art -->
+		<!-- Prints regular AD&D with translated subtitle on box art -->
 		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder III: A l'assaut de Myth Drannor (France)</description>
 		<year>1993</year>
 		<publisher>SSI</publisher>
@@ -13455,7 +13455,7 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 	</software>
 
 	<software name="eyebeho3de" cloneof="eyebeho3">
-        <!-- TODO: assumed same as French version, verify with box art -->
+		<!-- TODO: assumed same as French version, verify with box art -->
 		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder III: Sturm auf Myth Drannor (Germany)</description>
 		<year>1993</year>
 		<publisher>SSI</publisher>

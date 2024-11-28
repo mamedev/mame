@@ -18,7 +18,7 @@ TODO:
   adds some kind of auxillary autosave state feature at power-off
 
 BTANB:
-- see note below about so-called H8 bug
+- see note below about so-called H8 bug on the A20 ROM
 
 ================================================================================
 
@@ -33,10 +33,14 @@ GK 2000 (H8/323 version):
 - LCD with 5 7segs and custom segments
 - piezo, 16 LEDs, button sensors chessboard
 
-Radio Shack Chess Master:
-- PCB label: same as Centurion / Cougar (see below)
+Barracuda:
+- PCB label: ST39B-PE-013, P/N: 51K090-01310
 - Hitachi H8/3212 MCU, 10MHz XTAL
 - rest is same as GK 2000
+
+Radio Shack Chess Master:
+- PCB label: same as Centurion / Cougar (see below)
+- rest is same as Barracuda
 
 H8/323 A13 MCU is used in:
 - Saitek GK 2000 (1992 version, 86071220X12)
@@ -49,7 +53,7 @@ Travel Champion 2080 and Tandy Mega 2050X are 14MHz instead of 20MHz.
 
 H8/3212 V03 MCU (DIP) is used in:
 - Saitek GK 2000 (1997 version, suspected)
-- Saitek Barracuda (suspected)
+- Saitek Barracuda
 - Saitek Mephisto Montana
 - Tandy (Radio Shack) Chess Master (aka Master Chess Computer)
 

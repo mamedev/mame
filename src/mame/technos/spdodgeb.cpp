@@ -555,7 +555,7 @@ void spdodgeb_state::machine_reset()
 {
 	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
 	m_adpcm_end[0] = m_adpcm_end[1] = 0;
-	m_adpcm_idle[0] = m_adpcm_data[1] = 0;
+	m_adpcm_idle[0] = m_adpcm_idle[1] = 0;
 	m_adpcm_data[0] = m_adpcm_data[1] = -1;
 	m_mcu_status = 0;
 	memset(m_inputs, 0, sizeof(m_inputs));

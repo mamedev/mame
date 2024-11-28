@@ -24,6 +24,8 @@ MAIN BOARD:
 * Note the upper two address lines are latched using an I/O read. The I/O map only has
   space for 128 character bit maps
 
+None of the games use the 2636 sound.
+
 The CPU CANNOT read the character PROMs
         ------
 
@@ -81,31 +83,29 @@ Driver by
     Mike Coates
 
 Hardware Info
- Malcolm & Darren
+    Malcolm & Darren
 
 Additional work
-    2009 Couriersud
+    Couriersud, 2009
 
-Todo & FIXME:
-
+TODO:
 - Emulate protection properly in later games (reads area 0x73fx);
-- Superbike hangs indefinitely when collecting balloon bonus the
-  second time around, protection or s2650 core bug?
-- the board most probably has discrete circuits. The 393Hz tone used
-  for shots (superbike) and collisions (8ball) is just a guess.
+- The board most probably has discrete circuits. Possibly 2 beepers (current
+  frequency is completely guessed), and a pitch sweep sound.
 
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "cvs_base.h"
+
+#include "sound/beep.h"
 
 #include "speaker.h"
 
 
 namespace {
 
-/* Turn to 1 so all inputs are always available (this shall only be a debug feature) */
+// Turn to 1 so all inputs are always available (this shall only be a debug feature)
 #define CVS_SHOW_ALL_INPUTS 0
 
 
@@ -122,17 +122,16 @@ public:
 		, m_character_ram(*this, "character_ram", 3 * 0x800, ENDIANNESS_BIG)
 		, m_4_bit_dac_data(*this, "4bit_dac")
 		, m_tms5110_ctl_data(*this, "tms5110_ctl")
-		, m_dac3_state(*this, "dac3_state")
+		, m_sh_trigger(*this, "sh_trigger")
 		, m_speech_data_rom(*this, "speechdata")
 		, m_audiocpu(*this, "audiocpu")
 		, m_speechcpu(*this, "speechcpu")
 		, m_dac2(*this, "dac2")
-		, m_dac3(*this, "dac3")
+		, m_beep(*this, "beep%u", 0)
 		, m_tms5110(*this, "tms")
 		, m_soundlatch(*this, "soundlatch")
 		, m_in(*this, "IN%u", 0U)
-		, m_dsw2(*this, "DSW2")
-		, m_dsw3(*this, "DSW3")
+		, m_dsw(*this, "DSW%u", 1U)
 		, m_lamps(*this, "lamp%u", 1U)
 	{ }
 
@@ -148,6 +147,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+	virtual void device_post_load() override { m_gfxdecode->gfx(1)->mark_all_dirty(); }
 
 private:
 	// memory pointers
@@ -157,7 +157,7 @@ private:
 	                                                    we can use the same gfx_layout */
 	required_shared_ptr<uint8_t> m_4_bit_dac_data;
 	required_shared_ptr<uint8_t> m_tms5110_ctl_data;
-	required_shared_ptr<uint8_t> m_dac3_state;
+	required_shared_ptr<uint8_t> m_sh_trigger;
 	required_region_ptr<uint8_t> m_speech_data_rom;
 
 	bitmap_ind16 m_background_bitmap = 0;
@@ -167,9 +167,6 @@ private:
 
 	// misc
 	uint8_t m_protection_counter = 0U;
-	emu_timer *m_393hz_timer = nullptr;
-	uint8_t m_393hz_clock = 0U;
-
 	uint16_t m_character_ram_page_start = 0U;
 	uint8_t m_character_banking_mode = 0U;
 	uint16_t m_speech_rom_bit_address = 0U;
@@ -178,19 +175,18 @@ private:
 	required_device<s2650_device> m_audiocpu;
 	required_device<s2650_device> m_speechcpu;
 	required_device<dac_byte_interface> m_dac2;
-	required_device<dac_bit_interface> m_dac3;
+	required_device_array<beep_device, 2> m_beep;
 	required_device<tms5110_device> m_tms5110;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport_array<4> m_in;
-	required_ioport m_dsw2;
-	required_ioport m_dsw3;
+	required_ioport_array<3> m_dsw;
 	output_finder<2> m_lamps;
 
 	uint8_t huncholy_prot_r(offs_t offset);
 	uint8_t superbik_prot_r();
 	uint8_t hero_prot_r(offs_t offset);
 	int speech_rom_read_bit();
-	void slave_cpu_interrupt(int state);
+	void audio_cpu_interrupt(int state);
 	uint8_t input_r(offs_t offset);
 	void speech_rom_address_lo_w(uint8_t data);
 	void speech_rom_address_hi_w(uint8_t data);
@@ -201,16 +197,14 @@ private:
 	void video_fx_w(uint8_t data);
 	void scroll_w(uint8_t data);
 	void _4_bit_dac_data_w(offs_t offset, uint8_t data);
-	void unknown_w(offs_t offset, uint8_t data);
+	void sh_trigger_w(offs_t offset, uint8_t data);
 	void tms5110_ctl_w(offs_t offset, uint8_t data);
 	void tms5110_pdc_w(offs_t offset, uint8_t data);
-	TIMER_CALLBACK_MEMBER(_393hz_timer_cb);
-	void start_393hz_timer() ATTR_COLD;
 	void palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(main_cpu_interrupt);
 	void set_pens();
-	void dac_cpu_map(address_map &map) ATTR_COLD;
+	void audio_cpu_map(address_map &map) ATTR_COLD;
 	void main_cpu_data_map(address_map &map) ATTR_COLD;
 	void main_cpu_io_map(address_map &map) ATTR_COLD;
 	void main_cpu_map(address_map &map) ATTR_COLD;
@@ -312,6 +306,10 @@ void cvs_state::video_start()
 {
 	init_stars();
 
+	// cosmos relies on non-0 initial character RAM for the title screen
+	for (int i = 0; i < 0x1800; i++)
+		m_character_ram[i | 0x400] = 0xff;
+
 	// create helper bitmaps
 	m_screen->register_screen_bitmap(m_background_bitmap);
 	m_screen->register_screen_bitmap(m_collision_background);
@@ -364,7 +362,6 @@ uint32_t cvs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				x, y);
 	}
 
-
 	// Update screen - 8 regions, fixed scrolling area
 	int scroll[8];
 
@@ -394,21 +391,23 @@ uint32_t cvs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			{
 				int const bx = 255 - 7 - m_bullet_ram[offs] - ct;
 
-				// Bullet/Object Collision
-				if ((s2636_0_bitmap.pix(offs, bx) != 0) ||
-					(s2636_1_bitmap.pix(offs, bx) != 0) ||
-					(s2636_2_bitmap.pix(offs, bx) != 0))
-					m_collision_register |= 0x08;
+				if (cliprect.contains(bx, offs))
+				{
+					// Bullet/Object Collision
+					if ((s2636_0_bitmap.pix(offs, bx) != 0) ||
+						(s2636_1_bitmap.pix(offs, bx) != 0) ||
+						(s2636_2_bitmap.pix(offs, bx) != 0))
+						m_collision_register |= 0x08;
 
-				// Bullet/Background Collision
-				if (m_palette->pen_indirect(m_scrolled_collision_background.pix(offs, bx)))
-					m_collision_register |= 0x80;
+					// Bullet/Background Collision
+					if (m_palette->pen_indirect(m_scrolled_collision_background.pix(offs, bx)))
+						m_collision_register |= 0x80;
 
-				bitmap.pix(offs, bx) = BULLET_STAR_PEN;
+					bitmap.pix(offs, bx) = BULLET_STAR_PEN;
+				}
 			}
 		}
 	}
-
 
 	// mix and copy the S2636 images into the main bitmap, also check for collision
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
@@ -485,7 +484,7 @@ INTERRUPT_GEN_MEMBER(cvs_state::main_cpu_interrupt)
 }
 
 
-void cvs_state::slave_cpu_interrupt(int state)
+void cvs_state::audio_cpu_interrupt(int state)
 {
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -513,41 +512,12 @@ uint8_t cvs_state::input_r(offs_t offset)
 	case 0x02:  ret = m_in[1]->read(); break;
 	case 0x03:  ret = m_in[2]->read(); break;
 	case 0x04:  ret = m_in[3]->read(); break;
-	case 0x06:  ret = m_dsw3->read(); break;
-	case 0x07:  ret = m_dsw2->read(); break;
+	case 0x06:  ret = m_dsw[2]->read(); break;
+	case 0x07:  ret = m_dsw[1]->read(); break;
 	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", m_maincpu->pc(), offset & 0x0f); break;
 	}
 
 	return ret;
-}
-
-
-
-/*************************************
- *
- *  Timing
- *
- *************************************/
-#if 0
-int cvs_state::cvs_393hz_clock_r()
-{
-	return m_393hz_clock;
-}
-#endif
-
-TIMER_CALLBACK_MEMBER(cvs_state::_393hz_timer_cb)
-{
-	m_393hz_clock = !m_393hz_clock;
-
-	if (m_dac3_state[2])
-		m_dac3->write(m_393hz_clock);
-}
-
-
-void cvs_state::start_393hz_timer()
-{
-	m_393hz_timer = timer_alloc(FUNC(cvs_state::_393hz_timer_cb), this);
-	m_393hz_timer->adjust(attotime::from_hz(30*393), 0, attotime::from_hz(30*393));
 }
 
 
@@ -560,14 +530,13 @@ void cvs_state::start_393hz_timer()
 
 void cvs_state::_4_bit_dac_data_w(offs_t offset, uint8_t data)
 {
-	static int old_data[4] = {0,0,0,0};
+	data = BIT(data, 7);
 
-	if (data != old_data[offset])
+	if (data != m_4_bit_dac_data[offset])
 	{
-		LOG(("4BIT: %02x %02x\n", offset, data));
-		old_data[offset] = data;
+		LOG(("4BIT: %d %d\n", offset, data));
+		m_4_bit_dac_data[offset] = data;
 	}
-	m_4_bit_dac_data[offset] = data >> 7;
 
 	// merge into D0-D3
 	uint8_t const dac_value = (m_4_bit_dac_data[0] << 0) |
@@ -579,21 +548,25 @@ void cvs_state::_4_bit_dac_data_w(offs_t offset, uint8_t data)
 	m_dac2->write(dac_value);
 }
 
-void cvs_state::unknown_w(offs_t offset, uint8_t data)
+void cvs_state::sh_trigger_w(offs_t offset, uint8_t data)
 {
-	/* offset 2 is used in 8ball
-	 * offset 0 is used in spacefrt
-	 * offset 3 is used in darkwar
+	/* offset 0 is used in darkwar, spacefrt, logger, raiders
+	 * offset 2 is used in darkwar, spacefrt, 8ball, superbik, raiders
+	 * offset 3 is used in cosmos, darkwar, superbik, raiders
 	 *
-	 * offset 1 is not used (no trace in disassembly)
+	 * offset 1 is only used inadvertedly by logger
 	 */
 
-	if (data != m_dac3_state[offset])
+	data &= 1;
+
+	if (data != m_sh_trigger[offset])
 	{
-		if (VERBOSE && offset != 2)
-			popmessage("Unknown: %02x %02x\n", offset, data);
-		m_dac3_state[offset] = data;
+		LOG(("TRIG: %d %d\n", offset, data));
+		m_sh_trigger[offset] = data;
 	}
+
+	if (offset == 2 || offset == 3)
+		m_beep[offset & 1]->set_state(data);
 }
 
 
@@ -602,7 +575,6 @@ void cvs_state::unknown_w(offs_t offset, uint8_t data)
  *  Speech hardware
  *
  *************************************/
-
 
 void cvs_state::speech_rom_address_lo_w(uint8_t data)
 {
@@ -675,7 +647,7 @@ void cvs_state::audio_command_w(uint8_t data)
 	LOG(("data %02x\n", data));
 	// cause interrupt on audio CPU if bit 7 set
 	m_soundlatch->write(data);
-	slave_cpu_interrupt(data & 0x80 ? 1 : 0);
+	audio_cpu_interrupt(data & 0x80 ? 1 : 0);
 }
 
 
@@ -715,8 +687,10 @@ void cvs_state::main_cpu_io_map(address_map &map)
 void cvs_state::main_cpu_data_map(address_map &map)
 {
 	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(cvs_state::collision_r), FUNC(cvs_state::audio_command_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(cvs_state::collision_clear), FUNC(cvs_state::video_fx_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(cvs_state::collision_clear_r), FUNC(cvs_state::video_fx_w));
 }
+
+
 
 /*************************************
  *
@@ -724,7 +698,7 @@ void cvs_state::main_cpu_data_map(address_map &map)
  *
  *************************************/
 
-void cvs_state::dac_cpu_map(address_map &map)
+void cvs_state::audio_cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x0fff).rom();
@@ -732,7 +706,7 @@ void cvs_state::dac_cpu_map(address_map &map)
 	map(0x1800, 0x1800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1840, 0x1840).w("dac1", FUNC(dac_byte_interface::data_w));
 	map(0x1880, 0x1883).w(FUNC(cvs_state::_4_bit_dac_data_w)).share(m_4_bit_dac_data);
-	map(0x1884, 0x1887).w(FUNC(cvs_state::unknown_w)).share(m_dac3_state);  // ???? not connected to anything
+	map(0x1884, 0x1887).w(FUNC(cvs_state::sh_trigger_w)).share(m_sh_trigger);
 }
 
 
@@ -796,15 +770,8 @@ static INPUT_PORTS_START( cvs )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW3")
-	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
-	PORT_DIPUNUSED( 0x02, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
-	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
-	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_START("DSW1")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
@@ -821,10 +788,26 @@ static INPUT_PORTS_START( cvs )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+
+	PORT_START("DSW3")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cvs_registration )
 	PORT_INCLUDE(cvs)
+
+	PORT_MODIFY("DSW2")
+	// Told to be "Meter Pulses" but I don't know what this means
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )          // has an effect when COIN2 is pressed (when COIN1 is pressed, value always 1)
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x20, "5" )
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, "Registration" )              // can't tell what shall be the default value
@@ -834,12 +817,6 @@ static INPUT_PORTS_START( cvs_registration )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x00, "10" )
 	// bits 2 and 3 determine bonus life settings but they might change from game to game - they are sometimes unused
-
-	PORT_MODIFY("DSW2")
-	// Told to be "Meter Pulses" but I don't know what this means
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )          // has an effect when COIN2 is pressed (when COIN1 is pressed, value always 1)
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x20, "5" )
 INPUT_PORTS_END
 
 
@@ -927,6 +904,8 @@ static INPUT_PORTS_START( 8ball )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x1d93 - code at 0x0858 ('8ball') or 0x08c0 ('8ball1') - read back code at 0x0073
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
@@ -936,8 +915,6 @@ static INPUT_PORTS_START( 8ball )
 	PORT_DIPNAME( 0x20, 0x00, "Colors" )                    // stored at 0x1ed4 - code at 0x0847 ('8ball') or 0x08af ('8ball1')
 	PORT_DIPSETTING(    0x00, "Palette 1" )                 // table at 0x0781 ('8ball') or 0x07e9 ('8ball1') - 16 bytes
 	PORT_DIPSETTING(    0x20, "Palette 2" )                 // table at 0x0791 ('8ball') or 0x07f9 ('8ball1') - 16 bytes
-
-	// DSW2 bit 5 stored at 0x1d93 - code at 0x0858 ('8ball') or 0x08c0 ('8ball1') - read back code at 0x0073
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( logger )
@@ -949,6 +926,8 @@ static INPUT_PORTS_START( logger )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x7da1 - code at 0x6ec7 - read back code at 0x0073
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
@@ -956,8 +935,6 @@ static INPUT_PORTS_START( logger )
 	PORT_DIPSETTING(    0x04, "40k only" )                  // displays "40000"
 	PORT_DIPSETTING(    0x00, "80k only" )                  // displays "80000"
 	// DSW3 bit 5 stored at 0x7dc8 - code at 0x6eb6 - not read back
-
-	// DSW2 bit 5 stored at 0x7da1 - code at 0x6ec7 - read back code at 0x0073
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dazzler )
@@ -969,14 +946,14 @@ static INPUT_PORTS_START( dazzler )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x7d9c - code at 0x6b51 - read back code at 0x0099
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
 	PORT_DIPSETTING(    0x04, "20k only" )                  // displays "20000"
 	PORT_DIPSETTING(    0x08, "40k only" )                  // displays "40000"
 	PORT_DIPSETTING(    0x00, "80k only" )                  // displays "80000"
-
-	// DSW2 bit 5 stored at 0x7d9c - code at 0x6b51 - read back code at 0x0099
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wallst )
@@ -988,14 +965,14 @@ static INPUT_PORTS_START( wallst )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x1e95 - code at 0x1232 - read back code at 0x6054
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
 	PORT_DIPSETTING(    0x04, "20k only" )                  // displays "20000"
 	PORT_DIPSETTING(    0x08, "40k only" )                  // displays "40000"
 	PORT_DIPSETTING(    0x00, "80k only" )                  // displays "80000"
-
-	// DSW2 bit 5 stored at 0x1e95 - code at 0x1232 - read back code at 0x6054
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( radarzon )
@@ -1007,14 +984,14 @@ static INPUT_PORTS_START( radarzon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x3d6e - code at 0x22aa - read back code at 0x00e4
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "100k only" )                 // displays "100000"
 	PORT_DIPSETTING(    0x04, "200k only" )                 // displays "200000"
 	PORT_DIPSETTING(    0x08, "400k only" )                 // displays "400000"
 	PORT_DIPSETTING(    0x00, "800k only" )                 // displays "800000"
-
-	// DSW2 bit 5 stored at 0x3d6e - code at 0x22aa - read back code at 0x00e4
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( goldbug )
@@ -1026,14 +1003,14 @@ static INPUT_PORTS_START( goldbug )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x3d89 - code at 0x3377 - read back code at 0x6054
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "100k only" )                 // displays "100000"
 	PORT_DIPSETTING(    0x04, "200k only" )                 // displays "200000"
 	PORT_DIPSETTING(    0x08, "400k only" )                 // displays "400000"
 	PORT_DIPSETTING(    0x00, "800k only" )                 // displays "800000"
-
-	// DSW2 bit 5 stored at 0x3d89 - code at 0x3377 - read back code at 0x6054
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( diggerc )
@@ -1045,23 +1022,23 @@ static INPUT_PORTS_START( diggerc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
+	// DSW2 bit 5 stored at 0x3db3 - code at 0x22ad - read back code at 0x00e4
+
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "50k only" )                  // displays "50000"
 	PORT_DIPSETTING(    0x04, "100k only" )                 // displays "100000"
 	PORT_DIPSETTING(    0x08, "150k only" )                 // displays "150000"
 	PORT_DIPSETTING(    0x00, "200k only" )                 // displays "200000"
-
-	// DSW2 bit 5 stored at 0x3db3 - code at 0x22ad - read back code at 0x00e4
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( heartatk )
 	PORT_INCLUDE(cvs_registration)
 
+	// DSW2 bit 5 stored at 0x1e76 - code at 0x0c5c - read back code at 0x00e4
+
 	// DSW3 bits 2 and 3 stored at 0x1c61 (0, 2, 1, 3) - code at 0x0c52
 	// read back code at 0x2197 but untested value : bonus life always at 100000
-
-	// DSW2 bit 5 stored at 0x1e76 - code at 0x0c5c - read back code at 0x00e4
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hunchbak )
@@ -1093,19 +1070,19 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( superbik )
 	PORT_INCLUDE(cvs_registration)
 
-	// DSW3 bits 2 and 3 are not read : bonus life always at 5000
-
 	// DSW2 bit 5 stored at 0x1e79 - code at 0x060f - read back code at 0x25bf
+
+	// DSW3 bits 2 and 3 are not read : bonus life always at 5000
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( raiders )
 	PORT_INCLUDE(cvs_registration)
 
-	// DSW3 bits 2 and 3 are not read : bonus life always at 100000
-
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  // always 4 lives - table at 0x4218 - 2 bytes
 	// DSW2 bit 5 stored at 0x1e79 - code at 0x1307 - read back code at 0x251d
+
+	// DSW3 bits 2 and 3 are not read : bonus life always at 100000
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hero )
@@ -1117,11 +1094,11 @@ static INPUT_PORTS_START( hero )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
-	// DSW3 bits 2 and 3 are not read : bonus life always at 150000
-
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  // always 3 lives - table at 0x4ebb - 2 bytes
 	// DSW2 bit 5 stored at 0x1e99 - code at 0x0fdd - read back code at 0x0352
+
+	// DSW3 bits 2 and 3 are not read : bonus life always at 150000
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( huncholy )
@@ -1133,11 +1110,11 @@ static INPUT_PORTS_START( huncholy )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
-	// DSW3 bits 2 and 3 are not read : bonus life always at 20000
-
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  // always 3 lives - table at 0x4531 - 2 bytes
 	// DSW2 bit 5 stored at 0x1e7c - code at 0x067d - read back code at 0x2f95
+
+	// DSW3 bits 2 and 3 are not read : bonus life always at 20000
 INPUT_PORTS_END
 
 
@@ -1172,19 +1149,16 @@ GFXDECODE_END
  *
  *************************************/
 
-
 void cvs_state::machine_start()
 {
 	cvs_base_state::machine_start();
 
 	m_lamps.resolve();
 
-	start_393hz_timer();
-
 	// register state save
 	save_item(NAME(m_character_ram_page_start));
 	save_item(NAME(m_character_banking_mode));
-	save_item(NAME(m_393hz_clock));
+	save_item(NAME(m_protection_counter));
 	save_item(NAME(m_speech_rom_bit_address));
 	save_item(NAME(m_stars_on));
 	save_item(NAME(m_scroll_reg));
@@ -1197,7 +1171,7 @@ void cvs_state::machine_reset()
 	m_character_ram_page_start = 0;
 	m_character_banking_mode = 0;
 	m_speech_rom_bit_address = 0;
-	m_393hz_clock = 0;
+	m_protection_counter = 0;
 	m_stars_on = 0;
 	m_scroll_reg = 0;
 }
@@ -1211,19 +1185,16 @@ void cvs_state::cvs(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &cvs_state::main_cpu_data_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cvs_state::main_cpu_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
-	m_maincpu->flag_handler().set(FUNC(cvs_state::write_s2650_flag));
+	m_maincpu->flag_handler().set([this] (int state) { m_ram_view.select(state); });
 	m_maincpu->intack_handler().set_constant(0x03);
 
 	S2650(config, m_audiocpu, XTAL(14'318'181) / 16);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::dac_cpu_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::audio_cpu_map);
 	m_audiocpu->intack_handler().set([this] { m_audiocpu->set_input_line(0, CLEAR_LINE); return 0x03; });
-	// doesn't look like it is used at all
-	//m_audiocpu->sense_handler().set(FUNC(cvs_state::cvs_393hz_clock_r));
 
 	S2650(config, m_speechcpu, XTAL(14'318'181) / 16);
 	m_speechcpu->set_addrmap(AS_PROGRAM, &cvs_state::speech_cpu_map);
 	// romclk is much more probable, 393 Hz results in timing issues
-	//m_speechcpu->sense_handler().set(FUNC(cvs_state::cvs_393hz_clock_r));
 	m_speechcpu->sense_handler().set("tms", FUNC(tms5110_device::romclk_hack_r));
 
 	// video hardware
@@ -1254,13 +1225,15 @@ void cvs_state::cvs(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
+	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.20); // unknown DAC
+
+	BEEP(config, m_beep[0], 600).add_route(ALL_OUTPUTS, "speaker", 0.15); // placeholder
+	BEEP(config, m_beep[1], 150).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
 
 	TMS5100(config, m_tms5110, XTAL(640'000));
 	m_tms5110->data().set(FUNC(cvs_state::speech_rom_read_bit));
-	m_tms5110->add_route(ALL_OUTPUTS, "speaker", 0.5);
+	m_tms5110->add_route(ALL_OUTPUTS, "speaker", 0.30);
 }
 
 
@@ -1270,15 +1243,15 @@ void cvs_state::cvs(machine_config &config)
  *
  *************************************/
 
-#define CVS_COMMON_ROMS                                                                                             \
+#define CVS_COMMON_ROMS                                                                                    \
 	ROM_REGION( 0x8000, "speechcpu", 0 )                                                                   \
-	ROM_LOAD( "5b.bin",     0x0000, 0x0800, CRC(f055a624) SHA1(5dfe89d7271092e665cdd5cd59d15a2b70f92f43) )  \
-																											\
-	ROM_REGION( 0x0820, "proms", 0 )                                                                    \
-	ROM_LOAD( "82s185.10h", 0x0000, 0x0800, CRC(c205bca6) SHA1(ec9bd220e75f7b067ede6139763ef8aca0fb7a29) )  \
+	ROM_LOAD( "5b.bin",     0x0000, 0x0800, CRC(f055a624) SHA1(5dfe89d7271092e665cdd5cd59d15a2b70f92f43) ) \
+	\
+	ROM_REGION( 0x0820, "proms", 0 )                                                                       \
+	ROM_LOAD( "82s185.10h", 0x0000, 0x0800, CRC(c205bca6) SHA1(ec9bd220e75f7b067ede6139763ef8aca0fb7a29) ) \
 	ROM_LOAD( "82s123.10k", 0x0800, 0x0020, CRC(b5221cec) SHA1(71d9830b33b1a8140b0fe1a2ba8024ba8e6e48e0) )
 #define CVS_ROM_REGION_SPEECH_DATA(name, len, hash) \
-	ROM_REGION( 0x1000, "speechdata", 0 )   \
+	ROM_REGION( 0x1000, "speechdata", 0 )           \
 	ROM_LOAD( name, 0x0000, len, hash )
 
 #define ROM_LOAD_STAGGERED(name, offs, hash)        \
@@ -1288,23 +1261,23 @@ void cvs_state::cvs(machine_config &config)
 	ROM_CONTINUE(   0x6000 + offs, 0x0400 )
 
 
-ROM_START( huncholy )
+ROM_START( cosmos )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "ho-gp1.bin", 0x0000, CRC(4f17cda7) SHA1(ae6fe495c723042c6e060d4ada50aaef1019d5eb) )
-	ROM_LOAD_STAGGERED( "ho-gp2.bin", 0x0400, CRC(70fa52c7) SHA1(179813fdc204870d72c0bfa8cd5dbf277e1f67c4) )
-	ROM_LOAD_STAGGERED( "ho-gp3.bin", 0x0800, CRC(931934b1) SHA1(08fe5ad3459862246e9ea845abab4e01e1dbd62d) )
-	ROM_LOAD_STAGGERED( "ho-gp4.bin", 0x0c00, CRC(af5cd501) SHA1(9a79b173aa41a82faa9f19210d3e18bfa6c593fa) )
-	ROM_LOAD_STAGGERED( "ho-gp5.bin", 0x1000, CRC(658e8974) SHA1(30d0ada1cce99a842bad8f5a58630bc1b7048b03) )
+	ROM_LOAD_STAGGERED( "cs-gp1.bin", 0x0000, CRC(7eb96ddf) SHA1(f7456ee1ace03ab98c4e8128d375464122c4df01) )
+	ROM_LOAD_STAGGERED( "cs-gp2.bin", 0x0400, CRC(6975a8f7) SHA1(13192d4eedd843c0c1d7e5c54a3086f71b09fbcb) )
+	ROM_LOAD_STAGGERED( "cs-gp3.bin", 0x0800, CRC(76904b13) SHA1(de219999e4a1b72142e71ea707b6250f4732ccb3) )
+	ROM_LOAD_STAGGERED( "cs-gp4.bin", 0x0c00, CRC(bdc89719) SHA1(668267d0b05990ff83a9e38a62950d3d725a53b3) )
+	ROM_LOAD_STAGGERED( "cs-gp5.bin", 0x1000, CRC(94be44ea) SHA1(e496ea79d177c6d2d79d59f7d45c86b547469c6f) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "ho-sdp1.bin", 0x0000, 0x1000, CRC(3efb3ffd) SHA1(be4807c8b4fe23f2247aa3b6ac02285bee1a0520) )
+	ROM_LOAD( "cs-sdp1.bin", 0x0000, 0x0800, CRC(b385b669) SHA1(79621d3fb3eb4ea6fa8a733faa6f21edeacae186) )
 
-	CVS_ROM_REGION_SPEECH_DATA( "ho-sp1.bin", 0x1000, CRC(3fd39b1e) SHA1(f5d0b2cfaeda994762403f039a6f7933c5525234) )
+	CVS_ROM_REGION_SPEECH_DATA( "cs-sp1.bin", 0x1000, CRC(3c7fe86d) SHA1(9ae0b63b231a7092820650a196cde60588bc6b58) )
 
 	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "ho-cp1.bin",  0x0000, 0x0800, CRC(c6c73d46) SHA1(63aba92f77105fedf46337b591b074020bec05d0) )
-	ROM_LOAD( "ho-cp2.bin",  0x0800, 0x0800, CRC(e596371c) SHA1(93a0d0ccdf830ae72d070b03b7e2222f4a737ead) )
-	ROM_LOAD( "ho-cp3.bin",  0x1000, 0x0800, CRC(11fae1cf) SHA1(5ceabfb1ff1a6f76d1649512f57d7151f5258ecb) )
+	ROM_LOAD( "cs-cp1.bin", 0x0000, 0x0800, CRC(6a48c898) SHA1(c27f7bcdb2fe042ec52d1b9b4b9a4e47c288862d) )
+	ROM_LOAD( "cs-cp2.bin", 0x0800, 0x0800, CRC(db0dfd8c) SHA1(f2b0dd43f0e514fdae54e4066606187f45b98e38) )
+	ROM_LOAD( "cs-cp3.bin", 0x1000, 0x0800, CRC(01eee875) SHA1(6c41d716b5795f085229d855518862fb85f395a4) )
 
 	CVS_COMMON_ROMS
 ROM_END
@@ -1326,6 +1299,27 @@ ROM_START( darkwar )
 	ROM_LOAD( "dw-cp1.bin", 0x0000, 0x0800, CRC(7a0f9f3e) SHA1(0aa787923fbb614f15016d99c03093a59a0bfb88) )
 	ROM_LOAD( "dw-cp2.bin", 0x0800, 0x0800, CRC(232e5120) SHA1(76e4d6d17e8108306761604bd56d6269bfc431e1) )
 	ROM_LOAD( "dw-cp3.bin", 0x1000, 0x0800, CRC(573e0a17) SHA1(9c7991eac625b287bafb6cf722ffb405a9627e09) )
+
+	CVS_COMMON_ROMS
+ROM_END
+
+ROM_START( spacefrt )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "sf-gp1.bin", 0x0000, CRC(1158fc3a) SHA1(c1f470324b6ec65c3061f78a6ff8620154f20c09) )
+	ROM_LOAD_STAGGERED( "sf-gp2.bin", 0x0400, CRC(8b4e1582) SHA1(5b92082d67f32197c0c61ddd8e1e3feb742195f4) )
+	ROM_LOAD_STAGGERED( "sf-gp3.bin", 0x0800, CRC(48f05102) SHA1(72d40cdd0bbc4cfeb6ddf550de0dafc61270d382) )
+	ROM_LOAD_STAGGERED( "sf-gp4.bin", 0x0c00, CRC(c5b14631) SHA1(360bed649185a090f7c96adadd7f045ef574865a) )
+	ROM_LOAD_STAGGERED( "sf-gp5.bin", 0x1000, CRC(d7eca1b6) SHA1(8444e61827f0153d04c4f9c08416e7ab753d6918) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "sf-sdp1.bin", 0x0000, 0x0800, CRC(339a327f) SHA1(940887cd4660e37537fd9b57aa1ec3a4717ea0cf) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "sf-sp1.bin", 0x1000, CRC(c5628d30) SHA1(d29a5852a1762cbd5f3eba29ae2bf49b3a26f894) )
+
+	ROM_REGION( 0x1800, "tiles", 0 )
+	ROM_LOAD( "sf-cp1.bin", 0x0000, 0x0800, CRC(da194a68) SHA1(4215267e91644cf1e1f32f898bc9562bfba711f3) )
+	ROM_LOAD( "sf-cp2.bin", 0x0800, 0x0800, CRC(b96977c7) SHA1(8f0fab044f16787bce83562e2b22d962d0a2c209) )
+	ROM_LOAD( "sf-cp3.bin", 0x1000, 0x0800, CRC(f5d67b9a) SHA1(a492b41c53b1f28ac5f70969e5f06afa948c1a7d) )
 
 	CVS_COMMON_ROMS
 ROM_END
@@ -1372,65 +1366,44 @@ ROM_START( 8ball1 )
 	CVS_COMMON_ROMS
 ROM_END
 
-ROM_START( hunchbak ) // actual ROM label has "Century Elect. Ltd. (c)1981", and some label has HB/HB2 handwritten
+ROM_START( logger ) // actual ROM label has "Century Elect. Ltd. (c)1981", and LOG3 is handwritten
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "hb-gp1.bin", 0x0000, CRC(af801d54) SHA1(68e31561e98f7e2caa337dd764941d08f075b559) )
-	ROM_LOAD_STAGGERED( "hb-gp2.bin", 0x0400, CRC(b448cc8e) SHA1(ed94f662c0e08a3a0aca073fbec29ae1fbd0328e) )
-	ROM_LOAD_STAGGERED( "hb-gp3.bin", 0x0800, CRC(57c6ea7b) SHA1(8c3ba01ab1917a8c24180ed1c0011dbfed36d406) )
-	ROM_LOAD_STAGGERED( "hb-gp4.bin", 0x0c00, CRC(7f91287b) SHA1(9383d885c142417de73879905cbce272ba9514c7) )
-	ROM_LOAD_STAGGERED( "hb-gp5.bin", 0x1000, CRC(1dd5755c) SHA1(b1e158d52bd9a238e3e32ed3024e495df2292dcb) )
+	ROM_LOAD_STAGGERED( "1clog3.gp1", 0x0000, CRC(0022b9ed) SHA1(4b94d2663f802a8140e8eae1b66ee78fdfa654f5) )
+	ROM_LOAD_STAGGERED( "2clog3.gp2", 0x0400, CRC(23c5c8dc) SHA1(37fb6a62cb798d96de20078fe4a3af74a2be0e66) )
+	ROM_LOAD_STAGGERED( "3clog3.gp3", 0x0800, CRC(f9288f74) SHA1(8bb588194186fc0e0c2d61ed2746542c978ebb76) )
+	ROM_LOAD_STAGGERED( "4clog3.gp4", 0x0c00, CRC(e52ef7bf) SHA1(df5509b6847d6b9520a9d83b15083546898a981e) )
+	ROM_LOAD_STAGGERED( "5clog3.gp5", 0x1000, CRC(4ee04359) SHA1(a592d4b280ac0ad5f06d68a7809092548261f123) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "6c.sdp1", 0x0000, 0x1000, CRC(f9ba2854) SHA1(d041198e2e8b8c3e668bd1610310f8d25c5b1119) )
+	ROM_LOAD( "6clog3.sdp1", 0x0000, 0x1000, CRC(5af8da17) SHA1(357f02cdf38c6659aca51fa0a8534542fc29623c) )
 
-	CVS_ROM_REGION_SPEECH_DATA( "8a.sp1", 0x0800, CRC(ed1cd201) SHA1(6cc3842dda1bfddc06ffb436c55d14276286bd67) )
+	CVS_ROM_REGION_SPEECH_DATA( "8clog3.sp1", 0x0800, CRC(74f67815) SHA1(6a26a16c27a7e4d58b611e5127115005a60cff91) )
 
 	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "11a.cp1", 0x0000, 0x0800, CRC(f256b047) SHA1(02d79882bad37ffdd58ef478e2658a1369c32ebc) )
-	ROM_LOAD( "10a.cp2", 0x0800, 0x0800, CRC(b870c64f) SHA1(ce4f8de87568782ce02bba754edff85df7f5c393) )
-	ROM_LOAD( "9a.cp3",  0x1000, 0x0800, CRC(9a7dab88) SHA1(cd39a9d4f982a7f49c478db1408d7e07335f2ddc) )
+	ROM_LOAD( "11clog3.cp1", 0x0000, 0x0800, CRC(e4ede80e) SHA1(62f2bc78106a057b6a8420d40421908df609bf29) )
+	ROM_LOAD( "10clog3.cp2", 0x0800, 0x0800, CRC(d3de8e5b) SHA1(f95320e001869c42e51195d9cc11e4f2555e153f) )
+	ROM_LOAD( "9clog3.cp3",  0x1000, 0x0800, CRC(9b8d1031) SHA1(87ef12aeae80cc0f240dead651c6222848f8dccc) )
 
 	CVS_COMMON_ROMS
 ROM_END
 
-ROM_START( hunchbaka )
+ROM_START( loggerr2 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "1b.gp1", 0x0000, CRC(c816860b) SHA1(1109639645496d4644564d21c816b8baf8c84cf7) )
-	ROM_LOAD_STAGGERED( "2a.gp2", 0x0400, CRC(cab1e524) SHA1(c3fd7ac9ce5893fd2602a15ad0f6e3267a4ca122) )
-	ROM_LOAD_STAGGERED( "3a.gp3", 0x0800, CRC(b2adcfeb) SHA1(3090e2c6b945857c1e48dea395015a05c6165cd9) )
-	ROM_LOAD_STAGGERED( "4c.gp4", 0x0c00, CRC(229a8b71) SHA1(ea3815eb69d4927da356eada0add8382735feb48) )
-	ROM_LOAD_STAGGERED( "5a.gp5", 0x1000, CRC(cb4f0313) SHA1(1ef63cbe62e7a54d45e0afbc398c9d9b601e6403) )
+	ROM_LOAD_STAGGERED( "logger_r2_gp1_11ce.1", 0x0000, CRC(02b0a75e) SHA1(06fbfa3a31e104da86f21ef8f600715224b7f332) ) // hand written LOGGER R2 GP1 11CE
+	ROM_LOAD_STAGGERED( "logger_r2_gp2_5265.2", 0x0400, CRC(3285aa08) SHA1(f5c8496b2d33229572d4442f703a2aaf93f1403f) ) // hand written LOGGER R2 GP2 5265
+	ROM_LOAD_STAGGERED( "logger_r2_gp3_da04.3", 0x0800, CRC(d6a2a442) SHA1(7da009f8d3d4fb0b6624cd46ecae08675c317905) ) // hand written LOGGER R2 GP3 DA04
+	ROM_LOAD_STAGGERED( "logger_r2_gp4_657b.4", 0x0c00, CRC(608b551c) SHA1(f2fde14860606f501ab0046fbe4dca0b97eb2481) ) // hand written LOGGER R2 GP4 657B
+	ROM_LOAD_STAGGERED( "logger_r2_gp5_c2d5.5", 0x1000, CRC(3d8ecdcd) SHA1(c9ea38aee898a4ac6cb6409da819d1a053088526) ) // hand written LOGGER R2 GP5 C2D5
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "6c.sdp1", 0x0000, 0x1000, CRC(f9ba2854) SHA1(d041198e2e8b8c3e668bd1610310f8d25c5b1119) )
+	ROM_LOAD( "logger_sdp1_414a.6", 0x0000, 0x1000, CRC(5af8da17) SHA1(357f02cdf38c6659aca51fa0a8534542fc29623c) ) // hand written LOGGER SDP1 414A
 
-	CVS_ROM_REGION_SPEECH_DATA( "8a.sp1", 0x0800, CRC(ed1cd201) SHA1(6cc3842dda1bfddc06ffb436c55d14276286bd67) )
-
-	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "11a.cp1", 0x0000, 0x0800, CRC(f256b047) SHA1(02d79882bad37ffdd58ef478e2658a1369c32ebc) )
-	ROM_LOAD( "10a.cp2", 0x0800, 0x0800, CRC(b870c64f) SHA1(ce4f8de87568782ce02bba754edff85df7f5c393) )
-	ROM_LOAD( "9a.cp3",  0x1000, 0x0800, CRC(9a7dab88) SHA1(cd39a9d4f982a7f49c478db1408d7e07335f2ddc) )
-
-	CVS_COMMON_ROMS
-ROM_END
-
-ROM_START( wallst )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "ws-gp1.bin", 0x0000, CRC(bdac81b6) SHA1(6ce865d8902e815742a9ecf10d6f9495f376dede) )
-	ROM_LOAD_STAGGERED( "ws-gp2.bin", 0x0400, CRC(9ca67cdd) SHA1(575a4d8d037d2a3c07a8f49d93c7cf6781349ec1) )
-	ROM_LOAD_STAGGERED( "ws-gp3.bin", 0x0800, CRC(c2f407f2) SHA1(8208064fd0138a6ccacf03275b8d28793245bfd9) )
-	ROM_LOAD_STAGGERED( "ws-gp4.bin", 0x0c00, CRC(1e4b2fe1) SHA1(28eda70cc9cf619452729092e68734ab1a5dc7fb) )
-	ROM_LOAD_STAGGERED( "ws-gp5.bin", 0x1000, CRC(eec7bfd0) SHA1(6485e9e2e1624118e38892e74f80431820fd9672) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "ws-sdp1.bin", 0x0000, 0x1000, CRC(faed2ac0) SHA1(c2c48e24a560d918531e5c17fb109d68bdec850f) )
-
-	CVS_ROM_REGION_SPEECH_DATA( "ws-sp1.bin",  0x0800, CRC(84b72637) SHA1(9c5834320f39545403839fb7088c37177a6c8861) )
+	CVS_ROM_REGION_SPEECH_DATA( "logger_sp1_4626.8", 0x0800, CRC(74f67815) SHA1(6a26a16c27a7e4d58b611e5127115005a60cff91) ) // hand written LOGGER SP1 4626
 
 	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "ws-cp1.bin", 0x0000, 0x0800, CRC(5aca11df) SHA1(5ef815b5b09445515ff8b958c4ea29f1a221cee1) )
-	ROM_LOAD( "ws-cp2.bin", 0x0800, 0x0800, CRC(ca530d85) SHA1(e5a78667c3583d06d8387848323b11e4a91091ec) )
-	ROM_LOAD( "ws-cp3.bin", 0x1000, 0x0800, CRC(1e0225d6) SHA1(410795046c64c24de6711b167315308808b54291) )
+	ROM_LOAD( "logger_r2_cp1_d9cf.11", 0x0000, 0x0800, CRC(a1c1eb8c) SHA1(9fa2495b1b245f5889006cfc8857f51e57379cef) ) // hand written LOGGER R2 CP1 D9CF
+	ROM_LOAD( "logger_r2_cp2_cd1e.10", 0x0800, 0x0800, CRC(432d28d0) SHA1(30b9ec84fe04c5e48f4a1f9f7ab86a6a222db4cf) ) // hand written LOGGER R2 CP2 CD1E
+	ROM_LOAD( "logger_r2_cp3_5535.9",  0x1000, 0x0800, CRC(c87fcfcd) SHA1(eb937a6aa04ebe873cf46c4b3abf7bb02766eedf) ) // hand written LOGGER R2 CP3 5535
 
 	CVS_COMMON_ROMS
 ROM_END
@@ -1452,6 +1425,27 @@ ROM_START( dazzler )
 	ROM_LOAD( "dz-cp1.bin", 0x0000, 0x0800, CRC(0a8a9034) SHA1(9df3d4f387bd5ce3d3580ba678aeda1b65634ac2) )
 	ROM_LOAD( "dz-cp2.bin", 0x0800, 0x0800, CRC(3868dd82) SHA1(844584c5a80fb8f1797b4aa4e22024e75726293d) )
 	ROM_LOAD( "dz-cp3.bin", 0x1000, 0x0800, CRC(755d9ed2) SHA1(a7165a1d12a5a81d8bb941d8ad073e2097c90beb) )
+
+	CVS_COMMON_ROMS
+ROM_END
+
+ROM_START( wallst )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "ws-gp1.bin", 0x0000, CRC(bdac81b6) SHA1(6ce865d8902e815742a9ecf10d6f9495f376dede) )
+	ROM_LOAD_STAGGERED( "ws-gp2.bin", 0x0400, CRC(9ca67cdd) SHA1(575a4d8d037d2a3c07a8f49d93c7cf6781349ec1) )
+	ROM_LOAD_STAGGERED( "ws-gp3.bin", 0x0800, CRC(c2f407f2) SHA1(8208064fd0138a6ccacf03275b8d28793245bfd9) )
+	ROM_LOAD_STAGGERED( "ws-gp4.bin", 0x0c00, CRC(1e4b2fe1) SHA1(28eda70cc9cf619452729092e68734ab1a5dc7fb) )
+	ROM_LOAD_STAGGERED( "ws-gp5.bin", 0x1000, CRC(eec7bfd0) SHA1(6485e9e2e1624118e38892e74f80431820fd9672) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "ws-sdp1.bin", 0x0000, 0x1000, CRC(faed2ac0) SHA1(c2c48e24a560d918531e5c17fb109d68bdec850f) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "ws-sp1.bin",  0x0800, CRC(84b72637) SHA1(9c5834320f39545403839fb7088c37177a6c8861) )
+
+	ROM_REGION( 0x1800, "tiles", 0 )
+	ROM_LOAD( "ws-cp1.bin", 0x0000, 0x0800, CRC(5aca11df) SHA1(5ef815b5b09445515ff8b958c4ea29f1a221cee1) )
+	ROM_LOAD( "ws-cp2.bin", 0x0800, 0x0800, CRC(ca530d85) SHA1(e5a78667c3583d06d8387848323b11e4a91091ec) )
+	ROM_LOAD( "ws-cp3.bin", 0x1000, 0x0800, CRC(1e0225d6) SHA1(410795046c64c24de6711b167315308808b54291) )
 
 	CVS_COMMON_ROMS
 ROM_END
@@ -1582,111 +1576,6 @@ ROM_START( diggerc )
 	CVS_COMMON_ROMS
 ROM_END
 
-ROM_START( superbik )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "sb-gp1.bin", 0x0000, CRC(f0209700) SHA1(7843e8ebcbecb93814863ddd135f5acb0d481043) )
-	ROM_LOAD_STAGGERED( "sb-gp2.bin", 0x0400, CRC(1956d687) SHA1(00e261c5b1e1414b45661310c47daeceb3d5f4bf) )
-	ROM_LOAD_STAGGERED( "sb-gp3.bin", 0x0800, CRC(ceb27b75) SHA1(56fecc72746113a6611c18663d1b9e0e2daf57b4) )
-	ROM_LOAD_STAGGERED( "sb-gp4.bin", 0x0c00, CRC(430b70b3) SHA1(207c4939331c1561d145cbee0538da072aa51f5b) )
-	ROM_LOAD_STAGGERED( "sb-gp5.bin", 0x1000, CRC(013615a3) SHA1(1795a4dcc98255ad185503a99f48b7bacb5edc9d) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "sb-sdp1.bin", 0x0000, 0x0800, CRC(e977c090) SHA1(24bd4165434c745c1514d49cc90bcb621fb3a0f8) )
-
-	CVS_ROM_REGION_SPEECH_DATA( "sb-sp1.bin", 0x0800, CRC(0aeb9ccd) SHA1(e7123eed21e4e758bbe1cebfd5aad44a5de45c27) )
-
-	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "sb-cp1.bin", 0x0000, 0x0800, CRC(03ba7760) SHA1(4ed252e2c4ec7cea2199524f7c35a1dc7c44f8d8) )
-	ROM_LOAD( "sb-cp2.bin", 0x0800, 0x0800, CRC(04de69f2) SHA1(3ef3b3c159d47230622b6cc45baad8737bd93a90) )
-	ROM_LOAD( "sb-cp3.bin", 0x1000, 0x0800, CRC(bb7d0b9a) SHA1(94c72d6961204be9cab351ac854ac9c69b51e79a) )
-
-	CVS_COMMON_ROMS
-ROM_END
-
-ROM_START( hero )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "hr-gp1.bin", 0x0000, CRC(82f39788) SHA1(44217dc2312d10fceeb35adf3999cd6f240b60be) )
-	ROM_LOAD_STAGGERED( "hr-gp2.bin", 0x0400, CRC(79607812) SHA1(eaab829a2f5bcb8ec92c3f4122cffae31a4a77cb) )
-	ROM_LOAD_STAGGERED( "hr-gp3.bin", 0x0800, CRC(2902715c) SHA1(cf63f72681d1dcbdabdf7673ad8f61b5969e4bd1) )
-	ROM_LOAD_STAGGERED( "hr-gp4.bin", 0x0c00, CRC(696d2f8e) SHA1(73dd57f0f84e37ae707a89e17253aa3dd0c8b48b) )
-	ROM_LOAD_STAGGERED( "hr-gp5.bin", 0x1000, CRC(936a4ba6) SHA1(86cddcfafbd93dcdad3a1f26e280ceb96f779ab0) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "hr-sdp1.bin", 0x0000, 0x0800, CRC(c34ecf79) SHA1(07c96283410b1e7401140094db95800708cf310f) )
-
-	CVS_ROM_REGION_SPEECH_DATA( "hr-sp1.bin", 0x0800, CRC(a5c33cb1) SHA1(447ffb193b0dc4985bae5d8c214a893afd08664b) )
-
-	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "hr-cp1.bin", 0x0000, 0x0800, CRC(2d201496) SHA1(f195aa1b231a0e1752c7da824a10321f0527f8c9) )
-	ROM_LOAD( "hr-cp2.bin", 0x0800, 0x0800, CRC(21b61fe3) SHA1(31882003f0557ffc4ec38ae6ee07b5d294b4162c) )
-	ROM_LOAD( "hr-cp3.bin", 0x1000, 0x0800, CRC(9c8e3f9e) SHA1(9d949a4d12b45da12b434677670b2b109568564a) )
-
-	CVS_COMMON_ROMS
-ROM_END
-
-ROM_START( logger ) // actual ROM label has "Century Elect. Ltd. (c)1981", and LOG3 is handwritten
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "1clog3.gp1", 0x0000, CRC(0022b9ed) SHA1(4b94d2663f802a8140e8eae1b66ee78fdfa654f5) )
-	ROM_LOAD_STAGGERED( "2clog3.gp2", 0x0400, CRC(23c5c8dc) SHA1(37fb6a62cb798d96de20078fe4a3af74a2be0e66) )
-	ROM_LOAD_STAGGERED( "3clog3.gp3", 0x0800, CRC(f9288f74) SHA1(8bb588194186fc0e0c2d61ed2746542c978ebb76) )
-	ROM_LOAD_STAGGERED( "4clog3.gp4", 0x0c00, CRC(e52ef7bf) SHA1(df5509b6847d6b9520a9d83b15083546898a981e) )
-	ROM_LOAD_STAGGERED( "5clog3.gp5", 0x1000, CRC(4ee04359) SHA1(a592d4b280ac0ad5f06d68a7809092548261f123) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "6clog3.sdp1", 0x0000, 0x1000, CRC(5af8da17) SHA1(357f02cdf38c6659aca51fa0a8534542fc29623c) )
-
-	CVS_ROM_REGION_SPEECH_DATA( "8clog3.sp1", 0x0800, CRC(74f67815) SHA1(6a26a16c27a7e4d58b611e5127115005a60cff91) )
-
-	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "11clog3.cp1", 0x0000, 0x0800, CRC(e4ede80e) SHA1(62f2bc78106a057b6a8420d40421908df609bf29) )
-	ROM_LOAD( "10clog3.cp2", 0x0800, 0x0800, CRC(d3de8e5b) SHA1(f95320e001869c42e51195d9cc11e4f2555e153f) )
-	ROM_LOAD( "9clog3.cp3",  0x1000, 0x0800, CRC(9b8d1031) SHA1(87ef12aeae80cc0f240dead651c6222848f8dccc) )
-
-	CVS_COMMON_ROMS
-ROM_END
-
-ROM_START( loggerr2 )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "logger_r2_gp1_11ce.1", 0x0000, CRC(02b0a75e) SHA1(06fbfa3a31e104da86f21ef8f600715224b7f332) ) // hand written LOGGER R2 GP1 11CE
-	ROM_LOAD_STAGGERED( "logger_r2_gp2_5265.2", 0x0400, CRC(3285aa08) SHA1(f5c8496b2d33229572d4442f703a2aaf93f1403f) ) // hand written LOGGER R2 GP2 5265
-	ROM_LOAD_STAGGERED( "logger_r2_gp3_da04.3", 0x0800, CRC(d6a2a442) SHA1(7da009f8d3d4fb0b6624cd46ecae08675c317905) ) // hand written LOGGER R2 GP3 DA04
-	ROM_LOAD_STAGGERED( "logger_r2_gp4_657b.4", 0x0c00, CRC(608b551c) SHA1(f2fde14860606f501ab0046fbe4dca0b97eb2481) ) // hand written LOGGER R2 GP4 657B
-	ROM_LOAD_STAGGERED( "logger_r2_gp5_c2d5.5", 0x1000, CRC(3d8ecdcd) SHA1(c9ea38aee898a4ac6cb6409da819d1a053088526) ) // hand written LOGGER R2 GP5 C2D5
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "logger_sdp1_414a.6", 0x0000, 0x1000, CRC(5af8da17) SHA1(357f02cdf38c6659aca51fa0a8534542fc29623c) ) // hand written LOGGER SDP1 414A
-
-	CVS_ROM_REGION_SPEECH_DATA( "logger_sp1_4626.8", 0x0800, CRC(74f67815) SHA1(6a26a16c27a7e4d58b611e5127115005a60cff91) ) // hand written LOGGER SP1 4626
-
-	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "logger_r2_cp1_d9cf.11", 0x0000, 0x0800, CRC(a1c1eb8c) SHA1(9fa2495b1b245f5889006cfc8857f51e57379cef) ) // hand written LOGGER R2 CP1 D9CF
-	ROM_LOAD( "logger_r2_cp2_cd1e.10", 0x0800, 0x0800, CRC(432d28d0) SHA1(30b9ec84fe04c5e48f4a1f9f7ab86a6a222db4cf) ) // hand written LOGGER R2 CP2 CD1E
-	ROM_LOAD( "logger_r2_cp3_5535.9",  0x1000, 0x0800, CRC(c87fcfcd) SHA1(eb937a6aa04ebe873cf46c4b3abf7bb02766eedf) ) // hand written LOGGER R2 CP3 5535
-
-	CVS_COMMON_ROMS
-ROM_END
-
-ROM_START( cosmos )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "cs-gp1.bin", 0x0000, CRC(7eb96ddf) SHA1(f7456ee1ace03ab98c4e8128d375464122c4df01) )
-	ROM_LOAD_STAGGERED( "cs-gp2.bin", 0x0400, CRC(6975a8f7) SHA1(13192d4eedd843c0c1d7e5c54a3086f71b09fbcb) )
-	ROM_LOAD_STAGGERED( "cs-gp3.bin", 0x0800, CRC(76904b13) SHA1(de219999e4a1b72142e71ea707b6250f4732ccb3) )
-	ROM_LOAD_STAGGERED( "cs-gp4.bin", 0x0c00, CRC(bdc89719) SHA1(668267d0b05990ff83a9e38a62950d3d725a53b3) )
-	ROM_LOAD_STAGGERED( "cs-gp5.bin", 0x1000, CRC(94be44ea) SHA1(e496ea79d177c6d2d79d59f7d45c86b547469c6f) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "cs-sdp1.bin", 0x0000, 0x0800, CRC(b385b669) SHA1(79621d3fb3eb4ea6fa8a733faa6f21edeacae186) )
-
-	CVS_ROM_REGION_SPEECH_DATA( "cs-sp1.bin", 0x1000, CRC(3c7fe86d) SHA1(9ae0b63b231a7092820650a196cde60588bc6b58) )
-
-	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "cs-cp1.bin", 0x0000, 0x0800, CRC(6a48c898) SHA1(c27f7bcdb2fe042ec52d1b9b4b9a4e47c288862d) )
-	ROM_LOAD( "cs-cp2.bin", 0x0800, 0x0800, CRC(db0dfd8c) SHA1(f2b0dd43f0e514fdae54e4066606187f45b98e38) )
-	ROM_LOAD( "cs-cp3.bin", 0x1000, 0x0800, CRC(01eee875) SHA1(6c41d716b5795f085229d855518862fb85f395a4) )
-
-	CVS_COMMON_ROMS
-ROM_END
-
 ROM_START( heartatk )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD_STAGGERED( "ha-gp1.bin", 0x0000, CRC(e8297c23) SHA1(e79ae7e99f904afe90b43a54df7b0e257d65ac0b) )
@@ -1708,23 +1597,65 @@ ROM_START( heartatk )
 	CVS_COMMON_ROMS
 ROM_END
 
-ROM_START( spacefrt )
+ROM_START( hunchbak ) // actual ROM label has "Century Elect. Ltd. (c)1981", and some label has HB/HB2 handwritten
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_STAGGERED( "sf-gp1.bin", 0x0000, CRC(1158fc3a) SHA1(c1f470324b6ec65c3061f78a6ff8620154f20c09) )
-	ROM_LOAD_STAGGERED( "sf-gp2.bin", 0x0400, CRC(8b4e1582) SHA1(5b92082d67f32197c0c61ddd8e1e3feb742195f4) )
-	ROM_LOAD_STAGGERED( "sf-gp3.bin", 0x0800, CRC(48f05102) SHA1(72d40cdd0bbc4cfeb6ddf550de0dafc61270d382) )
-	ROM_LOAD_STAGGERED( "sf-gp4.bin", 0x0c00, CRC(c5b14631) SHA1(360bed649185a090f7c96adadd7f045ef574865a) )
-	ROM_LOAD_STAGGERED( "sf-gp5.bin", 0x1000, CRC(d7eca1b6) SHA1(8444e61827f0153d04c4f9c08416e7ab753d6918) )
+	ROM_LOAD_STAGGERED( "hb-gp1.bin", 0x0000, CRC(af801d54) SHA1(68e31561e98f7e2caa337dd764941d08f075b559) )
+	ROM_LOAD_STAGGERED( "hb-gp2.bin", 0x0400, CRC(b448cc8e) SHA1(ed94f662c0e08a3a0aca073fbec29ae1fbd0328e) )
+	ROM_LOAD_STAGGERED( "hb-gp3.bin", 0x0800, CRC(57c6ea7b) SHA1(8c3ba01ab1917a8c24180ed1c0011dbfed36d406) )
+	ROM_LOAD_STAGGERED( "hb-gp4.bin", 0x0c00, CRC(7f91287b) SHA1(9383d885c142417de73879905cbce272ba9514c7) )
+	ROM_LOAD_STAGGERED( "hb-gp5.bin", 0x1000, CRC(1dd5755c) SHA1(b1e158d52bd9a238e3e32ed3024e495df2292dcb) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "sf-sdp1.bin", 0x0000, 0x0800, CRC(339a327f) SHA1(940887cd4660e37537fd9b57aa1ec3a4717ea0cf) )
+	ROM_LOAD( "6c.sdp1", 0x0000, 0x1000, CRC(f9ba2854) SHA1(d041198e2e8b8c3e668bd1610310f8d25c5b1119) )
 
-	CVS_ROM_REGION_SPEECH_DATA( "sf-sp1.bin", 0x1000, CRC(c5628d30) SHA1(d29a5852a1762cbd5f3eba29ae2bf49b3a26f894) )
+	CVS_ROM_REGION_SPEECH_DATA( "8a.sp1", 0x0800, CRC(ed1cd201) SHA1(6cc3842dda1bfddc06ffb436c55d14276286bd67) )
 
 	ROM_REGION( 0x1800, "tiles", 0 )
-	ROM_LOAD( "sf-cp1.bin", 0x0000, 0x0800, CRC(da194a68) SHA1(4215267e91644cf1e1f32f898bc9562bfba711f3) )
-	ROM_LOAD( "sf-cp2.bin", 0x0800, 0x0800, CRC(b96977c7) SHA1(8f0fab044f16787bce83562e2b22d962d0a2c209) )
-	ROM_LOAD( "sf-cp3.bin", 0x1000, 0x0800, CRC(f5d67b9a) SHA1(a492b41c53b1f28ac5f70969e5f06afa948c1a7d) )
+	ROM_LOAD( "11a.cp1", 0x0000, 0x0800, CRC(f256b047) SHA1(02d79882bad37ffdd58ef478e2658a1369c32ebc) )
+	ROM_LOAD( "10a.cp2", 0x0800, 0x0800, CRC(b870c64f) SHA1(ce4f8de87568782ce02bba754edff85df7f5c393) )
+	ROM_LOAD( "9a.cp3",  0x1000, 0x0800, CRC(9a7dab88) SHA1(cd39a9d4f982a7f49c478db1408d7e07335f2ddc) )
+
+	CVS_COMMON_ROMS
+ROM_END
+
+ROM_START( hunchbaka )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "1b.gp1", 0x0000, CRC(c816860b) SHA1(1109639645496d4644564d21c816b8baf8c84cf7) )
+	ROM_LOAD_STAGGERED( "2a.gp2", 0x0400, CRC(cab1e524) SHA1(c3fd7ac9ce5893fd2602a15ad0f6e3267a4ca122) )
+	ROM_LOAD_STAGGERED( "3a.gp3", 0x0800, CRC(b2adcfeb) SHA1(3090e2c6b945857c1e48dea395015a05c6165cd9) )
+	ROM_LOAD_STAGGERED( "4c.gp4", 0x0c00, CRC(229a8b71) SHA1(ea3815eb69d4927da356eada0add8382735feb48) )
+	ROM_LOAD_STAGGERED( "5a.gp5", 0x1000, CRC(cb4f0313) SHA1(1ef63cbe62e7a54d45e0afbc398c9d9b601e6403) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "6c.sdp1", 0x0000, 0x1000, CRC(f9ba2854) SHA1(d041198e2e8b8c3e668bd1610310f8d25c5b1119) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "8a.sp1", 0x0800, CRC(ed1cd201) SHA1(6cc3842dda1bfddc06ffb436c55d14276286bd67) )
+
+	ROM_REGION( 0x1800, "tiles", 0 )
+	ROM_LOAD( "11a.cp1", 0x0000, 0x0800, CRC(f256b047) SHA1(02d79882bad37ffdd58ef478e2658a1369c32ebc) )
+	ROM_LOAD( "10a.cp2", 0x0800, 0x0800, CRC(b870c64f) SHA1(ce4f8de87568782ce02bba754edff85df7f5c393) )
+	ROM_LOAD( "9a.cp3",  0x1000, 0x0800, CRC(9a7dab88) SHA1(cd39a9d4f982a7f49c478db1408d7e07335f2ddc) )
+
+	CVS_COMMON_ROMS
+ROM_END
+
+ROM_START( superbik )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "sb-gp1.bin", 0x0000, CRC(f0209700) SHA1(7843e8ebcbecb93814863ddd135f5acb0d481043) )
+	ROM_LOAD_STAGGERED( "sb-gp2.bin", 0x0400, CRC(1956d687) SHA1(00e261c5b1e1414b45661310c47daeceb3d5f4bf) )
+	ROM_LOAD_STAGGERED( "sb-gp3.bin", 0x0800, CRC(ceb27b75) SHA1(56fecc72746113a6611c18663d1b9e0e2daf57b4) )
+	ROM_LOAD_STAGGERED( "sb-gp4.bin", 0x0c00, CRC(430b70b3) SHA1(207c4939331c1561d145cbee0538da072aa51f5b) )
+	ROM_LOAD_STAGGERED( "sb-gp5.bin", 0x1000, CRC(013615a3) SHA1(1795a4dcc98255ad185503a99f48b7bacb5edc9d) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "sb-sdp1.bin", 0x0000, 0x0800, CRC(e977c090) SHA1(24bd4165434c745c1514d49cc90bcb621fb3a0f8) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "sb-sp1.bin", 0x0800, CRC(0aeb9ccd) SHA1(e7123eed21e4e758bbe1cebfd5aad44a5de45c27) )
+
+	ROM_REGION( 0x1800, "tiles", 0 )
+	ROM_LOAD( "sb-cp1.bin", 0x0000, 0x0800, CRC(03ba7760) SHA1(4ed252e2c4ec7cea2199524f7c35a1dc7c44f8d8) )
+	ROM_LOAD( "sb-cp2.bin", 0x0800, 0x0800, CRC(04de69f2) SHA1(3ef3b3c159d47230622b6cc45baad8737bd93a90) )
+	ROM_LOAD( "sb-cp3.bin", 0x1000, 0x0800, CRC(bb7d0b9a) SHA1(94c72d6961204be9cab351ac854ac9c69b51e79a) )
 
 	CVS_COMMON_ROMS
 ROM_END
@@ -1771,7 +1702,47 @@ ROM_START( raidersr3 )
 	CVS_COMMON_ROMS
 ROM_END
 
+ROM_START( hero )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "hr-gp1.bin", 0x0000, CRC(82f39788) SHA1(44217dc2312d10fceeb35adf3999cd6f240b60be) )
+	ROM_LOAD_STAGGERED( "hr-gp2.bin", 0x0400, CRC(79607812) SHA1(eaab829a2f5bcb8ec92c3f4122cffae31a4a77cb) )
+	ROM_LOAD_STAGGERED( "hr-gp3.bin", 0x0800, CRC(2902715c) SHA1(cf63f72681d1dcbdabdf7673ad8f61b5969e4bd1) )
+	ROM_LOAD_STAGGERED( "hr-gp4.bin", 0x0c00, CRC(696d2f8e) SHA1(73dd57f0f84e37ae707a89e17253aa3dd0c8b48b) )
+	ROM_LOAD_STAGGERED( "hr-gp5.bin", 0x1000, CRC(936a4ba6) SHA1(86cddcfafbd93dcdad3a1f26e280ceb96f779ab0) )
 
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "hr-sdp1.bin", 0x0000, 0x0800, CRC(c34ecf79) SHA1(07c96283410b1e7401140094db95800708cf310f) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "hr-sp1.bin", 0x0800, CRC(a5c33cb1) SHA1(447ffb193b0dc4985bae5d8c214a893afd08664b) )
+
+	ROM_REGION( 0x1800, "tiles", 0 )
+	ROM_LOAD( "hr-cp1.bin", 0x0000, 0x0800, CRC(2d201496) SHA1(f195aa1b231a0e1752c7da824a10321f0527f8c9) )
+	ROM_LOAD( "hr-cp2.bin", 0x0800, 0x0800, CRC(21b61fe3) SHA1(31882003f0557ffc4ec38ae6ee07b5d294b4162c) )
+	ROM_LOAD( "hr-cp3.bin", 0x1000, 0x0800, CRC(9c8e3f9e) SHA1(9d949a4d12b45da12b434677670b2b109568564a) )
+
+	CVS_COMMON_ROMS
+ROM_END
+
+ROM_START( huncholy )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD_STAGGERED( "ho-gp1.bin", 0x0000, CRC(4f17cda7) SHA1(ae6fe495c723042c6e060d4ada50aaef1019d5eb) )
+	ROM_LOAD_STAGGERED( "ho-gp2.bin", 0x0400, CRC(70fa52c7) SHA1(179813fdc204870d72c0bfa8cd5dbf277e1f67c4) )
+	ROM_LOAD_STAGGERED( "ho-gp3.bin", 0x0800, CRC(931934b1) SHA1(08fe5ad3459862246e9ea845abab4e01e1dbd62d) )
+	ROM_LOAD_STAGGERED( "ho-gp4.bin", 0x0c00, CRC(af5cd501) SHA1(9a79b173aa41a82faa9f19210d3e18bfa6c593fa) )
+	ROM_LOAD_STAGGERED( "ho-gp5.bin", 0x1000, CRC(658e8974) SHA1(30d0ada1cce99a842bad8f5a58630bc1b7048b03) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "ho-sdp1.bin", 0x0000, 0x1000, CRC(3efb3ffd) SHA1(be4807c8b4fe23f2247aa3b6ac02285bee1a0520) )
+
+	CVS_ROM_REGION_SPEECH_DATA( "ho-sp1.bin", 0x1000, CRC(3fd39b1e) SHA1(f5d0b2cfaeda994762403f039a6f7933c5525234) )
+
+	ROM_REGION( 0x1800, "tiles", 0 )
+	ROM_LOAD( "ho-cp1.bin",  0x0000, 0x0800, CRC(c6c73d46) SHA1(63aba92f77105fedf46337b591b074020bec05d0) )
+	ROM_LOAD( "ho-cp2.bin",  0x0800, 0x0800, CRC(e596371c) SHA1(93a0d0ccdf830ae72d070b03b7e2222f4a737ead) )
+	ROM_LOAD( "ho-cp3.bin",  0x1000, 0x0800, CRC(11fae1cf) SHA1(5ceabfb1ff1a6f76d1649512f57d7151f5258ecb) )
+
+	CVS_COMMON_ROMS
+ROM_END
 
 
 /*************************************
@@ -1780,30 +1751,10 @@ ROM_END
  *
  *************************************/
 
-uint8_t cvs_state::huncholy_prot_r(offs_t offset)
-{
-	if (offset == 1)
-	{
-		m_protection_counter++;
-		if ((m_protection_counter & 0x0f) == 0x01) return 0x00;
-		return 0xff;
-	}
-
-	return 0; // offset 0
-}
-
-void cvs_state::init_huncholy()
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8sm_delegate(*this, FUNC(cvs_state::huncholy_prot_r)));
-
-	save_item(NAME(m_protection_counter));
-	m_protection_counter = 0;
-}
-
-
 void cvs_state::init_hunchbaka()
 {
 	uint8_t *rom = memregion("maincpu")->base();
+
 	// data lines D2 and D5 swapped
 	for (offs_t offs = 0; offs < 0x7400; offs++)
 		rom[offs] = bitswap<8>(rom[offs], 7, 6, 2, 4, 3, 5, 1, 0);
@@ -1812,17 +1763,28 @@ void cvs_state::init_hunchbaka()
 
 uint8_t cvs_state::superbik_prot_r()
 {
-	m_protection_counter++;
-	if ((m_protection_counter & 0x0f) == 0x02) return 0;
-	return 0xff;
+	if (!machine().side_effects_disabled())
+		m_protection_counter++;
+
+	return ((m_protection_counter & 0x0f) == 0x02) ? 0 : 0xff;
 }
 
 void cvs_state::init_superbik()
 {
-	m_protection_counter = 0;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f1, 0x73f2, read8smo_delegate(*this, FUNC(cvs_state::superbik_prot_r)));
+}
 
-	save_item(NAME(m_protection_counter));
+
+void cvs_state::init_raiders()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	// data lines D1 and D6 swapped
+	for (offs_t offs = 0; offs < 0x7400; offs++)
+		rom[offs] = bitswap<8>(rom[offs], 7, 1, 5, 4, 3, 2, 6, 0);
+
+	// partially remove mirroring on $3xxx/$7xxx (protection)
+	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x3400, 0x3bff, 0x4000);
 }
 
 
@@ -1857,19 +1819,24 @@ void cvs_state::init_hero()
 }
 
 
-void cvs_state::init_raiders()
+uint8_t cvs_state::huncholy_prot_r(offs_t offset)
 {
-	uint8_t *rom = memregion("maincpu")->base();
+	if (offset == 1)
+	{
+		if (!machine().side_effects_disabled())
+			m_protection_counter++;
 
-	// data lines D1 and D6 swapped
-	for (offs_t offs = 0; offs < 0x7400; offs++)
-		rom[offs] = bitswap<8>(rom[offs], 7, 1, 5, 4, 3, 2, 6, 0);
+		return ((m_protection_counter & 0x0f) == 0x01) ? 0 : 0xff;
+	}
 
-	// patch out protection
-	rom[0x010a] = 0xc0;
-	rom[0x010b] = 0xc0;
-	rom[0x010c] = 0xc0;
+	return 0; // offset 0
 }
+
+void cvs_state::init_huncholy()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8sm_delegate(*this, FUNC(cvs_state::huncholy_prot_r)));
+}
+
 
 } // anonymous namespace
 
@@ -1899,7 +1866,7 @@ GAME( 1983, heartatk,  0,        cvs, heartatk, cvs_state, empty_init,     ROT90
 GAME( 1983, hunchbak,  0,        cvs, hunchbak, cvs_state, empty_init,     ROT90, "Century Electronics", "Hunchback (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbaka, hunchbak, cvs, hunchbak, cvs_state, init_hunchbaka, ROT90, "Century Electronics", "Hunchback (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, superbik,  0,        cvs, superbik, cvs_state, init_superbik,  ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raiders,   0,        cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION| MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raidersr3, raiders,  cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION| MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raiders,   0,        cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raidersr3, raiders,  cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, hero,      0,        cvs, hero,     cvs_state, init_hero,      ROT90, "Seatongrove UK, Ltd.", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
 GAME( 1984, huncholy,  0,        cvs, huncholy, cvs_state, init_huncholy,  ROT90, "Seatongrove UK, Ltd.", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -33,6 +33,7 @@ protected:
 	DECLARE_MACHINE_RESET(pc9821);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	TIMER_CALLBACK_MEMBER(pit_delay);
 
 private:
 	required_shared_ptr<uint32_t> m_ext_gvram;
@@ -48,9 +49,13 @@ private:
 	uint8_t ext2_video_ff_r();
 	void ext2_video_ff_w(uint8_t data);
 	void pc9821_mode_ff_w(u8 data);
+	void pit_latch_delay(offs_t offset, uint8_t data);
 
+	uint8_t m_pit_latch_cmd = 0;
 	uint8_t m_pc9821_window_bank = 0;
 	uint8_t m_ext2_ff = 0;
+
+	emu_timer *m_pit_delay = nullptr;
 
 	struct {
 		uint8_t pal_entry = 0;

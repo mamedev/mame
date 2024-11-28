@@ -259,8 +259,7 @@ void tecmo_state::adpcm_vol_w(uint8_t data)
 
 void tecmo_state::adpcm_int(int state)
 {
-	if (m_adpcm_pos >= m_adpcm_end ||
-				m_adpcm_pos >= m_adpcm_rom.bytes())
+	if (m_adpcm_pos >= m_adpcm_end || m_adpcm_pos >= m_adpcm_rom.bytes())
 		m_msm->reset_w(1);
 	else if (m_adpcm_data != -1)
 	{

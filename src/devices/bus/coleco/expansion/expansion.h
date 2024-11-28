@@ -39,8 +39,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_COlECO_EXPANSION_EXPANSION_H
-#define MAME_BUS_COlECO_EXPANSION_EXPANSION_H
+#ifndef MAME_BUS_COLECO_EXPANSION_EXPANSION_H
+#define MAME_BUS_COLECO_EXPANSION_EXPANSION_H
 
 #pragma once
 
@@ -123,4 +123,4 @@ protected:
 DECLARE_DEVICE_TYPE(COLECO_EXPANSION, coleco_expansion_device)
 
 
-#endif // MAME_BUS_COlECO_EXPANSION_EXPANSION_H
+#endif // MAME_BUS_COLECO_EXPANSION_EXPANSION_H

@@ -12,9 +12,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_6502_H
+#define MAME_BUS_BBC_TUBE_TUBE_6502_H
 
-#ifndef MAME_BUS_BBC_TUBE_6502_H
-#define MAME_BUS_BBC_TUBE_6502_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/m6502/m65sc02.h"
@@ -122,5 +123,4 @@ DECLARE_DEVICE_TYPE(BBC_TUBE_6502P, bbc_tube_6502p_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_6502E, bbc_tube_6502e_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_65C102, bbc_tube_65c102_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_6502_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_6502_H
