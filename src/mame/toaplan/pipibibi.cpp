@@ -35,7 +35,7 @@ public:
 	void pipibibs(machine_config &config);
 
 	virtual void video_start() override ATTR_COLD;
-	u32 screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
@@ -84,7 +84,7 @@ void pipibibi_state::video_start()
 }
 
 
-u32 pipibibi_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 pipibibi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
@@ -283,7 +283,7 @@ void pipibibi_state::pipibibs(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(pipibibi_state::screen_update_toaplan2));
+	m_screen->set_screen_update(FUNC(pipibibi_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(pipibibi_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
@@ -321,7 +321,7 @@ void pipibibi_bootleg_state::pipibibsbl(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(28.322_MHz_XTAL / 4, 450, 0, 320, 262, 0, 240); // guess, but this is within NTSC parameters
-	m_screen->set_screen_update(FUNC(pipibibi_bootleg_state::screen_update_toaplan2));
+	m_screen->set_screen_update(FUNC(pipibibi_bootleg_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(pipibibi_bootleg_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 

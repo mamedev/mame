@@ -39,7 +39,7 @@ protected:
 	void snowbro2_68k_mem(address_map &map) ATTR_COLD;
 	void snowbro2b3_68k_mem(address_map &map) ATTR_COLD;
 
-	u32 screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	void sb2_oki_bankswitch_w(u8 data);
 private:
@@ -59,7 +59,7 @@ void snowbro2_state::video_start()
 	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
 }
 
-u32 snowbro2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 snowbro2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
@@ -323,7 +323,7 @@ void snowbro2_state::snowbro2(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(snowbro2_state::screen_update_toaplan2));
+	m_screen->set_screen_update(FUNC(snowbro2_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(snowbro2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 

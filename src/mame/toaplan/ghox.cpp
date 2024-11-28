@@ -42,7 +42,7 @@ private:
 	void ghox_68k_mem(address_map &map) ATTR_COLD;
 	void ghox_hd647180_mem_map(address_map &map) ATTR_COLD;
 
-	u32 screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
 	template<unsigned Which> u16 ghox_h_analog_r();
@@ -77,7 +77,7 @@ void ghox_state::video_start()
 }
 
 
-u32 ghox_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 ghox_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
@@ -271,7 +271,7 @@ void ghox_state::ghox(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(ghox_state::screen_update_toaplan2));
+	m_screen->set_screen_update(FUNC(ghox_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(ghox_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 

@@ -48,7 +48,6 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 
-	u32 screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void device_post_load() override;
 
 	void fixeight_68k_mem(address_map &map) ATTR_COLD;
@@ -56,7 +55,7 @@ protected:
 
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 
-	u32 screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	void tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
@@ -149,17 +148,6 @@ void fixeight_state::tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask)
 	m_tx_tilemap->set_scrollx(offset, m_tx_linescroll[offset]);
 }
 
-
-
-u32 fixeight_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp->render_vdp(bitmap, cliprect);
-
-	return 0;
-}
-
 void fixeight_state::screen_vblank(int state)
 {
 	// rising edge
@@ -182,7 +170,9 @@ void fixeight_state::create_tx_tilemap(int dx, int dx_flipped)
 
 u32 fixeight_bootleg_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen_update_toaplan2(screen, bitmap, cliprect);
+	bitmap.fill(0, cliprect);
+	m_custom_priority_bitmap.fill(0, cliprect);
+	m_vdp->render_vdp(bitmap, cliprect);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0);
 	return 0;
 }
@@ -214,9 +204,11 @@ void fixeight_state::video_start()
 }
 
 
-u32 fixeight_state::screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 fixeight_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen_update_toaplan2(screen, bitmap, cliprect);
+	bitmap.fill(0, cliprect);
+	m_custom_priority_bitmap.fill(0, cliprect);
+	m_vdp->render_vdp(bitmap, cliprect);
 
 	rectangle clip = cliprect;
 
@@ -475,7 +467,7 @@ static const gfx_layout truxton2_tx_tilelayout =
 };
 
 
-static GFXDECODE_START( gfx_truxton2 )
+static GFXDECODE_START( gfx )
 	GFXDECODE_ENTRY( nullptr, 0, truxton2_tx_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
@@ -504,11 +496,11 @@ void fixeight_state::fixeight(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240); // verified on PCB
-	m_screen->set_screen_update(FUNC(fixeight_state::screen_update_truxton2));
+	m_screen->set_screen_update(FUNC(fixeight_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(fixeight_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_truxton2);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, gp9001vdp_device::VDP_PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp, 27_MHz_XTAL);
