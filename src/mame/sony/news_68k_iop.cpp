@@ -279,8 +279,8 @@ namespace
         // uint8_t m_iop_bus_error_status = 0;
         uint8_t m_rtc_data = 0;
 
-        std::queue<uint8_t> scsi_dma_buffer;
-        int scsi_trx_width = 0;
+        // std::queue<uint8_t> scsi_dma_buffer;
+        // int scsi_trx_width = 0;
     };
 
     void news_iop_state::machine_start()
@@ -666,29 +666,29 @@ namespace
     void news_iop_state::scsi_drq_handler(int status)
     {
         LOGMASKED(LOG_SCSI, "SCSI DRQ changed to 0x%x\n", status);
-        if (status && scsi_trx_width == 4 && scsi_dma_buffer.size() < 3)
-        {
-            LOGMASKED(LOG_SCSI, "Absorbing into buffer\n", status);
-            scsi_dma_buffer.push(m_scsi->dma_r());
-        }
-        else if (status && scsi_trx_width == 4 && scsi_dma_buffer.size() == 3)
-        {
-            LOGMASKED(LOG_SCSI, "3 bytes of data are buffered and DRQ is asserted - resuming IOP to execute DMA trx\n");
-            m_iop->resume(SUSPEND_REASON_HALT);
-        }
-        else if (status && scsi_trx_width < 0 && scsi_dma_buffer.size() > 0)
-        {
-            LOGMASKED(LOG_SCSI, "Writing next byte!\n");
-            uint8_t next_byte = scsi_dma_buffer.front();
-            scsi_dma_buffer.pop();
-            scsi_trx_width++;
-            m_scsi->dma_w(next_byte);
-            if (scsi_trx_width == 0)
-            {
-                LOGMASKED(LOG_SCSI, "Write trx complete, resuming IOP\n");
-                m_iop->resume(SUSPEND_REASON_HALT);
-            }
-        }
+        // if (status && scsi_trx_width == 4 && scsi_dma_buffer.size() < 3)
+        // {
+        //     LOGMASKED(LOG_SCSI, "Absorbing into buffer\n", status);
+        //     scsi_dma_buffer.push(m_scsi->dma_r());
+        // }
+        // else if (status && scsi_trx_width == 4 && scsi_dma_buffer.size() == 3)
+        // {
+        //     LOGMASKED(LOG_SCSI, "3 bytes of data are buffered and DRQ is asserted - resuming IOP to execute DMA trx\n");
+        //     m_iop->resume(SUSPEND_REASON_HALT);
+        // }
+        // else if (status && scsi_trx_width < 0 && scsi_dma_buffer.size() > 0)
+        // {
+        //     LOGMASKED(LOG_SCSI, "Writing next byte!\n");
+        //     uint8_t next_byte = scsi_dma_buffer.front();
+        //     scsi_dma_buffer.pop();
+        //     scsi_trx_width++;
+        //     m_scsi->dma_w(next_byte);
+        //     if (scsi_trx_width == 0)
+        //     {
+        //         LOGMASKED(LOG_SCSI, "Write trx complete, resuming IOP\n");
+        //         m_iop->resume(SUSPEND_REASON_HALT);
+        //     }
+        // }
 
         m_scsi_intst = status; // can be masked, unlike SCSI IRQ
         m_scsi_dma->drq_w(status);
