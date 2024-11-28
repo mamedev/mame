@@ -16670,10 +16670,6 @@ galaxiaa                        // (c) 1979
 galaxiab                        // (c) 1979
 galaxiac                        // (c) 1979
 
-@source:cvs/quasar.cpp
-quasar                          // (c) 1980 Zelco Games Italy
-quasara                         // (c) 1980 Zelco Games Italy
-
 @source:cxg/chess2001.cpp
 ch2001
 
@@ -47176,6 +47172,10 @@ catnmous                        // (c) 1982
 catnmousa                       // (c) 1982
 laserbat                        // (c) 1981
 lazarian                        // (c) 1981
+
+@source:zaccaria/quasar.cpp
+quasar                          // (c) 1980 Zelco Games Italy
+quasara                         // (c) 1980 Zelco Games Italy
 
 @source:zaccaria/seabattl.cpp
 armada                          //
