@@ -847,6 +847,8 @@ void pc9801vm_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
 			pal4bit(m_analog16.g[m_analog16.pal_entry]),
 			pal4bit(m_analog16.b[m_analog16.pal_entry])
 		);
+		// lemmings raster effects
+		m_screen->update_partial(m_screen->vpos());
 		return;
 	}
 
