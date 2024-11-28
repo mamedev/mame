@@ -1,4 +1,4 @@
-name: 'Check #incude guargs'
+name: 'Check #include guards'
 
 on:
   push:
