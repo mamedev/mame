@@ -45232,11 +45232,99 @@ gizmondo                        //
 kontiki                         //
 tiki100                         //
 
+@source:toaplan/batsugun.cpp
+batsugun                        // TP-030 (c) 1993 Toaplan
+batsuguna                       // TP-030 (c) 1993 Toaplan
+batsugunb                       //
+batsugunc                       // TP-030 (c) 1993 Toaplan
+batsugunbl                      // bootleg
+batsugunsp                      // TP-030 (c) 1993 Toaplan
+
+@source:toaplan/dogyuun.cpp
+dogyuun                         // TP-022 (c) 1992 Toaplan
+dogyuuna                        // TP-022 (c) 1992 Toaplan
+dogyuunb                        // TP-022 (c) 1992 Toaplan
+dogyuunt                        // TP-022 (c) 1992 Toaplan
+dogyuunto                       // TX-022 (c) 1992 Toaplan
+
 @source:toaplan/dt7.cpp
 dt7
 
+@source:toaplan/enmadaio.cpp
+enmadaio                        // TP-031
+
+@source:toaplan/fixeight.cpp
+fixeight                        // TP-026 (c) 1992 + Taito license
+fixeighta                       // TP-026 (c) 1992 + Taito license
+fixeightat                      // TP-026 (c) 1992 + Taito license
+fixeightbl                      // bootleg
+fixeighth                       // TP-026 (c) 1992 + Taito license
+fixeightht                      // TP-026 (c) 1992 + Taito license
+fixeightj                       // TP-026 (c) 1992 + Taito license
+fixeightjt                      // TP-026 (c) 1992 + Taito license
+fixeightk                       // TP-026 (c) 1992 + Taito license
+fixeightkt                      // TP-026 (c) 1992 + Taito license
+fixeightt                       // TP-026 (c) 1992 + Taito license
+fixeighttw                      // TP-026 (c) 1992 + Taito license
+fixeighttwt                     // TP-026 (c) 1992 + Taito license
+fixeightu                       // TP-026 (c) 1992 + Taito license
+fixeightut                      // TP-026 (c) 1992 + Taito license
+
+@source:toaplan/ghox.cpp
+ghox                            // TP-021 (c) 1991 Toaplan
+ghoxj                           // TP-021 (c) 1991 Toaplan
+ghoxjo                          // TP-021 (c) 1991 Toaplan
+
+@source:toaplan/kbash.cpp
+kbash                           // TP-023 (c) 1993 Toaplan
+kbash2                          // bootleg
+kbashk                          // TP-023 (c) 1993 Toaplan
+kbashp                          // TP-023 (c) 1993 Toaplan
+
 @source:toaplan/mjsister.cpp
 mjsister                        // (c) 1986 Toaplan
+
+@source:toaplan/pipibibi.cpp
+pipibibs                        // TP-025
+pipibibsa                       // TP-025
+pipibibsbl                      // (c) 1991 Ryouta Kikaku (bootleg)
+pipibibsbl2                     // bootleg
+pipibibsbl3                     // (c) 1991 Ryouta Kikaku (bootleg)
+pipibibsp                       // TP-025
+
+@source:toaplan/raizing.cpp
+bgaregga                        // (c) 1996 Raizing/8ing
+bgareggabl                      // hack
+bgareggabla                     // hack
+bgareggablj                     // hack
+bgareggacn                      // (c) 1996 Raizing/8ing
+bgareggahk                      // (c) 1996 Raizing/8ing
+bgareggak                       // (c) 1996 Raizing/8ing
+bgaregganv                      // (c) 1996 Raizing/8ing
+bgareggat                       // (c) 1996 Raizing/8ing
+bgareggat2                      // (c) 1996 Raizing/8ing
+bgareggatw                      // (c) 1996 Raizing/8ing
+kingdmgp                        // (c) 1994 Raizing/8ing
+mahoudai                        // (c) 1993 Raizing + Able license
+shippumd                        // (c) 1994 Raizing/8ing
+sstriker                        // (c) 1993 Raizing
+sstrikerk                       // (c) 1993 Raizing
+
+@source:toaplan/raizing_batrider.cpp
+batrider                        // (c) 1998 Raizing/8ing
+batriderc                       // (c) 1998 Raizing/8ing
+batriderhk                      // (c) 1998 Raizing/8ing
+batriderj                       // (c) 1998 Raizing/8ing
+batriderja                      // (c) 1998 Raizing/8ing
+batriderk                       // (c) 1998 Raizing/8ing
+batridert                       // (c) 1998 Raizing/8ing
+batrideru                       // (c) 1998 Raizing/8ing
+bbakraid                        // (c) 1999 8ing
+bbakraidc                       // (c) 1999 8ing
+bbakraidj                       // (c) 1999 8ing
+bbakraidja                      // (c) 1999 8ing
+nprobowl                        // (c) 1996 Zuck + Able license
+probowl2                        // (c) 1996 Zuck + Able license
 
 @source:toaplan/slapfght.cpp
 alcon                           // A77 / TP-???
@@ -45260,6 +45348,23 @@ tigerhj                         // A47 (c) 1985 Taito Corporation   GX-551 [not 
 
 @source:toaplan/slapfght_ms.cpp
 slapfighm
+
+@source:toaplan/snowbro2.cpp
+snowbro2                        // TP-033 (c) 1994 Hanafram
+snowbro2b                       //
+snowbro2b2                      //
+snowbro2b3                      //
+snowbro2ny                      // TP-033 (c) 1994 Nyanko
+
+@source:toaplan/sunwise.cpp
+burgkids                        // (c) 1995 Sunwise
+othldrby                        // (c) 1995 Sunwise
+pwrkick                         // (c) 1994 Sunwise
+
+@source:toaplan/tekipaki.cpp
+tekipaki                        // TP-020 (c) 1991 Toaplan
+tekipakit                       // TP-020 (c) 1991 Toaplan (location test)
+whoopee                         // TP-025 (on TP-020)
 
 @source:toaplan/toaplan1.cpp
 demonwld                        // TP-O16 (c) 1990 Toaplan (+ Taito license when set to Japan)
@@ -45295,92 +45400,8 @@ zerowing                        // TP-O15 (c) 1989 Toaplan
 zerowing1                       // TP-O15 (c) 1989 Toaplan
 zerowingw                       // TP-O15 (c) 1989 Williams Electronics
 
-@source:toaplan/toaplan2.cpp
-batrider                        // (c) 1998 Raizing/8ing
-batriderc                       // (c) 1998 Raizing/8ing
-batriderhk                      // (c) 1998 Raizing/8ing
-batriderj                       // (c) 1998 Raizing/8ing
-batriderja                      // (c) 1998 Raizing/8ing
-batriderk                       // (c) 1998 Raizing/8ing
-batridert                       // (c) 1998 Raizing/8ing
-batrideru                       // (c) 1998 Raizing/8ing
-batsugun                        // TP-030 (c) 1993 Toaplan
-batsuguna                       // TP-030 (c) 1993 Toaplan
-batsugunb                       //
-batsugunc                       // TP-030 (c) 1993 Toaplan
-batsugunbl                      // bootleg
-batsugunsp                      // TP-030 (c) 1993 Toaplan
-bbakraid                        // (c) 1999 8ing
-bbakraidc                       // (c) 1999 8ing
-bbakraidj                       // (c) 1999 8ing
-bbakraidja                      // (c) 1999 8ing
-bgaregga                        // (c) 1996 Raizing/8ing
-bgareggabl                      // hack
-bgareggabla                     // hack
-bgareggablj                     // hack
-bgareggacn                      // (c) 1996 Raizing/8ing
-bgareggahk                      // (c) 1996 Raizing/8ing
-bgareggak                       // (c) 1996 Raizing/8ing
-bgaregganv                      // (c) 1996 Raizing/8ing
-bgareggat                       // (c) 1996 Raizing/8ing
-bgareggat2                      // (c) 1996 Raizing/8ing
-bgareggatw                      // (c) 1996 Raizing/8ing
-burgkids                        // (c) 1995 Sunwise
-dogyuun                         // TP-022 (c) 1992 Toaplan
-dogyuuna                        // TP-022 (c) 1992 Toaplan
-dogyuunb                        // TP-022 (c) 1992 Toaplan
-dogyuunt                        // TP-022 (c) 1992 Toaplan
-dogyuunto                       // TX-022 (c) 1992 Toaplan
-fixeight                        // TP-026 (c) 1992 + Taito license
-fixeighta                       // TP-026 (c) 1992 + Taito license
-fixeightat                      // TP-026 (c) 1992 + Taito license
-fixeightbl                      // bootleg
-fixeighth                       // TP-026 (c) 1992 + Taito license
-fixeightht                      // TP-026 (c) 1992 + Taito license
-fixeightj                       // TP-026 (c) 1992 + Taito license
-fixeightjt                      // TP-026 (c) 1992 + Taito license
-fixeightk                       // TP-026 (c) 1992 + Taito license
-fixeightkt                      // TP-026 (c) 1992 + Taito license
-fixeightt                       // TP-026 (c) 1992 + Taito license
-fixeighttw                      // TP-026 (c) 1992 + Taito license
-fixeighttwt                     // TP-026 (c) 1992 + Taito license
-fixeightu                       // TP-026 (c) 1992 + Taito license
-fixeightut                      // TP-026 (c) 1992 + Taito license
-ghox                            // TP-021 (c) 1991 Toaplan
-ghoxj                           // TP-021 (c) 1991 Toaplan
-ghoxjo                          // TP-021 (c) 1991 Toaplan
-grindstm                        // TP-027 (c) 1993 Toaplan + Unite Trading license (Korea)
-grindstma                       // TP-027 (c) 1993 Toaplan + Unite Trading license (Korea)
-kbash                           // TP-023 (c) 1993 Toaplan
-kbash2                          // bootleg
-kbashk                          // TP-023 (c) 1993 Toaplan
-kbashp                          // TP-023 (c) 1993 Toaplan
-kingdmgp                        // (c) 1994 Raizing/8ing
-mahoudai                        // (c) 1993 Raizing + Able license
-nprobowl                        // (c) 1996 Zuck + Able license
-othldrby                        // (c) 1995 Sunwise
-pipibibs                        // TP-025
-pipibibsa                       // TP-025
-pipibibsbl                      // (c) 1991 Ryouta Kikaku (bootleg)
-pipibibsbl2                     // bootleg
-pipibibsbl3                     // (c) 1991 Ryouta Kikaku (bootleg)
-pipibibsp                       // TP-025
-probowl2                        // (c) 1996 Zuck + Able license
-pwrkick                         // (c) 1994 Sunwise
-shippumd                        // (c) 1994 Raizing/8ing
-snowbro2                        // TP-033 (c) 1994 Hanafram
-snowbro2b                       //
-snowbro2b2                      //
-snowbro2b3                      //
-snowbro2ny                      // TP-033 (c) 1994 Nyanko
-sstriker                        // (c) 1993 Raizing
-sstrikerk                       // (c) 1993 Raizing
-tekipaki                        // TP-020 (c) 1991 Toaplan
-tekipakit                       // TP-020 (c) 1991 Toaplan (location test)
+@source:toaplan/truxton2.cpp
 truxton2                        // TP-024 (c) 1992 Toaplan
-vfive                           // TP-027 (c) 1993 Toaplan (Japan)
-whoopee                         // TP-025
-enmadaio                        // TP-031
 
 @source:toaplan/twincobr.cpp
 fnshark                         // bootleg
@@ -45401,6 +45422,11 @@ twincobru                       // B30 / TP-011 (c) 1987 Taito America Corporati
 
 @source:toaplan/twincobr_ms.cpp
 twincobrm                       // bootleg (Modular System)
+
+@source:toaplan/vfive.cpp
+grindstm                        // TP-027 (c) 1993 Toaplan + Unite Trading license (Korea)
+grindstma                       // TP-027 (c) 1993 Toaplan + Unite Trading license (Korea)
+vfive                           // TP-027 (c) 1993 Toaplan (Japan)
 
 @source:toaplan/wardner.cpp
 pyros                           // B25 / TP-009 (c) 1987 Taito America Corporation (US)

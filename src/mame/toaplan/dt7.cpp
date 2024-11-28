@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "toaplipt.h"
+#include "toaplan_v25_tables.h"
 #include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
@@ -35,10 +36,12 @@
 #include "speaker.h"
 #include "tilemap.h"
 
-class toaplan2_dt7_state : public driver_device
+namespace {
+
+class dt7_state : public driver_device
 {
 public:
-	toaplan2_dt7_state(const machine_config &mconfig, device_type type, const char *tag)
+	dt7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
@@ -60,7 +63,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	void toaplan2_dt7_reset(int state);
+	void dt7_reset(int state);
 
 	u32 screen_update_dt7_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_dt7_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -86,13 +89,8 @@ private:
 	uint8_t read_port_2();
 	void write_port_2(uint8_t data);
 
-	u16 video_count_r();
-
 	u8 dt7_shared_ram_hack_r(offs_t offset);
 	void shared_ram_w(offs_t offset, u8 data);
-
-	// We encode priority with colour in the tilemaps, so need a larger palette
-	static constexpr unsigned T2PALETTE_LENGTH = 0x10000;
 
 	void screen_vblank(int state);
 
@@ -114,77 +112,7 @@ private:
 };
 
 
-// single byte default-opcode
-#define UNKO 0xfc
-
-// complete guess, wrong, just to get correct opcode size for DASM
-
-#define G_62 0xa0  // very likely wrong (or is it?)
-
-// some kind of branch, not sure which
-// it's used after compares in blocks, sometimes with a 'be' then a 'br' straight after, so it must be a condition that could also fail a be and fall to the br
-//#define G_B0  0x74
-#define G_B0  0x79
-//#define G_B0  0x75
-
-//  6b  @ 73827
-#define G_6B  0x34  // must be a 2 byte operation on al? after an AND, 2nd byte is 0x08
-
-//  59  @ 73505 and 7379B  (maybe ret?, or di?)
-//#define G_59  0xfa
-#define G_59  0xc3
-
-static const u8 dt7_decryption_table[256] = {
-//  0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07, 0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f, /* 00 */
-	UNKO,0xea,0x8a,0x51,0x8b,UNKO,0x48,0x3c, 0x75,0x50,0x75,0x88,0x03,0x03,UNKO,0x36,
-
-//  0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17, 0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f, /* 10 */
-	0x8a,0x0f,0x8a,0x3c,0xe2,0xe8,0xc6,0xc7, 0x24,0x4d,0x68,0x3e,0x0c,0x33,0xbb,UNKO,
-
-//  0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27, 0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f, /* 20 */
-	0xbb,0xc6,0x1f,0x36,0x24,0xeb,0xe8,UNKO, 0x02,0x38,0x0f,0x45,0x8d,0x45,0x36,0xc6,
-
-//  0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37, 0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f, /* 30 */
-	0x53,0x8b,0x81,0x22,0xf9,0xbe,0x75,0x55, 0x45,0x51,0x5d,0x3e,0x0f,0x88,0x72,0x74,
-
-//  0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47, 0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f, /* 40 */
-	0x1e,0xb7,0x50,0xd0,0xe2,0xb1,0x0a,0xf3, 0xc7,0xff,0x8a,0x75,0x88,0xb5,UNKO,0xb3,
-
-//  0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57, 0x58,0x59,0x5a,0x5b,0x5c,0x5d,0x5e,0x5f, /* 50 */
-	0xc3,0x80,0x53,0x59,0x88,UNKO,0x87,0x45, 0x03,G_59,0x0c,0x36,0x5f,0x16,0x55,UNKO,
-
-//  0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67, 0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f, /* 60 */
-	0x0a,UNKO,G_62,0x89,0x88,0x57,0x2e,0xb1, 0x75,0x43,0x3a,G_6B,0x86,0x3a,0x03,0x58,
-
-//  0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77, 0x78,0x79,0x7a,0x7b,0x7c,0x7d,0x7e,0x7f, /* 70 */
-	0x46,0x33,0xe8,0x0f,0x0f,0xbb,0x59,0xc7, 0x2e,0xc6,0x53,0x3a,0xc0,0xfe,0x02,0x47,
-
-//  0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87, 0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f, /* 80 */
-	0xa0,0x2c,0xeb,0x24,UNKO,0xc3,0x8a,0x8e, 0x16,0x74,0x8a,0x33,0x4b,0x05,0x89,0x79,
-
-//  0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97, 0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f, /* 90 */
-	0xb4,0xd2,0x0f,0xbd,0xfb,0x3e,0x22,0x2a, 0x47,0xfe,0x8a,0xc3,0x03,0x5e,0xb3,0x07,
-
-//  0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7, 0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf, /* a0 */
-	0x86,0x1b,0x81,0xf3,0x86,0xe9,0x53,0x74, 0x80,0xab,0xb1,0xc3,0xd0,0x88,0x2e,0xa4,
-
-//  0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7, 0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf, /* b0 */
-	G_B0,0x5b,0x87,UNKO,0xc3,0x8c,0xff,0x8a, 0x50,0xeb,0x56,0x0c,UNKO,0xfc,0x83,0x74,
-
-//  0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7, 0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf, /* c0 */
-	0x26,UNKO,0xfe,0xbd,0x03,0xfe,0xb4,0xfe, 0x06,0xb8,0xc6,UNKO,0x45,0x73,0xb5,0x51,
-
-//  0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7, 0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf, /* d0 */
-	UNKO,0xa4,0xf9,0xc0,0x5b,0xab,0xf6,UNKO, 0x32,0xd3,0xeb,0xb9,0x73,0x89,0xbd,0x4d,
-
-//  0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7, 0xe8,0xe9,0xea,0xeb,0xec,0xed,0xee,0xef, /* e0 */
-	0xb8,0xb9,0x74,0x07,0x0a,0xb0,0x4f,0x0f, 0xe8,0x47,0xeb,0x50,0xd1,0xd0,0x5d,0x72,
-
-//  0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7, 0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff, /* f0 */
-	0x2e,0xe2,0xc1,0xe8,0xa2,0x53,0x0f,0x73, 0x3a,0xbf,0xbb,0x46,0x1a,0x3c,0x1a,0xbc,
-};
-
-void toaplan2_dt7_state::dt7_irq(int state)
+void dt7_state::dt7_irq(int state)
 {
 	// only the first VDP gets IRQ acked, so does it trigger both CPUs, or does the main CPU then trigger sub?
 	m_maincpu->set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
@@ -200,12 +128,12 @@ void toaplan2_dt7_state::dt7_irq(int state)
 
 
 // this is conditional on the unknown type of branch (see #define G_B0 in the table0
-uint8_t toaplan2_dt7_state::read_port_t()
+uint8_t dt7_state::read_port_t()
 {
 	logerror("%s: read port t\n", machine().describe_context()); return machine().rand();
 }
 
-uint8_t toaplan2_dt7_state::read_port_2()
+uint8_t dt7_state::read_port_2()
 {
 	logerror("%s: read port 2\n", machine().describe_context());
 
@@ -215,7 +143,7 @@ uint8_t toaplan2_dt7_state::read_port_2()
 // it seems to attempt to read inputs (including the tilt switch?) here on startup
 // strangely all the EEPROM access code (which is otherwise very similar to FixEight
 // also has accesses to this port added, maybe something is sitting in the middle?
-void toaplan2_dt7_state::write_port_2(uint8_t data)
+void dt7_state::write_port_2(uint8_t data)
 {
 	if ((m_ioport_state & 0x01) != (data & 0x01))
 	{
@@ -286,7 +214,7 @@ void toaplan2_dt7_state::write_port_2(uint8_t data)
 
 
 // hacks because the sound CPU isn't running properly
-u8 toaplan2_dt7_state::dt7_shared_ram_hack_r(offs_t offset)
+u8 dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 {
     u16 ret = m_shared_ram[offset];
 
@@ -315,67 +243,67 @@ u8 toaplan2_dt7_state::dt7_shared_ram_hack_r(offs_t offset)
     return ret;
 }
 
-void toaplan2_dt7_state::shared_ram_w(offs_t offset, u8 data)
+void dt7_state::shared_ram_w(offs_t offset, u8 data)
 {
 	m_shared_ram[offset] = data;
 }
 
 
-void toaplan2_dt7_state::dt7_unk_w(u8 data)
+void dt7_state::dt7_unk_w(u8 data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-void toaplan2_dt7_state::dt7_68k_0_mem(address_map &map)
+void dt7_state::dt7_68k_0_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
 
-	map(0x380000, 0x380001).r(FUNC(toaplan2_dt7_state::video_count_r));
+	map(0x380000, 0x380001).r(m_vdp[0], FUNC(gp9001vdp_device::vdpcount_r));
 
 	map(0x200000, 0x200fff).ram().w(m_palette[0], FUNC(palette_device::write16)).share("palette0");
 	map(0x280000, 0x280fff).ram().w(m_palette[1], FUNC(palette_device::write16)).share("palette1");
 
-	map(0x300000, 0x300000).w(FUNC(toaplan2_dt7_state::dt7_unk_w));
+	map(0x300000, 0x300000).w(FUNC(dt7_state::dt7_unk_w));
 
 	map(0x400000, 0x40000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x480000, 0x48000d).rw(m_vdp[1], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 
 	dt7_shared_mem(map);
 
-	map(0x610000, 0x61ffff).rw(FUNC(toaplan2_dt7_state::dt7_shared_ram_hack_r), FUNC(toaplan2_dt7_state::shared_ram_w)).umask16(0x00ff);
-//  map(0x620000, 0x62ffff).rw(FUNC(toaplan2_dt7_state::dt7_shared_ram_hack_r), FUNC(toaplan2_dt7_state::shared_ram_w)).umask16(0x00ff);
+	map(0x610000, 0x61ffff).rw(FUNC(dt7_state::dt7_shared_ram_hack_r), FUNC(dt7_state::shared_ram_w)).umask16(0x00ff);
+//  map(0x620000, 0x62ffff).rw(FUNC(dt7_state::dt7_shared_ram_hack_r), FUNC(dt7_state::shared_ram_w)).umask16(0x00ff);
 }
 
-void toaplan2_dt7_state::dt7_shared_mem(address_map &map)
+void dt7_state::dt7_shared_mem(address_map &map)
 {
 	map(0x500000, 0x50ffff).ram().share("shared_ram2");
 	// is this really in the middle of shared RAM, or is there a DMA to get it out?
-	map(0x509000, 0x50afff).ram().w(FUNC(toaplan2_dt7_state::tx_videoram_dt7_w)).share("tx_videoram");
+	map(0x509000, 0x50afff).ram().w(FUNC(dt7_state::tx_videoram_dt7_w)).share("tx_videoram");
 
 }
-void toaplan2_dt7_state::dt7_68k_1_mem(address_map &map)
+void dt7_state::dt7_68k_1_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().mirror(0x80000); // mirror needed or road doesn't draw
 	dt7_shared_mem(map);
 }
 
 
-uint8_t toaplan2_dt7_state::unmapped_v25_io1_r()
+uint8_t dt7_state::unmapped_v25_io1_r()
 {
 	logerror("%s: 0x58008 unknown read\n", machine().describe_context());
 	return machine().rand();
 }
 
-uint8_t toaplan2_dt7_state::unmapped_v25_io2_r()
+uint8_t dt7_state::unmapped_v25_io2_r()
 {
 	logerror("%s: 0x5800a unknown read\n", machine().describe_context());
 	return machine().rand();
 }
 
 
-void toaplan2_dt7_state::dt7_v25_mem(address_map &map)
+void dt7_state::dt7_v25_mem(address_map &map)
 {
 	// exact mirroring unknown, don't cover up where the inputs/sound maps
 	map(0x00000, 0x07fff).ram().share("shared_ram");
@@ -390,11 +318,11 @@ void toaplan2_dt7_state::dt7_v25_mem(address_map &map)
 	map(0x58002, 0x58002).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x58004, 0x58005).rw("ymsnd2", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x58006, 0x58006).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x58008, 0x58008).r(FUNC(toaplan2_dt7_state::unmapped_v25_io1_r));
-	map(0x5800a, 0x5800a).r(FUNC(toaplan2_dt7_state::unmapped_v25_io2_r));
+	map(0x58008, 0x58008).r(FUNC(dt7_state::unmapped_v25_io1_r));
+	map(0x5800a, 0x5800a).r(FUNC(dt7_state::unmapped_v25_io2_r));
 }
 
-void toaplan2_dt7_state::toaplan2_dt7_reset(int state)
+void dt7_state::dt7_reset(int state)
 {
 	//if (m_audiocpu != nullptr)
 	//  m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
@@ -411,22 +339,22 @@ static GFXDECODE_START( gfx_textrom_double_1 )
 	GFXDECODE_ENTRY( "text_1", 0, gfx_8x8x4_packed_msb, 0, 128 )
 GFXDECODE_END
 
-void toaplan2_dt7_state::dt7(machine_config &config)
+void dt7_state::dt7(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_dt7_state::dt7_68k_0_mem);
-	m_maincpu->reset_cb().set(FUNC(toaplan2_dt7_state::toaplan2_dt7_reset));
+	m_maincpu->set_addrmap(AS_PROGRAM, &dt7_state::dt7_68k_0_mem);
+	m_maincpu->reset_cb().set(FUNC(dt7_state::dt7_reset));
 
 	M68000(config, m_subcpu, 32_MHz_XTAL/2);
-	m_subcpu->set_addrmap(AS_PROGRAM, &toaplan2_dt7_state::dt7_68k_1_mem);
+	m_subcpu->set_addrmap(AS_PROGRAM, &dt7_state::dt7_68k_1_mem);
 
 	v25_device &audiocpu(V25(config, m_audiocpu, 32_MHz_XTAL/2));
-	audiocpu.set_addrmap(AS_PROGRAM, &toaplan2_dt7_state::dt7_v25_mem);
-	audiocpu.set_decryption_table(dt7_decryption_table);
-	audiocpu.pt_in_cb().set(FUNC(toaplan2_dt7_state::read_port_t));
-	audiocpu.p2_in_cb().set(FUNC(toaplan2_dt7_state::read_port_2));
-	audiocpu.p2_out_cb().set(FUNC(toaplan2_dt7_state::write_port_2));
+	audiocpu.set_addrmap(AS_PROGRAM, &dt7_state::dt7_v25_mem);
+	audiocpu.set_decryption_table(toaplan_v25_tables::dt7_decryption_table);
+	audiocpu.pt_in_cb().set(FUNC(dt7_state::read_port_t));
+	audiocpu.p2_in_cb().set(FUNC(dt7_state::read_port_2));
+	audiocpu.p2_out_cb().set(FUNC(dt7_state::write_port_2));
 	//audiocpu.p1_in_cb().set_ioport("EEPROM");
 	//audiocpu.p1_out_cb().set_ioport("EEPROM");
 
@@ -439,24 +367,24 @@ void toaplan2_dt7_state::dt7(machine_config &config)
 	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
 	m_screen[0]->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen[0]->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen[0]->set_screen_update(FUNC(toaplan2_dt7_state::screen_update_dt7_1));
-	m_screen[0]->screen_vblank().set(FUNC(toaplan2_dt7_state::screen_vblank));
+	m_screen[0]->set_screen_update(FUNC(dt7_state::screen_update_dt7_1));
+	m_screen[0]->screen_vblank().set(FUNC(dt7_state::screen_vblank));
 	m_screen[0]->set_palette(m_palette[0]);
 
 	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
 	m_screen[1]->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen[1]->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen[1]->set_screen_update(FUNC(toaplan2_dt7_state::screen_update_dt7_2));
-	//m_screen[1]->screen_vblank().set(FUNC(toaplan2_dt7_state::screen_vblank));
+	m_screen[1]->set_screen_update(FUNC(dt7_state::screen_update_dt7_2));
+	//m_screen[1]->screen_vblank().set(FUNC(dt7_state::screen_vblank));
 	m_screen[1]->set_palette(m_palette[1]);
 
-	PALETTE(config, m_palette[0]).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
+	PALETTE(config, m_palette[0]).set_format(palette_device::xBGR_555, gp9001vdp_device::VDP_PALETTE_LENGTH);
 
-	PALETTE(config, m_palette[1]).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
+	PALETTE(config, m_palette[1]).set_format(palette_device::xBGR_555, gp9001vdp_device::VDP_PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette[0]);
-	m_vdp[0]->vint_out_cb().set(FUNC(toaplan2_dt7_state::dt7_irq));
+	m_vdp[0]->vint_out_cb().set(FUNC(dt7_state::dt7_irq));
 	m_vdp[0]->set_screen(m_screen[0]);
 
 	GP9001_VDP(config, m_vdp[1], 27_MHz_XTAL);
@@ -507,31 +435,7 @@ static INPUT_PORTS_START( dt7 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
-
-u16 toaplan2_dt7_state::video_count_r()
-{
-	int vpos = m_screen[0]->vpos();
-
-	u16 video_status = 0xff00;    // Set signals inactive
-
-	vpos = (vpos + 15) % 262;
-
-	if (!m_vdp[0]->hsync_r())
-		video_status &= ~0x8000;
-	if (!m_vdp[0]->vsync_r())
-		video_status &= ~0x4000;
-	if (!m_vdp[0]->fblank_r())
-		video_status &= ~0x0100;
-	if (vpos < 256)
-		video_status |= (vpos & 0xff);
-	else
-		video_status |= 0xff;
-
-	return video_status;
-}
-
-
-TILE_GET_INFO_MEMBER(toaplan2_dt7_state::get_text_dt7_tile_info)
+TILE_GET_INFO_MEMBER(dt7_state::get_text_dt7_tile_info)
 {
 	const u16 attrib = m_tx_videoram[tile_index];
 	const u32 tile_number = attrib & 0x3ff;
@@ -546,7 +450,7 @@ TILE_GET_INFO_MEMBER(toaplan2_dt7_state::get_text_dt7_tile_info)
 			0);
 }
 
-void toaplan2_dt7_state::video_start()
+void dt7_state::video_start()
 {
 	/* our current VDP implementation needs this bitmap to work with */
 	m_screen[0]->register_screen_bitmap(m_custom_priority_bitmap);
@@ -555,14 +459,14 @@ void toaplan2_dt7_state::video_start()
 
 	// a different part of this tilemap is displayed on each screen
 	// each screen has a different palette and uses a ROM in a different location on the PCB
-	m_tx_tilemap[0] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(*this, FUNC(toaplan2_dt7_state::get_text_dt7_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tx_tilemap[1] = &machine().tilemap().create(*m_gfxdecode[1], tilemap_get_info_delegate(*this, FUNC(toaplan2_dt7_state::get_text_dt7_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tx_tilemap[0] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(*this, FUNC(dt7_state::get_text_dt7_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tx_tilemap[1] = &machine().tilemap().create(*m_gfxdecode[1], tilemap_get_info_delegate(*this, FUNC(dt7_state::get_text_dt7_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_tx_tilemap[0]->set_transparent_pen(0);
 	m_tx_tilemap[1]->set_transparent_pen(0);
 }
 
-void toaplan2_dt7_state::tx_videoram_dt7_w(offs_t offset, u16 data, u16 mem_mask)
+void dt7_state::tx_videoram_dt7_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_tx_videoram[offset]);
 	if (offset < 64 * 64)
@@ -572,7 +476,7 @@ void toaplan2_dt7_state::tx_videoram_dt7_w(offs_t offset, u16 data, u16 mem_mask
 	}
 }
 
-u32 toaplan2_dt7_state::screen_update_dt7_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dt7_state::screen_update_dt7_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
@@ -584,7 +488,7 @@ u32 toaplan2_dt7_state::screen_update_dt7_1(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-u32 toaplan2_dt7_state::screen_update_dt7_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dt7_state::screen_update_dt7_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
@@ -596,7 +500,7 @@ u32 toaplan2_dt7_state::screen_update_dt7_2(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void toaplan2_dt7_state::screen_vblank(int state)
+void dt7_state::screen_vblank(int state)
 {
 	m_vdp[0]->screen_eof();
 	m_vdp[1]->screen_eof();
@@ -650,5 +554,7 @@ ROM_START( dt7 )
 	ROM_LOAD( "7adpcm.43", 0x00000, 0x40000, CRC(aefce555) SHA1(0d47190287957122fefdae17ccf6bcfaef8cd430) )
 ROM_END
 
+} // anonymous namespace
+
 // The region comes from the EEPROM? so will need clones like FixEight
-GAME( 1993, dt7,         0,        dt7,          dt7,        toaplan2_dt7_state,empty_init, ROT270, "Toaplan",         "DT7 (prototype)",              MACHINE_NOT_WORKING )
+GAME( 1993, dt7,         0,        dt7,          dt7,        dt7_state,empty_init, ROT270, "Toaplan",         "DT7 (prototype)",              MACHINE_NOT_WORKING )
