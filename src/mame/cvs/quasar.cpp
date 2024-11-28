@@ -7,6 +7,14 @@ Zaccaria Quasar
 
 Driver by Mike Coates and Pierpaolo Prazzoli
 
+Zaccaria S2650 games share various levels of design with the Century Video
+System (CVS) games.
+
+Shooting seems to mix custom boards from Zaccaria and sound boards from CVS,
+hinting at a strong link between the two companies.
+
+Zaccaria are an Italian company, Century were based in Manchester UK.
+
 TODO:
 - Missing enemy shooting sound effect, needs netlist?
 - Where is the flipscreen signal?
@@ -33,25 +41,39 @@ I8085 Sound Board
 
 
 #include "emu.h"
-#include "cvs_base.h"
 
 #include "cpu/mcs48/mcs48.h"
+#include "cpu/s2650/s2650.h"
+#include "machine/gen_latch.h"
+#include "machine/s2636.h"
+#include "sound/dac.h"
+#include "sound/tms5110.h"
 
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
 namespace {
 
-class quasar_state : public cvs_base_state
+class quasar_state : public driver_device
 {
 public:
 	quasar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cvs_base_state(mconfig, type, tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_soundlatch(*this, "soundlatch")
+		, m_s2636(*this, "s2636%u", 0U)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
 		, m_in(*this, "IN%u", 0U)
 		, m_dsw(*this, "DSW%u", 0U)
+		, m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_BIG)
+		, m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_BIG)
 		, m_effectram(*this, "effectram", 0x400, ENDIANNESS_BIG)
+		, m_bullet_ram(*this, "bullet_ram")
 	{ }
 
 	void quasar(machine_config &config) ATTR_COLD;
@@ -65,15 +87,27 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	// devices
+	required_device<s2650_device> m_maincpu;
 	required_device<i8035_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
-
+	required_device_array<s2636_device, 3> m_s2636;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	required_ioport_array<2> m_in;
 	required_ioport_array<3> m_dsw;
 
+	// memory
+	memory_share_creator<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 	memory_share_creator<uint8_t> m_effectram;
+	required_shared_ptr<uint8_t> m_bullet_ram;
 
+	bitmap_ind16 m_collision_background;
+	uint8_t m_collision_register = 0U;
 	uint8_t m_effectcontrol = 0U;
+
 	uint8_t m_page = 0U;
 	uint8_t m_io_page = 0U;
 
@@ -82,6 +116,8 @@ private:
 	void video_w(offs_t offset, uint8_t data);
 	uint8_t io_r();
 	void bullet_w(offs_t offset, uint8_t data);
+	uint8_t collision_r();
+	uint8_t collision_clear_r();
 	void sh_command_w(uint8_t data);
 	uint8_t sh_command_r();
 	int audio_t1_r();
@@ -97,9 +133,8 @@ private:
 
 void quasar_state::machine_start()
 {
-	cvs_base_state::machine_start();
-
 	// register state save
+	save_item(NAME(m_collision_register));
 	save_item(NAME(m_effectcontrol));
 	save_item(NAME(m_page));
 	save_item(NAME(m_io_page));
@@ -107,9 +142,7 @@ void quasar_state::machine_start()
 
 void quasar_state::machine_reset()
 {
-	cvs_base_state::machine_reset();
-
-	m_effectcontrol = 0;
+	m_collision_register = 0;
 	m_page = 0;
 	m_io_page = 8;
 }
@@ -117,13 +150,7 @@ void quasar_state::machine_reset()
 
 /*******************************************************************************
 
-  Zaccaria S2650 games share various levels of design with the Century Video
-  System (CVS) games, and hence some routines are shared from there.
-
-  Shooting seems to mix custom boards from Zaccaria and sound boards from CVS
-  hinting at a strong link between the two companies.
-
-  Zaccaria are an Italian company, Century were based in Manchester UK
+  Video
 
 *******************************************************************************/
 
@@ -340,6 +367,19 @@ void quasar_state::bullet_w(offs_t offset, uint8_t data)
 	m_bullet_ram[offset] = data ^ 0xff;
 }
 
+uint8_t quasar_state::collision_r()
+{
+	return m_collision_register;
+}
+
+uint8_t quasar_state::collision_clear_r()
+{
+	if (!machine().side_effects_disabled())
+		m_collision_register = 0;
+
+	return 0;
+}
+
 // memory map taken from the manual
 
 void quasar_state::program(address_map &map)
@@ -528,11 +568,11 @@ void quasar_state::quasar(machine_config &config)
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x0a; });
 
-	i8035_device &audiocpu(I8035(config, "audiocpu", 6_MHz_XTAL));
-	audiocpu.set_addrmap(AS_PROGRAM, &quasar_state::sound_map);
-	audiocpu.set_addrmap(AS_IO, &quasar_state::sound_portmap);
-	audiocpu.t1_in_cb().set(FUNC(quasar_state::audio_t1_r));
-	audiocpu.p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	I8035(config, m_audiocpu, 6_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &quasar_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &quasar_state::sound_portmap);
+	m_audiocpu->t1_in_cb().set(FUNC(quasar_state::audio_t1_r));
+	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -548,15 +588,15 @@ void quasar_state::quasar(machine_config &config)
 	PALETTE(config, m_palette, FUNC(quasar_state::palette), (64 + 1) * 8 + (4 * 256), 0x500);
 
 	S2636(config, m_s2636[0], 0);
-	m_s2636[0]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
+	m_s2636[0]->set_offsets(-13, -35);
 	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	S2636(config, m_s2636[1], 0);
-	m_s2636[1]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
+	m_s2636[1]->set_offsets(-13, -35);
 	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	S2636(config, m_s2636[2], 0);
-	m_s2636[2]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
+	m_s2636[2]->set_offsets(-13, -35);
 	m_s2636[2]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	// sound hardware
