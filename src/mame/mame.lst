@@ -17510,6 +17510,7 @@ animaljr                        // "75" (c) 1993 Nakanihon/Taito (USA)
 animaljrj                       // "75" (c) 1993 Nakanihon/Taito (Japan)
 animaljrs                       // "75" (c) 1993 Nakanihon/Taito (Spanish version)
 daimyojn                        // "017" 2002 Dynax / Techno-Top
+daireach                        // Mahjong Dai-Reach (C) 2001 Techno-Top
 ddenlovj                        // "112" (c) 1995 Dynax (Japan)
 ddenlovr                        // "113" (c) 1996 Dynax (Hong Kong)
 ddenlovrb                       // bootleg
@@ -46940,6 +46941,7 @@ excitbj                         // (c) 1992 Wing Co. Ltd
 lucky74                         // (c) 1988 Wing Co. Ltd
 lucky74a                        // (c) 1988 Wing Co. Ltd
 lucky74b                        // (c) 1988 Wing Co. Ltd
+lucky88w                        // (c) 1988 Wing Co. Ltd
 
 @source:wing/pinkiri8.cpp
 janshi                          //

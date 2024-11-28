@@ -53,6 +53,7 @@ Year + Game                         Board                  CPU    Sound         
 1999  Mj Jong-Tei                   NM532-9902             Z80           YM2413 M6295  4L10FXXXX?
 2000  Mj Gorgeous Night             TSM003-0002            Z80           YM2413 M6295  4L10FXXXX?
 2000  Mj Jong-Tei                   TSM005-0004            Z80           YM2413 M6295  scratched off
+2001  Mj Dai-Reach                  TSM004-0002            Z80           YM2413 M6295  scratched off      2149C (I8255 in disguise?)
 2002  Mj Daimyojin                  TSM015-0111            Z80           YM2413 M6295  70C160F011
 2004  Mj Momotarou                  TSM015-0111?           Z80           YM2413 M6295  70C160F011?
 -----------------------------------------------------------------------------------------------------------------------------------
@@ -124,9 +125,9 @@ Notes:
 #include "dynax.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/tmpz84c015.h"
 #include "cpu/z80/kl5c80a12.h"
+#include "cpu/z80/tmpz84c015.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/ymopl.h"
 #include "machine/74259.h"
@@ -329,20 +330,20 @@ private:
 	uint16_t akamaru_e0010d_r();
 protected:
 	void mjflove_rombank_w(uint8_t data);
+	void sryudens_rambank_w(uint8_t data);
 private:
 	uint8_t mjflove_protection_r();
 	uint8_t mjflove_keyb_r(offs_t offset);
 	void mjflove_coincounter_w(uint8_t data);
 	uint8_t sryudens_keyb_r(offs_t offset);
 	void sryudens_coincounter_w(uint8_t data);
-	void sryudens_rambank_w(uint8_t data);
 protected:
 	uint8_t daimyojn_keyb1_r();
 	uint8_t daimyojn_keyb2_r();
+	void seljan2_palette_enab_w(uint8_t data);
 private:
 	void janshinp_coincounter_w(uint8_t data);
 	void seljan2_rombank_w(uint8_t data);
-	void seljan2_palette_enab_w(uint8_t data);
 	void seljan2_palette_w(offs_t offset, uint8_t data);
 	void quizchq_oki_bank_w(uint8_t data);
 	void ddenlovr_oki_bank_w(uint8_t data);
@@ -586,6 +587,7 @@ public:
 	void mjreach1(machine_config &config);
 	void daimyojn(machine_config &config);
 	void kotbinyo(machine_config &config);
+	void daireach(machine_config &config);
 
 	void init_momotaro();
 
@@ -626,6 +628,7 @@ private:
 	uint8_t daimyojn_protection_r();
 	uint8_t momotaro_protection_r();
 	uint8_t jongteia_protection_r();
+	uint8_t daireach_protection_r();
 	void daimyojn_palette_sel_w(uint8_t data);
 	void daimyojn_blitter_data_palette_w(uint8_t data);
 	uint8_t daimyojn_year_hack_r(offs_t offset);
@@ -638,6 +641,7 @@ private:
 
 	void hanakanz_map(address_map &map) ATTR_COLD;
 	void daimyojn_portmap(address_map &map) ATTR_COLD;
+	void daireach_portmap(address_map &map) ATTR_COLD;
 	void hanakanz_portmap(address_map &map) ATTR_COLD;
 	void hkagerou_portmap(address_map &map) ATTR_COLD;
 	void jongtei_portmap(address_map &map) ATTR_COLD;
@@ -4661,6 +4665,56 @@ void hanakanz_state::daimyojn_portmap(address_map &map)
 	map(0xe0, 0xe0).rw(FUNC(hanakanz_state::daimyojn_protection_r), FUNC(hanakanz_state::daimyojn_protection_w));
 }
 
+
+/***************************************************************************
+                            Mahjong Dai-Reach
+***************************************************************************/
+
+// 1B40: D4 ED 76 C9 CB
+// 1B45: C3 FA 61 DE DC
+
+uint8_t hanakanz_state::daireach_protection_r()
+{
+	switch (m_prot_val)
+	{
+		case 0xd4:  return 0xc3;
+		case 0xed:  return 0xfa;
+		case 0x76:  return 0x61;
+		case 0xc9:  return 0xde;
+		case 0xcb:  return 0xdc;
+	}
+	return 0xff;
+}
+
+
+void hanakanz_state::daireach_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x20, 0x23).w(FUNC(hanakanz_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).w(FUNC(hanakanz_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).w(FUNC(hanakanz_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).w(FUNC(hanakanz_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).w(FUNC(hanakanz_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).w(FUNC(hanakanz_state::ddenlovr_priority_w));
+	map(0x36, 0x36).w(FUNC(hanakanz_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).nopr();         // ? ack or watchdog
+	map(0x40, 0x41).w(FUNC(hanakanz_state::ddenlovr_blitter_w));
+	map(0x43, 0x43).r(FUNC(hanakanz_state::ddenlovr_gfxrom_r));
+	map(0x60, 0x60).rw("aysnd", FUNC(ay8910_device::data_r),FUNC(ay8910_device::address_w));   // dsw
+	map(0x62, 0x62).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x64, 0x65).w("ym2413", FUNC(ym2413_device::write));
+	map(0x66, 0x66).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x68, 0x68).w(FUNC(hanakanz_state::mjflove_rombank_w));
+	map(0x6a, 0x6a).nopr().w(FUNC(hanakanz_state::sryudens_rambank_w));
+	map(0x6c, 0x6c).r(FUNC(hanakanz_state::hanakanz_rand_r));
+	map(0x6e, 0x6e).rw(FUNC(hanakanz_state::daireach_protection_r), FUNC(hanakanz_state::daimyojn_protection_w));
+	map(0x70, 0x70).portr("SYSTEM");
+	map(0x72, 0x72).r(FUNC(hanakanz_state::daimyojn_keyb1_r));
+	map(0x74, 0x74).r(FUNC(hanakanz_state::daimyojn_keyb2_r));
+	map(0x78, 0x78).w(FUNC(hanakanz_state::mjchuuka_oki_bank_w));
+	map(0x7e, 0x7e).w(FUNC(hanakanz_state::seljan2_palette_enab_w));    // writes: 1 = palette RAM at b000, 0 = ROM
+}
 
 static INPUT_PORTS_START( ddenlovj )
 	PORT_START("P1")
@@ -10830,6 +10884,16 @@ void ddenlovr_state::seljan2(machine_config &config)
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
 }
 
+void hanakanz_state::daireach(machine_config &config)
+{
+	seljan2(config);
+
+	auto &maincpu(*subdevice<tmpz84c015_device>("maincpu"));
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::daireach_portmap);
+	maincpu.out_pb_callback().set(FUNC(hanakanz_state::mjchuuka_coincounter_w));
+
+	MCFG_VIDEO_START_OVERRIDE(hanakanz_state, ddenlovr)
+}
 
 /***************************************************************************
                             Mahjong Daimyojin
@@ -12946,6 +13010,29 @@ ROM_END
 
 /***************************************************************************
 
+Mahjong Dai Reach
+
+TSM004-0002 Techno-Top, Limited
+
+Has 4 banks of 10 DIP switches
+
+***************************************************************************/
+
+ROM_START( daireach )
+	ROM_REGION( 0x90000+0x8000+16*0x1000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "01202.5c", 0x00000, 0x80000, CRC(2d1cc94d) SHA1(4db6ea0414abfaf21c5bdd5e1cf395b01db1dce6) )
+	ROM_RELOAD(           0x10000, 0x80000 )
+
+	ROM_REGION( 0x600000, "blitter", 0 )
+	ROM_LOAD( "01203.11c",  0x000000, 0x200000, CRC(da054dbf) SHA1(80bab808711e6eb1521b68faee4b6ee7af001811) )
+	ROM_LOAD( "01204.11a",  0x400000, 0x200000, CRC(ac96b1fc) SHA1(c045b048a8226c2fb3ba6feee36ce487c7ba12d2) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "01201.1c", 0x00000, 0x80000, CRC(9a638bc8) SHA1(c584ea5f8fcfc03fd8e04a5da182388d8a707df1) )
+ROM_END
+
+/***************************************************************************
+
 Mahjong Gorgeous Night
 
 PCB is identical to Mahjong Jong-Tei, but with number:
@@ -13355,6 +13442,8 @@ GAME( 1999, jongtei,   0,        jongtei,   jongtei,  hanakanz_state, empty_init
 GAME( 2000, jongteia,  jongtei,  jongteia,  jongtei,  hanakanz_state, empty_init,    ROT0, "Dynax (Techno-Top license)",                  "Mahjong Jong-Tei (Japan, Techno-Top license)",                   MACHINE_NO_COCKTAIL  )
 
 GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night (Japan, TSM003-01)",                      MACHINE_NO_COCKTAIL  )
+
+GAME( 2001, daireach,  0,        daireach,  seljan2,  hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Dai-Reach (Japan, TSM012-C01)",                          MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL )
 
 GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, hanakanz_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                          MACHINE_NO_COCKTAIL  )
 
