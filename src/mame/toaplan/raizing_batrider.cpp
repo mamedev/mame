@@ -1,11 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:Quench, Yochizo, David Haywood
 
 #include "emu.h"
 
 #include "raizing.h"
-
-
 
 class batrider_state : public raizing_base_state
 {

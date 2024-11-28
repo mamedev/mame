@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:Quench, Yochizo, David Haywood
 
 #ifndef MAME_TOAPLAN_TOAPLAN_COINCOUNTER_H
 #define MAME_TOAPLAN_TOAPLAN_COINCOUNTER_H

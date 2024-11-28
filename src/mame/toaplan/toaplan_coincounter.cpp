@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:Quench, Yochizo, David Haywood
 
 #include "emu.h"
 #include "toaplan_coincounter.h"
