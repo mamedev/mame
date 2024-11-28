@@ -19,6 +19,20 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
+/*
+Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+dogyuun     TP-022        Toaplan       Dogyuun
+dogyuuna    TP-022        Toaplan       Dogyuun (older)
+dogyuunt    TP-022        Toaplan       Dogyuun (location test)
+
+dogyuun  - In the location test version, if you are hit while you have a bomb, the bomb explodes
+            automatically and saves you from dying. In the final released version, the bomb explodes
+            but you die anyway.
+            The only difference between the dogyuun and dogyuuna sets is some of the region jumper
+            settings; see the INPUT_PORTS definitions.
+*/
+
 namespace {
 
 class dogyuun_base_state : public driver_device

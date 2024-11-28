@@ -18,6 +18,20 @@
 
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
+/*
+Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+truxton2    TP-024        Toaplan       Truxton 2 / Tatsujin Oh
+
+truxton2 - Although the truxton2 PCB has only standard JAMMA mono audio output, and uses a YM3014B
+            mono DAC, the YM2151 music is actually sequenced in stereo. In toaplan2.h, uncomment
+            "#define TRUXTON2_STEREO" to hear the game's music the way it was originally composed.
+            Difficulty is much lower when the region is set to Europe or USA than when set to any
+            Asian region, independent of the "Difficulty" dipswitches. See the code beginning at
+            1FE94 (RAM address 1002D6 contains 0 if region is an Asian region, 1 if Europe or USA)
+
+*/
+
 namespace {
 
 class truxton2_state : public driver_device

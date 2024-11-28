@@ -5,6 +5,143 @@
 
 #include "raizing.h"
 
+/*
+
+Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+batrider    RA9704        Raizing/8ing  Armed Police Batrider (Europe - Fri Feb 13 1998)
+batrideru   RA9704        Raizing/8ing  Armed Police Batrider (USA - Fri Feb 13 1998)
+batriderc   RA9704        Raizing/8ing  Armed Police Batrider (China - Fri Feb 13 1998)
+batriderj   RA9704        Raizing/8ing  Armed Police Batrider - B Version (Japan - Fri Feb 13 1998)
+batriderk   RA9704        Raizing/8ing  Armed Police Batrider (Korea - Fri Feb 13 1998)
+batriderja  RA9704        Raizing/8ing  Armed Police Batrider (Japan - Mon Dec 22 1997)
+batridert   RA9704        Raizing/8ing  Armed Police Batrider (Taiwan - Mon Dec 22 1997)
+bbakraid    ET68-V99      8ing          Battle Bakraid - Unlimited Version (USA - Tue Jun 8th, 1999)
+bbakraidj   ET68-V99      8ing          Battle Bakraid - Unlimited Version (Japan - Tue Jun 8th, 1999)
+bbakraidja  ET68-V99      8ing          Battle Bakraid (Japan - Wed Apr 7th, 1999)
+
+batrider - Batrider was marketed as a two button game, and the regular ships all use only the first
+            two buttons, but in the original version you need the third button in order to control the
+            options of the hidden Battle Garegga ships.
+            This problem was fixed in the B Version, which lets you change the Battle Garegga ships'
+            option formation using Street Fighter style joystick commands (as well as by using the third
+            button, if the cabinet has one)
+
+bbakraid - Because players managed to counter stop the original Battle Bakraid not long after release,
+            the Unlimited Version, which can display more score digits, was released as a ROM upgrade.
+            The upgrade also fixes the bug in the original version that prevented the unlocking of
+            Team Edit mode from being saved in the EEPROM.
+
+ ****************************************************************************
+ * Armed Police Batrider                                                    *
+ *       The button you use to select your ship not only determines its     *
+ *       color, but affects its characteristics.                            *
+ *           A: High main shot power, low option shot power.                *
+ *              Average speed. Default autofire rate is 15 Hz.              *
+ *           B: Low main shot power, high option shot power. Slightly       *
+ *              slower than A type. Default autofire rate is 12 Hz.         *
+ *           C: High main shot and option shot power, but lowest speed.     *
+ *              Default autofire rate is 20 Hz.                             *
+ *       START: Low main shot and option shot power, but highest speed.     *
+ *              Default autofire rate is 10 Hz.                             *
+ *                                                                          *
+ * Note: The following features can also be enabled via dipswitches.        *
+ *                                                                          *
+ * PLAYER SELECT: After inserting a coin, input                             *
+ *       UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  B  A                 *
+ *       You can select a single character instead of a team.               *
+ * GUEST PLAYERS: After inserting a coin, input                             *
+ *       UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B                 *
+ *       You can use Mahou Daisakusen and Battle Garegga characters.        *
+ * SPECIAL COURSE: After inserting a coin, input                            *
+ *       UP  DOWN  UP  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B                 *
+ *       You can select the Special course, which consists of bosses only.  *
+ * STAGE EDIT: When you select your course, press A and B simultaneously.   *
+ *       You can choose what order to play Stage 2, 3 and 4 in,             *
+ *       or even skip them.                                                 *
+ ****************************************************************************
+
+ ############################################################################
+ # In Battle Bakraid, the button you use to select your ship not only       #
+ # determines its color, but affects its characteristics.                   #
+ #     A: Increased main shot power. Default autofire rate is 20 Hz.        #
+ #     B: Increased bomb blast duration. Default autofire rate is 12 Hz.    #
+ #     C: Increased side shot power. Default autofire rate is 15 Hz.        #
+ # START: Increased speed. Default autofire rate is 10 Hz.                  #
+ #                                                                          #
+ # STAGE EDIT: When you select your course, press A and B simultaneously.   #
+ #        You can choose what order to play Stage 2, 3, 4 and 5 in,         #
+ #        or even skip them. Stage Edit can also be enabled via dipswitch.  #
+ # ======================================================================== #
+ # Battle Bakraid has unlocking codes to gain access to extra players       #
+ # and game features. Once each feature is unlocked, it is saved in EEPROM  #
+ # and remains unlocked until you erase the EEPROM from the service mode.   #
+ # However, in the original (non-Unlimited) version, the unlocking of       #
+ # Team Edit is not saved in EEPROM, apparently due to a bug.               #
+ # Special thanks go to the 'R8ZING Shooter Tribute' page for finding       #
+ # and publishing this info.                                                #
+ # ======================================================================== #
+ #      PLAYER SELECT: PHASE 2                                              #
+ # Result:  3 more fighter planes available.                                #
+ # Code:    UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B  Start       #
+ # Conditions:                                                              #
+ #      1. Start from the title screen                                      #
+ #      2. Insert Coin                                                      #
+ #      3. Watch the 20 sec. counter and enter each part of the code right  #
+ #         between the counting.                                            #
+ # Example: 12,up,11,up,10,down,9,down,8,left,7,right,6.left,5,r..          #
+ # After entering the [B] button a chime should sound. Phase 2 unlocked!    #
+ # ------------------------------------------------------------------------ #
+ #      PLAYER SELECT: PHASE 3                                              #
+ # Result:  2 more fighter planes available.                                #
+ # Code:    UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  B  A  Start       #
+ # Conditions:                                                              #
+ #      1. Unlock Player Select Phase 2 first                               #
+ #      2. Insert Coin                                                      #
+ #      3. Watch the 20 sec. counter and enter each part of the code right  #
+ #         between the counting.                                            #
+ # Important: The entering of this code has to be finished before the       #
+ # counter passes 10 ! To do so, you will have to start after coin          #
+ # insertion, right before it starts to count:                              #
+ # Example: up,19,up,18,down,17,down,16,left,15,right,14.left,..            #
+ # After entering the [A] button a chime should sound. Phase 3 unlocked!    #
+ # ------------------------------------------------------------------------ #
+ #      TEAM EDIT: ENABLE                                                   #
+ # Result:  Unlocks the 'team edit' feature to select a team of different   #
+ #          ships like in Batrider.                                         #
+ # Code:    UP  DOWN  UP  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B  Start       #
+ # Conditions:                                                              #
+ #      1. Unlock Player Select Phase 2 and Phase 3 first                   #
+ #      2. Insert Coin                                                      #
+ #      3. Watch the 20 sec. counter and enter each part of the code right  #
+ #         between the counting.                                            #
+ # Important: This code hast to be entered so that the counter is at 0 when #
+ # you press the final button [B]. To do so, start after second 9:          #
+ # Example: 9,up,8,down,7,up,6,down,5,left,4,right,3,left,2,right,1,A,0,B   #
+ # After entering the [B] button a chime should sound. Team edit unlocked!  #
+ #                                                                          #
+ # Note: In the Japan version, to use Team Edit after unlocking it,         #
+ #       you must hold UP or DOWN  while selecting your course.             #
+ #       In the USA version, if Team Edit is unlocked, the game asks you    #
+ #       if you want to use it after you select your course.                #
+ # ------------------------------------------------------------------------ #
+ #      SPECIAL COURSE: ENABLE                                              #
+ # Result:  Unlocks the Special course, a game mode where you fight the     #
+ #          bosses only.                                                    #
+ # Code:    UP  DOWN  UP  DOWN  LEFT  RIGHT  LEFT  RIGHT  B  A  Start       #
+ # Conditions:                                                              #
+ #      1. Start from the title screen                                      #
+ #      2. Hold [C] button                                                  #
+ #      3. Insert Coin                                                      #
+ #      4. Watch the 20 sec. counter and enter each part of the code right  #
+ #         between the counting.                                            #
+ #      5. Release [C] button                                               #
+ # After entering the [A] button a chime should sound. Special course       #
+ # unlocked!                                                                #
+ ############################################################################
+
+*/
+
 namespace {
 
 class batrider_state : public raizing_base_state

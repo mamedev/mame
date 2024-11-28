@@ -23,39 +23,6 @@ Supported games:
 
     Name        Board No      Maker         Game name
     ----------------------------------------------------------------------------
-    tekipaki    TP-020        Toaplan       Teki Paki
-    tekipakit   TP-020        Toaplan       Teki Paki (location test)
-    ghox        TP-021        Toaplan       Ghox (Spinner with single up/down axis control)
-    ghoxj       TP-021        Toaplan       Ghox (8-Way Joystick controls)
-    dogyuun     TP-022        Toaplan       Dogyuun
-    dogyuuna    TP-022        Toaplan       Dogyuun (older)
-    dogyuunt    TP-022        Toaplan       Dogyuun (location test)
-    kbash       TP-023        Toaplan       Knuckle Bash
-    kbash2      bootleg       Toaplan       Knuckle Bash 2
-    truxton2    TP-024        Toaplan       Truxton 2 / Tatsujin Oh
-    pipibibs    TP-025        Toaplan       Pipi & Bibis / Whoopee!! (set 1)
-    pipibibsa   TP-025        Toaplan       Pipi & Bibis / Whoopee!! (set 2)
-    pipibibsp   TP-025        Toaplan       Pipi & Bibis / Whoopee!! (Prototype)
-    pipibibsbl  bootleg       Toaplan       Pipi & Bibis / Whoopee!! (based of the prototype)
-    whoopee    *TP-025/TP-020 Toaplan       Pipi & Bibis / Whoopee!! (Teki Paki hardware)
-    fixeight    TP-026        Toaplan       FixEight
-    fixeightbl  bootleg       Toaplan       FixEight
-    grindstm    TP-027        Toaplan       Grind Stormer (1992)
-    grindstma   TP-027        Toaplan       Grind Stormer (1992) (older)
-    vfive       TP-027        Toaplan       V-V (V-Five)  (1993 - Japan only)
-    batsugun    TP-030        Toaplan       Batsugun
-    batsuguna   TP-030        Toaplan       Batsugun (older)
-    batsugunsp  TP-030        Toaplan       Batsugun (Special Version)
-    enmadaio    TP-031        Toaplan       Enma Daio
-    pwrkick     SW931201      Sunwise       Power Kick
-    burgkids    SW931201      Sunwise       Burger Kids
-    othldrby    S951060-VGP   Sunwise       Othello Derby
-    snowbro2    TP-033        Hanafram      Snow Bros. 2 - With New Elves
-
-    * This version of Whoopee!! is on a board labeled TP-020
-      (same board number, and same hardware, as Teki Paki)
-      but the ROMs are labeled TP-025.
-
     sstriker    RA-MA7893-01  Raizing       Sorcer Striker
     sstrikera   RA-MA7893-01  Raizing       Sorcer Striker (Unite Trading license)
     mahoudai    RA-MA7893-01  Raizing       Mahou Daisakusen (Japan)
@@ -68,75 +35,8 @@ Supported games:
     bgaregganv  RA9503        Raizing/8ing  Battle Garegga - New Version (Hong Kong (and Austria?) - Sat Mar 2 1996)
     bgareggat2  RA9503        Raizing/8ing  Battle Garegga - Type 2 (World - Sat Mar 2 1996)
     bgareggacn  RA9503        Raizing/8ing  Battle Garegga - Type 2 (China (and Denmark?) - Tue Apr 2 1996)
-    batrider    RA9704        Raizing/8ing  Armed Police Batrider (Europe - Fri Feb 13 1998)
-    batrideru   RA9704        Raizing/8ing  Armed Police Batrider (USA - Fri Feb 13 1998)
-    batriderc   RA9704        Raizing/8ing  Armed Police Batrider (China - Fri Feb 13 1998)
-    batriderj   RA9704        Raizing/8ing  Armed Police Batrider - B Version (Japan - Fri Feb 13 1998)
-    batriderk   RA9704        Raizing/8ing  Armed Police Batrider (Korea - Fri Feb 13 1998)
-    batriderja  RA9704        Raizing/8ing  Armed Police Batrider (Japan - Mon Dec 22 1997)
-    batridert   RA9704        Raizing/8ing  Armed Police Batrider (Taiwan - Mon Dec 22 1997)
-    bbakraid    ET68-V99      8ing          Battle Bakraid - Unlimited Version (USA - Tue Jun 8th, 1999)
-    bbakraidj   ET68-V99      8ing          Battle Bakraid - Unlimited Version (Japan - Tue Jun 8th, 1999)
-    bbakraidja  ET68-V99      8ing          Battle Bakraid (Japan - Wed Apr 7th, 1999)
 
     SET NOTES:
-
-    ghox     - The ghoxj set displays an English title screen when the jumpers are set for Japan/Taito,
-               and fails to display the "Winners Don't Use Drugs" logo when set for USA/Taito (either
-               Taito America or Taito Japan).
-
-    dogyuun  - In the location test version, if you are hit while you have a bomb, the bomb explodes
-               automatically and saves you from dying. In the final released version, the bomb explodes
-               but you die anyway.
-               The only difference between the dogyuun and dogyuuna sets is some of the region jumper
-               settings; see the INPUT_PORTS definitions.
-
-    truxton2 - Although the truxton2 PCB has only standard JAMMA mono audio output, and uses a YM3014B
-               mono DAC, the YM2151 music is actually sequenced in stereo. In toaplan2.h, uncomment
-               "#define TRUXTON2_STEREO" to hear the game's music the way it was originally composed.
-               Difficulty is much lower when the region is set to Europe or USA than when set to any
-               Asian region, independent of the "Difficulty" dipswitches. See the code beginning at
-               1FE94 (RAM address 1002D6 contains 0 if region is an Asian region, 1 if Europe or USA)
-
-    fixeight - The same program is used for all regions, and the region can be changed just by swapping
-               EEPROMs. However, the V25 code also recognizes a secret input that rewrites the EEPROM to
-               use any one of the 14 recognized regional licenses, using the state of the player 1 and
-               player 2 button inputs held in conjunction with it as a 4-bit binary code:
-
-               Region                      Button input
-               ------------------------    ------------------------------------
-               Korea, Taito license        No buttons
-               Korea                       P1 button 1
-               Hong Kong, Taito license    P1 button 2
-               Hong Kong                   P1 buttons 1 & 2
-               Taiwan, Taito license       P2 button 1
-               Taiwan                      P1 button 1 + P2 button 1
-               SE Asia, Taito license      P1 button 2 + P2 button 1
-               Southeast Asia              P1 buttons 1 & 2 + P2 button 1
-               Europe, Taito license       P2 button 2
-               Europe                      P1 button 1 + P2 button 2
-               USA, Taito license          P1 button 2 + P2 button 2
-               USA                         P1 buttons 1 & 2 + P2 button 2
-               (Invalid)                   P2 buttons 1 & 2
-               (Invalid)                   P1 button 1 + P2 buttons 1 & 2
-               Japan                       P1 button 2 + P2 buttons 1 & 2
-               Japan, Taito license        P1 buttons 1 & 2 + P2 buttons 1 & 2
-
-    grindstm - Code at 20A26 in vfive forces region to Japan. All sets have some NOPs at reset vector,
-               and the NEC V25 CPU test that the other games do is skipped. Furthermore, all sets have
-               a broken ROM checksum routine that reads address ranges that don't match the actual
-               location or size of the ROM, and that has a hack at the end so it always passes.
-               Normally you would expect to see code like this in a bootleg, but the NOPs and other
-               oddities are identical among three different sets.
-
-    batsugun - The Special Version has many changes to make the game easier: it adds an autofire button,
-               replaces the regular bomb with the more powerful double bomb (which in the original version
-               required both players in a two player game to press their bomb buttons at once), gives you
-               a shield that can absorb one hit each time your ship "levels up", etc. It also changes the
-               colors of the title screen, ship select screen, stages, and enemies.
-               batsugun compared to batsuguna has code that looks more like the Special Version, but it
-               doesn't have any of the Special Version features. All the differences between batsugun
-               and batsuguna look like bug fixes that were carried over into the Special Version.
 
     sstriker - The mahoudai set reads the region jumpers, but the lookup tables in ROM that map jumper
                settings to copyright text, coinage settings, etc., contain identical values for every
@@ -161,18 +61,6 @@ Supported games:
                able to change the formation of your options with the third button, each of the selectable
                ships has a different, fixed option formation. However, the third button can still be used
                to select an alternate ship color and to enter the secret character and Stage Edit codes.
-
-    batrider - Batrider was marketed as a two button game, and the regular ships all use only the first
-               two buttons, but in the original version you need the third button in order to control the
-               options of the hidden Battle Garegga ships.
-               This problem was fixed in the B Version, which lets you change the Battle Garegga ships'
-               option formation using Street Fighter style joystick commands (as well as by using the third
-               button, if the cabinet has one)
-
-    bbakraid - Because players managed to counter stop the original Battle Bakraid not long after release,
-               the Unlimited Version, which can display more score digits, was released as a ROM upgrade.
-               The upgrade also fixes the bug in the original version that prevented the unlocking of
-               Team Edit mode from being saved in the EEPROM.
 
 
  ****************************************************************************
@@ -209,124 +97,11 @@ Supported games:
  *                                                                          *
  * EXTENDED, HARDER, and SPECIAL modes each have their own high score list. *
  * ------------------------------------------------------------------------ *
- * Armed Police Batrider                                                    *
- *       The button you use to select your ship not only determines its     *
- *       color, but affects its characteristics.                            *
- *           A: High main shot power, low option shot power.                *
- *              Average speed. Default autofire rate is 15 Hz.              *
- *           B: Low main shot power, high option shot power. Slightly       *
- *              slower than A type. Default autofire rate is 12 Hz.         *
- *           C: High main shot and option shot power, but lowest speed.     *
- *              Default autofire rate is 20 Hz.                             *
- *       START: Low main shot and option shot power, but highest speed.     *
- *              Default autofire rate is 10 Hz.                             *
- *                                                                          *
- * Note: The following features can also be enabled via dipswitches.        *
- *                                                                          *
- * PLAYER SELECT: After inserting a coin, input                             *
- *       UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  B  A                 *
- *       You can select a single character instead of a team.               *
- * GUEST PLAYERS: After inserting a coin, input                             *
- *       UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B                 *
- *       You can use Mahou Daisakusen and Battle Garegga characters.        *
- * SPECIAL COURSE: After inserting a coin, input                            *
- *       UP  DOWN  UP  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B                 *
- *       You can select the Special course, which consists of bosses only.  *
- * STAGE EDIT: When you select your course, press A and B simultaneously.   *
- *       You can choose what order to play Stage 2, 3 and 4 in,             *
- *       or even skip them.                                                 *
  ****************************************************************************
-
-
- ############################################################################
- # In Battle Bakraid, the button you use to select your ship not only       #
- # determines its color, but affects its characteristics.                   #
- #     A: Increased main shot power. Default autofire rate is 20 Hz.        #
- #     B: Increased bomb blast duration. Default autofire rate is 12 Hz.    #
- #     C: Increased side shot power. Default autofire rate is 15 Hz.        #
- # START: Increased speed. Default autofire rate is 10 Hz.                  #
- #                                                                          #
- # STAGE EDIT: When you select your course, press A and B simultaneously.   #
- #        You can choose what order to play Stage 2, 3, 4 and 5 in,         #
- #        or even skip them. Stage Edit can also be enabled via dipswitch.  #
- # ======================================================================== #
- # Battle Bakraid has unlocking codes to gain access to extra players       #
- # and game features. Once each feature is unlocked, it is saved in EEPROM  #
- # and remains unlocked until you erase the EEPROM from the service mode.   #
- # However, in the original (non-Unlimited) version, the unlocking of       #
- # Team Edit is not saved in EEPROM, apparently due to a bug.               #
- # Special thanks go to the 'R8ZING Shooter Tribute' page for finding       #
- # and publishing this info.                                                #
- # ======================================================================== #
- #      PLAYER SELECT: PHASE 2                                              #
- # Result:  3 more fighter planes available.                                #
- # Code:    UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B  Start       #
- # Conditions:                                                              #
- #      1. Start from the title screen                                      #
- #      2. Insert Coin                                                      #
- #      3. Watch the 20 sec. counter and enter each part of the code right  #
- #         between the counting.                                            #
- # Example: 12,up,11,up,10,down,9,down,8,left,7,right,6.left,5,r..          #
- # After entering the [B] button a chime should sound. Phase 2 unlocked!    #
- # ------------------------------------------------------------------------ #
- #      PLAYER SELECT: PHASE 3                                              #
- # Result:  2 more fighter planes available.                                #
- # Code:    UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  B  A  Start       #
- # Conditions:                                                              #
- #      1. Unlock Player Select Phase 2 first                               #
- #      2. Insert Coin                                                      #
- #      3. Watch the 20 sec. counter and enter each part of the code right  #
- #         between the counting.                                            #
- # Important: The entering of this code has to be finished before the       #
- # counter passes 10 ! To do so, you will have to start after coin          #
- # insertion, right before it starts to count:                              #
- # Example: up,19,up,18,down,17,down,16,left,15,right,14.left,..            #
- # After entering the [A] button a chime should sound. Phase 3 unlocked!    #
- # ------------------------------------------------------------------------ #
- #      TEAM EDIT: ENABLE                                                   #
- # Result:  Unlocks the 'team edit' feature to select a team of different   #
- #          ships like in Batrider.                                         #
- # Code:    UP  DOWN  UP  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B  Start       #
- # Conditions:                                                              #
- #      1. Unlock Player Select Phase 2 and Phase 3 first                   #
- #      2. Insert Coin                                                      #
- #      3. Watch the 20 sec. counter and enter each part of the code right  #
- #         between the counting.                                            #
- # Important: This code hast to be entered so that the counter is at 0 when #
- # you press the final button [B]. To do so, start after second 9:          #
- # Example: 9,up,8,down,7,up,6,down,5,left,4,right,3,left,2,right,1,A,0,B   #
- # After entering the [B] button a chime should sound. Team edit unlocked!  #
- #                                                                          #
- # Note: In the Japan version, to use Team Edit after unlocking it,         #
- #       you must hold UP or DOWN  while selecting your course.             #
- #       In the USA version, if Team Edit is unlocked, the game asks you    #
- #       if you want to use it after you select your course.                #
- # ------------------------------------------------------------------------ #
- #      SPECIAL COURSE: ENABLE                                              #
- # Result:  Unlocks the Special course, a game mode where you fight the     #
- #          bosses only.                                                    #
- # Code:    UP  DOWN  UP  DOWN  LEFT  RIGHT  LEFT  RIGHT  B  A  Start       #
- # Conditions:                                                              #
- #      1. Start from the title screen                                      #
- #      2. Hold [C] button                                                  #
- #      3. Insert Coin                                                      #
- #      4. Watch the 20 sec. counter and enter each part of the code right  #
- #         between the counting.                                            #
- #      5. Release [C] button                                               #
- # After entering the [A] button a chime should sound. Special course       #
- # unlocked!                                                                #
- ############################################################################
-
 
 Game status:
 
 To Do / Unknowns:
-    - Whoopee/Teki Paki sometimes tests bit 5 of the region jumper port
-        just after testing for vblank. Why?
-    - Priority problem on 2nd player side of selection screen in Fixeight bootleg.
-    - Fixeight bootleg text in sound check mode does not display properly
-        with the CPU set to 10MHz (ok at 16MHz). Possible error in video_count_r routine.
-    - Need to sort out the video status register.
     - Find out how exactly how sound CPU communication really works in bgaregga/batrider/bbakraid
         current emulation seems to work (plays all sounds), but there are still some unknown reads/writes
     - Music timing is bit different on bbakraid.

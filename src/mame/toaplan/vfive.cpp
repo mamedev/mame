@@ -17,6 +17,22 @@
 #include "cpu/nec/v25.h"
 #include "sound/ymopm.h"
 
+/*
+Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+grindstm    TP-027        Toaplan       Grind Stormer (1992)
+grindstma   TP-027        Toaplan       Grind Stormer (1992) (older)
+vfive       TP-027        Toaplan       V-V (V-Five)  (1993 - Japan only)
+
+
+grindstm - Code at 20A26 in vfive forces region to Japan. All sets have some NOPs at reset vector,
+            and the NEC V25 CPU test that the other games do is skipped. Furthermore, all sets have
+            a broken ROM checksum routine that reads address ranges that don't match the actual
+            location or size of the ROM, and that has a hack at the end so it always passes.
+            Normally you would expect to see code like this in a bootleg, but the NOPs and other
+            oddities are identical among three different sets.
+*/
+
 namespace {
 
 class vfive_state : public driver_device

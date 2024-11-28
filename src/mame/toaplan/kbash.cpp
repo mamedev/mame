@@ -18,6 +18,13 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
+/*
+Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+kbash       TP-023        Toaplan       Knuckle Bash
+kbash2      bootleg       Toaplan       Knuckle Bash 2
+*/
+
 namespace {
 
 class kbash_state : public driver_device

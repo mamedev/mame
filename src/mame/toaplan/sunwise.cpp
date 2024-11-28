@@ -20,6 +20,13 @@
 
 /*****************************************************************************
 
+Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+pwrkick     SW931201      Sunwise       Power Kick
+burgkids    SW931201      Sunwise       Burger Kids
+othldrby    S951060-VGP   Sunwise       Othello Derby
+
+
 Notes on Power Kick coin inputs:
 - The 10 yen input is "Key In" according to the bookkeeping screen, but is
   an otherwise normal coin input with a counter and a lockout (sharing the
@@ -65,11 +72,11 @@ private:
 	void pwrkick_coin_lockout_w(u8 data);
 
 	required_device<upd4992_device> m_rtc;
-	optional_device<ticket_dispenser_device> m_hopper;
+	optional_device<ticket_dispenser_device> m_hopper; // pwrkick only
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<gp9001vdp_device> m_vdp;
-	optional_device<okim6295_device> m_oki;
+	required_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	bitmap_ind8 m_custom_priority_bitmap;

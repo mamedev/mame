@@ -17,6 +17,23 @@
 #include "machine/gen_latch.h"
 #include "sound/ymopl.h"
 
+/*
+
+Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+tekipaki    TP-020        Toaplan       Teki Paki
+tekipakit   TP-020        Toaplan       Teki Paki (location test)
+whoopee    *TP-025/TP-020 Toaplan       Pipi & Bibis / Whoopee!! (Teki Paki hardware)
+
+    * This version of Whoopee!! is on a board labeled TP-020
+      (same board number, and same hardware, as Teki Paki)
+      but the ROMs are labeled TP-025.
+
+To Do / Unknowns:
+    - Whoopee/Teki Paki sometimes tests bit 5 of the region jumper port
+        just after testing for vblank. Why?
+*/
+
 namespace {
 
 class tekipaki_state : public driver_device

@@ -17,6 +17,18 @@
 #include "sound/ymopm.h"
 #include "sound/ymopl.h"
 
+/*
+* Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+pipibibs    TP-025        Toaplan       Pipi & Bibis / Whoopee!! (set 1)
+pipibibsa   TP-025        Toaplan       Pipi & Bibis / Whoopee!! (set 2)
+pipibibsp   TP-025        Toaplan       Pipi & Bibis / Whoopee!! (Prototype)
+pipibibsbl  bootleg       Toaplan       Pipi & Bibis / Whoopee!! (based of the prototype)
+
+TODO:
+	- move bootlegs to oneshot.cpp driver
+*/
+
 namespace {
 
 class pipibibi_state : public driver_device
@@ -34,6 +46,7 @@ public:
 
 	void pipibibs(machine_config &config);
 
+protected:
 	virtual void video_start() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
@@ -45,10 +58,9 @@ public:
 	void pipibibs_sound_z80_mem(address_map &map) ATTR_COLD;
 	void reset(int state);
 
-	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
-
+	required_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	required_device<m68000_base_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<gp9001vdp_device> m_vdp;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -240,8 +252,8 @@ void pipibibi_bootleg_state::pipibibi_bootleg_68k_mem(address_map &map)
 //  map(0x13f000, 0x13f001).nopw();        // ???
 	map(0x180000, 0x182fff).rw(m_vdp, FUNC(gp9001vdp_device::bootleg_videoram16_r), FUNC(gp9001vdp_device::bootleg_videoram16_w)); // TileRAM
 	map(0x188000, 0x18800f).w(m_vdp, FUNC(gp9001vdp_device::bootleg_scroll_w));
-	map(0x190003, 0x190003).r(FUNC(pipibibi_state::shared_ram_r));  // Z80 ready ?
-	map(0x190011, 0x190011).w(FUNC(pipibibi_state::shared_ram_w)); // Z80 task to perform
+	map(0x190003, 0x190003).r(FUNC(pipibibi_bootleg_state::shared_ram_r));  // Z80 ready ?
+	map(0x190011, 0x190011).w(FUNC(pipibibi_bootleg_state::shared_ram_w)); // Z80 task to perform
 	map(0x19c01d, 0x19c01d).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
 	map(0x19c020, 0x19c021).portr("DSWA");
 	map(0x19c024, 0x19c025).portr("DSWB");

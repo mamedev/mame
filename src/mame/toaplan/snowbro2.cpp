@@ -16,6 +16,13 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
+/*
+Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+snowbro2    TP-033        Hanafram      Snow Bros. 2 - With New Elves
+ 
+*/
+
 namespace {
 
 class snowbro2_state : public driver_device

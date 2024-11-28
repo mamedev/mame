@@ -17,6 +17,23 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
+/*
+Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+batsugun    TP-030        Toaplan       Batsugun
+batsuguna   TP-030        Toaplan       Batsugun (older)
+batsugunsp  TP-030        Toaplan       Batsugun (Special Version)
+
+batsugun - The Special Version has many changes to make the game easier: it adds an autofire button,
+            replaces the regular bomb with the more powerful double bomb (which in the original version
+            required both players in a two player game to press their bomb buttons at once), gives you
+            a shield that can absorb one hit each time your ship "levels up", etc. It also changes the
+            colors of the title screen, ship select screen, stages, and enemies.
+            batsugun compared to batsuguna has code that looks more like the Special Version, but it
+            doesn't have any of the Special Version features. All the differences between batsugun
+            and batsuguna look like bug fixes that were carried over into the Special Version.
+*/
+
 namespace {
 
 class batsugun_state : public driver_device

@@ -16,6 +16,18 @@
 #include "cpu/z180/hd647180x.h"
 #include "sound/ymopm.h"
 
+/*
+Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+ghox        TP-021        Toaplan       Ghox (Spinner with single up/down axis control)
+ghoxj       TP-021        Toaplan       Ghox (8-Way Joystick controls)
+
+
+ghox     - The ghoxj set displays an English title screen when the jumpers are set for Japan/Taito,
+            and fails to display the "Winners Don't Use Drugs" logo when set for USA/Taito (either
+            Taito America or Taito Japan).
+*/
+
 namespace {
 
 class ghox_state : public driver_device
@@ -53,9 +65,9 @@ private:
 	s8 m_old_paddle_h[2] = {0};
 
 	required_ioport_array<2> m_io_pad;
-	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
+	required_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	required_device<m68000_base_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<gp9001vdp_device> m_vdp;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

@@ -15,6 +15,12 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
+/*
+Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+enmadaio    TP-031        Toaplan       Enma Daio
+*/
+
 namespace {
 
 class enmadaio_state : public driver_device

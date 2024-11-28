@@ -20,6 +20,43 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
+/*
+Name        Board No      Maker         Game name
+----------------------------------------------------------------------------
+fixeight    TP-026        Toaplan       FixEight
+fixeightbl  bootleg       Toaplan       FixEight
+
+
+fixeight - The same program is used for all regions, and the region can be changed just by swapping
+            EEPROMs. However, the V25 code also recognizes a secret input that rewrites the EEPROM to
+            use any one of the 14 recognized regional licenses, using the state of the player 1 and
+            player 2 button inputs held in conjunction with it as a 4-bit binary code:
+
+            Region                      Button input
+            ------------------------    ------------------------------------
+            Korea, Taito license        No buttons
+            Korea                       P1 button 1
+            Hong Kong, Taito license    P1 button 2
+            Hong Kong                   P1 buttons 1 & 2
+            Taiwan, Taito license       P2 button 1
+            Taiwan                      P1 button 1 + P2 button 1
+            SE Asia, Taito license      P1 button 2 + P2 button 1
+            Southeast Asia              P1 buttons 1 & 2 + P2 button 1
+            Europe, Taito license       P2 button 2
+            Europe                      P1 button 1 + P2 button 2
+            USA, Taito license          P1 button 2 + P2 button 2
+            USA                         P1 buttons 1 & 2 + P2 button 2
+            (Invalid)                   P2 buttons 1 & 2
+            (Invalid)                   P1 button 1 + P2 buttons 1 & 2
+            Japan                       P1 button 2 + P2 buttons 1 & 2
+            Japan, Taito license        P1 buttons 1 & 2 + P2 buttons 1 & 2
+
+To Do / Unknowns:
+    - Priority problem on 2nd player side of selection screen in Fixeight bootleg.
+    - Fixeight bootleg text in sound check mode does not display properly
+        with the CPU set to 10MHz (ok at 16MHz). Possible error in video_count_r routine.
+*/
+
 namespace {
 
 class fixeight_state : public driver_device
@@ -59,10 +96,8 @@ protected:
 	void screen_vblank(int state);
 	void tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
 	void shared_ram_w(offs_t offset, u8 data) { m_shared_ram[offset] = data; }
-
 
 	void tx_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -71,18 +106,18 @@ protected:
 	void sound_reset_w(u8 data);
 	tilemap_t *m_tx_tilemap = nullptr;    /* Tilemap for extra-text-layer */
 	required_shared_ptr<u16> m_tx_videoram;
-	optional_shared_ptr<u16> m_tx_lineselect;
-	optional_shared_ptr<u16> m_tx_linescroll;
-	optional_shared_ptr<u16> m_tx_gfxram;
+	optional_shared_ptr<u16> m_tx_lineselect; // originals only
+	optional_shared_ptr<u16> m_tx_linescroll; // originals only
+	optional_shared_ptr<u16> m_tx_gfxram; // originals only
 	void reset(int state);
 
-	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
+	optional_shared_ptr<u8> m_shared_ram; // originals only - 8 bit RAM shared between 68K and sound CPU
 
 	required_device<m68000_base_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu; // originals only
 	required_device<gp9001vdp_device> m_vdp;
 	required_device<okim6295_device> m_oki;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom; // originals only
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
