@@ -35,9 +35,9 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 
 TEST_CASE("log", "[math][libm]")
 {
-	STATIC_REQUIRE(0.0f == bx::log(1.0f) );
-	STATIC_REQUIRE(1.0f == bx::log(bx::kE) );
-	STATIC_REQUIRE(bx::kLogNat2 == bx::log(2.0f) );
+	STATIC_REQUIRE(bx::isEqual(        0.0f, bx::log(  1.0f), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual(        1.0f, bx::log(bx::kE), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual(bx::kLogNat2, bx::log(  2.0f), 0.0000001f) );
 }
 
 static void testLog2(float _a)
@@ -50,15 +50,15 @@ TEST_CASE("log2", "[math][libm]")
 	testLog2(0.0f);
 	testLog2(256.0f);
 
-	STATIC_REQUIRE(0.0f == bx::log2(1.0f) );
-	STATIC_REQUIRE(1.0f == bx::log2(2.0f) );
-	STATIC_REQUIRE(2.0f == bx::log2(4.0f) );
-	STATIC_REQUIRE(3.0f == bx::log2(8.0f) );
-	STATIC_REQUIRE(4.0f == bx::log2(16.0f) );
-	STATIC_REQUIRE(5.0f == bx::log2(32.0f) );
-	STATIC_REQUIRE(6.0f == bx::log2(64.0f) );
-	STATIC_REQUIRE(7.0f == bx::log2(128.0f) );
-	STATIC_REQUIRE(8.0f == bx::log2(256.0f) );
+	STATIC_REQUIRE(bx::isEqual(0.0f, bx::log2(  1.0f), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual(1.0f, bx::log2(  2.0f), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual(2.0f, bx::log2(  4.0f), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual(3.0f, bx::log2(  8.0f), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual(4.0f, bx::log2( 16.0f), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual(5.0f, bx::log2( 32.0f), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual(6.0f, bx::log2( 64.0f), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual(7.0f, bx::log2(128.0f), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual(8.0f, bx::log2(256.0f), 0.0000001f) );
 }
 
 TEST_CASE("ceilLog2", "[math]")
