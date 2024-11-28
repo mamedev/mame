@@ -45236,68 +45236,65 @@ gizmondo                        //
 kontiki                         //
 tiki100                         //
 
+@source:toaplan/batsugun.cpp
+batsugun                        // TP-030 (c) 1993 Toaplan
+batsuguna                       // TP-030 (c) 1993 Toaplan
+batsugunb                       //
+batsugunc                       // TP-030 (c) 1993 Toaplan
+batsugunbl                      // bootleg
+batsugunsp                      // TP-030 (c) 1993 Toaplan
+
+@source:toaplan/dogyuun.cpp
+dogyuun                         // TP-022 (c) 1992 Toaplan
+dogyuuna                        // TP-022 (c) 1992 Toaplan
+dogyuunb                        // TP-022 (c) 1992 Toaplan
+dogyuunt                        // TP-022 (c) 1992 Toaplan
+dogyuunto                       // TX-022 (c) 1992 Toaplan
+
 @source:toaplan/dt7.cpp
 dt7
+
+@source:toaplan/enmadaio.cpp
+enmadaio                        // TP-031
+
+@source:toaplan/fixeight.cpp
+fixeight                        // TP-026 (c) 1992 + Taito license
+fixeighta                       // TP-026 (c) 1992 + Taito license
+fixeightat                      // TP-026 (c) 1992 + Taito license
+fixeightbl                      // bootleg
+fixeighth                       // TP-026 (c) 1992 + Taito license
+fixeightht                      // TP-026 (c) 1992 + Taito license
+fixeightj                       // TP-026 (c) 1992 + Taito license
+fixeightjt                      // TP-026 (c) 1992 + Taito license
+fixeightk                       // TP-026 (c) 1992 + Taito license
+fixeightkt                      // TP-026 (c) 1992 + Taito license
+fixeightt                       // TP-026 (c) 1992 + Taito license
+fixeighttw                      // TP-026 (c) 1992 + Taito license
+fixeighttwt                     // TP-026 (c) 1992 + Taito license
+fixeightu                       // TP-026 (c) 1992 + Taito license
+fixeightut                      // TP-026 (c) 1992 + Taito license
+
+@source:toaplan/ghox.cpp
+ghox                            // TP-021 (c) 1991 Toaplan
+ghoxj                           // TP-021 (c) 1991 Toaplan
+ghoxjo                          // TP-021 (c) 1991 Toaplan
+
+@source:toaplan/kbash.cpp
+kbash                           // TP-023 (c) 1993 Toaplan
+kbash2                          // bootleg
+kbashk                          // TP-023 (c) 1993 Toaplan
+kbashp                          // TP-023 (c) 1993 Toaplan
 
 @source:toaplan/mjsister.cpp
 mjsister                        // (c) 1986 Toaplan
 
-@source:toaplan/slapfght.cpp
-alcon                           // A77 / TP-???
-getstarb1                       // GX-006 bootleg but (c) 1986 Taito Corporation
-getstarb2                       // GX-006 bootleg but (c) 1986 Taito Corporation
-getstarj                        // A68 (c) 1986 Taito Corporation
-grdian                          // A68 (c) 1986 Taito Corporation
-perfrman                        // (c) 1985 Data East Corporation (Japan)
-perfrmanu                       // (c) 1985 Data East USA (US)
-slapfigh                        // A77 / TP-???
-slapfigha                       // A76 / TP-???
-slapfighb1                      // bootleg but (c) 1986 Taito Corporation
-slapfighb2                      // bootleg but (c) 1986 Taito Corporation
-slapfighb3                      // bootleg but (c) 1986 Taito Corporation
-tigerh                          // A47 (c) 1985 Taito America  Corporation   GX-551 [not a Konami board!]
-tigerhb1                        // bootleg but (c) 1985 Taito Corporation
-tigerhb2                        // bootleg but (c) 1985 Taito Corporation
-tigerhb3                        // bootleg but (c) 1985 Taito Corporation
-tigerhb4                        // bootleg but (c) 1985 Taito Corporation
-tigerhj                         // A47 (c) 1985 Taito Corporation   GX-551 [not a Konami board!]
-
-@source:toaplan/slapfght_ms.cpp
-slapfighm
-
-@source:toaplan/toaplan1.cpp
-demonwld                        // TP-O16 (c) 1990 Toaplan (+ Taito license when set to Japan)
-demonwld1                       // TP-O16 (c) 1989 Toaplan + Taito license
-demonwld2                       // TP-O16 (c) 1989 Toaplan
-demonwld3                       // TP-O16 (c) 1989 Toaplan
-demonwld4                       // TP-O16 (c) 1989 Toaplan
-demonwld5                       // TP-O16 (c) 1989 Toaplan + APM Electronics license
-fireshrk                        // TP-O17 (c) 1990 Toaplan
-fireshrka                       // TP-O17 (c) 1989 Toaplan
-fireshrkd                       // TP-O17 (c) 1990 Toaplan
-fireshrkdh                      // TP-O17 (c) 1990 Toaplan
-hellfire                        // B90 / TP-??? (c) 1989 Toaplan + Taito license
-hellfire1                       // B90 / TP-??? (c) 1989 Toaplan + Taito license
-hellfire1a                      // B90 / TP-??? (c) 1989 Toaplan + Taito license
-hellfire2a                      // B90 / TP-??? (c) 1989 Toaplan + Taito license
-outzone                         // TP-O18 (c) 1990 Toaplan
-outzonea                        // TP-O18 (c) 1990 Toaplan
-outzoneb                        // TP-O18 (c) 1990 Toaplan
-outzonec                        // TP-O18 (c) 1990 Toaplan
-outzoneh                        // TP-O18 (c) 1990 Toaplan
-outzonecv                       // TP-O18 (c) 1990 Toaplan (TP-015 conversion)
-rallybik                        // B45 / TP-O12 (c) 1988 Taito
-samesame                        // TP-O17 (c) 1989 Toaplan
-samesame2                       // TP-O17 (c) 1989 Toaplan
-samesamecn                      // TP-O17 (c) 1990 Toaplan
-samesamenh                      // hack
-truxton                         // B65 / TP-O13B (c) 1988 Taito
-vimana                          // TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan)
-vimanaj                         // TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan)
-vimanan                         // TP-O19 (c) 1991 Toaplan (+ Nova Apparate GmbH & Co license)
-zerowing                        // TP-O15 (c) 1989 Toaplan
-zerowing1                       // TP-O15 (c) 1989 Toaplan
-zerowingw                       // TP-O15 (c) 1989 Williams Electronics
+@source:toaplan/pipibibi.cpp
+pipibibs                        // TP-025
+pipibibsa                       // TP-025
+pipibibsbl                      // (c) 1991 Ryouta Kikaku (bootleg)
+pipibibsbl2                     // bootleg
+pipibibsbl3                     // (c) 1991 Ryouta Kikaku (bootleg)
+pipibibsp                       // TP-025
 
 @source:toaplan/raizing.cpp
 bgaregga                        // (c) 1996 Raizing/8ing
@@ -45333,71 +45330,28 @@ bbakraidja                      // (c) 1999 8ing
 nprobowl                        // (c) 1996 Zuck + Able license
 probowl2                        // (c) 1996 Zuck + Able license
 
-@source:toaplan/batsugun.cpp
-batsugun                        // TP-030 (c) 1993 Toaplan
-batsuguna                       // TP-030 (c) 1993 Toaplan
-batsugunb                       //
-batsugunc                       // TP-030 (c) 1993 Toaplan
-batsugunbl                      // bootleg
-batsugunsp                      // TP-030 (c) 1993 Toaplan
+@source:toaplan/slapfght.cpp
+alcon                           // A77 / TP-???
+getstarb1                       // GX-006 bootleg but (c) 1986 Taito Corporation
+getstarb2                       // GX-006 bootleg but (c) 1986 Taito Corporation
+getstarj                        // A68 (c) 1986 Taito Corporation
+grdian                          // A68 (c) 1986 Taito Corporation
+perfrman                        // (c) 1985 Data East Corporation (Japan)
+perfrmanu                       // (c) 1985 Data East USA (US)
+slapfigh                        // A77 / TP-???
+slapfigha                       // A76 / TP-???
+slapfighb1                      // bootleg but (c) 1986 Taito Corporation
+slapfighb2                      // bootleg but (c) 1986 Taito Corporation
+slapfighb3                      // bootleg but (c) 1986 Taito Corporation
+tigerh                          // A47 (c) 1985 Taito America  Corporation   GX-551 [not a Konami board!]
+tigerhb1                        // bootleg but (c) 1985 Taito Corporation
+tigerhb2                        // bootleg but (c) 1985 Taito Corporation
+tigerhb3                        // bootleg but (c) 1985 Taito Corporation
+tigerhb4                        // bootleg but (c) 1985 Taito Corporation
+tigerhj                         // A47 (c) 1985 Taito Corporation   GX-551 [not a Konami board!]
 
-@source:toaplan/sunwise.cpp
-burgkids                        // (c) 1995 Sunwise
-othldrby                        // (c) 1995 Sunwise
-pwrkick                         // (c) 1994 Sunwise
-
-@source:toaplan/dogyuun.cpp
-dogyuun                         // TP-022 (c) 1992 Toaplan
-dogyuuna                        // TP-022 (c) 1992 Toaplan
-dogyuunb                        // TP-022 (c) 1992 Toaplan
-dogyuunt                        // TP-022 (c) 1992 Toaplan
-dogyuunto                       // TX-022 (c) 1992 Toaplan
-
-@source:toaplan/fixeight.cpp
-fixeight                        // TP-026 (c) 1992 + Taito license
-fixeighta                       // TP-026 (c) 1992 + Taito license
-fixeightat                      // TP-026 (c) 1992 + Taito license
-fixeightbl                      // bootleg
-fixeighth                       // TP-026 (c) 1992 + Taito license
-fixeightht                      // TP-026 (c) 1992 + Taito license
-fixeightj                       // TP-026 (c) 1992 + Taito license
-fixeightjt                      // TP-026 (c) 1992 + Taito license
-fixeightk                       // TP-026 (c) 1992 + Taito license
-fixeightkt                      // TP-026 (c) 1992 + Taito license
-fixeightt                       // TP-026 (c) 1992 + Taito license
-fixeighttw                      // TP-026 (c) 1992 + Taito license
-fixeighttwt                     // TP-026 (c) 1992 + Taito license
-fixeightu                       // TP-026 (c) 1992 + Taito license
-fixeightut                      // TP-026 (c) 1992 + Taito license
-
-@source:toaplan/ghox.cpp
-ghox                            // TP-021 (c) 1991 Toaplan
-ghoxj                           // TP-021 (c) 1991 Toaplan
-ghoxjo                          // TP-021 (c) 1991 Toaplan
-
-@source:toaplan/vfive.cpp
-grindstm                        // TP-027 (c) 1993 Toaplan + Unite Trading license (Korea)
-grindstma                       // TP-027 (c) 1993 Toaplan + Unite Trading license (Korea)
-vfive                           // TP-027 (c) 1993 Toaplan (Japan)
-
-@source:toaplan/kbash.cpp
-kbash                           // TP-023 (c) 1993 Toaplan
-kbash2                          // bootleg
-kbashk                          // TP-023 (c) 1993 Toaplan
-kbashp                          // TP-023 (c) 1993 Toaplan
-
-@source:toaplan/pipibibi.cpp
-pipibibs                        // TP-025
-pipibibsa                       // TP-025
-pipibibsbl                      // (c) 1991 Ryouta Kikaku (bootleg)
-pipibibsbl2                     // bootleg
-pipibibsbl3                     // (c) 1991 Ryouta Kikaku (bootleg)
-pipibibsp                       // TP-025
-
-@source:toaplan/tekipaki.cpp
-tekipaki                        // TP-020 (c) 1991 Toaplan
-tekipakit                       // TP-020 (c) 1991 Toaplan (location test)
-whoopee                         // TP-025 (on TP-020)
+@source:toaplan/slapfght_ms.cpp
+slapfighm
 
 @source:toaplan/snowbro2.cpp
 snowbro2                        // TP-033 (c) 1994 Hanafram
@@ -45406,11 +45360,52 @@ snowbro2b2                      //
 snowbro2b3                      //
 snowbro2ny                      // TP-033 (c) 1994 Nyanko
 
+@source:toaplan/sunwise.cpp
+burgkids                        // (c) 1995 Sunwise
+othldrby                        // (c) 1995 Sunwise
+pwrkick                         // (c) 1994 Sunwise
+
+@source:toaplan/tekipaki.cpp
+tekipaki                        // TP-020 (c) 1991 Toaplan
+tekipakit                       // TP-020 (c) 1991 Toaplan (location test)
+whoopee                         // TP-025 (on TP-020)
+
+@source:toaplan/toaplan1.cpp
+demonwld                        // TP-O16 (c) 1990 Toaplan (+ Taito license when set to Japan)
+demonwld1                       // TP-O16 (c) 1989 Toaplan + Taito license
+demonwld2                       // TP-O16 (c) 1989 Toaplan
+demonwld3                       // TP-O16 (c) 1989 Toaplan
+demonwld4                       // TP-O16 (c) 1989 Toaplan
+demonwld5                       // TP-O16 (c) 1989 Toaplan + APM Electronics license
+fireshrk                        // TP-O17 (c) 1990 Toaplan
+fireshrka                       // TP-O17 (c) 1989 Toaplan
+fireshrkd                       // TP-O17 (c) 1990 Toaplan
+fireshrkdh                      // TP-O17 (c) 1990 Toaplan
+hellfire                        // B90 / TP-??? (c) 1989 Toaplan + Taito license
+hellfire1                       // B90 / TP-??? (c) 1989 Toaplan + Taito license
+hellfire1a                      // B90 / TP-??? (c) 1989 Toaplan + Taito license
+hellfire2a                      // B90 / TP-??? (c) 1989 Toaplan + Taito license
+outzone                         // TP-O18 (c) 1990 Toaplan
+outzonea                        // TP-O18 (c) 1990 Toaplan
+outzoneb                        // TP-O18 (c) 1990 Toaplan
+outzonec                        // TP-O18 (c) 1990 Toaplan
+outzoneh                        // TP-O18 (c) 1990 Toaplan
+outzonecv                       // TP-O18 (c) 1990 Toaplan (TP-015 conversion)
+rallybik                        // B45 / TP-O12 (c) 1988 Taito
+samesame                        // TP-O17 (c) 1989 Toaplan
+samesame2                       // TP-O17 (c) 1989 Toaplan
+samesamecn                      // TP-O17 (c) 1990 Toaplan
+samesamenh                      // hack
+truxton                         // B65 / TP-O13B (c) 1988 Taito
+vimana                          // TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan)
+vimanaj                         // TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan)
+vimanan                         // TP-O19 (c) 1991 Toaplan (+ Nova Apparate GmbH & Co license)
+zerowing                        // TP-O15 (c) 1989 Toaplan
+zerowing1                       // TP-O15 (c) 1989 Toaplan
+zerowingw                       // TP-O15 (c) 1989 Williams Electronics
+
 @source:toaplan/truxton2.cpp
 truxton2                        // TP-024 (c) 1992 Toaplan
-
-@source:toaplan/enmadaio.cpp
-enmadaio                        // TP-031
 
 @source:toaplan/twincobr.cpp
 fnshark                         // bootleg
@@ -45431,6 +45426,11 @@ twincobru                       // B30 / TP-011 (c) 1987 Taito America Corporati
 
 @source:toaplan/twincobr_ms.cpp
 twincobrm                       // bootleg (Modular System)
+
+@source:toaplan/vfive.cpp
+grindstm                        // TP-027 (c) 1993 Toaplan + Unite Trading license (Korea)
+grindstma                       // TP-027 (c) 1993 Toaplan + Unite Trading license (Korea)
+vfive                           // TP-027 (c) 1993 Toaplan (Japan)
 
 @source:toaplan/wardner.cpp
 pyros                           // B25 / TP-009 (c) 1987 Taito America Corporation (US)
