@@ -9,7 +9,6 @@
 
     TODO:
     - Battery status readings, maybe different analogue channel.
-    - Resolve ambiguity about status register, S3 and MC/HC machines expect different data.
 
 ******************************************************************************/
 
@@ -176,7 +175,7 @@ uint8_t psion_psu_asic5_device::data_r()
 		case 0x0d: // A3Status
 			// b0    ColdStart
 			// b1    PowerFail
-			data = 0x00; // ColdStart
+			data = 0x02; // PowerFail (required to initialise MC400/200/Word)
 			LOG("%s data_r: A3Status register %02x\n", machine().describe_context(), data);
 			break;
 
@@ -287,7 +286,7 @@ uint8_t psion_psu_asic3_device::data_r()
 				data = 0x07;
 				break;
 			}
-			data |= 0x40; // ColdStart
+			data |= 0x40; // PowerFail (required to initialise MC600)
 			LOG("%s data_r: PS34R_STATUS %02x\n", machine().describe_context(), data);
 			break;
 

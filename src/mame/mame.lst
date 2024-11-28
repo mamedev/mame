@@ -38758,6 +38758,12 @@ soldividk                       // (c) 1997 (Korea)
 tgm2                            // (c) 2000
 tgm2p                           // (c) 2000
 
+@source:psion/mc400.cpp
+mc200                           // 1989 Psion MC 200
+mc400                           // 1989 Psion MC 400
+mcword                          // 1992 Psion MC Word
+mcword_de                       // 1992 Psion MC Word (German)
+
 @source:psion/psion.cpp
 psion1                          //
 psioncm                         //
