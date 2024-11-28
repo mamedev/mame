@@ -102,16 +102,20 @@ TODO:
 
 #include "speaker.h"
 
+// configurable logging
+#define LOG_VIDEOFX     (1U << 1)
+#define LOG_SPEECH      (1U << 2)
+#define LOG_4BITDAC     (1U << 3)
+#define LOG_SHTRIGGER   (1U << 4)
 
-namespace {
+//#define VERBOSE (LOG_VIDEOFX)
+
+#include "logmacro.h"
 
 // Turn to 1 so all inputs are always available (this shall only be a debug feature)
 #define CVS_SHOW_ALL_INPUTS 0
 
-
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-
+namespace {
 
 class cvs_state : public cvs_base_state
 {
@@ -152,9 +156,7 @@ protected:
 private:
 	// memory pointers
 	memory_share_creator<uint8_t> m_palette_ram;
-	memory_share_creator<uint8_t> m_character_ram;  /* only half is used, but
-	                                                    by allocating twice the amount,
-	                                                    we can use the same gfx_layout */
+	memory_share_creator<uint8_t> m_character_ram; // only half is used, but we can use the same gfx_layout like this
 	required_shared_ptr<uint8_t> m_4_bit_dac_data;
 	required_shared_ptr<uint8_t> m_tms5110_ctl_data;
 	required_shared_ptr<uint8_t> m_sh_trigger;
@@ -182,11 +184,18 @@ private:
 	required_ioport_array<3> m_dsw;
 	output_finder<2> m_lamps;
 
+	void audio_cpu_map(address_map &map) ATTR_COLD;
+	void main_cpu_data_map(address_map &map) ATTR_COLD;
+	void main_cpu_io_map(address_map &map) ATTR_COLD;
+	void main_cpu_map(address_map &map) ATTR_COLD;
+	void speech_cpu_map(address_map &map) ATTR_COLD;
+
 	uint8_t huncholy_prot_r(offs_t offset);
 	uint8_t superbik_prot_r();
 	uint8_t hero_prot_r(offs_t offset);
 	int speech_rom_read_bit();
 	void audio_cpu_interrupt(int state);
+	void main_cpu_interrupt(int state);
 	uint8_t input_r(offs_t offset);
 	void speech_rom_address_lo_w(uint8_t data);
 	void speech_rom_address_hi_w(uint8_t data);
@@ -202,20 +211,10 @@ private:
 	void tms5110_pdc_w(offs_t offset, uint8_t data);
 	void palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(main_cpu_interrupt);
 	void set_pens();
-	void audio_cpu_map(address_map &map) ATTR_COLD;
-	void main_cpu_data_map(address_map &map) ATTR_COLD;
-	void main_cpu_io_map(address_map &map) ATTR_COLD;
-	void main_cpu_map(address_map &map) ATTR_COLD;
-	void speech_cpu_map(address_map &map) ATTR_COLD;
 	template <uint8_t Which> uint8_t character_ram_r(offs_t offset);
 	template <uint8_t Which> void character_ram_w(offs_t offset, uint8_t data);
 };
-
-
-static constexpr uint16_t SPRITE_PEN_BASE = 0x820;
-static constexpr uint16_t BULLET_STAR_PEN = 0x828;
 
 
 /******************************************************
@@ -226,6 +225,9 @@ static constexpr uint16_t BULLET_STAR_PEN = 0x828;
  *                                                    *
  * colours are taken from SRAM and are programmable   *
  ******************************************************/
+
+static constexpr uint16_t SPRITE_PEN_BASE = 0x820;
+static constexpr uint16_t BULLET_STAR_PEN = 0x828;
 
 void cvs_state::palette(palette_device &palette) const
 {
@@ -276,23 +278,22 @@ void cvs_state::set_pens()
 }
 
 
-
 void cvs_state::video_fx_w(uint8_t data)
 {
 	if (data & 0xce)
-		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n", m_maincpu->pc(), data & 0xce);
+		LOGMASKED(LOG_VIDEOFX, "%04x: Unimplemented CVS video fx = %2x\n", m_maincpu->pc(), data & 0xce);
 
 	m_stars_on = data & 0x01;
 
-	if (data & 0x02)   logerror("           SHADE BRIGHTER TO RIGHT\n");
-	if (data & 0x04)   logerror("           SCREEN ROTATE\n");
-	if (data & 0x08)   logerror("           SHADE BRIGHTER TO LEFT\n");
+	if (data & 0x02) LOGMASKED(LOG_VIDEOFX, "      SHADE BRIGHTER TO RIGHT\n");
+	if (data & 0x04) LOGMASKED(LOG_VIDEOFX, "      SCREEN ROTATE\n");
+	if (data & 0x08) LOGMASKED(LOG_VIDEOFX, "      SHADE BRIGHTER TO LEFT\n");
 
 	m_lamps[0] = BIT(data, 4);
 	m_lamps[1] = BIT(data, 5);
 
-	if (data & 0x40)   logerror("           SHADE BRIGHTER TO BOTTOM\n");
-	if (data & 0x80)   logerror("           SHADE BRIGHTER TO TOP\n");
+	if (data & 0x40) LOGMASKED(LOG_VIDEOFX, "      SHADE BRIGHTER TO BOTTOM\n");
+	if (data & 0x80) LOGMASKED(LOG_VIDEOFX, "      SHADE BRIGHTER TO TOP\n");
 }
 
 
@@ -448,6 +449,7 @@ uint32_t cvs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 
+
 /*************************************
  *
  *  Multiplexed memory access
@@ -476,13 +478,11 @@ void cvs_state::character_ram_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(cvs_state::main_cpu_interrupt)
+void cvs_state::main_cpu_interrupt(int state)
 {
-	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
-
-	scroll_start();
+	if (state)
+		m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 }
-
 
 void cvs_state::audio_cpu_interrupt(int state)
 {
@@ -534,7 +534,7 @@ void cvs_state::_4_bit_dac_data_w(offs_t offset, uint8_t data)
 
 	if (data != m_4_bit_dac_data[offset])
 	{
-		LOG(("4BIT: %d %d\n", offset, data));
+		LOGMASKED(LOG_4BITDAC, "4BIT: %d %d\n", offset, data);
 		m_4_bit_dac_data[offset] = data;
 	}
 
@@ -561,13 +561,14 @@ void cvs_state::sh_trigger_w(offs_t offset, uint8_t data)
 
 	if (data != m_sh_trigger[offset])
 	{
-		LOG(("TRIG: %d %d\n", offset, data));
+		LOGMASKED(LOG_SHTRIGGER, "TRIG: %d %d\n", offset, data);
 		m_sh_trigger[offset] = data;
 	}
 
 	if (offset == 2 || offset == 3)
 		m_beep[offset & 1]->set_state(data);
 }
+
 
 
 /*************************************
@@ -580,13 +581,13 @@ void cvs_state::speech_rom_address_lo_w(uint8_t data)
 {
 	// assuming that d0-d2 are cleared here
 	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0xf800) | (data << 3);
-	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3));
+	LOGMASKED(LOG_SPEECH, "%04x : CVS: Speech Lo %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3);
 }
 
 void cvs_state::speech_rom_address_hi_w(uint8_t data)
 {
 	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0x07ff) | (data << 11);
-	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3));
+	LOGMASKED(LOG_SPEECH, "%04x : CVS: Speech Hi %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3);
 }
 
 
@@ -605,12 +606,12 @@ void cvs_state::tms5110_ctl_w(offs_t offset, uint8_t data)
 	 */
 	m_tms5110_ctl_data[offset] = (~data >> 7) & 0x01;
 
-	uint8_t const ctl = 0 |                             // CTL1
-						(m_tms5110_ctl_data[1] << 1) |  // CTL2
-						(m_tms5110_ctl_data[2] << 2) |  // CTL4
-						(m_tms5110_ctl_data[1] << 3);   // CTL8
+	uint8_t const ctl = 0 |                // CTL1
+			(m_tms5110_ctl_data[1] << 1) | // CTL2
+			(m_tms5110_ctl_data[2] << 2) | // CTL4
+			(m_tms5110_ctl_data[1] << 3);  // CTL8
 
-	LOG(("CVS: Speech CTL = %04x %02x %02x\n", ctl, offset, data));
+	LOGMASKED(LOG_SPEECH, "CVS: Speech CTL = %04x %02x %02x\n", ctl, offset, data);
 	m_tms5110->ctl_w(ctl);
 }
 
@@ -618,7 +619,7 @@ void cvs_state::tms5110_ctl_w(offs_t offset, uint8_t data)
 void cvs_state::tms5110_pdc_w(offs_t offset, uint8_t data)
 {
 	uint8_t const out = ((~data) >> 7) & 1;
-	LOG(("CVS: Speech PDC = %02x %02x\n", offset, out));
+	LOGMASKED(LOG_SPEECH, "CVS: Speech PDC = %02x %02x\n", offset, out);
 	m_tms5110->pdc_w(out);
 }
 
@@ -636,6 +637,7 @@ int cvs_state::speech_rom_read_bit()
 }
 
 
+
 /*************************************
  *
  *  Inter-CPU communications
@@ -644,7 +646,7 @@ int cvs_state::speech_rom_read_bit()
 
 void cvs_state::audio_command_w(uint8_t data)
 {
-	LOG(("data %02x\n", data));
+	//LOG(("data %02x\n", data));
 	// cause interrupt on audio CPU if bit 7 set
 	m_soundlatch->write(data);
 	audio_cpu_interrupt(data & 0x80 ? 1 : 0);
@@ -727,6 +729,7 @@ void cvs_state::speech_cpu_map(address_map &map)
 	map(0x1ddc, 0x1dde).w(FUNC(cvs_state::tms5110_ctl_w)).share(m_tms5110_ctl_data);
 	map(0x1ddf, 0x1ddf).w(FUNC(cvs_state::tms5110_pdc_w));
 }
+
 
 
 /*************************************
@@ -1183,7 +1186,6 @@ void cvs_state::cvs(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cvs_state::main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &cvs_state::main_cpu_io_map);
 	m_maincpu->set_addrmap(AS_DATA, &cvs_state::main_cpu_data_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cvs_state::main_cpu_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->flag_handler().set([this] (int state) { m_ram_view.select(state); });
 	m_maincpu->intack_handler().set_constant(0x03);
@@ -1210,6 +1212,8 @@ void cvs_state::cvs(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000));
 	m_screen->set_screen_update(FUNC(cvs_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(cvs_state::main_cpu_interrupt));
+	m_screen->screen_vblank().append(FUNC(cvs_state::scroll_start));
 
 	S2636(config, m_s2636[0], 0);
 	m_s2636[0]->set_offsets(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
@@ -1237,6 +1241,7 @@ void cvs_state::cvs(machine_config &config)
 }
 
 
+
 /*************************************
  *
  *  ROM definitions
@@ -1250,6 +1255,7 @@ void cvs_state::cvs(machine_config &config)
 	ROM_REGION( 0x0820, "proms", 0 )                                                                       \
 	ROM_LOAD( "82s185.10h", 0x0000, 0x0800, CRC(c205bca6) SHA1(ec9bd220e75f7b067ede6139763ef8aca0fb7a29) ) \
 	ROM_LOAD( "82s123.10k", 0x0800, 0x0020, CRC(b5221cec) SHA1(71d9830b33b1a8140b0fe1a2ba8024ba8e6e48e0) )
+
 #define CVS_ROM_REGION_SPEECH_DATA(name, len, hash) \
 	ROM_REGION( 0x1000, "speechdata", 0 )           \
 	ROM_LOAD( name, 0x0000, len, hash )
@@ -1745,6 +1751,7 @@ ROM_START( huncholy )
 ROM_END
 
 
+
 /*************************************
  *
  *  Game specific initialization
@@ -1839,6 +1846,7 @@ void cvs_state::init_huncholy()
 
 
 } // anonymous namespace
+
 
 
 /*************************************

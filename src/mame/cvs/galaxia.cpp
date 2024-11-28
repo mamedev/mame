@@ -110,7 +110,6 @@ protected:
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	template <uint8_t Which> void video_w(offs_t offset, uint8_t data);
-	void vblank_irq(int state);
 	void data_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -372,16 +371,6 @@ uint32_t astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-void galaxia_state::vblank_irq(int state)
-{
-	if (state)
-	{
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-		scroll_start();
-	}
-}
-
-
 /*******************************************************************************
 
   I/O
@@ -587,7 +576,8 @@ void galaxia_state::galaxia(machine_config &config)
 	m_screen->set_visarea(0*8, 30*8-1, 2*8, 32*8-1);
 	m_screen->set_screen_update(FUNC(galaxia_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(galaxia_state::vblank_irq));
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
+	m_screen->screen_vblank().append(FUNC(galaxia_state::scroll_start));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxia);
 	PALETTE(config, m_palette, FUNC(galaxia_state::palette), 0x18+2);
@@ -628,7 +618,8 @@ void astrowar_state::astrowar(machine_config &config)
 	m_screen->set_visarea(1*8, 31*8-1, 2*8, 32*8-1);
 	m_screen->set_screen_update(FUNC(astrowar_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(astrowar_state::vblank_irq));
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
+	m_screen->screen_vblank().append(FUNC(astrowar_state::scroll_start));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_astrowar);
 	PALETTE(config, m_palette, FUNC(astrowar_state::palette), 0x18+2);

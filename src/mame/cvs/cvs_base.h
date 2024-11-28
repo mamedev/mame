@@ -75,7 +75,7 @@ protected:
 
 	uint8_t collision_r();
 	uint8_t collision_clear_r();
-	void scroll_start();
+	void scroll_start(int state);
 	void init_stars() ATTR_COLD;
 	void update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always);
 };

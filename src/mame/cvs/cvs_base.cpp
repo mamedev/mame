@@ -39,9 +39,10 @@ uint8_t cvs_base_state::collision_clear_r()
 
 // cvs stars hardware
 
-void cvs_base_state::scroll_start()
+void cvs_base_state::scroll_start(int state)
 {
-	m_stars_scroll++;
+	if (state)
+		m_stars_scroll++;
 }
 
 void cvs_base_state::init_stars()
