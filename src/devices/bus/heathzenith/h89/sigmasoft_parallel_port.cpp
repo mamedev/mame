@@ -232,14 +232,14 @@ void sigmasoft_parallel_port::device_start()
 void sigmasoft_parallel_port::device_add_mconfig(machine_config &config)
 {
 	// connect callbacks to TLB
-	ctrl_r_cb().set(":tlbc", FUNC(heath_tlb_connector::sigma_ctrl_r));
-	video_mem_r_cb().set(":tlbc", FUNC(heath_tlb_connector::sigma_video_mem_r));
-	video_mem_cb().set(":tlbc", FUNC(heath_tlb_connector::sigma_video_mem_w));
-	io_lo_cb().set(":tlbc", FUNC(heath_tlb_connector::sigma_io_lo_addr_w));
-	io_hi_cb().set(":tlbc", FUNC(heath_tlb_connector::sigma_io_hi_addr_w));
-	window_lo_cb().set(":tlbc", FUNC(heath_tlb_connector::sigma_window_lo_addr_w));
-	window_hi_cb().set(":tlbc", FUNC(heath_tlb_connector::sigma_window_hi_addr_w));
-	ctrl_cb().set(":tlbc", FUNC(heath_tlb_connector::sigma_ctrl_w));
+	ctrl_r_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_ctrl_r));
+	video_mem_r_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_video_mem_r));
+	video_mem_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_video_mem_w));
+	io_lo_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_io_lo_addr_w));
+	io_hi_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_io_hi_addr_w));
+	window_lo_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_window_lo_addr_w));
+	window_hi_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_window_hi_addr_w));
+	ctrl_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_ctrl_w));
 }
 
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_PARALLEL, device_h89bus_left_card_interface, sigmasoft_parallel_port, "sigmasoft_parallel_port", "SigmaSoft Universal Parallel Board");
