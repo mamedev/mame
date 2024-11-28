@@ -1120,7 +1120,7 @@ void bgaregga_state::bgaregga(machine_config &config)
 	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.3);
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/16, okim6295_device::PIN7_HIGH);
-	m_oki[0]->set_addrmap(0, &raizing_base_state::raizing_oki<0>);
+	m_oki[0]->set_addrmap(0, &bgaregga_state::raizing_oki<0>);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.6);
 }
 
