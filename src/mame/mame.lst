@@ -45300,18 +45300,6 @@ zerowing1                       // TP-O15 (c) 1989 Toaplan
 zerowingw                       // TP-O15 (c) 1989 Williams Electronics
 
 @source:toaplan/raizing.cpp
-batrider                        // (c) 1998 Raizing/8ing
-batriderc                       // (c) 1998 Raizing/8ing
-batriderhk                      // (c) 1998 Raizing/8ing
-batriderj                       // (c) 1998 Raizing/8ing
-batriderja                      // (c) 1998 Raizing/8ing
-batriderk                       // (c) 1998 Raizing/8ing
-batridert                       // (c) 1998 Raizing/8ing
-batrideru                       // (c) 1998 Raizing/8ing
-bbakraid                        // (c) 1999 8ing
-bbakraidc                       // (c) 1999 8ing
-bbakraidj                       // (c) 1999 8ing
-bbakraidja                      // (c) 1999 8ing
 bgaregga                        // (c) 1996 Raizing/8ing
 bgareggabl                      // hack
 bgareggabla                     // hack
@@ -45325,11 +45313,25 @@ bgareggat2                      // (c) 1996 Raizing/8ing
 bgareggatw                      // (c) 1996 Raizing/8ing
 kingdmgp                        // (c) 1994 Raizing/8ing
 mahoudai                        // (c) 1993 Raizing + Able license
-nprobowl                        // (c) 1996 Zuck + Able license
-probowl2                        // (c) 1996 Zuck + Able license
 shippumd                        // (c) 1994 Raizing/8ing
 sstriker                        // (c) 1993 Raizing
 sstrikerk                       // (c) 1993 Raizing
+
+@source:toaplan/raizing_batrider.cpp
+batrider                        // (c) 1998 Raizing/8ing
+batriderc                       // (c) 1998 Raizing/8ing
+batriderhk                      // (c) 1998 Raizing/8ing
+batriderj                       // (c) 1998 Raizing/8ing
+batriderja                      // (c) 1998 Raizing/8ing
+batriderk                       // (c) 1998 Raizing/8ing
+batridert                       // (c) 1998 Raizing/8ing
+batrideru                       // (c) 1998 Raizing/8ing
+bbakraid                        // (c) 1999 8ing
+bbakraidc                       // (c) 1999 8ing
+bbakraidj                       // (c) 1999 8ing
+bbakraidja                      // (c) 1999 8ing
+nprobowl                        // (c) 1996 Zuck + Able license
+probowl2                        // (c) 1996 Zuck + Able license
 
 @source:toaplan/batsugun.cpp
 batsugun                        // TP-030 (c) 1993 Toaplan
