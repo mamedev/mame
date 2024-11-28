@@ -44,9 +44,8 @@
 #include "emu.h"
 
 #include "intr_cntrl.h"
-#include "sigmasoft_parallel_port.h"
-#include "tlb.h"
 
+#include "bus/heathzenith/h19/tlb.h"
 #include "bus/heathzenith/h89/h89bus.h"
 #include "bus/heathzenith/h89/cards.h"
 #include "cpu/z80/z80.h"
@@ -198,17 +197,11 @@ class h89_sigmasoft_state : public h89_state
 {
 public:
 	h89_sigmasoft_state(const machine_config &mconfig, device_type type, const char *tag):
-		h89_state(mconfig, type, tag),
-		m_sigma_parallel(*this, "sigma_parallel")
+		h89_state(mconfig, type, tag)
 	{
 	}
 
 	void h89_sigmasoft(machine_config &config);
-
-protected:
-	required_device<sigmasoft_parallel_port> m_sigma_parallel;
-
-	void h89_sigmasoft_io(address_map &map);
 };
 
 
@@ -376,44 +369,6 @@ void h89_base_state::h89_base_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 }
-
-void h89_sigmasoft_state::h89_sigmasoft_io(address_map &map)
-{
-	h89_base_io(map);
-
-	// Add SigmaSoft parallel port board, required for IGC graphics
-	map(0x08,0x0f).rw(m_sigma_parallel, FUNC(sigmasoft_parallel_port::read), FUNC(sigmasoft_parallel_port::write));
-}
-
-/*
-    Memory Map for MMS 444-61C PROM
-
-                                  PORT
-    Use                        |  Hex  |
-   ----------------------------+-------+
-    Not specified, available   |  0-37 |
-    MMS 77316                  | 38-3F |
-    MMS Internal test fixtures | 40-47 |
-    MMS 77317 ACT/XCOMP I/O    | 48-4F |
-    MMS 77315 CAMEO I/O        | 50-56 |
-    Unused                     |    57 |
-    MMS 77314 Corvus I/O       | 58-59 |
-    MMS 77314 REMEX I/O        | 5A-5B |
-    MMS 77314,15,17 Conf Port  |    5C |
-    Unused                     | 5D-77 |
-    Disk I/O #1                | 78-7B |
-    Disk I/O #2                | 7C-7F |
-    HDOS reserved              | 80-CF |
-    DCE Serial I/O             | D0-D7 |
-    DTE Serial I/O             | D8-DF |
-    DCE Serial I/O             | EO-E7 |
-    Console I/O                | E8-EF |
-    NMI                        | F0-F1 |
-    General purpose port       |    F2 |
-    Unused                     | F8-F9 |
-    NMI                        | FA-FB |
-    Unused                     | FC-FF |
- */
 
 // Input ports
 static INPUT_PORTS_START( h88 )
@@ -1032,19 +987,10 @@ void h89_sigmasoft_state::h89_sigmasoft(machine_config &config)
 {
 	h89(config);
 	m_h89bus->set_default_bios_tag("444-61");
-	m_maincpu->set_addrmap(AS_IO, &h89_sigmasoft_state::h89_sigmasoft_io);
 
 	sigma_tlb_options(m_tlbc);
 
-	SIGMASOFT_PARALLEL_PORT(config, m_sigma_parallel);
-	m_sigma_parallel->ctrl_r_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_ctrl_r));
-	m_sigma_parallel->video_mem_r_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_video_mem_r));
-	m_sigma_parallel->video_mem_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_video_mem_w));
-	m_sigma_parallel->io_lo_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_io_lo_addr_w));
-	m_sigma_parallel->io_hi_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_io_hi_addr_w));
-	m_sigma_parallel->window_lo_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_window_lo_addr_w));
-	m_sigma_parallel->window_hi_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_window_hi_addr_w));
-	m_sigma_parallel->ctrl_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_ctrl_w));
+	H89BUS_LEFT_SLOT(config.replace(), "p501", "h89bus", h89_left_cards, "ss_parallel");
 }
 
 void h89_mms_state::h89_mms(machine_config &config)
