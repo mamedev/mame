@@ -229,7 +229,7 @@ u8 dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 	if (addr == 0x061f00c) { return ioport("SYS")->read(); }
 	if (addr == 0x061d000) { return 0x00; } // settings (from EEPROM?) including flipscreen        
 	if (addr == 0x061d002) { return 0x00; } // settings (from EEPROM?) dipswitch? 
-	if (addr == 0x061d004) { return 0xff; } // settings (from EEPROM?) region       
+	if (addr == 0x061d004) { return 0x00; } // settings (from EEPROM?) region       
 	if (addr == 0x061f004) { return ioport("IN1")->read(); } // P1 inputs
 	if (addr == 0x061f006) { return ioport("IN2")->read(); } // P2 inputs
 	//if (addr == 0x061f00e) { return machine().rand(); } // P2 coin / start
@@ -471,7 +471,7 @@ void dt7_state::tx_videoram_dt7_w(offs_t offset, u16 data, u16 mem_mask)
 
 void dt7_state::draw_tx_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int table)
 {
-	// there seems to be RAM for anoter tx tilemap
+	// there seems to be RAM for another tx tilemap
 	// but there were 2 empty sockets / sockets with blank tx ROMs, so
 	// it's likely only one of them is used
 	rectangle clip = cliprect;
