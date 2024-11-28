@@ -33,9 +33,16 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 	}
 }
 
-static bool testLog2(float _a)
+TEST_CASE("log", "[math][libm]")
 {
-	return bx::log2(_a) == bx::log(_a) * (1.0f / bx::log(2.0f) );
+	STATIC_REQUIRE(0.0f == bx::log(1.0f) );
+	STATIC_REQUIRE(1.0f == bx::log(bx::kE) );
+	STATIC_REQUIRE(bx::kLogNat2 == bx::log(2.0f) );
+}
+
+static void testLog2(float _a)
+{
+	REQUIRE(bx::log2(_a) == bx::log(_a) * (1.0f / bx::log(2.0f) ) );
 }
 
 TEST_CASE("log2", "[math][libm]")
@@ -43,15 +50,15 @@ TEST_CASE("log2", "[math][libm]")
 	testLog2(0.0f);
 	testLog2(256.0f);
 
-	REQUIRE(0.0f == bx::log2(1.0f) );
-	REQUIRE(1.0f == bx::log2(2.0f) );
-	REQUIRE(2.0f == bx::log2(4.0f) );
-	REQUIRE(3.0f == bx::log2(8.0f) );
-	REQUIRE(4.0f == bx::log2(16.0f) );
-	REQUIRE(5.0f == bx::log2(32.0f) );
-	REQUIRE(6.0f == bx::log2(64.0f) );
-	REQUIRE(7.0f == bx::log2(128.0f) );
-	REQUIRE(8.0f == bx::log2(256.0f) );
+	STATIC_REQUIRE(0.0f == bx::log2(1.0f) );
+	STATIC_REQUIRE(1.0f == bx::log2(2.0f) );
+	STATIC_REQUIRE(2.0f == bx::log2(4.0f) );
+	STATIC_REQUIRE(3.0f == bx::log2(8.0f) );
+	STATIC_REQUIRE(4.0f == bx::log2(16.0f) );
+	STATIC_REQUIRE(5.0f == bx::log2(32.0f) );
+	STATIC_REQUIRE(6.0f == bx::log2(64.0f) );
+	STATIC_REQUIRE(7.0f == bx::log2(128.0f) );
+	STATIC_REQUIRE(8.0f == bx::log2(256.0f) );
 }
 
 TEST_CASE("ceilLog2", "[math]")
@@ -324,7 +331,7 @@ TEST_CASE("rsqrt", "[math][libm]")
 	bx::Error err;
 
 	// rsqrtRef
-	REQUIRE(bx::isInfinite(bx::rsqrtRef(0.0f) ) );
+	STATIC_REQUIRE(bx::isInfinite(bx::rsqrtRef(0.0f) ) );
 
 	for (float xx = bx::kNearZero; xx < 100.0f; xx += 0.1f)
 	{
@@ -361,7 +368,8 @@ TEST_CASE("sqrt", "[math][libm]")
 	bx::Error err;
 
 	// sqrtRef
-	REQUIRE(bx::isNan(bx::sqrtRef(-1.0f) ) );
+	STATIC_REQUIRE(bx::isNan(bx::sqrtRef(-1.0f) ) );
+
 	REQUIRE(bx::isEqual(bx::sqrtRef(0.0f), ::sqrtf(0.0f), 0.0f) );
 	REQUIRE(bx::isEqual(bx::sqrtRef(1.0f), ::sqrtf(1.0f), 0.0f) );
 
@@ -434,7 +442,7 @@ TEST_CASE("mod", "[math][libm]")
 typedef float (*MathFloatFn)(float);
 
 template<MathFloatFn BxT, MathFloatFn CrtT>
-void testMathFunc1Float(float _value)
+static void testMathFunc1Float(float _value)
 {
 	REQUIRE(CrtT(_value) == BxT(_value) );
 }
@@ -519,21 +527,21 @@ TEST_CASE("exp", "[math][libm]")
 
 TEST_CASE("pow", "[math][libm]")
 {
-	REQUIRE(1.0f == bx::pow(0.0f, 0.0f) );
-	REQUIRE(1.0f == bx::pow(1.0f, 0.0f) );
-	REQUIRE(1.0f == bx::pow(3.0f, 0.0f) );
-	REQUIRE(1.0f == bx::pow(8.0f, 0.0f) );
-	REQUIRE(1.0f == bx::pow(9.0f, 0.0f) );
-	REQUIRE(0.0f == bx::pow(0.0f, 2.0f) );
+	STATIC_REQUIRE(1.0f == bx::pow(0.0f, 0.0f) );
+	STATIC_REQUIRE(1.0f == bx::pow(1.0f, 0.0f) );
+	STATIC_REQUIRE(1.0f == bx::pow(3.0f, 0.0f) );
+	STATIC_REQUIRE(1.0f == bx::pow(8.0f, 0.0f) );
+	STATIC_REQUIRE(1.0f == bx::pow(9.0f, 0.0f) );
+	STATIC_REQUIRE(0.0f == bx::pow(0.0f, 2.0f) );
 
-	REQUIRE(   4.0f == bx::pow( 2.0f,  2.0f) );
-	REQUIRE(  -4.0f == bx::pow(-2.0f,  2.0f) );
-	REQUIRE(  0.25f == bx::pow( 2.0f, -2.0f) );
-	REQUIRE( -0.25f == bx::pow(-2.0f, -2.0f) );
-	REQUIRE(   8.0f == bx::pow( 2.0f,  3.0f) );
-	REQUIRE(  -8.0f == bx::pow(-2.0f,  3.0f) );
-	REQUIRE( 0.125f == bx::pow( 2.0f, -3.0f) );
-	REQUIRE(-0.125f == bx::pow(-2.0f, -3.0f) );
+	STATIC_REQUIRE(   4.0f == bx::pow( 2.0f,  2.0f) );
+	STATIC_REQUIRE(  -4.0f == bx::pow(-2.0f,  2.0f) );
+	STATIC_REQUIRE(  0.25f == bx::pow( 2.0f, -2.0f) );
+	STATIC_REQUIRE( -0.25f == bx::pow(-2.0f, -2.0f) );
+	STATIC_REQUIRE(   8.0f == bx::pow( 2.0f,  3.0f) );
+	STATIC_REQUIRE(  -8.0f == bx::pow(-2.0f,  3.0f) );
+	STATIC_REQUIRE( 0.125f == bx::pow( 2.0f, -3.0f) );
+	STATIC_REQUIRE(-0.125f == bx::pow(-2.0f, -3.0f) );
 
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
@@ -548,6 +556,9 @@ TEST_CASE("pow", "[math][libm]")
 
 TEST_CASE("asin", "[math][libm]")
 {
+	STATIC_REQUIRE(bx::isEqual(       0.0f, bx::asin(0.0f), 0.0001f) );
+	STATIC_REQUIRE(bx::isEqual(bx::kPiHalf, bx::asin(1.0f), 0.0001f) );
+
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
 
@@ -561,6 +572,11 @@ TEST_CASE("asin", "[math][libm]")
 
 TEST_CASE("sin", "[math][libm]")
 {
+	STATIC_REQUIRE(bx::isEqual( 0.0f, bx::sin(0.0f            ), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual( 1.0f, bx::sin(bx::kPiHalf     ), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual( 0.0f, bx::sin(bx::kPi         ), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual(-1.0f, bx::sin(bx::kPiHalf*3.0f), 0.0000001f) );
+
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
 
@@ -624,6 +640,9 @@ TEST_CASE("sinh", "[math][libm]")
 
 TEST_CASE("acos", "[math][libm]")
 {
+	STATIC_REQUIRE(bx::isEqual(bx::kPiHalf, bx::acos(0.0f), 0.0001f) );
+	STATIC_REQUIRE(bx::isEqual(       0.0f, bx::acos(1.0f), 0.0001f) );
+
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
 
@@ -637,6 +656,11 @@ TEST_CASE("acos", "[math][libm]")
 
 TEST_CASE("cos", "[math][libm]")
 {
+	STATIC_REQUIRE(bx::isEqual( 1.0f, bx::cos(0.0f            ), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual( 0.0f, bx::cos(bx::kPiHalf     ), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual(-1.0f, bx::cos(bx::kPi         ), 0.0000001f) );
+	STATIC_REQUIRE(bx::isEqual( 0.0f, bx::cos(bx::kPiHalf*3.0f), 0.0000001f) );
+
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
 

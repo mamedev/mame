@@ -147,6 +147,11 @@ namespace bx
 		return _a && !(_a & (_a - 1) );
 	}
 
+	constexpr bool isConstantEvaluated()
+	{
+		return __builtin_is_constant_evaluated();
+	}
+
 	template <typename Ty, typename FromT>
 	inline constexpr Ty bitCast(const FromT& _from)
 	{

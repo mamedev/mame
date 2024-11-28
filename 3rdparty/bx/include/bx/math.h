@@ -212,47 +212,47 @@ namespace bx
 
 	/// Returns the sine of the argument _a.
 	///
-	BX_CONST_FUNC float sin(float _a);
+	BX_CONSTEXPR_FUNC float sin(float _a);
 
 	/// Returns hyperbolic sine of the argument _a.
 	///
-	BX_CONST_FUNC float sinh(float _a);
+	BX_CONSTEXPR_FUNC float sinh(float _a);
 
 	/// Returns radian angle between -pi/2 and +pi/2 whose sine is _a.
 	///
-	BX_CONST_FUNC float asin(float _a);
+	BX_CONSTEXPR_FUNC float asin(float _a);
 
 	/// Returns the cosine of the argument _a.
 	///
-	BX_CONST_FUNC float cos(float _a);
+	BX_CONSTEXPR_FUNC float cos(float _a);
 
 	/// Returns hyperbolic cosine of the argument _a.
 	///
-	BX_CONST_FUNC float cosh(float _a);
+	BX_CONSTEXPR_FUNC float cosh(float _a);
 
 	/// Returns radian angle between 0 and pi whose cosine is _a.
 	///
-	BX_CONST_FUNC float acos(float _a);
+	BX_CONSTEXPR_FUNC float acos(float _a);
 
 	/// Returns the circular tangent of the radian argument _a.
 	///
-	BX_CONST_FUNC float tan(float _a);
+	BX_CONSTEXPR_FUNC float tan(float _a);
 
 	/// Returns hyperbolic tangent of the argument _a.
 	///
-	BX_CONST_FUNC float tanh(float _a);
+	BX_CONSTEXPR_FUNC float tanh(float _a);
 
 	/// Returns radian angle between -pi/2 and +pi/2 whose tangent is _a.
 	///
-	BX_CONST_FUNC float atan(float _a);
+	BX_CONSTEXPR_FUNC float atan(float _a);
 
 	/// Returns the inverse tangent of _y/_x.
 	///
-	BX_CONST_FUNC float atan2(float _y, float _x);
+	BX_CONSTEXPR_FUNC float atan2(float _y, float _x);
 
 	/// Computes _a raised to the _b power.
 	///
-	BX_CONST_FUNC float pow(float _a, float _b);
+	BX_CONSTEXPR_FUNC float pow(float _a, float _b);
 
 	/// Returns the result of multiplying _a by 2 raised to the power of the exponent `_a * (2^_b)`.
 	///
@@ -261,23 +261,23 @@ namespace bx
 	/// Returns decomposed given floating point value _a into a normalized fraction and
 	/// an integral power of two.
 	///
-	float frexp(float _a, int32_t* _outExp);
+	BX_CONSTEXPR_FUNC float frexp(float _a, int32_t* _outExp);
 
 	/// Returns e (2.71828...) raised to the _a power.
 	///
-	BX_CONST_FUNC float exp(float _a);
+	BX_CONSTEXPR_FUNC float exp(float _a);
 
 	/// Returns 2 raised to the _a power.
 	///
-	BX_CONST_FUNC float exp2(float _a);
+	BX_CONSTEXPR_FUNC float exp2(float _a);
 
 	/// Returns the base e (2.71828...) logarithm of _a.
 	///
-	BX_CONST_FUNC float log(float _a);
+	BX_CONSTEXPR_FUNC float log(float _a);
 
 	/// Returns the base 2 logarithm of _a.
 	///
-	BX_CONST_FUNC float log2(float _a);
+	BX_CONSTEXPR_FUNC float log2(float _a);
 
 	/// Count number of bits set.
 	///
@@ -321,11 +321,11 @@ namespace bx
 
 	/// Returns the square root of _a.
 	///
-	BX_CONST_FUNC float sqrt(float _a);
+	BX_CONSTEXPR_FUNC float sqrt(float _a);
 
 	/// Returns reciprocal square root of _a.
 	///
-	BX_CONST_FUNC float rsqrt(float _a);
+	BX_CONSTEXPR_FUNC float rsqrt(float _a);
 
 	/// Returns the nearest integer not greater in magnitude than _a.
 	///
@@ -403,7 +403,7 @@ namespace bx
 	BX_CONSTEXPR_FUNC float smoothStep(float _a);
 
 	///
-	BX_CONST_FUNC float invSmoothStep(float _a);
+	BX_CONSTEXPR_FUNC float invSmoothStep(float _a);
 
 	///
 	BX_CONSTEXPR_FUNC float bias(float _time, float _bias);
@@ -486,13 +486,13 @@ namespace bx
 	BX_CONSTEXPR_FUNC Vec3 cross(const Vec3 _a, const Vec3 _b);
 
 	///
-	BX_CONST_FUNC float length(const Vec3 _a);
+	BX_CONSTEXPR_FUNC float length(const Vec3 _a);
 
 	///
-	BX_CONST_FUNC float distanceSq(const Vec3 _a, const Vec3 _b);
+	BX_CONSTEXPR_FUNC float distanceSq(const Vec3 _a, const Vec3 _b);
 
 	///
-	BX_CONST_FUNC float distance(const Vec3 _a, const Vec3 _b);
+	BX_CONSTEXPR_FUNC float distance(const Vec3 _a, const Vec3 _b);
 
 	///
 	BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3 _a, const Vec3 _b, float _t);
@@ -501,7 +501,7 @@ namespace bx
 	BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3 _a, const Vec3 _b, const Vec3 _t);
 
 	///
-	BX_CONST_FUNC Vec3 normalize(const Vec3 _a);
+	BX_CONSTEXPR_FUNC Vec3 normalize(const Vec3 _a);
 
 	///
 	BX_CONSTEXPR_FUNC Vec3 min(const Vec3 _a, const Vec3 _b);
@@ -527,7 +527,7 @@ namespace bx
 	void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3 _n, float _angle);
 
 	///
-	BX_CONST_FUNC Vec3 fromLatLong(float _u, float _v);
+	BX_CONSTEXPR_FUNC Vec3 fromLatLong(float _u, float _v);
 
 	///
 	void toLatLong(float* _outU, float* _outV, const Vec3 _dir);
@@ -811,10 +811,10 @@ namespace bx
 	void hsvToRgb(float _rgb[3], const float _hsv[3]);
 
 	///
-	BX_CONST_FUNC float toLinear(float _a);
+	BX_CONSTEXPR_FUNC float toLinear(float _a);
 
 	///
-	BX_CONST_FUNC float toGamma(float _a);
+	BX_CONSTEXPR_FUNC float toGamma(float _a);
 
 } // namespace bx
 

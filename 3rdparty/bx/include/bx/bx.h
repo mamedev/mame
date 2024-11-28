@@ -216,6 +216,9 @@ namespace bx
 	template<typename Ty>
 	constexpr bool isPowerOf2(Ty _a);
 
+	/// Returns true if it's evaluated as constexpr.
+	constexpr bool isConstantEvaluated();
+
 	/// Returns a value of type `Ty` by reinterpreting the object representation of `FromT`.
 	template <typename Ty, typename FromT>
 	constexpr Ty bitCast(const FromT& _from);

@@ -42,10 +42,7 @@ namespace bx
 	constexpr float    kInvLogNat2     = 1.4426950408889634073599246810019f;
 
 	/// The natural logarithm of the 2. ln(2)
-	constexpr float    kLogNat2Hi      = 0.6931471805599453094172321214582f;
-
-	///
-	constexpr float    kLogNat2Lo      = 1.90821492927058770002e-10f;
+	constexpr float    kLogNat2        = 0.6931471805599453094172321214582f;
 
 	/// The base of natural logarithms. e(1)
 	constexpr float    kE              = 2.7182818284590452353602874713527f;
@@ -83,7 +80,7 @@ namespace bx
 	/// Maximum representable floating-point number.
 	constexpr float    kFloatLargest   = 3.402823466e+38f;
 
-	///
+	/// Floating-point infinity.
 //	constexpr float    kFloatInfinity;
 
 	///
@@ -104,7 +101,7 @@ namespace bx
 	/// Largest representable double-precision floating-point number.
 	constexpr double   kDoubleLargest  = 1.7976931348623158e+308;
 
-	//
+	// Double-precision floating-point infinity.
 //	constexpr double   kDoubleInfinity;
 
 } // namespace bx

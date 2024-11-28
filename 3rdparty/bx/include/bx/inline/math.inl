@@ -158,6 +158,76 @@ namespace bx
 		return _a * _a;
 	}
 
+	inline BX_CONSTEXPR_FUNC float cos(float _a)
+	{
+		const float scaled = _a * 2.0f*kInvPi;
+		const float real   = floor(scaled);
+		const float xx     = _a - real * kPiHalf;
+		const int32_t bits = int32_t(real) & 3;
+
+		constexpr float kSinC2  = -0.16666667163372039794921875f;
+		constexpr float kSinC4  =  8.333347737789154052734375e-3f;
+		constexpr float kSinC6  = -1.9842604524455964565277099609375e-4f;
+		constexpr float kSinC8  =  2.760012648650445044040679931640625e-6f;
+		constexpr float kSinC10 = -2.50293279435709337121807038784027099609375e-8f;
+
+		constexpr float kCosC2  = -0.5f;
+		constexpr float kCosC4  =  4.166664183139801025390625e-2f;
+		constexpr float kCosC6  = -1.388833043165504932403564453125e-3f;
+		constexpr float kCosC8  =  2.47562347794882953166961669921875e-5f;
+		constexpr float kCosC10 = -2.59630184018533327616751194000244140625e-7f;
+
+		float c0  = xx;
+		float c2  = kSinC2;
+		float c4  = kSinC4;
+		float c6  = kSinC6;
+		float c8  = kSinC8;
+		float c10 = kSinC10;
+
+		if (bits == 0
+		||  bits == 2)
+		{
+			c0  = 1.0f;
+			c2  = kCosC2;
+			c4  = kCosC4;
+			c6  = kCosC6;
+			c8  = kCosC8;
+			c10 = kCosC10;
+		}
+
+		const float xsq    = square(xx);
+		const float tmp0   = mad(c10,  xsq, c8 );
+		const float tmp1   = mad(tmp0, xsq, c6 );
+		const float tmp2   = mad(tmp1, xsq, c4 );
+		const float tmp3   = mad(tmp2, xsq, c2 );
+		const float tmp4   = mad(tmp3, xsq, 1.0);
+		const float result = tmp4 * c0;
+
+		return bits == 1 || bits == 2
+			? -result
+			:  result
+			;
+	}
+
+	inline BX_CONSTEXPR_FUNC float acos(float _a)
+	{
+		constexpr float kAcosC0 =  1.5707288f;
+		constexpr float kAcosC1 = -0.2121144f;
+		constexpr float kAcosC2 =  0.0742610f;
+		constexpr float kAcosC3 = -0.0187293f;
+
+		const float absa   = abs(_a);
+		const float tmp0   = mad(kAcosC3, absa, kAcosC2);
+		const float tmp1   = mad(tmp0,    absa, kAcosC1);
+		const float tmp2   = mad(tmp1,    absa, kAcosC0);
+		const float tmp3   = tmp2 * sqrt(1.0f - absa);
+		const float negate = float(_a < 0.0f);
+		const float tmp4   = tmp3 - 2.0f*negate*tmp3;
+		const float result = negate*kPi + tmp4;
+
+		return result;
+	}
+
 	inline void sinCosApprox(float& _outSinApprox, float& _outCos, float _a)
 	{
 		const float aa     = _a - floor(_a*kInvPi2)*kPi2;
@@ -172,32 +242,32 @@ namespace bx
 		_outCos = cosA;
 	}
 
-	inline BX_CONST_FUNC float sin(float _a)
+	inline BX_CONSTEXPR_FUNC float sin(float _a)
 	{
 		return cos(_a - kPiHalf);
 	}
 
-	inline BX_CONST_FUNC float sinh(float _a)
+	inline BX_CONSTEXPR_FUNC float sinh(float _a)
 	{
 		return 0.5f*(exp(_a) - exp(-_a) );
 	}
 
-	inline BX_CONST_FUNC float asin(float _a)
+	inline BX_CONSTEXPR_FUNC float asin(float _a)
 	{
 		return kPiHalf - acos(_a);
 	}
 
-	inline BX_CONST_FUNC float cosh(float _a)
+	inline BX_CONSTEXPR_FUNC float cosh(float _a)
 	{
 		return 0.5f*(exp(_a) + exp(-_a) );
 	}
 
-	inline BX_CONST_FUNC float tan(float _a)
+	inline BX_CONSTEXPR_FUNC float tan(float _a)
 	{
 		return sin(_a) / cos(_a);
 	}
 
-	inline BX_CONST_FUNC float tanh(float _a)
+	inline BX_CONSTEXPR_FUNC float tanh(float _a)
 	{
 		const float tmp0   = exp(2.0f*_a);
 		const float tmp1   = tmp0 - 1.0f;
@@ -207,34 +277,57 @@ namespace bx
 		return result;
 	}
 
-	inline BX_CONST_FUNC float atan(float _a)
+	inline BX_CONSTEXPR_FUNC float atan(float _a)
 	{
 		return atan2(_a, 1.0f);
 	}
 
-	inline BX_CONST_FUNC float pow(float _a, float _b)
+	inline BX_CONSTEXPR_FUNC float atan2(float _y, float _x)
 	{
-		if (abs(_b) < kFloatSmallest)
+		const float ax     = abs(_x);
+		const float ay     = abs(_y);
+		const float maxaxy = max(ax, ay);
+		const float minaxy = min(ax, ay);
+
+		if (maxaxy == 0.0f)
 		{
-			return 1.0f;
+			return _y < 0.0f ? -0.0f : 0.0f;
 		}
 
-		if (abs(_a) < kFloatSmallest)
-		{
-			return 0.0f;
-		}
+		constexpr float kAtan2C0 = -0.013480470f;
+		constexpr float kAtan2C1 =  0.057477314f;
+		constexpr float kAtan2C2 = -0.121239071f;
+		constexpr float kAtan2C3 =  0.195635925f;
+		constexpr float kAtan2C4 = -0.332994597f;
+		constexpr float kAtan2C5 =  0.999995630f;
 
-		return copySign(exp(_b * log(abs(_a) ) ), _a);
+		const float mxy    = minaxy / maxaxy;
+		const float mxysq  = square(mxy);
+		const float tmp0   = mad(kAtan2C0, mxysq, kAtan2C1);
+		const float tmp1   = mad(tmp0,     mxysq, kAtan2C2);
+		const float tmp2   = mad(tmp1,     mxysq, kAtan2C3);
+		const float tmp3   = mad(tmp2,     mxysq, kAtan2C4);
+		const float tmp4   = mad(tmp3,     mxysq, kAtan2C5);
+		const float tmp5   = tmp4 * mxy;
+		const float tmp6   = ay > ax   ? kPiHalf - tmp5 : tmp5;
+		const float tmp7   = _x < 0.0f ? kPi     - tmp6 : tmp6;
+		const float result = _y < 0.0f ? -tmp7 : tmp7;
+
+		return result;
 	}
 
-	inline BX_CONST_FUNC float exp2(float _a)
+	inline BX_CONSTEXPR_FUNC float frexp(float _a, int32_t* _outExp)
 	{
-		return pow(2.0f, _a);
-	}
+		const uint32_t ftob     = floatToBits(_a);
+		const uint32_t masked0  = uint32_and(ftob, kFloatExponentMask);
+		const uint32_t exp0     = uint32_srl(masked0, kFloatExponentBitShift);
+		const uint32_t masked1  = uint32_and(ftob,   kFloatSignMask | kFloatMantissaMask);
+		const uint32_t bits     = uint32_or(masked1, UINT32_C(0x3f000000) );
+		const float    result   = bitsToFloat(bits);
 
-	inline BX_CONST_FUNC float log2(float _a)
-	{
-		return log(_a) * kInvLogNat2;
+		*_outExp = int32_t(exp0 - 0x7e);
+
+		return result;
 	}
 
 	inline BX_CONSTEXPR_FUNC float ldexp(float _a, int32_t _b)
@@ -249,6 +342,106 @@ namespace bx
 		const float    result   = bitsToFloat(bits);
 
 		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC float exp(float _a)
+	{
+		if (abs(_a) <= kNearZero)
+		{
+			return _a + 1.0f;
+		}
+
+		constexpr float kExpC0  =  1.66666666666666019037e-01f;
+		constexpr float kExpC1  = -2.77777777770155933842e-03f;
+		constexpr float kExpC2  =  6.61375632143793436117e-05f;
+		constexpr float kExpC3  = -1.65339022054652515390e-06f;
+		constexpr float kExpC4  =  4.13813679705723846039e-08f;
+		constexpr float kLogNat2Lo = 1.90821492927058770002e-10f;
+
+		const float kk     = round(_a*kInvLogNat2);
+		const float hi     = _a - kk*kLogNat2;
+		const float lo     =      kk*kLogNat2Lo;
+		const float hml    = hi - lo;
+		const float hmlsq  = square(hml);
+		const float tmp0   = mad(kExpC4, hmlsq, kExpC3);
+		const float tmp1   = mad(tmp0,   hmlsq, kExpC2);
+		const float tmp2   = mad(tmp1,   hmlsq, kExpC1);
+		const float tmp3   = mad(tmp2,   hmlsq, kExpC0);
+		const float tmp4   = hml - hmlsq * tmp3;
+		const float tmp5   = hml*tmp4/(2.0f-tmp4);
+		const float tmp6   = 1.0f - ( (lo - tmp5) - hi);
+		const float result = ldexp(tmp6, int32_t(kk) );
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC float log(float _a)
+	{
+		int32_t exp = 0;
+		float ff = frexp(_a, &exp);
+
+		if (ff < kSqrt2*0.5f)
+		{
+			ff *= 2.0f;
+			--exp;
+		}
+
+		constexpr float kLogC0 = 6.666666666666735130e-01f;
+		constexpr float kLogC1 = 3.999999999940941908e-01f;
+		constexpr float kLogC2 = 2.857142874366239149e-01f;
+		constexpr float kLogC3 = 2.222219843214978396e-01f;
+		constexpr float kLogC4 = 1.818357216161805012e-01f;
+		constexpr float kLogC5 = 1.531383769920937332e-01f;
+		constexpr float kLogC6 = 1.479819860511658591e-01f;
+		constexpr float kLogNat2Lo = 1.90821492927058770002e-10f;
+
+		ff -= 1.0f;
+		const float kk     = float(exp);
+		const float hi     = kk*kLogNat2;
+		const float lo     = kk*kLogNat2Lo;
+		const float ss     = ff / (2.0f + ff);
+		const float s2     = square(ss);
+		const float s4     = square(s2);
+
+		const float tmp0   = mad(kLogC6, s4, kLogC4);
+		const float tmp1   = mad(tmp0,   s4, kLogC2);
+		const float tmp2   = mad(tmp1,   s4, kLogC0);
+		const float t1     = s2*tmp2;
+
+		const float tmp3   = mad(kLogC5, s4, kLogC3);
+		const float tmp4   = mad(tmp3,   s4, kLogC1);
+		const float t2     = s4*tmp4;
+
+		const float t12    = t1 + t2;
+		const float hfsq   = 0.5f*square(ff);
+		const float result = hi - ( (hfsq - (ss*(hfsq+t12) + lo) ) - ff);
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC float pow(float _a, float _b)
+	{
+		if (abs(_b) < kFloatSmallest)
+		{
+			return 1.0f;
+		}
+
+		if (abs(_a) < kFloatSmallest)
+		{
+			return 0.0f;
+		}
+
+		return copySign(exp(_b * log(abs(_a) ) ), _a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float exp2(float _a)
+	{
+		return pow(2.0f, _a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float log2(float _a)
+	{
+		return log(_a) * kInvLogNat2;
 	}
 
 	template<>
@@ -437,7 +630,7 @@ namespace bx
 		return Ty(1)<<log2;
 	}
 
-	inline BX_CONST_FUNC float rsqrtRef(float _a)
+	inline BX_CONSTEXPR_FUNC float rsqrtRef(float _a)
 	{
 		if (_a < kFloatSmallest)
 		{
@@ -461,13 +654,13 @@ namespace bx
 		const simd128_t rsqrta = simd_rsqrt_ni(aa);
 #endif // BX_SIMD_NEON
 
-		float result;
+		float result = 0.0f;
 		simd_stx(&result, rsqrta);
 
 		return result;
 	}
 
-	inline BX_CONST_FUNC float sqrtRef(float _a)
+	inline BX_CONSTEXPR_FUNC float sqrtRef(float _a)
 	{
 		if (_a < 0.0f)
 		{
@@ -491,24 +684,34 @@ namespace bx
 		const simd128_t aa   = simd_splat(_a);
 		const simd128_t sqrt = simd_sqrt(aa);
 
-		float result;
+		float result = 0.0f;
 		simd_stx(&result, sqrt);
 
 		return result;
 	}
 
-	inline BX_CONST_FUNC float rsqrt(float _a)
+	inline BX_CONSTEXPR_FUNC float rsqrt(float _a)
 	{
 #if BX_SIMD_SUPPORTED
+		if (isConstantEvaluated() )
+		{
+			return rsqrtRef(_a);
+		}
+
 		return rsqrtSimd(_a);
 #else
 		return rsqrtRef(_a);
 #endif // BX_SIMD_SUPPORTED
 	}
 
-	inline BX_CONST_FUNC float sqrt(float _a)
+	inline BX_CONSTEXPR_FUNC float sqrt(float _a)
 	{
 #if BX_SIMD_SUPPORTED
+		if (isConstantEvaluated() )
+		{
+			return sqrtRef(_a);
+		}
+
 		return sqrtSimd(_a);
 #else
 		return sqrtRef(_a);
@@ -628,7 +831,7 @@ namespace bx
 		return square(_a)*(3.0f - 2.0f*_a);
 	}
 
-	inline BX_CONST_FUNC float invSmoothStep(float _a)
+	inline BX_CONSTEXPR_FUNC float invSmoothStep(float _a)
 	{
 		return 0.5f - sin(asin(1.0f - 2.0f * _a) / 3.0f);
 	}
@@ -906,18 +1109,18 @@ namespace bx
 		};
 	}
 
-	inline BX_CONST_FUNC float length(const Vec3 _a)
+	inline BX_CONSTEXPR_FUNC float length(const Vec3 _a)
 	{
 		return sqrt(dot(_a, _a) );
 	}
 
-	inline BX_CONST_FUNC float distanceSq(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC float distanceSq(const Vec3 _a, const Vec3 _b)
 	{
 		const Vec3 ba = sub(_b, _a);
 		return dot(ba, ba);
 	}
 
-	inline BX_CONST_FUNC float distance(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC float distance(const Vec3 _a, const Vec3 _b)
 	{
 		return length(sub(_b, _a) );
 	}
@@ -942,7 +1145,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONST_FUNC Vec3 normalize(const Vec3 _a)
+	inline BX_CONSTEXPR_FUNC Vec3 normalize(const Vec3 _a)
 	{
 		const float len   = length(_a);
 		const Vec3 result = divSafe(_a, len);
@@ -1035,9 +1238,8 @@ namespace bx
 		_outB = cross(_n, _outT);
 	}
 
-	inline BX_CONST_FUNC Vec3 fromLatLong(float _u, float _v)
+	inline BX_CONSTEXPR_FUNC Vec3 fromLatLong(float _u, float _v)
 	{
-		Vec3 result(InitNone);
 		const float phi   = _u * kPi2;
 		const float theta = _v * kPi;
 
@@ -1046,10 +1248,12 @@ namespace bx
 		const float ct = cos(theta);
 		const float cp = cos(phi);
 
-		result.x = -st*sp;
-		result.y =  ct;
-		result.z = -st*cp;
-		return result;
+		return
+		{
+			-st*sp,
+			 ct,
+			-st*cp,
+		};
 	}
 
 	inline void toLatLong(float* _outU, float* _outV, const Vec3 _dir)
@@ -1583,7 +1787,7 @@ namespace bx
 			;
 	}
 
-	inline BX_CONST_FUNC float toLinear(float _a)
+	inline BX_CONSTEXPR_FUNC float toLinear(float _a)
 	{
 		const float lo     = _a / 12.92f;
 		const float hi     = pow( (_a + 0.055f) / 1.055f, 2.4f);
@@ -1591,7 +1795,7 @@ namespace bx
 		return result;
 	}
 
-	inline BX_CONST_FUNC float toGamma(float _a)
+	inline BX_CONSTEXPR_FUNC float toGamma(float _a)
 	{
 		const float lo     = _a * 12.92f;
 		const float hi     = pow(abs(_a), 1.0f/2.4f) * 1.055f - 0.055f;

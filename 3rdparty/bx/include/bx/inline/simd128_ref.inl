@@ -9,8 +9,8 @@
 
 namespace bx
 {
-	BX_CONST_FUNC float sqrt(float);
-	BX_CONST_FUNC float rsqrt(float);
+	BX_CONSTEXPR_FUNC float sqrt(float);
+	BX_CONSTEXPR_FUNC float rsqrt(float);
 
 #define ELEMx 0
 #define ELEMy 1
