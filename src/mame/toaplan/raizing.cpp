@@ -2,35 +2,24 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "toaplan_v25_tables.h"
-
-#include "cpu/m68000/m68000.h"
-#include "machine/bankdev.h"
-#include "machine/eepromser.h"
-#include "machine/gen_latch.h"
-#include "machine/ticket.h"
-#include "machine/upd4992.h"
-#include "gp9001.h"
-#include "sound/okim6295.h"
-#include "emupal.h"
-#include "screen.h"
-#include "tilemap.h"
-
 
 #include "toaplipt.h"
 #include "gp9001.h"
-
-#include "cpu/m68000/m68000.h"
-#include "cpu/nec/v25.h"
-#include "cpu/z80/z80.h"
-#include "sound/okim6295.h"
-#include "sound/ymopm.h"
-#include "sound/ymz280b.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/nec/v25.h"
+#include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
+#include "machine/eepromser.h"
+#include "machine/gen_latch.h"
+#include "sound/okim6295.h"
+#include "sound/ymopm.h"
+#include "sound/ymz280b.h"
 
 // TODO: this is the old toaplan2.cpp header text, it could do with splitting between the new drivers
 
@@ -367,7 +356,6 @@ class raizing_base_state : public driver_device
 public:
 	raizing_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_dma_space(*this, "dma_space")
 		, m_tx_videoram(*this, "tx_videoram")
 		, m_tx_lineselect(*this, "tx_lineselect")
 		, m_tx_linescroll(*this, "tx_linescroll")
@@ -376,14 +364,12 @@ public:
 		, m_raizing_okibank{
 			{ *this, "raizing_okibank0_%u", 0U },
 			{ *this, "raizing_okibank1_%u", 0U } }
-		, m_eepromout(*this, "EEPROMOUT")
 		, m_shared_ram(*this, "shared_ram")
 		, m_mainram(*this, "mainram")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_vdp(*this, "gp9001")
 		, m_oki(*this, "oki%u", 1U)
-		, m_eeprom(*this, "eeprom")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -398,53 +384,24 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 	void bgaregga_common_video_start();
-	void batrider_common_video_start();
 
-	void bgaregga_68k_mem(address_map &map) ATTR_COLD;
-	void bgaregga_sound_z80_mem(address_map &map) ATTR_COLD;
-	void mahoudai_68k_mem(address_map &map) ATTR_COLD;
-	void shippumd_68k_mem(address_map &map) ATTR_COLD;
-	void raizing_sound_z80_mem(address_map &map) ATTR_COLD;
-
+	// used by everything
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 
 	void shippumd_coin_w(u8 data);
 	void raizing_z80_bankswitch_w(u8 data);
 	void raizing_oki_bankswitch_w(offs_t offset, u8 data);
 	u8 bgaregga_E01D_r();
-	u16 batrider_z80_busack_r();
-	void batrider_z80_busreq_w(u8 data);
-	u16 batrider_z80rom_r(offs_t offset);
-	void batrider_soundlatch_w(u8 data);
-	void batrider_soundlatch2_w(u8 data);
-	void batrider_unknown_sound_w(u16 data);
-	void batrider_clear_sndirq_w(u16 data);
-	void batrider_sndirq_w(u8 data);
-	void batrider_clear_nmi_w(u8 data);
-	u16 bbakraid_eeprom_r();
-	void bbakraid_eeprom_w(u8 data);
+
 
 	// used by bgaregga and batrider
 	void install_raizing_okibank(int chip);
 
-	void batrider_tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void batrider_textdata_dma_w(u16 data);
-	void batrider_pal_text_dma_w(u16 data);
-	void batrider_objectbank_w(offs_t offset, u8 data);
-	void batrider_bank_cb(u8 layer, u32 &code);
-	void nprobowl_68k_mem(address_map &map) ATTR_COLD;
 
 	u32 screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
 	DECLARE_MACHINE_RESET(bgaregga);
-	void batrider_68k_mem(address_map &map) ATTR_COLD;
-	void batrider_dma_mem(address_map &map) ATTR_COLD;
-	void batrider_sound_z80_mem(address_map &map) ATTR_COLD;
-	void batrider_sound_z80_port(address_map &map) ATTR_COLD;
-	void bbakraid_68k_mem(address_map &map) ATTR_COLD;
-	void bbakraid_sound_z80_mem(address_map &map) ATTR_COLD;
-	void bbakraid_sound_z80_port(address_map &map) ATTR_COLD;
 	template<unsigned Chip> void raizing_oki(address_map &map) ATTR_COLD;
 
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
@@ -459,10 +416,7 @@ protected:
 
 	u8 m_sndirq_line = 0;        /* IRQ4 for batrider, IRQ2 for bbakraid */
 	u8 m_z80_busreq = 0;
-	u16 m_gfxrom_bank[8]{};       /* Batrider object bank */
 
-
-	optional_device<address_map_bank_device> m_dma_space;
 
 	tilemap_t *m_tx_tilemap = nullptr;    /* Tilemap for extra-text-layer */
 	required_shared_ptr<u16> m_tx_videoram;
@@ -471,7 +425,6 @@ protected:
 	optional_shared_ptr<u16> m_tx_gfxram;
 	optional_memory_bank m_audiobank;
 	optional_memory_bank_array<8> m_raizing_okibank[2];
-	optional_ioport m_eepromout;
 	void coin_w(u8 data);
 	void reset(int state);
 
@@ -482,7 +435,6 @@ protected:
 	optional_device<cpu_device> m_audiocpu;
 	required_device<gp9001vdp_device> m_vdp;
 	optional_device_array<okim6295_device, 2> m_oki;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -492,27 +444,12 @@ protected:
 	bitmap_ind8 m_custom_priority_bitmap;
 };
 
-class bbakraid_state : public raizing_base_state
-{
-public:
-	bbakraid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: raizing_base_state(mconfig, type, tag)
-	{ }
-
-	void bbakraid(machine_config &config);
-
-	void init_bbakraid();
-
-protected:
-	virtual void video_start() override ATTR_COLD;
-
-};
-
 class batrider_state : public raizing_base_state
 {
 public:
 	batrider_state(const machine_config &mconfig, device_type type, const char *tag)
 		: raizing_base_state(mconfig, type, tag)
+		, m_dma_space(*this, "dma_space")
 	{ }
 
 	void batrider(machine_config &config);
@@ -522,6 +459,72 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 
+	void batrider_68k_mem(address_map &map) ATTR_COLD;
+	void batrider_dma_mem(address_map &map) ATTR_COLD;
+	void batrider_sound_z80_mem(address_map &map) ATTR_COLD;
+	void batrider_sound_z80_port(address_map &map) ATTR_COLD;
+
+	u16 batrider_z80_busack_r();
+	void batrider_z80_busreq_w(u8 data);
+	u16 batrider_z80rom_r(offs_t offset);
+	void batrider_soundlatch_w(u8 data);
+	void batrider_soundlatch2_w(u8 data);
+	void batrider_unknown_sound_w(u16 data);
+	void batrider_clear_sndirq_w(u16 data);
+	void batrider_sndirq_w(u8 data);
+	void batrider_clear_nmi_w(u8 data);
+	void batrider_tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void batrider_textdata_dma_w(u16 data);
+	void batrider_pal_text_dma_w(u16 data);
+	void batrider_objectbank_w(offs_t offset, u8 data);
+	void batrider_bank_cb(u8 layer, u32 &code);
+
+	u16 m_gfxrom_bank[8]{};       /* Batrider object bank */
+
+	// used by batrider, bbakraid, nprobowl
+	optional_device<address_map_bank_device> m_dma_space;
+};
+
+
+class bbakraid_state : public batrider_state
+{
+public:
+	bbakraid_state(const machine_config &mconfig, device_type type, const char *tag)
+		: batrider_state(mconfig, type, tag)
+		, m_eepromout(*this, "EEPROMOUT")
+		, m_eeprom(*this, "eeprom")
+	{ }
+
+	void bbakraid(machine_config &config);
+
+	void init_bbakraid();
+
+protected:
+private:
+	void bbakraid_68k_mem(address_map &map) ATTR_COLD;
+	void bbakraid_sound_z80_mem(address_map &map) ATTR_COLD;
+	void bbakraid_sound_z80_port(address_map &map) ATTR_COLD;
+
+	u16 bbakraid_eeprom_r();
+	void bbakraid_eeprom_w(u8 data);
+
+	optional_ioport m_eepromout;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+};
+
+
+class nprobowl_state : public batrider_state
+{
+public:
+	nprobowl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: batrider_state(mconfig, type, tag)
+	{ }
+
+	void nprobowl(machine_config &config);
+
+protected:
+private:
+	void nprobowl_68k_mem(address_map &map) ATTR_COLD;
 };
 
 class bgaregga_state : public raizing_base_state
@@ -537,6 +540,10 @@ public:
 
 protected:
 	virtual void video_start() override ATTR_COLD;
+
+private:
+	void bgaregga_68k_mem(address_map &map) ATTR_COLD;
+	void bgaregga_sound_z80_mem(address_map &map) ATTR_COLD;
 
 };
 
@@ -568,20 +575,12 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 
+private:
+	void mahoudai_68k_mem(address_map &map) ATTR_COLD;
+	void shippumd_68k_mem(address_map &map) ATTR_COLD;
+	void raizing_sound_z80_mem(address_map &map) ATTR_COLD;
 };
 
-class nprobowl_state : public raizing_base_state
-{
-public:
-	nprobowl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: raizing_base_state(mconfig, type, tag)
-	{ }
-
-	void nprobowl(machine_config &config);
-
-protected:
-	virtual void video_start() override ATTR_COLD;
-};
 
 void raizing_base_state::reset(int state)
 {
@@ -689,7 +688,7 @@ u32 raizing_base_state::screen_update_truxton2(screen_device &screen, bitmap_ind
 }
 
 
-void raizing_base_state::batrider_tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
+void batrider_state::batrider_tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/*** Dynamic GFX decoding for Batrider / Battle Bakraid ***/
 
@@ -702,7 +701,7 @@ void raizing_base_state::batrider_tx_gfxram_w(offs_t offset, u16 data, u16 mem_m
 	}
 }
 
-void raizing_base_state::batrider_textdata_dma_w(u16 data)
+void batrider_state::batrider_textdata_dma_w(u16 data)
 {
 	/*** Dynamic Text GFX decoding for Batrider ***/
 	/*** Only done once during start-up ***/
@@ -713,7 +712,7 @@ void raizing_base_state::batrider_textdata_dma_w(u16 data)
 	}
 }
 
-void raizing_base_state::batrider_pal_text_dma_w(u16 data)
+void batrider_state::batrider_pal_text_dma_w(u16 data)
 {
 	// FIXME: In batrider and bbakraid, the text layer and palette RAM
 	// are probably DMA'd from main RAM by writing here at every vblank,
@@ -725,7 +724,7 @@ void raizing_base_state::batrider_pal_text_dma_w(u16 data)
 	}
 }
 
-void raizing_base_state::batrider_objectbank_w(offs_t offset, u8 data)
+void batrider_state::batrider_objectbank_w(offs_t offset, u8 data)
 {
 	data &= 0xf;
 	if (m_gfxrom_bank[offset] != data)
@@ -735,7 +734,7 @@ void raizing_base_state::batrider_objectbank_w(offs_t offset, u8 data)
 	}
 }
 
-void raizing_base_state::batrider_bank_cb(u8 layer, u32 &code)
+void batrider_state::batrider_bank_cb(u8 layer, u32 &code)
 {
 	code = (m_gfxrom_bank[code >> 15] << 15) | (code & 0x7fff);
 }
@@ -778,7 +777,7 @@ void bgaregga_bootleg_state::video_start()
 	create_tx_tilemap(4, 4);
 }
 
-void raizing_base_state::batrider_common_video_start()
+void batrider_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
 	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
@@ -794,20 +793,8 @@ void raizing_base_state::batrider_common_video_start()
 	save_item(NAME(m_gfxrom_bank));
 }
 
-void batrider_state::video_start()
-{
-	batrider_common_video_start();
-}
 
-void bbakraid_state::video_start()
-{
-	batrider_common_video_start();
-}
 
-void nprobowl_state::video_start()
-{
-	batrider_common_video_start();
-}
 
 u32 raizing_base_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -1437,7 +1424,7 @@ u8 raizing_base_state::bgaregga_E01D_r()
 }
 
 
-u16 raizing_base_state::batrider_z80_busack_r()
+u16 batrider_state::batrider_z80_busack_r()
 {
 	// Bit 0x01 returns the status of BUSAK from the Z80.
 	// These accesses are made when the 68K wants to read the Z80
@@ -1447,39 +1434,39 @@ u16 raizing_base_state::batrider_z80_busack_r()
 }
 
 
-void raizing_base_state::batrider_z80_busreq_w(u8 data)
+void batrider_state::batrider_z80_busreq_w(u8 data)
 {
 	m_z80_busreq = (data & 0x01);   // see batrider_z80_busack_r above
 }
 
 
-u16 raizing_base_state::batrider_z80rom_r(offs_t offset)
+u16 batrider_state::batrider_z80rom_r(offs_t offset)
 {
 	return m_z80_rom[offset];
 }
 
 // these two latches are always written together, via a single move.l instruction
-void raizing_base_state::batrider_soundlatch_w(u8 data)
+void batrider_state::batrider_soundlatch_w(u8 data)
 {
 	m_soundlatch[0]->write(data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
-void raizing_base_state::batrider_soundlatch2_w(u8 data)
+void batrider_state::batrider_soundlatch2_w(u8 data)
 {
 	m_soundlatch[1]->write(data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-void raizing_base_state::batrider_unknown_sound_w(u16 data)
+void batrider_state::batrider_unknown_sound_w(u16 data)
 {
 	// the 68K writes here when it wants a sound acknowledge IRQ from the Z80
 	// for bbakraid this is on every sound command; for batrider, only on certain commands
 }
 
 
-void raizing_base_state::batrider_clear_sndirq_w(u16 data)
+void batrider_state::batrider_clear_sndirq_w(u16 data)
 {
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
@@ -1487,20 +1474,20 @@ void raizing_base_state::batrider_clear_sndirq_w(u16 data)
 }
 
 
-void raizing_base_state::batrider_sndirq_w(u8 data)
+void batrider_state::batrider_sndirq_w(u8 data)
 {
 	// if batrider_clear_sndirq_w() is correct, should this be ASSERT_LINE?
 	m_maincpu->set_input_line(m_sndirq_line, HOLD_LINE);
 }
 
 
-void raizing_base_state::batrider_clear_nmi_w(u8 data)
+void batrider_state::batrider_clear_nmi_w(u8 data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
-u16 raizing_base_state::bbakraid_eeprom_r()
+u16 bbakraid_state::bbakraid_eeprom_r()
 {
 	// Bit 0x01 returns the status of BUSAK from the Z80.
 	// BUSRQ is activated via bit 0x10 on the EEPROM write port.
@@ -1515,7 +1502,7 @@ u16 raizing_base_state::bbakraid_eeprom_r()
 }
 
 
-void raizing_base_state::bbakraid_eeprom_w(u8 data)
+void bbakraid_state::bbakraid_eeprom_w(u8 data)
 {
 	if (data & ~0x1f)
 		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %02X\n",m_maincpu->pc(),data);
@@ -1556,12 +1543,12 @@ void raizing_base_state::machine_start()
 }
 
 
-void raizing_base_state::mahoudai_68k_mem(address_map &map)
+void sstriker_state::mahoudai_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(FUNC(raizing_base_state::shared_ram_r), FUNC(raizing_base_state::shared_ram_w)).umask16(0x00ff);
-	map(0x21c01d, 0x21c01d).w(FUNC(raizing_base_state::coin_w));
+	map(0x218000, 0x21bfff).rw(FUNC(sstriker_state::shared_ram_r), FUNC(sstriker_state::shared_ram_w)).umask16(0x00ff);
+	map(0x21c01d, 0x21c01d).w(FUNC(sstriker_state::coin_w));
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
@@ -1572,20 +1559,20 @@ void raizing_base_state::mahoudai_68k_mem(address_map &map)
 	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x401000, 0x4017ff).ram();                         // Unused palette RAM
-	map(0x500000, 0x501fff).ram().w(FUNC(raizing_base_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x500000, 0x501fff).ram().w(FUNC(sstriker_state::tx_videoram_w)).share(m_tx_videoram);
 	map(0x502000, 0x502fff).ram().share(m_tx_lineselect);
-	map(0x503000, 0x5031ff).ram().w(FUNC(raizing_base_state::tx_linescroll_w)).share(m_tx_linescroll);
+	map(0x503000, 0x5031ff).ram().w(FUNC(sstriker_state::tx_linescroll_w)).share(m_tx_linescroll);
 	map(0x503200, 0x503fff).ram();
 }
 
 
-void raizing_base_state::shippumd_68k_mem(address_map &map)
+void sstriker_state::shippumd_68k_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(FUNC(raizing_base_state::shared_ram_r), FUNC(raizing_base_state::shared_ram_w)).umask16(0x00ff);
+	map(0x218000, 0x21bfff).rw(FUNC(sstriker_state::shared_ram_r), FUNC(sstriker_state::shared_ram_w)).umask16(0x00ff);
 //  map(0x21c008, 0x21c009).nopw();                    // ???
-	map(0x21c01d, 0x21c01d).w(FUNC(raizing_base_state::shippumd_coin_w)); // Coin count/lock + oki bankswitch
+	map(0x21c01d, 0x21c01d).w(FUNC(sstriker_state::shippumd_coin_w)); // Coin count/lock + oki bankswitch
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
@@ -1596,19 +1583,19 @@ void raizing_base_state::shippumd_68k_mem(address_map &map)
 	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x401000, 0x4017ff).ram();                         // Unused palette RAM
-	map(0x500000, 0x501fff).ram().w(FUNC(raizing_base_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x500000, 0x501fff).ram().w(FUNC(sstriker_state::tx_videoram_w)).share(m_tx_videoram);
 	map(0x502000, 0x502fff).ram().share(m_tx_lineselect);
-	map(0x503000, 0x5031ff).ram().w(FUNC(raizing_base_state::tx_linescroll_w)).share(m_tx_linescroll);
+	map(0x503000, 0x5031ff).ram().w(FUNC(sstriker_state::tx_linescroll_w)).share(m_tx_linescroll);
 	map(0x503200, 0x503fff).ram();
 }
 
 
-void raizing_base_state::bgaregga_68k_mem(address_map &map)
+void bgaregga_state::bgaregga_68k_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(FUNC(raizing_base_state::shared_ram_r), FUNC(raizing_base_state::shared_ram_w)).umask16(0x00ff);
-	map(0x21c01d, 0x21c01d).w(FUNC(raizing_base_state::coin_w));
+	map(0x218000, 0x21bfff).rw(FUNC(bgaregga_state::shared_ram_r), FUNC(bgaregga_state::shared_ram_w)).umask16(0x00ff);
+	map(0x21c01d, 0x21c01d).w(FUNC(bgaregga_state::coin_w));
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
@@ -1618,32 +1605,32 @@ void raizing_base_state::bgaregga_68k_mem(address_map &map)
 	map(0x21c03c, 0x21c03d).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
 	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(FUNC(raizing_base_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x500000, 0x501fff).ram().w(FUNC(bgaregga_state::tx_videoram_w)).share(m_tx_videoram);
 	map(0x502000, 0x502fff).ram().share(m_tx_lineselect);
-	map(0x503000, 0x5031ff).ram().w(FUNC(raizing_base_state::tx_linescroll_w)).share(m_tx_linescroll);
+	map(0x503000, 0x5031ff).ram().w(FUNC(bgaregga_state::tx_linescroll_w)).share(m_tx_linescroll);
 	map(0x503200, 0x503fff).ram();
 	map(0x600001, 0x600001).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 }
 
 
-void raizing_base_state::batrider_dma_mem(address_map &map)
+void batrider_state::batrider_dma_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().w(FUNC(raizing_base_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x0000, 0x1fff).ram().w(FUNC(batrider_state::tx_videoram_w)).share(m_tx_videoram);
 	map(0x2000, 0x2fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x3000, 0x31ff).ram().share(m_tx_lineselect);
-	map(0x3200, 0x33ff).ram().w(FUNC(raizing_base_state::tx_linescroll_w)).share(m_tx_linescroll);
+	map(0x3200, 0x33ff).ram().w(FUNC(batrider_state::tx_linescroll_w)).share(m_tx_linescroll);
 	map(0x3400, 0x7fff).ram();
-	map(0x8000, 0xffff).ram().w(FUNC(raizing_base_state::batrider_tx_gfxram_w)).share(m_tx_gfxram);
+	map(0x8000, 0xffff).ram().w(FUNC(batrider_state::batrider_tx_gfxram_w)).share(m_tx_gfxram);
 }
 
 
-void raizing_base_state::batrider_68k_mem(address_map &map)
+void batrider_state::batrider_68k_mem(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
 	map(0x200000, 0x207fff).ram().share(m_mainram);
 	map(0x208000, 0x20ffff).ram();
-	map(0x300000, 0x37ffff).r(FUNC(raizing_base_state::batrider_z80rom_r));
+	map(0x300000, 0x37ffff).r(FUNC(batrider_state::batrider_z80rom_r));
 	map(0x400000, 0x40000d).lrw16(
 							NAME([this](offs_t offset, u16 mem_mask) { return m_vdp->read(offset ^ (0xc/2), mem_mask); }),
 							NAME([this](offs_t offset, u16 data, u16 mem_mask) { m_vdp->write(offset ^ (0xc/2), data, mem_mask); }));
@@ -1653,26 +1640,26 @@ void raizing_base_state::batrider_68k_mem(address_map &map)
 	map(0x500006, 0x500007).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
 	map(0x500009, 0x500009).r(m_soundlatch[2], FUNC(generic_latch_8_device::read));
 	map(0x50000b, 0x50000b).r(m_soundlatch[3], FUNC(generic_latch_8_device::read));
-	map(0x50000c, 0x50000d).r(FUNC(raizing_base_state::batrider_z80_busack_r));
-	map(0x500011, 0x500011).w(FUNC(raizing_base_state::coin_w));
-	map(0x500021, 0x500021).w(FUNC(raizing_base_state::batrider_soundlatch_w));
-	map(0x500023, 0x500023).w(FUNC(raizing_base_state::batrider_soundlatch2_w));
-	map(0x500024, 0x500025).w(FUNC(raizing_base_state::batrider_unknown_sound_w));
-	map(0x500026, 0x500027).w(FUNC(raizing_base_state::batrider_clear_sndirq_w));
-	map(0x500061, 0x500061).w(FUNC(raizing_base_state::batrider_z80_busreq_w));
-	map(0x500080, 0x500081).w(FUNC(raizing_base_state::batrider_textdata_dma_w));
-	map(0x500082, 0x500083).w(FUNC(raizing_base_state::batrider_pal_text_dma_w));
-	map(0x5000c0, 0x5000cf).w(FUNC(raizing_base_state::batrider_objectbank_w)).umask16(0x00ff);
+	map(0x50000c, 0x50000d).r(FUNC(batrider_state::batrider_z80_busack_r));
+	map(0x500011, 0x500011).w(FUNC(batrider_state::coin_w));
+	map(0x500021, 0x500021).w(FUNC(batrider_state::batrider_soundlatch_w));
+	map(0x500023, 0x500023).w(FUNC(batrider_state::batrider_soundlatch2_w));
+	map(0x500024, 0x500025).w(FUNC(batrider_state::batrider_unknown_sound_w));
+	map(0x500026, 0x500027).w(FUNC(batrider_state::batrider_clear_sndirq_w));
+	map(0x500061, 0x500061).w(FUNC(batrider_state::batrider_z80_busreq_w));
+	map(0x500080, 0x500081).w(FUNC(batrider_state::batrider_textdata_dma_w));
+	map(0x500082, 0x500083).w(FUNC(batrider_state::batrider_pal_text_dma_w));
+	map(0x5000c0, 0x5000cf).w(FUNC(batrider_state::batrider_objectbank_w)).umask16(0x00ff);
 }
 
 
-void raizing_base_state::bbakraid_68k_mem(address_map &map)
+void bbakraid_state::bbakraid_68k_mem(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
 	map(0x200000, 0x207fff).ram().share(m_mainram);
 	map(0x208000, 0x20ffff).ram();
-	map(0x300000, 0x33ffff).r(FUNC(raizing_base_state::batrider_z80rom_r));
+	map(0x300000, 0x33ffff).r(FUNC(bbakraid_state::batrider_z80rom_r));
 	map(0x400000, 0x40000d).lrw16(
 							NAME([this](offs_t offset, u16 mem_mask) { return m_vdp->read(offset ^ (0xc/2), mem_mask); }),
 							NAME([this](offs_t offset, u16 data, u16 mem_mask) { m_vdp->write(offset ^ (0xc/2), data, mem_mask); }));
@@ -1680,22 +1667,22 @@ void raizing_base_state::bbakraid_68k_mem(address_map &map)
 	map(0x500002, 0x500003).portr("SYS-DSW");
 	map(0x500004, 0x500005).portr("DSW");
 	map(0x500006, 0x500007).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
-	map(0x500009, 0x500009).w(FUNC(raizing_base_state::coin_w));
+	map(0x500009, 0x500009).w(FUNC(bbakraid_state::coin_w));
 	map(0x500011, 0x500011).r(m_soundlatch[2], FUNC(generic_latch_8_device::read));
 	map(0x500013, 0x500013).r(m_soundlatch[3], FUNC(generic_latch_8_device::read));
-	map(0x500015, 0x500015).w(FUNC(raizing_base_state::batrider_soundlatch_w));
-	map(0x500017, 0x500017).w(FUNC(raizing_base_state::batrider_soundlatch2_w));
-	map(0x500018, 0x500019).r(FUNC(raizing_base_state::bbakraid_eeprom_r));
-	map(0x50001a, 0x50001b).w(FUNC(raizing_base_state::batrider_unknown_sound_w));
-	map(0x50001c, 0x50001d).w(FUNC(raizing_base_state::batrider_clear_sndirq_w));
-	map(0x50001f, 0x50001f).w(FUNC(raizing_base_state::bbakraid_eeprom_w));
-	map(0x500080, 0x500081).w(FUNC(raizing_base_state::batrider_textdata_dma_w));
-	map(0x500082, 0x500083).w(FUNC(raizing_base_state::batrider_pal_text_dma_w));
-	map(0x5000c0, 0x5000cf).w(FUNC(raizing_base_state::batrider_objectbank_w)).umask16(0x00ff);
+	map(0x500015, 0x500015).w(FUNC(bbakraid_state::batrider_soundlatch_w));
+	map(0x500017, 0x500017).w(FUNC(bbakraid_state::batrider_soundlatch2_w));
+	map(0x500018, 0x500019).r(FUNC(bbakraid_state::bbakraid_eeprom_r));
+	map(0x50001a, 0x50001b).w(FUNC(bbakraid_state::batrider_unknown_sound_w));
+	map(0x50001c, 0x50001d).w(FUNC(bbakraid_state::batrider_clear_sndirq_w));
+	map(0x50001f, 0x50001f).w(FUNC(bbakraid_state::bbakraid_eeprom_w));
+	map(0x500080, 0x500081).w(FUNC(bbakraid_state::batrider_textdata_dma_w));
+	map(0x500082, 0x500083).w(FUNC(bbakraid_state::batrider_pal_text_dma_w));
+	map(0x5000c0, 0x5000cf).w(FUNC(bbakraid_state::batrider_objectbank_w)).umask16(0x00ff);
 }
 
 
-void raizing_base_state::nprobowl_68k_mem(address_map &map) // TODO: verify everything, implement oki banking
+void nprobowl_state::nprobowl_68k_mem(address_map &map) // TODO: verify everything, implement oki banking
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x207fff).ram().share(m_mainram);
@@ -1712,37 +1699,37 @@ void raizing_base_state::nprobowl_68k_mem(address_map &map) // TODO: verify ever
 	//map(0x500040, 0x500041).w();
 	//map(0x500042, 0x500043).w();
 	map(0x500060, 0x500061).lr16(NAME([this] () -> u16 { return machine().rand(); })); // TODO: Hack, probably checks something in the mechanical part, verify
-	map(0x500080, 0x500081).w(FUNC(raizing_base_state::batrider_textdata_dma_w));
-	map(0x500082, 0x500083).w(FUNC(raizing_base_state::batrider_pal_text_dma_w));
+	map(0x500080, 0x500081).w(FUNC(nprobowl_state::batrider_textdata_dma_w));
+	map(0x500082, 0x500083).w(FUNC(nprobowl_state::batrider_pal_text_dma_w));
 }
 
 
-void raizing_base_state::raizing_sound_z80_mem(address_map &map)
+void sstriker_state::raizing_sound_z80_mem(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram().share(m_shared_ram);
 	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xe004, 0xe004).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe00e, 0xe00e).w(FUNC(raizing_base_state::coin_w));
+	map(0xe00e, 0xe00e).w(FUNC(sstriker_state::coin_w));
 }
 
 
-void raizing_base_state::bgaregga_sound_z80_mem(address_map &map)
+void bgaregga_state::bgaregga_sound_z80_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr(m_audiobank);
 	map(0xc000, 0xdfff).ram().share(m_shared_ram);
 	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xe004, 0xe004).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe006, 0xe008).w(FUNC(raizing_base_state::raizing_oki_bankswitch_w));
-	map(0xe00a, 0xe00a).w(FUNC(raizing_base_state::raizing_z80_bankswitch_w));
+	map(0xe006, 0xe008).w(FUNC(bgaregga_state::raizing_oki_bankswitch_w));
+	map(0xe00a, 0xe00a).w(FUNC(bgaregga_state::raizing_z80_bankswitch_w));
 	map(0xe00c, 0xe00c).w(m_soundlatch[0], FUNC(generic_latch_8_device::acknowledge_w));
 	map(0xe01c, 0xe01c).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
-	map(0xe01d, 0xe01d).r(FUNC(raizing_base_state::bgaregga_E01D_r));
+	map(0xe01d, 0xe01d).r(FUNC(bgaregga_state::bgaregga_E01D_r));
 }
 
 
-void raizing_base_state::batrider_sound_z80_mem(address_map &map)
+void batrider_state::batrider_sound_z80_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr(m_audiobank);
@@ -1750,37 +1737,37 @@ void raizing_base_state::batrider_sound_z80_mem(address_map &map)
 }
 
 
-void raizing_base_state::batrider_sound_z80_port(address_map &map)
+void batrider_state::batrider_sound_z80_port(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x40, 0x40).w(m_soundlatch[2], FUNC(generic_latch_8_device::write));
 	map(0x42, 0x42).w(m_soundlatch[3], FUNC(generic_latch_8_device::write));
-	map(0x44, 0x44).w(FUNC(raizing_base_state::batrider_sndirq_w));
-	map(0x46, 0x46).w(FUNC(raizing_base_state::batrider_clear_nmi_w));
+	map(0x44, 0x44).w(FUNC(batrider_state::batrider_sndirq_w));
+	map(0x46, 0x46).w(FUNC(batrider_state::batrider_clear_nmi_w));
 	map(0x48, 0x48).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0x4a, 0x4a).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x80, 0x81).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x82, 0x82).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x84, 0x84).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x88, 0x88).w(FUNC(raizing_base_state::raizing_z80_bankswitch_w));
-	map(0xc0, 0xc6).w(FUNC(raizing_base_state::raizing_oki_bankswitch_w));
+	map(0x88, 0x88).w(FUNC(batrider_state::raizing_z80_bankswitch_w));
+	map(0xc0, 0xc6).w(FUNC(batrider_state::raizing_oki_bankswitch_w));
 }
 
 
-void raizing_base_state::bbakraid_sound_z80_mem(address_map &map)
+void bbakraid_state::bbakraid_sound_z80_mem(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();     // No banking? ROM only contains code and data up to 0x28DC
 	map(0xc000, 0xffff).ram();
 }
 
 
-void raizing_base_state::bbakraid_sound_z80_port(address_map &map)
+void bbakraid_state::bbakraid_sound_z80_port(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x40, 0x40).w(m_soundlatch[2], FUNC(generic_latch_8_device::write));
 	map(0x42, 0x42).w(m_soundlatch[3], FUNC(generic_latch_8_device::write));
-	map(0x44, 0x44).w(FUNC(raizing_base_state::batrider_sndirq_w));
-	map(0x46, 0x46).w(FUNC(raizing_base_state::batrider_clear_nmi_w));
+	map(0x44, 0x44).w(FUNC(bbakraid_state::batrider_sndirq_w));
+	map(0x46, 0x46).w(FUNC(bbakraid_state::batrider_clear_nmi_w));
 	map(0x48, 0x48).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0x4a, 0x4a).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x80, 0x81).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
