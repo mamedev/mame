@@ -8,7 +8,7 @@ license:CC0-1.0
 
 	<!-- Series MC -->
 
-	<software name="eros4" supported="no">
+	<software name="eros4">
 		<description>EROS Ver.4.0 (Licensed to The Yorkshire Post)</description>
 		<year>1995</year>
 		<publisher>Design Systems</publisher>
@@ -20,7 +20,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mcmissile" supported="no">
+	<software name="mcmissile">
 		<description>MC Missile</description>
 		<year>1990</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -33,7 +33,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ssheet" supported="no">
+	<software name="ssheet">
 		<description>Spreadsheet</description>
 		<year>1990</year>
 		<publisher>Psion</publisher>
@@ -45,7 +45,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sysdisk212" cloneof="sysdisk220" supported="no">
+	<software name="sysdisk212" cloneof="sysdisk220">
 		<description>System Disk V2.12</description>
 		<year>1989</year>
 		<publisher>Psion</publisher>
@@ -57,7 +57,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sysdisk220" supported="no">
+	<software name="sysdisk220">
 		<description>System Disk V2.20</description>
 		<year>1989</year>
 		<publisher>Psion</publisher>
@@ -69,7 +69,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sysdisk250" supported="no">
+	<software name="sysdisk250">
 		<description>System Disk (MC Word) V2.50</description>
 		<year>1992</year>
 		<publisher>Psion</publisher>
