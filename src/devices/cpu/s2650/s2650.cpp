@@ -1033,10 +1033,6 @@ void s2650_device::execute_run()
 				M_LOD(m_reg[m_r], RDMEM(m_ea));
 				break;
 
-			case 0x10:      // illegal
-			case 0x11:      // illegal
-				m_icount -= 7;
-				break;
 			case 0x12:      // SPSU
 				m_icount -= 6;
 				M_SPSU();
@@ -1338,10 +1334,6 @@ void s2650_device::execute_run()
 				M_ADD(m_reg[m_r], RDMEM(m_ea));
 				break;
 
-			case 0x90:      // illegal
-			case 0x91:      // illegal
-				m_icount -= 7;
-				break;
 			case 0x92:      // LPSU
 				m_icount -= 6;
 				set_psu((R0 & ~PSU34 & ~SI) | (m_psu & SI));
@@ -1434,10 +1426,6 @@ void s2650_device::execute_run()
 				m_icount -= 9;
 				M_TPSL();
 				break;
-			case 0xb6:      // illegal
-			case 0xb7:      // illegal
-				m_icount -= 7;
-				break;
 
 			case 0xb8:      // BSFR,0 (*)a
 			case 0xb9:      // BSFR,1 (*)a
@@ -1469,13 +1457,6 @@ void s2650_device::execute_run()
 			case 0xc3:      // STRZ,3
 				m_icount -= 6;
 				M_LOD(m_reg[m_r], R0);
-				break;
-
-			case 0xc4:      // illegal
-			case 0xc5:      // illegal
-			case 0xc6:      // illegal
-			case 0xc7:      // illegal
-				m_icount -= 7;
 				break;
 
 			case 0xc8:      // STRR,0 (*)a
@@ -1592,6 +1573,11 @@ void s2650_device::execute_run()
 			case 0xff:      // BDRA,3 (*)a
 				m_icount -= 9;
 				M_BRA(--m_reg[m_r]);
+				break;
+
+			default:        // illegal
+				m_icount -= 6;
+				logerror("%s: illegal opcode $%02X @ $%04X\n", tag(), m_ppc, m_ir);
 				break;
 		}
 	} while (m_icount > 0);
