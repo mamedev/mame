@@ -682,12 +682,12 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Game Drivers
 
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT   CLASS         INIT        SCREEN  COMPANY             FULLNAME          FLAGS
+//    YEAR, NAME,     PARENT, MACHINE,  INPUT,  CLASS,        INIT,       SCREEN, COMPANY,            FULLNAME,         FLAGS
 GAME( 1980, quasar,   0,      quasar,   quasar, quasar_state, empty_init, ROT90,  "Zaccaria / Zelco", "Quasar (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, quasara,  quasar, quasar,   quasar, quasar_state, empty_init, ROT90,  "Zaccaria / Zelco", "Quasar (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

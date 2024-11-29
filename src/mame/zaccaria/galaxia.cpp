@@ -841,13 +841,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Game Drivers
 
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT   MACHINE   INPUT    CLASS           INIT        SCREEN  COMPANY             FULLNAME           FLAGS
+//    YEAR, NAME,     PARENT,  MACHINE,  INPUT,   CLASS,          INIT,       SCREEN, COMPANY,            FULLNAME,          FLAGS
 GAME( 1979, galaxia,  0,       galaxia,  galaxia, galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

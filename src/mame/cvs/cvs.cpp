@@ -92,15 +92,24 @@ TODO:
 - Emulate protection properly in later games (reads area 0x73fx);
 - The board most probably has discrete circuits. Possibly 2 beepers (current
   frequency is completely guessed), and a pitch sweep sound.
+- Is the star generator correct? On photos, it looks like there are more stars
+  overall (higher star density).
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "cvs_base.h"
 
+#include "cpu/s2650/s2650.h"
+#include "machine/gen_latch.h"
+#include "machine/s2636.h"
 #include "sound/beep.h"
+#include "sound/dac.h"
+#include "sound/tms5110.h"
 
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+
 
 // configurable logging
 #define LOG_VIDEOFX     (1U << 1)
@@ -115,21 +124,21 @@ TODO:
 // Turn to 1 so all inputs are always available (this shall only be a debug feature)
 #define CVS_SHOW_ALL_INPUTS 0
 
+
 namespace {
 
-class cvs_state : public cvs_base_state
+class cvs_state : public driver_device
 {
 public:
 	cvs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cvs_base_state(mconfig, type, tag)
-		, m_palette_ram(*this, "palette_ram", 0x10, ENDIANNESS_BIG)
-		, m_character_ram(*this, "character_ram", 3 * 0x800, ENDIANNESS_BIG)
-		, m_4_bit_dac_data(*this, "4bit_dac")
-		, m_tms5110_ctl_data(*this, "tms5110_ctl")
-		, m_sh_trigger(*this, "sh_trigger")
-		, m_speech_data_rom(*this, "speechdata")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_speechcpu(*this, "speechcpu")
+		, m_s2636(*this, "s2636_%u", 0U)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
 		, m_dac2(*this, "dac2")
 		, m_beep(*this, "beep%u", 0)
 		, m_tms5110(*this, "tms")
@@ -137,6 +146,16 @@ public:
 		, m_in(*this, "IN%u", 0U)
 		, m_dsw(*this, "DSW%u", 1U)
 		, m_lamps(*this, "lamp%u", 1U)
+		, m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_BIG)
+		, m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_BIG)
+		, m_palette_ram(*this, "palette_ram", 0x10, ENDIANNESS_BIG)
+		, m_character_ram(*this, "character_ram", 3 * 0x800, ENDIANNESS_BIG)
+		, m_bullet_ram(*this, "bullet_ram")
+		, m_4_bit_dac_data(*this, "4bit_dac")
+		, m_tms5110_ctl_data(*this, "tms5110_ctl")
+		, m_sh_trigger(*this, "sh_trigger")
+		, m_speech_data_rom(*this, "speechdata")
+		, m_ram_view(*this, "video_color_ram_view")
 	{ }
 
 	void init_raiders() ATTR_COLD;
@@ -154,28 +173,19 @@ protected:
 	virtual void device_post_load() override { m_gfxdecode->gfx(1)->mark_all_dirty(); }
 
 private:
-	// memory pointers
-	memory_share_creator<u8> m_palette_ram;
-	memory_share_creator<u8> m_character_ram; // only half is used, but we can use the same gfx_layout like this
-	required_shared_ptr<u8> m_4_bit_dac_data;
-	required_shared_ptr<u8> m_tms5110_ctl_data;
-	required_shared_ptr<u8> m_sh_trigger;
-	required_region_ptr<u8> m_speech_data_rom;
-
-	bitmap_ind16 m_background_bitmap = 0;
-	bitmap_ind16 m_scrolled_collision_background = 0;
-	u8 m_stars_on = 0U;
-	u8 m_scroll_reg = 0U;
-
-	// misc
-	u8 m_protection_counter = 0U;
-	u16 m_character_ram_page_start = 0U;
-	u8 m_character_banking_mode = 0U;
-	u16 m_speech_rom_bit_address = 0U;
+	// max stars is more than it needs to be, to allow experimenting with the star generator
+	static constexpr u16 MAX_STARS = 0x400;
+	static constexpr u16 SPRITE_PEN_BASE = 0x820;
+	static constexpr u16 BULLET_STAR_PEN = 0x828;
 
 	// devices
+	required_device<s2650_device> m_maincpu;
 	required_device<s2650_device> m_audiocpu;
 	required_device<s2650_device> m_speechcpu;
+	required_device_array<s2636_device, 3> m_s2636;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 	required_device<dac_byte_interface> m_dac2;
 	required_device_array<beep_device, 2> m_beep;
 	required_device<tms5110_device> m_tms5110;
@@ -184,36 +194,83 @@ private:
 	required_ioport_array<3> m_dsw;
 	output_finder<2> m_lamps;
 
+	// memory
+	memory_share_creator<u8> m_video_ram;
+	memory_share_creator<u8> m_color_ram;
+	memory_share_creator<u8> m_palette_ram;
+	memory_share_creator<u8> m_character_ram; // only half is used, but we can use the same gfx_layout like this
+	required_shared_ptr<u8> m_bullet_ram;
+	required_shared_ptr<u8> m_4_bit_dac_data;
+	required_shared_ptr<u8> m_tms5110_ctl_data;
+	required_shared_ptr<u8> m_sh_trigger;
+	required_region_ptr<u8> m_speech_data_rom;
+
+	memory_view m_ram_view;
+
+	// misc
+	u8 m_protection_counter = 0;
+	u16 m_character_ram_page_start = 0;
+	u8 m_character_banking_mode = 0;
+	u16 m_speech_rom_bit_address = 0;
+
+	bitmap_ind16 m_background_bitmap = 0;
+	bitmap_ind16 m_collision_background;
+	bitmap_ind16 m_scrolled_collision_background = 0;
+	u8 m_scroll_reg = 0;
+	u8 m_collision = 0;
+
+	// stars
+	u8 m_stars_on = 0;
+	u16 m_stars_scroll = 0;
+	u16 m_total_stars = 0;
+
+	struct star_t
+	{
+		u16 x = 0;
+		u16 y = 0;
+	};
+	star_t m_stars[MAX_STARS];
+
 	void audio_cpu_map(address_map &map) ATTR_COLD;
 	void main_cpu_data_map(address_map &map) ATTR_COLD;
 	void main_cpu_io_map(address_map &map) ATTR_COLD;
 	void main_cpu_map(address_map &map) ATTR_COLD;
 	void speech_cpu_map(address_map &map) ATTR_COLD;
 
-	u8 huncholy_prot_r(offs_t offset);
-	u8 superbik_prot_r();
-	u8 hero_prot_r(offs_t offset);
-	int speech_rom_read_bit();
+	void palette(palette_device &palette) const ATTR_COLD;
+	void set_pens();
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void video_fx_w(u8 data);
+	void scroll_w(u8 data);
+	u8 collision_r();
+	u8 collision_clear_r();
+
+	void init_stars() ATTR_COLD;
+	void update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void scroll_stars(int state);
+
+	template <u8 Which> u8 character_ram_r(offs_t offset);
+	template <u8 Which> void character_ram_w(offs_t offset, u8 data);
+	u8 palette_r(offs_t offset) { return m_palette_ram[offset & 0x0f]; }
+	void palette_w(offs_t offset, u8 data) { m_palette_ram[offset & 0x0f] = data; }
 	void audio_cpu_interrupt(int state);
 	void main_cpu_interrupt(int state);
 	u8 input_r(offs_t offset);
+
+	void _4_bit_dac_data_w(offs_t offset, u8 data);
+	void sh_trigger_w(offs_t offset, u8 data);
+
 	void speech_rom_address_lo_w(u8 data);
 	void speech_rom_address_hi_w(u8 data);
 	u8 speech_command_r();
 	void audio_command_w(u8 data);
-	u8 palette_r(offs_t offset) { return m_palette_ram[offset & 0x0f]; }
-	void palette_w(offs_t offset, u8 data) { m_palette_ram[offset & 0x0f] = data; }
-	void video_fx_w(u8 data);
-	void scroll_w(u8 data);
-	void _4_bit_dac_data_w(offs_t offset, u8 data);
-	void sh_trigger_w(offs_t offset, u8 data);
 	void tms5110_ctl_w(offs_t offset, u8 data);
 	void tms5110_pdc_w(offs_t offset, u8 data);
-	void palette(palette_device &palette) const ATTR_COLD;
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void set_pens();
-	template <u8 Which> u8 character_ram_r(offs_t offset);
-	template <u8 Which> void character_ram_w(offs_t offset, u8 data);
+	int speech_rom_read_bit();
+
+	u8 superbik_prot_r();
+	u8 hero_prot_r(offs_t offset);
+	u8 huncholy_prot_r(offs_t offset);
 };
 
 
@@ -226,9 +283,6 @@ private:
  *                                                    *
  * colours are taken from SRAM and are programmable   *
  ******************************************************/
-
-static constexpr u16 SPRITE_PEN_BASE = 0x820;
-static constexpr u16 BULLET_STAR_PEN = 0x828;
 
 void cvs_state::palette(palette_device &palette) const
 {
@@ -304,6 +358,19 @@ void cvs_state::scroll_w(u8 data)
 }
 
 
+u8 cvs_state::collision_r()
+{
+	return m_collision;
+}
+
+u8 cvs_state::collision_clear_r()
+{
+	if (!machine().side_effects_disabled())
+		m_collision = 0;
+	return 0;
+}
+
+
 void cvs_state::video_start()
 {
 	init_stars();
@@ -323,6 +390,66 @@ void cvs_state::video_start()
 	save_item(NAME(m_scrolled_collision_background));
 }
 
+
+
+/*************************************
+ *
+ *  Stars
+ *
+ *************************************/
+
+void cvs_state::init_stars()
+{
+	u32 generator = 0;
+	m_total_stars = 0;
+
+	// precalculate the star background
+	for (int y = 255; y >= 0; y--)
+	{
+		for (int x = 511; x >= 0; x--)
+		{
+			generator <<= 1;
+			generator |= BIT(~generator, 17) ^ BIT(generator, 5);
+
+			if ((generator & 0x130fe) == 0xfe && m_total_stars != MAX_STARS)
+			{
+				m_stars[m_total_stars].x = x;
+				m_stars[m_total_stars].y = y;
+
+				m_total_stars++;
+			}
+		}
+	}
+}
+
+void cvs_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = 0; offs < m_total_stars; offs++)
+	{
+		u8 x = (m_stars[offs].x + m_stars_scroll) >> 1;
+		u8 y = m_stars[offs].y + ((m_stars_scroll + m_stars[offs].x) >> 9);
+
+		if (BIT(y, 0) ^ BIT(x, 4))
+		{
+			if (cliprect.contains(x, y) && m_palette->pen_indirect(bitmap.pix(y, x)) == 0)
+				bitmap.pix(y, x) = BULLET_STAR_PEN;
+		}
+	}
+}
+
+void cvs_state::scroll_stars(int state)
+{
+	if (state)
+		m_stars_scroll++;
+}
+
+
+
+/*************************************
+ *
+ *  Display refresh
+ *
+ *************************************/
 
 u32 cvs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -444,7 +571,7 @@ u32 cvs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
 
 	// stars circuit
 	if (m_stars_on)
-		update_stars(bitmap, cliprect, BULLET_STAR_PEN, 0);
+		update_stars(bitmap, cliprect);
 
 	return 0;
 }
@@ -541,9 +668,9 @@ void cvs_state::_4_bit_dac_data_w(offs_t offset, u8 data)
 
 	// merge into D0-D3
 	u8 const dac_value = (m_4_bit_dac_data[0] << 0) |
-							  (m_4_bit_dac_data[1] << 1) |
-							  (m_4_bit_dac_data[2] << 2) |
-							  (m_4_bit_dac_data[3] << 3);
+			(m_4_bit_dac_data[1] << 1) |
+			(m_4_bit_dac_data[2] << 2) |
+			(m_4_bit_dac_data[3] << 3);
 
 	// output
 	m_dac2->write(dac_value);
@@ -1155,8 +1282,6 @@ GFXDECODE_END
 
 void cvs_state::machine_start()
 {
-	cvs_base_state::machine_start();
-
 	m_lamps.resolve();
 
 	// register state save
@@ -1164,20 +1289,22 @@ void cvs_state::machine_start()
 	save_item(NAME(m_character_banking_mode));
 	save_item(NAME(m_protection_counter));
 	save_item(NAME(m_speech_rom_bit_address));
-	save_item(NAME(m_stars_on));
 	save_item(NAME(m_scroll_reg));
+	save_item(NAME(m_collision));
+	save_item(NAME(m_stars_on));
+	save_item(NAME(m_stars_scroll));
 }
 
 void cvs_state::machine_reset()
 {
-	cvs_base_state::machine_reset();
-
 	m_character_ram_page_start = 0;
 	m_character_banking_mode = 0;
 	m_speech_rom_bit_address = 0;
 	m_protection_counter = 0;
-	m_stars_on = 0;
 	m_scroll_reg = 0;
+	m_collision = 0;
+	m_stars_on = 0;
+	m_stars_scroll = 0;
 }
 
 void cvs_state::cvs(machine_config &config)
@@ -1214,7 +1341,7 @@ void cvs_state::cvs(machine_config &config)
 	m_screen->set_screen_update(FUNC(cvs_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(cvs_state::main_cpu_interrupt));
-	m_screen->screen_vblank().append(FUNC(cvs_state::scroll_start));
+	m_screen->screen_vblank().append(FUNC(cvs_state::scroll_stars));
 
 	S2636(config, m_s2636[0], 0);
 	m_s2636[0]->set_offsets(-5, -26);
@@ -1856,26 +1983,27 @@ void cvs_state::init_huncholy()
  *
  *************************************/
 
-GAME( 1981, cosmos,    0,        cvs, cosmos,   cvs_state, empty_init,     ROT90, "Century Electronics", "Cosmos", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, darkwar,   0,        cvs, darkwar,  cvs_state, empty_init,     ROT90, "Century Electronics", "Dark Warrior", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, spacefrt,  0,        cvs, spacefrt, cvs_state, empty_init,     ROT90, "Century Electronics", "Space Fortress (CVS)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, 8ball,     0,        cvs, 8ball,    cvs_state, empty_init,     ROT90, "Century Electronics", "Video Eight Ball", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, 8ball1,    8ball,    cvs, 8ball,    cvs_state, empty_init,     ROT90, "Century Electronics", "Video Eight Ball (Rev.1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, logger,    0,        cvs, logger,   cvs_state, empty_init,     ROT90, "Century Electronics", "Logger (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, loggerr2,  logger,   cvs, logger,   cvs_state, empty_init,     ROT90, "Century Electronics (Enter-Tech, Ltd. license)", "Logger (Rev.2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dazzler,   0,        cvs, dazzler,  cvs_state, empty_init,     ROT90, "Century Electronics", "Dazzler", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wallst,    0,        cvs, wallst,   cvs_state, empty_init,     ROT90, "Century Electronics", "Wall Street", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, radarzon,  0,        cvs, radarzon, cvs_state, empty_init,     ROT90, "Century Electronics", "Radar Zone", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, radarzon1, radarzon, cvs, radarzon, cvs_state, empty_init,     ROT90, "Century Electronics", "Radar Zone (Rev.1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, radarzont, radarzon, cvs, radarzon, cvs_state, empty_init,     ROT90, "Century Electronics (Tuni Electro Service license)", "Radar Zone (Tuni)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Tuni Electro Service = predecessor to Enter-Tech
-GAME( 1982, outline,   radarzon, cvs, radarzon, cvs_state, empty_init,     ROT90, "Century Electronics", "Outline", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, goldbug,   0,        cvs, goldbug,  cvs_state, empty_init,     ROT90, "Century Electronics", "Gold Bug", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, diggerc,   0,        cvs, diggerc,  cvs_state, empty_init,     ROT90, "Century Electronics", "Digger (CVS)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, heartatk,  0,        cvs, heartatk, cvs_state, empty_init,     ROT90, "Century Electronics", "Heart Attack", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hunchbak,  0,        cvs, hunchbak, cvs_state, empty_init,     ROT90, "Century Electronics", "Hunchback (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hunchbaka, hunchbak, cvs, hunchbak, cvs_state, init_hunchbaka, ROT90, "Century Electronics", "Hunchback (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, superbik,  0,        cvs, superbik, cvs_state, init_superbik,  ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raiders,   0,        cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raidersr3, raiders,  cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hero,      0,        cvs, hero,     cvs_state, init_hero,      ROT90, "Seatongrove UK, Ltd.", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
-GAME( 1984, huncholy,  0,        cvs, huncholy, cvs_state, init_huncholy,  ROT90, "Seatongrove UK, Ltd.", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE, INPUT,    CLASS,     INIT,           SCREEN, COMPANY,               FULLNAME, FLAGS
+GAME( 1981, cosmos,    0,        cvs,     cosmos,   cvs_state, empty_init,     ROT90,  "Century Electronics", "Cosmos", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, darkwar,   0,        cvs,     darkwar,  cvs_state, empty_init,     ROT90,  "Century Electronics", "Dark Warrior", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, spacefrt,  0,        cvs,     spacefrt, cvs_state, empty_init,     ROT90,  "Century Electronics", "Space Fortress (CVS)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, 8ball,     0,        cvs,     8ball,    cvs_state, empty_init,     ROT90,  "Century Electronics", "Video Eight Ball", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, 8ball1,    8ball,    cvs,     8ball,    cvs_state, empty_init,     ROT90,  "Century Electronics", "Video Eight Ball (Rev.1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, logger,    0,        cvs,     logger,   cvs_state, empty_init,     ROT90,  "Century Electronics", "Logger (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, loggerr2,  logger,   cvs,     logger,   cvs_state, empty_init,     ROT90,  "Century Electronics (Enter-Tech, Ltd. license)", "Logger (Rev.2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dazzler,   0,        cvs,     dazzler,  cvs_state, empty_init,     ROT90,  "Century Electronics", "Dazzler", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wallst,    0,        cvs,     wallst,   cvs_state, empty_init,     ROT90,  "Century Electronics", "Wall Street", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, radarzon,  0,        cvs,     radarzon, cvs_state, empty_init,     ROT90,  "Century Electronics", "Radar Zone", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, radarzon1, radarzon, cvs,     radarzon, cvs_state, empty_init,     ROT90,  "Century Electronics", "Radar Zone (Rev.1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, radarzont, radarzon, cvs,     radarzon, cvs_state, empty_init,     ROT90,  "Century Electronics (Tuni Electro Service license)", "Radar Zone (Tuni)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Tuni Electro Service = predecessor to Enter-Tech
+GAME( 1982, outline,   radarzon, cvs,     radarzon, cvs_state, empty_init,     ROT90,  "Century Electronics", "Outline", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, goldbug,   0,        cvs,     goldbug,  cvs_state, empty_init,     ROT90,  "Century Electronics", "Gold Bug", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, diggerc,   0,        cvs,     diggerc,  cvs_state, empty_init,     ROT90,  "Century Electronics", "Digger (CVS)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, heartatk,  0,        cvs,     heartatk, cvs_state, empty_init,     ROT90,  "Century Electronics", "Heart Attack", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hunchbak,  0,        cvs,     hunchbak, cvs_state, empty_init,     ROT90,  "Century Electronics", "Hunchback (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hunchbaka, hunchbak, cvs,     hunchbak, cvs_state, init_hunchbaka, ROT90,  "Century Electronics", "Hunchback (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, superbik,  0,        cvs,     superbik, cvs_state, init_superbik,  ROT90,  "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raiders,   0,        cvs,     raiders,  cvs_state, init_raiders,   ROT90,  "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raidersr3, raiders,  cvs,     raiders,  cvs_state, init_raiders,   ROT90,  "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hero,      0,        cvs,     hero,     cvs_state, init_hero,      ROT90,  "Seatongrove UK, Ltd.", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
+GAME( 1984, huncholy,  0,        cvs,     huncholy, cvs_state, init_huncholy,  ROT90,  "Seatongrove UK, Ltd.", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
