@@ -567,4 +567,4 @@ ROM_END
 } // anonymous namespace
 
 // The region comes from the EEPROM? so will need clones like FixEight
-GAME( 1993, dt7,         0,        dt7,          dt7,        dt7_state,empty_init, ROT270, "Toaplan",         "DT7 (prototype)",              MACHINE_NOT_WORKING )
+GAME( 1993, dt7,         0,        dt7,          dt7,        dt7_state,empty_init, ROT270, "Toaplan",         "DT7 (prototype)",              MACHINE_NOT_WORKING ) // flyer shows "Survival Battle Dynamic Trial 7"
