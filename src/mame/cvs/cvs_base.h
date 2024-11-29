@@ -55,7 +55,7 @@ protected:
 	bitmap_ind16 m_collision_background;
 	uint8_t m_collision = 0U;
 	uint16_t m_total_stars = 0U;
-	int32_t m_stars_scroll = 0U;
+	uint8_t m_stars_scroll = 0U;
 
 	// devices
 	required_device<s2650_device> m_maincpu;

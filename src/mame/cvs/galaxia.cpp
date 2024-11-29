@@ -69,12 +69,11 @@ TODO:
 - Are there other versions of galaxia with different colors? The alternate sets
   in MAME took the gfx roms from the parent, but there are references online
   showing that not all versions look alike.
-- go through everything in the schematics for astrowar / galaxia
 - support screen raw params, blanking is much like how laserbat hardware does it
   and is needed to correct the speed in all machines
 - provide accurate sprite/bg sync in astrowar
-- provide correct color/star generation, using info from Galaxia technical
-  manual and schematics
+- improve starfield: density, blink rate, x repeat of 240, and the checkerboard
+  pattern (fast forward MAME to see) are all correct, the RNG is not right
 - add sound board emulation (info is in the schematics)
 
 */
@@ -116,6 +115,10 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
+	// max stars is more than it needs to be, to allow experimenting with the star generator
+	static constexpr uint16_t MAX_STARS = 0x800;
+	static constexpr uint8_t STAR_PEN = 0x18;
+
 	// devices
 	required_device<s2650_device> m_maincpu;
 	optional_device_array<s2636_device, 3> m_s2636;
@@ -131,8 +134,19 @@ protected:
 	memory_view m_ram_view;
 
 	bitmap_ind16 m_temp_bitmap;
-	uint8_t m_collision = 0U;
 	tilemap_t *m_bg_tilemap = nullptr;
+
+	uint8_t m_collision = 0;
+	uint16_t m_stars_scroll = 0;
+	uint16_t m_total_stars = 0;
+
+	struct star_t
+	{
+		uint16_t x = 0;
+		uint16_t y = 0;
+		uint8_t color = 0;
+	};
+	star_t m_stars[MAX_STARS];
 
 	template <uint8_t Which> void video_w(offs_t offset, uint8_t data);
 	void data_map(address_map &map) ATTR_COLD;
@@ -140,12 +154,16 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
+	void stars_palette(palette_device &palette) const ATTR_COLD;
 	virtual void palette(palette_device &palette) const ATTR_COLD;
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void mem_map(address_map &map) ATTR_COLD;
 
-private:
+	void scroll_stars(int state);
+	void init_stars() ATTR_COLD;
+	void update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void scroll_w(uint8_t data);
 	uint8_t collision_r();
 	uint8_t collision_clear_r();
@@ -172,20 +190,35 @@ protected:
 void galaxia_state::machine_start()
 {
 	save_item(NAME(m_collision));
+	save_item(NAME(m_stars_scroll));
 }
 
 void galaxia_state::machine_reset()
 {
 	m_collision = 0;
+	m_stars_scroll = 0;
 }
 
 
 
 /*******************************************************************************
 
-  Video
+  Palette
 
 *******************************************************************************/
+
+void galaxia_state::stars_palette(palette_device &palette) const
+{
+	// 6bpp pens for the stars
+	for (int i = 0; i < 0x40; i++)
+	{
+		int b = pal2bit(BIT(i, 1) << 1 | BIT(i, 0));
+		int g = pal2bit(BIT(i, 3) << 1 | BIT(i, 2));
+		int r = pal2bit(BIT(i, 5) << 1 | BIT(i, 4));
+
+		palette.set_pen_color(i + STAR_PEN, r, g, b);
+	}
+}
 
 void galaxia_state::palette(palette_device &palette) const
 {
@@ -207,6 +240,7 @@ void galaxia_state::palette(palette_device &palette) const
 		palette.set_pen_color(i | 0x10, pal1bit(BIT(data, 2)), pal1bit(BIT(data, 1)), pal1bit(BIT(data, 0)));
 	}
 
+	stars_palette(palette);
 }
 
 void astrowar_state::palette(palette_device &palette) const
@@ -220,7 +254,74 @@ void astrowar_state::palette(palette_device &palette) const
 		// sprites
 		palette.set_pen_color(i | 0x10, pal1bit(BIT(i, 0)), pal1bit(BIT(i, 1)), pal1bit(BIT(i, 2)));
 	}
+
+	stars_palette(palette);
 }
+
+
+
+/*******************************************************************************
+
+  Stars
+
+*******************************************************************************/
+
+void galaxia_state::init_stars()
+{
+	uint32_t generator = 0;
+	m_total_stars = 0;
+
+	// precalculate the star background
+	for (int y = 0; y < 272; y++)
+	{
+		for (int x = 0; x < 480; x++)
+		{
+			generator <<= 1;
+			generator |= BIT(~generator, 17) ^ BIT(generator, 5);
+
+			// stars are enabled if the shift register output is 0, and bits 1-7 are set
+			if ((generator & 0x200fe) == 0xfe && m_total_stars != MAX_STARS)
+			{
+				m_stars[m_total_stars].x = x;
+				m_stars[m_total_stars].y = y;
+				m_stars[m_total_stars].color = generator >> 8 & 0x3f;
+
+				m_total_stars++;
+			}
+		}
+	}
+}
+
+void galaxia_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = 0; offs < m_total_stars; offs++)
+	{
+		uint8_t x = ((m_stars[offs].x + m_stars_scroll) >> 1) % 240;
+		uint16_t y = m_stars[offs].y;
+
+		if ((BIT(y, 4) ^ BIT(y, 8) ^ BIT(x, 5)))
+		{
+			if (cliprect.contains(x, y))
+				bitmap.pix(y, x) = STAR_PEN + m_stars[offs].color;
+		}
+	}
+}
+
+void galaxia_state::scroll_stars(int state)
+{
+	if (state)
+		m_stars_scroll++;
+
+	m_stars_scroll %= 480;
+}
+
+
+
+/*******************************************************************************
+
+  Background
+
+*******************************************************************************/
 
 TILE_GET_INFO_MEMBER(galaxia_state::get_bg_tile_info)
 {
@@ -232,7 +333,7 @@ TILE_GET_INFO_MEMBER(galaxia_state::get_bg_tile_info)
 
 void galaxia_state::video_start()
 {
-	//init_stars();
+	init_stars();
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxia_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
@@ -250,12 +351,10 @@ static GFXDECODE_START( gfx_astrowar )
 GFXDECODE_END
 
 
-/********************************************************************************/
-
 void galaxia_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	//update_stars(bitmap, cliprect, 0x18, 1);
+	update_stars(bitmap, cliprect);
 
 	// tilemap doesn't wrap
 	rectangle bg_clip = cliprect;
@@ -266,6 +365,14 @@ void galaxia_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 	m_bg_tilemap->draw(screen, m_temp_bitmap, bg_clip, 0);
 	copybitmap_trans(bitmap, m_temp_bitmap, 0, 0, 0, 0, cliprect, 0);
 }
+
+
+
+/*******************************************************************************
+
+  Screen Update
+
+*******************************************************************************/
 
 uint32_t galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -585,10 +692,10 @@ void galaxia_state::galaxia(machine_config &config)
 	m_screen->set_screen_update(FUNC(galaxia_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
-	//m_screen->screen_vblank().append(FUNC(galaxia_state::scroll_stars));
+	m_screen->screen_vblank().append(FUNC(galaxia_state::scroll_stars));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxia);
-	PALETTE(config, m_palette, FUNC(galaxia_state::palette), 0x18);
+	PALETTE(config, m_palette, FUNC(galaxia_state::palette), 0x18 + 0x40);
 
 	S2636(config, m_s2636[0], 0);
 	m_s2636[0]->set_offsets(3, -26);

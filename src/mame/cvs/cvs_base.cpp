@@ -58,7 +58,7 @@ void cvs_base_state::init_stars()
 			generator <<= 1;
 			generator |= BIT(~generator, 17) ^ BIT(generator, 5);
 
-			if ((generator & 0x130fe) == 0xfe)
+			if ((generator & 0x130fe) == 0xfe && m_total_stars != CVS_MAX_STARS)
 			{
 				m_stars[m_total_stars].x = x;
 				m_stars[m_total_stars].y = y;
@@ -68,8 +68,6 @@ void cvs_base_state::init_stars()
 			}
 		}
 	}
-
-	assert(m_total_stars == 128);
 }
 
 void cvs_base_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always)
