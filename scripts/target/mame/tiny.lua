@@ -152,6 +152,8 @@ files{
 	MAME_DIR .. "src/mame/midway/gridlee_v.cpp",
 	MAME_DIR .. "src/mame/shared/s11c_bg.cpp",
 	MAME_DIR .. "src/mame/shared/s11c_bg.h",
+	MAME_DIR .. "src/mame/shared/williamsblitter.cpp",
+	MAME_DIR .. "src/mame/shared/williamsblitter.h",
 	MAME_DIR .. "src/mame/shared/williamssound.cpp",
 	MAME_DIR .. "src/mame/shared/williamssound.h",
 	MAME_DIR .. "src/mame/midway/williams.cpp",

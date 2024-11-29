@@ -148,7 +148,7 @@ void wmg_state::wmg_cpu1(address_map &map)
 	m_io_view[0](0xc804, 0xc807).r(FUNC(wmg_state::wmg_pia_0_r)).w(m_pia[0], FUNC(pia6821_device::write));
 	m_io_view[0](0xc80c, 0xc80f).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	m_io_view[0](0xc900, 0xc9ff).nopr().w(FUNC(wmg_state::wmg_vram_select_w));
-	m_io_view[0](0xca00, 0xca07).w(FUNC(wmg_state::blitter_w));
+	m_io_view[0](0xca00, 0xca07).m(m_blitter, FUNC(williams_blitter_device::map));
 	m_io_view[0](0xcb00, 0xcbff).r(FUNC(wmg_state::video_counter_r));
 	m_io_view[0](0xcbff, 0xcbff).w(FUNC(wmg_state::watchdog_reset_w));
 	m_io_view[0](0xcc00, 0xcfff).bankrw(m_nvrambank);
@@ -539,8 +539,7 @@ void wmg_state::wmg(machine_config &config)
 	pia2.irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
 	pia2.irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
+	WILLIAMS_BLITTER_SC1(config, m_blitter, 0xc000, m_maincpu, m_videoram);
 }
 
 /*************************************
