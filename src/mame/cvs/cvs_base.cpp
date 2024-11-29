@@ -24,12 +24,12 @@ void cvs_base_state::machine_reset()
 
 // collision register accesors
 
-uint8_t cvs_base_state::collision_r()
+u8 cvs_base_state::collision_r()
 {
 	return m_collision;
 }
 
-uint8_t cvs_base_state::collision_clear_r()
+u8 cvs_base_state::collision_clear_r()
 {
 	if (!machine().side_effects_disabled())
 		m_collision = 0;
@@ -47,7 +47,7 @@ void cvs_base_state::scroll_start(int state)
 
 void cvs_base_state::init_stars()
 {
-	uint32_t generator = 0;
+	u32 generator = 0;
 	m_total_stars = 0;
 
 	// precalculate the star background
@@ -74,8 +74,8 @@ void cvs_base_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	for (int offs = 0; offs < m_total_stars; offs++)
 	{
-		uint8_t x = (m_stars[offs].x + m_stars_scroll) >> 1;
-		uint8_t y = m_stars[offs].y + ((m_stars_scroll + m_stars[offs].x) >> 9);
+		u8 x = (m_stars[offs].x + m_stars_scroll) >> 1;
+		u8 y = m_stars[offs].y + ((m_stars_scroll + m_stars[offs].x) >> 9);
 
 		if (BIT(y, 0) ^ BIT(x, 4))
 		{

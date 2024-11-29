@@ -116,8 +116,8 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	// max stars is more than it needs to be, to allow experimenting with the star generator
-	static constexpr uint16_t MAX_STARS = 0x800;
-	static constexpr uint8_t STAR_PEN = 0x18;
+	static constexpr u16 MAX_STARS = 0x800;
+	static constexpr u8 STAR_PEN = 0x18;
 
 	// devices
 	required_device<s2650_device> m_maincpu;
@@ -127,28 +127,28 @@ protected:
 	required_device<palette_device> m_palette;
 
 	// memory
-	memory_share_creator<uint8_t> m_video_ram;
-	memory_share_creator<uint8_t> m_color_ram;
-	required_shared_ptr<uint8_t> m_bullet_ram;
+	memory_share_creator<u8> m_video_ram;
+	memory_share_creator<u8> m_color_ram;
+	required_shared_ptr<u8> m_bullet_ram;
 
 	memory_view m_ram_view;
 
 	bitmap_ind16 m_temp_bitmap;
 	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t m_collision = 0;
-	uint16_t m_stars_scroll = 0;
-	uint16_t m_total_stars = 0;
+	u8 m_collision = 0;
+	u16 m_stars_scroll = 0;
+	u16 m_total_stars = 0;
 
 	struct star_t
 	{
-		uint16_t x = 0;
-		uint16_t y = 0;
-		uint8_t color = 0;
+		u16 x = 0;
+		u16 y = 0;
+		u8 color = 0;
 	};
 	star_t m_stars[MAX_STARS];
 
-	template <uint8_t Which> void video_w(offs_t offset, uint8_t data);
+	template <u8 Which> void video_w(offs_t offset, u8 data);
 	void data_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -157,18 +157,18 @@ protected:
 	void stars_palette(palette_device &palette) const ATTR_COLD;
 	virtual void palette(palette_device &palette) const ATTR_COLD;
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void mem_map(address_map &map) ATTR_COLD;
 
 	void scroll_stars(int state);
 	void init_stars() ATTR_COLD;
 	void update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void scroll_w(uint8_t data);
-	uint8_t collision_r();
-	uint8_t collision_clear_r();
-	void ctrlport_w(uint8_t data);
-	void dataport_w(uint8_t data);
+	void scroll_w(u8 data);
+	u8 collision_r();
+	u8 collision_clear_r();
+	void ctrlport_w(u8 data);
+	void dataport_w(u8 data);
 };
 
 class astrowar_state : public galaxia_state
@@ -182,7 +182,7 @@ public:
 
 protected:
 	virtual void palette(palette_device &palette) const override ATTR_COLD;
-	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void mem_map(address_map &map) override ATTR_COLD;
 };
 
@@ -222,13 +222,13 @@ void galaxia_state::stars_palette(palette_device &palette) const
 
 void galaxia_state::palette(palette_device &palette) const
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	u8 const *const color_prom = memregion("proms")->base();
 
 	// background from A5-A8
 	for (int i = 0; i < 0x10; i++)
 	{
 		int index = bitswap<4>(i, 0, 1, 2, 3) << 5;
-		uint8_t data = color_prom[index];
+		u8 data = color_prom[index];
 
 		palette.set_pen_color(i, pal1bit(BIT(data, 0)), pal1bit(BIT(data, 1)), pal1bit(BIT(data, 2)));
 	}
@@ -236,7 +236,7 @@ void galaxia_state::palette(palette_device &palette) const
 	// sprites from A0-A3
 	for (int i = 0; i < 8; i++)
 	{
-		uint8_t data = ~color_prom[i] & 7;
+		u8 data = ~color_prom[i] & 7;
 		palette.set_pen_color(i | 0x10, pal1bit(BIT(data, 2)), pal1bit(BIT(data, 1)), pal1bit(BIT(data, 0)));
 	}
 
@@ -268,7 +268,7 @@ void astrowar_state::palette(palette_device &palette) const
 
 void galaxia_state::init_stars()
 {
-	uint32_t generator = 0;
+	u32 generator = 0;
 	m_total_stars = 0;
 
 	// precalculate the star background
@@ -296,8 +296,8 @@ void galaxia_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect
 {
 	for (int offs = 0; offs < m_total_stars; offs++)
 	{
-		uint8_t x = ((m_stars[offs].x + m_stars_scroll) >> 1) % 240;
-		uint16_t y = m_stars[offs].y;
+		u8 x = ((m_stars[offs].x + m_stars_scroll) >> 1) % 240;
+		u16 y = m_stars[offs].y;
 
 		if ((BIT(y, 4) ^ BIT(y, 8) ^ BIT(x, 5)))
 		{
@@ -325,8 +325,8 @@ void galaxia_state::scroll_stars(int state)
 
 TILE_GET_INFO_MEMBER(galaxia_state::get_bg_tile_info)
 {
-	uint8_t code = m_video_ram[tile_index]; // d7 unused for galaxia
-	uint8_t color = m_color_ram[tile_index]; // highest bits unused
+	u8 code = m_video_ram[tile_index]; // d7 unused for galaxia
+	u8 color = m_color_ram[tile_index]; // highest bits unused
 
 	tileinfo.set(0, code, color, 0);
 }
@@ -374,7 +374,7 @@ void galaxia_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 
 *******************************************************************************/
 
-uint32_t galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 const &s2636_0_bitmap = m_s2636[0]->update(cliprect);
 	bitmap_ind16 const &s2636_1_bitmap = m_s2636[1]->update(cliprect);
@@ -435,7 +435,7 @@ uint32_t galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-uint32_t astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// astrowar has only one S2636
 	bitmap_ind16 const &s2636_0_bitmap = m_s2636[0]->update(cliprect);
@@ -497,26 +497,26 @@ uint32_t astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 *******************************************************************************/
 
-template <uint8_t Which>
-void galaxia_state::video_w(offs_t offset, uint8_t data)
+template <u8 Which>
+void galaxia_state::video_w(offs_t offset, u8 data)
 {
 	m_bg_tilemap->mark_tile_dirty(offset);
 	Which ? m_video_ram[offset] = data : m_color_ram[offset] = data;
 }
 
-void galaxia_state::scroll_w(uint8_t data)
+void galaxia_state::scroll_w(u8 data)
 {
 	// fixed scrolling area
 	for (int i = 1; i < 6; i++)
 		m_bg_tilemap->set_scrolly(i, data);
 }
 
-uint8_t galaxia_state::collision_r()
+u8 galaxia_state::collision_r()
 {
 	return m_collision;
 }
 
-uint8_t galaxia_state::collision_clear_r()
+u8 galaxia_state::collision_clear_r()
 {
 	if (!machine().side_effects_disabled())
 		m_collision = 0;
@@ -524,7 +524,7 @@ uint8_t galaxia_state::collision_clear_r()
 	return 0;
 }
 
-void galaxia_state::ctrlport_w(uint8_t data)
+void galaxia_state::ctrlport_w(u8 data)
 {
 	// d0: triggers on every new credit
 	// d1: coin counter? if you put a coin in slot A, galaxia constantly
@@ -534,7 +534,7 @@ void galaxia_state::ctrlport_w(uint8_t data)
 	// other bits: unknown
 }
 
-void galaxia_state::dataport_w(uint8_t data)
+void galaxia_state::dataport_w(u8 data)
 {
 	// seems to be related to sound board comms
 }

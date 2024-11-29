@@ -38,9 +38,7 @@ protected:
 		, m_ram_view(*this, "video_color_ram_view")
 	{ }
 
-	static inline constexpr uint8_t CVS_MAX_STARS = 128;
-	static inline constexpr int8_t CVS_S2636_Y_OFFSET = -5;
-	static inline constexpr int8_t CVS_S2636_X_OFFSET = -26;
+	static inline constexpr u8 CVS_MAX_STARS = 128;
 
 	struct cvs_star
 	{
@@ -48,14 +46,14 @@ protected:
 	};
 
 	// memory pointers
-	required_shared_ptr<uint8_t> m_bullet_ram;
+	required_shared_ptr<u8> m_bullet_ram;
 
 	// video-related
 	cvs_star m_stars[CVS_MAX_STARS];
 	bitmap_ind16 m_collision_background;
-	uint8_t m_collision = 0U;
-	uint16_t m_total_stars = 0U;
-	uint8_t m_stars_scroll = 0U;
+	u8 m_collision = 0U;
+	u16 m_total_stars = 0U;
+	u8 m_stars_scroll = 0U;
 
 	// devices
 	required_device<s2650_device> m_maincpu;
@@ -65,16 +63,16 @@ protected:
 	required_device<palette_device> m_palette;
 
 	// memory
-	memory_share_creator<uint8_t> m_video_ram;
-	memory_share_creator<uint8_t> m_color_ram;
+	memory_share_creator<u8> m_video_ram;
+	memory_share_creator<u8> m_color_ram;
 
 	memory_view m_ram_view;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint8_t collision_r();
-	uint8_t collision_clear_r();
+	u8 collision_r();
+	u8 collision_clear_r();
 	void scroll_start(int state);
 	void init_stars() ATTR_COLD;
 	void update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always);

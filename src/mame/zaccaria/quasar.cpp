@@ -98,30 +98,30 @@ private:
 	required_ioport_array<3> m_dsw;
 
 	// memory
-	memory_share_creator<uint8_t> m_video_ram;
-	memory_share_creator<uint8_t> m_color_ram;
-	memory_share_creator<uint8_t> m_effectram;
-	required_shared_ptr<uint8_t> m_bullet_ram;
+	memory_share_creator<u8> m_video_ram;
+	memory_share_creator<u8> m_color_ram;
+	memory_share_creator<u8> m_effectram;
+	required_shared_ptr<u8> m_bullet_ram;
 
 	bitmap_ind16 m_collision_background;
-	uint8_t m_collision = 0U;
-	uint8_t m_effectcontrol = 0U;
+	u8 m_collision = 0U;
+	u8 m_effectcontrol = 0U;
 
-	uint8_t m_page = 0U;
-	uint8_t m_io_page = 0U;
+	u8 m_page = 0U;
+	u8 m_io_page = 0U;
 
-	void video_page_select_w(offs_t offset, uint8_t data);
-	void io_page_select_w(offs_t offset, uint8_t data);
-	void video_w(offs_t offset, uint8_t data);
-	uint8_t io_r();
-	void bullet_w(offs_t offset, uint8_t data);
-	uint8_t collision_r();
-	uint8_t collision_clear_r();
-	void sh_command_w(uint8_t data);
-	uint8_t sh_command_r();
+	void video_page_select_w(offs_t offset, u8 data);
+	void io_page_select_w(offs_t offset, u8 data);
+	void video_w(offs_t offset, u8 data);
+	u8 io_r();
+	void bullet_w(offs_t offset, u8 data);
+	u8 collision_r();
+	u8 collision_clear_r();
+	void sh_command_w(u8 data);
+	u8 sh_command_r();
 	int audio_t1_r();
 	void palette(palette_device &palette) const ATTR_COLD;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void program(address_map &map) ATTR_COLD;
 	void data(address_map &map) ATTR_COLD;
@@ -156,7 +156,7 @@ void quasar_state::machine_reset()
 
 void quasar_state::palette(palette_device &palette) const
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	u8 const *const color_prom = memregion("proms")->base();
 
 	// standard 1 bit per color palette (background and sprites)
 	for (int i = 0; i < 8; i++)
@@ -219,14 +219,14 @@ void quasar_state::video_start()
 	save_item(NAME(m_collision_background));
 }
 
-uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// for every character in the video RAM
 	for (int offs = 0; offs < 0x0400; offs++)
 	{
-		uint8_t const code = m_video_ram[offs];
-		uint8_t const x = (offs & 0x1f) << 3;
-		uint8_t const y = (offs >> 5) << 3;
+		u8 const code = m_video_ram[offs];
+		u8 const x = (offs & 0x1f) << 3;
+		u8 const y = (offs >> 5) << 3;
 
 		// While we have the current character code, draw the effects layer
 		// intensity / on and off controlled by latch
@@ -320,12 +320,12 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 *******************************************************************************/
 
-void quasar_state::video_page_select_w(offs_t offset, uint8_t data)
+void quasar_state::video_page_select_w(offs_t offset, u8 data)
 {
 	m_page = offset & 0x03;
 }
 
-void quasar_state::io_page_select_w(offs_t offset, uint8_t data)
+void quasar_state::io_page_select_w(offs_t offset, u8 data)
 {
 	m_io_page = offset & 0x03;
 
@@ -337,7 +337,7 @@ void quasar_state::io_page_select_w(offs_t offset, uint8_t data)
 	}
 }
 
-void quasar_state::video_w(offs_t offset, uint8_t data)
+void quasar_state::video_w(offs_t offset, u8 data)
 {
 	switch (m_page)
 	{
@@ -348,9 +348,9 @@ void quasar_state::video_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t quasar_state::io_r()
+u8 quasar_state::io_r()
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
 	switch (m_io_page)
 	{
@@ -363,17 +363,17 @@ uint8_t quasar_state::io_r()
 	return data;
 }
 
-void quasar_state::bullet_w(offs_t offset, uint8_t data)
+void quasar_state::bullet_w(offs_t offset, u8 data)
 {
 	m_bullet_ram[offset] = data ^ 0xff;
 }
 
-uint8_t quasar_state::collision_r()
+u8 quasar_state::collision_r()
 {
 	return m_collision;
 }
 
-uint8_t quasar_state::collision_clear_r()
+u8 quasar_state::collision_clear_r()
 {
 	if (!machine().side_effects_disabled())
 		m_collision = 0;
@@ -417,7 +417,7 @@ void quasar_state::data(address_map &map)
 
 *******************************************************************************/
 
-void quasar_state::sh_command_w(uint8_t data)
+void quasar_state::sh_command_w(u8 data)
 {
 	// bit 4 = Sound Invader : Linked to an NE555V circuit
 	// Not handled yet
@@ -426,7 +426,7 @@ void quasar_state::sh_command_w(uint8_t data)
 	m_soundlatch->write(data & 0xf);
 }
 
-uint8_t quasar_state::sh_command_r()
+u8 quasar_state::sh_command_r()
 {
 	return m_soundlatch->read() | (m_dsw[2]->read() & 0x30);
 }
