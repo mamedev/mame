@@ -148,6 +148,7 @@ void quasar_state::machine_reset()
 }
 
 
+
 /*******************************************************************************
 
   Video
@@ -310,6 +311,7 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
+
 /*******************************************************************************
 
   Quasar memory layout
@@ -409,6 +411,7 @@ void quasar_state::data(address_map &map)
 }
 
 
+
 /*******************************************************************************
 
   Sound board memory handlers
@@ -445,6 +448,7 @@ void quasar_state::sound_portmap(address_map &map)
 	map(0x00, 0x7f).ram();
 	map(0x80, 0x80).r(FUNC(quasar_state::sh_command_r));
 }
+
 
 
 /*******************************************************************************
@@ -551,6 +555,7 @@ static GFXDECODE_START( gfx_quasar )
 GFXDECODE_END
 
 
+
 /*******************************************************************************
 
   Machine Configuration
@@ -579,7 +584,7 @@ void quasar_state::quasar(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_refresh_hz(50); // from dot clock
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3500));
-	m_screen->set_size(256, 256);
+	m_screen->set_size(256, 312);
 	m_screen->set_visarea(1*8+1, 29*8-1, 2*8, 32*8-1);
 	m_screen->set_screen_update(FUNC(quasar_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -605,6 +610,7 @@ void quasar_state::quasar(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.2); // LM1408
 }
+
 
 
 /*******************************************************************************

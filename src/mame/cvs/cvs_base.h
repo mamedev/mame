@@ -29,7 +29,7 @@ protected:
 		: driver_device(mconfig, type, tag)
 		, m_bullet_ram(*this, "bullet_ram")
 		, m_maincpu(*this, "maincpu")
-		, m_s2636(*this, "s2636%u", 0U)
+		, m_s2636(*this, "s2636_%u", 0U)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")

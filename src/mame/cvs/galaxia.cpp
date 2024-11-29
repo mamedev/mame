@@ -51,14 +51,7 @@ Quick PCB sketch:
 Astro Wars (port of Astro Fighter) is on a stripped down board of Galaxia,
 using only one 2636 chip, less RAM, and no PROM.
 
-Manual and Schematic for Galaxia can be found at:
-http://www.zzzaccaria.com/manuals/SuperGalaxiansTechnicalManual.zip
-http://www.zzzaccaria.com/manuals/GalaxiaSchematics.zip
-
-The manual for Astro Wars can also be found at:
-http://www.opdenkelder.com/Astrowars_manual.zip
-
-HW has many similarities with quasar.cpp / cvs.cpp / zac2650.cpp
+HW has many similarities with quasar.cpp / cvs.cpp / zac1b1120.cpp
 real hardware video of Astro Wars can be seen here: youtu.be/eSrQFBMeDlM
 
 --------------------------------------------------------------------------------
@@ -102,25 +95,27 @@ public:
 
 	void galaxia(machine_config &config) ATTR_COLD;
 
-	void init_common() ATTR_COLD;
-
 protected:
 	virtual void video_start() override ATTR_COLD;
 
+	bitmap_ind16 m_temp_bitmap;
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	template <uint8_t Which> void video_w(offs_t offset, uint8_t data);
 	void data_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	virtual void palette(palette_device &palette) const ATTR_COLD;
+	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual void mem_map(address_map &map) ATTR_COLD;
+
 private:
 	void scroll_w(uint8_t data);
 	void ctrlport_w(uint8_t data);
 	void dataport_w(uint8_t data);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void palette(palette_device &palette) const ATTR_COLD;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mem_map(address_map &map) ATTR_COLD;
 };
 
 class astrowar_state : public galaxia_state
@@ -133,14 +128,9 @@ public:
 	void astrowar(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void video_start() override ATTR_COLD;
-
-private:
-	bitmap_ind16 m_temp_bitmap;
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void palette(palette_device &palette) const ATTR_COLD;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mem_map(address_map &map) ATTR_COLD;
+	virtual void palette(palette_device &palette) const override ATTR_COLD;
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	virtual void mem_map(address_map &map) override ATTR_COLD;
 };
 
 
@@ -149,11 +139,6 @@ private:
   Video
 
 *******************************************************************************/
-
-static constexpr uint8_t SPRITE_PEN_BASE = 0x10;
-static constexpr uint8_t STAR_PEN = 0x18;
-static constexpr uint8_t BULLET_PEN = 0x19;
-
 
 // Colors are 3bpp, but how they are generated is a mystery
 // there's no color PROM on the PCB, nor palette RAM
@@ -174,78 +159,65 @@ void galaxia_state::palette(palette_device &palette) const
 
 	for (int i = 0; i < 0x18; i++)
 		palette.set_pen_color(i, pal1bit(lut_clr[i] >> 0), pal1bit(lut_clr[i] >> 1), pal1bit(lut_clr[i] >> 2));
-
-	// stars/bullets
-	palette.set_pen_color(STAR_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
-	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
 }
 
 void astrowar_state::palette(palette_device &palette) const
 {
-	// no reference material available(?), except for Data East astrof
-	constexpr int lut_clr[8] = { 7, 3, 5, 1, 4, 2, 6, 7 };
-
 	for (int i = 0; i < 8; i++)
 	{
 		// background
 		palette.set_pen_color(i * 2, 0, 0, 0);
-		palette.set_pen_color(i * 2 + 1, pal1bit(lut_clr[i] >> 0), pal1bit(lut_clr[i] >> 1), pal1bit(lut_clr[i] >> 2));
+		palette.set_pen_color(i * 2 + 1, pal1bit(BIT(~i, 2)), pal1bit(BIT(~i, 1)), pal1bit(BIT(~i, 0)));
 
 		// sprites
-		palette.set_pen_color(i | SPRITE_PEN_BASE, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette.set_pen_color(i | 0x10, pal1bit(BIT(i, 0)), pal1bit(BIT(i, 1)), pal1bit(BIT(i, 2)));
 	}
-
-	// stars/bullets
-	palette.set_pen_color(STAR_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
-	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
 }
 
 TILE_GET_INFO_MEMBER(galaxia_state::get_bg_tile_info)
 {
-	uint8_t code = m_video_ram[tile_index] & 0x7f; // d7 unused
-	uint8_t color = m_color_ram[tile_index] & 3; // highest bits unused
+	uint8_t code = m_video_ram[tile_index]; // d7 unused for galaxia
+	uint8_t color = m_color_ram[tile_index]; // highest bits unused
 
 	tileinfo.set(0, code, color, 0);
-}
-
-TILE_GET_INFO_MEMBER(astrowar_state::get_bg_tile_info)
-{
-	uint8_t code = m_video_ram[tile_index];
-	uint8_t color = m_color_ram[tile_index] & 7; // highest bits unused
-
-	tileinfo.set(0, code, color, 0);
-}
-
-void galaxia_state::init_common()
-{
-	assert((STAR_PEN & 7) == 0);
-	init_stars();
 }
 
 void galaxia_state::video_start()
 {
-	init_common();
+	//init_stars();
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxia_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(8);
 
-}
-
-void astrowar_state::video_start()
-{
-	init_common();
-
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(astrowar_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg_tilemap->set_transparent_pen(0);
-	m_bg_tilemap->set_scroll_cols(8);
-	m_bg_tilemap->set_scrolldx(8, 8);
-
 	m_screen->register_screen_bitmap(m_temp_bitmap);
 }
 
+static GFXDECODE_START( gfx_galaxia )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x2_planar, 0, 4 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_astrowar )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x1, 0, 8 )
+GFXDECODE_END
+
 
 /********************************************************************************/
+
+void galaxia_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	//update_stars(bitmap, cliprect, 0x18, 1);
+
+	// tilemap doesn't wrap
+	rectangle bg_clip = cliprect;
+	bg_clip.max_y = 32*8-1;
+	bg_clip &= cliprect;
+
+	m_temp_bitmap.fill(0, cliprect);
+	m_bg_tilemap->draw(screen, m_temp_bitmap, bg_clip, 0);
+	copybitmap_trans(bitmap, m_temp_bitmap, 0, 0, 0, 0, cliprect, 0);
+}
 
 uint32_t galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -253,16 +225,15 @@ uint32_t galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	bitmap_ind16 const &s2636_1_bitmap = m_s2636[1]->update(cliprect);
 	bitmap_ind16 const &s2636_2_bitmap = m_s2636[2]->update(cliprect);
 
-	bitmap.fill(0, cliprect);
-	update_stars(bitmap, cliprect, STAR_PEN, 1);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_background(screen, bitmap, cliprect);
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			bool const bullet = m_bullet_ram[y] && x == (m_bullet_ram[y] ^ 0xff);
-			bool const background = (bitmap.pix(y, x) & 3) != 0;
+			int const bullet_pos = (((y < 0x100) ? m_bullet_ram[y] : 0) ^ 0xff) - 8;
+			bool const bullet = (bullet_pos != 0xff - 8) && (x <= bullet_pos && x > bullet_pos - 4);
+			bool const background = (m_temp_bitmap.pix(y, x) & 3) != 0;
 
 			// draw bullets
 			if (bullet)
@@ -271,11 +242,7 @@ uint32_t galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				if (background) m_collision_register |= 0x80;
 
 				// draw white 1x4-size bullet
-				for (int bx = 0; bx < 4; bx++)
-				{
-					if (cliprect.contains(x - bx, y))
-						bitmap.pix(y, x - bx) = BULLET_PEN;
-				}
+				bitmap.pix(y, x) = m_palette->white_pen();
 			}
 
 			// copy the S2636 images into the main bitmap and check collision
@@ -304,7 +271,7 @@ uint32_t galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x40;
 				}
 
-				bitmap.pix(y, x) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
+				bitmap.pix(y, x) = S2636_PIXEL_COLOR(pixel) | 0x10;
 			}
 		}
 	}
@@ -318,33 +285,30 @@ uint32_t astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	// astrowar has only one S2636
 	bitmap_ind16 const &s2636_0_bitmap = m_s2636[0]->update(cliprect);
 
-	bitmap.fill(0, cliprect);
-	update_stars(bitmap, cliprect, STAR_PEN, 1);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	copybitmap(m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+	draw_background(screen, bitmap, cliprect);
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		// draw bullets
-		if (m_bullet_ram[y])
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			uint8_t const pos = m_bullet_ram[y] ^ 0xff;
+			int const bullet_pos = (((y < 0x100) ? m_bullet_ram[y] : 0) ^ 0xff) - 8;
+			bool const bullet = (bullet_pos != 0xff - 8) && (x <= bullet_pos && x > bullet_pos - 4);
 
-			// background vs. bullet collision detection
-			if (m_temp_bitmap.pix(y, pos) & 1)
-				m_collision_register |= 0x02;
-
-			// draw white 1x4-size bullet
-			for (int bx = 0; bx < 4; bx++)
+			// draw bullets first
+			if (bullet)
 			{
-				if (cliprect.contains(pos - bx, y))
-					bitmap.pix(y, pos - bx) = BULLET_PEN;
+				// background vs. bullet collision detection
+				if (m_temp_bitmap.pix(y, x) & 1)
+					m_collision_register |= 0x02;
+
+				// draw white 1x4-size bullet
+				bitmap.pix(y, x) = m_palette->white_pen();
 			}
 		}
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			// NOTE: similar to zac2650.cpp, the sprite chip runs at a different frequency than the background generator
+			// NOTE: similar to zac1b1120.cpp, the sprite chip runs at a different frequency than the background generator
 			// the exact timing ratio is unknown, so we'll have to do with guesswork
 			float const s_ratio = 256.0f / 196.0f;
 
@@ -361,14 +325,15 @@ uint32_t astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				if ((m_temp_bitmap.pix(y, int(sx)) | m_temp_bitmap.pix(y, int(sx + 0.5f))) & 1)
 					m_collision_register |= 0x01;
 
-				bitmap.pix(y, int(sx)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
-				bitmap.pix(y, int(sx + 0.5f)) = S2636_PIXEL_COLOR(pixel) | SPRITE_PEN_BASE;
+				bitmap.pix(y, int(sx)) = S2636_PIXEL_COLOR(pixel) | 0x10;
+				bitmap.pix(y, int(sx + 0.5f)) = S2636_PIXEL_COLOR(pixel) | 0x10;
 			}
 		}
 	}
 
 	return 0;
 }
+
 
 
 /*******************************************************************************
@@ -451,6 +416,7 @@ void galaxia_state::data_map(address_map &map)
 }
 
 
+
 /*******************************************************************************
 
   Inputs
@@ -530,31 +496,12 @@ static INPUT_PORTS_START( galaxia )
 INPUT_PORTS_END
 
 
+
 /*******************************************************************************
 
   Machine Configs
 
 *******************************************************************************/
-
-static const gfx_layout tiles8x8x2_layout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	2,
-	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static GFXDECODE_START( gfx_galaxia )
-	GFXDECODE_ENTRY( "tiles", 0, tiles8x8x2_layout, 0, 4 )
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_astrowar )
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x1, 0, 8 )
-GFXDECODE_END
-
 
 void galaxia_state::galaxia(machine_config &config)
 {
@@ -572,26 +519,26 @@ void galaxia_state::galaxia(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3500));
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0*8, 30*8-1, 2*8, 32*8-1);
+	m_screen->set_size(256, 312);
+	m_screen->set_visarea(0*8, 29*8-1, 0*8, 34*8-1);
 	m_screen->set_screen_update(FUNC(galaxia_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
-	m_screen->screen_vblank().append(FUNC(galaxia_state::scroll_start));
+	//m_screen->screen_vblank().append(FUNC(galaxia_state::scroll_stars));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxia);
-	PALETTE(config, m_palette, FUNC(galaxia_state::palette), 0x18+2);
+	PALETTE(config, m_palette, FUNC(galaxia_state::palette), 0x18);
 
 	S2636(config, m_s2636[0], 0);
-	m_s2636[0]->set_offsets(-13, -26);
+	m_s2636[0]->set_offsets(3, -26);
 	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	S2636(config, m_s2636[1], 0);
-	m_s2636[1]->set_offsets(-13, -26);
+	m_s2636[1]->set_offsets(3, -26);
 	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	S2636(config, m_s2636[2], 0);
-	m_s2636[2]->set_offsets(-13, -26);
+	m_s2636[2]->set_offsets(3, -26);
 	m_s2636[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// sound hardware
@@ -600,37 +547,16 @@ void galaxia_state::galaxia(machine_config &config)
 
 void astrowar_state::astrowar(machine_config &config)
 {
-	// basic machine hardware
-	S2650(config, m_maincpu, 14.318181_MHz_XTAL / 8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &astrowar_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &astrowar_state::io_map);
-	m_maincpu->set_addrmap(AS_DATA, &astrowar_state::data_map);
-	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
-	m_maincpu->flag_handler().set([this] (int state) { m_ram_view.select(state); });
-	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
+	galaxia(config);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3500));
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(1*8, 31*8-1, 2*8, 32*8-1);
-	m_screen->set_screen_update(FUNC(astrowar_state::screen_update));
-	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
-	m_screen->screen_vblank().append(FUNC(astrowar_state::scroll_start));
+	GFXDECODE(config.replace(), m_gfxdecode, m_palette, gfx_astrowar);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_astrowar);
-	PALETTE(config, m_palette, FUNC(astrowar_state::palette), 0x18+2);
-
-	S2636(config, m_s2636[0], 0);
-	m_s2636[0]->set_offsets(-13, -8);
-	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
+	m_s2636[0]->set_offsets(3, -8);
+	config.device_remove("s2636_1");
+	config.device_remove("s2636_2");
 }
+
 
 
 /*******************************************************************************
@@ -653,8 +579,8 @@ ROM_START( galaxia )
 	ROM_LOAD( "galaxia.13l", 0x03000, 0x0400, CRC(3a9c38c7) SHA1(d1e934092b69c0f3f9636eba05a1d8a6d9588e6b) )
 
 	ROM_REGION( 0x0800, "tiles", 0 )
-	ROM_LOAD( "galaxia.1d", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) )
-	ROM_LOAD( "galaxia.3d", 0x00400, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) )
+	ROM_LOAD( "galaxia.3d", 0x00000, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) )
+	ROM_LOAD( "galaxia.1d", 0x00400, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
 	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
@@ -674,8 +600,8 @@ ROM_START( galaxiaa )
 	ROM_LOAD( "galaxia.13l", 0x03000, 0x0400, CRC(3a9c38c7) SHA1(d1e934092b69c0f3f9636eba05a1d8a6d9588e6b) )
 
 	ROM_REGION( 0x0800, "tiles", 0 )
-	ROM_LOAD( "galaxia.1d", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
-	ROM_LOAD( "galaxia.3d", 0x00400, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
+	ROM_LOAD( "galaxia.3d", 0x00000, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
+	ROM_LOAD( "galaxia.1d", 0x00400, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
 
 	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
 	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
@@ -695,8 +621,8 @@ ROM_START( galaxiab )
 	ROM_LOAD( "galaxia.13l", 0x03000, 0x0400, CRC(3a9c38c7) SHA1(d1e934092b69c0f3f9636eba05a1d8a6d9588e6b) )
 
 	ROM_REGION( 0x0800, "tiles", 0 )
-	ROM_LOAD( "galaxia.1d", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
-	ROM_LOAD( "galaxia.3d", 0x00400, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
+	ROM_LOAD( "galaxia.3d", 0x00000, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
+	ROM_LOAD( "galaxia.1d", 0x00400, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
 
 	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
 	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
@@ -716,8 +642,8 @@ ROM_START( galaxiac )
 	ROM_LOAD( "galaxia.13l", 0x03000, 0x0400, CRC(3a9c38c7) SHA1(d1e934092b69c0f3f9636eba05a1d8a6d9588e6b) )
 
 	ROM_REGION( 0x0800, "tiles", 0 )
-	ROM_LOAD( "galaxia.1d", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
-	ROM_LOAD( "galaxia.3d", 0x00400, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
+	ROM_LOAD( "galaxia.3d", 0x00000, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
+	ROM_LOAD( "galaxia.1d", 0x00400, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
 
 	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
 	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
@@ -749,4 +675,4 @@ GAME( 1979, galaxia,  0,       galaxia,  galaxia, galaxia_state,  empty_init, RO
 GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 4)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, astrowar, 0,       astrowar, galaxia, astrowar_state, empty_init, ROT90, "Zaccaria / Zelco", "Astro Wars",      MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, astrowar, 0,       astrowar, galaxia, astrowar_state, empty_init, ROT90, "Zaccaria / Zelco", "Astro Wars",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
