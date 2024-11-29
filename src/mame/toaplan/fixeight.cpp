@@ -83,6 +83,7 @@ public:
 	void init_fixeight();
 
 protected:
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	virtual void device_post_load() override;
@@ -151,9 +152,16 @@ public:
 };
 
 
+void fixeight_state::machine_reset()
+{
+	if (m_audiocpu.found())
+		sound_reset_w(0);
+}
+
 void fixeight_state::reset(int state)
 {
-	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	if (state)
+		sound_reset_w(0);
 }
 
 

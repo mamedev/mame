@@ -56,7 +56,6 @@ protected:
 
 	void pipibibs_68k_mem(address_map &map) ATTR_COLD;
 	void pipibibs_sound_z80_mem(address_map &map) ATTR_COLD;
-	void reset(int state);
 
 	required_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	required_device<m68000_base_device> m_maincpu;
@@ -83,11 +82,6 @@ private:
 	void pipibibi_bootleg_68k_mem(address_map &map) ATTR_COLD;
 
 };
-
-void pipibibi_state::reset(int state)
-{
-	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-}
 
 void pipibibi_state::video_start()
 {
@@ -282,7 +276,7 @@ void pipibibi_state::pipibibs(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &pipibibi_state::pipibibs_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(pipibibi_state::reset));
+	m_maincpu->reset_cb().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	Z80(config, m_audiocpu, 27_MHz_XTAL/8);         // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pipibibi_state::pipibibs_sound_z80_mem);
@@ -320,7 +314,7 @@ void pipibibi_bootleg_state::pipibibsbl(machine_config &config)
 	M68000(config, m_maincpu, 12_MHz_XTAL); // ??? (position labeled "68000-12" but 10 MHz-rated parts used)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pipibibi_bootleg_state::pipibibi_bootleg_68k_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &pipibibi_bootleg_state::cpu_space_pipibibsbl_map);
-	m_maincpu->reset_cb().set(FUNC(pipibibi_bootleg_state::reset));
+	m_maincpu->reset_cb().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // GoldStar Z8400B; clock source and divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pipibibi_bootleg_state::pipibibs_sound_z80_mem);

@@ -60,7 +60,6 @@ private:
 	template<unsigned Which> u16 ghox_h_analog_r();
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
 	void shared_ram_w(offs_t offset, u8 data) { m_shared_ram[offset] = data; }
-	void reset(int state);
 
 	s8 m_old_paddle_h[2] = {0};
 
@@ -73,13 +72,6 @@ private:
 	required_device<palette_device> m_palette;
 	bitmap_ind8 m_custom_priority_bitmap;
 };
-
-
-void ghox_state::reset(int state)
-{
-	if (m_audiocpu != nullptr)
-		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-}
 
 
 void ghox_state::video_start()
@@ -270,7 +262,7 @@ void ghox_state::ghox(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ghox_state::ghox_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(ghox_state::reset));
+	m_maincpu->reset_cb().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	HD647180X(config, m_audiocpu, 10_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ghox_state::ghox_hd647180_mem_map);

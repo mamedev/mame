@@ -53,6 +53,7 @@ public:
 	void dogyuun_base(machine_config &config);
 
 protected:
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
@@ -74,7 +75,6 @@ private:
 
 	void screen_vblank(int state);
 
-	void sound_reset_w(u8 data);
 	void reset(int state);
 
 	required_device<toaplan_coincounter_device> m_coincounter;
@@ -117,13 +117,13 @@ private:
 
 void dogyuun_base_state::reset(int state)
 {
-	if (m_audiocpu != nullptr)
-		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	if (state)
+		coin_sound_reset_w(0);
 }
 
-void dogyuun_base_state::sound_reset_w(u8 data)
+void dogyuun_base_state::machine_reset()
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & m_sound_reset_bit) ? CLEAR_LINE : ASSERT_LINE);
+	coin_sound_reset_w(0);
 }
 
 void dogyuun_base_state::video_start()
@@ -289,7 +289,7 @@ INPUT_PORTS_END
 void dogyuun_base_state::coin_sound_reset_w(u8 data)
 {
 	m_coincounter->coin_w(data & ~m_sound_reset_bit);
-	sound_reset_w(data & m_sound_reset_bit);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & m_sound_reset_bit) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void dogyuun_state::dogyuun_68k_mem(address_map &map)

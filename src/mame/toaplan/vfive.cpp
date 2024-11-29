@@ -51,6 +51,7 @@ public:
 	void vfive(machine_config &config);
 
 protected:
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -100,7 +101,13 @@ void vfive_state::screen_vblank(int state)
 
 void vfive_state::reset(int state)
 {
-	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	if (state)
+		coin_sound_reset_w(0);
+}
+
+void vfive_state::machine_reset()
+{
+	coin_sound_reset_w(0);
 }
 
 void vfive_state::coin_sound_reset_w(u8 data)

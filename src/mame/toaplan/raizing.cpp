@@ -173,7 +173,7 @@ private:
 void raizing_base_state::reset(int state)
 {
 	if (m_audiocpu != nullptr)
-		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
 TILE_GET_INFO_MEMBER(raizing_base_state::get_text_tile_info)
