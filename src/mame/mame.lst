@@ -16638,31 +16638,6 @@ c10                             //
 cb308                           //
 mcb216                          //
 
-@source:cvs/cvs.cpp
-8ball                           // (c) 1982 Century
-8ball1                          // (c) 1982 Century
-cosmos                          // (c) 1981 Century
-darkwar                         // (c) 1981 Century
-dazzler                         // (c) 1982 Century
-diggerc                         // (c) 1982 Century
-goldbug                         // (c) 1982 Century
-heartatk                        // (c) 1983 Century Electronics
-hero                            // (c) 1983 Seatongrove (c) 1984 CVS
-hunchbak                        // (c) 1983 Century
-hunchbaka                       // (c) 1983 Century
-huncholy                        // (c) 1984 Seatongrove (c) CVS
-logger                          // (c) 1982 Century (rev 3)
-loggerr2                        // (c) 1982 E T Marketing (rev 2)
-outline                         // (c) 1982 Century
-radarzon                        // (c) 1982 Century
-radarzon1                       // (c) 1982 Century
-radarzont                       // (c) 1982 Tuni Electro Service
-raiders                         // (c) 1983 Century Electronics UK
-raidersr3                       // (c) 1983 Century Electronics UK
-spacefrt                        // (c) 1981 Century
-superbik                        // (c) 1983 Century
-wallst                          // (c) 1982 Century
-
 @source:cxg/chess2001.cpp
 ch2001
 
@@ -29437,6 +29412,31 @@ funnyfmb                        //
 gangrose                        //
 tsarevna                        //
 tsarevnaa                       //
+
+@source:misc/cvs.cpp
+8ball                           // (c) 1982 Century
+8ball1                          // (c) 1982 Century
+cosmos                          // (c) 1981 Century
+darkwar                         // (c) 1981 Century
+dazzler                         // (c) 1982 Century
+diggerc                         // (c) 1982 Century
+goldbug                         // (c) 1982 Century
+heartatk                        // (c) 1983 Century Electronics
+hero                            // (c) 1983 Seatongrove (c) 1984 CVS
+hunchbak                        // (c) 1983 Century
+hunchbaka                       // (c) 1983 Century
+huncholy                        // (c) 1984 Seatongrove (c) CVS
+logger                          // (c) 1982 Century (rev 3)
+loggerr2                        // (c) 1982 E T Marketing (rev 2)
+outline                         // (c) 1982 Century
+radarzon                        // (c) 1982 Century
+radarzon1                       // (c) 1982 Century
+radarzont                       // (c) 1982 Tuni Electro Service
+raiders                         // (c) 1983 Century Electronics UK
+raidersr3                       // (c) 1983 Century Electronics UK
+spacefrt                        // (c) 1981 Century
+superbik                        // (c) 1983 Century
+wallst                          // (c) 1982 Century
 
 @source:misc/cwheel.cpp
 cwheel                          // (c) 19?? Gamebar

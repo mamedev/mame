@@ -51,7 +51,7 @@ Quick PCB sketch:
 Astro Wars (port of Astro Fighter) is on a stripped down board of Galaxia,
 using only one 2636 chip, less RAM, and no PROM.
 
-HW has many similarities with quasar.cpp / cvs.cpp / zac1b1120.cpp
+HW has many similarities with quasar.cpp / misc/cvs.cpp / zac1b1120.cpp
 real hardware video of Astro Wars can be seen here: youtu.be/eSrQFBMeDlM
 
 --------------------------------------------------------------------------------
