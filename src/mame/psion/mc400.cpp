@@ -50,7 +50,7 @@ public:
 	void mc400(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(key_on);
-	DECLARE_INPUT_CHANGED_MEMBER(reset);
+	//DECLARE_INPUT_CHANGED_MEMBER(reset);
 	DECLARE_INPUT_CHANGED_MEMBER(digitiser_changed);
 
 protected:
@@ -275,13 +275,13 @@ INPUT_CHANGED_MEMBER(psionmc_state::key_on)
 	}
 }
 
-INPUT_CHANGED_MEMBER(psionmc_state::reset)
-{
-	if (newval)
-	{
-		m_asic2->reset_w(0);
-	}
-}
+//INPUT_CHANGED_MEMBER(psionmc_state::reset)
+//{
+//	if (newval)
+//	{
+//		m_asic2->reset_w(0);
+//	}
+//}
 
 INPUT_CHANGED_MEMBER(psionmc_state::digitiser_changed)
 {
