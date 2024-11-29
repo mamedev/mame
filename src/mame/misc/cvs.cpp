@@ -220,7 +220,7 @@ private:
 	u8 m_collision = 0;
 
 	// stars
-	u8 m_stars_on = 0;
+	u8 m_stars_on = false;
 	u16 m_stars_scroll = 0;
 	u16 m_total_stars = 0;
 
@@ -338,7 +338,7 @@ void cvs_state::video_fx_w(u8 data)
 	if (data & 0xce)
 		LOGMASKED(LOG_VIDEOFX, "%04x: Unimplemented CVS video fx = %2x\n", m_maincpu->pc(), data & 0xce);
 
-	m_stars_on = data & 0x01;
+	m_stars_on = bool(data & 0x01);
 
 	if (data & 0x02) LOGMASKED(LOG_VIDEOFX, "      SHADE BRIGHTER TO RIGHT\n");
 	if (data & 0x04) LOGMASKED(LOG_VIDEOFX, "      SCREEN ROTATE\n");
@@ -790,7 +790,6 @@ void cvs_state::audio_command_w(u8 data)
 
 void cvs_state::main_cpu_map(address_map &map)
 {
-	map.global_mask(0x7fff);
 	map(0x0000, 0x13ff).rom();
 	map(0x1400, 0x1bff).mirror(0x6000).view(m_ram_view);
 	m_ram_view[0](0x1400, 0x14ff).ram().share(m_bullet_ram);
@@ -1303,7 +1302,7 @@ void cvs_state::machine_reset()
 	m_protection_counter = 0;
 	m_scroll_reg = 0;
 	m_collision = 0;
-	m_stars_on = 0;
+	m_stars_on = false;
 	m_stars_scroll = 0;
 }
 

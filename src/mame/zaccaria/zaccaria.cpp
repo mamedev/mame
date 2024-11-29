@@ -27,7 +27,7 @@ TODO:
   (i.e. dip 5 in the UI causes dip 8 to change in service mode display).
   A dip listing is available online.
 
-- get rid of (&machine().system() == &GAME_NAME(monymony)) and  check and see if the
+- get rid of (&machine().system() == &GAME_NAME(monymony)) and check and see if the
   protection handler should also apply to monymony2 that was added later
 
 

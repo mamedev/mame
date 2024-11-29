@@ -66,7 +66,10 @@ remaining suspicion that it might be a bad dump.
 
 TODO:
 - astrowar resets at the boss fight, very likely a bad bit in one ROM (MT7016)
-- fill in the remaining DIP switches
+- verify if extended play dipswitch values are correct for astrowar, and
+  identify unknown dipswitch
+- Are the unknown port reads in galaxia used for anything? Port 5 disables
+  collision detection, maybe for testing/debugging, the others are unknown.
 - Are there other versions of galaxia with different colors? The alternate sets
   in MAME took the gfx roms from the parent, but there are references online
   showing that not all versions look alike.
@@ -74,8 +77,10 @@ TODO:
   and is needed to correct the speed in all machines
 - provide accurate sprite/bg sync in astrowar
 - improve starfield: density, blink rate, x repeat of 240, and the checkerboard
-  pattern (fast forward MAME to see) are all correct, the RNG is not right
+  pattern (fast forward MAME to see) are all correct, the RNG is not right?
+  It may differ per PCB, not all PCB videos have the same star RNG pattern.
 - add sound board emulation (info is in the schematics)
+- add support for flip screen
 
 */
 
@@ -110,6 +115,7 @@ public:
 	{ }
 
 	void galaxia(machine_config &config) ATTR_COLD;
+	void galaxiaa(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -138,6 +144,7 @@ protected:
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	u8 m_collision = 0;
+	bool m_stars_on = false;
 	u16 m_stars_scroll = 0;
 	u16 m_total_stars = 0;
 
@@ -150,8 +157,11 @@ protected:
 	star_t m_stars[MAX_STARS];
 
 	template <u8 Which> void video_w(offs_t offset, u8 data);
-	void data_map(address_map &map) ATTR_COLD;
-	void io_map(address_map &map) ATTR_COLD;
+	void galaxia_mem(address_map &map) ATTR_COLD;
+	void galaxiaa_mem(address_map &map) ATTR_COLD;
+	void galaxia_io(address_map &map) ATTR_COLD;
+	void galaxiaa_io(address_map &map) ATTR_COLD;
+	void galaxia_data(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -159,7 +169,6 @@ protected:
 	virtual void palette(palette_device &palette) const ATTR_COLD;
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void mem_map(address_map &map) ATTR_COLD;
 
 	void scroll_stars(int state);
 	void init_stars() ATTR_COLD;
@@ -184,28 +193,30 @@ public:
 protected:
 	virtual void palette(palette_device &palette) const override ATTR_COLD;
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	virtual void mem_map(address_map &map) override ATTR_COLD;
+
+private:
+	void astrowar_mem(address_map &map) ATTR_COLD;
 };
 
 
 void galaxia_state::machine_start()
 {
 	save_item(NAME(m_collision));
+	save_item(NAME(m_stars_on));
 	save_item(NAME(m_stars_scroll));
 }
 
 void galaxia_state::machine_reset()
 {
 	m_collision = 0;
+	m_stars_on = false;
 	m_stars_scroll = 0;
 }
 
 
 
 /*******************************************************************************
-
-  Palette
-
+    Palette
 *******************************************************************************/
 
 void galaxia_state::stars_palette(palette_device &palette) const
@@ -262,9 +273,7 @@ void astrowar_state::palette(palette_device &palette) const
 
 
 /*******************************************************************************
-
-  Stars
-
+    Stars
 *******************************************************************************/
 
 void galaxia_state::init_stars()
@@ -319,9 +328,7 @@ void galaxia_state::scroll_stars(int state)
 
 
 /*******************************************************************************
-
-  Background
-
+    Background
 *******************************************************************************/
 
 TILE_GET_INFO_MEMBER(galaxia_state::get_bg_tile_info)
@@ -355,7 +362,9 @@ GFXDECODE_END
 void galaxia_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	update_stars(bitmap, cliprect);
+
+	if (m_stars_on)
+		update_stars(bitmap, cliprect);
 
 	// tilemap doesn't wrap
 	rectangle bg_clip = cliprect;
@@ -370,9 +379,7 @@ void galaxia_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap,
 
 
 /*******************************************************************************
-
-  Screen Update
-
+    Screen Update
 *******************************************************************************/
 
 u32 galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -493,9 +500,7 @@ u32 astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 
 /*******************************************************************************
-
-  I/O
-
+    I/O
 *******************************************************************************/
 
 template <u8 Which>
@@ -531,7 +536,13 @@ void galaxia_state::ctrlport_w(u8 data)
 	// d1: coin counter? if you put a coin in slot A, galaxia constantly
 	// strobes sets and clears the bit. if you put a coin in slot B
 	// however, the bit is set and cleared only once.
-	// d5: set as soon as the game completes selftest
+
+	// d3: flip screen
+	//flip_screen_set(BIT(data, 3));
+
+	// d5: enable stars
+	m_stars_on = bool(BIT(data, 5));
+
 	// other bits: unknown
 }
 
@@ -540,7 +551,13 @@ void galaxia_state::dataport_w(u8 data)
 	// seems to be related to sound board comms
 }
 
-void galaxia_state::mem_map(address_map &map)
+
+
+/*******************************************************************************
+    Address Maps
+*******************************************************************************/
+
+void galaxia_state::galaxia_mem(address_map &map)
 {
 	map(0x0000, 0x13ff).rom();
 	map(0x1400, 0x14ff).mirror(0x6000).ram().share(m_bullet_ram);
@@ -555,7 +572,13 @@ void galaxia_state::mem_map(address_map &map)
 	map(0x7214, 0x7214).portr("IN0");
 }
 
-void astrowar_state::mem_map(address_map &map)
+void galaxia_state::galaxiaa_mem(address_map &map)
+{
+	galaxia_state::galaxia_mem(map);
+	map(0x7214, 0x7214).unmapr();
+}
+
+void astrowar_state::astrowar_mem(address_map &map)
 {
 	map(0x0000, 0x13ff).rom();
 	map(0x1400, 0x14ff).mirror(0x6000).ram();
@@ -567,18 +590,23 @@ void astrowar_state::mem_map(address_map &map)
 	map(0x2000, 0x33ff).rom();
 }
 
-void galaxia_state::io_map(address_map &map)
+void galaxia_state::galaxia_io(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x00, 0x00).w(FUNC(galaxia_state::scroll_w)).portr("IN0");
+	map.global_mask(0x07);
+	map(0x00, 0x00).w(FUNC(galaxia_state::scroll_w));
 	map(0x02, 0x02).portr("IN1");
-	map(0x05, 0x05).nopr();
+	map(0x05, 0x05).lr8(NAME([] () { return 0xff; }));
 	map(0x06, 0x06).portr("DSW0");
 	map(0x07, 0x07).portr("DSW1");
-	map(0xac, 0xac).nopr();
 }
 
-void galaxia_state::data_map(address_map &map)
+void galaxia_state::galaxiaa_io(address_map &map)
+{
+	galaxia_state::galaxia_io(map);
+	map(0x00, 0x00).portr("IN0");
+}
+
+void galaxia_state::galaxia_data(address_map &map)
 {
 	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(galaxia_state::collision_r), FUNC(galaxia_state::ctrlport_w));
 	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(galaxia_state::collision_clear_r), FUNC(galaxia_state::dataport_w));
@@ -587,9 +615,7 @@ void galaxia_state::data_map(address_map &map)
 
 
 /*******************************************************************************
-
-  Inputs
-
+    Inputs
 *******************************************************************************/
 
 static INPUT_PORTS_START( galaxia )
@@ -600,85 +626,80 @@ static INPUT_PORTS_START( galaxia )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0xc3, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "A 1C_1C B 2C_1C" )
-	PORT_DIPSETTING(    0x01, "A 1C_2C B 2C_1C" )
-	PORT_DIPSETTING(    0x02, "A 1C_3C B 2C_1C" )
-	PORT_DIPSETTING(    0x03, "A 1C_5C B 2C_1C" )
-	PORT_DIPSETTING(    0x04, "A 1C_1C B 1C_1C" )
-	PORT_DIPSETTING(    0x05, "A 1C_2C B 1C_1C" )
-	PORT_DIPSETTING(    0x06, "A 1C_3C B 1C_1C" )
-	PORT_DIPSETTING(    0x07, "A 1C_5C B 1C_1C" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )     PORT_DIPLOCATION("3N:7,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coin_B ) )     PORT_DIPLOCATION("3N:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )      PORT_DIPLOCATION("3N:4")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "5" )
-
-	PORT_DIPNAME( 0x10, 0x00, "UNK04" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "UNK05" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "UNK06" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "UNK07" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("3N:3,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Hard ) )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "UNK10" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "UNK11" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "UNK12" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "UNK13" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "High Score" )          PORT_DIPLOCATION("2N:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, "Random" )
+	PORT_DIPNAME( 0x06, 0x00, "Random H.S." )         PORT_DIPLOCATION("2N:6,5") // only if high score is set to random
+	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x04, "Medium-High" )
+	PORT_DIPSETTING(    0x06, DEF_STR( High ) )
+	PORT_DIPNAME( 0x18, 0x10, "Extended Play" )       PORT_DIPLOCATION("2N:4,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x08, "2500" )
+	PORT_DIPSETTING(    0x10, "3500" )
+	PORT_DIPSETTING(    0x18, "5500" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )    PORT_DIPLOCATION("2N:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
-	PORT_DIPNAME( 0x10, 0x00, "UNK14" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "UNK15" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "UNK16" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "UNK17" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+static INPUT_PORTS_START( astrowar )
+	PORT_INCLUDE( galaxia )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 
 /*******************************************************************************
-
-  Machine Configs
-
+    Machine Configs
 *******************************************************************************/
 
 void galaxia_state::galaxia(machine_config &config)
 {
 	// basic machine hardware
 	S2650(config, m_maincpu, 14.318181_MHz_XTAL / 8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxia_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &galaxia_state::io_map);
-	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::data_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxia_state::galaxia_mem);
+	m_maincpu->set_addrmap(AS_IO, &galaxia_state::galaxia_io);
+	m_maincpu->set_addrmap(AS_DATA, &galaxia_state::galaxia_data);
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->flag_handler().set([this] (int state) { m_ram_view.select(state); });
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
@@ -714,9 +735,21 @@ void galaxia_state::galaxia(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 }
 
-void astrowar_state::astrowar(machine_config &config)
+void galaxia_state::galaxiaa(machine_config &config)
 {
 	galaxia(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxia_state::galaxiaa_mem);
+	m_maincpu->set_addrmap(AS_IO, &galaxia_state::galaxiaa_io);
+}
+
+void astrowar_state::astrowar(machine_config &config)
+{
+	galaxiaa(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrowar_state::astrowar_mem);
 
 	// video hardware
 	GFXDECODE(config.replace(), m_gfxdecode, m_palette, gfx_astrowar);
@@ -729,9 +762,7 @@ void astrowar_state::astrowar(machine_config &config)
 
 
 /*******************************************************************************
-
-  Game drivers
-
+    ROM Definitions
 *******************************************************************************/
 
 ROM_START( galaxia )
@@ -842,14 +873,12 @@ ROM_END
 
 
 /*******************************************************************************
-
-  Game Drivers
-
+    Game Drivers
 *******************************************************************************/
 
-//    YEAR, NAME,     PARENT,  MACHINE,  INPUT,   CLASS,          INIT,       SCREEN, COMPANY,            FULLNAME,          FLAGS
-GAME( 1979, galaxia,  0,       galaxia,  galaxia, galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 4)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, astrowar, 0,       astrowar, galaxia, astrowar_state, empty_init, ROT90,  "Zaccaria / Zelco", "Astro Wars",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,     PARENT,  MACHINE,  INPUT,    CLASS,          INIT,       SCREEN, COMPANY,            FULLNAME,          FLAGS
+GAME( 1979, galaxia,  0,       galaxia,  galaxia,  galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxiaa, galaxia, galaxiaa, galaxia,  galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxiab, galaxia, galaxiaa, galaxia,  galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxiac, galaxia, galaxiaa, galaxia,  galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 4)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, astrowar, 0,       astrowar, astrowar, astrowar_state, empty_init, ROT90,  "Zaccaria / Zelco", "Astro Wars",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -149,9 +149,7 @@ void quasar_state::machine_reset()
 
 
 /*******************************************************************************
-
-  Video
-
+    Video
 *******************************************************************************/
 
 void quasar_state::palette(palette_device &palette) const
@@ -312,12 +310,7 @@ u32 quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 
 /*******************************************************************************
-
-  Quasar memory layout
-
-  Paging for screen is controlled by OUT to 0,1,2 or 3
-  Paging for IO ports is controlled by OUT to 8,9,A or B
-
+    Quasar memory layout
 *******************************************************************************/
 
 void quasar_state::video_page_select_w(offs_t offset, u8 data)
@@ -339,6 +332,7 @@ void quasar_state::io_page_select_w(offs_t offset, u8 data)
 
 void quasar_state::video_w(offs_t offset, u8 data)
 {
+	// paging for screen is controlled by OUT to 0,1,2 or 3
 	switch (m_page)
 	{
 		case 0: m_video_ram[offset] = data; break;
@@ -352,6 +346,7 @@ u8 quasar_state::io_r()
 {
 	u8 data = 0;
 
+	// paging for IO ports is controlled by OUT to 8,9,A or B
 	switch (m_io_page)
 	{
 		case 0: data = m_in[0]->read(); break;
@@ -412,9 +407,7 @@ void quasar_state::data(address_map &map)
 
 
 /*******************************************************************************
-
-  Sound board memory handlers
-
+    Sound board memory handlers
 *******************************************************************************/
 
 void quasar_state::sh_command_w(u8 data)
@@ -451,9 +444,7 @@ void quasar_state::sound_portmap(address_map &map)
 
 
 /*******************************************************************************
-
-  Input Ports
-
+    Input Ports
 *******************************************************************************/
 
 static INPUT_PORTS_START( quasar )
@@ -485,7 +476,7 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coin_A ) )     PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )     PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
@@ -503,7 +494,7 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "High Score" )          PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x00, "High Score" )          PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, "Random" )
 	PORT_DIPNAME( 0x06, 0x04, "Random H.S." )         PORT_DIPLOCATION("SW2:2,3") // only if high score is set to random
@@ -511,7 +502,7 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x06, "Medium-High" )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Difficult ) )
@@ -531,7 +522,7 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x20, "Sound Program" )       PORT_DIPLOCATION("SOUND:3,4")
 	PORT_DIPSETTING(    0x00, "Invalid 1" )
-//  PORT_DIPSETTING(    0x10, "Invalid 1" )
+    PORT_DIPSETTING(    0x10, "Invalid 1" )
 	PORT_DIPSETTING(    0x30, "Invalid 2" )
 	PORT_DIPSETTING(    0x20, "Quasar" )
 INPUT_PORTS_END
@@ -556,9 +547,7 @@ GFXDECODE_END
 
 
 /*******************************************************************************
-
-  Machine Configuration
-
+    Machine Configuration
 *******************************************************************************/
 
 void quasar_state::quasar(machine_config &config)
@@ -613,9 +602,7 @@ void quasar_state::quasar(machine_config &config)
 
 
 /*******************************************************************************
-
-  ROM Definitions
-
+    ROM Definitions
 *******************************************************************************/
 
 ROM_START( quasar )
@@ -683,9 +670,7 @@ ROM_END
 
 
 /*******************************************************************************
-
-  Game Drivers
-
+    Game Drivers
 *******************************************************************************/
 
 //    YEAR, NAME,     PARENT, MACHINE,  INPUT,  CLASS,        INIT,       SCREEN, COMPANY,            FULLNAME,         FLAGS
