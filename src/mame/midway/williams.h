@@ -99,7 +99,6 @@ protected:
 	void vram_select_w(u8 data);
 	void sinistar_vram_select_w(u8 data);
 	void cmos_4bit_w(offs_t offset, u8 data);
-	void blitter_w(address_space &space, offs_t offset, u8 data);
 
 	template <unsigned A, unsigned... B>
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
