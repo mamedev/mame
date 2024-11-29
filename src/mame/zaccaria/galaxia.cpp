@@ -66,6 +66,7 @@ remaining suspicion that it might be a bad dump.
 
 TODO:
 - astrowar resets at the boss fight, very likely a bad bit in one ROM (MT7016)
+- fill in the remaining DIP switches
 - Are there other versions of galaxia with different colors? The alternate sets
   in MAME took the gfx roms from the parent, but there are references online
   showing that not all versions look alike.
