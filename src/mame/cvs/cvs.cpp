@@ -217,6 +217,7 @@ private:
 };
 
 
+
 /******************************************************
  * Convert colour PROM to format for MAME colour map  *
  *                                                    *
@@ -398,11 +399,11 @@ uint32_t cvs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					if ((s2636_0_bitmap.pix(offs, bx) != 0) ||
 						(s2636_1_bitmap.pix(offs, bx) != 0) ||
 						(s2636_2_bitmap.pix(offs, bx) != 0))
-						m_collision_register |= 0x08;
+						m_collision |= 0x08;
 
 					// Bullet/Background Collision
 					if (m_palette->pen_indirect(m_scrolled_collision_background.pix(offs, bx)))
-						m_collision_register |= 0x80;
+						m_collision |= 0x80;
 
 					bitmap.pix(offs, bx) = BULLET_STAR_PEN;
 				}
@@ -426,16 +427,16 @@ uint32_t cvs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				bitmap.pix(y, x) = SPRITE_PEN_BASE + S2636_PIXEL_COLOR(pixel);
 
 				// S2636 vs. S2636 collision detection
-				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x01;
-				if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x02;
-				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x04;
+				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) m_collision |= 0x01;
+				if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision |= 0x02;
+				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision |= 0x04;
 
 				// S2636 vs. background collision detection
 				if (m_palette->pen_indirect(m_scrolled_collision_background.pix(y, x)))
 				{
-					if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x10;
-					if (S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x20;
-					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x40;
+					if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision |= 0x10;
+					if (S2636_IS_PIXEL_DRAWN(pixel1)) m_collision |= 0x20;
+					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision |= 0x40;
 				}
 			}
 		}

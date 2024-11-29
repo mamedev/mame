@@ -47,7 +47,6 @@ I8085 Sound Board
 #include "machine/gen_latch.h"
 #include "machine/s2636.h"
 #include "sound/dac.h"
-#include "sound/tms5110.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -59,21 +58,21 @@ namespace {
 class quasar_state : public driver_device
 {
 public:
-	quasar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
-		, m_soundlatch(*this, "soundlatch")
-		, m_s2636(*this, "s2636%u", 0U)
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_screen(*this, "screen")
-		, m_palette(*this, "palette")
-		, m_in(*this, "IN%u", 0U)
-		, m_dsw(*this, "DSW%u", 0U)
-		, m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_BIG)
-		, m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_BIG)
-		, m_effectram(*this, "effectram", 0x400, ENDIANNESS_BIG)
-		, m_bullet_ram(*this, "bullet_ram")
+	quasar_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch"),
+		m_s2636(*this, "s2636%u", 0U),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_in(*this, "IN%u", 0U),
+		m_dsw(*this, "DSW%u", 0U),
+		m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_BIG),
+		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_BIG),
+		m_effectram(*this, "effectram", 0x400, ENDIANNESS_BIG),
+		m_bullet_ram(*this, "bullet_ram")
 	{ }
 
 	void quasar(machine_config &config) ATTR_COLD;
@@ -105,7 +104,7 @@ private:
 	required_shared_ptr<uint8_t> m_bullet_ram;
 
 	bitmap_ind16 m_collision_background;
-	uint8_t m_collision_register = 0U;
+	uint8_t m_collision = 0U;
 	uint8_t m_effectcontrol = 0U;
 
 	uint8_t m_page = 0U;
@@ -134,7 +133,7 @@ private:
 void quasar_state::machine_start()
 {
 	// register state save
-	save_item(NAME(m_collision_register));
+	save_item(NAME(m_collision));
 	save_item(NAME(m_effectcontrol));
 	save_item(NAME(m_page));
 	save_item(NAME(m_io_page));
@@ -142,7 +141,7 @@ void quasar_state::machine_start()
 
 void quasar_state::machine_reset()
 {
-	m_collision_register = 0;
+	m_collision = 0;
 	m_page = 0;
 	m_io_page = 8;
 }
@@ -273,8 +272,8 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				if (cliprect.contains(bx, by))
 				{
 					// bullet/object Collision
-					if (s2636_0_bitmap.pix(by, bx) != 0) m_collision_register |= 0x04;
-					if (s2636_2_bitmap.pix(by, bx) != 0) m_collision_register |= 0x08;
+					if (s2636_0_bitmap.pix(by, bx) != 0) m_collision |= 0x04;
+					if (s2636_2_bitmap.pix(by, bx) != 0) m_collision |= 0x08;
 
 					bitmap.pix(by, bx) = 7;
 				}
@@ -300,8 +299,8 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				// S2636 vs. background collision detection
 				if (m_palette->pen_indirect(m_collision_background.pix(y, x)))
 				{
-					if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x01;
-					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x02;
+					if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision |= 0x01;
+					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision |= 0x02;
 				}
 			}
 		}
@@ -371,13 +370,13 @@ void quasar_state::bullet_w(offs_t offset, uint8_t data)
 
 uint8_t quasar_state::collision_r()
 {
-	return m_collision_register;
+	return m_collision;
 }
 
 uint8_t quasar_state::collision_clear_r()
 {
 	if (!machine().side_effects_disabled())
-		m_collision_register = 0;
+		m_collision = 0;
 
 	return 0;
 }

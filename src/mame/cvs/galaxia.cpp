@@ -80,27 +80,58 @@ TODO:
 */
 
 #include "emu.h"
-#include "cvs_base.h"
 
+#include "cpu/s2650/s2650.h"
+#include "machine/s2636.h"
+#include "sound/dac.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
 
 namespace {
 
-class galaxia_state : public cvs_base_state
+class galaxia_state : public driver_device
 {
 public:
-	galaxia_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cvs_base_state(mconfig, type, tag)
+	galaxia_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_s2636(*this, "s2636_%u", 0U),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_BIG),
+		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_BIG),
+		m_bullet_ram(*this, "bullet_ram"),
+		m_ram_view(*this, "video_color_ram_view")
 	{ }
 
 	void galaxia(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
+	// devices
+	required_device<s2650_device> m_maincpu;
+	optional_device_array<s2636_device, 3> m_s2636;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	// memory
+	memory_share_creator<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_color_ram;
+	required_shared_ptr<uint8_t> m_bullet_ram;
+
+	memory_view m_ram_view;
+
 	bitmap_ind16 m_temp_bitmap;
+	uint8_t m_collision = 0U;
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	template <uint8_t Which> void video_w(offs_t offset, uint8_t data);
@@ -116,6 +147,8 @@ protected:
 
 private:
 	void scroll_w(uint8_t data);
+	uint8_t collision_r();
+	uint8_t collision_clear_r();
 	void ctrlport_w(uint8_t data);
 	void dataport_w(uint8_t data);
 };
@@ -123,8 +156,8 @@ private:
 class astrowar_state : public galaxia_state
 {
 public:
-	astrowar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaxia_state(mconfig, type, tag)
+	astrowar_state(const machine_config &mconfig, device_type type, const char *tag) :
+		galaxia_state(mconfig, type, tag)
 	{ }
 
 	void astrowar(machine_config &config) ATTR_COLD;
@@ -134,6 +167,18 @@ protected:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void mem_map(address_map &map) override ATTR_COLD;
 };
+
+
+void galaxia_state::machine_start()
+{
+	save_item(NAME(m_collision));
+}
+
+void galaxia_state::machine_reset()
+{
+	m_collision = 0;
+}
+
 
 
 /*******************************************************************************
@@ -242,7 +287,7 @@ uint32_t galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			if (bullet)
 			{
 				// background vs. bullet collision detection
-				if (background) m_collision_register |= 0x80;
+				if (background) m_collision |= 0x80;
 
 				// draw white 1x4-size bullet
 				bitmap.pix(y, x) = m_palette->white_pen();
@@ -258,20 +303,20 @@ uint32_t galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
 				// S2636 vs. S2636 collision detection
-				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x01;
-				if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x02;
-				if (S2636_IS_PIXEL_DRAWN(pixel2) && S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x04;
+				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) m_collision |= 0x01;
+				if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision |= 0x02;
+				if (S2636_IS_PIXEL_DRAWN(pixel2) && S2636_IS_PIXEL_DRAWN(pixel0)) m_collision |= 0x04;
 
 				// S2636 vs. bullet collision detection
-				if (bullet) m_collision_register |= 0x08;
+				if (bullet) m_collision |= 0x08;
 
 				// S2636 vs. background collision detection
 				if (background)
 				{
 					/* bit4 causes problems on 2nd level
-					if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x10; */
-					if (S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x20;
-					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x40;
+					if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision |= 0x10; */
+					if (S2636_IS_PIXEL_DRAWN(pixel1)) m_collision |= 0x20;
+					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision |= 0x40;
 				}
 
 				bitmap.pix(y, x) = S2636_PIXEL_COLOR(pixel) | 0x10;
@@ -302,7 +347,7 @@ uint32_t astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			{
 				// background vs. bullet collision detection
 				if (m_temp_bitmap.pix(y, x) & 1)
-					m_collision_register |= 0x02;
+					m_collision |= 0x02;
 
 				// draw white 1x4-size bullet
 				bitmap.pix(y, x) = m_palette->white_pen();
@@ -326,7 +371,7 @@ uint32_t astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			{
 				// S2636 vs. background collision detection
 				if ((m_temp_bitmap.pix(y, int(sx)) | m_temp_bitmap.pix(y, int(sx + 0.5f))) & 1)
-					m_collision_register |= 0x01;
+					m_collision |= 0x01;
 
 				bitmap.pix(y, int(sx)) = S2636_PIXEL_COLOR(pixel) | 0x10;
 				bitmap.pix(y, int(sx + 0.5f)) = S2636_PIXEL_COLOR(pixel) | 0x10;
@@ -357,6 +402,19 @@ void galaxia_state::scroll_w(uint8_t data)
 	// fixed scrolling area
 	for (int i = 1; i < 6; i++)
 		m_bg_tilemap->set_scrolly(i, data);
+}
+
+uint8_t galaxia_state::collision_r()
+{
+	return m_collision;
+}
+
+uint8_t galaxia_state::collision_clear_r()
+{
+	if (!machine().side_effects_disabled())
+		m_collision = 0;
+
+	return 0;
 }
 
 void galaxia_state::ctrlport_w(uint8_t data)

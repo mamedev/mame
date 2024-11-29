@@ -11,13 +11,13 @@
 void cvs_base_state::machine_start()
 {
 	// register state save
-	save_item(NAME(m_collision_register));
+	save_item(NAME(m_collision));
 	save_item(NAME(m_stars_scroll));
 }
 
 void cvs_base_state::machine_reset()
 {
-	m_collision_register = 0;
+	m_collision = 0;
 	m_stars_scroll = 0;
 }
 
@@ -26,13 +26,13 @@ void cvs_base_state::machine_reset()
 
 uint8_t cvs_base_state::collision_r()
 {
-	return m_collision_register;
+	return m_collision;
 }
 
 uint8_t cvs_base_state::collision_clear_r()
 {
 	if (!machine().side_effects_disabled())
-		m_collision_register = 0;
+		m_collision = 0;
 	return 0;
 }
 
