@@ -76,8 +76,8 @@ protected:
 	required_device<cpu_device> m_soundcpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
-	optional_shared_ptr<uint8_t> m_paletteram;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_paletteram;
 	optional_device<williams_blitter_device> m_blitter;
 	optional_device_array<pia6821_device, 4> m_pia;
 
