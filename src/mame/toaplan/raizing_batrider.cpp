@@ -154,9 +154,9 @@ public:
 		, m_z80_rom(*this, "audiocpu")
 	{ }
 
-	void batrider(machine_config &config);
+	void batrider(machine_config &config) ATTR_COLD;
 
-	void init_batrider();
+	void init_batrider() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -203,11 +203,10 @@ public:
 		, m_eeprom(*this, "eeprom")
 	{ }
 
-	void bbakraid(machine_config &config);
+	void bbakraid(machine_config &config) ATTR_COLD;
 
-	void init_bbakraid();
+	void init_bbakraid() ATTR_COLD;
 
-protected:
 private:
 	void bbakraid_68k_mem(address_map &map) ATTR_COLD;
 	void bbakraid_sound_z80_mem(address_map &map) ATTR_COLD;
@@ -218,8 +217,8 @@ private:
 	u16 bbakraid_eeprom_r();
 	void bbakraid_eeprom_w(u8 data);
 
-	optional_ioport m_eepromout;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_ioport m_eepromout;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 
@@ -230,9 +229,8 @@ public:
 		: batrider_state(mconfig, type, tag)
 	{ }
 
-	void nprobowl(machine_config &config);
+	void nprobowl(machine_config &config) ATTR_COLD;
 
-protected:
 private:
 	void nprobowl_68k_mem(address_map &map) ATTR_COLD;
 };
@@ -293,6 +291,8 @@ void batrider_state::batrider_bank_cb(u8 layer, u32 &code)
 
 void batrider_state::video_start()
 {
+	raizing_base_state::video_start();
+
 	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
 	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
 
@@ -398,6 +398,8 @@ void bbakraid_state::bbakraid_eeprom_w(u8 data)
 
 void batrider_state::machine_start()
 {
+	raizing_base_state::machine_start();
+
 	save_item(NAME(m_z80_busreq));
 }
 
@@ -409,6 +411,8 @@ INTERRUPT_GEN_MEMBER(bbakraid_state::bbakraid_snd_interrupt)
 
 void batrider_state::machine_reset()
 {
+	raizing_base_state::machine_reset();
+
 	common_bgaregga_reset();
 }
 
@@ -795,7 +799,7 @@ void batrider_state::batrider(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator (verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &batrider_state::batrider_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(batrider_state::reset));
+	m_maincpu->reset_cb().set(FUNC(batrider_state::reset_audiocpu));
 
 	Z80(config, m_audiocpu, 32_MHz_XTAL/6);     // 5.333MHz, 32MHz Oscillator (verified)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &batrider_state::batrider_sound_z80_mem);
@@ -854,7 +858,7 @@ void bbakraid_state::bbakraid(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbakraid_state::bbakraid_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(bbakraid_state::reset));
+	m_maincpu->reset_cb().set(FUNC(bbakraid_state::reset_audiocpu));
 
 	Z80(config, m_audiocpu, XTAL(32'000'000)/6);     /* 5.3333MHz , 32MHz Oscillator */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bbakraid_state::bbakraid_sound_z80_mem);
@@ -909,7 +913,7 @@ void nprobowl_state::nprobowl(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 32_MHz_XTAL / 2);   // 32MHz Oscillator, divisor not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &nprobowl_state::nprobowl_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(nprobowl_state::reset));
+	m_maincpu->reset_cb().set(FUNC(nprobowl_state::reset_audiocpu));
 
 	ADDRESS_MAP_BANK(config, m_dma_space, 0);
 	m_dma_space->set_addrmap(0, &nprobowl_state::batrider_dma_mem);
@@ -945,9 +949,7 @@ void nprobowl_state::nprobowl(machine_config &config)
 
 void batrider_state::init_batrider()
 {
-	u8 *Z80 = memregion("audiocpu")->base();
-
-	m_audiobank->configure_entries(0, 16, Z80, 0x4000);
+	m_audiobank->configure_entries(0, 16, &m_z80_rom[0], 0x4000);
 	install_raizing_okibank(0);
 	install_raizing_okibank(1);
 	m_sndirq_line = 4;

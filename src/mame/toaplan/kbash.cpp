@@ -3,20 +3,20 @@
 
 #include "emu.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
-
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplan_v25_tables.h"
 #include "toaplipt.h"
-#include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/nec/v25.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*
 Name        Board No      Maker         Game name
@@ -41,8 +41,10 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	void kbash(machine_config &config);
+	void kbash(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void video_start() override ATTR_COLD;
 
 	void kbash_68k_mem(address_map &map) ATTR_COLD;
 	void kbash_v25_mem(address_map &map) ATTR_COLD;
@@ -64,10 +66,6 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	bitmap_ind8 m_custom_priority_bitmap;
-
-protected:
-	virtual void video_start() override ATTR_COLD;
-
 };
 
 class kbash2_state : public kbash_state
@@ -78,11 +76,12 @@ public:
 		, m_musicoki(*this, "musicoki")
 	{ }
 
-	void kbash2(machine_config &config);
+	void kbash2(machine_config &config) ATTR_COLD;
 
+protected:
 	void kbash2_68k_mem(address_map &map) ATTR_COLD;
 
-	optional_device<okim6295_device> m_musicoki;
+	required_device<okim6295_device> m_musicoki;
 };
 
 void kbash_state::video_start()

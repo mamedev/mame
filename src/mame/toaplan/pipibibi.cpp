@@ -3,19 +3,19 @@
 
 #include "emu.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
-
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplipt.h"
-#include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ymopm.h"
 #include "sound/ymopl.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*
 * Name        Board No      Maker         Game name
@@ -44,7 +44,7 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	void pipibibs(machine_config &config);
+	void pipibibs(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -73,14 +73,13 @@ public:
 		: pipibibi_state(mconfig, type, tag)
 	{ }
 
-	void pipibibsbl(machine_config &config);
+	void pipibibsbl(machine_config &config) ATTR_COLD;
 
-	void init_pipibibsbl();
+	void init_pipibibsbl() ATTR_COLD;
 
 private:
 	void cpu_space_pipibibsbl_map(address_map &map) ATTR_COLD;
 	void pipibibi_bootleg_68k_mem(address_map &map) ATTR_COLD;
-
 };
 
 void pipibibi_state::video_start()
@@ -485,5 +484,3 @@ GAME( 1991, pipibibsp,   pipibibs, pipibibs,     pipibibsp,  pipibibi_state, emp
 GAME( 1991, pipibibsbl,  pipibibs, pipibibsbl,   pipibibsbl, pipibibi_bootleg_state, init_pipibibsbl, ROT0, "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (Ryouta Kikaku bootleg, encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, pipibibsbl2, pipibibs, pipibibsbl,   pipibibsbl, pipibibi_bootleg_state, empty_init,    ROT0,   "bootleg",                 "Pipi & Bibis / Whoopee!! (bootleg, decrypted)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map, not scrambled
 GAME( 1991, pipibibsbl3, pipibibs, pipibibsbl,   pipibibsbl, pipibibi_bootleg_state, empty_init,    ROT0,   "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (Ryouta Kikaku bootleg, decrypted)", MACHINE_SUPPORTS_SAVE )
-
-

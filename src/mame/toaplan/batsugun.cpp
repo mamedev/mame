@@ -3,19 +3,19 @@
 
 #include "emu.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
-
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplipt.h"
-#include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/nec/v25.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*
 Name        Board No      Maker         Game name
@@ -51,7 +51,7 @@ public:
 		, m_coincounter(*this, "coincounter")
 	{ }
 
-	void batsugun(machine_config &config);
+	void batsugun(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -74,7 +74,7 @@ private:
 
 	void screen_vblank(int state);
 
-	void reset(int state);
+	void reset_audiocpu(int state);
 
 	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_device<cpu_device> m_audiocpu;
@@ -190,7 +190,7 @@ void batsugun_state::screen_vblank(int state)
 }
 
 
-void batsugun_state::reset(int state)
+void batsugun_state::reset_audiocpu(int state)
 {
 	if (state)
 		coin_sound_reset_w(0);
@@ -198,7 +198,7 @@ void batsugun_state::reset(int state)
 
 void batsugun_state::machine_reset()
 {
-	if (m_audiocpu.found())
+	if (m_audiocpu)
 		coin_sound_reset_w(0);
 }
 
@@ -389,7 +389,7 @@ void batsugun_state::batsugun(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);           // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &batsugun_state::batsugun_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(batsugun_state::reset));
+	m_maincpu->reset_cb().set(FUNC(batsugun_state::reset_audiocpu));
 
 	v25_device &audiocpu(V25(config, m_audiocpu, 32_MHz_XTAL/2));         // NEC V25 type Toaplan marked CPU ???
 	audiocpu.set_addrmap(AS_PROGRAM, &batsugun_state::v25_mem);

@@ -109,68 +109,7 @@ To Do / Unknowns:
 
 *****************************************************************************/
 
-class bgaregga_state : public raizing_base_state
-{
-public:
-	bgaregga_state(const machine_config &mconfig, device_type type, const char *tag)
-		: raizing_base_state(mconfig, type, tag)
-	{ }
-
-	void bgaregga(machine_config &config);
-
-	void init_bgaregga();
-
-protected:
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-
-private:
-	void bgaregga_68k_mem(address_map &map) ATTR_COLD;
-	void bgaregga_sound_z80_mem(address_map &map) ATTR_COLD;
-
-	u8 bgaregga_E01D_r();
-};
-
-class bgaregga_bootleg_state : public bgaregga_state
-{
-public:
-	bgaregga_bootleg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: bgaregga_state(mconfig, type, tag)
-	{ }
-
-	void bgareggabl(machine_config &config);
-
-protected:
-	virtual void video_start() override ATTR_COLD;
-
-private:
-	u32 screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-};
-
-
-class sstriker_state : public raizing_base_state
-{
-public:
-	sstriker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: raizing_base_state(mconfig, type, tag)
-	{ }
-
-	void mahoudai(machine_config &config);
-	void shippumd(machine_config &config);
-
-protected:
-	virtual void video_start() override ATTR_COLD;
-
-private:
-	void mahoudai_68k_mem(address_map &map) ATTR_COLD;
-	void shippumd_68k_mem(address_map &map) ATTR_COLD;
-	void raizing_sound_z80_mem(address_map &map) ATTR_COLD;
-
-	void shippumd_coin_w(u8 data);
-};
-
-
-void raizing_base_state::reset(int state)
+void raizing_base_state::reset_audiocpu(int state)
 {
 	if (m_audiocpu != nullptr)
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, state);
@@ -270,6 +209,137 @@ void raizing_base_state::bgaregga_common_video_start()
 	/* Create the Text tilemap for this game */
 	create_tx_tilemap(0x1d4, 0x16b);
 }
+
+
+void raizing_base_state::raizing_z80_bankswitch_w(u8 data)
+{
+	m_audiobank->set_entry(data & 0x0f);
+}
+
+// bgaregga and batrider don't actually have a NMK112, but rather a GAL
+// programmed to bankswitch the sound ROMs in a similar fashion.
+// it may not be a coincidence that the composer and sound designer for
+// these two games, Manabu "Santaruru" Namiki, came to Raizing from NMK...
+void raizing_base_state::raizing_oki_bankswitch_w(offs_t offset, u8 data)
+{
+	m_raizing_okibank[(offset & 4) >> 2][offset & 3]->set_entry(data & 0xf);
+	m_raizing_okibank[(offset & 4) >> 2][4 + (offset & 3)]->set_entry(data & 0xf);
+	offset++;
+	data >>= 4;
+	m_raizing_okibank[(offset & 4) >> 2][offset & 3]->set_entry(data & 0xf);
+	m_raizing_okibank[(offset & 4) >> 2][4 + (offset & 3)]->set_entry(data & 0xf);
+}
+
+void raizing_base_state::common_bgaregga_reset()
+{
+	for (int chip = 0; chip < 2; chip++)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			if (m_raizing_okibank[chip][i] != nullptr)
+				m_raizing_okibank[chip][i]->set_entry(0);
+		}
+	}
+}
+
+void raizing_base_state::common_mem(address_map &map, offs_t rom_limit)
+{
+	map(0x000000, rom_limit).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x218000, 0x21bfff).rw(FUNC(raizing_base_state::shared_ram_r), FUNC(raizing_base_state::shared_ram_w)).umask16(0x00ff);
+	map(0x21c020, 0x21c021).portr("IN1");
+	map(0x21c024, 0x21c025).portr("IN2");
+	map(0x21c028, 0x21c029).portr("SYS");
+	map(0x21c02c, 0x21c02d).portr("DSWA");
+	map(0x21c030, 0x21c031).portr("DSWB");
+	map(0x21c034, 0x21c035).portr("JMPR");
+	map(0x21c03c, 0x21c03d).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
+	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
+	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500000, 0x501fff).ram().w(FUNC(raizing_base_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x502000, 0x502fff).ram().share(m_tx_lineselect);
+	map(0x503000, 0x5031ff).ram().w(FUNC(raizing_base_state::tx_linescroll_w)).share(m_tx_linescroll);
+	map(0x503200, 0x503fff).ram();
+}
+
+void raizing_base_state::install_raizing_okibank(int chip)
+{
+	assert(m_oki_rom[chip] && m_raizing_okibank[chip][0]);
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_raizing_okibank[chip][i]->configure_entries(0, 16, &m_oki_rom[chip][(i * 0x100)], 0x10000);
+	}
+	m_raizing_okibank[chip][4]->configure_entries(0, 16, &m_oki_rom[chip][0x400], 0x10000);
+	for (int i = 5; i < 8; i++)
+	{
+		m_raizing_okibank[chip][i]->configure_entries(0, 16, &m_oki_rom[chip][0], 0x10000);
+	}
+}
+
+
+namespace {
+
+class bgaregga_state : public raizing_base_state
+{
+public:
+	bgaregga_state(const machine_config &mconfig, device_type type, const char *tag)
+		: raizing_base_state(mconfig, type, tag)
+	{ }
+
+	void bgaregga(machine_config &config) ATTR_COLD;
+
+	void init_bgaregga() ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	void bgaregga_68k_mem(address_map &map) ATTR_COLD;
+	void bgaregga_sound_z80_mem(address_map &map) ATTR_COLD;
+
+	u8 bgaregga_E01D_r();
+};
+
+class bgaregga_bootleg_state : public bgaregga_state
+{
+public:
+	bgaregga_bootleg_state(const machine_config &mconfig, device_type type, const char *tag)
+		: bgaregga_state(mconfig, type, tag)
+	{ }
+
+	void bgareggabl(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	u32 screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
+
+class sstriker_state : public raizing_base_state
+{
+public:
+	sstriker_state(const machine_config &mconfig, device_type type, const char *tag)
+		: raizing_base_state(mconfig, type, tag)
+	{ }
+
+	void mahoudai(machine_config &config) ATTR_COLD;
+	void shippumd(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	void mahoudai_68k_mem(address_map &map) ATTR_COLD;
+	void shippumd_68k_mem(address_map &map) ATTR_COLD;
+	void raizing_sound_z80_mem(address_map &map) ATTR_COLD;
+
+	void shippumd_coin_w(u8 data);
+};
+
 
 void bgaregga_state::video_start()
 {
@@ -668,25 +738,6 @@ INPUT_PORTS_END
 
 
 
-void raizing_base_state::raizing_z80_bankswitch_w(u8 data)
-{
-	m_audiobank->set_entry(data & 0x0f);
-}
-
-// bgaregga and batrider don't actually have a NMK112, but rather a GAL
-// programmed to bankswitch the sound ROMs in a similar fashion.
-// it may not be a coincidence that the composer and sound designer for
-// these two games, Manabu "Santaruru" Namiki, came to Raizing from NMK...
-void raizing_base_state::raizing_oki_bankswitch_w(offs_t offset, u8 data)
-{
-	m_raizing_okibank[(offset & 4) >> 2][offset & 3]->set_entry(data & 0xf);
-	m_raizing_okibank[(offset & 4) >> 2][4 + (offset & 3)]->set_entry(data & 0xf);
-	offset++;
-	data >>= 4;
-	m_raizing_okibank[(offset & 4) >> 2][offset & 3]->set_entry(data & 0xf);
-	m_raizing_okibank[(offset & 4) >> 2][4 + (offset & 3)]->set_entry(data & 0xf);
-}
-
 u8 bgaregga_state::bgaregga_E01D_r()
 {
 	// the Z80 reads this address during its IRQ routine,
@@ -700,87 +751,35 @@ void sstriker_state::shippumd_coin_w(u8 data)
 	m_oki[0]->set_rom_bank(BIT(data, 4));
 }
 
-void raizing_base_state::common_bgaregga_reset()
-{
-	for (int chip = 0; chip < 2; chip++)
-	{
-		for (int i = 0; i < 8; i++)
-		{
-			if (m_raizing_okibank[chip][i] != nullptr)
-				m_raizing_okibank[chip][i]->set_entry(0);
-		}
-	}
-}
-
 void bgaregga_state::machine_reset()
 {
+	raizing_base_state::machine_reset();
+
 	common_bgaregga_reset();
 }
 
 void sstriker_state::mahoudai_68k_mem(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(FUNC(sstriker_state::shared_ram_r), FUNC(sstriker_state::shared_ram_w)).umask16(0x00ff);
-	map(0x21c01d, 0x21c01d).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
-	map(0x21c020, 0x21c021).portr("IN1");
-	map(0x21c024, 0x21c025).portr("IN2");
-	map(0x21c028, 0x21c029).portr("SYS");
-	map(0x21c02c, 0x21c02d).portr("DSWA");
-	map(0x21c030, 0x21c031).portr("DSWB");
-	map(0x21c034, 0x21c035).portr("JMPR");
-	map(0x21c03c, 0x21c03d).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
-	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
-	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	common_mem(map, 0x07ffff);
+
+	map(0x21c01d, 0x21c01d).w(m_coincounter, FUNC(toaplan_coincounter_device::coin_w));
 	map(0x401000, 0x4017ff).ram();                         // Unused palette RAM
-	map(0x500000, 0x501fff).ram().w(FUNC(sstriker_state::tx_videoram_w)).share(m_tx_videoram);
-	map(0x502000, 0x502fff).ram().share(m_tx_lineselect);
-	map(0x503000, 0x5031ff).ram().w(FUNC(sstriker_state::tx_linescroll_w)).share(m_tx_linescroll);
-	map(0x503200, 0x503fff).ram();
 }
 
 void sstriker_state::shippumd_68k_mem(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(FUNC(sstriker_state::shared_ram_r), FUNC(sstriker_state::shared_ram_w)).umask16(0x00ff);
+	common_mem(map, 0x0fffff);
+
 //  map(0x21c008, 0x21c009).nopw();                    // ???
 	map(0x21c01d, 0x21c01d).w(FUNC(sstriker_state::shippumd_coin_w)); // Coin count/lock + oki bankswitch
-	map(0x21c020, 0x21c021).portr("IN1");
-	map(0x21c024, 0x21c025).portr("IN2");
-	map(0x21c028, 0x21c029).portr("SYS");
-	map(0x21c02c, 0x21c02d).portr("DSWA");
-	map(0x21c030, 0x21c031).portr("DSWB");
-	map(0x21c034, 0x21c035).portr("JMPR");
-	map(0x21c03c, 0x21c03d).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
-	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
-	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x401000, 0x4017ff).ram();                         // Unused palette RAM
-	map(0x500000, 0x501fff).ram().w(FUNC(sstriker_state::tx_videoram_w)).share(m_tx_videoram);
-	map(0x502000, 0x502fff).ram().share(m_tx_lineselect);
-	map(0x503000, 0x5031ff).ram().w(FUNC(sstriker_state::tx_linescroll_w)).share(m_tx_linescroll);
-	map(0x503200, 0x503fff).ram();
 }
 
 void bgaregga_state::bgaregga_68k_mem(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(FUNC(bgaregga_state::shared_ram_r), FUNC(bgaregga_state::shared_ram_w)).umask16(0x00ff);
-	map(0x21c01d, 0x21c01d).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
-	map(0x21c020, 0x21c021).portr("IN1");
-	map(0x21c024, 0x21c025).portr("IN2");
-	map(0x21c028, 0x21c029).portr("SYS");
-	map(0x21c02c, 0x21c02d).portr("DSWA");
-	map(0x21c030, 0x21c031).portr("DSWB");
-	map(0x21c034, 0x21c035).portr("JMPR");
-	map(0x21c03c, 0x21c03d).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
-	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
-	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(FUNC(bgaregga_state::tx_videoram_w)).share(m_tx_videoram);
-	map(0x502000, 0x502fff).ram().share(m_tx_lineselect);
-	map(0x503000, 0x5031ff).ram().w(FUNC(bgaregga_state::tx_linescroll_w)).share(m_tx_linescroll);
-	map(0x503200, 0x503fff).ram();
+	common_mem(map, 0x0fffff);
+
+	map(0x21c01d, 0x21c01d).w(m_coincounter, FUNC(toaplan_coincounter_device::coin_w));
 	map(0x600001, 0x600001).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 }
 
@@ -790,7 +789,7 @@ void sstriker_state::raizing_sound_z80_mem(address_map &map)
 	map(0xc000, 0xdfff).ram().share(m_shared_ram);
 	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xe004, 0xe004).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe00e, 0xe00e).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
+	map(0xe00e, 0xe00e).w(m_coincounter, FUNC(toaplan_coincounter_device::coin_w));
 }
 
 void bgaregga_state::bgaregga_sound_z80_mem(address_map &map)
@@ -816,7 +815,7 @@ void sstriker_state::mahoudai(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &sstriker_state::mahoudai_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(sstriker_state::reset));
+	m_maincpu->reset_cb().set(FUNC(sstriker_state::reset_audiocpu));
 
 	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sstriker_state::raizing_sound_z80_mem);
@@ -861,7 +860,7 @@ void bgaregga_state::bgaregga(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &bgaregga_state::bgaregga_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(bgaregga_state::reset));
+	m_maincpu->reset_cb().set(FUNC(bgaregga_state::reset_audiocpu));
 
 	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bgaregga_state::bgaregga_sound_z80_mem);
@@ -907,21 +906,6 @@ void bgaregga_bootleg_state::bgareggabl(machine_config &config)
 	m_screen->set_screen_update(FUNC(bgaregga_bootleg_state::screen_update_bootleg));
 }
 
-
-void raizing_base_state::install_raizing_okibank(int chip)
-{
-	assert(m_oki_rom[chip] && m_raizing_okibank[chip][0]);
-
-	for (int i = 0; i < 4; i++)
-	{
-		m_raizing_okibank[chip][i]->configure_entries(0, 16, &m_oki_rom[chip][(i * 0x100)], 0x10000);
-	}
-	m_raizing_okibank[chip][4]->configure_entries(0, 16, &m_oki_rom[chip][0x400], 0x10000);
-	for (int i = 5; i < 8; i++)
-	{
-		m_raizing_okibank[chip][i]->configure_entries(0, 16, &m_oki_rom[chip][0], 0x10000);
-	}
-}
 
 void bgaregga_state::init_bgaregga()
 {
@@ -1333,6 +1317,8 @@ ROM_START( bgareggablj ) // fixed on Japanese region
 	ROM_REGION( 0x100000, "oki1", 0 )        // ADPCM Samples
 	ROM_LOAD( "rom5.bin", 0x000000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   sstriker_state, empty_init,      ROT270, "Raizing",                         "Sorcer Striker",           MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs

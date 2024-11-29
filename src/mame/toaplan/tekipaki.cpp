@@ -3,19 +3,19 @@
 
 #include "emu.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
-
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplipt.h"
-#include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/hd647180x.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopl.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*
 

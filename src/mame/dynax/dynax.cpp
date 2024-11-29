@@ -964,7 +964,7 @@ void dynax_adpcm_state::mjelctrn_io_map(address_map &map)
 	map(0x80, 0x80).w(FUNC(dynax_adpcm_state::hanamai_keyboard_w));         // keyboard row select
 	map(0x81, 0x81).portr("COINS");                                         // Coins
 	map(0x82, 0x82).r(FUNC(dynax_adpcm_state::mjelctrn_keyboard_1_r));      // P2
-	map(0x83, 0x83).r(FUNC(dynax_adpcm_state::hanamai_keyboard_0_r));       // P1
+	map(0x83, 0x83).r(FUNC(dynax_adpcm_state::hjingi_keyboard_0_r));        // P1
 	map(0x84, 0x84).r(FUNC(dynax_adpcm_state::mjelctrn_dsw_r));             // DSW8 x 4
 	map(0x85, 0x85).portr("SW1");                                           // DSW2
 	map(0xa1, 0xa7).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));  // Blitter
@@ -1050,58 +1050,64 @@ uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 	//static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
+	uint8_t result = 0xff;
 	switch (offset)
 	{
-		case 0:
+	case 0:
+		switch (m_input_sel)
 		{
-			switch (m_input_sel)
-			{
-				case 0x00:
-				case 0x80:
-					return ioport("COINS")->read(); // coins
+		case 0x00:
+		case 0x80:
+			result = ioport("COINS")->read(); // coins
+			break;
 
-				case 0x02:
-				case 0x82:
-					// do other bits do anything?
-					return m_hopper->line_r() ? 0xbf : 0xff;
+		case 0x02:
+		case 0x82:
+			// do other bits do anything?
+			result = m_hopper->line_r() ? 0xbf : 0xff;
+			break;
 
-				default:
-					logerror("%s: unmapped ip_sel=%02x read from offs %x\n", machine().describe_context(), m_input_sel, offset);
-					return 0xff;
-			}
+		default:
+			logerror("%s: unmapped ip_sel=%02x read from offs %x\n", machine().describe_context(), m_input_sel, offset);
 		}
+		break;
 
-		case 1:
+	case 1:
+		switch (m_input_sel)
 		{
-			switch (m_input_sel)
+		case 0x0d:
+			result = 0xff;
+			break;
+
+		// player 2
+		case 0x81:
+			if (m_keyb >= 5)
+				logerror("%s: unmapped keyb=%02x read\n", machine().describe_context(), m_keyb);
+			result = 0xff;//ioport(keynames1[m_keyb++])->read();
+			break;
+
+		// player 1
+		case 0x82:
+			if (m_input_mode != 0xff)
 			{
-				case 0x0d:
-					return 0xff;
-
-				// player 2
-				case 0x81:
-					if (m_keyb >= 5)
-						logerror("%s: unmapped keyb=%02x read\n", machine().describe_context(), m_keyb);
-					return 0xff;//ioport(keynames1[m_keyb++])->read();
-
-				// player 1
-				case 0x82:
-					if (m_input_mode != 0xff)
-						return 0x00;
-					if (m_keyb >= 5)
-					{
-						logerror("%s: unmapped keyb=%02x read\n", machine().describe_context(), m_keyb);
-						return 0x00;
-					}
-					return ioport(keynames0[m_keyb++])->read();
-
-				default:
-					logerror("%s: unmapped ip_sel=%02x read from offs %x\n", machine().describe_context(), m_input_sel, offset);
-					return 0xff;
+				result = 0x00;
 			}
+			else if (m_keyb >= 5)
+			{
+				logerror("%s: unmapped keyb=%02x read\n", machine().describe_context(), m_keyb);
+				result = 0x00;
+			}
+			result = ioport(keynames0[m_keyb])->read();
+			if (!machine().side_effects_disabled())
+				++m_keyb;
+			break;
+
+		default:
+			logerror("%s: unmapped ip_sel=%02x read from offs %x\n", machine().describe_context(), m_input_sel, offset);
 		}
+		break;
 	}
-	return 0xff;
+	return result;
 }
 
 
@@ -1112,14 +1118,14 @@ void dynax_state::tenkai_dswsel_w(uint8_t data)
 
 uint8_t dynax_state::tenkai_dsw_r()
 {
-	if (!BIT(m_dsw_sel, 0)) return ioport("DSW0")->read();
-	if (!BIT(m_dsw_sel, 1)) return ioport("DSW1")->read();
-	if (!BIT(m_dsw_sel, 2)) return ioport("DSW2")->read();
-	if (!BIT(m_dsw_sel, 3)) return ioport("DSW3")->read();
-	if (!BIT(m_dsw_sel, 4)) return ioport("DSW4")->read();
-	logerror("%s: unmapped dsw %02x read\n", machine().describe_context(), m_dsw_sel);
+	uint8_t result = 0xff;
+	if (!BIT(m_dsw_sel, 0)) result &= ioport("DSW0")->read();
+	if (!BIT(m_dsw_sel, 1)) result &= ioport("DSW1")->read();
+	if (!BIT(m_dsw_sel, 2)) result &= ioport("DSW2")->read();
+	if (!BIT(m_dsw_sel, 3)) result &= ioport("DSW3")->read();
+	if (!BIT(m_dsw_sel, 4)) result &= ioport("DSW4")->read();
 
-	return 0xff;
+	return result;
 }
 
 uint8_t dynax_state::tenkai_palette_r(offs_t offset)
@@ -1670,6 +1676,73 @@ INPUT_PORTS_END
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 #endif
+
+#define MAHJONG_COIN_TEST(ct, cm) \
+		PORT_START("COINS") \
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) PORT_CONDITION(ct, cm, EQUALS, 0)   /* Pay          */ \
+		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_CONDITION(ct, cm, EQUALS, cm)                     \
+		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                                /* 18B          */ \
+		PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE                                                    /* Test         */ \
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                            /* Analyzer     */ \
+		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                           /* Memory Reset */ \
+		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BILL1 )         PORT_CODE(KEYCODE_6)                                     /* Note         */ \
+		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                                                                  /* Coin         */ \
+		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                                                               /* Service      */
+
+#define MAHJONG_PAYOUT_RATE(shift, loc) \
+		PORT_DIPNAME( 0x0f << shift, 0x07 << shift, "Payout Rate" ) PORT_DIPLOCATION(loc) \
+		PORT_DIPSETTING(             0x00 << shift, "50%" ) \
+		PORT_DIPSETTING(             0x01 << shift, "53%" ) \
+		PORT_DIPSETTING(             0x02 << shift, "56%" ) \
+		PORT_DIPSETTING(             0x03 << shift, "59%" ) \
+		PORT_DIPSETTING(             0x04 << shift, "62%" ) \
+		PORT_DIPSETTING(             0x05 << shift, "65%" ) \
+		PORT_DIPSETTING(             0x06 << shift, "68%" ) \
+		PORT_DIPSETTING(             0x07 << shift, "71%" ) \
+		PORT_DIPSETTING(             0x08 << shift, "75%" ) \
+		PORT_DIPSETTING(             0x09 << shift, "78%" ) \
+		PORT_DIPSETTING(             0x0a << shift, "81%" ) \
+		PORT_DIPSETTING(             0x0b << shift, "84%" ) \
+		PORT_DIPSETTING(             0x0c << shift, "87%" ) \
+		PORT_DIPSETTING(             0x0d << shift, "90%" ) \
+		PORT_DIPSETTING(             0x0e << shift, "93%" ) \
+		PORT_DIPSETTING(             0x0f << shift, "96%" )
+
+#define MAHJONG_ODDS_RATE(shift, loc) \
+		PORT_DIPNAME( 0x03 << shift, 0x00 << shift, "Odds Rate" ) PORT_DIPLOCATION(loc) \
+		PORT_DIPSETTING(             0x03 << shift, "1 2 4 8 12 16 24 32" ) \
+		PORT_DIPSETTING(             0x00 << shift, "1 2 3 5 8 15 30 50" ) \
+		PORT_DIPSETTING(             0x01 << shift, "1 2 3 5 10 25 50 100" ) \
+		PORT_DIPSETTING(             0x02 << shift, "1 2 3 5 10 50 100 200" )
+
+#define MAHJONG_COINAGE(shift, loc) \
+		PORT_DIPNAME( 0x03 << shift, 0x03 << shift, DEF_STR(Coinage) ) PORT_DIPLOCATION(loc) /* ＣＯＩＮ　ＲＡＴＥ   */ \
+		PORT_DIPSETTING(             0x03 << shift, DEF_STR(1C_1C) )                         /* １コイン　　１プレイ */ \
+		PORT_DIPSETTING(             0x02 << shift, DEF_STR(1C_2C) )                         /* １コイン　　２プレイ */ \
+		PORT_DIPSETTING(             0x01 << shift, DEF_STR(1C_5C) )                         /* １コイン　　５プレイ */ \
+		PORT_DIPSETTING(             0x00 << shift, "1 Coin/10 Credits" )                    /* １コイン　１０プレイ */
+
+#define MAHJONG_NOTE_CREDITS(shift, loc, ct, cs) \
+		PORT_DIPNAME( 0x01 << shift, 0x00 << shift, "Credits Per Note" ) PORT_DIPLOCATION(loc)                 /* ＮＯＴＥ　ＲＡＴＥ */ \
+		PORT_DIPSETTING(             0x01 << shift, "5" )   PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x03 << cs) /* ＣＯＩＮ×５        */ \
+		PORT_DIPSETTING(             0x01 << shift, "10" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x02 << cs) \
+		PORT_DIPSETTING(             0x01 << shift, "25" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x01 << cs) \
+		PORT_DIPSETTING(             0x01 << shift, "50" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x00 << cs) \
+		PORT_DIPSETTING(             0x00 << shift, "10" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x03 << cs) /* ＣＯＩＮ×１０      */ \
+		PORT_DIPSETTING(             0x00 << shift, "20" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x02 << cs) \
+		PORT_DIPSETTING(             0x00 << shift, "50" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x01 << cs) \
+		PORT_DIPSETTING(             0x00 << shift, "100" ) PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x00 << cs)
+
+#define MAHJONG_YAKUMAN_BONUS(shift, loc) \
+		PORT_DIPNAME( 0x07 << shift, 0x04 << shift, "Yakuman Bonus Cycle" ) PORT_DIPLOCATION(loc) /* 役満ボーナスの設定周期 */ \
+		PORT_DIPSETTING(             0x07 << shift, "None" )                                      /* 無し                   */ \
+		PORT_DIPSETTING(             0x06 << shift, "First time only" )                           /* 初回のみ               */ \
+		PORT_DIPSETTING(             0x05 << shift, "Every 300 coins" )                           /* ３００コイン毎         */ \
+		PORT_DIPSETTING(             0x04 << shift, "Every 500 coins" )                           /* ５００コイン毎         */ \
+		PORT_DIPSETTING(             0x03 << shift, "Every 700 coins" )                           /* ７００コイン毎         */ \
+		PORT_DIPSETTING(             0x02 << shift, "Every 1000 coins" )                          /* １０００コイン毎       */ \
+	/*  PORT_DIPSETTING(             0x01 << shift, "Every 1000 coins" )*/ \
+	/*  PORT_DIPSETTING(             0x00 << shift, "Every 1000 coins" )*/
 
 static INPUT_PORTS_START( cdracula )
 	PORT_START("P1")
@@ -2981,52 +3054,20 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjembase )
 	PORT_START("DSW2")  /* DIP1, 7c20 (port $1e) */
-	PORT_DIPNAME( 0x0f, 0x07, "Payout Rate" )                   PORT_DIPLOCATION("SW 1:1,2,3,4")
-	PORT_DIPSETTING(    0x00, "50%" )
-	PORT_DIPSETTING(    0x01, "53%" )
-	PORT_DIPSETTING(    0x02, "56%" )
-	PORT_DIPSETTING(    0x03, "59%" )
-	PORT_DIPSETTING(    0x04, "62%" )
-	PORT_DIPSETTING(    0x05, "65%" )
-	PORT_DIPSETTING(    0x06, "68%" )
-	PORT_DIPSETTING(    0x07, "71%" )
-	PORT_DIPSETTING(    0x08, "75%" )
-	PORT_DIPSETTING(    0x09, "78%" )
-	PORT_DIPSETTING(    0x0a, "81%" )
-	PORT_DIPSETTING(    0x0b, "84%" )
-	PORT_DIPSETTING(    0x0c, "87%" )
-	PORT_DIPSETTING(    0x0d, "90%" )
-	PORT_DIPSETTING(    0x0e, "93%" )
-	PORT_DIPSETTING(    0x0f, "96%" )
+	MAHJONG_PAYOUT_RATE(0, "SW 1:1,2,3,4")
 	PORT_DIPNAME( 0x30, 0x10, "Maximum Bet" )                   PORT_DIPLOCATION("SW 1:5,6")
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x40, 0x00, "Credits Per Note" )              PORT_DIPLOCATION("SW 1:7")
-	PORT_DIPSETTING(    0x40, "5" )                             PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
-	PORT_DIPSETTING(    0x40, "10" )                            PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x08)
-	PORT_DIPSETTING(    0x40, "25" )                            PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x04)
-	PORT_DIPSETTING(    0x40, "50" )                            PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, "10" )                            PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
-	PORT_DIPSETTING(    0x00, "20" )                            PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x08)
-	PORT_DIPSETTING(    0x00, "50" )                            PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x04)
-	PORT_DIPSETTING(    0x00, "100" )                           PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x00)
+	MAHJONG_NOTE_CREDITS(6, "SW 1:7", "DSW1", 2)
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Flip_Screen) )            PORT_DIPLOCATION("SW 1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_START("DSW1")  /* DIP2, 7c21 (port $1c) */
-	PORT_DIPNAME( 0x03, 0x00, "Odds Rate" )                     PORT_DIPLOCATION("SW 2:1,2")
-	PORT_DIPSETTING(    0x03, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x01, "1 2 3 5 10 25 50 100" )
-	PORT_DIPSETTING(    0x02, "1 2 3 5 10 50 100 200" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR(Coinage) )                PORT_DIPLOCATION("SW 2:3,4")
-	PORT_DIPSETTING(    0x0c, DEF_STR(1C_1C) )
-	PORT_DIPSETTING(    0x08, DEF_STR(1C_2C) )
-	PORT_DIPSETTING(    0x04, DEF_STR(1C_5C) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	MAHJONG_ODDS_RATE(0, "SW 2:1,2")
+	MAHJONG_COINAGE(2, "SW 2:3,4")
 	PORT_DIPNAME( 0x30, 0x30, "Minimum Bet" )                   PORT_DIPLOCATION("SW 2:5,6")
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
@@ -3084,7 +3125,7 @@ static INPUT_PORTS_START( mjembase )
 	PORT_DIPNAME( 0x20, 0x00, "In-Game Music" )                 PORT_DIPLOCATION("SW 4:6")
 	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x40, 0x40, "Gal Selectt" )                   PORT_DIPLOCATION("SW 4:7")
+	PORT_DIPNAME( 0x40, 0x40, "Gal Select" )                    PORT_DIPLOCATION("SW 4:7")
 	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x80, 0x80, "Gal H Pose" )                    PORT_DIPLOCATION("SW 4:8")
@@ -3096,32 +3137,15 @@ static INPUT_PORTS_START( mjembase )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0xff, DEF_STR( On ) )
 
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00) // Pay
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                                       // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE                                                           // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                   // Analyzer
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                                  // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BILL1 )         PORT_CODE(KEYCODE_6)                                            // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                                                                         // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                                                                      // Service
+	MAHJONG_COIN_TEST("DSW1", 0x40)
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
 
 
-// DIP switch locations verified on mjelctrb PCB
+// DIP switch locations verified on mjelctrb PCB - disagrees with input test
 static INPUT_PORTS_START( mjelct3 )
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )     // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )     // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )        // Note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
+	MAHJONG_COIN_TEST("DSW1", 0x40)
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 
@@ -3135,64 +3159,34 @@ static INPUT_PORTS_START( mjelct3 )
 	PORT_DIPSETTING(    0x00, "1" ) // 32
 	PORT_DIPSETTING(    0x01, "2" ) // 64
 	PORT_DIPSETTING(    0x02, "3" ) // c8
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )              PORT_DIPLOCATION("SW3:3,4")
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x30, "Min Pay?" )                     PORT_DIPLOCATION("SW3:5,6")
+	MAHJONG_COINAGE(2, "SW3:3,4")
+	PORT_DIPNAME( 0x30, 0x30, "Minimum Bet" )                  PORT_DIPLOCATION("SW3:5,6")
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, "Allow Coin Out" )               PORT_DIPLOCATION("SW3:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Win A Prize?" )                 PORT_DIPLOCATION("SW3:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Payout Mode" )                  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, "Key-out" )
+	PORT_DIPSETTING(    0x00, "Hopper" )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper Polarity" )              PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Normal) )
+	PORT_DIPSETTING(    0x00, "Inverted" )
 
 	PORT_START("DSW1")  /* 7c20 (select = 40) */
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )                 PORT_DIPLOCATION("SW4:1,2,3,4")
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPSETTING(    0x01, "53" )
-	PORT_DIPSETTING(    0x02, "56" )
-	PORT_DIPSETTING(    0x03, "59" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x05, "65" )
-	PORT_DIPSETTING(    0x06, "68" )
-	PORT_DIPSETTING(    0x07, "71" )
-	PORT_DIPSETTING(    0x08, "75" )
-	PORT_DIPSETTING(    0x09, "78" )
-	PORT_DIPSETTING(    0x0a, "81" )
-	PORT_DIPSETTING(    0x0b, "84" )
-	PORT_DIPSETTING(    0x0c, "87" )
-	PORT_DIPSETTING(    0x0d, "90" )
-	PORT_DIPSETTING(    0x0e, "93" )
-	PORT_DIPSETTING(    0x0f, "96" )
-	PORT_DIPNAME( 0x30, 0x30, "Max Bet" )                      PORT_DIPLOCATION("SW4:5,6")
+	MAHJONG_PAYOUT_RATE(0, "SW4:1,2,3,4")
+	PORT_DIPNAME( 0x30, 0x30, "Maximum Bet" )                  PORT_DIPLOCATION("SW4:5,6")
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coin_B ) )              PORT_DIPLOCATION("SW4:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	MAHJONG_NOTE_CREDITS(6, "SW4:7", "DSW0", 2)
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )         PORT_DIPLOCATION("SW4:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")  /* 7c22 (select = 80) */
-	PORT_DIPNAME( 0x07, 0x07, "YAKUMAN Bonus" )                PORT_DIPLOCATION("SW2:1,2,3")
-	PORT_DIPSETTING(    0x07, "Cut" )
-	PORT_DIPSETTING(    0x06, "1 T" )
-	PORT_DIPSETTING(    0x05, "300" )
-	PORT_DIPSETTING(    0x04, "500" )
-	PORT_DIPSETTING(    0x03, "700" )
-	PORT_DIPSETTING(    0x02, "1000" )
-//  PORT_DIPSETTING(    0x01, "1000" )
-//  PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x08, 0x08, "YAKU times" )                   PORT_DIPLOCATION("SW2:4")
+	MAHJONG_YAKUMAN_BONUS(0, "SW2:1,2,3")
+	PORT_DIPNAME( 0x08, 0x08, "Yakuman Bonuses Per Cycle" )    PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPNAME( 0x10, 0x10, "Win Rate?" )                    PORT_DIPLOCATION("SW2:5")
@@ -3201,7 +3195,7 @@ static INPUT_PORTS_START( mjelct3 )
 	PORT_DIPNAME( 0x20, 0x20, "Draw New Tile (Part 3 Only)" )  PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, "Automatic" )
 	PORT_DIPSETTING(    0x20, "Manual" )
-	PORT_DIPNAME( 0x40, 0x40, "DonDen Key" )                   PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x00, "Don Den Button" )               PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, "A" )
 	PORT_DIPSETTING(    0x00, "Flip Flop" )
 	PORT_DIPNAME( 0x80, 0x00, "Subtitle" )                     PORT_DIPLOCATION("SW2:8")
@@ -3210,8 +3204,8 @@ static INPUT_PORTS_START( mjelct3 )
 
 	PORT_START("DSW3")  /* 7c23 (select = c0) */
 	PORT_DIPNAME( 0x01, 0x01, "Last Chance" )                  PORT_DIPLOCATION("SW5:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x01, DEF_STR(On) )
 	PORT_DIPNAME( 0x02, 0x02, "Pay Rate?" )                    PORT_DIPLOCATION("SW5:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( High ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
@@ -3221,15 +3215,15 @@ static INPUT_PORTS_START( mjelct3 )
 	PORT_DIPNAME( 0x08, 0x08, "In-Game Bet?" )                 PORT_DIPLOCATION("SW5:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )         PORT_DIPLOCATION("SW5:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR(Demo_Sounds) )           PORT_DIPLOCATION("SW5:5")
+	PORT_DIPSETTING(    0x10, DEF_STR(Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x20, 0x00, "In-Game Music" )                PORT_DIPLOCATION("SW5:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Select Girl" )                  PORT_DIPLOCATION("SW5:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x40, 0x40, "Gal Select" )                   PORT_DIPLOCATION("SW5:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x80, 0x00, "Nudity" )                       PORT_DIPLOCATION("SW5:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )   // Moles On Gal's Face
@@ -3318,15 +3312,7 @@ static INPUT_PORTS_START( mjelctrn )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")  /* 7c22 (select = 80) */
-	PORT_DIPNAME( 0x07, 0x04, "Yakuman Bonus Cycle" )          PORT_DIPLOCATION("SW2:1,2,3")
-	PORT_DIPSETTING(    0x07, "None" )
-	PORT_DIPSETTING(    0x06, "First time only" )
-	PORT_DIPSETTING(    0x05, "Every 300 coins" )
-	PORT_DIPSETTING(    0x04, "Every 500 coins" )
-	PORT_DIPSETTING(    0x03, "Every 700 coins" )
-	PORT_DIPSETTING(    0x02, "Every 1000 coins" )
-//  PORT_DIPSETTING(    0x01, "Every 1000 coins" )
-//  PORT_DIPSETTING(    0x00, "Every 1000 coins" )
+	MAHJONG_YAKUMAN_BONUS(0, "SW2:1,2,3")
 	PORT_DIPNAME( 0x08, 0x08, "Yakuman Bonuses Per Cycle" )    PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -3601,28 +3587,8 @@ static INPUT_PORTS_START( tenkai )
 	// There is an additional 4-switch bank (SW 5) for selecting the wiring options.
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0f, 0x07, "Payout Rate" )                   PORT_DIPLOCATION("SW 1:1,2,3,4")  // ＰＡＹ－ＯＵＴ　ＲＡＴＥ
-	PORT_DIPSETTING(    0x00, "50%" )
-	PORT_DIPSETTING(    0x01, "53%" )
-	PORT_DIPSETTING(    0x02, "56%" )
-	PORT_DIPSETTING(    0x03, "59%" )
-	PORT_DIPSETTING(    0x04, "62%" )
-	PORT_DIPSETTING(    0x05, "65%" )
-	PORT_DIPSETTING(    0x06, "68%" )
-	PORT_DIPSETTING(    0x07, "71%" )
-	PORT_DIPSETTING(    0x08, "75%" )
-	PORT_DIPSETTING(    0x09, "78%" )
-	PORT_DIPSETTING(    0x0a, "81%" )
-	PORT_DIPSETTING(    0x0b, "84%" )
-	PORT_DIPSETTING(    0x0c, "87%" )
-	PORT_DIPSETTING(    0x0d, "90%" )
-	PORT_DIPSETTING(    0x0e, "93%" )
-	PORT_DIPSETTING(    0x0f, "96%" )
-	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" )                     PORT_DIPLOCATION("SW 1:5,6")      // ＯＤＤＳ　ＲＡＴＥ
-	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPSETTING(    0x20, "1 2 3 5 10 50 100 200" )
+	MAHJONG_PAYOUT_RATE(0, "SW 1:1,2,3,4")                                                        // ＰＡＹ－ＯＵＴ　ＲＡＴＥ
+	MAHJONG_ODDS_RATE(4, "SW 1:5,6")                                                              // ＯＤＤＳ　ＲＡＴＥ
 	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )                   PORT_DIPLOCATION("SW 1:7,8")      // ＢＥＴ－ＭＡＸ
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -3630,25 +3596,13 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPSETTING(    0x00, "20" )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )                PORT_DIPLOCATION("SW 2:1,2")      // ＣＯＩＮ　ＲＡＴＥ
-	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )                                                    // １コイン　　１プレイ
-	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )                                                    // １コイン　　２プレイ
-	PORT_DIPSETTING(    0x01, DEF_STR(1C_5C) )                                                    // １コイン　　５プレイ
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )                                               // １コイン　１０プレイ
+	MAHJONG_COINAGE(0, "SW 2:1,2")                                                                // ＣＯＩＮ　ＲＡＴＥ
 	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                   PORT_DIPLOCATION("SW 2:3,4")      // ゲーム・スタート時の最低レート数
 	PORT_DIPSETTING(    0x0c, "1" )                                                               // レート　１
 	PORT_DIPSETTING(    0x08, "2" )                                                               // レート　２
 	PORT_DIPSETTING(    0x04, "3" )                                                               // レート　３
 	PORT_DIPSETTING(    0x00, "5" )                                                               // レート　５
-	PORT_DIPNAME( 0x70, 0x40, "Yakuman Bonus Cycle" )           PORT_DIPLOCATION("SW 2:5,6,7")    // 役満ボーナスの設定周期
-	PORT_DIPSETTING(    0x70, "None" )                                                            // 無し
-	PORT_DIPSETTING(    0x60, "First time only" )                                                 // 初回のみ
-	PORT_DIPSETTING(    0x50, "Every 300 coins" )                                                 // ３００コイン毎
-	PORT_DIPSETTING(    0x40, "Every 500 coins" )                                                 // ５００コイン毎
-	PORT_DIPSETTING(    0x30, "Every 700 coins" )                                                 // ７００コイン毎
-	PORT_DIPSETTING(    0x20, "Every 1000 coins" )                                                // １０００コイン毎
-//  PORT_DIPSETTING(    0x10, "Every 1000 coins" )
-//  PORT_DIPSETTING(    0x00, "Every 1000 coins" )
+	MAHJONG_YAKUMAN_BONUS(4, "SW 2:5,6,7")                                                        // 役満ボーナスの設定周期
 	PORT_DIPNAME( 0x80, 0x00, "Yakuman Bonuses Per Cycle" )     PORT_DIPLOCATION("SW 2:8")        // 役満ボーナスの回数設定周期毎に
 	PORT_DIPSETTING(    0x00, "1" )                                                               // １回
 	PORT_DIPSETTING(    0x80, "2" )                                                               // ２回
@@ -3706,15 +3660,7 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
 
 	PORT_START("DSW4")  /* (top) */
-	PORT_DIPNAME( 0x01, 0x00, "Credits Per Note" )              PORT_DIPLOCATION("SW 1:9")        // ＮＯＴＥ　ＲＡＴＥ
-	PORT_DIPSETTING(    0x01, "5" )                             PORT_CONDITION("DSW1", 0x03, EQUALS, 0x03) // ＣＯＩＮ×５
-	PORT_DIPSETTING(    0x01, "10" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x01, "25" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x01, "50" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, "10" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x03) // ＣＯＩＮ×１０
-	PORT_DIPSETTING(    0x00, "20" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, "50" )                            PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x00, "100" )                           PORT_CONDITION("DSW1", 0x03, EQUALS, 0x00)
+	MAHJONG_NOTE_CREDITS(0, "SW 1:9", "DSW1", 0)                                                           // ＮＯＴＥ　ＲＡＴＥ
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW 1:10")       // モニター画面反転
 	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                      // 通常
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 反転
@@ -3740,16 +3686,7 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPSETTING(    0x80, DEF_STR(No) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
 
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) // Pay (default assignment conflicts with I)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                                       // 18B
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE                                                           // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                   // Analyzer
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                                  // Memory Reset
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BILL1 )         PORT_CODE(KEYCODE_6)                                            // Note (default assignment conflicts with Small)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                                                                         // Coin
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                                                                      // Service
+	MAHJONG_COIN_TEST("DSW2", 0x01)
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
@@ -4770,7 +4707,10 @@ void dynax_adpcm_state::mjelctrn(machine_config &config)
 	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_adpcm_state::layer_half2_w));
 	// Q3, Q4 seem to be related to wrap around enable
 
+	subdevice<ls259_device>("outlatch")->q_out_cb<2>().set(m_hopper, FUNC(hopper_device::motor_w));
 	config.device_remove("mainirq");
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c015_device::trg0)).invert();
 
@@ -4795,8 +4735,6 @@ void dynax_adpcm_state::mjembase(machine_config &config)
 	m_mainlatch->q_out_cb<5>().set(m_hopper, FUNC(hopper_device::motor_w));
 
 	config.device_remove("outlatch");
-
-	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_adpcm_state, mjembase)
 }

@@ -3,20 +3,20 @@
 
 #include "emu.h"
 
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplipt.h"
-#include "gp9001.h"
-
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/upd4992.h"
 #include "sound/okim6295.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*****************************************************************************
 
@@ -60,13 +60,15 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 
-	void othldrby_68k_mem(address_map &map) ATTR_COLD;
+	void common_mem(address_map &map) ATTR_COLD;
 	void pwrkick_68k_mem(address_map &map) ATTR_COLD;
+	void othldrby_68k_mem(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
 	void sw_oki_bankswitch_w(u8 data);
+
 private:
 	void pwrkick_coin_w(u8 data);
 	void pwrkick_coin_lockout_w(u8 data);
@@ -393,7 +395,7 @@ void sunwise_state::pwrkick_coin_lockout_w(u8 data)
 }
 
 
-void sunwise_state::pwrkick_68k_mem(address_map &map)
+void sunwise_state::common_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram().share("nvram"); // Only 10022C-10037B is actually saved as NVRAM
@@ -407,33 +409,27 @@ void sunwise_state::pwrkick_68k_mem(address_map &map)
 	map(0x700000, 0x700001).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
 	map(0x700004, 0x700005).portr("DSWA");
 	map(0x700008, 0x700009).portr("DSWB");
+	map(0x70001c, 0x70001d).portr("SYS");
+	map(0x700031, 0x700031).w(FUNC(sunwise_state::sw_oki_bankswitch_w));
+}
+
+void sunwise_state::pwrkick_68k_mem(address_map &map)
+{
+	common_mem(map);
+
 	map(0x70000c, 0x70000d).portr("IN1");
 	map(0x700014, 0x700015).portr("IN2");
 	map(0x700018, 0x700019).portr("DSWC");
-	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700031, 0x700031).w(FUNC(sunwise_state::sw_oki_bankswitch_w));
 	map(0x700035, 0x700035).w(FUNC(sunwise_state::pwrkick_coin_w));
 	map(0x700039, 0x700039).w(FUNC(sunwise_state::pwrkick_coin_lockout_w));
 }
 
 void sunwise_state::othldrby_68k_mem(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x103fff).ram().share("nvram"); // Only 10331E-103401 is actually saved as NVRAM
-	map(0x104000, 0x10ffff).ram();
+	common_mem(map);
 
-	map(0x200000, 0x20000f).rw(m_rtc, FUNC(upd4992_device::read), FUNC(upd4992_device::write)).umask16(0x00ff);
-	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
-	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-
-	map(0x700000, 0x700001).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
-	map(0x700004, 0x700005).portr("DSWA");
-	map(0x700008, 0x700009).portr("DSWB");
 	map(0x70000c, 0x70000d).portr("IN1");
 	map(0x700010, 0x700011).portr("IN2");
-	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700031, 0x700031).w(FUNC(sunwise_state::sw_oki_bankswitch_w));
 	map(0x700035, 0x700035).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
 }
 

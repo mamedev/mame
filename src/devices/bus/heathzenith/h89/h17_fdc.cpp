@@ -39,6 +39,8 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+namespace {
+
 class heath_h17_fdc_device : public device_t, public device_h89bus_right_card_interface
 {
 public:
@@ -49,7 +51,7 @@ public:
 	virtual void write(u8 select_lines, u8 offset, u8 data) override;
 	virtual u8 read(u8 select_lines, u8 offset) override;
 
-	void side_select_w(int state);
+	[[maybe_unused]] void side_select_w(int state);
 
 protected:
 	static constexpr u8 MAX_FLOPPY_DRIVES = 3;
@@ -359,5 +361,7 @@ void heath_h17_fdc_device::sync_character_received(int state)
 
 	m_sync_char_received = bool(!BIT(state, 0));
 }
+
+} // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_H_17_FDC, device_h89bus_right_card_interface, heath_h17_fdc_device, "h89_h17_fdc", "Heath H-17 Hard-sectored Controller (H-88-1)");

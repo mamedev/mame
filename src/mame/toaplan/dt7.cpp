@@ -20,6 +20,7 @@
 
 
 #include "emu.h"
+
 #include "toaplipt.h"
 #include "toaplan_v25_tables.h"
 #include "gp9001.h"
@@ -57,10 +58,10 @@ public:
 	{ }
 
 public:
-	void dt7(machine_config &config);
+	void dt7(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void dt7_reset(int state);
@@ -83,8 +84,6 @@ private:
 	uint8_t unmapped_v25_io1_r();
 	uint8_t unmapped_v25_io2_r();
 
-	uint8_t m_ioport_state = 0x00;
-
 	uint8_t read_port_t();
 	uint8_t read_port_2();
 	void write_port_2(uint8_t data);
@@ -93,6 +92,8 @@ private:
 	void shared_ram_w(offs_t offset, u8 data);
 
 	void screen_vblank(int state);
+
+	uint8_t m_ioport_state = 0x00;
 
 	tilemap_t *m_tx_tilemap[2];    /* Tilemap for extra-text-layer */
 
@@ -216,31 +217,31 @@ void dt7_state::write_port_2(uint8_t data)
 // hacks because the sound CPU isn't running properly
 u8 dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 {
-    u16 ret = m_shared_ram[offset];
+	u16 ret = m_shared_ram[offset];
 
-    u32 addr = (offset * 2) + 0x610000;
+	u32 addr = (offset * 2) + 0x610000;
 
-    if (addr == 0x061f00c)
-      return ioport("SYS")->read();// machine().rand();
+	if (addr == 0x061f00c)
+		return ioport("SYS")->read();// machine().rand();
 
-    //return ret;
+	//return ret;
 
 
-    u32 pc = m_maincpu->pc();
-    if (pc == 0x7d84)
-        return 0xff;
-    if (addr == 0x061d000) // settings (from EEPROM?) including flipscreen
-        return 0x00;
-    if (addr == 0x061d002) // settings (from EEPROM?) dipswitch?
-        return 0x00;
-    if (addr == 0x061d004) // settings (from EEPROM?) region
-        return 0xff;
-    if (addr == 0x061f004)
-        return ioport("IN1")->read(); ;// machine().rand(); // p1 inputs
-    if (addr == 0x061f006)
-        return ioport("IN2")->read();// machine().rand(); // P2 inputs
+	u32 pc = m_maincpu->pc();
+	if (pc == 0x7d84)
+		return 0xff;
+	if (addr == 0x061d000) // settings (from EEPROM?) including flipscreen
+		return 0x00;
+	if (addr == 0x061d002) // settings (from EEPROM?) dipswitch?
+		return 0x00;
+	if (addr == 0x061d004) // settings (from EEPROM?) region
+		return 0xff;
+	if (addr == 0x061f004)
+		return ioport("IN1")->read(); ;// machine().rand(); // p1 inputs
+	if (addr == 0x061f006)
+		return ioport("IN2")->read();// machine().rand(); // P2 inputs
 //  logerror("%08x: dt7_shared_ram_hack_r address %08x ret %02x\n", pc, addr, ret);
-    return ret;
+	return ret;
 }
 
 void dt7_state::shared_ram_w(offs_t offset, u8 data)
@@ -285,7 +286,7 @@ void dt7_state::dt7_shared_mem(address_map &map)
 }
 void dt7_state::dt7_68k_1_mem(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom().mirror(0x80000); // mirror needed or road doesn't draw
+	map(0x000000, 0x07ffff).rom().mirror(0x080000); // mirror needed or road doesn't draw
 	dt7_shared_mem(map);
 }
 

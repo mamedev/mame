@@ -3,21 +3,21 @@
 
 #include "emu.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
-
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplan_v25_tables.h"
 #include "toaplipt.h"
-#include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*
 Name        Board No      Maker         Game name
@@ -35,10 +35,10 @@ dogyuun  - In the location test version, if you are hit while you have a bomb, t
 
 namespace {
 
-class dogyuun_base_state : public driver_device
+class dogyuun_state : public driver_device
 {
 public:
-	dogyuun_base_state(const machine_config &mconfig, device_type type, const char *tag)
+	dogyuun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
@@ -50,7 +50,8 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
-	void dogyuun_base(machine_config &config);
+	void dogyuun(machine_config &config) ATTR_COLD;
+	void dogyuunto(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -59,9 +60,9 @@ protected:
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
 	void shared_ram_w(offs_t offset, u8 data) { m_shared_ram[offset] = data; }
 
-	void coin_sound_reset_w(u8 data);
+	template <unsigned B> void coin_sound_reset_w(u8 data);
 
-	u8 m_sound_reset_bit = 0;
+	void dogyuun_base(machine_config &config) ATTR_COLD;
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -75,7 +76,12 @@ private:
 
 	void screen_vblank(int state);
 
-	void reset(int state);
+	void reset_audiocpu(int state);
+
+	void dogyuun_68k_mem(address_map &map) ATTR_COLD;
+	void v25_mem(address_map &map) ATTR_COLD;
+	void dogyuunto_68k_mem(address_map &map) ATTR_COLD;
+	void dogyuunto_sound_z80_mem(address_map &map) ATTR_COLD;
 
 	required_device<toaplan_coincounter_device> m_coincounter;
 	required_device<screen_device> m_screen;
@@ -83,50 +89,22 @@ private:
 	bitmap_ind16 m_secondary_render_bitmap;
 };
 
-class dogyuun_state : public dogyuun_base_state
-{
-public:
-	dogyuun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dogyuun_base_state(mconfig, type, tag)
-	{
-		m_sound_reset_bit = 0x20;
-	}
-
-	void dogyuun(machine_config &config);
-
-private:
-	void dogyuun_68k_mem(address_map &map) ATTR_COLD;
-	void v25_mem(address_map &map) ATTR_COLD;
-};
-
-class dogyuunto_state : public dogyuun_base_state
-{
-public:
-	dogyuunto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dogyuun_base_state(mconfig, type, tag)
-	{
-		m_sound_reset_bit = 0x10;
-	}
-
-	void dogyuunto(machine_config &config);
-
-private:
-	void dogyuunto_68k_mem(address_map &map) ATTR_COLD;
-	void dogyuunto_sound_z80_mem(address_map &map) ATTR_COLD;
-};
-
-void dogyuun_base_state::reset(int state)
+void dogyuun_state::reset_audiocpu(int state)
 {
 	if (state)
-		coin_sound_reset_w(0);
+	{
+		m_coincounter->coin_w(0);
+		m_audiocpu->set_input_line(ASSERT_LINE);
+	}
 }
 
-void dogyuun_base_state::machine_reset()
+void dogyuun_state::machine_reset()
 {
-	coin_sound_reset_w(0);
+	m_coincounter->coin_w(0);
+	m_audiocpu->set_input_line(ASSERT_LINE);
 }
 
-void dogyuun_base_state::video_start()
+void dogyuun_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
 	m_secondary_render_bitmap.reset();
@@ -135,7 +113,7 @@ void dogyuun_base_state::video_start()
 	m_vdp[1]->custom_priority_bitmap = &m_custom_priority_bitmap;
 }
 
-void dogyuun_base_state::screen_vblank(int state)
+void dogyuun_state::screen_vblank(int state)
 {
 	if (state)	// rising edge
 	{
@@ -144,7 +122,7 @@ void dogyuun_base_state::screen_vblank(int state)
 	}
 }
 
-u32 dogyuun_base_state::screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dogyuun_state::screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
@@ -286,10 +264,11 @@ static INPUT_PORTS_START( dogyuunt )
 	PORT_CONFSETTING(       0x00f0, "Japan (Taito Corp.)" )
 INPUT_PORTS_END
 
-void dogyuun_base_state::coin_sound_reset_w(u8 data)
+template <unsigned B>
+void dogyuun_state::coin_sound_reset_w(u8 data)
 {
-	m_coincounter->coin_w(data & ~m_sound_reset_bit);
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & m_sound_reset_bit) ? CLEAR_LINE : ASSERT_LINE);
+	m_coincounter->coin_w(data & ~(u8(1) << B));
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, B) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void dogyuun_state::dogyuun_68k_mem(address_map &map)
@@ -299,7 +278,7 @@ void dogyuun_state::dogyuun_68k_mem(address_map &map)
 	map(0x200010, 0x200011).portr("IN1");
 	map(0x200014, 0x200015).portr("IN2");
 	map(0x200018, 0x200019).portr("SYS");
-	map(0x20001d, 0x20001d).w(FUNC(dogyuun_state::coin_sound_reset_w)); // Coin count/lock + v25 reset line
+	map(0x20001d, 0x20001d).w(FUNC(dogyuun_state::coin_sound_reset_w<5>)); // Coin count/lock + v25 reset line
 	map(0x210000, 0x21ffff).rw(FUNC(dogyuun_state::shared_ram_r), FUNC(dogyuun_state::shared_ram_w)).umask16(0x00ff);
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -308,12 +287,12 @@ void dogyuun_state::dogyuun_68k_mem(address_map &map)
 }
 
 
-void dogyuunto_state::dogyuunto_68k_mem(address_map &map)
+void dogyuun_state::dogyuunto_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram();
-	map(0x218000, 0x218fff).rw(FUNC(dogyuunto_state::shared_ram_r), FUNC(dogyuunto_state::shared_ram_w)).umask16(0x00ff); // reads the same area as the finished game on startup, but then uses only this part
-	map(0x21c01d, 0x21c01d).w(FUNC(dogyuunto_state::coin_sound_reset_w)); // Coin count/lock + Z80 reset line
+	map(0x218000, 0x218fff).rw(FUNC(dogyuun_state::shared_ram_r), FUNC(dogyuun_state::shared_ram_w)).umask16(0x00ff); // reads the same area as the finished game on startup, but then uses only this part
+	map(0x21c01d, 0x21c01d).w(FUNC(dogyuun_state::coin_sound_reset_w<4>)); // Coin count/lock + Z80 reset line
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
@@ -325,7 +304,7 @@ void dogyuunto_state::dogyuunto_68k_mem(address_map &map)
 	map(0x700000, 0x700001).r(m_vdp[0], FUNC(gp9001vdp_device::vdpcount_r));         // test bit 8
 }
 
-void dogyuunto_state::dogyuunto_sound_z80_mem(address_map &map)
+void dogyuun_state::dogyuunto_sound_z80_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram().share(m_shared_ram);
@@ -340,11 +319,11 @@ void dogyuun_state::v25_mem(address_map &map)
 	map(0x80000, 0x87fff).mirror(0x78000).ram().share(m_shared_ram);
 }
 
-void dogyuun_base_state::dogyuun_base(machine_config &config)
+void dogyuun_state::dogyuun_base(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 25_MHz_XTAL/2);           /* verified on pcb */
-	m_maincpu->reset_cb().set(FUNC(dogyuun_base_state::reset));
+	m_maincpu->reset_cb().set(FUNC(dogyuun_state::reset_audiocpu));
 
 	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
 
@@ -352,8 +331,8 @@ void dogyuun_base_state::dogyuun_base(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(dogyuun_base_state::screen_update_dogyuun));
-	m_screen->screen_vblank().set(FUNC(dogyuun_base_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(dogyuun_state::screen_update_dogyuun));
+	m_screen->screen_vblank().set(FUNC(dogyuun_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, gp9001vdp_device::VDP_PALETTE_LENGTH);
@@ -390,15 +369,15 @@ void dogyuun_state::dogyuun(machine_config& config)
 }
 
 
-void dogyuunto_state::dogyuunto(machine_config &config)
+void dogyuun_state::dogyuunto(machine_config &config)
 {
 	dogyuun_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &dogyuunto_state::dogyuunto_68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dogyuun_state::dogyuunto_68k_mem);
 	m_maincpu->set_clock(24_MHz_XTAL / 2); // 24 MHz instead of 25
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 27_MHz_XTAL / 8)); // guessed divisor
-	audiocpu.set_addrmap(AS_PROGRAM, &dogyuunto_state::dogyuunto_sound_z80_mem);
+	audiocpu.set_addrmap(AS_PROGRAM, &dogyuun_state::dogyuunto_sound_z80_mem);
 
 	m_oki->set_clock(1.056_MHz_XTAL); // blue resonator 1056J
 }
@@ -524,4 +503,4 @@ GAME( 1992, dogyuun,     0,        dogyuun,      dogyuun,    dogyuun_state, empt
 GAME( 1992, dogyuuna,    dogyuun,  dogyuun,      dogyuuna,   dogyuun_state, empty_init,  ROT270, "Toaplan",         "Dogyuun (older set)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1992, dogyuunb,    dogyuun,  dogyuun,      dogyuunt,   dogyuun_state, empty_init,  ROT270, "Toaplan",         "Dogyuun (oldest set)",              MACHINE_SUPPORTS_SAVE ) // maybe a newer location test version, instead
 GAME( 1992, dogyuunt,    dogyuun,  dogyuun,      dogyuunt,   dogyuun_state, empty_init,  ROT270, "Toaplan",         "Dogyuun (10/9/1992 location test)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dogyuunto,   dogyuun,  dogyuunto,    dogyuunt,   dogyuunto_state, empty_init,    ROT270, "Toaplan",         "Dogyuun (8/25/1992 location test)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dogyuunto,   dogyuun,  dogyuunto,    dogyuunt,   dogyuun_state, empty_init,  ROT270, "Toaplan",         "Dogyuun (8/25/1992 location test)", MACHINE_SUPPORTS_SAVE )

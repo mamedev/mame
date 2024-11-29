@@ -1,14 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench, Yochizo, David Haywood
+#ifndef MAME_TOAPLAN_RAIZING_H
+#define MAME_TOAPLAN_RAIZING_H
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
+#pragma once
 
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplipt.h"
-#include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -18,6 +17,11 @@
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "sound/ymz280b.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 
 class raizing_base_state : public driver_device
@@ -48,7 +52,7 @@ public:
 
 protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void device_post_load() override;
+	virtual void device_post_load() override ATTR_COLD;
 
 	// used by everything
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
@@ -58,6 +62,8 @@ protected:
 	void raizing_oki_bankswitch_w(offs_t offset, u8 data);
 	void install_raizing_okibank(int chip);
 	void common_bgaregga_reset();
+
+	void common_mem(address_map &map, offs_t rom_limit) ATTR_COLD;
 
 	// similar as NMK112, but GAL-driven; NOT actual NMK112 is present
 	template<unsigned Chip>
@@ -84,7 +90,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
 	void coin_w(u8 data);
-	void reset(int state);
+	void reset_audiocpu(int state);
 
 	tilemap_t *m_tx_tilemap = nullptr;    /* Tilemap for extra-text-layer */
 	required_shared_ptr<u16> m_tx_videoram;
@@ -106,3 +112,5 @@ protected:
 	required_device<toaplan_coincounter_device> m_coincounter;
 	bitmap_ind8 m_custom_priority_bitmap;
 };
+
+#endif // MAME_TOAPLAN_RAIZING_H

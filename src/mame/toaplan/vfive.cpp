@@ -3,19 +3,19 @@
 
 #include "emu.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
-
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplan_v25_tables.h"
 #include "toaplipt.h"
-#include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/nec/v25.h"
 #include "sound/ymopm.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*
 Name        Board No      Maker         Game name
@@ -61,7 +61,7 @@ private:
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
 	void shared_ram_w(offs_t offset, u8 data) { m_shared_ram[offset] = data; }
 	void coin_sound_reset_w(u8 data);
-	void reset(int state);
+	void reset_audiocpu(int state);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
@@ -99,7 +99,7 @@ void vfive_state::screen_vblank(int state)
 	}
 }
 
-void vfive_state::reset(int state)
+void vfive_state::reset_audiocpu(int state)
 {
 	if (state)
 		coin_sound_reset_w(0);
@@ -270,7 +270,7 @@ void vfive_state::vfive(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20_MHz_XTAL/2);   // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &vfive_state::vfive_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(vfive_state::reset));
+	m_maincpu->reset_cb().set(FUNC(vfive_state::reset_audiocpu));
 
 	v25_device &audiocpu(V25(config, m_audiocpu, 20_MHz_XTAL/2)); // Verified on PCB, NEC V25 type Toaplan mark scratched out
 	audiocpu.set_addrmap(AS_PROGRAM, &vfive_state::vfive_v25_mem);
@@ -347,4 +347,3 @@ ROM_END
 GAME( 1992, grindstm,    0,        vfive,      grindstm,   vfive_state, empty_init,      ROT270, "Toaplan", "Grind Stormer",             MACHINE_SUPPORTS_SAVE )
 GAME( 1992, grindstma,   grindstm, vfive,      grindstma,  vfive_state, empty_init,      ROT270, "Toaplan", "Grind Stormer (older set)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, vfive,       grindstm, vfive,      vfive,      vfive_state, empty_init,      ROT270, "Toaplan", "V-Five (Japan)",            MACHINE_SUPPORTS_SAVE )
-

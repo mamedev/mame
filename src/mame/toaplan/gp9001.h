@@ -15,6 +15,8 @@ class gp9001vdp_device : public device_t,
 							public device_memory_interface
 {
 public:
+	static constexpr unsigned VDP_PALETTE_LENGTH = 0x10000;
+
 	typedef device_delegate<void (u8 layer, u32 &code)> gp9001_cb_delegate;
 
 	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -58,8 +60,6 @@ public:
 	u16 bootleg_spriteram16_r(offs_t offset);
 	void bootleg_spriteram16_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void bootleg_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	static constexpr unsigned VDP_PALETTE_LENGTH = 0x10000;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

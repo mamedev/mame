@@ -3,18 +3,18 @@
 
 #include "emu.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
-
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplipt.h"
-#include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*
 Name        Board No      Maker         Game name
@@ -37,8 +37,8 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	void snowbro2(machine_config &config);
-	void snowbro2b3(machine_config &config);
+	void snowbro2(machine_config &config) ATTR_COLD;
+	void snowbro2b3(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -49,8 +49,8 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	void sb2_oki_bankswitch_w(u8 data);
-private:
 
+private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<gp9001vdp_device> m_vdp;
 	required_device<okim6295_device> m_oki;
