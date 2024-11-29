@@ -16,9 +16,10 @@ hinting at a strong link between the two companies.
 Zaccaria are an Italian company, Century were based in Manchester UK.
 
 TODO:
-- Missing enemy shooting sound effect, needs netlist?
-- Where is the flipscreen signal?
-- Test/service input isn't working?
+- missing enemy shooting sound effect, needs netlist sound
+- missing color cycling effect after beating 3rd level? seen on an arcade video
+- where is the flipscreen signal?
+- test/service input isn't working?
 
 It's picky about vblank duration: If it's too short, parts of the game run too
 slow. Or if it's too long, parts of the game run too fast, and eg. the 3rd level
@@ -476,7 +477,7 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_A ) )     PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coin_A ) )     PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
