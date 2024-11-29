@@ -83,13 +83,8 @@ namespace bx
 	void* ThreadInternal::threadFunc(void* _arg)
 	{
 		Thread* thread = (Thread*)_arg;
-		union
-		{
-			void* ptr;
-			int32_t i;
-		} cast;
-		cast.i = thread->entry();
-		return cast.ptr;
+		intptr_t result = thread->entry();
+		return bitCast<void*>(result);
 	}
 #endif // BX_PLATFORM_
 
@@ -219,13 +214,9 @@ namespace bx
 		CloseHandle(ti->m_handle);
 		ti->m_handle = INVALID_HANDLE_VALUE;
 #elif BX_PLATFORM_POSIX
-		union
-		{
-			void* ptr;
-			int32_t i;
-		} cast;
-		pthread_join(ti->m_handle, &cast.ptr);
-		m_exitCode = cast.i;
+		void* ptr;
+		pthread_join(ti->m_handle, &ptr);
+		m_exitCode = narrowCast<int32_t>(bitCast<intptr_t>(ptr) );
 		ti->m_handle = 0;
 #endif // BX_PLATFORM_
 
