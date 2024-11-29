@@ -65,15 +65,17 @@ Also note that "galaxiab" 13H was dumped from 2 boards, so that should take away
 remaining suspicion that it might be a bad dump.
 
 TODO:
+- astrowar resets at the boss fight, very likely a bad bit in one ROM (MT7016)
+- Are there other versions of galaxia with different colors? The alternate sets
+  in MAME took the gfx roms from the parent, but there are references online
+  showing that not all versions look alike.
 - go through everything in the schematics for astrowar / galaxia
-- video rewrite to:
-  * support RAW_PARAMS, blanking is much like how laserbat hardware does it
-    and is needed to correct the speed in all machines
-  * provide correct color/star generation, using info from Galaxia technical
-    manual and schematics
-  * provide accurate sprite/bg sync in astrowar
-- what is the PROM for? schematics are too burnt to tell anything
-- add sound board emulation
+- support screen raw params, blanking is much like how laserbat hardware does it
+  and is needed to correct the speed in all machines
+- provide accurate sprite/bg sync in astrowar
+- provide correct color/star generation, using info from Galaxia technical
+  manual and schematics
+- add sound board emulation (info is in the schematics)
 
 */
 
@@ -140,25 +142,26 @@ protected:
 
 *******************************************************************************/
 
-// Colors are 3bpp, but how they are generated is a mystery
-// there's no color PROM on the PCB, nor palette RAM
-
 void galaxia_state::palette(palette_device &palette) const
 {
-	// estimated with video/photo references
-	constexpr int lut_clr[0x18] = {
-		// background
-		0, 1, 4, 5,
-		0, 3, 6, 2,
-		0, 1, 4, 5, // unused?
-		0, 3, 1, 7,
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-		// sprites
-		0, 4, 3, 6, 1, 5, 2, 7
-	};
+	// background from A5-A8
+	for (int i = 0; i < 0x10; i++)
+	{
+		int index = bitswap<4>(i, 0, 1, 2, 3) << 5;
+		uint8_t data = color_prom[index];
 
-	for (int i = 0; i < 0x18; i++)
-		palette.set_pen_color(i, pal1bit(lut_clr[i] >> 0), pal1bit(lut_clr[i] >> 1), pal1bit(lut_clr[i] >> 2));
+		palette.set_pen_color(i, pal1bit(BIT(data, 0)), pal1bit(BIT(data, 1)), pal1bit(BIT(data, 2)));
+	}
+
+	// sprites from A0-A3
+	for (int i = 0; i < 8; i++)
+	{
+		uint8_t data = ~color_prom[i] & 7;
+		palette.set_pen_color(i | 0x10, pal1bit(BIT(data, 2)), pal1bit(BIT(data, 1)), pal1bit(BIT(data, 0)));
+	}
+
 }
 
 void astrowar_state::palette(palette_device &palette) const
@@ -582,8 +585,8 @@ ROM_START( galaxia )
 	ROM_LOAD( "galaxia.3d", 0x00000, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) )
 	ROM_LOAD( "galaxia.1d", 0x00400, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) )
 
-	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
-	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) ) // colors + priority
 ROM_END
 
 ROM_START( galaxiaa )
@@ -603,8 +606,8 @@ ROM_START( galaxiaa )
 	ROM_LOAD( "galaxia.3d", 0x00000, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
 	ROM_LOAD( "galaxia.1d", 0x00400, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
 
-	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
-	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) ) // colors + priority
 ROM_END
 
 ROM_START( galaxiab )
@@ -624,8 +627,8 @@ ROM_START( galaxiab )
 	ROM_LOAD( "galaxia.3d", 0x00000, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
 	ROM_LOAD( "galaxia.1d", 0x00400, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
 
-	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
-	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) ) // colors + priority
 ROM_END
 
 ROM_START( galaxiac )
@@ -645,8 +648,8 @@ ROM_START( galaxiac )
 	ROM_LOAD( "galaxia.3d", 0x00000, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
 	ROM_LOAD( "galaxia.1d", 0x00400, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
 
-	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
-	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) ) // colors + priority
 ROM_END
 
 
@@ -671,8 +674,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1979, galaxia,  0,       galaxia,  galaxia, galaxia_state,  empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 4)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxia,  0,       galaxia,  galaxia, galaxia_state,  empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, galaxia_state,  empty_init, ROT90, "Zaccaria / Zelco", "Galaxia (set 4)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, astrowar, 0,       astrowar, galaxia, astrowar_state, empty_init, ROT90, "Zaccaria / Zelco", "Astro Wars",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
