@@ -16663,13 +16663,6 @@ spacefrt                        // (c) 1981 Century
 superbik                        // (c) 1983 Century
 wallst                          // (c) 1982 Century
 
-@source:cvs/galaxia.cpp
-astrowar                        // (c) 1980
-galaxia                         // (c) 1979
-galaxiaa                        // (c) 1979
-galaxiab                        // (c) 1979
-galaxiac                        // (c) 1979
-
 @source:cxg/chess2001.cpp
 ch2001
 
@@ -47201,6 +47194,13 @@ cannballv                       // (c) 1995 Yun Sung / T&K
 magix                           // (c) 1995 Yun Sung
 magixb                          // bootleg
 rocktris                        // (c) 1994? Yun Sung
+
+@source:zaccaria/galaxia.cpp
+astrowar                        // (c) 1980
+galaxia                         // (c) 1979
+galaxiaa                        // (c) 1979
+galaxiab                        // (c) 1979
+galaxiac                        // (c) 1979
 
 @source:zaccaria/laserbat.cpp
 catnmous                        // (c) 1982
