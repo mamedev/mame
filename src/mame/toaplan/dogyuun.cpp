@@ -94,14 +94,14 @@ void dogyuun_state::reset_audiocpu(int state)
 	if (state)
 	{
 		m_coincounter->coin_w(0);
-		m_audiocpu->set_input_line(ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
 void dogyuun_state::machine_reset()
 {
 	m_coincounter->coin_w(0);
-	m_audiocpu->set_input_line(ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 void dogyuun_state::video_start()
