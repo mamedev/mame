@@ -53,7 +53,6 @@ private:
 	inline void blit_pixel(address_space &space, int dstaddr, int srcdata);
 	int blit_core(address_space &space, int w, int h);
 
-	u8 m_config;
 	u16 m_clip_address;
 	u8 m_window_enable;
 	u8 m_control;
