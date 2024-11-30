@@ -152,11 +152,11 @@ void vgame_state::vgame(machine_config &config)
 
 ROM_START( hilice )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "hi_lice_v102fa.u13", 0x000000, 0x200000, CRC(b2588f54) SHA1(0d046e56596611954a9d2a9a30746d8aa370431b) )
+	ROM_LOAD( "hi_lice_v102fa.u13", 0x000000, 0x200000, CRC(4da87481) SHA1(5a20b254cfe8a2f087faa0dd17f682218a2ca1b2) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "hi_lice_cg_01fu3.u3", 0x000000, 0x200000, CRC(8ad6b233) SHA1(deaffd391265c885afb2f171089c1b33429470f1) )
-	ROM_LOAD( "hi_lice_cg_01fu8.u8", 0x200000, 0x200000, BAD_DUMP CRC(b2588f54) SHA1(0d046e56596611954a9d2a9a30746d8aa370431b) ) // didn't give consistent reads
+	ROM_LOAD( "hi_lice_cg_01fu8.u8", 0x200000, 0x200000, BAD_DUMP CRC(b1070209) SHA1(4568977fca2ff96b756a9600ad9a4730a6f8749a) ) // didn't give consistent reads
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "hi_lice_sp_100f.u45", 0x000000, 0x200000, CRC(b2588f54) SHA1(0d046e56596611954a9d2a9a30746d8aa370431b) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
