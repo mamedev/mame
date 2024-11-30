@@ -16138,7 +16138,13 @@ pb1000                          // Casio PB-1000
 pb2000c                         // Casio PB-2000C
 
 @source:casio/pickytlk.cpp
-pickytlk                        // Casio Picky Talk
+jd363                           // Casio Picky Talk - Super Denshi Techou
+jd364                           // Casio Color Picky Talk - Super Denshi Techou
+jd368                           // Casio Super Picky Talk - Access Pet
+mk300                           // Casio Plet's (MK-300)
+mk350                           // Casio Plet's (MK-350)
+pickydis                        // Tsukuda Original Disney Characters - Tegaki Electronic Note
+pickytlk                        // Casio Super Picky Talk - Forest of Gurutan
 
 @source:casio/pv1000.cpp
 pv1000                          // Casio PV-1000
