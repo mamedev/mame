@@ -154,6 +154,8 @@ files{
 	MAME_DIR .. "src/mame/shared/s11c_bg.h",
 	MAME_DIR .. "src/mame/shared/williamssound.cpp",
 	MAME_DIR .. "src/mame/shared/williamssound.h",
+	MAME_DIR .. "src/mame/midway/williamsblitter.cpp",
+	MAME_DIR .. "src/mame/midway/williamsblitter.h",
 	MAME_DIR .. "src/mame/midway/williams.cpp",
 	MAME_DIR .. "src/mame/midway/williams.h",
 	MAME_DIR .. "src/mame/midway/williams_m.cpp",
