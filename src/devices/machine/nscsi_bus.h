@@ -603,6 +603,12 @@ protected:
 		SC_REGENERATE                    = 0x82,
 		SC_EXTENDED_COPY                 = 0x83,
 		SC_RECEIVE_COPY_RESULTS          = 0x84,
+		SC_WRITE_16                      = 0x8a,
+		SC_SYNCHRONIZE_CACHE_16          = 0x91,
+		SC_WRITE_SAME_16                 = 0x93,
+		SC_READ_CAPACITY_16              = 0x9e,
+		SC_READ_LONG_16                  = 0x9e,
+		SC_WRITE_LONG_16                 = 0x9f,
 		SC_REPORT_LUNS                   = 0xa0,
 		SC_BLANK                         = 0xa1,
 		SC_SEND_EVENT                    = 0xa2,
@@ -633,7 +639,9 @@ protected:
 		SC_SCAN_MMC                      = 0xba,
 		SC_SET_CD_SPEED                  = 0xbb,
 		SC_PLAY_CD                       = 0xbc,
+		SC_SPARE_IN                      = 0xbc,
 		SC_MECHANISM_STATUS              = 0xbd,
+		SC_SPARE_OUT                     = 0xbd,
 		SC_READ_CD                       = 0xbe,
 		SC_SEND_DVD_STRUCTURE            = 0xbf
 	};

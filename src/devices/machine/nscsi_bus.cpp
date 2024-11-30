@@ -14,8 +14,8 @@
 #define LOG_DATA        (1U << 4)
 #define LOG_DATA_SENT   (1U << 5)
 
-//#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL | LOG_DATA)
 #define VERBOSE (LOG_UNSUPPORTED)
+#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -217,13 +217,13 @@ const char *const nscsi_full_device::command_names[256] = {
 	/* 50 */ "XDWRITE", "READ_DISC_INFORMATION/XPWRITE", "READ_TRACK_INFORMATION/XDREAD", "RESERVE_TRACK", "SEND_OPC_INFORMATION", "MODE_SELECT_10", "RESERVE_10", "RELEASE_10",
 	/* 58 */ "REPAIR_TRACK", "READ_MASTER_CUE", "MODE_SENSE_10", "CLOSE_TRACK_SESSION", "READ_BUFFER_CAPACITY", "SEND_CUE_SHEET", "PERSISTENT_RESERVE_IN", "PERSISTENT_RESERVE_OUT",
 	/* 80 */ "XDWRITE_EXTENDED", "REBUILD", "REGENERATE", "EXTENDED_COPY", "RECEIVE_COPY_RESULTS", "?", "?", "?",
-	/* 88 */ "?", "?", "?", "?", "?", "?", "?", "?",
-	/* 90 */ "?", "?", "?", "?", "?", "?", "?", "?",
-	/* 98 */ "?", "?", "?", "?", "?", "?", "?", "?",
+	/* 88 */ "?", "?", "WRITE_16", "?", "?", "?", "?", "?",
+	/* 90 */ "?", "SYNCHRONIZE_CACHE_16", "?", "WRITE_SAME_16", "?", "?", "?", "?",
+	/* 98 */ "?", "?", "?", "?", "?", "?", "READ_CAPACITY_166/READ_LONG_16", "WRITE_LONG_16",
 	/* a0 */ "REPORT_LUNS", "BLANK", "SEND_EVENT", "REPORT_DEVICE_IDENTIFIER/SEND_KEY", "SET_DEVICE_IDENTIFIER/REPORT_KEY", "PLAY_AUDIO_12", "LOAD_UNLOAD_MEDIUM", "MOVE_MEDIUM_ATTACHED/SET_READ_AHEAD",
 	/* a8 */ "READ_12", "PLAY_RELATIVE_12", "WRITE_12", "?", "ERASE_12/GET_PERFORMANCE", "READ_DVD_STRUCTURE", "WRITE_AND_VERIFY_12", "VERIFY_12",
 	/* b0 */ "SEARCH_DATA_HIGH_12", "SEARCH_DATA_EQUAL_12", "SEARCH_DATA_LOW_12", "SET_LIMITS_12", "READ_ELEMENT_STATUS_ATTACHED", "?", "SET_STREAMING", "READ_DEFECT_DATA_12",
-	/* b8 */ "?", "READ_CD_MSF", "SCAN_MMC", "SET_CD_SPEED", "PLAY_CD", "MECHANISM_STATUS", "READ_CD", "SEND_DVD_STRUCTURE",
+	/* b8 */ "?", "READ_CD_MSF", "SCAN_MMC", "SET_CD_SPEED", "PLAY_CD/SPARE_IN", "MECHANISM_STATUS/SPARE_OUT", "READ_CD", "SEND_DVD_STRUCTURE",
 	/* c0 */ "?", "?", "?", "?", "?", "?", "?", "?",
 	/* c8 */ "?", "?", "?", "?", "?", "?", "?", "?",
 	/* d0 */ "?", "?", "?", "?", "?", "?", "?", "?",
@@ -532,7 +532,7 @@ void nscsi_full_device::scsi_put_data(int id, int pos, uint8_t data)
 		scsi_sense_buffer[pos] = data;
 		break;
 	default:
-		fatalerror("nscsi_full_device::scsi_put_data - unknown id\n");
+		fatalerror("nscsi_full_device::scsi_put_data - unknown id %d\n", id);
 	}
 }
 
@@ -553,7 +553,9 @@ bool nscsi_full_device::scsi_command_done(uint8_t command, uint8_t length)
 	case 4: return true;
 	case 5: return length == 12;
 	case 6: return true;
-	case 7: return true;
+	case 7: return length == 32;
+	case 8: return length == 16;
+	case 9: return length == 16;
 	}
 	return true;
 }
