@@ -617,7 +617,7 @@ inline uint8_t s2650_device::ARG()
 	if ((res & 0x100) == 0) m_psl |= C;                         \
 	dest = res & 0xff;                                          \
 	if (~(dest ^ before ^ source) & 0x10) m_psl |= IDC;         \
-	if ((before ^ dest) & (source ^ dest) & 0x80) m_psl |= OVF; \
+	if ((before ^ source) & (before ^ dest) & 0x80) m_psl |= OVF; \
 	SET_CC(dest);                                               \
 }
 
