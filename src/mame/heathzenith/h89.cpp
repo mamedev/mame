@@ -615,6 +615,30 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x80, "Auto" )
 
+	// CDR8390 ROM
+	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )                        PORT_DIPLOCATION("SW501:1,2")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "H-88-1" )
+	PORT_DIPSETTING(    0x01, "undefined" )
+	PORT_DIPSETTING(    0x02, "undefined" )
+	PORT_DIPSETTING(    0x03, "undefined" )
+	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )                        PORT_DIPLOCATION("SW501:3,4")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "undefined" )
+	PORT_DIPSETTING(    0x04, "CDR FDC-880H" )
+	PORT_DIPSETTING(    0x08, "undefined" )
+	PORT_DIPSETTING(    0x0c, "undefined" )
+	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )                  PORT_DIPLOCATION("SW501:5")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "Disk I/O #2" )
+	PORT_DIPSETTING(    0x10, "Disk I/O #1" )
+	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )       PORT_DIPLOCATION("SW501:6")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )                  PORT_DIPLOCATION("SW501:7")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "9600" )
+	PORT_DIPSETTING(    0x40, "19200" )
+	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )                          PORT_DIPLOCATION("SW501:8")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, "Auto" )
+
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x03, 0x00, "CPU Clock Speed Upgrade")
@@ -630,6 +654,7 @@ static INPUT_PORTS_START( h89 )
 	PORT_CONFSETTING(   0x14, "Ultimeth MTRHEX-4k")
 	PORT_CONFSETTING(   0x18, "Ultimeth MTRHEX-2k")
 	PORT_CONFSETTING(   0x1c, "SigmaROM")
+	PORT_CONFSETTING(   0x20, "CDR8390 ROM")
 
 INPUT_PORTS_END
 
