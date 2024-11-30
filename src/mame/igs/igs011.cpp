@@ -1673,7 +1673,7 @@ void igs011_state::lhb_inputs_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().bookkeeping().coin_counter_w(0, BIT(data, 5) );
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 		//  coin out        BIT(data, 6)
 		m_hopper_bit = BIT(data, 7);
 	}
