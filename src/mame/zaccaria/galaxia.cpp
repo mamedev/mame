@@ -57,9 +57,6 @@ real hardware video of Astro Wars can be seen here: youtu.be/eSrQFBMeDlM
 --------------------------------------------------------------------------------
 
 TODO:
-- astrowar resets at the boss fight, very likely a bad bit in one ROM (MT7016)
-- verify if extended play dipswitch values are correct for astrowar, and
-  identify unknown dipswitch
 - What are ports 0 and 4 read for in galaxiaa? Is it some sort of protection?
   It's also suspicious that they moved IN0 to the main memory map.
 - What is port 5 exactly for? If it doesn't return 0xff, collision is disabled,
@@ -119,6 +116,7 @@ protected:
 	// max stars is more than it needs to be, to allow experimenting with the star generator
 	static constexpr u16 MAX_STARS = 0x800;
 	static constexpr u8 STAR_PEN = 0x18;
+	static constexpr u8 BULLET_PEN = 0x58;
 
 	// devices
 	required_device<s2650_device> m_maincpu;
@@ -159,7 +157,7 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void stars_palette(palette_device &palette) const ATTR_COLD;
+	void stars_bullet_palette(palette_device &palette) const ATTR_COLD;
 	virtual void palette(palette_device &palette) const ATTR_COLD;
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -213,7 +211,7 @@ void galaxia_state::machine_reset()
     Palette
 *******************************************************************************/
 
-void galaxia_state::stars_palette(palette_device &palette) const
+void galaxia_state::stars_bullet_palette(palette_device &palette) const
 {
 	// 6bpp pens for the stars
 	for (int i = 0; i < 0x40; i++)
@@ -224,6 +222,9 @@ void galaxia_state::stars_palette(palette_device &palette) const
 
 		palette.set_pen_color(i + STAR_PEN, r, g, b);
 	}
+
+	assert((BULLET_PEN & 3) == 0);
+	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(1));
 }
 
 void galaxia_state::palette(palette_device &palette) const
@@ -234,7 +235,7 @@ void galaxia_state::palette(palette_device &palette) const
 	for (int i = 0; i < 0x10; i++)
 	{
 		int index = bitswap<4>(i, 0, 1, 2, 3) << 5;
-		u8 data = color_prom[index];
+		u8 data = color_prom[index] & 7;
 
 		palette.set_pen_color(i, pal1bit(BIT(data, 0)), pal1bit(BIT(data, 1)), pal1bit(BIT(data, 2)));
 	}
@@ -246,7 +247,7 @@ void galaxia_state::palette(palette_device &palette) const
 		palette.set_pen_color(i | 0x10, pal1bit(BIT(data, 2)), pal1bit(BIT(data, 1)), pal1bit(BIT(data, 0)));
 	}
 
-	stars_palette(palette);
+	stars_bullet_palette(palette);
 }
 
 void astrowar_state::palette(palette_device &palette) const
@@ -261,7 +262,7 @@ void astrowar_state::palette(palette_device &palette) const
 		palette.set_pen_color(i | 0x10, pal1bit(BIT(i, 0)), pal1bit(BIT(i, 1)), pal1bit(BIT(i, 2)));
 	}
 
-	stars_palette(palette);
+	stars_bullet_palette(palette);
 }
 
 
@@ -399,7 +400,7 @@ u32 galaxia_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				if (background) m_collision |= 0x80;
 
 				// draw white 1x4-size bullet
-				bitmap.pix(y, x) = m_palette->white_pen();
+				bitmap.pix(y, x) = BULLET_PEN;
 			}
 
 			// copy the S2636 images into the main bitmap and check collision
@@ -459,7 +460,7 @@ u32 astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					m_collision |= 0x02;
 
 				// draw white 1x4-size bullet
-				bitmap.pix(y, x) = m_palette->white_pen();
+				bitmap.pix(y, x) = BULLET_PEN;
 			}
 		}
 
@@ -478,6 +479,8 @@ u32 astrowar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
+				// S2636 vs. bullet collision detection N/A
+
 				// S2636 vs. background collision detection
 				if ((m_temp_bitmap.pix(y, int(sx)) | m_temp_bitmap.pix(y, int(sx + 0.5f))) & 1)
 					m_collision |= 0x01;
@@ -680,6 +683,17 @@ static INPUT_PORTS_START( galaxiaa )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( astrowar )
+	PORT_INCLUDE( galaxia )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x18, 0x10, "Extended Play" )       PORT_DIPLOCATION("2N:4,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x08, "3000" )
+	PORT_DIPSETTING(    0x10, "5000" )
+	PORT_DIPSETTING(    0x18, "7000" )
+INPUT_PORTS_END
+
 
 
 /*******************************************************************************
@@ -710,7 +724,7 @@ void galaxia_state::galaxia(machine_config &config)
 	m_screen->screen_vblank().append(FUNC(galaxia_state::scroll_stars));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxia);
-	PALETTE(config, m_palette, FUNC(galaxia_state::palette), 0x18 + 0x40);
+	PALETTE(config, m_palette, FUNC(galaxia_state::palette), 0x18 + 0x40 + 1);
 
 	S2636(config, m_s2636[0], 0);
 	m_s2636[0]->set_offsets(3, -26);
@@ -831,7 +845,7 @@ ROM_START( astrowar )
 	ROM_LOAD( "astro.8i",  0x01000, 0x0400, CRC(ab87fbfc) SHA1(34b670f96c260f186c643e588995ae5d80377784) )
 	ROM_LOAD( "astro.10i", 0x02000, 0x0400, CRC(533675c1) SHA1(69cc066e1874a135a53a21b7b2461bda456504f1) )
 	ROM_LOAD( "astro.11i", 0x02400, 0x0400, CRC(59cf8901) SHA1(e849d4c99350b7e3453c156d91618b71b5be1163) )
-	ROM_LOAD( "astro.13i", 0x02800, 0x0400, CRC(5149c121) SHA1(232ba594e283fb25c31d8ae0b7d8315a81852a71) BAD_DUMP ) // suspected bad byte at 0x2a00
+	ROM_LOAD( "astro.13i", 0x02800, 0x0400, CRC(8d1575e0) SHA1(3d7f65ecf786704ebcd20cfaa2479ea24fd4e739) )
 	ROM_LOAD( "astro.11l", 0x02c00, 0x0400, CRC(29f52f57) SHA1(5cb50b82e09c537eeaeae167351fca686fde8228) )
 	ROM_LOAD( "astro.13l", 0x03000, 0x0400, CRC(882cdb87) SHA1(062ee8d296316cbce2eb62e72774aa4181e9847d) )
 
@@ -852,4 +866,4 @@ ROM_END
 GAME( 1979, galaxia,  0,       galaxia,  galaxia,  galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxiaa, galaxia, galaxiaa, galaxiaa, galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // protected?
 GAME( 1979, galaxiab, galaxia, galaxia,  galaxia,  galaxia_state,  empty_init, ROT90,  "Zaccaria / Zelco", "Galaxia (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, astrowar, 0,       astrowar, galaxia,  astrowar_state, empty_init, ROT90,  "Zaccaria / Zelco", "Astro Wars",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, astrowar, 0,       astrowar, astrowar, astrowar_state, empty_init, ROT90,  "Zaccaria / Zelco", "Astro Wars",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
