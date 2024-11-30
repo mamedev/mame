@@ -24880,6 +24880,7 @@ prmrsocr                        // GX101 (c) 1993 (Europe)
 prmrsocrj                       // GX101 (c) 1993 (Japan)
 punkshot                        // GX907 (c) 1990 (US)
 punkshot2                       // GX907 (c) 1990 (US)
+punkshot2a                      // GX907 (c) 1990 (Asia)
 punkshot2e                      // GX907 (c) 1990 (World)
 punkshotj                       // GX907 (c) 1990 (Japan)
 qgakumon                        // GX248 (c) 1993 (Japan)
@@ -42374,6 +42375,9 @@ evolhh
 
 @source:skeleton/extrema_m27sv.cpp
 multgmxl
+
+@source:skeleton/falconun.cpp
+falconun
 
 @source:skeleton/fanucs15.cpp
 fanucs15                        // 1990
