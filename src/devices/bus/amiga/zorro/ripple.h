@@ -18,6 +18,7 @@
 #include "machine/intelfsh.h"
 #include "bus/ata/ataintf.h"
 
+
 namespace bus::amiga::zorro {
 
 class ripple_ide_device : public device_t, public device_zorro2_card_interface, public amiga_autoconfig

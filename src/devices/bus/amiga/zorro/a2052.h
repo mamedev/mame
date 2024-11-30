@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license: GPL-2.0+
+// copyright-holders: Dirk Best
 /***************************************************************************
 
     Commodore A2052
@@ -23,12 +23,9 @@ namespace bus::amiga::zorro {
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> a2052_device
-
 class a2052_device : public device_t, public device_zorro2_card_interface, public amiga_autoconfig
 {
 public:
-	// construction/destruction
 	a2052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -43,12 +40,13 @@ protected:
 
 private:
 	required_ioport m_config;
-	std::vector<uint16_t> m_ram;
+	std::unique_ptr<uint16_t[]> m_ram;
+	int m_ram_size;
 };
 
 } // namespace bus::amiga::zorro
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE_NS(ZORRO_A2052, bus::amiga::zorro, a2052_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_A2052_H

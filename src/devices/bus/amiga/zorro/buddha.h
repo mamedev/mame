@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license: GPL-2.0+
+// copyright-holders: Dirk Best
 /***************************************************************************
 
     Buddha
@@ -24,8 +24,6 @@ namespace bus::amiga::zorro {
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> buddha_device
-
 class buddha_device : public device_t, public device_zorro2_card_interface, public amiga_autoconfig
 {
 public:
@@ -33,7 +31,6 @@ public:
 	buddha_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
@@ -47,6 +44,8 @@ protected:
 	virtual void autoconfig_base_address(offs_t address) override;
 
 private:
+	void mmio_map(address_map &map) ATTR_COLD;
+
 	// speed register
 	uint16_t speed_r(offs_t offset, uint16_t mem_mask = ~0);
 	void speed_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -68,10 +67,11 @@ private:
 	void ide_0_interrupt_w(int state);
 	void ide_1_interrupt_w(int state);
 
-	void mmio_map(address_map &map) ATTR_COLD;
+	uint8_t rom_r(offs_t offset);
 
 	required_device<ata_interface_device> m_ata_0;
 	required_device<ata_interface_device> m_ata_1;
+	required_region_ptr<uint8_t> m_bootrom;
 
 	bool m_ide_interrupts_enabled;
 	int m_ide_0_interrupt;
@@ -80,7 +80,7 @@ private:
 
 } // namespace bus::amiga::zorro
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE_NS(ZORRO_BUDDHA, bus::amiga::zorro, buddha_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_BUDDHA_H
