@@ -73,7 +73,8 @@ device_memory_interface::space_config_vector s2650_device::memory_space_config()
 
 
 // condition code changes for a byte
-static const uint8_t ccc[0x100] = {
+static const uint8_t ccc[0x100] =
+{
 	0x00,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
 	0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
 	0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
@@ -196,6 +197,7 @@ inline int s2650_device::check_irq_line()
 			int vector = m_intack_handler();
 
 			// build effective address within first 8K page
+			cycles += 9; // ZBSR
 			m_ea = util::sext(vector, 7) & PMSK;
 			if (vector & 0x80) // indirect bit set ?
 			{
@@ -215,6 +217,7 @@ inline int s2650_device::check_irq_line()
 			m_iar  = m_ea & PMSK;
 		}
 	}
+
 	return cycles;
 }
 
