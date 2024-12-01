@@ -110,6 +110,13 @@ which contains:
 This stream is then combined with the stream from the text plane pixel
 generator with the highest priority pixel being displayed on screen.
 
+There were two different System II CPU PCBs. 8618961200 uses the C65 I/O MCU
+(Hitachi 63705). 8618961803 (the last digit may vary) uses the C68 I/O MCU
+(Mitsubishi 37450). Each MCU has a socket for an external EPROM, though the
+C68 EPROM is normally unpopulated except on transitional PCBs which used a
+stock MCU presumably running in ROMless mode. Some games have been seen with
+either MCU type.
+
 
 Graphics Board details
 ======================
@@ -547,7 +554,6 @@ C102 - Controls CPU access to ROZ Memory Area.
 #include "namcos2.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
 #include "sound/ymopm.h"
