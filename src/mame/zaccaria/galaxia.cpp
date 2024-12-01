@@ -534,7 +534,7 @@ void galaxia_state::ctrlport_w(u8 data)
 	// strobes sets and clears the bit. if you put a coin in slot B
 	// however, the bit is set and cleared only once.
 
-	// d3: flip screen
+	// d3: flip screen?
 	//flip_screen_set(BIT(data, 3));
 
 	// d5: enable stars

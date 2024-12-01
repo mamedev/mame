@@ -89,9 +89,14 @@ Additional work
     Couriersud, 2009
 
 TODO:
-- Emulate protection properly in later games (reads area 0x73fx);
+- darkwar coin insert sound effect is missing. It sends the correct command,
+  but before audiocpu reads it, maincpu writes a new command for the speech cpu.
+  This worked fine in an older version of MAME since maincpu was twice slower.
+- diggerc loses speech sound effects (walking, digging) after killing an enemy.
+- Emulate protection properly in later games (reads area 0x73fx).
 - The board most probably has discrete circuits. Possibly 2 beepers (current
-  frequency is completely guessed), and a pitch sweep sound.
+  frequency is completely guessed), and a pitch sweep sound. No schematics
+  are available, or even video references.
 - Is the star generator correct? On photos, it looks like there are more stars
   overall (higher star density).
 
@@ -100,7 +105,6 @@ TODO:
 #include "emu.h"
 
 #include "cpu/s2650/s2650.h"
-#include "machine/gen_latch.h"
 #include "machine/s2636.h"
 #include "sound/beep.h"
 #include "sound/dac.h"
@@ -113,11 +117,12 @@ TODO:
 
 // configurable logging
 #define LOG_VIDEOFX     (1U << 1)
-#define LOG_SPEECH      (1U << 2)
-#define LOG_4BITDAC     (1U << 3)
-#define LOG_SHTRIGGER   (1U << 4)
+#define LOG_AUDIOCMD    (1U << 2)
+#define LOG_SPEECH      (1U << 3)
+#define LOG_4BITDAC     (1U << 4)
+#define LOG_SHTRIGGER   (1U << 5)
 
-//#define VERBOSE (LOG_VIDEOFX)
+//#define VERBOSE (LOG_AUDIOCMD)
 
 #include "logmacro.h"
 
@@ -142,7 +147,6 @@ public:
 		, m_dac2(*this, "dac2")
 		, m_beep(*this, "beep%u", 0)
 		, m_tms5110(*this, "tms")
-		, m_soundlatch(*this, "soundlatch")
 		, m_in(*this, "IN%u", 0U)
 		, m_dsw(*this, "DSW%u", 1U)
 		, m_lamps(*this, "lamp%u", 1U)
@@ -189,7 +193,6 @@ private:
 	required_device<dac_byte_interface> m_dac2;
 	required_device_array<beep_device, 2> m_beep;
 	required_device<tms5110_device> m_tms5110;
-	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport_array<4> m_in;
 	required_ioport_array<3> m_dsw;
 	output_finder<2> m_lamps;
@@ -211,6 +214,7 @@ private:
 	u8 m_protection_counter = 0;
 	u16 m_character_ram_page_start = 0;
 	u8 m_character_banking_mode = 0;
+	u8 m_audio_command = 0;
 	u16 m_speech_rom_bit_address = 0;
 
 	bitmap_ind16 m_background_bitmap = 0;
@@ -220,7 +224,7 @@ private:
 	u8 m_collision = 0;
 
 	// stars
-	u8 m_stars_on = false;
+	bool m_stars_on = false;
 	u16 m_stars_scroll = 0;
 	u16 m_total_stars = 0;
 
@@ -253,8 +257,6 @@ private:
 	template <u8 Which> void character_ram_w(offs_t offset, u8 data);
 	u8 palette_r(offs_t offset) { return m_palette_ram[offset & 0x0f]; }
 	void palette_w(offs_t offset, u8 data) { m_palette_ram[offset & 0x0f] = data; }
-	void audio_cpu_interrupt(int state);
-	void main_cpu_interrupt(int state);
 	u8 input_r(offs_t offset);
 
 	void _4_bit_dac_data_w(offs_t offset, u8 data);
@@ -263,6 +265,8 @@ private:
 	void speech_rom_address_lo_w(u8 data);
 	void speech_rom_address_hi_w(u8 data);
 	u8 speech_command_r();
+	u8 audio_command_r();
+	void audio_command_w_sync(s32 param);
 	void audio_command_w(u8 data);
 	void tms5110_ctl_w(offs_t offset, u8 data);
 	void tms5110_pdc_w(offs_t offset, u8 data);
@@ -336,19 +340,19 @@ void cvs_state::set_pens()
 void cvs_state::video_fx_w(u8 data)
 {
 	if (data & 0xce)
-		LOGMASKED(LOG_VIDEOFX, "%04x: Unimplemented CVS video fx = %2x\n", m_maincpu->pc(), data & 0xce);
+		LOGMASKED(LOG_VIDEOFX, "%s CVS: Unimplemented video fx = %2x\n", machine().describe_context(), data & 0xce);
 
 	m_stars_on = bool(data & 0x01);
 
-	if (data & 0x02) LOGMASKED(LOG_VIDEOFX, "      SHADE BRIGHTER TO RIGHT\n");
-	if (data & 0x04) LOGMASKED(LOG_VIDEOFX, "      SCREEN ROTATE\n");
-	if (data & 0x08) LOGMASKED(LOG_VIDEOFX, "      SHADE BRIGHTER TO LEFT\n");
+	if (data & 0x02) LOGMASKED(LOG_VIDEOFX, "    SHADE BRIGHTER TO RIGHT\n");
+	if (data & 0x04) LOGMASKED(LOG_VIDEOFX, "    SCREEN ROTATE\n");
+	if (data & 0x08) LOGMASKED(LOG_VIDEOFX, "    SHADE BRIGHTER TO LEFT\n");
 
 	m_lamps[0] = BIT(data, 4);
 	m_lamps[1] = BIT(data, 5);
 
-	if (data & 0x40) LOGMASKED(LOG_VIDEOFX, "      SHADE BRIGHTER TO BOTTOM\n");
-	if (data & 0x80) LOGMASKED(LOG_VIDEOFX, "      SHADE BRIGHTER TO TOP\n");
+	if (data & 0x40) LOGMASKED(LOG_VIDEOFX, "    SHADE BRIGHTER TO BOTTOM\n");
+	if (data & 0x80) LOGMASKED(LOG_VIDEOFX, "    SHADE BRIGHTER TO TOP\n");
 }
 
 
@@ -602,25 +606,6 @@ void cvs_state::character_ram_w(offs_t offset, u8 data)
 
 /*************************************
  *
- *  Interrupt generation
- *
- *************************************/
-
-void cvs_state::main_cpu_interrupt(int state)
-{
-	if (state)
-		m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
-}
-
-void cvs_state::audio_cpu_interrupt(int state)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
-/*************************************
- *
  *  Input port access
  *
  *************************************/
@@ -662,7 +647,7 @@ void cvs_state::_4_bit_dac_data_w(offs_t offset, u8 data)
 
 	if (data != m_4_bit_dac_data[offset])
 	{
-		LOGMASKED(LOG_4BITDAC, "4BIT: %d %d\n", offset, data);
+		LOGMASKED(LOG_4BITDAC, "CVS: 4BIT: %d %d\n", offset, data);
 		m_4_bit_dac_data[offset] = data;
 	}
 
@@ -689,7 +674,7 @@ void cvs_state::sh_trigger_w(offs_t offset, u8 data)
 
 	if (data != m_sh_trigger[offset])
 	{
-		LOGMASKED(LOG_SHTRIGGER, "TRIG: %d %d\n", offset, data);
+		LOGMASKED(LOG_SHTRIGGER, "CVS: TRIG: %d %d\n", offset, data);
 		m_sh_trigger[offset] = data;
 	}
 
@@ -709,29 +694,26 @@ void cvs_state::speech_rom_address_lo_w(u8 data)
 {
 	// assuming that d0-d2 are cleared here
 	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0xf800) | (data << 3);
-	LOGMASKED(LOG_SPEECH, "%04x : CVS: Speech Lo %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3);
+	LOGMASKED(LOG_SPEECH, "%s CVS: Speech Lo %02x Address = %04x\n", machine().describe_context(), data, m_speech_rom_bit_address >> 3);
 }
 
 void cvs_state::speech_rom_address_hi_w(u8 data)
 {
 	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0x07ff) | (data << 11);
-	LOGMASKED(LOG_SPEECH, "%04x : CVS: Speech Hi %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3);
+	LOGMASKED(LOG_SPEECH, "%s CVS: Speech Hi %02x Address = %04x\n", machine().describe_context(), data, m_speech_rom_bit_address >> 3);
 }
 
 
 u8 cvs_state::speech_command_r()
 {
-	/* FIXME: this was by observation on board ???
-	 *          -bit 7 is TMS status (active LO) */
-	return ((m_tms5110->ctl_r() ^ 1) << 7) | (m_soundlatch->read() & 0x7f);
+	// this was by observation on board, bit 7 is TMS status (active LO)
+	return ((m_tms5110->ctl_r() ^ 1) << 7) | (m_audio_command & 0x7f);
 }
 
 
 void cvs_state::tms5110_ctl_w(offs_t offset, u8 data)
 {
-	/*
-	 * offset 0: CS ?
-	 */
+	// offset 0: CS?
 	m_tms5110_ctl_data[offset] = (~data >> 7) & 0x01;
 
 	u8 const ctl = 0 |                     // CTL1
@@ -772,12 +754,32 @@ int cvs_state::speech_rom_read_bit()
  *
  *************************************/
 
+u8 cvs_state::audio_command_r()
+{
+	if (!machine().side_effects_disabled() && ~m_audio_command & 0x80)
+		LOGMASKED(LOG_AUDIOCMD, "%s CVS: Audio command miss\n", machine().describe_context());
+
+	return m_audio_command;
+}
+
+
+void cvs_state::audio_command_w_sync(s32 param)
+{
+	// cause interrupt on audio CPU if bit 7 is set
+	if (~m_audio_command & param & 0x80)
+		m_audiocpu->set_input_line(0, ASSERT_LINE);
+
+	m_audio_command = param;
+}
+
 void cvs_state::audio_command_w(u8 data)
 {
-	//LOG(("data %02x\n", data));
-	// cause interrupt on audio CPU if bit 7 set
-	m_soundlatch->write(data);
-	audio_cpu_interrupt(data & 0x80 ? 1 : 0);
+	// not using gen_latch here, too much error.log
+	if (data != m_audio_command)
+	{
+		LOGMASKED(LOG_AUDIOCMD, "%s CVS: Audio command %02x\n", machine().describe_context(), data);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(cvs_state::audio_command_w_sync), this), data);
+	}
 }
 
 
@@ -832,7 +834,7 @@ void cvs_state::audio_cpu_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x107f).ram();
-	map(0x1800, 0x1800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1800, 0x1800).r(FUNC(cvs_state::audio_command_r));
 	map(0x1840, 0x1840).w("dac1", FUNC(dac_byte_interface::data_w));
 	map(0x1880, 0x1883).w(FUNC(cvs_state::_4_bit_dac_data_w)).share(m_4_bit_dac_data);
 	map(0x1884, 0x1887).w(FUNC(cvs_state::sh_trigger_w)).share(m_sh_trigger);
@@ -1287,6 +1289,7 @@ void cvs_state::machine_start()
 	save_item(NAME(m_character_ram_page_start));
 	save_item(NAME(m_character_banking_mode));
 	save_item(NAME(m_protection_counter));
+	save_item(NAME(m_audio_command));
 	save_item(NAME(m_speech_rom_bit_address));
 	save_item(NAME(m_scroll_reg));
 	save_item(NAME(m_collision));
@@ -1298,6 +1301,7 @@ void cvs_state::machine_reset()
 {
 	m_character_ram_page_start = 0;
 	m_character_banking_mode = 0;
+	m_audio_command = 0;
 	m_speech_rom_bit_address = 0;
 	m_protection_counter = 0;
 	m_scroll_reg = 0;
@@ -1309,21 +1313,20 @@ void cvs_state::machine_reset()
 void cvs_state::cvs(machine_config &config)
 {
 	// basic machine hardware
-	S2650(config, m_maincpu, XTAL(14'318'181) / 16);
+	S2650(config, m_maincpu, 14.318181_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cvs_state::main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &cvs_state::main_cpu_io_map);
 	m_maincpu->set_addrmap(AS_DATA, &cvs_state::main_cpu_data_map);
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->flag_handler().set([this] (int state) { m_ram_view.select(state); });
-	m_maincpu->intack_handler().set_constant(0x03);
+	m_maincpu->intack_handler().set([this] { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
-	S2650(config, m_audiocpu, XTAL(14'318'181) / 16);
+	S2650(config, m_audiocpu, 14.318181_MHz_XTAL / 16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::audio_cpu_map);
 	m_audiocpu->intack_handler().set([this] { m_audiocpu->set_input_line(0, CLEAR_LINE); return 0x03; });
 
-	S2650(config, m_speechcpu, XTAL(14'318'181) / 16);
+	S2650(config, m_speechcpu, 14.318181_MHz_XTAL / 16);
 	m_speechcpu->set_addrmap(AS_PROGRAM, &cvs_state::speech_cpu_map);
-	// romclk is much more probable, 393 Hz results in timing issues
 	m_speechcpu->sense_handler().set("tms", FUNC(tms5110_device::romclk_hack_r));
 
 	// video hardware
@@ -1335,11 +1338,11 @@ void cvs_state::cvs(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 30*8-1, 1*8, 32*8-1);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000));
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(cvs_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(cvs_state::main_cpu_interrupt));
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 	m_screen->screen_vblank().append(FUNC(cvs_state::scroll_stars));
 
 	S2636(config, m_s2636[0], 0);
@@ -1353,8 +1356,6 @@ void cvs_state::cvs(machine_config &config)
 
 	// audio hardware
 	SPEAKER(config, "speaker").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
 	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.20); // unknown DAC
@@ -2005,4 +2006,4 @@ GAME( 1983, superbik,  0,        cvs,     superbik, cvs_state, init_superbik,  R
 GAME( 1983, raiders,   0,        cvs,     raiders,  cvs_state, init_raiders,   ROT90,  "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, raidersr3, raiders,  cvs,     raiders,  cvs_state, init_raiders,   ROT90,  "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, hero,      0,        cvs,     hero,     cvs_state, init_hero,      ROT90,  "Seatongrove UK, Ltd.", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
-GAME( 1984, huncholy,  0,        cvs,     huncholy, cvs_state, init_huncholy,  ROT90,  "Seatongrove UK, Ltd.", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, huncholy,  0,        cvs,     huncholy, cvs_state, init_huncholy,  ROT90,  "Seatongrove UK, Ltd.", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "
