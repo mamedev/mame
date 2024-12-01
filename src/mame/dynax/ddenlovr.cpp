@@ -288,7 +288,6 @@ private:
 	uint8_t rongrong_input_r();
 	void rongrong_select_w(uint8_t data);
 protected:
-	void hanakanz_keyb_w(uint8_t data);
 	uint8_t hanakanz_rand_r();
 private:
 	void mjschuka_protection_w(uint8_t data);
@@ -600,7 +599,6 @@ private:
 	void hanakanz_blitter_data_w(uint8_t data);
 
 	void hanakanz_rombank_w(uint8_t data);
-	//void hanakanz_keyb_w(uint8_t data);
 	void hanakanz_dsw_w(uint8_t data);
 	uint8_t hanakanz_keyb_r(offs_t offset);
 	uint8_t hanakanz_dsw_r();
@@ -2774,11 +2772,6 @@ void hanakanz_state::hanakanz_map(address_map &map)
 }
 
 
-void ddenlovr_state::hanakanz_keyb_w(uint8_t data)
-{
-	m_keyb = data;
-}
-
 void hanakanz_state::hanakanz_dsw_w(uint8_t data)
 {
 	m_dsw_sel = data;
@@ -2786,13 +2779,7 @@ void hanakanz_state::hanakanz_dsw_w(uint8_t data)
 
 uint8_t hanakanz_state::hanakanz_keyb_r(offs_t offset)
 {
-	uint8_t val = 0xff;
-
-	if      (!BIT(m_keyb, 0))   val = ioport(offset ? "KEY5" : "KEY0")->read();
-	else if (!BIT(m_keyb, 1))   val = ioport(offset ? "KEY6" : "KEY1")->read();
-	else if (!BIT(m_keyb, 2))   val = ioport(offset ? "KEY7" : "KEY2")->read();
-	else if (!BIT(m_keyb, 3))   val = ioport(offset ? "KEY8" : "KEY3")->read();
-	else if (!BIT(m_keyb, 4))   val = ioport(offset ? "KEY9" : "KEY4")->read();
+	uint8_t val = offset ? hanamai_keyboard_r<1>() : hanamai_keyboard_r<0>();
 
 	val |= ioport(offset ? "HOPPER" : "BET")->read();
 	return val;
@@ -2896,7 +2883,7 @@ void hanakanz_state::hanakanz_portmap(address_map &map)
 	map(0x90, 0x90).portr("SYSTEM");
 	map(0x91, 0x92).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0x93, 0x93).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
-	map(0x94, 0x94).w(FUNC(hanakanz_state::hanakanz_keyb_w));
+	map(0x94, 0x94).w(FUNC(hanakanz_state::hanamai_keyboard_w));
 	map(0x96, 0x96).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -2914,7 +2901,7 @@ void hanakanz_state::hkagerou_portmap(address_map &map)
 	map(0xb0, 0xb0).portr("SYSTEM");
 	map(0xb1, 0xb2).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0xb3, 0xb3).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
-	map(0xb4, 0xb4).w(FUNC(hanakanz_state::hanakanz_keyb_w));
+	map(0xb4, 0xb4).w(FUNC(hanakanz_state::hanamai_keyboard_w));
 	map(0xb6, 0xb6).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -2934,7 +2921,7 @@ void hanakanz_state::kotbinyo_portmap(address_map &map)
 	map(0xb1, 0xb1).portr("KEYB0");
 	map(0xb2, 0xb2).portr("KEYB1");
 	map(0xb3, 0xb3).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
-//  map(0xb4, 0xb4).w(FUNC(hanakanz_state::hanakanz_keyb_w));
+//  map(0xb4, 0xb4).w(FUNC(hanakanz_state::hanamai_keyboard_w));
 	map(0xb6, 0xb6).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -2954,7 +2941,7 @@ void hanakanz_state::kotbinsp_portmap(address_map &map)
 	map(0x91, 0x91).portr("KEYB0");
 	map(0x92, 0x92).portr("KEYB1");
 	map(0x93, 0x93).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
-//  map(0x94, 0x94).w(FUNC(hanakanz_state::hanakanz_keyb_w));
+//  map(0x94, 0x94).w(FUNC(hanakanz_state::hanamai_keyboard_w));
 	map(0x96, 0x96).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0xc0, 0xc0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0xe0, 0xef).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -2977,7 +2964,7 @@ void hanakanz_state::mjreach1_portmap(address_map &map)
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
-	map(0x90, 0x90).w(FUNC(hanakanz_state::hanakanz_keyb_w));
+	map(0x90, 0x90).w(FUNC(hanakanz_state::hanamai_keyboard_w));
 	map(0x92, 0x92).r(FUNC(hanakanz_state::hanakanz_rand_r));
 	map(0x93, 0x93).rw(FUNC(hanakanz_state::mjreach1_protection_r), FUNC(hanakanz_state::mjreach1_protection_w));
 	map(0x94, 0x94).portr("SYSTEM");
@@ -2995,13 +2982,7 @@ void hanakanz_state::mjreach1_portmap(address_map &map)
 
 uint8_t hanakanz_state::mjchuuka_keyb_r(offs_t offset)
 {
-	uint8_t val = 0xff;
-
-	if      (!BIT(m_keyb, 0))   val = ioport(offset ? "KEY5" : "KEY0")->read();
-	else if (!BIT(m_keyb, 1))   val = ioport(offset ? "KEY6" : "KEY1")->read();
-	else if (!BIT(m_keyb, 2))   val = ioport(offset ? "KEY7" : "KEY2")->read();
-	else if (!BIT(m_keyb, 3))   val = ioport(offset ? "KEY8" : "KEY3")->read();
-	else if (!BIT(m_keyb, 4))   val = ioport(offset ? "KEY9" : "KEY4")->read();
+	uint8_t val = hanakanz_keyb_r(offset);
 
 	val |= ioport(offset ? "HOPPER" : "BET")->read();
 
@@ -3099,7 +3080,7 @@ void hanakanz_state::mjchuuka_portmap(address_map &map)
 	map(0x21, 0x21).select(0xff00).w(FUNC(hanakanz_state::mjchuuka_palette_w));
 	map(0x23, 0x23).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_gfxrom_0_r));
 	map(0x40, 0x40).mirror(0xff00).w(FUNC(hanakanz_state::mjchuuka_coincounter_w));
-	map(0x41, 0x41).mirror(0xff00).w(FUNC(hanakanz_state::hanakanz_keyb_w));
+	map(0x41, 0x41).mirror(0xff00).w(FUNC(hanakanz_state::hanamai_keyboard_w));
 	map(0x42, 0x42).mirror(0xff00).portr("SYSTEM");
 	map(0x43, 0x44).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_keyb_r));
 	map(0x45, 0x45).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_gfxrom_1_r));
@@ -3160,7 +3141,7 @@ void ddenlovr_state::mjschuka_portmap(address_map &map)
 	map(0x5c, 0x5c).r(FUNC(ddenlovr_state::hanakanz_rand_r));
 
 	map(0x60, 0x60).w(FUNC(ddenlovr_state::sryudens_coincounter_w));
-	map(0x61, 0x61).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
+	map(0x61, 0x61).w(FUNC(ddenlovr_state::hanamai_keyboard_w));
 	map(0x62, 0x62).portr("SYSTEM");
 	map(0x63, 0x64).r(FUNC(ddenlovr_state::sryudens_keyb_r));
 
@@ -3191,7 +3172,7 @@ void ddenlovr_state::mjmyorntr_portmap(address_map &map)
 	map(0x40, 0x41).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0x43, 0x43).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x50, 0x50).w(FUNC(ddenlovr_state::sryudens_coincounter_w));
-	map(0x51, 0x51).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
+	map(0x51, 0x51).w(FUNC(ddenlovr_state::hanamai_keyboard_w));
 	map(0x52, 0x52).portr("SYSTEM");
 	map(0x53, 0x54).r(FUNC(ddenlovr_state::sryudens_keyb_r));
 	map(0x58, 0x58).portr("DSW1");
@@ -3236,7 +3217,7 @@ void ddenlovr_state::mjmyster_select2_w(uint8_t data)
 	m_input_sel = data;
 
 	if (data & 0x80)
-		m_keyb = 1;
+		m_keyb = 0;
 }
 
 uint8_t ddenlovr_state::mjmyster_coins_r()
@@ -3258,14 +3239,17 @@ uint8_t ddenlovr_state::mjmyster_keyb_r()
 {
 	uint8_t ret = 0xff;
 
-	if      (BIT(m_keyb, 0))   ret = ioport("KEY0")->read();
-	else if (BIT(m_keyb, 1))   ret = ioport("KEY1")->read();
-	else if (BIT(m_keyb, 2))   ret = ioport("KEY2")->read();
-	else if (BIT(m_keyb, 3))   ret = ioport("KEY3")->read();
-	else if (BIT(m_keyb, 4))   ret = ioport("KEY4")->read();
-	else    logerror("%06x: warning, unknown bits read, keyb = %02x\n", m_maincpu->pc(), m_keyb);
-
-	m_keyb <<= 1;
+	if (m_keyb < 5)
+	{
+		ret = m_io_key[BIT(m_input_sel, 0)][m_keyb]->read();
+		if (!machine().side_effects_disabled())
+			++m_keyb;
+	}
+	else
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%06x: warning, unknown bits read, keyb = %02x\n", m_maincpu->pc(), m_keyb);
+	}
 
 	return ret;
 }
@@ -3420,24 +3404,28 @@ void ddenlovr_state::hginga_coins_w(uint8_t data)
 
 uint8_t ddenlovr_state::hginga_input_r()
 {
-	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
-
+	uint8_t result = 0xff;
 	switch (m_input_sel)
 	{
-		case 0x2d:
-			return 0xff;
+	case 0x2d:
+		result = 0xff;
+		break;
 
-		// player 1
-		case 0xa1:
-			return ioport(keynames0[m_keyb++])->read();
+	case 0xa1: // player 1
+	case 0xa2: // player 2
+		if (m_keyb < 5)
+		{
+			result = m_io_key[BIT(m_input_sel, 1)][m_keyb]->read();
+			if (!machine().side_effects_disabled())
+				++m_keyb;
+		}
+		break;
 
-		// player 2
-		case 0xa2:
-			return ioport(keynames1[m_keyb++])->read();
+	default:
+		if (!machine().side_effects_disabled())
+			logerror("%04x: input_r with select = %02x\n", m_maincpu->pc(), m_input_sel);
 	}
-	logerror("%04x: input_r with select = %02x\n", m_maincpu->pc(), m_input_sel);
-	return 0xff;
+	return result;
 }
 
 void ddenlovr_state::hginga_blitter_w(offs_t offset, uint8_t data)
@@ -3500,7 +3488,7 @@ void ddenlovr_state::hginga_portmap(address_map &map)
                              Hanafuda Hana Gokou
 ***************************************************************************/
 
-uint8_t ddenlovr_state::hgokou_player_r(int player )
+uint8_t ddenlovr_state::hgokou_player_r(int player)
 {
 	uint8_t hopper_bit = ((m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));
 
@@ -3540,8 +3528,8 @@ void ddenlovr_state::hgokou_input_w(uint8_t data)
 			// bit 1 = out counter
 			// bit 2 = hopper
 			// bit 7 = ?
-			machine().bookkeeping().coin_counter_w(0, data & 1);
-			machine().bookkeeping().coin_counter_w(1, data & 2);
+			machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+			machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 			m_hopper = data & 0x04;
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x",data);
@@ -4094,13 +4082,7 @@ void ddenlovr_state::sryudens_map(address_map &map)
 
 uint8_t ddenlovr_state::sryudens_keyb_r(offs_t offset)
 {
-	uint8_t val = 0x3f;
-
-	if      (!BIT(m_keyb, 0))   val = ioport(offset ? "KEY5" : "KEY0")->read();
-	else if (!BIT(m_keyb, 1))   val = ioport(offset ? "KEY6" : "KEY1")->read();
-	else if (!BIT(m_keyb, 2))   val = ioport(offset ? "KEY7" : "KEY2")->read();
-	else if (!BIT(m_keyb, 3))   val = ioport(offset ? "KEY8" : "KEY3")->read();
-	else if (!BIT(m_keyb, 4))   val = ioport(offset ? "KEY9" : "KEY4")->read();
+	uint8_t val = offset ? hanamai_keyboard_r<1>() : hanamai_keyboard_r<0>();
 
 	val |= ioport(offset ? "HOPPER" : "BET")->read();
 	if (offset)
@@ -4116,8 +4098,8 @@ void ddenlovr_state::sryudens_coincounter_w(uint8_t data)
 	// bit 4 = ? on except during boot or test mode
 	// bit 7 = ? mostly on
 
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	m_hopper = data & 0x04;
 
 	if (data & 0x68)
@@ -4159,7 +4141,7 @@ void ddenlovr_state::sryudens_portmap(address_map &map)
 	map(0x93, 0x93).portr("DSW3");
 	map(0x94, 0x94).portr("DSWTOP");
 	map(0x98, 0x98).w(FUNC(ddenlovr_state::sryudens_coincounter_w));
-	map(0x99, 0x99).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
+	map(0x99, 0x99).w(FUNC(ddenlovr_state::hanamai_keyboard_w));
 	map(0x9a, 0x9a).portr("SYSTEM");
 	map(0x9b, 0x9c).r(FUNC(ddenlovr_state::sryudens_keyb_r));
 }
@@ -4205,7 +4187,7 @@ void ddenlovr_state::janshinp_portmap(address_map &map)
 	map(0x03, 0x03).portr("DSW3");
 	map(0x04, 0x04).portr("DSWTOP");
 	map(0x08, 0x08).w(FUNC(ddenlovr_state::janshinp_coincounter_w));
-	map(0x09, 0x09).w(FUNC(ddenlovr_state::hanakanz_keyb_w));
+	map(0x09, 0x09).w(FUNC(ddenlovr_state::hanamai_keyboard_w));
 	map(0x0a, 0x0a).portr("SYSTEM");
 	map(0x0b, 0x0c).r(FUNC(ddenlovr_state::sryudens_keyb_r));
 	map(0x20, 0x23).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
@@ -4373,7 +4355,8 @@ void htengoku_state::htengoku_coin_w(uint8_t data)
 			// bit 0 = coin counter
 			// bit 1 = out counter
 			// bit 2 = hopper
-			machine().bookkeeping().coin_counter_w(0, data & 1);
+			machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+			machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 			m_hopper = data & 0x04;
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x",data);
@@ -5027,7 +5010,7 @@ static INPUT_PORTS_START( htengoku )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_INCLUDE( HANAFUDA_KEYS_BET )
+	PORT_INCLUDE( dynax_hanafuda_keys_bet )
 
 	PORT_START("DSW0")  // IN11 - DSW1
 	PORT_DIPNAME( 0x01, 0x01, "Show Girls" )
@@ -5621,9 +5604,9 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // data clear
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))   // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // data clear
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  // note
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
@@ -7381,45 +7364,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )  // A
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )  // E
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )  // I
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )  // M
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )    // Kan
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) // Start 1
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )  // B
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )  // F
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )  // J
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )  // N
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )  // Reach
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )    // BET
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )  // C
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )  // G
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )  // K
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )    // Chi
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )    // Ron
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )  // D
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )  // H
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )  // L
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )    // Pon
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // nothing
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )  // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )        // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )    // "w"
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )    // Flip Flop
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )    // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )  // "s"
+	PORT_INCLUDE( dynax_mahjong_keys_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -7554,31 +7499,31 @@ static INPUT_PORTS_START( hginga )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
 //  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   // Test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // analyzer
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // data clear
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))    // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // data clear
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  // note
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)   // A
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)   // E
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2)   // A
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2)   // E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // I
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)   // M
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2)   // M
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2   )
 
 	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)   // B
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)   // F
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2)   // B
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2)   // F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // J
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)   // N
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2)   // N
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2) // BET
 
 	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)   // C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2)   // C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // K
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Chi
@@ -7586,7 +7531,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)   // D
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2)   // D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // L
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // PON
@@ -7602,23 +7547,23 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)   // "s"
 
 	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )  // A
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )  // E
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )  // A
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E )  // E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // I
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )  // M
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )  // M
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1   )
 
 	PORT_START("KEY6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )  // B
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )  // F
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B )  // B
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F )  // F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // J
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )  // N
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )  // N
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )    // BET
 
 	PORT_START("KEY7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )  // C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C )  // C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // K
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // Chi
@@ -7626,7 +7571,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )  // D
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D )  // D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // L
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // PON
@@ -10625,7 +10570,7 @@ void ddenlovr_state::mjflove(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::rongrong_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjflove_portmap);
 	maincpu.in_pa_callback().set_ioport("DSW2");
-	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hanakanz_keyb_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hanamai_keyboard_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
 
@@ -10846,7 +10791,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 	tmpz84c015_device &maincpu(TMPZ84C015(config, m_maincpu, XTAL(16'000'000) / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::seljan2_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::seljan2_portmap);
-	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::hanakanz_keyb_w));
+	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::hanamai_keyboard_w));
 	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::sryudens_coincounter_w));
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,seljan2)

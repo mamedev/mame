@@ -218,30 +218,16 @@ uint8_t dynax_state::ret_ff()
 }
 
 
-uint8_t dynax_state::hanamai_keyboard_0_r()
+template <unsigned N>
+uint8_t dynax_state::hanamai_keyboard_r()
 {
-	int res = 0x3f;
-
 	/* the game reads all rows at once (keyb = 0) to check if a key is pressed */
-	if (!BIT(m_keyb, 0)) res &= ioport("KEY0")->read();
-	if (!BIT(m_keyb, 1)) res &= ioport("KEY1")->read();
-	if (!BIT(m_keyb, 2)) res &= ioport("KEY2")->read();
-	if (!BIT(m_keyb, 3)) res &= ioport("KEY3")->read();
-	if (!BIT(m_keyb, 4)) res &= ioport("KEY4")->read();
-
-	return res;
-}
-
-uint8_t dynax_state::hanamai_keyboard_1_r()
-{
 	int res = 0x3f;
-
-	/* the game reads all rows at once (keyb = 0) to check if a key is pressed */
-	if (!BIT(m_keyb, 0)) res &= ioport("KEY5")->read();
-	if (!BIT(m_keyb, 1)) res &= ioport("KEY6")->read();
-	if (!BIT(m_keyb, 2)) res &= ioport("KEY7")->read();
-	if (!BIT(m_keyb, 3)) res &= ioport("KEY8")->read();
-	if (!BIT(m_keyb, 4)) res &= ioport("KEY9")->read();
+	for (unsigned i = 0; 5 > i; ++i)
+	{
+		if (!BIT(m_keyb, i))
+			res &= m_io_key[N][i]->read();
+	}
 
 	return res;
 }
@@ -483,8 +469,8 @@ void dynax_adpcm_state::hanamai_io_map(address_map &map)
 	map(0x20, 0x20).w(FUNC(dynax_adpcm_state::dynax_extra_scrolly_w));      // screen scroll Y
 	map(0x41, 0x47).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));  // Blitter
 	map(0x50, 0x50).w(FUNC(dynax_adpcm_state::dynax_rombank_w));            // BANK ROM Select  hnkochou only
-	map(0x60, 0x60).r(FUNC(dynax_adpcm_state::hanamai_keyboard_0_r));       // P1
-	map(0x61, 0x61).r(FUNC(dynax_adpcm_state::hanamai_keyboard_1_r));       // P2
+	map(0x60, 0x60).r(FUNC(dynax_adpcm_state::hanamai_keyboard_r<0>));      // P1
+	map(0x61, 0x61).r(FUNC(dynax_adpcm_state::hanamai_keyboard_r<1>));      // P2
 	map(0x62, 0x62).portr("COINS");                                         // Coins
 	map(0x63, 0x63).r(FUNC(dynax_adpcm_state::ret_ff));                     // ?
 	map(0x64, 0x64).w(FUNC(dynax_adpcm_state::hanamai_keyboard_w));         // keyboard row select
@@ -515,8 +501,8 @@ void dynax_adpcm_state::hnoridur_io_map(address_map &map)
 //  map(0x11, 0x11).nopw();                                                // CRT Controller
 	map(0x20, 0x20).w(FUNC(dynax_adpcm_state::hanamai_keyboard_w));        // keyboard row select
 	map(0x21, 0x21).portr("COINS");                                        // Coins
-	map(0x22, 0x22).r(FUNC(dynax_adpcm_state::hanamai_keyboard_1_r));      // P2
-	map(0x23, 0x23).r(FUNC(dynax_adpcm_state::hanamai_keyboard_0_r));      // P1
+	map(0x22, 0x22).r(FUNC(dynax_adpcm_state::hanamai_keyboard_r<1>));     // P2
+	map(0x23, 0x23).r(FUNC(dynax_adpcm_state::hanamai_keyboard_r<0>));     // P1
 	map(0x24, 0x24).portr("DSW1");                                         // DSW2
 	map(0x25, 0x25).portr("DSW3");                                         // DSW4
 	map(0x26, 0x26).portr("DSW2");                                         // DSW3
@@ -555,12 +541,12 @@ void dynax_adpcm_state::hjingi_lockout_w(int state)
 
 uint8_t dynax_adpcm_state::hjingi_keyboard_0_r()
 {
-	return hanamai_keyboard_0_r() | (m_hopper->line_r() ? 0 : (1 << 6));
+	return hanamai_keyboard_r<0>() | (m_hopper->line_r() ? 0 : (1 << 6));
 }
 
 uint8_t dynax_adpcm_state::hjingi_keyboard_1_r()
 {
-	return hanamai_keyboard_1_r() | ioport("BET")->read();
+	return hanamai_keyboard_r<1>() | ioport("BET")->read();
 }
 
 void dynax_adpcm_state::hjingi_mem_map(address_map &map)
@@ -635,57 +621,61 @@ void dynax_adpcm_state::yarunara_input_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 0: m_input_sel = data;
-				m_keyb = 0;
-				break;
+		case 0:
+			m_input_sel = data;
+			m_keyb = 0;
+			break;
 
-		case 1: break;
+		case 1:
+			break;
 	}
 
 }
 
 uint8_t dynax_adpcm_state::yarunara_input_r(offs_t offset)
 {
-	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
-
+	uint8_t result = 0xff;
 	switch (offset)
 	{
-		case 0:
+	case 0:
+		switch (m_input_sel)
 		{
-			switch (m_input_sel)
-			{
-			case 0x00:
-				return ioport("COINS")->read(); // coins
+		case 0x00:
+			result = ioport("COINS")->read(); // coins
+			break;
 
-			case 0x02:
-				return 0xff;    // bit 7 must be 1. Bit 2?
+		case 0x02:
+			result = 0xff;    // bit 7 must be 1. Bit 2?
+			break;
 
-			default:
-				return 0xff;
-			}
+		default:
+			result = 0xff;
 		}
+		break;
 
-		case 1:
+	case 1:
+		switch (m_input_sel)
 		{
-			switch (m_input_sel)
+		// player 2
+		case 0x01:  //quiztvqq
+		case 0x81:
+		// player 1
+		case 0x02:  //quiztvqq
+		case 0x82:
+			if (m_keyb < 5)
 			{
-			// player 2
-			case 0x01:  //quiztvqq
-			case 0x81:
-				return ioport(keynames1[m_keyb++])->read();
-
-			// player 1
-			case 0x02:  //quiztvqq
-			case 0x82:
-				return ioport(keynames0[m_keyb++])->read();
-
-			default:
-				return 0xff;
+				result = m_io_key[BIT(m_input_sel, 0)][m_keyb]->read();
+				if (!machine().side_effects_disabled())
+					++m_keyb;
 			}
+			break;
+
+		default:
+			result = 0xff;
 		}
+		break;
 	}
-	return 0xff;
+	return result;
 }
 
 void dynax_adpcm_state::yarunara_rombank_w(uint8_t data)
@@ -743,8 +733,8 @@ void dynax_adpcm_state::mcnpshnt_io_map(address_map &map)
 //  map(0x11, 0x11).nopw();                                                 // CRT Controller
 	map(0x20, 0x20).w(FUNC(dynax_adpcm_state::hanamai_keyboard_w));         // keyboard row select
 	map(0x21, 0x21).portr("COINS");                                         // Coins
-	map(0x22, 0x22).r(FUNC(dynax_adpcm_state::hanamai_keyboard_1_r));       // P2
-	map(0x23, 0x23).r(FUNC(dynax_adpcm_state::hanamai_keyboard_0_r));       // P1
+	map(0x22, 0x22).r(FUNC(dynax_adpcm_state::hanamai_keyboard_r<1>));      // P2
+	map(0x23, 0x23).r(FUNC(dynax_adpcm_state::hanamai_keyboard_r<0>));      // P1
 	map(0x24, 0x24).portr("DSW0");                                          // DSW2
 	map(0x26, 0x26).portr("DSW1");                                          // DSW3
 	map(0x30, 0x30).w(FUNC(dynax_adpcm_state::adpcm_reset_w));              // MSM5205 reset
@@ -797,22 +787,22 @@ void dynax_state::sprtmtch_io_map(address_map &map)
 void dynax_state::mjfriday_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w));       // Destination Pen
-	map(0x01, 0x01).w(FUNC(dynax_state::dynax_blit_palette01_w)); // Layers Palettes (Low Bits)
-	map(0x02, 0x02).w(FUNC(dynax_state::dynax_rombank_w));        // BANK ROM Select
-	map(0x03, 0x03).w(FUNC(dynax_state::dynax_blit_backpen_w));       // Background Color
+	map(0x00, 0x00).w(m_blitter, FUNC(dynax_blitter_rev2_device::pen_w));   // Destination Pen
+	map(0x01, 0x01).w(FUNC(dynax_state::dynax_blit_palette01_w));           // Layers Palettes (Low Bits)
+	map(0x02, 0x02).w(FUNC(dynax_state::dynax_rombank_w));                  // BANK ROM Select
+	map(0x03, 0x03).w(FUNC(dynax_state::dynax_blit_backpen_w));             // Background Color
 	map(0x10, 0x17).w(m_mainlatch, FUNC(ls259_device::write_d0));
-	map(0x41, 0x47).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));       // Blitter
-//  map(0x50, 0x50).nopw();   // CRT Controller
-//  map(0x51, 0x51).nopw();   // CRT Controller
-	map(0x60, 0x60).w(FUNC(dynax_state::hanamai_keyboard_w));     // keyboard row select
-	map(0x61, 0x61).portr("COINS");            // Coins
-	map(0x62, 0x62).r(FUNC(dynax_state::hanamai_keyboard_1_r));        // P2
-	map(0x63, 0x63).r(FUNC(dynax_state::hanamai_keyboard_0_r));        // P1
-	map(0x64, 0x64).portr("DSW0");         // DSW
-	map(0x67, 0x67).portr("DSW1");         // DSW
-	map(0x70, 0x71).w("ym2413", FUNC(ym2413_device::write));        //
-//  map(0x80, 0x80).nopw();   // IRQ ack?
+	map(0x41, 0x47).w(m_blitter, FUNC(dynax_blitter_rev2_device::regs_w));  // Blitter
+//  map(0x50, 0x50).nopw();                                                 // CRT Controller
+//  map(0x51, 0x51).nopw();                                                 // CRT Controller
+	map(0x60, 0x60).w(FUNC(dynax_state::hanamai_keyboard_w));               // keyboard row select
+	map(0x61, 0x61).portr("COINS");                                         // Coins
+	map(0x62, 0x62).r(FUNC(dynax_state::hanamai_keyboard_r<1>));            // P2
+	map(0x63, 0x63).r(FUNC(dynax_state::hanamai_keyboard_r<0>));            // P1
+	map(0x64, 0x64).portr("DSW0");                                          // DSW
+	map(0x67, 0x67).portr("DSW1");                                          // DSW
+	map(0x70, 0x71).w("ym2413", FUNC(ym2413_device::write));                //
+//  map(0x80, 0x80).nopw();                                                 // IRQ ack?
 }
 
 
@@ -826,8 +816,8 @@ void dynax_adpcm_state::nanajign_io_map(address_map &map)
 	map(0x0a, 0x0a).w("aysnd", FUNC(ay8912_device::address_w));             //
 	map(0x10, 0x10).w(FUNC(dynax_adpcm_state::hanamai_keyboard_w));         // keyboard row select
 	map(0x11, 0x11).portr("COINS");                                         // Coins
-	map(0x12, 0x12).r(FUNC(dynax_adpcm_state::hanamai_keyboard_1_r));       // P2
-	map(0x13, 0x13).r(FUNC(dynax_adpcm_state::hanamai_keyboard_0_r));       // P1
+	map(0x12, 0x12).r(FUNC(dynax_adpcm_state::hanamai_keyboard_r<1>));      // P2
+	map(0x13, 0x13).r(FUNC(dynax_adpcm_state::hanamai_keyboard_r<0>));      // P1
 	map(0x14, 0x14).portr("DSW0");                                          // DSW1
 	map(0x15, 0x15).portr("DSW1");                                          // DSW2
 	map(0x16, 0x16).portr("DSW2");                                          // DSW3
@@ -884,7 +874,7 @@ void jantouki_state::jantouki_io_map(address_map &map)
 	map(0x4f, 0x4f).w(FUNC(jantouki_state::dynax_blit2_romregion_w));       // Blitter 2 ROM bank
 	map(0x50, 0x50).w(FUNC(jantouki_state::jantouki_vblank_ack_w));         // VBlank IRQ Ack
 	map(0x51, 0x51).w(FUNC(jantouki_state::hanamai_keyboard_w));            // keyboard row select
-	map(0x52, 0x52).r(FUNC(jantouki_state::hanamai_keyboard_0_r));          // P1
+	map(0x52, 0x52).r(FUNC(jantouki_state::hanamai_keyboard_r<0>));         // P1
 	map(0x54, 0x54).portr("COINS");                                         // Coins
 	map(0x55, 0x55).portr("DSW0");                                          // DSW1
 	map(0x56, 0x56).portr("DSW1");                                          // DSW2
@@ -934,7 +924,7 @@ void jantouki_state::jantouki_sound_io_map(address_map &map)
 
 uint8_t dynax_adpcm_state::mjelctrn_keyboard_1_r()
 {
-	return (hanamai_keyboard_1_r() & 0x3f) | (ioport("FAKE")->read() ? 0x40 : 0);
+	return (hanamai_keyboard_r<1>() & 0x3f) | (ioport("FAKE")->read() ? 0x40 : 0);
 }
 
 uint8_t dynax_adpcm_state::mjelctrn_dsw_r()
@@ -1047,9 +1037,6 @@ void dynax_state::tenkai_ip_w(uint8_t data)
 
 uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 {
-	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-	//static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
-
 	uint8_t result = 0xff;
 	switch (offset)
 	{
@@ -1079,15 +1066,8 @@ uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 			result = 0xff;
 			break;
 
-		// player 2
-		case 0x81:
-			if (m_keyb >= 5)
-				logerror("%s: unmapped keyb=%02x read\n", machine().describe_context(), m_keyb);
-			result = 0xff;//ioport(keynames1[m_keyb++])->read();
-			break;
-
-		// player 1
-		case 0x82:
+		case 0x81: // player 2
+		case 0x82: // player 1
 			if (m_input_mode != 0xff)
 			{
 				result = 0x00;
@@ -1097,9 +1077,12 @@ uint8_t dynax_state::tenkai_ip_r(offs_t offset)
 				logerror("%s: unmapped keyb=%02x read\n", machine().describe_context(), m_keyb);
 				result = 0x00;
 			}
-			result = ioport(keynames0[m_keyb])->read();
-			if (!machine().side_effects_disabled())
-				++m_keyb;
+			else
+			{
+				result = m_io_key[BIT(m_input_sel, 0)][m_keyb]->read();
+				if (!machine().side_effects_disabled())
+					++m_keyb;
+			}
 			break;
 
 		default:
@@ -1302,27 +1285,9 @@ void dynax_state::ougonhai_banked_map(address_map &map)
                                 Mahjong Gekisha
 ***************************************************************************/
 
-uint8_t dynax_state::gekisha_keyboard_0_r()
-{
-	int res = 0x3f;
-
-	if (!BIT(m_keyb, 0)) res &= ioport("KEY0")->read();
-	if (!BIT(m_keyb, 1)) res &= ioport("KEY1")->read();
-	if (!BIT(m_keyb, 2)) res &= ioport("KEY2")->read();
-	if (!BIT(m_keyb, 3)) res &= ioport("KEY3")->read();
-	if (!BIT(m_keyb, 4)) res &= ioport("KEY4")->read();
-
-	return res;
-}
 uint8_t dynax_state::gekisha_keyboard_1_r()
 {
-	int res = 0x3f;
-
-	if (!BIT(m_keyb, 0)) res &= ioport("KEY5")->read();
-	if (!BIT(m_keyb, 1)) res &= ioport("KEY6")->read();
-	if (!BIT(m_keyb, 2)) res &= ioport("KEY7")->read();
-	if (!BIT(m_keyb, 3)) res &= ioport("KEY8")->read();
-	if (!BIT(m_keyb, 4)) res &= ioport("KEY9")->read();
+	uint8_t res = hanamai_keyboard_r<1>();
 
 	// bit 6
 	res |= ioport("BET")->read();
@@ -1366,7 +1331,7 @@ void dynax_state::gekisha_banked_map(address_map &map)
 	map(0x10060, 0x10060).w(FUNC(dynax_state::hanamai_keyboard_w));     // keyboard row select
 	map(0x10061, 0x10061).portr("COINS");            // Coins
 	map(0x10062, 0x10062).r(FUNC(dynax_state::gekisha_keyboard_1_r));        // P2
-	map(0x10063, 0x10063).r(FUNC(dynax_state::gekisha_keyboard_0_r));        // P1
+	map(0x10063, 0x10063).r(FUNC(dynax_state::hanamai_keyboard_r<0>));       // P1
 	map(0x10064, 0x10064).portr("DSW1");         // DSW
 	map(0x10065, 0x10065).portr("DSW3");         // DSW
 	map(0x10066, 0x10066).portr("DSW4");         // DSW
@@ -1433,7 +1398,7 @@ void cdracula_state::cdracula_io_map(address_map &map)
 
 ***************************************************************************/
 
-static INPUT_PORTS_START( MAHJONG_KEYS )
+INPUT_PORTS_START( dynax_mahjong_keys )
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(1)
@@ -1515,8 +1480,8 @@ static INPUT_PORTS_START( MAHJONG_KEYS )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( MAHJONG_KEYS_BET )
-	PORT_INCLUDE( MAHJONG_KEYS )
+INPUT_PORTS_START( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( dynax_mahjong_keys )
 
 	PORT_MODIFY("KEY1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(1)
@@ -1537,7 +1502,7 @@ static INPUT_PORTS_START( MAHJONG_KEYS_BET )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)   // "s"
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( HANAFUDA_KEYS )
+static INPUT_PORTS_START( dynax_hanafuda_keys )
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(1)
@@ -1619,8 +1584,8 @@ static INPUT_PORTS_START( HANAFUDA_KEYS )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( HANAFUDA_KEYS_BET )
-	PORT_INCLUDE( HANAFUDA_KEYS )
+INPUT_PORTS_START( dynax_hanafuda_keys_bet )
+	PORT_INCLUDE( dynax_hanafuda_keys )
 
 	PORT_MODIFY("KEY1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(1)
@@ -1643,7 +1608,7 @@ INPUT_PORTS_END
 
 #if 0
 [[maybe_unused]] static INPUT_PORTS_START( HANAFUDA_KEYS_BET_ALT )
-	PORT_INCLUDE( HANAFUDA_KEYS )
+	PORT_INCLUDE( dynax_hanafuda_keys )
 
 	PORT_MODIFY("KEY0")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )          // "t"
@@ -1885,7 +1850,7 @@ static INPUT_PORTS_START( hanamai )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_INCLUDE( HANAFUDA_KEYS )
+	PORT_INCLUDE( dynax_hanafuda_keys )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hnkochou )
@@ -1950,7 +1915,7 @@ static INPUT_PORTS_START( hnkochou )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_INCLUDE( HANAFUDA_KEYS_BET )
+	PORT_INCLUDE( dynax_hanafuda_keys_bet )
 INPUT_PORTS_END
 
 
@@ -2015,7 +1980,7 @@ static INPUT_PORTS_START( hnoridur )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_INCLUDE( HANAFUDA_KEYS )
+	PORT_INCLUDE( dynax_hanafuda_keys )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )       PORT_DIPLOCATION( "DIP3:1" )
@@ -2182,7 +2147,7 @@ static INPUT_PORTS_START( hjingi )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // 18A
 
-	PORT_INCLUDE( HANAFUDA_KEYS_BET )
+	PORT_INCLUDE( dynax_hanafuda_keys_bet )
 //  PORT_INCLUDE( HANAFUDA_KEYS_BET_ALT )
 
 	PORT_START("BET")
@@ -2342,7 +2307,7 @@ static INPUT_PORTS_START( mjfriday )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "18A"
 
-	PORT_INCLUDE( MAHJONG_KEYS )
+	PORT_INCLUDE( dynax_mahjong_keys )
 INPUT_PORTS_END
 
 
@@ -2408,7 +2373,7 @@ static INPUT_PORTS_START( mjdialq2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "18A"
 
-	PORT_INCLUDE( MAHJONG_KEYS )
+	PORT_INCLUDE( dynax_mahjong_keys )
 INPUT_PORTS_END
 
 
@@ -2473,7 +2438,7 @@ static INPUT_PORTS_START( yarunara )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_INCLUDE( MAHJONG_KEYS )
+	PORT_INCLUDE( dynax_mahjong_keys )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( warahana )
@@ -2519,7 +2484,7 @@ static INPUT_PORTS_START( warahana )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_INCLUDE( MAHJONG_KEYS )
+	PORT_INCLUDE( dynax_mahjong_keys )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hanayara )
@@ -2583,7 +2548,7 @@ static INPUT_PORTS_START( hanayara )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_INCLUDE( HANAFUDA_KEYS )
+	PORT_INCLUDE( dynax_hanafuda_keys )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( quiztvqq )
@@ -2746,7 +2711,7 @@ static INPUT_PORTS_START( mcnpshnt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_INCLUDE( MAHJONG_KEYS )
+	PORT_INCLUDE( dynax_mahjong_keys )
 INPUT_PORTS_END
 
 
@@ -2812,7 +2777,7 @@ static INPUT_PORTS_START( nanajign )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_INCLUDE( MAHJONG_KEYS )
+	PORT_INCLUDE( dynax_mahjong_keys )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -3139,7 +3104,7 @@ static INPUT_PORTS_START( mjembase )
 
 	MAHJONG_COIN_TEST("DSW1", 0x40)
 
-	PORT_INCLUDE( MAHJONG_KEYS_BET )
+	PORT_INCLUDE( dynax_mahjong_keys_bet )
 INPUT_PORTS_END
 
 
@@ -3147,7 +3112,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mjelct3 )
 	MAHJONG_COIN_TEST("DSW1", 0x40)
 
-	PORT_INCLUDE( MAHJONG_KEYS_BET )
+	PORT_INCLUDE( dynax_mahjong_keys_bet )
 
 	PORT_START("SW1")  // port 85
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -3246,7 +3211,7 @@ static INPUT_PORTS_START( mjelctrn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                              // Coin
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                           // Service
 
-	PORT_INCLUDE( MAHJONG_KEYS_BET )
+	PORT_INCLUDE( dynax_mahjong_keys_bet )
 
 	PORT_START("SW1")  // port 85
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -3426,7 +3391,7 @@ static INPUT_PORTS_START( majxtal7 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
 
-	PORT_INCLUDE( MAHJONG_KEYS_BET )
+	PORT_INCLUDE( dynax_mahjong_keys_bet )
 
 	PORT_START("DSW2") /* select = 80 */
 	PORT_DIPNAME( 0x07, 0x07, "YAKUMAN Bonus" )
@@ -3551,7 +3516,7 @@ static INPUT_PORTS_START( neruton )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )  // Coin
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // 18A
 
-	PORT_INCLUDE( MAHJONG_KEYS )
+	PORT_INCLUDE( dynax_mahjong_keys )
 
 	/* 2008-06 FP: the following are needed to make happy the read handlers shared with mjelctrn */
 	PORT_START("SW1")
@@ -3688,7 +3653,7 @@ static INPUT_PORTS_START( tenkai )
 
 	MAHJONG_COIN_TEST("DSW2", 0x01)
 
-	PORT_INCLUDE( MAHJONG_KEYS_BET )
+	PORT_INCLUDE( dynax_mahjong_keys_bet )
 INPUT_PORTS_END
 
 
@@ -3892,7 +3857,7 @@ static INPUT_PORTS_START( mjreach )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )     // Service
 
-	PORT_INCLUDE( MAHJONG_KEYS_BET )
+	PORT_INCLUDE( dynax_mahjong_keys_bet )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gekisha )
@@ -4016,7 +3981,7 @@ static INPUT_PORTS_START( gekisha )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_INCLUDE( MAHJONG_KEYS_BET )
+	PORT_INCLUDE( dynax_mahjong_keys_bet )
 INPUT_PORTS_END
 
 
