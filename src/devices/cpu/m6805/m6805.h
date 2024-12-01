@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /*** m6805: Portable 6805 emulator ******************************************/
 #ifndef MAME_CPU_M6805_M6805_H
 #define MAME_CPU_M6805_M6805_H

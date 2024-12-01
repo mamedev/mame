@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Vas Crabb
+// copyright-holders:Aaron Giles, Vas Crabb, Olivier Galibert
 
 #include "emu.h"
 #include "hd6305.h"
@@ -314,7 +314,7 @@ void hd6305v0_device::sci_ssr_w(u8 data)
 
 u8 hd6305v0_device::sci_data_r()
 {
-	logerror("sci data r\n");\
+	logerror("sci data r\n");
 	return 0x00;
 }
 
@@ -336,45 +336,36 @@ void hd6305v0_device::sci_data_w(u8 data)
 void hd6305v0_device::execute_set_input(int inputnum, int state)
 {
 	// TODO: edge vs. level on int1
-	if (inputnum == M6805V0_INT_IRQ1 || inputnum == M6805V0_INT_IRQ2)
-	{
-		if (m_irq_state[inputnum] != state)
-		{
+	if(inputnum == M6805V0_INT_IRQ1 || inputnum == M6805V0_INT_IRQ2) {
+		if(m_irq_state[inputnum] != state) {
 			m_irq_state[inputnum] = state;
 
-			if (state != CLEAR_LINE)
-			{
+			if(state != CLEAR_LINE)
 				m_pending_interrupts |= 1 << inputnum;
-			}
 		}
 	}
 }
 
 void hd6305v0_device::interrupt_vector()
 {
-	if ((m_pending_interrupts & (1 << M6805V0_INT_IRQ1)) != 0)
-	{
+	if((m_pending_interrupts & (1 << M6805V0_INT_IRQ1)) != 0) {
 		m_pending_interrupts &= ~(1 << M6805V0_INT_IRQ1);
 		rm16<false>(0x1ffa, m_pc);
 	}
-	else if ((m_pending_interrupts & (1 << M6805V0_INT_IRQ2)) != 0)
-	{
+	else if((m_pending_interrupts & (1 << M6805V0_INT_IRQ2)) != 0) {
 		m_pending_interrupts &= ~(1 << M6805V0_INT_IRQ2);
 		rm16<false>(0x1ff8, m_pc);
 	}
-	else if ((m_pending_interrupts & (1 << M6805V0_INT_TIMER1)) != 0)
-	{
+	else if((m_pending_interrupts & (1 << M6805V0_INT_TIMER1)) != 0) {
 		// TODO: 1ff6 when in wait...
 		m_pending_interrupts &= ~(1 << M6805V0_INT_TIMER1);
 		rm16<false>(0x1ff8, m_pc);
 	}
-	else if ((m_pending_interrupts & (1 << M6805V0_INT_TIMER2)) != 0)
-	{
+	else if((m_pending_interrupts & (1 << M6805V0_INT_TIMER2)) != 0) {
 		m_pending_interrupts &= ~(1 << M6805V0_INT_TIMER2);
 		rm16<false>(0x1ff4, m_pc);
 	}
-	else if ((m_pending_interrupts & (1 << M6805V0_INT_SCI)) != 0)
-	{
+	else if((m_pending_interrupts & (1 << M6805V0_INT_SCI)) != 0) {
 		m_pending_interrupts &= ~(1 << M6805V0_INT_SCI);
 		rm16<false>(0x1ff4, m_pc);
 	}
@@ -420,28 +411,20 @@ void hd63705z0_device::internal_map(address_map &map)
 
 void hd63705z0_device::execute_set_input(int inputnum, int state)
 {
-	if (inputnum == INPUT_LINE_NMI)
-	{
-		if (m_nmi_state != state)
-		{
+	if(inputnum == INPUT_LINE_NMI) {
+		if(m_nmi_state != state) {
 			m_nmi_state = state;
 
-			if (state != CLEAR_LINE)
-			{
+			if(state != CLEAR_LINE)
 				m_pending_interrupts |= 1 << HD63705_INT_NMI;
-			}
 		}
 	}
-	else if (inputnum <= HD63705_INT_ADCONV)
-	{
-		if (m_irq_state[inputnum] != state)
-		{
+	else if(inputnum <= HD63705_INT_ADCONV) {
+		if(m_irq_state[inputnum] != state) {
 			m_irq_state[inputnum] = state;
 
-			if (state != CLEAR_LINE)
-			{
+			if(state != CLEAR_LINE)
 				m_pending_interrupts |= 1 << inputnum;
-			}
 		}
 	}
 }
@@ -451,43 +434,35 @@ void hd63705z0_device::interrupt_vector()
 	// Need to add emulation of other interrupt sources here KW-2/4/99
 	// This is just a quick patch for Namco System 2 operation
 
-	if ((m_pending_interrupts & (1 << HD63705_INT_IRQ1)) != 0)
-	{
+	if((m_pending_interrupts & (1 << HD63705_INT_IRQ1)) != 0) {
 		m_pending_interrupts &= ~(1 << HD63705_INT_IRQ1);
 		rm16<true>(0x1ff8, m_pc);
 	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_IRQ2)) != 0)
-	{
+	else if((m_pending_interrupts & (1 << HD63705_INT_IRQ2)) != 0) {
 		m_pending_interrupts &= ~(1 << HD63705_INT_IRQ2);
 		rm16<true>(0x1fec, m_pc);
 	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_ADCONV)) != 0)
-	{
+	else if((m_pending_interrupts & (1 << HD63705_INT_ADCONV)) != 0) {
 		m_pending_interrupts &= ~(1 << HD63705_INT_ADCONV);
 		rm16<true>(0x1fea, m_pc);
 	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_TIMER1)) != 0)
-	{
+	else if((m_pending_interrupts & (1 << HD63705_INT_TIMER1)) != 0) {
 		m_pending_interrupts &= ~(1 << HD63705_INT_TIMER1);
 		rm16<true>(0x1ff6, m_pc);
 	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_TIMER2)) != 0)
-	{
+	else if((m_pending_interrupts & (1 << HD63705_INT_TIMER2)) != 0) {
 		m_pending_interrupts &= ~(1 << HD63705_INT_TIMER2);
 		rm16<true>(0x1ff4, m_pc);
 	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_TIMER3)) != 0)
-	{
+	else if((m_pending_interrupts & (1 << HD63705_INT_TIMER3)) != 0) {
 		m_pending_interrupts &= ~(1<<HD63705_INT_TIMER3);
 		rm16<true>(0x1ff2, m_pc);
 	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_PCI)) != 0)
-	{
+	else if((m_pending_interrupts & (1 << HD63705_INT_PCI)) != 0) {
 		m_pending_interrupts &= ~(1 << HD63705_INT_PCI);
 		rm16<true>(0x1ff0, m_pc);
 	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_SCI)) != 0)
-	{
+	else if((m_pending_interrupts & (1 << HD63705_INT_SCI)) != 0) {
 		m_pending_interrupts &= ~(1 << HD63705_INT_SCI);
 		rm16<true>(0x1fee, m_pc);
 	}
@@ -499,8 +474,7 @@ void hd63705z0_device::interrupt()
 	// pending_interrupts until the interrupt is taken, no matter what the
 	// external IRQ pin does.
 
-	if (BIT(m_pending_interrupts, HD63705_INT_NMI))
-	{
+	if(BIT(m_pending_interrupts, HD63705_INT_NMI)) {
 		pushword<true>(m_pc);
 		pushbyte<true>(m_x);
 		pushbyte<true>(m_a);
@@ -516,10 +490,8 @@ void hd63705z0_device::interrupt()
 		m_icount -= 11;
 		burn_cycles(11);
 	}
-	else if ((m_pending_interrupts & ((1 << M6805_IRQ_LINE) | HD63705_INT_MASK)) != 0)
-	{
-		if ((CC & IFLAG) == 0)
-		{
+	else if((m_pending_interrupts & ((1 << M6805_IRQ_LINE) | HD63705_INT_MASK)) != 0) {
+		if((CC & IFLAG) == 0) {
 			// standard IRQ
 			pushword<true>(m_pc);
 			pushbyte<true>(m_x);

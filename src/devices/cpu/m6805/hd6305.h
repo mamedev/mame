@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb, Olivier Galibert
 
 #ifndef MAME_CPU_M6805_HD6305_H
 #define MAME_CPU_M6805_HD6305_H
@@ -17,7 +17,6 @@
 DECLARE_DEVICE_TYPE(HD6305V0,  hd6305v0_device)
 DECLARE_DEVICE_TYPE(HD6305Y2,  hd6305y2_device)
 DECLARE_DEVICE_TYPE(HD63705Z0, hd63705z0_device)
-
 
 
 // ======================> hd6305_device
@@ -154,6 +153,7 @@ private:
 /****************************************************************************
  * 6805V0 section
  ****************************************************************************/
+
 #define M6805V0_INT_IRQ1            0x00
 #define M6805V0_INT_IRQ2            0x01
 #define M6805V0_INT_TIMER1          0x02
