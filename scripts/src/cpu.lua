@@ -2000,6 +2000,8 @@ if CPUS["M6805"] then
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m6805defs.h",
 		MAME_DIR .. "src/devices/cpu/m6805/6805ops.hxx",
+		MAME_DIR .. "src/devices/cpu/m6805/hd6305.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/hd6305.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.cpp",

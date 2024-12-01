@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/hd6305.h"
 
 DECLARE_DEVICE_TYPE(MKS3, mks3_device)
 

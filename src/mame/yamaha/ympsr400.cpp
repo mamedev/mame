@@ -7,7 +7,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/hd6305.h"
 #include "cpu/mn1880/mn1880.h"
 #include "sound/multipcm.h"
 #include "speaker.h"
