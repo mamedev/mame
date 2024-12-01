@@ -1286,7 +1286,7 @@ void gime_device::update_border(uint16_t physical_scanline)
 			// graphics, green or white
 			border = (~m_ff22_value & MODE_CSS) ? 0x12 : 0x3F;
 		}
-		else if (m_ff22_value & MODE_GM2)
+		else if ((m_ff22_value & MODE_GM2) && !(m_ff22_value & MODE_GM1))
 		{
 			// text, green or orange
 			border = (~m_ff22_value & MODE_CSS) ? 0x12 : 0x26;
@@ -1329,42 +1329,26 @@ inline uint16_t gime_device::get_lines_per_row()
 	uint16_t lines_per_row;
 	if (m_legacy_video)
 	{
-		switch(m_ff22_value & MODE_AG)
+		if (m_ff22_value & MODE_AG)
 		{
-			case 0:
+			static int gime_legacy_lines_per_row_graphic[8] =
 			{
-				// http://cocogamedev.mxf.yuku.com/topic/4299238#.VyC6ozArI-U
-				static int ff9c_lines_per_row[16] =
-				{
-					11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 4, 3, 2, 1, 12
-				};
+				3, 3, 3, 2, 2, 1, 1, 1
+			};
 
-				int i = m_gime_registers[0x0C] & 0x0F;
-				//lines_per_row = 12;
-				lines_per_row = ff9c_lines_per_row[i];
-				break;
-			}
+			int i = m_sam_state & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2);
+			lines_per_row = gime_legacy_lines_per_row_graphic[i];
+		}
+		else
+		{
+			// http://cocogamedev.mxf.yuku.com/topic/4299238#.VyC6ozArI-U
+			static int ff9c_lines_per_row_alpha[16] =
+			{
+				11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 4, 3, 2, 1, 12
+			};
 
-			case MODE_AG:
-				switch (m_sam_state & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2))
-				{
-				case 0:
-					lines_per_row = 12;
-					break;
-				case SAM_STATE_V1:
-					lines_per_row = 3;
-					break;
-				case SAM_STATE_V2:
-				case SAM_STATE_V1|SAM_STATE_V0:
-					lines_per_row = 2;
-					break;
-				default:
-					lines_per_row = 1;
-				}
-				break;
-
-			default:
-				fatalerror("Should not get here\n");
+			int i = m_gime_registers[0x0C] & 0x0F;
+			lines_per_row = ff9c_lines_per_row_alpha[i];
 		}
 	}
 	else
@@ -1523,7 +1507,11 @@ void gime_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t
 			case MODE_AG|MODE_GM0:
 			case MODE_AG|MODE_GM1|MODE_GM0:
 			case MODE_AG|MODE_GM2|MODE_GM0:
-				pitch = record_scanline_res<16, &gime_device::get_data_mc6847, true>(physical_scanline);
+				if (m_sam_state & SAM_STATE_V0)
+					pitch = record_scanline_res<16, &gime_device::get_data_mc6847, true>(physical_scanline);
+				else
+					pitch = record_scanline_res<32, &gime_device::get_data_mc6847, true>(physical_scanline);
+
 				break;
 
 			case 0:
@@ -1687,9 +1675,10 @@ uint32_t gime_device::emit_dummy_samples(const scanline_record *scanline, int sa
 //  emit_mc6847_samples
 //-------------------------------------------------
 
+template<int xscale>
 inline uint32_t gime_device::emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette)
 {
-	return super::emit_mc6847_samples<2>(
+	return super::emit_mc6847_samples<xscale>(
 		scanline->m_mode[sample_start],
 		&scanline->m_data[sample_start],
 		sample_count,
@@ -1883,11 +1872,14 @@ bool gime_device::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				case MODE_AG|MODE_GM0:
 				case MODE_AG|MODE_GM1|MODE_GM0:
 				case MODE_AG|MODE_GM2|MODE_GM0:
-					render_scanline<16, &gime_device::emit_mc6847_samples>(scanline, pixels, min_x, max_x, &resolver);
+					if (m_sam_state & SAM_STATE_V0)
+						render_scanline<16, &gime_device::emit_mc6847_samples<2>>(scanline, pixels, min_x, max_x, &resolver);
+					else
+						render_scanline<32, &gime_device::emit_mc6847_samples<1>>(scanline, pixels, min_x, max_x, &resolver);
 					break;
 
 				default:
-					render_scanline<32, &gime_device::emit_mc6847_samples>(scanline, pixels, min_x, max_x, &resolver);
+					render_scanline<32, &gime_device::emit_mc6847_samples<2>>(scanline, pixels, min_x, max_x, &resolver);
 					break;
 			}
 		}
