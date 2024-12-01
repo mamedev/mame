@@ -2,7 +2,7 @@
 // copyright-holders:
 /***********************************************************************************************
 
- Skeleton driver for "Seoul 88 Fever", a Korean video slot from Mecca.
+ Skeleton driver for "Seoul 88 Fever", Korean Bootleg of Lucky 75 from Wing by Mecca.
 
   ____________________________________________________________________________________________________
  | ____      ____________________    ____________   _________   ________   _________  _________       |
