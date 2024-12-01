@@ -11,6 +11,7 @@
          Service Switch
          Program ROMS (both Main & Sound)
          MB8841 (at least for Kangaroo)
+
        TVG-1-VIDEO-B
          10MHz OSC
          Graphic ROMS
@@ -174,12 +175,13 @@ class kangaroo_state : public driver_device
 public:
 	kangaroo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_palette(*this, "palette"),
 		m_video_control(*this, "video_control"),
 		m_videoram(*this, "videoram", 256 * 64 * 4, ENDIANNESS_LITTLE), // video RAM is accessed 32 bits at a time (two planes, 4bpp each, 4 pixels)
 		m_blitbank(*this, "blitbank"),
-		m_blitrom(*this, "blitter"),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")
+		m_blitrom(*this, "blitter")
 	{ }
 
 	void nomcu(machine_config &config);
@@ -188,18 +190,18 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void main_map(address_map &map) ATTR_COLD;
+	virtual void main_map(address_map &map) ATTR_COLD;
 
-private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<palette_device> m_palette;
+
 	// memory pointers
 	required_shared_ptr<uint8_t> m_video_control;
 	memory_share_creator<uint32_t> m_videoram;
 	required_memory_bank m_blitbank;
 	required_region_ptr<uint8_t> m_blitrom;
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
 
 	// misc
 	void coin_counter_w(uint8_t data);
@@ -218,7 +220,8 @@ class kangaroo_mcu_state : public kangaroo_state
 {
 public:
 	kangaroo_mcu_state(const machine_config &mconfig, device_type type, const char *tag) :
-		kangaroo_state(mconfig, type, tag)
+		kangaroo_state(mconfig, type, tag),
+		m_mcu(*this, "mcu")
 	{ }
 
 	void mcu(machine_config &config);
@@ -227,14 +230,16 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	virtual void main_map(address_map &map) override ATTR_COLD;
+
 private:
+	required_device<mb8841_cpu_device> m_mcu;
+
 	// MCU simulation (for now)
 	uint8_t m_mcu_clock = 0U;
 
 	uint8_t mcu_sim_r();
 	void mcu_sim_w(uint8_t data);
-
-	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -323,6 +328,7 @@ void kangaroo_state::blitter_execute()
 
 	// loop over height, then width
 	for (int y = 0; y <= height; y++, dst += 256)
+	{
 		for (int x = 0; x <= width; x++)
 		{
 			uint16_t effdst = (dst + x) & 0x3fff;
@@ -330,6 +336,7 @@ void kangaroo_state::blitter_execute()
 			videoram_write(effdst, m_blitrom[0 * gfxhalfsize + effsrc], mask & 0x05);
 			videoram_write(effdst, m_blitrom[1 * gfxhalfsize + effsrc], mask & 0x0a);
 		}
+	}
 }
 
 
@@ -358,7 +365,7 @@ uint32_t kangaroo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	{
 		uint32_t *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x; x < cliprect.max_x; x += 2) // <, not <=
 		{
 			uint8_t effxa = scrollx + ((x / 2) ^ xora);
 			uint8_t effya = scrolly + (y ^ xora);
@@ -424,16 +431,18 @@ void kangaroo_mcu_state::machine_start()
 void kangaroo_state::machine_reset()
 {
 	/* I think there is a bug in the startup checks of the game. At the very
-	   beginning, during the RAM check, it goes one byte too far, and ends up
-	   trying to write, and re-read, location dfff. To the best of my knowledge,
-	   that is a ROM address, so the test fails and the code keeps jumping back
-	   at 0000.
-	   However, a NMI causes a successful reset. Maybe the hardware generates a
-	   NMI short after power on, therefore masking the bug? The NMI is generated
-	   by the MB8841 custom microcontroller, so this could be a way to disguise
-	   the copy protection.
-	   Anyway, what I do here is just immediately generate the NMI, so the game
-	   properly starts. */
+	beginning, during the RAM check, it goes one byte too far, and ends up
+	trying to write, and re-read, location dfff. To the best of my knowledge,
+	that is a ROM address, so the test fails and the code keeps jumping back
+	at 0000.
+
+	However, a NMI causes a successful reset. Maybe the hardware generates a
+	NMI shortly after power on, therefore masking the bug? The NMI is generated
+	by the MB8841 custom microcontroller, so this could be a way to disguise
+	the copy protection.
+
+	Anyway, what I do here is just immediately generate the NMI, so the game
+	properly starts. */
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -500,7 +509,6 @@ void kangaroo_state::main_map(address_map &map)
 void kangaroo_mcu_state::main_map(address_map &map)
 {
 	kangaroo_state::main_map(map);
-
 	map(0xef00, 0xefff).rw(FUNC(kangaroo_mcu_state::mcu_sim_r), FUNC(kangaroo_mcu_state::mcu_sim_w));
 }
 
@@ -630,22 +638,21 @@ static INPUT_PORTS_START( kangaroo )
 	PORT_DIPSETTING(    0x04, "10000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x10, "A 2C/1C B 2C/1C" )
 	PORT_DIPSETTING(    0x20, "A 2C/1C B 1C/3C" )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, "A 1C/1C B 1C/1C" )
 	PORT_DIPSETTING(    0x30, "A 1C/1C B 1C/2C" )
 	PORT_DIPSETTING(    0x40, "A 1C/1C B 1C/3C" )
 	PORT_DIPSETTING(    0x50, "A 1C/1C B 1C/4C" )
 	PORT_DIPSETTING(    0x60, "A 1C/1C B 1C/5C" )
 	PORT_DIPSETTING(    0x70, "A 1C/1C B 1C/6C" )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x80, "A 1C/2C B 1C/2C" )
 	PORT_DIPSETTING(    0x90, "A 1C/2C B 1C/4C" )
 	PORT_DIPSETTING(    0xa0, "A 1C/2C B 1C/5C" )
 	PORT_DIPSETTING(    0xe0, "A 1C/2C B 1C/6C" )
 	PORT_DIPSETTING(    0xb0, "A 1C/2C B 1C/10C" )
 	PORT_DIPSETTING(    0xc0, "A 1C/2C B 1C/11C" )
 	PORT_DIPSETTING(    0xd0, "A 1C/2C B 1C/12C" )
-	// 0xe0 gives A 1/2 B 1/6
 	PORT_DIPSETTING(    0xf0, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
@@ -657,25 +664,22 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static constexpr XTAL MASTER_CLOCK = 10_MHz_XTAL;
-
 void kangaroo_state::nomcu(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, MASTER_CLOCK / 4);
+	Z80(config, m_maincpu, 10_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kangaroo_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(kangaroo_state::irq0_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", MASTER_CLOCK / 8));
-	audiocpu.set_addrmap(AS_PROGRAM, &kangaroo_state::sound_map);
-	audiocpu.set_addrmap(AS_IO, &kangaroo_state::sound_map); // yes, this is identical
-	audiocpu.set_vblank_int("screen", FUNC(kangaroo_state::irq0_line_hold));
-
+	Z80(config, m_audiocpu, 10_MHz_XTAL / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kangaroo_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &kangaroo_state::sound_map); // yes, this is identical
+	m_audiocpu->set_vblank_int("screen", FUNC(kangaroo_state::irq0_line_hold));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
-	screen.set_raw(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248);
+	screen.set_raw(10_MHz_XTAL, 320*2, 0*2, 256*2, 260, 8, 248);
 	screen.set_screen_update(FUNC(kangaroo_state::screen_update));
 
 	PALETTE(config, m_palette, palette_device::BGR_3BIT);
@@ -685,7 +689,7 @@ void kangaroo_state::nomcu(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	AY8910(config, "aysnd", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, "aysnd", 10_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 
@@ -693,9 +697,8 @@ void kangaroo_mcu_state::mcu(machine_config &config)
 {
 	nomcu(config);
 
-	subdevice<cpu_device>("maincpu")->set_addrmap(AS_PROGRAM, &kangaroo_mcu_state::main_map);
-
-	MB8841(config, "mcu", MASTER_CLOCK / 4 / 2).set_disable(); // not dumped
+	// basic machine hardware
+	MB8841(config, m_mcu, 10_MHz_XTAL / 4 / 2);
 }
 
 
@@ -736,10 +739,10 @@ ROM_START( kangaroo )
 	ROM_REGION( 0x1000, "audiocpu", 0 ) // On TVG-1-CPU-B board
 	ROM_LOAD( "tvg_81.8",    0x0000, 0x1000, CRC(fb449bfd) SHA1(f593a0339f47e121736a927587132aeb52704557) ) // IC24
 
-	ROM_REGION( 0x0800, "mcu", 0 )  // internal ROM from the 8841 custom MCU
-	ROM_LOAD( "mb8841.ic29",    0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 ) // internal ROM from the 8841 custom MCU
+	ROM_LOAD( "mb8841_477m.ic29", 0x0000, 0x0800, CRC(04ca58ee) SHA1(cc46a268a5d915c313476f44c44f92ed94c2b4a0) )
 
-	ROM_REGION( 0x0800, "user1", 0 )    // data for the 8841 custom MCU
+	ROM_REGION( 0x0800, "user1", 0 ) // data for the 8841 custom MCU
 	ROM_LOAD( "tvg_82.12",   0x0000, 0x0800, CRC(57766f69) SHA1(94a7a557d8325799523d5e1a88653a9a3fbe34f9) ) // IC28
 
 	ROM_REGION( 0x4000, "blitter", 0 ) // On TVG-1-VIDEO-B board
@@ -762,10 +765,10 @@ ROM_START( kangarooa )
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "136008-107.ic24",   0x0000, 0x1000, CRC(fb449bfd) SHA1(f593a0339f47e121736a927587132aeb52704557) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  // internal ROM from the 8841 custom MCU
-	ROM_LOAD( "mb8841.ic29",          0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 ) // internal ROM from the 8841 custom MCU
+	ROM_LOAD( "mb8841_477m.ic29",  0x0000, 0x0800, CRC(04ca58ee) SHA1(cc46a268a5d915c313476f44c44f92ed94c2b4a0) )
 
-	ROM_REGION( 0x0800, "user1", 0 )    // data for the 8841 custom MCU
+	ROM_REGION( 0x0800, "user1", 0 ) // data for the 8841 custom MCU
 	ROM_LOAD( "136008-112.ic28",   0x0000, 0x0800, CRC(57766f69) SHA1(94a7a557d8325799523d5e1a88653a9a3fbe34f9) )
 
 	ROM_REGION( 0x4000, "blitter", 0 )
@@ -810,10 +813,10 @@ ROM_START( kangarool ) // runs on earlier revision TVG-1-CPU-A + TVG-1-VIDEO-A P
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "tvg_81.ic24", 0x0000, 0x1000, CRC(fb449bfd) SHA1(f593a0339f47e121736a927587132aeb52704557) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  // internal ROM from the 8841 custom MCU
-	ROM_LOAD( "mb8841.ic29", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 ) // internal ROM from the 8841 custom MCU
+	ROM_LOAD( "mb8841_477m.ic29", 0x0000, 0x0800, CRC(04ca58ee) SHA1(cc46a268a5d915c313476f44c44f92ed94c2b4a0) )
 
-	ROM_REGION( 0x0800, "user1", 0 )    // data for the 8841 custom MCU
+	ROM_REGION( 0x0800, "user1", 0 ) // data for the 8841 custom MCU
 	ROM_LOAD( "tvg_82.ic28", 0x0000, 0x0800, CRC(57766f69) SHA1(94a7a557d8325799523d5e1a88653a9a3fbe34f9) )
 
 	ROM_REGION( 0x4000, "blitter", 0 )
