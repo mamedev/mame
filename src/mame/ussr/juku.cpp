@@ -91,10 +91,15 @@ public:
 		m_keys(*this, "COL.%u", 0U),
 		m_key_special(*this, "SPECIAL"),
 		m_screen(*this, "screen"),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+                m_mouse_x(*this, "MOUSE_X"),
+                m_mouse_y(*this, "MOUSE_Y"),
+                m_mouse_b(*this, "BUTTONS")
 	{ }
 
 	void juku(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(mouse_update);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -114,6 +119,7 @@ private:
 	required_ioport m_key_special;
 	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_speaker;
+	optional_ioport m_mouse_x, m_mouse_y, m_mouse_b;
 
 	int32_t m_width, m_height, m_hbporch, m_vbporch;
 
@@ -135,6 +141,10 @@ private:
 	void pio0_porta_w(uint8_t data);
 	uint8_t pio0_portb_r();
 	void pio0_portc_w(uint8_t data);
+
+	uint8_t mouse_port_r();
+        uint8_t m_prev_mouse_x, m_prev_mouse_y;
+	uint8_t m_prev_mouse_byte;
 
 	void screen_width(uint8_t data);
 	void screen_hblank_period(uint8_t data);
@@ -206,6 +216,7 @@ void juku_state::io_map(address_map &map)
 	map(0x1f, 0x1f).rw(FUNC(juku_state::fdc_data_r), FUNC(juku_state::fdc_data_w));
 	// mapping for cassette version (E5101?)
 	// map(0x1c, 0x1d).rw(m_sio[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x80, 0x80).r(FUNC(juku_state::mouse_port_r));
 }
 
 
@@ -397,6 +408,17 @@ static INPUT_PORTS_START( juku )
 	PORT_START("SPECIAL")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+
+        // Optional mouse at system port X1
+	PORT_START("MOUSE_X")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_CODE(MOUSECODE_X) PORT_SENSITIVITY(50) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(juku_state::mouse_update), 1)
+
+	PORT_START("MOUSE_Y")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_CODE(MOUSECODE_Y) PORT_SENSITIVITY(50) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(juku_state::mouse_update), 1)
+        
+	PORT_START("BUTTONS")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Left Button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(juku_state::mouse_update), 1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Right Button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(juku_state::mouse_update), 1)
 INPUT_PORTS_END
 
 
@@ -584,6 +606,75 @@ void juku_state::speaker_w(int state)
 
 
 //**************************************************************************
+//  MOUSE
+//**************************************************************************
+
+/*
+ * Calculate positive/negative delta from old and new relative value
+ */
+inline int delta(int o, int n)
+{
+    if(o>n) {
+        if(o-n<128) return n-o;
+        else return n+255-o;
+    }
+    if(o<n) {
+        if(n-o<128) return n-o;
+        else return n-255-o;
+    }
+        
+    return 0;
+}
+
+uint8_t juku_state::mouse_port_r()
+{
+	// 7-------  always 1
+	// -6------  always 0
+	// --5-----  vertical active
+	// ---4----  vertical direction
+	// ----3---  horizontal active
+	// -----2--  horizontal direction
+	// ------1-  left button
+	// -------0  right button
+
+        uint8_t data = 0b10000000;
+        int x = m_mouse_x->read(), y = m_mouse_y->read();
+        int dx = delta(m_prev_mouse_x, x);
+        int dy = delta(m_prev_mouse_y, y);
+
+        data |= m_mouse_b->read();
+        
+        if (dx!=0) {
+                data |= dx > 0 ? 0b00001000 : 0b00001100;
+                m_prev_mouse_x = x;
+        }
+
+        if (dy!=0) {
+                data |= dy > 0 ? 0b00110000 : 0b00100000;
+                m_prev_mouse_y = y;
+        }
+
+        if (m_prev_mouse_byte != data) {
+		m_prev_mouse_byte = data;
+                
+                LOG("m: ");
+                for (int i = 7; i >= 0; i--)
+                        LOG("%d", BIT(data, i));
+                LOG(" \n");
+        }
+
+	return data;
+}
+
+INPUT_CHANGED_MEMBER(juku_state::mouse_update)
+{
+        
+        m_pic->ir6_w(CLEAR_LINE);
+        m_pic->ir6_w(HOLD_LINE);
+}
+
+
+//**************************************************************************
 //  MACHINE EMULATION
 //**************************************************************************
 
@@ -671,6 +762,9 @@ void juku_state::machine_start()
 	save_item(NAME(m_beep_state));
 	save_item(NAME(m_beep_level));
 	save_item(NAME(m_fdc_cur_cmd));
+        save_item(NAME(m_prev_mouse_byte));
+        save_item(NAME(m_prev_mouse_y));
+        save_item(NAME(m_prev_mouse_x));
 	save_pointer(NAME(m_ram), 0x10000);
 }
 
@@ -688,6 +782,9 @@ void juku_state::machine_reset()
 	m_vblank_period_lsb = -1;
 	m_monitor_bits = 0U;
 	m_empty_screen_on_update = 0;
+        m_prev_mouse_byte = 0;
+        m_prev_mouse_y = 0;
+        m_prev_mouse_x = 0;
 }
 
 
