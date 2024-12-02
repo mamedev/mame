@@ -456,7 +456,7 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 u16 igs011_state::igs011_layers_r(offs_t offset)
 {
-	const int layer0 = ((offset & (0x80000 / 2)) ? 4 : 0) + (BIT(offset, 0) ? 0 : 2);
+	const int layer0 = bitswap<2>(offset ^ 1, 18, 0) << 1;
 
 	u8 const *const l0 = m_layer[layer0].get();
 	u8 const *const l1 = m_layer[layer0 + 1].get();
@@ -469,7 +469,7 @@ u16 igs011_state::igs011_layers_r(offs_t offset)
 
 void igs011_state::igs011_layers_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	const int layer0 = ((offset & (0x80000 / 2)) ? 4 : 0) + (BIT(offset, 0) ? 0 : 2);
+	const int layer0 = bitswap<2>(offset ^ 1, 18, 0) << 1;
 
 	u8 *const l0 = m_layer[layer0].get();
 	u8 *const l1 = m_layer[layer0 + 1].get();
@@ -690,11 +690,11 @@ void igs011_state::dips_w(offs_t offset, u16 data, u16 mem_mask)
 template<unsigned Num>
 u16 igs011_state::dips_r()
 {
-	u16 ret = 0;
+	u16 ret = 0xff;
 
 	for (int i = 0; i < Num; i++)
 		if (BIT(~m_dips_sel, i))
-			ret = m_io_dsw[i]->read();
+			ret &= m_io_dsw[i]->read();
 
 	// 0x0100 is blitter busy
 	return  (ret & 0xff) | 0x0000;
