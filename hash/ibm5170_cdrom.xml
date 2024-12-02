@@ -7500,6 +7500,42 @@ Installation and Open Circulation CDs are bootable.
 		</part>
 	</software>
 
+	<software name="winnt40w">
+		<description>Windows NT 4.0 Workstation</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="Microsoft Windows NT Workstation 4.0 [69401]" sha1="a3a8528c34fa8120ca6945320051052744a1c121"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt40s">
+		<description>Windows NT 4.0 Server</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="NTSRV40A" sha1="7b3c4480f32f6d0e4b030c02123c9fee28b1a6f2"/>
+			</diskarea>
+		</part>
+	</software>
+	
+	<software name="winxpps3">
+		<description>Windows XP Professional (with Service Pack 3)</description>
+		<year>2001</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="en_windows_xp_professional_with_service_pack_3_x86_cd_vl_x14-73974" sha1="66ac289ae27724c5ae17139227cbe78c01eefe40"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="win2kps4">
 		<description>Windows 2000 Professional (with Service Pack 4) (en 5.00.2195.6717)</description>
 		<year>1999</year>
