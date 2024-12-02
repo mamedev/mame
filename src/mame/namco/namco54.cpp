@@ -69,20 +69,17 @@ uint8_t namco_54xx_device::R0_r()
 	return m_latched_cmd & 0x0f;
 }
 
-void namco_54xx_device::O_w(uint8_t data)
+void namco_54xx_device::O_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	uint8_t out = (data & 0x0f);
-	if (data & 0x10)
-		m_discrete->write(NAMCO_54XX_1_DATA(m_basenode), out);
+	if (mem_mask == 0x0f)
+		m_discrete->write(NAMCO_54XX_0_DATA(m_basenode), data & 0x0f);
 	else
-		m_discrete->write(NAMCO_54XX_0_DATA(m_basenode), out);
+		m_discrete->write(NAMCO_54XX_1_DATA(m_basenode), data >> 4);
 }
 
 void namco_54xx_device::R1_w(uint8_t data)
 {
-	uint8_t out = (data & 0x0f);
-
-	m_discrete->write(NAMCO_54XX_2_DATA(m_basenode), out);
+	m_discrete->write(NAMCO_54XX_2_DATA(m_basenode), data & 0x0f);
 }
 
 
@@ -91,7 +88,7 @@ void namco_54xx_device::write(uint8_t data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_54xx_device::write_sync),this), data);
 }
 
-TIMER_CALLBACK_MEMBER( namco_54xx_device::write_sync )
+TIMER_CALLBACK_MEMBER(namco_54xx_device::write_sync)
 {
 	m_latched_cmd = param;
 }
@@ -114,8 +111,8 @@ ROM_END
 
 DEFINE_DEVICE_TYPE(NAMCO_54XX, namco_54xx_device, "namco54", "Namco 54xx")
 
-namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_54XX, tag, owner, clock),
+namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NAMCO_54XX, tag, owner, clock),
 	m_cpu(*this, "mcu"),
 	m_discrete(*this, finder_base::DUMMY_TAG),
 	m_basenode(0),
@@ -138,7 +135,7 @@ void namco_54xx_device::device_start()
 
 void namco_54xx_device::device_add_mconfig(machine_config &config)
 {
-	MB8844(config, m_cpu, DERIVED_CLOCK(1,1)); /* parent clock, internally divided by 6 */
+	MB8844(config, m_cpu, DERIVED_CLOCK(1,1)); // parent clock, internally divided by 6
 	m_cpu->read_k().set(FUNC(namco_54xx_device::K_r));
 	m_cpu->write_o().set(FUNC(namco_54xx_device::O_w));
 	m_cpu->read_r<0>().set(FUNC(namco_54xx_device::R0_r));

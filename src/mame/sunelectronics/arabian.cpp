@@ -619,12 +619,7 @@ uint8_t arabian_state::mcu_portk_r()
 
 void arabian_state::mcu_port_o_w(uint8_t data)
 {
-	uint8_t out = data & 0x0f;
-
-	if (data & 0x10)
-		m_mcu_port_o = (m_mcu_port_o & 0x0f) | (out << 4);
-	else
-		m_mcu_port_o = (m_mcu_port_o & 0xf0) | out;
+	m_mcu_port_o = data;
 }
 
 void arabian_state::mcu_port_p_w(uint8_t data)

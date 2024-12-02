@@ -1313,7 +1313,7 @@ void mcs48_cpu_device::burn_cycles(int count)
 			m_prescaler += count;
 			m_timer += m_prescaler >> 5;
 			m_prescaler &= 0x1f;
-			timerover = (oldtimer != 0 && m_timer == 0);
+			timerover = m_timer < oldtimer;
 		}
 
 		// if the counter is enabled, poll the T1 test input once for each cycle

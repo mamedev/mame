@@ -94,7 +94,9 @@ public:
 	// SO: serial output
 	auto write_so() { return m_write_so.bind(); }
 
-	void set_pla(u8 *pla) { m_PLA = pla; }
+	// PLA mask option (default to 8-bit)
+	void set_pla_bits(u8 bits) { m_pla_bits = bits; } // 4-bit or 8-bit (4-bit requires PLA data)
+	void set_pla_data(u8 *pla) { m_pla_data = pla; }
 
 	void clock_w(int state);
 
@@ -136,36 +138,40 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 
-	u8   m_PC;     // Program Counter: 6 bits
-	u8   m_PA;     // Page Address: 4 bits
-	u16  m_SP[4];  // Stack is 4*10 bit addresses deep, but we also use 3 top bits per address to store flags during irq
-	u8   m_SI;     // Stack index: 2 bits
-	u8   m_A;      // Accumulator: 4 bits
-	u8   m_X;      // Index X: 4 bits
-	u8   m_Y;      // Index Y: 4 bits
-	u8   m_st;     // State flag: 1 bit
-	u8   m_zf;     // Zero flag: 1 bit
-	u8   m_cf;     // Carry flag: 1 bit
-	u8   m_vf;     // Timer overflow flag: 1 bit
-	u8   m_sf;     // Serial Full/Empty flag: 1 bit
-	u8   m_if;     // Interrupt flag: 1 bit
+	u8   m_PC;      // Program Counter: 6 bits
+	u8   m_PA;      // Page Address: 4 bits
+	u16  m_SP[4];   // Stack is 4*10 bit addresses deep, but we also use 3 top bits per address to store flags during irq
+	u8   m_SI;      // Stack index: 2 bits
+	u8   m_A;       // Accumulator: 4 bits
+	u8   m_X;       // Index X: 4 bits
+	u8   m_Y;       // Index Y: 4 bits
+	u8   m_st;      // State flag: 1 bit
+	u8   m_zf;      // Zero flag: 1 bit
+	u8   m_cf;      // Carry flag: 1 bit
+	u8   m_vf;      // Timer overflow flag: 1 bit
+	u8   m_sf;      // Serial Full/Empty flag: 1 bit
+	u8   m_if;      // Interrupt flag: 1 bit
 
 	// Peripheral Control
-	u8   m_pio;    // Peripheral enable bits: 8 bits
+	u8   m_pio;     // Peripheral enable bits: 8 bits
 
 	// Timer registers
-	u8   m_TH;     // Timer High: 4 bits
-	u8   m_TL;     // Timer Low: 4 bits
-	u8   m_TP;     // Timer Prescale: 6 bits?
-	u8   m_ctr;    // current external counter value
+	u8   m_TH;      // Timer High: 4 bits
+	u8   m_TL;      // Timer Low: 4 bits
+	u8   m_TP;      // Timer Prescale: 6 bits?
+	u8   m_ctr;     // current external counter value
 
 	// Serial registers
-	u8   m_SB;     // Serial buffer: 4 bits
-	u16  m_SBcount;// number of bits received
+	u8   m_SB;      // Serial buffer: 4 bits
+	u16  m_SBcount; // number of bits received
 	emu_timer *m_serial;
 
-	// PLA configuration and port callbacks
-	u8 *m_PLA;
+	// PLA configuration
+	u8 *m_pla_data;
+	u8 m_pla_bits;
+	u8 m_o_output;
+
+	// port callbacks
 	devcb_read8 m_read_k;
 	devcb_write8 m_write_o;
 	devcb_write8 m_write_p;
@@ -189,7 +195,7 @@ private:
 	u8 m_debugger_flags;
 
 	TIMER_CALLBACK_MEMBER(serial_timer);
-	int pla(int inA, int inB);
+	void write_pla(u8 index);
 	void update_pio_enable(u8 newpio);
 	void increment_timer();
 	void update_pio(int cycles);

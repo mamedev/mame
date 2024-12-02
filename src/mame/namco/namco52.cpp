@@ -94,10 +94,7 @@ void namco_52xx_device::R3_w(uint8_t data)
 
 void namco_52xx_device::O_w(uint8_t data)
 {
-	if (data & 0x10)
-		m_address = (m_address & 0x0fff) | ((data & 0xf) << 12);
-	else
-		m_address = (m_address & 0xf0ff) | ((data & 0xf) << 8);
+	m_address = (m_address & 0x00ff) | (data << 8);
 }
 
 
@@ -106,7 +103,7 @@ void namco_52xx_device::write(uint8_t data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_52xx_device::write_sync),this), data);
 }
 
-TIMER_CALLBACK_MEMBER( namco_52xx_device::write_sync )
+TIMER_CALLBACK_MEMBER(namco_52xx_device::write_sync)
 {
 	m_latched_cmd = param;
 }
@@ -116,7 +113,7 @@ void namco_52xx_device::chip_select(int state)
 	m_cpu->set_input_line(0, state);
 }
 
-TIMER_CALLBACK_MEMBER( namco_52xx_device::external_clock_pulse )
+TIMER_CALLBACK_MEMBER(namco_52xx_device::external_clock_pulse)
 {
 	m_cpu->clock_w(ASSERT_LINE);
 	m_cpu->clock_w(CLEAR_LINE);

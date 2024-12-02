@@ -32,9 +32,9 @@ private:
 	uint8_t                   m_cmd;
 	uint8_t                   m_portO;
 
-	TIMER_CALLBACK_MEMBER( O_w_sync );
-	TIMER_CALLBACK_MEMBER( rw_sync );
-	TIMER_CALLBACK_MEMBER( write_sync );
+	TIMER_CALLBACK_MEMBER(O_w_sync);
+	TIMER_CALLBACK_MEMBER(rw_sync);
+	TIMER_CALLBACK_MEMBER(write_sync);
 
 	uint8_t K_r();
 	uint8_t R0_r();

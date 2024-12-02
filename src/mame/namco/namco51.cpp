@@ -78,7 +78,7 @@ void namco_51xx_device::rw(int state)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::rw_sync),this), state);
 }
 
-TIMER_CALLBACK_MEMBER( namco_51xx_device::rw_sync )
+TIMER_CALLBACK_MEMBER(namco_51xx_device::rw_sync)
 {
 	m_rw = param;
 }
@@ -98,7 +98,7 @@ void namco_51xx_device::write(uint8_t data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::write_sync),this), data);
 }
 
-TIMER_CALLBACK_MEMBER( namco_51xx_device::write_sync )
+TIMER_CALLBACK_MEMBER(namco_51xx_device::write_sync)
 {
 	m_portO = param;
 }
@@ -133,13 +133,9 @@ void namco_51xx_device::O_w(uint8_t data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::O_w_sync),this), data);
 }
 
-TIMER_CALLBACK_MEMBER( namco_51xx_device::O_w_sync )
+TIMER_CALLBACK_MEMBER(namco_51xx_device::O_w_sync)
 {
-	uint8_t out = (param & 0x0f);
-	if (param & 0x10)
-		m_portO = (m_portO & 0x0f) | (out << 4);
-	else
-		m_portO = (m_portO & 0xf0) | (out);
+	m_portO = param;
 }
 
 void namco_51xx_device::P_w(uint8_t data)

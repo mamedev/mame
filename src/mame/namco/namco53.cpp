@@ -93,11 +93,7 @@ uint8_t namco_53xx_device::R3_r()
 
 void namco_53xx_device::O_w(uint8_t data)
 {
-	uint8_t out = (data & 0x0f);
-	if (data & 0x10)
-		m_portO = (m_portO & 0x0f) | (out << 4);
-	else
-		m_portO = (m_portO & 0xf0) | (out);
+	m_portO = data;
 }
 
 void namco_53xx_device::P_w(uint8_t data)

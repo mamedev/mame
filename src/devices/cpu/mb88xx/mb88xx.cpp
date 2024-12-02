@@ -122,7 +122,8 @@ mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type
 			(data_width == 5) ? address_map_constructor(FUNC(mb88_cpu_device::data_5bit), this) :
 			(data_width == 6) ? address_map_constructor(FUNC(mb88_cpu_device::data_6bit), this) :
 			address_map_constructor(FUNC(mb88_cpu_device::data_7bit), this))
-	, m_PLA(nullptr)
+	, m_pla_data(nullptr)
+	, m_pla_bits(8)
 	, m_read_k(*this, 0)
 	, m_write_o(*this)
 	, m_write_p(*this)
@@ -194,6 +195,7 @@ void mb88_cpu_device::device_start()
 	m_serial = timer_alloc(FUNC(mb88_cpu_device::serial_timer), this);
 
 	m_ctr = 0;
+	m_o_output = 0;
 
 	save_item(NAME(m_PC));
 	save_item(NAME(m_PA));
@@ -348,17 +350,28 @@ TIMER_CALLBACK_MEMBER(mb88_cpu_device::serial_timer)
 			m_pending_interrupt |= INT_CAUSE_SERIAL;
 		}
 	}
-
 }
 
-int mb88_cpu_device::pla(int inA, int inB)
+void mb88_cpu_device::write_pla(u8 index)
 {
-	int index = ((inB & 1) << 4) | (inA & 0x0f);
+	u8 mask = 0xff;
 
-	if (m_PLA)
-		return m_PLA[index];
+	if (m_pla_bits == 8)
+	{
+		const u8 shift = (index & 0x10) ? 4 : 0;
+		mask = 0xf << shift;
+		m_o_output = (m_o_output & ~mask) | (index << shift & mask);
+	}
+	else
+	{
+		// if the driver hasn't supplied PLA data, just output the index
+		if (m_pla_data)
+			m_o_output = m_pla_data[index];
+		else
+			m_o_output = index;
+	}
 
-	return index;
+	m_write_o(0, m_o_output, mask);
 }
 
 void mb88_cpu_device::execute_set_input(int inputnum, int state)
@@ -492,7 +505,7 @@ void mb88_cpu_device::execute_run()
 				break;
 
 			case 0x01: // outO ZCS:...
-				m_write_o(pla(m_A, TEST_CF()));
+				write_pla(TEST_CF() << 4 | m_A);
 				m_st = 1;
 				break;
 
