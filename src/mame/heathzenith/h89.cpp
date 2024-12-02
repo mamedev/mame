@@ -48,6 +48,8 @@
 #include "bus/heathzenith/h19/tlb.h"
 #include "bus/heathzenith/h89/h89bus.h"
 #include "bus/heathzenith/h89/cards.h"
+#include "bus/heathzenith/h89/sigmasoft_parallel_port.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
 #include "machine/ram.h"
@@ -157,6 +159,8 @@ protected:
 	void reset_single_step_state();
 
 	template <int line> void slot_irq(int state);
+
+	void h89_left_cards(device_slot_interface &device);
 };
 
 /**
@@ -902,6 +906,17 @@ static void intr_ctrl_options(device_slot_interface &device)
 	device.option_add("mms",      HEATH_MMS_INTR_CNTRL);
 }
 
+
+void h89_base_state::h89_left_cards(device_slot_interface &device)
+{
+	device.option_add("ss_parallel", H89BUS_SIGMASOFT_PARALLEL).machine_config(
+        [this](device_t *device)
+        {
+             downcast<sigmasoft_parallel_port &>(*device).set_tlbc(m_tlbc);
+        });
+}
+
+
 void h89_base_state::h89_base(machine_config &config)
 {
 	config.set_default_layout(layout_h89);
@@ -950,9 +965,9 @@ void h89_base_state::h89_base(machine_config &config)
 	m_h89bus->out_fdcdrq_callback().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
 	m_h89bus->out_blockirq_callback().set(m_intr_socket, FUNC(heath_intr_socket::block_interrupts));
 	m_h89bus->out_fmwe_callback().set(FUNC(h89_base_state::set_fmwe));
-	H89BUS_LEFT_SLOT(config, "p501", "h89bus", h89_left_cards, nullptr);
-	H89BUS_LEFT_SLOT(config, "p502", "h89bus", h89_left_cards, nullptr);
-	H89BUS_LEFT_SLOT(config, "p503", "h89bus", h89_left_cards, nullptr);
+	H89BUS_LEFT_SLOT(config, "p501", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
+	H89BUS_LEFT_SLOT(config, "p502", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
+	H89BUS_LEFT_SLOT(config, "p503", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
 	H89BUS_RIGHT_SLOT(config, "p504", "h89bus", h89_right_cards, nullptr);
 	H89BUS_RIGHT_SLOT(config, "p505", "h89bus", h89_right_cards, "ha_88_3");
 	H89BUS_RIGHT_SLOT(config, "p506", "h89bus", h89_right_p506_cards, "we_pullup").set_p506_signalling(true);
@@ -990,7 +1005,7 @@ void h89_sigmasoft_state::h89_sigmasoft(machine_config &config)
 
 	sigma_tlb_options(m_tlbc);
 
-	H89BUS_LEFT_SLOT(config.replace(), "p501", "h89bus", h89_left_cards, "ss_parallel");
+	H89BUS_LEFT_SLOT(config.replace(), "p501", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, "ss_parallel");
 }
 
 void h89_mms_state::h89_mms(machine_config &config)
