@@ -26,17 +26,20 @@ The BPSC-2006KG PCB adds a TPA3004D2 audio amplifier.
 
 Banpresto "Chara Medal Island" series:
     BP-01 - Crayon Shin-chan - Arashi o Yobu! Sushitori Daigassen - クレヨンしんちゃん 嵐を呼ぶ！すし取り大合戦
-*** BP-02 - ??? - ???
+**  BP-02 - Pocket Monster - Sonans ga Koronda! - ポケットモンスター ソーナンスがころんだ！
     BP-03 - Dragon Ball Z - Bucchigiri no Chou Kessen - ドラゴンボールZ ぶっちぎりの超決戦
-*** BP-04 - ??? - ???
+*** BP-04 - ??? - ??? (possibly Eye Shield 21 - Nerae!! Gyakuten Touchdown - アイシールド21 狙え!!逆転タッチダウン)
     BP-05 - Chibi Maruko-chan - Wanage de Asobo!! - ちびまる子ちゃん輪投げで遊ぼ!!
+**  BP-06 - Doraemon - SOS! Itazura Nezumi wo Yattsukero!! - ドラえもん SOS!いたずらネズミをやっつけろ!!
+**  BP-07 - GeGeGe no Kitarou - Taose! Seiyou Youkai Gundan - ゲゲゲの鬼太郎 倒せ！西洋妖怪軍団
+**  BP-08 - Keroro Gunsou - Hacha Mecha Yakyu Taikai de Arimasu!! - ケロロ軍曹 ハチャメチャ野球大会であります!!
 almost surely more
 
 Takara / Tomy "VS medal" series (games show produced by Amodio and Tomy copyright on title screen):
 **  TM-01 - Kurohige Kiki Ippatsu - 黒ひげ危機一発
-*** TM-02 - ??? - ???
-    TM-03 - Zoids (may not be complete title) - ゾイド
-*** TM-04 - ??? - ???
+**  TM-02 - Tomica - トミカ
+    TM-03 - Zoids - ゾイド
+**  TM-04 - Keitei-oh - 海帝王
     TM-05 - Youkai VS Uchuujin - 妖怪ＶＳ宇宙人
     TM-06 - Satoyama Grand Prix - 里山グランプリ
     TM-07 - Ginga Yakyu - 銀河野球

@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-Gu, Choki, Pa
+Bootleg of Omori's 野球拳 - The Yakyuken
 
 PCB is marked 20282 and LC (stands for "lato componenti", so components side)
 with a small riser board marked W 15482 plugged into one of the main CPU ROMs'
@@ -42,10 +42,10 @@ TODO:
 
 namespace {
 
-class guchokipa_state : public driver_device
+class yakyuken_state : public driver_device
 {
 public:
-	guchokipa_state(const machine_config &mconfig, device_type type, const char *tag) :
+	yakyuken_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -54,7 +54,7 @@ public:
 		m_fgram(*this, "fgram")
 	{ }
 
-	void guchokipa(machine_config &config);
+	void yakyuken(machine_config &config);
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -83,14 +83,14 @@ private:
 };
 
 
-TILE_GET_INFO_MEMBER(guchokipa_state::get_bg_tile_info)
+TILE_GET_INFO_MEMBER(yakyuken_state::get_bg_tile_info)
 {
 	int const code = m_bgram[tile_index];
 
 	tileinfo.set(0, code, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(guchokipa_state::get_fg_tile_info)
+TILE_GET_INFO_MEMBER(yakyuken_state::get_fg_tile_info)
 {
 	int code = m_fgram[tile_index];
 
@@ -100,27 +100,27 @@ TILE_GET_INFO_MEMBER(guchokipa_state::get_fg_tile_info)
 }
 
 
-void guchokipa_state::video_start()
+void yakyuken_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(guchokipa_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(guchokipa_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(yakyuken_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(yakyuken_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-void guchokipa_state::fgram_w(offs_t offset, uint8_t data)
+void yakyuken_state::fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-void guchokipa_state::bgram_w(offs_t offset, uint8_t data)
+void yakyuken_state::bgram_w(offs_t offset, uint8_t data)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-uint32_t guchokipa_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t yakyuken_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -129,16 +129,16 @@ uint32_t guchokipa_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-void guchokipa_state::main_program_map(address_map &map)
+void yakyuken_state::main_program_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x6400, 0x67ff).ram();
-	map(0x7000, 0x73ff).ram().w(FUNC(guchokipa_state::bgram_w)).share(m_bgram);
-	map(0x7400, 0x77ff).ram().w(FUNC(guchokipa_state::fgram_w)).share(m_fgram);
+	map(0x7000, 0x73ff).ram().w(FUNC(yakyuken_state::bgram_w)).share(m_bgram);
+	map(0x7400, 0x77ff).ram().w(FUNC(yakyuken_state::fgram_w)).share(m_fgram);
 	map(0x7c00, 0x7fff).ram(); // only seems to be initialized with 0xff at start up
 }
 
-void guchokipa_state::main_io_map(address_map &map)
+void yakyuken_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("SW");
@@ -149,13 +149,13 @@ void guchokipa_state::main_io_map(address_map &map)
 	// .w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
-void guchokipa_state::sound_program_map(address_map &map)
+void yakyuken_state::sound_program_map(address_map &map)
 {
 	map(0x0000, 0x07ff).rom();
 	map(0x2000, 0x23ff).ram();
 }
 
-void guchokipa_state::sound_io_map(address_map &map)
+void yakyuken_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	// .r("soundlatch", FUNC(generic_latch_8_device::read));
@@ -164,7 +164,7 @@ void guchokipa_state::sound_io_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( guchokipa )
+static INPUT_PORTS_START( yakyuken )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) // 100 in book-keeping
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) // 500 in book-keeping
@@ -212,32 +212,32 @@ static INPUT_PORTS_START( guchokipa )
 INPUT_PORTS_END
 
 
-static GFXDECODE_START( gfx_guchokipa )
+static GFXDECODE_START( gfx_yakyuken )
 	GFXDECODE_ENTRY( "tiles", 0,     gfx_8x8x4_planar, 0, 1 )
 	GFXDECODE_ENTRY( "tiles", 0x800, gfx_8x8x4_planar, 0, 1 )
 GFXDECODE_END
 
 
-void guchokipa_state::guchokipa(machine_config &config)
+void yakyuken_state::yakyuken(machine_config &config)
 {
 	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.07 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &guchokipa_state::main_program_map);
-	m_maincpu->set_addrmap(AS_IO, &guchokipa_state::main_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(guchokipa_state::irq0_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &yakyuken_state::main_program_map);
+	m_maincpu->set_addrmap(AS_IO, &yakyuken_state::main_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(yakyuken_state::irq0_line_hold));
 
 	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 12); // 1.53 MHz
-	m_audiocpu->set_addrmap(AS_PROGRAM, &guchokipa_state::sound_program_map);
-	m_audiocpu->set_addrmap(AS_IO, &guchokipa_state::sound_io_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &yakyuken_state::sound_program_map);
+	m_audiocpu->set_addrmap(AS_IO, &yakyuken_state::sound_io_map);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 0, 256-1);
-	screen.set_screen_update(FUNC(guchokipa_state::screen_update));
+	screen.set_screen_update(FUNC(yakyuken_state::screen_update));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_guchokipa);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_yakyuken);
 	PALETTE(config, "palette").set_entries(0x10); // TODO
 
 	SPEAKER(config, "mono").front_center();
@@ -248,7 +248,7 @@ void guchokipa_state::guchokipa(machine_config &config)
 }
 
 
-ROM_START( guchokip )
+ROM_START( yakyuken )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "4210.bt1",  0x0000, 0x1000, CRC(6cf83735) SHA1(3d0a978adb1c1b4526fa00dedd08e2879f4af283) )
 	ROM_LOAD( "4211.bg12", 0x1000, 0x1000, CRC(098bf9ff) SHA1(17da91457a6e8154e09361d0600b37156c05f7c2) )
@@ -272,4 +272,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 198?, guchokip, 0, guchokipa, guchokipa, guchokipa_state, empty_init, ROT0, "<unknown>", "Gu, Choki, Pa", MACHINE_IS_SKELETON )
+GAME( 198?, yakyuken, 0, yakyuken, yakyuken, yakyuken_state, empty_init, ROT0, "bootleg", "The Yakyuken", MACHINE_IS_SKELETON )

@@ -35459,6 +35459,9 @@ popper                          // (c) 1983 Omori Electric Co., Ltd.
 @source:omori/spaceg.cpp
 spaceg                          // (c) 19??
 
+@source:omori/yakyuken.cpp
+yakyuken
+
 @source:omron/luna_68k.cpp
 luna                            // Omron Luna
 
@@ -42423,9 +42426,6 @@ goupilg2                        //
 
 @source:skeleton/grfd2301.cpp
 grfd2301                        //
-
-@source:skeleton/guchokipa.cpp
-guchokip
 
 @source:skeleton/happyvideo.cpp
 hppyvideo                       //
