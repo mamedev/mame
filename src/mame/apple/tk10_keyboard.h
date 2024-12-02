@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders: Golden Child
 
-#ifndef MAME_TK10_KEYBOARD_H
-#define MAME_TK10_KEYBOARD_H
+#ifndef MAME_APPLE_TK10_KEYBOARD_H
+#define MAME_APPLE_TK10_KEYBOARD_H
 
 #pragma once
 

@@ -93,15 +93,14 @@ public:
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
 		m_softlatch(*this, "softlatch"),
-		m_upperbank(*this, A2_UPPERBANK_TAG),
-		m_tk10_reset_data(1)
+		m_upperbank(*this, A2_UPPERBANK_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<timer_device> m_scantimer;
 	required_device<ram_device> m_ram;
-	required_device<ay3600_device> m_ay3600;
+	optional_device<ay3600_device> m_ay3600;
 	required_device<a2_video_device_composite> m_video;
 	required_device<apple2_common_device> m_a2common;
 	required_device<a2bus_device> m_a2bus;
@@ -114,10 +113,8 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<addressable_latch_device> m_softlatch;
 	memory_view m_upperbank;
-	u8 m_tk10_reset_data;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt_tk10);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
 
 	virtual void machine_start() override ATTR_COLD;
@@ -153,14 +150,12 @@ public:
 	int ay3600_control_r();
 	void ay3600_data_ready_w(int state);
 	void ay3600_ako_w(int state);
-	void tk10_data_write(u8 data);
-	void tk10_reset_write(u8 data);
 
 	void apple2_common(machine_config &config);
 	void apple2jp(machine_config &config);
 	void apple2(machine_config &config);
 	void space84(machine_config &config);
-	void am64(machine_config &config);
+//  void am64(machine_config &config);
 	[[maybe_unused]] void dodo(machine_config &config);
 	void albert(machine_config &config);
 	void ivelultr(machine_config &config);
@@ -171,9 +166,10 @@ private:
 	int m_speaker_state, m_cassette_state;
 
 	double m_joystick_x1_time, m_joystick_y1_time, m_joystick_x2_time, m_joystick_y2_time;
-
+protected:
 	u16 m_lastchar, m_strobe;
 	u8 m_transchar;
+private:
 	bool m_anykeydown;
 
 	int m_inh_slot;
@@ -183,9 +179,9 @@ private:
 	int m_ram_size;
 
 	int m_inh_bank;
-
+protected:
 	bool m_reset_latch;
-
+private:
 	double m_x_calibration, m_y_calibration;
 
 	device_a2bus_card_interface *m_slotdevice[8];
@@ -194,6 +190,7 @@ private:
 
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
+
 
 /***************************************************************************
     PARAMETERS
@@ -944,53 +941,6 @@ void apple2_state::ay3600_data_ready_w(int state)
 	}
 }
 
-void apple2_state::tk10_data_write(u8 data)
-{
-		if (m_maincpu->total_cycles() < 25000)
-		{
-			return;
-		}
-
-		if (data & 0x80)
-		{
-			m_transchar = data & 0x7f;
-			m_strobe = 0x80;
-//      printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
-		}
-}
-
-void apple2_state::tk10_reset_write(u8 data)
-{
-	m_tk10_reset_data = data;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt_tk10)
-{
-	int scanline = param;
-
-	if (scanline == 192)
-	{
-		if (!m_tk10_reset_data)
-		{
-			if (!m_reset_latch)
-			{
-				m_reset_latch = true;
-				m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			}
-		}
-		else
-		{
-			if (m_reset_latch)
-			{
-				m_reset_latch = false;
-				// allow cards to see reset
-				m_a2bus->reset_bus();
-				m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-			}
-		}
-	}
-}
-
 void apple2_state::ay3600_ako_w(int state)
 {
 	m_anykeydown = (state == ASSERT_LINE) ? true : false;
@@ -1279,16 +1229,87 @@ void apple2_state::space84(machine_config &config)
 	apple2p(config);
 }
 
-void apple2_state::am64(machine_config &config)
+class apple2_state_with_tk10 : public apple2_state
+{
+public:
+	apple2_state_with_tk10(const machine_config &mconfig, device_type type, const char *tag) :
+		apple2_state(mconfig, type, tag),
+		m_tk10_reset_data(1)
+	{
+	}
+
+	virtual void machine_start() override ATTR_COLD
+	{
+		apple2_state::machine_start();  // call parent
+		save_item(NAME(m_tk10_reset_data));
+	};
+
+	void am64(machine_config &config);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt_tk10);
+
+private:
+	void tk10_data_write(u8 data);
+	void tk10_reset_write(u8 data);
+	u8 m_tk10_reset_data;
+};
+
+void apple2_state_with_tk10::am64(machine_config &config)
 {
 	apple2p(config);
-	m_scantimer->configure_scanline(FUNC(apple2_state::apple2_interrupt_tk10), "screen", 0, 1);
+	m_scantimer->configure_scanline(FUNC(apple2_state_with_tk10::apple2_interrupt_tk10), "screen", 0, 1);
 
-//  config.device_remove(A2_KBDC_TAG);
+	config.device_remove(A2_KBDC_TAG);
 
 	tk10_keyboard_device &tk10(TK10_KEYBOARD(config, "tk10", 0));
-	tk10.data_write_cb().set(FUNC(apple2_state::tk10_data_write));
-	tk10.reset_write_cb().set(FUNC(apple2_state::tk10_reset_write));
+	tk10.data_write_cb().set(FUNC(apple2_state_with_tk10::tk10_data_write));
+	tk10.reset_write_cb().set(FUNC(apple2_state_with_tk10::tk10_reset_write));
+}
+
+void apple2_state_with_tk10::tk10_data_write(u8 data)
+{
+		if (m_maincpu->total_cycles() < 25000)
+		{
+			return;
+		}
+
+		if (data & 0x80)
+		{
+			m_transchar = data & 0x7f;
+			m_strobe = 0x80;
+		}
+}
+
+void apple2_state_with_tk10::tk10_reset_write(u8 data)
+{
+	m_tk10_reset_data = data;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(apple2_state_with_tk10::apple2_interrupt_tk10)
+{
+	int scanline = param;
+
+	if (scanline == 192)
+	{
+		if (!m_tk10_reset_data)
+		{
+			if (!m_reset_latch)
+			{
+				m_reset_latch = true;
+				m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			}
+		}
+		else
+		{
+			if (m_reset_latch)
+			{
+				m_reset_latch = false;
+				// allow cards to see reset
+				m_a2bus->reset_bus();
+				m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			}
+		}
+	}
 }
 
 void apple2_state::apple2jp(machine_config &config)
@@ -1689,7 +1710,7 @@ COMP( 1982, craft2p,  apple2, 0,      apple2p,  apple2p, apple2_state, empty_ini
 COMP( 1984, ivelultr, apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "Ivasim",              "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, prav8m,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Pravetz",             "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, space84,  apple2, 0,      space84,  apple2p, apple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_NOT_WORKING )
-COMP( 1985, am64,     apple2, 0,      am64,     apple2p, apple2_state, empty_init, "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, am64,     apple2, 0,      am64,     apple2p, apple2_state_with_tk10, empty_init, "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
 //COMP( 19??, laba2p,   apple2, 0,      laba2p,   apple2p, apple2_state, empty_init, "<unknown>",           "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, laser2c,  apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, basis108, apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Basis",               "Basis 108", MACHINE_SUPPORTS_SAVE )
