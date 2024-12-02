@@ -13,6 +13,7 @@
 #define LOG_STATE           (1U << 2)
 #define LOG_LINESTATE       (1U << 3)
 #define VERBOSE             (0)
+#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -238,6 +239,8 @@ macadb_device::macadb_device(const machine_config &mconfig, const char *tag, dev
 		m_keys(*this, "KEY%u", 0),
 		write_adb_data(*this),
 		write_adb_irq(*this),
+		write_adb_power(*this),
+		write_adb_akd(*this),
 		m_waiting_cmd(false),
 		m_datasize(0),
 		m_command(0),
@@ -313,6 +316,7 @@ static char const *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 bool macadb_device::adb_pollkbd(int update)
 {
 	int report, codes[2];
+	int akd = 0;
 	bool result;
 
 	codes[0] = codes[1] = 0xff; // key up
@@ -343,6 +347,10 @@ bool macadb_device::adb_pollkbd(int update)
 					if (!(keybuf & (1 << j)))
 					{
 						codes[report] |= 0x80;
+					}
+					else
+					{
+						akd = 1;
 					}
 
 					// update modifier state
@@ -426,10 +434,12 @@ bool macadb_device::adb_pollkbd(int update)
 	if (codes[0] == 0x5d)
 	{
 		codes[0] = codes[1] = 0x7f;
+		write_adb_power(ASSERT_LINE);
 	}
 	else if (codes[0] == 0xdd)
 	{
 		codes[0] = codes[1] = 0xff;
+		write_adb_power(CLEAR_LINE);
 	}
 
 	// figure out if there was a change
@@ -453,7 +463,14 @@ bool macadb_device::adb_pollkbd(int update)
 		}
 	}
 
+	write_adb_akd(akd);
+
 	return result;
+}
+
+void macadb_device::portable_update_keyboard()
+{
+	adb_pollkbd(0);
 }
 
 bool macadb_device::adb_pollmouse()

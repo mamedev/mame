@@ -2,12 +2,12 @@
 // copyright-holders:R. Belmont
 /****************************************************************************
 
-    drivers/macpwrbk030.cpp
+    macpwrbk030.cpp
     Mac PowerBooks with a 68030 CPU and M50753 PMU
     By R. Belmont
 
     These are basically late-period Mac IIs without NuBus and with
-    Egret/Cuda replaced with the PMU.
+    Egret/Cuda replaced by the PMU.
 
     Generation 1:
     PowerBook 140: 16 MHz 68030, 2 MiB RAM, no FPU, passive-matrix screen
@@ -29,11 +29,11 @@
       identifies all models (except the 145B is shown as a 145; Apple documents this as also
       occuring on hardware).
     - 165c/180c use of a VGA GPIO feature bit to determine the correct model is supported.
+    - Sleep/suspend and wake-up works on all models.
 
     Driver TODOs:
-    - Shutting down or restarting from Finder freezes the machine.  Something related
-      to power management presumably, but the cause is not clear.  This is why the driver is MACHINE_NOT_WORKING.
-    - External video interface on 160/165/165c/180/180c.
+    - External video interface on 160/165/165c/180/180c.  Need to make this a slot interface
+      because MAME doesn't otherwise support optionally adding a screen.
 
     ============================================================================
     Technical info
@@ -96,7 +96,7 @@
     Port 1: 0: CCFL PWR CNTL
             1: AKD              (input, works like the high bit of $C000 on the Apple II, except includes the modifiers)
             2: STOP CLK
-            3: CHRG ON          (input, 1 = charger is on, 7.1.1 Battery applet shows charging symbol on )
+            3: CHRG ON          (input, 1 = charger is on, 7.1.1 Battery applet shows charging symbol)
             4: KBD RST          (output, resets keyboard M50740)
             5: HICHG            (output)
             6: RING DETECT
@@ -256,7 +256,7 @@ private:
 
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
 	int m_ca1_data;
-	int m_adb_line;
+	int m_adb_line, m_adb_akd;
 
 	bool m_overlay;
 
@@ -276,6 +276,7 @@ private:
 
 	u32 screen_update_ddc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_gsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_vga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u16 via_r(offs_t offset);
 	void via_w(offs_t offset, u16 data, u16 mem_mask);
@@ -333,6 +334,7 @@ private:
 	u8 pmu_comms_r();
 	void pmu_comms_w(u8 data);
 	void set_adb_line(int state);
+	void set_adb_anykeydown(int state);
 	u8 pmu_p4_r();
 	void pmu_p4_w(u8 data);
 	u8 pmu_in_r();
@@ -380,6 +382,26 @@ void macpb030_state::machine_start()
 			this->m_ponti_snd_ctl |= 0x08;          // indicate sound chip write so power management knows not to sleep
 		}
 	});
+
+	save_item(NAME(m_via_interrupt));
+	save_item(NAME(m_via2_interrupt));
+	save_item(NAME(m_scc_interrupt));
+	save_item(NAME(m_last_taken_interrupt));
+	save_item(NAME(m_ca1_data));
+	save_item(NAME(m_adb_line));
+	save_item(NAME(m_adb_akd));
+	save_item(NAME(m_overlay));
+	save_item(NAME(m_hdsel));
+	save_item(NAME(m_pmu_blank_display));
+	save_item(NAME(m_pmu_from_via));
+	save_item(NAME(m_pmu_to_via));
+	save_item(NAME(m_pmu_ack));
+	save_item(NAME(m_pmu_req));
+	save_item(NAME(m_pangola_data));
+	save_item(NAME(m_ponti_modem_ctl));
+	save_item(NAME(m_ponti_snd_ctl));
+	save_item(NAME(m_ponti_SPI_SR));
+	save_item(NAME(m_ponti_backlight_ctl));
 }
 
 void macpb030_state::machine_reset()
@@ -662,6 +684,8 @@ void macpb030_state::ext_video_w(offs_t offset, u8 data)
 {
 	// 0 = DAC color number
 	// 1 = DAC color write (write R, then G, then B, like usual)
+	// 8 = depth (0=1bpp, 1=2bpp, 2=4bpp, 3=8bpp, 4=16bpp)
+	// 60+61 = visible vertical area (LSB in 60, MSB in 61)
 }
 
 u8 macpb030_state::pmu_in_r()
@@ -698,8 +722,18 @@ void macpb030_state::set_adb_line(int state)
 	m_adb_line = state;
 }
 
+void macpb030_state::set_adb_anykeydown(int state)
+{
+	m_adb_akd = state;
+}
+
 u8 macpb030_state::pmu_p1_r()
 {
+	if (m_adb_akd)
+	{
+		return 0x88 | 0x02;
+	}
+
 	return 0x88;
 }
 
@@ -718,8 +752,24 @@ u8 macpb030_state::pmu_comms_r()
 	return (m_pmu_req << 7);
 }
 
+u8 last_comms = 0xff;
 void macpb030_state::pmu_comms_w(u8 data)
 {
+	if (!BIT(data, 1))
+	{
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+		const u32 memory_size = std::min((u32)0x3fffff, m_rom_size);
+		const u32 memory_end = memory_size - 1;
+		offs_t memory_mirror = memory_end & ~(memory_size - 1);
+
+		space.unmap_write(0x00000000, memory_end);
+		space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
+		m_overlay = true;
+	}
+	if ((data & 3) != (last_comms & 3))
+	{
+		last_comms = data;
+	}
 	m_maincpu->set_input_line(INPUT_LINE_HALT, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 	m_maincpu->set_input_line(INPUT_LINE_RESET, BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -874,7 +924,7 @@ u32 macpb030_state::screen_update_ddc(screen_device &screen, bitmap_ind16 &bitma
 	// is the display enabled?
 	if (m_pmu_blank_display)
 	{
-		bitmap.fill(0, cliprect);
+		bitmap.fill(1, cliprect);
 		return 0;
 	}
 
@@ -903,7 +953,7 @@ u32 macpb030_state::screen_update_gsc(screen_device &screen, bitmap_ind16 &bitma
 	// is the display enabled?
 	if (!(m_gsc_regs[4] & 0x20) || m_pmu_blank_display)
 	{
-		bitmap.fill(0, cliprect);
+		bitmap.fill(0xf, cliprect);
 		return 0;
 	}
 
@@ -960,6 +1010,17 @@ u32 macpb030_state::screen_update_gsc(screen_device &screen, bitmap_ind16 &bitma
 		break;
 	}
 	return 0;
+}
+
+u32 macpb030_state::screen_update_vga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	if (m_pmu_blank_display)
+	{
+		bitmap.fill(0, cliprect);
+		return 0;
+	}
+
+	return m_vga->screen_update(screen, bitmap, cliprect);
 }
 
 u16 macpb030_state::via_r(offs_t offset)
@@ -1026,8 +1087,7 @@ void macpb030_state::via2_irq_w(int state)
 
 u32 macpb030_state::rom_switch_r(offs_t offset)
 {
-	// disable the overlay
-	if (m_overlay)
+	if (m_overlay && !machine().side_effects_disabled())
 	{
 		address_space& space = m_maincpu->space(AS_PROGRAM);
 		const u32 memory_end = m_ram->size() - 1;
@@ -1048,6 +1108,7 @@ TIMER_CALLBACK_MEMBER(macpb030_state::mac_6015_tick)
 	m_via1->write_ca1(m_ca1_data);
 
 	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
+	m_macadb->portable_update_keyboard();
 }
 
 u16 macpb030_state::scsi_r(offs_t offset, u16 mem_mask)
@@ -1124,7 +1185,7 @@ u8 macpb030_state::gsc_r(offs_t offset)
 		return 5;
 	}
 
-	return 0;
+	return m_gsc_regs[offset & 0x1f];
 }
 
 void macpb030_state::gsc_w(offs_t offset, u8 data)
@@ -1152,7 +1213,9 @@ void macpb030_state::macpb140_map(address_map &map)
 	map(0x50024000, 0x50027fff).r(FUNC(macpb030_state::buserror_r)).mirror(0x01f00000); // bus error here to make sure we aren't mistaken for another decoder
 	map(0x50080000, 0x500bffff).rw(FUNC(macpb030_state::jaws_r), FUNC(macpb030_state::jaws_w)).mirror(0x01f00000);
 
-	map(0xfee08000, 0xfeffffff).ram().share("vram");
+	// Video uses the mirror at fee08000, but the Power Manager stashes some sleep data in the
+	// lower 32K, so this *must* be mirrored
+	map(0xfee00000, 0xfee07fff).ram().share("vram").mirror(0x00008000);
 }
 
 void macpb030_state::macpb160_map(address_map &map)
@@ -1262,7 +1325,10 @@ u8 macpb030_state::via2_in_a()
 
 u8 macpb030_state::via2_in_b()
 {
-	return ((m_pmu_ack & 1) << 1);
+	// Must also return the pmu_req state here or bset/bclr operations on other
+	// bits in this port will accidentally clear pmu_req and cause CPU/PMU comms
+	// problems!  The ROM code for sleeping on all of these machines does that.
+	return ((m_pmu_ack & 1) << 1) | (m_pmu_req << 2);
 }
 
 void macpb030_state::via2_out_a(u8 data)
@@ -1320,6 +1386,7 @@ void macpb030_state::macpb140(machine_config &config)
 
 	MACADB(config, m_macadb, 31.3344_MHz_XTAL/2);
 	m_macadb->adb_data_callback().set(FUNC(macpb030_state::set_adb_line));
+	m_macadb->adb_akd_callback().set(FUNC(macpb030_state::set_adb_anykeydown));
 
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->cko_cb().set(m_via1, FUNC(via6522_device::write_ca2));
@@ -1346,6 +1413,7 @@ void macpb030_state::macpb140(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
 		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
+		adapter.irq_handler().set(m_pseudovia, FUNC(pseudovia_device::scsi_irq_w));
 		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
 	});
 
@@ -1451,7 +1519,7 @@ void macpb030_state::macpb165c(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpb030_state::macpb165c_map);
 
 	m_screen->set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
-	m_screen->set_screen_update("vga", FUNC(wd90c26_vga_device::screen_update));
+	m_screen->set_screen_update(FUNC(macpb030_state::screen_update_vga));
 	m_screen->set_no_palette();
 
 	WD90C26(config, m_vga, 0);
@@ -1524,15 +1592,15 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1991, macpb140, 0, 0, macpb140, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING)
-COMP(1991, macpb170, macpb140, 0, macpb170, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING)
-COMP(1992, macpb145, macpb140, 0, macpb145, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 145", MACHINE_NOT_WORKING)
-COMP(1993, macpb145b, macpb140, 0, macpb145b, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 145B", MACHINE_NOT_WORKING)
-COMP(1992, macpb160, 0, 0, macpb160, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 160", MACHINE_NOT_WORKING)
-COMP(1993, macpb165, macpb160, 0, macpb165, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 165", MACHINE_NOT_WORKING)
-COMP(1993, macpb165c, macpb180c, 0, macpb165c, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 165c", MACHINE_NOT_WORKING)
-COMP(1992, macpb180, macpb160, 0, macpb180, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 180", MACHINE_NOT_WORKING)
-COMP(1993, macpb180c, 0, 0, macpb180c, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 180c", MACHINE_NOT_WORKING)
+COMP(1991, macpb140, 0, 0, macpb140, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 140", MACHINE_SUPPORTS_SAVE)
+COMP(1991, macpb170, macpb140, 0, macpb170, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 170", MACHINE_SUPPORTS_SAVE)
+COMP(1992, macpb145, macpb140, 0, macpb145, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 145", MACHINE_SUPPORTS_SAVE)
+COMP(1993, macpb145b, macpb140, 0, macpb145b, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 145B", MACHINE_SUPPORTS_SAVE)
+COMP(1992, macpb160, 0, 0, macpb160, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 160", MACHINE_SUPPORTS_SAVE)
+COMP(1993, macpb165, macpb160, 0, macpb165, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 165", MACHINE_SUPPORTS_SAVE)
+COMP(1993, macpb165c, macpb180c, 0, macpb165c, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 165c", MACHINE_SUPPORTS_SAVE)
+COMP(1992, macpb180, macpb160, 0, macpb180, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 180", MACHINE_SUPPORTS_SAVE)
+COMP(1993, macpb180c, 0, 0, macpb180c, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook 180c", MACHINE_SUPPORTS_SAVE)
 
 // PowerBook Duos (probably will not belong in this driver ultimately)
 COMP(1992, macpd210, 0, 0, macpd210, macadb, macpb030_state, empty_init, "Apple Computer", "Macintosh PowerBook Duo 210", MACHINE_NOT_WORKING)

@@ -155,8 +155,6 @@ private:
 	emu_timer *m_6015_timer;
 	int m_via2_ca1_hack, m_nubus_irq_state;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
-
-	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 };
 
 class spike_state : public quadrax00_state
@@ -279,9 +277,6 @@ void quadrax00_state::machine_start()
 	m_rom_size = memregion("bootrom")->bytes();
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;
-
-	m_6015_timer = timer_alloc(FUNC(quadrax00_state::mac_6015_tick), this);
-	m_6015_timer->adjust(attotime::never);
 
 	save_item(NAME(m_via2_ca1_hack));
 	save_item(NAME(m_nubus_irq_state));
@@ -552,12 +547,6 @@ u8 quadrax00_state::ethernet_mac_r(offs_t offset)
 	}
 
 	return 0;
-}
-
-TIMER_CALLBACK_MEMBER(quadrax00_state::mac_6015_tick)
-{
-	/* handle ADB keyboard/mouse */
-	m_macadb->adb_vblank();
 }
 
 /***************************************************************************
