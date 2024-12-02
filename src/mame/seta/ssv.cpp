@@ -165,6 +165,8 @@ Notes:
 #include "emu.h"
 #include "ssv.h"
 
+#include "mahjong.h"
+
 #include "cpu/v810/v810.h"
 #include "cpu/v60/v60.h"
 #include "machine/nvram.h"
@@ -511,12 +513,12 @@ uint16_t ssv_state::hypreact_input_r()
 {
 	const uint16_t input_sel = *m_input_sel;
 
-	uint16_t result = 0xffff;
+	uint16_t result = 0x3f;
 	if (BIT(input_sel, 0)) result &= m_io_key[0]->read();
 	if (BIT(input_sel, 1)) result &= m_io_key[1]->read();
 	if (BIT(input_sel, 2)) result &= m_io_key[2]->read();
 	if (BIT(input_sel, 3)) result &= m_io_key[3]->read();
-	return result;
+	return result | 0x00c0;
 }
 
 void ssv_state::hypreact_map(address_map &map)
@@ -1019,45 +1021,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ssv_mahjong )
 	PORT_INCLUDE(ssv_joystick)
 
-	PORT_START("KEY0")  // IN5 - $800002(0)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY1")  // IN6 - $800002(1)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")  // IN7 - $800002(2)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")  // IN8 - $800002(3)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(mahjong_matrix_1p) // IN5-IN8 - $800002
+	PORT_MODIFY("KEY2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) // uses bet button, but not the rest of the gambling controls
 INPUT_PORTS_END
 
 

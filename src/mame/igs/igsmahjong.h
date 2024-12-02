@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, Vas Crabb
-#ifndef MAME_IGS_MAHJONG_H
-#define MAME_IGS_MAHJONG_H
+#ifndef MAME_IGS_IGSMAHJONG_H
+#define MAME_IGS_IGSMAHJONG_H
 
 #define IGS_MAHJONG_MATRIX_CONDITIONAL(port, mask, on)                                                                                     \
 		PORT_START("KEY0")                                                                                                                 \
@@ -50,4 +50,4 @@
 
 INPUT_PORTS_EXTERN(igs_mahjong_matrix);
 
-#endif // MAME_IGS_MAHJONG_H
+#endif // MAME_IGS_IGSMAHJONG_H

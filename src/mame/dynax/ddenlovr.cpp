@@ -124,6 +124,8 @@ Notes:
 #include "emu.h"
 #include "dynax.h"
 
+#include "mahjong.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/kl5c80a12.h"
 #include "cpu/z80/tmpz84c015.h"
@@ -417,7 +419,7 @@ protected:
 
 	// input/output
 	uint8_t m_coins = 0U;
-	uint8_t m_hopper = 0U;
+	uint8_t m_hopper_hack = 0U;
 
 	// blitter (TODO: merge with the dynax.h, where possible)
 	int m_extra_layers;
@@ -3529,7 +3531,7 @@ void ddenlovr_state::hgokou_input_w(uint8_t data)
 			// bit 7 = ?
 			machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 			machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
-			m_hopper = data & 0x04;
+			m_hopper_hack = data & 0x04;
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x",data);
 #endif
@@ -4087,7 +4089,7 @@ void ddenlovr_state::sryudens_coincounter_w(uint8_t data)
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
-	m_hopper = data & 0x04;
+	m_hopper_hack = data & 0x04;
 
 	if (data & 0x68)
 		logerror("%04x: warning, coin counter = %02x\n", m_maincpu->pc(), data);
@@ -4338,40 +4340,48 @@ void htengoku_state::htengoku_coin_w(uint8_t data)
 {
 	switch (m_input_sel)
 	{
-		case 0x0c:
-			// bit 0 = coin counter
-			// bit 1 = out counter
-			// bit 2 = hopper
-			machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-			machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
-			m_hopper = data & 0x04;
+	case 0x0c:
+		// bit 0 = coin counter
+		// bit 1 = out counter
+		// bit 2 = hopper
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+		m_hopper->motor_w(BIT(data, 2));
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x",data);
 #endif
-			m_coins = data;
-			break;
+		m_coins = data;
+		break;
 
-		case 0x0d:  break;  // ff resets input port sequence?
+	case 0x0d:  break;  // ff resets input port sequence?
 
-		case 0xff:  break;  // CRT controller?
-		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n", m_maincpu->pc(), m_input_sel, data);
+	case 0xff:  break;  // CRT controller?
+	default:
+		logerror("%04x: coins_w with select = %02x, data = %02x\n", m_maincpu->pc(), m_input_sel, data);
 	}
 }
 
 uint8_t htengoku_state::htengoku_input_r()
 {
-	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
-
+	uint8_t result = 0xff;
 	switch (m_input_sel)
 	{
-		case 0x81:  return ioport(keynames1[m_keyb++])->read();
-		case 0x82:  return ioport(keynames0[m_keyb++])->read();
-		case 0x0d:  return 0xff;    // unused
+	case 0x81:
+	case 0x82:
+		if (m_keyb < 5)
+		{
+			result = m_io_key[BIT(m_input_sel, 0)][m_keyb]->read();
+			if (!machine().side_effects_disabled())
+				++m_keyb;
+		}
+		break;
+	case 0x0d:
+		result = 0xff;    // unused
+		break;
+	default:
+		logerror("%04x: input_r with select = %02x\n", m_maincpu->pc(), m_input_sel);
 	}
-	logerror("%04x: input_r with select = %02x\n", m_maincpu->pc(), m_input_sel);
-	return 0xff;
+	return result;
 }
 
 uint8_t htengoku_state::htengoku_coin_r()
@@ -4380,7 +4390,7 @@ uint8_t htengoku_state::htengoku_coin_r()
 	{
 		case 0x00:  return ioport("COINS")->read();
 		case 0x01:  return 0xff;    //?
-		case 0x02:  return 0xbf | ((m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));  // bit 7 = blitter busy, bit 6 = hopper
+		case 0x02:  return 0xbf | (m_hopper->line_r() ? 0 : (1 << 6));  // bit 7 = blitter busy, bit 6 = hopper
 		case 0x03:  return m_coins;
 	}
 	logerror("%04x: coin_r with select = %02x\n", m_maincpu->pc(), m_input_sel);
@@ -4468,6 +4478,8 @@ void htengoku_state::htengoku(machine_config &config)
 	m_mainlatch->q_out_cb<2>().set(FUNC(dynax_state::layer_half2_w));  //
 	m_mainlatch->q_out_cb<5>().set(FUNC(dynax_state::blitter_ack_w));  // Blitter IRQ Ack
 
+	HOPPER(config, m_hopper, attotime::from_msec(50));
+
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -4510,7 +4522,7 @@ void htengoku_state::htengoku(machine_config &config)
 
 uint8_t ddenlovr_state::daimyojn_keyb1_r()
 {
-	uint8_t hopper_bit = ((m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));
+	uint8_t hopper_bit = ((m_hopper_hack && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));
 	uint8_t val = hanamai_keyboard_r<1>() | hopper_bit;
 
 //  val |= ioport("BET")->read();
@@ -4975,7 +4987,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( htengoku )
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // pay
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) PORT_CONDITION("DSW4", 0x10, EQUALS, 0x00) // pay
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_CONDITION("DSW4", 0x10, EQUALS, 0x10)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    // analyzer
@@ -5046,10 +5059,10 @@ static INPUT_PORTS_START( htengoku )
 	PORT_DIPNAME( 0x04, 0x04, "Credits Per Note" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x04, "10" )
-	PORT_DIPNAME( 0x08, 0x08, "Max Rate" )
+	PORT_DIPNAME( 0x08, 0x08, "Maximum Bet" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x30, 0x30, "Min Rate To Play" )
+	PORT_DIPNAME( 0x30, 0x30, "Minimum Bet" )
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
@@ -5094,8 +5107,8 @@ static INPUT_PORTS_START( htengoku )
 	PORT_DIPNAME( 0x08, 0x08, "Unknown 2-9" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Pay Out Type" )
-	PORT_DIPSETTING(    0x10, "Credit" )
+	PORT_DIPNAME( 0x10, 0x10, "Payout Mode" )
+	PORT_DIPSETTING(    0x10, "Key-out" )
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPNAME( 0x20, 0x20, "Hopper Switch" )
 	PORT_DIPSETTING(    0x20, "Active Low" )
@@ -6264,7 +6277,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_INCLUDE( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -6419,7 +6432,7 @@ static INPUT_PORTS_START( jongtei )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_INCLUDE( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -6630,7 +6643,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_INCLUDE( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -6785,7 +6798,7 @@ static INPUT_PORTS_START( mjschuka )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_INCLUDE( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -7041,7 +7054,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_INCLUDE( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -7399,7 +7412,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // data clear
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_CODE(KEYCODE_6)  // note
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -7429,9 +7442,15 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x40, "75%" )
 	PORT_DIPSETTING(    0x20, "70%" )
 	PORT_DIPSETTING(    0x00, "65%" ) // Hard
-	PORT_DIPNAME( 0x80, 0x80, "Key-in Rate ?" )            PORT_DIPLOCATION("SW1:8")  // What is this? Manual says キ一インレ一ト
-	PORT_DIPSETTING(    0x80, "x10" )
-	PORT_DIPSETTING(    0x00, "x5" )
+	PORT_DIPNAME( 0x80, 0x80, "Key-in Rate" )              PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, "5" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)
+	PORT_DIPSETTING(    0x00, "10" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, "25" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, "50" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, "10" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)
+	PORT_DIPSETTING(    0x80, "20" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x80, "50" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x80, "100" ) PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )         PORT_DIPLOCATION("SW2:1,2")
@@ -7439,7 +7458,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin 10 Credits" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Start Level" )              PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )              PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
@@ -7520,9 +7539,9 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x20, "30" )
 	PORT_DIPSETTING(    0x10, "40" )
 	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPNAME( 0x40, 0x40, "Max Bet" )                  PORT_DIPLOCATION("SW1:9")
-	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPNAME( 0x40, 0x40, "Maximum Bet" )              PORT_DIPLOCATION("SW1:9")
 	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )     PORT_DIPLOCATION("SW1:10")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -7539,7 +7558,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_INCLUDE( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" ) PORT_DIPLOCATION("SW1:1,2,3,4")
@@ -7782,7 +7801,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ddenlovr_state::mjflove_blitter_r))  // RTC (bit 5) & blitter irq flag (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
-	PORT_INCLUDE( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet )
 
 	PORT_START("DSW2")  // IN12 - DSW2
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2")
@@ -8023,7 +8042,7 @@ static INPUT_PORTS_START( sryudens )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )      // note2
 
-	PORT_INCLUDE( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -8178,7 +8197,7 @@ static INPUT_PORTS_START( seljan2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )      // note2
 
-	PORT_INCLUDE( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -8333,7 +8352,7 @@ static INPUT_PORTS_START( janshinp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )      // service coin (test mode)
 
-	PORT_INCLUDE( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -8487,7 +8506,7 @@ static INPUT_PORTS_START( dtoyoken )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )      // service coin (test mode)
 
-	PORT_INCLUDE( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -8641,7 +8660,7 @@ static INPUT_PORTS_START( daimyojn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )      // note2
 
-	PORT_INCLUDE( dynax_mahjong_keys_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -8800,7 +8819,7 @@ MACHINE_START_MEMBER(ddenlovr_state,ddenlovr)
 	save_item(NAME(m_dsw_sel));
 	save_item(NAME(m_keyb));
 	save_item(NAME(m_coins));
-	save_item(NAME(m_hopper));
+	save_item(NAME(m_hopper_hack));
 
 	save_item(NAME(m_okibank));
 
@@ -8819,7 +8838,7 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	m_dsw_sel = 0;
 	m_keyb = 0;
 	m_coins = 0;
-	m_hopper = 0;
+	m_hopper_hack = 0;
 
 	m_okibank = 0;
 	m_prot_val = 0;
