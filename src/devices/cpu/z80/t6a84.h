@@ -41,7 +41,7 @@ public:
 	uint32_t stack_address(uint16_t address);
 
 protected:
-	static inline constexpr uint32_t PAGE_SIZE = 0x10000;
+	static inline constexpr uint32_t DEVICE_PAGE_SIZE = 0x10000;
 
 	t6a84_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor io_map);
 
