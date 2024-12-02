@@ -436,6 +436,7 @@ inline void upd7220_device::recompute_parameters()
 	if (m_m)
 	{
 		screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+		screen().reset_origin();
 
 		update_hsync_timer(0);
 		update_vsync_timer(0);
