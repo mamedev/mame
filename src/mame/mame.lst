@@ -42639,6 +42639,9 @@ mycom                           //
 ngen                            // 1983
 ngenb38                         // 1991
 
+@source:skeleton/nordlead.cpp
+nordle2x                        // 2003
+
 @source:skeleton/onyx.cpp
 c5000                           // 1981
 c8002                           //
