@@ -3877,107 +3877,75 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gekisha )
 	PORT_START("DSW1") // $7C20
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPSETTING(    0x01, "53" )
-	PORT_DIPSETTING(    0x02, "56" )
-	PORT_DIPSETTING(    0x03, "59" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x05, "65" )
-	PORT_DIPSETTING(    0x06, "68" )
-	PORT_DIPSETTING(    0x07, "71" )
-	PORT_DIPSETTING(    0x08, "75" )
-	PORT_DIPSETTING(    0x09, "78" )
-	PORT_DIPSETTING(    0x0a, "81" )
-	PORT_DIPSETTING(    0x0b, "84" )
-	PORT_DIPSETTING(    0x0c, "87" )
-	PORT_DIPSETTING(    0x0d, "90" )
-	PORT_DIPSETTING(    0x0e, "93" )
-	PORT_DIPSETTING(    0x0f, "96" )
-	PORT_DIPNAME( 0x30, 0x30, "Max Bet" )
+	MAHJONG_PAYOUT_RATE(0, "SW1:1,2,3,4") // ＰＡＹ－ＯＵＴ　ＲＡＴＥ
+	PORT_DIPNAME( 0x30, 0x30, "Max Bet" ) PORT_DIPLOCATION( "SW1:5,6" ) // ＢＥＴ－ＭＡＸ
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x40, 0x40, "Credits Per Note" )
+	PORT_DIPNAME( 0x40, 0x40, "Credits Per Note" ) PORT_DIPLOCATION( "SW1:7" ) // ＮＯＴＥ　ＲＡＴＥ
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION( "SW1:8" ) // 画面反転
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2") // $7C21
-	PORT_DIPNAME( 0x03, 0x03, "Odds Rate" )
-	PORT_DIPSETTING(    0x03, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x01, "1 2 3 5 10 25 50 100" )
-	PORT_DIPSETTING(    0x02, "1 2 3 5 10 50 100 200" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x30, "Min Rate To Play" )
-	PORT_DIPSETTING(    0x30, "1" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x10, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	MAHJONG_ODDS_RATE(0, "SW2:1,2") // ＯＤＤＳ　ＲＡＴＥ
+	MAHJONG_COINAGE(2, "SW2:3,4") // コイン レート
+	PORT_DIPNAME( 0x30, 0x30, "Min Rate To Play" ) PORT_DIPLOCATION( "SW2:5,6" ) // ゲーム・スタートの最低レート枚数
+	PORT_DIPSETTING(    0x30, "1" ) // レート　１
+	PORT_DIPSETTING(    0x20, "2" ) // レート　２
+	PORT_DIPSETTING(    0x10, "3" ) // レート　３
+	PORT_DIPSETTING(    0x00, "5" ) // レート　５
+	PORT_DIPNAME( 0x40, 0x40, "Game Type" ) PORT_DIPLOCATION( "SW2:7" ) // ゲームタイプ
+	PORT_DIPSETTING(    0x40, "Credit" ) // クレジット式
+	PORT_DIPSETTING(    0x00, "Hopper" ) // ホッパー式
+	PORT_DIPNAME( 0x80, 0x80, "Hopper Switch" ) PORT_DIPLOCATION( "SW2:8" ) // ＨＯＰＰＥＲ　ＣＯＩＮ　感覚　ＳＷ
+	PORT_DIPSETTING(    0x80, "Active Low" )
+	PORT_DIPSETTING(    0x00, "Active High" )
 
 	PORT_START("DSW3")  // $7c22
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x07, "0" )
-	PORT_DIPSETTING(    0x06, "1" )
-	PORT_DIPSETTING(    0x05, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x03, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x01, "6" )
-	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown 3-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 3-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 3-5" )
+	MAHJONG_YAKUMAN_BONUS(0, "SW3:1,2,3") // 役満ボーナスの設定
+	PORT_DIPNAME( 0x08, 0x08, "Yakuman Bonuses Per Cycle" ) PORT_DIPLOCATION("SW3:4")// 役満ボーナスの回数設定周期毎に
+	PORT_DIPSETTING(    0x08, "1" ) // １回
+	PORT_DIPSETTING(    0x00, "2" ) // ２回
+	PORT_DIPNAME( 0x10, 0x00, "Computer Strength" ) PORT_DIPLOCATION("SW3:5") // コンピューターの強さ
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal) ) // 普通
+	PORT_DIPSETTING(    0x10, "Strong" )
+	PORT_DIPNAME( 0x20, 0x20, "Payout Rate Change" ) PORT_DIPLOCATION( "SW3:6" ) // 自動配当率変更
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 3-6" )
+	PORT_DIPNAME( 0x40, 0x00, "Service Count" ) PORT_DIPLOCATION( "SW3:7" ) // サービスカウント
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DonDen Key" )
+	PORT_DIPNAME( 0x80, 0x80, "DonDen Key" ) PORT_DIPLOCATION( "SW3:8" ) // ＤｏｎＤｅｎ機能ボタン変更
 	PORT_DIPSETTING(    0x80, "A" )
 	PORT_DIPSETTING(    0x00, "Flip Flop" )
 
 	PORT_START("DSW4")  // $7c23
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 4-0" )
+	PORT_DIPNAME( 0x01, 0x01, "Last Chance" ) PORT_DIPLOCATION( "SW4:1" ) // ラスト チャンス
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 4-1" )
+	PORT_DIPNAME( 0x02, 0x02, "Dice Chance" ) PORT_DIPLOCATION( "SW4:2" ) // ダイス チャンス
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Auto Tsumo after Reach" )
+	PORT_DIPNAME( 0x04, 0x04, "Auto Tsumo after Reach" ) PORT_DIPLOCATION( "SW4:3" ) // オート ツモ
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown 4-3" )
+	PORT_DIPNAME( 0x08, 0x08, "Double Up" ) PORT_DIPLOCATION( "SW4:4" ) // Ｗ－ＢＥＴ
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Girls (Demo)" )
+	PORT_DIPNAME( 0x10, 0x10, "Girls (Demo)" ) PORT_DIPLOCATION( "SW4:5" ) // ギャル カット
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 4-5" )
+	PORT_DIPNAME( 0x20, 0x20, "Girls (H-Scenes)" ) PORT_DIPLOCATION( "SW4:6" ) // ギャル Ｈカット
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION( "SW4:7" ) // デモ サウンド
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 4-7" )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 4-7" ) PORT_DIPLOCATION( "SW4:8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
