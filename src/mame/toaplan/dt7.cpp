@@ -5,17 +5,16 @@
    differences to keep it separate
 
    TODO:
-    - verify audio CPU opcodes
+    - verify audio CPU opcodes (see toaplan_v25_tables.h)
     - correctly hook up interrupts (especially V25)
     - correctly hook up inputs (there's a steering wheel test? is the game switchable)
     - serial comms (needs support in V25 core?) for linked units
     - verify frequencies on chips
     - verify alt titles, some regions have 'Car Fighting' as a subtitle, region comes from EEPROM?
     - verify text layer palettes
+	- service mode doesn't display properly
     - currently only coins up with service button
-    - course selection cursor doesn't move?
     - sound dies after one stage?
-    - game crashes after two stages?
 */
 
 
@@ -82,7 +81,7 @@ private:
 	void dt7_shared_mem(address_map &map);
 
 	void dt7_irq(int state);
-	void dt7_unk_w(u8 data);
+	void dt7_sndreset_coin_w(offs_t offset, u16 data, u16 mem_mask);
 
 	uint8_t unmapped_v25_io1_r();
 	uint8_t unmapped_v25_io2_r();
@@ -135,7 +134,8 @@ void dt7_state::dt7_irq(int state)
 // this is conditional on the unknown type of branch (see #define G_B0 in the table0
 uint8_t dt7_state::read_port_t()
 {
-	logerror("%s: read port t\n", machine().describe_context()); return machine().rand();
+	logerror("%s: read port t\n", machine().describe_context());
+	return machine().rand();
 }
 
 uint8_t dt7_state::read_port_2()
@@ -245,9 +245,11 @@ void dt7_state::shared_ram_w(offs_t offset, u8 data)
 }
 
 
-void dt7_state::dt7_unk_w(u8 data)
+void dt7_state::dt7_sndreset_coin_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x8000) ? CLEAR_LINE : ASSERT_LINE);
+	logerror("%s: dt7_sndreset_coin_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+	// coin counters in lower byte?
 }
 
 
@@ -261,7 +263,7 @@ void dt7_state::dt7_68k_0_mem(address_map &map)
 	map(0x200000, 0x200fff).ram().w(m_palette[0], FUNC(palette_device::write16)).share("palette0");
 	map(0x280000, 0x280fff).ram().w(m_palette[1], FUNC(palette_device::write16)).share("palette1");
 
-	map(0x300000, 0x300000).w(FUNC(dt7_state::dt7_unk_w));
+	map(0x300000, 0x300001).w(FUNC(dt7_state::dt7_sndreset_coin_w));
 
 	map(0x400000, 0x40000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x480000, 0x48000d).rw(m_vdp[1], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
