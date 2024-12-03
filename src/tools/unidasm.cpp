@@ -544,7 +544,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "m740",            le,  0, []() -> util::disasm_interface * { return new m740_disassembler(&m740_unidasm); } },
 	{ "mb86233",         le, -2, []() -> util::disasm_interface * { return new mb86233_disassembler; } },
 	{ "mb86235",         le, -3, []() -> util::disasm_interface * { return new mb86235_disassembler; } },
-	{ "mb88",            le,  0, []() -> util::disasm_interface * { return new mb88_disassembler; } },
+	{ "mb88xx",          le,  0, []() -> util::disasm_interface * { return new mb88_disassembler; } },
 	{ "mc88100",         be,  0, []() -> util::disasm_interface * { return new mc88100_disassembler; } },
 	{ "mc88110",         be,  0, []() -> util::disasm_interface * { return new mc88110_disassembler; } },
 	{ "mcs48",           le,  0, []() -> util::disasm_interface * { return new mcs48_disassembler(false, false); } },

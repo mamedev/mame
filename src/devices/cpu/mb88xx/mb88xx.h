@@ -117,7 +117,7 @@ protected:
 
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
-	virtual u32 execute_max_cycles() const noexcept override { return 3; }
+	virtual u32 execute_max_cycles() const noexcept override { return 2+3; } // includes interrupt
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 6 - 1) / 6; }
@@ -181,7 +181,7 @@ private:
 	devcb_write_line m_write_so;
 
 	// IRQ handling
-	u8 m_pending_interrupt;
+	u8 m_pending_irq;
 	bool m_in_irq;
 
 	memory_access<11, 0, 0, ENDIANNESS_BIG>::cache m_cache;
@@ -196,9 +196,9 @@ private:
 
 	TIMER_CALLBACK_MEMBER(serial_timer);
 	void write_pla(u8 index);
-	void update_pio_enable(u8 newpio);
+	void pio_enable(u8 newpio);
 	void increment_timer();
-	void update_pio(int cycles);
+	void burn_cycles(int cycles);
 };
 
 

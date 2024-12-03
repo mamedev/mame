@@ -111,7 +111,7 @@ private:
 	void mcu_port_r1_w(uint8_t data);
 	void mcu_port_r2_w(uint8_t data);
 	void mcu_port_r3_w(uint8_t data);
-	uint8_t mcu_portk_r();
+	uint8_t mcu_port_k_r();
 	void mcu_port_o_w(uint8_t data);
 	void mcu_port_p_w(uint8_t data);
 	void blitter_w(offs_t offset, uint8_t data);
@@ -591,7 +591,7 @@ void arabian_state::mcu_port_r3_w(uint8_t data)
 	m_mcu_port_r[3] = data & 0x0f;
 }
 
-uint8_t arabian_state::mcu_portk_r()
+uint8_t arabian_state::mcu_port_k_r()
 {
 	uint8_t val = 0xf;
 
@@ -790,16 +790,16 @@ void arabian_state::arabian(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(arabian_state::irq0_line_hold));
 
 	MB8841(config, m_mcu, MAIN_OSC / 3 / 2);
-	m_mcu->read_k().set(FUNC(arabian_state::mcu_portk_r));
+	m_mcu->read_k().set(FUNC(arabian_state::mcu_port_k_r));
 	m_mcu->write_o().set(FUNC(arabian_state::mcu_port_o_w));
 	m_mcu->write_p().set(FUNC(arabian_state::mcu_port_p_w));
 	m_mcu->read_r<0>().set(FUNC(arabian_state::mcu_port_r0_r));
-	m_mcu->write_r<0>().set(FUNC(arabian_state::mcu_port_r0_w));
 	m_mcu->read_r<1>().set(FUNC(arabian_state::mcu_port_r1_r));
-	m_mcu->write_r<1>().set(FUNC(arabian_state::mcu_port_r1_w));
 	m_mcu->read_r<2>().set(FUNC(arabian_state::mcu_port_r2_r));
-	m_mcu->write_r<2>().set(FUNC(arabian_state::mcu_port_r2_w));
 	m_mcu->read_r<3>().set(FUNC(arabian_state::mcu_port_r3_r));
+	m_mcu->write_r<0>().set(FUNC(arabian_state::mcu_port_r0_w));
+	m_mcu->write_r<1>().set(FUNC(arabian_state::mcu_port_r1_w));
+	m_mcu->write_r<2>().set(FUNC(arabian_state::mcu_port_r2_w));
 	m_mcu->write_r<3>().set(FUNC(arabian_state::mcu_port_r3_w));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
