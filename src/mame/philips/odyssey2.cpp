@@ -59,6 +59,10 @@ TODO:
 - volley has a sprite-char collision detection problem, causing the team on the
   right to never serve the ball. Sprite positions are correct so it's not that,
   and as seen on videos of other games, transparent pixels don't cause a collision.
+- spaans has a keyboard debounce issue: if you push and hold a key after the game
+  revealed the answer, it will be entered in the next input field. It's a prototype
+  so it wouldn't be surprising there are bugs, but this issue does not happen on
+  a real Videopac or Odyssey 2. It's probably video timing related.
 - screen resolution is not strictly defined, height(243) is correct, but
   horizontal overscan differs depending on monitor/tv? see syracuse for overscan
 - 824x on the real console, overlapping major system characters with eachother

@@ -23,8 +23,6 @@ Undumped (or dumped but not public):
 
 Protos:
 - Catburglar (youtube.com/watch?v=DDsWDFxy0oE)
-- Spaans (Spanish to Dutch translator)
-- Melrep
 - Crazy Horses
 
 http://www.ozyr.com/rene/PICS/protos.jpg
@@ -57,7 +55,6 @@ http://www.ozyr.com/rene/PICS/odyssey3_set.jpg
 There is an Odyssey³ Command Center Voice Module, could be differences to released Odyssey² version.
 
 Do Videopac+/Odyssey3 versions exist?:
-- Syracuse (France)
 - Robot City (USA)
 - Interpol (USA)
 
@@ -2060,6 +2057,18 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		</part>
 	</software>
 
+	<software name="melrep">
+		<description>Melrep (Europe, prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x800">
+				<rom name="pr_melrep.bin" size="0x800" crc="37b7b748" sha1="050a9aaa8877b0ff652ebbed72e11a36b085e9fa" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pinball">
 		<!-- re-released at Classic Games Expo (2004 in Philadelphia) with Ralph Baer's autograph (as he was the designer) -->
 		<description>Pinball! (USA, prototype)</description>
@@ -2134,6 +2143,18 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">
 				<rom name="soundtool.bin" size="0x800" crc="3e454bbe" sha1="976bbac3557e6daa262439645511e280b7c740fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaans">
+		<description>Spaans (Europe, prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x800">
+				<rom name="pr_spaans.bin" size="0x800" crc="5e70dd5c" sha1="ef1a9dbe458a76946e1e898ef49174becace6e1e" />
 			</dataarea>
 		</part>
 	</software>
@@ -2538,6 +2559,18 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
 				<rom name="vp_20pl.bin" size="0x2000" crc="2391c2fb" sha1="d358fcc6a0fa6469d7063114aa0dc143af14e3e9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syracusepl" cloneof="syracuse">
+		<description>Syracuse (France, plus, prototype)</description>
+		<year>198?</year>
+		<publisher>Brandt</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="pr_syracusepl.bin" size="0x2000" crc="38269d8b" sha1="f57d17a9b5f8346ab67f6c46f82b4e8c70c80c9e" />
 			</dataarea>
 		</part>
 	</software>
