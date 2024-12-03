@@ -56,9 +56,6 @@ TODO:
   and writes to the ptr/color registers, but does not increment the Y regs.
   Does it (ab)use an undocumented 8245 feature?
 - g7400 helicopt sometimes locks up at the sea level, timing or IRQ related?
-- volley has a sprite-char collision detection problem, causing the team on the
-  right to never serve the ball. Sprite positions are correct so it's not that,
-  and as seen on videos of other games, transparent pixels don't cause a collision.
 - spaans has a keyboard debounce issue: if you push and hold a key after the game
   revealed the answer, it will be entered in the next input field. It's a prototype
   so it wouldn't be surprising there are bugs, but this issue does not happen on

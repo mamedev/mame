@@ -35,16 +35,15 @@ TODO:
 DEFINE_DEVICE_TYPE(EF9340_1, ef9340_1_device, "ef9340_1", "Thomson EF9340+EF9341")
 
 
-ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, EF9340_1, tag, owner, clock)
-	, device_video_interface(mconfig, *this)
-	, m_charset(*this, "ef9340_1")
-	, m_write_exram(*this)
-	, m_read_exram(*this, 0xff)
-{
-	m_offset_x = 0;
-	m_offset_y = 0;
-}
+ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, EF9340_1, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	m_charset(*this, "ef9340_1"),
+	m_offset_x(0),
+	m_offset_y(0),
+	m_write_exram(*this),
+	m_read_exram(*this, 0xff)
+{ }
 
 
 ROM_START( ef9340_1 )
