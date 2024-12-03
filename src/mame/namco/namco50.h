@@ -7,7 +7,7 @@
 
 #include "cpu/mb88xx/mb88xx.h"
 
-/* device get info callback */
+
 class namco_50xx_device : public device_t
 {
 public:
@@ -28,9 +28,9 @@ protected:
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
-	uint8_t                   m_rw;
-	uint8_t                   m_cmd;
-	uint8_t                   m_portO;
+	uint8_t m_rw;
+	uint8_t m_cmd;
+	uint8_t m_portO;
 
 	TIMER_CALLBACK_MEMBER(O_w_sync);
 	TIMER_CALLBACK_MEMBER(rw_sync);

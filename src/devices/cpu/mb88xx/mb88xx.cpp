@@ -2,14 +2,14 @@
 // copyright-holders:Ernesto Corvi
 /***************************************************************************
 
-    mb88xx.cpp
     Core implementation for the portable Fujitsu MB88xx series MCU emulator.
 
     Written by Ernesto Corvi
 
     TODO:
-    - Add support for the timer
-    - Add support for the serial interface
+    - Verify timer, Bosconian voice samples are currently a good test case,
+      and they match PCB recordings.
+    - Improve support for the serial interface.
     - Split the core to support multiple CPU types?
 
 ***************************************************************************/
@@ -192,6 +192,7 @@ void mb88_cpu_device::device_start()
 
 	m_serial = timer_alloc(FUNC(mb88_cpu_device::serial_timer), this);
 
+	m_if = 0;
 	m_ctr = 0;
 	m_o_output = 0;
 
@@ -219,16 +220,16 @@ void mb88_cpu_device::device_start()
 	save_item(NAME(m_pending_irq));
 	save_item(NAME(m_in_irq));
 
-	state_add(MB88_PC,  "PC",  m_PC).formatstr("%02X");
-	state_add(MB88_PA,  "PA",  m_PA).formatstr("%02X");
-	state_add(MB88_SI,  "SI",  m_SI).formatstr("%01X");
-	state_add(MB88_A,   "A",   m_A).formatstr("%01X");
-	state_add(MB88_X,   "X",   m_X).formatstr("%01X");
-	state_add(MB88_Y,   "Y",   m_Y).formatstr("%01X");
-	state_add(MB88_PIO, "PIO", m_pio).formatstr("%02X");
-	state_add(MB88_TH,  "TH",  m_TH).formatstr("%01X");
-	state_add(MB88_TL,  "TL",  m_TL).formatstr("%01X");
-	state_add(MB88_SB,  "SB",  m_SB).formatstr("%01X");
+	state_add(MB88XX_PC,  "PC",  m_PC).formatstr("%02X");
+	state_add(MB88XX_PA,  "PA",  m_PA).formatstr("%02X");
+	state_add(MB88XX_SI,  "SI",  m_SI).formatstr("%01X");
+	state_add(MB88XX_A,   "A",   m_A).formatstr("%01X");
+	state_add(MB88XX_X,   "X",   m_X).formatstr("%01X");
+	state_add(MB88XX_Y,   "Y",   m_Y).formatstr("%01X");
+	state_add(MB88XX_PIO, "PIO", m_pio).formatstr("%02X");
+	state_add(MB88XX_TH,  "TH",  m_TH).formatstr("%01X");
+	state_add(MB88XX_TL,  "TL",  m_TL).formatstr("%01X");
+	state_add(MB88XX_SB,  "SB",  m_SB).formatstr("%01X");
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_pc).callimport().callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_debugger_pc).callimport().callexport().noshow();
@@ -314,7 +315,6 @@ void mb88_cpu_device::device_reset()
 	m_cf = 0;
 	m_vf = 0;
 	m_sf = 0;
-	m_if = 0;
 	m_pio = 0;
 	m_TH = 0;
 	m_TL = 0;
@@ -375,14 +375,30 @@ void mb88_cpu_device::write_pla(u8 index)
 
 void mb88_cpu_device::execute_set_input(int inputnum, int state)
 {
-	// On rising edge trigger interrupt.
-	// Note this is a logical level, the actual pin is high-to-low voltage triggered.
-	if ((m_pio & INT_CAUSE_EXTERNAL) && !m_if && state != CLEAR_LINE)
-	{
-		m_pending_irq |= INT_CAUSE_EXTERNAL;
-	}
+	state = state ? 1 : 0;
 
-	m_if = state != CLEAR_LINE;
+	switch (inputnum)
+	{
+		case MB88XX_IRQ_LINE:
+			// On rising edge trigger interrupt.
+			// Note this is a logical level, the actual pin is high-to-low voltage triggered.
+			if (!m_if && state && (m_pio & INT_CAUSE_EXTERNAL))
+				m_pending_irq |= INT_CAUSE_EXTERNAL;
+
+			m_if = state;
+			break;
+
+		case MB88XX_TC_LINE:
+			// on a falling clock, increment the timer, but only if enabled
+			if (m_ctr && !state && (m_pio & 0x40))
+				increment_timer();
+
+			m_ctr = state;
+			break;
+
+		default:
+			break;
+	}
 }
 
 void mb88_cpu_device::pio_enable(u8 newpio)
@@ -417,7 +433,6 @@ void mb88_cpu_device::increment_timer()
 
 void mb88_cpu_device::burn_cycles(int cycles)
 {
-	// TODO: improve/validate serial and timer support
 	m_icount -= cycles;
 
 	// internal clock enable
@@ -446,7 +461,6 @@ void mb88_cpu_device::burn_cycles(int cycles)
 		// the datasheet doesn't mention interrupt vectors but the Arabian MCU program expects the following
 		if (m_pending_irq & m_pio & INT_CAUSE_EXTERNAL)
 		{
-			// if we have a live external source, call the irqcallback
 			standard_irq_callback(0, intpc);
 			m_PC = 0x02;
 		}
@@ -466,18 +480,6 @@ void mb88_cpu_device::burn_cycles(int cycles)
 		m_pending_irq = 0;
 
 		burn_cycles(3); // ?
-	}
-}
-
-void mb88_cpu_device::clock_w(int state)
-{
-	if (state != m_ctr)
-	{
-		m_ctr = state;
-
-		// on a falling clock, increment the timer, but only if enabled
-		if (m_ctr == 0 && (m_pio & 0x40))
-			increment_timer();
 	}
 }
 

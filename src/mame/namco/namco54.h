@@ -43,7 +43,6 @@ private:
 DECLARE_DEVICE_TYPE(NAMCO_54XX, namco_54xx_device)
 
 
-
 /* discrete nodes */
 #define NAMCO_54XX_0_DATA(base)     (NODE_RELATIVE(base, 0))
 #define NAMCO_54XX_1_DATA(base)     (NODE_RELATIVE(base, 1))

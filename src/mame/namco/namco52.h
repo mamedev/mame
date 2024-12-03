@@ -6,6 +6,7 @@
 #include "sound/discrete.h"
 #include "cpu/mb88xx/mb88xx.h"
 
+
 class namco_52xx_device : public device_t
 {
 public:
@@ -55,7 +56,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_52XX, namco_52xx_device)
-
 
 
 /* discrete nodes */

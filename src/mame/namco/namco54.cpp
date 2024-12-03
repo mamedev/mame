@@ -56,7 +56,7 @@
 void namco_54xx_device::reset(int state)
 {
 	// The incoming signal is active low
-	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+	m_cpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 uint8_t namco_54xx_device::K_r()
@@ -96,7 +96,7 @@ TIMER_CALLBACK_MEMBER(namco_54xx_device::write_sync)
 
 void namco_54xx_device::chip_select(int state)
 {
-	m_cpu->set_input_line(0, state);
+	m_cpu->set_input_line(MB88XX_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -106,7 +106,7 @@ void namco_54xx_device::chip_select(int state)
 
 ROM_START( namco_54xx )
 	ROM_REGION( 0x400, "mcu", 0 )
-	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
+	ROM_LOAD( "54xx.bin", 0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 ROM_END
 
 DEFINE_DEVICE_TYPE(NAMCO_54XX, namco_54xx_device, "namco54", "Namco 54xx")

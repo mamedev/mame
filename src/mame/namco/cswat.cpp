@@ -2,16 +2,16 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Namco Cosmoswat, a lightgun game that uses a projector and a bunch of
-  mirrors and motors to move a spotlight(s) on a large projection screen,
-  similar to Namco Shoot Away/Shoot Away II.
-  The CRT is just used for showing status and keeping scores.
+Namco Cosmoswat, a lightgun game that uses a projector and a bunch of
+mirrors and motors to move a spotlight(s) on a large projection screen,
+similar to Namco Shoot Away/Shoot Away II.
+The CRT is just used for showing status and keeping scores.
 
-  X1 18.432MHz
-  HD68A09EP   - Hitachi M6809 CPU
-  2 * M58725P - Mitsubishi 2KB SRAM
-  0737        - Namco custom DIP28, clock divider?
-  5275        - Namco custom DIP42, sample player
+X1 18.432MHz
+HD68A09EP   - Hitachi M6809 CPU
+2 * M58725P - Mitsubishi 2KB SRAM
+0737        - Namco custom DIP28, clock divider?
+5275        - Namco custom DIP42, sample player
 
 TODO:
 - fix gfx/colors (redump needed)

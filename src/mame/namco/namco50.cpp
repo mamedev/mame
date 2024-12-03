@@ -138,7 +138,7 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 void namco_50xx_device::reset(int state)
 {
 	// The incoming signal is active low
-	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+	m_cpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -179,7 +179,7 @@ TIMER_CALLBACK_MEMBER(namco_50xx_device::rw_sync)
 
 void namco_50xx_device::chip_select(int state)
 {
-	m_cpu->set_input_line(0, state);
+	m_cpu->set_input_line(MB88XX_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void namco_50xx_device::write(uint8_t data)
@@ -204,7 +204,7 @@ uint8_t namco_50xx_device::read()
 
 ROM_START( namco_50xx )
 	ROM_REGION( 0x800, "mcu", 0 )
-	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+	ROM_LOAD( "50xx.bin", 0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
 ROM_END
 
 
@@ -237,7 +237,7 @@ void namco_50xx_device::device_start()
 
 void namco_50xx_device::device_add_mconfig(machine_config &config)
 {
-	MB8842(config, m_cpu, DERIVED_CLOCK(1,1)); /* parent clock, internally divided by 6 */
+	MB8842(config, m_cpu, DERIVED_CLOCK(1,1)); // parent clock, internally divided by 6
 	m_cpu->read_k().set(FUNC(namco_50xx_device::K_r));
 	m_cpu->read_r<0>().set(FUNC(namco_50xx_device::R0_r));
 	m_cpu->read_r<2>().set(FUNC(namco_50xx_device::R2_r));

@@ -517,7 +517,7 @@ void arabian_state::ay8910_portb_w(uint8_t data)
 	    bit 0 = coin 1 counter
 	*/
 
-	m_mcu->set_input_line(MB88_IRQ_LINE, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
+	m_mcu->set_input_line(MB88XX_IRQ_LINE, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
 	m_mcu->set_input_line(INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 
 	// clock the coin counters

@@ -53,7 +53,7 @@
 void namco_52xx_device::reset(int state)
 {
 	// The incoming signal is active low
-	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+	m_cpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 uint8_t namco_52xx_device::K_r()
@@ -110,13 +110,12 @@ TIMER_CALLBACK_MEMBER(namco_52xx_device::write_sync)
 
 void namco_52xx_device::chip_select(int state)
 {
-	m_cpu->set_input_line(0, state);
+	m_cpu->set_input_line(MB88XX_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(namco_52xx_device::external_clock_pulse)
 {
-	m_cpu->clock_w(ASSERT_LINE);
-	m_cpu->clock_w(CLEAR_LINE);
+	m_cpu->pulse_input_line(MB88XX_TC_LINE, attotime::zero);
 }
 
 
@@ -126,7 +125,7 @@ TIMER_CALLBACK_MEMBER(namco_52xx_device::external_clock_pulse)
 
 ROM_START( namco_52xx )
 	ROM_REGION( 0x400, "mcu", 0 )
-	ROM_LOAD( "52xx.bin",     0x0000, 0x0400, CRC(3257d11e) SHA1(4883b2fdbc99eb7b9906357fcc53915842c2c186) )
+	ROM_LOAD( "52xx.bin", 0x0000, 0x0400, CRC(3257d11e) SHA1(4883b2fdbc99eb7b9906357fcc53915842c2c186) )
 ROM_END
 
 
@@ -168,7 +167,7 @@ void namco_52xx_device::device_start()
 
 void namco_52xx_device::device_add_mconfig(machine_config &config)
 {
-	MB8843(config, m_cpu, DERIVED_CLOCK(1,1));     /* parent clock, internally divided by 6 */
+	MB8843(config, m_cpu, DERIVED_CLOCK(1,1)); // parent clock, internally divided by 6
 	m_cpu->read_k().set(FUNC(namco_52xx_device::K_r));
 	m_cpu->write_o().set(FUNC(namco_52xx_device::O_w));
 	m_cpu->write_p().set(FUNC(namco_52xx_device::P_w));

@@ -2,7 +2,6 @@
 // copyright-holders:Ernesto Corvi
 /***************************************************************************
 
-    mb88xx.h
     Core implementation for the portable Fujitsu MB88xx series MCU emulator.
 
     Written by Ernesto Corvi
@@ -54,20 +53,24 @@
 
 enum
 {
-	MB88_PC = 1,
-	MB88_PA,
-	MB88_FLAGS,
-	MB88_SI,
-	MB88_A,
-	MB88_X,
-	MB88_Y,
-	MB88_PIO,
-	MB88_TH,
-	MB88_TL,
-	MB88_SB
+	MB88XX_IRQ_LINE = 0,
+	MB88XX_TC_LINE
 };
 
-#define MB88_IRQ_LINE       0
+enum
+{
+	MB88XX_PC = 1,
+	MB88XX_PA,
+	MB88XX_FLAGS,
+	MB88XX_SI,
+	MB88XX_A,
+	MB88XX_X,
+	MB88XX_Y,
+	MB88XX_PIO,
+	MB88XX_TH,
+	MB88XX_TL,
+	MB88XX_SB
+};
 
 
 class mb88_cpu_device : public cpu_device
@@ -98,8 +101,6 @@ public:
 	void set_pla_bits(u8 bits) { m_pla_bits = bits; } // 4-bit or 8-bit (4-bit requires PLA data)
 	void set_pla_data(u8 *pla) { m_pla_data = pla; }
 
-	void clock_w(int state);
-
 	void data_4bit(address_map &map) ATTR_COLD;
 	void data_5bit(address_map &map) ATTR_COLD;
 	void data_6bit(address_map &map) ATTR_COLD;
@@ -120,6 +121,7 @@ protected:
 	virtual u32 execute_max_cycles() const noexcept override { return 2+3; } // includes interrupt
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == MB88XX_IRQ_LINE || inputnum == MB88XX_TC_LINE; }
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 6 - 1) / 6; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 6); }
 
@@ -150,7 +152,7 @@ private:
 	u8   m_cf;      // Carry flag: 1 bit
 	u8   m_vf;      // Timer overflow flag: 1 bit
 	u8   m_sf;      // Serial Full/Empty flag: 1 bit
-	u8   m_if;      // Interrupt flag: 1 bit
+	u8   m_if;      // Interrupt flag (IRQ pin): 1 bit
 
 	// Peripheral Control
 	u8   m_pio;     // Peripheral enable bits: 8 bits

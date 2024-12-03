@@ -40,10 +40,7 @@ private:
 	devcb_write_line m_lockout;
 
 	uint8_t K_r();
-	uint8_t R0_r();
-	uint8_t R1_r();
-	uint8_t R2_r();
-	uint8_t R3_r();
+	template<int N> uint8_t R_r();
 	void O_w(uint8_t data);
 	void P_w(uint8_t data);
 
