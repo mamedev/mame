@@ -158,6 +158,76 @@ namespace bx
 		return _a * _a;
 	}
 
+	inline BX_CONSTEXPR_FUNC float trunc(float _a)
+	{
+		return float(int(_a) );
+	}
+
+	inline BX_CONSTEXPR_FUNC float fract(float _a)
+	{
+		return _a - trunc(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c)
+	{
+		return _c - _a * _b;
+	}
+
+	inline BX_CONSTEXPR_FUNC float add(float _a, float _b)
+	{
+		return _a + _b;
+	}
+
+	inline BX_CONSTEXPR_FUNC float sub(float _a, float _b)
+	{
+		return _a - _b;
+	}
+
+	inline BX_CONSTEXPR_FUNC float mul(float _a, float _b)
+	{
+		return _a * _b;
+	}
+
+	inline BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c)
+	{
+		return add(mul(_a, _b), _c);
+	}
+
+	inline BX_CONSTEXPR_FUNC float rcp(float _a)
+	{
+		return 1.0f / _a;
+	}
+
+	inline BX_CONSTEXPR_FUNC float rcpSafe(float _a)
+	{
+		return rcp(copySign(max(kFloatSmallest, abs(_a) ), _a) );
+	}
+
+	inline BX_CONSTEXPR_FUNC float div(float _a, float _b)
+	{
+		return mul(_a, rcp(_b) );
+	}
+
+	inline BX_CONSTEXPR_FUNC float divSafe(float _a, float _b)
+	{
+		return mul(_a, rcpSafe(_b) );
+	}
+
+	inline BX_CONSTEXPR_FUNC float ceilDiv(float _a, float _b)
+	{
+		return div(_a + _b - 1, _b);
+	}
+
+	inline BX_CONSTEXPR_FUNC float ceilDivSafe(float _a, float _b)
+	{
+		return divSafe(_a + _b - 1, _b);
+	}
+
+	inline BX_CONSTEXPR_FUNC float mod(float _a, float _b)
+	{
+		return _a - _b * floor(div(_a, _b) );
+	}
+
 	inline BX_CONSTEXPR_FUNC float cos(float _a)
 	{
 		const float scaled = _a * 2.0f*kInvPi;
@@ -344,37 +414,6 @@ namespace bx
 		return result;
 	}
 
-	inline BX_CONSTEXPR_FUNC float exp(float _a)
-	{
-		if (abs(_a) <= kNearZero)
-		{
-			return _a + 1.0f;
-		}
-
-		constexpr float kExpC0  =  1.66666666666666019037e-01f;
-		constexpr float kExpC1  = -2.77777777770155933842e-03f;
-		constexpr float kExpC2  =  6.61375632143793436117e-05f;
-		constexpr float kExpC3  = -1.65339022054652515390e-06f;
-		constexpr float kExpC4  =  4.13813679705723846039e-08f;
-		constexpr float kLogNat2Lo = 1.90821492927058770002e-10f;
-
-		const float kk     = round(_a*kInvLogNat2);
-		const float hi     = _a - kk*kLogNat2;
-		const float lo     =      kk*kLogNat2Lo;
-		const float hml    = hi - lo;
-		const float hmlsq  = square(hml);
-		const float tmp0   = mad(kExpC4, hmlsq, kExpC3);
-		const float tmp1   = mad(tmp0,   hmlsq, kExpC2);
-		const float tmp2   = mad(tmp1,   hmlsq, kExpC1);
-		const float tmp3   = mad(tmp2,   hmlsq, kExpC0);
-		const float tmp4   = hml - hmlsq * tmp3;
-		const float tmp5   = hml*tmp4/(2.0f-tmp4);
-		const float tmp6   = 1.0f - ( (lo - tmp5) - hi);
-		const float result = ldexp(tmp6, int32_t(kk) );
-
-		return result;
-	}
-
 	inline BX_CONSTEXPR_FUNC float log(float _a)
 	{
 		int32_t exp = 0;
@@ -415,6 +454,44 @@ namespace bx
 		const float t12    = t1 + t2;
 		const float hfsq   = 0.5f*square(ff);
 		const float result = hi - ( (hfsq - (ss*(hfsq+t12) + lo) ) - ff);
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC float exp(float _a)
+	{
+		if (abs(_a) <= kNearZero)
+		{
+			return _a + 1.0f;
+		}
+
+		constexpr float expMin = log(kFloatSmallest);
+
+		if (_a <= expMin)
+		{
+			return 0.0f;
+		}
+
+		constexpr float kExpC0  =  1.66666666666666019037e-01f;
+		constexpr float kExpC1  = -2.77777777770155933842e-03f;
+		constexpr float kExpC2  =  6.61375632143793436117e-05f;
+		constexpr float kExpC3  = -1.65339022054652515390e-06f;
+		constexpr float kExpC4  =  4.13813679705723846039e-08f;
+		constexpr float kLogNat2Lo = 1.90821492927058770002e-10f;
+
+		const float kk     = round(_a*kInvLogNat2);
+		const float hi     = _a - kk*kLogNat2;
+		const float lo     =      kk*kLogNat2Lo;
+		const float hml    = hi - lo;
+		const float hmlsq  = square(hml);
+		const float tmp0   = mad(kExpC4, hmlsq, kExpC3);
+		const float tmp1   = mad(tmp0,   hmlsq, kExpC2);
+		const float tmp2   = mad(tmp1,   hmlsq, kExpC1);
+		const float tmp3   = mad(tmp2,   hmlsq, kExpC0);
+		const float tmp4   = hml - hmlsq * tmp3;
+		const float tmp5   = hml*tmp4/(2.0f-tmp4);
+		const float tmp6   = 1.0f - ( (lo - tmp5) - hi);
+		const float result = ldexp(tmp6, int32_t(kk) );
 
 		return result;
 	}
@@ -716,76 +793,6 @@ namespace bx
 #else
 		return sqrtRef(_a);
 #endif // BX_SIMD_SUPPORTED
-	}
-
-	inline BX_CONSTEXPR_FUNC float trunc(float _a)
-	{
-		return float(int(_a) );
-	}
-
-	inline BX_CONSTEXPR_FUNC float fract(float _a)
-	{
-		return _a - trunc(_a);
-	}
-
-	inline BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c)
-	{
-		return _c - _a * _b;
-	}
-
-	inline BX_CONSTEXPR_FUNC float add(float _a, float _b)
-	{
-		return _a + _b;
-	}
-
-	inline BX_CONSTEXPR_FUNC float sub(float _a, float _b)
-	{
-		return _a - _b;
-	}
-
-	inline BX_CONSTEXPR_FUNC float mul(float _a, float _b)
-	{
-		return _a * _b;
-	}
-
-	inline BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c)
-	{
-		return add(mul(_a, _b), _c);
-	}
-
-	inline BX_CONSTEXPR_FUNC float rcp(float _a)
-	{
-		return 1.0f / _a;
-	}
-
-	inline BX_CONSTEXPR_FUNC float rcpSafe(float _a)
-	{
-		return rcp(copySign(max(kFloatSmallest, abs(_a) ), _a) );
-	}
-
-	inline BX_CONSTEXPR_FUNC float div(float _a, float _b)
-	{
-		return mul(_a, rcp(_b) );
-	}
-
-	inline BX_CONSTEXPR_FUNC float divSafe(float _a, float _b)
-	{
-		return mul(_a, rcpSafe(_b) );
-	}
-
-	inline BX_CONSTEXPR_FUNC float ceilDiv(float _a, float _b)
-	{
-		return div(_a + _b - 1, _b);
-	}
-
-	inline BX_CONSTEXPR_FUNC float ceilDivSafe(float _a, float _b)
-	{
-		return divSafe(_a + _b - 1, _b);
-	}
-
-	inline BX_CONSTEXPR_FUNC float mod(float _a, float _b)
-	{
-		return _a - _b * floor(div(_a, _b) );
 	}
 
 	inline BX_CONSTEXPR_FUNC bool isEqual(float _a, float _b, float _epsilon)
