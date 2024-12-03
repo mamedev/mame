@@ -15,10 +15,10 @@
  * and uses a block of main memory allocated for CPU<->IOP interprocessor communication. The CPU and IOP interrupt each other 
  * whenever they need to communicate, after populating main memory with whatever data is needed.
  * The CPU delegates almost all I/O to the IOP (as the DMA controller), only handling I/O for some VME bus peripherals. 
- * The CPU bus (on the NWS-800, this is routed through the MMU) is often called the Hyperbus. The NWS-1800/1900 series and the single-CPU
- * 68k and R3000 models explictly call this the Hyperbus, but it is unclear if the NWS-800's CPU bus was only referred to that retroactively or not.
- * There are a couple of mentions of the Hyperbus in NEWS-OS 4 related to even the NWS-800, but the NWS-1xxx/3xxx series was already
- * released by the time NEWS-OS 4 was.
+ * The CPU bus (on the NWS-800, this is routed through the MMU) is often called the Hyperbus. The NWS-1800/1900/3800 series and the single-CPU
+ * 68k and R3000 models explictly call this the Hyperbus, but it is unclear if the NWS-800's CPU bus was only referred to that retroactively or not. 
+ * There are a couple of mentions of the Hyperbus in NEWS-OS 4 related to even the NWS-800, but the NWS-1xxx/3xxx series were already released by the time NEWS-OS 4 was.
+ * So, for clarity due to the number of busses on this system, the Hyperbus term is used throughout this code, but it may or may not be a 100% accurate description.
  * The Hyperbus is directly connected to main memory, the system ROM, and the VME bus interface. Everything else is connected to the I/O
  * bus. The IOP, CPU/MMU, and VME bus can all access the Hyperbus through a buffer. As far as I can tell, nothing on the Hyperbus
  * can talk to the I/O bus, only the IOP is able to do that.
@@ -26,9 +26,11 @@
  *  Supported:
  * 	 - NWS-831
  *
- *  Not supported yet (need system firmware dumps):
- *   - All other NWS-8xx systems
- *   - NWS-9xx server (2x '020)
+ *  Not supported yet:
+ *   - All other NWS-8xx workstations
+ *   - NWS-9xx servers (2x '020)
+ *   - NWS-18xx workstations (2x '030)
+ *   - NWS-19xx servers (2x '030)
  *
  * Known NWS-800 Series Base Configurations TODO: check that all of these appear in the model list in the headers
  * - NWS-811: Jun 1987, 4MB RAM, no cache, diskless
@@ -426,14 +428,11 @@ namespace
         LOG("Write CPURESET = 0x%x\n", data);
         if (data > 0)
         {
-            // m_cpu->resume(SUSPEND_REASON_RESET);
             m_cpu->set_input_line(INPUT_LINE_HALT, 0);
         }
         else
         {
-            // m_cpu->suspend(SUSPEND_REASON_RESET, true);
             m_cpu->set_input_line(INPUT_LINE_HALT, 1);
-            // int_check_cpu();
         }
     }
 
@@ -876,10 +875,10 @@ namespace
     {
         map(0x0, 0xffffffff).lrw32([this](offs_t offset, uint32_t mem_mask) {
             return m_mmu->hyperbus_r(offset, mem_mask, m_cpu->supervisor_mode());
-        }, "HB_R",
+        }, "hyperbus_r",
         [this](offs_t offset, uint32_t data, uint32_t mem_mask) {
             m_mmu->hyperbus_w(offset, data, mem_mask, m_cpu->supervisor_mode());
-        }, "HB_W");
+        }, "hyperbus_w");
     }
 
     template <news_iop_state::iop_irq_number Number>
@@ -948,10 +947,10 @@ namespace
     template <news_iop_state::cpu_irq_number Number>
     void news_iop_state::cpu_irq_w(int state)
     {
-        // if (Number != TIMER)
-        // {
+        if (Number != TIMER)
+        {
             LOG("cpu irq number %d state %d\n", Number, state);
-        // }
+        }
 
         // int shift = Number == SCC_PERIPHERAL ? SCC : Number;
         // if (Number == SCC_PERIPHERAL)
