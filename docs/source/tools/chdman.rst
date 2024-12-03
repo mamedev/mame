@@ -418,16 +418,43 @@ Compression algorithms
 The following compression algorithms are supported:
 
 zlib – zlib deflate
-   Compresses data using the zlib deflate algorithm.
+   Compresses data using the zlib deflate algorithm.  Decompression performance
+   is around 3½ times slower than Zstandard and 4 times faster than the
+   Lempel-Ziv-Markov chain algorithm (LZMA).
+
+   For good decompression performance for raw media images, hard disk media, and
+   DVD-ROM media, if your software doesn't support Zstandard, a good setting to
+   try using the ``createraw``, ``createhd``, or ``createdvd`` commands is
+   ``--compression zlib,huff,flac``.  This can be useful on low-end
+   hardware.  After creating a CHD, you can see statistics on compression
+   algorithms used with ``chdman info --verbose``.
 zstd – Zstandard
    Compresses data using the Zstandard algorithm.  This gives very good
    compression and decompression performance with better compression ratios than
-   zlib deflate, but older software may not support CHD files that use Zstandard
-   compression.
+   zlib deflate, but Zstandard support was added to the CHD format in January
+   2024, so older software may not support CHD files that use Zstandard
+   compression.  Decompression performance is around 15 times faster than the
+   Lempel-Ziv-Markov chain algorithm (LZMA) and 3½ times faster than
+   zlib deflate.
+
+   By default, chdman will not enable Zstandard compression, so CHD
+   files will be compatible with existing software.  You can enable Zstandard
+   compression when creating or copying a CHD with the ``--compression`` or
+   ``-c`` option.  chdman prefers higher compression ratios, so if you want
+   Zstandard to be used, you should generally disable LZMA compression.
+
+   For raw media images, hard disk media, and DVD-ROM media, a good setting to
+   try using the ``createraw``, ``createhd``, or ``createdvd`` commands is
+   ``--compression zstd,zlib,huff,flac``.  For the best decompression
+   performance using only Zstandard and the Free Lossless Audio Codec (FLAC), a
+   good setting to try is ``--compression zstd,flac``.  This can be useful on
+   low-end hardware.  After creating a CHD, you can see statistics on
+   compression algorithms used with ``chdman info --verbose``.
 lzma – Lempel-Ziv-Markov chain algorithm
-   Compresses data using the Lempel-Ziv-Markov-chain algorithm (LZMA).  This
+   Compresses data using the Lempel-Ziv-Markov chain algorithm (LZMA).  This
    gives high compression ratios at the cost of poor compression and
-   decompression performance.
+   decompression performance.  Decompression performance is around 15 times
+   slower than Zstandard and 4 times slower than zlib deflate.
 huff – Huffman coding
    Compresses data using 8-bit Huffman entropy coding.
 flac – Free Lossless Audio Codec
@@ -436,17 +463,44 @@ flac – Free Lossless Audio Codec
    media contains 16-bit PCM audio data.
 cdzl – zlib deflate for CD-ROM data
    Compresses audio data and subchannel data from CD-ROM sectors separately
-   using the zlib deflate algorithm.
+   using the zlib deflate algorithm.  Decompression performance is around 3½
+   times slower than Zstandard and 4 times faster than the
+   Lempel-Ziv-Markov chain algorithm (LZMA).
+
+   For good decompression performance for CD-ROM media, if your software doesn't
+   support Zstandard, a good setting to try using the ``createcd`` command is
+   ``--compression cdzl,cdfl``.  This can be useful on low-end hardware.  After
+   creating a CHD, you can see statistics on compression algorithms used with
+   ``chdman info --verbose``.
 cdzs – Zstandard for CD-ROM data
    Compresses audio data and subchannel data from CD-ROM sectors separately
    using the Zstandard algorithm.  This gives very good compression and
    decompression performance with better compression ratios than zlib deflate,
-   but older software may not support CHD files that use Zstandard compression.
+   but Zstandard support was added to the CHD format in January 2024, so older
+   software may not support CHD files that use Zstandard compression.
+   Decompression performance is around 15 times faster than the
+   Lempel-Ziv-Markov chain algorithm (LZMA) and 3½ times faster than zlib
+   deflate.
+
+   By default, chdman will not enable Zstandard compression, so CHD
+   files will be compatible with existing software.  You can enable Zstandard
+   compression when creating or copying a CHD with the ``--compression`` or
+   ``-c`` option.  chdman prefers higher compression ratios, so if you want
+   Zstandard to be used, you should generally disable LZMA compression.
+
+   For CD-ROM media, a good setting to try using the ``createcd`` command is
+   ``--compression cdzs,cdzl,cdfl``.  For the best decompression performance
+   using only Zstandard and the Free Lossless Audio Codec (FLAC), a good setting
+   to try is ``--compression cdzs,cdfl``.  This can be useful on low-end
+   hardware.  After creating a CHD, you can see statistics on compression
+   algorithms used with ``chdman info --verbose``.
 cdlz - Lempel-Ziv-Markov chain algorithm/zlib deflate for CD-ROM data
    Compresses audio data and subchannel data from CD-ROM sectors separately
    using the Lempel-Ziv-Markov chain algorithm (LZMA) for audio data and the
    zlib deflate algorithm for subchannel data.  This gives high compression
    ratios at the cost of poor compression and decompression performance.
+   Decompression performance is around 15 times slower than Zstandard and 4
+   times slower than zlib deflate.
 cdfl – Free Lossless Audio Codec/zlib deflate for CD-ROM data
    Compresses audio data and subchannel data from CD-ROM sectors separately
    using the Free Lossless Audio Codec (FLAC) for audio data and the zlib
