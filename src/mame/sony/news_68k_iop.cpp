@@ -1223,7 +1223,7 @@ namespace
         NSCSI_CONNECTOR(config, "scsi:7").option_set("am5380", AM5380).machine_config([this](device_t *device)
         {
             am5380_device &adapter = downcast<am5380_device &>(*device);
-            adapter.irq_handler().set(*this, FUNC(news_iop_state::iop_irq_w<SCSI>));
+            adapter.irq_handler().set([this](int state){ m_scsi_dma->irq_w(state); });
             adapter.drq_handler().set(*this, FUNC(news_iop_state::scsi_drq_handler));
         });
 
@@ -1236,6 +1236,7 @@ namespace
         m_scsi_dma->scsi_dma_write_callback().set(m_scsi, FUNC(ncr53c80_device::dma_w));
         m_scsi_dma->iop_halt_callback().set_inputline(m_iop, INPUT_LINE_HALT);
         m_scsi_dma->timeout_error_callback().set(FUNC(news_iop_state::iop_bus_error));
+        m_scsi_dma->irq_out_callback().set(FUNC(news_iop_state::iop_irq_w<SCSI>));
 
         // Epson RTC-58321B
         RTC58321(config, m_rtc, 32.768_kHz_XTAL);

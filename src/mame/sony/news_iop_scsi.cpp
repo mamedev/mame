@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Brice Onken
-// thanks-to:AJR
+// copyright-holders:Brice Onken,AJR
 
 /*
  * Sony NEWS 68k IOP SCSI DMA helper
@@ -20,7 +19,7 @@
  * until the count is longword aligned before starting this process, so this more or less emulates (at a high level)
  * what iopboot expects when the bus error handler and processor routines successfully read in a longword.
  *
- * Thanks to AJR - the macscsi helper was easy to graft my original hack implementation into for this!
+ * Thanks to AJR - the macscsi helper was easy to modify for this!
  */
 
 #include "emu.h"
@@ -46,6 +45,7 @@ news_iop_scsi_helper_device::news_iop_scsi_helper_device(const machine_config &m
     m_scsi_dma_write_callback(*this),
     m_iop_halt_callback(*this),
     m_timeout_error_callback(*this),
+    m_irq_out_callback(*this),
     m_timeout(attotime::from_usec(16)), // TODO: proper value for NEWS
     m_pseudo_dma_timer(nullptr),
     m_mode(mode::NON_DMA),
@@ -126,6 +126,31 @@ void news_iop_scsi_helper_device::drq_w(int state)
         {
             write_fifo_process();
         }
+        else if (m_mode == mode::READ_WAIT_DRQ)
+        {
+            m_mode = mode::READ_DMA;
+            m_read_fifo_data = u32(m_scsi_dma_read_callback(6)) << 24;
+            LOG("%s: Pseudo-DMA read started from DRQ: first byte = %02X\n", machine().describe_context(), m_read_fifo_data >> 24);
+            m_read_fifo_bytes = 1;
+            m_pseudo_dma_timer->adjust(m_timeout);
+            m_iop_halt_callback(ASSERT_LINE);
+        }
+    }
+}
+
+void news_iop_scsi_helper_device::irq_w(int state)
+{
+    LOG("irq_w(0x%x)\n", state);
+    m_irq = state > 0;
+    if (m_irq && (m_read_fifo_bytes != 0 || m_write_fifo_bytes != 0))
+    {
+        LOG("Gating IRQ\n");
+        m_mode = mode::IRQ_GATE;
+        m_irq_out_callback(false);
+    }
+    else 
+    {
+        m_irq_out_callback(m_irq);
     }
 }
 
@@ -219,14 +244,18 @@ u8 news_iop_scsi_helper_device::read_wrapper(bool pseudo_dma, offs_t offset)
                 --m_read_fifo_bytes;
                 LOG("%s: CPU read byte %02X from FIFO (%d left)\n", machine().describe_context(), data, m_read_fifo_bytes);
                 m_read_fifo_data <<= 8;
-                if (BIT(m_scsi_read_callback(5), 6))
+                if (BIT(m_scsi_read_callback(5), 6) && m_mode != mode::IRQ_GATE)
                 {
                     read_fifo_process();
                 }
-                else if (!m_pseudo_dma_timer->enabled())
+                else if (!m_pseudo_dma_timer->enabled() && m_mode != mode::IRQ_GATE)
                 {
                     m_pseudo_dma_timer->adjust(m_timeout);
                     m_iop_halt_callback(ASSERT_LINE);
+                }
+                else if (m_read_fifo_bytes == 0 && m_mode == mode::IRQ_GATE)
+                {
+                    m_irq_out_callback(m_irq); // TODO: might not be the right place for this
                 }
             }
         }
