@@ -34,7 +34,7 @@ on Videopac+, B is used for video mixer override
 */
 
 
-/* PCB */
+// PCB
 enum
 {
 	O2_STD = 0,
@@ -44,6 +44,7 @@ enum
 	O2_CHESS,
 	O2_HOMECOMP,
 	O2_TEST,
+	O2_TESTPL,
 	O2_VOICE
 };
 

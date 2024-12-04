@@ -102,6 +102,7 @@ static const o2_slot slot_list[] =
 	{ O2_CHESS,    "o2_chess" },
 	{ O2_HOMECOMP, "o2_homecomp" },
 	{ O2_TEST,     "o2_test" },
+	{ O2_TESTPL,   "o2_testpl" },
 	{ O2_VOICE,    "o2_voice" }
 };
 
@@ -291,5 +292,6 @@ void o2_cart(device_slot_interface &device)
 	device.option_add_internal("o2_chess",    O2_ROM_CHESS);
 	device.option_add_internal("o2_homecomp", O2_ROM_HOMECOMP);
 	device.option_add_internal("o2_test",     O2_ROM_TEST);
+	device.option_add_internal("o2_testpl",   O2_ROM_TESTPL);
 	device.option_add_internal("o2_voice",    O2_ROM_VOICE);
 }

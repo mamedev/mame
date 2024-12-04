@@ -2556,7 +2556,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		<publisher>Philips</publisher>
 		<info name="usage" value="See testcart, and at end of normal tests, press both joystick buttons to continue." />
 		<part name="cart" interface="odyssey_cart">
-			<feature name="slot" value="o2_rally" />
+			<feature name="slot" value="o2_testpl" />
 			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
 				<rom name="testcartpl.bin" size="0x2000" crc="b72b1494" sha1="fb281a5e4c7664209106f94e463d9017751712b5" />
