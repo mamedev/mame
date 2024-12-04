@@ -157,7 +157,7 @@ namespace
             LANCE = 3,          // Ethernet controller interrupts
             CPU = 4,            // Interrupt for interprocessor communication from CPU
             SCC = 5,            // Serial communication
-            TIMEOUT_FDCIRQ = 6, // Both timer and FDCIRQ feed IRQ6 TODO: Confirm that NWS800 also uses IOP timeout...
+            TIMEOUT_FDCIRQ = 6, // Both timer and FDCIRQ feed IRQ6
             FDCDRQ = 7,         // DRQ signal from FDC
             SCC_PERIPHERAL = 99 // hack to differentiate SCC interrupts better
         };
@@ -538,7 +538,6 @@ namespace
 
         // CPU doesn't run until the IOP tells it to
         m_cpu->set_input_line(INPUT_LINE_HALT, 1);
-        // m_cpu->suspend(SUSPEND_REASON_RESET, true);
     }
 
     void news_iop_state::init_common()

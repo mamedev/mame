@@ -16,6 +16,12 @@ DEFINE_DEVICE_TYPE(NEWS_020_MMU, news_020_mmu_device, "news_020_mmu", "Sony NEWS
 namespace
 {
 	constexpr int MMU_ENTRY_COUNT = 0x800;
+
+	// Bus error status definitions
+	constexpr uint8_t INVALID_ENTRY = 1 << 4;
+	constexpr uint8_t TAG_MISMATCH = 1 << 3;
+	constexpr uint8_t PROTECTION_VIOLATION = 1 << 2;
+	constexpr uint8_t MODIFIED = 1 << 1;
 }
 
 news_020_mmu_device::news_020_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -163,28 +169,27 @@ uint32_t news_020_mmu_device::hyperbus_r(offs_t offset, uint32_t mem_mask, bool 
 		if (!(pte & 0x80000000) && !(pte & 0x02000000))
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) -> invalid page\n", machine().describe_context(), offset, vpgnum, pte, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0)); // TODO: better log message
-			// machine().debug_break();
-			m_bus_error(offset, mem_mask, false, 0x10);
+			m_bus_error(offset, mem_mask, false, INVALID_ENTRY);
 		}
 		else if (tag != vpgnum)
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r 0x%08x (pg 0x%08x, pte 0x%08x) -> tag mismatch 0x%x != 0x%x \n", machine().describe_context(), offset, vpgnum, pte, tag, vpgnum, is_supervisor); // TODO: better log message
-			m_bus_error(offset, mem_mask, false, 0x8);
+			m_bus_error(offset, mem_mask, false, TAG_MISMATCH);
 		}
 		else if ((!system && !(pte & 0x08000000)) && !is_supervisor) // user memory protection violation
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) user protection violation\n", machine().describe_context(), offset, vpgnum, pte, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
-			m_bus_error(offset, mem_mask, false, 0x4);
+			m_bus_error(offset, mem_mask, false, PROTECTION_VIOLATION);
 		}
 		else if ((system && !(pte & 0x20000000)) && is_supervisor) // kernel memory protection violation
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) kernel protection violation\n", machine().describe_context(), offset, vpgnum, pte, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
-			m_bus_error(offset, mem_mask, false, 0x4);
+			m_bus_error(offset, mem_mask, false, PROTECTION_VIOLATION);
 		}
 		else if (!(pte & 0x80000000) && (pte & 0x02000000))
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) hyperbus_r fill on demand page addr = 0x%x pte = 0x%x\n", machine().describe_context(), offset, pte);
-			m_bus_error(offset, mem_mask, false, 0x10);
+			m_bus_error(offset, mem_mask, false, INVALID_ENTRY);
 		}
 		else
 		{
@@ -215,32 +220,32 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 		if (!(pte & 0x80000000) && !(pte & 0x02000000))
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x) -> invalid page (page % 400 = 0x%x, data = 0x%x pte = 0x%x) as supervisior? %d\n", machine().describe_context(), offset, vpgnum, vpgnum % MMU_ENTRY_COUNT, data, pte, is_supervisor);
-			m_bus_error(offset, mem_mask, true, 0x10); // should M be set here too?
+			m_bus_error(offset, mem_mask, true, INVALID_ENTRY); // should M be set here too?
 		}
 		else if (tag != vpgnum)
 		{
 			// TODO: update below log message
 			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x) -> tag mismatch 0x%x != 0x%x\n", machine().describe_context(), offset, vpgnum, vpgnum % MMU_ENTRY_COUNT, tag, vpgnum);
-			m_bus_error(offset, mem_mask, true, 0x8); // should M be set here too?
+			m_bus_error(offset, mem_mask, true, TAG_MISMATCH); // should M be set here too?
 
 		}
 		// TODO: order of operations between checking valid and access bits?
 		else if ((!system && !(pte & 0x10000000)) && !is_supervisor) // user memory protection violation
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) user protection violation\n", machine().describe_context(), offset, vpgnum, pte, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
-			m_bus_error(offset, mem_mask, true, 0x4);
+			m_bus_error(offset, mem_mask, true, PROTECTION_VIOLATION);
 		}
 		else if ((system && !(pte & 0x40000000)) && is_supervisor) // kernel memory protection violation
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) mmu w 0x%08x (pg 0x%08x, pte 0x%08x, index 0x%x) kernel protection violation\n", machine().describe_context(), offset, vpgnum, pte, (vpgnum % MMU_ENTRY_COUNT) + (system ? MMU_ENTRY_COUNT : 0x0));
-			m_bus_error(offset, mem_mask, true, 0x4);
+			m_bus_error(offset, mem_mask, true, PROTECTION_VIOLATION);
 		}
 		else if (pte & 0x54000000) // writeable or entered as modified into the table by the OS already
 		{
 			if (!(pte & 0x80000000) && (pte & 0x02000000))
 			{
 				LOGMASKED(LOG_DATA, "(%s) fill on demand page write addr = 0x%x pte = 0x%x\n", machine().describe_context(), offset, pte);
-				m_bus_error(offset, mem_mask, true, 0x10); // 0x2 (first M?) or 0x10 (invalid page)?
+				m_bus_error(offset, mem_mask, true, INVALID_ENTRY); // 0x2 (first M?) or 0x10 (invalid page)?
 			}
 			else
 			{
@@ -259,14 +264,14 @@ void news_020_mmu_device::hyperbus_w(offs_t offset, uint32_t data, uint32_t mem_
 					{
 						m_mmu_user_ram[vpgnum % MMU_ENTRY_COUNT] |= 0x04000000;
 					}
-					m_bus_error(offset, mem_mask, true, 0x2); // should this be set?
+					m_bus_error(offset, mem_mask, true, MODIFIED);
 				}
 			}
 		}
 		else
 		{
 			LOGMASKED(LOG_MAP_ERROR, "(%s) write to read-only page 0x%x because it was not set as writable (pte = 0x%x)\n", machine().describe_context(), vpgnum, pte);
-			m_bus_error(offset, mem_mask, true, 0x4);
+			m_bus_error(offset, mem_mask, true, PROTECTION_VIOLATION);
 		}
 	}
 }
