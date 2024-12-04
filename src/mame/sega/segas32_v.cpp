@@ -17,9 +17,8 @@
       The theory is that opaque pens should go above background layer and
       behind everything else like System 24.
 
-    - radr uses $1A0 as the X center for zooming; however, this
-      contradicts the theory that bit 9 is a sign bit. For now, the code
-      assumes that the X center has 10 bits of resolution.
+    - Verify that X/Y center has 10 bits of resolution when zooming and
+      9 when not.
 
     - In svf (the field) and radr (on the field), they use tilemap-specific
       flip in conjunction with rowscroll AND rowselect. According to Charles,
@@ -740,8 +739,8 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, segas32_state::la
 	srcy += (m_videoram[0x1ff14/2 + 4 * bgnum] & 0xfe00) << 4;
 
 	/* then account for the destination center coordinates */
-	srcx_start -= util::sext(m_videoram[0x1ff30/2 + 2 * bgnum] & 0x1ff, 10) * srcxstep;
-	srcy -= util::sext(m_videoram[0x1ff32/2 + 2 * bgnum], 9) * srcystep;
+	srcx_start -= util::sext(m_videoram[0x1ff30/2 + 2 * bgnum] & 0x1ff, (dstxstep != 0x200)?10:9) * srcxstep;
+	srcy -= util::sext(m_videoram[0x1ff32/2 + 2 * bgnum], (dstystep != 0x200)?10:9) * srcystep;
 
 	/* finally, account for destination top,left coordinates */
 	srcx_start += cliprect.min_x * srcxstep;
