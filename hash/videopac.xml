@@ -2147,7 +2147,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		</part>
 	</software>
 
-	<software name="spaans">
+	<software name="spaans" supported="partial">
 		<description>Spaans (Europe, prototype)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -2569,6 +2569,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		<publisher>Brandt</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
+			<feature name="b_pin" value="1" />
 			<dataarea name="rom" size="0x2000">
 				<rom name="pr_syracusepl.bin" size="0x2000" crc="38269d8b" sha1="f57d17a9b5f8346ab67f6c46f82b4e8c70c80c9e" />
 			</dataarea>
