@@ -28,7 +28,8 @@ To Do:
 metlclsh:
 - Clocks are all unknown
 - Text on the title screen has wrong colors the first time around
-  (uninitialized foreground palette 1, will be initialized shortly)
+  (uninitialized foreground palette 1, will be initialized shortly, verify
+   on PCB)
 - The background tilemap RAM is bankswitched with other (not understood) RAM
 - There are a few unknown writes
 
@@ -611,10 +612,8 @@ void metlclsh_state::metlclsh(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(58);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate. We're using PORT_VBLANK
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 1*8, 30*8-1);
+	// assume standard DECO video CRTC, unverified
+	screen.set_raw(XTAL(12'000'000)/2,384,0,256,272,8,248);
 	screen.set_screen_update(FUNC(metlclsh_state::screen_update));
 	screen.set_palette(m_palette);
 

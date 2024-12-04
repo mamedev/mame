@@ -325,7 +325,7 @@ public:
 	auto lic() { return m_lic_func.bind(); }
 };
 
-// ======================> m6809_device (LEGACY)
+// ======================> m6809_device (LEGACY, pinpoint if MC6809 or MC6809E)
 
 class m6809_device : public m6809_base_device
 {
