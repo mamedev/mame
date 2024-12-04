@@ -630,14 +630,14 @@ namespace
 
     void news_iop_state::astreset_w(uint8_t data)
     {
-        LOG("(%s) AST_RESET 0x%x\n", machine().describe_context(), data);
+        LOGMASKED(LOG_ALL_INTERRUPT, "(%s) AST_RESET 0x%x\n", machine().describe_context(), data);
         // TODO: Implement AST
         int_check_cpu();
     }
 
     void news_iop_state::astset_w(uint8_t data)
     {
-        LOG("(%s) AST_SET 0x%x as %s\n", machine().describe_context(), data, m_cpu->supervisor_mode() ? "supervisor" : "user");
+        LOGMASKED(LOG_ALL_INTERRUPT, "(%s) AST_SET 0x%x as %s\n", machine().describe_context(), data, m_cpu->supervisor_mode() ? "supervisor" : "user");
         // TODO: Implement AST
         int_check_cpu();
     }
@@ -926,7 +926,7 @@ namespace
             // LOGMASKED(LOG_MEMORY, "Suppressing cpu bus error at offset 0x%x mask 0x%x r/w %s status 0x%x pc 0x%x", offset, mem_mask, write ? "w" : "r", status, m_cpu->pc());
             return;
         }
-        // TODO: is this needed?
+        // TODO: is this needed? also, accessing_bits macro is maybe not right because 8 bit access will also trigger it
         // LOG("bus error at %08x & %08x (%s)\n", offset, mem_mask, rw ? "read" : "write");
         if (!ACCESSING_BITS_16_31) // what to do about 8 bit access?
         {
