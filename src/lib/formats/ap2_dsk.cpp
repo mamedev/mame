@@ -437,11 +437,11 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 		uint8_t sectdata[APPLE2_SECTOR_SIZE*16];
 		memset(sectdata, 0, sizeof(sectdata));
 		int nsect = 16;
-		if constexpr (VERBOSE_SAVE) {
+		if(VERBOSE_SAVE) {
 			fprintf(stderr,"DEBUG: a2_16sect_format::save() about to generate bitstream from track %d...", track);
 		}
 		auto buf = generate_bitstream_from_track(track, head, 3915, image);
-		if constexpr (VERBOSE_SAVE) {
+		if(VERBOSE_SAVE) {
 			fprintf(stderr,"done.\n");
 		}
 		int pos = 0;
@@ -475,10 +475,10 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 				uint8_t tr = gcr4_decode(h[2],h[3]);
 				uint8_t se = gcr4_decode(h[4],h[5]);
 				uint8_t chk = gcr4_decode(h[6],h[7]);
-				if constexpr (VERBOSE_SAVE) {
+				if(VERBOSE_SAVE) {
 					uint32_t post = get_u24be(&h[8]);
 					printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n",
-						vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
+							vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
 				}
 				// sanity check
 				if (tr == track && se < nsect) {
@@ -544,15 +544,14 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 							// but only write it if the bitfield of the track shows datagood is NOT set.
 							// if it is set we don't want to overwrite a guaranteed good read with a bad one
 							// if past read had a bad checksum or bad postamble...
-							if constexpr (USE_OLD_BEST_SECTOR_PRIORITY) {
+							if(USE_OLD_BEST_SECTOR_PRIORITY) {
 								if ((visualgrid[se][track]&DATAGOOD)==0) {
 									for(int i=0x56; i<0x156; i++) {
 										uint8_t dv = data[i];
 										*dest++ = dv;
 									}
 								}
-							}
-							else {
+							} else {
 								if (((visualgrid[se][track]&DATAGOOD)==0)||((visualgrid[se][track]&DATAPOST)==0)) {
 									// if the current read is good, and postamble is good, write it in, no matter what.
 									// if the current read is good and the current postamble is bad, write it in unless the postamble was good before
@@ -572,10 +571,10 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 								}
 							}
 							// do some checking
-							if constexpr (VERBOSE_SAVE) {
+							if(VERBOSE_SAVE) {
 								if ((data[0x156] != c) || (dpost&0xFFFF00)!=0xDEAA00)
 									fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n",
-										data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
+											data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
 							}
 							if (data[0x156] == c) visualgrid[se][track] |= DATAGOOD;
 							if ((dpost&0xFFFF00)==0xDEAA00) visualgrid[se][track] |= DATAPOST;
@@ -603,7 +602,7 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 		//printf("\n");
 	}
 	// display a little table of which sectors decoded ok
-	if constexpr (VERBOSE_SAVE) {
+	if(VERBOSE_SAVE) {
 		int total_good = 0;
 		for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
 			printf("T%2d: ",j);
