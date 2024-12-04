@@ -473,7 +473,7 @@ TIMER_CALLBACK_MEMBER(ef9340_1_device::draw_scanline)
 	else
 	{
 		for (int i = 0; i < 40 * 8; i++)
-			m_tmp_bitmap.pix(m_offset_y + vpos, m_offset_x + i) = 8;
+			m_tmp_bitmap.pix(m_offset_y + vpos, m_offset_x + i) = 0;
 	}
 
 	// determine next h parity
