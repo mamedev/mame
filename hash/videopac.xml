@@ -1604,6 +1604,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="gtwallst">
+		<!-- board game -->
 		<description>The Great Wall Street Fortune Hunt (Europe, USA)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
