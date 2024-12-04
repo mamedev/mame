@@ -492,7 +492,7 @@ void dt7_state::draw_tx_tilemap(screen_device& screen, bitmap_ind16& bitmap, con
 		m_tx_tilemap[table/2]->set_scrolly(0, scroll1 - y);
 		m_tx_tilemap[table/2]->draw(screen, bitmap, clip, 0);
 	}
- }
+}
 
 u32 dt7_state::screen_update_dt7_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
