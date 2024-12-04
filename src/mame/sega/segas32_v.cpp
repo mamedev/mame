@@ -739,7 +739,7 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, segas32_state::la
 	srcy += (m_videoram[0x1ff14/2 + 4 * bgnum] & 0xfe00) << 4;
 
 	/* then account for the destination center coordinates */
-	srcx_start -= util::sext(m_videoram[0x1ff30/2 + 2 * bgnum] & 0x1ff, (dstxstep != 0x200)?10:9) * srcxstep;
+	srcx_start -= util::sext(m_videoram[0x1ff30/2 + 2 * bgnum], (dstxstep != 0x200)?10:9) * srcxstep;
 	srcy -= util::sext(m_videoram[0x1ff32/2 + 2 * bgnum], (dstystep != 0x200)?10:9) * srcystep;
 
 	/* finally, account for destination top,left coordinates */
