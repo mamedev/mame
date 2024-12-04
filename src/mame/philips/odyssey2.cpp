@@ -55,10 +55,15 @@ TODO:
 - backgamm doesn't draw all the chars/sprites, it does multiple screen updates
   and writes to the ptr/color registers, but does not increment the Y regs.
   Does it (ab)use an undocumented 8245 feature?
-- g7400 helicopt sometimes locks up at the sea level, timing or IRQ related?
+- G7400 helicopt sometimes locks up at the sea level, timing or IRQ related?
+- testcartpl is French instead of English on G7400. It's due to inaccurate mcs48
+  timer emulation. It sets up the timer to trigger an IRQ exactly 32 cycles later,
+  but MAME is 2 cycles (or 1 opcode) too early, and a language check fails. It
+  uses the internal timer, not the T1 timer, so it works reliably on the real
+  console. Set bp 41a in the debugger to see.
 - spaans has a keyboard debounce issue: if you push and hold a key after the game
   revealed the answer, it will be entered in the next input field. It's a prototype
-  so it wouldn't be surprising there are bugs, but this issue does not happen on
+  so it wouldn't be surprising if there are bugs, but this issue does not happen on
   a real Videopac or Odyssey 2. It's probably video timing related.
 - screen resolution is not strictly defined, height(243) is correct, but
   horizontal overscan differs depending on monitor/tv? see syracuse for overscan
@@ -78,8 +83,8 @@ TODO:
     to inaccurate PAL video timing. The game does mid-scanline video updates.
   * gtwallst turns the display on too soon, the middle scroller is partially
     visible when it's not supposed to (also a bit glitchy on NTSC but not as bad)
-- g7400 probably has different video timing too (not same as g7000)
-- 4in1 and musician are not supposed to work on g7400, but work fine on MAME,
+- G7400 probably has different video timing too (not same as G7000)
+- 4in1 and musician are not supposed to work on G7400, but work fine on MAME,
   caused by bus conflict or because they write to P2?
 - according to tests, 8244 does not have a sound interrupt, but the Philips
   service test cartridge for 8245 tests for it and fails if it did not get an irq
@@ -101,7 +106,7 @@ BTANB:
 - a lot of PAL games have problems on NTSC (the other way around, not so much)
   * most-common cause is due to shorter vblank, less time to prepare frame
   * characters are not rendered near upper border on 8244 (eg. tutank, chezmxme)
-- g7400 games don't look correct on odyssey3 and vice versa: ef934x graphics are
+- G7400 games don't look correct on odyssey3 and vice versa: ef934x graphics are
   placed lower on odyssey3
 - Blackjack (Videopac 5) does not work on G7400, caused by a removed BIOS routine
 - due to different XTAL ratio on Jopac JO7400, some games that do mid-screen video

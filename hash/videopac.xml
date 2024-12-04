@@ -18,7 +18,6 @@ TODO:
 - add serials for radiola and jopacs
 
 Undumped (or dumped but not public):
-- G7400 service test cartridge
 - misc. homebrew cartridges
 
 Protos:
@@ -2108,7 +2107,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="testcart">
-		<!-- not a consumer product, factory test rom -->
+		<!-- not a consumer product, factory test cartridge -->
 		<description>Service Test Cartridge (Europe)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
@@ -2550,6 +2549,21 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		</part>
 	</software>
 
+	<software name="testcartpl" cloneof="testcart" supported="partial">
+		<!-- not a consumer product, factory test cartridge -->
+		<description>Service Test Cartridge (Europe, plus)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="See testcart, and at end of normal tests, press both joystick buttons to continue." />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rally" />
+			<feature name="b_pin" value="1" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="testcartpl.bin" size="0x2000" crc="b72b1494" sha1="fb281a5e4c7664209106f94e463d9017751712b5" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stonepl" cloneof="stone">
 		<description>Stone Sling (Europe, plus)</description>
 		<year>198?</year>
@@ -2564,7 +2578,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 	</software>
 
 	<software name="syracusepl" cloneof="syracuse">
-		<description>Syracuse (France, plus, prototype)</description>
+		<description>Syracuse+ (France, plus, prototype)</description>
 		<year>198?</year>
 		<publisher>Brandt</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -2642,7 +2656,7 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		<description>Norseman (Europe)</description>
 		<year>1983</year>
 		<publisher>GST Video</publisher>
-		<info name="programmer" value="Andy Eltisand Jake Dowding" />
+		<info name="programmer" value="Andy Eltisand, Jake Dowding" />
 		<info name="serial" value="57" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />

@@ -433,7 +433,7 @@ void i8244_device::write_cx(int x, bool cx)
 {
 	if (cx)
 	{
-		u8 colx = m_collision_map[x] & 0x3f;
+		u8 colx = m_collision_map[x];
 
 		// check if we collide with an already drawn source object
 		if (colx)
@@ -451,9 +451,7 @@ void i8244_device::write_cx(int x, bool cx)
 
 		// check if an already drawn object would collide with us
 		if (m_vdc.s.collision & 0x40)
-		{
 			m_collision_status |= colx;
-		}
 	}
 }
 
