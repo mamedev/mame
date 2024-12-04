@@ -46,17 +46,12 @@
  * - NWS-921: Feb 1988, 4x 286MB HDD
  *
  * References:
- *  - NWS-1960 Service Guide (much of the second generation dual-030 platform design is the same)
+ *  - NWS-1960 Service Guide
  *  - http://bitsavers.org/pdf/sony/news/Sony_NEWS_Technical_Manual_3ed_199103.pdf
  *  - https://katsu.watanabe.name/doc/sonynews/model.html
  *
- *  TODO: remove this unless I can test it more
- *  Note: The unsupported systems can be emulated by altering the ID-ROM data to tell the ROM which model it is, however,
- *        there is no guarantee that this ROM has full support for any other configuration. Therefore, the other
- *        models are marked as having no firmware dumps until/unless it can be verified that the other models
- *        actually shipped with the same ROMs but with different ID-ROM data.
- *
  * TODO:
+ *   - Investigate why clean shutdown still causes root part to have to be recovered
  *   - MMU emulation improvements (are all the right status bits set? any missing features? etc)
  *   - System cache emulation
  *   - Expansion slots (I/O Bus and VMEBus)
@@ -66,7 +61,7 @@
  *     an '030 machine (NWS-1960) so there are some accuracy improvements needed for the '020 machines,
  *     especially since the '020 machines have a custom MMU. The '030 machines don't need it, so there
  *     is no information on it in the 1960 service manual.
- *   - hyperbus handshake for IOP and CPU accesses. The bus has arbitration circuitry to prevent bus contention when both the CPU and IOP are trying to access the hyperbus (RAM and VME)
+ *   - Hyperbus handshake for IOP and CPU accesses. The bus has arbitration circuitry to prevent bus contention when both the CPU and IOP are trying to access the hyperbus (RAM and VME)
  */
 
 #include "emu.h"
@@ -97,9 +92,6 @@
 #include "machine/z80scc.h"
 #include "machine/bankdev.h"
 
-#include <bitset>
-#include <queue>
-
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_ALL_INTERRUPT (1U << 2)
 #define LOG_LED (1U << 3)
@@ -109,7 +101,7 @@
 #define LOG_TIMER (1U << 7)
 #define LOG_SCSI (1U << 8)
 
-// #define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
 
@@ -165,7 +157,7 @@ namespace
             LANCE = 3,          // Ethernet controller interrupts
             CPU = 4,            // Interrupt for interprocessor communication from CPU
             SCC = 5,            // Serial communication
-            TIMEOUT_FDCIRQ = 6, // Both timer and FDCIRQ feed IRQ6
+            TIMEOUT_FDCIRQ = 6, // Both timer and FDCIRQ feed IRQ6 TODO: Confirm that NWS800 also uses IOP timeout...
             FDCDRQ = 7,         // DRQ signal from FDC
             SCC_PERIPHERAL = 99 // hack to differentiate SCC interrupts better
         };
@@ -208,7 +200,6 @@ namespace
         uint8_t rtcreg_r();
         void rtcreg_w(uint8_t data);
         void rtcsel_w(uint8_t data);
-        // void scsi_reg_w(offs_t offset, uint8_t data);
         uint32_t scsi_dma_r(offs_t offset, uint32_t mem_mask);
         void scsi_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask);
         void scsi_drq_handler(int status);
@@ -280,9 +271,6 @@ namespace
         uint8_t m_cpu_bus_error_status = 0;
         // uint8_t m_iop_bus_error_status = 0;
         uint8_t m_rtc_data = 0;
-
-        // std::queue<uint8_t> scsi_dma_buffer;
-        // int scsi_trx_width = 0;
     };
 
     void news_iop_state::machine_start()
@@ -482,34 +470,6 @@ namespace
         m_rtc->cs2_w(0);
     }
 
-    // void news_iop_state::scsi_reg_w(offs_t offset, uint8_t data)
-    // {
-    //     if (offset == 7)
-    //     {
-    //         // starting read transaction, pause IOP and prime the read buffer to avoid BERRs
-    //         // Things go off the rails if a BERR happens, even though the iopboot bus error
-    //         // handler has some SCSI code in it. The bus error mechanism relies on many details
-    //         // from how the 68020 handles 32 bit read/writes on 8 bit devices, so this avoids the issue.
-    //         LOGMASKED(LOG_SCSI, "Starting SCSI DMA trx! (%s)\n", machine().describe_context());
-    //         scsi_trx_width = 4;
-    //         m_iop->suspend(SUSPEND_REASON_HALT, true);
-    //     }
-    //     else if (offset == 2)
-    //     {
-    //         // Reset trx width on dma stop
-    //         if (!BIT(data, 1))
-    //         {
-    //             scsi_trx_width = 0;
-    //             if (scsi_dma_buffer.size() != 0)
-    //             {
-    //                 LOGMASKED(LOG_SCSI, "Warning: Data left in buffer! (%s)\n", machine().describe_context());
-    //                 std::queue<unsigned char>().swap(scsi_dma_buffer);
-    //             }
-    //         }
-    //     }
-    //     m_scsi->write(offset, data);
-    // }
-
     uint32_t news_iop_state::scsi_dma_r(offs_t offset, uint32_t mem_mask)
     {
         uint32_t result = 0;
@@ -535,69 +495,11 @@ namespace
             fatalerror("scsi_dma_r: unknown mem_mask %08x\n", mem_mask);
         }
         return result;
-
-        // LOG("read offset 0x%x mem_mask 0x%x mem_mask_count = 0x%x\n", offset, mem_mask, std::bitset<32>(mem_mask).count());
-        // if (mem_mask == 0xff000000)
-        // {
-        //     // byte access
-        //     if (scsi_trx_width == 0)
-        //     {
-        //         fatalerror("scsi dma: wrong mode");
-        //         return 0u;
-        //     }
-        //     else if (scsi_trx_width == 4 || scsi_dma_buffer.size() > 0)
-        //     {
-        //         LOGMASKED(LOG_SCSI, "Flushing buffer before switching to byte access...\n");
-        //         scsi_trx_width = 1; // switch to byte access mode - one at a time for timing purposes
-        //         uint32_t data = scsi_dma_buffer.front();
-        //         scsi_dma_buffer.pop();
-        //         return data << 24;
-        //     }
-        //     else
-        //     {
-        //         if (!(m_scsi->read(5) & 0x40)) // bas_r
-        //         {
-        //             fatalerror("scsi dma: no data!");
-        //         }
-
-        //         LOGMASKED(LOG_SCSI, "Getting DMA byte!\n");
-        //         uint32_t data = m_scsi->dma_r();
-        //         return data << 24;
-        //     }
-        // }
-        // else if (mem_mask == 0xffffffff)
-        // {
-        //     // This nasty-looking function is to deal with the way the 68020 and SCSI signals are abused in NEWS-OS 4's iopboot routines
-        //     if (scsi_dma_buffer.size() == 3)
-        //     {
-        //         uint32_t data = scsi_dma_buffer.front() << 24;
-        //         scsi_dma_buffer.pop();
-        //         data |= (scsi_dma_buffer.front() << 16);
-        //         scsi_dma_buffer.pop();
-        //         data |= (scsi_dma_buffer.front() << 8);
-        //         scsi_dma_buffer.pop();
-        //         data |= m_scsi->dma_r(); // TODO: guard this with appropriate status check
-
-        //         // scsi_trx_width = 0;
-        //         m_scsi_intst = m_scsi->read(5) & 0x40; // bas_r
-        //         int_check_iop();
-        //         return data;
-        //     }
-        //     else
-        //     {
-        //         fatalerror("scsi_dma_r: invalid buffer count 0x%x", scsi_dma_buffer.size());
-        //     }
-        // }
-        // else
-        // {
-        //     fatalerror("scsi_dma_r: unexpected transaction width");
-        // }
     }
 
     void news_iop_state::scsi_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
     {
-        // LOG("(%s) scsi_dma_w(0x%x, 0x%x, 0x%x) called\n", machine().describe_context(), offset, data, mem_mask);
-        switch (mem_mask)
+       switch (mem_mask)
         {
         case 0xff000000:
             m_scsi_dma->write_wrapper(true, 0, data >> 24);
@@ -619,76 +521,11 @@ namespace
             fatalerror("scsi_drq_w: unknown mem_mask %08x\n", mem_mask);
             break;
         }
-        
-        // if (mem_mask == 0xff000000)
-        // {
-        //     // byte access
-        //     if (scsi_trx_width == 0)
-        //     {
-        //         m_scsi->dma_w((data >> 24) & 0xff);
-        //     }
-        //     else
-        //     {
-        //         fatalerror("scsi_dma_w: tried to switch from 32 to 8 in the middle of a transfer");
-        //     }
-        // }
-        // else if (mem_mask == 0xffffffff)
-        // {
-        //     if (scsi_trx_width > 0 || scsi_dma_buffer.size() != 0)
-        //     {
-        //         fatalerror("scsi_dma_w: tried to switch from read to write");
-        //     }
-
-        //     if (!(m_scsi->read(5) & 0x40)) // bas_r
-        //     {
-        //         fatalerror("scsi_dma_w: not ready for data");
-        //     }
-
-        //     // Halt I/O Processor to avoid having to deal with the bus error synchronization
-        //     m_iop->suspend(SUSPEND_REASON_HALT, true);
-
-        //     // Setup DMA buffer
-        //     scsi_trx_width = -3;
-        //     scsi_dma_buffer.push((data >> 16) & 0xff);
-        //     scsi_dma_buffer.push((data >> 8) & 0xff);
-        //     scsi_dma_buffer.push(data & 0xff);
-
-        //     // Send byte
-        //     m_scsi->dma_w((data >> 24) & 0xff);
-        // }
-        // else
-        // {
-        //     fatalerror("scsi_dma_w: unexpected transaction width");
-        // }
     }
 
     void news_iop_state::scsi_drq_handler(int status)
     {
         LOGMASKED(LOG_SCSI, "SCSI DRQ changed to 0x%x\n", status);
-        // if (status && scsi_trx_width == 4 && scsi_dma_buffer.size() < 3)
-        // {
-        //     LOGMASKED(LOG_SCSI, "Absorbing into buffer\n", status);
-        //     scsi_dma_buffer.push(m_scsi->dma_r());
-        // }
-        // else if (status && scsi_trx_width == 4 && scsi_dma_buffer.size() == 3)
-        // {
-        //     LOGMASKED(LOG_SCSI, "3 bytes of data are buffered and DRQ is asserted - resuming IOP to execute DMA trx\n");
-        //     m_iop->resume(SUSPEND_REASON_HALT);
-        // }
-        // else if (status && scsi_trx_width < 0 && scsi_dma_buffer.size() > 0)
-        // {
-        //     LOGMASKED(LOG_SCSI, "Writing next byte!\n");
-        //     uint8_t next_byte = scsi_dma_buffer.front();
-        //     scsi_dma_buffer.pop();
-        //     scsi_trx_width++;
-        //     m_scsi->dma_w(next_byte);
-        //     if (scsi_trx_width == 0)
-        //     {
-        //         LOGMASKED(LOG_SCSI, "Write trx complete, resuming IOP\n");
-        //         m_iop->resume(SUSPEND_REASON_HALT);
-        //     }
-        // }
-
         m_scsi_intst = status; // can be masked, unlike SCSI IRQ
         m_scsi_dma->drq_w(status);
         int_check_iop();
@@ -886,7 +723,7 @@ namespace
     {
         if (Number != TIMEOUT_FDCIRQ)
         {
-            LOG("iop irq number %d state %d\n", Number, state);
+            LOGMASKED(LOG_INTERRUPT, "iop irq number %d state %d\n", Number, state);
         }
 
         int shift = Number == SCC_PERIPHERAL ? SCC : Number;
@@ -926,7 +763,7 @@ namespace
             {
                 // if (i != 6)
                 // {
-                    LOG("Setting IOP input line %d to %d (%d)\n", interrupt_map[i], state ? 1 : 0, i);
+                    LOGMASKED(LOG_INTERRUPT, "Setting IOP input line %d to %d (%d)\n", interrupt_map[i], state ? 1 : 0, i);
                 // }
                 m_iop_int_state[i] = state;
                 m_iop->set_input_line(interrupt_map[i], state ? 1 : 0);
@@ -992,7 +829,7 @@ namespace
 
         if (m_cpu_timerenc && m_cpu_timerout)
         {
-            LOG("Setting CPU timer interrupt!\n");
+            // LOG("Setting CPU timer interrupt!\n");
             m_cpu->set_input_line(INPUT_LINE_IRQ6, 1);
         }
         else

@@ -20,12 +20,23 @@
  * what iopboot expects when the bus error handler and processor routines successfully read in a longword.
  *
  * Thanks to AJR - the macscsi helper was easy to modify for this!
+ * There are two key differences between this and the macscsi helper.
+ * 1. The IRQ signal is used by NEWS, and the timing is important. Therefore, IRQs are suppressed until the FIFO is drained by the IOP
+ *    so that the timing of IRQ can be preserved. Phase change interrupts, for example, will happen as soon as the FIFO is filled and 
+ *    there are no bytes left to transfer, which will interrupt the IOP too early.
+ * 2. iopboot does not check DRQ before trying to read from the SCSI controller, because its BERR handler
+ *    has a retry loop built in, so it doesn't care if the SCSI chip is ready or not. Because of this, the helper will
+ *    automatically transition to filling the FIFO once DRQ is active if iopboot primed the controller for reading.
  */
 
 #include "emu.h"
 #include "news_iop_scsi.h"
 
-#define VERBOSE (LOG_GENERAL)
+#define LOG_DATA (1U << 1)
+#define LOG_DRQ (1U << 2)
+#define LOG_IRQ (1U << 3)
+
+// #define VERBOSE (LOG_GENERAL|LOG_DRQ|LOG_IRQ)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NEWS_IOP_SCSI_HELPER, news_iop_scsi_helper_device, "news_iop_scsi_dma", "Sony NEWS SCSI DMA Helper")
@@ -65,6 +76,7 @@ void news_iop_scsi_helper_device::device_start()
     save_item(NAME(m_write_fifo_bytes));
     save_item(NAME(m_read_fifo_data));
     save_item(NAME(m_write_fifo_data));
+    save_item(NAME(m_irq));
 }
 
 void news_iop_scsi_helper_device::device_reset()
@@ -81,7 +93,7 @@ void news_iop_scsi_helper_device::read_fifo_process()
 
     u8 data = m_scsi_dma_read_callback(6);
     ++m_read_fifo_bytes;
-    LOG("Read byte %02X into FIFO (%d/4 filled)\n", data, m_read_fifo_bytes);
+    LOGMASKED(LOG_DATA, "Read byte %02X into FIFO (%d/4 filled)\n", data, m_read_fifo_bytes);
     m_read_fifo_data |= u32(data) << (32 - m_read_fifo_bytes * 8);
     if (m_read_fifo_bytes != 4)
     {
@@ -99,7 +111,7 @@ void news_iop_scsi_helper_device::write_fifo_process()
     assert(m_write_fifo_bytes != 0);
     --m_write_fifo_bytes;
     u8 data = BIT(m_write_fifo_data, m_write_fifo_bytes * 8, 8);
-    LOG("Write byte %02X from FIFO (%d left)\n", data, m_write_fifo_bytes);
+    LOGMASKED(LOG_DATA, "Write byte %02X from FIFO (%d left)\n", data, m_write_fifo_bytes);
     m_scsi_dma_write_callback(0, data);
 
     if (m_write_fifo_bytes != 0)
@@ -115,7 +127,7 @@ void news_iop_scsi_helper_device::write_fifo_process()
 
 void news_iop_scsi_helper_device::drq_w(int state)
 {
-    LOG("drq_w(0x%x)\n", state);
+    LOGMASKED(LOG_DRQ, "drq_w(0x%x)\n", state);
     if (state)
     {
         if (m_mode == mode::READ_DMA && m_read_fifo_bytes < 4)
@@ -130,7 +142,7 @@ void news_iop_scsi_helper_device::drq_w(int state)
         {
             m_mode = mode::READ_DMA;
             m_read_fifo_data = u32(m_scsi_dma_read_callback(6)) << 24;
-            LOG("%s: Pseudo-DMA read started from DRQ: first byte = %02X\n", machine().describe_context(), m_read_fifo_data >> 24);
+            LOGMASKED(LOG_DATA, "%s: Pseudo-DMA read started from DRQ: first byte = %02X\n", machine().describe_context(), m_read_fifo_data >> 24);
             m_read_fifo_bytes = 1;
             m_pseudo_dma_timer->adjust(m_timeout);
             m_iop_halt_callback(ASSERT_LINE);
@@ -140,12 +152,12 @@ void news_iop_scsi_helper_device::drq_w(int state)
 
 void news_iop_scsi_helper_device::irq_w(int state)
 {
-    LOG("irq_w(0x%x)\n", state);
+    LOGMASKED(LOG_IRQ, "irq_w(0x%x)\n", state);
     m_irq = state > 0;
     if (m_irq && (m_read_fifo_bytes != 0 || m_write_fifo_bytes != 0))
     {
-        LOG("Gating IRQ\n");
-        m_mode = mode::IRQ_GATE;
+        LOGMASKED(LOG_IRQ, "Gating IRQ\n");
+        m_mode = mode::IRQ_FIFO_DRAIN;
         m_irq_out_callback(false);
     }
     else 
@@ -192,7 +204,7 @@ void news_iop_scsi_helper_device::dma_stop()
 
 u8 news_iop_scsi_helper_device::read_wrapper(bool pseudo_dma, offs_t offset)
 {
-    LOG("read_wrapper(%s, 0x%x)\n", pseudo_dma ? "true" : "false", offset);
+    LOGMASKED(LOG_DATA, "read_wrapper(%s, 0x%x)\n", pseudo_dma ? "true" : "false", offset);
     u8 data = BAD_BYTE;
     switch (offset & 7)
     {
@@ -217,7 +229,7 @@ u8 news_iop_scsi_helper_device::read_wrapper(bool pseudo_dma, offs_t offset)
             {
                 m_mode = mode::READ_DMA;
                 m_read_fifo_data = u32(m_scsi_dma_read_callback(6)) << 24;
-                LOG("%s: Pseudo-DMA read started: first byte = %02X\n", machine().describe_context(), m_read_fifo_data >> 24);
+                LOGMASKED(LOG_DATA, "%s: Pseudo-DMA read started: first byte = %02X\n", machine().describe_context(), m_read_fifo_data >> 24);
                 m_read_fifo_bytes = 1;
                 m_pseudo_dma_timer->adjust(m_timeout);
                 m_iop_halt_callback(ASSERT_LINE);
@@ -242,20 +254,20 @@ u8 news_iop_scsi_helper_device::read_wrapper(bool pseudo_dma, offs_t offset)
             if (!machine().side_effects_disabled())
             {
                 --m_read_fifo_bytes;
-                LOG("%s: CPU read byte %02X from FIFO (%d left)\n", machine().describe_context(), data, m_read_fifo_bytes);
+                LOGMASKED(LOG_DATA, "%s: CPU read byte %02X from FIFO (%d left)\n", machine().describe_context(), data, m_read_fifo_bytes);
                 m_read_fifo_data <<= 8;
-                if (BIT(m_scsi_read_callback(5), 6) && m_mode != mode::IRQ_GATE)
+                if (BIT(m_scsi_read_callback(5), 6) && m_mode != mode::IRQ_FIFO_DRAIN)
                 {
                     read_fifo_process();
                 }
-                else if (!m_pseudo_dma_timer->enabled() && m_mode != mode::IRQ_GATE)
+                else if (!m_pseudo_dma_timer->enabled() && m_mode != mode::IRQ_FIFO_DRAIN)
                 {
                     m_pseudo_dma_timer->adjust(m_timeout);
                     m_iop_halt_callback(ASSERT_LINE);
                 }
-                else if (m_read_fifo_bytes == 0 && m_mode == mode::IRQ_GATE)
+                else if (m_read_fifo_bytes == 0 && m_mode == mode::IRQ_FIFO_DRAIN)
                 {
-                    m_irq_out_callback(m_irq); // TODO: might not be the right place for this
+                    m_irq_out_callback(m_irq);
                 }
             }
         }
@@ -263,7 +275,6 @@ u8 news_iop_scsi_helper_device::read_wrapper(bool pseudo_dma, offs_t offset)
         {
             if (m_mode != mode::BAD_DMA)
             {
-                LOG("mode = 0x%x\n",static_cast<uint32_t>(m_mode));
                 fatalerror("%s: Read underflow on SCSI pseudo-DMA\n", machine().describe_context());
                 m_mode = mode::BAD_DMA;
             }
@@ -303,7 +314,7 @@ void news_iop_scsi_helper_device::write_wrapper(bool pseudo_dma, offs_t offset, 
             {
                 m_write_fifo_data = (m_write_fifo_data << 8) | data;
                 ++m_write_fifo_bytes;
-                LOG("%s: CPU writing byte %02X into FIFO (%d/4 filled)\n", machine().describe_context(), data, m_write_fifo_bytes);
+                LOGMASKED(LOG_DATA, "%s: CPU writing byte %02X into FIFO (%d/4 filled)\n", machine().describe_context(), data, m_write_fifo_bytes);
                 if (!m_pseudo_dma_timer->enabled())
                 {
                     m_pseudo_dma_timer->adjust(m_timeout);

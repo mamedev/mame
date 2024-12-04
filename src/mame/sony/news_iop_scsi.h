@@ -37,7 +37,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	enum class mode : u8 { NON_DMA, READ_WAIT_DRQ, READ_DMA, WRITE_DMA, IRQ_GATE, BAD_DMA };
+	enum class mode : u8 { NON_DMA, READ_WAIT_DRQ, READ_DMA, WRITE_DMA, IRQ_FIFO_DRAIN, BAD_DMA };
 
 	// internal helpers
 	void read_fifo_process();
