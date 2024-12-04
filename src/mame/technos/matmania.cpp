@@ -487,7 +487,7 @@ static INPUT_PORTS_START( matmania )
 	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )       // The default setting should be cocktail.
 	PORT_DIPSETTING(   0x20, DEF_STR( Cocktail ) )
 	PORT_SERVICE_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")      // Listed as always ON among DIPs in the manual
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))      // Listed as always ON among DIPs in the manual
 
 	PORT_START("DSW2")
 	PORT_DIPNAME(0x03, 0x02, DEF_STR( Difficulty ) )    PORT_DIPLOCATION("SW2:1,2")

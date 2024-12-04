@@ -1454,12 +1454,6 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 #define PORT_SERVICE_NO_TOGGLE(_mask, _default) \
 	PORT_BIT( _mask, _mask & _default, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode ))
 
-#define PORT_VBLANK(_screen) \
-	PORT_READ_LINE_DEVICE_MEMBER(_screen, FUNC(screen_device::vblank))
-
-#define PORT_HBLANK(_screen) \
-	PORT_READ_LINE_DEVICE_MEMBER(_screen, FUNC(screen_device::hblank))
-
 //**************************************************************************
 //  INLINE FUNCTIONS
 //**************************************************************************

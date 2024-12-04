@@ -362,7 +362,7 @@ static INPUT_PORTS_START( bigprowr )
 	PORT_DIPSETTING(    0x40, "Upright, Dual Controls" )
 	PORT_DIPSETTING(    0x20, "Cocktail, Single Controls" ) // IMPOSSIBLE !
 	PORT_DIPSETTING(    0x60, DEF_STR( Cocktail ) )     // "Cocktail, Dual Controls"
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1")

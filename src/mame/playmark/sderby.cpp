@@ -786,7 +786,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pmroulet )
 	PORT_START("IN0")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // it must be toggled to boot anyway
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // it must be toggled to boot anyway
 	PORT_SERVICE_NO_TOGGLE(0x0020, IP_ACTIVE_LOW)
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -832,7 +832,7 @@ static INPUT_PORTS_START( croupierb )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // it must be toggled to boot anyway
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // it must be toggled to boot anyway
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -856,7 +856,7 @@ static INPUT_PORTS_START( magictch )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // it must be toggled to boot anyway
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // it must be toggled to boot anyway
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -880,7 +880,7 @@ static INPUT_PORTS_START( tropfrt )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // it must be toggled to boot anyway
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // it must be toggled to boot anyway
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
