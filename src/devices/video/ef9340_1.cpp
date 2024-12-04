@@ -16,8 +16,6 @@ This is implemented with a callback. The datasheet explains how to hook up
 TODO:
 - busy state (right now it is immediate)
 - internal display timing (on g7400, most of it is done externally)
-- window boxing
-- Y zoom
 - RES(restart) pin
 
 ***************************************************************************/
@@ -316,7 +314,11 @@ TIMER_CALLBACK_MEMBER(ef9340_1_device::draw_scanline)
 	if (vpos < 0)
 		return;
 
+	int zoom = (m_ef9340.Y0 & 0x20 && vpos >= 10) ? 2 : 1;
 	int slice = vpos % 10;
+	if (zoom == 2)
+		slice = ((vpos - 10) % 20) / 2;
+
 	bool dh = false;
 	if (vpos == 0)
 		m_ef9340.h_parity = false;
@@ -330,8 +332,9 @@ TIMER_CALLBACK_MEMBER(ef9340_1_device::draw_scanline)
 		u16 char_data = 0x00;
 		u8 fg = 0;
 		u8 bg = 0;
+		bool conceal = false;
+		bool box = bool(m_ef9340.R & 0x02);
 		bool underline = false;
-		bool blank = false;
 		bool w_parity = false;
 
 		if (vpos < 10)
@@ -353,7 +356,7 @@ TIMER_CALLBACK_MEMBER(ef9340_1_device::draw_scanline)
 		else
 		{
 			// displaying regular row
-			y_row = ((m_ef9340.Y0 & 0x1f) + (vpos - 10) / 10) % 24;
+			y_row = ((m_ef9340.Y0 & 0x1f) + (vpos - 10) / (10 * zoom)) % 24;
 		}
 
 		for (int x = 0; x < 40; x++)
@@ -454,14 +457,15 @@ TIMER_CALLBACK_MEMBER(ef9340_1_device::draw_scanline)
 
 			for (int i = 0; i < 8; i++)
 			{
-				u16 d = blank ? 0 : (char_data & 1) ? fg : bg;
-				m_tmp_bitmap.pix(m_offset_y + vpos, m_offset_x + x*8 + i) = d | 8;
+				u16 d = (conceal || box) ? 0 : (char_data & 1) ? fg : bg;
+				m_tmp_bitmap.pix(m_offset_y + vpos, m_offset_x + x*8 + i) = d | (box ? 0 : 8);
 				char_data >>= 1;
 			}
 
 			if (del)
 			{
-				blank = m_ef9340.R & 0x04 && b & 0x01;
+				conceal = b & 0x01 && (m_ef9340.R & 0x04);
+				box = !(b & 0x02) && (m_ef9340.R & 0x02);
 				underline = bool(b & 0x04);
 			}
 		}
@@ -469,11 +473,11 @@ TIMER_CALLBACK_MEMBER(ef9340_1_device::draw_scanline)
 	else
 	{
 		for (int i = 0; i < 40 * 8; i++)
-			m_tmp_bitmap.pix(m_offset_y + vpos, m_offset_x + i) = 0;
+			m_tmp_bitmap.pix(m_offset_y + vpos, m_offset_x + i) = 8;
 	}
 
 	// determine next h parity
-	if (vpos >= 10 && slice == 9)
+	if (vpos >= 10 && vpos & 1 && slice == 9)
 	{
 		if (dh)
 			m_ef9340.h_parity = !m_ef9340.h_parity;
