@@ -65,6 +65,8 @@ public:
 	void dt7(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -87,15 +89,15 @@ private:
 	void dt7_irq(int state);
 	void dt7_sndreset_coin_w(offs_t offset, u16 data, u16 mem_mask);
 
-	uint8_t unmapped_v25_io1_r();
-	uint8_t unmapped_v25_io2_r();
+	u8 unmapped_v25_io1_r();
+	u8 unmapped_v25_io2_r();
 
-	uint8_t read_port_t();
-	uint8_t read_port_2();
-	void write_port_2(uint8_t data);
+	u8 read_port_t();
+	u8 read_port_2();
+	void write_port_2(u8 data);
 
-	uint8_t eeprom_r();
-	void eeprom_w(uint8_t data);
+	u8 eeprom_r();
+	void eeprom_w(u8 data);
 
 
 	u8 dt7_shared_ram_hack_r(offs_t offset);
@@ -104,7 +106,7 @@ private:
 
 	void screen_vblank(int state);
 
-	uint8_t m_ioport_state = 0x00;
+	u8 m_ioport_state;
 
 	tilemap_t *m_tx_tilemap[2];    /* Tilemap for extra-text-layer */
 
@@ -145,19 +147,13 @@ void dt7_state::dt7_irq(int state)
 
 
 // this is conditional on the unknown type of branch (see #define G_B0 in the table0
-uint8_t dt7_state::read_port_t()
+u8 dt7_state::read_port_t()
 {
 	logerror("%s: read port t\n", machine().describe_context());
 	return machine().rand();
 }
 
-uint8_t dt7_state::read_port_2()
-{
-	logerror("%s: read port 2\n", machine().describe_context());
-	return 0xff;
-}
-
-uint8_t dt7_state::eeprom_r()
+u8 dt7_state::eeprom_r()
 {
 	if (m_ioport_state & 0x10)
 	{
@@ -175,7 +171,7 @@ uint8_t dt7_state::eeprom_r()
 	}
 }
 
-void dt7_state::eeprom_w(uint8_t data)
+void dt7_state::eeprom_w(u8 data)
 {
 	if (m_ioport_state & 0x10)
 	{
@@ -188,11 +184,16 @@ void dt7_state::eeprom_w(uint8_t data)
 	}
 }
 
+u8 dt7_state::read_port_2()
+{
+	logerror("%s: read port 2\n", machine().describe_context());
+	return m_ioport_state;
+}
 
 // it seems to attempt to read inputs (including the tilt switch?) here on startup
 // strangely all the EEPROM access code (which is otherwise very similar to FixEight
 // also has accesses to this port added, maybe something is sitting in the middle?
-void dt7_state::write_port_2(uint8_t data)
+void dt7_state::write_port_2(u8 data)
 {
 	if ((m_ioport_state & 0x01) != (data & 0x01))
 	{
@@ -343,18 +344,27 @@ void dt7_state::dt7_68k_1_mem(address_map &map)
 }
 
 
-uint8_t dt7_state::unmapped_v25_io1_r()
+u8 dt7_state::unmapped_v25_io1_r()
 {
 	logerror("%s: 0x58008 unknown read\n", machine().describe_context());
 	return machine().rand();
 }
 
-uint8_t dt7_state::unmapped_v25_io2_r()
+u8 dt7_state::unmapped_v25_io2_r()
 {
 	logerror("%s: 0x5800a unknown read\n", machine().describe_context());
 	return machine().rand();
 }
 
+void dt7_state::machine_start()
+{
+	save_item(NAME(m_ioport_state));
+}
+
+void dt7_state::machine_reset()
+{
+	m_ioport_state = 0x00;
+}
 
 void dt7_state::dt7_v25_mem(address_map &map)
 {
