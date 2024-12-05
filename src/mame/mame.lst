@@ -15225,6 +15225,9 @@ blktigerm
 @source:capcom/cbasebal.cpp
 cbasebal                        // 10/1989 (c) 1989 Capcom (Japan) (different hardware)
 
+@source:capcom/chakumelo.cpp
+chakumel
+
 @source:capcom/commando.cpp
 commando                        // 5/1985 (c) 1985 (World)
 commandob                       // bootleg
@@ -20662,11 +20665,22 @@ gkigt5p                         //
 gkigtez                         //
 gkigtezms                       //
 gkkey                           //
+igtmg133                        //
+igtmg156                        //
+igtmg159                        //
+igtmg164                        //
+igtmg166                        //
+igtmg214                        //
+igtmg247                        //
+igtmg394                        //
+igtmg535                        //
 igtsc                           //
+igtvp                           //
 ms14                            //
 ms3                             //
 ms5                             //
 ms72c                           //
+munsters                        //
 mystjag                         //
 sup8race                        //
 tripplay                        // (c) 1999 IGT
