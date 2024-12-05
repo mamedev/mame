@@ -30,6 +30,14 @@ TEST_CASE("Truncated output buffer.", "[string][printf]")
 	REQUIRE(4    == bx::snprintf(buffer1, BX_COUNTOF(buffer1), "abvg") );
 	REQUIRE('\0' == buffer1[BX_COUNTOF(buffer1)-1]);
 
+	buffer1[0] = '\xfb'; // null destination
+	REQUIRE(4      == bx::snprintf(NULL, BX_COUNTOF(buffer1), "abvg") );
+	REQUIRE('\xfb' == buffer1[0]);
+
+	buffer1[0] = '\xbf'; // one byte destination
+	REQUIRE(4    == bx::snprintf(buffer1, 1, "abvg") );
+	REQUIRE('\0' == buffer1[0]);
+
 	char buffer7[7]; // truncate
 	REQUIRE(10   == bx::snprintf(NULL, 0, "Ten chars!") );
 	REQUIRE(10   == bx::snprintf(buffer7, BX_COUNTOF(buffer7), "Ten chars!") );
