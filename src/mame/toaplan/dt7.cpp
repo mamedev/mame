@@ -359,13 +359,14 @@ uint8_t dt7_state::unmapped_v25_io2_r()
 void dt7_state::dt7_v25_mem(address_map &map)
 {
 	// exact mirroring unknown, don't cover up where the inputs/sound maps
-	map(0x00000, 0x07fff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
-	map(0x20000, 0x27fff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
-	map(0x28000, 0x2ffff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
-	map(0x60000, 0x67fff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
-	map(0x68000, 0x6ffff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
-	map(0x70000, 0x77fff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
-	map(0xf8000, 0xfffff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
+	// is it meant to mirror in all these locations, or is there a different issue in play?
+	map(0x00000, 0x07fff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0x20000, 0x27fff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0x28000, 0x2ffff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0x60000, 0x67fff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0x68000, 0x6ffff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0x70000, 0x77fff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0xf8000, 0xfffff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
 
 	map(0x58000, 0x58001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x58002, 0x58002).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
