@@ -155,33 +155,18 @@ u8 dt7_state::read_port_t()
 
 u8 dt7_state::eeprom_r()
 {
-	if (m_ioport_state & 0x10)
-	{
-		logerror("%s: eeprom_r\n", machine().describe_context());
-		// if you allow eeprom hookup at the moment (remove the ram hack reads)
-		// the game will init it the first time but then 2nd boot will be upside
-		// down as Japan region, and hang after the region warning
-		//return 0xff;
-		return m_eepromport->read();
-	}
-	else
-	{
-		logerror("%s: eeprom_r without eeprom enabled?\n", machine().describe_context());
-		return 0xff;
-	}
+	logerror("%s: eeprom_r\n", machine().describe_context());
+	// if you allow eeprom hookup at the moment (remove the ram hack reads)
+	// the game will init it the first time but then 2nd boot will be upside
+	// down as Japan region, and hang after the region warning
+	//return 0xff;
+	return m_eepromport->read();
 }
 
 void dt7_state::eeprom_w(u8 data)
 {
-	if (m_ioport_state & 0x10)
-	{
-		logerror("%s: eeprom_w %02x\n", machine().describe_context(), data);
-		m_eepromport->write(data);
-	}
-	else
-	{
-		logerror("%s: eeprom_w without eeprom enabled %02x\n", machine().describe_context(), data);
-	}
+	logerror("%s: eeprom_w %02x\n", machine().describe_context(), data);
+	m_eepromport->write(data);
 }
 
 u8 dt7_state::read_port_2()
@@ -267,7 +252,7 @@ void dt7_state::write_port_2(u8 data)
 u8 dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 {
 	u16 ret = m_shared_ram[offset];
-	
+
 	int pc = m_maincpu->pc();
 
 	if (pc == 0x7d84) { return 0xff; } // status?
@@ -283,6 +268,7 @@ u8 dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 	//if (addr == 0x061f00e) { return machine().rand(); } // P2 coin / start
 	
 	logerror("%08x: dt7_shared_ram_hack_r address %08x ret %02x\n", pc, addr, ret);
+
 	return ret;
 }
 
