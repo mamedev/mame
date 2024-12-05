@@ -109,7 +109,7 @@ public:
 	// some kind of branch, not sure which
 	// it's used after compares in blocks, sometimes with a 'be' then a 'br' straight after, so it must be a condition that could also fail a be and fall to the br
 	//#define G_B0  0x74
-	#define G_B0  0x79 // very low confidence
+	#define G_B0  0x77 // context suggests that this might instead be 0x77 (it follows comparing a bit position against 7)
 	//#define G_B0  0x75
 
 	//  6b  @ 73827 // must be a 2 byte operation on al? after an AND, at end of interrupt, 2nd byte is 0x08

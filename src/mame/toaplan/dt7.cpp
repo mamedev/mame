@@ -55,6 +55,10 @@ public:
 		, m_shared_ram(*this, "shared_ram")
 		, m_tx_videoram(*this, "tx_videoram")
 		, m_lineram(*this, "lineram")
+		, m_eepromport(*this, "EEPROM")
+		, m_sysport(*this, "SYS")
+		, m_p1port(*this, "IN1")
+		, m_p2port(*this, "IN2")
 	{ }
 
 public:
@@ -90,8 +94,13 @@ private:
 	uint8_t read_port_2();
 	void write_port_2(uint8_t data);
 
+	uint8_t eeprom_r();
+	void eeprom_w(uint8_t data);
+
+
 	u8 dt7_shared_ram_hack_r(offs_t offset);
 	void shared_ram_w(offs_t offset, u8 data);
+	void shared_ram_audio_w(offs_t offset, u8 data);
 
 	void screen_vblank(int state);
 
@@ -113,6 +122,10 @@ private:
 	required_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	required_shared_ptr<u16> m_tx_videoram;
 	required_shared_ptr<u16> m_lineram;
+	required_ioport m_eepromport;
+	required_ioport m_sysport;
+	required_ioport m_p1port;
+	required_ioport m_p2port;
 };
 
 
@@ -141,9 +154,40 @@ uint8_t dt7_state::read_port_t()
 uint8_t dt7_state::read_port_2()
 {
 	logerror("%s: read port 2\n", machine().describe_context());
-
 	return 0xff;
 }
+
+uint8_t dt7_state::eeprom_r()
+{
+	if (m_ioport_state & 0x10)
+	{
+		logerror("%s: eeprom_r\n", machine().describe_context());
+		// if you allow eeprom hookup at the moment (remove the ram hack reads)
+		// the game will init it the first time but then 2nd boot will be upside
+		// down as Japan region, and hang after the region warning
+		//return 0xff;
+		return m_eepromport->read();
+	}
+	else
+	{
+		logerror("%s: eeprom_r without eeprom enabled?\n", machine().describe_context());
+		return 0xff;
+	}
+}
+
+void dt7_state::eeprom_w(uint8_t data)
+{
+	if (m_ioport_state & 0x10)
+	{
+		logerror("%s: eeprom_w %02x\n", machine().describe_context(), data);
+		m_eepromport->write(data);
+	}
+	else
+	{
+		logerror("%s: eeprom_w without eeprom enabled %02x\n", machine().describe_context(), data);
+	}
+}
+
 
 // it seems to attempt to read inputs (including the tilt switch?) here on startup
 // strangely all the EEPROM access code (which is otherwise very similar to FixEight
@@ -222,19 +266,21 @@ void dt7_state::write_port_2(uint8_t data)
 u8 dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 {
 	u16 ret = m_shared_ram[offset];
+	
 	int pc = m_maincpu->pc();
 
 	if (pc == 0x7d84) { return 0xff; } // status?
-
+	
 	u32 addr = (offset * 2) + 0x610000;
-	if (addr == 0x061f00c) { return ioport("SYS")->read(); }
+	
+	if (addr == 0x061f00c) { return m_sysport->read(); }
 	if (addr == 0x061d000) { return 0x00; } // settings (from EEPROM?) including flipscreen
 	if (addr == 0x061d002) { return 0x00; } // settings (from EEPROM?) dipswitch?
 	if (addr == 0x061d004) { return 0x00; } // settings (from EEPROM?) region
-	if (addr == 0x061f004) { return ioport("IN1")->read(); } // P1 inputs
-	if (addr == 0x061f006) { return ioport("IN2")->read(); } // P2 inputs
+	if (addr == 0x061f004) { return m_p1port->read(); } // P1 inputs
+	if (addr == 0x061f006) { return m_p2port->read(); } // P2 inputs
 	//if (addr == 0x061f00e) { return machine().rand(); } // P2 coin / start
-
+	
 	logerror("%08x: dt7_shared_ram_hack_r address %08x ret %02x\n", pc, addr, ret);
 	return ret;
 }
@@ -244,6 +290,14 @@ void dt7_state::shared_ram_w(offs_t offset, u8 data)
 	m_shared_ram[offset] = data;
 }
 
+void dt7_state::shared_ram_audio_w(offs_t offset, u8 data)
+{
+	// just a helper function to try and debug the sound CPU a bit more easily
+	//int pc = m_audiocpu->pc();
+	//if (offset == 0xf004 / 2)
+	//	logerror("%08x: shared_ram_audio_w address %08x data %02x\n", pc, offset, data);
+	shared_ram_w(offset, data);
+}
 
 void dt7_state::dt7_sndreset_coin_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -305,13 +359,13 @@ uint8_t dt7_state::unmapped_v25_io2_r()
 void dt7_state::dt7_v25_mem(address_map &map)
 {
 	// exact mirroring unknown, don't cover up where the inputs/sound maps
-	map(0x00000, 0x07fff).ram().share("shared_ram");
-	map(0x20000, 0x27fff).ram().share("shared_ram");
-	map(0x28000, 0x2ffff).ram().share("shared_ram");
-	map(0x60000, 0x67fff).ram().share("shared_ram");
-	map(0x68000, 0x6ffff).ram().share("shared_ram");
-	map(0x70000, 0x77fff).ram().share("shared_ram");
-	map(0xf8000, 0xfffff).ram().share("shared_ram");
+	map(0x00000, 0x07fff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
+	map(0x20000, 0x27fff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
+	map(0x28000, 0x2ffff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
+	map(0x60000, 0x67fff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
+	map(0x68000, 0x6ffff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
+	map(0x70000, 0x77fff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
+	map(0xf8000, 0xfffff).ram().w(FUNC(shared_ram_audio_w)).share("shared_ram");
 
 	map(0x58000, 0x58001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x58002, 0x58002).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -354,8 +408,8 @@ void dt7_state::dt7(machine_config &config)
 	audiocpu.pt_in_cb().set(FUNC(dt7_state::read_port_t));
 	audiocpu.p2_in_cb().set(FUNC(dt7_state::read_port_2));
 	audiocpu.p2_out_cb().set(FUNC(dt7_state::write_port_2));
-	//audiocpu.p1_in_cb().set_ioport("EEPROM");
-	//audiocpu.p1_out_cb().set_ioport("EEPROM");
+	audiocpu.p1_in_cb().set(FUNC(dt7_state::eeprom_r));
+	audiocpu.p1_out_cb().set(FUNC(dt7_state::eeprom_w));
 
 	// eeprom type confirmed, and gets inited after first boot, but then game won't boot again?
 	EEPROM_93C66_16BIT(config, m_eeprom);
@@ -478,6 +532,11 @@ void dt7_state::draw_tx_tilemap(screen_device& screen, bitmap_ind16& bitmap, con
 	// there seems to be RAM for another tx tilemap
 	// but there were 2 empty sockets / sockets with blank tx ROMs, so
 	// it's likely only one of them is used
+
+	// see comments in other toaplan drivers, this is likely per-line
+	int flipx = m_lineram[(table * 2)] & 0x8000;
+	m_tx_tilemap[table / 2]->set_flip(flipx ? 0 : TILEMAP_FLIPX);
+
 	rectangle clip = cliprect;
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -486,11 +545,11 @@ void dt7_state::draw_tx_tilemap(screen_device& screen, bitmap_ind16& bitmap, con
 		u16 scroll1 = m_lineram[((y * 8) + (table * 2) + 0) & 0x7ff]; // lineselect
 		//u16 scroll2 = m_lineram[((y * 8) + (table * 2) + 1) & 0x7ff]; // xscroll
 
-		scroll1 &= 0x7fff; // 0x8000 might be enable? or per-line flip if it's more similar to other Toaplan drivers
+		scroll1 &= 0x7fff; // 0x8000 is per-line flip
 		scroll1 -= 0x0900; // are all these scroll bits?
 
-		m_tx_tilemap[table/2]->set_scrolly(0, scroll1 - y);
-		m_tx_tilemap[table/2]->draw(screen, bitmap, clip, 0);
+		m_tx_tilemap[table / 2]->set_scrolly(0, scroll1 - y);
+		m_tx_tilemap[table / 2]->draw(screen, bitmap, clip, 0);
 	}
 }
 
