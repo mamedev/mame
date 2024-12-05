@@ -95,14 +95,14 @@ protected:
 // ======================> o2_cart_slot_device
 
 class o2_cart_slot_device : public device_t,
-								public device_cartrom_image_interface,
-								public device_single_card_slot_interface<device_o2_cart_interface>
+		public device_cartrom_image_interface,
+		public device_single_card_slot_interface<device_o2_cart_interface>
 {
 public:
 	// construction/destruction
 	template <typename T>
-	o2_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: o2_cart_slot_device(mconfig, tag, owner, 0)
+	o2_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt) :
+		o2_cart_slot_device(mconfig, tag, owner, 0)
 	{
 		option_reset();
 		opts(*this);
@@ -143,9 +143,13 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
+private:
 	int m_type;
 	device_o2_cart_interface* m_cart;
+
+	required_ioport m_conf;
 	int m_b;
 };
 

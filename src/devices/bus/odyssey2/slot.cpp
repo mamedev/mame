@@ -27,22 +27,14 @@ DEFINE_DEVICE_TYPE(O2_CART_SLOT, o2_cart_slot_device, "o2_cart_slot", "Odyssey 2
 //  device_o2_cart_interface - constructor
 //-------------------------------------------------
 
-device_o2_cart_interface::device_o2_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "odyssey2cart")
-	, m_rom_size(0)
-	, m_exrom_size(0)
-	, m_voice_size(0)
-{
-}
+device_o2_cart_interface::device_o2_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "odyssey2cart"),
+	m_rom_size(0),
+	m_exrom_size(0),
+	m_voice_size(0)
+{ }
 
-
-//-------------------------------------------------
-//  ~device_o2_cart_interface - destructor
-//-------------------------------------------------
-
-device_o2_cart_interface::~device_o2_cart_interface()
-{
-}
+device_o2_cart_interface::~device_o2_cart_interface() { }
 
 
 //**************************************************************************
@@ -53,24 +45,18 @@ device_o2_cart_interface::~device_o2_cart_interface()
 //  o2_cart_slot_device - constructor
 //-------------------------------------------------
 
-o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, O2_CART_SLOT, tag, owner, clock)
-	, device_cartrom_image_interface(mconfig, *this)
-	, device_single_card_slot_interface<device_o2_cart_interface>(mconfig, *this)
-	, m_type(O2_STD)
-	, m_cart(nullptr)
-	, m_b(0)
-{
-}
+o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, O2_CART_SLOT, tag, owner, clock),
+	device_cartrom_image_interface(mconfig, *this),
+	device_single_card_slot_interface<device_o2_cart_interface>(mconfig, *this),
+	m_type(O2_STD),
+	m_cart(nullptr),
+	m_conf(*this, "CONF"),
+	m_b(0)
+{ }
 
+o2_cart_slot_device::~o2_cart_slot_device() { }
 
-//-------------------------------------------------
-//  o2_cart_slot_device - destructor
-//-------------------------------------------------
-
-o2_cart_slot_device::~o2_cart_slot_device()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -88,8 +74,8 @@ void o2_cart_slot_device::device_start()
 
 struct o2_slot
 {
-	int                     pcb_id;
-	const char              *slot_option;
+	int            pcb_id;
+	const char     *slot_option;
 };
 
 // Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
@@ -109,11 +95,13 @@ static const o2_slot slot_list[] =
 static int o2_get_pcb_id(const char *slot)
 {
 	if (slot)
+	{
 		for (auto & elem : slot_list)
 		{
 			if (!strcmp(elem.slot_option, slot))
 				return elem.pcb_id;
 		}
+	}
 
 	return 0;
 }
@@ -263,14 +251,42 @@ int o2_cart_slot_device::t0_read()
 
 int o2_cart_slot_device::b_read()
 {
+	int b_user = m_conf->read() & 3;
+	int b = b_user & 1;
+
 	if (m_cart)
 	{
-		int b = m_cart->b_read();
-		const bool override = b != -1;
-		return override ? b : m_b;
+		// cartridge may override pin B setting
+		int b_cart = m_cart->b_read();
+
+		if (b_cart >= 0)
+			b = b_cart;
+		else if (b_user & 2)
+			b = m_b;
 	}
-	else
-		return 0;
+
+	return b;
+}
+
+
+/*-------------------------------------------------
+ input ports
+-------------------------------------------------*/
+
+// Pin B only affects Videopac+ consoles: cartridges can decide whether to mask display edges or not,
+// by wiring the pin to either VCC or GND.
+
+static INPUT_PORTS_START( o2_cart_slot )
+	PORT_START("CONF")
+	PORT_CONFNAME( 0x03, 0x02, "Cartridge Pin B" )
+	PORT_CONFSETTING( 0x02, "Auto" ) // get setting from softwarelist
+	PORT_CONFSETTING( 0x00, "0" )
+	PORT_CONFSETTING( 0x01, "1" )
+INPUT_PORTS_END
+
+ioport_constructor o2_cart_slot_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(o2_cart_slot);
 }
 
 
