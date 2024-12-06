@@ -95,6 +95,9 @@ ROM_START( chakumel )
 	ROM_LOAD( "cmc4b.4b", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "cmc4c.4c", 0x200, 0x117, NO_DUMP )
 	ROM_LOAD( "cmc5c.5c", 0x400, 0x117, NO_DUMP )
+
+	DISK_REGION( "hdd" )
+	DISK_IMAGE( "chakumel", 0, NO_DUMP )
 ROM_END
 
 } // anonymous namespace

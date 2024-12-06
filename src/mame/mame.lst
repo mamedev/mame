@@ -20180,6 +20180,7 @@ lucky8j                         // 199?, hack
 lucky8k                         // (c) 1989 Wing. With CPU NEC D315-5136
 lucky8l                         // (c) 1989 Wing Co. Ltd
 lucky8m                         // (c) 1989 Wing Co. Ltd
+lucky8n                         // (c) 1989 Wing Co. Ltd
 luckybar                        // unknown
 luckylad                        // (c) 1985 Wing Co. Ltd
 magodds                         // 198? (c) Micro Manufacturing Ltd.
@@ -42916,6 +42917,9 @@ vector3                         //
 
 @source:skeleton/vectrix.cpp
 vectrix                         // (c) 19?? Olympia?
+
+@source:skeleton/venteta.cpp
+venteta
 
 @source:skeleton/vgame.cpp
 hilice                          //

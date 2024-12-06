@@ -524,6 +524,7 @@ public:
 	void init_lucky8f();
 	void init_lucky8l();
 	void init_lucky8m();
+	void init_lucky8n();
 	void init_magoddsc();
 	void init_flaming7();
 	void init_flam7_tw();
@@ -14522,6 +14523,40 @@ ROM_START( lucky8m )
 	ROM_LOAD( "g13", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+ROM_START( lucky8n )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gold.ic8.sub", 0x0000, 0x8000, CRC(f2fc90a2) SHA1(ab9f9166a3b15d69d2f70e1bcc562f54452628e7) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.7h",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "6.8h",  0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "7.10h", 0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 ) // all 1ST AND 2ND HALF IDENTICAL, match many other lucky8 sets otherwise
+	ROM_LOAD( "1.1h", 0x0000, 0x2000, CRC(8ca19ee7) SHA1(2e0cd4a74bd9abef60ed561ba4e5bb2681ce1222) )
+	ROM_IGNORE(               0x2000)
+	ROM_LOAD( "2.3h", 0x2000, 0x2000, CRC(3b5a992d) SHA1(bc862caa6bab654aad80c615ec5a9114bf060300) )
+	ROM_IGNORE(               0x2000)
+	ROM_LOAD( "3.4h", 0x4000, 0x2000, CRC(0219b22d) SHA1(faf7c6804ff36bdff31b5584660e4f2613d0e220) )
+	ROM_IGNORE(               0x2000)
+	ROM_LOAD( "4.6h", 0x6000, 0x2000, CRC(d26c3262) SHA1(c7f1868a66180fc58d65dc90f700df3e33af63a2) )
+	ROM_IGNORE(               0x2000)
+
+	// PROMs weren't dumped for this set, but GFX match so color PROMs should match too
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12",   0x000, 0x100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "prom4", 0x100, 0x100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x00, 0x20, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "g14", 0x000, 0x100, BAD_DUMP CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "g13", 0x00, 0x20, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
 ROM_START( animalw ) // according to the dumper: runs on the same HW as lucky8 but at the two 8255 has some shorts
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom8.bin",  0x0000, 0x8000, CRC(8826e4e7) SHA1(70cff8c5ce75ab0f568e8cdf39ef9165b73fa2c0) )
@@ -21362,6 +21397,45 @@ void wingco_state::init_lucky8m()
 	}
 }
 
+void wingco_state::init_lucky8n()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		m_decrypted_opcodes[i] = rom[i];
+
+		if (i < 0x100 || (i >= 0x300 && i < 0x400) || (i >= 0x500 && i < 0x600) ||
+		   (i >= 0xa00 && i < 0xb00) || (i >= 0xc00 && i < 0xd00) || (i >= 0x6e00 && i < 0x6f00) ||
+		   (i >= 0x7100 && i < 0x7200))
+		{
+			uint8_t x = rom[i];
+
+			switch(i & 0x1e)
+			{
+				case 0x00: x = bitswap<8>(x ^ 0xaa, 3, 6, 7, 4, 1, 5, 2, 0); break;
+				case 0x02: x = bitswap<8>(x ^ 0xaa, 3, 6, 7, 4, 1, 5, 2, 0); break;
+				case 0x04: x = bitswap<8>(x ^ 0x02, 6, 7, 3, 4, 1, 5, 2, 0); break;
+				case 0x06: x = bitswap<8>(x ^ 0x02, 6, 7, 3, 4, 1, 5, 2, 0); break;
+				case 0x08: x = bitswap<8>(x ^ 0x04, 1, 6, 5, 4, 3, 2, 7, 0); break;
+				case 0x0a: x = bitswap<8>(x ^ 0x04, 1, 6, 5, 4, 3, 2, 7, 0); break;
+				case 0x0c: x = bitswap<8>(x ^ 0xcc, 6, 2, 7, 4, 5, 1, 3, 0); break;
+				case 0x0e: x = bitswap<8>(x ^ 0xa0, 7, 2, 6, 4, 5, 3, 1, 0); break;
+				case 0x10: x = bitswap<8>(x ^ 0xaa, 3, 6, 7, 4, 1, 5, 2, 0); break;
+				case 0x12: x = bitswap<8>(x ^ 0xaa, 3, 6, 7, 4, 1, 5, 2, 0); break;
+				case 0x14: x = bitswap<8>(x ^ 0x60, 6, 5, 2, 4, 7, 3, 1, 0); break;
+				case 0x16: x = bitswap<8>(x ^ 0x60, 6, 5, 2, 4, 7, 3, 1, 0); break;
+				case 0x18: x = bitswap<8>(x ^ 0x04, 1, 6, 5, 4, 3, 2, 7, 0); break;
+				case 0x1a: x = bitswap<8>(x ^ 0x04, 1, 6, 5, 4, 3, 2, 7, 0); break;
+				case 0x1c: x = bitswap<8>(x ^ 0x60, 6, 5, 2, 4, 7, 3, 1, 0); break;
+				case 0x1e: x = bitswap<8>(x ^ 0x60, 6, 5, 2, 4, 7, 3, 1, 0); break;
+			}
+
+			m_decrypted_opcodes[i] = x;
+		}
+	}
+}
+
 void wingco_state::init_nd8lines()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -22285,6 +22359,7 @@ GAMEL( 199?, lucky8j,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_ini
 GAMEL( 1989, lucky8k,    lucky8,   lucky8k,  lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 10, W-4, encrypted NEC D315-5136)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 1989, lucky8l,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8l,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 11, W-4)",                          MACHINE_WRONG_COLORS,  layout_lucky8 )    // uses a strange mix of PLDs and PROMs for colors
 GAMEL( 1989, lucky8m,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8m,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 12, W-4, encrypted)",               0,                     layout_lucky8 )
+GAMEL( 1989, lucky8n,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8n,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 13)",                               0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,   ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
