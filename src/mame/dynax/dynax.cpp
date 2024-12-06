@@ -1577,60 +1577,12 @@ INPUT_PORTS_END
 		PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                                                                  /* Coin         */ \
 		PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                                                               /* Service      */
 
-#define MAHJONG_PAYOUT_RATE(shift, loc) \
-		PORT_DIPNAME( 0x0f << shift, 0x07 << shift, "Payout Rate" ) PORT_DIPLOCATION(loc) \
-		PORT_DIPSETTING(             0x00 << shift, "50%" ) \
-		PORT_DIPSETTING(             0x01 << shift, "53%" ) \
-		PORT_DIPSETTING(             0x02 << shift, "56%" ) \
-		PORT_DIPSETTING(             0x03 << shift, "59%" ) \
-		PORT_DIPSETTING(             0x04 << shift, "62%" ) \
-		PORT_DIPSETTING(             0x05 << shift, "65%" ) \
-		PORT_DIPSETTING(             0x06 << shift, "68%" ) \
-		PORT_DIPSETTING(             0x07 << shift, "71%" ) \
-		PORT_DIPSETTING(             0x08 << shift, "75%" ) \
-		PORT_DIPSETTING(             0x09 << shift, "78%" ) \
-		PORT_DIPSETTING(             0x0a << shift, "81%" ) \
-		PORT_DIPSETTING(             0x0b << shift, "84%" ) \
-		PORT_DIPSETTING(             0x0c << shift, "87%" ) \
-		PORT_DIPSETTING(             0x0d << shift, "90%" ) \
-		PORT_DIPSETTING(             0x0e << shift, "93%" ) \
-		PORT_DIPSETTING(             0x0f << shift, "96%" )
-
 #define MAHJONG_ODDS_RATE(shift, loc) \
 		PORT_DIPNAME( 0x03 << shift, 0x00 << shift, "Odds Rate" ) PORT_DIPLOCATION(loc) \
 		PORT_DIPSETTING(             0x03 << shift, "1 2 4 8 12 16 24 32" ) \
 		PORT_DIPSETTING(             0x00 << shift, "1 2 3 5 8 15 30 50" ) \
 		PORT_DIPSETTING(             0x01 << shift, "1 2 3 5 10 25 50 100" ) \
 		PORT_DIPSETTING(             0x02 << shift, "1 2 3 5 10 50 100 200" )
-
-#define MAHJONG_COINAGE(shift, loc) \
-		PORT_DIPNAME( 0x03 << shift, 0x03 << shift, DEF_STR(Coinage) ) PORT_DIPLOCATION(loc) /* ＣＯＩＮ　ＲＡＴＥ   */ \
-		PORT_DIPSETTING(             0x03 << shift, DEF_STR(1C_1C) )                         /* １コイン　　１プレイ */ \
-		PORT_DIPSETTING(             0x02 << shift, DEF_STR(1C_2C) )                         /* １コイン　　２プレイ */ \
-		PORT_DIPSETTING(             0x01 << shift, DEF_STR(1C_5C) )                         /* １コイン　　５プレイ */ \
-		PORT_DIPSETTING(             0x00 << shift, "1 Coin/10 Credits" )                    /* １コイン　１０プレイ */
-
-#define MAHJONG_NOTE_CREDITS(shift, loc, ct, cs) \
-		PORT_DIPNAME( 0x01 << shift, 0x00 << shift, "Credits Per Note" ) PORT_DIPLOCATION(loc)                 /* ＮＯＴＥ　ＲＡＴＥ */ \
-		PORT_DIPSETTING(             0x01 << shift, "5" )   PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x03 << cs) /* ＣＯＩＮ×５        */ \
-		PORT_DIPSETTING(             0x01 << shift, "10" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x02 << cs) \
-		PORT_DIPSETTING(             0x01 << shift, "25" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x01 << cs) \
-		PORT_DIPSETTING(             0x01 << shift, "50" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x00 << cs) \
-		PORT_DIPSETTING(             0x00 << shift, "10" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x03 << cs) /* ＣＯＩＮ×１０      */ \
-		PORT_DIPSETTING(             0x00 << shift, "20" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x02 << cs) \
-		PORT_DIPSETTING(             0x00 << shift, "50" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x01 << cs) \
-		PORT_DIPSETTING(             0x00 << shift, "100" ) PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x00 << cs)
-
-#define MAHJONG_YAKUMAN_BONUS(shift, loc) \
-		PORT_DIPNAME( 0x07 << shift, 0x04 << shift, "Yakuman Bonus Cycle" ) PORT_DIPLOCATION(loc) /* 役満ボーナスの設定周期 */ \
-		PORT_DIPSETTING(             0x07 << shift, "None" )                                      /* 無し                   */ \
-		PORT_DIPSETTING(             0x06 << shift, "First time only" )                           /* 初回のみ               */ \
-		PORT_DIPSETTING(             0x05 << shift, "Every 300 coins" )                           /* ３００コイン毎         */ \
-		PORT_DIPSETTING(             0x04 << shift, "Every 500 coins" )                           /* ５００コイン毎         */ \
-		PORT_DIPSETTING(             0x03 << shift, "Every 700 coins" )                           /* ７００コイン毎         */ \
-		PORT_DIPSETTING(             0x02 << shift, "Every 1000 coins" )                          /* １０００コイン毎       */ \
-	/*  PORT_DIPSETTING(             0x01 << shift, "Every 1000 coins" )*/ \
-	/*  PORT_DIPSETTING(             0x00 << shift, "Every 1000 coins" )*/
 
 static INPUT_PORTS_START( cdracula )
 	PORT_START("P1")
@@ -3004,7 +2956,7 @@ static INPUT_PORTS_START( mjembase )
 	PORT_DIPNAME( 0x04, 0x00, "Auto Tsumo" )                    PORT_DIPLOCATION("SW 4:3")
 	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x08, 0x00, "Double Up" )                     PORT_DIPLOCATION("SW 4:4")
+	PORT_DIPNAME( 0x08, 0x00, "Double Bet" )                    PORT_DIPLOCATION("SW 4:4")
 	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )    // press Bet during game to double the bet
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR(Demo_Sounds) )            PORT_DIPLOCATION("SW 4:5")
@@ -3027,7 +2979,7 @@ static INPUT_PORTS_START( mjembase )
 
 	MAHJONG_COIN_TEST("DSW1", 0x40)
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
 INPUT_PORTS_END
 
 
@@ -3035,7 +2987,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mjelct3 )
 	MAHJONG_COIN_TEST("DSW1", 0x40)
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
 
 	PORT_START("SW1")  // port 85
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -3134,7 +3086,7 @@ static INPUT_PORTS_START( mjelctrn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                              // Coin
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                           // Service
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
 
 	PORT_START("SW1")  // port 85
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -3262,10 +3214,10 @@ static INPUT_PORTS_START( majxtal7 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )                                                                         // Coin
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                                                                      // Service
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
 
 	PORT_START("DSW0")  /* select = 00 */
-	MAHJONG_ODDS_RATE(0, "DIP2:1,2") // sometimes offers double rate for 1, 2 or 3 han
+	MAHJONG_ODDS_RATE(0, "DIP2:1,2")
 	MAHJONG_COINAGE(2, "DIP2:3,4")
 	PORT_DIPNAME( 0x30, 0x30, "Minimum Bet" )                  PORT_DIPLOCATION("DIP2:5,6")
 	PORT_DIPSETTING(    0x30, "1" )
@@ -3472,7 +3424,7 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPNAME( 0x04, 0x00, "Tenkaigen Day" )                 PORT_DIPLOCATION("SW 3:3")        // 天開眼の日
 	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
-	PORT_DIPNAME( 0x08, 0x00, "Double Up" )                     PORT_DIPLOCATION("SW 3:4")        // Ｗ－ＢＥＴ
+	PORT_DIPNAME( 0x08, 0x00, "Double Bet" )                    PORT_DIPLOCATION("SW 3:4")        // Ｗ－ＢＥＴ
 	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
 	PORT_DIPNAME( 0x10, 0x00, "Renchan Rate" )                  PORT_DIPLOCATION("SW 3:5")        // 連荘レート
@@ -3489,7 +3441,7 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPSETTING(    0x00, "Flip Flop" )                                                       // Ｆ／Ｆ・ボタン
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds ))            PORT_DIPLOCATION("SW 4:1")        // デモ・サウンド
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )            PORT_DIPLOCATION("SW 4:1")        // デモ・サウンド
 	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                      // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
 	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )                 PORT_DIPLOCATION("SW 4:2")        // ゲーム・サウンド
@@ -3515,7 +3467,7 @@ static INPUT_PORTS_START( tenkai )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
 
 	PORT_START("DSW4")  /* (top) */
-	MAHJONG_NOTE_CREDITS(0, "SW 1:9", "DSW1", 0)                                                           // ＮＯＴＥ　ＲＡＴＥ
+	MAHJONG_NOTE_CREDITS(0, "SW 1:9", "DSW1", 0)                                                  // ＮＯＴＥ　ＲＡＴＥ
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW 1:10")       // モニター画面反転
 	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                      // 通常
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 反転
@@ -3543,7 +3495,7 @@ static INPUT_PORTS_START( tenkai )
 
 	MAHJONG_COIN_TEST("DSW2", 0x01)
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
 INPUT_PORTS_END
 
 
@@ -3635,7 +3587,7 @@ static INPUT_PORTS_START( mjreach )
 	PORT_DIPNAME( 0x02, 0x02, "Hopper Polarity" )               PORT_DIPLOCATION("DIP3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR(Normal) )
 	PORT_DIPSETTING(    0x00, "Inverted" )
-	PORT_DIPNAME( 0x04, 0x00, "Double Up" )                     PORT_DIPLOCATION("DIP3:3")
+	PORT_DIPNAME( 0x04, 0x00, "Double Bet" )                    PORT_DIPLOCATION("DIP3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR(Unknown) )                PORT_DIPLOCATION("DIP3:4")
@@ -3704,7 +3656,7 @@ static INPUT_PORTS_START( mjreach )
 
 	MAHJONG_COIN_TEST("DSW2", 0x01)
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gekisha )
@@ -3765,7 +3717,7 @@ static INPUT_PORTS_START( gekisha )
 	PORT_DIPNAME( 0x04, 0x04, "Auto Tsumo after Reach" ) PORT_DIPLOCATION( "SW4:3" ) // オート ツモ
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Double Up" ) PORT_DIPLOCATION( "SW4:4" ) // Ｗ－ＢＥＴ
+	PORT_DIPNAME( 0x08, 0x08, "Double Bet" ) PORT_DIPLOCATION( "SW4:4" ) // Ｗ－ＢＥＴ
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Girls (Demo)" ) PORT_DIPLOCATION( "SW4:5" ) // ギャル カット
@@ -3796,7 +3748,7 @@ static INPUT_PORTS_START( gekisha )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )        // Coin
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet )
+	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
 INPUT_PORTS_END
 
 

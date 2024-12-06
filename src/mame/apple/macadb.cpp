@@ -13,7 +13,7 @@
 #define LOG_STATE           (1U << 2)
 #define LOG_LINESTATE       (1U << 3)
 #define VERBOSE             (0)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

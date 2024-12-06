@@ -7,7 +7,7 @@
 
 
 INPUT_PORTS_START( igs_mahjong_matrix )
-	PORT_INCLUDE(mahjong_matrix_1p_bet)
+	PORT_INCLUDE(mahjong_matrix_1p_bet_wup)
 
 	PORT_MODIFY("KEY0")
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN)

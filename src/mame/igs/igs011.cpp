@@ -67,12 +67,18 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "igsmahjong.h"
+
+#include "mahjong.h"
+
 #include "cpu/m68000/m68000.h"
+#include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/ics2115.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
-#include "machine/nvram.h"
-#include "machine/timer.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -108,37 +114,42 @@ public:
 
 	int igs_hopper_r();
 
-	void init_lhbv33c();
-	void init_drgnwrldv21j();
-	void init_wlcc();
-	void init_nkishusp();
-	void init_drgnwrldv21();
-	void init_dbc();
-	void init_lhb();
-	void init_drgnwrld();
-	void init_drgnwrldv30();
-	void init_drgnwrldv11h();
-	void init_lhb2();
-	void init_xymg();
-	void init_drgnwrldv10c();
-	void init_drgnwrldv20j();
-	void init_drgnwrldv40k();
-	void init_ryukobou();
-	void init_tygn();
+	void init_lhbv33c() ATTR_COLD;
+	void init_drgnwrldv21j() ATTR_COLD;
+	void init_wlcc() ATTR_COLD;
+	void init_nkishusp() ATTR_COLD;
+	void init_drgnwrldv21() ATTR_COLD;
+	void init_dbc() ATTR_COLD;
+	void init_lhb() ATTR_COLD;
+	void init_drgnwrld() ATTR_COLD;
+	void init_drgnwrldv30() ATTR_COLD;
+	void init_drgnwrldv11h() ATTR_COLD;
+	void init_lhb2() ATTR_COLD;
+	void init_xymg() ATTR_COLD;
+	void init_drgnwrldv10c() ATTR_COLD;
+	void init_drgnwrldv20j() ATTR_COLD;
+	void init_drgnwrldv40k() ATTR_COLD;
+	void init_ryukobou() ATTR_COLD;
+	void init_tygn() ATTR_COLD;
 
-	void igs011_base(machine_config &config);
-	void drgnwrld(machine_config &config);
-	void nkishusp(machine_config &config);
-	void tygn(machine_config &config);
-	void wlcc(machine_config &config);
-	void xymg(machine_config &config);
-	void lhb2(machine_config &config);
-	void lhb(machine_config &config);
-	void drgnwrld_igs012(machine_config &config);
+	void drgnwrld(machine_config &config) ATTR_COLD;
+	void nkishusp(machine_config &config) ATTR_COLD;
+	void tygn(machine_config &config) ATTR_COLD;
+	void wlcc(machine_config &config) ATTR_COLD;
+	void xymg(machine_config &config) ATTR_COLD;
+	void lhb2(machine_config &config) ATTR_COLD;
+	void lhb(machine_config &config) ATTR_COLD;
+	void drgnwrld_igs012(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
+	struct blitter_t
+	{
+		u16  x, y, w, h,
+			gfx_lo, gfx_hi,
+			depth,
+			pen,
+			flags;
+	};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -176,15 +187,6 @@ protected:
 	u16 m_igs003_reg;
 	u16 m_lhb_irq_enable;
 
-	struct blitter_t
-	{
-		u16  x, y, w, h,
-			gfx_lo, gfx_hi,
-			depth,
-			pen,
-			flags;
-	};
-
 	blitter_t m_blitter;
 
 	u16 m_igs003_prot_hold;
@@ -193,6 +195,11 @@ protected:
 	u8 m_igs003_prot_z;
 	u8 m_igs003_prot_h1;
 	u8 m_igs003_prot_h2;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	void igs011_base(machine_config &config) ATTR_COLD;
 
 	void igs011_priority_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 igs011_layers_r(offs_t offset);
@@ -291,12 +298,12 @@ public:
 	{
 	}
 
-	void init_vbowl();
-	void init_vbowlj();
-	void init_vbowlhk();
+	void init_vbowl() ATTR_COLD;
+	void init_vbowlj() ATTR_COLD;
+	void init_vbowlhk() ATTR_COLD;
 
-	void vbowl(machine_config &config);
-	void vbowlhk(machine_config &config);
+	void vbowl(machine_config &config) ATTR_COLD;
+	void vbowlhk(machine_config &config) ATTR_COLD;
 
 private:
 	/* devices */
@@ -3290,262 +3297,194 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( lhb2 )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x02, "Pay Out (%)" )
-	PORT_DIPSETTING(    0x07, "50" )
-	PORT_DIPSETTING(    0x06, "54" )
-	PORT_DIPSETTING(    0x05, "58" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x03, "66" )
-	PORT_DIPSETTING(    0x02, "70" )
-	PORT_DIPSETTING(    0x01, "74" )
-	PORT_DIPSETTING(    0x00, "78" )
-	PORT_DIPNAME( 0x08, 0x00, "Odds Rate" )
+	PORT_DIPNAME( 0x07, 0x02, "Payout Rate" )           PORT_DIPLOCATION("SW1:1,2,3") // 機率調整
+	PORT_DIPSETTING(    0x07, "50%" )
+	PORT_DIPSETTING(    0x06, "54%" )
+	PORT_DIPSETTING(    0x05, "58%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x03, "66%" )
+	PORT_DIPSETTING(    0x02, "70%" )
+	PORT_DIPSETTING(    0x01, "74%" )
+	PORT_DIPSETTING(    0x00, "78%" )
+	PORT_DIPNAME( 0x08, 0x00, "Odds Rate" )             PORT_DIPLOCATION("SW1:4")     // 倍數?
 	PORT_DIPSETTING(    0x00, "1,2,3,4,5,6,7,8" )
 	PORT_DIPSETTING(    0x08, "1,2,3,5,8,15,30,50" )
-	PORT_DIPNAME( 0x10, 0x00, "Max Bet" )
+	PORT_DIPNAME( 0x10, 0x00, "Maximum Bet" )           PORT_DIPLOCATION("SW1:5")     // 最大押注
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x10, "10" )
-	PORT_DIPNAME( 0x60, 0x60, "Min Bet" )
+	PORT_DIPNAME( 0x60, 0x60, "Minimum Bet" )           PORT_DIPLOCATION("SW1:6,7")   // 最小押注
 	PORT_DIPSETTING(    0x60, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_DIPNAME( 0x80, 0x80, "Credit Timer" )          PORT_DIPLOCATION("SW1:8")     // ??清除    (clears credits after timeout if you don't start a game)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )                                        // ?
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )                                         // ?
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )  // Only when bit 4 = 1
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:1,2")   // 投幣比率
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x04, 0x04, "Credits Per Note" )  // Only when bit 4 = 0
+	PORT_DIPNAME( 0x04, 0x04, "Key-in Rate" )           PORT_DIPLOCATION("SW2:3")     // 開分比率
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x08, 0x08, "Max Note Credits" )
+	PORT_DIPNAME( 0x08, 0x08, "Credit Limit" )          PORT_DIPLOCATION("SW2:4")     // 進分上限
 	PORT_DIPSETTING(    0x08, "100" )
 	PORT_DIPSETTING(    0x00, "500" )
-	PORT_DIPNAME( 0x10, 0x10, "Money Type" )    // Decides whether to use bits 0&1 or bit 2
-	PORT_DIPSETTING(    0x10, "Coins" )
-	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0x20, 0x20, "Pay Out Type" )
-	PORT_DIPSETTING(    0x20, "Coins" )
-	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Credit Mode" )           PORT_DIPLOCATION("SW2:5")     // 進分方式
+	PORT_DIPSETTING(    0x10, "Coin Acceptor" )                                       // 投幣
+	PORT_DIPSETTING(    0x00, "Key-In" )                                              // 開分
+	PORT_DIPNAME( 0x20, 0x20, "Payout Mode" )           PORT_DIPLOCATION("SW2:6")     // 退分方式
+	PORT_DIPSETTING(    0x20, "Key-Out" )                                             // 洗分
+	PORT_DIPSETTING(    0x00, "Return Coins" )                                        // 退幣      (doesn't seem to work properly)
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )                                     // ????
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")     // ??音?
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                        // ?
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )                                         // ?
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:1,2")   // ??限?
 	PORT_DIPSETTING(    0x03, "500" )
 	PORT_DIPSETTING(    0x02, "1000" )
 	PORT_DIPSETTING(    0x01, "2000" )
-	PORT_DIPSETTING(    0x00, "30000" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0c, "0" )
-	PORT_DIPSETTING(    0x08, "1" )
-	PORT_DIPSETTING(    0x04, "2" )
-//  PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x70, "1 : 1" )
-	PORT_DIPSETTING(    0x60, "1 : 2" )
-	PORT_DIPSETTING(    0x50, "1 : 5" )
-	PORT_DIPSETTING(    0x40, "1 : 6" )
-	PORT_DIPSETTING(    0x30, "1 : 7" )
-	PORT_DIPSETTING(    0x20, "1 : 8" )
-	PORT_DIPSETTING(    0x10, "1 : 9" )
-	PORT_DIPSETTING(    0x00, "1 : 10" )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_DIPSETTING(    0x00, "?" )                                                   // ?限?
+	PORT_DIPNAME( 0x0c, 0x0c, "Gals" )                  PORT_DIPLOCATION("SW3:3,4")   // 美女
+	PORT_DIPSETTING(    0x0c, "0?" )                                                  // ?美女
+	PORT_DIPSETTING(    0x08, "1?" )                                                  // ?美女
+	PORT_DIPSETTING(    0x04, "2?" )                                                  // ?開女
+	PORT_DIPSETTING(    0x00, "3?" )                                                  // ?開女
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )                                     // (not shown in settings display)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW2", 0x10, EQUALS, 0x10) // 投幣
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW2", 0x10, EQUALS, 0x00) // 投幣
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                              // 清除
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                  // 測試      (hold on start for input test)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // 哈巴
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                               // 查帳
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW2", 0x20, EQUALS, 0x20) // 洗分
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW2", 0x20, EQUALS, 0x00) // 洗分
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    // ? set to 0 both
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // ? and you can't start a game
+	PORT_INCLUDE(mahjong_matrix_1p)
 
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY0")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ? set to 0 both
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ? and you can't start a game
 
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) // doesn't use any other gambling keys
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY2")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY3")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("KEY4")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( nkishusp )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x02, "Pay Out (%)" )
-	PORT_DIPSETTING(    0x07, "74" )
-	PORT_DIPSETTING(    0x06, "77" )
-	PORT_DIPSETTING(    0x05, "80" )
-	PORT_DIPSETTING(    0x04, "83" )
-	PORT_DIPSETTING(    0x03, "86" )
-	PORT_DIPSETTING(    0x02, "89" )
-	PORT_DIPSETTING(    0x01, "92" )
-	PORT_DIPSETTING(    0x00, "95" )
-	PORT_DIPNAME( 0x08, 0x00, "Odds Rate" )
+	PORT_DIPNAME( 0x07, 0x02, "Payout Rate" )           PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x07, "74%" )
+	PORT_DIPSETTING(    0x06, "77%" )
+	PORT_DIPSETTING(    0x05, "80%" )
+	PORT_DIPSETTING(    0x04, "83%" )
+	PORT_DIPSETTING(    0x03, "86%" )
+	PORT_DIPSETTING(    0x02, "89%" )
+	PORT_DIPSETTING(    0x01, "92%" )
+	PORT_DIPSETTING(    0x00, "95%" )
+	PORT_DIPNAME( 0x08, 0x00, "Odds Rate" )             PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "1,2,3,4,5,6,7,8" )
 	PORT_DIPSETTING(    0x08, "1,2,3,5,8,15,30,50" )
-	PORT_DIPNAME( 0x10, 0x00, "Max Bet" )
+	PORT_DIPNAME( 0x10, 0x00, "Maximum Bet" )           PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x10, "10" )
-	PORT_DIPNAME( 0x60, 0x60, "Min Bet" )
+	PORT_DIPNAME( 0x60, 0x60, "Minimum Bet" )           PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x60, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x80, 0x00, "Credit Timer" )
+	PORT_DIPNAME( 0x80, 0x80, "Credit Timer" )          PORT_DIPLOCATION("SW1:8")     // (clears credits after timeout if you don't start a game)
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )  // Only when bit 3 = 1
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x04, 0x04, "Credits Per Note" )  // Only when bit 3 = 0
+	PORT_DIPNAME( 0x04, 0x04, "Key-in Rate" )           PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x08, 0x08, "Money Type" )    // Decides whether to use bits 0&1 or bit 2
-	PORT_DIPSETTING(    0x08, "Coins" )
-	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0x10, 0x10, "Auto Play" )
+	PORT_DIPNAME( 0x08, 0x08, "Credit Mode" )           PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "Coin Acceptor" )
+	PORT_DIPSETTING(    0x00, "Key-In" )
+	PORT_DIPNAME( 0x10, 0x10, "Auto Play" )             PORT_DIPLOCATION("SW2:5")     // (automatically draws and discards tiles after reach)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Undress Girl" )
+	PORT_DIPNAME( 0x40, 0x40, "Nudity" )                PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )                                     // (not shown in settings display)
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Credit Limit" )
+	PORT_DIPNAME( 0x03, 0x03, "Credit Limit" )          PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(    0x03, "500" )
 	PORT_DIPSETTING(    0x02, "1000" )
 	PORT_DIPSETTING(    0x01, "2000" )
-	PORT_DIPSETTING(    0x00, "30000" )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x70, "1 : 1" )
-	PORT_DIPSETTING(    0x60, "1 : 2" )
-	PORT_DIPSETTING(    0x50, "1 : 5" )
-	PORT_DIPSETTING(    0x40, "1 : 6" )
-	PORT_DIPSETTING(    0x30, "1 : 7" )
-	PORT_DIPSETTING(    0x20, "1 : 8" )
-	PORT_DIPSETTING(    0x10, "1 : 9" )
-	PORT_DIPSETTING(    0x00, "1 : 10" )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                           // (seems to be limited to 9,999 trying to exceed this gives "RECORD ERROR 10")
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )                                     // (not shown in settings display)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   // data clear
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )   // stats
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08) // 投幣
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00) // 投幣
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                              // 清除
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                  // 測試      (hold on start for input test)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // 哈巴
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                               // 查帳
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                                             // 洗分
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    // ? set to 0 both
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // ? and you can't start a game
+	PORT_INCLUDE(mahjong_matrix_1p)
 
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY0")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ? set to 0 both
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ? and you can't start a game
 
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) // doesn't use any other gambling keys
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY2")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("KEY3")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("KEY4")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -3830,63 +3769,18 @@ static INPUT_PORTS_START( lhb )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )   // system reset
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )       // system reset
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )       // keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    // stats
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_IMPULSE(5)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coins
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("0") PORT_CODE(KEYCODE_0_PAD)   // shown in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(igs_mahjong_matrix)
 
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2)   // shown in test mode
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY4")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2)   // shown in test mode
 INPUT_PORTS_END
 
 
@@ -4035,45 +3929,48 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( xymg )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2")   // 投幣比率
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Credits Per Note" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Key-in Rate" )           PORT_DIPLOCATION("SW1:3,4")   // 開分比率
 	PORT_DIPSETTING(    0x0c, "10" )
 	PORT_DIPSETTING(    0x08, "20" )
 	PORT_DIPSETTING(    0x04, "50" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x10, 0x10, "Max Note Credits" )
+	PORT_DIPNAME( 0x10, 0x10, "Credit Limit" )          PORT_DIPLOCATION("SW1:5")     // 進分上限
 	PORT_DIPSETTING(    0x10, "500" )
-	PORT_DIPSETTING(    0x00, "9999" )
-	PORT_DIPNAME( 0x20, 0x20, "Money Type" )
-	PORT_DIPSETTING(    0x20, "Coins" ) // use bits 0-1
-	PORT_DIPSETTING(    0x00, "Notes" ) // use bits 2-3
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                           // 無限制     (if you have 10,000 or more credits, further credits will be rejected)
+	PORT_DIPNAME( 0x20, 0x20, "Credit Mode" )           PORT_DIPLOCATION("SW1:6")     // 進分方式
+	PORT_DIPSETTING(    0x20, "Coin Acceptor" )                                       // 投幣
+	PORT_DIPSETTING(    0x00, "Key-In" )                                              // 開分
+	PORT_DIPNAME( 0x40, 0x40, "Payout Mode" )           PORT_DIPLOCATION("SW1:7")     // 退分方式
+	PORT_DIPSETTING(    0x40, "Return Coins" )                                        // 退幣
+	PORT_DIPSETTING(    0x00, "Key-Out" )                                             // 洗分
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:8")     // 示範音樂
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                        // 無
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )                                         // 有
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x03, 0x03, "Double Up Jackpot" )     PORT_DIPLOCATION("SW2:1,2")   // 比倍爆機
 	PORT_DIPSETTING(    0x03, "1000" )
 	PORT_DIPSETTING(    0x02, "1500" )
 	PORT_DIPSETTING(    0x01, "2000" )
 	PORT_DIPSETTING(    0x00, "3000" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Bet" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )           PORT_DIPLOCATION("SW2:3,4")   // 最小押注
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  // shown in test mode
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )        PORT_DIPLOCATION("SW2:5")     // 比倍遊戲
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                        // 無
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )                                         // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )                                     // (not shown in settings display)
 
+	// FIXME: SW3 doesn't respond in input test - are these hooked up correctly?
 	PORT_START("DSW3")
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
@@ -4087,62 +3984,16 @@ static INPUT_PORTS_START( xymg )
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )   // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )   // stats
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coin
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )      // keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // stats
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(igs_mahjong_matrix)
 INPUT_PORTS_END
 
 
