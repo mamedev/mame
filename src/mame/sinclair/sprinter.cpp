@@ -776,7 +776,17 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		m_cbl_wa = 0;
 		m_cbl_wae = cbl_mode16();
 		const u8 divs[16] = {13, 9, 0, 0, 0, 0, 0, 0, 27, 19, 13, 9, 6, 4, 3, 1};
-		const attotime rate = (cbl_mode() && divs[m_cbl_xx & 15]) ? attotime::from_ticks(divs[m_cbl_xx & 15] + 1, X_SP / 192) : attotime::never;
+		attotime rate;
+		if (cbl_mode() && divs[m_cbl_xx & 15])
+		{
+			rate = attotime::from_ticks(divs[m_cbl_xx & 15] + 1, X_SP / 192);
+		}
+		else
+		{
+			rate = attotime::never;
+			if (m_hold_irq)
+				m_irq_off_timer->adjust(attotime::zero);
+		}
 		m_cbl_timer->adjust(rate, 0, rate);
 		break;
 	}
