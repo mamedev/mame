@@ -26,7 +26,7 @@ bool testAssertHandler(const bx::Location& _location, const char* _format, va_li
 	return true;
 }
 
-int runAllTests(int _argc, const char* _argv[])
+int runAllTests(int32_t _argc, const char* _argv[])
 {
 	bx::setAssertHandler(testAssertHandler);
 
@@ -58,12 +58,25 @@ int runAllTests(int _argc, const char* _argv[])
 		"\n\n"
 		);
 
+	bx::printf("Args:\n");
+
+	for (int32_t ii = 0; ii < _argc; ++ii)
+	{
+		bx::printf("\t%2d: \"%s\"", ii, _argv[ii]);
+	}
+
+	bx::printf("\n\n");
+
 	using namespace Catch;
 
 	Session session;
 
 	ConfigData config;
-	config.defaultColourMode = BX_PLATFORM_EMSCRIPTEN ? ColourMode::None : ColourMode::PlatformDefault;
+	config.defaultColourMode = BX_PLATFORM_EMSCRIPTEN
+		? ColourMode::None
+		: ColourMode::PlatformDefault
+		;
+	config.showDurations = ShowDurations::Always;
 
 	session.useConfigData(config);
 

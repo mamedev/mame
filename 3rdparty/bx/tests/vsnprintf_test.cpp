@@ -12,9 +12,10 @@
 
 TEST_CASE("No output buffer provided.", "[string][printf]")
 {
-	REQUIRE(4 == bx::snprintf(NULL, 0, "test") );
-
-	REQUIRE(1 == bx::snprintf(NULL, 0, "%d", 1) );
+	REQUIRE(4 == bx::snprintf(NULL,  0, "test") );
+	REQUIRE(4 == bx::snprintf(NULL, 10, "test") );
+	REQUIRE(1 == bx::snprintf(NULL,  0, "%d", 1) );
+	REQUIRE(1 == bx::snprintf(NULL, 10, "%d", 1) );
 }
 
 TEST_CASE("Truncated output buffer.", "[string][printf]")
@@ -58,7 +59,8 @@ TEST_CASE("Truncated output buffer.", "[string][printf]")
 template<bool StdCompliantT>
 static bool test(const char* _expected, const char* _format, va_list _argList)
 {
-	int32_t max = (int32_t)bx::strLen(_expected) + 1;
+	const int32_t expectedLen = bx::strLen(_expected);
+	int32_t max = expectedLen + 1024;
 	char* bxTemp = (char*)alloca(max);
 
 	va_list argList;
@@ -66,7 +68,7 @@ static bool test(const char* _expected, const char* _format, va_list _argList)
 	const int32_t bxLen = bx::vsnprintf(bxTemp, max, _format, argList);
 
 	bool result = true
-		&& bxLen == max-1
+		&& bxLen == expectedLen
 		&&     0 == bx::strCmp(_expected, bxTemp)
 		;
 
@@ -96,8 +98,8 @@ static bool test(const char* _expected, const char* _format, va_list _argList)
 	{
 		printf("---\n");
 		printf("printf format '%s'\n", _format);
-		printf("       result (%4d) '%s'\n", bxLen, bxTemp);
-		printf("     expected (%4d) '%s'\n", max-1, _expected);
+		printf("    bx result (%4d) '%s'\n", bxLen, bxTemp);
+		printf("     expected (%4d) '%s'\n", expectedLen, _expected);
 		printf("CRT vsnprintf (%4d) '%s'\n", crtLen, crtTemp);
 	}
 
@@ -133,6 +135,9 @@ TEST_CASE("Format %f", "[string][printf]")
 	REQUIRE(test("  13.370", "%*.*f", 8, 3, 13.37) );
 	REQUIRE(test("13.370  ", "%-8.3f", 13.37) );
 	REQUIRE(test("13.370  ", "%*.*f", -8, 3, 13.37) );
+	REQUIRE(test(" -13.370", "% 8.3f", -13.37) );
+	REQUIRE(test("          13.370", "% 16.3f",  13.37) );
+	REQUIRE(test("         -13.370", "% 16.3f", -13.37) );
 
 	REQUIRE(test("nan     ", "%-8f",  std::numeric_limits<double>::quiet_NaN() ) );
 	REQUIRE(test("     nan", "%8f",   std::numeric_limits<double>::quiet_NaN() ) );
@@ -216,8 +221,10 @@ TEST_CASE("Format %f", "[string][printf]")
 TEST_CASE("Format %d, %i, %o, %u, %x", "[string][printf]")
 {
 	REQUIRE(test("1337", "%d", 1337) );
+	REQUIRE(test("-1337", "% d", -1337) );
 	REQUIRE(test("1337                ", "%-20d",  1337) );
 	REQUIRE(test("-1337               ", "%-20d", -1337) );
+	REQUIRE(test("               -1337", "% 20d", -1337) );
 
 	REQUIRE(test("1337", "%i", 1337) );
 	REQUIRE(test("1337                ", "%-20i",  1337) );
@@ -273,7 +280,7 @@ TEST_CASE("Format %d, %i, %o, %u, %x", "[string][printf]")
 	REQUIRE(test("-001", "%04i", -1) );
 	REQUIRE(test("+001", "%+04i", 1) );
 
-	if (BX_ENABLED(BX_ARCH_32BIT) )
+	if (sizeof(intmax_t) == 4)
 	{
 		REQUIRE(test("2147483647", "%jd", INTMAX_MAX) );
 	}
@@ -318,11 +325,18 @@ TEST_CASE("Format %s", "[string][printf]")
 
 TEST_CASE("Format %td", "[string][printf]")
 {
-	size_t size = size_t(-1);
+	ptrdiff_t size = ptrdiff_t(-1);
 
 	REQUIRE(test("-1", "%td", size) );
 
-	REQUIRE(test("3221225472", "%td", size_t(3221225472) ) );
+	if (4 == sizeof(ptrdiff_t) )
+	{
+		REQUIRE(test("-1073741824", "%td", ptrdiff_t(3221225472) ) );
+	}
+	else
+	{
+		REQUIRE(test("3221225472", "%td", ptrdiff_t(3221225472) ) );
+	}
 }
 
 TEST_CASE("Format %n", "[string][printf]")
@@ -353,6 +367,7 @@ TEST_CASE("Format %c, %s, %S", "[string][printf]")
 	REQUIRE(test("x                   ", "%-20c", 'x') );
 
 	REQUIRE(test("hello               ", "%-20s", "hello") );
+	REQUIRE(test("     hello", "%10s", "hello") );
 	REQUIRE(test("hello, world!", "%s, %s!", "hello", "world") );
 
 	REQUIRE(testNotStdCompliant("h",     "%1s", "hello") );
