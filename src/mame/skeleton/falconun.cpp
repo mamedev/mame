@@ -5,6 +5,9 @@
 #include "emu.h"
 
 #include "cpu/m6800/m6800.h"
+#include "cpu/mcs48/mcs48.h"
+#include "machine/6821pia.h"
+#include "machine/input_merger.h"
 
 #include "screen.h"
 
@@ -27,17 +30,18 @@ class falconun_state : public driver_device
 public:
 	falconun_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "falcon_terminal"),
+		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen")
 	{ }
 
 	void falconun(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<m6802_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	void memmap(address_map &map) ATTR_COLD;
+	void slavemap(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 };
@@ -47,13 +51,30 @@ INPUT_PORTS_END
 
 void falconun_state::memmap(address_map &map)
 {
-	map(0x0000, 0xffff).rom();
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x2003).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc000, 0xffff).rom().region("falcon_terminal", 0xc000);
+}
+
+void falconun_state::slavemap(address_map &map)
+{
+	map(0x000, 0xfff).rom().region("slave", 0);
 }
 
 void falconun_state::falconun(machine_config &config)
 {
 	M6802(config, m_maincpu, 40'000'000 / 4); // TODO 10 MHz for a M6802??
 	m_maincpu->set_addrmap(AS_PROGRAM, &falconun_state::memmap);
+	m_maincpu->set_ram_enable(false);
+
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);
+
+	pia6821_device &pia(PIA6821(config, "pia"));
+	pia.irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	pia.irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+
+	i8035_device &slavemcu(I8035(config, "slavemcu", 6'000'000));
+	slavemcu.set_addrmap(AS_PROGRAM, &falconun_state::slavemap);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
