@@ -5,8 +5,9 @@
 
 Bootleg of Omori's 野球拳 - The Yakyuken
 
-It's a cocktail cabinet, each side has 7 buttons. One of the buttons is
-apparently for relinquishing controls to the other side.
+It's a strip rock-paper-scissors game in a cocktail cabinet, each side has
+7 buttons. One of the buttons apparently is for relinquishing controls to
+the other side.
 
 PCB is marked 20282 and LC (stands for "lato componenti", so components side)
 with a small riser board marked W 15482 plugged into one of the main CPU ROMs'
@@ -24,7 +25,7 @@ Bank of 8 switches
 The riser board has a pair of HM4334 1K*4 static RAMs and a quad 2-input NAND gate.
 
 TODO:
-- remaining DIPs
+- find out win rate dipswitch values, or is it max payout rate?
 - doesn't it have a hopper?
 - game sometimes leaves gaps when the lady is undressing
 - colors aren't 100% correct (see i.e. the stripes in the curtains)
@@ -38,6 +39,7 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 
 #include "emupal.h"
@@ -165,7 +167,7 @@ uint32_t yakyuken_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void yakyuken_state::main_program_map(address_map &map)
 {
 	map(0x0000, 0x37ff).rom();
-	map(0x6400, 0x67ff).ram();
+	map(0x6400, 0x67ff).ram().share("nvram");
 	map(0x7000, 0x73ff).select(0xc00).w(FUNC(yakyuken_state::vram_w));
 }
 
@@ -242,15 +244,15 @@ static INPUT_PORTS_START( yakyuken )
 	PORT_DIPNAME( 0x04, 0x04, "Max Bet" )               PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "30" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW:4") // some combination of the following 3 seems to affect win probability
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x38, 0x38, "Win Rate" )              PORT_DIPLOCATION("SW:4,5,6")
+	PORT_DIPSETTING(    0x38, "?%" )
+	PORT_DIPSETTING(    0x30, "?%" )
+	PORT_DIPSETTING(    0x28, "?%" )
+	PORT_DIPSETTING(    0x20, "?%" )
+	PORT_DIPSETTING(    0x18, "?%" )
+	PORT_DIPSETTING(    0x10, "?%" )
+	PORT_DIPSETTING(    0x08, "?%" )
+	PORT_DIPSETTING(    0x00, "100%" ) // test
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -281,6 +283,8 @@ void yakyuken_state::yakyuken(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &yakyuken_state::sound_io_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

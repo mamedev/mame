@@ -653,7 +653,7 @@ void ampoker2_state::io_map(address_map &map)
 	map(0x36, 0x36).w(FUNC(ampoker2_state::port36_w));    /* see write handlers */
 	map(0x37, 0x37).w(FUNC(ampoker2_state::watchdog_reset_w));
 	map(0x38, 0x39).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x3A, 0x3A).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x3a, 0x3a).r("aysnd", FUNC(ay8910_device::data_r));
 }
 
 /*
