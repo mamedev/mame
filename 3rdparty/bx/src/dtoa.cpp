@@ -428,7 +428,7 @@ namespace bx
 
 	int32_t toString(char* _dst, int32_t _max, double _value)
 	{
-		int32_t sign = 0 != (doubleToBits(_value) & (UINT64_C(1)<<63) ) ? 1 : 0;
+		int32_t sign = 0 != (doubleToBits(_value) & kDoubleSignMask) ? 1 : 0;
 		if (1 == sign)
 		{
 			*_dst++ = '-';

@@ -130,6 +130,8 @@ static bool testNotStdCompliant(const char* _expected, const char* _format, ...)
 
 TEST_CASE("Format %f", "[string][printf]")
 {
+	constexpr double kDoubleNan = bx::bitsToDouble(bx::kDoubleExponentMask | bx::kDoubleMantissaMask);
+
 	REQUIRE(test("1.337",    "%0.3f", 1.337) );
 	REQUIRE(test("  13.370", "%8.3f", 13.37) );
 	REQUIRE(test("  13.370", "%*.*f", 8, 3, 13.37) );
@@ -139,13 +141,15 @@ TEST_CASE("Format %f", "[string][printf]")
 	REQUIRE(test("          13.370", "% 16.3f",  13.37) );
 	REQUIRE(test("         -13.370", "% 16.3f", -13.37) );
 
-	REQUIRE(test("nan     ", "%-8f",  std::numeric_limits<double>::quiet_NaN() ) );
-	REQUIRE(test("     nan", "%8f",   std::numeric_limits<double>::quiet_NaN() ) );
-	REQUIRE(test("-NAN    ", "%-8F", -std::numeric_limits<double>::quiet_NaN() ) );
+	REQUIRE(test("nan     ", "%-8f",  kDoubleNan) );
+	REQUIRE(test("     nan", "%8f",   kDoubleNan) );
+	REQUIRE(test("-NAN    ", "%-8F", -kDoubleNan) );
 
-	REQUIRE(test("     inf", "%8f",   std::numeric_limits<double>::infinity() ) );
-	REQUIRE(test("inf     ", "%-8f",  std::numeric_limits<double>::infinity() ) );
-	REQUIRE(test("    -INF", "%8F",  -std::numeric_limits<double>::infinity() ) );
+#if !defined(__FAST_MATH__) || !__FAST_MATH__
+	REQUIRE(test("     inf", "%8f",   bx::kDoubleInfinity) );
+	REQUIRE(test("inf     ", "%-8f",  bx::kDoubleInfinity) );
+	REQUIRE(test("    -INF", "%8F",  -bx::kDoubleInfinity) );
+#endif // !defined(__FAST_MATH__) || !__FAST_MATH__
 
 	REQUIRE(test(" 1.0",     "%4.1f",    1.0) );
 	REQUIRE(test(" 1.500",   "%6.3f",    1.5) );

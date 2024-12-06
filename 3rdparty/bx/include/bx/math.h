@@ -261,7 +261,7 @@ namespace bx
 	/// Returns decomposed given floating point value _a into a normalized fraction and
 	/// an integral power of two.
 	///
-	BX_CONSTEXPR_FUNC float frexp(float _a, int32_t* _outExp);
+	float frexp(float _a, int32_t* _outExp);
 
 	/// Returns e (2.71828...) raised to the _a power.
 	///

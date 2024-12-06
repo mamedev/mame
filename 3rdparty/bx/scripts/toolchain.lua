@@ -509,6 +509,7 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "Release" }
+		targetsuffix "Release"
 		flags {
 			"NoBufferSecurityCheck",
 			"OptimizeSpeed",
@@ -516,7 +517,6 @@ function toolchain(_buildDir, _libDir)
 		defines {
 			"NDEBUG",
 		}
-		targetsuffix "Release"
 
 	configuration { "*-clang" }
 		buildoptions {

@@ -386,20 +386,6 @@ namespace bx
 		return result;
 	}
 
-	inline BX_CONSTEXPR_FUNC float frexp(float _a, int32_t* _outExp)
-	{
-		const uint32_t ftob     = floatToBits(_a);
-		const uint32_t masked0  = uint32_and(ftob, kFloatExponentMask);
-		const uint32_t exp0     = uint32_srl(masked0, kFloatExponentBitShift);
-		const uint32_t masked1  = uint32_and(ftob,   kFloatSignMask | kFloatMantissaMask);
-		const uint32_t bits     = uint32_or(masked1, UINT32_C(0x3f000000) );
-		const float    result   = bitsToFloat(bits);
-
-		*_outExp = int32_t(exp0 - 0x7e);
-
-		return result;
-	}
-
 	inline BX_CONSTEXPR_FUNC float ldexp(float _a, int32_t _b)
 	{
 		const uint32_t ftob     = floatToBits(_a);
@@ -416,8 +402,15 @@ namespace bx
 
 	inline BX_CONSTEXPR_FUNC float log(float _a)
 	{
-		int32_t exp = 0;
-		float ff = frexp(_a, &exp);
+		const uint32_t ftob     = floatToBits(_a);
+
+		const uint32_t masked0  = uint32_and(ftob, kFloatExponentMask);
+		const uint32_t exp0     = uint32_srl(masked0, kFloatExponentBitShift);
+		int32_t exp = int32_t(exp0 - 0x7e);
+
+		const uint32_t masked1  = uint32_and(ftob,   kFloatSignMask | kFloatMantissaMask);
+		const uint32_t bits     = uint32_or(masked1, UINT32_C(0x3f000000) );
+		float ff = bitsToFloat(bits);
 
 		if (ff < kSqrt2*0.5f)
 		{
