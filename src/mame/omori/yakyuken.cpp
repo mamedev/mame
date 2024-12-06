@@ -25,11 +25,13 @@ Bank of 8 switches
 The riser board has a pair of HM4334 1K*4 static RAMs and a quad 2-input NAND gate.
 
 TODO:
+- dump/add Omori's version, it's assumed it will have a title screen, as seen
+  inside the gfx roms (OEC logo is still in there too)
 - find out win rate dipswitch values, or is it max payout rate?
-- doesn't it have a hopper?
+- doesn't it have a hopper? or maybe the bootleg version removed that?
 - game sometimes leaves gaps when the lady is undressing
-- colors aren't 100% correct (see i.e. the stripes in the curtains)
-  reference video: https://www.youtube.com/watch?v=zTOFIhuwR2w
+- colors aren't 100% correct (see i.e. the stripes in the curtains), reference video:
+  https://www.youtube.com/watch?v=zTOFIhuwR2w
 - verify sound pitch (unfortunately, no pcb sound in above video)
 - verify irq frequency, though it looks similar to the pcb video
 

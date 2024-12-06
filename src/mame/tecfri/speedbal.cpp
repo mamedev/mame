@@ -606,6 +606,6 @@ void speedbal_state::init_musicbal()
 } // anonymous namespace
 
 
-GAMEL( 1987, speedbal,         0, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 1)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
+GAMEL( 1987, speedbal,  0,        speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 1)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
 GAMEL( 1987, speedbala, speedbal, speedbal, speedbal, speedbal_state, init_speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball (set 2)", MACHINE_SUPPORTS_SAVE, layout_speedbal )
-GAMEL( 1988, musicbal,         0, speedbal, musicbal, speedbal_state, init_musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball",         MACHINE_SUPPORTS_SAVE, layout_speedbal )
+GAMEL( 1988, musicbal,  0,        speedbal, musicbal, speedbal_state, init_musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball",         MACHINE_SUPPORTS_SAVE, layout_speedbal )
