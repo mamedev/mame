@@ -474,9 +474,9 @@ private:
 							draw_aa_pixel(dstdata, pitch, x1, dy, apply_intensity(0xff & (~y1 >> 8), col));
 						dy++;
 						dx -= 0x10000 - (0xffff & y1); // take off amount plotted
-						u8 a1 = (dx >> 8) & 0xff;   // calc remainder pixel
-						dx >>= 16;                   // adjust to pixel (solid) count
-						while (dx--)                 // plot rest of pixels
+						u8 a1 = (dx >> 8) & 0xff;      // calc remainder pixel
+						dx >>= 16;                     // adjust to pixel (solid) count
+						while (dx--)                   // plot rest of pixels
 						{
 							if (dy >= 0 && dy < height)
 								draw_aa_pixel(dstdata, pitch, x1, dy, col);
@@ -510,9 +510,9 @@ private:
 							draw_aa_pixel(dstdata, pitch, dx, y1, apply_intensity(0xff & (~x1 >> 8), col));
 						dx++;
 						dy -= 0x10000 - (0xffff & x1); // take off amount plotted
-						u8 a1 = (dy >> 8) & 0xff;   // remainder pixel
-						dy >>= 16;                   // adjust to pixel (solid) count
-						while (dy--)                 // plot rest of pixels
+						u8 a1 = (dy >> 8) & 0xff;      // remainder pixel
+						dy >>= 16;                     // adjust to pixel (solid) count
+						while (dy--)                   // plot rest of pixels
 						{
 							if (dx >= 0 && dx < width)
 								draw_aa_pixel(dstdata, pitch, dx, y1, col);

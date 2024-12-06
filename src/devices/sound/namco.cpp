@@ -5,11 +5,10 @@
     NAMCO sound driver.
 
     This driver handles the four known types of NAMCO wavetable sounds:
-
-        - 3-voice mono (PROM-based design: Pac-Man, Pengo, Dig Dug, etc)
-        - 8-voice quadrophonic (Pole Position 1, Pole Position 2)
-        - 8-voice mono (custom 15XX: Mappy, Dig Dug 2, etc)
-        - 8-voice stereo (System 1)
+    - 3-voice mono (PROM-based design: Pac-Man, Pengo, Dig Dug, etc)
+    - 8-voice quadrophonic (Pole Position 1, Pole Position 2)
+    - 8-voice mono (custom 15XX: Mappy, Dig Dug 2, etc)
+    - 8-voice stereo (System 1)
 
     The 15XX custom does not have a DAC of its own; instead, it streams
     the 4-bit PROM data directly into the 99XX custom DAC. Most pre-99XX
@@ -577,7 +576,6 @@ void namco_cus30_device::namcos1_sound_w(offs_t offset, uint8_t data)
 	sound_channel *voice;
 	int ch;
 	int nssw;
-
 
 	/* verify the offset */
 	if (offset > 63)
