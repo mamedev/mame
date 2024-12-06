@@ -97,13 +97,13 @@
 
 void irobot_state::irobot_clearirq_w(uint8_t data)
 {
-	m_maincpu->set_input_line(M6809_IRQ_LINE ,CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
 void irobot_state::irobot_clearfirq_w(uint8_t data)
 {
-	m_maincpu->set_input_line(M6809_FIRQ_LINE ,CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -372,10 +372,10 @@ ROM_START( irobot )
 	ROM_LOAD( "136029-121.bin",      0x2820,  0x0400, CRC(adebcb99) SHA1(4628f8af43d82e578833b1452ec747eeb822b4e4) )
 	ROM_LOAD( "136029-122.bin",      0x2c20,  0x0400, CRC(da7b6f79) SHA1(02398ba6e7c56d961bf92e2755e530db1144219d) )
 	ROM_LOAD( "136029-123.bin",      0x3020,  0x0400, CRC(39fff18f) SHA1(85f338eeff7d8ed58804611bf8446ebb697d196d) )
-ROM_END
 
 	/*  Colorprom from John's driver. ? */
 	/*  ROM_LOAD( "136029.125",    0x0000, 0x0020, CRC(c05abf82) ) */
+ROM_END
 
 
 
