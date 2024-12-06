@@ -1,8 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Ivan Vangelista, hap
 
 /*
+
 Bootleg of Omori's 野球拳 - The Yakyuken
+
+It's a cocktail cabinet, each side has 7 buttons. One of the buttons is
+apparently for relinquishing controls to the other side.
 
 PCB is marked 20282 and LC (stands for "lato componenti", so components side)
 with a small riser board marked W 15482 plugged into one of the main CPU ROMs'
@@ -13,20 +17,22 @@ SGS Z80CPUB1 main CPU (clock measured 3.07 MHz)
 18.432 MHz XTAL
 SGS Z80CPUB1 audio CPU (clock measured 1.53 MHz)
 AY-3-8910 sound chip
-MK4802 RAM (near audio CPU) and snd chip Ay-3-8910
+MK4802 RAM (near audio CPU)
 6x 2114 RAM (near GFX ROMs)
 Bank of 8 switches
 
 The riser board has a pair of HM4334 1K*4 static RAMs and a quad 2-input NAND gate.
 
 TODO:
-- sound
-- is visible area correct?
 - remaining DIPs
+- doesn't it have a hopper?
+- game sometimes leaves gaps when the lady is undressing
 - colors aren't 100% correct (see i.e. the stripes in the curtains)
   reference video: https://www.youtube.com/watch?v=zTOFIhuwR2w
-*/
+- verify sound pitch (unfortunately, no pcb sound in above video)
+- verify irq frequency, though it looks similar to the pcb video
 
+*/
 
 #include "emu.h"
 
@@ -50,30 +56,34 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_bgram(*this, "bgram"),
-		m_fgram(*this, "fgram")
+		m_screen(*this, "screen"),
+		m_ay(*this, "ay"),
+		m_vram(*this, "vram", 0x400*2, ENDIANNESS_LITTLE)
 	{ }
 
 	void yakyuken(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<ay8910_device> m_ay;
 
-	required_shared_ptr<uint8_t> m_bgram;
-	required_shared_ptr<uint8_t> m_fgram;
+	memory_share_creator<uint16_t> m_vram;
 
-	tilemap_t *m_bg_tilemap = nullptr;
-	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_ay_data = 0;
+	tilemap_t *m_tilemap = nullptr;
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	void bgram_w(offs_t offset, uint8_t data);
-	void fgram_w(offs_t offset, uint8_t data);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	void vram_w(offs_t offset, uint8_t data);
+	void palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_io_map(address_map &map) ATTR_COLD;
@@ -82,60 +92,81 @@ private:
 	void sound_io_map(address_map &map) ATTR_COLD;
 };
 
-
-TILE_GET_INFO_MEMBER(yakyuken_state::get_bg_tile_info)
+void yakyuken_state::machine_start()
 {
-	int const code = m_bgram[tile_index];
+	save_item(NAME(m_ay_data));
+}
 
+
+/*************************************
+ *
+ *  Video hardware
+ *
+ *************************************/
+
+void yakyuken_state::palette(palette_device &palette) const
+{
+	for (int i = 0; i < 8; i++)
+	{
+		palette.set_pen_color(i, pal1bit(BIT(i, 0)), pal1bit(BIT(i, 1)), pal1bit(BIT(i, 2)));
+
+		// second half is brighter
+		palette.set_pen_color(i | 8, pal1bit(BIT(i, 0)) | 0x80, pal1bit(BIT(i, 1)) | 0x80, pal1bit(BIT(i, 2)) | 0x80);
+	}
+}
+
+TILEMAP_MAPPER_MEMBER(yakyuken_state::tilemap_scan_rows)
+{
+	row += 2;
+	col -= 1;
+
+	// upper 2 rows are left and right columns
+	if (col & 0x20)
+		return (col & 1) << 5 | row;
+	else
+		return row << 5 | col;
+}
+
+TILE_GET_INFO_MEMBER(yakyuken_state::get_tile_info)
+{
+	int const code = m_vram[tile_index];
 	tileinfo.set(0, code, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(yakyuken_state::get_fg_tile_info)
-{
-	int code = m_fgram[tile_index];
-
-	if (code == 0x00) code = 0x2ff; // why? is this another 'big sprite' thing?
-
-	tileinfo.set(1, code, 0, 0);
-}
+static GFXDECODE_START( gfx_yakyuken )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_planar, 0, 1 )
+GFXDECODE_END
 
 
 void yakyuken_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(yakyuken_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(yakyuken_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-
-	m_fg_tilemap->set_transparent_pen(0);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(yakyuken_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(yakyuken_state::tilemap_scan_rows)), 8, 8, 34, 28);
 }
 
-void yakyuken_state::fgram_w(offs_t offset, uint8_t data)
+void yakyuken_state::vram_w(offs_t offset, uint8_t data)
 {
-	m_fgram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-void yakyuken_state::bgram_w(offs_t offset, uint8_t data)
-{
-	m_bgram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
+	m_vram[offset & 0x3ff] = (offset >> 2 & 0x300) | data;
+	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 uint32_t yakyuken_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
+
 void yakyuken_state::main_program_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();
+	map(0x0000, 0x37ff).rom();
 	map(0x6400, 0x67ff).ram();
-	map(0x7000, 0x73ff).ram().w(FUNC(yakyuken_state::bgram_w)).share(m_bgram);
-	map(0x7400, 0x77ff).ram().w(FUNC(yakyuken_state::fgram_w)).share(m_fgram);
-	map(0x7c00, 0x7fff).ram(); // only seems to be initialized with 0xff at start up
+	map(0x7000, 0x73ff).select(0xc00).w(FUNC(yakyuken_state::vram_w));
 }
 
 void yakyuken_state::main_io_map(address_map &map)
@@ -144,9 +175,9 @@ void yakyuken_state::main_io_map(address_map &map)
 	map(0x00, 0x00).portr("SW");
 	map(0x01, 0x01).portr("IN0");
 	map(0x02, 0x02).portr("IN1");
-	map(0x17, 0x17).lw8(NAME([this] (uint8_t data) { if (data & 0xfe) logerror("flip w: %02x\n", data); flip_screen_set(BIT(data, 0)); }));
-	// map(0x30, 0x30).w() // lamps?
-	// .w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x03, 0x03).portr("IN2");
+	map(0x17, 0x17).lw8(NAME([this] (uint8_t data) { flip_screen_set(BIT(data, 0)); }));
+	map(0x30, 0x30).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
 void yakyuken_state::sound_program_map(address_map &map)
@@ -158,11 +189,18 @@ void yakyuken_state::sound_program_map(address_map &map)
 void yakyuken_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	// .r("soundlatch", FUNC(generic_latch_8_device::read));
-	// .w("ay", FUNC(ay8910_device::address_data_w));
-	// .r("ay", FUNC(ay8910_device::data_r));
+	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x01, 0x01).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
+	map(0x02, 0x02).lw8(NAME([this] (uint8_t data) { m_ay_data = data; }));
+	map(0x03, 0x03).lw8(NAME([this] (uint8_t data) { m_ay->write_bc1_bc2(data & 3, m_ay_data); }));
 }
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( yakyuken )
 	PORT_START("IN0")
@@ -170,83 +208,105 @@ static INPUT_PORTS_START( yakyuken )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) // 500 in book-keeping
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) // 1000 in book-keeping
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("P1 Control")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("P2 Control")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // only works without credits inserted
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Bet")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Gu (rock)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Choki (scissors)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Pa (paper)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Take Score")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL PORT_NAME("P2 Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL PORT_NAME("P2 Take Score")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x03, "A 1C / B 5C / C 10C" )
 	PORT_DIPSETTING(    0x02, "A 2C / B 10C / C 20C" )
 	PORT_DIPSETTING(    0x01, "A 4C / B 20C / C 40C" )
 	PORT_DIPSETTING(    0x00, "A 5C / B 25C / C 50C" )
-	PORT_DIPNAME( 0x04, 0x04, "Max Bet" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPNAME( 0x04, 0x04, "Max Bet" )               PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "30" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4") // some combination of the following 3 seems to affect win probability
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW:4") // some combination of the following 3 seems to affect win probability
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
-static GFXDECODE_START( gfx_yakyuken )
-	GFXDECODE_ENTRY( "tiles", 0,     gfx_8x8x4_planar, 0, 1 )
-	GFXDECODE_ENTRY( "tiles", 0x800, gfx_8x8x4_planar, 0, 1 )
-GFXDECODE_END
-
+/*************************************
+ *
+ *  Machine config
+ *
+ *************************************/
 
 void yakyuken_state::yakyuken(machine_config &config)
 {
-	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.07 MHz
+	// basic machine hardware
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 3 / 2); // 3.072 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &yakyuken_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &yakyuken_state::main_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(yakyuken_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 12); // 1.53 MHz
+	attotime irq_period = attotime::from_ticks(0x2000, 18.432_MHz_XTAL / 3);
+	m_maincpu->set_periodic_int(FUNC(yakyuken_state::irq0_line_hold), irq_period);
+
+	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 3 / 4); // 1.536 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &yakyuken_state::sound_program_map);
 	m_audiocpu->set_addrmap(AS_IO, &yakyuken_state::sound_io_map);
 
+	config.set_maximum_quantum(attotime::from_hz(600));
+
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 256-1, 0, 256-1);
-	screen.set_screen_update(FUNC(yakyuken_state::screen_update));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(34*8, 28*8);
+	m_screen->set_visarea(0*8, 34*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(yakyuken_state::screen_update));
+	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_yakyuken);
-	PALETTE(config, "palette").set_entries(0x10); // TODO
+	PALETTE(config, "palette", FUNC(yakyuken_state::palette), 0x10);
 
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	AY8910(config, "ay", 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.35);
+	AY8910(config, m_ay, 18.432_MHz_XTAL / 3 / 16).add_route(ALL_OUTPUTS, "mono", 0.35);
 }
 
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( yakyuken )
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -272,4 +332,10 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 198?, yakyuken, 0, yakyuken, yakyuken, yakyuken_state, empty_init, ROT0, "bootleg", "The Yakyuken", MACHINE_IS_SKELETON )
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+GAME( 1982, yakyuken, 0, yakyuken, yakyuken, yakyuken_state, empty_init, ROT0, "bootleg", "The Yakyuken", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
