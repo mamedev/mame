@@ -563,7 +563,7 @@ namespace
         map(0x40000006, 0x40000006).w(FUNC(news_iop_state::iointen_w));
         map(0x40000007, 0x40000007).w(FUNC(news_iop_state::cpureset_w));
 
-        map(0x42000000, 0x42000003).rw(m_interval_timer, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // 3-channel timer (uPD8253C)
+        map(0x42000000, 0x42000003).rw(m_interval_timer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 
         map(0x44000000, 0x44000003).m(m_fdc, FUNC(upd765a_device::map));
         map(0x44000007, 0x44000007).rw(m_fdc, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
