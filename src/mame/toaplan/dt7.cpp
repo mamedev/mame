@@ -5,17 +5,16 @@
    differences to keep it separate
 
    TODO:
-    - verify audio CPU opcodes
+    - verify audio CPU opcodes (see toaplan_v25_tables.h)
     - correctly hook up interrupts (especially V25)
     - correctly hook up inputs (there's a steering wheel test? is the game switchable)
     - serial comms (needs support in V25 core?) for linked units
     - verify frequencies on chips
     - verify alt titles, some regions have 'Car Fighting' as a subtitle, region comes from EEPROM?
     - verify text layer palettes
-	- currently only coins up with service button
-	- course selection cursor doesn't move?
-	- sound dies after one stage?
-	- game crashes after two stages?
+	- service mode doesn't display properly
+    - currently only coins up with service button
+    - sound dies after one stage?
 */
 
 
@@ -55,12 +54,19 @@ public:
 		, m_palette(*this, "palette%u", 0U)
 		, m_shared_ram(*this, "shared_ram")
 		, m_tx_videoram(*this, "tx_videoram")
+		, m_lineram(*this, "lineram")
+		, m_eepromport(*this, "EEPROM")
+		, m_sysport(*this, "SYS")
+		, m_p1port(*this, "IN1")
+		, m_p2port(*this, "IN2")
 	{ }
 
 public:
 	void dt7(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -71,7 +77,9 @@ private:
 
 	void tx_videoram_dt7_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	TILE_GET_INFO_MEMBER(get_text_dt7_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_dt7_tile_info);
+
+	void draw_tx_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int table);
 
 	void dt7_68k_0_mem(address_map &map);
 	void dt7_68k_1_mem(address_map &map);
@@ -79,21 +87,26 @@ private:
 	void dt7_shared_mem(address_map &map);
 
 	void dt7_irq(int state);
-	void dt7_unk_w(u8 data);
+	void dt7_sndreset_coin_w(offs_t offset, u16 data, u16 mem_mask);
 
-	uint8_t unmapped_v25_io1_r();
-	uint8_t unmapped_v25_io2_r();
+	u8 unmapped_v25_io1_r();
+	u8 unmapped_v25_io2_r();
 
-	uint8_t read_port_t();
-	uint8_t read_port_2();
-	void write_port_2(uint8_t data);
+	u8 read_port_t();
+	u8 read_port_2();
+	void write_port_2(u8 data);
+
+	u8 eeprom_r();
+	void eeprom_w(u8 data);
+
 
 	u8 dt7_shared_ram_hack_r(offs_t offset);
 	void shared_ram_w(offs_t offset, u8 data);
+	void shared_ram_audio_w(offs_t offset, u8 data);
 
 	void screen_vblank(int state);
 
-	uint8_t m_ioport_state = 0x00;
+	u8 m_ioport_state;
 
 	tilemap_t *m_tx_tilemap[2];    /* Tilemap for extra-text-layer */
 
@@ -110,6 +123,11 @@ private:
 	required_device_array<palette_device, 2> m_palette;
 	required_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	required_shared_ptr<u16> m_tx_videoram;
+	required_shared_ptr<u16> m_lineram;
+	required_ioport m_eepromport;
+	required_ioport m_sysport;
+	required_ioport m_p1port;
+	required_ioport m_p2port;
 };
 
 
@@ -129,22 +147,38 @@ void dt7_state::dt7_irq(int state)
 
 
 // this is conditional on the unknown type of branch (see #define G_B0 in the table0
-uint8_t dt7_state::read_port_t()
+u8 dt7_state::read_port_t()
 {
-	logerror("%s: read port t\n", machine().describe_context()); return machine().rand();
+	logerror("%s: read port t\n", machine().describe_context());
+	return machine().rand();
 }
 
-uint8_t dt7_state::read_port_2()
+u8 dt7_state::eeprom_r()
+{
+	logerror("%s: eeprom_r\n", machine().describe_context());
+	// if you allow eeprom hookup at the moment (remove the ram hack reads)
+	// the game will init it the first time but then 2nd boot will be upside
+	// down as Japan region, and hang after the region warning
+	//return 0xff;
+	return m_eepromport->read();
+}
+
+void dt7_state::eeprom_w(u8 data)
+{
+	logerror("%s: eeprom_w %02x\n", machine().describe_context(), data);
+	m_eepromport->write(data);
+}
+
+u8 dt7_state::read_port_2()
 {
 	logerror("%s: read port 2\n", machine().describe_context());
-
-	return 0xff;
+	return m_ioport_state;
 }
 
 // it seems to attempt to read inputs (including the tilt switch?) here on startup
 // strangely all the EEPROM access code (which is otherwise very similar to FixEight
 // also has accesses to this port added, maybe something is sitting in the middle?
-void dt7_state::write_port_2(uint8_t data)
+void dt7_state::write_port_2(u8 data)
 {
 	if ((m_ioport_state & 0x01) != (data & 0x01))
 	{
@@ -219,28 +253,22 @@ u8 dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 {
 	u16 ret = m_shared_ram[offset];
 
+	int pc = m_maincpu->pc();
+
+	if (pc == 0x7d84) { return 0xff; } // status?
+	
 	u32 addr = (offset * 2) + 0x610000;
+	
+	if (addr == 0x061f00c) { return m_sysport->read(); }
+	if (addr == 0x061d000) { return 0x00; } // settings (from EEPROM?) including flipscreen
+	if (addr == 0x061d002) { return 0x00; } // settings (from EEPROM?) dipswitch?
+	if (addr == 0x061d004) { return 0x00; } // settings (from EEPROM?) region
+	if (addr == 0x061f004) { return m_p1port->read(); } // P1 inputs
+	if (addr == 0x061f006) { return m_p2port->read(); } // P2 inputs
+	//if (addr == 0x061f00e) { return machine().rand(); } // P2 coin / start
+	
+	logerror("%08x: dt7_shared_ram_hack_r address %08x ret %02x\n", pc, addr, ret);
 
-	if (addr == 0x061f00c)
-		return ioport("SYS")->read();// machine().rand();
-
-	//return ret;
-
-
-	u32 pc = m_maincpu->pc();
-	if (pc == 0x7d84)
-		return 0xff;
-	if (addr == 0x061d000) // settings (from EEPROM?) including flipscreen
-		return 0x00;
-	if (addr == 0x061d002) // settings (from EEPROM?) dipswitch?
-		return 0x00;
-	if (addr == 0x061d004) // settings (from EEPROM?) region
-		return 0xff;
-	if (addr == 0x061f004)
-		return ioport("IN1")->read(); ;// machine().rand(); // p1 inputs
-	if (addr == 0x061f006)
-		return ioport("IN2")->read();// machine().rand(); // P2 inputs
-//  logerror("%08x: dt7_shared_ram_hack_r address %08x ret %02x\n", pc, addr, ret);
 	return ret;
 }
 
@@ -249,10 +277,20 @@ void dt7_state::shared_ram_w(offs_t offset, u8 data)
 	m_shared_ram[offset] = data;
 }
 
-
-void dt7_state::dt7_unk_w(u8 data)
+void dt7_state::shared_ram_audio_w(offs_t offset, u8 data)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	// just a helper function to try and debug the sound CPU a bit more easily
+	//int pc = m_audiocpu->pc();
+	//if (offset == 0xf004 / 2)
+	//	logerror("%08x: shared_ram_audio_w address %08x data %02x\n", pc, offset, data);
+	shared_ram_w(offset, data);
+}
+
+void dt7_state::dt7_sndreset_coin_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x8000) ? CLEAR_LINE : ASSERT_LINE);
+	logerror("%s: dt7_sndreset_coin_w %04x %04x\n", machine().describe_context(), data, mem_mask);
+	// coin counters in lower byte?
 }
 
 
@@ -266,7 +304,7 @@ void dt7_state::dt7_68k_0_mem(address_map &map)
 	map(0x200000, 0x200fff).ram().w(m_palette[0], FUNC(palette_device::write16)).share("palette0");
 	map(0x280000, 0x280fff).ram().w(m_palette[1], FUNC(palette_device::write16)).share("palette1");
 
-	map(0x300000, 0x300000).w(FUNC(dt7_state::dt7_unk_w));
+	map(0x300000, 0x300001).w(FUNC(dt7_state::dt7_sndreset_coin_w));
 
 	map(0x400000, 0x40000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x480000, 0x48000d).rw(m_vdp[1], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
@@ -282,6 +320,7 @@ void dt7_state::dt7_shared_mem(address_map &map)
 	map(0x500000, 0x50ffff).ram().share("shared_ram2");
 	// is this really in the middle of shared RAM, or is there a DMA to get it out?
 	map(0x509000, 0x50afff).ram().w(FUNC(dt7_state::tx_videoram_dt7_w)).share("tx_videoram");
+	map(0x50f000, 0x50ffff).ram().share("lineram");
 
 }
 void dt7_state::dt7_68k_1_mem(address_map &map)
@@ -291,29 +330,39 @@ void dt7_state::dt7_68k_1_mem(address_map &map)
 }
 
 
-uint8_t dt7_state::unmapped_v25_io1_r()
+u8 dt7_state::unmapped_v25_io1_r()
 {
 	logerror("%s: 0x58008 unknown read\n", machine().describe_context());
 	return machine().rand();
 }
 
-uint8_t dt7_state::unmapped_v25_io2_r()
+u8 dt7_state::unmapped_v25_io2_r()
 {
 	logerror("%s: 0x5800a unknown read\n", machine().describe_context());
 	return machine().rand();
 }
 
+void dt7_state::machine_start()
+{
+	save_item(NAME(m_ioport_state));
+}
+
+void dt7_state::machine_reset()
+{
+	m_ioport_state = 0x00;
+}
 
 void dt7_state::dt7_v25_mem(address_map &map)
 {
 	// exact mirroring unknown, don't cover up where the inputs/sound maps
-	map(0x00000, 0x07fff).ram().share("shared_ram");
-	map(0x20000, 0x27fff).ram().share("shared_ram");
-	map(0x28000, 0x2ffff).ram().share("shared_ram");
-	map(0x60000, 0x67fff).ram().share("shared_ram");
-	map(0x68000, 0x6ffff).ram().share("shared_ram");
-	map(0x70000, 0x77fff).ram().share("shared_ram");
-	map(0xf8000, 0xfffff).ram().share("shared_ram");
+	// is it meant to mirror in all these locations, or is there a different issue in play?
+	map(0x00000, 0x07fff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0x20000, 0x27fff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0x28000, 0x2ffff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0x60000, 0x67fff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0x68000, 0x6ffff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0x70000, 0x77fff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0xf8000, 0xfffff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
 
 	map(0x58000, 0x58001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x58002, 0x58002).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -356,8 +405,8 @@ void dt7_state::dt7(machine_config &config)
 	audiocpu.pt_in_cb().set(FUNC(dt7_state::read_port_t));
 	audiocpu.p2_in_cb().set(FUNC(dt7_state::read_port_2));
 	audiocpu.p2_out_cb().set(FUNC(dt7_state::write_port_2));
-	//audiocpu.p1_in_cb().set_ioport("EEPROM");
-	//audiocpu.p1_out_cb().set_ioport("EEPROM");
+	audiocpu.p1_in_cb().set(FUNC(dt7_state::eeprom_r));
+	audiocpu.p1_out_cb().set(FUNC(dt7_state::eeprom_w));
 
 	// eeprom type confirmed, and gets inited after first boot, but then game won't boot again?
 	EEPROM_93C66_16BIT(config, m_eeprom);
@@ -436,7 +485,7 @@ static INPUT_PORTS_START( dt7 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
-TILE_GET_INFO_MEMBER(dt7_state::get_text_dt7_tile_info)
+TILE_GET_INFO_MEMBER(dt7_state::get_tx_dt7_tile_info)
 {
 	const u16 attrib = m_tx_videoram[tile_index];
 	const u32 tile_number = attrib & 0x3ff;
@@ -460,8 +509,8 @@ void dt7_state::video_start()
 
 	// a different part of this tilemap is displayed on each screen
 	// each screen has a different palette and uses a ROM in a different location on the PCB
-	m_tx_tilemap[0] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(*this, FUNC(dt7_state::get_text_dt7_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tx_tilemap[1] = &machine().tilemap().create(*m_gfxdecode[1], tilemap_get_info_delegate(*this, FUNC(dt7_state::get_text_dt7_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tx_tilemap[0] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(*this, FUNC(dt7_state::get_tx_dt7_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tx_tilemap[1] = &machine().tilemap().create(*m_gfxdecode[1], tilemap_get_info_delegate(*this, FUNC(dt7_state::get_tx_dt7_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_tx_tilemap[0]->set_transparent_pen(0);
 	m_tx_tilemap[1]->set_transparent_pen(0);
@@ -470,10 +519,34 @@ void dt7_state::video_start()
 void dt7_state::tx_videoram_dt7_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_tx_videoram[offset]);
-	if (offset < 64 * 64)
+	m_tx_tilemap[0]->mark_tile_dirty(offset);
+	m_tx_tilemap[1]->mark_tile_dirty(offset);
+}
+
+
+void dt7_state::draw_tx_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int table)
+{
+	// there seems to be RAM for another tx tilemap
+	// but there were 2 empty sockets / sockets with blank tx ROMs, so
+	// it's likely only one of them is used
+
+	// see comments in other toaplan drivers, this is likely per-line
+	int flipx = m_lineram[(table * 2)] & 0x8000;
+	m_tx_tilemap[table / 2]->set_flip(flipx ? 0 : TILEMAP_FLIPX);
+
+	rectangle clip = cliprect;
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		m_tx_tilemap[0]->mark_tile_dirty(offset);
-		m_tx_tilemap[1]->mark_tile_dirty(offset);
+		clip.min_y = clip.max_y = y;
+
+		u16 scroll1 = m_lineram[((y * 8) + (table * 2) + 0) & 0x7ff]; // lineselect
+		//u16 scroll2 = m_lineram[((y * 8) + (table * 2) + 1) & 0x7ff]; // xscroll
+
+		scroll1 &= 0x7fff; // 0x8000 is per-line flip
+		scroll1 -= 0x0900; // are all these scroll bits?
+
+		m_tx_tilemap[table / 2]->set_scrolly(0, scroll1 - y);
+		m_tx_tilemap[table / 2]->draw(screen, bitmap, clip, 0);
 	}
 }
 
@@ -482,22 +555,17 @@ u32 dt7_state::screen_update_dt7_1(screen_device &screen, bitmap_ind16 &bitmap, 
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
 	m_vdp[0]->render_vdp(bitmap, cliprect);
-
-	m_tx_tilemap[0]->set_scrolldy(0, 0);
-	m_tx_tilemap[0]->draw(screen, bitmap, cliprect, 0);
-
+	draw_tx_tilemap(screen, bitmap, cliprect, 0);
 	return 0;
 }
+
 
 u32 dt7_state::screen_update_dt7_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
 	m_vdp[1]->render_vdp(bitmap, cliprect);
-
-	m_tx_tilemap[1]->set_scrolldy(256 + 16, 256 + 16);
-	m_tx_tilemap[1]->draw(screen, bitmap, cliprect, 0);
-
+	draw_tx_tilemap(screen, bitmap, cliprect, 2);
 	return 0;
 }
 
@@ -558,4 +626,4 @@ ROM_END
 } // anonymous namespace
 
 // The region comes from the EEPROM? so will need clones like FixEight
-GAME( 1993, dt7,         0,        dt7,          dt7,        dt7_state,empty_init, ROT270, "Toaplan",         "DT7 (prototype)",              MACHINE_NOT_WORKING )
+GAME( 1993, dt7,         0,        dt7,          dt7,        dt7_state,empty_init, ROT270, "Toaplan",         "DT7 (prototype)",              MACHINE_NOT_WORKING ) // flyer shows "Survival Battle Dynamic Trial 7"
