@@ -824,10 +824,10 @@ copyright-holders:m1macrophage
 		<element ref="text_waveshape">
 			<bounds x="474" y="134" width="30" height="6"/>
 		</element>
-		<element ref="yellow_button">
+		<element ref="yellow_button" inputtag="button_group_b_3" inputmask="0x02">
 			<bounds x="436" y="144" width="26" height="18"/>
 		</element>
-		<element ref="text_interval" inputtag="button_group_b_3" inputmask="0x02">
+		<element ref="text_interval">
 			<bounds x="437" y="150" width="24" height="6"/>
 		</element>
 		<element ref="text_osc_bank">
