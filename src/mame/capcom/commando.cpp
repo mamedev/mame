@@ -226,7 +226,7 @@ private:
 	template <uint8_t Which> void colorram_w(offs_t offset, uint8_t data);
 	void scrollx_w(offs_t offset, uint8_t data);
 	void scrolly_w(offs_t offset, uint8_t data);
-	void c804_w(uint8_t data);
+	void control_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -265,7 +265,7 @@ void commando_state::scrolly_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
 }
 
-void commando_state::c804_w(uint8_t data)
+void commando_state::control_w(uint8_t data)
 {
 	// bits 0 and 1 are coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -360,7 +360,7 @@ void commando_state::main_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(FUNC(commando_state::c804_w));
+	map(0xc804, 0xc804).w(FUNC(commando_state::control_w));
 	// 0xc806 triggers the DMA (not emulated)
 	map(0xc808, 0xc809).w(FUNC(commando_state::scrollx_w));
 	map(0xc80a, 0xc80b).w(FUNC(commando_state::scrolly_w));
@@ -547,21 +547,21 @@ void commando_state::commando(machine_config &config)
 	static constexpr XTAL MAIN = 12_MHz_XTAL;
 	static constexpr XTAL PHI_B = MAIN / 2 / 2;
 	static constexpr XTAL PHI_MAIN = MAIN / 2 / 2; // As seen in the schematics:
-// the signal goes into a bus arbitration logic that doesn't affect its frequency
-// although the CPU gets slowed down when accessing char/background memories
+	// the signal goes into a bus arbitration logic that doesn't affect its frequency
+	// although the CPU gets slowed down when accessing char/background memories
 
 	// basic machine hardware
-	Z80(config, m_maincpu, PHI_MAIN);  // 3 MHz
+	Z80(config, m_maincpu, PHI_MAIN); // 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &commando_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &commando_state::decrypted_opcodes_map);
 
-	Z80(config, m_audiocpu, PHI_B);    // 3 MHz
+	Z80(config, m_audiocpu, PHI_B); // 3 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &commando_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(commando_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MAIN / 2, 384, 128, 0, 262, 22, 246);    // hsync is 50..77, vsync is 257..259
+	screen.set_raw(MAIN / 2, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(commando_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.screen_vblank().append(FUNC(commando_state::vblank_irq));
@@ -578,7 +578,6 @@ void commando_state::commando(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	YM2203(config, "ym1", PHI_B / 2).add_route(ALL_OUTPUTS, "mono", 0.15);
-
 	YM2203(config, "ym2", PHI_B / 2).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 

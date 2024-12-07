@@ -102,7 +102,7 @@ void sidearms_state::sidearms_map(address_map &map)
 	map(0xc801, 0xc801).portr("P1").w(FUNC(sidearms_state::bankswitch_w));
 	map(0xc802, 0xc802).portr("P2").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xc803, 0xc803).portr("DSW0");
-	map(0xc804, 0xc804).portr("DSW1").w(FUNC(sidearms_state::c804_w));
+	map(0xc804, 0xc804).portr("DSW1").w(FUNC(sidearms_state::control_w));
 	map(0xc805, 0xc805).portr("DSW2").w(FUNC(sidearms_state::star_scrollx_w));
 	map(0xc806, 0xc806).w(FUNC(sidearms_state::star_scrolly_w));
 	map(0xc808, 0xc809).writeonly().share("bg_scrollx");
@@ -126,7 +126,7 @@ void sidearms_state::turtship_map(address_map &map)
 	map(0xe800, 0xe800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xe801, 0xe801).w(FUNC(sidearms_state::bankswitch_w));
 	map(0xe802, 0xe802).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xe804, 0xe804).w(FUNC(sidearms_state::c804_w));
+	map(0xe804, 0xe804).w(FUNC(sidearms_state::control_w));
 	map(0xe805, 0xe805).w(FUNC(sidearms_state::star_scrollx_w));
 	map(0xe806, 0xe806).w(FUNC(sidearms_state::star_scrolly_w));
 	map(0xe808, 0xe809).writeonly().share("bg_scrollx");
@@ -170,7 +170,7 @@ void sidearms_state::whizz_map(address_map &map)
 	map(0xc801, 0xc801).portr("DSW1").w(FUNC(sidearms_state::whizz_bankswitch_w));
 	map(0xc802, 0xc802).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xc803, 0xc803).portr("IN0").nopw();
-	map(0xc804, 0xc804).portr("IN1").w(FUNC(sidearms_state::c804_w));
+	map(0xc804, 0xc804).portr("IN1").w(FUNC(sidearms_state::control_w));
 	map(0xc805, 0xc805).portr("IN2").nopw();
 	map(0xc806, 0xc806).portr("IN3");
 	map(0xc807, 0xc807).portr("IN4");
