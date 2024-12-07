@@ -427,10 +427,10 @@ protected:
 		uint8_t   watch_vdp2_vram_writes = 0;
 		uint8_t   is_cache_dirty = 0;
 
-		uint32_t  map_offset_min[2]{};
-		uint32_t  map_offset_max[2]{};
-		uint32_t  tile_offset_min[2]{};
-		uint32_t  tile_offset_max[2]{};
+		uint32_t  map_offset_min[2]{ 0, 0 };
+		uint32_t  map_offset_max[2]{ 0, 0 };
+		uint32_t  tile_offset_min[2]{ 0, 0 };
+		uint32_t  tile_offset_max[2]{ 0, 0 };
 
 		struct stv_vdp2_tilemap_capabilities    layer_data[2];
 

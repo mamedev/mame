@@ -186,7 +186,6 @@ end
 
 
 ---------------------------------------------------
----------------------------------------------------
 -- AC97
 --@src/devices/sound/pic-ac97.h,SOUNDS["AC97"] = true
 ---------------------------------------------------
@@ -197,6 +196,10 @@ if (SOUNDS["AC97"]~=null) then
 		MAME_DIR .. "src/devices/sound/pci-ac97.h",
 	}
 end
+
+
+
+---------------------------------------------------
 -- CEM 3394 analog synthesizer chip
 --@src/devices/sound/cem3394.h,SOUNDS["CEM3394"] = true
 ---------------------------------------------------
@@ -205,6 +208,20 @@ if (SOUNDS["CEM3394"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/cem3394.cpp",
 		MAME_DIR .. "src/devices/sound/cem3394.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- Creative Labs CT1745 SB16 Mixer
+--@src/devices/sound/ct1745.h,SOUNDS["CT1745"] = true
+---------------------------------------------------
+
+if (SOUNDS["CT1745"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ct1745.cpp",
+		MAME_DIR .. "src/devices/sound/ct1745.h",
 	}
 end
 

@@ -8,9 +8,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_X25_H
+#define MAME_BUS_BBC_TUBE_TUBE_X25_H
 
-#ifndef MAME_BUS_BBC_TUBE_X25_H
-#define MAME_BUS_BBC_TUBE_X25_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/z80/z80.h"
@@ -63,5 +64,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_TUBE_X25, bbc_tube_x25_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_X25_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_X25_H

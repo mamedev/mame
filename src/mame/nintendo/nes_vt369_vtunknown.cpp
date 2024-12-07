@@ -881,9 +881,12 @@ ROM_START( otrail )
 	ROM_LOAD( "t24c04a.bin", 0x000, 0x200, CRC(ce1fad6f) SHA1(82878996765739edba42042b6336460d5c8f8096) )
 ROM_END
 
-ROM_START( pcmx11 )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "pcmx11.bin", 0x000000, 0x800000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
+
+
+
+ROM_START( hhgc319 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128n10tfi01.u3", 0x000000, 0x1000000, CRC(4b51125f) SHA1(bab3981ae1652cf6620c7c6769a6729a1e4d588f) )
 ROM_END
 
 void nes_vt369_vtunknown_state::init_lxcmcypp()
@@ -996,9 +999,6 @@ CONS( 201?, 240in1ar,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknow
 CONS( 2019, unk2019hh,  0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2019 PCB)", MACHINE_NOT_WORKING )
 CONS( 2020, unk2020hh,  unk2019hh,0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
 
-// might be VT-09 or VT-162, uses a ROM glob on a sub-board, data lines seem scrambled at least?
-// NOT the same as the (undumped) vertical handheld console of the same name with Jungletac / Nice Code games, that one has unique games
-CONS( 2009, pcmx11,     0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Premier Portfolio International",    "Classic Max Pocket PCMX11 - 12 in 1 Colour Games Console (France)", MACHINE_NOT_WORKING )
 
 /*****************************************************************************
 * below are VT369? games that use flash ROM
@@ -1006,6 +1006,9 @@ CONS( 2009, pcmx11,     0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtun
 
 // portable fan + famiclone combo handheld
 CONS( 2020, nubsupmf,   0,      0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// unknown tech level, might be scrambled as default codebank/boot vectors don't seem valid
+CONS( 201?, hhgc319,  0,        0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use BGA on sub

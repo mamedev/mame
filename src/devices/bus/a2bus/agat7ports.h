@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_A2BUS_AGAT7_PORTS_H
-#define MAME_BUS_A2BUS_AGAT7_PORTS_H
+#ifndef MAME_BUS_A2BUS_AGAT7PORTS_H
+#define MAME_BUS_A2BUS_AGAT7PORTS_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_AGAT7_PORTS, a2bus_agat7_ports_device)
 
-#endif // MAME_BUS_A2BUS_AGAT7_PORTS_H
+#endif // MAME_BUS_A2BUS_AGAT7PORTS_H

@@ -2000,6 +2000,8 @@ if CPUS["M6805"] then
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m6805defs.h",
 		MAME_DIR .. "src/devices/cpu/m6805/6805ops.hxx",
+		MAME_DIR .. "src/devices/cpu/m6805/hd6305.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/hd6305.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.cpp",
@@ -2575,7 +2577,6 @@ if CPUS["S2650"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/s2650/s2650.cpp",
 		MAME_DIR .. "src/devices/cpu/s2650/s2650.h",
-		MAME_DIR .. "src/devices/cpu/s2650/s2650cpu.h",
 	}
 end
 
@@ -3028,6 +3029,8 @@ if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/z80/z80.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80.h",
+		MAME_DIR .. "src/devices/cpu/z80/t6a84.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/t6a84.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.cpp",
@@ -4132,6 +4135,23 @@ end
 if opt_tool(CPUS, "HT1130") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ht1130/ht1130d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ht1130/ht1130d.h")
+end
+
+--------------------------------------------------
+-- UPD777
+--@src/devices/cpu/upd777/upd777.h,CPUS["UPD777"] = true
+--------------------------------------------------
+
+if CPUS["UPD777"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/upd777/upd777.cpp",
+		MAME_DIR .. "src/devices/cpu/upd777/upd777.h",
+	}
+end
+
+if opt_tool(CPUS, "UPD777") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd777/upd777dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd777/upd777dasm.h")
 end
 
 --------------------------------------------------

@@ -5,9 +5,8 @@ license:CC0-1.0
 
 Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
-FIXME: Many of these images should be 5.25" rather than 3.5". (The old custom Thomson floppy emulation didn't care about form factor.)
-TODO: SAP format is not currently supported.
-TBD: Which images are compatible with which systems?
+FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ software can assumed to be the latter.
+       (The old custom Thomson floppy emulation didn't care about form factor, and many images are probably conversions.)
 -->
 <softwarelist name="to_flop" description="Thomson TO-series floppy disks">
 

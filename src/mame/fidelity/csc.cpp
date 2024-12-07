@@ -203,7 +203,8 @@ MOS MPS 6520 PIA, I/O is nearly same as CSC's PIA 0
 
 To play it on MAME with the sensorboard device, it is recommended to set up
 keyboard shortcuts for the spawn inputs. Then hold the spawn input down while
-clicking on the game board.
+clicking on the game board. Alternatively, it's also possible to flip pieces
+that are on the board by clicking while holding ALT.
 
 *******************************************************************************/
 
@@ -239,7 +240,8 @@ public:
 		m_dac(*this, "dac"),
 		m_speech(*this, "speech"),
 		m_language(*this, "language"),
-		m_inputs(*this, "IN.%u", 0)
+		m_inputs(*this, "IN.%u", 0),
+		m_board_inp(*this, "BOARD")
 	{ }
 
 	// machine drivers
@@ -264,6 +266,7 @@ protected:
 	optional_device<s14001a_device> m_speech;
 	optional_region_ptr<u8> m_language;
 	optional_ioport_array<9> m_inputs;
+	optional_ioport m_board_inp;
 
 	u8 m_led_data = 0;
 	u8 m_7seg_data = 0;
@@ -273,6 +276,8 @@ protected:
 	void csc_map(address_map &map) ATTR_COLD;
 	void csce_map(address_map &map) ATTR_COLD;
 	void rsc_map(address_map &map) ATTR_COLD;
+
+	u8 rsc_board_sensor_cb(offs_t offset);
 
 	// I/O handlers
 	u16 read_inputs();
@@ -311,10 +316,8 @@ INPUT_CHANGED_MEMBER(csc_state::su9_change_cpu_freq)
 
 
 /*******************************************************************************
-    I/O
+    Sensorboard
 *******************************************************************************/
-
-// sensorboard handlers
 
 INPUT_CHANGED_MEMBER(csc_state::rsc_init_board)
 {
@@ -344,6 +347,27 @@ INPUT_CHANGED_MEMBER(csc_state::rsc_init_board)
 	m_board->refresh();
 }
 
+u8 csc_state::rsc_board_sensor_cb(offs_t offset)
+{
+	if (~m_board_inp->read() & 4)
+		return 0;
+
+	u8 x = offset & 0xf;
+	u8 y = offset >> 4 & 0xf;
+	u8 piece = m_board->read_piece(x, y);
+
+	// flip piece
+	if (piece && offset != m_board->get_handpos())
+		m_board->write_piece(x, y, (piece & 1) + 1);
+
+	return 3;
+}
+
+
+
+/*******************************************************************************
+    I/O
+*******************************************************************************/
 
 // misc handlers
 
@@ -587,6 +611,7 @@ static INPUT_PORTS_START( rsc )
 	PORT_START("BOARD")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(csc_state::rsc_init_board), 0) PORT_NAME("Board Reset A")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(csc_state::rsc_init_board), 1) PORT_NAME("Board Reset B")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT) PORT_NAME("Modifier 3 / Flip Piece")
 INPUT_PORTS_END
 
 
@@ -676,6 +701,7 @@ void csc_state::rsc(machine_config &config)
 	m_pia[0]->cb2_handler().set(FUNC(csc_state::pia0_cb2_w));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->sensor_cb().set(FUNC(csc_state::rsc_board_sensor_cb));
 	m_board->set_spawnpoints(2);
 	m_board->set_delay(attotime::from_msec(300));
 

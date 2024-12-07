@@ -51,7 +51,7 @@ void rm480z_state::control_port_write(offs_t offset, uint8_t data)
 	case 0:
 	{
 		const int bank = (offset & 0x0300) >> 8;
-		uint8_t* ram = m_ram->pointer();
+		uint8_t *ram = m_ram->pointer();
 		m_bank[bank]->set_base(ram + 0x4000 * (data & 0x0f));
 		break;
 	}
@@ -223,7 +223,7 @@ void rm480z_state::hrg_port_write(offs_t offset, uint8_t data)
 
 void rm480z_state::machine_reset()
 {
-	uint8_t* mem = m_ram->pointer();
+	uint8_t *mem = m_ram->pointer();
 
 	m_vram.reset();
 	memset(m_hrg_ram, 0, sizeof(m_hrg_ram));

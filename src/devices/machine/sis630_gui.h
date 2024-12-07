@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_MACHINE_SIS630_VGA_H
-#define MAME_MACHINE_SIS630_VGA_H
+#ifndef MAME_MACHINE_SIS630_GUI_H
+#define MAME_MACHINE_SIS630_GUI_H
 
 #pragma once
 
@@ -94,5 +94,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SIS630_BRIDGE, sis630_bridge_device)
 
-
-#endif
+#endif // MAME_MACHINE_SIS630_GUI_H

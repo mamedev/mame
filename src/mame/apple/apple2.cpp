@@ -1183,14 +1183,14 @@ void apple2_state::apple2_common(machine_config &config)
 	m_a2bus->nmi_w().set(FUNC(apple2_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	A2BUS_SLOT(config, "sl0", m_a2bus, apple2_slot0_cards, "lang");
-	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
-	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
-	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
-	A2BUS_SLOT(config, "sl4", m_a2bus, apple2_cards, "mockingboard");
-	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
-	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, "diskiing");
-	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl0", XTAL(14'318'181) / 2, m_a2bus, apple2_slot0_cards, "lang");
+	A2BUS_SLOT(config, "sl1", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, "mockingboard");
+	A2BUS_SLOT(config, "sl5", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, "diskiing");
+	A2BUS_SLOT(config, "sl7", XTAL(14'318'181) / 2, m_a2bus, apple2_cards, nullptr);
 
 	/* Set up the softlists: clean cracks priority, originals second, others last */
 	SOFTWARE_LIST(config, "flop_a2_clean").set_original("apple2_flop_clcracked");

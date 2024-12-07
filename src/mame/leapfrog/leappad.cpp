@@ -4,11 +4,12 @@
 
     LEAPPAD:
     Example-Video: https://www.youtube.com/watch?v=LtUhENu5TKc
-    The LEAPPAD is basically compareable to the SEGA PICO, but without
+    The LEAPPAD is basically comparable to the SEGA PICO, but without
     Screen-Output! Each "Game" consists of two parts (Book + Cartridge).
     Insert the cartridge into the system and add the Book on the Top of the
     "console" and you can click on each pages and hear sounds or
     learning-stuff on each page...
+    Note: The Cocopad shares the same BIOS as the Leappad (CRC32 c886cddc)
 
     MY FIRST LEAPPAD:
     Basically the same as the LEAPPAD, but for even younger kids! (Cartridge
@@ -22,7 +23,7 @@
     also released some kind of Tablet with this name, and they even released
     a new "LEAPPAD" in around 2016:
     https://www.youtube.com/watch?v=MXFSgj6xLTU , which nearly looks like the
-    same, but is most likely techically completely different...
+    same, but is most likely technically completely different...
 
     The cartridges pinout is the same on the three systems:
        A1  N/C (A21?)
@@ -66,14 +67,36 @@
       B19  D4
       B20  GND
 
+    Cocopad BIOS pinout:
+         +-----------+
+     A23-|           |- GND
+     A21-|           |- A22
+     A18-|           |- A20
+     A17-|           |- A19
+     A07-|           |- A08
+     A06-|           |- A09
+     A05-|           |- A10
+     A04-|           |- A11
+     A03-|           |- A12
+     A02-|           |- A13
+     A01-|           |- A14
+     A00-|           |- A15
+      CE-|           |- A16
+     GND-|           |- CE
+      OE-|           |- A-1
+     D00-|           |- D07
+     D01-|           |- D06
+     D02-|           |- D05
+     D03-|           |- D04
+     VCC-|           |- GND
+         +-----------+
 *******************************************************************************/
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
-
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "cpu/mcs51/mcs51.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -96,10 +119,11 @@ public:
 	void leapfrog_mfleappad(machine_config &config);
 	void leapfrog_ltleappad(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+private:
 	void prog_map(address_map &map) ATTR_COLD;
 	void ext_map(address_map &map) ATTR_COLD;
 

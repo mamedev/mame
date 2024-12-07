@@ -4,13 +4,15 @@
 // All the macros that are fit to print. //
 ///////////////////////////////////////////
 
-#ifndef __DSP56_DEF_H__
-#define __DSP56_DEF_H__
+#ifndef MAME_CPU_DSP56156_DSP56DEF_H
+#define MAME_CPU_DSP56156_DSP56DEF_H
+
+#pragma once
 
 #include "dsp56156.h"
 
-namespace DSP_56156
-{
+namespace DSP_56156 {
+
 /***************************************************************************
     ALU
 ***************************************************************************/
@@ -53,4 +55,4 @@ namespace DSP_56156
 
 } // namespace DSP_56156
 
-#endif
+#endif // MAME_CPU_DSP56156_DSP56DEF_H

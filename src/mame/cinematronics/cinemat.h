@@ -5,6 +5,7 @@
     Cinematronics vector hardware
 
 *************************************************************************/
+
 #ifndef MAME_CINEMATRONICS_CINEMAT_H
 #define MAME_CINEMATRONICS_CINEMAT_H
 
@@ -36,13 +37,7 @@ public:
 		, m_analog_y(*this, "ANALOGY")
 		, m_led(*this, "led")
 		, m_pressed(*this, "pressed%u", 0U)
-		, m_coin_detected(0)
-		, m_coin_last_reset(0)
-		, m_mux_select(0)
-		, m_gear(0)
 		, m_vector_color(255, 255, 255)
-		, m_lastx(0)
-		, m_lasty(0)
 	{ }
 
 	required_device<ccpu_cpu_device> m_maincpu;
@@ -61,13 +56,15 @@ public:
 	output_finder<> m_led;
 	output_finder<10> m_pressed;
 
-	u8 m_coin_detected;
-	u8 m_coin_last_reset;
-	u8 m_mux_select;
-	u8 m_gear;
+	emu_timer *m_watchdog;
+	u8 m_coin_detected = 0;
+	u8 m_coin_last_reset = 0;
+	u8 m_mux_select = 0;
+	u8 m_gear = 0;
 	rgb_t m_vector_color;
-	s16 m_lastx;
-	s16 m_lasty;
+	s16 m_lastx = 0;
+	s16 m_lasty = 0;
+
 	u8 inputs_r(offs_t offset);
 	u8 switches_r(offs_t offset);
 	u8 coin_input_r();
@@ -196,10 +193,10 @@ protected:
 	void demon_sound_ports(address_map &map) ATTR_COLD;
 
 private:
-	u8 m_sound_fifo[16]{};
-	u8 m_sound_fifo_in = 0U;
-	u8 m_sound_fifo_out = 0U;
-	u8 m_last_portb_write = 0U;
+	u8 m_sound_fifo[16] = { };
+	u8 m_sound_fifo_in = 0;
+	u8 m_sound_fifo_out = 0;
+	u8 m_last_portb_write = 0;
 };
 
 

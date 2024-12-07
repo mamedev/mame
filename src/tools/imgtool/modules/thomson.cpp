@@ -1072,10 +1072,11 @@ static imgtoolerr_t thom_write_file(imgtool::partition &part,
 	return IMGTOOLERR_SUCCESS;
 }
 
-static imgtoolerr_t thom_suggest_transfer(imgtool::partition &part,
-						const char *fname,
-						imgtool_transfer_suggestion *suggestions,
-						size_t suggestions_length)
+static imgtoolerr_t thom_suggest_transfer(
+		imgtool::partition &part,
+		const char *fname,
+		imgtool::transfer_suggestion *suggestions,
+		size_t suggestions_length)
 {
 	int head = *( (int*) part.extra_bytes() );
 	imgtool::image &img(part.image());
@@ -1086,30 +1087,30 @@ static imgtoolerr_t thom_suggest_transfer(imgtool::partition &part,
 	if ( suggestions_length < 1 ) return IMGTOOLERR_SUCCESS;
 
 	if ( fname ) {
-	if ( ! thom_find_dirent( f, head, fname, &d ) )
-		return IMGTOOLERR_FILENOTFOUND;
-	if ( d.ftype == 0 && d.format == 0 ) is_basic = 1;
+		if ( ! thom_find_dirent( f, head, fname, &d ) )
+			return IMGTOOLERR_FILENOTFOUND;
+		if ( d.ftype == 0 && d.format == 0 ) is_basic = 1;
 	}
 
 	if ( is_basic ) {
-	suggestions[0].viability = SUGGESTION_RECOMMENDED;
-	suggestions[0].filter = filter_thombas128_getinfo;
-	if ( suggestions_length >= 2 ) {
-		suggestions[1].viability = SUGGESTION_POSSIBLE;
-		suggestions[1].filter = filter_thombas7_getinfo;
-	}
-	if ( suggestions_length >= 3 ) {
-		suggestions[2].viability = SUGGESTION_POSSIBLE;
-		suggestions[2].filter = filter_thombas5_getinfo;
-	}
-	if ( suggestions_length >= 4 ) {
-		suggestions[3].viability = SUGGESTION_POSSIBLE;
-		suggestions[3].filter = NULL;
-	}
+		suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
+		suggestions[0].filter = filter_thombas128_getinfo;
+		if ( suggestions_length >= 2 ) {
+			suggestions[1].viability = imgtool::SUGGESTION_POSSIBLE;
+			suggestions[1].filter = filter_thombas7_getinfo;
+		}
+		if ( suggestions_length >= 3 ) {
+			suggestions[2].viability = imgtool::SUGGESTION_POSSIBLE;
+			suggestions[2].filter = filter_thombas5_getinfo;
+		}
+		if ( suggestions_length >= 4 ) {
+			suggestions[3].viability = imgtool::SUGGESTION_POSSIBLE;
+			suggestions[3].filter = nullptr;
+		}
 	}
 	else {
-	suggestions[0].viability = SUGGESTION_RECOMMENDED;
-	suggestions[0].filter = NULL;
+		suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
+		suggestions[0].filter = nullptr;
 	}
 
 	return IMGTOOLERR_SUCCESS;
@@ -1211,12 +1212,12 @@ static const char *const thombas7[2][128] = {
 /* MO5: some keywords ar missing; DOS and TUNE are added */
 static const char *const thombas5[2][128] = {
 	{ /* statements */
-	"END", "FOR", "NEXT", "DATA", "DIM", "READ", NULL, "GO", "RUN", "IF",
+	"END", "FOR", "NEXT", "DATA", "DIM", "READ", nullptr, "GO", "RUN", "IF",
 	"RESTORE", "RETURN", "REM", "'", "STOP", "ELSE", "TRON", "TROFF", "DEFSTR",
-	"DEFINT", "DEFSNG", NULL, "ON", "TUNE", "ERROR", "RESUME", "AUTO",
+	"DEFINT", "DEFSNG", nullptr, "ON", "TUNE", "ERROR", "RESUME", "AUTO",
 	"DELETE", "LOCATE", "CLS", "CONSOLE", "PSET", "MOTOR", "SKIP", "EXEC",
-	"BEEP", "COLOR", "LINE", "BOX", NULL, "ATTRB", "DEF", "POKE", "PRINT",
-	"CONT", "LIST", "CLEAR", "DOS", NULL, "NEW", "SAVE", "LOAD", "MERGE",
+	"BEEP", "COLOR", "LINE", "BOX", nullptr, "ATTRB", "DEF", "POKE", "PRINT",
+	"CONT", "LIST", "CLEAR", "DOS", nullptr, "NEW", "SAVE", "LOAD", "MERGE",
 	"OPEN", "CLOSE", "INPEN", "PEN", "PLAY", "TAB(", "TO", "SUB", "FN",
 	"SPC(", "USING", "USR", "ERL", "ERR", "OFF", "THEN", "NOT", "STEP",
 	"+", "-", "*", "/", "^", "AND", "OR", "XOR", "EQV", "IMP", "MOD", "@",
@@ -1229,8 +1230,8 @@ static const char *const thombas5[2][128] = {
 	},
 	{ /* functions: 0xff prefix */
 	"SGN", "INT", "ABS", "FRE", "SQR", "LOG", "EXP", "COS", "SIN",
-	"TAN", "PEEK", "LEN", "STR$", "VAL", "ASC", "CHR$", "EOF", "CINT", NULL,
-	NULL, "FIX", "HEX$", NULL, "STICK", "STRIG", "GR$", "LEFT$", "RIGHT$",
+	"TAN", "PEEK", "LEN", "STR$", "VAL", "ASC", "CHR$", "EOF", "CINT", nullptr,
+	nullptr, "FIX", "HEX$", nullptr, "STICK", "STRIG", "GR$", "LEFT$", "RIGHT$",
 	"MID$", "INSTR", "VARPTR", "RND", "INKEY$", "INPUT", "CSRLIN", "POINT",
 	"SCREEN", "POS", "PTRIG",
 	/* DOS specific */
@@ -1373,7 +1374,7 @@ static imgtoolerr_t thomcrypt_write_file(imgtool::partition &part,
 	}
 }
 
-void filter_thomcrypt_getinfo(uint32_t state, union filterinfo *info)
+void filter_thomcrypt_getinfo(uint32_t state, imgtool::filterinfo *info)
 {
 	switch(state) {
 	case FILTINFO_STR_NAME:
@@ -1601,16 +1602,14 @@ struct {
 	{ "\xc3\xa7", "\x16" "Kc" },
 	{ "\xc3\x87", "\x16" "KC" },
 
-	{ NULL, NULL }
+	{ nullptr, nullptr }
 };
 
 static bool thom_basic_is_specialchar(const char *buf,
 					int *pos,
 					const char **thom)
 {
-	int i;
-
-	for (i = 0; special_chars[i].utf8 != NULL; i++)
+	for (int i = 0; special_chars[i].utf8 != nullptr; i++)
 	{
 		if (!strncmp(&buf[*pos], special_chars[i].utf8, strlen(special_chars[i].utf8)))
 		{
@@ -1875,32 +1874,33 @@ static imgtoolerr_t thom_basic_write_file(imgtool::partition &partition,
 					const char *fork,       \
 					imgtool::stream &dst)        \
 	{                                   \
-	return thom_basic_read_file( part, name, fork, dst, short );    \
+		return thom_basic_read_file( part, name, fork, dst, short );    \
 	}                                   \
-	static imgtoolerr_t short##_write_file(imgtool::partition &part, \
-						const char *name,       \
-						const char *fork,       \
-						imgtool::stream &src,        \
-						util::option_resolution *opts)    \
+	static imgtoolerr_t short##_write_file( \
+			imgtool::partition &part, \
+			const char *name,       \
+			const char *fork,       \
+			imgtool::stream &src,        \
+			util::option_resolution *opts)    \
 	{                                   \
-	return thom_basic_write_file( part, name, fork, src, opts, short ); \
+		return thom_basic_write_file( part, name, fork, src, opts, short ); \
 	}                                   \
-	void filter_##short##_getinfo(uint32_t state, union filterinfo *info) \
+	void filter_##short##_getinfo(uint32_t state, imgtool::filterinfo *info) \
 	{                                   \
 	switch(state)                           \
 		{                                   \
 		case FILTINFO_STR_NAME:                     \
-	info->s = #short;                       \
-	break;                              \
+			info->s = #short;                       \
+			break;                              \
 		case FILTINFO_STR_HUMANNAME:                    \
-	info->s = long;                         \
-	break;                              \
+			info->s = long;                         \
+			break;                              \
 		case FILTINFO_PTR_READFILE:                 \
-	info->read_file = short##_read_file;                \
-	break;                              \
+			info->read_file = short##_read_file;                \
+			break;                              \
 		case FILTINFO_PTR_WRITEFILE:                    \
-	info->write_file = short##_write_file;              \
-	break;                              \
+			info->write_file = short##_write_file;              \
+			break;                              \
 		}                                   \
 	}
 
@@ -1946,57 +1946,57 @@ static void thom_basic_get_info(const imgtool_class *clas,
 {
 	switch ( param ) {
 	case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:
-	info->i = sizeof(thom_floppy); break;
+		info->i = sizeof(thom_floppy); break;
 	case IMGTOOLINFO_INT_PARTITION_EXTRA_BYTES:
-	info->i = sizeof(int); break;
+		info->i = sizeof(int); break;
 	case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:
-	info->i = sizeof(int); break;
+		info->i = sizeof(int); break;
 	case IMGTOOLINFO_INT_SUPPORTS_CREATION_TIME:
 	case IMGTOOLINFO_INT_PREFER_UCASE:
-	info->i = 1; break;
+		info->i = 1; break;
 	case IMGTOOLINFO_INT_PATH_SEPARATOR:
-	info->i = 0; break;
+		info->i = 0; break;
 	case IMGTOOLINFO_STR_FILE:
-	strcpy( info->s = imgtool_temp_str(), __FILE__ ); break;
+		strcpy( info->s = imgtool_temp_str(), __FILE__ ); break;
 	case IMGTOOLINFO_STR_NAME:
-	strcpy( info->s = imgtool_temp_str(), "thom" ); break;
+		strcpy( info->s = imgtool_temp_str(), "thom" ); break;
 	case IMGTOOLINFO_STR_DESCRIPTION:
-	strcpy( info->s = imgtool_temp_str(), "Thomson BASIC filesystem" );
-	break;
+		strcpy( info->s = imgtool_temp_str(), "Thomson BASIC filesystem" );
+		break;
 	case IMGTOOLINFO_PTR_CREATE:
-	info->create = thom_create; break;
+		info->create = thom_create; break;
 	case IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE:
-	info->createimage_optguide = &thom_createimage_optguide; break;
+		info->createimage_optguide = &thom_createimage_optguide; break;
 	case IMGTOOLINFO_PTR_BEGIN_ENUM:
-	info->begin_enum = thom_begin_enum; break;
+		info->begin_enum = thom_begin_enum; break;
 	case IMGTOOLINFO_PTR_NEXT_ENUM:
-	info->next_enum = thom_next_enum; break;
+		info->next_enum = thom_next_enum; break;
 	case IMGTOOLINFO_PTR_READ_FILE:
-	info->read_file = thom_read_file; break;
+		info->read_file = thom_read_file; break;
 	case IMGTOOLINFO_PTR_WRITE_FILE:
-	info->write_file = thom_write_file; break;
+		info->write_file = thom_write_file; break;
 	case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:
-	info->writefile_optguide = &thom_writefile_optguide; break;
+		info->writefile_optguide = &thom_writefile_optguide; break;
 	case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC:
-	strcpy( info->s = imgtool_temp_str(), "T[0]-4;F[0]-2;C" ); break;
+		strcpy( info->s = imgtool_temp_str(), "T[0]-4;F[0]-2;C" ); break;
 	case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:
-	info->suggest_transfer = thom_suggest_transfer; break;
+		info->suggest_transfer = thom_suggest_transfer; break;
 	case IMGTOOLINFO_PTR_DELETE_FILE:
-	info->delete_file = thom_delete_file; break;
+		info->delete_file = thom_delete_file; break;
 	case IMGTOOLINFO_PTR_FREE_SPACE:
-	info->free_space = thom_free_space; break;
+		info->free_space = thom_free_space; break;
 	case IMGTOOLINFO_PTR_GET_GEOMETRY:
-	info->get_geometry = thom_get_geometry; break;
+		info->get_geometry = thom_get_geometry; break;
 	case IMGTOOLINFO_PTR_INFO:
-	info->info = thom_info; break;
+		info->info = thom_info; break;
 	case IMGTOOLINFO_PTR_READ_SECTOR:
-	info->read_sector = thom_read_sector; break;
+		info->read_sector = thom_read_sector; break;
 	case IMGTOOLINFO_PTR_WRITE_SECTOR:
-	info->write_sector = thom_write_sector; break;
+		info->write_sector = thom_write_sector; break;
 	case IMGTOOLINFO_PTR_LIST_PARTITIONS:
-	info->list_partitions = thom_list_partitions; break;
+		info->list_partitions = thom_list_partitions; break;
 	case IMGTOOLINFO_PTR_OPEN_PARTITION:
-	info->open_partition = thom_open_partition; break;
+		info->open_partition = thom_open_partition; break;
 	}
 }
 
@@ -2006,21 +2006,21 @@ void thom_fd_basic_get_info(const imgtool_class *clas,
 {
 	switch ( param ) {
 	case IMGTOOLINFO_STR_NAME:
-	strcpy( info->s = imgtool_temp_str(), "thom_fd" ); break;
+		strcpy( info->s = imgtool_temp_str(), "thom_fd" ); break;
 	case IMGTOOLINFO_STR_DESCRIPTION:
-	strcpy( info->s = imgtool_temp_str(),
-		"Thomson .fd disk image, BASIC format" );
-	break;
+		strcpy( info->s = imgtool_temp_str(),
+				"Thomson .fd disk image, BASIC format" );
+		break;
 	case IMGTOOLINFO_STR_FILE_EXTENSIONS:
-	strcpy( info->s = imgtool_temp_str(), "fd" ); break;
+		strcpy( info->s = imgtool_temp_str(), "fd" ); break;
 	case IMGTOOLINFO_PTR_OPEN:
-	info->open = thom_open_fd_qd; break;
+		info->open = thom_open_fd_qd; break;
 	case IMGTOOLINFO_PTR_CLOSE:
-	info->close = thom_close_fd_qd; break;
+		info->close = thom_close_fd_qd; break;
 	case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:
-	strcpy( info->s = imgtool_temp_str(), "H[1]-2;T40/[80];D0-[1];N" ); break;
+		strcpy( info->s = imgtool_temp_str(), "H[1]-2;T40/[80];D0-[1];N" ); break;
 	default:
-	thom_basic_get_info( clas, param, info );
+		thom_basic_get_info( clas, param, info );
 	}
 }
 
@@ -2030,21 +2030,21 @@ void thom_qd_basic_get_info(const imgtool_class *clas,
 {
 	switch ( param ) {
 	case IMGTOOLINFO_STR_NAME:
-	strcpy( info->s = imgtool_temp_str(), "thom_qd" ); break;
+		strcpy( info->s = imgtool_temp_str(), "thom_qd" ); break;
 	case IMGTOOLINFO_STR_DESCRIPTION:
-	strcpy( info->s = imgtool_temp_str(),
-		"Thomson .qd disk image, BASIC format" );
-	break;
+		strcpy( info->s = imgtool_temp_str(),
+				"Thomson .qd disk image, BASIC format" );
+		break;
 	case IMGTOOLINFO_STR_FILE_EXTENSIONS:
-	strcpy( info->s = imgtool_temp_str(), "qd" ); break;
+		strcpy( info->s = imgtool_temp_str(), "qd" ); break;
 	case IMGTOOLINFO_PTR_OPEN:
-	info->open = thom_open_fd_qd; break;
+		info->open = thom_open_fd_qd; break;
 	case IMGTOOLINFO_PTR_CLOSE:
-	info->close = thom_close_fd_qd; break;
+		info->close = thom_close_fd_qd; break;
 	case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:
-	strcpy( info->s = imgtool_temp_str(), "H[1]-2;T[25];D[0];N" ); break;
+		strcpy( info->s = imgtool_temp_str(), "H[1]-2;T[25];D[0];N" ); break;
 	default:
-	thom_basic_get_info( clas, param, info );
+		thom_basic_get_info( clas, param, info );
 	}
 }
 
@@ -2054,20 +2054,20 @@ void thom_sap_basic_get_info(const imgtool_class *clas,
 {
 	switch ( param ) {
 	case IMGTOOLINFO_STR_NAME:
-	strcpy( info->s = imgtool_temp_str(), "thom_sap" ); break;
+		strcpy( info->s = imgtool_temp_str(), "thom_sap" ); break;
 	case IMGTOOLINFO_STR_DESCRIPTION:
-	strcpy( info->s = imgtool_temp_str(),
-		"Thomson .sap disk image, BASIC format" );
-	break;
+		strcpy( info->s = imgtool_temp_str(),
+				"Thomson .sap disk image, BASIC format" );
+		break;
 	case IMGTOOLINFO_STR_FILE_EXTENSIONS:
-	strcpy( info->s = imgtool_temp_str(), "sap" ); break;
+		strcpy( info->s = imgtool_temp_str(), "sap" ); break;
 	case IMGTOOLINFO_PTR_OPEN:
-	info->open = thom_open_sap; break;
+		info->open = thom_open_sap; break;
 	case IMGTOOLINFO_PTR_CLOSE:
-	info->close = thom_close_sap; break;
+		info->close = thom_close_sap; break;
 	case IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC:
-	strcpy( info->s = imgtool_temp_str(), "H[1];T40/[80];D0-[1];N" ); break;
+		strcpy( info->s = imgtool_temp_str(), "H[1];T40/[80];D0-[1];N" ); break;
 	default:
-	thom_basic_get_info( clas, param, info );
+		thom_basic_get_info( clas, param, info );
 	}
 }

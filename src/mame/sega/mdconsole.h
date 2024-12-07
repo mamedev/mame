@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_SEGACONS_MDCONSOLE_H
-#define MAME_SEGACONS_MDCONSOLE_H
+#ifndef MAME_SEGA_MDCONSOLE_H
+#define MAME_SEGA_MDCONSOLE_H
 
 #pragma once
 
@@ -115,4 +115,4 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 };
 
-#endif // MAME_SEGACONS_MDCONSOLE_H
+#endif // MAME_SEGA_MDCONSOLE_H

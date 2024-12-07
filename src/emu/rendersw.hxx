@@ -474,9 +474,9 @@ private:
 							draw_aa_pixel(dstdata, pitch, x1, dy, apply_intensity(0xff & (~y1 >> 8), col));
 						dy++;
 						dx -= 0x10000 - (0xffff & y1); // take off amount plotted
-						u8 a1 = (dx >> 8) & 0xff;   // calc remainder pixel
-						dx >>= 16;                   // adjust to pixel (solid) count
-						while (dx--)                 // plot rest of pixels
+						u8 a1 = (dx >> 8) & 0xff;      // calc remainder pixel
+						dx >>= 16;                     // adjust to pixel (solid) count
+						while (dx--)                   // plot rest of pixels
 						{
 							if (dy >= 0 && dy < height)
 								draw_aa_pixel(dstdata, pitch, x1, dy, col);
@@ -510,9 +510,9 @@ private:
 							draw_aa_pixel(dstdata, pitch, dx, y1, apply_intensity(0xff & (~x1 >> 8), col));
 						dx++;
 						dy -= 0x10000 - (0xffff & x1); // take off amount plotted
-						u8 a1 = (dy >> 8) & 0xff;   // remainder pixel
-						dy >>= 16;                   // adjust to pixel (solid) count
-						while (dy--)                 // plot rest of pixels
+						u8 a1 = (dy >> 8) & 0xff;      // remainder pixel
+						dy >>= 16;                     // adjust to pixel (solid) count
+						while (dy--)                   // plot rest of pixels
 						{
 							if (dx >= 0 && dx < width)
 								draw_aa_pixel(dstdata, pitch, dx, y1, col);
@@ -575,7 +575,6 @@ private:
 			}
 		}
 	}
-
 
 
 	//**************************************************************************
@@ -664,19 +663,17 @@ private:
 
 
 	//**************************************************************************
-	//  16-BIT PALETTE RASTERIZERS
+	//  16-BIT RASTERIZERS
 	//**************************************************************************
 
 	//-------------------------------------------------
-	//  draw_quad_palette16_none - perform
-	//  rasterization of a 16bpp palettized texture
+	//  draw_quad_convert_none - perform
+	//  rasterization of a texture after conversion
 	//-------------------------------------------------
 
-	static void draw_quad_palette16_none(render_primitive const &prim, PixelType *dstdata, u32 pitch, quad_setup_data const &setup)
+	template <typename T>
+	static void draw_quad_convert_none(render_primitive const &prim, PixelType *dstdata, u32 pitch, quad_setup_data const &setup, T &&gettexel)
 	{
-		// ensure all parameters are valid
-		assert(prim.texture.palette != nullptr);
-
 		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
 		{
 			// fast case: no coloring, no alpha
@@ -691,7 +688,7 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 const pix = get_texel_palette16(prim.texture, curu, curv);
+					u32 const pix = gettexel(prim, curu, curv);
 					*dest++ = source32_to_dest(pix);
 					curu += setup.dudx;
 					curv += setup.dvdx;
@@ -717,7 +714,7 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 const pix = get_texel_palette16(prim.texture, curu, curv);
+					u32 const pix = gettexel(prim, curu, curv);
 					u32 const r = (source32_r(pix) * sr) >> 8;
 					u32 const g = (source32_g(pix) * sg) >> 8;
 					u32 const b = (source32_b(pix) * sb) >> 8;
@@ -748,7 +745,7 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 const pix = get_texel_palette16(prim.texture, curu, curv);
+					u32 const pix = gettexel(prim, curu, curv);
 					u32 const dpix = NoDestRead ? 0 : *dest;
 					u32 const r = (source32_r(pix) * sr + dest_r(dpix) * invsa) >> 8;
 					u32 const g = (source32_g(pix) * sg + dest_g(dpix) * invsa) >> 8;
@@ -764,11 +761,12 @@ private:
 
 
 	//-------------------------------------------------
-	//  draw_quad_palette16_add - perform
-	//  rasterization of a 16bpp palettized texture
+	//  draw_quad_convert_rop - perform rasterization
+	//  by using RGB operation after conversion
 	//-------------------------------------------------
 
-	static void draw_quad_palette16_add(render_primitive const &prim, PixelType *dstdata, u32 pitch, quad_setup_data const &setup)
+	template <typename T, typename U, typename V>
+	static void draw_quad_convert_rop(render_primitive const &prim, PixelType *dstdata, u32 pitch, quad_setup_data const &setup, T &&gettexel, U &&notint, V &&tinted)
 	{
 		// ensure all parameters are valid
 		assert(prim.texture.palette != nullptr);
@@ -787,18 +785,8 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					const u32 pix = get_texel_palette16(prim.texture, curu, curv);
-					if ((pix & 0xffffff) != 0)
-					{
-						u32 const dpix = NoDestRead ? 0 : *dest;
-						u32 r = source32_r(pix) + dest_r(dpix);
-						u32 g = source32_g(pix) + dest_g(dpix);
-						u32 b = source32_b(pix) + dest_b(dpix);
-						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
-						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
-						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
-						*dest = dest_assemble_rgb(r, g, b);
-					}
+					u32 const pix = gettexel(prim, curu, curv);
+					notint(*dest, pix);
 					dest++;
 					curu += setup.dudx;
 					curv += setup.dvdx;
@@ -824,193 +812,9 @@ private:
 				// loop over cols
 				for (s32 x = setup.startx; x < setup.endx; x++)
 				{
-					u32 const pix = get_texel_palette16(prim.texture, curu, curv);
-					if ((pix & 0xffffff) != 0)
-					{
-						u32 const dpix = NoDestRead ? 0 : *dest;
-						u32 r = ((source32_r(pix) * sr) >> 8) + dest_r(dpix);
-						u32 g = ((source32_g(pix) * sg) >> 8) + dest_g(dpix);
-						u32 b = ((source32_b(pix) * sb) >> 8) + dest_b(dpix);
-						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
-						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
-						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
-						*dest++ = dest_assemble_rgb(r, g, b);
-						curu += setup.dudx;
-						curv += setup.dvdx;
-					}
-				}
-			}
-		}
-	}
-
-
-
-	//**************************************************************************
-	//  16-BIT YUY RASTERIZERS
-	//**************************************************************************
-
-	//-------------------------------------------------
-	//  draw_quad_yuy16_none - perform
-	//  rasterization of a 16bpp YUY image
-	//-------------------------------------------------
-
-	static void draw_quad_yuy16_none(render_primitive const &prim, PixelType *dstdata, u32 pitch, quad_setup_data const &setup)
-	{
-		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
-		{
-			// fast case: no coloring, no alpha
-
-			// loop over rows
-			for (s32 y = setup.starty; y < setup.endy; y++)
-			{
-				PixelType *dest = dstdata + y * pitch + setup.startx;
-				s32 curu = setup.startu + (y - setup.starty) * setup.dudy;
-				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
-
-				// loop over cols
-				for (s32 x = setup.startx; x < setup.endx; x++)
-				{
-					u32 const pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					*dest++ = source32_to_dest(pix);
-					curu += setup.dudx;
-					curv += setup.dvdx;
-				}
-			}
-		}
-		else if (is_opaque(prim.color.a))
-		{
-			// coloring-only case
-
-			// clamp R,G,B to 0-256 range
-			u32 const sr = u32(std::clamp(256.0f * prim.color.r, 0.0f, 256.0f));
-			u32 const sg = u32(std::clamp(256.0f * prim.color.g, 0.0f, 256.0f));
-			u32 const sb = u32(std::clamp(256.0f * prim.color.b, 0.0f, 256.0f));
-
-			// loop over rows
-			for (s32 y = setup.starty; y < setup.endy; y++)
-			{
-				PixelType *dest = dstdata + y * pitch + setup.startx;
-				s32 curu = setup.startu + (y - setup.starty) * setup.dudy;
-				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
-
-				// loop over cols
-				for (s32 x = setup.startx; x < setup.endx; x++)
-				{
-					u32 const pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					u32 const r = (source32_r(pix) * sr) >> 8;
-					u32 const g = (source32_g(pix) * sg) >> 8;
-					u32 const b = (source32_b(pix) * sb) >> 8;
-
-					*dest++ = dest_assemble_rgb(r, g, b);
-					curu += setup.dudx;
-					curv += setup.dvdx;
-				}
-			}
-		}
-		else if (!is_transparent(prim.color.a))
-		{
-			// alpha and/or coloring case
-
-			// clamp R,G,B and inverse A to 0-256 range
-			u32 const sr = u32(std::clamp(256.0f * prim.color.r * prim.color.a, 0.0f, 256.0f));
-			u32 const sg = u32(std::clamp(256.0f * prim.color.g * prim.color.a, 0.0f, 256.0f));
-			u32 const sb = u32(std::clamp(256.0f * prim.color.b * prim.color.a, 0.0f, 256.0f));
-			u32 const invsa = u32(std::clamp(256.0f * (1.0f - prim.color.a), 0.0f, 256.0f));
-
-			// loop over rows
-			for (s32 y = setup.starty; y < setup.endy; y++)
-			{
-				PixelType *dest = dstdata + y * pitch + setup.startx;
-				s32 curu = setup.startu + (y - setup.starty) * setup.dudy;
-				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
-
-				// loop over cols
-				for (s32 x = setup.startx; x < setup.endx; x++)
-				{
-					u32 const pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					u32 const dpix = NoDestRead ? 0 : *dest;
-					u32 const r = (source32_r(pix) * sr + dest_r(dpix) * invsa) >> 8;
-					u32 const g = (source32_g(pix) * sg + dest_g(dpix) * invsa) >> 8;
-					u32 const b = (source32_b(pix) * sb + dest_b(dpix) * invsa) >> 8;
-
-					*dest++ = dest_assemble_rgb(r, g, b);
-					curu += setup.dudx;
-					curv += setup.dvdx;
-				}
-			}
-		}
-	}
-
-
-	//-------------------------------------------------
-	//  draw_quad_yuy16_add - perform
-	//  rasterization by using RGB add after YUY
-	//  conversion
-	//-------------------------------------------------
-
-	static void draw_quad_yuy16_add(render_primitive const &prim, PixelType *dstdata, u32 pitch, quad_setup_data const &setup)
-	{
-		// simply can't do this without reading from the dest
-		if constexpr (NoDestRead)
-			return;
-
-		if (prim.color.r >= 1.0f && prim.color.g >= 1.0f && prim.color.b >= 1.0f && is_opaque(prim.color.a))
-		{
-			// fast case: no coloring, no alpha
-
-			// loop over rows
-			for (s32 y = setup.starty; y < setup.endy; y++)
-			{
-				PixelType *dest = dstdata + y * pitch + setup.startx;
-				s32 curu = setup.startu + (y - setup.starty) * setup.dudy;
-				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
-
-				// loop over cols
-				for (s32 x = setup.startx; x < setup.endx; x++)
-				{
-					u32 const pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					u32 const dpix = NoDestRead ? 0 : *dest;
-					u32 r = source32_r(pix) + dest_r(dpix);
-					u32 g = source32_g(pix) + dest_g(dpix);
-					u32 b = source32_b(pix) + dest_b(dpix);
-					r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
-					g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
-					b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
-					*dest++ = dest_assemble_rgb(r, g, b);
-					curu += setup.dudx;
-					curv += setup.dvdx;
-				}
-			}
-		}
-		else
-		{
-			// alpha and/or coloring case
-
-			// clamp R,G,B and inverse A to 0-256 range
-			u32 const sr = u32(std::clamp(256.0f * prim.color.r, 0.0f, 256.0f));
-			u32 const sg = u32(std::clamp(256.0f * prim.color.g, 0.0f, 256.0f));
-			u32 const sb = u32(std::clamp(256.0f * prim.color.b, 0.0f, 256.0f));
-			u32 const sa = u32(std::clamp(256.0f * prim.color.a, 0.0f, 256.0f));
-
-			// loop over rows
-			for (s32 y = setup.starty; y < setup.endy; y++)
-			{
-				PixelType *dest = dstdata + y * pitch + setup.startx;
-				s32 curu = setup.startu + (y - setup.starty) * setup.dudy;
-				s32 curv = setup.startv + (y - setup.starty) * setup.dvdy;
-
-				// loop over cols
-				for (s32 x = setup.startx; x < setup.endx; x++)
-				{
-					const u32 pix = ycc_to_rgb(get_texel_yuy16(prim.texture, curu, curv));
-					const u32 dpix = NoDestRead ? 0 : *dest;
-					u32 r = ((source32_r(pix) * sr * sa) >> 16) + dest_r(dpix);
-					u32 g = ((source32_g(pix) * sg * sa) >> 16) + dest_g(dpix);
-					u32 b = ((source32_b(pix) * sb * sa) >> 16) + dest_b(dpix);
-					r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
-					g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
-					b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
-					*dest++ = dest_assemble_rgb(r, g, b);
+					u32 const pix = gettexel(prim, curu, curv);
+					tinted(*dest, pix, sr, sg, sb);
+					dest++;
 					curu += setup.dudx;
 					curv += setup.dvdx;
 				}
@@ -1225,6 +1029,7 @@ private:
 						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
 						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
 						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
+
 						*dest++ = dest_assemble_rgb(r, g, b);
 						curu += setup.dudx;
 						curv += setup.dvdx;
@@ -1245,6 +1050,7 @@ private:
 						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
 						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
 						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
+
 						*dest++ = dest_assemble_rgb(r, g, b);
 						curu += setup.dudx;
 						curv += setup.dvdx;
@@ -1284,6 +1090,7 @@ private:
 						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
 						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
 						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
+
 						*dest++ = dest_assemble_rgb(r, g, b);
 						curu += setup.dudx;
 						curv += setup.dvdx;
@@ -1304,6 +1111,7 @@ private:
 						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
 						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
 						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
+
 						*dest++ = dest_assemble_rgb(r, g, b);
 						curu += setup.dudx;
 						curv += setup.dvdx;
@@ -1784,25 +1592,101 @@ private:
 			setup.startv -= 0x8000;
 		}
 
+		auto const gettexel_palette16 =
+				[] (render_primitive const &prim, s32 u, s32 v) -> u32
+				{
+					return get_texel_palette16(prim.texture, u, v);
+				};
+		auto const gettexel_yuy16 =
+				[] (render_primitive const &prim, s32 u, s32 v) -> u32
+				{
+					return ycc_to_rgb(get_texel_yuy16(prim.texture, u, v));
+				};
+		auto const rop_mul_notint =
+				[] (PixelType &dest, u32 pix)
+				{
+					if ((pix & 0x00ff'ffff) != 0x00ff'ffff)
+					{
+						u32 const dpix = NoDestRead ? 0x00ff'ffff : dest;
+						u32 const r = (source32_r(pix) * dest_r(dpix)) >> (8 - SrcShiftR);
+						u32 const g = (source32_g(pix) * dest_g(dpix)) >> (8 - SrcShiftG);
+						u32 const b = (source32_b(pix) * dest_b(dpix)) >> (8 - SrcShiftB);
+						dest = dest_assemble_rgb(r, g, b);
+					}
+				};
+		auto const rop_mul_tinted =
+				[] (PixelType &dest, u32 pix, u32 sr, u32 sg, u32 sb)
+				{
+					if ((pix & 0x00ff'ffff) != 0x00ff'ffff)
+					{
+						u32 const dpix = NoDestRead ? 0x00ff'ffff : dest;
+						u32 const r = (source32_r(pix) * sr * dest_r(dpix)) >> (16 - SrcShiftR);
+						u32 const g = (source32_g(pix) * sg * dest_g(dpix)) >> (16 - SrcShiftG);
+						u32 const b = (source32_b(pix) * sb * dest_b(dpix)) >> (16 - SrcShiftB);
+						dest = dest_assemble_rgb(r, g, b);
+					}
+				};
+		auto const rop_add_notint =
+				[] (PixelType &dest, u32 pix)
+				{
+					if ((pix & 0x00ff'ffff) != 0)
+					{
+						u32 const dpix = NoDestRead ? 0 : dest;
+						u32 r = source32_r(pix) + dest_r(dpix);
+						u32 g = source32_g(pix) + dest_g(dpix);
+						u32 b = source32_b(pix) + dest_b(dpix);
+						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
+						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
+						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
+						dest = dest_assemble_rgb(r, g, b);
+					}
+				};
+		auto const rop_add_tinted =
+				[] (PixelType &dest, u32 pix, u32 sr, u32 sg, u32 sb)
+				{
+					if ((pix & 0x00ff'ffff) != 0)
+					{
+						u32 const dpix = NoDestRead ? 0 : dest;
+						u32 r = ((source32_r(pix) * sr) >> 8) + dest_r(dpix);
+						u32 g = ((source32_g(pix) * sg) >> 8) + dest_g(dpix);
+						u32 b = ((source32_b(pix) * sb) >> 8) + dest_b(dpix);
+						r = (r | -(r >> (8 - SrcShiftR))) & (0xff >> SrcShiftR);
+						g = (g | -(g >> (8 - SrcShiftG))) & (0xff >> SrcShiftG);
+						b = (b | -(b >> (8 - SrcShiftB))) & (0xff >> SrcShiftB);
+						dest = dest_assemble_rgb(r, g, b);
+					}
+				};
+
 		// render based on the texture coordinates
 		switch (prim.flags & (PRIMFLAG_TEXFORMAT_MASK | PRIMFLAG_BLENDMODE_MASK))
 		{
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16) | PRIMFLAG_BLENDMODE(BLENDMODE_NONE):
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA):
-				draw_quad_palette16_none(prim, dstdata, pitch, setup);
+				assert(prim.texture.palette);
+				draw_quad_convert_none(prim, dstdata, pitch, setup, gettexel_palette16);
+				break;
+
+			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16) | PRIMFLAG_BLENDMODE(BLENDMODE_RGB_MULTIPLY):
+				assert(prim.texture.palette);
+				draw_quad_convert_rop(prim, dstdata, pitch, setup, gettexel_palette16, rop_mul_notint, rop_mul_tinted);
 				break;
 
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD):
-				draw_quad_palette16_add(prim, dstdata, pitch, setup);
+				assert(prim.texture.palette);
+				draw_quad_convert_rop(prim, dstdata, pitch, setup, gettexel_palette16, rop_add_notint, rop_add_tinted);
 				break;
 
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16) | PRIMFLAG_BLENDMODE(BLENDMODE_NONE):
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA):
-				draw_quad_yuy16_none(prim, dstdata, pitch, setup);
+				draw_quad_convert_none(prim, dstdata, pitch, setup, gettexel_yuy16);
+				break;
+
+			case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16) | PRIMFLAG_BLENDMODE(BLENDMODE_RGB_MULTIPLY):
+				draw_quad_convert_rop(prim, dstdata, pitch, setup, gettexel_yuy16, rop_mul_notint, rop_mul_tinted);
 				break;
 
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD):
-				draw_quad_yuy16_add(prim, dstdata, pitch, setup);
+				draw_quad_convert_rop(prim, dstdata, pitch, setup, gettexel_yuy16, rop_add_notint, rop_add_tinted);
 				break;
 
 			case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32) | PRIMFLAG_BLENDMODE(BLENDMODE_NONE):

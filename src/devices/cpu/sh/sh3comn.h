@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#pragma once
+#ifndef MAME_CPU_SH_SH3COMN_H
+#define MAME_CPU_SH_SH3COMN_H
 
-#ifndef __SH3COMN_H__
-#define __SH3COMN_H__
+#pragma once
 
 
 // actual port handling is more complex than this
@@ -95,4 +95,4 @@
 #define SH3_EXPEVT_ADDR     ((0xffffffd4 - SH3_UPPER_REGBASE)/4)
 #define SH3_INTEVT_ADDR     ((0xffffffd8 - SH3_UPPER_REGBASE)/4)
 
-#endif /* __SH3COMN_H__ */
+#endif // MAME_CPU_SH_SH3COMN_H

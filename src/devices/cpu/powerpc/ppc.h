@@ -21,6 +21,8 @@
 
 #include "divtlb.h"
 
+#include <algorithm>
+
 
 /***************************************************************************
     CONSTANTS
@@ -468,22 +470,30 @@ protected:
 
 	/* architectural distinctions */
 	powerpc_flavor  m_flavor;
-	uint32_t          m_cap;
-	uint8_t           m_cache_line_size;
-	uint32_t          m_tb_divisor;
+	uint32_t        m_cap;
+	uint8_t         m_cache_line_size;
+	uint32_t        m_tb_divisor;
 
 	/* PowerPC 4xx-specific state */
 	/* PowerPC 4XX-specific serial port state */
 	struct ppc4xx_spu_state
 	{
-		ppc4xx_spu_state(device_t &owner) : tx_cb(owner) { }
+		ppc4xx_spu_state(device_t &owner) : timer(nullptr), tx_cb(owner) { }
 
-		uint8_t           regs[9];
-		uint8_t           txbuf;
-		uint8_t           rxbuf;
+		void clear()
+		{
+			std::fill(std::begin(regs), std::end(regs), 0);
+			txbuf = rxbuf = 0;
+			std::fill(std::begin(rxbuffer), std::end(rxbuffer), 0);
+			rxin = rxout = 0;
+		}
+
+		uint8_t         regs[9];
+		uint8_t         txbuf;
+		uint8_t         rxbuf;
 		emu_timer *     timer;
-		uint8_t           rxbuffer[256];
-		uint32_t          rxin, rxout;
+		uint8_t         rxbuffer[256];
+		uint32_t        rxin, rxout;
 		write8smo_delegate tx_cb;
 	};
 
@@ -491,8 +501,8 @@ protected:
 	emu_timer *     m_fit_timer;
 	emu_timer *     m_pit_timer;
 	emu_timer *     m_wdog_timer;
-	uint32_t          m_pit_reload;
-	uint32_t          m_irqstate;
+	uint32_t        m_pit_reload;
+	uint32_t        m_irqstate;
 	emu_timer *     m_buffered_dma_timer[4];
 	int             m_buffered_dma_rate[4];
 

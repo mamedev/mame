@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
-#ifndef MAME_SEIBU_SEICOP_H
-#define MAME_SEIBU_SEICOP_H
+#ifndef MAME_SEIBU_SEICOPBL_H
+#define MAME_SEIBU_SEICOPBL_H
 
 #pragma once
 
@@ -63,4 +63,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEIBU_COP_BOOTLEG, seibu_cop_bootleg_device)
 
-#endif // MAME_SEIBU_SEICOP_H
+#endif // MAME_SEIBU_SEICOPBL_H

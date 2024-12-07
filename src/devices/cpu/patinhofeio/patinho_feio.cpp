@@ -155,9 +155,9 @@ void patinho_feio_cpu_device::execute_run() {
 		m_ext = READ_ACC_EXTENSION_REG();
 		m_idx = READ_INDEX_REG();
 		m_update_panel_cb(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
-		debugger_instruction_hook(PC);
 
 		if (!m_run){
+			debugger_wait_hook();
 			if (!m_buttons_read_cb.isunset()){
 				uint16_t buttons = m_buttons_read_cb(0);
 				if (buttons & BUTTON_PARTIDA){
@@ -180,6 +180,7 @@ void patinho_feio_cpu_device::execute_run() {
 			}
 			m_icount = 0;   /* if processor is stopped, just burn cycles */
 		} else {
+			debugger_instruction_hook(PC);
 			execute_instruction();
 			m_icount --;
 		}

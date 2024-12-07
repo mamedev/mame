@@ -41,25 +41,7 @@
 
 ****************************************************************************
 
-    Blitter (Stargate and Defender do not have blitter)
-    ---------------------------------------------------
-
-    CA00 start_blitter    Each bits has a function
-          1000 0000 Do not process half the byte 4-7
-          0100 0000 Do not process half the byte 0-3
-          0010 0000 Shift the shape one pixel right (to display a shape on an odd pixel)
-          0001 0000 Remap, if shape != 0 then pixel = mask
-          0000 1000 Source  1 = take source 0 = take Mask only
-          0000 0100 ?
-          0000 0010 Transparent
-          0000 0001
-    CA01 blitter_mask     Not really a mask, more a remap color, see Blitter
-    CA02 blitter_source   hi
-    CA03 blitter_source   lo
-    CA04 blitter_dest     hi
-    CA05 blitter_dest     lo
-    CA06 blitter_w_h      H  Do a XOR with 4 to have the real value (Except Splat)
-    CA07 blitter_w_h      W  Do a XOR with 4 to have the real value (Except Splat)
+	CA00-CA07 blitter (Stargate and Defender do not have blitter)
 
     CB00 6 bits of the video counters bits 2-7
 
@@ -553,17 +535,21 @@ void williams_state::main_map(address_map &map)
 	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc900, 0xc9ff).w(FUNC(williams_state::vram_select_w));
-	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(williams_state::blitter_w));
 	map(0xcb00, 0xcbff).r(FUNC(williams_state::video_counter_r));
 	map(0xcbff, 0xcbff).w(FUNC(williams_state::watchdog_reset_w));
 	map(0xcc00, 0xcfff).ram().w(FUNC(williams_state::cmos_4bit_w)).share("nvram");
 	map(0xd000, 0xffff).rom();
 }
 
+void williams_state::main_map_blitter(address_map &map)
+{
+	main_map(map);
+	map(0xca00, 0xca07).mirror(0x00f8).m(m_blitter, FUNC(williams_blitter_device::map));
+}
 
 void williams_state::sinistar_main_map(address_map &map)
 {
-	main_map(map);
+	main_map_blitter(map);
 
 	map(0xc900, 0xc9ff).w(FUNC(williams_state::sinistar_vram_select_w));
 
@@ -574,7 +560,7 @@ void williams_state::sinistar_main_map(address_map &map)
 
 void williams_state::bubbles_main_map(address_map &map)
 {
-	main_map(map);
+	main_map_blitter(map);
 
 	// bubbles has additional CMOS for a full 8 bits
 	map(0xcc00, 0xcfff).ram().share("nvram");
@@ -583,7 +569,7 @@ void williams_state::bubbles_main_map(address_map &map)
 
 void williams_state::spdball_main_map(address_map &map)
 {
-	main_map(map);
+	main_map_blitter(map);
 
 	// install extra input handlers
 	map(0xc800, 0xc800).portr("AN0");
@@ -598,7 +584,7 @@ void williams_state::spdball_main_map(address_map &map)
 
 void williams_state::alienar_main_map(address_map &map)
 {
-	main_map(map);
+	main_map_blitter(map);
 
 	map(0xcbff, 0xcbff).nopw();
 }
@@ -621,10 +607,10 @@ void blaster_state::blaster_main_map(address_map &map)
 	map(0xc804, 0xc807).mirror(0x00f0).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc80c, 0xc80f).mirror(0x00f0).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc900, 0xc93f).w(FUNC(blaster_state::blaster_vram_select_w));
-	map(0xc940, 0xc97f).w(FUNC(blaster_state::remap_select_w));
+	map(0xc940, 0xc97f).w(m_blitter, FUNC(williams_blitter_device::remap_select_w));
 	map(0xc980, 0xc9bf).w(FUNC(blaster_state::bank_select_w));
 	map(0xc9c0, 0xc9ff).w(FUNC(blaster_state::video_control_w));
-	map(0xca00, 0xca07).mirror(0x00f8).w(FUNC(blaster_state::blitter_w));
+	map(0xca00, 0xca07).mirror(0x00f8).m(m_blitter, FUNC(williams_blitter_device::map));
 	map(0xcb00, 0xcbff).r(FUNC(blaster_state::video_counter_r));
 	map(0xcbff, 0xcbff).w(FUNC(blaster_state::watchdog_reset_w));
 	map(0xcc00, 0xcfff).ram().w(FUNC(blaster_state::cmos_4bit_w)).share("nvram");
@@ -648,7 +634,7 @@ void williams2_state::common_map(address_map &map)
 	m_palette_view[0](0x8000, 0x87ff).ram().w(FUNC(williams2_state::paletteram_w)).share(m_paletteram);
 	map(0xc000, 0xc7ff).ram().w(FUNC(williams2_state::tileram_w)).share(m_tileram);
 	map(0xc800, 0xc87f).w(FUNC(williams2_state::bank_select_w));
-	map(0xc880, 0xc887).mirror(0x0078).w(FUNC(williams2_state::blitter_w));
+	map(0xc880, 0xc887).mirror(0x0078).m(m_blitter, FUNC(williams_blitter_device::map));
 	map(0xc900, 0xc97f).w(FUNC(williams2_state::watchdog_reset_w));
 	map(0xc980, 0xc983).mirror(0x0070).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc984, 0xc987).mirror(0x0070).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -658,7 +644,7 @@ void williams2_state::common_map(address_map &map)
 	map(0xcb40, 0xcb5f).w(FUNC(williams2_state::xscroll_low_w));
 	map(0xcb60, 0xcb7f).w(FUNC(williams2_state::xscroll_high_w));
 	map(0xcb80, 0xcb9f).w(FUNC(williams2_state::video_control_w));
-	map(0xcba0, 0xcbbf).w(FUNC(williams2_state::blit_window_enable_w));
+	map(0xcba0, 0xcbbf).w(m_blitter, FUNC(williams_blitter_device::window_enable_w));
 	map(0xcbe0, 0xcbef).r(FUNC(williams2_state::video_counter_r));
 	map(0xcc00, 0xcfff).ram().w(FUNC(williams2_state::cmos_4bit_w)).share("nvram");
 }
@@ -1596,31 +1582,17 @@ void williams_state::williams_base(machine_config &config)
 	m_pia[2]->irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 }
 
-void williams_state::williams_b0(machine_config &config)
-{
-	williams_base(config);
-	m_blitter_config = WILLIAMS_BLITTER_NONE;
-	m_blitter_clip_address = 0x0000;
-}
-
 void williams_state::williams_b1(machine_config &config)
 {
 	williams_base(config);
-	m_blitter_config = WILLIAMS_BLITTER_SC1;
-	m_blitter_clip_address = 0xc000;
-}
-
-void williams_state::williams_b2(machine_config &config)
-{
-	williams_base(config);
-	m_blitter_config = WILLIAMS_BLITTER_SC2;
-	m_blitter_clip_address = 0xc000;
+	WILLIAMS_BLITTER_SC1(config, m_blitter, 0xc000, m_maincpu, m_videoram);
+	m_maincpu->set_addrmap(AS_PROGRAM, &williams_state::main_map_blitter);
 }
 
 
 void defender_state::defender(machine_config &config)
 {
-	williams_b0(config);
+	williams_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &defender_state::defender_main_map);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &defender_state::defender_sound_map);
@@ -1681,7 +1653,8 @@ void williams_state::joust(machine_config &config)
 
 void williams_state::splat(machine_config &config)
 {
-	williams_b2(config);
+	williams_base(config);
+	WILLIAMS_BLITTER_SC2(config, m_blitter, 0xc000, m_maincpu, m_videoram);
 	williams_muxed(config);
 }
 
@@ -1704,8 +1677,8 @@ void williams_state::bubbles(machine_config &config)
 void williams_state::sinistar_upright(machine_config &config)
 {
 	// Sinistar: blitter window clip
-	williams_b1(config);
-	m_blitter_clip_address = 0x7400;
+	williams_base(config);
+	WILLIAMS_BLITTER_SC1(config, m_blitter, 0x7400, m_maincpu, m_videoram);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &williams_state::sinistar_main_map);
 
@@ -1786,8 +1759,8 @@ void williams_state::lottofun(machine_config &config)
 
 void blaster_state::blastkit(machine_config &config)
 {
-	williams_b2(config);
-	m_blitter_clip_address = 0x9700;
+	williams_base(config);
+	WILLIAMS_BLITTER_SC2(config, m_blitter, 0x9700, m_maincpu, m_videoram, "proms");
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blaster_state::blaster_main_map);
 
@@ -1899,8 +1872,7 @@ void williams2_state::williams2_base(machine_config &config)
 	m_pia[2]->irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
 	m_pia[2]->irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 
-	m_blitter_config = WILLIAMS_BLITTER_SC2;
-	m_blitter_clip_address = 0x9000;
+	WILLIAMS_BLITTER_SC2(config, m_blitter, 0x9000, m_maincpu, m_videoram);
 }
 
 
@@ -3953,7 +3925,7 @@ GAME( 1982, jin,        0,        jin,              jin,      defender_state,  e
 
 
 // Standard Williams hardware
-GAME( 1981, stargate,   0,        williams_b0,      stargate, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz", "Stargate", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, stargate,   0,        williams_base,    stargate, williams_state,  empty_init,    ROT0,   "Williams / Vid Kidz", "Stargate", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, conquest,   0,        williams_b1,      conquest, conquest_state,  empty_init,    ROT270, "Williams / Vid Kidz", "Conquest (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
 

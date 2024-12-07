@@ -53,11 +53,11 @@ Namco System 1 Video Hardware
 
 ***************************************************************************/
 
-void namcos1_state::TilemapCB(u16 code, int *tile, int *mask)
+void namcos1_state::TilemapCB(u16 code, int &tile, int &mask)
 {
 	code &= 0x3fff;
-	*tile = code;
-	*mask = code;
+	tile = code;
+	mask = code;
 }
 
 /***************************************************************************
@@ -68,18 +68,16 @@ void namcos1_state::TilemapCB(u16 code, int *tile, int *mask)
 
 void namcos1_state::video_start()
 {
-	int i;
-
 	/* set table for sprite color == 0x7f */
-	for (i = 0;i < 15;i++)
+	for (int i = 0; i < 15; i++)
 		m_drawmode_table[i] = DRAWMODE_SHADOW;
 	m_drawmode_table[15] = DRAWMODE_NONE;
 
 	/* all palette entries are not affected by shadow sprites... */
-	for (i = 0;i < 0x2000;i++)
+	for (int i = 0; i < 0x2000; i++)
 		m_c116->shadow_table()[i] = i;
 	/* ... except for tilemap colors */
-	for (i = 0x0800;i < 0x1000;i++)
+	for (int i = 0x0800; i < 0x1000; i++)
 		m_c116->shadow_table()[i] = i + 0x0800;
 
 	m_copy_sprites = false;
@@ -150,8 +148,8 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		const u8 attr1 = source[10];
 		const u8 attr2 = source[14];
 		u32 color = source[12];
-		int flipx = (attr1 & 0x20) >> 5;
-		int flipy = (attr2 & 0x01);
+		bool flipx = BIT(attr1, 5);
+		bool flipy = BIT(attr2, 0);
 		const u16 sizex = sprite_size[(attr1 & 0xc0) >> 6];
 		const u16 sizey = sprite_size[(attr2 & 0x06) >> 1];
 		const u16 tx = (attr1 & 0x18) & (~(sizex - 1));
@@ -173,8 +171,8 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		{
 			sx = -sx - sizex;
 			sy = -sy - sizey;
-			flipx ^= 1;
-			flipy ^= 1;
+			flipx = !flipx;
+			flipy = !flipy;
 		}
 
 		sy++;   /* sprites are buffered and delayed by one scanline */
@@ -207,7 +205,6 @@ void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 u32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
 	rectangle new_clip = cliprect;
 
 	/* flip screen is embedded in the sprite control registers */
@@ -217,7 +214,7 @@ u32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	bitmap.fill(m_c116->black_pen(), cliprect);
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
-	i = m_c116->get_reg(0) - 1;                         // min x
+	int i = m_c116->get_reg(0) - 1;                         // min x
 	if (new_clip.min_x < i) new_clip.min_x = i;
 	i = m_c116->get_reg(1) - 1 - 1;                     // max x
 	if (new_clip.max_x > i) new_clip.max_x = i;

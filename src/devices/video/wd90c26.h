@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_VIDEO_WD902C26_H
-#define MAME_VIDEO_WD902C26_H
+#ifndef MAME_VIDEO_WD90C26_H
+#define MAME_VIDEO_WD90C26_H
 
 #pragma once
 
@@ -21,4 +21,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(WD90C26, wd90c26_vga_device)
 
-#endif // MAME_VIDEO_WD902C26_H
+#endif // MAME_VIDEO_WD90C26_H

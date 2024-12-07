@@ -640,6 +640,7 @@ void t11_device::execute_run()
 
 	if (m_wait_state)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}

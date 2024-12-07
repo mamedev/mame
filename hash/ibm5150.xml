@@ -11348,7 +11348,7 @@ On CGA/Hercules video mode: "Invalid Disk ! err# "
 
 	<software name="drgnflam" supported="partial">
 		<!-- Dumped from a copied disk -->
-		<description>Dragons of Flame</description>
+		<description>Advanced Dungeons &amp; Dragons - Dragons of Flame</description>
 		<year>1989</year>
 		<publisher>SSI</publisher>
 		<notes><![CDATA[
@@ -12330,7 +12330,7 @@ The game freezes after choosing the characters.
 	</software>
 
 	<software name="herolanc">
-		<description>Heroes of the Lance</description>
+		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance</description>
 		<year>1991</year>
 		<publisher>SSI</publisher>
 		<info name="version" value="1.0" />
@@ -12347,7 +12347,7 @@ The game freezes after choosing the characters.
 	</software>
 
 	<software name="hillsfar">
-		<description>Hillsfar (3.5", v1.2)</description>
+		<description>Advanced Dungeons &amp; Dragons - Hillsfar (3.5", v1.2)</description>
 		<year>1989</year>
 		<publisher>SSI</publisher>
 		<info name="developer" value="Westwood Associates" />
@@ -12360,7 +12360,7 @@ The game freezes after choosing the characters.
 	</software>
 
 	<software name="hillsfar525" cloneof="hillsfar">
-		<description>Hillsfar (5.25", v1.0)</description>
+		<description>Advanced Dungeons &amp; Dragons - Hillsfar (5.25", v1.0)</description>
 		<year>1989</year>
 		<publisher>SSI</publisher>
 		<info name="developer" value="Westwood Associates" />
@@ -12378,7 +12378,7 @@ The game freezes after choosing the characters.
 	</software>
 
 	<software name="hillsfar35a" cloneof="hillsfar">
-		<description>Hillsfar (3.5", v1.0)</description>
+		<description>Advanced Dungeons &amp; Dragons - Hillsfar (3.5", v1.0)</description>
 		<year>1989</year>
 		<publisher>SSI</publisher>
 		<info name="developer" value="Westwood Associates" />
@@ -12391,7 +12391,7 @@ The game freezes after choosing the characters.
 	</software>
 
 	<software name="hillsfar35b" cloneof="hillsfar">
-		<description>Hillsfar (3.5", v1.1)</description>
+		<description>Advanced Dungeons &amp; Dragons - Hillsfar (3.5", v1.1)</description>
 		<year>1989</year>
 		<publisher>SSI</publisher>
 		<info name="developer" value="Westwood Associates" />

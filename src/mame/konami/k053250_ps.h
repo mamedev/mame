@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_KONAMI_K053250PS_H
-#define MAME_KONAMI_K053250PS_H
+#ifndef MAME_KONAMI_K053250_PS_H
+#define MAME_KONAMI_K053250_PS_H
 
 #pragma once
 
@@ -84,4 +84,4 @@ private:
 
 DECLARE_DEVICE_TYPE(K053250PS, k053250ps_device)
 
-#endif // MAME_KONAMI_K053250PS_H
+#endif // MAME_KONAMI_K053250_PS_H

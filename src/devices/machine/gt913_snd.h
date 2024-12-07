@@ -4,8 +4,8 @@
     Casio GT913 sound (HLE)
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_GT913_H
-#define MAME_AUDIO_GT913_H
+#ifndef MAME_MACHINE_GT913_SND_H
+#define MAME_MACHINE_GT913_SND_H
 
 #pragma once
 
@@ -85,4 +85,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(GT913_SOUND, gt913_sound_device)
 
-#endif // MAME_AUDIO_GT913_H
+#endif // MAME_MACHINE_GT913_SND_H

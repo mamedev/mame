@@ -436,8 +436,6 @@ void aica_device::StopSlot(AICA_SLOT *slot,int keyoff)
 
 void aica_device::Init()
 {
-	int i;
-
 	m_IrqTimA = m_IrqTimBC = m_IrqMidi = 0;
 	m_MidiR = m_MidiW = 0;
 	m_MidiOutR = m_MidiOutW = 0;
@@ -448,14 +446,14 @@ void aica_device::Init()
 	m_timerB = timer_alloc(FUNC(aica_device::timerB_cb), this);
 	m_timerC = timer_alloc(FUNC(aica_device::timerC_cb), this);
 
-	for (i = 0; i < 0x400; ++i)
+	for (int i = 0; i < 0x400; ++i)
 	{
 		float envDB = ((float)(3 * (i - 0x3ff))) / 32.0f;
 		float scale = (float)(1 << SHIFT);
 		m_EG_TABLE[i] = (s32)(powf(10.0f, envDB / 20.0f) * scale);
 	}
 
-	for (i = 0; i < 0x20000; ++i)
+	for (int i = 0; i < 0x20000; ++i)
 	{
 		int iTL  = (i >> 0x0) & 0xff;
 		int iPAN = (i >> 0x8) & 0x1f;
@@ -507,7 +505,7 @@ void aica_device::Init()
 
 	m_ARTABLE[0] = m_DRTABLE[0] = 0;    //Infinite time
 	m_ARTABLE[1] = m_DRTABLE[1] = 0;    //Infinite time
-	for (i=2; i < 64; ++i)
+	for (int i=2; i < 64; ++i)
 	{
 		double step,scale;
 		double t = ARTimes[i];   //In ms
@@ -528,7 +526,7 @@ void aica_device::Init()
 	ClockChange();
 
 	// make sure all the slots are off
-	for (i = 0; i < 64; ++i)
+	for (int i = 0; i < 64; ++i)
 	{
 		m_Slots[i].slot = i;
 		m_Slots[i].active = 0;
@@ -1554,7 +1552,6 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 	, m_MidiR(0)
 	, m_mcieb(0)
 	, m_mcipd(0)
-
 {
 	memset(&m_udata.data, 0, sizeof(m_udata.data));
 	std::fill(std::begin(m_EFSPAN), std::end(m_EFSPAN), 0);
@@ -1571,7 +1568,7 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 	std::fill(std::begin(m_ARTABLE), std::end(m_ARTABLE), 0);
 	std::fill(std::begin(m_DRTABLE), std::end(m_DRTABLE), 0);
 
-	memset(&m_DSP, 0, sizeof(m_DSP));
+	m_DSP.init();
 
 	std::fill(std::begin(m_EG_TABLE), std::end(m_EG_TABLE), 0);
 	std::fill(std::begin(m_PLFO_TRI), std::end(m_PLFO_TRI), 0);

@@ -3,8 +3,8 @@
 
 // Yamaha SWP20, rompler
 
-#ifndef DEVICES_SOUND_SWP20_H
-#define DEVICES_SOUND_SWP20_H
+#ifndef MAME_SOUND_SWP20_H
+#define MAME_SOUND_SWP20_H
 
 #pragma once
 
@@ -72,4 +72,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SWP20, swp20_device)
 
-#endif
+#endif // MAME_SOUND_SWP20_H

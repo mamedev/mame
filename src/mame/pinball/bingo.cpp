@@ -2,6 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 
 #include "emu.h"
+
 #include "cpu/s2650/s2650.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/i86/i186.h"
@@ -12,22 +13,22 @@ namespace {
 class bingo_state : public driver_device
 {
 public:
-	bingo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+	bingo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void bingo(machine_config &config);
 	void bingo_map(address_map &map) ATTR_COLD;
-protected:
 
+	void init_bingo();
+
+protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override ATTR_COLD;
-public:
-	void init_bingo();
 };
 
 
@@ -59,22 +60,22 @@ void bingo_state::bingo(machine_config &config)
 class seeben_state : public driver_device
 {
 public:
-	seeben_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+	seeben_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void seeben(machine_config &config);
 	void seeben_map(address_map &map) ATTR_COLD;
-protected:
 
+	void init_seeben();
+
+protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override ATTR_COLD;
-public:
-	void init_seeben();
 };
 
 
@@ -103,22 +104,21 @@ void seeben_state::seeben(machine_config &config)
 class splin_state : public driver_device
 {
 public:
-	splin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+	splin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	void splin(machine_config &config);
 	void splin_map(address_map &map) ATTR_COLD;
-protected:
 
+	void init_splin();
+protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override ATTR_COLD;
-public:
-	void init_splin();
 };
 
 void splin_state::splin_map(address_map &map)

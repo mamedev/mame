@@ -1417,19 +1417,20 @@ ROM_START( ttmahjng )
 	ROM_LOAD( "ju09",         0x0100, 0x0100, CRC(27d47624) SHA1(ee04ce8043216be8b91413b546479419fca2b917) )
 ROM_END
 
+// Same romset also seen on a ORCA OVG-16B PCB (ROM numbers and locations as per comments at the end of the lines)
 ROM_START( jongpute )
 	ROM_REGION( 0x10000, "cpu1", 0 )
-	ROM_LOAD( "j2",           0x0000, 0x1000, CRC(6690b6a4) SHA1(ab79faa1ed84d766eee652f3cbdc0296ddb80fe2) )
-	ROM_LOAD( "j3",           0x1000, 0x1000, CRC(985723d3) SHA1(9d7499c48cfc242875a95d01459b8f3252ea41bc) )
-	ROM_LOAD( "j4",           0x2000, 0x1000, CRC(f35ab1e6) SHA1(5b76d05ab9d8b2a88b408cf9e9297ec31a8de33a) )
-	ROM_LOAD( "j5",           0x3000, 0x1000, CRC(77074618) SHA1(73329e945ea578bce1d04c80e09929bfb0e9875b) )
+	ROM_LOAD( "j2",           0x0000, 0x1000, CRC(6690b6a4) SHA1(ab79faa1ed84d766eee652f3cbdc0296ddb80fe2) ) // 1.4a
+	ROM_LOAD( "j3",           0x1000, 0x1000, CRC(985723d3) SHA1(9d7499c48cfc242875a95d01459b8f3252ea41bc) ) // 2.4c
+	ROM_LOAD( "j4",           0x2000, 0x1000, CRC(f35ab1e6) SHA1(5b76d05ab9d8b2a88b408cf9e9297ec31a8de33a) ) // 3.2a
+	ROM_LOAD( "j5",           0x3000, 0x1000, CRC(77074618) SHA1(73329e945ea578bce1d04c80e09929bfb0e9875b) ) // 4.2c
 
 	ROM_REGION( 0x10000, "cpu2", 0 )
-	ROM_LOAD( "j6",           0x0000, 0x1000, CRC(54b349b0) SHA1(e5620b85a24a35d995860c7121f1ddf16f7ea168) )
+	ROM_LOAD( "j6",           0x0000, 0x1000, CRC(54b349b0) SHA1(e5620b85a24a35d995860c7121f1ddf16f7ea168) ) // 5.2n
 
 	/* maybe used for pseudo sampling voice, "reach", that is not emulated yet */
 	ROM_REGION( 0x1000, "unknown", 0 )
-	ROM_LOAD( "j1",           0x0000, 0x1000, CRC(6d6ba272) SHA1(a4efd8daddbbf595ee46484578f544d7ed84e090) )
+	ROM_LOAD( "j1",           0x0000, 0x1000, CRC(6d6ba272) SHA1(a4efd8daddbbf595ee46484578f544d7ed84e090) ) // 6.8a
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	/* not dumped, but ttmahjng roms seem to be compatible completely */

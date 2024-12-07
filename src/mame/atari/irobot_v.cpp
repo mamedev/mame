@@ -164,29 +164,29 @@ void irobot_state::video_start()
 
 void irobot_state::draw_line(uint8_t *polybitmap, int x1, int y1, int x2, int y2, int col)
 {
-	int dx,dy,sx,sy,cx,cy;
+	int dx, dy, sx, sy, cx, cy;
 
-	dx = abs(x1-x2);
-	dy = abs(y1-y2);
+	dx = abs(x1 - x2);
+	dy = abs(y1 - y2);
 	sx = (x1 <= x2) ? 1: -1;
 	sy = (y1 <= y2) ? 1: -1;
-	cx = dx/2;
-	cy = dy/2;
+	cx = dx / 2;
+	cy = dy / 2;
 
-	if (dx>=dy)
+	if (dx >= dy)
 	{
 		for (;;)
 		{
 			if (x1 >= m_ir_xmin && x1 < m_ir_xmax && y1 >= m_ir_ymin && y1 < m_ir_ymax)
-					draw_pixel (x1, y1, col);
-				if (x1 == x2) break;
-				x1 += sx;
-				cx -= dy;
-				if (cx < 0)
-				{
-					y1 += sy;
-					cx += dx;
-				}
+				draw_pixel (x1, y1, col);
+			if (x1 == x2) break;
+			x1 += sx;
+			cx -= dy;
+			if (cx < 0)
+			{
+				y1 += sy;
+				cx += dx;
+			}
 		}
 	}
 	else
@@ -200,8 +200,8 @@ void irobot_state::draw_line(uint8_t *polybitmap, int x1, int y1, int x2, int y2
 			cy -= dx;
 			if (cy < 0)
 			{
-					x1 += sx;
-					cy += dy;
+				x1 += sx;
+				cy += dy;
 			}
 		}
 	}
@@ -214,21 +214,21 @@ void irobot_state::irobot_run_video()
 {
 	uint8_t *polybitmap;
 	uint16_t *combase16 = (uint16_t *)m_combase;
-	int sx,sy,ex,ey,sx2,ey2;
+	int sx, sy, ex, ey, sx2, ey2;
 	int color;
 	uint32_t d1;
-	int lpnt,spnt,spnt2;
+	int lpnt, spnt, spnt2;
 	int shp;
-	int32_t word1,word2;
+	int32_t word1, word2;
 
-	logerror("Starting Polygon Generator, Clear=%d\n",m_vg_clear);
+	logerror("Starting Polygon Generator, Clear=%d\n", m_vg_clear);
 
 	if (m_bufsel)
 		polybitmap = m_polybitmap2.get();
 	else
 		polybitmap = m_polybitmap1.get();
 
-	lpnt=0;
+	lpnt = 0;
 	while (lpnt < 0x7ff)
 	{
 		d1 = combase16[lpnt++];
@@ -243,15 +243,15 @@ void irobot_state::irobot_run_video()
 			{
 				sx = combase16[spnt];
 				if (sx == 0xffff) break;
-				sy = combase16[spnt+1];
+				sy = combase16[spnt + 1];
 				color = sy & 0x3f;
 				sx = ROUND_TO_PIXEL(sx);
 				sy = ROUND_TO_PIXEL(sy);
 				if (sx >= m_ir_xmin && sx < m_ir_xmax && sy >= m_ir_ymin && sy < m_ir_ymax)
-					draw_pixel(sx,sy,color);
-				spnt+=2;
-			}//while object
-		}//if point
+					draw_pixel(sx, sy, color);
+				spnt += 2;
+			} // while object
+		} // if point
 
 		/* line */
 		if (shp == 0xc)
@@ -261,45 +261,43 @@ void irobot_state::irobot_run_video()
 				ey = combase16[spnt];
 				if (ey == 0xffff) break;
 				ey = ROUND_TO_PIXEL(ey);
-				sy = combase16[spnt+1];
+				sy = combase16[spnt + 1];
 				color = sy & 0x3f;
 				sy = ROUND_TO_PIXEL(sy);
-				sx = combase16[spnt+3];
-				word1 = (int16_t)combase16[spnt+2];
+				sx = combase16[spnt + 3];
+				word1 = (int16_t)combase16[spnt + 2];
 				ex = sx + word1 * (ey - sy + 1);
-				draw_line(polybitmap, ROUND_TO_PIXEL(sx),sy,ROUND_TO_PIXEL(ex),ey,color);
-				spnt+=4;
-			}//while object
-		}//if line
+				draw_line(polybitmap, ROUND_TO_PIXEL(sx), sy, ROUND_TO_PIXEL(ex), ey, color);
+				spnt += 4;
+			} // while object
+		} // if line
 
 		/* polygon */
 		if (shp == 0x4)
 		{
 			spnt2 = combase16[spnt] & 0x7ff;
 
-			sx = combase16[spnt+1];
-			sx2 = combase16[spnt+2];
-			sy = combase16[spnt+3];
+			sx = combase16[spnt + 1];
+			sx2 = combase16[spnt + 2];
+			sy = combase16[spnt + 3];
 			color = sy & 0x3f;
 			sy = ROUND_TO_PIXEL(sy);
-			spnt+=4;
+			spnt += 4;
 
 			word1 = (int16_t)combase16[spnt];
-			ey = combase16[spnt+1];
+			ey = combase16[spnt + 1];
 			if (word1 != -1 || ey != 0xffff)
 			{
 				ey = ROUND_TO_PIXEL(ey);
-				spnt+=2;
-
-			//  sx += word1;
+				spnt += 2;
+				//sx += word1;
 
 				word2 = (int16_t)combase16[spnt2];
-				ey2 = ROUND_TO_PIXEL(combase16[spnt2+1]);
-				spnt2+=2;
+				ey2 = ROUND_TO_PIXEL(combase16[spnt2 + 1]);
+				spnt2 += 2;
+				//sx2 += word2;
 
-			//  sx2 += word2;
-
-				while(1)
+				while (1)
 				{
 					if (sy >= m_ir_ymin && sy < m_ir_ymax)
 					{
@@ -318,11 +316,11 @@ void irobot_state::irobot_run_video()
 					if (sy > ey)
 					{
 						word1 = (int16_t)combase16[spnt];
-						ey = combase16[spnt+1];
+						ey = combase16[spnt + 1];
 						if (word1 == -1 && ey == 0xffff)
 							break;
 						ey = ROUND_TO_PIXEL(ey);
-						spnt+=2;
+						spnt += 2;
 					}
 					else
 						sx += word1;
@@ -330,41 +328,36 @@ void irobot_state::irobot_run_video()
 					if (sy > ey2)
 					{
 						word2 = (int16_t)combase16[spnt2];
-						ey2 = ROUND_TO_PIXEL(combase16[spnt2+1]);
-						spnt2+=2;
+						ey2 = ROUND_TO_PIXEL(combase16[spnt2 + 1]);
+						spnt2 += 2;
 					}
 					else
 						sx2 += word2;
 
-				} //while polygon
-			}//if at least 2 sides
-		} //if polygon
-	} //while object
+				} // while polygon
+			} // if at least 2 sides
+		} // if polygon
+	} // while object
 }
 
 
 
 uint32_t irobot_state::screen_update_irobot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_videoram;
 	uint8_t *bitmap_base = m_bufsel ? m_polybitmap1.get() : m_polybitmap2.get();
-	int x, y, offs;
 
 	/* copy the polygon bitmap */
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &bitmap_base[y * BITMAP_WIDTH], nullptr);
 
 	/* redraw the non-zero characters in the alpha layer */
-	for (y = offs = 0; y < 32; y++)
-		for (x = 0; x < 32; x++, offs++)
+	for (int y = 0, offs = 0; y < 32; y++)
+		for (int x = 0; x < 32; x++, offs++)
 		{
-			int code = videoram[offs] & 0x3f;
-			int color = ((videoram[offs] & 0xc0) >> 6) | (m_alphamap >> 3);
+			int code = m_videoram[offs] & 0x3f;
+			int color = ((m_videoram[offs] & 0xc0) >> 6) | (m_alphamap >> 3);
 
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-					code, color,
-					0,0,
-					8*x,8*y,0);
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code, color, 0, 0, 8 * x, 8 * y, 0);
 		}
 
 	return 0;

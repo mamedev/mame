@@ -134,7 +134,7 @@ void a2bus_byte8251_device::device_add_mconfig(machine_config &config)
 	I8251(config, m_usart, 1021800); // CLK tied to ϕ1 signal from bus pin 38
 	m_usart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
-	MM5307AA(config, m_brg, A2BUS_7M_CLOCK / 8);
+	MM5307AA(config, m_brg, DERIVED_CLOCK(1, 8));
 	m_brg->output_cb().set(m_usart, FUNC(i8251_device::write_txc));
 	m_brg->output_cb().append(m_usart, FUNC(i8251_device::write_rxc));
 

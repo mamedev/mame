@@ -87,7 +87,7 @@
 
 #include "igs017_igs031.h"
 #include "igs027a.h"
-#include "mahjong.h"
+#include "igsmahjong.h"
 #include "pgmcrypt.h"
 
 #include "machine/i8255.h"

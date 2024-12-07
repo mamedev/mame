@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef DEVICES_CPU_DSPP_DSPPFE_H
-#define DEVICES_CPU_DSPP_DSPPFE_H
+#ifndef MAME_CPU_DSPP_DSPPFE_H
+#define MAME_CPU_DSPP_DSPPFE_H
+
+#pragma once
 
 #include "dspp.h"
 #include "cpu/drcfe.h"
@@ -69,5 +71,4 @@ private:
 	dspp_device *m_dspp;
 };
 
-
-#endif /* DEVICES_CPU_DSPP_DSPPFE_H */
+#endif // MAME_CPU_DSPP_DSPPFE_H

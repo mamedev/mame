@@ -35,7 +35,6 @@ public:
 		m_mcubank(*this, "mcubank"),
 		m_io_in(*this, "IN%u", 0U),
 		m_io_control(*this, "CONTROL%u", 0U),
-		m_io_paddle(*this, "PADDLE%u", 0U),
 		m_io_dipsw(*this, "DIPSW"),
 		m_dsw_sel(*this, "dsw_sel")
 	{ }
@@ -61,7 +60,6 @@ public:
 	void init_berabohm();
 	void init_galaga88();
 	void init_blastoff();
-	void init_quester();
 	void init_ws89();
 	void init_dspirit();
 	void init_pistoldm();
@@ -72,7 +70,6 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 	void driver_init();
 
-private:
 	required_device<mc6809e_device> m_maincpu;
 	required_device<mc6809e_device> m_subcpu;
 	required_device<mc6809e_device> m_audiocpu;
@@ -92,7 +89,6 @@ private:
 
 	optional_ioport_array<4> m_io_in;
 	optional_ioport_array<2> m_io_control;
-	optional_ioport_array<2> m_io_paddle;
 	required_ioport m_io_dipsw;
 	required_device<ls157_device> m_dsw_sel;
 
@@ -107,12 +103,12 @@ private:
 	u32 m_key_reminder = 0;
 	u32 m_key_numerator_high_word = 0;
 	u8 m_key[8]{};
-	int m_mcu_patch_data = 0;
-	int m_reset = 0;
-	int m_input_count = 0;
-	int m_strobe = 0;
-	int m_strobe_count = 0;
-	int m_stored_input[2]{};
+	u8 m_mcu_patch_data = 0;
+	s32 m_reset = 0;
+	s32 m_input_count = 0;
+	u8 m_strobe = 0;
+	u8 m_strobe_count = 0;
+	u8 m_stored_input[2]{};
 	bool m_copy_sprites = false;
 	u8 m_drawmode_table[16]{};
 
@@ -125,7 +121,6 @@ private:
 	void sound_bankswitch_w(u8 data);
 	void mcu_bankswitch_w(u8 data);
 	void mcu_patch_w(u8 data);
-	u8 quester_paddle_r(offs_t offset);
 	u8 berabohm_buttons_r(offs_t offset);
 	u8 faceoff_inputs_r(offs_t offset);
 	void spriteram_w(offs_t offset, u8 data);
@@ -143,7 +138,7 @@ private:
 	void key_type_2_init(int key_id);
 	void key_type_3_init(int key_id, int reg, int rng, int swap4_arg, int swap4, int bottom4, int top4);
 
-	void TilemapCB(u16 code, int *tile, int *mask);
+	void TilemapCB(u16 code, int &tile, int &mask);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -154,6 +149,29 @@ private:
 	void sound_map(address_map &map) ATTR_COLD;
 	void sub_map(address_map &map) ATTR_COLD;
 	void virtual_map(address_map &map) ATTR_COLD;
+};
+
+class quester_state : public namcos1_state
+{
+public:
+	quester_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcos1_state(mconfig, type, tag),
+		m_io_paddle(*this, "PADDLE%u", 0U)
+	{ }
+
+	void quester(machine_config &config);
+
+	void init_quester();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_ioport_array<2> m_io_paddle;
+
+	u8 paddle_r(offs_t offset);
+
+	void quester_mcu_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NAMCO_NAMCOS1_H

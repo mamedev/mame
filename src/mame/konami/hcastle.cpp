@@ -261,8 +261,8 @@ uint32_t hcastle_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_tilemap[0]->set_scrolly(0, ctrl_1_2);
 	m_tilemap[0]->set_scrollx(0, ((ctrl_1_1 << 8) + ctrl_1_0));
 
-//  Sprite priority
-//  if (ctrl_1_3 & 0x20)
+	//  Sprite priority
+	//if (ctrl_1_3 & 0x20)
 	if ((m_gfx_bank & 0x04) == 0)
 	{
 		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);

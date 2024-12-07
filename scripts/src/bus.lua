@@ -2893,6 +2893,8 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/sys68k_iscsi.h",
 		MAME_DIR .. "src/devices/bus/vme/sys68k_isio.cpp",
 		MAME_DIR .. "src/devices/bus/vme/sys68k_isio.h",
+		MAME_DIR .. "src/devices/bus/vme/tp880v.cpp",
+		MAME_DIR .. "src/devices/bus/vme/tp880v.h",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.cpp",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.h",
 	}
@@ -4686,6 +4688,8 @@ if (BUSES["ZORRO"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/zorro/action_replay.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.h",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/ripple.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/ripple.h",
 	}
 end
 
@@ -5252,6 +5256,8 @@ if (BUSES["CBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/cbus/amd98.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/amd98.h",
+		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_26.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_55.cpp",
@@ -5260,12 +5266,12 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_86.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.h",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_snd.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_snd.h",
-		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/mpu_pc98.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.h",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_snd.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/pc9801_snd.h",
+		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.cpp",
+		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.h",
 	}
 end
 
@@ -5742,7 +5748,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/h89/h89bus.h,BUSES["H89BUS"] = true
+--@src/devices/bus/heathzenith/h89/h89bus.h,BUSES["H89BUS"] = true
 ---------------------------------------------------
 
 if (BUSES["H89BUS"]~=null) then
@@ -5751,6 +5757,8 @@ if (BUSES["H89BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/cards.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h89bus.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h89bus.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/h17_fdc.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/h17_fdc.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h_88_3.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h_88_3.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h_88_5.cpp",
@@ -5759,9 +5767,23 @@ if (BUSES["H89BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/mms77316_fdc.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_sound.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_sound.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_parallel_port.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_parallel_port.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/we_pullup.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/we_pullup.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/z37_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/z37_fdc.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/heathzenith/h19/tlb.h,BUSES["HEATH_TLB_CONNECTOR"] = true
+---------------------------------------------------
+
+if (BUSES["HEATH_TLB_CONNECTOR"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlb.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlb.h",
 	}
 end

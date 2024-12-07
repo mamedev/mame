@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_EINSTEIN_SILICON_DISC_H
-#define MAME_BUS_EINSTEIN_SILICON_DISC_H
+#ifndef MAME_BUS_EINSTEIN_PIPE_SILICON_DISC_H
+#define MAME_BUS_EINSTEIN_PIPE_SILICON_DISC_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(EINSTEIN_SILICON_DISC, einstein_silicon_disc_device)
 
-#endif // MAME_BUS_EINSTEIN_SILICON_DISC_H
+#endif // MAME_BUS_EINSTEIN_PIPE_SILICON_DISC_H

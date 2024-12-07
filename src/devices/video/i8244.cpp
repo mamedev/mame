@@ -32,20 +32,20 @@ DEFINE_DEVICE_TYPE(I8245, i8245_device, "i8245", "Intel 8245")
 //  i8244_device - constructor
 //-------------------------------------------------
 
-i8244_device::i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: i8244_device(mconfig, I8244, tag, owner, clock)
+i8244_device::i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	i8244_device(mconfig, I8244, tag, owner, clock)
 { }
 
-i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, device_video_interface(mconfig, *this)
-	, m_irq_func(*this)
-	, m_charset(*this, "cgrom")
+i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
+	m_irq_func(*this),
+	m_charset(*this, "cgrom")
 { }
 
-i8245_device::i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: i8244_device(mconfig, I8245, tag, owner, clock)
+i8245_device::i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	i8244_device(mconfig, I8245, tag, owner, clock)
 { }
 
 
@@ -433,7 +433,7 @@ void i8244_device::write_cx(int x, bool cx)
 {
 	if (cx)
 	{
-		u8 colx = m_collision_map[x] & 0x3f;
+		u8 colx = m_collision_map[x];
 
 		// check if we collide with an already drawn source object
 		if (colx)
@@ -451,9 +451,7 @@ void i8244_device::write_cx(int x, bool cx)
 
 		// check if an already drawn object would collide with us
 		if (m_vdc.s.collision & 0x40)
-		{
 			m_collision_status |= colx;
-		}
 	}
 }
 
@@ -662,13 +660,13 @@ void i8244_device::draw_minor(int scanline, bitmap_ind16 &bitmap, const rectangl
 
 			switch (m_vdc.s.sprites[i].color & 0x03)
 			{
-				case 1: // Xg attribute set
+				case 1: // X9 attribute set
 					x_shift = 1;
 					break;
 				case 2: // S attribute set
 					x_shift = (((scanline - y) / zoom_px) & 0x01) ^ 0x01;
 					break;
-				case 3: // Xg and S attributes set
+				case 3: // X9 and S attributes set
 					x_shift = ((scanline - y) / zoom_px) & 0x01;
 					break;
 				default:
@@ -685,15 +683,17 @@ void i8244_device::draw_minor(int scanline, bitmap_ind16 &bitmap, const rectangl
 					{
 						if (cliprect.contains(px, scanline))
 						{
-							u8 mask = 1 << i;
+							// put zoom flag on high byte for later collision detection
+							u16 mask = (zoom_enable ? 0x101 : 1) << i;
+							u8 colx = m_collision_map[px];
 
 							// check if we collide with an already drawn source object
-							if (m_vdc.s.collision & m_collision_map[px])
+							if (m_vdc.s.collision & colx)
 								m_collision_status |= mask;
 
 							// check if an already drawn object would collide with us
 							if (m_vdc.s.collision & mask)
-								m_collision_status |= m_collision_map[px];
+								m_collision_status |= colx;
 
 							m_collision_map[px] |= mask;
 							bitmap.pix(scanline, px) = color;
@@ -714,8 +714,11 @@ u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	for (int scanline = cliprect.min_y; scanline <= cliprect.max_y; scanline++)
 	{
 		// clear collision maps
-		memset(m_collision_map, 0, sizeof(m_collision_map));
-		memset(m_priority_map, 0, sizeof(m_priority_map));
+		if (cliprect.min_x == screen.visible_area().min_x)
+		{
+			memset(m_collision_map, 0, sizeof(m_collision_map));
+			memset(m_priority_map, 0, sizeof(m_priority_map));
+		}
 
 		// display grid if enabled
 		if (m_vdc.s.control & 0x08 && scanline >= 24 && scanline <= 218)
@@ -726,6 +729,35 @@ u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 		{
 			draw_major(scanline, bitmap, cliprect);
 			draw_minor(scanline, bitmap, cliprect);
+		}
+
+		// go over the collision map again for edge cases on this scanline
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			if (x > screen.visible_area().min_x)
+			{
+				u16 colx0 = m_collision_map[x - 1];
+				u16 colx1 = m_collision_map[x];
+
+				// grid or minor to the left of major
+				if (colx1 & 0x80)
+				{
+					if (m_vdc.s.collision & colx0 & 0x3f)
+						m_collision_status |= 0x80;
+
+					if (m_vdc.s.collision & 0x80)
+						m_collision_status |= colx0 & 0x3f;
+				}
+
+				// grid to the left of non-zoomed minor
+				u8 mask = (colx1 & 0xf) & (~colx1 >> 8);
+
+				if (m_vdc.s.collision & colx0 & 0x30)
+					m_collision_status |= mask;
+
+				if (m_vdc.s.collision & mask)
+					m_collision_status |= colx0 & 0x30;
+			}
 		}
 	}
 

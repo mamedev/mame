@@ -9,6 +9,8 @@
 #include <tuple>
 
 
+namespace {
+
 #define _86F_FORMAT_HEADER   "86BF"
 
 #pragma pack(1)
@@ -23,6 +25,35 @@ struct _86FIMG
 };
 
 #pragma pack()
+
+enum
+{
+	SURFACE_DESC = 1,
+	TYPE_MASK = 6,
+	TYPE_DD = 0,
+	TYPE_HD = 2,
+	TYPE_ED = 4,
+	TYPE_ED2000 = 6,
+	TWO_SIDES = 8,
+	WRITE_PROTECT = 0x10,
+	RPM_MASK = 0x60,
+	RPM_0 = 0,
+	RPM_1 = 0x20,
+	RPM_15 = 0x40,
+	RPM_2 = 0x60,
+	EXTRA_BC = 0x80,
+	ZONED_RPM = 0x100,
+	ZONE_PREA2_1 = 0,
+	ZONE_PREA2_2 = 0x200,
+	ZONE_A2 = 0x400,
+	ZONE_C64 = 0x600,
+	ENDIAN_BIG = 0x800,
+	RPM_FAST = 0x1000,
+	TOTAL_BC = 0x1000
+};
+
+} // anonymous namespace
+
 
 _86f_format::_86f_format() : floppy_image_format_t()
 {

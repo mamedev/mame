@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_TAITO_TAITSJSEC_H
-#define MAME_TAITO_TAITSJSEC_H
+#ifndef MAME_TAITO_TAITOSJSEC_H
+#define MAME_TAITO_TAITOSJSEC_H
 
 #pragma once
 
@@ -91,4 +91,4 @@ private:
 	bool m_busak, m_reset;
 };
 
-#endif // MAME_TAITO_TATISJSEC_H
+#endif // MAME_TAITO_TAITOSJSEC_H

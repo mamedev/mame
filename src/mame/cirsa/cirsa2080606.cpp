@@ -17,7 +17,7 @@
      - La Perla del Caribe Plus
      - Las Joyas de Cleopatra
      - Leyendas de Oriente
-     - Lucky Player
+     - Lucky Player (2012 version)
      - Máquina del Tiempo
      - Multi Star
      - Ocean's Treasures

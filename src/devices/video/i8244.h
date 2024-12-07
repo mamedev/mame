@@ -39,9 +39,7 @@ DECLARE_DEVICE_TYPE(I8244, i8244_device)
 DECLARE_DEVICE_TYPE(I8245, i8245_device)
 
 
-class i8244_device :  public device_t
-					, public device_sound_interface
-					, public device_video_interface
+class i8244_device : public device_t, public device_sound_interface, public device_video_interface
 {
 public:
 	// construction/destruction
@@ -156,7 +154,7 @@ protected:
 	int m_bgate_start;
 
 	vdc_t m_vdc;
-	u8 m_collision_map[0x200];
+	u16 m_collision_map[0x200];
 	u8 m_priority_map[0x200];
 
 	u8 m_x_beam_pos;

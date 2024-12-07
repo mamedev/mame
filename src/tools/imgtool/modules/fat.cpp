@@ -140,6 +140,7 @@
 #include "multibyte.h"
 #include "unicode.h"
 
+#include <algorithm>
 #include <cctype>
 #include <cstdio>
 #include <ctime>
@@ -179,6 +180,18 @@ struct fat_file
 
 struct fat_dirent
 {
+	fat_dirent() :
+		directory(0),
+		eof(0),
+		filesize(0),
+		first_cluster(0),
+		dirent_sector_index(0),
+		dirent_sector_offset(0)
+	{
+		std::fill(std::begin(long_filename), std::end(long_filename), 0);
+		std::fill(std::begin(short_filename), std::end(short_filename), 0);
+	}
+
 	char long_filename[512];
 	char short_filename[13];
 	unsigned int directory : 1;
@@ -1273,15 +1286,16 @@ static uint32_t fat_setup_time(time_t ansi_time)
 
 
 
-static imgtoolerr_t fat_read_dirent(imgtool::partition &partition, fat_file *file,
-	fat_dirent &ent, fat_freeentry_info *freeent)
+static imgtoolerr_t fat_read_dirent(
+		imgtool::partition &partition,
+		fat_file *file,
+		fat_dirent &ent,
+		fat_freeentry_info *freeent)
 {
 	imgtoolerr_t err;
 	//const fat_partition_info *disk_info;
 	uint8_t entry[FAT_DIRENT_SIZE];
 	size_t bytes_read;
-	int i, j;
-	char32_t ch;
 	char16_t lfn_buf[512];
 	size_t lfn_len = 0;
 	int lfn_lastentry = 0;
@@ -1290,7 +1304,7 @@ static imgtoolerr_t fat_read_dirent(imgtool::partition &partition, fat_file *fil
 
 	assert(file->directory);
 	lfn_buf[0] = '\0';
-	memset(&ent, 0, sizeof(ent));
+	ent = fat_dirent();
 	//disk_info = fat_get_partition_info(partition);
 
 	/* The first eight bytes of a FAT directory entry is a blank padded name
@@ -1351,7 +1365,7 @@ static imgtoolerr_t fat_read_dirent(imgtool::partition &partition, fat_file *fil
 			}
 		}
 	}
-	while((entry[0] == 0x2E) || (entry[0] == 0xE5) || (entry[11] == 0x0F));
+	while ((entry[0] == 0x2E) || (entry[0] == 0xE5) || (entry[11] == 0x0F));
 
 	/* no more directory entries? */
 	if (entry[0] == '\0')
@@ -1369,14 +1383,14 @@ static imgtoolerr_t fat_read_dirent(imgtool::partition &partition, fat_file *fil
 		/* only use the LFN if the checksum passes */
 		if (lfn_checksum == fat_calc_filename_checksum(entry))
 		{
-			i = 0;
-			j = 0;
+			int i = 0, j = 0;
+			char32_t ch;
 			do
 			{
 				i += uchar_from_utf16(&ch, &lfn_buf[i], std::size(lfn_buf) - i);
 				j += utf8_from_uchar(&ent.long_filename[j], std::size(ent.long_filename) - j, ch);
 			}
-			while(ch != 0);
+			while (ch != 0);
 		}
 	}
 

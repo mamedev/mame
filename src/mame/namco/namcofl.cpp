@@ -260,23 +260,23 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
 	int objcode2tile(int code);
-	void tilemap_cb(uint16_t code, int *tile, int *mask);
-	void roz_cb(uint16_t code, int *tile, int *mask, int which);
+	void tilemap_cb(uint16_t code, int &tile, int &mask);
+	void roz_cb(uint16_t code, int &tile, int &mask, int which);
 	void namcoc75_am(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 };
 
 
-void namcofl_state::tilemap_cb(uint16_t code, int *tile, int *mask)
+void namcofl_state::tilemap_cb(uint16_t code, int &tile, int &mask)
 {
-	*tile = code;
-	*mask = code;
+	tile = code;
+	mask = code;
 }
 
-void namcofl_state::roz_cb(uint16_t code, int *tile, int *mask, int which)
+void namcofl_state::roz_cb(uint16_t code, int &tile, int &mask, int which)
 {
-	*tile = code;
-	*mask = code;
+	tile = code;
+	mask = code;
 }
 
 
@@ -293,7 +293,7 @@ uint32_t namcofl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	// intersect with master clip rectangle
 	clip &= cliprect;
 
-	bitmap.fill(m_c116->black_pen(), cliprect );
+	bitmap.fill(m_c116->black_pen(), cliprect);
 
 	for (int pri = 0; pri < 16; pri++)
 	{
@@ -362,7 +362,7 @@ void namcofl_state::c116_w(offs_t offset, uint8_t data)
 
 	if ((offset & 0x180e) == 0x180a)
 	{
-		uint16_t triggerscanline=m_c116->get_reg(5)-(32+1);
+		const uint16_t triggerscanline = m_c116->get_reg(5) - (32+1);
 		m_raster_interrupt_timer->adjust(m_screen->time_until_pos(triggerscanline));
 	}
 }
@@ -405,13 +405,13 @@ void namcofl_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	}
 #endif
 
-	if (offset & 1)
+	if (BIT(offset, 0))
 		m_shareram[offset >> 1] = (m_shareram[offset >> 1] & ~(uint32_t(mem_mask) << 16)) | ((data & mem_mask) << 16);
 	else
 		m_shareram[offset >> 1] = (m_shareram[offset >> 1] & ~uint32_t(mem_mask)) | (data & mem_mask);
 
 	// C75 BIOS has a very short window on the CPU sync signal, so immediately let the i960 at it
-	if ((offset == 0x6000/2) && (data & 0x80))
+	if ((offset == 0x6000/2) && BIT(data, 7))
 	{
 		m_mcu->yield();
 	}
@@ -419,7 +419,7 @@ void namcofl_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 uint16_t namcofl_state::mcu_shared_r(offs_t offset)
 {
-	if (offset & 1)
+	if (BIT(offset, 0))
 		return m_shareram[offset >> 1] >> 16;
 	else
 		return m_shareram[offset >> 1];
@@ -717,7 +717,7 @@ void namcofl_state::namcofl(machine_config &config)
 }
 
 ROM_START( speedrcr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_REGION( 0x100000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("se2_mp_ea4.19a",   0x000000, 0x080000, CRC(95ab3fd7) SHA1(273a536f8512f3c55260ac1b78533bc35b8390ed) )
 	ROM_LOAD32_WORD("se2_mp_oa4.18a",   0x000002, 0x080000, CRC(5b5ef1eb) SHA1(3e9e4abb1a32269baef772079de825dfe1ea230c) )
 
@@ -746,10 +746,10 @@ ROM_START( speedrcr )
 	ROM_LOAD32_WORD("se1obj1l.ic3", 0x400000, 0x200000, CRC(c4809fd5) SHA1(e0b80fccc17c83fb9d08f7f1cf2cd2f0f3a510b4) )
 	ROM_LOAD32_WORD("se1obj1u.ic4", 0x400002, 0x200000, CRC(0beefa56) SHA1(012fb7b330dbf851ab2217da0a0e7136ddc3d23f) )
 
-	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-2)
 	ROM_LOAD("se1_rsh.14k",    0x000000, 0x080000, CRC(f6408a1f) SHA1(3a299719090de3915331fc1ddbe0f41834da063a) )
 
-	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for BG)
 	ROM_LOAD("se1_ssh.18u",    0x000000, 0x080000, CRC(cb534142) SHA1(935a377c72b3a815ed46dfdb6ea6734d312da373) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -768,7 +768,7 @@ ROM_END
 
 
 ROM_START( finalapr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_REGION( 0x100000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr2_mp_eb.19a",   0x000000, 0x080000, CRC(8bfe615f) SHA1(7b867eb261268a83177f1f873689f77d1b6c47ca) )
 	ROM_LOAD32_WORD("flr2_mp_ob.18a",   0x000002, 0x080000, CRC(91c14e4f) SHA1(934a86daaef0e3e2c2b3066f4677ccb3aaab6eaf) )
 
@@ -793,10 +793,10 @@ ROM_START( finalapr )
 	ROM_LOAD32_WORD("flr1_obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
 	ROM_LOAD32_WORD("flr1_obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
-	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-2)
 	ROM_LOAD("flr1_rsh.14k", 0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
 
-	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for BG)
 	ROM_LOAD("flr1_ssh.18u", 0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -807,7 +807,7 @@ ROM_START( finalapr )
 ROM_END
 
 ROM_START( finalapr1 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_REGION( 0x100000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr2_mp_e.19a",   0x000000, 0x080000, CRC(cc8961ae) SHA1(08ce4d27a723101370d1c536b26256ce0d8a1b6c) )
 	ROM_LOAD32_WORD("flr2_mp_o.18a",   0x000002, 0x080000, CRC(8118f465) SHA1(c4b79878a82fd36b5707e92aa893f69c2b942d57) )
 
@@ -832,10 +832,10 @@ ROM_START( finalapr1 )
 	ROM_LOAD32_WORD("flr1_obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
 	ROM_LOAD32_WORD("flr1_obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
-	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-2)
 	ROM_LOAD("flr1_rsh.14k", 0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
 
-	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for BG)
 	ROM_LOAD("flr1_ssh.18u", 0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -846,7 +846,7 @@ ROM_START( finalapr1 )
 ROM_END
 
 ROM_START( finalaprj )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_REGION( 0x100000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr1_mp_ec.19a", 0x000000, 0x080000, CRC(52735494) SHA1(db9873cb39bcfdd3dbe2e5079249fecac2c46df9) )
 	ROM_LOAD32_WORD("flr1_mp_oc.18a", 0x000002, 0x080000, CRC(b11fe577) SHA1(70b51a1e66a3bb92f027aad7ba0f358c0e139b3c) )
 
@@ -871,10 +871,10 @@ ROM_START( finalaprj )
 	ROM_LOAD32_WORD("flr1_obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
 	ROM_LOAD32_WORD("flr1_obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
-	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-2)
 	ROM_LOAD("flr1_rsh.14k", 0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
 
-	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for BG)
 	ROM_LOAD("flr1_ssh.18u", 0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -885,7 +885,7 @@ ROM_START( finalaprj )
 ROM_END
 
 ROM_START( finalaprj1 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_REGION( 0x100000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr1_mp_eb.19a", 0x000000, 0x080000, CRC(1a77bcc0) SHA1(4090917afcd0346ea78e6e307879a980cf196204) )
 	ROM_LOAD32_WORD("flr1_mp_ob.18a", 0x000002, 0x080000, CRC(5f64eb2b) SHA1(0011ceeedefcf16c333c7ab28f334dd228eac4cf) )
 
@@ -910,10 +910,10 @@ ROM_START( finalaprj1 )
 	ROM_LOAD32_WORD("flr1_obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
 	ROM_LOAD32_WORD("flr1_obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
-	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-2)
 	ROM_LOAD("flr1_rsh.14k", 0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
 
-	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for BG)
 	ROM_LOAD("flr1_ssh.18u", 0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples

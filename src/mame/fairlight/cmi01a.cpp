@@ -229,7 +229,7 @@ void cmi01a_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			m_hc1 = m_hc0;
 			m_hc0 = hcn;
 
-			double env = hbn * m_env; // -32768..32767
+			double env = (m_env == 0) ? 0.0 : hbn * m_env; // -32768..32767 (guard against ∞ × 0 → NaN)
 			double vol = env * m_vol_latch; // -8388608..8388607
 			buf.put(sampindex, vol / 8388608);
 		}

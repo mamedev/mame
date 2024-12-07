@@ -224,7 +224,7 @@ void master_state::master(machine_config &config)
 	Z80(config, m_maincpu, 8_MHz_XTAL/2);
 	m_maincpu->z80_set_m1_cycles(4+1); // 1 WAIT CLK per M1
 	m_maincpu->set_addrmap(AS_PROGRAM, &master_state::main_trampoline);
-	ADDRESS_MAP_BANK(config, "mainmap").set_map(&master_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
+	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&master_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 418)); // 555 timer (22nF, 150K, 1K5), measured 418Hz
 	irq_clock.set_pulse_width(attotime::from_nsec(22870)); // active for 22.87us

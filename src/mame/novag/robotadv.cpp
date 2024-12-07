@@ -70,7 +70,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { refresh(); }
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -137,11 +137,6 @@ void robotadv_state::machine_start()
 	save_item(NAME(m_counter));
 	save_item(NAME(m_pwm_accum));
 	save_item(NAME(m_pwm_last));
-}
-
-void robotadv_state::machine_reset()
-{
-	refresh();
 }
 
 void robotadv_state::init_board(u8 data)

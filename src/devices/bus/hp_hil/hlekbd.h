@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#ifndef MAME_DEVICES_HP_HIL_HLEKBD_H
-#define MAME_DEVICES_HP_HIL_HLEKBD_H
+#ifndef MAME_BUS_HP_HIL_HLEKBD_H
+#define MAME_BUS_HP_HIL_HLEKBD_H
 
 #pragma once
 
@@ -70,4 +70,4 @@ private:
 DECLARE_DEVICE_TYPE_NS(HP_IPC_HLE_KEYBOARD, bus::hp_hil, hle_hp_ipc_device);
 DECLARE_DEVICE_TYPE_NS(HP_ITF_HLE_KEYBOARD, bus::hp_hil, hle_hp_itf_device);
 
-#endif // MAME_DEVICES_HP_HIL_HLEKBD_H
+#endif // MAME_BUS_HP_HIL_HLEKBD_H

@@ -258,8 +258,6 @@ void jaguar_state::jerry_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
  *
  *************************************/
 
-#if ENABLE_SPEEDUP_HACKS
-
 void jaguar_state::dsp_flags_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* write the data through */
@@ -278,8 +276,6 @@ void jaguar_state::dsp_flags_w(address_space &space, offs_t offset, uint32_t dat
 		}
 	}
 }
-
-#endif
 
 
 

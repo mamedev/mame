@@ -2942,6 +2942,26 @@ ROM_START( punkshotj )
 	ROM_LOAD( "907d04.d3",    0x0000, 0x80000, CRC(090feb5e) SHA1(2394907b62ff0724c277642caf6375239249e2d7) )
 ROM_END
 
+ROM_START( punkshot2a ) // possibly hack of an undumped original version (copyright year removed and substituted with 'SRS')
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
+	ROM_LOAD16_BYTE( "i7",    0x00000, 0x20000, CRC(f17400ad) SHA1(14408d4eca2ea5a021c208cbb811e51efbf33953) )
+	ROM_LOAD16_BYTE( "i10",   0x00001, 0x20000, CRC(552668ec) SHA1(4317d9c0b2aabd603a5bd4981c764c09407b4b7e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "907f01.e8",    0x0000, 0x8000, CRC(f040c484) SHA1(f76a739cacc0aba98a5bf85a48c81cef0d9bbfb4) )
+
+	ROM_REGION( 0x80000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "907d06.e23",   0x000000, 0x40000, CRC(f5cc38f4) SHA1(e6dc9994582a08740dc2fcb30a38771053627d5f) )
+	ROM_LOAD32_WORD( "907d05.e22",   0x000002, 0x40000, CRC(e25774c1) SHA1(74fda3b418b4b0064b5e660a93122b07f6d41416) )
+
+	ROM_REGION( 0x200000, "k051960", 0 )    /* sprites */
+	ROM_LOAD32_WORD( "907d07.k2",    0x000000, 0x100000, CRC(b0fe4543) SHA1(3be1caef29084063dd8754c1eecc34a2ec842415) )
+	ROM_LOAD32_WORD( "907d08.k7",    0x000002, 0x100000, CRC(d5ac8d9d) SHA1(cb330be1c5c016465ef7048b3b29c65a741ee45b) )
+
+	ROM_REGION( 0x80000, "k053260", 0 ) /* samples for the 053260 */
+	ROM_LOAD( "907d04.d3",    0x0000, 0x80000, CRC(090feb5e) SHA1(2394907b62ff0724c277642caf6375239249e2d7) )
+ROM_END
+
 ROM_START( lgtnfght )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "939k02.e11",   0x00000, 0x20000, CRC(2dfefa53) SHA1(135f3d06b04f950d1afc5fc0f8237c7af0e426b5) )
@@ -3922,10 +3942,11 @@ ROM_END
 
 
 //    YEAR  NAME         PARENT    MACHINE   INPUT      STATE        INIT         MONITOR COMPANY    FULLNAME,FLAGS
-GAME( 1990, punkshot,    0,        punkshot, punkshot,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 2 Players)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1990, punkshot2e,  punkshot, punkshot, punksht2,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Punk Shot (World 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, punkshotj,   punkshot, punkshot, punkshtj,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Punk Shot (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshot,    0,        punkshot, punkshot,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 4 Players)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Punk Shot (US 2 Players)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshot2e,  punkshot, punkshot, punksht2,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Punk Shot (World 2 Players)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshotj,   punkshot, punkshot, punkshtj,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Punk Shot (Japan 2 Players)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshot2a,  punkshot, punkshot, punksht2,  tmnt2_state, empty_init,  ROT0,   "Konami",  "Punk Shot (Asia 2 Players, hacked?)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, lgtnfght,    0,        lgtnfght, lgtnfght,  tmnt2_state, empty_init,  ROT90,  "Konami",  "Lightning Fighters (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, lgtnfghta,   lgtnfght, lgtnfght, lgtnfght,  tmnt2_state, empty_init,  ROT90,  "Konami",  "Lightning Fighters (Asia)",  MACHINE_SUPPORTS_SAVE )

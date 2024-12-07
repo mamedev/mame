@@ -2,8 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-Crazy Climber memory map (preliminary)
-as described by Lionel Theunissen (lionelth@ozemail.com.au)
+Nichibutsu Crazy Climber
 
 Crazy Kong is very similar to Crazy Climber, there is an additional ROM at
 5000-5fff and RAM is at 6000-6bff. Dip switches and input connections are
@@ -11,6 +10,18 @@ different as well.
 
 Swimmer is similar but also different (e.g. it has two CPUs and two 8910,
 graphics are 3bpp instead of 2)
+
+TODO:
+- add tms5110 support to bagmanf
+- toprollr Coin_B 2C_1C doesn't work right, is it a BTANB?
+
+BTANB:
+- yamato shot and missile sound effects block the bg music
+
+-------------------------------------------------------------------
+
+Crazy Climber memory map (preliminary)
+as described by Lionel Theunissen (lionelth@ozemail.com.au)
 
 0000h-4fffh ;20k program ROMs. ROM11=0000h
                                ROM10=1000h
@@ -114,55 +125,35 @@ I/O 9  ;AY-3-8910 Data Write Reg.
 I/O C  ;AY-3-8910 Data Read Reg.
         Port A of the 8910 selects the digital sample to play
 
-Changes:
-25 Jan 98 LBO
-        * Added support for the real Swimmer bigsprite ROMs, courtesy of Gary Walton.
-        * Increased the IRQs for the Swimmer audio CPU to 4 to make it more "jaunty".
-          Not sure if this is accurate, but it should be closer.
-3 Mar 98 LBO
-        * Added alternate version of Swimmer.
-
-TODO:
-        * Verify timings of sound/music on Swimmer.
-        * Add tms5110 support to bagmanf
-
-
 -------------------------------------------------------------------
 
-    T.S. 17.12.2005:
+Yamato:
+-------
+ Gradient tables are stored in two ROMs. Each table is 256 bytes
+ long: 128 for normal and 128 bytes for flipped screen.
+ Color format is direct RGB mapping of 16 bits.
 
-    Yamato:
-    -------
-     Added temporary bg gradient (bad colors/offset).
-
-     Gradient table are stored in two(?) ROMs.
-     Each table is 256 bytes long: 128 for normal
-     and 128 bytes for flipped screen.
-     Color format is unknown - probably direct RGB
-     mapping of 8 or 16 (both roms) bits. Also table
-     selection source is unknown.
-
-     At the title screen, it's a solid dark-cyan.
-     During gameplay, the sky is a cyan gradient, and
-     the sea is a dark blue gradient. When the player
-     ship explodes, the sky and sea briefly turn to a
-     lighter cyan gradient, followed by cyan-pink for
-     the sky, and purple-red for the sea.
-
-     TODO:
-      - bg gradient color decode & table selection
-      - music is too fast?
+ At the title screen, it's a solid dark-cyan. During gameplay,
+ the sky is a cyan gradient, and the sea is a dark blue gradient.
+ When the player ship explodes, the sky and sea briefly turn to a
+ lighter cyan gradient, followed by cyan-pink for the sky,
+ and purple-red for the sea.
 
 
-    Top Roller:
-    ----------
-     It's made by the same developers as Yamato (apparently
-     Falcon) and probably uses the same encrypted SEGA cpu.
+Top Roller:
+----------
+ It's made by the same developers as Yamato (apparently Falcon)
+ and probably uses the same encrypted SEGA cpu.
 
-     lives - $6155
+ lives - $6155
 
-     TODO:
-       - COINB DSW is missing
+Cannon Ball
+-----------
+ The Cannon Ball bootlegs on this Falcon (Crazy Kong) hardware
+ don't correctly handle the protection device found on the original
+ pacman hardware conversion, this causes them to crash after a few
+ rounds - confirmed on an original PCB. They clearly weren't tested
+ properly by the bootleggers.
 
 -------------------------------------------------------------------
 
@@ -227,29 +218,380 @@ Notes:
      D2125 - 1kx1 SRAM
       7603 - Harris M3-7603 32 bytes x8-bit bipolar PROM
 
-----
+-------------------------------------------------------------------
 
-2008-07
-Dip location verified from manual for: cclimber, guzzler, swimmer
+Donkey King
+1981 (bootleg)
 
- Cannon Ball
- -----------
+This game runs on dedicated hardware.
 
- The Cannon Ball bootlegs on this Falcon (Crazy Kong) hardware don't correctly
- handle the protection device found on the original pacman hardware conversion,
- this causes them to crash after the a few rounds - confirmed on an original PCB.
- They clearly weren't tested properly by the bootleggers.
+Possibly bootlegged by Hafasonic?
+
+CPU Board
+---------
+
+MTD-2
+|-----------------------------------------|
+|C1181  VOL             D5.1K   D7.1N     |
+|      LM3900               D6.1M   D8.1R |
+|                                         |
+|                       6116    D10.2N    |
+|                           D9.2M   D11.2R|
+|   4066                                  |
+|         AY3-8910                        |
+|                                  PAL12L6|
+|                                         |
+|1                                        |
+|8               2114 2114                |
+|W                                        |
+|A                                        |
+|Y                                        |
+|                                         |
+|                                         |
+|                    Z80A                 |
+|                                         |
+|                                         |
+|                                         |
+|   DSW(8)    82S129.5G                   |
+|                                         |
+|-----------------------------------------|
+Notes:
+      Z80 clock - 3.072MHz [18.432/6]
+      AY3-8910 clock - 1.536MHz [18.432/12]
+      HSync - 15.5065kHz
+      VSync - 60.5608Hz
+
+
+Video Board
+-----------
+
+MTD-2B
+|-----------------------------------------|
+| 18.432MHz                  82S123.1T    |
+|          2114                82S123.1U  |
+|          2114                  82S123.1V|
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|2101 2101    2114 2114                   |
+|                                         |
+|D12.6A      D1.6H D3.6L    2115 2115 2115|
+|   D13.6C      D2.6K  D4.6N              |
+|                                         |
+|                                         |
+|                           2115 2115 2125|
+|                                         |
+|-----------------------------------------|
+
+
+18-way Pinout
+-------------
+
+Parts          Solder
+-------------------------
+GND      1     GND
+GND      2     GND
+GND      3     GND
+SPK-     4     SPK+
++12V     5     +12V
+         6     P1 UP
+         7     P2 UP
+         8     VIDEO GND
++5V      9     +5V
+P1 DOWN  10
+P2 DOWN  11
+         12    P2 START
+COIN     13    P1 START
+P1 JUMP  14    P1 RIGHT
+RED      15    P1 LEFT
+P2 RIGHT 16    BLUE
+P2 LEFT  17    GREEN
+P2 JUMP  18    SYNC
+
+
+Dip Switch - Donkey King
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|                |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|Life          3 | OFF | OFF |     |     |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|              4 | ON  | OFF |     |     |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|              5 | OFF | ON  |     |     |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|              6 | ON  | ON  |     |     |     |     |     |     |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|Bonus      7000 |     |     | OFF | OFF |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          10000 |     |     | ON  | OFF |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          15000 |     |     | OFF | ON  |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          20000 |     |     | ON  | ON  |     |     |     |     |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|Credit    1C 1P |     |     |     |     | OFF | OFF | OFF |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          1C 2P |     |     |     |     | OFF | ON  | OFF |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          1C 3P |     |     |     |     | OFF | OFF | ON  |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          1C 4P |     |     |     |     | OFF | ON  | ON  |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          2C 1P |     |     |     |     | ON  | OFF | OFF |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          3C 1P |     |     |     |     | ON  | ON  | OFF |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          4C 1P |     |     |     |     | ON  | OFF | ON  |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          5C 1P |     |     |     |     | ON  | ON  | ON  |     |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|Screen    Table |     |     |     |     |     |     |     | OFF |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|        Upright |     |     |     |     |     |     |     | ON  |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "cclimber.h"
+
 #include "cclimber_a.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
+#include "machine/gen_latch.h"
+#include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
+#include "sound/snkwave.h"
+#include "video/resnet.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class cclimber_state : public driver_device
+{
+public:
+	cclimber_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_screen(*this, "screen"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_mainlatch(*this, "mainlatch"),
+		m_bigsprite_videoram(*this, "bigspriteram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_bigsprite_control(*this, "bigspritectrl"),
+		m_colorram(*this, "colorram"),
+		m_column_scroll(*this, "column_scroll"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
+
+	void init_cannonb();
+	void init_cannonb2();
+	void init_cclimber();
+	void init_cclimberj();
+	void init_ckongb();
+	void init_dking();
+	void init_rpatrol();
+
+	void root(machine_config &config);
+	void bagmanf(machine_config &config);
+	void cannonb(machine_config &config);
+	void cclimber(machine_config &config);
+	void cclimberx(machine_config &config);
+	void ckongb(machine_config &config);
+	void rpatrol(machine_config &config);
+	void tangramq(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override { m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); }
+	virtual void video_start() override ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_mainlatch;
+	required_shared_ptr<u8> m_bigsprite_videoram;
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_spriteram;
+	required_shared_ptr<u8> m_bigsprite_control;
+	required_shared_ptr<u8> m_colorram;
+
+	std::unique_ptr<u8[]> m_opcodes;
+
+	bool m_flip_x = false;
+	bool m_flip_y = false;
+
+	tilemap_t *m_pf_tilemap = nullptr;
+	tilemap_t *m_bs_tilemap = nullptr;
+
+	void nmi_mask_w(int state);
+	void cclimber_colorram_w(offs_t offset, u8 data);
+	void flip_screen_x_w(int state) { m_flip_x = state; }
+	void flip_screen_y_w(int state) { m_flip_y = state; }
+
+	void cclimber_portmap(address_map &map) ATTR_COLD;
+
+	void vblank_irq(int state);
+	void sound_nmi_clear_w(u8 data);
+	u8 sound_nmi_clear_r();
+
+	TILE_GET_INFO_MEMBER(cclimber_get_pf_tile_info);
+	TILE_GET_INFO_MEMBER(cclimber_get_bs_tile_info);
+
+	void draw_playfield(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cclimber_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
+
+private:
+	optional_shared_ptr<u8> m_column_scroll;
+	optional_shared_ptr<u8> m_decrypted_opcodes;
+
+	bool m_nmi_mask = false;
+
+	void bagmanf_vblank_irq(int state);
+
+	void cclimber_palette(palette_device &palette) const;
+
+	u32 screen_update_cclimber(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
+	void cclimber_decode(const u8 convtable[8][16]);
+
+	void bagmanf_map(address_map &map) ATTR_COLD;
+	void cannonb_map(address_map &map) ATTR_COLD;
+	void cclimber_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void rpatrol_map(address_map &map) ATTR_COLD;
+	void rpatrol_portmap(address_map &map) ATTR_COLD;
+	void tangramq_map(address_map &map) ATTR_COLD;
+	void tangramq_sound_map(address_map &map) ATTR_COLD;
+};
+
+class swimmer_state : public cclimber_state
+{
+public:
+	swimmer_state(const machine_config &mconfig, device_type type, const char* tag) :
+		cclimber_state(mconfig, type, tag),
+		m_bgcolor(*this, "bgcolor"),
+		m_soundlatch(*this, "soundlatch")
+	{ }
+
+	void swimmer(machine_config &config);
+	void au(machine_config &config);
+	void guzzler(machine_config &config);
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	optional_shared_ptr<u8> m_bgcolor;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
+	bool m_sidebg_enabled = false;
+	bool m_palettebank = false;
+
+	u8 soundlatch_read_and_clear();
+	void sidebg_enable_w(int state) { m_sidebg_enabled = state; }
+	void palette_bank_w(int state) { m_palettebank = state; }
+
+	void swimmer_root_map(address_map &map) ATTR_COLD;
+	void swimmer_map(address_map &map) ATTR_COLD;
+	void swimmer_audio_map(address_map &map) ATTR_COLD;
+	void swimmer_audio_portmap(address_map &map) ATTR_COLD;
+	void au_map(address_map &map) ATTR_COLD;
+	void guzzler_map(address_map &map) ATTR_COLD;
+
+	void swimmer_palette(palette_device &palette) const;
+	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element* gfx);
+	u32 screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void set_background_pen();
+	TILE_GET_INFO_MEMBER(swimmer_get_pf_tile_info);
+};
+
+class toprollr_state : public cclimber_state
+{
+public:
+	toprollr_state(const machine_config &mconfig, device_type type, const char* tag) :
+		cclimber_state(mconfig, type, tag),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_bg_coloram(*this, "bg_coloram"),
+		m_bank1(*this, "bank1"),
+		m_bank1d(*this, "bank1d")
+	{ }
+
+	void toprollr(machine_config &config);
+
+	void init_toprollr();
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	optional_shared_ptr<u8> m_bg_videoram;
+	optional_shared_ptr<u8> m_bg_coloram;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank1d;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	void toprollr_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void toprollr_map(address_map &map) ATTR_COLD;
+
+	void toprollr_palette(palette_device &palette) const;
+	void toprollr_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void toprollr_rombank_w(int state);
+	u32 screen_update_toprollr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(toprollr_get_pf_tile_info);
+	TILE_GET_INFO_MEMBER(toprollr_get_bs_tile_info);
+	TILE_GET_INFO_MEMBER(toproller_get_bg_tile_info);
+};
+
+class yamato_state : public cclimber_state
+{
+public:
+	yamato_state(const machine_config &mconfig, device_type type, const char* tag) :
+		cclimber_state(mconfig, type, tag),
+		m_gradient_rom(*this, "gradient")
+	{ }
+
+	void yamato(machine_config &config);
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	required_region_ptr<u8> m_gradient_rom;
+
+	bitmap_ind16 m_dest_bitmap;
+
+	void yamato_map(address_map &map) ATTR_COLD;
+	void yamato_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void yamato_portmap(address_map &map) ATTR_COLD;
+	void yamato_audio_map(address_map &map) ATTR_COLD;
+	void yamato_audio_portmap(address_map &map) ATTR_COLD;
+
+	void yamato_palette(palette_device &palette) const;
+	u32 screen_update_yamato(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+};
 
 
 void cclimber_state::machine_start()
@@ -257,15 +599,828 @@ void cclimber_state::machine_start()
 	save_item(NAME(m_nmi_mask));
 }
 
-void swimmer_state::swimmer_sh_soundlatch_w(uint8_t data)
+
+
+/*******************************************************************************
+    Video
+*******************************************************************************/
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  Crazy Climber has three 32x8 palette PROMs.
+  The palette PROMs are connected to the RGB output this way:
+
+  bit 7 -- 220 ohm resistor  -- BLUE
+        -- 470 ohm resistor  -- BLUE
+        -- 220 ohm resistor  -- GREEN
+        -- 470 ohm resistor  -- GREEN
+        -- 1  kohm resistor  -- GREEN
+        -- 220 ohm resistor  -- RED
+        -- 470 ohm resistor  -- RED
+  bit 0 -- 1  kohm resistor  -- RED
+
+***************************************************************************/
+
+void cclimber_state::cclimber_palette(palette_device &palette) const
 {
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	const u8 *color_prom = memregion("proms")->base();
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
+
+	// compute the color output resistor weights
+	double weights_rg[3], weights_b[2];
+	compute_resistor_weights(0, 255, -1.0,
+			3, resistances_rg, weights_rg, 0, 0,
+			2, resistances_b,  weights_b,  0, 0,
+			0, nullptr, nullptr, 0, 0);
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_weights(weights_rg, bit0, bit1, bit2);
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_weights(weights_rg, bit0, bit1, bit2);
+
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_weights(weights_b, bit0, bit1);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
 }
 
-uint8_t swimmer_state::soundlatch_read_and_clear()
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  Swimmer has two 256x4 char/sprite palette PROMs and one 32x8 big sprite
+  palette PROM.
+  The palette PROMs are connected to the RGB output this way:
+  (the 500 and 250 ohm resistors are made of 1 kohm resistors in parallel)
+
+  bit 3 -- 250 ohm resistor  -- BLUE
+        -- 500 ohm resistor  -- BLUE
+        -- 250 ohm resistor  -- GREEN
+  bit 0 -- 500 ohm resistor  -- GREEN
+  bit 3 -- 1  kohm resistor  -- GREEN
+        -- 250 ohm resistor  -- RED
+        -- 500 ohm resistor  -- RED
+  bit 0 -- 1  kohm resistor  -- RED
+
+  bit 7 -- 250 ohm resistor  -- BLUE
+        -- 500 ohm resistor  -- BLUE
+        -- 250 ohm resistor  -- GREEN
+        -- 500 ohm resistor  -- GREEN
+        -- 1  kohm resistor  -- GREEN
+        -- 250 ohm resistor  -- RED
+        -- 500 ohm resistor  -- RED
+  bit 0 -- 1  kohm resistor  -- RED
+
+  Additionally, the background color of the score panel is determined by
+  these resistors:
+
+                  /--- tri-state --  470 -- BLUE
+  +5V -- 1kohm ------- tri-state --  390 -- GREEN
+                  \--- tri-state -- 1000 -- RED
+
+***************************************************************************/
+
+void swimmer_state::swimmer_palette(palette_device &palette) const
 {
-	uint8_t res = m_soundlatch->read();
+	const u8 *color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < 0x100; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i + 0x000], 0);
+		bit1 = BIT(color_prom[i + 0x000], 1);
+		bit2 = BIT(color_prom[i + 0x000], 2);
+		int const r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
+		// green component
+		bit0 = BIT(color_prom[i + 0x000], 3);
+		bit1 = BIT(color_prom[i + 0x100], 0);
+		bit2 = BIT(color_prom[i + 0x100], 1);
+		int const g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
+		// blue component
+		bit0 = 0;
+		bit1 = BIT(color_prom[i + 0x100], 2);
+		bit2 = BIT(color_prom[i + 0x100], 3);
+		int const b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+
+	color_prom += 0x200;
+
+	// big sprite
+	for (int i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
+		// blue component
+		bit0 = 0;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
+		palette.set_pen_color(i + 0x100, rgb_t(r, g, b));
+	}
+
+	// side panel backgrond pen
+#if 0
+	// values calculated from the resistors don't seem to match the real board
+	palette.set_pen_color(0x120, rgb_t(0x24, 0x5d, 0x4e));
+#else
+	palette.set_pen_color(0x120, rgb_t(0x20, 0x98, 0x79));
+#endif
+}
+
+
+void yamato_state::yamato_palette(palette_device &palette) const
+{
+	u8 const *const color_prom = memregion("proms")->base();
+
+	// chars - 12 bits RGB
+	for (int i = 0; i < 0x40; i++)
+	{
+		int bit0, bit1, bit2, bit3;
+
+		// red component
+		bit0 = BIT(color_prom[i + 0x00], 0);
+		bit1 = BIT(color_prom[i + 0x00], 1);
+		bit2 = BIT(color_prom[i + 0x00], 2);
+		bit3 = BIT(color_prom[i + 0x00], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		// green component
+		bit0 = BIT(color_prom[i + 0x00], 4);
+		bit1 = BIT(color_prom[i + 0x00], 5);
+		bit2 = BIT(color_prom[i + 0x00], 6);
+		bit3 = BIT(color_prom[i + 0x00], 7);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		// blue component
+		bit0 = BIT(color_prom[i + 0x40], 0);
+		bit1 = BIT(color_prom[i + 0x40], 1);
+		bit2 = BIT(color_prom[i + 0x40], 2);
+		bit3 = BIT(color_prom[i + 0x40], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+
+	// big sprite - 8 bits RGB
+	for (int i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i + 0x80], 0);
+		bit1 = BIT(color_prom[i + 0x80], 1);
+		bit2 = BIT(color_prom[i + 0x80], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(color_prom[i + 0x80], 3);
+		bit1 = BIT(color_prom[i + 0x80], 4);
+		bit2 = BIT(color_prom[i + 0x80], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
+		bit0 = 0;
+		bit1 = BIT(color_prom[i + 0x80], 6);
+		bit2 = BIT(color_prom[i + 0x80], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_pen_color(i + 0x40, rgb_t(r, g, b));
+	}
+}
+
+
+void toprollr_state::toprollr_palette(palette_device &palette) const
+{
+	u8 const *const color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < 0xa0; i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
+		bit0 = 0;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+
+/***************************************************************************
+
+  Swimmer can directly set the background color.
+  The latch is connected to the RGB output this way:
+  (the 500 and 250 ohm resistors are made of 1 kohm resistors in parallel)
+
+  bit 7 -- 250 ohm resistor  -- RED
+        -- 500 ohm resistor  -- RED
+        -- 250 ohm resistor  -- GREEN
+        -- 500 ohm resistor  -- GREEN
+        -- 1  kohm resistor  -- GREEN
+        -- 250 ohm resistor  -- BLUE
+        -- 500 ohm resistor  -- BLUE
+  bit 0 -- 1  kohm resistor  -- BLUE
+
+***************************************************************************/
+
+void swimmer_state::set_background_pen()
+{
+	int bit0, bit1, bit2;
+
+	// red component
+	bit0 = 0;
+	bit1 = (*m_bgcolor >> 6) & 0x01;
+	bit2 = (*m_bgcolor >> 7) & 0x01;
+	int const r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
+	// green component
+	bit0 = (*m_bgcolor >> 3) & 0x01;
+	bit1 = (*m_bgcolor >> 4) & 0x01;
+	bit2 = (*m_bgcolor >> 5) & 0x01;
+	int const g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
+	// blue component
+	bit0 = (*m_bgcolor >> 0) & 0x01;
+	bit1 = (*m_bgcolor >> 1) & 0x01;
+	bit2 = (*m_bgcolor >> 2) & 0x01;
+	int const b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
+	m_palette->set_pen_color(0, rgb_t(r, g, b));
+}
+
+
+void cclimber_state::cclimber_colorram_w(offs_t offset, u8 data)
+{
+	// A5 is not connected, there is only 0x200 bytes of RAM
+	m_colorram[offset & ~0x20] = data;
+	m_colorram[offset | 0x20] = data;
+}
+
+
+TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_pf_tile_info)
+{
+	const int flags = TILE_FLIPYX(m_colorram[tile_index] >> 6);
+
+	// vertical flipping flips two adjacent characters
+	if (flags & 0x02)
+		tile_index = tile_index ^ 0x20;
+
+	const int code = ((m_colorram[tile_index] & 0x10) << 5) |
+			((m_colorram[tile_index] & 0x20) << 3) | m_videoram[tile_index];
+
+	const int color = m_colorram[tile_index] & 0x0f;
+
+	tileinfo.set(0, code, color, flags);
+}
+
+
+TILE_GET_INFO_MEMBER(swimmer_state::swimmer_get_pf_tile_info)
+{
+	const int flags = TILE_FLIPYX(m_colorram[tile_index] >> 6);
+
+	// vertical flipping flips two adjacent characters
+	if (flags & 0x02)
+		tile_index = tile_index ^ 0x20;
+
+	const int code = ((m_colorram[tile_index] & 0x30) << 4) | m_videoram[tile_index];
+	const int color = (m_palettebank << 4) | (m_colorram[tile_index] & 0x0f);
+
+	tileinfo.set(0, code, color, flags);
+}
+
+
+TILE_GET_INFO_MEMBER(toprollr_state::toprollr_get_pf_tile_info)
+{
+	const int attr = m_colorram[tile_index];
+	const int code = ((attr & 0x10) << 5) | ((attr & 0x20) << 3) | m_videoram[tile_index];
+	const int color = attr & 0x0f;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+
+TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_bs_tile_info)
+{
+	// only the lower right is visible
+	tileinfo.group = ((tile_index & 0x210) == 0x210) ? 0 : 1;
+
+	// the address doesn't use A4 of the coordinates, giving a 16x16 map
+	tile_index = ((tile_index & 0x1e0) >> 1) | (tile_index & 0x0f);
+
+	const int code = ((m_bigsprite_control[1] & 0x08) << 5) | m_bigsprite_videoram[tile_index];
+	const int color = m_bigsprite_control[1] & 0x07;
+
+	tileinfo.set(2, code, color, 0);
+}
+
+
+TILE_GET_INFO_MEMBER(toprollr_state::toprollr_get_bs_tile_info)
+{
+	// only the lower right is visible
+	tileinfo.group = ((tile_index & 0x210) == 0x210) ? 0 : 1;
+
+	// the address doesn't use A4 of the coordinates, giving a 16x16 map
+	tile_index = ((tile_index & 0x1e0) >> 1) | (tile_index & 0x0f);
+
+	const int code = ((m_bigsprite_control[1] & 0x18) << 5) | m_bigsprite_videoram[tile_index];
+	const int color = m_bigsprite_control[1] & 0x07;
+
+	tileinfo.set(2, code, color, 0);
+}
+
+
+TILE_GET_INFO_MEMBER(toprollr_state::toproller_get_bg_tile_info)
+{
+	const int code = ((m_bg_coloram[tile_index] & 0x40) << 2) | m_bg_videoram[tile_index];
+	const int color = m_bg_coloram[tile_index] & 0x0f;
+
+	tileinfo.set(3, code, color, TILE_FLIPX);
+}
+
+
+void cclimber_state::video_start()
+{
+	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::cclimber_get_pf_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_pf_tilemap->set_transparent_pen(0);
+	m_pf_tilemap->set_scroll_cols(32);
+
+	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::cclimber_get_bs_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bs_tilemap->set_scroll_cols(1);
+	m_bs_tilemap->set_scroll_rows(1);
+	m_bs_tilemap->set_transmask(0, 0x01, 0); // pen 0 is transparent
+	m_bs_tilemap->set_transmask(1, 0x0f, 0); // all 4 pens are transparent
+
+	save_item(NAME(m_flip_x));
+	save_item(NAME(m_flip_y));
+}
+
+void yamato_state::video_start()
+{
+	cclimber_state::video_start();
+	m_screen->register_screen_bitmap(m_dest_bitmap);
+}
+
+void swimmer_state::video_start()
+{
+	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(swimmer_state::swimmer_get_pf_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_pf_tilemap->set_transparent_pen(0);
+	m_pf_tilemap->set_scroll_cols(32);
+
+	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(swimmer_state::cclimber_get_bs_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bs_tilemap->set_scroll_cols(1);
+	m_bs_tilemap->set_scroll_rows(1);
+	m_bs_tilemap->set_transmask(0, 0x01, 0); // pen 0 is transparent
+	m_bs_tilemap->set_transmask(1, 0xff, 0); // all 8 pens are transparent
+
+	save_item(NAME(m_flip_x));
+	save_item(NAME(m_flip_y));
+	save_item(NAME(m_sidebg_enabled));
+	save_item(NAME(m_palettebank));
+}
+
+void toprollr_state::video_start()
+{
+	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toprollr_state::toprollr_get_pf_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_pf_tilemap->set_transparent_pen(0);
+
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toprollr_state::toproller_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_scroll_rows(1);
+
+	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toprollr_state::toprollr_get_bs_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bs_tilemap->set_scroll_cols(1);
+	m_bs_tilemap->set_scroll_rows(1);
+	m_bs_tilemap->set_transmask(0, 0x01, 0); // pen 0 is transparent
+	m_bs_tilemap->set_transmask(1, 0x0f, 0); // all 4 pens are transparent
+
+	save_item(NAME(m_flip_x));
+	save_item(NAME(m_flip_y));
+}
+
+
+void cclimber_state::draw_playfield(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_pf_tilemap->mark_all_dirty();
+	m_pf_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
+	for (int i = 0; i < 32; i++)
+		m_pf_tilemap->set_scrolly(i, m_column_scroll[i]);
+
+	m_pf_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+}
+
+
+void cclimber_state::cclimber_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	u8 x = m_bigsprite_control[3] - 8;
+	u8 y = m_bigsprite_control[2];
+	int bigsprite_flip_x = (m_bigsprite_control[1] & 0x10) >> 4;
+	int bigsprite_flip_y = (m_bigsprite_control[1] & 0x20) >> 5;
+
+	if (bigsprite_flip_x)
+		x = 0x80 - x;
+
+	if (bigsprite_flip_y)
+		y = 0x80 - y;
+
+	m_bs_tilemap->mark_all_dirty();
+
+	m_bs_tilemap->set_flip((bigsprite_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ^ bigsprite_flip_y ? TILEMAP_FLIPY : 0));
+
+	m_bs_tilemap->set_scrollx(0, x);
+	m_bs_tilemap->set_scrolly(0, y);
+
+	m_bs_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+}
+
+
+void toprollr_state::toprollr_draw_bigsprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	u8 x = m_bigsprite_control[3] - 8;
+	u8 y = m_bigsprite_control[2];
+
+	if (m_flip_x)
+		x = 0x80 - x;
+
+	m_bs_tilemap->mark_all_dirty();
+
+	m_bs_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
+
+	m_bs_tilemap->set_scrollx(0, x);
+	m_bs_tilemap->set_scrolly(0, y);
+
+	m_bs_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+}
+
+
+void cclimber_state::cclimber_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx)
+{
+	/* draw the sprites -- note that it is important to draw them exactly in this
+	   order, to have the correct priorities. */
+	for (int offs = 0x1c; offs >= 0; offs -= 4)
+	{
+		int x = m_spriteram[offs + 3] + 1;
+		/* x + 1 is evident in cclimber and ckong. It looks worse,
+		   but it has been confirmed on several PCBs. */
+
+		int y = 240 - m_spriteram[offs + 2];
+
+		int code = ((m_spriteram[offs + 1] & 0x10) << 3) |
+				((m_spriteram[offs + 1] & 0x20) << 1) |
+				(m_spriteram[offs + 0] & 0x3f);
+
+		int color = m_spriteram[offs + 1] & 0x0f;
+
+		int flipx = m_spriteram[offs + 0] & 0x40;
+		int flipy = m_spriteram[offs + 0] & 0x80;
+
+		if (m_flip_x)
+		{
+			x = 242 - x;
+			flipx = !flipx;
+		}
+
+		if (m_flip_y)
+		{
+			y = 240 - y;
+			flipy = !flipy;
+		}
+
+		gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
+	}
+}
+
+
+void cclimber_state::toprollr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx)
+{
+	/* draw the sprites -- note that it is important to draw them exactly in this
+	   order, to have the correct priorities. */
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+		int x = m_spriteram[offs + 3];
+		int y = 240 - m_spriteram[offs + 2];
+
+		const int code = ((m_spriteram[offs + 1] & 0x10) << 3) |
+				((m_spriteram[offs + 1] & 0x20) << 1) |
+				(m_spriteram[offs + 0] & 0x3f);
+
+		const int color = m_spriteram[offs + 1] & 0x0f;
+
+		int flipx = m_spriteram[offs + 0] & 0x40;
+		int flipy = m_spriteram[offs + 0] & 0x80;
+
+		if (m_flip_x)
+		{
+			x = 240 - x;
+			flipx = !flipx;
+		}
+
+		if (m_flip_y)
+		{
+			y = 240 - y;
+			flipy = !flipy;
+		}
+
+		gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
+	}
+}
+
+
+void swimmer_state::swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx)
+{
+	/* draw the sprites -- note that it is important to draw them exactly in this
+	   order, to have the correct priorities. */
+	for (int offs = 0x1c; offs >= 0; offs -= 4)
+	{
+		int x = m_spriteram[offs + 3];
+		int y = 240 - m_spriteram[offs + 2];
+
+		const int code = ((m_spriteram[offs + 1] & 0x30) << 2) |
+				(m_spriteram[offs + 0] & 0x3f);
+
+		const int color = (m_palettebank << 4) |
+				(m_spriteram[offs + 1] & 0x0f);
+
+		int flipx = m_spriteram[offs + 0] & 0x40;
+		int flipy = m_spriteram[offs + 0] & 0x80;
+
+		if (m_flip_x)
+		{
+			x = 240 - x;
+			flipx = !flipx;
+		}
+
+		if (m_flip_y)
+		{
+			y = 240 - y;
+			flipy = !flipy;
+		}
+
+		gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
+	}
+}
+
+
+u32 cclimber_state::screen_update_cclimber(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	draw_playfield(screen, bitmap, cliprect);
+
+	if (m_bigsprite_control[0] & 0x01)
+	{
+		// draw the "big sprite" under the regular sprites
+		cclimber_draw_bigsprite(screen, bitmap, cliprect);
+		cclimber_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
+	}
+	else
+	{
+		// draw the "big sprite" over the regular sprites
+		cclimber_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
+		cclimber_draw_bigsprite(screen, bitmap, cliprect);
+	}
+
+	return 0;
+}
+
+
+u32 yamato_state::screen_update_yamato(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+
+	// gradient bank from 74259
+	u16 bank = bitswap<3>(m_mainlatch->output_state(),3,5,6) << 8;
+	bank |= m_flip_x ? 0x80 : 0;
+
+	// fill in the gradient
+	for (int i = 0; i < 0x80; i++)
+	{
+		const u8 data0 = m_gradient_rom[0x0000 | bank | i];
+		const u8 data1 = m_gradient_rom[0x1000 | bank | i];
+
+		u8 r = pal5bit(data0 & 0x1f);
+		u8 g = pal5bit(data0 >> 5 | (data1 << 3 & 0x18));
+		u8 b = pal6bit(data1 >> 2);
+		u32 color = r << 16 | g << 8 | b;
+
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			int start = (i * 2 - 8) & 0xff;
+			for (int x = start; x < start + 2; x++)
+			{
+				if (cliprect.contains(x, y))
+					bitmap.pix(y, x) = color;
+			}
+		}
+	}
+
+	m_dest_bitmap.fill(0xff, cliprect);
+	draw_playfield(screen, m_dest_bitmap, cliprect);
+
+	if (m_bigsprite_control[0] & 0x01)
+	{
+		// draw the "big sprite" under the regular sprites
+		cclimber_draw_bigsprite(screen, m_dest_bitmap, cliprect);
+		toprollr_draw_sprites(m_dest_bitmap, cliprect, m_gfxdecode->gfx(1));
+	}
+	else
+	{
+		// draw the "big sprite" over the regular sprites
+		toprollr_draw_sprites(m_dest_bitmap, cliprect, m_gfxdecode->gfx(1));
+		cclimber_draw_bigsprite(screen, m_dest_bitmap, cliprect);
+	}
+
+	// copy the tilemap/sprites
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			const pen_t pen = m_dest_bitmap.pix(y, x);
+			if (pen != 0xff)
+				bitmap.pix(y, x) = m_palette->pen(pen);
+		}
+	}
+
+	return 0;
+}
+
+
+u32 swimmer_state::screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_bgcolor)
+		set_background_pen();
+
+	// fill side panel background
+	if (m_sidebg_enabled)
+	{
+		const u8 split_pos = 0x18 * 8;
+
+		if (m_flip_x)
+		{
+			rectangle split_rect_left(0, 0xff - split_pos, 0, 0xff);
+			rectangle split_rect_right(0x100 - split_pos, 0xff, 0, 0xff);
+
+			split_rect_left &= cliprect;
+			bitmap.fill(0x120, split_rect_left);
+
+			split_rect_right &= cliprect;
+			bitmap.fill(0, split_rect_right);
+		}
+		else
+		{
+			rectangle split_rect_left(0, split_pos - 1, 0, 0xff);
+			rectangle split_rect_right(split_pos, 0xff, 0, 0xff);
+
+			split_rect_left &= cliprect;
+			bitmap.fill(0, split_rect_left);
+
+			split_rect_right &= cliprect;
+			bitmap.fill(0x120, split_rect_right);
+		}
+	}
+	else
+		bitmap.fill(0, cliprect);
+
+	draw_playfield(screen, bitmap, cliprect);
+
+	if (m_bigsprite_control[0] & 0x01)
+	{
+		// draw the "big sprite" under the regular sprites
+		cclimber_draw_bigsprite(screen, bitmap, cliprect);
+		swimmer_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
+	}
+	else
+	{
+		// draw the "big sprite" over the regular sprites
+		swimmer_draw_sprites(bitmap, cliprect, m_gfxdecode->gfx(1));
+		cclimber_draw_bigsprite(screen, bitmap, cliprect);
+	}
+
+	return 0;
+}
+
+
+u32 toprollr_state::screen_update_toprollr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	rectangle scroll_area_clip = cliprect;
+	scroll_area_clip.min_x = (m_flip_x ? 3 : 5) * 8;
+	scroll_area_clip.max_x = (m_flip_x ? 27 : 29) * 8 - 1;
+	scroll_area_clip &= cliprect;
+
+	bitmap.fill(0, cliprect);
+
+	m_bg_tilemap->set_scrollx(0, m_bg_videoram[0]);
+	m_bg_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
+	m_bg_tilemap->mark_all_dirty();
+	m_bg_tilemap->draw(screen, bitmap, scroll_area_clip, 0, 0);
+
+	if (m_bigsprite_control[1] & 0x20)
+	{
+		// draw the "big sprite" over the regular sprites
+		toprollr_draw_sprites(bitmap, scroll_area_clip, m_gfxdecode->gfx(1));
+		toprollr_draw_bigsprite(screen, bitmap, scroll_area_clip);
+	}
+	else
+	{
+		// draw the "big sprite" under the regular sprites
+		toprollr_draw_bigsprite(screen, bitmap, scroll_area_clip);
+		toprollr_draw_sprites(bitmap, scroll_area_clip, m_gfxdecode->gfx(1));
+	}
+
+	m_pf_tilemap->mark_all_dirty();
+	m_pf_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
+	m_pf_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
+
+/*******************************************************************************
+    I/O
+*******************************************************************************/
+
+void cclimber_state::nmi_mask_w(int state)
+{
+	m_nmi_mask = state;
+}
+
+void cclimber_state::vblank_irq(int state)
+{
+	if (state && m_nmi_mask)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+void cclimber_state::bagmanf_vblank_irq(int state)
+{
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+void cclimber_state::sound_nmi_clear_w(u8 data)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+u8 cclimber_state::sound_nmi_clear_r()
+{
+	if (!machine().side_effects_disabled())
+		sound_nmi_clear_w(0);
+	return 0xff;
+}
+
+
+u8 swimmer_state::soundlatch_read_and_clear()
+{
+	u8 res = m_soundlatch->read();
 
 	// An extra flip-flop is used to clear the LS273 after reading it through a LS245
 	// (this flip-flop is then cleared in sync with the sound CPU clock)
@@ -276,51 +1431,24 @@ uint8_t swimmer_state::soundlatch_read_and_clear()
 }
 
 
-void yamato_state::yamato_p0_w(uint8_t data)
-{
-	m_yamato_p0 = data;
-}
-
-void yamato_state::yamato_p1_w(uint8_t data)
-{
-	m_yamato_p1 = data;
-}
-
-uint8_t yamato_state::yamato_p0_r()
-{
-	return m_yamato_p0;
-}
-
-uint8_t yamato_state::yamato_p1_r()
-{
-	return m_yamato_p1;
-}
-
-
 void toprollr_state::toprollr_rombank_w(int state)
 {
-	m_rombank = m_mainlatch->q5_r() | (m_mainlatch->q6_r() << 1);
+	u8 bank = m_mainlatch->output_state() >> 5 & 3;
 
-	if (m_rombank < 3)
+	if (bank < 3)
 	{
-		m_bank1->set_entry(m_rombank);
-		m_bank1d->set_entry(m_rombank);
+		m_bank1->set_entry(bank);
+		m_bank1d->set_entry(bank);
 	}
+	else
+		logerror("invalid ROM bank %d\n", bank); // doesn't happen
 }
 
 
-void cclimber_state::nmi_mask_w(int state)
-{
-	m_nmi_mask = state;
-}
 
-
-uint8_t cclimber_state::bagmanf_a000_r()
-{
-	// Should this actually use the same PAL16R6 as the parent set?
-	return 0x3f;
-}
-
+/*******************************************************************************
+    Address Maps
+*******************************************************************************/
 
 /* Note that River Patrol reads/writes to a000-a4f0. This is a bug in the code.
    The instruction at 0x0593 should say LD DE,$8000 */
@@ -388,7 +1516,6 @@ void cclimber_state::cannonb_map(address_map &map)
 }
 
 
-
 void swimmer_state::swimmer_root_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -401,7 +1528,7 @@ void swimmer_state::swimmer_root_map(address_map &map)
 	map(0x9c00, 0x9fff).ram().w(FUNC(swimmer_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).mirror(0x07ff).portr("P2");
-	map(0xa800, 0xa800).mirror(0x07ff).portr("P1").w(FUNC(swimmer_state::swimmer_sh_soundlatch_w));
+	map(0xa800, 0xa800).mirror(0x07ff).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb000, 0xb000).mirror(0x07ff).portr("DSW1");
 	map(0xb800, 0xb800).mirror(0x07ff).portr("DSW2");
 }
@@ -446,8 +1573,8 @@ void yamato_state::yamato_map(address_map &map)
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).mirror(0x07ff).portr("P1");
 	map(0xa800, 0xa800).mirror(0x07ff).portr("P2");
-	map(0xb000, 0xb000).mirror(0x07ff).portr("DSW");
-	map(0xb800, 0xb800).mirror(0x07ff).portr("COIN");
+	map(0xb000, 0xb000).mirror(0x07ff).portr("DSW1");
+	map(0xb800, 0xb800).mirror(0x07ff).portr("SYSTEM");
 }
 
 void yamato_state::yamato_decrypted_opcodes_map(address_map &map)
@@ -490,11 +1617,33 @@ void cclimber_state::bagmanf_map(address_map &map)
 	map(0x9800, 0x9800).portr("SYSTEM");
 	map(0x98dc, 0x98df).ram().share("bigspritectrl"); // wrong
 	map(0x9c00, 0x9fff).ram(); // not used, but initialized
-	map(0xa000, 0xa000).r(FUNC(cclimber_state::bagmanf_a000_r));
+	map(0xa000, 0xa000).lr8(NAME([]() { return 0x3f; })); // should this actually use the same PAL16R6 as the parent set?
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa800, 0xa800).nopr().w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
 	map(0xb000, 0xb000).portr("DSW").w("cclimber_audio", FUNC(cclimber_audio_device::sample_volume_w));
 	map(0xb800, 0xb800).nopr();
+}
+
+void cclimber_state::tangramq_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6bff).ram();
+	map(0x8000, 0x8000).portr("SYSTEM1");
+	map(0x8020, 0x8020).portr("SYSTEM2");
+	map(0x8800, 0x88ff).ram().share("bigspriteram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
+	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram(); // not used, but initialized
+	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram(); // not used, but initialized
+	map(0x98dc, 0x98df).ram().share("bigspritectrl");
+	map(0x98e0, 0x98ff).ram(); // not used, but initialized
+	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0xa000, 0xa000).portr("P1");
+	map(0xa800, 0xa800).portr("P2");
+	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0xb000, 0xb000).portr("DSW2").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xb800, 0xb800).portr("DSW1");
 }
 
 void toprollr_state::toprollr_decrypted_opcodes_map(address_map &map)
@@ -521,23 +1670,24 @@ void cclimber_state::rpatrol_portmap(address_map &map)
 void yamato_state::yamato_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(yamato_state::yamato_p0_w)); // ???
-	map(0x01, 0x01).w(FUNC(yamato_state::yamato_p1_w)); // ???
+	map(0x00, 0x00).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0x01, 0x01).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 
 
 void swimmer_state::swimmer_audio_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).r(FUNC(swimmer_state::soundlatch_read_and_clear));
-	map(0x4000, 0x4001).ram(); // ???
+	map(0x2000, 0x23ff).mirror(0x0c00).ram();
+	map(0x3000, 0x3000).mirror(0x0fff).r(FUNC(swimmer_state::soundlatch_read_and_clear));
+	map(0x4000, 0x4000).mirror(0x0fff).rw(FUNC(swimmer_state::sound_nmi_clear_r), FUNC(swimmer_state::sound_nmi_clear_w));
 }
 
 void yamato_state::yamato_audio_map(address_map &map)
 {
 	map(0x0000, 0x07ff).rom();
 	map(0x5000, 0x53ff).ram();
+	map(0xffff, 0xffff).nopr();
 }
 
 
@@ -553,10 +1703,26 @@ void yamato_state::yamato_audio_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x04, 0x04).r(FUNC(yamato_state::yamato_p0_r)); // ???
-	map(0x08, 0x08).r(FUNC(yamato_state::yamato_p1_r)); // ???
+	map(0x04, 0x04).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0x08, 0x08).r("soundlatch2", FUNC(generic_latch_8_device::read));
 }
 
+void cclimber_state::tangramq_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x4000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8002, 0x8007).w("wave", FUNC(snkwave_device::snkwave_w));
+	map(0x8008, 0x8009).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xa000, 0xa000).w(FUNC(cclimber_state::sound_nmi_clear_w));
+	map(0xe000, 0xe3ff).ram();
+}
+
+
+
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( cclimber )
 	PORT_START("P1")
@@ -800,6 +1966,93 @@ static INPUT_PORTS_START( rpatrol )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tangramq )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPNAME( 0x04, 0x04, "Freeze" ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x70, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:5,6,7")
+	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Infinite Lives" ) PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SYSTEM1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0xf7, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( swimmer )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -925,10 +2178,10 @@ static INPUT_PORTS_START( guzzler )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( yamato )
+static INPUT_PORTS_START( yamatou )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -937,8 +2190,8 @@ static INPUT_PORTS_START( yamato )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
@@ -946,7 +2199,7 @@ static INPUT_PORTS_START( yamato )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START("DSW")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
@@ -971,19 +2224,53 @@ static INPUT_PORTS_START( yamato )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) // set 1 only
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 ) // set 1 only
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+// Same as 'yamatou', but no coin 2 or service coin
+static INPUT_PORTS_START( yamato )
+	PORT_INCLUDE( yamatou )
+
+	PORT_MODIFY("DSW2")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( toprollr )
 	PORT_START("P1")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x01, "Invalid" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -991,6 +2278,7 @@ static INPUT_PORTS_START( toprollr )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 
 	PORT_START("P2")
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -1028,8 +2316,8 @@ static INPUT_PORTS_START( toprollr )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( au )
 	PORT_START("P1")
@@ -1083,6 +2371,11 @@ static INPUT_PORTS_START( au )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
+
+
+/*******************************************************************************
+    GFX Layouts
+*******************************************************************************/
 
 static const gfx_layout cclimber_charlayout =
 {
@@ -1187,24 +2480,16 @@ static GFXDECODE_START( gfx_au )
 	GFXDECODE_ENTRY( "bigsprite", 0x0000, swimmer_charlayout,  0,  8 ) // big sprites
 GFXDECODE_END
 
-void cclimber_state::vblank_irq(int state)
-{
-	if (state && m_nmi_mask)
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
 
-void cclimber_state::bagmanf_vblank_irq(int state)
-{
-	if (state && m_nmi_mask)
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
+
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 void cclimber_state::root(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 18.432_MHz_XTAL/3/2); // 3.072 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::cclimber_map);
-	m_maincpu->set_addrmap(AS_IO, &cclimber_state::cclimber_portmap);
 
 	LS259(config, m_mainlatch, 0);
 	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
@@ -1230,6 +2515,9 @@ void cclimber_state::cclimber(machine_config &config)
 {
 	root(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::cclimber_map);
+	m_maincpu->set_addrmap(AS_IO, &cclimber_state::cclimber_portmap);
+
 	// 7J on CCG-1
 	m_mainlatch->q_out_cb<4>().set("cclimber_audio", FUNC(cclimber_audio_device::sample_trigger));
 
@@ -1248,6 +2536,28 @@ void cclimber_state::rpatrol(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	AY8910(config, "aysnd", 18.432_MHz_XTAL/3/2/2).add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
+
+void cclimber_state::tangramq(machine_config &config)
+{
+	root(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::tangramq_map);
+
+	Z80(config, m_audiocpu, 8_MHz_XTAL / 2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cclimber_state::tangramq_sound_map);
+
+	m_audiocpu->set_periodic_int(FUNC(cclimber_state::nmi_line_assert), attotime::from_ticks(0x4000, 8_MHz_XTAL / 2)); // 244Hz
+
+	// sound hardware
+	SPEAKER(config, "speaker").front_center();
+
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE); // auto ack
+
+	AY8910(config, "ay1", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.35);
+	AY8910(config, "ay2", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "speaker", 0.35);
+
+	SNKWAVE(config, "wave", 8_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 0.30); // unused?
 }
 
 void cclimber_state::cclimberx(machine_config &config)
@@ -1285,7 +2595,7 @@ void cclimber_state::bagmanf(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::bagmanf_map);
 
-	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(cclimber_state::bagmanf_vblank_irq));
+	m_screen->screen_vblank().set(FUNC(cclimber_state::bagmanf_vblank_irq));
 }
 
 
@@ -1294,27 +2604,30 @@ void yamato_state::yamato(machine_config &config)
 	root(config);
 
 	// basic machine hardware
-	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 18.432_MHz_XTAL/3/2)); // 3.072 MHz
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 12_MHz_XTAL/4)); // 3 MHz
 	maincpu.set_addrmap(AS_PROGRAM, &yamato_state::yamato_map);
 	maincpu.set_addrmap(AS_IO, &yamato_state::yamato_portmap);
 	maincpu.set_addrmap(AS_OPCODES, &yamato_state::yamato_decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
-	Z80(config, m_audiocpu, 18.432_MHz_XTAL/3/2); // 3.072 MHz?
+	Z80(config, m_audiocpu, 12_MHz_XTAL/8); // 1.5 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &yamato_state::yamato_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &yamato_state::yamato_audio_portmap);
 
 	// video hardware
-	m_palette->set_entries(16*4+8*4+256);
 	m_palette->set_init(FUNC(yamato_state::yamato_palette));
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(yamato_state::screen_update_yamato));
+	m_screen->set_screen_update(FUNC(yamato_state::screen_update_yamato));
+	m_screen->set_no_palette();
 
 	// audio hardware
+	GENERIC_LATCH_8(config, "soundlatch1");
+	GENERIC_LATCH_8(config, "soundlatch2");
+
 	SPEAKER(config, "speaker").front_center();
 
-	AY8910(config, "ay1", 18.432_MHz_XTAL/12).add_route(ALL_OUTPUTS, "speaker", 0.25); // 1.536 MHz
-	AY8910(config, "ay2", 18.432_MHz_XTAL/12).add_route(ALL_OUTPUTS, "speaker", 0.25); // 1.536 MHz
+	AY8910(config, "ay1", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "speaker", 0.25); // 1.5 MHz
+	AY8910(config, "ay2", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "speaker", 0.25); // 1.5 MHz
 }
 
 
@@ -1322,7 +2635,8 @@ void toprollr_state::toprollr(machine_config &config)
 {
 	cclimber(config);
 
-	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 18.432_MHz_XTAL/3/2)); // 3.072 MHz
+	// basic machine hardware
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 12_MHz_XTAL/4)); // 3 MHz
 	maincpu.set_addrmap(AS_PROGRAM, &toprollr_state::toprollr_map);
 	maincpu.set_addrmap(AS_IO, &toprollr_state::cclimber_portmap);
 	maincpu.set_addrmap(AS_OPCODES, &toprollr_state::toprollr_decrypted_opcodes_map);
@@ -1338,8 +2652,10 @@ void toprollr_state::toprollr(machine_config &config)
 	m_palette->set_entries(32*5);
 	m_palette->set_init(FUNC(toprollr_state::toprollr_palette));
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(toprollr_state::screen_update_toprollr));
+	m_screen->set_screen_update(FUNC(toprollr_state::screen_update_toprollr));
 
+	// audio hardware
+	subdevice<cclimber_audio_device>("cclimber_audio")->set_clock(12_MHz_XTAL/8);
 	subdevice<cclimber_audio_device>("cclimber_audio")->set_sample_clockdiv(4);
 }
 
@@ -1360,7 +2676,7 @@ void swimmer_state::swimmer(machine_config &config)
 	Z80(config, m_audiocpu, 4_MHz_XTAL/2); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &swimmer_state::swimmer_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &swimmer_state::swimmer_audio_portmap);
-	m_audiocpu->set_periodic_int(FUNC(swimmer_state::nmi_line_pulse), attotime::from_hz((double)4000000/16384)); // IRQs are triggered by the main CPU
+	m_audiocpu->set_periodic_int(FUNC(swimmer_state::nmi_line_assert), attotime::from_ticks(0x4000, 4_MHz_XTAL));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1375,12 +2691,12 @@ void swimmer_state::swimmer(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_swimmer);
 
 	PALETTE(config, m_palette, FUNC(swimmer_state::swimmer_palette), 32*8+4*8+1);
-	set_sidepen(0x120);
 
 	// audio hardware
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE); // auto ack
 
 	AY8910(config, "ay1", 4_MHz_XTAL/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // verified on pcb
 	AY8910(config, "ay2", 4_MHz_XTAL/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // verified on pcb
@@ -1396,7 +2712,12 @@ void swimmer_state::au(machine_config &config)
 {
 	swimmer(config);
 
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &swimmer_state::au_map);
+
+	// no custom bgcolor or palette bank
+	m_mainlatch->q_out_cb<3>().set_nop();
+	m_mainlatch->q_out_cb<4>().set_nop();
 
 	m_audiocpu->remove_periodic_int();
 	m_screen->screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -1405,18 +2726,17 @@ void swimmer_state::au(machine_config &config)
 	subdevice<ay8910_device>("ay1")->set_clock(18.432_MHz_XTAL / 12);
 	subdevice<ay8910_device>("ay2")->set_clock(18.432_MHz_XTAL / 12);
 
+	// video hardware
 	m_gfxdecode->set_info(gfx_au);
 
 	PALETTE(config.replace(), m_palette).set_format(palette_device::xBGR_333_nibble, 64).set_endianness(ENDIANNESS_BIG);
-	set_sidepen(0);
 }
 
 
-/***************************************************************************
 
-  Game driver(s)
-
-***************************************************************************/
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( cclimber )
 	ROM_REGION( 0x6000, "maincpu", 0 )
@@ -2072,153 +3392,15 @@ ROM_START( monkeyd )
 ROM_END
 
 
-/* Donkey King
-1981 (bootleg)
-
-This game runs on dedicated hardware.
-
-Possibly bootlegged by Hafasonic?
-
-CPU Board
----------
-
-MTD-2
-|-----------------------------------------|
-|C1181  VOL             D5.1K   D7.1N     |
-|      LM3900               D6.1M   D8.1R |
-|                                         |
-|                       6116    D10.2N    |
-|                           D9.2M   D11.2R|
-|   4066                                  |
-|         AY3-8910                        |
-|                                  PAL12L6|
-|                                         |
-|1                                        |
-|8               2114 2114                |
-|W                                        |
-|A                                        |
-|Y                                        |
-|                                         |
-|                                         |
-|                    Z80A                 |
-|                                         |
-|                                         |
-|                                         |
-|   DSW(8)    82S129.5G                   |
-|                                         |
-|-----------------------------------------|
-Notes:
-      Z80 clock - 3.072MHz [18.432/6]
-      AY3-8910 clock - 1.536MHz [18.432/12]
-      HSync - 15.5065kHz
-      VSync - 60.5608Hz
-
-
-Video Board
------------
-
-MTD-2B
-|-----------------------------------------|
-| 18.432MHz                  82S123.1T    |
-|          2114                82S123.1U  |
-|          2114                  82S123.1V|
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|                                         |
-|2101 2101    2114 2114                   |
-|                                         |
-|D12.6A      D1.6H D3.6L    2115 2115 2115|
-|   D13.6C      D2.6K  D4.6N              |
-|                                         |
-|                                         |
-|                           2115 2115 2125|
-|                                         |
-|-----------------------------------------|
-
-
-18-way Pinout
--------------
-
-Parts          Solder
--------------------------
-GND      1     GND
-GND      2     GND
-GND      3     GND
-SPK-     4     SPK+
-+12V     5     +12V
-         6     P1 UP
-         7     P2 UP
-         8     VIDEO GND
-+5V      9     +5V
-P1 DOWN  10
-P2 DOWN  11
-         12    P2 START
-COIN     13    P1 START
-P1 JUMP  14    P1 RIGHT
-RED      15    P1 LEFT
-P2 RIGHT 16    BLUE
-P2 LEFT  17    GREEN
-P2 JUMP  18    SYNC
-
-
-Dip Switch - Donkey King
-+----------------+-----+-----+-----+-----+-----+-----+-----+-----+
-|                |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |
-+----------------+-----+-----+-----+-----+-----+-----+-----+-----+
-|Life          3 | OFF | OFF |     |     |     |     |     |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|              4 | ON  | OFF |     |     |     |     |     |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|              5 | OFF | ON  |     |     |     |     |     |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|              6 | ON  | ON  |     |     |     |     |     |     |
-+----------------+-----+-----+-----+-----+-----+-----+-----+-----+
-|Bonus      7000 |     |     | OFF | OFF |     |     |     |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          10000 |     |     | ON  | OFF |     |     |     |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          15000 |     |     | OFF | ON  |     |     |     |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          20000 |     |     | ON  | ON  |     |     |     |     |
-+----------------+-----+-----+-----+-----+-----+-----+-----+-----+
-|Credit    1C 1P |     |     |     |     | OFF | OFF | OFF |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          1C 2P |     |     |     |     | OFF | ON  | OFF |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          1C 3P |     |     |     |     | OFF | OFF | ON  |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          1C 4P |     |     |     |     | OFF | ON  | ON  |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          2C 1P |     |     |     |     | ON  | OFF | OFF |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          3C 1P |     |     |     |     | ON  | ON  | OFF |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          4C 1P |     |     |     |     | ON  | OFF | ON  |     |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|          5C 1P |     |     |     |     | ON  | ON  | ON  |     |
-+----------------+-----+-----+-----+-----+-----+-----+-----+-----+
-|Screen    Table |     |     |     |     |     |     |     | OFF |
-|                +-----+-----+-----+-----+-----+-----+-----+-----+
-|        Upright |     |     |     |     |     |     |     | ON  |
-+----------------+-----+-----+-----+-----+-----+-----+-----+-----+ */
-
 ROM_START( dking )
 	ROM_REGION( 0x6000, "maincpu", 0 )
-	ROM_LOAD( "d11.r2",       0x0800, 0x0800, CRC(f7cace41) SHA1(981dbb1cddd66a0cbc8fe147172ffe7eb5b7fa21) )
-	ROM_CONTINUE( 0x0000, 0x800 )
-	ROM_LOAD( "d7.1n",      0x1000, 0x1000, CRC(fe89dea4) SHA1(c39372ebe9950808ebc1ff7909c291496b206026) )
-	ROM_LOAD( "d9.2m",      0x2000, 0x1000, CRC(b9c34e14) SHA1(dcfe45dede6aef52a2989978762df9c5463bbbf2) )
-	ROM_LOAD( "d10.2n",     0x3000, 0x1000, CRC(243e458d) SHA1(de98fc90915913069b6802d5c662db18f56c36be) )
-	ROM_LOAD( "d8.1r",        0x4800, 0x0800, CRC(7c66fb5c) SHA1(5eda9b0037f958433d96bc945c1273b66ef9cac5) )
-	ROM_CONTINUE( 0x4000, 0x800 )
+	ROM_LOAD( "d11.r2", 0x0800, 0x0800, CRC(f7cace41) SHA1(981dbb1cddd66a0cbc8fe147172ffe7eb5b7fa21) )
+	ROM_CONTINUE(       0x0000, 0x0800 )
+	ROM_LOAD( "d7.1n",  0x1000, 0x1000, CRC(fe89dea4) SHA1(c39372ebe9950808ebc1ff7909c291496b206026) )
+	ROM_LOAD( "d9.2m",  0x2000, 0x1000, CRC(b9c34e14) SHA1(dcfe45dede6aef52a2989978762df9c5463bbbf2) )
+	ROM_LOAD( "d10.2n", 0x3000, 0x1000, CRC(243e458d) SHA1(de98fc90915913069b6802d5c662db18f56c36be) )
+	ROM_LOAD( "d8.1r",  0x4800, 0x0800, CRC(7c66fb5c) SHA1(5eda9b0037f958433d96bc945c1273b66ef9cac5) )
+	ROM_CONTINUE(       0x4000, 0x0800 )
 
 	ROM_REGION( 0x4000, "tile", 0 )
 	ROM_LOAD( "falcon6",      0x0000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) ) // d4.6n
@@ -2382,6 +3564,53 @@ ROM_START( silvland )
 	ROM_LOAD( "mb7051.1t",    0x0040, 0x0020, CRC(04a1be01) SHA1(9c270c04d374d46752ec99bd4e79fed1e2896bc0) )
 
 	// no samples
+ROM_END
+
+
+/*
+Tangram Q
+
+SNK ELECTRONICS A3002 UC01 + A2003UP03-01 PCBs
+
+A3002 UC01 main components:
+NEC D780C-1 CPU
+18.432 MHz XTAL
+2x HM6116LP-3 RAM (near program ROMs)
+6x TMM315D-1 SRAM (near CPU)
+2x M5L5101LP-1 RAM (near BG ROMs)
+2x bank of 8 DIP switches
+lots of TTL
+
+A2003UP03-01 main components:
+NEC D780C-1 CPU
+2x AY-3-8910 sound chip
+8 MHz XTAL
+HM6116P-4 RAM
+lots of TTL
+note: same PCB as Marvin's Maze
+*/
+
+ROM_START( tangramq )
+	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_LOAD( "m1.k5", 0x0000, 0x2000, CRC(dff92169) SHA1(805784afeba676306ed6c0d41d33ed0163bdc08e) )
+	ROM_LOAD( "m2.k4", 0x2000, 0x2000, CRC(1cbade75) SHA1(1fa276261428c392917df4a4dbd9f99710b9855e) )
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )
+	ROM_LOAD( "s1.a6", 0x0000, 0x2000, CRC(05af38f6) SHA1(7bdbf798964aa4d603fca0178b3f8fc251d207f6) )
+
+	// BTANB?: bigsprite colors look glitchy when in this order, but matches PCB reference and flyers
+	ROM_REGION( 0x2000, "bigsprite", 0 )
+	ROM_LOAD( "b2.e17", 0x0000, 0x1000, CRC(77d21b84) SHA1(7f9bfbfbc7fd51a97f15fee54ac851ddfa97b213) ) // 1xxxxxxxxxxx = 0xFF
+	ROM_LOAD( "b1.e19", 0x1000, 0x1000, CRC(f3ec2562) SHA1(859473c45b9d22c138b70ea649b93d41721e1e0d) ) // 1xxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x4000, "tile", 0 )
+	ROM_LOAD( "f1.h4", 0x0000, 0x2000, CRC(c7c3ffe1) SHA1(f8f0ac3b73f560af3ef0954e5d80984bad605ea2) )
+	ROM_LOAD( "f2.h2", 0x2000, 0x2000, CRC(dbc13c1f) SHA1(b299582f97a384b2d252d815a3c64e9f54346748) )
+
+	ROM_REGION( 0x60, "proms", 0 )
+	ROM_LOAD( "mb7051_m02.m6", 0x00, 0x20, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
+	ROM_LOAD( "mb7051_m02.m7", 0x20, 0x20, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
+	ROM_LOAD( "mb7051_m02.m8", 0x40, 0x20, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
 ROM_END
 
 
@@ -2683,15 +3912,15 @@ ROM_END
 
 ROM_START( guzzlers ) // Swimmer Conversion, 1k vs 2k romsize in maincpu
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "guzz1.l9",  0x0000, 0x1000, CRC(48f751ee) SHA1(a8ff19d150d382a43ad705fe2a470450e317aac3) )
-	ROM_LOAD( "guzz2.k9",  0x1000, 0x1000, CRC(c13f23e6) SHA1(2cd31e0419875c50433f1763e35e32afcaf68fde) )
-	ROM_LOAD( "guzz3.j9",  0x2000, 0x1000, CRC(7a523fd8) SHA1(683249d2ffdde21f74d80280e538645ac143d45c) )
-	ROM_LOAD( "guzz4.f9",  0x3000, 0x1000, CRC(d2bb2204) SHA1(87f821f1cb92577e10beb67be29d9eecd9e8a04f) )
-	ROM_LOAD( "guzz5.e9",  0x4000, 0x1000, CRC(09856fd0) SHA1(f2eeffe2c35f652a855502f808fd5056252ce7fd) )
-	ROM_LOAD( "guzz6.d9",  0x5000, 0x1000, CRC(80990d1e) SHA1(282f5247b88f29ee6178c771ecddf2a5ed995913) )
-	ROM_LOAD( "guzz7.c9",  0x6000, 0x1000, CRC(fe37b99d) SHA1(9219fe4506e81e574f5ae84ec10dc1df511f76a1) )
-	ROM_LOAD( "guzz8.a9",  0x7000, 0x1000, CRC(8d44f5f8) SHA1(957f1b880f6f815ac31c1a37c40cdff75dd119cf) )
-	ROM_LOAD( "guzz-16.bin",  0xe000, 0x2000, CRC(61ee00b7) SHA1(ea8516c8dfb2de32a8034f94c7d0c086e3596740) ) // 16.
+	ROM_LOAD( "guzz1.l9",    0x0000, 0x1000, CRC(48f751ee) SHA1(a8ff19d150d382a43ad705fe2a470450e317aac3) )
+	ROM_LOAD( "guzz2.k9",    0x1000, 0x1000, CRC(c13f23e6) SHA1(2cd31e0419875c50433f1763e35e32afcaf68fde) )
+	ROM_LOAD( "guzz3.j9",    0x2000, 0x1000, CRC(7a523fd8) SHA1(683249d2ffdde21f74d80280e538645ac143d45c) )
+	ROM_LOAD( "guzz4.f9",    0x3000, 0x1000, CRC(d2bb2204) SHA1(87f821f1cb92577e10beb67be29d9eecd9e8a04f) )
+	ROM_LOAD( "guzz5.e9",    0x4000, 0x1000, CRC(09856fd0) SHA1(f2eeffe2c35f652a855502f808fd5056252ce7fd) )
+	ROM_LOAD( "guzz6.d9",    0x5000, 0x1000, CRC(80990d1e) SHA1(282f5247b88f29ee6178c771ecddf2a5ed995913) )
+	ROM_LOAD( "guzz7.c9",    0x6000, 0x1000, CRC(fe37b99d) SHA1(9219fe4506e81e574f5ae84ec10dc1df511f76a1) )
+	ROM_LOAD( "guzz8.a9",    0x7000, 0x1000, CRC(8d44f5f8) SHA1(957f1b880f6f815ac31c1a37c40cdff75dd119cf) )
+	ROM_LOAD( "guzz-16.bin", 0xe000, 0x2000, CRC(61ee00b7) SHA1(ea8516c8dfb2de32a8034f94c7d0c086e3596740) ) // 16.
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "guzz-12.bin",  0x0000, 0x1000, CRC(f3754d9e) SHA1(bb30832aba4e82ab0ecce40fc1223d9771ff7dd2) ) // GUZZ12.L4
@@ -2738,6 +3967,66 @@ ROM_END
 
 ROM_START( yamato )
 	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "2.5de",        0x0000, 0x2000, CRC(e796fbce) SHA1(6bbb4f7818115ae0502d195e56f9e86e7020abcf) )
+	ROM_LOAD( "3.5f",         0x2000, 0x2000, CRC(de50e4e8) SHA1(11ce219f3a797e715cf79f37943402c7390475dd) )
+	ROM_LOAD( "4.5jh",        0x4000, 0x2000, CRC(4f831d4b) SHA1(01491debec90c49f5645dc4fad35a4142244c090) )
+	// 6000-7fff not present here
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "1.5v",         0x0000, 0x0800, CRC(3aad9e3c) SHA1(37b0414b265397881bb45b166ecab85880d1358d) )
+
+	ROM_REGION( 0x4000, "tile", 0 )
+	ROM_LOAD( "10.11k",       0x0000, 0x2000, CRC(161121f5) SHA1(017c5c6b773b0ae1d0be52e4bac90b699ea196dd) )
+	ROM_LOAD( "9.11h",        0x2000, 0x2000, CRC(56e84cc4) SHA1(c48e0e5460376d6b34173c42a27907ef12218182) )
+
+	ROM_REGION( 0x2000, "bigsprite", 0 )
+	ROM_LOAD( "8.11c",        0x0000, 0x1000, CRC(28024d9a) SHA1(c871c4d74be72a8bfea99e89d43f91922f4b734b) )
+	ROM_LOAD( "7.11a",        0x1000, 0x1000, CRC(4a179790) SHA1(7fb6b033de939ff8bd13055c073311dca2c1a6fe) )
+
+	ROM_REGION( 0x2000, "gradient", 0 )
+	ROM_LOAD( "5.5lm",        0x0000, 0x1000, CRC(7761ad24) SHA1(98878b19addd142d35718080eece05eaaee0388d) )
+	ROM_LOAD( "6.5n",         0x1000, 0x1000, CRC(da48444c) SHA1(a43e672ce262eb817fb4e5715ef4fb304a6a2815) )
+
+	ROM_REGION( 0x00a0, "proms", 0 )
+	ROM_LOAD( "1.bpr",        0x0000, 0x0020, CRC(ef2053ab) SHA1(2006cbf003f90a8e75f39047a88a3bba85d78e80) )
+	ROM_LOAD( "2.bpr",        0x0020, 0x0020, CRC(2281d39f) SHA1(e9b568bdacf7ab611801cf42ea5c7624f5440ef6) )
+	ROM_LOAD( "3.bpr",        0x0040, 0x0020, CRC(9e6341e3) SHA1(2e7a4d3c1f40d6089735734b9d9de2ca57fb73c7) )
+	ROM_LOAD( "4.bpr",        0x0060, 0x0020, CRC(1c97dc0b) SHA1(fe8e0a91172abdd2d14b199da144306a9b944372) )
+	ROM_LOAD( "5.bpr",        0x0080, 0x0020, CRC(edd6c05f) SHA1(b95db8aaf74fe175d1179f0d85f79242b16f5fb4) )
+ROM_END
+
+ROM_START( yamatoa )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "2-2.5de",      0x0000, 0x2000, CRC(93da1d52) SHA1(21b72856ebbd969e4e075b52719e6acdbd1bc4c5) )
+	ROM_LOAD( "3-2.5f",       0x2000, 0x2000, CRC(31e73821) SHA1(e582c9fcea1b29d43f65b6aa67e1895c38d2736c) )
+	ROM_LOAD( "4-2.5jh",      0x4000, 0x2000, CRC(fd7bcfc3) SHA1(5037170cb3a9824794e90d74def92b0b25d45caa) )
+	// 6000-7fff not present here
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "1.5v",         0x0000, 0x0800, CRC(3aad9e3c) SHA1(37b0414b265397881bb45b166ecab85880d1358d) )
+
+	ROM_REGION( 0x4000, "tile", 0 )
+	ROM_LOAD( "10.11k",       0x0000, 0x2000, CRC(161121f5) SHA1(017c5c6b773b0ae1d0be52e4bac90b699ea196dd) )
+	ROM_LOAD( "9.11h",        0x2000, 0x2000, CRC(56e84cc4) SHA1(c48e0e5460376d6b34173c42a27907ef12218182) )
+
+	ROM_REGION( 0x2000, "bigsprite", 0 )
+	ROM_LOAD( "8.11c",        0x0000, 0x1000, CRC(28024d9a) SHA1(c871c4d74be72a8bfea99e89d43f91922f4b734b) )
+	ROM_LOAD( "7.11a",        0x1000, 0x1000, CRC(4a179790) SHA1(7fb6b033de939ff8bd13055c073311dca2c1a6fe) )
+
+	ROM_REGION( 0x2000, "gradient", 0 )
+	ROM_LOAD( "5.5lm",        0x0000, 0x1000, CRC(7761ad24) SHA1(98878b19addd142d35718080eece05eaaee0388d) )
+	ROM_LOAD( "6.5n",         0x1000, 0x1000, CRC(da48444c) SHA1(a43e672ce262eb817fb4e5715ef4fb304a6a2815) )
+
+	ROM_REGION( 0x00a0, "proms", 0 )
+	ROM_LOAD( "1.bpr",        0x0000, 0x0020, CRC(ef2053ab) SHA1(2006cbf003f90a8e75f39047a88a3bba85d78e80) )
+	ROM_LOAD( "2.bpr",        0x0020, 0x0020, CRC(2281d39f) SHA1(e9b568bdacf7ab611801cf42ea5c7624f5440ef6) )
+	ROM_LOAD( "3.bpr",        0x0040, 0x0020, CRC(9e6341e3) SHA1(2e7a4d3c1f40d6089735734b9d9de2ca57fb73c7) )
+	ROM_LOAD( "4.bpr",        0x0060, 0x0020, CRC(1c97dc0b) SHA1(fe8e0a91172abdd2d14b199da144306a9b944372) )
+	ROM_LOAD( "5.bpr",        0x0080, 0x0020, CRC(edd6c05f) SHA1(b95db8aaf74fe175d1179f0d85f79242b16f5fb4) )
+ROM_END
+
+ROM_START( yamatou )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "2.5de",        0x0000, 0x2000, CRC(20895096) SHA1(af76786e3c519e710899f143d46c53087e9817c7) )
 	ROM_LOAD( "3.5f",         0x2000, 0x2000, CRC(57a696f9) SHA1(28ea80fb100ac92295fc3eb318617d7cb014408d) )
 	ROM_LOAD( "4.5jh",        0x4000, 0x2000, CRC(59a468e8) SHA1(a79cdee6efefd87a356cc8d710f8050bc12e07c3) )
@@ -2755,39 +4044,8 @@ ROM_START( yamato )
 	ROM_LOAD( "8.11c",        0x0000, 0x1000, CRC(28024d9a) SHA1(c871c4d74be72a8bfea99e89d43f91922f4b734b) )
 	ROM_LOAD( "7.11a",        0x1000, 0x1000, CRC(4a179790) SHA1(7fb6b033de939ff8bd13055c073311dca2c1a6fe) )
 
-	ROM_REGION( 0x2000, "user1", 0 )
-	ROM_LOAD( "5.5lm",        0x0000, 0x1000, CRC(7761ad24) SHA1(98878b19addd142d35718080eece05eaaee0388d) ) // ??
-	ROM_LOAD( "6.5n",         0x1000, 0x1000, CRC(da48444c) SHA1(a43e672ce262eb817fb4e5715ef4fb304a6a2815) )
-
-	ROM_REGION( 0x00a0, "proms", 0 )
-	ROM_LOAD( "1.bpr",        0x0000, 0x0020, CRC(ef2053ab) SHA1(2006cbf003f90a8e75f39047a88a3bba85d78e80) )
-	ROM_LOAD( "2.bpr",        0x0020, 0x0020, CRC(2281d39f) SHA1(e9b568bdacf7ab611801cf42ea5c7624f5440ef6) )
-	ROM_LOAD( "3.bpr",        0x0040, 0x0020, CRC(9e6341e3) SHA1(2e7a4d3c1f40d6089735734b9d9de2ca57fb73c7) )
-	ROM_LOAD( "4.bpr",        0x0060, 0x0020, CRC(1c97dc0b) SHA1(fe8e0a91172abdd2d14b199da144306a9b944372) )
-	ROM_LOAD( "5.bpr",        0x0080, 0x0020, CRC(edd6c05f) SHA1(b95db8aaf74fe175d1179f0d85f79242b16f5fb4) )
-ROM_END
-
-ROM_START( yamato2 )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "2-2.5de",      0x0000, 0x2000, CRC(93da1d52) SHA1(21b72856ebbd969e4e075b52719e6acdbd1bc4c5) )
-	ROM_LOAD( "3-2.5f",       0x2000, 0x2000, CRC(31e73821) SHA1(e582c9fcea1b29d43f65b6aa67e1895c38d2736c) )
-	ROM_LOAD( "4-2.5jh",      0x4000, 0x2000, CRC(fd7bcfc3) SHA1(5037170cb3a9824794e90d74def92b0b25d45caa) )
-	// hole at 6000-6fff
-	// 7000-7fff not present here
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "1.5v",         0x0000, 0x0800, CRC(3aad9e3c) SHA1(37b0414b265397881bb45b166ecab85880d1358d) )
-
-	ROM_REGION( 0x4000, "tile", 0 )
-	ROM_LOAD( "10.11k",       0x0000, 0x2000, CRC(161121f5) SHA1(017c5c6b773b0ae1d0be52e4bac90b699ea196dd) )
-	ROM_LOAD( "9.11h",        0x2000, 0x2000, CRC(56e84cc4) SHA1(c48e0e5460376d6b34173c42a27907ef12218182) )
-
-	ROM_REGION( 0x2000, "bigsprite", 0 )
-	ROM_LOAD( "8.11c",        0x0000, 0x1000, CRC(28024d9a) SHA1(c871c4d74be72a8bfea99e89d43f91922f4b734b) )
-	ROM_LOAD( "7.11a",        0x1000, 0x1000, CRC(4a179790) SHA1(7fb6b033de939ff8bd13055c073311dca2c1a6fe) )
-
-	ROM_REGION( 0x2000, "user1", 0 )
-	ROM_LOAD( "5.5lm",        0x0000, 0x1000, CRC(7761ad24) SHA1(98878b19addd142d35718080eece05eaaee0388d) ) // ??
+	ROM_REGION( 0x2000, "gradient", 0 )
+	ROM_LOAD( "5.5lm",        0x0000, 0x1000, CRC(7761ad24) SHA1(98878b19addd142d35718080eece05eaaee0388d) )
 	ROM_LOAD( "6.5n",         0x1000, 0x1000, CRC(da48444c) SHA1(a43e672ce262eb817fb4e5715ef4fb304a6a2815) )
 
 	ROM_REGION( 0x00a0, "proms", 0 )
@@ -2819,8 +4077,8 @@ ROM_START( toprollr )
 	ROM_LOAD( "2.f5",   0x00000, 0x02000, CRC(ef789f00) SHA1(424d69584d391ee7b9ad5db7ee6ced97d69897d4) )
 	ROM_LOAD( "8.f3",   0x02000, 0x02000, CRC(94371cfb) SHA1(cb501c36b213c995a4048b3a96c85848c556cd05) )
 	ROM_LOAD( "4.k5",   0x04000, 0x02000, CRC(1cb48ea0) SHA1(fdc75075112042ec84a7d1b3e5b5a6db1d1cb871) )
-	ROM_COPY( "user1", 0x04000, 0x0a000, 0x02000 )
-	ROM_COPY( "user1", 0x04000, 0x10000, 0x02000 )
+	ROM_COPY( "user1",  0x04000, 0x0a000, 0x02000 )
+	ROM_COPY( "user1",  0x04000, 0x10000, 0x02000 )
 	ROM_LOAD( "3.h5",   0x06000, 0x02000, CRC(d45494ba) SHA1(6e235b34f9457acadad6d4e27799978bc2e3db08) )
 	ROM_LOAD( "9.h3",   0x08000, 0x02000, CRC(8a8032a7) SHA1(d6642d72645c613c21f65bbbe1560d0437d41f43) )
 	ROM_LOAD( "1.d5",   0x0c000, 0x02000, CRC(9894374d) SHA1(173de4abbc3fb5d522aa6d6d5caf8e4d54f2a598) )
@@ -2830,55 +4088,97 @@ ROM_START( toprollr )
 	ROM_LOAD( "12.p3",  0x0000, 0x2000, CRC(7f989dc9) SHA1(3b4d18cbb992872b3cf8f5eaf5381ed3a9468cc1) )
 
 	ROM_REGION( 0x01a0, "proms", 0 )
-	ROM_LOAD( "prom.p2",  0x0000, 0x0020, CRC(42e828fa) SHA1(81250b1f7c3956b3902324adbbaf3b5989e854ee) ) //08-0f sprites + fg (wrong?)
-	ROM_LOAD( "prom.r2",  0x0020, 0x0020, CRC(99b87eed) SHA1(06c3164d681fe4aff0338c0dad1a921f7fe7369d) ) //10-17 sprites
-	ROM_LOAD( "prom.a1",  0x0040, 0x0020, CRC(7d626d6c) SHA1(7c7202d0ec5bf0381e7104eef53afa5fa4596a29) ) //00-07 big sprites
-	ROM_LOAD( "prom.p9",  0x0060, 0x0020, CRC(eb399c02) SHA1(bf3d6c6dd982cb54446cf8a010b7adb949514bdb) ) //18-1f bg
-	ROM_LOAD( "prom.n9",  0x0080, 0x0020, CRC(fb03ea99) SHA1(4dcef86106cef713dfcbd965072bfa8fe4b68e15) ) //20-27 bg
-	ROM_LOAD( "prom.s9",  0x00a0, 0x0100, CRC(abf4c5fb) SHA1(a953f14642d4b72328293b36bc3c65b13491ffff) ) //unknown prom (filled with 2 bit vals)
+	ROM_LOAD( "prom.p2",  0x0000, 0x0020, CRC(42e828fa) SHA1(81250b1f7c3956b3902324adbbaf3b5989e854ee) ) // 08-0f sprites + fg (wrong?)
+	ROM_LOAD( "prom.r2",  0x0020, 0x0020, CRC(99b87eed) SHA1(06c3164d681fe4aff0338c0dad1a921f7fe7369d) ) // 10-17 sprites
+	ROM_LOAD( "prom.a1",  0x0040, 0x0020, CRC(7d626d6c) SHA1(7c7202d0ec5bf0381e7104eef53afa5fa4596a29) ) // 00-07 big sprites
+	ROM_LOAD( "prom.p9",  0x0060, 0x0020, CRC(eb399c02) SHA1(bf3d6c6dd982cb54446cf8a010b7adb949514bdb) ) // 18-1f bg
+	ROM_LOAD( "prom.n9",  0x0080, 0x0020, CRC(fb03ea99) SHA1(4dcef86106cef713dfcbd965072bfa8fe4b68e15) ) // 20-27 bg
+	ROM_LOAD( "prom.s9",  0x00a0, 0x0100, CRC(abf4c5fb) SHA1(a953f14642d4b72328293b36bc3c65b13491ffff) ) // unknown prom (filled with 2 bit vals)
 ROM_END
 
 
-void yamato_state::init_yamato()
+void cclimber_state::cclimber_decode(const u8 convtable[8][16])
 {
-	save_item(NAME(m_yamato_p0));
-	save_item(NAME(m_yamato_p1));
+	u8 *rom = memregion("maincpu")->base();
+
+	for (int A = 0x0000; A < 0x6000; A++)
+	{
+		u8 src = rom[A];
+
+		// pick the translation table from bit 0 of the address
+		// and from bits 1 7 of the source data
+		int i = (A & 1) | (src & 0x02) | ((src & 0x80) >> 5);
+
+		// pick the offset in the table from bits 0 2 4 6 of the source data
+		int j = (src & 0x01) | ((src & 0x04) >> 1) | ((src & 0x10) >> 2) | ((src & 0x40) >> 3);
+
+		// decode the opcodes
+		m_decrypted_opcodes[A] = (src & 0xaa) | convtable[i][j];
+	}
+}
+
+void cclimber_state::init_cclimber()
+{
+	static const u8 convtable[8][16] =
+	{
+		// 0xff marks spots which are unused and therefore unknown
+		{ 0x44,0x14,0x54,0x10,0x11,0x41,0x05,0x50,0x51,0x00,0x40,0x55,0x45,0x04,0x01,0x15 },
+		{ 0x44,0x10,0x15,0x55,0x00,0x41,0x40,0x51,0x14,0x45,0x11,0x50,0x01,0x54,0x04,0x05 },
+		{ 0x45,0x10,0x11,0x44,0x05,0x50,0x51,0x04,0x41,0x14,0x15,0x40,0x01,0x54,0x55,0x00 },
+		{ 0x04,0x51,0x45,0x00,0x44,0x10,0xff,0x55,0x11,0x54,0x50,0x40,0x05,0xff,0x14,0x01 },
+		{ 0x54,0x51,0x15,0x45,0x44,0x01,0x11,0x41,0x04,0x55,0x50,0xff,0x00,0x10,0x40,0xff },
+		{ 0xff,0x54,0x14,0x50,0x51,0x01,0xff,0x40,0x41,0x10,0x00,0x55,0x05,0x44,0x11,0x45 },
+		{ 0x51,0x04,0x10,0xff,0x50,0x40,0x00,0xff,0x41,0x01,0x05,0x15,0x11,0x14,0x44,0x54 },
+		{ 0xff,0xff,0x54,0x01,0x15,0x40,0x45,0x41,0x51,0x04,0x50,0x05,0x11,0x44,0x10,0x14 }
+	};
+
+	cclimber_decode(convtable);
+}
+
+void cclimber_state::init_cclimberj()
+{
+	static const u8 convtable[8][16] =
+	{
+		{ 0x41,0x54,0x51,0x14,0x05,0x10,0x01,0x55,0x44,0x11,0x00,0x50,0x15,0x40,0x04,0x45 },
+		{ 0x50,0x11,0x40,0x55,0x51,0x14,0x45,0x04,0x54,0x15,0x10,0x05,0x44,0x01,0x00,0x41 },
+		{ 0x44,0x11,0x00,0x50,0x41,0x54,0x04,0x14,0x15,0x40,0x51,0x55,0x05,0x10,0x01,0x45 },
+		{ 0x10,0x50,0x54,0x55,0x01,0x44,0x40,0x04,0x14,0x11,0x00,0x41,0x45,0x15,0x51,0x05 },
+		{ 0x14,0x41,0x01,0x44,0x04,0x50,0x51,0x45,0x11,0x40,0x54,0x15,0x10,0x00,0x55,0x05 },
+		{ 0x01,0x05,0x41,0x45,0x54,0x50,0x55,0x10,0x11,0x15,0x51,0x14,0x44,0x40,0x04,0x00 },
+		{ 0x05,0x55,0x00,0x50,0x11,0x40,0x54,0x14,0x45,0x51,0x10,0x04,0x44,0x01,0x41,0x15 },
+		{ 0x55,0x50,0x15,0x10,0x01,0x04,0x41,0x44,0x45,0x40,0x05,0x00,0x11,0x14,0x51,0x54 },
+	};
+
+	cclimber_decode(convtable);
 }
 
 
-void toprollr_state::init_toprollr()
+void cclimber_state::init_ckongb()
 {
-	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
+	u8 *rom = memregion("maincpu")->base();
 
-	segacrpt_z80_device &cpu = downcast<segacrpt_z80_device &>(*m_maincpu);
-	cpu.set_region_p(memregion("user1")->base());
-	cpu.set_decrypted_p(m_opcodes.get());
-
-	m_bank1->configure_entries(0, 3, memregion("user1")->base(), 0x6000);
-	m_bank1d->configure_entries(0, 3, m_opcodes.get(), 0x6000);
-
-	m_bank1->set_entry(0);
-	m_bank1d->set_entry(0);
-
-	save_item(NAME(m_rombank));
+	// all the program ROMs are encrypted
+	for (int A = 0x0000; A < 0x6000; A++)
+		rom[A] = rom[A] ^ 0xf0;
 }
-
-
 
 void cclimber_state::init_dking()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
+	u8 *rom = memregion( "maincpu" )->base();
+
 	for (int j = 0; j < 0x5000; j += 0x1000)
 	{
-		for (int i = 0x0500; i < 0x0800; i++)  rom[i+j] ^=0xff;
-		for (int i = 0x0d00; i < 0x1000; i++)  rom[i+j] ^=0xff;
+		for (int i = 0x0500; i < 0x0800; i++)
+			rom[i + j] ^= 0xff;
+		for (int i = 0x0d00; i < 0x1000; i++)
+			rom[i + j] ^= 0xff;
 	}
-
 }
+
 
 void cclimber_state::init_rpatrol()
 {
-	uint8_t *rom = memregion( "maincpu" )->base();
+	u8 *rom = memregion( "maincpu" )->base();
 
 	// Bits are inverted
 	for (int i = 0x0000; i < 0x5000; i++)
@@ -2890,6 +4190,63 @@ void cclimber_state::init_rpatrol()
 }
 
 
+void cclimber_state::init_cannonb()
+{
+	u8 *rom = memregion("maincpu")->base();
+
+	// only first ROM is encrypted
+	for (int A = 0x0000; A < 0x1000; A++)
+	{
+		static const u8 xor_tab[4] = { 0x92, 0x82, 0x12, 0x10 };
+
+		u8 src = rom[A + 0x10000];
+		int i = ((A & 0x200) >> 8) | ((A & 0x80) >> 7);
+		src ^= xor_tab[i];
+
+		rom[A] = src;
+	}
+
+	init_cannonb2();
+}
+
+void cclimber_state::init_cannonb2()
+{
+	// set to 1 to fix protection check after bonus round (see notes in pacman.cpp driver)
+#if 0
+	u8 *rom = memregion("maincpu")->base();
+
+	rom[0x2ba0] = 0x21;
+	rom[0x2ba1] = 0xfb;
+	rom[0x2ba2] = 0x0e;
+	rom[0x2ba3] = 0x00;
+#endif
+}
+
+
+void toprollr_state::init_toprollr()
+{
+	m_opcodes = std::make_unique<u8[]>(0x6000*3);
+
+	segacrpt_z80_device &cpu = downcast<segacrpt_z80_device &>(*m_maincpu);
+	cpu.set_region_p(memregion("user1")->base());
+	cpu.set_decrypted_p(m_opcodes.get());
+
+	m_bank1->configure_entries(0, 3, memregion("user1")->base(), 0x6000);
+	m_bank1d->configure_entries(0, 3, m_opcodes.get(), 0x6000);
+
+	m_bank1->set_entry(0);
+	m_bank1d->set_entry(0);
+}
+
+} // anonymous namespace
+
+
+
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
+
+//    YEAR  NAME         PARENT    MACHINE    INPUT      CLASS           INIT            SCREEN  COMPANY                   FULLNAME                                       FLAGS
 GAME( 1980, cclimber,    0,        cclimberx, cclimber,  cclimber_state, init_cclimber,  ROT0,   "Nichibutsu",             "Crazy Climber (US set 1)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1980, cclimbera,   cclimber, cclimberx, cclimber,  cclimber_state, init_cclimber,  ROT0,   "Nichibutsu",             "Crazy Climber (US set 2)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1980, cclimberj,   cclimber, cclimberx, cclimberj, cclimber_state, init_cclimberj, ROT0,   "Nichibutsu",             "Crazy Climber (Japan)",                       MACHINE_SUPPORTS_SAVE )
@@ -2903,10 +4260,10 @@ GAME( 1980, cclimbrrod,  cclimber, cclimber,  cclimber,  cclimber_state, empty_i
 /* these sets have ugly colours, no extra attract screen, and no graphics for the extra attract screen in the BG roms
   - there is a Falcon logo in the text roms which is unused
   - does the code to display the extra screen still exist in the roms?  */
-GAME( 1981, ckong,       0,        cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Kyoei / Falcon", "Crazy Kong",                               MACHINE_SUPPORTS_SAVE ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
-GAME( 1981, ckongalc,    ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1981, monkeyd,     ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg",        "Monkey Donkey",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dking,       ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey King",                              MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
+GAME( 1981, ckong,       0,        cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Kyoei / Falcon", "Crazy Kong",                                  MACHINE_SUPPORTS_SAVE ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
+GAME( 1981, ckongalc,    ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1981, monkeyd,     ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg",        "Monkey Donkey",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dking,       ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey King",                                 MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
 GAME( 1981, ckongdks,    ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey Kong (Spanish bootleg of Crazy Kong)", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused
@@ -2928,10 +4285,12 @@ GAME( 1981, ckongpt2b2,  ckongpt2, cclimber,  ckongb2,   cclimber_state, empty_i
 // see bagman.cpp for parent
 GAME( 1982, bagmanf,     bagman,   bagmanf,   bagmanf,   cclimber_state, empty_init,     ROT270, "bootleg", "Le Bagnard (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, rpatrol,     0,        rpatrol,   rpatrol,   cclimber_state, init_rpatrol,   ROT0,   "Orca",    "River Patrol (Japan)",               MACHINE_SUPPORTS_SAVE)
+GAME( 1981, rpatrol,     0,        rpatrol,   rpatrol,   cclimber_state, init_rpatrol,   ROT0,   "Orca",    "River Patrol (Japan)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1981, rpatroln,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Orca",    "River Patrol (Japan, unprotected)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1981, rpatrolb,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "bootleg", "River Patrol (bootleg)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, silvland,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Falcon",  "Silver Land (hack of River Patrol)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1983, tangramq,    0,        tangramq,  tangramq,  cclimber_state, empty_init,     ROT270, "SNK",     "Tangram Q", MACHINE_SUPPORTS_SAVE )
 
 // see pacman.cpp for parent
 GAME( 1985, cannonb,     cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb,   ROT90,  "bootleg (Soft)",              "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
@@ -2942,12 +4301,13 @@ GAME( 1982, swimmer,     0,        swimmer,   swimmer,   swimmer_state,  empty_i
 GAME( 1982, swimmera,    swimmer,  swimmer,   swimmer,   swimmer_state,  empty_init,     ROT0,   "Tehkan", "Swimmer (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, swimmerb,    swimmer,  swimmer,   swimmerb,  swimmer_state,  empty_init,     ROT0,   "Tehkan", "Swimmer (set 3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, guzzler,     0,        guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, guzzler,     0,        guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   swimmer_state,  empty_init,     ROT90,  "Tehkan", "Guzzler (Swimmer conversion)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, au,          0,        au,        au,        swimmer_state,  empty_init,     ROT90,  "Tehkan", "Au (location test)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, yamato,      0,        yamato,    yamato,    yamato_state,   init_yamato,    ROT90,  "Sega",   "Yamato (US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, yamato2,     yamato,   yamato,    yamato,    yamato_state,   init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato,      0,        yamato,    yamato,    yamato_state,   empty_init,     ROT90,  "Sega",   "Yamato (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamatoa,     yamato,   yamato,    yamato,    yamato_state,   empty_init,     ROT90,  "Sega",   "Yamato (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamatou,     yamato,   yamato,    yamatou,   yamato_state,   empty_init,     ROT90,  "Sega",   "Yamato (US)",    MACHINE_SUPPORTS_SAVE )
 
 GAME( 1983, toprollr,    0,        toprollr,  toprollr,  toprollr_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_SUPPORTS_SAVE )

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_BUS_FP1030_RAMPACK_H
-#define MAME_BUS_FP1030_RAMPACK_H
+#ifndef MAME_BUS_FP1000_FP1030_RAMPACK_H
+#define MAME_BUS_FP1000_FP1030_RAMPACK_H
 
 #pragma once
 
@@ -31,4 +31,4 @@ private:
 DECLARE_DEVICE_TYPE(FP1030_RAMPACK, fp1030_rampack_device)
 
 
-#endif // MAME_BUS_FP1030_RAMPACK_H
+#endif // MAME_BUS_FP1000_FP1030_RAMPACK_H

@@ -655,6 +655,7 @@ void hmcs40_cpu_device::execute_run()
 	// in HLT state, the internal clock is not running
 	if (m_halt)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}

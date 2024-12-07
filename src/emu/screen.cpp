@@ -926,6 +926,7 @@ void screen_device::device_stop()
 void screen_device::device_post_load()
 {
 	realloc_screen_bitmaps();
+	m_scanline0_timer->adjust(time_until_pos(0));
 }
 
 
@@ -1914,7 +1915,7 @@ void screen_device::finalize_burnin()
 
 
 //-------------------------------------------------
-//  finalize_burnin - finalize the burnin bitmap
+//  load_effect_overlay -
 //-------------------------------------------------
 
 void screen_device::load_effect_overlay(const char *filename)

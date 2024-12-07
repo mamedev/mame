@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/hd6305.h"
 #include "machine/6850acia.h"
 
 namespace {

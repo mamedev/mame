@@ -3,8 +3,8 @@
 
 // Yamaha SWP00, rompler/dsp combo
 
-#ifndef DEVICES_SOUND_SWP00_H
-#define DEVICES_SOUND_SWP00_H
+#ifndef MAME_SOUND_SWP00_H
+#define MAME_SOUND_SWP00_H
 
 #pragma once
 
@@ -247,4 +247,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SWP00, swp00_device)
 
-#endif
+#endif // MAME_SOUND_SWP00_H

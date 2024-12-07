@@ -880,6 +880,7 @@ void m68000_musashi_device::execute_run()
 			}
 			if(m_stopped)
 			{
+				debugger_wait_hook();
 				if (m_icount > 0)
 					m_icount = 0;
 				return;

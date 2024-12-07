@@ -31,8 +31,8 @@
     Game options cannot be adjusted, any attempt to do so resets the machine (seen on real hardware)
     Volume control cycles in the 'Stereo' test, but cannot be tested.
 
-
     This should be similar hardware for Street Viper if we get a dump.
+
 ***************************************************************************/
 
 

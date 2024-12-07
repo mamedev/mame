@@ -68,7 +68,8 @@ public:
 		m_floppy(*this, "fdc:%d", 0U),
 		m_scc(*this, "scc"),
 		m_rtc(*this, "rtc"),
-		m_egret(*this, "egret")
+		m_egret(*this, "egret"),
+		m_config(*this, "config")
 	{
 	}
 
@@ -96,6 +97,7 @@ private:
 	required_device<z80scc_device> m_scc;
 	optional_device<rtc3430042_device> m_rtc;
 	optional_device<egret_device> m_egret;
+	optional_ioport m_config;
 
 	void set_via2_interrupt(int value);
 	void field_interrupts();
@@ -175,14 +177,6 @@ private:
 		else
 			m_fdc->write((offset >> 8) & 0xf, data >> 8);
 	}
-
-	void write_6015(int state)
-	{
-		if (state)
-		{
-			m_macadb->adb_vblank();
-		}
-	}
 };
 
 void maciici_state::machine_start()
@@ -201,6 +195,11 @@ void maciici_state::machine_reset()
 	if (m_egret)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	}
+
+	if (m_config)
+	{
+		m_maincpu->set_fpu_enable(BIT(m_config->read(), 0));
 	}
 
 	// put ROM mirror at 0
@@ -502,6 +501,13 @@ void maciici_state::devsel_w(uint8_t devsel)
 static INPUT_PORTS_START(maciici)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(maciisi)
+	PORT_START("config")
+	PORT_CONFNAME(0x01, 0x00, "FPU")
+	PORT_CONFSETTING(0x00, "No FPU")
+	PORT_CONFSETTING(0x01, "FPU Present")
+INPUT_PORTS_END
+
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -593,7 +599,6 @@ void maciici_state::maciixi_base(machine_config &config)
 
 	RBV(config, m_rbv, C15M);
 	m_rbv->via6015_callback().set(m_via1, FUNC(via6522_device::write_ca1));
-	m_rbv->via6015_callback().append(FUNC(maciici_state::write_6015));
 	m_rbv->irq_callback().set(FUNC(maciici_state::set_via2_interrupt));
 
 	/* internal ram */
@@ -687,4 +692,4 @@ ROM_END
 } // anonymous namespace
 
 COMP(1989, maciici, 0, 0, maciici, maciici, maciici_state, empty_init, "Apple Computer", "Macintosh IIci", MACHINE_SUPPORTS_SAVE)
-COMP(1990, maciisi, 0, 0, maciisi, maciici, maciici_state, empty_init, "Apple Computer", "Macintosh IIsi", MACHINE_SUPPORTS_SAVE)
+COMP(1990, maciisi, 0, 0, maciisi, maciisi, maciici_state, empty_init, "Apple Computer", "Macintosh IIsi", MACHINE_SUPPORTS_SAVE)

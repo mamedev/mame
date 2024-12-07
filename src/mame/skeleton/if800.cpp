@@ -98,7 +98,7 @@ void if800_state::if800(machine_config &config)
 
 
 //  PIC8259(config, "pic8259", 0);
-	UPD7220(config, m_hgdc, 8000000/4);
+	UPD7220(config, m_hgdc, 8000000 / 2);
 	m_hgdc->set_addrmap(0, &if800_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(if800_state::hgdc_display_pixels));
 

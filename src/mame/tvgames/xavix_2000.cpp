@@ -312,6 +312,12 @@ ROM_START( ttv_mx )
 	ROM_LOAD( "mxdirtrebel.bin", 0x000000, 0x800000, CRC(e64bf1a1) SHA1(137f97d7d857697a13e0c8984509994dc7bc5fc5) )
 ROM_END
 
+ROM_START( tom_jump )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "tom_jump.bin", 0x000000, 0x800000, CRC(20bf5c17) SHA1(bca7535baa6a54ad3ee0929bd3b74a22cb5139da) )
+ROM_END
+
+
 ROM_START( drgqst )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "dragonquest.bin", 0x000000, 0x800000, CRC(3d24413f) SHA1(1677e81cedcf349de7bf091a232dc82c6424efba) )
@@ -390,6 +396,10 @@ CONS( 2005, ttv_sw,   0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lot
 CONS( 2005, ttv_swj,  ttv_sw, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tomy / SSD Company LTD",        "Star Wars Saga Edition - Lightsaber Battle Game (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_lotr, 0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,         init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
+
+// テレビで遊び隊　韋駄天翔 激走 韋駄天バトル  - seems to be based on the same engine at ttv_mx and has an almost identical controller, but not exactly the same game
+CONS( 2005, tom_jump,   0,    0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,         init_xavix, "Tomy / SSD Company LTD",        "IDATEN Jump: Gekisou IDATEN Battle (Japan)", MACHINE_IMPERFECT_SOUND )
+
 // 剣神ドラゴンクエスト 甦りし伝説の剣
 CONS( 2003, drgqst,   0,      0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 

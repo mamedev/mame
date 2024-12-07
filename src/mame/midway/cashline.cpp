@@ -106,6 +106,48 @@
   |                                          |
   |                               :::::      |
   |__________________________________________|
+
+The reels symbols follow this order:
+
+Upper reels
+
+Pocket watch | Wad of bills | Wad of bills |
+Pocket watch | Money bag    | Wad of bills |
+Gold ingot   | Wad of bills | Wad of bills |
+Ring         | Money bag    | Wad of bills |
+Coins        | Ring         | Gold ingot   |
+Coins        | Ring         | Pocket watch |
+Coins        | Diamond      | Ring         |
+Coins        | Coins        | Ring         |
+Money bag    | Coins        | Ring         |
+Ring         | Coins        | Money bag    |
+Wad of bills | Gold ingot   | Pocket watch |
+Wad of bills | Pocket watch | Coins        |
+Wad of bills | Coins        | Coins        |
+Wad of bills | Pocket watch | Coins        |
+Diamond      | Wad of bills | Coins        |
+Pocket watch | Wad of bills | Diamond      |
+
+
+Lower reels
+
+Grape        | Grape        | Strawberry   |
+Lemon        | Lemon        | Grape        |
+Bell         | Strawberry   | Lemon        |
+Orange       | Grape        | Bell         |
+Lemon        | Orange       | Orange       |
+Grape        | Lemon        | Lemon        |
+Strawberry   | Merkur logo  | Seven        |
+Orange       | Lemon        | Lemon        |
+Grape        | Orange       | Strawberry   |
+Lemon        | Lemon        | Grape        |
+Seven        | Grape        | Orange       |
+Merkur logo  | Strawberry   | Lemon        |
+Orange       | Bell         | Merkur logo  |
+Lemon        | Seven        | Strawberry   |
+Strawberry   | Strawberry   | Grape        |
+Orange       | Orange       | Orange       |
+
 */
 
 #include "emu.h"
@@ -182,5 +224,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY        FULLNAME    FLAGS
-GAME( 1981, cashline, 0,      cashline, cashline, cashline_state, empty_init, ROT0,     "Bally/Sente", "Cashline", MACHINE_IS_SKELETON_MECHANICAL )
+//    YEAR   NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY        FULLNAME    FLAGS
+GAME( 1995?, cashline, 0,      cashline, cashline, cashline_state, empty_init, ROT0,     "Bally/Sente", "Cashline", MACHINE_IS_SKELETON_MECHANICAL )

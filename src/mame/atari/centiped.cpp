@@ -1051,7 +1051,7 @@ static INPUT_PORTS_START( centiped )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* trackball sign bit */
 
 	PORT_START("IN1")
@@ -1310,7 +1310,7 @@ static INPUT_PORTS_START( milliped )
 	PORT_DIPSETTING(   0x0c, "0 1x 2x 3x" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )       /* trackball sign bit */
 
 	PORT_START("IN1")   /* $2001 */ /* see port 7 for y trackball */
@@ -1455,7 +1455,7 @@ static INPUT_PORTS_START( warlords )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x80, "Upright (overlay)" )
 	PORT_DIPSETTING(    0x00, "Cocktail (no overlay)" )
@@ -1538,7 +1538,7 @@ static INPUT_PORTS_START( mazeinv )
 	PORT_DIPNAME( 0x40, 0x00, "Minimum credits" )       PORT_DIPLOCATION("SW0:!7")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1627,7 +1627,7 @@ static INPUT_PORTS_START( bullsdrt )
 	PORT_START("IN0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* trackball data */
 	PORT_BIT( 0x30, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* trackball sign bit */
 
 	PORT_START("IN1")
@@ -2292,13 +2292,13 @@ ROM_START( warlords )
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "037159-01.e6", 0x0000, 0x0800, CRC(ff979a08) SHA1(422053473e41e3e1f71eb28e40eedc78f22326b3) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_REGION( 0x0200, "proms", 0 ) // dumped from 3 different PCBs
 	/* Only the first 0x80 bytes are used by the hardware. A7 is grounded. */
-	/* Bytes 0x00-0x3f are used fore the color cocktail version. */
+	/* Bytes 0x00-0x3f are used for the color cocktail version. */
 	/* Bytes 0x40-0x7f are for the upright version of the cabinet with a */
 	/* mirror and painted background. */
 	ROM_LOAD( "037235-01.n7", 0x0000, 0x0100, CRC(a2c5c277) SHA1(f04de9fb6ee9619b4a4aae10c92b16b3123046cf) )
-	ROM_LOAD( "037161-01.m6", 0x0100, 0x0100, CRC(4cd24c85) SHA1(00f4876279255f3a2d136a9d916b388812cbd1fc) ) // Sync PROM
+	ROM_LOAD( "037161-01.m6", 0x0100, 0x0100, CRC(6fa3093a) SHA1(2b7aeca74c1ae4156bf1878453a047330f96f0a8) ) // Sync PROM
 ROM_END
 
 

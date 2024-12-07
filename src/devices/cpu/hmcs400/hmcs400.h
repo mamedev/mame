@@ -21,31 +21,31 @@ enum
 };
 
 
-// pinout reference
+// pinout reference (see datasheets for other pinouts)
 
 /*
-                _________________
-        D11  1 |*                | 64 D10
-        D12  2 |                 | 63 D9
-        D13  3 |                 | 62 D8
-        D14  4 |                 | 61 D7
-        D15  5 |                 | 60 D6
-        R00  6 |                 | 59 D5
-        R01  7 |                 | 58 D4
-        R02  8 |                 | 57 D3
-        R03  9 |                 | 56 D2
-        R10 10 |                 | 55 D1
-        R11 11 |                 | 54 D0
-        R12 12 |                 | 53 GND
-        R13 13 |                 | 52 OSC2
-        R20 14 |    HD61402x     | 51 OSC1
-        R21 15 |    HD61404x     | 50 _TEST
-        R22 16 |    HD61408x     | 49 RESET
-        R23 17 |                 | 48 R93
-        RA0 18 |     DP-64S      | 47 R92
-  RA1/Vdisp 19 |     DC-64S      | 46 R91
-        R30 20 |                 | 45 R90
-        R31 21 |                 | 44 R83
+                _________________                            _________________
+        D11  1 |*                | 64 D10            D12  1 |*                | 64 D11
+        D12  2 |                 | 63 D9             D13  2 |                 | 63 D10
+        D13  3 |                 | 62 D8             D14  3 |                 | 62 D9
+        D14  4 |                 | 61 D7       RA1/Vdisp  4 |                 | 61 D8
+        D15  5 |                 | 60 D6             R00  5 |                 | 60 D7
+        R00  6 |                 | 59 D5             R01  6 |                 | 59 D6
+        R01  7 |                 | 58 D4             R02  7 |                 | 58 D5
+        R02  8 |                 | 57 D3             R03  8 |    HD61412x     | 57 D4
+        R03  9 |                 | 56 D2             R10  9 |    HD61414x     | 56 D3
+        R10 10 |                 | 55 D1             R11 10 |    HD40x4240    | 55 D2
+        R11 11 |                 | 54 D0             R12 11 |                 | 54 D1
+        R12 12 |                 | 53 GND            R13 12 |     DP-42       | 53 D0
+        R13 13 |                 | 52 OSC2           R20 13 |     DP-42S      | 52 GND
+        R20 14 |    HD61402x     | 51 OSC1           R21 14 |                 | 51 OSC2
+        R21 15 |    HD61404x     | 50 _TEST          R22 15 |                 | 50 OSC1
+        R22 16 |    HD61408x     | 49 RESET          R23 16 |                 | 49 _TEST
+        R23 17 |                 | 48 R93            R30 17 |                 | 48 RESET
+        RA0 18 |     DP-64S      | 47 R92            R31 18 |                 | 47 R43
+  RA1/Vdisp 19 |     DC-64S      | 46 R91      R32/_INT0 19 |                 | 46 R42/SO
+        R30 20 |                 | 45 R90      R33/_INT1 20 |                 | 45 R41/SI
+        R31 21 |                 | 44 R83            Vcc 21 |_________________| 44 R40/_SCK
   R32/_INT0 22 |                 | 43 R82
   R33/_INT1 23 |                 | 42 R81
         R50 24 |                 | 41 R80
@@ -57,8 +57,6 @@ enum
         R62 30 |                 | 35 R42/SO
         R63 31 |                 | 34 R41/SI
         Vcc 32 |_________________| 33 R40/_SCK
-
-        (see datasheets for FP-64 pinouts)
 
 */
 
@@ -78,7 +76,7 @@ public:
 	auto read_d() { return m_read_d.bind(); }
 	auto write_d() { return m_write_d.bind(); }
 
-	// system clock divider mask option (only for HMCS408, HMCS414, HMCS424)
+	// system clock divider mask option (only for HMCS408, HMCS41x, HMCS42x)
 	// valid options: 4, 8, 16, default to 8
 	auto &set_divider(u8 div) { assert(m_has_div); m_divider = div; return *this; }
 
@@ -156,13 +154,15 @@ protected:
 	bool m_standby;       // standby mode (SBY opcode)
 	bool m_stop;          // stop mode (STOP opcode)
 
-	u8 m_r[11];           // R outputs state
-	u8 m_r_mask[11];
+	u8 m_r[11];           // R pins output state
+	u8 m_r_mask[11];      // R pins voltage mask
+	u32 m_r_dir;          // R pins I/O direction (bit 0=R, bit 1=W)
 	u16 m_d;              // D pins state
-	u16 m_d_mask;
+	u16 m_d_mask;         // D pins voltage mask
 
 	u8 m_int_line[2];     // INT0/INT1 pin state
 	u16 m_irq_flags;      // interrupt control bits
+	u16 m_irq_mask;       // valid irq flags bits
 	u8 m_pmr;             // port mode register
 	u16 m_prescaler;      // 11-bit clock prescaler
 	u8 m_timer_mode[2];   // TMA/TMB: timer mode registers
@@ -184,7 +184,7 @@ protected:
 	void pop_stack();
 	void push_stack();
 
-	void reset_io();
+	virtual void reset_io();
 	u8 read_r(u8 index);
 	void write_r(u8 index, u8 data);
 	int read_d(u8 index);
@@ -435,6 +435,92 @@ public:
 };
 
 
+class hmcs41x_cpu_device : public hmcs400_cpu_device
+{
+protected:
+	hmcs41x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void reset_io() override;
+};
+
+class hmcs412_cpu_device : public hmcs41x_cpu_device
+{
+protected:
+	hmcs412_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd614120_device : public hmcs412_cpu_device
+{
+public:
+	hd614120_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd614125_device : public hmcs412_cpu_device
+{
+public:
+	hd614125_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd614128_device : public hmcs412_cpu_device
+{
+public:
+	hd614128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
+class hmcs414_cpu_device : public hmcs41x_cpu_device
+{
+protected:
+	hmcs414_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd614140_device : public hmcs414_cpu_device
+{
+public:
+	hd614140_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd614145_device : public hmcs414_cpu_device
+{
+public:
+	hd614145_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd614148_device : public hmcs414_cpu_device
+{
+public:
+	hd614148_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
+class hmcs424_cpu_device : public hmcs41x_cpu_device
+{
+protected:
+	hmcs424_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	virtual void device_start() override ATTR_COLD { hmcs400_cpu_device::device_start(); }
+};
+
+class hd404240_device : public hmcs424_cpu_device
+{
+public:
+	hd404240_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd40l4240_device : public hmcs424_cpu_device
+{
+public:
+	hd40l4240_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class hd40a4240_device : public hmcs424_cpu_device
+{
+public:
+	hd40a4240_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
 DECLARE_DEVICE_TYPE(HD614022, hd614022_device)
 DECLARE_DEVICE_TYPE(HD614023, hd614023_device)
 DECLARE_DEVICE_TYPE(HD614025, hd614025_device)
@@ -455,5 +541,17 @@ DECLARE_DEVICE_TYPE(HD614085, hd614085_device)
 DECLARE_DEVICE_TYPE(HD614086, hd614086_device)
 DECLARE_DEVICE_TYPE(HD614088, hd614088_device)
 DECLARE_DEVICE_TYPE(HD614089, hd614089_device)
+
+DECLARE_DEVICE_TYPE(HD614120, hd614120_device)
+DECLARE_DEVICE_TYPE(HD614125, hd614125_device)
+DECLARE_DEVICE_TYPE(HD614128, hd614128_device)
+
+DECLARE_DEVICE_TYPE(HD614140, hd614140_device)
+DECLARE_DEVICE_TYPE(HD614145, hd614145_device)
+DECLARE_DEVICE_TYPE(HD614148, hd614148_device)
+
+DECLARE_DEVICE_TYPE(HD404240, hd404240_device)
+DECLARE_DEVICE_TYPE(HD40A4240, hd40a4240_device)
+DECLARE_DEVICE_TYPE(HD40L4240, hd40l4240_device)
 
 #endif // MAME_CPU_HMCS400_HMCS400_H

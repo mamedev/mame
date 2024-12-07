@@ -25,13 +25,9 @@ TODO (most of these should be generic hash rulesets but anyway ...):
 - de-cloneize data disks, use comma separated info name="datadisk" instead;
 - Verify disk labels, several are mislabeled (i.e. has numbers instead of letters and viceversa);
 - Mark as baddump any SW disk(s) that sports non-default factory saves;
-- Verify .hdm 3.5" entries, all of them but 100best35 may be really 5.25" instead.
+- Verify .hdm 3.5" entries, all of them but 100best35 works on 5.25" interface instead.
+  Unless 123note is right and .hdm filesize is that trimmed ...
 - document any unorthodox way for running a given sw;
-- document (and support) alternative file types (FDD, NFD, FIX)
-  can we convert some of those to FDI or D88? or some protection schemes need
-  such format? (Note that some disks come in DIP, DCP, DCU formats: these shall
-  be just plain images, like FDI, just with different headers with the track
-  "map")
 - fix doujin software names;
 - Remove manufacturer=<unofficial> and instead assign proper manufacturer naming for
   Victor freeware software (+ bad dump flag), bootleg for the PC9801 Game Packs;
@@ -2403,16 +2399,18 @@ Won't boot standalone, also access nonexistant track=77
 		</part>
 	</software>
 
-	<!-- Launching LOTUS.COM and selecting any option except the demo prompts the user for a system or data disk -->
-	<!-- Is this a partial user massaged dump to be autobootable? -->
 	<software name="lotus123" supported="partial">
-		<!-- based off R2.2J according to LOTUS.COM -->
-		<description>Lotus 1-2-3 (demo)</description>
+		<description>Lotus 1-2-3 (demo, R2.2J)</description>
 		<!-- all files sports a 1989 timestamp but AUTOEXEC.BAT (1990-08-02) -->
 		<year>1989?</year>
 		<!-- "Lotus Development Japan Ltd." -->
 		<publisher>Lotus</publisher>
+		<notes><![CDATA[
+Launching LOTUS.COM and selecting any option except the demo prompts the user for a system or data disk
+Actual 2.2J release has 4 disks, other three being System, Utility and Dictionary.
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Introduction Disk?"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="lotus123_demo.hdm" size="1261568" crc="20a570a9" sha1="d74a9dc3564adf145427200faa13521d57a27a22" offset="0" status="baddump" />
 			</dataarea>
@@ -2420,9 +2418,15 @@ Won't boot standalone, also access nonexistant track=77
 	</software>
 
 	<software name="123note" supported="no">
-		<description>Lotus 1-2-3 Notebook</description>
-		<year>19??</year>
+		<description>Lotus 1-2-3 Notebook (R 1.0)</description>
+		<year>1991</year>
 		<publisher>Lotus</publisher>
+		<notes><![CDATA[
+Why it needs a notebook at all? Graphic features?
+All the known 98NOTE machines have 3.5" built in, is this disk not supposed to be 5.25"?
+Installer has options for Toshiba DynaBook and Fujitsu FMNoteBook machines
+Not extensively tested (has several spreadsheet examples)
+]]></notes>
 		<info name="usage" value="Run INSTALL.BAT from DOS, select 1 (98NOTE), then run 123.EXE" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
@@ -2431,10 +2435,14 @@ Won't boot standalone, also access nonexistant track=77
 		</part>
 	</software>
 
-	<software name="freelncd">
-		<description>Lotus Freelance (demo)</description>
-		<year>19??</year>
+	<software name="freelncd" supported="partial">
+		<description>Lotus Freelance (R3J Auto Demo v1.0)</description>
+		<year>1989</year>
+		<!-- "Lotus Development Japan Ltd." -->
 		<publisher>Lotus</publisher>
+		<notes><![CDATA[
+Doesn't draw [kanji] on VM class
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="freelance_demo.hdm" size="1261568" crc="a9bab9de" sha1="128943b9c32ecc82bf58f214ad7cd5c655b46480" offset="0" />
@@ -2486,7 +2494,7 @@ Not extensively tested
 		<year>1989</year>
 		<publisher>Corpus</publisher>
 		<notes><![CDATA[
-Cannot enter any character inside, keeps moaning about half kanji not supported no matter CR position
+Cannot enter any printing character in text area, keeps moaning about half kanji not supported no matter CR position
 Blink is half size
 Not extensively tested
 ]]></notes>
@@ -2725,6 +2733,23 @@ Has [printer] options, PC-PR and ESC/P
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="wiz_golf_score_database.hdm" size="1261568" crc="7c89cd3a" sha1="df06022d153d24d7ff2133f5b4ab4a4c9ab69b0e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micat" supported="no">
+		<description>Micat (Ver 1.5)</description>
+		<year>1992</year>
+		<publisher>マイクロコア (Micro Core)</publisher>
+		<notes><![CDATA[
+Terminal emulator
+Requires a 1200/2400 baud [modem], press F5 once booted for full list of supported devices.
+]]></notes>
+		<info name="usage" value="Boot from DOS, mount floppy then execute MICAT.BAT" />
+		<!-- baddump: two extra files with 2014 timestamp -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="micat.fdi" size="1265664" crc="f5455088" sha1="0ff54044078e12fcfa4681862fba87a6433d94f9" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3408,14 +3433,13 @@ Incorrect layout on track 0 head 0, expected_size=166666, current_size=261600
 		</part>
 	</software>
 
-	<!--
-	    After the intro the game asks for a disk in drive A. It doesn't work with any of the disks here.
-	    Works when installed to HDD.
-	-->
-	<software name="5jikanm" supported="partial">
+	<software name="5jikanm" supported="yes">
 		<description>5 Jikanme no Venus</description>
 		<year>1995</year>
 		<publisher>フェアリーダスト (Fairy Dust)</publisher>
+		<notes><![CDATA[
+Throws a "excution file has been renamed" warning during MEGDOS boot
+]]></notes>
 		<info name="alt_title" value="５時間目のヴィーナス" />
 		<info name="release" value="19950407" />
 		<part name="flop1" interface="floppy_5_25">
@@ -4070,7 +4094,7 @@ Hangs after entering name on VM class
 	</software>
 
 	<software name="herolanc">
-		<description>AD&amp;D Heroes of the Lance</description>
+		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance</description>
 		<year>1989</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ ヒーローズ オブ ランス" />
@@ -4083,7 +4107,7 @@ Hangs after entering name on VM class
 	</software>
 
 	<software name="hillsfar">
-		<description>AD&amp;D Hillsfar</description>
+		<description>Advanced Dungeons &amp; Dragons - Hillsfar</description>
 		<year>1990</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ ヒルズファー" />
@@ -4096,7 +4120,7 @@ Hangs after entering name on VM class
 	</software>
 
 	<software name="poolrad">
-		<description>AD&amp;D Pool of Radiance</description>
+		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance</description>
 		<year>1989</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ プール オブ レイディアンス" />
@@ -4343,6 +4367,9 @@ fails to self boot, dos must be loaded first
 		<description>AI Shogi</description>
 		<year>1993</year>
 		<publisher>サムシンググッド (Something Good)</publisher>
+		<notes><![CDATA[
+Requires 3.5" floppy emulation
+]]></notes>
 		<info name="alt_title" value="ＡＩ将棋" />
 		<info name="release" value="19931205" />
 		<!-- TODO: apparently not autobootable, may require DOS -->
@@ -5674,11 +5701,13 @@ Every [kanji] character has one line of corruption
 		</part>
 	</software>
 
-	<!-- At some point it was possible to mount a -86 and a -26 to split BGMs and SFXs, regressed -->
 	<software name="animjv3" supported="partial">
 		<description>Animahjong V3</description>
 		<year>1993</year>
 		<publisher>ソニア (Sogna)</publisher>
+		<notes><![CDATA[
+[C-Bus] was possible to mount both -86 and -26 to split BGMs and SFXs (regression)
+]]></notes>
 		<info name="alt_title" value="あにまーじゃんＶ３" />
 		<info name="release" value="19930226" />
 		<part name="flop1" interface="floppy_5_25">
@@ -6276,7 +6305,6 @@ Punts directly in gameplay skipping the intro (cfr. pc8801_flop:arcus)
 		<year>1990</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
 		<notes><![CDATA[
-Intro [7220] text doesn't mask properly during intro in 24 kHz mode
 Double height Wolfteam logo in 15 kHz mode
 ]]></notes>
 		<info name="alt_title" value="アークス２ Ｓｉｌｅｎｔ Ｓｙｍｐｈｏｎｙ" />
@@ -7415,8 +7443,7 @@ Can be played with MU50 set with C/M compatibility mode
 		</part>
 	</software>
 
-	<!-- Starting in mouse mode hangs the game, but keyboard mode works -->
-	<software name="btlchess" supported="partial">
+	<software name="btlchess" supported="yes">
 		<description>Battle Chess</description>
 		<year>1990</year>
 		<publisher>パック・イン・ビデオ (Pack-in Video)</publisher>
@@ -10796,7 +10823,7 @@ Optional [AMD-98] support, uses AY1 only
 	</software>
 
 	<software name="ckrynn" supported="partial">
-		<description>Champions of Krynn</description>
+		<description>Advanced Dungeons &amp; Dragons - Champions of Krynn</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<notes><![CDATA[
@@ -11231,18 +11258,37 @@ Has optional [RS-MIDI] sound support
 		</part>
 	</software>
 
+	<!-- TODO: non-bootable .hdm version known to exist (will Abort Retry Fail when dir from MS-DOS) -->
 	<software name="chittyt" supported="no">
-		<description>Chitty Chitty Train</description>
+		<description>Chitty Chitty Train (.fdi installed hack)</description>
 		<year>1993</year>
 		<publisher>ビッツー (Bit²)</publisher>
 		<notes><![CDATA[
 Requires 3.5" floppy emulation
+Throws MSDOS.SYS error when booted from pc9821 class machines, I/O Error otherwise
 ]]></notes>
 		<info name="alt_title" value="チキチキトレイン" />
 		<info name="release" value="19930811" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="chitty chitty train (1993)(bit^2).fdi" size="1478656" crc="af527d06" sha1="53b4e459c9eab0c4573021fa6a724125e5e64a8e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chittyta" cloneof="chittyt" supported="yes">
+		<!-- Version provided by INSTAL.COM on disk -->
+		<description>Chitty Chitty Train (Ver 1.00, .hdm installed hack)</description>
+		<year>1993</year>
+		<publisher>ビッツー (Bit²)</publisher>
+		<notes><![CDATA[
+Game directory on autobootable disk
+]]></notes>
+		<info name="alt_title" value="チキチキトレイン" />
+		<info name="release" value="19930811" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="chitty chitty train fd installed.hdm" size="1261568" crc="e352d546" sha1="791be0e897981c71f49acb28fbd6bc580c4ea617" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -11836,11 +11882,17 @@ Missing [7220] text selector for choices (btanb? May just require specific keys,
 		</part>
 	</software>
 
-	<!-- Running the game from floppy doesn't work, it doesn't recognize the disks properly. Works from HDD. -->
-	<software name="civ" supported="partial">
+	<software name="civ" supported="no">
 		<description>Sid Meier's Civilization</description>
 		<year>1992</year>
 		<publisher>マイクロプローズジャパン (MicroProse Japan)</publisher>
+		<notes><![CDATA[
+Selecting new game from floppy direct boot will eventually black screen after world creation (that requires user press?) (verify)
+Booting from flop7 will "SYSTEM SHUTDOWN" no matter floppy combination
+[7220] Oddly cuts off mouse cursor when near top of screen, color clash on new game selections (verified to flicker)
+No BGM sound during gameplay (verify)
+[MIDI] MT-32 will black screen if selected when game is installed from HDD
+]]></notes>
 		<info name="alt_title" value="シヴィライゼーション" />
 		<info name="release" value="19920925" />
 		<info name="usage" value="Run INSTALL.BAT from DOS to install to HDD" />
@@ -11874,12 +11926,14 @@ Missing [7220] text selector for choices (btanb? May just require specific keys,
 				<rom name="civil5.fdi" size="1265664" crc="d415d6d9" sha1="f4940bbf3cd059646e8b99fc726654e33a2620b0" offset="0" />
 			</dataarea>
 		</part>
+		<!-- Maps data disk? -->
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="civil6.fdi" size="1265664" crc="913b2f6c" sha1="3ecd379da1afc80a7744e5ae344adf279888ca2e" offset="0" />
 			</dataarea>
 		</part>
+		<!-- Alt DOS 5.00 boot disk? -->
 		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 7"/>
 			<dataarea name="flop" size="1265664">
@@ -12246,7 +12300,7 @@ Requires [kanji] board
 	</software>
 
 	<software name="ssilblad" supported="no">
-		<description>Secret of the Silver Blades</description>
+		<description>Advanced Dungeons &amp; Dragons - Secret of the Silver Blades</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ シークレット オブ ザ シルバーブレード" />
@@ -12790,7 +12844,7 @@ Throws "E>" error with chrn=(0, 1, 1, 512) in 2dd mode
 		<notes><![CDATA[
 Uses NAX.EXE
 Draws "YM2608" with half [kanji] width on boot
-Unemulated optional [RS-MIDI]
+Unemulated optional [RS-MIDI], uses ARC_DRV.EXE
 ]]></notes>
 		<info name="release" value="199510xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -13263,7 +13317,7 @@ Game was included on extra disk with purchase of Hanaou blank floppy disk pack.
 	</software>
 
 	<software name="azurebnd" supported="yes">
-		<description>Curse of the Azure Bonds</description>
+		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds</description>
 		<year>1991</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ カース オブ アジュアボンド" />
@@ -13283,7 +13337,7 @@ Game was included on extra disk with purchase of Hanaou blank floppy disk pack.
 	</software>
 
 	<software name="azurebnda" cloneof="azurebnd" supported="yes">
-		<description>Curse of the Azure Bonds (alt)</description>
+		<description>Advanced Dungeons &amp; Dragons - Curse of the Azure Bonds (alt)</description>
 		<year>1991</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ カース オブ アジュアボンド" />
@@ -15118,7 +15172,7 @@ Is it really game like intended? [FDC] investigation required
 
 	<!-- Can't change disks, so it's not possible to save or load characters -->
 	<software name="dkkrynn" supported="no">
-		<description>Death Knights of Krynn</description>
+		<description>Advanced Dungeons &amp; Dragons - Death Knights of Krynn</description>
 		<year>1993</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ デスナイト オブ クリン" />
@@ -15891,15 +15945,14 @@ Is it really game like intended? [FDC] investigation required
 		</part>
 	</software>
 
-	<!--
-	    Doesn't recognize disk changes, but it's possible to install the game to HDD.
-	    Also, This game is supposed to play voice samples, but in MAME it just outputs a constant beep.
-	-->
 	<software name="diadrum" supported="partial">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Diadrum</description>
 		<year>1993</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
+		<notes><![CDATA[
+Opening [DAC1BIT] has low pitch on RS class
+]]></notes>
 		<info name="alt_title" value="ディアドラム" />
 		<info name="release" value="19931202" />
 		<info name="usage" value="Run INSTHD.EXE from DOS to install to HDD" />
@@ -16140,10 +16193,11 @@ During a game [mouse] clicking is too fast (skips intermediate selections)
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="alt_title" value="ディレクター物語" />
 		<info name="release" value="19880921" />
+		<!-- baddump: non-factory Ranking (assuming VICTOR should be first place at 0 pts.)-->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1086448">
-				<rom name="director monogatari (disk 1).d88" size="1086448" crc="5b45487f" sha1="e23c77fb7c41bd86f865b14f2767406ea9e1a172" offset="0" />
+				<rom name="director monogatari (disk 1).d88" size="1086448" crc="5b45487f" sha1="e23c77fb7c41bd86f865b14f2767406ea9e1a172" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -17773,7 +17827,7 @@ Couple of "Unimplemented floating point control" opcodes triggered in error.log
 
 	<software name="dragflam">
 		<!-- Origin: Neo Kobe Collection -->
-		<description>Dragons of Flame</description>
+		<description>Advanced Dungeons &amp; Dragons - Dragons of Flame</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ ドラゴン オブ フレイム" />
@@ -17871,7 +17925,7 @@ Couple of "Unimplemented floating point control" opcodes triggered in error.log
 	</software>
 
 	<software name="drgstrik">
-		<description>DragonStrike</description>
+		<description>Advanced Dungeons &amp; Dragons - DragonStrike</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ ドラゴンストライク" />
@@ -18034,13 +18088,10 @@ Couple of "Unimplemented floating point control" opcodes triggered in error.log
 		</part>
 	</software>
 
-	<software name="duel" supported="partial">
+	<software name="duel" supported="yes">
 		<description>Duel</description>
 		<year>1990</year>
 		<publisher>呉ソフトウエア工房 (KSK)</publisher>
-		<notes><![CDATA[
-[7220] bitmap not masking bottom of screen
-]]></notes>
 		<info name="alt_title" value="デュエル" />
 		<info name="release" value="19900512" />
 		<part name="flop1" interface="floppy_5_25">
@@ -18993,10 +19044,13 @@ Disk swaps doesn't work, [FDC] keeps recalibrate and sense interrupt status
 		</part>
 	</software>
 
-	<software name="emerald">
+	<software name="emerald" supported="no">
 		<description>Emerald Densetsu</description>
 		<year>1990</year>
 		<publisher>システムハウスオー！ (System House Oh!)</publisher>
+		<notes><![CDATA[
+[keyboard] becomes unresponsive after a bit of playthrough (tested both VM and RS, more prominent in latter)
+]]></notes>
 		<info name="alt_title" value="エメラルド伝説" />
 		<info name="release" value="19900618" />
 		<part name="flop1" interface="floppy_5_25">
@@ -19436,7 +19490,7 @@ Black screen, [FDC] keeps reading chrn=(3, 0, 3, 256) in 2dd mode
 
 	<!-- Doesn't recognize disk changes, so it's not possible to create the save disk -->
 	<software name="eyebehol" supported="no">
-		<description>Eye of the Beholder</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ アイ オブ ザ ビホルダー" />
@@ -19456,7 +19510,7 @@ Black screen, [FDC] keeps reading chrn=(3, 0, 3, 256) in 2dd mode
 	</software>
 
 	<software name="eyebeho2">
-		<description>Eye of the Beholder II - The Legend of Darkmoon</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder II: The Legend of Darkmoon</description>
 		<year>1993</year>
 		<publisher>カプコン (Capcom)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ アイ オブ ザ ビホルダー２ ＴＨＥ ＬＥＧＥＮＤ ＯＦ ＤＡＲＫＭＯＯＮ" />
@@ -19483,7 +19537,7 @@ Black screen, [FDC] keeps reading chrn=(3, 0, 3, 256) in 2dd mode
 
 	<!-- Works in 16-color mode, hangs in 256-color mode -->
 	<software name="eyebeho3" supported="partial">
-		<description>Eye of the Beholder III - Assault on Myth Drannor</description>
+		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder III: Assault on Myth Drannor</description>
 		<year>1994</year>
 		<publisher>ビング (Ving)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ アイ オブ ザ ビホルダー３ ＡＳＳＡＵＬＴ ＯＮ ＭＹＴＨ ＤＲＡＮＮＯＲ" />
@@ -30055,6 +30109,21 @@ Black screen, keeps hitting an empty divide by zero exception at PC=1fcb6
 		</part>
 	</software>
 
+	<software name="lemmings" supported="partial">
+		<description>Lemmings</description>
+		<year>1991</year>
+		<publisher>イマジニア (Imagineer)</publisher>
+		<notes><![CDATA[
+Heavy uses of palette raster effects (best results on pc9821)
+]]></notes>
+		<info name="alt_title" value="レミングス"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="lemmings.hdm" size="1261568" crc="1679be28" sha1="77a0c88d749b4affdc761cbefeabaa2673c05577"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lenam">
 		<description>Lenam - Sword of Legend</description>
 		<year>1990</year>
@@ -31917,12 +31986,13 @@ Cannot detect sound card on VM class (verify)
 		</part>
 	</software>
 
-	<software name="majavent">
-		<description>Majaventure - Negi Mahjong</description>
+	<software name="majavent" supported="yes">
+		<description>Majaventure - Negi Mahjong (2DD version)</description>
 		<year>1988</year>
 		<publisher>ＧＡＭＥテクノポリス (Game Technopolis)</publisher>
 		<info name="alt_title" value="まじゃべんちゃー・ねぎ麻雀" />
 		<info name="release" value="198805xx" />
+		<info name="usage" value="Needs floppy 2DD density select dip enabled, press D to start main game, A for Adventure omake game, Z to Commodore Basic" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697008">
 				<rom name="majavent.d88" size="697008" crc="d6cd827f" sha1="bd76df9f07550821c79c902dd1c3b6c3f1b9fe20" offset="0" />
@@ -31931,14 +32001,19 @@ Cannot detect sound card on VM class (verify)
 	</software>
 
 	<software name="majaventa" cloneof="majavent" supported="no">
-		<description>Majaventure - Negi Mahjong (alt format)</description>
+		<!-- Hacked for later models? -->
+		<description>Majaventure - Negi Mahjong (2HD version, unofficial?)</description>
 		<year>1988</year>
 		<publisher>ＧＡＭＥテクノポリス (Game Technopolis)</publisher>
+		<notes><![CDATA[
+[keyboard] inputs doesn't work on intended VM class
+]]></notes>
 		<info name="alt_title" value="まじゃべんちゃー・ねぎ麻雀" />
 		<info name="release" value="198805xx" />
+		<!-- baddump: non-factory hi-scores, much higher than parent set, first entry blank -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="766972">
-				<rom name="disk01.fdd" size="766972" crc="afcb74bb" sha1="38dd55ac99349089f7e467a4c20847f41456b4fc" offset="0" />
+				<rom name="disk01.fdd" size="766972" crc="afcb74bb" sha1="38dd55ac99349089f7e467a4c20847f41456b4fc" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -32601,7 +32676,7 @@ Optional [AMD-98] support, needs PIT for BGM
 		</part>
 	</software>
 
-	<software name="lavaleur" supported="no">
+	<software name="lavaleur" supported="yes">
 		<description>Mashou Denki La Valeur</description>
 		<year>1989</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
@@ -32613,24 +32688,28 @@ Optional [AMD-98] support, needs PIT for BGM
 				<rom name="mashou denki la valeur_diska.fdd" size="742396" crc="94e67f58" sha1="d34bc79f3747644192bceb167ce9c15f9c15e279" offset="0" />
 			</dataarea>
 		</part>
+		<!-- baddump: starts with predetermined Alan character. Is it supposed to have a bootable user disk creation process? -->
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario"/>
-			<dataarea name="flop" size="667644">
-				<rom name="mashou denki la valeur_scenario.fdd" size="667644" crc="262be88f" sha1="e3f595c9354a59dd51d24cdfa98f9cf741cecb64" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="User"/>
 			<dataarea name="flop" size="667644">
 				<rom name="mashou denki la valeur_user.fdd" size="667644" crc="391f95aa" sha1="eb12c8d509437b0ddbc81856fc40233f365efe23" offset="0" status="baddump" />
 			</dataarea>
 		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Scenario"/>
+			<dataarea name="flop" size="667644">
+				<rom name="mashou denki la valeur_scenario.fdd" size="667644" crc="262be88f" sha1="e3f595c9354a59dd51d24cdfa98f9cf741cecb64" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
-	<software name="mastmons" supported="no">
+	<software name="mastmons" supported="partial">
 		<description>Master of Monsters</description>
 		<year>1989</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Puts a TSR [mouse] driver during DOS boot, doesn't work in game? (verify)
+]]></notes>
 		<info name="alt_title" value="マスター・オブ・モンスターズ" />
 		<info name="release" value="198909xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -33417,17 +33496,6 @@ Optional [AMD-98] support, needs PIT for BGM
 		</part>
 	</software>
 
-	<software name="micat">
-		<description>Micat</description>
-		<year>1992</year>
-		<publisher>マイクロコア (Micro Core)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="micat.fdi" size="1265664" crc="f5455088" sha1="0ff54044078e12fcfa4681862fba87a6433d94f9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="michiyo">
 		<description>Michiyo Dreamy - The Quiz Master</description>
 		<year>1993</year>
@@ -33895,14 +33963,14 @@ Optional [AMD-98] support, needs PIT for BGM
 		<year>1986</year>
 		<publisher>アポロテクニカ (Apollo Technica)</publisher>
 		<notes><![CDATA[
-Repeats upper row on bottom during gameplay
-Ranking screen blinks cursor only on left of a (odd address) [kanji] LR. Reference shows this with underline cursor
+Verify blinking on ranking screen
 ]]></notes>
 		<info name="alt_title" value="マイティーヘッド" />
 		<info name="release" value="198608xx" />
+		<!-- baddump: has non-factory ranking scores -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697008">
-				<rom name="mighty head (apollo technica).d88" size="697008" crc="576b4eaf" sha1="9c08b59f1b69d6113dec2bce063ffe67c2e364b7" offset="0" />
+				<rom name="mighty head (apollo technica).d88" size="697008" crc="576b4eaf" sha1="9c08b59f1b69d6113dec2bce063ffe67c2e364b7" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -35832,18 +35900,22 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>Nihon Juudan Cessna Flight</description>
 		<year>1988</year>
 		<publisher>コムパック (Compac)</publisher>
+		<notes><![CDATA[
+Autoboot fails
+Throws disk errors if launched from DOS
+]]></notes>
 		<info name="alt_title" value="日本縦断セスナ・フライト" />
 		<info name="release" value="198806xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="disk_a.d88" size="1281968" crc="71d15a79" sha1="07b919fb53bf822f5b28242410a651de01f89fc5" offset="0" />
+				<rom name="disk_a.d88" size="1281968" crc="71d15a79" sha1="07b919fb53bf822f5b28242410a651de01f89fc5" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="disk_b.d88" size="1281968" crc="d8fd0be3" sha1="577dff7a924267ebbb9d1a7919f11b370d70df69" offset="0" />
+				<rom name="disk_b.d88" size="1281968" crc="d8fd0be3" sha1="577dff7a924267ebbb9d1a7919f11b370d70df69" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -36747,7 +36819,7 @@ Requires [kanji] board, currently missing from vanilla class (use VM)
 	</software>
 
 	<software name="okumanc" supported="no">
-		<description>Okuman Chouja</description>
+		<description>Okumanchouja</description>
 		<year>1988</year>
 		<publisher>コスモス・コンピュータ (Cosmos Computer)</publisher>
 		<info name="alt_title" value="億万長者" />
@@ -36759,7 +36831,7 @@ Requires [kanji] board, currently missing from vanilla class (use VM)
 	</software>
 
 	<software name="okumanc2">
-		<description>Okuman Chouja II</description>
+		<description>Okumanchouja II</description>
 		<year>1990</year>
 		<publisher>コスモス・コンピュータ (Cosmos Computer)</publisher>
 		<info name="alt_title" value="億万長者２" />
@@ -36779,8 +36851,8 @@ Requires [kanji] board, currently missing from vanilla class (use VM)
 	</software>
 
 	<software name="okumanc3">
-		<description>Okuman Chouja III</description>
-		<year>1990</year>
+		<description>Okumanchouja III</description>
+		<year>1992</year>
 		<publisher>コスモス・コンピュータ (Cosmos Computer)</publisher>
 		<info name="alt_title" value="億万長者３" />
 		<info name="release" value="19921225" />
@@ -38286,7 +38358,7 @@ Requires [kanji] board, currently missing from vanilla class (use VM)
 	</software>
 
 	<software name="pooldark">
-		<description>Pools of Darkness</description>
+		<description>Advanced Dungeons &amp; Dragons - Pools of Darkness</description>
 		<year>1993</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ プールズ オブ ダークネス" />
@@ -42168,6 +42240,10 @@ Optional [AMD-98] support
 		<description>Sa・Zi・Ri</description>
 		<year>1988</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<notes><![CDATA[
+Randomly soft reset during stage 1
+Has strips of (logic) tile garbage during stage 2, [FDC] copy protection failing?
+]]></notes>
 		<info name="alt_title" value="紫醜罹 サジリ" />
 		<info name="release" value="198804xx" />
 		<part name="flop1" interface="floppy_5_25">
@@ -43636,6 +43712,18 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt, tests
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="s2sp_b.fdi" size="1265664" crc="e676de32" sha1="e111d084c911fec8bde2d4b5891616e4345753cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shikinjo">
+		<description>Shikinjou</description>
+		<year>1990</year>
+		<publisher>スキャップトラスト (Scap Trust)</publisher>
+		<info name="alt_title" value="紫禁城"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="shikinjou.hdm" size="1261568" crc="b409b669" sha1="9b303f6c7b1bacef3d4165db6693093039a71555"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45148,12 +45236,12 @@ OPN channel 1 keeps repeating on deaths (verify)
 		</part>
 	</software>
 
-	<software name="spindiz2" supported="no">
+	<software name="spindiz2" supported="partial">
 		<description>Spindizzy II</description>
 		<year>1991</year>
 		<publisher>アルシスソフト (Arsys Software)</publisher>
 		<notes><![CDATA[
-Hangs on new game after selecting any stage, waits for an irq to happen
+Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="スピンディジー２" />
 		<info name="release" value="19910927" />
@@ -54397,34 +54485,33 @@ Optional [AMD-98] support
 	</software>
 
 
-<!-- !(bootleg) Game Packs -->
+<!-- !(bootleg? cover disk?) Game Packs -->
+<!-- Most of this stuff was actually released on tape only -->
 
-<!--
-
-PC-9801 Game Pack Vol.1
-
-ジャン狂                  HUDSON
-温泉みみず芸者
-女子大生プライベート      Falcom
-FLAPPY                    dB-SOFT
-RADER SNAKY
-７ならべ
-細見オセロ
-プロフェッショナル麻雀    Chatnoir
-THE COCKPIT               Ｉ／Ｏ
-幻魔大戦                  PONYCA
-VALIANT                   ALU/FLINT
-MARIO BROS. Special       HUDSON/NINTENDO
-POLAR STAR
-BACK GAMMON
-CHESS
-DOOR DOOR                 ENIX
-
--->
-	<software name="gamepac1" supported="no">
-		<description>PC9801 Game Pack Vol. 1</description>
+	<software name="gamepac1" supported="partial">
+		<description>PC-9801 Game Pack Vol. 1</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
+		<notes><![CDATA[
+Requires [kanji] adapter for menu, TBD for vanilla class
+[keyboard] may become unresponsive in some of these
+01:Flappy (dB-Soft)
+02:Professional Mahjong プロフェッショナル麻雀 (Chatnoir)
+03:Valiant (Alu/Flint)
+04:Backgammon バックギャモン (Tecno Soft)
+05:7 Narabe ７ならべ (Tsukumo/Sailsoft)
+06:The Cockpit v2.0 (I/O)
+07:Mario Bros. Special (Hudson/Nintendo)
+08:Chess チェス (S.Ishitobi)
+09:Othello Wars 細見オセロ (<uncredited>)
+10:Genma Taisen 幻魔大戦 (Pony Canyon)
+11:Polar Star III (Carry Lab)
+12:Door Door (Enix)
+13:Jong Kyo ジャン狂 (Hudson Soft)
+14:Onsen Mimizu Geisha 温泉みみず芸者 (CSK)
+15:Joshidai-sei Private 女子大生プライベート (Falcom)
+16:Radar Snaky (Carry Lab) - [keyboard] skips title screen first time around
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089808">
 				<rom name="pack1.nfd" size="1089808" crc="5a99e1fa" sha1="65aa7101e8a63abef5ebfb215ff1ddf3cdbf7e86" offset="0" />
@@ -54432,60 +54519,59 @@ DOOR DOOR                 ENIX
 		</part>
 	</software>
 
-
-<!--
-
-PC-9801 Game Pack Vol.2
-
-INSECTの復讐          Ｉ／Ｏ
-BELICOSER             Ｉ／Ｏ
-ギガンテス            Ｉ／Ｏ
-HOVER ATTACK          Ｉ／Ｏ
-FRUITS FIELD          Ｐｉｏ
-ザ・麻雀
-オールキャスト麻雀
-GALAGA                DEMPA
-王将                  Carry Lab.
-MOON BALL             ALU/FLINT
-上田オセロ
-MONOPOLY
-
--->
-	<software name="gamepac2" supported="no">
-		<description>PC9801 Game Pack Vol. 2</description>
+	<software name="gamepac2" supported="partial">
+		<description>PC-9801 Game Pack Vol. 2</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
+		<notes><![CDATA[
+Doesn't boot on vanilla class (verify), notes use VM class
+[keyboard] may become unresponsive in some of these
+01:"The Strategic Bomber Belicoser." ベリコーザ (I/O) - Runs too fast for VM, missing player bitmap GFX
+02:Fruits Fields フルーツフィールド (Pio)
+03:Galaga ギャラガ (Dempa?) - throws illegal function call in 20
+04:Gigantes ギガンテス (I/O) - Doesn't boot
+05:Hover Attack ホバーアタック (I/O)
+06:Insect no Fukushuu "Insect Wars" INSECTの復讐 (I/O) - Runs too fast for VM
+07:All Cast Yonin Mahjong オールキャスト四人麻雀 (<uncredited>) - no bitmap GFXs in gameplay
+08:Monopoly "Multinational Company Game" (<uncredited>)
+09:Oushou 王将 (Carry Lab)
+10:Ueda no Othello 上田のオセロ (<uncredited>) - throws illegal function call 1070, hangs in demonstration if NOP-ed
+11:The Mahjong 98 ザ・麻雀98 (<uncredited>)
+12:Moon Ball (Alu/Flint) - Hangs in gameplay
+]]></notes>
+		<!-- baddump: some of the bugs above are suspicious -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089808">
-				<rom name="pack2.nfd" size="1089808" crc="e648dba1" sha1="ccd4e733dd3880d9687059fc98d8344438449813" offset="0" />
+				<rom name="pack2.nfd" size="1089808" crc="e648dba1" sha1="ccd4e733dd3880d9687059fc98d8344438449813" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
-
-<!--
-
-PC-9801 Game Pack Vol.3
-
-CROSS FIGHT          Ｉ／Ｏ
-からくり忍者屋敷     Ｉ／Ｏ
-F-15 EAGLE           Ｉ／Ｏ
-団地妻の誘惑         KOEI
-倉庫番               THINKING RABBIT
-芸者
-PUZZLE-16
-将棋名人             Apollo Technica
-花札狂               HUDSON
-グラフィック野球拳
-セーラー服と野球拳
-JELDA                Carry Lab.
-MARS
-
--->
-	<software name="gamepac3" supported="no">
-		<description>PC9801 Game Pack Vol. 3</description>
+	<software name="gamepac3" supported="partial">
+		<description>PC-9801 Game Pack Vol. 3</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
+		<notes><![CDATA[
+Requires [kanji] adapter for menu, TBD for vanilla class
+[keyboard] may become unresponsive in some of these
+04 and 10 shows hacked instructions in Malaysian
+01:Danchi Tsuma no Yuuwaku 団地妻の誘惑 (Koei)
+02:"The Geisha Game" 芸者 (<uncredited>)
+03:Hanafuda Kyo 花札狂 (Hudson)
+04:Sailor-fuku to Yakyuu Ken "The Yakyuken" セーラー服と野球拳 (<uncredited>)
+05:Karakuri Ninja Yashiki からくり忍者屋敷 (I/O)
+06:Puzzle-16 (Login)
+07:Graphic Yakyuu Ken グラフィック野球拳 (<uncredited>)
+08:Shougi Meijin 将棋名人 (Apollo Technica)
+09:Jelda ジェルダ (Carry Lab)
+10:Soukoban "Angkut Barang" 倉庫番 (Soft Office/Thinking Rabbit) - [GRCG] clears dots when players pass on them
+11:Soukoban 2 倉庫番2 (Soft Office/Thinking Rabbit) - [GRCG] clears dots when players pass on them
+12:Soukoban 3 倉庫番3 (Soft Office/Thinking Rabbit) - [GRCG] clears dots when players pass on them
+13:F-15 Eagle F-15 イーグル (I/O) - [7220] flickers every other frame (verify)
+14:Mars "Terra Incoginta (sic) Mars - The Bringer of Wars" (<uncredited>) - title screen scroll doesn't fine tune text, stray characters on bottom left, starfield has bogus top row (verify)
+15:Cross Fight (I/O) - gameplay transitions doesn't fine tune text (verify)
+16:Flight Simulator フライトシミュレーター (Carry Lab?)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089808">
 				<rom name="pack3.nfd" size="1089808" crc="e8bada18" sha1="fc7ebccbd681d6d84405f5f2e46a9ffbd4187205" offset="0" />
@@ -54493,24 +54579,21 @@ MARS
 		</part>
 	</software>
 
-
-<!--
-
-PC-9801 Game Pack Vol.4
-
-HIROTON WARS            Carry Lab.
-SPACE BEE
-Starlight ADV.          Carry Lab.
-The GOLF
-BEST GOLF
-SPACE EMPIRE
-株式シミュレーション
-
--->
-	<software name="gamepac4" supported="no">
-		<description>PC9801 Game Pack Vol. 4</description>
+	<software name="gamepac4" supported="partial">
+		<description>PC-9801 Game Pack Vol. 4</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
+		<notes><![CDATA[
+Doesn't boot on vanilla class (verify), notes use VM class
+[keyboard] may become unresponsive in some of these
+01:Hiroton Wars (Carry Lab)
+02:Space Bee (<uncredited>) - Too fast on VM class
+03:Starlight Adventure (Carry Lab)
+04:The Golf (ASCII?)
+05:Best Golf (Micro Cabin)
+06:Space Empire (A. Kinoshita/T. Tsuruoka)
+07:Kabushiki Simulation 株式シミュレーション (<uncredited>)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1089808">
 				<rom name="pack4.nfd" size="1089808" crc="2f849548" sha1="75f734f7c52027f769e2e98f32bd86daf943207c" offset="0" />
@@ -57831,10 +57914,13 @@ Has [GS] and [CD] options, latter requiring a redbook?
 		</part>
 	</software>
 
-	<software name="gakubaku" supported="no">
+	<software name="gakubaku" supported="partial">
 		<description>Gakuen Bakuretsu Tenkousei!</description>
 		<year>1995</year>
 		<publisher>ジックス (ZyX)</publisher>
+		<notes><![CDATA[
+Unemulated [MIDI] LAPC-N option
+]]></notes>
 		<info name="alt_title" value="学園爆裂転校生！" />
 		<info name="release" value="19951020" />
 		<part name="flop1" interface="floppy_5_25">
@@ -57861,8 +57947,13 @@ Has [GS] and [CD] options, latter requiring a redbook?
 		<description>Gakuen Senshi Sailor Fighter</description>
 		<year>1994</year>
 		<publisher>ピーチソフト (Peach Soft)</publisher>
+		<notes><![CDATA[
+Hangs if [PC9801-86] is mounted, no BGM is played
+[DAC1BIT] intended for PC9821? (verify)
+]]></notes>
 		<info name="alt_title" value="学園戦士セーラーファイター" />
 		<info name="release" value="19940415" />
+		<info name="usage" value="Requires DOS HDD install, launch with SFM.BAT with Disk A and B in drives" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="941052">
@@ -59070,7 +59161,7 @@ Has [GS] and [CD] options, latter requiring a redbook?
 		</part>
 	</software>
 
-	<software name="joker2" supported="no">
+	<software name="joker2" supported="yes">
 		<description>Joker II</description>
 		<year>1992</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -61902,6 +61993,11 @@ Untested on [HDD] install
 		<description>Steam-Heart's</description>
 		<year>1994</year>
 		<publisher>戯画 (Giga)</publisher>
+		<notes><![CDATA[
+Awful [PC9801-86] mixing: channel 0 submerges everything else
+Can't make [MIDI] GS/GS2/MT-32 to work thru mu50
+Not extensively tested
+]]></notes>
 		<info name="alt_title" value="スチームハーツ" />
 		<info name="release" value="19940315" />
 		<part name="flop1" interface="floppy_5_25">
@@ -65673,7 +65769,7 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 		<year>199?</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<notes><![CDATA[
-Non-working 3.5" floppy
+Requires 3.5" floppy emulation
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -65684,7 +65780,7 @@ Non-working 3.5" floppy
 
 	<software name="camelzoo" supported="yes">
 		<description>Camel-Zoo</description>
-		<year>19??</year>
+		<year>1993?</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -65693,11 +65789,13 @@ Non-working 3.5" floppy
 		</part>
 	</software>
 
-	<!-- This game is supposed to play sound effects through the beeper, but in MAME it just outputs a constant beep -->
 	<software name="car2gp" supported="partial">
 		<description>Car II Grand Prix</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT] for sound (verify)
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="car 2 grand prix (bio 100).fdi" size="1265664" crc="d60d66eb" sha1="27f3015f11157d9a631f2386b49c45b9a3d62133" offset="0" />
@@ -65705,14 +65803,17 @@ Non-working 3.5" floppy
 		</part>
 	</software>
 
-	<!-- This game is supposed to play sound effects through the beeper, but in MAME it just outputs a constant beep -->
 	<software name="carax92" supported="partial">
 		<description>Carax 92</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT] for sound (verify)
+]]></notes>
+		<!-- baddump: has non-factory hi-score entries -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="carax'92 (bio100).fdi" size="1265664" crc="fcc52afb" sha1="1dd507301005d9287a5e53e1055d00ac9b1d66dd" offset="0" />
+				<rom name="carax'92 (bio100).fdi" size="1265664" crc="fcc52afb" sha1="1dd507301005d9287a5e53e1055d00ac9b1d66dd" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -65721,6 +65822,9 @@ Non-working 3.5" floppy
 		<description>Cray Shoot</description>
 		<year>19??</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Requires 3.5" floppy emulation
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="cray shoot (bio 100).fdi" size="1478656" crc="e37e85d7" sha1="0deb3e1eaa4e917c4110c9901a35a17f12919603" offset="0" />
@@ -65732,6 +65836,9 @@ Non-working 3.5" floppy
 		<description>Dynamo</description>
 		<year>1991</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Requires 3.5" floppy emulation
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1461756">
 				<rom name="dynamo (1991)(marka project).fdd" size="1461756" crc="c0935bcc" sha1="78c52f0ee6c85a3504ff37b71a2a48d2f9754781" offset="0" />
@@ -65743,6 +65850,9 @@ Non-working 3.5" floppy
 		<description>F1 Grandprix</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Requires 3.5" floppy emulation
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="f1 grandprix (1992)(bio 100).fdi" size="1478656" crc="8fa46fda" sha1="146ee288486174095297be074feb3d1007ec0de4" offset="0" />
@@ -65750,10 +65860,14 @@ Non-working 3.5" floppy
 		</part>
 	</software>
 
-	<software name="finalty">
-		<description>Finalty - Super Depth 2</description>
+	<software name="finalty" supported="yes">
+		<!-- "Superdepth 2 Finalty" displayed on title -->
+		<description>Finalty - Super Depth 2 (Test Version)</description>
 		<year>1995</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT] for sound
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="superdepth 2 finalty (bio 100).fdi" size="1265664" crc="299724f1" sha1="21849d8a9f2bc71a59d5f9d32fcff6bde22369ee" offset="0" />
@@ -65780,6 +65894,9 @@ Uses [DAC1BIT] only for sound
 		<description>Gemini Snake</description>
 		<year>1990</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
+		<notes><![CDATA[
+Requires 3.5" floppy emulation
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="gemini snake (1990)(bio 100).fdi" size="1478656" crc="2a28bfa9" sha1="8b20b04f86210b16683048b8a9a34b873b342b9d" offset="0" />
@@ -65787,8 +65904,9 @@ Uses [DAC1BIT] only for sound
 		</part>
 	</software>
 
-	<software name="goggle2">
-		<description>Goggle-II</description>
+	<software name="goggle2" supported="yes">
+		<!-- "The Ptolemaic Game" -->
+		<description>Goggle-II (5.25&quot; Disk)</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -65798,8 +65916,8 @@ Uses [DAC1BIT] only for sound
 		</part>
 	</software>
 
-	<software name="goggle2a" cloneof="goggle2">
-		<description>Goggle-II (alt)</description>
+	<software name="goggle2a" cloneof="goggle2" supported="yes">
+		<description>Goggle-II (3.5&quot; Disk)</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -66511,14 +66629,16 @@ Uses [DAC1BIT]
 		</part>
 	</software>
 
-	<!-- Crashes after the title screen with "初期設定データがありません" (initial settings data not present) error -->
 	<software name="ambcaptn" supported="no">
 		<description>The Ambition of Captain</description>
-		<year>19??</year>
+		<year>1992?</year>
 		<publisher>&lt;unofficial&gt;</publisher>
+		<notes><![CDATA[
+Crashes after the title screen with "初期設定データがありません" (initial settings data not present) error
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="the_ambition_of_captain.fdi" size="1265664" crc="4d1eed79" sha1="53956e9de710603996ae3d62191407acb4da50a6" offset="0" />
+				<rom name="the_ambition_of_captain.fdi" size="1265664" crc="4d1eed79" sha1="53956e9de710603996ae3d62191407acb4da50a6" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

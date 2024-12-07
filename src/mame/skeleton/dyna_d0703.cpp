@@ -180,4 +180,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2009, dynasty, 0, dyna_d0703, dynasty, dyna_d0703_state, empty_init, ROT0, "Dyna", "Dynasty (Ver. 1.02)", MACHINE_IS_SKELETON )
+GAME( 2009, dynasty, 0, dyna_d0703, dynasty, dyna_d0703_state, empty_init, ROT0, "Dyna", "Dynasty (2009, Ver. 1.02)", MACHINE_IS_SKELETON )

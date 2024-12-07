@@ -2,9 +2,15 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-  Heathkit Write enable pull
+  Heathkit Write Enable pull up resistor
 
-    On
+    The H89 has a 1k floppy RAM which can be write protected. With the original
+    equipment, the hard-sector controller card (H-88-1) could control the memory.
+    In later systems, Heath/Zenith wanted to provide a system with only the soft-
+    sectored controller (Z-89-37), but needed to allow writing to the floppy RAM.
+    Heath provided a pullup resistor with the new controller, which allowed the
+    memory to always be write enabled, this was installed on slot P506. Without
+    this, HDOS is not bootable on Z-89-37 soft-sectored controller.
 
 ****************************************************************************/
 

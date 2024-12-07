@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
+#ifndef MAME_CPU_E132XS_E132XSDRC_OPS_HXX
+#define MAME_CPU_E132XS_E132XSDRC_OPS_HXX
+
+#pragma once
 
 #include "e132xs.h"
 
@@ -5207,3 +5211,4 @@ void hyperstone_device::generate_do(drcuml_block &block, compiler_state &compile
 	fatalerror(" ");
 }
 
+#endif // MAME_CPU_E132XS_E132XSDRC_OPS_HXX

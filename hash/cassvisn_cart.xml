@@ -1,0 +1,215 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<!--
+The following games exist for this platform
+
+1 Yosaku
+2 Baseball
+3 Galaxian
+4 Big Sports 12
+5 Battle Vader
+6 PakPak Monster
+7 New Baseball
+8 Monster Mansion
+9 Astro Command
+10 Grand Champion*
+11 Monster Block
+12 Elevator Panic
+
+* = not dumped
+
+-->
+
+<!--
+Note on PRG size (from CPU documentation)
+
+Physically, 128 * 15 * 12 = 23,040 bits
+Logically, 127 * 15 * 12 = 22,860 bits (as final word of each page is inaccessible by the CPU)
+
+the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 15 * (12+4) 
+-->
+
+<softwarelist name="cassvisn_cart" description="Epoch Cassette Vision cartridges">
+
+	<software name="yosaku" supported="no">
+		<description>Yosaku</description>
+		<year>1981</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="きこりの与作"/> <!-- Kikori no Yosaku -->
+		<info name="release" value="19810730"/>
+		<part name="cart" interface="cassvisn_cart">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
+				<rom name="d777c005prog.s01" size="0xf00" crc="f917d2f0" sha1="b26baf2fd9b961b5a0e0475dfac93c18bd54cc4d"/>
+			</dataarea>			
+			<dataarea name="pat" size="0x4d0">
+				<rom name="d777c005_pat.s01" size="0x4d0" crc="bf085553" sha1="321262b6dd67789e03db8f03160cb1819529f43c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseball" supported="no">
+		<description>Baseball</description>
+		<year>1981</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ベースボール"/>
+		<info name="release" value="19810730"/>
+		<part name="cart" interface="cassvisn_cart">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
+				<rom name="d778c_prog.s01" size="0xf00" crc="34127969" sha1="56528b54720b844a6275d219fb78e51caf06f777"/>
+			</dataarea>
+			<dataarea name="pat" size="0x4d0">
+				<rom name="d778c_pat.s01" size="0x4d0" crc="603fa141" sha1="e30f5ce85d8e2419025d52a7c733be2c127cc24f"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- PCB is silkscreened 006, ROM here is 007 is there an undumped earlier version? -->
+	<software name="galaxian" supported="no">
+		<description>Galaxian</description>
+		<year>1981</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ギャラクシアン"/>
+		<info name="release" value="19810810"/>
+		<part name="cart" interface="cassvisn_cart">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
+				<rom name="d777c007prog.s01" size="0xf00" crc="538c13d3" sha1="537287e63b311caa281d8c6456f9cbe2eaebb9e7"/>
+			</dataarea>				
+			<dataarea name="pat" size="0x4d0">
+				<rom name="d777c007_pat.s01" size="0x4d0" crc="d343eca4" sha1="e8f0312de0d7f0934a66192c1aaa2c802532b021"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bigspt12" supported="no">
+		<description>Big Sports 12</description>
+		<year>1982</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ビッグスポーツ12"/>
+		<info name="release" value="19820615"/>
+		<part name="cart" interface="cassvisn_cart">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
+				<rom name="d777c004prog.s01" size="0xf00" crc="030fc0d2" sha1="b1efe8ff1bc51082502253e63721e656ee75edda"/>
+			</dataarea>		
+			<dataarea name="pat" size="0x4d0">
+				<rom name="d777c004_pat.s01" size="0x4d0" crc="7df5eb39" sha1="c59f6febf5f51eebc0cc8d288df6b5319510ecbf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PCB is skilscreened TV Vader & Yosaku, is there also a version of Yosaku using a D774C? -->
+	<software name="btlvader" supported="no">
+		<description>Battle Vader</description>
+		<year>1982</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="バトルヘーダー"/>
+		<info name="release" value="19820303"/>
+		<part name="cart" interface="cassvisn_cart">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
+				<rom name="d774cprog.s01" size="0xf00" crc="2bbe734f" sha1="04f2b6003b41bad2d246bd2e912887fdc77520c4"/>
+			</dataarea>
+			<dataarea name="pat" size="0x4d0">
+				<rom name="d774c_pat.s01" size="0x4d0" crc="5efbc1f4" sha1="1c5774113c554e26e8d0b7002d2f7b9d79107c82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pakpak" supported="no">
+		<description>PakPak Monster</description>
+		<year>1982</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="パクパクモンスター"/>
+		<info name="release" value="19820713"/>
+		<part name="cart" interface="cassvisn_cart">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
+				<rom name="d777c008prog.s01" size="0xf00" crc="254127d5" sha1="1217542ba02d84eeb0fad7b271a188ed2737fa71"/>
+			</dataarea>
+			<dataarea name="pat" size="0x4d0">
+				<rom name="d777c008_pat.s01" size="0x4d0" crc="e17f5d04" sha1="4393b21d3ef4e98ebf8d25ffb9b3f287fbbb23cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbasebal" supported="no">
+		<description>New Baseball</description>
+		<year>1982</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="ニューベースボール"/>
+		<info name="release" value="19820615"/>
+		<part name="cart" interface="cassvisn_cart">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
+				<rom name="d777c002prog.s01" size="0xf00" crc="65dae0cb" sha1="468ec1869235e96da2374f7a165d1d9ca96f3044"/>
+			</dataarea>
+			<dataarea name="pat" size="0x4d0">
+				<rom name="d777c002_pat.s01" size="0x4d0" crc="434209f8" sha1="e783cb265618c598ad614bf29c833f3e47ee6487"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monstrmn" supported="no">
+		<description>Monster Mansion</description>
+		<year>1982</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="モンスターマンション"/>
+		<info name="release" value="19821007"/>
+		<part name="cart" interface="cassvisn_cart">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
+				<rom name="d777c009prog.s01" size="0xf00" crc="e453a00c" sha1="7f3c20653c8f6168d17cad40eac5926e6e9bb7b0"/>
+			</dataarea>
+			<dataarea name="pat" size="0x4d0">
+				<rom name="d777c009_pat.s01" size="0x4d0" crc="75deffbd" sha1="4f4c25fa9f96a345f7128ff0b52de315117da549"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrocmd" supported="no">
+		<description>Astro Command</description>
+		<year>1982</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="アストロコマンド"/>
+		<info name="release" value="19820803"/>
+		<part name="cart" interface="cassvisn_cart">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
+				<rom name="d777c010prog.s01" size="0xf00" crc="2691f5ce" sha1="f5510e139c6bda266450d3feaffe073374608b08"/>
+			</dataarea>
+			<dataarea name="pat" size="0x4d0">
+				<rom name="d777c010_pat.s01" size="0x4d0" crc="8b0c00bd" sha1="6fc01434fd92172eeaa7600742525ed69ecb90c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monstrbk" supported="no">
+		<description>Monster Block</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="モンスターブロック"/>
+		<info name="release" value="19840316"/>
+		<part name="cart" interface="cassvisn_cart">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
+				<rom name="d777c013prog.s01" size="0xf00" crc="81903844" sha1="0fbccdb42c245ad62b14041256df0f33e83bc32a"/>
+			</dataarea>
+			<dataarea name="pat" size="0x4d0">
+				<rom name="d777c013_pat.s01" size="0x4d0" crc="abf87caa" sha1="dd629bd43bea70ece9f9cd25b70eeef1caf72828"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elvpanic" supported="no">
+		<description>Elevator Panic</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<info name="alt_title" value="エレベーターパニック"/>
+		<info name="release" value="19840801"/>
+		<part name="cart" interface="cassvisn_cart">
+			<dataarea name="prg" width="16" endianness="big" size="0xf00">
+				<rom name="d777c015prog.s01" size="0xf00" crc="709002f2" sha1="d88213dfcac99e303a34a0ad0561bf9242279873"/>
+			</dataarea>
+			<dataarea name="pat" size="0x4d0">
+				<rom name="d777c015_pat.s01" size="0x4d0" crc="51654eb2" sha1="e5e602a7c5dd2725b67235d401203ddd398bee9b"/>
+			</dataarea>
+		</part>
+	</software>
+	
+</softwarelist>

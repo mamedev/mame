@@ -22,8 +22,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	[[maybe_unused]] void pokey_w(offs_t offset, uint8_t data);
-
 	std::unique_ptr<int16_t[]> m_vol_lookup;
 
 	int16_t m_vol_crash[16];

@@ -4989,7 +4989,7 @@ ROM_START( hotdp )
 	ROM_LOAD32_WORD("tgp5.23", 0x1000002, 0x400000, CRC(29f311f3) SHA1(2f89767aaefeb2650091b37c4d505701681bb375) )
 
 	ROM_REGION( 0x1000000, "textures", 0 ) // Textures, Flash ROM modules instead if DIP ROMs
-	ROM_LOAD32_WORD("tex1.27", 0x0000000, 0x400000, BAD_DUMP CRC(86ef3ee4) SHA1(8ad2aa98d94e9a4f1abb61a02aba95064e533a61) ) // one of flash ROMs had broken most significant address pin, dump contains only half of even-bytes data mirrored 2x, correct sum should be 28DA
+	ROM_LOAD32_WORD("tex1.27", 0x0000000, 0x400000, CRC(eea00bdf) SHA1(5e04c19b544c6483252adaba3c92080d4750fde0) )
 	ROM_LOAD32_WORD("tex0.25", 0x0000002, 0x400000, CRC(fb10366a) SHA1(189389f84fa5f04c586953c54254f7bd09dd8d92) )
 	ROM_LOAD32_WORD("tex3.28", 0x0800000, 0x400000, CRC(9a61d7e8) SHA1(d9a563f74e485df5bdf149afaed69811b5536712) )
 	ROM_LOAD32_WORD("tex2.26", 0x0800002, 0x400000, CRC(84ec2923) SHA1(daea23864fbc48c14177e77cd783f73621472708) )

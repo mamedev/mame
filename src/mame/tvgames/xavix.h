@@ -750,6 +750,25 @@ private:
 	uint8_t tam_anport3_r() { return m_mouse1y->read()^0x7f; }
 };
 
+class xavix_tom_tvho_state : public xavix_state
+{
+public:
+	xavix_tom_tvho_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+	{ }
+
+	void xavix_tom_tvho(machine_config &config);
+
+private:
+
+private:
+	uint8_t tvho_anport0_r() { return m_mouse0x->read()^0x7f; }
+	uint8_t tvho_anport1_r() { return m_mouse0y->read()^0x7f; }
+	uint8_t tvho_anport2_r() { return m_mouse1x->read()^0x7f; }
+	uint8_t tvho_anport3_r() { return m_mouse1y->read()^0x7f; }
+};
+
+
 class xavix_mtrk_state : public xavix_state
 {
 public:

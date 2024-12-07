@@ -128,11 +128,17 @@ SCN2672_DRAW_CHARACTER_MEMBER(wy85_state::draw_character)
 	}
 
 	u8 lc = m_lc + (m_clr_rb ? 0 : linecount);
-	u16 a = bitswap<2>(attrcode, 5, 6) << 11 | ((charcode & 0x7f) << 4) | (lc & 0xf);
-	u16 c = BIT(attrcode, 3) && (lc & 9) == 9 ? 0x3ff : a >= 0x1800 ? m_fontram[a - 0x1800] << 2 : m_chargen[a] << 2;
-
 	rgb_t fg = !BIT(attrcode, 1) || (BIT(attrcode, 4) && blink) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
 	bool inv = (BIT(attrcode, 2) != cursor) == m_tru_inv;
+	if (BIT(attrcode, 3) && (lc & 9) == 9)
+	{
+		std::fill_n(&bitmap.pix(y, x), 10, inv ? rgb_t::black() : fg);
+		return;
+	}
+
+	u16 a = bitswap<2>(attrcode, 5, 6) << 11 | ((charcode & 0x7f) << 4) | (lc & 0xf);
+	u16 c = a >= 0x1800 ? m_fontram[a - 0x1800] << 2 : m_chargen[a] << 2;
+
 	if (inv && BIT(c, 2))
 		c |= 3;
 	if (BIT(attrcode, 0, 2) == 3)

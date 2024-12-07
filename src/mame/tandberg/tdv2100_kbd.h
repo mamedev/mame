@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_TANDBERG_TDV2100KBD_H
-#define MAME_TANDBERG_TDV2100KBD_H
+#ifndef MAME_TANDBERG_TDV2100_KBD_H
+#define MAME_TANDBERG_TDV2100_KBD_H
 
 #pragma once
 
@@ -83,4 +83,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TANDBERG_TDV2100_KEYBOARD, tandberg_tdv2100_keyboard_device)
 
-#endif // MAME_TANDBERG_TDV2100KBD_H
+#endif // MAME_TANDBERG_TDV2100_KBD_H

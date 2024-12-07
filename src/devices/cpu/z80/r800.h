@@ -31,7 +31,6 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
 

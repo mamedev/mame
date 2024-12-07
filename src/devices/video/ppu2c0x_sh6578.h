@@ -4,8 +4,8 @@
 
 ******************************************************************************/
 
-#ifndef MAME_VIDEO_PPU_SH6578_H
-#define MAME_VIDEO_PPU_SH6578_H
+#ifndef MAME_VIDEO_PPU2C0X_SH6578_H
+#define MAME_VIDEO_PPU2C0X_SH6578_H
 
 #pragma once
 
@@ -54,4 +54,4 @@ public:
 DECLARE_DEVICE_TYPE(PPU_SH6578,    ppu_sh6578_device)
 DECLARE_DEVICE_TYPE(PPU_SH6578PAL, ppu_sh6578pal_device)
 
-#endif // MAME_VIDEO_PPU_SH6578_H
+#endif // MAME_VIDEO_PPU2C0X_SH6578_H

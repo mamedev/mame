@@ -784,8 +784,8 @@ void v25_common_device::execute_run()
 
 	if (m_halted)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
-		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
 		return;
 	}
 

@@ -255,18 +255,6 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<!-- doesn't boot, loads first sector, and jumps into the text at the beginning of it -->
-	<software name="dsenraku" supported="no">
-		<description>Dsenryaku</description>
-		<year>19??</year>
-		<publisher>&lt;Unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="dsenryaku.d77" size="348848" crc="35f02f75" sha1="f590c7f2d3d1b602274bef5e1992babf4acfebc3"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fireball">
 		<description>Fireball</description>
 		<year>1987</year>

@@ -12,12 +12,14 @@
 #include "h_88_3.h"
 #include "h_88_5.h"
 #include "mms77316_fdc.h"
+#include "sigmasoft_parallel_port.h"
 #include "sigmasoft_sound.h"
 #include "we_pullup.h"
 #include "z37_fdc.h"
 
 void h89_left_cards(device_slot_interface &device)
 {
+	device.option_add("ss_parallel", H89BUS_SIGMASOFT_PARALLEL);
 }
 
 void h89_right_cards(device_slot_interface &device)

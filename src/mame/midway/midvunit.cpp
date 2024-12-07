@@ -1677,6 +1677,9 @@ ROM_START( crusnwld ) // Version 2.5, Wed Nov 04 1998 - 15:50:52
 	ROM_LOAD32_BYTE( "1.1_cruisn_world_u23_image.u23", 0x0c00001, 0x100000, CRC(6b920fc7) SHA1(993da81181f24075e1aead7c4b374f36dd86a9c3) )
 	ROM_LOAD32_BYTE( "1.1_cruisn_world_u24_image.u24", 0x0c00002, 0x100000, CRC(83485401) SHA1(58407818a82a7a3657530dcda7e373e678b58ab2) )
 	ROM_LOAD32_BYTE( "1.1_cruisn_world_u25_image.u25", 0x0c00003, 0x100000, CRC(0dad97a9) SHA1(cdb0c02da35243b118e37ff1519aa6ee1a79d06d) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "449_cruisn_world_upr.u904", 0x0000, 0x2000, CRC(65d9b301) SHA1(e51e1d43b68068884bddfe801799d1f778a4f31c) )
 ROM_END
 
 

@@ -8499,26 +8499,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- dgolf version 1.4TE rebuilt from Git using cc65 commit
-	     80a43d732dc9551ad84343ea9644d8fab7ec0bd9.  Byte-identical copies of 1.5 and
-	     1.0-1.4 have been reproduced with this toolchain, giving high confidence that the
-	     rebuilds are the same as what was released.  Without existent online copies,
-	     however, this cannot be verified.
-	-->
 	<software name="dgolf14te" cloneof="dgolf">
 		<description>NESert Golfing Tournament Edition (v1.4)</description>
 		<year>2019</year>
 		<publisher>rainwarrior</publisher>
-		<notes><![CDATA[
-		An original download should be located to verify and/or update the hash.
-		]]></notes>
-		<info name="release" value="20191124" /> <!-- From NESertGolfing Git tag -->
+		<info name="release" value="20191124" /> <!-- From NESertGolfing Git tag, apparently released earlier than this as downloads as early as 2019-11-10 exist -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
-				<rom name="dgolf_te prg" size="32768" crc="3ec19565" sha1="24c243f3edd8f1ba9c7f55ef45a1b4110e68ba1a" status="baddump" />
+				<rom name="dgolf_te prg" size="32768" crc="3ec19565" sha1="24c243f3edd8f1ba9c7f55ef45a1b4110e68ba1a" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192" />
@@ -22203,6 +22194,181 @@ license:CC0-1.0
 			<dataarea name="chr" size="8192">
 				<rom name="nes-lo-0 chr" size="8192" crc="e8c6c127" sha1="76b342287d63b91a362f5645dc5894c2db2ce1a5" offset="00000" />
 			</dataarea>
+		</part>
+	</software>
+
+	<software name="lj65">
+		<description>LJ65 (0.41, NTSC)</description>
+		<year>2009</year>
+		<publisher>Pin Eight</publisher>
+		<info name="release" value="20090602" />
+		<info name="version" value="0.41" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="lj65 0.41 prg" size="16384" crc="2c54109c" sha1="4d27a00707e05dbfe98af524c54e21f28d837641" offset="00000" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="lj65 0.41 chr" size="8192" crc="de91b2e6" sha1="b1f4389010a908c1cedd2b632b5abace4263899b" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192" />
+		</part>
+	</software>
+
+	<software name="lj65pal" cloneof="lj65">
+		<description>LJ65 (0.41, PAL)</description>
+		<year>2009</year>
+		<publisher>Pin Eight</publisher>
+		<info name="release" value="20090602" />
+		<info name="version" value="0.41" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="lj65-pal 0.41 prg" size="16384" crc="fffbc8ea" sha1="ccc6bb05aeb9a168097273113e53f2a79a804d73" offset="00000" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="lj65 0.41 chr" size="8192" crc="de91b2e6" sha1="b1f4389010a908c1cedd2b632b5abace4263899b" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192" />
+		</part>
+	</software>
+
+	<software name="tetram30" cloneof="lj65">
+		<description>Tetramino (0.30, NTSC)</description>
+		<year>2007</year>
+		<publisher>Pin Eight</publisher>
+		<info name="release" value="20070218" />
+		<info name="version" value="0.30" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="tetramino 0.30 prg" size="16384" crc="546ff8b1" sha1="ced291dc67243d351ed80bb755682ae4fbcd8277" offset="00000" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="tetramino 0.30 chr" size="8192" crc="9a4b6cfd" sha1="6cc933bf0df4aa1946106e1d80831c0f8e2c6faa" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192" />
+		</part>
+	</software>
+
+	<software name="tetram30pal" cloneof="lj65">
+		<description>Tetramino (0.30, PAL)</description>
+		<year>2007</year>
+		<publisher>Pin Eight</publisher>
+		<info name="release" value="20070218" />
+		<info name="version" value="0.30" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="tetramino-pal 0.30 prg" size="16384" crc="22fca23b" sha1="6dec4e7b8ab198637f96f33098f5c0d024d3fcea" offset="00000" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="tetramino 0.30 chr" size="8192" crc="9a4b6cfd" sha1="6cc933bf0df4aa1946106e1d80831c0f8e2c6faa" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192" />
+		</part>
+	</software>
+
+	<software name="tetram27" cloneof="lj65">
+		<description>Tetramino (0.27, NTSC)</description>
+		<year>2005</year>
+		<publisher>Pin Eight</publisher>
+		<info name="release" value="20051029" />
+		<info name="version" value="0.27" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="tetramino 0.27 prg" size="16384" crc="1497769d" sha1="79ae948bc1ca3787738ed6a94e91045ef8f44d55" offset="00000" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="tetramino 0.27 chr" size="8192" crc="9b83a887" sha1="6ba81be4e23f3a38a80ddeba69bf11c6efd3476d" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192" />
+		</part>
+	</software>
+
+	<software name="tetram27pal" cloneof="lj65">
+		<description>Tetramino (0.27, PAL)</description>
+		<year>2005</year>
+		<publisher>Pin Eight</publisher>
+		<info name="release" value="20051029" />
+		<info name="version" value="0.27" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-128" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="tetramino-pal 0.27 prg" size="16384" crc="d55a6236" sha1="0b3effe6edc1699dc9d4c3294839591331ae6d1b" offset="00000" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="tetramino 0.27 chr" size="8192" crc="9b83a887" sha1="6ba81be4e23f3a38a80ddeba69bf11c6efd3476d" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192" />
+		</part>
+	</software>
+
+	<software name="tetram2" cloneof="lj65">
+		<description>Tetramino (0.2)</description>
+		<year>2003</year>
+		<publisher>Pin Eight</publisher>
+		<info name="release" value="20031217" />
+		<info name="version" value="0.2" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="tetramino 0.2 prg" size="16384" crc="6b69b03d" sha1="6c92b8c9f5e5ec9be99a96ba9a134e0a85bd1139" offset="00000" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="tetramino 0.2 chr" size="8192" crc="f883d794" sha1="b940c8f1dcb19be7b6aefb303b184386c82ca1bc" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192" />
+		</part>
+	</software>
+
+	<software name="tetram1" cloneof="lj65">
+		<description>Tetramino (0.1)</description>
+		<year>2003</year>
+		<publisher>Pin Eight</publisher>
+		<info name="release" value="20031101" />
+		<info name="version" value="0.1" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="tetramino 0.1 prg" size="32768" crc="80fe53e0" sha1="790bc8d2d844b4f49a5ece72d91d6bcac8414c5b" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="tetramino 0.1 chr" size="8192" crc="2e87f789" sha1="6544d571d5d0bf1b9dc028fd06aa3dc853c33199" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192" />
 		</part>
 	</software>
 

@@ -80,6 +80,8 @@ ioport_constructor atari_trakball_device::device_input_ports() const
 
 void atari_trakball_device::device_start()
 {
+	save_item(NAME(m_last_pos));
+	save_item(NAME(m_last_direction));
 }
 
 #define QUADRATURE_ANGLE_RESOLUTION 0x02

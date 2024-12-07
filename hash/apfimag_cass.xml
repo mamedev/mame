@@ -318,7 +318,7 @@ checks whether the user is typing the program printed in the manual, for each le
 
 <!-- glitched gfx -->
 	<software name="defendyca" cloneof="defendyc" supported="partial">
-		<description>Defender (York 10 Computerware, Alt)</description>
+		<description>Defender (York 10 Computerware, alt)</description>
 		<year>19??</year>
 		<publisher>York 10 Computerware</publisher>
 		<part name="cass" interface="apf_cass">
@@ -422,7 +422,7 @@ checks whether the user is typing the program printed in the manual, for each le
 
 <!-- Escape 2 does not load correctly -->
 	<software name="lg3in1" supported="partial">
-		<description>Escape + 21 + Escape 2 (Bad?)</description>
+		<description>Escape + 21 + Escape 2 (bad?)</description>
 		<year>198?</year>
 		<publisher>Lacroix Games</publisher>
 		<info name="usage" value="Wait 1 or 2 secs from PLAY press and Return" />
@@ -501,7 +501,7 @@ checks whether the user is typing the program printed in the manual, for each le
 	</software>
 
 	<software name="froggy" supported="no">
-		<description>Froggy (Bad?)</description>
+		<description>Froggy (bad?)</description>
 		<year>198?</year>
 		<publisher>E. Beckett</publisher>
 		<part name="cass" interface="apf_cass">
@@ -605,7 +605,7 @@ checks whether the user is typing the program printed in the manual, for each le
 
 <!-- It does not load properly -->
 	<software name="llander" supported="no">
-		<description>Lunar Lander (Bad?)</description>
+		<description>Lunar Lander (bad?)</description>
 		<year>19??</year>
 		<publisher>IM-1 in a Million Club Newsletter</publisher>
 		<part name="cass" interface="apf_cass">
@@ -928,7 +928,7 @@ checks whether the user is typing the program printed in the manual, for each le
 
 <!-- Space Hunt does not seem to load fine, it was listed as an "Improved version of the above"... -->
 	<software name="gg2in1a" cloneof="gg2in1" supported="partial">
-		<description>Super 21 + Space Hunt (Alt?)</description>
+		<description>Super 21 + Space Hunt (alt?)</description>
 		<year>1983</year>
 		<publisher>Geo-Grafix</publisher>
 		<part name="cass" interface="apf_cass">
@@ -1203,7 +1203,7 @@ checks whether the user is typing the program printed in the manual, for each le
 <!-- Unsure what this is... Investigate! -->
 
 	<software name="primera">
-		<description>Primera? (Bad?)</description>
+		<description>Primera? (bad?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="apf_cass">
