@@ -148,8 +148,8 @@ m48t37_device::m48t37_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_flags = 0x7ff0;
 }
 
-m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: timekeeper_device(mconfig, M48T58, tag, owner, clock, 0x2000)
+m48t58_device::m48t58_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: timekeeper_device(mconfig, type, tag, owner, clock, 0x2000)
 {
 	m_offset_watchdog = -1;
 	m_offset_control = 0x1ff8;
@@ -164,8 +164,13 @@ m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_flags = -1;
 }
 
-m48t58_device::m48t58_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: timekeeper_device(mconfig, type, tag, owner, clock, 0x2000)
+m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: m48t58_device(mconfig, M48T58, tag, owner, clock)
+{
+}
+
+ds1643_device::ds1643_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: m48t58_device(mconfig, DS1643, tag, owner, clock)
 {
 }
 
@@ -198,11 +203,6 @@ mk48t12_device::mk48t12_device(const machine_config &mconfig, const char *tag, d
 	m_offset_month = 0x7fe;
 	m_offset_year = 0x7ff;
 	m_offset_century = -1;
-}
-
-ds1643_device::ds1643_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m48t58_device(mconfig, DS1643, tag, owner, clock)
-{
 }
 
 
