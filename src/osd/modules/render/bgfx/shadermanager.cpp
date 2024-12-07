@@ -86,10 +86,6 @@ std::string shader_manager::make_path_string(const osd_options &options, const s
 	switch (bgfx::getRendererType())
 	{
 		case bgfx::RendererType::Noop:
-		case bgfx::RendererType::Direct3D9:
-			shader_path += "dx9";
-			break;
-
 		case bgfx::RendererType::Direct3D11:
 		case bgfx::RendererType::Direct3D12:
 			shader_path += "dx11";

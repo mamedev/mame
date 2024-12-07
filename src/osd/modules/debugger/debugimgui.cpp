@@ -182,7 +182,7 @@ private:
 	void refresh_filelist();
 	void refresh_typelist();
 	void update_cpu_view(device_t* device);
-	static bool get_view_source(void* data, int idx, const char** out_text);
+	static const char* get_view_source(void* user_data, int idx);
 	static int history_set(ImGuiInputTextCallbackData* data);
 
 	running_machine* m_machine;
@@ -268,11 +268,10 @@ static inline void map_attr_to_fg_bg(unsigned char attr, rgb_t *fg, rgb_t *bg)
 	}
 }
 
-bool debug_imgui::get_view_source(void* data, int idx, const char** out_text)
+const char* debug_imgui::get_view_source(void* user_data, int idx)
 {
-	auto* vw = static_cast<debug_view*>(data);
-	*out_text = vw->source(idx)->name();
-	return true;
+	auto* vw = static_cast<debug_view*>(user_data);
+	return vw->source(idx)->name();
 }
 
 void debug_imgui::handle_events()
