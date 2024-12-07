@@ -47,6 +47,9 @@ FEB-2003 AAT
 
 Notes:
 
+  The main board of Side Arms has an unpopulated position reserved for a
+  8751 protection MCU.
+
   Unknown PROMs are mostly used for timing. Only the first four sprite
   encoding parameters have been identified, the other 28(!) are
   believed to be line-buffer controls.
@@ -630,10 +633,7 @@ void sidearms_state::sidearms(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
+	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -676,10 +676,7 @@ void sidearms_state::turtship(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(61.0338);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
+	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8); // 61.0338 Hz measured
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
 	screen.set_palette(m_palette);
@@ -725,10 +722,7 @@ void sidearms_state::whizz(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
+	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
