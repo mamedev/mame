@@ -55,6 +55,11 @@ public:
 	void set_GS_border(u8 border)   { m_GSborder = border; }
 	const u8 get_newvideo()         { return m_newvideo; }
 	void set_newvideo(u8 newvideo)  { m_newvideo = newvideo; }
+	const u8 get_GS_langsel()       { return m_GS_langsel; }
+	const u8 get_GS_language()      { return (m_GS_langsel >> 5) & 0x07; }
+	const bool is_pal_video_mode()  { return (m_GS_langsel >> 4) & 0x01; }
+	const bool get_language_switch(){ return (m_GS_langsel >> 3) & 0x01; }
+	void set_GS_langsel(u8 langsel) { m_GS_langsel = langsel; }
 	void set_SHR_color(u8 color, u32 rgb) { m_shr_palette[color] = rgb; }
 	void set_GS_border_color(u8 color, u32 rgb) { m_GSborder_colors[color] = rgb; }
 
@@ -123,7 +128,7 @@ private:
 	bool m_an2 = false;
 	bool m_80store = false;
 	bool m_monohgr = false;
-	u8 m_GSfg = 0, m_GSbg = 0, m_GSborder = 0, m_newvideo = 0, m_monochrome = 0, m_rgbmode = 0;
+	u8 m_GSfg = 0, m_GSbg = 0, m_GSborder = 0, m_newvideo = 0, m_GS_langsel = 0, m_monochrome = 0, m_rgbmode = 0;
 	u8 m_iie_langsw = 0; // language switch/modification on IIe/IIc/IIc+ and clones
 	optional_ioport m_vidconfig;
 };
