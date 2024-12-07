@@ -799,7 +799,8 @@ CONS( 2002, bkarastb,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke
 CONS( 2002, bkarastc,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 4)", MACHINE_IS_SKELETON )
 CONS( 2002, bkarastd,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 5)", MACHINE_IS_SKELETON )
 CONS( 2002, bkaraste,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 6)", MACHINE_IS_SKELETON )
-CONS( 2002, bkarastf,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 7)", MACHINE_IS_SKELETON )
+// this set has no downloaded data (or session data) suggesting it hasn't been used, the headers on the 3 songs that are included are different from the above sets however, so these themed units are likely different from factory 
+CONS( 2002, bkarastf,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station 'For Girls' (Japan)", MACHINE_IS_SKELETON )
 
 // The European releases take cartridges rather than relying on a download service
 CONS( 2004, easykara,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_IS_SKELETON )
