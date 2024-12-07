@@ -1128,7 +1128,6 @@ void mcs51_cpu_device::transmit_receive(int source)
 		switch (m_uart.txbit)
 		{
 		case SIO_IDLE:
-			transmit(1);
 			break;
 		case SIO_START:
 			LOGMASKED(LOG_TX, "tx start bit (%s)\n", machine().time().to_string());
