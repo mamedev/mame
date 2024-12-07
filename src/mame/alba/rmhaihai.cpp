@@ -21,14 +21,12 @@ TODO:
   protection (in rmhaisei the failure is more explicit, in rmhaijin it's
   deviously delayed to a later part of the game).
   In themj the checks are patched out, maybe it's a bootleg?
-  ETA: it uses IOX, which is shared with speedatk.cpp and srmp2.cpp as well.
+  ETA: it uses IOX, which is nominally shared with speedatk.cpp and srmp2.cpp.
+  Most likely all three have undumped 8041 or 8042 MCUs.
 
 - some unknown reads and writes.
 
 - visible area uncertain.
-
-- rmhaihaibl stops at RAM clear. There are various small routines changed,
-  probably to make up for missing IOX chip.
 
 ***************************************************************************/
 
@@ -60,11 +58,13 @@ public:
 
 	void init_rmhaihai();
 	void rmhaihai(machine_config &config);
+	void rmhaibl(machine_config &config);
 
 protected:
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	uint8_t keyboard_r();
+	uint8_t bootleg_keyboard_r();
 	void keyboard_w(uint8_t data);
 	void ctrl_w(uint8_t data);
 	void adpcm_w(uint8_t data);
@@ -76,6 +76,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	void rmhaihai_io_map(address_map &map) ATTR_COLD;
+	void rmhaihaibl_io_map(address_map &map) ATTR_COLD;
 	void rmhaihai_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
@@ -212,6 +213,17 @@ uint8_t rmhaihai_state::keyboard_r()
 	return 0;
 }
 
+uint8_t rmhaihai_state::bootleg_keyboard_r()
+{
+	// bootleg scans the key matrix directly without IOX
+	uint8_t ret = 0xff;
+	uint32_t keys = m_key[0]->read() | m_key[1]->read() << 16;
+	for (int i = 0; i < 5; i++)
+		if (!BIT(m_keyboard_cmd, i))
+			ret &= ~bitswap<3>(keys >> (i * 6 + BIT(m_keyboard_cmd, 6)), 4, 2, 0);
+	return ret;
+}
+
 void rmhaihai_state::keyboard_w(uint8_t data)
 {
 	logerror("%04x: keyboard_w %02x\n",m_maincpu->pc(),data);
@@ -283,6 +295,22 @@ void rmhaihai_state::rmhaihai_io_map(address_map &map)
 	map(0x8060, 0x8060).w(FUNC(rmhaihai_state::ctrl_w));
 	map(0x8080, 0x8080).nopw();    // ??
 	map(0xbc04, 0xbc04).nopw();    // ??
+	map(0xbc0c, 0xbc0c).nopw();    // ??
+}
+
+void rmhaihai_state::rmhaihaibl_io_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("adpcm", 0);
+	map(0x8000, 0x8000).w(FUNC(rmhaihai_state::keyboard_w));
+	map(0x8001, 0x8001).portr("EXTRA");
+	map(0x8002, 0x8002).r(FUNC(rmhaihai_state::bootleg_keyboard_r));
+	map(0x8003, 0x8003).nopw();    // ??
+	map(0x8020, 0x8020).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x8020, 0x8021).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x8040, 0x8040).w(FUNC(rmhaihai_state::adpcm_w));
+	map(0x8060, 0x8060).w(FUNC(rmhaihai_state::ctrl_w));
+	map(0x8080, 0x8080).nopw();    // ??
+	map(0xbc02, 0xbc02).r(FUNC(rmhaihai_state::bootleg_keyboard_r));
 	map(0xbc0c, 0xbc0c).nopw();    // ??
 }
 
@@ -429,6 +457,26 @@ static INPUT_PORTS_START( rmhaihai )
 	PORT_INCLUDE( mjctrl )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rmhaibl )
+	PORT_INCLUDE( rmhaihai )
+
+	PORT_MODIFY("KEY1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("KEY3")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("EXTRA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( rmhaihib )
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-1" )
@@ -546,6 +594,13 @@ void rmhaihai_state::rmhaihai(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void rmhaihai_state::rmhaibl(machine_config &config)
+{
+	rmhaihai(config);
+
+	m_maincpu->set_addrmap(AS_IO, &rmhaihai_state::rmhaihaibl_io_map);
+}
+
 void rmhaisei_state::rmhaisei(machine_config &config)
 {
 	rmhaihai(config);
@@ -634,6 +689,7 @@ ROM_END
 
 ROM_START( rmhaihaibl ) // seemingly bootleg PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	// code patched from rmhaihai2, with input routines heavily modified and protection checks removed
 	ROM_LOAD( "4.11g",     0x00000, 0x2000, CRC(a31394ba) SHA1(0cba4baa2c8addd7f127b21b26715ed79ec4cab7) )
 	ROM_CONTINUE(          0x06000, 0x2000 )
 	ROM_LOAD( "3.8g",      0x04000, 0x2000, CRC(aad71f3b) SHA1(fd0a7cc8478eaa09d1ee171f3cbbaeb6b94d414f) )
@@ -817,7 +873,7 @@ void rmhaihai_state::init_rmhaihai()
 
 GAME( 1985, rmhaihai,   0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",    "Real Mahjong Haihai (Japan, newer)", MACHINE_SUPPORTS_SAVE ) // writes Homedata in NVRAM
 GAME( 1985, rmhaihai2,  rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",    "Real Mahjong Haihai (Japan, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, rmhaihaibl, rmhaihai, rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "bootleg", "Real Mahjong Haihai (Japan, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rmhaihaibl, rmhaihai, rmhaibl,  rmhaibl,  rmhaihai_state, init_rmhaihai, ROT0, "bootleg", "Real Mahjong Haihai (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, rmhaihib,   rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, init_rmhaihai, ROT0, "Alba",    "Real Mahjong Haihai (Japan, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rmhaijin,   0,        rmhaihai, rmhaihai, rmhaihai_state, init_rmhaihai, ROT0, "Alba",    "Real Mahjong Haihai Jinji Idou Hen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rmhaisei,   0,        rmhaisei, rmhaihai, rmhaisei_state, init_rmhaihai, ROT0, "Visco",   "Real Mahjong Haihai Seichouhen (Japan)", MACHINE_SUPPORTS_SAVE )
