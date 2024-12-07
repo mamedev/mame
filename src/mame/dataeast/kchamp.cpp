@@ -67,8 +67,8 @@ IO ports and memory map changes. Dip switches differ too.
 #include "emu.h"
 #include "kchamp.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/74259.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -406,12 +406,12 @@ void kchamp_state::machine_reset()
 void kchamp_state::kchampvs(machine_config &config)
 {
 	// Basic machine hardware
-	Z80(config, m_maincpu, XTAL(12'000'000)/4);     // verified on PCB
+	Z80(config, m_maincpu, 12_MHz_XTAL/4); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchampvs_map);
 	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchampvs_io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &kchamp_state::decrypted_opcodes_map);
 
-	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    // verified on PCB
+	Z80(config, m_audiocpu, 12_MHz_XTAL/4); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchampvs_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchampvs_sound_io_map);
 	// IRQs triggered from main CPU
@@ -443,15 +443,15 @@ void kchamp_state::kchampvs(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	AY8910(config, m_ay[0], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    // verified on PCB
-	AY8910(config, m_ay[1], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    // verified on PCB
+	AY8910(config, m_ay[0], 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "speaker", 0.3); // verified on PCB
+	AY8910(config, m_ay[1], 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "speaker", 0.3); // verified on PCB
 
 	LS157(config, m_adpcm_select, 0); // at 4C
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MSM5205(config, m_msm, 375000);  // verified on PCB, discrete circuit clock
-	m_msm->vck_callback().set(FUNC(kchamp_state::msmint));  // interrupt function
-	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  // 1 / 96 = 3906.25Hz playback
+	MSM5205(config, m_msm, 375000); // verified on PCB, discrete circuit clock
+	m_msm->vck_callback().set(FUNC(kchamp_state::msmint)); // interrupt function
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B); // 1 / 96 = 3906.25Hz playback
 	m_msm->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -462,14 +462,15 @@ void kchamp_state::kchampvs(machine_config &config)
 void kchamp_state::kchamp(machine_config &config)
 {
 	// Basic machine hardware
-	Z80(config, m_maincpu, XTAL(12'000'000)/4);     // 12MHz / 4 = 3.0 MHz
+	Z80(config, m_maincpu, 8_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_map);
 	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchamp_io_map);
 
-	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    // 12MHz / 4 = 3.0 MHz
+	Z80(config, m_audiocpu, 8_MHz_XTAL/2);
+	m_audiocpu->z80_set_m1_cycles(4+1); // voice matches PCB recordings
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); // Hz
+	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125));
 	// IRQs triggered from main CPU
 	// NMIs from 125Hz clock
 
@@ -481,7 +482,7 @@ void kchamp_state::kchamp(machine_config &config)
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(59.10);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
@@ -498,8 +499,8 @@ void kchamp_state::kchamp(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	AY8910(config, m_ay[0], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); // Guess based on actual PCB recordings of karatedo
-	AY8910(config, m_ay[1], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); // Guess based on actual PCB recordings of karatedo
+	AY8910(config, m_ay[0], 8_MHz_XTAL/8).add_route(ALL_OUTPUTS, "speaker", 0.3);
+	AY8910(config, m_ay[1], 8_MHz_XTAL/8).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	DAC08(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // IC11
 }
