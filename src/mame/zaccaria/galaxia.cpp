@@ -67,9 +67,9 @@ TODO:
 - support screen raw params, blanking is much like how laserbat hardware does it
   and is needed to correct the speed in all machines
 - provide accurate sprite/bg sync in astrowar
-- improve starfield: density, blink rate, x repeat of 240, and the checkerboard
-  pattern (fast forward MAME to see) are all correct, the RNG is not right?
-  It may differ per PCB, not all PCB videos have the same star RNG pattern.
+- improve starfield RNG pattern. Other than the colors, it should be the same as
+  CVS. It may differ per PCB, not all PCB videos have the same star RNG pattern.
+  Maybe initial contents of the shift registers?
 - add sound board emulation (info is in the schematics)
 - add support for flip screen
 
@@ -285,7 +285,7 @@ void galaxia_state::init_stars()
 			generator |= BIT(~generator, 17) ^ BIT(generator, 5);
 
 			// stars are enabled if the shift register output is 0, and bits 1-7 are set
-			if ((generator & 0x200fe) == 0xfe && m_total_stars != MAX_STARS)
+			if ((generator & 0x100fe) == 0xfe && m_total_stars != MAX_STARS)
 			{
 				m_stars[m_total_stars].x = x;
 				m_stars[m_total_stars].y = y;
@@ -315,9 +315,7 @@ void galaxia_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect
 void galaxia_state::scroll_stars(int state)
 {
 	if (state)
-		m_stars_scroll++;
-
-	m_stars_scroll %= 480;
+		m_stars_scroll = (m_stars_scroll + 1) % 480;
 }
 
 
