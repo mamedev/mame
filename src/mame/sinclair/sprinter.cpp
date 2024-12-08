@@ -29,7 +29,6 @@ TODO:
 - ISA memory slots
 - fully untied from Spectrum parent
 - better rendering (currently not fully discovered) in Game Configuration
-- ? detect loading Configuration by checksum, not by presents in fastram
 
 *******************************************************************************************/
 
@@ -248,6 +247,8 @@ private:
 	u8 m_conf;
 	bool m_conf_loading;
 	bool m_starting;
+	u16 m_bitstream_count;
+	u32 m_bitstream_hash;
 	bool m_dos; // 0-on, 1-off
 	bool m_cash_on;
 
@@ -753,13 +754,9 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		update_video(dcpp & 1);
 		break;
 	case 0x2e:
-		if (m_conf)
-			machine().schedule_hard_reset();
-		else
-		{
-			m_conf_loading = 1;
-			machine().schedule_soft_reset();
-		}
+		m_conf = 0;
+		m_conf_loading = 1;
+		machine().schedule_soft_reset();
 		break;
 
 	case 0x88:
@@ -779,7 +776,17 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		m_cbl_wa = 0;
 		m_cbl_wae = cbl_mode16();
 		const u8 divs[16] = {13, 9, 0, 0, 0, 0, 0, 0, 27, 19, 13, 9, 6, 4, 3, 1};
-		const attotime rate = (cbl_mode() && divs[m_cbl_xx & 15]) ? attotime::from_ticks(divs[m_cbl_xx & 15] + 1, X_SP / 192) : attotime::never;
+		attotime rate;
+		if (cbl_mode() && divs[m_cbl_xx & 15])
+		{
+			rate = attotime::from_ticks(divs[m_cbl_xx & 15] + 1, X_SP / 192);
+		}
+		else
+		{
+			rate = attotime::never;
+			if (m_hold_irq)
+				m_irq_off_timer->adjust(attotime::zero);
+		}
 		m_cbl_timer->adjust(rate, 0, rate);
 		break;
 	}
@@ -1110,15 +1117,23 @@ u8 sprinter_state::bootstrap_r(offs_t offset)
 
 void sprinter_state::bootstrap_w(offs_t offset, u8 data)
 {
-	if (m_conf_loading)
+	if (!m_conf_loading)
 	{
-		m_conf_loading = 0;
-		m_conf = !(m_maincpu->csbr_r() & 0x0f); // cs0 disabled => loader reads config from fastram (which is Game Config)
-		m_ram_pages[0x2e] = m_conf ? 0x41 : 0x00;
-		machine().schedule_soft_reset();
+		m_program.write_byte(0x10000 | u16(offset), data);
 	}
 	else
-		m_program.write_byte(0x10000 | u16(offset), data);
+	{
+		m_fastram[offset & 0xffff] = data;
+		m_bitstream_hash += data << (8 * (m_bitstream_count % 4));
+		if (++m_bitstream_count > 0xfff)
+		{
+			m_conf_loading = 0;
+			m_conf = !(m_maincpu->csbr_r() & 0x0f); // cs0 disabled => loader reads config from fastram
+			m_conf &= m_bitstream_hash == 0x3861cfa4; // Game Config
+			m_ram_pages[0x2e] = m_conf ? 0x41 : 0x00;
+			machine().schedule_soft_reset();
+		}
+	}
 }
 
 u8 sprinter_state::ram_r(offs_t offset)
@@ -1397,6 +1412,8 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_joy2_ctrl));
 	save_item(NAME(m_conf));
 	save_item(NAME(m_conf_loading));
+	save_item(NAME(m_bitstream_count));
+	save_item(NAME(m_bitstream_hash));
 	save_item(NAME(m_starting));
 	save_item(NAME(m_dos));
 	save_item(NAME(m_cash_on));
@@ -1506,6 +1523,8 @@ void sprinter_state::machine_reset()
 
 	if (m_conf_loading)
 	{
+		m_bitstream_count = 0;
+		m_bitstream_hash = 0;
 		m_bank_rom[0]->set_entry(0x0c);
 		m_bank_view0.select(1);
 		m_bank_view3.disable();
