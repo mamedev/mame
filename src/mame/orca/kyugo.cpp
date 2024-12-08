@@ -128,6 +128,7 @@ Notes:
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 
@@ -178,7 +179,7 @@ private:
 	void scroll_y_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	void flashgala_sub_map(address_map &map) ATTR_COLD;
 	void flashgala_sub_portmap(address_map &map) ATTR_COLD;
@@ -907,10 +908,17 @@ void kyugo_state::machine_reset()
 	m_fgcolor = 0;
 }
 
-INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(kyugo_state::interrupt)
 {
-	if (m_nmi_mask)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	int scanline = param;
+
+	// vblank interrupt
+	if (scanline == 240 && m_nmi_mask)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+
+	// 4 sound interrupts per frame
+	if ((scanline & 0x3f) == 0x20)
+		m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -920,12 +928,11 @@ void kyugo_state::kyugo_base(machine_config &config)
 	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &kyugo_state::kyugo_main_map);
 	m_maincpu->set_addrmap(AS_IO, &kyugo_state::kyugo_main_portmap);
-	m_maincpu->set_vblank_int("screen", FUNC(kyugo_state::vblank_irq));
+	TIMER(config, "scantimer").configure_scanline(FUNC(kyugo_state::interrupt), "screen", 0, 1);
 
 	Z80(config, m_subcpu, 18.432_MHz_XTAL / 6); // verified on pcb
 	m_subcpu->set_addrmap(AS_PROGRAM, &kyugo_state::gyrodine_sub_map);
 	m_subcpu->set_addrmap(AS_IO, &kyugo_state::gyrodine_sub_portmap);
-	m_subcpu->set_periodic_int(FUNC(kyugo_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -936,10 +943,7 @@ void kyugo_state::kyugo_base(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 36*8-1, 2*8, 30*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 396, 0, 288, 260, 16, 240);
 	screen.set_screen_update(FUNC(kyugo_state::screen_update));
 	screen.set_palette(m_palette);
 
