@@ -1591,6 +1591,9 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		case 0x29:  // NEWVIDEO
 			return m_video->get_newvideo();
 
+		case 0x2b:  // LANGSEL
+			return m_video->get_GS_langsel();
+
 		case 0x2d:  // SLOTROMSEL
 			return m_slotromsel;
 
@@ -1944,6 +1947,10 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 
 		case 0x29:  // NEWVIDEO
 			m_video->set_newvideo(data);
+			break;
+
+		case 0x2b:  // LANGSEL
+			m_video->set_GS_langsel(data);
 			break;
 
 		case 0x2d:  // SLOTROMSEL
@@ -3931,8 +3938,8 @@ ROM_START(apple2gs)
 	ROM_REGION(0x1000, "adbmicro", 0)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
+	ROM_REGION(0x4000,"gfx1",0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	// 341-0728 is the MASK rom version while 341-0737 is the EPROM version - SAME data.
@@ -3946,8 +3953,8 @@ ROM_START(apple2gsr3p)
 	ROM_REGION(0x1000, "adbmicro", 0)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
+	ROM_REGION(0x4000,"gfx1",0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("341-0728", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0728: IIgs ROM03 prototype FC-FD - 28 pin MASK rom */
@@ -3958,8 +3965,8 @@ ROM_START(apple2gsr1)
 	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
+	ROM_REGION(0x4000,"gfx1",0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("342-0077-b", 0x20000, 0x20000, CRC(42f124b0) SHA1(e4fc7560b69d062cb2da5b1ffbe11cd1ca03cc37)) /* 342-0077-B: IIgs ROM01 */
@@ -3969,8 +3976,8 @@ ROM_START(apple2gsr0)
 	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
+	ROM_REGION(0x4000,"gfx1",0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("342-0077-a", 0x20000, 0x20000, CRC(dfbdd97b) SHA1(ff0c245dd0732ec4413a934fd80efc2defd8a8e3) ) /* 342-0077-A: IIgs ROM00 */
@@ -3980,8 +3987,8 @@ ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
+	ROM_REGION(0x4000,"gfx1",0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD( "rombf.bin",    0x020000, 0x020000, CRC(ab04fedf) SHA1(977589a17553956d583a21020080a39dd396df5c) )
@@ -3991,8 +3998,8 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
+	ROM_REGION(0x4000,"gfx1",0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD( "apple iigs alpha rom 2.0 19860310.bin", 0x020000, 0x020000, CRC(a47d275f) SHA1(c5836adcfc8be69c7351b84afa94c814e8d92b81) )
@@ -4003,8 +4010,8 @@ ROM_START(apple2gsmt)
 	ROM_REGION(0x1000, "adbmicro", 0)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
-	ROM_REGION(0x1000, "gfx1", 0)
-	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
+	ROM_REGION(0x4000, "gfx1", 0)
+	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
 
 	ROM_REGION(0x80000, "maincpu", 0)
 	// The Mark Twain ROM is 512K, with address bit 16 inverted (same as ROM 3).
