@@ -995,8 +995,8 @@ GAME( 1984, kchamptec, kchamp, kchamp,       kchamp,   kchamp_state,  empty_init
 GAME( 1984, karateda,  kchamp, kchamp_arfyc, kchamp,   kchamp_state,  empty_init,     ROT90, "bootleg (Arfyc)",       "Karate Dou (Arfyc bootleg)",           MACHINE_SUPPORTS_SAVE )
 
 // VS versions
-GAME( 1984, kchampvs,  kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ - Player Vs Player (US, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs2, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs2, ROT90, "Data East USA",         "Karate Champ - Player Vs Player (US, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs3, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ - Player Vs Player (US, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs4, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ - Player Vs Player (US, set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs,  0,      kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ: Player Vs Player (US, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs2, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs2, ROT90, "Data East USA",         "Karate Champ: Player Vs Player (US, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs3, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ: Player Vs Player (US, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs4, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ: Player Vs Player (US, set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, karatevs,  kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan)",                   MACHINE_SUPPORTS_SAVE )

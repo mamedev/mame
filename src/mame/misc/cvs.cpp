@@ -102,6 +102,8 @@ Main 2650 runs at 1.78MHz (14.318/8).
 Sound board 2650s run at 0.89MHz (14.318/16). Also seen with a 15.625MHz XTAL,
 which would result in slightly higher DAC sound pitch.
 
+Video timing is via a Signetics 2621 (PAL).
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -1365,7 +1367,7 @@ void cvs_state::cvs(machine_config &config)
 	BEEP(config, m_beep[0], 600).add_route(ALL_OUTPUTS, "speaker", 0.15); // placeholder
 	BEEP(config, m_beep[1], 150).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
 
-	TMS5100(config, m_tms5110, XTAL(640'000));
+	TMS5100(config, m_tms5110, 640_kHz_XTAL);
 	m_tms5110->data().set(FUNC(cvs_state::speech_rom_read_bit));
 	m_tms5110->add_route(ALL_OUTPUTS, "speaker", 0.30);
 }
