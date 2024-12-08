@@ -89,7 +89,7 @@ private:
 	uint32_t screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
-	INTERRUPT_GEN_MEMBER(sound_int);
+	INTERRUPT_GEN_MEMBER(sound_nmi);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int dx, int dy);
 	void decrypt_code();
 	void msmint(int state);

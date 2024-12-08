@@ -377,7 +377,7 @@ void kchamp_state::msmint(int state)
 * 1 Player Version  *
 ********************/
 
-INTERRUPT_GEN_MEMBER(kchamp_state::sound_int)
+INTERRUPT_GEN_MEMBER(kchamp_state::sound_nmi)
 {
 	if (m_sound_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -426,7 +426,7 @@ void kchamp_state::kchampvs(machine_config &config)
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 16, 240); // 59.10 Hz refresh verified on PCB
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 16, 240); // 59.10 Hz refresh measured on PCB
 	screen.set_screen_update(FUNC(kchamp_state::screen_update_kchampvs));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(kchamp_state::vblank_irq));
@@ -467,9 +467,9 @@ void kchamp_state::kchamp(machine_config &config)
 	m_audiocpu->z80_set_m1_cycles(4+1); // voice matches PCB recordings
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125));
-	// IRQs triggered from main CPU
-	// NMIs from 125Hz clock
+
+	attotime sound_nmi_period = attotime::from_ticks(0x10000, 8_MHz_XTAL); // ~122 Hz
+	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_nmi), sound_nmi_period);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC71
 	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flip_screen_set));
