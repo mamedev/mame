@@ -1722,7 +1722,6 @@ bgfx-tools:
 
 shaders: bgfx-tools
 	-$(call MKDIR,build/shaders/dx11)
-	-$(call MKDIR,build/shaders/dx9)
 	-$(call MKDIR,build/shaders/pssl)
 	-$(call MKDIR,build/shaders/metal)
 	-$(call MKDIR,build/shaders/essl)
