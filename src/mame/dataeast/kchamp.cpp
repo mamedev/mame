@@ -459,7 +459,7 @@ void kchamp_state::kchampvs(machine_config &config)
 void kchamp_state::kchamp(machine_config &config)
 {
 	// Basic machine hardware
-	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_map);
 	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchamp_io_map);
 
@@ -503,9 +503,10 @@ void kchamp_state::kchamp_arfyc(machine_config &config)
 {
 	kchamp(config);
 
-	m_audiocpu->set_clock(XTAL(8'867'238)/2); // 8.867238 MHz xtal / 2, measured on real PCB
-	m_ay[0]->set_clock(XTAL(8'867'238)/8);    // 8.867238 MHz xtal / 8, measured on real PCB
-	m_ay[1]->set_clock(XTAL(8'867'238)/8);    // 8.867238 MHz xtal / 8, measured on real PCB
+	// different sound hw XTAL, clocks verified on PCB
+	m_audiocpu->set_clock(8.867238_MHz_XTAL / 2);
+	m_ay[0]->set_clock(8.867238_MHz_XTAL / 8);
+	m_ay[1]->set_clock(8.867238_MHz_XTAL / 8);
 }
 
 

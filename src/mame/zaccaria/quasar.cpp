@@ -164,24 +164,9 @@ void quasar_state::palette(palette_device &palette) const
 	// effects color map
 	for (int i = 0; i < 0x100; i++)
 	{
-		int bit0, bit1, bit2;
-
-		// red component
-		bit0 = BIT(i, 7);
-		bit1 = BIT(i, 6);
-		bit2 = BIT(i, 5);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		// green component
-		bit0 = BIT(i, 4);
-		bit1 = BIT(i, 3);
-		bit2 = BIT(i, 2);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		// blue component
-		bit0 = BIT(i, 1);
-		bit1 = BIT(i, 0);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const r = pal3bit(bitswap<3>(i, 5, 6, 7));
+		int const g = pal3bit(bitswap<3>(i, 2, 3, 4));
+		int const b = pal2bit(bitswap<2>(i, 0, 1));
 
 		// 4 intensities
 		float level = 0.0f;
