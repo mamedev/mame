@@ -222,7 +222,7 @@ int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 	if (
 		size != APPLE2_TRACK_COUNT * 16 * APPLE2_SECTOR_SIZE
 		&& size != APPLE2_STD_TRACK_COUNT * 16 * APPLE2_SECTOR_SIZE
-		&& size != 143403 && size != 143363 && size != 143358
+		&& size != 143403 && size != 143363 && size != 143358 && size != 143195
 	)
 	{
 		return 0;
@@ -313,7 +313,9 @@ bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const s
 		uint8_t sector_data[APPLE2_SECTOR_SIZE*16];
 
 		auto const [err, actual] = read_at(io, fpos, sector_data, sizeof sector_data);
-		if (err || actual != sizeof sector_data)
+		// Some supported images have oddball sizes, where the last track is incomplete.
+		// Skip the `actual` check to avoid rejecting them.
+		if (err /* || actual != sizeof sector_data */)
 			return false;
 
 		fpos += APPLE2_SECTOR_SIZE*16;
