@@ -121,14 +121,15 @@
         F44      -wwwwwww --------  Layer 1 upper-right page select
                  -------- -wwwwwww  Layer 1 upper-left page select
         F46      -wwwwwww --------  Layer 1 lower-right page select
-                 -------- -wwwwwww  Layer 2 upper-left page select
-        F48      -wwwwwww --------  Layer 2 upper-right page select
-                 -------- -wwwwwww  Layer 2 lower-left page select
-        F4A      -wwwwwww --------  Layer 2 lower-right page select
-                 -------- -wwwwwww  Layer 3 upper-left page select
-                 -wwwwwww --------  Layer 3 upper-right page select
-        F4E      -------- -wwwwwww  Layer 3 lower-left page select
-                 -wwwwwww --------  Layer 3 lower-right page select
+                 -------- -wwwwwww  Layer 1 lower-left page select
+        F48      -wwwwwww --------  Layer 2 upper-left page select
+                 -------- -wwwwwww  Layer 2 upper-right page select
+        F4A      -wwwwwww --------  Layer 2 lower-left page select
+                 -------- -wwwwwww  Layer 2 lower-right page select
+        F4C      -wwwwwww --------  Layer 3 upper-left page select
+                 -------- -wwwwwww  Layer 3 upper-right page select
+        F4E      -wwwwwww --------  Layer 3 lower-left page select
+                 -------- -wwwwwww  Layer 3 lower-right page select
         F50      xxxxxxxx xxxxxxxx  Layer 0 X step increment (0x200 = 1.0)
         F52      yyyyyyyy yyyyyyyy  Layer 0 Y step increment (0x200 = 1.0)
         F54      xxxxxxxx xxxxxxxx  Layer 1 X step increment (0x200 = 1.0)
