@@ -742,7 +742,7 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, segas32_state::la
 	/*
 	   Then account for the destination center coordinates - We currently expand the resolution
 	   from 9 bit to 10 bit while zooming which correctly centers the bg in harddunk during attract
-	   mode at the low resolution and the course selection screen in radr at the higher resolution.
+	   mode at the lower resolution and the course selection bg in radr at the higher resolution.
 	   This behavior has not been verified yet on real hardware and might be a hack.
 	*/
 	srcx_start -= util::sext(m_videoram[0x1ff30/2 + 2 * bgnum], (dstxstep != 0x200) ? 10 : 9) * srcxstep;
