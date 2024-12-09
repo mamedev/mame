@@ -7,8 +7,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_MCS48_MCS48DASM_H
-#define MAME_CPU_MCS48_MCS48DASM_H
+#ifndef MAME_CPU_MCS48_MCS48DSM_H
+#define MAME_CPU_MCS48_MCS48DSM_H
 
 #pragma once
 
@@ -28,4 +28,4 @@ private:
 	bool m_i802x;
 };
 
-#endif
+#endif // MAME_CPU_MCS48_MCS48DSM_H

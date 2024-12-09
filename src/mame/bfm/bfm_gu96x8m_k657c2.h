@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_BFG_GU96X8M_K657C2_H
-#define MAME_MACHINE_BFG_GU96X8M_K657C2_H
+#ifndef MAME_BFM_BFM_GU96X8M_K657C2_H
+#define MAME_BFM_BFM_GU96X8M_K657C2_H
 
 #pragma once
 
@@ -74,4 +74,4 @@ private:
 
 DECLARE_DEVICE_TYPE(BFM_GU96X8M_K657C2, bfm_gu96x8m_k657c2_device)
 
-#endif // MAME_MACHINE_BFG_GU96X8M_K657C2_H
+#endif // MAME_BFM_BFM_GU96X8M_K657C2_H

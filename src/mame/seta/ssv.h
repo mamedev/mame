@@ -75,6 +75,7 @@ protected:
 	uint16_t mainram_r(offs_t offset);
 	void mainram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t srmp4_input_r();
+	uint16_t srmp7_input_r();
 	uint16_t srmp7_irqv_r();
 	void srmp7_sound_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t latch32_r(offs_t offset);

@@ -19,8 +19,9 @@ std::unique_ptr<util::disasm_interface> m68030_device::create_disassembler()
 }
 
 m68030_device::m68030_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m68000_musashi_device(mconfig, tag, owner, clock, M68030, 32,32)
+	: m68000_musashi_device(mconfig, tag, owner, clock, M68030, 32, 32)
 {
+	m_has_fpu = true;
 }
 
 void m68030_device::device_start()

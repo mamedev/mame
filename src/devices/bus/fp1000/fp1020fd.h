@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_BUS_FP1020FD_H
-#define MAME_BUS_FP1020FD_H
+#ifndef MAME_BUS_FP1000_FP1020FD_H
+#define MAME_BUS_FP1000_FP1020FD_H
 
 #pragma once
 
@@ -39,5 +39,4 @@ private:
 
 DECLARE_DEVICE_TYPE(FP1020FD, fp1020fd_device)
 
-
-#endif // MAME_BUS_FP1020FD_H
+#endif // MAME_BUS_FP1000_FP1020FD_H

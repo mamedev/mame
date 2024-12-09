@@ -2,8 +2,6 @@
 // copyright-holders:
 
 /*
-Unknown WHT gambling game
-
 The PCB is marked 'COPYRIGHT FOR WHT ELE CO,. VER 3.0'
 
 Main components are:
@@ -26,7 +24,6 @@ K-665 sound chip (Oki M6295 clone)
 
 
 TODO:
-- correct GFX decoding;
 - hook up RAMDAC devices / colors;
 - audio CPU ROM banking;
 - CRTC?;
@@ -77,7 +74,7 @@ public:
 		m_fgram(*this, "fgram")
 	{ }
 
-	void unkwht(machine_config &config) ATTR_COLD;
+	void yizhix(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -113,7 +110,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(whtm68k_state::scanline_cb)
 {
 	int const scanline = param;
 
-	if (scanline == 256)
+	if (scanline == 128)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 
 	if (scanline == 0)
@@ -123,8 +120,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(whtm68k_state::scanline_cb)
 
 void whtm68k_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(whtm68k_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(whtm68k_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(whtm68k_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(whtm68k_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -213,7 +210,7 @@ void whtm68k_state::ramdac2_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( unkwht )
+static INPUT_PORTS_START( yizhix )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) // Coin related? Gives 'coin jam if pressed'
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
@@ -266,14 +263,13 @@ static INPUT_PORTS_START( unkwht )
 INPUT_PORTS_END
 
 
- // TODO: wrong, just enough to see something in the decoder
 const gfx_layout gfx_8x8x4_packed_msb_r =
 {
 	8,8,
 	RGN_FRAC(1,1),
 	4,
 	{ STEP4(3,-1) },
-	{ STEP8(28,-4) },
+	{ 4, 0, 28, 24, 20, 16, 12, 8 },
 	{ STEP8(0,4*8) },
 	8*8*4
 };
@@ -283,7 +279,7 @@ static GFXDECODE_START( gfx_wht )
 GFXDECODE_END
 
 
-void whtm68k_state::unkwht(machine_config &config)
+void whtm68k_state::yizhix(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);
@@ -308,7 +304,7 @@ void whtm68k_state::unkwht(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: everything
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 512);
+	screen.set_size(512, 256);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(whtm68k_state::screen_update));
 
@@ -333,8 +329,8 @@ void whtm68k_state::unkwht(machine_config &config)
 	OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock and pin 7 not verified
 }
 
-
-ROM_START( unkwht )
+// 益智象棋 (Yìzhì Xiàngqí)
+ROM_START( yizhix )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "chs_p1.u13", 0x00000, 0x20000, CRC(6f180b89) SHA1(cfbdd93360f6f8a8c47624c2522e6c005658a436) )
 	ROM_LOAD16_BYTE( "chs_p2.u14", 0x00001, 0x20000, CRC(c8f53b59) SHA1(c8c7e0131e7cbfda59cd658da0f3d4a28deef0b1) )
@@ -354,4 +350,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996, unkwht,  0, unkwht, unkwht,  whtm68k_state, empty_init, ROT0, "WHT", "unknown WHT gambling game", MACHINE_IS_SKELETON ) // 1996 WHT copyright in GFX
+GAME( 1996, yizhix,  0, yizhix, yizhix,  whtm68k_state, empty_init, ROT0, "WHT", "Yizhi Xiangqi", MACHINE_IS_SKELETON ) // 1996 WHT copyright in GFX

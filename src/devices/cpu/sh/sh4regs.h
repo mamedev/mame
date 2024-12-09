@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#pragma once
+#ifndef MAME_CPU_SH_SH4REGS_H
+#define MAME_CPU_SH_SH4REGS_H
 
-#ifndef __SH4REGS_H__
-#define __SH4REGS_H__
+#pragma once
 
 /* 00000001111111100000000011111100 */
 #define PTEH    0x2000  /* FF000000 */
@@ -180,4 +180,4 @@
 #define PVR_SH7751R 0x04050000
 #define PRR_SH7751R 0x00000110
 
-#endif /* __SH4REGS_H__ */
+#endif // MAME_CPU_SH_SH4REGS_H

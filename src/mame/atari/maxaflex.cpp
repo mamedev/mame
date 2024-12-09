@@ -255,7 +255,7 @@ static INPUT_PORTS_START( a600xl )
 
 	// Max-A-Flex specific ports
 	PORT_START("coin")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_COIN1) PORT_CHANGED_MEMBER(DEVICE_SELF, maxaflex_state, coin_inserted, 0)
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_COIN1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(maxaflex_state::coin_inserted), 0)
 
 	PORT_START("dsw")
 	PORT_DIPNAME(0xf, 0x9, "Coin/Time" )

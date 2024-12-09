@@ -52,6 +52,21 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+	<software name="idanthol">
+		<description>id Anthology</description>
+		<year>1996</year>
+		<publisher>id Software</publisher>
+		<notes><![CDATA[
+		Discs 1, 2, 3 are in the ibm5170_cdrom.xml software list as they are PC software.
+		]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<part name="cdrom4" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 4) (Mac)" sha1="d9c3e998e17fa56fcb5abbdd0a924de78dacb2e8" />
+			</diskarea>
+		</part>
+	</software>
 	<software name="mac70a9">
 		<description>System Software 7.0a9 ("Big Bang" pre-release)</description>
 		<year>1991</year>
@@ -164,6 +179,18 @@ PPC750 - PowerPC 750 (G3) CPU
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mac81" sha1="cd3d8a45c20b271c27f80d957559071f525759f7"/>
+			</diskarea>
+		</part>
+	</software>
+	<!-- Mac OS 7.0.1-9.x -->
+	<software name="mfma_addsub">
+		<description>My First Math Adventure: Adding and Subtracting</description>
+		<year>1998</year>
+		<publisher>Global Software Publishing</publisher>
+		<info name="developer" value="Dorling Kindersley" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="my first math adventure - adding and subtracting" sha1="860fe59ec122aff801de2c724e40a5f0045f88be" />
 			</diskarea>
 		</part>
 	</software>

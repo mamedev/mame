@@ -4,8 +4,8 @@
     SPARC disassembler
 */
 
-#ifndef MAME_DEVICES_CPU_SPARC_SPARC_DASM_H
-#define MAME_DEVICES_CPU_SPARC_SPARC_DASM_H
+#ifndef MAME_CPU_SPARC_SPARCDASM_H
+#define MAME_CPU_SPARC_SPARCDASM_H
 
 #pragma once
 
@@ -255,4 +255,4 @@ private:
 	vis_op_desc_map         m_vis_op_desc;
 };
 
-#endif // MAME_DEVICES_CPU_SPARC_SPARC_DASM_H
+#endif // MAME_CPU_SPARC_SPARCDASM_H

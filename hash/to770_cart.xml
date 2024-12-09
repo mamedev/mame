@@ -12,7 +12,9 @@ The BASIC 128 cartridge is useful only on a TO7/70!
 	<software name="basic128">
 		<description>BASIC 128 (v1.0)</description>
 		<year>1984</year>
-		<publisher>Thomson</publisher>
+		<publisher>Thomson / Microsoft</publisher>
+		<info name="alt_title" value="BASIC 128 Microsoft 1.0" />
+		<info name="serial" value="MB 97-128" />
 
 		<part name="cart" interface="to_cart">
 			<dataarea name="rom" size="32768">

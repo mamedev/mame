@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
-/***************************************************************************
+/*******************************************************************************
 
     Kyugo hardware games
 
@@ -20,7 +20,8 @@
 
     Known issues:
         * attract mode in Son of Phoenix doesn't work
- ***************************************************************************
+
+********************************************************************************
 
 Repulse bootleg
 Hardware Info By Guru
@@ -121,17 +122,304 @@ Notes:
         2764 like the bootleg was but possibly chopped in half for emulation, hence the 4k
         size of the original ROM compared to the 8k size of the bootleg ROM.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
-#include "kyugo.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+namespace {
+
+class kyugo_state : public driver_device
+{
+public:
+	kyugo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_bgattribram(*this, "bgattribram"),
+		m_spriteram(*this, "spriteram_%u", 1U),
+		m_shared_ram(*this, "shared_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
+	{ }
+
+	void kyugo_base(machine_config &config);
+	void repulse(machine_config &config);
+	void flashgala(machine_config &config);
+	void srdmissn(machine_config &config);
+	void legend(machine_config &config);
+	void gyrodine(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	void nmi_mask_w(int state);
+	void coin_counter_w(offs_t offset, uint8_t data);
+	void fgvideoram_w(offs_t offset, uint8_t data);
+	void bgvideoram_w(offs_t offset, uint8_t data);
+	void bgattribram_w(offs_t offset, uint8_t data);
+	uint8_t spriteram_2_r(offs_t offset);
+	void scroll_x_lo_w(uint8_t data);
+	void gfxctrl_w(uint8_t data);
+	void scroll_y_w(uint8_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
+	void flashgala_sub_map(address_map &map) ATTR_COLD;
+	void flashgala_sub_portmap(address_map &map) ATTR_COLD;
+	void gyrodine_main_map(address_map &map) ATTR_COLD;
+	void gyrodine_sub_map(address_map &map) ATTR_COLD;
+	void gyrodine_sub_portmap(address_map &map) ATTR_COLD;
+	void kyugo_main_map(address_map &map) ATTR_COLD;
+	void kyugo_main_portmap(address_map &map) ATTR_COLD;
+	void srdmissn_main_map(address_map &map) ATTR_COLD;
+	void legend_sub_map(address_map &map) ATTR_COLD;
+	void repulse_sub_map(address_map &map) ATTR_COLD;
+	void repulse_sub_portmap(address_map &map) ATTR_COLD;
+	void srdmissn_sub_map(address_map &map) ATTR_COLD;
+	void srdmissn_sub_portmap(address_map &map) ATTR_COLD;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_bgattribram;
+	required_shared_ptr_array<uint8_t, 2> m_spriteram;
+	required_shared_ptr<uint8_t> m_shared_ram;
+
+	uint8_t m_nmi_mask = 0U;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint8_t m_scroll_x_lo = 0U;
+	uint8_t m_scroll_x_hi = 0U;
+	uint8_t m_scroll_y = 0U;
+	uint8_t m_bgpalbank = 0U;
+	uint8_t m_fgcolor = 0U;
+	const uint8_t *m_color_codes = nullptr;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
+
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(kyugo_state::get_fg_tile_info)
+{
+	int code = m_fgvideoram[tile_index];
+	int color = m_color_codes[code >> 3] << 1 | m_fgcolor;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+
+TILE_GET_INFO_MEMBER(kyugo_state::get_bg_tile_info)
+{
+	int attr = m_bgattribram[tile_index];
+	int code = m_bgvideoram[tile_index] | ((attr & 0x03) << 8);
+	int color = (attr >> 4) | (m_bgpalbank << 4);
+
+	tileinfo.set(1, code, color, TILE_FLIPYX((attr & 0x0c) >> 2));
+}
+
+
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+void kyugo_state::video_start()
+{
+	m_color_codes = memregion("proms")->base() + 0x300;
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kyugo_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kyugo_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+
+	m_bg_tilemap->set_scrolldx(-32, 288+32);
+}
+
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
+void kyugo_state::fgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+
+void kyugo_state::bgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+void kyugo_state::bgattribram_w(offs_t offset, uint8_t data)
+{
+	m_bgattribram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+uint8_t kyugo_state::spriteram_2_r(offs_t offset)
+{
+	// only the lower nibble is connected
+	return m_spriteram[1][offset] | 0xf0;
+}
+
+
+void kyugo_state::scroll_x_lo_w(uint8_t data)
+{
+	m_scroll_x_lo = data;
+}
+
+
+void kyugo_state::gfxctrl_w(uint8_t data)
+{
+	// bit 0 is scroll MSB
+	m_scroll_x_hi = data & 0x01;
+
+	// bit 5 is front layer color (Son of Phoenix only)
+	if (m_fgcolor != ((data & 0x20) >> 5))
+	{
+		m_fgcolor = (data & 0x20) >> 5;
+		m_fg_tilemap->mark_all_dirty();
+	}
+
+	// bit 6 is background palette bank
+	if (m_bgpalbank != ((data & 0x40) >> 6))
+	{
+		m_bgpalbank = (data & 0x40) >> 6;
+		m_bg_tilemap->mark_all_dirty();
+	}
+
+	// other bits are unknown
+}
+
+
+void kyugo_state::scroll_y_w(uint8_t data)
+{
+	m_scroll_y = data;
+}
+
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+void kyugo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// sprite information is scattered through memory
+	// and uses a portion of the text layer memory (outside the visible area)
+	uint8_t *spriteram_area1 = &m_spriteram[0][0x28];
+	uint8_t *spriteram_area2 = &m_spriteram[1][0x28];
+	uint8_t *spriteram_area3 = &m_fgvideoram[0x28];
+
+	int flip = flip_screen();
+
+	for (int n = 0; n < 12 * 2; n++)
+	{
+		int offs, sy, sx, color;
+
+		offs = 2 * (n % 12) + 64 * (n / 12);
+
+		sx = spriteram_area3[offs + 1] + 256 * (spriteram_area2[offs + 1] & 1);
+		if (sx > 320)
+			sx -= 512;
+
+		sy = 255 - spriteram_area1[offs] + 2;
+		if (sy > 0xf0)
+			sy -= 256;
+
+		if (flip)
+			sy = 240 - sy;
+
+		color = spriteram_area1[offs + 1] & 0x1f;
+
+		for (int y = 0; y < 16; y++)
+		{
+			int code = spriteram_area3[offs + 128 * y];
+			int attr = spriteram_area2[offs + 128 * y];
+
+			code = code | ((attr & 0x01) << 9) | ((attr & 0x02) << 7);
+
+			int flipx = attr & 0x08;
+			int flipy = attr & 0x04;
+
+			if (flip)
+			{
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
+					code,
+					color,
+					flipx,flipy,
+					sx, flip ? sy - 16*y : sy + 16*y, 0 );
+		}
+	}
+}
+
+
+uint32_t kyugo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (flip_screen())
+		m_bg_tilemap->set_scrollx(0, -(m_scroll_x_lo + (m_scroll_x_hi * 256)));
+	else
+		m_bg_tilemap->set_scrollx(0, m_scroll_x_lo + (m_scroll_x_hi * 256));
+
+	m_bg_tilemap->set_scrolly(0, m_scroll_y);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
 
 
 /*************************************
@@ -184,7 +472,6 @@ void kyugo_state::kyugo_main_portmap(address_map &map)
 	map.global_mask(0x07);
 	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
 }
-
 
 
 
@@ -305,7 +592,7 @@ void kyugo_state::srdmissn_sub_portmap(address_map &map)
 
 static INPUT_PORTS_START( common )
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("DSW2:1,2,3")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
@@ -314,7 +601,7 @@ static INPUT_PORTS_START( common )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("DSW2:4,5,6")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("DSW2:4,5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
@@ -323,8 +610,8 @@ static INPUT_PORTS_START( common )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )               PORT_DIPLOCATION("DSW2:7")
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )               PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                   PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                   PORT_DIPLOCATION("DSW2:8")
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -359,23 +646,23 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gyrodine )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "DSW1:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "DSW1:4" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )               PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )               PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, "20000 50000" )
 	PORT_DIPSETTING(    0x00, "40000 70000" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )                  PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                                        PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                    PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -384,7 +671,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( repulse )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -404,14 +691,14 @@ static INPUT_PORTS_START( repulse )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                                        PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                    PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("DSW2:7,8")
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
@@ -420,7 +707,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( airwolf )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x01, "6" )
@@ -452,7 +739,7 @@ static INPUT_PORTS_START( skywolf )
 	PORT_INCLUDE( airwolf )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                    PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -461,7 +748,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( flashgal )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                    PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -490,7 +777,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( srdmissn )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -519,7 +806,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( legend )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                        PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -530,7 +817,7 @@ static INPUT_PORTS_START( legend )
 	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" )               PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:5")  // probably unused
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:5") // probably unused
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )                PORT_DIPLOCATION("DSW1:6")
@@ -545,6 +832,7 @@ static INPUT_PORTS_START( legend )
 
 	PORT_INCLUDE( common )
 INPUT_PORTS_END
+
 
 
 /*************************************
@@ -595,6 +883,7 @@ static GFXDECODE_START( gfx_kyugo )
 GFXDECODE_END
 
 
+
 /*************************************
  *
  *  Machine drivers
@@ -619,25 +908,31 @@ void kyugo_state::machine_reset()
 	m_fgcolor = 0;
 }
 
-INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(kyugo_state::interrupt)
 {
-	if(m_nmi_mask)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	int scanline = param;
+
+	// vblank interrupt
+	if (scanline == 240 && m_nmi_mask)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+
+	// 4 sound interrupts per frame
+	if ((scanline & 0x3f) == 0x20)
+		m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
 
 void kyugo_state::kyugo_base(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(18'432'000)/6);  // verified on pcb
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &kyugo_state::kyugo_main_map);
 	m_maincpu->set_addrmap(AS_IO, &kyugo_state::kyugo_main_portmap);
-	m_maincpu->set_vblank_int("screen", FUNC(kyugo_state::vblank_irq));
+	TIMER(config, "scantimer").configure_scanline(FUNC(kyugo_state::interrupt), "screen", 0, 1);
 
-	Z80(config, m_subcpu, XTAL(18'432'000)/6);  // verified on pcb
+	Z80(config, m_subcpu, 18.432_MHz_XTAL / 6); // verified on pcb
 	m_subcpu->set_addrmap(AS_PROGRAM, &kyugo_state::gyrodine_sub_map);
 	m_subcpu->set_addrmap(AS_IO, &kyugo_state::gyrodine_sub_portmap);
-	m_subcpu->set_periodic_int(FUNC(kyugo_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -648,10 +943,7 @@ void kyugo_state::kyugo_base(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 36*8-1, 2*8, 30*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 396, 0, 288, 260, 16, 240);
 	screen.set_screen_update(FUNC(kyugo_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -661,17 +953,18 @@ void kyugo_state::kyugo_base(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(18'432'000)/12));  // verified on pcb
+	ay8910_device &ay1(AY8910(config, "ay1", 18.432_MHz_XTAL / 12)); // verified on pcb
 	ay1.port_a_read_callback().set_ioport("DSW1");
 	ay1.port_b_read_callback().set_ioport("DSW2");
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 0.30);  // verified on pcb
+	AY8910(config, "ay2", 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.30); // verified on pcb
 }
 
 void kyugo_state::gyrodine(machine_config &config)
 {
 	kyugo_base(config);
+
 	// add watchdog
 	WATCHDOG_TIMER(config, "watchdog");
 	m_maincpu->set_addrmap(AS_PROGRAM, &kyugo_state::gyrodine_main_map);
@@ -713,6 +1006,7 @@ void kyugo_state::legend(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &kyugo_state::legend_sub_map);
 	m_subcpu->set_addrmap(AS_IO, &kyugo_state::srdmissn_sub_portmap);
 }
+
 
 
 /*************************************
@@ -1578,7 +1872,7 @@ ROM_START( legendb )
 	ROM_LOAD( "epl12p6.9j", 0x0200, 0x0034, CRC(dcae870d) SHA1(2224724a3faf0608083f5d6ff76712adc7616a54) )
 ROM_END
 
-
+} // anonymous namespace
 
 
 

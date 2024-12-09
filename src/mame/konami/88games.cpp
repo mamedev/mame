@@ -38,21 +38,21 @@ public:
 		m_k051960(*this, "k051960"),
 		m_k051316(*this, "k051316"),
 		m_upd7759(*this, "upd%d", 1),
-		m_bank0000(*this, "bank0000"),
-		m_bank1000(*this, "bank1000"),
-		m_ram(*this, "ram")
+		m_mainbank(*this, "mainbank"),
+		m_k051316_view(*this, "k051316_view"),
+		m_palette_view(*this, "palette_view")
 	{ }
 
 	void _88games(machine_config &config);
 
 private:
-	/* video-related */
-	int          m_k88games_priority = 0;
-	int          m_videobank = 0;
-	int          m_zoomreadroms = 0;
-	int          m_speech_chip = 0;
+	// video-related
+	bool          m_k88games_priority = false;
+	bool          m_videobank = false;
+	bool          m_zoomreadroms = false;
+	uint8_t       m_speech_chip = 0;
 
-	/* devices */
+	// devices
 	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k052109_device> m_k052109;
@@ -60,24 +60,22 @@ private:
 	required_device<k051316_device> m_k051316;
 	required_device_array<upd7759_device, 2> m_upd7759;
 
-	/* memory banks */
-	required_memory_bank m_bank0000;
-	required_memory_bank m_bank1000;
+	// memory banks
+	required_memory_bank m_mainbank;
 
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_ram;
+	// memory views
+	memory_view m_k051316_view;
+	memory_view m_palette_view;
 
-	uint8_t bankedram_r(offs_t offset);
-	void bankedram_w(offs_t offset, uint8_t data);
 	void k88games_5f84_w(uint8_t data);
-	void k88games_sh_irqtrigger_w(uint8_t data);
+	void sh_irqtrigger_w(uint8_t data);
 	void speech_control_w(uint8_t data);
 	void speech_msg_w(uint8_t data);
 	uint8_t k052109_051960_r(offs_t offset);
 	void k052109_051960_w(offs_t offset, uint8_t data);
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	uint32_t screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K051316_CB_MEMBER(zoom_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
@@ -113,7 +111,7 @@ K051960_CB_MEMBER(_88games_state::sprite_callback)
 {
 	enum { sprite_colorbase = 512 / 16 };
 
-	*priority = (*color & 0x20) >> 5;   /* ??? */
+	*priority = (*color & 0x20) >> 5;   // ???
 	*color = sprite_colorbase + (*color & 0x0f);
 }
 
@@ -138,7 +136,7 @@ K051316_CB_MEMBER(_88games_state::zoom_callback)
 
 ***************************************************************************/
 
-uint32_t _88games_state::screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t _88games_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k052109->tilemap_update();
 
@@ -171,42 +169,23 @@ uint32_t _88games_state::screen_update_88games(screen_device &screen, bitmap_ind
  *
  *************************************/
 
-uint8_t _88games_state::bankedram_r(offs_t offset)
-{
-	if (m_videobank)
-		return m_ram[offset];
-	else
-	{
-		if (m_zoomreadroms)
-			return m_k051316->rom_r(offset);
-		else
-			return m_k051316->read(offset);
-	}
-}
-
-void _88games_state::bankedram_w(offs_t offset, uint8_t data)
-{
-	if (m_videobank)
-		m_ram[offset] = data;
-	else
-		m_k051316->write(offset, data);
-}
-
 void _88games_state::k88games_5f84_w(uint8_t data)
 {
-	/* bits 0/1 coin counters */
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	// bits 0/1 coin counters
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
-	/* bit 2 enables ROM reading from the 051316 */
-	/* also 5fce == 2 read roms, == 3 read ram */
-	m_zoomreadroms = data & 0x04;
+	// bit 2 enables ROM reading from the 051316
+	// also 5fce == 2 read roms, == 3 read ram
+	m_zoomreadroms = BIT(data, 2);
+	if (!m_videobank)
+		m_k051316_view.select(m_zoomreadroms ? 1 : 0);
 
 	if (data & 0xf8)
 		popmessage("5f84 = %02x", data);
 }
 
-void _88games_state::k88games_sh_irqtrigger_w(uint8_t data)
+void _88games_state::sh_irqtrigger_w(uint8_t data)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
@@ -225,7 +204,7 @@ void _88games_state::speech_msg_w(uint8_t data)
 	m_upd7759[m_speech_chip]->port_w(data);
 }
 
-/* special handlers to combine 052109 & 051960 */
+// special handlers to combine 052109 & 051960
 uint8_t _88games_state::k052109_051960_r(offs_t offset)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
@@ -259,17 +238,21 @@ void _88games_state::k052109_051960_w(offs_t offset, uint8_t data)
 
 void _88games_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0fff).bankr("bank0000"); /* banked ROM */
-	map(0x1000, 0x1fff).bankr("bank1000"); /* banked ROM + palette RAM */
+	map(0x0000, 0x1fff).bankr(m_mainbank); // banked ROM
 	map(0x1000, 0x1fff).w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0x1000, 0x1fff).view(m_palette_view); // banked ROM + palette RAM
+	m_palette_view[0](0x1000, 0x1fff).readonly().share("palette");
 	map(0x2000, 0x2fff).ram();
 	map(0x3000, 0x37ff).ram().share("nvram");
-	map(0x3800, 0x3fff).rw(FUNC(_88games_state::bankedram_r), FUNC(_88games_state::bankedram_w)).share("ram");
+	map(0x3800, 0x3fff).ram();
+	map(0x3800, 0x3fff).view(m_k051316_view);
+	m_k051316_view[0](0x3800, 0x3fff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write));
+	m_k051316_view[1](0x3800, 0x3fff).rw(m_k051316, FUNC(k051316_device::rom_r), FUNC(k051316_device::write));
 	map(0x4000, 0x7fff).rw(FUNC(_88games_state::k052109_051960_r), FUNC(_88games_state::k052109_051960_w));
 	map(0x5f84, 0x5f84).w(FUNC(_88games_state::k88games_5f84_w));
 	map(0x5f88, 0x5f88).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x5f8c, 0x5f8c).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x5f90, 0x5f90).w(FUNC(_88games_state::k88games_sh_irqtrigger_w));
+	map(0x5f90, 0x5f90).w(FUNC(_88games_state::sh_irqtrigger_w));
 	map(0x5f94, 0x5f94).portr("IN0");
 	map(0x5f95, 0x5f95).portr("IN1");
 	map(0x5f96, 0x5f96).portr("IN2");
@@ -369,7 +352,7 @@ static INPUT_PORTS_START( 88games )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, "No Coin B" )
-	/* "No Coin B" = coins produce sound, but no effect on coin counter */
+	// "No Coin B" = coins produce sound, but no effect on coin counter
 
 	PORT_START("DSW2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )
@@ -401,30 +384,35 @@ void _88games_state::banking_callback(uint8_t data)
 {
 	logerror("%s: bank select %02x\n", machine().describe_context(), data);
 
-	/* bits 0-2 select ROM bank for 0000-1fff */
-	/* bit 3: when 1, palette RAM at 1000-1fff */
-	/* bit 4: when 0, 051316 RAM at 3800-3fff; when 1, work RAM at 2000-3fff (NVRAM 3700-37ff) */
-	int rombank = data & 0x07;
-	m_bank0000->set_entry(rombank);
-	m_bank1000->set_entry((data & 0x08) ? 8 : rombank);
-	m_videobank = data & 0x10;
+	// bits 0-2 select ROM bank for 0000-1fff
+	// bit 3: when 1, palette RAM at 1000-1fff
+	// bit 4: when 0, 051316 RAM at 3800-3fff; when 1, work RAM at 2000-3fff (NVRAM 3700-37ff)
+	m_mainbank->set_entry(data & 0x07);
+	if (BIT(data, 3))
+		m_palette_view.select(0);
+	else
+		m_palette_view.disable();
 
-	/* bit 5 = enable char ROM reading through the video RAM */
-	m_k052109->set_rmrd_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	m_videobank = BIT(data, 4);
+	if (m_videobank)
+		m_k051316_view.disable();
+	else
+		m_k051316_view.select(m_zoomreadroms ? 1 : 0);
 
-	/* bit 6 is unknown, 1 most of the time */
+	// bit 5 = enable char ROM reading through the video RAM
+	m_k052109->set_rmrd_line(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 
-	/* bit 7 controls layer priority */
-	m_k88games_priority = data & 0x80;
+	// bit 6 is unknown, 1 most of the time
+
+	// bit 7 controls layer priority
+	m_k88games_priority = BIT(data, 7);
 }
 
 void _88games_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base() + 0x10000;
+	uint8_t *ROM = memregion("maincpu")->base();
 
-	m_bank0000->configure_entries(0, 8, &ROM[0x0000], 0x2000);
-	m_bank1000->configure_entries(0, 8, &ROM[0x1000], 0x2000);
-	m_bank1000->configure_entry(8, memshare("palette")->ptr());
+	m_mainbank->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
 	save_item(NAME(m_videobank));
 	save_item(NAME(m_zoomreadroms));
@@ -434,16 +422,18 @@ void _88games_state::machine_start()
 
 void _88games_state::machine_reset()
 {
-	m_videobank = 0;
-	m_zoomreadroms = 0;
+	m_videobank = false;
+	m_zoomreadroms = false;
+	m_k051316_view.select(0);
+	m_palette_view.disable();
 	m_speech_chip = 0;
-	m_k88games_priority = 0;
+	m_k88games_priority = false;
 }
 
 void _88games_state::_88games(machine_config &config)
 {
-	/* basic machine hardware */
-	KONAMI(config, m_maincpu, 12000000); /* ? */
+	// basic machine hardware
+	KONAMI(config, m_maincpu, 12000000); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &_88games_state::main_map);
 	m_maincpu->line().set(FUNC(_88games_state::banking_callback));
 
@@ -454,13 +444,13 @@ void _88games_state::_88games(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(_88games_state::screen_update_88games));
+	screen.set_screen_update(FUNC(_88games_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
@@ -480,7 +470,7 @@ void _88games_state::_88games(machine_config &config)
 	m_k051316->set_palette("palette");
 	m_k051316->set_zoom_callback(FUNC(_88games_state::zoom_callback));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -501,14 +491,14 @@ void _88games_state::_88games(machine_config &config)
  *************************************/
 
 ROM_START( 88games )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) // code + banked roms
 	ROM_LOAD( "861m01.k18", 0x08000, 0x08000, CRC(4a4e2959) SHA1(95572686bef48b5c1ce1dedf0afc891d92aff00d) )
 	ROM_LOAD( "861m02.k16", 0x10000, 0x10000, CRC(e19f15f6) SHA1(6c801b274e87eaff7f40148381ade5b38120cc12) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code
 	ROM_LOAD( "861d01.d9", 0x00000, 0x08000, CRC(0ff1dec0) SHA1(749dc98f8740beee1383f85effc9336081315f4b) )
 
-	ROM_REGION( 0x080000, "k052109", 0 )    /* tiles */
+	ROM_REGION( 0x080000, "k052109", 0 )    // tiles
 	ROM_LOAD32_BYTE( "861a08.a", 0x000000, 0x10000, CRC(77a00dd6) SHA1(e3667839f8ae3699236da3e312c20d571db38670) )
 	ROM_LOAD32_BYTE( "861a08.c", 0x000001, 0x10000, CRC(b422edfc) SHA1(b3842c8dc60975cc71812df098f29b4571b18120) )
 	ROM_LOAD32_BYTE( "861a09.a", 0x000002, 0x10000, CRC(df8917b6) SHA1(3614b78c2100f135ea0701409ce279a423decb23) )
@@ -518,7 +508,7 @@ ROM_START( 88games )
 	ROM_LOAD32_BYTE( "861a09.b", 0x040002, 0x10000, CRC(4917158d) SHA1(b53da3f29c9aeb59933dc3a8214cc1314e21000b) )
 	ROM_LOAD32_BYTE( "861a09.d", 0x040003, 0x10000, CRC(2bb3282c) SHA1(6ca54948a02c91543b7e595641b0edc2564f83ff) )
 
-	ROM_REGION( 0x100000, "k051960", 0 )    /* sprites */
+	ROM_REGION( 0x100000, "k051960", 0 )    // sprites
 	ROM_LOAD32_BYTE( "861a05.a", 0x000000, 0x10000, CRC(cedc19d0) SHA1(6eb2a292d574dee06e214e61c0e08fa233ac68e8) )
 	ROM_LOAD32_BYTE( "861a05.e", 0x000001, 0x10000, CRC(725af3fc) SHA1(98ac364db4b2c5682a299f4d2a288ebc8a303b1f) )
 	ROM_LOAD32_BYTE( "861a06.a", 0x000002, 0x10000, CRC(85e2e30e) SHA1(11010727db8c71650c5b9df5340f9bc412435d11) )
@@ -536,33 +526,33 @@ ROM_START( 88games )
 	ROM_LOAD32_BYTE( "861a06.d", 0x0c0002, 0x10000, CRC(bc70ab39) SHA1(a6fa0502ceb6862e7b1e4815326e268fd6511881) )
 	ROM_LOAD32_BYTE( "861a06.h", 0x0c0003, 0x10000, CRC(d906b79b) SHA1(905814ce708d80fd4d1a398f60faa0bc680fccaf) )
 
-	ROM_REGION( 0x040000, "k051316", 0 )    /* zoom/rotate */
+	ROM_REGION( 0x040000, "k051316", 0 )    // zoom/rotate
 	ROM_LOAD( "861a04.a", 0x000000, 0x10000, CRC(092a8b15) SHA1(d98a81bfa4bba73805f0236f8a80da130fcb378d) )
 	ROM_LOAD( "861a04.b", 0x010000, 0x10000, CRC(75744b56) SHA1(5133d8f6622796ed6b9e6a0d0f1df28f00331fc7) )
 	ROM_LOAD( "861a04.c", 0x020000, 0x10000, CRC(a00021c5) SHA1(f73f88af33387d73b4262e8652507e699926fabe) )
 	ROM_LOAD( "861a04.d", 0x030000, 0x10000, CRC(d208304c) SHA1(77dd31163c8431416ab0593f084719c914222912) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "861.g3",   0x0000, 0x0100, CRC(429785db) SHA1(d27e8e180f19d2b160f18c79520a77182a62218c) )    /* priority encoder (not used) */
+	ROM_LOAD( "861.g3",   0x0000, 0x0100, CRC(429785db) SHA1(d27e8e180f19d2b160f18c79520a77182a62218c) )    // priority encoder (not used)
 
-	ROM_REGION( 0x20000, "upd1", 0 ) /* samples for UPD7759 #0 */
+	ROM_REGION( 0x20000, "upd1", 0 ) // samples for UPD7759 #0
 	ROM_LOAD( "861a07.a", 0x000000, 0x10000, CRC(5d035d69) SHA1(9df63e004a4f52768331dfb3c3889301ac174ea1) )
 	ROM_LOAD( "861a07.b", 0x010000, 0x10000, CRC(6337dd91) SHA1(74ba58f1664abd1491598c1a9467f470304fa430) )
 
-	ROM_REGION( 0x20000, "upd2", 0 ) /* samples for UPD7759 #1 */
+	ROM_REGION( 0x20000, "upd2", 0 ) // samples for UPD7759 #1
 	ROM_LOAD( "861a07.c", 0x000000, 0x10000, CRC(5067a38b) SHA1(b5a8f7122356dd72a97e71b480835ba500116aaf) )
 	ROM_LOAD( "861a07.d", 0x010000, 0x10000, CRC(86731451) SHA1(c1410f6c7a23aa0c213878a6531d3e7eb966b0a4) )
 ROM_END
 
 ROM_START( konami88 )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) // code + banked roms
 	ROM_LOAD( "861.e03", 0x08000, 0x08000, CRC(55979bd9) SHA1(d683cc514e2b41fc4033d5dc107ca22ba8981ada) )
 	ROM_LOAD( "861.e02", 0x10000, 0x10000, CRC(5b7e98a6) SHA1(39b6e93221d14a4695c79fb39c4eea54ec5ffb0c) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code
 	ROM_LOAD( "861d01.d9", 0x00000, 0x08000, CRC(0ff1dec0) SHA1(749dc98f8740beee1383f85effc9336081315f4b) )
 
-	ROM_REGION(  0x080000, "k052109", 0 )    /* tiles */
+	ROM_REGION(  0x080000, "k052109", 0 )    // tiles
 	ROM_LOAD32_BYTE( "861a08.a", 0x000000, 0x10000, CRC(77a00dd6) SHA1(e3667839f8ae3699236da3e312c20d571db38670) )
 	ROM_LOAD32_BYTE( "861a08.c", 0x000001, 0x10000, CRC(b422edfc) SHA1(b3842c8dc60975cc71812df098f29b4571b18120) )
 	ROM_LOAD32_BYTE( "861a09.a", 0x000002, 0x10000, CRC(df8917b6) SHA1(3614b78c2100f135ea0701409ce279a423decb23) )
@@ -572,7 +562,7 @@ ROM_START( konami88 )
 	ROM_LOAD32_BYTE( "861a09.b", 0x040002, 0x10000, CRC(4917158d) SHA1(b53da3f29c9aeb59933dc3a8214cc1314e21000b) )
 	ROM_LOAD32_BYTE( "861a09.d", 0x040003, 0x10000, CRC(2bb3282c) SHA1(6ca54948a02c91543b7e595641b0edc2564f83ff) )
 
-	ROM_REGION( 0x100000, "k051960", 0 )    /* sprites */
+	ROM_REGION( 0x100000, "k051960", 0 )    // sprites
 	ROM_LOAD32_BYTE( "861a05.a", 0x000000, 0x10000, CRC(cedc19d0) SHA1(6eb2a292d574dee06e214e61c0e08fa233ac68e8) )
 	ROM_LOAD32_BYTE( "861a05.e", 0x000001, 0x10000, CRC(725af3fc) SHA1(98ac364db4b2c5682a299f4d2a288ebc8a303b1f) )
 	ROM_LOAD32_BYTE( "861a06.a", 0x000002, 0x10000, CRC(85e2e30e) SHA1(11010727db8c71650c5b9df5340f9bc412435d11) )
@@ -590,33 +580,33 @@ ROM_START( konami88 )
 	ROM_LOAD32_BYTE( "861a06.d", 0x0c0002, 0x10000, CRC(bc70ab39) SHA1(a6fa0502ceb6862e7b1e4815326e268fd6511881) )
 	ROM_LOAD32_BYTE( "861a06.h", 0x0c0003, 0x10000, CRC(d906b79b) SHA1(905814ce708d80fd4d1a398f60faa0bc680fccaf) )
 
-	ROM_REGION( 0x040000, "k051316", 0 )    /* zoom/rotate */
+	ROM_REGION( 0x040000, "k051316", 0 )    // zoom/rotate
 	ROM_LOAD( "861a04.a", 0x000000, 0x10000, CRC(092a8b15) SHA1(d98a81bfa4bba73805f0236f8a80da130fcb378d) )
 	ROM_LOAD( "861a04.b", 0x010000, 0x10000, CRC(75744b56) SHA1(5133d8f6622796ed6b9e6a0d0f1df28f00331fc7) )
 	ROM_LOAD( "861a04.c", 0x020000, 0x10000, CRC(a00021c5) SHA1(f73f88af33387d73b4262e8652507e699926fabe) )
 	ROM_LOAD( "861a04.d", 0x030000, 0x10000, CRC(d208304c) SHA1(77dd31163c8431416ab0593f084719c914222912) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "861.g3",   0x0000, 0x0100, CRC(429785db) SHA1(d27e8e180f19d2b160f18c79520a77182a62218c) )    /* priority encoder (not used) */
+	ROM_LOAD( "861.g3",   0x0000, 0x0100, CRC(429785db) SHA1(d27e8e180f19d2b160f18c79520a77182a62218c) )    // priority encoder (not used)
 
-	ROM_REGION( 0x20000, "upd1", 0 ) /* samples for UPD7759 #0 */
+	ROM_REGION( 0x20000, "upd1", 0 ) // samples for UPD7759 #0
 	ROM_LOAD( "861a07.a", 0x000000, 0x10000, CRC(5d035d69) SHA1(9df63e004a4f52768331dfb3c3889301ac174ea1) )
 	ROM_LOAD( "861a07.b", 0x010000, 0x10000, CRC(6337dd91) SHA1(74ba58f1664abd1491598c1a9467f470304fa430) )
 
-	ROM_REGION( 0x20000, "upd2", 0 ) /* samples for UPD7759 #1 */
+	ROM_REGION( 0x20000, "upd2", 0 ) // samples for UPD7759 #1
 	ROM_LOAD( "861a07.c", 0x000000, 0x10000, CRC(5067a38b) SHA1(b5a8f7122356dd72a97e71b480835ba500116aaf) )
 	ROM_LOAD( "861a07.d", 0x010000, 0x10000, CRC(86731451) SHA1(c1410f6c7a23aa0c213878a6531d3e7eb966b0a4) )
 ROM_END
 
 ROM_START( hypsptsp )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) // code + banked roms
 	ROM_LOAD( "861f03.k18", 0x08000, 0x08000, CRC(8c61aebd) SHA1(de720acfe07fd70fe467f9c73122e0fbeab2b8c8) )
 	ROM_LOAD( "861f02.k16", 0x10000, 0x10000, CRC(d2460c28) SHA1(936220aa3983ffa2330843f683347768772561af) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code
 	ROM_LOAD( "861d01.d9", 0x00000, 0x08000, CRC(0ff1dec0) SHA1(749dc98f8740beee1383f85effc9336081315f4b) )
 
-	ROM_REGION(  0x080000, "k052109", 0 )    /* tiles */
+	ROM_REGION(  0x080000, "k052109", 0 )    // tiles
 	ROM_LOAD32_BYTE( "861a08.a", 0x000000, 0x10000, CRC(77a00dd6) SHA1(e3667839f8ae3699236da3e312c20d571db38670) )
 	ROM_LOAD32_BYTE( "861a08.c", 0x000001, 0x10000, CRC(b422edfc) SHA1(b3842c8dc60975cc71812df098f29b4571b18120) )
 	ROM_LOAD32_BYTE( "861a09.a", 0x000002, 0x10000, CRC(df8917b6) SHA1(3614b78c2100f135ea0701409ce279a423decb23) )
@@ -626,7 +616,7 @@ ROM_START( hypsptsp )
 	ROM_LOAD32_BYTE( "861a09.b", 0x040002, 0x10000, CRC(4917158d) SHA1(b53da3f29c9aeb59933dc3a8214cc1314e21000b) )
 	ROM_LOAD32_BYTE( "861a09.d", 0x040003, 0x10000, CRC(2bb3282c) SHA1(6ca54948a02c91543b7e595641b0edc2564f83ff) )
 
-	ROM_REGION( 0x100000, "k051960", 0 )    /* sprites */
+	ROM_REGION( 0x100000, "k051960", 0 )    // sprites
 	ROM_LOAD32_BYTE( "861a05.a", 0x000000, 0x10000, CRC(cedc19d0) SHA1(6eb2a292d574dee06e214e61c0e08fa233ac68e8) )
 	ROM_LOAD32_BYTE( "861a05.e", 0x000001, 0x10000, CRC(725af3fc) SHA1(98ac364db4b2c5682a299f4d2a288ebc8a303b1f) )
 	ROM_LOAD32_BYTE( "861a06.a", 0x000002, 0x10000, CRC(85e2e30e) SHA1(11010727db8c71650c5b9df5340f9bc412435d11) )
@@ -644,20 +634,20 @@ ROM_START( hypsptsp )
 	ROM_LOAD32_BYTE( "861a06.d", 0x0c0002, 0x10000, CRC(bc70ab39) SHA1(a6fa0502ceb6862e7b1e4815326e268fd6511881) )
 	ROM_LOAD32_BYTE( "861a06.h", 0x0c0003, 0x10000, CRC(d906b79b) SHA1(905814ce708d80fd4d1a398f60faa0bc680fccaf) )
 
-	ROM_REGION( 0x040000, "k051316", 0 )    /* zoom/rotate */
+	ROM_REGION( 0x040000, "k051316", 0 )    // zoom/rotate
 	ROM_LOAD( "861a04.a", 0x000000, 0x10000, CRC(092a8b15) SHA1(d98a81bfa4bba73805f0236f8a80da130fcb378d) )
 	ROM_LOAD( "861a04.b", 0x010000, 0x10000, CRC(75744b56) SHA1(5133d8f6622796ed6b9e6a0d0f1df28f00331fc7) )
 	ROM_LOAD( "861a04.c", 0x020000, 0x10000, CRC(a00021c5) SHA1(f73f88af33387d73b4262e8652507e699926fabe) )
 	ROM_LOAD( "861a04.d", 0x030000, 0x10000, CRC(d208304c) SHA1(77dd31163c8431416ab0593f084719c914222912) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "861.g3",   0x0000, 0x0100, CRC(429785db) SHA1(d27e8e180f19d2b160f18c79520a77182a62218c) )    /* priority encoder (not used) */
+	ROM_LOAD( "861.g3",   0x0000, 0x0100, CRC(429785db) SHA1(d27e8e180f19d2b160f18c79520a77182a62218c) )    // priority encoder (not used)
 
-	ROM_REGION( 0x20000, "upd1", 0 ) /* samples for UPD7759 #0 */
+	ROM_REGION( 0x20000, "upd1", 0 ) // samples for UPD7759 #0
 	ROM_LOAD( "861a07.a", 0x000000, 0x10000, CRC(5d035d69) SHA1(9df63e004a4f52768331dfb3c3889301ac174ea1) )
 	ROM_LOAD( "861a07.b", 0x010000, 0x10000, CRC(6337dd91) SHA1(74ba58f1664abd1491598c1a9467f470304fa430) )
 
-	ROM_REGION( 0x20000, "upd2", 0 ) /* samples for UPD7759 #1 */
+	ROM_REGION( 0x20000, "upd2", 0 ) // samples for UPD7759 #1
 	ROM_LOAD( "861a07.c", 0x000000, 0x10000, CRC(5067a38b) SHA1(b5a8f7122356dd72a97e71b480835ba500116aaf) )
 	ROM_LOAD( "861a07.d", 0x010000, 0x10000, CRC(86731451) SHA1(c1410f6c7a23aa0c213878a6531d3e7eb966b0a4) )
 ROM_END

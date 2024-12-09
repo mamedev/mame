@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_IEE488_C8050_H
-#define MAME_BUS_IEE488_C8050_H
+#ifndef MAME_BUS_IEEE488_C8050_H
+#define MAME_BUS_IEEE488_C8050_H
 
 #pragma once
 
@@ -146,4 +146,4 @@ DECLARE_DEVICE_TYPE(C8250LP, c8250lp_device)
 DECLARE_DEVICE_TYPE(SFD1001, sfd1001_device)
 
 
-#endif // MAME_BUS_IEE488_C8050_H
+#endif // MAME_BUS_IEEE488_C8050_H

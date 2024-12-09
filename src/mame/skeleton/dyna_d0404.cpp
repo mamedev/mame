@@ -59,7 +59,6 @@ private:
 
 uint32_t dyna_d0404_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	return 0;
 }
 
@@ -71,6 +70,9 @@ void dyna_d0404_state::video_start()
 void dyna_d0404_state::program_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom();
+	map(0x00200000, 0x0020bfff).ram();
+	map(0x00240000, 0x0024ffff).ram();
+	map(0xffff0000, 0xffffffff).ram();
 }
 
 
@@ -196,9 +198,22 @@ ROM_START( cm2005b ) // DYNA CM2005 VER. 0.14H at 0xc0000 in ROM
 	ROM_LOAD( "gal16v8.10b", 0x40000, 0x40000, CRC(d8320940) SHA1(a65973fefaff03696cdbb60a02bfb5e352254951) )
 ROM_END
 
+ROM_START( supereld ) // DYNA SUPER EL DORADO Ver.1.04H at 0xc0000 in ROM
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "a29800uv-70f.11b", 0x000000, 0x100000, CRC(d142d7b2) SHA1(33b02a9e9ebc21bda0f262d921388c9f5edf256e) )
+
+	ROM_REGION( 0x100000, "gfx", 0 )
+	ROM_LOAD( "a29800uv-70f.12b", 0x000000, 0x100000, CRC(080f5212) SHA1(b76041ec24cc4e3d4694b94977ead282feaaa772) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8d.10a", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.10b", 0x200, 0x117, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 2005, cm2005,  0,      dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Cherry Master 2005 (Ver. 1.10U)", MACHINE_IS_SKELETON )
-GAME( 2005, cm2005a, cm2005, dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Cherry Master 2005 (Ver. 1.02U)", MACHINE_IS_SKELETON )
-GAME( 2005, cm2005b, cm2005, dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Cherry Master 2005 (Ver. 0.14H)", MACHINE_IS_SKELETON )
+GAME( 2005, cm2005,   0,      dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Cherry Master 2005 (Ver. 1.10U)", MACHINE_IS_SKELETON )
+GAME( 2005, cm2005a,  cm2005, dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Cherry Master 2005 (Ver. 1.02U)", MACHINE_IS_SKELETON )
+GAME( 2005, cm2005b,  cm2005, dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Cherry Master 2005 (Ver. 0.14H)", MACHINE_IS_SKELETON )
+GAME( 2008, supereld, 0,      dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Super El Dorado (Ver. 1.04H)",    MACHINE_IS_SKELETON )

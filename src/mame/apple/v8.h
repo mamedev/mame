@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "pseudovia.h"
+
 #include "machine/6522via.h"
 #include "machine/applefdintf.h"
 #include "machine/swim2.h"
@@ -40,19 +42,21 @@ public:
 	void cb2_w(int state);
 	template <u8 mask> void slot_irq_w(int state);
 	void scc_irq_w(int state);
+	void slot2_irq_w(int state);
 
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<asc_device> m_asc;
+	required_device<pseudovia_device> m_pseudovia;
 
 	std::unique_ptr<u32 []> m_vram;
 
-	u8 m_pseudovia_regs[256];
 	u32 *m_ram_ptr;
 	u32 m_ram_size;
 	bool m_overlay;
+	u8 m_video_config;
 
 	v8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -63,10 +67,6 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-
-	virtual u8 pseudovia_r(offs_t offset);
-
-	void asc_irq(int state);
 
 	virtual void ram_size(u8 config);
 
@@ -81,15 +81,17 @@ private:
 	sound_stream *m_stream;
 	emu_timer *m_6015_timer;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
-	u8 m_pseudovia_ier, m_pseudovia_ifr;
-	u8 m_pal_address, m_pal_idx, m_pal_control, m_pal_colkey;
+	u8 m_pal_address, m_pal_idx, m_pal_control, m_pal_colkey, m_config;
 
 	bool m_baseIs4M;
 
 	u32 rom_switch_r(offs_t offset);
 
-	void pseudovia_w(offs_t offset, u8 data);
-	void pseudovia_recalc_irqs();
+	void via2_pb_w(u8 data);
+	u8 via2_config_r();
+	void via2_config_w(u8 data);
+	u8 via2_video_config_r();
+	void via2_video_config_w(u8 data);
 
 	u16 mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, u16 data, u16 mem_mask);
@@ -126,7 +128,7 @@ protected:
 
 private:
 	u8 via_in_a() override;
-	u8 pseudovia_r(offs_t offset) override;
+	u8 via2_video_config_r();
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 };
 
@@ -158,7 +160,7 @@ private:
 
 	virtual u8 via_in_a() override;
 	virtual void via_out_a(u8 data) override;
-	virtual u8 pseudovia_r(offs_t offset) override;
+	u8 via2_video_config_r();
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 	u16 swim_r(offs_t offset, u16 mem_mask);
@@ -181,7 +183,7 @@ protected:
 
 private:
 	virtual u8 via_in_a() override;
-	virtual u8 pseudovia_r(offs_t offset) override;
+	u8 via2_video_config_r();
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 };
 

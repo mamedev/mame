@@ -287,7 +287,7 @@ void upd1771c_device::device_reset()
 	m_pc3 = 0;
 	m_t_tpos = 0;
 	m_t_ppos = 0;
-	m_state = 0;
+	m_state = STATE_SILENCE;
 	m_nw_tpos = 0;
 	memset(m_n_value, 0x00, sizeof(m_n_value));
 	memset(m_n_ppos, 0x00, sizeof(m_n_ppos));
@@ -432,15 +432,30 @@ void upd1771c_device::write(uint8_t data)
 			//6Khz(ish) DIGI playback
 
 			//end capture
-			if (m_index >= 2 && m_packet[m_index - 2] == 0xfe && m_packet[m_index - 1] == 0x00)
 			{
-				//TODO play capture!
-				m_index = 0;
-				m_packet[0] = 0;
-				m_state = STATE_ADPCM;
+				bool have_all_data = false;
+				if (m_index >= 2 && m_packet[m_index - 2] == 0xfe && m_packet[m_index - 1] == 0x00)
+				{
+					//TODO play capture!
+					if (m_index >= 6)
+					{
+						// offsets 2 and 3 in the transferred pcm data seem to contain the number of samples
+						uint16_t count = (m_packet[4] << 8) | m_packet[3];
+						count--;
+						m_packet[3] = count & 0xff;
+						m_packet[4] = (count >> 8);
+						if (count == 0)
+						{
+							m_index = 0;
+							m_packet[0] = 0;
+							m_state = STATE_ADPCM;
+							have_all_data = true;
+						}
+					}
+				}
+				if (!have_all_data)
+					m_timer->adjust(attotime::from_ticks(512, clock()));
 			}
-			else
-				m_timer->adjust(attotime::from_ticks(512, clock()));
 			break;
 
 		//garbage: wipe stack
@@ -460,6 +475,7 @@ void upd1771c_device::pcm_write(int state)
 		logerror("upd1771_pc3 change!: state = %d\n", state);
 		m_index = 0;
 		m_packet[0] = 0;
+		m_state = STATE_SILENCE;
 	}
 
 	m_pc3 = state;

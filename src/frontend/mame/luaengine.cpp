@@ -889,6 +889,7 @@ void lua_engine::initialize()
 	// TODO: stuff below here needs to be rationalised
 	emu["app_name"] = &emulator_info::get_appname_lower;
 	emu["app_version"] = &emulator_info::get_bare_build_version;
+	emu["app_build"] = &emulator_info::get_build_version;
 	emu["gamename"] = [this] () { return machine().system().type.fullname(); };
 	emu["romname"] = [this] () { return machine().basename(); };
 	emu["softname"] = [this] () { return machine().options().software_name(); };
@@ -1461,7 +1462,19 @@ void lua_engine::initialize()
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
 	machine_type["slots"] = sol::property([](running_machine &m) { return devenum<slot_interface_enumerator>(m.root_device()); });
-
+	machine_type["phase"] = sol::property(
+			[](running_machine& m)
+			{
+				switch (m.phase())
+				{
+				case machine_phase::PREINIT:	return "preinit";
+				case machine_phase::INIT:		return "init";
+				case machine_phase::RESET:		return "reset";
+				case machine_phase::RUNNING:	return "running";
+				case machine_phase::EXIT:		return "exit";
+				default:						return "";
+				}
+			});
 
 	auto game_driver_type = sol().registry().new_usertype<game_driver>("game_driver", sol::no_constructor);
 	game_driver_type["name"] = sol::property([] (game_driver const &driver) { return &driver.name[0]; });

@@ -378,6 +378,38 @@ u16 gp9001vdp_device::vdpstatus_r()
 	return ((screen().vpos() + 15) % 262) >= 245;
 }
 
+// this is a common form of reading several of the flags provide by the VDP
+u16 gp9001vdp_device::vdpcount_r()
+{
+	/* +---------+---------+--------+---------------------------+ */
+	/* | /H-Sync | /V-Sync | /Blank |       Scanline Count      | */
+	/* | Bit 15  | Bit 14  | Bit 8  |  Bit 7-0 (count from #EF) | */
+	/* +---------+---------+--------+---------------------------+ */
+	/*************** Control Signals are active low ***************/
+
+	int vpos = screen().vpos();
+
+	u16 video_status = 0xff00;    // Set signals inactive
+
+	vpos = (vpos + 15) % 262;
+
+	if (hsync_r())
+		video_status &= ~0x8000;
+	if (vsync_r())
+		video_status &= ~0x4000;
+	if (fblank_r())
+		video_status &= ~0x0100;
+	if (vpos < 256)
+		video_status |= (vpos & 0xff);
+	else
+		video_status |= 0xff;
+
+//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,m_screen->vblank());
+
+	return video_status;
+}
+
+
 void gp9001vdp_device::scroll_reg_select_w(u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)

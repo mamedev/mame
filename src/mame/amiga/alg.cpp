@@ -251,11 +251,11 @@ void alg_state::main_map_picmatic(address_map &map)
 
 static INPUT_PORTS_START( alg )
 	PORT_START("joy_0_dat")   // Read by Amiga core
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(alg_state, amiga_joystick_convert<0>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(alg_state::amiga_joystick_convert<0>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("joy_1_dat")   // Read by Amiga core
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(alg_state, amiga_joystick_convert<1>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(alg_state::amiga_joystick_convert<1>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("potgo")     // Read by Amiga core
@@ -266,7 +266,7 @@ static INPUT_PORTS_START( alg )
 	PORT_BIT( 0xaaff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("HVPOS")     // Read by Amiga core
-	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(alg_state, lightgun_pos_r)
+	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(alg_state::lightgun_pos_r))
 
 	PORT_START("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -297,13 +297,13 @@ static INPUT_PORTS_START( alg_2p )
 
 	PORT_MODIFY("potgo")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(alg_state, lightgun_trigger_r)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(alg_state::lightgun_trigger_r))
 
 	PORT_MODIFY("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("p2_joy")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(alg_state, lightgun_holster_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(alg_state::lightgun_holster_r))
 
 	PORT_START("GUN2X")     // Referenced by lightgun_pos_r
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)

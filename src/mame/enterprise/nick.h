@@ -75,6 +75,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void nick_map(address_map &map) ATTR_COLD;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

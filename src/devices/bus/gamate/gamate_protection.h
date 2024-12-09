@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_BUS_GAMATE_PROTECTION_H
-#define MAME_BUS_GAMATE_PROTECTION_H
+#ifndef MAME_BUS_GAMATE_GAMATE_PROTECTION_H
+#define MAME_BUS_GAMATE_GAMATE_PROTECTION_H
 
 #pragma once
 
@@ -35,5 +35,4 @@ private:
 	const uint8_t m_prot_string[15] = { 0x42, 0x49, 0x54, 0x20, 0x43, 0x4F, 0x52, 0x50, 0x4F, 0x52, 0x41, 0x54, 0x49, 0x4F, 0x4E }; // "BIT CORPORATION"
 };
 
-#endif // MAME_BUS_GAMATE_PROTECTION_H
-
+#endif // MAME_BUS_GAMATE_GAMATE_PROTECTION_H

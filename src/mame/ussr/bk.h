@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic, Sergey Svishchev
 /*****************************************************************************
  *
  * includes/bk.h
@@ -54,10 +54,6 @@ private:
 	void vid_scroll_w(uint16_t data);
 	void sel1_w(uint16_t data);
 	void trap_w(uint16_t data);
-	uint16_t floppy_cmd_r();
-	void floppy_cmd_w(uint16_t data);
-	uint16_t floppy_data_r();
-	void floppy_data_w(uint16_t data);
 	void reset_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

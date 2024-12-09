@@ -13,7 +13,7 @@
 
 #include "emupal.h"
 
-class k1ge_device : public device_t, public device_video_interface
+class k1ge_device : public device_t, public device_video_interface, public device_palette_interface
 {
 public:
 	template <typename T>
@@ -42,7 +42,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual uint32_t palette_entries() const noexcept override { return PALETTE_SIZE; }
 
 	devcb_write_line m_vblank_pin_w;
 	devcb_write_line m_hblank_pin_w;
@@ -59,9 +59,10 @@ protected:
 	void draw_sprite_plane( uint16_t *p, uint16_t priority, int line, int scroll_x, int scroll_y );
 	TIMER_CALLBACK_MEMBER( hblank_on_timer_callback );
 	TIMER_CALLBACK_MEMBER( timer_callback );
+	virtual void palette_init();
 
 private:
-	void k1ge_palette(palette_device &palette) const;
+	static constexpr int PALETTE_SIZE = 8;
 };
 
 
@@ -78,7 +79,7 @@ public:
 	k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual uint32_t palette_entries() const noexcept override { return PALETTE_SIZE; }
 
 	virtual void draw(int line) override;
 
@@ -86,9 +87,10 @@ protected:
 	void draw_sprite_plane( uint16_t *p, uint16_t priority, int line, int scroll_x, int scroll_y );
 	void k1ge_draw_scroll_plane( uint16_t *p, uint16_t base, int line, int scroll_x, int scroll_y, uint16_t pal_lut_base, uint16_t k2ge_lut_base );
 	void k1ge_draw_sprite_plane( uint16_t *p, uint16_t priority, int line, int scroll_x, int scroll_y );
+	virtual void palette_init() override;
 
 private:
-	void k2ge_palette(palette_device &palette) const;
+	static constexpr int PALETTE_SIZE = 4096;
 };
 
 DECLARE_DEVICE_TYPE(K1GE, k1ge_device)

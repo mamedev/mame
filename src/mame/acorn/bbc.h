@@ -100,6 +100,7 @@ public:
 		, m_bank2(*this, "bank2")
 		, m_bankdev(*this, "bankdev")
 		, m_bbcconfig(*this, "BBCCONFIG")
+		, m_statid(*this, "STATID")
 		, m_motor_led(*this, "motor_led")
 	{ }
 
@@ -256,6 +257,7 @@ protected:
 	optional_memory_bank m_bank2; //           bbcbp bbcbp128 bbcm
 	optional_device<address_map_bank_device> m_bankdev; //    bbcm
 	optional_ioport m_bbcconfig;
+	optional_ioport m_statid;
 
 	output_finder<> m_motor_led;
 

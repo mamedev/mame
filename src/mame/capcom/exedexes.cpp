@@ -80,7 +80,7 @@ private:
 
 	void videoram_w(offs_t offset, u8 data);
 	void colorram_w(offs_t offset, u8 data);
-	void c804_w(u8 data);
+	void control_w(u8 data);
 	void gfxctrl_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -171,7 +171,7 @@ void exedexes_state::colorram_w(offs_t offset, u8 data)
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-void exedexes_state::c804_w(u8 data)
+void exedexes_state::control_w(u8 data)
 {
 	// bits 0 and 1 are coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -326,7 +326,7 @@ void exedexes_state::main_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW0");
 	map(0xc004, 0xc004).portr("DSW1");
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(FUNC(exedexes_state::c804_w));                       // coin counters + text layer enable
+	map(0xc804, 0xc804).w(FUNC(exedexes_state::control_w));                       // coin counters + text layer enable
 	map(0xc806, 0xc806).nopw();                                                // watchdog ??
 	map(0xd000, 0xd3ff).ram().w(FUNC(exedexes_state::videoram_w)).share(m_videoram);
 	map(0xd400, 0xd7ff).ram().w(FUNC(exedexes_state::colorram_w)).share(m_colorram);

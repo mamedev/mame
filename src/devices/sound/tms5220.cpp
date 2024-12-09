@@ -627,7 +627,7 @@ void tms5220_device::data_write(int data)
 			m_fifo[m_fifo_tail] = data;
 			m_fifo_tail = (m_fifo_tail + 1) % FIFO_SIZE;
 			m_fifo_count++;
-			LOGMASKED(LOG_FIFO, "data_write: Added byte to FIFO (current count=%2d)\n", m_fifo_count);
+			LOGMASKED(LOG_FIFO, "data_write: Added %02X byte to FIFO (current count=%2d)\n", data, m_fifo_count);
 			update_fifo_status_and_ints();
 
 			// if we just unset buffer low with that last write, and SPEN *was* zero (see circuit 251, sheet 12)
@@ -742,6 +742,9 @@ void tms5220_device::update_fifo_status_and_ints()
 	}
 	m_previous_talk_status = talk_status();
 
+	// update continuously when RSQ is held active low
+	if (m_rs_ws == 0x01 && !m_RDB_flag)
+		m_read_latch = status_read(false);
 }
 
 /**********************************************************************************************
@@ -881,7 +884,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 	int i, bitout;
 	int32_t this_sample;
 
-	LOG("process called with size of %d; IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", size, m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
+	LOGMASKED(LOG_GENERATION, "process called with size of %d; IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", size, m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
 
 	/* loop until the buffer is full or we've stopped speaking */
 	while (size > 0)
@@ -936,12 +939,8 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 					m_inhibit = false;
 
 				/* Debug info for current parsed frame */
-				LOGMASKED(LOG_GENERATION, "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d ", old_frame_silence_flag(), new_frame_silence_flag(), old_frame_unvoiced_flag(), new_frame_unvoiced_flag());
-				LOGMASKED(LOG_GENERATION, "Processing new frame: ");
-				if (!m_inhibit)
-					LOGMASKED(LOG_GENERATION, "Normal Frame\n");
-				else
-					LOGMASKED(LOG_GENERATION, "Interpolation Inhibited\n");
+				LOGMASKED(LOG_GENERATION, "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d\n", old_frame_silence_flag(), new_frame_silence_flag(), old_frame_unvoiced_flag(), new_frame_unvoiced_flag());
+				LOGMASKED(LOG_GENERATION, "Processing new frame: %s\n", !m_inhibit ? "Normal Frame" : "Interpolation Inhibited");
 				LOGMASKED(LOG_GENERATION, "*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9]);
 				LOGMASKED(LOG_GENERATION, "*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",
 					(m_coeff->energytable[m_new_frame_energy_idx] * (1-m_zpar)),

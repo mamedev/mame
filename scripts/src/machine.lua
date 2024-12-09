@@ -3596,6 +3596,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/thmfc1.h,MACHINES["THMFC1"] = true
+---------------------------------------------------
+
+if (MACHINES["THMFC1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/thmfc1.cpp",
+		MAME_DIR .. "src/devices/machine/thmfc1.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ticket.h,MACHINES["TICKET"] = true
 ---------------------------------------------------
 

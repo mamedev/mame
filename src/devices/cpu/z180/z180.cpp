@@ -1918,7 +1918,7 @@ again:
 		if ((m_dstat & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
 			(m_dmode & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
 		{
-			debugger_instruction_hook(_PCD);
+			debugger_wait_hook();
 
 			/* FIXME z180_dma0 should be handled in handle_io_timers */
 			curcycles = z180_dma0(m_icount);
@@ -1934,18 +1934,21 @@ again:
 				handle_io_timers(curcycles);
 				m_after_EI = 0;
 
-				_PPC = _PCD;
-				debugger_instruction_hook(_PCD);
-
 				if (!m_HALT)
 				{
+					_PPC = _PCD;
+					debugger_instruction_hook(_PCD);
+
 					m_R++;
 					m_extra_cycles = 0;
 					curcycles = exec_op(ROP());
 					curcycles += m_extra_cycles;
 				}
 				else
+				{
+					debugger_wait_hook();
 					curcycles = 3;
+				}
 
 				m_icount -= curcycles;
 
@@ -1992,18 +1995,21 @@ again:
 			handle_io_timers(curcycles);
 			m_after_EI = 0;
 
-			_PPC = _PCD;
-			debugger_instruction_hook(_PCD);
-
 			if (!m_HALT)
 			{
+				_PPC = _PCD;
+				debugger_instruction_hook(_PCD);
+
 				m_R++;
 				m_extra_cycles = 0;
 				curcycles = exec_op(ROP());
 				curcycles += m_extra_cycles;
 			}
 			else
+			{
+				debugger_wait_hook();
 				curcycles = 3;
+			}
 
 			m_icount -= curcycles;
 			handle_io_timers(curcycles);

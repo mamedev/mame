@@ -17,10 +17,12 @@
 #include "hashing.h"
 #include "md5.h"
 #include "multibyte.h"
+#include "osdcore.h"
 #include "path.h"
 #include "strformat.h"
 #include "vbiparse.h"
 
+#include <array>
 #include <cassert>
 #include <cctype>
 #include <cstdio>
@@ -69,6 +71,9 @@ constexpr uint32_t TEMP_BUFFER_SIZE = 32 * 1024 * 1024;
 constexpr int MODE_NORMAL = 0;
 constexpr int MODE_CUEBIN = 1;
 constexpr int MODE_GDI = 2;
+
+// osd printf verbosity
+constexpr bool OSD_PRINTF_VERBOSE = false;
 
 // command modifier
 #define REQUIRED "~"
@@ -155,6 +160,46 @@ static void do_list_templates(parameters_map &params);
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+// Allow chdman to show osd_printf_X messages
+class chdman_osd_output : public osd_output
+{
+public:
+	chdman_osd_output() {
+		osd_output::push(this);
+	}
+
+	~chdman_osd_output() {
+		osd_output::pop(this);
+	}
+
+	void output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args);
+};
+
+void chdman_osd_output::output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args)
+{
+	switch (channel)
+	{
+	case OSD_OUTPUT_CHANNEL_ERROR:
+	case OSD_OUTPUT_CHANNEL_WARNING:
+		util::stream_format(std::cerr, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_INFO:
+	case OSD_OUTPUT_CHANNEL_LOG:
+		util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_VERBOSE:
+		if (OSD_PRINTF_VERBOSE) util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_DEBUG:
+#ifdef MAME_DEBUG
+		util::stream_format(std::cout, args);
+#endif
+		break;
+	default:
+		break;
+	}
+}
 
 // ======================> option_description
 
@@ -616,11 +661,11 @@ static clock_t lastprogress = 0;
 
 
 // default compressors
-static const chd_codec_type s_no_compression[4] = { CHD_CODEC_NONE, CHD_CODEC_NONE, CHD_CODEC_NONE, CHD_CODEC_NONE };
-static const chd_codec_type s_default_raw_compression[4] = { CHD_CODEC_LZMA, CHD_CODEC_ZLIB, CHD_CODEC_HUFFMAN, CHD_CODEC_FLAC };
-static const chd_codec_type s_default_hd_compression[4] = { CHD_CODEC_LZMA, CHD_CODEC_ZLIB, CHD_CODEC_HUFFMAN, CHD_CODEC_FLAC };
-static const chd_codec_type s_default_cd_compression[4] = { CHD_CODEC_CD_LZMA, CHD_CODEC_CD_ZLIB, CHD_CODEC_CD_FLAC };
-static const chd_codec_type s_default_ld_compression[4] = { CHD_CODEC_AVHUFF };
+static const std::array<chd_codec_type, 4> s_no_compression = { CHD_CODEC_NONE, CHD_CODEC_NONE, CHD_CODEC_NONE, CHD_CODEC_NONE };
+static const std::array<chd_codec_type, 4> s_default_raw_compression = { CHD_CODEC_LZMA, CHD_CODEC_ZLIB, CHD_CODEC_HUFFMAN, CHD_CODEC_FLAC };
+static const std::array<chd_codec_type, 4> s_default_hd_compression = { CHD_CODEC_LZMA, CHD_CODEC_ZLIB, CHD_CODEC_HUFFMAN, CHD_CODEC_FLAC };
+static const std::array<chd_codec_type, 4> s_default_cd_compression = { CHD_CODEC_CD_LZMA, CHD_CODEC_CD_ZLIB, CHD_CODEC_CD_FLAC };
+static const std::array<chd_codec_type, 4> s_default_ld_compression = { CHD_CODEC_AVHUFF };
 
 
 // descriptions for each option
@@ -1302,7 +1347,7 @@ static uint32_t parse_hunk_size(
 //  compression parameter string
 //-------------------------------------------------
 
-static void parse_compression(const parameters_map &params, const chd_codec_type (&defaults)[4], const chd_file &output_parent, chd_codec_type compression[4])
+static void parse_compression(const parameters_map &params, const std::array<chd_codec_type, 4> &defaults, const chd_file &output_parent, chd_codec_type compression[4])
 {
 	// TODO: should we default to the same compression as the output parent?
 	std::copy(std::begin(defaults), std::end(defaults), compression);
@@ -1765,8 +1810,10 @@ static void do_verify(parameters_map &params)
 		// fix it if requested; this also fixes the overall one so we don't need to do any more
 		if (params.find(OPTION_FIX) != params.end())
 		{
-			input_chd.set_raw_sha1(computed_sha1);
-			util::stream_format(std::cout, "SHA-1 updated to correct value in input CHD\n");
+			std::error_condition err = input_chd.set_raw_sha1(computed_sha1);
+			if (err)
+				report_error(1, "Error updating SHA1: %s", err.message());
+			util::stream_format(std::cout, "SHA1 updated to correct value in input CHD\n");
 		}
 	}
 	else
@@ -1788,7 +1835,10 @@ static void do_verify(parameters_map &params)
 				if (params.find(OPTION_FIX) != params.end())
 				{
 					input_chd.set_raw_sha1(computed_sha1);
-					util::stream_format(std::cout, "SHA-1 updated to correct value in input CHD\n");
+					std::error_condition err = input_chd.set_raw_sha1(computed_sha1);
+					if (err)
+						report_error(1, "Error updating SHA1: %s", err.message());
+					util::stream_format(std::cout, "SHA1 updated to correct value in input CHD\n");
 				}
 			}
 		}
@@ -2341,6 +2391,39 @@ static void do_create_ld(parameters_map &params)
 
 
 //-------------------------------------------------
+//  get_compression_defaults - use CHD metadata to
+//  pick the preferred type
+//-------------------------------------------------
+
+static const std::array<chd_codec_type, 4> &get_compression_defaults(chd_file &input_chd)
+{
+	std::error_condition err = input_chd.check_is_hd();
+	if (err == chd_file::error::METADATA_NOT_FOUND)
+		err = input_chd.check_is_dvd();
+	if (!err)
+		return s_default_hd_compression;
+	if (err != chd_file::error::METADATA_NOT_FOUND)
+		throw err;
+
+	err = input_chd.check_is_av();
+	if (!err)
+		return s_default_ld_compression;
+	if (err != chd_file::error::METADATA_NOT_FOUND)
+		throw err;
+
+	err = input_chd.check_is_cd();
+	if (err == chd_file::error::METADATA_NOT_FOUND)
+		err = input_chd.check_is_gd();
+	if (!err)
+		return s_default_cd_compression;
+	if (err != chd_file::error::METADATA_NOT_FOUND)
+		throw err;
+
+	return s_default_raw_compression;
+}
+
+
+//-------------------------------------------------
 //  do_copy - create a new CHD with data from
 //  another CHD
 //-------------------------------------------------
@@ -2367,14 +2450,7 @@ static void do_copy(parameters_map &params)
 
 	// process compression; we default to our current preferences using metadata to pick the type
 	chd_codec_type compression[4];
-	if (input_chd.is_hd() || input_chd.is_dvd())
-		parse_compression(params, s_default_hd_compression, output_parent, compression);
-	else if (input_chd.is_av())
-		parse_compression(params, s_default_ld_compression, output_parent, compression);
-	else if (input_chd.is_cd() || input_chd.is_gd())
-		parse_compression(params, s_default_cd_compression, output_parent, compression);
-	else
-		parse_compression(params, s_default_raw_compression, output_parent, compression);
+	parse_compression(params, get_compression_defaults(input_chd), output_parent, compression);
 
 	// process numprocessors
 	parse_numprocessors(params);
@@ -3050,7 +3126,7 @@ static void do_extract_ld(parameters_map &params)
 			input_chd.codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
 			// read the hunk into the buffers
-			std::error_condition err = input_chd.read_hunk(framenum, nullptr);
+			std::error_condition err = input_chd.codec_process_hunk(framenum);
 			if (err)
 			{
 				uint64_t filepos = ~uint64_t(0);
@@ -3322,6 +3398,7 @@ static void do_list_templates(parameters_map &params)
 int CLIB_DECL main(int argc, char *argv[])
 {
 	const std::vector<std::string> args = osd_get_command_line(argc, argv);
+	chdman_osd_output osdoutput;
 
 	// print the header
 	extern const char build_version[];

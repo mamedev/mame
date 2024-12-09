@@ -29,6 +29,8 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
+	int sense() { return exists() ? 0 : 1; }
+
 protected:
 	casio_ram_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned max_size);
 

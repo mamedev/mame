@@ -100,7 +100,7 @@ static INPUT_PORTS_START( dualbios )
 
 	/* the rom banking seems to be tied directly to the dipswitch */
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Region ) ) PORT_DIPLOCATION("SW:3") PORT_CHANGED_MEMBER(DEVICE_SELF, neopcb_state, select_bios, 0)
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Region ) ) PORT_DIPLOCATION("SW:3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(neopcb_state::select_bios), 0)
 	PORT_DIPSETTING(    0x00, DEF_STR( Asia ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Japan ) )
 INPUT_PORTS_END

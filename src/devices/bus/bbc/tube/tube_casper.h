@@ -6,9 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_CASPER_H
+#define MAME_BUS_BBC_TUBE_TUBE_CASPER_H
 
-#ifndef MAME_BUS_BBC_TUBE_CASPER_H
-#define MAME_BUS_BBC_TUBE_CASPER_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/m68000/m68000.h"
@@ -51,5 +52,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_TUBE_CASPER, bbc_tube_casper_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_CASPER_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_CASPER_H

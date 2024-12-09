@@ -9,8 +9,8 @@
 
 ******************************************************************************/
 
-#ifndef MAME_VIDEO_PPU_VT03_H
-#define MAME_VIDEO_PPU_VT03_H
+#ifndef MAME_VIDEO_PPU2C0X_VT_H
+#define MAME_VIDEO_PPU2C0X_VT_H
 
 #pragma once
 
@@ -100,6 +100,6 @@ public:
 };
 
 DECLARE_DEVICE_TYPE(PPU_VT03,    ppu_vt03_device)
-DECLARE_DEVICE_TYPE(PPU_VT03PAL,    ppu_vt03pal_device)
+DECLARE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device)
 
-#endif // MAME_VIDEO_PPU_VT03_H
+#endif // MAME_VIDEO_PPU2C0X_VT_H

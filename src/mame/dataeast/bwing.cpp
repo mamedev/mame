@@ -568,20 +568,20 @@ static INPUT_PORTS_START( bwing )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, bwing_state,coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, bwing_state,coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bwing_state::coin_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bwing_state::coin_inserted), 0)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_TILT ) PORT_CHANGED_MEMBER(DEVICE_SELF, bwing_state,tilt_pressed,0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_TILT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bwing_state::tilt_pressed), 0)
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("EXTRA") // a matter of taste
 	PORT_DIPNAME( 0x07, 0x00, "RGB" )
@@ -669,13 +669,13 @@ void bwing_state::device_post_load()
 void bwing_state::bwing(machine_config &config)
 {
 	// basic machine hardware
-	MC6809E(config, m_maincpu, 2'000'000);
+	MC6809E(config, m_maincpu, 24_MHz_XTAL / 16); // MC68A09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &bwing_state::p1_map);
 
-	MC6809E(config, m_subcpu, 2'000'000);
+	MC6809E(config, m_subcpu, 24_MHz_XTAL / 16); // MC68A09E
 	m_subcpu->set_addrmap(AS_PROGRAM, &bwing_state::p2_map);
 
-	DECO16(config, m_audiocpu, 2'000'000);
+	DECO16(config, m_audiocpu, 2'000'000); // FIXME: clock probably wrong
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bwing_state::p3_map);
 	m_audiocpu->set_addrmap(AS_IO, &bwing_state::p3_io_map);
 	m_audiocpu->set_periodic_int(FUNC(bwing_state::p3_interrupt), attotime::from_hz(1'000));
@@ -685,27 +685,23 @@ void bwing_state::bwing(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(600));   // must be long enough for polling
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 272, 8, 248); // verified from schematics
 	screen.set_screen_update(FUNC(bwing_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bwing);
 	PALETTE(config, m_palette).set_entries(64);
 
-
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8912(config, "ay1", XTAL(24'000'000) / 2 / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8912(config, "ay1", 24_MHz_XTAL / 16).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	AY8912(config, "ay2", XTAL(24'000'000) / 2 / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8912(config, "ay2", 24_MHz_XTAL / 16).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC08(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
+	DAC08(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.1);
 }
 
 //****************************************************************************

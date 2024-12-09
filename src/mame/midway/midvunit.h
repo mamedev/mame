@@ -182,7 +182,7 @@ protected:
 	uint8_t m_galil_input_index = 0;
 	uint8_t m_galil_input_length = 0;
 	const char *m_galil_input = nullptr;
-	uint8_t m_galil_output_index = 0;
+	uint16_t m_galil_output_index = 0;
 	char m_galil_output[450]{};
 	uint8_t m_wheel_board_output = 0;
 	uint32_t m_wheel_board_last = 0;

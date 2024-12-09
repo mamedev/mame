@@ -4395,6 +4395,21 @@ ROM_START( janputer )
 	ROM_LOAD( "82s123.prm", 0x00, 0x20, BAD_DUMP CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
 ROM_END
 
+ROM_START( janputera ) // FRM-03 + PS-101 PCBs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1",     0x0000, 0x1000, CRC(84bb36c2) SHA1(9981794deda728494c1112d9a85b4c92edb6b767) )
+	ROM_LOAD( "2",     0x1000, 0x1000, CRC(13bc62bd) SHA1(68645456a249da1de0677ea0785914fd866b86bb) )
+	ROM_LOAD( "3",     0x2000, 0x1000, CRC(61d9caa2) SHA1(96530f28db7e3955bb07ea025eb1df696365051d) )
+	ROM_LOAD( "4",     0x3000, 0x1000, CRC(538cbe03) SHA1(8634332d883033a5800901be664036c08fced61b) )
+	ROM_LOAD( "5",     0x4000, 0x1000, CRC(16c09c73) SHA1(ea712f9ca3200ca27434e4200187b488e24f4c65) )
+	ROM_LOAD( "6.sub", 0x5000, 0x1000, CRC(29a2377d) SHA1(42685519b6022173e4d32341c378da61377ac6d9) )
+	ROM_LOAD( "7.sub", 0x6000, 0x1000, CRC(cc33c951) SHA1(cdf55efe533ea02e606120858970116119b1da2c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom",  0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
+ROM_END
+
+
 /***************************************************************************
 Janyou Part II
 (c)1984 Cosmo Denshi
@@ -4424,6 +4439,18 @@ ROM_START( janyoup2 )
 	ROM_LOAD( "2.c109",       0x2000, 0x2000, CRC(324426d4) SHA1(409244c8458d9bafa325746c37de9e7b955b3787) )
 	ROM_LOAD( "3.c108",       0x4000, 0x2000, CRC(e98b6d34) SHA1(e27ab9a03aff750df78c5db52a112247bdd31328) )
 	ROM_LOAD( "4.c107",       0x6000, 0x1000, CRC(377b8ce9) SHA1(a5efc517ae975e54af5325b8b3f4867e9f449d4c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "n82s123n.c98", 0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
+ROM_END
+
+// on an original Cosmo Corporation PCB
+ROM_START( janyoup2a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.110", 0x0000, 0x2000, CRC(83b612d4) SHA1(6627b2bdf9119ed19516c19fc0ea519e1ac78d83) )
+	ROM_LOAD( "2.109", 0x2000, 0x2000, CRC(ddc669cd) SHA1(8611374b03ee836d07a119736c4ca8fc85b26b9d) )
+	ROM_LOAD( "3.108", 0x4000, 0x2000, CRC(e98b6d34) SHA1(e27ab9a03aff750df78c5db52a112247bdd31328) )
+	ROM_LOAD( "4.107", 0x6000, 0x1000, CRC(7c5ae13b) SHA1(4e8d9fd010f30f6bbfce85e5c9ff0406d07188fb) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "n82s123n.c98", 0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
@@ -5967,6 +5994,18 @@ ROM_START( ichiban ) // TODO: how does the banking work?
 	ROM_LOAD( "mjb.u38", 0x400, 0x200, CRC(0ef881cb) SHA1(44b61a443d683f5cb2d1b1a4f74d8a8f41021de5) )
 ROM_END
 
+ROM_START( dragonmj ) // MJ911 PCB, as ichiban. TODO: how does the banking work?
+	ROM_REGION( 0x60000, "maincpu", 0 ) // opcodes in first half are mixed with pseudo-random garbage
+	ROM_LOAD( "oct3.u15", 0x00000, 0x20000, CRC(87ac834d) SHA1(ab98406a008b566aff95da9ecb11d238e2f472ca) )
+	ROM_LOAD( "oct1.u28", 0x20000, 0x20000, CRC(0142aed1) SHA1(1ee627d6cbddeafbe1407fd569704ec511874c60) )
+	ROM_LOAD( "oct2.u14", 0x40000, 0x20000, CRC(40310894) SHA1(072418ed995e8dda1b47b59483a5139d731ed542) )
+
+	ROM_REGION( 0x600, "proms", 0 )
+	ROM_LOAD( "r.u36", 0x000, 0x200, CRC(1c5d555b) SHA1(cc9bc20d3ef5397acf3f3e195d59c7a633e6500e) )
+	ROM_LOAD( "g.u37", 0x200, 0x200, CRC(eb40711b) SHA1(2ed08fd86dc4f578536ebf65f377c63c8fdc6e07) )
+	ROM_LOAD( "b.u38", 0x400, 0x200, CRC(6b2fa97a) SHA1(7f8e33f2132348eaca1af55062b280e0a9234ac9) )
+ROM_END
+
 
 /*
 Pong Boo! 2 by OCT
@@ -6193,8 +6232,10 @@ GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, royalmah_state,         emp
 GAME( 1984?, chalgirl, 0,        chalgirl, royalmah, royalmah_prgbank_state, init_chalgirl, ROT0,   "bootleg",                    "Challenge Girl (Falcon bootleg)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // verify ROM loading / banking, bad girl colors
 GAME( 1983,  seljan,   0,        seljan,   seljan,   royalmah_state,         empty_init,    ROT0,   "Jem / Dyna Corp",            "Sel-Jan (Japan)",                       0 )
 GAME( 1983,  janyoup2, royalmj,  janyoup2, janyoup2, royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
+GAME( 1983,  janyoup2a,royalmj,  janyoup2, janyoup2, royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983, no title screen)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  royalmah_prgbank_state, init_tahjong,  ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
-GAME( 1981,  janputer, 0,        royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong)", 0 ) // MT #05392
+GAME( 1981,  janputer, 0,        royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong, set 1)", 0 ) // MT #05392
+GAME( 1981,  janputera,janputer, royalmah, royalmah, royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Ever Denshi)", "New Double Bet Mahjong (bootleg of Royal Mahjong, set 2)", 0 )
 GAME( 1990,  akamj,    0,        ippatsu,  ippatsu,  royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Electronics)", "Aka Mahjong (Double Bet, ver 1 16)", 0 )
 GAME( 1984,  rkjanoh2, 0,        rkjanoh2, royalmah, royalmah_prgbank_state, init_chalgirl, ROT0,   "SNK / Dyna Corp",            "Royal King Jang Oh 2 (v4.00 1984 Jun 10th)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // never seems to set the palette bank?
 GAME( 1984,  janoh,    0,        janoh,    royalmah, royalmah_state,         empty_init,    ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        MACHINE_NOT_WORKING )
@@ -6229,6 +6270,7 @@ GAME( 1992,  cafetime, 0,        cafetime, cafetime, royalmah_prgbank_state, ini
 GAME( 1993,  cafedoll, 0,        cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
 GAME( 1993,  cafedollg,cafedoll, cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll Great (Japan, Ver. 1.00)", MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
 GAME( 1993,  ichiban,  0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // ROM banking is wrong, causing several GFX problems
+GAME( 1993,  dragonmj, 0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "OCT",                        "Dragon Mahjong (Ver 1.20)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // " - DRAGON Ver1.20 1993/11/09
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             MACHINE_NOT_WORKING )
 GAME( 1996,  majrjhdx, 0,        majrjh,   mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Raijinhai DX (Ver. D105)",      0 )
 GAME( 1996,  majrjh,   majrjhdx, majrjh,   mjtensin, royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Raijinhai (Ver. D105)",         0 )

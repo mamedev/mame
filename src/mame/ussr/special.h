@@ -2,12 +2,12 @@
 // copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
- * includes/special.h
+ * ussr/special.h
  *
  ****************************************************************************/
 
-#ifndef MAME_SPECIAL_SPECIAL_H
-#define MAME_SPECIAL_SPECIAL_H
+#ifndef MAME_USSR_SPECIAL_H
+#define MAME_USSR_SPECIAL_H
 
 #pragma once
 
@@ -143,4 +143,4 @@ private:
 	optional_device<timer_device> m_pit_timer; // specimx only
 };
 
-#endif // MAME_SPECIAL_SPECIAL_H
+#endif // MAME_USSR_SPECIAL_H

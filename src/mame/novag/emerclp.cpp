@@ -60,7 +60,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override { set_power(true); }
+	virtual void machine_reset() override ATTR_COLD { set_power(true); }
 
 private:
 	// devices/pointers
@@ -246,8 +246,8 @@ static INPUT_PORTS_START( emerclp )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("New Game")
 
 	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, emerclp_state, power_switch, 1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, emerclp_state, power_switch, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(emerclp_state::power_switch), 1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(emerclp_state::power_switch), 0)
 INPUT_PORTS_END
 
 

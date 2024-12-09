@@ -998,12 +998,12 @@ inline bool sc16is741a_device::check_tx()
 				m_interrupts |= INTERRUPT_THR;
 				update_irq();
 			}
-			else
-			{
-				LOG("THR empty, setting THR interrupt\n");
-				m_interrupts |= INTERRUPT_THR;
-				update_irq();
-			}
+		}
+		else
+		{
+			LOG("THR empty, setting THR interrupt\n");
+			m_interrupts |= INTERRUPT_THR;
+			update_irq();
 		}
 	}
 

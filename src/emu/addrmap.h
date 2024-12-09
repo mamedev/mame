@@ -157,6 +157,30 @@ public:
 	address_map_entry &portw(const char *tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; return *this; }
 	address_map_entry &portrw(const char *tag) { portr(tag); portw(tag); return *this; }
 
+	template<bool req> address_map_entry &portr(ioport_finder<req> &finder) {
+		const std::pair<device_t &, const char *> target(finder.finder_target());
+		assert(&target.first == &m_devbase);
+		m_read.m_type = AMH_PORT;
+		m_read.m_tag = target.second;
+		return *this;
+	}
+
+	template<bool req> address_map_entry &portw(ioport_finder<req> &finder) {
+		const std::pair<device_t &, const char *> target(finder.finder_target());
+		assert(&target.first == &m_devbase);
+		m_write.m_type = AMH_PORT;
+		m_write.m_tag = target.second;
+		return *this;
+	}
+
+	template<bool req> address_map_entry &portrw(ioport_finder<req> &finder) {
+		const std::pair<device_t &, const char *> target(finder.finder_target());
+		assert(&target.first == &m_devbase);
+		m_write.m_type = m_read.m_type = AMH_PORT;
+		m_write.m_tag  = m_read.m_tag = target.second;
+		return *this;
+	}
+
 	// memory bank configuration
 	address_map_entry &bankr(const char *tag) { m_read.m_type = AMH_BANK; m_read.m_tag = tag; return *this; }
 	address_map_entry &bankw(const char *tag) { m_write.m_type = AMH_BANK; m_write.m_tag = tag; return *this; }

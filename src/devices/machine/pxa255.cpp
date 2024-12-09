@@ -39,6 +39,7 @@ pxa255_periphs_device::pxa255_periphs_device(const machine_config &mconfig, cons
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_dmadac(*this, "dac%u", 1U)
 	, m_palette(*this, "palette")
+	, m_screen(*this, "screen")
 {
 }
 
@@ -253,12 +254,14 @@ void pxa255_periphs_device::device_reset()
 
 void pxa255_periphs_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(1024, 1024);
-	screen.set_visarea(0, 295, 0, 479);
-	screen.set_screen_update(FUNC(pxa255_periphs_device::screen_update));
+	// TODO: should be SCREEN_TYPE_LCD, but that dislikes dynamic configure
+	// will stay stuck at 296x480 aspect ratio.
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(1024, 1024);
+	m_screen->set_visarea(0, 295, 0, 479);
+	m_screen->set_screen_update(FUNC(pxa255_periphs_device::screen_update));
 
 	PALETTE(config, m_palette).set_entries(256);
 
@@ -1462,10 +1465,24 @@ template <int Which>
 void pxa255_periphs_device::lcd_lccr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_LCD, "%s: lcd_lccr_w: LCD Control Register %d = %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
+
 	if (Which == 0)
 		m_lcd_regs.lccr[Which] = data & 0x00fffeff;
 	else
+	{
 		m_lcd_regs.lccr[Which] = data;
+		if (Which == 1 || Which == 2)
+		{
+			const u16 lpp = (m_lcd_regs.lccr[2] & LCCR2_LPP);
+			const u16 ppl = (m_lcd_regs.lccr[1] & LCCR1_PPL);
+
+			if (lpp && ppl)
+			{
+				rectangle rect(0, ppl, 0, lpp);
+				m_screen->configure(1024, 1024, rect, HZ_TO_ATTOSECONDS(60));
+			}
+		}
+	}
 }
 
 template <int Which>

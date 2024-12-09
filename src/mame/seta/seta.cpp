@@ -4577,7 +4577,7 @@ static INPUT_PORTS_START( setaroul )
 	PORT_SERVICE( 0x08, 0x08 )                          PORT_DIPLOCATION("SW2:1") // service mode
 
 	PORT_START("COIN") // d40009.b
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // medal (causes hopper over run / empty if the dsw is on)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // medal (causes hopper over run / empty if the dsw is on)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset")         // rst     (button SW5? Press twice quickly to enter the keyboard test)
 	PORT_DIPNAME( 0x04, 0x04, "Credit Meter" )    PORT_DIPLOCATION("SW6:1")  // crt.mtr (switch SW6? Shows stats screen. With added menus, if their dsw is on)
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
@@ -4585,10 +4585,10 @@ static INPUT_PORTS_START( setaroul )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Attendant Pay") // att.pay (clears error)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3    ) PORT_NAME("Note")          // note    (same as 100 coins)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    ) PORT_NAME("Coupon")        // cupon   (same as  10 coins)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(setaroul_state, coin_sensors_r)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(setaroul_state::coin_sensors_r))
 
 	PORT_START("COIN1") // start the coin drop sequence (see coin_sensors_r)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, setaroul_state, coin_drop_start, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(setaroul_state::coin_drop_start), 0)
 
 	PORT_START("DOOR") // d4000b.b
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -6702,7 +6702,7 @@ static INPUT_PORTS_START( crazyfgt )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r))
 
 	PORT_START("UNK") //? - $610002.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -6888,7 +6888,7 @@ static INPUT_PORTS_START( jockeyc )
 	PORT_START("COIN") // 200002.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) // Coin Drop - 1P
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) // Hopper Overflow - 1P
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper1", ticket_dispenser_device, line_r) // Hopper Coin Out - 1P
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper1", FUNC(ticket_dispenser_device::line_r)) // Hopper Coin Out - 1P
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER   ) // Attendant Pay - 1P
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin B - 1P")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin A - 1P")
@@ -6896,7 +6896,7 @@ static INPUT_PORTS_START( jockeyc )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) // Coin Sense 1 - 1P
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) // Coin Drop - 2P
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // Sel Sense (single hopper mode) / Hopper Overflow - 2P (double hopper mode)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper2", ticket_dispenser_device, line_r) // Hopper Coin Out - 2P (double hopper mode)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper2", FUNC(ticket_dispenser_device::line_r)) // Hopper Coin Out - 2P (double hopper mode)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER   ) // Attendant Pay - 2P
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Coin B - 2P")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coin A - 2P")

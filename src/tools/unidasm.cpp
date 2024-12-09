@@ -197,6 +197,7 @@ using util::BIT;
 #include "cpu/unsp/unspdasm.h"
 #include "cpu/upd177x/upd177xd.h"
 #include "cpu/upd7725/dasm7725.h"
+#include "cpu/upd777/upd777dasm.h"
 #include "cpu/upd7810/upd7810_dasm.h"
 #include "cpu/upd78k/upd78k0d.h"
 #include "cpu/upd78k/upd78k1d.h"
@@ -543,7 +544,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "m740",            le,  0, []() -> util::disasm_interface * { return new m740_disassembler(&m740_unidasm); } },
 	{ "mb86233",         le, -2, []() -> util::disasm_interface * { return new mb86233_disassembler; } },
 	{ "mb86235",         le, -3, []() -> util::disasm_interface * { return new mb86235_disassembler; } },
-	{ "mb88",            le,  0, []() -> util::disasm_interface * { return new mb88_disassembler; } },
+	{ "mb88xx",          le,  0, []() -> util::disasm_interface * { return new mb88_disassembler; } },
 	{ "mc88100",         be,  0, []() -> util::disasm_interface * { return new mc88100_disassembler; } },
 	{ "mc88110",         be,  0, []() -> util::disasm_interface * { return new mc88110_disassembler; } },
 	{ "mcs48",           le,  0, []() -> util::disasm_interface * { return new mcs48_disassembler(false, false); } },
@@ -673,6 +674,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "unsp12",          be, -1, []() -> util::disasm_interface * { return new unsp_12_disassembler; } },
 	{ "unsp20",          be, -1, []() -> util::disasm_interface * { return new unsp_20_disassembler; } },
 	{ "upd177x",         be, -1, []() -> util::disasm_interface * { return new upd177x_disassembler; } },
+	{ "upd777",          be, -1, []() -> util::disasm_interface * { return new upd777_disassembler; } },
 	{ "upd7725",         be, -2, []() -> util::disasm_interface * { return new necdsp_disassembler; } },
 	{ "upd7801",         le,  0, []() -> util::disasm_interface * { return new upd7801_disassembler; } },
 	{ "upd78c05",        le,  0, []() -> util::disasm_interface * { return new upd78c05_disassembler; } },

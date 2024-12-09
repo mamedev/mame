@@ -164,6 +164,7 @@ public:
 	void init_pacmanbl();
 	void init_devilfshg();
 	void init_jumpbug();
+	void init_jumpbugbc();
 	void init_checkman();
 	void init_checkmaj();
 	void init_dingo();

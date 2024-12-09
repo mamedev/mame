@@ -140,13 +140,13 @@ void cchance_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( cchance )
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, coin_sense_w)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::coin_sense_w))
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_h_r)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", taitoio_opto_device, opto_l_r)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::opto_h_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("opto", FUNC(taitoio_opto_device::opto_l_r))
 	// Hopper related? Goes "hopper time out" if IP_ACTIVE_LOW as suggested by service mode (buggy?)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Over") // "Hop Over"?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Slottle")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Drop SW") // "Coin Drop SW" as per other Taito gamblers?

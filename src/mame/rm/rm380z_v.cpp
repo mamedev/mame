@@ -87,7 +87,7 @@ int rm380z_state_cos40_hrg::calculate_hrg_vram_index(offs_t offset) const
 	return index;
 }
 
-bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
+bool rm380z_state::get_rowcol_from_offset(int &row, int &col, offs_t offset) const
 {
 	col = offset & 0x3f;  // the 6 least significant bits give the column (0-39)
 	row = offset >> 6;    // next 5 bits give the row (0-23)
@@ -95,7 +95,7 @@ bool rm380z_state::get_rowcol_from_offset(int& row, int& col, offs_t offset) con
 	return ((row < RM380Z_SCREENROWS) && (col < RM380Z_SCREENCOLS));
 }
 
-bool rm380z_state_cos40::get_rowcol_from_offset(int& row, int& col, offs_t offset) const
+bool rm380z_state_cos40::get_rowcol_from_offset(int &row, int &col, offs_t offset) const
 {
 	if (m_videomode == RM380Z_VIDEOMODE_80COL)
 	{
@@ -425,40 +425,6 @@ void rm380z_state_cos34::update_screen(bitmap_ind16 &bitmap) const
 		{
 			uint8_t curch = m_vram.get_char(row, col);
 			putChar_vdu40(curch, col, row, bitmap);
-		}
-	}
-}
-
-// only partially implemented and non working
-void rm480z_state::update_screen(bitmap_ind16 &bitmap) const
-{
-	uint16_t sy = 0, ma = 0;
-
-	for (uint8_t y = 0; y < RM380Z_SCREENROWS; y++)
-	{
-		for (uint8_t ra = 0; ra < 11; ra++)
-		{
-			uint16_t *p = &bitmap.pix(sy++);
-
-			for (uint16_t x = ma; x < ma + 64; x++)
-			{
-				uint8_t gfx = 0;
-				if (ra < 10)
-				{
-					const uint8_t chr = m_vram.get_char(y, x);
-					gfx = m_chargen[(chr << 4) | ra];
-				}
-
-				// Display a scanline of a character
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
-			}
 		}
 	}
 }

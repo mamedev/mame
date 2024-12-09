@@ -6,10 +6,10 @@
     Written by Ryan Holtz
 */
 
-#pragma once
+#ifndef MAME_CPU_PDP8_PDP8_H
+#define MAME_CPU_PDP8_PDP8_H
 
-#ifndef __PDP8_H__
-#define __PDP8_H__
+#pragma once
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -105,4 +105,4 @@ enum
 	PDP8_HALT
 };
 
-#endif /* __PDP8_H__ */
+#endif // MAME_CPU_PDP8_PDP8_H

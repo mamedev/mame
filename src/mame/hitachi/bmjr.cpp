@@ -4,6 +4,9 @@
 
 Basic Master Jr. (MB-6885) (c) 1982? Hitachi
 
+Notes:
+- MON G command ends with space key, not enter (will otherwise just ignore the command).
+
 TODO:
 - Identify and improve Sound DAC details;
 - Keyboard eats inputs if typed relatively fast (verify);
@@ -14,7 +17,6 @@ TODO:
 - Floppy adapter MP-1803, thru expansion bus;
 - Border color for MP-1710;
 - Printer, MP-1041/MP-1045;
-- Hookup SW list;
 
 **************************************************************************************************/
 
@@ -419,7 +421,7 @@ static INPUT_PORTS_START( bmjr )
 
 	PORT_START("BREAK")
 	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // TODO: read by timer irq service
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CHANGED_MEMBER(DEVICE_SELF, bmjr_state, break_key_pressed, 0)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bmjr_state::break_key_pressed), 0)
 INPUT_PORTS_END
 
 static const gfx_layout bmjr_charlayout =

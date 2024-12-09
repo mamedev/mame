@@ -573,6 +573,10 @@ u32 m68000_musashi_device::READ_EA_32(int ea)
 		{
 			return REG_D()[reg];
 		}
+		case 1: // An
+		{
+			return REG_A()[reg];
+		}
 		case 2:     // (An)
 		{
 			u32 ea = REG_A()[reg];
@@ -1738,6 +1742,42 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			m_icount -= 56;
 			break;
 		}
+		case 0x08: // FETOXM1
+		{
+			m_fpr[dst] = extF80_sub(extFloat80_etox(source), i32_to_extF80(1));
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
+			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FETOXM1: e ** %f - 1 = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
+			m_icount -= 568;
+			break;
+		}
+		case 0x10: // FETOX
+		{
+			m_fpr[dst] = extFloat80_etox(source);
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
+			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FETOX: e ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
+			m_icount -= 520;
+			break;
+		}
+		case 0x11: // FTWOTOX
+		{
+			m_fpr[dst] = extFloat80_2tox(source);
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
+			printf("FTWOTOX: 2 ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
+			m_icount -= 590;
+			break;
+		}
+		case 0x12: // FTENTOX
+		{
+			m_fpr[dst] = extFloat80_10tox(source);
+			set_condition_codes(m_fpr[dst]);
+			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
+			LOGMASKED(LOG_INSTRUCTIONS_VERBOSE, "FTENTOX: 10 ** %f = %f\n", fx80_to_double(source), fx80_to_double(m_fpr[dst]));
+			m_icount -= 590;
+			break;
+		}
 
 		default:    fatalerror("fpgen_rm_reg: unimplemented opmode %02X at %08X\n", opmode, m_ppc);
 	}
@@ -1829,20 +1869,7 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 	switch (mode)
 	{
 	case 0:     // Dn
-	#if 0
-		if (dir)
-		{
-			if (regsel & 4) WRITE_EA_32(ea, m_fpcr);
-			if (regsel & 2) WRITE_EA_32(ea, m_fpsr);
-			if (regsel & 1) WRITE_EA_32(ea, m_fpiar);
-		}
-		else
-		{
-			if (regsel & 4) m_fpcr = READ_EA_32(ea);
-			if (regsel & 2) m_fpsr = READ_EA_32(ea);
-			if (regsel & 1) m_fpiar = READ_EA_32(ea);
-		}
-	#endif
+	case 1:     // An
 		break;
 
 	case 2: // (An)
@@ -1907,6 +1934,7 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 	switch (mode)
 	{
 	case 0: // Dn
+	case 1: // An
 	case 3: // (An)+
 	case 4: // -(An)
 		if (dir)    // From system control reg to <ea>
@@ -2511,4 +2539,45 @@ void m68000_musashi_device::m68881_ftrap()
 				break;
 		}
 	}
+}
+
+// Read the FPU's Coprocessor Interface Registers (CIRs).
+// References: MC68881/68882 Coprocessor User's Manual 1st Edition,
+// pages 7-1 to 7-8 and M68030 User's Manual 3rd Edition page 7-69.
+u32 m68000_musashi_device::m6888x_read_cir(offs_t offset)
+{
+	// If no FPU is present, reading any CIRs causes a bus error.
+	// Pre-1992 Macintosh ROMs use this method to detect the presence
+	// of an FPU.  1992 and later ROMs just execute FNOP and check for
+	// an F-line trap, because this mechanism does not exist on the 68040.
+	if (!m_has_fpu)
+	{
+		m68k_cause_bus_error();
+	}
+
+	// TODO: actually try to return meaningful values?
+	// offset   function
+	// 0x00     Response            read-only       16 bit (value in D31-D16)
+	// 0x02     Control             write-only      16
+	// 0x04     Save                read            16
+	// 0x06     Restore             read/write      16
+	// 0x08     Operation Word      read/write      16
+	// 0x0a     Command             write-only      16
+	// 0x0c     (reserved)          N/A             16
+	// 0x0e     Condition           write-only      16
+	// 0x10     Operand             read/write      32 bit
+	// 0x14     Register Select     read-only       16
+	// 0x18     Instruction Address write-only      32
+	// 0x1c     Operand Address     read/write      32
+	return 0;
+}
+
+void m68000_musashi_device::m6888x_write_cir(offs_t offset, u32 data)
+{
+	if (!m_has_fpu)
+	{
+		m68k_cause_bus_error();
+	}
+
+	// TODO: actually do something with these values?
 }

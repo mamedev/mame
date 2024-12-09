@@ -369,6 +369,7 @@ void vga_device::io_3cx_map(address_map &map)
 	map(0x00, 0x00).rw(FUNC(vga_device::atc_address_r), FUNC(vga_device::atc_address_data_w));
 	map(0x01, 0x01).r(FUNC(vga_device::atc_data_r));
 	map(0x02, 0x02).rw(FUNC(vga_device::input_status_0_r), FUNC(vga_device::miscellaneous_output_w));
+//  map(0x03, 0x03).w(FUNC(vga_device::wakeup_w));
 	map(0x04, 0x04).rw(FUNC(vga_device::sequencer_address_r), FUNC(vga_device::sequencer_address_w));
 	map(0x05, 0x05).rw(FUNC(vga_device::sequencer_data_r), FUNC(vga_device::sequencer_data_w));
 	map(0x06, 0x06).rw(FUNC(vga_device::ramdac_mask_r), FUNC(vga_device::ramdac_mask_w));
@@ -1839,6 +1840,33 @@ TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 	vga.crtc.start_addr = latch_start_addr();
 	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
 	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+}
+
+// ISA bus bindings
+
+void vga_device::enter_setup_mode()
+{
+	// ...
+}
+
+/*
+ * ---x ---- setup mode (only $102 accessible if this is on)
+ * ---- x--- Enable $03xx I/O and memory accesses
+ * ---- -xxx BIOS ROM page select for lowest 4 Kbyte range
+ *
+ * The generic ISA sequence is:
+ * $46e8 0x10 (setup mode)
+ * $0102 0x01 (wakeup core)
+ * $46e8 0x0e
+ *
+ */
+void vga_device::mode_setup_w(offs_t offset, u8 data)
+{
+	LOG("mode_setup_w %02x\n", data);
+	if (BIT(data, 4))
+	{
+		enter_setup_mode();
+	}
 }
 
 /**************************************

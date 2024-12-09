@@ -2,12 +2,12 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    video/apple2.h  - Video handling for Apple II and IIgs
+    apple/apple2video.h  - Video handling for Apple II and IIgs
 
 *********************************************************************/
 
-#ifndef MAME_SHARED_APPLE2VIDEO_H
-#define MAME_SHARED_APPLE2VIDEO_H
+#ifndef MAME_APPLE_APPLE2VIDEO_H
+#define MAME_APPLE_APPLE2VIDEO_H
 
 #include "emupal.h"
 
@@ -55,6 +55,11 @@ public:
 	void set_GS_border(u8 border)   { m_GSborder = border; }
 	const u8 get_newvideo()         { return m_newvideo; }
 	void set_newvideo(u8 newvideo)  { m_newvideo = newvideo; }
+	const u8 get_GS_langsel()       { return m_GS_langsel; }
+	const u8 get_GS_language()      { return (m_GS_langsel >> 5) & 0x07; }
+	const bool is_pal_video_mode()  { return (m_GS_langsel >> 4) & 0x01; }
+	const bool get_language_switch(){ return (m_GS_langsel >> 3) & 0x01; }
+	void set_GS_langsel(u8 langsel) { m_GS_langsel = langsel; }
 	void set_SHR_color(u8 color, u32 rgb) { m_shr_palette[color] = rgb; }
 	void set_GS_border_color(u8 color, u32 rgb) { m_GSborder_colors[color] = rgb; }
 
@@ -70,6 +75,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint32_t screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void set_iie_langsw(u8 iie_langsw) { m_iie_langsw = iie_langsw; }
+	u8 get_iie_langsw() const { return m_iie_langsw; }
 
 protected:
 	a2_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -120,7 +128,8 @@ private:
 	bool m_an2 = false;
 	bool m_80store = false;
 	bool m_monohgr = false;
-	u8 m_GSfg = 0, m_GSbg = 0, m_GSborder = 0, m_newvideo = 0, m_monochrome = 0, m_rgbmode = 0;
+	u8 m_GSfg = 0, m_GSbg = 0, m_GSborder = 0, m_newvideo = 0, m_GS_langsel = 0, m_monochrome = 0, m_rgbmode = 0;
+	u8 m_iie_langsw = 0; // language switch/modification on IIe/IIc/IIc+ and clones
 	optional_ioport m_vidconfig;
 };
 
@@ -147,4 +156,4 @@ DECLARE_DEVICE_TYPE(APPLE2_VIDEO, a2_video_device)
 DECLARE_DEVICE_TYPE(APPLE2_VIDEO_COMPOSITE, a2_video_device_composite)
 DECLARE_DEVICE_TYPE(APPLE2_VIDEO_COMPOSITE_RGB, a2_video_device_composite_rgb)
 
-#endif // MAME_SHARED_APPLE2VIDEO_H
+#endif // MAME_APPLE_APPLE2VIDEO_H

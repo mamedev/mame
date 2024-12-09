@@ -151,9 +151,10 @@ void pc98lt_state::lt_io(address_map &map)
 	map.unmap_value_high();
 //  map(0x0000, 0x001f) // PIC (bit 3 ON slave / master), V50 internal / <undefined>
 	map(0x0020, 0x002f).w(FUNC(pc98lt_state::rtc_w)).umask16(0x00ff);
-	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8251 RS232c / i8255 system port
+	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0x0030, 0x0033).rw(m_sio_rs, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
+	map(0x0040, 0x0043).rw(m_sio_kbd, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); //i8255 printer port / i8251 keyboard
 //  map(0x0070, 0x007f) // PIT, V50 internal
 
 	// floppy actually requires a docking station on PC98HA, density should be 2dd given the mapping
@@ -266,7 +267,7 @@ void pc98ha_state::ha_io(address_map &map)
 
 static INPUT_PORTS_START( pc98lt )
 	PORT_START("SYSB")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(RTC_TAG, upd1990a_device, data_out_r)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(RTC_TAG, FUNC(upd1990a_device::data_out_r))
 	PORT_DIPNAME( 0x02, 0x00, "SYSB" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
@@ -332,7 +333,7 @@ static INPUT_PORTS_START( pc98lt )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(pc98lt_state, system_type_r)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(pc98lt_state::system_type_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc98ha )
@@ -418,6 +419,13 @@ static void pc9801_floppies(device_slot_interface &device)
 //  device.option_add("35hd", FLOPPY_35_HD);
 }
 
+void pc98lt_state::uart_irq_check()
+{
+	m_maincpu->set_input_line(4, m_uart_irq_pending & m_uart_irq_mask ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+
 void pc98lt_state::lt_config(machine_config &config)
 {
 	const XTAL xtal = XTAL(8'000'000);
@@ -427,15 +435,25 @@ void pc98lt_state::lt_config(machine_config &config)
 	// TODO: jumps off the weeds if divided by / 4 after timer check, DMA issue?
 //  m_maincpu->set_tclk(xtal / 4);
 	m_maincpu->set_tclk(xtal / 100);
-//  m_maincpu->tout2_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 //  m_pit->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
-//  m_pit->out_handler<2>().set(m_sio, FUNC(i8251_device::write_txc));
-//  m_pit->out_handler<2>().append(m_sio, FUNC(i8251_device::write_rxc));
-
+	m_maincpu->tout2_cb().set(m_sio_rs, FUNC(i8251_device::write_txc));
+	m_maincpu->tout2_cb().append(m_sio_rs, FUNC(i8251_device::write_rxc));
 //  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	PC9801_KBD(config, m_keyb, 53);
-	m_keyb->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	pc9801_serial(config);
+
+	I8251(config, m_sio_kbd, 0);
+	m_sio_kbd->txd_handler().set("keyb", FUNC(pc9801_kbd_device::input_txd));
+	m_sio_kbd->rxrdy_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_sio_kbd->write_cts(0);
+	m_sio_kbd->write_dsr(0);
+
+	clock_device &kbd_clock(CLOCK(config, "kbd_clock", 19'200));
+	kbd_clock.signal_handler().set(m_sio_kbd, FUNC(i8251_device::write_rxc));
+	kbd_clock.signal_handler().append(m_sio_kbd, FUNC(i8251_device::write_txc));
+
+	PC9801_KBD(config, m_keyb, 0);
+	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	I8255(config, m_ppi_sys, 0);
 	// PC98LT/HA has no dips, port A acts as a RAM storage

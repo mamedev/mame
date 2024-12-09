@@ -312,7 +312,7 @@ private:
 
 void katosmedz80_state::machine_start()
 {
-	// resolve handlers
+	// resolve outputs
 	m_ledsp2.resolve();
 	m_ledsp3.resolve();
 	m_ledsp5.resolve();
@@ -528,7 +528,7 @@ static INPUT_PORTS_START( dnbanban )
     x--- ----    Arm 4 Hit microswitch
 
 */
-	PORT_BIT( 0x55, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(katosmedz80_state, arm_sensors_r)
+	PORT_BIT( 0x55, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(FUNC(katosmedz80_state::arm_sensors_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1) PORT_NAME("Hit Arm 1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2) PORT_NAME("Hit Arm 2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3) PORT_NAME("Hit Arm 3")

@@ -6,6 +6,8 @@
 
      Driver by Frank Palazzolo (palazzol@comcast.net)
 
+     Hardware is extremely similar to nichibutsu/cclimber.cpp (possibly derived)
+
     - This driver was done with only flyer shots to go by.
     - Colors are a good guess (might be perfect)
     - Clock and interrupt speeds for the sound CPU is a guess, but seem
@@ -117,7 +119,7 @@ void mouser_state::palette(palette_device &palette) const
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

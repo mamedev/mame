@@ -45,8 +45,8 @@ ToDo:
 - Mechanical sounds
 - Skill Flight: not working
 - Miss Disco: not working (no manual available). Uses different hardware. No sound rom.
-- Spain82: can start a game but it's not really playable, has no sound (no manual available;
-   uses same sound board as Cerberus). The test buttons are unknown. The ball number doesn't show.
+- Spain82: can start a game but it's not really playable (no manual available).
+   The test buttons are unknown. The ball number doesn't show.
    So, after starting the machine, make sure the displays cycle between blank and 700000. If it
    just sits there it has hung up, exit and restart. Insert a coin, hold X and press 1. Now,
    you need to jiggle F and G and perhaps other nearby keys until the 0 starts flashing. You
@@ -62,6 +62,7 @@ ToDo:
 #include "emu.h"
 #include "genpin.h"
 
+#include "efo_sound3.h"
 #include "efo_zsu.h"
 
 #include "cpu/cosmac/cosmac.h"
@@ -87,6 +88,7 @@ public:
 		, m_4020(*this, "4020")
 		, m_ay1(*this, "ay1")
 		, m_ay2(*this, "ay2")
+		, m_sound3(*this, "sound3")
 		, m_zsu(*this, "zsu")
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_digits(*this, "digit%d", 0U)
@@ -94,6 +96,7 @@ public:
 	{ }
 
 	void play_3(machine_config &config);
+	void spain82(machine_config &config);
 	void flashman(machine_config &config);
 	void megaaton(machine_config &config);
 	void sklflite(machine_config &config);
@@ -103,7 +106,9 @@ private:
 	void port01_w(u8 data);
 	void terrlake_port01_w(u8 data);
 	void port02_w(u8 data);
+	void spain82_port02_w(u8 data);
 	void port03_w(u8 data);
+	void spain82_port03_w(u8 data);
 	void sklflite_port03_w(u8 data);
 	u8 port04_r();
 	u8 port05_r();
@@ -127,6 +132,7 @@ private:
 	void mem_map(address_map &map) ATTR_COLD;
 	void flashman_io(address_map &map) ATTR_COLD;
 	void sklflite_io(address_map &map) ATTR_COLD;
+	void spain82_io(address_map &map) ATTR_COLD;
 
 	u8 m_resetcnt = 0U;
 	u8 m_resetcnt_a = 0U;
@@ -146,6 +152,7 @@ private:
 	required_device<ripple_counter_device> m_4020;
 	optional_device<ay8910_device> m_ay1;
 	optional_device<ay8910_device> m_ay2;
+	optional_device<efo_sound3_device> m_sound3;
 	optional_device<efo_zsu_device> m_zsu;
 	required_ioport_array<10> m_io_keyboard;
 	output_finder<70> m_digits;
@@ -168,6 +175,13 @@ void play_3_state::io_map(address_map &map)
 	map(0x05, 0x05).r(FUNC(play_3_state::port05_r)); // more switches
 	map(0x06, 0x06).w(FUNC(play_3_state::port06_w)); // segments
 	map(0x07, 0x07).w(FUNC(play_3_state::port07_w)); // flipflop clear
+}
+
+void play_3_state::spain82_io(address_map &map)
+{
+	io_map(map);
+	map(0x02, 0x02).w(FUNC(play_3_state::spain82_port02_w));
+	map(0x03, 0x03).w(FUNC(play_3_state::spain82_port03_w));
 }
 
 void play_3_state::flashman_io(address_map &map)
@@ -384,10 +398,29 @@ void play_3_state::port02_w(u8 data)
 	m_soundlatch = data;
 }
 
+void play_3_state::spain82_port02_w(u8 data)
+{
+	m_soundlatch = data;
+	m_sound3->input_w(data);
+}
+
 void play_3_state::port03_w(u8 data)
 {
 	if (!BIT(data, 6))
 		m_audiocpu->ef1_w(1); // inverted
+
+	if (BIT(data, 5))
+	{
+		if (m_soundlatch == 11)
+			m_samples->start(0, 5); // outhole
+		for (u8 i = 0; i < 16; i++)
+			m_io_outputs[i] = (m_soundlatch == i) ? 1 : 0;
+	}
+}
+
+void play_3_state::spain82_port03_w(u8 data)
+{
+	m_sound3->clock_w(BIT(data, 6));
 
 	if (BIT(data, 5))
 	{
@@ -573,6 +606,20 @@ void play_3_state::play_3(machine_config &config)
 	m_ay2->port_a_write_callback().set_nop();
 }
 
+void play_3_state::spain82(machine_config &config)
+{
+	play_3(config);
+	m_maincpu->set_addrmap(AS_IO, &play_3_state::spain82_io);
+
+	config.device_remove("audiocpu");
+	config.device_remove("ay1");
+	config.device_remove("ay2");
+	config.device_remove("lspeaker");
+	config.device_remove("rspeaker");
+
+	EFO_SOUND3(config, m_sound3);
+}
+
 void play_3_state::flashman(machine_config &config)
 {
 	play_3(config);
@@ -630,7 +677,7 @@ ROM_START(spain82)
 	ROM_LOAD("spaic12.bin", 0x0000, 0x1000, CRC(cd37ecdc) SHA1(ff2d406b6ac150daef868121e5857a956aabf005))
 	ROM_LOAD("spaic11.bin", 0x1000, 0x0800, CRC(c86c0801) SHA1(1b52539538dae883f9c8fe5bc6454f9224780d11))
 
-	ROM_REGION(0x4000, "audiocpu", 0)
+	ROM_REGION(0x2000, "sound3:rom", 0)
 	ROM_LOAD("spasnd.bin", 0x0000, 0x2000, CRC(62412e2e) SHA1(9e48dc3295e78e1024f726906be6e8c3fe3e61b1))
 ROM_END
 
@@ -866,7 +913,7 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1982,  spain82,   0,        play_3,   spain82,  play_3_state, empty_init, ROT0, "Playmatic", "Spain '82",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  spain82,   0,        spain82,  spain82,  play_3_state, empty_init, ROT0, "Playmatic", "Spain '82",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  megaaton,  0,        megaaton, megaaton, play_3_state, empty_init, ROT0, "Playmatic", "Meg-Aaton",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  megaatona, megaaton, megaaton, megaaton, play_3_state, empty_init, ROT0, "Playmatic", "Meg-Aaton (alternate set)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1984,  nautilus,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Nautilus",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

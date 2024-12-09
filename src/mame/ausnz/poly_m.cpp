@@ -30,15 +30,16 @@ void poly_state::logical_mem_w(offs_t offset, uint8_t data)
 uint8_t poly_state::vector_r(offs_t offset)
 {
 	/* system mode is selected by a vector fetch (interrupt and reset) */
-	m_bankdev->set_bank(0);
+	if (!machine().side_effects_disabled())
+		m_memview.select(0);
 
-	return m_system->base()[0x0ff0 + offset];
+	return m_system->base()[offset & 0x0fff];
 }
 
 
 TIMER_CALLBACK_MEMBER(poly_state::set_protect)
 {
-	m_bankdev->set_bank(1);
+	m_memview.select(1);
 }
 
 void poly_state::set_protect_w(uint8_t data)

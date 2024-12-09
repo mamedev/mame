@@ -149,6 +149,7 @@ public:
 	void varthb3(machine_config &config);
 
 	void init_cps1();
+	void init_cps1mult();
 	void init_sf2ee();
 	void init_wof();
 	void init_dino();

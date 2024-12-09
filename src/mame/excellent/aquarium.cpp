@@ -389,7 +389,7 @@ static INPUT_PORTS_START( aquarium )
 	PORT_SERVICE( 0x1000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r))
 INPUT_PORTS_END
 
 static const gfx_layout layout_5bpp_hi =

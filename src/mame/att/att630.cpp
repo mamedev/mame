@@ -21,12 +21,16 @@ public:
 	att630_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_duart2(*this, "duart2")
 		, m_vram(*this, "vram")
+		, m_buttons(*this, "BUTTONS")
 		, m_bram_data(*this, "bram", 0x2000, ENDIANNESS_BIG)
 	{ }
 
 	void att630(machine_config &config);
 	void att730x(machine_config &config);
+
+	INPUT_CHANGED_MEMBER(mouse_moved);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -34,6 +38,7 @@ protected:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	u8 buttons_r();
 	u8 bram_r(offs_t offset);
 	void bram_w(offs_t offset, u8 data);
 
@@ -41,7 +46,9 @@ private:
 	void att730_map(address_map &map) ATTR_COLD;
 
 	required_device<m68000_device> m_maincpu;
+	required_device<scn2681_device> m_duart2;
 	required_shared_ptr<u16> m_vram;
+	required_ioport m_buttons;
 	memory_share_creator<u8> m_bram_data;
 };
 
@@ -56,6 +63,19 @@ u32 att630_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 			bitmap.pix(y, x) = BIT(m_vram[y * (1024 / 16) + x / 16], 15 - (x % 16)) ? rgb_t::white() : rgb_t::black();
 
 	return 0;
+}
+
+INPUT_CHANGED_MEMBER(att630_state::mouse_moved)
+{
+	m_duart2->ip2_w(0);
+	m_duart2->ip2_w(1);
+}
+
+u8 att630_state::buttons_r()
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	return m_buttons->read();
 }
 
 u8 att630_state::bram_r(offs_t offset)
@@ -75,6 +95,9 @@ void att630_state::att630_map(address_map &map)
 	map(0x100000, 0x1fffff).noprw(); // cartridge space
 	map(0x200000, 0x20001f).rw("duart1", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0x200020, 0x20003f).rw("duart2", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0x200040, 0x200041).portr("MOUSEX");
+	map(0x200042, 0x200043).portr("MOUSEY");
+	map(0x200045, 0x200045).r(FUNC(att630_state::buttons_r));
 	map(0x400000, 0x6fffff).noprw(); // expansion i/o card
 //  map(0x700000, 0x75ffff).noprw(); // video controller
 	map(0x760000, 0x77ffff).ram().share("vram");
@@ -92,6 +115,19 @@ void att630_state::att730_map(address_map &map)
 }
 
 static INPUT_PORTS_START( att630 )
+	PORT_START("MOUSEX")
+	PORT_BIT(0x0fff, 0x0000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(att630_state::mouse_moved), 0)
+	PORT_BIT(0xf000, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("MOUSEY")
+	PORT_BIT(0x0fff, 0x0000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(att630_state::mouse_moved), 0)
+	PORT_BIT(0xf000, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("BUTTONS")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON1)
+	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 void att630_state::att630(machine_config &config)
@@ -106,6 +142,7 @@ void att630_state::att630(machine_config &config)
 	screen.set_raw(87.18336_MHz_XTAL, 1376, 0, 1024, 1056, 0, 1024);
 	screen.set_color(rgb_t::amber());
 	screen.set_screen_update(FUNC(att630_state::screen_update));
+	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_1, ASSERT_LINE);
 
 	scn2681_device &duart1(SCN2681(config, "duart1", 3.6864_MHz_XTAL));
 	duart1.irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);

@@ -12,8 +12,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_AMIGA_KEYBOARD_H
-#define MAME_BUS_AMIGA_KEYBOARD_H
+#ifndef MAME_BUS_AMIGA_KEYBOARD_KEYBOARD_H
+#define MAME_BUS_AMIGA_KEYBOARD_KEYBOARD_H
 
 #pragma once
 
@@ -93,4 +93,4 @@ void amiga_keyboard_devices(device_slot_interface &device);
 void a500_keyboard_devices(device_slot_interface &device);
 void a600_keyboard_devices(device_slot_interface &device);
 
-#endif // MAME_BUS_AMIGA_KEYBOARD_H
+#endif // MAME_BUS_AMIGA_KEYBOARD_KEYBOARD_H

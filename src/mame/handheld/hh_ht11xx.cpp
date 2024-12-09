@@ -116,7 +116,7 @@ static INPUT_PORTS_START( brke23p2 )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Mute")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POWER_ON ) PORT_NAME("Power") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ht11xx_state, input_wakeup, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POWER_ON ) PORT_NAME("Power") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_ht11xx_state::input_wakeup), 0)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2") // not a joystick, but buttons are used for directional inputs in the snake game etc.
@@ -128,7 +128,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ga888 ) // the unit also has an up button, and a reset button, is 'up' connected to anything?
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Pause / Power") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ht11xx_state, input_wakeup, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Pause / Power") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_ht11xx_state::input_wakeup), 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )

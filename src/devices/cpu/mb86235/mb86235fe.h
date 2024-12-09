@@ -7,13 +7,13 @@
 
 ******************************************************************************/
 
+#ifndef MAME_CPU_MB86235_MB86235FE_H
+#define MAME_CPU_MB86235_MB86235FE_H
+
 #pragma once
 
 #include "mb86235.h"
 #include "cpu/drcfe.h"
-
-#ifndef __MB86235FE_H__
-#define __MB86235FE_H__
 
 class mb86235_frontend : public drc_frontend
 {
@@ -44,4 +44,4 @@ private:
 	void describe_ea(opcode_desc &desc, int md, int arx, int ary, int disp);
 };
 
-#endif /* __MB86235FE_H__ */
+#endif // MAME_CPU_MB86235_MB86235FE_H

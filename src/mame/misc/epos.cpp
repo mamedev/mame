@@ -416,7 +416,7 @@ static INPUT_PORTS_START( megadon )
 	PORT_DIPSETTING(    0x80, "Contest" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tristar8000_state, coin_r)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(tristar8000_state::coin_r))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
@@ -433,8 +433,8 @@ static INPUT_PORTS_START( megadon )
 
 	// 2 inputs connected to 74ls74 CLK pins, only one is actually hooked up
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tristar8000_state, coin_switch, 0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CHANGED_MEMBER(DEVICE_SELF, tristar8000_state, coin_switch, 0x02)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tristar8000_state::coin_switch), 0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tristar8000_state::coin_switch), 0x02)
 INPUT_PORTS_END
 
 
@@ -704,7 +704,7 @@ void tristar9000_state::machine_reset()
 void tristar8000_state::tristar8000(machine_config &config) // EPOS TRISTAR 8000 PCB
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(11'000'000) / 4); // 2.75 MHz schematics confirm 11MHz XTAL (see notes)
+	Z80(config, m_maincpu, 11_MHz_XTAL / 4); // 2.75 MHz schematics confirm 11MHz XTAL (see notes)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tristar8000_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &tristar8000_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tristar8000_state::irq0_line_hold));
@@ -713,17 +713,14 @@ void tristar8000_state::tristar8000(machine_config &config) // EPOS TRISTAR 8000
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(272, 241);
-	screen.set_visarea(0, 271, 0, 235);
+	screen.set_raw(11_MHz_XTAL / 2, 352, 0, 272, 258, 0, 236); // confirmed from schematics
 	screen.set_screen_update(FUNC(tristar8000_state::screen_update));
 
 	PALETTE(config, m_palette, FUNC(tristar8000_state::palette), 32);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	AY8912(config, "aysnd", XTAL(11'000'000) / 16).add_route(ALL_OUTPUTS, "mono", 1.0); // 0.6875 MHz, confirmed from schematics
+	AY8912(config, "aysnd", 11_MHz_XTAL / 16).add_route(ALL_OUTPUTS, "mono", 1.0); // 0.6875 MHz, confirmed from schematics
 }
 
 

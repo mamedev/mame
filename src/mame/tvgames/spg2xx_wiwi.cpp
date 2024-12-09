@@ -818,7 +818,7 @@ void spg2xx_game_marc250_state::init_m527()
 	//rom[((17 * 0x800000) / 2) | 0x015e58] = 0x0003;
 	// cliff overhang / gym dancing
 	//rom[((18 * 0x800000) / 2) | 0x01cab4] = 0x0003;
-	rom[((18 * 0x800000) / 2) | 0x021e25] = 0xffff; // secondary 'turn off'
+	rom[((18 * 0x800000) / 2) | 0x021e25] = 0xffff; // secondary 'turn off' on gym dancing
 	// jump chess
 	//rom[((19 * 0x800000) / 2) | 0x012c3a] = 0x0003;
 	// boxing, basketball etc.
@@ -969,6 +969,12 @@ ROM_START( marc250 )
 	ROM_LOAD16_WORD_SWAP( "m527.u6", 0x0000000, 0x10000000, CRC(4b856cab) SHA1(41c66bbdb0bb1442d7e11da18e9e6b20048445ba) )
 ROM_END
 
+ROM_START( 265games )
+	ROM_REGION( 0x10000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "265games.bin", 0x0000000, 0x10000000, CRC(761c92cb) SHA1(3e32bc6079610861bedafe8703302ed9620c9120) )
+ROM_END
+
+
 ROM_START( guitrbus )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "winfunguitar.bin", 0x000000, 0x400000, CRC(17419a27) SHA1(19377fcd18b08d3ae8e20de0244b3aaef1b5a66a) )
@@ -1004,7 +1010,9 @@ CONS( 200?, ddmsup,      0,        0, ddmsup, ddmsup,  spg2xx_game_ddmsup_state,
 
 CONS( 2007, ddmmeg12,    0,        0, ddmsup, ddmsup,  spg2xx_game_ddmsup_state,  empty_init,    "Senario",  "Double Dance Mania: Mega 12",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2015, marc250,     0,        0, marc101, m489,  spg2xx_game_marc250_state, init_m527, "Millennium 2000 GmbH", "Millennium Arcade 250 (M527)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2015, marc250,     0,        0, marc101, m489,  spg2xx_game_marc250_state, init_m527, "Millennium 2000 GmbH", "Millennium Arcade 250 (M527)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 201?, 265games,    0,        0, marc101, m489,  spg2xx_game_marc250_state, init_m527, "<unknown>", "265-in-1 Handheld Game (SPG2xx based)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // has the following strings at the start of the ROM
 // "Copyright(C) 2009-2012 ShenZhen Multi-Content Software CO., LTD"

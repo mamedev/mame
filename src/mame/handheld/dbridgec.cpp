@@ -72,6 +72,7 @@ private:
 
 void dbridgec_state::machine_start()
 {
+	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_com));
 	save_item(NAME(m_lcd_segs));
@@ -157,7 +158,7 @@ void dbridgec_state::input_w(u8 data)
 *******************************************************************************/
 
 #define IN0_CHANGED(x) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, dbridgec_state, in0_changed, 0)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dbridgec_state::in0_changed), 0)
 
 static INPUT_PORTS_START( dbridgec )
 	PORT_START("IN.0")

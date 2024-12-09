@@ -350,7 +350,7 @@ void mmodular_state::gen32_mem(address_map &map)
 
 static INPUT_PORTS_START( bavaria )
 	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mmodular_state, switch_sensor_type, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Board Sensors" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mmodular_state::switch_sensor_type), 0)
 	PORT_CONFSETTING(    0x00, "Magnets (Exclusive)" ) // or Muenchen/Modular
 	PORT_CONFSETTING(    0x01, "Induction (Bavaria)" )
 INPUT_PORTS_END

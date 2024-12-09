@@ -691,6 +691,8 @@ end
 
 if CPUS["H8"] then
 	files {
+		MAME_DIR .. "src/devices/cpu/h8/c77.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/c77.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8h.cpp",
@@ -1998,6 +2000,8 @@ if CPUS["M6805"] then
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m6805defs.h",
 		MAME_DIR .. "src/devices/cpu/m6805/6805ops.hxx",
+		MAME_DIR .. "src/devices/cpu/m6805/hd6305.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/hd6305.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.cpp",
@@ -2573,7 +2577,6 @@ if CPUS["S2650"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/s2650/s2650.cpp",
 		MAME_DIR .. "src/devices/cpu/s2650/s2650.h",
-		MAME_DIR .. "src/devices/cpu/s2650/s2650cpu.h",
 	}
 end
 
@@ -3026,6 +3029,8 @@ if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/z80/z80.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80.h",
+		MAME_DIR .. "src/devices/cpu/z80/t6a84.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/t6a84.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.cpp",
@@ -3630,8 +3635,26 @@ if CPUS["F2MC16"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.cpp",
 		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16.h",
-		MAME_DIR .. "src/devices/cpu/f2mc16/mb9061x.cpp",
-		MAME_DIR .. "src/devices/cpu/f2mc16/mb9061x.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_adc.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_adc.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_clock.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_clock.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_intc.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_intc.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_port.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_port.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_ppg.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_ppg.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_reload.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_reload.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_uart.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16_uart.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb90570.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb90570.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb90610a.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb90610a.h",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb90640a.cpp",
+		MAME_DIR .. "src/devices/cpu/f2mc16/mb90640a.h",
 	}
 end
 
@@ -4112,6 +4135,23 @@ end
 if opt_tool(CPUS, "HT1130") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ht1130/ht1130d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ht1130/ht1130d.h")
+end
+
+--------------------------------------------------
+-- UPD777
+--@src/devices/cpu/upd777/upd777.h,CPUS["UPD777"] = true
+--------------------------------------------------
+
+if CPUS["UPD777"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/upd777/upd777.cpp",
+		MAME_DIR .. "src/devices/cpu/upd777/upd777.h",
+	}
+end
+
+if opt_tool(CPUS, "UPD777") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd777/upd777dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd777/upd777dasm.h")
 end
 
 --------------------------------------------------

@@ -6,14 +6,16 @@
     (c) 1984/5 R.P.Gush
 
 *********************************************************************/
-#ifndef MAME_BUS_SPECTRUM_FLPONE_H
-#define MAME_BUS_SPECTRUM_FLPONE_H
+#ifndef MAME_BUS_SPECTRUM_FLOPPYONE_H
+#define MAME_BUS_SPECTRUM_FLOPPYONE_H
 
 #include "exp.h"
-#include "imagedev/floppy.h"
-#include "machine/wd_fdc.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/floppy.h"
+#include "machine/wd_fdc.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -76,5 +78,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(SPECTRUM_FLPONE, spectrum_flpone_device)
 
-
-#endif // MAME_BUS_SPECTRUM_FLPONE_H
+#endif // MAME_BUS_SPECTRUM_FLOPPYONE_H

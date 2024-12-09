@@ -398,6 +398,7 @@ void cojag_devices(device_slot_interface &device)
 	device.option_add("hdd", COJAG_HARDDISK);
 }
 
+
 /*************************************
  *
  *  Machine init
@@ -671,6 +672,7 @@ void jaguar_state::gpuctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	m_gpu->iobus_w(offset, data, mem_mask);
 }
 
+
 /*************************************
  *
  *  32-bit access to the DSP
@@ -686,6 +688,7 @@ void jaguar_state::dspctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_dsp->iobus_w(offset, data, mem_mask);
 }
+
 
 /*************************************
  *
@@ -869,7 +872,6 @@ void jaguar_state::eeprom_data_w(offs_t offset, uint32_t data)
     run it until we get back to the spin loop.
 */
 
-
 void jaguar_state::gpu_jump_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* update the data in memory */
@@ -923,9 +925,6 @@ uint32_t jaguar_state::gpu_jump_r()
     crank through some random numbers, just not several thousand every frame.
 */
 
-#if ENABLE_SPEEDUP_HACKS
-
-
 uint32_t jaguar_state::cojagr3k_main_speedup_r()
 {
 	uint64_t curcycles = m_maincpu->total_cycles();
@@ -952,8 +951,6 @@ uint32_t jaguar_state::cojagr3k_main_speedup_r()
 	return *m_main_speedup;
 }
 
-#endif
-
 
 
 /*************************************
@@ -971,17 +968,12 @@ uint32_t jaguar_state::cojagr3k_main_speedup_r()
     makes sure we don't waste time emulating that spin loop.
 */
 
-#if ENABLE_SPEEDUP_HACKS
-
-
 uint32_t jaguar_state::main_gpu_wait_r()
 {
 	if (m_gpu_command_pending)
 		m_maincpu->spin_until_interrupt();
 	return *m_main_gpu_wait;
 }
-
-#endif
 
 
 
@@ -997,8 +989,6 @@ uint32_t jaguar_state::main_gpu_wait_r()
     Very similar to the R3000 code, except we need to verify that the value in
     *main_speedup is actually 0.
 */
-
-#if ENABLE_SPEEDUP_HACKS
 
 void jaguar_state::area51_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
@@ -1060,7 +1050,6 @@ void jaguar_state::area51mx_main_speedup_w(offs_t offset, uint32_t data, uint32_
 	m_main_speedup_last_cycles = curcycles;
 }
 
-#endif
 
 
 /*************************************
@@ -1333,6 +1322,7 @@ void jaguarcd_state::jaguarcd_map(address_map &map)
 	map(0xdfff00, 0xdfff3f).rw(FUNC(jaguarcd_state::butch_regs_r16), FUNC(jaguarcd_state::butch_regs_w16));
 }
 
+
 /*************************************
  *
  *  Main CPU memory handlers
@@ -1488,6 +1478,7 @@ void jaguarcd_state::jagcd_gpu_dsp_map(address_map &map)
 	map(0x800000, 0x83ffff).r(FUNC(jaguarcd_state::cd_bios_r));
 	map(0xdfff00, 0xdfff3f).rw(FUNC(jaguarcd_state::butch_regs_r), FUNC(jaguarcd_state::butch_regs_w));
 }
+
 
 /*************************************
  *
@@ -1772,6 +1763,7 @@ static INPUT_PORTS_START( jaguar )
 	PORT_CONFSETTING(    0x10, "NTSC")
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  Machine driver
@@ -1897,6 +1889,7 @@ void jaguarcd_state::jaguarcd(machine_config &config)
 
 	CDROM(config, "cdrom").set_interface("jag_cdrom");
 }
+
 
 /*************************************
  *
@@ -2032,6 +2025,7 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state::cart_load )
 	m_maincpu->reset();
 	return std::make_pair(std::error_condition(), std::string());
 }
+
 
 /*************************************
  *
@@ -2246,7 +2240,6 @@ ROM_END
        ROM based games
 
 ****************************************/
-
 
 ROM_START( fishfren )
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for R3000 code */
@@ -2523,6 +2516,7 @@ void jaguar_state::init_area51()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x0c0, 0x09e);
+
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;

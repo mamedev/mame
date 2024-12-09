@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_LOCOMO
-#define MAME_MACHINE_LOCOMO
+#ifndef MAME_MACHINE_LOCOMO_H
+#define MAME_MACHINE_LOCOMO_H
 
 #pragma once
 
@@ -31,4 +31,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(LOCOMO, locomo_device)
 
-#endif // MAME_MACHINE_LOCOMO
+#endif // MAME_MACHINE_LOCOMO_H

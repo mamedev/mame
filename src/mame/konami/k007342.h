@@ -23,6 +23,8 @@ public:
 
 	// configuration
 	template <typename... T> void set_tile_callback(T &&... args) { m_callback.set(std::forward<T>(args)...); }
+	auto flipscreen_cb() { return m_flipscreen_cb.bind(); }
+	auto sprite_wrap_y_cb() { return m_sprite_wrap_y_cb.bind(); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -32,7 +34,7 @@ public:
 
 	void tilemap_update();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, uint32_t priority);
-	int is_int_enabled();
+	int is_int_enabled() { return m_int_enabled; }
 
 protected:
 	// device_t implementation
@@ -51,7 +53,10 @@ private:
 	uint8_t         m_regs[8];
 	uint16_t        m_scrollx[2];
 	uint8_t         m_scrolly[2];
+
 	tile_delegate   m_callback;
+	devcb_write_line m_flipscreen_cb;
+	devcb_write_line m_sprite_wrap_y_cb;
 
 	TILEMAP_MAPPER_MEMBER(scan);
 	TILE_GET_INFO_MEMBER(get_tile_info0);

@@ -62,7 +62,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override { m_dac->write(0x80); }
+	virtual void machine_reset() override ATTR_COLD { m_dac->write(0x80); }
 
 private:
 	// devices/pointers

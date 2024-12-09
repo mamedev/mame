@@ -1520,16 +1520,16 @@ static INPUT_PORTS_START( amiga )
 	PORT_CONFSETTING(0x20, DEF_STR(Joystick) )
 
 	PORT_START("cia_0_port_a")
-	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(amiga_state, floppy_drive_status)
+	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(amiga_state::floppy_drive_status))
 	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_BUTTON1) PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_BUTTON1) PORT_PLAYER(2)
 
 	PORT_START("joy_0_dat")
-	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(amiga_state, amiga_joystick_convert<0>)
+	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(amiga_state::amiga_joystick_convert<0>))
 	PORT_BIT(0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("joy_1_dat")
-	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(amiga_state, amiga_joystick_convert<1>)
+	PORT_BIT(0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(amiga_state::amiga_joystick_convert<1>))
 	PORT_BIT(0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("potgo")
@@ -1570,19 +1570,19 @@ INPUT_PORTS_START( cd32 )
 	PORT_MODIFY("cia_0_port_a")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM )
 	// this is the regular port for reading a single button joystick on the Amiga, many CD32 games require this to mirror the pad start button!
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cd32_state, cd32_sel_mirror_input<0>)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cd32_state, cd32_sel_mirror_input<1>)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(cd32_state::cd32_sel_mirror_input<0>))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(cd32_state::cd32_sel_mirror_input<1>))
 
 	PORT_MODIFY("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(amiga_state, amiga_joystick_convert<0>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(amiga_state::amiga_joystick_convert<0>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(amiga_state, amiga_joystick_convert<1>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(amiga_state::amiga_joystick_convert<1>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("potgo")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cd32_state, cd32_input)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(cd32_state::cd32_input))
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	// CD32 '11' button pad (4 dpad directions + 7 buttons), not read directly
@@ -2331,6 +2331,14 @@ ROM_START( a2000 )
 	ROMX_LOAD("kick40063.u2", 0x00000, 0x80000, CRC(fc24ae0d) SHA1(3b7f1493b27e212830f989f26ca76c02049f09ca), ROM_GROUPWORD | ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "logica2", "Logica Diagnostic 2.0")
 	ROMX_LOAD("logica2.u2",   0x00000, 0x80000, CRC(8484f426) SHA1(ba10d16166b2e2d6177c979c99edf8462b21651e), ROM_GROUPWORD | ROM_BIOS(4))
+#if 0 // not enabled yet, kickstart 3.2 is new and actively sold
+	ROM_SYSTEM_BIOS(5, "kick32",  "Kickstart 3.2 (47.96)")
+	ROMX_LOAD("kick47096.u2", 0x00000, 0x80000, CRC(8173d7b6) SHA1(b88e364daf23c9c9920e548b0d3d944e65b1031d), ROM_GROUPWORD | ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "kick321", "Kickstart 3.2 (47.102)")
+	ROMX_LOAD("kick47102.u2", 0x00000, 0x80000, CRC(4f078456) SHA1(8f64ada68a7f128ba782e8dc9fa583344171590a), ROM_GROUPWORD | ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(7, "kick322", "Kickstart 3.2 (47.111)")
+	ROMX_LOAD("kick47111.u2", 0x00000, 0x80000, CRC(e4458462) SHA1(7d5ebe686b69d59a863cc77a36b2cd60359a9ed2), ROM_GROUPWORD | ROM_BIOS(7))
+#endif
 ROM_END
 
 // Amiga 2000CR chip location: U500

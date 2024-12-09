@@ -459,7 +459,7 @@ static INPUT_PORTS_START( mgavegas )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) // 25 ptas in to play
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) // 100ptas in for change with 4 25 ptas coins
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("25 ptas level")     //"hack" hopper always full
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("Door")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("Channel")

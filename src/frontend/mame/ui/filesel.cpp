@@ -24,6 +24,9 @@
 #include "util/corestr.h"
 #include "util/zippath.h"
 
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
+
 #include <cstring>
 #include <locale>
 
@@ -69,6 +72,7 @@ menu_file_selector::menu_file_selector(
 	, m_has_empty(has_empty)
 	, m_has_softlist(has_softlist)
 	, m_has_create(has_create)
+	, m_is_midi(image->device().type() == MIDIIN || image->device().type() == MIDIOUT)
 	, m_clicked_directory(std::string::npos, std::string::npos)
 {
 	(void)m_image;
@@ -319,6 +323,10 @@ void menu_file_selector::append_entry_menu_item(const file_selector_entry *entry
 			text = _("[empty slot]");
 			break;
 
+		case SELECTOR_ENTRY_TYPE_MIDI:
+			text = _("[midi port]");
+			break;
+
 		case SELECTOR_ENTRY_TYPE_CREATE:
 			text = _("[create]");
 			break;
@@ -357,6 +365,12 @@ void menu_file_selector::select_item(const file_selector_entry &entry)
 	case SELECTOR_ENTRY_TYPE_EMPTY:
 		// empty slot - unload
 		m_result = result::EMPTY;
+		stack_pop();
+		break;
+
+	case SELECTOR_ENTRY_TYPE_MIDI:
+		// create
+		m_result = result::MIDI;
 		stack_pop();
 		break;
 
@@ -490,6 +504,10 @@ void menu_file_selector::populate()
 	// add the "[empty slot]" entry if available
 	if (m_has_empty)
 		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, "", "");
+
+	// add the "[midi port]" entry if available
+	if (m_is_midi)
+		append_entry(SELECTOR_ENTRY_TYPE_MIDI, "", "");
 
 	// add the "[create]" entry
 	if (m_has_create && directory && !directory->is_archive())

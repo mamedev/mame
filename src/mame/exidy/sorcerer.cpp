@@ -230,7 +230,7 @@ void sorcererd_state::sorcererd_io(address_map &map)
 static INPUT_PORTS_START(sorcerer)
 	PORT_START("VS")
 	/* vblank */
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	/* line 0 */
 	PORT_START("X.0")

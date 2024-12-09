@@ -7,8 +7,8 @@
  *
  *****************************************************************************/
 
-#ifndef MAME_CPU_LR35902_LR35902DASM_H
-#define MAME_CPU_LR35902_LR35902DASM_H
+#ifndef MAME_CPU_LR35902_LR35902D_H
+#define MAME_CPU_LR35902_LR35902D_H
 
 #pragma once
 
@@ -45,4 +45,4 @@ private:
 	static const lr35902dasm mnemonic_main[256];
 };
 
-#endif
+#endif // MAME_CPU_LR35902_LR35902D_H

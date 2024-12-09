@@ -593,6 +593,40 @@ ROM_START( suprgolfj )
 	ROM_LOAD( "cg18.3k",0x60000, 0x10000, CRC(36edd88e) SHA1(374c95721198a88831d6f7e0b71d05e2f8465271) )
 ROM_END
 
+ROM_START( suprgolfja )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // on the YUVO-702A main board
+	ROM_LOAD( "cg24.6k", 0x000000, 0x08000, CRC(d26d7f83) SHA1(60c58a90bd3bbe719e2f9b300853dde16c63544a) )
+
+	ROM_REGION( 0x100000, "user1", ROMREGION_ERASEFF ) // on the YUVO-702A main board
+	ROM_LOAD( "cg1.6j",  0x000000, 0x10000, CRC(ee545c71) SHA1(8ee459a85e52257d3f9a2aa7263b641aad87bafd) )
+	ROM_LOAD( "cg2.6g",  0x010000, 0x10000, CRC(a2ed2159) SHA1(5e13b6c4eaba8146a4c6c2ff24197f3ffca29b92) )
+	ROM_LOAD( "cg3.6f",  0x020000, 0x10000, CRC(4543334d) SHA1(7ee268ed6d02c78db8c222418313593df37cde4b) )
+	ROM_LOAD( "cg4.6d",  0x030000, 0x10000, CRC(85ace664) SHA1(5267406c98e2d124a4985816f8e2e32e74e09614) )
+	ROM_LOAD( "cg5.6c",  0x040000, 0x10000, CRC(609d5b37) SHA1(60640a9bd0883bf4dc999077d89ef793e827ac23) )
+	ROM_LOAD( "cg6.6a",  0x050000, 0x10000, CRC(5e4a8ddb) SHA1(0c71c7eba9fe79187c4214eb639a481305070dcc) )
+	ROM_LOAD( "cg7.5j",  0x060000, 0x10000, CRC(90ac6734) SHA1(2656397fca6dceabf8e35c093c0ba25e08d2ad1e) )
+	ROM_LOAD( "cg8.5g",  0x070000, 0x10000, CRC(2e9edece) SHA1(a0961bb23f312ed137134746d2d3d438fe098085) )
+	ROM_LOAD( "cg9.5f",  0x080000, 0x10000, CRC(139d71f1) SHA1(756ed068e1e2b76a9d1df95b432976e632edfa77) )
+	ROM_LOAD( "cg10.5d", 0x090000, 0x10000, CRC(c069e75e) SHA1(77f1b7571e677aef601b8b1c481b352ca6e485d6) )
+	// no 5c
+	ROM_LOAD( "cg11.5a", 0x0b0000, 0x10000, CRC(cfec1a0f) SHA1(c09ece059cb3c456b66c016c6fab3139d3f61c6a) )
+
+	ROM_REGION( 0x100000, "user2", ROMREGION_ERASEFF ) // on the OG7-0203 daughter board
+	ROM_LOAD( "cg20.ic14", 0x000000, 0x10000, CRC(b57d39f0) SHA1(a442a548fc3b44233fb32a0b21a34c3dee6d99ba) )
+	ROM_LOAD( "cg21.ic13", 0x010000, 0x10000, CRC(0323a2cd) SHA1(d7d4b35ad451acb2fa3d117bb0ae2f8fbd883f17) )
+	ROM_LOAD( "cg22.ic12", 0x020000, 0x10000, CRC(83bcbefd) SHA1(77f29cfd1583d2506e95b8513cb9f87569c31821) )
+	ROM_LOAD( "cg23.ic11", 0x030000, 0x10000, CRC(50191b4d) SHA1(8f74cba2a2b5fd2a03eaf13a6d6b39af8833a4ab) )
+
+	ROM_REGION( 0x70000, "gfx1", 0 ) // on the OG7-0203 daughter board
+	ROM_LOAD( "cg12.ic10", 0x00000, 0x10000, CRC(5707b3d5) SHA1(9102a40fefb6426f2cd9d92d66fdc77e078e3f4c) )
+	ROM_LOAD( "cg13.ic19", 0x10000, 0x10000, CRC(02ff0187) SHA1(aeeb3b2d15c3c8ff4695ecf6cfc0c385295ecce6) )
+	ROM_LOAD( "cg14.ic6",  0x20000, 0x10000, CRC(ca12e01d) SHA1(9c627fb527c8966e16dc6bdb99ec0b9728b5c5f9) )
+	ROM_LOAD( "cg15.ic5",  0x30000, 0x10000, CRC(0fb88270) SHA1(d85a7f1bc5b3c4b13bbd887cea4c055541cbb737) )
+	ROM_LOAD( "cg16.ic4",  0x40000, 0x10000, CRC(0498aa2e) SHA1(988965c3a584dac17ad8c7e504fa1f1e49775611) )
+	ROM_LOAD( "cg17.ic3",  0x50000, 0x10000, CRC(d27f87b5) SHA1(5b2927e89615589540e3853593aeff517584b6a0) )
+	ROM_LOAD( "cg18.ic2",  0x60000, 0x10000, CRC(36edd88e) SHA1(374c95721198a88831d6f7e0b71d05e2f8465271) )
+ROM_END
+
 ROM_START( albatross )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.6k",         0x000000, 0x008000, CRC(6f934951) SHA1(b7217a4e509e452f15f414ce7e23c724ecac6184) )
@@ -645,9 +679,10 @@ void suprgolf_state::init_suprgolfj()
 	ROM[0x6d72+(0x4000*3)-0x4000] = 0x20; // patch ROM check
 }
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
-GAME( 1989, suprgolf,  0,         suprgolf,  suprgolf, suprgolf_state, init_suprgolf,  ROT0, "Nasco", "Super Crowns Golf (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, suprgolfj, suprgolf,  suprgolf,  suprgolf, suprgolf_state, init_suprgolfj, ROT0, "Nasco", "Super Crowns Golf (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, albatross, suprgolf,  suprgolf,  suprgolf, suprgolf_state, init_suprgolf,  ROT0, "Nasco (Technos license)", "Albatross (US prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL| MACHINE_SUPPORTS_SAVE )
+GAME( 1989, suprgolf,   0,         suprgolf,  suprgolf, suprgolf_state, init_suprgolf,  ROT0, "Nasco", "Super Crowns Golf (World)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, suprgolfj,  suprgolf,  suprgolf,  suprgolf, suprgolf_state, init_suprgolfj, ROT0, "Nasco", "Super Crowns Golf (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, suprgolfja, suprgolf,  suprgolf,  suprgolf, suprgolf_state, init_suprgolfj, ROT0, "Nasco", "Super Crowns Golf (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, albatross,  suprgolf,  suprgolf,  suprgolf, suprgolf_state, init_suprgolf,  ROT0, "Nasco (Technos license)", "Albatross (US prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL| MACHINE_SUPPORTS_SAVE )

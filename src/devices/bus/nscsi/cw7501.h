@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_BUS_NSCSI_CW7501
-#define MAME_BUS_NSCSI_CW7501 1
+#ifndef MAME_BUS_NSCSI_CW7501_H
+#define MAME_BUS_NSCSI_CW7501_H
 
 #pragma once
 
@@ -49,4 +49,4 @@ protected:
 DECLARE_DEVICE_TYPE(CW7501, cw7501_device)
 DECLARE_DEVICE_TYPE(CDR4210, cdr4210_device)
 
-#endif // MAME_BUS_NSCSI_CW7501
+#endif // MAME_BUS_NSCSI_CW7501_H

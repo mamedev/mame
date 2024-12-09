@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
 	<element name="overlay">
 
 		<!-- same as gunchamp, except for y-offset -->
-
 		<rect>
 			<bounds left="0" top="0" right="400" bottom="300" />
 			<color red="1.0" green="0.15" blue="0.15" />
@@ -62,7 +62,6 @@ license:CC0-1.0
 			<bounds left="0" top="181" right="400" bottom="300" />
 			<color red="0.15" green="0.15" blue="1.0" />
 		</rect>
-
 	</element>
 
 	<view name="Color Overlay">

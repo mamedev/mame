@@ -283,7 +283,7 @@ uint8_t v25_common_device::brg0_r()
 
 void v25_common_device::brg0_w(uint8_t d)
 {
-	logerror("%06x: BRG0 divider set to %d\n", PC(), d);
+	logerror("%06x: BRG0 divider set to %u\n", PC(), d);
 	m_brg[0] = d;
 }
 
@@ -379,7 +379,7 @@ uint8_t v25_common_device::brg1_r()
 
 void v25_common_device::brg1_w(uint8_t d)
 {
-	logerror("%06x: BRG1 divider set to %d\n", PC(), d);
+	logerror("%06x: BRG1 divider set to %u\n", PC(), d);
 	m_brg[1] = d;
 }
 

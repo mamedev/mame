@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_BUS_FP1060IO_H
-#define MAME_BUS_FP1060IO_H
+#ifndef MAME_BUS_FP1000_FP1060IO_H
+#define MAME_BUS_FP1000_FP1060IO_H
 
 #pragma once
 
@@ -35,5 +35,4 @@ private:
 
 DECLARE_DEVICE_TYPE(FP1060IO, fp1060io_device)
 
-
-#endif // MAME_BUS_FP1060IO_H
+#endif // MAME_BUS_FP1000_FP1060IO_H

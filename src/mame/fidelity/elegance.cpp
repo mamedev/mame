@@ -188,7 +188,7 @@ void elegance_state::main_map(address_map &map)
 *******************************************************************************/
 
 static INPUT_PORTS_START( feleg )
-	PORT_INCLUDE( fidel_clockdiv_4 )
+	PORT_INCLUDE( fidel_clockdiv_4 ) // default for >3MHz
 
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("RV / Pawn")
@@ -201,7 +201,7 @@ static INPUT_PORTS_START( feleg )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("RE")
 
 	PORT_START("CPU")
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elegance_state, change_cpu_freq, 0) // factory set
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elegance_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (original)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (AS12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6085)" )
@@ -210,8 +210,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( felega )
 	PORT_INCLUDE( feleg )
 
-	PORT_MODIFY("CPU") // default to 3.57MHz
-	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, elegance_state, change_cpu_freq, 0) // factory set
+	PORT_MODIFY("CPU") // modify default to 3.57MHz
+	PORT_CONFNAME( 0x03, 0x01, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elegance_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (original)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (AS12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6085)" )

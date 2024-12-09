@@ -992,7 +992,7 @@ static INPUT_PORTS_START( tdv2115l )
 			PORT_CONFSETTING(0x0, DEF_STR( On ))
 
 	PORT_START("sw_rs232_baud")
-		PORT_CONFNAME(0x7, 0x6, "SPEED SELECT [Note: Baud-rate]")                                PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
+		PORT_CONFNAME(0x7, 0x6, "SPEED SELECT [Note: Baud-rate]")                                PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::uart_changed), 0)
 			PORT_CONFSETTING(0x0, "0: 110")
 			PORT_CONFSETTING(0x1, "1: 300")
 			PORT_CONFSETTING(0x2, "2: 600")
@@ -1003,22 +1003,22 @@ static INPUT_PORTS_START( tdv2115l )
 			PORT_CONFSETTING(0x7, "7: 19200")
 
 	PORT_START("sw_rs232_settings")
-		PORT_CONFNAME(0x01, 0x01, "RS-232 Parity checking")                                     PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)   // NO PARITY [YES/NO]
+		PORT_CONFNAME(0x01, 0x01, "RS-232 Parity checking")                                     PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::uart_changed), 0)   // NO PARITY [YES/NO]
 			PORT_CONFSETTING(0x01, DEF_STR( Off ))
 			PORT_CONFSETTING(0x00, DEF_STR( On ))
-		PORT_CONFNAME(0x02, 0x02, "RS-232 Parity type")                                         PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)   // EVEN PARITY [NO/YES]
+		PORT_CONFNAME(0x02, 0x02, "RS-232 Parity type")                                         PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::uart_changed), 0)   // EVEN PARITY [NO/YES]
 			PORT_CONFSETTING(0x00, "Odd")
 			PORT_CONFSETTING(0x02, "Even")
-		PORT_CONFNAME(0x04, 0x04, "RS-232 Number of stop bits")                                 PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)   // TWO STOP BITS [NO/YES]
+		PORT_CONFNAME(0x04, 0x04, "RS-232 Number of stop bits")                                 PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::uart_changed), 0)   // TWO STOP BITS [NO/YES]
 			PORT_CONFSETTING(0x00, "One")
 			PORT_CONFSETTING(0x04, "Two")
-		PORT_CONFNAME(0x08, 0x08, "RS-232 Internal local echo when on-line (for half duplex)")  PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)  // EXT. ECHO [YES/NO]
+		PORT_CONFNAME(0x08, 0x08, "RS-232 Internal local echo when on-line (for half duplex)")  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)  // EXT. ECHO [YES/NO]
 			PORT_CONFSETTING(0x08, DEF_STR( Off ))
 			PORT_CONFSETTING(0x00, DEF_STR( On ))
-		PORT_CONFNAME(0x10, 0x00, "RS-232 Automatic RTS with CTS")                              PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)  // AUTO RFS [NO/YES]
+		PORT_CONFNAME(0x10, 0x00, "RS-232 Automatic RTS with CTS")                              PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)  // AUTO RFS [NO/YES]
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x10, DEF_STR( Yes ))
-		PORT_CONFNAME(0x20, 0x00, "RS-232 Automatic DSR with DTR")                              PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)  // AUTO DSR [NO/YES]
+		PORT_CONFNAME(0x20, 0x00, "RS-232 Automatic DSR with DTR")                              PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)  // AUTO DSR [NO/YES]
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x20, DEF_STR( Yes ))
 
@@ -1026,22 +1026,22 @@ static INPUT_PORTS_START( tdv2115l )
 		PORT_DIPNAME(0x003, 0x001, "ACK/NACK/ENQUIRY lamps")
 			PORT_DIPSETTING(0x001, "Reset with CLEAR key")                      // 1: OFF 2: ON
 			PORT_DIPSETTING(0x002, "Reset with SYN ctrl-char (^V)")             // 1: ON  2: OFF
-		PORT_DIPNAME(0x00c, 0x004, "Rx handshake source")                                       PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)
+		PORT_DIPNAME(0x00c, 0x004, "Rx handshake source")                                       PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)
 			PORT_DIPSETTING(0x004, "DSR")                                       // 3: OFF 4: ON
 			PORT_DIPSETTING(0x008, "DCD")                                       // 3: ON  4: Off
 		PORT_DIPNAME(0x010, 0x010, "Operating mode")
 			PORT_DIPSETTING(0x010, "TTY mode (no CPU)")                         // 5: OFF
 			PORT_DIPSETTING(0x000, "CPU mode (CPU module required)")            // 5: ON
-		PORT_DIPNAME(0x020, 0x020, "DTR/RTS signals")                                           PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_lock_changed, 0)
+		PORT_DIPNAME(0x020, 0x020, "DTR/RTS signals")                                           PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_lock_changed), 0)
 			PORT_DIPSETTING(0x020, "Permanently asserted")                      // 6: OFF
 			PORT_DIPSETTING(0x000, "Affected by LINE/TRANS keys")               // 6: ON
-		PORT_DIPNAME(0x0c0, 0x040, "Require RTS + CTS for ON LINE lamp")                        PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, rs232_changed, 0)
+		PORT_DIPNAME(0x0c0, 0x040, "Require RTS + CTS for ON LINE lamp")                        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)
 			PORT_DIPSETTING(0x040, DEF_STR( Off ))                              // 7: OFF 8: ON
 			PORT_DIPSETTING(0x080, DEF_STR( On ))                               // 7: ON  8: OFF
 		PORT_DIPNAME(0x100, 0x000, "Automatic page-roll after end of page")
 			PORT_DIPSETTING(0x100, DEF_STR( Off ))                              // 9: OFF
 			PORT_DIPSETTING(0x000, DEF_STR( On ))                               // 9: ON
-		PORT_DIPNAME(0x200, 0x000, "RS-232 data length")                                        PORT_CHANGED_MEMBER(DEVICE_SELF, tandberg_tdv2100_disp_logic_device, uart_changed, 0)
+		PORT_DIPNAME(0x200, 0x000, "RS-232 data length")                                        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::uart_changed), 0)
 			PORT_DIPSETTING(0x200, "8 data bits")                               // 10: OFF
 			PORT_DIPSETTING(0x000, "7 data bits")                               // 10: ON
 

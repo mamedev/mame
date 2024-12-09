@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-#ifndef MAME_BUS_PLG1X0_PLG100VL_H
-#define MAME_BUS_PLG1X0_PLG100VL_H
+#ifndef MAME_BUS_PLG1X0_PLG100_VL_H
+#define MAME_BUS_PLG1X0_PLG100_VL_H
 
 // Yamaha PLG100-VL
 

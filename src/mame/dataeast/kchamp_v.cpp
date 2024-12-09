@@ -50,20 +50,20 @@ void kchamp_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kchamp_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-/*
-        Sprites
-        -------
-        Offset        Encoding
-             0        YYYYYYYY
-             1        TTTTTTTT
-             2        FGGTCCCC
-             3        XXXXXXXX
-*/
 
 void kchamp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int dx, int dy)
 {
 	for (int offs = 0; offs < 0x100; offs += 4)
 	{
+		/* sprite format:
+
+        Offset        Encoding
+             0        YYYYYYYY
+             1        TTTTTTTT - tile#
+             2        FGGTCCCC - y flip, gfx bank, high bit of tile#, color
+             3        XXXXXXXX
+		*/
+
 		int attr = m_spriteram[offs + 2];
 		int bank = 1 + ((attr & 0x60) >> 5);
 		int code = m_spriteram[offs + 1] + ((attr & 0x10) << 4);

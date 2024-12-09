@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_CARTROM_H
-#define MAME_DEVICES_IMAGEDEV_CARTROM_H
+#ifndef MAME_IMAGEDEV_CARTROM_H
+#define MAME_IMAGEDEV_CARTROM_H
 
 #pragma once
 
@@ -52,4 +52,4 @@ protected:
 	device_cartrom_image_interface(const machine_config &mconfig, device_t &device);
 };
 
-#endif // MAME_DEVICES_IMAGEDEV_CARTROM_H
+#endif // MAME_IMAGEDEV_CARTROM_H

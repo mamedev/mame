@@ -16,12 +16,10 @@
 
 **********************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_6821PIA_H
-#define MAME_DEVICES_MACHINE_6821PIA_H
+#ifndef MAME_MACHINE_6821PIA_H
+#define MAME_MACHINE_6821PIA_H
 
 #pragma once
-
-
 
 
 /***************************************************************************
@@ -216,5 +214,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PIA6821, pia6821_device)
 
-
-#endif // MAME_DEVICES_MACHINE_6821PIA_H
+#endif // MAME_MACHINE_6821PIA_H

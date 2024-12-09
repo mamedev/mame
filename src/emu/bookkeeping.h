@@ -32,11 +32,14 @@ public:
 	bookkeeping_manager(running_machine &machine);
 
 	// ----- tickets -----
+	// increment the number of dispensed tickets
+	void increment_dispensed_tickets(int delta);
+
 	// return the number of tickets dispensed
 	int get_dispensed_tickets() const;
 
-	// increment the number of dispensed tickets
-	void increment_dispensed_tickets(int delta);
+	// reset the number of dispensed tickets
+	void reset_dispensed_tickets();
 
 	// ----- coin counters -----
 	// write to a particular coin counter (clocks on active high edge)
@@ -44,6 +47,9 @@ public:
 
 	// return the coin count for a given coin
 	int coin_counter_get_count(int num);
+
+	// reset the coin count for a given coin
+	void coin_counter_reset_count(int num);
 
 	// enable/disable coin lockout for a particular coin
 	void coin_lockout_w(int num, int on);
@@ -56,6 +62,7 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
+
 private:
 	void config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);

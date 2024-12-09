@@ -265,6 +265,8 @@ INTERRUPT_GEN_MEMBER(xavix_state::interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		m_video_ctrl |= 0x80;
 	}
+
+	xavix_interrupt_extra();
 }
 
 
@@ -519,6 +521,11 @@ void xavix_i2c_ltv_tam_state::write_io1(uint8_t data, uint8_t direction)
 	}
 }
 
+void xavix_i2c_mj_state::write_io1(uint8_t data, uint8_t direction)
+{
+	m_i2cmem->write_sda(BIT(data | ~direction, 1));
+	m_i2cmem->write_scl(BIT(data | ~direction, 0));
+}
 
 // for taikodp
 void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
@@ -791,7 +798,7 @@ void xavix_state::timer_freq_w(uint8_t data)
 
 TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
 {
-	if (m_timer_control & 0x40) // Timer IRQ enable?
+	if ((m_timer_control & 0x40) && (!m_disable_timer_irq_hack)) // Timer IRQ enable?
 	{
 		m_irqsource |= 0x10;
 		m_timer_control |= 0x80;

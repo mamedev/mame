@@ -1176,6 +1176,7 @@ void adsp21xx_device::execute_run()
 {
 	// Return if CPU is halted
 	if (current_input_state(INPUT_LINE_HALT)) {
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}

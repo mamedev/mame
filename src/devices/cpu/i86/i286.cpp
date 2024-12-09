@@ -1078,6 +1078,7 @@ void i80286_cpu_device::execute_run()
 
 				if(m_halt || m_shutdown)
 				{
+					debugger_wait_hook();
 					m_icount = 0;
 					return;
 				}

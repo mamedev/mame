@@ -18,14 +18,12 @@ public:
 	void megadrvb(machine_config &config);
 	void md_bootleg(machine_config &config);
 
-	void init_aladmdb();
 	void init_srmdb();
 	void init_barek2ch();
 	void init_barek3();
 	void init_barek3a();
 	void init_sonic2mb();
 	void init_twinktmb();
-	void init_jparkmb();
 
 protected:
 	uint16_t dsw_r(offs_t offset);
@@ -34,15 +32,10 @@ protected:
 
 private:
 	void aladmdb_w(uint16_t data);
-	uint16_t aladmdb_r();
 	uint16_t barek3mba_r();
-	uint16_t jparkmb_r();
 	uint16_t twinktmb_r();
 
 	optional_ioport m_io_exp;
-
-	// bootleg specific
-	int m_aladmdb_mcu_port = 0;
 };
 
 // for games with emulated PIC microcontroller
@@ -114,6 +107,7 @@ public:
 	void init_mk3mdb();
 	void init_bk3ssrmb();
 	void init_barekch();
+	void init_srssf2mb();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

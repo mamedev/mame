@@ -199,6 +199,8 @@ protected:
 	};
 
 	virtual void configure_ops();
+	virtual uint8_t read_pc();
+	virtual void write_pc(uint8_t data);
 
 	static const struct opcode_s s_op48[256];
 	static const struct opcode_s s_op4C[256];
@@ -1410,6 +1412,8 @@ protected:
 	virtual void handle_timers(int cycles) override;
 	virtual void upd7810_take_irq() override;
 	virtual void configure_ops() override;
+	virtual uint8_t read_pc() override;
+	virtual void write_pc(uint8_t data) override;
 };
 
 

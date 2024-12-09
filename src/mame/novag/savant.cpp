@@ -153,7 +153,7 @@ void savant_state::stall_w(offs_t offset, u8 data)
 		m_psu->ext_int_w(1);
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, ASSERT_LINE);
-		m_maincpu->defer_access();
+		m_maincpu->retry_access();
 	}
 
 	m_z80_wait = !m_z80_wait;

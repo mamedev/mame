@@ -9,7 +9,7 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/h8500/h8520.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/hd6305.h"
 
 namespace {
 

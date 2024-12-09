@@ -812,11 +812,13 @@ void cosmac_device::execute_run()
 			break;
 
 		case cosmac_mode::RESET:
+			debugger_wait_hook();
 			reset_state();
 			m_icount--;
 			break;
 
 		case cosmac_mode::PAUSE:
+			debugger_wait_hook();
 			m_icount--;
 			break;
 

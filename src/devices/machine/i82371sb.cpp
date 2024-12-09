@@ -973,7 +973,7 @@ int i82371sb_isa_device::pin_mapper(int pin)
 
 void i82371sb_isa_device::irq_handler(int line, int state)
 {
-	if(line < 0 && line >= 16)
+	if(line < 0 || line >= 16)
 		return;
 
 	logerror("irq_handler %d %d\n", line, state);

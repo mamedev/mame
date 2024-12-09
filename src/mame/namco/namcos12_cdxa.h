@@ -27,10 +27,10 @@ public:
 
 	auto psx_int10_callback() { return m_psx_int10_cb.bind(); }
 
-	void psx_map(address_map &map) ATTR_COLD;
+	void amap(address_map &map) ATTR_COLD;
 
-	uint32_t sh2_ram_r(offs_t offset);
-	void sh2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t sh2_ram_r(offs_t offset);
+	void sh2_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void reset_sh2_w(uint16_t data);
 

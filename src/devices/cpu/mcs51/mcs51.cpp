@@ -2160,6 +2160,7 @@ void mcs51_cpu_device::execute_run()
 	/* if in powerdown, just return */
 	if ((m_features & FEATURE_CMOS) && GET_PD)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}

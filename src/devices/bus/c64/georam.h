@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUC_C64_GEORAM_H
-#define MAME_BUC_C64_GEORAM_H
+#ifndef MAME_BUS_C64_GEORAM_H
+#define MAME_BUS_C64_GEORAM_H
 
 #pragma once
 
@@ -49,4 +49,4 @@ private:
 DECLARE_DEVICE_TYPE(C64_GEORAM, c64_georam_cartridge_device)
 
 
-#endif // MAME_BUC_C64_GEORAM_H
+#endif // MAME_BUS_C64_GEORAM_H

@@ -75,6 +75,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/fdi_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/rpk.cpp",
 		MAME_DIR .. "src/lib/formats/rpk.h",
+		MAME_DIR .. "src/lib/formats/86f_dsk.cpp",
+		MAME_DIR .. "src/lib/formats/86f_dsk.h",
 
 		MAME_DIR .. "src/lib/formats/fsmgr.h",
 		MAME_DIR .. "src/lib/formats/fsmgr.cpp",
@@ -1766,6 +1768,18 @@ if opt_tool(FORMATS, "RX50_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/rx50_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/rx50_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/sap_dsk.h,FORMATS["SAP_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "SAP_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/sap_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/sap_dsk.h",
 	}
 end
 

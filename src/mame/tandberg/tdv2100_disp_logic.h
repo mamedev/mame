@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_TANDBERG_DISP_LOGIC_H
-#define MAME_TANDBERG_DISP_LOGIC_H
+#ifndef MAME_TANDBERG_TDV2100_DISP_LOGIC_H
+#define MAME_TANDBERG_TDV2100_DISP_LOGIC_H
 
 #pragma once
 
@@ -144,4 +144,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TANDBERG_TDV2100_DISPLAY_LOGIC, tandberg_tdv2100_disp_logic_device)
 
-#endif // MAME_TANDBERG_DISP_LOGIC_H
+#endif // MAME_TANDBERG_TDV2100_DISP_LOGIC_H

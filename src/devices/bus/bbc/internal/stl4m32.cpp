@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(BBC_STL4M32, bbc_stl4m32_device, "bbc_stl4m32", "Solidisk Fou
 
 INPUT_PORTS_START(stl4m32)
 	PORT_START("stl4m_clock")
-	PORT_CONFNAME(0x01, 0x01, "4MHz Clock") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_stl4m32_device, clock_switch, 0)
+	PORT_CONFNAME(0x01, 0x01, "4MHz Clock") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bbc_stl4m32_device::clock_switch), 0)
 	PORT_CONFSETTING(0x00, "2MHz")
 	PORT_CONFSETTING(0x01, "4MHz")
 INPUT_PORTS_END
