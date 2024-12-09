@@ -74,8 +74,9 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-			  Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本        Let's!TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan
-			  Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
+              Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本
+              Let's!TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan
+              Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
               TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
               Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
               テレビで遊び隊　韋駄天翔 激走 韋駄天バトル / トミー / 日本          Playing with TV Idaten Sho Gekisou Idaten Battle / Tommy / Japan
@@ -199,7 +200,7 @@
 
     dumped: see xavix2.cpp
     2006      Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本            Let's!TV Play NARUTO Ninja Experience ~Dattebayo~ / Bandai / Japan
-	2006      テレビであそぼう！まなぼう！超能力あいうえお図鑑 / エポック社 / 日本   Let's play on TV! Learn! Superpower Aiueo Illustrated Book / Epochsha / Japan
+    2006      テレビであそぼう！まなぼう！超能力あいうえお図鑑 / エポック社 / 日本   Let's play on TV! Learn! Superpower Aiueo Illustrated Book / Epochsha / Japan
 
 
 
