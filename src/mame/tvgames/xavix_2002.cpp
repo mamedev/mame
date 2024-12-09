@@ -563,6 +563,15 @@ ROM_START( ban_kksj )
 	//ROM_LOAD( "at24c02b.u4", 0x000, 0x100, CRC(297ce4aa) SHA1(7cbe94127108c2050e42ba8d530f53920eda2649) )
 ROM_END
 
+ROM_START( tmy_rkmj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "rkmj.u1", 0x000000, 0x800000, CRC(80e70625) SHA1(500e287671a0822b736ed05704090d90187602ac) )
+
+	//ROM_REGION( 0x200, "i2cmem", ROMREGION_ERASE00 )
+	//ROM_LOAD( "AT24C04.u4", 0x000, 0x200, CRC(6ea8cd4d) SHA1(2684dd3e1b6169bd99b9bfad154eb70c60fad42e) )
+ROM_END
+
+
 ROM_START( ban_ordj )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ordj.u2", 0x000000, 0x800000, CRC(78fbb00f) SHA1(797b5495e292c36c003300ed18547e5643056149) )
@@ -660,6 +669,8 @@ CONS( 2004, epo_tfit, 0, 0, xavix2002_i2c_24c04,    epo_tfit,   xavix_i2c_state,
 CONS( 2005, tmy_thom, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Thomas and Friends (Tomy)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, ban_kksj, 0, 0, xavix2002_i2c_24c02,    xavix_i2c,  xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Taikan Taitoku Kekkaishi Houi! Teiso! Ketsu! Metsu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, tmy_rkmj, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state, init_xavix, "Takara Tomy / Capcom / SSD Company LTD",   "Ryuusei no Rockman: Denpa Henkan! On Air! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型
 CONS( 2005, ban_ordj, 0, 0, xavix2002_i2c_24c04,    ban_ordj,   xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
