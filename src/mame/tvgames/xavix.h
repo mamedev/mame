@@ -634,6 +634,7 @@ public:
 
 	void xavix2002_i2c_24c08(machine_config &config);
 	void xavix2002_i2c_24c04(machine_config &config);
+	void xavix2002_i2c_24c02(machine_config &config);
 	void xavix2002_i2c_mrangbat(machine_config& config);
 
 protected:
