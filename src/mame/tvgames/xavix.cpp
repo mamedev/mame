@@ -74,8 +74,7 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-              Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本
-              Let's!TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan
+              Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本  (Let's! TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan)
               Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
               TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
               Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
