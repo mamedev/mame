@@ -423,6 +423,15 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 	map(0x6c00, 0x6cff).ram().w(FUNC(xavix_state::bmp_palram_sh_w)).share("bmp_palram_sh");
 	map(0x6d00, 0x6dff).ram().w(FUNC(xavix_state::bmp_palram_l_w)).share("bmp_palram_l");
 
+	// map(0x6a40, 0x6a7f).ram().share("ext_segment_regs"); // 16x32 extended segment regs
+
+	map(0x6f7c, 0x6f7c).rw(FUNC(xavix_state::superxavix_bitmap_pal_index_r), FUNC(xavix_state::superxavix_bitmap_pal_index_w)); // SgdPalBmpAdr
+	map(0x6f7d, 0x6f7d).rw(FUNC(xavix_state::superxavix_bitmap_pal_hue_r), FUNC(xavix_state::superxavix_bitmap_pal_hue_w)); // SgdPalBmpHue
+	map(0x6f7e, 0x6f7e).rw(FUNC(xavix_state::superxavix_bitmap_pal_saturation_r), FUNC(xavix_state::superxavix_bitmap_pal_saturation_w)); // SgdPalBmpSat
+	map(0x6f7f, 0x6f7f).rw(FUNC(xavix_state::superxavix_bitmap_pal_lightness_r), FUNC(xavix_state::superxavix_bitmap_pal_lightness_w)); // SgdPalBmpLgt
+
+	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
+
 	// extended external bus stuff (possible banking control?)
 	map(0x7909, 0x7909).w(FUNC(xavix_state::extended_extbus_reg0_w));
 	map(0x790b, 0x790b).w(FUNC(xavix_state::extended_extbus_reg1_w));
@@ -432,7 +441,7 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 	map(0x7a20, 0x7a22).rw("xavix2002io", FUNC(xavix2002_io_device::pio_out_r), FUNC(xavix2002_io_device::pio_out_w));
 	map(0x7a30, 0x7a32).r("xavix2002io", FUNC(xavix2002_io_device::pio_in_r));
 
-	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
+
 
 	map(0x7ffd, 0x7ffd).nopw(); // looks like a watchdog?
 }

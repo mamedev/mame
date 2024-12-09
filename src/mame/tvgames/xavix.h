@@ -425,6 +425,15 @@ private:
 
 	void spriteregs_w(uint8_t data);
 
+	void superxavix_bitmap_pal_index_w(uint8_t data);
+	uint8_t superxavix_bitmap_pal_index_r();
+	uint8_t superxavix_bitmap_pal_hue_r();
+	uint8_t superxavix_bitmap_pal_saturation_r();
+	uint8_t superxavix_bitmap_pal_lightness_r();
+	void superxavix_bitmap_pal_hue_w(uint8_t data);
+	void superxavix_bitmap_pal_saturation_w(uint8_t data);
+	void superxavix_bitmap_pal_lightness_w(uint8_t data);
+
 	uint8_t pal_ntsc_r();
 
 	virtual uint8_t lightgun_r(offs_t offset) { logerror("%s: unhandled lightgun_r %d\n", machine().describe_context(), offset); return 0xff;  }
@@ -516,6 +525,9 @@ private:
 
 	uint8_t m_timer_baseval = 0;
 
+	uint8_t m_superxavix_pal_index = 0;
+	uint8_t m_superxavix_bitmap_pal_index = 0;
+
 	int16_t get_vectors(int which, int half);
 
 	// raster IRQ
@@ -551,6 +563,13 @@ private:
 	required_ioport m_region;
 
 	required_device<gfxdecode_device> m_gfxdecode;
+
+	uint8_t get_pen_lightness_from_dat(uint16_t dat);
+	uint8_t get_pen_saturation_from_dat(uint16_t dat);
+	uint8_t get_pen_hue_from_dat(uint16_t dat);
+	uint16_t apply_pen_lightness_to_dat(uint16_t dat, uint16_t lightness);
+	uint16_t apply_pen_saturation_to_dat(uint16_t dat, uint16_t saturation);
+	uint16_t apply_pen_hue_to_dat(uint16_t dat, uint16_t hue);
 
 	void update_pen(int pen, uint8_t shval, uint8_t lval);
 	void draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
