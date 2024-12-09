@@ -6615,6 +6615,34 @@ Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-playe
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/23719/ -->
+	<software name="ttycoon">
+		<description>Transport Tycoon</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Chris Sawyer"/>
+		<info name="language" value="English"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="transport tycoon (usa)" sha1="ddb7d1fb8f9ac6abf307451228154332db12c545"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/94381/ -->
+	<software name="ttycoondlx">
+		<description>Transport Tycoon Deluxe</description>
+		<year>1995</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Chris Sawyer"/>
+		<info name="language" value="English/French/German/Spanish"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="transport tycoon deluxe (europe)" sha1="b81c9f530ffa6f75fceb0d631ff72cb97e0c8d6f"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="turricn2">
 		<description>Turrican II - The Final Fight</description>
 		<year>1996</year>

@@ -34348,6 +34348,36 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
+	<software name="ttycoon">
+		<!-- Original images (Redump)
+		<rom name="Transport Tycoon (EU).cue" size="1489" crc="c0d4caef" sha1="c5ad4f1b1b9e23fd775c76bcc993e230b40b0485"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 01).bin" size="132641040" crc="0e968d6b" sha1="9c79ebcac1d29701c15b2c9fd16564c5089d212e"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 02).bin" size="42858144" crc="3233248e" sha1="571ac211fca70fdf95d8981688664217d889144e"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 03).bin" size="43008672" crc="57aed47c" sha1="849e7b29f769060594407e6a727d0e0f0c088098"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 04).bin" size="40470864" crc="d1000a47" sha1="d69f8fa48646b5d5e459f3100cfb8651617dd619"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 05).bin" size="43262688" crc="84cba52d" sha1="dd05eb6fcf5a453b25452cbb6645e76884922019"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 06).bin" size="44382240" crc="1321fedb" sha1="4871a6f90709e029f82615c89a9b50c3b415589d"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 07).bin" size="41103552" crc="554771fb" sha1="3d812fe5e9ce422b8c9b5da5934c2294870822ab"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 08).bin" size="40414416" crc="5482d255" sha1="4a03aa86c8b528d68996fdb32ddc0383450a7ba5"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 09).bin" size="42178416" crc="1b533fa3" sha1="af1f32695ef3aa4e4469243c433309de6793db73"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 10).bin" size="46353216" crc="a7be7787" sha1="65fb31bcc92b4fe84815ebe1735cf2cf93345bec"/>
+		<rom name="Transport Tycoon (Europe) (En,Fr,De,Es,It) (Track 11).bin" size="2126208" crc="2a8d265d" sha1="b6eae98e3e5c7521928b69d500e9eac4fd45a649"/>
+		-->
+		<description>Transport Tycoon (Europe)</description>
+		<year>1997</year>
+		<publisher>Ocean Software Limited</publisher>
+		<info name="developer" value="MicroProse"/>
+		<info name="language" value="English/French/German/Italian/Spanish"/>
+		<info name="release" value="19970915"/>
+		<info name="serial" value="SLES-00262"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="transport tycoon (europe)" sha1="a7cca2cf45ffcc2d381ab15e65255a89156b3d30" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="tycorcd" cloneof="tycorc">
 		<!-- Original images (Redump)
 		<rom name="Tyco R-C - Assault with a Battery (USA) (Demo).cue" size="112" crc="7f2351e0" sha1="a424f3d09970ef5738ead698e88a7346cfaf581d"/>
