@@ -7104,7 +7104,7 @@ Incredibly slow in tearing down even on pcipcs7 (bypass with fast forward)
 	</software>
 
 	<software name="winnt31_fifi" cloneof="winnt31">
-		<description>Windows NT 3.1 (3.10.528.1, MSDN, fi-fi)</description>
+		<description>Windows NT 3.1 (3.10.528.1, MSDN, fi-FI)</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 		<info name="language" value="Finnish"/>
