@@ -467,6 +467,21 @@ void neogs_device::device_start()
 	m_zxbus->install_device(0x0000, 0xffff, *this, &neogs_device::neogsmap);
 
 	m_neogs_led.resolve();
+
+	save_item(NAME(m_data_in));
+	save_item(NAME(m_data_out));
+	save_item(NAME(m_command_in));
+	save_item(NAME(m_status));
+	save_item(NAME(m_spi_ctrl));
+	save_item(NAME(m_spi_data_out));
+	save_item(NAME(m_spi_data_in_latch));
+	save_item(NAME(m_spi_clock_cycles));
+	save_item(NAME(m_spi_clock_state));
+	save_item(NAME(m_mpag));
+	save_item(NAME(m_mpagx));
+	save_item(NAME(m_gscfg0));
+	save_pointer(NAME(m_vol), 6);
+	save_pointer(NAME(m_sample), 6);
 }
 
 void neogs_device::device_reset()
