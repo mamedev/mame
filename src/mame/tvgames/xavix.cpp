@@ -425,6 +425,11 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 
 	// map(0x6a40, 0x6a7f).ram().share("ext_segment_regs"); // 16x32 extended segment regs
 
+	map(0x6f78, 0x6f78).rw(FUNC(xavix_state::superxavix_chr_pal_index_r), FUNC(xavix_state::superxavix_chr_pal_index_w)); // SgdPalChrIdx
+	map(0x6f79, 0x6f79).rw(FUNC(xavix_state::superxavix_chr_pal_hue_r), FUNC(xavix_state::superxavix_chr_pal_hue_w)); // SgdPalChrHue
+	map(0x6f7a, 0x6f7a).rw(FUNC(xavix_state::superxavix_chr_pal_saturation_r), FUNC(xavix_state::superxavix_chr_pal_saturation_w)); // SgdPalChrSat
+	map(0x6f7b, 0x6f7b).rw(FUNC(xavix_state::superxavix_chr_pal_lightness_r), FUNC(xavix_state::superxavix_chr_pal_lightness_w)); // SgdPalChrLgt
+
 	map(0x6f7c, 0x6f7c).rw(FUNC(xavix_state::superxavix_bitmap_pal_index_r), FUNC(xavix_state::superxavix_bitmap_pal_index_w)); // SgdPalBmpAdr
 	map(0x6f7d, 0x6f7d).rw(FUNC(xavix_state::superxavix_bitmap_pal_hue_r), FUNC(xavix_state::superxavix_bitmap_pal_hue_w)); // SgdPalBmpHue
 	map(0x6f7e, 0x6f7e).rw(FUNC(xavix_state::superxavix_bitmap_pal_saturation_r), FUNC(xavix_state::superxavix_bitmap_pal_saturation_w)); // SgdPalBmpSat

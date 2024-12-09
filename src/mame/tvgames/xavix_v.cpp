@@ -119,52 +119,228 @@ uint8_t xavix_state::superxavix_bitmap_pal_index_r()
 	return m_superxavix_bitmap_pal_index;
 }
 
+void xavix_state::superxavix_chr_pal_index_w(uint8_t data)
+{
+	m_superxavix_pal_index = data;
+}
+
+uint8_t xavix_state::superxavix_chr_pal_index_r()
+{
+	return m_superxavix_pal_index;
+}
+
+
 uint8_t xavix_state::superxavix_bitmap_pal_hue_r()
 {
-	uint16_t dat = (m_bmp_palram_sh[m_superxavix_bitmap_pal_index]) | (m_bmp_palram_l[m_superxavix_bitmap_pal_index] << 8);
+	return superxavix_pal_hue_r(true);
+}
+
+uint8_t xavix_state::superxavix_chr_pal_hue_r()
+{
+	return superxavix_pal_hue_r(false);
+}
+
+uint8_t xavix_state::superxavix_pal_hue_r(bool bitmap)
+{
+	u8 *sh, *sl;
+	u8 ind;
+
+	if (bitmap)
+	{
+		sh = m_bmp_palram_sh;
+		sl = m_bmp_palram_l;
+		ind = m_superxavix_bitmap_pal_index;
+	}
+	else
+	{
+		sh = m_palram_sh;
+		sl = m_palram_l;
+		ind = m_superxavix_pal_index;
+	}
+
+	uint16_t dat = (sh[ind]) | (sl[ind] << 8);
 	uint16_t val = get_pen_hue_from_dat(dat);
 	return val << 2;
 }
 
 uint8_t xavix_state::superxavix_bitmap_pal_saturation_r()
 {
-	uint16_t dat = (m_bmp_palram_sh[m_superxavix_bitmap_pal_index]) | (m_bmp_palram_l[m_superxavix_bitmap_pal_index] << 8);
+	return superxavix_pal_saturation_r(true);
+}
+
+uint8_t xavix_state::superxavix_chr_pal_saturation_r()
+{
+	return superxavix_pal_saturation_r(false);
+}
+
+uint8_t xavix_state::superxavix_pal_saturation_r(bool bitmap)
+{
+	u8 *sh, *sl;
+	u8 ind;
+
+	if (bitmap)
+	{
+		sh = m_bmp_palram_sh;
+		sl = m_bmp_palram_l;
+		ind = m_superxavix_bitmap_pal_index;
+	}
+	else
+	{
+		sh = m_palram_sh;
+		sl = m_palram_l;
+		ind = m_superxavix_pal_index;
+	}
+
+	uint16_t dat = (sh[ind]) | (sl[ind] << 8);
 	uint16_t val = get_pen_saturation_from_dat(dat);
 	return val << 4;
 }
 
 uint8_t xavix_state::superxavix_bitmap_pal_lightness_r()
 {
-	uint16_t dat = (m_bmp_palram_sh[m_superxavix_bitmap_pal_index]) | (m_bmp_palram_l[m_superxavix_bitmap_pal_index] << 8);
+	return superxavix_pal_lightness_r(true);
+}
+
+uint8_t xavix_state::superxavix_chr_pal_lightness_r()
+{
+	return superxavix_pal_lightness_r(false);
+}
+
+uint8_t xavix_state::superxavix_pal_lightness_r(bool bitmap)
+{
+	u8 *sh, *sl;
+	u8 ind;
+
+	if (bitmap)
+	{
+		sh = m_bmp_palram_sh;
+		sl = m_bmp_palram_l;
+		ind = m_superxavix_bitmap_pal_index;
+	}
+	else
+	{
+		sh = m_palram_sh;
+		sl = m_palram_l;
+		ind = m_superxavix_pal_index;
+	}
+
+	uint16_t dat = (sh[ind]) | (sl[ind] << 8);
 	uint16_t val = get_pen_lightness_from_dat(dat);
 	return val << 2;
 }
 
 void xavix_state::superxavix_bitmap_pal_hue_w(uint8_t data)
 {
-	uint16_t olddat = (m_bmp_palram_sh[m_superxavix_bitmap_pal_index]) | (m_bmp_palram_l[m_superxavix_bitmap_pal_index] << 8);
+	superxavix_pal_hue_w(data, true);
+}
+
+void xavix_state::superxavix_chr_pal_hue_w(uint8_t data)
+{
+	superxavix_pal_hue_w(data, false);
+}
+
+void xavix_state::superxavix_pal_hue_w(uint8_t data, bool bitmap)
+{
+	u8 *sh, *sl;
+	u8 ind;
+	int offset;
+
+	if (bitmap)
+	{
+		sh = m_bmp_palram_sh;
+		sl = m_bmp_palram_l;
+		ind = m_superxavix_bitmap_pal_index;
+		offset = 256;
+	}
+	else
+	{
+		sh = m_palram_sh;
+		sl = m_palram_l;
+		ind = m_superxavix_pal_index;
+		offset = 0;
+	}
+
+	uint16_t olddat = (sh[ind]) | (sl[ind] << 8);
 	uint16_t newdata = apply_pen_hue_to_dat(olddat, data >> 2);
-	m_bmp_palram_sh[m_superxavix_bitmap_pal_index] = newdata & 0xff;
-	m_bmp_palram_l[m_superxavix_bitmap_pal_index] = (newdata >> 8) & 0xff;
-	update_pen(m_superxavix_bitmap_pal_index+256, m_bmp_palram_sh[m_superxavix_bitmap_pal_index], m_bmp_palram_l[m_superxavix_bitmap_pal_index]);
+	sh[ind] = newdata & 0xff;
+	sl[ind] = (newdata >> 8) & 0xff;
+	update_pen(ind+offset, sh[ind], sl[ind]);
 }
 
 void xavix_state::superxavix_bitmap_pal_saturation_w(uint8_t data)
 {
-	uint16_t olddat = (m_bmp_palram_sh[m_superxavix_bitmap_pal_index]) | (m_bmp_palram_l[m_superxavix_bitmap_pal_index] << 8);
+	superxavix_pal_saturation_w(data, true);
+}
+
+void xavix_state::superxavix_chr_pal_saturation_w(uint8_t data)
+{
+	superxavix_pal_saturation_w(data, false);
+}
+
+void xavix_state::superxavix_pal_saturation_w(uint8_t data, bool bitmap)
+{
+	u8 *sh, *sl;
+	u8 ind;
+	int offset;
+
+	if (bitmap)
+	{
+		sh = m_bmp_palram_sh;
+		sl = m_bmp_palram_l;
+		ind = m_superxavix_bitmap_pal_index;
+		offset = 256;
+	}
+	else
+	{
+		sh = m_palram_sh;
+		sl = m_palram_l;
+		ind = m_superxavix_pal_index;
+		offset = 0;
+	}
+
+	uint16_t olddat = (sh[ind]) | (sl[ind] << 8);
 	uint16_t newdata = apply_pen_saturation_to_dat(olddat, data >> 4);
-	m_bmp_palram_sh[m_superxavix_bitmap_pal_index] = newdata & 0xff;
-	m_bmp_palram_l[m_superxavix_bitmap_pal_index] = (newdata >> 8) & 0xff;
-	update_pen(m_superxavix_bitmap_pal_index+256, m_bmp_palram_sh[m_superxavix_bitmap_pal_index], m_bmp_palram_l[m_superxavix_bitmap_pal_index]);
+	sh[ind] = newdata & 0xff;
+	sl[ind] = (newdata >> 8) & 0xff;
+	update_pen(ind+offset, sh[ind], sl[ind]);
 }
 
 void xavix_state::superxavix_bitmap_pal_lightness_w(uint8_t data)
 {
-	uint16_t olddat = (m_bmp_palram_sh[m_superxavix_bitmap_pal_index]) | (m_bmp_palram_l[m_superxavix_bitmap_pal_index] << 8);
+	superxavix_pal_lightness_w(data, true);
+}
+
+void xavix_state::superxavix_chr_pal_lightness_w(uint8_t data)
+{
+	superxavix_pal_lightness_w(data, false);
+}
+
+void xavix_state::superxavix_pal_lightness_w(uint8_t data, bool bitmap)
+{
+	u8 *sh, *sl;
+	u8 ind;
+	int offset;
+
+	if (bitmap)
+	{
+		sh = m_bmp_palram_sh;
+		sl = m_bmp_palram_l;
+		ind = m_superxavix_bitmap_pal_index;
+		offset = 256;
+	}
+	else
+	{
+		sh = m_palram_sh;
+		sl = m_palram_l;
+		ind = m_superxavix_pal_index;
+		offset = 0;
+	}
+
+	uint16_t olddat = (sh[ind]) | (sl[ind] << 8);
 	uint16_t newdata = apply_pen_lightness_to_dat(olddat, data >> 2);
-	m_bmp_palram_sh[m_superxavix_bitmap_pal_index] = newdata & 0xff;
-	m_bmp_palram_l[m_superxavix_bitmap_pal_index] = (newdata >> 8) & 0xff;
-	update_pen(m_superxavix_bitmap_pal_index+256, m_bmp_palram_sh[m_superxavix_bitmap_pal_index], m_bmp_palram_l[m_superxavix_bitmap_pal_index]);
+	sh[ind] = newdata & 0xff;
+	sl[ind] = (newdata >> 8) & 0xff;
+	update_pen(ind+offset, sh[ind], sl[ind]);
 }
 
 uint16_t xavix_state::apply_pen_lightness_to_dat(uint16_t dat, uint16_t lightness)
