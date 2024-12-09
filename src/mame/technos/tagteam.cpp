@@ -30,6 +30,7 @@ TODO:
 
 #include "cpu/m6502/m6502.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "video/resnet.h"
@@ -89,7 +90,7 @@ private:
 	void control_w(uint8_t data);
 	void flipscreen_w(uint8_t data);
 
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(v8_timer_irq);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -427,10 +428,12 @@ static GFXDECODE_START( gfx_tagteam )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(tagteam_state::sound_timer_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(tagteam_state::v8_timer_irq)
 {
+	// same source for both interrupts
+	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	if (m_sound_nmi_mask)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -439,11 +442,11 @@ void tagteam_state::tagteam(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, 12_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tagteam_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(tagteam_state::irq0_line_assert), attotime::from_hz(272 / 16 * 57)); // connected to bit 4 of vcount (basically once every 16 scanlines)
 
 	M6502(config, m_audiocpu, 12_MHz_XTAL / 2 / 6); // daughterboard gets 12mhz / 2 from mainboard, but how it's divided further is a guess
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tagteam_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(tagteam_state::sound_timer_irq), attotime::from_hz(272 / 16 * 57)); // same source as maincpu IRQ
+
+	TIMER(config, "v8").configure_scanline(FUNC(tagteam_state::v8_timer_irq), "screen", 8, 16); // connected to bit 4 of vcount (basically once every 16 scanlines)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
