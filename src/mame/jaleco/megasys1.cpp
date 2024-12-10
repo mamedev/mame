@@ -138,10 +138,10 @@ RAM             RW      0e0000-0effff*        <               <
 #include "speaker.h"
 
 #define SYS_A_CPU_CLOCK     (XTAL(12'000'000) / 2)    /* clock for main 68000 */
-#define SYS_B_CPU_CLOCK     XTAL(8'000'000)       /* clock for main 68000 */
+#define SYS_B_CPU_CLOCK     XTAL(8'000'000)           /* clock for main 68000 */
 #define SYS_C_CPU_CLOCK     (XTAL(24'000'000) / 2)    /* clock for main 68000 */
-#define SYS_D_CPU_CLOCK     XTAL(8'000'000)       /* clock for main 68000 */
-#define SOUND_CPU_CLOCK     XTAL(7'000'000)       /* clock for sound 68000 */
+#define SYS_D_CPU_CLOCK     XTAL(8'000'000)           /* clock for main 68000 */
+#define SOUND_CPU_CLOCK     XTAL(7'000'000)           /* clock for sound 68000 */
 #define OKI4_SOUND_CLOCK    XTAL(4'000'000)
 
 #define VERBOSE     0
@@ -286,10 +286,53 @@ void megasys1_typea_state::megasys1A_map(address_map &map)
 }
 
 /***************************************************************************
+                            [ Common - System B & C ]
+***************************************************************************/
+
+void megasys1_state::megasys1bc_handle_scanline_irq(int scanline)
+{
+	if(scanline == 224+16) // vblank-out irq
+		m_maincpu->set_input_line(4, HOLD_LINE);
+
+	if(scanline == 80+16)
+		m_maincpu->set_input_line(1, HOLD_LINE);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1BC_scanline)
+{
+	int scanline = param;
+
+	megasys1bc_handle_scanline_irq(scanline);
+
+	if(scanline == 0+16)
+		m_maincpu->set_input_line(2, HOLD_LINE);
+
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(megasys1_bc_iomcu_state::megasys1BC_iomcu_scanline)
+{
+	int scanline = param;
+
+	megasys1bc_handle_scanline_irq(scanline);
+
+	if(scanline == 0+16) // end of vblank (rising edge)
+	{
+		LOG("%s: megasys1BC_iomcu_scanline: Send INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
+		m_iomcu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	}
+
+	if(scanline == 224+16) // start of vblank (falling edge)
+	{
+		LOG("%s: megasys1BC_iomcu_scanline: Clear INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
+		m_iomcu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+	}
+}
+
+/***************************************************************************
                             [ Main CPU - System B ]
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1B_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1Bbl_scanline)
 {
 	int scanline = param;
 
@@ -381,6 +424,12 @@ void megasys1_bc_iosim_state::megasys1B_iosim_map(address_map &map)
 	map(0x0e0000, 0x0e0001).rw(FUNC(megasys1_bc_iosim_state::ip_select_r), FUNC(megasys1_bc_iosim_state::ip_select_w));
 }
 
+void megasys1_bc_iomcu_state::megasys1B_iomcu_map(address_map &map)
+{
+	megasys1B_map(map);
+	map(0x0e0000, 0x0e0001).rw(FUNC(megasys1_bc_iomcu_state::ip_select_iomcu_r), FUNC(megasys1_bc_iomcu_state::ip_select_iomcu_w));
+}
+
 void megasys1_state::megasys1B_edfbl_map(address_map &map)
 {
 	map.global_mask(0xfffff);
@@ -412,48 +461,6 @@ void megasys1_state::megasys1B_monkelf_map(address_map &map)
 /***************************************************************************
                             [ Main CPU - System C ]
 ***************************************************************************/
-
-
-#define INTERRUPT_NUM_C INTERRUPT_NUM_B
-#define interrupt_C     interrupt_B
-
-void megasys1_state::megasys1c_handle_scanline_irq(int scanline)
-{
-	if(scanline == 224+16) // vblank-out irq
-		m_maincpu->set_input_line(4, HOLD_LINE);
-
-	if(scanline == 80+16)
-		m_maincpu->set_input_line(1, HOLD_LINE);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1C_scanline)
-{
-	int scanline = param;
-
-	megasys1c_handle_scanline_irq(scanline);
-
-	if(scanline == 0+16)
-		m_maincpu->set_input_line(2, HOLD_LINE);
-
-}
-TIMER_DEVICE_CALLBACK_MEMBER(megasys1_bc_iomcu_state::megasys1C_iomcu_scanline)
-{
-	int scanline = param;
-
-	megasys1c_handle_scanline_irq(scanline);
-
-	if(scanline == 0+16) // end of vblank (rising edge)
-	{
-		LOG("%s: megasys1C_iomcu_scanline: Send INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
-		m_iomcu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-	}
-
-	if(scanline == 224+16) // start of vblank (falling edge)
-	{
-		LOG("%s: megasys1C_iomcu_scanline: Clear INT1 to MCU: (scanline %03d)\n", machine().describe_context(), scanline);
-		m_iomcu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-	}
-}
 
 void megasys1_state::ram_w(offs_t offset, u16 data)
 {
@@ -2025,17 +2032,41 @@ void megasys1_typea_state::system_A_p47bl(machine_config &config)
 	m_p47bl_adpcm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
-void megasys1_bc_iosim_state::system_B(machine_config &config)
+void megasys1_state::system_B(machine_config &config)
 {
 	system_base(config);
 
 	/* basic machine hardware */
 
 	m_maincpu->set_clock(SYS_B_CPU_CLOCK); /* 8MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iosim_state::megasys1B_iosim_map);
-	m_scantimer->set_callback(FUNC(megasys1_bc_iosim_state::megasys1B_scanline));
+	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_map);
+	m_scantimer->set_callback(FUNC(megasys1_state::megasys1BC_scanline));
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iosim_state::megasys1B_sound_map);
+	/* video hardware */
+	m_screen->set_raw(SYS_A_CPU_CLOCK, 384,  0, 256, 278, 16, 240);
+//  m_screen->set_raw(SYS_A_CPU_CLOCK, 406,  0, 256, 263, 16, 240);
+
+	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_sound_map);
+}
+
+void megasys1_bc_iosim_state::system_B_iosim(machine_config &config)
+{
+	system_B(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iosim_state::megasys1B_iosim_map);
+}
+
+void megasys1_bc_iomcu_state::system_B_iomcu(machine_config &config)
+{
+	system_B(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::megasys1B_iomcu_map);
+	m_scantimer->set_callback(FUNC(megasys1_bc_iomcu_state::megasys1BC_iomcu_scanline));
+
+	TMP91640(config, m_iomcu, SYS_C_CPU_CLOCK); // Toshiba TMP91640, with 16Kbyte internal ROM, 512bytes internal RAM
+	m_iomcu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::iomcu_map);
+	m_iomcu->port_read<1>().set(FUNC(megasys1_bc_iomcu_state::mcu_port1_r));
+	m_iomcu->port_write<2>().set(FUNC(megasys1_bc_iomcu_state::mcu_port2_w));
+	m_iomcu->port_write<6>().set(FUNC(megasys1_bc_iomcu_state::mcu_port6_w));
 }
 
 void megasys1_state::system_B_monkelf(machine_config &config)
@@ -2046,7 +2077,7 @@ void megasys1_state::system_B_monkelf(machine_config &config)
 
 	m_maincpu->set_clock(SYS_B_CPU_CLOCK); /* 8MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_monkelf_map);
-	m_scantimer->set_callback(FUNC(megasys1_state::megasys1B_scanline));
+	m_scantimer->set_callback(FUNC(megasys1_state::megasys1Bbl_scanline));
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_sound_map);
 }
@@ -2056,7 +2087,7 @@ void megasys1_state::system_Bbl(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12_MHz_XTAL / 2); // edfbl has lower clock, verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_edfbl_map);
-	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1B_scanline), m_screen, 0, 1);
+	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1Bbl_scanline), m_screen, 0, 1);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2091,7 +2122,7 @@ void megasys1_state::system_Bbl(machine_config &config)
 
 void megasys1_bc_iosim_state::system_B_hayaosi1(machine_config &config)
 {
-	system_B(config);
+	system_B_iosim(config);
 
 	/* basic machine hardware */
 
@@ -2111,7 +2142,7 @@ void megasys1_state::system_C(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_clock(SYS_C_CPU_CLOCK); /* 12MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1C_map);
-	m_scantimer->set_callback(FUNC(megasys1_state::megasys1C_scanline));
+	m_scantimer->set_callback(FUNC(megasys1_state::megasys1BC_scanline));
 
 	/* video hardware */
 	m_screen->set_raw(SYS_A_CPU_CLOCK, 384,  0, 256, 278, 16, 240);
@@ -2133,14 +2164,13 @@ void megasys1_bc_iomcu_state::system_C_iomcu(machine_config &config)
 	system_C(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::megasys1C_iomcu_map);
-	m_scantimer->set_callback(FUNC(megasys1_bc_iomcu_state::megasys1C_iomcu_scanline));
+	m_scantimer->set_callback(FUNC(megasys1_bc_iomcu_state::megasys1BC_iomcu_scanline));
 
 	TMP91640(config, m_iomcu, SYS_C_CPU_CLOCK); // Toshiba TMP91640, with 16Kbyte internal ROM, 512bytes internal RAM
 	m_iomcu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::iomcu_map);
 	m_iomcu->port_read<1>().set(FUNC(megasys1_bc_iomcu_state::mcu_port1_r));
 	m_iomcu->port_write<2>().set(FUNC(megasys1_bc_iomcu_state::mcu_port2_w));
 	m_iomcu->port_write<6>().set(FUNC(megasys1_bc_iomcu_state::mcu_port6_w));
-
 }
 /***************************************************************************
 
@@ -3108,7 +3138,7 @@ ROM_START( edf )
 	ROM_LOAD16_BYTE( "edf2.f3",  0x000001, 0x020000, CRC(ce93643e) SHA1(686bf0ec104af8c97624a782e0d60afe170fd945) )
 
 	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "edf.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "edf.mcu", 0x00000, 0x04000, CRC(1503026d) SHA1(5ff63cc5aa58b7a805c019612ddd6d5191a92333) )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "edf_m04.rom",  0x000000, 0x080000, CRC(6744f406) SHA1(3b8f13ca968456186d9ad61f34611b7eab62ea86) )
@@ -3147,7 +3177,7 @@ ROM_START( edfa )
 	ROM_LOAD16_BYTE( "edf2.f3",  0x000001, 0x020000, CRC(ce93643e) SHA1(686bf0ec104af8c97624a782e0d60afe170fd945) )
 
 	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "edf.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "edf.mcu", 0x00000, 0x04000, CRC(1503026d) SHA1(5ff63cc5aa58b7a805c019612ddd6d5191a92333) )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "edf_m04.rom",  0x000000, 0x080000, CRC(6744f406) SHA1(3b8f13ca968456186d9ad61f34611b7eab62ea86) )
@@ -3186,7 +3216,7 @@ ROM_START( edfu )
 	ROM_LOAD16_BYTE( "edf2.f3",  0x000001, 0x020000, CRC(ce93643e) SHA1(686bf0ec104af8c97624a782e0d60afe170fd945) )
 
 	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
-	ROM_LOAD( "edf.mcu", 0x00000, 0x04000, NO_DUMP )
+	ROM_LOAD( "edf.mcu", 0x00000, 0x04000, CRC(1503026d) SHA1(5ff63cc5aa58b7a805c019612ddd6d5191a92333) )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "edf_m04.rom",  0x000000, 0x080000, CRC(6744f406) SHA1(3b8f13ca968456186d9ad61f34611b7eab62ea86) )
@@ -5201,11 +5231,6 @@ void megasys1_bc_iosim_state::init_avspirit() // Type B
 	m_ip_select_values = avspirit_seq;
 }
 
-void megasys1_bc_iosim_state::init_edf() // Type B
-{
-	m_ip_select_values = edf_seq;
-}
-
 void megasys1_bc_iosim_state::init_hayaosi1() // Type B
 {
 	m_ip_select_values = hayaosi1_seq;
@@ -5254,8 +5279,8 @@ void megasys1_state::init_monkelf()
  *************************************/
 
 // Type Z
-GAME( 1988, lomakai,    0,        system_Z,          lomakai,  megasys1_typez_state, empty_init,    ROT0,   "Jaleco", "Legend of Makai (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, makaiden,   lomakai,  system_Z,          lomakai,  megasys1_typez_state, empty_init,    ROT0,   "Jaleco", "Makai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, lomakai,    0,        system_Z,                 lomakai,  megasys1_typez_state,        empty_init,        ROT0,   "Jaleco", "Legend of Makai (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, makaiden,   lomakai,  system_Z,                 lomakai,  megasys1_typez_state,        empty_init,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type A
 GAME( 1988, p47,        0,        system_A,                 p47,      megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
@@ -5296,23 +5321,23 @@ GAME( 1992, soldam,     0,        system_A_d65006_soldam,   soldam,   megasys1_t
 GAME( 1992, soldamj,    soldam,   system_A_gs88000_soldam,  soldam,   megasys1_typea_state,        empty_init,        ROT0,   "Jaleco", "Soldam (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Type B
-GAME( 1991, avspirit,   0,        system_B,          avspirit, megasys1_bc_iosim_state, init_avspirit, ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, monkelf,    avspirit, system_B_monkelf,  avspirit, megasys1_state,          init_monkelf,  ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edf,        0,        system_B,          edf,      megasys1_bc_iosim_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfa,       edf,      system_B,          edf,      megasys1_bc_iosim_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfu,       edf,      system_B,          edf,      megasys1_bc_iosim_state, init_edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, edfbl,      edf,      system_Bbl,        edf,      megasys1_state,          empty_init,    ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hayaosi1,   0,        system_B_hayaosi1, hayaosi1, megasys1_bc_iosim_state, init_hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, avspirit,   0,        system_B_iosim,           avspirit, megasys1_bc_iosim_state,     init_avspirit,     ROT0,   "Jaleco", "Avenging Spirit", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, monkelf,    avspirit, system_B_monkelf,         avspirit, megasys1_state,              init_monkelf,      ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edf,        0,        system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfa,       edf,      system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfu,       edf,      system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfbl,      edf,      system_Bbl,               edf,      megasys1_state,              empty_init,        ROT0,   "bootleg","E.D.F. : Earth Defense Force (bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hayaosi1,   0,        system_B_hayaosi1,        hayaosi1, megasys1_bc_iosim_state,     init_hayaosi1,     ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Type C
-GAME( 1991, 64street,   0,        system_C_iomcu,          64street, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, 64streetj,  64street, system_C_iomcu,          64street, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, 64streetja, 64street, system_C_iomcu,          64street, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bigstrik,   0,        system_C_iomcu,          bigstrik, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, chimerab,   0,        system_C_iomcu,          chimerab, megasys1_bc_iomcu_state, empty_init,    ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, chimeraba,  chimerab, system_C_iosim,          chimerab, megasys1_bc_iosim_state, init_chimeraba,ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, cybattlr,   0,        system_C_iomcu,          cybattlr, megasys1_bc_iomcu_state, empty_init,    ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64street,   0,        system_C_iomcu,           64street, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64streetj,  64street, system_C_iomcu,           64street, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, 64streetja, 64street, system_C_iomcu,           64street, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bigstrik,   0,        system_C_iomcu,           bigstrik, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "Big Striker", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, chimerab,   0,        system_C_iomcu,           chimerab, megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, chimeraba,  chimerab, system_C_iosim,           chimerab, megasys1_bc_iosim_state,     init_chimeraba,    ROT0,   "Jaleco", "Chimera Beast (Japan, prototype, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cybattlr,   0,        system_C_iomcu,           cybattlr, megasys1_bc_iomcu_state,     empty_init,        ROT90,  "Jaleco", "Cybattler", MACHINE_SUPPORTS_SAVE )
 
 // Type D
-GAME( 1993, peekaboo,   0,        system_D,                peekaboo, megasys1_typed_state,    init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, peekaboou,  peekaboo, system_D,                peekaboo, megasys1_typed_state,    init_peekaboo, ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, peekaboo,   0,        system_D,                 peekaboo, megasys1_typed_state,        init_peekaboo,     ROT0,   "Jaleco", "Peek-a-Boo! (Japan, ver. 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, peekaboou,  peekaboo, system_D,                 peekaboo, megasys1_typed_state,        init_peekaboo,     ROT0,   "Jaleco", "Peek-a-Boo! (North America, ver 1.0)", MACHINE_SUPPORTS_SAVE )

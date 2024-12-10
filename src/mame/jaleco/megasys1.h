@@ -51,11 +51,13 @@ public:
 		m_hardware_type_z = 0;
 	}
 
+	void system_base(machine_config &config);
+
+	void system_B(machine_config &config);
 	void system_B_monkelf(machine_config &config);
+	void system_Bbl(machine_config &config);
 
 	void system_C(machine_config &config);
-	void system_Bbl(machine_config &config);
-	void system_base(machine_config &config);
 
 	void init_monkelf();
 
@@ -84,9 +86,9 @@ protected:
 	void megasys1B_map(address_map &map) ATTR_COLD;
 	void megasys1C_map(address_map &map) ATTR_COLD;
 
-	void megasys1c_handle_scanline_irq(int scanline);
+	void megasys1bc_handle_scanline_irq(int scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys_base_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(megasys1B_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys1Bbl_scanline);
 
 	void megasys_base_map(address_map &map) ATTR_COLD;
 	void megasys1B_sound_map(address_map &map) ATTR_COLD;
@@ -142,7 +144,7 @@ private:
 	void ram_w(offs_t offset, u16 data);
 
 
-	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys1BC_scanline);
 
 	void priority_create();
 
@@ -272,9 +274,8 @@ public:
 	void init_avspirit();
 	void init_chimeraba();
 	void init_hayaosi1();
-	void init_edf();
 
-	void system_B(machine_config &config);
+	void system_B_iosim(machine_config &config);
 	void system_B_hayaosi1(machine_config &config);
 	void system_C_iosim(machine_config &config);
 
@@ -287,7 +288,6 @@ protected:
 	u16 m_ip_latched = 0;
 
 	static constexpr u8 avspirit_seq[7] =    { 0x37,0x35,0x36,0x33,0x34,  0xff,0x06 };
-	static constexpr u8 edf_seq[7] =         { 0x20,0x21,0x22,0x23,0x24,  0xf0,0x06 };
 	static constexpr u8 hayaosi1_seq[7] =    { 0x51,0x52,0x53,0x54,0x55,  0xfc,0x06 };
 	static constexpr u8 chimeraba_seq[7]   = { 0x56,0x52,0x53,0x55,0x54,  0xfa,0x06 };
 
@@ -306,6 +306,7 @@ public:
 		m_iomcu(*this, "iomcu")
 	{ }
 
+	void system_B_iomcu(machine_config &config);
 	void system_C_iomcu(machine_config &config);
 
 protected:
@@ -325,10 +326,11 @@ private:
 	u8 m_mcu_input_data;
 	u8 m_mcu_io_data;
 
+	void megasys1B_iomcu_map(address_map &map) ATTR_COLD;
 	void megasys1C_iomcu_map(address_map &map) ATTR_COLD;
 	void iomcu_map(address_map &map) ATTR_COLD;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(megasys1C_iomcu_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(megasys1BC_iomcu_scanline);
 };
 
 #endif // MAME_JALECO_MEGASYS1_H
