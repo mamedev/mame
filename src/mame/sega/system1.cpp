@@ -2225,10 +2225,11 @@ void system1_state::sys1ppi(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	SN76489A(config, m_sn[0], SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	// 1st SN audio output actually goes to 2nd SN audio input (pin 9)
+	SN76489A(config, m_sn[0], SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	// 2nd SN's clock is selectable via jumper
-	SN76489A(config, m_sn[1], SOUND_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, m_sn[1], SOUND_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.60);
 
 	input_merger_device &sn_ready(INPUT_MERGER_ANY_LOW(config, "sn_ready"));
 	sn_ready.output_handler().set_inputline(m_soundcpu, Z80_INPUT_LINE_WAIT);
