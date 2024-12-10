@@ -1690,6 +1690,17 @@ static INPUT_PORTS_START( queenbee )
 INPUT_PORTS_END
 
 /***************************************************************************
+                            Queen Bee Bingo
+***************************************************************************/
+
+static INPUT_PORTS_START( qbeebing )
+	PORT_INCLUDE( humlan )
+
+	PORT_MODIFY("IN-A")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Change")
+INPUT_PORTS_END
+
+/***************************************************************************
                        Express Card / Top Card
 ***************************************************************************/
 
@@ -4017,6 +4028,6 @@ GAME( 2002, xreel,       queenbee, humlan,   humlan,   subsino2_state, empty_ini
 
 GAME( 2002, squeenb,     0,        humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Super Queen Bee (Ver. 101)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
 
-GAME( 2003, qbeebing,    0,        humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee Bingo",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, qbeebing,    0,        humlan,   qbeebing, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee Bingo",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 200?, treamary,    0,        bishjan,  bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Treasure Mary",                         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
