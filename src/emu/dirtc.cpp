@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "dirtc.h"
 
+#include "emutime.h"
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -79,8 +81,8 @@ void device_rtc_interface::set_time(bool update, int year, int month, int day, i
 
 void device_rtc_interface::set_current_time(const system_time &systime)
 {
-	const system_time::full_time &time = m_use_utc ? systime.utc_time : systime.local_time;
-	set_time(true, time.year, time.month + 1, time.mday, time.weekday + 1,
+	const util::arbitrary_datetime &time = m_use_utc ? systime.utc_time : systime.local_time;
+	set_time(true, time.year, time.month, time.day_of_month, time.day_of_week() + 1,
 		time.hour, time.minute, time.second);
 }
 

@@ -12,6 +12,7 @@
 
 #include "config.h"
 #include "emuopts.h"
+#include "emutime.h"
 #include "fileio.h"
 #include "inputdev.h"
 #include "main.h"

@@ -49,6 +49,7 @@ ToDo:
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
 
+#include "emutime.h"
 #include "speaker.h"
 
 namespace {
@@ -214,7 +215,7 @@ uint8_t wpc_s_state::rtc_r(offs_t offset)
 	// This may get wonky if the game is running on year change.  Find
 	// something better to do at that time.
 
-	uint8_t day = (systime.local_time.day - m_rtc_base_day) & 31;
+	uint8_t day = (systime.local_time.day_of_year() - m_rtc_base_day) & 31;
 	uint8_t hour = systime.local_time.hour;
 	uint8_t min = systime.local_time.minute;
 
@@ -285,9 +286,9 @@ void wpc_s_state::machine_reset()
 	machine().base_datetime(systime);
 	m_mainram[0x1800] = systime.local_time.year >> 8;
 	m_mainram[0x1801] = systime.local_time.year;
-	m_mainram[0x1802] = systime.local_time.month+1;
-	m_mainram[0x1803] = systime.local_time.mday;
-	m_mainram[0x1804] = systime.local_time.weekday+1;
+	m_mainram[0x1802] = systime.local_time.month;
+	m_mainram[0x1803] = systime.local_time.day_of_month;
+	m_mainram[0x1804] = systime.local_time.day_of_week() + 1;
 	m_mainram[0x1805] = 0;
 	m_mainram[0x1806] = 1;
 	uint16_t checksum = 0;
@@ -296,7 +297,7 @@ void wpc_s_state::machine_reset()
 	checksum = ~checksum;
 	m_mainram[0x1807] = checksum >> 8;
 	m_mainram[0x1808] = checksum;
-	m_rtc_base_day = systime.local_time.day;
+	m_rtc_base_day = systime.local_time.day_of_year();
 }
 
 void wpc_s_state::init()

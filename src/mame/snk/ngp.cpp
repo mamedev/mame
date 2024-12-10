@@ -112,6 +112,7 @@ the Neogeo Pocket.
 #include "sound/dac.h"
 
 #include "dirtc.h"
+#include "emutime.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"

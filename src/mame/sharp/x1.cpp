@@ -198,6 +198,7 @@ Notes:
 #include "emu.h"
 #include "x1.h"
 
+#include "emutime.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -2143,9 +2144,9 @@ void x1_state::machine_start()
 		system_time systime;
 		machine().base_datetime(systime);
 
-		m_rtc.day = ((systime.local_time.mday / 10)<<4) | ((systime.local_time.mday % 10) & 0xf);
-		m_rtc.month = ((systime.local_time.month+1));
-		m_rtc.wday = ((systime.local_time.weekday % 10) & 0xf);
+		m_rtc.day = ((systime.local_time.day_of_month / 10)<<4) | ((systime.local_time.day_of_month % 10) & 0xf);
+		m_rtc.month = systime.local_time.month;
+		m_rtc.wday = systime.local_time.day_of_week();
 		m_rtc.year = (((systime.local_time.year % 100)/10)<<4) | ((systime.local_time.year % 10) & 0xf);
 		m_rtc.hour = ((systime.local_time.hour / 10)<<4) | ((systime.local_time.hour % 10) & 0xf);
 		m_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);

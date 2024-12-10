@@ -104,6 +104,7 @@ Chips:
 #include "video/cesblit.h"
 
 #include "emupal.h"
+#include "emutime.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -246,9 +247,9 @@ uint16_t tmaster_state::rtc_r(offs_t offset)
 	m_rtc_ram[0x1] = binary_to_bcd(systime.local_time.second);
 	m_rtc_ram[0x2] = binary_to_bcd(systime.local_time.minute);
 	m_rtc_ram[0x3] = binary_to_bcd(systime.local_time.hour);
-	m_rtc_ram[0x4] = binary_to_bcd(systime.local_time.weekday);
-	m_rtc_ram[0x5] = binary_to_bcd(systime.local_time.mday);
-	m_rtc_ram[0x6] = binary_to_bcd(systime.local_time.month+1);
+	m_rtc_ram[0x4] = systime.local_time.day_of_week();
+	m_rtc_ram[0x5] = binary_to_bcd(systime.local_time.day_of_month);
+	m_rtc_ram[0x6] = binary_to_bcd(systime.local_time.month);
 	m_rtc_ram[0x7] = binary_to_bcd(systime.local_time.year % 100);
 
 	return m_rtc_ram[offset];

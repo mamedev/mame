@@ -53,6 +53,7 @@
 #include "emu.h"
 #include "cuda.h"
 #include "cpu/m6805/m6805.h"
+#include "emutime.h"
 
 #define LOG_ADB         (1U << 1)   // low-level ADB details
 #define LOG_I2C         (1U << 2)   // low-level I2C details
@@ -221,8 +222,8 @@ void cuda_device::pc_w(u8 data)
 				cur_time.tm_sec = systime.local_time.second;
 				cur_time.tm_min = systime.local_time.minute;
 				cur_time.tm_hour = systime.local_time.hour;
-				cur_time.tm_mday = systime.local_time.mday;
-				cur_time.tm_mon = systime.local_time.month;
+				cur_time.tm_mday = systime.local_time.day_of_month;
+				cur_time.tm_mon = systime.local_time.month - 1;
 				cur_time.tm_year = systime.local_time.year - 1900;
 				cur_time.tm_isdst = 0;
 

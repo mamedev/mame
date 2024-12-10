@@ -27,6 +27,9 @@
 
 #include "emu.h"
 #include "ds1315.h"
+
+#include "emutime.h"
+
 #include "coreutil.h"
 
 
@@ -204,9 +207,10 @@ void ds1315_device::fill_raw_data()
 	raw[2] = dec_2_bcd(systime.local_time.minute);
 	raw[3] = dec_2_bcd(systime.local_time.hour);
 
-	raw[4] = dec_2_bcd((systime.local_time.weekday != 0) ? systime.local_time.weekday : 7);
-	raw[5] = dec_2_bcd(systime.local_time.mday);
-	raw[6] = dec_2_bcd(systime.local_time.month + 1);
+	int weekday = systime.local_time.day_of_week();
+	raw[4] = (weekday != 0) ? weekday : 7;
+	raw[5] = dec_2_bcd(systime.local_time.day_of_month);
+	raw[6] = dec_2_bcd(systime.local_time.month);
 	raw[7] = dec_2_bcd(systime.local_time.year - 1900); /* Epoch is 1900 */
 
 	/* Ok now we have the raw bcd bytes. Now we need to push them into our bit array */

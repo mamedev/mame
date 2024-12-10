@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "midwayic.h"
 
+#include "emutime.h"
+
 #define LOG_IRQ             (1U << 1)
 #define LOG_NVRAM           (1U << 2)
 #define LOG_FIFO            (1U << 3)
@@ -511,9 +513,9 @@ void midway_serial_pic2_device::write(u8 data)
 					m_buffer[m_total++] = make_bcd(systime.local_time.second);
 					m_buffer[m_total++] = make_bcd(systime.local_time.minute);
 					m_buffer[m_total++] = make_bcd(systime.local_time.hour);
-					m_buffer[m_total++] = make_bcd(systime.local_time.weekday + 1);
-					m_buffer[m_total++] = make_bcd(systime.local_time.mday);
-					m_buffer[m_total++] = make_bcd(systime.local_time.month + 1);
+					m_buffer[m_total++] = systime.local_time.day_of_week() + 1;
+					m_buffer[m_total++] = make_bcd(systime.local_time.day_of_month);
+					m_buffer[m_total++] = make_bcd(systime.local_time.month);
 					m_buffer[m_total++] = make_bcd(systime.local_time.year - 1900 - m_yearoffs);
 				}
 				else

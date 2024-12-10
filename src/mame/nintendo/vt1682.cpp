@@ -66,6 +66,7 @@
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "emupal.h"
+#include "emutime.h"
 #include "screen.h"
 #include "speaker.h"
 

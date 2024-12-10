@@ -13,6 +13,8 @@
 #include "emu.h"
 #include "bsx.h"
 
+#include "emutime.h"
+
 
 //-------------------------------------------------
 //  sns_rom_bsx_device - constructor

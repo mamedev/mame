@@ -4068,6 +4068,23 @@ Core Misc Options
 
             mame galaga88 -nonvram_save
 
+.. _mame-commandline-rtcdate:
+
+**-rtcdate** *<string>*
+
+    Specify a date and/or time to initialize real-time clock devices to (for
+    systems that have one) at the start of machine emulation. The full format is
+    ``YYYY-MM-DD hh:mm:ss``, though either the date or time may be omitted
+    altogether (in which case the system date or time will be used), the seconds
+    may be omitted (defaulting to zero), or the year may be specified alone.
+
+    Note that four-digit years must be specified here, even though RTC devices
+    in emulated systems might not keep track of the century.
+
+    Example:
+        .. code-block:: bash
+
+            mame a1010 -rtcdate 23:59:50
 
 .. _mame-commandline-scripting:
 

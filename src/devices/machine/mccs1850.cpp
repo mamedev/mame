@@ -18,6 +18,8 @@
 #include "emu.h"
 #include "mccs1850.h"
 
+#include "emutime.h"
+
 #include "multibyte.h"
 
 //#define VERBOSE 0

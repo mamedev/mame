@@ -111,6 +111,7 @@
 #include "sound/asc.h"
 
 #include "emupal.h"
+#include "emutime.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -349,8 +350,8 @@ void macportable_state::pmu_p0_w(u8 data)
 		cur_time.tm_sec = systime.local_time.second;
 		cur_time.tm_min = systime.local_time.minute;
 		cur_time.tm_hour = systime.local_time.hour;
-		cur_time.tm_mday = systime.local_time.mday;
-		cur_time.tm_mon = systime.local_time.month;
+		cur_time.tm_mday = systime.local_time.day_of_month;
+		cur_time.tm_mon = systime.local_time.month - 1;
 		cur_time.tm_year = systime.local_time.year - 1900;
 		cur_time.tm_isdst = 0;
 
