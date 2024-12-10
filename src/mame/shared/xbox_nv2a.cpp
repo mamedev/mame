@@ -2191,7 +2191,7 @@ void nv2a_renderer::render_register_combiners(int32_t scanline, const nv2a_raste
 		// 2: compute
 		// 2.1: initialize
 		combiner_initialize_registers(threadid, colorf);
-		// 2.2: general cmbiner stages
+		// 2.2: general combiner stages
 		for (n = 0; n < combiner.setup.stages; n++) {
 			// 2.2.1 initialize
 			combiner_initialize_stage(threadid, n);
@@ -2203,7 +2203,7 @@ void nv2a_renderer::render_register_combiners(int32_t scanline, const nv2a_raste
 			// 2.2.4 map outputs to registers
 			combiner_map_stage_output(threadid, n);
 		}
-		// 2.3: final cmbiner stage
+		// 2.3: final combiner stage
 		combiner_initialize_final(threadid);
 		combiner_map_final_input(threadid);
 		combiner_final_output(threadid);
