@@ -189,6 +189,8 @@ void gaelco3d_state::machine_start()
 	save_item(NAME(m_fp_state));
 	save_item(NAME(m_fp_analog_ports));
 	save_item(NAME(m_fp_lenght));
+	// Init outputs
+	m_start_lamp.resolve();
 }
 
 
@@ -643,8 +645,8 @@ void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
 
 void gaelco3d_state::radikalb_lamp_w(int state)
 {
-	// Arbitrary data written
-	logerror("%06X:unknown_127_w = %d\n", m_maincpu->pc(), state);
+	// Lamp data written directly from latch to output
+	m_start_lamp = m_outlatch->q2_r();
 }
 
 void gaelco3d_state::unknown_137_w(int state)
