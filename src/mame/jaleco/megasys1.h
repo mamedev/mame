@@ -51,13 +51,9 @@ public:
 		m_hardware_type_z = 0;
 	}
 
-	void system_base(machine_config &config);
 
-	void system_B(machine_config &config);
-	void system_B_monkelf(machine_config &config);
-	void system_Bbl(machine_config &config);
-
-	void system_C(machine_config &config);
+	void system_B_monkelf(machine_config &config) ATTR_COLD;
+	void system_Bbl(machine_config &config) ATTR_COLD;
 
 	void init_monkelf();
 
@@ -93,6 +89,10 @@ protected:
 	void megasys_base_map(address_map &map) ATTR_COLD;
 	void megasys1B_sound_map(address_map &map) ATTR_COLD;
 
+	void system_base(machine_config &config) ATTR_COLD;
+	void system_B(machine_config &config) ATTR_COLD;
+	void system_C(machine_config &config) ATTR_COLD;	
+	
 	void megasys1_palette(palette_device &palette);
 
 	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -161,16 +161,16 @@ public:
 		m_gatearray(*this, "gatearray")
 	{ }
 
-	void system_A(machine_config &config);
-	void system_A_d65006_soldam(machine_config &config);
-	void system_A_gs88000_soldam(machine_config &config);
-	void system_A_iganinju(machine_config &config);
-	void system_A_kickoffb(machine_config &config);
-	void system_A_p47bl(machine_config &config);
-	void system_A_d65006(machine_config &config);
-	void system_A_d65006_iganinju(machine_config &config);
-	void system_A_gs88000(machine_config &config);
-	void system_A_unkarray(machine_config &config);
+	void system_A(machine_config &config) ATTR_COLD;
+	void system_A_d65006_soldam(machine_config &config) ATTR_COLD;
+	void system_A_gs88000_soldam(machine_config &config) ATTR_COLD;
+	void system_A_iganinju(machine_config &config) ATTR_COLD;
+	void system_A_kickoffb(machine_config &config) ATTR_COLD;
+	void system_A_p47bl(machine_config &config) ATTR_COLD;
+	void system_A_d65006(machine_config &config) ATTR_COLD;
+	void system_A_d65006_iganinju(machine_config &config) ATTR_COLD;
+	void system_A_gs88000(machine_config &config) ATTR_COLD;
+	void system_A_unkarray(machine_config &config) ATTR_COLD;
 
 	void init_jitsupro_gfx();
 	void init_rodland_gfx();
@@ -221,7 +221,7 @@ public:
 		m_okibank(*this, "okibank")
 	{ }
 
-	void system_D(machine_config &config);
+	void system_D(machine_config &config) ATTR_COLD;
 
 	void init_peekaboo();
 
@@ -275,9 +275,9 @@ public:
 	void init_chimeraba();
 	void init_hayaosi1();
 
-	void system_B_iosim(machine_config &config);
-	void system_B_hayaosi1(machine_config &config);
-	void system_C_iosim(machine_config &config);
+	void system_B_iosim(machine_config &config) ATTR_COLD;
+	void system_B_hayaosi1(machine_config &config) ATTR_COLD;
+	void system_C_iosim(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -306,8 +306,8 @@ public:
 		m_iomcu(*this, "iomcu")
 	{ }
 
-	void system_B_iomcu(machine_config &config);
-	void system_C_iomcu(machine_config &config);
+	void system_B_iomcu(machine_config &config) ATTR_COLD;
+	void system_C_iomcu(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
