@@ -1,3 +1,0 @@
-gradle.ext.sdkVersion = 24
-
-include ':app'

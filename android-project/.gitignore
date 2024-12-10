@@ -1,8 +1,0 @@
-.idea
-.gradle
-local.properties
-*.iml
-*.so
-*.apk
-*.hprof
-build
