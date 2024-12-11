@@ -51,7 +51,6 @@ public:
 		, m_paletteram32(*this, "paletteram32")
 		, m_analog(*this, "ANALOG%u", 0U)
 		, m_adsp_bank(*this, "adspbank")
-		, m_start_lamp(*this, "Start_lamp")
 	{ }
 
 	void footbpow(machine_config &config);
@@ -156,7 +155,6 @@ private:
 	void tms_control3_w(int state);
 	void adsp_control_w(offs_t offset, uint16_t data);
 	void adsp_rombank_w(offs_t offset, uint16_t data);
-	void radikalb_lamp_w(int state);
 	void unknown_137_w(int state);
 	void unknown_13a_w(int state);
 	void gaelco3d_render_w(uint32_t data);
@@ -179,8 +177,6 @@ private:
 	void main020_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 	void tms_map(address_map &map) ATTR_COLD;
-
-	output_finder<> m_start_lamp;
 };
 
 #endif // MAME_GAELCO_GAELCO3D_H

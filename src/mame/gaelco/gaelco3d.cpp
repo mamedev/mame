@@ -189,8 +189,6 @@ void gaelco3d_state::machine_start()
 	save_item(NAME(m_fp_state));
 	save_item(NAME(m_fp_analog_ports));
 	save_item(NAME(m_fp_lenght));
-	// Init outputs
-	m_start_lamp.resolve();
 }
 
 
@@ -642,13 +640,6 @@ void gaelco3d_state::adsp_tx_callback(offs_t offset, uint32_t data)
  *
  *************************************/
 
-
-void gaelco3d_state::radikalb_lamp_w(int state)
-{
-	// Lamp data written directly from latch to output
-	m_start_lamp = m_outlatch->q2_r();
-}
-
 void gaelco3d_state::unknown_137_w(int state)
 {
 	// Only written $00 or $ff
@@ -950,7 +941,7 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 
 	LS259(config, m_outlatch); // IC2 on top board near edge connector
 	m_outlatch->q_out_cb<1>().set(FUNC(gaelco3d_state::tms_control3_w));
-	m_outlatch->q_out_cb<2>().set(FUNC(gaelco3d_state::radikalb_lamp_w));
+	m_outlatch->q_out_cb<2>().set_output("Start_lamp"); // START LAMP
 	m_outlatch->q_out_cb<3>().set(FUNC(gaelco3d_state::unknown_137_w));
 	m_outlatch->q_out_cb<4>().set(m_serial, FUNC(gaelco_serial_device::irq_enable));
 	m_outlatch->q_out_cb<5>().set(FUNC(gaelco3d_state::analog_port_clock_w));
