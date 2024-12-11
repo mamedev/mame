@@ -109,15 +109,300 @@ void xavix_state::spriteram_w(offs_t offset, uint8_t data)
 	}
 }
 
+void xavix_state::superxavix_bitmap_pal_index_w(uint8_t data)
+{
+	m_superxavix_bitmap_pal_index = data;
+}
+
+uint8_t xavix_state::superxavix_bitmap_pal_index_r()
+{
+	return m_superxavix_bitmap_pal_index;
+}
+
+void xavix_state::superxavix_chr_pal_index_w(uint8_t data)
+{
+	m_superxavix_pal_index = data;
+}
+
+uint8_t xavix_state::superxavix_chr_pal_index_r()
+{
+	return m_superxavix_pal_index;
+}
+
+
+uint8_t xavix_state::superxavix_bitmap_pal_hue_r()
+{
+	return superxavix_pal_hue_r(true);
+}
+
+uint8_t xavix_state::superxavix_chr_pal_hue_r()
+{
+	return superxavix_pal_hue_r(false);
+}
+
+uint8_t xavix_state::superxavix_pal_hue_r(bool bitmap)
+{
+	u8 *sh, *sl;
+	u8 ind;
+
+	if (bitmap)
+	{
+		sh = m_bmp_palram_sh;
+		sl = m_bmp_palram_l;
+		ind = m_superxavix_bitmap_pal_index;
+	}
+	else
+	{
+		sh = m_palram_sh;
+		sl = m_palram_l;
+		ind = m_superxavix_pal_index;
+	}
+
+	uint16_t dat = (sh[ind]) | (sl[ind] << 8);
+	uint16_t val = get_pen_hue_from_dat(dat);
+	return val << 2;
+}
+
+uint8_t xavix_state::superxavix_bitmap_pal_saturation_r()
+{
+	return superxavix_pal_saturation_r(true);
+}
+
+uint8_t xavix_state::superxavix_chr_pal_saturation_r()
+{
+	return superxavix_pal_saturation_r(false);
+}
+
+uint8_t xavix_state::superxavix_pal_saturation_r(bool bitmap)
+{
+	u8 *sh, *sl;
+	u8 ind;
+
+	if (bitmap)
+	{
+		sh = m_bmp_palram_sh;
+		sl = m_bmp_palram_l;
+		ind = m_superxavix_bitmap_pal_index;
+	}
+	else
+	{
+		sh = m_palram_sh;
+		sl = m_palram_l;
+		ind = m_superxavix_pal_index;
+	}
+
+	uint16_t dat = (sh[ind]) | (sl[ind] << 8);
+	uint16_t val = get_pen_saturation_from_dat(dat);
+	return val << 4;
+}
+
+uint8_t xavix_state::superxavix_bitmap_pal_lightness_r()
+{
+	return superxavix_pal_lightness_r(true);
+}
+
+uint8_t xavix_state::superxavix_chr_pal_lightness_r()
+{
+	return superxavix_pal_lightness_r(false);
+}
+
+uint8_t xavix_state::superxavix_pal_lightness_r(bool bitmap)
+{
+	u8 *sh, *sl;
+	u8 ind;
+
+	if (bitmap)
+	{
+		sh = m_bmp_palram_sh;
+		sl = m_bmp_palram_l;
+		ind = m_superxavix_bitmap_pal_index;
+	}
+	else
+	{
+		sh = m_palram_sh;
+		sl = m_palram_l;
+		ind = m_superxavix_pal_index;
+	}
+
+	uint16_t dat = (sh[ind]) | (sl[ind] << 8);
+	uint16_t val = get_pen_lightness_from_dat(dat);
+	return val << 2;
+}
+
+void xavix_state::superxavix_bitmap_pal_hue_w(uint8_t data)
+{
+	superxavix_pal_hue_w(data, true);
+}
+
+void xavix_state::superxavix_chr_pal_hue_w(uint8_t data)
+{
+	superxavix_pal_hue_w(data, false);
+}
+
+void xavix_state::superxavix_pal_hue_w(uint8_t data, bool bitmap)
+{
+	u8 *sh, *sl;
+	u8 ind;
+	int offset;
+
+	if (bitmap)
+	{
+		sh = m_bmp_palram_sh;
+		sl = m_bmp_palram_l;
+		ind = m_superxavix_bitmap_pal_index;
+		offset = 256;
+	}
+	else
+	{
+		sh = m_palram_sh;
+		sl = m_palram_l;
+		ind = m_superxavix_pal_index;
+		offset = 0;
+	}
+
+	uint16_t olddat = (sh[ind]) | (sl[ind] << 8);
+	uint16_t newdata = apply_pen_hue_to_dat(olddat, data >> 2);
+	sh[ind] = newdata & 0xff;
+	sl[ind] = (newdata >> 8) & 0xff;
+	update_pen(ind+offset, sh[ind], sl[ind]);
+}
+
+void xavix_state::superxavix_bitmap_pal_saturation_w(uint8_t data)
+{
+	superxavix_pal_saturation_w(data, true);
+}
+
+void xavix_state::superxavix_chr_pal_saturation_w(uint8_t data)
+{
+	superxavix_pal_saturation_w(data, false);
+}
+
+void xavix_state::superxavix_pal_saturation_w(uint8_t data, bool bitmap)
+{
+	u8 *sh, *sl;
+	u8 ind;
+	int offset;
+
+	if (bitmap)
+	{
+		sh = m_bmp_palram_sh;
+		sl = m_bmp_palram_l;
+		ind = m_superxavix_bitmap_pal_index;
+		offset = 256;
+	}
+	else
+	{
+		sh = m_palram_sh;
+		sl = m_palram_l;
+		ind = m_superxavix_pal_index;
+		offset = 0;
+	}
+
+	uint16_t olddat = (sh[ind]) | (sl[ind] << 8);
+	uint16_t newdata = apply_pen_saturation_to_dat(olddat, data >> 4);
+	sh[ind] = newdata & 0xff;
+	sl[ind] = (newdata >> 8) & 0xff;
+	update_pen(ind+offset, sh[ind], sl[ind]);
+}
+
+void xavix_state::superxavix_bitmap_pal_lightness_w(uint8_t data)
+{
+	superxavix_pal_lightness_w(data, true);
+}
+
+void xavix_state::superxavix_chr_pal_lightness_w(uint8_t data)
+{
+	superxavix_pal_lightness_w(data, false);
+}
+
+void xavix_state::superxavix_pal_lightness_w(uint8_t data, bool bitmap)
+{
+	u8 *sh, *sl;
+	u8 ind;
+	int offset;
+
+	if (bitmap)
+	{
+		sh = m_bmp_palram_sh;
+		sl = m_bmp_palram_l;
+		ind = m_superxavix_bitmap_pal_index;
+		offset = 256;
+	}
+	else
+	{
+		sh = m_palram_sh;
+		sl = m_palram_l;
+		ind = m_superxavix_pal_index;
+		offset = 0;
+	}
+
+	uint16_t olddat = (sh[ind]) | (sl[ind] << 8);
+	uint16_t newdata = apply_pen_lightness_to_dat(olddat, data >> 2);
+	sh[ind] = newdata & 0xff;
+	sl[ind] = (newdata >> 8) & 0xff;
+	update_pen(ind+offset, sh[ind], sl[ind]);
+}
+
+uint16_t xavix_state::apply_pen_lightness_to_dat(uint16_t dat, uint16_t lightness)
+{
+	lightness &= 0x3f;
+	dat &= ~0x1f00;
+	dat &= ~0x8000;
+	dat |= (lightness & 0x3e) << 7;
+	dat |= (lightness & 0x01) << 15;
+	return dat;
+}
+
+uint16_t xavix_state::apply_pen_saturation_to_dat(uint16_t dat, uint16_t saturation)
+{
+	saturation &= 0x0f;
+	dat &= ~0x00e0;
+	dat &= ~0x4000;
+	dat |= (saturation & 0x0e) << 4;
+	dat |= (saturation & 0x01) << 14;
+	return dat;
+}
+
+uint16_t xavix_state::apply_pen_hue_to_dat(uint16_t dat, uint16_t hue)
+{
+	hue &= 0x3f;
+	dat &= ~0x001f;
+	dat &= ~0x2000;
+	dat |= (hue & 0x3e) >> 1;
+	dat |= (hue & 0x01) << 13;
+	return dat;
+}
+
+uint8_t xavix_state::get_pen_lightness_from_dat(uint16_t dat)
+{
+	uint8_t y_raw = (dat & 0x1f00) >> 7;
+	y_raw |= (dat & 0x8000) >> 15; // currently we don't make use of this bit
+	return y_raw;
+}
+
+uint8_t xavix_state::get_pen_saturation_from_dat(uint16_t dat)
+{
+	uint8_t c_raw = (dat & 0x00e0) >> 4;
+	c_raw |= (dat & 0x4000) >> 14; // currently we don't make use of this bit
+	return c_raw;
+}
+
+uint8_t xavix_state::get_pen_hue_from_dat(uint16_t dat)
+{
+	uint8_t h_raw = (dat & 0x001f) << 1;
+	h_raw |= (dat & 0x2000) >> 13; // currently we don't make use of this bit
+	return h_raw;
+}
+
 void xavix_state::update_pen(int pen, uint8_t shval, uint8_t lval)
 {
 	uint16_t dat;
 	dat = shval;
 	dat |= lval << 8;
 
-	int y_raw = (dat & 0x1f00) >> 8;
-	int c_raw = (dat & 0x00e0) >> 5;
-	int h_raw = (dat & 0x001f) >> 0;
+	int y_raw = get_pen_lightness_from_dat(dat) >> 1;
+	int c_raw = get_pen_saturation_from_dat(dat) >> 1;
+	int h_raw = get_pen_hue_from_dat(dat) >> 1;
 
 	// The dividers may be dynamic
 	double y = y_raw / 20.0;
