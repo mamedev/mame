@@ -4,7 +4,7 @@
 
     XaviX 2
 
-    unknown architecture, does not appear to be 6502 derived like XaviX / SuperXaviX
+    RISC-like architecture, not 6502-derived like XaviX / SuperXaviX
 
     die is marked  "SSD 2002-2004 NEC 800208-51"
 
@@ -12,12 +12,14 @@
 
 #include "emu.h"
 
-#include "screen.h"
-#include "emupal.h"
-#include "softlist.h"
-#include "speaker.h"
 #include "cpu/xavix2/xavix2.h"
 #include "machine/i2cmem.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 #include <algorithm>
 
 
@@ -774,7 +776,7 @@ ROM_END
 CONS( 2006, ltv_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Naruto (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // テレビであそぼう!まなぼう! 超脳力あいうえお図鑑
-CONS( 2006, epo_dabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Terebi de Asobou! Manabou! Chou Nouryoku Aiueo Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, epo_dabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "TV de Asobou! Manabou! Chou Nouryoku AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
 
