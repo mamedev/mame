@@ -130,12 +130,16 @@ RAM             RW      0e0000-0effff*        <               <
 #include "emu.h"
 #include "megasys1.h"
 
+#include "jalcrpt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
-#include "jalcrpt.h"
 #include "speaker.h"
+
+#define VERBOSE     0
+#include "logmacro.h"
 
 #define SYS_A_CPU_CLOCK     (XTAL(12'000'000) / 2)    /* clock for main 68000 */
 #define SYS_B_CPU_CLOCK     XTAL(8'000'000)           /* clock for main 68000 */
@@ -143,9 +147,6 @@ RAM             RW      0e0000-0effff*        <               <
 #define SYS_D_CPU_CLOCK     XTAL(8'000'000)           /* clock for main 68000 */
 #define SOUND_CPU_CLOCK     XTAL(7'000'000)           /* clock for sound 68000 */
 #define OKI4_SOUND_CLOCK    XTAL(4'000'000)
-
-#define VERBOSE     0
-#include "logmacro.h"
 
 void megasys1_state::machine_reset()
 {
@@ -285,8 +286,8 @@ void megasys1_state::megasys_base_map(address_map &map)
 
 void megasys1_typea_state::megasys1A_map(address_map &map)
 {
-	map.global_mask(0xfffff);
 	megasys_base_map(map);
+
 	map(0x000000, 0x07ffff).rom();
 	map(0x080008, 0x080009).r(m_soundlatch[1], FUNC(generic_latch_16_device::read));    /* from sound cpu */
 	map(0x084000, 0x084001).w(FUNC(megasys1_typea_state::active_layers_w));
@@ -364,11 +365,11 @@ void megasys1_bc_iosim_state::ip_select_w(u16 data) // TO MCU
 	int i;
 
 //  Coins   P1      P2      DSW1    DSW2
-//  57      53      54      55      56      < 64street (not used anymore / MCU code dumped)
+//  57      53      54      55      56      < 64street (not used any more - MCU code dumped)
 //  37      35      36      33      34      < avspirit
-//  58      54      55      56      57      < bigstrik (not used anymore / MCU code dumped)
-//  56      52      53      54      55      < cybattlr (not used anymore / MCU code dumped)
-//  20      21      22      23      24      < edf      (not used anymore / MCU code dumped)
+//  58      54      55      56      57      < bigstrik (not used any more - MCU code dumped)
+//  56      52      53      54      55      < cybattlr (not used any more - MCU code dumped)
+//  20      21      22      23      24      < edf      (not used any more - MCU code dumped)
 //  51      52      53      54      55      < hayaosi1
 
 	/* f(x) = ((x*x)>>4)&0xFF ; f(f($D)) == 6 */
@@ -388,7 +389,6 @@ void megasys1_bc_iosim_state::ip_select_w(u16 data) // TO MCU
 			case 6 :    m_ip_latched = 0x06; break; // sent before each other command
 			default:  return; // get out if it wasn't a valid request
 	}
-
 
 	// if the command is valid, generate an IRQ from the MCU
 	m_maincpu->set_input_line(2, HOLD_LINE);
@@ -535,8 +535,8 @@ void megasys1_bc_iomcu_state::megasys1B_iomcu_map(address_map &map)
 
 void megasys1_state::megasys1B_edfbl_map(address_map &map)
 {
-	map.global_mask(0xfffff);
 	megasys1B_map(map);
+
 	map(0x0e0002, 0x0e0003).portr("SYSTEM");
 	map(0x0e0004, 0x0e0005).portr("P1");
 	map(0x0e0006, 0x0e0007).portr("P2");
@@ -547,8 +547,8 @@ void megasys1_state::megasys1B_edfbl_map(address_map &map)
 
 void megasys1_state::megasys1B_monkelf_map(address_map &map)
 {
-	map.global_mask(0xfffff);
 	megasys1B_map(map);
+
 	map(0x044200, 0x044205).w(FUNC(megasys1_state::monkelf_scroll0_w));
 	map(0x044208, 0x04420d).w(FUNC(megasys1_state::monkelf_scroll1_w));
 	map(0x0e0002, 0x0e0003).portr("P1");
