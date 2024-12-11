@@ -658,12 +658,14 @@ CONS( 2004, epo_tfit, 0, 0, xavix2002_i2c_24c04,    epo_tfit,   xavix_i2c_state,
 // それいけトーマス ソドー島のなかまたち
 CONS( 2005, tmy_thom, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Thomas and Friends (Tomy)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, ban_kksj, 0, 0, xavix2002_i2c_24c02,    xavix_i2c,  xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Taikan Taitoku Kekkaishi Houi! Teiso! Ketsu! Metsu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// Ｌｅｔ’ｓ！ ＴＶプレイ 体感体得 結界師 方囲！定礎！結！滅！
+CONS( 2007, ban_kksj, 0, 0, xavix2002_i2c_24c02,    xavix_i2c,  xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Taikan Taitoku Kekkaishi: Houi! Jouso! Ketsu! Metsu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+// 流星のロックマン 電波変換！オン・エア！
 CONS( 2007, tmy_rkmj, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state, init_xavix, "Takara Tomy / Capcom / SSD Company LTD",   "Ryuusei no Rockman: Denpa Henkan! On Air! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型
-CONS( 2005, ban_ordj, 0, 0, xavix2002_i2c_24c04,    ban_ordj,   xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ban_ordj, 0, 0, xavix2002_i2c_24c04,    ban_ordj,   xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Ongeki Battle! Kamen Rider Hibiki: Kimero! Ikki Kasei no Kata (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // has HT24LC16
 CONS( 2008, udance,   0, 0, xavix2002, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "U-Dance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
