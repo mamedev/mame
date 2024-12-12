@@ -38,6 +38,8 @@ public:
 
 	void xavix2002_super_tv_pc(machine_config &config);
 
+	void init_stvpc();
+
 private:
 	uint8_t read_extended_io0() { return 0x00; }
 	uint8_t read_extended_io1() { return 0x00; }
@@ -45,6 +47,8 @@ private:
 	//void write_extended_io0(uint8_t data);
 	//void write_extended_io1(uint8_t data);
 	//void write_extended_io2(uint8_t data);
+
+	virtual void xavix_extbus_map(address_map &map) override;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 

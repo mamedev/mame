@@ -396,6 +396,13 @@ DEVICE_IMAGE_LOAD_MEMBER(xavix2002_super_tv_pc_state::cart_load)
 	return std::make_pair(std::error_condition(), std::string());
 }
 
+void xavix2002_super_tv_pc_state::xavix_extbus_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rom().region("bios", 0x00000).mirror(0x800000);
+	map(0xe00000, 0xe7ffff).ram(); // writes here
+}
+
+
 void xavix2002_super_tv_pc_state::xavix2002_super_tv_pc(machine_config& config)
 {
 	xavix2002(config);
@@ -546,7 +553,7 @@ ROM_START( domstepc )
 ROM_END
 
 ROM_START( mrangbat )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("powerrangerspad.bin", 0x000000, 0x400000, CRC(d3a98775) SHA1(485c66242dd0ee436a278d23005aece48d606431) )
 ROM_END
 
@@ -571,7 +578,7 @@ ROM_START( ban_ordj )
 ROM_END
 
 ROM_START( epo_tfit )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("tennisfitness.bin", 0x000000, 0x400000, CRC(cbf65bd2) SHA1(30b3da6f061b2dd91679db42a050f715901beb87) )
 ROM_END
 
@@ -597,11 +604,6 @@ ROM_START( suprtvpchk )
 	ROM_CONTINUE(0x000000, 0x200000)
 	ROM_CONTINUE(0x600000, 0x200000)
 	ROM_CONTINUE(0x400000, 0x200000)
-
-	// The area at 0x400000 in the ROM is 0xff filled, probably the system maps RAM, not ROM here as there are also writes.
-	// Replacing it with 0x00 as a hack allows the machine to get to the 'desktop' but in reality some of the memory bypass
-	// speedups will need removing and RAM mapping
-	ROM_FILL(0x600000, 0x80000,0x00)
 ROM_END
 
 ROM_START( suprtvpcdo )
@@ -610,10 +612,13 @@ ROM_START( suprtvpcdo )
 	ROM_CONTINUE(0x000000, 0x200000)
 	ROM_CONTINUE(0x600000, 0x200000)
 	ROM_CONTINUE(0x400000, 0x200000)
-
-	// see note in suprtvpchk set
-	ROM_FILL(0x600000, 0x80000,0x00)
 ROM_END
+
+void xavix2002_super_tv_pc_state::init_stvpc()
+{
+	init_xavix();
+	m_disable_memory_bypass = true;
+}
 
 
 CONS( 2004, xavtenni, 0, 0, xavix2002_i2c_24c04, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -671,8 +676,8 @@ CONS( 2008, udance,   0, 0, xavix2002, xavix, xavix_state, init_xavix, "Tiger / 
 
 // these have RAM in the usual ROM space (still needs handling) & also have an Atmel 24LC64,
 // this one (pet themed) boots to the desktop (as do the 'hamtaro' 'eccjr' cartridges)
-CONS( 2004, suprtvpc,    0,        0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV-PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, suprtvpc,    0,        0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // hangs after 'loading' sequence
-CONS( 2006, suprtvpchk,  suprtvpc, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV-PC - Hello Kitty", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2006, suprtvpcdo,  suprtvpc, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Super TV-PC - Doraemon", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, suprtvpchk,  suprtvpc, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Hello Kitty", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, suprtvpcdo,  suprtvpc, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Doraemon", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

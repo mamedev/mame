@@ -216,6 +216,8 @@ protected:
 
 	bool m_disable_timer_irq_hack = false; // hack for epo_mini which floods timer IRQs to the point it won't do anything else
 
+	virtual void xavix_extbus_map(address_map &map) ATTR_COLD;
+
 private:
 
 	// screen updates
@@ -224,7 +226,6 @@ private:
 	void xavix_map(address_map &map) ATTR_COLD;
 
 	void xavix_lowbus_map(address_map &map) ATTR_COLD;
-	void xavix_extbus_map(address_map &map) ATTR_COLD;
 	void superxavix_lowbus_map(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(interrupt);
@@ -255,13 +256,6 @@ private:
 		// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
 		return m_rgn[(offset) & (m_rgnlen - 1)];
 	}
-
-	virtual uint8_t extbus_r(offs_t offset) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
-	virtual void extbus_w(offs_t offset, uint8_t data)
-	{
-		logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);
-	}
-
 
 	uint8_t sample_read(offs_t offset)
 	{
@@ -630,6 +624,8 @@ protected:
 	void extended_extbus_reg0_w(uint8_t data);
 	void extended_extbus_reg1_w(uint8_t data);
 	void extended_extbus_reg2_w(uint8_t data);
+
+	bool m_disable_memory_bypass = false;
 };
 
 class xavix_guru_state : public xavix_state
@@ -842,7 +838,9 @@ public:
 		xavix_state(mconfig, type, tag),
 		m_cartslot(*this, "cartslot")
 	{
-		m_cartlimit = 0x400000;
+		// all signals 0x000000 - 0x5fffff go to the cart
+		// even if the largest cart is 0x400000 in size
+		m_cartlimit = 0x600000;
 	}
 
 	void xavix_cart(machine_config &config);
@@ -853,6 +851,32 @@ public:
 	void xavix_cart_daig(machine_config &config);
 
 protected:
+
+	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
+
+	u8 cart_r(offs_t offset)
+	{
+		if (m_cartslot->has_cart())
+		{
+			return m_cartslot->read_cart(offset);
+		}
+		else
+		{
+			return m_rgn[(offset) & (m_rgnlen - 1)];
+		}
+	}
+
+	void cart_w(offs_t offset, uint8_t data)
+	{
+		if (m_cartslot->has_cart())
+		{
+			m_cartslot->write_cart(offset, data);
+		}
+		else
+		{
+			logerror("%s: unhandled write access to cart area with no cart installed %08x %02x\n", machine().describe_context(), offset, data);
+		}
+	}
 
 	// for Cart cases this memory bypass becomes more complex
 
@@ -866,14 +890,7 @@ protected:
 			}
 			else
 			{
-				if (m_cartslot->has_cart())
-				{
-					return m_cartslot->read_cart(offset);
-				}
-				else
-				{
-					return m_rgn[(offset) & (m_rgnlen - 1)];
-				}
+				return cart_r(offset);
 			}
 		}
 		else
@@ -890,14 +907,7 @@ protected:
 		}
 		else
 		{
-			if (m_cartslot->has_cart())
-			{
-				return m_cartslot->read_cart(offset);
-			}
-			else
-			{
-				return m_rgn[(offset) & (m_rgnlen - 1)];
-			}
+			return cart_r(offset);
 		}
 	}
 
@@ -918,51 +928,6 @@ protected:
 		}
 	};
 
-	virtual uint8_t extbus_r(offs_t offset) override
-	{
-		if (m_cartslot->has_cart() && m_cartslot->is_read_access_not_rom())
-		{
-			logerror("%s: read from external bus %06x (SEEPROM READ?)\n", machine().describe_context(), offset);
-			return m_cartslot->read_extra(offset);
-		}
-		else
-		{
-			if ((offset & 0x7fffff) >= m_cartlimit)
-			{
-				return m_rgn[(offset) & (m_rgnlen - 1)];
-			}
-			else
-			{
-				if (m_cartslot->has_cart())
-				{
-					return m_cartslot->read_cart(offset);
-				}
-				else
-				{
-					return m_rgn[(offset) & (m_rgnlen - 1)];
-				}
-			}
-		}
-	}
-	virtual void extbus_w(offs_t offset, uint8_t data) override
-	{
-		if (m_cartslot->has_cart() && m_cartslot->is_write_access_not_rom())
-		{
-			logerror("%s: write to external bus %06x %02x (SEEPROM WRITE?)\n", machine().describe_context(), offset, data);
-			return m_cartslot->write_extra(offset, data);
-		}
-		else
-		{
-			if (m_cartslot->has_cart())
-			{
-				return m_cartslot->write_cart(offset, data);
-			}
-			else
-			{
-				logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);
-			}
-		}
-	}
 
 	virtual inline uint8_t read_full_data_sp_bypass(uint32_t offset) override
 	{
@@ -976,14 +941,7 @@ protected:
 			}
 			else
 			{
-				if (m_cartslot->has_cart())
-				{
-					return m_cartslot->read_cart(offset);
-				}
-				else
-				{
-					return m_rgn[(offset) & (m_rgnlen - 1)];
-				}
+				return cart_r(offset);
 			}
 		}
 		else
@@ -996,14 +954,7 @@ protected:
 				}
 				else
 				{
-					if (m_cartslot->has_cart())
-					{
-						return m_cartslot->read_cart(offset);
-					}
-					else
-					{
-						return m_rgn[(offset) & (m_rgnlen - 1)];
-					}
+					return cart_r(offset);
 				}
 			}
 			else

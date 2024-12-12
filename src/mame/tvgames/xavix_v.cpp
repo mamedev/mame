@@ -21,8 +21,10 @@ inline uint8_t xavix_state::get_next_bit()
 	// going through memory is slow, try not to do it too often!
 	if (m_tmp_databit == 0)
 	{
-		//m_bit = m_maincpu->read_full_data_sp(m_tmp_dataaddress);
-		m_bit = read_full_data_sp_bypass(m_tmp_dataaddress);
+		if (m_disable_memory_bypass)
+			m_bit = m_maincpu->space(AS_PROGRAM).read_byte(m_tmp_dataaddress);
+		else
+			m_bit = read_full_data_sp_bypass(m_tmp_dataaddress);
 	}
 
 	uint8_t ret = m_bit >> m_tmp_databit;
@@ -677,22 +679,31 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 		// the register being 0 probably isn't the condition here
 		if (tileregs[0x0] != 0x00)
 		{
-			//tile |= m_maincpu->read_full_data_sp((tileregs[0x0] << 8) + count);
-			tile |= read_full_data_sp_bypass((tileregs[0x0] << 8) + count);
+			const offs_t realaddress = (tileregs[0x0] << 8) + count;
+			if (m_disable_memory_bypass)
+				tile |= m_maincpu->space(AS_PROGRAM).read_byte(realaddress);
+			else
+				tile |= read_full_data_sp_bypass(realaddress);
 		}
 
 		// only read the next byte if we're not in an 8-bit mode
 		if (((tileregs[0x7] & 0x7f) != 0x00) && ((tileregs[0x7] & 0x7f) != 0x08))
 		{
-			//tile |= m_maincpu->read_full_data_sp((tileregs[0x1] << 8) + count) << 8;
-			tile |= read_full_data_sp_bypass((tileregs[0x1] << 8) + count) << 8;
+			const offs_t realaddress = (tileregs[0x1] << 8) + count;
+			if (m_disable_memory_bypass)
+				tile |= m_maincpu->space(AS_PROGRAM).read_byte(realaddress) << 8;
+			else
+				tile |= read_full_data_sp_bypass(realaddress) << 8;
 		}
 
 		// 24 bit modes can use reg 0x2, otherwise it gets used as extra attribute in other modes
 		if (alt_tileaddressing2 == 2)
 		{
-			//tile |= m_maincpu->read_full_data_sp((tileregs[0x2] << 8) + count) << 16;
-			tile |= read_full_data_sp_bypass((tileregs[0x2] << 8) + count) << 16;
+			const offs_t realaddress = (tileregs[0x2] << 8) + count;
+			if (m_disable_memory_bypass)
+				tile |= m_maincpu->space(AS_PROGRAM).read_byte(realaddress) << 16;
+			else
+				tile |= read_full_data_sp_bypass(realaddress) << 16;
 		}
 
 
@@ -747,8 +758,13 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 			// Tilemap specific mode extension with an 8-bit per tile attribute, works in all modes except 24-bit (no room for attribute) and header (not needed?)
 			if (tileregs[0x7] & 0x08)
 			{
-				//uint8_t extraattr = m_maincpu->read_full_data_sp((tileregs[0x2] << 8) + count);
-				uint8_t extraattr = read_full_data_sp_bypass((tileregs[0x2] << 8) + count);
+				const offs_t realaddress = (tileregs[0x2] << 8) + count;
+				uint8_t extraattr;
+
+				if (m_disable_memory_bypass)
+					extraattr = m_maincpu->space(AS_PROGRAM).read_byte(realaddress);
+				else
+					extraattr = read_full_data_sp_bypass(realaddress);
 
 				// make use of the extraattr stuff?
 				pal = (extraattr & 0xf0) >> 4;
@@ -1260,7 +1276,12 @@ void xavix_state::spritefragment_dma_trg_w(uint8_t data)
 		for (int i = 0; i < len; i++)
 		{
 			//uint8_t dat = m_maincpu->read_full_data_sp(src + i);
-			uint8_t dat = read_full_data_sp_bypass(src + i);
+			const offs_t realaddress = src + i;
+			uint8_t dat;
+			if (m_disable_memory_bypass)
+				dat = m_maincpu->space(AS_PROGRAM).read_byte(realaddress);
+			else
+				dat = read_full_data_sp_bypass(realaddress);
 			//m_fragment_sprite[(dst + i) & 0x7ff] = dat;
 			spriteram_w((dst + i) & 0x7ff, dat);
 		}
