@@ -1113,11 +1113,11 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	draw_sprites(screen, bitmap, clip);
 
 	//popmessage("%02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x", m_soundregs[0],m_soundregs[1],m_soundregs[2],m_soundregs[3],m_soundregs[4],m_soundregs[5],m_soundregs[6],m_soundregs[7],m_soundregs[8],m_soundregs[9],m_soundregs[10],m_soundregs[11],m_soundregs[12],m_soundregs[13],m_soundregs[14],m_soundregs[15]);
-
-	// temp, needs priority, transparency etc. also it's far bigger than the screen, I guess it must get scaled?!
+	
+	// incomplete!
 	if (m_bmp_base)
 	{
-		// looks like it can zoom the bitmap using these?
+		// screen position for the bitmap?
 		uint16_t top = ((m_bmp_base[0x01] << 8) | m_bmp_base[0x00]);
 		uint16_t bot = ((m_bmp_base[0x03] << 8) | m_bmp_base[0x02]);
 		uint16_t lft = ((m_bmp_base[0x05] << 8) | m_bmp_base[0x04]);
@@ -1130,7 +1130,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		uint16_t rgtadr = ((m_bmp_base[0x0f] << 8) | m_bmp_base[0x0e]);
 
 		uint16_t start = ((m_bmp_base[0x11] << 8) | m_bmp_base[0x10]);
-		uint8_t end = m_bmp_base[0x12]; // ?? related to width?
+		uint8_t step = m_bmp_base[0x12]; // step value to next line base
 		uint8_t size = m_bmp_base[0x13]; // some kind of additional scaling?
 		uint8_t mode = m_bmp_base[0x14]; // enable,bpp, zval etc.
 
@@ -1138,10 +1138,10 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		if (mode & 0x01)
 		{
-			popmessage("bitmap t:%04x b:%04x l:%04x r:%04x  -- -- ba:%04x la:%04x ra:%04x   -- -- end:%02x - size:%02x unused:%08x",
+			popmessage("bitmap t:%04x b:%04x l:%04x r:%04x  -- -- ba:%04x la:%04x ra:%04x   -- -- step:%02x - size:%02x unused:%08x",
 				top, bot, lft, rgt,
 				/*topadr*/ botadr, lftadr, rgtadr,
-				/*start*/ end, size, unused);
+				/*start*/ step, size, unused);
 
 			int base = start * 0x800;
 			int base2 = topadr * 0x8;
@@ -1149,19 +1149,37 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			int bpp = ((mode & 0x0e) >> 1) + 1;
 			int zval = ((mode & 0xf0) >> 4);
 
-			int width = (rgtadr * 8) / bpp;
+			int hposadjust, vpostadjust;
+			bool is_highres = true;
 
-			//int count = 0;
+			// SuperXaviX seems to have CRTC registers (0x6f80 - 0x6faf area), so in reality this probably
+			// comes from there due to different overall screen positioning; might also depend on bitmap
+			// bpp mode (so this is probably not the correct way to detect this)
+			// there could also be XaviX2000+ opcode bugs causing wrong register values!
+			if ((size & 0x70) == 0x70)
+				is_highres = false;
+
+			if (is_highres)
+				hposadjust = 0x90; // good for xavtenni, xavbowl, tmy_thom, tmy_rkmj, but not xavbaseb
+			else
+				hposadjust = 0x46; // good for udance, ban_ordj, not quite correct for ban_kksj in demo
+
+			vpostadjust = 0x06; // probably can vary (see XaviX boot-up logos, logo vs text positions)
+
+			top += vpostadjust;
+			bot += vpostadjust;
 
 			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
 				int line = y - top;
 
-				if ((line > 0) && (y < bot))
+				if ((line > 0) && (y < bot)) // should also clip if out of range for botadr
 				{
-					set_data_address(base + base2 + ((line * width * bpp) / 8), 0);
+					set_data_address(base + base2 + ((line * (step*64)) / 8), 0);
 
-					for (int x = 0; x < width; x++)
+					// also needs to take into account 'lftadr' address from the line base
+					// and clip against 'rgtadr' address if reads go beyond linebase + that for the line
+					for (int x = lft - hposadjust; x < rgt - hposadjust; x++)
 					{
 						uint32_t *const yposptr = &bitmap.pix(y);
 						uint16_t *const zyposptr = &m_zbuffer.pix(y);
@@ -1172,14 +1190,23 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 							dat |= (get_next_bit() << i);
 						}
 
-						if (((x <= cliprect.max_x) && (x >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
+						// in reality the bitmap resolution can be twice the horizontal resolution of
+						// the standard XaviX layers, but this would require more reworking of XaviX code
+						// so render at half resolution on high resolution cases for now
+						int realx;
+						if (is_highres)
+							realx = x >> 1;
+						else
+							realx = x;
+
+						if (((realx <= cliprect.max_x) && (realx >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
 						{
 							if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
 							{
-								if (zval >= zyposptr[x])
+								if (zval >= zyposptr[realx])
 								{
-									yposptr[x] = paldata[dat + 0x100];
-									zyposptr[x] = zval;
+									yposptr[realx] = paldata[dat + 0x100];
+									zyposptr[realx] = zval;
 								}
 							}
 						}
