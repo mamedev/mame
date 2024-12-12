@@ -111,9 +111,32 @@ void xavix_state::spriteram_w(offs_t offset, uint8_t data)
 	}
 }
 
+void xavix_state::superxavix_crtc_1_w(offs_t offset, uint8_t data)
+{
+	logerror("%s superxavix_crtc_1_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_sx_crtc_1[offset] = data;
+}
+
+uint8_t xavix_state::superxavix_crtc_1_r(offs_t offset)
+{
+	return m_sx_crtc_1[offset];
+}
+
+void xavix_state::superxavix_crtc_2_w(offs_t offset, uint8_t data)
+{
+	logerror("%s superxavix_crtc_2_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_sx_crtc_2[offset] = data;
+}
+
+uint8_t xavix_state::superxavix_crtc_2_r(offs_t offset)
+{
+	return m_sx_crtc_2[offset];
+}
+
+
 void xavix_state::superxavix_plt_loc_w(offs_t offset, uint8_t data)
 {
-	logerror("%s superxavix_plt_loc_w %02x %08x\n", machine().describe_context(), offset, data);
+	logerror("%s superxavix_plt_loc_w %02x %02x\n", machine().describe_context(), offset, data);
 
 	m_sx_plt_loc[offset] = data;
 	if (offset == 3)

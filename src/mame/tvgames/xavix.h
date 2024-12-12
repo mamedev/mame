@@ -115,7 +115,9 @@ public:
 		m_anport(*this, "anport"),
 		m_math(*this, "math"),
 		m_xavix2002io(*this, "xavix2002io"),
-		m_sx_plt_loc(*this, "sx_plt_loc")
+		m_sx_plt_loc(*this, "sx_plt_loc"),
+		m_sx_crtc_1(*this, "sx_crtc_1"),
+		m_sx_crtc_2(*this, "sx_crtc_2")
 	{ }
 
 	void xavix(machine_config &config);
@@ -420,6 +422,11 @@ private:
 
 	void spriteregs_w(uint8_t data);
 
+	void superxavix_crtc_1_w(offs_t offset, uint8_t data);
+	uint8_t superxavix_crtc_1_r(offs_t offset);
+	void superxavix_crtc_2_w(offs_t offset, uint8_t data);
+	uint8_t superxavix_crtc_2_r(offs_t offset);
+
 	void superxavix_plt_loc_w(offs_t offset, uint8_t data);
 	uint8_t superxavix_plt_loc_r(offs_t offset);
 
@@ -617,6 +624,8 @@ protected:
 	required_device<xavix_math_device> m_math;
 	optional_device<xavix2002_io_device> m_xavix2002io;
 	optional_shared_ptr<uint8_t> m_sx_plt_loc;
+	optional_shared_ptr<uint8_t> m_sx_crtc_1;
+	optional_shared_ptr<uint8_t> m_sx_crtc_2;
 
 	uint8_t m_extbusctrl[3]{};
 

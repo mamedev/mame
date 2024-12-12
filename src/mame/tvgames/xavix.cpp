@@ -447,6 +447,9 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 	map(0x6f7e, 0x6f7e).rw(FUNC(xavix_state::superxavix_bitmap_pal_saturation_r), FUNC(xavix_state::superxavix_bitmap_pal_saturation_w)); // SgdPalBmpSat
 	map(0x6f7f, 0x6f7f).rw(FUNC(xavix_state::superxavix_bitmap_pal_lightness_r), FUNC(xavix_state::superxavix_bitmap_pal_lightness_w)); // SgdPalBmpLgt
 
+	map(0x6f80, 0x6f99).rw(FUNC(xavix_state::superxavix_crtc_1_r), FUNC(xavix_state::superxavix_crtc_1_w)).share("sx_crtc_1"); // Super XaviX CRTC?
+	map(0x6fa0, 0x6fa7).rw(FUNC(xavix_state::superxavix_crtc_2_r), FUNC(xavix_state::superxavix_crtc_2_w)).share("sx_crtc_2"); // maybe more CRTC regs?
+
 	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
 
 	// extended external bus stuff (possible banking control?)
