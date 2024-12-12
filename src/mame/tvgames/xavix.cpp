@@ -1879,6 +1879,11 @@ void xavix_cart_state::xavix_cart_daig(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_daig").set_original("takara_daigunder_dx_cart");
 }
 
+void xavix_cart_gcslottv_state::xavix_extbus_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rw(FUNC(xavix_cart_gcslottv_state::cart_r), FUNC(xavix_cart_gcslottv_state::cart_w)).mirror(0x800000);
+}
+
 void xavix_cart_gcslottv_state::xavix_cart_gcslottv(machine_config &config)
 {
 	xavix_cart(config);

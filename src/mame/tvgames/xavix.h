@@ -981,6 +981,7 @@ public:
 	void xavix_cart_gcslottv(machine_config &config);
 
 protected:
+	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
 };
 
 class xavix_i2c_cart_state : public xavix_cart_state
