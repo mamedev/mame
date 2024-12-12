@@ -46,10 +46,10 @@ protected:
 
 	virtual bool test_il() override { return m_nmi_state != CLEAR_LINE; }
 
-	u8 port_r(offs_t port);
-	void port_w(offs_t port, u8 data);
-	u8 port_ddr_r(offs_t port);
-	void port_ddr_w(offs_t port, u8 data);
+	template<int Port> u8 port_r();
+	template<int Port> void port_w(u8 data);
+	template<int Port> u8 port_ddr_r();
+	template<int Port> void port_ddr_w(u8 data);
 
 	u8 timer_data_r();
 	void timer_data_w(u8 data);

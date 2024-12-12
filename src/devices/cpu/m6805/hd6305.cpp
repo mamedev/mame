@@ -79,32 +79,36 @@ void hd6305_device::device_reset()
 	m_sci_tx(1);
 }
 
-u8 hd6305_device::port_r(offs_t port)
+template<int Port>
+u8 hd6305_device::port_r()
 {
-	if(m_port_ddr[port] == 0xff)
-		return m_port_data[port];
+	if(m_port_ddr[Port] == 0xff)
+		return m_port_data[Port];
 
-	return (m_port_ddr[port] & m_port_data[port]) | (m_read_port[port]() & ~m_port_ddr[port]);
+	return (m_port_ddr[Port] & m_port_data[Port]) | (m_read_port[Port]() & ~m_port_ddr[Port]);
 }
 
-void hd6305_device::port_w(offs_t port, u8 data)
+template<int Port>
+void hd6305_device::port_w(u8 data)
 {
-	if(data != m_port_data[port]) {
-		m_port_data[port] = data;
-		m_write_port[port](port, data | ~m_port_ddr[port], m_port_ddr[port]);
+	if(data != m_port_data[Port]) {
+		m_port_data[Port] = data;
+		m_write_port[Port](Port, data | ~m_port_ddr[Port], m_port_ddr[Port]);
 	}
 }
 
-u8 hd6305_device::port_ddr_r(offs_t port)
+template<int Port>
+u8 hd6305_device::port_ddr_r()
 {
-	return m_port_ddr[port];
+	return m_port_ddr[Port];
 }
 
-void hd6305_device::port_ddr_w(offs_t port, u8 data)
+template<int Port>
+void hd6305_device::port_ddr_w(u8 data)
 {
-	if(data != m_port_ddr[port]) {
+	if(data != m_port_ddr[Port]) {
 		logerror("port %d ddr %c%c%c%c%c%c%c%c\n",
-				port,
+				Port,
 				BIT(data, 7) ? 'o': 'i',
 				BIT(data, 6) ? 'o': 'i',
 				BIT(data, 5) ? 'o': 'i',
@@ -114,8 +118,8 @@ void hd6305_device::port_ddr_w(offs_t port, u8 data)
 				BIT(data, 1) ? 'o': 'i',
 				BIT(data, 0) ? 'o': 'i');
 
-		m_port_ddr[port] = data;
-		m_write_port[port](port, m_port_data[port] | ~data, data);
+		m_port_ddr[Port] = data;
+		m_write_port[Port](Port, m_port_data[Port] | ~data, data);
 	}
 }
 
@@ -375,8 +379,14 @@ hd6305v0_device::hd6305v0_device(const machine_config &mconfig, const char *tag,
 
 void hd6305v0_device::internal_map(address_map &map)
 {
-	map(0x0000, 0x0003).rw(FUNC(hd6305v0_device::port_r), FUNC(hd6305v0_device::port_w));
-	map(0x0004, 0x0007).rw(FUNC(hd6305v0_device::port_ddr_r), FUNC(hd6305v0_device::port_ddr_w));
+	map(0x0000, 0x0000).rw(FUNC(hd6305v0_device::port_r<0>), FUNC(hd6305v0_device::port_w<0>));
+	map(0x0001, 0x0001).rw(FUNC(hd6305v0_device::port_r<1>), FUNC(hd6305v0_device::port_w<1>));
+	map(0x0002, 0x0002).rw(FUNC(hd6305v0_device::port_r<2>), FUNC(hd6305v0_device::port_w<2>));
+	map(0x0003, 0x0003).rw(FUNC(hd6305v0_device::port_r<3>), FUNC(hd6305v0_device::port_w<3>));
+	map(0x0004, 0x0004).rw(FUNC(hd6305v0_device::port_ddr_r<0>), FUNC(hd6305v0_device::port_ddr_w<0>));
+	map(0x0005, 0x0005).rw(FUNC(hd6305v0_device::port_ddr_r<1>), FUNC(hd6305v0_device::port_ddr_w<1>));
+	map(0x0006, 0x0006).rw(FUNC(hd6305v0_device::port_ddr_r<2>), FUNC(hd6305v0_device::port_ddr_w<2>));
+	map(0x0007, 0x0007).rw(FUNC(hd6305v0_device::port_ddr_r<3>), FUNC(hd6305v0_device::port_ddr_w<3>));
 	map(0x0008, 0x0008).rw(FUNC(hd6305v0_device::timer_data_r), FUNC(hd6305v0_device::timer_data_w));
 	map(0x0009, 0x0009).rw(FUNC(hd6305v0_device::timer_ctrl_r), FUNC(hd6305v0_device::timer_ctrl_w));
 	map(0x000a, 0x000a).rw(FUNC(hd6305v0_device::misc_r), FUNC(hd6305v0_device::misc_w));
