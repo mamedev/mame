@@ -27,6 +27,7 @@ hd6305_device::hd6305_device(
 	m_read_port(*this, 0xff),
 	m_write_port(*this)
 {
+	std::fill(m_port_ddr_override.begin(), m_port_ddr_override.end(), 0x00);
 }
 
 // common peripherals
@@ -82,10 +83,11 @@ void hd6305_device::device_reset()
 template<int Port>
 u8 hd6305_device::port_r()
 {
-	if(m_port_ddr[Port] == 0xff)
+	const u8 ddr = m_port_ddr[Port] & ~m_port_ddr_override[Port];
+	if(ddr == 0xff)
 		return m_port_data[Port];
 
-	return (m_port_ddr[Port] & m_port_data[Port]) | (m_read_port[Port]() & ~m_port_ddr[Port]);
+	return (m_port_data[Port] & ddr) | (m_read_port[Port]() & ~ddr);
 }
 
 template<int Port>
@@ -399,6 +401,54 @@ void hd6305v0_device::internal_map(address_map &map)
 
 
 /****************************************************************************
+ * HD6305Y0 section
+ ****************************************************************************/
+
+hd6305y0_device::hd6305y0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	hd6305_device(
+			mconfig,
+			tag,
+			owner,
+			clock,
+			HD6305Y0,
+			{ s_hmos_s_ops, s_cmos_cycles, 14, 0x00ff, 0x00c0, 0x1fff, 0x1ffc },
+			address_map_constructor(FUNC(hd6305y0_device::internal_map), this))
+{
+}
+
+void hd6305y0_device::internal_map(address_map &map)
+{
+	map(0x0000, 0x0000).rw(FUNC(hd6305y0_device::port_r<0>), FUNC(hd6305y0_device::port_w<0>));
+	map(0x0001, 0x0001).rw(FUNC(hd6305y0_device::port_r<1>), FUNC(hd6305y0_device::port_w<1>));
+	map(0x0002, 0x0002).rw(FUNC(hd6305y0_device::port_r<2>), FUNC(hd6305y0_device::port_w<2>));
+	map(0x0003, 0x0003).r(FUNC(hd6305y0_device::port_r<3>));
+	map(0x0004, 0x0004).w(FUNC(hd6305y0_device::port_ddr_w<0>));
+	map(0x0005, 0x0005).w(FUNC(hd6305y0_device::port_ddr_w<1>));
+	map(0x0006, 0x0006).w(FUNC(hd6305y0_device::port_ddr_w<2>));
+	map(0x0007, 0x0007).w(FUNC(hd6305y0_device::port_ddr_w<6>));
+	map(0x0008, 0x0008).rw(FUNC(hd6305y0_device::timer_data_r), FUNC(hd6305y0_device::timer_data_w));
+	map(0x0009, 0x0009).rw(FUNC(hd6305y0_device::timer_ctrl_r), FUNC(hd6305y0_device::timer_ctrl_w));
+	map(0x000a, 0x000a).rw(FUNC(hd6305y0_device::misc_r), FUNC(hd6305y0_device::misc_w));
+	map(0x000b, 0x000b).rw(FUNC(hd6305y0_device::port_r<4>), FUNC(hd6305y0_device::port_w<4>));
+	map(0x000c, 0x000c).rw(FUNC(hd6305y0_device::port_r<5>), FUNC(hd6305y0_device::port_w<5>));
+	map(0x000d, 0x000d).rw(FUNC(hd6305y0_device::port_r<6>), FUNC(hd6305y0_device::port_w<6>));
+	map(0x0010, 0x0010).rw(FUNC(hd6305y0_device::sci_ctrl_r), FUNC(hd6305y0_device::sci_ctrl_w));
+	map(0x0011, 0x0011).rw(FUNC(hd6305y0_device::sci_ssr_r), FUNC(hd6305y0_device::sci_ssr_w));
+	map(0x0012, 0x0012).rw(FUNC(hd6305y0_device::sci_data_r), FUNC(hd6305y0_device::sci_data_w));
+	map(0x0040, 0x013f).ram();
+	map(0x0140, 0x1fff).rom().region(DEVICE_SELF, 0);
+}
+
+void hd6305y0_device::device_reset()
+{
+	hd6305_device::device_reset();
+
+	// ports E and F are write-only
+	m_port_ddr[4] = m_port_ddr[5] = 0xff;
+}
+
+
+/****************************************************************************
  * HD6305Y2 section
  ****************************************************************************/
 
@@ -549,5 +599,6 @@ void hd63705z0_device::interrupt()
 
 
 DEFINE_DEVICE_TYPE(HD6305V0,  hd6305v0_device,  "hd6305v0",  "Hitachi HD6305V0")
+DEFINE_DEVICE_TYPE(HD6305Y0,  hd6305y0_device,  "hd6305y0",  "Hitachi HD6305Y0")
 DEFINE_DEVICE_TYPE(HD6305Y2,  hd6305y2_device,  "hd6305y2",  "Hitachi HD6305Y2")
 DEFINE_DEVICE_TYPE(HD63705Z0, hd63705z0_device, "hd63705z0", "Hitachi HD63705Z0")

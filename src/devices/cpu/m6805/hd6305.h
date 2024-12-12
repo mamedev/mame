@@ -15,6 +15,7 @@
 
 // device type declarations
 DECLARE_DEVICE_TYPE(HD6305V0,  hd6305v0_device)
+DECLARE_DEVICE_TYPE(HD6305Y0,  hd6305y0_device)
 DECLARE_DEVICE_TYPE(HD6305Y2,  hd6305y2_device)
 DECLARE_DEVICE_TYPE(HD63705Z0, hd63705z0_device)
 
@@ -81,6 +82,7 @@ protected:
 	devcb_write8::array<9> m_write_port;
 	std::array<u8, 9> m_port_data;
 	std::array<u8, 9> m_port_ddr;
+	std::array<u8, 9> m_port_ddr_override;
 
 	emu_timer *m_timer_timer;
 	emu_timer *m_timer_sci;
@@ -116,6 +118,36 @@ public:
 	auto write_portc() { return m_write_port[2].bind(); }
 	auto read_portd()  { return m_read_port [3].bind(); }
 	auto write_portd() { return m_write_port[3].bind(); }
+
+private:
+	void internal_map(address_map &map) ATTR_COLD;
+};
+
+// ======================> hd6305y0_device
+
+class hd6305y0_device : public hd6305_device
+{
+public:
+	// construction/destruction
+	hd6305y0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto read_porta()  { return m_read_port [0].bind(); }
+	auto write_porta() { return m_write_port[0].bind(); }
+	auto read_portb()  { return m_read_port [1].bind(); }
+	auto write_portb() { return m_write_port[1].bind(); }
+	auto read_portc()  { return m_read_port [2].bind(); }
+	auto write_portc() { return m_write_port[2].bind(); }
+	auto read_portd()  { return m_read_port [3].bind(); }
+	auto write_porte() { return m_write_port[4].bind(); }
+	auto write_portf() { return m_write_port[5].bind(); }
+	auto read_portg()  { return m_read_port [6].bind(); }
+	auto write_portg() { return m_write_port[6].bind(); }
+
+	// port G voltage can override DDR, and read the input pins no matter the DDR value
+	void read_portg_override_mask(u8 mask) { m_port_ddr_override[6] = mask; }
+
+protected:
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void internal_map(address_map &map) ATTR_COLD;
