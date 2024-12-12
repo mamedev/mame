@@ -108,6 +108,7 @@
   * Power Card (Ver 0263, encrypted),                              Fun World,            1993.
   * Mega Card (Ver.0210, encrypted),                               Fun World,            1993.
   * Mega Card (Ver.0053, encrypted),                               Fun World,            1992.
+  * Joker Card (encrypted),                                        Fun World,            1993.
   * Joker Card 300 (Ver.A267BC, encrypted),                        Amatic Trading,       1993.
   * Royal Card (Evona, Polish, encrypted),                         Evona Electronic,     1991.
   * Saloon (French, encrypted),                                    unknown,              199?.
@@ -143,7 +144,7 @@
   * Royal Card (stealth with MSX multigame),                       bootleg,              1991.
 
 
-  Supported games: 123
+  Supported games: 124
 
 
 **********************************************************************************************

@@ -137,8 +137,8 @@
   * Genie (ICP-1, set 1),                              198?, Video Fun Games Ltd.
   * Genie (ICP-1, set 2),                              198?, Unknown.
   * Silver Game,                                       1983, Unknown.
-  * Silver Game,                                       1983, Unknown.
   * Bonus Poker,                                       1984, Galanthis Inc.
+  * Joker Bonus,                                       198?, Unknown.
   * "Unknown French poker game",                       198?, Unknown.
   * "Unknown encrypted poker game",                    198?, Unknown.
   * "Good Luck! poker (Sisteme France)",               198?, Sisteme France.
@@ -152,6 +152,7 @@
   * Open 5 Cards,                                      1987, MNG.
   * Le Super Pendu (V1, words set #1),                 198?, Voyageur de L'Espace Inc..
   * Le Super Pendu (V1, words set #2),                 198?, Voyageur de L'Espace Inc..
+  * Roulette (ICP-1 PCB),                              198?, Unknown.
   * Mega Double Poker (conversion kit, set 1),         1990, Blitz System Inc.
   * Mega Double Poker (conversion kit, set 2),         1990, Blitz System Inc.
   * Maxi Double Poker (version 1.8),                   1990, Blitz System Inc.
@@ -1046,6 +1047,7 @@ public:
 	void icp_ext(machine_config &config);
 	void gldnirq0(machine_config &config);
 	void lespendu(machine_config &config);
+	void icproul(machine_config &config);
 
 	void init_vkdlswwh();
 	void init_icp1db();
@@ -4331,6 +4333,70 @@ static INPUT_PORTS_START(lespendu)
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( icproul )
+	// Multiplexed - 4x5bits
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("IN0-0-01") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  PORT_NAME("Meters")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("IN0-0-04") PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("IN0-1-01") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("IN0-1-04") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("IN0-1-08") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("IN0-1-10") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Place Bet / Take Out") PORT_IMPULSE(5)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Cancel Bets")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("IN0-2-10") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Program") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("IN0-3-02") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Note In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("IN0-3-10") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	// only bits 4-7 are connected here and were routed to SW1 1-4
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, "Field Type" )
+	PORT_DIPSETTING(    0x10, "Type 1: Normal" )
+	PORT_DIPSETTING(    0x00, "Type 2: Double Zero" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
@@ -4928,6 +4994,24 @@ void goldnpkr_state::lespendu(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
+
+
+void goldnpkr_state::icproul(machine_config &config)
+{
+	goldnpkr_base(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::pottnpkr_map);
+
+	NVRAM(config.replace(), "nvram", nvram_device::DEFAULT_ALL_1);
+
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, pottnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -12258,6 +12342,33 @@ ROM_END
 	ROM_LOAD( "82s129.ic31",     0x0000, 0x0100, CRC(b4e1ccd6) SHA1(bb1ce6ff60b92886cd8689b9c9f2fdfa9b33fe09) )
 ROM_END
 
+/*
+  Roulette
+  ICP-1 PCB.
+
+  Obscure and rare roulette game with zillions of checks
+  and protected with password. See the notes above.
+
+*/
+ROM_START( icproul )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2732.16a", 0x2000, 0x1000, CRC(4c956d72) SHA1(e590b5dd8c89923d2c22aed12778727d1304a547) )
+	ROM_LOAD( "2732.17a", 0x3000, 0x1000, CRC(9db71131) SHA1(31802518fe323487322078f7a4535812436900e9) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(             0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "2532.8a",  0x2000, 0x1000, CRC(337db871) SHA1(4d852f64553daac285ea9b61a28299f700e56a44) )  // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // unused GFX bank
+	ROM_FILL(             0x0000, 0x1800, 0x0000 ) // filling the whole space
+
+	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM, otherwise need to do extended checks and set password
+	ROM_LOAD( "icproul_nvram.bin", 0x0000, 0x0800, CRC(8580a8b3) SHA1(102ac40316ac4c31125b26d5ea688a36894a04ff) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s129an.bin", 0x0000, 0x0100, CRC(1a30bdd8) SHA1(d0a020e9604e8e0920a4500e02770db6c639bace) )
+ROM_END
+
 
 /*********************************************
 *                Driver Init                 *
@@ -12950,6 +13061,7 @@ GAME(  1987, op5cards,  0,        op5cards, op5cards, goldnpkr_state, init_op5ca
 GAMEL( 198?, lespendu,  0,        lespendu, lespendu, goldnpkr_state, init_lespendu, ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #1)",      0,                layout_lespendu )
 GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
 
+GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Roulette (ICP-1 PCB)",                    0 )  // password protected
 
 /*************************************** SETS W/IRQ0 ***************************************/
 
