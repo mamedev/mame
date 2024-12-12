@@ -93,9 +93,9 @@ public:
 		m_sprite_xhigh_ignore_hack(true),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
-		m_rom_dma_src(*this,"rom_dma_src"),
-		m_rom_dma_dst(*this,"rom_dma_dst"),
-		m_rom_dma_len(*this,"rom_dma_len"),
+		m_rom_dma_src(*this, "rom_dma_src"),
+		m_rom_dma_dst(*this, "rom_dma_dst"),
+		m_rom_dma_len(*this, "rom_dma_len"),
 		m_palram_sh(*this, "palram_sh"),
 		m_palram_l(*this, "palram_l"),
 		m_bmp_palram_sh(*this, "bmp_palram_sh"),
@@ -114,7 +114,8 @@ public:
 		m_adc(*this, "adc"),
 		m_anport(*this, "anport"),
 		m_math(*this, "math"),
-		m_xavix2002io(*this, "xavix2002io")
+		m_xavix2002io(*this, "xavix2002io"),
+		m_sx_plt_loc(*this, "sx_plt_loc")
 	{ }
 
 	void xavix(machine_config &config);
@@ -419,6 +420,9 @@ private:
 
 	void spriteregs_w(uint8_t data);
 
+	void superxavix_plt_loc_w(offs_t offset, uint8_t data);
+	uint8_t superxavix_plt_loc_r(offs_t offset);
+
 	void superxavix_bitmap_pal_index_w(uint8_t data);
 	uint8_t superxavix_bitmap_pal_index_r();
 	void superxavix_chr_pal_index_w(uint8_t data);
@@ -612,6 +616,7 @@ protected:
 	required_device<xavix_anport_device> m_anport;
 	required_device<xavix_math_device> m_math;
 	optional_device<xavix2002_io_device> m_xavix2002io;
+	optional_shared_ptr<uint8_t> m_sx_plt_loc;
 
 	uint8_t m_extbusctrl[3]{};
 

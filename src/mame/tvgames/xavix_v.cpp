@@ -111,6 +111,23 @@ void xavix_state::spriteram_w(offs_t offset, uint8_t data)
 	}
 }
 
+void xavix_state::superxavix_plt_loc_w(offs_t offset, uint8_t data)
+{
+	logerror("%s superxavix_plt_loc_w %02x %08x\n", machine().describe_context(), offset, data);
+
+	m_sx_plt_loc[offset] = data;
+	if (offset == 3)
+	{
+		uint32_t address = (m_sx_plt_loc[3] << 24) | (m_sx_plt_loc[2] << 16) | (m_sx_plt_loc[1] << 8) | (m_sx_plt_loc[0] << 0);
+		logerror("%s SuperXavix Bitmap Plotter set to address %08x\n", machine().describe_context(), address);
+	}
+}
+
+uint8_t xavix_state::superxavix_plt_loc_r(offs_t offset)
+{
+	return m_sx_plt_loc[offset];
+}
+
 void xavix_state::superxavix_bitmap_pal_index_w(uint8_t data)
 {
 	m_superxavix_bitmap_pal_index = data;
