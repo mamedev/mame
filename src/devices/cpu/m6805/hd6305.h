@@ -23,6 +23,10 @@ DECLARE_DEVICE_TYPE(HD63705Z0, hd63705z0_device)
 
 class hd6305_device : public m6805_base_device
 {
+public:
+	auto write_sci_tx() { return m_sci_tx.bind(); }
+	auto write_sci_clk() { return m_sci_clk.bind(); }
+
 protected:
 	// construction/destruction
 	hd6305_device(
@@ -34,64 +38,13 @@ protected:
 			configuration_params const &params,
 			address_map_constructor internal_map);
 
-	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
-
-	virtual bool test_il() override { return m_nmi_state != CLEAR_LINE; }
-};
-
-// ======================> hd6305v0_device
-
-class hd6305v0_device : public hd6305_device
-{
-public:
-	// construction/destruction
-	hd6305v0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	auto write_sci_tx() { return m_sci_tx.bind(); }
-	auto write_sci_clk() { return m_sci_clk.bind(); }
-
-	auto read_porta()  { return m_read_port [0].bind(); }
-	auto write_porta() { return m_write_port[0].bind(); }
-	auto read_portb()  { return m_read_port [1].bind(); }
-	auto write_portb() { return m_write_port[1].bind(); }
-	auto read_portc()  { return m_read_port [2].bind(); }
-	auto write_portc() { return m_write_port[2].bind(); }
-	auto read_portd()  { return m_read_port [3].bind(); }
-	auto write_portd() { return m_write_port[3].bind(); }
-
-protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void interrupt_vector() override;
 
-private:
-	devcb_read8::array<4> m_read_port;
-	devcb_write8::array<4> m_write_port;
-	devcb_write_line m_sci_clk;
-	devcb_write_line m_sci_tx;
-
-	emu_timer *m_timer_timer;
-	emu_timer *m_timer_sci;
-
-	std::array<u8, 4> m_port_data;
-	std::array<u8, 4> m_port_ddr;
-
-	u64 m_timer_last_update;
-
-	u8 m_tdr;
-	u8 m_prescaler;
-	u8 m_tcr;
-	u8 m_ssr;
-	u8 m_scr;
-	u8 m_mr;
-	u8 m_sci_tx_data;
-
-	bool m_sci_tx_filled;
-	u8 m_sci_tx_byte;
-	u8 m_sci_tx_step;
-
-	void internal_map(address_map &map) ATTR_COLD;
+	virtual bool test_il() override { return m_nmi_state != CLEAR_LINE; }
 
 	u8 port_r(offs_t port);
 	void port_w(offs_t port, u8 data);
@@ -119,6 +72,53 @@ private:
 
 	TIMER_CALLBACK_MEMBER(timer_cb);
 	TIMER_CALLBACK_MEMBER(sci_cb);
+
+	devcb_write_line m_sci_clk;
+	devcb_write_line m_sci_tx;
+
+	// maximum 9 I/O ports
+	devcb_read8::array<9> m_read_port;
+	devcb_write8::array<9> m_write_port;
+	std::array<u8, 9> m_port_data;
+	std::array<u8, 9> m_port_ddr;
+
+	emu_timer *m_timer_timer;
+	emu_timer *m_timer_sci;
+
+	u64 m_timer_last_update;
+
+	u8 m_tdr;
+	u8 m_prescaler;
+	u8 m_tcr;
+	u8 m_ssr;
+	u8 m_scr;
+	u8 m_mr;
+	u8 m_sci_tx_data;
+
+	bool m_sci_tx_filled;
+	u8 m_sci_tx_byte;
+	u8 m_sci_tx_step;
+};
+
+// ======================> hd6305v0_device
+
+class hd6305v0_device : public hd6305_device
+{
+public:
+	// construction/destruction
+	hd6305v0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto read_porta()  { return m_read_port [0].bind(); }
+	auto write_porta() { return m_write_port[0].bind(); }
+	auto read_portb()  { return m_read_port [1].bind(); }
+	auto write_portb() { return m_write_port[1].bind(); }
+	auto read_portc()  { return m_read_port [2].bind(); }
+	auto write_portc() { return m_write_port[2].bind(); }
+	auto read_portd()  { return m_read_port [3].bind(); }
+	auto write_portd() { return m_write_port[3].bind(); }
+
+private:
+	void internal_map(address_map &map) ATTR_COLD;
 };
 
 // ======================> hd6305y2_device
@@ -151,14 +151,14 @@ private:
 };
 
 /****************************************************************************
- * 6805V0 section
+ * HD6305 section
  ****************************************************************************/
 
-#define M6805V0_INT_IRQ1            0x00
-#define M6805V0_INT_IRQ2            0x01
-#define M6805V0_INT_TIMER1          0x02
-#define M6805V0_INT_TIMER2          0x03
-#define M6805V0_INT_SCI             0x04
+#define HD6305_INT_IRQ1             0x00
+#define HD6305_INT_IRQ2             0x01
+#define HD6305_INT_TIMER1           0x02
+#define HD6305_INT_TIMER2           0x03
+#define HD6305_INT_SCI              0x04
 
 /****************************************************************************
  * HD63705 section

@@ -1,13 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles, Vas Crabb, Olivier Galibert
+/*
+Hitachi HD6305 series
+
+TODO:
+- add HD6305Y2 peripherals (nothing to test it with?)
+- add HD63705Z0 peripherals
+
+*/
 
 #include "emu.h"
 #include "hd6305.h"
 #include "m6805defs.h"
-
-/****************************************************************************
- * HD6305 section
- ****************************************************************************/
 
 hd6305_device::hd6305_device(
 		machine_config const &mconfig,
@@ -16,44 +20,20 @@ hd6305_device::hd6305_device(
 		uint32_t clock,
 		device_type const type,
 		configuration_params const &params,
-		address_map_constructor internal_map)
-	: m6805_base_device(mconfig, tag, owner, clock, type, params, internal_map)
+		address_map_constructor internal_map) :
+	m6805_base_device(mconfig, tag, owner, clock, type, params, internal_map),
+	m_sci_clk(*this),
+	m_sci_tx(*this),
+	m_read_port(*this, 0xff),
+	m_write_port(*this)
 {
 }
 
-hd6305v0_device::hd6305v0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6305_device(
-			mconfig,
-			tag,
-			owner,
-			clock,
-			HD6305V0,
-			{ s_hmos_s_ops, s_hmos_cycles, 14, 0x00ff, 0x00c0, 0x1fff, 0x1ffc },
-			address_map_constructor(FUNC(hd6305v0_device::internal_map), this)),
-	  m_read_port(*this, 0xff),
-	  m_write_port(*this),
-	  m_sci_clk(*this),
-	  m_sci_tx(*this)
-{
-}
+// common peripherals
 
-void hd6305v0_device::internal_map(address_map &map)
+void hd6305_device::device_start()
 {
-	map(0x0000, 0x0003).rw(FUNC(hd6305v0_device::port_r), FUNC(hd6305v0_device::port_w));
-	map(0x0004, 0x0007).rw(FUNC(hd6305v0_device::port_ddr_r), FUNC(hd6305v0_device::port_ddr_w));
-	map(0x0008, 0x0008).rw(FUNC(hd6305v0_device::timer_data_r), FUNC(hd6305v0_device::timer_data_w));
-	map(0x0009, 0x0009).rw(FUNC(hd6305v0_device::timer_ctrl_r), FUNC(hd6305v0_device::timer_ctrl_w));
-	map(0x000a, 0x000a).rw(FUNC(hd6305v0_device::misc_r), FUNC(hd6305v0_device::misc_w));
-	map(0x0010, 0x0010).rw(FUNC(hd6305v0_device::sci_ctrl_r), FUNC(hd6305v0_device::sci_ctrl_w));
-	map(0x0011, 0x0011).rw(FUNC(hd6305v0_device::sci_ssr_r), FUNC(hd6305v0_device::sci_ssr_w));
-	map(0x0012, 0x0012).rw(FUNC(hd6305v0_device::sci_data_r), FUNC(hd6305v0_device::sci_data_w));
-	map(0x0040, 0x00ff).ram();
-	map(0x1000, 0x1fff).rom().region(DEVICE_SELF, 0);
-}
-
-void hd6305v0_device::device_start()
-{
-	hd6305_device::device_start();
+	m6805_base_device::device_start();
 
 	save_item(NAME(m_port_data));
 	save_item(NAME(m_port_ddr));
@@ -69,13 +49,13 @@ void hd6305v0_device::device_start()
 	save_item(NAME(m_sci_tx_byte));
 	save_item(NAME(m_sci_tx_step));
 
-	m_timer_timer = timer_alloc(FUNC(hd6305v0_device::timer_cb), this);
-	m_timer_sci = timer_alloc(FUNC(hd6305v0_device::sci_cb), this);
+	m_timer_timer = timer_alloc(FUNC(hd6305_device::timer_cb), this);
+	m_timer_sci = timer_alloc(FUNC(hd6305_device::sci_cb), this);
 }
 
-void hd6305v0_device::device_reset()
+void hd6305_device::device_reset()
 {
-	hd6305_device::device_reset();
+	m6805_base_device::device_reset();
 
 	std::fill(m_port_data.begin(), m_port_data.end(), 0x00);
 	std::fill(m_port_ddr.begin(), m_port_ddr.end(), 0x00);
@@ -99,7 +79,7 @@ void hd6305v0_device::device_reset()
 	m_sci_tx(1);
 }
 
-u8 hd6305v0_device::port_r(offs_t port)
+u8 hd6305_device::port_r(offs_t port)
 {
 	if(m_port_ddr[port] == 0xff)
 		return m_port_data[port];
@@ -107,7 +87,7 @@ u8 hd6305v0_device::port_r(offs_t port)
 	return (m_port_ddr[port] & m_port_data[port]) | (m_read_port[port]() & ~m_port_ddr[port]);
 }
 
-void hd6305v0_device::port_w(offs_t port, u8 data)
+void hd6305_device::port_w(offs_t port, u8 data)
 {
 	if(data != m_port_data[port]) {
 		m_port_data[port] = data;
@@ -115,12 +95,12 @@ void hd6305v0_device::port_w(offs_t port, u8 data)
 	}
 }
 
-u8 hd6305v0_device::port_ddr_r(offs_t port)
+u8 hd6305_device::port_ddr_r(offs_t port)
 {
 	return m_port_ddr[port];
 }
 
-void hd6305v0_device::port_ddr_w(offs_t port, u8 data)
+void hd6305_device::port_ddr_w(offs_t port, u8 data)
 {
 	if(data != m_port_ddr[port]) {
 		logerror("port %d ddr %c%c%c%c%c%c%c%c\n",
@@ -139,7 +119,7 @@ void hd6305v0_device::port_ddr_w(offs_t port, u8 data)
 	}
 }
 
-void hd6305v0_device::timer_update_regs()
+void hd6305_device::timer_update_regs()
 {
 	u32 counter = m_prescaler;
 	u64 tc = machine().time().as_ticks(clock())/4;
@@ -147,7 +127,7 @@ void hd6305v0_device::timer_update_regs()
 
 	u32 next_counter = counter + cycles;
 	u32 shift = BIT(m_tcr, 0, 3);
-	u32 steps = shift ? (((next_counter >> (shift-1)) + 1) >> 1) - (((counter >> (shift-1)) + 1) >> 1): cycles;
+	u32 steps = shift ? (((next_counter >> (shift-1)) + 1) >> 1) - (((counter >> (shift-1)) + 1) >> 1) : cycles;
 
 	m_tdr -= steps;
 	m_prescaler = next_counter & 0x7f;
@@ -155,11 +135,11 @@ void hd6305v0_device::timer_update_regs()
 	if(!m_tdr && steps) {
 		m_tcr |= 0x80;
 		if(!BIT(m_tcr, 6))
-			m_pending_interrupts |= 1 << M6805V0_INT_TIMER1;
+			m_pending_interrupts |= 1 << HD6305_INT_TIMER1;
 	}
 }
 
-void hd6305v0_device::timer_wait_next_timeout()
+void hd6305_device::timer_wait_next_timeout()
 {
 	u32 shift = BIT(m_tcr, 0, 3);
 	u32 cycles;
@@ -177,26 +157,26 @@ void hd6305v0_device::timer_wait_next_timeout()
 	m_timer_timer->adjust(attotime::from_ticks(cycles*4, clock()));
 }
 
-u8 hd6305v0_device::timer_data_r()
+u8 hd6305_device::timer_data_r()
 {
 	timer_update_regs();
 	return m_tdr;
 }
 
-void hd6305v0_device::timer_data_w(u8 data)
+void hd6305_device::timer_data_w(u8 data)
 {
 	timer_update_regs();
 	m_tdr = data;
 	timer_wait_next_timeout();
 }
 
-u8 hd6305v0_device::timer_ctrl_r()
+u8 hd6305_device::timer_ctrl_r()
 {
 	timer_update_regs();
 	return m_tcr;
 }
 
-void hd6305v0_device::timer_ctrl_w(u8 data)
+void hd6305_device::timer_ctrl_w(u8 data)
 {
 	timer_update_regs();
 	u8 old = m_tcr;
@@ -213,9 +193,9 @@ void hd6305v0_device::timer_ctrl_w(u8 data)
 			logerror("WARNING: timer mode not implemented\n");
 	}
 	if((m_tcr & 0xc0) == 0x80)
-		m_pending_interrupts |= 1 << M6805V0_INT_TIMER1;
+		m_pending_interrupts |= 1 << HD6305_INT_TIMER1;
 	else
-		m_pending_interrupts &= ~(1 << M6805V0_INT_TIMER1);
+		m_pending_interrupts &= ~(1 << HD6305_INT_TIMER1);
 	if(BIT(m_tcr, 3)) {
 		m_prescaler = 0x7f;
 		m_tcr &= ~0x08;
@@ -225,18 +205,18 @@ void hd6305v0_device::timer_ctrl_w(u8 data)
 }
 
 
-TIMER_CALLBACK_MEMBER(hd6305v0_device::timer_cb)
+TIMER_CALLBACK_MEMBER(hd6305_device::timer_cb)
 {
 	timer_update_regs();
 	timer_wait_next_timeout();
 }
 
-u8 hd6305v0_device::misc_r()
+u8 hd6305_device::misc_r()
 {
 	return m_mr;
 }
 
-void hd6305v0_device::misc_w(u8 data)
+void hd6305_device::misc_w(u8 data)
 {
 	m_mr = (m_mr & data & 0x80) | (data & 0x60) | 0x1f;
 	logerror("misc %02x  int2=%s, %s  int=%s\n", data,
@@ -245,17 +225,17 @@ void hd6305v0_device::misc_w(u8 data)
 			BIT(m_mr, 5) ? "edge" : "level");
 }
 
-void hd6305v0_device::sci_timer_step()
+void hd6305_device::sci_timer_step()
 {
 	m_timer_sci->adjust(attotime::from_ticks(1 << (BIT(m_scr, 0, 4) + 2), clock()));
 }
 
-TIMER_CALLBACK_MEMBER(hd6305v0_device::sci_cb)
+TIMER_CALLBACK_MEMBER(hd6305_device::sci_cb)
 {
 	if(m_sci_tx_step == 16) {
 		m_ssr |= 0x80;
 		if(!BIT(m_ssr, 5))
-			m_pending_interrupts |= 1 << M6805V0_INT_SCI;
+			m_pending_interrupts |= 1 << HD6305_INT_SCI;
 
 		if(m_sci_tx_filled) {
 			m_sci_tx_filled = false;
@@ -281,12 +261,12 @@ TIMER_CALLBACK_MEMBER(hd6305v0_device::sci_cb)
 	sci_timer_step();
 }
 
-u8 hd6305v0_device::sci_ctrl_r()
+u8 hd6305_device::sci_ctrl_r()
 {
 	return m_scr;
 }
 
-void hd6305v0_device::sci_ctrl_w(u8 data)
+void hd6305_device::sci_ctrl_w(u8 data)
 {
 	m_scr = data;
 	logerror("sci ctrl %02x  d3=%s d4=%s d5=%s rate=%d\n", data,
@@ -296,12 +276,12 @@ void hd6305v0_device::sci_ctrl_w(u8 data)
 			clock()/(1 << (BIT(data, 0, 4) + 3)));
 }
 
-u8 hd6305v0_device::sci_ssr_r()
+u8 hd6305_device::sci_ssr_r()
 {
 	return m_ssr;
 }
 
-void hd6305v0_device::sci_ssr_w(u8 data)
+void hd6305_device::sci_ssr_w(u8 data)
 {
 	m_ssr = ((m_ssr & data) & 0xc0) | (data & 0x38) | 7;
 	logerror("sci ssr w %02x sci irq=%s, %s  timer2 irq=%s, %s%s\n", data,
@@ -312,18 +292,18 @@ void hd6305v0_device::sci_ssr_w(u8 data)
 			BIT(m_ssr, 3) ? "reset sci prescaler" : "");
 
 	if((m_ssr & 0xa0) == 0x80)
-		m_pending_interrupts |= 1 << M6805V0_INT_SCI;
+		m_pending_interrupts |= 1 << HD6305_INT_SCI;
 	else
-		m_pending_interrupts &= ~(1 << M6805V0_INT_SCI);
+		m_pending_interrupts &= ~(1 << HD6305_INT_SCI);
 }
 
-u8 hd6305v0_device::sci_data_r()
+u8 hd6305_device::sci_data_r()
 {
 	logerror("sci data r\n");
 	return 0x00;
 }
 
-void hd6305v0_device::sci_data_w(u8 data)
+void hd6305_device::sci_data_w(u8 data)
 {
 	m_sci_tx_data = data;
 	if(m_sci_tx_step == 0) {
@@ -338,10 +318,10 @@ void hd6305v0_device::sci_data_w(u8 data)
 		m_sci_tx_filled = true;
 }
 
-void hd6305v0_device::execute_set_input(int inputnum, int state)
+void hd6305_device::execute_set_input(int inputnum, int state)
 {
 	// TODO: edge vs. level on int1
-	if(inputnum == M6805V0_INT_IRQ1 || inputnum == M6805V0_INT_IRQ2) {
+	if(inputnum == HD6305_INT_IRQ1 || inputnum == HD6305_INT_IRQ2) {
 		if(m_irq_state[inputnum] != state) {
 			m_irq_state[inputnum] = state;
 
@@ -351,34 +331,69 @@ void hd6305v0_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-void hd6305v0_device::interrupt_vector()
+void hd6305_device::interrupt_vector()
 {
-	if((m_pending_interrupts & (1 << M6805V0_INT_IRQ1)) != 0) {
-		m_pending_interrupts &= ~(1 << M6805V0_INT_IRQ1);
+	if((m_pending_interrupts & (1 << HD6305_INT_IRQ1)) != 0) {
+		m_pending_interrupts &= ~(1 << HD6305_INT_IRQ1);
 		rm16<false>(0x1ffa, m_pc);
 	}
-	else if((m_pending_interrupts & (1 << M6805V0_INT_IRQ2)) != 0) {
-		m_pending_interrupts &= ~(1 << M6805V0_INT_IRQ2);
+	else if((m_pending_interrupts & (1 << HD6305_INT_IRQ2)) != 0) {
+		m_pending_interrupts &= ~(1 << HD6305_INT_IRQ2);
 		rm16<false>(0x1ff8, m_pc);
 	}
-	else if((m_pending_interrupts & (1 << M6805V0_INT_TIMER1)) != 0) {
+	else if((m_pending_interrupts & (1 << HD6305_INT_TIMER1)) != 0) {
 		// TODO: 1ff6 when in wait...
-		m_pending_interrupts &= ~(1 << M6805V0_INT_TIMER1);
+		m_pending_interrupts &= ~(1 << HD6305_INT_TIMER1);
 		rm16<false>(0x1ff8, m_pc);
 	}
-	else if((m_pending_interrupts & (1 << M6805V0_INT_TIMER2)) != 0) {
-		m_pending_interrupts &= ~(1 << M6805V0_INT_TIMER2);
+	else if((m_pending_interrupts & (1 << HD6305_INT_TIMER2)) != 0) {
+		m_pending_interrupts &= ~(1 << HD6305_INT_TIMER2);
 		rm16<false>(0x1ff4, m_pc);
 	}
-	else if((m_pending_interrupts & (1 << M6805V0_INT_SCI)) != 0) {
-		m_pending_interrupts &= ~(1 << M6805V0_INT_SCI);
+	else if((m_pending_interrupts & (1 << HD6305_INT_SCI)) != 0) {
+		m_pending_interrupts &= ~(1 << HD6305_INT_SCI);
 		rm16<false>(0x1ff4, m_pc);
 	}
 }
 
 
-hd6305y2_device::hd6305y2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6305_device(
+/****************************************************************************
+ * HD6305V0 section
+ ****************************************************************************/
+
+hd6305v0_device::hd6305v0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	hd6305_device(
+			mconfig,
+			tag,
+			owner,
+			clock,
+			HD6305V0,
+			{ s_hmos_s_ops, s_hmos_cycles, 14, 0x00ff, 0x00c0, 0x1fff, 0x1ffc },
+			address_map_constructor(FUNC(hd6305v0_device::internal_map), this))
+{
+}
+
+void hd6305v0_device::internal_map(address_map &map)
+{
+	map(0x0000, 0x0003).rw(FUNC(hd6305v0_device::port_r), FUNC(hd6305v0_device::port_w));
+	map(0x0004, 0x0007).rw(FUNC(hd6305v0_device::port_ddr_r), FUNC(hd6305v0_device::port_ddr_w));
+	map(0x0008, 0x0008).rw(FUNC(hd6305v0_device::timer_data_r), FUNC(hd6305v0_device::timer_data_w));
+	map(0x0009, 0x0009).rw(FUNC(hd6305v0_device::timer_ctrl_r), FUNC(hd6305v0_device::timer_ctrl_w));
+	map(0x000a, 0x000a).rw(FUNC(hd6305v0_device::misc_r), FUNC(hd6305v0_device::misc_w));
+	map(0x0010, 0x0010).rw(FUNC(hd6305v0_device::sci_ctrl_r), FUNC(hd6305v0_device::sci_ctrl_w));
+	map(0x0011, 0x0011).rw(FUNC(hd6305v0_device::sci_ssr_r), FUNC(hd6305v0_device::sci_ssr_w));
+	map(0x0012, 0x0012).rw(FUNC(hd6305v0_device::sci_data_r), FUNC(hd6305v0_device::sci_data_w));
+	map(0x0040, 0x00ff).ram();
+	map(0x1000, 0x1fff).rom().region(DEVICE_SELF, 0);
+}
+
+
+/****************************************************************************
+ * HD6305Y2 section
+ ****************************************************************************/
+
+hd6305y2_device::hd6305y2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	hd6305_device(
 			mconfig,
 			tag,
 			owner,
@@ -395,8 +410,13 @@ void hd6305y2_device::internal_map(address_map &map)
 	map(0x0040, 0x013f).ram();
 }
 
-hd63705z0_device::hd63705z0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6305_device(
+
+/****************************************************************************
+ * HD63705Z0 section
+ ****************************************************************************/
+
+hd63705z0_device::hd63705z0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	hd6305_device(
 			mconfig,
 			tag,
 			owner,

@@ -2225,7 +2225,8 @@ void system1_state::sys1ppi(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	// 1st SN audio output actually goes to 2nd SN audio input (pin 9)
+	// 1st SN audio output actually goes to 2nd SN audio input (pin 9),
+	// with a resistor in between, so the volume is lowered a bit.
 	SN76489A(config, m_sn[0], SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	// 2nd SN's clock is selectable via jumper
