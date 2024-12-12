@@ -1261,6 +1261,11 @@ project "bx"
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
 
+	configuration { "xcode*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/osx",
+		}
+
 	configuration { "freebsd" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
@@ -1485,6 +1490,11 @@ end
 		}
 
 	configuration { "osx*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/osx",
+		}
+
+	configuration { "xcode*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
