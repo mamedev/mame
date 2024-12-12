@@ -54,6 +54,7 @@ void hd6305v0_device::internal_map(address_map &map)
 void hd6305v0_device::device_start()
 {
 	hd6305_device::device_start();
+
 	save_item(NAME(m_port_data));
 	save_item(NAME(m_port_ddr));
 	save_item(NAME(m_tdr));
@@ -108,9 +109,10 @@ u8 hd6305v0_device::port_r(offs_t port)
 
 void hd6305v0_device::port_w(offs_t port, u8 data)
 {
-	m_port_data[port] = data;
-	if(m_port_ddr[port] != 0x00)
-		m_write_port[port](data | ~m_port_ddr[port]);
+	if(data != m_port_data[port]) {
+		m_port_data[port] = data;
+		m_write_port[port](port, data | ~m_port_ddr[port], m_port_ddr[port]);
+	}
 }
 
 u8 hd6305v0_device::port_ddr_r(offs_t port)
@@ -120,17 +122,21 @@ u8 hd6305v0_device::port_ddr_r(offs_t port)
 
 void hd6305v0_device::port_ddr_w(offs_t port, u8 data)
 {
-	logerror("port %d ddr %c%c%c%c%c%c%c%c\n",
-			 port,
-			 BIT(data, 7) ? 'o': 'i',
-			 BIT(data, 6) ? 'o': 'i',
-			 BIT(data, 5) ? 'o': 'i',
-			 BIT(data, 4) ? 'o': 'i',
-			 BIT(data, 3) ? 'o': 'i',
-			 BIT(data, 2) ? 'o': 'i',
-			 BIT(data, 1) ? 'o': 'i',
-			 BIT(data, 0) ? 'o': 'i');
-	m_port_ddr[port] = data;
+	if(data != m_port_ddr[port]) {
+		logerror("port %d ddr %c%c%c%c%c%c%c%c\n",
+				port,
+				BIT(data, 7) ? 'o': 'i',
+				BIT(data, 6) ? 'o': 'i',
+				BIT(data, 5) ? 'o': 'i',
+				BIT(data, 4) ? 'o': 'i',
+				BIT(data, 3) ? 'o': 'i',
+				BIT(data, 2) ? 'o': 'i',
+				BIT(data, 1) ? 'o': 'i',
+				BIT(data, 0) ? 'o': 'i');
+
+		m_port_ddr[port] = data;
+		m_write_port[port](port, m_port_data[port] | ~data, data);
+	}
 }
 
 void hd6305v0_device::timer_update_regs()
@@ -197,12 +203,12 @@ void hd6305v0_device::timer_ctrl_w(u8 data)
 	m_tcr = (m_tcr & data & 0x80) | (data & 0x7f);
 	if((old ^ m_tcr) & 0x7f) {
 		logerror("timer ctrl %02x irq=%s, %s clock=%s%s prescale=%d\n", data,
-				 BIT(m_tcr, 7) ? "on" : "off",
-				 BIT(m_tcr, 6) ? "disabled" : "enabled",
-				 BIT(m_tcr, 4, 2) == 0 ? "e" : BIT(m_tcr, 4, 2) == 1 ? "e&timer" : BIT(m_tcr, 4, 2) == 2 ? "off" : "timer",
-				 BIT(m_tcr, 3) ? " reset prescaler" : "",
-				 1 << BIT(m_tcr, 0, 3)
-				 );
+				BIT(m_tcr, 7) ? "on" : "off",
+				BIT(m_tcr, 6) ? "disabled" : "enabled",
+				BIT(m_tcr, 4, 2) == 0 ? "e" : BIT(m_tcr, 4, 2) == 1 ? "e&timer" : BIT(m_tcr, 4, 2) == 2 ? "off" : "timer",
+				BIT(m_tcr, 3) ? " reset prescaler" : "",
+				1 << BIT(m_tcr, 0, 3));
+
 		if(BIT(m_tcr, 4, 2) != 0)
 			logerror("WARNING: timer mode not implemented\n");
 	}
@@ -234,9 +240,9 @@ void hd6305v0_device::misc_w(u8 data)
 {
 	m_mr = (m_mr & data & 0x80) | (data & 0x60) | 0x1f;
 	logerror("misc %02x  int2=%s, %s  int=%s\n", data,
-			 BIT(m_mr, 7) ? "on" : "off",
-			 BIT(m_mr, 6) ? "disabled" : "enabled",
-			 BIT(m_mr, 5) ? "edge" : "level");
+			BIT(m_mr, 7) ? "on" : "off",
+			BIT(m_mr, 6) ? "disabled" : "enabled",
+			BIT(m_mr, 5) ? "edge" : "level");
 }
 
 void hd6305v0_device::sci_timer_step()
@@ -284,11 +290,10 @@ void hd6305v0_device::sci_ctrl_w(u8 data)
 {
 	m_scr = data;
 	logerror("sci ctrl %02x  d3=%s d4=%s d5=%s rate=%d\n", data,
-			 BIT(data, 7) ? "data_out" : "gpio",
-			 BIT(data, 6) ? "data_in" : "gpio",
-			 BIT(data, 5) == 0 ? "gpio" : BIT(data, 4) ? "clock_in" : "clock_out",
-			 clock()/(1 << (BIT(data, 0, 4) + 3))
-			 );
+			BIT(data, 7) ? "data_out" : "gpio",
+			BIT(data, 6) ? "data_in" : "gpio",
+			BIT(data, 5) == 0 ? "gpio" : BIT(data, 4) ? "clock_in" : "clock_out",
+			clock()/(1 << (BIT(data, 0, 4) + 3)));
 }
 
 u8 hd6305v0_device::sci_ssr_r()
@@ -300,11 +305,11 @@ void hd6305v0_device::sci_ssr_w(u8 data)
 {
 	m_ssr = ((m_ssr & data) & 0xc0) | (data & 0x38) | 7;
 	logerror("sci ssr w %02x sci irq=%s, %s  timer2 irq=%s, %s%s\n", data,
-			 BIT(m_ssr, 7) ? "on" : "off",
-			 BIT(m_ssr, 5) ? "disabled" : "enabled",
-			 BIT(m_ssr, 6) ? "on" : "off",
-			 BIT(m_ssr, 4) ? "disabled" : "enabled",
-			 BIT(m_ssr, 3) ? "reset sci prescaler" : "");
+			BIT(m_ssr, 7) ? "on" : "off",
+			BIT(m_ssr, 5) ? "disabled" : "enabled",
+			BIT(m_ssr, 6) ? "on" : "off",
+			BIT(m_ssr, 4) ? "disabled" : "enabled",
+			BIT(m_ssr, 3) ? "reset sci prescaler" : "");
 
 	if((m_ssr & 0xa0) == 0x80)
 		m_pending_interrupts |= 1 << M6805V0_INT_SCI;
