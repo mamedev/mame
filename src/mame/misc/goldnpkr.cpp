@@ -31,7 +31,7 @@
   * Jack Potten's Poker (set 10, ICP-1 PCB),           198?, Bootleg.
   * Jack Potten's Poker (set 11, German, W.W.),        198?, Bootleg.
   * Jack Potten's Poker (set 12, no Double-Up),        198?, Bootleg.
-  * Jack Potten's Poker (set 13, ICP-1 PCB),           198?, Bootleg.
+  * Jack Potten's Poker (w/fever, ICP-1 PCB),          198?, Bootleg.
   * Jack Potten's Poker (NGold, set 1),                198?, Unknown.
   * Jack Potten's Poker (NGold, set 2),                198?, Unknown.
   * Jack Potten's Poker (NGold, set 3),                198?, Unknown.
@@ -13038,12 +13038,21 @@ void goldnpkr_state::init_olym65()
 
 void goldnpkr_state::init_glfev()
 {
-// to do: break the loops
+// breaking the protection loops
+
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	ROM[0xf7c9] = 0xea;
+	ROM[0xf7ca] = 0xea;
+	ROM[0xf7cb] = 0xea;
+
+	ROM[0xf7d5] = 0xea;
+	ROM[0xf7d6] = 0xea;
+	ROM[0xf7d7] = 0xea;
 }
 
 
 } // anonymous namespace
-
 
 
 /*********************************************
@@ -13077,7 +13086,7 @@ GAMEL( 198?, potnpkrj,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 198?, potnpkrk,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 12, no Double-Up)", 0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrl,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (set 13, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
 GAMEL( 1988, potnpkrm,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 14, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
-GAME ( 198?, potnpkrn,  pottnpkr, glfever,  glfever,  goldnpkr_state, init_glfev,    ROT0,   "bootleg",                  "Jack Potten's Poker (fever, ICP-1 PCB)",     MACHINE_NOT_WORKING  )  // hangs
+GAME ( 198?, potnpkrn,  pottnpkr, glfever,  glfever,  goldnpkr_state, init_glfev,    ROT0,   "bootleg",                  "Jack Potten's Poker (w/fever, ICP-1 PCB)",   0 )
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
