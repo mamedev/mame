@@ -10,14 +10,17 @@ TMP68HC000-P16 CPU
 28.6363 MHz XTAL (near CPU)
 ES-9409 custom (GFX, same as dblcrown.cpp)
 6x N341256P-15 RAM (near custom)
-IS61C64 RAM (near custom, exact type not readable)
-YMZ280B-F sound chip (no XTAL, running internal?)
-2x N341256P-15 RAM (near YMZ280B-F)
+IS61C64AH-20N RAM (near custom)
+2x N341256P-15 RAM (near custom)
+YMZ280B-F sound chip (no XTAL)
+YMZ284-D SSGL (in audio amp area)
 MAX693ACPE watchdog
 93C56 EEPROM
 bank of 8 DIP switches
+battery (near CPU)
 
 Undumped games known to run on this PCB:
+* Flower Dream 9
 * Multi Spin
 * Star Ball
 */
@@ -176,7 +179,7 @@ void es9501_state::es9501(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", 16.9344_MHz_XTAL));
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 28.636363_MHz_XTAL / 2));
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
 }
