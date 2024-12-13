@@ -2079,8 +2079,7 @@ void spg2xx_game_prail_state::prail_portb_w(offs_t offset, uint16_t data, uint16
 {
 	if (mem_mask & 0x0f)
 	{
-		uint8_t bank = data & 0x0f;
-		bank = bitswap<8>(bank, 7, 6, 5, 4, 3, 2, 0, 1);
+		uint8_t const bank = bitswap<4>(data, 3, 2, 0, 1);
 		switch_bank(bank);
 	}
 
@@ -2570,5 +2569,5 @@ CONS( 2006, anpantv,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,   
 
 // Train Game V1.4 2012-08-15 on PCB. SPG243 headers in each chunk.
 // Last few bytes of SEEPROM have 'JUNGT' in them, is this developed by JungleSoft/JungleTac?
-CONS( 2012, prail,      0,        0, prail,     prail,     spg2xx_game_prail_state,    empty_init,   "Takara Tomy",                                            "Boku wa Plarail Untenshi Shinkansen de Ikou! (Japan)",                  MACHINE_IMPERFECT_SOUND )
+CONS( 2012, prail,      0,        0, prail,     prail,     spg2xx_game_prail_state,    empty_init,   "Takara Tomy",                                            "Boku wa Plarail Untenshi - Shinkansen de Ikou! (Japan)",                MACHINE_IMPERFECT_SOUND )
 // the 'plus' version from 2015 runs on newer hardware, see generalplus_gpl16250_spi.cpp
