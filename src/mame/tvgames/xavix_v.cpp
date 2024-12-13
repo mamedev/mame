@@ -135,20 +135,51 @@ uint8_t xavix_state::superxavix_crtc_2_r(offs_t offset)
 
 void xavix_state::superxavix_plt_flush_w(uint8_t data)
 {
-	// flush current write buffer, maybe also set write mode?
-	logerror("%s: superxavix_plt_flush_w %02x\n", machine().describe_context(), data);
+	// flush current write buffer (as we might not have filled a byte when plotting)
+	// and set write mode?
+	// do we need to cache the previous write address for the flush? (probably not, this seems to be explicitly
+	// written both after every transfer, and before the next one.
+	if (m_plotter_has_byte)
+	{
+		m_maincpu->space(6).write_byte((m_sx_plt_address >> 3) & 0x7fffff, m_plotter_current_byte);
+	}
+
+	m_plotter_has_byte = 0;
+	m_plotter_current_byte = 0x00;
+	//printf("%s: superxavix_plt_flush_w %02x\n", machine().describe_context().c_str(), data);
 	m_sx_plt_mode = data;
 }
 
 
+
 void xavix_state::superxavix_plt_dat_w(uint8_t data)
 {
-	uint32_t realaddress = m_sx_plt_address / 0x8; // it's a bit-offset?
+	uint8_t pixels = m_sx_plt_mode + 1;
 
-	//if (m_sx_plt_mode == 0x07) // maybe 8bpp, suprtvpc doesn't write the bad status bar or bad text with this, but suprtvpchk drawing breaks
-	m_maincpu->space(6).write_byte(realaddress & 0x7fffff, data);
+	while (pixels)
+	{
+		if (!m_plotter_has_byte)
+		{
+			m_plotter_current_byte = m_maincpu->space(6).read_byte((m_sx_plt_address>>3) & 0x7fffff);
+			m_plotter_has_byte = 1;
+		}
 
-	m_sx_plt_address += 0x8;
+		uint8_t bit_to_write = data & 1;
+		data >>= 1;
+
+		uint8_t destbit = m_sx_plt_address & 0x7;
+		m_plotter_current_byte &= ~(1 << destbit);
+		m_plotter_current_byte |= (bit_to_write << destbit);
+
+		m_sx_plt_address++;
+		if (!(m_sx_plt_address & 0x7))
+		{
+			m_maincpu->space(6).write_byte(((m_sx_plt_address-1)>>3) & 0x7fffff, m_plotter_current_byte);
+			m_plotter_has_byte = 0;
+		}
+
+		pixels--;
+	}
 }
 
 void xavix_state::superxavix_plt_loc_w(offs_t offset, uint8_t data)

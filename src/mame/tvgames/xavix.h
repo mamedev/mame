@@ -564,6 +564,8 @@ private:
 	uint8_t m_superxavix_bitmap_pal_index = 0;
 	uint32_t m_sx_plt_address = 0;
 	uint8_t m_sx_plt_mode = 0;
+	uint8_t m_plotter_has_byte = 0;
+	uint8_t m_plotter_current_byte = 0x00;
 
 	int16_t get_vectors(int which, int half);
 
