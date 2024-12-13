@@ -17935,6 +17935,9 @@ rpanic                          // (c) 1992 Excellent System / Jaleco
 @source:excellent/dblcrown.cpp
 dblcrown                        // (c) 1994 Excellent System
 
+@source:excellent/es9501.cpp
+specd9
+
 @source:excellent/gcpinbal.cpp
 gcpinbal                        // (c) 1994 Excellent System
 pwrflip                         // (c) 1994 Excellent System
@@ -20102,6 +20105,7 @@ poker21
 @source:igs/goldstar.cpp
 3cdpoker                        // hack?
 3cdpokera                       // hack?
+amaztsk                         //
 animalhs                        // (c) 1991 Suns Co Ltd.
 animalhsa                       // (c) 1991 Suns Co Ltd.
 animalhsb                       // bootleg
@@ -20185,6 +20189,7 @@ fl7_tw                          // Taiwanese Hardware.
 goldfrui                        // bootleg
 goldstar                        // (c) 198? IGS
 goldstbl                        // (c) 198? IGS
+halltsk                         //
 hamhouse                        // bootleg
 hamhouse9                       // bootleg
 jkrmast                         // (c) 199? unknown

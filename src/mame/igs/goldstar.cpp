@@ -457,6 +457,7 @@ public:
 	void init_cll();
 	void init_animalhs();
 	void init_eldoraddoa();
+	template <uint8_t Xor_value> void init_tsk();
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -481,6 +482,7 @@ public:
 	void super7(machine_config &config);
 	void animalhs(machine_config &config);
 	void eldoraddoa(machine_config &config);
+	void amaztsk(machine_config &config);
 	void animalhs_map(address_map &map) ATTR_COLD;
 	void animalhs_portmap(address_map &map) ATTR_COLD;
 	void amcoe1_portmap(address_map &map) ATTR_COLD;
@@ -494,6 +496,7 @@ public:
 	void cmtetriskr_portmap(address_map &map) ATTR_COLD;
 	void cmv4zg_portmap(address_map &map) ATTR_COLD;
 	void eldoraddoa_portmap(address_map &map) ATTR_COLD;
+	void nfm_portmap(address_map &map) ATTR_COLD;
 	void super7_portmap(address_map &map) ATTR_COLD;
 	void chryangl_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void ss2001_portmap(address_map &map) ATTR_COLD;
@@ -2364,6 +2367,12 @@ void cmaster_state::amcoe2_portmap(address_map &map)
 	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 }
 
+void cmaster_state::nfm_portmap(address_map &map)
+{
+	amcoe2_portmap(map);
+
+	map(0x17, 0x17).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 void goldstar_state::lucky8_map(address_map &map)
 {
@@ -10005,7 +10014,7 @@ static const gfx_layout tiles8x8_3bpp_layout =
 static GFXDECODE_START( gfx_nfm )
 	GFXDECODE_ENTRY( "tilegfx", 0, tiles8x8_3bpp_layout, 0, 16 )
 	GFXDECODE_ENTRY( "reelgfx", 0, tiles8x32_4bpp_layout, 128+64, 4 )
-	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 ) // wrong, needs correct decoding
+	GFXDECODE_ENTRY( "user1",   0, gfx_8x8x8_raw,  0, 16 )
 GFXDECODE_END
 
 
@@ -11182,12 +11191,21 @@ void cmaster_state::nfm(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::nfm_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::nfm_portmap);
 
 	m_gfxdecode->set_info(gfx_nfm);
 
 	m_palette->set_init(FUNC(cmaster_state::nfm_palette));
+
+	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); /* clock frequency & pin 7 not verified */
 }
 
+void cmaster_state::amaztsk(machine_config &config)
+{
+	nfm(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map); // expects NVRAM instead of ROM in the 0xd000 - 0xd7ff range
+}
 
 void unkch_state::vblank_irq(int state)
 {
@@ -18162,11 +18180,13 @@ ROM_START( nfm )
 	ROM_LOAD( "fruit6", 0x08000, 0x08000, CRC(39d5b89a) SHA1(4cf52fa557ffc792d3e13f7dbb5d45fd617bac85) )
 	ROM_LOAD( "fruit5", 0x10000, 0x08000, CRC(a7a8f08d) SHA1(76c93194133ba85c0dde1f364260e16d5b647134) )
 
-	ROM_REGION( 0x140000, "user1", 0 )
-	ROM_LOAD( "8_f29c51002t.u53",       0x00000, 0x40000, CRC(ff9d5b6d) SHA1(a84fe241ff9958740dcdbd4650bd16a0aa6e01ca) )
+	ROM_REGION( 0x100000, "user1", 0 )
 	// according to the dumper, the next two contain game logo + symbols animations + talking sounds
-	ROM_LOAD( "am29f040b.plcc32-a.bin", 0x40000, 0x80000, CRC(04bb0bcf) SHA1(b72fc5c351cb05d86938d49d310fe623c7de70d5) )
-	ROM_LOAD( "am29f040b.plcc32-b.bin", 0xc0000, 0x80000, CRC(f95838f9) SHA1(99a999945e489c56ec04a87b5037d7e8d138f686) )
+	ROM_LOAD( "am29f040b.plcc32-a.bin", 0x00000, 0x80000, CRC(04bb0bcf) SHA1(b72fc5c351cb05d86938d49d310fe623c7de70d5) )
+	ROM_LOAD( "am29f040b.plcc32-b.bin", 0x80000, 0x80000, CRC(f95838f9) SHA1(99a999945e489c56ec04a87b5037d7e8d138f686) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "8_f29c51002t.u53", 0x00000, 0x40000, CRC(ff9d5b6d) SHA1(a84fe241ff9958740dcdbd4650bd16a0aa6e01ca) )
 
 	ROM_REGION( 0x8000, "colours", 0 ) // colours, only 0x200 used
 	ROM_LOAD( "fruiprg2", 0x0000, 0x08000, CRC(13925ff5) SHA1(236415a244ef6092834f8080cf0d2e04bbfa2650) )
@@ -18202,14 +18222,92 @@ ROM_START( nfma )
 	ROM_LOAD( "6_27c256.u11", 0x08000, 0x08000, CRC(39d5b89a) SHA1(4cf52fa557ffc792d3e13f7dbb5d45fd617bac85) ) // matches nfm
 	ROM_LOAD( "5_27c256.u4",  0x10000, 0x08000, CRC(a7a8f08d) SHA1(76c93194133ba85c0dde1f364260e16d5b647134) ) // matches nfm
 
-	ROM_REGION( 0x140000, "user1", 0 )
-	ROM_LOAD( "8_f29c51002t.u53",       0x00000, 0x40000, CRC(ff9d5b6d) SHA1(a84fe241ff9958740dcdbd4650bd16a0aa6e01ca) )
+	ROM_REGION( 0x100000, "user1", 0 )
 	// according to the dumper, the next two contain game logo + symbols animations + talking sounds
-	ROM_LOAD( "am29f040b.plcc32-a.bin", 0x40000, 0x80000, CRC(04bb0bcf) SHA1(b72fc5c351cb05d86938d49d310fe623c7de70d5) )
-	ROM_LOAD( "am29f040b.plcc32-b.bin", 0xc0000, 0x80000, CRC(f95838f9) SHA1(99a999945e489c56ec04a87b5037d7e8d138f686) )
+	ROM_LOAD( "am29f040b.plcc32-a.bin", 0x00000, 0x80000, CRC(04bb0bcf) SHA1(b72fc5c351cb05d86938d49d310fe623c7de70d5) )
+	ROM_LOAD( "am29f040b.plcc32-b.bin", 0x80000, 0x80000, CRC(f95838f9) SHA1(99a999945e489c56ec04a87b5037d7e8d138f686) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "8_f29c51002t.u53", 0x00000, 0x40000, CRC(ff9d5b6d) SHA1(a84fe241ff9958740dcdbd4650bd16a0aa6e01ca) )
 
 	ROM_REGION( 0x8000, "colours", 0 ) // colours, only 0x200 used
 	ROM_LOAD( "10bp_27c257.u62", 0x0000, 0x8000, CRC(13925ff5) SHA1(236415a244ef6092834f8080cf0d2e04bbfa2650) ) // matches nfm
+ROM_END
+
+ROM_START( halltsk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "halloween_mp.u3", 0x00000, 0x10000, CRC(73bd23a2) SHA1(15f91995e69b8da096135df2d27fb0439206c0fa) ) // on subboard, 27C512
+
+	ROM_REGION( 0x10000, "reelgfx", 0 ) // all 27C256
+	ROM_LOAD( "halloween_4.bin", 0x0000, 0x4000, CRC(3d824818) SHA1(85ad476da4d48afb3814a005724ab82bd8879d8c) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(                0x0000, 0x4000 )
+	ROM_LOAD( "halloween_3.bin", 0x4000, 0x4000, CRC(3ff5daf9) SHA1(b8a37fb0c32c85a263dd9a4b7a64d82e6b4012a7) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(                0x4000, 0x4000 )
+	ROM_LOAD( "halloween_2.bin", 0x8000, 0x4000, CRC(aa9ae972) SHA1(f5ee3faac34940a80b86a5d8bd39fefaa75f59f0) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(                0x8000, 0x4000 )
+	ROM_LOAD( "halloween_1.bin", 0xc000, 0x4000, CRC(b03f696a) SHA1(7eeead9737ab7d62872dc4f26654c8e661e6b9f4) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(                0xc000, 0x4000 )
+
+	ROM_REGION( 0x18000, "tilegfx", 0 ) // all  27C512
+	ROM_LOAD( "halloween_7.bin", 0x00000, 0x08000, CRC(2be097f6) SHA1(c7114262524c532b99018aca0aa236263e820337) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(                0x00000, 0x08000 )
+	ROM_LOAD( "halloween_6.bin", 0x08000, 0x08000, CRC(83095784) SHA1(3a623fa6259e452fc27a51b0d2801ef69f24d34d) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(                0x08000, 0x08000 )
+	ROM_LOAD( "halloween_5.bin", 0x10000, 0x08000, CRC(475e58ed) SHA1(0841762c96cd7ad884f18e3991edf94d70867cbc) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(                0x10000, 0x08000 )
+
+	ROM_REGION( 0x100000, "user1", ROMREGION_ERASE00 ) // not on this PCB?
+
+	ROM_REGION( 0x40000, "oki", 0 ) // on subboard, AM29F040
+	ROM_LOAD( "halloween_vsp.bin", 0x00000, 0x40000, CRC(fc56b7fb) SHA1(cf4087a765a9b3e7a3abb6049deba37d6859c02c) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                             0x40000 )
+
+	ROM_REGION( 0x10000, "colours", 0 ) // 27c512, only 0x200 used
+	ROM_LOAD( "halloween_8.bin", 0x00000, 0x10000, CRC(d5bd2fad) SHA1(7b8988cf4ec76ff1f4bdbb11a4cc4b2562fc4996) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // TODO: verify what are these for
+	ROM_LOAD( "h.1", 0x000, 0x100, CRC(2e3cf7a7) SHA1(4dd4e85e693b3966b7dd21c38041c2e28bef6a3c) )
+	ROM_LOAD( "h.2", 0x100, 0x100, CRC(c40219ad) SHA1(544982e63847a08d3a4c135775c83deeb004a81f) )
+	ROM_LOAD( "t.1", 0x200, 0x100, CRC(6d52f710) SHA1(9729a4240f9a4408f33d743c97eef1572f083e66) )
+	ROM_LOAD( "t.2", 0x300, 0x100, CRC(242535dc) SHA1(260f7a141c1915cf65726a5182a5dac4271419f5) )
+ROM_END
+
+ROM_START( amaztsk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "amazonia_mp.u3", 0x00000, 0x10000, CRC(baddb153) SHA1(1a696ad1ef21d0d27fa2d2a729b56c7130d1f205) ) // on subboard, 27C512
+
+	ROM_REGION( 0x10000, "reelgfx", 0 ) // all 27C256
+	ROM_LOAD( "amazonia_4.bin", 0x0000, 0x4000, CRC(03da97b6) SHA1(e2ec003a0584b93724c84e674c20a2e047015949) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(               0x0000, 0x4000 )
+	ROM_LOAD( "amazonia_3.bin", 0x4000, 0x4000, CRC(4585c8c5) SHA1(cb32caa5fbf611ea4dc3f638c62614abbec83cfa) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(               0x4000, 0x4000 )
+	ROM_LOAD( "amazonia_2.bin", 0x8000, 0x4000, CRC(acf3100f) SHA1(988813b60f01a188b6a46df32a2c6634b3178ced) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(               0x8000, 0x4000 )
+	ROM_LOAD( "amazonia_1.bin", 0xc000, 0x4000, CRC(fc6d856f) SHA1(05eec692b3ecd8fa74a7ebfa9bf84915b189ef11) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(               0xc000, 0x4000 )
+
+	ROM_REGION( 0x18000, "tilegfx", 0 ) // all  27C512
+	ROM_LOAD( "amazonia_7.bin", 0x00000, 0x08000, CRC(5680d299) SHA1(78eba64d4b94346b2c4204657f4b2549c26c8c3d) ) // 0xxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(               0x00000, 0x08000 )
+	ROM_LOAD( "amazonia_6.bin", 0x08000, 0x08000, CRC(c3cb5d5c) SHA1(8d8f1c2cf2f91a75355828aba2716fdd2e4d255e) ) // 0xxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(               0x08000, 0x08000 )
+	ROM_LOAD( "amazonia_5.bin", 0x10000, 0x08000, CRC(46630843) SHA1(fb703c09e0d89999999f2c4ce726dd2d5d21224e) ) // 0xxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(               0x10000, 0x08000 )
+
+	ROM_REGION( 0x100000, "user1", ROMREGION_ERASE00 ) // not on this PCB?
+
+	ROM_REGION( 0x80000, "oki", 0 ) // on subboard, AM29F040
+	ROM_LOAD( "amazonia_vsp.bin", 0x00000, 0x80000, CRC(1aad7535) SHA1(7e585596de545d47c8db426adc2cf7f47cdd04de) )
+
+	ROM_REGION( 0x10000, "colours", 0 ) // 27c512, only 0x200 used
+	ROM_LOAD( "amazonia_8.bin", 0x0000, 0x8000, CRC(044a140a) SHA1(fe46a21270ba1c39ba7b8229479e379a25510d44) ) // 0xxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(               0x0000, 0x8000 )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "h.1", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "h.2", 0x100, 0x100, NO_DUMP )
+	ROM_LOAD( "t.1", 0x200, 0x100, NO_DUMP )
+	ROM_LOAD( "t.2", 0x300, 0x100, NO_DUMP )
 ROM_END
 
 
@@ -22257,6 +22355,20 @@ void cmaster_state::init_eldoraddoa()
 		m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0xff, 4, 5, 6, 7, 0, 1, 2, 3);
 }
 
+template <uint8_t Xor_value>
+void cmaster_state::init_tsk()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x10000);
+	memcpy(&buffer[0], rom, 0x10000);
+
+	for (int i = 0; i < 0xc000; i++)
+		rom [i] = buffer[i ^ 0x1000];
+
+	for (int i = 0; i < 0x10000; i++)
+		rom[i] = bitswap<8>(rom[i] ^ Xor_value, 6, 7, 4, 5, 2, 3, 0, 1);
+}
+
 } // anonymous namespace
 
 
@@ -22494,6 +22606,8 @@ GAME( 2006, noved,       nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_in
 
 GAME( 2003, nfm,         0,        nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic, vFB02-07A)",         MACHINE_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode
 GAME( 2003, nfma,        nfm,      nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic, vFB02-01A)",         MACHINE_NOT_WORKING ) // vFB02-01A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode
+GAME( 2006, amaztsk,     0,        amaztsk,  nfm,       cmaster_state,  init_tsk<0xba>, ROT0, "Ming-Yang Electronic / TSK", "Amazonia (Ming-Yang Electronic / TSK)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // resets when starting reels, reels don't show, inputs need fixing, no sound
+GAME( 2006, halltsk,     0,        nfm,      nfm,       cmaster_state,  init_tsk<0x71>, ROT0, "Ming-Yang Electronic / TSK", "Halloween (Ming-Yang Electronic / TSK, version 1.0)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // resets when starting reels, reels don't show, inputs need fixing, no sound
 
 
 // Super Cherry Master sets...
