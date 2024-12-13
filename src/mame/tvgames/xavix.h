@@ -246,7 +246,14 @@ private:
 	{
 		if (offset & 0x8000)
 		{
-			return m_rgn[(offset) & (m_rgnlen - 1)];
+			if (m_disable_memory_bypass)
+			{
+				return m_maincpu->space(6).read_byte(offset & 0x7fffff);
+			}
+			else
+			{
+				return m_rgn[(offset) & (m_rgnlen - 1)];
+			}
 		}
 		else
 		{
@@ -256,8 +263,15 @@ private:
 
 	virtual uint8_t opcodes_800000_r(offs_t offset)
 	{
-		// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
-		return m_rgn[(offset) & (m_rgnlen - 1)];
+		if (m_disable_memory_bypass)
+		{
+			return m_maincpu->space(6).read_byte(offset & 0x7fffff);
+		}
+		else
+		{
+			// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
+			return m_rgn[(offset) & (m_rgnlen - 1)];
+		}
 	}
 
 	uint8_t sample_read(offs_t offset)
@@ -427,6 +441,7 @@ private:
 	void superxavix_crtc_2_w(offs_t offset, uint8_t data);
 	uint8_t superxavix_crtc_2_r(offs_t offset);
 
+	void superxavix_plt_dat_w(uint8_t data);
 	void superxavix_plt_loc_w(offs_t offset, uint8_t data);
 	uint8_t superxavix_plt_loc_r(offs_t offset);
 
@@ -546,6 +561,7 @@ private:
 
 	uint8_t m_superxavix_pal_index = 0;
 	uint8_t m_superxavix_bitmap_pal_index = 0;
+	uint32_t m_sx_plt_address = 0;
 
 	int16_t get_vectors(int which, int half);
 
@@ -898,13 +914,20 @@ protected:
 	{
 		if (offset & 0x8000)
 		{
-			if ((offset & 0x7fffff) >= m_cartlimit)
+			if (m_disable_memory_bypass)
 			{
-				return m_rgn[(offset) & (m_rgnlen - 1)];
+				return m_maincpu->space(6).read_byte(offset & 0x7fffff);
 			}
 			else
 			{
-				return cart_r(offset);
+				if ((offset & 0x7fffff) >= m_cartlimit)
+				{
+					return m_rgn[(offset) & (m_rgnlen - 1)];
+				}
+				else
+				{
+					return cart_r(offset);
+				}
 			}
 		}
 		else
@@ -915,13 +938,20 @@ protected:
 
 	virtual uint8_t opcodes_800000_r(offs_t offset) override
 	{
-		if ((offset & 0x7fffff) >= m_cartlimit)
+		if (m_disable_memory_bypass)
 		{
-			return m_rgn[(offset) & (m_rgnlen - 1)];
+			return m_maincpu->space(6).read_byte(offset & 0x7fffff);
 		}
 		else
 		{
-			return cart_r(offset);
+			if ((offset & 0x7fffff) >= m_cartlimit)
+			{
+				return m_rgn[(offset) & (m_rgnlen - 1)];
+			}
+			else
+			{
+				return cart_r(offset);
+			}
 		}
 	}
 

@@ -133,6 +133,12 @@ uint8_t xavix_state::superxavix_crtc_2_r(offs_t offset)
 	return m_sx_crtc_2[offset];
 }
 
+void xavix_state::superxavix_plt_dat_w(uint8_t data)
+{
+	uint32_t realaddress = m_sx_plt_address / 0x8;
+	m_maincpu->space(6).write_byte(realaddress & 0x7fffff, data);
+	m_sx_plt_address += 0x8;
+}
 
 void xavix_state::superxavix_plt_loc_w(offs_t offset, uint8_t data)
 {
@@ -141,8 +147,8 @@ void xavix_state::superxavix_plt_loc_w(offs_t offset, uint8_t data)
 	m_sx_plt_loc[offset] = data;
 	if (offset == 3)
 	{
-		uint32_t address = (m_sx_plt_loc[3] << 24) | (m_sx_plt_loc[2] << 16) | (m_sx_plt_loc[1] << 8) | (m_sx_plt_loc[0] << 0);
-		logerror("%s SuperXavix Bitmap Plotter set to address %08x\n", machine().describe_context(), address);
+		m_sx_plt_address = (m_sx_plt_loc[3] << 24) | (m_sx_plt_loc[2] << 16) | (m_sx_plt_loc[1] << 8) | (m_sx_plt_loc[0] << 0);
+		logerror("%s SuperXavix Bitmap Plotter set to address %08x\n", machine().describe_context(), m_sx_plt_address);
 	}
 }
 
