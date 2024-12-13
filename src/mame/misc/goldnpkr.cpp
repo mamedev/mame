@@ -16,6 +16,7 @@
   * Golden Poker Double Up (bootleg, set 2),           198?, Bootleg.
   * Golden Poker Double Up (bootleg, set 3),           1983, Intercoast (bootleg).
   * Golden Poker Double Up (bootleg, set 4),           1983, Intercoast (bootleg).
+  * Golden Poker Double Up (bootleg, set 5),           198?, Bootleg.
   * Videotron Poker (cards selector, set 1),           198?, Unknown.
   * Videotron Poker (cards selector, set 2),           198?, Unknown.
   * Videotron Poker (normal controls),                 198?, Unknown.
@@ -31,10 +32,13 @@
   * Jack Potten's Poker (set 10, ICP-1 PCB),           198?, Bootleg.
   * Jack Potten's Poker (set 11, German, W.W.),        198?, Bootleg.
   * Jack Potten's Poker (set 12, no Double-Up),        198?, Bootleg.
+  * Jack Potten's Poker (set 13, ICP-1 PCB),           198?, Unknown.
+  * Jack Potten's Poker (set 14, ICP-1 PCB),           198?, Bootleg (PED).
   * Jack Potten's Poker (w/fever, ICP-1 PCB),          198?, Bootleg.
   * Jack Potten's Poker (NGold, set 1),                198?, Unknown.
   * Jack Potten's Poker (NGold, set 2),                198?, Unknown.
   * Jack Potten's Poker (NGold, set 3),                198?, Unknown.
+  * Amstar Draw Poker,                                 198?, Amstar?
   * Buena Suerte (Spanish, set 1),                     1990, Unknown.
   * Buena Suerte (Spanish, set 2),                     1991, Unknown.
   * Buena Suerte (Spanish, set 3),                     1991, Unknown.
@@ -49,7 +53,7 @@
   * Buena Suerte (Spanish, set 12),                    1991, Unknown.
   * Buena Suerte (Spanish, set 13),                    1991, Unknown.
   * Buena Suerte (Spanish, set 14),                    1991, Unknown.
-  * Buena Suerte (Spanish, set 15),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 15, Prodel PCB),        1991, Unknown.
   * Buena Suerte (Spanish, set 16),                    1991, Unknown.
   * Buena Suerte (Spanish, set 17),                    1991, Unknown.
   * Buena Suerte (Spanish, set 18),                    1991, Unknown.
@@ -59,10 +63,11 @@
   * Buena Suerte (Spanish, set 22),                    1991, Unknown.
   * Buena Suerte (Spanish/Portuguese, set 23),         1991, Unknown.
   * Good Luck,                                         198?, Unknown.
-  * Falcons Wild - World Wide Poker,                   1983, Falcon.
+  * Falcons Wild - Wild Card 1991 (TVG),               1991, TVG.
   * Falcons Wild - World Wide Poker (VK set 1),        1990, Video Klein.
   * Falcons Wild - World Wide Poker (VK set 2),        1990, Video Klein.
-  * Falcons Wild - Wild Card 1991,                     1991, TVG.
+  * Falcons Wild - World Wide Poker (Falcon original, protected),  1983, Falcon.
+  * Falcons Wild - World Wide Poker (Falcon original), 1983, Falcon.
   * Witch Card (Video Klein CPU box, set 1),           1991, Video Klein.
   * Witch Card (Video Klein CPU box, set 2),           1991, Video Klein.
   * Witch Card (Spanish, witch game, set 1),           1991, Unknown.
@@ -140,12 +145,12 @@
   * Bonus Poker,                                       1984, Galanthis Inc.
   * Joker Bonus,                                       198?, Unknown.
   * "Unknown French poker game",                       198?, Unknown.
-  * "Unknown encrypted poker game",                    198?, Unknown.
+  * "Super Double (French)",                           198?, Karateco.
   * "Good Luck! poker (Sisteme France)",               198?, Sisteme France.
+  * Mundial/Mondial (Italian/French),                  1987, Unknown.
   * Bonne Chance! (Golden Poker prequel HW, set 1),    198?, Unknown.
   * Bonne Chance! (Golden Poker prequel HW, set 2),    198?, Unknown.
   * Boa Sorte! (Golden Poker prequel HW),              198?, Unknown.
-  * Mundial/Mondial (Italian/French),                  1987, Unknown.
   * Super 98 (3-hands, ICP-1),                         199?, Unknown.
   * unknown rocket/animal-themed poker,                199?, Unknown.
   * Super 21,                                          1987, Public MNG.
@@ -158,6 +163,9 @@
   * Maxi Double Poker (version 1.8),                   1990, Blitz System Inc.
   * Wild Card (Olympic Games, v2.0),                   1989, Olympic Video Gaming PTY LTD.
   * Black jack (Olympic Games, v5.04, upgrade for WC), 1989, Olympic Video Gaming PTY LTD.
+
+
+  Total: 153 sets.
 
 
 ************************************************************************************
@@ -13227,7 +13235,7 @@ GAME(  1987, op5cards,  0,        op5cards, op5cards, goldnpkr_state, init_op5ca
 GAMEL( 198?, lespendu,  0,        lespendu, lespendu, goldnpkr_state, init_lespendu, ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #1)",      0,                layout_lespendu )
 GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
 
-GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Roulette (ICP-1 PCB)",                    0 )  // password protected
+GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Roulette (ICP-1 PCB)",                    0 )  // password protected
 
 /*************************************** SETS W/IRQ0 ***************************************/
 
