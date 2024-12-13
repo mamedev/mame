@@ -793,7 +793,7 @@ void pentevo_state::pentevo(machine_config &config)
 
 ROM_START( pentevo )
 	ROM_REGION(0x090000, "maincpu", ROMREGION_ERASEFF)
-	ROM_DEFAULT_BIOS("v0.59.13fe")
+	ROM_DEFAULT_BIOS("v0.59.13")
 
 	// http://svn.zxevo.ru/revision.php?repname=pentevo&path=%2From%2Fzxevo_fe.rom
 	ROM_SYSTEM_BIOS(0, "v0.59.02fe", "ERS v0.59.02 (FE), NEO-DOS v0.53")
