@@ -441,6 +441,7 @@ private:
 	void superxavix_crtc_2_w(offs_t offset, uint8_t data);
 	uint8_t superxavix_crtc_2_r(offs_t offset);
 
+	void superxavix_plt_flush_w(uint8_t data);
 	void superxavix_plt_dat_w(uint8_t data);
 	void superxavix_plt_loc_w(offs_t offset, uint8_t data);
 	uint8_t superxavix_plt_loc_r(offs_t offset);
@@ -562,6 +563,7 @@ private:
 	uint8_t m_superxavix_pal_index = 0;
 	uint8_t m_superxavix_bitmap_pal_index = 0;
 	uint32_t m_sx_plt_address = 0;
+	uint8_t m_sx_plt_mode = 0;
 
 	int16_t get_vectors(int which, int half);
 

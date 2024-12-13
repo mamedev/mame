@@ -133,10 +133,21 @@ uint8_t xavix_state::superxavix_crtc_2_r(offs_t offset)
 	return m_sx_crtc_2[offset];
 }
 
+void xavix_state::superxavix_plt_flush_w(uint8_t data)
+{
+	// flush current write buffer, maybe also set write mode?
+	logerror("%s: superxavix_plt_flush_w %02x\n", machine().describe_context(), data);
+	m_sx_plt_mode = data;
+}
+
+
 void xavix_state::superxavix_plt_dat_w(uint8_t data)
 {
-	uint32_t realaddress = m_sx_plt_address / 0x8;
+	uint32_t realaddress = m_sx_plt_address / 0x8; // it's a bit-offset?
+
+	//if (m_sx_plt_mode == 0x07) // maybe 8bpp, suprtvpc doesn't write the bad status bar or bad text with this, but suprtvpchk drawing breaks
 	m_maincpu->space(6).write_byte(realaddress & 0x7fffff, data);
+
 	m_sx_plt_address += 0x8;
 }
 

@@ -902,6 +902,7 @@ void xavix_state::machine_start()
 	save_item(NAME(m_superxavix_pal_index));
 	save_item(NAME(m_superxavix_bitmap_pal_index));
 	save_item(NAME(m_sx_plt_address));
+	save_item(NAME(m_sx_plt_mode));
 
 	save_item(NAME(m_sx_extended_extbus));
 }

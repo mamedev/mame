@@ -432,7 +432,7 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 	// map(0x6a40, 0x6a7f).ram().share("ext_segment_regs"); // 16x32 extended segment regs
 
 	 // bitmap plotter(!) (with auto-inc?) - used by super pc tv units
-	map(0x6f60, 0x6f60).nopw(); // writes here to flush plotter FIFO
+	map(0x6f60, 0x6f60).w(FUNC(xavix_state::superxavix_plt_flush_w)); // writes here to flush plotter FIFO
 	map(0x6f62, 0x6f62).w(FUNC(xavix_state::superxavix_plt_dat_w)); // writes plotter data here
 	// 0x6f63 can be used to read from bitmap?
 	map(0x6f64, 0x6f67).rw(FUNC(xavix_state::superxavix_plt_loc_r), FUNC(xavix_state::superxavix_plt_loc_w)).share("sx_plt_loc");
