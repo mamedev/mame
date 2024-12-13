@@ -190,13 +190,14 @@ void es9501_state::es9501(machine_config &config)
 }
 
 
-ROM_START( d9flower ) // Dream 9 Flower string, but images seem more Flower 9 Dream
+ROM_START( d9flower ) // Dream 9 Flower string, but images seem more Flower 9 Dream. No mask ROMs, only EPROMs
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "2.u33", 0x00000, 0x40000, CRC(a57ef10e) SHA1(89d46c80e03b21469f61ee021013e4be51ef882e) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "1.u31", 0x00001, 0x40000, CRC(fb6c1e72) SHA1(a03e9129c52c4587fb360f2f886bbd9983f49f05) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x280000, "gfx", ROMREGION_ERASE00 )
-	ROM_LOAD( "u4.u51", 0x000000, 0x080000, CRC(c2a06ed5) SHA1(ffb07982f9ad91ce28bf3eacb8deedcc957bbbc1) )
+	ROM_REGION( 0x200000, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "3.u50", 0x000000, 0x080000, CRC(0f1f8b61) SHA1(d33d73dcdbf06a84e6be28ac1c3273dd21d0ad17) )
+	ROM_LOAD( "4.u51", 0x080000, 0x080000, CRC(c2a06ed5) SHA1(ffb07982f9ad91ce28bf3eacb8deedcc957bbbc1) )
 
 	ROM_REGION( 0x200000, "ymz", ROMREGION_ERASE00 )
 	ROM_LOAD( "5.u23", 0x000000, 0x080000, CRC(b6ad2e58) SHA1(84c0cdc155f641d4e5d8ae99acbfa5b297762418) )
@@ -230,5 +231,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, d9flower, 0, es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System", "Dream 9 Flower (v1.00c)",   MACHINE_IS_SKELETON ) // or possibly Cadence Technology copyright
-GAME( 1997, specd9,   0, es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System", "Special Dream 9 (v1.0.5G)", MACHINE_IS_SKELETON )
+GAME( 1998, d9flower, 0, es9501, specd9, es9501_state, empty_init, ROT0, "Cadence Technology", "Dream 9 Flower (v1.00c)",   MACHINE_IS_SKELETON )
+GAME( 1997, specd9,   0, es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Special Dream 9 (v1.0.5G)", MACHINE_IS_SKELETON )
