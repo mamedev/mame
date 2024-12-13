@@ -12,7 +12,10 @@ is also presumed to be the same.
 Hardware notes:
 - PCB label: 100054
 - Hitachi HD6305Y0P @ ~8MHz (LC oscillator)
-- 8*8 chessboard buttons, 16+4 leds, piezo
+- 9*10 chessboard buttons, 19+4 leds, piezo
+
+Strangely enough, it doesn't use the HD6305 internal timer. The only peripherals
+it makes use of are the I/O ports.
 
 BTANB:
 - it uses 馬 and 車 for red horse and chariot instead of 傌 and 俥, newer Novag
