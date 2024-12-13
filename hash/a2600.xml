@@ -6186,6 +6186,47 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<!-- https://forums.atariage.com/topic/210515-new-2600-homebrews-heartbreak-fix-it-felix-sr-joy-ride/ -->
+	<software name="felixsr">
+		<description>Fix-It Felix Sr.</description>
+		<year>2013</year>
+		<publisher>Cybearg</publisher>
+		<info name="release" value="20130327"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="fix-it felix sr. (pal50).bin" size="4096" crc="4f066bc9" sha1="296d9c1ef7b214b863516822c7a38009559f3a2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="felixsre" cloneof="felixsr">
+		<description>Fix-It Felix Sr. (PAL)</description>
+		<year>2013</year>
+		<publisher>Cybearg</publisher>
+		<info name="release" value="20130327"/>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="fix-it felix sr. (pal50).bin" size="4096" crc="a0a88a0c" sha1="8942868cead351fffd1914fd52b523bdc774dace"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Is this meant for a console mod? -->
+	<software name="felixsrea" cloneof="felixsr" supported="no">
+		<description>Fix-It Felix Sr. (PAL60)</description>
+		<year>2013</year>
+		<publisher>Cybearg</publisher>
+		<info name="release" value="20130327"/>
+		<sharedfeat name="compatibility" value="PAL" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="fix-it felix sr. (pal60).bin" size="4096" crc="b0677067" sha1="5a258bdfdf1c72c7b74d1a90f7fb8f7a4d3f7cc7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="festival">
 		<description>Festival (PAL)</description>
 		<year>1983</year>
