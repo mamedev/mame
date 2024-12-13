@@ -2066,7 +2066,7 @@ void megasys1_bc_iomcu_state::system_B_iomcu(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::megasys1B_iomcu_map);
 	m_scantimer->set_callback(FUNC(megasys1_bc_iomcu_state::megasys1BC_iomcu_scanline));
 
-	TMP91640(config, m_iomcu, SYS_C_CPU_CLOCK); // Toshiba TMP91640, with 16Kbyte internal ROM, 512bytes internal RAM
+	TMP91640(config, m_iomcu, SYS_B_CPU_CLOCK); // Toshiba TMP91640, with 16Kbyte internal ROM, 512bytes internal RAM
 	m_iomcu->set_addrmap(AS_PROGRAM, &megasys1_bc_iomcu_state::iomcu_map);
 	m_iomcu->port_read<1>().set(FUNC(megasys1_bc_iomcu_state::mcu_port1_r));
 	m_iomcu->port_write<2>().set(FUNC(megasys1_bc_iomcu_state::mcu_port2_w));
