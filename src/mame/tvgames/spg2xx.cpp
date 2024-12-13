@@ -2098,6 +2098,7 @@ void spg2xx_game_prail_state::prail(machine_config &config)
 
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_prail_state::prail_portb_w));
 
+	// TODO: this is not currently hooked up, it's used to store the unlock states for the gallery
 	I2C_24C02(config, "i2cmem", 0); // ATMLH13402C (24C02 compatible)
 }
 
