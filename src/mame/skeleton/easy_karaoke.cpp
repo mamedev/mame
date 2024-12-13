@@ -77,6 +77,15 @@
     "Karaoke TV Star" appears to be a US product using this technology - advertises 50 built in songs, but
     also a downloadable service.  It has a 2002 date on the box / product.  Another version offers 35 songs
 
+    ------------------
+
+	For units which allow downloadable songs the only difference in the bootloader ROMs is a couple of bytes
+	at the end.  This may be used as security, to tie the downloads stored in the flash ROM to the units as
+	the format of the downloaded data in the flash ROMs appears to be different in each case, starting with
+	different unique bytes after the header information for each unit we've seen. (maybe encryption?)
+	The bootloader ROM has a unique ID on a sticker in each case too (could be a bytesum, haven't checked)
+
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -521,8 +530,57 @@ ROM_START( bkarast )
 	ROM_LOAD16_WORD_SWAP( "sst37vf010.u9", 0x000000, 0x20000, CRC(a7c69fbb) SHA1(28ef698e63e76d9461b71649e4ee9c8f252f82e2) ) // bootloader
 
 	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
-	ROM_LOAD( "tc58v64bft_withspare.u8", 0x000000, 0x840000, CRC(7770996a) SHA1(cb6df756f88c1f5ff4bd202e7758586c03aff00e) )
+	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(7770996a) SHA1(cb6df756f88c1f5ff4bd202e7758586c03aff00e) )
 ROM_END
+
+ROM_START( bkarasta )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "1ed041.u9", 0x000000, 0x20000, CRC(b6a9c84b) SHA1(062b44dfbbf1dcbc40aa86ab0836fc19c6bddcd5) ) // bootloader
+
+	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
+	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(50ff920d) SHA1(421850df09d7f407291de31102ebcdfc69da1872) )
+ROM_END
+
+ROM_START( bkarastb )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "1f2aea.u9", 0x000000, 0x20000, CRC(4001da51) SHA1(3b3a7cc08d8a30b6b8a422c108d71cb34b0c0b3a) ) // bootloader
+
+	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
+	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(a7e8ae4f) SHA1(69cc81c574a47c9b1e8c6570b6d3f1144ec99168) )
+ROM_END
+
+ROM_START( bkarastc )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "1f260f.u9", 0x000000, 0x20000, CRC(a8ba923f) SHA1(79295b4508b02d9db2dd38b785693146c5be34f2) ) // bootloader
+
+	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
+	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(34cafa82) SHA1(4c3970a996c06398d11ada88fa412e0e66ebf509) )
+ROM_END
+
+ROM_START( bkarastd )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "1f2589.u9", 0x000000, 0x20000, CRC(62cec581) SHA1(c7737be096805565db53ab668089296efb4a8984) ) // bootloader
+
+	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
+	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(491578a4) SHA1(e20be74daa83fce5dcd5d90822de73f98b7d25d5) )
+ROM_END
+
+ROM_START( bkaraste )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "1f4808.u9", 0x000000, 0x20000, CRC(77244cac) SHA1(17b8db2d94a0f83a175d6ad8ce8ffd31ebb8500b) ) // bootloader
+
+	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
+	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(6b3985f3) SHA1(8dda8ece164d6cbad99f6f6cfde5a714c7271e1f) )
+ROM_END
+
+ROM_START( bkarastf )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "200cc8.u9", 0x000000, 0x20000, CRC(2e24ad8a) SHA1(64e4b7756c1a8818f8c445286f63113f6b5c61c6) ) // bootloader
+
+	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
+	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(4d300ac8) SHA1(afec80f68265e1cd81de6024be4b744acf9a2d3c) )
+ROM_END
+
 
 /*
 The 'easykara' set has the following 10 songs built in.
@@ -735,7 +793,14 @@ CONS( 2002, karatvsta,     karatvst,       0,      ivl_karaoke_base, ivl_karaoke
 CONS( 2002, mks4001,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Memorex license)", "Star Singer Karaoke (MKS4001)", MACHINE_IS_SKELETON ) // 50 songs built in, appears to have around 54 downloads, including a test download
 
 // Bandai's Japanese release also lacks a cartridge slot, relying on downloads for additional songs. It also comes with a CD containing the PC-side software.  The external microphone design differs slightly.
-CONS( 2002, bkarast,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan)", MACHINE_IS_SKELETON )
+CONS( 2002, bkarast,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 1)", MACHINE_IS_SKELETON )
+CONS( 2002, bkarasta,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 2)", MACHINE_IS_SKELETON )
+CONS( 2002, bkarastb,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 3)", MACHINE_IS_SKELETON )
+CONS( 2002, bkarastc,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 4)", MACHINE_IS_SKELETON )
+CONS( 2002, bkarastd,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 5)", MACHINE_IS_SKELETON )
+CONS( 2002, bkaraste,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 6)", MACHINE_IS_SKELETON )
+// this set has no downloaded data (or session data) suggesting it hasn't been used, the headers on the 3 songs that are included are different from the above sets however, so these themed units are likely different from factory 
+CONS( 2002, bkarastf,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station 'For Girls' (Japan)", MACHINE_IS_SKELETON )
 
 // The European releases take cartridges rather than relying on a download service
 CONS( 2004, easykara,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_IS_SKELETON )
