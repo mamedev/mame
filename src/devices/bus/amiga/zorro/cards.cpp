@@ -17,6 +17,7 @@
 #include "action_replay.h"
 #include "buddha.h"
 #include "ripple.h"
+#include "toccata.h"
 
 
 void a1000_expansion_cards(device_slot_interface &device)
@@ -47,6 +48,7 @@ void zorro2_cards(device_slot_interface &device)
 	device.option_add("a2232", ZORRO_A2232);
 	device.option_add("buddha", ZORRO_BUDDHA);
 	device.option_add("ripple", ZORRO_RIPPLE);
+	device.option_add("toccata", ZORRO_TOCCATA);
 }
 
 void zorro3_cards(device_slot_interface &device)
@@ -58,4 +60,5 @@ void zorro3_cards(device_slot_interface &device)
 	device.option_add("a2232", ZORRO_A2232);
 	device.option_add("buddha", ZORRO_BUDDHA);
 	device.option_add("ripple", ZORRO_RIPPLE);
+	device.option_add("toccata", ZORRO_TOCCATA);
 }
