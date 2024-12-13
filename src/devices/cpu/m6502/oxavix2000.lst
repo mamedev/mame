@@ -482,7 +482,7 @@ asr_abx
 	prefetch();
 
 cmc_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	logerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc();
 	prefetch();
 

@@ -6,15 +6,23 @@ authors:hap
 <mamelayout version="2">
 	<element name="overlay">
 		<rect>
-			<bounds left="0" top="0" right="216" bottom="65" />
-			<color red="0.2" green="0.6" blue="1" />
+			<bounds left="0" top="0" right="216" bottom="33" />
+			<color red="1" green="0.2" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds left="0" top="32" right="216" bottom="65" />
+			<color red="0.2" green="1.0" blue="0.2" />
 		</rect>
 		<rect>
 			<bounds left="0" top="64" right="216" bottom="193" />
 			<color red="1" green="1" blue="0.2" />
 		</rect>
 		<rect>
-			<bounds left="0" top="192" right="216" bottom="256" />
+			<bounds left="0" top="192" right="216" bottom="225" />
+			<color red="0.2" green="1.0" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds left="0" top="224" right="216" bottom="256" />
 			<color red="1" green="0.2" blue="0.2" />
 		</rect>
 	</element>

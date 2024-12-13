@@ -1866,10 +1866,10 @@ void jaguar_state::jaguar(machine_config &config)
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg").set_load_callback(FUNC(jaguar_state::quickload_cb));
+	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg,rom", attotime::from_seconds(1)).set_load_callback(FUNC(jaguar_state::quickload_cb));
 
 	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "jaguar_cart", "j64,rom,bin"));
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "jaguar_cart", "j64"));
 	cartslot.set_device_load(FUNC(jaguar_state::cart_load));
 
 	/* software lists */
@@ -1923,14 +1923,13 @@ void jaguarcd_state::init_jaguarcd()
 
 std::pair<std::error_condition, std::string> jaguar_state::quickload_cb(snapshot_image_device &image)
 {
-	offs_t quickload_begin = 0x4000, start = quickload_begin, skip = 0;
+	offs_t quickload_begin = 0x1000, start = 0x4000, skip = 0;
 
-	memset(m_shared_ram, 0, 0x200000);
-	offs_t quickload_size = std::min(offs_t(image.length()), 0x200000 - quickload_begin);
+	offs_t quickload_size = std::min(offs_t(image.length()), 0x20000 - start);
 
-	image.fread( &memregion("maincpu")->base()[quickload_begin], quickload_size);
+	image.fread( &m_shared_ram[quickload_begin], quickload_size);
 
-	fix_endian(&memregion("maincpu")->base()[quickload_begin], quickload_size);
+	fix_endian(&m_shared_ram[quickload_begin], quickload_size);
 
 	/* Deal with some of the numerous homebrew header systems */
 		/* COF */
@@ -1966,18 +1965,29 @@ std::pair<std::error_condition, std::string> jaguar_state::quickload_cb(snapshot
 	else    /* JAG binary */
 	if (image.is_filetype("jag"))
 		start = 0x5000;
+	else
+	if (image.is_filetype("rom"))
+		start = 0x802000;
 
+	quickload_size = image.length();
 
 	/* Now that we have the info, reload the file */
-	if ((start != quickload_begin) || (skip))
+	if ((start + quickload_size) < 0x200000)
 	{
 		memset(m_shared_ram, 0, 0x200000);
-		image.fseek(0, SEEK_SET);
-		image.fread( &m_shared_ram[(start-skip)/4], quickload_size);
-		quickload_begin = start;
-		fix_endian(&memregion("maincpu")->base()[(start-skip)&0xfffffc], quickload_size);
+		image.fseek(skip, SEEK_SET);
+		image.fread( &m_shared_ram[start/4], quickload_size-skip);
+		fix_endian(&m_shared_ram[start/4], quickload_size-skip);
 	}
-
+	else
+	if (start >= 0x800000)
+	{
+		image.fseek(skip, SEEK_SET);
+		image.fread( &m_cart_base[(start - 0x800000) / 4], quickload_size - skip);
+		fix_endian(&m_cart_base[(start - 0x800000) / 4], quickload_size - skip);
+	}
+	else
+		return std::make_pair(image_error::UNSUPPORTED, "Unsupported start address for this quickload.");
 
 	/* Some programs are too lazy to set a stack pointer */
 	m_maincpu->set_state_int(M68K_SP, 0x1000);
@@ -1996,13 +2006,6 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state::cart_load )
 	if (!image.loaded_through_softlist())
 	{
 		size = image.length();
-
-		/* .rom files load & run at 802000 */
-		if (image.is_filetype("rom"))
-		{
-			load_offset = 0x2000;             // fix load address
-			m_cart_base[0x101] = 0x802000;    // fix exec address
-		}
 
 		/* Load cart into memory */
 		image.fread(&m_cart_base[load_offset/4], size);

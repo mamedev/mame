@@ -1065,6 +1065,7 @@ cgold2                          //
 cgold2a                         //
 clkwise                         //
 coralr2                         //
+dblagent                        //
 eforest                         //
 eforestnz                       //
 eforestu                        //
@@ -17525,6 +17526,7 @@ hanakanz                        // "507" (c) 1996 Dynax
 hginga                          // "81" (c) 1994 Dynax
 hgokbang                        // "116" (c) 1995 Dynax
 hgokou                          // "108" (c) 1995 Dynax (Alba license)
+hgokoua                         // "108" (c) 1995 Dynax (Alba license)
 hkagerou                        // "510" Hana Kagerou 1996 Nakanihon
 hparadis                        // "101" (c) 1994 Nakanihon
 htengoku                        // "65" (c) 1992 Dynax
@@ -17933,6 +17935,9 @@ rpanic                          // (c) 1992 Excellent System / Jaleco
 @source:excellent/dblcrown.cpp
 dblcrown                        // (c) 1994 Excellent System
 
+@source:excellent/es9501.cpp
+specd9
+
 @source:excellent/gcpinbal.cpp
 gcpinbal                        // (c) 1994 Excellent System
 pwrflip                         // (c) 1994 Excellent System
@@ -17942,6 +17947,7 @@ fever13                         // (c) 1995 Excellent System
 lastbank                        // (c) 1994 Excellent System
 mir7hg                          // (c) 1996 Excellent System
 ukiyobox                        // (c) 1995 Excellent System
+wcircus                         // (c) 199? Cobra
 
 @source:excellent/witch.cpp
 keirinou                        // (c) 1987 Excellent System
@@ -20099,6 +20105,7 @@ poker21
 @source:igs/goldstar.cpp
 3cdpoker                        // hack?
 3cdpokera                       // hack?
+amaztsk                         //
 animalhs                        // (c) 1991 Suns Co Ltd.
 animalhsa                       // (c) 1991 Suns Co Ltd.
 animalhsb                       // bootleg
@@ -20171,6 +20178,7 @@ crazybonb                       // (c) 199? unknown
 eldoradd                        // (c) 1991 Dyna Electronics
 eldoraddo                       // (c) 1991 Dyna Electronics
 eldoraddoa                      // (c) 1991 Dyna Electronics
+eldoraddob                      // (c) 1991 Dyna Electronics
 fb2010                          // (c) 2009 Amcoe
 fl7_3121                        // (c) 199? Cyberdyne Systems, Inc.
 fl7_50                          // (c) 199? Cyberdyne Systems, Inc.
@@ -20181,6 +20189,7 @@ fl7_tw                          // Taiwanese Hardware.
 goldfrui                        // bootleg
 goldstar                        // (c) 198? IGS
 goldstbl                        // (c) 198? IGS
+halltsk                         //
 hamhouse                        // bootleg
 hamhouse9                       // bootleg
 jkrmast                         // (c) 199? unknown
@@ -30622,6 +30631,7 @@ goldnpkf                        // Intercoast (bootleg)
 goldnpkg                        // Bootleg
 goldnpkr                        // (c) 1981 Bonanza
 goodluck                        // Unknown
+icproul                         // bootleg?
 jkrbonus                        // bootleg?
 jokercar                        // 199?, unknown
 lespendu                        // (c) 198? Voyageur de L'Espace Inc.
@@ -46186,6 +46196,7 @@ tvpc_tom
 ltv_naru                        //
 domfitad                        //
 dombikec                        //
+epo_dabj
 
 @source:tvgames/xavix_2000.cpp
 ban_omt                         //
@@ -46208,6 +46219,8 @@ ttv_sw                          //
 ttv_swj                         //
 
 @source:tvgames/xavix_2002.cpp
+ban_kksj
+ban_ordj
 domdance                        //
 domfitch                        //
 domfitex                        //
@@ -46217,6 +46230,7 @@ mrangbat
 suprtvpc
 suprtvpcdo
 suprtvpchk
+tmy_rkmj
 tmy_thom                        //
 udance
 xavaero                         //
