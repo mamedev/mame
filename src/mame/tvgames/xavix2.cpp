@@ -4,7 +4,7 @@
 
     XaviX 2
 
-    unknown architecture, does not appear to be 6502 derived like XaviX / SuperXaviX
+    RISC-like architecture, not 6502-derived like XaviX / SuperXaviX
 
     die is marked  "SSD 2002-2004 NEC 800208-51"
 
@@ -12,12 +12,14 @@
 
 #include "emu.h"
 
-#include "screen.h"
-#include "emupal.h"
-#include "softlist.h"
-#include "speaker.h"
 #include "cpu/xavix2/xavix2.h"
 #include "machine/i2cmem.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 #include <algorithm>
 
 
@@ -125,7 +127,7 @@ protected:
 
 	void pio_mode_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 pio_mode_r(offs_t offset);
-	virtual void pio_update() = 0;
+	virtual void pio_update();
 	void pio_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 pio_r();
 
@@ -491,6 +493,10 @@ u32 xavix2_state::pio_mode_r(offs_t offset)
 	return m_pio_mode[offset];
 }
 
+void xavix2_state::pio_update()
+{
+}
+
 void naruto_state::pio_update()
 {
 	if (BIT(m_pio_mask_out, 21))
@@ -705,6 +711,10 @@ static INPUT_PORTS_START(domyos)
 	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_BUTTON16) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dabj )
+	PORT_START("pio")
+INPUT_PORTS_END
+
 void xavix2_state::config(machine_config &config)
 {
 	// unknown CPU 'SSD 2002-2004 NEC 800208-51'
@@ -745,6 +755,11 @@ ROM_START( ltv_naru )
 	ROM_LOAD( "naruto.bin", 0x000000, 0x800000, CRC(e3465ad2) SHA1(13e3d2de5d5a084635cab158f3639a1ea73265dc) )
 ROM_END
 
+ROM_START( epo_dabj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "dabj.u3", 0x000000, 0x800000, CRC(9ebc1384) SHA1(38abaebd05bc9ab300ee5fbf37bd88ce9cbd20e1) )
+ROM_END
+
 ROM_START( domfitad )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpfitnessadventure.bin", 0x000000, 0x1000000, CRC(a7917081) SHA1(95ae5dc6e64a78ae060cb0e61d8b0af34a93c4ce) )
@@ -758,7 +773,10 @@ ROM_END
 } // anonymous namespace
 
 // Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本
-CONS( 2006, ltv_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Naruto", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ltv_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Naruto (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// テレビであそぼう!まなぼう! 超脳力あいうえお図鑑
+CONS( 2006, epo_dabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "TV de Asobou! Manabou! Chou Nouryoku AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
 

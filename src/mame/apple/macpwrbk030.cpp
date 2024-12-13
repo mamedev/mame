@@ -595,6 +595,7 @@ u16 macpb030_state::pangola_r()
 void macpb030_state::pangola_w(u16 data)
 {
 	m_pangola_data = data;
+	// TODO: trace pins, 0x13 -> 0x17 -> 0x16 sequence written before waking up VGA core
 }
 
 u8 macpb030_state::pangola_vram_r(offs_t offset)
@@ -1257,9 +1258,13 @@ void macpb030_state::macpb165c_map(address_map &map)
 	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder
 	map(0x50f80000, 0x50fbffff).rw(FUNC(macpb030_state::niagra_r), FUNC(macpb030_state::niagra_w));
 
-	// on-board color video on 165c/180c
+	// on-board color video on 165c/180c, presumably under ISA bus
 	map(0xfc000000, 0xfc07ffff).rw(FUNC(macpb030_state::pangola_vram_r), FUNC(macpb030_state::pangola_vram_w)).mirror(0x00380000);
+//  map(0xfc400102, 0xfc400102).w(wd90c26_vga_device::wakeup_w));
 	map(0xfc4003b0, 0xfc4003df).m(m_vga, FUNC(wd90c26_vga_device::io_map));
+	// TODO: trace $3d0 writes (doesn't belong to WD90C26 core, RAMDAC overlay?)
+	map(0xfc4046e8, 0xfc4046e8).mirror(0x3000).w(m_vga, FUNC(wd90c26_vga_device::mode_setup_w));
+
 	map(0xfc800000, 0xfc800003).rw(FUNC(macpb030_state::pangola_r), FUNC(macpb030_state::pangola_w));
 	map(0xfcff8000, 0xfcffffff).rom().region("vrom", 0x0000);
 
@@ -1521,6 +1526,7 @@ void macpb030_state::macpb165c(machine_config &config)
 	m_screen->set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	m_screen->set_screen_update(FUNC(macpb030_state::screen_update_vga));
 	m_screen->set_no_palette();
+	m_screen->set_type(SCREEN_TYPE_LCD);
 
 	WD90C26(config, m_vga, 0);
 	m_vga->set_screen(m_screen);

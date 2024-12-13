@@ -76,6 +76,7 @@ void a2_video_device::device_start()
 	save_item(NAME(m_GSbg));
 	save_item(NAME(m_GSborder));
 	save_item(NAME(m_newvideo));
+	save_item(NAME(m_GS_langsel));
 	save_item(NAME(m_monochrome));
 	save_item(NAME(m_rgbmode));
 	save_item(NAME(m_shr_palette));
@@ -387,10 +388,6 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 				}
 			}
 		}
-		else if (Model == model::IIGS)
-		{
-			code |= 0x100;
-		}
 		else
 		{
 			if ((code >= 0x60) && (code <= 0x7f))
@@ -402,6 +399,10 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 		if (Model == model::IIE)
 		{
 			code |= get_iie_langsw() * 0x100;
+		}
+		else if (Model == model::IIGS)
+		{
+			code |= get_GS_language() * 0x100;
 		}
 	}
 	else    // original II and II Plus

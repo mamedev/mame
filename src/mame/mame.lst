@@ -58,241 +58,256 @@ acrnsys5                        // 1982 Acorn System 5
 acrnsys1                        // 1979 Acorn System 1 (Microcomputer Kit)
 
 @source:acorn/aristmk5.cpp
-aristmk5                        // (c) 1995, USA platform set chips
-adonis                          // (c) 1998
-adonisa                         // (c) 1998
-adonisu                         // (c) 2001
-adonisce                        // (c) 1999
-alchemst                        // (c) 2002
-baddog                          // (c) 1996
-blackpnt                        // (c) 1996
-bootsctn                        // (c) 1998
-bootsctnu                       // (c) 1999
-bootsctnua                      // (c) 1999
-bootsctnub                      // (c) 1999
-bparty                          // (c) 2000
-bpartya                         // (c) 2000
-bumblbug                        // (c) 1996
-bumblbugq                       // (c) 1996
-bumblbugu                       // (c) 1997
-bumblbugua                      // (c) 1997
-buttdeli                        // (c) 1995
-canrose                         // (c) 1996
-cashcat                         // (c) 1998
-cashcata                        // (c) 1997
-cashcatnz                       // (c) 1999
-cashcham                        // (c) 1997
-cashchamu                       // (c) 1996
-cashchama                       // (c) 1998
-cashchamnz                      // (c) 1998
-cashcra5                        // (c) 1997
-cashcra5a                       // (c) 1997
-chariotc                        // (c) 1998
-chariotcpe                      // (c) 1998
-checkma5                        // (c) 2001
-chickna5                        // (c) 1996
-chickna5q                       // (c) 1998
-chickna5u                       // (c) 1998
-chickna5ua                      // (c) 1998
-chickna5v                       // (c) 1996
-coralrc2                        // (c) 1998
-cuckoo                          // (c) 1998
-cuckoou                         // (c) 2000
-dstbloom                        // (c) 1995
-dstblooma                       // (c) 1995
-diamdest                        // (c) 2000
-diamdove                        // (c) 1999
-dmdfever                        // (c) 1996
-dimtouch                        // (c) 1997
-dolphntr                        // (c) 1996
-dolphntra                       // (c) 1996
-dolphntrb                       // (c) 1996
-dolphntrce                      // (c) 1999
-dolphntrcea                     // (c) 1999
-dolphntrceb                     // (c) 1999
-dolphntrq                       // (c) 2000
-dolphntru                       // (c) 1996
-dreamwv                         // (c) 1997
-drgneye                         // (c) 1997
-dynajack                        // (c) 2000
-dynajacku                       // (c) 2001
-eldorda5                        // (c) 1998
-eforsta5                        // (c) 1995
-eforsta5ce                      // (c) 2000
-eforsta5cea                     // (c) 2000
-eforsta5u                       // (c) 1997
-eforsta5ua                      // (c) 1997
-fastfort                        // (c) 1998
-fortellr                        // (c) 2000
-fortfvr                         // (c) 2001
-gambler                         // (c) 1998
-geisha                          // (c) 2001
-genmagi                         // (c) 1999
-glizrdce                        // (c) 2001
-gnomeatw                        // (c) 1998
-goldpyr                         // (c) 1997
-goldpyra                        // (c) 1997
-goldpyrb                        // (c) 1998
-goldenra                        // (c) 2000
-honeypot                        // (c) 2000
-hnktonku                        // (c) 2001
-hrtthrob                        // (c) 2006
-incasun                         // (c) 1999
-incasunsp                       // (c) 1999
-incasunnz                       // (c) 2000
-incasunv                        // (c) 1999
-incasunu                        // (c) 2000
-incasunua                       // (c) 2000
-indrema5                        // (c) 1998
-indrema5q                       // (c) 2000
-indrema5v                       // (c) 1998
-jumpbean                        // (c) 1996
-jumpjoey                        // (c) 1996
-jungjuic                        // (c) 1996
-kgalah                          // (c) 1995
-kgalaha                         // (c) 1995
-kgalahce                        // (c) 2001
-kgbirda5                        // (c) 1994
-koalamnt                        // (c) 2001
-kookabuk                        // (c) 1998
-kyhatonu                        // (c) 2000
-locoloot                        // (c) 1997
-locoloota                       // (c) 1997
-locolootnz                      // (c) 1998
-locolootq                       // (c) 1997
-locolootu                       // (c) 2001
-lonewolf                        // (c) 1997
-luckyclo                        // (c) 1995
-mgarden                         // (c) 1997
-magimask                        // (c) 2000
-magimaska                       // (c) 2000
-magimaskb                       // (c) 2000
-magtcha5                        // (c) 1997
-magtcha5a                       // (c) 1997
-mammothm                        // (c) 1997
-marmagic                        // (c) 2000
-marmagicu                       // (c) 2000
-marmagicua                      // (c) 2000
-minemine                        // (c) 1996
-minemineu                       // (c) 1996
-minemineua                      // (c) 1996
-monmouse                        // (c) 1997
-monmousea                       // (c) 1997
-montree                         // (c) 2001
-mountmon                        // (c) 1996
-mountmona                       // (c) 1996
-mountmonce                      // (c) 2001
-mountmonu                       // (c) 2001
-mountmonua                      // (c) 2001
-multidrw                        // (c) 2000
-mystgard                        // (c) 1996
-one4all                         // (c) 2001
-orchidms                        // (c) 1999
-orchidmsa                       // (c) 1999
-orchidmsnz                      // (c) 2000
-oscara5                         // (c) 1996
-oscara5a                        // (c) 1996
-pantmag                         // (c) 1999
-pantmaga                        // (c) 1999
-partygrs                        // (c) 2001
-partygrsa                       // (c) 2001
-partygrsb                       // (c) 2001
-peaflut                         // (c) 2000
-peafluta                        // (c) 2000
-pengpay                         // (c) 1997
-pengpaya                        // (c) 1996
-pengpayb                        // (c) 1997
-pengpayc                        // (c) 1995
-pengpayce                       // (c) 2001
-pengpayd                        // (c) 1995
-pengpayu                        // (c) 1997
-pengpayua                       // (c) 1997
-pengpayub                       // (c) 1997
-pengpuck                        // (c) 2001
-penpir                          // (c) 1998
-penpira                         // (c) 1998
-penpir2                         // (c) 1998
-petshop                         // (c) 1998
-petshopa                        // (c) 1998
-phantpay                        // (c) 1995
-phantpyc                        // (c) 2000
-przfight                        // (c) 1996
-qcash                           // (c) 1998
-qnile                           // (c) 1997
-qnilea                          // (c) 1997
-qnileb                          // (c) 1997
-qnilebr                         // (c) 2002
-qnilec                          // (c) 1997
-qnilece                         // (c) 2001
-qnilecea                        // (c) 2001
-qnileceb                        // (c) 2001
-qniled                          // (c) 1999
-qnilefl                         // (c) 2001
-qnilemax                        // (c) 1999
-qnilenl                         // (c) 2000
-qnilenz                         // (c) 1998
-qnilepe                         // (c) 1997
-qnileq                          // (c) 1999
-qnileu                          // (c) 1997
-qnileua                         // (c) 1997
-qtbird                          // (c) 1994
-rainwarr                        // (c) 2001
-rainwarrce                      // (c) 2001
-reelpwr                         // (c) 1996
-reelrock                        // (c) 1998
-reelrockq                       // (c) 2000
-retrsam                         // (c) 1997
-retrsama                        // (c) 1997
-retrsamb                        // (c) 1997
-rushrst                         // (c) 1997
-sbuk2                           // (c) 1999
-sbuk2a                          // (c) 1995
-sbuk3                           // (c) 1998
-sbuk3a                          // (c) 1998
-sldeluxe                        // (c) 2001
-slvrwolf                        // (c) 1998
-snowcat                         // (c) 1996
-sumospin                        // (c) 1997
-swhr2                           // (c) 1995
-swhr2a                          // (c) 1995
-swhr2q                          // (c) 1996
-swhr2u                          // (c) 1998
-swhr2v                          // (c) 1995
-thndh                           // (c) 1996
-thndha                          // (c) 1996
-thor                            // (c) 1996
-topbana                         // (c) 1997
-toutango                        // (c) 1998
-toutangonl                      // (c) 1999
-trstrove                        // (c) 2000
-tritreat                        // (c) 2002
-trojhors                        // (c) 2001
-trpdlght                        // (c) 1996
-trpdlghtu                       // (c) 1997
-unicornd                        // (c) 1998
-unicornda                       // (c) 1998
-unicorndnz                      // (c) 2000
-unicorndu                       // (c) 2001
-venicea5                        // (c) 2002
-wafricau                        // (c) 2001
-wamazon                         // (c) 1996
-wamazona                        // (c) 1996
-wamazonv                        // (c) 1996
-wikwin                          // (c) 1997
-wildbill                        // (c) 1996
-wldangel                        // (c) 1996
-wcougar                         // (c) 1996
-wcougaru                        // (c) 1997
-wcougarua                       // (c) 1997
-wcougarub                       // (c) 1997
-wcougaruc                       // (c) 1997
-wcoyote                         // (c) 2001
-wizways                         // (c) 1996
-wnpost                          // (c) 1997
-wthing                          // (c) 1999
-wthinga                         // (c) 2000
-wtiger                          // (c) 1999
-yukongl5                        // (c) 2000
+adonis                          //
+adonisa                         //
+adonisce                        //
+adonisu                         //
+alchemst                        //
+aristmk5                        // USA platform set chips
+baddog                          //
+blackpnt                        //
+blackpntu                       //
+bootsctn                        //
+bootsctnu                       //
+bootsctnua                      //
+bootsctnub                      //
+bootsctnuc                      //
+bootsctnud                      //
+bparty                          //
+bpartya                         //
+bpartyb                         //
+bumblbug                        //
+bumblbugq                       //
+bumblbugu                       //
+bumblbugua                      //
+bumblbugub                      //
+buttdeli                        //
+canrose                         //
+cashcat                         //
+cashcata                        //
+cashcatnz                       //
+cashcham                        //
+cashchama                       //
+cashchamnz                      //
+cashchamu                       //
+cashcra5                        //
+cashcra5a                       //
+chariotc                        //
+chariotcpe                      //
+chariotcu                       //
+checkma5                        //
+chickna5                        //
+chickna5q                       //
+chickna5u                       //
+chickna5ua                      //
+chickna5v                       //
+coralrc2                        //
+cuckoo                          //
+cuckoou                         //
+diamdest                        //
+diamdove                        //
+dimtouch                        //
+dmdfever                        //
+dolphntr                        //
+dolphntra                       //
+dolphntrb                       //
+dolphntrce                      //
+dolphntrcea                     //
+dolphntrceb                     //
+dolphntrq                       //
+dolphntru                       //
+dolphntrua                      //
+dreamwv                         //
+drgneye                         //
+dstbloom                        //
+dstblooma                       //
+dynajack                        //
+dynajacku                       //
+eforsta5                        //
+eforsta5u                       //
+eforsta5ua                      //
+eforstce                        //
+eforstcea                       //
+eldorda5                        //
+fastfort                        //
+fortellr                        //
+fortfvr                         //
+gamblra5                        //
+geisha                          //
+genmagi                         //
+glizrdce                        //
+gnomeatw                        //
+goldenra                        //
+goldpyr                         //
+goldpyru                        //
+goldpyrua                       //
+honeypot                        //
+honktonk                        //
+hrtthrob                        //
+incasun                         //
+incasunnz                       //
+incasunsp                       //
+incasunu                        //
+incasunua                       //
+incasunv                        //
+indrema5                        //
+indrema5q                       //
+indrema5v                       //
+jumpbean                        //
+jumpjoey                        //
+jumpjoeyu                       //
+jungjuic                        //
+kgalah                          //
+kgalaha                         //
+kgalahce                        //
+kgbirda5                        //
+koalamnt                        //
+kookabuk                        //
+kyhaton                         //
+locoloot                        //
+locoloota                       //
+locolootnz                      //
+locolootq                       //
+locolootu                       //
+lonewolf                        //
+luckyclo                        //
+magimask                        //
+magimaska                       //
+magimaskb                       //
+magimaskc                       //
+magtcha5                        //
+magtcha5a                       //
+mammothm                        //
+marmagic                        //
+marmagicu                       //
+marmagicua                      //
+mgarden                         //
+mgardena                        //
+minemine                        //
+minemineu                       //
+minemineua                      //
+minemineub                      //
+monmouse                        //
+monmousea                       //
+montree                         //
+mountmon                        //
+mountmona                       //
+mountmonce                      //
+mountmonu                       //
+mountmonua                      //
+multidrw                        //
+mystgard                        //
+one4all                         //
+orchidms                        //
+orchidmsa                       //
+orchidmsnz                      //
+oscara5                         //
+oscara5a                        //
+pantmag                         //
+pantmaga                        //
+partygrs                        //
+partygrsa                       //
+partygrsb                       //
+peaflut                         //
+peafluta                        //
+pengpay                         //
+pengpaya                        //
+pengpayb                        //
+pengpayc                        //
+pengpayce                       //
+pengpaycea                      //
+pengpayd                        //
+pengpaydx                       //
+pengpayu                        //
+pengpayua                       //
+pengpayub                       //
+pengpuck                        //
+penpir                          //
+penpir2                         //
+penpira                         //
+petshop                         //
+petshopa                        //
+phantpay                        //
+phantpyc                        //
+przfight                        //
+qcash                           //
+qnile                           //
+qnilea                          //
+qnileb                          //
+qnilebr                         //
+qnilec                          //
+qnilece                         //
+qnilecea                        //
+qnileceb                        //
+qniled                          //
+qnilefl                         //
+qnilemax                        //
+qnilenl                         //
+qnilenz                         //
+qnilepe                         //
+qnileq                          //
+qnileu                          //
+qnileua                         //
+qtbird                          //
+rainwarr                        //
+rainwarrce                      //
+reelpwr                         //
+reelrock                        //
+reelrockq                       //
+retrsam                         //
+retrsama                        //
+retrsamb                        //
+rushrst                         //
+sbuk2                           //
+sbuk2a                          //
+sbuk3                           //
+sbuk3a                          //
+sldeluxe                        //
+slvrwolf                        //
+snowcat                         //
+sumospin                        //
+swhr2                           //
+swhr2a                          //
+swhr2q                          //
+swhr2u                          //
+swhr2v                          //
+thndh                           //
+thndha                          //
+thor                            //
+topbana                         //
+toutango                        //
+toutangonl                      //
+tritreat                        //
+trojhors                        //
+trpdlght                        //
+trpdlghtu                       //
+trstrove                        //
+unicornd                        //
+unicornda                       //
+unicorndnz                      //
+unicorndu                       //
+venicea5                        //
+wafrica                         //
+wamazon                         //
+wamazona                        //
+wamazonv                        //
+wcougar                         //
+wcougaru                        //
+wcougarua                       //
+wcougarub                       //
+wcougaruc                       //
+wcougarud                       //
+wcoyote                         //
+wikwin                          //
+wildbill                        //
+wizways                         //
+wldangel                        //
+wldangelu                       //
+wnpost                          //
+wthing                          //
+wthinga                         //
+wtigerc                         //
+yukongl5                        //
 
 @source:acorn/atom.cpp
 atom                            // 1979 Acorn Atom
@@ -1036,375 +1051,387 @@ tvg2000                         // Schmid TVG 2000
 vdmaster                        // Video Master
 
 @source:aristocrat/aristmk4.cpp
-3bagflnz                        // (c) 1996
-3bagflvt                        // (c) 1996
-86lions                         // (c) 1985?
-arcwins                         // (c) 1996
-autmoon                         // (c) 1999
-blkrhino                        // (c) 1995
-blkrhinonz                      // (c) 1996
-cgold                           // (c) 1986 Ainsworth Nominees P.L.
-cgold2                          // (c) 1995
-clkwise                         // (c) 1986 Ainsworth Nominees P.L.
-coralr2                         // (c) 2000
-eforest                         // (c) 1995
-eforestnz                       // (c) 1996
-eforestu                        // (c) 1996
-ffortune                        // (c) 1998
-fhunter                         // (c) 1996
-fhuntera                        // (c) 1996
-fvrpitch                        // (c) 1986 Ainsworth Nominees P.L.
-gldnpkr                         // (c) 1986 Ainsworth Nominees P.L.
-goldenc                         // (c) 1996
-grnlizrd                        // (c) 1994
-gtroppo                         // (c) 1986 Ainsworth Nominees P.L.
-gunnrose                        // (c) 1993
-kgbird                          // (c) 1996
-kgbirda                         // (c) 1996
-phantomp                        // (c) 1998
-swtht2nz                        // (c) 1998
-teqsun                          // (c) 1993
-topgear                         // (c) 1996
-wildone                         // (c) 1997
-wtigernz                        // (c) 1996
+3bagfull                        //
+3bagfullnz                      //
+3bagfullu                       //
+86lions                         //
+arcwins                         //
+arcwinsa                        //
+autmoon                         //
+blkrhino                        //
+blkrhinonz                      //
+cgold                           //
+cgold2                          //
+cgold2a                         //
+clkwise                         //
+coralr2                         //
+dblagent                        //
+eforest                         //
+eforestnz                       //
+eforestu                        //
+ffortune                        //
+fhunter                         //
+fhuntera                        //
+fvrpitch                        //
+gambler                         //
+gldnpkr                         //
+goldenc                         //
+grnlizrd                        //
+gtroppo                         //
+gunnrose                        //
+kgbird                          //
+kgbirdnz                        //
+kgbirdnza                       //
+letsgof                         //
+phantomp                        //
+swtht2nz                        //
+teqsun                          //
+thundhrt                        //
+topgear                         //
+trktreat                        //
+wildone                         //
+wtiger                          //
+wtigernz                        //
 
 @source:aristocrat/aristmk6.cpp
-aristmk6                        // (c) 2000
-5drag                           // (c) 2004
-5draga                          // (c) 2004
-5dragnz                         // (c) 2005
-5dragsp                         // (c) 2004
-5dragce                         // (c) 2007
-5koi                            // (c) 2007
-5koia                           // (c) 2007
-15lions                         // (c) 2004
-50lions                         // (c) 2002
-50lionsa                        // (c) 2003
-50lionsu                        // (c) 2005
-50lionrr                        // (c) 2012
-100lions                        // (c) 2006
-100lionsa                       // (c) 2006
-adonisa6                        // (c) 2005
-aduskcm                         // (c) 2001
-afterhrs                        // (c) 2004
-alchemy                         // (c) 2003
-atkgld                          // (c) 2007
-amzqueen                        // (c) 2001
-amztempl                        // (c) 2009
-antcleo                         // (c) 2004
-antcleoa                        // (c) 2004
-apocof                          // (c) 2003
-arabnga6                        // (c) 2001
-arabnga6a                       // (c) 2001
-arabnga6u                       // (c) 2004
-arwincm                         // (c) 2003
-arish                           // (c) 2003
-asnprinc                        // (c) 2004
-beavbuk                         // (c) 2008
-betzoo                          // (c) 2003
-bigben                          // (c) 2003
-bigbena                         // (c) 2003
-bigbenb                         // (c) 2004
-bigbenq                         // (c) 2005
-bigheart                        // (c) 1999
-bigred                          // (c) 2002
-bigreda                         // (c) 2002
-bigred2                         // (c) 2005
-blkbrum                         // (c) 2002
-blkmust                         // (c) 200?
-bluetigr                        // (c) 2007
-bobdolly                        // (c) 2007
-brazil                          // (c) 2005
-brazila                         // (c) 2006
-bucaneer                        // (c) 2004
-bucaneera                       // (c) 2004
-bucaneeru                       // (c) 2005
-buckstop                        // (c) 2010
-buffalo                         // (c) 2006
-buffaloa                        // (c) 2006
-buffalou                        // (c) 2006
-bmbugs                          // (c) 2005
-bushrngr                        // (c) 2001
-cactusco                        // (c) 2007
-callwld                         // (c) 2007
-calyking                        // (c) 2005
-canaryrc                        // (c) 2006
-centrion                        // (c) 2007
-cmtonig                         // (c) 2005
-cinhell                         // (c) 2004
-corrida                         // (c) 2005
-cryspri                         // (c) 2003
-cryspria                        // (c) 2003
-cryspriu                        // (c) 2006
-csd                             // (c) 2002
-csda                            // (c) 2003
-csdce                           // (c) 2003
-csdjc                           // (c) 2003
-csdq                            // (c) 2002
-csret                           // (c) 2006
-csdsp                           // (c) 2002
-deepfrz                         // (c) 2009
-deepfrzu                        // (c) 2010
-deltabel                        // (c) 2005
-deltaqn                         // (c) 2004
-diamhrts                        // (c) 2007
-dimeye                          // (c) 2002
-dimeyece                        // (c) 2004
-dimeyeu                         // (c) 2004
-di4ever                         // (c) 2002
-dinosa6                         // (c) 2003
-dblagent                        // (c) 2005
-dbldolph                        // (c) 2000
-dbldolphq                       // (c) 2000
-doltra6                         // (c) 2004
-doltra6nz                       // (c) 2004
-drgnlord                        // (c) 2004
-drgnmgic                        // (c) 2006
-drmcatch                        // (c) 2003
-drmcatcha                       // (c) 2004
-drmred                          // (c) 2008
-dstgold                         // (c) 2005
-eaglrock                        // (c) 2004
-estrike                         // (c) 2010
-eastland                        // (c) 2004
-eggsrccm                        // (c) 2005
-efce                            // (c) 200?
-encspell                        // (c) 2007
-enchantr                        // (c) 2000
-eott                            // (c) 2000
-firednc                         // (c) 2004
-firednca                        // (c) 2005
-flamolce                        // (c) 2002
-flamoljc                        // (c) 2002
-followst                        // (c) 2000
-fortath                         // (c) 2007
-fortking                        // (c) 2006
-frogwld                         // (c) 2004
-gambjack                        // (c) 2005
-gwnn                            // (c) 2004
-geishaa6                        // (c) 2000
-geishaa6a                       // (c) 2001
-geishaa6b                       // (c) 2001
-geishajc                        // (c) 2001
-goape                           // (c) 2001
-gogreen                         // (c) 2001
-gogreena                        // (c) 2001
-goldarch                        // (c) 2005
-gldnflc                         // (c) 2003
-gldgong                         // (c) 2005
-gldgongq                        // (c) 2005
-gldgongu                        // (c) 2005
-goldinc                         // (c) 2004
-goldincu                        // (c) 2005
-goldpya6                        // (c) 2004
-goldpym                         // (c) 2002
-goldsam                         // (c) 2007
-gbmoney                         // (c) 2002
-grizzly                         // (c) 2006
-heartgld                        // (c) 2003
-heartglda                       // (c) 2004
-heartveg                        // (c) 2006
-hlntroy                         // (c) 2002
-hlntroya                        // (c) 2002
-hlntroyb                        // (c) 2002
-hlntroyc                        // (c) 2002
-hlntroyu                        // (c) 2004
-highnoon                        // (c) 2001
-holdrma6                        // (c) 2002
-holdrma6a                       // (c) 2002
-househrt                        // (c) 2004
-househrta                       // (c) 2005
-incachf                         // (c) 2005
-indream                         // (c) 2001
-indreama                        // (c) 2004
-indremce                        // (c) 2002
-indremll                        // (c) 2003
-indrem2c                        // (c) 2003
-indremmm                        // (c) 2003
-indgldcm                        // (c) 2001
-indprncs                        // (c) 2004
-jailbrk                         // (c) 2002
-jefffox                         // (c) 2003
-jewelcm                         // (c) 2003
-kingnep                         // (c) 2005
-kingnile                        // (c) 2003
-kingnilea                       // (c) 2002
-kingnileb                       // (c) 2003
-kingpeng                        // (c) 2002
-kingpengsp                      // (c) 2002
-koalama6                        // (c) 2000
-kohinoor                        // (c) 2003
-lgfish                          // (c) 2006
-lgfisha                         // (c) 2006
-lemrol                          // (c) 2004
-lineking                        // (c) 2005
-lordleo                         // (c) 2002
-lougcm                          // (c) 2001
-lovestuk                        // (c) 200?
-luigibal                        // (c) 2007
-lucky88                         // (c) 2007
-magforst                        // (c) 2005
-magician                        // (c) 2006
-magmerm                         // (c) 2003
-mchilli                         // (c) 2008
-mchilliq                        // (c) 2010
-metestrm                        // (c) 2007
-milkin                          // (c) 2007
-mskitty                         // (c) 2005
-mnytree                         // (c) 2000
-mnytreea                        // (c) 2001
-moonfire                        // (c) 2004
-moonwalt                        // (c) 2007
-mrwoo                           // (c) 200?
-mystarr                         // (c) 2002
-mysteycm                        // (c) 2001
-mysteycmu                       // (c) 2002
-mystmerm                        // (c) 2002
-nerdwild                        // (c) 2005
-opsesam                         // (c) 200?
-orbeaut                         // (c) 2006
-outbackj                        // (c) 2005
-owlcap                          // (c) 2001
-pandpays                        // (c) 2004
-parislgt                        // (c) 2001
-parislgta                       // (c) 2001
-parislgtu                       // (c) 2002
-pcockmag                        // (c) 2002
-pcockmaga                       // (c) 2002
-pcockmagu                       // (c) 2004
-pelipete                        // (c) 2004
-pelipetea                       // (c) 2005
-pelipetejc                      // (c) 2006
-pelipeteu                       // (c) 2005
-pennyar                         // (c) 2005
-pengpyce                        // (c) 2003
-pharfor                         // (c) 2000
-phxfant                         // (c) 2005
-pirata6                         // (c) 2000
-pirata6a                        // (c) 2001
-pcbydem                         // (c) 2006
-pcfavor                         // (c) 2004
-pcgold                          // (c) 2010
-pcmostw                         // (c) 2006
-pcorig                          // (c) 2004
-pcplat                          // (c) 2009
-pwsuper                         // (c) 200?
-pompeia6                        // (c) 2001
-pompeia6a                       // (c) 2002
-pompeia6u                       // (c) 2005
-pompeia6ua                      // (c) 2002
-prideaf                         // (c) 2005
-prophecy                        // (c) 2004
-qnilea6                         // (c) 2005
-qnilea6a                        // (c) 2005
-qnilea6b                        // (c) 2005
-qnilese                         // (c) 2001
-qnilesea                        // (c) 2001
-qnileseb                        // (c) 2001
-qnilejc                         // (c) 2002
-qnilejcsp                       // (c) 2002
-qnilemt2                        // (c) 2005
-qsheba                          // (c) 2003
-qshebaa                         // (c) 2003
-raprichs                        // (c) 2005
-redbara6                        // (c) 2002
-redbarfl                        // (c) 2003
-redbarjc                        // (c) 2003
-reelrkfl                        // (c) 201?
-retsama6                        // (c) 2002
-roadtrip                        // (c) 2005
-rubymag                         // (c) 2002
-rubymaga                        // (c) 2003
-rumbreel                        // (c) 2010
-ruprup                          // (c) 2002
-scatmag2                        // (c) 2000
-scatmag2a                       // (c) 2001
-scatmag2sa                      // (c) 2001
-scatmag3                        // (c) 2006
-sealdeal                        // (c) 2002
-shorthng                        // (c) 2004
-shamnmg                         // (c) 2006
-shamnmgu                        // (c) 200?
-smtma6                          // (c) 2001
-smtma6q                         // (c) 2001
-silkrda6                        // (c) 2004
-silkrda6u                       // (c) 2006
-silgola6                        // (c) 2002
-skydnca6                        // (c) 2008
-snapshot                        // (c) 200?
-spgcarn                         // (c) 1999
-spgcarnjc                       // (c) 2003
-spgcarnq                        // (c) 2001
-spgfest                         // (c) 2008
-spgfestnz                       // (c) 2008
-stardrft                        // (c) 2003
-stardrftu                       // (c) 2004
-starqst                         // (c) 2001
-statsymb                        // (c) 2005
-sunmoon                         // (c) 2003
-sunmoona                        // (c) 2003
-sunmonbb                        // (c) 200?
-sunqndol                        // (c) 2003
-sbuk5                           // (c) 2005
-swhr2a6                         // (c) 2005
-swh2ld                          // (c) 2002
-tahitim                         // (c) 2006
-thaiprnc                        // (c) 2002
-thaiprnca                       // (c) 2003
-thndrhrt                        // (c) 2004
-tigress                         // (c) 2007
-tigressa                        // (c) 2007
-tikitalk                        // (c) 2007
-tiktorch                        // (c) 2003
-tiktorchnz                      // (c) 2003
-timbwolf                        // (c) 200?
-topshta6                        // (c) 2002
-torgods                         // (c) 2000
-torgodsa                        // (c) 2004
-toprdice                        // (c) 2001
-trsking                         // (c) 2006
-turtreas                        // (c) 2006
-turtreasa                       // (c) 2006
-venetian                        // (c) 2002
-venice                          // (c) 2004
-wcougpp                         // (c) 2006
-werewild                        // (c) 2009
-werewildq                       // (c) 2010
-whalecsh                        // (c) 2002
-whalecshu                       // (c) 2003
-whalecshua                      // (c) 2005
-wheregld                        // (c) 2004
-whereglda                       // (c) 2004
-wheregldb                       // (c) 2004
-wheregldq                       // (c) 2005
-wheregldsp                      // (c) 2004
-whtwater                        // (c) 2003
-wikwin2                         // (c) 2006
-wingoly                         // (c) 2004
-wingolyu                        // (c) 2005
-wldafr                          // (c) 2002
-wldcata6                        // (c) 2006
-wldcata6a                       // (c) 2007
-wldgoos                         // (c) 2003
-wldgoosa                        // (c) 2003
-wgorilla                        // (c) 2009
-wldpanda                        // (c) 2006
-wldpandaa                       // (c) 2006
-wldpanth                        // (c) 2004
-wldstall                        // (c) 2006
-wtepee                          // (c) 2007
-wwaratah                        // (c) 2006
-wwaratahsp                      // (c) 2006
-wways                           // (c) 2002
-wwaysa                          // (c) 2003
-wzwaysll                        // (c) 2003
-zorroa6                         // (c) 2003
-zorroa6a                        // (c) 2006
-zorroa6u                        // (c) 2005
+100lions                        //
+100lionsa                       //
+15lions                         //
+50lions                         //
+50lionsa                        //
+50lionsu                        //
+50lionrr                        //
+5drag                           //
+5draga                          //
+5dragnz                         //
+5dragsp                         //
+5dragce                         //
+5koi                            //
+5koia                           //
+adonisa6                        //
+aduskcm                         //
+afterhrs                        //
+alchemy                         //
+amzqueen                        //
+amztempl                        //
+antcleo                         //
+antcleoa                        //
+apocof                          //
+arabnga6                        //
+arabnga6a                       //
+arabnga6u                       //
+arish                           //
+aristmk6                        //
+arwincm                         //
+asnprinc                        //
+atkgld                          //
+beavbuk                         //
+betzoo                          //
+bigben                          //
+bigbena                         //
+bigbenb                         //
+bigbenq                         //
+bigheart                        //
+bigred                          //
+bigred2                         //
+bigreda                         //
+blkbrum                         //
+blkmust                         //
+bluetigr                        //
+bmbugs                          //
+bobdolly                        //
+brazil                          //
+brazila                         //
+bucaneer                        //
+bucaneera                       //
+bucaneeru                       //
+buckstop                        //
+buffalo                         //
+buffaloa                        //
+buffalou                        //
+bushrngr                        //
+cactusco                        //
+callwld                         //
+calyking                        //
+canaryrc                        //
+centrion                        //
+cmtonig                         //
+cinhell                         //
+corrida                         //
+cryspri                         //
+cryspria                        //
+cryspriu                        //
+csd                             //
+csda                            //
+csdce                           //
+csdjc                           //
+csdq                            //
+csdsp                           //
+csret                           //
+dagenta6                        //
+dbldolph                        //
+dbldolphq                       //
+dbldolphu                       //
+deepfrz                         //
+deepfrzu                        //
+deltabel                        //
+deltaqn                         //
+di4ever                         //
+diamhrts                        //
+dimeye                          //
+dimeyece                        //
+dimeyeu                         //
+dinosa6                         //
+doltra6                         //
+doltra6nz                       //
+drgnlord                        //
+drgnmgic                        //
+drmcatch                        //
+drmcatcha                       //
+drmred                          //
+dstgold                         //
+eaglrock                        //
+eastland                        //
+efce                            //
+eggsrccm                        //
+enchantr                        //
+encspell                        //
+eott                            //
+estrike                         //
+firednc                         //
+firednca                        //
+flamolce                        //
+flamoljc                        //
+followst                        //
+fortath                         //
+fortking                        //
+frogwld                         //
+gambjack                        //
+gbmoney                         //
+geishaa6                        //
+geishaa6a                       //
+geishaa6b                       //
+geishajc                        //
+gldgong                         //
+gldgongq                        //
+gldgongu                        //
+gldnflc                         //
+goape                           //
+gogreen                         //
+gogreena                        //
+goldarch                        //
+goldinc                         //
+goldincu                        //
+goldpya6                        //
+goldpym                         //
+goldsam                         //
+grizzly                         //
+gwnn                            //
+heartgld                        //
+heartglda                       //
+heartveg                        //
+highnoon                        //
+hlntroy                         //
+hlntroya                        //
+hlntroyb                        //
+hlntroyc                        //
+hlntroyu                        //
+holdrma6                        //
+holdrma6a                       //
+househrt                        //
+househrta                       //
+incachf                         //
+indream                         //
+indreama                        //
+indremll                        //
+indrem2c                        //
+indremce                        //
+indremmm                        //
+indgldcm                        //
+indprncs                        //
+jailbrk                         //
+jefffox                         //
+jewelcm                         //
+kingnep                         //
+kingnile                        //
+kingnilea                       //
+kingnileb                       //
+kingpeng                        //
+kingpengsp                      //
+koalama6                        //
+kohinoor                        //
+lemrol                          //
+lgfish                          //
+lgfisha                         //
+lineking                        //
+lordleo                         //
+lougcm                          //
+lovestuk                        //
+lucky88                         //
+luigibal                        //
+magforst                        //
+magician                        //
+magmerm                         //
+mchilli                         //
+mchilliq                        //
+metestrm                        //
+milkin                          //
+mnytree                         //
+mnytreea                        //
+moonfire                        //
+moonwalt                        //
+mrwoo                           //
+mskitty                         //
+mystarr                         //
+mysteycm                        //
+mysteycmu                       //
+mystmerm                        //
+nerdwild                        //
+opsesam                         //
+orbeaut                         //
+outbackj                        //
+owlcap                          //
+pandpays                        //
+parislgt                        //
+parislgta                       //
+parislgtu                       //
+pcockmag                        //
+pcockmaga                       //
+pcockmagu                       //
+pelipete                        //
+pelipetea                       //
+pelipetejc                      //
+pelipeteu                       //
+pengpyce                        //
+pennyar                         //
+pharfor                         //
+phxfant                         //
+pirata6                         //
+pirata6a                        //
+pcbydem                         //
+pcfavor                         //
+pcgold                          //
+pcmostw                         //
+pcorig                          //
+pcplat                          //
+pompeia6                        //
+pompeia6a                       //
+pompeia6u                       //
+pompeia6ua                      //
+prideaf                         //
+prophecy                        //
+pwsuper                         //
+qnilea6                         //
+qnilea6a                        //
+qnilea6b                        //
+qnilejc                         //
+qnilejcsp                       //
+qnilemt2                        //
+qnilese                         //
+qnilesea                        //
+qnileseb                        //
+qsheba                          //
+qshebaa                         //
+raprichs                        //
+redbara6                        //
+redbarfl                        //
+redbarjc                        //
+reelrkfl                        //
+retsama6                        //
+roadtrip                        //
+rubymag                         //
+rubymaga                        //
+rumbreel                        //
+ruprup                          //
+sbuk5                           //
+scatmag2                        //
+scatmag2a                       //
+scatmag2sa                      //
+scatmag3                        //
+sctmagce                        //
+sealdeal                        //
+shamnmg                         //
+shamnmgu                        //
+shorthng                        //
+silgola6                        //
+silkrda6                        //
+silkrda6u                       //
+skydnca6                        //
+smtma6                          //
+smtma6q                         //
+snapshot                        //
+spgcarn                         //
+spgcarnjc                       //
+spgcarnq                        //
+spgfest                         //
+spgfestnz                       //
+stardrft                        //
+stardrftu                       //
+starqst                         //
+statsymb                        //
+sunmonbb                        //
+sunmoon                         //
+sunmoona                        //
+sunqndol                        //
+swh2ld                          //
+swhr2a6                         //
+tahitim                         //
+thaiprnc                        //
+thaiprnca                       //
+thndrhrt                        //
+tigress                         //
+tigressa                        //
+tikitalk                        //
+tiktorch                        //
+tiktorchnz                      //
+timbwolf                        //
+toprdice                        //
+topshta6                        //
+torgods                         //
+torgodsa                        //
+trsking                         //
+turtreas                        //
+turtreasa                       //
+venetian                        //
+venice                          //
+wcougpp                         //
+werewild                        //
+werewildq                       //
+wgorilla                        //
+whalecsh                        //
+whalecshu                       //
+whalecshua                      //
+wheregld                        //
+whereglda                       //
+wheregldb                       //
+wheregldq                       //
+wheregldsp                      //
+whtwater                        //
+wikwin2                         //
+wingoly                         //
+wingolyu                        //
+wldafr                          //
+wldcata6                        //
+wldcata6a                       //
+wldgoos                         //
+wldgoosa                        //
+wldpanda                        //
+wldpandaa                       //
+wldpanth                        //
+wldstall                        //
+wtepee                          //
+wwaratah                        //
+wwaratahsp                      //
+wways                           //
+wwaysa                          //
+wzwaysll                        //
+zorroa6                         //
+zorroa6a                        //
+zorroa6u                        //
 
 @source:aristocrat/aristmk7.cpp
-aristmk7                        // (c) 2006?
-a7lucky88                       // (c) 200?
+aristmk7                        //
+a7lucky88                       //
 
 @source:aristocrat/caswin.cpp
 caswin                          // (c) 1985
@@ -17499,6 +17526,7 @@ hanakanz                        // "507" (c) 1996 Dynax
 hginga                          // "81" (c) 1994 Dynax
 hgokbang                        // "116" (c) 1995 Dynax
 hgokou                          // "108" (c) 1995 Dynax (Alba license)
+hgokoua                         // "108" (c) 1995 Dynax (Alba license)
 hkagerou                        // "510" Hana Kagerou 1996 Nakanihon
 hparadis                        // "101" (c) 1994 Nakanihon
 htengoku                        // "65" (c) 1992 Dynax
@@ -17916,6 +17944,7 @@ fever13                         // (c) 1995 Excellent System
 lastbank                        // (c) 1994 Excellent System
 mir7hg                          // (c) 1996 Excellent System
 ukiyobox                        // (c) 1995 Excellent System
+wcircus                         // (c) 199? Cobra
 
 @source:excellent/witch.cpp
 keirinou                        // (c) 1987 Excellent System
@@ -19559,6 +19588,7 @@ h19                             // Heath H19
 @source:heathzenith/h89.cpp
 h89                             // Heath H89 (WH89)
 h88                             // Heath H88 (with cassette tape)
+h89_cdr                         // Heath H89 with CDR Systems hardware
 h89_mms                         // Heath H89 with Magnolia MicroSystems(MMS) hardware
 h89_sigmasoft                   // H89 with the SigmaSoft IGC card
 z90                             // Zenith Z-90
@@ -20144,6 +20174,7 @@ crazybonb                       // (c) 199? unknown
 eldoradd                        // (c) 1991 Dyna Electronics
 eldoraddo                       // (c) 1991 Dyna Electronics
 eldoraddoa                      // (c) 1991 Dyna Electronics
+eldoraddob                      // (c) 1991 Dyna Electronics
 fb2010                          // (c) 2009 Amcoe
 fl7_3121                        // (c) 199? Cyberdyne Systems, Inc.
 fl7_50                          // (c) 199? Cyberdyne Systems, Inc.
@@ -30595,6 +30626,7 @@ goldnpkf                        // Intercoast (bootleg)
 goldnpkg                        // Bootleg
 goldnpkr                        // (c) 1981 Bonanza
 goodluck                        // Unknown
+icproul                         // bootleg?
 jkrbonus                        // bootleg?
 jokercar                        // 199?, unknown
 lespendu                        // (c) 198? Voyageur de L'Espace Inc.
@@ -46162,6 +46194,7 @@ tvpc_tom
 ltv_naru                        //
 domfitad                        //
 dombikec                        //
+epo_dabj
 
 @source:tvgames/xavix_2000.cpp
 ban_omt                         //
@@ -46184,6 +46217,8 @@ ttv_sw                          //
 ttv_swj                         //
 
 @source:tvgames/xavix_2002.cpp
+ban_kksj
+ban_ordj
 domdance                        //
 domfitch                        //
 domfitex                        //
@@ -46193,6 +46228,7 @@ mrangbat
 suprtvpc
 suprtvpcdo
 suprtvpchk
+tmy_rkmj
 tmy_thom                        //
 udance
 xavaero                         //

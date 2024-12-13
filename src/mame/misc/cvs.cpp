@@ -1,9 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders: Mike Coates, Couriersud
 
-/***************************************************************************
+/*******************************************************************************
 
 Century CVS System
+
+Driver by Mike Coates
+Thanks to Malcolm & Darren for hardware info
+
+Additional work by Couriersud, 2009
+
+TODO:
+- darkwar coin insert sound effect is missing. It sends the correct command,
+  but before audiocpu reads it, maincpu writes a new command for the speech cpu.
+  This worked fine in an older version of MAME since maincpu was twice slower.
+- diggerc loses speech sound effects (walking, digging) after killing an enemy.
+- Emulate protection properly in later games (reads area 0x73fx).
+- The board most probably has discrete circuits. Possibly 2 beepers (current
+  frequency is completely guessed), and a pitch sweep sound. No schematics
+  are available, or even video references.
+- Improve starfield: density, blink rate, x repeat of 240, and the checkerboard
+  pattern (fast forward MAME to see) are all correct, the RNG is not right?
+
 
 MAIN BOARD:
 
@@ -79,28 +97,14 @@ ADR14 ADR13 | READ                                      | WRITE
             | D7 = BULLET AND CP1 OR CP2                |
 ------------+-------------------------------------------+-------------------------------
 
-Driver by
-    Mike Coates
+Main 2650 runs at 1.78MHz (14.318/8).
 
-Hardware Info
-    Malcolm & Darren
+Sound board 2650s run at 0.89MHz (14.318/16). Also seen with a 15.625MHz XTAL,
+which would result in slightly higher DAC sound pitch.
 
-Additional work
-    Couriersud, 2009
+Video timing is via a Signetics 2621 (PAL).
 
-TODO:
-- darkwar coin insert sound effect is missing. It sends the correct command,
-  but before audiocpu reads it, maincpu writes a new command for the speech cpu.
-  This worked fine in an older version of MAME since maincpu was twice slower.
-- diggerc loses speech sound effects (walking, digging) after killing an enemy.
-- Emulate protection properly in later games (reads area 0x73fx).
-- The board most probably has discrete circuits. Possibly 2 beepers (current
-  frequency is completely guessed), and a pitch sweep sound. No schematics
-  are available, or even video references.
-- Is the star generator correct? On photos, it looks like there are more stars
-  overall (higher star density).
-
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -178,7 +182,7 @@ protected:
 
 private:
 	// max stars is more than it needs to be, to allow experimenting with the star generator
-	static constexpr u16 MAX_STARS = 0x400;
+	static constexpr u16 MAX_STARS = 0x800;
 	static constexpr u16 SPRITE_PEN_BASE = 0x820;
 	static constexpr u16 BULLET_STAR_PEN = 0x828;
 
@@ -408,14 +412,14 @@ void cvs_state::init_stars()
 	m_total_stars = 0;
 
 	// precalculate the star background
-	for (int y = 255; y >= 0; y--)
+	for (int y = 0; y < 256; y++)
 	{
-		for (int x = 511; x >= 0; x--)
+		for (int x = 0; x < 480; x++)
 		{
 			generator <<= 1;
 			generator |= BIT(~generator, 17) ^ BIT(generator, 5);
 
-			if ((generator & 0x130fe) == 0xfe && m_total_stars != MAX_STARS)
+			if ((generator & 0x100fe) == 0xfe && m_total_stars != MAX_STARS)
 			{
 				m_stars[m_total_stars].x = x;
 				m_stars[m_total_stars].y = y;
@@ -430,10 +434,10 @@ void cvs_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = 0; offs < m_total_stars; offs++)
 	{
-		u8 x = (m_stars[offs].x + m_stars_scroll) >> 1;
-		u8 y = m_stars[offs].y + ((m_stars_scroll + m_stars[offs].x) >> 9);
+		u8 x = ((m_stars[offs].x + m_stars_scroll) >> 1) % 240;
+		u8 y = m_stars[offs].y;
 
-		if (BIT(y, 0) ^ BIT(x, 4))
+		if (BIT(y, 4) ^ BIT(x, 5))
 		{
 			if (cliprect.contains(x, y) && m_palette->pen_indirect(bitmap.pix(y, x)) == 0)
 				bitmap.pix(y, x) = BULLET_STAR_PEN;
@@ -444,7 +448,7 @@ void cvs_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 void cvs_state::scroll_stars(int state)
 {
 	if (state)
-		m_stars_scroll++;
+		m_stars_scroll = (m_stars_scroll + 1) % 480;
 }
 
 
@@ -1363,7 +1367,7 @@ void cvs_state::cvs(machine_config &config)
 	BEEP(config, m_beep[0], 600).add_route(ALL_OUTPUTS, "speaker", 0.15); // placeholder
 	BEEP(config, m_beep[1], 150).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
 
-	TMS5100(config, m_tms5110, XTAL(640'000));
+	TMS5100(config, m_tms5110, 640_kHz_XTAL);
 	m_tms5110->data().set(FUNC(cvs_state::speech_rom_read_bit));
 	m_tms5110->add_route(ALL_OUTPUTS, "speaker", 0.30);
 }

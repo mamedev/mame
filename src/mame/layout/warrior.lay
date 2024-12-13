@@ -6,23 +6,23 @@ license:CC0-1.0
 	<element name="pit">
 		<rect>
 			<bounds x="0" y="0" height="190" width="190" />
-			<color red="0" green="0" blue="0.50" />
-		</rect>
-		<rect>
-			<bounds x="10" y="10" height="170" width="170" />
 			<color red="0" green="0" blue="0.40" />
 		</rect>
 		<rect>
+			<bounds x="10" y="10" height="170" width="170" />
+			<color red="0" green="0" blue="0.32" />
+		</rect>
+		<rect>
 			<bounds x="20" y="20" height="150" width="150" />
-			<color red="0" green="0" blue="0.30" />
+			<color red="0" green="0" blue="0.24" />
 		</rect>
 		<rect>
 			<bounds x="30" y="30" height="130" width="130" />
-			<color red="0" green="0" blue="0.20" />
+			<color red="0" green="0" blue="0.16" />
 		</rect>
 		<rect>
 			<bounds x="40" y="40" height="110" width="110" />
-			<color red="0" green="0" blue="0.10" />
+			<color red="0" green="0" blue="0.08" />
 		</rect>
 		<rect>
 			<bounds x="50" y="50" height="90" width="90" />
@@ -32,13 +32,13 @@ license:CC0-1.0
 	<element name="p1start">
 		<disk>
 			<bounds x="0" y="0" height="130" width="130" />
-			<color red="0" green="1" blue="0" />
+			<color red="0" green="0.4" blue="0" />
 		</disk>
 	</element>
 	<element name="p2start">
 		<rect>
 			<bounds x="0" y="0" height="130" width="130" />
-			<color red="1" green="0" blue="0" />
+			<color red="0.4" green="0" blue="0" />
 		</rect>
 		<rect>
 			<bounds x="5" y="5" height="120" width="120" />
@@ -46,24 +46,20 @@ license:CC0-1.0
 		</rect>
 	</element>
 	<view name="Backdrop">
-		<element ref="pit">
-			<bounds x="270" y="330" width="190" height="190" />
-			<color alpha=".8" />
-		</element>
-		<element ref="pit">
-			<bounds x="580" y="270" width="190" height="190" />
-			<color alpha=".8" />
-		</element>
-		<element ref="p1start">
-			<bounds x="75" y="75" width="130" height="130" />
-			<color alpha=".4" />
-		</element>
-		<element ref="p2start">
-			<bounds x="825" y="580" width="130" height="130" />
-			<color alpha=".4" />
-		</element>
-		<screen index="0" blend="add">
+		<screen index="0">
 			<bounds x="0" y="0" width="1024" height="768" />
 		</screen>
+		<element ref="pit" blend="add">
+			<bounds x="270" y="330" width="190" height="190" />
+		</element>
+		<element ref="pit" blend="add">
+			<bounds x="580" y="270" width="190" height="190" />
+		</element>
+		<element ref="p1start" blend="add">
+			<bounds x="75" y="75" width="130" height="130" />
+		</element>
+		<element ref="p2start" blend="add">
+			<bounds x="825" y="580" width="130" height="130" />
+		</element>
 	</view>
 </mamelayout>

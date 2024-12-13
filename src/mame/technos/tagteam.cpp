@@ -30,6 +30,7 @@ TODO:
 
 #include "cpu/m6502/m6502.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "video/resnet.h"
@@ -89,7 +90,7 @@ private:
 	void control_w(uint8_t data);
 	void flipscreen_w(uint8_t data);
 
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(v8_timer_irq);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -427,30 +428,29 @@ static GFXDECODE_START( gfx_tagteam )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(tagteam_state::sound_timer_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(tagteam_state::v8_timer_irq)
 {
+	// same source for both interrupts
+	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	if (m_sound_nmi_mask)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
 void tagteam_state::tagteam(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, XTAL(12'000'000) / 8);
+	M6502(config, m_maincpu, 12_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tagteam_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(tagteam_state::irq0_line_assert), attotime::from_hz(272 / 16 * 57)); // connected to bit 4 of vcount (basically once every 16 scanlines)
 
-	M6502(config, m_audiocpu, XTAL(12'000'000) / 2 / 6); // daughterboard gets 12mhz / 2 from mainboard, but how it's divided further is a guess
+	M6502(config, m_audiocpu, 12_MHz_XTAL / 2 / 6); // daughterboard gets 12mhz / 2 from mainboard, but how it's divided further is a guess
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tagteam_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(tagteam_state::sound_timer_irq), attotime::from_hz(272 / 16 * 57)); // same source as maincpu IRQ
+
+	TIMER(config, "v8").configure_scanline(FUNC(tagteam_state::v8_timer_irq), "screen", 8, 16); // connected to bit 4 of vcount (basically once every 16 scanlines)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57); // measured?
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3072));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248); // confirmed from schematics; 57 Hz measured?
 	screen.set_screen_update(FUNC(tagteam_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -463,8 +463,8 @@ void tagteam_state::tagteam(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 
-	AY8910(config, "ay1", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	AY8910(config, "ay2", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, "ay1", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }

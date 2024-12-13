@@ -42,12 +42,10 @@
               Let's!TVプレイ ふしぎ星のふたご姫Gyu! ドレスチェンジでキュートにダンス / バンダイ / 日本   Let's!TV Play Gyu, the Twin Princess of the Mysterious Planet! Dance cutely with a dress change / Bandai / Japan
               Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's!TV Play Experience Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
               Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！ / バンダイ / 日本   Let's! TV Play Narikiri Experience Boukenger Run! Shoot! Mission starts! ! / Bandai / Japan
-              テレビであそぼう！まなぼう！超能力あいうえお図鑑 / エポック社 / 日本   Let's play on TV! Learn! Superpower Aiueo Illustrated Book / Epochsha / Japan
               Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！ / タカラトミー / 日本   Let's!TV Play Narikiri Fight Ultraman Shoot! Deadly ray! ! / Takara Tomy / Japan
     2005      どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！ / エポック社 / 日本          Doraemon anywhere - Japan travel game DX experience! Where is the Dragon Grand Prix! / Epoch / Japan
               Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう / バンダイ / 日本         Let's!TV Play Futari wa PreCure MaxHeart Dance on the mat Let's go to MaxHeart / Bandai / Japan
               Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's!TV Play Mahou Sentai Magiranger Dance & Battle at Magimat / Bandai / Japan
-              Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本        Let's!TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan
               Jala Jaland /atlus/Japan (arcade version)                                                       -           -               -           -               -                   -                       -
     2004      Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
               Accessory memory mascot for TV mail Pc mail cot 2 characters (Putchi, Petchi) /EPOCH/Japan      -           -               -           -               -                   -                       -
@@ -63,9 +61,7 @@
 
     not dumped: no TSOP pads
     2003      Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       have
-    2002      Excite Striker (UK)
     2001      Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
-    2000      connecTV OPUS /RADICA EU (different ROM to US?)
 
 
     not dumped: xavix2.cpp
@@ -76,6 +72,9 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
+              Excite Striker (UK)
+              connecTV OPUS /RADICA EU (different ROM to US?)
+              Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本  (Let's! TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan)
               Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
               TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
               Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
@@ -200,6 +199,7 @@
 
     dumped: see xavix2.cpp
     2006      Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本            Let's!TV Play NARUTO Ninja Experience ~Dattebayo~ / Bandai / Japan
+    2006      テレビであそぼう！まなぼう！超能力あいうえお図鑑 / エポック社 / 日本   Let's play on TV! Learn! Superpower Aiueo Illustrated Book / Epochsha / Japan
 
 
 
@@ -423,6 +423,20 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 	map(0x6c00, 0x6cff).ram().w(FUNC(xavix_state::bmp_palram_sh_w)).share("bmp_palram_sh");
 	map(0x6d00, 0x6dff).ram().w(FUNC(xavix_state::bmp_palram_l_w)).share("bmp_palram_l");
 
+	// map(0x6a40, 0x6a7f).ram().share("ext_segment_regs"); // 16x32 extended segment regs
+
+	map(0x6f78, 0x6f78).rw(FUNC(xavix_state::superxavix_chr_pal_index_r), FUNC(xavix_state::superxavix_chr_pal_index_w)); // SgdPalChrIdx
+	map(0x6f79, 0x6f79).rw(FUNC(xavix_state::superxavix_chr_pal_hue_r), FUNC(xavix_state::superxavix_chr_pal_hue_w)); // SgdPalChrHue
+	map(0x6f7a, 0x6f7a).rw(FUNC(xavix_state::superxavix_chr_pal_saturation_r), FUNC(xavix_state::superxavix_chr_pal_saturation_w)); // SgdPalChrSat
+	map(0x6f7b, 0x6f7b).rw(FUNC(xavix_state::superxavix_chr_pal_lightness_r), FUNC(xavix_state::superxavix_chr_pal_lightness_w)); // SgdPalChrLgt
+
+	map(0x6f7c, 0x6f7c).rw(FUNC(xavix_state::superxavix_bitmap_pal_index_r), FUNC(xavix_state::superxavix_bitmap_pal_index_w)); // SgdPalBmpAdr
+	map(0x6f7d, 0x6f7d).rw(FUNC(xavix_state::superxavix_bitmap_pal_hue_r), FUNC(xavix_state::superxavix_bitmap_pal_hue_w)); // SgdPalBmpHue
+	map(0x6f7e, 0x6f7e).rw(FUNC(xavix_state::superxavix_bitmap_pal_saturation_r), FUNC(xavix_state::superxavix_bitmap_pal_saturation_w)); // SgdPalBmpSat
+	map(0x6f7f, 0x6f7f).rw(FUNC(xavix_state::superxavix_bitmap_pal_lightness_r), FUNC(xavix_state::superxavix_bitmap_pal_lightness_w)); // SgdPalBmpLgt
+
+	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
+
 	// extended external bus stuff (possible banking control?)
 	map(0x7909, 0x7909).w(FUNC(xavix_state::extended_extbus_reg0_w));
 	map(0x790b, 0x790b).w(FUNC(xavix_state::extended_extbus_reg1_w));
@@ -432,7 +446,7 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 	map(0x7a20, 0x7a22).rw("xavix2002io", FUNC(xavix2002_io_device::pio_out_r), FUNC(xavix2002_io_device::pio_out_w));
 	map(0x7a30, 0x7a32).r("xavix2002io", FUNC(xavix2002_io_device::pio_in_r));
 
-	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
+
 
 	map(0x7ffd, 0x7ffd).nopw(); // looks like a watchdog?
 }

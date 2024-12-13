@@ -341,19 +341,19 @@ uint32_t mcm70_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			}
 
 			// gap around pixel
-			if (x < 222)
+			if (x < 221)
 			{
 				bitmap.pix(yl,     xl + 3) = pen[0];
 				bitmap.pix(yl + 1, xl + 3) = pen[0];
 				bitmap.pix(yl + 2, xl + 3) = pen[0];
 			}
-			if (y < 7)
+			if (y < 6)
 			{
 				bitmap.pix(yl + 3, xl    ) = pen[0];
 				bitmap.pix(yl + 3, xl + 1) = pen[0];
 				bitmap.pix(yl + 3, xl + 2) = pen[0];
 			}
-			if (x < 222 && y < 7)
+			if (x < 221 && y < 6)
 			{
 				bitmap.pix(yl + 3, xl + 3) = pen[0];
 			}
@@ -383,7 +383,7 @@ void mcm70_state::mcm70(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(mcm70_state::screen_update));
 	screen.set_size(887, 27);
-	screen.set_visarea(0, 886, 0, 26);
+	screen.set_visarea_full();
 	PALETTE(config, m_palette, FUNC(mcm70_state::mcm70_palette), 5);
 }
 

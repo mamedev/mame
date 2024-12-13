@@ -399,6 +399,7 @@ const double XTAL::known_xtals[] = {
 	 28'224'000, // 28.224_MHz_XTAL        Roland JD-800
 	 28'322'000, // 28.322_MHz_XTAL        Saitek RISC 2500, Mephisto Montreux
 	 28'375'160, // 28.37516_MHz_XTAL      Amiga PAL systems
+	 28'432'000, // 28.432_MHz_XTAL        Fuuki FG-3J MAIN-J PCB
 	 28'475'000, // 28.475_MHz_XTAL        CoCo 3 PAL
 	 28'480'000, // 28.48_MHz_XTAL         Chromatics CGC-7900
 	 28'636'000, // 28.636_MHz_XTAL        Super Kaneko Nova System

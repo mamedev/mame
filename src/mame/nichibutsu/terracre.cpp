@@ -2,6 +2,7 @@
 // copyright-holders: Carlos A. Lozano
 
 /******************************************************************
+
 Terra Cresta (preliminary)
 Nichibutsu 1985
 68000 + Z80
@@ -79,6 +80,7 @@ AT-2
       2148 2148         2148 2148
                                          1 2 3  6116
  22MHz
+
 */
 
 #include "emu.h"
@@ -784,14 +786,20 @@ void terracre_state::ym3526(machine_config &config)
 	//  Sum:                    0.796296
 	//  Multiply all 3 values by 1 / 0.796296 (i.e. 1.255814):
 	// Final values are: ym: 0.255814; dac1: 0.232558; dac2: 0.511628)
-	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R10, R11, nothing(infinite resistance), wire(short), C11, C12
+
+	// R10, R11, nothing(infinite resistance), wire(short), C11, C12
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0));
 	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R17, R18, nothing(infinite resistance), wire(short), C19, C17
+
+	// R17, R18, nothing(infinite resistance), wire(short), C19, C17
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7));
 	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R16, R15, nothing(infinite resistance), wire(short), C18, C21
+
+	// R16, R15, nothing(infinite resistance), wire(short), C18, C21
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7));
 	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	YM3526(config, "ymsnd", XTAL(16'000'000) / 4).add_route(ALL_OUTPUTS, m_ymfilter, 0.2558);     // 4MHz verified on PCB
+	YM3526(config, "ymsnd", XTAL(16'000'000) / 4).add_route(ALL_OUTPUTS, m_ymfilter, 0.2558); // 4MHz verified on PCB
 
 	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.2326); // SIP R2R DAC @ RA-1 with 74HC374P latch
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.5116); // SIP R2R DAC @ RA-2 with 74HC374P latch
@@ -830,11 +838,17 @@ void terracre_state::ym2203(machine_config &config)
 	//  Sum:                     0.7245
 	//  Multiply all 5 values by 1 / 0.7245 (i.e. 1.380):
 	//  ym: 0.2415; dac1: 0.2196; dac2: 0.4830, ssgA+B: 0.0222; ssgC: 0.0337
-	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R10, R11, nothing(infinite resistance), wire(short), C11, C12
+
+	// R10, R11, nothing(infinite resistance), wire(short), C11, C12
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0));
 	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R17, R18, nothing(infinite resistance), wire(short), C19, C17
+
+	// R17, R18, nothing(infinite resistance), wire(short), C19, C17
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7));
 	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R16, R15, nothing(infinite resistance), wire(short), C18, C21
+
+	// R16, R15, nothing(infinite resistance), wire(short), C18, C21
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7));
 	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	//TODO: the ym2203 sub-board has a complicated and convoluted enough set of analog
@@ -847,17 +861,20 @@ void terracre_state::ym2203(machine_config &config)
 	// unconventional way.
 
 	// This filter is a differential amplifier, with no real cutoff, and a gain of -2.127
-	FILTER_BIQUAD(config, m_ssgfilter_cgain).opamp_mfb_lowpass_setup(RES_K(4.7), 0.0, RES_K(10), 0.0, CAP_N(22)/100.0); // YR12, N/A(short), YR15, N/A(unpopulated), (parasitic capacitance from YC3)
+	// YR12, N/A(short), YR15, N/A(unpopulated), (parasitic capacitance from YC3)
+	FILTER_BIQUAD(config, m_ssgfilter_cgain).opamp_mfb_lowpass_setup(RES_K(4.7), 0.0, RES_K(10), 0.0, CAP_N(22)/100.0);
 	m_ssgfilter_cgain->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	// This filter is a 2nd order sallen-key lowpass, unity gain.
-	FILTER_BIQUAD(config, m_ssgfilter_cfilt).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(22), CAP_N(10)); // YR3, YR5, nothing(infinite resistance), wire(short), YC3, YC6
+	// YR3, YR5, nothing(infinite resistance), wire(short), YC3, YC6
+	FILTER_BIQUAD(config, m_ssgfilter_cfilt).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(22), CAP_N(10));
 	m_ssgfilter_cfilt->add_route(ALL_OUTPUTS, m_ssgfilter_cgain, 1.0);
 
 	// This filter is a differential amplifier, with no real cutoff, and a gain of -4.5454
 	// Technically it was probably intended as first order MFB lowpass, but the cap ("YC0")
 	//  near/bypassing YR7 was left unpopulated.
-	FILTER_BIQUAD(config, m_ssgfilter_abgain).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_N(100)/10000.0); // YR8, N/A(short), YR7, N/A(unpopulated), (parasitic capacitance from YC1)
+	// YR8, N/A(short), YR7, N/A(unpopulated), (parasitic capacitance from YC1)
+	FILTER_BIQUAD(config, m_ssgfilter_abgain).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_N(100)/10000.0);
 	m_ssgfilter_abgain->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	MIXER(config, m_ssgmixer);

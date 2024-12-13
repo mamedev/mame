@@ -899,6 +899,9 @@ void xavix_state::machine_start()
 	save_item(NAME(m_timer_baseval));
 	save_item(NAME(m_spritereg));
 
+	save_item(NAME(m_superxavix_pal_index));
+	save_item(NAME(m_superxavix_bitmap_pal_index));
+
 	save_item(NAME(m_sx_extended_extbus));
 }
 

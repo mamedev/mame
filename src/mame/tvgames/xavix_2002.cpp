@@ -266,6 +266,14 @@ static INPUT_PORTS_START( xavixp )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ban_ordj )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) // something input related, having it high allows bypass of calibration screen
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /* SuperXavix IO port handliner (per game) */
 
@@ -418,6 +426,14 @@ void xavix_i2c_state::xavix2002_i2c_24c04(machine_config &config)
 	I2C_24C04(config, "i2cmem", 0);
 }
 
+void xavix_i2c_state::xavix2002_i2c_24c02(machine_config &config)
+{
+	xavix2002(config);
+
+	I2C_24C02(config, "i2cmem", 0);
+}
+
+
 void xavix_i2c_state::xavix2002_i2c_mrangbat(machine_config &config)
 {
 	xavix2002(config);
@@ -539,6 +555,21 @@ ROM_START( tmy_thom )
 	ROM_LOAD( "thomastank.bin", 0x000000, 0x800000, CRC(a52a23be) SHA1(e5b3500239d9e56eb5405f7585982959e5a162da) )
 ROM_END
 
+ROM_START( ban_kksj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "kksj.u1", 0x000000, 0x800000, CRC(8071dc36) SHA1(46f41d4185a115b27c685d1eabcd554b3c5a64b7) )
+ROM_END
+
+ROM_START( tmy_rkmj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "rkmj.u1", 0x000000, 0x800000, CRC(80e70625) SHA1(500e287671a0822b736ed05704090d90187602ac) )
+ROM_END
+
+ROM_START( ban_ordj )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "ordj.u2", 0x000000, 0x800000, CRC(78fbb00f) SHA1(797b5495e292c36c003300ed18547e5643056149) )
+ROM_END
+
 ROM_START( epo_tfit )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("tennisfitness.bin", 0x000000, 0x400000, CRC(cbf65bd2) SHA1(30b3da6f061b2dd91679db42a050f715901beb87) )
@@ -626,6 +657,15 @@ CONS( 2004, epo_tfit, 0, 0, xavix2002_i2c_24c04,    epo_tfit,   xavix_i2c_state,
 // TODO: does it have an SEEPROM? why does it hang? full title?
 // それいけトーマス ソドー島のなかまたち
 CONS( 2005, tmy_thom, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Thomas and Friends (Tomy)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// Ｌｅｔ’ｓ！ ＴＶプレイ 体感体得 結界師 方囲！定礎！結！滅！
+CONS( 2007, ban_kksj, 0, 0, xavix2002_i2c_24c02,    xavix_i2c,  xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Taikan Taitoku Kekkaishi: Houi! Jouso! Ketsu! Metsu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// 流星のロックマン 電波変換！オン・エア！
+CONS( 2007, tmy_rkmj, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state, init_xavix, "Takara Tomy / Capcom / SSD Company LTD",   "Ryuusei no Rockman: Denpa Henkan! On Air! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型
+CONS( 2005, ban_ordj, 0, 0, xavix2002_i2c_24c04,    ban_ordj,   xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Ongeki Battle! Kamen Rider Hibiki: Kimero! Ikki Kasei no Kata (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // has HT24LC16
 CONS( 2008, udance,   0, 0, xavix2002, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "U-Dance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

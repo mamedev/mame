@@ -2,15 +2,18 @@
 // copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
-    Tekunon Kougyou(Teknon Kogyo) Beam Invader hardware
+Tekunon Kougyou (Teknon Kogyo, テクノン工業) Beam Invader (ビームインベーダー)
+Pacom (パコム) Pacom Invader (パコムインベーダー)
 
-    driver by Zsolt Vasvari
+driver by Zsolt Vasvari
 
-    Games supported:
-        * Beam Invader (2 sets)
-
-    Known issues:
-        * Port 0 might be an analog port select
+TODO:
+- discrete sound
+- analog controls are laggy
+- verify Z80 clock, 9.732MHz XTAL was seen on a CTA Invader, and Star Invader
+- are interrupts correct? vblank-in and vblank-out may be more logical, but
+  it does spend a lot of time in both interrupt routines
+- which game is the 1st version? Is it Fuji Star Invader? (which is undumped)
 
 
 Stephh's notes (based on the games Z80 code and some tests) :
@@ -58,10 +61,15 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
+
 #include "screen.h"
 
 #include "beaminv.lh"
+#include "ctainv.lh"
+#include "pacominv.lh"
 
 
 namespace {
@@ -69,82 +77,39 @@ namespace {
 class beaminv_state : public driver_device
 {
 public:
-	beaminv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
+	beaminv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_videoram(*this, "videoram"),
+		m_inputs(*this, "IN%u", 0)
+	{ }
 
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_videoram;
+	void beaminv(machine_config &config);
+	void ctainv(machine_config &config);
 
-	/* misc */
-	emu_timer  *m_interrupt_timer = nullptr;
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
-	/* input-related */
-	uint8_t      m_controller_select = 0;
-
-	/* devices */
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_ioport_array<3> m_inputs;
+
+	uint8_t m_controller_select = 0;
+
+	uint32_t screen_update_beaminv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint8_t v128_r();
 	void controller_select_w(uint8_t data);
 	uint8_t controller_r();
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	uint32_t screen_update_beaminv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(interrupt_callback);
-	void create_interrupt_timer();
-	void start_interrupt_timer();
-	void beaminv(machine_config &config);
-	void ctainv(machine_config &config);
-	void main_io_map(address_map &map) ATTR_COLD;
+
 	void main_map(address_map &map) ATTR_COLD;
 	void ctainv_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt) { m_maincpu->set_input_line(0, HOLD_LINE); }
 };
-
-
-
-/*************************************
- *
- *  Interrupt generation
- *
- *************************************/
-
-/* the interrupt scanlines are a guess */
-
-#define INTERRUPTS_PER_FRAME    (2)
-
-static const int interrupt_lines[INTERRUPTS_PER_FRAME] = { 0x00, 0x80 };
-
-
-TIMER_CALLBACK_MEMBER(beaminv_state::interrupt_callback)
-{
-	int interrupt_number = param;
-	int next_interrupt_number;
-	int next_vpos;
-
-	m_maincpu->set_input_line(0, HOLD_LINE);
-
-	/* set up for next interrupt */
-	next_interrupt_number = (interrupt_number + 1) % INTERRUPTS_PER_FRAME;
-	next_vpos = interrupt_lines[next_interrupt_number];
-
-	m_interrupt_timer->adjust(m_screen->time_until_pos(next_vpos), next_interrupt_number);
-}
-
-
-void beaminv_state::create_interrupt_timer()
-{
-	m_interrupt_timer = timer_alloc(FUNC(beaminv_state::interrupt_callback), this);
-}
-
-
-void beaminv_state::start_interrupt_timer()
-{
-	int vpos = interrupt_lines[0];
-	m_interrupt_timer->adjust(m_screen->time_until_pos(vpos));
-}
 
 
 
@@ -156,26 +121,7 @@ void beaminv_state::start_interrupt_timer()
 
 void beaminv_state::machine_start()
 {
-	create_interrupt_timer();
-
-
-	/* setup for save states */
 	save_item(NAME(m_controller_select));
-}
-
-
-
-/*************************************
- *
- *  Machine reset
- *
- *************************************/
-
-void beaminv_state::machine_reset()
-{
-	start_interrupt_timer();
-
-	m_controller_select = 0;
 }
 
 
@@ -196,11 +142,10 @@ uint32_t beaminv_state::screen_update_beaminv(screen_device &screen, bitmap_rgb3
 
 		for (int i = 0; i < 8; i++)
 		{
-			pen_t pen = (data & 0x01) ? rgb_t::white() : rgb_t::black();
-			bitmap.pix(y, x) = pen;
+			pen_t pen = BIT(data, i) ? rgb_t::white() : rgb_t::black();
 
-			data >>= 1;
-			x++;
+			if (cliprect.contains(x + i, y))
+				bitmap.pix(y, x + i) = pen;
 		}
 	}
 
@@ -210,7 +155,7 @@ uint32_t beaminv_state::screen_update_beaminv(screen_device &screen, bitmap_rgb3
 
 uint8_t beaminv_state::v128_r()
 {
-	return (m_screen->vpos() >> 7) & 0x01;
+	return BIT(m_screen->vpos(), 7);
 }
 
 
@@ -221,27 +166,30 @@ uint8_t beaminv_state::v128_r()
  *
  *************************************/
 
-#define P1_CONTROL_PORT_TAG ("CONTP1")
-#define P2_CONTROL_PORT_TAG ("CONTP2")
-
-
 void beaminv_state::controller_select_w(uint8_t data)
 {
-	/* 0x01 (player 1) or 0x02 (player 2) */
+	// 0x01 (player 1) or 0x02 (player 2)
 	m_controller_select = data;
 }
 
 
 uint8_t beaminv_state::controller_r()
 {
-	return ioport((m_controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG)->read();
+	uint8_t data = 0;
+
+	// read paddle controllers
+	for (int i = 0; i < 2; i++)
+		if (BIT(m_controller_select, i))
+			data |= m_inputs[i + 1]->read();
+
+	return data;
 }
 
 
 
 /*************************************
  *
- *  Memory handlers
+ *  Address maps
  *
  *************************************/
 
@@ -249,8 +197,9 @@ void beaminv_state::main_map(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
 	map(0x1800, 0x1fff).ram();
+	map(0x2000, 0x23ff).rom();
 	map(0x2400, 0x2400).mirror(0x03ff).portr("DSW");
-	map(0x2800, 0x2800).mirror(0x03ff).portr("INPUTS");
+	map(0x2800, 0x2800).mirror(0x03ff).portr("IN0");
 	map(0x3400, 0x3400).mirror(0x03ff).r(FUNC(beaminv_state::controller_r));
 	map(0x3800, 0x3800).mirror(0x03ff).r(FUNC(beaminv_state::v128_r));
 	map(0x4000, 0x5fff).ram().share("videoram");
@@ -259,28 +208,16 @@ void beaminv_state::main_map(address_map &map)
 
 void beaminv_state::ctainv_map(address_map &map)
 {
-	map(0x0000, 0x17ff).rom();
-	map(0x1800, 0x1fff).ram();
-	map(0x2000, 0x23ff).rom().region("maincpu", 0x1800);
-	map(0x2400, 0x2400).mirror(0x03ff).portr("DSW");
-	map(0x2800, 0x2800).mirror(0x03ff).portr("INPUTS");
+	main_map(map);
 	map(0x2c00, 0x2c00).mirror(0x03ff).r(FUNC(beaminv_state::controller_r));
-	map(0x3800, 0x3800).mirror(0x03ff).r(FUNC(beaminv_state::v128_r));
-	map(0x4000, 0x5fff).ram().share("videoram");
+	map(0x3400, 0x3400).mirror(0x03ff).unmapr();
 }
 
-
-
-/*************************************
- *
- *  Port handlers
- *
- *************************************/
 
 void beaminv_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(beaminv_state::controller_select_w)); /* to be confirmed */
+	map(0x00, 0x00).w(FUNC(beaminv_state::controller_select_w));
 }
 
 
@@ -311,7 +248,7 @@ static INPUT_PORTS_START( beaminv )
 	PORT_DIPSETTING(    0x60, "Never" )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START("INPUTS")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -319,10 +256,10 @@ static INPUT_PORTS_START( beaminv )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START(P1_CONTROL_PORT_TAG)
+	PORT_START("IN1")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(1)
 
-	PORT_START(P2_CONTROL_PORT_TAG)
+	PORT_START("IN2")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -342,10 +279,10 @@ static INPUT_PORTS_START( pacominv )
 	PORT_DIPSETTING(    0x40, "34 Enemies" )
 	PORT_DIPSETTING(    0x40, "29 Enemies" )
 
-	PORT_MODIFY(P1_CONTROL_PORT_TAG)
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0xff, 0x65, IPT_PADDLE ) PORT_MINMAX(0x35,0x95) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(1)
 
-	PORT_MODIFY(P2_CONTROL_PORT_TAG)
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0xff, 0x65, IPT_PADDLE ) PORT_MINMAX(0x35,0x95) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -376,16 +313,17 @@ INPUT_PORTS_END
 
 void beaminv_state::beaminv(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 2000000);   /* 2 MHz ? */
+	// basic machine hardware
+	Z80(config, m_maincpu, 9.732_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &beaminv_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &beaminv_state::main_io_map);
 
+	TIMER(config, "scantimer").configure_scanline(FUNC(beaminv_state::interrupt), "screen", 0, 128);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 247, 16, 231);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 29*8-1);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_screen_update(FUNC(beaminv_state::screen_update_beaminv));
 }
@@ -394,8 +332,6 @@ void beaminv_state::beaminv(machine_config &config)
 void beaminv_state::ctainv(machine_config &config)
 {
 	beaminv(config);
-
-	m_maincpu->set_clock(9.732_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &beaminv_state::ctainv_map);
 }
 
@@ -448,10 +384,11 @@ ROM_START( ctainv )
 	ROM_LOAD( "3.bin", 0x0c00, 0x0400, CRC(772db93e) SHA1(65d0a7528c86b4c3377e8cfda82eae51ee078238) )
 	ROM_LOAD( "4.bin", 0x1000, 0x0400, CRC(c9f671d9) SHA1(27e8ded5afc92f1eef9968a6af4b8c5af482904f) )
 	ROM_LOAD( "5.bin", 0x1400, 0x0400, CRC(a028342f) SHA1(32fd83b0ac8215935032a22e3bfd9fcf1b8402c0) )
-	ROM_LOAD( "6.bin", 0x1800, 0x0400, CRC(06dcb63c) SHA1(4d5260b3785e2c215dd0b3c9f8457cf4a557a452) )
+	ROM_LOAD( "6.bin", 0x2000, 0x0400, CRC(06dcb63c) SHA1(4d5260b3785e2c215dd0b3c9f8457cf4a557a452) )
 ROM_END
 
 } // anonymous namespace
+
 
 
 /*************************************
@@ -460,7 +397,7 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1979, beaminv,   0,       beaminv, beaminv,  beaminv_state, empty_init, ROT270, "Teknon Kogyo",      "Beam Invader",          MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
-GAMEL( 1979, pacominv,  beaminv, beaminv, pacominv, beaminv_state, empty_init, ROT270, "Pacom Corporation", "Pacom Invader (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
-GAMEL( 19??, pacominva, beaminv, beaminv, pacominv, beaminv_state, empty_init, ROT270, "Pacom Corporation", "Pacom Invader (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
-GAME ( 19??, ctainv,    beaminv, ctainv,  ctainv,   beaminv_state, empty_init, ROT270, "CTA Corporation",   "CTA Invader",           MACHINE_WRONG_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1979, beaminv,   0,       beaminv, beaminv,  beaminv_state, empty_init, ROT270, "Teknon Kogyo",              "Beam Invader",          MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )
+GAMEL( 1979, pacominv,  beaminv, beaminv, pacominv, beaminv_state, empty_init, ROT270, "Pacom Corporation",         "Pacom Invader (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_pacominv ) // bootleg?
+GAMEL( 1979, pacominva, beaminv, beaminv, pacominv, beaminv_state, empty_init, ROT270, "Pacom Corporation",         "Pacom Invader (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_pacominv ) // "
+GAMEL( 19??, ctainv,    beaminv, ctainv,  ctainv,   beaminv_state, empty_init, ROT270, "bootleg (CTA Corporation)", "CTA Invader",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_ctainv )

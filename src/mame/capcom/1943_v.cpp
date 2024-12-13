@@ -131,7 +131,7 @@ void _1943_state::colorram_w(offs_t offset, u8 data)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-void _1943_state::c804_w(u8 data)
+void _1943_state::control_w(u8 data)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -150,7 +150,7 @@ void _1943_state::c804_w(u8 data)
 	m_char_on = data & 0x80;
 }
 
-void _1943_state::d806_w(u8 data)
+void _1943_state::layer_w(u8 data)
 {
 	/* bit 4 enables bg 1 */
 	m_bg1_on = data & 0x10;
