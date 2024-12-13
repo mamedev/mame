@@ -390,5 +390,23 @@ protected:
 private:
 };
 
+class spg2xx_game_prail_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_prail_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void prail(machine_config &config);
+
+protected:
+	void prail_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+private:
+	required_device<i2cmem_device> m_i2cmem;
+};
+
+
 
 #endif // MAME_TVGAMES_SPG2XX_H
