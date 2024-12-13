@@ -35367,6 +35367,9 @@ cexpert
 cfortea
 cforteb
 
+@source:novag/cnchess.cpp
+cnchess
+
 @source:novag/const.cpp
 const
 const36

@@ -130,6 +130,9 @@ void hd6305_device::port_ddr_w(u8 data)
 
 void hd6305_device::timer_update_regs()
 {
+	if(machine().side_effects_disabled())
+		return;
+
 	u32 counter = m_prescaler;
 	u64 tc = machine().time().as_ticks(clock())/4;
 	u32 cycles = tc - m_timer_last_update;
@@ -308,7 +311,8 @@ void hd6305_device::sci_ssr_w(u8 data)
 
 u8 hd6305_device::sci_data_r()
 {
-	logerror("sci data r\n");
+	if(!machine().side_effects_disabled())
+		logerror("sci data r\n");
 	return 0x00;
 }
 
