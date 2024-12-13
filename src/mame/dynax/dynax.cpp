@@ -2182,55 +2182,55 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjdialq2 )
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x00, "PINFU with TSUMO" )  PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x38, 0x20, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:4,5,6")
-	PORT_DIPSETTING(    0x38, "1 (Easy)" )
-	PORT_DIPSETTING(    0x30, "2" )
-	PORT_DIPSETTING(    0x28, "3" )
-	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPSETTING(    0x18, "5" )
-	PORT_DIPSETTING(    0x10, "6" )
-	PORT_DIPSETTING(    0x08, "7" )
-	PORT_DIPSETTING(    0x00, "8 (Hard)" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage ) )               PORT_DIPLOCATION("SW. 1:1,2")     // プレイ料金
+	PORT_DIPSETTING(    0x00, DEF_STR(3C_1C) )                                                    // ３コイン　１プレー
+	PORT_DIPSETTING(    0x02, DEF_STR(2C_1C) )                                                    // ２コイン　１プレー
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )                                                    // １コイン　１プレー
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_2C) )                                                    // １コイン　２プレー
+	PORT_DIPNAME( 0x04, 0x00, "Allow Pinfu with Tsumo")         PORT_DIPLOCATION("SW. 1:3")       // ルール　ピンフ・ツモ複合
+	PORT_DIPSETTING(    0x04, DEF_STR(No) )                                                       // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                      // 有り
+	PORT_DIPNAME( 0x38, 0x20, DEF_STR(Difficulty) )             PORT_DIPLOCATION("SW. 1:4,5,6")   // 難易度　コンピュー
+	PORT_DIPSETTING(    0x38, "1 (Weak)" )                                                        // 弱い　　（１）
+	PORT_DIPSETTING(    0x30, "2" )                                                               // 　　　　（２）
+	PORT_DIPSETTING(    0x28, "3" )                                                               // 　　　　（３）
+	PORT_DIPSETTING(    0x20, "4 (Normal)" )                                                      // 標準　　（４）
+	PORT_DIPSETTING(    0x18, "5" )                                                               // 　　　　（５）
+	PORT_DIPSETTING(    0x10, "6" )                                                               // 　　　　（６）
+	PORT_DIPSETTING(    0x08, "7" )                                                               // 　　　　（７）
+	PORT_DIPSETTING(    0x00, "8 (Strong)" )                                                      // 強い　　（８）
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR(Demo_Sounds ) )           PORT_DIPLOCATION("SW. 1:7")       // デモ・サウンド
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                      // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有り
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Flip_Screen) )            PORT_DIPLOCATION("SW. 1:8")       // モニター画面反転
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                      // 正
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 逆
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, "Time Setting" )      PORT_DIPLOCATION("SW2:1,2,3")
-	PORT_DIPSETTING(    0x07, "08:30" )
-	PORT_DIPSETTING(    0x06, "09:00" )
-	PORT_DIPSETTING(    0x05, "09:30" )
-	PORT_DIPSETTING(    0x04, "10:00" )
-	PORT_DIPSETTING(    0x03, "10:30" )
-	PORT_DIPSETTING(    0x02, "11:00" )
-	PORT_DIPSETTING(    0x01, "11:30" )
-	PORT_DIPSETTING(    0x00, "12:00" )
-	PORT_DIPNAME( 0x08, 0x00, "Time Service" )  PORT_DIPLOCATION("SW2:4") // "secret moves" happen at certain time stamps
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "TEL Display" )       PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "GAL mode" )          PORT_DIPLOCATION("SW2:6") // unknown what this does
-	PORT_DIPSETTING(    0x20, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x40, 0x40, "Select Special Item" )   PORT_DIPLOCATION("SW2:7")/* Allows to select which one of the nine special items you want. */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Debug" )         PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x07, "Game Clock Start" )              PORT_DIPLOCATION("SW. 2:1,2,3")   // ゲーム時計スタート
+	PORT_DIPSETTING(    0x07, "08:30" )                                                           // 　８時３０分
+	PORT_DIPSETTING(    0x06, "09:00" )                                                           // 　９時００分
+	PORT_DIPSETTING(    0x05, "09:30" )                                                           // 　９時３０分
+	PORT_DIPSETTING(    0x04, "10:00" )                                                           // １０時００分
+	PORT_DIPSETTING(    0x03, "10:30" )                                                           // １０時３０分
+	PORT_DIPSETTING(    0x02, "11:00" )                                                           // １１時００分
+	PORT_DIPSETTING(    0x01, "11:30" )                                                           // １１時３０分
+	PORT_DIPSETTING(    0x00, "12:00" )                                                           // １２時００分
+	PORT_DIPNAME( 0x08, 0x00, "Time Service" )                  PORT_DIPLOCATION("SW. 2:4")       // タイム－サービス（時間等によりできる秘技）
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有り                  (allows secret techniques depending on the time)
+	PORT_DIPNAME( 0x10, 0x10, "Show Telephone Numbers" )        PORT_DIPLOCATION("SW. 2:5")       // ＴＥＬ表示
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                      // 無し
+	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                       // 有り
+	PORT_DIPNAME( 0x20, 0x20, "Gal Mode" )                      PORT_DIPLOCATION("SW. 2:6")       // ＧＡＬモード切り替え  (not clear what this does)
+	PORT_DIPSETTING(    0x20, "1" )                                                               // １
+	PORT_DIPSETTING(    0x00, "2" )                                                               // ２
+	PORT_DIPNAME( 0x40, 0x40, "Bonus Item Select (cheat)" )     PORT_DIPLOCATION("SW. 2:7")       // ＯＦＦ固定
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       //                       (allows you to select a bonus item and always win the jan-ken-pon game)
+	PORT_DIPNAME( 0x80, 0x80, "Show Debug Info" )               PORT_DIPLOCATION("SW. 2:8")       // ＯＦＦ固定
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "17B"
@@ -2242,7 +2242,7 @@ static INPUT_PORTS_START( mjdialq2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "18A"
 
-	PORT_INCLUDE( dynax_mahjong_keys )
+	PORT_INCLUDE( mahjong_matrix_2p_ff )
 INPUT_PORTS_END
 
 
@@ -2353,7 +2353,7 @@ static INPUT_PORTS_START( mjcomv1 )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )   // "17B"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )   // "18B"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR(Test))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE PORT_NAME(DEF_STR(Test))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )   // "06B"
@@ -3355,7 +3355,7 @@ static INPUT_PORTS_START( neruton )
 	PORT_DIPSETTING(    0x02, "11:00" )                                                           // １１時００分
 	PORT_DIPSETTING(    0x01, "11:30" )                                                           // １１時３０分
 	PORT_DIPSETTING(    0x00, "12:00" )                                                           // １２時００分
-	PORT_DIPNAME( 0x08, 0x00, "Time Service" )                  PORT_DIPLOCATION("SW. 2:4")       // タイム－サービス
+	PORT_DIPNAME( 0x08, 0x00, "Time Service" )                  PORT_DIPLOCATION("SW. 2:4")       // タイム－サービス（時間等によりできる秘技）
 	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無し
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有り               (allows secret techniques depending on the time)
 	PORT_DIPNAME( 0x10, 0x10, "Gal H Pose" )                    PORT_DIPLOCATION("SW. 2:5")       // ＯＦＦ固定

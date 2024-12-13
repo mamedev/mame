@@ -141,8 +141,8 @@ TODO:
 
 /* macros for CC -- CC bits affected should be reset before calling */
 #define SET_Z(a)        if(!(a))SEZ
-#define SET_Z8(a)       SET_Z((u8)(a))
-#define SET_Z16(a)      SET_Z((u16)(a))
+#define SET_Z8(a)       SET_Z(u8(a))
+#define SET_Z16(a)      SET_Z(u16(a))
 #define SET_N8(a)       CC|=(((a)&0x80)>>4)
 #define SET_N16(a)      CC|=(((a)&0x8000)>>12)
 #define SET_H(a,b,r)    CC|=((((a)^(b)^(r))&0x10)<<1)
@@ -202,7 +202,7 @@ const u8 m6800_cpu_device::flags8d[256]= /* decrement */
 #define SET_FLAGS16(a,b,r)  {SET_N16(r);SET_Z16(r);SET_V16(a,b,r);SET_C16(r);}
 
 /* for treating an u8 as a signed s16 */
-#define SIGNED(b) ((s16)(b&0x80?b|0xff00:b))
+#define SIGNED(b) (s16(b&0x80?b|0xff00:b))
 
 /* Macros for addressing modes */
 #define DIRECT IMMBYTE(EAD)

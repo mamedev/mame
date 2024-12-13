@@ -1,9 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
 #include "emu.h"
-#include "bitmap.h"
-#include "video/rgbutil.h"
 #include "xbox_nv2a.h"
+
+#include "video/rgbutil.h"
+
+#include "bitmap.h"
+
 #include <bitset>
 #include <cfloat>
 

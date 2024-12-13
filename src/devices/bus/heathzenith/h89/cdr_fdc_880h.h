@@ -15,5 +15,4 @@
 
 DECLARE_DEVICE_TYPE(H89BUS_CDR_FDC_880H, device_h89bus_right_card_interface)
 
-
 #endif // MAME_BUS_HEATHZENITH_H89_CDR_FDC_880H_H

@@ -15,62 +15,6 @@
 #include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
-namespace {
-
-class cdr_fdc_880h_device : public device_t, public device_h89bus_right_card_interface
-{
-public:
-
-	cdr_fdc_880h_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
-	virtual void write(u8 select_lines, u8 offset, u8 data) override;
-	virtual u8 read(u8 select_lines, u8 offset) override;
-
-	// The controller has two 16L8 PALs which are not dumped (z15 and z20 from schematics).
-	static constexpr feature_type unemulated_features() { return feature::DISK; }
-
-protected:
-
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	void cmd_w(u8 val);
-	void data_w(u8 val);
-	u8 data_r();
-	u8 status_r();
-
-	void set_irq(int state);
-	void set_drq(int state);
-
-private:
-
-	required_device<fd1797_device>             m_fdc;
-	required_device_array<floppy_connector, 4> m_floppies;
-
-	bool                                       m_irq_allowed;
-
-	bool                                       m_irq;
-	bool                                       m_drq;
-
-	bool                                       m_double_density;
-	bool                                       m_five_in_drive;
-	bool                                       m_mode_operate;
-	s8                                         m_drive;
-
-
-	/// Bits set in cmd_ControlPort_c
-	static constexpr u8 ctrl_EnableIntReq_c    = 7;
-	static constexpr u8 ctrl_SetMFMRecording_c = 6;
-	static constexpr u8 ctrl_DriveType_c       = 5;
-	static constexpr u8 ctrl_Mode_c            = 4;
-
-	static constexpr XTAL MASTER_CLOCK         = XTAL(4'000'000);
-	static constexpr XTAL FIVE_IN_CLOCK        = MASTER_CLOCK / 4;
-	static constexpr XTAL EIGHT_IN_CLOCK       = MASTER_CLOCK / 2;
-
-};
-
 #define LOG_REG   (1U << 1)    // Shows register setup
 #define LOG_LINES (1U << 2)    // Show control lines
 #define LOG_DRIVE (1U << 3)    // Show drive select
@@ -96,6 +40,59 @@ private:
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
+
+namespace {
+
+class cdr_fdc_880h_device : public device_t, public device_h89bus_right_card_interface
+{
+public:
+	cdr_fdc_880h_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	virtual void write(u8 select_lines, u8 offset, u8 data) override;
+	virtual u8 read(u8 select_lines, u8 offset) override;
+
+	// The controller has two 16L8 PALs which are not dumped (z15 and z20 from schematics).
+	static constexpr feature_type unemulated_features() { return feature::DISK; }
+
+protected:
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void cmd_w(u8 val);
+	void data_w(u8 val);
+	u8 data_r();
+	u8 status_r();
+
+	void set_irq(int state);
+	void set_drq(int state);
+
+private:
+	/// Bits set in cmd_ControlPort_c
+	static constexpr u8 ctrl_EnableIntReq_c    = 7;
+	static constexpr u8 ctrl_SetMFMRecording_c = 6;
+	static constexpr u8 ctrl_DriveType_c       = 5;
+	static constexpr u8 ctrl_Mode_c            = 4;
+
+	static constexpr XTAL MASTER_CLOCK         = XTAL(4'000'000);
+	static constexpr XTAL FIVE_IN_CLOCK        = MASTER_CLOCK / 4;
+	static constexpr XTAL EIGHT_IN_CLOCK       = MASTER_CLOCK / 2;
+
+	required_device<fd1797_device>             m_fdc;
+	required_device_array<floppy_connector, 4> m_floppies;
+
+	bool                                       m_irq_allowed;
+
+	bool                                       m_irq;
+	bool                                       m_drq;
+
+	bool                                       m_double_density;
+	bool                                       m_five_in_drive;
+	bool                                       m_mode_operate;
+	s8                                         m_drive;
+};
 
 
 cdr_fdc_880h_device::cdr_fdc_880h_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
@@ -320,12 +317,11 @@ void cdr_fdc_880h_device::device_reset()
 	set_slot_int5(CLEAR_LINE);
 	set_slot_wait(CLEAR_LINE);
 
-	for (int i = 0; i < 4; i++)
+	for (auto &elem : m_floppies)
 	{
-		auto elem = m_floppies[i];
 		if (elem)
 		{
-			floppy_image_device *floppy = elem->get_device();
+			floppy_image_device *const floppy = elem->get_device();
 			if (floppy)
 			{
 				// turn on motor of all installed 8" floppies
