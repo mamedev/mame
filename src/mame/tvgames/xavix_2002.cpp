@@ -399,9 +399,8 @@ DEVICE_IMAGE_LOAD_MEMBER(xavix2002_super_tv_pc_state::cart_load)
 void xavix2002_super_tv_pc_state::xavix_extbus_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rom().region("bios", 0x00000).mirror(0x800000);
-	map(0xe00000, 0xe7ffff).ram(); // writes here
+	map(0x600000, 0x67ffff).ram(); // writes here
 }
-
 
 void xavix2002_super_tv_pc_state::xavix2002_super_tv_pc(machine_config& config)
 {
