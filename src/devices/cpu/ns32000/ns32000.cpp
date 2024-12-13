@@ -3888,9 +3888,16 @@ void ns32532_device::device_add_mconfig(machine_config &config)
 
 void ns32532_device::device_reset()
 {
+	// TODO: pc and psr are saved in r0/r1 at reset
+	//m_r[0] = m_pc;
+	//m_r[1] = m_psr;
+
 	ns32000_device<32, 2>::device_reset();
 
 	m_cfg = CFG_P | CFG_FC | CFG_FM | CFG_FF;
+	m_mcr = 0;
+	m_msr = 0;
+	m_dcr = 0;
 }
 
 device_memory_interface::space_config_vector ns32532_device::memory_space_config() const
