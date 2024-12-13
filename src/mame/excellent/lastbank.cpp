@@ -896,6 +896,9 @@ ROM_START( wcircus )
 
 	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
 	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(d018ed97) SHA1(02eb6559805f81f371d39b9c0660cd6d9d392656) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8b.u45", 0x000, 0x117, CRC(02e1f2e9) SHA1(25ae98facfed2796bfc1ad33cce73c5074edd135) )
 ROM_END
 
 } // anonymous namespace

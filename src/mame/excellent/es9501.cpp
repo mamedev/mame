@@ -20,7 +20,6 @@ bank of 8 DIP switches
 battery (near CPU)
 
 Undumped games known to run on this PCB:
-* Flower Dream 9
 * Multi Spin
 * Star Ball
 */
@@ -30,6 +29,7 @@ Undumped games known to run on this PCB:
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
+#include "sound/ay8910.h"
 #include "sound/ymz280b.h"
 
 #include "emupal.h"
@@ -88,6 +88,7 @@ void es9501_state::program_map(address_map &map)
 	map(0x600004, 0x600005).portr("DSW");
 	// map(0x600008, 0x600009).w // watchdog?
 	map(0x700000, 0x700003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff); // ??
+	map(0x700004, 0x700007).w("ymz284", FUNC(ymz284_device::address_data_w)).umask16(0x00ff); // ??
 }
 
 
@@ -182,8 +183,30 @@ void es9501_state::es9501(machine_config &config)
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 28.636363_MHz_XTAL / 2));
 	ymz.add_route(0, "lspeaker", 1.0);
 	ymz.add_route(1, "rspeaker", 1.0);
+
+	ymz284_device & ymz284(YMZ284(config, "ymz284", 28.636363_MHz_XTAL / 8)); // divider not verified
+	ymz284.add_route(0, "lspeaker", 1.0);
+	ymz284.add_route(1, "rspeaker", 1.0);
 }
 
+
+ROM_START( d9flower ) // Dream 9 Flower string, but images seem more Flower 9 Dream
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "2.u33", 0x00000, 0x40000, CRC(a57ef10e) SHA1(89d46c80e03b21469f61ee021013e4be51ef882e) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "1.u31", 0x00001, 0x40000, CRC(fb6c1e72) SHA1(a03e9129c52c4587fb360f2f886bbd9983f49f05) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x280000, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "u4.u51", 0x000000, 0x080000, CRC(c2a06ed5) SHA1(ffb07982f9ad91ce28bf3eacb8deedcc957bbbc1) )
+
+	ROM_REGION( 0x200000, "ymz", ROMREGION_ERASE00 )
+	ROM_LOAD( "5.u23", 0x000000, 0x080000, CRC(b6ad2e58) SHA1(84c0cdc155f641d4e5d8ae99acbfa5b297762418) )
+
+	ROM_REGION16_BE( 0x100, "eeprom", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, NO_DUMP )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "3.u37", 0x000, 0x117, BAD_DUMP CRC(bea4cb24) SHA1(09987e6b903cc3bd202a9d933474b36bdbb99d9a) ) // not dumped for this set, but marked same
+ROM_END
 
 ROM_START( specd9 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -207,4 +230,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1997, specd9, 0, es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System", "Special Dream 9 (v1.0.5G)", MACHINE_IS_SKELETON )
+GAME( 199?, d9flower, 0, es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System", "Dream 9 Flower (v1.00c)",   MACHINE_IS_SKELETON ) // or possibly Cadence Technology copyright
+GAME( 1997, specd9,   0, es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System", "Special Dream 9 (v1.0.5G)", MACHINE_IS_SKELETON )
