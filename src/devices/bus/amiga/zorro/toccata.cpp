@@ -76,10 +76,10 @@ void toccata_device::device_add_mconfig(machine_config &config)
 	m_ad1848->drq().set(FUNC(toccata_device::drq_w));
 
 	IDT7202(config, m_fifo[0]);
-	m_fifo[0]->hf_handler().set(FUNC(playback_hf_w));
+	m_fifo[0]->hf_handler().set(FUNC(toccata_device::playback_hf_w));
 
 	IDT7202(config, m_fifo[1]);
-	m_fifo[1]->hf_handler().set(FUNC(record_hf_w));
+	m_fifo[1]->hf_handler().set(FUNC(toccata_device::record_hf_w));
 }
 
 
