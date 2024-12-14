@@ -161,6 +161,14 @@ public:
 	// construction/destruction
 	hd6305y2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto read_porta()  { return m_read_port [0].bind(); }
+	auto write_porta() { return m_write_port[0].bind(); }
+	auto read_portb()  { return m_read_port [1].bind(); }
+	auto write_portb() { return m_write_port[1].bind(); }
+	auto read_portc()  { return m_read_port [2].bind(); }
+	auto write_portc() { return m_write_port[2].bind(); }
+	auto read_portd()  { return m_read_port [3].bind(); }
+
 private:
 	void internal_map(address_map &map) ATTR_COLD;
 };

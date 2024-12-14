@@ -7,7 +7,6 @@ Hitachi HD6305 series
 TODO:
 - HD6305xx has a 14-bit address space, not 13 (memory_access in m6805.h)
 - add unimplemented opcodes: STOP, WAIT, DAA, and HD63705Z0 also has MUL
-- add HD6305Y2 peripherals (nothing to test it with?)
 - add HD63705Z0 peripherals
 
 */
