@@ -4,16 +4,16 @@
 
     g65sc02.h
 
-    Rockwell-class 65c02 with internal static registers, making clock stoppable?
+    65c02 with internal static registers, making clock stoppable?
 
 ***************************************************************************/
 
 #ifndef MAME_CPU_M6502_G65SC02_H
 #define MAME_CPU_M6502_G65SC02_H
 
-#include "r65c02.h"
+#include "w65c02.h"
 
-class g65sc02_device : public r65c02_device {
+class g65sc02_device : public w65c02_device {
 public:
 	g65sc02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -29,6 +29,10 @@ public:
 class g65sc102_device : public g65sc02_device {
 public:
 	g65sc102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 };
 
 class g65sc112_device : public g65sc02_device {

@@ -4,7 +4,7 @@
 
     g65sc02.cpp
 
-    Rockwell-class 65c02 with internal static registers, making clock stoppable?
+    65c02 with internal static registers, making clock stoppable?
 
     TODO:
     - none of the CPU type differences are currently emulated (eg. BE pin, ML pin),
@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(G65SC102, g65sc102_device, "g65sc102", "GTE G65SC102")
 DEFINE_DEVICE_TYPE(G65SC112, g65sc112_device, "g65sc112", "GTE G65SC112")
 
 g65sc02_device::g65sc02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	r65c02_device(mconfig, type, tag, owner, clock)
+	w65c02_device(mconfig, type, tag, owner, clock)
 {
 }
 

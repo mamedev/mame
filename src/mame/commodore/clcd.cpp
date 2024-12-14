@@ -719,7 +719,7 @@ INPUT_PORTS_END
 void clcd_state::clcd(machine_config &config)
 {
 	/* basic machine hardware */
-	G65SC102(config, m_maincpu, 1000000);
+	G65SC102(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &clcd_state::clcd_mem);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", g65sc102_device::IRQ_LINE);

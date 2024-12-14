@@ -28,6 +28,10 @@ protected:
 class r65c102_device : public r65c02_device {
 public:
 	r65c102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 };
 
 class r65c112_device : public r65c02_device {
