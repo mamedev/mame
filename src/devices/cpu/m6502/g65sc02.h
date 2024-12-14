@@ -16,19 +16,22 @@
 class g65sc02_device : public r65c02_device {
 public:
 	g65sc02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	g65sc02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class g65sc12_device : public r65c02_device {
+class g65sc12_device : public g65sc02_device {
 public:
 	g65sc12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class g65sc102_device : public r65c02_device {
+class g65sc102_device : public g65sc02_device {
 public:
 	g65sc102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class g65sc112_device : public r65c02_device {
+class g65sc112_device : public g65sc02_device {
 public:
 	g65sc112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };

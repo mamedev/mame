@@ -328,7 +328,7 @@ void textelcomp_state::textelcomp(machine_config &config)
 	G65SC02(config, m_maincpu, 3.6864_MHz_XTAL / 2); // G65SC02P-2 (clock not verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &textelcomp_state::mem_map);
 
-	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, g65sc02_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, G65SC02_IRQ_LINE);
 
 	via6522_device &via0(R65C22(config, "via0", 3.6864_MHz_XTAL / 2)); // G65SC22P-2
 	via0.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));

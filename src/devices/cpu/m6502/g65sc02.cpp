@@ -20,22 +20,27 @@ DEFINE_DEVICE_TYPE(G65SC12, g65sc12_device, "g65sc12", "GTE G65SC12")
 DEFINE_DEVICE_TYPE(G65SC102, g65sc102_device, "g65sc102", "GTE G65SC102")
 DEFINE_DEVICE_TYPE(G65SC112, g65sc112_device, "g65sc112", "GTE G65SC112")
 
+g65sc02_device::g65sc02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	r65c02_device(mconfig, type, tag, owner, clock)
+{
+}
+
 g65sc02_device::g65sc02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	r65c02_device(mconfig, G65SC02, tag, owner, clock)
+	g65sc02_device(mconfig, G65SC02, tag, owner, clock)
 {
 }
 
 g65sc12_device::g65sc12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	r65c02_device(mconfig, G65SC12, tag, owner, clock)
+	g65sc02_device(mconfig, G65SC12, tag, owner, clock)
 {
 }
 
 g65sc102_device::g65sc102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	r65c02_device(mconfig, G65SC102, tag, owner, clock)
+	g65sc02_device(mconfig, G65SC102, tag, owner, clock)
 {
 }
 
 g65sc112_device::g65sc112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	r65c02_device(mconfig, G65SC112, tag, owner, clock)
+	g65sc02_device(mconfig, G65SC112, tag, owner, clock)
 {
 }
