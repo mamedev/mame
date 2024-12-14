@@ -3306,7 +3306,7 @@ void lunapark_state::machine_reset()
 void funworld_state::fw1stpal(machine_config &config)
 {
 	// basic machine hardware
-	M65SC02(config, m_maincpu, CPU_CLOCK);  // 2 MHz.
+	G65SC02(config, m_maincpu, CPU_CLOCK);  // 2 MHz.
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::funworld_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -3470,7 +3470,7 @@ void intergames_state::intrgmes(machine_config &config)
 {
 	fw1stpal(config);
 
-	M65SC02(config.replace(), m_maincpu, CPU_CLOCK);    // 2 MHz.
+	G65SC02(config.replace(), m_maincpu, CPU_CLOCK);    // 2 MHz.
 	m_maincpu->set_addrmap(AS_PROGRAM, &intergames_state::intergames_map);
 	//m_maincpu->set_periodic_int(FUNC(intergames_state::nmi_line_pulse), attotime::from_hz(60));
 

@@ -78,7 +78,7 @@ void lynx_state::sound_cb()
 void lynx_state::lynx(machine_config &config)
 {
 	/* basic machine hardware */
-	M65SC02(config, m_maincpu, XTAL(16'000'000) / 4);        /* vti core, integrated in vlsi, stz, but not bbr bbs */
+	G65SC02(config, m_maincpu, XTAL(16'000'000) / 4); /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lynx_state::cpu_map);
 	config.set_maximum_quantum(attotime::from_hz(60));
 

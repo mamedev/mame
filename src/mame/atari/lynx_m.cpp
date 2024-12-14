@@ -1227,7 +1227,7 @@ void lynx_state::interrupt_set(u8 line)
 
 void lynx_state::interrupt_update()
 {
-	m_maincpu->set_input_line(M65SC02_IRQ_LINE, (m_mikey.interrupt == 0) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(G65SC02_IRQ_LINE, (m_mikey.interrupt == 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -1877,7 +1877,7 @@ void lynx_state::machine_reset()
 
 	m_mikey.interrupt = 0;
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	m_maincpu->set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(G65SC02_IRQ_LINE, CLEAR_LINE);
 
 	m_suzy = SUZY();
 	m_mikey = MIKEY();

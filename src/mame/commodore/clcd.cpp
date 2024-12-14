@@ -13,10 +13,11 @@
 
 
 #include "emu.h"
+
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/m65sc02.h"
 #include "machine/6522via.h"
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
@@ -25,6 +26,7 @@
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -538,7 +540,7 @@ public:
 	void clcd_banked_mem(address_map &map) ATTR_COLD;
 	void clcd_mem(address_map &map) ATTR_COLD;
 private:
-	required_device<m65c02_device> m_maincpu;
+	required_device<g65sc102_device> m_maincpu;
 	required_device<mos6551_device> m_acia;
 	required_device<via6522_device> m_via0;
 	required_device<msm58321_device> m_rtc;
@@ -717,10 +719,10 @@ INPUT_PORTS_END
 void clcd_state::clcd(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 1000000);
+	G65SC102(config, m_maincpu, 1000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &clcd_state::clcd_mem);
 
-	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", m65c02_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", g65sc102_device::IRQ_LINE);
 
 	via6522_device &via0(R65C22(config, "via0", 1000000));
 	via0.writepa_handler().set(FUNC(clcd_state::via0_pa_w));
@@ -823,4 +825,4 @@ ROM_END
 
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                        FULLNAME           FLAGS */
-COMP( 1985, clcd, 0,      0,      clcd,    clcd,  clcd_state, empty_init, "Commodore Business Machines", "LCD (Prototype)", 0 )
+COMP( 1985, clcd, 0,      0,      clcd,    clcd,  clcd_state, empty_init, "Commodore Business Machines", "LCD (prototype)", 0 )

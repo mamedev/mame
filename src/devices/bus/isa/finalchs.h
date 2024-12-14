@@ -35,7 +35,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	required_device<m65sc02_device> m_maincpu;
+	required_device<g65sc02_device> m_maincpu;
 	required_device<generic_latch_8_device> m_mainlatch;
 	required_device<generic_latch_8_device> m_sublatch;
 

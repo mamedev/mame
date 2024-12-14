@@ -402,7 +402,7 @@ void const_state::nconst36(machine_config &config)
 	nconst(config);
 
 	// basic machine hardware
-	M65SC02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
+	G65SC02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
 	subdevice<clock_device>("irq_clock")->set_clock(7.2_MHz_XTAL/2 / 0x2000); // ~439Hz (pulse width same as nconst)

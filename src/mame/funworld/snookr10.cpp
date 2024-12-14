@@ -1037,7 +1037,7 @@ GFXDECODE_END
 void snookr10_state::snookr10(machine_config &config)
 {
 	// basic machine hardware
-	M65SC02(config, m_maincpu, XTAL(16'000'000) / 8);    // 2 MHz (1.999 MHz measured)
+	G65SC02(config, m_maincpu, XTAL(16'000'000) / 8); // 2 MHz (1.999 MHz measured)
 	m_maincpu->set_addrmap(AS_PROGRAM, &snookr10_state::snookr10_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
