@@ -4052,7 +4052,7 @@ INPUT_PORTS_END
 	     342-0151-A 1982 ISO  German QWERTZ           US QWERTY                         DE            original      yes
 	     342-0152-A 1982 ISO  Swedish QWERTY          US QWERTY                         SE, FI        original      yes
 	     342-0153-A 1982 ISO  French AZERTY           US QWERTY                         FR, BE        original      yes
-	     342-0154-A 1982 ISO  Italian QZERTY          US QWERTY                         IT            original      no
+	     342-0154-A 1982 ISO  Italian QZERTY          US QWERTY                         IT            original      yes
 	     342-0155-A 1982 ISO  US QWERTY               Western Spanish QWERTY (original) Latin America original      no (order may be reversed)
 	     342-0211-A 1982 ISO  Spanish QWERTY          US QWERTY                         ES, PT        original      yes
 	     342-0283-A 1983 ISO  French AZERTY (SL)      US QWERTY                         FR            original      no
@@ -4075,7 +4075,7 @@ INPUT_PORTS_END
 	     342-0161-A German           US English         no        DE            yes
 	     342-0162-A Swedish          US English         no        SE            yes
 	     342-0163-A French           US English         no        FR, BE        no
-	     342-0164-A Italian          US English         no        IT            no
+	     342-0164-A Italian          US English         no        IT            yes
 	     342-0165-A US English       Spanish            no        Latin America no (order may be reversed)
 	     342-0166-A US English       French             no        CA            no (order may be reversed)
 	     342-0167-A US English       Spanish            no        Latin America no (order may be reversed)
@@ -4084,11 +4084,12 @@ INPUT_PORTS_END
 	     342-0265-A US English       none               yes       US, AU        yes
 	     342-0273-A UK English       US English         yes       UK, NL, AU    yes
 	     342-0274-A French           US English         yes       FR, BE        yes
-	     342-0275-A German           US English         yes       DE            no
-	     342-0276-A Italian          US English         yes       IT            no
-	     342-0306-A US English       French             yes       CA            no (order may be reversed)
+	     342-0275-A German           US English         yes       DE            yes
+	     342-0276-A Italian          US English         yes       IT            yes
+	     342-0306-A US English       French             yes       CA            yes (order may be reversed)
 	     342-0307-A US English       Spanish            yes       Latin America no (order may be reversed)
-	     342-0nnn-A Swedish          US English         yes       SE            no
+	     342-0328-A Swedish          US English         yes       SE            no
+	     342-0nnn-A Swedish          US English         yes       SE            no (possible revision based on 342-0328 but with a tilde ~ instead of a macron ¯)
 	     342-0nnn-A Spanish          US English         yes       ES, PT        no
 
 	     References:
@@ -4610,6 +4611,20 @@ static INPUT_PORTS_START( apple2euk_sysconfig )
 	PORT_CONFSETTING(0x12, "US English")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( apple2ede_sysconfig )
+	PORT_START("kbd_lang_select")
+	PORT_CONFNAME(0xff, 0x00, "Keyboard")
+	PORT_CONFSETTING(0x00, "German")
+	PORT_CONFSETTING(0x12, "US English")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2ese_sysconfig )
+	PORT_START("kbd_lang_select")
+	PORT_CONFNAME(0xff, 0x00, "Keyboard")
+	PORT_CONFSETTING(0x00, "Swedish")
+	PORT_CONFSETTING(0x12, "US English")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( laser128 )
 	PORT_INCLUDE( apple2e_nam_us_kbd )
 	PORT_INCLUDE( laser128_sysconfig )
@@ -4768,6 +4783,109 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2euk )
 	PORT_INCLUDE( apple2euk_common )
+	PORT_INCLUDE( apple2e_special )
+	PORT_INCLUDE( apple2_sysconfig_accel )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2e_iso_de_kbd )
+	PORT_INCLUDE( apple2e_iso_us_kbd )
+
+	PORT_MODIFY("X0")
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR(U'§')
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('/')
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
+
+	PORT_MODIFY("X1")
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('z') PORT_CHAR('Z')
+
+	PORT_MODIFY("X2")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(U'ö') PORT_CHAR(U'Ö')
+
+	PORT_MODIFY("X3")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)      PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR(';')
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR(':')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('-') PORT_CHAR('_')
+
+	PORT_MODIFY("X4")
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('#') PORT_CHAR(U'^') // (actually to the left of the return key on the ASDF row)
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('\'') PORT_CHAR('`')
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR('=')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR(U'ß') PORT_CHAR('?')
+
+	PORT_MODIFY("X5")
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('<') PORT_CHAR('>')  // actually the key between left shift and Y
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(U'ü') PORT_CHAR(U'Ü')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')
+
+	PORT_MODIFY("X6")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR(U'ä') PORT_CHAR(U'Ä')
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2ede_common )
+	PORT_INCLUDE( apple2ede_sysconfig )
+	PORT_INCLUDE( apple2e_iso_de_kbd )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2cde )
+	PORT_INCLUDE( apple2ede_common )
+	PORT_INCLUDE( apple2c )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2ede )
+	PORT_INCLUDE( apple2ede_common )
+	PORT_INCLUDE( apple2e_special )
+	PORT_INCLUDE( apple2_sysconfig_accel )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2e_iso_se_kbd )
+	PORT_INCLUDE( apple2e_iso_us_kbd )
+
+	PORT_MODIFY("X0")
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('/')
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
+
+	PORT_MODIFY("X2")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(U'ö') PORT_CHAR(U'Ö')
+
+	PORT_MODIFY("X3")
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR(';')
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR(':')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('-') PORT_CHAR('_')
+
+	PORT_MODIFY("X4")
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('@') PORT_CHAR(U'*') // (actually to the left of the return key on the ASDF row)
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('\'') PORT_CHAR('`')
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR('=')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('+') PORT_CHAR('?')
+
+	PORT_MODIFY("X5")
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('<') PORT_CHAR('>')  // actually the key between left shift and Z
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(U'å') PORT_CHAR(U'Å')
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(U'¯') PORT_CHAR('^') // ¯ was eventually replaced with ~ when the Apple IIgs came out - TBD if any later IIe models have it
+
+	PORT_MODIFY("X6")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR(U'ä') PORT_CHAR(U'Ä')
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2ese_common )
+	PORT_INCLUDE( apple2ese_sysconfig )
+	PORT_INCLUDE( apple2e_iso_se_kbd )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2cse )
+	PORT_INCLUDE( apple2ese_common )
+	PORT_INCLUDE( apple2c )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2ese )
+	PORT_INCLUDE( apple2ese_common )
 	PORT_INCLUDE( apple2e_special )
 	PORT_INCLUDE( apple2_sysconfig_accel )
 INPUT_PORTS_END
@@ -4934,6 +5052,16 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2epuk )
 	PORT_INCLUDE( apple2euk )
+	PORT_INCLUDE( apple2ep_keypad )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2epde )
+	PORT_INCLUDE( apple2ede )
+	PORT_INCLUDE( apple2ep_keypad )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( apple2epse )
+	PORT_INCLUDE( apple2ese )
 	PORT_INCLUDE( apple2ep_keypad )
 INPUT_PORTS_END
 
@@ -5456,6 +5584,30 @@ ROM_START(apple2euk)
 	ROM_LOAD( "341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e) )
 ROM_END
 
+ROM_START(apple2ede)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("341-0161-a.e9", 0x0000, 0x2000, CRC(0862a145) SHA1(a6cca6c569dba80aeb789c9cb7292f93dab00c29))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD ( "342-0135-b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
+	ROM_LOAD ( "342-0134-a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD("341-0151-a.f12", 0x000, 0x800, CRC(64574bb4) SHA1(c44809bbb017bfe3c07dc99e87a3a9fa7b9741c3))
+ROM_END
+
+ROM_START(apple2ese)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("341-0162-a.e9", 0x0000, 0x2000, CRC(d0a2e9e1) SHA1(78afd70b39cc151a2c84a36058b1d5d48e6c36fa))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD ( "342-0135-b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
+	ROM_LOAD ( "342-0134-a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD("341-0152-a.f12", 0x000, 0x800, CRC(ace44a35) SHA1(a035ab94339fc9ee78296cd2a6c3823925c8f53b))
+ROM_END
+
 ROM_START(apple2efr)
 	ROM_REGION(0x2000, "gfx1", 0)
 	ROM_LOAD("341-0163-a.e9", 0x0000, 0x2000, BAD_DUMP CRC(1824d614) SHA1(a513bec3e44b8e823465720f3db6ee3f7781c1cd)) // created from "342-0274-a.e9"
@@ -5518,6 +5670,30 @@ ROM_START(apple2eeuk)
 	ROM_LOAD( "341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e) )
 ROM_END
 
+ROM_START(apple2eede)
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_LOAD("342-0275-a.e9", 0x0000, 0x2000, CRC(dac59882) SHA1(882ee6921f0d5d6615cf7c52881dda2f319c2696))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD ( "342-0304-a.e10", 0x0000, 0x2000, CRC(443aa7c4) SHA1(3aecc56a26134df51e65e17f33ae80c1f1ac93e6)) /* PCB: "CD ROM // 342-0304", 2364 mask rom */
+	ROM_LOAD ( "342-0303-a.e8", 0x2000, 0x2000, CRC(95e10034) SHA1(afb09bb96038232dc757d40c0605623cae38088e)) /* PCB: "EF ROM // 342-0303", 2364 mask rom */
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0151-a.f12", 0x000, 0x800, CRC(64574bb4) SHA1(c44809bbb017bfe3c07dc99e87a3a9fa7b9741c3))
+ROM_END
+
+ROM_START(apple2eese)
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_LOAD("341-0328-a.e9", 0x0000, 0x2000, BAD_DUMP CRC(04b3936d) SHA1(b036b07459f119bd5777ceaf3ae9dec6add91f33))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD ( "342-0304-a.e10", 0x0000, 0x2000, CRC(443aa7c4) SHA1(3aecc56a26134df51e65e17f33ae80c1f1ac93e6)) /* PCB: "CD ROM // 342-0304", 2364 mask rom */
+	ROM_LOAD ( "342-0303-a.e8", 0x2000, 0x2000, CRC(95e10034) SHA1(afb09bb96038232dc757d40c0605623cae38088e)) /* PCB: "EF ROM // 342-0303", 2364 mask rom */
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0152-a.f12", 0x000, 0x800, CRC(ace44a35) SHA1(a035ab94339fc9ee78296cd2a6c3823925c8f53b))
+ROM_END
+
 ROM_START(apple2eefr)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "342-0274-a.e9", 0x0000, 0x2000, CRC(8f342081) SHA1(c81c1bbf237e70f8c3e5eef3c8fd5bd9b9f54d1e) )
@@ -5554,6 +5730,28 @@ ROM_START(apple2epuk)
 	ROM_LOAD("341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e))
 ROM_END
 
+ROM_START(apple2epde)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("342-0275-a.e9", 0x0000, 0x2000, CRC(dac59882) SHA1(882ee6921f0d5d6615cf7c52881dda2f319c2696))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("32-0349-b.128", 0x0000, 0x4000, CRC(1d70b193) SHA1(b8ea90abe135a0031065e01697c4a3a20d51198b)) /* should rom name be 342-0349-b? */
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0151-a.f12", 0x000, 0x800, CRC(64574bb4) SHA1(c44809bbb017bfe3c07dc99e87a3a9fa7b9741c3))
+ROM_END
+
+ROM_START(apple2epse)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("341-0328-a.e9", 0x0000, 0x2000, BAD_DUMP CRC(04b3936d) SHA1(b036b07459f119bd5777ceaf3ae9dec6add91f33))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("32-0349-b.128", 0x0000, 0x4000, CRC(1d70b193) SHA1(b8ea90abe135a0031065e01697c4a3a20d51198b)) /* should rom name be 342-0349-b? */
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0152-a.f12", 0x000, 0x800, CRC(ace44a35) SHA1(a035ab94339fc9ee78296cd2a6c3823925c8f53b))
+ROM_END
+
 ROM_START(apple2epfr)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "342-0274-a.e9", 0x0000, 0x2000, CRC(8f342081) SHA1(c81c1bbf237e70f8c3e5eef3c8fd5bd9b9f54d1e) )
@@ -5586,6 +5784,28 @@ ROM_START(apple2cuk)
 
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD("341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e))
+ROM_END
+
+ROM_START(apple2cde)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("342-0275-a.e9", 0x0000, 0x2000, CRC(dac59882) SHA1(882ee6921f0d5d6615cf7c52881dda2f319c2696))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("a2c.128", 0x0000, 0x4000, CRC(f0edaa1b) SHA1(1a9b8aca5e32bb702ddb7791daddd60a89655729)) /* should be 342-0272-A? */
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0151-a.f12", 0x000, 0x800, CRC(64574bb4) SHA1(c44809bbb017bfe3c07dc99e87a3a9fa7b9741c3))
+ROM_END
+
+ROM_START(apple2cse)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("341-0328-a.e9", 0x0000, 0x2000, BAD_DUMP CRC(04b3936d) SHA1(b036b07459f119bd5777ceaf3ae9dec6add91f33))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("a2c.128", 0x0000, 0x4000, CRC(f0edaa1b) SHA1(1a9b8aca5e32bb702ddb7791daddd60a89655729)) /* should be 342-0272-A? */
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0152-a.f12", 0x000, 0x800, CRC(ace44a35) SHA1(a035ab94339fc9ee78296cd2a6c3823925c8f53b))
 ROM_END
 
 ROM_START(apple2cfr)
@@ -5675,6 +5895,28 @@ ROM_START(apple2c0uk)
 	ROM_LOAD("341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e))
 ROM_END
 
+ROM_START(apple2c0de)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("342-0275-a.e9", 0x0000, 0x2000, CRC(dac59882) SHA1(882ee6921f0d5d6615cf7c52881dda2f319c2696))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("3420033a.256", 0x0000, 0x8000, CRC(c8b979b3) SHA1(10767e96cc17bad0970afda3a4146564e6272ba1))
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0151-a.f12", 0x000, 0x800, CRC(64574bb4) SHA1(c44809bbb017bfe3c07dc99e87a3a9fa7b9741c3))
+ROM_END
+
+ROM_START(apple2c0se)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("341-0328-a.e9", 0x0000, 0x2000, BAD_DUMP CRC(04b3936d) SHA1(b036b07459f119bd5777ceaf3ae9dec6add91f33))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("3420033a.256", 0x0000, 0x8000, CRC(c8b979b3) SHA1(10767e96cc17bad0970afda3a4146564e6272ba1))
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0152-a.f12", 0x000, 0x800, CRC(ace44a35) SHA1(a035ab94339fc9ee78296cd2a6c3823925c8f53b))
+ROM_END
+
 ROM_START(apple2c0fr)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "342-0274-a.e9", 0x0000, 0x2000, CRC(8f342081) SHA1(c81c1bbf237e70f8c3e5eef3c8fd5bd9b9f54d1e) )
@@ -5709,6 +5951,28 @@ ROM_START(apple2c3uk)
 	ROM_LOAD("341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e))
 ROM_END
 
+ROM_START(apple2c3de)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("342-0275-a.e9", 0x0000, 0x2000, CRC(dac59882) SHA1(882ee6921f0d5d6615cf7c52881dda2f319c2696))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("342-0445-a.256", 0x0000, 0x8000, CRC(bc5a79ff) SHA1(5338d9baa7ae202457b6500fde5883dbdc86e5d3))
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0151-a.f12", 0x000, 0x800, CRC(64574bb4) SHA1(c44809bbb017bfe3c07dc99e87a3a9fa7b9741c3))
+ROM_END
+
+ROM_START(apple2c3se)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("341-0328-a.e9", 0x0000, 0x2000, BAD_DUMP CRC(04b3936d) SHA1(b036b07459f119bd5777ceaf3ae9dec6add91f33))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("342-0445-a.256", 0x0000, 0x8000, CRC(bc5a79ff) SHA1(5338d9baa7ae202457b6500fde5883dbdc86e5d3))
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0152-a.f12", 0x000, 0x800, CRC(ace44a35) SHA1(a035ab94339fc9ee78296cd2a6c3823925c8f53b))
+ROM_END
+
 ROM_START(apple2c3fr)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "342-0274-a.e9", 0x0000, 0x2000, CRC(8f342081) SHA1(c81c1bbf237e70f8c3e5eef3c8fd5bd9b9f54d1e) )
@@ -5741,6 +6005,28 @@ ROM_START(apple2c4uk)
 
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD("341-0150-a.e12", 0x000, 0x800, CRC(66ffacd7) SHA1(47bb9608be38ff75429a989b930a93b47099648e))
+ROM_END
+
+ROM_START(apple2c4de)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("342-0275-a.e9", 0x0000, 0x2000, CRC(dac59882) SHA1(882ee6921f0d5d6615cf7c52881dda2f319c2696))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("3410445b.256", 0x0000, 0x8000, CRC(06f53328) SHA1(015061597c4cda7755aeb88b735994ffd2f235ca))
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0151-a.f12", 0x000, 0x800, CRC(64574bb4) SHA1(c44809bbb017bfe3c07dc99e87a3a9fa7b9741c3))
+ROM_END
+
+ROM_START(apple2c4se)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("341-0328-a.e9", 0x0000, 0x2000, BAD_DUMP CRC(04b3936d) SHA1(b036b07459f119bd5777ceaf3ae9dec6add91f33))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("3410445b.256", 0x0000, 0x8000, CRC(06f53328) SHA1(015061597c4cda7755aeb88b735994ffd2f235ca))
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD("341-0152-a.f12", 0x000, 0x800, CRC(ace44a35) SHA1(a035ab94339fc9ee78296cd2a6c3823925c8f53b))
 ROM_END
 
 ROM_START(apple2c4fr)
@@ -6014,17 +6300,25 @@ ROM_END
 /*    YEAR  NAME        PARENT   COMPAT  MACHINE          INPUT       CLASS          INIT           COMPANY                              FULLNAME */
 COMP( 1983, apple2e,    0,       apple2, apple2e,         apple2eus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, apple2euk,  apple2e, 0,      apple2epal,      apple2euk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, apple2ede,  apple2e, 0,      apple2epal,      apple2ede,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (Germany)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, apple2ese,  apple2e, 0,      apple2epal,      apple2ese,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (Sweden)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, apple2efr,  apple2e, 0,      apple2epal,      apple2efr,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, apple2ees,  apple2e, 0,      apple2epal,      apple2ees,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (Spain)", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, mprof3,     apple2e, 0,      mprof3,          apple2e,    apple2e_state, empty_init,    "Multitech",                         "Microprofessor III", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2ee,   apple2e, 0,      apple2ee,        apple2eus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (enhanced)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2eeuk, apple2e, 0,      apple2eepal,     apple2euk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (enhanced, UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2eede, apple2e, 0,      apple2eepal,     apple2ede,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (enhanced, Germany)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2eese, apple2e, 0,      apple2eepal,     apple2ese,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (enhanced, Sweden)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2eefr, apple2e, 0,      apple2eepal,     apple2eefr, apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (enhanced, France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1987, apple2ep,   apple2e, 0,      apple2ep,        apple2epus, apple2e_state, empty_init,    "Apple Computer",                    "Apple //e (Platinum)", MACHINE_SUPPORTS_SAVE )
 COMP( 1987, apple2epuk, apple2e, 0,      apple2eppal,     apple2epuk, apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (Platinum, UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, apple2epde, apple2e, 0,      apple2eppal,     apple2epde, apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (Platinum, Germany)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, apple2epse, apple2e, 0,      apple2eppal,     apple2epse, apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (Platinum, Sweden)", MACHINE_SUPPORTS_SAVE )
 COMP( 1987, apple2epfr, apple2e, 0,      apple2eppal,     apple2epfr, apple2e_state, init_pal,      "Apple Computer",                    "Apple //e (Platinum, France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, apple2c,    0,       apple2, apple2c,         apple2cus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //c" , MACHINE_SUPPORTS_SAVE )
 COMP( 1984, apple2cuk,  apple2c, 0,      apple2cpal,      apple2cuk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (UK)" , MACHINE_SUPPORTS_SAVE )
+COMP( 1984, apple2cde,  apple2c, 0,      apple2cpal,      apple2cde,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (Germany)" , MACHINE_SUPPORTS_SAVE )
+COMP( 1984, apple2cse,  apple2c, 0,      apple2cpal,      apple2cse,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (Sweden)" , MACHINE_SUPPORTS_SAVE )
 COMP( 1984, apple2cfr,  apple2c, 0,      apple2cpal,      apple2cfr,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (France)" , MACHINE_SUPPORTS_SAVE )
 COMP( 1985?,spectred,   apple2e, 0,      spectred,        spectred,   apple2e_state, empty_init,    "Scopus/Spectrum",                   "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
 COMP( 1986, tk3000,     apple2c, 0,      tk3000,          tk3000,     apple2e_state, empty_init,    "Microdigital",                      "TK3000//e" , MACHINE_SUPPORTS_SAVE )
@@ -6035,12 +6329,18 @@ COMP( 1988, las128ex,   apple2c, 0,      laser128,        laser128,   apple2e_st
 COMP( 1988, las128e2,   apple2c, 0,      laser128ex2,     laser128,   apple2e_state, init_128ex,    "Video Technology",                  "Laser 128ex2 (version 6.1)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2c0,   apple2c, 0,      apple2c_iwm,     apple2cus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //c (UniDisk 3.5)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2c0uk, apple2c, 0,      apple2c_iwm_pal, apple2cuk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (UniDisk 3.5, UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2c0de, apple2c, 0,      apple2c_iwm_pal, apple2cde,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (UniDisk 3.5, Germany)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, apple2c0se, apple2c, 0,      apple2c_iwm_pal, apple2cse,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (UniDisk 3.5, Sweden)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, apple2c0fr, apple2c, 0,      apple2c_iwm_pal, apple2cfr,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (UniDisk 3.5, France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2c3,   apple2c, 0,      apple2c_mem,     apple2cus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //c (Original Memory Expansion)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2c3uk, apple2c, 0,      apple2c_mem_pal, apple2cuk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (Original Memory Expansion, UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2c3de, apple2c, 0,      apple2c_mem_pal, apple2cde,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (Original Memory Expansion, Germany)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2c3se, apple2c, 0,      apple2c_mem_pal, apple2cse,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (Original Memory Expansion, Sweden)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2c3fr, apple2c, 0,      apple2c_mem_pal, apple2cfr,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (Original Memory Expansion, France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2c4,   apple2c, 0,      apple2c_mem,     apple2cus,  apple2e_state, empty_init,    "Apple Computer",                    "Apple //c (rev 4)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2c4uk, apple2c, 0,      apple2c_mem_pal, apple2cuk,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (rev 4, UK)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2c4de, apple2c, 0,      apple2c_mem_pal, apple2cde,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (rev 4, Germany)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, apple2c4se, apple2c, 0,      apple2c_mem_pal, apple2cse,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (rev 4, Sweden)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2c4fr, apple2c, 0,      apple2c_mem_pal, apple2cfr,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (rev 4, France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1987, ceci,       0,       apple2, cec,             ceci,       apple2e_state, empty_init,    "Shaanxi Province Computer Factory", "China Education Computer I", MACHINE_SUPPORTS_SAVE )
 COMP( 1989, cece,       0,       apple2, cec,             ceci,       apple2e_state, empty_init,    "Shaanxi Province Computer Factory", "China Education Computer E", MACHINE_SUPPORTS_SAVE )
