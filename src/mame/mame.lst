@@ -32671,6 +32671,9 @@ sshot                           // (c) 1979 Model Racing
 @source:modelracing/subhuntr.cpp
 subhuntr                        // 1979 Model Racing
 
+@source:moog/source.cpp
+moogsource                      // Moog Source
+
 @source:morrow/microdec.cpp
 md2                             //
 md3                             //
