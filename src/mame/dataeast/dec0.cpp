@@ -370,7 +370,7 @@ Notes:
 #include "dec0.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/r65c02.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m68705.h"
 #include "machine/input_merger.h"
@@ -1826,7 +1826,7 @@ void dec0_state::dec0(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::dec0_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dec0_state::irq6_line_assert)); /* VBL */
 
-	M6502(config, m_audiocpu, XTAL(12'000'000) / 8);
+	R65C02(config, m_audiocpu, XTAL(12'000'000) / 8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec0_state::dec0_s_map);
 
 	input_merger_device &audio_irq(INPUT_MERGER_ANY_HIGH(config, "audio_irq"));
@@ -2289,7 +2289,7 @@ void dec0_state::midresb(machine_config &config)
 	midres(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::midresb_map);
 
-	M6502(config.replace(), m_audiocpu, 1500000);
+	R65C02(config.replace(), m_audiocpu, 1500000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec0_state::dec0_s_map);
 
 	M68705R3(config, m_mcu, XTAL(3'579'545));

@@ -92,7 +92,7 @@ protected:
 	/* misc */
 	bool     m_coin_state = false;
 
-	emu_timer *m_m6502_timer = nullptr;
+	emu_timer *m_6502_timer = nullptr;
 };
 
 // with I8751 MCU

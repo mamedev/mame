@@ -5,6 +5,7 @@
     r65c02.cpp
 
     Rockwell 65c02, CMOS variant with bitwise instructions
+    Also licensed to Ricoh, who sold it as RP65C02.
 
     TODO:
     - are any of the CPU subtype differences meaningful to MAME?

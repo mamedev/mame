@@ -44,7 +44,7 @@ To do:
 #include "emu.h"
 #include "dec8.h"
 
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/r65c02.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "deco222.h"
@@ -200,7 +200,7 @@ void dec8_state_base::sound_w(u8 data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(m6502_device::NMI_LINE, ASSERT_LINE);
-	m_m6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
+	m_6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
 }
 
 void csilver_state::adpcm_int(int state)
@@ -1797,7 +1797,7 @@ void dec8_state_base::machine_start()
 	uint32_t max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 	m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
 
-	m_m6502_timer = timer_alloc(FUNC(dec8_state_base::audiocpu_nmi_clear), this);
+	m_6502_timer = timer_alloc(FUNC(dec8_state_base::audiocpu_nmi_clear), this);
 
 	save_item(NAME(m_coin_state));
 
@@ -1885,7 +1885,7 @@ void lastmisn_state::lastmisn(machine_config &config)
 	MC6809E(config, m_subcpu, 2000000);
 	m_subcpu->set_addrmap(AS_PROGRAM, &lastmisn_state::lastmisn_sub_map);
 
-	M6502(config, m_audiocpu, 1500000);
+	R65C02(config, m_audiocpu, 1500000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::ym3526_s_map); /* NMIs are caused by the main CPU */
 
 	I8751(config, m_mcu, XTAL(8'000'000));
@@ -1944,7 +1944,7 @@ void lastmisn_state::shackled(machine_config &config)
 	MC6809E(config, m_subcpu, 2000000);
 	m_subcpu->set_addrmap(AS_PROGRAM, &lastmisn_state::shackled_sub_map);
 
-	M6502(config, m_audiocpu, 1500000);
+	R65C02(config, m_audiocpu, 1500000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::ym3526_s_map); /* NMIs are caused by the main CPU */
 
 	I8751(config, m_mcu, XTAL(8'000'000));
@@ -2001,7 +2001,7 @@ void gondo_state::gondo(machine_config &config)
 	HD6309E(config, m_maincpu, 3000000); /* HD63C09EP */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gondo_state::gondo_map);
 
-	M6502(config, m_audiocpu, 1500000);
+	R65C02(config, m_audiocpu, 1500000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gondo_state::oscar_s_map); /* NMIs are caused by the main CPU */
 
 	I8751(config, m_mcu, XTAL(8'000'000));
@@ -2056,7 +2056,7 @@ void lastmisn_state::garyoret(machine_config &config)
 	HD6309E(config, m_maincpu, 3000000); /* HD63C09EP */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastmisn_state::garyoret_map);
 
-	M6502(config, m_audiocpu, 1500000);
+	R65C02(config, m_audiocpu, 1500000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::oscar_s_map); /* NMIs are caused by the main CPU */
 
 	I8751(config, m_mcu, XTAL(8'000'000));
@@ -2168,7 +2168,7 @@ void lastmisn_state::ghostb(machine_config &config)
 void lastmisn_state::meikyuh(machine_config &config)
 {
 	ghostb(config);
-	M6502(config.replace(), m_audiocpu, 1500000);
+	R65C02(config.replace(), m_audiocpu, 1500000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::dec8_s_map);
 }
 
@@ -2182,7 +2182,7 @@ void csilver_state::csilver(machine_config &config)
 	MC6809E(config, m_subcpu, XTAL(12'000'000)/8); /* verified on pcb */
 	m_subcpu->set_addrmap(AS_PROGRAM, &csilver_state::sub_map);
 
-	M6502(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
+	R65C02(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &csilver_state::sound_map); /* NMIs are caused by the main CPU */
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -2299,7 +2299,7 @@ void oscar_state::oscarbl(machine_config &config)
 {
 	oscar(config);
 
-	M6502(config.replace(), m_audiocpu, XTAL(12'000'000)/8);
+	R65C02(config.replace(), m_audiocpu, XTAL(12'000'000)/8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &oscar_state::oscar_s_map); /* NMIs are caused by the main CPU */
 	m_audiocpu->set_addrmap(AS_OPCODES, &oscar_state::oscarbl_s_opcodes_map);
 }
@@ -2359,7 +2359,7 @@ void oscar_state::cobracom(machine_config &config)
 	MC6809E(config, m_maincpu, 2000000);  /* MC68B09EP */
 	m_maincpu->set_addrmap(AS_PROGRAM, &oscar_state::cobra_map);
 
-	M6502(config, m_audiocpu, 1500000);
+	R65C02(config, m_audiocpu, 1500000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &oscar_state::dec8_s_map); /* NMIs are caused by the main CPU */
 
 	/* video hardware */
