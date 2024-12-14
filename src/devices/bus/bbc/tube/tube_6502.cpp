@@ -165,7 +165,7 @@ void bbc_tube_65c102_device::device_add_mconfig(machine_config &config)
 {
 	bbc_tube_6502_device::device_add_mconfig(config);
 
-	R65C02(config.replace(), m_maincpu, 16_MHz_XTAL / 4); // R65C102
+	R65C102(config.replace(), m_maincpu, 16_MHz_XTAL / 4); // R65C102
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_65c102_device::tube_6502_mem);
 }
 
