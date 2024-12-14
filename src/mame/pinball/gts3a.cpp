@@ -50,7 +50,7 @@ ToDo:
 
 #include "gottlieb_a.h"
 
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
 #include "video/mc6845.h"
@@ -101,7 +101,6 @@ private:
 	void u5a_w(u8 data);
 	u8 dmd_r();
 	void dmd_w(u8 data);
-	void nmi_w(int state);
 	void crtc_vs(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void palette_init(palette_device &palette);
@@ -113,8 +112,8 @@ private:
 	u8 m_segment = 0U;
 	u8 m_u4b = 0U;
 
-	required_device<m65c02_device> m_maincpu;
-	required_device<m65c02_device> m_dmdcpu;
+	required_device<w65c02_device> m_maincpu;
+	required_device<w65c02_device> m_dmdcpu;
 	required_memory_bank    m_bank1;
 	required_device<mc6845_device> m_crtc;
 	required_shared_ptr<u8> m_vram;
@@ -286,12 +285,6 @@ INPUT_CHANGED_MEMBER( gts3a_state::test_inp )
 	m_u4->write_ca1(newval);
 }
 
-// This trampoline needed; WRITELINE("maincpu", m65c02_device, nmi_line) does not work
-void gts3a_state::nmi_w(int state)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
-}
-
 void gts3a_state::lampret_w(u8 data)
 {
 	if (m_row < 12)
@@ -316,7 +309,7 @@ void gts3a_state::solenoid_w(offs_t offset, u8 data)
 void gts3a_state::segbank_w(u8 data)
 {
 	m_segment = data;
-	m_dmdcpu->set_input_line(M65C02_IRQ_LINE, ASSERT_LINE);
+	m_dmdcpu->set_input_line(W65C02_IRQ_LINE, ASSERT_LINE);
 }
 
 void gts3a_state::u4b_w(u8 data)
@@ -360,7 +353,7 @@ void gts3a_state::init_gts3a()
 
 u8 gts3a_state::dmd_r()
 {
-	m_dmdcpu->set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
+	m_dmdcpu->set_input_line(W65C02_IRQ_LINE, CLEAR_LINE);
 	return m_segment;
 }
 
@@ -430,12 +423,12 @@ void gts3a_state::machine_reset()
 
 void gts3a_state::p0(machine_config &config)
 {
-	M65C02(config, m_maincpu, XTAL(4'000'000) / 2);
+	W65C02(config, m_maincpu, XTAL(4'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gts3a_state::mem_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 6116LP + DS1210
 
-	M65C02(config, m_dmdcpu, XTAL(3'579'545) / 2);
+	W65C02(config, m_dmdcpu, XTAL(3'579'545) / 2);
 	m_dmdcpu->set_addrmap(AS_PROGRAM, &gts3a_state::dmd_map);
 
 	// Video
@@ -462,7 +455,7 @@ void gts3a_state::p0(machine_config &config)
 	m_u4->readpb_handler().set(FUNC(gts3a_state::u4b_r));
 	m_u4->writepb_handler().set(FUNC(gts3a_state::u4b_w));
 	//m_u4->ca2_handler().set(FUNC(gts3a_state::u4ca2_w));
-	m_u4->cb2_handler().set(FUNC(gts3a_state::nmi_w));
+	m_u4->cb2_handler().set_inputline("maincpu", W65C02_NMI_LINE).invert();
 
 	R65C22(config, m_u5, XTAL(4'000'000) / 2);
 	m_u5->irq_handler().set("irq", FUNC(input_merger_device::in_w<1>));
@@ -473,7 +466,7 @@ void gts3a_state::p0(machine_config &config)
 	//m_u5->cb1_Handler().set(FUNC(gts3a_state::u5cb1_w));
 	//m_u5->cb2_Handler().set(FUNC(gts3a_state::u5cb2_w));
 
-	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", m65c02_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", W65C02_IRQ_LINE);
 
 	// Sound
 	genpin_audio(config);

@@ -64,7 +64,7 @@ ToDo:
 ****************************************************************************************************/
 #include "emu.h"
 #include "genpin.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/6522via.h"
@@ -596,7 +596,7 @@ void alvg_state::pca020(machine_config &config)
 void alvg_state::alvg(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, XTAL(4'000'000) / 2);
+	W65C02(config, m_maincpu, XTAL(4'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alvg_state::main_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -628,7 +628,7 @@ void alvg_state::alvg(machine_config &config)
 
 	genpin_audio(config);
 
-	INPUT_MERGER_ANY_HIGH(config, "cpuirq").output_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "cpuirq").output_handler().set_inputline(m_maincpu, W65C02_IRQ_LINE);
 }
 
 

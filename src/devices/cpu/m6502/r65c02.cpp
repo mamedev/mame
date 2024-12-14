@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(R65C102, r65c102_device, "r65c102", "Rockwell R65C102")
 DEFINE_DEVICE_TYPE(R65C112, r65c112_device, "r65c112", "Rockwell R65C112")
 
 r65c02_device::r65c02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	m65c02_device(mconfig, type, tag, owner, clock)
+	w65c02_device(mconfig, type, tag, owner, clock)
 {
 }
 

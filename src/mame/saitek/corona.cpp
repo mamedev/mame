@@ -13,7 +13,7 @@ different compared to Stratos/Turbo King.
 #include "emu.h"
 #include "stratos.h"
 
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -260,7 +260,7 @@ INPUT_PORTS_END
 void corona_state::corona(machine_config &config)
 {
 	// basic machine hardware
-	M65C02(config, m_maincpu, 5_MHz_XTAL); // see change_cpu_freq
+	W65C02(config, m_maincpu, 5_MHz_XTAL); // see change_cpu_freq
 	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(corona_state::irq0_line_hold), attotime::from_hz(183));
 

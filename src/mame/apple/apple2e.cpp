@@ -128,7 +128,7 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "apple2common.h"
 
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
@@ -4954,7 +4954,7 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	/* basic machine hardware */
 	if (enhanced)
 	{
-		M65C02(config, m_maincpu, 1021800);
+		W65C02(config, m_maincpu, 1021800);
 	}
 	else
 	{
@@ -5093,7 +5093,7 @@ void apple2e_state::spectred(machine_config &config)
 void apple2e_state::tk3000(machine_config &config)
 {
 	apple2e(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	W65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 
 //  z80_device &subcpu(Z80(config, "subcpu", 1021800));    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
@@ -5226,7 +5226,7 @@ void apple2e_state::apple2c_mem_pal(machine_config &config)
 void apple2e_state::laser128(machine_config &config)
 {
 	apple2c(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	W65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
@@ -5261,7 +5261,7 @@ void apple2e_state::laser128(machine_config &config)
 void apple2e_state::laser128o(machine_config &config)
 {
 	apple2c(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	W65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
@@ -5297,7 +5297,7 @@ void apple2e_state::laser128o(machine_config &config)
 void apple2e_state::laser128ex2(machine_config &config)
 {
 	apple2c(config);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	W65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
@@ -5334,7 +5334,7 @@ void apple2e_state::ace500(machine_config &config)
 	apple2e_common(config, true, false);
 	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
 
-	M65C02(config.replace(), m_maincpu, 1021800);
+	W65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace500_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
@@ -5376,7 +5376,7 @@ void apple2e_state::ace500(machine_config &config)
 void apple2e_state::ace2200(machine_config &config)
 {
 	apple2e_common(config, false, false);
-	M65C02(config.replace(), m_maincpu, 1021800);
+	W65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace2200_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 

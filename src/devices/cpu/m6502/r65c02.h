@@ -11,9 +11,9 @@
 #ifndef MAME_CPU_M6502_R65C02_H
 #define MAME_CPU_M6502_R65C02_H
 
-#include "m65c02.h"
+#include "w65c02.h"
 
-class r65c02_device : public m65c02_device {
+class r65c02_device : public w65c02_device {
 public:
 	r65c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

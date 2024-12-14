@@ -31,8 +31,8 @@ TODO:
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -352,7 +352,7 @@ void simultano_state::simultano(machine_config &config)
 	cc2150(config);
 
 	// basic machine hardware
-	M65C02(config.replace(), m_maincpu, 5_MHz_XTAL);
+	W65C02(config.replace(), m_maincpu, 5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::simultano_map);
 	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(76)); // approximation
 

@@ -64,7 +64,7 @@ ToDo:
 
 #include "gottlieb_a.h"
 
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
 #include "speaker.h"
@@ -105,7 +105,6 @@ private:
 	void solenoid_w(offs_t, u8);
 	void u4b_w(u8 data);
 	void u5a_w(u8 data);
-	void nmi_w(int state);
 	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_dispclk = false;
@@ -115,7 +114,7 @@ private:
 	u8 m_segment[4]{};
 	u8 m_u4b = 0U;
 
-	required_device<m65c02_device> m_maincpu;
+	required_device<w65c02_device> m_maincpu;
 	required_device<via6522_device> m_u4;
 	required_device<via6522_device> m_u5;
 	optional_device<gottlieb_sound_p5_device> m_p5_sound;
@@ -242,12 +241,6 @@ INPUT_CHANGED_MEMBER( gts3_state::test_inp )
 	m_u4->write_ca1(newval);
 }
 
-// This trampoline needed; WRITELINE("maincpu", m65c02_device, nmi_line) does not work
-void gts3_state::nmi_w(int state)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
-}
-
 void gts3_state::lampret_w(u8 data)
 {
 	if (m_row < 12)
@@ -348,7 +341,7 @@ void gts3_state::machine_reset()
 
 void gts3_state::p0(machine_config &config)
 {
-	M65C02(config, m_maincpu, XTAL(4'000'000) / 2);
+	W65C02(config, m_maincpu, XTAL(4'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gts3_state::mem_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -361,7 +354,7 @@ void gts3_state::p0(machine_config &config)
 	m_u4->readpb_handler().set(FUNC(gts3_state::u4b_r));
 	m_u4->writepb_handler().set(FUNC(gts3_state::u4b_w));
 	//m_u4->ca2_handler().set(FUNC(gts3_state::u4ca2_w));
-	m_u4->cb2_handler().set(FUNC(gts3_state::nmi_w));
+	m_u4->cb2_handler().set_inputline("maincpu", W65C02_NMI_LINE).invert();
 
 	R65C22(config, m_u5, XTAL(4'000'000) / 2);
 	m_u5->irq_handler().set("irq", FUNC(input_merger_device::in_w<1>));
@@ -372,7 +365,7 @@ void gts3_state::p0(machine_config &config)
 	//m_u5->cb1_handler().set(FUNC(gts3_state::u5cb1_w));
 	//m_u5->cb2_handler().set(FUNC(gts3_state::u5cb2_w));
 
-	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", m65c02_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", W65C02_IRQ_LINE);
 
 	/* Sound */
 	genpin_audio(config);

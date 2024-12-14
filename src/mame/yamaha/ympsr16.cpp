@@ -23,7 +23,7 @@
 
 #include "emu.h"
 //#include "bus/midi/midi.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 
 namespace {
 
@@ -122,7 +122,7 @@ INPUT_PORTS_END
 
 void yamaha_psr16_state::psr16(machine_config &config)
 {
-	M65C02(config, m_maincpu, 5.5_MHz_XTAL / 4); // XTAL value from PSS-480; internal divider guessed
+	W65C02(config, m_maincpu, 5.5_MHz_XTAL / 4); // XTAL value from PSS-480; internal divider guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &yamaha_psr16_state::psr16_map);
 }
 

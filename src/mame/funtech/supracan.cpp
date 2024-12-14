@@ -68,7 +68,7 @@ STATUS:
 #include "bus/supracan/rom.h"
 #include "bus/supracan/slot.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -2394,7 +2394,7 @@ void supracan_state::supracan(machine_config &config)
 
 	// TODO: Verify type and actual clock
 	// /4 makes speedyd to fail booting
-	M65C02(config, m_soundcpu, U13_CLOCK / 6 / 2);
+	W65C02(config, m_soundcpu, U13_CLOCK / 6 / 2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &supracan_state::sound_map);
 
 	config.set_perfect_quantum(m_soundcpu);

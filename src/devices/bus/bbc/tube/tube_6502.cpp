@@ -134,8 +134,8 @@ void bbc_tube_6502_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_6502_device::tube_6502_mem);
 
 	TUBE(config, m_ula);
-	m_ula->pnmi_handler().set_inputline(m_maincpu, M65C02_NMI_LINE);
-	m_ula->pirq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
+	m_ula->pnmi_handler().set_inputline(m_maincpu, G65SC02_NMI_LINE);
+	m_ula->pirq_handler().set_inputline(m_maincpu, G65SC02_IRQ_LINE);
 	m_ula->prst_handler().set(FUNC(bbc_tube_6502_device::prst_w));
 
 	RAM(config, m_ram).set_default_size("64K").set_default_value(0);
