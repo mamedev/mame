@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m65sc02.cpp
+    g65sc02.cpp
 
     Rockwell-class 65c02 with internal static registers, making clock stoppable?
 
@@ -13,7 +13,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "m65sc02.h"
+#include "g65sc02.h"
 
 DEFINE_DEVICE_TYPE(G65SC02, g65sc02_device, "g65sc02", "GTE G65SC02")
 DEFINE_DEVICE_TYPE(G65SC12, g65sc12_device, "g65sc12", "GTE G65SC12")

@@ -23,7 +23,7 @@ Hardware notes:
 #include "mmboard.h"
 #include "mmdisplay2.h"
 
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "machine/74259.h"
 #include "machine/chessmachine.h"
 #include "machine/nvram.h"

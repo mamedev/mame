@@ -17,7 +17,7 @@
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "machine/6522via.h"
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"

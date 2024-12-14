@@ -2,14 +2,14 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m65sc02.h
+    g65sc02.h
 
     Rockwell-class 65c02 with internal static registers, making clock stoppable?
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_M6502_M65SC02_H
-#define MAME_CPU_M6502_M65SC02_H
+#ifndef MAME_CPU_M6502_G65SC02_H
+#define MAME_CPU_M6502_G65SC02_H
 
 #include "r65c02.h"
 
@@ -44,4 +44,4 @@ DECLARE_DEVICE_TYPE(G65SC12, g65sc12_device)
 DECLARE_DEVICE_TYPE(G65SC102, g65sc102_device)
 DECLARE_DEVICE_TYPE(G65SC112, g65sc112_device)
 
-#endif // MAME_CPU_M6502_M65SC02_H
+#endif // MAME_CPU_M6502_G65SC02_H

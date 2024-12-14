@@ -6,7 +6,7 @@
 
 #include "emu.h"
 #include "lynx.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 
 #include "corestr.h"
 #include "render.h"

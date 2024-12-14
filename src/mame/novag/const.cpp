@@ -70,8 +70,8 @@ TODO:
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "cpu/m6502/g65sc02.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65sc02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"

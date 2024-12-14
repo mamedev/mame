@@ -1738,6 +1738,7 @@ end
 --------------------------------------------------
 -- MOS Technology 6502 and its many derivatives
 --@src/devices/cpu/m6502/deco16.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/g65sc02.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/gew7.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/gew12.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m3745x.h,CPUS["M6502"] = true
@@ -1755,7 +1756,6 @@ end
 --@src/devices/cpu/m6502/m6510t.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m65ce02.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m65c02.h,CPUS["M6502"] = true
---@src/devices/cpu/m6502/m65sc02.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m740.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m7501.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m8502.h,CPUS["M6502"] = true
@@ -1775,6 +1775,8 @@ if CPUS["M6502"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/m6502/deco16.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/deco16.h",
+		MAME_DIR .. "src/devices/cpu/m6502/g65sc02.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/g65sc02.h",
 		MAME_DIR .. "src/devices/cpu/m6502/gew7.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/gew7.h",
 		MAME_DIR .. "src/devices/cpu/m6502/gew12.cpp",
@@ -1811,8 +1813,6 @@ if CPUS["M6502"] then
 		MAME_DIR .. "src/devices/cpu/m6502/m65c02.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m65ce02.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m65ce02.h",
-		MAME_DIR .. "src/devices/cpu/m6502/m65sc02.cpp",
-		MAME_DIR .. "src/devices/cpu/m6502/m65sc02.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m740.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m740.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m7501.cpp",

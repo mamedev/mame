@@ -177,8 +177,8 @@ CPU D6 to W: (model 6092, tied to VCC otherwise)
 
 #include "emu.h"
 
+#include "cpu/m6502/g65sc02.h"
 #include "cpu/m6502/r65c02.h"
-#include "cpu/m6502/m65sc02.h"
 #include "machine/clock.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"

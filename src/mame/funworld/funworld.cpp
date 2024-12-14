@@ -755,7 +755,7 @@
 #include "emu.h"
 #include "funworld.h"
 
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"

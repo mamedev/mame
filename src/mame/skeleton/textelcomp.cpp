@@ -7,7 +7,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "machine/input_merger.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
