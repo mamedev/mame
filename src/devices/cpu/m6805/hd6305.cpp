@@ -473,7 +473,20 @@ hd6305y2_device::hd6305y2_device(const machine_config &mconfig, const char *tag,
 
 void hd6305y2_device::internal_map(address_map &map)
 {
-	// TODO: ports, timer, SCI
+	map(0x0000, 0x0000).rw(FUNC(hd6305y2_device::port_r<0>), FUNC(hd6305y2_device::port_w<0>));
+	map(0x0001, 0x0001).rw(FUNC(hd6305y2_device::port_r<1>), FUNC(hd6305y2_device::port_w<1>));
+	map(0x0002, 0x0002).rw(FUNC(hd6305y2_device::port_r<2>), FUNC(hd6305y2_device::port_w<2>));
+	map(0x0003, 0x0003).r(FUNC(hd6305y2_device::port_r<3>));
+	map(0x0004, 0x0004).w(FUNC(hd6305y2_device::port_ddr_w<0>));
+	map(0x0005, 0x0005).w(FUNC(hd6305y2_device::port_ddr_w<1>));
+	map(0x0006, 0x0006).w(FUNC(hd6305y2_device::port_ddr_w<2>));
+	map(0x0008, 0x0008).rw(FUNC(hd6305y2_device::timer_data_r), FUNC(hd6305y2_device::timer_data_w));
+	map(0x0009, 0x0009).rw(FUNC(hd6305y2_device::timer_ctrl_r), FUNC(hd6305y2_device::timer_ctrl_w));
+	map(0x000a, 0x000a).rw(FUNC(hd6305y2_device::misc_r), FUNC(hd6305y2_device::misc_w));
+	map(0x0010, 0x0010).rw(FUNC(hd6305y2_device::sci_ctrl_r), FUNC(hd6305y2_device::sci_ctrl_w));
+	map(0x0011, 0x0011).rw(FUNC(hd6305y2_device::sci_ssr_r), FUNC(hd6305y2_device::sci_ssr_w));
+	map(0x0012, 0x0012).rw(FUNC(hd6305y2_device::sci_data_r), FUNC(hd6305y2_device::sci_data_w));
+	// All other page zero addresses up to 0x001f are reserved
 	map(0x0040, 0x013f).ram();
 }
 
