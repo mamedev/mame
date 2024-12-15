@@ -108,7 +108,7 @@ const upd177x_disassembler::instruction upd177x_disassembler::instructions[] {
 	{ 0x1808, 0xfe0f, [](P) -> u32 { util::stream_format(stream, "callo (%s)", reg4(opcode)); return 1 | STEP_OVER; } },
 
 	{ 0x6000, 0xf000, [](P) -> u32 { util::stream_format(stream, "jmp %s", abs12(opcode, pc)); return 1; } },
-	{ 0x2000, 0xff0f, [](P) -> u32 { util::stream_format(stream, "jmp %s", abs4_4(opcode, pc)); return 1; } },
+	{ 0x2000, 0xff0f, [](P) -> u32 { util::stream_format(stream, "jpp %s", abs4_4(opcode, pc)); return 1; } },
 	{ 0x0501, 0xffff, [](P) -> u32 { util::stream_format(stream, "jmpa"); return 1; } },
 	{ 0x2400, 0xff00, [](P) -> u32 { util::stream_format(stream, "jmpfz %s", abs8(opcode, pc)); return 1; } },
 
