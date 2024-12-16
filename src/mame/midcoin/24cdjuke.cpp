@@ -48,8 +48,7 @@ QTY     Type
 Notes
 
 This is the PCB for one of the first ever CD based Juke Box, made in 1988 by Midcoin, some info here:
-http://www.tilt.it/deb/i-midcoin.html
-
+https://www.tilt.it/deb/midcoin-en.html
 
 */
 
