@@ -22,8 +22,9 @@
 #define LOG_BLIT (1U << 2)
 #define LOG_HDAC (1U << 3) // log hidden DAC
 #define LOG_BANK (1U << 4) // log offset registers
+#define LOG_PLL  (1U << 5)
 
-#define VERBOSE (LOG_GENERAL | LOG_HDAC | LOG_REG)
+#define VERBOSE (LOG_GENERAL | LOG_HDAC | LOG_REG | LOG_PLL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
@@ -101,7 +102,7 @@ void cirrus_gd5428_vga_device::ramdac_hidden_mask_w(offs_t offset, u8 data)
 		// TODO: '5428 reads do not lock the Hidden DAC
 		m_hidden_dac_mode = data;
 		m_hidden_dac_phase = 0;
-		cirrus_define_video_mode();
+		recompute_params();
 		LOGMASKED(LOG_HDAC, "CL: Hidden DAC write %02x\n", data);
 		return;
 	}
@@ -182,7 +183,7 @@ void cirrus_gd5428_vga_device::crtc_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			vga.crtc.vert_blank_end &= ~0x00ff;
 			vga.crtc.vert_blank_end |= data;
-			cirrus_define_video_mode();
+			recompute_params();
 		})
 	);
 	map(0x19, 0x19).lrw8(
@@ -203,7 +204,7 @@ void cirrus_gd5428_vga_device::crtc_map(address_map &map)
 			m_cr1a = data;
 			vga.crtc.horz_blank_end = (vga.crtc.horz_blank_end & 0xff3f) | ((data & 0x30) << 2);
 			vga.crtc.vert_blank_end = (vga.crtc.vert_blank_end & 0xfcff) | ((data & 0xc0) << 2);
-			cirrus_define_video_mode();
+			recompute_params();
 		})
 	);
 	map(0x1b, 0x1b).lrw8(
@@ -217,7 +218,7 @@ void cirrus_gd5428_vga_device::crtc_map(address_map &map)
 			vga.crtc.start_addr_latch |= ((data & 0x01) << 16);
 			vga.crtc.start_addr_latch |= ((data & 0x0c) << 15);
 			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x10) << 4);
-			cirrus_define_video_mode();
+			recompute_params();
 		})
 	);
 //  map(0x25, 0x25) PSR Part Status (r/o, "factory testing and internal tracking only")
@@ -513,7 +514,7 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 			gc_locked = (data & 0x17) != 0x12;
 			LOG("Cirrus register extensions %s\n", gc_locked ? "unlocked" : "locked");
 			m_lock_reg = data & 0x17;
-			cirrus_define_video_mode();
+			recompute_params();
 		})
 	);
 	map(0x07, 0x07).lw8(
@@ -522,7 +523,7 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 			if((data & 0xf0) != 0)
 				popmessage("pc_vga_cirrus: 1MB framebuffer window enabled at %iMB (%02x)",data >> 4,data);
 			vga.sequencer.data[0x07] = data;
-			cirrus_define_video_mode();
+			recompute_params();
 		})
 	);
 	// TODO: check me
@@ -549,6 +550,7 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_vclk_num[offset] = data;
+			recompute_params();
 		})
 	);
 	map(0x0f, 0x0f).lrw8(
@@ -616,6 +618,7 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_vclk_denom[offset] = data;
+			recompute_params();
 		})
 	);
 }
@@ -759,10 +762,11 @@ uint32_t cirrus_gd5428_vga_device::screen_update(screen_device &screen, bitmap_r
 	return 0;
 }
 
-void cirrus_gd5428_vga_device::cirrus_define_video_mode()
+void cirrus_gd5428_vga_device::recompute_params()
 {
 	uint8_t divisor = 1;
 	float clock;
+	// TODO: coming from OSC, expose as this->clock()
 	const XTAL xtal = XTAL(14'318'181);
 	uint8_t clocksel = (vga.miscellaneous_output & 0xc) >> 2;
 
@@ -774,6 +778,7 @@ void cirrus_gd5428_vga_device::cirrus_define_video_mode()
 		int denominator = (m_vclk_denom[clocksel] & 0x3e) >> 1;
 		int mul = m_vclk_denom[clocksel] & 0x01 ? 2 : 1;
 		clock = (xtal * numerator / denominator / mul).dvalue();
+		LOGMASKED(LOG_PLL, "CL: PLL setting %d num %d denom %d mul %d -> %f\n", clocksel, numerator, denominator, mul, clock);
 	}
 
 	svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = svga.rgb32_en = 0;

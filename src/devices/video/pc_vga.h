@@ -38,7 +38,7 @@ public:
 
 	// $46e8, $56e8, $66e8, $76e8 for ISA bus
 	void mode_setup_w(offs_t offset, uint8_t data);
-	// $102 / $3c3, MCA bus
+	// $102 ISA bus / $3c3 MCA bus
 	//void wakeup_w(offs_t offset, uint8_t data);
 
 	virtual uint8_t mem_r(offs_t offset);
