@@ -43,11 +43,11 @@ sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, 
 {
 }
 
-inline bool sigmasoft_parallel_port::checkAccess(u8 select_lines, u16 offset)
+inline bool sigmasoft_parallel_port::card_selected(u8 select_lines, u16 offset)
 {
-	return !m_enabled ||
-		!(select_lines & h89bus_device::H89_IO) ||
-		((offset & SELECT_ADDR_MASK) != m_base_addr);
+	return m_enabled &&
+		(select_lines & h89bus_device::H89_IO) &&
+		((offset & SELECT_ADDR_MASK) == m_base_addr);
 }
 
 void sigmasoft_parallel_port::video_mem_w(u8 val)
@@ -100,7 +100,7 @@ void sigmasoft_parallel_port::ctrl_w(u8 val)
 
 void sigmasoft_parallel_port::write(u8 select_lines, u16 offset, u8 data)
 {
-	if (checkAccess(select_lines, offset))
+	if (!card_selected(select_lines, offset))
 	{
 		return;
 	}
@@ -153,9 +153,9 @@ u8 sigmasoft_parallel_port::ctrl_r()
 
 u8 sigmasoft_parallel_port::read(u8 select_lines, u16 offset)
 {
-	u8 value = 0x00;
+	u8 value = 0;
 
-	if (checkAccess(select_lines, offset))
+	if (!card_selected(select_lines, offset))
 	{
 		return value;
 	}
@@ -234,7 +234,7 @@ static INPUT_PORTS_START( sigmasoft_parallel_port_device )
 	PORT_CONFSETTING(   0x00, DEF_STR( No ))
 	PORT_CONFSETTING(   0x20, DEF_STR( Yes ))
 
-	PORT_CONFNAME(0x40, 0x40, "Connected to TLBC and IGC")
+	PORT_CONFNAME(0x40, 0x40, "Connected to SigmaSoft IGC")
 	PORT_CONFSETTING(   0x00, DEF_STR( No ))
 	PORT_CONFSETTING(   0x40, DEF_STR( Yes ))
 

@@ -43,7 +43,7 @@ protected:
 	void ctrl_w(u8 val);
 	u8 ctrl_r();
 
-	inline bool checkAccess(u8 select_lines, u16 offset);
+	inline bool card_selected(u8 select_lines, u16 offset);
 
 private:
 
