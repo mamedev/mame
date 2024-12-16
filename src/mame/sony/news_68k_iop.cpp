@@ -10,19 +10,19 @@
  * chips are different and the custom MMU is not needed because the 1800/1900 design uses the '030.
  *
  * The NWS-800 series uses one '020 as the I/O Processor (IOP). This processor is responsible for booting the system
- * and also runs a small OS (called iopboot) with processes for handling DMA and interrupts for data-intensive peripherals
- * like SCSI, Ethernet, etc. The Main Processor (often referred to, confusingly, as the CPU) runs NEWS-OS (BSD derivative), 
- * and uses a block of main memory allocated for CPU<->IOP interprocessor communication. The CPU and IOP interrupt each other 
- * whenever they need to communicate, after populating main memory with whatever data is needed.
- * The CPU delegates almost all I/O to the IOP (as the DMA controller), only handling I/O for some VME bus peripherals. 
+ * and also runs a small sub-OS (called iopboot) with processes for handling DMA and interrupts for data-intensive peripherals
+ * like SCSI, Ethernet, etc. The Main Processor (often referred to, confusingly, as the CPU) runs NEWS-OS (BSD derivative),
+ * and uses a block of main memory allocated for CPU<->IOP interprocessor communication to trigger I/O.
+ * The CPU and IOP interrupt each other whenever they need to communicate, after populating main memory with whatever data is needed.
+ * The CPU delegates almost all I/O to the IOP (as the DMA controller), only handling I/O for some VME bus peripherals.
  * The CPU bus (on the NWS-800, this is routed through the MMU) is often called the Hyperbus. The NWS-1800/1900/3800 series and the single-CPU
- * 68k and R3000 models explictly call this the Hyperbus, but it is unclear if the NWS-800's CPU bus was only referred to that retroactively or not. 
+ * 68k and R3000 models explictly call this the Hyperbus, but it is unclear if the NWS-800's CPU bus was only referred to that retroactively or not.
  * There are a couple of mentions of the Hyperbus in NEWS-OS 4 related to even the NWS-800, but the NWS-1xxx/3xxx series were already released by the time NEWS-OS 4 was.
  * So, for clarity due to the number of busses on this system, the Hyperbus term is used throughout this code, but it may or may not be a 100% accurate description.
  * The Hyperbus is directly connected to main memory, the system ROM, and the VME bus interface. Everything else is connected to the I/O
  * bus. The IOP, CPU/MMU, and VME bus can all access the Hyperbus through a buffer. As far as I can tell, nothing on the Hyperbus
  * can talk to the I/O bus, only the IOP is able to do that.
- * 
+ *
  *  Supported:
  * 	 - NWS-831
  *
@@ -57,10 +57,6 @@
  *   - Expansion slots (I/O Bus and VMEBus)
  *   - Networking is very flaky - XDMCP doesn't work, repeated telnet sessions eventually cause the network stack to hang, etc.
  *   - Graphics, kbms, and parallel port emulation
- *   - The '020 and '030 machines have a lot of similarities but the only service docs I have are for
- *     an '030 machine (NWS-1960) so there are some accuracy improvements needed for the '020 machines,
- *     especially since the '020 machines have a custom MMU. The '030 machines don't need it, so there
- *     is no information on it in the 1960 service manual.
  *   - Hyperbus handshake for IOP and CPU accesses. The bus has arbitration circuitry to prevent bus contention when both the CPU and IOP are trying to access the hyperbus (RAM and VME)
  */
 
@@ -100,6 +96,7 @@
 #define LOG_MEMORY_ERROR (1U << 6)
 #define LOG_TIMER (1U << 7)
 #define LOG_SCSI (1U << 8)
+#define LOG_AST (1U << 9)
 
 #define VERBOSE (LOG_GENERAL)
 
@@ -150,42 +147,41 @@ namespace
         // machine config
         void common(machine_config &config);
 
+        // IRQ setup
         enum iop_irq_number : unsigned
         {
             CPIRQ_3_1 = 1,      // Expansion I/O bus and VME bus interrupts
             SCSI = 2,           // SCSI interrupts
             LANCE = 3,          // Ethernet controller interrupts
-            CPU = 4,            // Interrupt for interprocessor communication from CPU
-            SCC = 5,            // Serial communication
-            TIMEOUT_FDCIRQ = 6, // Both timer and FDCIRQ feed IRQ6
-            FDCDRQ = 7,         // DRQ signal from FDC
+            CPU = 4,            // Interprocessor communication interrupt (from CPU)
+            SCC = 5,            // Serial communication interrupts
+            TIMEOUT_FDCIRQ = 6, // IOP timeout and IRQ from FDC
+            FDCDRQ = 7,         // DRQ from FDC
             SCC_PERIPHERAL = 99 // hack to differentiate SCC interrupts better
         };
+
         template <iop_irq_number Number>
         void iop_irq_w(int state);
         void int_check_iop();
 
         enum cpu_irq_number : unsigned
         {
-            AST = 1,     // Asynchronous System Trap
+            AST = 1,     // Asynchronous System Trap interrupt
             CPIRQ1 = 2,  // VME bus interrupt
-            IOPIRQ3 = 3, // low-priority interprocessor communication interrupts from IOP
+            IOPIRQ3 = 3, // Low-priority interprocessor communication interrupts (from IOP)
             CPIRQ3 = 4,  // VME bus interrupt
-            IOPIRQ5 = 5, // high-priority interprocessor communication interrupts from IOP
-            TIMER = 6,   // 100Hz timer
-            PERR = 7     // Parity error
+            IOPIRQ5 = 5, // High-priority interprocessor communication interrupts (from IOP)
+            TIMER = 6,   // 100Hz timer interrupt
+            PERR = 7     // Parity error interrupt
         };
+
         template <cpu_irq_number Number>
         void cpu_irq_w(int state);
         void int_check_cpu();
 
-        void iop_bus_error(uint8_t data);
-
-        void handle_rts(int data);
-        void handle_dtr(int data);
-        void update_dcd();
-
+        // 68k bus error handlers
         void cpu_bus_error(offs_t offset, uint32_t mem_mask, bool write, uint8_t status);
+        void iop_bus_error(uint8_t data);
 
         // Platform hardware used by the IOP
         uint8_t iop_status_r();
@@ -204,6 +200,11 @@ namespace
         void scsi_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask);
         void scsi_drq_handler(int status);
 
+        // Front panel signal handlers
+        void handle_rts(int data);
+        void handle_dtr(int data);
+        void update_dcd();
+
         // Platform hardware used by the main processor
         void cpu_romdis_w(uint8_t data);
         void mmuen_w(uint8_t data);
@@ -212,9 +213,9 @@ namespace
         void astreset_w(uint8_t data);
         void astset_w(uint8_t data);
 
+        // CPU timer handlers
         void interval_timer_tick(uint8_t data);
         TIMER_CALLBACK_MEMBER(bus_error_off_cpu);
-        // TIMER_CALLBACK_MEMBER(bus_error_off_iop);
 
     private:
         // CPUs (2x 68020, but only the main processor has an FPU)
@@ -259,27 +260,23 @@ namespace
         offs_t m_last_berr_pc_cpu = 0;
         emu_timer  *m_cpu_bus_error_timer;
 
-        // bool m_iop_bus_error = false;
-        // offs_t m_last_berr_pc_iop = 0;
-        // emu_timer  *m_iop_bus_error_timer;
-
         int m_sw1_first_read = 0;
 
         bool m_panel_clear = false;
         bool m_panel_shift = false;
         int m_panel_shift_count = 0;
         uint8_t m_cpu_bus_error_status = 0;
-        // uint8_t m_iop_bus_error_status = 0;
         uint8_t m_rtc_data = 0;
+
+        static const int NET_RAM_SIZE = 8192; // 16K RAM, in 16-bit words
     };
 
     void news_iop_state::machine_start()
     {
         m_cpu_bus_error_timer = timer_alloc(FUNC(news_iop_state::bus_error_off_cpu), this);
-        // m_iop_bus_error_timer = timer_alloc(FUNC(news_iop_state::bus_error_off_iop), this);
 
-        m_net_ram = std::make_unique<u16[]>(8192); // 16K RAM
-        save_pointer(NAME(m_net_ram), 8192);
+        m_net_ram = std::make_unique<u16[]>(NET_RAM_SIZE);
+        save_pointer(NAME(m_net_ram), NET_RAM_SIZE);
 
         m_mmu->space(0).install_ram(0x0, m_ram->mask(), m_ram->pointer());
 
@@ -291,7 +288,7 @@ namespace
         // TODO: Confirm that channel 0 drives both CPU and IOP
         // On the NWS-1960, the 8253 uses channel 0 for the 100Hz CPU timer, channel 1 for main memory refresh, and channel 2 for the IOP timeout
         // On the 831, using the same assignment breaks things because channel 2 is too fast for the IOP to operate correctly because it gets interrupted far too frequently.
-        // The 1850 (same design as 1960) loads channels 0 and 2 with count 0x4e20, whereas the 831 loads channel 0 with 0x4e20 and channel 2 with 0x2. 
+        // The 1850 (same design as 1960) loads channels 0 and 2 with count 0x4e20, whereas the 831 loads channel 0 with 0x4e20 and channel 2 with 0x2.
         // Therefore, because the 831 seems to behave with 0x4e20 driving the IOP as well as the CPU (100Hz), they both hook off of channel 0 for now. However, one or both could be
         // generated elsewhere (or some other trickery is afoot) on the real system, so this needs more investigation in the future.
         // Math: 0x4e20 cycles * 500ns = 10ms period, 1 / 10ms = 100Hz
@@ -309,13 +306,7 @@ namespace
     TIMER_CALLBACK_MEMBER(news_iop_state::bus_error_off_cpu)
     {
         m_cpu_bus_error = false;
-        // m_cpu_bus_error_status = 0; TODO: might be better to remove this, in case the status is checked after this timer is fired
     }
-
-    // TIMER_CALLBACK_MEMBER(news_iop_state::bus_error_off_iop)
-    // {
-    //     m_iop_bus_error = false;
-    // }
 
     uint8_t news_iop_state::iop_status_r()
     {
@@ -324,7 +315,7 @@ namespace
         // 7: FDC IRQ
         // 6: ~CPIRQ3
         // 5: Main Memory Parity Error Flag
-        // 4: ~CPIRQ1
+        // 4: ~CPIRQ1 (NWS-800: SCSI interrupt status?)
         // 3: DSR CHB
         // 2: RI CHB
         // 1: DSR CHA
@@ -362,12 +353,9 @@ namespace
 
     void news_iop_state::min_w(uint8_t data)
     {
-        // TODO: HD rate works, DD rate untested
         constexpr int HD_RATE = 500000;
-        constexpr int DD_RATE = 250000;
-
-        // 0 = HD, 1 = DD
-        const int rate = (data > 0) ? DD_RATE : HD_RATE;
+        constexpr int DD_RATE = 250000; // TODO: Test DD rate when image is available
+        const int rate = (data > 0) ? DD_RATE : HD_RATE; // 0 = HD, 1 = DD
 
         LOG("Write MIN = 0x%x, set rate to %s (%s)\n", data, rate == HD_RATE ? "HD" : "DD", machine().describe_context());
         m_fdc->set_rate(rate);
@@ -480,14 +468,14 @@ namespace
             break;
 
         case 0xffff0000:
-            result = (m_scsi_dma->read_wrapper(true, 6) << 24) | 
+            result = (m_scsi_dma->read_wrapper(true, 6) << 24) |
                      (m_scsi_dma->read_wrapper(true, 6) << 16);
             break;
 
         case 0xffffffff:
-            result = (m_scsi_dma->read_wrapper(true, 6) << 24) | 
-                     (m_scsi_dma->read_wrapper(true, 6) << 16) | 
-                     (m_scsi_dma->read_wrapper(true, 6) << 8) | 
+            result = (m_scsi_dma->read_wrapper(true, 6) << 24) |
+                     (m_scsi_dma->read_wrapper(true, 6) << 16) |
+                     (m_scsi_dma->read_wrapper(true, 6) << 8) |
                      m_scsi_dma->read_wrapper(true, 6);
             break;
 
@@ -547,10 +535,20 @@ namespace
     void news_iop_state::iop_map(address_map &map)
     {
         map.unmap_value_low();
-        map(0x03000000, 0x0300ffff).rom().region("eprom", 0).mirror(0x007f0000); // TODO: Not 100% sure this mirror is correct
+        map(0x03000000, 0x0300ffff).rom().region("eprom", 0).mirror(0x007f0000);
         map(0x00800000, 0x00ffffff).noprw(); // TODO: how to handle this, lower RAM
 
-        // map(0x20000000, 0x3fffffff).lrw8(NAME([this](){ iop_bus_error(); return 0xff; }), NAME([this](uint8_t data){ /*iop_bus_error();*/ }));
+        // IOP bus expansion I/O
+        map(0x20000000, 0x20ffffff).lrw32([this](offs_t offset, uint32_t mem_mask)
+                                          {
+                                              LOG("extio_r(0x%x, 0x%x) = 0x%x (%s)\n", offset, mem_mask, 0xff, machine().describe_context());
+                                              return 0xff;
+                                          }, "extio_r",
+                                          [this](offs_t offset, uint32_t data, uint32_t mem_mask)
+                                          {
+                                              LOG("extio_w(0x%x, 0x%x, 0x%x) (%s)\n", offset, data, mem_mask, machine().describe_context());
+                                          }, "extio_w").mirror(0x1f000000);
+
         // map(0x4c000100, 0x4c0001ff).lrw8(NAME([this](){ iop_bus_error(); return 0; }), NAME([this](uint8_t data){ iop_bus_error(); }));
 
         map(0x60000000, 0x60000000).r(FUNC(news_iop_state::iop_status_r));
@@ -569,7 +567,7 @@ namespace
         map(0x44000007, 0x44000007).rw(m_fdc, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
 
         map(0x46000001, 0x46000001).rw(FUNC(news_iop_state::rtcreg_r), FUNC(news_iop_state::rtcreg_w));
-        map(0x46000002, 0x46000002).w(FUNC(news_iop_state::rtcsel_w)); // TODO: no reads to this addr, right?
+        map(0x46000002, 0x46000002).w(FUNC(news_iop_state::rtcsel_w));
 
         map(0x4a000000, 0x4a000003).rw(m_scc_peripheral, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)); // kbms
         map(0x4c000000, 0x4c000003).rw(m_scc_external, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));	  // rs232
@@ -625,19 +623,20 @@ namespace
         LOGMASKED(LOG_MEMORY, "(%s) r BERR_STATUS = 0x%x\n", machine().describe_context(), m_cpu_bus_error_status);
         uint8_t status = m_cpu_bus_error_status;
         m_cpu_bus_error_status = 0;
+        m_last_berr_pc_cpu = 0;
         return status;
     }
 
     void news_iop_state::astreset_w(uint8_t data)
     {
-        LOGMASKED(LOG_ALL_INTERRUPT, "(%s) AST_RESET 0x%x\n", machine().describe_context(), data);
+        LOGMASKED(LOG_AST, "(%s) AST_RESET 0x%x\n", machine().describe_context(), data);
         // TODO: Implement AST
         int_check_cpu();
     }
 
     void news_iop_state::astset_w(uint8_t data)
     {
-        LOGMASKED(LOG_ALL_INTERRUPT, "(%s) AST_SET 0x%x as %s\n", machine().describe_context(), data, m_cpu->supervisor_mode() ? "supervisor" : "user");
+        LOGMASKED(LOG_AST, "(%s) AST_SET 0x%x as %s\n", machine().describe_context(), data, m_cpu->supervisor_mode() ? "supervisor" : "user");
         // TODO: Implement AST
         int_check_cpu();
     }
@@ -646,14 +645,9 @@ namespace
     {
         map(0x03000000, 0x0300ffff).rom().region("eprom", 0).mirror(0x007f0000);
 
-        // MMU mapping control
-        map(0x06000000, 0x061fffff).rw(m_mmu, FUNC(news_020_mmu_device::mmu_entry_r), FUNC(news_020_mmu_device::mmu_entry_w)).select(0x10000000); // MMU map RAM
-        map(0x04c00000, 0x04c00000).w(m_mmu, FUNC(news_020_mmu_device::clear_entries)).select(0x10000000);
-
         // Various platform control registers (MMU and otherwise)
         map(0x04400000, 0x04400000).w(FUNC(news_iop_state::cpu_romdis_w));
         map(0x04400001, 0x04400001).w(FUNC(news_iop_state::mmuen_w));
-
         map(0x04400002, 0x04400002).lw8([this](uint8_t data)
                                         {
                                             // TODO: resolve copy-paste between this, some of the IOP stuff, and CPINT4EN
@@ -688,23 +682,17 @@ namespace
         map(0x04400004, 0x04400004).w(FUNC(news_iop_state::timerenc_w));
         map(0x04400005, 0x04400005).lw8(NAME([this](uint8_t data) { LOG("CACHEEN 0x%x\n", data); }));
         map(0x04400006, 0x04400006).lw8(NAME([this](uint8_t data) { LOG("PARITYEN 0x%x\n", data); }));
-        map(0x04400007, 0x04400007).lw8(NAME([this](uint8_t data) { LOG("UNKNOWN 0x%x\n", data); }));
-
         map(0x04800000, 0x04800000).lw8([this](uint8_t data) { iop_irq_w<CPU>(1); }, "INT_IOP");
+        map(0x04c00000, 0x04c00000).select(0x10000000).w(m_mmu, FUNC(news_020_mmu_device::clear_entries));
 
-        map(0x05c00000, 0x05c00000).r(FUNC(news_iop_state::berr_status_r));
-
+        map(0x05000000, 0x05000000).select(0x400000).lw8([this](offs_t offset, uint8_t data)
+                                                         {
+                                                             LOGMASKED(LOG_MEMORY, "%s cache clear = 0x%x (%s)\n", (offset & 0x400000) ? "system" : "user", data, machine().describe_context());
+                                                         }, "CACHE_CLR");
         map(0x05800000, 0x05800000).w(FUNC(news_iop_state::astreset_w));
         map(0x05800001, 0x05800001).w(FUNC(news_iop_state::astset_w));
-
-        map(0x05000000, 0x05000000).lw8([this](uint8_t data)
-                                        { LOGMASKED(LOG_MEMORY, "(%s) user cache clear = 0x%x\n", machine().describe_context(), data); },
-                                        "USER_CACHE_CLR");
-
-        map(0x05400000, 0x05400000).lw8([this](uint8_t data)
-                                        { // TODO: use select and merge with previous one
-                                            LOGMASKED(LOG_MEMORY, "(%s) system cache clear = 0x%x\n", machine().describe_context(), data);
-                                        }, "SYS_CACHE_CLR");
+        map(0x05c00000, 0x05c00000).r(FUNC(news_iop_state::berr_status_r));
+        map(0x06000000, 0x061fffff).rw(m_mmu, FUNC(news_020_mmu_device::mmu_entry_r), FUNC(news_020_mmu_device::mmu_entry_w)).select(0x10000000);
     }
 
     void news_iop_state::cpu_map(address_map &map)
@@ -760,10 +748,10 @@ namespace
 
             if (m_iop_int_state[i] != state)
             {
-                // if (i != 6)
-                // {
+                if (i != 6)
+                {
                     LOGMASKED(LOG_INTERRUPT, "Setting IOP input line %d to %d (%d)\n", interrupt_map[i], state ? 1 : 0, i);
-                // }
+                }
                 m_iop_int_state[i] = state;
                 m_iop->set_input_line(interrupt_map[i], state ? 1 : 0);
             }
@@ -787,12 +775,6 @@ namespace
         {
             LOG("cpu irq number %d state %d\n", Number, state);
         }
-
-        // int shift = Number == SCC_PERIPHERAL ? SCC : Number;
-        // if (Number == SCC_PERIPHERAL)
-        // {
-        // 	m_blame_peripheral = state > 0;
-        // }
 
         if (state)
         {
@@ -828,17 +810,12 @@ namespace
 
         if (m_cpu_timerenc && m_cpu_timerout)
         {
-            // LOG("Setting CPU timer interrupt!\n");
             m_cpu->set_input_line(INPUT_LINE_IRQ6, 1);
         }
         else
         {
-            // LOG("Clearing CPU timer interrupt!\n");
             m_cpu->set_input_line(INPUT_LINE_IRQ6, 0);
-            // m_cpu_timerout = false; // just in case
         }
-
-        // TODO: Implement AST (Asynchronous System Trap, IRQ1)
     }
 
     static void news_scsi_devices(device_slot_interface &device)
@@ -923,48 +900,27 @@ namespace
     {
         if (machine().side_effects_disabled() || (m_cpu_bus_error && m_cpu->pc() == m_last_berr_pc_cpu))
         {
-            // LOGMASKED(LOG_MEMORY, "Suppressing cpu bus error at offset 0x%x mask 0x%x r/w %s status 0x%x pc 0x%x", offset, mem_mask, write ? "w" : "r", status, m_cpu->pc());
+            LOGMASKED(LOG_MEMORY, "Suppressing cpu bus error at offset 0x%x mask 0x%x r/w %s status 0x%x pc 0x%x", offset, mem_mask, write ? "w" : "r", status, m_cpu->pc());
             return;
         }
-        // TODO: is this needed? also, accessing_bits macro is maybe not right because 8 bit access will also trigger it
-        // LOG("bus error at %08x & %08x (%s)\n", offset, mem_mask, rw ? "read" : "write");
-        if (!ACCESSING_BITS_16_31) // what to do about 8 bit access?
-        {
-            offset++;
-        }
-        // Based on hcpu30's handling of bus errors
+
         LOGMASKED(LOG_MEMORY, "Applying cpu bus error at offset 0x%x mask 0x%x r/w %s status 0x%x pc 0x%x\n", offset, mem_mask, write ? "w" : "r", status, m_cpu->pc());
 
         m_last_berr_pc_cpu = m_cpu->pc();
         m_cpu_bus_error = true;
         m_cpu_bus_error_status = status;
         m_cpu->set_buserror_details(offset, !write, m_cpu->get_fc(), true);
-        m_cpu_bus_error_timer->adjust(m_cpu->cycles_to_attotime(16)); // 16 is shamelessly stolen from hcpu30 - is that right?
+        m_cpu_bus_error_timer->adjust(m_cpu->cycles_to_attotime(16)); // TODO: 16 is what hcpu30 uses for a similar implementation - is that OK for NEWS?
     }
 
     void news_iop_state::iop_bus_error(uint8_t data)
     {
-        // TODO: fancy bus error
         if (!machine().side_effects_disabled())
         {
+            // For now, only SCSI will cause bus errors, so the offset is hardcoded
+            m_iop->set_buserror_details(0x64000000, data == news_iop_scsi_helper_device::READ_ERROR, m_iop->get_fc());
             m_iop->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
         }
-
-            //     if (machine().side_effects_disabled() || (m_iop_bus_error && m_iop->pc() == m_last_berr_pc_iop))
-    //     {
-    //         LOGMASKED(LOG_GENERAL, "Suppressing iop bus error at offset 0x%x mask 0x%x r/w %s status 0x%x pc 0x%x\n", offset, mem_mask, write ? "w" : "r", status, m_iop->pc());
-    //         return;
-    //     }
-
-    //     // LOGMASKED(LOG_GENERAL, "Applying iop bus error at offset 0x%x mask 0x%x r/w %s status 0x%x pc 0x%x\n", offset, mem_mask, write ? "w" : "r", status, m_iop->pc());
-    //     // machine().debug_break();
-    //     m_last_berr_pc_iop = m_iop->pc();
-    //     m_iop_bus_error = true;
-    //     m_iop_bus_error_status = status;
-    //     m_iop->set_buserror_details(offset, !write, m_iop->get_fc(), true);
-    //     // m_iop->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-    //     // m_iop->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-    //     m_iop_bus_error_timer->adjust(m_cpu->cycles_to_attotime(16));
     }
 
     void news_iop_state::common(machine_config &config)
@@ -1071,7 +1027,7 @@ namespace
         m_scsi_dma->scsi_dma_read_callback().set(m_scsi, FUNC(ncr53c80_device::dma_r));
         m_scsi_dma->scsi_dma_write_callback().set(m_scsi, FUNC(ncr53c80_device::dma_w));
         m_scsi_dma->iop_halt_callback().set_inputline(m_iop, INPUT_LINE_HALT);
-        m_scsi_dma->timeout_error_callback().set(FUNC(news_iop_state::iop_bus_error));
+        m_scsi_dma->bus_error_callback().set(FUNC(news_iop_state::iop_bus_error));
         m_scsi_dma->irq_out_callback().set(FUNC(news_iop_state::iop_irq_w<SCSI>));
 
         // Epson RTC-58321B

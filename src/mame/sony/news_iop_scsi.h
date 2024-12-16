@@ -18,7 +18,7 @@ public:
 	auto scsi_dma_read_callback() { return m_scsi_dma_read_callback.bind(); }
 	auto scsi_dma_write_callback() { return m_scsi_dma_write_callback.bind(); }
 	auto iop_halt_callback() { return m_iop_halt_callback.bind(); }
-	auto timeout_error_callback() { return m_timeout_error_callback.bind(); }
+	auto bus_error_callback() { return m_bus_error_callback.bind(); }
     auto irq_out_callback() { return m_irq_out_callback.bind(); }
 
 	// miscellaneous configuration
@@ -30,6 +30,10 @@ public:
 
 	void drq_w(int state);
     void irq_w(int state);
+
+	// Constants for consumers of the bus error details
+	static const u8 READ_ERROR = 1;
+	static const u8 WRITE_ERROR = 0;
 
 protected:
 	// device_t implementation
@@ -51,7 +55,7 @@ private:
 	devcb_read8 m_scsi_dma_read_callback;
 	devcb_write8 m_scsi_dma_write_callback;
 	devcb_write_line m_iop_halt_callback;
-	devcb_write8 m_timeout_error_callback;
+	devcb_write8 m_bus_error_callback;
     devcb_write_line m_irq_out_callback;
 
 	// misc. parameters

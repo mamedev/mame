@@ -45,8 +45,6 @@ ALLOW_SAVE_TYPE(news_iop_scsi_helper_device::mode);
 
 // TODO: adjustments to the below for NEWS?
 static constexpr u8 BAD_BYTE = 0xbb;
-static constexpr u8 READ_ERROR = 1;
-static constexpr u8 WRITE_ERROR = 0;
 
 news_iop_scsi_helper_device::news_iop_scsi_helper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
     : device_t(mconfig, NEWS_IOP_SCSI_HELPER, tag, owner, clock), 
@@ -55,7 +53,7 @@ news_iop_scsi_helper_device::news_iop_scsi_helper_device(const machine_config &m
     m_scsi_dma_read_callback(*this, BAD_BYTE),
     m_scsi_dma_write_callback(*this),
     m_iop_halt_callback(*this),
-    m_timeout_error_callback(*this),
+    m_bus_error_callback(*this),
     m_irq_out_callback(*this),
     m_timeout(attotime::from_usec(16)), // TODO: proper value for NEWS
     m_pseudo_dma_timer(nullptr),
@@ -278,7 +276,7 @@ u8 news_iop_scsi_helper_device::read_wrapper(bool pseudo_dma, offs_t offset)
                 fatalerror("%s: Read underflow on SCSI pseudo-DMA\n", machine().describe_context());
                 m_mode = mode::BAD_DMA;
             }
-            m_timeout_error_callback(READ_ERROR);
+            m_bus_error_callback(READ_ERROR);
             m_pseudo_dma_timer->enable(false);
         }
         else
@@ -306,7 +304,7 @@ void news_iop_scsi_helper_device::write_wrapper(bool pseudo_dma, offs_t offset, 
     case 0:
         if (m_mode == mode::BAD_DMA && pseudo_dma)
         {
-            m_timeout_error_callback(WRITE_ERROR);
+            m_bus_error_callback(WRITE_ERROR);
         }
         else if (m_mode == mode::WRITE_DMA && (m_write_fifo_bytes != 0 || !BIT(m_scsi_read_callback(5), 6)))
         {
@@ -324,7 +322,7 @@ void news_iop_scsi_helper_device::write_wrapper(bool pseudo_dma, offs_t offset, 
             else if (pseudo_dma)
             {
                 logerror("%s: Write overflow on SCSI pseudo-DMA\n", machine().describe_context());
-                m_timeout_error_callback(WRITE_ERROR);
+                m_bus_error_callback(WRITE_ERROR);
                 m_mode = mode::BAD_DMA;
             }
         }
