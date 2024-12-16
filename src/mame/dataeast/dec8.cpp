@@ -3938,7 +3938,7 @@ GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  lastmisn_state, empty_ini
 GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   lastmisn_state, empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   lastmisn_state, empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
 GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   lastmisn_state, empty_init,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuhbl,  ghostb,   meikyuh,  meikyuh,   lastmisn_state, init_meikyuhbl, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, meikyuhbl,  ghostb,   meikyuh,  meikyuh,   lastmisn_state, init_meikyuhbl, ROT0,   "bootleg",               "Meikyuu Hunter G (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
