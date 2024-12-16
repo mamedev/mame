@@ -98,7 +98,7 @@
 #define LOG_SCSI (1U << 8)
 #define LOG_AST (1U << 9)
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL|LOG_AST)
 
 #include "logmacro.h"
 
@@ -212,6 +212,7 @@ namespace
         uint8_t berr_status_r();
         void astreset_w(uint8_t data);
         void astset_w(uint8_t data);
+        void update_ast();
 
         // CPU timer handlers
         void interval_timer_tick(uint8_t data);
@@ -256,9 +257,11 @@ namespace
         bool m_scsi_intst = false;
         bool m_scsi_inte = false;
         bool m_blame_peripheral = false;
+        bool m_ast_latched = false;
+        bool m_ast_active = false;
         bool m_cpu_bus_error = false;
         offs_t m_last_berr_pc_cpu = 0;
-        emu_timer  *m_cpu_bus_error_timer;
+        emu_timer *m_cpu_bus_error_timer;
 
         int m_sw1_first_read = 0;
 
@@ -630,15 +633,30 @@ namespace
     void news_iop_state::astreset_w(uint8_t data)
     {
         LOGMASKED(LOG_AST, "(%s) AST_RESET 0x%x\n", machine().describe_context(), data);
-        // TODO: Implement AST
-        int_check_cpu();
+        m_ast_latched = false;
+        m_ast_active = false;
+        update_ast();
     }
 
     void news_iop_state::astset_w(uint8_t data)
     {
         LOGMASKED(LOG_AST, "(%s) AST_SET 0x%x as %s\n", machine().describe_context(), data, m_cpu->supervisor_mode() ? "supervisor" : "user");
-        // TODO: Implement AST
-        int_check_cpu();
+        m_ast_latched = true;
+        update_ast();
+    }
+
+    void news_iop_state::update_ast()
+    {            
+        // This logic matches (more or less) the NWS-1960 schematic but rarely fires,
+        // so this might not be correct. I'm not really sure what all would rely on AST.
+        if (m_ast_latched && !m_ast_active && !m_cpu->supervisor_mode()) {
+            LOGMASKED(LOG_AST, "Triggering AST!\n");
+            m_ast_active = true;
+            m_cpu->set_input_line(INPUT_LINE_IRQ1, 1);
+        } 
+        else if (!m_ast_active) {
+            m_cpu->set_input_line(INPUT_LINE_IRQ1, 0);
+        }
     }
 
     void news_iop_state::mmu_map(address_map &map)
@@ -698,9 +716,11 @@ namespace
     void news_iop_state::cpu_map(address_map &map)
     {
         map(0x0, 0xffffffff).lrw32([this](offs_t offset, uint32_t mem_mask) {
+            update_ast(); // Need to catch any supervisor -> user transitions
             return m_mmu->hyperbus_r(offset, mem_mask, m_cpu->supervisor_mode());
         }, "hyperbus_r",
         [this](offs_t offset, uint32_t data, uint32_t mem_mask) {
+            update_ast(); // Need to catch any supervisor -> user transitions
             m_mmu->hyperbus_w(offset, data, mem_mask, m_cpu->supervisor_mode());
         }, "hyperbus_w");
     }
@@ -808,14 +828,8 @@ namespace
             }
         }
 
-        if (m_cpu_timerenc && m_cpu_timerout)
-        {
-            m_cpu->set_input_line(INPUT_LINE_IRQ6, 1);
-        }
-        else
-        {
-            m_cpu->set_input_line(INPUT_LINE_IRQ6, 0);
-        }
+        m_cpu->set_input_line(INPUT_LINE_IRQ6, m_cpu_timerenc && m_cpu_timerout);
+        update_ast();
     }
 
     static void news_scsi_devices(device_slot_interface &device)
