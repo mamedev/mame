@@ -52,7 +52,7 @@ uint8_t xavix_math_device::barrel_r(offs_t offset)
 // the pickup animations however don't seem to play, which indicates this could still be wrong.
 void xavix_math_device::barrel_w(offs_t offset, uint8_t data)
 {
-	LOG("%s: barrel_w %02x\n", machine().describe_context(), data);
+	LOG("%s: barrel_w %d %02x\n", machine().describe_context(), offset, data);
 
 	m_barrel_params[offset] = data;
 
@@ -111,18 +111,23 @@ void xavix_math_device::barrel_w(offs_t offset, uint8_t data)
 
 uint8_t xavix_math_device::mult_r(offs_t offset)
 {
-	return m_multresults[offset];
+	uint8_t ret = m_multresults[offset];
+	LOG("%s: mult_r %d %02x (read result)\n", machine().describe_context(), offset, ret);
+	return ret;
 }
 
 void xavix_math_device::mult_w(offs_t offset, uint8_t data)
 {
+	LOG("%s: mult_w %d %02x (write result)\n", machine().describe_context(), offset, data);
 	// rad_madf writes here to set the base value which the multiplication result gets added to
 	m_multresults[offset] = data;
 }
 
 uint8_t xavix_math_device::mult_param_r(offs_t offset)
 {
-	return m_multparams[offset];
+	uint8_t ret = m_multparams[offset];;
+	LOG("%s: mult_param_r %d %02x (read parameters)\n", machine().describe_context(), offset, ret);
+	return ret;
 }
 
 void xavix_math_device::mult_param_w(offs_t offset, uint8_t data, uint8_t mem_mask)
@@ -139,9 +144,9 @@ void xavix_math_device::mult_param_w(offs_t offset, uint8_t data, uint8_t mem_ma
 
 	if (offset == 2)
 	{
+		LOG("%s: mult_param_w %d %02x (write param1 and trigger)\n", machine().describe_context(), offset, data);
+
 		// assume 0 is upper bits, might be 'mode' instead, check
-
-
 		int signmode = (m_multparams[0] & 0x3f);
 
 		uint16_t result = 0;
@@ -171,6 +176,14 @@ void xavix_math_device::mult_param_w(offs_t offset, uint8_t data, uint8_t mem_ma
 
 		m_multresults[1] = (result >> 8) & 0xff;
 		m_multresults[0] = result & 0xff;
+	}
+	else if (offset == 1)
+	{
+		LOG("%s: mult_param_w %d %02x (write param2)\n", machine().describe_context(), offset, data);
+	}
+	else
+	{
+		LOG("%s: mult_param_w %d %02x (write mode bits)\n", machine().describe_context(), offset, data);
 	}
 }
 
