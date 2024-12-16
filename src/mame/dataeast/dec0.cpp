@@ -1772,14 +1772,17 @@ static GFXDECODE_START( gfx_secretab )
 	GFXDECODE_ENTRY( "tiles2",  0, automat_tilelayout2,  0x300, 0x10 )
 GFXDECODE_END
 
+
 /******************************************************************************/
 
-
-
 // DECO video CRTC, pixel clock is unverified (actually 24MHz/4?)
-void dec0_state::set_screen_raw_params_data_east(machine_config &config)
+void dec0_state::set_screen_raw_params(machine_config &config)
 {
-	m_screen->set_raw(XTAL(12'000'000)/2,384,0,256,272,8,248);
+//  m_screen->set_refresh_hz(57.41);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); / 57.41 Hz, 529us Vblank
+//  m_screen->set_size(32*8, 32*8);
+//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_raw(XTAL(12'000'000) / 2, 384, 0, 256, 272, 8, 248);
 }
 
 void dec0_state::dec0_base(machine_config &config)
@@ -1788,12 +1791,7 @@ void dec0_state::dec0_base(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	set_screen_raw_params_data_east(config);
-	//m_screen->set_refresh_hz(57.41);
-	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 57.41 Hz, 529us Vblank */
-	//m_screen->set_size(32*8, 32*8);
-	//m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	//screen update callback differs per game
+	set_screen_raw_params(config);
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dec0);
@@ -1930,9 +1928,7 @@ void dec0_automat_state::automat(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(57.41);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 57.41 Hz, 529us Vblank */
-	set_screen_raw_params_data_east(config);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(dec0_automat_state::screen_update_automat));
 	m_screen->set_palette(m_palette);
 
@@ -2006,9 +2002,7 @@ void dec0_automat_state::secretab(machine_config &config) // all clocks verified
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(57.41);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); // 57.41 Hz, 529us Vblank
-	set_screen_raw_params_data_east(config);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(dec0_automat_state::screen_update_secretab));
 	m_screen->set_palette(m_palette);
 
