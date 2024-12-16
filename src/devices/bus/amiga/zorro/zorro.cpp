@@ -199,6 +199,10 @@ void zorro2_bus_device::device_reset()
 	// call base device
 	zorro_bus_device_base::device_reset();
 
+	// reset zorro cards
+	for (device_zorro2_card_interface &card : m_dev)
+		card.device().reset();
+
 	// initiate autoconfig
 	m_autoconfig_device = 0;
 
