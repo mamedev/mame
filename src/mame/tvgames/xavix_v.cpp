@@ -1370,6 +1370,10 @@ void xavix_state::spritefragment_dma_trg_w(uint8_t data)
 			// TODO: verify the source data in RAM is actually correct
 			if ((unk & 0x80) && (i & 0x80))
 			{
+				// do nothing, maybe unk is the length of each section to copy?
+			}
+			else
+			{
 				//uint8_t dat = m_maincpu->read_full_data_sp(src + i);
 				const offs_t realaddress = src + readaddress;
 				uint8_t dat;

@@ -59,14 +59,13 @@ void xavix_math_device::barrel_w(offs_t offset, uint8_t data)
 	// offset 0 = trigger
 	if (offset == 0)
 	{
-		int shift_data = m_barrel_params[1];
+		uint8_t shift_data = m_barrel_params[1];
 		int shift_amount = data & 0x0f;
 		int shift_param = (data & 0xf0) >> 4;
 
 		if (shift_param == 0x00) // just a shift? (definitely right for 'hammer throw'
 		{
 			// used in epo_guru for 'hammer throw', 'pre-title screen', 'mini game select', '3d chase game (floor scroll, pickups, misc)', 'toilet roll mini game (when you make an error)'
-
 			if (shift_amount & 0x08)
 			{
 				m_barrel_params[1] = (shift_data >> (shift_amount & 0x7));
@@ -81,6 +80,7 @@ void xavix_math_device::barrel_w(offs_t offset, uint8_t data)
 			// used in epo_guru for '3d chase game' (unsure of actual purpose in it)
 			switch (shift_amount)
 			{
+			// rol?
 			case 0x0: m_barrel_params[1] = shift_data; break;
 			case 0x1: m_barrel_params[1] = (shift_data << 1) | ((shift_data >> 7) & 0x01); break;
 			case 0x2: m_barrel_params[1] = (shift_data << 2) | ((shift_data >> 6) & 0x03); break;
@@ -89,15 +89,20 @@ void xavix_math_device::barrel_w(offs_t offset, uint8_t data)
 			case 0x5: m_barrel_params[1] = (shift_data << 5) | ((shift_data >> 3) & 0x1f); break;
 			case 0x6: m_barrel_params[1] = (shift_data << 6) | ((shift_data >> 2) & 0x2f); break;
 			case 0x7: m_barrel_params[1] = (shift_data << 7) | ((shift_data >> 1) & 0x3f); break;
-			case 0x8: m_barrel_params[1] = shift_data; break;
-			case 0x9: m_barrel_params[1] = (shift_data >> 1) | ((shift_data & 0x01) << 7); break;
-			case 0xa: m_barrel_params[1] = (shift_data >> 2) | ((shift_data & 0x03) << 6); break;
-			case 0xb: m_barrel_params[1] = (shift_data >> 3) | ((shift_data & 0x07) << 5); break;
-			case 0xc: m_barrel_params[1] = (shift_data >> 4) | ((shift_data & 0x0f) << 4); break;
-			case 0xd: m_barrel_params[1] = (shift_data >> 5) | ((shift_data & 0x1f) << 3); break;
-			case 0xe: m_barrel_params[1] = (shift_data >> 6) | ((shift_data & 0x2f) << 2); break;
-			case 0xf: m_barrel_params[1] = (shift_data >> 7) | ((shift_data & 0x3f) << 1); break;
+			// asr?
+			case 0x8: m_barrel_params[1] = ((int8_t)shift_data >> 0); break;
+			case 0x9: m_barrel_params[1] = ((int8_t)shift_data >> 1); break;
+			case 0xa: m_barrel_params[1] = ((int8_t)shift_data >> 2); break;
+			case 0xb: m_barrel_params[1] = ((int8_t)shift_data >> 3); break;
+			case 0xc: m_barrel_params[1] = ((int8_t)shift_data >> 4); break;
+			case 0xd: m_barrel_params[1] = ((int8_t)shift_data >> 5); break;
+			case 0xe: m_barrel_params[1] = ((int8_t)shift_data >> 6); break;
+			case 0xf: m_barrel_params[1] = ((int8_t)shift_data >> 7); break;
 			}
+		}
+		else
+		{
+			popmessage("unknown shift %02x\n", shift_param);
 		}
 	}
 }
