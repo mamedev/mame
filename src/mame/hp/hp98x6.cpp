@@ -54,6 +54,7 @@
 #include "cpu/m68000/m68000.h"
 #include "imagedev/floppy.h"
 #include "machine/74123.h"
+#include "machine/input_merger.h"
 #include "machine/ins8250.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
@@ -138,6 +139,13 @@ protected:
 		, m_upi(*this, "upi")
 		, m_hpib(*this, "hpib")
 		, m_dio_bus(*this, "diobus")
+		, m_irq1_merger(*this , "merge_irq1")
+		, m_irq2_merger(*this , "merge_irq2")
+		, m_irq3_merger(*this , "merge_irq3")
+		, m_irq4_merger(*this , "merge_irq4")
+		, m_irq5_merger(*this , "merge_irq5")
+		, m_irq6_merger(*this , "merge_irq6")
+		, m_irq7_merger(*this , "merge_irq7")
 		, m_chargen(*this, "chargen")
 		, m_rom_drawers(*this, "drawer%u", 0U)
 	{
@@ -161,6 +169,13 @@ protected:
 	required_device<hp98x6_upi_device> m_upi;
 	required_device<tms9914_device> m_hpib;
 	required_device<bus::hp_dio::dio16_device> m_dio_bus;
+	required_device<input_merger_any_high_device> m_irq1_merger;
+	required_device<input_merger_any_high_device> m_irq2_merger;
+	required_device<input_merger_any_high_device> m_irq3_merger;
+	required_device<input_merger_any_high_device> m_irq4_merger;
+	required_device<input_merger_any_high_device> m_irq5_merger;
+	required_device<input_merger_any_high_device> m_irq6_merger;
+	required_device<input_merger_any_high_device> m_irq7_merger;
 
 	// Character generator
 	required_region_ptr<uint8_t> m_chargen;
@@ -250,14 +265,24 @@ void hp98x6_base_state::hp98x6_base(machine_config &config, unsigned dot_clock, 
 	DIO16(config, m_dio_bus, 0);
 	m_dio_bus->set_program_space(m_cpu, AS_PROGRAM);
 	m_cpu->reset_cb().append(m_dio_bus, FUNC(bus::hp_dio::dio16_device::reset_in));
-	m_dio_bus->irq1_out_cb().set_inputline(m_cpu, M68K_IRQ_1);
-	m_dio_bus->irq2_out_cb().set_inputline(m_cpu, M68K_IRQ_2);
-	m_dio_bus->irq3_out_cb().set_inputline(m_cpu, M68K_IRQ_3);
-	m_dio_bus->irq4_out_cb().set_inputline(m_cpu, M68K_IRQ_4);
-	m_dio_bus->irq5_out_cb().set_inputline(m_cpu, M68K_IRQ_5);
-	m_dio_bus->irq6_out_cb().set_inputline(m_cpu, M68K_IRQ_6);
-	m_dio_bus->irq7_out_cb().set_inputline(m_cpu, M68K_IRQ_7);
-	m_upi->irq1_write_cb().set(m_dio_bus, FUNC(bus::hp_dio::dio16_device::irq1_in));
+	// IRQ mergers
+	INPUT_MERGER_ANY_HIGH(config, m_irq1_merger).output_handler().set_inputline(m_cpu, M68K_IRQ_1);
+	INPUT_MERGER_ANY_HIGH(config, m_irq2_merger).output_handler().set_inputline(m_cpu, M68K_IRQ_2);
+	INPUT_MERGER_ANY_HIGH(config, m_irq3_merger).output_handler().set_inputline(m_cpu, M68K_IRQ_3);
+	INPUT_MERGER_ANY_HIGH(config, m_irq4_merger).output_handler().set_inputline(m_cpu, M68K_IRQ_4);
+	INPUT_MERGER_ANY_HIGH(config, m_irq5_merger).output_handler().set_inputline(m_cpu, M68K_IRQ_5);
+	INPUT_MERGER_ANY_HIGH(config, m_irq6_merger).output_handler().set_inputline(m_cpu, M68K_IRQ_6);
+	INPUT_MERGER_ANY_HIGH(config, m_irq7_merger).output_handler().set_inputline(m_cpu, M68K_IRQ_7);
+
+	m_dio_bus->irq1_out_cb().set(m_irq1_merger, FUNC(input_merger_any_high_device::in_w<0>));
+	m_dio_bus->irq2_out_cb().set(m_irq2_merger, FUNC(input_merger_any_high_device::in_w<0>));
+	m_dio_bus->irq3_out_cb().set(m_irq3_merger, FUNC(input_merger_any_high_device::in_w<0>));
+	m_dio_bus->irq4_out_cb().set(m_irq4_merger, FUNC(input_merger_any_high_device::in_w<0>));
+	m_dio_bus->irq5_out_cb().set(m_irq5_merger, FUNC(input_merger_any_high_device::in_w<0>));
+	m_dio_bus->irq6_out_cb().set(m_irq6_merger, FUNC(input_merger_any_high_device::in_w<0>));
+	m_dio_bus->irq7_out_cb().set(m_irq7_merger, FUNC(input_merger_any_high_device::in_w<0>));
+
+	m_upi->irq1_write_cb().set(m_irq1_merger, FUNC(input_merger_any_high_device::in_w<1>));
 
 	DIO16_SLOT(config, "slot0", 0, "diobus", dio16_hp98x6_cards, nullptr, false);
 	DIO16_SLOT(config, "slot1", 0, "diobus", dio16_hp98x6_cards, nullptr, false);
@@ -307,13 +332,13 @@ void hp98x6_base_state::cpu_reset_w(int state)
 void hp98x6_base_state::hpib_irq_w(int state)
 {
 	m_hpib_irq = bool(state);
-	m_dio_bus->irq3_in(state);
+	m_irq3_merger->in_w<1>(state);
 }
 
 void hp98x6_base_state::upi_irq7_w(int state)
 {
 	m_upi_irq7 = bool(state);
-	m_dio_bus->irq7_in(state);
+	m_irq7_merger->in_w<1>(state);
 }
 
 // +--------------+
@@ -556,7 +581,7 @@ void hp9816_state::uart_reset()
 
 void hp9816_state::uart_update_irq()
 {
-	m_dio_bus->irq4_in(m_uart_irq && m_uart_int_en);
+	m_irq4_merger->in_w<1>(m_uart_irq && m_uart_int_en);
 }
 
 uint8_t hp9816_state::uart_r(offs_t offset)
@@ -1162,7 +1187,7 @@ void hp9826_36_state::fdc_irq_w(int state)
 {
 	LOG_FDC("fdc IRQ %d\n", state);
 	m_fdc_irq = bool(state);
-	m_dio_bus->irq2_in(state);
+	m_irq2_merger->in_w<1>(state);
 }
 
 void hp9826_36_state::fdc_drq_w(int state)

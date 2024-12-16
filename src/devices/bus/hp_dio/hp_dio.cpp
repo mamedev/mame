@@ -160,28 +160,30 @@ void dio16_device::set_irq(unsigned index, unsigned int level, int state)
 	else
 		m_irq[level] &= ~(1 << index);
 
-	switch (level) {
-	case 0:
-		m_irq1_out_cb(irq1_out());
-		break;
-	case 1:
-		m_irq2_out_cb(irq2_out());
-		break;
-	case 2:
-		m_irq3_out_cb(irq3_out());
-		break;
-	case 3:
-		m_irq4_out_cb(irq4_out());
-		break;
-	case 4:
-		m_irq5_out_cb(irq5_out());
-		break;
-	case 5:
-		m_irq6_out_cb(irq6_out());
-		break;
-	case 6:
-		m_irq7_out_cb(irq7_out());
-		break;
+	if (m_bus_index != index) {
+		switch (level) {
+		case 0:
+			m_irq1_out_cb(state);
+			break;
+		case 1:
+			m_irq2_out_cb(state);
+			break;
+		case 2:
+			m_irq3_out_cb(state);
+			break;
+		case 3:
+			m_irq4_out_cb(state);
+			break;
+		case 4:
+			m_irq5_out_cb(state);
+			break;
+		case 5:
+			m_irq6_out_cb(state);
+			break;
+		case 6:
+			m_irq7_out_cb(state);
+			break;
+		}
 	}
 }
 

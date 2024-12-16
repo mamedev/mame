@@ -105,13 +105,13 @@ public:
 	void reset_in(int state);
 
 	// output lines
-	int irq1_out() const { return m_irq[0] != 0; }
-	int irq2_out() const { return m_irq[1] != 0; }
-	int irq3_out() const { return m_irq[2] != 0; }
-	int irq4_out() const { return m_irq[3] != 0; }
-	int irq5_out() const { return m_irq[4] != 0; }
-	int irq6_out() const { return m_irq[5] != 0; }
-	int irq7_out() const { return m_irq[6] != 0; }
+	int irq1_out() const { return (m_irq[0] & ~m_bus_index) ? 1 : 0; }
+	int irq2_out() const { return (m_irq[1] & ~m_bus_index) ? 1 : 0; }
+	int irq3_out() const { return (m_irq[2] & ~m_bus_index) ? 1 : 0; }
+	int irq4_out() const { return (m_irq[3] & ~m_bus_index) ? 1 : 0; }
+	int irq5_out() const { return (m_irq[4] & ~m_bus_index) ? 1 : 0; }
+	int irq6_out() const { return (m_irq[5] & ~m_bus_index) ? 1 : 0; }
+	int irq7_out() const { return (m_irq[6] & ~m_bus_index) ? 1 : 0; }
 	int dmar0_out() const { return dmar0_r(); }
 	int dmar1_out() const { return dmar1_r(); }
 
