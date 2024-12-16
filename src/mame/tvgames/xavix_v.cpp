@@ -1361,17 +1361,26 @@ void xavix_state::spritefragment_dma_trg_w(uint8_t data)
 
 	if (data & 0x40)
 	{
+		int readaddress = 0;
+
 		for (int i = 0; i < len; i++)
 		{
-			//uint8_t dat = m_maincpu->read_full_data_sp(src + i);
-			const offs_t realaddress = src + i;
-			uint8_t dat;
-			if (m_disable_memory_bypass)
-				dat = m_maincpu->space(AS_PROGRAM).read_byte(realaddress);
-			else
-				dat = read_full_data_sp_bypass(realaddress);
-			//m_fragment_sprite[(dst + i) & 0x7ff] = dat;
-			spriteram_w((dst + i) & 0x7ff, dat);
+			// tak_chq explicitly sets unk & 0x80
+			// and the source data is in 0x80 byte blocks, not 0x100
+			// TODO: verify the source data in RAM is actually correct
+			if ((unk & 0x80) && (i & 0x80))
+			{
+				//uint8_t dat = m_maincpu->read_full_data_sp(src + i);
+				const offs_t realaddress = src + readaddress;
+				uint8_t dat;
+				if (m_disable_memory_bypass)
+					dat = m_maincpu->space(AS_PROGRAM).read_byte(realaddress);
+				else
+					dat = read_full_data_sp_bypass(realaddress);
+				//m_fragment_sprite[(dst + i) & 0x7ff] = dat;
+				spriteram_w((dst + i) & 0x7ff, dat);
+				readaddress++;
+			}
 		}
 	}
 }
