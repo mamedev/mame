@@ -125,7 +125,7 @@ void xavix_math_device::mult_w(offs_t offset, uint8_t data)
 
 uint8_t xavix_math_device::mult_param_r(offs_t offset)
 {
-	uint8_t ret = m_multparams[offset];;
+	uint8_t ret = m_multparams[offset];
 	LOG("%s: mult_param_r %d %02x (read parameters)\n", machine().describe_context(), offset, ret);
 	return ret;
 }
