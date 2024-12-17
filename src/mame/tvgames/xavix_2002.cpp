@@ -612,6 +612,10 @@ ROM_START( suprtvpchk )
 	ROM_CONTINUE(0x000000, 0x200000)
 	ROM_CONTINUE(0x600000, 0x200000)
 	ROM_CONTINUE(0x400000, 0x200000)
+	// to display the loading screen and desktop backgrounds the data must appear as if it were loaded normally?
+	// this is copied to RAM with the ldapa_imp opcodes and a pointer to 0xd46000 (0x546000 with high bit set for data access)
+	// what is going on? banking / bus control? does ldapa_imp not see the swapped ROM?
+	//ROM_COPY("bios", 0x700000, 0x500000, 0x100000 )
 ROM_END
 
 ROM_START( suprtvpcdo )
@@ -620,6 +624,8 @@ ROM_START( suprtvpcdo )
 	ROM_CONTINUE(0x000000, 0x200000)
 	ROM_CONTINUE(0x600000, 0x200000)
 	ROM_CONTINUE(0x400000, 0x200000)
+	// see comment in suprtvpchk
+	//ROM_COPY("bios", 0x700000, 0x500000, 0x100000 )
 ROM_END
 
 void superxavix_super_tv_pc_state::init_stvpc()
