@@ -235,7 +235,7 @@ void karnov_state::mcu_p2_w(uint8_t data)
 	// ------1-  secreq ack
 	// -------0  cinclr
 
-	const u8 fall = ~data & m_mcu_p2;
+	const uint8_t fall = ~data & m_mcu_p2;
 	m_mcu_p2 = data;
 
 	if (BIT(fall, 0))
@@ -296,7 +296,7 @@ void karnov_state::mcu_data_h_w(uint8_t data)
 
 void karnov_state::mcubl_p1_w(uint8_t data)
 {
-	const u8 fall = ~data & m_mcu_p1;
+	const uint8_t fall = ~data & m_mcu_p1;
 	m_mcu_p1 = data;
 
 	if (BIT(fall, 0))
@@ -754,9 +754,9 @@ void karnov_state::karnov(machine_config &config)
 
 	I8751(config, m_mcu, 8_MHz_XTAL);
 	m_mcu->port_in_cb<0>().set([this](){ return m_mcu_p0; });
-	m_mcu->port_out_cb<0>().set([this](u8 data){ m_mcu_p0 = data; });
+	m_mcu->port_out_cb<0>().set([this](uint8_t data){ m_mcu_p0 = data; });
 	m_mcu->port_in_cb<1>().set([this](){ return m_mcu_p1; });
-	m_mcu->port_out_cb<1>().set([this](u8 data){ m_mcu_p1 = data; });
+	m_mcu->port_out_cb<1>().set([this](uint8_t data){ m_mcu_p1 = data; });
 	m_mcu->port_out_cb<2>().set(FUNC(karnov_state::mcu_p2_w));
 	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
