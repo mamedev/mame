@@ -411,9 +411,9 @@ void superxavix_super_tv_pc_state::xavix_extbus_map(address_map &map)
 
 	map(0x600000, 0x67ffff).ram().share("bitmap_buffer"); // reads/writes here
 	// unusual (and likely wrong) workaround for suprtvpchk / suprtvpcdo loading screens / desktop backgrounds
-	map(0xd00000, 0xdfffff).rom().region("bios", 0x700000);
+	// note: can't be correct, breaks the quiz game in suprtvpc (2nd demo in attract mode)
+	//map(0xd00000, 0xdfffff).rom().region("bios", 0x700000);
 	map(0xe00000, 0xe7ffff).ram().share("bitmap_buffer"); // reads/writes here
-
 }
 
 void superxavix_super_tv_pc_state::superxavix_super_tv_pc(machine_config& config)
