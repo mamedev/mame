@@ -254,8 +254,8 @@ static INPUT_PORTS_START( xavix_bowl )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_i2c_bowl_state::camera_r))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_i2c_bowl_state::camera_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(superxavix_i2c_bowl_state::camera_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(superxavix_i2c_bowl_state::camera_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
@@ -277,13 +277,13 @@ INPUT_PORTS_END
 
 /* SuperXavix IO port handliner (per game) */
 
-uint8_t xavix_i2c_jmat_state::read_extended_io0()
+uint8_t superxavix_i2c_jmat_state::read_extended_io0()
 {
 	LOG("%s: read_extended_io0\n", machine().describe_context());
 	return 0x00;
 }
 
-uint8_t xavix_i2c_jmat_state::read_extended_io1()
+uint8_t superxavix_i2c_jmat_state::read_extended_io1()
 {
 	LOG("%s: read_extended_io1\n", machine().describe_context());
 
@@ -292,18 +292,18 @@ uint8_t xavix_i2c_jmat_state::read_extended_io1()
 	//return 0x00;
 }
 
-uint8_t xavix_i2c_jmat_state::read_extended_io2()
+uint8_t superxavix_i2c_jmat_state::read_extended_io2()
 {
 	LOG("%s: read_extended_io2\n", machine().describe_context());
 	return 0x00;
 }
 
-void xavix_i2c_jmat_state::write_extended_io0(uint8_t data)
+void superxavix_i2c_jmat_state::write_extended_io0(uint8_t data)
 {
 	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
 }
 
-void xavix_i2c_jmat_state::write_extended_io1(uint8_t data)
+void superxavix_i2c_jmat_state::write_extended_io1(uint8_t data)
 {
 	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
 
@@ -312,7 +312,7 @@ void xavix_i2c_jmat_state::write_extended_io1(uint8_t data)
 
 }
 
-void xavix_i2c_jmat_state::write_extended_io2(uint8_t data)
+void superxavix_i2c_jmat_state::write_extended_io2(uint8_t data)
 {
 	LOG("%s: io2_data_w %02x\n", machine().describe_context(), data);
 }
@@ -322,39 +322,48 @@ int xavix_i2c_lotr_state::camera_r() // seems to be some kind of camera status b
 	return machine().rand();
 }
 
-int xavix_i2c_bowl_state::camera_r() // seems to be some kind of camera status bits
+int superxavix_i2c_bowl_state::camera_r() // seems to be some kind of camera status bits
 {
 	return machine().rand();
 }
 
-void xavix_state::xavix2002(machine_config &config)
+void superxavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
+{
+	m_i2cmem->write_sda(BIT(data | ~direction, 3));
+	m_i2cmem->write_scl(BIT(data | ~direction, 4));
+}
+
+void superxavix_state::xavix2002(machine_config &config)
 {
 	xavix(config);
 
-	XAVIX2002(config.replace(), m_maincpu, MAIN_CLOCK);
+	XAVIX2002(config.replace(), m_maincpu, MAIN_CLOCK * 2);
 	set_xavix_cpumaps(config);
-	m_maincpu->set_addrmap(5, &xavix_state::superxavix_lowbus_map); // has extra video, io etc.
+	m_maincpu->set_addrmap(5, &superxavix_state::superxavix_lowbus_map); // has extra video, io etc.
 
 	m_palette->set_entries(512);
+
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 
 	XAVIX2002IO(config, m_xavix2002io, 0);
 }
 
 
 
-void xavix_i2c_jmat_state::xavix2002_i2c_jmat(machine_config &config)
+void superxavix_i2c_jmat_state::superxavix_i2c_jmat(machine_config &config)
 {
-	xavix2002_i2c_24c08(config);
+	superxavix_i2c_24c08(config);
 
-	m_xavix2002io->read_0_callback().set(FUNC(xavix_i2c_jmat_state::read_extended_io0));
-	m_xavix2002io->write_0_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io0));
-	m_xavix2002io->read_1_callback().set(FUNC(xavix_i2c_jmat_state::read_extended_io1));
-	m_xavix2002io->write_1_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io1));
-	m_xavix2002io->read_2_callback().set(FUNC(xavix_i2c_jmat_state::read_extended_io2));
-	m_xavix2002io->write_2_callback().set(FUNC(xavix_i2c_jmat_state::write_extended_io2));
+	m_xavix2002io->read_0_callback().set(FUNC(superxavix_i2c_jmat_state::read_extended_io0));
+	m_xavix2002io->write_0_callback().set(FUNC(superxavix_i2c_jmat_state::write_extended_io0));
+	m_xavix2002io->read_1_callback().set(FUNC(superxavix_i2c_jmat_state::read_extended_io1));
+	m_xavix2002io->write_1_callback().set(FUNC(superxavix_i2c_jmat_state::write_extended_io1));
+	m_xavix2002io->read_2_callback().set(FUNC(superxavix_i2c_jmat_state::read_extended_io2));
+	m_xavix2002io->write_2_callback().set(FUNC(superxavix_i2c_jmat_state::write_extended_io2));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(xavix2002_super_tv_pc_state::cart_load)
+DEVICE_IMAGE_LOAD_MEMBER(superxavix_super_tv_pc_state::cart_load)
 {
 	u64 length;
 	memory_region *cart_region = nullptr;
@@ -396,43 +405,43 @@ DEVICE_IMAGE_LOAD_MEMBER(xavix2002_super_tv_pc_state::cart_load)
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-void xavix2002_super_tv_pc_state::xavix_extbus_map(address_map &map)
+void superxavix_super_tv_pc_state::xavix_extbus_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rom().region("bios", 0x00000).mirror(0x800000);
 	map(0x600000, 0x67ffff).ram(); // writes here
 }
 
-void xavix2002_super_tv_pc_state::xavix2002_super_tv_pc(machine_config& config)
+void superxavix_super_tv_pc_state::superxavix_super_tv_pc(machine_config& config)
 {
 	xavix2002(config);
 
-	m_xavix2002io->read_0_callback().set(FUNC(xavix2002_super_tv_pc_state::read_extended_io0));
-	m_xavix2002io->read_1_callback().set(FUNC(xavix2002_super_tv_pc_state::read_extended_io1));
-	m_xavix2002io->read_2_callback().set(FUNC(xavix2002_super_tv_pc_state::read_extended_io2));
+	m_xavix2002io->read_0_callback().set(FUNC(superxavix_super_tv_pc_state::read_extended_io0));
+	m_xavix2002io->read_1_callback().set(FUNC(superxavix_super_tv_pc_state::read_extended_io1));
+	m_xavix2002io->read_2_callback().set(FUNC(superxavix_super_tv_pc_state::read_extended_io2));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "super_tv_pc_cart");
 	m_cart->set_width(GENERIC_ROM8_WIDTH);
-	m_cart->set_device_load(FUNC(xavix2002_super_tv_pc_state::cart_load));
+	m_cart->set_device_load(FUNC(superxavix_super_tv_pc_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("super_tv_pc_cart");
 }
 
 
-void xavix_i2c_state::xavix2002_i2c_24c08(machine_config &config)
+void superxavix_i2c_state::superxavix_i2c_24c08(machine_config &config)
 {
 	xavix2002(config);
 
 	I2C_24C08(config, "i2cmem", 0);
 }
 
-void xavix_i2c_state::xavix2002_i2c_24c04(machine_config &config)
+void superxavix_i2c_state::superxavix_i2c_24c04(machine_config &config)
 {
 	xavix2002(config);
 
 	I2C_24C04(config, "i2cmem", 0);
 }
 
-void xavix_i2c_state::xavix2002_i2c_24c02(machine_config &config)
+void superxavix_i2c_state::superxavix_i2c_24c02(machine_config &config)
 {
 	xavix2002(config);
 
@@ -440,7 +449,7 @@ void xavix_i2c_state::xavix2002_i2c_24c02(machine_config &config)
 }
 
 
-void xavix_i2c_state::xavix2002_i2c_mrangbat(machine_config &config)
+void superxavix_i2c_state::superxavix_i2c_mrangbat(machine_config &config)
 {
 	xavix2002(config);
 
@@ -613,24 +622,24 @@ ROM_START( suprtvpcdo )
 	ROM_CONTINUE(0x400000, 0x200000)
 ROM_END
 
-void xavix2002_super_tv_pc_state::init_stvpc()
+void superxavix_super_tv_pc_state::init_stvpc()
 {
 	init_xavix();
 	m_disable_memory_bypass = true;
 }
 
 
-CONS( 2004, xavtenni, 0, 0, xavix2002_i2c_24c04, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2004, xavbaseb, 0, 0, xavix2002_i2c_24c08, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2004, xavbowl,  0, 0, xavix2002_i2c_24c04, xavix_bowl, xavix_i2c_bowl_state, init_xavix, "SSD Company LTD",         "XaviX Bowling (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
-CONS( 2004, xavbox,   0, 0, xavix2002_i2c_jmat, xavix,  xavix_i2c_jmat_state,      init_xavix, "SSD Company LTD",         "XaviX Boxing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
+CONS( 2004, xavtenni, 0, 0, superxavix_i2c_24c04, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, xavbaseb, 0, 0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, xavbowl,  0, 0, superxavix_i2c_24c04, xavix_bowl, superxavix_i2c_bowl_state, init_xavix, "SSD Company LTD",         "XaviX Bowling (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
+CONS( 2004, xavbox,   0, 0, superxavix_i2c_jmat, xavix,  superxavix_i2c_jmat_state,      init_xavix, "SSD Company LTD",         "XaviX Boxing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
 // Bass Fishing PCB is just like Tennis except with an RF daughterboard.
-CONS( 2004, xavbassf, 0, 0, xavix2002_i2c_24c08, xavix_i2c,  xavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, xavbassf, 0, 0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // TODO: check SEEPROM type and hookup, banking!
-CONS( 2005, xavjmat,  0, 0, xavix2002_i2c_jmat,  xavix,      xavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, xavaero,  0, 0, xavix2002_i2c_jmat,  xavix,      xavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "XaviX Aerostep (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2007, xavmusic, 0, 0, xavix2002_i2c_jmat,  xavix,      xavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "XaviX Music & Circuit (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, xavjmat,  0, 0, superxavix_i2c_jmat,  xavix,      superxavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, xavaero,  0, 0, superxavix_i2c_jmat,  xavix,      superxavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "XaviX Aerostep (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, xavmusic, 0, 0, superxavix_i2c_jmat,  xavix,      superxavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "XaviX Music & Circuit (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // https://arnaudmeyer.wordpress.com/domyos-interactive-system/
 // Domyos Fitness Adventure
@@ -645,38 +654,38 @@ CONS( 2007, xavmusic, 0, 0, xavix2002_i2c_jmat,  xavix,      xavix_i2c_jmat_stat
 // Domyos Bike Concept (not listed on site above)
 
 // Has SEEPROM and an RTC.  Exercise has some leftover PC buffer stuff.  (TODO, check SEEPROM type, RTC type, banking) (both Exercises and Challenge are identical PCBs)
-CONS( 2008, domfitex, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2008, domfitch, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Challenge (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2007, domdance, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Dance (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2007, domstepc, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Step Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, domfitex, 0, 0, superxavix_i2c_jmat, xavixp, superxavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, domfitch, 0, 0, superxavix_i2c_jmat, xavixp, superxavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Challenge (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, domdance, 0, 0, superxavix_i2c_jmat, xavixp, superxavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Dance (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, domstepc, 0, 0, superxavix_i2c_jmat, xavixp, superxavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Step Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // some DIS games run on XaviX 2 instead, see xavix2.cpp for Domyos Fitness Adventure and Domyos Bike Concept
 
 // Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル
-CONS( 2005, mrangbat, 0, 0, xavix2002_i2c_mrangbat, mrangbat,   xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD", "Let's! TV Play Mahou Taiketsu Magiranger - Magimat de Dance & Battle (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, mrangbat, 0, 0, superxavix_i2c_mrangbat, mrangbat,   superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD", "Let's! TV Play Mahou Taiketsu Magiranger - Magimat de Dance & Battle (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // エキサイトスポーツ　テニス×フィットネス
-CONS( 2004, epo_tfit, 0, 0, xavix2002_i2c_24c04,    epo_tfit,   xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD",  "Excite Sports Tennis x Fitness (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Epoch Tennis and Fitness has 24LC04
+CONS( 2004, epo_tfit, 0, 0, superxavix_i2c_24c04,    epo_tfit,   superxavix_i2c_state, init_xavix, "Epoch / SSD Company LTD",  "Excite Sports Tennis x Fitness (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Epoch Tennis and Fitness has 24LC04
 
 // それいけトーマス ソドー島のなかまたち
-CONS( 2005, tmy_thom, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Soreike Thomas - Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, tmy_thom, 0, 0, superxavix_i2c_24c04,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Soreike Thomas - Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Ｌｅｔ’ｓ！ ＴＶプレイ 体感体得 結界師 方囲！定礎！結！滅！
-CONS( 2007, ban_kksj, 0, 0, xavix2002_i2c_24c02,    xavix_i2c,  xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Taikan Taitoku Kekkaishi: Houi! Jouso! Ketsu! Metsu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, ban_kksj, 0, 0, superxavix_i2c_24c02,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Taikan Taitoku Kekkaishi: Houi! Jouso! Ketsu! Metsu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // 流星のロックマン 電波変換！オン・エア！
-CONS( 2007, tmy_rkmj, 0, 0, xavix2002_i2c_24c04,    xavix_i2c,  xavix_i2c_state, init_xavix, "Takara Tomy / Capcom / SSD Company LTD",   "Ryuusei no Rockman: Denpa Henkan! On Air! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, tmy_rkmj, 0, 0, superxavix_i2c_24c04,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Takara Tomy / Capcom / SSD Company LTD",   "Ryuusei no Rockman: Denpa Henkan! On Air! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型
-CONS( 2005, ban_ordj, 0, 0, xavix2002_i2c_24c04,    ban_ordj,   xavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Ongeki Battle! Kamen Rider Hibiki: Kimero! Ikki Kasei no Kata (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ban_ordj, 0, 0, superxavix_i2c_24c04,    ban_ordj,   superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Ongeki Battle! Kamen Rider Hibiki: Kimero! Ikki Kasei no Kata (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // has HT24LC16
-CONS( 2008, udance,   0, 0, xavix2002, xavix, xavix_state, init_xavix, "Tiger / SSD Company LTD", "U-Dance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, udance,   0, 0, xavix2002, xavix, superxavix_state, init_xavix, "Tiger / SSD Company LTD", "U-Dance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // these have RAM in the usual ROM space (still needs handling) & also have an Atmel 24LC64,
 // this one (pet themed) boots to the desktop (as do the 'hamtaro' 'eccjr' cartridges)
-CONS( 2004, suprtvpc,    0,        0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, suprtvpc,    0,        0, superxavix_super_tv_pc,    xavix,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // hangs after 'loading' sequence
-CONS( 2006, suprtvpchk,  suprtvpc, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Hello Kitty", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2006, suprtvpcdo,  suprtvpc, 0, xavix2002_super_tv_pc,    xavix,      xavix2002_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Doraemon", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, suprtvpchk,  suprtvpc, 0, superxavix_super_tv_pc,    xavix,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Hello Kitty", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, suprtvpcdo,  suprtvpc, 0, superxavix_super_tv_pc,    xavix,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Doraemon", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

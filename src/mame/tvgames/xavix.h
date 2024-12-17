@@ -118,7 +118,9 @@ public:
 		m_sx_plt_loc(*this, "sx_plt_loc"),
 		m_sx_crtc_1(*this, "sx_crtc_1"),
 		m_sx_crtc_2(*this, "sx_crtc_2")
-	{ }
+	{
+		m_video_hres_multiplier = 1;
+	}
 
 	void xavix(machine_config &config);
 	void xavix_nv(machine_config &config);
@@ -128,8 +130,6 @@ public:
 
 	void xavix2000(machine_config &config);
 	void xavix2000_nv(machine_config &config);
-
-	void xavix2002(machine_config &config);
 
 	void xavix_43mhz(machine_config &config);
 
@@ -221,15 +221,12 @@ protected:
 
 	virtual void xavix_extbus_map(address_map &map) ATTR_COLD;
 
-private:
-
 	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void xavix_map(address_map &map) ATTR_COLD;
 
 	void xavix_lowbus_map(address_map &map) ATTR_COLD;
-	void superxavix_lowbus_map(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
@@ -441,34 +438,6 @@ private:
 	void superxavix_crtc_2_w(offs_t offset, uint8_t data);
 	uint8_t superxavix_crtc_2_r(offs_t offset);
 
-	void superxavix_plt_flush_w(uint8_t data);
-	void superxavix_plt_dat_w(uint8_t data);
-	void superxavix_plt_loc_w(offs_t offset, uint8_t data);
-	uint8_t superxavix_plt_loc_r(offs_t offset);
-
-	void superxavix_bitmap_pal_index_w(uint8_t data);
-	uint8_t superxavix_bitmap_pal_index_r();
-	void superxavix_chr_pal_index_w(uint8_t data);
-	uint8_t superxavix_chr_pal_index_r();
-	uint8_t superxavix_bitmap_pal_hue_r();
-	uint8_t superxavix_bitmap_pal_saturation_r();
-	uint8_t superxavix_bitmap_pal_lightness_r();
-	uint8_t superxavix_chr_pal_hue_r();
-	uint8_t superxavix_chr_pal_saturation_r();
-	uint8_t superxavix_chr_pal_lightness_r();
-	uint8_t superxavix_pal_hue_r(bool bitmap);
-	uint8_t superxavix_pal_saturation_r(bool bitmap);
-	uint8_t superxavix_pal_lightness_r(bool bitmap);
-	void superxavix_bitmap_pal_hue_w(uint8_t data);
-	void superxavix_bitmap_pal_saturation_w(uint8_t data);
-	void superxavix_bitmap_pal_lightness_w(uint8_t data);
-	void superxavix_chr_pal_hue_w(uint8_t data);
-	void superxavix_chr_pal_saturation_w(uint8_t data);
-	void superxavix_chr_pal_lightness_w(uint8_t data);
-	void superxavix_pal_hue_w(uint8_t data, bool bitmap);
-	void superxavix_pal_saturation_w(uint8_t data, bool bitmap);
-	void superxavix_pal_lightness_w(uint8_t data, bool bitmap);
-
 	uint8_t pal_ntsc_r();
 
 	virtual uint8_t lightgun_r(offs_t offset) { logerror("%s: unhandled lightgun_r %d\n", machine().describe_context(), offset); return 0xff;  }
@@ -660,6 +629,7 @@ protected:
 	void extended_extbus_reg2_w(uint8_t data);
 
 	bool m_disable_memory_bypass = false;
+	int m_video_hres_multiplier;
 };
 
 class xavix_guru_state : public xavix_state
@@ -676,6 +646,75 @@ protected:
 private:
 	uint8_t guru_anport2_r() { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
 };
+
+class superxavix_state : public xavix_state
+{
+public:
+	superxavix_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+	{
+		m_video_hres_multiplier = 2;
+	}
+
+	void xavix2002(machine_config &config);
+
+protected:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
+	void superxavix_lowbus_map(address_map &map) ATTR_COLD;
+
+private:
+	void superxavix_plt_flush_w(uint8_t data);
+	void superxavix_plt_dat_w(uint8_t data);
+	void superxavix_plt_loc_w(offs_t offset, uint8_t data);
+	uint8_t superxavix_plt_loc_r(offs_t offset);
+
+	void superxavix_bitmap_pal_index_w(uint8_t data);
+	uint8_t superxavix_bitmap_pal_index_r();
+	void superxavix_chr_pal_index_w(uint8_t data);
+	uint8_t superxavix_chr_pal_index_r();
+	uint8_t superxavix_bitmap_pal_hue_r();
+	uint8_t superxavix_bitmap_pal_saturation_r();
+	uint8_t superxavix_bitmap_pal_lightness_r();
+	uint8_t superxavix_chr_pal_hue_r();
+	uint8_t superxavix_chr_pal_saturation_r();
+	uint8_t superxavix_chr_pal_lightness_r();
+	uint8_t superxavix_pal_hue_r(bool bitmap);
+	uint8_t superxavix_pal_saturation_r(bool bitmap);
+	uint8_t superxavix_pal_lightness_r(bool bitmap);
+	void superxavix_bitmap_pal_hue_w(uint8_t data);
+	void superxavix_bitmap_pal_saturation_w(uint8_t data);
+	void superxavix_bitmap_pal_lightness_w(uint8_t data);
+	void superxavix_chr_pal_hue_w(uint8_t data);
+	void superxavix_chr_pal_saturation_w(uint8_t data);
+	void superxavix_chr_pal_lightness_w(uint8_t data);
+	void superxavix_pal_hue_w(uint8_t data, bool bitmap);
+	void superxavix_pal_saturation_w(uint8_t data, bool bitmap);
+	void superxavix_pal_lightness_w(uint8_t data, bool bitmap);
+};
+
+
+class superxavix_i2c_state : public superxavix_state
+{
+public:
+	superxavix_i2c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: superxavix_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+
+	void superxavix_i2c_24c08(machine_config &config);
+	void superxavix_i2c_24c04(machine_config &config);
+	void superxavix_i2c_24c02(machine_config &config);
+	void superxavix_i2c_mrangbat(machine_config& config);
+
+protected:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+	required_device<i2cmem_device> m_i2cmem;
+};
+
+
 
 class xavix_i2c_state : public xavix_state
 {
@@ -694,11 +733,6 @@ public:
 	void xavix2000_i2c_24c08(machine_config &config);
 	void xavix2000_i2c_24c04(machine_config &config);
 	void xavix2000_i2c_24c02(machine_config &config);
-
-	void xavix2002_i2c_24c08(machine_config &config);
-	void xavix2002_i2c_24c04(machine_config &config);
-	void xavix2002_i2c_24c02(machine_config &config);
-	void xavix2002_i2c_mrangbat(machine_config& config);
 
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;

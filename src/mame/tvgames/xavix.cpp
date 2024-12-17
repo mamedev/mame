@@ -421,41 +421,41 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7fff, 0x7fff).rw(FUNC(xavix_state::irq_vector_hi_r),FUNC(xavix_state::irq_vector_hi_w));
 }
 
-void xavix_state::superxavix_lowbus_map(address_map &map)
+void superxavix_state::superxavix_lowbus_map(address_map &map)
 {
 	xavix_lowbus_map(map);
 
 	// bitmap layer palette
-	map(0x6c00, 0x6cff).ram().w(FUNC(xavix_state::bmp_palram_sh_w)).share("bmp_palram_sh");
-	map(0x6d00, 0x6dff).ram().w(FUNC(xavix_state::bmp_palram_l_w)).share("bmp_palram_l");
+	map(0x6c00, 0x6cff).ram().w(FUNC(superxavix_state::bmp_palram_sh_w)).share("bmp_palram_sh");
+	map(0x6d00, 0x6dff).ram().w(FUNC(superxavix_state::bmp_palram_l_w)).share("bmp_palram_l");
 
 	// map(0x6a40, 0x6a7f).ram().share("ext_segment_regs"); // 16x32 extended segment regs
 
 	 // bitmap plotter(!) (with auto-inc?) - used by super pc tv units
-	map(0x6f60, 0x6f60).w(FUNC(xavix_state::superxavix_plt_flush_w)); // writes here to flush plotter FIFO
-	map(0x6f62, 0x6f62).w(FUNC(xavix_state::superxavix_plt_dat_w)); // writes plotter data here
+	map(0x6f60, 0x6f60).w(FUNC(superxavix_state::superxavix_plt_flush_w)); // writes here to flush plotter FIFO
+	map(0x6f62, 0x6f62).w(FUNC(superxavix_state::superxavix_plt_dat_w)); // writes plotter data here
 	// 0x6f63 can be used to read from bitmap?
-	map(0x6f64, 0x6f67).rw(FUNC(xavix_state::superxavix_plt_loc_r), FUNC(xavix_state::superxavix_plt_loc_w)).share("sx_plt_loc");
+	map(0x6f64, 0x6f67).rw(FUNC(superxavix_state::superxavix_plt_loc_r), FUNC(superxavix_state::superxavix_plt_loc_w)).share("sx_plt_loc");
 
-	map(0x6f78, 0x6f78).rw(FUNC(xavix_state::superxavix_chr_pal_index_r), FUNC(xavix_state::superxavix_chr_pal_index_w)); // SgdPalChrIdx
-	map(0x6f79, 0x6f79).rw(FUNC(xavix_state::superxavix_chr_pal_hue_r), FUNC(xavix_state::superxavix_chr_pal_hue_w)); // SgdPalChrHue
-	map(0x6f7a, 0x6f7a).rw(FUNC(xavix_state::superxavix_chr_pal_saturation_r), FUNC(xavix_state::superxavix_chr_pal_saturation_w)); // SgdPalChrSat
-	map(0x6f7b, 0x6f7b).rw(FUNC(xavix_state::superxavix_chr_pal_lightness_r), FUNC(xavix_state::superxavix_chr_pal_lightness_w)); // SgdPalChrLgt
+	map(0x6f78, 0x6f78).rw(FUNC(superxavix_state::superxavix_chr_pal_index_r), FUNC(superxavix_state::superxavix_chr_pal_index_w)); // SgdPalChrIdx
+	map(0x6f79, 0x6f79).rw(FUNC(superxavix_state::superxavix_chr_pal_hue_r), FUNC(superxavix_state::superxavix_chr_pal_hue_w)); // SgdPalChrHue
+	map(0x6f7a, 0x6f7a).rw(FUNC(superxavix_state::superxavix_chr_pal_saturation_r), FUNC(superxavix_state::superxavix_chr_pal_saturation_w)); // SgdPalChrSat
+	map(0x6f7b, 0x6f7b).rw(FUNC(superxavix_state::superxavix_chr_pal_lightness_r), FUNC(superxavix_state::superxavix_chr_pal_lightness_w)); // SgdPalChrLgt
 
-	map(0x6f7c, 0x6f7c).rw(FUNC(xavix_state::superxavix_bitmap_pal_index_r), FUNC(xavix_state::superxavix_bitmap_pal_index_w)); // SgdPalBmpAdr
-	map(0x6f7d, 0x6f7d).rw(FUNC(xavix_state::superxavix_bitmap_pal_hue_r), FUNC(xavix_state::superxavix_bitmap_pal_hue_w)); // SgdPalBmpHue
-	map(0x6f7e, 0x6f7e).rw(FUNC(xavix_state::superxavix_bitmap_pal_saturation_r), FUNC(xavix_state::superxavix_bitmap_pal_saturation_w)); // SgdPalBmpSat
-	map(0x6f7f, 0x6f7f).rw(FUNC(xavix_state::superxavix_bitmap_pal_lightness_r), FUNC(xavix_state::superxavix_bitmap_pal_lightness_w)); // SgdPalBmpLgt
+	map(0x6f7c, 0x6f7c).rw(FUNC(superxavix_state::superxavix_bitmap_pal_index_r), FUNC(superxavix_state::superxavix_bitmap_pal_index_w)); // SgdPalBmpAdr
+	map(0x6f7d, 0x6f7d).rw(FUNC(superxavix_state::superxavix_bitmap_pal_hue_r), FUNC(superxavix_state::superxavix_bitmap_pal_hue_w)); // SgdPalBmpHue
+	map(0x6f7e, 0x6f7e).rw(FUNC(superxavix_state::superxavix_bitmap_pal_saturation_r), FUNC(superxavix_state::superxavix_bitmap_pal_saturation_w)); // SgdPalBmpSat
+	map(0x6f7f, 0x6f7f).rw(FUNC(superxavix_state::superxavix_bitmap_pal_lightness_r), FUNC(superxavix_state::superxavix_bitmap_pal_lightness_w)); // SgdPalBmpLgt
 
-	map(0x6f80, 0x6f99).rw(FUNC(xavix_state::superxavix_crtc_1_r), FUNC(xavix_state::superxavix_crtc_1_w)).share("sx_crtc_1"); // Super XaviX CRTC?
-	map(0x6fa0, 0x6fa7).rw(FUNC(xavix_state::superxavix_crtc_2_r), FUNC(xavix_state::superxavix_crtc_2_w)).share("sx_crtc_2"); // maybe more CRTC regs?
+	map(0x6f80, 0x6f99).rw(FUNC(superxavix_state::superxavix_crtc_1_r), FUNC(superxavix_state::superxavix_crtc_1_w)).share("sx_crtc_1"); // Super XaviX CRTC?
+	map(0x6fa0, 0x6fa7).rw(FUNC(superxavix_state::superxavix_crtc_2_r), FUNC(superxavix_state::superxavix_crtc_2_w)).share("sx_crtc_2"); // maybe more CRTC regs?
 
 	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
 
 	// extended external bus stuff (possible banking control?)
-	map(0x7909, 0x7909).w(FUNC(xavix_state::extended_extbus_reg0_w));
-	map(0x790b, 0x790b).w(FUNC(xavix_state::extended_extbus_reg1_w));
-	map(0x790d, 0x790d).w(FUNC(xavix_state::extended_extbus_reg2_w));
+	map(0x7909, 0x7909).w(FUNC(superxavix_state::extended_extbus_reg0_w));
+	map(0x790b, 0x790b).w(FUNC(superxavix_state::extended_extbus_reg1_w));
+	map(0x790d, 0x790d).w(FUNC(superxavix_state::extended_extbus_reg2_w));
 
 	map(0x7a10, 0x7a12).rw("xavix2002io", FUNC(xavix2002_io_device::pio_dir_r), FUNC(xavix2002_io_device::pio_dir_w));
 	map(0x7a20, 0x7a22).rw("xavix2002io", FUNC(xavix2002_io_device::pio_out_r), FUNC(xavix2002_io_device::pio_out_w));

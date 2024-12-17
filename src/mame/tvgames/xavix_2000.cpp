@@ -404,7 +404,7 @@ CONS( 2005, tom_jump,   0,    0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_sta
 CONS( 2003, drgqst,   0,      0, xavix2000_i2c_24c08, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // チョロＱビュンビュンレーサー
-// lots broken, including attempting bad sprite DMAs, probably buggy xavix2000 opcodes
+// crashes whenever a CPU car reaches a corner - see map
 CONS( 2003, tak_chq,  0,      0, xavix2000_i2c_24c04, xavix_i2c,   xavix_i2c_state,         init_xavix, "Takara / SSD Company LTD",      "Choro-Q Byun Byun Racer (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // hangs after starting a game, check why

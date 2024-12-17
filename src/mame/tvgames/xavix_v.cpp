@@ -133,7 +133,7 @@ uint8_t xavix_state::superxavix_crtc_2_r(offs_t offset)
 	return m_sx_crtc_2[offset];
 }
 
-void xavix_state::superxavix_plt_flush_w(uint8_t data)
+void superxavix_state::superxavix_plt_flush_w(uint8_t data)
 {
 	// flush current write buffer (as we might not have filled a byte when plotting)
 	// and set write mode?
@@ -152,7 +152,7 @@ void xavix_state::superxavix_plt_flush_w(uint8_t data)
 
 
 
-void xavix_state::superxavix_plt_dat_w(uint8_t data)
+void superxavix_state::superxavix_plt_dat_w(uint8_t data)
 {
 	uint8_t pixels = m_sx_plt_mode + 1;
 
@@ -182,7 +182,7 @@ void xavix_state::superxavix_plt_dat_w(uint8_t data)
 	}
 }
 
-void xavix_state::superxavix_plt_loc_w(offs_t offset, uint8_t data)
+void superxavix_state::superxavix_plt_loc_w(offs_t offset, uint8_t data)
 {
 	logerror("%s superxavix_plt_loc_w %02x %02x\n", machine().describe_context(), offset, data);
 
@@ -194,43 +194,43 @@ void xavix_state::superxavix_plt_loc_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t xavix_state::superxavix_plt_loc_r(offs_t offset)
+uint8_t superxavix_state::superxavix_plt_loc_r(offs_t offset)
 {
 	return m_sx_plt_loc[offset];
 }
 
-void xavix_state::superxavix_bitmap_pal_index_w(uint8_t data)
+void superxavix_state::superxavix_bitmap_pal_index_w(uint8_t data)
 {
 	m_superxavix_bitmap_pal_index = data;
 }
 
-uint8_t xavix_state::superxavix_bitmap_pal_index_r()
+uint8_t superxavix_state::superxavix_bitmap_pal_index_r()
 {
 	return m_superxavix_bitmap_pal_index;
 }
 
-void xavix_state::superxavix_chr_pal_index_w(uint8_t data)
+void superxavix_state::superxavix_chr_pal_index_w(uint8_t data)
 {
 	m_superxavix_pal_index = data;
 }
 
-uint8_t xavix_state::superxavix_chr_pal_index_r()
+uint8_t superxavix_state::superxavix_chr_pal_index_r()
 {
 	return m_superxavix_pal_index;
 }
 
 
-uint8_t xavix_state::superxavix_bitmap_pal_hue_r()
+uint8_t superxavix_state::superxavix_bitmap_pal_hue_r()
 {
 	return superxavix_pal_hue_r(true);
 }
 
-uint8_t xavix_state::superxavix_chr_pal_hue_r()
+uint8_t superxavix_state::superxavix_chr_pal_hue_r()
 {
 	return superxavix_pal_hue_r(false);
 }
 
-uint8_t xavix_state::superxavix_pal_hue_r(bool bitmap)
+uint8_t superxavix_state::superxavix_pal_hue_r(bool bitmap)
 {
 	u8 *sh, *sl;
 	u8 ind;
@@ -253,17 +253,17 @@ uint8_t xavix_state::superxavix_pal_hue_r(bool bitmap)
 	return val << 2;
 }
 
-uint8_t xavix_state::superxavix_bitmap_pal_saturation_r()
+uint8_t superxavix_state::superxavix_bitmap_pal_saturation_r()
 {
 	return superxavix_pal_saturation_r(true);
 }
 
-uint8_t xavix_state::superxavix_chr_pal_saturation_r()
+uint8_t superxavix_state::superxavix_chr_pal_saturation_r()
 {
 	return superxavix_pal_saturation_r(false);
 }
 
-uint8_t xavix_state::superxavix_pal_saturation_r(bool bitmap)
+uint8_t superxavix_state::superxavix_pal_saturation_r(bool bitmap)
 {
 	u8 *sh, *sl;
 	u8 ind;
@@ -286,17 +286,17 @@ uint8_t xavix_state::superxavix_pal_saturation_r(bool bitmap)
 	return val << 4;
 }
 
-uint8_t xavix_state::superxavix_bitmap_pal_lightness_r()
+uint8_t superxavix_state::superxavix_bitmap_pal_lightness_r()
 {
 	return superxavix_pal_lightness_r(true);
 }
 
-uint8_t xavix_state::superxavix_chr_pal_lightness_r()
+uint8_t superxavix_state::superxavix_chr_pal_lightness_r()
 {
 	return superxavix_pal_lightness_r(false);
 }
 
-uint8_t xavix_state::superxavix_pal_lightness_r(bool bitmap)
+uint8_t superxavix_state::superxavix_pal_lightness_r(bool bitmap)
 {
 	u8 *sh, *sl;
 	u8 ind;
@@ -319,17 +319,17 @@ uint8_t xavix_state::superxavix_pal_lightness_r(bool bitmap)
 	return val << 2;
 }
 
-void xavix_state::superxavix_bitmap_pal_hue_w(uint8_t data)
+void superxavix_state::superxavix_bitmap_pal_hue_w(uint8_t data)
 {
 	superxavix_pal_hue_w(data, true);
 }
 
-void xavix_state::superxavix_chr_pal_hue_w(uint8_t data)
+void superxavix_state::superxavix_chr_pal_hue_w(uint8_t data)
 {
 	superxavix_pal_hue_w(data, false);
 }
 
-void xavix_state::superxavix_pal_hue_w(uint8_t data, bool bitmap)
+void superxavix_state::superxavix_pal_hue_w(uint8_t data, bool bitmap)
 {
 	u8 *sh, *sl;
 	u8 ind;
@@ -357,17 +357,17 @@ void xavix_state::superxavix_pal_hue_w(uint8_t data, bool bitmap)
 	update_pen(ind+offset, sh[ind], sl[ind]);
 }
 
-void xavix_state::superxavix_bitmap_pal_saturation_w(uint8_t data)
+void superxavix_state::superxavix_bitmap_pal_saturation_w(uint8_t data)
 {
 	superxavix_pal_saturation_w(data, true);
 }
 
-void xavix_state::superxavix_chr_pal_saturation_w(uint8_t data)
+void superxavix_state::superxavix_chr_pal_saturation_w(uint8_t data)
 {
 	superxavix_pal_saturation_w(data, false);
 }
 
-void xavix_state::superxavix_pal_saturation_w(uint8_t data, bool bitmap)
+void superxavix_state::superxavix_pal_saturation_w(uint8_t data, bool bitmap)
 {
 	u8 *sh, *sl;
 	u8 ind;
@@ -395,17 +395,17 @@ void xavix_state::superxavix_pal_saturation_w(uint8_t data, bool bitmap)
 	update_pen(ind+offset, sh[ind], sl[ind]);
 }
 
-void xavix_state::superxavix_bitmap_pal_lightness_w(uint8_t data)
+void superxavix_state::superxavix_bitmap_pal_lightness_w(uint8_t data)
 {
 	superxavix_pal_lightness_w(data, true);
 }
 
-void xavix_state::superxavix_chr_pal_lightness_w(uint8_t data)
+void superxavix_state::superxavix_chr_pal_lightness_w(uint8_t data)
 {
 	superxavix_pal_lightness_w(data, false);
 }
 
-void xavix_state::superxavix_pal_lightness_w(uint8_t data, bool bitmap)
+void superxavix_state::superxavix_pal_lightness_w(uint8_t data, bool bitmap)
 {
 	u8 *sh, *sl;
 	u8 ind;
@@ -1107,11 +1107,12 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
 {
+
 	const pen_t *paldata = m_palette->pens();
 	if (ypos > cliprect.max_y || ypos < cliprect.min_y)
 		return;
 
-	if ((xpos > cliprect.max_x) || ((xpos + drawwidth) < cliprect.min_x))
+	if (((xpos * m_video_hres_multiplier) > cliprect.max_x) || (((xpos * m_video_hres_multiplier) + drawwidth * m_video_hres_multiplier) < cliprect.min_x))
 		return;
 
 	if ((ypos >= cliprect.min_y && ypos <= cliprect.max_y))
@@ -1152,6 +1153,8 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, co
 				dat |= (get_next_bit() << i);
 			}
 
+			col = col * m_video_hres_multiplier;
+
 			if ((col >= cliprect.min_x && col <= cliprect.max_x))
 			{
 				uint16_t *const zyposptr = &m_zbuffer.pix(ypos);
@@ -1164,8 +1167,14 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, co
 					{
 						uint32_t *const yposptr = &bitmap.pix(ypos);
 						yposptr[col] = paldata[pen];
+						if (m_video_hres_multiplier == 2)
+							yposptr[col+1] = paldata[pen];
 
 						zyposptr[col] = zval;
+
+						if (m_video_hres_multiplier == 2)
+							zyposptr[col+1] = zval;
+
 					}
 				}
 			}
@@ -1200,8 +1209,8 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		*/
 		if (((m_arena_start != 0x00) && (m_arena_end != 0x00)) && ((m_arena_start != 0xff) && (m_arena_end != 0xff)))
 		{
-			clip.max_x = m_arena_start - 3; // must be -3 to hide garbage on the right hand side of snowboarder
-			clip.min_x = m_arena_end - 2; // must be -2 to render a single pixel line of the left border on Mappy remix (verified to render), although this creates a single pixel gap on the left of snowboarder status bar (need to verify)
+			clip.max_x = (m_arena_start - 3) * m_video_hres_multiplier; // must be -3 to hide garbage on the right hand side of snowboarder
+			clip.min_x = (m_arena_end - 2) * m_video_hres_multiplier; // must be -2 to render a single pixel line of the left border on Mappy remix (verified to render), although this creates a single pixel gap on the left of snowboarder status bar (need to verify)
 
 			if (clip.min_x < cliprect.min_x)
 				clip.min_x = cliprect.min_x;
@@ -1218,6 +1227,17 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	//popmessage("%02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x", m_soundregs[0],m_soundregs[1],m_soundregs[2],m_soundregs[3],m_soundregs[4],m_soundregs[5],m_soundregs[6],m_soundregs[7],m_soundregs[8],m_soundregs[9],m_soundregs[10],m_soundregs[11],m_soundregs[12],m_soundregs[13],m_soundregs[14],m_soundregs[15]);
 	
+
+
+	return 0;
+}
+
+uint32_t superxavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	xavix_state::screen_update(screen, bitmap, cliprect);
+
+	const pen_t *paldata = m_palette->pens();
+
 	// incomplete!
 	if (m_bmp_base)
 	{
@@ -1279,14 +1299,14 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 				if ((line > 0) && (y < bot)) // should also clip if out of range for botadr
 				{
-					set_data_address(base + base2 + ((line * (step*64)) / 8), 0);
+					set_data_address(base + base2 + ((line * (step * 64)) / 8), 0);
 
 					// also needs to take into account 'lftadr' address from the line base
 					// and clip against 'rgtadr' address if reads go beyond linebase + that for the line
 					for (int x = lft - hposadjust; x < rgt - hposadjust; x++)
 					{
-						uint32_t *const yposptr = &bitmap.pix(y);
-						uint16_t *const zyposptr = &m_zbuffer.pix(y);
+						uint32_t* const yposptr = &bitmap.pix(y);
+						uint16_t* const zyposptr = &m_zbuffer.pix(y);
 
 						uint8_t dat = 0;
 						for (int i = 0; i < bpp; i++)
@@ -1294,14 +1314,11 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 							dat |= (get_next_bit() << i);
 						}
 
-						// in reality the bitmap resolution can be twice the horizontal resolution of
-						// the standard XaviX layers, but this would require more reworking of XaviX code
-						// so render at half resolution on high resolution cases for now
 						int realx;
-						if (is_highres)
-							realx = x >> 1;
-						else
-							realx = x;
+						realx = x;
+
+						if (!is_highres)
+							realx *= 2;
 
 						if (((realx <= cliprect.max_x) && (realx >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
 						{
@@ -1314,6 +1331,23 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 								}
 							}
 						}
+
+						// draw doubled pixel for low-res bitmap
+						if (!is_highres)
+							realx += 1;
+
+						if (((realx <= cliprect.max_x) && (realx >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
+						{
+							if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
+							{
+								if (zval >= zyposptr[realx])
+								{
+									yposptr[realx] = paldata[dat + 0x100];
+									zyposptr[realx] = zval;
+								}
+							}
+						}
+
 					}
 				}
 			}
@@ -1323,7 +1357,6 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	return 0;
 }
-
 
 void xavix_state::spritefragment_dma_params_1_w(offs_t offset, uint8_t data)
 {

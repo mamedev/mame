@@ -10,14 +10,14 @@
 
 #include "softlist_dev.h"
 
-class xavix_i2c_jmat_state : public xavix_i2c_state
+class superxavix_i2c_jmat_state : public superxavix_i2c_state
 {
 public:
-	xavix_i2c_jmat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
+	superxavix_i2c_jmat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: superxavix_i2c_state(mconfig, type, tag)
 	{ }
 
-	void xavix2002_i2c_jmat(machine_config &config);
+	void superxavix_i2c_jmat(machine_config &config);
 
 private:
 	uint8_t read_extended_io0();
@@ -28,15 +28,15 @@ private:
 	void write_extended_io2(uint8_t data);
 };
 
-class xavix2002_super_tv_pc_state : public xavix_state
+class superxavix_super_tv_pc_state : public superxavix_state
 {
 public:
-	xavix2002_super_tv_pc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_state(mconfig, type, tag)
+	superxavix_super_tv_pc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: superxavix_state(mconfig, type, tag)
 		, m_cart(*this, "cartslot")
 	{ }
 
-	void xavix2002_super_tv_pc(machine_config &config);
+	void superxavix_super_tv_pc(machine_config &config);
 
 	void init_stvpc();
 
@@ -55,11 +55,11 @@ private:
 	required_device<generic_slot_device> m_cart;
 };
 
-class xavix_i2c_bowl_state : public xavix_i2c_state
+class superxavix_i2c_bowl_state : public superxavix_i2c_state
 {
 public:
-	xavix_i2c_bowl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
+	superxavix_i2c_bowl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: superxavix_i2c_state(mconfig, type, tag)
 	{ }
 
 	int camera_r();
