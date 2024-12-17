@@ -1041,6 +1041,7 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 				xpos &= 0x7f;
 				xpos = -0x80 + xpos;
 
+				// this also breaks the epoch logo on suprtvpc, although some ingame elements need it
 				if (!m_sprite_xhigh_ignore_hack)
 					if (!xposh)
 						xpos -= 0x80;
@@ -1262,10 +1263,13 @@ uint32_t superxavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 		if (mode & 0x01)
 		{
-			popmessage("bitmap t:%04x b:%04x l:%04x r:%04x  -- -- ba:%04x la:%04x ra:%04x   -- -- step:%02x - size:%02x unused:%08x",
-				top, bot, lft, rgt,
-				/*topadr*/ botadr, lftadr, rgtadr,
-				/*start*/ step, size, unused);
+			if (0)
+			{
+				popmessage("bitmap t:%04x b:%04x l:%04x r:%04x  -- -- ba:%04x la:%04x ra:%04x   -- -- step:%02x - size:%02x unused:%08x",
+					top, bot, lft, rgt,
+					/*topadr*/ botadr, lftadr, rgtadr,
+					/*start*/ step, size, unused);
+			}
 
 			int base = start * 0x800;
 			int base2 = topadr * 0x8;
