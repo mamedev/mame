@@ -18581,10 +18581,10 @@ ROM_START( eldoraddob ) // String "DYNA ELD3 V2.0D" in program ROM, DYNA D9105B 
 	ROM_REGION( 0x100000, "gfx", 0 )
 	ROM_LOAD( "tc538000p-dyna dm9106.h2", 0x000000, 0x100000, CRC(fa84c372) SHA1(a71e57e76321b7ebb16933d9bc983b9160995b4a) )
 
-	ROM_REGION( 0x300, "proms", 0 ) // not dumped for this set, but GFX ROM matches the one for eldoraddo
-	ROM_LOAD( "mb7114.e8",  0x000, 0x100, BAD_DUMP CRC(fa274678) SHA1(6712cb1f7ead1a7aa703ec799e7199c33ace857c) )
-	ROM_LOAD( "mb7114.e10", 0x100, 0x100, BAD_DUMP CRC(e58877ea) SHA1(30fa873fc05d91610ef68eef54b78f2c7301a62a) )
-	ROM_LOAD( "mb7114.e12", 0x200, 0x100, BAD_DUMP CRC(781b2842) SHA1(566667d4f81e93b29bb01dbc51bf144c02dff75d) )
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "e14", 0x000, 0x100, CRC(fa274678) SHA1(6712cb1f7ead1a7aa703ec799e7199c33ace857c) )
+	ROM_LOAD( "e15", 0x100, 0x100, CRC(e58877ea) SHA1(30fa873fc05d91610ef68eef54b78f2c7301a62a) )
+	ROM_LOAD( "e16", 0x200, 0x100, CRC(781b2842) SHA1(566667d4f81e93b29bb01dbc51bf144c02dff75d) )
 
 	ROM_REGION( 0x400, "plds", 0 ) // available as brute-forced dumps, need to be verified and converted
 	ROM_LOAD( "pal16l8.d13", 0x000, 0x104, NO_DUMP )

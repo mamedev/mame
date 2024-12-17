@@ -5504,7 +5504,7 @@ ROM_START( janoh )
 	ROM_LOAD( "rom7.p6",  0x6000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x20, "proms", 0 )
-	ROM_LOAD( "janho.color", 0x00, 0x20, NO_DUMP )
+	ROM_LOAD( "janoh.color", 0x00, 0x20, NO_DUMP )
 ROM_END
 
 ROM_START( janohb ) // same set was also found with the first 6 ROMs combined in 3 bigger capacity ROMs
@@ -5518,7 +5518,7 @@ ROM_START( janohb ) // same set was also found with the first 6 ROMs combined in
 	ROM_LOAD( "jo7.7", 0x6000, 0x1000, CRC(774cb324) SHA1(930d6643fcd7e479a68811e775144d46f0183636) )
 
 	ROM_REGION( 0x20, "proms", 0 )
-	ROM_LOAD( "janho.color", 0x00, 0x20, NO_DUMP )
+	ROM_LOAD( "janoh.color", 0x00, 0x20, CRC(74a53e94) SHA1(ca9114bd9b2b07f5abe82616b41ae9fdb9537a4f) )
 ROM_END
 
 /***************************************************************************
