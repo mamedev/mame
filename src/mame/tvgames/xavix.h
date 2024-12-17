@@ -98,9 +98,6 @@ public:
 		m_rom_dma_len(*this, "rom_dma_len"),
 		m_palram_sh(*this, "palram_sh"),
 		m_palram_l(*this, "palram_l"),
-		m_bmp_palram_sh(*this, "bmp_palram_sh"),
-		m_bmp_palram_l(*this, "bmp_palram_l"),
-		m_bmp_base(*this, "bmp_base"),
 		m_colmix_sh(*this, "colmix_sh"),
 		m_colmix_l(*this, "colmix_l"),
 		m_colmix_ctrl(*this, "colmix_ctrl"),
@@ -417,8 +414,6 @@ protected:
 	void palram_l_w(offs_t offset, uint8_t data);
 	void colmix_sh_w(offs_t offset, uint8_t data);
 	void colmix_l_w(offs_t offset, uint8_t data);
-	void bmp_palram_sh_w(offs_t offset, uint8_t data);
-	void bmp_palram_l_w(offs_t offset, uint8_t data);
 	void spriteram_w(offs_t offset, uint8_t data);
 	bool m_sprite_xhigh_ignore_hack;
 
@@ -537,10 +532,6 @@ protected:
 	required_shared_ptr<uint8_t> m_palram_sh;
 	required_shared_ptr<uint8_t> m_palram_l;
 
-	optional_shared_ptr<uint8_t> m_bmp_palram_sh;
-	optional_shared_ptr<uint8_t> m_bmp_palram_l;
-	optional_shared_ptr<uint8_t> m_bmp_base;
-
 	required_shared_ptr<uint8_t> m_colmix_sh;
 	required_shared_ptr<uint8_t> m_colmix_l;
 	required_shared_ptr<uint8_t> m_colmix_ctrl;
@@ -625,6 +616,9 @@ public:
 		, m_sx_crtc_1(*this, "sx_crtc_1")
 		, m_sx_crtc_2(*this, "sx_crtc_2")
 		, m_sx_plt_loc(*this, "sx_plt_loc")
+		, m_bmp_palram_sh(*this, "bmp_palram_sh")
+		, m_bmp_palram_l(*this, "bmp_palram_l")
+		, m_bmp_base(*this, "bmp_base")
 	{
 		m_video_hres_multiplier = 2;
 	}
@@ -675,6 +669,9 @@ private:
 	void superxavix_crtc_2_w(offs_t offset, uint8_t data);
 	uint8_t superxavix_crtc_2_r(offs_t offset);
 
+	void bmp_palram_sh_w(offs_t offset, uint8_t data);
+	void bmp_palram_l_w(offs_t offset, uint8_t data);
+
 	void extended_extbus_reg0_w(uint8_t data);
 	void extended_extbus_reg1_w(uint8_t data);
 	void extended_extbus_reg2_w(uint8_t data);
@@ -691,6 +688,10 @@ private:
 	required_shared_ptr<uint8_t> m_sx_crtc_1;
 	required_shared_ptr<uint8_t> m_sx_crtc_2;
 	required_shared_ptr<uint8_t> m_sx_plt_loc;
+
+	required_shared_ptr<uint8_t> m_bmp_palram_sh;
+	required_shared_ptr<uint8_t> m_bmp_palram_l;
+	required_shared_ptr<uint8_t> m_bmp_base;
 };
 
 

@@ -75,13 +75,13 @@ void xavix_state::palram_l_w(offs_t offset, uint8_t data)
 	update_pen(offset, m_palram_sh[offset], m_palram_l[offset]);
 }
 
-void xavix_state::bmp_palram_sh_w(offs_t offset, uint8_t data)
+void superxavix_state::bmp_palram_sh_w(offs_t offset, uint8_t data)
 {
 	m_bmp_palram_sh[offset] = data;
 	update_pen(offset+256, m_bmp_palram_sh[offset], m_bmp_palram_l[offset]);
 }
 
-void xavix_state::bmp_palram_l_w(offs_t offset, uint8_t data)
+void superxavix_state::bmp_palram_l_w(offs_t offset, uint8_t data)
 {
 	m_bmp_palram_l[offset] = data;
 	update_pen(offset+256, m_bmp_palram_sh[offset], m_bmp_palram_l[offset]);
