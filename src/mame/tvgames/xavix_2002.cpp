@@ -407,8 +407,13 @@ DEVICE_IMAGE_LOAD_MEMBER(superxavix_super_tv_pc_state::cart_load)
 
 void superxavix_super_tv_pc_state::xavix_extbus_map(address_map &map)
 {
-	map(0x000000, 0x7fffff).rom().region("bios", 0x00000).mirror(0x800000);
-	map(0x600000, 0x67ffff).ram(); // writes here
+	map(0x000000, 0x7fffff).rom().region("bios", 0x000000).mirror(0x800000);
+
+	map(0x600000, 0x67ffff).ram().share("bitmap_buffer"); // reads/writes here
+	// unusual (and likely wrong) workaround for suprtvpchk / suprtvpcdo loading screens / desktop backgrounds
+	map(0xd00000, 0xdfffff).rom().region("bios", 0x700000);
+	map(0xe00000, 0xe7ffff).ram().share("bitmap_buffer"); // reads/writes here
+
 }
 
 void superxavix_super_tv_pc_state::superxavix_super_tv_pc(machine_config& config)
@@ -615,6 +620,7 @@ ROM_START( suprtvpchk )
 	// to display the loading screen and desktop backgrounds the data must appear as if it were loaded normally?
 	// this is copied to RAM with the ldapa_imp opcodes and a pointer to 0xd46000 (0x546000 with high bit set for data access)
 	// what is going on? banking / bus control? does ldapa_imp not see the swapped ROM?
+	// we workaround this in the external bus map instead, but that is likely incorrect too
 	//ROM_COPY("bios", 0x700000, 0x500000, 0x100000 )
 ROM_END
 

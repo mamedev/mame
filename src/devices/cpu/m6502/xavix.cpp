@@ -135,6 +135,9 @@ uint8_t xavix_device::read_full_data(uint32_t addr)
 
 inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 {
+	// in theory data area reads (databank >= 0x80)
+	// should probably mask with 0x7fffff, but we handle this externally
+	// due to something not fully understood with Super PC-TV units
 	if (databank < 0x80)
 	{
 		if (adr < 0x8000)
@@ -152,12 +155,12 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 		}
 		else
 		{
-			return m_extbus_space->read_byte(((databank << 16) | adr) & 0x7fffff);
+			return m_extbus_space->read_byte(((databank << 16) | adr) /* & 0x7fffff */);
 		}
 	}
 	else
 	{
-		return m_extbus_space->read_byte(((databank << 16) | adr) & 0x7fffff);
+		return m_extbus_space->read_byte(((databank << 16) | adr) /* & 0x7fffff */);
 	}
 }
 
@@ -238,6 +241,9 @@ void xavix_device::write_zeropage(uint32_t addr, uint8_t val)
 // data writes
 inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_t val)
 {
+	// in theory data area writes (databank >= 0x80)
+	// should probably mask with 0x7fffff, but we handle this externally
+	// due to something not fully understood with Super PC-TV units
 	if (databank < 0x80)
 	{
 		if (adr < 0x8000)
@@ -257,12 +263,12 @@ inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_
 		}
 		else
 		{
-			m_extbus_space->write_byte(((databank << 16) | adr) & 0x7fffff, val);
+			m_extbus_space->write_byte(((databank << 16) | adr) /* & 0x7fffff */, val);
 		}
 	}
 	else
 	{
-		m_extbus_space->write_byte(((databank << 16) | adr) & 0x7fffff, val);
+		m_extbus_space->write_byte(((databank << 16) | adr) /* & 0x7fffff */, val);
 	}
 }
 
