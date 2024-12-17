@@ -54,7 +54,7 @@ void picasso2p_device::mmio_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rw(FUNC(picasso2p_device::vga0_r), FUNC(picasso2p_device::vga0_w)).umask16(0xffff);
 	map(0x1000, 0x1fff).rw(FUNC(picasso2p_device::vga1_r), FUNC(picasso2p_device::vga1_w)).umask16(0xffff);
-	map(0x46e8, 0x46b8).unmaprw(); // TODO
+	map(0x46e8, 0x46e8).w(m_vga, FUNC(cirrus_gd5428_vga_device::mode_setup_w));
 }
 
 void picasso2p_device::vga_map(address_map &map)

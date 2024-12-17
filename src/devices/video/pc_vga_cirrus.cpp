@@ -8,6 +8,8 @@
  * - Original Acumos AVGA1/2 chipsets (Cirrus Logic eventually bought Acumos and rebranded);
  * - Fix or implement hidden DAC modes (15bpp + mixed, true color, others);
  * - bebox: logo at startup is squashed;
+ * - zorro/picasso2: many blitting errors, verify HW cursor;
+ * - zorro/picasso2: segmentation fault on exit
  * - Merge with trs/vis.cpp implementation (CL-GD5200 RAMDAC with custom VGA controller)
  *
  */
@@ -24,7 +26,7 @@
 #define LOG_BANK (1U << 4) // log offset registers
 #define LOG_PLL  (1U << 5)
 
-#define VERBOSE (LOG_GENERAL | LOG_HDAC | LOG_REG | LOG_PLL)
+#define VERBOSE (LOG_GENERAL | LOG_HDAC | LOG_REG | LOG_BLIT)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
@@ -331,6 +333,7 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 		}),
 		NAME([this](offs_t offset, u8 data) {
 			m_blt_width = (m_blt_width & 0xff00) | data;
+			LOGMASKED(LOG_BLIT, "CL: blt_width %02x [0] (%04x)\n", data, m_blt_width);
 		})
 	);
 	// BLT Width 1
@@ -340,6 +343,7 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 		}),
 		NAME([this](offs_t offset, u8 data) {
 			m_blt_width = (m_blt_width & 0x00ff) | (data << 8);
+			LOGMASKED(LOG_BLIT, "CL: blt_width %02x [1] (%04x)\n", data, m_blt_width);
 		})
 	);
 	// BLT Height 0
@@ -349,6 +353,7 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 		}),
 		NAME([this](offs_t offset, u8 data) {
 			m_blt_height = (m_blt_height & 0xff00) | data;
+			LOGMASKED(LOG_BLIT, "CL: m_blt_height %02x [0] (%04x)\n", data, m_blt_height);
 		})
 	);
 	// BLT Height 1
@@ -358,6 +363,7 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 		}),
 		NAME([this](offs_t offset, u8 data) {
 			m_blt_height = (m_blt_height & 0x00ff) | (data << 8);
+			LOGMASKED(LOG_BLIT, "CL: m_blt_height %02x [1] (%04x)\n", data, m_blt_height);
 		})
 	);
 	// BLT Destination Pitch 0
@@ -436,6 +442,8 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 		}),
 		NAME([this](offs_t offset, u8 data) {
 			m_blt_status = data & ~0xf2;
+			if (BIT(data, 2))
+				m_blt_status &= ~9;
 			if(data & 0x02)
 			{
 				if(m_blt_mode & 0x04)  // blit source is system memory
@@ -625,6 +633,7 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 
 void cirrus_gd5428_vga_device::device_start()
 {
+	svga_device::device_start();
 	zero();
 
 	for (int i = 0; i < 0x100; i++)
@@ -634,10 +643,10 @@ void cirrus_gd5428_vga_device::device_start()
 	vga.crtc.maximum_scan_line = 1;
 
 	// copy over interfaces
-	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
-	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
+	//vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
+	//memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 
-	save_pointer(NAME(vga.memory), vga.svga_intf.vram_size);
+	//save_pointer(NAME(vga.memory), vga.svga_intf.vram_size);
 	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
 	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
@@ -666,7 +675,7 @@ void cirrus_gd5446_vga_device::device_start()
 
 void cirrus_gd5428_vga_device::device_reset()
 {
-	vga_device::device_reset();
+	svga_device::device_reset();
 	gc_locked = true;
 	gc_mode_ext = 0;
 	gc_bank[0] = gc_bank[1] = 0;
@@ -945,7 +954,7 @@ void cirrus_gd5428_vga_device::start_bitblt()
 			m_blt_source_current = m_blt_source + (m_blt_source_pitch*(y+1));
 		m_blt_dest_current = m_blt_dest + (m_blt_dest_pitch*(y+1));
 	}
-	m_blt_status &= ~0x02;
+	m_blt_status &= ~0x09;
 }
 
 void cirrus_gd5428_vga_device::start_reverse_bitblt()
@@ -1020,7 +1029,7 @@ void cirrus_gd5428_vga_device::start_reverse_bitblt()
 			m_blt_source_current = m_blt_source - (m_blt_source_pitch*(y+1));
 		m_blt_dest_current = m_blt_dest - (m_blt_dest_pitch*(y+1));
 	}
-	m_blt_status &= ~0x02;
+	m_blt_status &= ~0x09;
 }
 
 void cirrus_gd5428_vga_device::start_system_bitblt()
@@ -1111,8 +1120,16 @@ void cirrus_gd5428_vga_device::copy_pixel(uint8_t src, uint8_t dst)
 	case 0x0e:  // WHITE
 		res = 0xff;
 		break;
+	case 0x50:  // DSna / DPna
+		// used by picasso2, unknown purpose
+		res = (dst & (~src));
+		break;
 	case 0x59:  // SRCINVERT
 		res = src ^ dst;
+		break;
+	case 0x6d:  // SRCPAINT / DSo
+		// picasso2 on VGA Workbench (upper right icon)
+		res = src | dst;
 		break;
 	default:
 		popmessage("pc_vga_cirrus: Unsupported BitBLT ROP mode %02x",m_blt_rop);
@@ -1169,10 +1186,20 @@ uint8_t cirrus_gd5428_vga_device::mem_r(offs_t offset)
 	uint32_t addr;
 	uint8_t cur_mode = pc_vga_choosevideomode();
 
-	if(gc_locked || offset >= 0x10000 || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
-		return vga_device::mem_r(offset);
-
 	const uint8_t bank = offset_select(offset);
+
+	// FIXME: workaround crash behaviour in picasso2
+	// it will otherwise provide an offset of 0x1fxxxx in the gc_locked below
+    // causing a crash during adapter init
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
+	{
+		return svga_device::mem_linear_r((offset & 0xffff) + bank * 0x10000);
+	}
+
+	if(gc_locked || offset >= 0x10000 || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
+	{
+		return vga_device::mem_r(offset & 0x1ffff);
+	}
 
 	if(gc_mode_ext & 0x20)  // 16kB bank granularity
 		addr = bank * 0x4000;
@@ -1320,13 +1347,20 @@ void cirrus_gd5428_vga_device::mem_w(offs_t offset, uint8_t data)
 		return;
 	}
 
-	if(gc_locked || offset >= 0x10000 || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
+	const uint8_t bank = offset_select(offset);
+
+	// FIXME: as above
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
-		vga_device::mem_w(offset,data);
+		svga_device::mem_linear_w((offset + bank * 0x10000), data);
 		return;
 	}
 
-	const uint8_t bank = offset_select(offset);
+	if(gc_locked || offset >= 0x10000 || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
+	{
+		vga_device::mem_w(offset & 0x1ffff,data);
+		return;
+	}
 
 	if(gc_mode_ext & 0x20)  // 16kB bank granularity
 		addr = bank * 0x4000;
