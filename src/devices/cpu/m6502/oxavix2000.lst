@@ -436,17 +436,19 @@ bit_xav_zpx
 	prefetch();
 
 bit_abx
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc();
+	TMP = read_pc();
+	PC++;
+	TMP = set_h(TMP, read_pc());
+	PC++;
+	TMP += X;
+	TMP2 = read(TMP);
+	do_bit(TMP2);
 	prefetch();
 
 bit_imm
 	TMP = read_pc();
 	PC++;
-	if(A & TMP)
-		P &= ~F_Z;
-	else
-		P |= F_Z;
+	do_bit(TMP);
 	prefetch();
 
 asr_xav_zpg
@@ -454,6 +456,7 @@ asr_xav_zpg
 	PC++;
 	TMP2 = read_zeropage(TMP);
 	do_asr(TMP2);
+	write_zeropage(TMP,TMP2);
 	prefetch();
 
 asr_aba
