@@ -113,11 +113,7 @@ public:
 		m_sound(*this, "xavix_sound"),
 		m_adc(*this, "adc"),
 		m_anport(*this, "anport"),
-		m_math(*this, "math"),
-		m_xavix2002io(*this, "xavix2002io"),
-		m_sx_plt_loc(*this, "sx_plt_loc"),
-		m_sx_crtc_1(*this, "sx_crtc_1"),
-		m_sx_crtc_2(*this, "sx_crtc_2")
+		m_math(*this, "math")
 	{
 		m_video_hres_multiplier = 1;
 	}
@@ -433,11 +429,6 @@ protected:
 
 	void spriteregs_w(uint8_t data);
 
-	void superxavix_crtc_1_w(offs_t offset, uint8_t data);
-	uint8_t superxavix_crtc_1_r(offs_t offset);
-	void superxavix_crtc_2_w(offs_t offset, uint8_t data);
-	uint8_t superxavix_crtc_2_r(offs_t offset);
-
 	uint8_t pal_ntsc_r();
 
 	virtual uint8_t lightgun_r(offs_t offset) { logerror("%s: unhandled lightgun_r %d\n", machine().describe_context(), offset); return 0xff;  }
@@ -529,13 +520,6 @@ protected:
 
 	uint8_t m_timer_baseval = 0;
 
-	uint8_t m_superxavix_pal_index = 0;
-	uint8_t m_superxavix_bitmap_pal_index = 0;
-	uint32_t m_sx_plt_address = 0;
-	uint8_t m_sx_plt_mode = 0;
-	uint8_t m_plotter_has_byte = 0;
-	uint8_t m_plotter_current_byte = 0x00;
-
 	int16_t get_vectors(int which, int half);
 
 	// raster IRQ
@@ -571,6 +555,10 @@ protected:
 	required_ioport m_region;
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<xavix_sound_device> m_sound;
+	required_device<xavix_adc_device> m_adc;
+	required_device<xavix_anport_device> m_anport;
+	required_device<xavix_math_device> m_math;
 
 	uint8_t get_pen_lightness_from_dat(uint16_t dat);
 	uint8_t get_pen_saturation_from_dat(uint16_t dat);
@@ -602,31 +590,12 @@ protected:
 
 	int get_current_address_byte();
 
-	required_device<xavix_sound_device> m_sound;
-
-
 	uint8_t sound_regram_read_cb(offs_t offset);
-
-protected:
-	required_device<xavix_adc_device> m_adc;
-	required_device<xavix_anport_device> m_anport;
-	required_device<xavix_math_device> m_math;
-	optional_device<xavix2002_io_device> m_xavix2002io;
-	optional_shared_ptr<uint8_t> m_sx_plt_loc;
-	optional_shared_ptr<uint8_t> m_sx_crtc_1;
-	optional_shared_ptr<uint8_t> m_sx_crtc_2;
 
 	uint8_t m_extbusctrl[3]{};
 
 	virtual uint8_t extintrf_790x_r(offs_t offset);
 	virtual void extintrf_790x_w(offs_t offset, uint8_t data);
-
-	// additional SuperXaviX / XaviX2002 stuff
-	uint8_t m_sx_extended_extbus[3]{};
-
-	void extended_extbus_reg0_w(uint8_t data);
-	void extended_extbus_reg1_w(uint8_t data);
-	void extended_extbus_reg2_w(uint8_t data);
 
 	bool m_disable_memory_bypass = false;
 	int m_video_hres_multiplier;
@@ -652,6 +621,10 @@ class superxavix_state : public xavix_state
 public:
 	superxavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag)
+		, m_xavix2002io(*this, "xavix2002io")
+		, m_sx_crtc_1(*this, "sx_crtc_1")
+		, m_sx_crtc_2(*this, "sx_crtc_2")
+		, m_sx_plt_loc(*this, "sx_plt_loc")
 	{
 		m_video_hres_multiplier = 2;
 	}
@@ -659,9 +632,14 @@ public:
 	void xavix2002(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 	void superxavix_lowbus_map(address_map &map) ATTR_COLD;
+
+	required_device<xavix2002_io_device> m_xavix2002io;
 
 private:
 	void superxavix_plt_flush_w(uint8_t data);
@@ -691,6 +669,28 @@ private:
 	void superxavix_pal_hue_w(uint8_t data, bool bitmap);
 	void superxavix_pal_saturation_w(uint8_t data, bool bitmap);
 	void superxavix_pal_lightness_w(uint8_t data, bool bitmap);
+
+	void superxavix_crtc_1_w(offs_t offset, uint8_t data);
+	uint8_t superxavix_crtc_1_r(offs_t offset);
+	void superxavix_crtc_2_w(offs_t offset, uint8_t data);
+	uint8_t superxavix_crtc_2_r(offs_t offset);
+
+	void extended_extbus_reg0_w(uint8_t data);
+	void extended_extbus_reg1_w(uint8_t data);
+	void extended_extbus_reg2_w(uint8_t data);
+
+	uint8_t m_superxavix_pal_index = 0;
+	uint8_t m_superxavix_bitmap_pal_index = 0;
+	uint32_t m_sx_plt_address = 0;
+	uint8_t m_sx_plt_mode = 0;
+	uint8_t m_plotter_has_byte = 0;
+	uint8_t m_plotter_current_byte = 0x00;
+
+	uint8_t m_sx_extended_extbus[3]{};
+
+	required_shared_ptr<uint8_t> m_sx_crtc_1;
+	required_shared_ptr<uint8_t> m_sx_crtc_2;
+	required_shared_ptr<uint8_t> m_sx_plt_loc;
 };
 
 
