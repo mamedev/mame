@@ -6195,7 +6195,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="fix-it felix sr. (pal50).bin" size="4096" crc="4f066bc9" sha1="296d9c1ef7b214b863516822c7a38009559f3a2a"/>
+				<rom name="fix-it felix sr. (ntsc).bin" size="4096" crc="4f066bc9" sha1="296d9c1ef7b214b863516822c7a38009559f3a2a"/>
 			</dataarea>
 		</part>
 	</software>
