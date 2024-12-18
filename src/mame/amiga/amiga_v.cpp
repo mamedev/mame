@@ -550,6 +550,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	for (int x = 0; x < (amiga_state::SCREEN_WIDTH / 2) + 10; x++)
 	{
 		int sprpix;
+        const bool out_of_beam = x >= amiga_state::SCREEN_WIDTH / 2;
 
 		/* time to execute the copper? */
 		if (x == next_copper_x)
@@ -600,9 +601,11 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		}
 
 		/* clear the target pixels to the background color as a starting point */
-		if (dst != nullptr)
+		if (dst != nullptr && !out_of_beam)
+        {
 			dst[x*2+0] =
 			dst[x*2+1] = m_palette->pen(CUSTOM_REG(REG_COLOR00));
+        }
 
 		/* if we hit the first fetch pixel, reset the counters and latch the delays */
 		if (x == ddf_start_pixel)
@@ -742,7 +745,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				CUSTOM_REG(REG_CLXDAT) |= 0x001;
 
 			/* if we are within the display region, render */
-			if (dst != nullptr && x >= m_diw.left() && x < m_diw.right())
+			if (dst != nullptr && x >= m_diw.left() && x < m_diw.right() && !out_of_beam)
 			{
 				int pix, pri;
 
