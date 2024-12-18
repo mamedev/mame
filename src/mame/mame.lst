@@ -469,6 +469,10 @@ mpc3000
 hana6pt2                        // (c) 1991 Alba
 yumefuda                        // (c) 1991 Alba
 
+@source:alba/hanadojo.cpp
+hanadojo
+hanadojoa
+
 @source:alba/rmhaihai.cpp
 rmhaihai                        // (c) 1985 Alba
 rmhaihai2                       // (c) 1985 Alba
