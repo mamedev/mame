@@ -157,14 +157,70 @@ PL2 Button | 7A | 7B | PL1 Button
 ***************************************************************************/
 
 #include "emu.h"
-#include "route16.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/sn76477.h"
 
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+
+
+namespace {
+
+class route16_state : public driver_device
+{
+public:
+	route16_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_cpu1(*this, "cpu1")
+		, m_cpu2(*this, "cpu2")
+		, m_videoram(*this, "videoram%u", 1U)
+		, m_proms(*this, "proms")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+	{ }
+
+	void routex(machine_config &config);
+	void route16(machine_config &config);
+
+	void init_route16();
+	void init_route16a();
+	void init_route16c();
+	void init_route16d();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+	void out0_w(uint8_t data);
+	void out1_w(uint8_t data);
+
+	uint32_t screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stratvox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	required_device<cpu_device> m_cpu1;
+	required_device<cpu_device> m_cpu2;
+
+	required_shared_ptr_array<uint8_t, 2> m_videoram;
+	required_region_ptr<uint8_t> m_proms;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+
+	uint8_t m_protection_data = 0;
+	uint8_t m_flipscreen = 0;
+	uint8_t m_palreg[2] = { };
+
+private:
+	uint8_t route16_prot_r();
+	uint8_t routex_prot_r();
+
+	void cpu1_io_map(address_map &map) ATTR_COLD;
+	void route16_cpu1_map(address_map &map) ATTR_COLD;
+	void route16_cpu2_map(address_map &map) ATTR_COLD;
+	void routex_cpu1_map(address_map &map) ATTR_COLD;
+};
 
 class speakres_state : public route16_state
 {
@@ -197,6 +253,37 @@ private:
 	required_device<dac_byte_interface> m_dac;
 
 	attotime m_speakres_vrx;
+};
+
+class jongpute_state : public route16_state
+{
+public:
+	jongpute_state(const machine_config &mconfig, device_type type, const char *tag)
+		: route16_state(mconfig, type, tag)
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_key(*this, "KEY%u", 0U)
+	{ }
+
+	void jongpute(machine_config &config);
+	void vscompmj(machine_config &config);
+
+	void init_vscompmj();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	void input_w(uint8_t data);
+	template <int N> uint8_t input_r();
+
+	void jongpute_cpu1_map(address_map &map) ATTR_COLD;
+	void vscompmj_cpu1_map(address_map &map) ATTR_COLD;
+	void vscompmj_decrypted_opcodes(address_map &map) ATTR_COLD;
+
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	required_ioport_array<8> m_key;
+
+	uint8_t m_port_select = 0;
 };
 
 
@@ -337,6 +424,141 @@ void jongpute_state::init_vscompmj() // only opcodes encrypted
 
 		m_decrypted_opcodes[i] = x;
 	}
+}
+
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+uint32_t route16_state::screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint8_t *color_prom1 = &m_proms[0x000];
+	uint8_t *color_prom2 = &m_proms[0x100];
+
+	for (offs_t offs = 0; offs < m_videoram[0].bytes(); offs++)
+	{
+		uint8_t y = offs >> 6;
+		uint8_t x = offs << 2;
+
+		uint8_t data1 = m_videoram[0][offs];
+		uint8_t data2 = m_videoram[1][offs];
+
+		for (int i = 0; i < 4; i++)
+		{
+			uint8_t dx = x, dy = y;
+
+			// Game observation shows that Route 16 can blank each bitmap by setting bit 1 of the
+			// palette register. Since the schematics are missing the relevant pages, I cannot confirm
+			// how this works, but I am 99% sure the bit 1 would be connected to A7 of the color PROM.
+			// Since the color PROMs contain 0 in the upper half, this would produce a black output.
+
+			uint8_t color1 = color_prom1[((m_palreg[0] << 6) & 0x80) |
+					(m_palreg[0] << 2) |
+					((data1 >> 3) & 0x02) |
+					((data1 >> 0) & 0x01)];
+
+			uint8_t color2 = color_prom2[((m_palreg[1] << 6) & 0x80) |
+					(m_palreg[1] << 2) |
+					((data2 >> 3) & 0x02) |
+					((data2 >> 0) & 0x01)];
+
+			// the final color is the OR of the two colors (verified)
+			uint8_t final_color = (color1 | color2) & 0x07;
+
+			if (m_flipscreen)
+			{
+				dy = 255 - dy;
+				dx = 255 - dx;
+			}
+
+			if (cliprect.contains(dx, dy))
+				bitmap.pix(dy, dx) = m_palette->pen_color(final_color);
+
+			x++;
+			data1 >>= 1;
+			data2 >>= 1;
+		}
+	}
+
+	return 0;
+}
+
+
+// The Stratovox video connections have been verified from the schematics
+
+uint32_t route16_state::screen_update_stratvox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint8_t *color_prom1 = &m_proms[0x000];
+	uint8_t *color_prom2 = &m_proms[0x100];
+
+	for (offs_t offs = 0; offs < m_videoram[0].bytes(); offs++)
+	{
+		uint8_t y = offs >> 6;
+		uint8_t x = offs << 2;
+
+		uint8_t data1 = m_videoram[0][offs];
+		uint8_t data2 = m_videoram[1][offs];
+
+		for (int i = 0; i < 4; i++)
+		{
+			uint8_t dx = x, dy = y;
+
+			uint8_t color1 = color_prom1[(m_palreg[0] << 2) |
+					((data1 >> 3) & 0x02) |
+					((data1 >> 0) & 0x01)];
+
+			// bit 7 of the 2nd color is the OR of the 1st color bits 0 and 1 (verified)
+			uint8_t color2 = color_prom2[(((data1 << 3) & 0x80) | ((data1 << 7) & 0x80)) |
+					(m_palreg[1] << 2) |
+					((data2 >> 3) & 0x02) |
+					((data2 >> 0) & 0x01)];
+
+			// the final color is the OR of the two colors
+			uint8_t final_color = (color1 | color2) & 0x07;
+
+			if (m_flipscreen)
+			{
+				dy = 255 - dy;
+				dx = 255 - dx;
+			}
+
+			if (cliprect.contains(dx, dy))
+				bitmap.pix(dy, dx) = m_palette->pen_color(final_color);
+
+			x++;
+			data1 >>= 1;
+			data2 >>= 1;
+		}
+	}
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
+void route16_state::out0_w(uint8_t data)
+{
+	m_palreg[0] = data & 0x1f;
+
+	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
+}
+
+
+void route16_state::out1_w(uint8_t data)
+{
+	m_palreg[1] = data & 0x1f;
+
+	m_flipscreen = (data >> 5) & 0x01;
 }
 
 
@@ -990,6 +1212,7 @@ void jongpute_state::vscompmj(machine_config &config)
 }
 
 
+
 /*************************************
  *
  *  ROM definitions
@@ -1436,6 +1659,9 @@ ROM_START( vscompmj )
 	ROM_REGION( 0x0100, "proms2", 0 ) // currently unused by the emulation
 	ROM_LOAD( "82s129.9r",         0x0000, 0x0100, CRC(20ac25d8) SHA1(6f06472ac7fcb22c9060092a2d456be5d3ca6d5f) )
 ROM_END
+
+} // anonymous namespace
+
 
 
 /*************************************
