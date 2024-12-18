@@ -284,6 +284,7 @@ void xavix_state::colmix_6ff2_w(uint8_t data)
 {
 	LOG("%s: colmix_6ff2_w %02x\n", machine().describe_context(), data);
 	m_colmix_ctrl[0] = data;
+	// bits 0xe0 seem to enable a TV static effect somehow, used by rad_opus
 }
 
 
