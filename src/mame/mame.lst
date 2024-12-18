@@ -30986,10 +30986,6 @@ dealracl                        //
 kingpin                         // (c) 1983 American Communications Laboratories Inc.
 maxideal                        // (c) 1983 American Communications Laboratories Inc.
 
-@source:misc/kurukuru.cpp
-kurukuru                        // (c) 1990 Success / Taiyo Jidoki.
-ppj                             // (c) 199? Success / Taiyo Jidoki.
-
 @source:misc/ladyfrog.cpp
 ladyfrog                        // (c) 1990 Mondial Games
 toucheme                        //
@@ -31695,9 +31691,6 @@ onetwoe                         // (c) 1997 Barko
 multibaby                       // (c) 1990 Oper Coin
 spirulo                         // (c) 1988 Oper Coin
 
-@source:misc/othello.cpp
-othello                         // (c) 1984 Success.
-
 @source:misc/pachifev.cpp
 pachifev                        // (c) 1983?
 
@@ -32222,9 +32215,6 @@ skeetsht                        // (c) 1991
 @source:misc/skimaxx.cpp
 skimaxx                         // (c) 1996 Kyle Hodgetts/ICE
 
-@source:misc/skopro.cpp
-drgdance                        // 2008
-
 @source:misc/skyarmy.cpp
 skyarmy                         // (c) 1982 Shoei
 
@@ -32272,9 +32262,6 @@ sms4in1                         // (c) 1984 SMS MFG CORP
 sms4in1a                        // (c) 1984 SMS MFG CORP
 trvhang                         // (c) 1984 SMS MFG CORP
 trvhanga                        // (c) 1984 SMS MFG CORP
-
-@source:misc/sothello.cpp
-sothello                        // (c) 1986 Success / Fujiwara.
 
 @source:misc/spdamjes.cpp
 spdamjes                        // (c) 19?? T-90 S.A.
@@ -32743,10 +32730,6 @@ sys1121                         // (c) 1984 Motorola
 
 @source:motorola/uchroma68.cpp
 uchroma68                       // 1980 Motorola evaluation board for the MC6847
-
-@source:msx/big10.cpp
-big10                           //
-big10a                          // (c) 1986 System Make
 
 @source:msx/forte2.cpp
 pesadelo                        // (c) 1989 Forte II Games
@@ -43498,6 +43481,26 @@ xplan                           // (c) 2006 Subsino
 xreel
 xtrain                          // (c) 1999 Subsino
 
+@source:success/big10.cpp
+big10                           //
+big10a                          // (c) 1986 System Make
+
+@source:success/kurukuru.cpp
+kurukuru                        // (c) 1990 Success / Taiyo Jidoki.
+ppj                             // (c) 199? Success / Taiyo Jidoki.
+
+@source:success/othello.cpp
+othello                         // (c) 1984 Success.
+
+@source:success/skopro.cpp
+drgdance                        // 2008
+
+@source:success/sothello.cpp
+sothello                        // (c) 1986 Success / Fujiwara.
+
+@source:success/tonton.cpp
+tonton                          // (c) 199? Success / Taiyo Jidoki.
+
 @source:sun/sun1.cpp
 sun1                            //
 
@@ -43643,9 +43646,6 @@ shangha2                        // (c) 1989 Sunsoft (Sun Electronics)
 shangha2a                       // (c) 1989 Sunsoft (Sun Electronics)
 shanghai                        // (c) 1988 Sunsoft (Sun Electronics)
 shanghaij                       // (c) 1988 Sunsoft (Sun Electronics)
-
-@source:sunelectronics/tonton.cpp
-tonton                          // (c) 199? Success / Taiyo Jidoki.
 
 @source:sunwise/anoworld.cpp
 anoworld
