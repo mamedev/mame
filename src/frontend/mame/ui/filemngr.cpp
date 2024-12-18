@@ -38,9 +38,9 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings)
+menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_container &container, std::string &&warnings)
 	: menu(mui, container)
-	, m_warnings(warnings ? warnings : "")
+	, m_warnings(std::move(warnings))
 	, m_selected_device(nullptr)
 {
 	// The warning string is used when accessing from the force_file_manager call, i.e.
@@ -66,7 +66,18 @@ void menu_file_manager::recompute_metrics(uint32_t width, uint32_t height, float
 {
 	menu::recompute_metrics(width, height, aspect);
 
-	set_custom_space(0.0F, line_height() + 3.0F * tb_border());
+	if (!m_warnings.empty())
+	{
+		m_warnings_layout.reset();
+
+		float const max_width(1.0F - (4.0F * lr_border()));
+		m_warnings_layout.emplace(create_layout(max_width, text_layout::text_justify::LEFT));
+		m_warnings_layout->add_text(m_warnings, ui().colors().text_color());
+	}
+
+	set_custom_space(
+			m_warnings_layout ? ((m_warnings_layout->lines() * line_height()) + 3.0F * tb_border()) : 0.0F,
+			line_height() + 3.0F * tb_border());
 }
 
 
@@ -76,6 +87,20 @@ void menu_file_manager::recompute_metrics(uint32_t width, uint32_t height, float
 
 void menu_file_manager::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
+	// show the warnings if any
+	if (m_warnings_layout)
+	{
+		ui().draw_outlined_box(
+				container(),
+				((1.0F + m_warnings_layout->actual_width()) * 0.5F) + lr_border(), origy1 - (3.0F * tb_border()) - (m_warnings_layout->lines() * line_height()),
+				((1.0F - m_warnings_layout->actual_width()) * 0.5F) - lr_border(), origy1 - tb_border(),
+				ui().colors().background_color());
+		m_warnings_layout->emit(
+				container(),
+				(1.0F - m_warnings_layout->actual_width()) * 0.5F,
+				origy1 - (2.0F * tb_border()) - (m_warnings_layout->lines() * line_height()));
+	}
+
 	// access the path
 	std::string_view path = m_selected_device && m_selected_device->exists() ? m_selected_device->filename() : std::string_view();
 	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, std::string_view(), path);
@@ -121,9 +146,6 @@ void menu_file_manager::fill_image_line(device_image_interface &img, std::string
 void menu_file_manager::populate()
 {
 	m_notifiers.clear();
-
-	if (!m_warnings.empty())
-		item_append(m_warnings, FLAG_DISABLE, nullptr);
 
 	// cycle through all devices for this system
 	bool missing_mandatory = false;
@@ -246,11 +268,11 @@ bool menu_file_manager::handle(event const *ev)
 }
 
 // force file manager menu
-void menu_file_manager::force_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings)
+void menu_file_manager::force_file_manager(mame_ui_manager &mui, render_container &container, std::string &&warnings)
 {
 	// drop any existing menus and start the file manager
 	menu::stack_reset(mui);
-	menu::stack_push_special_main<menu_file_manager>(mui, container, warnings);
+	menu::stack_push_special_main<menu_file_manager>(mui, container, std::move(warnings));
 	mui.show_menu();
 
 	// make sure MAME is paused
