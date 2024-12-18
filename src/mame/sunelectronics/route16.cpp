@@ -179,6 +179,9 @@ public:
 	void stratvox(machine_config &config);
 	void spacecho(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	uint8_t speakres_in3_r();
 	void speakres_out2_w(uint8_t data);
@@ -203,14 +206,23 @@ private:
  *
  *************************************/
 
-MACHINE_START_MEMBER(speakres_state, speakres)
+void route16_state::machine_start()
 {
+	save_item(NAME(m_protection_data));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_palreg));
+}
+
+void speakres_state::machine_start()
+{
+	route16_state::machine_start();
 	save_item(NAME(m_speakres_vrx));
 }
 
-MACHINE_START_MEMBER(route16_state, jongpute)
+void jongpute_state::machine_start()
 {
-	save_item(NAME(m_jongpute_port_select));
+	route16_state::machine_start();
+	save_item(NAME(m_port_select));
 }
 
 void route16_state::init_route16a()
@@ -230,8 +242,6 @@ void route16_state::init_route16a()
 
 void route16_state::init_route16()
 {
-	save_item(NAME(m_protection_data));
-
 	// hack out the protection
 	u8 *rom = memregion("cpu1")->base();
 	rom[0x105] = 0; // remove jp nz,4109
@@ -251,8 +261,6 @@ void route16_state::init_route16()
 
 void route16_state::init_route16c()
 {
-	save_item(NAME(m_protection_data));
-
 	// hack out the protection
 	u8 *rom = memregion("cpu1")->base();
 	rom[0x0e9] = 0x3a; // remove call 2CD8
@@ -264,8 +272,6 @@ void route16_state::init_route16c()
 
 void route16_state::init_route16d()
 {
-	save_item(NAME(m_protection_data));
-
 	// hack out the protection
 	u8 *rom = memregion("cpu1")->base();
 
@@ -284,7 +290,7 @@ void route16_state::init_route16d()
 	rom[0x74d] = 0x07;
 }
 
-void route16_state::init_vscompmj() // only opcodes encrypted
+void jongpute_state::init_vscompmj() // only opcodes encrypted
 {
 	uint8_t *rom = memregion("cpu1")->base();
 
@@ -401,18 +407,18 @@ void speakres_state::stratvox_dac_w(uint8_t data)
  *
  ***************************************************/
 
-void route16_state::jongpute_input_w(uint8_t data)
+void jongpute_state::input_w(uint8_t data)
 {
-	m_jongpute_port_select = data;
+	m_port_select = data;
 }
 
 template <int N>
-uint8_t route16_state::jongpute_input_r()
+uint8_t jongpute_state::input_r()
 {
 	uint8_t data = 0;
 
 	for (int i = 0; i < 4; i++)
-		if (BIT(m_jongpute_port_select, i))
+		if (BIT(m_port_select, i))
 			data |= m_key[N * 4 + i]->read();
 
 	return data;
@@ -471,7 +477,7 @@ void route16_state::route16_cpu1_map(address_map &map)
 	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
 	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
 	map(0x5800, 0x5800).portr("P2");
-	map(0x8000, 0xbfff).ram().share("videoram1");
+	map(0x8000, 0xbfff).ram().share(m_videoram[0]);
 }
 
 
@@ -483,7 +489,7 @@ void route16_state::routex_cpu1_map(address_map &map)
 	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
 	map(0x5800, 0x5800).portr("P2");
 	map(0x6400, 0x6400).r(FUNC(route16_state::routex_prot_r));
-	map(0x8000, 0xbfff).ram().share("videoram1");
+	map(0x8000, 0xbfff).ram().share(m_videoram[0]);
 }
 
 
@@ -494,7 +500,7 @@ void speakres_state::stratvox_cpu1_map(address_map &map)
 	map(0x4800, 0x4800).portr("DSW").w(FUNC(speakres_state::out0_w));
 	map(0x5000, 0x5000).portr("P1").w(FUNC(speakres_state::out1_w));
 	map(0x5800, 0x5800).portr("P2");
-	map(0x8000, 0xbfff).ram().share("videoram1");
+	map(0x8000, 0xbfff).ram().share(m_videoram[0]);
 }
 
 
@@ -506,23 +512,23 @@ void speakres_state::speakres_cpu1_map(address_map &map)
 	map(0x5000, 0x5000).portr("P1").w(FUNC(speakres_state::out1_w));
 	map(0x5800, 0x5800).portr("P2").w(FUNC(speakres_state::speakres_out2_w));
 	map(0x6000, 0x6000).r(FUNC(speakres_state::speakres_in3_r));
-	map(0x8000, 0xbfff).ram().share("videoram1");
+	map(0x8000, 0xbfff).ram().share(m_videoram[0]);
 }
 
 
-void route16_state::jongpute_cpu1_map(address_map &map)
+void jongpute_state::jongpute_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).r(FUNC(route16_state::jongpute_input_r<1>)).w(FUNC(route16_state::out1_w));
-	map(0x5800, 0x5800).rw(FUNC(route16_state::jongpute_input_r<0>), FUNC(route16_state::jongpute_input_w));
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(jongpute_state::out0_w));
+	map(0x5000, 0x5000).r(FUNC(jongpute_state::input_r<1>)).w(FUNC(jongpute_state::out1_w));
+	map(0x5800, 0x5800).rw(FUNC(jongpute_state::input_r<0>), FUNC(jongpute_state::input_w));
 	map(0x6800, 0x6800).w("ay8910", FUNC(ay8910_device::data_w));
 	map(0x6900, 0x6900).w("ay8910", FUNC(ay8910_device::address_w));
-	map(0x8000, 0xbfff).ram().share("videoram1");
+	map(0x8000, 0xbfff).ram().share(m_videoram[0]);
 }
 
-void route16_state::vscompmj_cpu1_map(address_map &map)
+void jongpute_state::vscompmj_cpu1_map(address_map &map)
 {
 	jongpute_cpu1_map(map);
 
@@ -530,26 +536,9 @@ void route16_state::vscompmj_cpu1_map(address_map &map)
 	map(0x7000, 0x7fff).rom();
 }
 
-void route16_state::vscompmj_decrypted_opcodes(address_map &map)
+void jongpute_state::vscompmj_decrypted_opcodes(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
-}
-
-
-void route16_state::route16_cpu2_map(address_map &map)
-{
-	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x8000, 0xbfff).ram().share("videoram2");
-}
-
-
-void speakres_state::stratvox_cpu2_map(address_map &map)
-{
-	map(0x0000, 0x1fff).rom();
-	map(0x2800, 0x2800).w(FUNC(speakres_state::stratvox_dac_w));
-	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x8000, 0xbfff).ram().share("videoram2");
 }
 
 
@@ -558,6 +547,23 @@ void route16_state::cpu1_io_map(address_map &map)
 	map.global_mask(0x1ff);
 	map(0x0000, 0x0000).mirror(0x00ff).w("ay8910", FUNC(ay8910_device::data_w));
 	map(0x0100, 0x0100).mirror(0x00ff).w("ay8910", FUNC(ay8910_device::address_w));
+}
+
+
+void route16_state::route16_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram().share("sharedram");
+	map(0x8000, 0xbfff).ram().share(m_videoram[1]);
+}
+
+
+void speakres_state::stratvox_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2800, 0x2800).w(FUNC(speakres_state::stratvox_dac_w));
+	map(0x4000, 0x43ff).ram().share("sharedram");
+	map(0x8000, 0xbfff).ram().share(m_videoram[1]);
 }
 
 
@@ -878,7 +884,7 @@ INPUT_PORTS_END
 
 void route16_state::route16(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_cpu1, 10_MHz_XTAL / 4); // verified on PCB
 	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::route16_cpu1_map);
 	m_cpu1->set_addrmap(AS_IO, &route16_state::cpu1_io_map);
@@ -889,17 +895,17 @@ void route16_state::route16(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(m_cpu1->clock() / 4));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 0, 256-1);
 	m_screen->set_refresh_hz(57);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_screen_update(FUNC(route16_state::screen_update_route16));
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	AY8910(config, "ay8910", 10_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.5); // verified on PCB
 }
@@ -909,7 +915,7 @@ void route16_state::routex(machine_config &config)
 {
 	route16(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::routex_cpu1_map);
 }
 
@@ -918,14 +924,14 @@ void speakres_state::stratvox(machine_config &config)
 {
 	route16(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_cpu1->set_addrmap(AS_PROGRAM, &speakres_state::stratvox_cpu1_map);
 	m_cpu2->set_addrmap(AS_PROGRAM, &speakres_state::stratvox_cpu2_map);
 
-	/* video hardware */
+	// video hardware
 	m_screen->set_screen_update(FUNC(speakres_state::screen_update_stratvox));
 
-	/* sound hardware */
+	// sound hardware
 	subdevice<ay8910_device>("ay8910")->port_a_write_callback().set(FUNC(speakres_state::stratvox_sn76477_w)); // SN76477 commands (SN76477 not populated on Route 16 PCB)
 
 	SN76477(config, m_sn);
@@ -951,40 +957,36 @@ void speakres_state::speakres(machine_config &config)
 {
 	stratvox(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_cpu1->set_addrmap(AS_PROGRAM, &speakres_state::speakres_cpu1_map);
-
-	MCFG_MACHINE_START_OVERRIDE(speakres_state, speakres)
 }
 
 void speakres_state::spacecho(machine_config &config)
 {
 	speakres(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_cpu2->set_periodic_int(FUNC(route16_state::irq0_line_hold), attotime::from_hz(48*60));
 }
 
-void route16_state::jongpute(machine_config &config)
+void jongpute_state::jongpute(machine_config &config)
 {
 	route16(config);
-	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::jongpute_cpu1_map);
+	m_cpu1->set_addrmap(AS_PROGRAM, &jongpute_state::jongpute_cpu1_map);
 	m_cpu1->set_addrmap(AS_IO, address_map_constructor());
 
-	MCFG_MACHINE_START_OVERRIDE(route16_state, jongpute)
-
-	/* video hardware */
-	m_screen->set_screen_update(FUNC(route16_state::screen_update_stratvox));
+	// video hardware
+	m_screen->set_screen_update(FUNC(jongpute_state::screen_update_stratvox));
 
 	PALETTE(config.replace(), m_palette, palette_device::BGR_3BIT);
 }
 
-void route16_state::vscompmj(machine_config &config)
+void jongpute_state::vscompmj(machine_config &config)
 {
 	jongpute(config);
 
-	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::vscompmj_cpu1_map);
-	m_cpu1->set_addrmap(AS_OPCODES, &route16_state::vscompmj_decrypted_opcodes);
+	m_cpu1->set_addrmap(AS_PROGRAM, &jongpute_state::vscompmj_cpu1_map);
+	m_cpu1->set_addrmap(AS_OPCODES, &jongpute_state::vscompmj_decrypted_opcodes);
 }
 
 
@@ -1451,15 +1453,15 @@ GAME( 1981, route16bl, route16,  route16,  route16,  route16_state,  empty_init,
 GAME( 1981, routex,    route16,  routex,   route16,  route16_state,  empty_init,    ROT270, "bootleg",                                    "Route X (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, routexa,   route16,  routex,   route16,  route16_state,  empty_init,    ROT270, "bootleg",                                    "Route X (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, speakres,  0,        speakres, speakres, speakres_state, empty_init,    ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakresb, speakres, speakres, speakres, speakres_state, empty_init,    ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvox,  speakres, stratvox, stratvox, speakres_state, empty_init,    ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxa, speakres, stratvox, stratvox, speakres_state, empty_init,    ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxb, speakres, stratvox, stratvox, speakres_state, empty_init,    ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho,  speakres, spacecho, spacecho, speakres_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho2, speakres, spacecho, spacecho, speakres_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakhlp,  speakres, spacecho, spacecho, speakres_state, empty_init,    ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1980, speakres,  0,        speakres, speakres, speakres_state, empty_init,    ROT270, "Sun Electronics",                  "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakresb, speakres, speakres, speakres, speakres_state, empty_init,    ROT270, "bootleg",                          "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvox,  speakres, stratvox, stratvox, speakres_state, empty_init,    ROT270, "Sun Electronics (Taito license)",  "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxa, speakres, stratvox, stratvox, speakres_state, empty_init,    ROT270, "Sun Electronics (Taito license)",  "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxb, speakres, stratvox, stratvox, speakres_state, empty_init,    ROT270, "bootleg",                          "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho,  speakres, spacecho, spacecho, speakres_state, empty_init,    ROT270, "bootleg (Gayton Games)",           "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho2, speakres, spacecho, spacecho, speakres_state, empty_init,    ROT270, "bootleg (Gayton Games)",           "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakhlp,  speakres, spacecho, spacecho, speakres_state, empty_init,    ROT270, "bootleg",                          "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, jongpute,  0,        jongpute, jongpute, route16_state,  empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )  // sampling voice is not emulated, bug with colors makes tile recognition difficult
-GAME( 1981, ttmahjng,  jongpute, jongpute, jongpute, route16_state,  empty_init,    ROT0,   "Alpha Denshi Co. (Taito license)", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vscompmj,  jongpute, vscompmj, jongpute, route16_state,  init_vscompmj, ROT0,   "Nichibutsu",                       "VS Computer Mahjong", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // decryption might be incomplete (attract resets), inputs seem read differently
+GAME( 1981, jongpute,  0,        jongpute, jongpute, jongpute_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )  // sampling voice is not emulated, bug with colors makes tile recognition difficult
+GAME( 1981, ttmahjng,  jongpute, jongpute, jongpute, jongpute_state, empty_init,    ROT0,   "Alpha Denshi Co. (Taito license)", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vscompmj,  jongpute, vscompmj, jongpute, jongpute_state, init_vscompmj, ROT0,   "Nichibutsu",                       "VS Computer Mahjong", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // decryption might be incomplete (attract resets), inputs seem read differently

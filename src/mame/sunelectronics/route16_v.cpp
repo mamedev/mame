@@ -11,13 +11,6 @@
 #include "emu.h"
 #include "route16.h"
 
-void route16_state::video_start()
-{
-	save_item(NAME(m_flipscreen));
-	save_item(NAME(m_palette_1));
-	save_item(NAME(m_palette_2));
-}
-
 /*************************************
  *
  *  Memory handlers
@@ -26,7 +19,7 @@ void route16_state::video_start()
 
 void route16_state::out0_w(uint8_t data)
 {
-	m_palette_1 = data & 0x1f;
+	m_palreg[0] = data & 0x1f;
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
 }
@@ -34,7 +27,7 @@ void route16_state::out0_w(uint8_t data)
 
 void route16_state::out1_w(uint8_t data)
 {
-	m_palette_2 = data & 0x1f;
+	m_palreg[1] = data & 0x1f;
 
 	m_flipscreen = (data >> 5) & 0x01;
 }
@@ -49,31 +42,33 @@ void route16_state::out1_w(uint8_t data)
 
 uint32_t route16_state::screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *color_prom1 = &memregion("proms")->base()[0x000];
-	uint8_t *color_prom2 = &memregion("proms")->base()[0x100];
+	uint8_t *color_prom1 = &m_proms[0x000];
+	uint8_t *color_prom2 = &m_proms[0x100];
 
-	for (offs_t offs = 0; offs < m_videoram1.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram[0].bytes(); offs++)
 	{
 		uint8_t y = offs >> 6;
 		uint8_t x = offs << 2;
 
-		uint8_t data1 = m_videoram1[offs];
-		uint8_t data2 = m_videoram2[offs];
+		uint8_t data1 = m_videoram[0][offs];
+		uint8_t data2 = m_videoram[1][offs];
 
 		for (int i = 0; i < 4; i++)
 		{
+			uint8_t dx = x, dy = y;
+
 			// Game observation shows that Route 16 can blank each bitmap by setting bit 1 of the
 			// palette register. Since the schematics are missing the relevant pages, I cannot confirm
 			// how this works, but I am 99% sure the bit 1 would be connected to A7 of the color PROM.
 			// Since the color PROMs contain 0 in the upper half, this would produce a black output.
 
-			uint8_t color1 = color_prom1[((m_palette_1 << 6) & 0x80) |
-					(m_palette_1 << 2) |
+			uint8_t color1 = color_prom1[((m_palreg[0] << 6) & 0x80) |
+					(m_palreg[0] << 2) |
 					((data1 >> 3) & 0x02) |
 					((data1 >> 0) & 0x01)];
 
-			uint8_t color2 = color_prom2[((m_palette_2 << 6) & 0x80) |
-					(m_palette_2 << 2) |
+			uint8_t color2 = color_prom2[((m_palreg[1] << 6) & 0x80) |
+					(m_palreg[1] << 2) |
 					((data2 >> 3) & 0x02) |
 					((data2 >> 0) & 0x01)];
 
@@ -82,12 +77,12 @@ uint32_t route16_state::screen_update_route16(screen_device &screen, bitmap_rgb3
 
 			if (m_flipscreen)
 			{
-				y = 255 - y;
-				x = 255 - x;
+				dy = 255 - dy;
+				dx = 255 - dx;
 			}
 
-			if (cliprect.contains(x, y))
-				bitmap.pix(y, x) = m_palette->pen_color(final_color);
+			if (cliprect.contains(dx, dy))
+				bitmap.pix(dy, dx) = m_palette->pen_color(final_color);
 
 			x++;
 			data1 >>= 1;
@@ -103,26 +98,28 @@ uint32_t route16_state::screen_update_route16(screen_device &screen, bitmap_rgb3
 
 uint32_t route16_state::screen_update_stratvox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *color_prom1 = &memregion("proms")->base()[0x000];
-	uint8_t *color_prom2 = &memregion("proms")->base()[0x100];
+	uint8_t *color_prom1 = &m_proms[0x000];
+	uint8_t *color_prom2 = &m_proms[0x100];
 
-	for (offs_t offs = 0; offs < m_videoram1.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram[0].bytes(); offs++)
 	{
 		uint8_t y = offs >> 6;
 		uint8_t x = offs << 2;
 
-		uint8_t data1 = m_videoram1[offs];
-		uint8_t data2 = m_videoram2[offs];
+		uint8_t data1 = m_videoram[0][offs];
+		uint8_t data2 = m_videoram[1][offs];
 
 		for (int i = 0; i < 4; i++)
 		{
-			uint8_t color1 = color_prom1[(m_palette_1 << 2) |
+			uint8_t dx = x, dy = y;
+
+			uint8_t color1 = color_prom1[(m_palreg[0] << 2) |
 					((data1 >> 3) & 0x02) |
 					((data1 >> 0) & 0x01)];
 
 			// bit 7 of the 2nd color is the OR of the 1st color bits 0 and 1 (verified)
 			uint8_t color2 = color_prom2[(((data1 << 3) & 0x80) | ((data1 << 7) & 0x80)) |
-					(m_palette_2 << 2) |
+					(m_palreg[1] << 2) |
 					((data2 >> 3) & 0x02) |
 					((data2 >> 0) & 0x01)];
 
@@ -131,12 +128,12 @@ uint32_t route16_state::screen_update_stratvox(screen_device &screen, bitmap_rgb
 
 			if (m_flipscreen)
 			{
-				y = 255 - y;
-				x = 255 - x;
+				dy = 255 - dy;
+				dx = 255 - dx;
 			}
 
-			if (cliprect.contains(x, y))
-				bitmap.pix(y, x) = m_palette->pen_color(final_color);
+			if (cliprect.contains(dx, dy))
+				bitmap.pix(dy, dx) = m_palette->pen_color(final_color);
 
 			x++;
 			data1 >>= 1;
