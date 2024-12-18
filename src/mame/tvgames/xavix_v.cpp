@@ -836,6 +836,14 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 			else if (alt_tileaddressing2 == 1)
 			{
 				// 8-byte alignment Addressing Mode uses a fixed offset? (like sprites)
+
+				// epo_stad reaches here, but has issues when you strike out (just start a game with default
+				// options and wait for all strikes to occur)
+				// the tiles behind the dialog box are meant to be 16x16 2bpp and are stored near the start
+				// of the ROM (tiles 0x09 - 0x11 if viewed in the tileviewer)
+				//
+				// is this an edge case, or does early hardware act in a different way?
+
 				tile = tile * 8;
 				basereg = (tile & 0x70000) >> 16;
 				tile &= 0xffff;
@@ -969,7 +977,7 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		int zval = (attr1 & 0xf0) >> 4;
 		int flipx = (attr1 & 0x01);
-		int flipy = (attr1 & 0x02);
+		int flipy = (attr1 & 0x02); // XaviX logo on xavmusic has this set, but doesn't want it, why?
 
 		int drawheight = 16;
 		int drawwidth = 16;

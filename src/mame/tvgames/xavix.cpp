@@ -1617,6 +1617,18 @@ static const gfx_layout char16layout =
 	16*16*4
 };
 
+	
+static const gfx_layout char_16x16x2_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	2,
+	{ 0,1 },
+	{ 6,4,2,0,14,12,10,8,22,20,18,16,30,28,26,24 },
+	{ STEP16(0,16*2) },
+	16*16*2
+};
+
 static const gfx_layout charlayout8bpp =
 {
 	8,8,
@@ -1640,6 +1652,7 @@ static const gfx_layout char16layout8bpp =
 };
 
 static GFXDECODE_START( gfx_xavix )
+	GFXDECODE_ENTRY( "bios", 0, char_16x16x2_layout, 0, 64 )
 	GFXDECODE_ENTRY( "bios", 0, gfx_8x8x4_packed_lsb, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, char16layout, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, charlayout8bpp, 0, 1 )
