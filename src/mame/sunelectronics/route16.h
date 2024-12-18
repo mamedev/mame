@@ -15,15 +15,13 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cpu1(*this, "cpu1")
 		, m_cpu2(*this, "cpu2")
-		, m_sharedram(*this, "sharedram")
 		, m_videoram1(*this, "videoram1")
 		, m_videoram2(*this, "videoram2")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_key(*this, "KEY%u", 0U)
-		, m_protection_data(0)
-	{}
+	{ }
 
 	void routex(machine_config &config);
 	void jongpute(machine_config &config);
@@ -43,12 +41,10 @@ protected:
 	void out1_w(uint8_t data);
 
 private:
-	template<bool cpu1> void route16_sharedram_w(offs_t offset, uint8_t data);
-	uint8_t route16_prot_read();
-	uint8_t routex_prot_read();
-	void jongpute_input_port_matrix_w(uint8_t data);
-	uint8_t jongpute_p1_matrix_r();
-	uint8_t jongpute_p2_matrix_r();
+	uint8_t route16_prot_r();
+	uint8_t routex_prot_r();
+	void jongpute_input_w(uint8_t data);
+	template <int N> uint8_t jongpute_input_r();
 	DECLARE_MACHINE_START(jongpute);
 
 	uint32_t screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -69,14 +65,13 @@ protected:
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;
 
-	required_shared_ptr<uint8_t> m_sharedram;
 	required_shared_ptr<uint8_t> m_videoram1;
 	required_shared_ptr<uint8_t> m_videoram2;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_key;
-	uint8_t m_protection_data;
+	uint8_t m_protection_data = 0;
 
 	uint8_t m_jongpute_port_select = 0;
 	uint8_t m_flipscreen = 0;

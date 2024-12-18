@@ -196,7 +196,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device_array<dac_byte_interface, 2> m_dac;
-	required_device_array<beep_device, 4> m_beep;
+	required_device_array<beep_device, 3> m_beep;
 	required_device<tms5100_device> m_tms5100;
 	required_ioport_array<4> m_in;
 	required_ioport_array<3> m_dsw;
@@ -652,7 +652,7 @@ void cvs_state::_8_bit_dac_data_w(u8 data)
 	m_dac[0]->write(data);
 
 	// data also goes to 8038 oscillator
-	m_beep[0]->set_clock(data * 4);
+	m_beep[2]->set_clock(data * 4);
 }
 
 void cvs_state::_4_bit_dac_data_w(offs_t offset, u8 data)
@@ -677,12 +677,10 @@ void cvs_state::_4_bit_dac_data_w(offs_t offset, u8 data)
 
 void cvs_state::sh_trigger_w(offs_t offset, u8 data)
 {
-	/* offset 0 is used in darkwar, spacefrt, logger, raiders
-	 * offset 2 is used in darkwar, spacefrt, 8ball, superbik, raiders
-	 * offset 3 is used in cosmos, darkwar, superbik, raiders
-	 *
-	 * offset 1 is only used inadvertedly(?) by logger
-	 */
+	// offset 0 is used in darkwar, spacefrt, logger, dazzler, wallst, raiders
+	// offset 1 is used in logger, wallst
+	// offset 2 is used in darkwar, spacefrt, 8ball, dazzler, superbik, raiders
+	// offset 3 is used in cosmos, darkwar, superbik, raiders
 
 	data &= 1;
 
@@ -692,7 +690,10 @@ void cvs_state::sh_trigger_w(offs_t offset, u8 data)
 		m_sh_trigger[offset] = data;
 	}
 
-	m_beep[offset]->set_state(data);
+	if (offset != 1)
+		m_beep[(offset == 0) ? 2 : (offset & 1)]->set_state(data);
+	else
+		m_beep[2]->set_output_gain(0, data ? 0.5 : 1.0);
 }
 
 
@@ -1373,10 +1374,9 @@ void cvs_state::cvs(machine_config &config)
 	DAC_8BIT_R2R(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
 	DAC_4BIT_R2R(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.20); // unknown DAC
 
-	BEEP(config, m_beep[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.10); // placeholder
-	BEEP(config, m_beep[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.10); // "
-	BEEP(config, m_beep[2], 600).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
-	BEEP(config, m_beep[3], 150).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
+	BEEP(config, m_beep[0], 600).add_route(ALL_OUTPUTS, "speaker", 0.15); // placeholder
+	BEEP(config, m_beep[1], 150).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
+	BEEP(config, m_beep[2], 0).add_route(ALL_OUTPUTS, "speaker", 0.075); // "
 
 	TMS5100(config, m_tms5100, 640_kHz_XTAL);
 	m_tms5100->data().set(FUNC(cvs_state::speech_rom_read_bit));

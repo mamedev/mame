@@ -73,15 +73,15 @@ uint32_t route16_state::screen_update_route16(screen_device &screen, bitmap_rgb3
 		for (int i = 0; i < 4; i++)
 		{
 			uint8_t color1 = color_prom1[((m_palette_1 << 6) & 0x80) |
-										(m_palette_1 << 2) |
-										((data1 >> 3) & 0x02) |
-										((data1 >> 0) & 0x01)];
+					(m_palette_1 << 2) |
+					((data1 >> 3) & 0x02) |
+					((data1 >> 0) & 0x01)];
 
 			/* bit 7 of the 2nd color is the OR of the 1st color bits 0 and 1 - this is a guess */
 			uint8_t color2 = color_prom2[((m_palette_2 << 6) & 0x80) | (((color1 << 6) & 0x80) | ((color1 << 7) & 0x80)) |
-										(m_palette_2 << 2) |
-										((data2 >> 3) & 0x02) |
-										((data2 >> 0) & 0x01)];
+					(m_palette_2 << 2) |
+					((data2 >> 3) & 0x02) |
+					((data2 >> 0) & 0x01)];
 
 			/* the final color is the OR of the two colors (verified) */
 			uint8_t final_color = (color1 | color2) & 0x07;
@@ -121,14 +121,14 @@ uint32_t route16_state::screen_update_jongpute(screen_device &screen, bitmap_rgb
 		for (int i = 0; i < 4; i++)
 		{
 			uint8_t color1 = color_prom1[(m_palette_1 << 2) |
-										((data1 >> 3) & 0x02) |
-										((data1 >> 0) & 0x01)];
+					((data1 >> 3) & 0x02) |
+					((data1 >> 0) & 0x01)];
 
 			/* bit 7 of the 2nd color is the OR of the 1st color bits 0 and 1 (verified) */
 			uint8_t color2 = color_prom2[(((data1 << 3) & 0x80) | ((data1 << 7) & 0x80)) |
-										(m_palette_2 << 2) |
-										((data2 >> 3) & 0x02) |
-										((data2 >> 0) & 0x01)];
+					(m_palette_2 << 2) |
+					((data2 >> 3) & 0x02) |
+					((data2 >> 0) & 0x01)];
 
 			/* the final color is the OR of the two colors */
 			uint8_t final_color = (color1 | color2) & 0x07;
