@@ -1119,10 +1119,7 @@ void route16_state::route16(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0, 256-1);
-	m_screen->set_refresh_hz(57);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_raw(10_MHz_XTAL / 2, 320, 0, 256, 260, 8, 248);
 	m_screen->set_screen_update(FUNC(route16_state::screen_update_route16));
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
