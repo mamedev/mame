@@ -485,8 +485,11 @@ asr_abx
 	prefetch();
 
 cmc_imp
-	logerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc();
+	TMP = P & F_C;
+	P &= ~F_C;
+	TMP = ~TMP;
+	P |= TMP & F_C;
 	prefetch();
 
 sev_imp
