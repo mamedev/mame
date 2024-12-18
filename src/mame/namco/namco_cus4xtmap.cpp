@@ -5,7 +5,7 @@
     CUS42 + CUS43 Tilemaps
     used by
     baraduke.cpp (all games)
-	namcos86.cpp (all games)
+    namcos86.cpp (all games)
 */
 
 #include "emu.h"
