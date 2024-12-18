@@ -835,20 +835,23 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 			}
 			else if (alt_tileaddressing2 == 1)
 			{
-				// 8-byte alignment Addressing Mode uses a fixed offset? (like sprites)
-
-				// epo_stad reaches here, but has issues when you strike out (just start a game with default
-				// options and wait for all strikes to occur)
-				// the tiles behind the dialog box are meant to be 16x16 2bpp and are stored near the start
-				// of the ROM (tiles 0x09 - 0x11 if viewed in the tileviewer)
-				//
-				// is this an edge case, or does early hardware act in a different way?
-
-				tile = tile * 8;
-				basereg = (tile & 0x70000) >> 16;
-				tile &= 0xffff;
-				gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
-				tile += gfxbase;
+				if (tileregs[0x7] & 0x01)
+				{
+					// only epo_stad has been seen using this mode (box behind dialog after you allow multiple strikes against you)
+					basereg = (tile & 0xf000) >> 12;
+					tile = tile & 0x0fff;
+					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+					tile += gfxbase;
+				}
+				else
+				{
+					// 8-byte alignment Addressing Mode uses a fixed offset? (like sprites)
+					basereg = (tile & 0xe000) >> 13;
+					tile &= 0x1fff;
+					tile = tile * 8;
+					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+					tile += gfxbase;
+				}
 			}
 
 			// Tilemap specific mode extension with an 8-bit per tile attribute, works in all modes except 24-bit (no room for attribute) and header (not needed?)
