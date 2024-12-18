@@ -1814,7 +1814,8 @@ inline void gime_device::render_scanline(const scanline_record *scanline, pixel_
 	{
 		/* determine how many bytes exist for which the mode is identical */
 		for (x2 = x + 1; (x2 < sample_count) && (scanline->m_mode[x] == scanline->m_mode[x2]) && (scanline->m_palette[x] == scanline->m_palette[x2]); x2++)
-			;
+		{
+		}
 
 		/* resolve the palette */
 		resolved_palette = resolver->get_palette(scanline->m_palette[x]);

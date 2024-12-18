@@ -984,7 +984,8 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 			/* determine how many bytes exist for which the mode is identical */
 			int x2;
 			for (x2 = x + 1; (x2 < width) && (m_data[y].m_mode[x] == m_data[y].m_mode[x2]); x2++)
-				;
+			{
+			}
 
 			/* emit the samples */
 			pixels += emit_samples(

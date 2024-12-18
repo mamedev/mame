@@ -2218,7 +2218,7 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_tr
 		if(va != ca || vb != cb || vc != cc || h[4] != 0xde || h[5] != 0xaa)
 			sdata.clear();
 	no_data_field:
-		;
+		(void)0;
 	}
 
 	return sector_data;

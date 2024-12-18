@@ -919,7 +919,8 @@ bool menu_select_game::load_available_machines()
 		readbuf = strtrimspace(rbuf);
 
 		if (readbuf.empty() || ('#' == readbuf[0])) // ignore empty lines and line comments
-			;
+		{
+		}
 		else if ('[' == readbuf[0]) // throw out the rest of the file if we find a section heading
 			break;
 		else

@@ -347,7 +347,9 @@ bool video_bgfx::init_bgfx_library(osd_window &window)
 
 	std::string_view const backend(m_options->bgfx_backend());
 	if (backend == "auto")
-		; // do nothing
+	{
+		// do nothing
+	}
 	else if (backend == "dx9" || backend == "d3d9")
 		init.type = bgfx::RendererType::Direct3D9;
 	else if (backend == "dx11" || backend == "d3d11")

@@ -222,7 +222,8 @@ uint32_t batman_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 						// playfield priority 3 always wins
 						if (pfpriority == 3)
-							;
+						{
+						}
 
 						// priority is consistent for upper pens in playfield
 						else if (pf[x] & 0x08)
@@ -240,7 +241,8 @@ uint32_t batman_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 						// playfield priority 3 always wins
 						if (pfpriority == 3)
-							;
+						{
+						}
 
 						// otherwise, MOs get shown
 						else

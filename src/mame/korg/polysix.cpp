@@ -683,7 +683,9 @@ void polysix_state::key_p2_w(u8 data)
 		if(index < 6)
 			m_sound->set_pitch(index, m_key_bus);
 		else
-			; // TODO
+		{
+			// TODO
+		}
 	}
 
 	if(BIT(chg, 7))

@@ -728,7 +728,9 @@ void edge1_device_base::vblank(int state)
 		m_bus->irq3_w(CLEAR_LINE);
 	}
 	else
-		; // TODO: clear vblank status
+	{
+		// TODO: clear vblank status
+	}
 }
 
 u32 edge1_device_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

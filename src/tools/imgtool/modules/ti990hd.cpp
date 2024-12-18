@@ -1042,7 +1042,8 @@ static int new_file(ti99_image *image, char filename[10], int *out_fdr_secnum/*,
 		i = 1;  /* skip empty entry 0 (it must be a non-listable catalog) */
 
 	for (; (i<128) && ((fdr_secnum = image->catalog[i].fdr_secnum) != 0) && ((reply = memcmp(image->catalog[i].filename, filename, 10)) < 0); i++)
-		;
+	{
+	}
 
 	if (i == 128)
 		/* catalog is full */
@@ -1059,7 +1060,8 @@ static int new_file(ti99_image *image, char filename[10], int *out_fdr_secnum/*,
 
 		/* look for first free entry in catalog */
 		for (i=catalog_index; image->catalog[i].fdr_secnum != 0; i++)
-			;
+		{
+		}
 
 		if (i == 128)
 			/* catalog is full */

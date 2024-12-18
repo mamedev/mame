@@ -647,7 +647,8 @@ void midzeus_state::tms32032_control_w(offs_t offset, uint32_t data, uint32_t me
 
 	// ignore changes to the memory control register
 	if (offset == 0x64)
-		;
+	{
+	}
 
 	// watch for accesses to the timers
 	else if (offset == 0x20 || offset == 0x30)

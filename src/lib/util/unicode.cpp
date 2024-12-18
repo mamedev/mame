@@ -544,7 +544,8 @@ char32_t uchar_tolower(char32_t ch)
 const char *utf8_previous_char(const char *utf8string)
 {
 	while ((*--utf8string & 0xc0) == 0x80)
-		;
+	{
+	}
 	return utf8string;
 }
 

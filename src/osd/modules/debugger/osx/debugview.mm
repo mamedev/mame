@@ -858,7 +858,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 						return;
 					}
 				default:
-					;
+					(void)0;
 			}
 			[super keyDown:event];
 			return;

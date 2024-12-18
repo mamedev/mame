@@ -647,7 +647,7 @@ macro   nsc800_take_interrupt
 		PC = 0x002c;
 	} else {
 		+ 2 * m_memrq_cycles
-		;
+		(void)0;
 	}
 	WZ = PC;
 	#if HAS_LDAIR_QUIRK
@@ -8690,7 +8690,7 @@ macro   ldix
 		if (TDAT8 != A) {
 			TADR = DE;
 			call wm
-			;
+			(void)0;
 		}
 		HL++;
 		DE++;
@@ -8704,7 +8704,7 @@ macro   lddx
 		if (TDAT8 != A) {
 			TADR = DE;
 			call wm
-			;
+			(void)0;
 		}
 		DE++;
 		HL--;
@@ -8829,7 +8829,7 @@ z80n:edb7	# ldpirx
 	if (TDAT8 != A) {
 		TADR = DE;
 		call wm
-		;
+		(void)0;
 	}
 	DE++;
 	BC--;

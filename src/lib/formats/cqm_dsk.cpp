@@ -343,7 +343,8 @@ bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	int ssize;
 	for(ssize=0; (128 << ssize) < sector_size; ssize++)
-		;
+	{
+	}
 
 	desc_pc_sector sects[256];
 	for(int track = 0, pos = 0; track < tracks; track++)

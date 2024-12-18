@@ -789,7 +789,7 @@ void lk201_device::send_port(uint8_t offset, uint8_t olddata)
 					m_speaker->set_output_gain(0, (100 - (12 * 7)) / 100.0f);
 					break;
 				default:
-					;
+					break;
 			} // switch (volume)
 
 		} // if (update_strobe)

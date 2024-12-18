@@ -1555,7 +1555,7 @@ void model1_state::tgp_scan()
 			}
 		}
 	end:
-		;
+		(void)0;
 	}
 	m_render_done = 0;
 }

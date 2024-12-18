@@ -1426,7 +1426,8 @@ void tx0_state::tx0_keyboard()
 		if (typewriter_transitions)
 		{
 			for (j=0; (((typewriter_transitions >> j) & 1) == 0) /*&& (j<16)*/; j++)
-				;
+			{
+			}
 			charcode = (i << 4) + j;
 			/* shuffle and insert data into LR */
 			lr = (1 << 17) | (charcode << 11) | m_maincpu->state_int(TX0_LR);

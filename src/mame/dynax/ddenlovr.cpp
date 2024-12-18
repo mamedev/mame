@@ -1306,11 +1306,11 @@ void ddenlovr_state::blitter_w(int blitter, offs_t offset, uint8_t data)
 							break;
 
 				default:
-							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x", data);
 					logerror("%06x: unknown blitter command %02x\n", m_maincpu->pc(), data);
 				#endif
+							break;
 			}
 
 			m_blitter_irq_handler(0);
@@ -1461,11 +1461,11 @@ void ddenlovr_state::blitter_w_funkyfig(int blitter, offs_t offset, uint8_t data
 							break;
 
 				default:
-							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x", data);
 					logerror("%s: unknown blitter command %02x\n", machine().describe_context(), data);
 				#endif
+							break;
 			}
 
 			m_blitter_irq_handler(0);
@@ -1658,11 +1658,11 @@ void hanakanz_state::hanakanz_blitter_data_w(uint8_t data)
 							break;
 
 				default:
-							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x", data);
 					logerror("%06x: unknown blitter command %02x\n", m_maincpu->pc(), data);
 				#endif
+							break;
 			}
 
 			// NO IRQ !?

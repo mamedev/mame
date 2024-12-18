@@ -367,7 +367,7 @@ bool wd177x_format::save(util::random_read_write &io, const std::vector<uint32_t
 		change:
 			chosen_candidate = candidates[i];
 		dont_change:
-			;
+			(void)0;
 		}
 		// We have a winner, bail out
 		break;
@@ -496,7 +496,7 @@ void wd177x_format::check_compatibility(const floppy_image &image, std::vector<i
 		}
 		*ok_cands++ = candidates[i];
 	fail:
-		;
+		(void)0;
 	}
 	candidates.resize(ok_cands - &candidates[0]);
 }

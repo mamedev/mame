@@ -1844,7 +1844,8 @@ static int dsk_read_catalog(struct ti99_lvl2_imgref *l2_img, int aphysrec, ti99_
 
 	/* Set file count */
 	for (i=0; (i<128) && (dest->files[i].fdr_ptr != 0); i++)
-		;
+	{
+	}
 	dest->num_files = i;
 
 	/* Set subdir count to 0 (subdirs are loaded elsewhere) */
@@ -2654,7 +2655,8 @@ static int win_alloc_file_physrecs(ti99_lvl2_fileref_win *win_file, int nb_alloc
 
 	/* find last non-empty cluster */
 	for (cluster_index=0; (cluster_index<54) && (get_UINT16BE(win_file->curfdr.clusters[cluster_index][0]) != 0); cluster_index++)
-		;
+	{
+	}
 	/* if we are dealing with an empty file, we will have (cluster_index == 0)... */
 	if (cluster_index != 0)
 	{
@@ -2820,7 +2822,8 @@ static int new_file_lvl2_dsk(struct ti99_lvl2_imgref *l2_img, int parent_ref, ch
 
 	/* find insertion point in catalog */
 	for (i=0; (i < catalog->num_files) && ((reply = memcmp(catalog->files[i].name, filename, 10)) < 0); i++)
-		;
+	{
+	}
 
 	if ((i<catalog->num_files) && (reply == 0))
 		/* file already exists */
@@ -2873,7 +2876,8 @@ static int new_file_lvl2_win(struct ti99_lvl2_imgref *l2_img, ti99_catalog *pare
 
 	/* find insertion point in catalog */
 	for (i=0; (i < parent_catalog->num_files) && ((reply = memcmp(parent_catalog->files[i].name, filename, 10)) < 0); i++)
-		;
+	{
+	}
 
 	if ((i<parent_catalog->num_files) && (reply == 0))
 		/* file already exists */
@@ -4019,7 +4023,8 @@ static imgtoolerr_t dsk_image_init(imgtool::image &img, imgtool::stream::ptr &&s
 	image->AUformat.physrecsperAU = (totphysrecs + 1599) / 1600;
 	/* round to next larger power of 2 */
 	for (i = 1; i < image->AUformat.physrecsperAU; i <<= 1)
-		;
+	{
+	}
 	image->AUformat.physrecsperAU = i;
 	image->AUformat.totAUs = totphysrecs / image->AUformat.physrecsperAU;
 
@@ -5257,7 +5262,8 @@ static imgtoolerr_t dsk_image_create(imgtool::image &image, imgtool::stream::ptr
 	physrecsperAU = (totphysrecs + 1599) / 1600;
 	/* round to next larger power of 2 */
 	for (i = 1; i < physrecsperAU; i <<= 1)
-		;
+	{
+	}
 	physrecsperAU = i;
 	totAUs = totphysrecs / physrecsperAU;
 

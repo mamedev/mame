@@ -460,7 +460,8 @@ void pdp1_device::field_interrupt()
 	{
 		m_sbs_request = 1;
 		for (i=0; /*i<16 &&*/ (! ((current_irq >> i) & 1)); i++)
-			;
+		{
+		}
 		m_sbs_level = i;
 	}
 	else

@@ -3393,7 +3393,9 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 				UML_SHR(block, XERSO32, R32(G_RS(op)), 31);                         // shr     [xerso],rs,31
 			}
 			else if (spr == SPROEA_PVR)
-				;                                                                           // read only
+			{
+			                                                                        // read only
+			}
 			else
 			{
 				generate_update_cycles(block, compiler, desc->pc, false);           // <update cycles>

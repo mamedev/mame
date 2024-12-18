@@ -7,8 +7,7 @@ uint8_t minx_cpu_device::ADD8( uint8_t arg1, uint8_t arg2 )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( ( arg2 ^ arg1 ^ 0x80 ) & ( arg2 ^ res ) & 0x80 ) ? FLAG_O : 0 )
 		| ( ( res & 0xFF00 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFF;
 }
 
@@ -20,8 +19,7 @@ uint16_t minx_cpu_device::ADD16( uint16_t arg1, uint16_t arg2 )
 		| ( ( res & 0x8000 ) ? FLAG_S : 0 )
 		| ( ( ( arg2 ^ arg1 ^ 0x8000 ) & ( arg2 ^ res ) & 0x8000 ) ? FLAG_O : 0 )
 		| ( ( res & 0xFF0000 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFFFF;
 }
 
@@ -33,8 +31,7 @@ uint8_t minx_cpu_device::ADDC8( uint8_t arg1, uint8_t arg2 )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( ( arg2 ^ arg1 ^ 0x80 ) & ( arg2 ^ res ) & 0x80 ) ? FLAG_O : 0 )
 		| ( ( res & 0xFF00 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFF;
 }
 
@@ -46,8 +43,7 @@ uint16_t minx_cpu_device::ADDC16( uint16_t arg1, uint16_t arg2 )
 		| ( ( res & 0x8000 ) ? FLAG_S : 0 )
 		| ( ( ( arg2 ^ arg1 ^ 0x8000 ) & ( arg2 ^ res ) & 0x8000 ) ? FLAG_O : 0 )
 		| ( ( res & 0xFF0000 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFFFF;
 }
 
@@ -57,8 +53,7 @@ uint8_t minx_cpu_device::INC8( uint8_t arg )
 	uint8_t old_F = m_F;
 	uint8_t res = ADD8( arg, 1 );
 	m_F = ( old_F & ~ ( FLAG_Z ) )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res;
 }
 
@@ -68,8 +63,7 @@ uint16_t minx_cpu_device::INC16( uint16_t arg )
 	uint8_t old_F = m_F;
 	uint16_t res = ADD16( arg, 1 );
 	m_F = ( old_F & ~ ( FLAG_Z ) )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res;
 }
 
@@ -81,8 +75,7 @@ uint8_t minx_cpu_device::SUB8( uint8_t arg1, uint8_t arg2 )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( ( arg2 ^ arg1 ) & ( arg1 ^ res ) & 0x80 ) ? FLAG_O : 0 )
 		| ( ( res & 0xFF00 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFF;
 }
 
@@ -94,8 +87,7 @@ uint16_t minx_cpu_device::SUB16( uint16_t arg1, uint16_t arg2 )
 		| ( ( res & 0x8000 ) ? FLAG_S : 0 )
 		| ( ( ( arg2 ^ arg1 ) & ( arg1 ^ res ) & 0x8000 ) ? FLAG_O : 0 )
 		| ( ( res & 0xFF0000 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFFFF;
 }
 
@@ -107,8 +99,7 @@ uint8_t minx_cpu_device::SUBC8( uint8_t arg1, uint8_t arg2 )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( ( arg2 ^ arg1 ) & ( arg1 ^ res ) & 0x80 ) ? FLAG_O : 0 )
 		| ( ( res & 0xFF00 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFF;
 }
 
@@ -120,8 +111,7 @@ uint16_t minx_cpu_device::SUBC16( uint16_t arg1, uint16_t arg2 )
 		| ( ( res & 0x8000 ) ? FLAG_S : 0 )
 		| ( ( ( arg2 ^ arg1 ) & ( arg1 ^ res ) & 0x8000 ) ? FLAG_O : 0 )
 		| ( ( res & 0xFF0000 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFFFF;
 }
 
@@ -131,8 +121,7 @@ uint8_t minx_cpu_device::DEC8( uint8_t arg )
 	uint8_t old_F = m_F;
 	uint8_t res = SUB8( arg, 1 );
 	m_F = ( old_F & ~ ( FLAG_Z ) )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res;
 }
 
@@ -142,8 +131,7 @@ uint16_t minx_cpu_device::DEC16( uint16_t arg )
 	uint8_t old_F = m_F;
 	uint16_t res = SUB16( arg, 1 );
 	m_F = ( old_F & ~ ( FLAG_Z ) )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res;
 }
 
@@ -153,8 +141,7 @@ uint8_t minx_cpu_device::AND8( uint8_t arg1, uint8_t arg2 )
 	uint8_t res = arg1 & arg2;
 	m_F = ( m_F & ~ ( FLAG_S | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res;
 }
 
@@ -164,8 +151,7 @@ uint8_t minx_cpu_device::OR8( uint8_t arg1, uint8_t arg2 )
 	uint8_t res = arg1 | arg2;
 	m_F = ( m_F & ~ ( FLAG_S | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res;
 }
 
@@ -175,8 +161,7 @@ uint8_t minx_cpu_device::XOR8( uint8_t arg1, uint8_t arg2 )
 	uint8_t res = arg1 ^ arg2;
 	m_F = ( m_F & ~ ( FLAG_S | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res;
 }
 
@@ -186,8 +171,7 @@ uint8_t minx_cpu_device::NOT8( uint8_t arg )
 	uint8_t res = ~arg;
 	m_F = ( m_F & ~ ( FLAG_S | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res;
 }
 
@@ -197,8 +181,7 @@ uint8_t minx_cpu_device::NEG8( uint8_t arg )
 	uint8_t res = -arg;
 	m_F = ( m_F & ~ ( FLAG_S | FLAG_O | FLAG_C | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res;
 }
 
@@ -210,8 +193,7 @@ uint8_t minx_cpu_device::SAL8( uint8_t arg )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( arg != 0 && res == 0 ) ? FLAG_O : 0 )
 		| ( ( arg & 0x80 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res;
 }
 
@@ -223,8 +205,7 @@ uint8_t minx_cpu_device::SAR8( uint8_t arg )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( arg != 0x80 && res == 0x80 ) ? FLAG_O : 0 )
 		| ( ( arg & 0x01 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFF;
 }
 
@@ -235,8 +216,7 @@ uint8_t minx_cpu_device::SHL8( uint8_t arg )
 	m_F = ( m_F & ~ ( FLAG_S | FLAG_C | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( arg & 0x80 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res;
 }
 
@@ -247,8 +227,7 @@ uint8_t minx_cpu_device::SHR8( uint8_t arg )
 	m_F = ( m_F & ~ ( FLAG_S | FLAG_C | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( arg & 0x01 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFF;
 }
 
@@ -259,8 +238,7 @@ uint8_t minx_cpu_device::ROLC8( uint8_t arg )
 	m_F = ( m_F & ~ ( FLAG_S | FLAG_C | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( arg & 0x80 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFF;
 }
 
@@ -271,8 +249,7 @@ uint8_t minx_cpu_device::RORC8( uint8_t arg )
 	m_F = ( m_F & ~ ( FLAG_S | FLAG_C | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( arg & 0x01 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFF;
 }
 
@@ -283,8 +260,7 @@ uint8_t minx_cpu_device::ROL8( uint8_t arg )
 	m_F = ( m_F & ~ ( FLAG_S | FLAG_C | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( arg & 0x80 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFF;
 }
 
@@ -295,8 +271,7 @@ uint8_t minx_cpu_device::ROR8( uint8_t arg )
 	m_F = ( m_F & ~ ( FLAG_S | FLAG_C | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( arg & 0x01 ) ? FLAG_C : 0 )
-		| ( ( res ) ? 0 : FLAG_Z )
-	;
+		| ( ( res ) ? 0 : FLAG_Z );
 	return res & 0xFF;
 }
 

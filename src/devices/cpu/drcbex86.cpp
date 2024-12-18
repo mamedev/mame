@@ -1063,13 +1063,15 @@ void drcbe_x86::emit_mov_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	if (param.is_immediate())
 	{
 		if (!reglo.isValid())
-			;
+		{
+		}
 		else if (u32(param.immediate()) == 0)
 			a.xor_(reglo, reglo);                                                       // xor   reglo,reglo
 		else
 			a.mov(reglo, param.immediate());                                            // mov   reglo,param
 		if (!reghi.isValid())
-			;
+		{
+		}
 		else if (u32(param.immediate() >> 32) == 0)
 			a.xor_(reghi, reghi);                                                       // xor   reghi,reghi
 		else
@@ -1204,14 +1206,18 @@ void drcbe_x86::emit_and_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	else if (param.is_immediate())
 	{
 		if (!inst.flags() && u32(param.immediate()) == 0xffffffffU)
-			;// skip
+		{
+			// skip
+		}
 		else if (!inst.flags() && u32(param.immediate()) == 0)
 			a.xor_(reglo, reglo);                                                       // xor   reglo,reglo
 		else
 			a.and_(reglo, param.immediate());                                           // and   reglo,param
 		if (saveflags) a.pushfd();                                                      // pushf
 		if (!inst.flags() && u32(param.immediate() >> 32) == 0xffffffffU)
-			;// skip
+		{
+			// skip
+		}
 		else if (!inst.flags() && u32(param.immediate() >> 32) == 0)
 			a.xor_(reghi, reghi);                                                       // xor   reghi,reghi
 		else
@@ -1239,14 +1245,18 @@ void drcbe_x86::emit_and_m64_p64(Assembler &a, Mem const &memref_lo, Mem const &
 	if (param.is_immediate())
 	{
 		if (!inst.flags() && u32(param.immediate()) == 0xffffffffU)
-			;// skip
+		{
+			// skip
+		}
 		else if (!inst.flags() && u32(param.immediate()) == 0)
 			a.mov(memref_lo, 0);                                                        // mov   [dest],0
 		else
 			a.and_(memref_lo, param.immediate());                                       // and   [dest],param
 		if (saveflags) a.pushfd();                                                      // pushf
 		if (!inst.flags() && u32(param.immediate() >> 32) == 0xffffffffU)
-			;// skip
+		{
+			// skip
+		}
 		else if (!inst.flags() && u32(param.immediate() >> 32) == 0)
 			a.mov(memref_hi, 0);                                                        // mov   [dest+4],0
 		else
@@ -1282,14 +1292,18 @@ void drcbe_x86::emit_or_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi, 
 	else if (param.is_immediate())
 	{
 		if (!inst.flags() && u32(param.immediate()) == 0)
-			;// skip
+		{
+			// skip
+		}
 		else if (!inst.flags() && u32(param.immediate()) == 0xffffffffU)
 			a.mov(reglo, ~0);                                                           // mov   reglo,-1
 		else
 			a.or_(reglo, param.immediate());                                            // or    reglo,param
 		if (saveflags) a.pushfd();                                                      // pushf
 		if (!inst.flags() && u32(param.immediate() >> 32) == 0)
-			;// skip
+		{
+			// skip
+		}
 		else if (!inst.flags() && u32(param.immediate() >> 32) == 0xffffffffU)
 			a.mov(reghi, ~0);                                                           // mov   reghi,-1
 		else
@@ -1317,14 +1331,18 @@ void drcbe_x86::emit_or_m64_p64(Assembler &a, Mem const &memref_lo, Mem const &m
 	if (param.is_immediate())
 	{
 		if (!inst.flags() && u32(param.immediate()) == 0)
-			;// skip
+		{
+			// skip
+		}
 		else if (!inst.flags() && u32(param.immediate()) == 0xffffffffU)
 			a.mov(memref_lo, ~0);                                                       // mov   [dest],-1
 		else
 			a.or_(memref_lo, param.immediate());                                        // or    [dest],param
 		if (saveflags) a.pushfd();                                                      // pushf
 		if (!inst.flags() && u32(param.immediate() >> 32) == 0)
-			;// skip
+		{
+			// skip
+		}
 		else if (!inst.flags() && u32(param.immediate() >> 32) == 0xffffffffU)
 			a.mov(memref_hi, ~0);                                                       // mov   [dest+4],-1
 		else
@@ -1360,14 +1378,18 @@ void drcbe_x86::emit_xor_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	else if (param.is_immediate())
 	{
 		if (!inst.flags() && u32(param.immediate()) == 0)
-			;// skip
+		{
+			// skip
+		}
 		else if (!inst.flags() && u32(param.immediate()) == 0xffffffffU)
 			a.not_(reglo);                                                              // not   reglo
 		else
 			a.xor_(reglo, param.immediate());                                           // xor   reglo,param
 		if (saveflags) a.pushfd();                                                      // pushf
 		if (!inst.flags() && u32(param.immediate() >> 32) == 0)
-			;// skip
+		{
+			// skip
+		}
 		else if (!inst.flags() && u32(param.immediate() >> 32) == 0xffffffffU)
 			a.not_(reghi);                                                              // not   reghi
 		else
@@ -1395,14 +1417,18 @@ void drcbe_x86::emit_xor_m64_p64(Assembler &a, Mem const &memref_lo, Mem const &
 	if (param.is_immediate())
 	{
 		if (!inst.flags() && u32(param.immediate()) == 0)
-			;// skip
+		{
+			// skip
+		}
 		else if (!inst.flags() && u32(param.immediate()) == 0xffffffffU)
 			a.not_(memref_lo);                                                          // not   [dest]
 		else
 			a.xor_(memref_lo, param.immediate());                                       // xor   [dest],param
 		if (saveflags) a.pushfd();                                                      // pushf
 		if (!inst.flags() && u32(param.immediate() >> 32) == 0)
-			;// skip
+		{
+			// skip
+		}
 		else if (!inst.flags() && u32(param.immediate() >> 32) == 0xffffffffU)
 			a.not_(memref_hi);                                                          // not   [dest+4]
 		else
@@ -1433,7 +1459,9 @@ void drcbe_x86::emit_shl_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	{
 		int count = param.immediate() & 63;
 		if (!inst.flags() && count == 0)
-			;// skip
+		{
+			// skip
+		}
 		else
 		{
 			while (count >= 32)
@@ -1507,7 +1535,9 @@ void drcbe_x86::emit_shr_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	{
 		int count = param.immediate() & 63;
 		if (!inst.flags() && count == 0)
-			;// skip
+		{
+			// skip
+		}
 		else
 		{
 			while (count >= 32)
@@ -1581,7 +1611,9 @@ void drcbe_x86::emit_sar_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	{
 		int count = param.immediate() & 63;
 		if (!inst.flags() && count == 0)
-			;// skip
+		{
+			// skip
+		}
 		else
 		{
 			while (count >= 32)
@@ -1655,7 +1687,9 @@ void drcbe_x86::emit_rol_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	{
 		int count = param.immediate() & 63;
 		if (!inst.flags() && count == 0)
-			;// skip
+		{
+			// skip
+		}
 		else
 		{
 			while (count >= 32)
@@ -1732,7 +1766,9 @@ void drcbe_x86::emit_ror_r64_p64(Assembler &a, Gp const &reglo, Gp const &reghi,
 	{
 		int count = param.immediate() & 63;
 		if (!inst.flags() && count == 0)
-			;// skip
+		{
+			// skip
+		}
 		else
 		{
 			while (count >= 32)
@@ -3616,7 +3652,9 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 		if (inst.flags() == FLAG_Z)
 			a.or_(eax, edx);                                                            // or    eax,edx
 		else if (inst.flags() == FLAG_S)
-			;// do nothing -- final OR will have the right result
+		{
+			// do nothing -- final OR will have the right result
+		}
 		else if (inst.flags() == (FLAG_Z | FLAG_S))
 		{
 			a.movzx(ecx, ax);                                                           // movzx ecx,ax

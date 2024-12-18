@@ -445,7 +445,7 @@ void screen_device::svg_renderer::rebuild_cache()
 			}
 			doing.push_back(key);
 		conflict:
-			;
+			(void)0;
 		}
 		for(int key : doing)
 			state[key] = true;
@@ -499,7 +499,7 @@ void screen_device::svg_renderer::rebuild_cache()
 				}
 				doing.push_back(key);
 			conflict2:
-				;
+				(void)0;
 			}
 			for(int key : doing)
 				for(int akey : keys[key])

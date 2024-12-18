@@ -481,7 +481,6 @@ int xa_dasm::handle_adds_movs(XA_DASM_PARAMS, int which)
 		int rd = (op2 & 0xf0) >> 4;
 		const char** regnames = size ? m_regnames16 : m_regnames8;
 		util::stream_format(stream, "%s%s %s, %s", m_addsmovs[which], size ? ".w" : ".b", regnames[rd], show_expanded_data4(data4, size)); // last is not m_regnames8
-		;
 		return 2;
 	}
 

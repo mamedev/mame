@@ -3118,7 +3118,6 @@ void m2_te_device::walk_span(uint32_t wrange, bool omit_right,
 #if 1 // DEBUG
 		if (sx == 320/2 && sy == 200)
 		{
-			;
 		}
 #endif
 

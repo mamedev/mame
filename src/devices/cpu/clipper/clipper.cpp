@@ -1996,7 +1996,9 @@ void clipper_c400_device::execute_instruction()
 	case 0xbc:
 		// waitd:
 		if (!SSW(U))
-			; // TODO: don't know what this instruction does
+		{
+			// TODO: don't know what this instruction does
+		}
 		else
 			m_exception = EXCEPTION_PRIVILEGED_INSTRUCTION;
 		break;

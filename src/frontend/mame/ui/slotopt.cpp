@@ -103,7 +103,8 @@ void menu_slot_devices::set_slot_device(device_slot_interface &slot, std::string
 
 	// refresh any options that we might have annotated earlier
 	while (try_refresh_current_options())
-		;
+	{
+	}
 
 	// changing the options may result in options changing; we need to reset
 	reset(reset_options::REMEMBER_POSITION);

@@ -716,9 +716,13 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 
 	case 0x1b:
 		if (data & 0x80)
-			; // RESET
+		{
+			// RESET
+		}
 		if (data & 0x40)
-			; // AEN
+		{
+			// AEN
+		}
 		m_isa_addr_ext = data & 0x3f;
 		break;
 

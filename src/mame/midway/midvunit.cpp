@@ -296,7 +296,9 @@ void midvunit_base_state::tms32031_control_w(offs_t offset, uint32_t data, uint3
 
 
 	if (offset == 0x64)
-		; // ignore changes to the memory control register
+	{
+		// ignore changes to the memory control register
+	}
 	else if (offset == 0x20 || offset == 0x30)
 	{
 		// watch for accesses to the timers

@@ -721,7 +721,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 						dest++, sourcex += dx;
 				}
 			next4:
-				;
+				(void)0;
 			}
 		}
 	}
@@ -900,7 +900,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 						dest--, sourcex += dx;
 				}
 			next4:
-				;
+				(void)0;
 			}
 		}
 	}

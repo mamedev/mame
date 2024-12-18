@@ -196,8 +196,7 @@ void apollo_graphics_15i::bt458::write(uint8_t data, uint8_t c10)
 		}
 		break;
 	default:
-		MLOG1(("bt458::write: writing unexpected Bt458 data=%02x C1,C0=%d", data, c10))
-		;
+		MLOG1(("bt458::write: writing unexpected Bt458 data=%02x C1,C0=%d", data, c10));
 		break;
 	}
 }
@@ -1144,8 +1143,7 @@ void apollo_graphics_15i::apollo_mem_w(offs_t offset, uint16_t data, uint16_t me
 		break;
 
 	default:
-		MLOG(("writing Graphics Memory - unexpected cr0 mode %d", CR0_MODE(m_cr0)))
-		;
+		MLOG(("writing Graphics Memory - unexpected cr0 mode %d", CR0_MODE(m_cr0)));
 		break;
 	}
 	m_update_flag = 1;

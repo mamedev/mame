@@ -220,7 +220,8 @@ static int os9_interpret_dirent(void *entry, char **filename, uint32_t *lsn, int
 	}
 
 	for (i = 0; (i < 28) && !(entry_b[i] & 0x80); i++)
-		;
+	{
+	}
 	entry_b[i] &= 0x7F;
 	entry_b[i+1] = '\0';
 

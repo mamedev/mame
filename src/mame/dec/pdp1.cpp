@@ -1516,7 +1516,8 @@ void pdp1_typewriter_device::pdp1_keyboard()
 		if (typewriter_transitions)
 		{
 			for (j=0; (((typewriter_transitions >> j) & 1) == 0) /*&& (j<16)*/; j++)
-				;
+			{
+			}
 			m_tb = (i << 4) + j;
 			m_st_tyi(1);
 			m_maincpu->set_state_int(PDP1_PF1, 1);

@@ -2187,7 +2187,9 @@ void nv2a_renderer::render_register_combiners(int32_t scanline, const nv2a_raste
 				combiner_argb8_float(a8r8g8b8, colorf[n + 2]);
 			}
 			else if (texture[n].mode == 4)
-				; // nothing
+			{
+				// nothing
+			}
 			else
 				combiner_argb8_float(0xff000000, colorf[n + 2]);
 		}

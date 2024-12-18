@@ -1431,7 +1431,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 			}
 
 		default:
-			; // fall through
+			(void)0; // fall through
 		}
 		[[fallthrough]];
 

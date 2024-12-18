@@ -742,7 +742,8 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 
 	// <dipswitch>
 	else if (strcmp(tagname, "dipswitch") == 0)
-		;
+	{
+	}
 	else
 		unknown_tag(tagname);
 }
@@ -858,7 +859,8 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 
 	// <dipvalue>
 	else if (strcmp(tagname, "dipvalue") == 0)
-		;
+	{
+	}
 	else
 		unknown_tag(tagname);
 }

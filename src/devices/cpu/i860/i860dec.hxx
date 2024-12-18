@@ -4638,7 +4638,9 @@ void debugger (i860s *cpustate)
 		else if (buf[0] == 's')
 			m_single_stepping = 1;
 		else if (buf[0] == 'l')
-			; //m_pc = elf_load(buf + 1);
+		{
+			//m_pc = elf_load(buf + 1);
+		}
 		else if (buf[0] == 'd' && buf[1] == 'b')
 		{
 			if (buf[2] == '0')
@@ -4658,7 +4660,7 @@ void debugger (i860s *cpustate)
 		}
 		else if (buf[0] == 'B')
 		{
-			;//m_pc = elf_load("bins/bsd");
+			//m_pc = elf_load("bins/bsd");
 			break;
 		}
 		else if (buf[0] == '?')
