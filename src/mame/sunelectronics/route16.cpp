@@ -923,7 +923,7 @@ void speakres_state::stratvox(machine_config &config)
 	m_cpu2->set_addrmap(AS_PROGRAM, &speakres_state::stratvox_cpu2_map);
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(speakres_state::screen_update_jongpute));
+	m_screen->set_screen_update(FUNC(speakres_state::screen_update_stratvox));
 
 	/* sound hardware */
 	subdevice<ay8910_device>("ay8910")->port_a_write_callback().set(FUNC(speakres_state::stratvox_sn76477_w)); // SN76477 commands (SN76477 not populated on Route 16 PCB)
@@ -974,7 +974,7 @@ void route16_state::jongpute(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(route16_state, jongpute)
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(route16_state::screen_update_jongpute));
+	m_screen->set_screen_update(FUNC(route16_state::screen_update_stratvox));
 
 	PALETTE(config.replace(), m_palette, palette_device::BGR_3BIT);
 }
