@@ -16,10 +16,8 @@ TODO:
   This worked fine in an older version of MAME since maincpu was twice slower.
 - diggerc loses speech sound effects (walking, digging) after killing an enemy.
 - Emulate protection properly in later games (reads area 0x73fx).
-- The board has discrete sound circuits, see sh_trigger_w: 0x1884 enables an
-  8038CCJD, 0x1885 connects to it too. 0x1886 produces a high-pitched whistle,
-  and 0x1887 produces a low thud sound. The current implementation with the
-  beeper devices is wrong, but better than nothing.
+- The board has discrete sound circuits, see sh_trigger_w, current implementation
+  with the beeper devices is wrong, but better than nothing.
 - Improve starfield: density, blink rate, x repeat of 240, and the checkerboard
   pattern (fast forward MAME to see) are all correct, the RNG is not right?
 
@@ -677,12 +675,13 @@ void cvs_state::_4_bit_dac_data_w(offs_t offset, u8 data)
 
 void cvs_state::sh_trigger_w(offs_t offset, u8 data)
 {
-	// offset 0 is used in darkwar, spacefrt, logger, dazzler, wallst, raiders
-	// offset 1 is used in logger, wallst
-	// offset 2 is used in darkwar, spacefrt, 8ball, dazzler, superbik, raiders
-	// offset 3 is used in cosmos, darkwar, superbik, raiders
+	/* Discrete sound hardware triggers:
 
-	/**********
+	offset 0 is used in darkwar, spacefrt, logger, dazzler, wallst, raiders
+	offset 1 is used in logger, wallst
+	offset 2 is used in darkwar, spacefrt, 8ball, dazzler, superbik, raiders
+	offset 3 is used in cosmos, darkwar, superbik, raiders
+
 	Additional notes from poking the CVS sound hardware with an
 	In Circuit Emulator from PrSwan (Paul Swan).
 	I have recordings available.
@@ -695,11 +694,10 @@ void cvs_state::sh_trigger_w(offs_t offset, u8 data)
 			0x55,0xAA,0xFF - increasing value has higher frequency
 	- 0x1885 - A scope showed this halving the XP8038 amplitude with a little decay.
 		Causes 4016 pin 11 to rise (on) and decay-fall (off)
-	- 0x1886 - Mikes comment above about a high pitched whistle didn't match my PCBs. His was faulty?
-		Outputs a complete Galaxia-style ship fire sound, with attack-to-on and decay-to-off.
+	- 0x1886 - Outputs a complete Galaxia-style ship fire sound, with attack-to-on and decay-to-off.
 	- 0x1887 - Reflected on an LM380.
 		Causes an envelope-like operation on the XP8038 tone with attack (on) and decay (off).
-	***********/
+	*/
 
 	data &= 1;
 

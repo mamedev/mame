@@ -4,8 +4,8 @@
 
 Driver by Zsolt Vasvari
 
-Notes
------
+Notes / TODO:
+-------------
 
 Route 16:
 - Route 16 doesn't have the SN76477 chip. There is space on the PCB
@@ -27,6 +27,14 @@ Stratovox:
   pots on the PCB. One for music, one for speech and a master volume.
 
 Space Echo:
+- Speech doesn't work at all, is it an old regression?
+
+- Interrupts per frame for cpu2 is a best guess based on how stratvox uses the DAC,
+  writing up to 195 times per frame with each byte from the ROM written 4 times.
+  spacecho writes one byte per interrupt so 195/4 or 48 is used. a lower number
+  increases the chance of a sound interrupting itself, which for most sounds
+  is buggy and causes the game to freeze until the first sound completes.
+
 - When all astronauts are taken the game over tune ends with 5 bad notes,
   this appears to be a bug in the ROM from a changed instruction at 2EB3.
 
@@ -37,12 +45,6 @@ Space Echo:
 - The game hangs if it doesn't pass the startup test, a best guess is implemented
   rather than patching out the test. code for the same test is in stratvox but
   isn't called, speakres has a very similar test but doesn't care about the result.
-
-- Interrupts per frame for cpu1 is a best guess based on how stratvox uses the DAC,
-  writing up to 195 times per frame with each byte from the ROM written 4 times.
-  spacecho writes one byte per interrupt so 195/4 or 48 is used. a lower number
-  increases the chance of a sound interrupting itself, which for most sounds
-  is buggy and causes the game to freeze until the first sound completes.
 
 vscompmj:
 - Stuck notes (constant tone) in-game after the mahjong tiles are laid down.
@@ -1681,10 +1683,10 @@ GAME( 1980, speakresb, speakres, speakres, speakres, speakres_state, empty_init,
 GAME( 1980, stratvox,  speakres, stratvox, stratvox, speakres_state, empty_init,    ROT270, "Sun Electronics (Taito license)",  "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, stratvoxa, speakres, stratvox, stratvox, speakres_state, empty_init,    ROT270, "Sun Electronics (Taito license)",  "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, stratvoxb, speakres, stratvox, stratvox, speakres_state, empty_init,    ROT270, "bootleg",                          "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho,  speakres, spacecho, spacecho, speakres_state, empty_init,    ROT270, "bootleg (Gayton Games)",           "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho2, speakres, spacecho, spacecho, speakres_state, empty_init,    ROT270, "bootleg (Gayton Games)",           "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho,  speakres, spacecho, spacecho, speakres_state, empty_init,    ROT270, "bootleg (Gayton Games)",           "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1980, spacecho2, speakres, spacecho, spacecho, speakres_state, empty_init,    ROT270, "bootleg (Gayton Games)",           "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1980, speakhlp,  speakres, spacecho, spacecho, speakres_state, empty_init,    ROT270, "bootleg",                          "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, jongpute,  0,        jongpute, jongpute, jongpute_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )  // sampling voice is not emulated, bug with colors makes tile recognition difficult
+GAME( 1981, jongpute,  0,        jongpute, jongpute, jongpute_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // sampling voice is not emulated, bug with colors makes tile recognition difficult
 GAME( 1981, ttmahjng,  jongpute, jongpute, jongpute, jongpute_state, empty_init,    ROT0,   "Alpha Denshi Co. (Taito license)", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, vscompmj,  jongpute, vscompmj, jongpute, jongpute_state, init_vscompmj, ROT0,   "Nichibutsu",                       "VS Computer Mahjong", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // decryption might be incomplete (attract resets), inputs seem read differently
