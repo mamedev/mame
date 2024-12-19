@@ -1237,10 +1237,6 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	draw_tilemap(screen, bitmap, clip, 1); // epo_golf requires this layer in front when priorities are equal or menu doesn't show?
 	draw_sprites(screen, bitmap, clip);
 
-	//popmessage("%02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x", m_soundregs[0],m_soundregs[1],m_soundregs[2],m_soundregs[3],m_soundregs[4],m_soundregs[5],m_soundregs[6],m_soundregs[7],m_soundregs[8],m_soundregs[9],m_soundregs[10],m_soundregs[11],m_soundregs[12],m_soundregs[13],m_soundregs[14],m_soundregs[15]);
-	
-
-
 	return 0;
 }
 
