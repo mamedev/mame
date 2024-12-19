@@ -69,6 +69,8 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 	, m_p0_out(*this)
 	, m_p1_out(*this)
 	, m_p2_out(*this)
+	, m_dma_read(*this, 0xffff)
+	, m_dma_write(*this)
 	, m_prefetch_size(prefetch_size)
 	, m_prefetch_cycles(prefetch_cycles)
 	, m_chip_type(chip_type)
@@ -215,7 +217,6 @@ void v25_common_device::device_reset()
 	m_intm = 0;
 	m_halted = 0;
 
-	m_TM0 = m_MD0 = m_TM1 = m_MD1 = 0;
 	m_TMC0 = m_TMC1 = 0;
 
 	for (int i = 0; i < 2; i++)
@@ -225,6 +226,10 @@ void v25_common_device::device_reset()
 		m_brg[i] = 0;
 		m_sce[i] = 0;
 	}
+
+	m_dmam[0] = m_dmam[1] = 0;
+	m_dma_channel = -1;
+	m_last_dma_channel = 0;
 
 	m_RAMEN = 1;
 	m_TB = 20;
@@ -483,6 +488,111 @@ void v25_common_device::external_int()
 	}
 }
 
+void v25_common_device::dma_process()
+{
+	uint16_t sar = m_internal_ram[m_dma_channel * 4];
+	uint16_t dar = m_internal_ram[m_dma_channel * 4 + 1];
+	uint16_t sarh_darh = m_internal_ram[m_dma_channel * 4 + 2];
+	uint8_t dmamode = BIT(m_dmam[m_dma_channel], 5, 3);
+	bool w = BIT(m_dmam[m_dma_channel], 4);
+
+	uint32_t saddr = (BIT(dmamode, 0) ? 0 : (uint32_t(sarh_darh) & 0xff00) << 4) + sar;
+	uint32_t daddr = (BIT(dmamode, 1) ? 0 : (uint32_t(sarh_darh) & 0x00ff) << 12) + dar;
+
+	switch (dmamode & 3)
+	{
+	case 0:
+		// Memory to memory transfer
+		if (w)
+		{
+			uint16_t data = v25_read_word(saddr);
+			v25_write_word(daddr, data);
+		}
+		else
+		{
+			uint8_t data = v25_read_byte(saddr);
+			v25_write_byte(daddr, data);
+		}
+		m_icount -= (w && m_program->addr_width() == 8) ? 8 : 4;
+		break;
+
+	case 1:
+		// I/O to memory transfer
+		if (w && m_program->addr_width() == 16)
+		{
+			uint16_t data = m_dma_read[m_dma_channel](daddr);
+			v25_write_word(daddr, data);
+		}
+		else
+		{
+			uint8_t data = m_dma_read[m_dma_channel](daddr);
+			v25_write_byte(daddr, data);
+			if (w)
+			{
+				logerror("Warning: V25 16-bit I/O to memory transfer\n");
+				data = m_dma_read[m_dma_channel](daddr + 1);
+				v25_write_byte(daddr + 1, data);
+				m_icount -= 2;
+			}
+		}
+		m_icount -= 2;
+		break;
+
+	case 2:
+		// Memory to I/O transfer
+		if (w && m_program->addr_width() == 16)
+		{
+			uint16_t data = v25_read_word(saddr);
+			m_dma_write[m_dma_channel](saddr, data);
+		}
+		else
+		{
+			uint8_t data = v25_read_byte(saddr);
+			m_dma_write[m_dma_channel](saddr, data);
+			if (w)
+			{
+				logerror("Warning: V25 16-bit memory to I/O transfer\n");
+				data = v25_read_byte(saddr + 1);
+				m_dma_write[m_dma_channel](saddr + 1, data);
+				m_icount -= 2;
+			}
+		}
+		m_icount -= 2;
+		break;
+
+	default:
+		logerror("Reserved DMA transfer mode\n");
+		m_icount--;
+		break;
+	}
+
+	// Update source and destination based on address control
+	uint8_t dmac = m_dmac[m_dma_channel];
+	if (BIT(dmac, 0, 2) == 1)
+		m_internal_ram[m_dma_channel * 4] = sar + (w ? 2 : 1);
+	else if (BIT(dmac, 0, 2) == 2)
+		m_internal_ram[m_dma_channel * 4] = sar - (w ? 2 : 1);
+	if (BIT(dmac, 4, 2) == 1)
+		m_internal_ram[m_dma_channel * 4 + 1] = dar + (w ? 2 : 1);
+	else if (BIT(dmac, 4, 2) == 2)
+		m_internal_ram[m_dma_channel * 4 + 1] = dar - (w ? 2 : 1);
+
+	// Update TC
+	uint16_t tc = --m_internal_ram[m_dma_channel * 4 + 3];
+	if (tc == 0)
+	{
+		m_dmam[m_dma_channel] &= 0xf0; // disable channel
+		m_pending_irq |= m_dma_channel ? INTD1 : INTD0; // request interrupt
+	}
+
+	if (dmamode == 0 || dmamode > 4 || tc == 0)
+	{
+		// Single step/single transfer modes (or end of burst)
+		m_last_dma_channel = m_dma_channel;
+		m_dma_channel = -1;
+	}
+}
+
 /****************************************************************************/
 /*                             OPCODES                                      */
 /****************************************************************************/
@@ -570,6 +680,9 @@ void v25_common_device::device_start()
 	m_EO = 0;
 	m_E16 = 0;
 
+	m_TM0 = m_MD0 = m_TM1 = m_MD1 = 0;
+	m_dmac[0] = m_dmac[1] = 0;
+
 	for (i = 0; i < 4; i++)
 		m_timers[i] = timer_alloc(FUNC(v25_common_device::v25_timer_callback), this);
 
@@ -630,6 +743,10 @@ void v25_common_device::device_start()
 	save_item(NAME(m_scc));
 	save_item(NAME(m_brg));
 	save_item(NAME(m_sce));
+	save_item(NAME(m_dmac));
+	save_item(NAME(m_dmam));
+	save_item(NAME(m_dma_channel));
+	save_item(NAME(m_last_dma_channel));
 	save_item(NAME(m_RAMEN));
 	save_item(NAME(m_TB));
 	save_item(NAME(m_PCK));
@@ -790,6 +907,12 @@ void v25_common_device::execute_run()
 	}
 
 	while(m_icount>0) {
+		if (m_dma_channel != -1)
+		{
+			dma_process();
+			continue;
+		}
+
 		/* Dispatch IRQ */
 		m_prev_ip = m_ip;
 		if (m_no_interrupt==0 && (m_pending_irq & m_unmasked_irq))
@@ -808,5 +931,13 @@ void v25_common_device::execute_run()
 		prev_ICount = m_icount;
 		(this->*s_nec_instruction[fetchop()])();
 		do_prefetch(prev_ICount);
+
+		if ((m_dmam[0] & 0x0c) == 0x0c || (m_dmam[1] & 0x0c) == 0x0c)
+		{
+			if ((m_dmam[1 - m_last_dma_channel] & 0x0c) == 0x0c)
+				m_dma_channel = 1 - m_last_dma_channel;
+			else
+				m_dma_channel = m_last_dma_channel;
+		}
 	}
 }
