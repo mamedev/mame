@@ -117,12 +117,16 @@ public:
 
 	void xavix(machine_config &config);
 	void xavix_nv(machine_config &config);
+	void xavix_1mb_nv(machine_config &config);
+	void xavix_2mb_nv(machine_config &config);
+	void xavix_4mb_nv(machine_config &config);
 	void xavix_4mb(machine_config &config);
 	void xavix_2mb(machine_config &config);
 	void xavix_1mb(machine_config &config);
 
 	void xavixp(machine_config &config);
 	void xavixp_nv(machine_config &config);
+	void xavixp_1mb_nv(machine_config &config);
 	void xavixp_4mb(machine_config &config);
 	void xavixp_2mb(machine_config &config);
 	void xavixp_1mb(machine_config &config);
@@ -736,12 +740,17 @@ public:
 	{ }
 
 	void xavix_i2c_24lc04(machine_config &config);
+	void xavix_i2c_24lc04_4mb(machine_config &config);
 	void xavix_i2c_24lc04_2mb(machine_config &config);
 	void xavix_i2c_24lc04_1mb(machine_config &config);
 	void xavix_i2c_24c02(machine_config &config);
+	void xavix_i2c_24c02_4mb(machine_config &config);
+	void xavix_i2c_24c02_2mb(machine_config &config);
 	void xavix_i2c_24c02_43mhz(machine_config &config);
 	void xavix_i2c_24c08(machine_config &config);
+	void xavix_i2c_24c08_4mb(machine_config &config);
 	void xavix_i2c_24c16(machine_config &config);
+	void xavix_i2c_24c16_4mb(machine_config &config);
 
 	void xavix2000_i2c_24c08(machine_config &config);
 	void xavix2000_i2c_24c04(machine_config &config);
