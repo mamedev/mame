@@ -65,7 +65,7 @@ protected:
 		ACIA6850(config, m_acia);
 		PIA6821(config, m_pia);
 
-		RS232_PORT(config, "printer", printer_devices, "printer");
+		RS232_PORT(config, "pr", printer_devices, "printer");
 
 		// control panel
 		PIA6821(config, m_pia_cp);
