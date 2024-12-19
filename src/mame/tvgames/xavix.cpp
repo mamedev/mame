@@ -283,13 +283,13 @@ void xavix_state::xavix_map(address_map &map)
 // this is used by data reads / writes after some processing in the core to decide if data reads can see lowbus, zeropage, stack, bank registers etc. and only falls through to here on a true external bus access
 void xavix_state::xavix_extbus_map(address_map &map)
 {
-	map(0x000000, 0x7fffff).rom().region("bios", 0x00000).mirror(0x800000);
+	map(0x000000, 0x7fffff).rom().region("bios", 0x00000);
 }
 
 void xavix_cart_state::xavix_extbus_map(address_map &map)
 {
-	map(0x000000, 0x5fffff).rw(FUNC(xavix_cart_state::cart_r), FUNC(xavix_cart_state::cart_w)).mirror(0x800000);
-	map(0x600000, 0x7fffff).rom().region("bios", 0x600000).mirror(0x800000);
+	map(0x000000, 0x5fffff).rw(FUNC(xavix_cart_state::cart_r), FUNC(xavix_cart_state::cart_w));
+	map(0x600000, 0x7fffff).rom().region("bios", 0x600000);
 }
 
 void xavix_state::xavix_lowbus_map(address_map &map)
@@ -1901,7 +1901,7 @@ void xavix_cart_state::xavix_cart_daig(machine_config &config)
 
 void xavix_cart_gcslottv_state::xavix_extbus_map(address_map &map)
 {
-	map(0x000000, 0x7fffff).rw(FUNC(xavix_cart_gcslottv_state::cart_r), FUNC(xavix_cart_gcslottv_state::cart_w)).mirror(0x800000);
+	map(0x000000, 0x7fffff).rw(FUNC(xavix_cart_gcslottv_state::cart_r), FUNC(xavix_cart_gcslottv_state::cart_w));
 }
 
 void xavix_cart_gcslottv_state::xavix_cart_gcslottv(machine_config &config)

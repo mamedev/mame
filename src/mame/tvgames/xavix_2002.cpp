@@ -407,9 +407,9 @@ DEVICE_IMAGE_LOAD_MEMBER(superxavix_super_tv_pc_state::cart_load)
 
 void superxavix_super_tv_pc_state::xavix_extbus_map(address_map &map)
 {
-	map(0x000000, 0x7fffff).rom().region("bios", 0x000000).mirror(0x800000);
-	map(0x500000, 0x5fffff).bankr("rombank").mirror(0x800000); // needed for suprtvpchk and suprtvpcdo to read bitmaps for loading screen and desktop
-	map(0x600000, 0x67ffff).ram().share("bitmap_buffer").mirror(0x800000); // reads/writes here
+	map(0x000000, 0x7fffff).rom().region("bios", 0x000000);
+	map(0x500000, 0x5fffff).bankr("rombank"); // needed for suprtvpchk and suprtvpcdo to read bitmaps for loading screen and desktop
+	map(0x600000, 0x67ffff).ram().share("bitmap_buffer"); // reads/writes here
 }
 
 void superxavix_super_tv_pc_state::machine_reset()
