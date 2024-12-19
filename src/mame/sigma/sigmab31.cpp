@@ -200,4 +200,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1988, cptlucky, 0, sigmab31, cptlucky, sigmab31_state, empty_init, ROT0, "Sigma", "Captain Lucky", MACHINE_IS_SKELETON_MECHANICAL ) // 1988 copyright in main CPU ROM
+GAME( 1988, cptlucky, 0, sigmab31, cptlucky, sigmab31_state, empty_init, ROT0, "Sigma", "Captain Lucky", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // 1988 copyright in main CPU ROM

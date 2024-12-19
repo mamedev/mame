@@ -179,4 +179,4 @@ ROM_END
 } // anonymous namespace
 
 /*   YEAR   NAME         PARENT  COMPAT  MACHINE      INPUT  CLASS          INIT  COMPANY  FULLNAME       FLAGS */
-COMP(1993,  ews4800_310, 0,      0,      ews4800_310, 0,     ews4800_state, init, "NEC",   "EWS4800/310", MACHINE_IS_SKELETON)
+COMP(1993,  ews4800_310, 0,      0,      ews4800_310, 0,     ews4800_state, init, "NEC",   "EWS4800/310", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

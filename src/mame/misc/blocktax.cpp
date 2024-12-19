@@ -112,4 +112,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2002, blocktax, 0, blocktax, blocktax, blocktax_state, empty_init, ROT0, "TAX / Game Revival", "Blockout (TAX)", MACHINE_IS_SKELETON )
+GAME( 2002, blocktax, 0, blocktax, blocktax, blocktax_state, empty_init, ROT0, "TAX / Game Revival", "Blockout (TAX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

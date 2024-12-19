@@ -75,4 +75,4 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME        PARENT MACHINE     INPUT       CLASS             INIT        ROT   COMPANY    FULLNAME                 FLAGS
-GAME(1983, dmainevent, 0,     dmainevent, dmainevent, dmainevent_state, empty_init, ROT0, "Destron", "Main Event (Destron)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1983, dmainevent, 0,     dmainevent, dmainevent, dmainevent_state, empty_init, ROT0, "Destron", "Main Event (Destron)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

@@ -73,4 +73,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1992, sy35, 0, 0, sy35, sy35, yamaha_sy35_state, empty_init, "Yamaha", "SY35 Music Synthesizer", MACHINE_IS_SKELETON)
+SYST(1992, sy35, 0, 0, sy35, sy35, yamaha_sy35_state, empty_init, "Yamaha", "SY35 Music Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

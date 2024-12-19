@@ -124,4 +124,4 @@ ROM_END
 } // Anonymous namespace
 
 //    YEAR  NAME       PARENT  MACHINE    INPUT      CLASS            INIT        ROT   COMPANY   FULLNAME           FLAGS
-GAME( 2005, ruletamag, 0,      flashvga2, ruletamag, flashvga2_state, empty_init, ROT0, "Codere", u8"Ruleta Mágica", MACHINE_IS_SKELETON )
+GAME( 2005, ruletamag, 0,      flashvga2, ruletamag, flashvga2_state, empty_init, ROT0, "Codere", u8"Ruleta Mágica", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

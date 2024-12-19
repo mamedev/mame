@@ -104,4 +104,4 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY              FULLNAME      FLAGS
-COMP( 1995, aceex2814, 0,      0,      aceex2814, aceex2814, aceex2814_state, empty_init, "Aceex Corporation", "Aceex 2814", MACHINE_IS_SKELETON )
+COMP( 1995, aceex2814, 0,      0,      aceex2814, aceex2814, aceex2814_state, empty_init, "Aceex Corporation", "Aceex 2814", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

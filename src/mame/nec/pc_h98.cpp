@@ -208,4 +208,4 @@ ROM_START( pc_h98s )
 //  LOAD_IDE_ROM
 ROM_END
 
-COMP( 1991, pc_h98s, 0,   0, pc_h98s, pc_h98,   pc_hyper98_state, init_pc9801_kanji,   "NEC",   "PC-H98S model 8/U8", MACHINE_IS_SKELETON )
+COMP( 1991, pc_h98s, 0,   0, pc_h98s, pc_h98,   pc_hyper98_state, init_pc9801_kanji,   "NEC",   "PC-H98S model 8/U8", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

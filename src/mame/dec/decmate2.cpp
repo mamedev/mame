@@ -1009,5 +1009,5 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1982, decmate2, 0, 0, pc278, decmate2, decmate2_state, init_pc278, "Digital Equipment Corporation", "DECmate II (PC278)", MACHINE_IS_SKELETON)
-COMP(1984, decmate3, 0, 0, pc238, decmate2, decmate2_state, init_pc238, "Digital Equipment Corporation", "DECmate III (PC238)", MACHINE_IS_SKELETON)
+COMP(1982, decmate2, 0, 0, pc278, decmate2, decmate2_state, init_pc278, "Digital Equipment Corporation", "DECmate II (PC278)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1984, decmate3, 0, 0, pc238, decmate2, decmate2_state, init_pc238, "Digital Equipment Corporation", "DECmate III (PC238)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

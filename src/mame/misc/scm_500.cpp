@@ -99,5 +99,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, scm_500,  0,    scm_500, scm_500, scm_500_state, empty_init, ROT0, "Standard Change-Makers", "Standard Change-Makers System 500 / 500E", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, scm_500,  0,    scm_500, scm_500, scm_500_state, empty_init, ROT0, "Standard Change-Makers", "Standard Change-Makers System 500 / 500E", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 // 1995 - 500E - same basic hw?

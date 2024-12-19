@@ -153,4 +153,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1999, rallypnt2, 0, rallypnt, rallypnt, rallypnt_state, empty_init, ROT0, "Atlus", "Rally Point 2", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1999, rallypnt2, 0, rallypnt, rallypnt, rallypnt_state, empty_init, ROT0, "Atlus", "Rally Point 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

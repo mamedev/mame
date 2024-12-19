@@ -137,4 +137,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, venteta, 0, venteta, venteta, venteta_state, empty_init, ROT0, "Rania", "Venteta", MACHINE_IS_SKELETON )
+GAME( 200?, venteta, 0, venteta, venteta, venteta_state, empty_init, ROT0, "Rania", "Venteta", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -123,4 +123,4 @@ ROM_END
 
 } // Anonymous namespace
 
-CONS( 2005, digiblst,  0, 0, digiblast,  digiblast,  digiblast_state, empty_init, "Nikko Entertainment B.V. / Grey Innovation", "digiBLAST", MACHINE_IS_SKELETON )
+CONS( 2005, digiblst,  0, 0, digiblast,  digiblast,  digiblast_state, empty_init, "Nikko Entertainment B.V. / Grey Innovation", "digiBLAST", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

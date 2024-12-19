@@ -229,4 +229,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                FULLNAME                FLAGS
-COMP( 1983, iez80, 0,      0,      iez80,   iez80, iez80_state, empty_init, "Insight Enterprises", "Z80 SBC (prototype?)", MACHINE_IS_SKELETON )
+COMP( 1983, iez80, 0,      0,      iez80,   iez80, iez80_state, empty_init, "Insight Enterprises", "Z80 SBC (prototype?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

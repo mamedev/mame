@@ -786,27 +786,27 @@ ROM_END
 
 // This is the original US release, there's no cartridge slot, but it has a NAND Flash inside, and in addition to 50 built-in songs, advertises
 // use of a (now defunct) www.onkeysongs.com service for downloading additional songs to the microphone via bundled PC software.
-CONS( 2002, karatvst,      0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 50 songs)", MACHINE_IS_SKELETON )
-CONS( 2002, karatvsta,     karatvst,       0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 25 songs, 'FREE 35 Hit Songs / $35 value' packaging)", MACHINE_IS_SKELETON ) // 25 songs on unit, download code for 10 songs
+CONS( 2002, karatvst,      0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 50 songs)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, karatvsta,     karatvst,       0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 25 songs, 'FREE 35 Hit Songs / $35 value' packaging)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 25 songs on unit, download code for 10 songs
 
 // The "Memorex Star Singer Karaoke / MKS4001" is also made by IVL and boasts 50 built in songs, the casing is different too.
-CONS( 2002, mks4001,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Memorex license)", "Star Singer Karaoke (MKS4001)", MACHINE_IS_SKELETON ) // 50 songs built in, appears to have around 54 downloads, including a test download
+CONS( 2002, mks4001,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Memorex license)", "Star Singer Karaoke (MKS4001)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 50 songs built in, appears to have around 54 downloads, including a test download
 
 // Bandai's Japanese release also lacks a cartridge slot, relying on downloads for additional songs. It also comes with a CD containing the PC-side software.  The external microphone design differs slightly.
-CONS( 2002, bkarast,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 1)", MACHINE_IS_SKELETON )
-CONS( 2002, bkarasta,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 2)", MACHINE_IS_SKELETON )
-CONS( 2002, bkarastb,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 3)", MACHINE_IS_SKELETON )
-CONS( 2002, bkarastc,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 4)", MACHINE_IS_SKELETON )
-CONS( 2002, bkarastd,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 5)", MACHINE_IS_SKELETON )
-CONS( 2002, bkaraste,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 6)", MACHINE_IS_SKELETON )
-// this set has no downloaded data (or session data) suggesting it hasn't been used, the headers on the 3 songs that are included are different from the above sets however, so these themed units are likely different from factory 
-CONS( 2002, bkarastf,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station 'For Girls' (Japan)", MACHINE_IS_SKELETON )
+CONS( 2002, bkarast,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, bkarasta,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, bkarastb,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, bkarastc,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 4)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, bkarastd,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 5)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, bkaraste,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 6)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// this set has no downloaded data (or session data) suggesting it hasn't been used, the headers on the 3 songs that are included are different from the above sets however, so these themed units are likely different from factory
+CONS( 2002, bkarastf,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station 'For Girls' (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // The European releases take cartridges rather than relying on a download service
-CONS( 2004, easykara,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_IS_SKELETON )
+CONS( 2004, easykara,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2003, karams,        0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook license)",             "KaraokeMicro Star (France)", MACHINE_IS_SKELETON )
-CONS( 2003, karamsg,       0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook / Imago license)",     "Karaoke Microphone Pro / KaraokeMicro Star (Greece)", MACHINE_IS_SKELETON ) // KaraokeMicro Star branding is used on-screen, Karaoke Microphone Pro on the box
+CONS( 2003, karams,        0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook license)",             "KaraokeMicro Star (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2003, karamsg,       0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook / Imago license)",     "Karaoke Microphone Pro / KaraokeMicro Star (Greece)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // KaraokeMicro Star branding is used on-screen, Karaoke Microphone Pro on the box
 
-CONS( 2003, dks7000c,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Classic Handheld Karaoke Player (DKS7000-C)", MACHINE_IS_SKELETON )
-CONS( 2003, dks7000p,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Princess Handheld Karaoke Player (DKS7000-P)", MACHINE_IS_SKELETON )
+CONS( 2003, dks7000c,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Classic Handheld Karaoke Player (DKS7000-C)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2003, dks7000p,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Princess Handheld Karaoke Player (DKS7000-P)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

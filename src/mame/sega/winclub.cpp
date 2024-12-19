@@ -127,4 +127,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2005, wwmspot, 0, winclub, winclub, winclub_state, empty_init, ROT0, "Sega", "Winner's Wheel - Magical Spot", MACHINE_IS_SKELETON ) // year taken from instructions on cabinet (see YouTube video)
+GAME( 2005, wwmspot, 0, winclub, winclub, winclub_state, empty_init, ROT0, "Sega", "Winner's Wheel - Magical Spot", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // year taken from instructions on cabinet (see YouTube video)

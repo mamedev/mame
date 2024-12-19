@@ -175,4 +175,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1984, cardinal, 0, 0, cardinal, cardinal, cardinal_state, empty_init, "Standard Microsystems", "Cardinal Video Terminal", MACHINE_IS_SKELETON)
+COMP(1984, cardinal, 0, 0, cardinal, cardinal, cardinal_state, empty_init, "Standard Microsystems", "Cardinal Video Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

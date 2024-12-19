@@ -200,4 +200,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1997, xbase09, 0, 0, xbase09, xbase09, xbase09_state, empty_init, "JoMoX", "XBase 09 Midi Controlled Analogue Drum Module", MACHINE_IS_SKELETON)
+SYST(1997, xbase09, 0, 0, xbase09, xbase09, xbase09_state, empty_init, "JoMoX", "XBase 09 Midi Controlled Analogue Drum Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

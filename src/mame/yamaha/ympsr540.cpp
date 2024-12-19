@@ -379,4 +379,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1999, psr540, 0, 0, psr540, psr540, psr540_state, empty_init, "Yamaha", "PSR540", MACHINE_IS_SKELETON )
+SYST( 1999, psr540, 0, 0, psr540, psr540, psr540_state, empty_init, "Yamaha", "PSR540", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

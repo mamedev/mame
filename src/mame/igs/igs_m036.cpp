@@ -557,25 +557,25 @@ void igs_m036_state::init_igsm312()
 
 ***************************************************************************/
 
-GAME( 200?, cjdh2,    0,     igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN)", MACHINE_IS_SKELETON )
-GAME( 200?, cjdh2a,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNA)", MACHINE_IS_SKELETON )
-GAME( 200?, cjdh2b,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNB)", MACHINE_IS_SKELETON )
-GAME( 200?, cjdh2c,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V215CN)", MACHINE_IS_SKELETON )
+GAME( 200?, cjdh2,    0,     igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2a,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2b,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNB)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2c,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,   ROT0, "IGS",           "Chao Ji Da Heng 2 (V215CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, cjddzsp,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_IS_SKELETON )
+GAME( 200?, cjddzsp,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2007, qhzb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Que Huang Zheng Ba (V100CN)", MACHINE_IS_SKELETON )
+GAME( 2007, qhzb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Que Huang Zheng Ba (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2009, lhtb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Tebie Ban (V101CN)", MACHINE_IS_SKELETON ) // 龍虎特別版 - Lónghǔ tèbié bǎn
+GAME( 2009, lhtb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Tebie Ban (V101CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龍虎特別版 - Lónghǔ tèbié bǎn
 
-GAME( 200?, lhzb3in1, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_IS_SKELETON ) // 龙虎争霸三合一
+GAME( 200?, lhzb3in1, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龙虎争霸三合一
 
-GAME( 200?, igsm312,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_IS_SKELETON ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
+GAME( 200?, igsm312,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
 
-GAME( 200?, super70s, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Super 70's (V100US)", MACHINE_IS_SKELETON )
+GAME( 200?, super70s, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Super 70's (V100US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_IS_SKELETON )
+GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Long Hu Zheng Ba Gao Qing Ban (V105CN)", MACHINE_IS_SKELETON )
+GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS",           "Long Hu Zheng Ba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2015, mghammer, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_IS_SKELETON )
+GAME( 2015, mghammer, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -257,4 +257,4 @@ void cointek_state::init_unkct()
 } // anonymous namespace
 
 
-GAME( 1989, unkct, 0, cointek, unkct, cointek_state, init_unkct, ROT0, "Cointek Enterprise Corp", "unknown Cointek game", MACHINE_IS_SKELETON ) // string in ROM at 0x7839: Ver 4.00 1989-08-01
+GAME( 1989, unkct, 0, cointek, unkct, cointek_state, init_unkct, ROT0, "Cointek Enterprise Corp", "unknown Cointek game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // string in ROM at 0x7839: Ver 4.00 1989-08-01

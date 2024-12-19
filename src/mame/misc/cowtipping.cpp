@@ -125,5 +125,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004, cowtipp,  0,       cowtipping, cowtipping, cowtipping_state, empty_init, ROT270, "Game Refuge / Team Play", "Cow Tipping - Shake Cattle & Roll (set 1)", MACHINE_IS_SKELETON )
-GAME( 2004, cowtippa, cowtipp, cowtipping, cowtipping, cowtipping_state, empty_init, ROT270, "Game Refuge / Team Play", "Cow Tipping - Shake Cattle & Roll (set 2)", MACHINE_IS_SKELETON )
+GAME( 2004, cowtipp,  0,       cowtipping, cowtipping, cowtipping_state, empty_init, ROT270, "Game Refuge / Team Play", "Cow Tipping - Shake Cattle & Roll (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, cowtippa, cowtipp, cowtipping, cowtipping, cowtipping_state, empty_init, ROT270, "Game Refuge / Team Play", "Cow Tipping - Shake Cattle & Roll (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

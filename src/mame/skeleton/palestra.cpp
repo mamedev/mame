@@ -93,4 +93,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS(  1978, palestra, 0,   0, palestra,   palestra,    palestra_state,   empty_init, "LPO", "Palestra-02", MACHINE_IS_SKELETON)
+CONS(  1978, palestra, 0,   0, palestra,   palestra,    palestra_state,   empty_init, "LPO", "Palestra-02", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -656,5 +656,5 @@ ROM_END
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE   INPUT  CLASS            INIT        COMPANY                FULLNAME       FLAGS
 COMP( 1987, falco5220e, 0,          0,      falco500, 0,     falco500_state, empty_init, "Falco Data Products", "Falco 5220e", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1991, falco500e,  falco5220e, 0,      falco500, 0,     falco500_state, empty_init, "Falco Data Products", "Falco 500e",  MACHINE_IS_SKELETON )
-COMP( 1989, falco5220s, falco5220e, 0,      falco500, 0,     falco500_state, empty_init, "Falco Data Products", "Falco 5220s", MACHINE_IS_SKELETON )
+COMP( 1991, falco500e,  falco5220e, 0,      falco500, 0,     falco500_state, empty_init, "Falco Data Products", "Falco 500e",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1989, falco5220s, falco5220e, 0,      falco500, 0,     falco500_state, empty_init, "Falco Data Products", "Falco 5220s", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

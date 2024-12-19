@@ -186,8 +186,8 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1988, psr16,  0,      0, psr16,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-16",  MACHINE_IS_SKELETON)
-SYST(1988, psr36,  0,      0, psr36,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-36",  MACHINE_IS_SKELETON)
-SYST(1988, pss480, 0,      0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-480 / PSS-580", MACHINE_IS_SKELETON)
-SYST(1988, pss680, 0,      0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-680", MACHINE_IS_SKELETON)
-SYST(1989, pss780, pss680, 0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-780", MACHINE_IS_SKELETON)
+SYST(1988, psr16,  0,      0, psr16,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-16",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1988, psr36,  0,      0, psr36,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-36",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1988, pss480, 0,      0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-480 / PSS-580", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1988, pss680, 0,      0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-680", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1989, pss780, pss680, 0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-780", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

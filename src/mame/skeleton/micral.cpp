@@ -475,5 +475,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME         FLAGS
-COMP( 1981, micral,   0,      0,      micral,  micral, micral_state, empty_init, "Bull R2E",       "Micral 80-22G", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
-COMP( 1982, questarm, micral, 0,      micral,  micral, micral_state, empty_init, "Honeywell Bull", "Questar/M",     MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, micral,   0,      0,      micral,  micral, micral_state, empty_init, "Bull R2E",       "Micral 80-22G", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, questarm, micral, 0,      micral,  micral, micral_state, empty_init, "Honeywell Bull", "Questar/M",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

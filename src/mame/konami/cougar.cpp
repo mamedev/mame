@@ -111,4 +111,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2008, spinfev,  0,   cougar, cougar, cougar_state, empty_init, ROT0, "Konami", "Spin Fever",  MACHINE_IS_SKELETON ) // 'GPB-JB-F01 2008-04-17' and 'SPIN FEVER (GSGPB)  BOOT SCRIPT' strings in HDD
+GAME( 2008, spinfev,  0,   cougar, cougar, cougar_state, empty_init, ROT0, "Konami", "Spin Fever",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 'GPB-JB-F01 2008-04-17' and 'SPIN FEVER (GSGPB)  BOOT SCRIPT' strings in HDD
