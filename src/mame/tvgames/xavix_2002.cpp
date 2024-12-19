@@ -456,6 +456,12 @@ void superxavix_i2c_state::superxavix_i2c_24c04(machine_config &config)
 	I2C_24C04(config, "i2cmem", 0);
 }
 
+void superxavix_i2c_state::superxavix_i2c_24c04_4mb(machine_config &config)
+{
+	superxavix_i2c_24c04(config);
+	m_maincpu->set_addrmap(6, &superxavix_i2c_state::xavix_4mb_extbus_map);	
+}
+
 void superxavix_i2c_state::superxavix_i2c_24c02(machine_config &config)
 {
 	xavix2002(config);
@@ -467,6 +473,8 @@ void superxavix_i2c_state::superxavix_i2c_24c02(machine_config &config)
 void superxavix_i2c_state::superxavix_i2c_mrangbat(machine_config &config)
 {
 	xavix2002(config);
+
+	m_maincpu->set_addrmap(6, &superxavix_i2c_state::xavix_4mb_extbus_map);
 
 	I2C_24C02(config, "i2cmem", 0); // 24C02?
 
@@ -576,7 +584,7 @@ ROM_START( domstepc )
 ROM_END
 
 ROM_START( mrangbat )
-	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("powerrangerspad.bin", 0x000000, 0x400000, CRC(d3a98775) SHA1(485c66242dd0ee436a278d23005aece48d606431) )
 ROM_END
 
@@ -601,7 +609,7 @@ ROM_START( ban_ordj )
 ROM_END
 
 ROM_START( epo_tfit )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("tennisfitness.bin", 0x000000, 0x400000, CRC(cbf65bd2) SHA1(30b3da6f061b2dd91679db42a050f715901beb87) )
 ROM_END
 
@@ -680,7 +688,7 @@ CONS( 2007, domstepc, 0, 0, superxavix_i2c_jmat, xavixp, superxavix_i2c_jmat_sta
 CONS( 2005, mrangbat, 0, 0, superxavix_i2c_mrangbat, mrangbat,   superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD", "Let's! TV Play Mahou Taiketsu Magiranger - Magimat de Dance & Battle (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // エキサイトスポーツ　テニス×フィットネス
-CONS( 2004, epo_tfit, 0, 0, superxavix_i2c_24c04,    epo_tfit,   superxavix_i2c_state, init_xavix, "Epoch / SSD Company LTD",  "Excite Sports Tennis x Fitness (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Epoch Tennis and Fitness has 24LC04
+CONS( 2004, epo_tfit, 0, 0, superxavix_i2c_24c04_4mb,    epo_tfit,   superxavix_i2c_state, init_xavix, "Epoch / SSD Company LTD",  "Excite Sports Tennis x Fitness (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Epoch Tennis and Fitness has 24LC04
 
 // それいけトーマス ソドー島のなかまたち
 CONS( 2005, tmy_thom, 0, 0, superxavix_i2c_24c04,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Soreike Thomas - Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

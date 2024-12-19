@@ -292,6 +292,21 @@ void xavix_cart_state::xavix_extbus_map(address_map &map)
 	map(0x600000, 0x7fffff).rom().region("bios", 0x600000);
 }
 
+void xavix_state::xavix_4mb_extbus_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).mirror(0x400000).rom().region("bios", 0x00000);
+}
+
+void xavix_state::xavix_2mb_extbus_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).mirror(0x600000).rom().region("bios", 0x00000);
+}
+
+void xavix_state::xavix_1mb_extbus_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).mirror(0x700000).rom().region("bios", 0x00000);
+}
+
 void xavix_state::xavix_lowbus_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram().share("mainram");
@@ -1767,6 +1782,19 @@ void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 	I2C_24C04(config, "i2cmem", 0); // 24LC04 on Nostalgia games, 24C04 on others
 }
 
+void xavix_i2c_state::xavix_i2c_24lc04_2mb(machine_config &config)
+{
+	xavix_i2c_24lc04(config);
+	m_maincpu->set_addrmap(6, &xavix_i2c_state::xavix_2mb_extbus_map);
+}
+
+void xavix_i2c_state::xavix_i2c_24lc04_1mb(machine_config &config)
+{
+	xavix_i2c_24lc04(config);
+	m_maincpu->set_addrmap(6, &xavix_i2c_state::xavix_1mb_extbus_map);
+}
+
+
 void xavix_i2c_ltv_tam_state::xavix_i2c_24lc04_tam(machine_config &config)
 {
 	xavix_i2c_24lc04(config);
@@ -2047,22 +2075,22 @@ void xavix_state::init_xavix()
 ***************************************************************************/
 
 ROM_START( taitons1 )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "taitonostalgia1.u3", 0x000000, 0x200000, CRC(25bd8c67) SHA1(a109cd2da6aa4596e3ca3abd1afce2d0001a473f) )
 ROM_END
 
 ROM_START( taitons2 )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "taitonostalgia2.bin", 0x000000, 0x200000, CRC(d7dbd93d) SHA1(ad96f80d317e7fd64682a1fe406c5ee9dd5eabf9) )
 ROM_END
 
 ROM_START( namcons1 )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "namconostalgia1.bin", 0x000000, 0x100000, CRC(9bcccccd) SHA1(cf8fe6de76fbd23974f999299db6f558f79c8f22) )
 ROM_END
 
 ROM_START( namcons2 )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "nostalgia.bin", 0x000000, 0x100000, CRC(03f7f755) SHA1(bdf1b10ab0104ed580951b0c428c4e93e7373afe) )
 ROM_END
 
@@ -2591,16 +2619,16 @@ ROM_END
 */
 
 // Let's!TVプレイCLASSIC タイトーノスタルジア1
-CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04_2mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC タイトーノスタルジア2
-CONS( 2006, taitons2,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, taitons2,  0,          0,  xavix_i2c_24lc04_2mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC ナムコノスタルジア1
-CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04_1mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC ナムコノスタルジア2
-CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04_1mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2000, rad_ping,  0,          0,  xavix,            rad_ping, xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
 CONS( 2000, rad_pingp, rad_ping,   0,  xavixp,           rad_pingp,xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "ConnecTV Table Tennis (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

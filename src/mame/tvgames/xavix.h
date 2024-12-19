@@ -214,6 +214,10 @@ protected:
 
 	virtual void xavix_extbus_map(address_map &map) ATTR_COLD;
 
+	void xavix_4mb_extbus_map(address_map &map) ATTR_COLD;
+	void xavix_2mb_extbus_map(address_map &map) ATTR_COLD;
+	void xavix_1mb_extbus_map(address_map &map) ATTR_COLD;
+
 	// screen updates
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -703,9 +707,9 @@ public:
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
-
 	void superxavix_i2c_24c08(machine_config &config);
 	void superxavix_i2c_24c04(machine_config &config);
+	void superxavix_i2c_24c04_4mb(machine_config &config);
 	void superxavix_i2c_24c02(machine_config &config);
 	void superxavix_i2c_mrangbat(machine_config& config);
 
@@ -726,6 +730,8 @@ public:
 	{ }
 
 	void xavix_i2c_24lc04(machine_config &config);
+	void xavix_i2c_24lc04_2mb(machine_config &config);
+	void xavix_i2c_24lc04_1mb(machine_config &config);
 	void xavix_i2c_24c02(machine_config &config);
 	void xavix_i2c_24c02_43mhz(machine_config &config);
 	void xavix_i2c_24c08(machine_config &config);
