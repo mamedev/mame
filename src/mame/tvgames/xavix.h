@@ -861,10 +861,10 @@ public:
 private:
 
 private:
-	uint8_t tvho_anport0_r() { return m_mouse0x->read()^0x7f; }
-	uint8_t tvho_anport1_r() { return m_mouse0y->read()^0x7f; }
-	uint8_t tvho_anport2_r() { return m_mouse1x->read()^0x7f; }
-	uint8_t tvho_anport3_r() { return m_mouse1y->read()^0x7f; }
+	uint8_t tvho_anport0_r() { return (m_mouse0x->read()^0x7f)+1; }
+	uint8_t tvho_anport1_r() { return (m_mouse0y->read()^0x7f)+1; }
+	uint8_t tvho_anport2_r() { return (m_mouse1x->read()^0x7f)+1; }
+	uint8_t tvho_anport3_r() { return (m_mouse1y->read()^0x7f)+1; }
 };
 
 
