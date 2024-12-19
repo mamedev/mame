@@ -64,7 +64,7 @@ void xavix_math_device::barrel_w(offs_t offset, uint8_t data)
 		m_sgn_mpd = data & 0x80;
 		m_sgn_mpr = 0;
 		m_mpr = data;
-		do_math(true);	
+		do_math(true);
 	}
 	else
 	{
@@ -122,7 +122,7 @@ void xavix_math_device::do_math(bool mul_shf)
 		mulinp = 1 << (m_mpr & 0x7);
 	}
 
-	if (m_sgn_mpd && (mpd & 0x80) && m_sgn_mpr && (mulinp & 0x80)) 
+	if (m_sgn_mpd && (mpd & 0x80) && m_sgn_mpr && (mulinp & 0x80))
 	{
 		result = mpd * mulinp - (mpd << 8) - (mulinp << 8);
 	}
@@ -175,6 +175,6 @@ void xavix_math_device::mult_param_w(offs_t offset, uint8_t data, uint8_t mem_ma
 	else if (offset == 2)
 	{
 		m_mpr = data;
-		do_math(false);	
+		do_math(false);
 	}
 }

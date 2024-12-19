@@ -1632,7 +1632,7 @@ static const gfx_layout char16layout =
 	16*16*4
 };
 
-	
+
 static const gfx_layout char_16x16x2_layout =
 {
 	16,16,

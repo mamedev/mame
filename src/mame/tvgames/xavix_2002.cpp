@@ -459,7 +459,7 @@ void superxavix_i2c_state::superxavix_i2c_24c04(machine_config &config)
 void superxavix_i2c_state::superxavix_i2c_24c04_4mb(machine_config &config)
 {
 	superxavix_i2c_24c04(config);
-	m_maincpu->set_addrmap(6, &superxavix_i2c_state::xavix_4mb_extbus_map);	
+	m_maincpu->set_addrmap(6, &superxavix_i2c_state::xavix_4mb_extbus_map);
 }
 
 void superxavix_i2c_state::superxavix_i2c_24c02(machine_config &config)
