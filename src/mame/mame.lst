@@ -835,25 +835,39 @@ ace500                          // 1986 Franklin Ace 500
 apple2c                         // Apr 1984 Apple //c
 apple2c0                        // ??? 1985 Apple //c (3.5 ROM)
 apple2c0uk                      // ??? 1985 Apple //c (3.5 ROM) (UK)
+apple2c0de                      // ??? 1985 Apple //c (3.5 ROM) (Germany)
 apple2c0fr                      // ??? 1985 Apple //c (3.5 ROM) (France)
+apple2c0se                      // ??? 1985 Apple //c (3.5 ROM) (Sweden)
 apple2c3                        // Sep 1986 Apple //c (Original Mem. Exp.)
 apple2c3uk                      // Sep 1986 Apple //c (Original Mem. Exp.) (UK)
+apple2c3de                      // Sep 1986 Apple //c (Original Mem. Exp.) (Germany)
 apple2c3fr                      // Sep 1986 Apple //c (Original Mem. Exp.) (France)
+apple2c3se                      // Sep 1986 Apple //c (Original Mem. Exp.) (Sweden)
 apple2c4                        // ??? 198? Apple //c (rev 4)
 apple2c4uk                      // ??? 198? Apple //c (rev 4) (UK)
+apple2c4de                      // ??? 198? Apple //c (rev 4) (Germany)
 apple2c4fr                      // ??? 198? Apple //c (rev 4) (France)
+apple2c4se                      // ??? 198? Apple //c (rev 4) (Sweden)
+apple2cde                       // Apr 1984 Apple //c (Germany)
 apple2cfr                       // Apr 1984 Apple //c (France)
 apple2cp                        // Sep 1988 Apple //c+
+apple2cse                       // Apr 1984 Apple //c (Sweden)
 apple2cuk                       // Apr 1984 Apple //c (UK)
 apple2e                         // Jan 1983 Apple //e
 apple2ee                        // Mar 1985 Apple //e Enhanced
+apple2ede                       // Jan 1983 Apple //e (Germany)
+apple2eede                      // Mar 1985 Apple //e Enhanced (Germany)
 apple2eefr                      // Mar 1985 Apple //e Enhanced (France)
+apple2eese                      // Mar 1985 Apple //e Enhanced (Sweden)
 apple2ees                       // Mar 1985 Apple //e Enhanced (Spain)
 apple2eeuk                      // Mar 1985 Apple //e Enhanced (UK)
 apple2efr                       // Jan 1983 Apple //e (France)
 apple2ep                        // Jan 1987 Apple //e Platinum
+apple2epde                      // Jan 1987 Apple //e Platinum (Germany)
 apple2epfr                      // Jan 1987 Apple //e Platinum (France)
+apple2epse                      // Jan 1987 Apple //e Platinum (Sweden)
 apple2epuk                      // Jan 1987 Apple //e Platinum (UK)
+apple2ese                       // Jan 1983 Apple //e (Sweden)
 apple2euk                       // Jan 1983 Apple //e (UK)
 cec2000                         // China Education Computer-2000
 cece                            // China Education Computer-E
