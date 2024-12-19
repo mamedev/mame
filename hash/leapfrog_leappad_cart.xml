@@ -1277,7 +1277,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="oej1ggdni" supported="no">
-		<description>Oyako Eigo Step 1 gatsu gou - Doubutsuen ni Ikou! (Japan)</description>
+		<description>Oyako Eigo Step 1-gatsu gou - Doubutsuen ni Ikou! (Japan)</description>
 		<year>2003</year>
 		<publisher>LeapFrog / Benesse</publisher>
 		<info name="alt_title" value="おやこえいご すてっぷ 1がつごう - どうぶつえんにいこう!" />
@@ -1291,10 +1291,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="oej5gg" supported="no">
-		<description>Oyako Eigo Jump 5 gatsu gou - Okashi no Kuni no Daibouken (Japan)</description>
+		<description>Oyako Eigo Jump 5-gatsu gou - Okashi no Kuni no Daibouken (Japan)</description>
 		<year>2003</year>
 		<publisher>LeapFrog / Benesse</publisher>
-		<info name="alt_title" value="おやこえいご じゃんぷ 5がつごう - おかしの くにの だいぼうけん" />
+		<info name="alt_title" value="おやこえいご じゃんぷ 5がつごう - おかしのくにのだいぼうけん" />
 		<info name="serial" value="500-01007"/>
 		<part name="cart" interface="leapfrog_leappad_cart">
 			<feature name="pcb" value="57000-003-7218"/>
@@ -1305,7 +1305,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="oej9gg" supported="no">
-		<description>Oyako Eigo Jump 9 gatsu gou - Monjaa Gou de Tankenja! (Japan)</description>
+		<description>Oyako Eigo Jump 9-gatsu gou - Monjaa Gou de Tankenja! (Japan)</description>
 		<year>2003</year>
 		<publisher>LeapFrog / Benesse</publisher>
 		<info name="alt_title" value="おやこえいご じゃんぷ 9がつごう - モンジャーごうでたんけんじゃ!" />
@@ -1319,7 +1319,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="oej1ggstr" supported="no">
-		<description>Oyako Eigo Jump 1 gatsu gou - Shougakkou Taiken Report (Japan)</description>
+		<description>Oyako Eigo Jump 1-gatsu gou - Shougakkou Taiken Report (Japan)</description>
 		<year>2004</year>
 		<publisher>LeapFrog / Benesse</publisher>
 		<info name="alt_title" value="おやこえいご じゃんぷ 1がつごう - しょうがっこうたいけんレポート" />
@@ -1333,7 +1333,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kland1" supported="no">
-		<description>Korasho Land 1 Gakkou e Ikou! (Japan)</description>
+		<description>Korasho Land 1: Gakkou e Ikou! (Japan)</description>
 		<year>2004</year>
 		<publisher>LeapFrog / Benesse</publisher>
 		<info name="alt_title" value="コラショランド 1 がっこうへいこう!" />
@@ -1348,7 +1348,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kland4" supported="no">
-		<description>Korasho Land 4 Machino Naka wo Tanken! (Japan)</description>
+		<description>Korasho Land 4: Machi no Naka o Tanken! (Japan)</description>
 		<year>2005</year>
 		<publisher>LeapFrog / Benesse</publisher>
 		<info name="alt_title" value="コラショランド 4 まちのなかをたんけん!" />
@@ -1362,7 +1362,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kland2" supported="no">
-		<description>Korasho Land 2 Tanoshii Ichinichi (Japan)</description>
+		<description>Korasho Land 2: Tanoshii Ichinichi (Japan)</description>
 		<year>2004</year>
 		<publisher>LeapFrog / Benesse</publisher>
 		<info name="alt_title" value="コラショランド 2 たのしいいちにち" />
@@ -1376,7 +1376,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kland3" supported="no">
-		<description>Korasho Land 3 Tanjoubi Omedetou (Japan)</description>
+		<description>Korasho Land 3: Tanjoubi Omedetou (Japan)</description>
 		<year>2004</year>
 		<publisher>LeapFrog / Benesse</publisher>
 		<info name="alt_title" value="コラショランド 3 たんじょうびおめでとう" />
@@ -1390,7 +1390,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kland5" supported="no">
-		<description>Korasho Land 5 Bokutatchi no Ichinen (Japan)</description>
+		<description>Korasho Land 5: Bokutatchi no Ichinen (Japan)</description>
 		<year>2005</year>
 		<publisher>LeapFrog / Benesse</publisher>
 		<info name="alt_title" value="コラショランド 5 ぼくたちのいちねん" />
