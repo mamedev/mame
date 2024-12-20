@@ -209,6 +209,8 @@ protected:
 	void common(machine_config &config);
 	void video_config(machine_config &config);
 
+	virtual TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
 private:
 	uint8_t m_scrollx[2]{}, m_scrolly[2]{};
 	uint8_t m_layers = 0U;
@@ -218,8 +220,7 @@ private:
 	void gfxbank_w(uint8_t data);
 	void scrollx_w(offs_t offset, uint8_t data);
 	void scrolly_w(offs_t offset, uint8_t data);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	virtual TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -272,11 +273,27 @@ private:
 	void blit_trigger_w(uint8_t data);
 	void vblank_ack_w(uint8_t data);
 	void gfxbank_w(uint8_t data);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	virtual TILE_GET_INFO_MEMBER(get_bg_tile_info) override;
+	virtual TILE_GET_INFO_MEMBER(get_tx_tile_info) override;
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
+
+class ninjemakt_state : public galivan_state
+{
+public:
+	ninjemakt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		galivan_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	virtual TILE_GET_INFO_MEMBER(get_tx_tile_info) override;
+
+};
+
 
 class youmab_state : public ninjemak_state
 {
@@ -501,7 +518,16 @@ TILE_GET_INFO_MEMBER(ninjemak_state::get_tx_tile_info)
 			0);
 }
 
-
+TILE_GET_INFO_MEMBER(ninjemakt_state::get_tx_tile_info)
+{
+	uint16_t index = tile_index;
+	int const attr = m_videoram[index + 0x400];
+	int const code = m_videoram[index] | ((attr & 0x03) << 8);
+	tileinfo.set(0,
+			code,
+			(attr & 0x1c) >> 2,
+			0);
+}
 
 /***************************************************************************
 
@@ -525,6 +551,13 @@ void ninjemak_state::video_start()
 	m_tx_tilemap->set_transparent_pen(15);
 }
 
+void ninjemakt_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ninjemakt_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ninjemakt_state::get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+
+	m_tx_tilemap->set_transparent_pen(15);
+}
 
 
 /***************************************************************************
@@ -1643,10 +1676,10 @@ ROM_START( ninjemat )
 
 	ROM_REGION( 0x8000, "bgtiles", 0 )
 	ROM_LOAD( "5.c1",         0x00000, 0x4000, CRC(e8469d44) SHA1(a015e4f67597fca438ed4c714b9854615e5d59b7) )
-	ROM_LOAD( "6.c3",         0x04000, 0x4000, BAD_DUMP CRC(163a024e) SHA1(bb4c78f5e231e8e9c9556790d94972b963b1480e) ) // Bad ROM?
+	ROM_LOAD( "6.c3",         0x04000, 0x4000, CRC(163a024e) SHA1(bb4c78f5e231e8e9c9556790d94972b963b1480e) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "7114.a9",      0x00000, 0x0100, CRC(6eecaeaa) SHA1(5767fb8b07d652956474e2a6e56bc49b7c002814) ) // red
+	ROM_LOAD( "7114.a9",      0x00000, 0x0100, BAD_DUMP CRC(6eecaeaa) SHA1(5767fb8b07d652956474e2a6e56bc49b7c002814) ) // red - BAD: FIXED BITS (000000xx) (should be using all 4 lower bits)
 	ROM_LOAD( "7114.a10",     0x00100, 0x0100, CRC(30556466) SHA1(caa1a941d3a2651504acc1ea3ae14de921e1975a) ) // green
 	ROM_LOAD( "7114.a11",     0x00200, 0x0100, CRC(1fe3d4fd) SHA1(6f1f432667ec1d7286149ccde6790b74499aa50a) ) // blue
 	ROM_LOAD( "7114.c2",      0x00300, 0x0100, CRC(23bade78) SHA1(7e2de5eb08d888f97830807b6dbe85d09bb3b7f8) ) // sprite lookup table
@@ -1905,7 +1938,7 @@ GAME( 1986, dangarj,  dangar,   dangarj,  dangar2,  dangarj_state,  empty_init, 
 GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  galivan_state,  empty_init,  ROT270, "bootleg",                     "Ufo Robo Dangar (9/26/1986, bootleg set 1)",          MACHINE_SUPPORTS_SAVE ) // checks protection like dangarj but check readback is patched at 0x9d58 (also checks I/O port 0xc0?)
 GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state,  empty_init,  ROT270, "bootleg",                     "Ufo Robo Dangar (9/26/1986, bootleg set 2)",          MACHINE_SUPPORTS_SAVE ) // directly patched at entry point 0x9d44
 GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Ninja Emaki (US)",                                    MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, ninjemat, ninjemak, galivan,  galivan,  ninjemak_state, empty_init,  ROT270, "Nichibutsu (Tecfri license)", "Ninja Emaki (Tecfri license)",                        MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, ninjemat, ninjemak, galivan,  galivan,  ninjemakt_state,empty_init,  ROT270, "Nichibutsu (Tecfri license)", "Ninja Emaki (Tecfri license)",                        MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan)",                           MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan, alt)",                      MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, youmab_state,   empty_init , ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 1)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // player is invincible
