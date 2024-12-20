@@ -628,6 +628,11 @@ int drcbe_c::execute(code_handle &entry)
 				PARAM0 = flags & PARAM1;
 				break;
 
+			case MAKE_OPCODE_SHORT(OP_SETFLGS, 4, 0):   // SETFLGS src
+			case MAKE_OPCODE_SHORT(OP_SETFLGS, 4, 1):
+				flags = PARAM0;
+				break;
+
 			case MAKE_OPCODE_SHORT(OP_SAVE, 4, 0):      // SAVE    dst
 				*inst[0].state = m_state;
 				inst[0].state->flags = flags;
