@@ -143,6 +143,7 @@ namespace uml
 		// control flow operations
 		OP_NOP,                     // NOP
 		OP_DEBUG,                   // DEBUG   pc
+		OP_BREAK,                   // BREAK
 		OP_EXIT,                    // EXIT    src1[,c]
 		OP_HASHJMP,                 // HASHJMP mode,pc,handle
 		OP_JMP,                     // JMP     imm[,c]
@@ -425,6 +426,7 @@ namespace uml
 
 		// control flow operations
 		void nop() { configure(OP_NOP, 4); }
+		void break_() { configure(OP_BREAK, 4); }
 		void debug(u32 pc) { configure(OP_DEBUG, 4, pc); }
 		void exit(parameter param) { configure(OP_EXIT, 4, param); }
 		void exit(condition_t cond, parameter param) { configure(OP_EXIT, 4, param, cond); }

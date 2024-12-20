@@ -29,6 +29,7 @@
 
 /* ----- Control Flow Operations ----- */
 #define UML_NOP(block)                                      do { using namespace uml; block.append().nop(); } while (0)
+#define UML_BREAK(block)                                    do { using namespace uml; block.append().break_(); } while (0)
 #define UML_DEBUG(block, pc)                                do { using namespace uml; block.append().debug(pc); } while (0)
 #define UML_EXIT(block, param)                              do { using namespace uml; block.append().exit(param); } while (0)
 #define UML_EXITc(block, cond, param)                       do { using namespace uml; block.append().exit(param, cond); } while (0)
