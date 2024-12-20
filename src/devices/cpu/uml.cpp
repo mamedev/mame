@@ -176,7 +176,9 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO3(SUBB,    "!subb",    4|8, false, C,    SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO2(CMP,     "!cmp",     4|8, false, NONE, SZVC, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO4(MULU,    "!mulu",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(MULUH,   "!muluh",   4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO4(MULS,    "!muls",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(MULSH,   "!mulsh",   4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO4(DIVU,    "!divu",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO4(DIVS,    "!divs",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO3(AND,     "!and",     4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
@@ -512,6 +514,19 @@ void uml::instruction::simplify()
 			}
 			break;
 
+		// MULUH: convert simple form to MOV if immediate, or if multiplying by 0
+		case OP_MULUH:
+			if (m_param[1].is_immediate_value(0) || m_param[2].is_immediate_value(0))
+				convert_to_mov_immediate(0);
+			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
+			{
+				if (m_size == 4)
+					convert_to_mov_immediate(u32(u32(m_param[1].immediate()) * u32(m_param[2].immediate())));
+				else if (m_size == 8)
+					convert_to_mov_immediate(u64(u64(m_param[1].immediate()) * u64(m_param[2].immediate())));
+			}
+			break;
+
 		// MULS: convert simple form to MOV if immediate, or if multiplying by 0
 		case OP_MULS:
 			if (m_param[0] == m_param[1])
@@ -525,6 +540,19 @@ void uml::instruction::simplify()
 					else if (m_size == 8)
 						convert_to_mov_immediate(s64(s64(m_param[1].immediate()) * s64(m_param[2].immediate())));
 				}
+			}
+			break;
+
+		// MULSH: convert simple form to MOV if immediate, or if multiplying by 0
+		case OP_MULSH:
+			if (m_param[1].is_immediate_value(0) || m_param[2].is_immediate_value(0))
+				convert_to_mov_immediate(0);
+			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
+			{
+				if (m_size == 4)
+					convert_to_mov_immediate(s32(s32(m_param[1].immediate()) * s32(m_param[2].immediate())));
+				else if (m_size == 8)
+					convert_to_mov_immediate(s64(s64(m_param[1].immediate()) * s64(m_param[2].immediate())));
 			}
 			break;
 
