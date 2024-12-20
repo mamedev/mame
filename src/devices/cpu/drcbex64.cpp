@@ -2764,7 +2764,7 @@ void drcbe_x64::op_carry(Assembler &a, const instruction &inst)
 	// degenerate case: source is immediate
 	if (srcp.is_immediate() && bitp.is_immediate())
 	{
-		if (srcp.immediate() & ((uint64_t)1 << bitp.immediate()))
+		if (srcp.immediate() & ((uint64_t)1 << (bitp.immediate() & (inst.size() * 8 - 1))))
 			a.stc();
 		else
 			a.clc();
@@ -2784,7 +2784,7 @@ void drcbe_x64::op_carry(Assembler &a, const instruction &inst)
 	if (srcp.is_memory())
 	{
 		if (bitp.is_immediate())
-			a.bt(MABS(srcp.memory(), inst.size()), bitp.immediate());
+			a.bt(MABS(srcp.memory(), inst.size()), (bitp.immediate() & (inst.size() * 8 - 1)));
 		else
 			a.bt(MABS(srcp.memory(), inst.size()), bitreg);
 	}
@@ -2792,7 +2792,7 @@ void drcbe_x64::op_carry(Assembler &a, const instruction &inst)
 	{
 		Gp const src = Gp::fromTypeAndId(RegType::kX86_Gpq, srcp.ireg());
 		if (bitp.is_immediate())
-			a.bt(src, bitp.immediate());
+			a.bt(src, (bitp.immediate() & (inst.size() * 8 - 1)));
 		else
 			a.bt(src, bitreg);
 	}
