@@ -987,8 +987,7 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 4, 1):
 				temp64 = mul_32x32(PARAM2, PARAM3);
-				temp32 = (int32_t)temp64;
-				flags = FLAGS32_NZ(temp32);
+				flags = FLAGS64_NZ(temp64);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
 				if (temp64 != (int32_t)temp64)
