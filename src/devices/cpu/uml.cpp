@@ -507,9 +507,9 @@ void uml::instruction::simplify()
 				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate(u32(u32(m_param[1].immediate()) * u32(m_param[2].immediate())));
+						convert_to_mov_immediate(u32(u32(m_param[2].immediate()) * u32(m_param[3].immediate())));
 					else if (m_size == 8)
-						convert_to_mov_immediate(u64(u64(m_param[1].immediate()) * u64(m_param[2].immediate())));
+						convert_to_mov_immediate(u64(u64(m_param[2].immediate()) * u64(m_param[3].immediate())));
 				}
 			}
 			break;
@@ -536,9 +536,9 @@ void uml::instruction::simplify()
 				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate(s32(s32(m_param[1].immediate()) * s32(m_param[2].immediate())));
+						convert_to_mov_immediate(s32(s32(m_param[2].immediate()) * s32(m_param[3].immediate())));
 					else if (m_size == 8)
-						convert_to_mov_immediate(s64(s64(m_param[1].immediate()) * s64(m_param[2].immediate())));
+						convert_to_mov_immediate(s64(s64(m_param[2].immediate()) * s64(m_param[3].immediate())));
 				}
 			}
 			break;
@@ -565,9 +565,9 @@ void uml::instruction::simplify()
 				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate(u32(u32(m_param[1].immediate()) / u32(m_param[2].immediate())));
+						convert_to_mov_immediate(u32(u32(m_param[2].immediate()) / u32(m_param[3].immediate())));
 					else if (m_size == 8)
-						convert_to_mov_immediate(u64(u64(m_param[1].immediate()) / u64(m_param[2].immediate())));
+						convert_to_mov_immediate(u64(u64(m_param[2].immediate()) / u64(m_param[3].immediate())));
 				}
 			}
 			break;
@@ -581,9 +581,9 @@ void uml::instruction::simplify()
 				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate(s32(s32(m_param[1].immediate()) / s32(m_param[2].immediate())));
+						convert_to_mov_immediate(s32(s32(m_param[2].immediate()) / s32(m_param[3].immediate())));
 					else if (m_size == 8)
-						convert_to_mov_immediate(s64(s64(m_param[1].immediate()) / s64(m_param[2].immediate())));
+						convert_to_mov_immediate(s64(s64(m_param[2].immediate()) / s64(m_param[3].immediate())));
 				}
 			}
 			break;
