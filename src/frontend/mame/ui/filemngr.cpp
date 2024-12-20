@@ -73,11 +73,13 @@ void menu_file_manager::recompute_metrics(uint32_t width, uint32_t height, float
 		float const max_width(1.0F - (4.0F * lr_border()));
 		m_warnings_layout.emplace(create_layout(max_width, text_layout::text_justify::LEFT));
 		m_warnings_layout->add_text(m_warnings, ui().colors().text_color());
-	}
 
-	set_custom_space(
-			m_warnings_layout ? ((m_warnings_layout->lines() * line_height()) + 3.0F * tb_border()) : 0.0F,
-			line_height() + 3.0F * tb_border());
+		set_custom_space(0.0F, (float(m_warnings_layout->lines() + 1) * line_height()) + (6.0F * tb_border()));
+	}
+	else
+	{
+		set_custom_space(0.0F, line_height() + (3.0F * tb_border()));
+	}
 }
 
 
@@ -87,23 +89,24 @@ void menu_file_manager::recompute_metrics(uint32_t width, uint32_t height, float
 
 void menu_file_manager::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
+	// access the path
+	if (m_selected_device && m_selected_device->exists())
+		extra_text_render(top, (3.0F * tb_border()) + line_height(), origx1, origy1, origx2, origy2, std::string_view(), m_selected_device->filename());
+
 	// show the warnings if any
 	if (m_warnings_layout)
 	{
 		ui().draw_outlined_box(
 				container(),
-				((1.0F + m_warnings_layout->actual_width()) * 0.5F) + lr_border(), origy1 - (3.0F * tb_border()) - (m_warnings_layout->lines() * line_height()),
-				((1.0F - m_warnings_layout->actual_width()) * 0.5F) - lr_border(), origy1 - tb_border(),
+				((1.0F + m_warnings_layout->actual_width()) * 0.5F) + lr_border(), origy2 + (4.0F * tb_border()) + line_height(),
+				((1.0F - m_warnings_layout->actual_width()) * 0.5F) - lr_border(), origy2 + bottom,
 				ui().colors().background_color());
 		m_warnings_layout->emit(
 				container(),
 				(1.0F - m_warnings_layout->actual_width()) * 0.5F,
-				origy1 - (2.0F * tb_border()) - (m_warnings_layout->lines() * line_height()));
+				origy2 + (5.0F * tb_border()) + line_height());
 	}
 
-	// access the path
-	std::string_view path = m_selected_device && m_selected_device->exists() ? m_selected_device->filename() : std::string_view();
-	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, std::string_view(), path);
 }
 
 
@@ -136,7 +139,9 @@ void menu_file_manager::fill_image_line(device_image_interface &img, std::string
 		}
 	}
 	else
+	{
 		filename.assign("---");
+	}
 }
 
 //-------------------------------------------------
