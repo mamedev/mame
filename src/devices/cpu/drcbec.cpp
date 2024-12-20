@@ -965,6 +965,20 @@ int drcbe_c::execute(code_handle &entry)
 					flags |= FLAG_V;
 				break;
 
+			case MAKE_OPCODE_SHORT(OP_MULUH, 4, 0):      // MULUH   dst,src1,src2[,f]
+				temp64 = mulu_32x32(PARAM1, PARAM2);
+				PARAM0 = (uint32_t)temp64;
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_MULUH, 4, 1):
+				temp64 = mulu_32x32(PARAM1, PARAM2);
+				temp32 = (uint32_t)temp64;
+				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
+				if (temp64 > temp32)
+					flags |= FLAG_V;
+				break;
+
 			case MAKE_OPCODE_SHORT(OP_MULS, 4, 0):      // MULS    dst,edst,src1,src2[,f]
 				temp64 = mul_32x32(PARAM2, PARAM3);
 				PARAM1 = temp64 >> 32;
@@ -977,6 +991,20 @@ int drcbe_c::execute(code_handle &entry)
 				flags = FLAGS32_NZ(temp32);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
+				if (temp64 != (int32_t)temp64)
+					flags |= FLAG_V;
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_MULSH, 4, 0):      // MULSH   dst,src1,src2[,f]
+				temp64 = mul_32x32(PARAM1, PARAM2);
+				PARAM0 = (int32_t)temp64;
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_MULSH, 4, 1):
+				temp64 = mul_32x32(PARAM1, PARAM2);
+				temp32 = (int32_t)temp64;
+				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
 				if (temp64 != (int32_t)temp64)
 					flags |= FLAG_V;
 				break;
@@ -1581,12 +1609,30 @@ int drcbe_c::execute(code_handle &entry)
 				flags = dmulu(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, true);
 				break;
 
+			case MAKE_OPCODE_SHORT(OP_MULUH, 8, 0):      // DMULUH  dst,src1,src2[,f]
+				dmulu(*inst[0].puint64, *inst[0].puint64, DPARAM1, DPARAM2, false);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_MULUH, 8, 1):
+				flags = dmulu(*inst[0].puint64, *inst[0].puint64, DPARAM1, DPARAM2, true);
+				flags = FLAGS64_NZ(DPARAM0) | (flags & FLAG_V);
+				break;
+
 			case MAKE_OPCODE_SHORT(OP_MULS, 8, 0):      // DMULS   dst,edst,src1,src2[,f]
 				dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, false);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 8, 1):
 				flags = dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, true);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_MULSH, 8, 0):      // DMULSH  dst,src1,src2[,f]
+				dmuls(*inst[0].puint64, *inst[0].puint64, DPARAM1, DPARAM2, false);
+				break;
+
+			case MAKE_OPCODE_SHORT(OP_MULSH, 8, 1):
+				flags = dmuls(*inst[0].puint64, *inst[0].puint64, DPARAM1, DPARAM2, true);
+				flags = FLAGS64_NZ(DPARAM0) | (flags & FLAG_V);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_DIVU, 8, 0):      // DDIVU   dst,edst,src1,src2[,f]
@@ -2241,7 +2287,7 @@ int drcbe_c::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src
 	// store the results
 	dsthi = hi;
 	dstlo = lo;
-	return ((hi >> 60) & FLAG_S) | ((dsthi != 0) << 1);
+	return ((hi >> 60) & FLAG_S) | ((hi != 0) << 1);
 }
 
 
@@ -2292,7 +2338,7 @@ int drcbe_c::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2,
 	// store the results
 	dsthi = hi;
 	dstlo = lo;
-	return ((hi >> 60) & FLAG_S) | ((dsthi != ((int64_t)lo >> 63)) << 1);
+	return ((hi >> 60) & FLAG_S) | ((hi != ((int64_t)lo >> 63)) << 1);
 }
 
 uint32_t drcbe_c::tzcount32(uint32_t value)
