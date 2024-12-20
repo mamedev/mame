@@ -34,7 +34,6 @@
 
     year        name                                                                                            PCB ID      ROM width       TSOP pads   ROM size        SEEPROM             die markings            extra components / notes
 
-    2011      anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
     2009      anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
     2006      Hello Kitty カードでおままごと　あいうおえ図鑑 / エポック社 / 日本       Hello Kitty Play House with Cards Aiuoe Illustrated Book / Epochsha / Japan
               ドラえもん 体感タケコプター! 空とぶ大冒険 / エポック社 / 日本      Doraemon Experience Takecopter! Great Flying Adventure / Epoch Publishing / Japan
@@ -67,12 +66,12 @@
     not dumped: xavix2.cpp
 
     2008      究極! 筋肉スタジアム! サスケ完全制覇   kyuukyoku! kinniku grand slam! SASUKE kanzen seiha /EPOCH/Japan                                 -           -               -           -               -                   -                       -
-    2006      Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～ / バンダイ / 日本         Let's!TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ / Bandai / Japan
     2006      SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦 / エポック社 / 日本   SASUKE Sasuke & Muscle Battle!! Sportsman No. 1 Decisive Battle / Epoch Publishing / Japan
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-              Excite Striker (UK)
+			  anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
+			  Excite Striker (UK)
               connecTV OPUS /RADICA EU (different ROM to US?)
               Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本  (Let's! TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan)
               Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
@@ -200,6 +199,7 @@
     dumped: see xavix2.cpp
     2006      Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本            Let's!TV Play NARUTO Ninja Experience ~Dattebayo~ / Bandai / Japan
     2006      テレビであそぼう！まなぼう！超能力あいうえお図鑑 / エポック社 / 日本   Let's play on TV! Learn! Superpower Aiueo Illustrated Book / Epochsha / Japan
+    2006      Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～ / バンダイ / 日本         Let's!TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ / Bandai / Japan
 
 
 

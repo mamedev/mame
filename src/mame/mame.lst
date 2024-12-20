@@ -46260,6 +46260,7 @@ tvpc_ham
 tvpc_tom
 
 @source:tvgames/xavix2.cpp
+ban_db2j
 ltv_naru                        //
 domfitad                        //
 dombikec                        //
@@ -46286,6 +46287,7 @@ ttv_sw                          //
 ttv_swj                         //
 
 @source:tvgames/xavix_2002.cpp
+anpanmdx
 ban_kksj
 ban_ordj
 domdance                        //
