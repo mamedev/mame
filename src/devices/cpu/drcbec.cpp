@@ -826,7 +826,8 @@ int drcbe_c::execute(code_handle &entry)
 				m_space[PARAM3]->write_dword(PARAM0, PARAM1, PARAM2);
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_CARRY, 4, 1):     // CARRY   src,bitnum
+			case MAKE_OPCODE_SHORT(OP_CARRY, 4, 0):     // CARRY   src,bitnum
+			case MAKE_OPCODE_SHORT(OP_CARRY, 4, 1):
 				flags = (flags & ~FLAG_C) | ((PARAM0 >> (PARAM1 & 31)) & FLAG_C);
 				break;
 
@@ -1454,6 +1455,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_CARRY, 8, 0):     // DCARRY  src,bitnum
+			case MAKE_OPCODE_SHORT(OP_CARRY, 8, 1):
 				flags = (flags & ~FLAG_C) | ((DPARAM0 >> (DPARAM1 & 63)) & FLAG_C);
 				break;
 
