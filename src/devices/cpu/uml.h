@@ -62,16 +62,16 @@ namespace uml
 	{
 		COND_ALWAYS = 0,
 
-		COND_Z = 0x80,              // requires Z
-		COND_NZ,                    // requires Z
-		COND_S,                     // requires S
-		COND_NS,                    // requires S
-		COND_C,                     // requires C
-		COND_NC,                    // requires C
-		COND_V,                     // requires V
-		COND_NV,                    // requires V
-		COND_U,                     // requires U
-		COND_NU,                    // requires U
+		COND_Z = 0x80,              // requires Z (zero/equal)
+		COND_NZ,                    // requires Z (not zero/unequal)
+		COND_S,                     // requires S (signed)
+		COND_NS,                    // requires S (not signed)
+		COND_C,                     // requires C (carry)
+		COND_NC,                    // requires C (no carry)
+		COND_V,                     // requires V (overflow)
+		COND_NV,                    // requires V (no overflow)
+		COND_U,                     // requires U (unordered)
+		COND_NU,                    // requires U (not unordered)
 		COND_A,                     // requires CZ, unsigned
 		COND_BE,                    // requires CZ, unsigned
 		COND_G,                     // requires SVZ, signed
