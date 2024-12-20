@@ -1046,8 +1046,7 @@ ROM_START( darwin )
 	ROM_LOAD( "darw_11.rom",  0x08000, 0x8000, CRC(548ce2d1) SHA1(3b1757c70346ab4ee19ec85e7ae5137f8ccf446f) )
 	ROM_LOAD( "darw_12.rom",  0x10000, 0x8000, CRC(faba5fef) SHA1(848da4d4888f0218b737f1dc9b62944f68349a43) )
 
-	// A PCB has been found with the first PROM substituted with a TBP28S42 (4b56a744) SHA1(5fdc336d90c8a289c146c66f241dd217fc11bf35), see brkthrut ROM loading for how they did it.
-	// With that in mind, there's a one byte difference at 0x55 (0xf0 instead of 0x70). It is unknown if it's bitrot or if it's intended.
+	// A PCB has been found with the first PROM substituted with a TBP28S42, see brkthrut ROM loading for how they did it.
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "df.12",   0x0000, 0x0100, CRC(89b952ef) SHA1(77dc4020a2e25f81fae1182d58993cf09d13af00) ) // red and green component
 	ROM_LOAD( "df.13",   0x0100, 0x0100, CRC(d595e91d) SHA1(5e9793f6602455c79afdc855cd13183a7f48ab1e) ) // blue component
