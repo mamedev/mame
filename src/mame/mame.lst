@@ -134,6 +134,7 @@ fortellr                        //
 fortfvr                         //
 gamblra5                        //
 geisha                          //
+geishanz                        //
 genmagi                         //
 glizrdce                        //
 gnomeatw                        //
@@ -153,6 +154,7 @@ incasunv                        //
 indrema5                        //
 indrema5q                       //
 indrema5v                       //
+jkrpkra5                        //
 jumpbean                        //
 jumpjoey                        //
 jumpjoeyu                       //
@@ -161,6 +163,7 @@ kgalah                          //
 kgalaha                         //
 kgalahce                        //
 kgbirda5                        //
+kingsran                        //
 koalamnt                        //
 kookabuk                        //
 kyhaton                         //
@@ -20325,6 +20328,7 @@ unkch2                          // bootleg
 unkch3                          // bootleg
 unkch4                          // bootleg
 war3cb                          //
+wcat                            //
 wcat3                           //
 wcat3a                          //
 wcherry                         // bootleg
@@ -20750,632 +20754,648 @@ tripplay                        // (c) 1999 IGT
 wofigt                          //
 
 @source:igt/peplus.cpp
-im1p1952                        // (c) 1995 IGT - International Game Technology
-im1p19s1                        // (c) 1995 IGT - International Game Technology
-im2p1929                        // (c) 1995 IGT - International Game Technology
-im3p1940                        // (c) 1995 IGT - International Game Technology
-pcramclr                        // (c) 1987 IGT - International Game Technology
-pc644vz                         // (c) 1987 IGT - International Game Technology
-pc679cy                         // (c) 1987 IGT - International Game Technology
-pc714vz                         // (c) 1987 IGT - International Game Technology
-pc716vy                         // (c) 1987 IGT - International Game Technology
-pc718vy                         // (c) 1987 IGT - International Game Technology
-pebe0013                        // (c) 1994 IGT - International Game Technology
-pebe0014                        // (c) 1994 IGT - International Game Technology
-pebe0014a                       // (c) 1994 IGT - International Game Technology
-peip0028                        // (c) 1987 IGT - International Game Technology
-peip0029                        // (c) 1987 IGT - International Game Technology
-peip0031                        // (c) 1987 IGT - International Game Technology
-peip0041                        // (c) 1987 IGT - International Game Technology
-peip0051                        // (c) 1987 IGT - International Game Technology
-peip0058                        // (c) 1987 IGT - International Game Technology
-peip0062                        // (c) 1987 IGT - International Game Technology
-peip0074                        // (c) 1987 IGT - International Game Technology
-peip0079                        // (c) 1987 IGT - International Game Technology
-peip0101                        // (c) 1987 IGT - International Game Technology
-peip0103                        // (c) 1987 IGT - International Game Technology
-peip0105                        // (c) 1987 IGT - International Game Technology
-peip0108                        // (c) 1987 IGT - International Game Technology
-peip0111                        // (c) 1987 IGT - International Game Technology
-peip0112                        // (c) 1987 IGT - International Game Technology
-peip0114                        // (c) 1987 IGT - International Game Technology
-peip0115                        // (c) 1987 IGT - International Game Technology
-peip0116                        // (c) 1987 IGT - International Game Technology
-peip0118                        // (c) 1987 IGT - International Game Technology
-peip0120                        // (c) 1987 IGT - International Game Technology
-peivc006                        // (c) 1987 IGT - International Game Technology
-peke0004                        // (c) 1994 IGT - International Game Technology
-peke0004a                       // (c) 1994 IGT - International Game Technology
-peke0004b                       // (c) 1994 IGT - International Game Technology
-peke0017                        // (c) 1994 IGT - International Game Technology
-peke0017a                       // (c) 1994 IGT - International Game Technology
-peke0026                        // (c) 1994 IGT - International Game Technology
-peke1001                        // (c) 1994 IGT - International Game Technology
-peke1006                        // (c) 1994 IGT - International Game Technology
-peke1012                        // (c) 1994 IGT - International Game Technology
-peke1012a                       // (c) 1994 IGT - International Game Technology
-peke1012b                       // (c) 1994 IGT - International Game Technology
-peke1013                        // (c) 1994 IGT - International Game Technology
-peke1013a                       // (c) 1994 IGT - International Game Technology
-pekoc766                        // (c) 1997 IGT - International Game Technology
-pekoc801                        // (c) 1997 IGT - International Game Technology
-pekoc802                        // (c) 1997 IGT - International Game Technology
-pekoc803                        // (c) 1997 IGT - International Game Technology
-pekoc803a                       // (c) 1997 IGT - International Game Technology
-pekoc804                        // (c) 1997 IGT - International Game Technology
-pekoc806                        // (c) 1997 IGT - International Game Technology
-pekoc818                        // (c) 1997 IGT - International Game Technology
-pekoc819                        // (c) 1997 IGT - International Game Technology
-pekoc822                        // (c) 1997 IGT - International Game Technology
-pekoc825                        // (c) 1997 IGT - International Game Technology
-pemg0025                        // (c) 1994 IGT - International Game Technology
-pemg0026                        // (c) 1994 IGT - International Game Technology
-pemg0182                        // (c) 1994 IGT - International Game Technology
-pemg0183                        // (c) 1994 IGT - International Game Technology
-pemg0213                        // (c) 1994 IGT - International Game Technology
-pemg0225                        // (c) 1994 IGT - International Game Technology
-pemg0252                        // (c) 1994 IGT - International Game Technology
-pepk0719                        // (c) 1987 IGT - International Game Technology
-pepk0719a                       // (c) 1987 IGT - International Game Technology
-pepk0719b                       // (c) 1987 IGT - International Game Technology
-pepk0756                        // (c) 1987 IGT - International Game Technology
-pepk0756a                       // (c) 1987 IGT - International Game Technology
-pepk0756b                       // (c) 1987 IGT - International Game Technology
-pepk0756c                       // (c) 1987 IGT - International Game Technology
-pepk0756d                       // (c) 1987 IGT - International Game Technology
-pepk0757                        // (c) 1987 IGT - International Game Technology
-pepk0758                        // (c) 1987 IGT - International Game Technology
-pepk0769                        // (c) 1987 IGT - International Game Technology
-pepk0773                        // (c) 1987 IGT - International Game Technology
-pepk0785                        // (c) 1987 IGT - International Game Technology
-pepk0788                        // (c) 1987 IGT - International Game Technology
-pepk0810                        // (c) 1987 IGT - International Game Technology
-pepk0810a                       // (c) 1987 IGT - International Game Technology
-pepk0811                        // (c) 1987 IGT - International Game Technology
-pepk0823                        // (c) 1987 IGT - International Game Technology
-pepk0832                        // (c) 1987 IGT - International Game Technology
-pepk0846                        // (c) 1987 IGT - International Game Technology
-pepk0849                        // (c) 1987 IGT - International Game Technology
-pepk0856                        // (c) 1987 IGT - International Game Technology
-pepk0856a                       // (c) 1987 IGT - International Game Technology
-pepk0858                        // (c) 1987 IGT - International Game Technology
-pepk0873                        // (c) 1987 IGT - International Game Technology
-pepk0873a                       // (c) 1987 IGT - International Game Technology
-pepk0885                        // (c) 1987 IGT - International Game Technology
-pepk0930                        // (c) 1987 IGT - International Game Technology
-pepk0930a                       // (c) 1987 IGT - International Game Technology
-pepk1002                        // (c) 1987 IGT - International Game Technology
-pepk1004                        // (c) 1987 IGT - International Game Technology
-pepk1013                        // (c) 1987 IGT - International Game Technology
-pepk1015                        // (c) 1987 IGT - International Game Technology
-pepk1017                        // (c) 1987 IGT - International Game Technology
-pepk1020                        // (c) 1987 IGT - International Game Technology
-pepk1024                        // (c) 1987 IGT - International Game Technology
-pepk1030                        // (c) 1987 IGT - International Game Technology
-pepk1031                        // (c) 1987 IGT - International Game Technology
-pepk1069                        // (c) 1987 IGT - International Game Technology
-pepp0001                        // (c) 1987 IGT - International Game Technology
-pepp0002                        // (c) 1987 IGT - International Game Technology
-pepp0002a                       // (c) 1987 IGT - International Game Technology
-pepp0005                        // (c) 1987 IGT - International Game Technology
-pepp0006                        // (c) 1987 IGT - International Game Technology
-pepp0008                        // (c) 1987 IGT - International Game Technology
-pepp0008a                       // (c) 1987 IGT - International Game Technology
-pepp0008b                       // (c) 1987 IGT - International Game Technology
-pepp0009                        // (c) 1987 IGT - International Game Technology
-pepp0010                        // (c) 1987 IGT - International Game Technology
-pepp0014                        // (c) 1987 IGT - International Game Technology
-pepp0014a                       // (c) 1987 IGT - International Game Technology
-pepp0021                        // (c) 1987 IGT - International Game Technology
-pepp0023                        // (c) 1987 IGT - International Game Technology
-pepp0038                        // (c) 1987 IGT - International Game Technology
-pepp0040                        // (c) 1987 IGT - International Game Technology
-pepp0040a                       // (c) 1987 IGT - International Game Technology
-pepp0040b                       // (c) 1987 IGT - International Game Technology
-pepp0041                        // (c) 1987 IGT - International Game Technology
-pepp0042                        // (c) 1987 IGT - International Game Technology
-pepp0042a                       // (c) 1987 IGT - International Game Technology
-pepp0042b                       // (c) 1987 IGT - International Game Technology
-pepp0043                        // (c) 1987 IGT - International Game Technology
-pepp0043a                       // (c) 1987 IGT - International Game Technology
-pepp0043b                       // (c) 1987 IGT - International Game Technology
-pepp0045                        // (c) 1987 IGT - International Game Technology
-pepp0045a                       // (c) 1987 IGT - International Game Technology
-pepp0045b                       // (c) 1987 IGT - International Game Technology
-pepp0045c                       // (c) 1987 IGT - International Game Technology
-pepp0045d                       // (c) 1987 IGT - International Game Technology
-pepp0046                        // (c) 1987 IGT - International Game Technology
-pepp0046a                       // (c) 1987 IGT - International Game Technology
-pepp0046b                       // (c) 1987 IGT - International Game Technology
-pepp0046c                       // (c) 1987 IGT - International Game Technology
-pepp0048                        // (c) 1987 IGT - International Game Technology
-pepp0048a                       // (c) 1987 IGT - International Game Technology
-pepp0048b                       // (c) 1987 IGT - International Game Technology
-pepp0048c                       // (c) 1987 IGT - International Game Technology
-pepp0050                        // (c) 1987 IGT - International Game Technology
-pepp0050a                       // (c) 1987 IGT - International Game Technology
-pepp0050b                       // (c) 1987 IGT - International Game Technology
-pepp0050c                       // (c) 1987 IGT - International Game Technology
-pepp0051                        // (c) 1987 IGT - International Game Technology
-pepp0052                        // (c) 1987 IGT - International Game Technology
-pepp0053                        // (c) 1987 IGT - International Game Technology
-pepp0054                        // (c) 1987 IGT - International Game Technology
-pepp0055                        // (c) 1987 IGT - International Game Technology
-pepp0055a                       // (c) 1987 IGT - International Game Technology
-pepp0055b                       // (c) 1987 IGT - International Game Technology
-pepp0055c                       // (c) 1987 IGT - International Game Technology
-pepp0057                        // (c) 1987 IGT - International Game Technology
-pepp0057a                       // (c) 1987 IGT - International Game Technology
-pepp0057b                       // (c) 1987 IGT - International Game Technology
-pepp0057c                       // (c) 1987 IGT - International Game Technology
-pepp0057d                       // (c) 1987 IGT - International Game Technology
-pepp0059                        // (c) 1987 IGT - International Game Technology
-pepp0059a                       // (c) 1987 IGT - International Game Technology
-pepp0060                        // (c) 1987 IGT - International Game Technology
-pepp0060a                       // (c) 1987 IGT - International Game Technology
-pepp0060b                       // (c) 1987 IGT - International Game Technology
-pepp0060c                       // (c) 1987 IGT - International Game Technology
-pepp0063                        // (c) 1987 IGT - International Game Technology
-pepp0064                        // (c) 1987 IGT - International Game Technology
-pepp0065                        // (c) 1987 IGT - International Game Technology
-pepp0078                        // (c) 1987 IGT - International Game Technology
-pepp0079                        // (c) 1987 IGT - International Game Technology
-pepp0083                        // (c) 1987 IGT - International Game Technology
-pepp0083a                       // (c) 1987 IGT - International Game Technology
-pepp0085                        // (c) 1987 IGT - International Game Technology
-pepp0089                        // (c) 1987 IGT - International Game Technology
-pepp0094                        // (c) 1987 IGT - International Game Technology
-pepp0094a                       // (c) 1987 IGT - International Game Technology
-pepp0103                        // (c) 1987 IGT - International Game Technology
-pepp0103a                       // (c) 1987 IGT - International Game Technology
-pepp0103b                       // (c) 1987 IGT - International Game Technology
-pepp0103c                       // (c) 1987 IGT - International Game Technology
-pepp0104                        // (c) 1987 IGT - International Game Technology
-pepp0104a                       // (c) 1987 IGT - International Game Technology
-pepp0116                        // (c) 1987 IGT - International Game Technology
-pepp0116a                       // (c) 1987 IGT - International Game Technology
-pepp0117                        // (c) 1987 IGT - International Game Technology
-pepp0118                        // (c) 1987 IGT - International Game Technology
-pepp0120                        // (c) 1987 IGT - International Game Technology
-pepp0122                        // (c) 1987 IGT - International Game Technology
-pepp0125                        // (c) 1987 IGT - International Game Technolog
-pepp0125a                       // (c) 1987 IGT - International Game Technology
-pepp0126                        // (c) 1987 IGT - International Game Technology
-pepp0126a                       // (c) 1987 IGT - International Game Technology
-pepp0126b                       // (c) 1987 IGT - International Game Technology
-pepp0127                        // (c) 1987 IGT - International Game Technology
-pepp0127a                       // (c) 1987 IGT - International Game Technology
-pepp0127b                       // (c) 1987 IGT - International Game Technology
-pepp0129                        // (c) 1987 IGT - International Game Technology
-pepp0130                        // (c) 1987 IGT - International Game Technology
-pepp0132                        // (c) 1987 IGT - International Game Technology
-pepp0143                        // (c) 1987 IGT - International Game Technology
-pepp0150                        // (c) 1987 IGT - International Game Technology
-pepp0158                        // (c) 1987 IGT - International Game Technology
-pepp0158a                       // (c) 1987 IGT - International Game Technology
-pepp0158b                       // (c) 1987 IGT - International Game Technology
-pepp0158c                       // (c) 1987 IGT - International Game Technology
-pepp0158d                       // (c) 1987 IGT - International Game Technology
-pepp0159                        // (c) 1987 IGT - International Game Technology
-pepp0171                        // (c) 1987 IGT - International Game Technology
-pepp0171a                       // (c) 1987 IGT - International Game Technology
-pepp0178                        // (c) 1987 IGT - International Game Technology
-pepp0181                        // (c) 1987 IGT - International Game Technology
-pepp0188                        // (c) 1987 IGT - International Game Technology
-pepp0188a                       // (c) 1987 IGT - International Game Technology
-pepp0188b                       // (c) 1987 IGT - International Game Technology
-pepp0189                        // (c) 1987 IGT - International Game Technology
-pepp0190                        // (c) 1987 IGT - International Game Technology
-pepp0190a                       // (c) 1987 IGT - International Game Technology
-pepp0190b                       // (c) 1987 IGT - International Game Technology
-pepp0190c                       // (c) 1987 IGT - International Game Technology
-pepp0195                        // (c) 1987 IGT - International Game Technology
-pepp0197                        // (c) 1987 IGT - International Game Technology
-pepp0197a                       // (c) 1987 IGT - International Game Technology
-pepp0197b                       // (c) 1987 IGT - International Game Technology
-pepp0197c                       // (c) 1987 IGT - International Game Technology
-pepp0197d                       // (c) 1987 IGT - International Game Technology
-pepp0197e                       // (c) 1987 IGT - International Game Technology
-pepp0203                        // (c) 1987 IGT - International Game Technology
-pepp0203a                       // (c) 1987 IGT - International Game Technology
-pepp0203b                       // (c) 1987 IGT - International Game Technology
-pepp0203c                       // (c) 1987 IGT - International Game Technology
-pepp0203d                       // (c) 1987 IGT - International Game Technology
-pepp0203e                       // (c) 1987 IGT - International Game Technology
-pepp0218                        // (c) 1987 IGT - International Game Technology
-pepp0219                        // (c) 1987 IGT - International Game Technology
-pepp0221                        // (c) 1987 IGT - International Game Technology
-pepp0221a                       // (c) 1987 IGT - International Game Technology
-pepp0221b                       // (c) 1987 IGT - International Game Technology
-pepp0223                        // (c) 1987 IGT - International Game Technology
-pepp0224                        // (c) 1987 IGT - International Game Technology
-pepp0224a                       // (c) 1987 IGT - International Game Technology
-pepp0230                        // (c) 1987 IGT - International Game Technology
-pepp0232                        // (c) 1987 IGT - International Game Technology
-pepp0242                        // (c) 1987 IGT - International Game Technology
-pepp0249                        // (c) 1987 IGT - International Game Technology
-pepp0250                        // (c) 1987 IGT - International Game Technology
-pepp0250a                       // (c) 1987 IGT - International Game Technology
-pepp0265                        // (c) 1987 IGT - International Game Technology
-pepp0265a                       // (c) 1987 IGT - International Game Technology
-pepp0265b                       // (c) 1987 IGT - International Game Technology
-pepp0265c                       // (c) 1987 IGT - International Game Technology
-pepp0274                        // (c) 1987 IGT - International Game Technology
-pepp0288                        // (c) 1987 IGT - International Game Technology
-pepp0290                        // (c) 1987 IGT - International Game Technology
-pepp0290a                       // (c) 1987 IGT - International Game Technology
-pepp0291                        // (c) 1987 IGT - International Game Technology
-pepp0291a                       // (c) 1987 IGT - International Game Technology
-pepp0294                        // (c) 1987 IGT - International Game Technology
-pepp0295                        // (c) 1987 IGT - International Game Technology
-pepp0401                        // (c) 1987 IGT - International Game Technology
-pepp0409                        // (c) 1987 IGT - International Game Technology
-pepp0410                        // (c) 1987 IGT - International Game Technology
-pepp0410a                       // (c) 1987 IGT - International Game Technology
-pepp0417                        // (c) 1987 IGT - International Game Technology
-pepp0417a                       // (c) 1987 IGT - International Game Technology
-pepp0418                        // (c) 1987 IGT - International Game Technology
-pepp0418a                       // (c) 1987 IGT - International Game Technology
-pepp0419                        // (c) 1987 IGT - International Game Technology
-pepp0419a                       // (c) 1987 IGT - International Game Technology
-pepp0419b                       // (c) 1987 IGT - International Game Technology
-pepp0420                        // (c) 1987 IGT - International Game Technology
-pepp0420a                       // (c) 1987 IGT - International Game Technology
-pepp0423                        // (c) 1987 IGT - International Game Technology
-pepp0423a                       // (c) 1987 IGT - International Game Technology
-pepp0423b                       // (c) 1987 IGT - International Game Technology
-pepp0423c                       // (c) 1987 IGT - International Game Technology
-pepp0425                        // (c) 1987 IGT - International Game Technology
-pepp0426                        // (c) 1987 IGT - International Game Technology
-pepp0428                        // (c) 1987 IGT - International Game Technology
-pepp0429                        // (c) 1987 IGT - International Game Technology
-pepp0429a                       // (c) 1987 IGT - International Game Technology
-pepp0430                        // (c) 1987 IGT - International Game Technology
-pepp0430a                       // (c) 1987 IGT - International Game Technology
-pepp0431                        // (c) 1987 IGT - International Game Technology
-pepp0434                        // (c) 1987 IGT - International Game Technology
-pepp0434a                       // (c) 1987 IGT - International Game Technology
-pepp0445                        // (c) 1987 IGT - International Game Technology
-pepp0447                        // (c) 1987 IGT - International Game Technology
-pepp0447a                       // (c) 1987 IGT - International Game Technology
-pepp0447b                       // (c) 1987 IGT - International Game Technology
-pepp0449                        // (c) 1987 IGT - International Game Technology
-pepp0449a                       // (c) 1987 IGT - International Game Technology
-pepp0450                        // (c) 1995 IGT - International Game Technology
-pepp0451                        // (c) 1995 IGT - International Game Technology
-pepp0452                        // (c) 1987 IGT - International Game Technology
-pepp0452a                       // (c) 1987 IGT - International Game Technology
-pepp0453                        // (c) 1987 IGT - International Game Technology
-pepp0454                        // (c) 1987 IGT - International Game Technology
-pepp0454a                       // (c) 1987 IGT - International Game Technology
-pepp0455                        // (c) 1987 IGT - International Game Technology
-pepp0458                        // (c) 1987 IGT - International Game Technology
-pepp0459                        // (c) 1987 IGT - International Game Technology
-pepp0459a                       // (c) 1987 IGT - International Game Technology
-pepp0467                        // (c) 1987 IGT - International Game Technology
-pepp0469                        // (c) 1987 IGT - International Game Technology
-pepp0472                        // (c) 1987 IGT - International Game Technology
-pepp0488                        // (c) 1987 IGT - International Game Technology
-pepp0508                        // (c) 1987 IGT - International Game Technology
-pepp0508a                       // (c) 1987 IGT - International Game Technology
-pepp0509                        // (c) 1987 IGT - International Game Technology
-pepp0510                        // (c) 1987 IGT - International Game Technology
-pepp0514                        // (c) 1987 IGT - International Game Technology
-pepp0514a                       // (c) 1987 IGT - International Game Technology
-pepp0514b                       // (c) 1987 IGT - International Game Technology
-pepp0515                        // (c) 1987 IGT - International Game Technology
-pepp0515a                       // (c) 1987 IGT - International Game Technology
-pepp0515b                       // (c) 1987 IGT - International Game Technology
-pepp0515c                       // (c) 1987 IGT - International Game Technology
-pepp0516                        // (c) 1987 IGT - International Game Technology
-pepp0516a                       // (c) 1987 IGT - International Game Technology
-pepp0516b                       // (c) 1987 IGT - International Game Technology
-pepp0516c                       // (c) 1987 IGT - International Game Technology
-pepp0526                        // (c) 1987 IGT - International Game Technology
-pepp0531                        // (c) 1987 IGT - International Game Technology
-pepp0536                        // (c) 1987 IGT - International Game Technology
-pepp0538                        // (c) 1987 IGT - International Game Technology
-pepp0540                        // (c) 1987 IGT - International Game Technology
-pepp0540a                       // (c) 1987 IGT - International Game Technology
-pepp0542                        // (c) 1987 IGT - International Game Technology
-pepp0542a                       // (c) 1987 IGT - International Game Technology
-pepp0542b                       // (c) 1987 IGT - International Game Technology
-pepp0550                        // (c) 1987 IGT - International Game Technology
-pepp0550a                       // (c) 1987 IGT - International Game Technology
-pepp0550b                       // (c) 1987 IGT - International Game Technology
-pepp0555                        // (c) 1987 IGT - International Game Technology
-pepp0559                        // (c) 1987 IGT - International Game Technology
-pepp0562                        // (c) 1987 IGT - International Game Technology
-pepp0568                        // (c) 1987 IGT - International Game Technology
-pepp0585                        // (c) 1987 IGT - International Game Technology
-pepp0587                        // (c) 1987 IGT - International Game Technology
-pepp0596                        // (c) 1987 IGT - International Game Technology
-pepp0598                        // (c) 1987 IGT - International Game Technology
-pepp0711                        // (c) 1987 IGT - International Game Technology
-pepp0713                        // (c) 1987 IGT - International Game Technology
-pepp0725                        // (c) 1987 IGT - International Game Technology
-pepp0725a                       // (c) 1987 IGT - International Game Technology
-pepp0726                        // (c) 1987 IGT - International Game Technology
-pepp0728                        // (c) 1987 IGT - International Game Technology
-pepp0729                        // (c) 1987 IGT - International Game Technology
-pepp0733                        // (c) 1987 IGT - International Game Technology
-pepp0750                        // (c) 1987 IGT - International Game Technology
-pepp0750a                       // (c) 1987 IGT - International Game Technology
-pepp0757                        // (c) 1987 IGT - International Game Technology
-pepp0760                        // (c) 1987 IGT - International Game Technology
-pepp0763                        // (c) 1987 IGT - International Game Technology
-pepp0764                        // (c) 1987 IGT - International Game Technology
-pepp0775                        // (c) 1987 IGT - International Game Technology
-pepp0777                        // (c) 1987 IGT - International Game Technology
-pepp0797                        // (c) 1987 IGT - International Game Technology
-pepp0812                        // (c) 1987 IGT - International Game Technology
-pepp0816                        // (c) 1987 IGT - International Game Technology
-peps0014                        // (c) 1996 IGT - International Game Technology
-peps0015                        // (c) 1996 IGT - International Game Technology
-peps0021                        // (c) 1996 IGT - International Game Technology
-peps0022                        // (c) 1996 IGT - International Game Technology
-peps0040                        // (c) 1996 IGT - International Game Technology
-peps0041                        // (c) 1996 IGT - International Game Technology
-peps0042                        // (c) 1996 IGT - International Game Technology
-peps0043                        // (c) 1996 IGT - International Game Technology
-peps0044                        // (c) 1996 IGT - International Game Technology
-peps0045                        // (c) 1996 IGT - International Game Technology
-peps0047                        // (c) 1996 IGT - International Game Technology
-peps0048                        // (c) 1996 IGT - International Game Technology
-peps0070                        // (c) 1996 IGT - International Game Technology
-peps0086                        // (c) 1996 IGT - International Game Technology
-peps0090                        // (c) 1996 IGT - International Game Technology
-peps0092                        // (c) 1996 IGT - International Game Technology
-peps0205                        // (c) 1996 IGT - International Game Technology
-peps0206                        // (c) 1996 IGT - International Game Technology
-peps0207                        // (c) 1996 IGT - International Game Technology
-peps0239                        // (c) 1996 IGT - International Game Technology
-peps0267                        // (c) 1996 IGT - International Game Technology
-peps0271                        // (c) 1996 IGT - International Game Technology
-peps0275                        // (c) 1996 IGT - International Game Technology
-peps0275a                       // (c) 1996 IGT - International Game Technology
-peps0280                        // (c) 1996 IGT - International Game Technology
-peps0280a                       // (c) 1996 IGT - International Game Technology
-peps0291                        // (c) 1996 IGT - International Game Technology
-peps0296                        // (c) 1996 IGT - International Game Technology
-peps0298                        // (c) 1996 IGT - International Game Technology
-peps0308                        // (c) 1996 IGT - International Game Technology
-peps0358                        // (c) 1996 IGT - International Game Technology
-peps0364                        // (c) 1996 IGT - International Game Technology
-peps0366                        // (c) 1996 IGT - International Game Technology
-peps0372                        // (c) 1996 IGT - International Game Technology
-peps0373                        // (c) 1996 IGT - International Game Technology
-peps0425                        // (c) 1996 IGT - International Game Technology
-peps0426                        // (c) 1996 IGT - International Game Technology
-peps0470                        // (c) 1996 IGT - International Game Technology
-peps0581                        // (c) 1996 IGT - International Game Technology
-peps0615                        // (c) 1996 IGT - International Game Technology
-peps0623                        // (c) 1996 IGT - International Game Technology
-peps0628                        // (c) 1996 IGT - International Game Technology
-peps0629                        // (c) 1996 IGT - International Game Technology
-peps0631                        // (c) 1996 IGT - International Game Technology
-peps0708                        // (c) 1996 IGT - International Game Technology
-peps0716                        // (c) 1996 IGT - International Game Technology
-peps0722                        // (c) 1996 IGT - International Game Technology
-peset001                        // (c) 1987 IGT - International Game Technology
-peset004                        // (c) 1987 IGT - International Game Technology
-peset012                        // (c) 1987 IGT - International Game Technology
-peset022                        // (c) 1987 IGT - International Game Technology
-peset033                        // (c) 1987 IGT - International Game Technology
-peset038                        // (c) 1987 IGT - International Game Technology
-peset100                        // (c) 1987 IGT - International Game Technology
-peset117                        // (c) 1987 IGT - International Game Technology
-pex0002p                        // (c) 1995 IGT - International Game Technology
-pex0002pa                       // (c) 1995 IGT - International Game Technology
-pex0006k                        // (c) 1997 IGT - International Game Technology
-pex0006p                        // (c) 1995 IGT - International Game Technology
-pex0013k                        // (c) 1997 IGT - International Game Technology
-pex0013ka                       // (c) 1997 IGT - International Game Technology
-pex0014p                        // (c) 1995 IGT - International Game Technology
-pex0040p                        // (c) 1995 IGT - International Game Technology
-pex0042p                        // (c) 1995 IGT - International Game Technology
-pex0045p                        // (c) 1995 IGT - International Game Technology
-pex0046p                        // (c) 1995 IGT - International Game Technology
-pex0053p                        // (c) 1995 IGT - International Game Technology
-pex0054p                        // (c) 1995 IGT - International Game Technology
-pex0055p                        // (c) 1995 IGT - International Game Technology
-pex0055pa                       // (c) 1995 IGT - International Game Technology
-pex0055pb                       // (c) 1995 IGT - International Game Technology
-pex0055pc                       // (c) 1995 IGT - International Game Technology
-pex0055pd                       // (c) 1995 IGT - International Game Technology
-pex0055pe                       // (c) 1995 IGT - International Game Technology
-pex0055pf                       // (c) 1995 IGT - International Game Technology
-pex0055pg                       // (c) 1995 IGT - International Game Technology
-pex0055ph                       // (c) 1995 IGT - International Game Technology
-pex0055pi                       // (c) 1995 IGT - International Game Technology
-pex0055pj                       // (c) 1995 IGT - International Game Technology
-pex0055pk                       // (c) 1995 IGT - International Game Technology
-pex0055pl                       // (c) 1995 IGT - International Game Technology
-pex0055pm                       // (c) 1995 IGT - International Game Technology
-pex0055pn                       // (c) 1995 IGT - International Game Technology
-pex0055po                       // (c) 1995 IGT - International Game Technology
-pex0055pp                       // (c) 1995 IGT - International Game Technology
-pex0055pq                       // (c) 1995 IGT - International Game Technology
-pex0055pr                       // (c) 1995 IGT - International Game Technology
-pex0055ps                       // (c) 1995 IGT - International Game Technology
-pex0055pt                       // (c) 1995 IGT - International Game Technology
-pex0057p                        // (c) 1995 IGT - International Game Technology
-pex0057pa                       // (c) 1995 IGT - International Game Technology
-pex0057pb                       // (c) 1995 IGT - International Game Technology
-pex0057pc                       // (c) 1995 IGT - International Game Technology
-pex0057pd                       // (c) 1995 IGT - International Game Technology
-pex0057pe                       // (c) 1995 IGT - International Game Technology
-pex0057pf                       // (c) 1995 IGT - International Game Technology
-pex0057pg                       // (c) 1995 IGT - International Game Technology
-pex0060p                        // (c) 1995 IGT - International Game Technology
-pex0124p                        // (c) 1995 IGT - International Game Technology
-pex0127p                        // (c) 1995 IGT - International Game Technology
-pex0150p                        // (c) 1995 IGT - International Game Technology
-pex0158p                        // (c) 1995 IGT - International Game Technology
-pex0171p                        // (c) 1995 IGT - International Game Technology
-pex0188p                        // (c) 1995 IGT - International Game Technology
-pex0190p                        // (c) 1995 IGT - International Game Technology
-pex0197p                        // (c) 1995 IGT - International Game Technology
-pex0203p                        // (c) 1995 IGT - International Game Technology
-pex0224p                        // (c) 1995 IGT - International Game Technology
-pex0225p                        // (c) 1995 IGT - International Game Technology
-pex0242p                        // (c) 1995 IGT - International Game Technology
-pex0265p                        // (c) 1995 IGT - International Game Technology
-pex0291p                        // (c) 1995 IGT - International Game Technology
-pex0403p                        // (c) 1995 IGT - International Game Technology
-pex0417p                        // (c) 1995 IGT - International Game Technology
-pex0426p                        // (c) 1995 IGT - International Game Technology
-pex0430p                        // (c) 1995 IGT - International Game Technology
-pex0434p                        // (c) 1995 IGT - International Game Technology
-pex0444p                        // (c) 1995 IGT - International Game Technology
-pex0447p                        // (c) 1995 IGT - International Game Technology
-pex0449p                        // (c) 1995 IGT - International Game Technology
-pex0451p                        // (c) 1995 IGT - International Game Technology
-pex0452p                        // (c) 1995 IGT - International Game Technology
-pex0454p                        // (c) 1995 IGT - International Game Technology
-pex0455p                        // (c) 1995 IGT - International Game Technology
-pex0458p                        // (c) 1995 IGT - International Game Technology
-pex0459p                        // (c) 1995 IGT - International Game Technology
-pex0459pa                       // (c) 1995 IGT - International Game Technology
-pex0489p                        // (c) 1995 IGT - International Game Technology
-pex0508p                        // (c) 1995 IGT - International Game Technology
-pex0514p                        // (c) 1995 IGT - International Game Technology
-pex0515p                        // (c) 1995 IGT - International Game Technology
-pex0516p                        // (c) 1995 IGT - International Game Technology
-pex0536p                        // (c) 1995 IGT - International Game Technology
-pex0537p                        // (c) 1995 IGT - International Game Technology
-pex0550p                        // (c) 1995 IGT - International Game Technology
-pex0556p                        // (c) 1995 IGT - International Game Technology
-pex0557p                        // (c) 1995 IGT - International Game Technology
-pex0568p                        // (c) 1995 IGT - International Game Technology
-pex0578p                        // (c) 1995 IGT - International Game Technology
-pex0581p                        // (c) 1995 IGT - International Game Technology
-pex0588p                        // (c) 1995 IGT - International Game Technology
-pex0725p                        // (c) 1995 IGT - International Game Technology
-pex0726p                        // (c) 1995 IGT - International Game Technology
-pex0727p                        // (c) 1995 IGT - International Game Technology
-pex0763p                        // (c) 1995 IGT - International Game Technology
-pex0764p                        // (c) 1995 IGT - International Game Technology
-pex0827s                        // (c) 1997 IGT - International Game Technology
-pex0838s                        // (c) 1997 IGT - International Game Technology
-pex0841s                        // (c) 1997 IGT - International Game Technology
-pex0846s                        // (c) 1997 IGT - International Game Technology
-pex0998s                        // (c) 1997 IGT - International Game Technology
-pex1087s                        // (c) 1997 IGT - International Game Technology
-pex2002p                        // (c) 1995 IGT - International Game Technology
-pex2004p                        // (c) 1995 IGT - International Game Technology
-pex2010p                        // (c) 1995 IGT - International Game Technology
-pex2016p                        // (c) 1995 IGT - International Game Technology
-pex2017p                        // (c) 1995 IGT - International Game Technology
-pex2018p                        // (c) 1995 IGT - International Game Technology
-pex2021p                        // (c) 1995 IGT - International Game Technology
-pex2024p                        // (c) 1995 IGT - International Game Technology
-pex2025p                        // (c) 1995 IGT - International Game Technology
-pex2026p                        // (c) 1995 IGT - International Game Technology
-pex2027p                        // (c) 1995 IGT - International Game Technology
-pex2028p                        // (c) 1995 IGT - International Game Technology
-pex2029p                        // (c) 1995 IGT - International Game Technology
-pex2031p                        // (c) 1995 IGT - International Game Technology
-pex2033p                        // (c) 1995 IGT - International Game Technology
-pex2034p                        // (c) 1995 IGT - International Game Technology
-pex2035p                        // (c) 1995 IGT - International Game Technology
-pex2036p                        // (c) 1995 IGT - International Game Technology
-pex2037p                        // (c) 1995 IGT - International Game Technology
-pex2038p                        // (c) 1995 IGT - International Game Technology
-pex2039p                        // (c) 1995 IGT - International Game Technology
-pex2040p                        // (c) 1995 IGT - International Game Technology
-pex2042p                        // (c) 1995 IGT - International Game Technology
-pex2043p                        // (c) 1995 IGT - International Game Technology
-pex2044p                        // (c) 1995 IGT - International Game Technology
-pex2045p                        // (c) 1995 IGT - International Game Technology
-pex2046p                        // (c) 1995 IGT - International Game Technology
-pex2066p                        // (c) 1995 IGT - International Game Technology
-pex2067p                        // (c) 1995 IGT - International Game Technology
-pex2068p                        // (c) 1995 IGT - International Game Technology
-pex2069p                        // (c) 1995 IGT - International Game Technology
-pex2070p                        // (c) 1995 IGT - International Game Technology
-pex2111p                        // (c) 1995 IGT - International Game Technology
-pex2121p                        // (c) 1995 IGT - International Game Technology
-pex2121pa                       // (c) 1995 IGT - International Game Technology
-pex2127p                        // (c) 1995 IGT - International Game Technology
-pex2134p                        // (c) 1995 IGT - International Game Technology
-pex2143p                        // (c) 1995 IGT - International Game Technology
-pex2149p                        // (c) 1995 IGT - International Game Technology
-pex2150p                        // (c) 1995 IGT - International Game Technology
-pex2152p                        // (c) 1995 IGT - International Game Technology
-pex2172p                        // (c) 1995 IGT - International Game Technology
-pex2172pa                       // (c) 1995 IGT - International Game Technology
-pex2173p                        // (c) 1995 IGT - International Game Technology
-pex2178p                        // (c) 1995 IGT - International Game Technology
-pex2179p                        // (c) 1995 IGT - International Game Technology
-pex2180p                        // (c) 1995 IGT - International Game Technology
-pex2211p                        // (c) 1995 IGT - International Game Technology
-pex2236p                        // (c) 1995 IGT - International Game Technology
-pex2240p                        // (c) 1995 IGT - International Game Technology
-pex2241p                        // (c) 1995 IGT - International Game Technology
-pex2244p                        // (c) 1995 IGT - International Game Technology
-pex2245p                        // (c) 1995 IGT - International Game Technology
-pex2245pa                       // (c) 1995 IGT - International Game Technology
-pex2247p                        // (c) 1995 IGT - International Game Technology
-pex2250p                        // (c) 1995 IGT - International Game Technology
-pex2251p                        // (c) 1995 IGT - International Game Technology
-pex2252p                        // (c) 1995 IGT - International Game Technology
-pex2270p                        // (c) 1995 IGT - International Game Technology
-pex2272p                        // (c) 1995 IGT - International Game Technology
-pex2275p                        // (c) 1995 IGT - International Game Technology
-pex2276p                        // (c) 1995 IGT - International Game Technology
-pex2279p                        // (c) 1995 IGT - International Game Technology
-pex2283p                        // (c) 1995 IGT - International Game Technology
-pex2284p                        // (c) 1995 IGT - International Game Technology
-pex2287p                        // (c) 1995 IGT - International Game Technology
-pex2297p                        // (c) 1995 IGT - International Game Technology
-pex2297pa                       // (c) 1995 IGT - International Game Technology
-pex2302p                        // (c) 1995 IGT - International Game Technology
-pex2303p                        // (c) 1995 IGT - International Game Technology
-pex2306p                        // (c) 1995 IGT - International Game Technology
-pex2307p                        // (c) 1995 IGT - International Game Technology
-pex2308p                        // (c) 1995 IGT - International Game Technology
-pex2309p                        // (c) 1995 IGT - International Game Technology
-pex2310p                        // (c) 1995 IGT - International Game Technology
-pex2312p                        // (c) 1995 IGT - International Game Technology
-pex2314p                        // (c) 1995 IGT - International Game Technology
-pex2315p                        // (c) 1995 IGT - International Game Technology
-pex2374p                        // (c) 1995 IGT - International Game Technology
-pex2376p                        // (c) 1995 IGT - International Game Technology
-pex2377p                        // (c) 1995 IGT - International Game Technology
-pex2386p                        // (c) 1995 IGT - International Game Technology
-pex2412p                        // (c) 1995 IGT - International Game Technology
-pex2419p                        // (c) 1995 IGT - International Game Technology
-pex2420p                        // (c) 1995 IGT - International Game Technology
-pex2421p                        // (c) 1995 IGT - International Game Technology
-pex2440p                        // (c) 1995 IGT - International Game Technology
-pex2461p                        // (c) 1995 IGT - International Game Technology
-pex2474p                        // (c) 1995 IGT - International Game Technology
-pex2478p                        // (c) 1995 IGT - International Game Technology
-pex2479p                        // (c) 1995 IGT - International Game Technology
-pex2480p                        // (c) 1995 IGT - International Game Technology
-pex2485p                        // (c) 1995 IGT - International Game Technology
-pexm001p                        // (c) 1997 IGT - International Game Technology
-pexm002p                        // (c) 1997 IGT - International Game Technology
-pexm002pa                       // (c) 1997 IGT - International Game Technology
-pexm003p                        // (c) 1997 IGT - International Game Technology
-pexm004p                        // (c) 1997 IGT - International Game Technology
-pexm005p                        // (c) 1997 IGT - International Game Technology
-pexm006p                        // (c) 1997 IGT - International Game Technology
-pexm006pa                       // (c) 1997 IGT - International Game Technology
-pexm007p                        // (c) 1997 IGT - International Game Technology
-pexm008p                        // (c) 1997 IGT - International Game Technology
-pexm009p                        // (c) 1997 IGT - International Game Technology
-pexm013p                        // (c) 1997 IGT - International Game Technology
-pexmp011                        // (c) 1997 IGT - International Game Technology
-pexmp013                        // (c) 1997 IGT - International Game Technology
-pexmp014                        // (c) 1997 IGT - International Game Technology
-pexmp017                        // (c) 1997 IGT - International Game Technology
-pexmp017a                       // (c) 1997 IGT - International Game Technology
-pexmp022                        // (c) 1997 IGT - International Game Technology
-pexmp026                        // (c) 1997 IGT - International Game Technology
-pexmp030                        // (c) 1997 IGT - International Game Technology
-sv1pf434                        // (c) 1992 IGT - International Game Technology
+im1p1952                        //
+im1p19s1                        //
+im2p1929                        //
+im3p1940                        //
+pcramclr                        //
+pc644vz                         //
+pc679cy                         //
+pc714vz                         //
+pc716vy                         //
+pc718vy                         //
+pebe0013                        //
+pebe0014                        //
+pebe0014a                       //
+peip0028                        //
+peip0029                        //
+peip0031                        //
+peip0041                        //
+peip0051                        //
+peip0058                        //
+peip0062                        //
+peip0074                        //
+peip0079                        //
+peip0101                        //
+peip0103                        //
+peip0105                        //
+peip0108                        //
+peip0111                        //
+peip0112                        //
+peip0114                        //
+peip0115                        //
+peip0116                        //
+peip0118                        //
+peip0120                        //
+peivc006                        //
+peke0004                        //
+peke0004a                       //
+peke0004b                       //
+peke0017                        //
+peke0017a                       //
+peke0026                        //
+peke1001                        //
+peke1006                        //
+peke1012                        //
+peke1012a                       //
+peke1012b                       //
+peke1013                        //
+peke1013a                       //
+pekoc766                        //
+pekoc801                        //
+pekoc802                        //
+pekoc803                        //
+pekoc803a                       //
+pekoc804                        //
+pekoc806                        //
+pekoc818                        //
+pekoc819                        //
+pekoc822                        //
+pekoc825                        //
+pemg0025                        //
+pemg0026                        //
+pemg0182                        //
+pemg0183                        //
+pemg0213                        //
+pemg0225                        //
+pemg0252                        //
+pepk0719                        //
+pepk0719a                       //
+pepk0719b                       //
+pepk0756                        //
+pepk0756a                       //
+pepk0756b                       //
+pepk0756c                       //
+pepk0756d                       //
+pepk0757                        //
+pepk0758                        //
+pepk0769                        //
+pepk0773                        //
+pepk0785                        //
+pepk0788                        //
+pepk0810                        //
+pepk0810a                       //
+pepk0811                        //
+pepk0823                        //
+pepk0832                        //
+pepk0846                        //
+pepk0849                        //
+pepk0856                        //
+pepk0856a                       //
+pepk0858                        //
+pepk0873                        //
+pepk0873a                       //
+pepk0885                        //
+pepk0930                        //
+pepk0930a                       //
+pepk1002                        //
+pepk1004                        //
+pepk1013                        //
+pepk1015                        //
+pepk1017                        //
+pepk1020                        //
+pepk1024                        //
+pepk1030                        //
+pepk1031                        //
+pepk1069                        //
+pepp0001                        //
+pepp0002                        //
+pepp0002a                       //
+pepp0005                        //
+pepp0006                        //
+pepp0008                        //
+pepp0008a                       //
+pepp0008b                       //
+pepp0009                        //
+pepp0010                        //
+pepp0014                        //
+pepp0014a                       //
+pepp0021                        //
+pepp0023                        //
+pepp0038                        //
+pepp0040                        //
+pepp0040a                       //
+pepp0040b                       //
+pepp0041                        //
+pepp0042                        //
+pepp0042a                       //
+pepp0042b                       //
+pepp0043                        //
+pepp0043a                       //
+pepp0043b                       //
+pepp0045                        //
+pepp0045a                       //
+pepp0045b                       //
+pepp0045c                       //
+pepp0045d                       //
+pepp0045e                       //
+pepp0045f                       //
+pepp0045g                       //
+pepp0046                        //
+pepp0046a                       //
+pepp0046b                       //
+pepp0046c                       //
+pepp0048                        //
+pepp0048a                       //
+pepp0048b                       //
+pepp0048c                       //
+pepp0050                        //
+pepp0050a                       //
+pepp0050b                       //
+pepp0050c                       //
+pepp0050d                       //
+pepp0051                        //
+pepp0052                        //
+pepp0053                        //
+pepp0054                        //
+pepp0055                        //
+pepp0055a                       //
+pepp0055b                       //
+pepp0055c                       //
+pepp0055d                       //
+pepp0057                        //
+pepp0057a                       //
+pepp0057b                       //
+pepp0057c                       //
+pepp0057d                       //
+pepp0059                        //
+pepp0059a                       //
+pepp0060                        //
+pepp0060a                       //
+pepp0060b                       //
+pepp0060c                       //
+pepp0063                        //
+pepp0064                        //
+pepp0065                        //
+pepp0078                        //
+pepp0079                        //
+pepp0083                        //
+pepp0083a                       //
+pepp0085                        //
+pepp0089                        //
+pepp0094                        //
+pepp0094a                       //
+pepp0102                        //
+pepp0103                        //
+pepp0103a                       //
+pepp0103b                       //
+pepp0103c                       //
+pepp0104                        //
+pepp0104a                       //
+pepp0116                        //
+pepp0116a                       //
+pepp0117                        //
+pepp0118                        //
+pepp0120                        //
+pepp0122                        //
+pepp0123                        //
+pepp0125                        //
+pepp0125a                       //
+pepp0126                        //
+pepp0126a                       //
+pepp0126b                       //
+pepp0127                        //
+pepp0127a                       //
+pepp0127b                       //
+pepp0129                        //
+pepp0130                        //
+pepp0132                        //
+pepp0143                        //
+pepp0150                        //
+pepp0158                        //
+pepp0158a                       //
+pepp0158b                       //
+pepp0158c                       //
+pepp0158d                       //
+pepp0159                        //
+pepp0171                        //
+pepp0171a                       //
+pepp0178                        //
+pepp0181                        //
+pepp0188                        //
+pepp0188a                       //
+pepp0188b                       //
+pepp0189                        //
+pepp0190                        //
+pepp0190a                       //
+pepp0190b                       //
+pepp0190c                       //
+pepp0195                        //
+pepp0197                        //
+pepp0197a                       //
+pepp0197b                       //
+pepp0197c                       //
+pepp0197d                       //
+pepp0197e                       //
+pepp0197f                       //
+pepp0203                        //
+pepp0203a                       //
+pepp0203b                       //
+pepp0203c                       //
+pepp0203d                       //
+pepp0203e                       //
+pepp0218                        //
+pepp0219                        //
+pepp0221                        //
+pepp0221a                       //
+pepp0221b                       //
+pepp0223                        //
+pepp0224                        //
+pepp0224a                       //
+pepp0230                        //
+pepp0231                        //
+pepp0232                        //
+pepp0242                        //
+pepp0242a                       //
+pepp0249                        //
+pepp0250                        //
+pepp0250a                       //
+pepp0265                        //
+pepp0265a                       //
+pepp0265b                       //
+pepp0265c                       //
+pepp0274                        //
+pepp0288                        //
+pepp0290                        //
+pepp0290a                       //
+pepp0291                        //
+pepp0291a                       //
+pepp0294                        //
+pepp0295                        //
+pepp0401                        //
+pepp0409                        //
+pepp0410                        //
+pepp0410a                       //
+pepp0417                        //
+pepp0417a                       //
+pepp0418                        //
+pepp0418a                       //
+pepp0419                        //
+pepp0419a                       //
+pepp0419b                       //
+pepp0420                        //
+pepp0420a                       //
+pepp0423                        //
+pepp0423a                       //
+pepp0423b                       //
+pepp0423c                       //
+pepp0425                        //
+pepp0426                        //
+pepp0428                        //
+pepp0429                        //
+pepp0429a                       //
+pepp0430                        //
+pepp0430a                       //
+pepp0431                        //
+pepp0434                        //
+pepp0434a                       //
+pepp0445                        //
+pepp0447                        //
+pepp0447a                       //
+pepp0447b                       //
+pepp0449                        //
+pepp0449a                       //
+pepp0450                        //
+pepp0451                        //
+pepp0452                        //
+pepp0452a                       //
+pepp0453                        //
+pepp0454                        //
+pepp0454a                       //
+pepp0455                        //
+pepp0458                        //
+pepp0459                        //
+pepp0459a                       //
+pepp0467                        //
+pepp0469                        //
+pepp0472                        //
+pepp0488                        //
+pepp0508                        //
+pepp0508a                       //
+pepp0509                        //
+pepp0510                        //
+pepp0514                        //
+pepp0514a                       //
+pepp0514b                       //
+pepp0515                        //
+pepp0515a                       //
+pepp0515b                       //
+pepp0515c                       //
+pepp0516                        //
+pepp0516a                       //
+pepp0516b                       //
+pepp0516c                       //
+pepp0526                        //
+pepp0531                        //
+pepp0536                        //
+pepp0538                        //
+pepp0540                        //
+pepp0540a                       //
+pepp0540b                       //
+pepp0542                        //
+pepp0542a                       //
+pepp0542b                       //
+pepp0550                        //
+pepp0550a                       //
+pepp0550b                       //
+pepp0555                        //
+pepp0559                        //
+pepp0562                        //
+pepp0568                        //
+pepp0585                        //
+pepp0587                        //
+pepp0596                        //
+pepp0598                        //
+pepp0711                        //
+pepp0713                        //
+pepp0725                        //
+pepp0725a                       //
+pepp0726                        //
+pepp0728                        //
+pepp0729                        //
+pepp0733                        //
+pepp0750                        //
+pepp0750a                       //
+pepp0757                        //
+pepp0760                        //
+pepp0763                        //
+pepp0764                        //
+pepp0775                        //
+pepp0777                        //
+pepp0797                        //
+pepp0812                        //
+pepp0816                        //
+peps0014                        //
+peps0015                        //
+peps0021                        //
+peps0022                        //
+peps0040                        //
+peps0041                        //
+peps0042                        //
+peps0043                        //
+peps0044                        //
+peps0045                        //
+peps0047                        //
+peps0048                        //
+peps0070                        //
+peps0086                        //
+peps0090                        //
+peps0092                        //
+peps0205                        //
+peps0206                        //
+peps0207                        //
+peps0239                        //
+peps0267                        //
+peps0271                        //
+peps0275                        //
+peps0275a                       //
+peps0278                        //
+peps0280                        //
+peps0280a                       //
+peps0291                        //
+peps0296                        //
+peps0298                        //
+peps0308                        //
+peps0358                        //
+peps0364                        //
+peps0366                        //
+peps0372                        //
+peps0373                        //
+peps0425                        //
+peps0426                        //
+peps0470                        //
+peps0581                        //
+peps0615                        //
+peps0623                        //
+peps0628                        //
+peps0629                        //
+peps0631                        //
+peps0708                        //
+peps0716                        //
+peps0722                        //
+peset001                        //
+peset004                        //
+peset012                        //
+peset022                        //
+peset033                        //
+peset038                        //
+peset100                        //
+peset117                        //
+pex0002p                        //
+pex0002pa                       //
+pex0006k                        //
+pex0006p                        //
+pex0013k                        //
+pex0013ka                       //
+pex0014p                        //
+pex0040p                        //
+pex0042p                        //
+pex0045p                        //
+pex0046p                        //
+pex0053p                        //
+pex0054p                        //
+pex0055p                        //
+pex0055pa                       //
+pex0055pb                       //
+pex0055pc                       //
+pex0055pd                       //
+pex0055pe                       //
+pex0055pf                       //
+pex0055pg                       //
+pex0055ph                       //
+pex0055pi                       //
+pex0055pj                       //
+pex0055pk                       //
+pex0055pl                       //
+pex0055pm                       //
+pex0055pn                       //
+pex0055po                       //
+pex0055pp                       //
+pex0055pq                       //
+pex0055pr                       //
+pex0055ps                       //
+pex0055pt                       //
+pex0057p                        //
+pex0057pa                       //
+pex0057pb                       //
+pex0057pc                       //
+pex0057pd                       //
+pex0057pe                       //
+pex0057pf                       //
+pex0057pg                       //
+pex0060p                        //
+pex0124p                        //
+pex0126p                        //
+pex0127p                        //
+pex0150p                        //
+pex0158p                        //
+pex0171p                        //
+pex0188p                        //
+pex0190p                        //
+pex0197p                        //
+pex0203p                        //
+pex0224p                        //
+pex0225p                        //
+pex0242p                        //
+pex0265p                        //
+pex0291p                        //
+pex0403p                        //
+pex0417p                        //
+pex0426p                        //
+pex0430p                        //
+pex0434p                        //
+pex0444p                        //
+pex0447p                        //
+pex0449p                        //
+pex0451p                        //
+pex0452p                        //
+pex0454p                        //
+pex0455p                        //
+pex0458p                        //
+pex0459p                        //
+pex0459pa                       //
+pex0489p                        //
+pex0508p                        //
+pex0514p                        //
+pex0515p                        //
+pex0516p                        //
+pex0536p                        //
+pex0537p                        //
+pex0550p                        //
+pex0556p                        //
+pex0557p                        //
+pex0568p                        //
+pex0578p                        //
+pex0581p                        //
+pex0588p                        //
+pex0725p                        //
+pex0726p                        //
+pex0727p                        //
+pex0763p                        //
+pex0764p                        //
+pex0827s                        //
+pex0838s                        //
+pex0841s                        //
+pex0846s                        //
+pex0998s                        //
+pex1087s                        //
+pex2001p                        //
+pex2002p                        //
+pex2004p                        //
+pex2010p                        //
+pex2016p                        //
+pex2017p                        //
+pex2018p                        //
+pex2021p                        //
+pex2024p                        //
+pex2025p                        //
+pex2026p                        //
+pex2027p                        //
+pex2028p                        //
+pex2029p                        //
+pex2031p                        //
+pex2033p                        //
+pex2034p                        //
+pex2035p                        //
+pex2036p                        //
+pex2037p                        //
+pex2038p                        //
+pex2039p                        //
+pex2040p                        //
+pex2042p                        //
+pex2043p                        //
+pex2044p                        //
+pex2045p                        //
+pex2046p                        //
+pex2066p                        //
+pex2067p                        //
+pex2068p                        //
+pex2069p                        //
+pex2070p                        //
+pex2111p                        //
+pex2121p                        //
+pex2121pa                       //
+pex2127p                        //
+pex2133p                        //
+pex2134p                        //
+pex2143p                        //
+pex2149p                        //
+pex2150p                        //
+pex2152p                        //
+pex2172p                        //
+pex2172pa                       //
+pex2173p                        //
+pex2178p                        //
+pex2179p                        //
+pex2180p                        //
+pex2211p                        //
+pex2236p                        //
+pex2240p                        //
+pex2241p                        //
+pex2244p                        //
+pex2245p                        //
+pex2245pa                       //
+pex2247p                        //
+pex2250p                        //
+pex2251p                        //
+pex2252p                        //
+pex2270p                        //
+pex2272p                        //
+pex2275p                        //
+pex2276p                        //
+pex2278p                        //
+pex2279p                        //
+pex2283p                        //
+pex2284p                        //
+pex2287p                        //
+pex2297p                        //
+pex2297pa                       //
+pex2302p                        //
+pex2303p                        //
+pex2306p                        //
+pex2307p                        //
+pex2308p                        //
+pex2309p                        //
+pex2310p                        //
+pex2312p                        //
+pex2314p                        //
+pex2315p                        //
+pex2374p                        //
+pex2376p                        //
+pex2377p                        //
+pex2386p                        //
+pex2412p                        //
+pex2419p                        //
+pex2420p                        //
+pex2421p                        //
+pex2440p                        //
+pex2461p                        //
+pex2474p                        //
+pex2478p                        //
+pex2479p                        //
+pex2480p                        //
+pex2485p                        //
+pexm001p                        //
+pexm002p                        //
+pexm002pa                       //
+pexm003p                        //
+pexm004p                        //
+pexm005p                        //
+pexm006p                        //
+pexm006pa                       //
+pexm007p                        //
+pexm008p                        //
+pexm009p                        //
+pexm013p                        //
+pexmp011                        //
+pexmp013                        //
+pexmp014                        //
+pexmp017                        //
+pexmp017a                       //
+pexmp022                        //
+pexmp026                        //
+pexmp030                        //
+sv1pf434                        //
 
 @source:igt/splus.cpp
 spset005                        // (c) 1993 IGT - International Game Technology
@@ -44100,6 +44120,8 @@ rollace2                        // (c) 1983 Williams
 
 @source:taito/sbmjb.cpp
 bubbroul                        // E48 (c) 1997 Taito
+bubbroul17                      // E48 (c) 1997 Taito
+harikiri                        // E67 (c) 1998 Taito
 honooinv                        // E41 (c) 1997 Taito
 packysts                        // E55 (c) 1997 Taito
 rendfgtr                        // E88 (c) 2000 Taito

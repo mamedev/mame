@@ -534,6 +534,7 @@ public:
 	void init_luckylad();
 	void init_nd8lines();
 	void init_super972();
+	void init_wcat();
 	void init_wcat3();
 
 	DECLARE_VIDEO_START(bingowng);
@@ -14575,6 +14576,39 @@ ROM_START( lucky8n )
 	ROM_LOAD( "g13", 0x00, 0x20, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+// only the subboard available (Z80, ROM, 2 stickered chips, 2 banks of 8 DIP switches (marked SW5 and SW6) and a rotary switch (SW7))
+// very professional-looking subboard marked Excel Planning
+// needs correct GFX ROMs / color PROMs (using the ones from wcat3, for now)
+ROM_START( wcat )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "y8.u1.sub", 0x00000, 0x20000, CRC(49e11ff4) SHA1(ce421f85b298c2e9c335fdbf0547a355ae29f1a6) )
+	ROM_FILL( 0x1c000, 0x1000, 0xc9 ) // jumps in this area multiple times, but nothing there. Something to do with the 2 stickered chips?
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "wcat3.h7",   0x10000, 0x8000, BAD_DUMP CRC(065cb575) SHA1(4dd49773c4caeaa489342e61f26c8eaaae876edc) )
+	ROM_LOAD( "wcat3.h8",   0x08000, 0x8000, BAD_DUMP CRC(60463213) SHA1(b0937b4a55f74831ce9a06f3df0af504845f908d) )
+	ROM_LOAD( "wcat3.h10",  0x00000, 0x8000, BAD_DUMP CRC(dda38c26) SHA1(4b9292911133dd6067a1c61a44845e824e88a52d) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "wcat3.h1",   0x6000, 0x2000, BAD_DUMP CRC(0509d556) SHA1(c2f46d279f45b544c67b0c966659cc6d5d53c22f) )
+	ROM_LOAD( "wcat3.h2",   0x4000, 0x2000, BAD_DUMP CRC(d50f3d62) SHA1(8500c7f3a2f51ea0ed7e142ecdc4e669ba3e7065) )
+	ROM_LOAD( "wcat3.h4",   0x2000, 0x2000, BAD_DUMP CRC(373d9949) SHA1(ff483505fb9e86411acad7059bf5434dde290946) )
+	ROM_LOAD( "wcat3.h5",   0x0000, 0x2000, BAD_DUMP CRC(50febe3b) SHA1(0479bcee53b174aa0413951e283e446b09a6f156) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "wcat3.g13",  0x0000, 0x0100, BAD_DUMP CRC(c29a36f2) SHA1(936b07a195f6e7f6a884bd35f442003cf67aa447) )
+	ROM_LOAD( "wcat3.g14",  0x0100, 0x0100, BAD_DUMP CRC(dcd53d2c) SHA1(bbcb4266117c3cd1c8ef0e5046d3558c8293313a) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "wcat3.d13",  0x0000, 0x0020, BAD_DUMP CRC(eab832ed) SHA1(0fbc8914ba1805cfc6698fe7f137a934e63a4f89) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "wcat3.f3",   0x0000, 0x0100, BAD_DUMP CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "wcat3.d12",  0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
 ROM_START( animalw ) // according to the dumper: runs on the same HW as lucky8 but at the two 8255 has some shorts
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom8.bin",  0x0000, 0x8000, CRC(8826e4e7) SHA1(70cff8c5ce75ab0f568e8cdf39ef9165b73fa2c0) )
@@ -20830,6 +20864,15 @@ void goldstar_state::init_ladylinre()
 	}
 }
 
+void wingco_state::init_wcat()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+		m_decrypted_opcodes[i] = rom[0x10000 + i];
+}
+
+
 void wingco_state::init_wcat3()
 {
 	// there must be some more conditions and/or some errors as the game needs to be soft resets 4-5 times before working apparently fine
@@ -22504,6 +22547,7 @@ GAME(  198?, ladylinrb,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_lady
 GAME(  198?, ladylinrc,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrc, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 2)",                            0 )
 GAME(  198?, ladylinrd,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrd, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            0 )
 GAME(  198?, ladylinre,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
+GAME ( 1992?,wcat,       0,        wcat3,    lucky8b,  wingco_state,   init_wcat,      ROT0, "Excel",             "Wild Cat",                                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs correct GFX ROMs, I/O, etc
 GAME(  1995, wcat3,      0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // decryption partially wrong, needs soft resets before running. Bad PROM decode
 GAMEL( 199?, animalw,    0,        lucky8,   animalw,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900)",                                MACHINE_NOT_WORKING,    layout_lucky8 )    // inputs / DIPs need to be checked
 
