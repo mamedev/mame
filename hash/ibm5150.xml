@@ -6829,6 +6829,106 @@ Throws "Null sized DOS image ! Invalid disk !" from HxC Disk Browser
 		</part>
 	</software>
 
+	<software name="msdos622">
+		<!-- If a non-upgrade version exists and is found, this should become msdos622u -->
+		<description>MS-DOS (Version 6.22, 360K 5.25", Upgrade)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+		<info name="version" value="6.22" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk01.img" size="368640" crc="941919da" sha1="d5943abd7245237759235da92350dc9926ad0cdd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk02.img" size="368640" crc="0c4efbdb" sha1="49b7e75c82f64e85e67c4f04c15f591947c0435f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk03.img" size="368640" crc="bc45d263" sha1="e5c30533f50dea1f1ba6111e84b203334333d853"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk04.img" size="368640" crc="abf5c052" sha1="8de9f574505149c4f5123f3905e9b27805b4b1b7"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk05.img" size="368640" crc="b199f525" sha1="139dc0ce531701a068fabe48b554de90b31cd3e6"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk06.img" size="368640" crc="d4fff0a8" sha1="7f3b20e25d36b4f44af09e681557be1813979ee6"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk07.img" size="368640" crc="da97587e" sha1="544b53abddf5247eb51e8289f2a710f61a8fe945"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk08.img" size="368640" crc="11ac146d" sha1="8b3bbea86975200af53d8a505101512429fd0f47"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk09.img" size="368640" crc="7c27cf02" sha1="dc5a5c990f192a15567e50b5db63c04df2824e73"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk10.img" size="368640" crc="ac4520e6" sha1="a6836c62c4f24cc24451d86751845a00c54c5652"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk11.img" size="368640" crc="7ed47c77" sha1="7d81474bfa306505a6c2832f7e49a53ff766e73c"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk12.img" size="368640" crc="3745c46f" sha1="0453a1ed0c0f56bb4806780b6d71c195b056363d"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk13.img" size="368640" crc="bf9045d3" sha1="b567e8b04e34d312cd9b49073481ae1f602f852b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622sup">
+		<description>MS-DOS 6.22 Supplemental Kit</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+		<info name="version" value="6.22" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Supplemental Disk 1" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk01.img" size="368640" crc="acd4a768" sha1="aecb6c64d22241a8af2d0f9227884f431ef72e39"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Supplemental Disk 2" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk02.img" size="368640" crc="0af2d03a" sha1="10ae513c0ff170b51d1c96541647aef36a00f7b2"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Supplemental Disk 3" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk03.img" size="368640" crc="bac65dfe" sha1="68c0b930f02f174d2cd370b21385b24fb272512b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mmsdos4">
 		<description>Multitasking MS-DOS (Version 4.00)</description>
 		<year>1985</year>

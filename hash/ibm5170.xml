@@ -3529,6 +3529,28 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="msdos622b" cloneof="msdos622">
+		<description>MS-DOS (Version 6.22, 1994-05-09 beta)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="6.22"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1b.img" size="1474560" crc="9ac544b1" sha1="b213b7d9b597d8f64d9507d32e5518426f331086"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2b.img" size="1474560" crc="ad24247c" sha1="98e6352d337fcafca1aa9ac8018a8983b69e898b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3b.img" size="1474560" crc="12052bf6" sha1="97bd560965ac5bcc000f999ddfa7bed74d513f7c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos622u" cloneof="msdos622">
 		<description>MS-DOS (Version 6.22, Upgrade, 3.5")</description>
 		<year>1994</year>
@@ -3600,11 +3622,76 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="msdos622es" cloneof="msdos622">
+		<description>MS-DOS (Version 6.22, Spanish)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Spanish" />
+		<info name="version" value="6.22" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot / Installation Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1es.img" size="1474560" crc="4fc5957e" sha1="17a7e800228af53c8868010a85d94007cbe17c76" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2es.img" size="1474560" crc="735fa49e" sha1="f5a4292046d69d3aaeb459afab30a217d6bc869b" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3es.img" size="1474560" crc="95520d61" sha1="e0390f40de740cd580f41ec20bc119114c0fce09" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Supplemental Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="supplement-es.img" size="1474560" crc="645dfb68" sha1="3723e292431c6fa93746d5f2461e6b112c564bcd" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622fr" cloneof="msdos622">
+		<description>MS-DOS (Version 6.22, French)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="French" />
+		<info name="version" value="6.22" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot / Installation Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1fr.img" size="1474560" crc="5697e0dc" sha1="2563599c6b1574a7e27d8b150b13c681db13bbd7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2fr.img" size="1474560" crc="507f780d" sha1="caa2c16eeda98f5c68f24826a067152764abb495"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3fr.img" size="1474560" crc="1033f40f" sha1="5c88b00f449055fcc88f363d5bcd2632e07f1fb9"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Supplemental Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="supplement-fr.img" size="1474560" crc="ae02bc3e" sha1="f4054aa95b951df9dde0d4db49091eec22ec503c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos622de" cloneof="msdos622">
 		<!-- KryoFlux dump from original disks, shows as unmodified -->
 		<description>MS-DOS (Version 6.22, German)</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
+		<info name="language" value="German" />
 		<info name="version" value="6.22" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -3619,6 +3706,70 @@ license:CC0-1.0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="MS_DOS_6.22_German_disk3.img" size="1474560" crc="95f32c5d" sha1="ed1358083d1c56105356e4b029e2beca6d6211da"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Supplemental Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="MS_DOS_6.22_German_Supplemental.img" size="1474560" crc="fa16918f" sha1="9e360df52f57c1595d66889502929fd18ebb61d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622it" cloneof="msdos622">
+		<description>MS-DOS (Version 6.22, Italian)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Italian" />
+		<info name="version" value="6.22" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot / Installation Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1it.img" size="1474560" crc="e8961cb9" sha1="0760046471a25547ad003cc2b371779383f0baef"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Boot / Installation Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2it.img" size="1474560" crc="a2b4513f" sha1="ca5bca4a1d593e175e7b71e27b54b9a4e58ab697"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Boot / Installation Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3it.img" size="1474560" crc="3b2937a8" sha1="1b774a0de129345fcd6440399a1ef0112c829927"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Supplemental Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="supplement-it.img" size="1474560" crc="94be47c6" sha1="1a47996abc36b7053d19ab144daf93481ad5ce35"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622nl" cloneof="msdos622">
+		<description>MS-DOS (Version 6.22, Dutch)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Dutch" />
+		<info name="version" value="6.22" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot / Installation Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1nl.img" size="1474560" crc="1e2caca7" sha1="3003d435415a04879f36b24a9f8000c7c5402312"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2nl.img" size="1474560" crc="c834b954" sha1="045aa044528611e14f41e115b3e4af74f7b37963"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3nl.img" size="1474560" crc="86b86531" sha1="eba8a7afc8305b0a2e2fab762e35e79aec0fbeb1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3650,6 +3801,59 @@ license:CC0-1.0
 			<feature name="part_id" value="Supplemental Disk" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="MS-DOS 6.22 [BR] - Disk 4 of 4 - Supplemental Disk.img" size="1474560" crc="491b3f2c" sha1="1b288096d3d59af039c591d68bf1490fbe1929e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622ru" cloneof="msdos622">
+		<!-- Contains disk identifier files dated 1995 -->
+		<description>MS-DOS (Version 6.22, Russian)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Russian" />
+		<info name="version" value="6.22" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot / Installation Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1ru.img" size="1474560" crc="a5a28e90" sha1="e7e842ae68c385cf18a1a99bcb454dc10b5bcd2a" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2ru.img" size="1474560" crc="ac5109d8" sha1="ff62e1a52c734b0e2f5624d5aa6a6293abb6a8cb" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3ru.img" size="1474560" crc="543cf6c6" sha1="4c8560551a0e828617bc9c280aa5bdab4acc9c19" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622sv" cloneof="msdos622">
+		<description>MS-DOS (Version 6.22, Swedish)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="Swedish" />
+		<info name="version" value="6.22" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot / Installation Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1sv.img" size="1474560" crc="edcec394" sha1="8ca3a2b0209f47e587bbebf773dd301b73609398" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2sv.img" size="1474560" crc="5fdabb47" sha1="6a699745d2d4994ce271f5799890572de68ede40" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3sv.img" size="1474560" crc="ae13becf" sha1="9fd60a7377236578e00d2f7a8f2fe669fddf8be1" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
