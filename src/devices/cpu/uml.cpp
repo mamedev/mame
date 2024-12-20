@@ -653,7 +653,12 @@ void uml::instruction::simplify()
 		// SHL: convert to MOV if immediate or shifting by 0
 		case OP_SHL:
 			if (m_param[1].is_immediate() && m_param[2].is_immediate())
-				convert_to_mov_immediate(m_param[1].immediate() << m_param[2].immediate());
+			{
+				if (m_size == 4)
+					convert_to_mov_immediate(u32(m_param[1].immediate()) << (m_param[2].immediate() & 31));
+				else if (m_size == 8)
+					convert_to_mov_immediate(u64(m_param[1].immediate()) << (m_param[2].immediate() & 63));
+			}
 			else if (m_param[2].is_immediate_value(0))
 				convert_to_mov_param(1);
 			break;
@@ -663,9 +668,9 @@ void uml::instruction::simplify()
 			if (m_param[1].is_immediate() && m_param[2].is_immediate())
 			{
 				if (m_size == 4)
-					convert_to_mov_immediate(u32(m_param[1].immediate()) >> m_param[2].immediate());
+					convert_to_mov_immediate(u32(m_param[1].immediate()) >> (m_param[2].immediate() & 31));
 				else if (m_size == 8)
-					convert_to_mov_immediate(u64(m_param[1].immediate()) >> m_param[2].immediate());
+					convert_to_mov_immediate(u64(m_param[1].immediate()) >> (m_param[2].immediate() & 63));
 			}
 			else if (m_param[2].is_immediate_value(0))
 				convert_to_mov_param(1);
@@ -676,9 +681,9 @@ void uml::instruction::simplify()
 			if (m_param[1].is_immediate() && m_param[2].is_immediate())
 			{
 				if (m_size == 4)
-					convert_to_mov_immediate(s32(m_param[1].immediate()) >> m_param[2].immediate());
+					convert_to_mov_immediate(s32(m_param[1].immediate()) >> (m_param[2].immediate() & 31));
 				else if (m_size == 8)
-					convert_to_mov_immediate(s64(m_param[1].immediate()) >> m_param[2].immediate());
+					convert_to_mov_immediate(s64(m_param[1].immediate()) >> (m_param[2].immediate() & 63));
 			}
 			else if (m_param[2].is_immediate_value(0))
 				convert_to_mov_param(1);
@@ -689,9 +694,9 @@ void uml::instruction::simplify()
 			if (m_param[1].is_immediate() && m_param[2].is_immediate())
 			{
 				if (m_size == 4)
-					convert_to_mov_immediate(rotl_32(m_param[1].immediate(), m_param[2].immediate()));
+					convert_to_mov_immediate(rotl_32(m_param[1].immediate(), m_param[2].immediate() & 31));
 				else if (m_size == 8)
-					convert_to_mov_immediate(rotl_64(m_param[1].immediate(), m_param[2].immediate()));
+					convert_to_mov_immediate(rotl_64(m_param[1].immediate(), m_param[2].immediate() & 63));
 			}
 			else if (m_param[2].is_immediate_value(0))
 				convert_to_mov_param(1);
@@ -702,9 +707,9 @@ void uml::instruction::simplify()
 			if (m_param[1].is_immediate() && m_param[2].is_immediate())
 			{
 				if (m_size == 4)
-					convert_to_mov_immediate(rotr_32(m_param[1].immediate(), m_param[2].immediate()));
+					convert_to_mov_immediate(rotr_32(m_param[1].immediate(), m_param[2].immediate() & 31));
 				else if (m_size == 8)
-					convert_to_mov_immediate(rotr_64(m_param[1].immediate(), m_param[2].immediate()));
+					convert_to_mov_immediate(rotr_64(m_param[1].immediate(), m_param[2].immediate() & 63));
 			}
 			else if (m_param[2].is_immediate_value(0))
 				convert_to_mov_param(1);
