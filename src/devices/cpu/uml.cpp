@@ -149,9 +149,10 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 
 	// Internal Register Operations
 	OPINFO1(SETFMOD, "setfmod",  4,   false, NONE, NONE, ALL,  PINFO(IN, OP, IANY))
-	OPINFO1(GETFMOD, "getfmod",  4,   false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
+	OPINFO1(GETFMOD, "getfmod",  4,   false, NONE, NONE, NONE, PINFO(OUT, OP, IRM))
 	OPINFO1(GETEXP,  "getexp",   4,   false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
-	OPINFO2(GETFLGS, "getflgs",  4,   false, P2,   NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IMV))
+	OPINFO2(GETFLGS, "getflgs",  4,   false, P2,   NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, IMV))
+	OPINFO1(SETFLGS, "setflgs",  4,   false, NONE, ALL,  ALL,  PINFO(IN, OP, IANY))
 	OPINFO1(SAVE,    "save",     4,   false, ALL,  NONE, ALL,  PINFO(OUT, OP, STATE))
 	OPINFO1(RESTORE, "restore",  4,   false, NONE, ALL,  ALL,  PINFO(IN, OP, STATE))
 

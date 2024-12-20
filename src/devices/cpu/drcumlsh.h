@@ -53,6 +53,7 @@
 #define UML_GETFMOD(block, dst)                             do { using namespace uml; block.append().getfmod(dst); } while (0)
 #define UML_GETEXP(block, dst)                              do { using namespace uml; block.append().getexp(dst); } while (0)
 #define UML_GETFLGS(block, dst, flags)                      do { using namespace uml; block.append().getflgs(dst, flags); } while (0)
+#define UML_SETFLGS(block, flags)                           do { using namespace uml; block.append().setflgs(flags); } while (0)
 #define UML_SAVE(block, dst)                                do { using namespace uml; block.append().save(dst); } while (0)
 #define UML_RESTORE(block, src)                             do { using namespace uml; block.append().restore(src); } while (0)
 

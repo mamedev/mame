@@ -157,6 +157,7 @@ namespace uml
 		OP_GETFMOD,                 // GETFMOD dst
 		OP_GETEXP,                  // GETEXP  dst
 		OP_GETFLGS,                 // GETFLGS dst[,f]
+		OP_SETFLGS,                 // SETFLGS src
 		OP_SAVE,                    // SAVE    mem
 		OP_RESTORE,                 // RESTORE mem
 
@@ -443,6 +444,7 @@ namespace uml
 		void getfmod(parameter dst) { configure(OP_GETFMOD, 4, dst); }
 		void getexp(parameter dst) { configure(OP_GETEXP, 4, dst); }
 		void getflgs(parameter dst, u32 flags) { configure(OP_GETFLGS, 4, dst, flags); }
+		void setflgs(u32 flags) { configure(OP_SETFLGS, 4, flags); }
 		void save(drcuml_machine_state *dst) { configure(OP_SAVE, 4, parameter::make_memory(dst)); }
 		void restore(drcuml_machine_state *src) { configure(OP_RESTORE, 4, parameter::make_memory(src)); }
 
