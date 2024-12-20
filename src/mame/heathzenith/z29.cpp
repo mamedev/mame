@@ -196,4 +196,4 @@ ROM_END
 } // anonymous namespace
 
 //    year  name   parent compat  machine  input class      init        company                fullname          flags
-COMP( 1983, z29,   0,     0,      z29,     z29,  z29_state, empty_init, "Zenith Data Systems", "Z-29 Terminal",  MACHINE_IS_SKELETON)
+COMP( 1983, z29,   0,     0,      z29,     z29,  z29_state, empty_init, "Zenith Data Systems", "Z-29 Terminal",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

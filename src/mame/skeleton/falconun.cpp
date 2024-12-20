@@ -127,4 +127,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 198?, falconun, 0, falconun, falconun, falconun_state, empty_init, ROT0, "Falcon", "unknown Falcon gambling machine", MACHINE_IS_SKELETON )
+GAME( 198?, falconun, 0, falconun, falconun, falconun_state, empty_init, ROT0, "Falcon", "unknown Falcon gambling machine", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -3006,6 +3006,58 @@ Crashes after EA logo, requires better [VDP] irq handling
 	</software>
 
 
+	<software name="felixjr">
+		<description>Fix-it Felix Jr.</description>
+		<year>2014</year>
+		<publisher>Airwalk Studios</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="601870">
+				<rom name="fix-it felix jr (final).bin" size="601870" crc="424ff451" sha1="2bad4a0db0f95a7588e75f344c25427a6e83522b" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- Another, 1.12, version is known to have existed between this and the final version
+		 See: https://www.youtube.com/watch?v=_1uGkfw5ky8 -->
+	<software name="felixjrv10" cloneof="felixjr">
+		<description>Fix-it Felix Jr. (v1.0)</description>
+		<year>2013</year>
+		<publisher>Airwalk Studios</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="131072">
+				<rom name="fix-it felix jr (1.0).bin" size="131072" crc="0b3ab7e9" sha1="c097b6dda7c0014e269884602bacd0eaff02d005" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="wreckit" cloneof="felixjr">
+		<description>Wreck It Ralph (Russian translation bootleg)</description>
+		<year>2022</year>
+		<publisher>T+Rus Pirates</publisher>
+		<info name="language" value="Russian" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="601870">
+				<rom name="wreck it ralph (trus bootleg).bin" size="601870" crc="6eec9f12" sha1="72eb534155a846327f2081566d7fa5ff12952ffa" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="wreckita" cloneof="felixjr">
+		<description>Wreck It Ralph (Russian translation bootleg, alt)</description>
+		<year>2022</year>
+		<publisher>T+Rus Pirates</publisher>
+		<info name="language" value="Russian" />
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="601870">
+				<rom name="wreck it ralph (trus bootleg alt).bin" size="601870" crc="ac8e0de5" sha1="68d1908926c39c336340300742086d5e17bf9806" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="feverpit">
 		<description>Fever Pitch (Europe)</description>
 		<year>1995</year>

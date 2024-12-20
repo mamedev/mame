@@ -21,7 +21,7 @@ w65c02s_device::w65c02s_device(const machine_config &mconfig, const char *tag, d
 }
 
 w65c02s_device::w65c02s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	m65c02_device(mconfig, type, tag, owner, clock)
+	w65c02_device(mconfig, type, tag, owner, clock)
 {
 }
 

@@ -38,6 +38,7 @@ void ad1848_device::device_start()
 	save_item(NAME(m_addr));
 	save_item(NAME(m_stat));
 	save_item(NAME(m_sam_cnt));
+	save_item(NAME(m_calibration_cycles));
 	save_item(NAME(m_samples));
 	save_item(NAME(m_count));
 	save_item(NAME(m_play));
@@ -52,6 +53,7 @@ void ad1848_device::device_reset()
 	m_addr = 0;
 	m_stat = 0;
 	m_sam_cnt = 0;
+	m_calibration_cycles = 0;
 	m_samples = 0;
 	m_play = false;
 	m_irq = false;
@@ -96,9 +98,17 @@ void ad1848_device::write(offs_t offset, uint8_t data)
 					break;
 				case 9:
 				{
+					// auto-calibration
+					if (m_mce && BIT(data, 3))
+					{
+						logerror("set auto-calibration\n");
+						m_regs.init |= 0x20;
+						m_calibration_cycles = 384;
+					}
+
 					m_play = (data & 1) ? true : false;
 					// FIXME: provide external configuration for XTAL1 (24.576 MHz) and XTAL2 (16.9344 MHz) inputs
-					attotime rate = m_play ? attotime::from_hz(((m_regs.dform & 1) ? 16.9344_MHz_XTAL : 24.576_MHz_XTAL)
+					attotime rate = (m_play || BIT(m_regs.init, 5)) ? attotime::from_hz(((m_regs.dform & 1) ? 16.9344_MHz_XTAL : 24.576_MHz_XTAL)
 							/ div_factor[(m_regs.dform >> 1) & 7]) : attotime::never;
 					m_timer->adjust(rate, 0 , rate);
 					m_drq_cb(m_play ? ASSERT_LINE : CLEAR_LINE);
@@ -157,6 +167,16 @@ void ad1848_device::dack_w(uint8_t data)
 
 TIMER_CALLBACK_MEMBER(ad1848_device::update_tick)
 {
+	// auto-calibration
+	if (BIT(m_regs.init, 5))
+	{
+		if (--m_calibration_cycles == 0)
+		{
+			logerror("calibration finished\n");
+			m_regs.init &= ~0x20;
+		}
+	}
+
 	if(!m_play)
 		return;
 	switch(m_regs.dform >> 4)

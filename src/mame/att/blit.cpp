@@ -291,4 +291,4 @@ ROM_END
 
 /* Driver */
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS        INIT           COMPANY  FULLNAME     FLAGS
-COMP( 1981, blit,     0,      0,      blit,     blit,     blit_state,  empty_init,    "AT&T",  "Blit",      MACHINE_IS_SKELETON )
+COMP( 1981, blit,     0,      0,      blit,     blit,     blit_state,  empty_init,    "AT&T",  "Blit",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

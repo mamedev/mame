@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="panel">
+		<!--<image file="teletex800.png" />-->
+	</element>
+
+	<element name="button">
+		<rect>
+  			<color red="0.25" green="0.25" blue="0.25" />
+		</rect>
+	</element>
+
+ 	<element name="red_led" defstate="0">
+		<disk state="0">
+			<color red="0.20" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+ 
+ 	<element name="green_led" defstate="0">
+		<disk state="0">
+			<color red="0.0" green="0.20" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.0" green="0.75" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.0" green="1.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="time_led" defstate="0">
+	    <text state="0" string="TID">
+			<color red="0.0" green="0.20" blue="0.0" />
+		</text>
+	    <text state="1" string="TID">
+			<color red="0.0" green="0.75" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="date_led" defstate="0">
+	    <text state="0" string="DAT">
+			<color red="0.0" green="0.20" blue="0.0" />
+		</text>
+	    <text state="1" string="DAT">
+			<color red="0.0" green="0.75" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="year_led" defstate="0">
+	    <text state="0" string="ÅR">
+			<color red="0.0" green="0.20" blue="0.0" />
+		</text>
+	    <text state="1" string="ÅR">
+			<color red="0.0" green="0.75" blue="0.0" />
+		</text>
+	</element>
+
+	<view name="Front panel">
+        <bounds x="0" y="0" width="810" height="473" />
+
+        <element ref="panel">
+            <bounds x="0" y="0" width="810" height="473" />
+        </element>
+
+		<!-- BATTERI DRIFT -->
+		<element name="bat_led" ref="red_led">
+			<bounds x="114" y="118" width="16" height="16" />
+		</element>
+
+		<!-- SKRIVAR FEL -->
+		<element name="pr_led" ref="red_led">
+			<bounds x="205" y="118" width="16" height="16" />
+		</element>
+
+		<!-- OKVITT TELEX -->
+		<element name="telex_led" ref="green_led">
+			<bounds x="298" y="118" width="16" height="16" />
+		</element>
+
+		<!-- MOTTAGNA -->
+		<element name="rx_digit0" ref="digit">
+			<bounds x="384" y="107" width="38" height="49" />
+		</element>
+
+		<element name="rx_digit1" ref="digit">
+			<bounds x="440" y="107" width="38" height="49" />
+		</element>
+
+		<!-- SEND KÖ -->
+		<element name="tx_digit0" ref="digit">
+			<bounds x="522" y="107" width="38" height="49" />
+		</element>
+
+		<element name="tx_digit1" ref="digit">
+			<bounds x="578" y="107" width="38" height="49" />
+		</element>
+
+		<!-- TID -->
+		<element name="time_led" ref="time_led">
+			<bounds x="658" y="99" width="29" height="14" />
+		</element>
+
+		<!-- DAT -->
+		<element name="date_led" ref="date_led">
+			<bounds x="659" y="123" width="29" height="14" />
+		</element>
+
+		<!-- ÅR -->
+		<element name="year_led" ref="year_led">
+			<bounds x="659" y="147" width="22" height="14" />
+		</element>
+
+		<!-- MINNES VARNING -->
+		<element name="mem_led" ref="red_led">
+			<bounds x="114" y="204" width="16" height="16" />
+		</element>
+
+		<!-- OBS -->
+		<element name="obs_led" ref="red_led">
+			<bounds x="205" y="204" width="16" height="16" />
+		</element>
+
+		<!-- SKRIV -->
+		<element name="write_led" ref="green_led">
+			<bounds x="298" y="204" width="16" height="16" />
+		</element>
+
+		<!-- LOG -->
+		<element name="log_led" ref="green_led">
+			<bounds x="388" y="204" width="16" height="16" />
+		</element>
+
+		<!-- KÖ -->
+		<element name="queue_led" ref="green_led">
+			<bounds x="479" y="204" width="16" height="16" />
+		</element>
+
+		<!-- ALLA -->
+		<element name="all_led" ref="green_led">
+			<bounds x="571" y="204" width="16" height="16" />
+		</element>
+
+		<!-- SKRIV -->
+		<element ref="button" inputtag="BTN" inputmask="0x01">
+		    <bounds x="275" y="262" width="54" height="54" />
+		</element>
+
+		<!-- ALLA -->
+		<element ref="button" inputtag="BTN" inputmask="0x02">
+		    <bounds x="556" y="261" width="54" height="54" />
+		</element>
+
+		<!-- KLOCK -->
+		<element ref="button" inputtag="BTN" inputmask="0x04">
+		    <bounds x="648" y="263" width="54" height="54" />
+		</element>
+	</view>
+</mamelayout>

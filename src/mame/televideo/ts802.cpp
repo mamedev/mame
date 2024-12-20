@@ -251,5 +251,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY      FULLNAME  FLAGS
-COMP( 1982, ts802,  0,      0,      ts802,   ts802, ts802_state, init_ts802, "Televideo", "TS802",  MACHINE_IS_SKELETON )
-COMP( 1982, ts802h, ts802,  0,      ts802,   ts802, ts802_state, init_ts802, "Televideo", "TS802H", MACHINE_IS_SKELETON )
+COMP( 1982, ts802,  0,      0,      ts802,   ts802, ts802_state, init_ts802, "Televideo", "TS802",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1982, ts802h, ts802,  0,      ts802,   ts802, ts802_state, init_ts802, "Televideo", "TS802H", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

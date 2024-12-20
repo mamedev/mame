@@ -348,4 +348,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1966, hp2100, 0, 0, hp2100, hp2100, hp2100_state, empty_init, "Hewlett-Packard", "HP 2100", MACHINE_IS_SKELETON )
+COMP( 1966, hp2100, 0, 0, hp2100, hp2100, hp2100_state, empty_init, "Hewlett-Packard", "HP 2100", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

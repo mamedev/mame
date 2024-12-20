@@ -676,29 +676,29 @@ ROM_END
 
 //    YEAR  NAME         PARENT    MACHINE   INPUT     STATE           INIT        ROT   COMPANY                  FULLNAME                                           FLAGS
 /* hardware green H83048*/
-GAME( 200?, bookthr,     0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Book Theatre (Ver 1.2)",                          MACHINE_IS_SKELETON )
-GAME( 2000, capunc,      0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Capitan Uncino (Nazionale Elettronica, Ver 1.2)", MACHINE_IS_SKELETON )
-GAME( 2001, capcor,      0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)",                   MACHINE_IS_SKELETON )
+GAME( 200?, bookthr,     0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Book Theatre (Ver 1.2)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, capunc,      0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Capitan Uncino (Nazionale Elettronica, Ver 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, capcor,      0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 /* hardware green H83048 + piggyback for timekeeping*/
-GAME( 2001, bowlroad,    0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Bowling Road (Ver 1.5)",                          MACHINE_IS_SKELETON )
-GAME( 2001, euro2k2,     0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",                    MACHINE_IS_SKELETON )
-GAME( 2001, euro2k2a,    euro2k2,  itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",                    MACHINE_IS_SKELETON )
-GAME( 2001, labrinth,    0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Labyrinth (Ver 1.5)",                             MACHINE_IS_SKELETON )
-GAME( 2002, laperla,     0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "La Perla Nera (Ver 2.0)",                         MACHINE_IS_SKELETON )
-GAME( 2001, laperlag,    0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",                    MACHINE_IS_SKELETON )
-GAME( 200?, pinups,      0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Pin Ups (Ver 1.0 Rev A)",                         MACHINE_IS_SKELETON )
-GAME( 2001, wcup,        0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "World Cup (Ver 1.5)",                             MACHINE_IS_SKELETON )
+GAME( 2001, bowlroad,    0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Bowling Road (Ver 1.5)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, euro2k2,     0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, euro2k2a,    euro2k2,  itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, labrinth,    0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Labyrinth (Ver 1.5)",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, laperla,     0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "La Perla Nera (Ver 2.0)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, laperlag,    0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, pinups,      0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Pin Ups (Ver 1.0 Rev A)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, wcup,        0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "World Cup (Ver 1.5)",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 /* hardware red H83048 Rev 1.1 + timekeeping on board*/
-GAME( 2001, abacus,      0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Abacus (Ver 1.0)",                                MACHINE_IS_SKELETON )
-GAME( 2001, bowlroad14,  bowlroad, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Bowling Road (Ver 1.4)",                          MACHINE_IS_SKELETON )
-GAME( 2002, euro2k2s,    euro2k2,  itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",                     MACHINE_IS_SKELETON )
-GAME( 2001, uforobot,    0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "UFO Robot (Ver 1.0 Rev A)",                       MACHINE_IS_SKELETON )
+GAME( 2001, abacus,      0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Abacus (Ver 1.0)",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, bowlroad14,  bowlroad, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Bowling Road (Ver 1.4)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, euro2k2s,    euro2k2,  itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, uforobot,    0,        itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "UFO Robot (Ver 1.0 Rev A)",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 /* hardware green ND2001 Rev 1.0*/
-GAME( 2001, bowlroad14n, bowlroad, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Bowling Road (Ver 1.4, ND2001 hardware)",         MACHINE_IS_SKELETON )
-GAME( 2001, wcup14,      wcup,     itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "World Cup (Ver 1.4)",                             MACHINE_IS_SKELETON )
+GAME( 2001, bowlroad14n, bowlroad, itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "Bowling Road (Ver 1.4, ND2001 hardware)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, wcup14,      wcup,     itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "World Cup (Ver 1.4)",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 /* different hardware */
-GAME( 2000, mnumber,     0,        mnumber,  itgamble, itgamble_state, empty_init, ROT0, "MM / BRL Bologna",      "Mystery Number",                                  MACHINE_IS_SKELETON )
+GAME( 2000, mnumber,     0,        mnumber,  itgamble, itgamble_state, empty_init, ROT0, "MM / BRL Bologna",      "Mystery Number",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

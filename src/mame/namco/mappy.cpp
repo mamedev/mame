@@ -1835,16 +1835,20 @@ ROM_START( phozons )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "5t.rom", 0x0000, 0x2000, CRC(d50f08f8) SHA1(4e9dda0d5ad1c1b8b3be7edb05b3060f5f63a9c7) )  // sprites - 5t.bin
 
-	ROM_REGION( 0x0520, "proms", 0 )
-	ROM_LOAD( "red.prm",     0x0000, 0x0100, CRC(a2880667) SHA1(b24d9b3354d20a7ecc02c428245669c6c86bfd61) ) // red palette ROM (4 bits)
-	ROM_LOAD( "green.prm",   0x0100, 0x0100, CRC(d6e08bef) SHA1(b0ca7f8a77b7208cf974a8cc565fc91b7f40f51f) ) // green palette ROM (4 bits)
-	ROM_LOAD( "blue.prm",    0x0200, 0x0100, CRC(b2d69c72) SHA1(e7b1ed698ab0e87872cb3a8f3ec102ca3a753259) ) // blue palette ROM (4 bits)
-	ROM_LOAD( "chr.prm",     0x0300, 0x0100, CRC(429e8fee) SHA1(7b1899ca3f33f4561b572de1f24d9ea9d7d84b59) ) // characters
-	ROM_LOAD( "sprite.prm",  0x0400, 0x0100, CRC(9061db07) SHA1(4305d37e613e1d15d37539b152c948648189c2cd) ) // sprites
-	ROM_LOAD( "palette.prm", 0x0500, 0x0020, CRC(60e856ed) SHA1(dcc9a2dfc728b9ca1ab895008de07e20ebed9da3) ) // unused - timing?
+	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_LOAD( "ph1-2.1r", 0x0000, 0x0100, CRC(a2880667) SHA1(b24d9b3354d20a7ecc02c428245669c6c86bfd61) ) // red palette ROM (4 bits)
+	ROM_LOAD( "ph1-1.1s", 0x0100, 0x0100, CRC(d6e08bef) SHA1(b0ca7f8a77b7208cf974a8cc565fc91b7f40f51f) ) // green palette ROM (4 bits)
+	ROM_LOAD( "ph1-3.1p", 0x0200, 0x0100, CRC(b2d69c72) SHA1(e7b1ed698ab0e87872cb3a8f3ec102ca3a753259) ) // blue palette ROM (4 bits)
+	ROM_LOAD( "ph1-5.5l", 0x0300, 0x0100, CRC(429e8fee) SHA1(7b1899ca3f33f4561b572de1f24d9ea9d7d84b59) ) // characters
+	ROM_LOAD( "ph1-6.6r", 0x0400, 0x0100, CRC(9061db07) SHA1(4305d37e613e1d15d37539b152c948648189c2cd) ) // sprites
 
 	ROM_REGION( 0x0100, "namco", 0 )    // sound PROMs
-	ROM_LOAD( "sound.prm", 0x0000, 0x0100, CRC(ad43688f) SHA1(072f427453efb1dda8147da61804fff06e1bc4d5) )
+	ROM_LOAD( "ph1-4.3e", 0x0000, 0x0100, CRC(ad43688f) SHA1(072f427453efb1dda8147da61804fff06e1bc4d5) )
+
+	ROM_REGION( 0x0600, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "ph1-7.7b", 0x0000, 0x0117, CRC(9a00af9a) SHA1(b5d5a3d8a091e0e3d62b2cce34ae9b8dc1cfcbff) )
+	ROM_LOAD( "ph1-8.4b", 0x0200, 0x0117, CRC(fb180f00) SHA1(c0a355fb5287e715b0c39b78eacfdcd00db953b1) )
+	ROM_LOAD( "ph1-9.7r", 0x0400, 0x0117, CRC(3b21d560) SHA1(905f9a6b7440b2eeb34475879751748300b42428) )
 ROM_END
 
 ROM_START( mappy )

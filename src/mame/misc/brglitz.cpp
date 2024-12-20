@@ -190,4 +190,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR   NAME     PARENT MACHINE  INPUT    CLASS          INIT        ROT   COMPANY       FULLNAME          FLAGS
-GAME( 2014,  brglitz, 0,     brglitz, brglitz, brglitz_state, empty_init, ROT0, "Harry Levy", "Ballroom Glitz", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2014,  brglitz, 0,     brglitz, brglitz, brglitz_state, empty_init, ROT0, "Harry Levy", "Ballroom Glitz", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

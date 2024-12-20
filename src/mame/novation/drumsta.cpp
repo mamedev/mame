@@ -75,4 +75,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1995, drumsta, 0, 0, drumsta, drumsta, drumsta_state, empty_init, "Novation", "Drum Station", MACHINE_IS_SKELETON)
+SYST(1995, drumsta, 0, 0, drumsta, drumsta, drumsta_state, empty_init, "Novation", "Drum Station", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

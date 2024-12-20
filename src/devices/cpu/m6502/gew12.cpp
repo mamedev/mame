@@ -19,7 +19,7 @@
 DEFINE_DEVICE_TYPE(GEW12, gew12_device, "gew12", "Yamaha YMW728-F (GEW12)")
 
 gew12_device::gew12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6502_mcu_device_base<m65c02_device>(mconfig, GEW12, tag, owner, clock)
+	: m6502_mcu_device_base<w65c02_device>(mconfig, GEW12, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_in_cb(*this, 0xff), m_out_cb(*this)
 	, m_rom(*this, DEVICE_SELF)
@@ -36,7 +36,7 @@ void gew12_device::device_add_mconfig(machine_config &config)
 
 void gew12_device::device_start()
 {
-	m65c02_device::device_start();
+	w65c02_device::device_start();
 
 	m_bank_mask = device_generic_cart_interface::map_non_power_of_two(
 			unsigned(m_rom->bytes() >> 14),
@@ -61,7 +61,7 @@ void gew12_device::device_start()
 
 void gew12_device::device_reset()
 {
-	m6502_mcu_device_base<m65c02_device>::device_reset();
+	m6502_mcu_device_base<w65c02_device>::device_reset();
 
 	internal_update();
 	m_irq_pending = 0;
@@ -142,9 +142,9 @@ void gew12_device::internal_irq(int num, int state)
 void gew12_device::irq_update()
 {
 	if (m_irq_pending & m_irq_enable)
-		set_input_line(M65C02_IRQ_LINE, ASSERT_LINE);
+		set_input_line(W65C02_IRQ_LINE, ASSERT_LINE);
 	else
-		set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
+		set_input_line(W65C02_IRQ_LINE, CLEAR_LINE);
 }
 
 

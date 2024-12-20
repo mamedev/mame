@@ -267,5 +267,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1986, ds8,     0, 0, ds8,     ds8, korg_ds8_state, empty_init, "Korg", "DS-8 Digital Synthesizer",    MACHINE_IS_SKELETON)
-SYST(1987, korg707, 0, 0, korg707, ds8, korg_ds8_state, empty_init, "Korg", "707 Performing Synthesizer", MACHINE_IS_SKELETON)
+SYST(1986, ds8,     0, 0, ds8,     ds8, korg_ds8_state, empty_init, "Korg", "DS-8 Digital Synthesizer",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1987, korg707, 0, 0, korg707, ds8, korg_ds8_state, empty_init, "Korg", "707 Performing Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

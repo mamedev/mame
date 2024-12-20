@@ -213,4 +213,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 198?,  mmm_ldip,  0,  mmm,  mmm, mmm_state, empty_init, ROT0,  "Maygay",    "Lucky Dip (Maygay)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 198?,  mmm_ldip,  0,  mmm,  mmm, mmm_state, empty_init, ROT0,  "Maygay",    "Lucky Dip (Maygay)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

@@ -81,5 +81,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1996, sx700, 0, 0, sx700, sx700, boss_sx700_state, empty_init, "Roland", "Boss SX-700 Studio Effects Processor", MACHINE_IS_SKELETON)
-SYST(1996, gx700, 0, 0, gx700, sx700, boss_sx700_state, empty_init, "Roland", "Boss GX-700 Guitar Effects Processor", MACHINE_IS_SKELETON)
+SYST(1996, sx700, 0, 0, sx700, sx700, boss_sx700_state, empty_init, "Roland", "Boss SX-700 Studio Effects Processor", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1996, gx700, 0, 0, gx700, sx700, boss_sx700_state, empty_init, "Roland", "Boss GX-700 Guitar Effects Processor", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

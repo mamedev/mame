@@ -20,7 +20,7 @@ authors:hap
 		<rect state="0"><color red="0.15" green="1.0" blue="0.1" alpha="0.13" /></rect>
 	</element>
 
-	<element name="but1" defstate="0">
+	<element name="but1">
 		<disk>
 			<bounds xc="3" yc="3" width="6" height="6" />
 			<color red="0.75" green="0.25" blue="0.05" />
@@ -52,7 +52,7 @@ authors:hap
 		</rect>
 	</element>
 
-	<element name="but8" defstate="0">
+	<element name="but8">
 		<rect>
 			<bounds x="0" y="0" width="10" height="6" />
 			<color alpha="0" />
@@ -71,7 +71,7 @@ authors:hap
 		</rect>
 	</element>
 
-	<element name="butb" defstate="0">
+	<element name="butb">
 		<disk>
 			<bounds xc="3" yc="3" width="6" height="6" />
 			<color red="0.2" green="0.2" blue="0.2" />

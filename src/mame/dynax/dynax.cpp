@@ -2182,55 +2182,55 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjdialq2 )
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x00, "PINFU with TSUMO" )  PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x38, 0x20, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:4,5,6")
-	PORT_DIPSETTING(    0x38, "1 (Easy)" )
-	PORT_DIPSETTING(    0x30, "2" )
-	PORT_DIPSETTING(    0x28, "3" )
-	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPSETTING(    0x18, "5" )
-	PORT_DIPSETTING(    0x10, "6" )
-	PORT_DIPSETTING(    0x08, "7" )
-	PORT_DIPSETTING(    0x00, "8 (Hard)" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )                PORT_DIPLOCATION("SW. 1:1,2")     // プレイ料金
+	PORT_DIPSETTING(    0x00, DEF_STR(3C_1C) )                                                    // ３コイン　１プレー
+	PORT_DIPSETTING(    0x02, DEF_STR(2C_1C) )                                                    // ２コイン　１プレー
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )                                                    // １コイン　１プレー
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_2C) )                                                    // １コイン　２プレー
+	PORT_DIPNAME( 0x04, 0x00, "Allow Pinfu with Tsumo")         PORT_DIPLOCATION("SW. 1:3")       // ルール　ピンフ・ツモ複合
+	PORT_DIPSETTING(    0x04, DEF_STR(No) )                                                       // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                      // 有り
+	PORT_DIPNAME( 0x38, 0x20, DEF_STR(Difficulty) )             PORT_DIPLOCATION("SW. 1:4,5,6")   // 難易度　コンピュー
+	PORT_DIPSETTING(    0x38, "1 (Weak)" )                                                        // 弱い　　（１）
+	PORT_DIPSETTING(    0x30, "2" )                                                               // 　　　　（２）
+	PORT_DIPSETTING(    0x28, "3" )                                                               // 　　　　（３）
+	PORT_DIPSETTING(    0x20, "4 (Normal)" )                                                      // 標準　　（４）
+	PORT_DIPSETTING(    0x18, "5" )                                                               // 　　　　（５）
+	PORT_DIPSETTING(    0x10, "6" )                                                               // 　　　　（６）
+	PORT_DIPSETTING(    0x08, "7" )                                                               // 　　　　（７）
+	PORT_DIPSETTING(    0x00, "8 (Strong)" )                                                      // 強い　　（８）
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR(Demo_Sounds ) )           PORT_DIPLOCATION("SW. 1:7")       // デモ・サウンド
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                      // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有り
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Flip_Screen) )            PORT_DIPLOCATION("SW. 1:8")       // モニター画面反転
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                      // 正
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 逆
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, "Time Setting" )      PORT_DIPLOCATION("SW2:1,2,3")
-	PORT_DIPSETTING(    0x07, "08:30" )
-	PORT_DIPSETTING(    0x06, "09:00" )
-	PORT_DIPSETTING(    0x05, "09:30" )
-	PORT_DIPSETTING(    0x04, "10:00" )
-	PORT_DIPSETTING(    0x03, "10:30" )
-	PORT_DIPSETTING(    0x02, "11:00" )
-	PORT_DIPSETTING(    0x01, "11:30" )
-	PORT_DIPSETTING(    0x00, "12:00" )
-	PORT_DIPNAME( 0x08, 0x00, "Time Service" )  PORT_DIPLOCATION("SW2:4") // "secret moves" happen at certain time stamps
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "TEL Display" )       PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "GAL mode" )          PORT_DIPLOCATION("SW2:6") // unknown what this does
-	PORT_DIPSETTING(    0x20, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x40, 0x40, "Select Special Item" )   PORT_DIPLOCATION("SW2:7")/* Allows to select which one of the nine special items you want. */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Debug" )         PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x07, "Game Clock Start" )              PORT_DIPLOCATION("SW. 2:1,2,3")   // ゲーム時計スタート
+	PORT_DIPSETTING(    0x07, "08:30" )                                                           // 　８時３０分
+	PORT_DIPSETTING(    0x06, "09:00" )                                                           // 　９時００分
+	PORT_DIPSETTING(    0x05, "09:30" )                                                           // 　９時３０分
+	PORT_DIPSETTING(    0x04, "10:00" )                                                           // １０時００分
+	PORT_DIPSETTING(    0x03, "10:30" )                                                           // １０時３０分
+	PORT_DIPSETTING(    0x02, "11:00" )                                                           // １１時００分
+	PORT_DIPSETTING(    0x01, "11:30" )                                                           // １１時３０分
+	PORT_DIPSETTING(    0x00, "12:00" )                                                           // １２時００分
+	PORT_DIPNAME( 0x08, 0x00, "Time Service" )                  PORT_DIPLOCATION("SW. 2:4")       // タイム－サービス（時間等によりできる秘技）
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有り                  (allows secret techniques depending on the time)
+	PORT_DIPNAME( 0x10, 0x10, "Show Telephone Numbers" )        PORT_DIPLOCATION("SW. 2:5")       // ＴＥＬ表示
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                      // 無し
+	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                       // 有り
+	PORT_DIPNAME( 0x20, 0x20, "Gal Mode" )                      PORT_DIPLOCATION("SW. 2:6")       // ＧＡＬモード切り替え  (not clear what this does)
+	PORT_DIPSETTING(    0x20, "1" )                                                               // １
+	PORT_DIPSETTING(    0x00, "2" )                                                               // ２
+	PORT_DIPNAME( 0x40, 0x40, "Bonus Item Select (cheat)" )     PORT_DIPLOCATION("SW. 2:7")       // ＯＦＦ固定
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       //                       (allows you to select a bonus item and always win the jan-ken-pon game)
+	PORT_DIPNAME( 0x80, 0x80, "Show Debug Info" )               PORT_DIPLOCATION("SW. 2:8")       // ＯＦＦ固定
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "17B"
@@ -2242,7 +2242,7 @@ static INPUT_PORTS_START( mjdialq2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // "18A"
 
-	PORT_INCLUDE( dynax_mahjong_keys )
+	PORT_INCLUDE( mahjong_matrix_2p_ff )
 INPUT_PORTS_END
 
 
@@ -2353,7 +2353,7 @@ static INPUT_PORTS_START( mjcomv1 )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )   // "17B"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )   // "18B"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR(Test))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE PORT_NAME(DEF_STR(Test))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )   // "06B"
@@ -2640,93 +2640,60 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( nanajign )
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x38, "0" )
-	PORT_DIPSETTING(    0x30, "1" )
-	PORT_DIPSETTING(    0x28, "2" )
-	PORT_DIPSETTING(    0x20, "3" )
-	PORT_DIPSETTING(    0x18, "4" )
-	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPSETTING(    0x08, "6" )
-	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      //?
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )                PORT_DIPLOCATION("SW. 2:1,2")     // プレイ料金
+	PORT_DIPSETTING(    0x00, DEF_STR(3C_1C) )                                                    // ３コイン　１プレー
+	PORT_DIPSETTING(    0x02, DEF_STR(2C_1C) )                                                    // ２コイン　１プレー
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )                                                    // １コイン　１プレー
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_2C) )                                                    // １コイン　２プレー
+	PORT_DIPNAME( 0x04, 0x00, "Allow Pinfu with Tsumo")         PORT_DIPLOCATION("SW. 2:3")       // ルール　ピンフ・ツモ複合
+	PORT_DIPSETTING(    0x04, DEF_STR(No) )                                                       // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )                                                      // 有り
+	PORT_DIPNAME( 0x38, 0x20, DEF_STR(Difficulty) )             PORT_DIPLOCATION("SW. 2:4,5,6")   // 難易度　コンピューター
+	PORT_DIPSETTING(    0x38, "1 (Weak)" )                                                        // 　　弱い　　（１）
+	PORT_DIPSETTING(    0x30, "2" )                                                               // 　　　　　　（２）
+	PORT_DIPSETTING(    0x28, "3" )                                                               // 　　　　　　（３）
+	PORT_DIPSETTING(    0x20, "4 (Normal)" )                                                      // 標準　　　　（４）
+	PORT_DIPSETTING(    0x18, "5" )                                                               // 　　　　　　（５）
+	PORT_DIPSETTING(    0x10, "6" )                                                               // 　　　　　　（６）
+	PORT_DIPSETTING(    0x08, "7" )                                                               // 　　　　　　（７）
+	PORT_DIPSETTING(    0x00, "8 (Strong)" )                                                      // 　　強い　　（８）
+	PORT_DIPNAME( 0x40, 0x40, "Auto Reach" )                    PORT_DIPLOCATION("SW. 2:7")       // オート・ツモ
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                      // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有り
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Flip_Screen) )            PORT_DIPLOCATION("SW. 2:8")       // モニター画面反転
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                      // 正
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 逆
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  //*
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  //*
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  //*
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  //*
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds ) )           PORT_DIPLOCATION("SW. 3:1")       // デモ・サウンド
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                      // 無し
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有り
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW. 3:2" )                                               // ＯＦＦ固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW. 3:3" )                                               // ＯＦＦ固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW. 3:4" )                                               // ＯＦＦ固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW. 3:5" )                                               // ＯＦＦ固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW. 3:6" )                                               // ＯＦＦ固定
+	PORT_DIPNAME( 0x40, 0x40, "Computer Hand Always Open" )     PORT_DIPLOCATION("SW. 3:7")       // ＯＦＦ固定
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Service_Mode) )           PORT_DIPLOCATION("SW. 3:8")       //  ＯＦＦ固定
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )    // Test
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR(Test))   // Test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  // Analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // Memory Reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_INCLUDE( dynax_mahjong_keys )
+	PORT_INCLUDE( mahjong_matrix_2p_ff )
 
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW2") // not shown in test mode or manual
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -3355,7 +3322,7 @@ static INPUT_PORTS_START( neruton )
 	PORT_DIPSETTING(    0x02, "11:00" )                                                           // １１時００分
 	PORT_DIPSETTING(    0x01, "11:30" )                                                           // １１時３０分
 	PORT_DIPSETTING(    0x00, "12:00" )                                                           // １２時００分
-	PORT_DIPNAME( 0x08, 0x00, "Time Service" )                  PORT_DIPLOCATION("SW. 2:4")       // タイム－サービス
+	PORT_DIPNAME( 0x08, 0x00, "Time Service" )                  PORT_DIPLOCATION("SW. 2:4")       // タイム－サービス（時間等によりできる秘技）
 	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無し
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有り               (allows secret techniques depending on the time)
 	PORT_DIPNAME( 0x10, 0x10, "Gal H Pose" )                    PORT_DIPLOCATION("SW. 2:5")       // ＯＦＦ固定
@@ -3616,8 +3583,6 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mjreach )
-	// Only a photo of one page of the manual has been seen
-
 	// The manual provides two sets of standard settings:
 	//       標準設定　シングル向け                        標準設定　メダルコーナー向け
 	// SW 1  OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF       OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF
@@ -3639,61 +3604,61 @@ static INPUT_PORTS_START( mjreach )
 	PORT_DIPSETTING(    0x08, "2" )                                                                // レート２
 	PORT_DIPSETTING(    0x04, "3" )                                                                // レート３
 	PORT_DIPSETTING(    0x00, "5" )                                                                // レート５
-	MAHJONG_YAKUMAN_BONUS(4, "DIP2:5,6,7")                                                         // 役満ボーナスチャンスの設定周期
+	MAHJONG_YAKUMAN_BONUS(4, "DIP-SW2:5,6,7")                                                      // 役満ボーナスチャンスの設定周期
 	PORT_DIPNAME( 0x80, 0x00, "Yakuman Bonuses Per Cycle" )     PORT_DIPLOCATION("DIP-SW2:8")      // 役満ボーナスの回数設定周期毎に
 	PORT_DIPSETTING(    0x00, "1" )                                                                // １回
 	PORT_DIPSETTING(    0x80, "2" )                                                                // ２回
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Payout Mode" )                   PORT_DIPLOCATION("DIP-SW3:1")
-	PORT_DIPSETTING(    0x01, "Key-out" )
-	PORT_DIPSETTING(    0x00, "Hopper" )
-	PORT_DIPNAME( 0x02, 0x02, "Hopper Polarity" )               PORT_DIPLOCATION("DIP-SW3:2")
-	PORT_DIPSETTING(    0x02, DEF_STR(Normal) )
-	PORT_DIPSETTING(    0x00, "Inverted" )
-	PORT_DIPNAME( 0x04, 0x00, "Double Bet" )                    PORT_DIPLOCATION("DIP-SW3:3")
-	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR(Unknown) )                PORT_DIPLOCATION("DIP-SW3:4")
-	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x10, 0x00, "Renchan Rate" )                  PORT_DIPLOCATION("DIP-SW3:5")
-	PORT_DIPSETTING(    0x10, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x20, 0x00, "Last Chance" )                   PORT_DIPLOCATION("DIP-SW3:6")
-	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0xc0, 0x00, "Last Chance Count" )             PORT_DIPLOCATION("DIP-SW3:7,8")
+	PORT_DIPNAME( 0x01, 0x01, "Payout Mode" )                   PORT_DIPLOCATION("DIP-SW3:1")      // ゲーム仕様
+	PORT_DIPSETTING(    0x01, "Key-out" )                                                          // クレジット式
+	PORT_DIPSETTING(    0x00, "Hopper" )                                                           // ホッパー式
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Polarity" )               PORT_DIPLOCATION("DIP-SW3:2")      // ホッパーアクティブ
+	PORT_DIPSETTING(    0x02, DEF_STR(Normal) )                                                    // 通常
+	PORT_DIPSETTING(    0x00, "Inverted" )                                                         // 反転
+	PORT_DIPNAME( 0x04, 0x00, "Double Bet" )                    PORT_DIPLOCATION("DIP-SW3:3")      // Ｗ－ＢＥＴ機能
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                        // 有
+	PORT_DIPNAME( 0x08, 0x00, "Computer Strength" )             PORT_DIPLOCATION("DIP-SW3:4")      // コンピューターの強さ
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                    // 普通
+	PORT_DIPSETTING(    0x08, "Strong" )                                                           // 強い
+	PORT_DIPNAME( 0x10, 0x00, "Renchan Rate" )                  PORT_DIPLOCATION("DIP-SW3:5")      // 連荘レート
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                        // 有
+	PORT_DIPNAME( 0x20, 0x00, "Last Chance" )                   PORT_DIPLOCATION("DIP-SW3:6")      // ラストチャンス
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                        // 有
+	PORT_DIPNAME( 0xc0, 0x00, "Last Chance Tsumo Count" )       PORT_DIPLOCATION("DIP-SW3:7,8")    // ラストチャンスのツモ回数
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )            PORT_DIPLOCATION("DIP-SW4:1")
-	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )                 PORT_DIPLOCATION("DIP-SW4:2")
-	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x04, 0x04, "Auto Reach" )                    PORT_DIPLOCATION("DIP-SW4:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Don Den Button" )                PORT_DIPLOCATION("DIP-SW4:4")
-	PORT_DIPSETTING(    0x08, "Start" )
-	PORT_DIPSETTING(    0x00, "Flip Flop" )
-	PORT_DIPNAME( 0x10, 0x00, "Show Gals" )                     PORT_DIPLOCATION("DIP-SW4:5")
-	PORT_DIPSETTING(    0x10, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x20, 0x00, "Suggest Calls" )                 PORT_DIPLOCATION("DIP-SW4:6")
-	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )  // shows when kan/pon/chi/ron is possible
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Unknown) )                PORT_DIPLOCATION("DIP-SW4:7")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )            PORT_DIPLOCATION("DIP-SW4:1")      // デモ・サウンド
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                        // 有
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )                 PORT_DIPLOCATION("DIP-SW4:2")      // ゲーム・サウンド
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                        // 有
+	PORT_DIPNAME( 0x04, 0x00, "Auto Reach" )                    PORT_DIPLOCATION("DIP-SW4:3")      // オート・リーチ機能
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                        // 有
+	PORT_DIPNAME( 0x08, 0x00, "Don Den Button" )                PORT_DIPLOCATION("DIP-SW4:4")      // Ｄｏｎ・Ｄｅｎ機能　ボタン変更
+	PORT_DIPSETTING(    0x08, "Start" )                                                            // スタートボタン
+	PORT_DIPSETTING(    0x00, "Flip Flop" )                                                        // Ｆ／Ｆボタン
+	PORT_DIPNAME( 0x10, 0x00, "Show Renchan Gal" )              PORT_DIPLOCATION("DIP-SW4:5")      // 連荘ギャル表示
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                        // 有
+	PORT_DIPNAME( 0x20, 0x00, "In-Game Messages" )              PORT_DIPLOCATION("DIP-SW4:6")      // ゲーム中のメッセージ
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                        // 有 (shows when kan/pon/chi/ron is possible)
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR(Unused) )                 PORT_DIPLOCATION("DIP-SW4:7")      // ＯＮ固定
 	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                PORT_DIPLOCATION("DIP-SW4:8")
-	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) ) // shows "super revolver" bonus game during attract mode
+	PORT_DIPNAME( 0x80, 0x80, "Super Revolver Jackpot Payout Rate" ) PORT_DIPLOCATION("DIP-SW4:8") // スパーレボルバーのＪＡＣＫ－ＰＯＴの出率
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                    // 通常 (shows "super revolver" bonus game during attract mode)
+	PORT_DIPSETTING(    0x80, "Frequent" )                                                         // よく出る
 
 	PORT_START("DSW4")  /* 4 (top) */
 	MAHJONG_NOTE_CREDITS(0, "DIP-SW1:9", "DSW1", 0)                                                // ＮＯＴＥ　ＲＡＴＥ
@@ -3705,18 +3670,18 @@ static INPUT_PORTS_START( mjreach )
 	PORT_DIPSETTING(    0x08, "500" )
 	PORT_DIPSETTING(    0x04, "700" )
 	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Unknown) )                PORT_DIPLOCATION("DIP-SW3:9")
-	PORT_DIPSETTING(    0x10, DEF_STR(Off) )
-	PORT_DIPSETTING(    0x00, DEF_STR(On) ) // shows "super revolver" bonus game on start
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR(Unknown) )                PORT_DIPLOCATION("DIP-SW3:10")
-	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
+	PORT_DIPNAME( 0x10, 0x00, "Super Revolver" )                PORT_DIPLOCATION("DIP-SW3:9")      // スパーレボルバー
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                       // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                        // 有
+	PORT_DIPNAME( 0x20, 0x00, "Payout Variation" )              PORT_DIPLOCATION("DIP-SW3:10")     // 配当の波
+	PORT_DIPSETTING(    0x20, "Small" )                                                            // 小さい
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                    // 通常
+	PORT_DIPNAME( 0x40, 0x40, "Renchan Gal Display" )           PORT_DIPLOCATION("DIP-SW4:9")      // 連荘ギャルの表示の方式
+	PORT_DIPSETTING(    0x40, "After Each Win" )                                                   // 勝つごとに表示 (= On according to manual page?)
+	PORT_DIPSETTING(    0x00, "After 3 Consecutive Wins" )                                         // ３連荘のみ表示 (= Off according to manual page?)
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unused) )                 PORT_DIPLOCATION("DIP-SW4:10")     // ＯＦＦ固定
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown top-6" )
-	PORT_DIPSETTING(    0x40, "1" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown top-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	MAHJONG_COIN_TEST("DSW2", 0x01)
 

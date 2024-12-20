@@ -39,6 +39,12 @@ public:
 	auto p1_out_cb() { return m_p1_out.bind(); }
 	auto p2_out_cb() { return m_p2_out.bind(); }
 
+	auto dma0_read_cb() { return m_dma_read[0].bind(); }
+	auto dma1_read_cb() { return m_dma_read[1].bind(); }
+
+	auto dma0_write_cb() { return m_dma_write[0].bind(); }
+	auto dma1_write_cb() { return m_dma_write[1].bind(); }
+
 	TIMER_CALLBACK_MEMBER(v25_timer_callback);
 
 protected:
@@ -113,19 +119,25 @@ private:
 	uint8_t   m_no_interrupt;
 	uint8_t   m_halted;
 
-	/* timer related */
+	// timer related
 	uint16_t  m_TM0, m_MD0, m_TM1, m_MD1;
 	uint8_t   m_TMC0, m_TMC1;
 	emu_timer *m_timers[4];
 
-	/* serial interface related */
+	// serial interface related
 	uint8_t   m_scm[2];
 	uint8_t   m_scc[2];
 	uint8_t   m_brg[2];
 	uint8_t   m_sce[2];
 
-	/* system control */
-	uint8_t   m_RAMEN, m_TB, m_PCK; /* PRC register */
+	// DMA related
+	uint8_t   m_dmac[2];
+	uint8_t   m_dmam[2];
+	int8_t    m_dma_channel;
+	int8_t    m_last_dma_channel;
+
+	// system control
+	uint8_t   m_RAMEN, m_TB, m_PCK; // PRC register
 	uint8_t   m_RFM;
 	uint16_t  m_WTC;
 	uint32_t  m_IDB;
@@ -145,6 +157,9 @@ private:
 	devcb_write8 m_p0_out;
 	devcb_write8 m_p1_out;
 	devcb_write8 m_p2_out;
+
+	devcb_read16::array<2> m_dma_read;
+	devcb_write16::array<2> m_dma_write;
 
 	uint8_t   m_prefetch_size;
 	uint8_t   m_prefetch_cycles;
@@ -177,6 +192,7 @@ private:
 	void nec_bankswitch(unsigned bank_num);
 	void nec_trap();
 	void external_int();
+	void dma_process();
 
 	void ida_sfr_map(address_map &map) ATTR_COLD;
 	uint8_t read_irqcontrol(int /*INTSOURCES*/ source, uint8_t priority);
@@ -257,6 +273,18 @@ private:
 	void tmic1_w(uint8_t d);
 	uint8_t tmic2_r();
 	void tmic2_w(uint8_t d);
+	uint8_t dmac0_r();
+	void dmac0_w(uint8_t d);
+	uint8_t dmam0_r();
+	void dmam0_w(uint8_t d);
+	uint8_t dmac1_r();
+	void dmac1_w(uint8_t d);
+	uint8_t dmam1_r();
+	void dmam1_w(uint8_t d);
+	uint8_t dic0_r();
+	void dic0_w(uint8_t d);
+	uint8_t dic1_r();
+	void dic1_w(uint8_t d);
 	uint8_t rfm_r();
 	void rfm_w(uint8_t d);
 	uint16_t wtc_r();

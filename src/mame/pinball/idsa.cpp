@@ -410,5 +410,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1985, v1,       0, idsa,     idsa, idsa_state, empty_init, ROT0, "IDSA", "V.1",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, bsktbllp, 0, bsktbllp, idsa, idsa_state, empty_init, ROT0, "IDSA", "Basket Ball", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, v1,       0, idsa,     idsa, idsa_state, empty_init, ROT0, "IDSA", "V.1",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1987, bsktbllp, 0, bsktbllp, idsa, idsa_state, empty_init, ROT0, "IDSA", "Basket Ball", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

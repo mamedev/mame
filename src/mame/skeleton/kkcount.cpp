@@ -118,4 +118,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2005, kkcount, 0, kkcount, kkcount, komaya_state, empty_init, ROT0, "Komaya", "Circlun - Kuru.Kuru-Count", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2005, kkcount, 0, kkcount, kkcount, komaya_state, empty_init, ROT0, "Komaya", "Circlun - Kuru.Kuru-Count", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

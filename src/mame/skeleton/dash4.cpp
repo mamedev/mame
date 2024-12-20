@@ -85,4 +85,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1999, dash4, 0, 0, dash4, dash4, dash4_state, empty_init, "Cross Products", "DASH4 Debug Adapter", MACHINE_IS_SKELETON )
+SYST( 1999, dash4, 0, 0, dash4, dash4, dash4_state, empty_init, "Cross Products", "DASH4 Debug Adapter", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -143,4 +143,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1994, mx3210, 0, 0, mx3210, mx3210, mx3210_state, empty_init, "Xyplex Inc.", "MAXserver MX-3210 Local Router", MACHINE_IS_SKELETON)
+SYST(1994, mx3210, 0, 0, mx3210, mx3210, mx3210_state, empty_init, "Xyplex Inc.", "MAXserver MX-3210 Local Router", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

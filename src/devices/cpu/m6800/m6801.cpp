@@ -130,9 +130,9 @@ enum
 #define TSR_ICF1    0x40
 #define TSR_ICF2    0x80
 
-/* Note: don't use 0 cycles here for invalid opcodes so that we don't */
-/* hang in an infinite loop if we hit one */
-#define XX 4 // invalid opcode unknown cc
+// to prevent the possibility of MAME locking up, don't use 0 cycles here
+#define XX 4 // illegal opcode unknown cycle count
+
 const u8 m6801_cpu_device::cycles_6803[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
@@ -174,7 +174,8 @@ const u8 m6801_cpu_device::cycles_63701[256] =
 	/*E*/  4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5,
 	/*F*/  4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5
 };
-#undef XX // /invalid opcode unknown cc
+
+#undef XX // /illegal opcode unknown cc
 
 
 const m6800_cpu_device::op_func m6801_cpu_device::m6803_insn[0x100] = {

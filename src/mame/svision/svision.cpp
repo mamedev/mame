@@ -13,7 +13,7 @@
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/timer.h"
 
 #include "emupal.h"
@@ -207,7 +207,7 @@ void svision_state::check_irq()
 	bool irq = m_timer_shot && BIT(m_reg[BANK], 1);
 	irq = irq || (m_dma_finished && BIT(m_reg[BANK], 2));
 
-	m_maincpu->set_input_line(M65C02_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(W65C02_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(svision_state::timer)
@@ -712,7 +712,7 @@ void svision_state::svision(machine_config &config)
 {
 	svision_base(config);
 
-	M65C02(config, m_maincpu, 4'000'000);
+	W65C02(config, m_maincpu, 4'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &svision_state::program_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);

@@ -1624,7 +1624,7 @@ void bbcbp_state::econx25(machine_config &config)
 void bbcm_state::bbcm(machine_config &config)
 {
 	/* basic machine hardware */
-	M65SC02(config, m_maincpu, 16_MHz_XTAL / 8);
+	G65SC12(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbcm_state::bbcm_mem);
 	m_maincpu->set_addrmap(AS_OPCODES, &bbcm_state::bbcm_fetch);
 	m_maincpu->set_periodic_int(FUNC(bbc_state::bbcb_keyscan), attotime::from_hz(1000)); /* scan keyboard */

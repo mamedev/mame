@@ -275,7 +275,7 @@ ROM_END
 
 
 //    year, name,       parent, compat, machine,            input,            class,                  init,       company,    fullname,                  flags
-CONS( 2001, leappad,    0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad",                 MACHINE_IS_SKELETON )
-CONS( 2002, mfleappad,  0,      0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad",        MACHINE_IS_SKELETON )
-CONS( 2004, leappadmic, 0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad Plus Microphone", MACHINE_IS_SKELETON ) // Compatible with regular LeapPad carts
-CONS( 2005, ltleappad,  0,      0,      leapfrog_ltleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "Little Touch LeapPad",    MACHINE_IS_SKELETON )
+CONS( 2001, leappad,    0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, mfleappad,  0,      0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2004, leappadmic, 0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad Plus Microphone", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Compatible with regular LeapPad carts
+CONS( 2005, ltleappad,  0,      0,      leapfrog_ltleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "Little Touch LeapPad",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

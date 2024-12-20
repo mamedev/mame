@@ -1,6 +1,6 @@
 # license:BSD-3-Clause
 # copyright-holders:Olivier Galibert
-# m65c02 opcodes
+# w65c02 opcodes
 
 adc_c_aba
 	TMP = read_pc();

@@ -82,7 +82,6 @@ alternate view (see video options). The EAG conversion is a cloneset of feag.
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/clock.h"
 #include "machine/i8255.h"

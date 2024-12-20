@@ -125,4 +125,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1982, poly61,  0, 0, poly61,  poly61, poly61_state,  empty_init, "Korg", "Poly-61 Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1982, poly61,  0, 0, poly61,  poly61, poly61_state,  empty_init, "Korg", "Poly-61 Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

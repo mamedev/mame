@@ -592,7 +592,7 @@ void leapster_state::init_leapster()
 } // anonymous namespace
 
 
-CONS( 2003, leapster,    0,        0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster",       MACHINE_IS_SKELETON )
-CONS( 2005, leapstertv,  leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster TV",    MACHINE_IS_SKELETON )
-CONS( 2005, leapsterlmx, leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster L-MAX", MACHINE_IS_SKELETON )
-CONS( 2009, leapster2,   leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster 2",     MACHINE_IS_SKELETON )
+CONS( 2003, leapster,    0,        0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, leapstertv,  leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster TV",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, leapsterlmx, leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster L-MAX", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, leapster2,   leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster 2",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

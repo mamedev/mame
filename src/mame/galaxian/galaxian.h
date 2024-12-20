@@ -324,6 +324,7 @@ public:
 	void galartic(machine_config &config);
 	void bigkonggx(machine_config &config);
 	void scrammr(machine_config &config);
+	void turpinnv(machine_config &config);
 
 	template <int Mask> ioport_value ckongg_coinage_r();
 	template <int Mask> int ckongs_coinage_r();
@@ -392,6 +393,7 @@ protected:
 	void takeoff_sound_portmap(address_map &map) ATTR_COLD;
 	void theend_map(address_map &map) ATTR_COLD;
 	void thepitm_map(address_map &map) ATTR_COLD;
+	void turpinnv_map(address_map &map) ATTR_COLD;
 	void turpins_map(address_map &map) ATTR_COLD;
 	void turpins_sound_map(address_map &map) ATTR_COLD;
 	void turtles_map(address_map &map) ATTR_COLD;

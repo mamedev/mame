@@ -306,4 +306,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY          FULLNAME       FLAGS
-COMP( 2003, consoemt, 0,      0,      consoemt, consoemt, consoemt_state, empty_init, "Indra / Amper", "Consola EMT", MACHINE_IS_SKELETON )
+COMP( 2003, consoemt, 0,      0,      consoemt, consoemt, consoemt_state, empty_init, "Indra / Amper", "Consola EMT", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

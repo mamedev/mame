@@ -7520,7 +7520,7 @@ Installation and Open Circulation CDs are bootable.
 		</part>
 		<part name="flop" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="en-us windows nt 3.10.528.1 3.5.img" size="1474560" crc="1e2c946b" sha1="7928d1cd298b32e724fc33731184b2a7dbd55b7e"/>
+				<rom name="en-us windows nt 3.10.528.1 3.5.img" size="1474560" crc="6501bf63" sha1="386d83a2e9fd758272cbbd0beb4148f9e238626e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7537,7 +7537,7 @@ Installation and Open Circulation CDs are bootable.
 		</part>
 		<part name="flop" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="en-us windows nt 3.10.528.1 3.5.img" size="1474560" crc="1e2c946b" sha1="7928d1cd298b32e724fc33731184b2a7dbd55b7e"/>
+				<rom name="en-us windows nt 3.10.528.1 3.5.img" size="1474560" crc="6501bf63" sha1="386d83a2e9fd758272cbbd0beb4148f9e238626e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7554,7 +7554,7 @@ Installation and Open Circulation CDs are bootable.
 		</part>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="en-us windows nt 3.10.511.1 3.5.img" size="1474560" crc="6501bf63" sha1="386d83a2e9fd758272cbbd0beb4148f9e238626e"/>
+				<rom name="en-us windows nt 3.10.511.1 3.5.img" size="1474560" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">

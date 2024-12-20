@@ -324,4 +324,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 2001, n501, 0, 0, n501, n501, n5xx_state, empty_init, "Samsung", "Samsung NUON Enhanced DVD Player / DVD-N501", MACHINE_IS_SKELETON )
+SYST( 2001, n501, 0, 0, n501, n501, n5xx_state, empty_init, "Samsung", "Samsung NUON Enhanced DVD Player / DVD-N501", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

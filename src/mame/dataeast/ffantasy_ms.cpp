@@ -389,7 +389,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, automatm,  robocop,  ffantasym, ffantasym, ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Automat (bootleg of Robocop, Modular System)", MACHINE_IS_SKELETON )
-GAME( 199?, drgninjam, baddudes, ffantasym, ffantasym, ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Dragon Ninja (Modular System)",                MACHINE_IS_SKELETON )
-GAME( 199?, ffantasym, hippodrm, ffantasym, ffantasym, ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Fighting Fantasy (Modular System)",            MACHINE_IS_SKELETON )
-GAME( 199?, secretagm, secretag, secretagm, ffantasym, ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Secret Agent (Modular System)",                MACHINE_IS_SKELETON )
+GAME( 199?, automatm,  robocop,  ffantasym, ffantasym, ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Automat (bootleg of Robocop, Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, drgninjam, baddudes, ffantasym, ffantasym, ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Dragon Ninja (Modular System)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, ffantasym, hippodrm, ffantasym, ffantasym, ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Fighting Fantasy (Modular System)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, secretagm, secretag, secretagm, ffantasym, ffantasy_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Secret Agent (Modular System)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

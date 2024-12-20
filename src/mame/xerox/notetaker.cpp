@@ -1001,4 +1001,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT           COMPANY  FULLNAME     FLAGS
-COMP( 1978, notetakr, 0,      0,      notetakr, notetakr, notetaker_state, empty_init, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)
+COMP( 1978, notetakr, 0,      0,      notetakr, notetakr, notetaker_state, empty_init, "Xerox", "NoteTaker", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

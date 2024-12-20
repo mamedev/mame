@@ -150,4 +150,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, tankfrceb, tankfrce, namcos1b, namcos1b, namcos1b_state, empty_init, ROT0, "bootleg", "Tank Force (bootleg)", MACHINE_IS_SKELETON )
+GAME( 199?, tankfrceb, tankfrce, namcos1b, namcos1b, namcos1b_state, empty_init, ROT0, "bootleg", "Tank Force (bootleg)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license: GPL-2.0+
+// copyright-holders: Dirk Best
 /***************************************************************************
 
     Commodore A2058
@@ -23,12 +23,9 @@ namespace bus::amiga::zorro {
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> a2058_device
-
 class a2058_device : public device_t, public device_zorro2_card_interface, public amiga_autoconfig
 {
 public:
-	// construction/destruction
 	a2058_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -49,7 +46,7 @@ private:
 
 } // namespace bus::amiga::zorro
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE_NS(ZORRO_A2058, bus::amiga::zorro, a2058_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_A2058_H

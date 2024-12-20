@@ -161,4 +161,4 @@ void syvg_state::init_luckyvl()
 } // anonymous namespace
 
 
-GAME( 2003, luckyvl, 0, syvg, luckyvl, syvg_state, init_luckyvl, ROT0, "Shyh-Yuan Electronics", "Lucky V Line", MACHINE_IS_SKELETON )
+GAME( 2003, luckyvl, 0, syvg, luckyvl, syvg_state, init_luckyvl, ROT0, "Shyh-Yuan Electronics", "Lucky V Line", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

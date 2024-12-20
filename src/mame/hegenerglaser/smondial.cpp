@@ -23,7 +23,7 @@ Undocumented buttons:
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
@@ -279,7 +279,7 @@ INPUT_PORTS_END
 void smondialb_state::smondialb(machine_config &config)
 {
 	// basic machine hardware
-	M65SC02(config, m_maincpu, 4_MHz_XTAL);
+	G65SC02(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &smondialb_state::smondialb_mem);
 
 	const attotime nmi_period = attotime::from_hz(4_MHz_XTAL / 0x2000);

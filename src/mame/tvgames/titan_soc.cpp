@@ -170,6 +170,6 @@ void titan_soc_state::init_titan_soc()
 } // anonymous namespace
 
 
-CONS( 2009, megadri4,  0,        0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 1)",      MACHINE_IS_SKELETON )
-CONS( 2009, megadri4a, megadri4, 0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 2)",      MACHINE_IS_SKELETON )
-CONS( 2004, colecofl,  0,        0, titan_soc, titan_soc, titan_soc_state, empty_init,     "AtGames",                     "Colecovision Flashback",                  MACHINE_IS_SKELETON )
+CONS( 2009, megadri4,  0,        0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 1)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, megadri4a, megadri4, 0, titan_soc, titan_soc, titan_soc_state, init_titan_soc, "Tectoy (licensed from Sega)", "Mega Drive 4 / Guitar Idol (set 2)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2004, colecofl,  0,        0, titan_soc, titan_soc, titan_soc_state, empty_init,     "AtGames",                     "Colecovision Flashback",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

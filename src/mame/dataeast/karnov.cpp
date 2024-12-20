@@ -87,6 +87,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
 #include "video/bufsprite.h"
+
 #include "deckarn.h"
 #include "decrmc3.h"
 #include "screen.h"
@@ -95,7 +96,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 
 namespace {
-
 
 /*************************************
  *
@@ -106,8 +106,8 @@ namespace {
 class karnov_state : public driver_device
 {
 public:
-	karnov_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	karnov_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
@@ -169,6 +169,7 @@ private:
 	void karnovjbl_sound_map(address_map &map) ATTR_COLD;
 
 	void screen_vblank(int state);
+
 	// protection mcu
 	void mcu_coin_irq(int state);
 	void mcu_ack_w(uint16_t data);
@@ -234,28 +235,29 @@ void karnov_state::mcu_p2_w(uint8_t data)
 	// ------1-  secreq ack
 	// -------0  cinclr
 
-	if (BIT(m_mcu_p2, 0) == 1 && BIT(data, 0) == 0)
+	const uint8_t fall = ~data & m_mcu_p2;
+	m_mcu_p2 = data;
+
+	if (BIT(fall, 0))
 		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 
-	if (BIT(m_mcu_p2, 1) == 1 && BIT(data, 1) == 0)
+	if (BIT(fall, 1))
 		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 
-	if (BIT(m_mcu_p2, 2) == 1 && BIT(data, 2) == 0)
+	if (BIT(fall, 2))
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 
-	if (BIT(m_mcu_p2, 4) == 1 && BIT(data, 4) == 0)
+	if (BIT(fall, 4))
 		m_mcu_p0 = m_maincpu_to_mcu >> 0;
 
-	if (BIT(m_mcu_p2, 5) == 1 && BIT(data, 5) == 0)
+	if (BIT(fall, 5))
 		m_mcu_p1 = m_maincpu_to_mcu >> 8;
 
-	if (BIT(m_mcu_p2, 6) == 1 && BIT(data, 6) == 0)
+	if (BIT(fall, 6))
 		m_mcu_to_maincpu = (m_mcu_to_maincpu & 0xff00) | (m_mcu_p0 << 0);
 
-	if (BIT(m_mcu_p2, 7) == 1 && BIT(data, 7) == 0)
+	if (BIT(fall, 7))
 		m_mcu_to_maincpu = (m_mcu_to_maincpu & 0x00ff) | (m_mcu_p1 << 8);
-
-	m_mcu_p2 = data;
 }
 
 // i8031 for bootleg emulation
@@ -294,10 +296,13 @@ void karnov_state::mcu_data_h_w(uint8_t data)
 
 void karnov_state::mcubl_p1_w(uint8_t data)
 {
-	if (BIT(m_mcu_p1, 0) == 1 && BIT(data, 0) == 0)
+	const uint8_t fall = ~data & m_mcu_p1;
+	m_mcu_p1 = data;
+
+	if (BIT(fall, 0))
 		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 
-	if (BIT(m_mcu_p1, 1) == 1 && BIT(data, 1) == 0)
+	if (BIT(fall, 1))
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 
 	m_mcu_p1 = data;
@@ -749,9 +754,9 @@ void karnov_state::karnov(machine_config &config)
 
 	I8751(config, m_mcu, 8_MHz_XTAL);
 	m_mcu->port_in_cb<0>().set([this](){ return m_mcu_p0; });
-	m_mcu->port_out_cb<0>().set([this](u8 data){ m_mcu_p0 = data; });
+	m_mcu->port_out_cb<0>().set([this](uint8_t data){ m_mcu_p0 = data; });
 	m_mcu->port_in_cb<1>().set([this](){ return m_mcu_p1; });
-	m_mcu->port_out_cb<1>().set([this](u8 data){ m_mcu_p1 = data; });
+	m_mcu->port_out_cb<1>().set([this](uint8_t data){ m_mcu_p1 = data; });
 	m_mcu->port_out_cb<2>().set(FUNC(karnov_state::mcu_p2_w));
 	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
@@ -1251,13 +1256,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, karnov,      0,       karnov,     karnov,     karnov_state, empty_init, ROT0,   "Data East USA",               "Karnov (US, rev 6)",                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnova,     karnov,  karnov,     karnov,     karnov_state, empty_init, ROT0,   "Data East USA",               "Karnov (US, rev 5)",                                         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnovj,     karnov,  karnov,     karnov,     karnov_state, empty_init, ROT0,   "Data East Corporation",       "Karnov (Japan)",                                             MACHINE_SUPPORTS_SAVE )
-GAME( 1987, karnovjbl,   karnov,  karnovjbl,  karnovjbl,  karnov_state, empty_init, ROT0,   "bootleg (K. J. Corporation)", "Karnov (Japan, bootleg with NEC D8748HD)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wndrplnt,    0,       wndrplnt,   wndrplnt,   karnov_state, empty_init, ROT270, "Data East Corporation",       "Wonder Planet (Japan)",                                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnov,     0,       karnov,     chelnov,    karnov_state, empty_init, ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (World)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovu,    chelnov, karnov,     chelnovu,   karnov_state, empty_init, ROT0,   "Data East USA",               "Chelnov - Atomic Runner (US)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovj,    chelnov, karnov,     chelnovj,   karnov_state, empty_init, ROT0,   "Data East Corporation",       "Chelnov - Atomic Runner (Japan)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovjbl,  chelnov, chelnovjbl, chelnovjbl, karnov_state, empty_init, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chelnovjbla, chelnov, chelnovjbl, chelnovjbl, karnov_state, empty_init, ROT0,   "bootleg",                     "Chelnov - Atomic Runner (Japan, bootleg with I8031, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnov,      0,       karnov,     karnov,     karnov_state, empty_init, ROT0,   "Data East USA",               "Karnov (US, rev 6)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnova,     karnov,  karnov,     karnov,     karnov_state, empty_init, ROT0,   "Data East USA",               "Karnov (US, rev 5)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnovj,     karnov,  karnov,     karnov,     karnov_state, empty_init, ROT0,   "Data East Corporation",       "Karnov (Japan)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1987, karnovjbl,   karnov,  karnovjbl,  karnovjbl,  karnov_state, empty_init, ROT0,   "bootleg (K. J. Corporation)", "Karnov (Japan, bootleg with NEC D8748HD)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wndrplnt,    0,       wndrplnt,   wndrplnt,   karnov_state, empty_init, ROT270, "Data East Corporation",       "Wonder Planet (Japan)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnov,     0,       karnov,     chelnov,    karnov_state, empty_init, ROT0,   "Data East Corporation",       "Atomic Runner Chelnov (World)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovu,    chelnov, karnov,     chelnovu,   karnov_state, empty_init, ROT0,   "Data East USA",               "Atomic Runner Chelnov (US)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovj,    chelnov, karnov,     chelnovj,   karnov_state, empty_init, ROT0,   "Data East Corporation",       "Atomic Runner Chelnov (Japan)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovjbl,  chelnov, chelnovjbl, chelnovjbl, karnov_state, empty_init, ROT0,   "bootleg",                     "Atomic Runner Chelnov (Japan, bootleg with I8031, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chelnovjbla, chelnov, chelnovjbl, chelnovjbl, karnov_state, empty_init, ROT0,   "bootleg",                     "Atomic Runner Chelnov (Japan, bootleg with I8031, set 2)", MACHINE_SUPPORTS_SAVE )

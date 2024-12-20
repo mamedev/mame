@@ -15,7 +15,7 @@ Hardware notes:
 
 #include "emu.h"
 
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
@@ -175,7 +175,7 @@ INPUT_PORTS_END
 void mondial2_state::mondial2(machine_config &config)
 {
 	// basic machine hardware
-	M65SC02(config, m_maincpu, 2_MHz_XTAL);
+	G65SC02(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mondial2_state::mondial2_mem);
 
 	const attotime nmi_period = attotime::from_hz(2_MHz_XTAL / 0x1000);

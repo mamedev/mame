@@ -178,4 +178,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, holddraw, 0, amstarz80, holddraw, amstarz80_state, empty_init, ROT0, "Amstar", "Hold & Draw", MACHINE_IS_SKELETON ) // supposedly, but might actually be another similar game
+GAME( 1981, holddraw, 0, amstarz80, holddraw, amstarz80_state, empty_init, ROT0, "Amstar", "Hold & Draw", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // supposedly, but might actually be another similar game

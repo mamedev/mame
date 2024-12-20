@@ -366,9 +366,9 @@ void boramz80_state::init_tpkborama()
 } // anonymous namespace
 
 
-GAME( 1987, pkboram,   0,        pk, pkboram,  boramz80_state, empty_init,     ROT0, "Boram", "PK - New Exciting Poker!",        MACHINE_IS_SKELETON ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
-GAME( 1988, tpkboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo",                        MACHINE_IS_SKELETON ) // PK-TURBO jan.29.1988. BORAM CORP.
-GAME( 1998, tpkborama, tpkboram, pk, tpkboram, boramz80_state, init_tpkborama, ROT0, "Boram", "PK Turbo (Ver 2.3B2, encrypted)", MACHINE_IS_SKELETON ) // dep inctype-23B1998 0519Ver 2.3B2
-GAME( 1990, pkrboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Rainbow (v 1.5)",              MACHINE_IS_SKELETON ) // PK RAINBOW v1.5 BORAM Corp. 1990.11.06�
-GAME( 1992, tpkg2,     0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Great 2",                MACHINE_IS_SKELETON ) // PK TURBO GREAT2 1992.06.04 BORAM CORP.
-GAME( 19??, unkboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "unknown Boram poker game",        MACHINE_IS_SKELETON ) // PKS v100 BORAM CORP
+GAME( 1987, pkboram,   0,        pk, pkboram,  boramz80_state, empty_init,     ROT0, "Boram", "PK - New Exciting Poker!",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
+GAME( 1988, tpkboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // PK-TURBO jan.29.1988. BORAM CORP.
+GAME( 1998, tpkborama, tpkboram, pk, tpkboram, boramz80_state, init_tpkborama, ROT0, "Boram", "PK Turbo (Ver 2.3B2, encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dep inctype-23B1998 0519Ver 2.3B2
+GAME( 1990, pkrboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Rainbow (v 1.5)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // PK RAINBOW v1.5 BORAM Corp. 1990.11.06�
+GAME( 1992, tpkg2,     0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Great 2",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // PK TURBO GREAT2 1992.06.04 BORAM CORP.
+GAME( 19??, unkboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "unknown Boram poker game",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // PKS v100 BORAM CORP

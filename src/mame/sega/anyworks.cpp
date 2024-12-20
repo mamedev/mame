@@ -112,4 +112,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2010, unkanyw, 0, unkanyw, unkanyw, anyworks_state, empty_init, ROT0, "AnyWorks / Sega", "unknown AnyWorks / Sega medal game BIOS", MACHINE_IS_SKELETON )
+GAME( 2010, unkanyw, 0, unkanyw, unkanyw, anyworks_state, empty_init, ROT0, "AnyWorks / Sega", "unknown AnyWorks / Sega medal game BIOS", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
