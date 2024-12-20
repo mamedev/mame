@@ -359,9 +359,10 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 				m_labels.set_codeptr(inst.param(0).label(), (drccodeptr)dst);
 				break;
 
-			// ignore COMMENT and NOP opcodes
+			// ignore COMMENT, NOP, and BREAK opcodes
 			case OP_COMMENT:
 			case OP_NOP:
+			case OP_BREAK:
 				break;
 
 			// when we hit a MAPVAR opcode, log the change for the current PC
