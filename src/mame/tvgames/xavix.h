@@ -574,11 +574,13 @@ protected:
 	uint16_t apply_pen_saturation_to_dat(uint16_t dat, uint16_t saturation);
 	uint16_t apply_pen_hue_to_dat(uint16_t dat, uint16_t hue);
 
+	virtual void get_tile_pixel_dat(uint8_t& dat, int bpp);
+
 	void update_pen(int pen, uint8_t shval, uint8_t lval);
-	void draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
-	void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which);
+	virtual void draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
+	virtual void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which);
 	void draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which, int line);
-	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int line);
 	void decode_inline_header(int &flipx, int &flipy, int &test, int& pal, int debug_packets);
 
@@ -635,6 +637,7 @@ public:
 		, m_bmp_palram_sh(*this, "bmp_palram_sh")
 		, m_bmp_palram_l(*this, "bmp_palram_l")
 		, m_bmp_base(*this, "bmp_base")
+		, m_extra(*this, "extra")
 	{
 		m_video_hres_multiplier = 2;
 	}
@@ -650,6 +653,8 @@ protected:
 	void superxavix_lowbus_map(address_map &map) ATTR_COLD;
 
 	required_device<xavix2002_io_device> m_xavix2002io;
+
+	virtual void get_tile_pixel_dat(uint8_t &dat, int bpp) override;
 
 private:
 	void superxavix_plt_flush_w(uint8_t data);
@@ -692,6 +697,10 @@ private:
 	void extended_extbus_reg1_w(uint8_t data);
 	void extended_extbus_reg2_w(uint8_t data);
 
+	uint8_t get_next_bit_sx();
+	virtual void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which) override;
+
 	uint8_t m_superxavix_pal_index = 0;
 	uint8_t m_superxavix_bitmap_pal_index = 0;
 	uint32_t m_sx_plt_address = 0;
@@ -708,6 +717,10 @@ private:
 	required_shared_ptr<uint8_t> m_bmp_palram_sh;
 	required_shared_ptr<uint8_t> m_bmp_palram_l;
 	required_shared_ptr<uint8_t> m_bmp_base;
+
+	optional_region_ptr<uint8_t> m_extra;
+
+	bool m_use_superxavix_extra; // does not need saving
 };
 
 

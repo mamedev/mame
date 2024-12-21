@@ -41,6 +41,28 @@ inline uint8_t xavix_state::get_next_bit()
 	return ret;
 }
 
+inline uint8_t superxavix_state::get_next_bit_sx()
+{
+	if (m_tmp_databit == 0)
+	{
+		m_bit = m_extra[m_tmp_dataaddress&0x7fffff];
+	}
+
+	uint8_t ret = m_bit >> m_tmp_databit;
+	ret &= 1;
+
+	m_tmp_databit++;
+
+	if (m_tmp_databit == 8)
+	{
+		m_tmp_databit = 0;
+		m_tmp_dataaddress++;
+	}
+
+	return ret;
+}
+
+
 inline uint8_t xavix_state::get_next_byte()
 {
 	uint8_t dat = 0;
@@ -599,6 +621,12 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	}
 }
 
+void superxavix_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
+{
+	m_use_superxavix_extra = false;
+	xavix_state::draw_tilemap(screen, bitmap, cliprect, which);
+}
+
 void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &pal, int debug_packets)
 {
 	uint8_t byte1 = 0;
@@ -906,6 +934,16 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	}
 }
 
+void superxavix_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+	if (m_extra)
+		m_use_superxavix_extra = true;
+
+	xavix_state::draw_sprites(screen, bitmap, cliprect);
+	m_use_superxavix_extra = false;
+}
+
+
 void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int line)
 {
 	int alt_addressing = 0;
@@ -928,6 +966,11 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		// 24-bit addressing (Addressing Mode 2)
 		alt_addressing = 0;
+	}
+	else if (m_spritereg == 0x07)
+	{
+		// used by anpanmdx - is this a specific 24-bit mode to enable SuperXaviX extra ROM access?
+		alt_addressing = 3;
 	}
 	else
 	{
@@ -962,8 +1005,8 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 		int xpos = spr_xpos[i];
 		int tile = 0;
 
-		// high 8-bits only used in 24-bit mode
-		if (((m_spritereg & 0x7f) == 0x04) || ((m_spritereg & 0x7f) == 0x15))
+		// high 8-bits only used in 24-bit modes
+		if (((m_spritereg & 0x7f) == 0x04) || ((m_spritereg & 0x7f) == 0x07) || ((m_spritereg & 0x7f) == 0x15))
 			tile |= (spr_addr_hi[i] << 16);
 
 		// mid 8-bits used in everything except 8-bit mode
@@ -1089,20 +1132,32 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 				if (alt_addressing == 1)
 				{
 					tile = (tile * drawheight * drawwidth * bpp) / 8;
-					basereg = 0; // always uses segment register 0 in tile addressing mode?
-				}
-				else
-				{
-					// 8-byte alignment Addressing Mode uses a fixed offset?
-					if (alt_addressing == 2)
-						tile = tile * 8;
+					int gfxbase = (m_segment_regs[1] << 16) | (m_segment_regs[0] << 8); // always use segment 0
+					tile += gfxbase;
 
+				}
+				else if (alt_addressing == 2)
+				{
+					tile = tile * 8;
 					basereg = (tile & 0xf0000) >> 16;
 					tile &= 0xffff;
+					int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+					tile += gfxbase;
+				}
+				else if (alt_addressing == 3)
+				{
+					// 24-bit, with multiplier, no segment use?
+					// seen in anpanmdx, might be superxavix specific to be able to access more memory?
+					tile = tile * 8;
+				}
+				else // currently unused case
+				{
+					basereg = (tile & 0xf0000) >> 16;
+					tile &= 0xffff;
+					int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+					tile += gfxbase;
 				}
 
-				int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
-				tile += gfxbase;
 			}
 
 			draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos , line, drawheight, drawwidth, flipx, flipy, pal, zval, drawline);
@@ -1117,9 +1172,34 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 }
 
+void xavix_state::get_tile_pixel_dat(uint8_t &dat, int bpp)
+{
+	for (int i = 0; i < bpp; i++)
+	{
+		dat |= (get_next_bit() << i);
+	}
+}
+
+void superxavix_state::get_tile_pixel_dat(uint8_t &dat, int bpp)
+{
+	if (m_use_superxavix_extra)
+	{
+		for (int i = 0; i < bpp; i++)
+		{
+			dat |= (get_next_bit_sx() << i);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < bpp; i++)
+		{
+			dat |= (get_next_bit() << i);
+		}
+	}
+}
+
 void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
 {
-
 	const pen_t *paldata = m_palette->pens();
 	if (ypos > cliprect.max_y || ypos < cliprect.min_y)
 		return;
@@ -1160,10 +1240,7 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 			uint8_t dat = 0;
 
-			for (int i = 0; i < bpp; i++)
-			{
-				dat |= (get_next_bit() << i);
-			}
+			get_tile_pixel_dat(dat, bpp);
 
 			col = col * m_video_hres_multiplier;
 
@@ -1320,9 +1397,20 @@ uint32_t superxavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 						uint16_t* const zyposptr = &m_zbuffer.pix(y);
 
 						uint8_t dat = 0;
-						for (int i = 0; i < bpp; i++)
+
+						if (m_extra)
 						{
-							dat |= (get_next_bit() << i);
+							for (int i = 0; i < bpp; i++)
+							{
+								dat |= (get_next_bit_sx() << i);
+							}
+						}
+						else
+						{
+							for (int i = 0; i < bpp; i++)
+							{
+								dat |= (get_next_bit() << i);
+							}
 						}
 
 						int realx;
