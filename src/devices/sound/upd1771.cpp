@@ -234,11 +234,11 @@ const unsigned char noise_tbl[]=
 } // anonymous namespace
 
 
-DEFINE_DEVICE_TYPE(UPD1771C, upd1771c_device, "upd1771c", "NEC uPD1771C 017")
+DEFINE_DEVICE_TYPE(UPD1771C_HLE, upd1771c_hle_device, "upd1771c_hle", "NEC uPD1771C 017 HLE")
 
 
-upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, UPD1771C, tag, owner, clock)
+upd1771c_hle_device::upd1771c_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, UPD1771C_HLE, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_ack_handler(*this)
 {
@@ -248,9 +248,9 @@ upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag,
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void upd1771c_device::device_start()
+void upd1771c_hle_device::device_start()
 {
-	m_timer = timer_alloc(FUNC(upd1771c_device::ack_callback), this);
+	m_timer = timer_alloc(FUNC(upd1771c_hle_device::ack_callback), this);
 
 	m_channel = stream_alloc(0, 1, clock() / 4);
 
@@ -280,7 +280,7 @@ void upd1771c_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void upd1771c_device::device_reset()
+void upd1771c_hle_device::device_reset()
 {
 	m_index = 0;
 	m_expected_bytes = 0;
@@ -295,7 +295,7 @@ void upd1771c_device::device_reset()
 
 
 
-uint8_t upd1771c_device::read()
+uint8_t upd1771c_hle_device::read()
 {
 	return 0x80; // TODO
 }
@@ -362,7 +362,7 @@ Byte8: 0b???VVVVV  Low Freq1 volume
 Byte9: 0b???VVVVV  Low Freq2 volume
 */
 
-void upd1771c_device::write(uint8_t data)
+void upd1771c_hle_device::write(uint8_t data)
 {
 	LOG("upd1771_w: received byte 0x%02x\n", data);
 
@@ -467,7 +467,7 @@ void upd1771c_device::write(uint8_t data)
 }
 
 
-void upd1771c_device::pcm_write(int state)
+void upd1771c_hle_device::pcm_write(int state)
 {
 	//RESET upon HIGH
 	if (state != m_pc3)
@@ -482,7 +482,7 @@ void upd1771c_device::pcm_write(int state)
 }
 
 
-TIMER_CALLBACK_MEMBER( upd1771c_device::ack_callback )
+TIMER_CALLBACK_MEMBER( upd1771c_hle_device::ack_callback )
 {
 	m_ack_handler(1);
 }
@@ -492,7 +492,7 @@ TIMER_CALLBACK_MEMBER( upd1771c_device::ack_callback )
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void upd1771c_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void upd1771c_hle_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	auto &buffer = outputs[0];
 

@@ -14,11 +14,11 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-class upd1771c_device : public device_t,
+class upd1771c_hle_device : public device_t,
 						public device_sound_interface
 {
 public:
-	upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd1771c_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto ack_handler() { return m_ack_handler.bind(); }
 
@@ -73,6 +73,6 @@ private:
 	uint32_t   m_n_ppos[3];   //period pos
 };
 
-DECLARE_DEVICE_TYPE(UPD1771C, upd1771c_device)
+DECLARE_DEVICE_TYPE(UPD1771C_HLE, upd1771c_hle_device)
 
 #endif // MAME_SOUND_UPD1771_H
