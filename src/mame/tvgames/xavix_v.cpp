@@ -1023,7 +1023,11 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		int zval = (attr1 & 0xf0) >> 4;
 		int flipx = (attr1 & 0x01);
-		int flipy = (attr1 & 0x02); // XaviX logo on xavmusic has this set, but doesn't want it, why?
+		int flipy = (attr1 & 0x02); 
+
+		// many elements, including the XaviX logo on xavmusic have yflip set, but don't want it, why?
+		if (m_disable_sprite_yflip)
+			flipy = 0;
 
 		int drawheight = 16;
 		int drawwidth = 16;

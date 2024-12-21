@@ -19,6 +19,8 @@ public:
 
 	void superxavix_i2c_jmat(machine_config &config);
 
+	void init_xavmusic();
+
 private:
 	uint8_t read_extended_io0();
 	uint8_t read_extended_io1();

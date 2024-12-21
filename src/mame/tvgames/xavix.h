@@ -607,6 +607,7 @@ protected:
 	virtual void extintrf_790x_w(offs_t offset, uint8_t data);
 
 	bool m_disable_memory_bypass = false;
+	bool m_disable_sprite_yflip = false;
 	int m_video_hres_multiplier;
 };
 
