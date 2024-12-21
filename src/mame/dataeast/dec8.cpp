@@ -1205,7 +1205,7 @@ static INPUT_PORTS_START( ghostb )
 	PORT_START("DSW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Tested on real hardware
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-    // 1-2 should be coinage.
+	// 1-2 should be coinage.
 //  PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
 //  PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 //  PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -1752,7 +1752,7 @@ static const gfx_layout sr_sprites =
 	{ 16*8, 1+(16*8), 2+(16*8), 3+(16*8), 4+(16*8), 5+(16*8), 6+(16*8), 7+(16*8),
 		0,1,2,3,4,5,6,7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
-//	{ 0*8, 2*8, 1*8, 3*8, 4*8, 6*8, 5*8, 7*8 ,8*8,10*8,9*8,11*8,12*8,14*8,13*8,15*8 }, bootleg decode
+//  { 0*8, 2*8, 1*8, 3*8, 4*8, 6*8, 5*8, 7*8 ,8*8,10*8,9*8,11*8,12*8,14*8,13*8,15*8 }, bootleg decode
 	16*16
 };
 

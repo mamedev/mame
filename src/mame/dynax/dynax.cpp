@@ -3628,7 +3628,7 @@ static INPUT_PORTS_START( mjreach )
 	PORT_DIPNAME( 0x20, 0x00, "Last Chance" )                   PORT_DIPLOCATION("DIP-SW3:6")      // ラストチャンス
 	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                       // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                        // 有
-	PORT_DIPNAME( 0xc0, 0x00, "Last Chance Tsumo Count" )       PORT_DIPLOCATION("DIP-SW3:7,8")    // ラストチャンスのツモ回数
+	PORT_DIPNAME( 0xc0, 0x00, "Last Chance Count" )             PORT_DIPLOCATION("DIP-SW3:7,8")    // ラストチャンスのツモ回数
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -3653,7 +3653,7 @@ static INPUT_PORTS_START( mjreach )
 	PORT_DIPNAME( 0x20, 0x00, "In-Game Messages" )              PORT_DIPLOCATION("DIP-SW4:6")      // ゲーム中のメッセージ
 	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                       // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                        // 有 (shows when kan/pon/chi/ron is possible)
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR(Unused) )                 PORT_DIPLOCATION("DIP-SW4:7")      // ＯＮ固定
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR(Unknown) )                PORT_DIPLOCATION("DIP-SW4:7")      // ＯＮ固定
 	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x80, 0x80, "Super Revolver Jackpot Payout Rate" ) PORT_DIPLOCATION("DIP-SW4:8") // スパーレボルバーのＪＡＣＫ－ＰＯＴの出率
@@ -3679,7 +3679,7 @@ static INPUT_PORTS_START( mjreach )
 	PORT_DIPNAME( 0x40, 0x40, "Renchan Gal Display" )           PORT_DIPLOCATION("DIP-SW4:9")      // 連荘ギャルの表示の方式
 	PORT_DIPSETTING(    0x40, "After Each Win" )                                                   // 勝つごとに表示 (= On according to manual page?)
 	PORT_DIPSETTING(    0x00, "After 3 Consecutive Wins" )                                         // ３連荘のみ表示 (= Off according to manual page?)
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unused) )                 PORT_DIPLOCATION("DIP-SW4:10")     // ＯＦＦ固定
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                PORT_DIPLOCATION("DIP-SW4:10")     // ＯＦＦ固定
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 

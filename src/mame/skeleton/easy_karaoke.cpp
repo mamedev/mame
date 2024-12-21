@@ -79,11 +79,11 @@
 
     ------------------
 
-	For units which allow downloadable songs the only difference in the bootloader ROMs is a couple of bytes
-	at the end.  This may be used as security, to tie the downloads stored in the flash ROM to the units as
-	the format of the downloaded data in the flash ROMs appears to be different in each case, starting with
-	different unique bytes after the header information for each unit we've seen. (maybe encryption?)
-	The bootloader ROM has a unique ID on a sticker in each case too (could be a bytesum, haven't checked)
+    For units which allow downloadable songs the only difference in the bootloader ROMs is a couple of bytes
+    at the end.  This may be used as security, to tie the downloads stored in the flash ROM to the units as
+    the format of the downloaded data in the flash ROMs appears to be different in each case, starting with
+    different unique bytes after the header information for each unit we've seen. (maybe encryption?)
+    The bootloader ROM has a unique ID on a sticker in each case too (could be a bytesum, haven't checked)
 
 
 *******************************************************************************/

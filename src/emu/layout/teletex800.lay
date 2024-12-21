@@ -9,11 +9,11 @@ license:CC0-1.0
 
 	<element name="button">
 		<rect>
-  			<color red="0.25" green="0.25" blue="0.25" />
+			<color red="0.25" green="0.25" blue="0.25" />
 		</rect>
 	</element>
 
- 	<element name="red_led" defstate="0">
+	<element name="red_led" defstate="0">
 		<disk state="0">
 			<color red="0.20" green="0.0" blue="0.0" />
 		</disk>
@@ -21,8 +21,8 @@ license:CC0-1.0
 			<color red="0.75" green="0.0" blue="0.0" />
 		</disk>
 	</element>
- 
- 	<element name="green_led" defstate="0">
+
+	<element name="green_led" defstate="0">
 		<disk state="0">
 			<color red="0.0" green="0.20" blue="0.0" />
 		</disk>
@@ -38,38 +38,38 @@ license:CC0-1.0
 	</element>
 
 	<element name="time_led" defstate="0">
-	    <text state="0" string="TID">
+		<text state="0" string="TID">
 			<color red="0.0" green="0.20" blue="0.0" />
 		</text>
-	    <text state="1" string="TID">
+		<text state="1" string="TID">
 			<color red="0.0" green="0.75" blue="0.0" />
 		</text>
 	</element>
 
 	<element name="date_led" defstate="0">
-	    <text state="0" string="DAT">
+		<text state="0" string="DAT">
 			<color red="0.0" green="0.20" blue="0.0" />
 		</text>
-	    <text state="1" string="DAT">
+		<text state="1" string="DAT">
 			<color red="0.0" green="0.75" blue="0.0" />
 		</text>
 	</element>
 
 	<element name="year_led" defstate="0">
-	    <text state="0" string="ÅR">
+		<text state="0" string="ÅR">
 			<color red="0.0" green="0.20" blue="0.0" />
 		</text>
-	    <text state="1" string="ÅR">
+		<text state="1" string="ÅR">
 			<color red="0.0" green="0.75" blue="0.0" />
 		</text>
 	</element>
 
 	<view name="Front panel">
-        <bounds x="0" y="0" width="810" height="473" />
+		<bounds x="0" y="0" width="810" height="473" />
 
-        <element ref="panel">
-            <bounds x="0" y="0" width="810" height="473" />
-        </element>
+		<element ref="panel">
+			<bounds x="0" y="0" width="810" height="473" />
+		</element>
 
 		<!-- BATTERI DRIFT -->
 		<element name="bat_led" ref="red_led">
@@ -151,17 +151,17 @@ license:CC0-1.0
 
 		<!-- SKRIV -->
 		<element ref="button" inputtag="BTN" inputmask="0x01">
-		    <bounds x="275" y="262" width="54" height="54" />
+			<bounds x="275" y="262" width="54" height="54" />
 		</element>
 
 		<!-- ALLA -->
 		<element ref="button" inputtag="BTN" inputmask="0x02">
-		    <bounds x="556" y="261" width="54" height="54" />
+			<bounds x="556" y="261" width="54" height="54" />
 		</element>
 
 		<!-- KLOCK -->
 		<element ref="button" inputtag="BTN" inputmask="0x04">
-		    <bounds x="648" y="263" width="54" height="54" />
+			<bounds x="648" y="263" width="54" height="54" />
 		</element>
 	</view>
 </mamelayout>

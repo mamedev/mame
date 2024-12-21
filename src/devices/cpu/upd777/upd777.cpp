@@ -60,7 +60,7 @@ void upd777_cpu_device::internal_data_map(address_map &map)
 	// 00  yyyyyyp   (y = ypos, p = PRIO)
 	// 01  xxxxxxx   (x = xpos)
 	// 02  ttttttt   (t = pattern)
-	// 03  YYYRGBS   (Y = , RGB = color, S=ySUB)  
+	// 03  YYYRGBS   (Y = , RGB = color, S=ySUB)
 
 	map(0x00, 0x7f).ram().share("datamem");
 }
@@ -254,7 +254,7 @@ inline void upd777_cpu_device::set_frs(u8 frs) { m_frs = frs & 0x7f; }
 inline void upd777_cpu_device::set_fls(u8 fls) { m_fls = fls & 0x7f; }
 
 // MODE is a 7-bit register with the following format
-// 6543210  
+// 6543210
 // rbhpRGB (r = reverberate sound effect, b = brightness, h = hue, p = black/prio, RGB = color)
 inline void upd777_cpu_device::set_mode(u8 mode) { m_mode = mode & 0x7f; }
 
@@ -517,7 +517,7 @@ void upd777_cpu_device::do_op()
 		{
 			if (!non)
 			{
-				if ((srcreg1 & srcreg2) == 0) // skip if (x·y) makes zero, N->L[2:1] 
+				if ((srcreg1 & srcreg2) == 0) // skip if (x·y) makes zero, N->L[2:1]
 					m_skip = 1;
 			}
 			else
@@ -569,7 +569,7 @@ void upd777_cpu_device::do_op()
 	}
 	else if ((inst & 0b1111'1010'0000) == 0b0011'0010'0000)
 	{
-		//   0b0011'0r1R'oonn (where r = reg1, R = reg2, o = optype, and n = next l value)	
+		//   0b0011'0r1R'oonn (where r = reg1, R = reg2, o = optype, and n = next l value)
 		// 320 AND A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
 		// 324 Add A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
 		// 328 OR A1[7:1] and A1[7:1], store to A1[7:1], N->L[2:1]
@@ -606,7 +606,7 @@ void upd777_cpu_device::do_op()
 			src1 = src1 + src2;
 			// not in this case?
 			//if (src1 & 0x80)
-			//	m_skip = 1;
+			//  m_skip = 1;
 			break;
 		}
 		case 2: // OR
@@ -719,7 +719,7 @@ void upd777_cpu_device::do_op()
 	}
 	else if ((inst & 0b1111'1100'0010) == 0b0100'0100'0000)
 	{
-		//   0b0100'01dg'ks0n (where  d = DISP, G = GPE, K = KIE, S = SME, n = A11)	
+		//   0b0100'01dg'ks0n (where  d = DISP, G = GPE, K = KIE, S = SME, n = A11)
 		// 440 Set D to DISP, G to GPE, K to KIE, S to SME, N->A[11]
 		const int d = (inst >> 5) & 0x1;
 		const int g = (inst >> 4) & 0x1;
@@ -1172,7 +1172,7 @@ uint32_t upd777_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &b
 // 0x68-0x6f are 'Y Repeat' (7x7)
 // 0x70-0x77 are 'XY Repeat' (8x7)
 // 0x78-0x7f are 'X Repeat' (8x7)
-// 
+//
 // NOTE, sprite patterns *7 and *f are unused so documentation expresses these ranges as to 66, 6e etc. rather than 67 6f
 //
 // it isn't clear how the 'Bent' effect etc. is enabled, as clearly not all patterns in this range should use it?

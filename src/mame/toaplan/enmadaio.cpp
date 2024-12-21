@@ -77,7 +77,7 @@ u32 enmadaio_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void enmadaio_state::screen_vblank(int state)
 {
-	if (state) 	// rising edge
+	if (state)  // rising edge
 	{
 		m_vdp->screen_eof();
 	}
