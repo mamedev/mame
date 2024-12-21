@@ -352,4 +352,4 @@ ioport_constructor z_89_11_device::device_input_ports() const
 
 }
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_Z_89_11, device_h89bus_right_card_interface, z_89_11_device, "Z-89-11", "Heath/Zenith Z-89-11 Multi-Function I/O Card");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_Z_89_11, device_h89bus_right_card_interface, z_89_11_device, "z_89_11", "Heath/Zenith Z-89-11 Multi-Function I/O Card");
