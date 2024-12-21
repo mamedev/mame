@@ -44,9 +44,7 @@ protected:
 
 	void update_intr(u8 level);
 
-	void lp_int(int data);
 	void aux_int(int data);
-	void modem_int(int data);
 
 	required_device<i8255_device>    m_lp;
 	required_device<ins8250_device>  m_aux;
@@ -55,13 +53,14 @@ protected:
 	required_ioport                  m_cfg_aux;
 	required_ioport                  m_cfg_modem;
 
-	bool                             m_lp_enabled;
-	bool                             m_aux_enabled;
-	bool                             m_modem_enabled;
 
-	u8                               m_lp_int_idx;
-	u8                               m_aux_int_idx;
-	u8                               m_modem_int_idx;
+	bool m_lp_enabled;
+	bool m_aux_enabled;
+	bool m_modem_enabled;
+
+	u8 m_lp_int_idx;
+	u8 m_aux_int_idx;
+	u8 m_modem_int_idx;
 
 	int m_lp_intr;
 	int m_aux_intr;
@@ -194,18 +193,6 @@ void z_89_11_device::update_intr(u8 level)
 	}
 }
 
-void z_89_11_device::lp_int(int data)
-{
-	if (!m_lp_enabled)
-	{
-		return;
-	}
-
-	m_lp_intr = data;
-
-	update_intr(m_lp_int_idx);
-}
-
 void z_89_11_device::aux_int(int data)
 {
 	if (!m_aux_enabled)
@@ -216,18 +203,6 @@ void z_89_11_device::aux_int(int data)
 	m_aux_intr = data;
 
 	update_intr(m_aux_int_idx);
-}
-
-void z_89_11_device::modem_int(int data)
-{
-	if (!m_modem_enabled)
-	{
-		return;
-	}
-
-	m_modem_intr = data;
-
-	update_intr(m_modem_int_idx);
 }
 
 void z_89_11_device::device_start()
