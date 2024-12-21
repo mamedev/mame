@@ -6835,6 +6835,7 @@ Throws "Null sized DOS image ! Invalid disk !" from HxC Disk Browser
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 		<info name="language" value="English" />
+		<info name="usage" value="The installer does not copy UNDELETE.EXE; it can be manually copied from disk 10." />
 		<info name="version" value="6.22" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
