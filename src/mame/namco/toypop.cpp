@@ -73,7 +73,6 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
@@ -85,7 +84,6 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	// memory pointers
 	required_shared_ptr<u8> m_spriteram;
 	required_shared_ptr<u8> m_sharedram;
 	required_shared_ptr<u16> m_bgvram;
@@ -93,7 +91,6 @@ private:
 
 	required_ioport_array<2> m_io_dsw;
 
-	// video-related
 	tilemap_t *m_tx_tilemap;
 	u8 m_pal_bank = 0;
 
@@ -116,6 +113,7 @@ private:
 	void sharedram_w(offs_t offset, u8 data);
 	void sub_irq_enable_w(offs_t offset, u16 data);
 	void sound_halt_ctrl_w(offs_t offset, u8 data);
+
 	void txvram_w(offs_t offset, u8 data);
 	u8 bg_rmw_r(offs_t offset);
 	void bg_rmw_w(offs_t offset, u8 data);
