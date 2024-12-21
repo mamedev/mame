@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_Z29_KBD_KEYBOARD_H
-#define MAME_BUS_Z29_KBD_KEYBOARD_H
+#ifndef MAME_BUS_HEATHZENITH_Z29_KEYBOARD_H
+#define MAME_BUS_HEATHZENITH_Z29_KEYBOARD_H
 
 #pragma once
 
@@ -100,4 +100,4 @@ inline void z29_keyboard_port_device::keyout_w(int state)
 		m_kbd->receive_data(state);
 }
 
-#endif // MAME_BUS_Z29_KBD_KEYBOARD_H
+#endif // MAME_BUS_HEATHZENITH_Z29_KEYBOARD_H

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_BUS_Z29_KBD_MD_KBD_H
-#define MAME_BUS_Z29_KBD_MD_KBD_H
+#ifndef MAME_BUS_HEATHZENITH_Z29_MD_KBD_H
+#define MAME_BUS_HEATHZENITH_Z29_MD_KBD_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(MD_KEYBOARD, md_keyboard_device)
 
-#endif // MAME_BUS_Z29_KBD_MD_KBD_H
+#endif // MAME_BUS_HEATHZENITH_Z29_MD_KBD_H
