@@ -63,8 +63,8 @@ public:
 	{
 	}
 
-	void toypop(machine_config &config);
-	void liblrabl(machine_config &config);
+	void toypop(machine_config &config) ATTR_COLD;
+	void liblrabl(machine_config &config) ATTR_COLD;
 
 protected:
 	// driver_device overrides
@@ -207,7 +207,7 @@ void namcos16_state::video_start()
 	save_item(NAME(m_pal_bank));
 }
 
-void namcos16_state::draw_background(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip)
+void namcos16_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, bool flip)
 {
 	u16 const pal_base = 0x300 + (m_pal_bank << 4);
 	u32 const src_base = 0x200/2;
@@ -240,7 +240,7 @@ void namcos16_state::draw_background(bitmap_ind16 &bitmap,const rectangle &clipr
 // TODO: this is likely to be a lot more complex, and maybe is per scanline too
 void namcos16_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,bool flip)
 {
-	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
+	gfx_element *const gfx_1 = m_gfxdecode->gfx(1);
 	u16 const bank1 = 0x0800;
 	u16 const bank2 = 0x1000;
 
@@ -483,10 +483,10 @@ static INPUT_PORTS_START( liblrabl )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWA:6,5,4")
 	// bonus scores for common
-	PORT_DIPSETTING(    0x1c, "40k 120k 200k 400k 600k 1m" )
-	PORT_DIPSETTING(    0x0c, "40k 140k 250k 400k 700k 1m" )
+	PORT_DIPSETTING(    0x1c, "40k 120k 200k 400k 600k 1M" )
+	PORT_DIPSETTING(    0x0c, "40k 140k 250k 400k 700k 1M" )
 	// bonus scores for 1, 2 or 3 lives
-	PORT_DIPSETTING(    0x14, "50k 150k 300k 500k 700k 1m" ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x14, "50k 150k 300k 500k 700k 1M" ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
 	PORT_DIPSETTING(    0x04, "40k 120k and every 120k" )    PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
 	PORT_DIPSETTING(    0x18, "40k 150k and every 150k" )    PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
 	PORT_DIPSETTING(    0x08, "50k 150k 300k" )              PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
@@ -673,7 +673,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::main_scanline)
 {
 	int const scanline = param;
 
-	if (scanline == 224 && m_main_irq_enable == true)
+	if (scanline == 224 && m_main_irq_enable)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 
 	// TODO: definitely can't fire from this, presume that a command send has a timing response ...
@@ -692,7 +692,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::main_scanline)
 
 void namcos16_state::vblank_irq(int state)
 {
-	if (state && m_sub_irq_enable == true)
+	if (state && m_sub_irq_enable)
 		m_subcpu->set_input_line(6, HOLD_LINE);
 }
 
