@@ -275,6 +275,18 @@ static INPUT_PORTS_START( ban_ordj )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( anpanmdx )
+	PORT_INCLUDE(xavix_i2c)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Back
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Start ('Paper')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // Left in Menu ('Red Star')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) // Right in Menu ('Blue Star')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+INPUT_PORTS_END
+
 /* SuperXavix IO port handliner (per game) */
 
 uint8_t superxavix_i2c_jmat_state::read_extended_io0()
@@ -719,7 +731,7 @@ CONS( 2007, tmy_rkmj, 0, 0, superxavix_i2c_24c04,    xavix_i2c,  superxavix_i2c_
 // Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型
 CONS( 2005, ban_ordj, 0, 0, superxavix_i2c_24c04,    ban_ordj,   superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Ongeki Battle! Kamen Rider Hibiki: Kimero! Ikki Kasei no Kata (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2011, anpanmdx, 0, 0, superxavix_i2c_24c08,    ban_ordj,   superxavix_i2c_state, init_xavix, "JoyPalette / SSD Company LTD",   "Anpanman Kazoku De Ikunou Mat DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2011, anpanmdx, 0, 0, superxavix_i2c_24c08,    anpanmdx,   superxavix_i2c_state, init_xavix, "JoyPalette / SSD Company LTD",   "Anpanman Kazoku De Ikunou Mat DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
 // has HT24LC16
