@@ -2944,24 +2944,6 @@ if (BUSES["WYSEKBD"]~=null) then
 	}
 end
 
-
----------------------------------------------------
---
---@src/devices/bus/z29_kbd/keyboard.h,BUSES["Z29_KBD"] = true
----------------------------------------------------
-
-if (BUSES["Z29_KBD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/z29_kbd/keyboard.cpp",
-		MAME_DIR .. "src/devices/bus/z29_kbd/keyboard.h",
-		MAME_DIR .. "src/devices/bus/z29_kbd/he191_3425.cpp",
-		MAME_DIR .. "src/devices/bus/z29_kbd/he191_3425.h",
-		MAME_DIR .. "src/devices/bus/z29_kbd/md_kbd.cpp",
-		MAME_DIR .. "src/devices/bus/z29_kbd/md_kbd.h",
-	}
-end
-
-
 ---------------------------------------------------
 --
 --@src/devices/bus/z88/z88.h,BUSES["Z88"] = true
@@ -5789,3 +5771,21 @@ if (BUSES["HEATH_TLB_CONNECTOR"]~=null) then
 		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlb.h",
 	}
 end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/heathzenith/z29/keyboard.h,BUSES["Z29_KBD"] = true
+---------------------------------------------------
+
+if (BUSES["Z29_KBD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/heathzenith/z29/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/z29/keyboard.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/z29/he191_3425.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/z29/he191_3425.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/z29/md_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/z29/md_kbd.h",
+	}
+end
+

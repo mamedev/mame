@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "bus/z29_kbd/keyboard.h"
+#include "bus/heathzenith/z29/keyboard.h"
 #include "sound/beep.h"
 
 

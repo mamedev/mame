@@ -14,7 +14,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "bus/z29_kbd/keyboard.h"
+#include "bus/heathzenith/z29/keyboard.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/i8251.h"
 #include "video/mc6845.h"

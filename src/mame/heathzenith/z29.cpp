@@ -8,7 +8,7 @@
 
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
-#include "bus/z29_kbd/keyboard.h"
+#include "bus/heathzenith/z29/keyboard.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/x2212.h"
 #include "video/i8275.h"
