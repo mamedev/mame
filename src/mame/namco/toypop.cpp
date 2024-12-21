@@ -94,7 +94,6 @@ private:
 	tilemap_t *m_tx_tilemap;
 	u8 m_pal_bank = 0;
 
-	// misc
 	bool m_main_irq_enable = false;
 	bool m_sub_irq_enable = false;
 
