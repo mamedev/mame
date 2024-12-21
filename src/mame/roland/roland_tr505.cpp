@@ -64,4 +64,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1986, tr505, 0, 0, tr505, tr505, roland_tr505_state, empty_init, "Roland", "TR-505 Rhythm Composer", MACHINE_IS_SKELETON)
+SYST(1986, tr505, 0, 0, tr505, tr505, roland_tr505_state, empty_init, "Roland", "TR-505 Rhythm Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

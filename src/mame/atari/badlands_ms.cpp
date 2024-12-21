@@ -199,4 +199,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, badlandsm, badlands, badlandsm, badlandsm, badlands_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Bad Lands (Modular System)", MACHINE_IS_SKELETON )
+GAME( 199?, badlandsm, badlands, badlandsm, badlandsm, badlands_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Bad Lands (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

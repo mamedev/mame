@@ -159,4 +159,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, instantm, 0, instantm, instantm, instantm_state, empty_init, ROT0, "Capcom / Polaroid", "Polaroid Instant Memories", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, instantm, 0, instantm, instantm, instantm_state, empty_init, ROT0, "Capcom / Polaroid", "Polaroid Instant Memories", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

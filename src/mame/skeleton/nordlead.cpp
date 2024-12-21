@@ -78,4 +78,4 @@ ROM_END
 
 //SYST(1995, nordlead, 0, 0, nordlead, nordlead, nordlead_state, empty_init, "Clavia", "Nord Lead", ...)
 // ...
-SYST(2003, nordle2x, 0, 0, nordle2x,  nordle2x, nordlead_state, empty_init, "Clavia", "Nord Lead 2X", MACHINE_IS_SKELETON )
+SYST(2003, nordle2x, 0, 0, nordle2x,  nordle2x, nordlead_state, empty_init, "Clavia", "Nord Lead 2X", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

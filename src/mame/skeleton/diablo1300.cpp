@@ -209,4 +209,4 @@ ROM_END
 
 
 //   YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY               FULLNAME
-COMP(1976, diablo, 0,      0,      diablo1300, diablo1300, diablo1300_state, empty_init, "Diablo Systems Inc", "Diablo HyType II Series 1300 CPU", MACHINE_IS_SKELETON)
+COMP(1976, diablo, 0,      0,      diablo1300, diablo1300, diablo1300_state, empty_init, "Diablo Systems Inc", "Diablo HyType II Series 1300 CPU", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

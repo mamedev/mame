@@ -480,6 +480,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1985,  cosflnsm,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Cosmic Flash (NSM)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Hot Fire Birds",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985,  gamesnsm,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "The Games (NSM)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  cosflnsm,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Cosmic Flash (NSM)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Hot Fire Birds",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  gamesnsm,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "The Games (NSM)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

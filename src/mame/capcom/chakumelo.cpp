@@ -103,4 +103,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1999, chakumel, 0, chakumel, chakumel, chakumelo_state, empty_init, ROT0, "Capcom", "Chaku Melo Collection", MACHINE_IS_SKELETON )
+GAME( 1999, chakumel, 0, chakumel, chakumel, chakumelo_state, empty_init, ROT0, "Capcom", "Chaku Melo Collection", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

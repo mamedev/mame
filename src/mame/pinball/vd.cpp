@@ -355,5 +355,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1986, break86,  0,    vd,  break86,  vd_state, init_0, ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986, papillon, 0,    vd,  papillon, vd_state, init_1, ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986, break86,  0,    vd,  break86,  vd_state, init_0, ROT0,  "Video Dens", "Break '86", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986, papillon, 0,    vd,  papillon, vd_state, init_1, ROT0,  "Video Dens", "Papillon",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

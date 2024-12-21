@@ -373,4 +373,4 @@ void blktiger_ms_state::init_blktigerm()
 } // Anonymous namespace
 
 
-GAME( 1991, blktigerm,  blktiger,  blktigerm,  blktigerm,  blktiger_ms_state, init_blktigerm, ROT0, "bootleg (Gaelco / Ervisa)", "Black Tiger (Modular System)", MACHINE_IS_SKELETON )
+GAME( 1991, blktigerm,  blktiger,  blktigerm,  blktigerm,  blktiger_ms_state, init_blktigerm, ROT0, "bootleg (Gaelco / Ervisa)", "Black Tiger (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

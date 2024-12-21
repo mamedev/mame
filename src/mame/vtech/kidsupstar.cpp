@@ -95,4 +95,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2016, kidsupstar, 0, 0, kidsupstar, kidsupstar, kidsupstar_state, empty_init, "VTech", "Kidi SuperStar LightShow", MACHINE_IS_SKELETON )
+CONS( 2016, kidsupstar, 0, 0, kidsupstar, kidsupstar, kidsupstar_state, empty_init, "VTech", "Kidi SuperStar LightShow", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

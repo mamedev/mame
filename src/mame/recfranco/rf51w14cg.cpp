@@ -253,6 +253,6 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME         PARENT      MACHINE     INPUT       CLASS            INIT        ROT   COMPANY               FULLNAME                                                      FLAGS
-GAME( 2003, rf51w14cg,   0,          rf51w14cg,  rf51w14cg,  rf51w14cg_state, empty_init, ROT0, "Recreativos Franco", "unknown Recreativos Franco slot machine (model RF51W14-CG)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1995, rfsantafem,  0,          rfsantafem, rfsantafem, rf51w14cg_state, empty_init, ROT0, "Recreativos Franco", "Santa Fe Mine (set 1)",                                      MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1995, rfsantafema, rfsantafem, rfsantafem, rfsantafem, rf51w14cg_state, empty_init, ROT0, "Recreativos Franco", "Santa Fe Mine (set 2)",                                      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2003, rf51w14cg,   0,          rf51w14cg,  rf51w14cg,  rf51w14cg_state, empty_init, ROT0, "Recreativos Franco", "unknown Recreativos Franco slot machine (model RF51W14-CG)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1995, rfsantafem,  0,          rfsantafem, rfsantafem, rf51w14cg_state, empty_init, ROT0, "Recreativos Franco", "Santa Fe Mine (set 1)",                                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1995, rfsantafema, rfsantafem, rfsantafem, rfsantafem, rf51w14cg_state, empty_init, ROT0, "Recreativos Franco", "Santa Fe Mine (set 2)",                                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

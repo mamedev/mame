@@ -387,4 +387,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1993, a1010, 0, 0, textelcomp, textelcomp, textelcomp_state, empty_init, "Humantechnik", "Textel Compact A1010-0", MACHINE_IS_SKELETON)
+COMP(1993, a1010, 0, 0, textelcomp, textelcomp, textelcomp_state, empty_init, "Humantechnik", "Textel Compact A1010-0", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

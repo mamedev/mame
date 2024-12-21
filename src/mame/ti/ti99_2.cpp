@@ -151,7 +151,8 @@
 
     The ROMs contain a stripped-down version of TI BASIC, but without
     the specific graphics subprograms. Programs written on the 99/2 should
-    run on the 99/4A, but the opposite is not true.
+    run on the 99/4A, but the opposite is not true. The 24K version is
+    buggy and incomplete: OPEN and SAVE cause the CPU to restart itself.
 
     Original implementation: Raphael Nabet; December 1999, 2000
 

@@ -141,4 +141,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1984, sx240, 0, 0, sx240, sx240, kawai_sx240_state, empty_init, "Kawai Musical Instrument Manufacturing", "SX-240 8-Voice Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1984, sx240, 0, 0, sx240, sx240, kawai_sx240_state, empty_init, "Kawai Musical Instrument Manufacturing", "SX-240 8-Voice Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

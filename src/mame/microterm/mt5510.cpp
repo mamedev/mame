@@ -121,4 +121,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1988, mt5510, 0, 0, mt5510, mt5510, mt5510_state, empty_init, "Microterm", "Microterm 5510", MACHINE_IS_SKELETON)
+COMP(1988, mt5510, 0, 0, mt5510, mt5510, mt5510_state, empty_init, "Microterm", "Microterm 5510", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

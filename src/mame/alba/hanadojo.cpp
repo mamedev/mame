@@ -219,5 +219,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1984, hanadojo,  0,        hanadojo, hanadojo, hanadojo_state, empty_init, ROT0, "Alba", "Hana Doujou (set 1)", MACHINE_IS_SKELETON )
-GAME( 1984, hanadojoa, hanadojo, hanadojo, hanadojo, hanadojo_state, empty_init, ROT0, "Alba", "Hana Doujou (set 2)", MACHINE_IS_SKELETON )
+GAME( 1984, hanadojo,  0,        hanadojo, hanadojo, hanadojo_state, empty_init, ROT0, "Alba", "Hana Doujou (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, hanadojoa, hanadojo, hanadojo, hanadojo, hanadojo_state, empty_init, ROT0, "Alba", "Hana Doujou (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

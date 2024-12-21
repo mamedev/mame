@@ -91,4 +91,4 @@ ROM_END
 } // anonymous namespace
 
 // JG7420_24 on sticker
-CONS( 201?, lx_jg7420,    0,       0,      gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Lexibook", "Lexibook JG7420 200-in-1", MACHINE_IS_SKELETON )
+CONS( 201?, lx_jg7420,    0,       0,      gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Lexibook", "Lexibook JG7420 200-in-1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

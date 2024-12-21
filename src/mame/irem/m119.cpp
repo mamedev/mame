@@ -140,4 +140,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2000, scumimon, 0, m119, m119, m119_state, empty_init, ROT0, "Irem", "Slotters Club: Umi Monogatari", MACHINE_IS_SKELETON ) // Ver PROGRAM 2000/09/14
+GAME( 2000, scumimon, 0, m119, m119, m119_state, empty_init, ROT0, "Irem", "Slotters Club: Umi Monogatari", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Ver PROGRAM 2000/09/14

@@ -159,4 +159,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT  CLASS             INIT        COMPANY    FULLNAME  FLAGS
-COMP( 1987, digilog400, 0,          0,      digilog400, 0,     digilog400_state, empty_init, "Digilog", "400",    MACHINE_IS_SKELETON )
+COMP( 1987, digilog400, 0,          0,      digilog400, 0,     digilog400_state, empty_init, "Digilog", "400",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

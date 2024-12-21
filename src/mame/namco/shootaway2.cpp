@@ -126,4 +126,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996,  shootaw2,  0,  m74,  m74, m74_state, empty_init, ROT0, "Namco", "Shoot Away II", MACHINE_IS_SKELETON )
+GAME( 1996,  shootaw2,  0,  m74,  m74, m74_state, empty_init, ROT0, "Namco", "Shoot Away II", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

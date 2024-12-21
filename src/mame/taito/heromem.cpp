@@ -333,4 +333,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1997, heromem, 0, heromem, heromem, heromem_state, empty_init, ROT0, "Taito", "Heroine's Memory", MACHINE_IS_SKELETON_MECHANICAL ) // video is emulatable, coin pushing mechanics less so
+GAME( 1997, heromem, 0, heromem, heromem, heromem_state, empty_init, ROT0, "Taito", "Heroine's Memory", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // video is emulatable, coin pushing mechanics less so

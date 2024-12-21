@@ -20,8 +20,6 @@ Known issues:
 
 - Zaviga's DIPs are incomplete. (manual missing)
 
-- "RGB dip-switch" looks kludgy at best;
-
 *****************************************************************************/
 
 
@@ -44,8 +42,8 @@ namespace {
 class bwing_state : public driver_device
 {
 public:
-	bwing_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bwing_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -58,10 +56,12 @@ public:
 		m_fgscrollram(*this, "fgscrollram"),
 		m_bgscrollram(*this, "bgscrollram"),
 		m_gfxram(*this, "gfxram", 0x6000, ENDIANNESS_BIG),
-		m_vramview(*this, "vramview") { }
+		m_vramview(*this, "vramview")
+	{ }
 
 	void init_bwing();
 	void bwing(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(tilt_pressed);
 
@@ -128,6 +128,9 @@ private:
 };
 
 
+//****************************************************************************
+// Video Hardware
+
 void bwing_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
@@ -165,52 +168,33 @@ void bwing_state::scrollreg_w(offs_t offset, uint8_t data)
 
 	switch (offset)
 	{
-		case 6: m_palatch = data; break; // one of the palette components is latched through I/O(yike)
+		case 6:
+			// one of the palette components is latched through I/O(yike)
+			m_palatch = data;
+			break;
 
 		case 7:
 			m_mapmask = data;
 			m_vramview.select(data >> 6);
-		break;
+			break;
 	}
 }
 
 
 void bwing_state::paletteram_w(offs_t offset, uint8_t data)
 {
-	static const float rgb[4][3] = {
-		{0.85f, 0.95f, 1.00f},
-		{0.90f, 1.00f, 1.00f},
-		{0.80f, 1.00f, 1.00f},
-		{0.75f, 0.90f, 1.10f}
-	};
-
 	m_paletteram[offset] = data;
 
-	int r = ~data & 7;
-	int g = ~(data >> 4) & 7;
-	int b = ~m_palatch & 7;
-
-	r = ((r << 5) + (r << 2) + (r >> 1));
-	g = ((g << 5) + (g << 2) + (g >> 1));
-	b = ((b << 5) + (b << 2) + (b >> 1));
-
-	int i;
-
-	if ((i = ioport("EXTRA")->read()) < 4)
-	{
-		r = (float)r * rgb[i][0];
-		g = (float)g * rgb[i][1];
-		b = (float)b * rgb[i][2];
-		if (r > 0xff) r = 0xff;
-		if (g > 0xff) g = 0xff;
-		if (b > 0xff) b = 0xff;
-	}
+	int r = pal3bit(~data & 7);
+	int g = pal3bit(~(data >> 4) & 7);
+	int b = pal3bit(~m_palatch & 7);
 
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
+
 //****************************************************************************
-// Initializations
+// Video Initialization
 
 TILE_GET_INFO_MEMBER(bwing_state::get_fgtileinfo)
 {
@@ -246,8 +230,9 @@ void bwing_state::video_start()
 		m_sreg[i] = 0;
 }
 
+
 //****************************************************************************
-// Realtime
+// Screen Update
 
 void bwing_state::draw_sprites(bitmap_ind16 &bmp, const rectangle &clip, uint8_t *ram, int pri)
 {
@@ -282,9 +267,9 @@ void bwing_state::draw_sprites(bitmap_ind16 &bmp, const rectangle &clip, uint8_t
 
 		// single/double
 		if (!(attrib & 0x10))
-				gfx->transpen(bmp, clip, code, color, fx, fy, x, y, 0);
+			gfx->transpen(bmp, clip, code, color, fx, fy, x, y, 0);
 		else
-				gfx->zoom_transpen(bmp, clip, code, color, fx, fy, x, y, 1 << 16, 2 << 16, 0);
+			gfx->zoom_transpen(bmp, clip, code, color, fx, fy, x, y, 1 << 16, 2 << 16, 0);
 	}
 }
 
@@ -353,6 +338,7 @@ INTERRUPT_GEN_MEMBER(bwing_state::p3_interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
+
 //****************************************************************************
 // Memory and I/O Handlers
 
@@ -400,7 +386,7 @@ void bwing_state::p1_ctrl_w(offs_t offset, uint8_t data)
 				m_soundlatch->write(data);
 				m_audiocpu->set_input_line(DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
-		break;
+			break;
 
 		// BANKSEL(supposed to bank-switch CPU0 4000-7fff(may also 8000-bfff) 00=bank 0, 80=bank 1, unused)
 		case 6: break;
@@ -425,6 +411,7 @@ void bwing_state::p2_ctrl_w(offs_t offset, uint8_t data)
 	}
 }
 
+
 //****************************************************************************
 // CPU Memory Maps
 
@@ -436,7 +423,7 @@ void bwing_state::p1_map(address_map &map)
 	map(0x1000, 0x13ff).ram().w(FUNC(bwing_state::videoram_w)).share(m_videoram);
 	map(0x1400, 0x17ff).ram();
 	map(0x1800, 0x19ff).ram().share(m_spriteram);
-	map(0x1a00, 0x1aff).ram().w(FUNC(bwing_state::paletteram_w)).share("paletteram");
+	map(0x1a00, 0x1a3f).ram().w(FUNC(bwing_state::paletteram_w)).share("paletteram");
 	map(0x1b00, 0x1b00).portr("DSW0");
 	map(0x1b01, 0x1b01).portr("DSW1");
 	map(0x1b02, 0x1b02).portr("IN0");
@@ -483,6 +470,7 @@ void bwing_state::p3_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("VBLANK").w(FUNC(bwing_state::p3_u8f_w));
 }
+
 
 //****************************************************************************
 // I/O Port Maps
@@ -582,15 +570,8 @@ static INPUT_PORTS_START( bwing )
 
 	PORT_START("VBLANK")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
-
-	PORT_START("EXTRA") // a matter of taste
-	PORT_DIPNAME( 0x07, 0x00, "RGB" )
-	PORT_DIPSETTING(    0x00, "Default" )
-	PORT_DIPSETTING(    0x01, "More Red" )
-	PORT_DIPSETTING(    0x02, "More Green" )
-	PORT_DIPSETTING(    0x03, "More Blue" )
-	PORT_DIPSETTING(    0x04, "Max" )
 INPUT_PORTS_END
+
 
 //****************************************************************************
 // Graphics Layouts
@@ -637,6 +618,7 @@ static GFXDECODE_START( gfx_bwing )
 	GFXDECODE_RAM( "gfxram", 0x1000, ram_tilelayout, 0x30, 2 ) // background tiles
 GFXDECODE_END
 
+
 //****************************************************************************
 // Hardware Definitions
 
@@ -675,12 +657,12 @@ void bwing_state::bwing(machine_config &config)
 	MC6809E(config, m_subcpu, 24_MHz_XTAL / 16); // MC68A09E
 	m_subcpu->set_addrmap(AS_PROGRAM, &bwing_state::p2_map);
 
-	DECO16(config, m_audiocpu, 2'000'000); // FIXME: clock probably wrong
+	DECO16(config, m_audiocpu, 24_MHz_XTAL / 16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bwing_state::p3_map);
 	m_audiocpu->set_addrmap(AS_IO, &bwing_state::p3_io_map);
 	m_audiocpu->set_periodic_int(FUNC(bwing_state::p3_interrupt), attotime::from_hz(1'000));
 
-	config.set_maximum_quantum(attotime::from_hz(18'000));     // high enough?
+	config.set_maximum_quantum(attotime::from_hz(18'000)); // high enough?
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -703,6 +685,7 @@ void bwing_state::bwing(machine_config &config)
 
 	DAC08(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.1);
 }
+
 
 //****************************************************************************
 // ROM Maps
@@ -841,8 +824,9 @@ ROM_START( zavigaj )
 	ROM_LOAD( "as13.1h", 0x08000, 0x04000, CRC(15d0922b) SHA1(b8d715a9e610531472d516c19f6035adbce93c84) )
 ROM_END
 
+
 //****************************************************************************
-// Initializations
+// Driver Initialization
 
 void bwing_state::init_bwing()
 {
@@ -859,6 +843,7 @@ void bwing_state::init_bwing()
 }
 
 } // anonymous namespace
+
 
 //****************************************************************************
 // Game Entries

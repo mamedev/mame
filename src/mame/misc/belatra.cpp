@@ -213,14 +213,14 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004, fairyl2,   0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Fairy Land 2 (set 1)",         MACHINE_IS_SKELETON )
-GAME( 2004, fairyl2a,  fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Fairy Land 2 (set 2)",         MACHINE_IS_SKELETON )
-GAME( 2004, fairyl2b,  fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Fairy Land 2 (set 3)",         MACHINE_IS_SKELETON )
-GAME( 2004, fairyl2bl, fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Fairy Land 2 (bootleg)",       MACHINE_IS_SKELETON )
+GAME( 2004, fairyl2,   0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Fairy Land 2 (set 1)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, fairyl2a,  fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Fairy Land 2 (set 2)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, fairyl2b,  fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Fairy Land 2 (set 3)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, fairyl2bl, fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Fairy Land 2 (bootleg)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2004, ldrink,    0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Lucky Drink (set 1)",          MACHINE_IS_SKELETON )
-GAME( 2004, ldrinka,   ldrink,  belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Lucky Drink (set 2)",          MACHINE_IS_SKELETON )
+GAME( 2004, ldrink,    0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Lucky Drink (set 1)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, ldrinka,   ldrink,  belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Lucky Drink (set 2)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2004, merryjn,   0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Merry Joiner",                 MACHINE_IS_SKELETON )
+GAME( 2004, merryjn,   0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "Merry Joiner",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, unkbel,    0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "unknown Belatra slot machine", MACHINE_IS_SKELETON )
+GAME( 200?, unkbel,    0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra", "unknown Belatra slot machine", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

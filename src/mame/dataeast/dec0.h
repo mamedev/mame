@@ -220,10 +220,10 @@ private:
 };
 
 
-class dec0_automat_state : public dec0_state
+class automat_state : public dec0_state
 {
 public:
-	dec0_automat_state(const machine_config &mconfig, device_type type, const char *tag) :
+	automat_state(const machine_config &mconfig, device_type type, const char *tag) :
 		dec0_state(mconfig, type, tag),
 		m_msm(*this, "msm%u", 1U),
 		m_adpcm_select(*this, "adpcm_select%u", 1U),

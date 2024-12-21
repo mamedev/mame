@@ -324,4 +324,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1981, sdk51, 0, 0, sdk51, sdk51, sdk51_state, empty_init, "Intel", "MCS-51 System Design Kit", MACHINE_IS_SKELETON)
+COMP(1981, sdk51, 0, 0, sdk51, sdk51, sdk51_state, empty_init, "Intel", "MCS-51 System Design Kit", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

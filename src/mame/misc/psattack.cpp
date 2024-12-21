@@ -273,5 +273,5 @@ void psattack_state::init_psattack()
 } // anonymous namespace
 
 
-GAME( 2004, psattack, 0,        psattack, psattack,  psattack_state, init_psattack, ROT0, "Uniana",              "P's Attack", MACHINE_IS_SKELETON ) // has a CF card instead of flash roms
+GAME( 2004, psattack, 0,        psattack, psattack,  psattack_state, init_psattack, ROT0, "Uniana",              "P's Attack", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // has a CF card instead of flash roms
 

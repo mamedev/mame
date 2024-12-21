@@ -28,15 +28,16 @@ Cobra Command (Japan)       (c) 1988 Data East Corporation (6809)
 All games use a 6502 for sound (some are encrypted), all games except Cobracom
 and Oscar use an Intel 8751 for protection & coinage.
 
-Meikyuu Hunter G was formerly known as Mazehunter.
+Meikyuu Hunter G was formerly known as Mazehunter. It's a Japan-only modified
+version of Ghostbusters, due to licensing restrictions.
 
 Emulation by Bryan McPhail, mish@tendril.co.uk
 Thanks to Jose Miguel Morales Farreras for Super Real Darwin information!
 
 TODO:
 - shackled continue after game over does not work, see MT0418. It's not that
-  big of an issue for user-wise, since credits add more health. For breywood,
-  it appears to work ok after the 1st level.
+  big of an issue user-wise, since credits add more health. For breywood, it
+  appears to work ok after the 1st level.
 - srdarwin 'double' sprites appearing from the top of the screen are clipped
 - strangely coloured butterfly on Garyo Retsuden water levels!
 - gondo 2nd coin doesn't work, probably due to hacked MCU ROM
@@ -4036,8 +4037,8 @@ GAME( 1987, ghostb,     0,        ghostb,    ghostb,    ghostb_state,   empty_in
 GAME( 1987, ghostb2a,   ghostb,   ghostb,    ghostb2a,  ghostb_state,   empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ghostb3,    ghostb,   ghostb,    ghostb3,   ghostb_state,   empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ghostb3a,   ghostb,   ghostb,    ghostb3,   ghostb_state,   empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuh,    ghostb,   meikyuh,   meikyuh,   ghostb_state,   empty_init,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuhbl,  ghostb,   meikyuh,   meikyuh,   ghostb_state,   init_meikyuhbl, ROT0,   "bootleg",               "Meikyuu Hunter G (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, meikyuh,    0,        meikyuh,   meikyuh,   ghostb_state,   empty_init,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan)", MACHINE_SUPPORTS_SAVE ) // modified Ghostbusters
+GAME( 1987, meikyuhbl,  meikyuh,  meikyuh,   meikyuh,   ghostb_state,   init_meikyuhbl, ROT0,   "bootleg",               "Meikyuu Hunter G (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilver,    0,        csilver,   csilver,   csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilverj,   csilver,  csilver,   csilverj,  csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilverja,  csilver,  csilver,   csilver,   csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )

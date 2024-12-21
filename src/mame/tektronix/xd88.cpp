@@ -90,4 +90,4 @@ ROM_END
 } // anonymous namespace
 
 /*   YEAR  NAME     PARENT COMPAT MACHINE  INPUT CLASS       INIT        COMPANY      FULLNAME   FLAGS */
-COMP(1990, xd88_01, 0,     0,     xd88_01, 0,    xd88_state, empty_init, "Tektronix", "XD88/01", MACHINE_IS_SKELETON)
+COMP(1990, xd88_01, 0,     0,     xd88_01, 0,    xd88_state, empty_init, "Tektronix", "XD88/01", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

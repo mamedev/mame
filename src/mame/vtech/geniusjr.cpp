@@ -426,15 +426,15 @@ ROM_END
 
 
 //    YEAR   NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY    FULLNAME                             FLAGS
-COMP( 1996,  gj4000,   0,       0,      gj4000,   geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior 4000 (Germany)",      MACHINE_IS_SKELETON )
-COMP( 1999?, scientus, gj4000,  0,      gj4000,   geniusjr, geniusjr_state, empty_init, "C.Q.F.D", "Scientus (France)",                 MACHINE_IS_SKELETON )
-COMP( 1993,  gjmovie,  0,       0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Movie (Germany)",     MACHINE_IS_SKELETON )
-COMP( 199?,  pitagjr,  gjmovie, 0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   u8"Pitagorín Junior",                MACHINE_IS_SKELETON ) // Also sold as "El Super-Ordenador Parlanchín"
-COMP( 1996,  gjrstar,  0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar (Germany)",   MACHINE_IS_SKELETON )
-COMP( 1996,  gjrstar2, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 2 (Germany)", MACHINE_IS_SKELETON )
-COMP( 1995,  pcompelr, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Precomputer Elektronik (Russia)",   MACHINE_IS_SKELETON ) // Прекомпьютер Электроник
-COMP( 1998,  gjrstar3, 0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 3 (Germany)", MACHINE_IS_SKELETON )
-COMP( 1998,  gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior 5000 (Germany)",      MACHINE_IS_SKELETON )
-COMP( 1993,  gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Leader Notebook",            MACHINE_IS_SKELETON )
-COMP( 1993,  pitagor,  gln,     0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   u8"Pitagorín",                       MACHINE_IS_SKELETON )
-COMP( 1995,  gls,      0,       0,      gls,      geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Leader Select",              MACHINE_IS_SKELETON )
+COMP( 1996,  gj4000,   0,       0,      gj4000,   geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior 4000 (Germany)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1999?, scientus, gj4000,  0,      gj4000,   geniusjr, geniusjr_state, empty_init, "C.Q.F.D", "Scientus (France)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1993,  gjmovie,  0,       0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Movie (Germany)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 199?,  pitagjr,  gjmovie, 0,      gjmovie,  geniusjr, geniusjr_state, empty_init, "VTech",   u8"Pitagorín Junior",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Also sold as "El Super-Ordenador Parlanchín"
+COMP( 1996,  gjrstar,  0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar (Germany)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1996,  gjrstar2, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 2 (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1995,  pcompelr, gjrstar, 0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Precomputer Elektronik (Russia)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Прекомпьютер Электроник
+COMP( 1998,  gjrstar3, 0,       0,      gjrstar,  geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior Redstar 3 (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1998,  gj5000,   0,       0,      gj5000,   geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Junior 5000 (Germany)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1993,  gln,      0,       0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Leader Notebook",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1993,  pitagor,  gln,     0,      gln,      geniusjr, geniusjr_state, empty_init, "VTech",   u8"Pitagorín",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1995,  gls,      0,       0,      gls,      geniusjr, geniusjr_state, empty_init, "VTech",   "Genius Leader Select",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

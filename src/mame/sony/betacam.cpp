@@ -137,6 +137,6 @@ ROM_END
 
 
 //   YEAR  NAME   PARENT/COMPAT MACHINE  INPUT    CLASS          INIT       COMPANY  FULLNAME                                                FLAGS
-SYST(199?, uvw1200,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassette Player UVW-1200 RGB",          MACHINE_IS_SKELETON)
-SYST(199?, uvw1600,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassette Player/Recorder UVW-1600 RGB", MACHINE_IS_SKELETON)
-SYST(199?, uvw1800,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassette Player/Recorder UVW-1800 RGB", MACHINE_IS_SKELETON)
+SYST(199?, uvw1200,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassette Player UVW-1200 RGB",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(199?, uvw1600,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassette Player/Recorder UVW-1600 RGB", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(199?, uvw1800,   0, 0,     betacam, betacam, betacam_state, empty_init, "Sony", "BETACAM-SP Videocassette Player/Recorder UVW-1800 RGB", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

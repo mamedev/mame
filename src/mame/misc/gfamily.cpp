@@ -206,4 +206,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 200?, gmfamily, 0, gfamily, gfamily, gfamily_state, empty_init, ROT0, "bootleg", "Games Family", MACHINE_IS_SKELETON )
+GAME( 200?, gmfamily, 0, gfamily, gfamily, gfamily_state, empty_init, ROT0, "bootleg", "Games Family", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

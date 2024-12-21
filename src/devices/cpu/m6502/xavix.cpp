@@ -345,5 +345,4 @@ void xavix_device::state_string_export(const device_state_entry &entry, std::str
 
 
 
-
 #include "cpu/m6502/xavix.hxx"

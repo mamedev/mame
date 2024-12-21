@@ -109,4 +109,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1975, wheelsii, 0, midwayttl, 0, midwayttl_state, empty_init, ROT0, "Midway", "Wheels II", MACHINE_IS_SKELETON )
+GAME( 1975, wheelsii, 0, midwayttl, 0, midwayttl_state, empty_init, ROT0, "Midway", "Wheels II", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

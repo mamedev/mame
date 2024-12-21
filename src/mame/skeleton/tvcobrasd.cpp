@@ -211,5 +211,5 @@ ROM_END
 
 
 //   YEAR  NAME      PARENT   MACHINE     INPUT    CLASS          INIT        ROT   COMPANY         FULLNAME                                                FLAGS
-GAME(1998, cobrasd,  0,       cobrasdoki, cobrasd, cobrasd_state, empty_init, ROT0, u8"TourVisión", "Cobra Sport Dart / Tour Sport Dart (OKI M6376 sound)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, cobrasda, cobrasd, cobrasday,  cobrasd, cobrasd_state, empty_init, ROT0, u8"TourVisión", "Cobra Sport Dart / Tour Sport Dart (AY-8910 sound)",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1998, cobrasd,  0,       cobrasdoki, cobrasd, cobrasd_state, empty_init, ROT0, u8"TourVisión", "Cobra Sport Dart / Tour Sport Dart (OKI M6376 sound)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, cobrasda, cobrasd, cobrasday,  cobrasd, cobrasd_state, empty_init, ROT0, u8"TourVisión", "Cobra Sport Dart / Tour Sport Dart (AY-8910 sound)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

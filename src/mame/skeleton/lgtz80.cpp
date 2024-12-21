@@ -491,5 +491,5 @@ void lgtz80_state::init_arthurkn()
 } // anonymous namespace
 
 
-GAME( 2003?, fruitcat, 0, fruitcat, fruitcat, lgtz80_state, init_fruitcat, ROT0, "LGT", "Fruit Cat (v2.00)", MACHINE_IS_SKELETON )
-GAME( 200?,  arthurkn, 0, arthurkn, fruitcat, lgtz80_state, init_arthurkn, ROT0, "LGT", "Arthur's Knights",  MACHINE_IS_SKELETON )
+GAME( 2003?, fruitcat, 0, fruitcat, fruitcat, lgtz80_state, init_fruitcat, ROT0, "LGT", "Fruit Cat (v2.00)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?,  arthurkn, 0, arthurkn, fruitcat, lgtz80_state, init_arthurkn, ROT0, "LGT", "Arthur's Knights",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

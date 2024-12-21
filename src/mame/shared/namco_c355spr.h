@@ -135,7 +135,6 @@ protected:
 	void build_sprite_list(int no);
 
 private:
-
 	void copybitmap(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 pri);
 	void copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &clip, u8 pri);
 

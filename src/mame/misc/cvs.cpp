@@ -16,10 +16,8 @@ TODO:
   This worked fine in an older version of MAME since maincpu was twice slower.
 - diggerc loses speech sound effects (walking, digging) after killing an enemy.
 - Emulate protection properly in later games (reads area 0x73fx).
-- The board has discrete sound circuits, see sh_trigger_w: 0x1884 enables an
-  8038CCJD, 0x1885 connects to it too. 0x1886 produces a high-pitched whistle,
-  and 0x1887 produces a low thud sound. The current implementation with the
-  beeper devices is wrong, but better than nothing.
+- The board has discrete sound circuits, see sh_trigger_w, current implementation
+  with the beeper devices is wrong, but better than nothing.
 - Improve starfield: density, blink rate, x repeat of 240, and the checkerboard
   pattern (fast forward MAME to see) are all correct, the RNG is not right?
 
@@ -196,7 +194,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device_array<dac_byte_interface, 2> m_dac;
-	required_device_array<beep_device, 4> m_beep;
+	required_device_array<beep_device, 3> m_beep;
 	required_device<tms5100_device> m_tms5100;
 	required_ioport_array<4> m_in;
 	required_ioport_array<3> m_dsw;
@@ -652,7 +650,7 @@ void cvs_state::_8_bit_dac_data_w(u8 data)
 	m_dac[0]->write(data);
 
 	// data also goes to 8038 oscillator
-	m_beep[0]->set_clock(data * 4);
+	m_beep[2]->set_clock(data * 4);
 }
 
 void cvs_state::_4_bit_dac_data_w(offs_t offset, u8 data)
@@ -677,12 +675,29 @@ void cvs_state::_4_bit_dac_data_w(offs_t offset, u8 data)
 
 void cvs_state::sh_trigger_w(offs_t offset, u8 data)
 {
-	/* offset 0 is used in darkwar, spacefrt, logger, raiders
-	 * offset 2 is used in darkwar, spacefrt, 8ball, superbik, raiders
-	 * offset 3 is used in cosmos, darkwar, superbik, raiders
-	 *
-	 * offset 1 is only used inadvertedly(?) by logger
-	 */
+	/* Discrete sound hardware triggers:
+
+	offset 0 is used in darkwar, spacefrt, logger, dazzler, wallst, raiders
+	offset 1 is used in logger, wallst
+	offset 2 is used in darkwar, spacefrt, 8ball, dazzler, superbik, raiders
+	offset 3 is used in cosmos, darkwar, superbik, raiders
+
+	Additional notes from poking the CVS sound hardware with an
+	In Circuit Emulator from PrSwan (Paul Swan).
+	I have recordings available.
+
+	- 0x1884 - Enables an XP8038 frequency generator IC
+		Reflected on pin 10 of a 4016.
+		The frequency is set by 0x1840, the 8 bit DAC register.
+		Not all 0x1840 values were tested, but:
+			0x00 - off, 0x1884 enable has no sound.
+			0x55,0xAA,0xFF - increasing value has higher frequency
+	- 0x1885 - A scope showed this halving the XP8038 amplitude with a little decay.
+		Causes 4016 pin 11 to rise (on) and decay-fall (off)
+	- 0x1886 - Outputs a complete Galaxia-style ship fire sound, with attack-to-on and decay-to-off.
+	- 0x1887 - Reflected on an LM380.
+		Causes an envelope-like operation on the XP8038 tone with attack (on) and decay (off).
+	*/
 
 	data &= 1;
 
@@ -692,7 +707,10 @@ void cvs_state::sh_trigger_w(offs_t offset, u8 data)
 		m_sh_trigger[offset] = data;
 	}
 
-	m_beep[offset]->set_state(data);
+	if (offset != 1)
+		m_beep[(offset == 0) ? 2 : (offset & 1)]->set_state(data);
+	else
+		m_beep[2]->set_output_gain(0, data ? 0.5 : 1.0);
 }
 
 
@@ -1373,10 +1391,9 @@ void cvs_state::cvs(machine_config &config)
 	DAC_8BIT_R2R(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
 	DAC_4BIT_R2R(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.20); // unknown DAC
 
-	BEEP(config, m_beep[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.10); // placeholder
-	BEEP(config, m_beep[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.10); // "
-	BEEP(config, m_beep[2], 600).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
-	BEEP(config, m_beep[3], 150).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
+	BEEP(config, m_beep[0], 600).add_route(ALL_OUTPUTS, "speaker", 0.15); // placeholder
+	BEEP(config, m_beep[1], 150).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
+	BEEP(config, m_beep[2], 0).add_route(ALL_OUTPUTS, "speaker", 0.075); // "
 
 	TMS5100(config, m_tms5100, 640_kHz_XTAL);
 	m_tms5100->data().set(FUNC(cvs_state::speech_rom_read_bit));

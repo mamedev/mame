@@ -24,11 +24,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "video/v9938.h"
+
 #include "speaker.h"
 
 
@@ -37,8 +39,8 @@ namespace {
 class tonton_state : public driver_device
 {
 public:
-	tonton_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tonton_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_v9938(*this, "v9938"),
 		m_maincpu(*this, "maincpu"),
 		m_hopper(*this, "hopper")
@@ -135,7 +137,7 @@ static INPUT_PORTS_START( tonton )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Unknown A")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))    // hopper feedback
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // hopper feedback
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_START("DSW1")
@@ -213,7 +215,7 @@ void tonton_state::ay_bout_w(uint8_t data)
 void tonton_state::tonton(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, CPU_CLOCK);  // Guess. According to other MSX2 based gambling games
+	Z80(config, m_maincpu, CPU_CLOCK); // Guess. According to other MSX2 based gambling games
 	m_maincpu->set_addrmap(AS_PROGRAM, &tonton_state::tonton_map);
 	m_maincpu->set_addrmap(AS_IO, &tonton_state::tonton_io);
 
@@ -230,7 +232,7 @@ void tonton_state::tonton(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ym2149_device &aysnd(YM2149(config, "aysnd", YM2149_CLOCK));   // Guess. According to other MSX2 based gambling games
+	ym2149_device &aysnd(YM2149(config, "aysnd", YM2149_CLOCK)); // Guess. According to other MSX2 based gambling games
 	/*
 	  AY8910: Port A out: FF
 	  AY8910: Port B out: FF
@@ -239,8 +241,8 @@ void tonton_state::tonton(machine_config &config)
 	  AY8910: Port A out: 00
 	  AY8910: Port B out: 00
 	*/
-	aysnd.port_a_write_callback().set(FUNC(tonton_state::ay_aout_w));    // Write all bits twice, and then reset them at boot
-	aysnd.port_b_write_callback().set(FUNC(tonton_state::ay_bout_w));    // Write all bits twice, and then reset them at boot
+	aysnd.port_a_write_callback().set(FUNC(tonton_state::ay_aout_w)); // Write all bits twice, and then reset them at boot
+	aysnd.port_b_write_callback().set(FUNC(tonton_state::ay_bout_w)); // Write all bits twice, and then reset them at boot
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
 
