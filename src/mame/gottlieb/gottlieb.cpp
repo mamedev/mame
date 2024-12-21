@@ -426,9 +426,12 @@ void gottlieb_state::machine_start()
 
 void gottlieb_state::machine_reset()
 {
-	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
+	// if we have a laserdisc, reset our philips code callback for the next line 17
 	if (m_laserdisc != nullptr)
 		m_laserdisc_philips_timer->adjust(m_screen->time_until_pos(17), 17);
+
+	// HACK: prevent NMI immediately after soft reset
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
