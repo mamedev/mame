@@ -123,7 +123,7 @@ private:
 	uint8_t *m_char_rom = nullptr;
 
 	required_device<speaker_device> m_speaker;
-	required_device<upd1771c_device> m_sound;
+	required_device<upd1771c_hle_device> m_sound;
 
 	required_shared_ptr<uint16_t> m_video_ram_1;
 	required_shared_ptr<uint16_t> m_video_ram_2;
@@ -500,7 +500,7 @@ void apc_state::apc_io(address_map &map)
 //  0x5a  APU data (Arithmetic Processing Unit!)
 //  0x5b, Power Off
 //  0x5e  APU status/command
-	map(0x60, 0x60).rw(m_sound, FUNC(upd1771c_device::read), FUNC(upd1771c_device::write));
+	map(0x60, 0x60).rw(m_sound, FUNC(upd1771c_hle_device::read), FUNC(upd1771c_hle_device::write));
 //  map(0x68, 0x6f) i8255 , ODA printer port (A: status (R) B: data (W) C: command (W))
 //  map(0x70, 0x76).rw("upd7220_btm", FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
 //  0x71, 0x77 IDA Controller
@@ -972,7 +972,7 @@ void apc_state::apc(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, m_speaker).front_center();
-	UPD1771C(config, m_sound, MAIN_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.00); //uPD1771C-006
+	UPD1771C_HLE(config, m_sound, MAIN_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.00); //uPD1771C-006
 }
 
 
