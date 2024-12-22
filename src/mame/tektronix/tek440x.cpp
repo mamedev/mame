@@ -479,51 +479,6 @@ DECLARE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device)
 
 DEFINE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device, "mc68010_tekmmu", "MC68010 with Tek4404 custom MMU")
 
-class m68010_tekmmu_device : public m68010_device
-{
-	using m68010_device::m68010_device;
-
-	// HACK
-	u8 *m_map_control = nullptr;
-	u16 *m_map = nullptr;
-
-	// device_memory_interface overrides
-	bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override
-	{
-	
-	target_space = &space(spacenum);
-	
-		if (spacenum == AS_PROGRAM)
-		if (FUNCTION_CODE_USER_PROGRAM)			// only in User mode
-		if (BIT(*m_map_control, MAP_VM_ENABLE))
-		{
-			if (intention == TR_WRITE)
-			if (BIT(m_map[address >> 12], 14) == 0)	// read only
-			{
-				return false;
-			}
-		
-			LOG("memory_translate: map %08x => paddr(%08x)\n",(address), (BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12) ) );
-		
-			address = BIT(address, 0, 12) | (BIT(m_map[address >> 12], 0, 11) << 12);
-		}
-		
-		return true;
-	}
-
-public:
-	void linktoMMU(u8 *map_control, u16 *map)
-	{
-		LOG("linktoMMU: %p %p\n",map_control, map);
-		
-		m_map_control = map_control;
-		m_map = map;
-	}
-
-};
-DECLARE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device)
-
-DEFINE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device, "mc68010_tekmmu", "MC68010 with Tek4404 custom MMU")
 
 namespace {
 
