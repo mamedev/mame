@@ -81,7 +81,7 @@ private:
 
 	address_space_config m_program_config;
 
-	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_program;
+	memory_access<16, 1, -1, ENDIANNESS_LITTLE>::specific m_program;
 	devcb_write8 m_pb_out_cb;
 	sound_stream *m_channel;
 

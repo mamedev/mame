@@ -63,7 +63,7 @@ static constexpr u8 STACK_START = 0x20;
 upd177x_cpu_device::upd177x_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1, address_map_constructor(FUNC(upd177x_cpu_device::program_map), this))
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, address_map_constructor(FUNC(upd177x_cpu_device::program_map), this))
 	, m_pb_out_cb(*this)
 { }
 
