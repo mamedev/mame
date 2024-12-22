@@ -64,7 +64,6 @@ upd177x_cpu_device::upd177x_cpu_device(const machine_config &mconfig, device_typ
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1, address_map_constructor(FUNC(upd177x_cpu_device::program_map), this))
-	, m_pa_out_cb(*this)
 	, m_pb_out_cb(*this)
 { }
 
@@ -187,7 +186,6 @@ void upd177x_cpu_device::op0xxx(u16 opcode)
 		break;
 	case 0x0002:  // OUT PA
 		m_pa = m_a;
-		m_pa_out_cb(m_pa);
 		break;
 	case 0x0004:  // OUT PB
 		m_pb = m_a;

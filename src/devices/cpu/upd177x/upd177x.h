@@ -36,7 +36,6 @@ public:
 	upd177x_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
-	auto pa_out_cb() { return m_pa_out_cb.bind(); }
 	auto pb_out_cb() { return m_pb_out_cb.bind(); }
 
 	void pa_w(u8 data) { m_pa = data; }
@@ -83,7 +82,6 @@ private:
 	address_space_config m_program_config;
 
 	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_program;
-	devcb_write8 m_pa_out_cb;
 	devcb_write8 m_pb_out_cb;
 	sound_stream *m_channel;
 
