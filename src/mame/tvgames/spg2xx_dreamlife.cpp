@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
+/*
+    TODO:
+        Service mode inputs for Giga Pets Explorer
+        Dump and emulate Giga Pets handheld game units
+*/
 
 #include "emu.h"
 #include "spg2xx.h"
@@ -79,6 +84,26 @@ static INPUT_PORTS_START( dsgnwrld )
 	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( gigapets )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Back") // PCB marking is "Cancel"
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// TODO: Likely handheld game unit inputs
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0xc000, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 void dreamlif_state::dreamlif(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -104,9 +129,17 @@ ROM_START( dsgnwrld )
 	ROM_LOAD16_WORD_SWAP( "designersworld.bin", 0x000000, 0x800000, CRC(b3987161) SHA1(f7d03b172fd0accc6370d9ccc340b3aa6317426f) )
 ROM_END
 
+// PCB Markings: 3059L-R3 0626 / 3059TV-R3B / 3059R-R1 0626
+// Dumped as K8D6X16UTM
+ROM_START( gigapets )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "rom.u7", 0x000000, 0x800000, CRC(beacc99c) SHA1(d6e3ed69e297282b9d85661a7468e0c0a6815d31) )
+ROM_END
+
 } // anonymous namespace
 
 
 // Hasbro games
 CONS( 2005, dreamlif,  0,        0, dreamlif, dreamlif,   dreamlif_state, empty_init, "Hasbro", "Dream Life (Version 1.0, Feb 07 2005)",  MACHINE_IMPERFECT_SOUND )
 CONS( 2005, dsgnwrld,  0,        0, dreamlif, dsgnwrld,   dreamlif_state, empty_init, "Hasbro", "Designer's World (Version 1.0, Dec 20 2005)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2006, gigapets,  0,        0, dreamlif, gigapets,   dreamlif_state, empty_init, "Hasbro", "Giga Pets Explorer (Version 1.34.1, Mar 17 2006)",  MACHINE_IMPERFECT_SOUND )
