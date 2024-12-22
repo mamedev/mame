@@ -588,7 +588,7 @@ int ncr5385_device::state_step()
 		{
 			LOGMASKED(LOG_STATE, "selection: BSY asserted by target\n");
 			m_state = SEL_COMPLETE;
-			delay = SCSI_BUS_SKEW;
+			delay = SCSI_BUS_SKEW * 2;
 		}
 		else
 		{
