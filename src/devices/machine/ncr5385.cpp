@@ -244,7 +244,7 @@ u8 ncr5385_device::aux_status_r()
 
 	if (!m_int_status)
 	{
-		// AB mask out any bits
+		// mask out any bits
 		data &= ~(AUX_STATUS_MSG | AUX_STATUS_CD | AUX_STATUS_IO);
 
 		// return current phase
@@ -479,6 +479,7 @@ void ncr5385_device::dma_w(u8 data)
 	m_state_timer->adjust(attotime::zero);
 }
 
+
 void ncr5385_device::state_timer(s32 param)
 {
 	// step state machine
@@ -686,8 +687,6 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
-			delay = 5'000;	// AB 5us, does this help??
-			
 			// clear ACK except after last byte of message input phase
 			if (!remaining() && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_IN)
 			{
@@ -839,8 +838,8 @@ void ncr5385_device::update_int()
 		{
 			m_cmd = 0;
 
-		// AB should we not clear out existing?
-		m_aux_status &= ~(AUX_STATUS_MSG | AUX_STATUS_CD | AUX_STATUS_IO);
+			// mask out any bits
+			m_aux_status &= ~(AUX_STATUS_MSG | AUX_STATUS_CD | AUX_STATUS_IO);
 
 			// latch current phase
 			u32 const ctrl = scsi_bus->ctrl_r();
