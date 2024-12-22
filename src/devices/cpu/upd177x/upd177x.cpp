@@ -253,7 +253,7 @@ void upd177x_cpu_device::op0xxx(u16 opcode)
 	case 0x0602:  // OFF
 	case 0x0801:  // RETS
 	default:
-		fatalerror("%04x: Unsupported instruction %04x\n", m_pc - 1, opcode);
+		fatalerror("%s, %04x: Unsupported instruction %04x\n", tag(), m_pc - 1, opcode);
 	}
 }
 
@@ -330,7 +330,7 @@ void upd177x_cpu_device::op1xxx(u16 opcode)
 	case 0x0a08:  // CALL1 (Rr)
 	case 0x0b08:  // CALL1 (Rr)
 	default:
-		fatalerror("%04x: Unsupported instruction %04x\n", m_pc - 1, opcode);
+		fatalerror("%s, %04x: Unsupported instruction %04x\n", tag(), m_pc - 1, opcode);
 	}
 }
 
@@ -346,7 +346,7 @@ void upd177x_cpu_device::op2xxx(u16 opcode)
 	case 0x0000:  // JPP n
 	case 0x8000:  // JMPFZ n
 	default:
-		fatalerror("%04x: Unsupported instruction %04x\n", m_pc - 1, opcode);
+		fatalerror("%s, %04x: Unsupported instruction %04x\n", tag(), m_pc - 1, opcode);
 	}
 }
 
@@ -367,7 +367,7 @@ void upd177x_cpu_device::op3xxx(u16 opcode)
 	case 0x0100:  // MVI MD1,n
 	case 0x0200:  // MVI (H),n
 	default:
-		fatalerror("%04x: Unsupported instruction %04x\n", m_pc - 1, opcode);
+		fatalerror("%s, %04x: Unsupported instruction %04x\n", tag(), m_pc - 1, opcode);
 	}
 }
 
@@ -444,7 +444,7 @@ void upd177x_cpu_device::op89xxx(u16 opcode)
 	case 0x1800:  // TADI C A,n
 	case 0x1e00:  // TSBI Z A,n
 	default:
-		fatalerror("%04x: Unsupported instruction %04x\n", m_pc - 1, opcode);
+		fatalerror("%s, %04x: Unsupported instruction %04x\n", tag(), m_pc - 1, opcode);
 	}
 }
 
@@ -502,7 +502,7 @@ void upd177x_cpu_device::opabxxx(u16 opcode)
 	case 0x1d00:  // TSB C H,n
 	case 0x1e00:  // TSB Z (H),n
 	default:
-		fatalerror("%04x: Unsupported instruction %04x\n", m_pc - 1, opcode);
+		fatalerror("%s, %04x: Unsupported instruction %04x\n", tag(), m_pc - 1, opcode);
 	}
 }
 
@@ -583,7 +583,7 @@ void upd177x_cpu_device::opcdxxx(u16 opcode)
 	case 0x1e08:  // TSB Z Rr,A
 	case 0x1e09:  // TSB Z (H),A
 	default:
-		fatalerror("%04x: Unsupported instruction %04x\n", m_pc - 1, opcode);
+		fatalerror("%s, %04x: Unsupported instruction %04x\n", tag(), m_pc - 1, opcode);
 	}
 }
 
@@ -637,7 +637,7 @@ void upd177x_cpu_device::opefxxx(u16 opcode)
 	default:
 		if (opcode != 0xffff)
 		{
-			fatalerror("%04x: Unsupported instruction %04x\n", m_pc - 1, opcode);
+			fatalerror("%s, %04x: Unsupported instruction %04x\n", tag(), m_pc - 1, opcode);
 		}
 	}
 }
@@ -720,7 +720,7 @@ void upd177x_cpu_device::m_cycle()
 	{
 		if (BIT(m_md1, MD1_TIME_BIT))
 		{
-			fatalerror("TM int not supported\n");
+			fatalerror("%s: TM int not supported\n", tag());
 		}
 	}
 	if (BIT(counter_diff, m_noise_counter_bit))
@@ -737,7 +737,7 @@ void upd177x_cpu_device::m_cycle()
 
 		if (BIT(m_md0, MD0_NS_BIT))
 		{
-			fatalerror("NS int not supported\n");
+			fatalerror("%s: NS int not supported\n", tag());
 		}
 	}
 }
