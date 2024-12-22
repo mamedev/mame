@@ -7,7 +7,6 @@ TODO:
 - Noise, time, and external interrupts not implemented
 - CH1/CH2 not implemented
 - Not all instructions implemented
-- Are PNC1 and PNC2 updated every machine cycle or only when the noise counter overflows?
 
 */
 
