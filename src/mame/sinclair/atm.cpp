@@ -181,7 +181,7 @@ u8 atm_state::get_border_color(u16 hpos, u16 vpos)
 
 void atm_state::atm_update_video_mode()
 {
-	bool zx_scale = m_rg == 0b011;
+	bool zx_scale = m_rg & 1;
 	bool double_width = BIT(m_rg, 1) && !zx_scale;
 	u8 border_x = (40 - (32 * !zx_scale)) << double_width;
 	u8 border_y = (40 - (4 * !zx_scale));

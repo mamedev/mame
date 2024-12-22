@@ -3,19 +3,19 @@
 
 #include "emu.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
-
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplipt.h"
-#include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/hd647180x.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopl.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*
 
@@ -63,7 +63,6 @@ private:
 
 	void tekipaki_68k_mem(address_map &map) ATTR_COLD;
 	void hd647180_io_map(address_map &map) ATTR_COLD;
-	void reset(int state);
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -74,11 +73,6 @@ private:
 	bitmap_ind8 m_custom_priority_bitmap;
 };
 
-
-void tekipaki_state::reset(int state)
-{
-	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-}
 
 void tekipaki_state::video_start()
 {
@@ -274,7 +268,7 @@ void tekipaki_state::tekipaki(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         // 10MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &tekipaki_state::tekipaki_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(tekipaki_state::reset));
+	m_maincpu->reset_cb().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, 10_MHz_XTAL));
 	// 16k byte ROM and 512 byte RAM are internal

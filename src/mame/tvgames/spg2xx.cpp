@@ -1356,6 +1356,29 @@ static INPUT_PORTS_START( ddr33v )
 INPUT_PORTS_END
 
 
+static const ioport_value handle_table[3] =
+{
+	0x00, 0x01, 0x03,
+};
+
+// the on/off slider has 3 positions; off, on (low sound), on (high sound) but this seems to be a hardware feature, not read by the code
+static INPUT_PORTS_START( prail )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Doors")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Horn")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Lights")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Conductor")
+	PORT_BIT( 0xc000, 0x0000, IPT_POSITIONAL_V ) PORT_POSITIONS(3) PORT_REMAP_TABLE(handle_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(1)
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) // battery state
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x0003, 0x0000, IPT_POSITIONAL_V ) PORT_POSITIONS(3) PORT_REMAP_TABLE(handle_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(2)
+INPUT_PORTS_END
+
 void spg2xx_game_state::machine_start()
 {
 	if (m_bank)
@@ -2052,6 +2075,34 @@ void spg2xx_game_doraphone_state::doraphone(machine_config &config)
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_doraphone_state::base_portc_r));
 }
 
+void spg2xx_game_prail_state::prail_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (mem_mask & 0x0f)
+	{
+		uint8_t const bank = bitswap<4>(data, 3, 2, 0, 1);
+		switch_bank(bank);
+	}
+
+	portb_w(offset, data & ~0x000f, mem_mask & ~0x000f);
+}
+
+void spg2xx_game_prail_state::prail(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen); // SPG243
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_prail_state::mem_map_4m);
+
+	spg2xx_base(config);
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_prail_state::base_porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_prail_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_prail_state::base_portc_r));
+
+	m_maincpu->portb_out().set(FUNC(spg2xx_game_prail_state::prail_portb_w));
+
+	// TODO: this is not currently hooked up, it's used to store the unlock states for the gallery
+	I2C_24C02(config, "i2cmem", 0); // ATMLH13402C (24C02 compatible)
+}
+
+
 void spg2xx_game_doraphone_state::doraphonep(machine_config &config)
 {
 	doraphone(config);
@@ -2330,6 +2381,12 @@ ROM_START( anpantv )
 	ROM_LOAD16_WORD_SWAP( "anpanman_tv.bin", 0x000000, 0x800000, CRC(5e32dc1a) SHA1(bae260ffc56f5315cdafd5bc40966ec6d31e267f) )
 ROM_END
 
+ROM_START( prail )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "traingame.u1", 0x000000, 0x8000000, CRC(5c96d526) SHA1(cda0280b320762bda7a7358ec7ce29690aa815fb) )
+ROM_END
+
+
 void spg2xx_game_state::init_crc()
 {
 	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
@@ -2510,3 +2567,8 @@ CONS( 2008, ddr33v,     0,        0, spg2xx,    ddr33v,    spg2xx_game_ddr33v_st
 
 // PCB has 'Anpanman TV 2006 Ver 1.4' printed on it, ROM has SPG260 header.  Uses custom built-in keyboard, no display built into the unit.
 CONS( 2006, anpantv,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "Bandai",                                                "Anpanman TV (Japan)",                                                   MACHINE_NOT_WORKING )
+
+// Train Game V1.4 2012-08-15 on PCB. SPG243 headers in each chunk.
+// Last few bytes of SEEPROM have 'JUNGT' in them, is this developed by JungleSoft/JungleTac?
+CONS( 2012, prail,      0,        0, prail,     prail,     spg2xx_game_prail_state,    empty_init,   "Takara Tomy",                                            "Boku wa Plarail Untenshi - Shinkansen de Ikou! (Japan)",                MACHINE_IMPERFECT_SOUND )
+// the 'plus' version from 2015 runs on newer hardware, see generalplus_gpl16250_spi.cpp

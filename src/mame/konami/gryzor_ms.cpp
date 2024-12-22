@@ -185,4 +185,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, gryzorm, contra, gryzorm, gryzorm, gryzor_ms_state, empty_init, ROT90, "bootleg (Gaelco / Ervisa)", "Gryzor (Modular System)", MACHINE_IS_SKELETON )
+GAME( 1987, gryzorm, contra, gryzorm, gryzorm, gryzor_ms_state, empty_init, ROT90, "bootleg (Gaelco / Ervisa)", "Gryzor (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

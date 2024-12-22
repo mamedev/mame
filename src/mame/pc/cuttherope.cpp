@@ -79,4 +79,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2016, cuttherope, 0, cuttherope, cuttherope, cuttherope_state, empty_init, ROT90, "ICE", "Cut The Rope", MACHINE_IS_SKELETON )
+GAME(2016, cuttherope, 0, cuttherope, cuttherope, cuttherope_state, empty_init, ROT90, "ICE", "Cut The Rope", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

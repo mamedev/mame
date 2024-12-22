@@ -211,7 +211,7 @@ Set 5043 bit 0 low
 #include "elan_eu3a05_a.h"
 
 #include "cpu/m6502/m6502.h"
-//#include "cpu/m6502/m65c02.h"
+//#include "cpu/m6502/w65c02.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"

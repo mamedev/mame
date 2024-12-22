@@ -91,4 +91,4 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME       PARENT MACHINE   INPUT     CLASS            INIT        ROT   COMPANY         FULLNAME                      FLAGS
-GAME(2000, bolsaint,  0,     bolsaint, bolsaint, bolsaint_state,  empty_init, ROT0, "Sleic/Petaco", "Bolsa Internacional (euro)", MACHINE_IS_SKELETON_MECHANICAL) // VER.1.0 found on ROM string, but EPROM label reads V3.22
+GAME(2000, bolsaint,  0,     bolsaint, bolsaint, bolsaint_state,  empty_init, ROT0, "Sleic/Petaco", "Bolsa Internacional (euro)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK) // VER.1.0 found on ROM string, but EPROM label reads V3.22

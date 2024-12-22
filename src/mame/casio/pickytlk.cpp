@@ -2,19 +2,16 @@
 // copyright-holders:QUFB
 /***************************************************************************
 
-    Driver for Casio Picky Talk
+    Driver for Casio Picky Talk and Casio Plet's
 
     TODO:
 
     - Communication port;
     - Panel active buttons display;
     - Review PORT/OPT callbacks copied from CFX9850G;
-
-    Some points of interest can be accessed under the debugger:
-
-    1. bpset 0x200328
-    2. ip=3fe (clock screen)
-    3. ip=410 (main screen)
+    - Fix unk_F8 loop when viewing calendar in JD-363/JD-364 models;
+    - Fix busy loop @ 20:2981 in Plet's models;
+    - Keyboard input for Plet's models;
 
     Hardware
     --------
@@ -25,6 +22,25 @@
     - LSI1 (CPU): Unknown (instruction set compatible with Hitachi HCD62121)
     - LSI3 (Static RAM): NEC D441000LGZ (1M-bit, 128K-word by 8-bit)
     - LSI5 (Mask ROM): NEC D23C8000XGX-C64 (8M-bit, 1M-word by 8-bit, pin compatible with AMD AM29F800B)
+
+    Plet's (MK-300):
+
+    - PCB revision: A141252-1 Z836-1
+    - LSI1 (CPU): Unknown (instruction set compatible with Hitachi HCD62121)
+    - LSI3 (Static RAM): Toshiba TC551001BFL-10V (1M-bit, 128K-word by 8-bit)
+    - LSI5 (Mask ROM): NEC D23C8000XGX-C77 (8M-bit, 1M-word by 8-bit, pin compatible with AMD AM29F800B)
+
+    Plet's (MK-350):
+
+    - PCB revision: A141252-1 Z836-1
+    - LSI1 (CPU): Unknown (instruction set compatible with Hitachi HCD62121)
+    - LSI3 (Static RAM): NEC D441000LGW-B85X
+    - LSI5 (Mask ROM): Oki M538032E-48
+
+    Hidden Features
+    ---------------
+
+    [JD-370] On the debugger, run "bpset 20adb2,,{ ip=20ad27; g; }" to access an unused test program.
 
 ***************************************************************************/
 
@@ -46,10 +62,10 @@
 
 namespace {
 
-class pickytlk_state : public driver_device
+class pickytlk_base_state : public driver_device
 {
 public:
-	pickytlk_state(const machine_config &mconfig, device_type type, const char *tag)
+	pickytlk_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_display_ram(*this, "display_ram")
 		, m_maincpu(*this, "maincpu")
@@ -68,7 +84,7 @@ public:
 	ioport_value pen_y_rescale_r();
 	ioport_value pen_target_r();
 
-private:
+protected:
 	enum pen_target : u8
 	{
 		PEN_TARGET_LCD = 0,
@@ -96,11 +112,11 @@ private:
 	TIMER_CALLBACK_MEMBER(io_timer_tick);
 	u8 io_pen_x_read();
 	u8 io_pen_y_read();
-	u8 tablet_read(offs_t offset);
+	virtual u8 tablet_read(offs_t offset);
 	void tablet_write(offs_t offset, u8 data);
 
+	virtual void pickytlk_layout(machine_config &config);
 	void update_crosshair(screen_device &screen);
-	void pickytlk_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void pickytlk_mem(address_map &map) ATTR_COLD;
@@ -128,19 +144,19 @@ private:
 	u8 m_pen_target;
 };
 
-void pickytlk_state::machine_start()
+void pickytlk_base_state::machine_start()
 {
 	save_item(NAME(m_ko));
 	save_item(NAME(m_port));
 	save_item(NAME(m_opt));
 	m_io_tablet_regs = make_unique_clear<u8[]>(0x100);
 	save_pointer(NAME(m_io_tablet_regs), 0x100);
-	m_io_timer = timer_alloc(FUNC(pickytlk_state::io_timer_tick), this);
+	m_io_timer = timer_alloc(FUNC(pickytlk_base_state::io_timer_tick), this);
 	save_item(NAME(m_pen_state));
 	save_item(NAME(m_pen_target));
 }
 
-void pickytlk_state::machine_reset()
+void pickytlk_base_state::machine_reset()
 {
 	memset(m_io_tablet_regs.get(), 0, 0x100);
 	m_io_timer->reset(attotime::never);
@@ -148,14 +164,14 @@ void pickytlk_state::machine_reset()
 	m_pen_target = PEN_TARGET_LCD;
 }
 
-CROSSHAIR_MAPPER_MEMBER(pickytlk_state::pen_y_mapper)
+CROSSHAIR_MAPPER_MEMBER(pickytlk_base_state::pen_y_mapper)
 {
 	// Parameter `linear_value` is ignored, since we will read the input port directly
 	// for adjustments, just need to return that value in the expected range [0.0f..1.0f].
 	return (float) pen_y_rescale_r() / 0xff;
 }
 
-ioport_value pickytlk_state::pen_y_rescale_r()
+ioport_value pickytlk_base_state::pen_y_rescale_r()
 {
 	/*
 	    There are two distinct areas that can be interacted with the pen:
@@ -182,25 +198,12 @@ ioport_value pickytlk_state::pen_y_rescale_r()
 	return adjusted_value;
 }
 
-ioport_value pickytlk_state::pen_target_r()
+ioport_value pickytlk_base_state::pen_target_r()
 {
 	return m_pen_target;
 }
 
-void pickytlk_state::pickytlk_mem(address_map &map)
-{
-	map(0x000000, 0x007fff).mirror(0x008000).rom();
-	map(0x080000, 0x0807ff).ram();
-	map(0x080300, 0x08030f).rw(FUNC(pickytlk_state::tablet_read), FUNC(pickytlk_state::tablet_write));
-//  map(0x100000, 0x10ffff) // some memory mapped i/o???
-//  map(0x110000, 0x11ffff) // some memory mapped i/o???
-	map(0x200000, 0x2fffff).rom().region("mask_rom", 0);
-	map(0x400000, 0x4007ff).ram().share("display_ram");
-	map(0x400800, 0x41ffff).ram();
-//  map(0xe10000, 0xe1ffff) // some memory mapped i/o???
-}
-
-TIMER_CALLBACK_MEMBER(pickytlk_state::io_timer_tick)
+TIMER_CALLBACK_MEMBER(pickytlk_base_state::io_timer_tick)
 {
 	if (m_pen_state == PEN_PRESS)
 	{
@@ -208,7 +211,7 @@ TIMER_CALLBACK_MEMBER(pickytlk_state::io_timer_tick)
 	}
 }
 
-u8 pickytlk_state::io_pen_x_read()
+u8 pickytlk_base_state::io_pen_x_read()
 {
 	// Pen callibration tests seem to check coordinates relative to the center of the LCD screen,
 	// and those offsets also align with the LCD position relative to the full tablet surface.
@@ -218,7 +221,7 @@ u8 pickytlk_state::io_pen_x_read()
 	return rescale(io_pen_x_pos, io_pen_x_min, io_pen_x_max, 0x20, 0xdf);
 }
 
-u8 pickytlk_state::io_pen_y_read()
+u8 pickytlk_base_state::io_pen_y_read()
 {
 	s16 io_pen_y_min = m_io_pen_y->field(0xff)->minval();
 	s16 io_pen_y_max = m_io_pen_y->field(0xff)->maxval();
@@ -228,7 +231,260 @@ u8 pickytlk_state::io_pen_y_read()
 		: rescale(io_pen_y_pos, io_pen_y_min, io_pen_y_max, 0xa0, 0xf0);
 }
 
-u8 pickytlk_state::tablet_read(offs_t offset)
+u8 pickytlk_base_state::tablet_read(offs_t offset)
+{
+	// Default (overriden by each system)
+	return 0;
+}
+
+void pickytlk_base_state::tablet_write(offs_t offset, u8 data)
+{
+	LOGMASKED(LOG_TABLET, "%s: tablet_write [%02x] = %02x\n", machine().describe_context(), offset, data);
+	m_io_tablet_regs[offset] = data;
+}
+
+void pickytlk_base_state::kol_w(u8 data)
+{
+	m_ko = (m_ko & 0xff00) | data;
+	LOGMASKED(LOG_IO, "%s: KO = %04x\n", machine().describe_context(), m_ko);
+}
+
+void pickytlk_base_state::koh_w(u8 data)
+{
+	m_ko = (m_ko & 0x00ff) | (u16(data) << 8);
+	LOGMASKED(LOG_IO, "%s: KO = %04x\n", machine().describe_context(), m_ko);
+}
+
+void pickytlk_base_state::port_w(u8 data)
+{
+	m_port = data;
+	LOGMASKED(LOG_IO, "%s: PORT = %02x\n", machine().describe_context(), m_port);
+}
+
+void pickytlk_base_state::opt_w(u8 data)
+{
+	m_opt = data;
+	LOGMASKED(LOG_IO, "%s: OPT = %02x\n", machine().describe_context(), m_opt);
+}
+
+u8 pickytlk_base_state::ki_r()
+{
+	if (BIT(m_io_buttons->read(), 6))
+	{
+		if (m_pen_state == PEN_RELEASE)
+		{
+			m_pen_state = PEN_PRESS;
+			// FIXME: Adjust delay when more accurate instruction timings are implemented.
+			// Program code waits for input flag to be stable by executing `mov DSIZE,0xff`
+			// then `movq R00,R00` 15 times (see pickytlk ROM @ 2015f6).
+			m_io_timer->adjust(attotime::from_msec(20), 0, attotime::never);
+		}
+	}
+	else
+	{
+		m_pen_state = PEN_RELEASE;
+		m_io_timer->reset(attotime::never);
+	}
+
+	return m_pen_state == PEN_PRESS ? 0x80 : 0;
+}
+
+u8 pickytlk_base_state::in0_r()
+{
+	// battery level?
+	// bit4 -> if reset CPU keeps restarting (several unknown instructions before jumping to 0)
+	//         perhaps a battery present check?
+	// bit 5 -> 0 = low battery
+
+	// --XX ---- VDET
+	// ---- -X-- data-in
+	return 0x30 & ~0x00;
+}
+
+u8 pickytlk_base_state::input_flag_read()
+{
+	return m_pen_state == PEN_PRESS || m_pen_state == PEN_HOLD ? 0 : 1;
+}
+
+void pickytlk_base_state::pickytlk_layout(machine_config &config)
+{
+	// Nothing (overriden by each system)
+}
+
+void pickytlk_base_state::update_crosshair(screen_device &screen)
+{
+	// Either screen crosshair or layout view's cursor should be visible at a time.
+	machine().crosshair().get_crosshair(0).set_screen(m_pen_target ? CROSSHAIR_SCREEN_NONE : &screen);
+}
+
+u32 pickytlk_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	update_crosshair(screen);
+
+	u16 offset = 0;
+
+	for (int i = 0; i < 16; i++)
+	{
+		int const x = i * 8;
+
+		for (int j = 0; j < 64; j++)
+		{
+			u16 *const row = &bitmap.pix(63 - j);
+
+			u8 const data1 = m_display_ram[offset];
+			u8 const data2 = m_display_ram[offset + 0x400];
+
+			for (int b = 0; b < 8; b++)
+			{
+				if (x + b < 127)
+				{
+					row[x + b] = (BIT(data1, b) << 1) | BIT(data2, b);
+				}
+			}
+
+			offset++;
+		}
+	}
+
+	return 0;
+}
+
+
+static INPUT_PORTS_START(pickytlk)
+	// TODO: On/Off/Reset
+	PORT_START("BUTTONS")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Pen Down")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(pickytlk_base_state::pen_target_r))
+
+	PORT_START("PEN_X")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Pen X")
+
+	PORT_START("PEN_Y")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Pen Y") PORT_CROSSHAIR_MAPPER_MEMBER(FUNC(pickytlk_base_state::pen_y_mapper))
+
+	PORT_START("PEN_Y_RESCALE")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(pickytlk_base_state::pen_y_rescale_r))
+INPUT_PORTS_END
+
+
+void pickytlk_base_state::pickytlk(machine_config &config)
+{
+	HCD62121(config, m_maincpu, 4300000); /* X1 - 4.3 MHz */
+	m_maincpu->kol_cb().set(FUNC(pickytlk_base_state::kol_w));
+	m_maincpu->koh_cb().set(FUNC(pickytlk_base_state::koh_w));
+	m_maincpu->port_cb().set(FUNC(pickytlk_base_state::port_w));
+	m_maincpu->opt_cb().set(FUNC(pickytlk_base_state::opt_w));
+	m_maincpu->ki_cb().set(FUNC(pickytlk_base_state::ki_r));
+	m_maincpu->in0_cb().set(FUNC(pickytlk_base_state::in0_r));
+	m_maincpu->input_flag_cb().set(FUNC(pickytlk_base_state::input_flag_read));
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_size(127, 64);
+	screen.set_visarea(0, 126, 0, 63);
+	screen.set_screen_update(FUNC(pickytlk_base_state::screen_update));
+	screen.set_palette("palette");
+
+	pickytlk_layout(config);
+}
+
+
+class pickytlk_monocolor_state : public pickytlk_base_state
+{
+public:
+	pickytlk_monocolor_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pickytlk_base_state(mconfig, type, tag)
+	{ }
+
+	void pickytlk_monocolor(machine_config &config);
+
+private:
+	virtual u8 tablet_read(offs_t offset) override;
+	virtual void pickytlk_layout(machine_config &config) override;
+	void pickytlk_mem(address_map &map);
+	void pickytlk_palette(palette_device &palette) const;
+};
+
+void pickytlk_monocolor_state::pickytlk_layout(machine_config &config)
+{
+	config.set_default_layout(layout_pickytlk);
+}
+
+u8 pickytlk_monocolor_state::tablet_read(offs_t offset)
+{
+	LOGMASKED(LOG_TABLET, "%s: tablet_read [%02x] = %02x\n", machine().describe_context(), offset, m_io_tablet_regs[offset]);
+
+	if (BIT(offset, 0))
+	{
+		u8 y = BIT(m_ko, 3) ? io_pen_y_read() : 0;
+		LOGMASKED(LOG_TABLET, "%s: pen y = %02x\n", machine().describe_context(), y);
+		return BIT(m_ko, 0) ? y : (0xff - y);
+	}
+	else
+	{
+		u8 x = BIT(m_ko, 2) ? io_pen_x_read() : 0;
+		LOGMASKED(LOG_TABLET, "%s: pen x = %02x\n", machine().describe_context(), x);
+		return BIT(m_ko, 0) ? x : (0xff - x);
+	}
+}
+
+void pickytlk_monocolor_state::pickytlk_mem(address_map &map)
+{
+	map(0x000000, 0x00bfff).rom();
+//  map(0x040000, 0x04ffff) // Unknown
+	map(0x080000, 0x0807ff).ram();
+//  map(0x100000, 0x10ffff) // Unknown
+	map(0x200000, 0x2fffff).rom().region("mask_rom", 0);
+	map(0x400000, 0x4007ff).ram().share("display_ram");
+	map(0x400800, 0x41ffff).ram();
+	// Read after pen callibration
+	map(0x800030, 0x80003f).rw(FUNC(pickytlk_monocolor_state::tablet_read), FUNC(pickytlk_monocolor_state::tablet_write));
+	// Read before pen callibration
+	map(0x800040, 0x80004f).rw(FUNC(pickytlk_monocolor_state::tablet_read), FUNC(pickytlk_monocolor_state::tablet_write));
+//  map(0xe00000, 0xe0ffff) // LCD I/O
+}
+
+void pickytlk_monocolor_state::pickytlk_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, 0xee, 0xee, 0xcc);
+	palette.set_pen_color(1, 0x11, 0x11, 0x11);
+	palette.set_pen_color(2, 0x11, 0x11, 0x11);
+	palette.set_pen_color(3, 0x11, 0x11, 0x11);
+}
+
+void pickytlk_monocolor_state::pickytlk_monocolor(machine_config &config)
+{
+	pickytlk_base_state::pickytlk(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &pickytlk_monocolor_state::pickytlk_mem);
+
+	// TODO: Verify palette. Colors can be changed by changing the contrast.
+	PALETTE(config, "palette", FUNC(pickytlk_monocolor_state::pickytlk_palette), 4);
+}
+
+
+class pickytlk_multicolor_state : public pickytlk_base_state
+{
+public:
+	pickytlk_multicolor_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pickytlk_base_state(mconfig, type, tag)
+	{ }
+
+	void pickytlk_multicolor(machine_config &config);
+
+private:
+	virtual u8 tablet_read(offs_t offset) override;
+	virtual void pickytlk_layout(machine_config &config) override;
+	void pickytlk_mem(address_map &map);
+	void pickytlk_palette(palette_device &palette) const;
+};
+
+void pickytlk_multicolor_state::pickytlk_layout(machine_config &config)
+{
+	config.set_default_layout(layout_pickytlk);
+}
+
+u8 pickytlk_multicolor_state::tablet_read(offs_t offset)
 {
 	/*
 	    Pen coordinates can return a mirrored value when bit 4 is not set.
@@ -268,82 +524,20 @@ u8 pickytlk_state::tablet_read(offs_t offset)
 	}
 }
 
-void pickytlk_state::tablet_write(offs_t offset, u8 data)
+void pickytlk_multicolor_state::pickytlk_mem(address_map &map)
 {
-	LOGMASKED(LOG_TABLET, "%s: tablet_write [%02x] = %02x\n", machine().describe_context(), offset, data);
-	m_io_tablet_regs[offset] = data;
+	map(0x000000, 0x007fff).rom();
+	map(0x080000, 0x0807ff).ram();
+	map(0x080300, 0x08030f).rw(FUNC(pickytlk_multicolor_state::tablet_read), FUNC(pickytlk_multicolor_state::tablet_write));
+//  map(0x100000, 0x10ffff) // Unknown
+//  map(0x110000, 0x11ffff) // LCD I/O
+	map(0x200000, 0x2fffff).rom().region("mask_rom", 0);
+	map(0x400000, 0x4007ff).ram().share("display_ram");
+	map(0x400800, 0x41ffff).ram();
+//  map(0xe10000, 0xe1ffff) // LCD I/O
 }
 
-void pickytlk_state::kol_w(u8 data)
-{
-	m_ko = (m_ko & 0xff00) | data;
-	LOGMASKED(LOG_IO, "%s: KO = %04x\n", machine().describe_context(), m_ko);
-}
-
-void pickytlk_state::koh_w(u8 data)
-{
-	m_ko = (m_ko & 0x00ff) | (u16(data) << 8);
-	LOGMASKED(LOG_IO, "%s: KO = %04x\n", machine().describe_context(), m_ko);
-}
-
-void pickytlk_state::port_w(u8 data)
-{
-	m_port = data;
-	LOGMASKED(LOG_IO, "%s: PORT = %02x\n", machine().describe_context(), m_port);
-}
-
-void pickytlk_state::opt_w(u8 data)
-{
-	m_opt = data;
-	LOGMASKED(LOG_IO, "%s: OPT = %02x\n", machine().describe_context(), m_opt);
-}
-
-u8 pickytlk_state::ki_r()
-{
-	if (BIT(m_io_buttons->read(), 6))
-	{
-		if (m_pen_state == PEN_RELEASE)
-		{
-			m_pen_state = PEN_PRESS;
-			// FIXME: Adjust delay when more accurate instruction timings are implemented.
-			// Program code waits for input flag to be stable by executing `mov DSIZE,0xff`
-			// then `movq R00,R00` 15 times (see pickytlk ROM @ 2015f6).
-			m_io_timer->adjust(attotime::from_msec(1), 0, attotime::never);
-		}
-	}
-	else
-	{
-		m_pen_state = PEN_RELEASE;
-		m_io_timer->reset(attotime::never);
-	}
-
-	return m_pen_state == PEN_PRESS ? 0x80 : 0;
-}
-
-u8 pickytlk_state::in0_r()
-{
-	// battery level?
-	// bit4 -> if reset CPU keeps restarting (several unknown instructions before jumping to 0)
-	//         perhaps a battery present check?
-	// bit 5 -> 0 = low battery
-
-	// --XX ---- VDET
-	// ---- -X-- data-in
-	return 0x30 & ~0x00;
-}
-
-u8 pickytlk_state::input_flag_read()
-{
-	return m_pen_state == PEN_HOLD ? 0 : 1;
-}
-
-void pickytlk_state::update_crosshair(screen_device &screen)
-{
-	// Either screen crosshair or layout view's cursor should be visible at a time.
-	machine().crosshair().get_crosshair(0).set_screen(m_pen_target ? CROSSHAIR_SCREEN_NONE : &screen);
-}
-
-void pickytlk_state::pickytlk_palette(palette_device &palette) const
+void pickytlk_multicolor_state::pickytlk_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xee, 0xee, 0xcc);
 	palette.set_pen_color(1, 0x11, 0x33, 0x99);
@@ -351,92 +545,112 @@ void pickytlk_state::pickytlk_palette(palette_device &palette) const
 	palette.set_pen_color(3, 0xee, 0x77, 0x33);
 }
 
-u32 pickytlk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void pickytlk_multicolor_state::pickytlk_multicolor(machine_config &config)
 {
-	update_crosshair(screen);
+	pickytlk_base_state::pickytlk(config);
 
-	u16 offset = 0;
+	m_maincpu->set_addrmap(AS_PROGRAM, &pickytlk_multicolor_state::pickytlk_mem);
 
-	for (int i = 0; i < 16; i++)
-	{
-		int const x = i * 8;
-
-		for (int j = 0; j < 64; j++)
-		{
-			u16 *const row = &bitmap.pix(63 - j);
-
-			u8 const data1 = m_display_ram[offset];
-			u8 const data2 = m_display_ram[offset + 0x400];
-
-			for (int b = 0; b < 8; b++)
-			{
-				if (x + b < 127)
-				{
-					row[x + b] = (BIT(data1, b) << 1) | BIT(data2, b);
-				}
-			}
-
-			offset++;
-		}
-	}
-
-	return 0;
+	// TODO: Verify palette. Colors can be changed by changing the contrast.
+	PALETTE(config, "palette", FUNC(pickytlk_multicolor_state::pickytlk_palette), 4);
 }
 
 
-static INPUT_PORTS_START(pickytlk)
-	// TODO: On/Off/Reset
-	PORT_START("BUTTONS")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Pen Down")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(pickytlk_state::pen_target_r))
-
-	PORT_START("PEN_X")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Pen X")
-
-	PORT_START("PEN_Y")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_NAME("Pen Y") PORT_CROSSHAIR_MAPPER_MEMBER(FUNC(pickytlk_state::pen_y_mapper))
-
-	PORT_START("PEN_Y_RESCALE")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(pickytlk_state::pen_y_rescale_r))
-INPUT_PORTS_END
-
-
-void pickytlk_state::pickytlk(machine_config &config)
+class plets_state : public pickytlk_multicolor_state
 {
-	HCD62121(config, m_maincpu, 4300000); /* X1 - 4.3 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &pickytlk_state::pickytlk_mem);
-	m_maincpu->kol_cb().set(FUNC(pickytlk_state::kol_w));
-	m_maincpu->koh_cb().set(FUNC(pickytlk_state::koh_w));
-	m_maincpu->port_cb().set(FUNC(pickytlk_state::port_w));
-	m_maincpu->opt_cb().set(FUNC(pickytlk_state::opt_w));
-	m_maincpu->ki_cb().set(FUNC(pickytlk_state::ki_r));
-	m_maincpu->in0_cb().set(FUNC(pickytlk_state::in0_r));
-	m_maincpu->input_flag_cb().set(FUNC(pickytlk_state::input_flag_read));
+public:
+	plets_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pickytlk_multicolor_state(mconfig, type, tag)
+	{ }
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_size(127, 64);
-	screen.set_visarea(0, 126, 0, 63);
-	screen.set_screen_update(FUNC(pickytlk_state::screen_update));
-	screen.set_palette("palette");
+private:
+	virtual void pickytlk_layout(machine_config &config) override;
+};
 
-	// TODO: Verify amount of colors and palette. Colors can be changed by changing the contrast.
-	PALETTE(config, "palette", FUNC(pickytlk_state::pickytlk_palette), 4);
-
-	config.set_default_layout(layout_pickytlk);
+void plets_state::pickytlk_layout(machine_config &config)
+{
+	// Nothing
 }
 
+
+#define CPU_ROM_MONOCOLOR \
+	ROM_REGION(0xc000, "maincpu", 0) \
+	ROM_LOAD("cpu.lsi1", 0x0000, 0xc000, CRC(67c76253) SHA1(2f7d368e584608d0ed3135159c36f35f02cdd8c4))
+
+#define CPU_ROM_MULTICOLOR \
+	ROM_REGION(0x8000, "maincpu", 0) \
+	ROM_LOAD("cpu.lsi1", 0x0000, 0x8000, CRC(d58efff9) SHA1(a8d2c2a331d79c5299274e2f2d180deda60a5aed))
+
+
+ROM_START(jd363)
+	CPU_ROM_MONOCOLOR
+
+	ROM_REGION(0x100000, "mask_rom", 0)
+	ROM_LOAD("d23c8000lwgx-c11.lsi5", 0x00000, 0x100000, CRC(d4c6e7d2) SHA1(ef199725f04da977cd47293dba8086011f156baf))
+ROM_END
+
+ROM_START(pickydis)
+	CPU_ROM_MONOCOLOR
+
+	ROM_REGION(0x100000, "mask_rom", 0)
+	ROM_LOAD("d23c8000lwgx-c14.lsi5", 0x00000, 0x100000, CRC(1a6273c7) SHA1(f0601873503272d9a620789b5c9798f6e1baf4e7))
+ROM_END
+
+ROM_START(jd364)
+	CPU_ROM_MULTICOLOR
+
+	ROM_REGION(0x100000, "mask_rom", 0)
+	ROM_LOAD("d23c8000lwgx-c12.lsi5", 0x00000, 0x100000, CRC(c023b709) SHA1(0c081a62f00d0fbee496a5c9067fb145cb79c8cd))
+ROM_END
+
+ROM_START(jd368)
+	CPU_ROM_MULTICOLOR
+
+	ROM_REGION(0x100000, "mask_rom", 0)
+	ROM_LOAD("d23c8000xgx-c42.lsi5", 0x00000, 0x100000, CRC(c396bafb) SHA1(0d5610d288ab2474017c05ed54fc816d2e82525f))
+ROM_END
 
 ROM_START(pickytlk)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("cpu.lsi1", 0x0000, 0x8000, CRC(d58efff9) SHA1(a8d2c2a331d79c5299274e2f2d180deda60a5aed))
+	CPU_ROM_MULTICOLOR
 
 	ROM_REGION(0x100000, "mask_rom", 0)
 	ROM_LOAD("d23c8000xgx-c64.lsi5", 0x00000, 0x100000, CRC(6ed6feae) SHA1(f9a63db3d048da0954cab052690deb01ec384b22))
 ROM_END
 
+ROM_START(mk300)
+	CPU_ROM_MULTICOLOR
+
+	ROM_REGION(0x100000, "mask_rom", 0)
+	ROM_LOAD("d23c8000xgx-c77.lsi5", 0x00000, 0x100000, CRC(50ecb853) SHA1(5f2564ccb6ff7e0e5a21064ca32626f35dc81506))
+ROM_END
+
+ROM_START(mk350)
+	CPU_ROM_MULTICOLOR
+
+	ROM_REGION(0x100000, "mask_rom", 0)
+	ROM_LOAD("m538032e-48.lsi5", 0x00000, 0x100000, CRC(42068a99) SHA1(24f8dc15a51a391d4c35cce7332d55f1fa4d8160))
+ROM_END
+
 } // anonymous namespace
 
 
-// "CASIO スーパーピッキートーク「グルタンの森」はやわかりビデオ" has copyright dates 1997,1998,1999
-COMP(1997, pickytlk, 0, 0, pickytlk, pickytlk, pickytlk_state, empty_init, "Casio", "Super Picky Talk - Forest of Gurutan", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// Release date 1995-09 from "Casio Game Perfect Catalogue"
+COMP(1995, jd363, 0, 0, pickytlk_monocolor, pickytlk, pickytlk_monocolor_state, empty_init, "Casio", "Picky Talk - Super Denshi Techou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// ROM date 9539K7001
+COMP(1995?, pickydis, 0, 0, pickytlk_monocolor, pickytlk, pickytlk_monocolor_state, empty_init, "Tsukuda Original", "Disney Characters - Tegaki Electronic Note", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// Release date 1995-10 from "Casio Game Perfect Catalogue"
+COMP(1995, jd364, 0, 0, pickytlk_multicolor, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Color Picky Talk - Super Denshi Techou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// ROM date 9737K7041
+COMP(1997?, jd368, 0, 0, pickytlk_multicolor, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Super Picky Talk - Access Pet", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// Release date 1998-07 from "Casio Game Perfect Catalogue"
+COMP(1998, pickytlk, 0, 0, pickytlk_multicolor, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Super Picky Talk - Forest of Gurutan", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// Release date 1999-09 from "Casio Game Perfect Catalogue"
+COMP(1999, mk300, 0, 0, pickytlk_multicolor, pickytlk, plets_state, empty_init, "Casio", "Plet's (MK-300)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// ROM date 0019K7001
+COMP(2000?, mk350, 0, 0, pickytlk_multicolor, pickytlk, plets_state, empty_init, "Casio", "Plet's (MK-350)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

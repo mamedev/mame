@@ -7,7 +7,9 @@ This driver covers Dyna games running on the DYNA CPU91A-011 custom CPU.
 It is an encrypted NEC V25 or V35.
 It has been seen on the following PCBs:
 D9203
+D9205 (sub PCB)
 D9304
+D9401
 D9701 (sub PCB)
 D9702
 D9805
@@ -1593,6 +1595,20 @@ ROM_START( scherrymp10u ) // DYNA D9702 PCB; DYNA PLUS V1.0U in bookkeeping scre
 	ROM_LOAD( "82s147.11b", 0x200, 0x200, CRC(a67e7a63) SHA1(b23e0eb9af13e57bbc8602ddc7fb381ba5c8267e) )
 ROM_END
 
+ROM_START( cb4 ) // Wing W4 board + DYNA D9205 subboard; DYNA CB4 V5.0 in bookkeeping screen.
+	ROM_REGION16_LE( 0x040000, "boot_prg", 0 )
+	ROM_LOAD16_WORD( "5mk.2g", 0x020000, 0x10000, CRC(ecc6f80e) SHA1(b6de63cd5231ef9481ee79d841a6ea591add7e4d) )
+	ROM_RELOAD(                 0x30000, 0x10000)
+
+	ROM_REGION( 0x100000, "gfx", 0 )
+	ROM_LOAD16_BYTE( "cb4.4i", 0x000000, 0x040000, CRC(c1799150) SHA1(50e80607b93f6ee35e3e8ff5d854dc83afe76505) )
+	ROM_LOAD16_BYTE( "cb4.4j", 0x000001, 0x040000, CRC(3a12cf69) SHA1(232eeca78cdabcd952825aba0ad397e3dde79747) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // not dumped yet
+	ROM_LOAD( "82s147.9b",  0x000, 0x200, BAD_DUMP CRC(dcf976d2) SHA1(73a08e4587f3516d694a8060b79470cf71df3925) )
+	ROM_LOAD( "82s147.11b", 0x200, 0x200, BAD_DUMP CRC(a67e7a63) SHA1(b23e0eb9af13e57bbc8602ddc7fb381ba5c8267e) )
+ROM_END
+
 ROM_START( cb5 ) // Wing W4 board + DYNA D9701 subboard; DYNA CB5 V1.3 in bookkeeping screen. Appears to be the missing link to igs/goldstar.cpp hw.
 	ROM_REGION16_LE( 0x040000, "boot_prg", 0 )
 	ROM_LOAD16_WORD( "cb5-131.1g", 0x020000, 0x20000, CRC(7d47192c) SHA1(bc65f0b3223789fbcd78a7f3ba4f1c0e2a1ee4da) )
@@ -1685,6 +1701,18 @@ ROM_START( tripjack ) // DYNA D9805 PCB; DYNA TRJ V1.6G in bookkeeping screen
 	ROM_LOAD( "82s135.11b", 0x100, 0x100, CRC(9940ef22) SHA1(42b0c6410d8db34e0316e95b7b7007abc3098341) )
 ROM_END
 
+ROM_START( crzybell ) // DYNA D9401 PCB; DYNA CRBL1 V1.2D in bookkeeping screen
+	ROM_REGION16_LE( 0x40000, "boot_prg", 0 )
+	ROM_LOAD16_WORD( "cbl12d.6e", 0x20000, 0x20000, CRC(a5d43b00) SHA1(b89fd8eb7675b3dd4f47bf95326da1b881997a56) )
+
+	ROM_REGION( 0x80000, "gfx", 0 )
+	ROM_LOAD( "cbl1d.2g", 0x00000, 0x80000, CRC(83c6a91f) SHA1(3f802777e4a5581f7efe86309992f0e7a79851ee) )
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 ) // not dumped yet
+	ROM_LOAD( "82s135.j5", 0x000, 0x100, BAD_DUMP CRC(2d2237fb) SHA1(9b71801bd465d2a823f648f4d3c1823b5ba3340e) )
+	ROM_LOAD( "82s135.k5", 0x100, 0x100, BAD_DUMP CRC(9940ef22) SHA1(42b0c6410d8db34e0316e95b7b7007abc3098341) )
+ROM_END
+
 
 void cb2001_state::init_smaller_proms()
 {
@@ -1714,6 +1742,8 @@ GAME( 1993, scherrym ,    0,         scherrym,  cb2001,    cb2001_state, init_sm
 GAME( 1993, scherrym12 ,  scherrym,  scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Super Cherry Master (V1.2)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, scherrymp,    0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Super Cherry Master Plus (V1.6)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, scherrymp10u, scherrymp, scherrymp, scherrymp, cb2001_state, empty_init,         ROT0, "Dyna",  "Super Cherry Master Plus (V1.0U)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cb4,          0,         cb5,       cb5,       cb2001_state, empty_init,         ROT0, "Dyna",  "Cherry Bonus IV (V5.0)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cb5,          0,         cb5,       cb5,       cb2001_state, empty_init,         ROT0, "Dyna",  "Cherry Bonus V Five (V1.3)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, mystjb,       0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Mystery J & B (V1.3G)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, tripjack,     0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Triple Jack (V1.6G)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, crzybell,     0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Crazy Bell (V1.2D)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

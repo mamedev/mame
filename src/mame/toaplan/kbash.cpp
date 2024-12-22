@@ -3,20 +3,20 @@
 
 #include "emu.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
-
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplan_v25_tables.h"
 #include "toaplipt.h"
-#include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/nec/v25.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*
 Name        Board No      Maker         Game name
@@ -41,8 +41,10 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	void kbash(machine_config &config);
+	void kbash(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void video_start() override ATTR_COLD;
 
 	void kbash_68k_mem(address_map &map) ATTR_COLD;
 	void kbash_v25_mem(address_map &map) ATTR_COLD;
@@ -54,7 +56,6 @@ public:
 
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
 	void shared_ram_w(offs_t offset, u8 data) { m_shared_ram[offset] = data; }
-	void reset(int state);
 
 	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 
@@ -65,10 +66,6 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	bitmap_ind8 m_custom_priority_bitmap;
-
-protected:
-	virtual void video_start() override ATTR_COLD;
-
 };
 
 class kbash2_state : public kbash_state
@@ -79,17 +76,13 @@ public:
 		, m_musicoki(*this, "musicoki")
 	{ }
 
-	void kbash2(machine_config &config);
+	void kbash2(machine_config &config) ATTR_COLD;
 
+protected:
 	void kbash2_68k_mem(address_map &map) ATTR_COLD;
 
-	optional_device<okim6295_device> m_musicoki;
+	required_device<okim6295_device> m_musicoki;
 };
-
-void kbash_state::reset(int state)
-{
-	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-}
 
 void kbash_state::video_start()
 {
@@ -301,7 +294,7 @@ void kbash_state::kbash(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         /* 16MHz Oscillator */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kbash_state::kbash_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(kbash_state::reset));
+	m_maincpu->reset_cb().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	/* ROM based v25 */
 	v25_device &audiocpu(V25(config, m_audiocpu, 16_MHz_XTAL));         /* NEC V25 type Toaplan marked CPU ??? */

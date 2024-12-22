@@ -213,7 +213,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2005, cm2005,   0,      dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Cherry Master 2005 (Ver. 1.10U)", MACHINE_IS_SKELETON )
-GAME( 2005, cm2005a,  cm2005, dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Cherry Master 2005 (Ver. 1.02U)", MACHINE_IS_SKELETON )
-GAME( 2005, cm2005b,  cm2005, dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Cherry Master 2005 (Ver. 0.14H)", MACHINE_IS_SKELETON )
-GAME( 2008, supereld, 0,      dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Super El Dorado (Ver. 1.04H)",    MACHINE_IS_SKELETON )
+GAME( 2005, cm2005,   0,      dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Cherry Master 2005 (Ver. 1.10U)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, cm2005a,  cm2005, dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Cherry Master 2005 (Ver. 1.02U)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, cm2005b,  cm2005, dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Cherry Master 2005 (Ver. 0.14H)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2008, supereld, 0,      dyna_d0404, cm2005, dyna_d0404_state, empty_init, ROT0, "Dyna",  "Super El Dorado (Ver. 1.04H)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

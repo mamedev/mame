@@ -293,7 +293,7 @@ P1-049-A
 #include "emu.h"
 #include "x1_012.h"
 
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
@@ -933,7 +933,7 @@ void tndrcade_state::sub_bankswitch_lockout_w(u8 data)
 	seta_coin_lockout_w(data);
 
 	// 65C02 code doesn't seem to do anything to explicitly acknowledge IRQ; implicitly acknowledging it here seems most likely
-	m_subcpu->set_input_line(m65c02_device::IRQ_LINE, CLEAR_LINE);
+	m_subcpu->set_input_line(W65C02_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -1043,7 +1043,7 @@ void downtown_state::calibr50_sub_bankswitch_w(u8 data)
 
 	// Bit 2: IRQCLR
 	if (!BIT(data, 2))
-		m_subcpu->set_input_line(m65c02_device::IRQ_LINE, CLEAR_LINE);
+		m_subcpu->set_input_line(W65C02_IRQ_LINE, CLEAR_LINE);
 
 	// Bit 1: /PCMMUTE
 	m_x1snd->set_output_gain(ALL_OUTPUTS, BIT(data, 1) ? 1.0f : 0.0f);
@@ -1769,10 +1769,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(downtown_state::seta_sub_interrupt)
 	int scanline = param;
 
 	if (scanline == 240)
-		m_subcpu->pulse_input_line(m65c02_device::NMI_LINE, attotime::zero);
+		m_subcpu->pulse_input_line(W65C02_NMI_LINE, attotime::zero);
 
 	if (scanline == 112)
-		m_subcpu->set_input_line(m65c02_device::IRQ_LINE, ASSERT_LINE);
+		m_subcpu->set_input_line(W65C02_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -1785,10 +1785,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(tndrcade_state::tndrcade_sub_interrupt)
 	int scanline = param;
 
 	if (scanline == 240)
-		m_subcpu->pulse_input_line(m65c02_device::NMI_LINE, attotime::zero);
+		m_subcpu->pulse_input_line(W65C02_NMI_LINE, attotime::zero);
 
 	if ((scanline % 16) == 0)
-		m_subcpu->set_input_line(m65c02_device::IRQ_LINE, ASSERT_LINE);
+		m_subcpu->set_input_line(W65C02_IRQ_LINE, ASSERT_LINE);
 }
 
 void tndrcade_state::tndrcade(machine_config &config)
@@ -1797,7 +1797,7 @@ void tndrcade_state::tndrcade(machine_config &config)
 	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // 8 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &tndrcade_state::tndrcade_map);
 
-	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); // 2 MHz
+	W65C02(config, m_subcpu, 16_MHz_XTAL / 8); // 2 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &tndrcade_state::tndrcade_sub_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(tndrcade_state::tndrcade_sub_interrupt), "screen", 0, 1);
 
@@ -1849,7 +1849,7 @@ void downtown_state::twineagl(machine_config &config)
 	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // 8 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_map);
 
-	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); // 2 MHz
+	W65C02(config, m_subcpu, 16_MHz_XTAL / 8); // 2 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::twineagl_sub_map);
 	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::seta_sub_interrupt), "screen", 0, 1);
 
@@ -1900,7 +1900,7 @@ void downtown_state::downtown(machine_config &config)
 	M68000(config, m_maincpu, 16_MHz_XTAL / 2); // verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_map);
 
-	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); // verified on pcb
+	W65C02(config, m_subcpu, 16_MHz_XTAL / 8); // verified on pcb
 	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_sub_map);
 	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::seta_sub_interrupt), "screen", 0, 1);
 
@@ -1981,7 +1981,7 @@ void usclssic_state::usclssic(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); // 2 MHz
+	W65C02(config, m_subcpu, 16_MHz_XTAL / 8); // 2 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &usclssic_state::calibr50_sub_map);
 
 	UPD4701A(config, m_upd4701);
@@ -2010,7 +2010,7 @@ void usclssic_state::usclssic(machine_config &config)
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(usclssic_state::screen_update_usclssic));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set_inputline(m_subcpu, m65c02_device::IRQ_LINE, ASSERT_LINE);
+	screen.screen_vblank().set_inputline(m_subcpu, W65C02_IRQ_LINE, ASSERT_LINE);
 
 	X1_012(config, m_tiles, m_palette, gfx_usclssic);
 	m_tiles->set_screen(m_screen);
@@ -2023,7 +2023,7 @@ void usclssic_state::usclssic(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
-	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, m65c02_device::NMI_LINE);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, W65C02_NMI_LINE);
 	m_soundlatch[0]->set_separate_acknowledge(true);
 
 	X1_010(config, m_x1snd, 16_MHz_XTAL);   // 16 MHz
@@ -2051,7 +2051,7 @@ void downtown_state::calibr50(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	M65C02(config, m_subcpu, 16_MHz_XTAL / 8); // verified on pcb
+	W65C02(config, m_subcpu, 16_MHz_XTAL / 8); // verified on pcb
 	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::calibr50_sub_map);
 	m_subcpu->set_periodic_int(FUNC(downtown_state::irq0_line_assert), attotime::from_hz(4*60));  // IRQ: 4/frame
 
@@ -2088,7 +2088,7 @@ void downtown_state::calibr50(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
-	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, m65c02_device::NMI_LINE);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, W65C02_NMI_LINE);
 	m_soundlatch[0]->set_separate_acknowledge(true);
 
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
@@ -2110,7 +2110,7 @@ void downtown_state::metafox(machine_config &config)
 	M68000(config, m_maincpu, 16000000/2); // 8 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_map);
 
-	M65C02(config, m_subcpu, 16000000/8); // 2 MHz
+	W65C02(config, m_subcpu, 16000000/8); // 2 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::metafox_sub_map);
 	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::seta_sub_interrupt), "screen", 0, 1);
 

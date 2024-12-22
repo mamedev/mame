@@ -254,4 +254,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2019, rs70_648,  0,        0, mk3b_soc, mk3b_soc, mk3b_soc_state, init_rs70, "CoolBoy", "RS-70 648-in-1",      MACHINE_IS_SKELETON )
+CONS( 2019, rs70_648,  0,        0, mk3b_soc, mk3b_soc, mk3b_soc_state, init_rs70, "CoolBoy", "RS-70 648-in-1",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

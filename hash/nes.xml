@@ -28760,6 +28760,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- https://forums.nesdev.org/viewtopic.php?t=4965 -->
+	<software name="pcmdemo">
+		<description>PCM Demo With Graphics</description>
+		<year>2009</year>
+		<publisher>frantik</publisher>
+		<info name="release" value="20090317"/>
+		<info name="alt_title" value="Rick Rolled!"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom"/>
+			<feature name="pcb" value="NES-UNROM"/>
+			<feature name="mirroring" value="horizontal"/>
+			<dataarea name="prg" size="262144">
+				<rom name="pcm demo wgraphics" size="262144" crc="3c5be639" sha1="07d361a75b3d445607667a114c581d9a594958ff"/>
+			</dataarea>
+			<dataarea name="vram" size="8192"/>
+		</part>
+	</software>
+
 	<software name="peepart">
 		<description>Peepar Time (Japan)</description>
 		<year>1990</year>

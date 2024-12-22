@@ -409,8 +409,8 @@ void dgpix_state::io_map(address_map &map)
 
 static INPUT_PORTS_START( dgpix )
 	PORT_START("VBLANK")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // value 2 is used by fmaniac3
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // value 2 is used by fmaniac3
 	PORT_BIT( 0xfffffffc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUTS")

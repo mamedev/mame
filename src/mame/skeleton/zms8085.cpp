@@ -376,4 +376,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1979, zephyr, 0, 0, zephyr, zephyr, zms8085_state, empty_init, "Zentec", "Zephyr (00-441-01)", MACHINE_IS_SKELETON )
+COMP( 1979, zephyr, 0, 0, zephyr, zephyr, zms8085_state, empty_init, "Zentec", "Zephyr (00-441-01)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -18,7 +18,6 @@ enigma2b (1981)
  Conversion like enigma2a, but boots with 1981 copyright and Phantoms II title
 
 TODO:
-- enigma2  - Star blinking frequency
 - enigma2b - bad sound ROM?
 
 
@@ -202,7 +201,7 @@ private:
 	optional_region_ptr<uint8_t> m_stars;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	int m_blink_count = 0;
+	uint8_t m_blink_count = 0;
 	uint8_t m_sound_latch = 0;
 	uint8_t m_last_sound_data = 0;
 	uint8_t m_protection_data = 0;
@@ -263,13 +262,13 @@ TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_assert_callback)
 	uint16_t next_counter;
 	int next_vpos;
 
-	/* compute vector and set the interrupt line */
+	// compute vector and set the interrupt line
 	int vpos = m_screen->vpos();
 	uint16_t counter = vpos_to_vysnc_chain_counter(vpos);
 	uint8_t vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
 	m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector); // Z80
 
-	/* set up for next interrupt */
+	// set up for next interrupt
 	if (counter == INT_TRIGGER_COUNT_1)
 		next_counter = INT_TRIGGER_COUNT_2;
 	else
@@ -353,7 +352,7 @@ uint32_t enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb3
 		uint8_t bit;
 		uint8_t color;
 
-		/* read the video RAM */
+		// read the video RAM
 		if ((x & 0x07) == 0x00)
 		{
 			offs_t color_map_address = (y >> 3 << 5) | (x >> 3);
@@ -361,9 +360,12 @@ uint32_t enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb3
 			/* the schematics shows it like this, but it doesn't work as this would
 			   produce no stars, due to the contents of the PROM -- maybe there is
 			   a star disabled bit somewhere that's connected here instead of flip_screen() */
-			/* star_map_address = (y >> 4 << 6) | (enigma2_flip_screen_get() << 5) | (x >> 3); */
+			//offs_t star_map_address = (y >> 4 << 6) | (m_flip_screen ? 0x20 : 0) | (x >> 3);
 			offs_t star_map_address = (y >> 4 << 6) | 0x20 | (x >> 3);
-			if (m_blink_count & 0x08)
+
+			// blink rate is with an RC osc, this is an estimation based on PCB video
+			// (yes, the intervals are uneven like this)
+			if (m_blink_count & 0x30)
 				star_map_address |= 0x400;
 
 			offs_t videoram_address = (y << 5) | (x >> 3);
@@ -382,7 +384,7 @@ uint32_t enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb3
 			star_color = m_stars[star_map_address] & 0x07;
 		}
 
-		/* plot the current pixel */
+		// plot the current pixel
 		if (m_flip_screen)
 		{
 			bit = video_data & 0x80;
@@ -398,29 +400,27 @@ uint32_t enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb3
 			color = fore_color;
 		else
 		{
-			/* stars only appear at certain positions */
+			// stars only appear at certain positions
 			color = ((x & y & 0x0f) == 0x0f) ? star_color : 0;
 		}
 
 		bitmap.pix(bitmap_y, x) = m_palette->pen_color(color);
 
-		/* next pixel */
+		// next pixel
 		x = x + 1;
 
-		/* end of line? */
+		// end of line?
 		if (x == 0)
 		{
-			/* end of screen? */
+			// end of screen?
 			if (bitmap_y == visarea.max_y)
 				break;
 
-			/* next row */
+			// next row
 			y = y + 1;
 			bitmap_y = bitmap_y + 1;
 		}
 	}
-
-	m_blink_count++;
 
 	return 0;
 }
@@ -439,19 +439,19 @@ uint32_t enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb
 		uint8_t bit;
 		pen_t pen;
 
-		/* read the video RAM */
+		// read the video RAM
 		if ((x & 0x07) == 0x00)
 		{
 			offs_t videoram_address = (y << 5) | (x >> 3);
 
 			/* when the screen is flipped, all the video address bits are inverted,
 			   and the adder at 16A is activated */
-			if (m_flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
+			if (m_flip_screen) videoram_address = (~videoram_address + 0x0400) & 0x1fff;
 
 			video_data = m_videoram[videoram_address];
 		}
 
-		/* plot the current pixel */
+		// plot the current pixel
 		if (m_flip_screen)
 		{
 			bit = video_data & 0x80;
@@ -466,17 +466,17 @@ uint32_t enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb
 		pen = bit ? rgb_t::white() : rgb_t::black();
 		bitmap.pix(bitmap_y, x) = pen;
 
-		/* next pixel */
+		// next pixel
 		x = x + 1;
 
-		/* end of line? */
+		// end of line?
 		if (x == 0)
 		{
-			/* end of screen? */
+			// end of screen?
 			if (bitmap_y == visarea.max_y)
 				break;
 
-			/* next row */
+			// next row
 			y = y + 1;
 			bitmap_y = bitmap_y + 1;
 		}
@@ -518,7 +518,7 @@ uint8_t enigma2_state::dip_switch_r(offs_t offset)
 
 void enigma2_state::sound_data_w(uint8_t data)
 {
-	/* clock sound latch shift register on rising edge of D2 */
+	// clock sound latch shift register on rising edge of D2
 	if (!(data & 0x04) && (m_last_sound_data & 0x04))
 		m_sound_latch = (m_sound_latch >> 1) | (~data << 7 & 0x80);
 
@@ -724,7 +724,7 @@ INPUT_PORTS_END
 
 void enigma2_state::enigma2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_main_cpu_map);
 
@@ -733,14 +733,15 @@ void enigma2_state::enigma2(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(m_audiocpu->clock() / 4));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(enigma2_state::screen_update_enigma2));
+	m_screen->screen_vblank().set([this] (int state) { if (state) m_blink_count++; });
 
 	PALETTE(config, m_palette, palette_device::GBR_3BIT);
 
-	/* audio hardware */
+	// audio hardware
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY8910_CLOCK));
@@ -752,7 +753,7 @@ void enigma2_state::enigma2(machine_config &config)
 
 void enigma2_state::enigma2a(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2a_main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &enigma2_state::enigma2a_main_cpu_io_map);
@@ -762,12 +763,12 @@ void enigma2_state::enigma2a(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(m_audiocpu->clock() / 4));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(enigma2_state::screen_update_enigma2a));
 
-	/* audio hardware */
+	// audio hardware
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY8910_CLOCK));
@@ -820,7 +821,7 @@ ROM_START( enigma2b )
 	ROM_LOAD( "ic32.bin",   0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
 	ROM_LOAD( "ic42.bin",   0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
 
-	/* this rom was completely broken on this pcb.. */
+	// this rom was completely broken on this pcb..
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound.bin",  0x0000, 0x0800, BAD_DUMP CRC(5f092d3c) SHA1(17c70f6af1b5560a45e6b1bdb330a98b27570fe9) )
 ROM_END

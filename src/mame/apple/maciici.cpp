@@ -177,14 +177,6 @@ private:
 		else
 			m_fdc->write((offset >> 8) & 0xf, data >> 8);
 	}
-
-	void write_6015(int state)
-	{
-		if (state)
-		{
-			m_macadb->adb_vblank();
-		}
-	}
 };
 
 void maciici_state::machine_start()
@@ -607,7 +599,6 @@ void maciici_state::maciixi_base(machine_config &config)
 
 	RBV(config, m_rbv, C15M);
 	m_rbv->via6015_callback().set(m_via1, FUNC(via6522_device::write_ca1));
-	m_rbv->via6015_callback().append(FUNC(maciici_state::write_6015));
 	m_rbv->irq_callback().set(FUNC(maciici_state::set_via2_interrupt));
 
 	/* internal ram */

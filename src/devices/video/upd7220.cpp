@@ -351,7 +351,7 @@ inline void upd7220_device::update_vsync_timer(int state)
 	// page 6-68, route vsync so that top is start of back porch, end is at sync time
 	// (at bottom of MAME vpos() mechanism)
 	// - pc9801:lemmings and pc9801:spindiz2 cares
-	int next_y = state ? (m_vbp + m_al + m_vfp) * vert_mult : 0;
+	int next_y = state ? 0 : (m_vbp + m_al + m_vfp) * vert_mult;
 
 	attotime duration = screen().time_until_pos(next_y, 0);
 
@@ -365,10 +365,11 @@ inline void upd7220_device::update_vsync_timer(int state)
 
 inline void upd7220_device::update_hsync_timer(int state)
 {
+	const int horiz_mult = (m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_GRAPHICS ? 16 : 8;
 	int y = screen().vpos();
 
-	int next_x = state ? m_hs : 0;
-	int next_y = state ? y : ((y + 1) % m_al);
+	int next_x = state ? m_hs * horiz_mult : 0;
+	int next_y = state ? y : ((y + 1) % (m_vs + m_vbp + m_al + m_vfp - 1));
 
 	attotime duration = screen().time_until_pos(next_y, next_x);
 
@@ -435,6 +436,7 @@ inline void upd7220_device::recompute_parameters()
 	if (m_m)
 	{
 		screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+		screen().reset_origin();
 
 		update_hsync_timer(0);
 		update_vsync_timer(0);

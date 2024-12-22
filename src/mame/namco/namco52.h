@@ -6,6 +6,7 @@
 #include "sound/discrete.h"
 #include "cpu/mb88xx/mb88xx.h"
 
+
 class namco_52xx_device : public device_t
 {
 public:
@@ -27,8 +28,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER( write_sync );
-	TIMER_CALLBACK_MEMBER( external_clock_pulse );
+	TIMER_CALLBACK_MEMBER(write_sync);
+	TIMER_CALLBACK_MEMBER(external_clock_pulse);
 
 private:
 	// internal state
@@ -55,7 +56,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_52XX, namco_52xx_device)
-
 
 
 /* discrete nodes */

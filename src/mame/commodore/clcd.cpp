@@ -1,22 +1,25 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder,smf,Mike Naberezny
+// copyright-holders:Curt Coder, smf, Mike Naberezny
 /***************************************************************************
 
-        Commodore LCD prototype
+Commodore LCD prototype
 
-        GTE G65SC102PI-2
-        GTE G65SC51P-1
-        Rockwell R65C22P2 x 2
-        AMI S3530X Bell 103/V.21 Single chip modem
+OSC: 4MHz, 1.8432MHz, 3.579545MHz
+GTE G65SC102PI-2
+GTE G65SC51P-1
+Rockwell R65C22P2 x 2
+AMI S3530X Bell 103/V.21 Single chip modem
+OKI M5260 x 2
 
 ****************************************************************************/
 
 
 #include "emu.h"
+
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "machine/6522via.h"
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
@@ -25,6 +28,7 @@
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -101,7 +105,7 @@ public:
 	void clcd_palette(palette_device &palette) const
 	{
 		palette.set_pen_color(0, rgb_t(124, 149, 143));
-		palette.set_pen_color(1, rgb_t(54,64,65));
+		palette.set_pen_color(1, rgb_t(54, 64, 65));
 	}
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -405,12 +409,12 @@ public:
 
 		if (!m_iec->clk_r())
 		{
-			data |= 1<<6;
+			data |= 1 << 6;
 		}
 
 		if (!m_iec->data_r())
 		{
-			data |= 1<<7;
+			data |= 1 << 7;
 		}
 
 		return data;
@@ -537,8 +541,9 @@ public:
 	void clcd(machine_config &config);
 	void clcd_banked_mem(address_map &map) ATTR_COLD;
 	void clcd_mem(address_map &map) ATTR_COLD;
+
 private:
-	required_device<m65c02_device> m_maincpu;
+	required_device<g65sc102_device> m_maincpu;
 	required_device<mos6551_device> m_acia;
 	required_device<via6522_device> m_via0;
 	required_device<msm58321_device> m_rtc;
@@ -716,28 +721,28 @@ INPUT_PORTS_END
 
 void clcd_state::clcd(machine_config &config)
 {
-	/* basic machine hardware */
-	M65C02(config, m_maincpu, 1000000);
+	// basic machine hardware
+	G65SC102(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &clcd_state::clcd_mem);
 
-	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", m65c02_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", g65sc102_device::IRQ_LINE);
 
-	via6522_device &via0(R65C22(config, "via0", 1000000));
+	via6522_device &via0(R65C22(config, "via0", 4_MHz_XTAL / 4));
 	via0.writepa_handler().set(FUNC(clcd_state::via0_pa_w));
 	via0.writepb_handler().set(FUNC(clcd_state::via0_pb_w));
 	via0.readpb_handler().set(FUNC(clcd_state::via0_pb_r));
 	via0.cb1_handler().set(FUNC(clcd_state::via0_cb1_w));
 	via0.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	via6522_device &via1(R65C22(config, "via1", 1000000));
+	via6522_device &via1(R65C22(config, "via1", 4_MHz_XTAL / 4));
 	via1.writepa_handler().set(FUNC(clcd_state::via1_pa_w));
 	via1.writepb_handler().set(FUNC(clcd_state::via1_pb_w));
 	via1.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	via1.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe)).invert();
 	via1.cb2_handler().set("speaker", FUNC(speaker_sound_device::level_w));
 
-	MOS6551(config, m_acia, 1000000);
-	m_acia->set_xtal(XTAL(1'843'200));
+	MOS6551(config, m_acia, 4_MHz_XTAL / 4);
+	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -761,7 +766,7 @@ void clcd_state::clcd(machine_config &config)
 		bankdev->set_stride(0x400);
 	}
 
-	MSM58321(config, m_rtc, XTAL(32'768));
+	MSM58321(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->d0_handler().set("via1", FUNC(via6522_device::write_pa0));
 	m_rtc->d1_handler().set("via1", FUNC(via6522_device::write_pa1));
 	m_rtc->d2_handler().set("via1", FUNC(via6522_device::write_pa2));
@@ -770,7 +775,7 @@ void clcd_state::clcd(machine_config &config)
 	m_rtc->set_year0(1984);
 	m_rtc->set_default_24h(true);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(80);
 	screen.set_screen_update(FUNC(clcd_state::screen_update));
@@ -794,14 +799,15 @@ void clcd_state::clcd(machine_config &config)
 
 ROM_START( clcd )
 	ROM_REGION( 0x20000, "maincpu", 0 )
+
 	ROM_SYSTEM_BIOS( 0, "apr85", "Bil Herd Prototype" )
-	ROMX_LOAD( "ss,calc 13apr.u105",    0x000000, 0x0008000, CRC(88a587a7) SHA1(b08f3169b7cd696bb6a9b6e6e87a077345377ac4), ROM_BIOS(0))
-	ROMX_LOAD( "wp,t,m 13apr.u104",     0x008000, 0x0008000, CRC(41028c3c) SHA1(fcab6f0bbeef178eb8e5ecf82d9c348d8f318a8f), ROM_BIOS(0))
-	ROMX_LOAD( "s12apr.u103",           0x010000, 0x0008000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745), ROM_BIOS(0))
-	ROMX_LOAD( "k12apr.u102",           0x018000, 0x0008000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef), ROM_BIOS(0))
+	ROMX_LOAD( "ss,calc 13apr.u105",    0x000000, 0x008000, CRC(88a587a7) SHA1(b08f3169b7cd696bb6a9b6e6e87a077345377ac4), ROM_BIOS(0) )
+	ROMX_LOAD( "wp,t,m 13apr.u104",     0x008000, 0x008000, CRC(41028c3c) SHA1(fcab6f0bbeef178eb8e5ecf82d9c348d8f318a8f), ROM_BIOS(0) )
+	ROMX_LOAD( "s12apr.u103",           0x010000, 0x008000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745), ROM_BIOS(0) )
+	ROMX_LOAD( "k12apr.u102",           0x018000, 0x008000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef), ROM_BIOS(0) )
 	// Patch RTC register table by swapping day & month values
-	ROMX_FILL(0x1c216, 1, 0x09, ROM_BIOS(0))
-	ROMX_FILL(0x1c217, 1, 0x07, ROM_BIOS(0))
+	ROMX_FILL( 0x1c216, 1, 0x09, ROM_BIOS(0) )
+	ROMX_FILL( 0x1c217, 1, 0x07, ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS( 1, "may85", "Jeff Porter prototype" )
 	ROMX_LOAD( "s 3-24-85.u108",        0x000000, 0x008000, CRC(52db0ee9) SHA1(bea1e04fb88d205ebac7a1dbe2f5e98f84e7a3a7), ROM_BIOS(1) )
@@ -823,4 +829,4 @@ ROM_END
 
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                        FULLNAME           FLAGS */
-COMP( 1985, clcd, 0,      0,      clcd,    clcd,  clcd_state, empty_init, "Commodore Business Machines", "LCD (Prototype)", 0 )
+COMP( 1985, clcd, 0,      0,      clcd,    clcd,  clcd_state, empty_init, "Commodore Business Machines", "LCD (prototype)", 0 )

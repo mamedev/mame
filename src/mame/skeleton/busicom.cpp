@@ -6,8 +6,6 @@ Busicom 141-PF
 
 2009-08-04 Initial driver by Miodrag Milanovic
 
-Multiply and divide work; addition and subtraction do not.
-
 ****************************************************************************/
 
 #include "emu.h"
@@ -127,7 +125,7 @@ void busicom_state::busicom_rp(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x000f).mirror(0x0700).w(FUNC(busicom_state::shifter_w)); // ROM0 I/O
 	map(0x0010, 0x001f).mirror(0x0700).rw(FUNC(busicom_state::keyboard_r), FUNC(busicom_state::printer_ctrl_w)); // ROM1 I/O
-	map(0x0020, 0x002f).mirror(0x0700).r(FUNC(busicom_state::printer_r));  // ROM2 I/O
+	map(0x0020, 0x002f).mirror(0x0700).r(FUNC(busicom_state::printer_r)); // ROM2 I/O
 }
 
 void busicom_state::busicom_mp(address_map &map)
@@ -233,7 +231,7 @@ void busicom_state::machine_reset()
 
 void busicom_state::busicom(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I4004(config, m_maincpu, 750000);
 	m_maincpu->set_rom_map(&busicom_state::busicom_rom);
 	m_maincpu->set_ram_memory_map(&busicom_state::busicom_mem);
@@ -241,10 +239,10 @@ void busicom_state::busicom(machine_config &config)
 	m_maincpu->set_ram_status_map(&busicom_state::busicom_stat);
 	m_maincpu->set_ram_ports_map(&busicom_state::busicom_mp);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(40*17, 44*11);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(busicom_state::screen_update_busicom));
@@ -255,7 +253,7 @@ void busicom_state::busicom(machine_config &config)
 	TIMER(config, "busicom_timer").configure_periodic(FUNC(busicom_state::timer_callback), attotime::from_msec(28*2));
 }
 
-/* ROM definition */
+// ROM definition
 ROM_START( busicom )
 	ROM_REGION( 0x0500, "maincpu", 0 )
 	ROM_LOAD( "busicom.l01", 0x0000, 0x0100, CRC(51ae2513) SHA1(5cb4097a3945db35af4ed64b629b20b08fc9824f))
@@ -265,7 +263,7 @@ ROM_START( busicom )
 	ROM_LOAD( "busicom.l11", 0x0400, 0x0100, CRC(4d2b2942) SHA1(9a59db76eff084369797735ec19da8cbc70d0d39))
 ROM_END
 
-/* Driver */
+// Driver
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME          FLAGS
-COMP( 1974, busicom, 0,      0,      busicom, busicom, busicom_state, empty_init, "Business Computer Corporation", "Busicom 141-PF", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1974, busicom, 0,      0,      busicom, busicom, busicom_state, empty_init, "Business Computer Corporation", "Busicom 141-PF", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

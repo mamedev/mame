@@ -193,4 +193,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1988, shadowwm, shadoww, shadowwm, shadowwm, shadoww_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Shadow Warriors (Modular System)", MACHINE_IS_SKELETON )
+GAME( 1988, shadowwm, shadoww, shadowwm, shadowwm, shadoww_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Shadow Warriors (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

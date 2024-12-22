@@ -12,7 +12,7 @@
 #pragma once
 
 #include "cbmiec.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 
 
 
@@ -43,7 +43,7 @@ protected:
 	void cbm_iec_reset(int state) override;
 
 private:
-	required_device<m65c02_device> m_maincpu;
+	required_device<w65c02_device> m_maincpu;
 
 	void serial_box_mem(address_map &map) ATTR_COLD;
 };

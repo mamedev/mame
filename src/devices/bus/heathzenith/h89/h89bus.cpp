@@ -123,6 +123,10 @@ ROM_START(h89bus)
 	// MMS (Magnolia Micro Systems) I/O decoding
 	ROM_SYSTEM_BIOS(2, "444-61c", "MMS decoding (444-61c)")
 	ROMX_LOAD( "444-61c.bin",  0x000000, 0x000100, CRC(e7122061) SHA1(33c124f44c0f9cb99c9b17ad15411b4bc6407eae), ROM_BIOS(2))
+
+	// CDR Systems
+	ROM_SYSTEM_BIOS(3, "cdr86", "CDR decoding (CDR86)")
+	ROMX_LOAD( "cdr86.bin",  0x000000, 0x000100, CRC(d35e4063) SHA1(879f9d265d77f8a74c70febd9a80d6896ab8ec7e), ROM_BIOS(3))
 ROM_END
 
 //**************************************************************************

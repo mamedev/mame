@@ -133,7 +133,7 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1999, gl6600cx, 0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "Genius Leader 6600 CX (Germany)", MACHINE_IS_SKELETON )
-COMP( 1999, gl8008cx, 0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "Genius Leader 8008 CX (Germany)", MACHINE_IS_SKELETON)
-COMP( 1999, bs9009cx, 0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "BrainStation 9009 CXL (Germany)", MACHINE_IS_SKELETON)
-COMP( 2000, gtbmcx,   0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "Genius Tabletop Black Magic CX (Germany)", MACHINE_IS_SKELETON)
+COMP( 1999, gl6600cx, 0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "Genius Leader 6600 CX (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1999, gl8008cx, 0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "Genius Leader 8008 CX (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP( 1999, bs9009cx, 0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "BrainStation 9009 CXL (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP( 2000, gtbmcx,   0, 0, glcx, glcx, glcx_state, empty_init, "VTech", "Genius Tabletop Black Magic CX (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

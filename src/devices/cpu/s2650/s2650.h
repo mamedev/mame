@@ -42,8 +42,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 13; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 6; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 18+15; } // includes interrupt
 	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;

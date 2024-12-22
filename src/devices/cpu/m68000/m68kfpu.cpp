@@ -573,6 +573,10 @@ u32 m68000_musashi_device::READ_EA_32(int ea)
 		{
 			return REG_D()[reg];
 		}
+		case 1: // An
+		{
+			return REG_A()[reg];
+		}
 		case 2:     // (An)
 		{
 			u32 ea = REG_A()[reg];
@@ -1865,20 +1869,7 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 	switch (mode)
 	{
 	case 0:     // Dn
-	#if 0
-		if (dir)
-		{
-			if (regsel & 4) WRITE_EA_32(ea, m_fpcr);
-			if (regsel & 2) WRITE_EA_32(ea, m_fpsr);
-			if (regsel & 1) WRITE_EA_32(ea, m_fpiar);
-		}
-		else
-		{
-			if (regsel & 4) m_fpcr = READ_EA_32(ea);
-			if (regsel & 2) m_fpsr = READ_EA_32(ea);
-			if (regsel & 1) m_fpiar = READ_EA_32(ea);
-		}
-	#endif
+	case 1:     // An
 		break;
 
 	case 2: // (An)
@@ -1943,6 +1934,7 @@ void m68000_musashi_device::fmove_fpcr(u16 w2)
 	switch (mode)
 	{
 	case 0: // Dn
+	case 1: // An
 	case 3: // (An)+
 	case 4: // -(An)
 		if (dir)    // From system control reg to <ea>

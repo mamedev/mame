@@ -139,5 +139,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, clrmatch, 0, fr002, fr002, novadesitec_fr002_state, empty_init, ROT0, "Nova Desitec", "Color Match",  MACHINE_IS_SKELETON )
-GAME( 200?, sportmem, 0, fr002, fr002, novadesitec_fr002_state, empty_init, ROT0, "Nova Desitec", "Sport Memory", MACHINE_IS_SKELETON )
+GAME( 200?, clrmatch, 0, fr002, fr002, novadesitec_fr002_state, empty_init, ROT0, "Nova Desitec", "Color Match",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, sportmem, 0, fr002, fr002, novadesitec_fr002_state, empty_init, ROT0, "Nova Desitec", "Sport Memory", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

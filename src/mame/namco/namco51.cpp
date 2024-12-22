@@ -64,13 +64,13 @@
 void namco_51xx_device::reset(int state)
 {
 	// Reset line is active low.
-	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+	m_cpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void namco_51xx_device::vblank(int state)
 {
 	// The timer is active on falling edges.
-	m_cpu->clock_w(!state);
+	m_cpu->set_input_line(MB88XX_TC_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void namco_51xx_device::rw(int state)
@@ -78,14 +78,14 @@ void namco_51xx_device::rw(int state)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::rw_sync),this), state);
 }
 
-TIMER_CALLBACK_MEMBER( namco_51xx_device::rw_sync )
+TIMER_CALLBACK_MEMBER(namco_51xx_device::rw_sync)
 {
 	m_rw = param;
 }
 
 void namco_51xx_device::chip_select(int state)
 {
-	m_cpu->set_input_line(0, state);
+	m_cpu->set_input_line(MB88XX_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint8_t namco_51xx_device::read()
@@ -98,7 +98,7 @@ void namco_51xx_device::write(uint8_t data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::write_sync),this), data);
 }
 
-TIMER_CALLBACK_MEMBER( namco_51xx_device::write_sync )
+TIMER_CALLBACK_MEMBER(namco_51xx_device::write_sync)
 {
 	m_portO = param;
 }
@@ -108,24 +108,10 @@ uint8_t namco_51xx_device::K_r()
 	return (m_rw << 3) | (m_portO & 0x07);
 }
 
-uint8_t namco_51xx_device::R0_r()
+template<int N>
+uint8_t namco_51xx_device::R_r()
 {
-	return m_in[0]();
-}
-
-uint8_t namco_51xx_device::R1_r()
-{
-	return m_in[1]();
-}
-
-uint8_t namco_51xx_device::R2_r()
-{
-	return m_in[2]();
-}
-
-uint8_t namco_51xx_device::R3_r()
-{
-	return m_in[3]();
+	return m_in[N]();
 }
 
 void namco_51xx_device::O_w(uint8_t data)
@@ -133,13 +119,9 @@ void namco_51xx_device::O_w(uint8_t data)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::O_w_sync),this), data);
 }
 
-TIMER_CALLBACK_MEMBER( namco_51xx_device::O_w_sync )
+TIMER_CALLBACK_MEMBER(namco_51xx_device::O_w_sync)
 {
-	uint8_t out = (param & 0x0f);
-	if (param & 0x10)
-		m_portO = (m_portO & 0x0f) | (out << 4);
-	else
-		m_portO = (m_portO & 0xf0) | (out);
+	m_portO = param;
 }
 
 void namco_51xx_device::P_w(uint8_t data)
@@ -153,7 +135,7 @@ void namco_51xx_device::P_w(uint8_t data)
 
 ROM_START( namco_51xx )
 	ROM_REGION( 0x400, "mcu", 0 )
-	ROM_LOAD( "51xx.bin",     0x0000, 0x0400, CRC(c2f57ef8) SHA1(50de79e0d6a76bda95ffb02fcce369a79e6abfec) )
+	ROM_LOAD( "51xx.bin", 0x0000, 0x0400, CRC(c2f57ef8) SHA1(50de79e0d6a76bda95ffb02fcce369a79e6abfec) )
 ROM_END
 
 DEFINE_DEVICE_TYPE(NAMCO_51XX, namco_51xx_device, "namco51", "Namco 51xx")
@@ -185,12 +167,12 @@ void namco_51xx_device::device_start()
 
 void namco_51xx_device::device_add_mconfig(machine_config &config)
 {
-	MB8843(config, m_cpu, DERIVED_CLOCK(1,1));     /* parent clock, internally divided by 6 */
+	MB8843(config, m_cpu, DERIVED_CLOCK(1,1)); // parent clock, internally divided by 6
 	m_cpu->read_k().set(FUNC(namco_51xx_device::K_r));
-	m_cpu->read_r<0>().set(FUNC(namco_51xx_device::R0_r));
-	m_cpu->read_r<1>().set(FUNC(namco_51xx_device::R1_r));
-	m_cpu->read_r<2>().set(FUNC(namco_51xx_device::R2_r));
-	m_cpu->read_r<3>().set(FUNC(namco_51xx_device::R3_r));
+	m_cpu->read_r<0>().set(FUNC(namco_51xx_device::R_r<0>));
+	m_cpu->read_r<1>().set(FUNC(namco_51xx_device::R_r<1>));
+	m_cpu->read_r<2>().set(FUNC(namco_51xx_device::R_r<2>));
+	m_cpu->read_r<3>().set(FUNC(namco_51xx_device::R_r<3>));
 	m_cpu->write_o().set(FUNC(namco_51xx_device::O_w));
 	m_cpu->write_p().set(FUNC(namco_51xx_device::P_w));
 }

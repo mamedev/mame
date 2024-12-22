@@ -23,7 +23,7 @@ TODO:
 */
 
 #include "emu.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
@@ -289,7 +289,7 @@ GFXDECODE_END
 void rgum_state::rgum(machine_config &config)
 {
 	// basic machine hardware
-	M65C02(config, m_maincpu, 24_MHz_XTAL / 16);  // divisor not verified
+	W65C02(config, m_maincpu, 24_MHz_XTAL / 16);  // divisor not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &rgum_state::main_map);
 
 	// NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z08

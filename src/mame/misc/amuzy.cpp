@@ -18,7 +18,7 @@
     "for girls series"
     GA4004-0 - Wan Wan Dash           - ワンワンダッシュ
     GB4004-0 - Docchi Fighter         - ドッチファイター
-*** GC4004-0 - Kingyo Carnival        - きんぎょかーにばる
+*** GC4004-0 - Kingyo Carnival        - 金魚カーニバル
     GD4004-0 - Mogu Mogu Hammer       - モグモグハンマー
 *** GE4004-0 - Ninniki Ninja Battle   - ニンニキ忍者バトル
 *** GF4004-0 - Waku Waku Diving       - わくわくダイビング
@@ -31,20 +31,20 @@
     KB4004-0 - Boo Boo Donpatchi      - ブーブードンパッチ
     KC4004-0 - Fisherman Battle       - フィッシャーマンバトル
     KD4004-0 - Haunted Hunter         - ホーンテッドハンター
-    KE4004-0 - Zenigata Ponta         - 銭型ポン太
+    KE4004-0 - Zenigata Ponta         - 銭形ポン太
     KF4004-0 - Rodeo King             - ロデオキング
-    KG4004-0 - Dojokko Tsukami        - どじょっこつかみ
+    KG4004-0 - Dojokko Tsukami        - どじょっ子つかみ
 *** KH4004-0 - Katori Attack          - 蚊とりアタック
-*** KI4004-0 - ???                    - ???
+*** KI4004-0 - ??? (maybe unreleased) - ???
     KJ4004-0 - Shippe Champion        - しっぺチャンピオン
-*** KK4004-0 - ???                    - ???
+*** KK4004-0 - ??? (maybe unreleased) - ???
     KL4004-0 - Wanpaku Pirates        - わんぱくパイレーツ
     KM4004-0 - Itazura Cockroach      - いたずらコックローチ
     more?
 
     "kids and kiddy series"
-    YA4004-0 - Acchi Muite Hoi Battle - あっちむいてほいバトル
-*** YB4004-0 - ???                    - ???
+    YA4004-0 - Acchi Muite Hoi Battle - あっちむいてホイバトル
+*** YB4004-0 - Yubi Zumou Senshuken   - 指ずもう選手権
 *** YC4004-0 - Dekopin Janken         - デコピンじゃんけん
 *** YD4004-0 - Tsuna Hiki Champ       - つなひきチャンプ
 *** YE4004-0 - Chanbara Kids          - チャンバラキッズ

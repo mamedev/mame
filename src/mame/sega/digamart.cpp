@@ -134,4 +134,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1983, digamart, 0, digamart, digamart, digamart_state, empty_init, ROT0, "Sega", "Diga Mart (rev. A)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, digamart, 0, digamart, digamart, digamart_state, empty_init, ROT0, "Sega", "Diga Mart (rev. A)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

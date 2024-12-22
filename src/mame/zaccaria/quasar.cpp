@@ -16,9 +16,10 @@ hinting at a strong link between the two companies.
 Zaccaria are an Italian company, Century were based in Manchester UK.
 
 TODO:
-- Missing enemy shooting sound effect, needs netlist?
-- Where is the flipscreen signal?
-- Test/service input isn't working?
+- missing enemy shooting sound effect, needs netlist sound
+- missing color cycling effect after beating 3rd level? seen on an arcade video
+- where is the flipscreen signal?
+- test/service input isn't working?
 
 It's picky about vblank duration: If it's too short, parts of the game run too
 slow. Or if it's too long, parts of the game run too fast, and eg. the 3rd level
@@ -35,7 +36,7 @@ Quasar by Zaccaria (1980)
 
 2650A CPU
 
-I8085 Sound Board
+I8035 Sound Board
 
 *******************************************************************************/
 
@@ -47,7 +48,6 @@ I8085 Sound Board
 #include "machine/gen_latch.h"
 #include "machine/s2636.h"
 #include "sound/dac.h"
-#include "sound/tms5110.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -59,21 +59,21 @@ namespace {
 class quasar_state : public driver_device
 {
 public:
-	quasar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
-		, m_soundlatch(*this, "soundlatch")
-		, m_s2636(*this, "s2636%u", 0U)
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_screen(*this, "screen")
-		, m_palette(*this, "palette")
-		, m_in(*this, "IN%u", 0U)
-		, m_dsw(*this, "DSW%u", 0U)
-		, m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_BIG)
-		, m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_BIG)
-		, m_effectram(*this, "effectram", 0x400, ENDIANNESS_BIG)
-		, m_bullet_ram(*this, "bullet_ram")
+	quasar_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch"),
+		m_s2636(*this, "s2636%u", 0U),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_in(*this, "IN%u", 0U),
+		m_dsw(*this, "DSW%u", 0U),
+		m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_BIG),
+		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_BIG),
+		m_effectram(*this, "effectram", 0x400, ENDIANNESS_BIG),
+		m_bullet_ram(*this, "bullet_ram")
 	{ }
 
 	void quasar(machine_config &config) ATTR_COLD;
@@ -99,30 +99,30 @@ private:
 	required_ioport_array<3> m_dsw;
 
 	// memory
-	memory_share_creator<uint8_t> m_video_ram;
-	memory_share_creator<uint8_t> m_color_ram;
-	memory_share_creator<uint8_t> m_effectram;
-	required_shared_ptr<uint8_t> m_bullet_ram;
+	memory_share_creator<u8> m_video_ram;
+	memory_share_creator<u8> m_color_ram;
+	memory_share_creator<u8> m_effectram;
+	required_shared_ptr<u8> m_bullet_ram;
 
 	bitmap_ind16 m_collision_background;
-	uint8_t m_collision_register = 0U;
-	uint8_t m_effectcontrol = 0U;
+	u8 m_collision = 0U;
+	u8 m_effectcontrol = 0U;
 
-	uint8_t m_page = 0U;
-	uint8_t m_io_page = 0U;
+	u8 m_page = 0U;
+	u8 m_io_page = 0U;
 
-	void video_page_select_w(offs_t offset, uint8_t data);
-	void io_page_select_w(offs_t offset, uint8_t data);
-	void video_w(offs_t offset, uint8_t data);
-	uint8_t io_r();
-	void bullet_w(offs_t offset, uint8_t data);
-	uint8_t collision_r();
-	uint8_t collision_clear_r();
-	void sh_command_w(uint8_t data);
-	uint8_t sh_command_r();
+	void video_page_select_w(offs_t offset, u8 data);
+	void io_page_select_w(offs_t offset, u8 data);
+	void video_w(offs_t offset, u8 data);
+	u8 io_r();
+	void bullet_w(offs_t offset, u8 data);
+	u8 collision_r();
+	u8 collision_clear_r();
+	void sh_command_w(u8 data);
+	u8 sh_command_r();
 	int audio_t1_r();
 	void palette(palette_device &palette) const ATTR_COLD;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void program(address_map &map) ATTR_COLD;
 	void data(address_map &map) ATTR_COLD;
@@ -134,7 +134,7 @@ private:
 void quasar_state::machine_start()
 {
 	// register state save
-	save_item(NAME(m_collision_register));
+	save_item(NAME(m_collision));
 	save_item(NAME(m_effectcontrol));
 	save_item(NAME(m_page));
 	save_item(NAME(m_io_page));
@@ -142,21 +142,20 @@ void quasar_state::machine_start()
 
 void quasar_state::machine_reset()
 {
-	m_collision_register = 0;
+	m_collision = 0;
 	m_page = 0;
 	m_io_page = 8;
 }
 
 
+
 /*******************************************************************************
-
-  Video
-
+    Video
 *******************************************************************************/
 
 void quasar_state::palette(palette_device &palette) const
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	u8 const *const color_prom = memregion("proms")->base();
 
 	// standard 1 bit per color palette (background and sprites)
 	for (int i = 0; i < 8; i++)
@@ -165,24 +164,9 @@ void quasar_state::palette(palette_device &palette) const
 	// effects color map
 	for (int i = 0; i < 0x100; i++)
 	{
-		int bit0, bit1, bit2;
-
-		// red component
-		bit0 = BIT(i, 7);
-		bit1 = BIT(i, 6);
-		bit2 = BIT(i, 5);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		// green component
-		bit0 = BIT(i, 4);
-		bit1 = BIT(i, 3);
-		bit2 = BIT(i, 2);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		// blue component
-		bit0 = BIT(i, 1);
-		bit1 = BIT(i, 0);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const r = pal3bit(bitswap<3>(i, 5, 6, 7));
+		int const g = pal3bit(bitswap<3>(i, 2, 3, 4));
+		int const b = pal2bit(bitswap<2>(i, 0, 1));
 
 		// 4 intensities
 		float level = 0.0f;
@@ -219,14 +203,14 @@ void quasar_state::video_start()
 	save_item(NAME(m_collision_background));
 }
 
-uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// for every character in the video RAM
 	for (int offs = 0; offs < 0x0400; offs++)
 	{
-		uint8_t const code = m_video_ram[offs];
-		uint8_t const x = (offs & 0x1f) << 3;
-		uint8_t const y = (offs >> 5) << 3;
+		u8 const code = m_video_ram[offs];
+		u8 const x = (offs & 0x1f) << 3;
+		u8 const y = (offs >> 5) << 3;
 
 		// While we have the current character code, draw the effects layer
 		// intensity / on and off controlled by latch
@@ -272,8 +256,8 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				if (cliprect.contains(bx, by))
 				{
 					// bullet/object Collision
-					if (s2636_0_bitmap.pix(by, bx) != 0) m_collision_register |= 0x04;
-					if (s2636_2_bitmap.pix(by, bx) != 0) m_collision_register |= 0x08;
+					if (s2636_0_bitmap.pix(by, bx) != 0) m_collision |= 0x04;
+					if (s2636_2_bitmap.pix(by, bx) != 0) m_collision |= 0x08;
 
 					bitmap.pix(by, bx) = 7;
 				}
@@ -299,8 +283,8 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				// S2636 vs. background collision detection
 				if (m_palette->pen_indirect(m_collision_background.pix(y, x)))
 				{
-					if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x01;
-					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x02;
+					if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision |= 0x01;
+					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision |= 0x02;
 				}
 			}
 		}
@@ -310,21 +294,17 @@ uint32_t quasar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
+
 /*******************************************************************************
-
-  Quasar memory layout
-
-  Paging for screen is controlled by OUT to 0,1,2 or 3
-  Paging for IO ports is controlled by OUT to 8,9,A or B
-
+    Quasar memory layout
 *******************************************************************************/
 
-void quasar_state::video_page_select_w(offs_t offset, uint8_t data)
+void quasar_state::video_page_select_w(offs_t offset, u8 data)
 {
 	m_page = offset & 0x03;
 }
 
-void quasar_state::io_page_select_w(offs_t offset, uint8_t data)
+void quasar_state::io_page_select_w(offs_t offset, u8 data)
 {
 	m_io_page = offset & 0x03;
 
@@ -336,8 +316,9 @@ void quasar_state::io_page_select_w(offs_t offset, uint8_t data)
 	}
 }
 
-void quasar_state::video_w(offs_t offset, uint8_t data)
+void quasar_state::video_w(offs_t offset, u8 data)
 {
+	// paging for screen is controlled by OUT to 0,1,2 or 3
 	switch (m_page)
 	{
 		case 0: m_video_ram[offset] = data; break;
@@ -347,10 +328,11 @@ void quasar_state::video_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t quasar_state::io_r()
+u8 quasar_state::io_r()
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
+	// paging for IO ports is controlled by OUT to 8,9,A or B
 	switch (m_io_page)
 	{
 		case 0: data = m_in[0]->read(); break;
@@ -362,20 +344,20 @@ uint8_t quasar_state::io_r()
 	return data;
 }
 
-void quasar_state::bullet_w(offs_t offset, uint8_t data)
+void quasar_state::bullet_w(offs_t offset, u8 data)
 {
 	m_bullet_ram[offset] = data ^ 0xff;
 }
 
-uint8_t quasar_state::collision_r()
+u8 quasar_state::collision_r()
 {
-	return m_collision_register;
+	return m_collision;
 }
 
-uint8_t quasar_state::collision_clear_r()
+u8 quasar_state::collision_clear_r()
 {
 	if (!machine().side_effects_disabled())
-		m_collision_register = 0;
+		m_collision = 0;
 
 	return 0;
 }
@@ -409,13 +391,12 @@ void quasar_state::data(address_map &map)
 }
 
 
+
 /*******************************************************************************
-
-  Sound board memory handlers
-
+    Sound board memory handlers
 *******************************************************************************/
 
-void quasar_state::sh_command_w(uint8_t data)
+void quasar_state::sh_command_w(u8 data)
 {
 	// bit 4 = Sound Invader : Linked to an NE555V circuit
 	// Not handled yet
@@ -424,7 +405,7 @@ void quasar_state::sh_command_w(uint8_t data)
 	m_soundlatch->write(data & 0xf);
 }
 
-uint8_t quasar_state::sh_command_r()
+u8 quasar_state::sh_command_r()
 {
 	return m_soundlatch->read() | (m_dsw[2]->read() & 0x30);
 }
@@ -447,10 +428,9 @@ void quasar_state::sound_portmap(address_map &map)
 }
 
 
+
 /*******************************************************************************
-
-  Input Ports
-
+    Input Ports
 *******************************************************************************/
 
 static INPUT_PORTS_START( quasar )
@@ -500,7 +480,7 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "High Score" )          PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x00, "High Score" )          PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, "Random" )
 	PORT_DIPNAME( 0x06, 0x04, "Random H.S." )         PORT_DIPLOCATION("SW2:2,3") // only if high score is set to random
@@ -508,12 +488,12 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x06, "Medium-High" )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Very_Difficult ) )
-	PORT_DIPNAME( 0x60, 0x40, "Extended Play" )       PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "5500" )
 	PORT_DIPSETTING(    0x40, "7500" )
@@ -528,7 +508,7 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x20, "Sound Program" )       PORT_DIPLOCATION("SOUND:3,4")
 	PORT_DIPSETTING(    0x00, "Invalid 1" )
-//  PORT_DIPSETTING(    0x10, "Invalid 1" )
+	PORT_DIPSETTING(    0x10, "Invalid 1" )
 	PORT_DIPSETTING(    0x30, "Invalid 2" )
 	PORT_DIPSETTING(    0x20, "Quasar" )
 INPUT_PORTS_END
@@ -551,10 +531,9 @@ static GFXDECODE_START( gfx_quasar )
 GFXDECODE_END
 
 
+
 /*******************************************************************************
-
-  Machine Configuration
-
+    Machine Configuration
 *******************************************************************************/
 
 void quasar_state::quasar(machine_config &config)
@@ -579,8 +558,8 @@ void quasar_state::quasar(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_refresh_hz(50); // from dot clock
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3500));
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(1*8+1, 29*8-1, 2*8, 32*8-1);
+	m_screen->set_size(256, 312);
+	m_screen->set_visarea(0*8, 29*8-1, 2*8, 32*8-1);
 	m_screen->set_screen_update(FUNC(quasar_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -588,15 +567,15 @@ void quasar_state::quasar(machine_config &config)
 	PALETTE(config, m_palette, FUNC(quasar_state::palette), (64 + 1) * 8 + (4 * 256), 0x500);
 
 	S2636(config, m_s2636[0], 0);
-	m_s2636[0]->set_offsets(-13, -35);
+	m_s2636[0]->set_offsets(-13, -26);
 	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	S2636(config, m_s2636[1], 0);
-	m_s2636[1]->set_offsets(-13, -35);
+	m_s2636[1]->set_offsets(-13, -26);
 	m_s2636[1]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	S2636(config, m_s2636[2], 0);
-	m_s2636[2]->set_offsets(-13, -35);
+	m_s2636[2]->set_offsets(-13, -26);
 	m_s2636[2]->add_route(ALL_OUTPUTS, "mono", 0.2);
 
 	// sound hardware
@@ -607,10 +586,9 @@ void quasar_state::quasar(machine_config &config)
 }
 
 
+
 /*******************************************************************************
-
-  ROM Definitions
-
+    ROM Definitions
 *******************************************************************************/
 
 ROM_START( quasar )
@@ -676,5 +654,11 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1980, quasar,   0,      quasar,   quasar, quasar_state, empty_init, ROT90, "Zaccaria / Zelco", "Quasar (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, quasara,  quasar, quasar,   quasar, quasar_state, empty_init, ROT90, "Zaccaria / Zelco", "Quasar (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+/*******************************************************************************
+    Game Drivers
+*******************************************************************************/
+
+//    YEAR, NAME,     PARENT, MACHINE,  INPUT,  CLASS,        INIT,       SCREEN, COMPANY,            FULLNAME,         FLAGS
+GAME( 1980, quasar,   0,      quasar,   quasar, quasar_state, empty_init, ROT90,  "Zaccaria / Zelco", "Quasar (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, quasara,  quasar, quasar,   quasar, quasar_state, empty_init, ROT90,  "Zaccaria / Zelco", "Quasar (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

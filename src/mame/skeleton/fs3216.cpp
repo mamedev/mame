@@ -566,4 +566,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1982, fs3216, 0, 0, fs3216, fs3216, fs3216_state, empty_init, "Fortune Systems", "Fortune 32:16", MACHINE_IS_SKELETON)
+COMP(1982, fs3216, 0, 0, fs3216, fs3216, fs3216_state, empty_init, "Fortune Systems", "Fortune 32:16", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

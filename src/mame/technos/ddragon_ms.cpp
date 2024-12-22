@@ -183,4 +183,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, ddragonm, ddragon, ddragonm, ddragonm, ddragon_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Double Dragon (Modular System)", MACHINE_IS_SKELETON )
+GAME( 1987, ddragonm, ddragon, ddragonm, ddragonm, ddragon_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Double Dragon (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

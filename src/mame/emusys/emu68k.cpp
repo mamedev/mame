@@ -240,10 +240,10 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1989, proteus1,  0, 0, proteus1,  proteus1,  emu68k_state, empty_init, "E-mu Systems", "Proteus/1 16-Bit Multi-Timbral Digital Sound Module", MACHINE_IS_SKELETON)
-SYST(1989, proteusxr, 0, 0, proteusxr, proteus1,  emu68k_state, empty_init, "E-mu Systems", "Proteus/1 XR 16-Bit Multi-Timbral Digital Sound Module", MACHINE_IS_SKELETON)
-SYST(1991, procuss,   0, 0, proteusxr, procuss,   emu68k_state, empty_init, "E-mu Systems", "Pro/Cussion Maximum Percussion Module", MACHINE_IS_SKELETON)
-SYST(1993, vintkeys,  0, 0, vintkeys,  vintkeys,  emu68k_state, empty_init, "E-mu Systems", "Vintage Keys Classic Analog Keyboards", MACHINE_IS_SKELETON)
-SYST(1996, orbit9090, 0, 0, phatt,     orbit9090, emu68k_state, empty_init, "E-mu Systems", "Orbit 9090 - The Dance Planet", MACHINE_IS_SKELETON)
-SYST(1997, phatt,     0, 0, phatt,     phatt,     emu68k_state, empty_init, "E-mu Systems", "Planet Phatt - The Swing System", MACHINE_IS_SKELETON)
-SYST(1997, carnaval,  0, 0, phatt,     carnaval,  emu68k_state, empty_init, "E-mu Systems", "Carnaval - Jugando con Fuego", MACHINE_IS_SKELETON)
+SYST(1989, proteus1,  0, 0, proteus1,  proteus1,  emu68k_state, empty_init, "E-mu Systems", "Proteus/1 16-Bit Multi-Timbral Digital Sound Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1989, proteusxr, 0, 0, proteusxr, proteus1,  emu68k_state, empty_init, "E-mu Systems", "Proteus/1 XR 16-Bit Multi-Timbral Digital Sound Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1991, procuss,   0, 0, proteusxr, procuss,   emu68k_state, empty_init, "E-mu Systems", "Pro/Cussion Maximum Percussion Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1993, vintkeys,  0, 0, vintkeys,  vintkeys,  emu68k_state, empty_init, "E-mu Systems", "Vintage Keys Classic Analog Keyboards", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1996, orbit9090, 0, 0, phatt,     orbit9090, emu68k_state, empty_init, "E-mu Systems", "Orbit 9090 - The Dance Planet", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1997, phatt,     0, 0, phatt,     phatt,     emu68k_state, empty_init, "E-mu Systems", "Planet Phatt - The Swing System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1997, carnaval,  0, 0, phatt,     carnaval,  emu68k_state, empty_init, "E-mu Systems", "Carnaval - Jugando con Fuego", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

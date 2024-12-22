@@ -526,7 +526,7 @@ static INPUT_PORTS_START( atetris )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "50H:!2" )   // Listed As "SPARE2 (Unused)"
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "50H:!1" )   // Listed As "SPARE1 (Unused)"
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
 	// The control panel has a start and an action button for both players. The board has them connected together on the JAMMA connector.

@@ -15,16 +15,17 @@
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
 
 struct M92_pf_layer_info
 {
-	tilemap_t *     tmap = nullptr;
-	tilemap_t *     wide_tmap = nullptr;
-	uint16_t          vram_base = 0;
-	uint16_t          control[4]{};
+	tilemap_t *tmap = nullptr;
+	tilemap_t *wide_tmap = nullptr;
+	uint16_t vram_base = 0;
+	uint16_t control[4]{};
 };
 
 class m92_state : public driver_device
@@ -126,6 +127,7 @@ private:
 	void m92_base_map(address_map &map) ATTR_COLD;
 	void m92_portmap(address_map &map) ATTR_COLD;
 	void majtitl2_map(address_map &map) ATTR_COLD;
+	void nbbatman2bl_map(address_map &map) ATTR_COLD;
 	void ppan_portmap(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 

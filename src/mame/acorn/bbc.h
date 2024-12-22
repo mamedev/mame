@@ -12,8 +12,8 @@
 
 #pragma once
 
+#include "cpu/m6502/g65sc02.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65sc02.h"
 #include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/6522via.h"

@@ -421,7 +421,7 @@ static INPUT_PORTS_START( cobra )
 	PORT_INCLUDE( begas )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	// TODO: different dips
 INPUT_PORTS_END
@@ -430,7 +430,7 @@ static INPUT_PORTS_START( rblaster )
 	PORT_INCLUDE( begas )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	// TODO: different dips
 INPUT_PORTS_END

@@ -71,7 +71,7 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	void c800_w(uint8_t data);
+	void control_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -147,7 +147,7 @@ void higemaru_state::palette(palette_device &palette) const
 	}
 }
 
-void higemaru_state::c800_w(uint8_t data)
+void higemaru_state::control_w(uint8_t data)
 {
 	if (data & 0x7c)
 		LOGC800("c800 = %02x\n", data);
@@ -238,7 +238,7 @@ void higemaru_state::program_map(address_map &map)
 	map(0xc002, 0xc002).portr("SYSTEM");
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
-	map(0xc800, 0xc800).w(FUNC(higemaru_state::c800_w));
+	map(0xc800, 0xc800).w(FUNC(higemaru_state::control_w));
 	map(0xc801, 0xc802).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xc803, 0xc804).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0xd000, 0xd3ff).ram().w(FUNC(higemaru_state::videoram_w)).share(m_videoram);

@@ -155,7 +155,6 @@ private:
 	void tms_control3_w(int state);
 	void adsp_control_w(offs_t offset, uint16_t data);
 	void adsp_rombank_w(offs_t offset, uint16_t data);
-	void radikalb_lamp_w(int state);
 	void unknown_137_w(int state);
 	void unknown_13a_w(int state);
 	void gaelco3d_render_w(uint32_t data);

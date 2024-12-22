@@ -3,19 +3,19 @@
 
 #include "emu.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
-
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplipt.h"
-#include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ymopm.h"
 #include "sound/ymopl.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*
 * Name        Board No      Maker         Game name
@@ -26,7 +26,7 @@ pipibibsp   TP-025        Toaplan       Pipi & Bibis / Whoopee!! (Prototype)
 pipibibsbl  bootleg       Toaplan       Pipi & Bibis / Whoopee!! (based of the prototype)
 
 TODO:
-	- move bootlegs to oneshot.cpp driver
+    - move bootlegs to oneshot.cpp driver
 */
 
 namespace {
@@ -44,7 +44,7 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	void pipibibs(machine_config &config);
+	void pipibibs(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -56,7 +56,6 @@ protected:
 
 	void pipibibs_68k_mem(address_map &map) ATTR_COLD;
 	void pipibibs_sound_z80_mem(address_map &map) ATTR_COLD;
-	void reset(int state);
 
 	required_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	required_device<m68000_base_device> m_maincpu;
@@ -74,20 +73,14 @@ public:
 		: pipibibi_state(mconfig, type, tag)
 	{ }
 
-	void pipibibsbl(machine_config &config);
+	void pipibibsbl(machine_config &config) ATTR_COLD;
 
-	void init_pipibibsbl();
+	void init_pipibibsbl() ATTR_COLD;
 
 private:
 	void cpu_space_pipibibsbl_map(address_map &map) ATTR_COLD;
 	void pipibibi_bootleg_68k_mem(address_map &map) ATTR_COLD;
-
 };
-
-void pipibibi_state::reset(int state)
-{
-	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-}
 
 void pipibibi_state::video_start()
 {
@@ -282,7 +275,7 @@ void pipibibi_state::pipibibs(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &pipibibi_state::pipibibs_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(pipibibi_state::reset));
+	m_maincpu->reset_cb().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	Z80(config, m_audiocpu, 27_MHz_XTAL/8);         // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pipibibi_state::pipibibs_sound_z80_mem);
@@ -320,7 +313,7 @@ void pipibibi_bootleg_state::pipibibsbl(machine_config &config)
 	M68000(config, m_maincpu, 12_MHz_XTAL); // ??? (position labeled "68000-12" but 10 MHz-rated parts used)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pipibibi_bootleg_state::pipibibi_bootleg_68k_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &pipibibi_bootleg_state::cpu_space_pipibibsbl_map);
-	m_maincpu->reset_cb().set(FUNC(pipibibi_bootleg_state::reset));
+	m_maincpu->reset_cb().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // GoldStar Z8400B; clock source and divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &pipibibi_bootleg_state::pipibibs_sound_z80_mem);
@@ -491,5 +484,3 @@ GAME( 1991, pipibibsp,   pipibibs, pipibibs,     pipibibsp,  pipibibi_state, emp
 GAME( 1991, pipibibsbl,  pipibibs, pipibibsbl,   pipibibsbl, pipibibi_bootleg_state, init_pipibibsbl, ROT0, "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (Ryouta Kikaku bootleg, encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, pipibibsbl2, pipibibs, pipibibsbl,   pipibibsbl, pipibibi_bootleg_state, empty_init,    ROT0,   "bootleg",                 "Pipi & Bibis / Whoopee!! (bootleg, decrypted)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map, not scrambled
 GAME( 1991, pipibibsbl3, pipibibs, pipibibsbl,   pipibibsbl, pipibibi_bootleg_state, empty_init,    ROT0,   "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (Ryouta Kikaku bootleg, decrypted)", MACHINE_SUPPORTS_SAVE )
-
-

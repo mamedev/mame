@@ -1499,7 +1499,7 @@ end
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
 
-	configuration { "linux*" }
+	configuration { "linux*", "not mingw*" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/directx-headers/include/wsl/stubs",
 			MAME_DIR .. "3rdparty/bx/include/compat/linux",

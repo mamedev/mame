@@ -375,7 +375,7 @@ void williams_state::sinistar_vram_select_w(u8 data)
 	vram_select_w(data);
 
 	// window enable from bit 2 (clips to 0x7400)
-	m_blitter_window_enable = BIT(data, 2);
+	m_blitter->window_enable_w(BIT(data, 2));
 }
 
 
@@ -421,7 +421,7 @@ void blaster_state::blaster_vram_select_w(u8 data)
 	m_cocktail = BIT(data, 1);
 
 	// window enable from bit 2 (clips to 0x9700)
-	m_blitter_window_enable = BIT(data, 2);
+	m_blitter->window_enable_w(BIT(data, 2));
 }
 
 

@@ -155,4 +155,4 @@ ROM_END
 
 
 //   YEAR  NAME       PARENT COMPAT MACHINE    INPUT      CLASS            INIT        COMPANY  FULLNAME                                              FLAGS
-SYST(19??, semcrossw, 0,     0,     semcrossw, semcrossw, semcrossw_state, empty_init, "Etra",  "Crosswalk traffic light controller (unknown model)", MACHINE_IS_SKELETON)
+SYST(19??, semcrossw, 0,     0,     semcrossw, semcrossw, semcrossw_state, empty_init, "Etra",  "Crosswalk traffic light controller (unknown model)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

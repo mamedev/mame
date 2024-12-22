@@ -73,7 +73,8 @@ device_memory_interface::space_config_vector s2650_device::memory_space_config()
 
 
 // condition code changes for a byte
-static const uint8_t ccc[0x100] = {
+static const uint8_t ccc[0x100] =
+{
 	0x00,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
 	0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
 	0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
@@ -196,6 +197,7 @@ inline int s2650_device::check_irq_line()
 			int vector = m_intack_handler();
 
 			// build effective address within first 8K page
+			cycles += 9; // ZBSR
 			m_ea = util::sext(vector, 7) & PMSK;
 			if (vector & 0x80) // indirect bit set ?
 			{
@@ -215,6 +217,7 @@ inline int s2650_device::check_irq_line()
 			m_iar  = m_ea & PMSK;
 		}
 	}
+
 	return cycles;
 }
 
@@ -617,7 +620,7 @@ inline uint8_t s2650_device::ARG()
 	if ((res & 0x100) == 0) m_psl |= C;                         \
 	dest = res & 0xff;                                          \
 	if (~(dest ^ before ^ source) & 0x10) m_psl |= IDC;         \
-	if ((before ^ dest) & (source ^ dest) & 0x80) m_psl |= OVF; \
+	if ((before ^ source) & (before ^ dest) & 0x80) m_psl |= OVF; \
 	SET_CC(dest);                                               \
 }
 
@@ -905,7 +908,7 @@ void s2650_device::state_string_export(const device_state_entry &entry, std::str
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c",
 				m_psu & 0x80 ? 'S':'.',
 				m_psu & 0x40 ? 'O':'.',
 				m_psu & 0x20 ? 'I':'.',

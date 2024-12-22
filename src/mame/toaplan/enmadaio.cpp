@@ -3,17 +3,17 @@
 
 #include "emu.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
-
-#include "toaplipt.h"
 #include "gp9001.h"
+#include "toaplipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*
 Name        Board No      Maker         Game name
@@ -36,9 +36,9 @@ public:
 		, m_okibank(*this, "okibank")
 	{ }
 
-	void enmadaio(machine_config &config);
+	void enmadaio(machine_config &config) ATTR_COLD;
 
-	void init_enmadaio();
+	void init_enmadaio() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -77,7 +77,7 @@ u32 enmadaio_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void enmadaio_state::screen_vblank(int state)
 {
-	if (state) 	// rising edge
+	if (state)  // rising edge
 	{
 		m_vdp->screen_eof();
 	}

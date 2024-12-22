@@ -13,9 +13,11 @@
 #pragma once
 
 #include "ui/menu.h"
+#include "ui/text.h"
 
 #include "notifier.h"
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -25,9 +27,9 @@ namespace ui {
 class menu_file_manager : public menu
 {
 public:
-	static void force_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings);
+	static void force_file_manager(mame_ui_manager &mui, render_container &container, std::string &&warnings);
 
-	menu_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings);
+	menu_file_manager(mame_ui_manager &mui, render_container &container, std::string &&warnings);
 	virtual ~menu_file_manager();
 
 protected:
@@ -42,6 +44,7 @@ private:
 
 	std::string const m_warnings;
 	std::vector<util::notifier_subscription> m_notifiers;
+	std::optional<text_layout> m_warnings_layout;
 	device_image_interface *m_selected_device;
 };
 

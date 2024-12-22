@@ -390,5 +390,5 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1991, ncd19c, 0, 0, ncd19c, ncd19c, ncd88k_state, empty_init, "Network Computing Devices", "19c", MACHINE_IS_SKELETON)
-COMP(1993, ncdmcx, 0, 0, ncdmcx, 0,      ncdmcx_state, empty_init, "Network Computing Devices", "MCX", MACHINE_IS_SKELETON)
+COMP(1991, ncd19c, 0, 0, ncd19c, ncd19c, ncd88k_state, empty_init, "Network Computing Devices", "19c", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1993, ncdmcx, 0, 0, ncdmcx, 0,      ncdmcx_state, empty_init, "Network Computing Devices", "MCX", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

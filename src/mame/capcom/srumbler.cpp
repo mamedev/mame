@@ -10,21 +10,25 @@
 
   M6809 for game, Z80 and YM-2203 for sound.
 
+  TODO:
+  - Verify screen refresh rate. Start a game (wait for credit sound to finish),
+    and at the intro, the music theme should change at the same time Zapper's
+    love letter is shown. ~59.6Hz from other Capcom games is too fast.
+
 ***************************************************************************/
 
 #include "emu.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/ymopn.h"
+#include "video/bufsprite.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
-
-#include "machine/timer.h"
-#include "video/bufsprite.h"
-#include "emupal.h"
 #include "tilemap.h"
 
 
@@ -69,7 +73,7 @@ private:
 	void bankswitch_w(uint8_t data);
 	void foreground_w(offs_t offset, uint8_t data);
 	void background_w(offs_t offset, uint8_t data);
-	void _4009_w(uint8_t data);
+	void control_w(uint8_t data);
 	void scroll_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -151,7 +155,7 @@ void srumbler_state::background_w(offs_t offset, uint8_t data)
 }
 
 
-void srumbler_state::_4009_w(uint8_t data)
+void srumbler_state::control_w(uint8_t data)
 {
 	// bit 0 flips screen
 	flip_screen_set(data & 1);
@@ -200,7 +204,6 @@ void srumbler_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		0x01 X MSB
 		*/
 
-
 		int const attr = buffered_spriteram[offs + 1];
 		int code = buffered_spriteram[offs];
 		code += ((attr & 0xe0) << 3);
@@ -231,6 +234,7 @@ uint32_t srumbler_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
@@ -238,13 +242,13 @@ uint32_t srumbler_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void srumbler_state::bankswitch_w(uint8_t data)
 {
 	/*
-	  banking is controlled by two PROMs. 0000-4fff is mapped to the same
-	  address (RAM and I/O) for all banks, so we don't handle it here.
-	  e000-ffff is all mapped to the same ROMs, however we do handle it
-	  here anyway.
-	  Note that 5000-8fff can be either ROM or RAM, so we should handle
-	  that as well to be 100% accurate.
-	 */
+	    banking is controlled by two PROMs. 0000-4fff is mapped to the same
+	    address (RAM and I/O) for all banks, so we don't handle it here.
+	    e000-ffff is all mapped to the same ROMs, however we do handle it
+	    here anyway.
+	    Note that 5000-8fff can be either ROM or RAM, so we should handle
+	    that as well to be 100% accurate.
+	*/
 	uint8_t const *prom1 = &m_proms[data & 0xf0];
 	uint8_t const *prom2 = &m_proms[0x100 + ((data & 0x0f) << 4)];
 
@@ -273,7 +277,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(srumbler_state::interrupt)
 	if (scanline == 248)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 
-	if (scanline == 0)
+	if (scanline == 8)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
@@ -289,11 +293,11 @@ Ignore the warnings about writing to unmapped memory.
 
 void srumbler_state::main_map(address_map &map)
 {
-	map(0x0000, 0x1dff).ram();  // RAM (of 1 sort or another)
+	map(0x0000, 0x1dff).ram(); // RAM (of 1 sort or another)
 	map(0x1e00, 0x1fff).ram().share("spriteram");
 	map(0x2000, 0x3fff).ram().w(FUNC(srumbler_state::background_w)).share(m_backgroundram);
 	map(0x4008, 0x4008).portr("SYSTEM").w(FUNC(srumbler_state::bankswitch_w));
-	map(0x4009, 0x4009).portr("P1").w(FUNC(srumbler_state::_4009_w));
+	map(0x4009, 0x4009).portr("P1").w(FUNC(srumbler_state::control_w));
 	map(0x400a, 0x400a).portr("P2");
 	map(0x400b, 0x400b).portr("DSW1");
 	map(0x400c, 0x400c).portr("DSW2");
@@ -301,7 +305,7 @@ void srumbler_state::main_map(address_map &map)
 	map(0x400e, 0x400e).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x5000, 0x5fff).bankr(m_rombank[0]).w(FUNC(srumbler_state::foreground_w)).share(m_foregroundram);
 	map(0x6000, 0x6fff).bankr(m_rombank[1]);
-	map(0x6000, 0x6fff).nopw();        // Video RAM 2 ??? (not used)
+	//map(0x6000, 0x6fff).nopw(); // Video RAM 2 ??? (not used)
 	map(0x7000, 0x7fff).bankr(m_rombank[2]);
 	map(0x7000, 0x73ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x8000, 0x8fff).bankr(m_rombank[3]);
@@ -465,10 +469,10 @@ void srumbler_state::srumbler(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(57.5);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(10*8, (64-10)*8-1, 1*8, 31*8-1 );
+	screen.set_visarea(10*8, (64-10)*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(srumbler_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -487,13 +491,13 @@ void srumbler_state::srumbler(machine_config &config)
 	ym1.add_route(0, "mono", 0.10);
 	ym1.add_route(1, "mono", 0.10);
 	ym1.add_route(2, "mono", 0.10);
-	ym1.add_route(3, "mono", 0.30);
+	ym1.add_route(3, "mono", 0.25);
 
 	ym2203_device &ym2(YM2203(config, "ym2", 16_MHz_XTAL / 4));
 	ym2.add_route(0, "mono", 0.10);
 	ym2.add_route(1, "mono", 0.10);
 	ym2.add_route(2, "mono", 0.10);
-	ym2.add_route(3, "mono", 0.30);
+	ym2.add_route(3, "mono", 0.25);
 }
 
 

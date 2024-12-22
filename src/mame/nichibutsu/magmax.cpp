@@ -32,6 +32,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/rescap.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/flt_biquad.h"
 #include "sound/mixer.h"
@@ -79,7 +80,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -102,7 +102,6 @@ private:
 	uint8_t m_ls74_clr = 0;
 	uint8_t m_ls74_q = 0;
 	uint8_t m_gain_control = 0;
-	emu_timer *m_interrupt_timer = nullptr;
 	uint8_t m_flipscreen = 0;
 	std::unique_ptr<uint32_t[]> m_prom_tab;
 	bitmap_ind16 m_bitmap;
@@ -115,7 +114,7 @@ private:
 
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(scanline_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_io_map(address_map &map) ATTR_COLD;
@@ -136,6 +135,7 @@ private:
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
+
 void magmax_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
@@ -233,10 +233,10 @@ uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				uint32_t const prom_data = m_prom_tab[(ls283 >> 6) & 0xff];
 
 				rom18d_addr &= 0x20f8;
-				rom18d_addr += (prom_data & 0x1f00) + ((ls283 & 0x38) >>3);
+				rom18d_addr += (prom_data & 0x1f00) + ((ls283 & 0x38) >> 3);
 
 				rom15f_addr &= 0x201c;
-				rom15f_addr += (m_rom18b[0x4000 + rom18d_addr]<<5) + ((ls283 & 0x6)>>1);
+				rom15f_addr += (m_rom18b[0x4000 + rom18d_addr] << 5) + ((ls283 & 0x6) >> 1);
 				rom15f_addr += (prom_data & 0x4000);
 
 				uint32_t const graph_color = (prom_data & 0x0070);
@@ -249,7 +249,7 @@ uint32_t magmax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				line_data[h] = pen_base + graph_color + graph_data;
 
 				// priority: background over sprites
-				if (map_v_scr_100 && ((graph_data & 0x0c)==0x0c))
+				if (map_v_scr_100 && ((graph_data & 0x0c) == 0x0c))
 					m_bitmap.pix(v, h) = line_data[h];
 			}
 
@@ -346,88 +346,71 @@ void magmax_state::ay8910_portb_0_w(uint8_t data)
 {
 	// bit 0 is input to CLR line of the LS74
 	m_ls74_clr = data & 1;
-	if (m_ls74_clr == 0)
-		m_ls74_q = 0;
+	m_ls74_q &= m_ls74_clr;
 }
 
-TIMER_CALLBACK_MEMBER(magmax_state::scanline_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(magmax_state::sound_timer)
 {
-	int scanline = param;
-
 	/* bit 0 goes hi whenever line V6 from video part goes lo->hi
 	   that is when scanline is 64 and 192 accordingly */
-	if (m_ls74_clr != 0)
-		m_ls74_q = 1;
-
-	scanline += 128;
-	scanline &= 255;
-
-	m_interrupt_timer->adjust(m_screen->time_until_pos(scanline), scanline);
+	m_ls74_q = m_ls74_clr;
 }
 
 void magmax_state::machine_start()
 {
-	// Create interrupt timer
-	m_interrupt_timer = timer_alloc(FUNC(magmax_state::scanline_callback), this);
-
 	// Set up save state
 	save_item(NAME(m_ls74_clr));
 	save_item(NAME(m_ls74_q));
 	save_item(NAME(m_gain_control));
 }
 
-void magmax_state::machine_reset()
-{
-	m_interrupt_timer->adjust(m_screen->time_until_pos(64), 64);
-}
-
 
 
 void magmax_state::ay8910_porta_0_w(uint8_t data)
 {
-/*There are three AY8910 chips and four(!) separate amplifiers on the board
-* Each of AY channels is hardware mapped in following way:
-* amplifier 0 gain x 1.00 <- AY0 CHA
-* amplifier 1 gain x 1.00 <- AY0 CHB + AY0 CHC + AY1 CHA + AY1 CHB
-* amplifier 2 gain x 4.54 (150K/33K) <- AY1 CHC + AY2 CHA
-* amplifier 3 gain x 4.54 (150K/33K) <- AY2 CHB + AY2 CHC
-*
-* Each of the amps has its own analog circuit:
-* amp0, amp1 and amp2 are different from each other; amp3 is the same as amp2
-*
-* Outputs of those amps are inputs to post amps, each having own circuit
-* that is partially controlled by AY #0 port A.
-* PORT A BIT 0 - control postamp 0 (gain x10.0 | gain x 5.00)
-* PORT A BIT 1 - control postamp 1 (gain x4.54 | gain x 2.27)
-* PORT A BIT 2 - control postamp 2 (gain x1.00 | gain x 0.50)
-* PORT A BIT 3 - control postamp 3 (gain x1.00 | gain x 0.50)
-*
-* The "control" means assert/clear input pins on chip called 4066 (it is analog switch)
-* which results in volume gain (exactly 2 times).
-* I use set_output_gain() to emulate the effect.
+	/* There are three AY8910 chips and four(!) separate amplifiers on the board
+	* Each of AY channels is hardware mapped in following way:
+	* amplifier 0 gain x 1.00 <- AY0 CHA
+	* amplifier 1 gain x 1.00 <- AY0 CHB + AY0 CHC + AY1 CHA + AY1 CHB
+	* amplifier 2 gain x 4.54 (150K/33K) <- AY1 CHC + AY2 CHA
+	* amplifier 3 gain x 4.54 (150K/33K) <- AY2 CHB + AY2 CHC
+	*
+	* Each of the amps has its own analog circuit:
+	* amp0, amp1 and amp2 are different from each other; amp3 is the same as amp2
+	*
+	* Outputs of those amps are inputs to post amps, each having own circuit
+	* that is partially controlled by AY #0 port A.
+	* PORT A BIT 0 - control postamp 0 (gain x10.0 | gain x 5.00)
+	* PORT A BIT 1 - control postamp 1 (gain x4.54 | gain x 2.27)
+	* PORT A BIT 2 - control postamp 2 (gain x1.00 | gain x 0.50)
+	* PORT A BIT 3 - control postamp 3 (gain x1.00 | gain x 0.50)
+	*
+	* The "control" means assert/clear input pins on chip called 4066 (it is analog switch)
+	* which results in volume gain (exactly 2 times).
+	* I use set_output_gain() to emulate the effect.
 
-gain summary:
-port A control ON         OFF
-amp0 = *1*10.0=10.0  *1*5.0   = 5.0
-amp1 = *1*4.54=4.54  *1*2.27  = 2.27
-amp2 = *4.54*1=4.54  *4.54*0.5= 2.27
-amp3 = *4.54*1=4.54  *4.54*0.5= 2.27
-*/
+	gain summary:
+	port A control ON         OFF
+	amp0 = *1*10.0=10.0  *1*5.0   = 5.0
+	amp1 = *1*4.54=4.54  *1*2.27  = 2.27
+	amp2 = *4.54*1=4.54  *4.54*0.5= 2.27
+	amp3 = *4.54*1=4.54  *4.54*0.5= 2.27
+	*/
 
-/*
-bit0 - SOUND Chan#0 name=AY-3-8910 #0 Ch A
+	/*
+	bit0 - SOUND Chan#0 name=AY-3-8910 #0 Ch A
 
-bit1 - SOUND Chan#1 name=AY-3-8910 #0 Ch B
-bit1 - SOUND Chan#2 name=AY-3-8910 #0 Ch C
-bit1 - SOUND Chan#3 name=AY-3-8910 #1 Ch A
-bit1 - SOUND Chan#4 name=AY-3-8910 #1 Ch B
+	bit1 - SOUND Chan#1 name=AY-3-8910 #0 Ch B
+	bit1 - SOUND Chan#2 name=AY-3-8910 #0 Ch C
+	bit1 - SOUND Chan#3 name=AY-3-8910 #1 Ch A
+	bit1 - SOUND Chan#4 name=AY-3-8910 #1 Ch B
 
-bit2 - SOUND Chan#5 name=AY-3-8910 #1 Ch C
-bit2 - SOUND Chan#6 name=AY-3-8910 #2 Ch A
+	bit2 - SOUND Chan#5 name=AY-3-8910 #1 Ch C
+	bit2 - SOUND Chan#6 name=AY-3-8910 #2 Ch A
 
-bit3 - SOUND Chan#7 name=AY-3-8910 #2 Ch B
-bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
-*/
+	bit3 - SOUND Chan#7 name=AY-3-8910 #2 Ch B
+	bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
+	*/
 
 	if (m_gain_control == (data & 0x0f))
 		return;
@@ -436,11 +419,13 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 
 	LOGGAINCTRL("gain_ctrl = %2x", data & 0x0f);
 
-	const double mix_resistors[4] = { RES_K(1.0), RES_K(2.2), RES_K(10.0), RES_K(10.0) }; // R35, R33, R32, R34
 	for (int i = 0; i < 4; i++)
 	{
-		// RES_K(5) == (1.0 / ((1.0 / RES_K(10)) + (1.0 / RES_K(10)))) because of the optional extra 10k in parallel in each inverting amplifier circuit
-		// the total max number of output gain 'units' of all 4 inputs is 10 + 10/2.2 + 1 + 1 = 16.545454, so we divide the gain amount by this number so we don't clip
+		const double mix_resistors[4] = { RES_K(1.0), RES_K(2.2), RES_K(10.0), RES_K(10.0) }; // R35, R33, R32, R34
+
+		// RES_K(5) == (1.0 / ((1.0 / RES_K(10)) + (1.0 / RES_K(10)))) because of the optional extra 10k in parallel in each inverting amplifier circuit.
+		// The total max number of output gain 'units' of all 4 inputs is 10 + 10/2.2 + 1 + 1 = 16.545454,
+		// so we divide the gain amount by this number so we don't clip.
 		m_ayfilter[i]->set_output_gain(0, (-1.0 * (((m_gain_control & (1 << i)) ? RES_K(10) : RES_K(5)) / mix_resistors[i] )) / 16.545454);
 		//m_ayfilter[i]->set_output_gain(0, (m_gain_control & (1 << i)) ? 1.0 : 0.5);
 	}
@@ -595,7 +580,7 @@ GFXDECODE_END
 void magmax_state::magmax(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(16'000'000) / 2);   // verified on PCB
+	M68000(config, m_maincpu, XTAL(16'000'000) / 2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &magmax_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(magmax_state::irq1_line_assert));
 
@@ -604,7 +589,6 @@ void magmax_state::magmax(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &magmax_state::sound_io_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -620,13 +604,20 @@ void magmax_state::magmax(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	FILTER_BIQUAD(config, m_ayfilter[0]).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(22), CAP_N(10)); // R22, R23, nothing(infinite resistance), wire(short), C16, C19
+	// R22, R23, nothing(infinite resistance), wire(short), C16, C19
+	FILTER_BIQUAD(config, m_ayfilter[0]).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(22), CAP_N(10));
 	m_ayfilter[0]->add_route(ALL_OUTPUTS, "speaker", 1.0); // <- gain here is controlled by m_ay[0] IOA0 and resistor R35
-	FILTER_BIQUAD(config, m_ayfilter[1]).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R26, R27, nothing(infinite resistance), wire(short), C18, C14
+
+	// R26, R27, nothing(infinite resistance), wire(short), C18, C14
+	FILTER_BIQUAD(config, m_ayfilter[1]).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7));
 	m_ayfilter[1]->add_route(ALL_OUTPUTS, "speaker", 1.0); // <- gain here is controlled by m_ay[0] IOA1 and resistor R33
-	FILTER_BIQUAD(config, m_ayfilter[2]).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_P(330)); // R24, wire(short), R28, wire(short), C22
+
+	// R24, wire(short), R28, wire(short), C22
+	FILTER_BIQUAD(config, m_ayfilter[2]).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_P(330));
 	m_ayfilter[2]->add_route(ALL_OUTPUTS, "speaker", 1.0); // <- gain here is controlled by m_ay[0] IOA2 and resistor R32
-	FILTER_BIQUAD(config, m_ayfilter[3]).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_P(330)); // R25, wire(short), R31, wire(short), C23
+
+	// R25, wire(short), R31, wire(short), C23
+	FILTER_BIQUAD(config, m_ayfilter[3]).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_P(330));
 	m_ayfilter[3]->add_route(ALL_OUTPUTS, "speaker", 1.0); // <- gain here is controlled by m_ay[0] IOA3 and resistor R34
 
 	MIXER(config, m_aymixer[0]).add_route(0, m_ayfilter[1], 1.0);
@@ -653,6 +644,8 @@ void magmax_state::magmax(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 	m_soundlatch->set_separate_acknowledge(true);
+
+	TIMER(config, "sound_timer").configure_scanline(FUNC(magmax_state::sound_timer), "screen", 64, 128);
 }
 
 

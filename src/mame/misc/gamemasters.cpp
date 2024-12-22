@@ -154,4 +154,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1989, gmsshoot, 0, gmsshoot, gmsshoot, gamemasters_state, empty_init, ROT0, "GameMasters", "Sharpshooter (coin pusher)", MACHINE_IS_SKELETON_MECHANICAL) // flyer and PCB dated 1988, but program strings claim 1989 copyright
+GAME(1989, gmsshoot, 0, gmsshoot, gmsshoot, gamemasters_state, empty_init, ROT0, "GameMasters", "Sharpshooter (coin pusher)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK) // flyer and PCB dated 1988, but program strings claim 1989 copyright

@@ -3,19 +3,19 @@
 
 #include "emu.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
-
+#include "gp9001.h"
 #include "toaplan_coincounter.h"
 #include "toaplipt.h"
-#include "gp9001.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/nec/v25.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
 
 /*
 Name        Board No      Maker         Game name
@@ -51,9 +51,10 @@ public:
 		, m_coincounter(*this, "coincounter")
 	{ }
 
-	void batsugun(machine_config &config);
+	void batsugun(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	required_device<m68000_base_device> m_maincpu;
@@ -73,8 +74,7 @@ private:
 
 	void screen_vblank(int state);
 
-	void sound_reset_w(u8 data);
-	void reset(int state);
+	void reset_audiocpu(int state);
 
 	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_device<cpu_device> m_audiocpu;
@@ -190,15 +190,16 @@ void batsugun_state::screen_vblank(int state)
 }
 
 
-void batsugun_state::reset(int state)
+void batsugun_state::reset_audiocpu(int state)
 {
-	if (m_audiocpu)
-		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	if (state)
+		coin_sound_reset_w(0);
 }
 
-void batsugun_state::sound_reset_w(u8 data)
+void batsugun_state::machine_reset()
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	if (m_audiocpu)
+		coin_sound_reset_w(0);
 }
 
 void batsugun_state::video_start()
@@ -220,7 +221,7 @@ void batsugun_bootleg_state::fixeightbl_oki(address_map &map)
 void batsugun_state::coin_sound_reset_w(u8 data)
 {
 	m_coincounter->coin_w(data & ~0x20);
-	sound_reset_w(data & 0x20);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( base )
@@ -388,7 +389,7 @@ void batsugun_state::batsugun(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);           // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &batsugun_state::batsugun_68k_mem);
-	m_maincpu->reset_cb().set(FUNC(batsugun_state::reset));
+	m_maincpu->reset_cb().set(FUNC(batsugun_state::reset_audiocpu));
 
 	v25_device &audiocpu(V25(config, m_audiocpu, 32_MHz_XTAL/2));         // NEC V25 type Toaplan marked CPU ???
 	audiocpu.set_addrmap(AS_PROGRAM, &batsugun_state::v25_mem);
@@ -431,6 +432,7 @@ void batsugun_bootleg_state::batsugunbl(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &batsugun_bootleg_state::batsugunbl_68k_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &batsugun_bootleg_state::cpu_space_batsugunbl_map);
+	m_maincpu->reset_cb().set_nop();
 
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
 

@@ -416,4 +416,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1983, dx9, 0, 0, dx9, dx9, yamaha_dx9_state, empty_init, "Yamaha", "DX9 Digital Programmable Algorithm Synthesizer", MACHINE_IS_SKELETON)
+SYST(1983, dx9, 0, 0, dx9, dx9, yamaha_dx9_state, empty_init, "Yamaha", "DX9 Digital Programmable Algorithm Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

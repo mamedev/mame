@@ -22,18 +22,18 @@ DEFINE_DEVICE_TYPE(CCPU, ccpu_cpu_device, "ccpu", "Cinematronics CPU")
     MACROS
 ***************************************************************************/
 
-#define READOP(a)         (m_cache.read_byte(a))
+#define READOP(a)        (m_cache.read_byte(a))
 
-#define RDMEM(a)          (m_data.read_word((a) & 0xfff))
-#define WRMEM(a,v)        (m_data.write_word((a), (v)))
+#define RDMEM(a)         (m_data.read_word((a) & 0xfff))
+#define WRMEM(a,v)       (m_data.write_word((a), (v)))
 
-#define READPORT(a)       (m_io.read_byte(a))
-#define WRITEPORT(a,v)    (m_io.write_byte((a), (v)))
+#define READPORT(a)      (m_io.read_byte(a))
+#define WRITEPORT(a,v)   (m_io.write_byte((a), (v)))
 
 #define SET_A0           do { m_a0flag = m_A; } while (0)
-#define SET_CMP_VAL(x)    do { m_cmpacc = *m_acc; m_cmpval = (x) & 0xfff; } while (0)
-#define SET_NC(a)         do { m_ncflag = ~(a); } while (0)
-#define SET_MI(a)         do { m_nextnextmiflag = (a); } while (0)
+#define SET_CMP_VAL(x)   do { m_cmpacc = *m_acc; m_cmpval = (x) & 0xfff; } while (0)
+#define SET_NC(a)        do { m_ncflag = ~(a); } while (0)
+#define SET_MI(a)        do { m_nextnextmiflag = (a); } while (0)
 
 #define TEST_A0          (m_a0flag & 1)
 #define TEST_NC          ((m_ncflag >> 12) & 1)
@@ -52,10 +52,10 @@ DEFINE_DEVICE_TYPE(CCPU, ccpu_cpu_device, "ccpu", "Cinematronics CPU")
 #define STANDARD_ACC_OP(resexp,cmpval) \
 do { \
 	uint16_t result = resexp; \
-	SET_A0;                      /* set the A0 bit based on the previous 'A' value */ \
-	SET_CMP_VAL(cmpval);          /* set the compare values to the previous accumulator and the cmpval */ \
-	SET_NC(result);               /* set the NC flag based on the unmasked result */ \
-	*m_acc = result & 0xfff;     /* store the low 12 bits of the new value */ \
+	SET_A0;                     /* set the A0 bit based on the previous 'A' value */ \
+	SET_CMP_VAL(cmpval);        /* set the compare values to the previous accumulator and the cmpval */ \
+	SET_NC(result);             /* set the NC flag based on the unmasked result */ \
+	*m_acc = result & 0xfff;    /* store the low 12 bits of the new value */ \
 } while (0)
 
 
@@ -92,12 +92,15 @@ uint8_t ccpu_cpu_device::read_jmi()
 }
 
 
-void ccpu_cpu_device::wdt_timer_trigger()
+void ccpu_cpu_device::wdt_trigger(int state)
 {
+	if (!state)
+		return;
+
 	m_waiting = false;
 	m_watchdog++;
 	if (m_watchdog >= 3)
-		m_PC = 0;
+		device_reset();
 }
 
 

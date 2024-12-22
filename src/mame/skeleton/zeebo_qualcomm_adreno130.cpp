@@ -144,4 +144,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2009, zeebo,      0,       0,      zeebo, zeebo, zeebo_game_state, empty_init, "Zeebo Inc.", "Zeebo (Brazil)", MACHINE_IS_SKELETON )
+CONS( 2009, zeebo,      0,       0,      zeebo, zeebo, zeebo_game_state, empty_init, "Zeebo Inc.", "Zeebo (Brazil)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

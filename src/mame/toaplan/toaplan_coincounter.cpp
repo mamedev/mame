@@ -41,6 +41,3 @@ void toaplan_coincounter_device::coin_w(u8 data)
 		logerror("Writing unknown upper bits (%02x) to coin control\n",data);
 	}
 }
-
-
-
