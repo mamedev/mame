@@ -32,8 +32,6 @@ TODO:
 - game sometimes leaves gaps when the lady is undressing
 - colors aren't 100% correct (see i.e. the stripes in the curtains), reference video:
   https://www.youtube.com/watch?v=zTOFIhuwR2w
-- verify sound pitch (unfortunately, no pcb sound in above video)
-- verify irq frequency, though it looks similar to the pcb video
 
 */
 
@@ -276,9 +274,7 @@ void yakyuken_state::yakyuken(machine_config &config)
 	Z80(config, m_maincpu, 18.432_MHz_XTAL / 3 / 2); // 3.072 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &yakyuken_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &yakyuken_state::main_io_map);
-
-	attotime irq_period = attotime::from_ticks(0x2000, 18.432_MHz_XTAL / 3);
-	m_maincpu->set_periodic_int(FUNC(yakyuken_state::irq0_line_hold), irq_period);
+	m_maincpu->set_periodic_int(FUNC(yakyuken_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 3 / 4); // 1.536 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &yakyuken_state::sound_program_map);
@@ -304,7 +300,8 @@ void yakyuken_state::yakyuken(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	AY8910(config, m_ay, 18.432_MHz_XTAL / 3 / 16).add_route(ALL_OUTPUTS, "mono", 0.35);
+	AY8910(config, m_ay, 18.432_MHz_XTAL / 3 / 4); // 1.536 MHz
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.35);
 }
 
 
