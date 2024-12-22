@@ -146,10 +146,7 @@ void upd177x_cpu_device::device_start()
 
 void upd177x_cpu_device::device_reset()
 {
-	// Yes, this is odd, but otherwise there are sync issues between writing and clearing PA in scv kungfurd when playing back adpcm.
-	// During a reset an OUT PA gets executed just around the same time when the main cpu is writing to PA.
-	// Since the OUT PA completes while the external write to PA is still in progress the external write to PA wins.
-	m_pc = 1;
+	m_pc = 0;
 	m_sp = 0;
 	m_a = 0;
 	m_a_save = 0;

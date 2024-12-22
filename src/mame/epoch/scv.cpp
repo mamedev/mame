@@ -46,6 +46,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(vblank_update);
+	TIMER_CALLBACK_MEMBER(pa_w_update);
 
 private:
 	void scv_palette(palette_device &palette) const;
@@ -75,6 +76,7 @@ private:
 	required_ioport_array<8> m_pa;
 	required_ioport m_pc0;
 	required_memory_region m_charrom;
+	emu_timer *m_pa_w_timer;
 };
 
 
@@ -87,7 +89,12 @@ void scv_state::scv_mem(address_map &map)
 	map(0x0000, 0x0fff).rom();   // BIOS
 
 	map(0x2000, 0x3403).ram().share(m_videoram);  // VRAM + 4 registers
-	map(0x3600, 0x3600).w(m_upd1771c, FUNC(upd1771c_cpu_device::pa_w));
+	map(0x3600, 0x3600).lw8(NAME([this] (u8 data) {
+		// With the current cores there are sync issues between writing and clearing PA in scv kungfurd when playing back adpcm.
+		// During a reset an OUT PA gets executed just around the same time when the main cpu is writing to PA.
+		// Since the OUT PA completes while the external write to PA is still in progress the external write to PA wins.
+		m_pa_w_timer->adjust(m_upd1771c->cycles_to_attotime(8), data);
+	}));
 
 	// 8000 - ff7f - Cartridge
 	// ff80 - ffff - CPU internal RAM
@@ -479,9 +486,16 @@ u32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
+TIMER_CALLBACK_MEMBER(scv_state::pa_w_update)
+{
+	m_upd1771c->pa_w(param);
+}
+
+
 void scv_state::machine_start()
 {
 	m_vb_timer = timer_alloc(FUNC(scv_state::vblank_update), this);
+	m_pa_w_timer = timer_alloc(FUNC(scv_state::pa_w_update), this);
 
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portc));
