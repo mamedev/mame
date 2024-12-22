@@ -92,6 +92,7 @@ private:
 
 	emu_timer *m_dma_timer;
 	emu_timer *m_frame_timer;
+	emu_timer *m_toc_timer;
 
 	void nvram_write(uint32_t data);
 	uint32_t nvram_read();

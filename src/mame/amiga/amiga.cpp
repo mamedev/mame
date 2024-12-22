@@ -2239,7 +2239,7 @@ void cd32_state::cd32(machine_config &config)
 	m_cia_0->sp_wr_callback().set_nop();
 
 	SOFTWARE_LIST(config, "cd32_list").set_original("cd32");
-	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
+	SOFTWARE_LIST(config, "cd_list").set_compatible("cdtv");
 }
 
 void cd32_state::cd32n(machine_config &config)
