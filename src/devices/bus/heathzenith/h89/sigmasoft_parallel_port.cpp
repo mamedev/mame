@@ -50,51 +50,11 @@ inline bool sigmasoft_parallel_port::card_selected(u8 select_lines, u16 offset)
 		((offset & SELECT_ADDR_MASK) == m_base_addr);
 }
 
-void sigmasoft_parallel_port::video_mem_w(u8 val)
+void sigmasoft_parallel_port::igc_w(u8 offset, u8 val)
 {
 	if (m_connected_tlbc)
 	{
-		m_tlbc->sigma_video_mem_w(val);
-	}
-}
-
-void sigmasoft_parallel_port::io_lo_addr_w(u8 val)
-{
-	if (m_connected_tlbc)
-	{
-		m_tlbc->sigma_io_lo_addr_w(val);
-	}
-}
-
-void sigmasoft_parallel_port::io_hi_addr_w(u8 val)
-{
-	if (m_connected_tlbc)
-	{
-		m_tlbc->sigma_io_hi_addr_w(val);
-	}
-}
-
-void sigmasoft_parallel_port::window_lo_addr_w(u8 val)
-{
-	if (m_connected_tlbc)
-	{
-		m_tlbc->sigma_window_lo_addr_w(val);
-	}
-}
-
-void sigmasoft_parallel_port::window_hi_addr_w(u8 val)
-{
-	if (m_connected_tlbc)
-	{
-		m_tlbc->sigma_window_hi_addr_w(val);
-	}
-}
-
-void sigmasoft_parallel_port::ctrl_w(u8 val)
-{
-	if (m_connected_tlbc)
-	{
-		m_tlbc->sigma_ctrl_w(val);
+		m_tlbc->sigma_w(offset, val);
 	}
 }
 
@@ -112,23 +72,12 @@ void sigmasoft_parallel_port::write(u8 select_lines, u16 offset, u8 data)
 	switch (offset)
 	{
 	case 0:
-		video_mem_w(data);
-		break;
 	case 1:
-		io_lo_addr_w(data);
-		break;
 	case 2:
-		io_hi_addr_w(data);
-		break;
 	case 3:
-		window_lo_addr_w(data);
-		break;
 	case 4:
-		window_hi_addr_w(data);
-		break;
 	case 5:
-		// IGC Control
-		ctrl_w(data);
+		igc_w(offset, data);
 		break;
 	case 6:
 		// TODO - Centronics interface
@@ -139,16 +88,9 @@ void sigmasoft_parallel_port::write(u8 select_lines, u16 offset, u8 data)
 	}
 }
 
-u8 sigmasoft_parallel_port::video_mem_r()
+u8 sigmasoft_parallel_port::igc_r(u8 offset)
 {
-	// get video memory value from igc device
-	return m_connected_tlbc ? m_tlbc->sigma_video_mem_r() : 0;
-}
-
-u8 sigmasoft_parallel_port::ctrl_r()
-{
-	// get control register from igc device
-	return m_connected_tlbc ? m_tlbc->sigma_ctrl_r() : 0;
+	return m_connected_tlbc ? m_tlbc->sigma_r(offset) : 0;
 }
 
 u8 sigmasoft_parallel_port::read(u8 select_lines, u16 offset)
@@ -165,23 +107,12 @@ u8 sigmasoft_parallel_port::read(u8 select_lines, u16 offset)
 	switch (offset)
 	{
 	case 0:
-		value = video_mem_r();
-		break;
 	case 1:
-		// TODO - Light Pen Low address
-		break;
 	case 2:
-		// TODO - Light Pen High address
-		break;
 	case 3:
-		// TODO - Left input device
-		break;
 	case 4:
-		// TODO - Right input device
-		break;
 	case 5:
-		// IGC Control Register
-		value = ctrl_r();
+		value = igc_r(offset);
 		break;
 	case 6:
 		// TODO - Centronics interface

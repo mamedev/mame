@@ -31,17 +31,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	void video_mem_w(u8 val);
-	u8 video_mem_r();
 
-	void io_lo_addr_w(u8 val);
-	void io_hi_addr_w(u8 val);
-
-	void window_lo_addr_w(u8 val);
-	void window_hi_addr_w(u8 val);
-
-	void ctrl_w(u8 val);
-	u8 ctrl_r();
+	void igc_w(u8 offset, u8 val);
+	u8 igc_r(u8 offset);
 
 	inline bool card_selected(u8 select_lines, u16 offset);
 
@@ -59,7 +51,6 @@ private:
 
 	// base address of board configured by jumpers.
 	u16 m_base_addr;
-
 };
 
 
