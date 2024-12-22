@@ -3928,9 +3928,14 @@ end
 --@src/devices/cpu/upd177x/upd177x.h,CPUS["UPD177X"] = true
 --------------------------------------------------
 
+if CPUS["UPD177X"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/upd177x/upd177x.cpp",
+		MAME_DIR .. "src/devices/cpu/upd177x/upd177x.h",
+	}
+end
+
 if opt_tool(CPUS, "UPD177X") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd177x/upd177x.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd177x/upd177x.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd177x/upd177xd.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd177x/upd177xd.h")
 end
