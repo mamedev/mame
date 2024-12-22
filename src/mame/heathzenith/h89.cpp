@@ -197,17 +197,6 @@ public:
 	void h89(machine_config &config);
 };
 
-class h89_sigmasoft_state : public h89_state
-{
-public:
-	h89_sigmasoft_state(const machine_config &mconfig, device_type type, const char *tag):
-		h89_state(mconfig, type, tag)
-	{
-	}
-
-	void h89_sigmasoft(machine_config &config);
-};
-
 
 /**
  * Heathkit H89 with MMS hardware
@@ -879,24 +868,17 @@ void h89_mms_state::port_f2_mms_w(offs_t offset, u8 data)
 
 static void tlb_options(device_slot_interface &device)
 {
-	device.option_add("heath",      HEATH_TLB);
-	device.option_add("gp19",       HEATH_GP19);
-	device.option_add("imaginator", HEATH_IMAGINATOR);
-	device.option_add("super19",    HEATH_SUPER19);
-	device.option_add("superset",   HEATH_SUPERSET);
-	device.option_add("ultrarom",   HEATH_ULTRA);
-	device.option_add("watzman",    HEATH_WATZ);
-}
-
-
-static void sigma_tlb_options(device_slot_interface *device)
-{
-	device->option_reset();
-	device->option_add("igc",          HEATH_IGC);
-	device->option_add("igc_super19",  HEATH_IGC_SUPER19);
-	device->option_add("igc_ultrarom", HEATH_IGC_ULTRA);
-	device->option_add("igc_watzman",  HEATH_IGC_WATZ);
-	device->set_default_option("igc");
+	device.option_add("heath",        HEATH_TLB);
+	device.option_add("gp19",         HEATH_GP19);
+	device.option_add("imaginator",   HEATH_IMAGINATOR);
+	device.option_add("super19",      HEATH_SUPER19);
+	device.option_add("superset",     HEATH_SUPERSET);
+	device.option_add("ultrarom",     HEATH_ULTRA);
+	device.option_add("watzman",      HEATH_WATZ);
+	device.option_add("igc",          HEATH_IGC);
+	device.option_add("igc_super19",  HEATH_IGC_SUPER19);
+	device.option_add("igc_ultrarom", HEATH_IGC_ULTRA);
+	device.option_add("igc_watzman",  HEATH_IGC_WATZ);
 }
 
 static void intr_ctrl_options(device_slot_interface &device)
@@ -998,16 +980,6 @@ void h89_state::h89(machine_config &config)
 	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", h89_right_cards, "z37fdc");
 }
 
-void h89_sigmasoft_state::h89_sigmasoft(machine_config &config)
-{
-	h89(config);
-	m_h89bus->set_default_bios_tag("444-61");
-
-	sigma_tlb_options(m_tlbc);
-
-	H89BUS_LEFT_SLOT(config.replace(), "p501", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, "ss_parallel");
-}
-
 void h89_mms_state::h89_mms(machine_config &config)
 {
 	h89_base(config);
@@ -1104,33 +1076,6 @@ ROM_START( h89 )
 	ROM_SIGMA_V_1_2(9)
 ROM_END
 
-ROM_START( h89_sigmasoft )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_DEFAULT_BIOS("mtr90")
-
-	ROM_H17
-
-	ROM_MTR90_444_142(0)
-
-	ROM_MTR89(1)
-
-	ROM_MMS_444_84B(2)
-
-	ROM_KMR_100(3)
-
-	ROM_ULTIMETH_4K(4)
-
-	ROM_MTR90_444_84(5)
-
-	ROM_MMS_444_84A(6)
-
-	ROM_ULTIMETH_2K(7)
-
-	ROM_SIGMA_V_1_3(8)
-
-	ROM_SIGMA_V_1_2(9)
-ROM_END
-
 ROM_START( h89_mms )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mms84b")
@@ -1179,4 +1124,3 @@ COMP( 1979, h88,           h89,   0,     h88,           h88,  h88_state,        
 COMP( 1979, h89,           0,     0,     h89,           h89,  h89_state,           empty_init, "Heath Company",       "H-89",                    MACHINE_SUPPORTS_SAVE)
 COMP( 1981, h89_mms,       h89,   0,     h89_mms,       h89,  h89_mms_state,       empty_init, "Heath Company",       "H-89 with MMS Equipment", MACHINE_SUPPORTS_SAVE)
 COMP( 1981, z90,           h89,   0,     h89,           h89,  h89_state,           empty_init, "Zenith Data Systems", "Z-90",                    MACHINE_SUPPORTS_SAVE)
-COMP( 1984, h89_sigmasoft, h89,   0,     h89_sigmasoft, h89,  h89_sigmasoft_state, empty_init, "Heath Company",       "H-89 with SigmaSoft IGC", MACHINE_SUPPORTS_SAVE)
