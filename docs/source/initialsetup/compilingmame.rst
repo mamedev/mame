@@ -184,9 +184,9 @@ configuration::
 Building with Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* You can generate Visual Studio 2019 projects using **make vs2019**.  The
+* You can generate Visual Studio 2022 projects using **make vs2022**.  The
   solution and project files will be created in
-  ``build/projects/windows/mame/vs2019`` by default (the name of the ``build``
+  ``build/projects/windows/mame/vs2022`` by default (the name of the ``build``
   folder can be changed using the ``BUILDDIR`` option).  This will always
   regenerate the settings, so **REGENIE=1** is *not* needed.
 * Adding **MSBUILD=1** to the make options will build the solution using
@@ -766,7 +766,7 @@ The MSVC compiler produces spurious warnings about potentially uninitialised
 local variables.  You currently need to add ``NOWERROR=1`` to the options passed
 to make when generating the Visual Studio project files.  This stops warnings
 from being treated as errors.  (MSVC seems to lack options to control which
-specific warnings are treated as error, which other compilers support.)
+specific warnings are treated as errors, which other compilers support.)
 
 
 .. _compiling-unusual:
