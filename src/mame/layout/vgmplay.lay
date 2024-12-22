@@ -97,31 +97,79 @@ license:CC0-1.0
 	<element name="act_label_c352"><text string="C352" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_ga20"><text string="GA20" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
-	<element name="static_black2"><rect><color red="0.2" green="0.21" blue="0.23" /></rect></element>
-
 	<element name="hl1" defstate="0">
-		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
-		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1" />
 	</element>
-	<element name="text_l1">
-		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
-		<text string="&#x25A0;"><color red="0.9" green="0.9" blue="0.2" /></text>
+
+	<element name="button_l1">
+		<rect>
+			<bounds x="0" y="0" width="11" height="5" />
+			<color red="0.2" green="0.21" blue="0.23" />
+		</rect>
+		<image>
+			<bounds xc="5.5" yc="2.5" width="4" height="2" />
+			<data><![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" viewBox="0 0 200 100">
+					<path fill="#E5E533" stroke="none" d="M 50,0 l 100,0 l 0,100 l -100,0 z" />
+				</svg>
+			]]></data>
+		</image>
 	</element>
-	<element name="text_l2">
-		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
-		<text string="&#x25EB;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	<element name="button_l2">
+		<rect>
+			<bounds x="0" y="0" width="11" height="5" />
+			<color red="0.2" green="0.21" blue="0.23" />
+		</rect>
+		<image>
+			<bounds xc="5.5" yc="2.5" width="4" height="2" />
+			<data><![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" viewBox="0 0 200 100">
+					<path fill="#E5E533" stroke="none" d="M 55,0 l 30,0 l 0,100 l -30,0 z m 60,0 l 30,0 l 0,100 l -30,0 z" />
+				</svg>
+			]]></data>
+		</image>
 	</element>
-	<element name="text_l3">
-		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
-		<text string="&#x25B6;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	<element name="button_l3">
+		<rect>
+			<bounds x="0" y="0" width="11" height="5" />
+			<color red="0.2" green="0.21" blue="0.23" />
+		</rect>
+		<image>
+			<bounds xc="5.5" yc="2.5" width="4" height="2" />
+			<data><![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" viewBox="0 0 200 100">
+					<path fill="#E5E533" stroke="none" d="M 40,0 l 120,50 l -120,50 z" />
+				</svg>
+			]]></data>
+		</image>
 	</element>
-	<element name="text_l4">
-		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
-		<text string="&#x25C4;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	<element name="button_l4">
+		<rect>
+			<bounds x="0" y="0" width="11" height="5" />
+			<color red="0.2" green="0.21" blue="0.23" />
+		</rect>
+		<image>
+			<bounds xc="5.5" yc="2.5" width="4" height="2" />
+			<data><![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" viewBox="0 0 200 100">
+					<path fill="#E5E533" stroke="none" d="M 10,0 l 15,0 l 0,45 l 85,-45 l 0,45 l 85,-45 l 0,100 l -85,-45 l 0,45 l -85,-45 l 0,45 l -15,0 z" />
+				</svg>
+			]]></data>
+		</image>
 	</element>
-	<element name="text_l5">
-		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
-		<text string="&#x25CE;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	<element name="button_l5">
+		<rect>
+			<bounds x="0" y="0" width="11" height="5" />
+			<color red="0.2" green="0.21" blue="0.23" />
+		</rect>
+		<image>
+			<bounds xc="5.5" yc="2.5" width="4" height="2" />
+			<data><![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" viewBox="0 0 200 100">
+					<path fill="#E5E533" stroke="none" d="M 120,15 l 40,0 a 40,40,0,0,1,0,80 l -120,0 a 40,40,0,0,1,0,-80 l 30,0 l 0,-15 l 40,25 l -40,25 l 0,-15 l -30,0 a 20,20,0,0,0,0,40 l 120,0 a 20,20,0,0,0,0,-40 l -40,0 z" />
+				</svg>
+			]]></data>
+		</image>
 	</element>
 
 	<group name="activity">
@@ -218,23 +266,13 @@ license:CC0-1.0
 		<element ref="act_label_ga20"><bounds x="49" y="22.2" width="10" height="1.6" /></element>
 	</group>
 
-	<group name="lights">
-
-	</group>
-
 	<view name="Full View">
 		<collection name="Controls">
-			<element ref="static_black2"><bounds x="0"  y="4" width="11" height="5" /></element>
-			<element ref="static_black2"><bounds x="12" y="4" width="11" height="5" /></element>
-			<element ref="static_black2"><bounds x="24" y="4" width="11" height="5" /></element>
-			<element ref="static_black2"><bounds x="36" y="4" width="11" height="5" /></element>
-			<element ref="static_black2"><bounds x="48" y="4" width="11" height="5" /></element>
-
-			<element ref="text_l1"><bounds x="0"  y="5" width="11" height="3.5" /></element>
-			<element ref="text_l2"><bounds x="12" y="5" width="11" height="3.5" /></element>
-			<element ref="text_l3"><bounds x="24" y="5" width="11" height="3.5" /></element>
-			<element ref="text_l4"><bounds x="36" y="5" width="11" height="3.5" /></element>
-			<element ref="text_l5"><bounds x="48" y="5" width="11" height="3.5" /></element>
+			<element ref="button_l1"><bounds x="0"  y="4" width="11" height="5" /></element>
+			<element ref="button_l2"><bounds x="12" y="4" width="11" height="5" /></element>
+			<element ref="button_l3"><bounds x="24" y="4" width="11" height="5" /></element>
+			<element ref="button_l4"><bounds x="36" y="4" width="11" height="5" /></element>
+			<element ref="button_l5"><bounds x="48" y="4" width="11" height="5" /></element>
 
 			<element ref="hl1" inputtag="CONTROLS" inputmask="0x0001"><bounds x="0"  y="4" width="11" height="5" /><color alpha="0.15" /></element>
 			<element ref="hl1" inputtag="CONTROLS" inputmask="0x0002"><bounds x="12" y="4" width="11" height="5" /><color alpha="0.15" /></element>
