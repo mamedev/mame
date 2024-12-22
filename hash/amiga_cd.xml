@@ -7,6 +7,24 @@ http://redump.org/discs/system/acd
 -->
 <softwarelist name="amigacd" description="Commodore AmigaCD images">
 
+<!-- !Games -->
+
+    <software name="kangfu" supported="no">
+        <!-- "CD-32, A1200, A4000" on cover art -->
+		<description>Kang Fu</description>
+		<year>1996</year>
+		<publisher>GREat Effects Development (GREED)</publisher>
+		<notes><![CDATA[
+Plenty of [AGA] bugs
+CD32: unsupported [Akiko] close tray after CD32 BIOS plays back music, will otherwise throw "Out of Memory" afterwards.
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="kangfu_cd32" sha1="804503915194e87ac44ab4cc9f412444efbc2ee6" />
+			</diskarea>
+		</part>
+	</software>
+
 <!-- !Collections -->
 
 	<software name="amigames" supported="partial">
