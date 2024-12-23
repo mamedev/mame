@@ -1484,7 +1484,7 @@ void drcbe_x64::op_nop(Assembler &a, const instruction &inst)
 
 void drcbe_x64::op_break(Assembler &a, const instruction &inst)
 {
-	a.int3();
+	smart_call_r64(a, (x86code *)(uintptr_t)&osd_break_into_debugger, rax);
 }
 
 

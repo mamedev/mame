@@ -2387,7 +2387,7 @@ void drcbe_x86::op_nop(Assembler &a, const instruction &inst)
 
 void drcbe_x86::op_break(Assembler &a, const instruction &inst)
 {
-	a.int3();
+	a.call(imm(&osd_break_into_debugger));
 }
 
 //-------------------------------------------------
