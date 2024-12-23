@@ -105,8 +105,8 @@ void tamag1_state::tama(machine_config &config)
 {
 	// basic machine hardware
 	E0C6S46(config, m_maincpu, 32.768_kHz_XTAL);
-	m_maincpu->write_segs().set(FUNC(tamag1_state::lcd_segment_w));
 	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
+	m_maincpu->write_segs().set(FUNC(tamag1_state::lcd_segment_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -124,6 +124,7 @@ void tamag1_state::alienfev(machine_config &config)
 	// basic machine hardware
 	E0C6S46(config, m_maincpu, 32.768_kHz_XTAL);
 	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
+	m_maincpu->set_osc3(1'000'000);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -145,8 +146,8 @@ void tamag1_state::venusdm(machine_config &config)
 {
 	// basic machine hardware
 	E0C6S46(config, m_maincpu, 32.768_kHz_XTAL);
-	m_maincpu->set_pixel_callback(FUNC(tamag1_state::pixel_callback));
 	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
+	m_maincpu->set_pixel_callback(FUNC(tamag1_state::pixel_callback));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -201,5 +202,5 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS         INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1997, tama,     0,      0,      tama,     tama,     tamag1_state, empty_init, "Bandai", "Tamagotchi (Gen. 1, World)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1997, alienfev, 0,      0,      alienfev, alienfev, tamag1_state, empty_init, "Epoch", "Chibi Pachi Alien Fever", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1997, alienfev, 0,      0,      alienfev, alienfev, tamag1_state, empty_init, "Epoch", "Chibi Pachi: Alien Fever", MACHINE_SUPPORTS_SAVE )
 SYST( 1997, venusdm,  0,      0,      venusdm,  venusdm,  tamag1_state, empty_init, "Nikko", "Beans Collection: Venus Diet Monogatari", MACHINE_SUPPORTS_SAVE )

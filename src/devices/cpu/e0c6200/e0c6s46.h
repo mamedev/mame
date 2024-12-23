@@ -68,6 +68,9 @@ public:
 
 	template <typename... T> void set_pixel_callback(T &&... args) { m_pixel_cb.set(std::forward<T>(args)...); } // transform pixel x/y
 
+	// OSC3 (set fast oscillator, via resistor)
+	void set_osc3(u32 osc) { m_osc3 = osc; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -90,6 +93,8 @@ private:
 	u8 m_irqflag[6];
 	u8 m_irqmask[6];
 	u8 m_osc;
+	u32 m_osc1;
+	u32 m_osc3;
 	u8 m_svd;
 
 	// lcd driver

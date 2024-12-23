@@ -6,11 +6,11 @@
   QFP5-128pin, see manual for pinout
 
   TODO:
-  - OSC3
-  - K input interrupt can trigger if input is active while writing to the mask register
   - finish i/o ports
   - serial interface
   - buzzer envelope addition
+  - what happens if OSC3 is selected while OSCC (bit 2) is low?
+  - K input interrupt can trigger if input is active while writing to the mask register
   - add mask options for ports (eg. buzzer on output port R4x is optional)
 
 */
@@ -51,6 +51,7 @@ void e0c6s46_device::e0c6s46_data(address_map &map)
 e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	e0c6200_cpu_device(mconfig, E0C6S46, tag, owner, clock, address_map_constructor(FUNC(e0c6s46_device::e0c6s46_program), this), address_map_constructor(FUNC(e0c6s46_device::e0c6s46_data), this)),
 	m_vram(*this, "vram%u", 1U),
+	m_osc3(0),
 	m_write_segs(*this),
 	m_write_contrast(*this),
 	m_pixel_cb(*this),
@@ -70,14 +71,18 @@ void e0c6s46_device::device_start()
 	e0c6200_cpu_device::device_start();
 
 	// misc init
+	m_osc1 = clock();
+	if (m_osc3 == 0)
+		m_osc3 = m_osc1;
+
 	m_core_256_handle = timer_alloc(FUNC(e0c6s46_device::core_256_cb), this);
-	m_core_256_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
+	m_core_256_handle->adjust(attotime::from_ticks(64, m_osc1));
 	m_prgtimer_handle = timer_alloc(FUNC(e0c6s46_device::prgtimer_cb), this);
 	m_prgtimer_handle->adjust(attotime::never);
 	m_buzzer_handle = timer_alloc(FUNC(e0c6s46_device::buzzer_cb), this);
 	m_buzzer_handle->adjust(attotime::never);
 	m_lcd_driver = timer_alloc(FUNC(e0c6s46_device::lcd_driver_cb), this);
-	m_lcd_driver->adjust(attotime::from_ticks(1024, unscaled_clock()));
+	m_lcd_driver->adjust(attotime::from_ticks(1024, m_osc1));
 
 	m_pixel_cb.resolve();
 
@@ -372,7 +377,7 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::core_256_cb)
 	// clock-timer, stopwatch timer, and some features of the buzzer all run
 	// from the same internal 256hz timer (64 ticks high+low at default clock of 32768hz)
 	m_256_src_pulse ^= 1;
-	m_core_256_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
+	m_core_256_handle->adjust(attotime::from_ticks(64, m_osc1));
 
 	// clock stopwatch on falling edge of pulse+on
 	m_swl_cur_pulse = m_256_src_pulse | (m_stopwatch_on ^ 1);
@@ -482,7 +487,7 @@ bool e0c6s46_device::prgtimer_reset_prescaler()
 	// only 2 to 7 are clock dividers
 	u8 sel = m_prgtimer_select & 7;
 	if (sel >= 2)
-		m_prgtimer_handle->adjust(attotime::from_ticks(2 << (sel ^ 7), unscaled_clock()));
+		m_prgtimer_handle->adjust(attotime::from_ticks(2 << (sel ^ 7), m_osc1));
 
 	return (sel >= 2);
 }
@@ -520,7 +525,7 @@ void e0c6s46_device::schedule_buzzer()
 		high -= m_bz_duty_ratio;
 	low -= high;
 
-	m_buzzer_handle->adjust(attotime::from_ticks(m_bz_pulse ? high : low, mul * unscaled_clock()));
+	m_buzzer_handle->adjust(attotime::from_ticks(m_bz_pulse ? high : low, mul * m_osc1));
 }
 
 TIMER_CALLBACK_MEMBER(e0c6s46_device::buzzer_cb)
@@ -598,7 +603,7 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::lcd_driver_cb)
 		}
 	}
 
-	m_lcd_driver->adjust(attotime::from_ticks(1024, unscaled_clock()));
+	m_lcd_driver->adjust(attotime::from_ticks(1024, m_osc1));
 }
 
 u32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -784,8 +789,8 @@ void e0c6s46_device::io_w(offs_t offset, u8 data)
 			// d0,d1: CPU operating voltage
 			// d2: OSC3 on (high freq)
 			// d3: clock source OSC1 or OSC3
-			if (data & 8)
-				logerror("io_w selected OSC3! PC=$%04X\n", m_prev_pc);
+			if ((m_osc ^ data) & 8)
+				set_clock((data & 8) ? m_osc3 : m_osc1);
 			m_osc = data;
 			break;
 
