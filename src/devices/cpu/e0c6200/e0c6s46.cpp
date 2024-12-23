@@ -588,6 +588,28 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::lcd_driver_cb)
 	m_lcd_driver->adjust(attotime::from_ticks(1024, unscaled_clock()));
 }
 
+u32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const u8 *src = lcd_buffer();
+	const u8 width = m_vram[0].bytes() * 4 / 8;
+
+	for (int x = 0; x < width; x++)
+	{
+		for (int y = 0; y < 16; y++)
+		{
+			int sx = x;
+			int sy = y;
+			//int sx = y | (x / 20) << 4;
+			//int sy = x % 20;
+
+			if (cliprect.contains(sx, sy))
+				bitmap.pix(sy, sx) = src[y * width + x];
+		}
+	}
+
+	return 0;
+}
+
 
 
 //-------------------------------------------------

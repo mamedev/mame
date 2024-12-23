@@ -63,7 +63,7 @@ public:
 	auto write_contrast() { return m_write_contrast.bind(); }
 
 	const u8 *lcd_buffer() { return &m_render_buf[0]; } // get intermediate LCD pixel buffer
-	//u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect); // optional
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect); // optional
 
 protected:
 	// device-level overrides
