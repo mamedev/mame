@@ -1081,50 +1081,149 @@ void drcbe_x64::alu_op_param(Assembler &a, Inst::Id const opcode, Operand const 
 	}
 }
 
-void drcbe_x64::calculate_status_flags(Assembler &a, Operand const &dst, u8 flags)
+void drcbe_x64::calculate_status_flags(Assembler &a, uint32_t instsize, Operand const &dst, u8 flags)
 {
 	// calculate status flags in a way that does not modify any other status flags
 	uint32_t flagmask = 0;
 
-	if (flags & FLAG_C) flagmask |= 0x001;
-	if (flags & FLAG_V) flagmask |= 0x800;
-	if (flags & FLAG_Z) flagmask |= 0x040;
-	if (flags & FLAG_S) flagmask |= 0x080;
-	if (flags & FLAG_U) flagmask |= 0x004;
+	// can't get FLAG_V from lahf so implement it using seto if needed in the future
+	if (flags & FLAG_C) flagmask |= 0x0100;
+	if (flags & FLAG_Z) flagmask |= 0x4000;
+	if (flags & FLAG_S) flagmask |= 0x8000;
+	if (flags & FLAG_U) flagmask |= 0x0400;
 
 	if ((flags & (FLAG_Z | FLAG_S)) == flags)
 	{
-		Gp tempreg = dst.isMem() ? rax : dst.as<Gpq>().id() == rbx.id() ? rax : rbx;
-		Gp tempreg2 = dst.isMem() ? rdx : dst.as<Gpq>().id() == rcx.id() ? rdx : rcx;
+		Gp tempreg = r10;
+		Gp tempreg2 = r11;
+
+		a.mov(tempreg, rax);
 
 		if (dst.isMem())
-		{
-			a.push(tempreg2);
 			a.mov(tempreg2, dst.as<Mem>());
-		}
+		else
+			a.mov(tempreg2, dst.as<Gpq>().r64());
 
-		a.push(tempreg);
+		a.lahf();
+		a.and_(rax, ~flagmask);
+		if (instsize == 4)
+			a.test(tempreg2.r32(), tempreg2.r32());
+		else
+			a.test(tempreg2, tempreg2);
+		a.mov(tempreg2, rax);
 
-		a.pushfd();
-		a.pop(tempreg);
-		a.and_(tempreg, ~flagmask);
+		a.lahf();
+		a.and_(rax, flagmask);
+		a.or_(rax, tempreg2);
+		a.sahf();
 
-		a.add(dst.isMem() ? tempreg2.as<Gpq>() : dst.as<Gpq>(), 0);
-
-		a.pushfd();
-		a.and_(qword_ptr(rsp), flagmask);
-		a.or_(qword_ptr(rsp), tempreg);
-		a.popfd();
-
-		a.pop(tempreg);
-
-		if (dst.isMem())
-			a.pop(tempreg2);
+		a.mov(rax, tempreg);
 	}
 	else
 	{
 		fatalerror("drcbe_x64::calculate_status_flags: unknown flag combination requested: %02x\n", flags);
 	}
+}
+
+void drcbe_x64::calculate_status_flags_mul(Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo, asmjit::x86::Gp const &hi)
+{
+	Gp tempreg = r11;
+	Gp tempreg2 = r10;
+
+	if (lo.id() == rax.id() || hi.id() == rax.id())
+		a.mov(tempreg2, rax);
+
+	a.seto(al);
+	a.movzx(rax, al); // clear out the rest of rax for lahf
+	a.mov(tempreg, rax);
+
+	a.lahf();
+	a.shl(tempreg, 16);
+	a.or_(tempreg, rax);
+
+	if (hi.id() == rax.id())
+		a.mov(rax, tempreg2);
+
+	if (instsize == 4)
+		a.test(hi.r32(), hi.r32());
+	else
+		a.test(hi, hi);
+
+	a.lahf();  // will have the sign flag + upper half zero
+	a.mov(hi, rax);
+
+	if (lo.id() == rax.id())
+		a.mov(rax, tempreg2);
+
+	if (instsize == 4)
+		a.test(lo.r32(), lo.r32());
+	else
+		a.test(lo, lo);
+
+	a.lahf();  // lower half zero
+	a.and_(rax, hi);
+	a.and_(rax, 0x4000); // zero
+
+	a.and_(hi, 0x8000); // sign
+	a.or_(rax, hi);
+
+	a.and_(tempreg, ~(0x4000 | 0x8000));
+	a.or_(tempreg, rax);
+
+	// restore overflow flag
+	a.mov(rax, tempreg);
+	a.shr(rax, 16);
+	a.add(al, 0x7f);
+
+	a.mov(rax, tempreg);
+	a.sahf();
+}
+
+void drcbe_x64::calculate_status_flags_mul_low(Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo, asmjit::x86::Gp const &hi, bool is_signed)
+{
+	Gp tempreg = r10;
+	Gp tempreg2 = r11;
+
+	a.mov(tempreg2, rax);
+
+	if (is_signed)
+	{
+		if (instsize == 4)
+		{
+			a.mov(tempreg.r32(), hi.r32());
+			a.cdq();
+			a.cmp(tempreg.r32(), hi.r32());
+		}
+		else
+		{
+			a.mov(tempreg, hi);
+			a.cqo();
+			a.cmp(tempreg, hi);
+		}
+	}
+	else
+	{
+		if (instsize == 4)
+			a.test(hi.r32(), hi.r32());
+		else
+			a.test(hi, hi);
+	}
+
+	a.mov(tempreg, rdx);
+
+	a.setnz(dl);
+
+	if (instsize == 4)
+		a.test(lo.r32(), lo.r32());
+	else
+		a.test(lo, lo);
+
+	a.lahf();
+	a.add(dl, 0x7f);
+	a.sahf();
+
+	a.mov(rdx, tempreg);
+	a.mov(rax, tempreg2);
 }
 
 void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsize, Operand const &dst, be_parameter const &param, bool update_flags)
@@ -1137,7 +1236,7 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 		a.emit(opcode, dst, imm(param.immediate()));
 
 		if (update_flags)
-			calculate_status_flags(a, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
+			calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
 	}
 	else
 	{
@@ -1146,7 +1245,10 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 
 		Gp shift = cl;
 
-		a.pushfd(); // no status flags should change if shift is 0, so preserve flags
+		a.mov(r10, rax);
+		a.seto(al);
+		a.movzx(r11, al);
+		a.lahf(); // no status flags should change if shift is 0, so preserve flags
 
 		mov_reg_param(a, shift, param);
 
@@ -1154,17 +1256,24 @@ void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsiz
 		a.test(shift, shift);
 		a.short_().jz(restore_flags);
 
-		a.popfd(); // restore flags to keep carry for rolc/rorc
+		a.sahf(); // restore flags to keep carry for rolc/rorc
+		a.mov(rax, r10);
 
 		a.emit(opcode, dst, shift);
 
 		if (update_flags)
-			calculate_status_flags(a, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
+			calculate_status_flags(a, opsize, dst, FLAG_S | FLAG_Z); // calculate status flags but preserve carry
 
 		a.short_().jmp(end);
 
 		a.bind(restore_flags);
-		a.popfd();
+
+		// restore overflow flag
+		a.add(r11.r32(), 0x7fffffff);
+
+		// restore other flags
+		a.sahf();
+		a.mov(rax, r10);
 
 		a.bind(end);
 	}
@@ -1918,15 +2027,16 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp dstreg = dstp.select_register(eax);
 
-	a.pushfq();
+	a.lahf();
+	a.mov(r10, rax);
 
 	// compute mask for flags
+	// can't get FLAG_V from lahf so implement it using seto if needed in the future
 	uint32_t flagmask = 0;
-	if (maskp.immediate() & FLAG_C) flagmask |= 0x001;
-	if (maskp.immediate() & FLAG_V) flagmask |= 0x800;
-	if (maskp.immediate() & FLAG_Z) flagmask |= 0x040;
-	if (maskp.immediate() & FLAG_S) flagmask |= 0x080;
-	if (maskp.immediate() & FLAG_U) flagmask |= 0x004;
+	if (maskp.immediate() & FLAG_C) flagmask |= 0x0100;
+	if (maskp.immediate() & FLAG_Z) flagmask |= 0x4000;
+	if (maskp.immediate() & FLAG_S) flagmask |= 0x8000;
+	if (maskp.immediate() & FLAG_U) flagmask |= 0x0400;
 
 	switch (maskp.immediate())
 	{
@@ -2016,10 +2126,9 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 
 		// default cases
 		default:
-			a.pushfq();                                                                 // pushf
-			a.pop(eax);                                                                 // pop    eax
-			a.and_(eax, flagmask);                                                      // and    eax,flagmask
-			a.movzx(dstreg, byte_ptr(rbp, rax, 0, offset_from_rbp(&m_near.flagsmap[0]))); // movzx  dstreg,[flags_map]
+			a.mov(r11, r10);
+			a.and_(r11, flagmask);
+			a.movzx(dstreg, byte_ptr(rbp, r11, 0, offset_from_rbp(&m_near.flagsmap[0]))); // movzx  dstreg,[flags_map]
 			break;
 	}
 
@@ -2031,7 +2140,8 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 	else if (inst.size() == 8)
 		mov_param_reg(a, dstp, dstreg.r64());                                           // mov   dstp,dstreg
 
-	a.popfq();
+	a.mov(rax, r10);
+	a.sahf();
 }
 
 
@@ -3369,34 +3479,6 @@ void drcbe_x64::op_mulu(Assembler &a, const instruction &inst)
 		mov_param_reg(a, dstp, dstreg);
 		if (compute_hi)
 			mov_param_reg(a, edstp, edstreg);
-
-		// compute flags
-		if (inst.flags() != 0)
-		{
-			Gp tempreg = ecx;
-
-			a.pushfd();
-
-			a.test(edstreg, edstreg);
-			a.pushfd(); // will have the sign flag + upper half zero
-			a.pop(edstreg);
-
-			a.test(dstreg, dstreg);
-			a.pushfd(); // lower half zero
-			a.pop(dstreg);
-
-			a.and_(qword_ptr(rsp, 0), ~(0x40 | 0x80));
-			a.mov(tempreg, edstreg);
-			a.and_(tempreg, 0x80); // sign
-
-			a.and_(dstreg, edstreg);
-			a.and_(dstreg, 0x40); // zero
-
-			a.or_(dstreg, tempreg);
-			a.or_(qword_ptr(rsp, 0), dstreg);
-
-			a.popfd();
-		}
 	}
 
 	// 64-bit form
@@ -3419,35 +3501,10 @@ void drcbe_x64::op_mulu(Assembler &a, const instruction &inst)
 		mov_param_reg(a, dstp, dstreg);
 		if (compute_hi)
 			mov_param_reg(a, edstp, edstreg);
-
-		// compute flags
-		if (inst.flags() != 0)
-		{
-			Gp tempreg = rcx;
-
-			a.pushfd();
-
-			a.test(edstreg, edstreg);
-			a.pushfd(); // will have the sign flag + upper half zero
-			a.pop(edstreg);
-
-			a.test(dstreg, dstreg);
-			a.pushfd(); // lower half zero
-			a.pop(dstreg);
-
-			a.and_(qword_ptr(rsp, 0), ~(0x40 | 0x80));
-			a.mov(tempreg, edstreg);
-			a.and_(tempreg, 0x80); // sign
-
-			a.and_(dstreg, edstreg);
-			a.and_(dstreg, 0x40); // zero
-
-			a.or_(dstreg, tempreg);
-			a.or_(qword_ptr(rsp, 0), dstreg);
-
-			a.popfd();
-		}
 	}
+
+	if (inst.flags())
+		calculate_status_flags_mul(a, inst.size(), rax, rdx);
 }
 
 
@@ -3486,24 +3543,6 @@ void drcbe_x64::op_muluh(Assembler &a, const instruction &inst)
 			a.mul(hireg);
 		}
 		mov_param_reg(a, dstp, dstreg);
-
-		// compute flags
-		if (inst.flags())
-		{
-			a.test(dstreg, dstreg);
-			a.pushfd(); // sign + zero
-
-			// if upper result is not zero then it overflowed
-			a.test(hireg, hireg);
-			a.pushfd();
-			a.pop(hireg);
-			a.and_(hireg, 0x40); // zero
-			a.xor_(hireg, 0x40);
-			a.shl(hireg, 5); // turn into overflow flag
-			a.or_(qword_ptr(rsp, 0), hireg);
-
-			a.popfd();
-		}
 	}
 
 	// 64-bit form
@@ -3524,25 +3563,10 @@ void drcbe_x64::op_muluh(Assembler &a, const instruction &inst)
 			a.mul(hireg);
 		}
 		mov_param_reg(a, dstp, dstreg);
-
-		// compute flags
-		if (inst.flags())
-		{
-			a.test(dstreg, dstreg);
-			a.pushfd(); // sign + zero
-
-			// if upper result is not zero then it overflowed
-			a.test(hireg, hireg);
-			a.pushfd();
-			a.pop(hireg);
-			a.and_(hireg, 0x40); // zero
-			a.xor_(hireg, 0x40);
-			a.shl(hireg, 5); // turn into overflow flag
-			a.or_(qword_ptr(rsp, 0), hireg);
-
-			a.popfd();
-		}
 	}
+
+	if (inst.flags())
+		calculate_status_flags_mul_low(a, inst.size(), rax, rdx, false);
 }
 
 
@@ -3584,34 +3608,6 @@ void drcbe_x64::op_muls(Assembler &a, const instruction &inst)
 		mov_param_reg(a, dstp, dstreg);
 		if (compute_hi)
 			mov_param_reg(a, edstp, edstreg);
-
-		// compute flags
-		if (inst.flags() != 0)
-		{
-			Gp tempreg = ecx;
-
-			a.pushfd();
-
-			a.test(edstreg, edstreg);
-			a.pushfd(); // will have the sign flag + upper half zero
-			a.pop(edstreg);
-
-			a.test(dstreg, dstreg);
-			a.pushfd(); // lower half zero
-			a.pop(dstreg);
-
-			a.and_(qword_ptr(rsp, 0), ~(0x40 | 0x80));
-			a.mov(tempreg, edstreg);
-			a.and_(tempreg, 0x80); // sign
-
-			a.and_(dstreg, edstreg);
-			a.and_(dstreg, 0x40); // zero
-
-			a.or_(dstreg, tempreg);
-			a.or_(qword_ptr(rsp, 0), dstreg);
-
-			a.popfd();
-		}
 	}
 
 	// 64-bit form
@@ -3633,35 +3629,10 @@ void drcbe_x64::op_muls(Assembler &a, const instruction &inst)
 		mov_param_reg(a, dstp, dstreg);
 		if (compute_hi)
 			mov_param_reg(a, edstp, edstreg);
-
-		// compute flags
-		if (inst.flags() != 0)
-		{
-			Gp tempreg = rcx;
-
-			a.pushfd();
-
-			a.test(edstreg, edstreg);
-			a.pushfd(); // will have the sign flag + upper half zero
-			a.pop(edstreg);
-
-			a.test(dstreg, dstreg);
-			a.pushfd(); // lower half zero
-			a.pop(dstreg);
-
-			a.and_(qword_ptr(rsp, 0), ~(0x40 | 0x80));
-			a.mov(tempreg, edstreg);
-			a.and_(tempreg, 0x80); // sign
-
-			a.and_(dstreg, edstreg);
-			a.and_(dstreg, 0x40); // zero
-
-			a.or_(dstreg, tempreg);
-			a.or_(qword_ptr(rsp, 0), dstreg);
-
-			a.popfd();
-		}
 	}
+
+	if (inst.flags())
+		calculate_status_flags_mul(a, inst.size(), rax, rdx);
 }
 
 
@@ -3699,26 +3670,6 @@ void drcbe_x64::op_mulsh(Assembler &a, const instruction &inst)
 			a.imul(hireg);
 		}
 		mov_param_reg(a, dstp, dstreg);
-
-		// compute flags
-		if (inst.flags())
-		{
-			a.test(dstreg, dstreg);
-			a.pushfd(); // sign + zero
-
-			a.mov(ecx, hireg);
-			a.cdq();
-
-			a.cmp(ecx, hireg);
-			a.pushfd();
-			a.pop(hireg);
-			a.and_(hireg, 0x40); // zero
-			a.xor_(hireg, 0x40);
-			a.shl(hireg, 5); // turn into overflow flag
-			a.or_(dword_ptr(rsp, 0), hireg);
-
-			a.popfd();
-		}
 	}
 
 	// 64-bit form
@@ -3738,27 +3689,10 @@ void drcbe_x64::op_mulsh(Assembler &a, const instruction &inst)
 			a.imul(hireg);
 		}
 		mov_param_reg(a, dstp, dstreg);
-
-		// compute flags
-		if (inst.flags())
-		{
-			a.test(dstreg, dstreg);
-			a.pushfd(); // sign + zero
-
-			a.mov(rcx, hireg);
-			a.cqo();
-
-			a.cmp(rcx, hireg);
-			a.pushfd();
-			a.pop(hireg);
-			a.and_(hireg, 0x40); // zero
-			a.xor_(hireg, 0x40);
-			a.shl(hireg, 5); // turn into overflow flag
-			a.or_(dword_ptr(rsp, 0), hireg);
-
-			a.popfd();
-		}
 	}
+
+	if (inst.flags())
+		calculate_status_flags_mul_low(a, inst.size(), rax, rdx, true);
 }
 
 
