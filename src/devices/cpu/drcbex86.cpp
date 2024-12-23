@@ -2387,6 +2387,8 @@ void drcbe_x86::op_nop(Assembler &a, const instruction &inst)
 
 void drcbe_x86::op_break(Assembler &a, const instruction &inst)
 {
+	static const char *const message = "break from drc";
+	a.mov(dword_ptr(esp, 0), imm(message));
 	a.call(imm(&osd_break_into_debugger));
 }
 
