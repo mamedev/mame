@@ -45,7 +45,7 @@ enum
 class e0c6s46_device : public e0c6200_cpu_device
 {
 public:
-	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state)> pixel_update_delegate;
+	using pixel_delegate = device_delegate<void (int &dx, int &dy)>;
 
 	e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -62,8 +62,11 @@ public:
 	// LCD contrast (adjusts VL pins overall voltage level)
 	auto write_contrast() { return m_write_contrast.bind(); }
 
+	// screen update (optional)
 	const u8 *lcd_buffer() { return &m_render_buf[0]; } // get intermediate LCD pixel buffer
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect); // optional
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	template <typename... T> void set_pixel_callback(T &&... args) { m_pixel_cb.set(std::forward<T>(args)...); } // transform pixel x/y
 
 protected:
 	// device-level overrides
@@ -92,12 +95,14 @@ private:
 	// lcd driver
 	u8 m_lcd_control;
 	u8 m_lcd_contrast;
-	std::unique_ptr<u8[]> m_render_buf;
 	devcb_write8 m_write_segs;
 	devcb_write8 m_write_contrast;
 
 	emu_timer *m_lcd_driver;
 	TIMER_CALLBACK_MEMBER(lcd_driver_cb);
+
+	std::unique_ptr<u8[]> m_render_buf;
+	pixel_delegate m_pixel_cb;
 
 	// i/o ports
 	devcb_write8::array<5> m_write_r;

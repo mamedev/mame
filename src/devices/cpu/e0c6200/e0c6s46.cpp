@@ -7,7 +7,7 @@
 
   TODO:
   - OSC3
-  - K input interrupts
+  - K input interrupt can trigger if input is active while writing to the mask register
   - finish i/o ports
   - serial interface
   - buzzer envelope addition
@@ -53,6 +53,7 @@ e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, d
 	m_vram(*this, "vram%u", 1U),
 	m_write_segs(*this),
 	m_write_contrast(*this),
+	m_pixel_cb(*this),
 	m_write_r(*this),
 	m_read_p(*this, 0),
 	m_write_p(*this)
@@ -77,6 +78,8 @@ void e0c6s46_device::device_start()
 	m_buzzer_handle->adjust(attotime::never);
 	m_lcd_driver = timer_alloc(FUNC(e0c6s46_device::lcd_driver_cb), this);
 	m_lcd_driver->adjust(attotime::from_ticks(1024, unscaled_clock()));
+
+	m_pixel_cb.resolve();
 
 	const u32 render_buf_size = m_vram[0].bytes() * 2 * 4;
 	m_render_buf = make_unique_clear<u8[]>(render_buf_size);
@@ -274,7 +277,17 @@ void e0c6s46_device::execute_set_input(int line, int state)
 	int port = line >> 2 & 1;
 	u8 bit = 1 << (line & 3);
 
+	u8 prev = m_port_k[port];
 	m_port_k[port] = (m_port_k[port] & ~bit) | (state ? bit : 0);
+
+	// set interrupt on falling/rising edge of input
+	u8 dfk = (port == 0) ? m_dfk0 : 0xf;
+	u8 edge = ~(prev ^ dfk) & (m_port_k[port] ^ dfk) & bit;
+	if (m_irqmask[IRQREG_INPUT0 + port] & edge)
+	{
+		m_irqflag[IRQREG_INPUT0 + port] |= edge;
+		m_possible_irq = true;
+	}
 }
 
 
@@ -597,13 +610,14 @@ u32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	{
 		for (int y = 0; y < 16; y++)
 		{
-			int sx = x;
-			int sy = y;
-			//int sx = y | (x / 20) << 4;
-			//int sy = x % 20;
+			int dx = x;
+			int dy = y;
 
-			if (cliprect.contains(sx, sy))
-				bitmap.pix(sy, sx) = src[y * width + x];
+			if (!m_pixel_cb.isnull())
+				m_pixel_cb(dx, dy);
+
+			if (cliprect.contains(dx, dy))
+				bitmap.pix(dy, dx) = src[y * width + x];
 		}
 	}
 

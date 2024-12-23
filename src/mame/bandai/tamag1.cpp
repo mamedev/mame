@@ -48,6 +48,7 @@ protected:
 
 private:
 	void lcd_segment_w(offs_t offset, u8 data) { m_out_x[offset & 0xf][offset >> 4] = data; }
+	void pixel_callback(int &dx, int &dy) { int x = dx; dx = dy | (dx / 20) << 4; dy = x % 20; }
 
 	required_device<e0c6s46_device> m_maincpu;
 	output_finder<16, 40> m_out_x;
@@ -122,7 +123,6 @@ void tamag1_state::alienfev(machine_config &config)
 {
 	// basic machine hardware
 	E0C6S46(config, m_maincpu, 32.768_kHz_XTAL);
-	m_maincpu->write_segs().set(FUNC(tamag1_state::lcd_segment_w));
 	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
 
 	// video hardware
@@ -145,7 +145,7 @@ void tamag1_state::venusdm(machine_config &config)
 {
 	// basic machine hardware
 	E0C6S46(config, m_maincpu, 32.768_kHz_XTAL);
-	m_maincpu->write_segs().set(FUNC(tamag1_state::lcd_segment_w));
+	m_maincpu->set_pixel_callback(FUNC(tamag1_state::pixel_callback));
 	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
 
 	// video hardware
@@ -202,4 +202,4 @@ ROM_END
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS         INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1997, tama,     0,      0,      tama,     tama,     tamag1_state, empty_init, "Bandai", "Tamagotchi (Gen. 1, World)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1997, alienfev, 0,      0,      alienfev, alienfev, tamag1_state, empty_init, "Epoch", "Chibi Pachi Alien Fever", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-SYST( 1997, venusdm,  0,      0,      venusdm,  venusdm,  tamag1_state, empty_init, "Nikko", "Beans Collection: Venus Diet Monogatari", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1997, venusdm,  0,      0,      venusdm,  venusdm,  tamag1_state, empty_init, "Nikko", "Beans Collection: Venus Diet Monogatari", MACHINE_SUPPORTS_SAVE )
