@@ -245,9 +245,9 @@ const drcbe_x86::opcode_table_entry drcbe_x86::s_opcode_table_source[] =
 	{ uml::OP_SUBB,    &drcbe_x86::op_subc },       // SUBB    dst,src1,src2[,f]
 	{ uml::OP_CMP,     &drcbe_x86::op_cmp },        // CMP     src1,src2[,f]
 	{ uml::OP_MULU,    &drcbe_x86::op_mulu },       // MULU    dst,edst,src1,src2[,f]
-	{ uml::OP_MULUH,   &drcbe_x86::op_muluh },      // MULUH   dst,src1,src2[,f]
+	{ uml::OP_MULULW,  &drcbe_x86::op_mululw },     // MULULW  dst,src1,src2[,f]
 	{ uml::OP_MULS,    &drcbe_x86::op_muls },       // MULS    dst,edst,src1,src2[,f]
-	{ uml::OP_MULSH,   &drcbe_x86::op_mulsh },      // MULSH   dst,src1,src2[,f]
+	{ uml::OP_MULSLW,  &drcbe_x86::op_mulslw },     // MULSLW  dst,src1,src2[,f]
 	{ uml::OP_DIVU,    &drcbe_x86::op_divu },       // DIVU    dst,edst,src1,src2[,f]
 	{ uml::OP_DIVS,    &drcbe_x86::op_divs },       // DIVS    dst,edst,src1,src2[,f]
 	{ uml::OP_AND,     &drcbe_x86::op_and },        // AND     dst,src1,src2[,f]
@@ -4406,10 +4406,10 @@ void drcbe_x86::op_mulu(Assembler &a, const instruction &inst)
 
 
 //-------------------------------------------------
-//  op_muluh - process a MULUH (32x32=32) opcode
+//  op_mululw - process a MULULW (32x32=32) opcode
 //-------------------------------------------------
 
-void drcbe_x86::op_muluh(Assembler &a, const instruction &inst)
+void drcbe_x86::op_mululw(Assembler &a, const instruction &inst)
 {
 	// validate instruction
 	assert(inst.size() == 4 || inst.size() == 8);
@@ -4561,10 +4561,10 @@ void drcbe_x86::op_muls(Assembler &a, const instruction &inst)
 
 
 //-------------------------------------------------
-//  op_mulsh - process a MULSH (32x32=32) opcode
+//  op_mulslw - process a MULSLW (32x32=32) opcode
 //-------------------------------------------------
 
-void drcbe_x86::op_mulsh(Assembler &a, const instruction &inst)
+void drcbe_x86::op_mulslw(Assembler &a, const instruction &inst)
 {
 	// validate instruction
 	assert(inst.size() == 4 || inst.size() == 8);

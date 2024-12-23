@@ -182,9 +182,9 @@ namespace uml
 		OP_SUBB,                    // SUBB    dst,src1,src2[,f]
 		OP_CMP,                     // CMP     src1,src2[,f]
 		OP_MULU,                    // MULU    dst,edst,src1,src2[,f]
-		OP_MULUH,                   // MULUH   dst,src1,src2[,f]
+		OP_MULULW,                  // MULULW  dst,src1,src2[,f]
 		OP_MULS,                    // MULS    dst,edst,src1,src2[,f]
-		OP_MULSH,                   // MULSH   dst,src1,src2[,f]
+		OP_MULSLW,                  // MULSLW  dst,src1,src2[,f]
 		OP_DIVU,                    // DIVU    dst,edst,src1,src2[,f]
 		OP_DIVS,                    // DIVS    dst,edst,src1,src2[,f]
 		OP_AND,                     // AND     dst,src1,src2[,f]
@@ -473,9 +473,9 @@ namespace uml
 		void subb(parameter dst, parameter src1, parameter src2) { configure(OP_SUBB, 4, dst, src1, src2); }
 		void cmp(parameter src1, parameter src2) { configure(OP_CMP, 4, src1, src2); }
 		void mulu(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_MULU, 4, dst, edst, src1, src2); }
-		void muluh(parameter dst, parameter src1, parameter src2) { configure(OP_MULUH, 4, dst, src1, src2); }
+		void mululw(parameter dst, parameter src1, parameter src2) { configure(OP_MULULW, 4, dst, src1, src2); }
 		void muls(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_MULS, 4, dst, edst, src1, src2); }
-		void mulsh(parameter dst, parameter src1, parameter src2) { configure(OP_MULSH, 4, dst, src1, src2); }
+		void mulslw(parameter dst, parameter src1, parameter src2) { configure(OP_MULSLW, 4, dst, src1, src2); }
 		void divu(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_DIVU, 4, dst, edst, src1, src2); }
 		void divs(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_DIVS, 4, dst, edst, src1, src2); }
 		void _and(parameter dst, parameter src1, parameter src2) { configure(OP_AND, 4, dst, src1, src2); }
@@ -514,9 +514,9 @@ namespace uml
 		void dsubb(parameter dst, parameter src1, parameter src2) { configure(OP_SUBB, 8, dst, src1, src2); }
 		void dcmp(parameter src1, parameter src2) { configure(OP_CMP, 8, src1, src2); }
 		void dmulu(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_MULU, 8, dst, edst, src1, src2); }
-		void dmuluh(parameter dst, parameter src1, parameter src2) { configure(OP_MULUH, 8, dst, src1, src2); }
+		void dmululw(parameter dst, parameter src1, parameter src2) { configure(OP_MULULW, 8, dst, src1, src2); }
 		void dmuls(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_MULS, 8, dst, edst, src1, src2); }
-		void dmulsh(parameter dst, parameter src1, parameter src2) { configure(OP_MULSH, 8, dst, src1, src2); }
+		void dmulslw(parameter dst, parameter src1, parameter src2) { configure(OP_MULSLW, 8, dst, src1, src2); }
 		void ddivu(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_DIVU, 8, dst, edst, src1, src2); }
 		void ddivs(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_DIVS, 8, dst, edst, src1, src2); }
 		void dand(parameter dst, parameter src1, parameter src2) { configure(OP_AND, 8, dst, src1, src2); }

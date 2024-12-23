@@ -177,9 +177,9 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO3(SUBB,    "!subb",    4|8, false, C,    SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO2(CMP,     "!cmp",     4|8, false, NONE, SZVC, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO4(MULU,    "!mulu",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Unsigned 32x32=64 and 64x64=128 multiplication
-	OPINFO3(MULUH,   "!muluh",   4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Unsigned 32x32=32 and 64x64=64 multiplication (overflow set based on 32x32=64 calculation but zero and sign based on 32-bit result)
+	OPINFO3(MULULW,  "!mululw",  4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Unsigned 32x32=32 and 64x64=64 multiplication (overflow set based on 32x32=64 calculation but zero and sign based on 32-bit result)
 	OPINFO4(MULS,    "!muls",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Signed 32x32=64 and 64x64=128 multiplication
-	OPINFO3(MULSH,   "!mulsh",   4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Signed 32x32=32 and 64x64=64 multiplication (overflow set based on 32x32=64 calculation but zero and sign based on 32-bit result)
+	OPINFO3(MULSLW,  "!mulslw",  4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Signed 32x32=32 and 64x64=64 multiplication (overflow set based on 32x32=64 calculation but zero and sign based on 32-bit result)
 	OPINFO4(DIVU,    "!divu",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO4(DIVS,    "!divs",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO3(AND,     "!and",     4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
@@ -515,8 +515,8 @@ void uml::instruction::simplify()
 			}
 			break;
 
-		// MULUH: convert simple form to MOV if immediate, or if multiplying by 0
-		case OP_MULUH:
+		// MULULW: convert simple form to MOV if immediate, or if multiplying by 0
+		case OP_MULULW:
 			if (m_param[1].is_immediate_value(0) || m_param[2].is_immediate_value(0))
 				convert_to_mov_immediate(0);
 			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
@@ -544,8 +544,8 @@ void uml::instruction::simplify()
 			}
 			break;
 
-		// MULSH: convert simple form to MOV if immediate, or if multiplying by 0
-		case OP_MULSH:
+		// MULSLW: convert simple form to MOV if immediate, or if multiplying by 0
+		case OP_MULSLW:
 			if (m_param[1].is_immediate_value(0) || m_param[2].is_immediate_value(0))
 				convert_to_mov_immediate(0);
 			else if (m_param[1].is_immediate() && m_param[2].is_immediate())

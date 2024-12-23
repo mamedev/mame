@@ -173,9 +173,9 @@ private:
 	void op_subc(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_cmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_mulu(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_muluh(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mululw(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_muls(asmjit::x86::Assembler &a, const uml::instruction &inst);
-	void op_mulsh(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mulslw(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_divu(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_divs(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_and(asmjit::x86::Assembler &a, const uml::instruction &inst);

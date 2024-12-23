@@ -966,12 +966,12 @@ int drcbe_c::execute(code_handle &entry)
 					flags |= FLAG_V;
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_MULUH, 4, 0):      // MULUH   dst,src1,src2[,f]
+			case MAKE_OPCODE_SHORT(OP_MULULW, 4, 0):      // MULULW   dst,src1,src2[,f]
 				temp64 = mulu_32x32(PARAM1, PARAM2);
 				PARAM0 = (uint32_t)temp64;
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_MULUH, 4, 1):
+			case MAKE_OPCODE_SHORT(OP_MULULW, 4, 1):
 				temp64 = mulu_32x32(PARAM1, PARAM2);
 				temp32 = (uint32_t)temp64;
 				flags = FLAGS32_NZ(temp32);
@@ -995,12 +995,12 @@ int drcbe_c::execute(code_handle &entry)
 					flags |= FLAG_V;
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_MULSH, 4, 0):      // MULSH   dst,src1,src2[,f]
+			case MAKE_OPCODE_SHORT(OP_MULSLW, 4, 0):      // MULSLW   dst,src1,src2[,f]
 				temp64 = mul_32x32(PARAM1, PARAM2);
 				PARAM0 = (int32_t)temp64;
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_MULSH, 4, 1):
+			case MAKE_OPCODE_SHORT(OP_MULSLW, 4, 1):
 				temp64 = mul_32x32(PARAM1, PARAM2);
 				temp32 = (int32_t)temp64;
 				flags = FLAGS32_NZ(temp32);
@@ -1619,11 +1619,11 @@ int drcbe_c::execute(code_handle &entry)
 				flags = dmulu(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, true);
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_MULUH, 8, 0):      // DMULUH  dst,src1,src2[,f]
+			case MAKE_OPCODE_SHORT(OP_MULULW, 8, 0):      // DMULULW  dst,src1,src2[,f]
 				dmulu(*inst[0].puint64, *inst[0].puint64, DPARAM1, DPARAM2, false);
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_MULUH, 8, 1):
+			case MAKE_OPCODE_SHORT(OP_MULULW, 8, 1):
 				flags = dmulu(*inst[0].puint64, *inst[0].puint64, DPARAM1, DPARAM2, true);
 				flags = FLAGS64_NZ(DPARAM0) | (flags & FLAG_V);
 				break;
@@ -1636,11 +1636,11 @@ int drcbe_c::execute(code_handle &entry)
 				flags = dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, true);
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_MULSH, 8, 0):      // DMULSH  dst,src1,src2[,f]
+			case MAKE_OPCODE_SHORT(OP_MULSLW, 8, 0):      // DMULSLW  dst,src1,src2[,f]
 				dmuls(*inst[0].puint64, *inst[0].puint64, DPARAM1, DPARAM2, false);
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_MULSH, 8, 1):
+			case MAKE_OPCODE_SHORT(OP_MULSLW, 8, 1):
 				flags = dmuls(*inst[0].puint64, *inst[0].puint64, DPARAM1, DPARAM2, true);
 				flags = FLAGS64_NZ(DPARAM0) | (flags & FLAG_V);
 				break;
