@@ -181,6 +181,7 @@ enum
 // compute C and V flags for 32-bit add/subtract
 #define FLAGS32_C_ADD(a,b)          ((uint32_t)~(a) < (uint32_t)(b))
 #define FLAGS32_C_SUB(a,b)          ((uint32_t)(b) > (uint32_t)(a))
+#define FLAGS32_C_SUBC(a,b,c)       (((uint32_t)(c) != 0 && ((uint32_t)(b) + (uint32_t)(c)) == 0) || (uint32_t)(b) + (uint32_t)(c) > (uint32_t)(a))
 #define FLAGS32_V_SUB(r,a,b)        (((((a) ^ (b)) & ((a) ^ (r))) >> 30) & FLAG_V)
 #define FLAGS32_V_ADD(r,a,b)        (((~((a) ^ (b)) & ((a) ^ (r))) >> 30) & FLAG_V)
 
@@ -188,10 +189,12 @@ enum
 #define FLAGS32_NZ(v)               ((((v) >> 28) & FLAG_S) | (((uint32_t)(v) == 0) << 2))
 #define FLAGS32_NZCV_ADD(r,a,b)     (FLAGS32_NZ(r) | FLAGS32_C_ADD(a,b) | FLAGS32_V_ADD(r,a,b))
 #define FLAGS32_NZCV_SUB(r,a,b)     (FLAGS32_NZ(r) | FLAGS32_C_SUB(a,b) | FLAGS32_V_SUB(r,a,b))
+#define FLAGS32_NZCV_SUBC(r,a,b,c)  (FLAGS32_NZ(r) | FLAGS32_C_SUBC(a,b,c) | FLAGS32_V_SUB(r,a,b))
 
 // compute C and V flags for 64-bit add/subtract
 #define FLAGS64_C_ADD(a,b)          ((uint64_t)~(a) < (uint64_t)(b))
 #define FLAGS64_C_SUB(a,b)          ((uint64_t)(b) > (uint64_t)(a))
+#define FLAGS64_C_SUBC(a,b,c)       (((uint64_t)(c) != 0 && ((uint64_t)(b) + (uint64_t)(c)) == 0) || (uint64_t)(b) + (uint64_t)(c) > (uint64_t)(a))
 #define FLAGS64_V_SUB(r,a,b)        (((((a) ^ (b)) & ((a) ^ (r))) >> 62) & FLAG_V)
 #define FLAGS64_V_ADD(r,a,b)        (((~((a) ^ (b)) & ((a) ^ (r))) >> 62) & FLAG_V)
 
@@ -199,6 +202,7 @@ enum
 #define FLAGS64_NZ(v)               ((((v) >> 60) & FLAG_S) | (((uint64_t)(v) == 0) << 2))
 #define FLAGS64_NZCV_ADD(r,a,b)     (FLAGS64_NZ(r) | FLAGS64_C_ADD(a,b) | FLAGS64_V_ADD(r,a,b))
 #define FLAGS64_NZCV_SUB(r,a,b)     (FLAGS64_NZ(r) | FLAGS64_C_SUB(a,b) | FLAGS64_V_SUB(r,a,b))
+#define FLAGS64_NZCV_SUBC(r,a,b,c)  (FLAGS64_NZ(r) | FLAGS64_C_SUBC(a,b,c) | FLAGS64_V_SUB(r,a,b))
 
 
 
@@ -937,16 +941,7 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_SUBB, 4, 1):
 				temp32 = PARAM1 - PARAM2 - (flags & FLAG_C);
-				temp64 = (uint64_t)PARAM1 - (uint64_t)PARAM2 - (uint64_t)(flags & FLAG_C);
-				if (PARAM2 + 1 != 0)
-					flags = FLAGS32_NZCV_SUB(temp32, PARAM1, PARAM2 + (flags & FLAG_C));
-				else
-				{
-					flags = FLAGS32_NZCV_SUB(temp32, PARAM1 - (flags & FLAG_C), PARAM2);
-					flags &= ~(FLAG_C | FLAG_V);
-					flags |= ((temp64>>32) & 1) ? FLAG_C : 0;
-					flags |= (((PARAM1) ^ (PARAM2)) & ((PARAM1) ^ (temp64)) & 0x80000000) ? FLAG_V : 0;
-				}
+				flags = FLAGS32_NZCV_SUBC(temp32, PARAM1, PARAM2, flags & FLAG_C);
 				PARAM0 = temp32;
 				break;
 
@@ -1607,10 +1602,7 @@ int drcbe_c::execute(code_handle &entry)
 
 			case MAKE_OPCODE_SHORT(OP_SUBB, 8, 1):
 				temp64 = DPARAM1 - DPARAM2 - (flags & FLAG_C);
-				if (DPARAM2 + 1 != 0)
-					flags = FLAGS64_NZCV_SUB(temp64, DPARAM1, DPARAM2 + (flags & FLAG_C));
-				else
-					flags = FLAGS64_NZCV_SUB(temp64, DPARAM1 - (flags & FLAG_C), DPARAM2);
+				flags = FLAGS64_NZCV_SUBC(temp64, DPARAM1, DPARAM2, flags & FLAG_C);
 				DPARAM0 = temp64;
 				break;
 
