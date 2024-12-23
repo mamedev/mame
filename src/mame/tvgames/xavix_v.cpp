@@ -172,7 +172,10 @@ void superxavix_state::superxavix_plt_flush_w(uint8_t data)
 	m_sx_plt_mode = data;
 }
 
-
+uint8_t superxavix_state::superxavix_plt_dat_r()
+{
+	return machine().rand();
+}
 
 void superxavix_state::superxavix_plt_dat_w(uint8_t data)
 {

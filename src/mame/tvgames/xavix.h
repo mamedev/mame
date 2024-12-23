@@ -644,6 +644,7 @@ public:
 	}
 
 	void xavix2002(machine_config &config);
+	void xavix2002_4mb(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -659,6 +660,7 @@ protected:
 
 private:
 	void superxavix_plt_flush_w(uint8_t data);
+	uint8_t superxavix_plt_dat_r();
 	void superxavix_plt_dat_w(uint8_t data);
 	void superxavix_plt_loc_w(offs_t offset, uint8_t data);
 	uint8_t superxavix_plt_loc_r(offs_t offset);
@@ -733,6 +735,7 @@ public:
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
+	void superxavix_i2c_24c16(machine_config &config);
 	void superxavix_i2c_24c08(machine_config &config);
 	void superxavix_i2c_24c04(machine_config &config);
 	void superxavix_i2c_24c04_4mb(machine_config &config);

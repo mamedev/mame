@@ -68,6 +68,22 @@ private:
 	required_memory_bank m_rombank;
 };
 
+class superxavix_doradraw_state : public superxavix_state
+{
+public:
+	superxavix_doradraw_state(const machine_config &mconfig, device_type type, const char *tag)
+		: superxavix_state(mconfig, type, tag)
+	{ }
+
+	void superxavix_doradraw(machine_config &config);
+
+	void init_doradraw();
+
+private:
+
+	virtual void xavix_extbus_map(address_map &map) override;
+};
+
 class superxavix_i2c_bowl_state : public superxavix_i2c_state
 {
 public:
