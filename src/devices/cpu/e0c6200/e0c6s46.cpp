@@ -41,8 +41,8 @@ void e0c6s46_device::e0c6s46_program(address_map &map)
 void e0c6s46_device::e0c6s46_data(address_map &map)
 {
 	map(0x0000, 0x027f).ram();
-	map(0x0e00, 0x0e4f).ram().share("vram1");
-	map(0x0e80, 0x0ecf).ram().share("vram2");
+	map(0x0e00, 0x0e4f).ram().share(m_vram[0]);
+	map(0x0e80, 0x0ecf).ram().share(m_vram[1]);
 	map(0x0f00, 0x0f7f).rw(FUNC(e0c6s46_device::io_r), FUNC(e0c6s46_device::io_w));
 }
 
@@ -50,9 +50,9 @@ void e0c6s46_device::e0c6s46_data(address_map &map)
 // device definitions
 e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	e0c6200_cpu_device(mconfig, E0C6S46, tag, owner, clock, address_map_constructor(FUNC(e0c6s46_device::e0c6s46_program), this), address_map_constructor(FUNC(e0c6s46_device::e0c6s46_data), this)),
-	m_vram1(*this, "vram1"),
-	m_vram2(*this, "vram2"),
-	m_pixel_update_cb(*this),
+	m_vram(*this, "vram%u", 1U),
+	m_write_segs(*this),
+	m_write_contrast(*this),
 	m_write_r(*this),
 	m_read_p(*this, 0),
 	m_write_p(*this)
@@ -68,15 +68,19 @@ void e0c6s46_device::device_start()
 {
 	e0c6200_cpu_device::device_start();
 
-	m_pixel_update_cb.resolve();
-
-	// create timers
+	// misc init
 	m_core_256_handle = timer_alloc(FUNC(e0c6s46_device::core_256_cb), this);
 	m_core_256_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
 	m_prgtimer_handle = timer_alloc(FUNC(e0c6s46_device::prgtimer_cb), this);
 	m_prgtimer_handle->adjust(attotime::never);
 	m_buzzer_handle = timer_alloc(FUNC(e0c6s46_device::buzzer_cb), this);
 	m_buzzer_handle->adjust(attotime::never);
+	m_lcd_driver = timer_alloc(FUNC(e0c6s46_device::lcd_driver_cb), this);
+	m_lcd_driver->adjust(attotime::from_ticks(1024, unscaled_clock()));
+
+	const u32 render_buf_size = m_vram[0].bytes() * 2 * 4;
+	m_render_buf = make_unique_clear<u8[]>(render_buf_size);
+	save_pointer(NAME(m_render_buf), render_buf_size);
 
 	// zerofill
 	memset(m_port_r, 0x0, sizeof(m_port_r));
@@ -194,6 +198,8 @@ void e0c6s46_device::device_reset()
 	m_data->write_byte(0xf7b, 0x0);
 	m_data->write_byte(0xf7d, 0x0);
 	m_data->write_byte(0xf7e, 0x0);
+
+	m_write_contrast(m_lcd_contrast);
 
 	// reset ports
 	for (int i = 0; i < 5; i++)
@@ -545,13 +551,11 @@ void e0c6s46_device::clock_bz_1shot()
 //  LCD Driver
 //-------------------------------------------------
 
-u32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+TIMER_CALLBACK_MEMBER(e0c6s46_device::lcd_driver_cb)
 {
-	// call this 32 times per second (osc1/1024: 32hz at default clock of 32768hz)
+	// this gets called 32 times per second (osc1/1024: 32hz at default clock of 32768hz)
 	for (int bank = 0; bank < 2; bank++)
 	{
-		const u8* vram = bank ? m_vram2 : m_vram1;
-
 		// determine operating mode
 		bool lcd_on = false;
 		int pixel = 0;
@@ -563,26 +567,25 @@ u32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			lcd_on = true;
 
 		// draw pixels
-		for (int offset = 0; offset < 0x50; offset++)
+		for (int offset = 0; offset < m_vram[0].bytes(); offset++)
 		{
 			for (int c = 0; c < 4; c++)
 			{
 				if (lcd_on)
-					pixel = vram[offset] >> c & 1;
+					pixel = m_vram[bank][offset] >> c & 1;
 
 				// 16 COM(common) pins, 40 SEG(segment) pins
 				int seg = offset / 2;
 				int com = bank * 8 + (offset & 1) * 4 + c;
 
-				if (!m_pixel_update_cb.isnull())
-					m_pixel_update_cb(bitmap, cliprect, m_lcd_contrast, seg, com, pixel);
-				else if (cliprect.contains(seg, com))
-					bitmap.pix(com, seg) = pixel;
+				const u8 width = m_vram[0].bytes() * 4 / 8;
+				m_render_buf[com * width + seg] = pixel;
+				m_write_segs(seg << 4 | com, pixel);
 			}
 		}
 	}
 
-	return 0;
+	m_lcd_driver->adjust(attotime::from_ticks(1024, unscaled_clock()));
 }
 
 
@@ -760,6 +763,7 @@ void e0c6s46_device::io_w(offs_t offset, u8 data)
 		case 0x72:
 			// contrast adjustment (0=light, 15=dark)
 			m_lcd_contrast = data;
+			m_write_contrast(data);
 			break;
 
 		// SVD circuit (supply voltage detection)

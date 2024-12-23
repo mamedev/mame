@@ -42,10 +42,6 @@ enum
 };
 
 
-// lcd driver
-#define E0C6S46_PIXEL_UPDATE(name) void name(bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state)
-
-
 class e0c6s46_device : public e0c6200_cpu_device
 {
 public:
@@ -60,12 +56,14 @@ public:
 	template <std::size_t Port> auto read_p() { return m_read_p[Port].bind(); }
 	template <std::size_t Port> auto write_p() { return m_write_p[Port].bind(); }
 
-	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb.set(std::forward<T>(args)...); }
+	// LCD segment outputs: COM0-COM15 as a0-a3, SEG0-SEGx as a4-a10
+	auto write_segs() { return m_write_segs.bind(); }
 
-	u8 io_r(offs_t offset);
-	void io_w(offs_t offset, u8 data);
+	// LCD contrast (adjusts VL pins overall voltage level)
+	auto write_contrast() { return m_write_contrast.bind(); }
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	const u8 *lcd_buffer() { return &m_render_buf[0]; } // get intermediate LCD pixel buffer
+	//u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect); // optional
 
 protected:
 	// device-level overrides
@@ -81,17 +79,25 @@ protected:
 	void e0c6s46_program(address_map &map) ATTR_COLD;
 
 private:
-	required_shared_ptr<u8> m_vram1;
-	required_shared_ptr<u8> m_vram2;
+	u8 io_r(offs_t offset);
+	void io_w(offs_t offset, u8 data);
+
+	required_shared_ptr_array<u8, 2> m_vram;
 
 	u8 m_irqflag[6];
 	u8 m_irqmask[6];
 	u8 m_osc;
 	u8 m_svd;
 
+	// lcd driver
 	u8 m_lcd_control;
 	u8 m_lcd_contrast;
-	pixel_update_delegate m_pixel_update_cb;
+	std::unique_ptr<u8[]> m_render_buf;
+	devcb_write8 m_write_segs;
+	devcb_write8 m_write_contrast;
+
+	emu_timer *m_lcd_driver;
+	TIMER_CALLBACK_MEMBER(lcd_driver_cb);
 
 	// i/o ports
 	devcb_write8::array<5> m_write_r;
