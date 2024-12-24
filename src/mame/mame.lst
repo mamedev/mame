@@ -29184,9 +29184,16 @@ abigchs                         // Big Cheese
 aclown                          // Clown
 atlantca                        // Atlantica
 atlantcaa                       //
+atrbonpk                        // Bonus Poker
+atrbtlma                        // Beetlemania
+atricmon                        // I C Money
+atricmona                       //
 atronic                         //
 atronica                        //
-baboshka                        // Baboshka
+atronicb                        //
+atrwild                         // Wild Thing
+baboshka                        // Babooshka
+baboshkar                       //
 beachpt                         // Beach Patrol
 bearnec                         // Bear Necessities
 beetleup                        // Beetles Unplugged
@@ -29196,21 +29203,23 @@ castawaya                       //
 cfblue                          // Crazy Fruits Blue
 cfbluea                         //
 cfgreen                         // Crazy Fruits Green
+chicdale                        // Chickendales
 chicken                         // Chicken
 dncsprt                         // Dancing Spirit
 drmmake                         // Dream Maker
+drmmaker                        //
 goldcity                        // Gold City
 goldglen                        // Golden Glenn
+haphippy                        // Happy Happy Hippy
 iccash                          // I C Cash
 jumpjkpt                        // Jumping Jackpots
 mushmagi                        // Mushroom Magic
 santam                          // Santa Maria
-shpinxii                        // Sphinx II
+sphinxii                        // Sphinx II
+sphinxiir                       //
 splmastr                        // Spell Master
 tajmah                          // Tajmahal
-atrwild
-atricmon
-atrbonpk
+tylagoon                        // Typhoon Lagoon
 
 @source:misc/attckufo.cpp
 attckufo                        // (c) 1980 Ryoto Electric Co.
