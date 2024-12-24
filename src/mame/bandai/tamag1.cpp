@@ -182,6 +182,14 @@ ROM_START( tama )
 	ROM_LOAD( "tama.svg", 0, 139072, CRC(9468b964) SHA1(ab49471db21a00a3b3a68da39c40da69da5d7e1b) )
 ROM_END
 
+ROM_START( tamag2 )
+	ROM_REGION( 0x3000, "maincpu", 0 )
+	ROM_LOAD( "tamag2.bin", 0x0000, 0x3000, CRC(9f97539e) SHA1(09e5101b37636a314fc599d5d69b4846721b3c88) )
+
+	ROM_REGION( 139072, "screen", 0)
+	ROM_LOAD( "tama.svg", 0, 139072, CRC(9468b964) SHA1(ab49471db21a00a3b3a68da39c40da69da5d7e1b) )
+ROM_END
+
 ROM_START( alienfev )
 	ROM_REGION( 0x3000, "maincpu", 0 )
 	ROM_LOAD( "alienfev.bin", 0x0000, 0x3000, CRC(e561599c) SHA1(7927e198f8989861ba057150e59d1f4ad403c1d2) )
@@ -202,5 +210,6 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS         INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1997, tama,     0,      0,      tama,     tama,     tamag1_state, empty_init, "Bandai", "Tamagotchi (Gen. 1, World)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1997, tamag2,   0,      0,      tama,     tama,     tamag1_state, empty_init, "Bandai", "Tamagotchi (Gen. 2, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1997, alienfev, 0,      0,      alienfev, alienfev, tamag1_state, empty_init, "Epoch", "Chibi Pachi: Alien Fever", MACHINE_SUPPORTS_SAVE )
 SYST( 1997, venusdm,  0,      0,      venusdm,  venusdm,  tamag1_state, empty_init, "Nikko", "Beans Collection: Venus Diet Monogatari", MACHINE_SUPPORTS_SAVE )

@@ -2501,6 +2501,7 @@ sv8000                          // Super Vision 8000
 @source:bandai/tamag1.cpp
 alienfev                        // Epoch
 tama                            // Bandai
+tamag2                          // Bandai
 venusdm                         // Nikko
 
 @source:bandai/wswan.cpp
