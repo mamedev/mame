@@ -124,6 +124,8 @@ Notes:
 #include "emu.h"
 #include "dynax.h"
 
+#include "mjdipsw.h"
+
 #include "mahjong.h"
 
 #include "cpu/m68000/m68000.h"

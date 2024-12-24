@@ -106,6 +106,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 
+#include "mjdipsw.h"
+
 #include "mahjong.h"
 
 #include "cpu/tlcs90/tlcs90.h"
@@ -3155,137 +3157,221 @@ static INPUT_PORTS_START( mjtensin )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cafetime ) // dips definitions and defaults taken from MT05580, this uses 10 switch dip banks
+	// The manual provides two sets of standard settings:
+	//       標準設定　シングル向け                        標準設定　コーナー向け
+	// SW 1  OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF       OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF
+	// SW 2  OFF OFF OFF OFF  ON  ON OFF  ON  ON OFF       OFF OFF OFF OFF  ON OFF  ON  ON  ON OFF
+	// SW 3  OFF OFF  ON  ON  ON  ON  ON OFF OFF OFF       OFF OFF  ON  ON  ON  ON  ON OFF OFF OFF
+	// SW 4  OFF  ON  ON  ON  ON  ON OFF  ON OFF OFF        ON  ON OFF  ON  ON  ON OFF  ON OFF OFF
+
 	PORT_INCLUDE( mjctrl2 )
 
 	PORT_START("DSW1")  // IN11
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" ) PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x0f, "96%" )
-	PORT_DIPSETTING(    0x0e, "93%" )
-	PORT_DIPSETTING(    0x0d, "90%" )
-	PORT_DIPSETTING(    0x0c, "87%" )
-	PORT_DIPSETTING(    0x0b, "84%" )
-	PORT_DIPSETTING(    0x0a, "81%" )
-	PORT_DIPSETTING(    0x09, "78%" )
-	PORT_DIPSETTING(    0x08, "75%" )
-	PORT_DIPSETTING(    0x07, "71%" )
-	PORT_DIPSETTING(    0x06, "68%" )
-	PORT_DIPSETTING(    0x05, "65%" )
-	PORT_DIPSETTING(    0x04, "62%" )
-	PORT_DIPSETTING(    0x03, "59%" )
-	PORT_DIPSETTING(    0x02, "56%" )
-	PORT_DIPSETTING(    0x01, "53%" )
-	PORT_DIPSETTING(    0x00, "50%" )
-	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" ) PORT_DIPLOCATION("SW1:5,6") // Yakuman - Triple - Double - Haneman - Mangan - 3 Han - 2 Han - 1 Han
-	PORT_DIPSETTING(    0x30, "32-24-16-12-8-4-2-1" )
-	PORT_DIPSETTING(    0x00, "50-30-15-8-5-3-2-1" )
-	PORT_DIPSETTING(    0x10, "100-50-25-10-5-3-2-1" )
-	PORT_DIPSETTING(    0x20, "200-100-50-10-5-3-2-1" )
-	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" ) PORT_DIPLOCATION("SW1:7,8")
+	MAHJONG_PAYOUT_RATE(0, "SW 1:1,2,3,4")                                                        // ＰＡＹ－ＯＵＴ　ＲＡＴＥ
+	MAHJONG_ODDS_RATE(4, "SW 1:5,6")                                                              // ＯＤＤＳ　ＲＡＴＥ
+	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )                   PORT_DIPLOCATION("SW 1:7,8")      // ＢＥＴ－ＭＡＸ
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
-	PORT_START("DSW2")  // IN12, defaults for 'single type'
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1C_10C" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Rate" ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(    0x0c, "1" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x70, 0x40, "Yakuman Bonus" ) PORT_DIPLOCATION("SW2:5,6,7") // default for 'corner type' would be 0x20
-	PORT_DIPSETTING(    0x70, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x60, "Once on Start" )
-	PORT_DIPSETTING(    0x50, "Every 300 Coins" )
-	PORT_DIPSETTING(    0x40, "Every 500 Coins" )
-	PORT_DIPSETTING(    0x30, "Every 700 Coins" )
-	PORT_DIPSETTING(    0x20, "Every 1000 Coins" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Unknown ) ) // not listed on dip sheet
-	PORT_DIPSETTING(    0x00, DEF_STR( Unknown ) ) // not listed on dip sheet
-	PORT_DIPNAME( 0x80, 0x00, "Yakuman Bonus Cycle" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x00, "Once" )
-	PORT_DIPSETTING(    0x80, "Twice" )
+	PORT_START("DSW2")  // IN12
+	MAHJONG_COINAGE(0, "SW 2:1,2")                                                                // ＣＯＩＮ　ＲＡＴＥ
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                   PORT_DIPLOCATION("SW 2:3,4")      // ゲーム・スタート時の最低レート数
+	PORT_DIPSETTING(    0x0c, "1" )                                                               // レート　１
+	PORT_DIPSETTING(    0x08, "2" )                                                               // レート　２
+	PORT_DIPSETTING(    0x04, "3" )                                                               // レート　３
+	PORT_DIPSETTING(    0x00, "5" )                                                               // レート　５
+	MAHJONG_YAKUMAN_BONUS(4, "SW 2:5,6,7")                                                        // 役満ボーナスの設定周期
+	PORT_DIPNAME( 0x80, 0x00, "Yakuman Bonuses Per Cycle" )     PORT_DIPLOCATION("SW 2:8")        // 役満ボーナスの回数設定周期毎に
+	PORT_DIPSETTING(    0x00, "1" )                                                               // １回
+	PORT_DIPSETTING(    0x80, "2" )                                                               // ２回
 
 	PORT_START("DSW3")  // IN13
-	PORT_DIPNAME( 0x01, 0x01, "Payout Type" ) PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(    0x01, "Credits" )
-	PORT_DIPSETTING(    0x00, "Hopper" )
-	PORT_DIPNAME( 0x02, 0x02, "Hopper Type" ) PORT_DIPLOCATION("SW3:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, "Reversed" )
-	PORT_DIPNAME( 0x04, 0x00, "W-Bet" ) PORT_DIPLOCATION("SW3:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Renchan Rate" ) PORT_DIPLOCATION("SW3:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Last Chance" ) PORT_DIPLOCATION("SW3:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Good Time Timer" ) PORT_DIPLOCATION("SW3:6")
-	PORT_DIPSETTING(    0x00, "3 Minutes" )
-	PORT_DIPSETTING(    0x20, "5 Minutes" )
-	PORT_DIPNAME( 0x40, 0x00, "Quiz Bonus" ) PORT_DIPLOCATION("SW3:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Quiz Bonus Points" ) PORT_DIPLOCATION("SW3:8")
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPNAME( 0x01, 0x01, "Payout Mode" )                   PORT_DIPLOCATION("SW 3:1")        // ゲーム・タイプ
+	PORT_DIPSETTING(    0x01, "Key-out" )                                                         // クレジット・タイプ
+	PORT_DIPSETTING(    0x00, "Hopper" )                                                          // ホッパー・タイプ
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Polarity" )               PORT_DIPLOCATION("SW 3:2")        // ホッパー・アクティブ
+	PORT_DIPSETTING(    0x02, DEF_STR(Normal) )                                                   // 通常
+	PORT_DIPSETTING(    0x00, "Inverted" )                                                        // 反転
+	PORT_DIPNAME( 0x04, 0x00, "Double Bet" )                    PORT_DIPLOCATION("SW 3:3")        // Ｗ－ＢＥＴ
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x08, 0x00, "Renchan Rate" )                  PORT_DIPLOCATION("SW 3:4")        // 連荘レート
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x10, 0x00, "Last Chance" )                   PORT_DIPLOCATION("SW 3:5")        // ラスト・チャンス
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x20, 0x00, "Good Time Duration" )            PORT_DIPLOCATION("SW 3:6")        // Ｇｏｏｄ Ｔｉｍｅ の時間
+	PORT_DIPSETTING(    0x00, "3 Minutes" )                                                       // ３分間
+	PORT_DIPSETTING(    0x20, "5 Minutes" )                                                       // ５分間
+	PORT_DIPNAME( 0x40, 0x00, "Quiz Bonus" )                    PORT_DIPLOCATION("SW 3:7")        // クイズ・ボーナス
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x80, 0x80, "Quiz Bonus Points" )             PORT_DIPLOCATION("SW 3:8")        // クイズ・ボーナスのポイント
+	PORT_DIPSETTING(    0x00, "2" )                                                               // ２点
+	PORT_DIPSETTING(    0x80, "3" )                                                               // ３点
 
-	PORT_START("DSW4")  // IN14, defaults for 'single type'
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW4:1") // Should be off for 'single type' and on for 'corner type', left on for easier regression testing
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "BGM during Gameplay" ) PORT_DIPLOCATION("SW4:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Don Den Button" )  PORT_DIPLOCATION("SW4:3") // Off for 'corner type'
-	PORT_DIPSETTING(    0x04, "Start Button" )
-	PORT_DIPSETTING(    0x00, "F/F Button" )
-	PORT_DIPNAME( 0x08, 0x00, "Auto Reach" ) PORT_DIPLOCATION("SW4:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Full Test" )  PORT_DIPLOCATION("SW4:5") // 4 koma comic test
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Background" ) PORT_DIPLOCATION("SW4:6")
-	PORT_DIPSETTING(    0x20, "Black" )
-	PORT_DIPSETTING(    0x00, "Green" )
-	PORT_DIPNAME( 0x40, 0x40, "Book (Stage) Select" ) PORT_DIPLOCATION("SW4:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Yakuman Match" ) PORT_DIPLOCATION("SW4:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW4")  // IN14
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )            PORT_DIPLOCATION("SW 4:1")        // デモ・サウンド
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )                 PORT_DIPLOCATION("SW 4:2")        // ゲーム・サウンド
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x04, 0x00, "Don Den Button" )                PORT_DIPLOCATION("SW 4:3")        // Ｄｏｎ・Ｄｅｎ　機能ボタン変更
+	PORT_DIPSETTING(    0x04, "Start" )                                                           // スタート・ボタ
+	PORT_DIPSETTING(    0x00, "Flip Flop" )                                                       // Ｆ／Ｆ・ボタン
+	PORT_DIPNAME( 0x08, 0x00, "Auto Reach" )                    PORT_DIPLOCATION("SW 4:4")        // オート・リーチ
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x10, 0x00, "Show 4-Panel Comics" )           PORT_DIPLOCATION("SW 4:5")        // ４コマ・漫画表示
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x20, 0x00, "Background Color" )              PORT_DIPLOCATION("SW 4:6")        // バック・カラー
+	PORT_DIPSETTING(    0x20, "Black" )                                                           // 黒
+	PORT_DIPSETTING(    0x00, "Green" )                                                           // 緑
+	PORT_DIPNAME( 0x40, 0x40, "Stage Select" )                  PORT_DIPLOCATION("SW 4:7")        // 本（ステージ）セレクト
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
+	PORT_DIPNAME( 0x80, 0x00, "Yakuman Match" )                 PORT_DIPLOCATION("SW 4:8")        // 役満勝負
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                      // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 有
 
-	PORT_START("DSWTOP")    // IN15, actually dips 9-10 of the first 4 banks
-	PORT_DIPNAME( 0x01, 0x00, "Credits Per Note" ) PORT_DIPLOCATION("SW1:9")
-	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:10")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:9")
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:10") // listed as Unused OFF
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, "Quiz Questions Table" ) PORT_DIPLOCATION("SW3:9,10")
-	PORT_DIPSETTING(    0x30, "A" )
-	PORT_DIPSETTING(    0x20, "B" )
-	PORT_DIPSETTING(    0x10, "C" )
-	PORT_DIPSETTING(    0x00, "D" )
-	PORT_DIPNAME( 0x40, 0x40, "Yakuman Match Frequency" ) PORT_DIPLOCATION("SW4:9")
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x40, "Often" )
-	PORT_DIPNAME( 0x80, 0x80, "4 Koma Comic Type" ) PORT_DIPLOCATION("SW4:10")
-	PORT_DIPSETTING(    0x00, "A" )
-	PORT_DIPSETTING(    0x80, "B" )
+	PORT_START("DSWTOP")    // IN15, actually switches 9-10 of the first 4 banks
+	MAHJONG_NOTE_CREDITS(0, "SW 1:9", "DSW2", 0)                                                  // ＮＯＴＥ　ＲＡＴＥ
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Flip_Screen) )            PORT_DIPLOCATION("SW 1:10")       // モニター画面反転
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                      // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                       // 反転
+	PORT_DIPNAME( 0x04, 0x00, "Computer Strength" )             PORT_DIPLOCATION("SW 2:9")        // コンピューターの強さ
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                   // 普通
+	PORT_DIPSETTING(    0x04, "Strong" )                                                          // 強い
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR(Unknown) )                PORT_DIPLOCATION("SW 2:10")       // ＯＦＦ固定
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x30, 0x30, "Quiz Questions Table" )          PORT_DIPLOCATION("SW 3:9,10")     // クイズ問題テーブル
+	PORT_DIPSETTING(    0x30, "A" )                                                               // テーブル Ａ
+	PORT_DIPSETTING(    0x20, "B" )                                                               // テーブル Ｂ
+	PORT_DIPSETTING(    0x10, "C" )                                                               // テーブル Ｃ
+	PORT_DIPSETTING(    0x00, "D" )                                                               // テーブル Ｄ
+	PORT_DIPNAME( 0x40, 0x40, "Yakuman Match Frequency" )       PORT_DIPLOCATION("SW 4:9")        // 役満勝負の頻度
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                   // 普通
+	PORT_DIPSETTING(    0x40, "Frequent" )                                                        // よく出る
+	PORT_DIPNAME( 0x80, 0x80, "4-Panel Comic Type" )            PORT_DIPLOCATION("SW 4:10")       // ４コマ・漫画 タイプ
+	PORT_DIPSETTING(    0x00, "A" )                                                               // Ａタイプ
+	PORT_DIPSETTING(    0x80, "B" )                                                               // Ｂタイプ
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cafedoll )
+	// The manual provides three sets of standard settings:
+	//       標準設定　シングル向け                        標準設定　メダル コーナー向け                 標準設定　アミューズ コーナー向け
+	// SW 1  OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF       OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF        ON OFF OFF  ON OFF OFF  ON OFF  ON OFF
+	// SW 2  OFF OFF OFF OFF  ON  ON  ON  ON  ON  ON       OFF OFF OFF OFF  ON  ON  ON  ON  ON  ON       OFF OFF OFF OFF  ON  ON  ON  ON  ON  ON
+	// SW 3   ON OFF  ON  ON  ON OFF OFF  ON OFF OFF       OFF  ON  ON  ON  ON OFF OFF  ON OFF OFF       OFF OFF OFF OFF OFF OFF OFF OFF  ON  ON
+	// SW 4  OFF  ON  ON  ON  ON  ON  ON  ON OFF OFF        ON  ON  ON  ON OFF  ON  ON  ON  ON OFF        ON  ON  ON  ON OFF  ON  ON  ON  ON OFF
+
+	PORT_INCLUDE( mjctrl2 )
+
+	PORT_START("DSW1")  // IN11
+	MAHJONG_PAYOUT_RATE(0, "SW 1:1,2,3,4")                                                             // ＰＡＹ－ＯＵＴ　ＲＡＴＥ
+	MAHJONG_ODDS_RATE(4, "SW 1:5,6")                                                                   // ＯＤＤＳ　ＲＡＴＥ
+	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )                        PORT_DIPLOCATION("SW 1:7,8")      // ＢＥＴ－ＭＡＸ
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+
+	PORT_START("DSW2")  // IN12
+	MAHJONG_COINAGE(0, "SW 2:1,2")                                                                     // ＣＯＩＮ　ＲＡＴＥ
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                        PORT_DIPLOCATION("SW 2:3,4")      // ゲーム・スタート時の最低レート数
+	PORT_DIPSETTING(    0x0c, "1" )                                                                    // レート　１
+	PORT_DIPSETTING(    0x08, "2" )                                                                    // レート　２
+	PORT_DIPSETTING(    0x04, "3" )                                                                    // レート　３
+	PORT_DIPSETTING(    0x00, "5" )                                                                    // レート　５
+	PORT_DIPNAME( 0x30, 0x00, "Credit Limit" )                       PORT_DIPLOCATION("SW 2:5,6")      // クレジット・コインリミット
+	PORT_DIPSETTING(    0x30, "300" )
+	PORT_DIPSETTING(    0x20, "500" )
+	PORT_DIPSETTING(    0x10, "700" )
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPNAME( 0x40, 0x00, "Double Bet" )                         PORT_DIPLOCATION("SW 2:7")        // Ｗ－ＢＥＴ機能
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 有
+	PORT_DIPNAME( 0x80, 0x00, "Renchan Rate" )                       PORT_DIPLOCATION("SW 2:8")        // 連荘レート
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 有
+
+	PORT_START("DSW3")  // IN13
+	PORT_DIPNAME( 0x03, 0x02, "Bonus Chance Cycle" )                 PORT_DIPLOCATION("SW 3:1,2")      // ボーナス・チャンスの設定周期
+	PORT_DIPSETTING(    0x03, "First time only" )                                                      // 初回のみ
+	PORT_DIPSETTING(    0x02, "Every 500 coins" )                                                      // ５００コイン毎
+	PORT_DIPSETTING(    0x01, "Every 700 coins" )                                                      // ７００コイン毎
+	PORT_DIPSETTING(    0x00, "Every 1000 coins" )                                                     // １０００コイン毎
+	PORT_DIPNAME( 0x04, 0x00, "Bonus Chances Per Cycle" )            PORT_DIPLOCATION("SW 3:3")        // ボーナス・チャンスの回数設定周期毎に
+	PORT_DIPSETTING(    0x00, "1" )                                                                    // １回
+	PORT_DIPSETTING(    0x04, "2" )                                                                    // ２回
+	PORT_DIPNAME( 0x18, 0x00, "Bonus Chance Combination" )           PORT_DIPLOCATION("SW 3:4,5")      // ボーナス・チャンスの組みあわせ
+	PORT_DIPSETTING(    0x18, "No Bonus Chance" )                                                      // ボーナス・チャンス無し
+	PORT_DIPSETTING(    0x10, "Yakuman Chance Only" )                                                  // 役満チャンスのみ
+	PORT_DIPSETTING(    0x08, "Renzoku Chance Only" )                                                  // 連続チャンスのみ
+	PORT_DIPSETTING(    0x00, "(A) Yakuman Chance and (B) Renzoku Chance" )                            // (A)役満チャンスと(B)連続チャンス
+	PORT_DIPNAME( 0x60, 0x60, "Ratio of (A) and (B) When Combined" ) PORT_DIPLOCATION("SW 3:6,7")      // 組み合わせ複合時の(A)(B)の出率
+	PORT_DIPSETTING(    0x60, "Equal" )                                                                // 同等
+	PORT_DIPSETTING(    0x40, "More of (A)" )                                                          // (A)が多い
+	PORT_DIPSETTING(    0x20, "More of (B)" )                                                          // (B)が多い
+	PORT_DIPNAME( 0x80, 0x00, "Renzoku Chance Payout" )              PORT_DIPLOCATION("SW 3:8")        // 連続チャンスの配当
+	PORT_DIPSETTING(    0x80, DEF_STR(Low) )                                                           // 小さい
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                        // 通常
+
+	PORT_START("DSW4")  // IN14
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )                 PORT_DIPLOCATION("SW 4:1")        // デモ・サウンド
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 有
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )                      PORT_DIPLOCATION("SW 4:2")        // ゲーム・サウンド
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 有
+	PORT_DIPNAME( 0x04, 0x00, "Background Color" )                   PORT_DIPLOCATION("SW 4:3")        // バック・カラー
+	PORT_DIPSETTING(    0x04, "Black" )                                                                // 黒
+	PORT_DIPSETTING(    0x00, "Green" )                                                                // グリーン
+	PORT_DIPNAME( 0x08, 0x00, "Last Chance" )                        PORT_DIPLOCATION("SW 4:4")        // ラスト・チャンス
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 有
+	PORT_DIPNAME( 0x10, 0x00, "Don Den Button" )                     PORT_DIPLOCATION("SW 4:5")        // Ｄｏｎ・Ｄｅｎ　機能ボタン変更
+	PORT_DIPSETTING(    0x10, "Start" )                                                                // スタート・ボタ
+	PORT_DIPSETTING(    0x00, "Flip Flop" )                                                            // Ｆ／Ｆ・ボタン
+	PORT_DIPNAME( 0x20, 0x00, "Show 4-Panel Comics" )                PORT_DIPLOCATION("SW 4:6")        // ４コマ・漫画表示
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 有
+	PORT_DIPNAME( 0x40, 0x00, "Quiz Bonus" )                         PORT_DIPLOCATION("SW 4:7")        // クイズ・ボーナス
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 有
+	PORT_DIPNAME( 0x80, 0x00, "Mid-Game Bonus Game" )                PORT_DIPLOCATION("SW 4:8")        // ゲーム中のボーナス ゲーム
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 有
+
+	PORT_START("DSWTOP")    // IN15, actually switches 9-10 of the first 4 banks
+	MAHJONG_NOTE_CREDITS(0, "SW 1:9", "DSW2", 0)                                                       // ＮＯＴＥ　ＲＡＴＥ
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Flip_Screen) )                 PORT_DIPLOCATION("SW 1:10")       // モニター画面反転
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                           // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 反転
+	PORT_DIPNAME( 0x04, 0x00, "Computer Strength" )                  PORT_DIPLOCATION("SW 2:9")        // コンピューターの強さ
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                        // 普通
+	PORT_DIPSETTING(    0x04, "Strong" )                                                               // 強い
+	PORT_DIPNAME( 0x08, 0x00, "Auto Reach" )                         PORT_DIPLOCATION("SW 2:10")       // オート・リーチ機能
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )                                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                            // 有
+	PORT_DIPNAME( 0x10, 0x10, "Game Type" )                          PORT_DIPLOCATION("SW 3:9")        // ゲーム タイプ
+	PORT_DIPSETTING(    0x10, "Credit Type" )                                                          // クレジット タイプ
+	PORT_DIPSETTING(    0x00, "Credit Timer Type" )                                                    // クレジット タイマー タイプ
+	PORT_DIPNAME( 0x20, 0x20, "Game Start Rate 1" )                  PORT_DIPLOCATION("SW 3:10")       // ゲームスタート レート１
+	PORT_DIPSETTING(    0x20, DEF_STR(Normal) )                                                        // 通常
+	PORT_DIPSETTING(    0x00, "Fixed" )                                                                // 固定
+	PORT_DIPNAME( 0x40, 0x40, "Just Time Bonus Standard Settings" )  PORT_DIPLOCATION("SW 4:9")        // ジャスト・タイム・ボーナス 標準設定
+	PORT_DIPSETTING(    0x40, "Single" )                                                               // シングル向け
+	PORT_DIPSETTING(    0x00, "Medal Corner" )                                                         // メダル コーナー向け
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                     PORT_DIPLOCATION("SW 4:10")       // ＯＦＦ固定
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ippatsu )
@@ -6256,8 +6342,8 @@ GAME( 1990,  mjifb3,      mjifb,    mjifb,    mjifb,    royalmah_prgbank_state, 
 GAME( 1991,  mjvegasa,    0,        mjvegasa, mjvegasa, royalmah_prgbank_state, init_mjvegasa, ROT0,   "Dynax",                      "Mahjong Vegas (Japan, unprotected)",    0 )
 GAME( 1991,  mjvegas,     mjvegasa, mjvegas,  mjvegasa, royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 0 )
 GAME( 1992,  cafetime,    0,        cafetime, cafetime, royalmah_prgbank_state, init_cafetime, ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
-GAME( 1993,  cafedoll,    0,        cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
-GAME( 1993,  cafedollg,   cafedoll, cafedoll, cafetime, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll Great (Japan, Ver. 1.00)", MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
+GAME( 1993,  cafedoll,    0,        cafedoll, cafedoll, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
+GAME( 1993,  cafedollg,   cafedoll, cafedoll, cafedoll, royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll Great (Japan, Ver. 1.00)", MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
 GAME( 1993,  ichiban,     0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // ROM banking is wrong, causing several GFX problems
 GAME( 1993,  dragonmj,    0,        ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "OCT",                        "Dragon Mahjong (Ver 1.20)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // " - DRAGON Ver1.20 1993/11/09
 GAME( 1993,  dragonmj103, dragonmj, ichiban,  ichiban,  royalmah_prgbank_state, init_ichiban,  ROT0,   "OCT",                        "Dragon Mahjong (Ver 1.03)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // " - DRAGON Ver1.03 1993/10/16
