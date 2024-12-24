@@ -798,7 +798,8 @@ CONS( 2007, tmy_rkmj, 0, 0, superxavix_i2c_24c04,    xavix_i2c,  superxavix_i2c_
 // Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型
 CONS( 2005, ban_ordj, 0, 0, superxavix_i2c_24c04,    ban_ordj,   superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Ongeki Battle! Kamen Rider Hibiki: Kimero! Ikki Kasei no Kata (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, ban_dn1j, 0, 0, superxavix_i2c_24c04,    ban_ordj,   superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Disney Music with Winnie the Pooh (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// ディズニーキャラクターズ オト！イロ！トン・トン！ミラクルパレード
+CONS( 2007, ban_dn1j, 0, 0, superxavix_i2c_24c04,    ban_ordj,   superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Disney Characters Oto! Iro! Don-Don! Miracle Parade (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2011, anpanmdx, 0, 0, superxavix_i2c_24c08,    anpanmdx,   superxavix_i2c_state, init_xavix, "JoyPalette / SSD Company LTD",   "Anpanman Kazoku De Ikunou Mat DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
