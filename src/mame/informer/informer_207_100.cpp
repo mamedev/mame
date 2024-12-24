@@ -222,4 +222,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE           INPUT             CLASS                   INIT        COMPANY     FULLNAME            FLAGS
-COMP( 1983, in207100, 0,       0,      informer_207_100, informer_207_100, informer_207_100_state, empty_init, "Informer", "Informer 207/100", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, in207100, 0,       0,      informer_207_100, informer_207_100, informer_207_100_state, empty_init, "Informer", "Informer 207/100", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

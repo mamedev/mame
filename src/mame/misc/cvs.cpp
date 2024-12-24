@@ -1,9 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders: Mike Coates, Couriersud
 
-/***************************************************************************
+/*******************************************************************************
 
 Century CVS System
+
+Driver by Mike Coates
+Thanks to Malcolm & Darren for hardware info
+
+Additional work by Couriersud, 2009
+
+TODO:
+- darkwar coin insert sound effect is missing. It sends the correct command,
+  but before audiocpu reads it, maincpu writes a new command for the speech cpu.
+  This worked fine in an older version of MAME since maincpu was twice slower.
+- diggerc loses speech sound effects (walking, digging) after killing an enemy.
+- Emulate protection properly in later games (reads area 0x73fx).
+- The board has discrete sound circuits, see sh_trigger_w, current implementation
+  with the beeper devices is wrong, but better than nothing.
+- Improve starfield: density, blink rate, x repeat of 240, and the checkerboard
+  pattern (fast forward MAME to see) are all correct, the RNG is not right?
+
 
 MAIN BOARD:
 
@@ -79,28 +96,14 @@ ADR14 ADR13 | READ                                      | WRITE
             | D7 = BULLET AND CP1 OR CP2                |
 ------------+-------------------------------------------+-------------------------------
 
-Driver by
-    Mike Coates
+Main 2650A runs at 1.78MHz (14.318/8).
 
-Hardware Info
-    Malcolm & Darren
+Sound board 2650As run at 0.89MHz (14.318/16). Also seen with a 15.625MHz XTAL,
+which would result in slightly higher DAC sound pitch.
 
-Additional work
-    Couriersud, 2009
+Video timing is via a Signetics 2621 (PAL).
 
-TODO:
-- darkwar coin insert sound effect is missing. It sends the correct command,
-  but before audiocpu reads it, maincpu writes a new command for the speech cpu.
-  This worked fine in an older version of MAME since maincpu was twice slower.
-- diggerc loses speech sound effects (walking, digging) after killing an enemy.
-- Emulate protection properly in later games (reads area 0x73fx).
-- The board most probably has discrete circuits. Possibly 2 beepers (current
-  frequency is completely guessed), and a pitch sweep sound. No schematics
-  are available, or even video references.
-- Is the star generator correct? On photos, it looks like there are more stars
-  overall (higher star density).
-
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -144,9 +147,9 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_dac2(*this, "dac2")
+		, m_dac(*this, "dac%u", 0)
 		, m_beep(*this, "beep%u", 0)
-		, m_tms5110(*this, "tms")
+		, m_tms5100(*this, "tms")
 		, m_in(*this, "IN%u", 0U)
 		, m_dsw(*this, "DSW%u", 1U)
 		, m_lamps(*this, "lamp%u", 1U)
@@ -156,7 +159,7 @@ public:
 		, m_character_ram(*this, "character_ram", 3 * 0x800, ENDIANNESS_BIG)
 		, m_bullet_ram(*this, "bullet_ram")
 		, m_4_bit_dac_data(*this, "4bit_dac")
-		, m_tms5110_ctl_data(*this, "tms5110_ctl")
+		, m_tms5100_ctl_data(*this, "tms5100_ctl")
 		, m_sh_trigger(*this, "sh_trigger")
 		, m_speech_data_rom(*this, "speechdata")
 		, m_ram_view(*this, "video_color_ram_view")
@@ -178,7 +181,7 @@ protected:
 
 private:
 	// max stars is more than it needs to be, to allow experimenting with the star generator
-	static constexpr u16 MAX_STARS = 0x400;
+	static constexpr u16 MAX_STARS = 0x800;
 	static constexpr u16 SPRITE_PEN_BASE = 0x820;
 	static constexpr u16 BULLET_STAR_PEN = 0x828;
 
@@ -190,9 +193,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<dac_byte_interface> m_dac2;
-	required_device_array<beep_device, 2> m_beep;
-	required_device<tms5110_device> m_tms5110;
+	required_device_array<dac_byte_interface, 2> m_dac;
+	required_device_array<beep_device, 3> m_beep;
+	required_device<tms5100_device> m_tms5100;
 	required_ioport_array<4> m_in;
 	required_ioport_array<3> m_dsw;
 	output_finder<2> m_lamps;
@@ -204,7 +207,7 @@ private:
 	memory_share_creator<u8> m_character_ram; // only half is used, but we can use the same gfx_layout like this
 	required_shared_ptr<u8> m_bullet_ram;
 	required_shared_ptr<u8> m_4_bit_dac_data;
-	required_shared_ptr<u8> m_tms5110_ctl_data;
+	required_shared_ptr<u8> m_tms5100_ctl_data;
 	required_shared_ptr<u8> m_sh_trigger;
 	required_region_ptr<u8> m_speech_data_rom;
 
@@ -259,6 +262,7 @@ private:
 	void palette_w(offs_t offset, u8 data) { m_palette_ram[offset & 0x0f] = data; }
 	u8 input_r(offs_t offset);
 
+	void _8_bit_dac_data_w(u8 data);
 	void _4_bit_dac_data_w(offs_t offset, u8 data);
 	void sh_trigger_w(offs_t offset, u8 data);
 
@@ -268,8 +272,8 @@ private:
 	u8 audio_command_r();
 	void audio_command_w_sync(s32 param);
 	void audio_command_w(u8 data);
-	void tms5110_ctl_w(offs_t offset, u8 data);
-	void tms5110_pdc_w(offs_t offset, u8 data);
+	void tms5100_ctl_w(offs_t offset, u8 data);
+	void tms5100_pdc_w(offs_t offset, u8 data);
 	int speech_rom_read_bit();
 
 	u8 superbik_prot_r();
@@ -408,14 +412,14 @@ void cvs_state::init_stars()
 	m_total_stars = 0;
 
 	// precalculate the star background
-	for (int y = 255; y >= 0; y--)
+	for (int y = 0; y < 256; y++)
 	{
-		for (int x = 511; x >= 0; x--)
+		for (int x = 0; x < 480; x++)
 		{
 			generator <<= 1;
 			generator |= BIT(~generator, 17) ^ BIT(generator, 5);
 
-			if ((generator & 0x130fe) == 0xfe && m_total_stars != MAX_STARS)
+			if ((generator & 0x100fe) == 0xfe && m_total_stars != MAX_STARS)
 			{
 				m_stars[m_total_stars].x = x;
 				m_stars[m_total_stars].y = y;
@@ -430,10 +434,10 @@ void cvs_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = 0; offs < m_total_stars; offs++)
 	{
-		u8 x = (m_stars[offs].x + m_stars_scroll) >> 1;
-		u8 y = m_stars[offs].y + ((m_stars_scroll + m_stars[offs].x) >> 9);
+		u8 x = ((m_stars[offs].x + m_stars_scroll) >> 1) % 240;
+		u8 y = m_stars[offs].y;
 
-		if (BIT(y, 0) ^ BIT(x, 4))
+		if (BIT(y, 4) ^ BIT(x, 5))
 		{
 			if (cliprect.contains(x, y) && m_palette->pen_indirect(bitmap.pix(y, x)) == 0)
 				bitmap.pix(y, x) = BULLET_STAR_PEN;
@@ -444,7 +448,7 @@ void cvs_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 void cvs_state::scroll_stars(int state)
 {
 	if (state)
-		m_stars_scroll++;
+		m_stars_scroll = (m_stars_scroll + 1) % 480;
 }
 
 
@@ -637,9 +641,17 @@ u8 cvs_state::input_r(offs_t offset)
 
 /*************************************
  *
- *  4-bit DAC
+ *  Sound hardware
  *
  *************************************/
+
+void cvs_state::_8_bit_dac_data_w(u8 data)
+{
+	m_dac[0]->write(data);
+
+	// data also goes to 8038 oscillator
+	m_beep[2]->set_clock(data * 4);
+}
 
 void cvs_state::_4_bit_dac_data_w(offs_t offset, u8 data)
 {
@@ -658,17 +670,34 @@ void cvs_state::_4_bit_dac_data_w(offs_t offset, u8 data)
 			(m_4_bit_dac_data[3] << 3);
 
 	// output
-	m_dac2->write(dac_value);
+	m_dac[1]->write(dac_value);
 }
 
 void cvs_state::sh_trigger_w(offs_t offset, u8 data)
 {
-	/* offset 0 is used in darkwar, spacefrt, logger, raiders
-	 * offset 2 is used in darkwar, spacefrt, 8ball, superbik, raiders
-	 * offset 3 is used in cosmos, darkwar, superbik, raiders
-	 *
-	 * offset 1 is only used inadvertedly by logger
-	 */
+	/* Discrete sound hardware triggers:
+
+	offset 0 is used in darkwar, spacefrt, logger, dazzler, wallst, raiders
+	offset 1 is used in logger, wallst
+	offset 2 is used in darkwar, spacefrt, 8ball, dazzler, superbik, raiders
+	offset 3 is used in cosmos, darkwar, superbik, raiders
+
+	Additional notes from poking the CVS sound hardware with an
+	In Circuit Emulator from PrSwan (Paul Swan).
+	I have recordings available.
+
+	- 0x1884 - Enables an XP8038 frequency generator IC
+	    Reflected on pin 10 of a 4016.
+	    The frequency is set by 0x1840, the 8 bit DAC register.
+	    Not all 0x1840 values were tested, but:
+	        0x00 - off, 0x1884 enable has no sound.
+	        0x55,0xAA,0xFF - increasing value has higher frequency
+	- 0x1885 - A scope showed this halving the XP8038 amplitude with a little decay.
+	    Causes 4016 pin 11 to rise (on) and decay-fall (off)
+	- 0x1886 - Outputs a complete Galaxia-style ship fire sound, with attack-to-on and decay-to-off.
+	- 0x1887 - Reflected on an LM380.
+	    Causes an envelope-like operation on the XP8038 tone with attack (on) and decay (off).
+	*/
 
 	data &= 1;
 
@@ -678,8 +707,10 @@ void cvs_state::sh_trigger_w(offs_t offset, u8 data)
 		m_sh_trigger[offset] = data;
 	}
 
-	if (offset == 2 || offset == 3)
-		m_beep[offset & 1]->set_state(data);
+	if (offset != 1)
+		m_beep[(offset == 0) ? 2 : (offset & 1)]->set_state(data);
+	else
+		m_beep[2]->set_output_gain(0, data ? 0.5 : 1.0);
 }
 
 
@@ -707,30 +738,30 @@ void cvs_state::speech_rom_address_hi_w(u8 data)
 u8 cvs_state::speech_command_r()
 {
 	// this was by observation on board, bit 7 is TMS status (active LO)
-	return ((m_tms5110->ctl_r() ^ 1) << 7) | (m_audio_command & 0x7f);
+	return ((m_tms5100->ctl_r() ^ 1) << 7) | (m_audio_command & 0x7f);
 }
 
 
-void cvs_state::tms5110_ctl_w(offs_t offset, u8 data)
+void cvs_state::tms5100_ctl_w(offs_t offset, u8 data)
 {
 	// offset 0: CS?
-	m_tms5110_ctl_data[offset] = (~data >> 7) & 0x01;
+	m_tms5100_ctl_data[offset] = (~data >> 7) & 0x01;
 
 	u8 const ctl = 0 |                     // CTL1
-			(m_tms5110_ctl_data[1] << 1) | // CTL2
-			(m_tms5110_ctl_data[2] << 2) | // CTL4
-			(m_tms5110_ctl_data[1] << 3);  // CTL8
+			(m_tms5100_ctl_data[1] << 1) | // CTL2
+			(m_tms5100_ctl_data[2] << 2) | // CTL4
+			(m_tms5100_ctl_data[1] << 3);  // CTL8
 
 	LOGMASKED(LOG_SPEECH, "CVS: Speech CTL = %04x %02x %02x\n", ctl, offset, data);
-	m_tms5110->ctl_w(ctl);
+	m_tms5100->ctl_w(ctl);
 }
 
 
-void cvs_state::tms5110_pdc_w(offs_t offset, u8 data)
+void cvs_state::tms5100_pdc_w(offs_t offset, u8 data)
 {
 	u8 const out = ((~data) >> 7) & 1;
 	LOGMASKED(LOG_SPEECH, "CVS: Speech PDC = %02x %02x\n", offset, out);
-	m_tms5110->pdc_w(out);
+	m_tms5100->pdc_w(out);
 }
 
 
@@ -835,7 +866,7 @@ void cvs_state::audio_cpu_map(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x107f).ram();
 	map(0x1800, 0x1800).r(FUNC(cvs_state::audio_command_r));
-	map(0x1840, 0x1840).w("dac1", FUNC(dac_byte_interface::data_w));
+	map(0x1840, 0x1840).w(FUNC(cvs_state::_8_bit_dac_data_w));
 	map(0x1880, 0x1883).w(FUNC(cvs_state::_4_bit_dac_data_w)).share(m_4_bit_dac_data);
 	map(0x1884, 0x1887).w(FUNC(cvs_state::sh_trigger_w)).share(m_sh_trigger);
 }
@@ -855,8 +886,8 @@ void cvs_state::speech_cpu_map(address_map &map)
 	map(0x1d00, 0x1d00).w(FUNC(cvs_state::speech_rom_address_lo_w));
 	map(0x1d40, 0x1d40).w(FUNC(cvs_state::speech_rom_address_hi_w));
 	map(0x1d80, 0x1d80).r(FUNC(cvs_state::speech_command_r));
-	map(0x1ddc, 0x1dde).w(FUNC(cvs_state::tms5110_ctl_w)).share(m_tms5110_ctl_data);
-	map(0x1ddf, 0x1ddf).w(FUNC(cvs_state::tms5110_pdc_w));
+	map(0x1ddc, 0x1dde).w(FUNC(cvs_state::tms5100_ctl_w)).share(m_tms5100_ctl_data);
+	map(0x1ddf, 0x1ddf).w(FUNC(cvs_state::tms5100_pdc_w));
 }
 
 
@@ -1327,7 +1358,7 @@ void cvs_state::cvs(machine_config &config)
 
 	S2650(config, m_speechcpu, 14.318181_MHz_XTAL / 16);
 	m_speechcpu->set_addrmap(AS_PROGRAM, &cvs_state::speech_cpu_map);
-	m_speechcpu->sense_handler().set("tms", FUNC(tms5110_device::romclk_hack_r));
+	m_speechcpu->sense_handler().set("tms", FUNC(tms5100_device::romclk_hack_r));
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cvs);
@@ -1357,15 +1388,16 @@ void cvs_state::cvs(machine_config &config)
 	// audio hardware
 	SPEAKER(config, "speaker").front_center();
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
-	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.20); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
+	DAC_4BIT_R2R(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.20); // unknown DAC
 
 	BEEP(config, m_beep[0], 600).add_route(ALL_OUTPUTS, "speaker", 0.15); // placeholder
 	BEEP(config, m_beep[1], 150).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
+	BEEP(config, m_beep[2], 0).add_route(ALL_OUTPUTS, "speaker", 0.075); // "
 
-	TMS5100(config, m_tms5110, XTAL(640'000));
-	m_tms5110->data().set(FUNC(cvs_state::speech_rom_read_bit));
-	m_tms5110->add_route(ALL_OUTPUTS, "speaker", 0.30);
+	TMS5100(config, m_tms5100, 640_kHz_XTAL);
+	m_tms5100->data().set(FUNC(cvs_state::speech_rom_read_bit));
+	m_tms5100->add_route(ALL_OUTPUTS, "speaker", 0.30);
 }
 
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /*** m6805: Portable 6805 emulator ******************************************/
 #ifndef MAME_CPU_M6805_M6805_H
 #define MAME_CPU_M6805_M6805_H
@@ -103,6 +103,8 @@ protected:
 	static cycle_count_table s_hmos_cycles;
 	static cycle_count_table s_cmos_cycles;
 	static cycle_count_table s_hc_cycles;
+	static cycle_count_table s_hd6305_cycles;
+	static cycle_count_table s_hd63705_cycles;
 
 	// construction/destruction
 	m6805_base_device(

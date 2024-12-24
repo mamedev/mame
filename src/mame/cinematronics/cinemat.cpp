@@ -44,8 +44,6 @@
 #include "warrior.lh"
 #include "wotw.lh"
 
-#define MASTER_CLOCK            XTAL(19'923'000)
-
 
 /*************************************
  *
@@ -61,6 +59,7 @@ void cinemat_state::machine_start()
 	save_item(NAME(m_vector_color));
 	save_item(NAME(m_lastx));
 	save_item(NAME(m_lasty));
+
 	m_led.resolve();
 	m_pressed.resolve();
 }
@@ -1024,7 +1023,7 @@ INPUT_PORTS_END
 void cinemat_state::cinemat_nojmi_4k(machine_config &config)
 {
 	// basic machine hardware
-	CCPU(config, m_maincpu, MASTER_CLOCK/4);
+	CCPU(config, m_maincpu, 19.923_MHz_XTAL/4);
 	m_maincpu->set_vector_func(FUNC(cinemat_state::cinemat_vector_callback));
 	m_maincpu->external_func().set(FUNC(cinemat_state::joystick_read));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cinemat_state::program_map_4k);
@@ -1037,12 +1036,14 @@ void cinemat_state::cinemat_nojmi_4k(machine_config &config)
 
 	// video hardware
 	VECTOR(config, "vector", 0);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_refresh_hz(MASTER_CLOCK/4/16/16/16/16/2);
+	m_screen->set_refresh_hz(19.923_MHz_XTAL/4/16/16/16/16/2);
 	m_screen->set_size(1024, 768);
-	m_screen->set_visarea(0, 1023, 0, 767);
+	m_screen->set_visarea_full();
 	m_screen->set_screen_update(FUNC(cinemat_state::screen_update_cinemat));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(ccpu_cpu_device::wdt_trigger));
 }
 
 void cinemat_state::cinemat_jmi_4k(machine_config &config)

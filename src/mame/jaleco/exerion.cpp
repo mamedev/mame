@@ -758,7 +758,7 @@ static INPUT_PORTS_START( exerion )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )          // see notes
 	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )

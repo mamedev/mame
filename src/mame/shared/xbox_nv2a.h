@@ -608,6 +608,7 @@ public:
 		logical_operation_enabled = false;
 		logical_operation = NV2A_LOGIC_OP::COPY;
 		fog_color = 0;
+		bilinear_filter = false;
 		for (int n = 0; n < 4; n++) {
 			texture[n].enabled = 0;
 			texture[n].mode = 0;
@@ -845,6 +846,7 @@ public:
 	uint32_t blend_color;
 	NV2A_LOGIC_OP logical_operation;
 	uint32_t fog_color;
+	bool bilinear_filter;
 	struct {
 		float modelview[4][4];
 		float modelview_inverse[4][4];

@@ -124,7 +124,7 @@ static INPUT_PORTS_START( phoenix )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION( "SW1:7" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("CAB")       // fake port for non-memory mapped dip switch
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION( "SW1:!8" )
@@ -207,7 +207,7 @@ static INPUT_PORTS_START( condor )
 	PORT_DIPSETTING(    0x50, "Fast" )
 	PORT_DIPSETTING(    0x60, "Faster" )
 	PORT_DIPSETTING(    0x70, "Fastest" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_B ) )           PORT_DIPLOCATION( "SW2:1,2,3,4" )
@@ -416,7 +416,7 @@ static INPUT_PORTS_START( survival )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("CAB")       // fake port for non-memory mapped dip switch
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION( "SW1:8" )

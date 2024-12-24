@@ -37,6 +37,7 @@ public:
 		, m_hopper(*this, "hopper")
 		, m_bankdev(*this, "bankdev")
 		, m_mainirq(*this, "mainirq")
+		, m_io_key{ { *this, "KEY%u", 0U }, { *this, "KEY%u", 5U } }
 	{
 	}
 
@@ -69,6 +70,9 @@ protected:
 	optional_device<ls259_device> m_mainlatch;
 	optional_device<dynax_blitter_rev2_device> m_blitter;
 	optional_device<hopper_device> m_hopper;
+	optional_device<address_map_bank_device> m_bankdev;
+	optional_device<rst_pos_buffer_device> m_mainirq;
+	optional_ioport_array<5> m_io_key[2];
 
 	/* input / output */
 	uint8_t m_input_sel = 0U;
@@ -94,8 +98,7 @@ protected:
 	void coincounter_0_w(int state);
 	void coincounter_1_w(int state);
 	uint8_t ret_ff();
-	uint8_t hanamai_keyboard_0_r();
-	uint8_t hanamai_keyboard_1_r();
+	template <unsigned N> uint8_t hanamai_keyboard_r();
 	void hanamai_keyboard_w(uint8_t data);
 	void dynax_rombank_w(uint8_t data);
 	void dynax_blit_palette23_w(uint8_t data);
@@ -117,10 +120,6 @@ protected:
 	void dynax_common_reset();
 
 	void sprtmtch_mem_map(address_map &map) ATTR_COLD;
-
-	// devices
-	optional_device<address_map_bank_device> m_bankdev;
-	optional_device<rst_pos_buffer_device> m_mainirq;
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
 	std::unique_ptr<uint8_t[]>  m_pixmap[8][2]{};
@@ -171,7 +170,6 @@ private:
 	void tenkai_6c_w(int state);
 	void tenkai_70_w(int state);
 	void tenkai_blit_romregion_w(uint8_t data);
-	uint8_t gekisha_keyboard_0_r();
 	uint8_t gekisha_keyboard_1_r();
 	void gekisha_hopper_w(offs_t offset, uint8_t data);
 	void gekisha_p4_w(uint8_t data);
@@ -461,6 +459,7 @@ private:
 };
 
 
-INPUT_PORTS_EXTERN(HANAFUDA_KEYS_BET);
+INPUT_PORTS_EXTERN(dynax_mahjong_keys);
+INPUT_PORTS_EXTERN(dynax_hanafuda_keys_bet);
 
 #endif // MAME_DYNAX_DYNAX_H

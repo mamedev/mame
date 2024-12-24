@@ -46,12 +46,13 @@ constexpr ioport_value IP_ACTIVE_LOW = 0xffffffff;
 constexpr int MAX_PLAYERS = 10;
 
 // unicode constants
+constexpr char32_t UCHAR_INVALID = 0xffff;
 constexpr char32_t UCHAR_PRIVATE = 0x100000;
 constexpr char32_t UCHAR_SHIFT_1 = UCHAR_PRIVATE + 0;
 constexpr char32_t UCHAR_SHIFT_2 = UCHAR_PRIVATE + 1;
 constexpr char32_t UCHAR_SHIFT_BEGIN = UCHAR_SHIFT_1;
 constexpr char32_t UCHAR_SHIFT_END = UCHAR_SHIFT_2;
-constexpr char32_t UCHAR_MAMEKEY_BEGIN = UCHAR_PRIVATE + 2;
+constexpr char32_t UCHAR_MAMEKEY_BEGIN = UCHAR_SHIFT_END + 1;
 
 
 // crosshair types
@@ -473,7 +474,7 @@ public:
 	bool none() const { return (m_condition == ALWAYS); }
 
 	// configuration
-	void reset() { set(ALWAYS, nullptr, 0, 0); }
+	void reset() { set(ALWAYS, "", 0, 0); }
 	void set(condition_t condition, const char *tag, ioport_value mask, ioport_value value)
 	{
 		m_condition = condition;
@@ -488,7 +489,7 @@ public:
 private:
 	// internal state
 	condition_t     m_condition;    // condition to use
-	const char *    m_tag;          // tag of port whose condition is to be tested
+	const char *    m_tag;          // tag of port whose condition is to be tested (must never be nullptr)
 	ioport_port *   m_port;         // reference to the port to be tested
 	ioport_value    m_mask;         // mask to apply to the port
 	ioport_value    m_value;        // value to compare against
@@ -1091,6 +1092,7 @@ private:
 	ioport_port *       m_curport;
 	ioport_field *      m_curfield;
 	ioport_setting *    m_cursetting;
+	int                 m_curshift;
 };
 
 
@@ -1453,12 +1455,6 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 
 #define PORT_SERVICE_NO_TOGGLE(_mask, _default) \
 	PORT_BIT( _mask, _mask & _default, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode ))
-
-#define PORT_VBLANK(_screen) \
-	PORT_READ_LINE_DEVICE_MEMBER(_screen, FUNC(screen_device::vblank))
-
-#define PORT_HBLANK(_screen) \
-	PORT_READ_LINE_DEVICE_MEMBER(_screen, FUNC(screen_device::hblank))
 
 //**************************************************************************
 //  INLINE FUNCTIONS

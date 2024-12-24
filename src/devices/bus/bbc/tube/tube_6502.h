@@ -18,7 +18,8 @@
 #pragma once
 
 #include "tube.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
+#include "cpu/m6502/r65c02.h"
 #include "machine/ram.h"
 #include "machine/tube.h"
 

@@ -118,4 +118,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 2006, wbingo06, 0, wbingo06, wbingo06, winbingo_state, empty_init, ROT0, "<unknown>", "Win Bingo 2006", MACHINE_IS_SKELETON )
+GAME( 2006, wbingo06, 0, wbingo06, wbingo06, winbingo_state, empty_init, ROT0, "<unknown>", "Win Bingo 2006", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

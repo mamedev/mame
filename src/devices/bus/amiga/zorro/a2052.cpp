@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license: GPL-2.0+
+// copyright-holders: Dirk Best
 /***************************************************************************
 
     Commodore A2052
@@ -21,12 +21,20 @@
 
 DEFINE_DEVICE_TYPE(ZORRO_A2052, bus::amiga::zorro::a2052_device, "zorro_a2052", "CBM A2052 Fast Memory")
 
-
 namespace bus::amiga::zorro {
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
+a2052_device::a2052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ZORRO_A2052, tag, owner, clock),
+	device_zorro2_card_interface(mconfig, *this),
+	m_config(*this, "config"),
+	m_ram_size(0)
+{
+}
+
+
+//**************************************************************************
+//  INPUT DEFINITIONS
+//**************************************************************************
 
 static INPUT_PORTS_START( a2052 )
 	PORT_START("config")
@@ -43,31 +51,21 @@ ioport_constructor a2052_device::device_input_ports() const
 
 
 //**************************************************************************
-//  LIVE DEVICE
+//  MACHINE EMULATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  a2052_device - constructor
-//-------------------------------------------------
-
-a2052_device::a2052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ZORRO_A2052, tag, owner, clock),
-	device_zorro2_card_interface(mconfig, *this),
-	m_config(*this, "config")
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
 void a2052_device::device_start()
 {
+	// setup ram
+	m_ram = make_unique_clear<uint16_t[]>(0x200000/2);
+
+	// register for save states
+	save_pointer(NAME(m_ram), 0x200000/2);
 }
 
 
 //**************************************************************************
-//  IMPLEMENTATION
+//  AUTOCONFIG
 //**************************************************************************
 
 void a2052_device::autoconfig_base_address(offs_t address)
@@ -79,7 +77,7 @@ void a2052_device::autoconfig_base_address(offs_t address)
 	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	// install access to the rom space
-	m_slot->space().install_ram(address, address + m_ram.size()*2 - 1, &m_ram[0]);
+	m_slot->space().install_ram(address, address + (m_ram_size << 20) - 1, m_ram.get());
 
 	// we're done
 	m_slot->cfgout_w(0);
@@ -99,20 +97,20 @@ void a2052_device::cfgin_w(int state)
 		{
 		case 0:
 			autoconfig_board_size(BOARD_SIZE_512K);
-			m_ram.resize(0x080000/2);
+			m_ram_size = 0x080000 >> 20;
 			break;
 		case 1:
 			autoconfig_board_size(BOARD_SIZE_1M);
-			m_ram.resize(0x100000/2);
+			m_ram_size = 0x100000 >> 20;
 			break;
 		case 2:
 			autoconfig_board_size(BOARD_SIZE_2M);
-			m_ram.resize(0x200000/2);
+			m_ram_size = 0x200000 >> 20;
 			break;
 		}
 
-		autoconfig_product(0x0a);
-		autoconfig_manufacturer(0x0202);
+		autoconfig_product(10);
+		autoconfig_manufacturer(514);
 		autoconfig_serial(0x00000000);
 
 		autoconfig_link_into_memory(true);
@@ -123,8 +121,8 @@ void a2052_device::cfgin_w(int state)
 
 		// install autoconfig handler
 		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
-				read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-				write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
+			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffffffff);
 	}
 }
 

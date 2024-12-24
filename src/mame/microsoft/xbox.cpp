@@ -218,4 +218,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2001, xbox, 0, 0, xbox,  xbox, xbox_state, empty_init, "Microsoft", "XBOX", MACHINE_IS_SKELETON )
+CONS( 2001, xbox, 0, 0, xbox,  xbox, xbox_state, empty_init, "Microsoft", "XBOX", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -108,6 +108,7 @@
   * Power Card (Ver 0263, encrypted),                              Fun World,            1993.
   * Mega Card (Ver.0210, encrypted),                               Fun World,            1993.
   * Mega Card (Ver.0053, encrypted),                               Fun World,            1992.
+  * Joker Card (encrypted),                                        Fun World,            1993.
   * Joker Card 300 (Ver.A267BC, encrypted),                        Amatic Trading,       1993.
   * Royal Card (Evona, Polish, encrypted),                         Evona Electronic,     1991.
   * Saloon (French, encrypted),                                    unknown,              199?.
@@ -141,9 +142,6 @@
   * Royal Card (stealth with NES multigame, set 1),                bootleg,              1991.
   * Royal Card (stealth with NES multigame, set 2),                bootleg,              1991.
   * Royal Card (stealth with MSX multigame),                       bootleg,              1991.
-
-
-  Supported games: 123
 
 
 **********************************************************************************************
@@ -757,7 +755,7 @@
 #include "emu.h"
 #include "funworld.h"
 
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
@@ -3308,7 +3306,7 @@ void lunapark_state::machine_reset()
 void funworld_state::fw1stpal(machine_config &config)
 {
 	// basic machine hardware
-	M65SC02(config, m_maincpu, CPU_CLOCK);  // 2 MHz.
+	G65SC02(config, m_maincpu, CPU_CLOCK);  // 2 MHz.
 	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::funworld_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -3472,7 +3470,7 @@ void intergames_state::intrgmes(machine_config &config)
 {
 	fw1stpal(config);
 
-	M65SC02(config.replace(), m_maincpu, CPU_CLOCK);    // 2 MHz.
+	G65SC02(config.replace(), m_maincpu, CPU_CLOCK);    // 2 MHz.
 	m_maincpu->set_addrmap(AS_PROGRAM, &intergames_state::intergames_map);
 	//m_maincpu->set_periodic_int(FUNC(intergames_state::nmi_line_pulse), attotime::from_hz(60));
 
@@ -9028,7 +9026,7 @@ GAME(  1990, funquizb,   0,        funquiz,  funquiza,  funworld_state, empty_in
 GAMEL( 1986, novoplay,   0,        fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Admiral / Novomatic",      "Novo Play Multi Card / Club Card",      0,                       layout_novoplay )
 GAMEL( 1992, novoplaya,  novoplay, intrgmes,   novop_ab,  intergames_state, init_novop_a, ROT0, "Novo Play International",  "Novo Play Club Card (V6.2H)",           0,                       layout_novoplay )
 GAMEL( 1991, novoplayb,  novoplay, intrgmes,   novop_ab,  intergames_state, init_novop_b, ROT0, "Novo Play International",  "Novo Play Club Card (V3.3H)",           0,                       layout_novoplay )
-GAME(  1991, intrgmes,   0,        intrgmes,   intrgmes,  intergames_state, init_intgms,  ROT0, "Inter Games",             "Joker Card (Inter Games)",               0 )
+GAME(  1991, intrgmes,   0,        intrgmes,   intrgmes,  intergames_state, init_intgms,  ROT0, "Inter Games",              "Joker Card (Inter Games)",              0 )
 GAMEL( 1985, fw_a7_11,   0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A7-11 game 1",              MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1985, fw_a7_11a,  fw_a7_11, fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A7-11 game 2",              MACHINE_NOT_WORKING,     layout_jollycrd )
 GAMEL( 1991, fw_a0_1,    0,        fw_brick_2, fw_brick1, funworld_state,   empty_init,   ROT0, "Fun World",          "unknown Fun World A0-1 game",                 MACHINE_NOT_WORKING,     layout_jollycrd )

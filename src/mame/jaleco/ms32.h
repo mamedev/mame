@@ -80,7 +80,7 @@ public:
 		, m_sprram(*this, "sprram", 0x10000, ENDIANNESS_LITTLE)
 		, m_txram(*this, "txram", 0x4000, ENDIANNESS_LITTLE)
 		, m_bgram(*this, "bgram", 0x4000, ENDIANNESS_LITTLE)
-		, m_io_mj(*this, "MJ%u", 0U)
+		, m_io_mj(*this, "KEY%u", 0U)
 	{ }
 
 	void ms32(machine_config &config);

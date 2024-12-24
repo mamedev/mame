@@ -15,7 +15,7 @@
 #define LOG_DATA_SENT   (1U << 5)
 
 #define VERBOSE (LOG_UNSUPPORTED)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

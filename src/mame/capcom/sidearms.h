@@ -70,7 +70,7 @@ private:
 	void bankswitch_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	void c804_w(uint8_t data);
+	void control_w(uint8_t data);
 	void gfxctrl_w(uint8_t data);
 	void star_scrollx_w(uint8_t data);
 	void star_scrolly_w(uint8_t data);

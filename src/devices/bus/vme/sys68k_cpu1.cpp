@@ -663,8 +663,8 @@ ioport_constructor vme_sys68k_cpu1_card_device::device_input_ports() const
 /* Driver */
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME          FLAGS */
 //COMP( 1983, fccpu1,   0,      0,      fccpu1,   force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-1",   MACHINE_NO_SOUND_HW )
-//COMP( 1989, fccpu6,   0,      0,      fccpu6,   force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6",   MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6a,  0,      0,      fccpu6a,  force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6a",  MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6v,  0,      0,      fccpu6v,  force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6v",  MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6va, 0,      0,      fccpu6va, force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6va", MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6vb, 0,      0,      fccpu6vb, force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6vb", MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6,   0,      0,      fccpu6,   force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//COMP( 1989, fccpu6a,  0,      0,      fccpu6a,  force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6a",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//COMP( 1989, fccpu6v,  0,      0,      fccpu6v,  force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6v",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//COMP( 1989, fccpu6va, 0,      0,      fccpu6va, force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6va", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//COMP( 1989, fccpu6vb, 0,      0,      fccpu6vb, force68k, vme_sys68k_cpu1_card_device, empty_init, "Force Computers GmbH", "SYS68K/CPU-6vb", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

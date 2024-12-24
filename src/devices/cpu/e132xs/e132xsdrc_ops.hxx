@@ -665,6 +665,7 @@ void hyperstone_device::generate_divsu(drcuml_block &block, compiler_state &comp
 	{
 		UML_DTEST(block, I1, 0x8000000000000000LL);
 		UML_JMPc(block, uml::COND_NZ, no_result);
+		UML_DSEXT(block, I0, I0, SIZE_DWORD);
 	}
 
 	if (SIGNED)

@@ -183,5 +183,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1995, bassstr, 0, 0,  bassstr,  basssta, basssta_state, empty_init, "Novation", "BassStation Rack Analogue Synthesizer Module", MACHINE_IS_SKELETON)
-SYST(1997, sbasssta, 0, 0, sbasssta, basssta, basssta_state, empty_init, "Novation", "Super Bass Station", MACHINE_IS_SKELETON)
+SYST(1995, bassstr, 0, 0,  bassstr,  basssta, basssta_state, empty_init, "Novation", "BassStation Rack Analogue Synthesizer Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1997, sbasssta, 0, 0, sbasssta, basssta, basssta_state, empty_init, "Novation", "Super Bass Station", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

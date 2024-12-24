@@ -114,5 +114,5 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 2007, dbzscout,     0,              0,      zevio, zevio, zevio_state, empty_init, "Bandai / Koto", "Dragon Ball Z: Scouter Battle Taikan Kamehameha: Ora to Omee to Scouter (Japan)", MACHINE_IS_SKELETON )
-CONS( 2008, dbzonep,      0,              0,      zevio, zevio, zevio_state, empty_init, "Bandai / Koto", "Dragon Ball Z x One Piece: Battle Taikan Gum-Gum no Kamehameha: Omee no Koe de Ora o Yobu (Japan)", MACHINE_IS_SKELETON )
+CONS( 2007, dbzscout,     0,              0,      zevio, zevio, zevio_state, empty_init, "Bandai / Koto", "Dragon Ball Z: Scouter Battle Taikan Kamehameha: Ora to Omee to Scouter (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2008, dbzonep,      0,              0,      zevio, zevio, zevio_state, empty_init, "Bandai / Koto", "Dragon Ball Z x One Piece: Battle Taikan Gum-Gum no Kamehameha: Omee no Koe de Ora o Yobu (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

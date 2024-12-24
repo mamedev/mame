@@ -139,7 +139,7 @@ bool t6a84_device::memory_translate(int spacenum, int intention, offs_t &address
 
 uint32_t t6a84_device::code_address(uint16_t address)
 {
-	const uint32_t page_address = PAGE_SIZE * m_code_page + address;
+	const uint32_t page_address = m_code_page << 16 | address;
 	LOGMASKED(LOG_MEM, "CODE @ %06x => %06x\n", address, page_address);
 
 	return page_address;
@@ -147,7 +147,7 @@ uint32_t t6a84_device::code_address(uint16_t address)
 
 uint32_t t6a84_device::data_address(uint16_t address)
 {
-	const uint32_t page_address = PAGE_SIZE * m_data_page + address;
+	const uint32_t page_address = m_data_page << 16 | address;
 	LOGMASKED(LOG_MEM, "DATA @ %06x => %06x\n", address, page_address);
 
 	return page_address;
@@ -155,7 +155,7 @@ uint32_t t6a84_device::data_address(uint16_t address)
 
 uint32_t t6a84_device::stack_address(uint16_t address)
 {
-	const uint32_t page_address = PAGE_SIZE * m_stack_page + address;
+	const uint32_t page_address = m_stack_page << 16 | address;
 	LOGMASKED(LOG_MEM, "STACK @ %06x => %06x\n", address, page_address);
 
 	return page_address;

@@ -329,4 +329,4 @@ ROM_END
 } // anonymous namespace
 
 /*   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME  FLAGS */
-COMP(1987, sx1010, 0,      0,      sx1010,  sx1010, sx1000_state, init_common, "Casio", "SX1010", MACHINE_IS_SKELETON)
+COMP(1987, sx1010, 0,      0,      sx1010,  sx1010, sx1000_state, init_common, "Casio", "SX1010", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

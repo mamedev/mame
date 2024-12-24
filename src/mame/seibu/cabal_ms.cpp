@@ -173,4 +173,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1988, cabalm, cabal, cabalm, cabalm, cabal_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Cabal (Modular System)", MACHINE_IS_SKELETON )
+GAME( 1988, cabalm, cabal, cabalm, cabalm, cabal_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Cabal (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

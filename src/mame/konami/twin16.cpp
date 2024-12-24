@@ -58,8 +58,6 @@ Known Issues:
 #include "speaker.h"
 
 
-
-
 int twin16_state::spriteram_process_enable()
 {
 	return (m_CPUA_register & 0x40) == 0;
@@ -133,6 +131,7 @@ void fround_state::fround_CPU_register_w(offs_t offset, uint16_t data, uint16_t 
 	*/
 	uint16_t old = m_CPUA_register;
 	COMBINE_DATA(&m_CPUA_register);
+
 	if (m_CPUA_register != old)
 	{
 		if ((old & 0x08) == 0 && (m_CPUA_register & 0x08))
@@ -171,7 +170,7 @@ void twin16_state::sound_map(address_map &map)
 	map(0xd000, 0xd000).w(m_upd7759, FUNC(upd7759_device::port_w));
 	map(0xe000, 0xe000).w(FUNC(twin16_state::upd_start_w));
 	map(0xf000, 0xf000).r(FUNC(twin16_state::upd_busy_r)); // miaj writes 0 to it
-	}
+}
 
 void twin16_state::main_map(address_map &map)
 {

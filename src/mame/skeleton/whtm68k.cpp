@@ -350,4 +350,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996, yizhix,  0, yizhix, yizhix,  whtm68k_state, empty_init, ROT0, "WHT", "Yizhi Xiangqi", MACHINE_IS_SKELETON ) // 1996 WHT copyright in GFX
+GAME( 1996, yizhix,  0, yizhix, yizhix,  whtm68k_state, empty_init, ROT0, "WHT", "Yizhi Xiangqi", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 1996 WHT copyright in GFX

@@ -41,7 +41,7 @@
 
 ****************************************************************************
 
-	CA00-CA07 blitter (Stargate and Defender do not have blitter)
+    CA00-CA07 blitter (Stargate and Defender do not have blitter)
 
     CB00 6 bits of the video counters bits 2-7
 

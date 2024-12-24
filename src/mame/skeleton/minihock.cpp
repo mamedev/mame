@@ -98,4 +98,4 @@ ROM_END
 
 
 //    YEAR  NAME        PARENT  MACHINE     INPUT       CLASS             INIT        ROT   COMPANY    FULLNAME       FLAGS
-GAME( 1991, minihockey, 0,      minihockey, minihockey, minihockey_state, empty_init, ROT0, "Rumatic", "Mini Hockey", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1991, minihockey, 0,      minihockey, minihockey, minihockey_state, empty_init, ROT0, "Rumatic", "Mini Hockey", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

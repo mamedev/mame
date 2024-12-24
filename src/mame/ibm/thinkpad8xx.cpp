@@ -102,4 +102,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR, NAME,        PARENT, COMPAT, MACHINE,     INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,       FLAGS
-COMP( 1996, thinkpad850, 0,      0,      thinkpad850, thinkpad8xx, thinkpad8xx_state, empty_init, "IBM",   "ThinkPad 850", MACHINE_IS_SKELETON )
+COMP( 1996, thinkpad850, 0,      0,      thinkpad850, thinkpad8xx, thinkpad8xx_state, empty_init, "IBM",   "ThinkPad 850", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

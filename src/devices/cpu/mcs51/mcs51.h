@@ -66,6 +66,7 @@ public:
 
 	void program_internal(address_map &map) ATTR_COLD;
 	void data_internal(address_map &map) ATTR_COLD;
+
 protected:
 	// construction/destruction
 	mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features = 0);
@@ -92,7 +93,6 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-protected:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;

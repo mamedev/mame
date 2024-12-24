@@ -269,4 +269,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1992, cd100b, 0, 0, cd100b, cd100b, cd100_state, empty_init, "Rowe International", "CD-100B LaserStar", MACHINE_IS_SKELETON_MECHANICAL)
+SYST(1992, cd100b, 0, 0, cd100b, cd100b, cd100_state, empty_init, "Rowe International", "CD-100B LaserStar", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

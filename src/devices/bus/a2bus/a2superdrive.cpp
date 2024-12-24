@@ -74,11 +74,10 @@ protected:
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
 
 private:
+	void w65c02_mem(address_map &map) ATTR_COLD;
 
-	void m65c02_mem(address_map &map) ATTR_COLD;
-
-	void m65c02_w(offs_t offset, uint8_t value);
-	uint8_t m65c02_r(offs_t offset);
+	void w65c02_w(offs_t offset, uint8_t value);
+	uint8_t w65c02_r(offs_t offset);
 
 	void phases_w(uint8_t phases);
 	void sel35_w(int sel35);
@@ -111,10 +110,10 @@ const tiny_rom_entry *a2bus_superdrive_device::device_rom_region() const
 	return ROM_NAME( superdrive );
 }
 
-void a2bus_superdrive_device::m65c02_mem(address_map &map)
+void a2bus_superdrive_device::w65c02_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).ram().share(m_ram);
-	map(0x0a00, 0x0aff).rw(FUNC(a2bus_superdrive_device::m65c02_r), FUNC(a2bus_superdrive_device::m65c02_w));
+	map(0x0a00, 0x0aff).rw(FUNC(a2bus_superdrive_device::w65c02_r), FUNC(a2bus_superdrive_device::w65c02_w));
 	map(0x8000, 0xffff).rom().region(SUPERDRIVE_ROM_REGION, 0x0000);
 }
 
@@ -123,7 +122,7 @@ void a2bus_superdrive_device::device_add_mconfig(machine_config &config)
 {
 
 	W65C02S(config, m_65c02,  DERIVED_CLOCK(2, 7));  /* ~ 2.046 MHz */
-	m_65c02->set_addrmap(AS_PROGRAM, &a2bus_superdrive_device::m65c02_mem);
+	m_65c02->set_addrmap(AS_PROGRAM, &a2bus_superdrive_device::w65c02_mem);
 
 	SWIM1(config, m_fdc, C16M);
 
@@ -221,7 +220,7 @@ void a2bus_superdrive_device::write_c800(uint16_t offset, uint8_t data)
 
 
 /* uc 65c02 i/o at $0a00 */
-void a2bus_superdrive_device::m65c02_w(offs_t offset, uint8_t value)
+void a2bus_superdrive_device::w65c02_w(offs_t offset, uint8_t value)
 {
 	// $00-$0f = swim registers
 	// $40 = head sel low
@@ -265,7 +264,7 @@ void a2bus_superdrive_device::m65c02_w(offs_t offset, uint8_t value)
 	}
 }
 
-uint8_t a2bus_superdrive_device::m65c02_r(offs_t offset)
+uint8_t a2bus_superdrive_device::w65c02_r(offs_t offset)
 {
 	floppy_image_device *floppy = nullptr;
 

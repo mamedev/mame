@@ -14,7 +14,7 @@
 #include "econet.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/scsi/scsi.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/r65c02.h"
 #include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/buffer.h"
@@ -81,7 +81,7 @@ private:
 
 	static void floppy_formats_afs(format_registration &fr);
 
-	required_device<m65c02_device> m_maincpu;
+	required_device<r65c102_device> m_maincpu;
 	required_device<wd2793_device> m_fdc;
 	required_device<mc6854_device> m_adlc;
 	required_device<mc146818_device> m_rtc;

@@ -176,4 +176,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, twincobrm, twincobr, twincobrm, twincobrm, twincobr_ms_state, empty_init, ROT270, "bootleg (Gaelco / Ervisa)", "Twin Cobra (Modular System)", MACHINE_IS_SKELETON )
+GAME( 199?, twincobrm, twincobr, twincobrm, twincobrm, twincobr_ms_state, empty_init, ROT270, "bootleg (Gaelco / Ervisa)", "Twin Cobra (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

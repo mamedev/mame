@@ -988,4 +988,4 @@ ROM_START(polysix)
 ROM_END
 
 
-SYST(1980, polysix, 0, 0, polysix, polysix, polysix_state, empty_init, "Korg", "Polysix Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1980, polysix, 0, 0, polysix, polysix, polysix_state, empty_init, "Korg", "Polysix Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

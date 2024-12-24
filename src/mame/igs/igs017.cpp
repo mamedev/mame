@@ -82,7 +82,7 @@ Notes:
 
 #include "igs017_igs031.h"
 #include "igs022.h"
-#include "mahjong.h"
+#include "igsmahjong.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/z180.h"

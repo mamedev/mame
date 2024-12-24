@@ -1287,7 +1287,7 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 //  PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", FUNC(upd1990a_device::data_out_r))
-//  PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
+//  PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// TODO: Coming from the old legacy driver as "EXSWITCH", where this maps?

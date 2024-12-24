@@ -57,7 +57,9 @@ Dumped games:
 2000 Pye-nage Taikai              https://youtu.be/oL2OIbrv-KI
 2000 Taihou de Doboon             https://youtu.be/loPP3jt0Ob0
 2001 Hae Hae Ka Ka Ka             https://youtu.be/37IxYCg0tic
+2002 Gun Kids
 2003 Go Go Cowboy (EN, prize)     https://youtu.be/rymtzmSXjuA
+2003 Wantouchable                 https://youtu.be/aRcTCdZZLRo
 
 Games with the same cabinet, or in the Treasure Fall series, which might be on the same hardware:
 
@@ -75,10 +77,8 @@ Games with the same cabinet, or in the Treasure Fall series, which might be on t
 2002 Karateman                    https://youtu.be/EIrVHEAv3Sc
 2002 Perfect Goal (screenless)    https://youtu.be/ilneyp-8dBI
 2003 Go Go Cowboy (JP, medal)     https://youtu.be/qYDw2sxNRqE
-2003 Gun Kids
 2003 Kurukuru Train               https://youtu.be/Ef7TQX4C9fA
 2003 Safari Kingdom (screenless)
-2003 Wantouchable                 https://youtu.be/aRcTCdZZLRo
 2003 Zakuzaku Kaizokudan
 2004 Animal Punch
 2004 Dotabata Zaurus              https://youtu.be/Gxt6klOYZ9A
@@ -1204,7 +1204,7 @@ GFXDECODE_END
 static INPUT_PORTS_START( sigma_1b )
 	PORT_START("EEPROM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM  )                       // Related to d013. Must be 0
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_CUSTOM  ) PORT_VBLANK("screen") // Related to d013. Must be 0
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // Related to d013. Must be 0
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )

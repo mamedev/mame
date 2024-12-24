@@ -155,4 +155,4 @@ ROM_END
 
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY                FULLNAME      FLAGS
-COMP( 1987, hawk,    0,       0,      hawk,    hawk,  hawk_state, init_hawk, "Husky Computers Ltd", "Husky Hawk", MACHINE_IS_SKELETON )
+COMP( 1987, hawk,    0,       0,      hawk,    hawk,  hawk_state, init_hawk, "Husky Computers Ltd", "Husky Hawk", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

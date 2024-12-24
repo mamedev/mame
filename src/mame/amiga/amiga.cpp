@@ -1704,6 +1704,7 @@ void amiga_state::amiga_base(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("amiga_flop");
 	SOFTWARE_LIST(config, "ocs_list").set_original("amigaocs_flop");
 	SOFTWARE_LIST(config, "demos_list").set_original("amiga_demos");
+	SOFTWARE_LIST(config, "amigacd_list").set_original("amiga_cd");
 }
 
 void a1000_state::a1000(machine_config &config)
@@ -2239,7 +2240,7 @@ void cd32_state::cd32(machine_config &config)
 	m_cia_0->sp_wr_callback().set_nop();
 
 	SOFTWARE_LIST(config, "cd32_list").set_original("cd32");
-	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
+	SOFTWARE_LIST(config, "cd_list").set_compatible("cdtv");
 }
 
 void cd32_state::cd32n(machine_config &config)

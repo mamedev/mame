@@ -15,7 +15,7 @@
         * VR4310 CPU (similar to the N64's VR4300)
         * VR4373 "Nile 3" system controller / PCI bridge
         * CMD 646U2 Ultra DMA IDE controller
-        * M4T28-8R128H1 TimeKeeper RTC/CMOS
+        * M4T28-BR128H1 TimeKeeper RTC/CMOS
         * PLX PCI9050 Bus Target Interface Chip (interfaces ISA-style designs to PCI)
         * Midway ZeusII-series custom video
         * Actiontec PM560LKI PCI Data/Fax Modem (PCI\VEN_11C1&DEV_0480&SUBSYS_04801668)

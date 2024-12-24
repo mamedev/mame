@@ -2,16 +2,18 @@
 // copyright-holders:hap
 /*
 
-  Seiko Epson E0C6S46 MCU
-  QFP5-128pin, see manual for pinout
+  Seiko Epson E0C6S46 family
 
-  TODO:
-  - OSC3
-  - K input interrupts
-  - finish i/o ports
-  - serial interface
-  - buzzer envelope addition
-  - add mask options for ports (eg. buzzer on output port R4x is optional)
+E0C6S46: 6144x12 ROM, 640x4 RAM, 2*80x4 VRAM, LCD has 16 commons and 40 segments
+E0C6S48: 8192x12 ROM, 768x4 RAM, 2*102x4 VRAM, LCD has 16 commons and 51 segments
+
+TODO:
+- finish i/o ports
+- serial interface
+- buzzer envelope addition
+- what happens if OSC3 is selected while OSCC (bit 2) is low?
+- K input interrupt can trigger if input is active while writing to the mask register
+- add mask options for ports (eg. buzzer on output port R4x is optional)
 
 */
 
@@ -28,36 +30,59 @@ enum
 	IRQREG_INPUT1
 };
 
+// device definitions
 DEFINE_DEVICE_TYPE(E0C6S46, e0c6s46_device, "e0c6s46", "Seiko Epson E0C6S46")
+DEFINE_DEVICE_TYPE(E0C6S48, e0c6s48_device, "e0c6s48", "Seiko Epson E0C6S48")
 
 
 // internal memory maps
-void e0c6s46_device::e0c6s46_program(address_map &map)
+void e0c6s46_device::program_map(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
 }
 
+void e0c6s48_device::program_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+}
 
-void e0c6s46_device::e0c6s46_data(address_map &map)
+void e0c6s46_device::data_map(address_map &map)
 {
 	map(0x0000, 0x027f).ram();
-	map(0x0e00, 0x0e4f).ram().share("vram1");
-	map(0x0e80, 0x0ecf).ram().share("vram2");
+	map(0x0e00, 0x0e4f).ram().share(m_vram[0]);
+	map(0x0e80, 0x0ecf).ram().share(m_vram[1]);
 	map(0x0f00, 0x0f7f).rw(FUNC(e0c6s46_device::io_r), FUNC(e0c6s46_device::io_w));
 }
 
+void e0c6s48_device::data_map(address_map &map)
+{
+	map(0x0000, 0x02ff).ram();
+	map(0x0e00, 0x0e65).ram().share(m_vram[0]);
+	map(0x0e80, 0x0ee5).ram().share(m_vram[1]);
+	map(0x0f00, 0x0f7f).rw(FUNC(e0c6s48_device::io_r), FUNC(e0c6s48_device::io_w));
+}
 
-// device definitions
-e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	e0c6200_cpu_device(mconfig, E0C6S46, tag, owner, clock, address_map_constructor(FUNC(e0c6s46_device::e0c6s46_program), this), address_map_constructor(FUNC(e0c6s46_device::e0c6s46_data), this)),
-	m_vram1(*this, "vram1"),
-	m_vram2(*this, "vram2"),
-	m_pixel_update_cb(*this),
+
+// constructor
+e0c6s46_device::e0c6s46_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor program, address_map_constructor data) :
+	e0c6200_cpu_device(mconfig, type, tag, owner, clock, program, data),
+	m_vram(*this, "vram%u", 1U),
+	m_write_segs(*this),
+	m_write_contrast(*this),
+	m_pixel_cb(*this),
 	m_write_r(*this),
 	m_read_p(*this, 0),
-	m_write_p(*this)
+	m_write_p(*this),
+	m_osc3(0)
 { }
 
+e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	e0c6s46_device(mconfig, E0C6S46, tag, owner, clock, address_map_constructor(FUNC(e0c6s46_device::program_map), this), address_map_constructor(FUNC(e0c6s46_device::data_map), this))
+{ }
+
+e0c6s48_device::e0c6s48_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	e0c6s46_device(mconfig, E0C6S48, tag, owner, clock, address_map_constructor(FUNC(e0c6s48_device::program_map), this), address_map_constructor(FUNC(e0c6s48_device::data_map), this))
+{ }
 
 
 //-------------------------------------------------
@@ -68,15 +93,24 @@ void e0c6s46_device::device_start()
 {
 	e0c6200_cpu_device::device_start();
 
-	m_pixel_update_cb.resolve();
+	// misc init
+	m_osc1 = clock();
+	if (m_osc3 == 0)
+		m_osc3 = m_osc1;
 
-	// create timers
 	m_core_256_handle = timer_alloc(FUNC(e0c6s46_device::core_256_cb), this);
-	m_core_256_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
+	m_core_256_handle->adjust(attotime::from_ticks(64, m_osc1));
 	m_prgtimer_handle = timer_alloc(FUNC(e0c6s46_device::prgtimer_cb), this);
-	m_prgtimer_handle->adjust(attotime::never);
 	m_buzzer_handle = timer_alloc(FUNC(e0c6s46_device::buzzer_cb), this);
-	m_buzzer_handle->adjust(attotime::never);
+	m_osc_change = timer_alloc(FUNC(e0c6s46_device::osc_change), this);
+	m_lcd_driver = timer_alloc(FUNC(e0c6s46_device::lcd_driver_cb), this);
+	m_lcd_driver->adjust(attotime::from_ticks(1024, m_osc1));
+
+	m_pixel_cb.resolve();
+
+	const u32 render_buf_size = m_vram[0].bytes() * 2 * 4;
+	m_render_buf = make_unique_clear<u8[]>(render_buf_size);
+	save_pointer(NAME(m_render_buf), render_buf_size);
 
 	// zerofill
 	memset(m_port_r, 0x0, sizeof(m_port_r));
@@ -195,6 +229,8 @@ void e0c6s46_device::device_reset()
 	m_data->write_byte(0xf7d, 0x0);
 	m_data->write_byte(0xf7e, 0x0);
 
+	m_write_contrast(m_lcd_contrast);
+
 	// reset ports
 	for (int i = 0; i < 5; i++)
 		write_r(i, m_port_r[i]);
@@ -212,9 +248,9 @@ void e0c6s46_device::execute_one()
 {
 	// E0C6S46 has no support for SLP opcode
 	if (m_op == 0xff9)
-		return;
-
-	e0c6200_cpu_device::execute_one();
+		op_illegal();
+	else
+		e0c6200_cpu_device::execute_one();
 }
 
 
@@ -268,7 +304,17 @@ void e0c6s46_device::execute_set_input(int line, int state)
 	int port = line >> 2 & 1;
 	u8 bit = 1 << (line & 3);
 
+	u8 prev = m_port_k[port];
 	m_port_k[port] = (m_port_k[port] & ~bit) | (state ? bit : 0);
+
+	// set interrupt on falling/rising edge of input
+	u8 dfk = (port == 0) ? m_dfk0 : 0xf;
+	u8 edge = ~(prev ^ dfk) & (m_port_k[port] ^ dfk) & bit;
+	if (m_irqmask[IRQREG_INPUT0 + port] & edge)
+	{
+		m_irqflag[IRQREG_INPUT0 + port] |= edge;
+		m_possible_irq = true;
+	}
 }
 
 
@@ -353,7 +399,7 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::core_256_cb)
 	// clock-timer, stopwatch timer, and some features of the buzzer all run
 	// from the same internal 256hz timer (64 ticks high+low at default clock of 32768hz)
 	m_256_src_pulse ^= 1;
-	m_core_256_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
+	m_core_256_handle->adjust(attotime::from_ticks(64, m_osc1));
 
 	// clock stopwatch on falling edge of pulse+on
 	m_swl_cur_pulse = m_256_src_pulse | (m_stopwatch_on ^ 1);
@@ -368,6 +414,12 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::core_256_cb)
 	// (handle clock_clktimer last in case of watchdog reset)
 	if (m_256_src_pulse == 0)
 		clock_clktimer();
+}
+
+TIMER_CALLBACK_MEMBER(e0c6s46_device::osc_change)
+{
+	// set MCU instruction clock on CLKCHG change
+	set_clock((m_osc & 8) ? m_osc3 : m_osc1);
 }
 
 
@@ -463,7 +515,7 @@ bool e0c6s46_device::prgtimer_reset_prescaler()
 	// only 2 to 7 are clock dividers
 	u8 sel = m_prgtimer_select & 7;
 	if (sel >= 2)
-		m_prgtimer_handle->adjust(attotime::from_ticks(2 << (sel ^ 7), unscaled_clock()));
+		m_prgtimer_handle->adjust(attotime::from_ticks(2 << (sel ^ 7), m_osc1));
 
 	return (sel >= 2);
 }
@@ -501,7 +553,7 @@ void e0c6s46_device::schedule_buzzer()
 		high -= m_bz_duty_ratio;
 	low -= high;
 
-	m_buzzer_handle->adjust(attotime::from_ticks(m_bz_pulse ? high : low, mul * unscaled_clock()));
+	m_buzzer_handle->adjust(attotime::from_ticks(m_bz_pulse ? high : low, mul * m_osc1));
 }
 
 TIMER_CALLBACK_MEMBER(e0c6s46_device::buzzer_cb)
@@ -545,13 +597,11 @@ void e0c6s46_device::clock_bz_1shot()
 //  LCD Driver
 //-------------------------------------------------
 
-u32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+TIMER_CALLBACK_MEMBER(e0c6s46_device::lcd_driver_cb)
 {
-	// call this 32 times per second (osc1/1024: 32hz at default clock of 32768hz)
+	// this gets called 32 times per second (osc1/1024: 32hz at default clock of 32768hz)
 	for (int bank = 0; bank < 2; bank++)
 	{
-		const u8* vram = bank ? m_vram2 : m_vram1;
-
 		// determine operating mode
 		bool lcd_on = false;
 		int pixel = 0;
@@ -563,22 +613,44 @@ u32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			lcd_on = true;
 
 		// draw pixels
-		for (int offset = 0; offset < 0x50; offset++)
+		for (int offset = 0; offset < m_vram[0].bytes(); offset++)
 		{
 			for (int c = 0; c < 4; c++)
 			{
 				if (lcd_on)
-					pixel = vram[offset] >> c & 1;
+					pixel = m_vram[bank][offset] >> c & 1;
 
 				// 16 COM(common) pins, 40 SEG(segment) pins
 				int seg = offset / 2;
 				int com = bank * 8 + (offset & 1) * 4 + c;
 
-				if (!m_pixel_update_cb.isnull())
-					m_pixel_update_cb(bitmap, cliprect, m_lcd_contrast, seg, com, pixel);
-				else if (cliprect.contains(seg, com))
-					bitmap.pix(com, seg) = pixel;
+				const u8 width = m_vram[0].bytes() * 4 / 8;
+				m_render_buf[com * width + seg] = pixel;
+				m_write_segs(seg << 4 | com, pixel);
 			}
+		}
+	}
+
+	m_lcd_driver->adjust(attotime::from_ticks(1024, m_osc1));
+}
+
+u32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const u8 *src = lcd_buffer();
+	const u8 width = m_vram[0].bytes() * 4 / 8;
+
+	for (int x = 0; x < width; x++)
+	{
+		for (int y = 0; y < 16; y++)
+		{
+			int dx = x;
+			int dy = y;
+
+			if (!m_pixel_cb.isnull())
+				m_pixel_cb(dx, dy);
+
+			if (cliprect.contains(dx, dy))
+				bitmap.pix(dy, dx) = src[y * width + x];
 		}
 	}
 
@@ -745,8 +817,13 @@ void e0c6s46_device::io_w(offs_t offset, u8 data)
 			// d0,d1: CPU operating voltage
 			// d2: OSC3 on (high freq)
 			// d3: clock source OSC1 or OSC3
-			if (data & 8)
-				logerror("io_w selected OSC3! PC=$%04X\n", m_prev_pc);
+			if ((m_osc ^ data) & 8)
+			{
+				if (m_osc1 == m_osc3)
+					logerror("io_w unhandled OSC change, PC=$%04X\n", m_prev_pc);
+				else
+					m_osc_change->adjust(attotime::zero);
+			}
 			m_osc = data;
 			break;
 
@@ -760,6 +837,7 @@ void e0c6s46_device::io_w(offs_t offset, u8 data)
 		case 0x72:
 			// contrast adjustment (0=light, 15=dark)
 			m_lcd_contrast = data;
+			m_write_contrast(data);
 			break;
 
 		// SVD circuit (supply voltage detection)

@@ -251,7 +251,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::scanline_interrupt)
 		{
 			m_upd71059c->ir0_w(0);
 		}
-
 	}
 }
 
@@ -300,7 +299,7 @@ void m92_state::sound_reset_w(uint16_t data)
 
 void m92_state::m92_base_map(address_map &map)
 {
-	map(0xe0000, 0xeffff).ram(); /* System ram */
+	map(0xe0000, 0xeffff).ram(); // System ram
 	map(0xf8000, 0xf87ff).ram().share("spriteram");
 	map(0xf8800, 0xf8fff).rw(FUNC(m92_state::paletteram_r), FUNC(m92_state::paletteram_w));
 	map(0xf9000, 0xf900f).w(FUNC(m92_state::spritecontrol_w)).share("spritecontrol");
@@ -308,7 +307,7 @@ void m92_state::m92_base_map(address_map &map)
 	map(0xffff0, 0xfffff).rom().region("maincpu", 0x7fff0);
 }
 
-/* appears to be an earlier board */
+// appears to be an earlier board
 void m92_state::lethalth_map(address_map &map)
 {
 	m92_base_map(map);
@@ -320,7 +319,7 @@ void m92_state::m92_map(address_map &map)
 {
 	m92_base_map(map);
 	map(0x00000, 0xbffff).rom();
-	map(0xc0000, 0xcffff).rom().region("maincpu", 0x00000); /* Mirror used by In The Hunt as protection */
+	map(0xc0000, 0xcffff).rom().region("maincpu", 0x00000); // Mirror used by In The Hunt as protection
 	map(0xd0000, 0xdffff).ram().w(FUNC(m92_state::vram_w)).share("vram_data");
 }
 
@@ -329,15 +328,25 @@ void m92_state::m92_banked_map(address_map &map)
 	m92_base_map(map);
 	map(0x00000, 0x9ffff).rom();
 	map(0xa0000, 0xbffff).bankr("mainbank");
-	map(0xc0000, 0xcffff).rom().region("maincpu", 0x00000); /* Mirror used by In The Hunt as protection */
+	map(0xc0000, 0xcffff).rom().region("maincpu", 0x00000); // Mirror used by In The Hunt as protection
 	map(0xd0000, 0xdffff).ram().w(FUNC(m92_state::vram_w)).share("vram_data");
 }
 
-/* This game has an eeprom on the game board */
+// This game has an eeprom on the game board
 void m92_state::majtitl2_map(address_map &map)
 {
 	m92_banked_map(map);
 	map(0xf0000, 0xf3fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+}
+
+void m92_state::nbbatman2bl_map(address_map &map)
+{
+	m92_banked_map(map);
+
+	// disable for now, it has different sprite hardware
+	map(0xf8000, 0xf87ff).unmaprw();
+	map(0xf9000, 0xf900f).unmapw();
+	map(0xf9800, 0xf9801).unmapw();
 }
 
 void m92_state::m92_portmap(address_map &map)
@@ -348,7 +357,7 @@ void m92_state::m92_portmap(address_map &map)
 	map(0x02, 0x02).w(FUNC(m92_state::coincounter_w));
 	map(0x04, 0x05).portr("DSW");
 	map(0x06, 0x07).portr("P3_P4");
-	map(0x08, 0x08).r("soundlatch2", FUNC(generic_latch_8_device::read));   // answer from sound CPU
+	map(0x08, 0x08).r("soundlatch2", FUNC(generic_latch_8_device::read)); // answer from sound CPU
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x80, 0x87).w(FUNC(m92_state::pf_control_w<0>));
 	map(0x88, 0x8f).w(FUNC(m92_state::pf_control_w<1>));
@@ -424,7 +433,7 @@ static INPUT_PORTS_START( m92_2player )
 	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW3:8" )
 
 	PORT_START("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW1:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW1:3" )
@@ -437,7 +446,7 @@ static INPUT_PORTS_START( m92_2player )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )
-	/* Dip switch bank 2 */
+	/* DIP switch bank 2 */
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -490,10 +499,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( bmaster )
 	PORT_INCLUDE(m92_2player)
 
-	/* Game manual specificly mentions dip switch bank 3 is unused */
+	/* Game manual specificly mentions DIP switch bank 3 is unused */
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0003, "2" )
@@ -514,7 +523,7 @@ static INPUT_PORTS_START( gunforce )
 	PORT_INCLUDE(m92_2player)
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, "2" )
 	PORT_DIPSETTING(      0x0003, "3" )
@@ -535,7 +544,7 @@ static INPUT_PORTS_START( lethalth )
 	PORT_INCLUDE(m92_2player)
 
 	PORT_MODIFY("COINS_DSW3")
-	/* Dip switch bank 3 */
+	/* DIP switch bank 3 */
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(      0x0200, "500K & 1M" )
 	PORT_DIPSETTING(      0x0300, "700K & 1.5M" )
@@ -543,7 +552,7 @@ static INPUT_PORTS_START( lethalth )
 	PORT_DIPSETTING(      0x0100, "1M & 2M" )
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, "2" )
 	PORT_DIPSETTING(      0x0003, "3" )
@@ -564,7 +573,7 @@ static INPUT_PORTS_START( thndblst )
 	PORT_INCLUDE(lethalth)
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0010, 0x0000, "Continuous Play" ) PORT_DIPLOCATION("SW1:5") /* manual says Unused */
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
@@ -575,7 +584,7 @@ static INPUT_PORTS_START( hook )
 	PORT_INCLUDE(m92_4player)
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0003, "2" )
@@ -597,7 +606,7 @@ static INPUT_PORTS_START( majtitl2 )
 	PORT_INCLUDE(m92_4player)
 
 	PORT_MODIFY("COINS_DSW3")
-	/* Dip switch bank 3 */
+	/* DIP switch bank 3 */
 	PORT_DIPNAME( 0x0100, 0x0100, "Ticket Dispenser" ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )  /* "Ticket payout function is not working now" will be shown on screen */
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )   /* Stored data is shown on screen with the option to clear data */
@@ -615,12 +624,12 @@ static INPUT_PORTS_START( majtitl2 )
 	PORT_DIPSETTING(      0x0000, "DL 4SS" )
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 2 */
+	/* DIP switch bank 2 */
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )
 
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0001, 0x0001, "Given Holes/Stroke Play" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0001, "2" )
@@ -646,7 +655,7 @@ static INPUT_PORTS_START( mysticri )
 	PORT_INCLUDE(m92_2player)
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, "2" )
 	PORT_DIPSETTING(      0x0003, "3" )
@@ -667,7 +676,7 @@ static INPUT_PORTS_START( uccops )
 	PORT_INCLUDE(m92_3player)
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0003, 0x0002, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0003, "2" )
@@ -690,7 +699,7 @@ static INPUT_PORTS_START( rtypeleo )
 	PORT_INCLUDE(m92_2player)
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, "2" )
 	PORT_DIPSETTING(      0x0003, "3" )
@@ -708,7 +717,7 @@ static INPUT_PORTS_START( inthunt )
 	PORT_INCLUDE(m92_2player)
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, "2" )
 	PORT_DIPSETTING(      0x0003, "3" )
@@ -729,7 +738,7 @@ static INPUT_PORTS_START( nbbatman )
 	PORT_INCLUDE(m92_4player)
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0003, "2" )
@@ -753,7 +762,7 @@ static INPUT_PORTS_START( psoldier )
 	IREM_GENERIC_JOYSTICKS_3_BUTTONS(1, 2)
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0020, 0x0000, "Any Button to Start" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
@@ -772,10 +781,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dsoccr94j )
 	PORT_INCLUDE(m92_4player)
-	/* Dip Switch 2, dip 2 is listed as "Don't Change" and is "OFF" */
+	/* DIP Switch 2, dip 2 is listed as "Don't Change" and is "OFF" */
 
 	PORT_MODIFY("COINS_DSW3")
-	/* Dip switch bank 3 */
+	/* DIP switch bank 3 */
 	PORT_DIPNAME( 0x0300, 0x0300, "Player Power" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(      0x0000, "500" )
 	PORT_DIPSETTING(      0x0300, "1000" )
@@ -783,7 +792,7 @@ static INPUT_PORTS_START( dsoccr94j )
 	PORT_DIPSETTING(      0x0200, "2000" )
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0003, 0x0003, "Time" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0000, "1:30" )
 	PORT_DIPSETTING(      0x0003, "2:00" )
@@ -798,11 +807,11 @@ static INPUT_PORTS_START( dsoccr94j )
 	PORT_DIPSETTING(      0x0010, "Match Mode" )
 	PORT_DIPSETTING(      0x0000, "Power Mode" )
 /*
-   Match Mode: Winner advances to the next game.  Game Over for the loser
-   Power Mode: The Players can play the game until their respective powers run
-               out, reguardless of whether they win or lose the game.
-               Player 2 can join in any time during the game
-               Player power (time) can be adjusted by dip switch #3
+    Match Mode: Winner advances to the next game.  Game Over for the loser
+    Power Mode: The Players can play the game until their respective powers run
+        out, reguardless of whether they win or lose the game.
+        Player 2 can join in any time during the game
+        Player power (time) can be adjusted by DIP switch #3
 */
 	PORT_DIPNAME( 0x0020, 0x0020, "Starting Button" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, "Button 1" )
@@ -814,7 +823,7 @@ static INPUT_PORTS_START( gunforc2 )
 	PORT_INCLUDE(m92_2player)
 
 	PORT_MODIFY("DSW")
-	/* Dip switch bank 1 */
+	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, "3" )
 	PORT_DIPSETTING(      0x0003, "2" )
@@ -897,8 +906,8 @@ static const gfx_layout bootleg_spritelayout =
 
 
 static GFXDECODE_START( gfx_bootleg )
-	GFXDECODE_ENTRY( "gfx1", 0, bootleg_charlayout,   0x400, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0, bootleg_spritelayout, 0x400, 128 )
+	GFXDECODE_ENTRY( "gfx1", 0, bootleg_charlayout,   0, 128 )
+	GFXDECODE_ENTRY( "gfx2", 0, bootleg_spritelayout, 0, 128 )
 GFXDECODE_END
 
 
@@ -1070,6 +1079,8 @@ void m92_state::nbbatman2bl(machine_config &config)
 	config.device_remove("soundcpu");
 	config.device_remove("ymsnd");
 	config.device_remove("irem");
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &m92_state::nbbatman2bl_map);
 
 	m_gfxdecode->set_info(gfx_bootleg);
 

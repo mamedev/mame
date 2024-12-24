@@ -179,26 +179,49 @@ void ripple_ide_device::autoconfig_base_address(offs_t address)
 	// flash occupies our space until the ide registers are switched in
 	m_slot->space().install_readwrite_handler(address, address + 0x1ffff,
 		emu::rw_delegate(m_flash, FUNC(intelfsh8_device::read)),
-		emu::rw_delegate(m_flash, FUNC(intelfsh8_device::write)), 0xff00);
+		emu::rw_delegate(m_flash, FUNC(intelfsh8_device::write)), 0xff00ff00);
 
 	// install write tap to handle switching in ide registers
 	m_write_tap.remove();
-	m_write_tap = m_slot->space().install_write_tap(
-		address, address + 0x1ffff,
-		"rom_disable_w",
-		[this] (offs_t offset, uint16_t &data, uint16_t mem_mask)
-		{
-			m_write_tap.remove();
 
-			// ripple registers are now available
-			m_slot->space().install_device(m_base_address, m_base_address + 0x1ffff, *this, &ripple_ide_device::mmio_map);
+	if (m_slot->space().data_width() == 16)
+	{
+		m_write_tap = m_slot->space().install_write_tap(
+			address, address + 0x1ffff,
+			"flash_disable_w",
+			[this] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+			{
+				m_write_tap.remove();
 
-			// we need to repeat the write here as this tap won't hit it yet
-			// the initial write will instead hit the flash, but it's harmless
-			m_slot->space().write_word(offset, data, mem_mask);
-		},
-		&m_write_tap
-	);
+				// ripple registers are now available
+				m_slot->space().install_device(m_base_address, m_base_address + 0x1ffff, *this, &ripple_ide_device::mmio_map);
+
+				// we need to repeat the write here as this tap won't hit it yet
+				// the initial write will instead hit the flash, but it's harmless
+				m_slot->space().write_word(offset, data, mem_mask);
+			},
+			&m_write_tap
+		);
+	}
+	else
+	{
+		m_write_tap = m_slot->space().install_write_tap(
+			address, address + 0x1ffff,
+			"flash_disable_w",
+			[this] (offs_t offset, uint32_t &data, uint32_t mem_mask)
+			{
+				m_write_tap.remove();
+
+				// ripple registers are now available
+				m_slot->space().install_device(m_base_address, m_base_address + 0x1ffff, *this, &ripple_ide_device::mmio_map);
+
+				// we need to repeat the write here as this tap won't hit it yet
+				// the initial write will instead hit the flash, but it's harmless
+				m_slot->space().write_dword(offset, data, mem_mask);
+			},
+			&m_write_tap
+		);
+	}
 
 	// we're done
 	m_slot->cfgout_w(0);
@@ -226,7 +249,7 @@ void ripple_ide_device::cfgin_w(int state)
 		// install autoconfig handler
 		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffffffff);
 	}
 }
 

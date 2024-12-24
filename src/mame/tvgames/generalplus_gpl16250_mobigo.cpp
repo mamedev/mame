@@ -169,6 +169,6 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2010, mobigo,  0,      0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo", MACHINE_IS_SKELETON )
-CONS( 2010, mobigos, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo (Spain)", MACHINE_IS_SKELETON )
-CONS( 2012, mobigo2, 0,      0, mobigo2,  mobigo, mobigo2_state, nand_init840, "VTech", "MobiGo 2 (Germany)", MACHINE_IS_SKELETON )
+CONS( 2010, mobigo,  0,      0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2010, mobigos, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2012, mobigo2, 0,      0, mobigo2,  mobigo, mobigo2_state, nand_init840, "VTech", "MobiGo 2 (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
