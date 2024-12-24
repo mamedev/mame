@@ -2498,12 +2498,6 @@ rx78                            //
 @source:bandai/sv8000.cpp
 sv8000                          // Super Vision 8000
 
-@source:bandai/tamag1.cpp
-alienfev                        // Epoch
-tama                            // Bandai
-tamag2                          // Bandai
-venusdm                         // Nikko
-
 @source:bandai/wswan.cpp
 pockchv2                        // Benesse Pocket Challenge V2
 wscolor                         // Bandai WonderSwan Color Handheld
@@ -19150,6 +19144,12 @@ mhockeya                        // Mattel
 msoccer                         // Mattel
 qkracer                         // National Semiconductor
 qkspeller                       // National Semiconductor
+
+@source:handheld/hh_e0c6x.cpp
+alienfev                        // Epoch
+tama                            // Bandai
+tamag2                          // Bandai
+venusdm                         // Nikko
 
 @source:handheld/hh_hmcs40.cpp
 alnattck                        // Coleco
