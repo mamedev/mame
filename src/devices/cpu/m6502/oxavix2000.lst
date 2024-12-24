@@ -332,8 +332,10 @@ orapa_imp
 	prefetch();
 
 andpa_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc();
+	TMP = read_full_data(m_pa);
+	A &= TMP;
+	set_nz(A);
 	prefetch();
 
 eorpa_imp
@@ -471,8 +473,14 @@ asr_aba
 	prefetch();
 
 asr_xav_zpx
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	TMP = read_pc();
 	read_pc();
+	PC++;
+	TMP = uint8_t(TMP+X);
+	TMP2 = read_zeropage(TMP);
+	read_zeropage((TMP+1) & 0xff);
+	TMP2 = do_asr(TMP2);
+	write_zeropage(TMP, TMP2);
 	prefetch();
 
 asr_acc
@@ -480,8 +488,16 @@ asr_acc
 	prefetch();
 
 asr_abx
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
-	read_pc();
+	TMP = read_pc();
+	PC++;
+	TMP = set_h(TMP, read_pc());
+	PC++;
+	read(set_l(TMP, TMP+X));
+	TMP += X;
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_asr(TMP2);
+	write(TMP, TMP2);
 	prefetch();
 
 cmc_imp
