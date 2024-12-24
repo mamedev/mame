@@ -257,8 +257,8 @@ namespace
         bool m_scsi_intst = false;
         bool m_scsi_inte = false;
         bool m_blame_peripheral = false;
+        bool m_ast = false;
         bool m_ast_latched = false;
-        bool m_ast_active = false;
         bool m_cpu_bus_error = false;
         offs_t m_last_berr_pc_cpu = 0;
         emu_timer *m_cpu_bus_error_timer;
@@ -529,6 +529,10 @@ namespace
 
         // CPU doesn't run until the IOP tells it to
         m_cpu->set_input_line(INPUT_LINE_HALT, 1);
+
+        // Clear AST state
+        m_ast_latched = false;
+        m_ast = false;
     }
 
     void news_iop_state::init_common()
@@ -633,28 +637,24 @@ namespace
     void news_iop_state::astreset_w(uint8_t data)
     {
         LOGMASKED(LOG_AST, "(%s) AST_RESET 0x%x\n", machine().describe_context(), data);
-        m_ast_latched = false;
-        m_ast_active = false;
-        update_ast();
+        m_ast = false;
     }
 
     void news_iop_state::astset_w(uint8_t data)
     {
         LOGMASKED(LOG_AST, "(%s) AST_SET 0x%x as %s\n", machine().describe_context(), data, m_cpu->supervisor_mode() ? "supervisor" : "user");
-        m_ast_latched = true;
-        update_ast();
+        m_ast = true;
     }
 
     void news_iop_state::update_ast()
-    {            
-        // This logic matches (more or less) the NWS-1960 schematic but rarely fires,
-        // so this might not be correct. I'm not really sure what all would rely on AST.
-        if (m_ast_latched && !m_ast_active && !m_cpu->supervisor_mode()) {
-            LOGMASKED(LOG_AST, "Triggering AST!\n");
-            m_ast_active = true;
+    {
+        // Logic equation: !AST || (AST && AST_LATCH && SUPERVISOR), 0 is IRQ active
+        const bool previous_ast_latch = m_ast_latched;
+        m_ast_latched = !m_ast || (m_ast && previous_ast_latch && m_cpu->supervisor_mode());
+        if (!m_ast_latched && previous_ast_latch) {
+            LOGMASKED(LOG_AST, "Setting AST IRQ!\n");
             m_cpu->set_input_line(INPUT_LINE_IRQ1, 1);
-        } 
-        else if (!m_ast_active) {
+        } else if (m_ast_latched && !previous_ast_latch) {
             m_cpu->set_input_line(INPUT_LINE_IRQ1, 0);
         }
     }
@@ -715,13 +715,15 @@ namespace
 
     void news_iop_state::cpu_map(address_map &map)
     {
+        // TODO: confirm clock signal that drives AST flip flop
         map(0x0, 0xffffffff).lrw32([this](offs_t offset, uint32_t mem_mask) {
+            const uint32_t result = m_mmu->hyperbus_r(offset, mem_mask, m_cpu->supervisor_mode());
             update_ast(); // Need to catch any supervisor -> user transitions
-            return m_mmu->hyperbus_r(offset, mem_mask, m_cpu->supervisor_mode());
+            return result;
         }, "hyperbus_r",
         [this](offs_t offset, uint32_t data, uint32_t mem_mask) {
-            update_ast(); // Need to catch any supervisor -> user transitions
             m_mmu->hyperbus_w(offset, data, mem_mask, m_cpu->supervisor_mode());
+            update_ast(); // Need to catch any supervisor -> user transitions
         }, "hyperbus_w");
     }
 
@@ -829,7 +831,6 @@ namespace
         }
 
         m_cpu->set_input_line(INPUT_LINE_IRQ6, m_cpu_timerenc && m_cpu_timerout);
-        update_ast();
     }
 
     static void news_scsi_devices(device_slot_interface &device)
