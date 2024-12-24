@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  Seiko Epson E0C6S46 MCU
+  Seiko Epson E0C6S46 family
 
 */
 
@@ -10,6 +10,19 @@
 #define MAME_CPU_E0C6200_E0C6S46_H
 
 #include "e0c6200.h"
+
+// for the 2 K input ports, use set_input_line(line, state)
+enum
+{
+	E0C6S46_LINE_K00 = 0,
+	E0C6S46_LINE_K01,
+	E0C6S46_LINE_K02,
+	E0C6S46_LINE_K03,
+	E0C6S46_LINE_K10,
+	E0C6S46_LINE_K11,
+	E0C6S46_LINE_K12,
+	E0C6S46_LINE_K13
+};
 
 enum
 {
@@ -28,18 +41,7 @@ enum
 	E0C6S46_PORT_P3X
 };
 
-// for the 2 K input ports, use set_input_line(line, state)
-enum
-{
-	E0C6S46_LINE_K00 = 0,
-	E0C6S46_LINE_K01,
-	E0C6S46_LINE_K02,
-	E0C6S46_LINE_K03,
-	E0C6S46_LINE_K10,
-	E0C6S46_LINE_K11,
-	E0C6S46_LINE_K12,
-	E0C6S46_LINE_K13
-};
+// no pinout diagram here, refer to the manual
 
 
 class e0c6s46_device : public e0c6200_cpu_device
@@ -72,6 +74,8 @@ public:
 	void set_osc3(u32 osc) { m_osc3 = osc; }
 
 protected:
+	e0c6s46_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor program, address_map_constructor data);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -81,20 +85,18 @@ protected:
 	virtual void execute_one() override;
 	virtual bool check_interrupt() override;
 
-	void e0c6s46_data(address_map &map) ATTR_COLD;
-	void e0c6s46_program(address_map &map) ATTR_COLD;
-
-private:
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
 
 	required_shared_ptr_array<u8, 2> m_vram;
 
+private:
+	void program_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
+
 	u8 m_irqflag[6];
 	u8 m_irqmask[6];
 	u8 m_osc;
-	u32 m_osc1;
-	u32 m_osc3;
 	u8 m_svd;
 
 	// lcd driver
@@ -167,9 +169,25 @@ private:
 	void schedule_buzzer();
 	void reset_buzzer();
 	void clock_bz_1shot();
+
+	u32 m_osc1;
+	u32 m_osc3;
+	emu_timer *m_osc_change;
+	TIMER_CALLBACK_MEMBER(osc_change);
+};
+
+class e0c6s48_device : public e0c6s46_device
+{
+public:
+	e0c6s48_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+private:
+	void program_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 };
 
 
 DECLARE_DEVICE_TYPE(E0C6S46, e0c6s46_device)
+DECLARE_DEVICE_TYPE(E0C6S48, e0c6s48_device)
 
 #endif // MAME_CPU_E0C6200_E0C6S46_H

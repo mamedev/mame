@@ -11,8 +11,8 @@ to play the games for a longer time. For the drivers that don't have an SVG
 screen, use -prescale or -nofilter to disable bilinear filtering.
 
 TODO:
-- add the Mothra Tamagotchi version that was recently dumped (has a E0C6S48)
 - SVGs could be more accurate? it seems they're handmade instead of a 1:1 scan
+  like for eg. the Game & Watch LCDs
 - alienfev unmapped reads/writes, or are they harmless?
 - add LCD deflicker like hh_sm510? see venusdm for example
 - hook up LCD contrast, does any game use it? (eg. for fade-out)
@@ -51,7 +51,7 @@ protected:
 	void lcd_segment_w(offs_t offset, u8 data) { m_out_x[offset & 0xf][offset >> 4] = data; }
 
 	required_device<e0c6s46_device> m_maincpu;
-	output_finder<16, 40> m_out_x;
+	output_finder<16, 51> m_out_x; // max 16 * 51
 };
 
 void hh_e0c6x_state::machine_start()
@@ -93,7 +93,7 @@ INPUT_CHANGED_MEMBER(hh_e0c6x_state::input_changed)
   * Seiko Epson E0C6S46 MCU under epoxy
   * 32*16 LCD screen + 8 custom segments, 1-bit sound
 
-  Generation 2 is on the exact same hardware
+  Generation 2 is on the exact same hardware.
 
 *******************************************************************************/
 
@@ -166,11 +166,85 @@ ROM_END
 
 /*******************************************************************************
 
+  Bandai Tamagotchi Angel (aka Angel Gotch in Japan)
+  * Seiko Epson E0C6S48
+  * 32*16 LCD screen + 8 custom segments, 1-bit sound
+
+  Mothra no Tamagotch is on similar hardware.
+
+*******************************************************************************/
+
+class tamaang_state : public hh_e0c6x_state
+{
+public:
+	tamaang_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_e0c6x_state(mconfig, type, tag)
+	{ }
+
+	void tamaang(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( tamaang )
+	PORT_INCLUDE( tama )
+
+	PORT_MODIFY("K0")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CHANGED_CB(3) PORT_NAME("Vibration Sensor")
+INPUT_PORTS_END
+
+// config
+
+void tamaang_state::tamaang(machine_config &config)
+{
+	// basic machine hardware
+	E0C6S48(config, m_maincpu, 32.768_kHz_XTAL);
+	m_maincpu->set_osc3(1'000'000);
+	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
+	m_maincpu->write_segs().set(FUNC(tamaang_state::lcd_segment_w));
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(32);
+	screen.set_size(1119, 1080);
+	screen.set_visarea_full();
+
+	config.set_default_layout(layout_hh_e0c6x_lcd);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tamaang )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "tamaang.bin", 0x0000, 0x4000, CRC(87bcb59f) SHA1(f5899bb7717756ac581451cf16cf97d909961c5c) )
+
+	ROM_REGION( 139978, "screen", 0)
+	ROM_LOAD( "tamaang.svg", 0, 139978, CRC(76f27f06) SHA1(b416275a12173316e053fa994c5fd68a4d5c1a5c) )
+ROM_END
+
+ROM_START( tamamot )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "tamamot.bin", 0x0000, 0x4000, CRC(85e4bee9) SHA1(74c1f6761724b7cbda8bca3113db78586b786d2d) )
+
+	ROM_REGION( 138289, "screen", 0)
+	ROM_LOAD( "tamamot.svg", 0, 138289, CRC(4e8210c2) SHA1(522536ae5bf744889c0d028c3a292bdf649f81e3) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   Epoch Chibi Pachi: Alien Fever
   * Seiko Epson E0C6S46 MCU
   * 39*16 LCD screen, 1-bit sound
 
-  It's a Pachislot keychain game, the MCU runs on the higher-speed OSC3.
+  It's a Pachislot keychain game, the MCU constantly runs on the higher-speed OSC3.
 
 *******************************************************************************/
 
@@ -200,8 +274,8 @@ void alienfev_state::alienfev(machine_config &config)
 {
 	// basic machine hardware
 	E0C6S46(config, m_maincpu, 32.768_kHz_XTAL);
-	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
 	m_maincpu->set_osc3(1'000'000);
+	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -310,6 +384,8 @@ ROM_END
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1997, tama,     0,      0,      tama,     tama,     tama_state,     empty_init, "Bandai", "Tamagotchi (Gen. 1, World)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1997, tamag2,   0,      0,      tama,     tama,     tama_state,     empty_init, "Bandai", "Tamagotchi (Gen. 2, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1997, tamaang,  0,      0,      tamaang,  tamaang,  tamaang_state,  empty_init, "Bandai", "Angel Gotch (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1997, tamamot,  0,      0,      tamaang,  tama,     tamaang_state,  empty_init, "Bandai", "Mothra no Tamagotch (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 SYST( 1997, alienfev, 0,      0,      alienfev, alienfev, alienfev_state, empty_init, "Epoch", "Chibi Pachi: Alien Fever", MACHINE_SUPPORTS_SAVE )
 
