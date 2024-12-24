@@ -32,7 +32,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "hh_ht11xx_single.lh"
+#include "hh_ht11xx_lcd.lh"
 
 
 namespace {
@@ -67,7 +67,7 @@ void hh_ht11xx_state::mcfg_svg_screen(machine_config &config, u16 width, u16 hei
 	screen.set_size(width, height);
 	screen.set_visarea_full();
 
-	config.set_default_layout(layout_hh_ht11xx_single);
+	config.set_default_layout(layout_hh_ht11xx_lcd);
 }
 
 
