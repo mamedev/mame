@@ -19,7 +19,7 @@ namespace fs { const vtech_image VTECH; }
 // Filesystem has no subdirectories.
 //
 // Track 0 sectors 0-14 have the file names.  16 bytes/entry
-//   offset 0  : File type 'T' (basic) or 'B' (binary)
+//   offset 0  : File type 'T' (basic), 'B' (binary), or some other letter (application-specific)
 //   offset 1  : 0x3a
 //   offset 2-9: File name
 //   offset a  : Track number of first file sector
@@ -147,7 +147,7 @@ meta_data vtech_impl::file_metadata(const u8 *entry)
 	res.set(meta_name::name, trim_end_spaces(rstr(entry+2, 8)));
 	res.set(meta_name::file_type, std::string{ char(entry[0]) });
 	res.set(meta_name::loading_address, get_u16le(entry + 0xc));
-	res.set(meta_name::length, ((get_u16le(entry + 0xe) - get_u16le(entry + 0xc) + 1) & 0xffff));
+	res.set(meta_name::length, (get_u16le(entry + 0xe) - get_u16le(entry + 0xc)) & 0xffff);
 
 	return res;
 }
@@ -280,7 +280,7 @@ err_t vtech_impl::file_create(const std::vector<std::string> &path, const meta_d
 				bdir.w8  (off+0xa, 0x00);
 				bdir.w8  (off+0xb, 0x00);
 				bdir.w16l(off+0xc, meta.get_number(meta_name::loading_address, 0x7ae9));
-				bdir.w16l(off+0xe, bdir.r16l(off+0xc) - 1); // Size 0 initially
+				bdir.w16l(off+0xe, bdir.r16l(off+0xc)); // Size 0 initially
 				return ERR_OK;
 			}
 		}
@@ -303,7 +303,7 @@ std::pair<err_t, std::vector<u8>> vtech_impl::file_read(const std::vector<std::s
 
 	u8 track = entry[0xa];
 	u8 sector = entry[0xb];
-	int len = ((get_u16le(entry + 0xe) - get_u16le(entry + 0xc)) & 0xffff) + 1;
+	int len = (get_u16le(entry + 0xe) - get_u16le(entry + 0xc)) & 0xffff;
 
 	data.resize(len, 0);
 	int pos = 0;
@@ -333,7 +333,7 @@ err_t vtech_impl::file_write(const std::vector<std::string> &path, const std::ve
 
 	u8 *entry = bdir.data() + off;
 
-	u32 cur_len = ((get_u16le(entry + 0xe) - get_u16le(entry + 0xc) + 1) & 0xffff);
+	u32 cur_len = (get_u16le(entry + 0xe) - get_u16le(entry + 0xc)) & 0xffff;
 	u32 new_len = data.size();
 	if(new_len > 65535)
 		new_len = 65535;
@@ -372,7 +372,7 @@ err_t vtech_impl::file_write(const std::vector<std::string> &path, const std::ve
 			dblk.w16l(126, 0);
 	}
 
-	u16 end_address = (get_u16le(entry + 0xc) + data.size() - 1) & 0xffff;
+	u16 end_address = (get_u16le(entry + 0xc) + data.size()) & 0xffff;
 	put_u16le(entry + 0xe, end_address);
 	if(need_ns) {
 		entry[0xa] = blocks[0].first;
