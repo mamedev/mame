@@ -1480,15 +1480,11 @@ void xavix_state::spritefragment_dma_trg_w(uint8_t data)
 	uint16_t src = (m_spritefragment_dmaparam1[1] << 8) | m_spritefragment_dmaparam1[0];
 	uint16_t dst = (m_spritefragment_dmaparam2[0] << 8);
 
-	uint8_t unk = m_spritefragment_dmaparam2[1];
+	uint8_t src_block_size = m_spritefragment_dmaparam2[1];
 
-	LOG("%s: spritefragment_dma_trg_w with trg %02x size %04x src %04x dest %04x unk (%02x)\n", machine().describe_context(), data & 0xf8, len, src, dst, unk);
+	LOG("%s: spritefragment_dma_trg_w with trg %02x size %04x src %04x dest %04x unk (%02x)\n", machine().describe_context(), data & 0xf8, len, src, dst, src_block_size);
 
-	if (unk)
-	{
-		// tak_chq triggers this, but probably due to bad xavix2000 opcodes, as many things look invalid
-		logerror("m_spritefragment_dmaparam2[1] != 0x00 (is %02x)\n", m_spritefragment_dmaparam2[1]);
-	}
+	src_block_size--; // 0x00 is maximum
 
 	if (len == 0x00)
 	{
@@ -1506,8 +1502,8 @@ void xavix_state::spritefragment_dma_trg_w(uint8_t data)
 		{
 			// tak_chq explicitly sets unk & 0x80
 			// and the source data is in 0x80 byte blocks, not 0x100
-			// TODO: verify the source data in RAM is actually correct
-			if ((unk & 0x80) && (i & 0x80))
+			// epo_doka uses 0xb4, which seems to confirm this
+			if ((i & 0xff) > src_block_size)
 			{
 				// do nothing, maybe unk is the length of each section to copy?
 			}
