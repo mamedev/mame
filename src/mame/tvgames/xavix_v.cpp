@@ -1278,12 +1278,10 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, co
 	}
 }
 
-uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+rectangle xavix_state::do_arena(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *paldata = m_palette->pens();
-	// not sure what you end up with if you fall through all layers as transparent, so far no issues noticed
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	m_zbuffer.fill(0, cliprect);
 
 	rectangle clip = cliprect;
 
@@ -1315,21 +1313,30 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				clip.max_x = cliprect.max_x;
 		}
 	}
-	bitmap.fill(paldata[0], clip);
 
+	bitmap.fill(paldata[0], clip);
+	m_zbuffer.fill(0, clip);
+
+	return clip;
+}
+
+void xavix_state::draw_regular_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &clip)
+{
 	draw_tilemap(screen, bitmap, clip, 0);
 	draw_tilemap(screen, bitmap, clip, 1); // epo_golf requires this layer in front when priorities are equal or menu doesn't show?
 	draw_sprites(screen, bitmap, clip);
+}
 
+uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	rectangle clip = do_arena(screen, bitmap, cliprect);
+	draw_regular_layers(screen, bitmap, clip);
 	return 0;
 }
 
-uint32_t superxavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	xavix_state::screen_update(screen, bitmap, cliprect);
-
 	const pen_t *paldata = m_palette->pens();
-
 	// incomplete!
 	if (m_bmp_base)
 	{
@@ -1460,7 +1467,13 @@ uint32_t superxavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 		}
 	}
+}
 
+uint32_t superxavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	rectangle clip = do_arena(screen, bitmap, cliprect);
+	draw_bitmap_layer(screen, bitmap, clip); // maxheart suggests bitmap is drawn first or you get a black box over the display
+	draw_regular_layers(screen, bitmap, clip);
 	return 0;
 }
 

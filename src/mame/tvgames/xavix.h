@@ -576,7 +576,9 @@ protected:
 
 	virtual void get_tile_pixel_dat(uint8_t& dat, int bpp);
 
+	rectangle do_arena(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_pen(int pen, uint8_t shval, uint8_t lval);
+	void draw_regular_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &clip);
 	virtual void draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
 	virtual void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which);
 	void draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which, int line);
@@ -699,6 +701,8 @@ private:
 	void extended_extbus_reg0_w(uint8_t data);
 	void extended_extbus_reg1_w(uint8_t data);
 	void extended_extbus_reg2_w(uint8_t data);
+
+	void draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t get_next_bit_sx();
 	virtual void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
