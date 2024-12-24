@@ -245,9 +245,6 @@ u8 ncr5385_device::aux_status_r()
 
 	if (!m_int_status)
 	{
-		// mask out any bits
-		data &= ~(AUX_STATUS_MSG | AUX_STATUS_CD | AUX_STATUS_IO);
-
 		// return current phase
 		u32 const ctrl = scsi_bus->ctrl_r();
 		if (ctrl & S_MSG)
@@ -831,9 +828,6 @@ void ncr5385_device::update_int()
 		if (int_state)
 		{
 			m_cmd = 0;
-
-			// mask out any bits
-			m_aux_status &= ~(AUX_STATUS_MSG | AUX_STATUS_CD | AUX_STATUS_IO);
 
 			// latch current phase
 			u32 const ctrl = scsi_bus->ctrl_r();
