@@ -1425,18 +1425,6 @@ if (SOUNDS["AD1848"]~=null) then
 end
 
 ---------------------------------------------------
--- UPD1771
---@src/devices/sound/upd1771.h,SOUNDS["UPD1771"] = true
----------------------------------------------------
-
-if (SOUNDS["UPD1771"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/upd1771.cpp",
-		MAME_DIR .. "src/devices/sound/upd1771.h",
-	}
-end
-
----------------------------------------------------
 -- GB_SOUND
 --@src/devices/sound/gb.h,SOUNDS["GB_SOUND"] = true
 ---------------------------------------------------
