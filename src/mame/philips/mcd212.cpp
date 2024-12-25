@@ -722,9 +722,9 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 						const uint8_t u0 = (u + u1) >> 1;
 						const uint8_t v0 = (v + v1) >> 1;
 
-						uint32_t *limit_r = m_dyuv_limit_r_lut + y0 + 0xff;
-						uint32_t *limit_g = m_dyuv_limit_g_lut + y0 + 0xff;
-						uint32_t *limit_b = m_dyuv_limit_b_lut + y0 + 0xff;
+						uint32_t *limit_r = m_dyuv_limit_r_lut + y0 + 0x100;
+						uint32_t *limit_g = m_dyuv_limit_g_lut + y0 + 0x100;
+						uint32_t *limit_b = m_dyuv_limit_b_lut + y0 + 0x100;
 
 						uint32_t entry = limit_r[m_dyuv_v_to_r[v0]] | limit_g[m_dyuv_u_to_g[u0] + m_dyuv_v_to_g[v0]] | limit_b[m_dyuv_u_to_b[u0]];
 						pixels[x] = entry;
@@ -744,9 +744,9 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 							x++;
 						}
 
-						limit_r = m_dyuv_limit_r_lut + y1 + 0xff;
-						limit_g = m_dyuv_limit_g_lut + y1 + 0xff;
-						limit_b = m_dyuv_limit_b_lut + y1 + 0xff;
+						limit_r = m_dyuv_limit_r_lut + y1 + 0x100;
+						limit_g = m_dyuv_limit_g_lut + y1 + 0x100;
+						limit_b = m_dyuv_limit_b_lut + y1 + 0x100;
 
 						entry = limit_r[m_dyuv_v_to_r[v1]] | limit_g[m_dyuv_u_to_g[u1] + m_dyuv_v_to_g[v1]] | limit_b[m_dyuv_u_to_b[u1]];
 						pixels[x] = entry;
