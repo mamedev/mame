@@ -1434,9 +1434,9 @@ void mcd212_device::device_start()
 		m_delta_uv_lut[d] = s_dyuv_deltas[d >> 4];
 	}
 
-	for (uint16_t w = 0; w < 3 * 0xff; w++)
+	for (uint16_t w = 0; w < 0x300; w++)
 	{
-		const uint8_t limit = (w < 0xff + 16) ?  0 : w <= 16 + 2 * 0xff ? w - 0x10f : 0xff;
+		const uint8_t limit = (w < 0x110) ?  0 : w > 0x1e0 ? 0xff : (uint8_t)((w-0x110)*1.16438f); // Renormalize to the range 16-235
 		m_dyuv_limit_r_lut[w] = limit << 16;
 		m_dyuv_limit_g_lut[w] = limit << 8;
 		m_dyuv_limit_b_lut[w] = limit;
