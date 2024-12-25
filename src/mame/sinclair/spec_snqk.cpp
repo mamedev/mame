@@ -2485,7 +2485,7 @@ void spectrum_state::hrust_decompress_block(address_space &space, const u8 *sour
 
 		} while (bb == 0x03 && len != 0x0f);
 
-		short offset = 0;
+		s16 offset = 0;
 		if (len == 0)
 		{
 			offset = 0xfff8 + bitbuf.get_bits(3);
@@ -2829,7 +2829,7 @@ void spectrum_state::setup_spg(const u8 *snapdata, u32 snapsize)
 		{
 			case 0x00:
 				for (auto i = 0; i < size; i++)
-					space.write_byte(0xc000 + i, snapdata[data_offset + i]);
+					space.write_byte(0xc000 + offs + i, snapdata[data_offset + i]);
 				break;
 
 			case 0x01:
@@ -2838,7 +2838,7 @@ void spectrum_state::setup_spg(const u8 *snapdata, u32 snapsize)
 
 			case 0x02:
 				hrust_decompress_block(space, &snapdata[data_offset], 0xc000 + offs, size);
-			break;
+				break;
 
 			default:
 				logerror("Unsupported compression: %d\n", compression);
