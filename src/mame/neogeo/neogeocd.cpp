@@ -77,24 +77,14 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	int32_t seek_idle(int32_t cycles);
-
 private:
 	optional_device<lc89510_temp_device> m_tempcdc;
 	required_shared_ptr<uint8_t> m_z80_ram;
 	required_shared_ptr<uint8_t> m_adpcm_ram;
 
-	void do_dma(address_space& curr_space);
-	void set_dma_regs(offs_t offset, uint16_t data);
-
-	uint16_t memcard_r(offs_t offset);
-	void memcard_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t control_r(offs_t offset);
-	void control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint8_t transfer_r(offs_t offset);
-	void transfer_w(offs_t offset, uint8_t data);
-
-	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
+	std::unique_ptr<uint8_t[]> m_meminternal_data;
+	std::unique_ptr<uint8_t[]> m_sprite_ram;
+	std::unique_ptr<uint8_t[]> m_fix_ram;
 
 	// neoCD
 	uint8_t m_system_region = 0;
@@ -120,6 +110,20 @@ private:
 
 	bool prohibit_cdc_irq = false; // hack?
 
+	int32_t seek_idle(int32_t cycles);
+
+	void do_dma(address_space& curr_space);
+	void set_dma_regs(offs_t offset, uint16_t data);
+
+	uint16_t memcard_r(offs_t offset);
+	void memcard_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t control_r(offs_t offset);
+	void control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t transfer_r(offs_t offset);
+	void transfer_w(offs_t offset, uint8_t data);
+
+	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
+
 	int get_irq_vector_ack(void) { return m_irq_vector_ack; }
 	void set_irq_vector_ack(int val) { m_irq_vector_ack = val; }
 	int get_irq_vector(void) { return m_irq_vector; }
@@ -134,16 +138,11 @@ private:
 
 	uint8_t cdc_irq_ack();
 
-	std::unique_ptr<uint8_t[]> m_meminternal_data;
-	std::unique_ptr<uint8_t[]> m_sprite_ram;
-	std::unique_ptr<uint8_t[]> m_fix_ram;
-
 	void neocd_audio_io_map(address_map &map) ATTR_COLD;
 	void neocd_audio_map(address_map &map) ATTR_COLD;
 	void neocd_main_map(address_map &map) ATTR_COLD;
 	void neocd_vector_map(address_map &map) ATTR_COLD;
 	void neocd_ym_map(address_map &map) ATTR_COLD;
-
 };
 
 
