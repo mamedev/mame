@@ -2033,12 +2033,12 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 	a.mov(r10, rax);
 
 	// compute mask for flags
-	// can't get FLAG_V from lahf so implement it using seto if needed in the future
+	// can't get FLAG_V from lahf
 	uint32_t flagmask = 0;
-	if (maskp.immediate() & FLAG_C) flagmask |= 0x0100;
-	if (maskp.immediate() & FLAG_Z) flagmask |= 0x4000;
-	if (maskp.immediate() & FLAG_S) flagmask |= 0x8000;
-	if (maskp.immediate() & FLAG_U) flagmask |= 0x0400;
+	if (maskp.immediate() & FLAG_C) flagmask |= 0x001;
+	if (maskp.immediate() & FLAG_Z) flagmask |= 0x040;
+	if (maskp.immediate() & FLAG_S) flagmask |= 0x080;
+	if (maskp.immediate() & FLAG_U) flagmask |= 0x004;
 
 	switch (maskp.immediate())
 	{
@@ -2128,9 +2128,20 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 
 		// default cases
 		default:
+			if (maskp.immediate() & FLAG_V)
+			{
+				a.seto(al);
+				a.movzx(eax, al);
+				a.shl(eax, 1);
+			}
+
 			a.mov(r11, r10);
+			a.shr(r11, 8);
 			a.and_(r11, flagmask);
 			a.movzx(dstreg, byte_ptr(rbp, r11, 0, offset_from_rbp(&m_near.flagsmap[0]))); // movzx  dstreg,[flags_map]
+
+			if (maskp.immediate() & FLAG_V)
+				a.or_(dstreg, eax);
 			break;
 	}
 
@@ -2141,6 +2152,15 @@ void drcbe_x64::op_getflgs(Assembler &a, const instruction &inst)
 	// 64-bit form
 	else if (inst.size() == 8)
 		mov_param_reg(a, dstp, dstreg.r64());                                           // mov   dstp,dstreg
+
+	if (maskp.immediate() & FLAG_V)
+	{
+		// Restore overflow flag
+		a.mov(eax, dstreg);
+		a.shr(eax, 1);
+		a.and_(eax, 1);
+		a.add(al, 0x7f);
+	}
 
 	a.mov(rax, r10);
 	a.sahf();
