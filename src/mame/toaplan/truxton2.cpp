@@ -136,7 +136,7 @@ void truxton2_state::tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask)
 
 
 void truxton2_state::screen_vblank(int state)
-{	
+{
 	if (state) // rising edge
 	{
 		m_vdp->screen_eof();

@@ -26,7 +26,7 @@ pipibibsp   TP-025        Toaplan       Pipi & Bibis / Whoopee!! (Prototype)
 pipibibsbl  bootleg       Toaplan       Pipi & Bibis / Whoopee!! (based of the prototype)
 
 TODO:
-	- move bootlegs to oneshot.cpp driver
+    - move bootlegs to oneshot.cpp driver
 */
 
 namespace {

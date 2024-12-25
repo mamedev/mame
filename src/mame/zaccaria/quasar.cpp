@@ -508,7 +508,7 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x20, "Sound Program" )       PORT_DIPLOCATION("SOUND:3,4")
 	PORT_DIPSETTING(    0x00, "Invalid 1" )
-    PORT_DIPSETTING(    0x10, "Invalid 1" )
+	PORT_DIPSETTING(    0x10, "Invalid 1" )
 	PORT_DIPSETTING(    0x30, "Invalid 2" )
 	PORT_DIPSETTING(    0x20, "Quasar" )
 INPUT_PORTS_END

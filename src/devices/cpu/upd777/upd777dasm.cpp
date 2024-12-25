@@ -135,7 +135,7 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 	else if (((inst & 0b1111'0000'0000) == 0b0010'0000'0000) && ((inst & 0b0000'0000'1100) != 0b0000'0000'0100))
 	{
 		// 0b0010'rrnR'oonn where rr = reg1 (A1, A2, M or H), n = invert condition, R = reg2 (A1 or A2) and oo = optype (only 0,2,3 are valid, no cases here for 1) nn = next l value
-		// 
+		//
 		// optype · (AND)
 		// 200 Skip if (A1[7:1]·A1[7:1]) makes zero, N->L[2:1]
 		// 220 Skip if (A1[7:1]·A1[7:1]) makes non zero, N->L[2:1]
@@ -499,6 +499,6 @@ offs_t upd777_disassembler::disassemble(std::ostream &stream, offs_t pc, const u
 	{
 		util::stream_format(stream, "%04x <ILLEGAL>", inst);
 	}
-	
+
 	return 1;
 }

@@ -23,7 +23,7 @@ They can be divided in three "families":
    Despite the hardware differences, the memory map is almost identical to
    Super Pacman, and that's why it's included in this driver.
    There is no information about the custom ICs used by this board. The video
-   section is probably more similar to Gaplus than to Supr Pacman: the sprite
+   section is probably more similar to Gaplus than to Super Pacman: the sprite
    generator might be a 21XX (though Gaplus doesn't use 8x8 sprites), and the
    00XX and 04XX address generators are probably replaced by the single CUS20
    (which also handles the flip screen flag).
@@ -59,7 +59,7 @@ Video board:
 sprites; in Mappy it handles the 4bpp sprites, while the tilemap is handled by
 standard LS components.
 
-The I/O interface chips vary from game to game (see machine/namcoio.c)
+The I/O interface chips vary from game to game (see namco/namcoio.cpp)
 
 
 Super Pac-Man memory map
@@ -565,38 +565,38 @@ TODO:
  *
  *************************************/
 
-#define MASTER_CLOCK        (XTAL(18'432'000))
+static constexpr XTAL MASTER_CLOCK = XTAL(18'432'000);
 
-#define PIXEL_CLOCK         (MASTER_CLOCK/3)
+static constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK / 3;
 
 // H counts from 128->511, HBLANK starts at 144 and ends at 240
-#define HTOTAL              (384)
-#define HBEND               (0)     // (96+16)
-#define HBSTART             (288)   // (16)
+static constexpr unsigned HTOTAL  = 384;
+static constexpr unsigned HBEND   = 0;     // (96+16)
+static constexpr unsigned HBSTART = 288;   // (16)
 
-#define VTOTAL              (264)
-#define VBEND               (0)     // (16)
-#define VBSTART             (224)   // (224+16)
+static constexpr unsigned VTOTAL  = 264;
+static constexpr unsigned VBEND   = 0;     // (16)
+static constexpr unsigned VBSTART = 224;   // (224+16)
 
 
 
 /***************************************************************************/
 
-void mappy_state::int_on_w(int state)
+void mappy_state::main_int_on_w(int state)
 {
 	m_main_irq_mask = state;
 	if (!state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void mappy_state::int_on_2_w(int state)
+void mappy_state::sub_int_on_w(int state)
 {
 	m_sub_irq_mask = state;
 	if (!state)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-void mappy_state::int_on_3_w(int state)
+void phozon_state::sub2_int_on_w(int state)
 {
 	m_sub2_irq_mask = state;
 	if (!state)
@@ -626,75 +626,76 @@ void mappy_state::vblank_irq(int state)
 
 	if (m_sub_irq_mask)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
+}
 
-	if (m_subcpu2.found() && m_sub2_irq_mask)
+void phozon_state::phozon_vblank_irq(int state)
+{
+	if (!state)
+		return;
+
+	vblank_irq(state);
+
+	if (m_sub2_irq_mask)
 		m_subcpu2->set_input_line(0, ASSERT_LINE);
 }
 
-void mappy_state::superpac_cpu1_map(address_map &map)
+void mappy_state::superpac_main_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram");
-	map(0x0800, 0x1fff).ram().share("spriteram");   // work RAM with embedded sprite RAM
-	map(0x2000, 0x2000).rw(FUNC(mappy_state::superpac_flipscreen_r), FUNC(mappy_state::superpac_flipscreen_w));
+	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share(m_videoram);
+	map(0x0800, 0x1fff).ram().share(m_spriteram);   // work RAM with embedded sprite RAM
+	map(0x2000, 0x2000).rw(FUNC(mappy_state::flipscreen_r), FUNC(mappy_state::flipscreen_w));
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the sound CPU
-	map(0x4800, 0x480f).rw("namcoio_1", FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
-	map(0x4810, 0x481f).rw("namcoio_2", FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
+	map(0x4800, 0x480f).rw(m_namcoio[0], FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
+	map(0x4810, 0x481f).rw(m_namcoio[1], FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
 	map(0x5000, 0x500f).w("mainlatch", FUNC(ls259_device::write_a0));   // various control bits
 	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xa000, 0xffff).rom();
 }
 
-void mappy_state::phozon_cpu1_map(address_map &map)
+void phozon_state::main_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram");  // video RAM
-	map(0x0800, 0x1fff).ram().share("spriteram");   // shared RAM with CPU #2/sprite RAM
+	map(0x0000, 0x07ff).ram().w(FUNC(phozon_state::superpac_videoram_w)).share(m_videoram);  // video RAM
+	map(0x0800, 0x1fff).ram().share(m_spriteram);   // shared RAM with CPU #2/sprite RAM
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the sound CPU
-	map(0x4800, 0x480f).rw("namcoio_1", FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
-	map(0x4810, 0x481f).rw("namcoio_2", FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
+	map(0x4800, 0x480f).rw(m_namcoio[0], FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
+	map(0x4810, 0x481f).rw(m_namcoio[1], FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
 	map(0x5000, 0x500f).w("mainlatch", FUNC(ls259_device::write_a0));   // various control bits
 	map(0x7000, 0x7000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x8000, 0xffff).rom();
 }
 
-void mappy_state::mappy_cpu1_map(address_map &map)
+void mappy_state::mappy_main_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(FUNC(mappy_state::mappy_videoram_w)).share("videoram");
-	map(0x1000, 0x27ff).ram().share("spriteram");   // work RAM with embedded sprite RAM
+	map(0x0000, 0x0fff).ram().w(FUNC(mappy_state::mappy_videoram_w)).share(m_videoram);
+	map(0x1000, 0x27ff).ram().share(m_spriteram);   // work RAM with embedded sprite RAM
 	map(0x3800, 0x3fff).w(FUNC(mappy_state::mappy_scroll_w));   // scroll
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the sound CPU
-	map(0x4800, 0x480f).rw("namcoio_1", FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
-	map(0x4810, 0x481f).rw("namcoio_2", FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
+	map(0x4800, 0x480f).rw(m_namcoio[0], FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
+	map(0x4810, 0x481f).rw(m_namcoio[1], FUNC(namcoio_device::read), FUNC(namcoio_device::write));   // custom I/O chips interface
 	map(0x5000, 0x500f).w("mainlatch", FUNC(ls259_device::write_a0));   // various control bits
 	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x8000, 0xffff).rom();  // only a000-ffff in Mappy
 }
 
-void mappy_state::superpac_cpu2_map(address_map &map)
+void mappy_state::superpac_sub_map(address_map &map)
 {
 	map(0x0000, 0x03ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the main CPU (also sound registers)
 	map(0x2000, 0x200f).w("mainlatch", FUNC(ls259_device::write_a0));   // various control bits
 	map(0xe000, 0xffff).rom();
 }
 
-void mappy_state::phozon_cpu2_map(address_map &map)
+void phozon_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x03ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the main CPU + sound registers
 	map(0xe000, 0xffff).rom();
 }
 
-void mappy_state::mappy_cpu2_map(address_map &map)
-{
-	map(0x0000, 0x03ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with the main CPU (also sound registers)
-	map(0x2000, 0x200f).w("mainlatch", FUNC(ls259_device::write_a0));   // various control bits
-	map(0xe000, 0xffff).rom();
-}
-
 
 // extra CPU only present in Phozon
-void mappy_state::phozon_cpu3_map(address_map &map)
+void phozon_state::sub2_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(FUNC(mappy_state::superpac_videoram_w)).share("videoram");
-	map(0x0800, 0x1fff).ram().share("spriteram");   // shared RAM with CPU #2/sprite RAM
+	map(0x0000, 0x07ff).ram().w(FUNC(phozon_state::superpac_videoram_w)).share(m_videoram);
+	map(0x0800, 0x1fff).ram().share(m_spriteram);   // shared RAM with CPU #2/sprite RAM
 	map(0x4000, 0x43ff).rw(m_namco_15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));   // shared RAM with CPU #2
 	map(0xa000, 0xa7ff).ram();
 	map(0xe000, 0xffff).rom();
@@ -1219,10 +1220,10 @@ static const gfx_layout charlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	2,
-	{ 0, 4 },
-	{ 8*8+0, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8
+	{ STEP2(0, 4) },
+	{ STEP4(8*8, 1), STEP4(0, 1) },
+	{ STEP8(0, 8) },
+	8*8*2
 };
 
 static const gfx_layout spritelayout_2bpp =
@@ -1230,12 +1231,10 @@ static const gfx_layout spritelayout_2bpp =
 	16,16,
 	RGN_FRAC(1,1),
 	2,
-	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8, 8*8+1, 8*8+2, 8*8+3,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8
+	{ STEP2(0, 4) },
+	{ STEP4(0, 1), STEP4(8*8, 1), STEP4(8*8*2, 1), STEP4(8*8*3, 1) },
+	{ STEP8(0, 8), STEP8(8*8*4, 8) },
+	16*16*2
 };
 
 static const gfx_layout spritelayout_8x8 =
@@ -1243,45 +1242,43 @@ static const gfx_layout spritelayout_8x8 =
 	8,8,
 	RGN_FRAC(1,1),
 	2,
-	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8, 8*8+1, 8*8+2, 8*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8
+	{ STEP2(0, 4) },
+	{ STEP4(0, 1), STEP4(8*8, 1) },
+	{ STEP8(0, 8) },
+	8*8*2
 };
 
 static const gfx_layout spritelayout_4bpp =
 {
 	16,16,
-	RGN_FRAC(1,2),
+	RGN_FRAC(1,1),
 	4,
-	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
-	{ 0, 1, 2, 3, 8*8, 8*8+1, 8*8+2, 8*8+3, 16*8+0, 16*8+1, 16*8+2, 16*8+3,
-			24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8
+	{ STEP4(0, 4) },
+	{ STEP4(0, 1), STEP4(8*16, 1), STEP4(8*16*2, 1), STEP4(8*16*3, 1) },
+	{ STEP8(0, 16), STEP8(8*16*4, 16) },
+	16*16*4
 };
 
 
 
 static GFXDECODE_START( gfx_superpac )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_2bpp, 64*4, 64 )
+	GFXDECODE_ENTRY( "tiles",   0, charlayout,           0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout_2bpp, 64*4, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_phozon )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_8x8, 64*4, 64 )
+	GFXDECODE_ENTRY( "tiles",   0, charlayout,          0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout_8x8, 64*4, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_mappy )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_4bpp, 64*4, 16 )
+	GFXDECODE_ENTRY( "tiles",   0, charlayout,           0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout_4bpp, 64*4, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_todruaga )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_4bpp, 64*4, 64 )
+	GFXDECODE_ENTRY( "tiles",   0, charlayout,           0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout_4bpp, 64*4, 64 )
 GFXDECODE_END
 
 
@@ -1295,8 +1292,8 @@ void mappy_state::out_lamps(uint8_t data)
 {
 	m_leds[0] = BIT(data, 0);
 	m_leds[1] = BIT(data, 1);
-	machine().bookkeeping().coin_lockout_global_w(data & 4);
-	machine().bookkeeping().coin_counter_w(0, ~data & 8);
+	machine().bookkeeping().coin_lockout_global_w(BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(0, BIT(~data, 3));
 }
 
 void mappy_state::machine_start()
@@ -1308,6 +1305,12 @@ void mappy_state::machine_start()
 
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
+}
+
+void phozon_state::machine_start()
+{
+	mappy_state::machine_start();
+
 	save_item(NAME(m_sub2_irq_mask));
 }
 
@@ -1316,14 +1319,14 @@ void mappy_state::superpac_common(machine_config &config)
 {
 	// basic machine hardware
 	MC6809E(config, m_maincpu, PIXEL_CLOCK/4);  // 1.536 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &mappy_state::superpac_cpu1_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mappy_state::superpac_main_map);
 
 	MC6809E(config, m_subcpu, PIXEL_CLOCK/4);   // 1.536 MHz
-	m_subcpu->set_addrmap(AS_PROGRAM, &mappy_state::superpac_cpu2_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &mappy_state::superpac_sub_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));    // 2M on CPU board
-	mainlatch.q_out_cb<0>().set(FUNC(mappy_state::int_on_2_w));
-	mainlatch.q_out_cb<1>().set(FUNC(mappy_state::int_on_w));
+	mainlatch.q_out_cb<0>().set(FUNC(mappy_state::sub_int_on_w));
+	mainlatch.q_out_cb<1>().set(FUNC(mappy_state::main_int_on_w));
 	mainlatch.q_out_cb<3>().set(m_namco_15xx, FUNC(namco_15xx_device::sound_enable_w));
 	mainlatch.q_out_cb<4>().set(m_namcoio[0], FUNC(namcoio_device::set_reset_line)).invert();
 	mainlatch.q_out_cb<4>().append(m_namcoio[1], FUNC(namcoio_device::set_reset_line)).invert();
@@ -1352,7 +1355,7 @@ void mappy_state::superpac_common(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	NAMCO_15XX(config, m_namco_15xx, 18432000/768);
+	NAMCO_15XX(config, m_namco_15xx, MASTER_CLOCK/768);
 	m_namco_15xx->set_voices(8);
 	m_namco_15xx->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
@@ -1412,22 +1415,22 @@ void mappy_state::grobda(machine_config &config)
 	m_namcoio[1]->out_callback<0>().set("dipmux", FUNC(ls157_device::select_w)).bit(0);
 }
 
-void mappy_state::phozon(machine_config &config)
+void phozon_state::phozon(machine_config &config)
 {
 	// basic machine hardware
 	MC6809E(config, m_maincpu, PIXEL_CLOCK/4);  // MAIN CPU
-	m_maincpu->set_addrmap(AS_PROGRAM, &mappy_state::phozon_cpu1_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &phozon_state::main_map);
 
 	MC6809E(config, m_subcpu, PIXEL_CLOCK/4);   // SOUND CPU
-	m_subcpu->set_addrmap(AS_PROGRAM, &mappy_state::phozon_cpu2_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &phozon_state::sub_map);
 
 	MC6809E(config, m_subcpu2, PIXEL_CLOCK/4);  // SUB CPU
-	m_subcpu2->set_addrmap(AS_PROGRAM, &mappy_state::phozon_cpu3_map);
+	m_subcpu2->set_addrmap(AS_PROGRAM, &phozon_state::sub2_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));    // 5C
-	mainlatch.q_out_cb<0>().set(FUNC(mappy_state::int_on_2_w));
-	mainlatch.q_out_cb<1>().set(FUNC(mappy_state::int_on_w));
-	mainlatch.q_out_cb<2>().set(FUNC(mappy_state::int_on_3_w));
+	mainlatch.q_out_cb<0>().set(FUNC(phozon_state::sub_int_on_w));
+	mainlatch.q_out_cb<1>().set(FUNC(phozon_state::main_int_on_w));
+	mainlatch.q_out_cb<2>().set(FUNC(phozon_state::sub2_int_on_w));
 	mainlatch.q_out_cb<3>().set(m_namco_15xx, FUNC(namco_15xx_device::sound_enable_w));
 	mainlatch.q_out_cb<4>().set(m_namcoio[0], FUNC(namcoio_device::set_reset_line)).invert();
 	mainlatch.q_out_cb<4>().append(m_namcoio[1], FUNC(namcoio_device::set_reset_line)).invert();
@@ -1457,20 +1460,18 @@ void mappy_state::phozon(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_phozon);
-	PALETTE(config, m_palette, FUNC(mappy_state::phozon_palette), 64*4+64*4, 32);
+	PALETTE(config, m_palette, FUNC(phozon_state::palette), 64*4+64*4, 32);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	m_screen->set_screen_update(FUNC(mappy_state::screen_update_phozon));
+	m_screen->set_screen_update(FUNC(phozon_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(mappy_state::vblank_irq));   // cause IRQs on all three CPUs; also update the custom I/O chips
-
-	MCFG_VIDEO_START_OVERRIDE(mappy_state,phozon)
+	m_screen->screen_vblank().set(FUNC(phozon_state::phozon_vblank_irq));   // cause IRQs on all three CPUs; also update the custom I/O chips
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	NAMCO_15XX(config, m_namco_15xx, 18432000/768);
+	NAMCO_15XX(config, m_namco_15xx, MASTER_CLOCK/768);
 	m_namco_15xx->set_voices(8);
 	m_namco_15xx->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
@@ -1479,14 +1480,14 @@ void mappy_state::mappy_common(machine_config &config)
 {
 	// basic machine hardware
 	MC6809E(config, m_maincpu, PIXEL_CLOCK/4);  // 1.536 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &mappy_state::mappy_cpu1_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mappy_state::mappy_main_map);
 
 	MC6809E(config, m_subcpu, PIXEL_CLOCK/4);   // 1.536 MHz
-	m_subcpu->set_addrmap(AS_PROGRAM, &mappy_state::mappy_cpu2_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &mappy_state::superpac_sub_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));    // 2M on CPU board
-	mainlatch.q_out_cb<0>().set(FUNC(mappy_state::int_on_2_w));
-	mainlatch.q_out_cb<1>().set(FUNC(mappy_state::int_on_w));
+	mainlatch.q_out_cb<0>().set(FUNC(mappy_state::sub_int_on_w));
+	mainlatch.q_out_cb<1>().set(FUNC(mappy_state::main_int_on_w));
 	mainlatch.q_out_cb<2>().set(FUNC(mappy_state::flip_screen_set));
 	mainlatch.q_out_cb<3>().set(m_namco_15xx, FUNC(namco_15xx_device::sound_enable_w));
 	mainlatch.q_out_cb<4>().set(m_namcoio[0], FUNC(namcoio_device::set_reset_line)).invert();
@@ -1516,7 +1517,7 @@ void mappy_state::mappy_common(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	NAMCO_15XX(config, m_namco_15xx, 18432000/768);
+	NAMCO_15XX(config, m_namco_15xx, MASTER_CLOCK/768);
 	m_namco_15xx->set_voices(8);
 	m_namco_15xx->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
@@ -1597,10 +1598,10 @@ ROM_START( superpac )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "spc-3.1k",     0xf000, 0x1000, CRC(04445ddb) SHA1(ce7d14963d5ddaefdeaf433a6f82c43cd1611d9b) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "tiles", 0 )
 	ROM_LOAD( "sp1-6.3c",     0x0000, 0x1000, CRC(91c5935c) SHA1(10579edabc26a0910253fab7d41b4c19ecdaaa09) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "spv-2.3f",     0x0000, 0x2000, CRC(670a42f2) SHA1(9171922df07e31fd1dc415766f7d2cc50a9d10dc) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
@@ -1620,10 +1621,10 @@ ROM_START( superpacm )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "spc-3.1k",     0xf000, 0x1000, CRC(04445ddb) SHA1(ce7d14963d5ddaefdeaf433a6f82c43cd1611d9b) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "tiles", 0 )
 	ROM_LOAD( "spv-1.3c",     0x0000, 0x1000, CRC(78337e74) SHA1(11222adb55e6bce508896ccb1f6dbab0c1d44e5b) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "spv-2.3f",     0x0000, 0x2000, CRC(670a42f2) SHA1(9171922df07e31fd1dc415766f7d2cc50a9d10dc) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
@@ -1644,10 +1645,10 @@ ROM_START( pacnpal )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "pap1-4.1k",     0xf000, 0x1000, CRC(330e20de) SHA1(5b23e5dcc38dc644a36efc8b03eba34cea540bea) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "tiles", 0 )
 	ROM_LOAD( "pap1-6.3c",     0x0000, 0x1000, CRC(a36b96cb) SHA1(e0a11b5a43cbf756ddb045c743973d0a55dbb979) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "pap1-5.3f",     0x0000, 0x2000, CRC(fb6f56e3) SHA1(fd10d2ee49b4e059e9ef6046bc86d97e3185164d) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
@@ -1668,10 +1669,10 @@ ROM_START( pacnpal2 )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "pap1-4.1k",     0xf000, 0x1000, CRC(330e20de) SHA1(5b23e5dcc38dc644a36efc8b03eba34cea540bea) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "tiles", 0 )
 	ROM_LOAD( "pap1-6.3c",     0x0000, 0x1000, CRC(a36b96cb) SHA1(e0a11b5a43cbf756ddb045c743973d0a55dbb979) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "pap1-5.3f",     0x0000, 0x2000, CRC(fb6f56e3) SHA1(fd10d2ee49b4e059e9ef6046bc86d97e3185164d) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
@@ -1693,10 +1694,10 @@ ROM_START( pacnchmp )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "pap1-4.1k",     0xf000, 0x1000, CRC(330e20de) SHA1(5b23e5dcc38dc644a36efc8b03eba34cea540bea) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "tiles", 0 )
 	ROM_LOAD( "pap2-6.3c",      0x0000, 0x1000, CRC(93d15c30) SHA1(5da4120b680726c83a651b445254604cbf7cc883) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "pap2-5.3f",      0x0000, 0x2000, CRC(39f44aa4) SHA1(0696539cb2c7fcda2f6c295c7d65678dac18950b) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
@@ -1717,10 +1718,10 @@ ROM_START( grobda )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "gr1-4.1k",  0xe000, 0x2000, CRC(3fe78c08) SHA1(dd49a96e613e0ced5b82eafcaf935e136e7db53a) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "tiles", 0 )
 	ROM_LOAD( "gr1-7.3c",  0x0000, 0x1000, CRC(4ebfabfd) SHA1(fffce05f59e090c4281aca0c0494825027b764fb) )   // characters
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "gr1-5.3f",  0x0000, 0x2000, CRC(eed43487) SHA1(d2b39651f39bdfca3754f7bbd7a52e7bf843dabe) )   // sprites
 	ROM_LOAD( "gr1-6.3e",  0x2000, 0x2000, CRC(cebb7362) SHA1(6efd57f9fa0f93f70e60efc387b3a782fad2665c) )   // sprites
 
@@ -1742,10 +1743,10 @@ ROM_START( grobda2 )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "gr1-4.1k",  0xe000, 0x2000, CRC(3fe78c08) SHA1(dd49a96e613e0ced5b82eafcaf935e136e7db53a) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "tiles", 0 )
 	ROM_LOAD( "gr1-7.3c",  0x0000, 0x1000, CRC(4ebfabfd) SHA1(fffce05f59e090c4281aca0c0494825027b764fb) )   // characters
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "gr1-5.3f",  0x0000, 0x2000, CRC(eed43487) SHA1(d2b39651f39bdfca3754f7bbd7a52e7bf843dabe) )   // sprites
 	ROM_LOAD( "gr1-6.3e",  0x2000, 0x2000, CRC(cebb7362) SHA1(6efd57f9fa0f93f70e60efc387b3a782fad2665c) )   // sprites
 
@@ -1767,10 +1768,10 @@ ROM_START( grobda3 )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "gr1-4.1k",  0xe000, 0x2000, CRC(3fe78c08) SHA1(dd49a96e613e0ced5b82eafcaf935e136e7db53a) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "tiles", 0 )
 	ROM_LOAD( "gr1-7.3c",  0x0000, 0x1000, CRC(4ebfabfd) SHA1(fffce05f59e090c4281aca0c0494825027b764fb) )   // characters
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_REGION( 0x4000, "sprites", 0 )
 	ROM_LOAD( "gr1-5.3f",  0x0000, 0x2000, CRC(eed43487) SHA1(d2b39651f39bdfca3754f7bbd7a52e7bf843dabe) )   // sprites
 	ROM_LOAD( "gr1-6.3e",  0x2000, 0x2000, CRC(cebb7362) SHA1(6efd57f9fa0f93f70e60efc387b3a782fad2665c) )   // sprites
 
@@ -1796,11 +1797,11 @@ ROM_START( phozon )
 	ROM_REGION( 0x10000, "sub2", 0 )    // 64k for the SUB CPU
 	ROM_LOAD( "9r.rom", 0xe000, 0x2000, CRC(5d9f0a28) SHA1(2caef680229180b237f8c4becf052f1a96592efd) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "tiles", 0 )
 	ROM_LOAD( "7j.rom", 0x0000, 0x1000, CRC(27f9db5b) SHA1(12ef817136b45927d7f279952fa19049a1349f60) )  // characters (set 1)
 	ROM_LOAD( "8j.rom", 0x1000, 0x1000, CRC(15b12ef8) SHA1(e3303656b4e8b988e55a9551e5344e289958f677) )  // characters (set 2)
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "5t.rom", 0x0000, 0x2000, CRC(d50f08f8) SHA1(4e9dda0d5ad1c1b8b3be7edb05b3060f5f63a9c7) )  // sprites
 
 	ROM_REGION( 0x0520, "proms", 0 )
@@ -1828,11 +1829,11 @@ ROM_START( phozons )
 	ROM_REGION( 0x10000, "sub2", 0 )    // 64k for the SUB CPU
 	ROM_LOAD( "9r.rom", 0xe000, 0x2000, CRC(5d9f0a28) SHA1(2caef680229180b237f8c4becf052f1a96592efd) )  // 9r.bin
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_REGION( 0x2000, "tiles", 0 )
 	ROM_LOAD( "7j.bin", 0x0000, 0x1000, CRC(312b3ece) SHA1(1d4d3371a42321644ec3669f95abcfe860020868) )  // characters (set 1)
 	ROM_LOAD( "8j.bin", 0x1000, 0x1000, CRC(d21422a2) SHA1(0268651628d66dc67a3b6bb8fb682b668e7ebbad) )  // characters (set 2)
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_REGION( 0x2000, "sprites", 0 )
 	ROM_LOAD( "5t.rom", 0x0000, 0x2000, CRC(d50f08f8) SHA1(4e9dda0d5ad1c1b8b3be7edb05b3060f5f63a9c7) )  // sprites - 5t.bin
 
 	ROM_REGION( 0x0500, "proms", 0 )
@@ -1860,12 +1861,12 @@ ROM_START( mappy )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "mp1_4.1k",   0xe000, 0x2000, CRC(8182dd5b) SHA1(f36b57f7f1e79f00b3f07afe1960bca5f5325ee2) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "mp1_5.3b",   0x0000, 0x1000, CRC(16498b9f) SHA1(76610149c65f955484fef1c033ddc3fed3f4e568) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "mp1_6.3m",   0x0000, 0x2000, CRC(f2d9647a) SHA1(3cc216793c6a5f73c437ad2524563deb3b5e2890) )
-	ROM_LOAD( "mp1_7.3n",   0x2000, 0x2000, CRC(757cf2b6) SHA1(8dfbf03953d5219d9eb5fc654ec3392442ba1dc4) )
+	ROM_REGION( 0x4000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "mp1_6.3m",   0x0000, 0x2000, CRC(f2d9647a) SHA1(3cc216793c6a5f73c437ad2524563deb3b5e2890) )
+	ROM_LOAD16_BYTE( "mp1_7.3n",   0x0001, 0x2000, CRC(757cf2b6) SHA1(8dfbf03953d5219d9eb5fc654ec3392442ba1dc4) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
 	ROM_LOAD( "mp1-5.5b",   0x0000, 0x0020, CRC(56531268) SHA1(2e356706c07f43eeb67783fb122bdc7fed1b3589) )  // palette
@@ -1885,12 +1886,12 @@ ROM_START( mappyj )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "mp1_4.1k",   0xe000, 0x2000, CRC(8182dd5b) SHA1(f36b57f7f1e79f00b3f07afe1960bca5f5325ee2) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "mp1_5.3b",   0x0000, 0x1000, CRC(16498b9f) SHA1(76610149c65f955484fef1c033ddc3fed3f4e568) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "mp1_6.3m",   0x0000, 0x2000, CRC(f2d9647a) SHA1(3cc216793c6a5f73c437ad2524563deb3b5e2890) )
-	ROM_LOAD( "mp1_7.3n",   0x2000, 0x2000, CRC(757cf2b6) SHA1(8dfbf03953d5219d9eb5fc654ec3392442ba1dc4) )
+	ROM_REGION( 0x4000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "mp1_6.3m",   0x0000, 0x2000, CRC(f2d9647a) SHA1(3cc216793c6a5f73c437ad2524563deb3b5e2890) )
+	ROM_LOAD16_BYTE( "mp1_7.3n",   0x0001, 0x2000, CRC(757cf2b6) SHA1(8dfbf03953d5219d9eb5fc654ec3392442ba1dc4) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
 	ROM_LOAD( "mp1-5.5b",   0x0000, 0x0020, CRC(56531268) SHA1(2e356706c07f43eeb67783fb122bdc7fed1b3589) )  // palette
@@ -1909,12 +1910,12 @@ ROM_START( todruaga )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "td1_4.1k",   0xe000, 0x2000, CRC(ae9d06d9) SHA1(3d8621fdd74fafa61f342886faa37f0aab50c5a7) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "td1_5.3b",   0x0000, 0x1000, CRC(d32b249f) SHA1(7d7cee4101ef615fb92c3702f89a9823a6231195) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "td1_6.3m",   0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
-	ROM_LOAD( "td1_7.3n",   0x2000, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
+	ROM_REGION( 0x4000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "td1_6.3m",   0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
+	ROM_LOAD16_BYTE( "td1_7.3n",   0x0001, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
 
 	ROM_REGION( 0x0520, "proms", 0 )
 	ROM_LOAD( "td1-5.5b",   0x0000, 0x0020, CRC(122cc395) SHA1(a648c53f2e95634bb5b27d79be3fd908021d056e) )  // palette
@@ -1933,12 +1934,12 @@ ROM_START( todruagao )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "td1_4.1k",   0xe000, 0x2000, CRC(ae9d06d9) SHA1(3d8621fdd74fafa61f342886faa37f0aab50c5a7) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "td1_5.3b",   0x0000, 0x1000, CRC(d32b249f) SHA1(7d7cee4101ef615fb92c3702f89a9823a6231195) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "td1_6.3m",   0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
-	ROM_LOAD( "td1_7.3n",   0x2000, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
+	ROM_REGION( 0x4000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "td1_6.3m",   0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
+	ROM_LOAD16_BYTE( "td1_7.3n",   0x0001, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
 
 	ROM_REGION( 0x0520, "proms", 0 )
 	ROM_LOAD( "td1-5.5b",   0x0000, 0x0020, CRC(122cc395) SHA1(a648c53f2e95634bb5b27d79be3fd908021d056e) )  // palette
@@ -1957,12 +1958,12 @@ ROM_START( todruagas )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "td1_4.1k",   0xe000, 0x2000, CRC(ae9d06d9) SHA1(3d8621fdd74fafa61f342886faa37f0aab50c5a7) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "td1_5.3b",   0x0000, 0x1000, CRC(d32b249f) SHA1(7d7cee4101ef615fb92c3702f89a9823a6231195) )
 
-	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "td1_6.3m",   0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
-	ROM_LOAD( "td1_7.3n",   0x2000, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
+	ROM_REGION( 0x4000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "td1_6.3m",   0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
+	ROM_LOAD16_BYTE( "td1_7.3n",   0x0001, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
 
 	ROM_REGION( 0x0520, "proms", 0 )
 	ROM_LOAD( "td1-5.5b",   0x0000, 0x0020, CRC(122cc395) SHA1(a648c53f2e95634bb5b27d79be3fd908021d056e) )  // palette
@@ -1981,12 +1982,12 @@ ROM_START( digdug2 )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "d21_4.1k",   0xe000, 0x2000, CRC(737443b1) SHA1(0e46204089cc6e5ffab0d2a62f9a1728f8c35948) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "d21_5.3b",   0x0000, 0x1000, CRC(afcb4509) SHA1(c9a54df22b0b92efbe7417a00200587225906b46) )
 
-	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "d21_6.3m",   0x0000, 0x4000, CRC(df1f4ad8) SHA1(004fba630018dbf03c4b0e284c98077e19fface3) )
-	ROM_LOAD( "d21_7.3n",   0x4000, 0x4000, CRC(ccadb3ea) SHA1(77d8d8e6039272f73e63c8f76084138ec613365a) )
+	ROM_REGION( 0x8000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "d21_6.3m",   0x0000, 0x4000, CRC(df1f4ad8) SHA1(004fba630018dbf03c4b0e284c98077e19fface3) )
+	ROM_LOAD16_BYTE( "d21_7.3n",   0x0001, 0x4000, CRC(ccadb3ea) SHA1(77d8d8e6039272f73e63c8f76084138ec613365a) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
 	ROM_LOAD( "d21-5.5b",   0x0000, 0x0020, CRC(9b169db5) SHA1(77e840d10ab59708a051c3b15305b33d431ee06d) )  // palette
@@ -2005,12 +2006,12 @@ ROM_START( digdug2o )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "d21_4.1k",   0xe000, 0x2000, CRC(737443b1) SHA1(0e46204089cc6e5ffab0d2a62f9a1728f8c35948) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "d21_5.3b",   0x0000, 0x1000, CRC(afcb4509) SHA1(c9a54df22b0b92efbe7417a00200587225906b46) )
 
-	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "d21_6.3m",   0x0000, 0x4000, CRC(df1f4ad8) SHA1(004fba630018dbf03c4b0e284c98077e19fface3) )
-	ROM_LOAD( "d21_7.3n",   0x4000, 0x4000, CRC(ccadb3ea) SHA1(77d8d8e6039272f73e63c8f76084138ec613365a) )
+	ROM_REGION( 0x8000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "d21_6.3m",   0x0000, 0x4000, CRC(df1f4ad8) SHA1(004fba630018dbf03c4b0e284c98077e19fface3) )
+	ROM_LOAD16_BYTE( "d21_7.3n",   0x0001, 0x4000, CRC(ccadb3ea) SHA1(77d8d8e6039272f73e63c8f76084138ec613365a) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
 	ROM_LOAD( "d21-5.5b",   0x0000, 0x0020, CRC(9b169db5) SHA1(77e840d10ab59708a051c3b15305b33d431ee06d) )  // palette
@@ -2030,12 +2031,12 @@ ROM_START( motos )
 	ROM_REGION( 0x10000, "sub", 0 ) // 64k for the second CPU
 	ROM_LOAD( "mo1_4.1k",   0xe000, 0x2000, CRC(55e45d21) SHA1(a8b195acfec542734751de29c9dafc2b165a5881) )
 
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "mo1_5.3b",   0x0000, 0x1000, CRC(5d4a2a22) SHA1(4af9bf2ae9bb78d2d029ef38809181ffa3c0eb66) )
 
-	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "mo1_6.3m",   0x0000, 0x4000, CRC(2f0e396e) SHA1(664679f9d3d74a3fccb086af910392b4fe40c9bc) )
-	ROM_LOAD( "mo1_7.3n",   0x4000, 0x4000, CRC(cf8a3b86) SHA1(2b49cdec516e23783f2a291633d81ab8bd0245fc) )
+	ROM_REGION( 0x8000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "mo1_6.3m",   0x0000, 0x4000, CRC(2f0e396e) SHA1(664679f9d3d74a3fccb086af910392b4fe40c9bc) )
+	ROM_LOAD16_BYTE( "mo1_7.3n",   0x0001, 0x4000, CRC(cf8a3b86) SHA1(2b49cdec516e23783f2a291633d81ab8bd0245fc) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
 	ROM_LOAD( "mo1-5.5b",   0x0000, 0x0020, CRC(71972383) SHA1(66b0619affcc5168b099108800a941d6e2416ab0) )  // palette
@@ -2055,25 +2056,25 @@ void mappy_state::init_digdug2()
 
 
 // 2x6809, static tilemap, 2bpp sprites (Super Pacman type)
-GAME( 1982, superpac,  0,        superpac, superpac,  mappy_state, empty_init,   ROT90, "Namco", "Super Pac-Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, superpacm, superpac, superpac, superpac,  mappy_state, empty_init,   ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnpal,   0,        pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnpal2,  pacnpal,  pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, pacnchmp,  pacnpal,  pacnpal,  pacnpal,   mappy_state, empty_init,   ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda,    0,        grobda,   grobda,    mappy_state, empty_init,   ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda2,   grobda,   grobda,   grobda,    mappy_state, empty_init,   ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, grobda3,   grobda,   grobda,   grobda,    mappy_state, empty_init,   ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superpac,  0,        superpac, superpac,  mappy_state,  empty_init,   ROT90, "Namco", "Super Pac-Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, superpacm, superpac, superpac, superpac,  mappy_state,  empty_init,   ROT90, "Namco (Bally Midway license)", "Super Pac-Man (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnpal,   0,        pacnpal,  pacnpal,   mappy_state,  empty_init,   ROT90, "Namco", "Pac & Pal", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnpal2,  pacnpal,  pacnpal,  pacnpal,   mappy_state,  empty_init,   ROT90, "Namco", "Pac & Pal (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pacnchmp,  pacnpal,  pacnpal,  pacnpal,   mappy_state,  empty_init,   ROT90, "Namco", "Pac-Man & Chomp Chomp", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda,    0,        grobda,   grobda,    mappy_state,  empty_init,   ROT90, "Namco", "Grobda (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda2,   grobda,   grobda,   grobda,    mappy_state,  empty_init,   ROT90, "Namco", "Grobda (Old Ver. set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, grobda3,   grobda,   grobda,   grobda,    mappy_state,  empty_init,   ROT90, "Namco", "Grobda (Old Ver. set 2)", MACHINE_SUPPORTS_SAVE )
 
 // 3x6809, static tilemap, 2bpp sprites (Gaplus type)
-GAME( 1983, phozon,    0,        phozon,    phozon,   mappy_state, empty_init,   ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, phozons,   phozon,   phozon,    phozon,   mappy_state, empty_init,   ROT90, "Namco (Sidam license)", "Phozon (Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, phozon,    0,        phozon,    phozon,   phozon_state, empty_init,   ROT90, "Namco", "Phozon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, phozons,   phozon,   phozon,    phozon,   phozon_state, empty_init,   ROT90, "Namco (Sidam license)", "Phozon (Sidam)", MACHINE_SUPPORTS_SAVE )
 
 // 2x6809, scroling tilemap, 4bpp sprites (Super Pacman type)
-GAME( 1983, mappy,     0,        mappy,     mappy,    mappy_state, empty_init,   ROT90, "Namco", "Mappy (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mappyj,    mappy,    mappy,     mappy,    mappy_state, empty_init,   ROT90, "Namco", "Mappy (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruaga,  0,        todruaga,  todruaga, mappy_state, empty_init,   ROT90, "Namco", "The Tower of Druaga (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruagao, todruaga, todruaga,  todruaga, mappy_state, empty_init,   ROT90, "Namco", "The Tower of Druaga (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, todruagas, todruaga, todruaga,  todruaga, mappy_state, empty_init,   ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, digdug2,   0,        digdug2,   digdug2,  mappy_state, init_digdug2, ROT90, "Namco", "Dig Dug II (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, digdug2o,  digdug2,  digdug2,   digdug2,  mappy_state, init_digdug2, ROT90, "Namco", "Dig Dug II (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, motos,     0,        motos,     motos,    mappy_state, empty_init,   ROT90, "Namco", "Motos", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mappy,     0,        mappy,     mappy,    mappy_state,  empty_init,   ROT90, "Namco", "Mappy (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mappyj,    mappy,    mappy,     mappy,    mappy_state,  empty_init,   ROT90, "Namco", "Mappy (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruaga,  0,        todruaga,  todruaga, mappy_state,  empty_init,   ROT90, "Namco", "The Tower of Druaga (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruagao, todruaga, todruaga,  todruaga, mappy_state,  empty_init,   ROT90, "Namco", "The Tower of Druaga (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, todruagas, todruaga, todruaga,  todruaga, mappy_state,  empty_init,   ROT90, "bootleg? (Sidam)", "The Tower of Druaga (Sidam)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, digdug2,   0,        digdug2,   digdug2,  mappy_state,  init_digdug2, ROT90, "Namco", "Dig Dug II (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, digdug2o,  digdug2,  digdug2,   digdug2,  mappy_state,  init_digdug2, ROT90, "Namco", "Dig Dug II (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, motos,     0,        motos,     motos,    mappy_state,  empty_init,   ROT90, "Namco", "Motos", MACHINE_SUPPORTS_SAVE )

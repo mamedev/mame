@@ -496,8 +496,8 @@ void v25_common_device::dma_process()
 	uint8_t dmamode = BIT(m_dmam[m_dma_channel], 5, 3);
 	bool w = BIT(m_dmam[m_dma_channel], 4);
 
-	uint32_t saddr = (BIT(dmamode, 0) ? 0 : (uint32_t(sarh_darh) & 0xff00) << 4) + sar;
-	uint32_t daddr = (BIT(dmamode, 1) ? 0 : (uint32_t(sarh_darh) & 0x00ff) << 12) + dar;
+	uint32_t saddr = ((uint32_t(sarh_darh) & 0xff00) << 4) + sar;
+	uint32_t daddr = ((uint32_t(sarh_darh) & 0x00ff) << 12) + dar;
 
 	switch (dmamode & 3)
 	{

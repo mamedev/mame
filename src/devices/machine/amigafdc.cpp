@@ -511,7 +511,9 @@ void amiga_fdc_device::ciaaprb_w(uint8_t data)
 			floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&amiga_fdc_device::index_callback, this));
 	}
 
-	if(floppy) {
+	const bool floppy_inserted = floppy && floppy->exists();
+
+	if(floppy_inserted) {
 		floppy->ss_w(!(BIT(data, 2)));
 		floppy->dir_w(BIT(data, 1));
 		floppy->stp_w(BIT(data, 0));
@@ -519,7 +521,7 @@ void amiga_fdc_device::ciaaprb_w(uint8_t data)
 		m_fdc_led = BIT(data, 7); // LED directly connected to FDC motor
 	}
 
-	if(floppy) {
+	if(floppy_inserted) {
 		if(cur_live.state == IDLE)
 			live_start();
 	} else

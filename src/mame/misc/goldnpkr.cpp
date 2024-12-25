@@ -6057,7 +6057,7 @@ ROM_END
   The second set is a hack of the first with unknown mods.
 
 */
-ROM_START( potnpkro ) // ICP-1 wires hack set. 
+ROM_START( potnpkro ) // ICP-1 wires hack set.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7.16a", 0x6000, 0x1000, CRC(2dc5e372) SHA1(70a251efe879bc1122baa78984251041a355c895) )
 	ROM_LOAD( "x.17a", 0x7000, 0x1000, CRC(1694a0d8) SHA1(bb1132d1e75347ad5156d2b3866aad255f7d53ca) )
@@ -6076,7 +6076,7 @@ ROM_START( potnpkro ) // ICP-1 wires hack set.
 	ROM_LOAD( "tbp24s10n_wh.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
-ROM_START( potnpkrp ) // ICP-1 PROM mod set. 
+ROM_START( potnpkrp ) // ICP-1 PROM mod set.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6.16a",            0x6000, 0x1000, CRC(2dc5e372) SHA1(70a251efe879bc1122baa78984251041a355c895) )
 	ROM_LOAD( "95_09_hn71_7.17a", 0x7000, 0x1000, CRC(2353317a) SHA1(18bf8cfe30aaa4b05207cc250ec1c024bc19ed56) )

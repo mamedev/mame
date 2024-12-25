@@ -2498,9 +2498,6 @@ rx78                            //
 @source:bandai/sv8000.cpp
 sv8000                          // Super Vision 8000
 
-@source:bandai/tamag1.cpp
-tama                            // Bandai
-
 @source:bandai/wswan.cpp
 pockchv2                        // Benesse Pocket Challenge V2
 wscolor                         // Bandai WonderSwan Color Handheld
@@ -19148,6 +19145,15 @@ msoccer                         // Mattel
 qkracer                         // National Semiconductor
 qkspeller                       // National Semiconductor
 
+@source:handheld/hh_e0c6x.cpp
+alienfev                        // Epoch
+stackch                         // Tandy Corporation
+tama                            // Bandai
+tamaang                         // Bandai
+tamag2                          // Bandai
+tamamot                         // Bandai
+venusdm                         // Nikko
+
 @source:handheld/hh_hmcs40.cpp
 alnattck                        // Coleco
 bambball                        // Bambino
@@ -29181,9 +29187,16 @@ abigchs                         // Big Cheese
 aclown                          // Clown
 atlantca                        // Atlantica
 atlantcaa                       //
+atrbonpk                        // Bonus Poker
+atrbtlma                        // Beetlemania
+atricmon                        // I C Money
+atricmona                       //
 atronic                         //
 atronica                        //
-baboshka                        // Baboshka
+atronicb                        //
+atrwild                         // Wild Thing
+baboshka                        // Babooshka
+baboshkar                       //
 beachpt                         // Beach Patrol
 bearnec                         // Bear Necessities
 beetleup                        // Beetles Unplugged
@@ -29193,21 +29206,23 @@ castawaya                       //
 cfblue                          // Crazy Fruits Blue
 cfbluea                         //
 cfgreen                         // Crazy Fruits Green
+chicdale                        // Chickendales
 chicken                         // Chicken
 dncsprt                         // Dancing Spirit
 drmmake                         // Dream Maker
+drmmaker                        //
 goldcity                        // Gold City
 goldglen                        // Golden Glenn
+haphippy                        // Happy Happy Hippy
 iccash                          // I C Cash
 jumpjkpt                        // Jumping Jackpots
 mushmagi                        // Mushroom Magic
 santam                          // Santa Maria
-shpinxii                        // Sphinx II
+sphinxii                        // Sphinx II
+sphinxiir                       //
 splmastr                        // Spell Master
 tajmah                          // Tajmahal
-atrwild
-atricmon
-atrbonpk
+tylagoon                        // Typhoon Lagoon
 
 @source:misc/attckufo.cpp
 attckufo                        // (c) 1980 Ryoto Electric Co.
@@ -45981,6 +45996,7 @@ rad_digi
 @source:tvgames/spg2xx_dreamlife.cpp
 dreamlif                        //
 dsgnwrld
+gigapets
 
 @source:tvgames/spg2xx_ican.cpp
 icanguit                        //

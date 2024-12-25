@@ -20,7 +20,7 @@
 Name        Board No      Maker         Game name
 ----------------------------------------------------------------------------
 snowbro2    TP-033        Hanafram      Snow Bros. 2 - With New Elves
- 
+
 */
 
 namespace {
@@ -75,7 +75,7 @@ u32 snowbro2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 void snowbro2_state::screen_vblank(int state)
-{	
+{
 	if (state) // rising edge
 	{
 		m_vdp->screen_eof();

@@ -14576,13 +14576,13 @@ ROM_START( lucky8n )
 	ROM_LOAD( "g13", 0x00, 0x20, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
-// only the subboard available (Z80, ROM, 2 stickered chips, 2 banks of 8 DIP switches (marked SW5 and SW6) and a rotary switch (SW7))
+// only the subboard available (Z80, ROM, 2 stickered chips (sanded), 2 banks of 8 DIP switches (marked SW5 and SW6) and a rotary switch (SW7))
 // very professional-looking subboard marked Excel Planning
 // needs correct GFX ROMs / color PROMs (using the ones from wcat3, for now)
 ROM_START( wcat )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "y8.u1.sub", 0x00000, 0x20000, CRC(49e11ff4) SHA1(ce421f85b298c2e9c335fdbf0547a355ae29f1a6) )
-	ROM_FILL( 0x1c000, 0x1000, 0xc9 ) // jumps in this area multiple times, but nothing there. Something to do with the 2 stickered chips?
+	ROM_FILL( 0x1c000, 0x1000, 0xc9 ) // jumps in this area multiple times, but nothing here. Something to do with the 2 stickered chips?
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "wcat3.h7",   0x10000, 0x8000, BAD_DUMP CRC(065cb575) SHA1(4dd49773c4caeaa489342e61f26c8eaaae876edc) )

@@ -29,7 +29,7 @@ Note on PRG size (from CPU documentation)
 Physically, 128 * 15 * 12 = 23,040 bits
 Logically, 127 * 15 * 12 = 22,860 bits (as final word of each page is inaccessible by the CPU)
 
-the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 15 * (12+4) 
+the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 15 * (12+4)
 -->
 
 <softwarelist name="cassvisn_cart" description="Epoch Cassette Vision cartridges">
@@ -43,7 +43,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d777c005prog.s01" size="0xf00" crc="f917d2f0" sha1="b26baf2fd9b961b5a0e0475dfac93c18bd54cc4d"/>
-			</dataarea>			
+			</dataarea>
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d777c005_pat.s01" size="0x4d0" crc="bf085553" sha1="321262b6dd67789e03db8f03160cb1819529f43c"/>
 			</dataarea>
@@ -65,7 +65,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- PCB is silkscreened 006, ROM here is 007 is there an undumped earlier version? -->
 	<software name="galaxian" supported="no">
 		<description>Galaxian</description>
@@ -76,7 +76,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d777c007prog.s01" size="0xf00" crc="538c13d3" sha1="537287e63b311caa281d8c6456f9cbe2eaebb9e7"/>
-			</dataarea>				
+			</dataarea>
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d777c007_pat.s01" size="0x4d0" crc="d343eca4" sha1="e8f0312de0d7f0934a66192c1aaa2c802532b021"/>
 			</dataarea>
@@ -92,7 +92,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" width="16" endianness="big" size="0xf00">
 				<rom name="d777c004prog.s01" size="0xf00" crc="030fc0d2" sha1="b1efe8ff1bc51082502253e63721e656ee75edda"/>
-			</dataarea>		
+			</dataarea>
 			<dataarea name="pat" size="0x4d0">
 				<rom name="d777c004_pat.s01" size="0x4d0" crc="7df5eb39" sha1="c59f6febf5f51eebc0cc8d288df6b5319510ecbf"/>
 			</dataarea>
@@ -211,5 +211,5 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

@@ -88,7 +88,7 @@ protected:
 		m_all_led.resolve();
 		m_time_led.resolve();
 		m_date_led.resolve();
-		m_year_led.resolve();	
+		m_year_led.resolve();
 		m_rx_digits.resolve();
 		m_tx_digits.resolve();
 	}
@@ -129,7 +129,7 @@ private:
 	{
 	}
 
-	constexpr static const z80_daisy_config z80_daisy_chain[] = 
+	constexpr static const z80_daisy_config z80_daisy_chain[] =
 	{
 		{ nullptr }
 	};

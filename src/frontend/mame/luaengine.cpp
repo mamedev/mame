@@ -1467,12 +1467,12 @@ void lua_engine::initialize()
 			{
 				switch (m.phase())
 				{
-				case machine_phase::PREINIT:	return "preinit";
-				case machine_phase::INIT:		return "init";
-				case machine_phase::RESET:		return "reset";
-				case machine_phase::RUNNING:	return "running";
-				case machine_phase::EXIT:		return "exit";
-				default:						return "";
+				case machine_phase::PREINIT:    return "preinit";
+				case machine_phase::INIT:       return "init";
+				case machine_phase::RESET:      return "reset";
+				case machine_phase::RUNNING:    return "running";
+				case machine_phase::EXIT:       return "exit";
+				default:                        return "";
 				}
 			});
 

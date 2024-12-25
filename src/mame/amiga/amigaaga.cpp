@@ -549,7 +549,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	for (int x = 0; x < (amiga_state::SCREEN_WIDTH / 2) + offset_hack[bitplane_fmode]; x++)
 	{
 		int sprpix;
-        const bool out_of_beam = x >= amiga_state::SCREEN_WIDTH / 2;
+		const bool out_of_beam = x >= amiga_state::SCREEN_WIDTH / 2;
 
 		/* time to execute the copper? */
 		if (x == next_copper_x)

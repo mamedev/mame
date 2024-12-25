@@ -687,16 +687,16 @@ void cvs_state::sh_trigger_w(offs_t offset, u8 data)
 	I have recordings available.
 
 	- 0x1884 - Enables an XP8038 frequency generator IC
-		Reflected on pin 10 of a 4016.
-		The frequency is set by 0x1840, the 8 bit DAC register.
-		Not all 0x1840 values were tested, but:
-			0x00 - off, 0x1884 enable has no sound.
-			0x55,0xAA,0xFF - increasing value has higher frequency
+	    Reflected on pin 10 of a 4016.
+	    The frequency is set by 0x1840, the 8 bit DAC register.
+	    Not all 0x1840 values were tested, but:
+	        0x00 - off, 0x1884 enable has no sound.
+	        0x55,0xAA,0xFF - increasing value has higher frequency
 	- 0x1885 - A scope showed this halving the XP8038 amplitude with a little decay.
-		Causes 4016 pin 11 to rise (on) and decay-fall (off)
+	    Causes 4016 pin 11 to rise (on) and decay-fall (off)
 	- 0x1886 - Outputs a complete Galaxia-style ship fire sound, with attack-to-on and decay-to-off.
 	- 0x1887 - Reflected on an LM380.
-		Causes an envelope-like operation on the XP8038 tone with attack (on) and decay (off).
+	    Causes an envelope-like operation on the XP8038 tone with attack (on) and decay (off).
 	*/
 
 	data &= 1;

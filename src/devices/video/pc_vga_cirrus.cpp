@@ -1190,7 +1190,7 @@ uint8_t cirrus_gd5428_vga_device::mem_r(offs_t offset)
 
 	// FIXME: workaround crash behaviour in picasso2
 	// it will otherwise provide an offset of 0x1fxxxx in the gc_locked below
-    // causing a crash during adapter init
+	// causing a crash during adapter init
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
 		return svga_device::mem_linear_r((offset & 0xffff) + bank * 0x10000);

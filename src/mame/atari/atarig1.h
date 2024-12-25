@@ -18,17 +18,18 @@
 class atarig1_state : public atarigen_state
 {
 public:
-	atarig1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
-			m_slapstic(*this, "slapstic"),
-			m_slapstic_bank(*this, "slapstic_bank"),
-			m_jsa(*this, "jsa"),
-			m_playfield_tilemap(*this, "playfield"),
-			m_alpha_tilemap(*this, "alpha"),
-			m_rle(*this, "rle"),
-			m_adc(*this, "adc"),
-			m_in1(*this, "IN1"),
-			m_mo_command(*this, "mo_command") { }
+	atarig1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atarigen_state(mconfig, type, tag),
+		m_slapstic(*this, "slapstic"),
+		m_slapstic_bank(*this, "slapstic_bank"),
+		m_jsa(*this, "jsa"),
+		m_playfield_tilemap(*this, "playfield"),
+		m_alpha_tilemap(*this, "alpha"),
+		m_rle(*this, "rle"),
+		m_adc(*this, "adc"),
+		m_in1(*this, "IN1"),
+		m_mo_command(*this, "mo_command")
+	{ }
 
 	void atarig1(machine_config &config);
 	void pfslap111(machine_config &config);
@@ -64,11 +65,11 @@ private:
 
 	bool            m_bslapstic_primed = false;
 
-	uint8_t           m_pfscroll_xoffset = 0;
-	uint16_t          m_current_control = 0;
-	uint8_t           m_playfield_tile_bank = 0;
-	uint16_t          m_playfield_xscroll = 0;
-	uint16_t          m_playfield_yscroll = 0;
+	uint8_t         m_pfscroll_xoffset = 0;
+	uint16_t        m_current_control = 0;
+	uint8_t         m_playfield_tile_bank = 0;
+	uint16_t        m_playfield_xscroll = 0;
+	uint16_t        m_playfield_yscroll = 0;
 
 	void video_int_ack_w(uint16_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
