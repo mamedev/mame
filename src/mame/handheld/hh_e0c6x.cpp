@@ -11,6 +11,7 @@ to play the games for a longer time. For the drivers that don't have an SVG
 screen, use -prescale or -nofilter to disable bilinear filtering.
 
 TODO:
+- stackch only LEFT and ON buttons work, both are bit 0, MCU opcode bug?
 - SVGs could be more accurate? it seems they're handmade instead of a 1:1 scan
   like for eg. the Game & Watch LCDs
 - alienfev unmapped reads/writes, or are they harmless?
@@ -264,7 +265,7 @@ static INPUT_PORTS_START( alienfev )
 	PORT_START("K0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CHANGED_CB(0) PORT_NAME("Mode")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CHANGED_CB(1) PORT_NAME("Select")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CHANGED_CB(2) PORT_NAME("Sound")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(2) PORT_NAME("Sound")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_CB(3) PORT_NAME("Handle")
 INPUT_PORTS_END
 
@@ -371,6 +372,81 @@ ROM_START( venusdm )
 	ROM_LOAD( "venusdm.bin", 0x0000, 0x3000, CRC(2228b081) SHA1(22f6a2ede6259e76f1c8b9b50171c54d8a7de502) )
 ROM_END
 
+
+
+
+
+/*******************************************************************************
+
+  Tandy (Radio Shack division) Stack Challenge (model 60-2247)
+  * Seiko Epson E0C6S46 MCU
+  * 10*21 LCD screen + custom segments, 1-bit sound
+
+  It's a brick game clone. The game is supposedly from 1991 (it's included in
+  the 1992 Radio Shack catalog). Did E0C6S46 exist already, or is this a newer
+  revision?
+
+*******************************************************************************/
+
+class stackch_state : public hh_e0c6x_state
+{
+public:
+	stackch_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_e0c6x_state(mconfig, type, tag)
+	{ }
+
+	void stackch(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( stackch )
+	PORT_START("K0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_CHANGED_CB(0) PORT_NAME("Left / Level")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_CHANGED_CB(1) PORT_NAME("Down / Start")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_CHANGED_CB(2) PORT_NAME("Right / Height")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_CB(3)
+
+	PORT_START("K1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_ON ) PORT_CHANGED_CB(4) PORT_NAME("On / Off")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SELECT ) PORT_CHANGED_CB(5) PORT_NAME("Pause")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(6) PORT_NAME("Sound")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+// config
+
+void stackch_state::stackch(machine_config &config)
+{
+	// basic machine hardware
+	E0C6S46(config, m_maincpu, 32.768_kHz_XTAL);
+	m_maincpu->set_osc3(1'000'000);
+	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
+	m_maincpu->write_segs().set(FUNC(stackch_state::lcd_segment_w));
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(32);
+	screen.set_size(856, 1080);
+	screen.set_visarea_full();
+
+	config.set_default_layout(layout_hh_e0c6x_lcd);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( stackch )
+	ROM_REGION( 0x3000, "maincpu", 0 )
+	ROM_LOAD( "stackch.bin", 0x0000, 0x3000, CRC(28b9310a) SHA1(52b80d70aa7fc3b6323799403b3aba0e3d957f3b) )
+
+	ROM_REGION( 133022, "screen", 0)
+	ROM_LOAD( "stackch.svg", 0, 133022, CRC(caf74ad4) SHA1(2f2e836b0efe377305bb113a550f1cb4ec939273) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -390,3 +466,5 @@ SYST( 1997, tamamot,  0,      0,      tamaang,  tama,     tamaang_state,  empty_
 SYST( 1997, alienfev, 0,      0,      alienfev, alienfev, alienfev_state, empty_init, "Epoch", "Chibi Pachi: Alien Fever", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1997, venusdm,  0,      0,      venusdm,  venusdm,  venusdm_state,  empty_init, "Nikko", "Beans Collection: Venus Diet Monogatari", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1991, stackch,  0,      0,      stackch,  stackch,  stackch_state,  empty_init, "Tandy Corporation", "Stack Challenge", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
