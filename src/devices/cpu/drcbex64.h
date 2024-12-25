@@ -231,7 +231,7 @@ private:
 
 	void calculate_status_flags(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::Operand const &dst, u8 flags);
 	void calculate_status_flags_mul(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo, asmjit::x86::Gp const &hi);
-	void calculate_status_flags_mul_low(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo, asmjit::x86::Gp const &hi, bool is_signed);
+	void calculate_status_flags_mul_low(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo);
 
 	size_t emit(asmjit::CodeHolder &ch);
 

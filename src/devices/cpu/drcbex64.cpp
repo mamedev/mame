@@ -1161,11 +1161,10 @@ void drcbe_x64::calculate_status_flags_mul(Assembler &a, uint32_t instsize, asmj
 		a.test(lo, lo);
 
 	a.lahf();  // lower half zero
-	a.and_(rax, hi);
+	a.and_(rax, hi); // if top and bottom are zero then this will leave the zero flag
 	a.and_(rax, 0x4000); // zero
-
 	a.and_(hi, 0x8000); // sign
-	a.or_(rax, hi);
+	a.or_(rax, hi); // combine sign flag from top and zero flags for both
 
 	a.and_(tempreg, ~(0x4000 | 0x8000));
 	a.or_(tempreg, rax);
@@ -1179,51 +1178,20 @@ void drcbe_x64::calculate_status_flags_mul(Assembler &a, uint32_t instsize, asmj
 	a.sahf();
 }
 
-void drcbe_x64::calculate_status_flags_mul_low(Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo, asmjit::x86::Gp const &hi, bool is_signed)
+void drcbe_x64::calculate_status_flags_mul_low(Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo)
 {
-	Gp tempreg = r10;
-	Gp tempreg2 = r11;
-
-	a.mov(tempreg2, rax);
-
-	if (is_signed)
-	{
-		if (instsize == 4)
-		{
-			a.mov(tempreg.r32(), hi.r32());
-			a.cdq();
-			a.cmp(tempreg.r32(), hi.r32());
-		}
-		else
-		{
-			a.mov(tempreg, hi);
-			a.cqo();
-			a.cmp(tempreg, hi);
-		}
-	}
-	else
-	{
-		if (instsize == 4)
-			a.test(hi.r32(), hi.r32());
-		else
-			a.test(hi, hi);
-	}
-
-	a.mov(tempreg, rdx);
-
-	a.setnz(dl);
+	// calculate zero, sign flags based on the lower half of the result but keep the overflow from the multiplication
+	a.seto(dl);
 
 	if (instsize == 4)
 		a.test(lo.r32(), lo.r32());
 	else
 		a.test(lo, lo);
 
+	// restore overflow flag
 	a.lahf();
 	a.add(dl, 0x7f);
 	a.sahf();
-
-	a.mov(rdx, tempreg);
-	a.mov(rax, tempreg2);
 }
 
 void drcbe_x64::shift_op_param(Assembler &a, Inst::Id const opcode, size_t opsize, Operand const &dst, be_parameter const &param, bool update_flags)
@@ -3588,7 +3556,7 @@ void drcbe_x64::op_mululw(Assembler &a, const instruction &inst)
 	}
 
 	if (inst.flags())
-		calculate_status_flags_mul_low(a, inst.size(), rax, rdx, false);
+		calculate_status_flags_mul_low(a, inst.size(), rax);
 }
 
 
@@ -3714,7 +3682,7 @@ void drcbe_x64::op_mulslw(Assembler &a, const instruction &inst)
 	}
 
 	if (inst.flags())
-		calculate_status_flags_mul_low(a, inst.size(), rax, rdx, true);
+		calculate_status_flags_mul_low(a, inst.size(), rax);
 }
 
 
