@@ -1363,11 +1363,16 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 		{
 			if (0)
 			{
-				popmessage("bitmap t:%04x b:%04x l:%04x r:%04x  -- -- ba:%04x la:%04x ra:%04x   -- -- step:%02x - size:%02x unused:%08x",
+				popmessage("bitmap t:%04x b:%04x l:%04x r:%04x  -- -- ta: %04x ba:%04x la:%04x ra:%04x   -- -- start %04x (%08x) step:%02x - size:%02x unused:%08x\n",
 					top, bot, lft, rgt,
-					/*topadr*/ botadr, lftadr, rgtadr,
-					/*start*/ step, size, unused);
+					topadr, botadr, lftadr, rgtadr,
+					start, start * 0x800, step, size, unused);
 			}
+
+			// anpanmdx title screen ends up with a seemingly incorrect value for start
+			// when it does the scroller.  There is presumably an opcode or math bug causing this.
+			//if (start >= 0x7700)
+			///	start -= 0x3c00;
 
 			int base = start * 0x800;
 			int base2 = topadr * 0x8;
