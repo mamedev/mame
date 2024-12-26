@@ -194,7 +194,7 @@ void pentevo_state::atm_port_ff_w(offs_t offset, u8 data)
 {
 	if (BIT(m_port_bf_data, 5) && !m_pen2)
 	{
-		u8 pen = get_border_color(m_screen->hpos(), m_screen->vpos());
+		u8 pen = 0x0f & get_border_color(m_screen->hpos(), m_screen->vpos());
 		m_palette_data[pen] = data;
 		m_palette->set_pen_color(pen,
 			(BIT(~data, 1) * 0x88) | (BIT(~data, 6) * 0x44) | (BIT(~offset,  9) * 0x22) | (BIT(~offset, 14) * 0x11),

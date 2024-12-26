@@ -102,7 +102,7 @@ protected:
 	bool m_pen2;          // palette selector
 	u8 m_rg = 0b011;      // 0:320x200lo, 2:640:200hi, 3:256x192zx, 6:80x25txt
 	u8 m_br3;
-	std::vector<u8> m_palette_data;
+	u8 m_palette_data[16];
 	u8 m_ata_data_latch;
 	u8 m_beta_drive_selected;
 };
