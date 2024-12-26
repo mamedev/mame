@@ -180,7 +180,7 @@ private:
 	u16 m_char_led_source = 0x3fff;
 
 	required_device<pwm_display_device> m_led_matrix_device;
-	u8 m_led_sink = 0;
+	u8 m_led_sink = 0;  // Also used as the sink for the LT-1604.
 	u8 m_led_source = 0;
 
 	// When these strings get converted to output names, they will include
@@ -670,6 +670,8 @@ void memorymoog_state::memorymoog(machine_config& config)
 	PWM_DISPLAY(config, m_led_matrix_device).set_size(8, 8);
 	m_led_matrix_device->output_x().set(FUNC(memorymoog_state::led_update_w));
 
+	// All latches below are on board 5 (DMUX board).
+
 	// U54-U58 are connected on the +-7.5V inverted data bus.
 
 	// Bits 0, 1 and 3 are not connected.
@@ -678,7 +680,8 @@ void memorymoog_state::memorymoog(machine_config& config)
 	u54.bit_handler<4>().set_output("VOICE_MOD_FILT").invert();
 	u54.bit_handler<5>().set_output("VOICE_MOD_INVERT_ENABLE").invert();
 
-	// Bit 0 translated to 0.7/15V.
+	// Bit 0 translated from -+7.5V to ~ 0.7/15V via Zener CR4 (IN5237A,
+	// Vz ~= 8.2V) and R164 (10K, connected to +15V).
 	output_latch_device& u55(OUTPUT_LATCH(config, "latch_u55"));
 	u55.bit_handler<0>().set_output("CONTOURED_OSC_3_AMT").invert();
 	u55.bit_handler<1>().set_output("VOICE_MOD_PW_1").invert();
@@ -795,7 +798,7 @@ DECLARE_INPUT_CHANGED_MEMBER(memorymoog_state::octave_button_pressed)
 	{
 		m_octave_low = true;
 	}
-	if (!oct_minus_1 && oct_0)
+	else if (!oct_minus_1 && oct_0)
 	{
 		m_octave_low = false;
 	}
@@ -1121,5 +1124,5 @@ ROM_END
 }  // Anonymous namespace.
 
 // In production from 1982 to 1985.
-SYST(1982, memorymoog, 0, 0, memorymoog, memorymoog, memorymoog_state, empty_init, "Moog Music", "Memorymoog", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE);
+SYST(1982, memorymoog, 0, 0, memorymoog, memorymoog, memorymoog_state, empty_init, "Moog Music", "Memorymoog", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
 
