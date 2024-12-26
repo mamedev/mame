@@ -256,7 +256,7 @@ void pc88va_state::sys_port5_w(u8 data)
 
 u8 pc88va_state::sys_port5_r()
 {
-	return m_rstmd | 8;
+	return (m_rstmd ? 1 : 0) | 8;
 }
 
 uint8_t pc88va_state::hdd_status_r()
