@@ -10,9 +10,7 @@ E0C6S48: 8192x12 ROM, 768x4 RAM, 2*102x4 VRAM, LCD has 16 commons and 51 segment
 TODO:
 - finish i/o ports
 - serial interface
-- buzzer envelope addition
 - what happens if OSC3 is selected while OSCC (bit 2) is low?
-- K input interrupt can trigger if input is active while writing to the mask register
 - add mask options for ports (eg. buzzer on output port R4x is optional)
 
 */
@@ -148,6 +146,7 @@ void e0c6s46_device::device_start()
 	m_bz_43_on = 0;
 	m_bz_freq = 0;
 	m_bz_envelope = 0;
+	m_bz_envelope_count = 0;
 	m_bz_duty_ratio = 0;
 	m_bz_1shot_on = 0;
 	m_bz_1shot_running = false;
@@ -190,6 +189,7 @@ void e0c6s46_device::device_start()
 	save_item(NAME(m_bz_43_on));
 	save_item(NAME(m_bz_freq));
 	save_item(NAME(m_bz_envelope));
+	save_item(NAME(m_bz_envelope_count));
 	save_item(NAME(m_bz_duty_ratio));
 	save_item(NAME(m_bz_1shot_on));
 	save_item(NAME(m_bz_1shot_running));
@@ -211,12 +211,12 @@ void e0c6s46_device::device_reset()
 	memset(m_irqflag, 0, sizeof(m_irqflag));
 	memset(m_irqmask, 0, sizeof(m_irqmask));
 
-	// reset other i/o
+	// reset other I/O
 	m_data->write_byte(0xf41, 0xf);
 	m_data->write_byte(0xf54, 0xf);
 	m_data->write_byte(0xf70, 0x0);
 	m_data->write_byte(0xf71, 0x8);
-	m_data->write_byte(0xf73, m_svd & 0xc0);
+	m_data->write_byte(0xf73, m_svd & 3);
 
 	m_data->write_byte(0xf74, 0x0);
 	m_data->write_byte(0xf75, 0x4);
@@ -276,13 +276,19 @@ bool e0c6s46_device::check_interrupt()
 	for (int pri = 5; pri >= 0; pri--)
 	{
 		// hw glitch note, not emulated: if a new interrupt is requested in the
-		// middle of handling this interrupt, irq vector may be an OR of 2 vectors
-		m_irq_vector = 2*pri + 2;
+		// middle of handling this interrupt, IRQ vector may be an OR of 2 vectors
+		m_irq_vector = 2 * pri + 2;
 		int reg = priorder[pri];
 		m_irq_id = reg;
 
 		switch (reg)
 		{
+			// IK0/IK1 only have 1 flag bit
+			case IRQREG_INPUT0: case IRQREG_INPUT1:
+				if (m_irqflag[reg])
+					return true;
+				break;
+
 			// other: mask vs flag
 			default:
 				if (m_irqflag[reg] & m_irqmask[reg])
@@ -301,20 +307,24 @@ void e0c6s46_device::execute_set_input(int line, int state)
 		return;
 
 	state = (state) ? 1 : 0;
-	int port = line >> 2 & 1;
+	u8 port = line >> 2 & 1;
 	u8 bit = 1 << (line & 3);
 
 	u8 prev = m_port_k[port];
 	m_port_k[port] = (m_port_k[port] & ~bit) | (state ? bit : 0);
 
-	// set interrupt on falling/rising edge of input
+	// set IRQ flag on falling/rising edge of input
 	u8 dfk = (port == 0) ? m_dfk0 : 0xf;
 	u8 edge = ~(prev ^ dfk) & (m_port_k[port] ^ dfk) & bit;
 	if (m_irqmask[IRQREG_INPUT0 + port] & edge)
 	{
-		m_irqflag[IRQREG_INPUT0 + port] |= edge;
+		m_irqflag[IRQREG_INPUT0 + port] |= 1;
 		m_possible_irq = true;
 	}
+
+	// clock programmable timer on falling edge of K03
+	if ((prev & ~m_port_k[port] & bit) && m_prgtimer_on && (m_prgtimer_select & 7) < 2)
+		clock_prgtimer();
 }
 
 
@@ -330,28 +340,22 @@ void e0c6s46_device::write_r(u8 port, u8 data)
 	data &= 0xf;
 	m_port_r[port] = data;
 
-	// ports R0x-R3x can be high-impedance
-	u8 out = data;
-	if (port < 4 && !(m_r_dir >> port & 1))
-		out = 0xf;
-
-	switch (port)
+	if (port < 4)
 	{
-		case 0: m_write_r[0](port, out, 0xff); break;
-		case 1: m_write_r[1](port, out, 0xff); break;
-		case 2: m_write_r[2](port, out, 0xff); break;
-		case 3: m_write_r[3](port, out, 0xff); break; // TODO: R33 PTCLK/_SRDY
-
-		// R4x: special output
-		case 4:
-			// d3: buzzer on: direct output or 1-shot output
-			if ((data & 8) != m_bz_43_on)
-			{
-				m_bz_43_on = data & 8;
-				reset_buzzer();
-			}
-			write_r4_out();
-			break;
+		// ports R0-R3 can be high-impedance
+		u8 mask = BIT(m_r_dir, port) ? 0xf : 0;
+		m_write_r[port](port, data | (mask ^ 0xf), mask);
+	}
+	else
+	{
+		// R43: buzzer on: direct output or 1-shot output
+		if ((data & 8) != m_bz_43_on)
+		{
+			m_bz_43_on = data & 8;
+			reset_bz_envelope();
+			reset_buzzer();
+		}
+		write_r4_out();
 	}
 }
 
@@ -360,8 +364,8 @@ void e0c6s46_device::write_r4_out()
 	// R40: _FOUT(clock inverted output)
 	// R42: FOUT or _BZ
 	// R43: BZ(buzzer)
-	u8 out = (m_port_r[4] & 2) | (m_bz_pulse << 3) | (m_bz_pulse << 2 ^ 4);
-	m_write_r[4](4, out, 0xff);
+	u8 data = (m_port_r[4] & 2) | (m_bz_pulse << 3) | (m_bz_pulse << 2 ^ 4);
+	m_write_r[4](4, data, 0xf);
 }
 
 
@@ -372,20 +376,18 @@ void e0c6s46_device::write_p(u8 port, u8 data)
 	data &= 0xf;
 	m_port_p[port] = data;
 
-	// don't output if port direction is set to input
-	if (!(m_p_dir >> port & 1))
-		return;
-
-	m_write_p[port](port, data, 0xff);
+	// high-impedance if port is set to input
+	u8 mask = BIT(m_p_dir, port) ? 0xf : 0;
+	m_write_p[port](port, data | (mask ^ 0xf), mask);
 }
 
 u8 e0c6s46_device::read_p(u8 port)
 {
 	// return written value if port direction is set to output
-	if (m_p_dir >> port & 1)
+	if (BIT(m_p_dir, port))
 		return m_port_p[port];
 
-	return m_read_p[port](port, 0xff);
+	return m_read_p[port](port);
 }
 
 
@@ -409,6 +411,10 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::core_256_cb)
 	// clock 1-shot buzzer on rising edge if it's on
 	if (m_bz_1shot_on != 0 && m_256_src_pulse == 1)
 		clock_bz_1shot();
+
+	// clock buzzer envelope on rising edge if it's on
+	if (m_bz_envelope & 1 && m_256_src_pulse == 1)
+		clock_bz_envelope();
 
 	// clock-timer is always running, advance it on falling edge
 	// (handle clock_clktimer last in case of watchdog reset)
@@ -440,7 +446,7 @@ void e0c6s46_device::clock_clktimer()
 {
 	m_clktimer_count++;
 
-	// irq on falling edge of 32, 8, 2, 1hz
+	// IRQ on falling edge of 32, 8, 2, 1hz
 	u8 flag = 0;
 	if ((m_clktimer_count & 0x07) == 0)
 		flag |= 1;
@@ -478,7 +484,7 @@ void e0c6s46_device::clock_stopwatch()
 	{
 		m_swl_slice = 0;
 
-		// bcd counter, irq on falling edge of 10 and 1hz
+		// bcd counter, IRQ on falling edge of 10 and 1hz
 		m_swl_count = (m_swl_count + 1) % 10;
 		if (m_swl_count == 0)
 		{
@@ -486,10 +492,10 @@ void e0c6s46_device::clock_stopwatch()
 			m_swh_count = (m_swh_count + 1) % 10;
 			if (m_swh_count == 0)
 				m_irqflag[IRQREG_STOPWATCH] |= 2;
-		}
 
-		if (m_irqflag[IRQREG_STOPWATCH] & m_irqmask[IRQREG_STOPWATCH])
-			m_possible_irq = true;
+			if (m_irqflag[IRQREG_STOPWATCH] & m_irqmask[IRQREG_STOPWATCH])
+				m_possible_irq = true;
+		}
 	}
 }
 
@@ -498,7 +504,7 @@ void e0c6s46_device::clock_stopwatch()
 
 void e0c6s46_device::clock_prgtimer()
 {
-	// irq and reload when it reaches zero
+	// IRQ and reload when it reaches zero
 	if (--m_prgtimer_count == 0)
 	{
 		m_irqflag[IRQREG_PRGTIMER] |= 1;
@@ -540,7 +546,7 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::prgtimer_cb)
 void e0c6s46_device::schedule_buzzer()
 {
 	// only schedule next buzzer timeout if it's on
-	if (m_bz_43_on != 0 && !m_bz_1shot_running)
+	if (m_bz_43_on && !m_bz_1shot_running)
 		return;
 
 	// pulse width differs per frequency selection
@@ -558,10 +564,13 @@ void e0c6s46_device::schedule_buzzer()
 
 TIMER_CALLBACK_MEMBER(e0c6s46_device::buzzer_cb)
 {
-	// invert pulse wave and write to output
-	m_bz_pulse ^= 1;
-	write_r4_out();
+	// invert pulse wave if buzzer is on
+	if (m_bz_43_on && !m_bz_1shot_running)
+		m_bz_pulse = 0;
+	else
+		m_bz_pulse ^= 1;
 
+	write_r4_out();
 	schedule_buzzer();
 }
 
@@ -579,8 +588,8 @@ void e0c6s46_device::clock_bz_1shot()
 	// reload counter the 1st time
 	if (m_bz_1shot_count == 0)
 	{
-		reset_buzzer();
 		m_bz_1shot_count = (m_bz_freq & 8) ? 16 : 8;
+		reset_buzzer();
 	}
 
 	// stop ringing when counter reaches 0
@@ -589,6 +598,24 @@ void e0c6s46_device::clock_bz_1shot()
 		m_bz_1shot_on = 0;
 		m_bz_1shot_running = false;
 	}
+}
+
+void e0c6s46_device::clock_bz_envelope()
+{
+	if (--m_bz_envelope_count == 0)
+	{
+		m_bz_envelope_count = (m_bz_envelope & 2) ? 32 : 16;
+
+		// maximum duty addition is 7
+		if (m_bz_duty_ratio < 7)
+			m_bz_duty_ratio++;
+	}
+}
+
+void e0c6s46_device::reset_bz_envelope()
+{
+	m_bz_envelope_count = (m_bz_envelope & 2) ? 32 : 16;
+	m_bz_duty_ratio = 0;
 }
 
 
@@ -667,17 +694,17 @@ u8 e0c6s46_device::io_r(offs_t offset)
 {
 	switch (offset)
 	{
-		// irq flags, masks
+		// IRQ flags, masks
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05:
 		{
-			// irq flags are reset(acked) when read
+			// IRQ flags are reset(acked) when read
 			u8 flag = m_irqflag[offset];
 			if (!machine().side_effects_disabled())
 				m_irqflag[offset] = 0;
 			return flag;
 		}
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15:
-			return m_irqmask[offset-0x10];
+			return m_irqmask[offset & 7];
 
 		// K input ports
 		case 0x40: case 0x42:
@@ -761,18 +788,34 @@ void e0c6s46_device::io_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
-		// irq masks
+		// IRQ masks
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15:
 		{
 			static const u8 maskmask[6] = { 0xf, 3, 1, 1, 0xf, 0xf };
-			m_irqmask[offset-0x10] = data & maskmask[offset-0x10];
-			m_possible_irq = true;
+			u8 prev = m_irqmask[offset & 7];
+			m_irqmask[offset & 7] = data & maskmask[offset & 7];
+			u8 rise = ~prev & m_irqmask[offset & 7];
+
+			if (rise)
+			{
+				m_possible_irq = true;
+
+				if (offset >= 0x14)
+				{
+					u8 port = offset & 1;
+					u8 dfk = (port == 0) ? m_dfk0 : 0xf;
+
+					// IK flag gets set if input is active at rising edge of mask bit
+					if (rise & (m_port_k[port] ^ dfk))
+						m_irqflag[offset & 7] |= 1;
+				}
+			}
 			break;
 		}
 
 		// K input ports
 		case 0x41:
-			// d0-d3: K0x irq on 0: rising edge, 1: falling edge
+			// d0-d3: K0x IRQ on 0: rising edge, 1: falling edge
 			m_dfk0 = data;
 			break;
 
@@ -926,8 +969,8 @@ void e0c6s46_device::io_w(offs_t offset, u8 data)
 			// d1: envelope cycle selection
 			// d2: reset envelope
 			// d3: trigger one-shot buzzer
-			if (data & 1)
-				logerror("io_w enabled envelope, PC=$%04X\n", m_prev_pc);
+			if (~m_bz_envelope & data & 1 || data & 4)
+				reset_bz_envelope();
 			m_bz_envelope = data & 3;
 			m_bz_1shot_on |= data & 8;
 			break;

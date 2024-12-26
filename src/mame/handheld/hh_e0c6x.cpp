@@ -11,12 +11,15 @@ to play the games for a longer time. For the drivers that don't have an SVG
 screen, use -prescale or -nofilter to disable bilinear filtering.
 
 TODO:
-- stackch only LEFT and ON buttons work, both are bit 0, MCU opcode bug?
-- SVGs could be more accurate? it seems they're handmade instead of a 1:1 scan
-  like for eg. the Game & Watch LCDs
+- in stackch, you can still move around when the game is paused, maybe BTANB?
+- digimon external port is unemulated
 - alienfev unmapped reads/writes, or are they harmless?
+- SVGs could be more accurate? Instead of 1:1 scans like with Game & Watch,
+  they were created by tracing segments by hand from macro photos
+- redo tamamot SVG, LCD was not available and azya redrew it from online photos
 - add LCD deflicker like hh_sm510? see venusdm for example
-- hook up LCD contrast, does any game use it? (eg. for fade-out)
+- hook up LCD contrast, stackch and alienfev support user-defined contrast,
+  but it doesn't look like any game uses it for eg. fade-out
 
 *******************************************************************************/
 
@@ -45,6 +48,7 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -79,6 +83,12 @@ INPUT_CHANGED_MEMBER(hh_e0c6x_state::input_changed)
 	m_maincpu->set_input_line(param, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
+INPUT_CHANGED_MEMBER(hh_e0c6x_state::reset_button)
+{
+	// when an input is directly wired to MCU RESET pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 
 /*******************************************************************************
@@ -94,7 +104,8 @@ INPUT_CHANGED_MEMBER(hh_e0c6x_state::input_changed)
   * Seiko Epson E0C6S46 MCU under epoxy
   * 32*16 LCD screen + 8 custom segments, 1-bit sound
 
-  Generation 2 is on the exact same hardware.
+  Generation 2 is on the exact same hardware. It's nearly the same game, they
+  only changed the graphics.
 
 *******************************************************************************/
 
@@ -129,7 +140,7 @@ void tama_state::tama(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(32);
+	screen.set_refresh_hz(60);
 	screen.set_size(1119, 1080);
 	screen.set_visarea_full();
 
@@ -167,11 +178,12 @@ ROM_END
 
 /*******************************************************************************
 
-  Bandai Tamagotchi Angel (aka Angel Gotch in Japan)
-  * Seiko Epson E0C6S48
+  Bandai Tamagotchi Angel (Tenshitchi no Tamagotchi (aka Angel Gotch) in Japan)
+  * PCB label: TAL-1, 00-83520-001
+  * Seiko Epson E0C6S48 under epoxy
   * 32*16 LCD screen + 8 custom segments, 1-bit sound
 
-  Mothra no Tamagotch is on similar hardware.
+  Mothra no Tamagotchi is on similar hardware.
 
 *******************************************************************************/
 
@@ -206,7 +218,7 @@ void tamaang_state::tamaang(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(32);
+	screen.set_refresh_hz(60);
 	screen.set_size(1119, 1080);
 	screen.set_visarea_full();
 
@@ -233,6 +245,91 @@ ROM_START( tamamot )
 
 	ROM_REGION( 138289, "screen", 0)
 	ROM_LOAD( "tamamot.svg", 0, 138289, CRC(4e8210c2) SHA1(522536ae5bf744889c0d028c3a292bdf649f81e3) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Bandai Digital Monster (retroactively called Ver. 1)
+  * PCB label: TDM-1, 00-83830-001
+  * Seiko Epson E0C6S48 MCU under epoxy
+  * external port on P20, for connecting to another Digimon handheld
+  * 32*16 LCD screen + 8 custom segments, 1-bit sound
+
+  The sequels (Ver. 2 to Ver. 4) are on the same hardware, and are compatible
+  with eachother for battle mode.
+
+*******************************************************************************/
+
+class digimon_state : public hh_e0c6x_state
+{
+public:
+	digimon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_e0c6x_state(mconfig, type, tag)
+	{ }
+
+	void digimon(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( digimon )
+	PORT_INCLUDE( tama )
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(digimon_state::reset_button), 0) PORT_NAME("Reset")
+INPUT_PORTS_END
+
+// config
+
+void digimon_state::digimon(machine_config &config)
+{
+	// basic machine hardware
+	E0C6S48(config, m_maincpu, 32.768_kHz_XTAL);
+	m_maincpu->set_osc3(1'000'000);
+	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
+	m_maincpu->write_segs().set(FUNC(digimon_state::lcd_segment_w));
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1113, 1080);
+	screen.set_visarea_full();
+
+	config.set_default_layout(layout_hh_e0c6x_lcd);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( digimon )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "digimon.bin", 0x0000, 0x4000, CRC(08ffac1b) SHA1(1dde9b0aa81c8f4a1e22d3a79d4743833fc6cba7) )
+
+	ROM_REGION( 157940, "screen", 0)
+	ROM_LOAD( "digimon.svg", 0, 157940, CRC(91fc473e) SHA1(9c64e120b31d16455b87cffcad029082b5b98c2e) )
+ROM_END
+
+ROM_START( digimonv2 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "digimonv2.bin", 0x0000, 0x4000, CRC(19a9e54e) SHA1(ab860ca9f31f478532122cb9d20f59964a080a27) )
+
+	ROM_REGION( 157940, "screen", 0)
+	ROM_LOAD( "digimon.svg", 0, 157940, CRC(91fc473e) SHA1(9c64e120b31d16455b87cffcad029082b5b98c2e) )
+ROM_END
+
+ROM_START( digimonv3 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "digimonv3.bin", 0x0000, 0x4000, CRC(3000cf30) SHA1(0acd50e623e20d857e13bae150ac03405896cf2b) )
+
+	ROM_REGION( 157940, "screen", 0)
+	ROM_LOAD( "digimon.svg", 0, 157940, CRC(91fc473e) SHA1(9c64e120b31d16455b87cffcad029082b5b98c2e) )
 ROM_END
 
 
@@ -280,7 +377,7 @@ void alienfev_state::alienfev(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(32);
+	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(39, 16);
 	screen.set_visarea_full();
@@ -349,7 +446,7 @@ void venusdm_state::venusdm(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(32);
+	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32, 20);
 	screen.set_visarea_full();
@@ -386,6 +483,10 @@ ROM_END
   the 1992 Radio Shack catalog). Did E0C6S46 exist already, or is this a newer
   revision?
 
+  BTANB:
+  - it doesn't allow 2 button presses at the same time, making fast gameplay
+    impossible (eg. left or right + rotate button)
+
 *******************************************************************************/
 
 class stackch_state : public hh_e0c6x_state
@@ -405,7 +506,7 @@ static INPUT_PORTS_START( stackch )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_CHANGED_CB(0) PORT_NAME("Left / Level")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_CHANGED_CB(1) PORT_NAME("Down / Start")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_CHANGED_CB(2) PORT_NAME("Right / Height")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_CB(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_CB(3) PORT_NAME("Rotate / Contrast")
 
 	PORT_START("K1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_ON ) PORT_CHANGED_CB(4) PORT_NAME("On / Off")
@@ -426,7 +527,7 @@ void stackch_state::stackch(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_refresh_hz(32);
+	screen.set_refresh_hz(60);
 	screen.set_size(856, 1080);
 	screen.set_visarea_full();
 
@@ -457,14 +558,17 @@ ROM_END
 
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1997, tama,     0,      0,      tama,     tama,     tama_state,     empty_init, "Bandai", "Tamagotchi (Gen. 1, World)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1997, tamag2,   0,      0,      tama,     tama,     tama_state,     empty_init, "Bandai", "Tamagotchi (Gen. 2, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1997, tamaang,  0,      0,      tamaang,  tamaang,  tamaang_state,  empty_init, "Bandai", "Angel Gotch (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1997, tamamot,  0,      0,      tamaang,  tama,     tamaang_state,  empty_init, "Bandai", "Mothra no Tamagotch (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1997, tama,      0,       0,      tama,     tama,     tama_state,     empty_init, "Bandai", "Tamagotchi (Gen. 1, World)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1997, tamag2,    0,       0,      tama,     tama,     tama_state,     empty_init, "Bandai", "Tamagotchi (Gen. 2, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1997, tamaang,   0,       0,      tamaang,  tamaang,  tamaang_state,  empty_init, "Bandai", "Tenshitchi no Tamagotchi (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1997, tamamot,   0,       0,      tamaang,  tama,     tamaang_state,  empty_init, "Bandai", "Mothra no Tamagotchi (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1997, digimon,   0,       0,      digimon,  digimon,  digimon_state,  empty_init, "Bandai", "Digital Monster (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NODEVICE_LAN )
+SYST( 1998, digimonv2, 0,       0,      digimon,  digimon,  digimon_state,  empty_init, "Bandai", "Digital Monster Ver. 2 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NODEVICE_LAN )
+SYST( 1998, digimonv3, 0,       0,      digimon,  digimon,  digimon_state,  empty_init, "Bandai", "Digital Monster Ver. 3 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NODEVICE_LAN )
 
-SYST( 1997, alienfev, 0,      0,      alienfev, alienfev, alienfev_state, empty_init, "Epoch", "Chibi Pachi: Alien Fever", MACHINE_SUPPORTS_SAVE )
+SYST( 1997, alienfev,  0,       0,      alienfev, alienfev, alienfev_state, empty_init, "Epoch", "Chibi Pachi: Alien Fever", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1997, venusdm,  0,      0,      venusdm,  venusdm,  venusdm_state,  empty_init, "Nikko", "Beans Collection: Venus Diet Monogatari", MACHINE_SUPPORTS_SAVE )
+SYST( 1997, venusdm,   0,       0,      venusdm,  venusdm,  venusdm_state,  empty_init, "Nikko", "Beans Collection: Venus Diet Monogatari", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1991, stackch,  0,      0,      stackch,  stackch,  stackch_state,  empty_init, "Tandy Corporation", "Stack Challenge", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1991, stackch,   0,       0,      stackch,  stackch,  stackch_state,  empty_init, "Tandy Corporation", "Stack Challenge", MACHINE_SUPPORTS_SAVE )

@@ -159,6 +159,7 @@ private:
 	u8 m_bz_43_on;
 	u8 m_bz_freq;
 	u8 m_bz_envelope;
+	u8 m_bz_envelope_count;
 	u8 m_bz_duty_ratio;
 	u8 m_bz_1shot_on;
 	bool m_bz_1shot_running;
@@ -169,6 +170,8 @@ private:
 	void schedule_buzzer();
 	void reset_buzzer();
 	void clock_bz_1shot();
+	void clock_bz_envelope();
+	void reset_bz_envelope();
 
 	u32 m_osc1;
 	u32 m_osc3;

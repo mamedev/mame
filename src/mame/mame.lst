@@ -19147,6 +19147,9 @@ qkspeller                       // National Semiconductor
 
 @source:handheld/hh_e0c6x.cpp
 alienfev                        // Epoch
+digimon                         // Bandai
+digimonv2                       // Bandai
+digimonv3                       // Bandai
 stackch                         // Tandy Corporation
 tama                            // Bandai
 tamaang                         // Bandai
@@ -36907,6 +36910,7 @@ bmf_cn                          //
 bmf_de                          //
 bmf_fr                          //
 bmf_it                          //
+bmf_ita                         //
 bmf_jp                          //
 bmf_nl                          //
 bmf_nl302                       //
