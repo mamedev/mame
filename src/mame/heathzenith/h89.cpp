@@ -927,10 +927,10 @@ static void intr_ctrl_options(device_slot_interface &device)
 void h89_base_state::h89_left_cards(device_slot_interface &device)
 {
 	device.option_add("ss_parallel", H89BUS_SIGMASOFT_PARALLEL).machine_config(
-        [this](device_t *device)
-        {
-             downcast<sigmasoft_parallel_port &>(*device).set_tlbc(m_tlbc);
-        });
+		[this](device_t *device)
+		{
+			downcast<sigmasoft_parallel_port &>(*device).set_tlbc(m_tlbc);
+		});
 }
 
 

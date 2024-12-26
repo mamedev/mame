@@ -1822,7 +1822,7 @@ void heath_igc_tlb_device::sigma_w(u8 offset, u8 data)
 	}
 }
 
-u8 heath_igc_tlb_device::sigma_r(u8 offset) 
+u8 heath_igc_tlb_device::sigma_r(u8 offset)
 {
 	u8 val = 0;
 
