@@ -307,9 +307,19 @@ void xavix_state::xavix_1mb_extbus_map(address_map &map)
 	map(0x000000, 0x0fffff).mirror(0x700000).rom().region("bios", 0x00000);
 }
 
+void xavix_state::mainram_w(offs_t offset, uint8_t data)
+{
+	m_mainram[offset] = data;
+
+// trying to debug anpanmdx title screen issue
+//	if ((offset == 0x3d) && (data == 0x77))
+//		logerror("%s: writing 0x77 to 0x3d\n", machine().describe_context());
+}
+
+
 void xavix_state::xavix_lowbus_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().share("mainram");
+	map(0x0000, 0x3fff).ram().w(FUNC(xavix_state::mainram_w)).share("mainram");
 
 	// Memory Emulator / Text Array
 	map(0x4000, 0x4fff).rw(FUNC(xavix_state::xavix_memoryemu_txarray_r), FUNC(xavix_state::xavix_memoryemu_txarray_w));

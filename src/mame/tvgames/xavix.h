@@ -431,6 +431,7 @@ protected:
 	void colmix_sh_w(offs_t offset, uint8_t data);
 	void colmix_l_w(offs_t offset, uint8_t data);
 	void spriteram_w(offs_t offset, uint8_t data);
+	void mainram_w(offs_t offset, uint8_t data);
 	bool m_sprite_xhigh_ignore_hack;
 
 	void tmap1_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
