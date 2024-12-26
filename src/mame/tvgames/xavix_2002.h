@@ -22,12 +22,12 @@ public:
 	void init_xavmusic();
 
 private:
-	uint8_t read_extended_io0();
-	uint8_t read_extended_io1();
-	uint8_t read_extended_io2();
-	void write_extended_io0(uint8_t data);
-	void write_extended_io1(uint8_t data);
-	void write_extended_io2(uint8_t data);
+	uint8_t read_extended_io0(offs_t offset, uint8_t mem_mask);
+	uint8_t read_extended_io1(offs_t offset, uint8_t mem_mask);
+	uint8_t read_extended_io2(offs_t offset, uint8_t mem_mask);
+	void write_extended_io0(offs_t offset, uint8_t data, uint8_t mem_mask);
+	void write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask);
+	void write_extended_io2(offs_t offset, uint8_t data, uint8_t mem_mask);
 };
 
 class superxavix_super_tv_pc_state : public superxavix_state
@@ -49,18 +49,23 @@ private:
 	uint8_t stvpc_anport0_r() { return (m_mouse0x->read()^0x7f)+1; }
 	uint8_t stvpc_anport1_r() { return (m_mouse0y->read()^0x7f)+1; }
 
-	uint8_t read_extended_io0() { return 0x00; }
-	uint8_t read_extended_io1() { return 0x00; }
-	uint8_t read_extended_io2() { return 0x00; }
-	void write_extended_io0(uint8_t data) { logerror("%s: extio0_w %02x\n", machine().describe_context(), data); }
-	void write_extended_io1(uint8_t data) { logerror("%s: extio1_w %02x\n", machine().describe_context(), data); }
-	void write_extended_io2(uint8_t data)
+	uint8_t read_extended_io0(offs_t offset, uint8_t mem_mask) { return 0x00; }
+	uint8_t read_extended_io1(offs_t offset, uint8_t mem_mask) { return 0x00; }
+	uint8_t read_extended_io2(offs_t offset, uint8_t mem_mask) { return 0x00; }
+	void write_extended_io0(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: extio0_w %02x\n", machine().describe_context(), data); }
+	void write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask) { logerror("%s: extio1_w %02x\n", machine().describe_context(), data); }
+	void write_extended_io2(offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		logerror("%s: extio2_w %02x\n", machine().describe_context(), data);
-		if (data & 0x04)
-			m_rombank->set_entry(1);
-		else
-			m_rombank->set_entry(0);
+		{
+			if (mem_mask & 0x04)
+			{
+				if (data & 0x04)
+					m_rombank->set_entry(1);
+				else
+					m_rombank->set_entry(0);
+			}
+		}
 	}
 
 	virtual void xavix_extbus_map(address_map &map) override;

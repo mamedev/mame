@@ -298,42 +298,49 @@ INPUT_PORTS_END
 
 /* SuperXavix IO port handliner (per game) */
 
-uint8_t superxavix_i2c_jmat_state::read_extended_io0()
+uint8_t superxavix_i2c_jmat_state::read_extended_io0(offs_t offset, uint8_t mem_mask)
 {
 	LOG("%s: read_extended_io0\n", machine().describe_context());
 	return 0x00;
 }
 
-uint8_t superxavix_i2c_jmat_state::read_extended_io1()
+uint8_t superxavix_i2c_jmat_state::read_extended_io1(offs_t offset, uint8_t mem_mask)
 {
 	LOG("%s: read_extended_io1\n", machine().describe_context());
 
+	uint8_t ret = 0x00;
+
 	// reads this by reading the byte, then shifting right 4 times to place value into carry flag
-	return m_i2cmem->read_sda() << 3;
-	//return 0x00;
+	if (!(mem_mask & 0x08))
+		ret |= m_i2cmem->read_sda() << 3;
+
+	return ret;
 }
 
-uint8_t superxavix_i2c_jmat_state::read_extended_io2()
+uint8_t superxavix_i2c_jmat_state::read_extended_io2(offs_t offset, uint8_t mem_mask)
 {
 	LOG("%s: read_extended_io2\n", machine().describe_context());
 	return 0x00;
 }
 
-void superxavix_i2c_jmat_state::write_extended_io0(uint8_t data)
+void superxavix_i2c_jmat_state::write_extended_io0(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
 }
 
-void superxavix_i2c_jmat_state::write_extended_io1(uint8_t data)
+void superxavix_i2c_jmat_state::write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
 
-	m_i2cmem->write_sda((data & 0x08) >> 3);
-	m_i2cmem->write_scl((data & 0x10) >> 4);
+	if (mem_mask & 0x08)
+		m_i2cmem->write_sda((data & 0x08) >> 3);
+
+	if (mem_mask & 0x10)
+		m_i2cmem->write_scl((data & 0x10) >> 4);
 
 }
 
-void superxavix_i2c_jmat_state::write_extended_io2(uint8_t data)
+void superxavix_i2c_jmat_state::write_extended_io2(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG("%s: io2_data_w %02x\n", machine().describe_context(), data);
 }
