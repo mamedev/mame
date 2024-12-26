@@ -44,8 +44,15 @@ void xavix2002_io_device::pio_dir_w(offs_t offset, uint8_t data)
 	if (offset < 3)
 	{
 		m_sx_pio_dir[offset] = data;
-		pio_out_w(offset, m_sx_pio_out[offset]);
-		// update port?
+
+		// update output port after direction change?
+		switch (offset)
+		{
+			case 0: m_out0_cb(0, m_sx_pio_out[offset], m_sx_pio_dir[offset]); break;
+			case 1: m_out1_cb(0, m_sx_pio_out[offset], m_sx_pio_dir[offset]); break;
+			case 2: m_out2_cb(0, m_sx_pio_out[offset], m_sx_pio_dir[offset]); break;
+			default: break;
+		}
 	}
 }
 
