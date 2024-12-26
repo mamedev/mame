@@ -440,6 +440,7 @@ void atm_state::machine_reset()
 	m_beta->enable();
 	m_beta_drive_selected = 0;
 
+	m_port_fe_data = -1;
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
 	m_port_77_data = 0;
