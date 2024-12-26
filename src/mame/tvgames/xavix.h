@@ -690,6 +690,9 @@ private:
 	void superxavix_pal_saturation_w(uint8_t data, bool bitmap);
 	void superxavix_pal_lightness_w(uint8_t data, bool bitmap);
 
+	uint8_t bitmap_params_r(offs_t offset);
+	void bitmap_params_w(offs_t offset, uint8_t data);
+
 	void superxavix_crtc_1_w(offs_t offset, uint8_t data);
 	uint8_t superxavix_crtc_1_r(offs_t offset);
 	void superxavix_crtc_2_w(offs_t offset, uint8_t data);

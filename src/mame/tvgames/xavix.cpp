@@ -465,7 +465,7 @@ void superxavix_state::superxavix_lowbus_map(address_map &map)
 	map(0x6f80, 0x6f99).rw(FUNC(superxavix_state::superxavix_crtc_1_r), FUNC(superxavix_state::superxavix_crtc_1_w)).share("sx_crtc_1"); // Super XaviX CRTC?
 	map(0x6fa0, 0x6fa7).rw(FUNC(superxavix_state::superxavix_crtc_2_r), FUNC(superxavix_state::superxavix_crtc_2_w)).share("sx_crtc_2"); // maybe more CRTC regs?
 
-	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
+	map(0x6fb0, 0x6fc7).rw(FUNC(superxavix_state::bitmap_params_r), FUNC(superxavix_state::bitmap_params_w)).share("bmp_base");
 
 	// extended external bus stuff (possible banking control?)
 	map(0x7909, 0x7909).w(FUNC(superxavix_state::extended_extbus_reg0_w));

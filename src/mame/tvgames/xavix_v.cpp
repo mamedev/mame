@@ -144,6 +144,18 @@ uint8_t superxavix_state::superxavix_crtc_1_r(offs_t offset)
 	return m_sx_crtc_1[offset];
 }
 
+void superxavix_state::bitmap_params_w(offs_t offset, uint8_t data)
+{
+	logerror("%s bitmap_params_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_bmp_base[offset] = data;
+	// if anything changes these mid-screen we may need to trigger a partial update here
+}
+
+uint8_t superxavix_state::bitmap_params_r(offs_t offset)
+{
+	return m_bmp_base[offset];
+}
+
 void superxavix_state::superxavix_crtc_2_w(offs_t offset, uint8_t data)
 {
 	logerror("%s superxavix_crtc_2_w %02x %02x\n", machine().describe_context(), offset, data);
