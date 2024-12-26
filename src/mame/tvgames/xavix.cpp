@@ -310,10 +310,16 @@ void xavix_state::xavix_1mb_extbus_map(address_map &map)
 void xavix_state::mainram_w(offs_t offset, uint8_t data)
 {
 	m_mainram[offset] = data;
-
-// trying to debug anpanmdx title screen issue
-//	if ((offset == 0x3d) && (data == 0x77))
-//		logerror("%s: writing 0x77 to 0x3d\n", machine().describe_context());
+/*
+// trying to debug anpanmdx title screen issue 
+	if ((offset == 0x3d) && (data == 0x77))
+		logerror("%s: writing 0x77 to 0x3d\n", machine().describe_context());
+	if ((offset == 0x98) && (data == 0x77))
+		logerror("%s: writing 0x77 to 0x98\n", machine().describe_context());
+	if ((offset == 0x3f2) && (data == 0x77))
+		logerror("%s: writing 0x77 to 0x3f2\n", machine().describe_context());
+// but the unwanted? value of 0x77 is explicitly set by the code at 1c61c
+*/
 }
 
 
