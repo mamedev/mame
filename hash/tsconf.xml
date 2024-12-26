@@ -301,6 +301,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="streetfighter2">
+		<description>Street Fighter 2 (v1.1)</description>
+		<year>2023</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Black Cat"/>
+		<info name="developer" value="Marie Slip"/>
+		<info name="developer" value="n1k-o"/>
+		<part name="dump" interface="spectrum_snapshot">
+			<dataarea name="dump" size="3172352">
+				<rom name="SFv1.1.spg" size="3172352" crc="a46029fc" sha1="10a65e1ea8d1f756edfd670820afcb3f7a81f9dd" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="synchronization">
 		<description>Synchronization</description>
 		<year>201?</year>

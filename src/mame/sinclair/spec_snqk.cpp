@@ -2817,13 +2817,8 @@ void spectrum_state::setup_spg(const u8 *snapdata, u32 snapsize)
 		const u16 size = (BIT(data, 0, 5) + 1) * 512;
 		const u8 compression = BIT(data, 6, 2);
 
-		const u8 page = snapdata[SPG_BLOCK_INFO(b) + 2];
-		if (page > 0xdf)
-		{
-			logerror("Page %02x is not allowed\n", page);
-			return;
-		}
-		bank3_set_page(page);
+		data = snapdata[SPG_BLOCK_INFO(b) + 2];
+		bank3_set_page(data);
 
 		switch (compression)
 		{
