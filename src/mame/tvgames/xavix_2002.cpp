@@ -287,6 +287,15 @@ static INPUT_PORTS_START( anpanmdx )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( suprtvpc )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("MOUSE0X")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
+	PORT_MODIFY("MOUSE0Y")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+INPUT_PORTS_END
+
 /* SuperXavix IO port handliner (per game) */
 
 uint8_t superxavix_i2c_jmat_state::read_extended_io0()
@@ -449,6 +458,8 @@ void superxavix_super_tv_pc_state::superxavix_super_tv_pc(machine_config& config
 	m_xavix2002io->read_2_callback().set(FUNC(superxavix_super_tv_pc_state::read_extended_io2));
 	m_xavix2002io->write_2_callback().set(FUNC(superxavix_super_tv_pc_state::write_extended_io2));
 
+	m_anport->read_0_callback().set(FUNC(superxavix_super_tv_pc_state::stvpc_anport0_r));
+	m_anport->read_1_callback().set(FUNC(superxavix_super_tv_pc_state::stvpc_anport1_r));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "super_tv_pc_cart");
 	m_cart->set_width(GENERIC_ROM8_WIDTH);
@@ -810,10 +821,10 @@ CONS( 2008, udance,   0, 0, xavix2002, xavix, superxavix_state, init_xavix, "Tig
 
 // these have RAM in the usual ROM space (still needs handling) & also have an Atmel 24LC64,
 // this one (pet themed) boots to the desktop (as do the 'hamtaro' 'eccjr' cartridges)
-CONS( 2004, suprtvpc,    0,        0, superxavix_super_tv_pc,    xavix,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, suprtvpc,    0,        0, superxavix_super_tv_pc,    suprtvpc,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // hangs after 'loading' sequence
-CONS( 2006, suprtvpchk,  suprtvpc, 0, superxavix_super_tv_pc,    xavix,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Hello Kitty (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2006, suprtvpcdo,  suprtvpc, 0, superxavix_super_tv_pc,    xavix,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, suprtvpchk,  suprtvpc, 0, superxavix_super_tv_pc,    suprtvpc,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Hello Kitty (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, suprtvpcdo,  suprtvpc, 0, superxavix_super_tv_pc,    suprtvpc,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ドラえもん うごく！おえかき エポック社
 CONS( 2007, doradraw,  0, 0, superxavix_doradraw,    xavix,      superxavix_doradraw_state, init_doradraw, "Epoch / SSD Company LTD", "Doraemon Moving! Oekaki (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

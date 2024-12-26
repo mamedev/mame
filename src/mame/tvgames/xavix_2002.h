@@ -46,6 +46,9 @@ public:
 private:
 	virtual void machine_reset() override;
 
+	uint8_t stvpc_anport0_r() { return (m_mouse0x->read()^0x7f)+1; }
+	uint8_t stvpc_anport1_r() { return (m_mouse0y->read()^0x7f)+1; }
+
 	uint8_t read_extended_io0() { return 0x00; }
 	uint8_t read_extended_io1() { return 0x00; }
 	uint8_t read_extended_io2() { return 0x00; }
