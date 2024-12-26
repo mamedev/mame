@@ -312,24 +312,24 @@ ROM_START( digimon )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "digimon.bin", 0x0000, 0x4000, CRC(08ffac1b) SHA1(1dde9b0aa81c8f4a1e22d3a79d4743833fc6cba7) )
 
-	ROM_REGION( 157940, "screen", 0)
-	ROM_LOAD( "digimon.svg", 0, 157940, CRC(91fc473e) SHA1(9c64e120b31d16455b87cffcad029082b5b98c2e) )
+	ROM_REGION( 158040, "screen", 0)
+	ROM_LOAD( "digimon.svg", 0, 158040, CRC(0a6ad374) SHA1(e0bafc2c907dbe49e366ff76f2aef622e058f915) )
 ROM_END
 
 ROM_START( digimonv2 )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "digimonv2.bin", 0x0000, 0x4000, CRC(19a9e54e) SHA1(ab860ca9f31f478532122cb9d20f59964a080a27) )
 
-	ROM_REGION( 157940, "screen", 0)
-	ROM_LOAD( "digimon.svg", 0, 157940, CRC(91fc473e) SHA1(9c64e120b31d16455b87cffcad029082b5b98c2e) )
+	ROM_REGION( 158040, "screen", 0)
+	ROM_LOAD( "digimon.svg", 0, 158040, CRC(0a6ad374) SHA1(e0bafc2c907dbe49e366ff76f2aef622e058f915) )
 ROM_END
 
 ROM_START( digimonv3 )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "digimonv3.bin", 0x0000, 0x4000, CRC(3000cf30) SHA1(0acd50e623e20d857e13bae150ac03405896cf2b) )
 
-	ROM_REGION( 157940, "screen", 0)
-	ROM_LOAD( "digimon.svg", 0, 157940, CRC(91fc473e) SHA1(9c64e120b31d16455b87cffcad029082b5b98c2e) )
+	ROM_REGION( 158040, "screen", 0)
+	ROM_LOAD( "digimon.svg", 0, 158040, CRC(0a6ad374) SHA1(e0bafc2c907dbe49e366ff76f2aef622e058f915) )
 ROM_END
 
 
