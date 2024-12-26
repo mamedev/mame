@@ -20069,7 +20069,8 @@ rtpc020                         // IBM RT PC Model 020
 rtpc025                         // IBM RT PC Model 025
 rtpca25                         // IBM RT PC Model A25
 
-@source:ibm/system23.cpp		//IBM System/23 Datamaster
+@source:ibm/system23.cpp		// IBM System/23 Datamaster
+system23
 
 @source:ibm/thinkpad600.cpp
 thinkpad600                     // IBM Thinkpad 600
