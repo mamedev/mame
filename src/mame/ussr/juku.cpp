@@ -27,7 +27,6 @@
     - Network?
     - Ramdisk?
     - Memory extensions?
-    - Mouse!
 
 ***************************************************************************/
 
@@ -663,8 +662,8 @@ void juku_state::machine_start()
 	membank("ram_4000")->set_base(&m_ram[0x4000]);
 	membank("ram_c000")->set_base(&m_ram[0xc000]);
 
-        if (m_mouse.found() && strcmp(mconfig().options().mouse_device(), "none") != 0)
-                m_maincpu->space(AS_IO).install_read_handler(0x80, 0x80, read8smo_delegate(*m_mouse, FUNC(juku_mouse_device::mouse_port_r)));
+	if (m_mouse.found() && strcmp(mconfig().options().mouse_device(), "none") != 0)
+		m_maincpu->space(AS_IO).install_read_handler(0x80, 0x80, read8smo_delegate(*m_mouse, FUNC(juku_mouse_device::mouse_port_r)));
 
 	// register for save states
 	save_item(NAME(m_width));
@@ -787,8 +786,8 @@ void juku_state::juku(machine_config &config)
 	TTL74148(config, m_key_encoder, 0);
 
 	// E4701
-        JUKU_MOUSE(config, m_mouse);
-        m_mouse->int_handler().set(m_pic, FUNC(pic8259_device::ir6_w));
+	JUKU_MOUSE(config, m_mouse);
+	m_mouse->int_handler().set(m_pic, FUNC(pic8259_device::ir6_w));
 
 	// КР1818ВГ93 (for E6502 disk drive)
 	KR1818VG93(config, m_fdc, 16_MHz_XTAL/16);

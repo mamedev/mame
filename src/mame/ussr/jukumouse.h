@@ -20,7 +20,7 @@ protected:
 private:
 	required_ioport m_mouse_x, m_mouse_y, m_mouse_b;
 	uint8_t m_prev_mouse_x, m_prev_mouse_y;
-        uint8_t m_prev_byte;
+	uint8_t m_prev_byte;
 	devcb_write_line m_int_handler;        
 	emu_timer *m_mouse_timer;
 };

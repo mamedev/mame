@@ -4,8 +4,8 @@
 #include "emu.h"
 #include "jukumouse.h"
 
-#define VERBOSE 1
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -32,7 +32,7 @@ void juku_mouse_device::device_reset()
 {
 	m_prev_mouse_y = 0;
 	m_prev_mouse_x = 0;
-        m_prev_byte = 0;
+	m_prev_byte = 0;
 	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(1400));
 }
 
@@ -61,9 +61,9 @@ TIMER_CALLBACK_MEMBER( juku_mouse_device::poll_delta )
 	int dy = delta(m_prev_mouse_y, y);
 
 	if (dx != 0 || dy != 0 || (m_prev_byte & 0b11) != buttons) {
-                m_int_handler(CLEAR_LINE);
-                m_int_handler(ASSERT_LINE);
-        }
+		m_int_handler(CLEAR_LINE);
+		m_int_handler(ASSERT_LINE);
+	}
 }
 
 INPUT_PORTS_START( juku_mouse )
@@ -98,13 +98,13 @@ uint8_t juku_mouse_device::mouse_port_r()
 		data |= dx > 0 ? 0b00001000 : 0b00001100;
 		m_prev_mouse_x = x;
 	}
-        
-        if (dy != 0) {
+
+	if (dy != 0) {
 		data |= dy > 0 ? 0b00110000 : 0b00100000;
 		m_prev_mouse_y = y;
 	}
 
-        m_prev_byte = data;
+	m_prev_byte = data;
 
 	return data;
 }
