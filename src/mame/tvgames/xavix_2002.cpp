@@ -819,10 +819,8 @@ CONS( 2009, apmj2009, 0, 0, superxavix_i2c_24c16,    xavix_i2c,  superxavix_i2c_
 // has HT24LC16
 CONS( 2008, udance,   0, 0, xavix2002, xavix, superxavix_state, init_xavix, "Tiger / SSD Company LTD", "U-Dance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// these have RAM in the usual ROM space (still needs handling) & also have an Atmel 24LC64,
-// this one (pet themed) boots to the desktop (as do the 'hamtaro' 'eccjr' cartridges)
+// these have RAM in the usual ROM space & also have an Atmel 24LC64,
 CONS( 2004, suprtvpc,    0,        0, superxavix_super_tv_pc,    suprtvpc,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// hangs after 'loading' sequence
 CONS( 2006, suprtvpchk,  suprtvpc, 0, superxavix_super_tv_pc,    suprtvpc,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Hello Kitty (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2006, suprtvpcdo,  suprtvpc, 0, superxavix_super_tv_pc,    suprtvpc,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

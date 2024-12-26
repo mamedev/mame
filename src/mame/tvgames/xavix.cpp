@@ -2850,7 +2850,8 @@ CONS( 2005, has_wamg,  0,          0,  xavix_4mb,        has_wamg, xavix_state, 
 CONS( 2002, tak_geig,  0,          0,  xavix_4mb_nv,     tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // TVホッケー
-// playable but could do with better deadzome handling on the controls at least, and for some reason auto-center heads to the bottom left corner in breakout mode?
+// playable but could do with better deadzome handling on the controls at least
+// the trackball functionality works well in the menus, but not the games
 CONS( 2001, tom_tvho,  0,          0,  xavix_tom_tvho,   tom_tvho, xavix_tom_tvho_state, init_xavix,    "Tomy / SSD Company LTD",                       "TV Hockey (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // コメットさん☆ラブリンバトン
