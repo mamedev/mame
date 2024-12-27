@@ -2195,7 +2195,6 @@ void drcbe_c::output_parameter(drcbec_instruction **dstptr, void **immedptr, int
 {
 	drcbec_instruction *dst = *dstptr;
 	void *immed = *immedptr;
-	parameter temp_param;
 
 	switch (param.type())
 	{
@@ -2232,8 +2231,7 @@ void drcbe_c::output_parameter(drcbec_instruction **dstptr, void **immedptr, int
 
 		// convert mapvars to immediates
 		case parameter::PTYPE_MAPVAR:
-			temp_param = m_map.get_last_value(param.mapvar());
-			return output_parameter(dstptr, immedptr, size, temp_param);
+			return output_parameter(dstptr, immedptr, size, param.mapvar());
 
 		// memory just points to the memory
 		case parameter::PTYPE_MEMORY:
