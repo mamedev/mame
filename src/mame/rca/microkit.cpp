@@ -136,7 +136,6 @@ void microkit_state::ram_w(offs_t offset, uint8_t data)
 void microkit_state::machine_reset()
 {
 	m_resetcnt = 0;
-	m_maincpu->reset();
 }
 
 void microkit_state::machine_start()

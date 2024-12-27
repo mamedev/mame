@@ -294,7 +294,6 @@ void juicebox_state::machine_start()
 
 void juicebox_state::machine_reset()
 {
-	m_maincpu->reset();
 	smc_reset();
 }
 

@@ -719,8 +719,6 @@ void m20_state::machine_reset()
 	if(system_bios() > 0)  // bits have different meanings?
 		m_port21 &= ~8;
 
-	m_fd1797->reset();
-
 	memcpy(RAM, ROM, 8);  // we need only the reset vector
 	m_kbdi8251->write_cts(0);
 	if (m_apb)

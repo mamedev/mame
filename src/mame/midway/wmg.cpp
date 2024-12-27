@@ -427,7 +427,6 @@ void wmg_state::machine_reset()
 	m_wmg_d000 = 0xff;
 	m_port_select = 0;
 	wmg_c400_w(0);
-	m_maincpu->reset();
 }
 
 /*************************************

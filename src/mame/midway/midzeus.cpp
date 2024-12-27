@@ -238,7 +238,6 @@ void midzeus_state::machine_reset()
 {
 	memcpy(m_ram_base, memregion("maindata")->base(), 0x40000*4);
 	*m_ram_base <<= 1;
-	m_maincpu->reset();
 
 	m_cmos_protected = true;
 	memset(m_disk_asic_jr, 0x0, 0x10 * 4);

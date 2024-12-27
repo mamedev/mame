@@ -149,7 +149,6 @@ private:
 	required_shared_ptr<uint8_t> m_video_ram;
 
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	void via1_pa_w(uint8_t data);
 	void write_nfrd(int state);
@@ -683,17 +682,6 @@ void victor9k_state::machine_start()
 	}
 }
 
-void victor9k_state::machine_reset()
-{
-	m_maincpu->reset();
-	m_upd7201->reset();
-	m_ssda->reset();
-	m_via1->reset();
-	m_via2->reset();
-	m_via3->reset();
-	m_crtc->reset();
-	m_fdc->reset();
-}
 
 
 

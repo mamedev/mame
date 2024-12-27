@@ -88,8 +88,6 @@ void tricep_state::machine_reset()
 
 	memcpy((uint8_t*)m_ram.target(),bios,0x2000);
 
-	m_maincpu->reset();
-
 	m_mux = 0;
 }
 

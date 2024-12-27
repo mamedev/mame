@@ -767,9 +767,6 @@ void newbrain_state::machine_start()
 
 void newbrain_state::machine_reset()
 {
-	m_maincpu->reset();
-	m_cop->reset();
-
 	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_cop->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 

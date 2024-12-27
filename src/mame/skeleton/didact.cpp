@@ -276,7 +276,6 @@ void md6802_state::machine_start()
 void md6802_state::machine_reset()
 {
 	LOG("--->%s()\n", FUNCNAME);
-	m_maincpu->reset();
 }
 
 // This address map is traced from schema
@@ -467,7 +466,6 @@ int mp68a_state::pia2_cb1_r()
 void mp68a_state::machine_reset()
 {
 	LOG("--->%s()\n", FUNCNAME);
-	m_maincpu->reset();
 }
 
 void mp68a_state::machine_start()
@@ -633,8 +631,6 @@ void modulab_state::io_w(offs_t offset, u8 data)
 void modulab_state::machine_reset()
 {
 	LOG("--->%s()\n", FUNCNAME);
-
-	m_maincpu->reset();
 }
 
 void modulab_state::machine_start()
@@ -774,7 +770,7 @@ INPUT_CHANGED_MEMBER(didact_state::trigger_reset)
 	if (newval == CLEAR_LINE)
 	{
 		LOGKBD("RESET is released, resetting the CPU\n");
-		machine_reset();
+		m_maincpu->reset();
 		m_shift = 0;
 		m_led = 0;
 	}

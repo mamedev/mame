@@ -180,8 +180,6 @@ void bfmsys85_state::machine_reset()
 	m_mux_input_strobe  = 0;
 	m_mux_input         = 0;
 
-	m_vfd->reset(); // reset display1
-
 	m_locked          = 0x00; // hardware is open
 }
 

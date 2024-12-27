@@ -261,7 +261,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint32_t midvplus_misc_r(offs_t offset);

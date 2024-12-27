@@ -1019,8 +1019,6 @@ void v1050_state::machine_reset()
 	bankswitch();
 
 	set_baud_sel(0);
-
-	m_fdc->reset();
 }
 
 // Machine Driver

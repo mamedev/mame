@@ -1105,7 +1105,6 @@ void jpmsys5_state::machine_reset()
 {
 	m_acia6850[2]->write_rxd(1);
 	m_acia6850[2]->write_dcd(0);
-	m_vfd->reset();
 }
 
 

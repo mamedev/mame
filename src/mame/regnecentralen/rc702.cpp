@@ -170,7 +170,6 @@ void rc702_state::machine_reset()
 	m_7474->preset_w(1);
 	m_fdc->set_ready_line_connected(1); // always ready for minifloppy; controlled by fdc for 20cm
 	m_fdc->set_unscaled_clock(4000000); // 4MHz for minifloppy; 8MHz for 20cm
-	m_maincpu->reset();
 }
 
 void rc702_state::machine_start()

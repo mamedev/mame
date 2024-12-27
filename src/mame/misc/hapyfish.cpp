@@ -476,7 +476,6 @@ void hapyfish_state::machine_start()
 
 void hapyfish_state::machine_reset()
 {
-	m_maincpu->reset();
 	std::fill(std::begin(m_port), std::end(m_port), 0);
 	m_nand_select = true; // select NAND #1
 	m_i2c_sda_in = 1;

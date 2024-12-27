@@ -50,7 +50,6 @@ private:
 	required_ioport m_peny;
 
 	uint32_t m_port[9] = { };
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	uint32_t s3c2440_gpio_port_r(offs_t offset);
@@ -198,13 +197,8 @@ INPUT_CHANGED_MEMBER(mini2440_state::mini2440_input_changed)
 
 // ...
 
-void mini2440_state::machine_start()
-{
-}
-
 void mini2440_state::machine_reset()
 {
-	m_maincpu->reset();
 	memset( m_port, 0, sizeof( m_port));
 }
 

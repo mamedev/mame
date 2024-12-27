@@ -224,7 +224,6 @@ void ts816_state::machine_reset()
 	m_term_data = 0;
 	m_status = 1;
 	set_banks();
-	m_maincpu->reset();
 }
 
 // correct order yet to be determined

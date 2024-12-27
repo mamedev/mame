@@ -697,10 +697,6 @@ void osc1000b_state::machine_start()
 	save_item(NAME(m_keylatch));
 }
 
-void osc1000b_state::machine_reset()
-{
-}
-
 // Telmac 2000
 
 void tmc2000_state::machine_start()

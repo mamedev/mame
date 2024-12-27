@@ -99,7 +99,6 @@ void balsente_state::machine_reset()
 	m_bankab->set_entry(0);
 	m_bankcd->set_entry(0);
 	m_bankef->set_entry(0);
-	m_maincpu->reset();
 
 	/* start a timer to generate interrupts */
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));

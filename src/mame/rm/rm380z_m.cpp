@@ -339,7 +339,6 @@ void rm380z_state::machine_reset()
 	m_fbfe = 0x00;
 
 	config_memory_map();
-	m_fdc->reset();
 }
 
 void rm380z_state_cos34::machine_reset()

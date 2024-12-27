@@ -793,9 +793,7 @@ void dgn_beta_state::machine_reset()
 	m_DMA_NMI_LAST = 0x80;       /* start with DMA NMI inactive, as pulled up */
 //  DMA_NMI = CLEAR_LINE;       /* start with DMA NMI inactive */
 
-	m_wd2797_written=0;
-
-	m_maincpu->reset();
+	m_wd2797_written = 0;
 }
 
 void dgn_beta_state::machine_start()

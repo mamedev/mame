@@ -1132,8 +1132,6 @@ void youmab_state::machine_start()
 
 void galivan_state::machine_reset()
 {
-	m_maincpu->reset();
-
 	m_layers = 0;
 	m_scrollx[0] = m_scrollx[1] = 0;
 	m_scrolly[0] = m_scrolly[1] = 0;
@@ -1141,8 +1139,6 @@ void galivan_state::machine_reset()
 
 void ninjemak_state::machine_reset()
 {
-	m_maincpu->reset();
-
 	m_scrollx = 0;
 	m_scrolly = 0;
 	m_dispdisable = 0;

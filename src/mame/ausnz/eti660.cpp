@@ -301,7 +301,6 @@ void eti660_state::pia_pa_w(u8 data)
 void eti660_state::machine_reset()
 {
 	m_resetcnt = 0;
-	m_maincpu->reset();  // needed
 }
 
 void eti660_state::machine_start()

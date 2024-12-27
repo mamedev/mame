@@ -94,7 +94,6 @@ void spg2xx_game_mysprt_plus_state::machine_reset()
 	m_bank_enabled = 0;
 
 	m_maincpu->invalidate_cache();
-	m_maincpu->reset();
 }
 
 void spg2xx_game_mysprt_orig_state::machine_reset()
@@ -106,7 +105,6 @@ void spg2xx_game_mysprt_orig_state::machine_reset()
 	m_bank_enabled = 0;
 
 	m_maincpu->invalidate_cache();
-	m_maincpu->reset();
 }
 
 static INPUT_PORTS_START( mysprtch ) // Down + Button 1 and Button 2 for service mode

@@ -31,8 +31,6 @@ void nes_state::machine_reset()
 	// Reset the mapper variables. Will also mark the char-gen ram as dirty
 	if (m_cartslot)
 		m_cartslot->pcb_reset();
-
-	m_maincpu->reset();
 }
 
 //-------------------------------------------------

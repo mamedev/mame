@@ -490,9 +490,6 @@ void bfm_sc2_state::on_scorpion2_reset()
 
 	e2ram_reset();
 
-	if (m_ym2413)
-		m_ym2413->reset();
-
 	// make sure no inputs are overidden ////////////////////////////////////
 	memset(m_input_override, 0, sizeof(m_input_override));
 
@@ -1458,10 +1455,7 @@ int bfm_sc2_state::read_e2ram()
 void bfm_sc2_vid_state::machine_reset()
 {
 	// reset the board //////////////////////////////////////////////////////
-
 	on_scorpion2_reset();
-	m_vfd0->reset();
-	m_vfd1->reset();
 }
 
 
@@ -2822,8 +2816,6 @@ void bfm_sc2_state::bfmdm01_busy(int state)
 void bfm_sc2_awp_state::machine_reset()
 {
 	on_scorpion2_reset();
-	m_vfd0->reset();
-	m_vfd1->reset();
 }
 
 

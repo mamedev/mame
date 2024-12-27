@@ -460,7 +460,6 @@ void bmjr_state::machine_reset()
 	m_basic_view.select(0);
 	m_printer_view.select(0);
 	m_monitor_view.select(0);
-	m_maincpu->reset();
 }
 
 void bmjr_state::bmjr(machine_config &config)

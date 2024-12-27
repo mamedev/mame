@@ -458,7 +458,6 @@ void bitgraph_state::machine_start()
 
 void bitgraph_state::machine_reset()
 {
-	m_maincpu->reset();
 	m_misccr = 0;
 	m_pia_a = 0;
 	m_pia_b = 0;

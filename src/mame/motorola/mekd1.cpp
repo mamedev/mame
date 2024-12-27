@@ -369,8 +369,6 @@ void mekd1_state::write_f13_clock(int state)
 
 void mekd1_state::machine_reset()
 {
-	m_pia0->reset();
-	m_pia1->reset();
 	m_brg->rsa_w(CLEAR_LINE);
 	m_brg->rsb_w(ASSERT_LINE);
 	m_bit_rate_timer->reset();

@@ -557,9 +557,6 @@ void ep64_state::machine_start()
 
 void ep64_state::machine_reset()
 {
-	m_dave->reset();
-	m_nick->reset();
-
 	wr0_w(0);
 	subdevice<output_latch_device>("cent_data_out")->write(0);
 	wr2_w(0);

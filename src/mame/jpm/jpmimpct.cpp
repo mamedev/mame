@@ -265,9 +265,6 @@ void jpmimpct_state::machine_start()
 void jpmimpct_state::machine_reset()
 {
 	/* Reset states */
-	if (m_vfd)
-		m_vfd->reset();
-
 	m_coinstate = 0xffff;
 }
 

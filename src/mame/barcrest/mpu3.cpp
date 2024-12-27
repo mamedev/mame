@@ -314,8 +314,6 @@ void mpu3_state::update_triacs()
 /* called if board is reset */
 void mpu3_state::machine_reset()
 {
-	m_vfd->reset();
-
 	m_lamp_strobe   = 0;
 	m_led_strobe    = 0;
 

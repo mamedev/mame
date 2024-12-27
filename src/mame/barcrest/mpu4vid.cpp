@@ -1891,8 +1891,6 @@ void mpu4vid_state::machine_start()
 
 void mpu4vid_state::machine_reset()
 {
-	m_vfd->reset(); //for debug ports only
-
 	m_lamp_strobe    = 0;
 	m_lamp_strobe2   = 0;
 	m_led_strobe     = 0;

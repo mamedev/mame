@@ -207,7 +207,6 @@ void gladiatr_state::machine_reset()
 {
 	// 6809 bank memory set
 	m_adpcmbank->set_entry(0);
-	m_audiocpu->reset();
 }
 
 /* YM2203 port B handler (output) */

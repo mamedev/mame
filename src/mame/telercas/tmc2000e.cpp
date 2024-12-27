@@ -272,12 +272,6 @@ void tmc2000e_state::machine_start()
 	save_item(NAME(m_keylatch));
 }
 
-void tmc2000e_state::machine_reset()
-{
-	m_cti->reset();
-
-	// reset program counter to 0xc000
-}
 
 /* Machine Drivers */
 

@@ -675,7 +675,6 @@ void itech8_state::machine_reset()
 	if (m_mainbank)
 	{
 		m_mainbank->set_entry(0 ^ m_bankxor);
-		m_maincpu->reset();
 	}
 
 	// set the visible area

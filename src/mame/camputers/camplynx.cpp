@@ -745,7 +745,6 @@ void camplynx_state::machine_reset()
 		port82_w( 0 );
 	else
 		port7f_w( 0 );
-	m_maincpu->reset();
 }
 
 MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )

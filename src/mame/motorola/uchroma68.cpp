@@ -403,8 +403,6 @@ void uchroma68_state::machine_start()
 
 void uchroma68_state::machine_reset()
 {
-	m_mc6846->reset();
-	m_pia->reset();
 	m_kbd_strobe_timer->reset();
 	m_kbd_strobe = 1;
 	m_kbd_data = 0;

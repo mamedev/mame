@@ -606,9 +606,7 @@ void pinball2k_state::machine_start()
 void pinball2k_state::machine_reset()
 {
 	uint8_t *rom = memregion("bios")->base();
-
 	memcpy(m_bios_ram, rom, 0x40000);
-	m_maincpu->reset();
 }
 
 void pinball2k_state::ramdac_map(address_map &map)

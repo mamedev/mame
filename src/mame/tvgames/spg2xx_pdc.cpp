@@ -157,7 +157,6 @@ void spg2xx_pdc_game_state::machine_reset()
 {
 	m_current_bank = -1;
 	switch_bank(m_numbanks - 1); // pdc100 must boot from upper bank
-	m_maincpu->reset();
 }
 
 // pdc100 simply writes 0000 at times during bootup while initializing stuff, which causes an invalid bankswitch mid-code execution

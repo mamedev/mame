@@ -61,7 +61,6 @@ private:
 	uint32_t m_port[9];
 	required_device<s3c2440_device> m_s3c2440;
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<gf4500_device> m_gf4500;
 	uint32_t s3c2440_gpio_port_r(offs_t offset);
@@ -147,10 +146,6 @@ void gizmondo_state::machine_start()
 	m_port[S3C2440_GPIO_PORT_D] = 0x4F60;
 }
 
-void gizmondo_state::machine_reset()
-{
-	m_maincpu->reset();
-}
 
 /*******************************************************************************
     ADDRESS MAPS

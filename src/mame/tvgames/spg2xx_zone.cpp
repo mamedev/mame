@@ -183,7 +183,6 @@ void zone40_state::machine_reset()
 	wireless60_state::machine_reset();
 	m_z40_rombase = 0x1e0;
 	m_maincpu->invalidate_cache();
-	m_maincpu->reset();
 }
 
 static INPUT_PORTS_START( wirels60 )

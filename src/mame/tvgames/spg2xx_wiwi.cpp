@@ -164,7 +164,6 @@ void spg2xx_game_marc250_state::machine_reset()
 {
 	spg2xx_game_marc101_state::machine_reset();
 	switch_bank(31);
-	m_maincpu->reset();
 
 	m_pulse_timer2->adjust(attotime::never);
 	m_toggle2 = false;

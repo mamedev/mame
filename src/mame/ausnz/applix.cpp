@@ -708,7 +708,6 @@ void applix_state::machine_reset()
 	membank("bank1")->set_entry(0);
 	m_p3 = 0xff;
 	m_last_write_addr = 0;
-	m_maincpu->reset();
 }
 
 void applix_state::floppy_formats(format_registration &fr)

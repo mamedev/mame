@@ -799,9 +799,6 @@ void vixen_state::machine_reset()
 	m_cmd_d1 = 0;
 	update_interrupt();
 
-	m_fdc->reset();
-	m_io_i8155->reset();
-	m_usart->reset();
 	m_maincpu->set_state_int(Z80_PC, 0xf000);
 }
 

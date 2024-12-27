@@ -110,15 +110,6 @@ void midvunit_base_state::machine_reset()
 	m_dcs->reset_w(1);
 
 	memcpy(m_ram_base, memregion("maindata")->base(), 0x20000*4);
-	m_maincpu->reset();
-}
-
-
-void midvplus_state::machine_reset()
-{
-	midvunit_base_state::machine_reset();
-
-	m_ata->reset();
 }
 
 

@@ -52,7 +52,6 @@ private:
 	required_device<pit68230_device> m_pit;
 	required_device<msm58321_device> m_rtc;
 
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	void m68k_reset_callback(int state);
@@ -74,9 +73,6 @@ private:
 	u8 m_h4;
 };
 
-void micro20_state::machine_start()
-{
-}
 
 void micro20_state::machine_reset()
 {
@@ -85,7 +81,6 @@ void micro20_state::machine_reset()
 
 	pRAM[0] = pROM[2];
 	pRAM[1] = pROM[3];
-	m_maincpu->reset();
 
 	m_tin = 0;
 }

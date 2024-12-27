@@ -653,8 +653,6 @@ void bfm_sc1_state::machine_reset()
 	m_mux2_datahi         = 0;
 	m_mux2_input        = 0;
 
-	m_vfd0->reset();
-
 	m_acia_status   = 0x02; // MC6850 transmit buffer empty !!!
 	m_locked          = 0x07; // hardware is locked
 

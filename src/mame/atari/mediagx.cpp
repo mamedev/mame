@@ -861,7 +861,6 @@ void mediagx_state::machine_reset()
 {
 	uint8_t *rom = memregion("bios")->base();
 	memcpy(m_bios_ram, rom, 0x40000);
-	m_maincpu->reset();
 
 	timer_device *sound_timer = subdevice<timer_device>("sound_timer");
 	sound_timer->adjust(attotime::from_msec(10));

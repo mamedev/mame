@@ -69,8 +69,6 @@ private:
 	required_device_array<floppy_connector, 3> m_floppy;
 	required_device<nscsi_callback_device> m_sasi;
 
-	virtual void machine_reset() override ATTR_COLD;
-
 	static void floppy_formats(format_registration &fr);
 
 	void program_map(address_map &map) ATTR_COLD;
@@ -89,11 +87,6 @@ void x37_state::cpu_space_map(address_map &map)
 
 static INPUT_PORTS_START( x37 )
 INPUT_PORTS_END
-
-void x37_state::machine_reset()
-{
-	m_fpu->reset();
-}
 
 static void x37_floppies(device_slot_interface &device)
 {

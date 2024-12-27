@@ -210,7 +210,6 @@ void dagz80_state::machine_reset()
 	uint8_t* rom = memregion("user1")->base();
 	uint16_t size = memregion("user1")->bytes();
 	memcpy(m_p_ram, rom, size);
-	m_maincpu->reset();
 }
 
 void selz80_state::scanlines_w(uint8_t data)

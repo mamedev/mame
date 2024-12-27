@@ -400,8 +400,6 @@ void pyl601_state::machine_reset()
 	membank("bank3")->set_base(ram + 0xe000);
 	membank("bank4")->set_base(ram + 0xe700);
 	membank("bank6")->set_base(ram + 0xf000);
-
-	m_maincpu->reset();
 }
 
 void pyl601_state::machine_start()

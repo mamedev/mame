@@ -99,7 +99,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	/* keyboard state */
 	int m_keylatch = 0;

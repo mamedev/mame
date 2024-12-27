@@ -270,7 +270,6 @@ void palmz22_state::machine_start()
 
 void palmz22_state::machine_reset()
 {
-	m_maincpu->reset();
 	memset( m_port, 0, sizeof( m_port));
 }
 

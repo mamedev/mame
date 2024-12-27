@@ -61,8 +61,6 @@ public:
 
 	void init_proconn();
 
-protected:
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	template <unsigned N> void ay_w(uint8_t data) { m_ay->address_data_w(N, data); }
@@ -264,10 +262,6 @@ static const z80_daisy_config z80_daisy_chain[] =
 	{ nullptr }
 };
 
-void proconn_state::machine_reset()
-{
-	m_vfd->reset(); // reset display1
-}
 
 void proconn_state::proconn(machine_config &config)
 {

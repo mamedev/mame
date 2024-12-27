@@ -433,8 +433,6 @@ void excali64_state::machine_reset()
 	m_bankw[1]->set_entry(2); // write to videoram
 	m_bankw[2]->set_entry(2); // write to videoram hires pointers
 	m_bankw[3]->set_entry(0); // write to RAM
-
-	m_maincpu->reset();
 }
 
 void excali64_state::machine_start()

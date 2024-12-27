@@ -414,8 +414,6 @@ void zorba_state::machine_reset()
 	m_pia0->cb1_w(m_printer_prowriter ? m_printer_select : m_printer_fault);
 
 	m_bank1->set_entry(1);
-
-	m_maincpu->reset();
 }
 
 

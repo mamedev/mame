@@ -812,17 +812,6 @@ void plus4_state::machine_start()
 
 void plus4_state::machine_reset()
 {
-	m_maincpu->reset();
-
-	m_iec->reset();
-
-	if (m_acia)
-	{
-		m_acia->reset();
-	}
-
-	m_exp->reset();
-
 	if (m_user)
 	{
 		m_user->write_3(0);

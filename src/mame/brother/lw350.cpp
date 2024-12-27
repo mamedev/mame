@@ -417,7 +417,6 @@ void lw350_state::machine_start()
 void lw350_state::machine_reset()
 {
 	io_90 = 0x00;
-	fdc->reset();
 	fdc_drq = 0;
 }
 

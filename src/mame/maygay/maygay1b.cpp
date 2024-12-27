@@ -101,8 +101,7 @@
 
 void maygay1b_state::machine_reset()
 {
-	m_vfd->reset(); // reset display1
-	m_Vmm=false;
+	m_Vmm = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////

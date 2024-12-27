@@ -265,7 +265,6 @@ protected:
 	required_device<screen_device> m_screen;
 
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t dispon_r();
 	void keylatch_w(uint8_t data);
@@ -322,7 +321,6 @@ private:
 	required_device<cdp1864_device> m_cti;
 
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	void dma_w(offs_t offset, uint8_t data);
 	int rdata_r();
@@ -419,7 +417,7 @@ INPUT_CHANGED_MEMBER( studio2_state::reset_w )
 {
 	if (oldval && !newval)
 	{
-		machine_reset();
+		m_vdc->reset();
 	}
 }
 
@@ -577,16 +575,6 @@ void mpt02_state::machine_start()
 
 	// register for state saving
 	save_item(NAME(m_keylatch));
-}
-
-void studio2_state::machine_reset()
-{
-	m_vdc->reset();
-}
-
-void mpt02_state::machine_reset()
-{
-	m_cti->reset();
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )

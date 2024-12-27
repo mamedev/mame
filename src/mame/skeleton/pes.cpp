@@ -141,7 +141,6 @@ void pes_state::rx_w(int state)
 void pes_state::machine_reset()
 {
 	m_port3 = 0; // reset the openbus state of port 3
-	m_speech->reset(); // reset the 5220
 }
 
 

@@ -462,7 +462,6 @@ void missb2_state::machine_reset()
 {
 	MACHINE_RESET_CALL_MEMBER(common);
 
-	m_oki->reset();
 	bublbobl_bankswitch_w(0x00); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
 

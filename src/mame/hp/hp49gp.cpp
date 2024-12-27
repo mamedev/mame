@@ -47,8 +47,6 @@ private:
 	required_device<s3c2410_device> m_s3c2410;
 	required_shared_ptr<uint32_t> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	uint32_t s3c2410_gpio_port_r(offs_t offset);
 	void s3c2410_gpio_port_w(offs_t offset, uint32_t data);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
@@ -251,17 +249,6 @@ void hp49gp_state::s3c2410_gpio_port_w(offs_t offset, uint32_t data)
 INPUT_CHANGED_MEMBER(hp49gp_state::port_changed)
 {
 	m_s3c2410->s3c2410_request_eint(param + 8);
-}
-
-// ...
-
-void hp49gp_state::machine_start()
-{
-}
-
-void hp49gp_state::machine_reset()
-{
-	m_maincpu->reset();
 }
 
 /***************************************************************************

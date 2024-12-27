@@ -122,7 +122,6 @@ public:
 	required_ioport m_s8;
 
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t pcs6_0_1_r(offs_t offset, uint16_t mem_mask = ~0);
 	void pcs6_0_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -714,21 +713,6 @@ void compis_state::machine_start()
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_select));
 	save_item(NAME(m_tmr0));
-}
-
-
-//-------------------------------------------------
-//  machine_reset
-//-------------------------------------------------
-
-void compis_state::machine_reset()
-{
-	m_uart->reset();
-	m_mpsc->reset();
-	m_ppi->reset();
-	m_graphics->reset();
-	m_isbx0->reset();
-	m_isbx1->reset();
 }
 
 

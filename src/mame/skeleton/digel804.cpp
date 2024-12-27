@@ -94,7 +94,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	void op00(uint8_t data);
 	uint8_t ip40();
@@ -209,11 +208,6 @@ void digel804_state::machine_start()
 	m_keyen_state = 1; // /KEYEN
 
 	m_rambank->set_base(m_ram->pointer());
-}
-
-void digel804_state::machine_reset()
-{
-	m_vfd->reset();
 }
 
 uint8_t digel804_state::ip40() // eprom data bus read

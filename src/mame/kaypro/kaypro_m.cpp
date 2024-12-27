@@ -276,7 +276,6 @@ void kaypro_state::machine_reset()
 	m_bank3->set_entry(1); // point at video ram
 	m_system_port = 0x80;
 	m_fdc_rq = 0;
-	m_maincpu->reset();
 	m_floppy_timer->adjust(attotime::from_hz(1));   /* kick-start the nmi timer */
 }
 
