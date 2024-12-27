@@ -731,6 +731,15 @@ ROM_START( suprtvpcdo )
 	ROM_CONTINUE(0x400000, 0x200000)
 ROM_END
 
+ROM_START( epo_ntpj )
+	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("ntpj.u6", 0x000000, 0x800000, CRC(6ce02166) SHA1(21c2ed48014e66123bb9968648984f82de361e2a) )
+
+	// uses IS24C64 EEPROM
+
+	// there is extra hardware for the Piano side of things which may or may not have ROM data in it		
+ROM_END
+
 ROM_START( doradraw )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("dmdj.u2", 0x000000, 0x800000, CRC(b3ca50ab) SHA1(9e6d28c1e170d3556e3c4ddcefb4cb51fd100df5) )
@@ -830,6 +839,9 @@ CONS( 2008, udance,   0, 0, xavix2002, xavix, superxavix_state, init_xavix, "Tig
 CONS( 2004, suprtvpc,    0,        0, superxavix_super_tv_pc,    suprtvpc,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2006, suprtvpchk,  suprtvpc, 0, superxavix_super_tv_pc,    suprtvpc,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Hello Kitty (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2006, suprtvpcdo,  suprtvpc, 0, superxavix_super_tv_pc,    suprtvpc,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// similar to Super TV-PC but with additional built in piano
+CONS( 2008, epo_ntpj,  0, 0, superxavix_super_tv_pc, suprtvpc, superxavix_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Hello Kitty Piano PC (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ドラえもん うごく！おえかき エポック社
 CONS( 2007, doradraw,  0, 0, superxavix_doradraw,    xavix,      superxavix_doradraw_state, init_doradraw, "Epoch / SSD Company LTD", "Doraemon Moving! Oekaki (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
