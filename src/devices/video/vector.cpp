@@ -50,7 +50,7 @@
 
 
 #define VECTOR_WIDTH_DENOM 512
-#define DOT_BITMAP_SIZE 32
+#define DOT_BITMAP_SIZE 16
 
 // 20000 is needed for mhavoc (see MT 06668) 10000 is enough for other games
 #define MAX_POINTS 20000
@@ -93,16 +93,15 @@ void vector_device::device_start()
 	/* allocate memory for tables */
 	m_vector_list = std::make_unique<point[]>(MAX_POINTS);
 
-	// Draw a soft circle texture for vector points.
+	// Draw a circle texture for vector points.
 	const float mid = (DOT_BITMAP_SIZE - 1) * 0.5f;
 	for (int y = 0; y < DOT_BITMAP_SIZE; y++)
 	{
 		for (int x = 0; x < DOT_BITMAP_SIZE; x++)
 		{
-			// Radial distance squared on the unit circle.
-			float dist_sq = ((x - mid) * (x - mid) + (y - mid) * (y - mid)) / (mid * mid);
-			// These constants make a circle with diameter roughly 1/3 the texture width.
-			float bright = fmaxf(0, fminf(255, expf(-dist_sq * 3) * 320.0f));
+			float center_dist = sqrtf((x - mid) * (x - mid) + (y - mid) * (y - mid));
+			float edge_dist = DOT_BITMAP_SIZE * 0.5f - center_dist;
+			float bright = fmaxf(0, fminf(255, edge_dist * 255.0f));
 			m_dot_bitmap.pix(y, x) = rgb_t(255, bright, bright, bright);;
 		}
 	}
@@ -215,10 +214,9 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			if (lastx == curpoint->x && lasty == curpoint->y) {
 				// apply point scale for points.
 				beam_width *= vector_options::s_beam_dot_size;
-				// The main circle fills 1/3 of the texture width,
-				// so scale by 3X, or 1.5X in each direction.
-				const float beam_x = beam_width * 1.5f * (xscale / yscale);
-				const float beam_y = beam_width * 1.5f;
+				// Shift by half the beam width in each direction.
+				const float beam_x = beam_width * 0.5f * (xscale / yscale);
+				const float beam_y = beam_width * 0.5f;
 				// Make dots twice as bright as lines.
 				const int dot_intensity = std::min(255, curpoint->intensity * 2);
 				screen.container().add_quad(
