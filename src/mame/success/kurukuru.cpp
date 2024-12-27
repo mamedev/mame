@@ -17,7 +17,7 @@
 
   Pyon Pyon series:
 
-  ぴょんぴょん (Pyon Pyon),                1988 Success / Taiyo Jidoki.
+  ぴょんぴょん (Pyon Pyon),               1988 Success / Taiyo Jidoki.
   くるくるぴょんぴょん (Kuru Kuru Pyon Pyon), 1990 Success / Taiyo Jidoki.
   ぴょんぴょんジャンプ (Pyon Pyon Jump),     1991 Success / Taiyo Jidoki.
   スイスイぴょんぴょん (Sui Sui Pyon Pyon),  1992 Success / Taiyo Jidoki.

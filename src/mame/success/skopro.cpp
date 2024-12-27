@@ -80,4 +80,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2008, drgdance,  0,   skopro, skopro, skopro_state, empty_init, ROT0, "Success", "Dragon Dance (V1.02J)",  MACHINE_IS_SKELETON )
+GAME( 2008, drgdance,  0,   skopro, skopro, skopro_state, empty_init, ROT0, "Success", "Dragon Dance (V1.02J)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

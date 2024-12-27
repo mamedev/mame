@@ -3019,7 +3019,7 @@ Crashes after EA logo, requires better [VDP] irq handling
 
 
 	<!-- Another, 1.12, version is known to have existed between this and the final version
-		 See: https://www.youtube.com/watch?v=_1uGkfw5ky8 -->
+	     See: https://www.youtube.com/watch?v=_1uGkfw5ky8 -->
 	<software name="felixjrv10" cloneof="felixjr">
 		<description>Fix-it Felix Jr. (v1.0)</description>
 		<year>2013</year>

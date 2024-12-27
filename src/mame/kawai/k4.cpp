@@ -82,5 +82,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1989, k4,  0,  0, k4, k4, kawai_k4_state, empty_init, "Kawai Musical Instrument Manufacturing", "K4 16-bit Digital Synthesizer",         MACHINE_IS_SKELETON)
-SYST(1989, k4r, k4, 0, k4, k4, kawai_k4_state, empty_init, "Kawai Musical Instrument Manufacturing", "K4r 16-bit Digital Synthesizer Module", MACHINE_IS_SKELETON)
+SYST(1989, k4,  0,  0, k4, k4, kawai_k4_state, empty_init, "Kawai Musical Instrument Manufacturing", "K4 16-bit Digital Synthesizer",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1989, k4r, k4, 0, k4, k4, kawai_k4_state, empty_init, "Kawai Musical Instrument Manufacturing", "K4r 16-bit Digital Synthesizer Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -115,4 +115,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1987, cit101xl, 0, 0, cit101xl, cit101xl, cit101xl_state, empty_init, "CIE Terminals", "CIT-101XL Video Display Terminal", MACHINE_IS_SKELETON)
+COMP(1987, cit101xl, 0, 0, cit101xl, cit101xl, cit101xl_state, empty_init, "CIE Terminals", "CIT-101XL Video Display Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

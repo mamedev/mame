@@ -1285,7 +1285,7 @@ void amiga_state::bplcon0_w(u16 data)
 	if ((data & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) == (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2))
 	{
 		/* planes go from 0 to 6, inclusive */
-		popmessage( "bplcon0_w: setting up planes > 6, %04x", data );
+		popmessage( "bplcon0_w: setting up planes > 6, %04x (bug if not AGA SW)", data );
 		data &= ~BPLCON0_BPU0;
 	}
 	CUSTOM_REG(REG_BPLCON0) = data;
@@ -1387,7 +1387,8 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 			return m_fdc->adkcon_r();
 
 		case REG_DSKDATR:
-			popmessage("DSKDAT R");
+			if (!machine().side_effects_disabled())
+				popmessage("DSKDAT R");
 			break;
 	}
 

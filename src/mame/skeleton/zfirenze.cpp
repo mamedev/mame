@@ -105,4 +105,4 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS           INIT        COMPANY            FULLNAME                     FLAGS
-SYST( 1995, zfirenze,  0,      0,      zfirenze,  zfirenze,  zfirenze_state, empty_init, "Zanussi / Necta", "Firenze (vending machine)", MACHINE_IS_SKELETON )
+SYST( 1995, zfirenze,  0,      0,      zfirenze,  zfirenze,  zfirenze_state, empty_init, "Zanussi / Necta", "Firenze (vending machine)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

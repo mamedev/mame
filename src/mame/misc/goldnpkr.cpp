@@ -6057,7 +6057,7 @@ ROM_END
   The second set is a hack of the first with unknown mods.
 
 */
-ROM_START( potnpkro ) // ICP-1 wires hack set. 
+ROM_START( potnpkro ) // ICP-1 wires hack set.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7.16a", 0x6000, 0x1000, CRC(2dc5e372) SHA1(70a251efe879bc1122baa78984251041a355c895) )
 	ROM_LOAD( "x.17a", 0x7000, 0x1000, CRC(1694a0d8) SHA1(bb1132d1e75347ad5156d2b3866aad255f7d53ca) )
@@ -6072,11 +6072,11 @@ ROM_START( potnpkro ) // ICP-1 wires hack set.
 	ROM_LOAD( "8.6a", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    // cards deck gfx, bitplane2
 	ROM_LOAD( "9.7a", 0x1000, 0x0800, CRC(907b21df) SHA1(a6a3968b2ee23ef15ecc8c3b2afbe1b2cc5f42e7) )    // cards deck gfx, bitplane3
 
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp24sa10.bin", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // not dumped for this set
+	ROM_REGION( 0x0100, "proms", 0 )  // same as common golden poker
+	ROM_LOAD( "tbp24s10n_wh.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
-ROM_START( potnpkrp ) // ICP-1 PROM mod set. 
+ROM_START( potnpkrp ) // ICP-1 PROM mod set.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6.16a",            0x6000, 0x1000, CRC(2dc5e372) SHA1(70a251efe879bc1122baa78984251041a355c895) )
 	ROM_LOAD( "95_09_hn71_7.17a", 0x7000, 0x1000, CRC(2353317a) SHA1(18bf8cfe30aaa4b05207cc250ec1c024bc19ed56) )
@@ -6092,8 +6092,11 @@ ROM_START( potnpkrp ) // ICP-1 PROM mod set.
 	ROM_LOAD( "3.7a", 0x1000, 0x0800, CRC(77143e12) SHA1(b459f704d89be1dd64de3514c0adc6a5d5364749) )    // cards deck gfx, bitplane3
 	ROM_IGNORE(               0x0800)  // identical halves, discarding the 2nd half
 
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tbp24sa10.bin", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // not dumped for this set
+	ROM_REGION( 0x0100, "proms", 0 )  // high addressing pin tied to GND. the unused second half turns the background color to magenta.
+	ROM_LOAD( "tbp24s10n_pm.bin", 0x0000, 0x0080, CRC(1e79c53d) SHA1(8aa5ae1b82c6e8277427a53a54718f72737e4ec3) )
+	ROM_IGNORE(                           0x0080)
+	ROM_RELOAD(                   0x0080, 0x0080)
+	ROM_IGNORE(                           0x0080)
 ROM_END
 
 

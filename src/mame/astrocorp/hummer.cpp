@@ -138,5 +138,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAME ( 2009,  pengprty, 0, hummer, hummer, hummer_state, empty_init, ROT0, "Astro Corp.", "Penguin Party",                  MACHINE_IS_SKELETON )
-GAME ( 2012,  jackvent, 0, hummer, hummer, hummer_state, empty_init, ROT0, "Astro Corp.", "Jack's Venture - Inca Treasure", MACHINE_IS_SKELETON )
+GAME ( 2009,  pengprty, 0, hummer, hummer, hummer_state, empty_init, ROT0, "Astro Corp.", "Penguin Party",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME ( 2012,  jackvent, 0, hummer, hummer, hummer_state, empty_init, ROT0, "Astro Corp.", "Jack's Venture - Inca Treasure", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

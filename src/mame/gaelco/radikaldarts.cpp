@@ -77,4 +77,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 2011?, radikaldrt, 0, radikaldarts, radikaldarts, radikaldarts_state, empty_init, ROT0, "Gaelco Darts", "Radikal Darts (Diana Version 7.29.25)", MACHINE_IS_SKELETON )
+GAME( 2011?, radikaldrt, 0, radikaldarts, radikaldarts, radikaldarts_state, empty_init, ROT0, "Gaelco Darts", "Radikal Darts (Diana Version 7.29.25)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

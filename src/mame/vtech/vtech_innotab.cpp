@@ -220,4 +220,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2011, innotab2,     0,       0,      vtech_innotab, vtech_innotab, vtech_innotab_state, empty_init, "VTech", "InnoTAB 2 (UK)",   MACHINE_IS_SKELETON )
+CONS( 2011, innotab2,     0,       0,      vtech_innotab, vtech_innotab, vtech_innotab_state, empty_init, "VTech", "InnoTAB 2 (UK)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

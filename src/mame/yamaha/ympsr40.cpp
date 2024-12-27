@@ -61,4 +61,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1985, psr40, 0, 0, psr40, psr40, yamaha_psr40_state, empty_init, "Yamaha", "PSR-40", MACHINE_IS_SKELETON)
+SYST(1985, psr40, 0, 0, psr40, psr40, yamaha_psr40_state, empty_init, "Yamaha", "PSR-40", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

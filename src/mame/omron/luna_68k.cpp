@@ -191,4 +191,4 @@ ROM_END
 } // anonymous namespace
 
 /*   YEAR   NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT  COMPANY  FULLNAME  FLAGS */
-COMP(1989?, luna, 0,      0,      luna,    0,     luna_68k_state, init, "Omron", "Luna",   MACHINE_IS_SKELETON)
+COMP(1989?, luna, 0,      0,      luna,    0,     luna_68k_state, init, "Omron", "Luna",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

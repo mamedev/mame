@@ -210,4 +210,4 @@ void sterz80_state::init_tongzi()
 } // anonymous namespace
 
 
-GAME( 2003, tongzi, 0, tongzi, tongzi, sterz80_state, init_tongzi, ROT0, "Ster", "Tong Zi Maque", MACHINE_IS_SKELETON )
+GAME( 2003, tongzi, 0, tongzi, tongzi, sterz80_state, init_tongzi, ROT0, "Ster", "Tong Zi Maque", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

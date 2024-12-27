@@ -208,9 +208,9 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1976, bazooka,   0,       pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering",                     "Bazooka",               MACHINE_IS_SKELETON )
-GAME( 1976, knightar,  0,       pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering",                     "Knights in Armor",      MACHINE_IS_SKELETON )
-GAME( 1977, bazookabr, bazooka, pse, 0, pse_state, empty_init, ROT0, "Taito do Brasil",                                 "Bazooka (Brazil)",      MACHINE_IS_SKELETON )
-GAME( 1977, dpatrol,   0,       pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering",                     "Desert Patrol",         MACHINE_IS_SKELETON )
-GAME( 1977, dpatrola,  dpatrol, pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering (Telegames license)", "Desert Patrol (set 2)", MACHINE_IS_SKELETON )
-GAME( 1978, gametree,  0,       pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering",                     "Game Tree",             MACHINE_IS_SKELETON )
+GAME( 1976, bazooka,   0,       pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering",                     "Bazooka",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1976, knightar,  0,       pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering",                     "Knights in Armor",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1977, bazookabr, bazooka, pse, 0, pse_state, empty_init, ROT0, "Taito do Brasil",                                 "Bazooka (Brazil)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1977, dpatrol,   0,       pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering",                     "Desert Patrol",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1977, dpatrola,  dpatrol, pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering (Telegames license)", "Desert Patrol (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1978, gametree,  0,       pse, 0, pse_state, empty_init, ROT0, "Project Support Engineering",                     "Game Tree",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

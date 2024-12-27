@@ -104,4 +104,4 @@ ROM_END
 
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 2016, rbitgen,      0,       0,      actions_atj2279b, actions_atj2279b, actions_atj2279b_state, empty_init, "Retro-Bit", "Generations (Retro-Bit)", MACHINE_IS_SKELETON )
+CONS( 2016, rbitgen,      0,       0,      actions_atj2279b, actions_atj2279b, actions_atj2279b_state, empty_init, "Retro-Bit", "Generations (Retro-Bit)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

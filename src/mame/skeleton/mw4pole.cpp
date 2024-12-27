@@ -50,4 +50,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1995, mw4pole, 0, 0, mw4pole, mw4pole, mw4pole_state, empty_init, "Waldorf Electronics", "MiniWorks 4-Pole", MACHINE_IS_SKELETON)
+SYST(1995, mw4pole, 0, 0, mw4pole, mw4pole, mw4pole_state, empty_init, "Waldorf Electronics", "MiniWorks 4-Pole", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

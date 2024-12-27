@@ -57,6 +57,12 @@ void v25_common_device::ida_sfr_map(address_map &map)
 	map(0x19c, 0x19c).rw(FUNC(v25_common_device::tmic0_r), FUNC(v25_common_device::tmic0_w));
 	map(0x19d, 0x19d).rw(FUNC(v25_common_device::tmic1_r), FUNC(v25_common_device::tmic1_w));
 	map(0x19e, 0x19e).rw(FUNC(v25_common_device::tmic2_r), FUNC(v25_common_device::tmic2_w));
+	map(0x1a0, 0x1a0).rw(FUNC(v25_common_device::dmac0_r), FUNC(v25_common_device::dmac0_w));
+	map(0x1a1, 0x1a1).rw(FUNC(v25_common_device::dmam0_r), FUNC(v25_common_device::dmam0_w));
+	map(0x1a2, 0x1a2).rw(FUNC(v25_common_device::dmac1_r), FUNC(v25_common_device::dmac1_w));
+	map(0x1a3, 0x1a3).rw(FUNC(v25_common_device::dmam1_r), FUNC(v25_common_device::dmam1_w));
+	map(0x1ac, 0x1ac).rw(FUNC(v25_common_device::dic0_r), FUNC(v25_common_device::dic0_w));
+	map(0x1ad, 0x1ad).rw(FUNC(v25_common_device::dic1_r), FUNC(v25_common_device::dic1_w));
 	map(0x1e1, 0x1e1).rw(FUNC(v25_common_device::rfm_r), FUNC(v25_common_device::rfm_w));
 	map(0x1e8, 0x1e9).rw(FUNC(v25_common_device::wtc_r), FUNC(v25_common_device::wtc_w));
 	map(0x1ea, 0x1ea).rw(FUNC(v25_common_device::flag_r), FUNC(v25_common_device::flag_w));
@@ -469,7 +475,13 @@ uint16_t v25_common_device::md1_r()
 
 void v25_common_device::md1_w(uint16_t d)
 {
-	m_MD1 = d;
+	if (m_MD1 == 0 && d != 0)
+	{
+		m_MD1 = d;
+		tmc1_w(m_TMC1); // HACK: start timer if necessary
+	}
+	else
+		m_MD1 = d;
 }
 
 void v25_common_device::tmc0_w(uint8_t d)
@@ -477,7 +489,7 @@ void v25_common_device::tmc0_w(uint8_t d)
 	m_TMC0 = d;
 	if (BIT(d, 0))   // oneshot mode
 	{
-		if (BIT(d, 7))
+		if (BIT(d, 7) && m_TM0 != 0)
 		{
 			unsigned tmp = m_PCK * m_TM0 * (BIT(d, 6) ? 128 : 12);
 			attotime time = clocks_to_attotime(tmp);
@@ -486,7 +498,7 @@ void v25_common_device::tmc0_w(uint8_t d)
 		else
 			m_timers[0]->adjust(attotime::never);
 
-		if (BIT(d, 5))
+		if (BIT(d, 5) && m_MD0 != 0)
 		{
 			unsigned tmp = m_PCK * m_MD0 * (BIT(d, 4) ? 128 : 12);
 			attotime time = clocks_to_attotime(tmp);
@@ -497,7 +509,7 @@ void v25_common_device::tmc0_w(uint8_t d)
 	}
 	else    // interval mode
 	{
-		if (BIT(d, 7))
+		if (BIT(d, 7) && m_MD0 != 0)
 		{
 			unsigned tmp = m_PCK * m_MD0 * (BIT(d, 6) ? 128 : 6);
 			attotime time = clocks_to_attotime(tmp);
@@ -516,11 +528,11 @@ void v25_common_device::tmc0_w(uint8_t d)
 void v25_common_device::tmc1_w(uint8_t d)
 {
 	m_TMC1 = d & 0xC0;
-	if (BIT(d, 7))
+	if (BIT(d, 7) && m_MD1 != 0)
 	{
 		unsigned tmp = m_PCK * m_MD1 * (BIT(d, 6) ? 128 : 6);
 		attotime time = clocks_to_attotime(tmp);
-		m_timers[2]->adjust(time, INTTU2, time);
+		m_timers[2]->adjust(time, INTTU1 | INTTU2, time);
 		m_TM1 = m_MD1;
 	}
 	else
@@ -567,6 +579,115 @@ uint8_t v25_common_device::tmic2_r()
 void v25_common_device::tmic2_w(uint8_t d)
 {
 	write_irqcontrol(INTTU2, d);
+}
+
+uint8_t v25_common_device::dmac0_r()
+{
+	return m_dmac[0];
+}
+
+void v25_common_device::dmac0_w(uint8_t d)
+{
+	logerror("%06x: DMAC0 set to %02x\n", PC(), d);
+	logerror("        SAR0 %s after each transfer\n", (d & 0x03) == 0x01 ? "incremented" : (d & 0x03) == 0x02 ? "decremented" : "unmodified");
+	logerror("        DAR0 %s after each transfer\n", (d & 0x30) == 0x10 ? "incremented" : (d & 0x30) == 0x20 ? "decremented" : "unmodified");
+	m_dmac[0] = d & 0x33;
+}
+
+uint8_t v25_common_device::dmam0_r()
+{
+	return m_dmam[0];
+}
+
+void v25_common_device::dmam0_w(uint8_t d)
+{
+	logerror("%06x: DMAM0 set to %02x\n", PC(), d);
+	if ((d & 0x60) == 0)
+		logerror("        %s mode, memory to memory, %s\n", BIT(d, 7) ? "Single step" : "Burst", BIT(d, 4) ? "words" : "bytes");
+	else if ((d & 0x60) != 0x60)
+		logerror("        %s mode, %s to %s, %s\n", BIT(d, 7) ? "Single transfer" : "Demand release",
+			BIT(d, 5) ? "I/O" : "memory",
+			BIT(d, 6) ? "I/O" : "memory",
+			BIT(d, 4) ? "words" : "bytes");
+	if (BIT(d, 2))
+	{
+		uint16_t sar = m_internal_ram[0];
+		uint16_t dar = m_internal_ram[1];
+		uint16_t sarh_darh = m_internal_ram[2];
+		uint16_t tc = m_internal_ram[3];
+		logerror("        DMA enabled%s (%04x:%04x -> %04x:%04x, %u %s)\n", BIT(d, 3) ? " and triggered" : "",
+			sarh_darh & 0xff00, sar,
+			(sarh_darh & 0x00ff) << 8, dar,
+			tc, BIT(d, 4) ? "words" : "bytes");
+	}
+	else
+		logerror("        DMA not enabled\n");
+	m_dmam[0] = d & 0xfc;
+}
+
+uint8_t v25_common_device::dmac1_r()
+{
+	return m_dmac[1];
+}
+
+void v25_common_device::dmac1_w(uint8_t d)
+{
+	logerror("%06x: DMAC1 set to %02x\n", PC(), d);
+	logerror("        SAR1 %s after each transfer\n", (d & 0x03) == 0x01 ? "incremented" : (d & 0x03) == 0x02 ? "decremented" : "unmodified");
+	logerror("        DAR1 %s after each transfer\n", (d & 0x30) == 0x10 ? "incremented" : (d & 0x30) == 0x20 ? "decremented" : "unmodified");
+	m_dmac[1] = d & 0x33;
+}
+
+uint8_t v25_common_device::dmam1_r()
+{
+	return m_dmam[1];
+}
+
+void v25_common_device::dmam1_w(uint8_t d)
+{
+	logerror("%06x: DMAM1 set to %02x\n", PC(), d);
+	if ((d & 0x60) == 0)
+		logerror("        %s mode, memory to memory, %s\n", BIT(d, 7) ? "Single step" : "Burst", BIT(d, 4) ? "words" : "bytes");
+	else if ((d & 0x60) != 0x60)
+		logerror("        %s mode, %s to %s, %s\n", BIT(d, 7) ? "Single transfer" : "Demand release",
+			BIT(d, 5) ? "I/O" : "memory",
+			BIT(d, 6) ? "I/O" : "memory",
+			BIT(d, 4) ? "words" : "bytes");
+	if (BIT(d, 2))
+	{
+		uint16_t sar = m_internal_ram[4];
+		uint16_t dar = m_internal_ram[5];
+		uint16_t sarh_darh = m_internal_ram[6];
+		uint16_t tc = m_internal_ram[7];
+		logerror("        DMA enabled%s (%04x:%04x -> %04x:%04x, %u %s)\n", BIT(d, 3) ? " and triggered" : "",
+			sarh_darh & 0xff00, sar,
+			(sarh_darh & 0x00ff) << 8, dar,
+			tc, BIT(d, 4) ? "words" : "bytes");
+	}
+	else
+		logerror("        DMA not enabled\n");
+	m_dmam[1] = d & 0xfc;
+}
+
+uint8_t v25_common_device::dic0_r()
+{
+	return read_irqcontrol(INTD0, m_priority_intd);
+}
+
+void v25_common_device::dic0_w(uint8_t d)
+{
+	write_irqcontrol(INTD0, d);
+	m_priority_intd = d & 0x7;
+}
+
+uint8_t v25_common_device::dic1_r()
+{
+	return read_irqcontrol(INTD1, 7);
+}
+
+void v25_common_device::dic1_w(uint8_t d)
+{
+	write_irqcontrol(INTD1, d);
 }
 
 uint8_t v25_common_device::rfm_r()

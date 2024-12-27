@@ -110,4 +110,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(199?, is482, 0, 0, is482, is482, is48x_state, empty_init, "Decision Data", "IS-482 Workstation", MACHINE_IS_SKELETON)
+COMP(199?, is482, 0, 0, is482, is482, is48x_state, empty_init, "Decision Data", "IS-482 Workstation", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

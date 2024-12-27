@@ -81,4 +81,4 @@ ROM_END
 } // Anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME         FLAGS
-COMP( 1973, intlc8,   0,      0,      intlc8, intlc8,     intlc8_state,   empty_init, "Intel", "Intellec 8 MCS", MACHINE_IS_SKELETON )
+COMP( 1973, intlc8,   0,      0,      intlc8, intlc8,     intlc8_state,   empty_init, "Intel", "Intellec 8 MCS", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

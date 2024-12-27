@@ -534,6 +534,7 @@ public:
 	void init_luckylad();
 	void init_nd8lines();
 	void init_super972();
+	void init_wcat();
 	void init_wcat3();
 
 	DECLARE_VIDEO_START(bingowng);
@@ -14575,6 +14576,39 @@ ROM_START( lucky8n )
 	ROM_LOAD( "g13", 0x00, 0x20, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+// only the subboard available (Z80, ROM, 2 stickered chips (sanded), 2 banks of 8 DIP switches (marked SW5 and SW6) and a rotary switch (SW7))
+// very professional-looking subboard marked Excel Planning
+// needs correct GFX ROMs / color PROMs (using the ones from wcat3, for now)
+ROM_START( wcat )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "y8.u1.sub", 0x00000, 0x20000, CRC(49e11ff4) SHA1(ce421f85b298c2e9c335fdbf0547a355ae29f1a6) )
+	ROM_FILL( 0x1c000, 0x1000, 0xc9 ) // jumps in this area multiple times, but nothing here. Something to do with the 2 stickered chips?
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "wcat3.h7",   0x10000, 0x8000, BAD_DUMP CRC(065cb575) SHA1(4dd49773c4caeaa489342e61f26c8eaaae876edc) )
+	ROM_LOAD( "wcat3.h8",   0x08000, 0x8000, BAD_DUMP CRC(60463213) SHA1(b0937b4a55f74831ce9a06f3df0af504845f908d) )
+	ROM_LOAD( "wcat3.h10",  0x00000, 0x8000, BAD_DUMP CRC(dda38c26) SHA1(4b9292911133dd6067a1c61a44845e824e88a52d) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "wcat3.h1",   0x6000, 0x2000, BAD_DUMP CRC(0509d556) SHA1(c2f46d279f45b544c67b0c966659cc6d5d53c22f) )
+	ROM_LOAD( "wcat3.h2",   0x4000, 0x2000, BAD_DUMP CRC(d50f3d62) SHA1(8500c7f3a2f51ea0ed7e142ecdc4e669ba3e7065) )
+	ROM_LOAD( "wcat3.h4",   0x2000, 0x2000, BAD_DUMP CRC(373d9949) SHA1(ff483505fb9e86411acad7059bf5434dde290946) )
+	ROM_LOAD( "wcat3.h5",   0x0000, 0x2000, BAD_DUMP CRC(50febe3b) SHA1(0479bcee53b174aa0413951e283e446b09a6f156) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "wcat3.g13",  0x0000, 0x0100, BAD_DUMP CRC(c29a36f2) SHA1(936b07a195f6e7f6a884bd35f442003cf67aa447) )
+	ROM_LOAD( "wcat3.g14",  0x0100, 0x0100, BAD_DUMP CRC(dcd53d2c) SHA1(bbcb4266117c3cd1c8ef0e5046d3558c8293313a) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "wcat3.d13",  0x0000, 0x0020, BAD_DUMP CRC(eab832ed) SHA1(0fbc8914ba1805cfc6698fe7f137a934e63a4f89) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "wcat3.f3",   0x0000, 0x0100, BAD_DUMP CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "wcat3.d12",  0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
 ROM_START( animalw ) // according to the dumper: runs on the same HW as lucky8 but at the two 8255 has some shorts
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom8.bin",  0x0000, 0x8000, CRC(8826e4e7) SHA1(70cff8c5ce75ab0f568e8cdf39ef9165b73fa2c0) )
@@ -18581,10 +18615,10 @@ ROM_START( eldoraddob ) // String "DYNA ELD3 V2.0D" in program ROM, DYNA D9105B 
 	ROM_REGION( 0x100000, "gfx", 0 )
 	ROM_LOAD( "tc538000p-dyna dm9106.h2", 0x000000, 0x100000, CRC(fa84c372) SHA1(a71e57e76321b7ebb16933d9bc983b9160995b4a) )
 
-	ROM_REGION( 0x300, "proms", 0 ) // not dumped for this set, but GFX ROM matches the one for eldoraddo
-	ROM_LOAD( "mb7114.e8",  0x000, 0x100, BAD_DUMP CRC(fa274678) SHA1(6712cb1f7ead1a7aa703ec799e7199c33ace857c) )
-	ROM_LOAD( "mb7114.e10", 0x100, 0x100, BAD_DUMP CRC(e58877ea) SHA1(30fa873fc05d91610ef68eef54b78f2c7301a62a) )
-	ROM_LOAD( "mb7114.e12", 0x200, 0x100, BAD_DUMP CRC(781b2842) SHA1(566667d4f81e93b29bb01dbc51bf144c02dff75d) )
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "e14", 0x000, 0x100, CRC(fa274678) SHA1(6712cb1f7ead1a7aa703ec799e7199c33ace857c) )
+	ROM_LOAD( "e15", 0x100, 0x100, CRC(e58877ea) SHA1(30fa873fc05d91610ef68eef54b78f2c7301a62a) )
+	ROM_LOAD( "e16", 0x200, 0x100, CRC(781b2842) SHA1(566667d4f81e93b29bb01dbc51bf144c02dff75d) )
 
 	ROM_REGION( 0x400, "plds", 0 ) // available as brute-forced dumps, need to be verified and converted
 	ROM_LOAD( "pal16l8.d13", 0x000, 0x104, NO_DUMP )
@@ -20830,6 +20864,15 @@ void goldstar_state::init_ladylinre()
 	}
 }
 
+void wingco_state::init_wcat()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+		m_decrypted_opcodes[i] = rom[0x10000 + i];
+}
+
+
 void wingco_state::init_wcat3()
 {
 	// there must be some more conditions and/or some errors as the game needs to be soft resets 4-5 times before working apparently fine
@@ -22504,6 +22547,7 @@ GAME(  198?, ladylinrb,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_lady
 GAME(  198?, ladylinrc,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrc, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 2)",                            0 )
 GAME(  198?, ladylinrd,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrd, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            0 )
 GAME(  198?, ladylinre,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
+GAME ( 1992?,wcat,       0,        wcat3,    lucky8b,  wingco_state,   init_wcat,      ROT0, "Excel",             "Wild Cat",                                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs correct GFX ROMs, I/O, etc
 GAME(  1995, wcat3,      0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // decryption partially wrong, needs soft resets before running. Bad PROM decode
 GAMEL( 199?, animalw,    0,        lucky8,   animalw,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900)",                                MACHINE_NOT_WORKING,    layout_lucky8 )    // inputs / DIPs need to be checked
 
@@ -22626,7 +22670,7 @@ GAME( 1996, cherry96,    scmaster,  unkch,    unkch4,    unkch_state,    init_un
 GAME( 1998, rolling,     scmaster,  rolling,  unkch4,    unkch_state,    empty_init,     ROT0, "bootleg", "Rolling",                                                      MACHINE_NOT_WORKING ) // inputs, outputs
 
 // this has a 4th reel
-GAME( 200?, ss2001,      0,        ss2001,   cmaster,   cmaster_state,  empty_init,     ROT0, "bootleg", "Super Shanghai 2001",                                          MACHINE_IS_SKELETON ) // TODO: everything
+GAME( 200?, ss2001,      0,        ss2001,   cmaster,   cmaster_state,  empty_init,     ROT0, "bootleg", "Super Shanghai 2001",                                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // TODO: everything
 
 /* Stealth sets.
    These have hidden games inside that can be switched to avoid inspections, police or whatever purposes)... */

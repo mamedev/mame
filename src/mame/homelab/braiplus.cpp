@@ -265,4 +265,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1988, braiplus, 0, 0, braiplus, braiplus, braiplus_state, empty_init, "Jozsef and Endre Lukacs", "BraiLab Plus", MACHINE_IS_SKELETON )
+COMP( 1988, braiplus, 0, 0, braiplus, braiplus, braiplus_state, empty_init, "Jozsef and Endre Lukacs", "BraiLab Plus", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

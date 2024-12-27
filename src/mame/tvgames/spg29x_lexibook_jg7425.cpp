@@ -203,10 +203,10 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 2015, fundr200,    0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Funderdome", "Funderdome Video Game Entertainment System 200+ Games (FUN-GAME32-1)", MACHINE_IS_SKELETON ) // FUN-GAME32-1 on manual
-CONS( 2015, lx_jg7425,   0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Lexibook JG7425 221-in-1", MACHINE_IS_SKELETON )
-CONS( 2016, lx_aven,     0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Marvel Avengers TV Game Console (32-bit, Lexibook)", MACHINE_IS_SKELETON )
-CONS( 2016, lx_frozen,   0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Disney Frozen TV Game Console (32-bit, Lexibook, JG7420FZ)", MACHINE_IS_SKELETON )
+CONS( 2015, fundr200,    0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Funderdome", "Funderdome Video Game Entertainment System 200+ Games (FUN-GAME32-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // FUN-GAME32-1 on manual
+CONS( 2015, lx_jg7425,   0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Lexibook JG7425 221-in-1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2016, lx_aven,     0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Marvel Avengers TV Game Console (32-bit, Lexibook)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2016, lx_frozen,   0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Disney Frozen TV Game Console (32-bit, Lexibook, JG7420FZ)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // slightly different, but same basic structure of the external ROM
-COMP( 201?, zone3d,      0,         0,      lexibook_jg7425,  lexibook_jg7425, lexibook_jg7425_state, empty_init,"Zone", "Zone 3D", MACHINE_IS_SKELETON )
+COMP( 201?, zone3d,      0,         0,      lexibook_jg7425,  lexibook_jg7425, lexibook_jg7425_state, empty_init,"Zone", "Zone 3D", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

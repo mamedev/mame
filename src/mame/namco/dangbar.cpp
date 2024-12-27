@@ -157,6 +157,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1993, sspanic,   0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Same Same Panic", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1994, dangbar,   0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Dangerous Bar",   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1994, bellybmbr, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Belly Bomber",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, sspanic,   0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Same Same Panic", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1994, dangbar,   0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Dangerous Bar",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1994, bellybmbr, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Belly Bomber",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

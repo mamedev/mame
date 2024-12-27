@@ -66,7 +66,7 @@ class source_state : public driver_device
 {
 public:
 	source_state(const machine_config& mconfig, device_type type,
-	             const char* tag) ATTR_COLD
+				 const char* tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
 		, m_octave_io(*this, "octave_buttons")
@@ -371,7 +371,7 @@ void source_state::cv_w(offs_t offset, u8 data)
 
 	if (offset == static_cast<int>(CV::KEYBOARD_APPROX))
 		LOGMASKED(LOG_CV_KEYBOARD_APPROX,
-		          "CV %d: 0x%02x, %f\n", offset, data, cv);
+				  "CV %d: 0x%02x, %f\n", offset, data, cv);
 	else
 		LOGMASKED(LOG_CV, "CV %d: 0x%02x, %f\n", offset, data, cv);
 }
@@ -408,7 +408,7 @@ float source_state::get_keyboard_v() const
 
 	// *** Convert pressed key to a voltage.
 
-	static constexpr const float KEYBOARD_VREF = 8.24;  // From schematic.
+	static constexpr const float KEYBOARD_VREF = 8.24f;  // From schematic.
 	static constexpr const float RKEY = RES_R(100);
 	static constexpr const float R74 = RES_R(150);
 	static constexpr const float R76 = RES_K(220);
@@ -426,7 +426,7 @@ float source_state::get_keyboard_v() const
 		const float v = KEYBOARD_VREF * RES_VOLTAGE_DIVIDER(upper_r, lower_r);
 		kb_voltage = v * RES_VOLTAGE_DIVIDER(R77, R76);
 		LOGMASKED(LOG_KEYBOARD, "Key %d - %f - %f\n", pressed_key, v,
-			      kb_voltage);
+				  kb_voltage);
 	}
 	return kb_voltage;
 }
@@ -494,7 +494,7 @@ u8 source_state::buttons_r(
 	if (pressed & 0x3f)
 	{
 		LOGMASKED(LOG_BUTTONS, "Button read %s - %02X: %02X\n",
-		          name, m_button_row_latch, pressed);
+				  name, m_button_row_latch, pressed);
 	}
 	return pressed;
 }
@@ -517,7 +517,7 @@ u8 source_state::encoder_r()
 {
 	// D0 contains whether the encoder was last incremented or decremented.
 	LOGMASKED(LOG_ENCODER,
-	          "Encoder read: %d - %d\n", m_encoder->read(), m_encoder_incr);
+			  "Encoder read: %d - %d\n", m_encoder->read(), m_encoder_incr);
 	// Reading the encoder's state also clears /INT (via U21B, U7A and U15A).
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -651,9 +651,9 @@ DECLARE_INPUT_CHANGED_MEMBER(source_state::encoder_moved)
 {
 	static constexpr const int WRAP_BUFFER = 10;
 	const bool overflowed = newval <= WRAP_BUFFER &&
-	                        oldval >= 240 - WRAP_BUFFER;
+							oldval >= 240 - WRAP_BUFFER;
 	const bool underflowed = newval >= 240 - WRAP_BUFFER &&
-	                         oldval <= WRAP_BUFFER;
+							 oldval <= WRAP_BUFFER;
 	m_encoder_incr = ((newval > oldval) || overflowed) && !underflowed;
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	LOGMASKED(LOG_ENCODER, "Encoder changed: %d %d\n", newval, m_encoder_incr);
@@ -835,5 +835,5 @@ ROM_END
 
 }  // Anonymous namespace.
 
-SYST(1981, moogsource, 0, 0, source, source, source_state, empty_init, "Moog Music", "Moog Source", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND);
+SYST(1981, moogsource, 0, 0, source, source, source_state, empty_init, "Moog Music", "Moog Source", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
 

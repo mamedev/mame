@@ -82,7 +82,6 @@ public:
 		m_ram_ptr(nullptr), m_rom_ptr(nullptr),
 		m_ram_mask(0), m_ram_size(0), m_rom_size(0),
 		m_overlay(0),
-		m_6015_timer(nullptr),
 		m_via2_ca1_hack(0),
 		m_nubus_irq_state(0),
 		m_via_interrupt(0), m_via2_interrupt(0), m_scc_interrupt(0), m_last_taken_interrupt(0)
@@ -152,7 +151,6 @@ private:
 	void devsel_w(u8 devsel);
 
 	u8 m_mac[6];
-	emu_timer *m_6015_timer;
 	int m_via2_ca1_hack, m_nubus_irq_state;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
 };
@@ -307,9 +305,6 @@ void quadrax00_state::machine_reset()
 
 	space.unmap_write(0x00000000, memory_end);
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
-
-	// start 60.15 Hz timer
-	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 }
 
 void eclipse_state::machine_start()

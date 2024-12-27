@@ -190,4 +190,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY       FULLNAME          FLAGS
-COMP( 1986, mt440, 0,      0,      mt440,   mt440, mt440_state, empty_init, "Micro-Term", "Micro-Term 440", MACHINE_IS_SKELETON )
+COMP( 1986, mt440, 0,      0,      mt440,   mt440, mt440_state, empty_init, "Micro-Term", "Micro-Term 440", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

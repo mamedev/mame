@@ -103,4 +103,4 @@ ROM_END
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS     INIT        COMPANY   FULLNAME                       FLAGS
-COMP( 1996, alesqs7, 0,      0,      qs7,     qs7,   qs_state, empty_init, "Alesis", "Alesis QS7 musical keyboard", MACHINE_IS_SKELETON )
+COMP( 1996, alesqs7, 0,      0,      qs7,     qs7,   qs_state, empty_init, "Alesis", "Alesis QS7 musical keyboard", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -121,4 +121,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1983, clxvme186, 0, 0, clxvme186, clxvme186, clxvme186_state, empty_init, "Colex", "Colex VME-80186", MACHINE_IS_SKELETON)
+COMP(1983, clxvme186, 0, 0, clxvme186, clxvme186, clxvme186_state, empty_init, "Colex", "Colex VME-80186", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

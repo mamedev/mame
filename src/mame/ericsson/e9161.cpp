@@ -85,4 +85,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(198?, e9161, 0, 0, e9161, e9161, e9161_state, empty_init, "Ericsson", "9161 Display Processor Unit", MACHINE_IS_SKELETON)
+COMP(198?, e9161, 0, 0, e9161, e9161, e9161_state, empty_init, "Ericsson", "9161 Display Processor Unit", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

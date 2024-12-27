@@ -455,8 +455,8 @@ ROM_END
 GAME( 1995?, design6,     0,          design6,    design6,  design6_state,  empty_init, ROT0, "Azkoyen", "Design D6",                         MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 GAME( 1995?, designe,     0,          design6,    designe,  design6_state,  empty_init, ROT0, "Azkoyen", "Design (Euro)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
-GAME( 19??,  azkoyent6,   0,          azkoyent,   azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T6",          MACHINE_IS_SKELETON )
-GAME( 19??,  azkoyent8,   0,          azkoyent,   azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T8",          MACHINE_IS_SKELETON )
-GAME( 19??,  azkoyent12,  0,          azkoyent,   azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T12",         MACHINE_IS_SKELETON )
-GAME( 19??,  azkoyent61,  0,          azkoyent61, azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T61 (set 1)", MACHINE_IS_SKELETON )
-GAME( 19??,  azkoyent61a, azkoyent61, azkoyent61, azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T61 (set 2)", MACHINE_IS_SKELETON )
+GAME( 19??,  azkoyent6,   0,          azkoyent,   azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T6",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 19??,  azkoyent8,   0,          azkoyent,   azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T8",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 19??,  azkoyent12,  0,          azkoyent,   azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T12",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 19??,  azkoyent61,  0,          azkoyent61, azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T61 (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 19??,  azkoyent61a, azkoyent61, azkoyent61, azkoyent, azkoyent_state, empty_init, ROT0, "Azkoyen", "Vending machine model T61 (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -196,5 +196,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004, dkkids,   0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Kids",   MACHINE_IS_SKELETON )
-GAME( 2005, dkbattle, 0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Battle", MACHINE_IS_SKELETON )
+GAME( 2004, dkkids,   0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Kids",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, dkbattle, 0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito Corporation", "Dinoking Battle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

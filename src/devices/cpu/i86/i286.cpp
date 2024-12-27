@@ -384,21 +384,16 @@ void i80286_cpu_device::execute_set_input(int inptnum, int state)
 {
 	if(inptnum == INPUT_LINE_NMI)
 	{
-		if(m_nmi_state == state)
-		{
-			return;
-		}
-		m_nmi_state = state;
-		if(state != CLEAR_LINE)
+		if(!m_nmi_state && state)
 		{
 			m_pending_irq |= NMI_IRQ;
 		}
+		m_nmi_state = state;
 	}
 	else if(inptnum == INPUT_LINE_A20)
 		m_amask = m_a20_callback(state);
 	else
 	{
-		m_irq_state = state;
 		if(state == CLEAR_LINE)
 		{
 			m_pending_irq &= ~INT_IRQ;
@@ -760,7 +755,7 @@ void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int 
 					throw TRAP(FAULT_GP, IDXTBL(selector));
 
 			if(!PRES(r))
-				throw TRAP(FAULT_NP, IDXTBL(selector));  // this order is important
+				throw TRAP(FAULT_NP, IDXTBL(selector)); // this order is important
 
 			if(offset > LIMIT(desc))
 				throw TRAP(FAULT_GP, 0);
@@ -774,7 +769,8 @@ void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int 
 			m_prev_ip = m_ip = offset;
 		}
 		else
-		{ // systemdescriptor
+		{
+			// systemdescriptor
 			uint16_t gatesel = GATESEL(desc);
 
 			if(!gate)

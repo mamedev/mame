@@ -445,4 +445,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1980, v100, 0, 0, v100, v100, v100_state, empty_init, "Visual Technology", "Visual 100", MACHINE_IS_SKELETON )
+COMP( 1980, v100, 0, 0, v100, v100, v100_state, empty_init, "Visual Technology", "Visual 100", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

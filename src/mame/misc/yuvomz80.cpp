@@ -169,5 +169,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1995, hexaprs,  0,       hexaprs,  hexaprs, yuvomz80_state, empty_init, ROT0, "Yuvo / Yubis", "Hexa President (YM2610 set)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1995, hexaprsz, hexaprs, hexaprsz, hexaprs, yuvomz80_state, empty_init, ROT0, "Yuvo / Yubis", "Hexa President (YMZ280B set)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1995, hexaprs,  0,       hexaprs,  hexaprs, yuvomz80_state, empty_init, ROT0, "Yuvo / Yubis", "Hexa President (YM2610 set)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1995, hexaprsz, hexaprs, hexaprsz, hexaprs, yuvomz80_state, empty_init, ROT0, "Yuvo / Yubis", "Hexa President (YMZ280B set)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

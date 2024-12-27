@@ -25,6 +25,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
+	u8 p0_r();
 	void p0_w(u8 data);
 	u8 pt_r();
 
@@ -40,6 +41,11 @@ private:
 void tvdear_state::machine_start()
 {
 	save_item(NAME(m_p0));
+}
+
+u8 tvdear_state::p0_r()
+{
+	return m_p0;
 }
 
 void tvdear_state::p0_w(u8 data)
@@ -59,7 +65,7 @@ void tvdear_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
 	map(0x10000, 0x17fff).ram();
-	map(0x80000, 0xfffff).rom().region("maincpu", 0x080000);
+	map(0x40000, 0xfffff).rom().region("maincpu", 0x040000);
 }
 
 void tvdear_state::io_map(address_map &map)
@@ -174,6 +180,7 @@ void tvdear_state::tvdear(machine_config &config)
 	V25(config, m_maincpu, 16000000); // NEC D70320DGJ-8; XTAL marked 16AKSS5HT
 	m_maincpu->set_addrmap(AS_PROGRAM, &tvdear_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &tvdear_state::io_map);
+	m_maincpu->p0_in_cb().set(FUNC(tvdear_state::p0_r));
 	m_maincpu->p0_out_cb().set(FUNC(tvdear_state::p0_w));
 	m_maincpu->pt_in_cb().set(FUNC(tvdear_state::pt_r));
 
@@ -189,4 +196,5 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 1995, tvdear,  0,          0,  tvdear,  tvdear, tvdear_state, empty_init, "Takara", "TV Dear Multi Word Processor", MACHINE_IS_SKELETON | MACHINE_NODEVICE_PRINTER ) // テレビディア マルチワープロ
+// テレビディア マルチワープロ
+CONS( 1995, tvdear,  0,          0,  tvdear,  tvdear, tvdear_state, empty_init, "Takara", "TV Dear Multi Word Processor", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER )
