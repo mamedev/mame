@@ -460,8 +460,11 @@ public:
 		//we need to override init_cpu_m68010 so replacing call to m68010_device::device_start();
 		m68000_musashi_device::device_start();
 		init_cpu_m68010();
-		
-		LOG("m68010_tekmmu_device::device_start: setting emmu\n");
+	}
+	void device_reset() override
+	{
+		m68000_musashi_device::device_reset();
+		LOG("m68010_tekmmu_device::device_reset: setting emmu\n");
 		set_emmu_enable(true);		// sets m_instruction_restart=true
 	}
 
@@ -771,10 +774,10 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 				inbuserr = 1;
 
-				LOG("memory_r: bus error: PID(%d) != %d %08x fc(%d) pc(%08x)\n", BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
-				m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-				m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-				m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 0, m_maincpu->get_fc());
+				LOG("memory_r: %06x: bus error: PTE PID %d != current PID %d fc(%d) pc(%08x) berr(%d)\n", offset<<1,
+					BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), m_maincpu->get_fc(), m_maincpu->pc(),
+					inbuserr);
+				m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 1, m_maincpu->get_fc(), true);
 
 				mem_mask = 0;
 				return 0xffff;
@@ -795,13 +798,15 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		if (offset >= OFF8_TO_OFF16(MAXRAM) && offset < OFF8_TO_OFF16(0x600000))
 		{
 			LOG("memory_r: bus error: NOMEM %08x fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
-			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 1, m_maincpu->get_fc());
+			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 1, m_maincpu->get_fc(), true);
 		}
 	}
-	
+
+	if (inbuserr && (m_maincpu->get_fc() & 4))
+	{
+	LOG("berr reset(r) %06x\n", offset<<1);
 	inbuserr = 0;
+	}
 
 	return (m_boot) ? m_prom[offset & 0x3fff] : m_vm->read16(offset, mem_mask);
 }
@@ -837,16 +842,15 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			inbuserr = 1;
 
 			LOG("memory_w: bus error: PID(%d) != %d %08x fc(%d)\n", BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), OFF16_TO_OFF8(offset), m_maincpu->get_fc());
-			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 0, m_maincpu->get_fc());
+			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 0, m_maincpu->get_fc(), true);
 			
 			mem_mask = 0;	// disable write
 		}
-		else
+		else if (!inbuserr)
 		{
 			m_map_control |= (1 << MAP_BLOCK_ACCESS);
 		}
+		else mem_mask = 0;
 
 		// write-enabled page?
 		if (BIT(m_map[offset >> 11], 14) == 0)
@@ -856,9 +860,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			inbuserr = 1;
 
 			LOG("memory_w: bus error: READONLY %08x fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(),  m_maincpu->pc());
-			m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-			m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 0, m_maincpu->get_fc());
+			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 0, m_maincpu->get_fc(), true);
 			
 			mem_mask = 0;	// disable write
 			return;
@@ -868,7 +870,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		if (mem_mask)
 		{
 			m_map[offset >> 11] |= 0x8000;
-			LOG("memory_w: DIRTY m_map(0x%04x) m_map_control(%02x)\n", m_map[offset >> 11], m_map_control);
+			LOG("memory_w: DIRTY m_map(0x%04x) m_map_control(%02x) berr(%d)\n", m_map[offset >> 11], m_map_control, inbuserr);
 		}
 		
 		offset = BIT(offset, 0, 11) | (BIT(m_map[offset >> 11], 0, 11) << 11);
@@ -879,13 +881,14 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	if (offset >= OFF8_TO_OFF16(MAXRAM) && offset < OFF8_TO_OFF16(0x600000) && !machine().side_effects_disabled())
 	{
 		LOG("memory_w: bus error: NOMEM %08x fc(%d)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc());
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 0, m_maincpu->get_fc());
+		m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), 0, m_maincpu->get_fc(), true);
 	}
 
-	//LOG("memory_w: %08x <= %04x\n",  OFF16_TO_OFF8(offset), data);
-inbuserr = 0;
+	if (inbuserr && (m_maincpu->get_fc() & 4))
+	{
+	LOG("berr reset(w) %06x\n", offset<<1);
+	inbuserr = 0;
+	}
 
 	m_vm->write16(offset, data, mem_mask);
 }
@@ -901,9 +904,7 @@ u16 tek440x_state::map_r(offs_t offset)
 		if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
 		{
 				LOG("map_r: bus error: PID(%d) %08x fc(%d) pc(%08x)\n", BIT(m_map[(offset >> 11) & 0x7ff], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
-				m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-				m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-				m_maincpu->set_buserror_details(offset, 0, m_maincpu->get_fc());
+				m_maincpu->set_buserror_details(offset, 1, m_maincpu->get_fc(), true);
 				return 0;
 		}
 	}
