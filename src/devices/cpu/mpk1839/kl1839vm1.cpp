@@ -11,7 +11,7 @@
 
 #define LOG_VAX    (1U << 1)
 
-#define VERBOSE ( LOG_GENERAL | LOG_VAX )
+//#define VERBOSE ( LOG_GENERAL | LOG_VAX )
 #include "logmacro.h"
 
 #define UNIMPLEMENTED(msg) LOG("Unimplemented: %s\n", msg)
