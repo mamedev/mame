@@ -475,6 +475,17 @@ void superxavix_super_tv_pc_state::superxavix_super_tv_pc(machine_config& config
 	SOFTWARE_LIST(config, "cart_list").set_original("super_tv_pc_cart");
 }
 
+void superxavix_piano_pc_state::superxavix_piano_pc(machine_config &config)
+{
+	xavix2002(config);
+
+	m_anport->read_0_callback().set(FUNC(superxavix_piano_pc_state::piano_pc_anport0_r));
+	m_anport->read_1_callback().set(FUNC(superxavix_piano_pc_state::piano_pc_anport1_r));
+
+	m_xavix2002io->read_0_callback().set(FUNC(superxavix_piano_pc_state::read_extended_io0));
+	m_xavix2002io->read_1_callback().set(FUNC(superxavix_piano_pc_state::read_extended_io1));
+	m_xavix2002io->read_2_callback().set(FUNC(superxavix_piano_pc_state::read_extended_io2));
+}
 
 
 void superxavix_doradraw_state::xavix_extbus_map(address_map &map)
@@ -762,6 +773,13 @@ void superxavix_i2c_jmat_state::init_xavmusic()
 	m_disable_sprite_yflip = true;
 }
 
+void superxavix_piano_pc_state::init_piano_pc()
+{
+	init_xavix();
+	m_disable_memory_bypass = true;
+}
+
+
 void superxavix_doradraw_state::init_doradraw()
 {
 	init_xavix();
@@ -841,7 +859,7 @@ CONS( 2006, suprtvpchk,  suprtvpc, 0, superxavix_super_tv_pc,    suprtvpc,      
 CONS( 2006, suprtvpcdo,  suprtvpc, 0, superxavix_super_tv_pc,    suprtvpc,      superxavix_super_tv_pc_state, init_stvpc, "Epoch / SSD Company LTD", "Super TV-PC - Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // similar to Super TV-PC but with additional built in piano
-CONS( 2008, epo_ntpj,  0, 0, superxavix_super_tv_pc, suprtvpc, superxavix_super_tv_pc_state, init_xavix, "Epoch / SSD Company LTD", "Hello Kitty Piano PC (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, epo_ntpj,  0, 0, superxavix_piano_pc, suprtvpc, superxavix_piano_pc_state, init_piano_pc, "Epoch / SSD Company LTD", "Hello Kitty Piano PC (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ドラえもん うごく！おえかき エポック社
 CONS( 2007, doradraw,  0, 0, superxavix_doradraw,    xavix,      superxavix_doradraw_state, init_doradraw, "Epoch / SSD Company LTD", "Doraemon Moving! Oekaki (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

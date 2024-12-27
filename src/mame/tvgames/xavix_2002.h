@@ -76,6 +76,28 @@ private:
 	required_memory_bank m_rombank;
 };
 
+
+class superxavix_piano_pc_state : public superxavix_state
+{
+public:
+	superxavix_piano_pc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: superxavix_state(mconfig, type, tag)
+	{ }
+
+	void superxavix_piano_pc(machine_config &config);
+
+	void init_piano_pc();
+
+private:
+	uint8_t piano_pc_anport0_r() { return (m_mouse0x->read()^0x7f)+1; }
+	uint8_t piano_pc_anport1_r() { return (m_mouse0y->read()^0x7f)+1; }
+
+	// needs 0x00 returning from one of these to boot past loading screen
+	uint8_t read_extended_io0(offs_t offset, uint8_t mem_mask) { return 0x00; }
+	uint8_t read_extended_io1(offs_t offset, uint8_t mem_mask) { return 0x00; }
+	uint8_t read_extended_io2(offs_t offset, uint8_t mem_mask) { return 0x00; }
+};
+
 class superxavix_doradraw_state : public superxavix_state
 {
 public:
