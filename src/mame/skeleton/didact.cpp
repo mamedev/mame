@@ -770,7 +770,7 @@ INPUT_CHANGED_MEMBER(didact_state::trigger_reset)
 	if (newval == CLEAR_LINE)
 	{
 		LOGKBD("RESET is released, resetting the CPU\n");
-		m_maincpu->reset();
+		machine_reset();
 		m_shift = 0;
 		m_led = 0;
 	}
