@@ -138,7 +138,7 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 	// Control Flow Operations
 	OPINFO0(NOP,     "nop",      4,   false, NONE, NONE, NONE)
 	OPINFO1(DEBUG,   "debug",    4,   false, NONE, NONE, ALL,  PINFO(IN, OP, IANY)) // MAME debugger breakpoint
-	OPINFO0(BREAK,   "break",    4,   false, NONE, NONE, NONE) // (for debugging) Hardware breakpoint for debugging the output assembly (will cause MAME to crash without a debugger attached)
+	OPINFO0(BREAK,   "break",    4,   false, NONE, NONE, NONE) // (for debugging) Issues a breakpoint exception to allow for debugging the generated assembly
 	OPINFO1(EXIT,    "exit",     4,   true,  NONE, NONE, ALL,  PINFO(IN, OP, IANY))
 	OPINFO3(HASHJMP, "hashjmp",  4,   false, NONE, NONE, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, HANDLE))
 	OPINFO1(JMP,     "jmp",      4,   true,  NONE, NONE, NONE, PINFO(IN, OP, LABEL))

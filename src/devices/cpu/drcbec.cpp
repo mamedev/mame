@@ -523,6 +523,10 @@ int drcbe_c::execute(code_handle &entry)
 				// these opcodes should be processed at compile-time only
 				fatalerror("Unexpected opcode\n");
 
+			case MAKE_OPCODE_SHORT(OP_BREAK, 4, 0):
+				osd_break_into_debugger("break from drc");
+				break;
+
 			case MAKE_OPCODE_SHORT(OP_DEBUG, 4, 0):     // DEBUG   pc
 				if (m_device.machine().debug_flags & DEBUG_FLAG_CALL_HOOK)
 					m_device.debug()->instruction_hook(PARAM0);
@@ -991,7 +995,7 @@ int drcbe_c::execute(code_handle &entry)
 				flags = FLAGS64_NZ(temp64);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (uint32_t)temp64;
-				if (temp64 != (int32_t)temp64)
+				if ((int64_t)temp64 != (int32_t)temp64)
 					flags |= FLAG_V;
 				break;
 
@@ -1005,7 +1009,7 @@ int drcbe_c::execute(code_handle &entry)
 				temp32 = (int32_t)temp64;
 				flags = FLAGS32_NZ(temp32);
 				PARAM0 = temp32;
-				if (temp64 != (int32_t)temp64)
+				if ((int64_t)temp64 != (int32_t)temp64)
 					flags |= FLAG_V;
 				break;
 
