@@ -1911,7 +1911,7 @@ void drcbe_x64::op_setfmod(Assembler &a, const instruction &inst)
 	if (srcp.is_immediate())
 	{
 		int value = srcp.immediate() & 3;
-		a.mov(MABS(&m_state.fmod), value);                                              // mov   [fmod],srcp
+		a.mov(MABS(&m_state.fmod, 1), value);                                           // mov   [fmod],srcp
 		a.ldmxcsr(MABS(&m_near.ssecontrol[value]));                                     // ldmxcsr fp_control[srcp]
 	}
 
@@ -2194,7 +2194,7 @@ void drcbe_x64::op_save(Assembler &a, const instruction &inst)
 	for (int regnum = 0; regnum < std::size(m_state.r); regnum++)
 	{
 		if (int_register_map[regnum] != 0)
-			a.mov(ptr(rcx, regoffs + 8 * regnum), Gpq(regnum));
+			a.mov(ptr(rcx, regoffs + 8 * regnum), Gpq(int_register_map[regnum]));
 		else
 		{
 			a.mov(rax, MABS(&m_state.r[regnum].d));
@@ -2207,7 +2207,7 @@ void drcbe_x64::op_save(Assembler &a, const instruction &inst)
 	for (int regnum = 0; regnum < std::size(m_state.f); regnum++)
 	{
 		if (float_register_map[regnum] != 0)
-			a.movsd(ptr(rcx, regoffs + 8 * regnum), Xmm(regnum));
+			a.movsd(ptr(rcx, regoffs + 8 * regnum), Xmm(float_register_map[regnum]));
 		else
 		{
 			a.mov(rax, MABS(&m_state.f[regnum].d));
@@ -2238,7 +2238,7 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 	for (int regnum = 0; regnum < std::size(m_state.r); regnum++)
 	{
 		if (int_register_map[regnum] != 0)
-			a.mov(Gpq(regnum), ptr(rcx, regoffs + 8 * regnum));
+			a.mov(Gpq(int_register_map[regnum]), ptr(rcx, regoffs + 8 * regnum));
 		else
 		{
 			a.mov(rax, ptr(rcx, regoffs + 8 * regnum));
@@ -2251,7 +2251,7 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 	for (int regnum = 0; regnum < std::size(m_state.f); regnum++)
 	{
 		if (float_register_map[regnum] != 0)
-			a.movsd(Xmm(regnum), ptr(rcx, regoffs + 8 * regnum));
+			a.movsd(Xmm(float_register_map[regnum]), ptr(rcx, regoffs + 8 * regnum));
 		else
 		{
 			a.mov(rax, ptr(rcx, regoffs + 8 * regnum));
@@ -2272,7 +2272,7 @@ void drcbe_x64::op_restore(Assembler &a, const instruction &inst)
 
 	// copy flags
 	a.movzx(eax, byte_ptr(rcx, offsetof(drcuml_machine_state, flags)));                 // movzx  eax,state->flags
-	a.push(ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));                   // push   flags_unmap[eax*8]
+	a.push(qword_ptr(rbp, rax, 3, offset_from_rbp(&m_near.flagsunmap[0])));             // push   flags_unmap[eax*8]
 	a.popfq();                                                                          // popf
 }
 
