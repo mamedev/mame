@@ -77,6 +77,25 @@ static INPUT_PORTS_START( spg2xx_jakks )
 	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jak_supm )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
+	PORT_BIT( 0x01ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+	PORT_BIT( 0x0006, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( mk )
 	PORT_START("P1")
 	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -190,6 +209,11 @@ ROM_START( jak_potc )
 	ROM_LOAD16_WORD_SWAP( "pirates.u5", 0x000000, 0x400000, CRC(935fe66c) SHA1(8b5b11c61b7f32c313aa46e33a1c918ed82f7916) )
 ROM_END
 
+ROM_START( jak_supm )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "superman.u3", 0x000000, 0x400000, CRC(626bdd85) SHA1(605b3193c17f606d2de5689f045b50ac0b7ff024) )
+ROM_END
+
 ROM_START( jak_sbjd )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "spongebobjelly.bin", 0x000000, 0x400000, CRC(804fbd87) SHA1(519aa7fada993837cb57fce26a1d721547af1861) )
@@ -237,3 +261,5 @@ CONS( 2007, jak_sbjd, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_ini
 CONS( 2008, jak_wall, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wall-E (JAKKS Pacific TV Game) (Dec 18 2007 11:34:25)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2007, jak_potc, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Pirates of the Caribbean - Islands of Fortune (JAKKS Pacific TV Game) (Jun 1 2007 12:34:28)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, jak_supm, 0, 0, spg2xx_jakks,  jak_supm,      jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Superman in Super Villain Showdown (JAKKS Pacific TV Game) (26 Jan 2006 A)", MACHINE_IMPERFECT_SOUND ) // has AT24C04
