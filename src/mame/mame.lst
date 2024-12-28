@@ -46285,6 +46285,7 @@ tvpc_ham
 tvpc_tom
 
 @source:tvgames/xavix2.cpp
+ban_db2j
 ltv_naru                        //
 domfitad                        //
 dombikec                        //
@@ -46311,13 +46312,20 @@ ttv_sw                          //
 ttv_swj                         //
 
 @source:tvgames/xavix_2002.cpp
+anpanmdx
+apmj2009
+ban_dn1j
 ban_kksj
+epo_ntpj
 ban_ordj
 domdance                        //
 domfitch                        //
 domfitex                        //
 domstepc                        //
+doradraw
+epo_doka
 epo_tfit
+maxheart
 mrangbat
 suprtvpc
 suprtvpcdo

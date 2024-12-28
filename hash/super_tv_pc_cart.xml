@@ -27,6 +27,8 @@ license:CC0-1.0
 		<part name="cart" interface="super_tv_pc_cart">
 			<dataarea name="prg" size="0x400000">
 				<rom name="c-02.u1" size="0x400000" crc="99fb0088" sha1="b46400c850b08abd5c8ee649f483e0694b3eb059" />
+				<!-- bypass EEPROM error until cart EEPROM is properly hooked up -->
+				<rom value="0xea" offset="0xd809" size="2" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -38,7 +40,8 @@ license:CC0-1.0
 		<info name="alt_title" value="ダブルマウスパーティー" />
 		<part name="cart" interface="super_tv_pc_cart">
 			<dataarea name="prg" size="0x200000">
-				<rom name="c-03.u1" size="0x200000" crc="94634a7b" sha1="d69ec0a8c6061e749206927ee68dbcf852fcc03e" />
+				<!-- baddump because code seems to be corrupt in places -->
+				<rom name="c-03.u1" size="0x200000" crc="94634a7b" sha1="d69ec0a8c6061e749206927ee68dbcf852fcc03e" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -51,6 +54,8 @@ license:CC0-1.0
 		<part name="cart" interface="super_tv_pc_cart">
 			<dataarea name="prg" size="0x400000">
 				<rom name="c-04.u1" size="0x400000" crc="89b6ef86" sha1="1af69047508fce08fa949a7d821255e306a329a3" />
+				<!-- bypass (invisible) EEPROM error until cart EEPROM is properly hooked up -->
+				<rom value="0xea" offset="0xd5fa" size="2" loadflag="fill" />		
 			</dataarea>
 		</part>
 	</software>

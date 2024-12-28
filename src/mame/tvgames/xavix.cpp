@@ -34,8 +34,6 @@
 
     year        name                                                                                            PCB ID      ROM width       TSOP pads   ROM size        SEEPROM             die markings            extra components / notes
 
-    2011      anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
-    2009      anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
     2006      Hello Kitty カードでおままごと　あいうおえ図鑑 / エポック社 / 日本       Hello Kitty Play House with Cards Aiuoe Illustrated Book / Epochsha / Japan
               ドラえもん 体感タケコプター! 空とぶ大冒険 / エポック社 / 日本      Doraemon Experience Takecopter! Great Flying Adventure / Epoch Publishing / Japan
               スーパーテレビパソコンLink / エポック社 / 日本   Super TV PC Link / Epoch / Japan
@@ -43,9 +41,6 @@
               Let's!TVプレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック / バンダイ / 日本  Let's!TV Play Experience Cast Off Kamen Rider Kabuto Clock Up & Rider Kick / Bandai / Japan
               Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！ / バンダイ / 日本   Let's! TV Play Narikiri Experience Boukenger Run! Shoot! Mission starts! ! / Bandai / Japan
               Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！ / タカラトミー / 日本   Let's!TV Play Narikiri Fight Ultraman Shoot! Deadly ray! ! / Takara Tomy / Japan
-    2005      どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！ / エポック社 / 日本          Doraemon anywhere - Japan travel game DX experience! Where is the Dragon Grand Prix! / Epoch / Japan
-              Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう / バンダイ / 日本         Let's!TV Play Futari wa PreCure MaxHeart Dance on the mat Let's go to MaxHeart / Bandai / Japan
-              Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's!TV Play Mahou Sentai Magiranger Dance & Battle at Magimat / Bandai / Japan
               Jala Jaland /atlus/Japan (arcade version)                                                       -           -               -           -               -                   -                       -
     2004      Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
               Accessory memory mascot for TV mail Pc mail cot 2 characters (Putchi, Petchi) /EPOCH/Japan      -           -               -           -               -                   -                       -
@@ -67,12 +62,16 @@
     not dumped: xavix2.cpp
 
     2008      究極! 筋肉スタジアム! サスケ完全制覇   kyuukyoku! kinniku grand slam! SASUKE kanzen seiha /EPOCH/Japan                                 -           -               -           -               -                   -                       -
-    2006      Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～ / バンダイ / 日本         Let's!TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ / Bandai / Japan
     2006      SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦 / エポック社 / 日本   SASUKE Sasuke & Muscle Battle!! Sportsman No. 1 Decisive Battle / Epoch Publishing / Japan
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-              Excite Striker (UK)
+	          Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's!TV Play Mahou Sentai Magiranger Dance & Battle at Magimat / Bandai / Japan
+			  anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
+			  どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！ / エポック社 / 日本          Doraemon anywhere - Japan travel game DX experience! Where is the Dragon Grand Prix! / Epoch / Japan
+              Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう / バンダイ / 日本         Let's!TV Play Futari wa PreCure MaxHeart Dance on the mat Let's go to MaxHeart / Bandai / Japan
+			  anpan-man kazoku de ikunou mat DX /JoyPalette/Japan                                             -           -               -           -               -                   -                       -
+			  Excite Striker (UK)
               connecTV OPUS /RADICA EU (different ROM to US?)
               Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型 / バンダイ / 日本  (Let's! TV Play Ongeki Battle! Kamen Rider Hibiki Decide! Ichikkasei no Kata / Bandai / Japan)
               Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
@@ -200,6 +199,7 @@
     dumped: see xavix2.cpp
     2006      Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本            Let's!TV Play NARUTO Ninja Experience ~Dattebayo~ / Bandai / Japan
     2006      テレビであそぼう！まなぼう！超能力あいうえお図鑑 / エポック社 / 日本   Let's play on TV! Learn! Superpower Aiueo Illustrated Book / Epochsha / Japan
+    2006      Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～ / バンダイ / 日本         Let's!TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ / Bandai / Japan
 
 
 
@@ -283,12 +283,49 @@ void xavix_state::xavix_map(address_map &map)
 // this is used by data reads / writes after some processing in the core to decide if data reads can see lowbus, zeropage, stack, bank registers etc. and only falls through to here on a true external bus access
 void xavix_state::xavix_extbus_map(address_map &map)
 {
-	map(0x000000, 0xffffff).rw(FUNC(xavix_state::extbus_r), FUNC(xavix_state::extbus_w));
+	map(0x000000, 0x7fffff).rom().region("bios", 0x00000);
 }
+
+void xavix_cart_state::xavix_extbus_map(address_map &map)
+{
+	map(0x000000, 0x5fffff).rw(FUNC(xavix_cart_state::cart_r), FUNC(xavix_cart_state::cart_w));
+	map(0x600000, 0x7fffff).rom().region("bios", 0x600000);
+}
+
+void xavix_state::xavix_4mb_extbus_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).mirror(0x400000).rom().region("bios", 0x00000);
+}
+
+void xavix_state::xavix_2mb_extbus_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).mirror(0x600000).rom().region("bios", 0x00000);
+}
+
+void xavix_state::xavix_1mb_extbus_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).mirror(0x700000).rom().region("bios", 0x00000);
+}
+
+void xavix_state::mainram_w(offs_t offset, uint8_t data)
+{
+	m_mainram[offset] = data;
+/*
+// trying to debug anpanmdx title screen issue 
+	if ((offset == 0x3d) && (data == 0x77))
+		logerror("%s: writing 0x77 to 0x3d\n", machine().describe_context());
+	if ((offset == 0x98) && (data == 0x77))
+		logerror("%s: writing 0x77 to 0x98\n", machine().describe_context());
+	if ((offset == 0x3f2) && (data == 0x77))
+		logerror("%s: writing 0x77 to 0x3f2\n", machine().describe_context());
+// but the unwanted? value of 0x77 is explicitly set by the code at 1c61c
+*/
+}
+
 
 void xavix_state::xavix_lowbus_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().share("mainram");
+	map(0x0000, 0x3fff).ram().w(FUNC(xavix_state::mainram_w)).share("mainram");
 
 	// Memory Emulator / Text Array
 	map(0x4000, 0x4fff).rw(FUNC(xavix_state::xavix_memoryemu_txarray_r), FUNC(xavix_state::xavix_memoryemu_txarray_w));
@@ -415,32 +452,41 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7fff, 0x7fff).rw(FUNC(xavix_state::irq_vector_hi_r),FUNC(xavix_state::irq_vector_hi_w));
 }
 
-void xavix_state::superxavix_lowbus_map(address_map &map)
+void superxavix_state::superxavix_lowbus_map(address_map &map)
 {
 	xavix_lowbus_map(map);
 
 	// bitmap layer palette
-	map(0x6c00, 0x6cff).ram().w(FUNC(xavix_state::bmp_palram_sh_w)).share("bmp_palram_sh");
-	map(0x6d00, 0x6dff).ram().w(FUNC(xavix_state::bmp_palram_l_w)).share("bmp_palram_l");
+	map(0x6c00, 0x6cff).ram().w(FUNC(superxavix_state::bmp_palram_sh_w)).share("bmp_palram_sh");
+	map(0x6d00, 0x6dff).ram().w(FUNC(superxavix_state::bmp_palram_l_w)).share("bmp_palram_l");
 
 	// map(0x6a40, 0x6a7f).ram().share("ext_segment_regs"); // 16x32 extended segment regs
 
-	map(0x6f78, 0x6f78).rw(FUNC(xavix_state::superxavix_chr_pal_index_r), FUNC(xavix_state::superxavix_chr_pal_index_w)); // SgdPalChrIdx
-	map(0x6f79, 0x6f79).rw(FUNC(xavix_state::superxavix_chr_pal_hue_r), FUNC(xavix_state::superxavix_chr_pal_hue_w)); // SgdPalChrHue
-	map(0x6f7a, 0x6f7a).rw(FUNC(xavix_state::superxavix_chr_pal_saturation_r), FUNC(xavix_state::superxavix_chr_pal_saturation_w)); // SgdPalChrSat
-	map(0x6f7b, 0x6f7b).rw(FUNC(xavix_state::superxavix_chr_pal_lightness_r), FUNC(xavix_state::superxavix_chr_pal_lightness_w)); // SgdPalChrLgt
+	 // bitmap plotter(!) (with auto-inc?) - used by super pc tv units
+	map(0x6f60, 0x6f60).w(FUNC(superxavix_state::superxavix_plt_flush_w)); // writes here to flush plotter FIFO
+	map(0x6f62, 0x6f62).w(FUNC(superxavix_state::superxavix_plt_dat_w)); // writes plotter data here
+	map(0x6f63, 0x6f63).r(FUNC(superxavix_state::superxavix_plt_dat_r));
+	map(0x6f64, 0x6f67).rw(FUNC(superxavix_state::superxavix_plt_loc_r), FUNC(superxavix_state::superxavix_plt_loc_w)).share("sx_plt_loc");
 
-	map(0x6f7c, 0x6f7c).rw(FUNC(xavix_state::superxavix_bitmap_pal_index_r), FUNC(xavix_state::superxavix_bitmap_pal_index_w)); // SgdPalBmpAdr
-	map(0x6f7d, 0x6f7d).rw(FUNC(xavix_state::superxavix_bitmap_pal_hue_r), FUNC(xavix_state::superxavix_bitmap_pal_hue_w)); // SgdPalBmpHue
-	map(0x6f7e, 0x6f7e).rw(FUNC(xavix_state::superxavix_bitmap_pal_saturation_r), FUNC(xavix_state::superxavix_bitmap_pal_saturation_w)); // SgdPalBmpSat
-	map(0x6f7f, 0x6f7f).rw(FUNC(xavix_state::superxavix_bitmap_pal_lightness_r), FUNC(xavix_state::superxavix_bitmap_pal_lightness_w)); // SgdPalBmpLgt
+	map(0x6f78, 0x6f78).rw(FUNC(superxavix_state::superxavix_chr_pal_index_r), FUNC(superxavix_state::superxavix_chr_pal_index_w)); // SgdPalChrIdx
+	map(0x6f79, 0x6f79).rw(FUNC(superxavix_state::superxavix_chr_pal_hue_r), FUNC(superxavix_state::superxavix_chr_pal_hue_w)); // SgdPalChrHue
+	map(0x6f7a, 0x6f7a).rw(FUNC(superxavix_state::superxavix_chr_pal_saturation_r), FUNC(superxavix_state::superxavix_chr_pal_saturation_w)); // SgdPalChrSat
+	map(0x6f7b, 0x6f7b).rw(FUNC(superxavix_state::superxavix_chr_pal_lightness_r), FUNC(superxavix_state::superxavix_chr_pal_lightness_w)); // SgdPalChrLgt
 
-	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
+	map(0x6f7c, 0x6f7c).rw(FUNC(superxavix_state::superxavix_bitmap_pal_index_r), FUNC(superxavix_state::superxavix_bitmap_pal_index_w)); // SgdPalBmpAdr
+	map(0x6f7d, 0x6f7d).rw(FUNC(superxavix_state::superxavix_bitmap_pal_hue_r), FUNC(superxavix_state::superxavix_bitmap_pal_hue_w)); // SgdPalBmpHue
+	map(0x6f7e, 0x6f7e).rw(FUNC(superxavix_state::superxavix_bitmap_pal_saturation_r), FUNC(superxavix_state::superxavix_bitmap_pal_saturation_w)); // SgdPalBmpSat
+	map(0x6f7f, 0x6f7f).rw(FUNC(superxavix_state::superxavix_bitmap_pal_lightness_r), FUNC(superxavix_state::superxavix_bitmap_pal_lightness_w)); // SgdPalBmpLgt
+
+	map(0x6f80, 0x6f99).rw(FUNC(superxavix_state::superxavix_crtc_1_r), FUNC(superxavix_state::superxavix_crtc_1_w)).share("sx_crtc_1"); // Super XaviX CRTC?
+	map(0x6fa0, 0x6fa7).rw(FUNC(superxavix_state::superxavix_crtc_2_r), FUNC(superxavix_state::superxavix_crtc_2_w)).share("sx_crtc_2"); // maybe more CRTC regs?
+
+	map(0x6fb0, 0x6fc7).rw(FUNC(superxavix_state::bitmap_params_r), FUNC(superxavix_state::bitmap_params_w)).share("bmp_base");
 
 	// extended external bus stuff (possible banking control?)
-	map(0x7909, 0x7909).w(FUNC(xavix_state::extended_extbus_reg0_w));
-	map(0x790b, 0x790b).w(FUNC(xavix_state::extended_extbus_reg1_w));
-	map(0x790d, 0x790d).w(FUNC(xavix_state::extended_extbus_reg2_w));
+	map(0x7909, 0x7909).w(FUNC(superxavix_state::extended_extbus_reg0_w));
+	map(0x790b, 0x790b).w(FUNC(superxavix_state::extended_extbus_reg1_w));
+	map(0x790d, 0x790d).w(FUNC(superxavix_state::extended_extbus_reg2_w));
 
 	map(0x7a10, 0x7a12).rw("xavix2002io", FUNC(xavix2002_io_device::pio_dir_r), FUNC(xavix2002_io_device::pio_dir_w));
 	map(0x7a20, 0x7a22).rw("xavix2002io", FUNC(xavix2002_io_device::pio_out_r), FUNC(xavix2002_io_device::pio_out_w));
@@ -745,13 +791,13 @@ static INPUT_PORTS_START( tom_tvho )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("MOUSE0X")
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x01, IPT_AD_STICK_X ) PORT_MINMAX(0x01, 0xfe) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_REVERSE PORT_PLAYER(1)
 	PORT_MODIFY("MOUSE0Y")
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x01, IPT_AD_STICK_Y ) PORT_MINMAX(0x01, 0xfe) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_PLAYER(1)
 	PORT_MODIFY("MOUSE1X")
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x01, IPT_AD_STICK_X ) PORT_MINMAX(0x01, 0xfe) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_REVERSE PORT_PLAYER(2)
 	PORT_MODIFY("MOUSE1Y")
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x01, IPT_AD_STICK_Y ) PORT_MINMAX(0x01, 0xfe) PORT_SENSITIVITY(7) PORT_KEYDELTA(35) PORT_PLAYER(2)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -1602,6 +1648,18 @@ static const gfx_layout char16layout =
 	16*16*4
 };
 
+
+static const gfx_layout char_16x16x2_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	2,
+	{ 0,1 },
+	{ 6,4,2,0,14,12,10,8,22,20,18,16,30,28,26,24 },
+	{ STEP16(0,16*2) },
+	16*16*2
+};
+
 static const gfx_layout charlayout8bpp =
 {
 	8,8,
@@ -1625,6 +1683,7 @@ static const gfx_layout char16layout8bpp =
 };
 
 static GFXDECODE_START( gfx_xavix )
+	GFXDECODE_ENTRY( "bios", 0, char_16x16x2_layout, 0, 64 )
 	GFXDECODE_ENTRY( "bios", 0, gfx_8x8x4_packed_lsb, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, char16layout, 0, 16 )
 	GFXDECODE_ENTRY( "bios", 0, charlayout8bpp, 0, 1 )
@@ -1695,9 +1754,28 @@ void xavix_state::xavix(machine_config &config)
 	m_sound->add_route(1, "rspeaker", 1.0);
 }
 
+void xavix_state::xavix_4mb(machine_config &config)
+{
+	xavix(config);
+	m_maincpu->set_addrmap(6, &xavix_state::xavix_4mb_extbus_map);
+}
+
+void xavix_state::xavix_2mb(machine_config &config)
+{
+	xavix(config);
+	m_maincpu->set_addrmap(6, &xavix_state::xavix_2mb_extbus_map);
+}
+
+void xavix_state::xavix_1mb(machine_config &config)
+{
+	xavix(config);
+	m_maincpu->set_addrmap(6, &xavix_state::xavix_1mb_extbus_map);
+}
+
+
 void xavix_guru_state::xavix_guru(machine_config &config)
 {
-	xavix_nv(config);
+	xavix_4mb_nv(config);
 
 	m_anport->read_2_callback().set(FUNC(xavix_guru_state::guru_anport2_r));
 }
@@ -1710,9 +1788,21 @@ void xavix_i2c_state::xavix_i2c_24c02(machine_config &config)
 	I2C_24C02(config, "i2cmem", 0);
 }
 
-void xavix_i2c_state::xavix_i2c_24c02_43mhz(machine_config &config)
+void xavix_i2c_state::xavix_i2c_24c02_4mb(machine_config &config)
 {
 	xavix_i2c_24c02(config);
+	m_maincpu->set_addrmap(6, &xavix_i2c_state::xavix_4mb_extbus_map);
+}
+
+void xavix_i2c_state::xavix_i2c_24c02_2mb(machine_config &config)
+{
+	xavix_i2c_24c02(config);
+	m_maincpu->set_addrmap(6, &xavix_i2c_state::xavix_2mb_extbus_map);
+}
+
+void xavix_i2c_state::xavix_i2c_24c02_43mhz(machine_config &config)
+{
+	xavix_i2c_24c02_4mb(config);
 
 	// tomplc crashes when you start the game at regular clock speeds
 	// this could indicate that it's actually one of the newer chips
@@ -1722,7 +1812,7 @@ void xavix_i2c_state::xavix_i2c_24c02_43mhz(machine_config &config)
 
 void xavix_state::xavix_43mhz(machine_config &config)
 {
-	xavix(config);
+	xavix_4mb(config);
 
 	// tomthr crashes when you start the game at regular clock speeds
 	// this could indicate that it's actually one of the newer chips
@@ -1739,9 +1829,28 @@ void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 	I2C_24C04(config, "i2cmem", 0); // 24LC04 on Nostalgia games, 24C04 on others
 }
 
-void xavix_i2c_ltv_tam_state::xavix_i2c_24lc04_tam(machine_config &config)
+void xavix_i2c_state::xavix_i2c_24lc04_4mb(machine_config &config)
 {
 	xavix_i2c_24lc04(config);
+	m_maincpu->set_addrmap(6, &xavix_i2c_state::xavix_4mb_extbus_map);
+}
+
+void xavix_i2c_state::xavix_i2c_24lc04_2mb(machine_config &config)
+{
+	xavix_i2c_24lc04(config);
+	m_maincpu->set_addrmap(6, &xavix_i2c_state::xavix_2mb_extbus_map);
+}
+
+void xavix_i2c_state::xavix_i2c_24lc04_1mb(machine_config &config)
+{
+	xavix_i2c_24lc04(config);
+	m_maincpu->set_addrmap(6, &xavix_i2c_state::xavix_1mb_extbus_map);
+}
+
+
+void xavix_i2c_ltv_tam_state::xavix_i2c_24lc04_tam(machine_config &config)
+{
+	xavix_i2c_24lc04_4mb(config);
 
 	m_anport->read_0_callback().set(FUNC(xavix_i2c_ltv_tam_state::tam_anport0_r));
 	m_anport->read_1_callback().set(FUNC(xavix_i2c_ltv_tam_state::tam_anport1_r));
@@ -1752,7 +1861,7 @@ void xavix_i2c_ltv_tam_state::xavix_i2c_24lc04_tam(machine_config &config)
 
 void xavix_tom_tvho_state::xavix_tom_tvho(machine_config &config)
 {
-	xavix(config);
+	xavix_2mb(config);
 
 	m_anport->read_0_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport0_r));
 	m_anport->read_1_callback().set(FUNC(xavix_tom_tvho_state::tvho_anport1_r));
@@ -1764,6 +1873,8 @@ void xavix_i2c_mj_state::xavix_i2c_24lc02_mj(machine_config &config)
 {
 	xavix_i2c_24c02(config);
 
+	m_maincpu->set_addrmap(6, &xavix_i2c_mj_state::xavix_2mb_extbus_map);
+
 	m_anport->read_0_callback().set(FUNC(xavix_i2c_mj_state::mj_anport0_r));
 }
 
@@ -1774,6 +1885,12 @@ void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
 	I2C_24C08(config, "i2cmem", 0);
 }
 
+void xavix_i2c_state::xavix_i2c_24c08_4mb(machine_config &config)
+{
+	xavix_i2c_24c08(config);
+	m_maincpu->set_addrmap(6, &xavix_i2c_state::xavix_4mb_extbus_map);
+}
+
 void xavix_i2c_state::xavix_i2c_24c16(machine_config& config)
 {
 	xavix(config);
@@ -1781,13 +1898,36 @@ void xavix_i2c_state::xavix_i2c_24c16(machine_config& config)
 	I2C_24C16(config, "i2cmem", 0);
 }
 
+void xavix_i2c_state::xavix_i2c_24c16_4mb(machine_config& config)
+{
+	xavix_i2c_24c16(config);
+	m_maincpu->set_addrmap(6, &xavix_i2c_state::xavix_4mb_extbus_map);
+}
+
 
 void xavix_state::xavixp(machine_config &config)
 {
 	// other clocks should change too!
-
 	xavix(config);
 	m_screen->set_refresh_hz(50);
+}
+
+void xavix_state::xavixp_4mb(machine_config &config)
+{
+	xavixp(config);
+	m_maincpu->set_addrmap(6, &xavix_state::xavix_4mb_extbus_map);
+}
+
+void xavix_state::xavixp_2mb(machine_config &config)
+{
+	xavixp(config);
+	m_maincpu->set_addrmap(6, &xavix_state::xavix_2mb_extbus_map);
+}
+
+void xavix_state::xavixp_1mb(machine_config &config)
+{
+	xavixp(config);
+	m_maincpu->set_addrmap(6, &xavix_state::xavix_1mb_extbus_map);
 }
 
 void xavix_state::xavix_nv(machine_config &config)
@@ -1796,17 +1936,41 @@ void xavix_state::xavix_nv(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 }
 
+void xavix_state::xavix_1mb_nv(machine_config &config)
+{
+	xavix_nv(config);
+	m_maincpu->set_addrmap(6, &xavix_state::xavix_1mb_extbus_map);
+}
+
+void xavix_state::xavix_2mb_nv(machine_config &config)
+{
+	xavix_nv(config);
+	m_maincpu->set_addrmap(6, &xavix_state::xavix_2mb_extbus_map);
+}
+
+void xavix_state::xavix_4mb_nv(machine_config &config)
+{
+	xavix_nv(config);
+	m_maincpu->set_addrmap(6, &xavix_state::xavix_4mb_extbus_map);
+}
+
 void xavix_state::xavixp_nv(machine_config &config)
 {
 	xavixp(config);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 }
 
+void xavix_state::xavixp_1mb_nv(machine_config &config)
+{
+	xavixp_nv(config);
+	m_maincpu->set_addrmap(6, &xavix_state::xavix_1mb_extbus_map);
+}
+
 
 
 void xavix_mtrk_state::xavix_mtrk(machine_config &config)
 {
-	xavix(config);
+	xavix_4mb(config);
 
 	XAVIX_MTRK_WHEEL(config, m_wheel, 0);
 	m_wheel->event_out_cb().set(FUNC(xavix_state::ioevent_trg08));
@@ -1821,7 +1985,7 @@ void xavix_mtrk_state::xavix_mtrkp(machine_config &config)
 
 void xavix_madfb_state::xavix_madfb(machine_config &config)
 {
-	xavix(config);
+	xavix_4mb(config);
 
 	XAVIX_MADFB_BALL(config, m_ball, 0);
 	m_ball->event_out_cb().set(FUNC(xavix_state::ioevent_trg01));
@@ -1869,6 +2033,11 @@ void xavix_cart_state::xavix_cart_daig(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SOFTWARE_LIST(config, "cart_list_daig").set_original("takara_daigunder_dx_cart");
+}
+
+void xavix_cart_gcslottv_state::xavix_extbus_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rw(FUNC(xavix_cart_gcslottv_state::cart_r), FUNC(xavix_cart_gcslottv_state::cart_w));
 }
 
 void xavix_cart_gcslottv_state::xavix_cart_gcslottv(machine_config &config)
@@ -2034,58 +2203,58 @@ ROM_START( namcons2 )
 ROM_END
 
 ROM_START( rad_box )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("boxing.bin", 0x000000, 0x200000, CRC(5cd40714) SHA1(165260228c029a9502ca0598c84c24fd9bdeaebe) )
 ROM_END
 
 ROM_START( rad_boxp )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("boxing.bin", 0x000000, 0x200000, CRC(5cd40714) SHA1(165260228c029a9502ca0598c84c24fd9bdeaebe) )
 ROM_END
 
 ROM_START( rad_bass )
-	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("bassfishin.bin", 0x000000, 0x100000, CRC(b54eb1c5) SHA1(084faa9349369f2b8846950765f9c8f758db3e9e) )
 ROM_END
 
 ROM_START( rad_bassp )
-	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("bassfishin.bin", 0x000000, 0x100000, CRC(b54eb1c5) SHA1(084faa9349369f2b8846950765f9c8f758db3e9e) )
 ROM_END
 
 ROM_START( rad_opus )
-	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("opus.bin", 0x000000, 0x100000, CRC(f84c11c5) SHA1(6e34129d0ca9c52b7c342fc94860629d81705523) )
 ROM_END
 
 ROM_START( rad_opusp )
-	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("opus.bin", 0x000000, 0x100000, CRC(f84c11c5) SHA1(6e34129d0ca9c52b7c342fc94860629d81705523) )
 ROM_END
 
 ROM_START( rad_opusa )
-	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("opus_alt.bin", 0x000000, 0x100000, CRC(509df402) SHA1(c5b863670eac8498ddda9dfde91387634cf7aa9f) )
 ROM_END
 
 ROM_START( rad_hnt )
-	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("huntin1.bin", 0x000000, 0x100000, CRC(e51e250f) SHA1(d72199096d466cd344bb243ef1228e0df9501d00) )
 ROM_END
 
 ROM_START( rad_hnt2 )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("huntin2.bin", 0x000000, 0x200000, CRC(fb6846df) SHA1(267632790ed42eba7ef1517b86b024799a78839d) )
 ROM_END
 
 
 ROM_START( rad_snow )
-	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("snoblu.bin", 0x000000, 0x100000, CRC(593e40b3) SHA1(03483ac39eddd7746470fb60018e704382b0da59) )
 ROM_END
 
 ROM_START( rad_snowp )
-	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("snoblu.bin", 0x000000, 0x100000, CRC(593e40b3) SHA1(03483ac39eddd7746470fb60018e704382b0da59) )
 ROM_END
 
@@ -2131,87 +2300,87 @@ ROM_START( rad_mtrkp ) // rom was dumped from NTSC unit, assuming to be the same
 ROM_END
 
 ROM_START( rad_ssx )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("snowssx.bin", 0x000000, 0x400000, CRC(108e19a6) SHA1(3dfb18efb6331b96a53138a5ba29dae9cd966e90) )
 ROM_END
 
 ROM_START( rad_ssxp )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("snowssx.bin", 0x000000, 0x400000, CRC(108e19a6) SHA1(3dfb18efb6331b96a53138a5ba29dae9cd966e90) )
 ROM_END
 
 ROM_START( rad_sbw )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("snowbwhite.bin", 0x000000, 0x400000, CRC(640c1473) SHA1(d37d1484a5b14735b35afbca305dad7d178b08a2) )
 ROM_END
 
 ROM_START( rad_bdp )
-	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("barbiepad.bin", 0x000000, 0x200000, CRC(48731512) SHA1(377d4e1c98cafcd9d5e1ee27943289d250a6e7a9) )
 ROM_END
 
 ROM_START( rad_madf )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("madden.bin", 0x000000, 0x400000, CRC(e972fdcf) SHA1(52001316254880755da959c3441d232fd2c72c7a) )
 ROM_END
 
 ROM_START( rad_fb )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("rfootball.bin", 0x000000, 0x400000, CRC(025e0cb4) SHA1(60ce363de236d5119d078e346ad5d2ae50dbc7e1) )
 ROM_END
 
 ROM_START( epo_fish )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("fish.bin", 0x000000, 0x200000, CRC(72392caf) SHA1(16a65c79ff7e3b5f5f514a024bd652412ed38b74) )
 ROM_END
 
 ROM_START( epo_efdx )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitefishing.bin", 0x000000, 0x400000, CRC(9c85b261) SHA1(6a363faed2ec89c5176e46554a98ca1e20132579) )
 ROM_END
 
 ROM_START( epo_esdx )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("baseballdx.bin", 0x000000, 0x400000, CRC(fe2e832e) SHA1(e6343f5e5f52316538d918d0d67c15764aa40f65) )
 ROM_END
 
 ROM_START( epo_stad )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitestadium.bin", 0x000000, 0x200000, CRC(b58035b9) SHA1(1382a9e42ff932e7ec2186b210917bcf5c571b86) )
 ROM_END
 
 ROM_START( epo_esht ) // ESTJ-MAIN REV:0 PCB
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("tigers.u3", 0x000000, 0x400000, CRC(51a17ef3) SHA1(864190e91775716218be3ac0699570844d67d3e7) )
 ROM_END
 
 ROM_START( epo_epp )
-	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitepingpong.bin", 0x000000, 0x100000, CRC(1fdb9cbd) SHA1(8ed0c1f6d2708ab6e79f0b9553e587c6446e8338) )
 ROM_END
 
 ROM_START( epo_epps )
-	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitepingpong_special.bin", 0x000000, 0x100000, CRC(d59c4b44) SHA1(5a48b9046a1d1beb10972fc1d41d6d63fe829465) )
 ROM_END
 
 ROM_START( epo_eppk )
-	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("sonokongpingpong.bin", 0x000000, 0x100000, CRC(ea81ced6) SHA1(ef8961d3670148501a478c17cd09f5088e32ad41) )
 ROM_END
 
 ROM_START( epo_epp2 )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitepingpong2.u3", 0x000000, 0x200000, CRC(4b70012a) SHA1(4dd80472067027be5a416ec953f4ed6e7df5fc25) )
 ROM_END
 
 ROM_START( epo_epp3 )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitepingpong3.bin", 0x000000, 0x200000, CRC(a2ee8bff) SHA1(6e16dbaac9680e1f311c08e3f573d0cf8708b446))
 ROM_END
 
 ROM_START( epo_mj ) // MARJ MAIN-11A
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("marj.u4", 0x000000, 0x200000, CRC(4e496424) SHA1(9661130ad8315082bd211b3817e5830b576907a8) )
 ROM_END
 
@@ -2246,17 +2415,17 @@ ROM_START( tak_town )
 ROM_END
 
 ROM_START( epo_guru )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("gururinworld.bin", 0x000000, 0x400000, CRC(e5ae4523) SHA1(0e39ef8f94203d34e49422081667805f50a339a1) )
 ROM_END
 
 ROM_START( epo_dmon ) // Doraemon has a phototransistor, microphone and 24LC02, PCB says XaviX 2002
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("doraemon.bin", 0x000000, 0x400000, CRC(d8f5412f) SHA1(11a4c017ed400f7aa585be744d9693efe734c192) )
 ROM_END
 
 ROM_START( rad_rh )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("rescueheroes.bin", 0x000000, 0x200000, CRC(38c391a7) SHA1(120334d4ce89d98438c2a35bf7e53af5096cc878) )
 ROM_END
 
@@ -2296,52 +2465,52 @@ ROM_START( ban_krrj ) // KRRJ MAIN PCB 01
 ROM_END
 
 ROM_START( tak_geig )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("geigeki.bin", 0x000000, 0x400000, CRC(bd0c3576) SHA1(06f614dbec0225ce4ed866b98450912986d72faf) )
 ROM_END
 
 ROM_START( tom_tvho ) // ET105 REV 0.0
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("tvhockey.u4", 0x000000, 0x200000, CRC(9cd72ae2) SHA1(0530851123b607ddb85f9513405ce97c493f5fd6) )
 ROM_END
 
 ROM_START( tak_comt )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("comet.u3", 0x000000, 0x200000, CRC(407c5566) SHA1(41d73c34af8cc3d07a34fcac0bc1856442c94200) )
 ROM_END
 
 ROM_START( jarajal )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("takaraslots.bin", 0x000000, 0x200000, CRC(afae0b72) SHA1(b1c5d80a8dc8466982efd79d54cd82a58f0ff997) )
 ROM_END
 
 ROM_START( tomshoot )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("airgun.u4", 0x000000, 0x200000, CRC(3e4f7b65) SHA1(4e1660d4952c498e250526c2c3f027253e1fcbe1) )
 ROM_END
 
 ROM_START( tcarnavi )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("navi.bin", 0x000000, 0x400000, CRC(f4e693fb) SHA1(be37b35f1e1e661e10187253c2c3aa9858a90812) )
 ROM_END
 
 ROM_START( tomcpin )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("championpinball.bin", 0x000000, 0x400000, CRC(24f6d753) SHA1(3d3b39692bef8156da9e350b456c4e2f0af74484) )
 ROM_END
 
 ROM_START( tomplc )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("imaplayrailconductor.bin", 0x000000, 0x400000, CRC(b775d0ed) SHA1(33142509b11bbe45b0b9222232033dd64ef01ff2) )
 ROM_END
 
 ROM_START( tomthr ) // THRJ MAIN PCB   REV 0.6
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("thrj.u4", 0x000000, 0x400000, CRC(a7e8dc74) SHA1(676b2a905b757356c6c1dfe3f10148484caa44c5) )
 ROM_END
 
 ROM_START( gungunad )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	// some lines were swapped going into the die, but it is unclear if they're swapped back inside it
 	ROM_LOAD("gga.bin", 0x000000, 0x40000, CRC(5252b6bb) SHA1(8a9f920e4bccabbd337f37a838af574e2b16746f) )
 	ROM_CONTINUE(0x080000,0x040000)
@@ -2356,12 +2525,12 @@ ROM_END
 
 
 ROM_START( gungunrv )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("gungunrevolution.u1", 0x000000, 0x400000, CRC(4e34f624) SHA1(7acdd0991df78ecffd156381817ed4f85f6aef09) )
 ROM_END
 
 ROM_START( bistro )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("bistro.u2", 0x000000, 0x200000, CRC(40865e05) SHA1(597a615c61f29c6f6e7ce997a229175cb151242f) )
 ROM_END
 
@@ -2476,7 +2645,7 @@ ROM_END
 
 // ASKJ MAIN-09 PCB
 ROM_START( epo_quiz )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "quizmaster.u1", 0x000000, 0x400000, CRC(e91868b8) SHA1(0128603d755731dafe328b142292dc6e5fe00d78) )
 ROM_END
 
@@ -2515,32 +2684,32 @@ ROM_START( epo_hamd )
 ROM_END
 
 ROM_START( tvpc_tom )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "tvpc_thomas.u1", 0x000000, 0x400000, CRC(507f334e) SHA1(d66efd13f166fcd2a66133dc981c8a67b2a26d5f) )
 ROM_END
 
 ROM_START( tvpc_dor )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "tvpc_doreamon.u3", 0x000000, 0x400000, CRC(6f2edbb2) SHA1(98fa86f85e00aa40e7a585ff0bc930cb5ca88362) )
 ROM_END
 
 ROM_START( tvpc_ham )
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "hpcj.u3", 0x000000, 0x400000, CRC(76e8c854) SHA1(5998c03292a16107d0d7ae00f77677582680f323) )
 ROM_END
 
 ROM_START( tak_gin )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "snowboard.bin", 0x000000, 0x200000, CRC(79fdeae3) SHA1(ab08790e95cdccf3541ecbddb87ebf0dedb3718b) )
 ROM_END
 
 ROM_START( tak_hamr ) // HAMJ MAIN on PCB
-	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "hamj.u4", 0x000000, 0x400000, CRC(2f4f5270) SHA1(dfb75f0d20247cf1c886840149c7cf91780ae1b9) )
 ROM_END
 
 ROM_START( tak_beyb )
-	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "beyblade.u2", 0x000000, 0x200000, CRC(bcf6b3a7) SHA1(1c80f1241138b9d7816f1e5285ff8f3c61739c95) )
 ROM_END
 
@@ -2558,63 +2727,63 @@ ROM_END
 */
 
 // Let's!TVプレイCLASSIC タイトーノスタルジア1
-CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04_2mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC タイトーノスタルジア2
-CONS( 2006, taitons2,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, taitons2,  0,          0,  xavix_i2c_24lc04_2mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC ナムコノスタルジア1
-CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, namcons1,  0,          0,  xavix_i2c_24lc04_1mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイCLASSIC ナムコノスタルジア2
-CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, namcons2,  0,          0,  xavix_i2c_24lc04_1mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Namco",             "Let's! TV Play Classic - Namco Nostalgia 2 (Japan)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2000, rad_ping,  0,          0,  xavix,            rad_ping, xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
-CONS( 2000, rad_pingp, rad_ping,   0,  xavixp,           rad_pingp,xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "ConnecTV Table Tennis (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2000, rad_ping,  0,          0,  xavix_1mb,        rad_ping, xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
+CONS( 2000, rad_pingp, rad_ping,   0,  xavixp_1mb,       rad_pingp,xavix_state,          init_xavix,    "Radica / SSD Company LTD / Simmer Technology", "ConnecTV Table Tennis (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // this set reads the region byte and will show either 'RADICA: Play TV Opus' or 'RADICA: ConnecTV Opus' as the title
-CONS( 2000, rad_opus,  0,          0,  xavix_nv,         rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // there is a missing 'TV Static' noise effect when menus appear (box shows 'Play TV' ingame just shows 'Radica:Plug & Play')
-CONS( 2000, rad_opusp, rad_opus,   0,  xavixp_nv,        rad_opusp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Opus (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2000, rad_opus,  0,          0,  xavix_1mb_nv,     rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // there is a missing 'TV Static' noise effect when menus appear (box shows 'Play TV' ingame just shows 'Radica:Plug & Play')
+CONS( 2000, rad_opusp, rad_opus,   0,  xavixp_1mb_nv,    rad_opusp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Opus (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // the set below does NOT read the PAL/NTSC flag, and will only display 'RADICA: Plug & Play Opus' as the title
 // older release, or region where the Play TV / ConnecTV trademarks weren't used?
-CONS( 2000, rad_opusa, rad_opus,   0,  xavixp_nv,        rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Plug & Play Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2000, rad_opusa, rad_opus,   0,  xavixp_1mb_nv,    rad_opus, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Plug & Play Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2000, rad_hnt,   0,          0,  xavix_nv,         rad_hnt,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Buckmasters Huntin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun (box shows 'Play TV' ingame just shows 'Plug & Play')
+CONS( 2000, rad_hnt,   0,          0,  xavix_1mb_nv,     rad_hnt,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Buckmasters Huntin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun (box shows 'Play TV' ingame just shows 'Plug & Play')
 
-CONS( 2003, rad_hnt2,  0,          0,  xavix_nv,         rad_hnt,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Buckmasters Huntin' 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun, crashes on pause
+CONS( 2003, rad_hnt2,  0,          0,  xavix_2mb_nv,     rad_hnt,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Buckmasters Huntin' 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun, crashes on pause
 
 CONS( 2003, rad_mtrk,  0,          0,  xavix_mtrk,       rad_mtrk, xavix_mtrk_state,     init_xavix,    "Radica / SSD Company LTD",                     "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavix_mtrkp,      rad_mtrkp,xavix_mtrk_state,     init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, rad_box,   0,          0,  xavix,            rad_box,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, rad_boxp,  rad_box,    0,  xavixp,           rad_boxp, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Boxin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, rad_box,   0,          0,  xavix_2mb,        rad_box,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, rad_boxp,  rad_box,    0,  xavixp_2mb,       rad_boxp, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Boxin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, rad_crdn,  0,          0,  xavix,            rad_crdn, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp,           rad_crdnp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, rad_crdn,  0,          0,  xavix_1mb,        rad_crdn, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp_1mb,       rad_crdnp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2000, rad_bb,    0,          0,  xavix,            rad_bb,   xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Play TV branding used on box, not ingame
+CONS( 2000, rad_bb,    0,          0,  xavix_1mb,        rad_bb,   xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Play TV branding used on box, not ingame
 
-CONS( 2001, rad_bass,  0,          0,  xavix,            rad_bass, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp,           rad_bassp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001, rad_bass,  0,          0,  xavix_1mb,        rad_bass, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001, rad_bassp, rad_bass,   0,  xavixp_1mb,       rad_bassp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
-CONS( 2001, rad_snow,  0,          0,  xavix_nv,         rad_snow, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IMPERFECT_SOUND )
-CONS( 2001, rad_snowp, rad_snow,   0,  xavixp_nv,        rad_snowp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IMPERFECT_SOUND )
+CONS( 2001, rad_snow,  0,          0,  xavix_1mb_nv,     rad_snow, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IMPERFECT_SOUND )
+CONS( 2001, rad_snowp, rad_snow,   0,  xavixp_1mb_nv,    rad_snowp,xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2003, rad_madf,  0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_state,    init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // no Play TV branding, USA only release?
 
 CONS( 200?, rad_fb,    0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_state,    init_xavix,    "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // USA only release? doesn't change logo for PAL.
 
-CONS( 200?, rad_rh,    0,          0,  xavix,            rad_rh,   xavix_state,          init_xavix,    "Radica / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, rad_rh,    0,          0,  xavix_2mb,        rad_rh,   xavix_state,          init_xavix,    "Radica / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, rad_ssx,   0,          0,  xavix,            rad_snow, xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "Play TV SSX Snowboarder (NTSC)", MACHINE_IMPERFECT_SOUND )
-CONS( 2004, rad_ssxp,  rad_ssx,    0,  xavixp,           rad_snowp,xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "ConnecTV SSX Snowboarder (PAL)", MACHINE_IMPERFECT_SOUND )
+CONS( 2004, rad_ssx,   0,          0,  xavix_4mb,        rad_snow, xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "Play TV SSX Snowboarder (NTSC)", MACHINE_IMPERFECT_SOUND )
+CONS( 2004, rad_ssxp,  rad_ssx,    0,  xavixp_4mb,       rad_snowp,xavix_state,          init_xavix,    "Radica / Electronic Arts / SSD Company LTD",  "ConnecTV SSX Snowboarder (PAL)", MACHINE_IMPERFECT_SOUND )
 
 // basically a reissue of SSX but without the license
-CONS( 2006, rad_sbw,   0,          0,  xavix,            rad_snow, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (White) (NTSC)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, rad_sbw,   0,          0,  xavix_4mb,        rad_snow, xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Snowboarder (White) (NTSC)", MACHINE_IMPERFECT_SOUND )
 // doesn't exist with ConnecTV branding?
 
-CONS( 2002, rad_bdp,   0,          0,  xavix,            rad_bdp,  xavix_state,          init_xavix,    "Radica / Mattel / SSD Company LTD",            "Barbie Dance Party", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2002, rad_bdp,   0,          0,  xavix_2mb,        rad_bdp,  xavix_state,          init_xavix,    "Radica / Mattel / SSD Company LTD",            "Barbie Dance Party", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ゴール決めるぜ！ エキサイトストライカー
 CONS( 2001, epo_strk,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Goal Kimeruze! Excite Striker (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -2627,15 +2796,15 @@ CONS( 2001, tak_town,  0,          0,  xavix,            rad_jcon, xavix_state, 
 CONS( 2002, rad_jcon,  tak_town,   0,  xavix,            rad_jcon, xavix_state,          init_xavix,    "Radica / Takara / SSD Company LTD",            "Play TV Jr. Construction", MACHINE_IMPERFECT_SOUND )
 
 // ホームラン打とうぜ! エキサイトスタジアム
-CONS( 2000, epo_stad,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Home Run Datouze! Excite Stadium (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2000, epo_stad,  0,          0,  xavix_2mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Home Run Datouze! Excite Stadium (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // this seems to be based off the epo_stad code, but heavily modified
-CONS( 2002, rad_bb2,   0,          0,  xavix,            rad_bb2,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // contains string "Radica RBB2 V1.0"
+CONS( 2002, rad_bb2,   0,          0,  xavix_2mb,        rad_bb2,  xavix_state,          init_xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // contains string "Radica RBB2 V1.0"
 
 // 勝負しようぜ！ エキサイトスタジアムDX
-CONS( 2002, epo_esdx,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Shoubu Shiyouze! Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002, epo_esdx,  0,          0,  xavix_4mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Shoubu Shiyouze! Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 阪神タイガース エキサイトスタジアムＤＸ
-CONS( 2003, epo_esht,  0,          0,  xavix_nv,         epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Hanshin Tigers Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_esht,  0,          0,  xavix_4mb_nv,     epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Hanshin Tigers Excite Stadium DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // interrupt issues after the title screen cause it to hang
 // エースきめるぜ！エキサイトテニス
@@ -2645,85 +2814,86 @@ CONS( 2002, epo_tenn,  0,          0,  xavix,            epo_epp,  xavix_state, 
 CONS( 2001, epo_hamd,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Ham-chans Dai Shuugou Dance Surunoda! Hashirunoda! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 卓球やろうぜ！ エキサイトピンポン
-CONS( 2000, epo_epp,   0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Takkyuu Yarouze! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2000, epo_eppk,  epo_epp,    0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD / Sonokong",           "Real Ping Pong (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2000, epo_epp,   0,          0,  xavix_1mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Takkyuu Yarouze! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2000, epo_eppk,  epo_epp,    0,  xavix_1mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD / Sonokong",           "Real Ping Pong (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // しゃもじdeピンポン
 // This special version of Excite Ping Pong was a competition prize, not a retail product.  The competition was sponsored by ミツカン (Mizkan)
-CONS( 2001, epo_epps,  0,          0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / Mizkan / SSD Company LTD",             "Shamoji de Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001, epo_epps,  0,          0,  xavix_1mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / Mizkan / SSD Company LTD",             "Shamoji de Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 卓球やろうぜ！ エキサイトピンポン2
-CONS( 2003, epo_epp2,   0,         0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Takkyuu Yarouze! Excite Ping Pong 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_epp2,   0,         0,  xavix_2mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Takkyuu Yarouze! Excite Ping Pong 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 愛ちゃんに挑戦！エキサイトピンポン
-CONS( 2006, epo_epp3,   0,         0,  xavix,            epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Ai-chan ni Chousen! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, epo_epp3,   0,         0,  xavix_2mb,        epo_epp,  xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Ai-chan ni Chousen! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // TV麻雀 昇段対局～4人打ち
 CONS( 2003, epo_mj,     0,         0,  xavix_i2c_24lc02_mj,  epo_mj,   xavix_i2c_mj_state,   init_xavix,    "Epoch / SSD Company LTD",                      "TV Mahjong Shoudan Taikyoku - 4-nin Uchi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ブラックバス釣ろうぜ！ エキサイトフィッシング
-CONS( 2001, epo_fish,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Black Bass Tsurouze! Excite Fishing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001, epo_fish,  0,          0,  xavix_2mb,        xavix,    xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Black Bass Tsurouze! Excite Fishing (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 大モノ釣ろうぜ！ エキサイトフィッシングＤＸ
-CONS( 2003, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Dai Mono Tsurouze! Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_efdx,  0,          0,  xavix_i2c_24c08_4mb,epo_efdx, xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Dai Mono Tsurouze! Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ぐるりんワールド
 CONS( 2005, epo_guru,  0,          0,  xavix_guru,       epo_guru, xavix_guru_state,     init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // ドラえもん こえでドカン！わくわくくうきほう！！
-CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Doraemon Wakuwaku Kuukihou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // full / proper title?
+CONS( 2002, epo_dmon, 0,           0,  xavix_i2c_24c02_4mb,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Doraemon Wakuwaku Kuukihou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // full / proper title?
 
 // コロッケ！いただ禁貨！バンカーバトル!!
-CONS( 2003, epo_crok,  0,          0,  xavix_i2c_24lc04, xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Croket! Itada Kinka! Banker Battle!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_crok,  0,          0,  xavix_i2c_24lc04_4mb, xavix_i2c,xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Croket! Itada Kinka! Banker Battle!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。ステージ！ダンスだぴょん！
-CONS( 2002, epo_mms,   0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! (Japan)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2002, epo_mms,   0,          0,  xavix_i2c_24c02_4mb,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 // ズバズバブレード
-CONS( 2002, tak_zuba,  0,          0,  xavix_i2c_24c02,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Zuba Zuba Blade (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002, tak_zuba,  0,          0,  xavix_i2c_24c02_4mb,  xavix_i2c,xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Zuba Zuba Blade (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。ステージ！ダンスだぴょん！ぷらすっ
-CONS( 2003, epo_mmsp,  0,          0,  xavix_i2c_24c02,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! Plus (Japan)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_mmsp,  0,          0,  xavix_i2c_24c02_4mb,  epo_mms,  xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "mini-moni Stage! Dance Dapyon! Plus (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ ケロロ軍曹 ケロロ小隊大パニック！ドタバタ大決戦であります
-CONS( 2006, ban_krrj,  0,          0,  xavix,            ban_krrj, xavix_state,          init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Keroro Shoutai Dai Panic! Dotabata Daikessen de Arimasu (Japan)",  MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_krrj,  0,          0,  xavix_4mb,        ban_krrj, xavix_state,          init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Keroro Shoutai Dai Panic! Dotabata Daikessen de Arimasu (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 // オールスター感謝祭　超豪華！クイズ決定版～赤坂５丁目体感スタジオ～
-CONS( 2004, epo_quiz,  0,          0,  xavix,            epo_quiz, xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "All-Star Kansha-sai Chou Gouka! Quiz Kettieban: Akasaka 5-choume Taikan Studio (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2004, epo_quiz,  0,          0,  xavix_4mb,        epo_quiz, xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "All-Star Kansha-sai Chou Gouka! Quiz Kettieban: Akasaka 5-choume Taikan Studio (Japan)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, has_wamg,  0,          0,  xavix,            has_wamg, xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, has_wamg,  0,          0,  xavix_4mb,        has_wamg, xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // GEIGEKI ゴーゴーシューティング
-CONS( 2002, tak_geig,  0,          0,  xavix_nv,         tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2002, tak_geig,  0,          0,  xavix_4mb_nv,     tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // TVホッケー
-// playable but could do with better deadzome handling on the controls at least, and for some reason auto-center heads to the bottom left corner in breakout mode?
+// playable but could do with better deadzome handling on the controls at least
+// the trackball functionality works well in the menus, but not the games
 CONS( 2001, tom_tvho,  0,          0,  xavix_tom_tvho,   tom_tvho, xavix_tom_tvho_state, init_xavix,    "Tomy / SSD Company LTD",                       "TV Hockey (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // コメットさん☆ラブリンバトン
-CONS( 2001, tak_comt,  0,          0,  xavix_nv,         tak_comt,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Comet-san Lovelin Baton (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001, tak_comt,  0,          0,  xavix_2mb_nv,     tak_comt,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Comet-san Lovelin Baton (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 爆進スノボ ギンギンボーダーズ
-CONS( 2001, tak_gin,   0,          0,  xavix,            tak_gin,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Bakushin Sno-Bo - Gingin Boarders (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
+CONS( 2001, tak_gin,   0,          0,  xavix_2mb,        tak_gin,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Bakushin Sno-Bo - Gingin Boarders (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
 
 // ぽこぽこハンマーズ
-CONS( 2002, tak_hamr,  0,          0,  xavix_i2c_24c02,  tak_hamr, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Poko Poko Hammers (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2002, tak_hamr,  0,          0,  xavix_i2c_24c02_4mb,  tak_hamr, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Poko Poko Hammers (Japan)", MACHINE_IMPERFECT_SOUND )
 
 //ベイブレード　アルティメットシューター
-CONS( 2002, tak_beyb,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Beyblade Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002, tak_beyb,  0,          0,  xavix_2mb,        xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Beyblade Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
 // ジャラジャランド
-CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Jyarajyaland (Japan, PlugIt! version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, jarajal,   0,          0,  xavix_2mb_nv,     jarajal,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Jyarajyaland (Japan, PlugIt! version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 近代撃ちまくりバラエティ 射的王(シャテキング)
-CONS( 2002, tomshoot, 0,           0,  xavix_i2c_24c02,  tomshoot,xavix_i2c_tomshoot_state,  init_xavix,    "Tomy / SSD Company LTD",                   "Kindai Uchimakuri Variety Shateking (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2002, tomshoot, 0,           0,  xavix_i2c_24c02_2mb,  tomshoot,xavix_i2c_tomshoot_state,  init_xavix,    "Tomy / SSD Company LTD",                   "Kindai Uchimakuri Variety Shateking (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // トミカ カーナビドライブ / トミー
-CONS( 2003, tcarnavi,  0,          0,  xavix_nv,         tcarnavi, xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2003, tcarnavi,  0,          0,  xavix_4mb_nv,     tcarnavi, xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // ちゃんぴよんピンボール
-CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08,  tomcpin,  xavix_i2c_state,      init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08_4mb,  tomcpin,  xavix_i2c_state,      init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // 日本一周 僕はプラレール運転士
 CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -2733,13 +2903,13 @@ CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_st
 CONS( 2006, tomthr,    0,          0,  xavix_43mhz,      tomthr,   xavix_state,          init_xavix,    "Takara Tomy / SSD Company LTD",                "Asobitai Hyper Rescue - Boku wa Kyuujotai! (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // ガンガンアドベンチャー
-CONS( 2001, gungunad,  0,          0,  xavix_nv,         xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001, gungunad,  0,          0,  xavix_2mb_nv,     xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ガンガンレボリューション
-CONS( 2004, gungunrv,  0,          0,  xavix_i2c_24lc04, gungunrv, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Revolution (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, gungunrv,  0,          0,  xavix_i2c_24lc04_4mb, gungunrv, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Revolution (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ビストロキッズ ぼくもわたしもコックさん！
-CONS( 2001, bistro,    0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Sega Toys / SSD Company LTD",                  "Bistro Kids: Boku mo Watashi mo Kok-san! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001, bistro,    0,          0,  xavix_2mb,        xavix,    xavix_state,          init_xavix,    "Sega Toys / SSD Company LTD",                  "Bistro Kids: Boku mo Watashi mo Kok-san! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 
 /* Music titles: Emulation note:
@@ -2791,17 +2961,17 @@ CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04_tam,  ltv_tam,xavix_i2c_
 CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikara_state,    init_xavix,    "Takara Tomy / SSD Company LTD",            "Hi-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 // 東京フレンドパーク2
-CONS( 2003, epo_tfp2,  0,          0,  xavix_i2c_24c08,  epo_tfp2, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park 2 (Japan)", MACHINE_IMPERFECT_SOUND) // uses in24lc08b
+CONS( 2003, epo_tfp2,  0,          0,  xavix_i2c_24c08_4mb,  epo_tfp2, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II (Japan)", MACHINE_IMPERFECT_SOUND) // uses in24lc08b
 
 // 東京フレンドパーク2スペシャル
-CONS( 2005, epo_tp2s,  0,          0,  xavix,            epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II Special! (Japan)", MACHINE_IMPERFECT_SOUND)
+CONS( 2005, epo_tp2s,  0,          0,  xavix_4mb,        epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II Special! (Japan)", MACHINE_IMPERFECT_SOUND)
 
 // 東京フレンドパークⅡ パーフェクト!めざせ!グランドスラム‼︎
 CONS( 2007, epo_tp2p,  0,          0,  xavix,            epo_tp2p, xavix_state,     init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II Perfect! Mezase! Grand Slam!! (Japan)", MACHINE_IMPERFECT_SOUND)
 
 // きかんしゃトーマス テレビパソコン
-CONS( 2005, tvpc_tom,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Thomas & Friends (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2005, tvpc_tom,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Thomas & Friends (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // ドラえもん テレビパソコン
-CONS( 2003, tvpc_dor,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2003, tvpc_dor,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Doraemon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // とっとこハム太郎 テレビパソコン
-CONS( 2003, tvpc_ham,  0,          0,  xavix_i2c_24c16,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Tottoko Hamutaro (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2003, tvpc_ham,  0,          0,  xavix_i2c_24c16_4mb,  tvpc_tom, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "TV-PC Tottoko Hamutaro (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
