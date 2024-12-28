@@ -222,7 +222,7 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				screen.container().add_quad(
 					coords.x0 - beam_x, coords.y0 - beam_y,
 					coords.x1 + beam_x, coords.y1 + beam_y,
-					rgb_t(0xff, dot_intensity, dot_intensity, dot_intensity),
+					(dot_intensity << 24) | (curpoint->col & 0xffffff),
 					m_dot_texture,
 					flags);
 			}
