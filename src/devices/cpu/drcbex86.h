@@ -117,6 +117,7 @@ private:
 	asmjit::x86::Mem MABS(void const *base, u32 const size = 0) const { return asmjit::x86::Mem(u64(base), size); }
 	void normalize_commutative(be_parameter &inner, be_parameter &outer);
 	void emit_combine_z_flags(asmjit::x86::Assembler &a);
+	void emit_combine_zs_flags(asmjit::x86::Assembler &a);
 	void emit_combine_z_shl_flags(asmjit::x86::Assembler &a);
 	void reset_last_upper_lower_reg();
 	void set_last_lower_reg(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Gp const &reglo);
@@ -134,6 +135,7 @@ private:
 	void op_mapvar(asmjit::x86::Assembler &a, const uml::instruction &inst);
 
 	void op_nop(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_break(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_debug(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_exit(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_hashjmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
@@ -148,6 +150,7 @@ private:
 	void op_getfmod(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_getexp(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_getflgs(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_setflgs(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_save(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_restore(asmjit::x86::Assembler &a, const uml::instruction &inst);
 
@@ -170,7 +173,9 @@ private:
 	void op_subc(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_cmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_mulu(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mululw(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_muls(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mulslw(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_divu(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_divs(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_and(asmjit::x86::Assembler &a, const uml::instruction &inst);
@@ -217,7 +222,7 @@ private:
 	void emit_mov_p32_r32(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Gp const &reg);
 
 	void alu_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, asmjit::Operand const &dst, be_parameter const &param, std::function<bool(asmjit::x86::Assembler &a, asmjit::Operand const &dst, be_parameter const &src)> optimize = [](asmjit::x86::Assembler &a, asmjit::Operand dst, be_parameter const &src) { return false; });
-	void shift_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, asmjit::Operand const &dst, be_parameter const &param, std::function<bool(asmjit::x86::Assembler &a, asmjit::Operand const &dst, be_parameter const &src)> optimize);
+	void shift_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, size_t opsize, asmjit::Operand const &dst, be_parameter const &param, std::function<bool(asmjit::x86::Assembler &a, asmjit::Operand const &dst, be_parameter const &src)> optimize, bool update_flags);
 
 	// 64-bit code emission helpers
 	void emit_mov_r64_p64(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reglo, asmjit::x86::Gp const &reghi, be_parameter const &param);
@@ -246,10 +251,12 @@ private:
 	void emit_fstp_p(asmjit::x86::Assembler &a, int size, be_parameter const &param);
 
 	// callback helpers
-	static int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags);
-	static int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags);
+	static int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags, bool halfmul_flags);
+	static int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags, bool halfmul_flags);
 	static int ddivu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2);
 	static int ddivs(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2);
+
+	void calculate_status_flags(asmjit::x86::Assembler &a, asmjit::Operand const &dst, u8 flags);
 
 	size_t emit(asmjit::CodeHolder &ch);
 
