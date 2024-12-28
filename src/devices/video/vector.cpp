@@ -102,7 +102,7 @@ void vector_device::device_start()
 			float center_dist = sqrtf((x - mid) * (x - mid) + (y - mid) * (y - mid));
 			float edge_dist = DOT_BITMAP_SIZE * 0.5f - center_dist;
 			float bright = fmaxf(0, fminf(255, edge_dist * 255.0f));
-			m_dot_bitmap.pix(y, x) = rgb_t(255, bright, bright, bright);;
+			m_dot_bitmap.pix(y, x) = rgb_t(255, bright, bright, bright);
 		}
 	}
 	m_dot_texture = machine().render().texture_alloc(render_texture::hq_scale);
