@@ -788,7 +788,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 				m_map_control |= (1 << MAP_BLOCK_ACCESS);
 			}
 			
-			LOG("memory_r: map %08x => paddr(%08x) fc(%d) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_maincpu->get_fc(), m_maincpu->pc());
+			//LOG("memory_r: map %08x => paddr(%08x) fc(%d) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_maincpu->get_fc(), m_maincpu->pc());
 			
 			offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
 		}
@@ -869,8 +869,9 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		// mark page dirty (NB before we overwrite offset)
 		if (mem_mask)
 		{
+			if (!(m_map[offset >> 11] & 0x8000))
+				LOG("memory_w: DIRTY m_map(0x%04x) m_map_control(%02x) berr(%d)\n", m_map[offset >> 11], m_map_control, inbuserr);
 			m_map[offset >> 11] |= 0x8000;
-			LOG("memory_w: DIRTY m_map(0x%04x) m_map_control(%02x) berr(%d)\n", m_map[offset >> 11], m_map_control, inbuserr);
 		}
 		
 		offset = BIT(offset, 0, 11) | (BIT(m_map[offset >> 11], 0, 11) << 11);
@@ -1025,6 +1026,10 @@ void tek440x_state::videocntl_w(u8 data)
 	}
 
 	m_vint->in_w<0>(BIT(data, 6));
+	
+  if (BIT(m_videocntl ^ data, 6) && !BIT(data, 6))
+			m_vint->in_w<2>(0);
+
 	m_videocntl = data;
 }
 
@@ -1420,6 +1425,7 @@ void tek440x_state::tek4404(machine_config &config)
 	m_screen->set_screen_update(FUNC(tek440x_state::screen_update));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(m_vint, FUNC(input_merger_all_high_device::in_w<1>));
+	m_screen->screen_vblank().append(m_vint, FUNC(input_merger_all_high_device::in_w<2>));
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	MOS6551(config, m_acia, 40_MHz_XTAL / 4 / 10);
