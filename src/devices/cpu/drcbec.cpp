@@ -391,10 +391,14 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 					psize[2] = 4;
 				if (opcode == OP_STORE || opcode == OP_FSTORE)
 					psize[1] = 4;
-				if (opcode == OP_READ || opcode == OP_READM || opcode == OP_FREAD)
+				if (opcode == OP_READ || opcode == OP_FREAD)
 					psize[1] = psize[2] = 4;
-				if (opcode == OP_WRITE || opcode == OP_WRITEM || opcode == OP_FWRITE)
+				if (opcode == OP_WRITE || opcode == OP_FWRITE)
 					psize[0] = psize[2] = 4;
+				if (opcode == OP_READM)
+					psize[1] = psize[3] = 4;
+				if (opcode == OP_WRITEM)
+					psize[0] = psize[3] = 4;
 				if (opcode == OP_SEXT && inst.param(2).size() != SIZE_QWORD)
 					psize[1] = 4;
 				if (opcode == OP_FTOINT)
@@ -1455,20 +1459,20 @@ int drcbe_c::execute(code_handle &entry)
 				DPARAM0 = m_space[PARAM2]->read_dword(PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(OP_READ8, 8, 0):     // DREAD   dst,src1,space_QOWRD
+			case MAKE_OPCODE_SHORT(OP_READ8, 8, 0):     // DREAD   dst,src1,space_QWORD
 				DPARAM0 = m_space[PARAM2]->read_qword(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_READM2, 8, 0):    // DREADM  dst,src1,mask,space_WORD
-				DPARAM0 = m_space[PARAM3]->read_word(PARAM1, PARAM2);
+				DPARAM0 = m_space[PARAM3]->read_word(PARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_READM4, 8, 0):    // DREADM  dst,src1,mask,space_DWORD
-				DPARAM0 = m_space[PARAM3]->read_dword(PARAM1, PARAM2);
+				DPARAM0 = m_space[PARAM3]->read_dword(PARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_READM8, 8, 0):    // DREADM  dst,src1,mask,space_QWORD
-				DPARAM0 = m_space[PARAM3]->read_qword(PARAM1, PARAM2);
+				DPARAM0 = m_space[PARAM3]->read_qword(PARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_WRITE1, 8, 0):    // DWRITE  dst,src1,space_BYTE
