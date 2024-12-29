@@ -274,7 +274,7 @@ static const gfx_layout molayout =
 
 
 static GFXDECODE_START( gfx_mm2 )
-	GFXDECODE_ENTRY( "tiles", 0, pflayout,   0x0, 1  )
+	GFXDECODE_ENTRY( "tiles",   0, pflayout,   0x0, 1  )
 	GFXDECODE_ENTRY( "sprites", 0, molayout,   0x0, 0x10  )
 GFXDECODE_END
 
