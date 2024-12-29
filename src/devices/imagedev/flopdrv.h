@@ -135,8 +135,6 @@ public:
 
 
 private:
-	int flopimg_get_sectors_per_track(int side);
-	void flopimg_get_id_callback(chrn_id *id, int id_index, int side);
 	void log_readwrite(const char *name, int head, int track, int sector, const char *buf, int length);
 	void floppy_drive_set_geometry_absolute(int tracks, int sides);
 	TIMER_CALLBACK_MEMBER(floppy_drive_index_callback);

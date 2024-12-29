@@ -62,41 +62,6 @@ static const floppy_error_map errmap[] =
     IMPLEMENTATION
 ***************************************************************************/
 
-int legacy_floppy_image_device::flopimg_get_sectors_per_track(int side)
-{
-	floperr_t err;
-	int sector_count;
-
-	if (!m_floppy)
-		return 0;
-
-	err = floppy_get_sector_count(m_floppy, side, m_track, &sector_count);
-	if (err)
-		return 0;
-	return sector_count;
-}
-
-void legacy_floppy_image_device::flopimg_get_id_callback(chrn_id *id, int id_index, int side)
-{
-	int cylinder, sector, N;
-	unsigned long flags;
-	uint32_t sector_length;
-
-	if (!m_floppy)
-		return;
-
-	floppy_get_indexed_sector_info(m_floppy, side, m_track, id_index, &cylinder, &side, &sector, &sector_length, &flags);
-
-	N = compute_log2(sector_length);
-
-	id->C = cylinder;
-	id->H = side;
-	id->R = sector;
-	id->data_id = id_index;
-	id->flags = flags;
-	id->N = ((N >= 7) && (N <= 10)) ? N - 7 : 0;
-}
-
 void legacy_floppy_image_device::log_readwrite(const char *name, int head, int track, int sector, const char *buf, int length)
 {
 	char membuf[1024];
