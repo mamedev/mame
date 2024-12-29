@@ -324,19 +324,39 @@ void drcbe_c::reset()
 
 void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
+	// Calculate the max possible number of register clears required
+	uint32_t regclears = 0;
+
+	for (int inum = 0; inum < numinst; inum++)
+	{
+		const instruction &inst = instlist[inum];
+
+		if (inst.size() != 4)
+			continue;
+
+		for (int pnum = 0; pnum < inst.numparams(); pnum++)
+		{
+			if (uml::instruction::is_param_out(inst.opcode(), pnum) && inst.param(pnum).is_int_register())
+				regclears++;
+		}
+	}
+
 	// tell all of our utility objects that a block is beginning
-	m_hash.block_begin(block, instlist, numinst);
+	m_hash.block_begin(block, instlist, numinst + regclears);
 	m_labels.block_begin(block);
 	m_map.block_begin(block);
 
 	// begin codegen; fail if we can't
-	drccodeptr *cachetop = m_cache.begin_codegen(numinst * sizeof(drcbec_instruction) * 4);
+	drccodeptr *cachetop = m_cache.begin_codegen((numinst + regclears) * sizeof(drcbec_instruction) * 4);
 	if (cachetop == nullptr)
 		block.abort();
 
 	// compute the base by aligning the cache top to an even multiple of drcbec_instruction
 	drcbec_instruction *base = (drcbec_instruction *)(((uintptr_t)*cachetop + sizeof(drcbec_instruction) - 1) & ~(sizeof(drcbec_instruction) - 1));
 	drcbec_instruction *dst = base;
+
+	bool ireg_needs_clearing[REG_I_COUNT];
+	std::fill(std::begin(ireg_needs_clearing), std::end(ireg_needs_clearing), true);
 
 	// generate code by copying the instructions and extracting immediates
 	for (int inum = 0; inum < numinst; inum++)
@@ -453,6 +473,41 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 
 				// point past the end of the immediates
 				dst += immedwords;
+
+				// Keep track of which registers had an 8 byte write and clear it the next time it's written
+				if (inst.size() == 4)
+				{
+					for (int pnum = 0; pnum < inst.numparams(); pnum++)
+					{
+						if (uml::instruction::is_param_out(inst.opcode(), pnum) && inst.param(pnum).is_int_register() && ireg_needs_clearing[inst.param(pnum).ireg() - REG_I0])
+						{
+							immedwords = (8 + sizeof(drcbec_instruction) - 1) / sizeof(drcbec_instruction);
+
+							(dst++)->i = MAKE_OPCODE_FULL(OP_AND, 8, 0, 0, 3 + immedwords);
+
+							immed = dst + 3;
+
+							output_parameter(&dst, &immed, 8, inst.param(pnum));
+							output_parameter(&dst, &immed, 8, inst.param(pnum));
+							output_parameter(&dst, &immed, 8, 0xffffffff);
+
+							dst += immedwords;
+
+							ireg_needs_clearing[inst.param(pnum).ireg() - REG_I0] = false;
+						}
+					}
+				}
+				else if (inst.size() == 8)
+				{
+					for (int pnum = 0; pnum < inst.numparams(); pnum++)
+					{
+						if (uml::instruction::is_param_out(inst.opcode(), pnum) && inst.param(pnum).is_int_register())
+						{
+							ireg_needs_clearing[inst.param(pnum).ireg() - REG_I0] = true;
+						}
+					}
+				}
+
 				break;
 		}
 	}
