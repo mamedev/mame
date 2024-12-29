@@ -5803,3 +5803,17 @@ if (BUSES["HEATH_TLB_CONNECTOR"]~=null) then
 		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlb.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/super8008/super8008.h,BUSES["SUPER8008"] = true
+---------------------------------------------------
+
+if (BUSES["SUPER8008"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/super8008/super8008.cpp",
+		MAME_DIR .. "src/devices/bus/super8008/super8008.h",
+		MAME_DIR .. "src/devices/bus/super8008/super8008_blaster.cpp",
+		MAME_DIR .. "src/devices/bus/super8008/super8008_blaster.h",
+	}
+end
