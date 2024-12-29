@@ -112,7 +112,6 @@ public:
 	virtual const char *image_brief_type_name() const noexcept override { return "flop"; }
 	virtual const util::option_guide &create_option_guide() const override { return floppy_option_guide(); }
 
-	floppy_image_legacy *flopimg_get_image();
 	void floppy_drive_set_geometry(floppy_type_t type);
 	void floppy_drive_set_flag_state(int flag, int state);
 	void floppy_drive_set_ready_state(int state, int flag);

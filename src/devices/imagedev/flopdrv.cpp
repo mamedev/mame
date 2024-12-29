@@ -62,12 +62,6 @@ static const floppy_error_map errmap[] =
     IMPLEMENTATION
 ***************************************************************************/
 
-
-floppy_image_legacy *legacy_floppy_image_device::flopimg_get_image()
-{
-	return m_floppy;
-}
-
 int legacy_floppy_image_device::flopimg_get_sectors_per_track(int side)
 {
 	floperr_t err;
