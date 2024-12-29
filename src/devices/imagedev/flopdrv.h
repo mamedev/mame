@@ -130,7 +130,6 @@ public:
 	void floppy_stp_w(int state);
 	void floppy_wtg_w(int state);
 	int floppy_tk00_r();
-	int floppy_dskchg_r();
 	int floppy_twosid_r();
 	int floppy_index_r();
 	int floppy_ready_r();

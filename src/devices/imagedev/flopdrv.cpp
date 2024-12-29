@@ -470,12 +470,6 @@ int legacy_floppy_image_device::floppy_tk00_r()
 	return m_tk00;
 }
 
-/* disk changed */
-int legacy_floppy_image_device::floppy_dskchg_r()
-{
-	return m_dskchg;
-}
-
 /* 2-sided disk */
 int legacy_floppy_image_device::floppy_twosid_r()
 {
