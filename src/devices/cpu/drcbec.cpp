@@ -336,7 +336,7 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 
 		for (int pnum = 0; pnum < inst.numparams(); pnum++)
 		{
-			if (uml::instruction::is_param_out(inst.opcode(), pnum) && inst.param(pnum).is_int_register())
+			if (inst.is_param_out(pnum) && inst.param(pnum).is_int_register())
 				regclears++;
 		}
 	}
@@ -479,7 +479,7 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 				{
 					for (int pnum = 0; pnum < inst.numparams(); pnum++)
 					{
-						if (uml::instruction::is_param_out(inst.opcode(), pnum) && inst.param(pnum).is_int_register() && ireg_needs_clearing[inst.param(pnum).ireg() - REG_I0])
+						if (inst.is_param_out(pnum) && inst.param(pnum).is_int_register() && ireg_needs_clearing[inst.param(pnum).ireg() - REG_I0])
 						{
 							immedwords = (8 + sizeof(drcbec_instruction) - 1) / sizeof(drcbec_instruction);
 
@@ -501,7 +501,7 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 				{
 					for (int pnum = 0; pnum < inst.numparams(); pnum++)
 					{
-						if (uml::instruction::is_param_out(inst.opcode(), pnum) && inst.param(pnum).is_int_register())
+						if (inst.is_param_out(pnum) && inst.param(pnum).is_int_register())
 						{
 							ireg_needs_clearing[inst.param(pnum).ireg() - REG_I0] = true;
 						}
