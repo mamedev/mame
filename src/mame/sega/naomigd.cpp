@@ -490,8 +490,8 @@ static INPUT_PORTS_START(gdrom_board_ioports)
 	PORT_CONFSETTING(0x01, "Enabled")
 	PORT_CONFSETTING(0x00, "Disabled")
 	PORT_CONFNAME(0x02, 0x02, "Initialized")
-	PORT_CONFSETTING(0x02, "Yes")
-	PORT_CONFSETTING(0x00, "No")
+	PORT_CONFSETTING(0x00, DEF_STR(No))
+	PORT_CONFSETTING(0x02, DEF_STR(Yes))
 INPUT_PORTS_END
 
 naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

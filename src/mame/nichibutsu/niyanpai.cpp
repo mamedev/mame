@@ -508,10 +508,10 @@ static INPUT_PORTS_START( 4psimasy )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coinage ) )          PORT_DIPLOCATION("DSWA:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 
 	/* this switch not mentioned by the manual */
 	PORT_START("DSWB")

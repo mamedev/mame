@@ -1505,8 +1505,8 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )  // OK
 	PORT_DIPSETTING(    0x00, "Yes (50.000)" )  // OK, 50.000
 	PORT_DIPNAME( 0x40, 0x00, "Control" )  // OK
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )  // OK
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )  // OK
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )  // OK
 	PORT_DIPNAME( 0x80, 0x00, "Reel Cover" )  // OK
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )  // OK
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )  // OK

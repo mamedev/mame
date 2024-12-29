@@ -313,8 +313,8 @@ void msx_cart_msx_audio_fsca1_device::device_add_mconfig(machine_config &config)
 static INPUT_PORTS_START(msx_audio_fsca1)
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x04, 0x04, "FS-CA1 Firmware switch")
-	PORT_CONFSETTING( 0x04, "On" )
-	PORT_CONFSETTING( 0x00, "Off" )
+	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x04, DEF_STR( On ) )
 	PORT_BIT(0xFB, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 INPUT_PORTS_END
 

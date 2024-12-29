@@ -3205,20 +3205,20 @@ static INPUT_PORTS_START( kamikazp )
 	PORT_MODIFY("IN2") // actual coinage appers to have been moved here (need to check code, wouldn't surprise me if some of these had other side-effects too) these are also some of the most ridiculous coinage setttings I've seen!
 	PORT_DIPNAME( 0x0f, 0x08, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x07, "6C / 2C" ) // first 4 coins give 1 credit, next 2 coins give 1 credit
+	PORT_DIPSETTING(    0x07, "6 Coins/2 Credits" ) // first 4 coins give 1 credit, next 2 coins give 1 credit
 	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_1C )  )
-	PORT_DIPSETTING(    0x03, "6C / 3C" ) // first 3 coins give 1 credit, 2nd 3 coins give 2 credits
-	PORT_DIPSETTING(    0x0b, "7C / 3C" )
+	PORT_DIPSETTING(    0x03, "6 Coins/3 Credits" ) // first 3 coins give 1 credit, 2nd 3 coins give 2 credits
+	PORT_DIPSETTING(    0x0b, "7 Coins/3 Credits" )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 4C_2C )  ) // first 3 coins give 1 credit, next coin gives 1 credit
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) ) // 2
 	PORT_DIPSETTING(    0x09, DEF_STR( 3C_2C ) ) // first 2 coins give 1 credit, next coin gives 1 credit
 	PORT_DIPSETTING(    0x05, DEF_STR( 4C_3C ) ) // first 2 coins give 1 credit, 2nd 2 coins give 2 credits
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C )   )
-	PORT_DIPSETTING(    0x06, "1C / 1C (duplicate 1)" )
-	PORT_DIPSETTING(    0x0a, "1C / 1C (duplicate 2)" )
-	PORT_DIPSETTING(    0x0e, "1C / 1C (duplicate 3)" )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, "1 Coin/1 Credit (duplicate 1)" )
+	PORT_DIPSETTING(    0x0a, "1 Coin/1 Credit (duplicate 2)" )
+	PORT_DIPSETTING(    0x0e, "1 Coin/1 Credit (duplicate 3)" )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) ) // .66
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) ) // always shows 9 credits
 INPUT_PORTS_END
 
@@ -3726,9 +3726,9 @@ static INPUT_PORTS_START( spacempr )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
@@ -4474,10 +4474,10 @@ static INPUT_PORTS_START( mooncptc )
 
 	PORT_MODIFY("IN2") // no 1c/1c ?
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 INPUT_PORTS_END
 
 
@@ -4568,8 +4568,8 @@ static INPUT_PORTS_START( fantastc )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coinage ) ) // no effect?
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -4623,8 +4623,8 @@ static INPUT_PORTS_START( timefgtr )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -4682,8 +4682,8 @@ static INPUT_PORTS_START( kong )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )
@@ -5189,9 +5189,9 @@ static INPUT_PORTS_START( thepitm )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ) )
 
 	PORT_START("IN2")
@@ -5888,8 +5888,8 @@ static INPUT_PORTS_START( jungsub ) // TODO: are there more dip-switches?
 	PORT_DIPSETTING(    0x00, "20P 1 play, 50P 3 plays" )
 	PORT_DIPSETTING(    0x40, "10P 1 play, 50P 6 plays" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( astroamb )
@@ -5918,8 +5918,8 @@ static INPUT_PORTS_START( astroamb )
 
 	PORT_START("IN2")
 	PORT_DIPNAME(    0x01, 0x01, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(       0x00, DEF_STR( Cocktail ) )
 	PORT_DIPSETTING(       0x01, DEF_STR( Upright ) )
+	PORT_DIPSETTING(       0x00, DEF_STR( Cocktail ) )
 	PORT_DIPNAME(    0x06, 0x06, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(       0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(       0x02, DEF_STR( 1C_2C ) )
@@ -7275,8 +7275,8 @@ static INPUT_PORTS_START( highroll )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown 9") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown 10") PORT_CODE(KEYCODE_9_PAD)
 	PORT_DIPNAME( 0x80, 0x00, "Bookkeeping" ) // at first boot, without default NVRAM, this needs to be on, or the games gives error 99, then needs to be switched off to exit bookkeeping
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x07, 0x07, "House" )
@@ -7364,10 +7364,10 @@ static INPUT_PORTS_START( sbhoei )
 
 	PORT_MODIFY("IN2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )      PORT_DIPLOCATION("DPSW:!2,!3")
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )      PORT_DIPLOCATION("DPSW:!4,!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )

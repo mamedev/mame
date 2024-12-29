@@ -329,8 +329,8 @@ static INPUT_PORTS_START( blackt96 )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:!1")
-	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Yes ) ) // buggy, applies to attract mode only.
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) ) // buggy, applies to attract mode only.
 
 	// Dipswitch Port B
 	PORT_START("DSW2")

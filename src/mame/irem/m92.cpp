@@ -575,8 +575,8 @@ static INPUT_PORTS_START( thndblst )
 	PORT_MODIFY("DSW")
 	/* DIP switch bank 1 */
 	PORT_DIPNAME( 0x0010, 0x0000, "Continuous Play" ) PORT_DIPLOCATION("SW1:5") /* manual says Unused */
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 

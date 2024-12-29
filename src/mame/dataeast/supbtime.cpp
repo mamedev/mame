@@ -319,8 +319,8 @@ static INPUT_PORTS_START( supbtime )
 	// inverted with respect to other Deco games
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Cabinet ) )        PORT_DIPLOCATION("DSW1:8") // No effect?
-	PORT_DIPSETTING(      0x0001, DEF_STR( Cocktail ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

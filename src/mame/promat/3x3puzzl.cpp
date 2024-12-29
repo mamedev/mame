@@ -263,10 +263,10 @@ static INPUT_PORTS_START( _3x3puzzle )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) )        PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )    PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -294,10 +294,10 @@ static INPUT_PORTS_START( casanova )
 
 	PORT_MODIFY("DSW01") // Do NOT trust "DIP INFO" for correct settings! At least Coinage is WRONG!
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) ) // DIP switch info shows 2 Coins / Credit
-	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) ) // DIP switch info shows 3 Coins / Credit
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) ) // DIP switch info shows 5 Coins / Credit
+	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) ) // DIP switch info shows 3 Coins / Credit
+	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) ) // DIP switch info shows 2 Coins / Credit
 	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )

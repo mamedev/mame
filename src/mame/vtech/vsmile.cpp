@@ -273,8 +273,8 @@ static INPUT_PORTS_START( vsmilem )
 	PORT_CONFSETTING(    0x0f, "English (3)" ) // V.Smile Motion logo with "Active Learning System", voice 2, regular cartridge image, "Please insert a Smartridge(tm)" text   (Smartridge must be a region specific term?)
 
 	PORT_CONFNAME( 0x10, 0x10, "VTech Intro" )
-	PORT_CONFSETTING(    0x00, "Off" )
-	PORT_CONFSETTING(    0x10, "On" )
+	PORT_CONFSETTING(    0x00, DEF_STR(Off) )
+	PORT_CONFSETTING(    0x10, DEF_STR(On) )
 	PORT_BIT( 0xe0, 0x00, IPT_UNUSED )
 
 	PORT_START("SYSTEM")

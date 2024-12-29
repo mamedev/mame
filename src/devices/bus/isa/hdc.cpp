@@ -140,8 +140,8 @@ static INPUT_PORTS_START( isa_hdc )
 
 	PORT_START("ROM")
 	PORT_DIPNAME( 0x01, 0x01, "Install ROM?")
-	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
 INPUT_PORTS_END
 
 DEFINE_DEVICE_TYPE(XT_HDC,     xt_hdc_device, "xt_hdc", "Generic PC-XT Fixed Disk Controller")

@@ -215,17 +215,17 @@ static INPUT_PORTS_START( amust )
 	// bits 6,7 not used?
 	// bit 5 - fdc intrq
 	PORT_DIPNAME( 0x01, 0x01, "Bit0" ) // code @ FC99
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x02, 0x02, "Bit1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x04, 0x04, "Bit2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x08, 0x08, "Bit3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Boot to Monitor" ) // code @ F895
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )

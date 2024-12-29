@@ -143,8 +143,8 @@ static INPUT_PORTS_START(compc)
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
 	PORT_DIPSETTING(    0x02, DEF_STR(Yes) )
 	PORT_DIPNAME( 0x01, 0x01, "Boot from floppy")
-	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
 INPUT_PORTS_END
 
 void compc_state::compc_map(address_map &map)

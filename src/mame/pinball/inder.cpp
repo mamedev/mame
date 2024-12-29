@@ -403,8 +403,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( lapbylap )
 	PORT_START("X0")
 	PORT_DIPNAME( 0x03, 0x03, "Coin Slot 1") // sw G,H
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
 	PORT_DIPNAME( 0x08, 0x08, "Balls") // sw E
 	PORT_DIPSETTING(    0x08, "3")
 	PORT_DIPSETTING(    0x00, "5")
@@ -513,8 +513,8 @@ static INPUT_PORTS_START( pinmoonl )
 	PORT_DIPSETTING(    0x00, "3")
 	PORT_DIPSETTING(    0x08, "5")
 	PORT_DIPNAME( 0x02, 0x00, "Coin Slot 1")
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
 	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
 	PORT_DIPSETTING(    0x00, "2600000")
 	PORT_DIPSETTING(    0x10, "3000000")
@@ -610,8 +610,8 @@ static INPUT_PORTS_START( pinclown )
 	PORT_DIPSETTING(    0x00, "3")
 	PORT_DIPSETTING(    0x08, "5")
 	PORT_DIPNAME( 0x02, 0x00, "Coin Slot 1")
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
 	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
 	PORT_DIPSETTING(    0x00, "2800000")
 	PORT_DIPSETTING(    0x10, "3200000")
@@ -630,8 +630,8 @@ static INPUT_PORTS_START( pinclown )
 
 	PORT_START("X2")
 	PORT_DIPNAME( 0x20, 0x00, "Quita bola extra al 2nd derribo")
-	PORT_DIPSETTING(    0x00, DEF_STR(Yes))
 	PORT_DIPSETTING(    0x20, DEF_STR(No))
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes))
 	PORT_DIPNAME( 0x80, 0x00, "Apagado de dianas")
 	PORT_DIPSETTING(    0x00, DEF_STR(Easy)) // "Facil"
 	PORT_DIPSETTING(    0x80, DEF_STR(Hard)) // "Dificil"
@@ -702,8 +702,8 @@ static INPUT_PORTS_START( corsario )
 	PORT_DIPSETTING(    0x00, "3")
 	PORT_DIPSETTING(    0x08, "5")
 	PORT_DIPNAME( 0x02, 0x00, "Coin Slot 1")
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C )) // and 4c_3c
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
 	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
 	PORT_DIPSETTING(    0x00, "3000000")
 	PORT_DIPSETTING(    0x10, "3500000")
@@ -785,8 +785,8 @@ static INPUT_PORTS_START( mundial )
 	PORT_DIPSETTING(    0x00, "3")
 	PORT_DIPSETTING(    0x08, "5")
 	PORT_DIPNAME( 0x02, 0x00, "Coin Slot 1")
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
 	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
 	PORT_DIPSETTING(    0x00, "3600000")
 	PORT_DIPSETTING(    0x10, "4000000")
@@ -871,8 +871,8 @@ static INPUT_PORTS_START( atleta )
 	PORT_DIPSETTING(    0x00, "3")
 	PORT_DIPSETTING(    0x08, "5")
 	PORT_DIPNAME( 0x02, 0x00, "Coin Slot 1")
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C )) // and 4c_3c
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
 	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
 	PORT_DIPSETTING(    0x00, "3500000")
 	PORT_DIPSETTING(    0x10, "4000000")
@@ -1040,17 +1040,17 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( larana ) // to be determined, need the manual
 	PORT_START("X0")
 	PORT_DIPNAME( 0x01, 0x00, "Coin control 1")
-	PORT_DIPSETTING(    0x00, "Off")
-	PORT_DIPSETTING(    0x01, "On")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x01, DEF_STR(On))
 	PORT_DIPNAME( 0x02, 0x00, "Coin control 2")
-	PORT_DIPSETTING(    0x00, "Off")
-	PORT_DIPSETTING(    0x02, "On")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x02, DEF_STR(On))
 	PORT_DIPNAME( 0x04, 0x00, "Coin control 3")
-	PORT_DIPSETTING(    0x00, "Off")
-	PORT_DIPSETTING(    0x04, "On")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x04, DEF_STR(On))
 	PORT_DIPNAME( 0x08, 0x00, "Coin control 4")
-	PORT_DIPSETTING(    0x00, "Off")
-	PORT_DIPSETTING(    0x08, "On")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off))
+	PORT_DIPSETTING(    0x08, DEF_STR(On))
 	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
 	PORT_DIPSETTING(    0x00, "3600000")
 	PORT_DIPSETTING(    0x10, "4000000")

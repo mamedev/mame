@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device, "bitmap_printer", "Bit
 INPUT_PORTS_START(bitmap_printer)
 	PORT_START("DRAWMARKS")
 	PORT_CONFNAME(0x3, 0x02, "Draw Inch Marks")
-	PORT_CONFSETTING(0x0, "Off")
+	PORT_CONFSETTING(0x0, DEF_STR(Off))
 	PORT_CONFSETTING(0x1, "with marks")
 	PORT_CONFSETTING(0x2, "with numbers")
 

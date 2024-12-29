@@ -271,8 +271,8 @@ static INPUT_PORTS_START( ron )
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x04, 0x04, "2P Coinage" ) // how many credits per 2p mode
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

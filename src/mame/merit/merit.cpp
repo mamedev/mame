@@ -1431,10 +1431,10 @@ static INPUT_PORTS_START( couple )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 //2 Coins for 2 Credits?I think this is an invalid setting,it doesn't even work correctly
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
@@ -1509,8 +1509,8 @@ static INPUT_PORTS_START( matchem )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( 4C_5C ) ) // shows "5 PLAYS FOR 4 COINS"
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) // shows "4 PLAYS FOR 4 COINS"
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_5C ) ) // shows "5 PLAYS FOR 4 COINS"
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1527,8 +1527,8 @@ static INPUT_PORTS_START( matchemg )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3") // it always gives 6 credits, but it only shows the possibility when off, maybe it locks out the second coin instead?
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) ) // 6 games for 5 DM
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) ) // 5 games for 5 DM
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) ) // 6 games for 5 DM
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

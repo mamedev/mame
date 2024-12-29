@@ -119,8 +119,8 @@ static INPUT_PORTS_START( pc9801_55 )
 	PORT_DIPSETTING(    0x66, "i386, 0xdc000-0xddfff")
 	// ...
 	PORT_DIPNAME( 0x80, 0x80, "PC-9801-55: ROM accessibility at Power-On") PORT_DIPLOCATION("SCSI_SW2:!8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
 	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
 
 	PORT_START("SCSI_JP")
 	// SW3 and SW4 Jumper settings

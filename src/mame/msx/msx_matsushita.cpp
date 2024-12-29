@@ -22,8 +22,8 @@ msx_matsushita_device::msx_matsushita_device(const machine_config &mconfig, cons
 static INPUT_PORTS_START(matsushita)
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x80, 0x00, "Firmware switch")
-	PORT_CONFSETTING(0x00, "On")
-	PORT_CONFSETTING(0x80, "Off")
+	PORT_CONFSETTING(0x80, DEF_STR(Off))
+	PORT_CONFSETTING(0x00, DEF_STR(On))
 	PORT_BIT(0x7F, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 

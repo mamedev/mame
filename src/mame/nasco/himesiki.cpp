@@ -510,8 +510,8 @@ static INPUT_PORTS_START( androidp )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
 
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x08, "1" )

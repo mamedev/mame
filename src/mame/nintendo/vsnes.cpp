@@ -2459,8 +2459,8 @@ static INPUT_PORTS_START( supxevs )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!3" )
 	PORT_DIPNAME( 0x08, 0x00, "Hidden Password Screen" )  PORT_DIPLOCATION("SW1:!4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 // Set to Yes and hold both A and B while pressing P1 start to access Password Screen
 //     Level 2:  5135
 //     Level 3:  3706

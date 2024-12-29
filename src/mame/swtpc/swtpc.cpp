@@ -178,7 +178,7 @@ static INPUT_PORTS_START( swtpc )
 	// appears to have issues and is not optimized for the DC5 FDC.
 	PORT_START("SWTBUG_LOAD_AT_A100")
 	PORT_CONFNAME(0x1, 1, "SWTBUG disk boot patch, to load at 0xa100")
-	PORT_CONFSETTING(0, "No")
+	PORT_CONFSETTING(0, DEF_STR(No))
 	PORT_CONFSETTING(1, "Yes - apply patch")
 
 INPUT_PORTS_END

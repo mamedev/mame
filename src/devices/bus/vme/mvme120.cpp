@@ -50,8 +50,8 @@ static INPUT_PORTS_START(mvme120)
 	PORT_START("S3")
 	// described as "autoboot" and "cache disable" in the manual
 	PORT_DIPNAME(0x01, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("S3:1")    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vme_mvme120_device::s3_autoboot), 0)
-	PORT_DIPSETTING(   0x01, DEF_STR( On ) )
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x01, DEF_STR( On ) )
 
 	PORT_DIPNAME(0x02, 0x00, "Baud Rate Select")    PORT_DIPLOCATION("S3:2")    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vme_mvme120_device::s3_baudrate), 0)
 	PORT_DIPSETTING(   0x02, "10.0MHz CPU")

@@ -3558,8 +3558,8 @@ static INPUT_PORTS_START( wfishing ) // dips taken from test mode
 
 	PORT_START("DSW2")
 	PORT_DIPNAME(    0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(       0x01, DEF_STR( On ) )
 	PORT_DIPSETTING(       0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(       0x01, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" )
 	PORT_DIPNAME(    0x04, 0x04, "Advertise Coin Indication" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(       0x04, "100-400 Yen" )
@@ -3706,11 +3706,11 @@ static INPUT_PORTS_START( ultracin )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 // we use common sys16b tags to simplify port reads
