@@ -236,6 +236,11 @@ ROM_START( jak_spd3 )
 	ROM_LOAD16_WORD_SWAP( "spiderman3.u4", 0x000000, 0x200000, CRC(87019271) SHA1(80d126af970236a1cecf7ade49f916caf8f67ceb) )
 ROM_END
 
+ROM_START( jak_powr ) // shows Game-Key screen but was never produced with a GK slot
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "powerrangers.u2", 0x000000, 0x200000, CRC(859c6cff) SHA1(12bb08657e333c2644d707deead8cd3e34a140b2) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -270,3 +275,5 @@ CONS( 2007, jak_potc, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_ini
 CONS( 2006, jak_supm, 0, 0, spg2xx_jakks,  jak_supm,      jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Superman in Super Villain Showdown (JAKKS Pacific TV Game) (26 Jan 2006 A)", MACHINE_IMPERFECT_SOUND ) // has AT24C04
 
 CONS( 2007, jak_spd3, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Spider-Man 3 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2005, jak_powr, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Power Rangers S.P.D. (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
