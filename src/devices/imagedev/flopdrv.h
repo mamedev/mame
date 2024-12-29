@@ -121,7 +121,6 @@ public:
 	void floppy_drive_write_sector_data(int side, int index1, const void *ptr,int length, int ddam);
 	void floppy_install_load_proc(void (*proc)(device_image_interface &image, bool is_created));
 	void floppy_install_unload_proc(void (*proc)(device_image_interface &image));
-	void floppy_drive_set_index_pulse_callback(void (*callback)(device_t *controller,device_t *image, int state));
 	int floppy_drive_get_current_track();
 	uint64_t floppy_drive_get_current_track_size(int head);
 	void floppy_drive_set_rpm(float rpm);

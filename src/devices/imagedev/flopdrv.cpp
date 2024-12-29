@@ -317,12 +317,6 @@ void legacy_floppy_image_device::floppy_install_unload_proc(void (*proc)(device_
 	m_unload_proc = proc;
 }
 
-/* set the callback for the index pulse */
-void legacy_floppy_image_device::floppy_drive_set_index_pulse_callback(void (*callback)(device_t *controller, device_t *img, int state))
-{
-	m_index_pulse_callback = callback;
-}
-
 int legacy_floppy_image_device::floppy_drive_get_current_track()
 {
 	return m_current_track;
