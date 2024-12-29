@@ -278,17 +278,6 @@ void legacy_floppy_image_device::floppy_drive_seek(signed int signed_tracks)
 	m_id_index = 0;
 }
 
-void legacy_floppy_image_device::floppy_drive_read_track_data_info_buffer(int side, void *ptr, int *length )
-{
-	if (exists())
-	{
-		if (!m_floppy)
-			return;
-
-		floppy_read_track_data(m_floppy, side, m_track, ptr, *length);
-	}
-}
-
 void legacy_floppy_image_device::floppy_drive_write_track_data_info_buffer(int side, const void *ptr, int *length )
 {
 	if (exists())
