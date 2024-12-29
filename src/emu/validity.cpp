@@ -26,6 +26,8 @@
 #include <type_traits>
 #include <typeinfo>
 
+#define ALLOW_DUPLICATE_DIPSETTINGS 1
+
 
 namespace {
 
@@ -1953,11 +1955,10 @@ void validity_checker::validate_begin()
 	// take over error and warning outputs
 	osd_output::push(this);
 
-	// reset all our maps
+	// reset all our maps (except DEF_STRs)
 	m_names_map.clear();
 	m_descriptions_map.clear();
 	m_roms_map.clear();
-	m_defstr_map.clear();
 	m_region_map.clear();
 	m_ioport_set.clear();
 	m_slotcard_set.clear();
@@ -2395,6 +2396,8 @@ void validity_checker::validate_analog_input_field(const ioport_field &field)
 
 void validity_checker::validate_dip_settings(const ioport_field &field)
 {
+	assert(!m_defstr_map.empty());
+
 	char const *const demo_sounds = ioport_string_from_index(INPUT_STRING_Demo_Sounds);
 	char const *const flipscreen = ioport_string_from_index(INPUT_STRING_Flip_Screen);
 	char const *const name = field.specific_name() ? field.specific_name() : "UNNAMED";
@@ -2440,7 +2443,11 @@ void validity_checker::validate_dip_settings(const ioport_field &field)
 
 			// check for proper coin ordering
 			else if (strindex >= __input_string_coinage_start && strindex <= __input_string_coinage_end && next_strindex >= __input_string_coinage_start && next_strindex <= __input_string_coinage_end &&
+#if ALLOW_DUPLICATE_DIPSETTINGS
+						strindex > next_strindex && setting->condition() == nextsetting->condition())
+#else
 						strindex >= next_strindex && setting->condition() == nextsetting->condition())
+#endif
 			{
 				osd_printf_error("%s option has unsorted coinage %s > %s\n", name, setting->name(), nextsetting->name());
 				coin_error = true;
@@ -2451,10 +2458,10 @@ void validity_checker::validate_dip_settings(const ioport_field &field)
 	// if we have a coin error, demonstrate the correct way
 	if (coin_error)
 	{
-		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "   Note proper coin sort order should be:\n");
+		osd_printf_warning("Note proper coin sort order should be:\n");
 		for (int entry = 0; entry < std::size(coin_list); entry++)
 			if (coin_list[entry])
-				output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "      %s\n", ioport_string_from_index(__input_string_coinage_start + entry));
+				osd_printf_warning("   %s\n", ioport_string_from_index(__input_string_coinage_start + entry));
 	}
 }
 
