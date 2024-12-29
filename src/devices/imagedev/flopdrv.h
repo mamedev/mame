@@ -127,7 +127,6 @@ public:
 	void floppy_ds_w(int state);
 	void floppy_mon_w(int state);
 	void floppy_drtn_w(int state);
-	void floppy_wtd_w(int state);
 	void floppy_stp_w(int state);
 	void floppy_wtg_w(int state);
 	int floppy_wpt_r();

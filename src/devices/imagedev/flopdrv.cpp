@@ -421,11 +421,6 @@ void legacy_floppy_image_device::floppy_drtn_w(int state)
 	m_drtn = state;
 }
 
-/* write data */
-void legacy_floppy_image_device::floppy_wtd_w(int state)
-{
-}
-
 /* step */
 void legacy_floppy_image_device::floppy_stp_w(int state)
 {
