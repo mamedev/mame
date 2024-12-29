@@ -2306,7 +2306,7 @@ void drcbe_x64::op_load(Assembler &a, const instruction &inst)
 	Gp basereg = get_base_register_and_offset(a, basep.memory(), rdx, baseoffs);
 
 	// pick a target register for the general case
-	Gp dstreg = dstp.select_register(eax);
+	Gp dstreg = (inst.size() == 4) ? dstp.select_register(eax) : dstp.select_register(rax);
 
 	// immediate index
 	if (indp.is_immediate())
@@ -2314,13 +2314,13 @@ void drcbe_x64::op_load(Assembler &a, const instruction &inst)
 		s32 const offset = baseoffs + (s32(indp.immediate()) << scalesizep.scale());
 
 		if (size == SIZE_BYTE)
-			a.movzx(dstreg, byte_ptr(basereg, offset));                                 // movzx dstreg,[basep + scale*indp]
+			a.movzx(dstreg, byte_ptr(basereg, offset));
 		else if (size == SIZE_WORD)
-			a.movzx(dstreg, word_ptr(basereg, offset));                                 // movzx dstreg,[basep + scale*indp]
+			a.movzx(dstreg, word_ptr(basereg, offset));
 		else if (size == SIZE_DWORD)
-			a.mov(dstreg, ptr(basereg, offset));                                        // mov   dstreg,[basep + scale*indp]
+			a.mov(dstreg, dword_ptr(basereg, offset));
 		else if (size == SIZE_QWORD)
-			a.mov(dstreg.r64(), ptr(basereg, offset));                                  // mov   dstreg,[basep + scale*indp]
+			a.mov(dstreg, ptr(basereg, offset));
 	}
 
 	// other index
@@ -2329,20 +2329,17 @@ void drcbe_x64::op_load(Assembler &a, const instruction &inst)
 		Gp indreg = indp.select_register(rcx);
 		movsx_r64_p32(a, indreg, indp);
 		if (size == SIZE_BYTE)
-			a.movzx(dstreg, byte_ptr(basereg, indreg, scalesizep.scale(), baseoffs));   // movzx dstreg,[basep + scale*indp]
+			a.movzx(dstreg, byte_ptr(basereg, indreg, scalesizep.scale(), baseoffs));
 		else if (size == SIZE_WORD)
-			a.movzx(dstreg, word_ptr(basereg, indreg, scalesizep.scale(), baseoffs));   // movzx dstreg,[basep + scale*indp]
+			a.movzx(dstreg, word_ptr(basereg, indreg, scalesizep.scale(), baseoffs));
 		else if (size == SIZE_DWORD)
-			a.mov(dstreg, ptr(basereg, indreg, scalesizep.scale(), baseoffs));          // mov   dstreg,[basep + scale*indp]
+			a.mov(dstreg, dword_ptr(basereg, indreg, scalesizep.scale(), baseoffs));
 		else if (size == SIZE_QWORD)
-			a.mov(dstreg.r64(), ptr(basereg, indreg, scalesizep.scale(), baseoffs));    // mov   dstreg,[basep + scale*indp]
+			a.mov(dstreg, ptr(basereg, indreg, scalesizep.scale(), baseoffs));
 	}
 
 	// store result
-	if (inst.size() == 4)
-		mov_param_reg(a, dstp, dstreg);                                                 // mov   dstp,dstreg
-	else
-		mov_param_reg(a, dstp, dstreg.r64());                                           // mov   dstp,dstreg
+	mov_param_reg(a, dstp, dstreg);
 }
 
 

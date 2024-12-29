@@ -393,7 +393,7 @@ void uml::instruction::simplify()
 			if (m_param[2].is_immediate_value(paramsizemask[m_param[3].size()]))
 			{
 				m_opcode = OP_READ;
-				m_numparams = 2;
+				m_numparams = 3;
 				m_param[2] = m_param[3];
 			}
 			break;
@@ -403,7 +403,7 @@ void uml::instruction::simplify()
 			if (m_param[2].is_immediate_value(paramsizemask[m_param[3].size()]))
 			{
 				m_opcode = OP_WRITE;
-				m_numparams = 2;
+				m_numparams = 3;
 				m_param[2] = m_param[3];
 			}
 			break;
