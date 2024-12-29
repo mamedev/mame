@@ -117,7 +117,6 @@ public:
 	void floppy_drive_set_ready_state(int state, int flag);
 	int floppy_drive_get_flag_state(int flag);
 	void floppy_drive_seek(signed int signed_tracks);
-	void floppy_drive_write_track_data_info_buffer(int side, const void *ptr, int *length );
 	void floppy_drive_format_sector(int side, int sector_index,int c,int h, int r, int n, int filler);
 	void floppy_drive_read_sector_data(int side, int index1, void *ptr, int length);
 	void floppy_drive_write_sector_data(int side, int index1, const void *ptr,int length, int ddam);
