@@ -464,12 +464,6 @@ void legacy_floppy_image_device::floppy_wtg_w(int state)
 	m_wtg = state;
 }
 
-/* write protect signal, active low */
-int legacy_floppy_image_device::floppy_wpt_r()
-{
-	return m_wpt;
-}
-
 /* track 0 detect */
 int legacy_floppy_image_device::floppy_tk00_r()
 {
