@@ -9,10 +9,6 @@
 
 #include "formats/flopimg_legacy.h"
 
-#define FLOPPY_TYPE_REGULAR 0
-#define FLOPPY_TYPE_APPLE   1
-#define FLOPPY_TYPE_SONY    2
-
 #define FLOPPY_DRIVE_2_8_INCH   1
 #define FLOPPY_DRIVE_3_INCH     2
 #define FLOPPY_DRIVE_3_5_INCH   3
@@ -135,8 +131,6 @@ public:
 	uint64_t floppy_drive_get_current_track_size(int head);
 	void floppy_drive_set_rpm(float rpm);
 	void floppy_drive_set_controller(device_t *controller);
-	int floppy_get_drive_type();
-	void floppy_set_type(int ftype);
 	void floppy_ds_w(int state);
 	void floppy_mon_w(int state);
 	void floppy_drtn_w(int state);
@@ -219,7 +213,6 @@ protected:
 	int m_track;
 	void (*m_load_proc)(device_image_interface &image, bool is_created);
 	void (*m_unload_proc)(device_image_interface &image);
-	int m_floppy_drive_type;
 
 	char            m_extension_list[256];
 };

@@ -143,8 +143,6 @@ void legacy_floppy_image_device::floppy_drive_init()
 	m_rpm = 300;
 
 	m_controller = nullptr;
-
-	m_floppy_drive_type = FLOPPY_TYPE_REGULAR;
 }
 
 /* index pulses at rpm/60 Hz, and stays high 1/20th of time */
@@ -478,17 +476,6 @@ TIMER_CALLBACK_MEMBER( legacy_floppy_image_device::set_wpt )
 	//m_out_wpt_func(param);
 }
 
-int legacy_floppy_image_device::floppy_get_drive_type()
-{
-	return m_floppy_drive_type;
-}
-
-void legacy_floppy_image_device::floppy_set_type(int ftype)
-{
-	m_floppy_drive_type = ftype;
-}
-
-
 /* drive select */
 void legacy_floppy_image_device::floppy_ds_w(int state)
 {
@@ -646,8 +633,7 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 		m_floppy(nullptr),
 		m_track(0),
 		m_load_proc(nullptr),
-		m_unload_proc(nullptr),
-		m_floppy_drive_type(0)
+		m_unload_proc(nullptr)
 {
 	memset(&m_extension_list,0,sizeof(m_extension_list));
 }
