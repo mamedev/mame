@@ -166,7 +166,6 @@ protected:
 	int m_idx;  /* index pulse */
 	int m_tk00; /* track 00 */
 	int m_wpt;  /* write protect */
-	int m_rdy;  /* ready */
 	int m_dskchg;     /* disk changed */
 
 	/* drive select logic */
@@ -192,7 +191,6 @@ protected:
 	float m_rpm;
 
 	emu_timer *m_wpt_timer;
-	int m_id_index;
 
 	device_t *m_controller;
 

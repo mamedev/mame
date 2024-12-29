@@ -93,8 +93,6 @@ void legacy_floppy_image_device::floppy_drive_init()
 
 	floppy_drive_set_geometry(m_config->floppy_type);
 
-	/* initialise id index - not so important */
-	m_id_index = 0;
 	/* initialise track */
 	m_current_track = 0;
 
@@ -239,8 +237,6 @@ void legacy_floppy_image_device::floppy_drive_seek(signed int signed_tracks)
 	/* inform disk image of step operation so it can cache information */
 	if (exists())
 		m_track = m_current_track;
-
-	m_id_index = 0;
 }
 
 void legacy_floppy_image_device::floppy_drive_read_sector_data(int side, int index1, void *ptr, int length)
@@ -468,7 +464,6 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 		m_idx(0),
 		m_tk00(0),
 		m_wpt(0),
-		m_rdy(0),
 		m_dskchg(0),
 		m_active(0),
 		m_config(nullptr),
@@ -479,7 +474,6 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 		m_index_timer(nullptr),
 		m_index_pulse_callback(nullptr),
 		m_rpm(0.0f),
-		m_id_index(0),
 		m_controller(nullptr),
 		m_floppy(nullptr),
 		m_track(0),
