@@ -278,40 +278,6 @@ void legacy_floppy_image_device::floppy_drive_seek(signed int signed_tracks)
 	m_id_index = 0;
 }
 
-
-/* this is not accurate. But it will do for now */
-int legacy_floppy_image_device::floppy_drive_get_next_id(int side, chrn_id *id)
-{
-	int spt;
-
-	/* get sectors per track */
-	spt = flopimg_get_sectors_per_track(side);
-
-	/* set index */
-	if ((m_id_index==(spt-1)) || (spt==0))
-	{
-		floppy_drive_set_flag_state(FLOPPY_DRIVE_INDEX, 1);
-	}
-	else
-	{
-		floppy_drive_set_flag_state(FLOPPY_DRIVE_INDEX, 0);
-	}
-
-	/* get id */
-	if (spt!=0)
-	{
-		flopimg_get_id_callback(id, m_id_index, side);
-	}
-
-	m_id_index++;
-	if (spt!=0)
-		m_id_index %= spt;
-	else
-		m_id_index = 0;
-
-	return (spt == 0) ? 0 : 1;
-}
-
 void legacy_floppy_image_device::floppy_drive_read_track_data_info_buffer(int side, void *ptr, int *length )
 {
 	if (exists())
