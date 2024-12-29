@@ -322,17 +322,6 @@ int legacy_floppy_image_device::floppy_drive_get_current_track()
 	return m_current_track;
 }
 
-uint64_t legacy_floppy_image_device::floppy_drive_get_current_track_size(int head)
-{
-	int size = 0;
-	if (exists())
-	{
-		size = floppy_get_track_size(m_floppy, head, m_current_track);
-	}
-
-	return size;
-}
-
 void legacy_floppy_image_device::floppy_drive_set_rpm(float rpm)
 {
 	m_rpm = rpm;

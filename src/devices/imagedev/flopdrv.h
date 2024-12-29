@@ -122,7 +122,6 @@ public:
 	void floppy_install_load_proc(void (*proc)(device_image_interface &image, bool is_created));
 	void floppy_install_unload_proc(void (*proc)(device_image_interface &image));
 	int floppy_drive_get_current_track();
-	uint64_t floppy_drive_get_current_track_size(int head);
 	void floppy_drive_set_rpm(float rpm);
 	void floppy_drive_set_controller(device_t *controller);
 	void floppy_ds_w(int state);
