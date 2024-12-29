@@ -112,8 +112,6 @@ public:
 	virtual const char *image_brief_type_name() const noexcept override { return "flop"; }
 	virtual const util::option_guide &create_option_guide() const override { return floppy_option_guide(); }
 
-	void floppy_drive_set_geometry(floppy_type_t type);
-	void floppy_drive_set_flag_state(int flag, int state);
 	void floppy_drive_set_ready_state(int state, int flag);
 	int floppy_drive_get_flag_state(int flag);
 	void floppy_drive_seek(signed int signed_tracks);
@@ -136,7 +134,9 @@ public:
 
 private:
 	void log_readwrite(const char *name, int head, int track, int sector, const char *buf, int length);
+	void floppy_drive_set_flag_state(int flag, int state);
 	void floppy_drive_set_geometry_absolute(int tracks, int sides);
+	void floppy_drive_set_geometry(floppy_type_t type);
 	TIMER_CALLBACK_MEMBER(floppy_drive_index_callback);
 	void floppy_drive_init();
 	void floppy_drive_index_func();
