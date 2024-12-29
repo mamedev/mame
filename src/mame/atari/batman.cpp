@@ -136,7 +136,6 @@ const atari_motion_objects_config batman_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x03ff,0,0,0 }}, // mask for the link
@@ -304,7 +303,7 @@ void batman_state::latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	COMBINE_DATA(&m_latch_data);
 
 	// bit 4 is connected to the /RESET pin on the 6502
-	if (m_latch_data & 0x0010)
+	if (BIT(m_latch_data, 4))
 		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	else
 		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -419,9 +418,9 @@ static const gfx_layout pfmolayout =
 
 
 static GFXDECODE_START( gfx_batman )
-	GFXDECODE_ENTRY( "spr_tiles_2", 0, pfmolayout,  512, 32 )      // sprites & playfield
-	GFXDECODE_ENTRY( "spr_tiles_1", 0, pfmolayout,  256, 16 )      // sprites & playfield
-	GFXDECODE_ENTRY( "chars",       0, anlayout,      0, 64 )      // characters 8x8
+	GFXDECODE_ENTRY( "tiles",   0, pfmolayout,  512, 32 )      // playfield
+	GFXDECODE_ENTRY( "sprites", 0, pfmolayout,  256, 16 )      // sprites
+	GFXDECODE_ENTRY( "chars",   0, anlayout,      0, 64 )      // characters
 GFXDECODE_END
 
 
@@ -452,7 +451,7 @@ void batman_state::batman(machine_config &config)
 
 	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(batman_state::get_playfield_tile_info));
 	TILEMAP(config, "vad:playfield2", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(batman_state::get_playfield2_tile_info));
-	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(batman_state::get_alpha_tile_info));
+	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 30, 0).set_info_callback(FUNC(batman_state::get_alpha_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, batman_state::s_mob_config).set_gfxdecode("gfxdecode");
 	m_mob->set_xoffset(-1);
@@ -497,7 +496,7 @@ ROM_START( batman )
 	ROM_REGION( 0x20000, "chars", 0 )
 	ROM_LOAD( "136085-2009.10m",  0x00000, 0x20000, CRC(a82d4923) SHA1(38e03eebd95347a383f3d7357462252961bd3c7f) )
 
-	ROM_REGION( 0x100000, "spr_tiles_1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "136085-1010.13r",  0x000000, 0x20000, CRC(466e1365) SHA1(318530e8a97c1b6ee3e671e677fc7684df5cc3a8) ) // graphics, plane 0
 	ROM_LOAD( "136085-1014.14r",  0x020000, 0x20000, CRC(ef53475a) SHA1(9bfc66bb8dd02757e4a79a75928b260f4518a94b) )
 	ROM_LOAD( "136085-1011.13m",  0x040000, 0x20000, CRC(8cda5efc) SHA1(b0410f9bf1f38f5f1e9add15079b03d7f19b4c8f) ) // graphics, plane 1
@@ -507,7 +506,7 @@ ROM_START( batman )
 	ROM_LOAD( "136085-1013.13c",  0x0c0000, 0x20000, CRC(68b64975) SHA1(f3fb45dd74fc21dd2eece87e739c734963962f93) ) // graphics, plane 3
 	ROM_LOAD( "136085-1017.14c",  0x0e0000, 0x20000, CRC(e4af157b) SHA1(ddf9eff84c882a096f7e435a6227b32d31029f9e) )
 
-	ROM_REGION( 0x100000, "spr_tiles_2", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136085-1018.15r",  0x000000, 0x20000, CRC(4c14f1e5) SHA1(2a65d0aafd944886d9e801c9de0f857f2e9db773) )
 	ROM_LOAD( "136085-1022.16r",  0x020000, 0x20000, CRC(7476a15d) SHA1(779f9aec114aa71a268a7a646d998c1593f55d08) )
 	ROM_LOAD( "136085-1019.15m",  0x040000, 0x20000, CRC(2046d9ec) SHA1(3b14b18545eac2e6cb1d3157ec1af251287b3e45) )

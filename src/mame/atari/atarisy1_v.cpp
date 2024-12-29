@@ -19,19 +19,19 @@
  *************************************/
 
 /* the color and remap PROMs are mapped as follows */
-#define PROM1_BANK_4            0x80        /* active low */
-#define PROM1_BANK_3            0x40        /* active low */
-#define PROM1_BANK_2            0x20        /* active low */
-#define PROM1_BANK_1            0x10        /* active low */
-#define PROM1_OFFSET_MASK       0x0f        /* postive logic */
+static constexpr unsigned PROM1_BANK_4         = 0x80;        /* active low */
+static constexpr unsigned PROM1_BANK_3         = 0x40;        /* active low */
+static constexpr unsigned PROM1_BANK_2         = 0x20;        /* active low */
+static constexpr unsigned PROM1_BANK_1         = 0x10;        /* active low */
+static constexpr unsigned PROM1_OFFSET_MASK    = 0x0f;        /* postive logic */
 
-#define PROM2_BANK_6_OR_7       0x80        /* active low */
-#define PROM2_BANK_5            0x40        /* active low */
-#define PROM2_PLANE_5_ENABLE    0x20        /* active high */
-#define PROM2_PLANE_4_ENABLE    0x10        /* active high */
-#define PROM2_PF_COLOR_MASK     0x0f        /* negative logic */
-#define PROM2_BANK_7            0x08        /* active low, plus PROM2_BANK_6_OR_7 low as well */
-#define PROM2_MO_COLOR_MASK     0x07        /* negative logic */
+static constexpr unsigned PROM2_BANK_6_OR_7    = 0x80;        /* active low */
+static constexpr unsigned PROM2_BANK_5         = 0x40;        /* active low */
+static constexpr unsigned PROM2_PLANE_5_ENABLE = 0x20;        /* active high */
+static constexpr unsigned PROM2_PLANE_4_ENABLE = 0x10;        /* active high */
+static constexpr unsigned PROM2_PF_COLOR_MASK  = 0x0f;        /* negative logic */
+static constexpr unsigned PROM2_BANK_7         = 0x08;        /* active low, plus PROM2_BANK_6_OR_7 low as well */
+static constexpr unsigned PROM2_MO_COLOR_MASK  = 0x07;        /* negative logic */
 
 
 
@@ -84,21 +84,21 @@ static const gfx_layout objlayout_6bpp =
 
 TILE_GET_INFO_MEMBER(atarisy1_state::get_alpha_tile_info)
 {
-	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
-	int code = data & 0x3ff;
-	int color = (data >> 10) & 0x07;
-	int opaque = data & 0x2000;
+	uint16_t const data = m_alpha_tilemap->basemem_read(tile_index);
+	int const code = data & 0x3ff;
+	int const color = (data >> 10) & 0x07;
+	int const opaque = data & 0x2000;
 	tileinfo.set(0, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
 TILE_GET_INFO_MEMBER(atarisy1_state::get_playfield_tile_info)
 {
-	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
-	uint16_t lookup = m_playfield_lookup[((data >> 8) & 0x7f) | (m_playfield_tile_bank << 7)];
-	int gfxindex = (lookup >> 8) & 15;
-	int code = ((lookup & 0xff) << 8) | (data & 0xff);
-	int color = 0x20 + (((lookup >> 12) & 15) << m_bank_color_shift[gfxindex]);
+	uint16_t const data = m_playfield_tilemap->basemem_read(tile_index);
+	uint16_t const lookup = m_playfield_lookup[((data >> 8) & 0x7f) | (m_playfield_tile_bank << 7)];
+	int const gfxindex = (lookup >> 8) & 15;
+	int const code = ((lookup & 0xff) << 8) | (data & 0xff);
+	int const color = 0x20 + (((lookup >> 12) & 15) << m_bank_color_shift[gfxindex]);
 	tileinfo.set(gfxindex, code, color, (data >> 15) & 1);
 }
 
@@ -124,7 +124,6 @@ const atari_motion_objects_config atarisy1_state::s_mob_config =
 	0x38,               /* maximum number of links to visit/scanline (0=all) */
 
 	0x100,              /* base palette entry */
-	0x100,              /* maximum number of colors */
 	0,                  /* transparent pen index */
 
 	{{ 0,0,0,0x003f }}, /* mask for the link */
@@ -167,7 +166,7 @@ void atarisy1_state::video_start()
 	// reset the statics
 	m_mob->set_yscroll(256);
 	m_next_timer_scanline = -1;
-	m_scanline_int_state = 0;
+	m_scanline_int_state = false;
 	m_bankselect = 0xff;
 	m_playfield_tile_bank = 0;
 
@@ -189,12 +188,12 @@ void atarisy1_state::video_start()
 
 void atarisy1_state::bankselect_w(uint8_t data)
 {
-	uint8_t oldselect = m_bankselect;
-	uint8_t newselect = data;
-	int scanline = m_screen->vpos();
+	uint8_t const oldselect = m_bankselect;
+	uint8_t const newselect = data;
+	int const scanline = m_screen->vpos();
 
 	// update memory
-	uint8_t diff = oldselect ^ newselect;
+	uint8_t const diff = oldselect ^ newselect;
 
 	// sound CPU reset
 	if (BIT(diff, 7))
@@ -218,9 +217,9 @@ void atarisy1_state::bankselect_w(uint8_t data)
 	update_timers(scanline);
 
 	// playfield bank select
-	if (diff & 0x04)
+	if (BIT(diff, 2))
 	{
-		m_playfield_tile_bank = (newselect >> 2) & 1;
+		m_playfield_tile_bank = BIT(newselect, 2);
 		m_playfield_tilemap->mark_all_dirty();
 	}
 
@@ -236,9 +235,9 @@ void atarisy1_state::bankselect_w(uint8_t data)
  *
  *************************************/
 
-void atarisy1_state::atarisy1_priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void atarisy1_state::priority_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t oldpens = m_playfield_priority_pens;
+	uint16_t const oldpens = m_playfield_priority_pens;
 	uint16_t newpens = oldpens;
 
 	/* force a partial update in case this changes mid-screen */
@@ -256,9 +255,9 @@ void atarisy1_state::atarisy1_priority_w(offs_t offset, uint16_t data, uint16_t 
  *
  *************************************/
 
-void atarisy1_state::atarisy1_xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void atarisy1_state::xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t oldscroll = *m_xscroll;
+	uint16_t const oldscroll = *m_xscroll;
 	uint16_t newscroll = oldscroll;
 
 	/* force a partial update in case this changes mid-screen */
@@ -287,12 +286,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::reset_yscroll_callback)
 }
 
 
-void atarisy1_state::atarisy1_yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void atarisy1_state::yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t oldscroll = *m_yscroll;
+	uint16_t const oldscroll = *m_yscroll;
 	uint16_t newscroll = oldscroll;
-	int scanline = m_screen->vpos();
-	int adjusted_scroll;
+	int const scanline = m_screen->vpos();
 
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newscroll);
@@ -300,7 +298,7 @@ void atarisy1_state::atarisy1_yscroll_w(offs_t offset, uint16_t data, uint16_t m
 
 	/* because this latches a new value into the scroll base,
 	   we need to adjust for the scanline */
-	adjusted_scroll = newscroll;
+	int adjusted_scroll = newscroll;
 	if (scanline <= m_screen->visible_area().bottom())
 		adjusted_scroll -= (scanline + 1);
 	m_playfield_tilemap->set_scrolly(0, adjusted_scroll);
@@ -321,11 +319,11 @@ void atarisy1_state::atarisy1_yscroll_w(offs_t offset, uint16_t data, uint16_t m
  *
  *************************************/
 
-void atarisy1_state::atarisy1_spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void atarisy1_state::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int active_bank = m_mob->bank();
+	int const active_bank = m_mob->bank();
 	uint16_t *spriteram = m_mob->spriteram();
-	int oldword = spriteram[offset];
+	int const oldword = spriteram[offset];
 	int newword = oldword;
 	COMBINE_DATA(&newword);
 
@@ -364,17 +362,17 @@ void atarisy1_state::atarisy1_spriteram_w(offs_t offset, uint16_t data, uint16_t
 TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::int3off_callback)
 {
 	// clear the state
-	m_scanline_int_state = 0;
+	m_scanline_int_state = false;
 	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::int3_callback)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	// update the state
-	m_scanline_int_state = 1;
+	m_scanline_int_state = true;
 	m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 
 	// set a timer to turn it off
@@ -393,7 +391,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::int3_callback)
  *
  *************************************/
 
-uint16_t atarisy1_state::atarisy1_int3state_r()
+uint16_t atarisy1_state::int3state_r()
 {
 	return m_scanline_int_state ? 0x0080 : 0x0000;
 }
@@ -412,7 +410,7 @@ void atarisy1_state::update_timers(int scanline)
 
 void atarisy1r_state::update_timers(int scanline)
 {
-	int offset = m_mob->bank() * 64 * 4;
+	int const offset = m_mob->bank() * 64 * 4;
 	int link = 0, best = scanline, found = 0;
 	uint8_t spritevisit[64];
 
@@ -425,9 +423,9 @@ void atarisy1r_state::update_timers(int scanline)
 		/* timers are indicated by 0xffff in entry 2 */
 		if (m_mob->spriteram()[offset + link + 0x40] == 0xffff)
 		{
-			int data = m_mob->spriteram()[offset + link];
-			int vsize = (data & 15) + 1;
-			int ypos = (256 - (data >> 5) - vsize * 8 - 1) & 0x1ff;
+			int const data = m_mob->spriteram()[offset + link];
+			int const vsize = (data & 15) + 1;
+			int const ypos = (256 - (data >> 5) - vsize * 8 - 1) & 0x1ff;
 
 			/* note that we found something */
 			found = 1;
@@ -475,7 +473,7 @@ void atarisy1r_state::update_timers(int scanline)
  *
  *************************************/
 
-uint32_t atarisy1_state::screen_update_atarisy1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t atarisy1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
 	m_mob->draw_async(cliprect);
@@ -526,18 +524,17 @@ uint32_t atarisy1_state::screen_update_atarisy1(screen_device &screen, bitmap_in
 
 void atarisy1_state::decode_gfx(uint16_t *pflookup, uint16_t *molookup)
 {
-	uint8_t *prom1 = &memregion("proms")->as_u8(0x000);
-	uint8_t *prom2 = &memregion("proms")->as_u8(0x200);
-	int obj, i;
+	uint8_t const *prom1 = &memregion("proms")->as_u8(0x000);
+	uint8_t const *prom2 = &memregion("proms")->as_u8(0x200);
 
 	/* reset the globals */
 	memset(&m_bank_gfx[0][0], 0, sizeof(m_bank_gfx));
 
 	/* loop for two sets of objects */
-	for (obj = 0; obj < 2; obj++)
+	for (int obj = 0; obj < 2; obj++)
 	{
 		/* loop for 256 objects in the set */
-		for (i = 0; i < 256; i++, prom1++, prom2++)
+		for (int i = 0; i < 256; i++, prom1++, prom2++)
 		{
 			int bank, bpp, color, offset;
 
@@ -588,7 +585,6 @@ void atarisy1_state::decode_gfx(uint16_t *pflookup, uint16_t *molookup)
 
 int atarisy1_state::get_bank(uint8_t prom1, uint8_t prom2, int bpp)
 {
-	const uint8_t *srcdata;
 	int bank_index, gfx_index;
 
 	/* determine the bank index */
@@ -628,7 +624,7 @@ int atarisy1_state::get_bank(uint8_t prom1, uint8_t prom2, int bpp)
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* decode the graphics */
-	srcdata = &tiles->as_u8(0x80000 * (bank_index - 1));
+	const uint8_t *srcdata = &tiles->as_u8(0x80000 * (bank_index - 1));
 	switch (bpp)
 	{
 	case 4:
