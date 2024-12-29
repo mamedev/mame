@@ -5855,9 +5855,9 @@ void drcbe_x86::op_fload(Assembler &a, const instruction &inst)
 	{
 		Gp const indreg = indp.select_register(ecx);
 		emit_mov_r32_p32(a, indreg, indp);
-		a.mov(eax, ptr(u64(basep.memory(0)), indreg, inst.size() == 8 ? 3 : 2));
+		a.mov(eax, ptr(u64(basep.memory(0)), indreg, (inst.size() == 8) ? 3 : 2));
 		if (inst.size() == 8)
-			a.mov(edx, ptr(u64(basep.memory(4)), indreg, inst.size() == 8 ? 3 : 2));
+			a.mov(edx, ptr(u64(basep.memory(4)), indreg, (inst.size() == 8) ? 3 : 2));
 	}
 
 	// general case
@@ -5901,9 +5901,9 @@ void drcbe_x86::op_fstore(Assembler &a, const instruction &inst)
 	{
 		Gp const indreg = indp.select_register(ecx);
 		emit_mov_r32_p32(a, indreg, indp);
-		a.mov(ptr(u64(basep.memory(0)), indreg, inst.size() == 8 ? 3 : 2), eax);
+		a.mov(ptr(u64(basep.memory(0)), indreg, (inst.size() == 8) ? 3 : 2), eax);
 		if (inst.size() == 8)
-			a.mov(ptr(u64(basep.memory(4)), indreg, inst.size() == 8 ? 3 : 2), edx);
+			a.mov(ptr(u64(basep.memory(4)), indreg, (inst.size() == 8) ? 3 : 2), edx);
 	}
 }
 
