@@ -278,15 +278,6 @@ void legacy_floppy_image_device::floppy_drive_seek(signed int signed_tracks)
 	m_id_index = 0;
 }
 
-void legacy_floppy_image_device::floppy_drive_format_sector(int side, int sector_index,int c,int h, int r, int n, int filler)
-{
-	if (exists())
-	{
-/*      if (m_interface_.format_sector)
-            m_interface_.format_sector(img, side, sector_index,c, h, r, n, filler);*/
-	}
-}
-
 void legacy_floppy_image_device::floppy_drive_read_sector_data(int side, int index1, void *ptr, int length)
 {
 	if (exists())
