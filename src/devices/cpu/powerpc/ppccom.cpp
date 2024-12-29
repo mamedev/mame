@@ -288,7 +288,6 @@ ppc601_device::ppc601_device(const machine_config &mconfig, const char *tag, dev
 std::unique_ptr<util::disasm_interface> ppc601_device::create_disassembler()
 {
 	// 601 has both POWER and PowerPC instructions
-	printf("601 create_disassembler\n");
 	return std::make_unique<powerpc_disassembler>((powerpc_disassembler::implementation)(powerpc_disassembler::I_POWER|powerpc_disassembler::I_POWERPC));
 }
 
