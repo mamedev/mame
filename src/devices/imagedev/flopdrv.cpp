@@ -470,15 +470,6 @@ int legacy_floppy_image_device::floppy_tk00_r()
 	return m_tk00;
 }
 
-/* 2-sided disk */
-int legacy_floppy_image_device::floppy_twosid_r()
-{
-	if (m_floppy == nullptr)
-		return 1;
-	else
-		return !floppy_get_heads_per_disk(m_floppy);
-}
-
 int legacy_floppy_image_device::floppy_index_r()
 {
 	return m_idx;
