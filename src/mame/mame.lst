@@ -24169,7 +24169,8 @@ glregion
 gradius3                        // GX945 (c) 1989 (World)
 gradius3a                       // GX945 (c) 1989 (Asia)
 gradius3j                       // GX945 (c) 1989 (Japan)
-gradius3js                      // GX945 (c) 1989 (Japan, split)
+gradius3ja                      // GX945 (c) 1989 (Japan)
+gradius3jas                     // GX945 (c) 1989 (Japan, split)
 
 @source:konami/gryzor_ms.cpp
 gryzorm                         // bootleg (Modular System)
