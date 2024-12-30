@@ -1921,7 +1921,8 @@ TIMER_CALLBACK_MEMBER(m2_cde_device::next_dma)
 	dma_channel &dma_ch = m_dma[ch];
 
 	// TODO: HACK!
-#if 1
+	// this hack causes extreme slowdown when the games are loading (including between scenes) due to recompiler overhead, is it still needed?
+#if 0
 	m_cpu1->set_cache_dirty();
 #endif
 
