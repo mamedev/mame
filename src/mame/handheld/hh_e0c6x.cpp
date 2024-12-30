@@ -260,7 +260,7 @@ ROM_END
   * 32*16 LCD screen + 8 custom segments, 1-bit sound
 
   The sequels (Ver. 2 to Ver. 4) are on the same hardware, and are compatible
-  with eachother for battle mode.
+  with each other for battle mode.
 
 *******************************************************************************/
 
