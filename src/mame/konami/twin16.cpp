@@ -1272,12 +1272,12 @@ GAME( 1987, devilw,    0,        devilw,    devilw,    twin16_state,    init_twi
 GAME( 1987, majuu,     devilw,   devilw,    devilw,    twin16_state,    init_twin16,    ROT0,   "Konami", "Majuu no Ohkoku", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, darkadv,   devilw,   devilw,    darkadv,   twin16_state,    init_twin16,    ROT0,   "Konami", "Dark Adventure", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, vulcan,    0,        twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vulcana,   vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vulcanb,   vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gradius2,  vulcan,   twin16,    gradius2,  twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II: GOFER no Yabou (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gradius2a, vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II: GOFER no Yabou (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gradius2b, vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II: GOFER no Yabou (Japan set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vulcan,    0,        twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (new)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vulcana,   vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (old)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vulcanb,   vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gradius2,  vulcan,   twin16,    gradius2,  twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II: GOFER no Yabou (Japan, new)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gradius2a, vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II: GOFER no Yabou (Japan, old)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gradius2b, vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II: GOFER no Yabou (Japan, older)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, fround,    0,        fround,    fround,    fround_state,    init_fround,    ROT0,   "Konami", "The Final Round (version M)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, froundl,   fround,   fround,    fround,    fround_state,    init_fround,    ROT0,   "Konami", "The Final Round (version L)", MACHINE_SUPPORTS_SAVE )
