@@ -731,7 +731,7 @@ ROM_END
 
 
 GAME( 1989, gradius3,    0,        gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (World, version R)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3j,   gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III: Densetsu kara Shinwa e (Japan, version 3)", MACHINE_SUPPORTS_SAVE ) // newer
+GAME( 1989, gradius3j,   gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III: Densetsu kara Shinwa e (Japan, version 3, newer)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gradius3ja,  gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III: Densetsu kara Shinwa e (Japan, version S)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gradius3jas, gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III: Densetsu kara Shinwa e (Japan, version S, split)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gradius3a,   gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (Asia)", MACHINE_SUPPORTS_SAVE )
