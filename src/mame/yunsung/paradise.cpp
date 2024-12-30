@@ -842,7 +842,7 @@ static INPUT_PORTS_START( penkyi )
 	PORT_DIPSETTING(    0x02, "0:50" )
 	PORT_DIPSETTING(    0x03, "1:00" )
 	PORT_DIPNAME( 0x80, 0x80, "Game Mode" )      PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, "Normal" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Redemption" ) // gives out tickets
 
 	PORT_MODIFY("DSW2")  // port $2021

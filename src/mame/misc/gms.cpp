@@ -556,7 +556,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPNAME( 0x0040, 0x0000, "Pay Out Type" ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(      0x0040, "Credits" )
 	PORT_DIPSETTING(      0x0000, "Coins" )
-	PORT_DIPNAME( 0x0080, 0x0080, "Controls" ) PORT_DIPLOCATION("DSW2:8") // should default to keyboard, but set on joystick since the former isn't emulated yet
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Controls ) ) PORT_DIPLOCATION("DSW2:8") // should default to keyboard, but set on joystick since the former isn't emulated yet
 	PORT_DIPSETTING(      0x0080, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0000, "Keyboard" )
 	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW5:1")
@@ -704,7 +704,7 @@ static INPUT_PORTS_START( ssanguoj )
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Controls" ) PORT_DIPLOCATION("DSW1:8") // should default to keyboard, but set on joystick since the former isn't emulated yet
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Controls ) ) PORT_DIPLOCATION("DSW1:8") // should default to keyboard, but set on joystick since the former isn't emulated yet
 	PORT_DIPSETTING(      0x0080, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0000, "Keyboard" )
 	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:1")
@@ -1251,8 +1251,8 @@ static INPUT_PORTS_START( sc2in1 )
 	PORT_DIPSETTING(       0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(       0x0040, "Power On" )
 	PORT_DIPNAME(          0x0080, 0x0000, "Connector" ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(       0x0000, "Joystick" ) // hardcoded
-	PORT_DIPSETTING(       0x0080, "Joystick" )
+	PORT_DIPSETTING(       0x0000, DEF_STR( Joystick ) ) // hardcoded
+	PORT_DIPSETTING(       0x0080, DEF_STR( Joystick ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ballch )

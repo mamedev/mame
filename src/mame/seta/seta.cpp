@@ -5260,7 +5260,7 @@ static INPUT_PORTS_START( madshark )
 	// TODO: pinpoint for what market is the Chinese title for
 	// (Is our current romset even suited for this setting to properly work? It still says Mad Shark during attract)
 	PORT_CONFNAME( 0x0080, 0x0000, "Title Language" )       // Changes title graphics only
-	PORT_CONFSETTING(      0x0000, "English" )              // Mad Shark - title used in most of the world, including Japan
+	PORT_CONFSETTING(      0x0000, DEF_STR( English ) )     // Mad Shark - title used in most of the world, including Japan
 	PORT_CONFSETTING(      0x0080, "Traditional Chinese" )  // 最強鮫 - presumably for Taiwan (Zuìqiáng Jiāo) or Hong Kong (Zeoi Koeng Gaau)
 
 	PORT_START("DSW") //2 DSWs
@@ -6942,10 +6942,10 @@ static INPUT_PORTS_START( jockeyc )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x00, "Hopper" )                PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, "Single" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, "Double" )
 	PORT_DIPNAME( 0x80, 0x80, "Coin Sensor" )           PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x00, "Single" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x80, "Double" )
 
 	PORT_START("DSW2_3") // SW2 & SW3
@@ -7117,7 +7117,7 @@ static INPUT_PORTS_START( inttoote )
 	PORT_DIPSETTING(      0x0000, "Cyclic (8 Set Races)"  ) // 8 set races continually cycled (player has a mental history of the preceding races)
 	PORT_DIPNAME( 0x1000, 0x1000, "Odds" )                PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(      0x1000, "Lower" )
-	PORT_DIPSETTING(      0x0000, "Higher" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Higher ) )
 	PORT_DIPNAME( 0x2000, 0x2000, "Unknown SW3:6" )       PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

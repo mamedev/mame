@@ -2957,7 +2957,7 @@ static INPUT_PORTS_START( mjifb )
 	PORT_DIPSETTING(    0x04, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
 	PORT_DIPNAME( 0x38, 0x20, "YAKUMAN Bonus" ) PORT_DIPLOCATION("DSW2:4,5,6")
-	PORT_DIPSETTING(    0x38, "None" ) // default for "corner type" cabinet
+	PORT_DIPSETTING(    0x38, DEF_STR( None ) ) // default for "corner type" cabinet
 	PORT_DIPSETTING(    0x30, "Once at start" )
 	PORT_DIPSETTING(    0x28, "Every 300 coins" )
 	PORT_DIPSETTING(    0x20, "Every 500 coins" )
@@ -3367,7 +3367,7 @@ static INPUT_PORTS_START( cafedoll )
 	PORT_DIPSETTING(    0x20, DEF_STR(Normal) )                                                        // 通常
 	PORT_DIPSETTING(    0x00, "Fixed" )                                                                // 固定
 	PORT_DIPNAME( 0x40, 0x40, "Just Time Bonus Standard Settings" )  PORT_DIPLOCATION("SW 4:9")        // ジャスト・タイム・ボーナス 標準設定
-	PORT_DIPSETTING(    0x40, "Single" )                                                               // シングル向け
+	PORT_DIPSETTING(    0x40, DEF_STR(Single) )                                                        // シングル向け
 	PORT_DIPSETTING(    0x00, "Medal Corner" )                                                         // メダル コーナー向け
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                     PORT_DIPLOCATION("SW 4:10")       // ＯＦＦ固定
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
@@ -3839,7 +3839,7 @@ static INPUT_PORTS_START( ichiban )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 
 	PORT_START("DSW-C")
-	PORT_DIPNAME( 0x03, 0x03, "China" ) PORT_DIPLOCATION("DSW-C:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( China ) ) PORT_DIPLOCATION("DSW-C:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, "Hane" )
 	PORT_DIPSETTING(    0x01, "Bai" )

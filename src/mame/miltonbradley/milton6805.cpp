@@ -238,8 +238,8 @@ static INPUT_PORTS_START( milton )
 
 	PORT_START("VOLUME")
 	PORT_CONFNAME( 0x01, 0x00, "Volume" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(milton_state::volume_changed), 0)
-	PORT_CONFSETTING(    0x01, "Low" )
-	PORT_CONFSETTING(    0x00, "High" )
+	PORT_CONFSETTING(    0x01, DEF_STR( Low ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( High ) )
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(milton_state::volume_changed)

@@ -391,17 +391,17 @@ void imi5000h_device::device_add_mconfig(machine_config & config)
 static INPUT_PORTS_START( imi5000h )
 	PORT_START("LSI-11")
 	PORT_DIPNAME( 0x01, 0x00, "LSI-11" )
-	PORT_DIPSETTING(    0x01, "Normal" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "LSI-11" ) // emulate DEC RL01 and RL02
 
 	PORT_START("MUX")
 	PORT_DIPNAME( 0x01, 0x00, "MUX" )
-	PORT_DIPSETTING(    0x01, "Single" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, "Multiplexer" ) // Corvus Multiplexer Network
 
 	PORT_START("FORMAT")
 	PORT_DIPNAME( 0x01, 0x00, "FORMAT" )
-	PORT_DIPSETTING(    0x01, "Normal" ) // read controller firmware from cylinders 0 and 1
+	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) ) // read controller firmware from cylinders 0 and 1
 	PORT_DIPSETTING(    0x00, "Format" ) // drive ready after self-test, allow format
 
 	PORT_START("RESET")

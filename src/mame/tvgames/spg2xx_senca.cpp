@@ -788,8 +788,8 @@ static INPUT_PORTS_START( oplayer )
 
 	PORT_START("BATT")
 	PORT_CONFNAME( 0x0001,  0x0001, "Battery Status" )
-	PORT_CONFSETTING(       0x0000, "Low" )
-	PORT_CONFSETTING(       0x0001, "High" )
+	PORT_CONFSETTING(       0x0000, DEF_STR( Low ) )
+	PORT_CONFSETTING(       0x0001, DEF_STR( High ) )
 INPUT_PORTS_END
 
 

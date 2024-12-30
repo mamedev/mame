@@ -265,7 +265,7 @@ static INPUT_PORTS_START( max80 )
 
 	PORT_START("BOOT")   // lower 3 dips decide the boot device. Other 5 dips are unknown. Manual shows them all set low.
 	PORT_DIPNAME( 0x07, 0x02, "Boot device")
-	PORT_DIPSETTING(    0x00, "None")
+	PORT_DIPSETTING(    0x00, DEF_STR(None))
 	PORT_DIPSETTING(    0x01, "Floppy 5")
 	PORT_DIPSETTING(    0x02, "Floppy 8")
 	PORT_DIPSETTING(    0x03, "HD 5 UVC")

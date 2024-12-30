@@ -940,7 +940,7 @@ static INPUT_PORTS_START( leader )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "Coin Lock" )                 PORT_DIPLOCATION("DSW-C:8")
 	PORT_DIPSETTING(    0x80, "Locked" )
-	PORT_DIPSETTING(    0x00, "Normal" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
 
@@ -1429,8 +1429,8 @@ static INPUT_PORTS_START( sonikfig )
 	PORT_DIPSETTING(    0x02, "85%" )  // OK
 	PORT_DIPSETTING(    0x00, "90%" )  // OK
 	PORT_DIPNAME( 0x20, 0x00, "Reels Speed" )  // OK
-	PORT_DIPSETTING(    0x20, "Low" )  // OK
-	PORT_DIPSETTING(    0x00, "Hi" )  // OK
+	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )  // OK
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )  // OK
 	PORT_DIPNAME( 0x40, 0x00, "Bonus Score" )  // OK
 	PORT_DIPSETTING(    0x40, "32" )  // OK
 	PORT_DIPSETTING(    0x00, "24" )  // OK

@@ -4151,7 +4151,7 @@ static INPUT_PORTS_START( chryangl )
 	PORT_DIPSETTING(    0x00, "Limited" )
 
 	PORT_START("DSW3")  // note in manual says "Reverse these settings" for entire DSW3 ???
-	PORT_DIPNAME( 0x01, 0x01, "Unused" )                PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )       PORT_DIPLOCATION("DSW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )         PORT_DIPLOCATION("DSW3:2,3")
@@ -4167,7 +4167,7 @@ static INPUT_PORTS_START( chryangl )
 	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW3:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unused" )                PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )       PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )       PORT_DIPLOCATION("DSW3:8")
@@ -4343,7 +4343,7 @@ static INPUT_PORTS_START( tonypok )
 	PORT_DIPSETTING(    0x20, "Big / Small" )
 	PORT_DIPSETTING(    0x00, "Black / Red" )
 	PORT_DIPNAME( 0x40, 0x40, "Card Type" )             PORT_DIPLOCATION("DSW4:7")      /* OK */
-	PORT_DIPSETTING(    0x40, "Standard" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Standard ) )
 	PORT_DIPSETTING(    0x00, "Jets" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:8")      /* OK */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -4899,7 +4899,7 @@ static INPUT_PORTS_START( lucky8 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0x00, "Special Odds" )              PORT_DIPLOCATION("DSW1:7,8")    /* doesn't seem to actually do anything - in W-4 manual but probably unused in these game */
-	PORT_DIPSETTING(    0xc0, "None" )
+	PORT_DIPSETTING(    0xc0, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x80, "Limited to X 300 (X 1000)" )
 	PORT_DIPSETTING(    0x40, "Limited to X 500 (X 5000)" )
 	PORT_DIPSETTING(    0x00, "Limited to X 1000 (X 10000)" )
@@ -5115,7 +5115,7 @@ static INPUT_PORTS_START( ns8linew )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0x00, "Special Odds" )              PORT_DIPLOCATION("DSW1:7,8")    /* not checked */
-	PORT_DIPSETTING(    0xc0, "None" )
+	PORT_DIPSETTING(    0xc0, DEF_STR( None ) )
 	PORT_DIPSETTING(    0xb0, "Limited to x300 (x1000)" )
 	PORT_DIPSETTING(    0x40, "Limited to x500 (x5000)" )
 	PORT_DIPSETTING(    0x00, "Limited to x1000 (x10000)" )
@@ -5360,7 +5360,7 @@ static INPUT_PORTS_START( ns8linwa )
 	PORT_DIPSETTING(    0x20, "70%" )  // OK
 	PORT_DIPSETTING(    0x30, "75%" )  // OK
 	PORT_DIPNAME( 0xc0, 0x00, "Special Odds" )              PORT_DIPLOCATION("DSW1:7,8")  // not checked
-	PORT_DIPSETTING(    0xc0, "None" )
+	PORT_DIPSETTING(    0xc0, DEF_STR( None ) )
 	PORT_DIPSETTING(    0xb0, "Limited to x300 (x1000)" )
 	PORT_DIPSETTING(    0x40, "Limited to x500 (x5000)" )
 	PORT_DIPSETTING(    0x00, "Limited to x1000 (x10000)" )
@@ -5816,7 +5816,7 @@ static INPUT_PORTS_START( bingowng )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 /*  On a W-4 PCB these are used as: "Special Odds-Prohibition Of Winning...(Odds B)" - see DSW2-7
     PORT_DIPNAME( 0x80, 0x00, "Special Odds" )              PORT_DIPLOCATION("DSW1:7,8")
-    PORT_DIPSETTING(    0x00, "None" )
+    PORT_DIPSETTING(    0x00, DEF_STR( None ) )
     PORT_DIPSETTING(    0x40, "x300 (x1000)" )
     PORT_DIPSETTING(    0x80, "x500 (x5000" )
     PORT_DIPSETTING(    0xc0, "x1000 (x10000)
@@ -5824,10 +5824,10 @@ static INPUT_PORTS_START( bingowng )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, "Main Game Rate" )        PORT_DIPLOCATION("DSW2:1,2")    /* OK */
-	PORT_DIPSETTING(    0x03, "Very Easy" )
-	PORT_DIPSETTING(    0x02, "Easy" )
-	PORT_DIPSETTING(    0x01, "Hard" )
-	PORT_DIPSETTING(    0x00, "Very Hard" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 	PORT_DIPNAME( 0x04, 0x00, "Double Up Game" )        PORT_DIPLOCATION("DSW2:3")      /* OK */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
@@ -7573,10 +7573,10 @@ static INPUT_PORTS_START( unkch )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Game Level" )                PORT_DIPLOCATION("DSW1:1,2")        /* OK */
-	PORT_DIPSETTING(    0x03, "Easy" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, "Mid 1" )
 	PORT_DIPSETTING(    0x01, "Mid 2" )
-	PORT_DIPSETTING(    0x00, "Hard" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x04, 0x04, "Punti" )                     PORT_DIPLOCATION("DSW1:3")          /* OK */
 	PORT_DIPSETTING(    0x04, "Ticket" )
 	PORT_DIPSETTING(    0x00, "Gettoni" )
@@ -7691,10 +7691,10 @@ static INPUT_PORTS_START( unkch3 )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Game Level" )                PORT_DIPLOCATION("DSW1:1,2")    /* OK */
-	PORT_DIPSETTING(    0x03, "Easy" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, "Mid 1" )
 	PORT_DIPSETTING(    0x01, "Mid 2" )
-	PORT_DIPSETTING(    0x00, "Hard" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x04, 0x04, "Punti Unit" )                PORT_DIPLOCATION("DSW1:3")      /* OK */
 	PORT_DIPSETTING(    0x00, "500" )
 	PORT_DIPSETTING(    0x04, "1000" )
@@ -7807,10 +7807,10 @@ static INPUT_PORTS_START( unkch4 )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Game Level" )                PORT_DIPLOCATION("DSW1:1,2")        /* OK */
-	PORT_DIPSETTING(    0x03, "Easy" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, "Mid 1" )
 	PORT_DIPSETTING(    0x01, "Mid 2" )
-	PORT_DIPSETTING(    0x00, "Hard" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x04, 0x04, "Punti" )                     PORT_DIPLOCATION("DSW1:3")          /* OK */
 	PORT_DIPSETTING(    0x04, "Ticket" )    /* payout rate 100 */
 	PORT_DIPSETTING(    0x00, "Gettoni" )   /* payout rate 10 */
@@ -8755,7 +8755,7 @@ static INPUT_PORTS_START( star100 )
 	PORT_DIPSETTING(    0x08, "5000" )
 	PORT_DIPSETTING(    0x00, "No Limit" )
 	PORT_DIPNAME( 0x20, 0x20, "Bonus" )                 PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x20, "Normal" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Random" )
 	PORT_DIPNAME( 0xc0, 0xc0, "Number of Clown" )       PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0xc0, "60%" )
@@ -9046,7 +9046,7 @@ static INPUT_PORTS_START( cmpacman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* Tied to GND and to the hidden switch that change games. (PC0+GND) -+-> PB0 */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Unknown" )                   PORT_DIPLOCATION("DSW1:!1")     /* not checked */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:!1")     /* not checked */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" )         PORT_DIPLOCATION("DSW1:!2")     /* not checked */

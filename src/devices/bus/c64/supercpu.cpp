@@ -84,7 +84,7 @@ static INPUT_PORTS_START( c64_supercpu )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, "Speed" )
-	PORT_DIPSETTING(    0x04, "Normal" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Turbo" )
 
 	PORT_START("RESET")

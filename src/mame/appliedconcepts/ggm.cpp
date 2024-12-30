@@ -544,7 +544,7 @@ static INPUT_PORTS_START( ggm )
 
 	PORT_START("IN.5")
 	PORT_CONFNAME( 0x0f, 0x0f, "Keypad Overlay" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ggm_state::overlay_switch), 0)
-	PORT_CONFSETTING(    0x00, "None" )
+	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 	PORT_CONFSETTING(    0x0f, "Auto" ) // get param from softwarelist
 	PORT_CONFSETTING(    0x01, "Boris 2.5" )
 	PORT_CONFSETTING(    0x04, "Las Vegas 21" )

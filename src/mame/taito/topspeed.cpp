@@ -822,8 +822,8 @@ static INPUT_PORTS_START( topspeed )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SWA:1,2")
 	PORT_DIPSETTING(    0x03, "Deluxe" )    // analog pedals, racing wheel, motor (tilt disabled)
-	PORT_DIPSETTING(    0x02, "Standard" )  // digital pedals, continuous wheel
-	PORT_DIPSETTING(    0x01, "Standard" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Standard ) )  // digital pedals, continuous wheel
+	PORT_DIPSETTING(    0x01, DEF_STR( Standard ) )
 	PORT_DIPSETTING(    0x00, "Mini" )      // analog pedals, racing wheel
 	TAITO_DSWA_BITS_2_TO_3_LOC(SWA)
 	TAITO_COINAGE_WORLD_LOC(SWA)

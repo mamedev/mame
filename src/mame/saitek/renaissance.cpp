@@ -373,7 +373,7 @@ static INPUT_PORTS_START( ren )
 
 	PORT_START("IN.8")
 	PORT_CONFNAME( 0x40, 0x00, "Battery Status" )
-	PORT_CONFSETTING(    0x40, "Low" )
+	PORT_CONFSETTING(    0x40, DEF_STR( Low ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 
 	PORT_START("RESET")

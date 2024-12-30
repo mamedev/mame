@@ -506,7 +506,7 @@ static INPUT_PORTS_START(kn01)
 	PORT_DIPNAME(0x0801, 0x0000, "Graphics Mode")
 	PORT_DIPSETTING(     0x0000, "Color")
 	PORT_DIPSETTING(     0x0800, "Monochrome")
-	PORT_DIPSETTING(     0x0801, "None")
+	PORT_DIPSETTING(     0x0801, DEF_STR(None))
 
 	PORT_DIPNAME(0x8000, 0x8000, "Manufacturing Mode")
 	PORT_DIPSETTING(     0x8000, DEF_STR(Off))

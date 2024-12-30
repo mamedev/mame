@@ -1363,7 +1363,7 @@ static INPUT_PORTS_START( inyourfa )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Pass Target change (offense)")
 
 	PORT_START("DSW")
-	PORT_DIPNAME(           0x0003, 0x0003, "Game Time" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME(           0x0003, 0x0003, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(                0x0002, "00:50" )
 	PORT_DIPSETTING(                0x0001, "01:00" )
 	PORT_DIPSETTING(                0x0003, "01:10" )

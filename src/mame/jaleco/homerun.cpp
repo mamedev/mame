@@ -452,7 +452,7 @@ static INPUT_PORTS_START( homerun )
 
 // The manual shows the following DIPs but they don't appear to do anything
 // so this could be for a different version which is not dumped.
-//..PORT_DIPNAME( 0x70, 0x70, "Difficulty" )               PORT_DIPLOCATION("DIPSW:5,6,7")
+//..PORT_DIPNAME( 0x70, 0x70, DEF_STR( Difficulty ) )      PORT_DIPLOCATION("DIPSW:5,6,7")
 //..PORT_DIPSETTING(    0x70, "1" )
 //..PORT_DIPSETTING(    0x10, "2" )
 //..PORT_DIPSETTING(    0x20, "3" )  // manual only shows difficulty 1-5 but using 3 DIP switches
@@ -465,7 +465,7 @@ static INPUT_PORTS_START( homerun )
 //..PORT_DIPSETTING(    0x88, "1 Medal" )    // after number is a Japanese symbol 枚 which is used for counting flat thin objects
 //..PORT_DIPSETTING(    0x08, "2 Medals" )   // so it must be referring to 'medals' since the wiring diagram shows a 'medal hopper'
 //..PORT_DIPSETTING(    0x80, "3 Medals" )
-//..PORT_DIPSETTING(    0x00, "Unused" )
+//..PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )
 
 INPUT_PORTS_END
 

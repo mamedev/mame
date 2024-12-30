@@ -1366,7 +1366,7 @@ u16 tomy_princ_tablet_state::adc6_r()
 // FIXME: Identify unknown keys
 static INPUT_PORTS_START( tomy_princ_tablet )
 	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x00, "Controller" )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Controller ) )
 	PORT_CONFSETTING( 0x00, DEF_STR( None ) )
 	PORT_CONFSETTING( 0x01, "Pen" )
 

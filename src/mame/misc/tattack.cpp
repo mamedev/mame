@@ -321,7 +321,7 @@ static INPUT_PORTS_START( tattack )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, "Game Time" )                PORT_DIPLOCATION( "SW1:1,2,3,4" )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Game_Time ) )                PORT_DIPLOCATION( "SW1:1,2,3,4" )
 	PORT_DIPSETTING(    0x00, "2:00" )
 	PORT_DIPSETTING(    0x01, "2:05" )
 	PORT_DIPSETTING(    0x02, "2:10" )

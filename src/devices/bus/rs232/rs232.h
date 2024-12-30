@@ -82,7 +82,7 @@
 #define PORT_RS232_PARITY(_tag, _default_parity, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, _default_parity, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
-	PORT_CONFSETTING( RS232_PARITY_NONE, "None") \
+	PORT_CONFSETTING( RS232_PARITY_NONE, DEF_STR(None)) \
 	PORT_CONFSETTING( RS232_PARITY_ODD, "Odd") \
 	PORT_CONFSETTING( RS232_PARITY_EVEN, "Even") \
 	PORT_CONFSETTING( RS232_PARITY_MARK, "Mark") \

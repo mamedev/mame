@@ -1475,7 +1475,7 @@ static INPUT_PORTS_START( packbang )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME(       0x04, 0x04, "Timer Speed" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, "Slow" )
-	PORT_DIPSETTING(    0x04, "Standard" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Standard ) )
 	PORT_DIPNAME(       0x18, 0x18, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x00, "Invalid" ) // Japanese text, Korean Kaneko logo 'Unusued' according to test mode
 	PORT_DIPSETTING(    0x08, DEF_STR( Korea ) )

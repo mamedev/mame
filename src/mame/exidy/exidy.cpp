@@ -926,11 +926,11 @@ static INPUT_PORTS_START( teetert )
     The schematics claim these exist, but there's nothing in
     the ROMs to support that claim (as far as I can see):
 
-    PORT_DIPNAME( 0x03, 0x00, "Language" )
-    PORT_DIPSETTING(    0x00, "English" )
-    PORT_DIPSETTING(    0x01, "French" )
-    PORT_DIPSETTING(    0x02, "German" )
-    PORT_DIPSETTING(    0x03, "Spanish" )
+    PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+    PORT_DIPSETTING(    0x01, DEF_STR( French ) )
+    PORT_DIPSETTING(    0x02, DEF_STR( German ) )
+    PORT_DIPSETTING(    0x03, DEF_STR( Spanish ) )
     PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
     PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )

@@ -1773,7 +1773,7 @@ static INPUT_PORTS_START( v4shpwnd )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x08, 0x00, "Spin Speed" ) PORT_DIPLOCATION("DIL2:04") //Non Prize machines use this to inhibit OCD attract mode
-	PORT_DIPSETTING(    0x00, "Normal" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, "Fast" )
 	PORT_DIPNAME( 0x10, 0x00, "Halt Payout when Empty" ) PORT_DIPLOCATION("DIL2:05")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )

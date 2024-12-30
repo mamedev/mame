@@ -961,7 +961,7 @@ static INPUT_PORTS_START( slampic2 )
 	PORT_DIPNAME( 0x20, 0x20, "Join In") PORT_DIPLOCATION("SW(B):6")
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Cabinet" ) PORT_DIPLOCATION("SW(B):7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW(B):7,8")
 	PORT_DIPSETTING( 0xc0, "2 Players Cabinet" )
 	//PORT_DIPSETTING( 0x80, "Invalid" )              // only coin 1 works, credits both player 1 and 2
 	PORT_DIPSETTING( 0x40, "4 Players Cabinet" )

@@ -613,7 +613,7 @@ static INPUT_PORTS_START( midnrun )
 	PORT_DIPSETTING( 0x02, "'T'Gate" )
 	PORT_DIPSETTING( 0x00, "Button" )
 	PORT_DIPNAME( 0x01, 0x01, "CG Board Type" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING( 0x01, "Single" )
+	PORT_DIPSETTING( 0x01, DEF_STR( Single ) )
 	PORT_DIPSETTING( 0x00, "Twin" ) //unused
 
 	PORT_START("ANALOG1")

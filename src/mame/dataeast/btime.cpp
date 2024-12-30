@@ -435,7 +435,7 @@ static INPUT_PORTS_START( btime )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 //  PORT_DIPNAME( 0x80, 0x00, "Screen" )              PORT_DIPLOCATION("SW1:8") // Manual states this is Screen Invert
-//  PORT_DIPSETTING(    0x00, "Normal" )
+//  PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 //  PORT_DIPSETTING(    0x80, "Invert" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))  // Schematics show this is connected to DIP SW2.8
 

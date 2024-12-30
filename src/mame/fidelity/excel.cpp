@@ -426,7 +426,7 @@ static INPUT_PORTS_START( fexcel )
 
 	PORT_START("IN.2")
 	PORT_CONFNAME( 0x80, 0x00, "Battery Status" )
-	PORT_CONFSETTING(    0x80, "Low" )
+	PORT_CONFSETTING(    0x80, DEF_STR( Low ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 

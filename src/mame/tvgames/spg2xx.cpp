@@ -503,8 +503,8 @@ static INPUT_PORTS_START( lexiart )
 
 	PORT_MODIFY("P1")
 	PORT_DIPNAME( 0x0100, 0x0000, "Battery State" )
-	PORT_DIPSETTING(      0x0000, "Ok" )
-	PORT_DIPSETTING(      0x0100, "Low" )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Low ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( itvphone ) // hold 8 and ENTER for Diagnostics mode

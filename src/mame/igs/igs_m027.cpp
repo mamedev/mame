@@ -696,7 +696,7 @@ INPUT_PORTS_START( jking02 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
 	PORT_DIPNAME( 0x80, 0x80, "PC Board Mode" )            PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, "Single" )
+	PORT_DIPSETTING(    0x80, DEF_STR(Single) )
 	PORT_DIPSETTING(    0x00, "Linking" )
 
 	PORT_START("DSW2")
@@ -970,7 +970,7 @@ INPUT_PORTS_START( zhongguo )
 	PORT_DIPNAME( 0x06, 0x06, "Card Display" )             PORT_DIPLOCATION("SW2:2,3")  // 扑克画面
 	PORT_DIPSETTING(    0x06, "Small Cards" )                                           // 小扑克
 	PORT_DIPSETTING(    0x04, "Cards" )                                                 // 扑克
-	PORT_DIPSETTING(    0x02, "Alternate" )                                             // 変异       (numbers with coloured dot patterns for suits)
+	PORT_DIPSETTING(    0x02, DEF_STR(Alternate) )                                      // 変异       (numbers with coloured dot patterns for suits)
 	PORT_DIPSETTING(    0x00, "Small Cards" )                                           // 小扑克
 	PORT_DIPNAME( 0x08, 0x08, "Double Up Jackpot" )        PORT_DIPLOCATION("SW2:4")    // 比倍爆机
 	PORT_DIPSETTING(    0x08, "1000" )
@@ -1138,7 +1138,7 @@ INPUT_PORTS_START( cjddzp )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
 	PORT_DIPNAME( 0x80, 0x80, "Single Machine/Linked" )    PORT_DIPLOCATION("SW1:8")          // 单机连线
-	PORT_DIPSETTING(    0x80, "Single Machine" )                                              // 单机
+	PORT_DIPSETTING(    0x80, DEF_STR(Single) )                                               // 单机
 	PORT_DIPSETTING(    0x00, "Linked" )                                                      // 连线
 
 	PORT_START("DSW2")
@@ -1434,7 +1434,7 @@ INPUT_PORTS_START( amazonia )
 	PORT_DIPSETTING(    0x70, "90%" )
 // Payment System
 	PORT_DIPNAME( 0x80, 0x80, "Sistema de Pagamento" ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x00, "Normal" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x80, "Auto" )
 
 

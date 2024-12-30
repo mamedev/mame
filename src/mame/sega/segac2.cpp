@@ -1209,7 +1209,7 @@ static INPUT_PORTS_START( sonicpop )
 	PORT_DIPNAME( 0x02, 0x02, "Trouble BGM" ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x00, "Region" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Region ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x04, "Export" )
 	PORT_DIPSETTING(    0x08, "USA (duplicate)" )
@@ -1553,7 +1553,7 @@ static INPUT_PORTS_START( ooparts ) // testmode expects controls similar to twin
 	PORT_DIPSETTING(    0x18, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x60, 0x60, "Region" ) PORT_DIPLOCATION("SW2:6,7") // undocumented
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Region ) ) PORT_DIPLOCATION("SW2:6,7") // undocumented
 	PORT_DIPSETTING(    0x60, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x20, "Export" )

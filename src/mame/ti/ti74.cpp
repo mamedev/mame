@@ -329,7 +329,7 @@ INPUT_CHANGED_MEMBER(ti74_state::battery_status_changed)
 static INPUT_PORTS_START( ti74 )
 	PORT_START("BATTERY")
 	PORT_CONFNAME( 0x01, 0x01, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ti74_state::battery_status_changed), 0)
-	PORT_CONFSETTING(    0x00, "Low" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Low ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
 
 	// 8x8 keyboard matrix, RESET and ON buttons are not on it. Unused entries are not connected, but some have a purpose for factory testing.
@@ -419,7 +419,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ti95 )
 	PORT_START("BATTERY")
 	PORT_CONFNAME( 0x01, 0x01, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ti74_state::battery_status_changed), 0)
-	PORT_CONFSETTING(    0x00, "Low" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Low ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
 
 	// 8x8 keyboard matrix, RESET and ON buttons are not on it.

@@ -698,7 +698,7 @@ INPUT_PORTS_START( ti99_hsgpl)
 	PORT_START( "HSGPLMODE" )
 	PORT_DIPNAME( 0x01, 0x01, "HSGPL mode" )
 		PORT_DIPSETTING(    0x00, "Flash" )
-		PORT_DIPSETTING(    0x01, "Normal" )
+		PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
 void snug_high_speed_gpl_device::device_add_mconfig(machine_config &config)

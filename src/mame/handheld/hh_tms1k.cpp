@@ -1794,7 +1794,7 @@ static INPUT_PORTS_START( palmmd8 )
 	PORT_START("IN.10") // R10
 	PORT_CONFNAME( 0x31, 0x20, "Mode" ) // bit 4 indicates M-digit on/off, bit 5 indicates upper row filament on/off
 	PORT_CONFSETTING(    0x31, "Memory" )
-	PORT_CONFSETTING(    0x01, "Single" )
+	PORT_CONFSETTING(    0x01, DEF_STR( Single ) )
 	PORT_CONFSETTING(    0x20, "Process" )
 	PORT_CONFNAME( 0x02, 0x00, "AM" ) // accumulate memory
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -9663,7 +9663,7 @@ static INPUT_PORTS_START( ssimon )
 	PORT_START("IN.6") // fake
 	PORT_CONFNAME( 0x03, 0x01, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ssimon_state::speed_switch), 0)
 	PORT_CONFSETTING(    0x00, "Simple" )
-	PORT_CONFSETTING(    0x01, "Normal" )
+	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
 	PORT_CONFSETTING(    0x02, "Super" )
 
 	PORT_START("SWITCH") // fake
@@ -12299,7 +12299,7 @@ static INPUT_PORTS_START( vclock3 )
 	PORT_CONFSETTING(    0x00, "Battery" )
 	PORT_CONFSETTING(    0x01, "Mains" )
 	PORT_CONFNAME( 0x02, 0x00, "Battery Status" )
-	PORT_CONFSETTING(    0x02, "Low" )
+	PORT_CONFSETTING(    0x02, DEF_STR( Low ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
@@ -12517,7 +12517,7 @@ static INPUT_PORTS_START( wtalker )
 
 	PORT_START("IN.4") // R3
 	PORT_CONFNAME( 0x01, 0x00, "Battery Status" )
-	PORT_CONFSETTING(    0x01, "Low" )
+	PORT_CONFSETTING(    0x01, DEF_STR( Low ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -12713,7 +12713,7 @@ static INPUT_PORTS_START( speechp )
 	PORT_START("IN.10") // K8
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x08, 0x00, "Battery Status" )
-	PORT_CONFSETTING(    0x08, "Low" )
+	PORT_CONFSETTING(    0x08, DEF_STR( Low ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
@@ -15155,7 +15155,7 @@ static INPUT_PORTS_START( tithermos )
 
 	PORT_START("IN.8")
 	PORT_CONFNAME( 0x01, 0x00, "Fan")
-	PORT_CONFSETTING(    0x00, "On" )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 	PORT_CONFSETTING(    0x01, "Auto" ) // same output as heat/cool
 INPUT_PORTS_END
 
@@ -17185,8 +17185,8 @@ static INPUT_PORTS_START( ssports4 )
 	PORT_START("IN.5") // O7+R5
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x04, 0x00, "Speed" )
-	PORT_CONFSETTING(    0x04, "High" ) // HI
-	PORT_CONFSETTING(    0x00, "Low" )  // LO
+	PORT_CONFSETTING(    0x00, DEF_STR( Low ) )  // LO
+	PORT_CONFSETTING(    0x04, DEF_STR( High ) ) // HI
 	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x08, "1" )
 	PORT_CONFSETTING(    0x00, "2" )

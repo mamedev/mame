@@ -273,7 +273,7 @@ static INPUT_PORTS_START( mp200 )
 	PORT_DIPSETTING(    0x40, "3 Free Games")
 	PORT_DIPNAME( 0x80, 0x00, "Rollover lights")
 	PORT_DIPSETTING(    0x00, "Always on")
-	PORT_DIPSETTING(    0x80, "Alternate")
+	PORT_DIPSETTING(    0x80, DEF_STR( Alternate ))
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Talking feature")

@@ -183,8 +183,8 @@ static INPUT_PORTS_START( ts803 )
 	PORT_DIPSETTING(    0x80, "Off - TS803H leave here" )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x100,0x100, "Reverse Video" ) PORT_DIPLOCATION("SW:9")
-	PORT_DIPSETTING(    0x000, "Reverse" )
-	PORT_DIPSETTING(    0x100, "Normal" )
+	PORT_DIPSETTING(    0x000, DEF_STR( Reverse ) )
+	PORT_DIPSETTING(    0x100, DEF_STR( Normal ) )
 	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_UNUSED ) // SW10 is not connected to anything
 INPUT_PORTS_END
 

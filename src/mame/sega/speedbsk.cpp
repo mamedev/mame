@@ -212,9 +212,9 @@ static INPUT_PORTS_START( speedbsk )
 
 	// this could be the dip switch on the main pcb
 	PORT_START("region")
-	PORT_DIPNAME( 0x03, 0x00, "Region" )
-	PORT_DIPSETTING(    0x00, "Jpn" )
-	PORT_DIPSETTING(    0x01, "USA" )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Region ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x02, "etc" )
 	PORT_DIPSETTING(    0x03, "***" )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )

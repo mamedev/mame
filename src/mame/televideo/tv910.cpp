@@ -425,10 +425,10 @@ static INPUT_PORTS_START( tv910 )
 
 	PORT_START("CHARSET") // actually a pair of jumpers: E4-E5 (bit 1), E6-E7 (bit 0)
 	PORT_DIPNAME( 0x03, 0x00, "Character Set" )
-	PORT_DIPSETTING( 0x00, "English" )
-	PORT_DIPSETTING( 0x01, "German" )
-	PORT_DIPSETTING( 0x02, "French" )
-	PORT_DIPSETTING( 0x03, "Spanish" )
+	PORT_DIPSETTING( 0x00, DEF_STR(English) )
+	PORT_DIPSETTING( 0x01, DEF_STR(German) )
+	PORT_DIPSETTING( 0x02, DEF_STR(French) )
+	PORT_DIPSETTING( 0x03, DEF_STR(Spanish) )
 INPUT_PORTS_END
 
 void tv910_state::machine_start()

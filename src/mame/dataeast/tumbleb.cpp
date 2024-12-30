@@ -1484,7 +1484,7 @@ static INPUT_PORTS_START( magicbal )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW") /* Switch positions based on other games - needs to be verified on real hardware!! */
-	PORT_DIPNAME( 0x0003, 0x0003, "Game Time" )     PORT_DIPLOCATION("SW1:8,7") /* Only used if Game is Timed, does this control # of innings if not timed? */
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("SW1:8,7") /* Only used if Game is Timed, does this control # of innings if not timed? */
 	PORT_DIPSETTING(      0x0003, "5:00" )
 	PORT_DIPSETTING(      0x0001, "6:00" )
 	PORT_DIPSETTING(      0x0002, "7:00" )

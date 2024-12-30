@@ -897,7 +897,7 @@ static INPUT_PORTS_START( term2 )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0080, 0x0080, "Display" )                 PORT_DIPLOCATION("DS1:1")
-	PORT_DIPSETTING(      0x0080, "Normal" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Mirrored" )
 	PORT_DIPNAME( 0x0040, 0x0040, "Coinage Source" )          PORT_DIPLOCATION("DS1:2")
 	PORT_DIPSETTING(      0x0000, "CMOS" )

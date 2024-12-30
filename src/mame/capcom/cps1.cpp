@@ -2192,7 +2192,7 @@ static INPUT_PORTS_START( sf2amfx )
 
 	PORT_MODIFY("DSWB")
 	PORT_DIPNAME( 0x18, 0x18, "Game Speed" )   PORT_DIPLOCATION("SW(B):4,5")
-	PORT_DIPSETTING(    0x18, "Normal" )
+	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, "Fast" )
 	PORT_DIPSETTING(    0x08, "Very Fast" )
 	PORT_DIPSETTING(    0x00, "Extremely Fast" )
@@ -2214,7 +2214,7 @@ static INPUT_PORTS_START( sf2accp2 )
 	PORT_DIPSETTING(    0x38, "Extremely fast" ) // loop counter 30
 	PORT_DIPSETTING(    0x30, "Very fast" ) // loop counter 70
 	PORT_DIPSETTING(    0x28, "Fast" ) // loop counter 90
-	PORT_DIPSETTING(    0x20, "Normal" ) // loop counter 150
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) ) // loop counter 150
 	PORT_DIPSETTING(    0x18, "Slow" ) // loop counter 190
 	PORT_DIPSETTING(    0x10, "Very slow" ) // loop counter 230
 	PORT_DIPSETTING(    0x00, "Slowest" ) // loop counter 310
@@ -3219,7 +3219,7 @@ static INPUT_PORTS_START( pang3b4 )
 	PORT_DIPSETTING(    0x07, "Easy 3" )
 	PORT_DIPSETTING(    0x06, "Easy 2" )
 	PORT_DIPSETTING(    0x05, "Easy 1" )
-	PORT_DIPSETTING(    0x04, "Normal" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x03, "Hard 1" )
 	PORT_DIPSETTING(    0x02, "Hard 2" )
 	PORT_DIPSETTING(    0x01, "Hard 3" )

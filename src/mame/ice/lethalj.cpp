@@ -711,9 +711,9 @@ static INPUT_PORTS_START( franticfa ) // how do the directional inputs work?
     PORT_DIPSETTING(      0x1c00, "9 (duplicate 4)" )
     PORT_DIPNAME( 0x6000, 0x2000, "Initial Fruit Values" )
     PORT_DIPSETTING(      0x0000, "Lowest" )
-    PORT_DIPSETTING(      0x2000, "Low" )
-    PORT_DIPSETTING(      0x4000, "Medium" )
-    PORT_DIPSETTING(      0x6000, "High" )
+    PORT_DIPSETTING(      0x2000, DEF_STR( Low ) )
+    PORT_DIPSETTING(      0x4000, DEF_STR( Medium ) )
+    PORT_DIPSETTING(      0x6000, DEF_STR( High ) )
 */
 
 	PORT_DIPNAME( 0x0c00, 0x0400, "Apples Per Game" )       PORT_DIPLOCATION("SW3:4,3")
