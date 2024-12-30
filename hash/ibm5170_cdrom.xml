@@ -7476,6 +7476,7 @@ Other stuff untested
 		<publisher>Symantec</publisher>
 		<info name="language" value="English/French/German/Italian/Spanish" />
 		<info name="release" value="20040505" />
+		<info name="usage" value="Windows installer accepts any string starting with &quot;PM805EN1-&quot; for a product key." />
 		<info name="version" value="8.05" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
