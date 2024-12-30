@@ -1728,24 +1728,15 @@ TIMER_CALLBACK_MEMBER(tms5220_device::set_io_ready)
 			{
 				LOGMASKED(LOG_IO_READY, "m_timer_io_ready: in SPKEXT and FIFO was full! cannot service write now, delaying 16 cycles...\n");
 				m_timer_io_ready->adjust(clocks_to_attotime(16), 1);
+				break;
 			}
 			else
 			{
-				// MZ: Tests with a real TI Speech Synthesizer seem to prove
-				// that during SPEAK, writes are not serviced either.
-				if (talk_status())
-				{
-					LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Speech generation is active! Cannot service write now, delaying 16 cycles...\n");
-					m_timer_io_ready->adjust(clocks_to_attotime(16), 1);
-				}
-				else
-				{
-					LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced write: %02x\n", m_write_latch);
-					data_write(m_write_latch);
-					m_io_ready = param;
-				}
+				LOGMASKED(LOG_IO_READY, "m_timer_io_ready: Serviced write: %02x\n", m_write_latch);
+				data_write(m_write_latch);
+				m_io_ready = param;
+				break;
 			}
-			break;
 		case 0x01:
 			/* Read */
 			m_read_latch = status_read(true);
