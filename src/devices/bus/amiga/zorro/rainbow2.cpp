@@ -150,14 +150,17 @@ uint32_t rainbow2_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 	}
 	else
 	{
-		unsigned i = 0;
-
-		for (unsigned y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+		for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			for (unsigned x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
+			unsigned const i = y * 768 * 2; // line data start in memory
+			auto *const dst = &bitmap.pix(y);
+
+			for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				uint32_t *const vram = reinterpret_cast<uint32_t *>(&m_vram[0]);
-				bitmap.pix(y, x) = vram[i++];
+				uint16_t const v1 = m_vram[(i + (x << 1)) | 0]; // green, blue
+				uint16_t const v2 = m_vram[(i + (x << 1)) | 1]; // alpha, red
+
+				dst[x] = (uint32_t(v2) << 16) | v1;
 			}
 		}
 	}
