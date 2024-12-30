@@ -264,7 +264,7 @@ uint8_t mrokumei_state::mrokumei_keyboard_r(offs_t offset)
 {
 	uint8_t res = 0x3f;
 
-	// offset 0 is player 1, offset 1 player 2 (not supported)
+	// offset 0 is player 1, offset 1 player 2
 	for (int i = 0; i < 5; i++)
 	{
 		if (BIT(m_keyb, i))
