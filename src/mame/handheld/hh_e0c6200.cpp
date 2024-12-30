@@ -7,7 +7,7 @@ Seiko Epson E0C6200-based handhelds, mostly electronic keychain toys from the
 late-1990s. The first Tamagotchi games are on this MCU.
 
 These were meant to stay on 24/7, so make sure to use save states if you want
-to play the games for a longer time.
+to play the games for a longer time or remember high scores.
 
 For most of the games, external artwork is required for the background inlays.
 For the drivers that don't have an SVG screen, use -prescale or -nofilter to
