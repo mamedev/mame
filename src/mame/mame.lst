@@ -19147,7 +19147,7 @@ msoccer                         // Mattel
 qkracer                         // National Semiconductor
 qkspeller                       // National Semiconductor
 
-@source:handheld/hh_e0c6x.cpp
+@source:handheld/hh_e0c6200.cpp
 alienfev                        // Epoch
 digimon                         // Bandai
 digimonv2                       // Bandai
