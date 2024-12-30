@@ -17,7 +17,10 @@ namespace
 				m_maincpu(*this, "maincpu"),
 				m_ppi_kbd(*this, "ppi_kbd"),
 				m_ppi_diag(*this, "ppi_diag"),
+				m_ram(*this, "ram"),
+				m_paged_ram(*this, "paged_ram"),
 				m_diag_digits(*this, "digit%u", 0U)
+
 			{
 
 			}
@@ -32,6 +35,8 @@ namespace
 			required_device<i8085a_cpu_device> m_maincpu;
 			required_device<i8255_device> m_ppi_kbd;
 			required_device<i8255_device> m_ppi_diag;
+			required_shared_ptr<u8> m_ram;
+			required_shared_ptr<u8> m_paged_ram;
 			output_finder<2> m_diag_digits;
 
 			uint8_t m_bus_test_register = 0;
@@ -42,6 +47,9 @@ namespace
 			void cpu_test_register_w(uint8_t data);
 			uint8_t cpu_test_register_r();
 
+			uint8_t sid_sod_connection;
+			void sod_w(int state);
+			int sid_r();
 
 			void system23_io(address_map &map) ATTR_COLD;
 			void system23_mem(address_map &map) ATTR_COLD;
@@ -63,6 +71,16 @@ namespace
 		return m_bus_test_register;
 	}
 
+	int system23_state::sid_r()
+	{
+		return ASSERT_LINE; // patch to bypass the test
+	}
+
+	void system23_state::sod_w(int state)
+	{
+		sid_sod_connection = state;
+	}
+
 	void system23_state::system23_io(address_map &map)
 	{
 		map.unmap_value_high();
@@ -74,6 +92,8 @@ namespace
 	{
 		map.unmap_value_high();
 		map(0x0000, 0x3fff).rom().region("ros_unpaged",0);
+		map(0x8000, 0xbfff).ram().share("ram");
+		map(0xC000, 0xffff).ram().share("paged_ram");
 	}
 
 	void system23_state::system23(machine_config &config)
@@ -81,6 +101,8 @@ namespace
 		i8085a_cpu_device &maincpu(I8085A(config, "maincpu", 6_MHz_XTAL)); //frequency needs to be adjusted
 		maincpu.set_addrmap(AS_PROGRAM, &system23_state::system23_mem);
 		maincpu.set_addrmap(AS_IO, &system23_state::system23_io);
+		maincpu.in_sid_func().set(FUNC(system23_state::sid_r));
+		maincpu.out_sod_func().set(FUNC(system23_state::sod_w));
 
 		I8255(config, m_ppi_kbd);
 		m_ppi_kbd->in_pa_callback().set(FUNC(system23_state::cpu_test_register_r));
