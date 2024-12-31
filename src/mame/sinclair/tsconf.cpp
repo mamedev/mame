@@ -151,9 +151,13 @@ void tsconf_state::video_start()
 
 	m_ts_tilemap[TM_TILES0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_ts_tilemap[TM_TILES0]->set_transparent_pen(0);
+	m_gfxdecode->gfx(TM_TILES0)->set_granularity(16);
 
 	m_ts_tilemap[TM_TILES1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_ts_tilemap[TM_TILES1]->set_transparent_pen(0);
+	m_gfxdecode->gfx(TM_TILES1)->set_granularity(16);
+
+	m_gfxdecode->gfx(TM_SPRITES)->set_granularity(16);
 
 	m_frame_irq_timer = timer_alloc(FUNC(tsconf_state::irq_frame), this);
 	m_scanline_irq_timer = timer_alloc(FUNC(tsconf_state::irq_scanline), this);
@@ -301,7 +305,7 @@ void tsconf_state::tsconf(machine_config &config)
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.75);;
 
-	PALETTE(config, "palette", palette_device::BLACK, 256 * 16);
+	PALETTE(config, "palette", palette_device::BLACK, 256);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);
 	m_screen->set_screen_update(FUNC(tsconf_state::screen_update));
 	m_screen->set_no_palette();

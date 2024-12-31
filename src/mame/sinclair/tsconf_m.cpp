@@ -463,8 +463,6 @@ void tsconf_state::cram_write(u16 offset, u8 data)
 	u8 pen = dest >> 1;
 	rgb_t rgb = from_pwm((m_cram->read(dest | 1) << 8 | m_cram->read(dest & 0x1fe)));
 	m_palette->set_pen_color(pen, rgb);
-	// Duplicate pen for alternative use in 256-based palette required by raw gfx decoder
-	m_palette->set_pen_color(((pen & 0xf0) << 4) | (pen & 0x0f), rgb);
 }
 
 void tsconf_state::cram_write16(offs_t offset, u16 data)
