@@ -741,5 +741,5 @@ CONS( 200?, conyfght,  0,        0, spg110_base, conyteni,  spg110_game_state, e
 // The unit contains no BIOS ROM, was sold by Taikee as Singing Star Karaoke, but also by Imaginarium / ItsMagical in Spain as Karao Kids.  Cartridges are compatible.
 CONS( 200?, sstarkar,  0,        0, sstarkar, conyteni,  spg110_sstarkar_game_state, empty_init, "Taikee",      "Singing Star Karaoke (World) / Karao Kids (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // "ItsMagical" brand from Imaginarium
 
-CONS( 2004, easports,  0,        0, easports_pal, easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",      "EA Sports Classics: NHL 95 & FIFA 95 (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, easports,  0,        0, easports_pal, easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",      "EA Sports Classics: NHL 95 & FIFA Soccer 96 (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // US release has Madden instead of FIFA
