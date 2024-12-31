@@ -27,7 +27,6 @@ public:
 protected:
 	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_config_complete() override;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -47,6 +46,9 @@ protected:
 	void parity_w(offs_t offset, u32 &data, u32 mem_mask);
 
 	void mailbox_w(offs_t offset, u8 data);
+
+	u8 nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, u8 data);
 
 private:
 	required_device<mips1_device_base> m_cpu;
