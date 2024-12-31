@@ -33,21 +33,21 @@ public:
 		m_fake_io(*this, "FAKE")
 	{ }
 
-	void atarigt(machine_config &config);
-	void atarigt_stereo(machine_config &config);
-	void tmek(machine_config &config);
-	void primrage20(machine_config &config);
-	void primrage(machine_config &config);
+	void atarigt(machine_config &config) ATTR_COLD;
+	void atarigt_stereo(machine_config &config) ATTR_COLD;
+	void tmek(machine_config &config) ATTR_COLD;
+	void primrage20(machine_config &config) ATTR_COLD;
+	void primrage(machine_config &config) ATTR_COLD;
 
-	void init_primrage();
-	void init_tmek();
+	void init_primrage() ATTR_COLD;
+	void init_tmek() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	static const unsigned ADDRSEQ_COUNT = 4;
+	static inline constexpr unsigned ADDRSEQ_COUNT = 4;
 
 	required_device<palette_device> m_palette;
 	memory_share_creator<uint16_t> m_colorram;
@@ -73,21 +73,21 @@ private:
 	bitmap_ind16    m_pf_bitmap;
 	bitmap_ind16    m_an_bitmap;
 
-	uint8_t           m_playfield_tile_bank = 0;
-	uint8_t           m_playfield_color_bank = 0;
-	uint16_t          m_playfield_xscroll = 0;
-	uint16_t          m_playfield_yscroll = 0;
+	uint8_t         m_playfield_tile_bank = 0;
+	uint8_t         m_playfield_color_bank = 0;
+	uint16_t        m_playfield_xscroll = 0;
+	uint16_t        m_playfield_yscroll = 0;
 
-	uint32_t          m_tram_checksum = 0;
+	uint32_t        m_tram_checksum = 0;
 
 	void            (atarigt_state::*m_protection_w)(address_space &space, offs_t offset, uint16_t data);
 	void            (atarigt_state::*m_protection_r)(address_space &space, offs_t offset, uint16_t *data);
 
 	bool            m_ignore_writes = false;
 	offs_t          m_protaddr[ADDRSEQ_COUNT]{};
-	uint8_t           m_protmode = 0;
-	uint16_t          m_protresult = 0;
-	std::unique_ptr<uint8_t[]> m_protdata;
+	uint8_t         m_protmode = 0;
+	uint16_t        m_protresult = 0;
+	std::unique_ptr<uint8_t []> m_protdata;
 
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
 	void video_int_write_line(int state);
