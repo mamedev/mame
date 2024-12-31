@@ -51,18 +51,18 @@ class atari_rle_objects_device : public device_t,
 {
 public:
 	// constants
-	static const int PRIORITY_SHIFT     = 12;
-	//static const int BANK_SHIFT         = 15;
-	static const uint16_t PRIORITY_MASK = ((0xffff << PRIORITY_SHIFT) & 0xffff);
-	static const uint16_t DATA_MASK     = (PRIORITY_MASK ^ 0xffff);
+	static inline constexpr int PRIORITY_SHIFT     = 12;
+	//static inline constexpr int BANK_SHIFT         = 15;
+	static inline constexpr uint16_t PRIORITY_MASK = ((0xffff << PRIORITY_SHIFT) & 0xffff);
+	static inline constexpr uint16_t DATA_MASK     = (PRIORITY_MASK ^ 0xffff);
 
-	static const int CONTROL_MOGO       = 1;
-	static const int CONTROL_ERASE      = 2;
-	static const int CONTROL_FRAME      = 4;
+	static inline constexpr int CONTROL_MOGO       = 1;
+	static inline constexpr int CONTROL_ERASE      = 2;
+	static inline constexpr int CONTROL_FRAME      = 4;
 
-	static const int COMMAND_NOP        = 0;
-	static const int COMMAND_DRAW       = 1;
-	static const int COMMAND_CHECKSUM   = 2;
+	static inline constexpr int COMMAND_NOP        = 0;
+	static inline constexpr int COMMAND_DRAW       = 1;
+	static inline constexpr int COMMAND_CHECKSUM   = 2;
 
 	// construction/destruction
 	atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, const atari_rle_objects_config &config)
@@ -87,7 +87,7 @@ public:
 	bitmap_ind16 &vram(int idx) { return m_vram[idx][(m_control_bits & CONTROL_FRAME) >> 2]; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
