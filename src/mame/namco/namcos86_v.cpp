@@ -101,12 +101,12 @@ void namcos86_state::namcos86_palette(palette_device &palette)
 
 ***************************************************************************/
 
-void namcos86_state::tile_cb_0(u8 layer, u8& gfxno, u32& code)
+void namcos86_state::tile_cb_0(u8 layer, u8 &gfxno, u32 &code)
 {
 	code = (code & 0xff) | ((((m_tile_address_prom[((layer & 1) << 4) + (((code >> 8) & 0x03) << 2)] & 0x0e) >> 1) << 8) | (m_tilebank << 11));
 }
 
-void namcos86_state::tile_cb_1(u8 layer, u8& gfxno, u32& code)
+void namcos86_state::tile_cb_1(u8 layer, u8 &gfxno, u32 &code)
 {
 	code = (code & 0xff) | (((m_tile_address_prom[((layer & 1) << 4) + ((code >> 8) & 0x03)] & 0xe0) >> 5) << 8);
 }
