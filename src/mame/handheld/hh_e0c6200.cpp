@@ -259,7 +259,7 @@ ROM_END
   Bandai Digital Monster (retroactively called Ver. 1)
   * PCB label: TDM-1, 00-83830-001
   * Seiko Epson E0C6S48 MCU under epoxy
-  * external port on P20, for connecting to another Digimon handheld
+  * external port, for connecting to another Digimon handheld
   * 32*16 LCD screen + 8 custom segments, 1-bit sound
 
   The sequels (Ver. 2 to Ver. 4) are on the same hardware, and are compatible
@@ -275,7 +275,24 @@ public:
 	{ }
 
 	void digimon(machine_config &config);
+
+private:
+	u8 extport_r();
+	void extport_w(u8 data);
 };
+
+// handlers
+
+u8 digimon_state::extport_r()
+{
+	// P20: external port data from linked digimon
+	return 0xf;
+}
+
+void digimon_state::extport_w(u8 data)
+{
+	// P20: external port data to linked digimon
+}
 
 // inputs
 
@@ -293,6 +310,8 @@ void digimon_state::digimon(machine_config &config)
 	// basic machine hardware
 	E0C6S48(config, m_maincpu, 32.768_kHz_XTAL);
 	m_maincpu->set_osc3(1'000'000);
+	m_maincpu->read_p<2>().set(FUNC(digimon_state::extport_r));
+	m_maincpu->write_p<2>().set(FUNC(digimon_state::extport_w));
 	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
 	m_maincpu->write_segs().set(FUNC(digimon_state::lcd_segment_w));
 
@@ -425,6 +444,7 @@ public:
 	void venusdm(machine_config &config);
 
 private:
+	// reorder pixel coordinates
 	void pixel_callback(int &dx, int &dy) { int x = dx; dx = dy | (dx / 20) << 4; dy = x % 20; }
 };
 
