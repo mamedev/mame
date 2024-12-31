@@ -8492,7 +8492,7 @@ Installation and Open Circulation CDs are bootable.
 	</software>
 
 	<software name="winnt40e" cloneof="winnt40">
-		<description>Windows NT Server, Enterpise Edition 4.0 (4.0.1381.4)</description>
+		<description>Windows NT Server, Enterprise Edition 4.0 (4.0.1381.4)</description>
 		<year>1997</year>
 		<publisher>Microsoft</publisher>
 		<notes><![CDATA[
