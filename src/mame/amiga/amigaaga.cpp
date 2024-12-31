@@ -528,9 +528,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		CUSTOM_REG(REG_COLOR00) = m_genlock_color;
 
 	/* loop over the line */
-	/* copper runs on odd timeslots */
-	// TODO: diverges wrt OCS, is this right?
-	next_copper_x = 2;
+	// TODO: copper runs on odd timeslots
+	next_copper_x = 0;
 	// TODO: verify where we're missing pixels here for the GFX pitch bitplane corruptions
 	// - wbenc30 scrolling in lores mode (fmode=3, expects a +58!, verify ddfstrt)
 	// - roadkill title (fmode=3, max +14), gameplay uses fmode=1
@@ -554,23 +553,24 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		/* time to execute the copper? */
 		if (x == next_copper_x)
 		{
+			planes = (CUSTOM_REG(REG_BPLCON0) & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) >> 12;
+			// TODO: verify number of planes that doesn't go beyond 8
+			if ( CUSTOM_REG(REG_BPLCON0) & BPLCON0_BPU3 )
+				planes |= 8;
+
 			/* execute the next batch, restoring and re-saving color 0 around it */
 			CUSTOM_REG(REG_COLOR00) = save_color0;
 			next_copper_x = m_copper->execute_next(
 				x,
 				m_last_scanline & 0xff,
-				bool(BIT(CUSTOM_REG(REG_DMACON), 14)) // BBUSY
+				bool(BIT(CUSTOM_REG(REG_DMACON), 14)), // BBUSY
+				planes
 			);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
 			if (m_genlock_color != 0xffff)
 				CUSTOM_REG(REG_COLOR00) = m_genlock_color;
 
 			/* compute update-related register values */
-			planes = (CUSTOM_REG(REG_BPLCON0) & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) >> 12;
-			// TODO: verify number of planes that doesn't go beyond 8
-			if ( CUSTOM_REG(REG_BPLCON0) & BPLCON0_BPU3 )
-				planes |= 8;
-
 			hires = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HIRES;
 			ham = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HOMOD;
 			dualpf = CUSTOM_REG(REG_BPLCON0) & BPLCON0_DBLPF;
@@ -606,7 +606,9 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 			// FIXME: as like OCS/ECS Amiga verify this one
 			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
+			{
 				ddf_stop_pixel += 8;
+			}
 
 			// display window
 			update_display_window();
@@ -630,6 +632,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		{
 			odelay = CUSTOM_REG(REG_BPLCON1) & 0xf;
 			edelay = ( CUSTOM_REG(REG_BPLCON1) >> 4 ) & 0x0f;
+
+			//printf("%04x %d %04x %d %d (%02x %02x)\n", CUSTOM_REG(REG_BPLCON1), scanline, bitplane_fmode, ddf_start_pixel, ddf_stop_pixel, CUSTOM_REG(REG_DDFSTRT), CUSTOM_REG(REG_DDFSTOP));
 			// extended delays for AGA
 			// FIXME: check above table for implications about this
 			switch( bitplane_fmode )
@@ -876,6 +880,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		}
 	}
 
+// TODO: move to debugger command
 #if 0
 	if ( m_screen->frame_number() % 16 == 0 && scanline == 250 )
 	{
@@ -883,18 +888,18 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		const char *m_hires = "HIRES";
 		const char *m_ham = "HAM";
 		const char *m_dualpf = "DUALPF";
-		const char *m_lace = "LACE";
-		const char *m_hilace = "HI-LACE";
+		//const char *m_lace = "LACE";
+		//const char *m_hilace = "HI-LACE";
 		const char *p = m_lores;
 
 		if ( hires ) p = m_hires;
 		if ( ham ) p = m_ham;
 		if ( dualpf ) p = m_dualpf;
-		if ( lace ) p = m_lace;
+		//if ( lace ) p = m_lace;
 
-		if ( hires && lace ) p = m_hilace;
+		//if ( hires && lace ) p = m_hilace;
 
-		popmessage("%s(%d pl od=%02x ed=%02x start=%d stop=%d hstart=%04x hstop=%04x diwhigh=%04x fetchbits=%d )", p, planes, odelay, edelay, ddf_start_pixel, ddf_stop_pixel, CUSTOM_REG(REG_DIWSTRT), CUSTOM_REG(REG_DIWSTOP), CUSTOM_REG(REG_DIWHIGH), defbitoffs );
+		popmessage("%s(%d pl od=%02x ed=%02x start=%d stop=%d (%d %d H %d %d V) fetchbits=%d )", p, planes, odelay, edelay, ddf_start_pixel, ddf_stop_pixel, m_diw.min_x, m_diw.max_x, m_diw.min_y, m_diw.max_y, defbitoffs );
 		//popmessage("%s(%d pl bplpt1=%06X, bpl1mod=%04x, offset=%x)", p, planes, CUSTOM_REG_LONG(REG_BPL1PTH), CUSTOM_REG(REG_BPL1MOD), hires_modulo_offset );
 	}
 #endif

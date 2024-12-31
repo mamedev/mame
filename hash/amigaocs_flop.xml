@@ -2725,6 +2725,8 @@ ATK test: failed
 		<year>1994</year>
 		<publisher>Virgin</publisher>
 		<notes><![CDATA[
+Guru Meditation 00000004.00001970 at bootup
+[Copper] cuts bottom part of screen badly during gameplay
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -4995,6 +4997,7 @@ ATK test: OK
 
 	<software name="batman" supported="no">
 		<!-- SPS (CAPS) release 6 -->
+		<!-- TODO: check why people refers to this as "Batman: The Movie" -->
 		<description>Batman (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
@@ -21172,6 +21175,7 @@ ATK test: failed
 
 	<software name="gearwork" supported="no">
 		<!-- SPS (CAPS) release 1028 -->
+		<!-- Also known as Clik Clak (US?) -->
 		<description>Gear Works (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
@@ -43731,7 +43735,7 @@ ATK test: OK
 Red screen, [FDC] dsksync (fixed)
 Title screen shows with foreground garbage, [Copper] sprites
 https://codetapper.com/amiga/sprite-tricks/shadow-of-the-beast/
-Hangs during first intro in gameplay
+Hangs during first intro in gameplay, verify [DSKDAT R] access
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">

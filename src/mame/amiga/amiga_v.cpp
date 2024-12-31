@@ -539,6 +539,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		CUSTOM_REG(REG_COLOR00) = m_genlock_color;
 
 	/* loop over the line */
+	// TODO: copper runs on odd timeslots
 	next_copper_x = 0;
 	// FIXME: without the add this increment will skip bitplane ops
 	// ddf_stop_pixel_max = 0xd8 * 2 = 432 + 17 + 15 + 1(*) = 465 > width / 2 (455)
@@ -557,17 +558,20 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		{
 			/* execute the next batch, restoring and re-saving color 0 around it */
 			CUSTOM_REG(REG_COLOR00) = save_color0;
+
+			planes = (CUSTOM_REG(REG_BPLCON0) & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) >> 12;
+
 			next_copper_x = m_copper->execute_next(
 				x,
 				m_last_scanline & 0xff,
-				bool(BIT(CUSTOM_REG(REG_DMACON), 14)) // BBUSY
+				bool(BIT(CUSTOM_REG(REG_DMACON), 14)), // BBUSY
+				planes
 			);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
 			if (m_genlock_color != 0xffff)
 				CUSTOM_REG(REG_COLOR00) = m_genlock_color;
 
 			/* compute update-related register values */
-			planes = (CUSTOM_REG(REG_BPLCON0) & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) >> 12;
 			hires = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HIRES;
 			ham = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HOMOD;
 			dualpf = CUSTOM_REG(REG_BPLCON0) & BPLCON0_DBLPF;
