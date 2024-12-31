@@ -5,11 +5,13 @@
 
 #pragma once
 
+#include "namco_cus4xtmap.h"
+
 #include "cpu/m6800/m6801.h"
 #include "machine/watchdog.h"
-#include "namco_cus4xtmap.h"
 #include "sound/n63701x.h"
 #include "sound/namco.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -35,13 +37,13 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void genpeitd(machine_config &config);
-	void wndrmomo(machine_config &config);
-	void roishtar(machine_config &config);
-	void rthunder(machine_config &config);
-	void hopmappy(machine_config &config);
+	void genpeitd(machine_config &config) ATTR_COLD;
+	void wndrmomo(machine_config &config) ATTR_COLD;
+	void roishtar(machine_config &config) ATTR_COLD;
+	void rthunder(machine_config &config) ATTR_COLD;
+	void hopmappy(machine_config &config) ATTR_COLD;
 
-	void init_namco86();
+	void init_namco86() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -63,8 +65,8 @@ private:
 	void backcolor_w(uint8_t data);
 	void spriteram_w(offs_t offset, uint8_t data);
 
-	void tile_cb_0(u8 layer, u8& gfxno, u32& code);
-	void tile_cb_1(u8 layer, u8& gfxno, u32& code);
+	void tile_cb_0(u8 layer, u8 &gfxno, u32 &code);
+	void tile_cb_1(u8 layer, u8 &gfxno, u32 &code);
 
 	void namcos86_palette(palette_device &palette);
 
