@@ -94,9 +94,9 @@ public:
 		m_k007232(*this, "k007232")
 	{ }
 
-	void nyanpani(machine_config &config);
-	void salamand(machine_config &config);
-	void blkpnthr(machine_config &config);
+	void nyanpani(machine_config &config) ATTR_COLD;
+	void salamand(machine_config &config) ATTR_COLD;
+	void blkpnthr(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -135,8 +135,8 @@ public:
 		m_io_accel(*this, "ACCEL")
 	{ }
 
-	void hcrash(machine_config &config);
-	void citybomb(machine_config &config);
+	void hcrash(machine_config &config) ATTR_COLD;
+	void citybomb(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -169,10 +169,10 @@ public:
 		m_sound_shared_ram(*this, "sound_shared")
 	{ }
 
-	void konamigt(machine_config &config);
-	void rf2_gx400(machine_config &config);
-	void gx400(machine_config &config);
-	void nemesis(machine_config &config);
+	void konamigt(machine_config &config) ATTR_COLD;
+	void rf2_gx400(machine_config &config) ATTR_COLD;
+	void gx400(machine_config &config) ATTR_COLD;
+	void nemesis(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -214,7 +214,7 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigt_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);
-	void create_palette_lookups();
+	void create_palette_lookups() ATTR_COLD;
 
 	void gx400_map(address_map &map) ATTR_COLD;
 	void gx400_sound_map(address_map &map) ATTR_COLD;
@@ -236,10 +236,10 @@ public:
 		m_bubblememory_region(*this, "bubblememory")
 	{ }
 
-	void bubsys(machine_config &config);
+	void bubsys(machine_config &config) ATTR_COLD;
 
-	void bubsys_init();
-	void bubsys_twinbeeb_init();
+	void bubsys_init() ATTR_COLD;
+	void bubsys_twinbeeb_init() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
