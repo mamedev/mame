@@ -12,6 +12,8 @@
 class namco_cus4xtmap_device : public device_t, public device_gfx_interface
 {
 public:
+	using tile_delegate = device_delegate<void (u8 layer, u8 &gfxno, u32 &code)>;
+
 	// construction/destruction
 	namco_cus4xtmap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	template <typename T> namco_cus4xtmap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
@@ -29,7 +31,6 @@ public:
 		m_flipped_yoffs = flipped_yoffs;
 	}
 
-	typedef device_delegate<void(u8 layer, u8& gfxno, u32& code)> tile_delegate;
 	template <typename... T> void set_tile_callback(T &&... args) { m_tile_cb.set(std::forward<T>(args)...); }
 
 	// handlers
