@@ -2955,19 +2955,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="arcbootc">
-		<description>Arcade Boot Camp (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2018-09-23"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="arcade boot camp (4am crack).dsk" size="143360" crc="07d556c3" sha1="e0a12dc797f5f358b5222f3753efdfc655a134e1" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="archon">
 		<description>Archon (cleanly cracked)</description>
 		<year>1984</year>
@@ -3855,19 +3842,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="boulderdash construction kit (imperfect 4am crack).dsk" size="143360" crc="cf7fac16" sha1="d190de3042f2684cae2b2cb0c9484d454b4b6b1a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bnckmg">
-		<description>Bouncing Kamungas (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2018-05-05"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bouncing kamungas (4am crack).dsk" size="143360" crc="7c949f6a" sha1="7afe51c5db44bfdfa190c8fa14ebfd1c18551ece" />
 			</dataarea>
 		</part>
 	</software>
@@ -5440,19 +5414,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="crmwave">
-		<description>Crime Wave (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2018-02-15"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="crime wave (4am crack).dsk" size="143360" crc="c0bc686d" sha1="0cdf8482c26ee748127cce617c6b903c523c1dd3" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="crossbow">
 		<description>Crossbow (cleanly cracked)</description>
 		<year>1988</year>
@@ -6833,26 +6794,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="eureka - following directions level b (4am crack) side b.dsk" size="143360" crc="813e01c0" sha1="a250f99f37cf4cde08dd1eae788b54786a7c7ae6" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="examazon">
-		<description>Expedition Amazon (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2016-08-01"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="expedition amazon (4am crack) side a.dsk" size="143360" crc="b7bd4d32" sha1="3effbf439395e69d197e5f919a7cf8892bb35058" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Boot"/>
-			<dataarea name="flop" size="143360">
-				<rom name="expedition amazon (4am crack) side b (boot).dsk" size="143360" crc="4cbb6e00" sha1="0974f4f34520234c741e67de535e664eb9b9396a" />
 			</dataarea>
 		</part>
 	</software>
@@ -11005,19 +10946,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ltrs4you">
-		<description>Letters For You (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Polarware</publisher>
-		<info name="release" value="2015-07-12"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="letters for you (4am crack).dsk" size="143360" crc="2f0c8b80" sha1="388c29e8fdf79d22b70e072eb6fb9f466bffc973" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="libmedsk">
 		<description>Library and Media Skills (cleanly cracked)</description>
 		<year>1983</year>
@@ -13431,19 +13359,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="minitman">
-		<description>Minit Man (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2016-07-25"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="minit man (4am crack).dsk" size="143360" crc="1bf28949" sha1="672bd74a7edeff788a2793a66e2039a4a5b31791" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="misldefn">
 		<description>Missile Defense (cleanly cracked)</description>
 		<year>1981</year>
@@ -14718,26 +14633,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ootopos">
-		<description>Oo-Topos (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Polarware</publisher>
-		<info name="release" value="2018-01-26"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="oo-topos (4am crack) side a.dsk" size="143360" crc="893e44ad" sha1="a6b5efc18704857d037796fdeabb5f4d05d7b40a" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Boot"/>
-			<dataarea name="flop" size="143360">
-				<rom name="oo-topos (4am crack) side b - boot.dsk" size="143360" crc="496489cf" sha1="4877a0e92410e9a8fdeb2607777de3ae989909d7" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="opfrog">
 		<description>Operation Frog (cleanly cracked)</description>
 		<year>1984</year>
@@ -14776,19 +14671,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="operation frog (imperfect 4am crack).dsk" size="143360" crc="cca3962f" sha1="dc2cc50dd30c6bff92273d85441d79d6a22d2824" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="opatract">
-		<description>Opposites Attract (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Polarware</publisher>
-		<info name="release" value="2015-01-20"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="opposites attract (4am crack).dsk" size="143360" crc="62ac96f6" sha1="d3a54214136a9569938fc9d2cc5621157eb6c064" />
 			</dataarea>
 		</part>
 	</software>
@@ -15195,19 +15077,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="picture parade v11.24.88 (4am crack).dsk" size="143360" crc="b2473c8a" sha1="a9faec6a88ff1c86f492fc142e0bddde017b746b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pieman">
-		<description>Pie-Man (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2017-08-08"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="pie-man (4am crack).dsk" size="143360" crc="dd8efb80" sha1="088cdc2636dc09d8da1d163b2c2f8e50bd1beb31" />
 			</dataarea>
 		</part>
 	</software>
@@ -17918,32 +17787,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="undiatip">
-		<description>Un Dia Tipico (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>D.C. Heath and Company</publisher>
-		<info name="release" value="2014-08-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="un dia tipico (4am crack) disk 1.dsk" size="143360" crc="52b778b5" sha1="ed1a8e64cfd0eb99bc6af05e3b9c62bbf278758e" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="un dia tipico (4am crack) disk 2.dsk" size="143360" crc="f68796d9" sha1="84edf33806a3cd9c77722f10738f3ae7407af216" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="143360">
-				<rom name="un dia tipico (4am crack) disk 3.dsk" size="143360" crc="126fdfe1" sha1="8f7647a79fd360c9087211a3fedc2c5092f9031b" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="artowar">
 		<description>The Ancient Art of War (cleanly cracked)</description>
 		<year>1989</year>
@@ -19507,28 +19350,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="questr2">
-		<description>The Quest (Revision 2, 1984) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2015-08-13"/>
-		<!-- This is the 1984 re-release, with updated double hi-res graphics by
-		Marsha and Steve Meuse. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the quest revision 2 (4am crack) side a.dsk" size="143360" crc="41088b27" sha1="bae0274ababd10baea488c27d53625cc353df20d" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the quest revision 2 (4am crack) side b.dsk" size="143360" crc="41232904" sha1="67b674fcd9286131b986564ba981f7ab3ad724a1" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wrabbt12">
 		<description>Writer Rabbit (version 1.2) (cleanly cracked)</description>
 		<year>1986</year>
@@ -19719,7 +19540,7 @@ license:CC0-1.0
 	<software name="chgearth">
 		<description>The Changing Earth (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2015-09-08"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -21001,26 +20822,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rmljackb">
-		<description>Reading Magic Library: Jack in the Beanstalk (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Tom Snyder Productions</publisher>
-		<info name="release" value="2016-04-11"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="reading magic library - jack in the beanstalk (4am crack) side a.dsk" size="143360" crc="1e416db8" sha1="e376def9d99dc80cb6a557dba81bf692b82e089a" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="reading magic library - jack in the beanstalk (4am crack) side b.dsk" size="143360" crc="2ba00460" sha1="ef38a4058d01f65baebb06a24f58bf6abdbc356a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vocbsenr">
 		<description>The Vocabulary Game: Senior Level (cleanly cracked)</description>
 		<year>1984</year>
@@ -21745,26 +21546,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="xyphus">
-		<description>Xyphus (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2016-08-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="xyphus (4am crack) side a.dsk" size="143360" crc="ee14153e" sha1="be08e5edb46f603e8ea9f334fb4a9af6407a86bf" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="xyphus (4am crack) side b.dsk" size="143360" crc="014a80b1" sha1="c26fee0543b9532dba814baf6ab12a5f9a36e50c" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tpuzzler">
 		<description>The Puzzler (cleanly cracked)</description>
 		<year>1984</year>
@@ -21918,7 +21699,7 @@ license:CC0-1.0
 	<software name="rosiecrb">
 		<description>Rosie the Counting Rabbit (cleanly cracked)</description>
 		<year>1987</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2016-08-24"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -22137,7 +21918,7 @@ license:CC0-1.0
 	<software name="saursore">
 		<description>What Makes A Dinosaur Sore (cleanly cracked)</description>
 		<year>1987</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2016-10-22"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -22273,19 +22054,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk E"/>
 			<dataarea name="flop" size="143360">
 				<rom name="dragonworld (4am crack) disk e.dsk" size="143360" crc="e9929c16" sha1="8f8e23e5a71876cf3f38b9b690cf97b45614999f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="stellar7">
-		<description>Stellar 7 (Penguin Software) (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2016-11-22"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="stellar 7 (4am crack).dsk" size="143360" crc="69526fd9" sha1="2711ccba9b85775c5d0db5f382f1fd7336d33bab" />
 			</dataarea>
 		</part>
 	</software>
@@ -24631,7 +24399,7 @@ license:CC0-1.0
 	<software name="smpllive">
 		<description>The Simplest Living Things (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2017-09-17"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -25681,48 +25449,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="trans85">
-		<description>Transylvania (1985 Version) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Polarware</publisher>
-		<info name="release" value="2018-01-30"/>
-		<!-- This is the 1985 re-release with updated graphics and gameplay.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="transylvania 1985 (4am crack) side a.dsk" size="143360" crc="2f86c356" sha1="18ec83ce3520e8fae2eb6e8d3312e9712baa5459" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="transylvania 1985 (4am crack) side b.dsk" size="143360" crc="d73ceb4d" sha1="374d001aa9180a915b1c5e06dac92b59ad094f7b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crmns85">
-		<description>The Crimson Crown (1985 Version) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Polarware</publisher>
-		<info name="release" value="2018-01-30"/>
-		<!-- This is the 1985 re-release with updated graphics and gameplay.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the crimson crown 1985 (4am crack) side a.dsk" size="143360" crc="aba5242a" sha1="fed7cdb0a85fa1e5e938e85a6bc13ad8359aa4d8" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the crimson crown 1985 (4am crack) side b.dsk" size="143360" crc="82509d3a" sha1="874a960a64ac7a68bd4ba648383bedf844f65e61" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="rnd23dgt">
 		<description>Round Two-Digit and Three-Digit Numbers (cleanly cracked)</description>
 		<year>1990</year>
@@ -25896,19 +25622,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="thndrbmb">
-		<description>Thunder Bombs (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2018-02-05"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="thunder bombs (4am crack).dsk" size="143360" crc="96ca4434" sha1="fec4f16b5434b0a639b8d480e08981a1871ff42c" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tzone11">
 		<description>Time Zone (version 1.1) (cleanly cracked)</description>
 		<year>1982</year>
@@ -26044,7 +25757,7 @@ license:CC0-1.0
 	<software name="wdtoothb">
 		<description>Where Did My Toothbrush Go (cleanly cracked)</description>
 		<year>1988</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2018-02-15"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -26783,19 +26496,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="spystrks">
-		<description>The Spy Strikes Back (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2018-08-05"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the spy strikes back (4am crack).dsk" size="143360" crc="bf877558" sha1="826cae2efab3fb3f87d06e54235cea33f2a4611d" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wndwlkr">
 		<description>Windwalker (cleanly cracked)</description>
 		<year>1989</year>
@@ -26973,62 +26673,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="adventure construction set (4am and san inc crack) disk 2b.dsk" size="143360" crc="fc6d82b3" sha1="72d0ed56b5e9eb23c7f34ff75e662ffc7d4c5877" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="trans82">
-		<description>Transylvania (1982 Version) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2018-09-23"/>
-		<!-- This version runs on a 48K Apple ][+ or later.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="transylvania 1982 (4am crack).dsk" size="143360" crc="68d44ab2" sha1="541de6cb27d1a70502139b30cee71be4d9cff34e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="trans84">
-		<description>Transylvania (1984 Version) (128K) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2018-09-23"/>
-		<!--This 1984 re-release by Steven Meuse features double hi-res graphics by
-		Marsha Meuse. This version requires a 128K Apple //e, //c, or IIgs.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="transylvania 1984 (4am crack).dsk" size="143360" crc="85ba86cd" sha1="ae05ef72d7e0cc94dda195da630b784a8d988589" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="talisman">
-		<description>Talisman: Challenging the Sands of Time (128K) (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Polarware</publisher>
-		<info name="release" value="2018-09-26"/>
-		<!-- It requires a 128K Apple //e, //c, or IIgs.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Boot"/>
-			<dataarea name="flop" size="143360">
-				<rom name="talisman (4am crack) disk 1 - boot.dsk" size="143360" crc="775a823a" sha1="74896efb208edec2e42c9f1a62b74d06f0600110" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Empire"/>
-			<dataarea name="flop" size="143360">
-				<rom name="talisman (4am crack) disk 2 - empire.dsk" size="143360" crc="77660e58" sha1="3daf907bdab65e930d9a1ffd62dab3326e09841d" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3 - Lands beyond"/>
-			<dataarea name="flop" size="143360">
-				<rom name="talisman (4am crack) disk 3 - lands beyond.dsk" size="143360" crc="214ff3b5" sha1="0ddcfbd830e431988e96c19382a247bb232931e1" />
 			</dataarea>
 		</part>
 	</software>
@@ -27447,7 +27091,7 @@ license:CC0-1.0
 	<software name="unrepasf">
 		<description>Un Repas Francais (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2019-07-21"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -27908,7 +27552,7 @@ license:CC0-1.0
 	<software name="addfacts">
 		<description>The Addition Facts (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2019-08-04"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -27921,7 +27565,7 @@ license:CC0-1.0
 	<software name="mulfacts">
 		<description>The Multiplication Facts (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2019-08-04"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -27999,7 +27643,7 @@ license:CC0-1.0
 	<software name="divfacts">
 		<description>The Division Facts (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2019-08-17"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -28012,7 +27656,7 @@ license:CC0-1.0
 	<software name="subfacts">
 		<description>The Subtraction Facts (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2019-08-17"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -29165,7 +28809,7 @@ license:CC0-1.0
 	<software name="awwolves">
 		<description>Animal Watch: Wolves (cleanly cracked)</description>
 		<year>1988</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2020-04-25"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -29191,7 +28835,7 @@ license:CC0-1.0
 	<software name="awwhales">
 		<description>Animal Watch: Whales (cleanly cracked)</description>
 		<year>1988</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2020-04-25"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -29217,7 +28861,7 @@ license:CC0-1.0
 	<software name="awtracks">
 		<description>Animal Watch: Tracks (cleanly cracked)</description>
 		<year>1988</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2020-04-25"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -29360,7 +29004,7 @@ license:CC0-1.0
 	<software name="dcktrex">
 		<description>Dinosaur Construction Kit: Tyrannosaurus Rex (cleanly cracked)</description>
 		<year>1987</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2020-05-27"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -30727,19 +30371,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the lion's share (4am crack) side b.dsk" size="143360" crc="3c32d295" sha1="7bb2a4bae042f400c52a1953dd47d01c4c6ba25f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="stel7sec">
-		<description>Stellar 7 (Software Entertainment Company release) (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Software Entertainment Company</publisher>
-
-		<info name="release" value="2020-11-02"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="stellar 7 (software entertainment company) (4am crack).dsk" size="143360" crc="4068c80b" sha1="0e4ef0b16c1122bc03f8479f6b76112dbf12a721"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33497,20 +33128,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pensate">
-		<description>Pensate (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Penguin Software</publisher>
-		<info name="release" value="2021-04-03"/>
-		<!--"Pensate" is a 1983 board game developed and distributed by Penguin Software.-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="pensate (4am crack).dsk" size="143360" crc="c7681fa5" sha1="4353b479a2d43e852b22a995afb2f2d0e5db9522"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="risk14">
 		<description>Risk (version 1.4) (cleanly cracked)</description>
 		<year>1988</year>
@@ -33656,7 +33273,7 @@ license:CC0-1.0
 	<software name="jatblock">
 		<description>Just Around The Block (cleanly cracked)</description>
 		<year>1987</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2021-04-18"/>
 		<info name="programmer" value="Rob Shaver and Peter Andrews"/>
 		<!--"Just Around The Block" is a 1987 educational game developed by Rob Shaver and Peter Andrews, and distributed by D.C. Heath. It is preserved here for the first time.-->
@@ -37369,7 +36986,7 @@ license:CC0-1.0
 	<software name="spnmstry">
 		<description>Spanish for Mastery (cleanly cracked)</description>
 		<year>1985</year>
-		<publisher>D.C. Heath</publisher>
+		<publisher>D.C. Heath and Company</publisher>
 		<info name="release" value="2022-07-02"/>
 		<!--"Spanish for Mastery" is a 1985 educational program developed by Jean-Paul Valette and Rebecca M. Valette, and distributed by D.C. Heath. It is preserved here for the first time.-->
 
@@ -39089,6 +38706,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="arbootcamp">
+		<description>Arcade Boot Camp (4am crack)</description>
+		<year>1984</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="John Besnard" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-23-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="arcade boot camp (4am crack).dsk" size="143360" crc="07d556c3" sha1="e0a12dc797f5f358b5222f3753efdfc655a134e1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="adbmastmat">
 		<description>Arcademic Drill Builder: Master Match (4am crack)</description>
 		<year>1983</year>
@@ -40216,6 +39849,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="boppie's great word chase (4am crack).dsk" size="143360" crc="312d613d" sha1="7b0205491b48377aa985451f815f2b66af26b1a2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bnckmg">
+		<description>Bouncing Kamungas! (4am crack)</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="Tom Becklund" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-05-05-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bouncing kamungas (4am crack).dsk" size="143360" crc="7c949f6a" sha1="7afe51c5db44bfdfa190c8fa14ebfd1c18551ece" />
 			</dataarea>
 		</part>
 	</software>
@@ -42192,6 +41841,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="crmwave">
+		<description>Crime Wave (4am crack)</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="Scott Schram" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-02-15-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="crime wave (4am crack).dsk" size="143360" crc="c0bc686d" sha1="0cdf8482c26ee748127cce617c6b903c523c1dd3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crscalir1">
 		<description>Crosscountry California (revision 1, 1987) (4am crack)</description>
 		<year>1987</year>
@@ -43909,6 +43574,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="excel-a-read (4am crack).dsk" size="143360" crc="e4fef281" sha1="66a38a96dbb72d4812e970b3f276308d8f403905" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="examazon">
+		<description>Expedition Amazon (4am crack)</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="Willard Phillips" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-08-01-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition amazon (4am crack) side a.dsk" size="143360" crc="b7bd4d32" sha1="3effbf439395e69d197e5f919a7cf8892bb35058" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition amazon (4am crack) side b (boot).dsk" size="143360" crc="4cbb6e00" sha1="0974f4f34520234c741e67de535e664eb9b9396a" />
 			</dataarea>
 		</part>
 	</software>
@@ -48869,6 +48557,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="minitman">
+		<description>Minit Man (4am crack)</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="Greg Malone" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-07-25-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="minit man (4am crack).dsk" size="143360" crc="1bf28949" sha1="672bd74a7edeff788a2793a66e2039a4a5b31791" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="modeling">
 		<description>Modeling (A-823 version 1.0) (4am crack)</description>
 		<year>1983</year>
@@ -49187,8 +48891,8 @@ license:CC0-1.0
 	<software name="mulscribe">
 		<description>MultiScribe (version 3.01c) (4am crack)</description>
 		<year>1987</year>
-		<publisher>StyleWare, Inc.</publisher>
-		<info name="developer" value="StyleWare, Inc." />
+		<publisher>StyleWare</publisher>
+		<info name="developer" value="StyleWare" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<info name="version" value="3.01c" />
 		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS" />
@@ -49448,6 +49152,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ootopos">
+		<description>Oo-Topos (4am crack)</description>
+		<year>1986</year>
+		<publisher>Polarware</publisher>
+		<info name="programmer" value="Michael Berlyn, Muffy Berlyn, Raimund Redlich, and Brian Poff" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later. Double hi-res graphics are available on 128K Apple //e and later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-01-26-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="oo-topos (4am crack) side a.dsk" size="143360" crc="893e44ad" sha1="a6b5efc18704857d037796fdeabb5f4d05d7b40a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="oo-topos (4am crack) side b - boot.dsk" size="143360" crc="496489cf" sha1="4877a0e92410e9a8fdeb2607777de3ae989909d7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="opapoc">
 		<description>Operation Apocalypse (4am and san inc crack)</description>
 		<year>1981</year>
@@ -49676,6 +49403,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="peanuts picture puzzlers (4am crack) side b.dsk" size="143360" crc="6b17b3a3" sha1="90dfcdfaa01186d3390bdc25e58e9a55618bf7ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pensate">
+		<description>Pensate (4am crack)</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="John Besnard" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2021-04-03-->
+		<!--board game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pensate (4am crack).dsk" size="143360" crc="c7681fa5" sha1="4353b479a2d43e852b22a995afb2f2d0e5db9522"/>
 			</dataarea>
 		</part>
 	</software>
@@ -49979,6 +49722,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="picture perfect (4am crack).dsk" size="143360" crc="fa891908" sha1="aa48e4e7cabee08f6cd9c74af7ace845237a7c98" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pieman">
+		<description>Pie-Man (4am crack)</description>
+		<year>1982</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="Eagle Berns and Michael Kosaka" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2017-08-08-->
+		<!--arcade game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pie-man (4am crack).dsk" size="143360" crc="dd8efb80" sha1="088cdc2636dc09d8da1d163b2c2f8e50bd1beb31" />
 			</dataarea>
 		</part>
 	</software>
@@ -51205,6 +50964,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="native americans (4am crack).dsk" size="143360" crc="5e56633c" sha1="a5a0b44be0191509f31744b9ca3a1ba53736b863" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmljackb">
+		<description>Reading Magic Library: Jack and the Beanstalk (4am crack)</description>
+		<year>1988</year>
+		<publisher>Tom Snyder Productions</publisher>
+		<info name="developer" value="Tom Snyder Productions" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!--Dump released: 2016-04-11-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading magic library - jack and the beanstalk (4am crack) side a.dsk" size="143360" crc="1e416db8" sha1="e376def9d99dc80cb6a557dba81bf692b82e089a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="reading magic library - jack and the beanstalk (4am crack) side b.dsk" size="143360" crc="2ba00460" sha1="ef38a4058d01f65baebb06a24f58bf6abdbc356a" />
 			</dataarea>
 		</part>
 	</software>
@@ -52459,23 +52241,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sscletfy">
-		<description>Sesame Street Crayon: Letters For You (version 1987-10-31) (4am crack)</description>
-		<year>1987</year>
-		<publisher>Polarware</publisher>
-		<info name="programmer" value="Brian A. Rice and Angela Greene" />
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<info name="version" value="1987-10-31" />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!--Dump released: 2023-09-16-->
-		<!--educational program-->
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="sesame street crayon- letters for you 1987-10-31 (4am crack).dsk" size="143360" crc="5dcd383a" sha1="646235e72878281a52ef7054aa75a0824c26eac7" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="shadhwk1r1" cloneof="shadhwk1">
 		<description>Shadow Hawk One (revision 1) (4am crack)</description>
 		<year>1981</year>
@@ -53437,6 +53202,41 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="start solving- tina's tv show (4am crack).dsk" size="143360" crc="4ad1efd3" sha1="9ef957f3a90309b80fb5c54c1ae90066c65599c2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stellar7sec" cloneof="stellar7">
+		<description>Stellar 7 (Software Entertainment Company) (4am crack)</description>
+		<year>1983</year>
+		<publisher>Software Entertainment Company</publisher>
+		<info name="programmer" value="Damon Slye" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2020-11-02-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="stellar 7 (software entertainment company) (4am crack).dsk" size="143360" crc="4068c80b" sha1="0e4ef0b16c1122bc03f8479f6b76112dbf12a721"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stellar7">
+		<description>Stellar 7 (Penguin Software) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Penguin Software</publisher>
+		<info name="developer" value="Dyamix" />
+		<info name="original_publisher" value="Software Entertainment Company" />
+		<info name="programmer" value="Damon Slye" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Remake by Dynamix and distributed by Penguin Software.-->
+		<!--Dump released: 2016-11-22-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="stellar 7 (4am crack).dsk" size="143360" crc="69526fd9" sha1="2711ccba9b85775c5d0db5f382f1fd7336d33bab" />
 			</dataarea>
 		</part>
 	</software>
@@ -54480,6 +54280,35 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="talisman">
+		<description>Talisman: Challenging the Sands of Time (4am crack)</description>
+		<year>1987</year>
+		<publisher>Polarware</publisher>
+		<info name="programmer" value=" Bruce X. Hoffman, Ray Redlich, Brian Poff, and Jeffrey A. Jay" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-26-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="talisman (4am crack) disk 1 - boot.dsk" size="143360" crc="775a823a" sha1="74896efb208edec2e42c9f1a62b74d06f0600110" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Empire"/>
+			<dataarea name="flop" size="143360">
+				<rom name="talisman (4am crack) disk 2 - empire.dsk" size="143360" crc="77660e58" sha1="3daf907bdab65e930d9a1ffd62dab3326e09841d" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Lands beyond"/>
+			<dataarea name="flop" size="143360">
+				<rom name="talisman (4am crack) disk 3 - lands beyond.dsk" size="143360" crc="214ff3b5" sha1="0ddcfbd830e431988e96c19382a247bb232931e1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="teachpet">
 		<description>Teacher's Pet (4am crack)</description>
 		<year>1980</year>
@@ -54832,6 +54661,56 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the counting bee v1.2 (4am crack).dsk" size="143360" crc="e95d7931" sha1="8e816c2a20f76f4622874a39fb3fabdb3d646ac4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="covetmir83">
+		<description>The Coveted Mirror (version 1983) (4am crack)</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="Eagle I. Berns and Holly Thomason" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1983" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2015-07-20-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="143360">
+				<rom name="the coveted mirror (4am crack) side a.dsk" size="143360" crc="8df0cdb8" sha1="c17022314f84b4353860a77a234639148d747674" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot" />
+			<dataarea name="flop" size="143360">
+				<rom name="the coveted mirror (4am crack) side b (boot).dsk" size="143360" crc="129348b9" sha1="40dc102262baf72edb00be5a890bc51956e2e64f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crmcrown">
+		<description>The Crimson Crown (version 1985) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Polarware</publisher>
+		<info name="original_publisher" value="Penguin Software" />
+		<info name="programmer" value="Antonio Antiochia" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1985" />
+		<!--Re-release by Polarware with updated graphics and gameplay.-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-01-30-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the crimson crown 1985 (4am crack) side a.dsk" size="143360" crc="aba5242a" sha1="fed7cdb0a85fa1e5e938e85a6bc13ad8359aa4d8" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the crimson crown 1985 (4am crack) side b.dsk" size="143360" crc="82509d3a" sha1="874a960a64ac7a68bd4ba648383bedf844f65e61" />
 			</dataarea>
 		</part>
 	</software>
@@ -55302,6 +55181,31 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="thequest">
+		<description>The Quest (version 1984) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="Dallas Snell, Joe Toler, Joel Ellis Rea, Marsha Meuse, and Steven Meuse" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later. Double hi-res graphics are available on 128K Apple //e and later." />
+		<info name="version" value="1984" />
+		<!--Re-release with updated graphics and gameplay.-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2015-08-13-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the quest revision 2 (4am crack) side a.dsk" size="143360" crc="41088b27" sha1="bae0274ababd10baea488c27d53625cc353df20d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the quest revision 2 (4am crack) side b.dsk" size="143360" crc="41232904" sha1="67b674fcd9286131b986564ba981f7ab3ad724a1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="schsp40">
 		<description>The School Speller: Magic Slate II: 40-Column Apple //e Version (version 1.0) (4am crack)</description>
 		<year>1989</year>
@@ -55396,6 +55300,56 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="sscletfy081287" cloneof="sscletfy">
+		<description>The Sesame Street Crayon: Letters For You (version 1987-08-12) (4am crack)</description>
+		<year>1986</year>
+		<publisher>Polarware</publisher>
+		<info name="programmer" value="Brian A. Rice and Angela Greene" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1987-08-12" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2015-07-12-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="letters for you (4am crack).dsk" size="143360" crc="2f0c8b80" sha1="388c29e8fdf79d22b70e072eb6fb9f466bffc973" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sscletfy">
+		<description>The Sesame Street Crayon: Letters For You (version 1987-10-31) (4am crack)</description>
+		<year>1987</year>
+		<publisher>Polarware</publisher>
+		<info name="programmer" value="Brian A. Rice and Angela Greene" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1987-10-31" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2023-09-16-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="sesame street crayon- letters for you 1987-10-31 (4am crack).dsk" size="143360" crc="5dcd383a" sha1="646235e72878281a52ef7054aa75a0824c26eac7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sscopatt">
+		<description>The Sesame Street Crayon: Opposites Attract (4am crack)</description>
+		<year>1986</year>
+		<publisher>Polarware</publisher>
+		<info name="programmer" value="Brian A. Rice and Rick Wetzel" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2015-01-20-->
+		<!--educational program-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="opposites attract (4am crack).dsk" size="143360" crc="62ac96f6" sha1="d3a54214136a9569938fc9d2cc5621157eb6c064" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shrdspg10" cloneof="shrdspg">
 		<description>The Shard of Spring (version 1.0) (4am crack)</description>
 		<year>1986</year>
@@ -55471,6 +55425,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the spelling bee (4am crack).dsk" size="143360" crc="f8890faf" sha1="d59f124f3e7ebf31fe39a1271eb0650d0388e7f4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spysback">
+		<description>The Spy Strikes Back (4am crack)</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="Robert Hardy and Mark Pelczarski" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-08-05-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the spy strikes back (4am crack).dsk" size="143360" crc="bf877558" sha1="826cae2efab3fb3f87d06e54235cea33f2a4611d" />
 			</dataarea>
 		</part>
 	</software>
@@ -55994,6 +55964,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="thunbomb">
+		<description>Thunder Bombs (4am crack)</description>
+		<year>1982</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="Tom Becklund" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-02-05-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="thunder bombs (4am crack).dsk" size="143360" crc="96ca4434" sha1="fec4f16b5434b0a639b8d480e08981a1871ff42c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="timecaps">
 		<description>Time Capsule (4am crack)</description>
 		<year>1985</year>
@@ -56223,6 +56209,67 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="trains (4am crack).dsk" size="143360" crc="2c1b5629" sha1="45650352ac0446bfec95bd93f0899bc25b6a0f6e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transyl82" cloneof="transyl">
+		<description>Transylvania (version 1982) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="Antonio Antiochia" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1982" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-23-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="transylvania 1982 (4am crack).dsk" size="143360" crc="68d44ab2" sha1="541de6cb27d1a70502139b30cee71be4d9cff34e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transyl84" cloneof="transyl">
+		<description>Transylvania (version 1984) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="Antonio Antiochia, Steven Meuse, and Marsha Meuse" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="1984" />
+		<!--Re-release with double hi-res graphics.-->
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-09-23-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="transylvania 1984 (4am crack).dsk" size="143360" crc="85ba86cd" sha1="ae05ef72d7e0cc94dda195da630b784a8d988589" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transyl">
+		<description>Transylvania (version 1985) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Polarware</publisher>
+		<info name="original_publisher" value="Penguin Software" />
+		<info name="programmer" value="Antonio Antiochia" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1985" />
+		<!--Re-release by Polarware with updated graphics and gameplay.-->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2018-01-30-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="transylvania 1985 (4am crack) side a.dsk" size="143360" crc="2f86c356" sha1="18ec83ce3520e8fae2eb6e8d3312e9712baa5459" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="transylvania 1985 (4am crack) side b.dsk" size="143360" crc="d73ceb4d" sha1="374d001aa9180a915b1c5e06dac92b59ad094f7b" />
 			</dataarea>
 		</part>
 	</software>
@@ -56583,6 +56630,36 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Game"/>
 			<dataarea name="flop" size="143360">
 				<rom name="u.s.a.a.f. v1.2 (4am and san inc crack) disk 2 - game.dsk" size="143360" crc="3a96f561" sha1="eca97c385f63d69915f97f03dc8d1c424faa0045" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="undiatip">
+		<description>Un Día Típico (4am crack)</description>
+		<year>1985</year>
+		<publisher>D.C. Heath and Company</publisher>
+		<info name="developer" value="Sky Logic" />
+		<info name="programmer" value="Arlene Krane" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2014-08-21. Redumped: 2024-10-06 to fix data corruption on disk 2.-->
+		<!--educational game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="143360">
+				<rom name="un dia tipico (4am crack) disk 1.dsk" size="143360" crc="52b778b5" sha1="ed1a8e64cfd0eb99bc6af05e3b9c62bbf278758e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="143360">
+				<rom name="un dia tipico (4am crack) disk 2.dsk" size="143360" crc="9145ec1a" sha1="f810cfaab9d1df4c34f79d9338f35b57b3356d2b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="143360">
+				<rom name="un dia tipico (4am crack) disk 3.dsk" size="143360" crc="126fdfe1" sha1="8f7647a79fd360c9087211a3fedc2c5092f9031b" />
 			</dataarea>
 		</part>
 	</software>
@@ -57719,6 +57796,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="mecc-a114 writing an opinion paper v1.1 (4am crack).dsk" size="143360" crc="2c4a3959" sha1="6836ede014567f28f9aecd817cfba9a6603cd127" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xyphus">
+		<description>Xyphus (4am crack)</description>
+		<year>1984</year>
+		<publisher>Penguin Software</publisher>
+		<info name="programmer" value="Skip Waller and Dave Albert" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!--Dump released: 2016-08-02-->
+		<!--role-playing game-->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="xyphus (4am crack) side a.dsk" size="143360" crc="ee14153e" sha1="be08e5edb46f603e8ea9f334fb4a9af6407a86bf" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Scenario"/>
+			<dataarea name="flop" size="143360">
+				<rom name="xyphus (4am crack) side b.dsk" size="143360" crc="014a80b1" sha1="c26fee0543b9532dba814baf6ab12a5f9a36e50c" />
 			</dataarea>
 		</part>
 	</software>
