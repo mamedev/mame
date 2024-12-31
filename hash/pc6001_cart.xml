@@ -46,7 +46,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Cart back has a date code of 58.01.29, Showa 58 is 1983 -->
-	<software name="turpina" supported="yes">
+	<software name="turpina" cloneof="turpin" supported="yes">
 		<description>Turpin (19830129)</description>
 		<year>1983</year>
 		<publisher>Konami</publisher>
