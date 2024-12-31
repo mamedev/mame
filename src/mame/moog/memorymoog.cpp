@@ -57,6 +57,7 @@ TODO:
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/output_latch.h"
@@ -65,14 +66,15 @@ TODO:
 #include "video/pwm.h"
 
 #define LOG_KEYPRESS (1U << 1)
-#define LOG_CV (1U << 2)
-#define LOG_ADC (1U << 3)
+#define LOG_CV       (1U << 2)
+#define LOG_ADC      (1U << 3)
+
 #define VERBOSE (LOG_GENERAL|LOG_CV)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
 #include "logmacro.h"
 
-namespace
-{
+namespace {
 
 constexpr const char MAINCPU_TAG[] = "z80";
 constexpr const char CTC_TAG[] = "ctc";
@@ -81,8 +83,7 @@ constexpr const char NVRAM_TAG[] = "nvram";
 class memorymoog_state : public driver_device
 {
 public:
-	memorymoog_state(const machine_config& mconfig, device_type type,
-	                 const char* tag) ATTR_COLD
+	memorymoog_state(const machine_config& mconfig, device_type type, const char* tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
 		, m_ctc(*this, CTC_TAG)
@@ -105,13 +106,13 @@ public:
 		{
 			for (int j = 0; j < 4; ++j)
 			{
-				m_leds.at(i).push_back(
+				m_leds[i].push_back(
 					output_finder<>(
 						*this, std::string("led_") + BOARD_6_LED_NAMES[i][j]));
 			}
 			for (int j = 0; j < 4; ++j)
 			{
-				m_leds.at(i).push_back(
+				m_leds[i].push_back(
 					output_finder<>(
 						*this, std::string("led_") + BOARD_7_LED_NAMES[i][j]));
 			}
@@ -119,15 +120,21 @@ public:
 	}
 
 	void memorymoog(machine_config& config) ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(octave_button_pressed);
+
+protected:
+	void machine_start() override ATTR_COLD;
 
 private:
 	float get_cv() const;
 	bool adc_comparator_on() const;
 
 	u8 u26_low4_r();
+
+	template<int N> u8 key_matrix_r(
+		const required_ioport_array<N>& input, u8 input_mask, u8 selection,
+		const char* name);
 	u8 keyboard_r();
 	u8 switches_a_r();
 	u8 switches_b_r();
@@ -183,6 +190,9 @@ private:
 	u8 m_led_sink = 0;  // Also used as the sink for the LT-1604.
 	u8 m_led_source = 0;
 
+	std::vector<std::vector<output_finder<>>> m_leds;
+	std::vector<float> m_cv; // Control voltages. See CV_NAMES below.
+
 	// When these strings get converted to output names, they will include
 	// the "led_" prefix.
 	static constexpr const char* BOARD_6_LED_NAMES[8][4] =
@@ -207,7 +217,6 @@ private:
 		{"osc3_amt", "fp1_pitch", "vm_pw2", "vm_filter"},
 		{"invert", "fp1_volume", "vm_pw1", "vm_freq2"},
 	};
-	std::vector<std::vector<output_finder<>>> m_leds;
 
 	static constexpr const int NUM_CVS = 64;
 	static constexpr const char* CV_NAMES[NUM_CVS] =
@@ -292,7 +301,6 @@ private:
 		"AUTOTUNE_F2",
 		"AUTOTUNE_F3",
 	};
-	std::vector<float> m_cv;
 
 	static constexpr const float V_REF = 10;
 };
@@ -367,8 +375,9 @@ u8 memorymoog_state::u26_low4_r()
 	return 0xf0 | (d3 << 3) | (d2 << 2) | (d1 << 1) | d0;
 }
 
-template<int N> u8 key_matrix_r(const required_ioport_array<N>& input,
-                                u8 input_mask, u8 selection, const char* name)
+template<int N> u8 memorymoog_state::key_matrix_r(
+	const required_ioport_array<N>& input, u8 input_mask, u8 selection,
+	const char* name)
 {
 	static_assert(N > 0 && N <= 8);
 
@@ -406,10 +415,10 @@ void memorymoog_state::update_sh()
 		return;
 
 	const float cv = get_cv();
-	if (m_cv.at(m_selected_sh) == cv)
+	if (m_cv[m_selected_sh] == cv)
 		return;
 
-	m_cv.at(m_selected_sh) = cv;
+	m_cv[m_selected_sh] = cv;
 	// TODO: all autotune CVs are divided by a 115K-10K divider.
 	LOGMASKED(LOG_CV, "CV: %02d %-20s %04X - %f\n", m_selected_sh,
 	          CV_NAMES[m_selected_sh], m_dac_latch, cv);
@@ -508,7 +517,7 @@ void memorymoog_state::led_update_w(offs_t offset, u8 data)
 {
 	// This is a callback from the pwm_display_device for LEDs.
 	// The offset should be decoded as: x = offset >> 6, y = offset & 0x3f.
-	m_leds.at(offset & 0x3f).at(offset >> 6) = data;
+	m_leds[offset & 0x3f][offset >> 6] = data;
 }
 
 void memorymoog_state::digit_latch_w(u8 data)
@@ -634,6 +643,30 @@ void memorymoog_state::io_map(address_map& map)
 	map(0x80, 0x83).mirror(0x7c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
+void memorymoog_state::machine_start()
+{
+	m_digits.resolve();
+	m_chars.resolve();
+	m_octave_minus_1_led.resolve();
+	m_octave_0_led.resolve();
+	for (std::vector<output_finder<>>& led_row : m_leds)
+		for (output_finder<>& led_output : led_row)
+			led_output.resolve();
+
+	save_item(NAME(m_keyboard_columns));
+	save_item(NAME(m_switch_rows));
+	save_item(NAME(m_dac_latch));
+	save_item(NAME(m_selected_sh));
+	save_item(NAME(m_selected_pot));
+	save_item(NAME(m_positive_hysteresis));
+	save_item(NAME(m_negative_hysteresis));
+	save_item(NAME(m_octave_low));
+	save_item(NAME(m_char_led_source));
+	save_item(NAME(m_led_sink));
+	save_item(NAME(m_led_source));
+	save_item(NAME(m_cv));
+}
+
 const z80_daisy_config memorymoog_daisy_chain[] =
 {
 	{ CTC_TAG },
@@ -754,30 +787,6 @@ void memorymoog_state::memorymoog(machine_config& config)
 	u52.bit_handler<3>().set_output("TRIG_D");
 	u52.bit_handler<4>().set_output("TRIG_E");
 	u52.bit_handler<5>().set_output("TRIG_F");
-}
-
-void memorymoog_state::machine_start()
-{
-	m_digits.resolve();
-	m_chars.resolve();
-	m_octave_minus_1_led.resolve();
-	m_octave_0_led.resolve();
-	for (std::vector<output_finder<>>& led_row : m_leds)
-		for (output_finder<>& led_output : led_row)
-			led_output.resolve();
-
-	save_item(NAME(m_keyboard_columns));
-	save_item(NAME(m_switch_rows));
-	save_item(NAME(m_dac_latch));
-	save_item(NAME(m_selected_sh));
-	save_item(NAME(m_selected_pot));
-	save_item(NAME(m_positive_hysteresis));
-	save_item(NAME(m_negative_hysteresis));
-	save_item(NAME(m_octave_low));
-	save_item(NAME(m_char_led_source));
-	save_item(NAME(m_led_sink));
-	save_item(NAME(m_led_source));
-	save_item(NAME(m_cv));
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(memorymoog_state::octave_button_pressed)
@@ -1121,7 +1130,7 @@ ROM_START(memorymoog)
 	ROMX_LOAD("v2p4.u4", 0x002000, 0x001000, CRC(580db768) SHA1(98cd285342758abf7736002e0fbd30f4f7ecb96d), ROM_BIOS(0))
 ROM_END
 
-}  // Anonymous namespace.
+}  // anonymous namespace
 
 // In production from 1982 to 1985.
 SYST(1982, memorymoog, 0, 0, memorymoog, memorymoog, memorymoog_state, empty_init, "Moog Music", "Memorymoog", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
