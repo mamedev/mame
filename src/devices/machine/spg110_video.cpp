@@ -154,6 +154,7 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 		uint8_t pal = 0x000;
 		uint8_t pri = 0x00;
 		bool flip_x = false;
+		bool flip_y = false;
 
 		if (!(ctrl & 0x0002)) // 'regset'
 		{
@@ -167,15 +168,17 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 			pal = extra_attribute & 0x0f;
 			pri = (extra_attribute & 0x30) >> 4;
 			flip_x = extra_attribute & 0x40;
+			flip_y = extra_attribute & 0x80;
 		}
+
+		const uint32_t yflipmask = flip_y ? tile_h - 1 : 0;
 
 		if (pri == priority)
 		{
-
 			if (flip_x)
-				draw<FlipXOn>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, 0, pal, tile_h, tile_w, bpp);
+				draw<FlipXOn>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, yflipmask, pal, tile_h, tile_w, bpp);
 			else
-				draw<FlipXOff>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, 0, pal, tile_h, tile_w, bpp);
+				draw<FlipXOff>(cliprect, tile_scanline, xx, yy, ctrl, bitmap_addr, tile, yflipmask, pal, tile_h, tile_w, bpp);
 		}
 
 	}
