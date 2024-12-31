@@ -493,12 +493,15 @@ public:
 	// screen layout
 	enum
 	{
-		SCREEN_WIDTH = 910,
+		// standard htotal is $e3 x 2 -> 908
+		// https://videogameperfection.com/forums/topic/advanced-timing-settings-for-amiga/
+		SCREEN_WIDTH = 908,
 		SCREEN_HEIGHT_PAL = 625,
 		SCREEN_HEIGHT_NTSC = 525,
 		VBLANK_PAL = 58, // 52
 		VBLANK_NTSC = 42,
-		HBLANK = 186
+		// first possible diw is $5c x 2 -> 184
+		HBLANK = 184
 	};
 
 	emu_timer *m_blitter_timer = nullptr;
