@@ -262,7 +262,10 @@ public:
 		m_ata(*this, "ata"),
 		m_screen(*this, "screen"),
 		m_m48t58(*this, "m48t58"),
-		m_ymz280b(*this, "ymz")
+		m_ymz280b(*this, "ymz"),
+		m_inputs(*this, "P%u", 1),
+		m_gunx(*this, "GUNX%u", 1),
+		m_guny(*this, "GUNY%u", 1)
 	{
 	}
 
@@ -281,12 +284,18 @@ public:
 
 	static void cr589_config(device_t *device);
 
-	void m2_map(address_map &map) ATTR_COLD;
+	void init_totlvice();
+	void init_btltryst();
+	void init_hellngt();
+
+	template<int N> ioport_value evilngt_aim_up() { return m_guny[N]->read() ? 0 : 1; }
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
-public:
+private:
+	void m2_map(address_map &map) ATTR_COLD;
+
 	void ppc1_int(int state);
 	void ppc2_int(int state);
 
@@ -305,15 +314,11 @@ public:
 	void konami_io1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void konami_eeprom_w(uint16_t data);
 
-	void init_totlvice();
-	void init_btltryst();
-	void init_hellngt();
-
 	void konami_atapi_unk_w(uint16_t data)
 	{
 		// 8000 = /Reset
 		// 4000 = C000 ... DOIO DMA ... 4000
-//      m_ata->write_dmack(data & 0x4000 ? ASSERT_LINE : CLEAR_LINE);
+		//m_ata->write_dmack(data & 0x4000 ? ASSERT_LINE : CLEAR_LINE);
 
 		if (!(data & 0x8000))
 		{
@@ -321,7 +326,6 @@ public:
 		}
 	}
 
-private:
 	void install_ymz280b();
 	void install_m48t58();
 
@@ -337,16 +341,17 @@ private:
 
 	optional_device<m48t58_device> m_m48t58;
 	optional_device<ymz280b_device> m_ymz280b;
+	optional_ioport_array<6> m_inputs;
+	optional_ioport_array<3> m_gunx;
+	optional_ioport_array<3> m_guny;
 
-	// Konami SIO
-	uint16_t    m_sio_data = 0;
-
-	uint32_t    m_ata_int = 0; // TEST
+	uint16_t m_sio_data = 0; // Konami SIO
+	uint32_t m_ata_int = 0; // TEST
 	emu_timer *m_atapi_timer = nullptr;
 
-	TIMER_CALLBACK_MEMBER( atapi_delay )
+	TIMER_CALLBACK_MEMBER(atapi_delay)
 	{
-		m_atapi_timer->adjust( attotime::never );
+		m_atapi_timer->adjust(attotime::never);
 		m_ata_int = param;
 	}
 
@@ -463,21 +468,31 @@ uint16_t konamim2_state::konami_io0_r(offs_t offset)
 		 7FFF = -32543
 		 FFFF = -32607
 		 */
-		case 0:
+		case 0: case 1: case 2:
 		{
-			return swapendian_int16((int16_t)ioport("GUNX1")->read());
+			uint16_t data = m_gunx[offset].read_safe(0);
+
+			// off-screen is 0, let's use left/right edges as off-screen
+			// (the data == 0 check is there in case GUNX port does not exist)
+			if (data == 0 || data == m_gunx[offset]->field(0xffff)->maxval())
+				data = 0;
+
+			return swapendian_int16(data);
 		}
-		case 1: return 0;
-		case 2: return 0; // P3 X?
 		case 3: return 0xffff; // ?
-		case 4:
+		case 4: case 5: case 6:
 		{
-			return swapendian_int16((int16_t)ioport("GUNY1")->read());
+			uint16_t data = m_guny[offset - 4].read_safe(0);
+
+			// off-screen is 0, let's use left/right edges as off-screen
+			uint16_t x = m_gunx[offset - 4].read_safe(0);
+			if (x == 0 || x == m_gunx[offset - 4]->field(0xffff)->maxval())
+				data = 0;
+
+			return swapendian_int16(data);
 		}
-		case 5: return 0; // P2 Y
-		case 6: return 0; // P3 Y?
 		case 7: return 0; //??
-		case 8: return ioport("P5")->read();
+		case 8: return m_inputs[4].read_safe(0xffff);
 	}
 
 	//return machine().rand();
@@ -532,12 +547,12 @@ uint16_t konamim2_state::konami_io1_r(offs_t offset)
 			break;
 
 		case 2: // DIP switches
-			data = ioport("P2")->read();
+			data = m_inputs[1].read_safe(0xff);
 			break;
 
 		case 3:
 		{
-			data = ioport("P1")->read();
+			data = m_inputs[0].read_safe(0xff);
 #if M2_BAD_TIMING
 			static uint32_t d = 0;
 			data |= d;
@@ -551,7 +566,7 @@ uint16_t konamim2_state::konami_io1_r(offs_t offset)
 		}
 
 		case 4: // Buttons
-			data = ioport("P4")->read();
+			data = m_inputs[3].read_safe(0xffff);
 			break;
 
 		case 5: // Changing this has a tendency to stop evilngt from booting...
@@ -559,7 +574,7 @@ uint16_t konamim2_state::konami_io1_r(offs_t offset)
 			break;
 
 		case 6: // Buttons
-			data = ioport("P6")->read();
+			data = m_inputs[5].read_safe(0xffff);
 			break;
 
 		case 7:
@@ -729,7 +744,7 @@ static INPUT_PORTS_START( konamim2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED ) // ATAPI?
-	PORT_BIT( 0xDE00, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xde00, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( btltryst )
@@ -901,20 +916,26 @@ static INPUT_PORTS_START( totlvice )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("GUNX1")
-	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 640) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 639) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
 	PORT_START("GUNY1")
-	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 240) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 239) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("GUNX2")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 639) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_PLAYER(2)
+
+	PORT_START("GUNY2")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 239) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	PORT_START("P5") // Gun switches
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Gun Trigger")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Gun Trigger")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P6")
@@ -982,7 +1003,7 @@ static INPUT_PORTS_START( heatof11 )
 	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( hellngt )
+static INPUT_PORTS_START( evilngt )
 	PORT_INCLUDE( konamim2 )
 
 	PORT_START("P2")
@@ -1030,25 +1051,60 @@ static INPUT_PORTS_START( hellngt )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("GUNX1")
-	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 320*2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 639) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
 	PORT_START("GUNY1")
-	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 0, 240 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 239) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("GUNX2")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 639) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_PLAYER(2)
+
+	PORT_START("GUNY2")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 239) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("GUNX3")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 639) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_PLAYER(3)
+
+	PORT_START("GUNY3")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 239) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(3)
 
 	PORT_START("P5") // Gun switches
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Gun Trigger")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Gun Trigger")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 Gun Trigger")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(konamim2_state::evilngt_aim_up<0>))
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Gun Reload") // shotgun manual reload instead of aim-up sensor
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(konamim2_state::evilngt_aim_up<2>))
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P6")
 	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
 	PORT_BIT( 0xfffb, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hellngt )
+	PORT_INCLUDE( evilngt )
+
+	// Different screen resolution
+	PORT_MODIFY("GUNX1")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 511) PORT_SENSITIVITY(50) PORT_KEYDELTA(16) PORT_PLAYER(1)
+
+	PORT_MODIFY("GUNY1")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 383) PORT_SENSITIVITY(50) PORT_KEYDELTA(16) PORT_PLAYER(1)
+
+	PORT_MODIFY("GUNX2")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 511) PORT_SENSITIVITY(50) PORT_KEYDELTA(16) PORT_PLAYER(2)
+
+	PORT_MODIFY("GUNY2")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 383) PORT_SENSITIVITY(50) PORT_KEYDELTA(16) PORT_PLAYER(2)
+
+	PORT_MODIFY("GUNX3")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 511) PORT_SENSITIVITY(50) PORT_KEYDELTA(16) PORT_PLAYER(3)
+
+	PORT_MODIFY("GUNY3")
+	PORT_BIT( 0xffff, 0x0000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 383) PORT_SENSITIVITY(50) PORT_KEYDELTA(16) PORT_PLAYER(3)
 INPUT_PORTS_END
 
 
@@ -1229,90 +1285,12 @@ ROM_START( polystar )
 	DISK_IMAGE_READONLY( "623jaa02", 0, BAD_DUMP SHA1(e7d9e628a3e0e085e084e4e3630fa5e3a7345547) )
 ROM_END
 
-ROM_START( btltryst )
-	ROM_REGION64_BE( 0x200000, "boot", 0 )
-	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
-
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.7k",  0x000000, 0x000080, CRC(cc2c5640) SHA1(694cf2b3700f52ed80252b013052c90020e58ce6) )
-
-	ROM_REGION( 0x2000, "m48t58", 0 ) // timekeeper SRAM
-	ROM_LOAD( "m48t58", 0x000000, 0x002000, CRC(71ee073b) SHA1(cc8002d7ee8d1695aebbbb2a3a1e97a7e16948c1) )
-
-	DISK_REGION( "ata:0:cr589" )
-	DISK_IMAGE_READONLY( "636jac02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
-ROM_END
-
-#if 0
-ROM_START( btltrysta )
-	ROM_REGION64_BE( 0x200000, "boot", 0 )
-	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
-
-	ROM_REGION( 0x2000, "m48t58", 0 ) // timekeeper SRAM
-	ROM_LOAD( "m48t58y", 0x000000, 0x002000, CRC(8611ff09) SHA1(6410236947d99c552c4a1f7dd5fd8c7a5ae4cba1) )
-
-	DISK_REGION( "ata:0:cr589" )
-	DISK_IMAGE_READONLY( "636jaa02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
-ROM_END
-#endif
-
-ROM_START( heatof11 )
-	ROM_REGION64_BE( 0x200000, "boot", 0 )  // boot ROM
-	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
-
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM default contents
-	ROM_LOAD( "93c46.7k",  0x000000, 0x000080, CRC(e7029938) SHA1(ae41340dbcb600debe246629dc36fb371d1a5b05) )
-
-	ROM_REGION( 0x2000, "m48t58", 0 ) // timekeeper SRAM
-	ROM_LOAD( "dallas.5e",  0x000000, 0x002000, CRC(5b74eafd) SHA1(afbf5f1f5a27407fd6f17c764bbb7fae4ab779f5) )
-
-	DISK_REGION( "ata:0:cr589" )
-	/* Ring codes found on the disc:
-	      703EAA02 PN.0000046809  1 + + + + +  IFPI L251
-	      IFPI 42MO */
-	DISK_IMAGE_READONLY( "703eaa02", 0, SHA1(f8a87eacfdbbd22659f39c7a72e3895f0a7697b7) )
-ROM_END
-
-ROM_START( evilngt )
-	ROM_REGION64_BE( 0x200000, "boot", 0 )
-	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
-
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM default contents
-	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(60ae825e) SHA1(fd61db9667c53dd12700a0fe202fcd1e3d35d206) )
-
-	ROM_REGION( 0x2000, "m48t58", 0 ) // timekeeper SRAM
-	ROM_LOAD( "m48t58y.9n", 0x000000, 0x002000, CRC(e887ca1f) SHA1(54205f01b1ceba1d5f4d979fc30be1add8116e90) )
-
-	ROM_REGION( 0x400000, "ymz", 0 ) // YMZ280B sound ROM on sub board
-	ROM_LOAD( "810a03.16h", 0x000000, 0x400000, CRC(05112d3a) SHA1(0df2a167b7bc08a32d983b71614d59834efbfb59) )
-
-	DISK_REGION( "ata:0:cr589" )
-	DISK_IMAGE_READONLY( "810uba02", 0, SHA1(e570470c1cbfe187d5bba8125616412f386264ba) )
-ROM_END
-
-ROM_START( hellngt )
-	ROM_REGION64_BE( 0x200000, "boot", 0 )
-	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
-
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM default contents
-	ROM_LOAD( "93c46.7k",    0x000000, 0x000080, CRC(53b41f68) SHA1(f75f59808a5b04b1e49f2cca0592a2466b82f019) )
-
-	ROM_REGION( 0x2000, "m48t58", 0 )
-	ROM_LOAD( "m48t58y.9n",  0x000000, 0x002000, CRC(ff8e78a1) SHA1(02e56f55264dd0bf3a08808726a6366e9cb6031e) )
-
-	ROM_REGION( 0x400000, "ymz", 0 ) // YMZ280B sound ROM on sub board
-	ROM_LOAD( "810a03.16h",  0x000000, 0x400000, CRC(05112d3a) SHA1(0df2a167b7bc08a32d983b71614d59834efbfb59) )
-
-	DISK_REGION( "ata:0:cr589" )
-	DISK_IMAGE_READONLY( "810eaa02", 0, SHA1(d701b900eddc7674015823b2cb33e887bf107fa8) )
-ROM_END
-
 ROM_START( totlvice )
 	ROM_REGION64_BE( 0x200000, "boot", 0 )
 	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(25aa0bd1) SHA1(cc461e0629ff71c3a868882f1f67af0e19135c1a) )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM default contents with calibrated guns
+	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(9c34554a) SHA1(2ca939c518649fdbf7789cfa481b611be8ec32ad) )
 
 	ROM_REGION( 0x100000, "ymz", 0 ) // YMZ280B sound rom on sub board
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
@@ -1366,6 +1344,84 @@ ROM_START( totlvicj )
 
 	DISK_REGION( "ata:0:cr589" ) // Need a re-image
 	DISK_IMAGE_READONLY( "639jad01", 0, BAD_DUMP SHA1(39d41d5a9d1c40636d174c8bb8172b1121e313f8) )
+ROM_END
+
+ROM_START( btltryst )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.7k",  0x000000, 0x000080, CRC(cc2c5640) SHA1(694cf2b3700f52ed80252b013052c90020e58ce6) )
+
+	ROM_REGION( 0x2000, "m48t58", 0 ) // timekeeper SRAM
+	ROM_LOAD( "m48t58", 0x000000, 0x002000, CRC(71ee073b) SHA1(cc8002d7ee8d1695aebbbb2a3a1e97a7e16948c1) )
+
+	DISK_REGION( "ata:0:cr589" )
+	DISK_IMAGE_READONLY( "636jac02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
+ROM_END
+
+#if 0
+ROM_START( btltrysta )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
+
+	ROM_REGION( 0x2000, "m48t58", 0 ) // timekeeper SRAM
+	ROM_LOAD( "m48t58y", 0x000000, 0x002000, CRC(8611ff09) SHA1(6410236947d99c552c4a1f7dd5fd8c7a5ae4cba1) )
+
+	DISK_REGION( "ata:0:cr589" )
+	DISK_IMAGE_READONLY( "636jaa02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
+ROM_END
+#endif
+
+ROM_START( heatof11 )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )  // boot ROM
+	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM default contents
+	ROM_LOAD( "93c46.7k",  0x000000, 0x000080, CRC(e7029938) SHA1(ae41340dbcb600debe246629dc36fb371d1a5b05) )
+
+	ROM_REGION( 0x2000, "m48t58", 0 ) // timekeeper SRAM
+	ROM_LOAD( "dallas.5e",  0x000000, 0x002000, CRC(5b74eafd) SHA1(afbf5f1f5a27407fd6f17c764bbb7fae4ab779f5) )
+
+	DISK_REGION( "ata:0:cr589" )
+	/* Ring codes found on the disc:
+	      703EAA02 PN.0000046809  1 + + + + +  IFPI L251
+	      IFPI 42MO */
+	DISK_IMAGE_READONLY( "703eaa02", 0, SHA1(f8a87eacfdbbd22659f39c7a72e3895f0a7697b7) )
+ROM_END
+
+ROM_START( evilngt )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM default contents with calibrated guns
+	ROM_LOAD( "93c46.7k", 0x000000, 0x000080, CRC(e632f292) SHA1(85c5292cd4002a272126d06bb50fb1bd38476936) )
+
+	ROM_REGION( 0x2000, "m48t58", 0 ) // timekeeper SRAM
+	ROM_LOAD( "m48t58y.9n", 0x000000, 0x002000, CRC(e887ca1f) SHA1(54205f01b1ceba1d5f4d979fc30be1add8116e90) )
+
+	ROM_REGION( 0x400000, "ymz", 0 ) // YMZ280B sound ROM on sub board
+	ROM_LOAD( "810a03.16h", 0x000000, 0x400000, CRC(05112d3a) SHA1(0df2a167b7bc08a32d983b71614d59834efbfb59) )
+
+	DISK_REGION( "ata:0:cr589" )
+	DISK_IMAGE_READONLY( "810uba02", 0, SHA1(e570470c1cbfe187d5bba8125616412f386264ba) )
+ROM_END
+
+ROM_START( hellngt )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM default contents with calibrated guns
+	ROM_LOAD( "93c46.7k",    0x000000, 0x000080, CRC(7a531078) SHA1(c35096c3e9681ba916fa43bd06e2f171a3718e1c) )
+
+	ROM_REGION( 0x2000, "m48t58", 0 )
+	ROM_LOAD( "m48t58y.9n",  0x000000, 0x002000, CRC(ff8e78a1) SHA1(02e56f55264dd0bf3a08808726a6366e9cb6031e) )
+
+	ROM_REGION( 0x400000, "ymz", 0 ) // YMZ280B sound ROM on sub board
+	ROM_LOAD( "810a03.16h",  0x000000, 0x400000, CRC(05112d3a) SHA1(0df2a167b7bc08a32d983b71614d59834efbfb59) )
+
+	DISK_REGION( "ata:0:cr589" )
+	DISK_IMAGE_READONLY( "810eaa02", 0, SHA1(d701b900eddc7674015823b2cb33e887bf107fa8) )
 ROM_END
 
 #if 0 // FIXME
@@ -1620,7 +1676,7 @@ GAME( 1997, totlvicu,  totlvice, totlvice, totlvice, konamim2_state, init_totlvi
 GAME( 1998, btltryst,  0,        btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAC)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
 //GAME( 1998, btltrysta, btltryst, btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAA)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, heatof11,  0,        heatof11, heatof11, konamim2_state, init_btltryst, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1998, evilngt,   0,        evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver UBA)",         MACHINE_IMPERFECT_TIMING )
+GAME( 1998, evilngt,   0,        evilngt,  evilngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver UBA)",         MACHINE_IMPERFECT_TIMING )
 GAME( 1998, hellngt,   evilngt,  hellngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Hell Night (ver EAA)",         MACHINE_IMPERFECT_TIMING )
 
 //CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
