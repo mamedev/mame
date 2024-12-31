@@ -158,6 +158,8 @@ files{
 	MAME_DIR .. "src/mame/midway/williams.h",
 	MAME_DIR .. "src/mame/midway/williams_m.cpp",
 	MAME_DIR .. "src/mame/midway/williams_v.cpp",
+	MAME_DIR .. "src/mame/midway/williamsblitter.cpp",
+	MAME_DIR .. "src/mame/midway/williamsblitter.h",
 	MAME_DIR .. "src/mame/gaelco/gaelco.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelco.h",
 	MAME_DIR .. "src/mame/gaelco/gaelco_v.cpp",

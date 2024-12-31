@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_68307_BUS_H
-#define MAME_MACHINE_68307_BUS_H
+#ifndef MAME_MACHINE_68307BUS_H
+#define MAME_MACHINE_68307BUS_H
 
 #pragma once
 
@@ -19,4 +19,4 @@ public:
 	void reset();
 };
 
-#endif // MAME_MACHINE_68307_BUS_H
+#endif // MAME_MACHINE_68307BUS_H

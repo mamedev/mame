@@ -41,12 +41,13 @@ public:
 	// D3 indicates how the S2636 drew this pixel - 0 = background, 1 = object/score
 	bitmap_ind16 const &bitmap() const { return m_bitmap; }
 
-	// this function is for backwards compatibility and will eventually be removed
-	// use the functions below for per-scanline drawing/collisions
+	// This function is for backwards compatibility and will eventually be removed.
+	// Please note that it is not compatible with partial updates, use the functions
+	// below for per-scanline drawing/collisions.
 	bitmap_ind16 const &update(const rectangle &cliprect);
 
-	// call render_first_line to render the first line of the display and render_next_line for each additional line
-	void render_first_line();
+	// render_next_line will draw one line at a time, call start_new_frame at line 0
+	void start_new_frame() { m_screen_line = 0; }
 	void render_next_line();
 
 	uint8_t read_data(offs_t offset);
@@ -126,7 +127,7 @@ private:
 	bitmap_ind16        m_bitmap;
 
 	// 256-byte register file (not all of this really exists)
-	uint8_t   m_registers[0x100];
+	uint8_t m_registers[0x100];
 
 	// tracking where we're up to in the screen update
 	bool    m_vrst;

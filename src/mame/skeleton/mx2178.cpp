@@ -198,4 +198,4 @@ ROM_END
 } // Anonymous namespace
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME        FLAGS
-COMP( 1984, mx2178, 0,      0,      mx2178,  mx2178, mx2178_state, empty_init, "Memorex", "Memorex 2178", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, mx2178, 0,      0,      mx2178,  mx2178, mx2178_state, empty_init, "Memorex", "Memorex 2178", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

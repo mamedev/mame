@@ -12,8 +12,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_HPDIO_HPDIO_H
-#define MAME_BUS_HPDIO_HPDIO_H
+#ifndef MAME_BUS_HP_DIO_HP_DIO_H
+#define MAME_BUS_HP_DIO_HP_DIO_H
 
 #pragma once
 
@@ -291,4 +291,4 @@ DECLARE_DEVICE_TYPE_NS(DIO16, bus::hp_dio, dio16_device)
 void dio16_cards(device_slot_interface &device);
 void dio32_cards(device_slot_interface &device);
 
-#endif // MAME_BUS_HPDIO_HPDIO_H
+#endif // MAME_BUS_HP_DIO_HP_DIO_H

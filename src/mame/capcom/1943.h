@@ -82,8 +82,8 @@ private:
 
 	void videoram_w(offs_t offset, u8 data);
 	void colorram_w(offs_t offset, u8 data);
-	void c804_w(u8 data);
-	void d806_w(u8 data);
+	void control_w(u8 data);
+	void layer_w(u8 data);
 
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

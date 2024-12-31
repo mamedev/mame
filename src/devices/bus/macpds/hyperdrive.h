@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_BUS_PDS_HYPERDRIVE_H
-#define MAME_BUS_PDS_HYPERDRIVE_H
+#ifndef MAME_BUS_MACPDS_HYPERDRIVE_H
+#define MAME_BUS_MACPDS_HYPERDRIVE_H
 
 #pragma once
 
@@ -50,4 +50,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PDS_HYPERDRIVE, macpds_hyperdrive_device)
 
-#endif // MAME_BUS_PDS_TPDFPD_H
+#endif // MAME_BUS_MACPDS_HYPERDRIVE_H

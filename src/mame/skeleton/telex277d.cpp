@@ -75,4 +75,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1979, telex277d, 0, 0, telex277d, telex277d, telex277d_state, empty_init, "Telex Computer Products", "Telex 277-D Display Terminal (Model 2)", MACHINE_IS_SKELETON)
+COMP(1979, telex277d, 0, 0, telex277d, telex277d, telex277d_state, empty_init, "Telex Computer Products", "Telex 277-D Display Terminal (Model 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

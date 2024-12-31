@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NSCSI_S1410_H
-#define MAME_MACHINE_NSCSI_S1410_H
+#ifndef MAME_BUS_NSCSI_S1410_H
+#define MAME_BUS_NSCSI_S1410_H
 
 #pragma once
 

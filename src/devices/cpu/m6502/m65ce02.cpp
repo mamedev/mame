@@ -20,7 +20,7 @@ m65ce02_device::m65ce02_device(const machine_config &mconfig, const char *tag, d
 }
 
 m65ce02_device::m65ce02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	m65c02_device(mconfig, type, tag, owner, clock), TMP3(0), Z(0), B(0)
+	w65c02_device(mconfig, type, tag, owner, clock), TMP3(0), Z(0), B(0)
 {
 }
 
@@ -31,7 +31,7 @@ std::unique_ptr<util::disasm_interface> m65ce02_device::create_disassembler()
 
 void m65ce02_device::init()
 {
-	m65c02_device::init();
+	w65c02_device::init();
 	state_add(M65CE02_Z, "Z", Z);
 	state_add(M65CE02_B, "B", B).callimport().formatstr("%2s");
 	save_item(NAME(B));
@@ -51,7 +51,7 @@ void m65ce02_device::device_start()
 
 void m65ce02_device::device_reset()
 {
-	m65c02_device::device_reset();
+	w65c02_device::device_reset();
 	Z = 0x00;
 	B = 0x0000;
 }

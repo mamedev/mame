@@ -145,5 +145,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1975, avenger, 0, electra, 0, electra_state, empty_init, ROT0, "Electra", "Avenger",         MACHINE_IS_SKELETON )
-GAME( 1976, flyingf, 0, electra, 0, electra_state, empty_init, ROT0, "Electra", "Flying Fortress", MACHINE_IS_SKELETON )
+GAME( 1975, avenger, 0, electra, 0, electra_state, empty_init, ROT0, "Electra", "Avenger",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1976, flyingf, 0, electra, 0, electra_state, empty_init, ROT0, "Electra", "Flying Fortress", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

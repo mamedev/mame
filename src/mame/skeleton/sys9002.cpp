@@ -188,4 +188,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME                FLAGS
-COMP( 198?, sys9002, 0,      0,      sys9002, sys9002, sys9002_state, empty_init, "Mannesmann Kienzle", "System 9002 Terminal", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 198?, sys9002, 0,      0,      sys9002, sys9002, sys9002_state, empty_init, "Mannesmann Kienzle", "System 9002 Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

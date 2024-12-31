@@ -6,9 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_CMS6809_H
+#define MAME_BUS_BBC_TUBE_TUBE_CMS6809_H
 
-#ifndef MAME_BUS_BBC_TUBE_CMS6809_H
-#define MAME_BUS_BBC_TUBE_CMS6809_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/m6809/m6809.h"
@@ -50,5 +51,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_TUBE_CMS6809, bbc_tube_cms6809_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_CMS6809_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_CMS6809_H

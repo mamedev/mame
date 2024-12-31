@@ -67,8 +67,8 @@ IO ports and memory map changes. Dip switches differ too.
 #include "emu.h"
 #include "kchamp.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/74259.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -377,7 +377,7 @@ void kchamp_state::msmint(int state)
 * 1 Player Version  *
 ********************/
 
-INTERRUPT_GEN_MEMBER(kchamp_state::sound_int)
+INTERRUPT_GEN_MEMBER(kchamp_state::sound_nmi)
 {
 	if (m_sound_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -406,12 +406,12 @@ void kchamp_state::machine_reset()
 void kchamp_state::kchampvs(machine_config &config)
 {
 	// Basic machine hardware
-	Z80(config, m_maincpu, XTAL(12'000'000)/4);     // verified on PCB
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchampvs_map);
 	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchampvs_io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &kchamp_state::decrypted_opcodes_map);
 
-	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    // verified on PCB
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchampvs_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchampvs_sound_io_map);
 	// IRQs triggered from main CPU
@@ -426,10 +426,7 @@ void kchamp_state::kchampvs(machine_config &config)
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.10); // verified on PCB
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 16, 240); // 59.10 Hz refresh measured on PCB
 	screen.set_screen_update(FUNC(kchamp_state::screen_update_kchampvs));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(kchamp_state::vblank_irq));
@@ -443,15 +440,15 @@ void kchamp_state::kchampvs(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	AY8910(config, m_ay[0], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    // verified on PCB
-	AY8910(config, m_ay[1], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    // verified on PCB
+	AY8910(config, m_ay[0], 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.3); // verified on PCB
+	AY8910(config, m_ay[1], 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.3); // verified on PCB
 
-	LS157(config, m_adpcm_select, 0); // at 4C
+	LS157(config, m_adpcm_select); // at 4C
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MSM5205(config, m_msm, 375000);  // verified on PCB, discrete circuit clock
-	m_msm->vck_callback().set(FUNC(kchamp_state::msmint));  // interrupt function
-	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  // 1 / 96 = 3906.25Hz playback
+	MSM5205(config, m_msm, 12_MHz_XTAL / 32); // 375 kHz verified on PCB
+	m_msm->vck_callback().set(FUNC(kchamp_state::msmint)); // interrupt function
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B); // 1 / 96 = 3906.25Hz playback
 	m_msm->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -462,16 +459,17 @@ void kchamp_state::kchampvs(machine_config &config)
 void kchamp_state::kchamp(machine_config &config)
 {
 	// Basic machine hardware
-	Z80(config, m_maincpu, XTAL(12'000'000)/4);     // 12MHz / 4 = 3.0 MHz
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_map);
 	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchamp_io_map);
 
-	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    // 12MHz / 4 = 3.0 MHz
+	Z80(config, m_audiocpu, 8_MHz_XTAL / 2);
+	m_audiocpu->z80_set_m1_cycles(4+1); // voice matches PCB recordings
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); // Hz
-	// IRQs triggered from main CPU
-	// NMIs from 125Hz clock
+
+	attotime sound_nmi_period = attotime::from_ticks(0x10000, 8_MHz_XTAL); // ~122 Hz
+	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_nmi), sound_nmi_period);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC71
 	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flip_screen_set));
@@ -481,10 +479,7 @@ void kchamp_state::kchamp(machine_config &config)
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(kchamp_state::screen_update_kchamp));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(kchamp_state::vblank_irq));
@@ -498,19 +493,20 @@ void kchamp_state::kchamp(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	AY8910(config, m_ay[0], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); // Guess based on actual PCB recordings of karatedo
-	AY8910(config, m_ay[1], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); // Guess based on actual PCB recordings of karatedo
+	AY8910(config, m_ay[0], 8_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.3);
+	AY8910(config, m_ay[1], 8_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	DAC08(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // IC11
+	DAC08(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.3); // IC11
 }
 
 void kchamp_state::kchamp_arfyc(machine_config &config)
 {
 	kchamp(config);
 
-	m_audiocpu->set_clock(XTAL(8'867'238)/2); // 8.867238 MHz xtal / 2, measured on real PCB
-	m_ay[0]->set_clock(XTAL(8'867'238)/8);    // 8.867238 MHz xtal / 8, measured on real PCB
-	m_ay[1]->set_clock(XTAL(8'867'238)/8);    // 8.867238 MHz xtal / 8, measured on real PCB
+	// different sound hw XTAL, clocks verified on PCB
+	m_audiocpu->set_clock(8.867238_MHz_XTAL / 2);
+	m_ay[0]->set_clock(8.867238_MHz_XTAL / 8);
+	m_ay[1]->set_clock(8.867238_MHz_XTAL / 8);
 }
 
 
@@ -998,8 +994,10 @@ GAME( 1984, kchamp2p,  kchamp, kchamp,       kchampvs, kchamp_state,  empty_init
 GAME( 1984, karatedo,  kchamp, kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "Data East Corporation", "Karate Dou (Japan)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kchamptec, kchamp, kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "bootleg (Tecfri)",      "Karate Champ (Tecfri bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1984, karateda,  kchamp, kchamp_arfyc, kchamp,   kchamp_state,  empty_init,     ROT90, "bootleg (Arfyc)",       "Karate Dou (Arfyc bootleg)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs,  kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 1)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs2, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs2, ROT90, "Data East USA",         "Karate Champ (US VS version, set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs3, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 3)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs4, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 4)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984, karatevs,  kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", MACHINE_SUPPORTS_SAVE )
+
+// VS versions
+GAME( 1984, kchampvs,  0,        kchampvs, kchampvs, kchamp_state, init_kchampvs,  ROT90, "Data East USA",         "Karate Champ: Player Vs Player (US, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs2, kchampvs, kchampvs, kchampvs, kchamp_state, init_kchampvs2, ROT90, "Data East USA",         "Karate Champ: Player Vs Player (US, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs3, kchampvs, kchampvs, kchampvs, kchamp_state, init_kchampvs,  ROT90, "Data East USA",         "Karate Champ: Player Vs Player (US, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs4, kchampvs, kchampvs, kchampvs, kchamp_state, init_kchampvs,  ROT90, "Data East USA",         "Karate Champ: Player Vs Player (US, set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, karatevs,  kchampvs, kchampvs, kchampvs, kchamp_state, init_kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan)",                  MACHINE_SUPPORTS_SAVE )

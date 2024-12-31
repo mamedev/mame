@@ -39,8 +39,8 @@
 
 *****************************************************************************/
 
-#ifndef MAME_MACHINE_TTL7474_H
-#define MAME_MACHINE_TTL7474_H
+#ifndef MAME_MACHINE_7474_H
+#define MAME_MACHINE_7474_H
 
 #pragma once
 
@@ -102,4 +102,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TTL7474, ttl7474_device)
 
-#endif // MAME_MACHINE_TTL7474_H
+#endif // MAME_MACHINE_7474_H

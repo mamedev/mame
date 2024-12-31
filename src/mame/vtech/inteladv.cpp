@@ -104,6 +104,6 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME                              FLAGS
-COMP( 2005, inteladv, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "Intelligence Advance E/R (Germany)", MACHINE_IS_SKELETON )
-COMP( 2003, dyndesk,  0,      0,      dyndesk,  dyndesk,  inteladv_state, empty_init, "VTech", "DynamiDesk (Germany)",               MACHINE_IS_SKELETON )
-COMP( 2012, cars2lap, 0,      0,      dyndesk,  dyndesk,  inteladv_state, empty_init, "VTech", "CARS 2 Laptop (Germany)",            MACHINE_IS_SKELETON ) // probably doesn't belong here
+COMP( 2005, inteladv, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "Intelligence Advance E/R (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 2003, dyndesk,  0,      0,      dyndesk,  dyndesk,  inteladv_state, empty_init, "VTech", "DynamiDesk (Germany)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 2012, cars2lap, 0,      0,      dyndesk,  dyndesk,  inteladv_state, empty_init, "VTech", "CARS 2 Laptop (Germany)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // probably doesn't belong here

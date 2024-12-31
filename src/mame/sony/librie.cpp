@@ -121,4 +121,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 2004, librie, 0, 0, ebx5003, ebx5003, librie_state, empty_init, "Sony", "Librie EBR 1000", MACHINE_IS_SKELETON )
+SYST( 2004, librie, 0, 0, ebx5003, ebx5003, librie_state, empty_init, "Sony", "Librie EBR 1000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

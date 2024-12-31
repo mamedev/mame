@@ -12,32 +12,12 @@
 #include "emu.h"
 #include "2650dasm.h"
 
-/* handy table to build relative offsets from HR (holding register) */
-const int s2650_disassembler::rel[0x100] = {
-	  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-	 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-	 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
-	 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
-	-64,-63,-62,-61,-60,-59,-58,-57,-56,-55,-54,-53,-52,-51,-50,-49,
-	-48,-47,-46,-45,-44,-43,-42,-41,-40,-39,-38,-37,-36,-35,-34,-33,
-	-32,-31,-30,-29,-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,
-	-16,-15,-14,-13,-12,-11,-10, -9, -8, -7, -6, -5, -4, -3, -2, -1,
-	  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-	 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-	 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
-	 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
-	-64,-63,-62,-61,-60,-59,-58,-57,-56,-55,-54,-53,-52,-51,-50,-49,
-	-48,-47,-46,-45,-44,-43,-42,-41,-40,-39,-38,-37,-36,-35,-34,-33,
-	-32,-31,-30,-29,-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,
-	-16,-15,-14,-13,-12,-11,-10, -9, -8, -7, -6, -5, -4, -3, -2, -1,
-};
-
 std::string s2650_disassembler::SYM(int addr)
 {
 	return util::string_format("$%04x", addr);
 }
 
-/* format an immediate */
+// format an immediate
 std::string s2650_disassembler::IMM(offs_t pc, const data_buffer &params)
 {
 	return util::string_format("$%02x", params.r8(pc));
@@ -52,7 +32,7 @@ void s2650_disassembler::add(std::string &buf, const std::string &str)
 	buf += str;
 }
 
-/* format an immediate for PSL */
+// format an immediate for PSL
 std::string s2650_disassembler::IMM_PSL(offs_t pc, const data_buffer &params)
 {
 	u8 v = params.r8(pc);
@@ -68,23 +48,23 @@ std::string s2650_disassembler::IMM_PSL(offs_t pc, const data_buffer &params)
 			case 0x80: add(buff, "m"); break;
 			case 0xc0: add(buff, "cc"); break;
 		}
-		if (v & 0x20)   /* inter digit carry */
+		if (v & 0x20)   // inter digit carry
 			add(buff, "idc");
-		if (v & 0x10)   /* register select */
+		if (v & 0x10)   // register select
 			add(buff, "rs");
-		if (v & 0x08)   /* with carry */
+		if (v & 0x08)   // with carry
 			add(buff, "wc");
-		if (v & 0x04)   /* overflow */
+		if (v & 0x04)   // overflow
 			add(buff, "ovf");
-		if (v & 0x02)   /* 2's complement comparisons */
+		if (v & 0x02)   // 2's complement comparisons
 			add(buff, "com");
-		if (v & 0x01)   /* carry */
+		if (v & 0x01)   // carry
 			add(buff, "c");
 		return buff;
 	}
 }
 
-/* format an immediate for PSU (processor status upper) */
+// format an immediate for PSU (processor status upper)
 std::string s2650_disassembler::IMM_PSU(offs_t pc, const data_buffer &params)
 {
 	int v = params.r8(pc);
@@ -94,45 +74,45 @@ std::string s2650_disassembler::IMM_PSU(offs_t pc, const data_buffer &params)
 
 	} else {
 		std::string buff;
-		if (v & 0x80)   /* sense input */
+		if (v & 0x80)   // sense input
 			add(buff, "si");
-		if (v & 0x40)   /* flag output */
+		if (v & 0x40)   // flag output
 			add(buff, "fo");
-		if (v & 0x20)   /* interrupt inhibit */
+		if (v & 0x20)   // interrupt inhibit
 			add(buff, "ii");
-		if (v & 0x10)   /* unused bit 4 */
+		if (v & 0x10)   // unused bit 4
 			add(buff, "4");
-		if (v & 0x08)   /* unused bit 3 */
+		if (v & 0x08)   // unused bit 3
 			add(buff, "3");
-		if (v & 0x04)   /* stack pointer bit 2 */
+		if (v & 0x04)   // stack pointer bit 2
 			add(buff, "sp2");
-		if (v & 0x02)   /* stack pointer bit 1 */
+		if (v & 0x02)   // stack pointer bit 1
 			add(buff, "sp1");
-		if (v & 0x01)   /* stack pointer bit 0 */
+		if (v & 0x01)   // stack pointer bit 0
 			add(buff, "sp0");
 		return buff;
 	}
 }
 
-/* format an relative address */
+// format an relative address
 std::string s2650_disassembler::REL(offs_t pc, const data_buffer &params)
 {
 	int o = params.r8(pc);
-	return util::string_format("%s%s", (o&0x80)?"*":"", SYM((pc&0x6000)+((pc+1+rel[o])&0x1fff)));
+	return util::string_format("%s%s", (o & 0x80) ? "*" : "", SYM((pc & 0x6000) + ((pc + 1 + util::sext(o, 7)) & 0x1fff)));
 }
 
-/* format an relative address (implicit page 0) */
+// format an relative address (implicit page 0)
 std::string s2650_disassembler::REL0(offs_t pc, const data_buffer &params)
 {
 	int o = params.r8(pc);
-	return util::string_format("%s%s", (o&0x80)?"*":"", SYM((rel[o]) & 0x1fff));
+	return util::string_format("%s%s", (o & 0x80) ? "*" : "", SYM(util::sext(o, 7) & 0x1fff));
 }
 
-/* format a destination register and an absolute address */
+// format a destination register and an absolute address
 std::string s2650_disassembler::ABS(int load, int r, offs_t pc, const data_buffer &params)
 {
 	int h = params.r8(pc);
-	int l = params.r8((pc&0x6000)+((pc+1)&0x1fff));
+	int l = params.r8((pc & 0x6000) + ((pc + 1) & 0x1fff));
 	int a = (pc & 0x6000) + ((h & 0x1f) << 8) + l;
 
 	if (m_config->get_z80_mnemonics_mode()) {
@@ -174,11 +154,11 @@ std::string s2650_disassembler::ABS(int load, int r, offs_t pc, const data_buffe
 	return "";
 }
 
-/* format an (branch) absolute address */
+// format an (branch) absolute address
 std::string s2650_disassembler::ADR(offs_t pc, const data_buffer &params)
 {
 	int h = params.r8(pc);
-	int l = params.r8((pc&0x6000)+((pc+1)&0x1fff));
+	int l = params.r8((pc & 0x6000) + ((pc + 1) & 0x1fff));
 	int a = ((h & 0x7f) << 8) + l;
 	if (h & 0x80)
 		return util::string_format("*%s", SYM(a));
@@ -190,7 +170,7 @@ s2650_disassembler::s2650_disassembler(config *conf) : m_config(conf)
 {
 }
 
-/* disassemble one instruction at PC into buff. return byte size of instr */
+// disassemble one instruction at PC into buff. return byte size of instr
 offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
@@ -215,7 +195,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			pc+=1;
 			break;
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			util::stream_format(stream, z80 ? "ld   %s" : "loda,%s", ABS(1,rv,pc, params));
+			util::stream_format(stream, z80 ? "ld   %s" : "loda,%s", ABS(1, rv, pc, params));
 			pc+=2;
 			break;
 		case 0x10: case 0x11:
@@ -273,7 +253,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			pc+=1;
 			break;
 		case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-			util::stream_format(stream, z80 ? "xor  %s" : "eora,%s", ABS(1,rv,pc, params));
+			util::stream_format(stream, z80 ? "xor  %s" : "eora,%s", ABS(1, rv, pc, params));
 			pc+=2;
 			break;
 		case 0x30: case 0x31: case 0x32: case 0x33:
@@ -326,7 +306,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			pc+=1;
 			break;
 		case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-			util::stream_format(stream, z80 ? "and  %s" : "anda,%s", ABS(1,rv,pc, params));
+			util::stream_format(stream, z80 ? "and  %s" : "anda,%s", ABS(1, rv, pc, params));
 			pc+=2;
 			break;
 		case 0x50: case 0x51: case 0x52: case 0x53:
@@ -358,7 +338,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			pc+=1;
 			break;
 		case 0x6c: case 0x6d: case 0x6e: case 0x6f:
-			util::stream_format(stream, z80 ? "or   %s" : "iora,%s", ABS(1,rv,pc, params));
+			util::stream_format(stream, z80 ? "or   %s" : "iora,%s", ABS(1, rv, pc, params));
 			pc+=2;
 			break;
 		case 0x70: case 0x71: case 0x72: case 0x73:
@@ -402,7 +382,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			pc+=1;
 			break;
 		case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-			util::stream_format(stream, z80 ? "add  %s" : "adda,%s", ABS(1,rv,pc, params));
+			util::stream_format(stream, z80 ? "add  %s" : "adda,%s", ABS(1, rv, pc, params));
 			pc+=2;
 			break;
 		case 0x90: case 0x91:
@@ -446,7 +426,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			pc+=1;
 			break;
 		case 0xac: case 0xad: case 0xae: case 0xaf:
-			util::stream_format(stream, z80 ? "sub  %s" : "suba,%s", ABS(1,rv,pc, params));
+			util::stream_format(stream, z80 ? "sub  %s" : "suba,%s", ABS(1, rv, pc, params));
 			pc+=2;
 			break;
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
@@ -497,7 +477,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			pc+=1;
 			break;
 		case 0xcc: case 0xcd: case 0xce: case 0xcf:
-			util::stream_format(stream, z80 ? "ld   %s" : "stra,%s", ABS(0,rv,pc, params));
+			util::stream_format(stream, z80 ? "ld   %s" : "stra,%s", ABS( 0, rv, pc, params));
 			pc+=2;
 			break;
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
@@ -518,7 +498,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			flags = STEP_COND;
 			break;
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3:
-			util::stream_format(stream, z80 ? "cp   r0,%d" : "comz,%d", rv);
+			util::stream_format(stream, z80 ? "cp   r0,r%d" : "comz,%d", rv);
 			break;
 		case 0xe4: case 0xe5: case 0xe6: case 0xe7:
 			util::stream_format(stream, z80 ? "cp   r%d,%s" : "comi,%d %s", rv, IMM(pc, params));
@@ -529,7 +509,7 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			pc+=1;
 			break;
 		case 0xec: case 0xed: case 0xee: case 0xef:
-			util::stream_format(stream, z80 ? "cp   %s" : "coma,%s", ABS(1,rv,pc, params));
+			util::stream_format(stream, z80 ? "cp   %s" : "coma,%s", ABS(1, rv, pc, params));
 			pc+=2;
 			break;
 		case 0xf0: case 0xf1: case 0xf2: case 0xf3:
@@ -551,19 +531,4 @@ offs_t s2650_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			break;
 	}
 	return (pc - PC) | flags | SUPPORTED;
-}
-
-u32 s2650_disassembler::opcode_alignment() const
-{
-	return 1;
-}
-
-u32 s2650_disassembler::interface_flags() const
-{
-	return PAGED;
-}
-
-u32 s2650_disassembler::page_address_bits() const
-{
-	return 13;
 }

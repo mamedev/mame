@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_RP2C33_SND_H
-#define MAME_MACHINE_RP2C33_SND_H
+#ifndef MAME_SOUND_RP2C33_SND_H
+#define MAME_SOUND_RP2C33_SND_H
 
 #pragma once
 
@@ -95,11 +95,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(RP2C33_SOUND, rp2c33_sound_device)
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-#endif // MAME_MACHINE_RP2C33_SND_H
+#endif // MAME_SOUND_RP2C33_SND_H

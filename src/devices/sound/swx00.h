@@ -3,8 +3,8 @@
 
 // Yamaha SWX00, rompler/dsp/cpu combo, audio support
 
-#ifndef DEVICES_SOUND_SWX00_H
-#define DEVICES_SOUND_SWX00_H
+#ifndef MAME_SOUND_SWX00_H
+#define MAME_SOUND_SWX00_H
 
 #pragma once
 
@@ -123,4 +123,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SWX00_SOUND, swx00_sound_device)
 
-#endif
+#endif // MAME_SOUND_SWX00_H

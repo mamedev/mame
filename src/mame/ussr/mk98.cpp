@@ -485,4 +485,4 @@ ROM_END
 
 
 //    YEAR  NAME   PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT         COMPANY         FULLNAME  FLAGS
-COMP( 1998, mk98,  0,       0,      mk98,    0,     mk98_state,  empty_init,  "Elektronika",  "MK-98",  MACHINE_IS_SKELETON)
+COMP( 1998, mk98,  0,       0,      mk98,    0,     mk98_state,  empty_init,  "Elektronika",  "MK-98",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -486,4 +486,4 @@ void vme_sys68k_iscsi1_card_device::not_implemented_w(uint8_t data){
 
 // This info isn't kept in a card driver atm so storing it as a comment for later use
 //      YEAR  NAME           PARENT  COMPAT  MACHINE       INPUT    CLASS             INIT COMPANY                  FULLNAME           FLAGS
-//COMP( 1986, fcscsi1,       0,      0,      fcscsi1,      fcscsi1, driver_device,     0,  "Force Computers Gmbh",  "SYS68K/SCSI-1",   MACHINE_IS_SKELETON )
+//COMP( 1986, fcscsi1,       0,      0,      fcscsi1,      fcscsi1, driver_device,     0,  "Force Computers Gmbh",  "SYS68K/SCSI-1",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

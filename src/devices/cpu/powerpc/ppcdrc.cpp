@@ -2681,7 +2681,9 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 
 		case 0x0eb: /* MULLWx */
 		case 0x2eb: /* MULLWOx */
-			UML_MULS(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));    // muls    rd,rd,ra,rb
+			// The flags are calculated based on the resulting 32-bit value from the 32x32=32 multiplication
+			// reference: example 4 https://www.ibm.com/docs/en/aix/7.2?topic=set-mullw-muls-multiply-low-word-instruction
+			UML_MULSLW(block, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));    // mulslw    rd,ra,rb
 			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), false);// <update flags>
 			return true;
 

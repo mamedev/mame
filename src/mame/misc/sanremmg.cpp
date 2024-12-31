@@ -143,6 +143,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_IS_SKELETON )
-GAME( 200?, elsypokr, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "Electro System (Elsy)", "unknown Elsy poker", MACHINE_IS_SKELETON )
-GAME( 2002, elsygame, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "Electro System (Elsy)", "unknown Elsy game", MACHINE_IS_SKELETON ) // Fruit Diamont (sic)?
+GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, elsypokr, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "Electro System (Elsy)", "unknown Elsy poker", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, elsygame, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "Electro System (Elsy)", "unknown Elsy game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Fruit Diamont (sic)?

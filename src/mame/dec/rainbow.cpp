@@ -3464,6 +3464,6 @@ ROM_END
 /* Driver */
 
 /*   YEAR  NAME         PARENT   COMPAT  MACHINE         INPUT           STATE                 INIT        COMPANY                          FULLNAME         FLAGS */
-COMP(1982, rainbow100a, rainbow, 0,      rainbow_modela, rainbow100b_in, rainbow_modela_state, empty_init, "Digital Equipment Corporation", "Rainbow 100-A", MACHINE_IS_SKELETON)
+COMP(1982, rainbow100a, rainbow, 0,      rainbow_modela, rainbow100b_in, rainbow_modela_state, empty_init, "Digital Equipment Corporation", "Rainbow 100-A", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 COMP(1983, rainbow,     0,       0,      rainbow_modelb, rainbow100b_in, rainbow_modelb_state, empty_init, "Digital Equipment Corporation", "Rainbow 100-B", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS)
 COMP(1985, rainbow190,  rainbow, 0,      rainbow_modelb, rainbow100b_in, rainbow_modelb_state, empty_init, "Digital Equipment Corporation", "Rainbow 190-B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS)

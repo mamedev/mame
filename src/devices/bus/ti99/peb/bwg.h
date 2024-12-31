@@ -11,8 +11,8 @@
 
 *****************************************************************************/
 
-#ifndef MAME_BUS_TI99_PED_BWG_H
-#define MAME_BUS_TI99_PED_BWG_H
+#ifndef MAME_BUS_TI99_PEB_BWG_H
+#define MAME_BUS_TI99_PEB_BWG_H
 
 #pragma once
 
@@ -135,4 +135,4 @@ private:
 
 DECLARE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device)
 
-#endif // MAME_BUS_TI99_PED_BWG_H
+#endif // MAME_BUS_TI99_PEB_BWG_H

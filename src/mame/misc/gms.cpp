@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders: Tomasz Slanina, David Haywood
-// thanks-to:Hammy
+// thanks-to: Hammy
 
 /*******************************************************************
 实战麻将王 (Shízhàn Májiàng Wáng), GMS, 1998
@@ -138,6 +138,7 @@ public:
 	void init_ballch();
 	void init_cots();
 	void init_rbspm();
+	void init_sball2k1();
 	void init_ssanguoj();
 	void init_sscs();
 	void init_super555();
@@ -1492,6 +1493,102 @@ static INPUT_PORTS_START( cots )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( sball2k1 ) // default password for accessing game settings is all Start
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_SERVICE_NO_TOGGLE(0x01, IP_ACTIVE_LOW)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
+
+
+	// There are 4 banks of 8 DIP switches on the PCB but only 1 is shown in test mode. DIP switch settings as per test mode. Other settings seem to be determined by software.
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0001, 0x0000, "Play Mode" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0001, "Games" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR ( Unused ) ) PORT_DIPLOCATION("SW1:2") // 'No Use' according to test mode
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, "Ability Game" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, "Reg. Ability" ) PORT_DIPLOCATION("SW1:4") // sic. Regulate?
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, "One Game" ) PORT_DIPLOCATION("SW1:5") // "One Partite" in test mode, seems a mix of English and Italian
+	PORT_DIPSETTING(      0x0000, "10 Lives" )
+	PORT_DIPSETTING(      0x0010, "20 Lives" )
+	PORT_DIPNAME( 0x0020, 0x0000, "Game Setup" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, "Power On" ) // asks for password on start up, says to move the switch to On afterward
+	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x0040, 0x0000, "Time Limit" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, "Comma" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, "No. 6" )
+	PORT_DIPSETTING(      0x0000, "No. 5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW4:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW4:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW3:8" )
+INPUT_PORTS_END
+
+
 static const gfx_layout rbmk32_layout =
 {
 	8,32,
@@ -1828,6 +1925,24 @@ ROM_START( super555 ) // GMS branded chips: A66, A68, M06
 ROM_END
 
 
+ROM_START( sball2k1 ) // GMS branded chips: A66, A68, no stickers on ROMs
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "p1.u64", 0x00000, 0x80000, CRC(148fde1d) SHA1(4e846939d66bebb9a40b5a8a8d2b4c8b9ecdac4e) ) // M27C4002, 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x040000, "oki", 0 )
+	ROM_LOAD( "s1.u83", 0x00000, 0x20000, BAD_DUMP CRC(f668dc38) SHA1(b9ff20bd3675f591a46d71f7d7599a1005abc0b6) ) // TMS27C010A, proved difficult to dump, marked as bad as precaution
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
+	// not populated
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "a1.u41", 0x00000, 0x20000,  CRC(8567a2f7) SHA1(18f187fb533a23fbb554b941361c9d3b03d1c0ce) ) // D27010
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c46.u138", 0x00, 0x080, NO_DUMP )
+ROM_END
+
+
 /*******************************************************************
 Sān Sè Cáishén (三色財神), GMS, 1999
 Hardware Info by Guru
@@ -2060,6 +2175,18 @@ void gms_2layers_state::init_ssanguoj()
 	rom[0x2fc0 / 2] = 0x6000; // loops endlessly after ROM / RAM test
 }
 
+void gms_2layers_state::init_sball2k1()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	rom[0x14f6c / 2] = 0x4e71;
+	rom[0x14f6e / 2] = 0x4e71;
+	rom[0x14f9a / 2] = 0x6000;
+	rom[0x14f9c / 2] = 0x0010;
+	rom[0x15528 / 2] = 0x4e71;
+	rom[0x1552a / 2] = 0x4e71;
+}
+
 void gms_3layers_state::init_sc2in1()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
@@ -2116,7 +2243,7 @@ void gms_2layers_state::init_sscs()
 	rom[0xce2a / 2] = 0x6000; // U136 ERROR
 	rom[0xce3c / 2] = 0x4e71; // U136 ERROR
 	rom[0xce3e / 2] = 0x4e71; // U136 ERROR
-	rom[0x19c1a / 2 ] = 0x6000; // U85 ERROR
+	rom[0x19c1a / 2] = 0x6000; // U85 ERROR
 }
 
 } // anonymous namespace
@@ -2130,6 +2257,7 @@ GAME( 1998, ssanguoj, 0, ssanguoj, ssanguoj, gms_2layers_state, init_ssanguoj, R
 // card games
 GAME( 1999, super555, 0, super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 GAME( 1999, sscs,     0, super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                       MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 2001, sball2k1, 0, super555, sball2k1, gms_2layers_state, init_sball2k1, ROT0,  "GMS", "Super Ball 2001 (Italy version 5.23)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 GAME( 2001, sc2in1,   0, magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)",           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 
 // slot, on slightly different PCB

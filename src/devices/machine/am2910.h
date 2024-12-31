@@ -7,8 +7,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_AM2910_AM2910_H
-#define MAME_MACHINE_AM2910_AM2910_H
+#ifndef MAME_MACHINE_AM2910_H
+#define MAME_MACHINE_AM2910_H
 
 #pragma once
 
@@ -79,4 +79,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(AM2910, am2910_device)
 
-#endif // MAME_MACHINE_AM2910_AM2910_H
+#endif // MAME_MACHINE_AM2910_H

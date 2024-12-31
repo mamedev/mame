@@ -104,4 +104,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(2001, europl01, 0, europl01, europl01, startouch_state, empty_init, ROT0, "Sleic / Petaco", "EuroPlay 2001", MACHINE_IS_SKELETON)
+GAME(2001, europl01, 0, europl01, europl01, startouch_state, empty_init, ROT0, "Sleic / Petaco", "EuroPlay 2001", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

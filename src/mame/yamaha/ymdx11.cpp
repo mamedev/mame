@@ -137,4 +137,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1988, dx11, 0, 0, dx11, dx11, yamaha_dx11_state, empty_init, "Yamaha", "DX11 Digital Programmable Algorithm Synthesizer", MACHINE_IS_SKELETON)
+SYST(1988, dx11, 0, 0, dx11, dx11, yamaha_dx11_state, empty_init, "Yamaha", "DX11 Digital Programmable Algorithm Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

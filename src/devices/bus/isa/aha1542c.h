@@ -10,8 +10,8 @@
 
  **********************************************************************/
 
-#ifndef MAME_BUS_AHA1542C_H
-#define MAME_BUS_AHA1542C_H
+#ifndef MAME_BUS_ISA_AHA1542C_H
+#define MAME_BUS_ISA_AHA1542C_H
 
 #pragma once
 
@@ -94,4 +94,4 @@ DECLARE_DEVICE_TYPE(AHA1542C, aha1542c_device)
 DECLARE_DEVICE_TYPE(AHA1542CF, aha1542cf_device)
 DECLARE_DEVICE_TYPE(AHA1542CP, aha1542cp_device)
 
-#endif // MAME_BUS_AHA1542C_H
+#endif // MAME_BUS_ISA_AHA1542C_H

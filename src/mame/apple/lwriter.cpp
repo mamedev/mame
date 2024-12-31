@@ -815,6 +815,6 @@ ROM_END
 
 
 /*    YEAR  NAME         PARENT  COMPAT  MACHINE     INPUT    STATE          INIT        COMPANY            FULLNAME             FLAGS */
-CONS( 1985, lwriter,     0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter",       MACHINE_IS_SKELETON)
-CONS( 1986, lwriterplus, 0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter Plus",  MACHINE_IS_SKELETON)
-CONS( 1988, lwriter2nt,  0,      0,      lwriter2nt, lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter II NT", MACHINE_IS_SKELETON)
+CONS( 1985, lwriter,     0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 1986, lwriterplus, 0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter Plus",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 1988, lwriter2nt,  0,      0,      lwriter2nt, lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter II NT", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -122,5 +122,5 @@ void dynamoah_state::security_decrypt()
 } // anonymous namespace
 
 
-GAME( 199?, dynamoah,  0,        dynamoah, dynamoah, dynamoah_state, security_decrypt, ROT0, "Dynamo", "Air Hockey (6.12?, encrypted)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, dynamoaha, dynamoah, dynamoah, dynamoah, dynamoah_state, security_decrypt, ROT0, "Dynamo", "Air Hockey (6.03, encrypted)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, dynamoah,  0,        dynamoah, dynamoah, dynamoah_state, security_decrypt, ROT0, "Dynamo", "Air Hockey (6.12?, encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, dynamoaha, dynamoah, dynamoah, dynamoah, dynamoah_state, security_decrypt, ROT0, "Dynamo", "Air Hockey (6.03, encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

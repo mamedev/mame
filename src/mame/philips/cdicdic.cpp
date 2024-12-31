@@ -706,7 +706,7 @@ void cdicdic_device::process_audio_map()
 	else
 	{
 		m_decode_addr = 0xffff;
-		m_audio_sector_counter = m_audio_format_sectors;
+		m_audio_sector_counter = 0;
 	}
 
 	if (was_decoding)

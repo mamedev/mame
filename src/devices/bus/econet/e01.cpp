@@ -245,7 +245,7 @@ void econet_e01_device::e01_mem(address_map &map)
 void econet_e01_device::device_add_mconfig(machine_config &config)
 {
 	// basic machine hardware
-	M65C02(config, m_maincpu, XTAL(8'000'000)/4); // Rockwell R65C102P3
+	R65C102(config, m_maincpu, XTAL(8'000'000)); // Rockwell R65C102P3
 	m_maincpu->set_addrmap(AS_PROGRAM, &econet_e01_device::e01_mem);
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);

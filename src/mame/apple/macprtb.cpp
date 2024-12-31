@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /****************************************************************************
 
-    drivers/macprtb.cpp
+    macprtb.cpp
     Mac Portable / PowerBook 100 emulation
     By R. Belmont
 
@@ -20,6 +20,9 @@
     of functional layout: ASC and SWIM are present, but there's only 1 VIA
     (CMDμ G65SC22PE-2, not the "6523" variant normally used in ADB Macs) and an
     M50753 microcontroller "PMU" handles power management, ADB, and clock/PRAM.
+
+    These machines didn't have a power switch, so you can press any key after
+    shutting them down and they'll reboot.  No other Apple portables did that.
 
     VIA connections:
     Port A: 8-bit bidirectional data bus to the PMU
@@ -147,12 +150,14 @@ public:
 		m_last_taken_interrupt(-1),
 		m_ca1_data(0),
 		m_overlay(false),
+		m_pmu_blank_display(true),
 		m_pmu_to_via(0),
 		m_pmu_from_via(0),
 		m_pmu_ack(0),
 		m_pmu_req(0),
 		m_pmu_p0(0x80),
-		m_adb_line(1)
+		m_adb_line(1),
+		m_adb_akd(0)
 	{
 	}
 
@@ -202,6 +207,7 @@ private:
 	u8 pmu_comms_r();
 	void pmu_comms_w(u8 data);
 	void set_adb_line(int state);
+	void set_adb_anykeydown(int state);
 	u8 pmu_adb_r();
 	void pmu_adb_w(u8 data);
 	u8 pmu_in_r();
@@ -235,10 +241,10 @@ private:
 	s32 m_via_cycles, m_via_interrupt, m_scc_interrupt, m_asc_interrupt, m_last_taken_interrupt;
 	s32 m_ca1_data;
 
-	bool m_overlay;
+	bool m_overlay, m_pmu_blank_display;
 
 	u8 m_pmu_to_via, m_pmu_from_via, m_pmu_ack, m_pmu_req, m_pmu_p0;
-	s32 m_adb_line;
+	s32 m_adb_line, m_adb_akd;
 };
 
 void macportable_state::nvram_default()
@@ -369,7 +375,7 @@ void macportable_state::pmu_p0_w(u8 data)
 
 u8 macportable_state::pmu_p1_r()
 {
-	return 0x08;        // indicate on charger power
+	return 0x08 | (m_adb_akd << 1);        // indicate on charger power
 }
 
 u8 macportable_state::pmu_data_r()
@@ -389,6 +395,17 @@ u8 macportable_state::pmu_comms_r()
 
 void macportable_state::pmu_comms_w(u8 data)
 {
+	if (!BIT(data, 1))
+	{
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+		const u32 memory_size = std::min((u32)0x3fffff, m_rom_size);
+		const u32 memory_end = memory_size - 1;
+		offs_t memory_mirror = memory_end & ~(memory_size - 1);
+		space.unmap_readwrite(0x00000000, memory_end);
+		space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
+		m_overlay = true;
+	}
+
 	m_maincpu->set_input_line(INPUT_LINE_RESET, BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_via1->write_ca2(BIT(data, 4)); // 1 second interrupt
@@ -401,6 +418,11 @@ void macportable_state::set_adb_line(int state)
 	m_adb_line = state;
 }
 
+void macportable_state::set_adb_anykeydown(int state)
+{
+	m_adb_akd = state;
+}
+
 u8 macportable_state::pmu_adb_r()
 {
 	return (m_adb_line << 1);
@@ -409,6 +431,8 @@ u8 macportable_state::pmu_adb_r()
 void macportable_state::pmu_adb_w(u8 data)
 {
 	m_macadb->adb_linechange_w((data & 1) ^ 1);
+
+	m_pmu_blank_display = BIT(data, 2) ^ 1;
 }
 
 u8 macportable_state::pmu_in_r()
@@ -463,7 +487,14 @@ void macportable_state::machine_start()
 	save_item(NAME(m_last_taken_interrupt));
 	save_item(NAME(m_ca1_data));
 	save_item(NAME(m_overlay));
+	save_item(NAME(m_pmu_blank_display));
 	save_item(NAME(m_pmu_to_via));
+	save_item(NAME(m_pmu_from_via));
+	save_item(NAME(m_pmu_ack));
+	save_item(NAME(m_pmu_req));
+	save_item(NAME(m_pmu_p0));
+	save_item(NAME(m_adb_line));
+	save_item(NAME(m_adb_akd));
 
 	m_6015_timer = timer_alloc(FUNC(macportable_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
@@ -480,6 +511,8 @@ void macportable_state::machine_reset()
 
 	// start 60.15 Hz timer
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 void macportable_state::init_macprtb()
@@ -488,6 +521,13 @@ void macportable_state::init_macprtb()
 
 u32 macportable_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// is the display enabled?
+	if (m_pmu_blank_display)
+	{
+		bitmap.fill(0, cliprect);
+		return 0;
+	}
+
 	u16 const *const video_ram = (const u16 *) m_vram.target();
 
 	for (int y = 0; y < 400; y++)
@@ -542,21 +582,18 @@ void macportable_state::via_irq_w(int state)
 u16 macportable_state::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (!machine().side_effects_disabled())
+	if (m_overlay && !machine().side_effects_disabled())
 	{
-		if ((m_overlay) && (offset == 0x67f))
-		{
-			address_space &space = m_maincpu->space(AS_PROGRAM);
-			const u32 memory_end = m_ram->size() - 1;
-			void *memory_data = m_ram->pointer();
-			offs_t memory_mirror = memory_end & ~memory_end;
+		address_space &space = m_maincpu->space(AS_PROGRAM);
+		const u32 memory_end = m_ram->size() - 1;
+		void *memory_data = m_ram->pointer();
+		offs_t memory_mirror = memory_end & ~memory_end;
 
-			space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
-			m_overlay = false;
-		}
+		space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
+		m_overlay = false;
 	}
 
-	return m_rom_ptr[offset & ((m_rom_size - 1)>>2)];
+	return m_rom_ptr[offset & ((m_rom_size - 1)>>1)];
 }
 
 TIMER_CALLBACK_MEMBER(macportable_state::mac_6015_tick)
@@ -566,7 +603,7 @@ TIMER_CALLBACK_MEMBER(macportable_state::mac_6015_tick)
 	m_via1->write_ca1(m_ca1_data);
 
 	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
-	m_macadb->adb_vblank();
+	m_macadb->portable_update_keyboard();
 }
 
 u16 macportable_state::scsi_r(offs_t offset, u16 mem_mask)
@@ -592,8 +629,7 @@ void macportable_state::scsi_berr_w(u8 data)
 
 void macportable_state::macprtb_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).r(FUNC(macportable_state::rom_switch_r));
-	map(0x900000, 0x93ffff).rom().region("bootrom", 0).mirror(0x0c0000);
+	map(0x900000, 0x93ffff).r(FUNC(macportable_state::rom_switch_r)).mirror(0x0c0000);
 	map(0xf60000, 0xf6ffff).rw(FUNC(macportable_state::iwm_r), FUNC(macportable_state::iwm_w));
 	map(0xf70000, 0xf7ffff).rw(FUNC(macportable_state::via_r), FUNC(macportable_state::via_w));
 	map(0xf90000, 0xf9ffff).rw(FUNC(macportable_state::scsi_r), FUNC(macportable_state::scsi_w));
@@ -612,7 +648,7 @@ u8 macportable_state::via_in_a()
 
 u8 macportable_state::via_in_b()
 {
-	return 0x80 | 0x04 | ((m_pmu_ack & 1)<<1);
+	return 0x80 | 0x04 | ((m_pmu_ack & 1)<<1) | m_pmu_req;
 }
 
 void macportable_state::via_out_a(u8 data)
@@ -702,6 +738,7 @@ void macportable_state::macprtb(machine_config &config)
 
 	MACADB(config, m_macadb, 15.6672_MHz_XTAL);
 	m_macadb->adb_data_callback().set(FUNC(macportable_state::set_adb_line));
+	m_macadb->adb_akd_callback().set(FUNC(macportable_state::set_adb_anykeydown));
 
 	SWIM1(config, m_swim, 15.6672_MHz_XTAL);
 	m_swim->phases_cb().set(FUNC(macportable_state::phases_w));
@@ -759,11 +796,12 @@ void macportable_state::macprtb(machine_config &config)
 	m_ram->set_default_size("1M");
 	m_ram->set_extra_options("2M,4M,5M,6M,7M,8M,9M");
 
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68000");
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
-	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }
 
 ROM_START(macprtb)

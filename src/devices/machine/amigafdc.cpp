@@ -511,6 +511,7 @@ void amiga_fdc_device::ciaaprb_w(uint8_t data)
 			floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&amiga_fdc_device::index_callback, this));
 	}
 
+	// btanb: trackdisk has no HW interlock for motor running with disk not inserted.
 	if(floppy) {
 		floppy->ss_w(!(BIT(data, 2)));
 		floppy->dir_w(BIT(data, 1));

@@ -178,4 +178,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, pspikesm, pspikes, pspikesm, pspikesm, pspikes_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Power Spikes (Modular System)", MACHINE_IS_SKELETON )
+GAME( 199?, pspikesm, pspikes, pspikesm, pspikesm, pspikes_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Power Spikes (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

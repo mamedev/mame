@@ -35,7 +35,7 @@ int a2_13sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 	if (io.length(size))
 		return 0;
 
-	if (size != APPLE2_STD_TRACK_COUNT * 13 * 256)
+	if (size != APPLE2_STD_TRACK_COUNT * 13 * APPLE2_SECTOR_SIZE)
 		return 0;
 
 	return FIFID_SIZE;
@@ -49,11 +49,11 @@ bool a2_13sect_format::load(util::random_read &io, uint32_t form_factor, const s
 
 	image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 
-	int tracks = size / 13 / 256;
+	int tracks = size / 13 / APPLE2_SECTOR_SIZE;
 
 	for(int track = 0; track < tracks; track++) {
 		std::vector<uint32_t> track_data;
-		uint8_t sector_data[256 * 13];
+		uint8_t sector_data[APPLE2_SECTOR_SIZE * 13];
 
 		auto const [err, actual] = read_at(
 			io, track * sizeof sector_data, sector_data, sizeof sector_data);
@@ -89,7 +89,7 @@ bool a2_13sect_format::load(util::random_read &io, uint32_t form_factor, const s
 				pval = nval;
 			};
 
-			const uint8_t *sdata = sector_data + 256 * sector;
+			const uint8_t *sdata = sector_data + APPLE2_SECTOR_SIZE * sector;
 
 			// write 154 bytes encoding bits 2-0
 			write_data_byte(sdata[255] & 7);
@@ -218,16 +218,17 @@ int a2_16sect_format::identify(util::random_read &io, uint32_t form_factor, cons
 	if (io.length(size))
 		return 0;
 
-	//uint32_t expected_size = 35 * 16 * 256;
-	uint32_t expected_size = APPLE2_TRACK_COUNT * 16 * 256;
-
 	// check standard size plus some oddball sizes in our softlist
-	if ((size != expected_size) && (size != 35 * 16 * 256) && (size != 143403) && (size != 143363) && (size != 143358))
+	if (
+		size != APPLE2_TRACK_COUNT * 16 * APPLE2_SECTOR_SIZE
+		&& size != APPLE2_STD_TRACK_COUNT * 16 * APPLE2_SECTOR_SIZE
+		&& size != 143403 && size != 143363 && size != 143358 && size != 143195
+	)
 	{
 		return 0;
 	}
 
-	uint8_t sector_data[256*2];
+	uint8_t sector_data[APPLE2_SECTOR_SIZE*2];
 	static const unsigned char pascal_block1[4] = { 0x08, 0xa5, 0x0f, 0x29 };
 	static const unsigned char pascal2_block1[4] = { 0xff, 0xa2, 0x00, 0x8e };
 	static const unsigned char dos33_block1[4] = { 0xa2, 0x02, 0x8e, 0x52 };
@@ -304,18 +305,20 @@ bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const s
 
 	image.set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 
-	int tracks = (size == (40 * 16 * 256)) ? 40 : 35;
+	int tracks = (size == (APPLE2_TRACK_COUNT * 16 * APPLE2_SECTOR_SIZE)) ? APPLE2_TRACK_COUNT : APPLE2_STD_TRACK_COUNT;
 
 	int fpos = 0;
 	for(int track=0; track < tracks; track++) {
 		std::vector<uint32_t> track_data;
-		uint8_t sector_data[256*16];
+		uint8_t sector_data[APPLE2_SECTOR_SIZE*16];
 
 		auto const [err, actual] = read_at(io, fpos, sector_data, sizeof sector_data);
-		if (err || actual != sizeof sector_data)
+		// Some supported images have oddball sizes, where the last track is incomplete.
+		// Skip the `actual` check to avoid rejecting them.
+		if (err /* || actual != sizeof sector_data */)
 			return false;
 
-		fpos += 256*16;
+		fpos += APPLE2_SECTOR_SIZE*16;
 		for(int i=0; i<49; i++)
 			raw_w(track_data, 10, 0x3fc);
 		for(int i=0; i<16; i++) {
@@ -330,7 +333,7 @@ bool a2_16sect_format::load(util::random_read &io, uint32_t form_factor, const s
 				sector = dos_skewing[i];
 			}
 
-			const uint8_t *sdata = sector_data + 256 * sector;
+			const uint8_t *sdata = sector_data + APPLE2_SECTOR_SIZE * sector;
 			for(int j=0; j<20; j++)
 				raw_w(track_data, 10, 0x3fc);
 			raw_w(track_data,  8, 0xff);
@@ -393,34 +396,37 @@ uint8_t a2_16sect_format::gb(const std::vector<bool> &buf, int &pos, int &wrap)
 		return v;
 }
 
-//#define VERBOSE_SAVE
-
 bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
 	int g_tracks, g_heads;
 	int visualgrid[16][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
 
-// lenient addr check: if unset, only accept an addr mark if the checksum was good
-// if set, accept an addr mark if the track and sector values are both sane
-#undef LENIENT_ADDR_CHECK
-// if set, use the old, not as robust logic for choosing which copy of a decoded sector to write
-// to the resulting image if the sector has a bad checksum and/or postamble
-#undef USE_OLD_BEST_SECTOR_PRIORITY
-// nothing found
-#define NOTFOUND 0
-// address mark was found
-#define ADDRFOUND 1
-// address checksum is good
-#define ADDRGOOD 2
-// data mark was found (requires addrfound and sane values)
-#define DATAFOUND 4
-// data checksum is good
-#define DATAGOOD 8
-// data postamble is good
-#define DATAPOST 16
+	constexpr bool VERBOSE_SAVE = false;
+
+	// if false, only accept an addr mark if the checksum was good
+	// if true, accept an addr mark if the track and sector values are both sane
+	constexpr bool LENIENT_ADDR_CHECK = false;
+
+	// if true, use the old, not as robust logic for choosing which copy of a decoded sector to write
+	// to the resulting image if the sector has a bad checksum and/or postamble
+	constexpr bool USE_OLD_BEST_SECTOR_PRIORITY = false;
+
+	// nothing found
+	constexpr int NOTFOUND = 0;
+	// address mark was found
+	constexpr int ADDRFOUND = 1;
+	// address checksum is good
+	constexpr int ADDRGOOD = 2;
+	// data mark was found (requires addrfound and sane values)
+	constexpr int DATAFOUND = 4;
+	// data checksum is good
+	constexpr int DATAGOOD = 8;
+	// data postamble is good
+	constexpr int DATAPOST = 16;
+
 	for (auto & elem : visualgrid) {
 		for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
-			elem[j] = 0;
+			elem[j] = NOTFOUND;
 		}
 	}
 	image.get_actual_geometry(g_tracks, g_heads);
@@ -430,16 +436,16 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 	int pos_data = 0;
 
 	for(int track=0; track < g_tracks; track++) {
-		uint8_t sectdata[(256)*16];
+		uint8_t sectdata[APPLE2_SECTOR_SIZE*16];
 		memset(sectdata, 0, sizeof(sectdata));
 		int nsect = 16;
-		#ifdef VERBOSE_SAVE
-		fprintf(stderr,"DEBUG: a2_16sect_format::save() about to generate bitstream from track %d...", track);
-		#endif
+		if(VERBOSE_SAVE) {
+			fprintf(stderr,"DEBUG: a2_16sect_format::save() about to generate bitstream from track %d...", track);
+		}
 		auto buf = generate_bitstream_from_track(track, head, 3915, image);
-		#ifdef VERBOSE_SAVE
-		fprintf(stderr,"done.\n");
-		#endif
+		if(VERBOSE_SAVE) {
+			fprintf(stderr,"done.\n");
+		}
 		int pos = 0;
 		int wrap = 0;
 		int hb = 0;
@@ -471,19 +477,17 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 				uint8_t tr = gcr4_decode(h[2],h[3]);
 				uint8_t se = gcr4_decode(h[4],h[5]);
 				uint8_t chk = gcr4_decode(h[6],h[7]);
-				#ifdef VERBOSE_SAVE
-				uint32_t post = get_u24be(&h[8]);
-				printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n", vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
-				#endif
+				if(VERBOSE_SAVE) {
+					uint32_t post = get_u24be(&h[8]);
+					printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n",
+							vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
+				}
 				// sanity check
 				if (tr == track && se < nsect) {
-				visualgrid[se][track] |= ADDRFOUND;
-				visualgrid[se][track] |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
-#ifdef LENIENT_ADDR_CHECK
-				if ((visualgrid[se][track] & ADDRFOUND) == ADDRFOUND) {
-#else
-					if ((visualgrid[se][track] & ADDRGOOD) == ADDRGOOD) {
-#endif
+					visualgrid[se][track] |= ADDRFOUND;
+					visualgrid[se][track] |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
+
+					if (visualgrid[se][track] & (LENIENT_ADDR_CHECK ? ADDRFOUND : ADDRGOOD)) {
 						int opos = pos;
 						int owrap = wrap;
 						hb = 0;
@@ -509,11 +513,11 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 
 							if (m_prodos_order)
 							{
-								dest = sectdata+(256)*prodos_skewing[se];
+								dest = sectdata+APPLE2_SECTOR_SIZE*prodos_skewing[se];
 							}
 							else
 							{
-								dest = sectdata+(256)*dos_skewing[se];
+								dest = sectdata+APPLE2_SECTOR_SIZE*dos_skewing[se];
 							}
 
 							// first read in sector and decode to 6bit form
@@ -542,37 +546,38 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 							// but only write it if the bitfield of the track shows datagood is NOT set.
 							// if it is set we don't want to overwrite a guaranteed good read with a bad one
 							// if past read had a bad checksum or bad postamble...
-#ifndef USE_OLD_BEST_SECTOR_PRIORITY
-							if (((visualgrid[se][track]&DATAGOOD)==0)||((visualgrid[se][track]&DATAPOST)==0)) {
-								// if the current read is good, and postamble is good, write it in, no matter what.
-								// if the current read is good and the current postamble is bad, write it in unless the postamble was good before
-								// if the current read is bad and the current postamble is good and the previous read had neither good, write it in
-								// if the current read isn't good and neither is the postamble but nothing better
-								// has been written before, write it anyway.
-								if ( ((data[0x156] == c) && (dpost&0xFFFF00)==0xDEAA00) ||
-													(((data[0x156] == c) && (dpost&0xFFFF00)!=0xDEAA00) && ((visualgrid[se][track]&DATAPOST)==0)) ||
-													(((data[0x156] != c) && (dpost&0xFFFF00)==0xDEAA00) && (((visualgrid[se][track]&DATAGOOD)==0)&&(visualgrid[se][track]&DATAPOST)==0)) ||
-													(((data[0x156] != c) && (dpost&0xFFFF00)!=0xDEAA00) && (((visualgrid[se][track]&DATAGOOD)==0)&&(visualgrid[se][track]&DATAPOST)==0))
-													) {
+							if(USE_OLD_BEST_SECTOR_PRIORITY) {
+								if ((visualgrid[se][track]&DATAGOOD)==0) {
 									for(int i=0x56; i<0x156; i++) {
 										uint8_t dv = data[i];
 										*dest++ = dv;
 									}
 								}
-							}
-#else
-							if ((visualgrid[se][track]&DATAGOOD)==0) {
-								for(int i=0x56; i<0x156; i++) {
-									uint8_t dv = data[i];
-									*dest++ = dv;
+							} else {
+								if (((visualgrid[se][track]&DATAGOOD)==0)||((visualgrid[se][track]&DATAPOST)==0)) {
+									// if the current read is good, and postamble is good, write it in, no matter what.
+									// if the current read is good and the current postamble is bad, write it in unless the postamble was good before
+									// if the current read is bad and the current postamble is good and the previous read had neither good, write it in
+									// if the current read isn't good and neither is the postamble but nothing better
+									// has been written before, write it anyway.
+									if ( ((data[0x156] == c) && (dpost&0xFFFF00)==0xDEAA00) ||
+														(((data[0x156] == c) && (dpost&0xFFFF00)!=0xDEAA00) && ((visualgrid[se][track]&DATAPOST)==0)) ||
+														(((data[0x156] != c) && (dpost&0xFFFF00)==0xDEAA00) && (((visualgrid[se][track]&DATAGOOD)==0)&&(visualgrid[se][track]&DATAPOST)==0)) ||
+														(((data[0x156] != c) && (dpost&0xFFFF00)!=0xDEAA00) && (((visualgrid[se][track]&DATAGOOD)==0)&&(visualgrid[se][track]&DATAPOST)==0))
+														) {
+										for(int i=0x56; i<0x156; i++) {
+											uint8_t dv = data[i];
+											*dest++ = dv;
+										}
+									}
 								}
 							}
-#endif
 							// do some checking
-							#ifdef VERBOSE_SAVE
-							if ((data[0x156] != c) || (dpost&0xFFFF00)!=0xDEAA00)
-								fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n", data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
-							#endif
+							if(VERBOSE_SAVE) {
+								if ((data[0x156] != c) || (dpost&0xFFFF00)!=0xDEAA00)
+									fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n",
+											data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
+							}
 							if (data[0x156] == c) visualgrid[se][track] |= DATAGOOD;
 							if ((dpost&0xFFFF00)==0xDEAA00) visualgrid[se][track] |= DATAPOST;
 						} else if ((hb == 4)&&(dosver == 1)) {
@@ -590,33 +595,33 @@ bool a2_16sect_format::save(util::random_read_write &io, const std::vector<uint3
 		}
 		for(int i=0; i<nsect; i++) {
 			//if(nsect>0) printf("t%d,", track);
-			uint8_t const *const data = sectdata + (256)*i;
-			auto const [err, actual] = write_at(io, pos_data, data, 256);
-			if (err || actual != 256)
+			uint8_t const *const data = sectdata + APPLE2_SECTOR_SIZE*i;
+			auto const [err, actual] = write_at(io, pos_data, data, APPLE2_SECTOR_SIZE);
+			if (err || actual != APPLE2_SECTOR_SIZE)
 				return false;
-			pos_data += 256;
+			pos_data += APPLE2_SECTOR_SIZE;
 		}
 		//printf("\n");
 	}
 	// display a little table of which sectors decoded ok
-	#ifdef VERBOSE_SAVE
-	int total_good = 0;
-	for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
-		printf("T%2d: ",j);
-		for (int i = 0; i < 16; i++) {
-			if (visualgrid[i][j] == NOTFOUND) printf("-NF- ");
-			else {
-				if (visualgrid[i][j] & ADDRFOUND) printf("a"); else printf(" ");
-				if (visualgrid[i][j] & ADDRGOOD) printf("A"); else printf(" ");
-				if (visualgrid[i][j] & DATAFOUND) printf("d"); else printf(" ");
-				if (visualgrid[i][j] & DATAGOOD) { printf("D"); total_good++; } else printf(" ");
-				if (visualgrid[i][j] & DATAPOST) printf("."); else printf(" ");
+	if(VERBOSE_SAVE) {
+		int total_good = 0;
+		for (int j = 0; j < APPLE2_TRACK_COUNT; j++) {
+			printf("T%2d: ",j);
+			for (int i = 0; i < 16; i++) {
+				if (visualgrid[i][j] == NOTFOUND) printf("-NF- ");
+				else {
+					if (visualgrid[i][j] & ADDRFOUND) printf("a"); else printf(" ");
+					if (visualgrid[i][j] & ADDRGOOD) printf("A"); else printf(" ");
+					if (visualgrid[i][j] & DATAFOUND) printf("d"); else printf(" ");
+					if (visualgrid[i][j] & DATAGOOD) { printf("D"); total_good++; } else printf(" ");
+					if (visualgrid[i][j] & DATAPOST) printf("."); else printf(" ");
+				}
 			}
+			printf("\n");
 		}
-		printf("\n");
+		printf("Total Good Sectors: %d\n", total_good);
 	}
-	printf("Total Good Sectors: %d\n", total_good);
-	#endif
 
 	return true;
 }
@@ -1407,7 +1412,7 @@ bool a2_nib_format::load(util::random_read &io, uint32_t form_factor, const std:
 	if (size != expected_size_35t && size != expected_size_40t)
 		return false;
 
-	const auto nr_tracks = size == expected_size_35t? 35 : 40;
+	const auto nr_tracks = size / nibbles_per_track;
 
 	std::vector<uint8_t> nibbles(nibbles_per_track);
 	for (unsigned track = 0; track < nr_tracks; ++track) {

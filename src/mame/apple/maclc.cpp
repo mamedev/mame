@@ -480,7 +480,9 @@ void maclc_state::maccclas(machine_config &config)
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
 	m_cuda->via_data_callback().set(m_v8, FUNC(v8_device::cb2_w));
+	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	SPICE(config.replace(), m_v8, C15M);
@@ -518,12 +520,14 @@ void maclc_state::mactv(machine_config &config)
 	config.device_remove("fdc");
 
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
-	m_cuda->set_default_bios_tag("341s0788");   // TODO: 0789 freezes during boot, possible VIA bug or 6522/6523 difference?
+	m_cuda->set_default_bios_tag("341s0789");
 	m_cuda->reset_callback().set(FUNC(maclc_state::egret_reset_w));
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_v8, FUNC(v8_device::cb1_w));
 	m_cuda->via_data_callback().set(m_v8, FUNC(v8_device::cb2_w));
+	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	TINKERBELL(config.replace(), m_v8, C15M);

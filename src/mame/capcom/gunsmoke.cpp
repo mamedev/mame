@@ -139,8 +139,8 @@ private:
 	uint8_t protection_r(offs_t offset);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	void c804_w(uint8_t data);
-	void d806_w(uint8_t data);
+	void control_w(uint8_t data);
+	void layer_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void palette(palette_device &palette) const;
@@ -218,7 +218,7 @@ void gunsmoke_state::colorram_w(offs_t offset, uint8_t data)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-void gunsmoke_state::c804_w(uint8_t data)
+void gunsmoke_state::control_w(uint8_t data)
 {
 	// bits 0 and 1 are for coin counters
 	machine().bookkeeping().coin_counter_w(1, data & 0x01);
@@ -236,7 +236,7 @@ void gunsmoke_state::c804_w(uint8_t data)
 	m_chon = data & 0x80;
 }
 
-void gunsmoke_state::d806_w(uint8_t data)
+void gunsmoke_state::layer_w(uint8_t data)
 {
 	// bits 0-2 select the sprite 3 bank
 	m_sprite3bank = data & 0x07;
@@ -371,13 +371,13 @@ void gunsmoke_state::main_map(address_map &map)
 	map(0xc004, 0xc004).portr("DSW2");
 	map(0xc4c9, 0xc4cb).r(FUNC(gunsmoke_state::protection_r));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(FUNC(gunsmoke_state::c804_w));  // ROM bank switch, screen flip
+	map(0xc804, 0xc804).w(FUNC(gunsmoke_state::control_w));  // ROM bank switch, screen flip
 	// 0xc806 DMA trigger (not emulated)
 	map(0xd000, 0xd3ff).ram().w(FUNC(gunsmoke_state::videoram_w)).share(m_videoram);
 	map(0xd400, 0xd7ff).ram().w(FUNC(gunsmoke_state::colorram_w)).share(m_colorram);
 	map(0xd800, 0xd801).ram().share(m_scrollx);
 	map(0xd802, 0xd802).ram().share(m_scrolly);
-	map(0xd806, 0xd806).w(FUNC(gunsmoke_state::d806_w));  // sprites and bg enable
+	map(0xd806, 0xd806).w(FUNC(gunsmoke_state::layer_w));  // sprites and bg enable
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xffff).ram().share(m_spriteram);
 }

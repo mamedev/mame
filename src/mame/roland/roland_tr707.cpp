@@ -202,5 +202,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1985, tr707, 0, 0, tr707, tr707, roland_tr707_state, empty_init, "Roland", "TR-707 Rhythm Composer", MACHINE_IS_SKELETON)
-SYST(1985, tr727, 0, 0, tr707, tr707, roland_tr707_state, empty_init, "Roland", "TR-727 Rhythm Composer", MACHINE_IS_SKELETON)
+SYST(1985, tr707, 0, 0, tr707, tr707, roland_tr707_state, empty_init, "Roland", "TR-707 Rhythm Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1985, tr727, 0, 0, tr707, tr707, roland_tr707_state, empty_init, "Roland", "TR-727 Rhythm Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

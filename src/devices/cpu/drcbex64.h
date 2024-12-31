@@ -135,6 +135,7 @@ private:
 	void op_mapvar(asmjit::x86::Assembler &a, const uml::instruction &inst);
 
 	void op_nop(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_break(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_debug(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_exit(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_hashjmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
@@ -149,6 +150,7 @@ private:
 	void op_getfmod(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_getexp(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_getflgs(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_setflgs(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_save(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_restore(asmjit::x86::Assembler &a, const uml::instruction &inst);
 
@@ -171,7 +173,9 @@ private:
 	void op_subc(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_cmp(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_mulu(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mululw(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_muls(asmjit::x86::Assembler &a, const uml::instruction &inst);
+	void op_mulslw(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_divu(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_divs(asmjit::x86::Assembler &a, const uml::instruction &inst);
 	void op_and(asmjit::x86::Assembler &a, const uml::instruction &inst);
@@ -208,7 +212,7 @@ private:
 	// alu and shift operation helpers
 	static bool ones(u64 const value, unsigned const size) noexcept { return (size == 4) ? u32(value) == 0xffffffffU : value == 0xffffffff'ffffffffULL; }
 	void alu_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, asmjit::Operand const &dst, be_parameter const &param, std::function<bool(asmjit::x86::Assembler &a, asmjit::Operand const &dst, be_parameter const &src)> optimize = [](asmjit::x86::Assembler &a, asmjit::Operand dst, be_parameter const &src) { return false; });
-	void shift_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, asmjit::Operand const &dst, be_parameter const &param);
+	void shift_op_param(asmjit::x86::Assembler &a, asmjit::x86::Inst::Id const opcode, size_t opsize, asmjit::Operand const &dst, be_parameter const &param, bool update_flags);
 
 	// parameter helpers
 	void mov_reg_param(asmjit::x86::Assembler &a, asmjit::x86::Gp const &reg, be_parameter const &param, bool const keepflags = false);
@@ -224,6 +228,10 @@ private:
 	void movss_p32_r128(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Xmm const &reg);
 	void movsd_r128_p64(asmjit::x86::Assembler &a, asmjit::x86::Xmm const &reg, be_parameter const &param);
 	void movsd_p64_r128(asmjit::x86::Assembler &a, be_parameter const &param, asmjit::x86::Xmm const &reg);
+
+	void calculate_status_flags(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::Operand const &dst, u8 flags);
+	void calculate_status_flags_mul(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo, asmjit::x86::Gp const &hi);
+	void calculate_status_flags_mul_low(asmjit::x86::Assembler &a, uint32_t instsize, asmjit::x86::Gp const &lo);
 
 	size_t emit(asmjit::CodeHolder &ch);
 

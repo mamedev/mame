@@ -10,8 +10,8 @@
 
 *****************************************************************************/
 
-#ifndef MAME_BUS_TI99_PEB_CORCOMP_H
-#define MAME_BUS_TI99_PEB_CORCOMP_H
+#ifndef MAME_BUS_TI99_PEB_CC_FDC_H
+#define MAME_BUS_TI99_PEB_CC_FDC_H
 
 #pragma once
 
@@ -246,4 +246,4 @@ DECLARE_DEVICE_TYPE_NS(CCDCC_PALU1, bus::ti99::peb, ccdcc_palu1_device)
 DECLARE_DEVICE_TYPE_NS(CCFDC_PALU12, bus::ti99::peb, ccfdc_palu12_device)
 DECLARE_DEVICE_TYPE_NS(CCFDC_PALU6, bus::ti99::peb, ccfdc_palu6_device)
 
-#endif // MAME_BUS_TI99_PEB_CORCOMP_H
+#endif // MAME_BUS_TI99_PEB_CC_FDC_H

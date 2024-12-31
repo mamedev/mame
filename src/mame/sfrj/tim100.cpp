@@ -248,4 +248,4 @@ ROM_END
 
 } // Anonymous namespace
 
-COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, empty_init, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, empty_init, "Mihajlo Pupin Institute", "TIM-100", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

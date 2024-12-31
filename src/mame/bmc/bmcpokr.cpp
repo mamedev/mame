@@ -1143,17 +1143,14 @@ void bmcpokr_state::machine_start()
 
 void bmcpokr_state::bmcpokr(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(42'000'000) / 4); // 68000 @10.50MHz (42/4)
+	M68000(config, m_maincpu, 42_MHz_XTAL / 4); // 68000 @10.50MHz (42/4)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmcpokr_state::bmcpokr_mem);
 
 	TIMER(config, "scantimer", 0).configure_scanline(FUNC(bmcpokr_state::interrupt), "screen", 0, 1);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh(HZ_TO_ATTOSECONDS(58.935)); // HSync - 15.440kHz, VSync - 58.935Hz
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_raw(42_MHz_XTAL / 4, 680, 0, 480, 262, 0, 240); // HSync - 15.440kHz, VSync - 58.935Hz
 	screen.set_screen_update(FUNC(bmcpokr_state::screen_update));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 60*8-1, 0*8, 30*8-1);
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(256);
@@ -1169,9 +1166,9 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", XTAL(42'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 1.00); // UM3567 @3.50MHz (42/12)
+	YM2413(config, "ymsnd", 42_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.00); // UM3567 @3.50MHz (42/12)
 
-	OKIM6295(config, "oki", XTAL(42'000'000) / 40, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); // M6295 @1.05MHz (42/40)
+	OKIM6295(config, "oki", 42_MHz_XTAL / 40, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); // M6295 @1.05MHz (42/40)
 }
 
 void bmcpokr_state::fengyunh(machine_config &config)

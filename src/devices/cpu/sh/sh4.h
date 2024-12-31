@@ -10,8 +10,8 @@
  *
  *****************************************************************************/
 
-#ifndef MAME_CPU_SH4_SH4_H
-#define MAME_CPU_SH4_SH4_H
+#ifndef MAME_CPU_SH_SH4_H
+#define MAME_CPU_SH_SH4_H
 
 #pragma once
 
@@ -807,5 +807,4 @@ DECLARE_DEVICE_TYPE(SH3BE, sh3be_device)
 DECLARE_DEVICE_TYPE(SH4LE, sh4_device)
 DECLARE_DEVICE_TYPE(SH4BE, sh4be_device)
 
-
-#endif // MAME_CPU_SH4_SH4_H
+#endif // MAME_CPU_SH_SH4_H

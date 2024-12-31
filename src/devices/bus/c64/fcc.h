@@ -12,7 +12,7 @@
 #pragma once
 
 #include "exp.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "machine/gen_latch.h"
 
 
@@ -48,7 +48,7 @@ protected:
 	virtual void c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
 
 private:
-	required_device<m65sc02_device> m_maincpu;
+	required_device<g65sc02_device> m_maincpu;
 	required_device<generic_latch_8_device> m_mainlatch;
 	required_device<generic_latch_8_device> m_sublatch;
 

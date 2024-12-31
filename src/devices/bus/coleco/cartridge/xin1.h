@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_COLECO_XIN1_H
-#define MAME_BUS_COLECO_XIN1_H
+#ifndef MAME_BUS_COLECO_CARTRIDGE_XIN1_H
+#define MAME_BUS_COLECO_CARTRIDGE_XIN1_H
 
 #pragma once
 
@@ -44,5 +44,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(COLECOVISION_XIN1, colecovision_xin1_cartridge_device)
 
-
-#endif // MAME_BUS_COLECO_XIN1_H
+#endif // MAME_BUS_COLECO_CARTRIDGE_XIN1_H

@@ -37,10 +37,12 @@ Tomasz Slanina 20050225
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -52,8 +54,8 @@ namespace {
 class vroulet_state : public driver_device
 {
 public:
-	vroulet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	vroulet_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -63,6 +65,9 @@ public:
 		m_ball(*this, "ball") { }
 
 	void vroulet(machine_config &config);
+
+protected:
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -85,8 +90,6 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	virtual void video_start() override ATTR_COLD;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vroulet_io_map(address_map &map) ATTR_COLD;
 	void vroulet_map(address_map &map) ATTR_COLD;
@@ -95,7 +98,6 @@ private:
 
 /* video */
 
-
 void vroulet_state::paletteram_w(offs_t offset, uint8_t data)
 {
 	/*
@@ -103,15 +105,15 @@ void vroulet_state::paletteram_w(offs_t offset, uint8_t data)
 	 but... each palette has 8 colors only, not 16 as expected...
 	*/
 
-	int i,j,a,b;
 	m_generic_paletteram_8[offset]=data;
-	for(i=0;i<32;i++)
+
+	for (int i = 0; i < 32; i++)
 	{
-		for(j=0;j<16;j++)
+		for (int j = 0; j < 16; j++)
 		{
-			a=m_generic_paletteram_8[((i*8+j)*2)&0xff ];
-			b=m_generic_paletteram_8[((i*8+j)*2+1)&0xff ];
-			m_palette->set_pen_color(i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
+			int a = m_generic_paletteram_8[((i * 8 + j) * 2) & 0xff];
+			int b = m_generic_paletteram_8[((i * 8 + j) * 2 + 1) & 0xff];
+			m_palette->set_pen_color(i * 16 + j, pal4bit(b), pal4bit(b >> 4), pal4bit(a));
 		}
 	}
 }
@@ -151,6 +153,7 @@ uint32_t vroulet_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, 0x320, 1, 0, 0,
 		m_ball[1], m_ball[0] - 12, 0);
+
 	return 0;
 }
 
@@ -271,21 +274,21 @@ static const gfx_layout charlayout =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( gfx_vroulet )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,    0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 32 )
 GFXDECODE_END
 
 /* PPI8255 Interface */
 
-void vroulet_state::ppi8255_a_w(uint8_t data) {}// watchdog ?
-void vroulet_state::ppi8255_b_w(uint8_t data) {}// lamps ?
-void vroulet_state::ppi8255_c_w(uint8_t data) {}
+void vroulet_state::ppi8255_a_w(uint8_t data) { } // watchdog ?
+void vroulet_state::ppi8255_b_w(uint8_t data) { } // lamps ?
+void vroulet_state::ppi8255_c_w(uint8_t data) { }
 
 /* Machine Driver */
 
 void vroulet_state::vroulet(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4000000);   //???
+	Z80(config, m_maincpu, 4000000); // ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &vroulet_state::vroulet_map);
 	m_maincpu->set_addrmap(AS_IO, &vroulet_state::vroulet_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vroulet_state::irq0_line_hold));

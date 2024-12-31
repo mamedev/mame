@@ -18,6 +18,9 @@
 class a2_video_device : public device_t, public device_palette_interface, public device_video_interface
 {
 public:
+	// Models with different text-mode behavior. II includes the II+ and IIE includes the IIc and IIc Plus.
+	enum class model { II, IIE, IIGS, II_J_PLUS, IVEL_ULTRA };
+
 	// construction/destruction
 	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -51,15 +54,17 @@ public:
 	void set_GS_monochrome(u8 mono) { m_monochrome = mono; }
 	void set_GS_foreground(u8 fg)   { m_GSfg = fg; }
 	void set_GS_background(u8 bg)   { m_GSbg = bg; }
-	const u8 get_GS_border()        { return m_GSborder; }
+	u8 get_GS_border()              { return m_GSborder; }
 	void set_GS_border(u8 border)   { m_GSborder = border; }
 	const u8 get_newvideo()         { return m_newvideo; }
 	void set_newvideo(u8 newvideo)  { m_newvideo = newvideo; }
+	u8 get_GS_langsel()             { return m_GS_langsel; }
+	u8 get_GS_language()            { return (m_GS_langsel >> 5) & 0x07; }
+	bool is_pal_video_mode()        { return (m_GS_langsel >> 4) & 0x01; }
+	bool get_language_switch()      { return (m_GS_langsel >> 3) & 0x01; }
+	void set_GS_langsel(u8 langsel) { m_GS_langsel = langsel; }
 	void set_SHR_color(u8 color, u32 rgb) { m_shr_palette[color] = rgb; }
 	void set_GS_border_color(u8 color, u32 rgb) { m_GSborder_colors[color] = rgb; }
-
-	// Models with different text-mode behavior. II includes the II+ and IIE includes the IIc and IIc Plus.
-	enum class model { II, IIE, IIGS, II_J_PLUS, IVEL_ULTRA };
 
 	void set_ram_pointers(u8 *main, u8 *aux)    { m_ram_ptr = main; m_aux_ptr = aux; }
 	void set_aux_mask(u16 aux_mask)             { m_aux_mask = aux_mask; }
@@ -70,6 +75,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint32_t screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void set_iie_langsw(u8 iie_langsw) { m_iie_langsw = iie_langsw; }
+	u8 get_iie_langsw() const { return m_iie_langsw; }
 
 protected:
 	a2_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -120,7 +128,8 @@ private:
 	bool m_an2 = false;
 	bool m_80store = false;
 	bool m_monohgr = false;
-	u8 m_GSfg = 0, m_GSbg = 0, m_GSborder = 0, m_newvideo = 0, m_monochrome = 0, m_rgbmode = 0;
+	u8 m_GSfg = 0, m_GSbg = 0, m_GSborder = 0, m_newvideo = 0, m_GS_langsel = 0, m_monochrome = 0, m_rgbmode = 0;
+	u8 m_iie_langsw = 0; // language switch/modification on IIe/IIc/IIc+ and clones
 	optional_ioport m_vidconfig;
 };
 

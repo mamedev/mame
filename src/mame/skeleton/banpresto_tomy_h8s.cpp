@@ -21,21 +21,25 @@ The main components are:
 The BPSC-2006KG PCB adds a TPA3004D2 audio amplifier.
 
 
+** means not dumped
 *** means not dumped nor identified
 
 Banpresto "Chara Medal Island" series:
     BP-01 - Crayon Shin-chan - Arashi o Yobu! Sushitori Daigassen - クレヨンしんちゃん 嵐を呼ぶ！すし取り大合戦
-*** BP-02 - ??? - ???
+**  BP-02 - Pocket Monster - Sonans ga Koronda! - ポケットモンスター ソーナンスがころんだ！
     BP-03 - Dragon Ball Z - Bucchigiri no Chou Kessen - ドラゴンボールZ ぶっちぎりの超決戦
-*** BP-04 - ??? - ???
+*** BP-04 - ??? - ??? (possibly Eye Shield 21 - Nerae!! Gyakuten Touchdown - アイシールド21 狙え!!逆転タッチダウン)
     BP-05 - Chibi Maruko-chan - Wanage de Asobo!! - ちびまる子ちゃん輪投げで遊ぼ!!
+**  BP-06 - Doraemon - SOS! Itazura Nezumi wo Yattsukero!! - ドラえもん SOS!いたずらネズミをやっつけろ!!
+**  BP-07 - GeGeGe no Kitarou - Taose! Seiyou Youkai Gundan - ゲゲゲの鬼太郎 倒せ！西洋妖怪軍団
+**  BP-08 - Keroro Gunsou - Hacha Mecha Yakyu Taikai de Arimasu!! - ケロロ軍曹 ハチャメチャ野球大会であります!!
 almost surely more
 
 Takara / Tomy "VS medal" series (games show produced by Amodio and Tomy copyright on title screen):
-*** TM-01 - ??? - ???
-*** TM-02 - ??? - ???
-    TM-03 - Zoids (may not be complete title) - ゾイド
-*** TM-04 - ??? - ???
+**  TM-01 - Kurohige Kiki Ippatsu - 黒ひげ危機一発
+**  TM-02 - Tomica - トミカ
+    TM-03 - Zoids - ゾイド
+**  TM-04 - Keitei-oh - 海帝王
     TM-05 - Youkai VS Uchuujin - 妖怪ＶＳ宇宙人
     TM-06 - Satoyama Grand Prix - 里山グランプリ
     TM-07 - Ginga Yakyu - 銀河野球
@@ -229,12 +233,12 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2006, cscaoysd, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Crayon Shin-chan - Arashi o Yobu! Sushitori Daigassen", MACHINE_IS_SKELETON )
-GAME( 2006, dbzbgck,  0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Dragon Ball Z - Bucchigiri no Chou Kessen",             MACHINE_IS_SKELETON )
-GAME( 2007, cmcwa,    0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Chibi Maruko-chan - Wanage de Asobo!!",                 MACHINE_IS_SKELETON )
-GAME( 2005, zoids,    0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Zoids",                                                 MACHINE_IS_SKELETON ) // title to be verified
-GAME( 2007, youkai,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Youkai VS Uchuujin",                                    MACHINE_IS_SKELETON )
-GAME( 2007, satoyama, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Satoyama Grand Prix",                                   MACHINE_IS_SKELETON )
-GAME( 2007, gyakyu,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Ginga Yakyu",                                           MACHINE_IS_SKELETON )
-GAME( 2007, yujogs,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Yujo Gattai Shishigami-o",                              MACHINE_IS_SKELETON ) // title to be verified, inferred from some strings related to characters
-GAME( 200?, unkbpmed, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "unknown Banpresto medal game",                          MACHINE_IS_SKELETON )
+GAME( 2006, cscaoysd, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Crayon Shin-chan - Arashi o Yobu! Sushitori Daigassen", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, dbzbgck,  0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Dragon Ball Z - Bucchigiri no Chou Kessen",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, cmcwa,    0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Chibi Maruko-chan - Wanage de Asobo!!",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, zoids,    0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Zoids",                                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // title to be verified
+GAME( 2007, youkai,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Youkai VS Uchuujin",                                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, satoyama, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Satoyama Grand Prix",                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, gyakyu,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Ginga Yakyu",                                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, yujogs,   0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Amodio / Tomy", "Yujo Gattai Shishigami-o",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // title to be verified, inferred from some strings related to characters
+GAME( 200?, unkbpmed, 0, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "unknown Banpresto medal game",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

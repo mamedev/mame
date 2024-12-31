@@ -17,7 +17,6 @@
 #define COLOR(gfxn,offs) (m_gfxdecode->gfx(gfxn)->colorbase() + offs)
 
 
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -25,6 +24,7 @@
   Zarzon has a different PROM layout from the others.
 
 ***************************************************************************/
+
 void snk6502_state::snk6502_palette(palette_device &palette)
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -56,7 +56,7 @@ void snk6502_state::snk6502_palette(palette_device &palette)
 		m_palette_val[i] = rgb_t(r, g, b);
 	}
 
-	m_backcolor = 0;    // background color can be changed by the game
+	m_backcolor = 0; // background color can be changed by the game
 
 	for (int i = 0; i < TOTAL_COLORS(0); i++)
 		palette.set_pen_color(COLOR(0, i), m_palette_val[i]);
@@ -102,7 +102,6 @@ void snk6502_state::charram_w(offs_t offset, uint8_t data)
 void snk6502_state::flipscreen_w(uint8_t data)
 {
 	/* bits 0-2 select background color */
-
 	if (m_backcolor != (data & 7))
 	{
 		m_backcolor = data & 7;
@@ -112,7 +111,6 @@ void snk6502_state::flipscreen_w(uint8_t data)
 	}
 
 	/* bit 3 selects char bank */
-
 	int bank = (~data & 0x08) >> 3;
 
 	if (m_charbank != bank)
@@ -122,7 +120,6 @@ void snk6502_state::flipscreen_w(uint8_t data)
 	}
 
 	/* bit 7 flips screen */
-
 	if (flip_screen() != (data & 0x80))
 	{
 		flip_screen_set(data & 0x80);
@@ -228,7 +225,7 @@ void snk6502_state::satansat_palette(palette_device &palette)
 		m_palette_val[i] = rgb_t(r, g, b);
 	}
 
-	m_backcolor = 0;    // background color can be changed by the game
+	m_backcolor = 0; // background color can be changed by the game
 
 	for (int i = 0; i < TOTAL_COLORS(0); i++)
 		palette.set_pen_color(COLOR(0, i), m_palette_val[4 * (i % 4) + (i / 4)]);
@@ -245,7 +242,6 @@ void snk6502_state::satansat_palette(palette_device &palette)
 void snk6502_state::satansat_b002_w(uint8_t data)
 {
 	/* bit 0 flips screen */
-
 	if (flip_screen() != (data & 0x01))
 	{
 		flip_screen_set(data & 0x01);
@@ -261,7 +257,6 @@ void snk6502_state::satansat_b002_w(uint8_t data)
 void snk6502_state::satansat_backcolor_w(uint8_t data)
 {
 	/* bits 0-1 select background color. Other bits unused. */
-
 	if (m_backcolor != (data & 0x03))
 	{
 		m_backcolor = data & 0x03;

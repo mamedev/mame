@@ -321,12 +321,20 @@ void wd90c00_vga_device::device_reset()
 	m_pr10_scratch = 0;
 	m_ext_crtc_read_unlock = false;
 	m_ext_crtc_write_unlock = false;
-	// egasw
-	m_pr11 = (m_cnf15_read_cb() << 7) | (m_cnf14_read_cb() << 6) | m_cnf13_read_cb() << 5 | m_cnf12_read_cb() << 4;
 	m_interlace_start = 0;
 	m_interlace_end = 0;
 	m_interlace_mode = false;
 	m_pr15 = 0;
+}
+
+// Make sure fetching happens in setup mode
+// macpb180c reads then writes 0xf4 to PR11 when waking up from sleep or restart
+// (the intention is locking VCLK), assume config refetch happening here.
+void wd90c00_vga_device::enter_setup_mode()
+{
+	vga_device::enter_setup_mode();
+	// egasw
+	m_pr11 = (m_cnf15_read_cb() << 7) | (m_cnf14_read_cb() << 6) | m_cnf13_read_cb() << 5 | m_cnf12_read_cb() << 4;
 }
 
 ioport_value wd90c00_vga_device::egasw1_r() { return BIT(m_pr11, 4); }
@@ -347,9 +355,12 @@ ioport_constructor wd90c00_vga_device::device_input_ports() const
 	return INPUT_PORTS_NAME(paradise_vga_sense);
 }
 
+// NOTE: make sure that PR10 just unlocks PR11~PR17 for wd90c26
+// (that has different unlock mechanism for flat panel regs)
+// TODO: 'C11 and beyond are unchecked.
 u8 wd90c00_vga_device::crtc_data_r(offs_t offset)
 {
-	if (!m_ext_crtc_read_unlock && vga.crtc.index >= 0x2a && !machine().side_effects_disabled())
+	if (!m_ext_crtc_read_unlock && vga.crtc.index >= 0x2a && vga.crtc.index <= 0x30 && !machine().side_effects_disabled())
 	{
 		LOGLOCKED("Attempt to read ext. CRTC register offset %02x while locked\n", vga.crtc.index);
 		return 0xff;
@@ -359,7 +370,7 @@ u8 wd90c00_vga_device::crtc_data_r(offs_t offset)
 
 void wd90c00_vga_device::crtc_data_w(offs_t offset, u8 data)
 {
-	if (!m_ext_crtc_write_unlock && vga.crtc.index >= 0x2a && !machine().side_effects_disabled())
+	if (!m_ext_crtc_write_unlock && vga.crtc.index >= 0x2a && vga.crtc.index <= 0x30 && !machine().side_effects_disabled())
 	{
 		LOGLOCKED("Attempt to write ext. CRTC register offset [%02x] <- %02x while locked\n", vga.crtc.index, data);
 		return;
@@ -426,7 +437,7 @@ void wd90c00_vga_device::ext_crtc_unlock_w(offs_t offset, u8 data)
 {
 	m_ext_crtc_read_unlock = (data & 0x88) == 0x80;
 	m_ext_crtc_write_unlock = (data & 0x7) == 5;
-	LOGLOCKED("PR10 read %s write %s state (%02x)\n"
+	LOGLOCKED("PR10 CRTC read %s write %s state (%02x)\n"
 		, m_ext_crtc_read_unlock ? "unlock" : "lock"
 		, m_ext_crtc_write_unlock ? "unlock" : "lock"
 		, data

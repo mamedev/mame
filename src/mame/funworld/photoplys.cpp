@@ -75,4 +75,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 2001, photoply2k1sp, 0, photoplays, photoplays, photoplays_state, empty_init, ROT0, "Funworld", "Photo Play 2001 (Spanish)", MACHINE_IS_SKELETON )
+GAME( 2001, photoply2k1sp, 0, photoplays, photoplays, photoplays_state, empty_init, ROT0, "Funworld", "Photo Play 2001 (Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

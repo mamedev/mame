@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont,Kevin Horton
-#ifndef MAME_BUS_CBUS_MPU401_H
-#define MAME_BUS_CBUS_MPU401_H
+#ifndef MAME_BUS_CBUS_MPU_PC98_H
+#define MAME_BUS_CBUS_MPU_PC98_H
 
 #pragma once
 
@@ -42,4 +42,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MPU_PC98, mpu_pc98_device)
 
-#endif // MAME_BUS_CBUS_MPU401_H
+#endif // MAME_BUS_CBUS_MPU_PC98_H

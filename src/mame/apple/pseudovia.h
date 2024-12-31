@@ -29,6 +29,7 @@ public:
 	void vbl_irq_w(int state);
 	void scc_irq_w(int state);
 	void asc_irq_w(int state);
+	void scsi_irq_w(int state);
 
 protected:
 	// device-level overrides

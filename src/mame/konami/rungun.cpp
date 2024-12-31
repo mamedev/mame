@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-/*************************************************************************
+/*******************************************************************************
 
    Run and Gun / Slam Dunk
    (c) 1993 Konami
@@ -15,13 +15,16 @@
    should be fine.
 
    Known Issues:
-   - CRTC and video registers needs syncronization with current video draw state, it's very noticeable if for example scroll values are in very different states between screens.
-   - Current draw state could be improved optimization-wise (for example by supporting it in the core in some way).
+   - CRTC and video registers needs syncronization with current video draw state,
+     it's very noticeable if for example scroll values are in very different states
+     between screens.
+   - Current draw state could be improved optimization-wise (for example by supporting
+     it in the core in some way).
    - sprite palettes are not entirely right (fixed?)
    - sound volume mixing, handtune with set_gain() with m_k054539 devices.
      Also notice that "volume" in sound options is for k054539_1 (SFX)
 
-*************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -53,8 +56,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_k054539_1(*this, "k054539_1"),
-		m_k054539_2(*this, "k054539_2"),
+		m_k054539(*this, "k054539_%u", 0),
 		m_k053936(*this, "k053936"),
 		m_k055673(*this, "k055673"),
 		m_k053252(*this, "k053252"),
@@ -84,8 +86,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<k054539_device> m_k054539_1;
-	required_device<k054539_device> m_k054539_2;
+	required_device_array<k054539_device, 2> m_k054539;
 	required_device<k053936_device> m_k053936;
 	required_device<k055673_device> m_k055673;
 	required_device<k053252_device> m_k053252;
@@ -110,23 +111,23 @@ private:
 	tilemap_t   *m_ttl_tilemap[2]{};
 	tilemap_t   *m_936_tilemap[2]{};
 	std::unique_ptr<uint16_t[]> m_psac2_vram;
-	std::unique_ptr<uint16_t[]>    m_ttl_vram;
-	std::unique_ptr<uint16_t[]>   m_pal_ram;
-	uint8_t       m_current_display_bank = 0;
+	std::unique_ptr<uint16_t[]> m_ttl_vram;
+	std::unique_ptr<uint16_t[]> m_pal_ram;
+	uint8_t     m_current_display_bank = 0;
 	int         m_ttl_gfx_index = 0;
 	int         m_sprite_colorbase = 0;
 
-	uint8_t       *m_roz_rom = nullptr;
-	uint8_t       m_roz_rombase = 0;
+	uint8_t     *m_roz_rom = nullptr;
+	uint8_t     m_roz_rombase = 0;
 
 	/* sound */
-	uint8_t       m_sound_ctrl = 0;
-	uint8_t       m_sound_nmi_clk = 0;
+	uint8_t     m_sound_ctrl = 0;
+	uint8_t     m_sound_nmi_clk = 0;
 
 	bool        m_video_priority_mode = false;
 	std::unique_ptr<uint16_t[]> m_banked_ram;
 	bool        m_single_screen_mode = false;
-	uint8_t       m_video_mux_bank = 0;
+	uint8_t     m_video_mux_bank = 0;
 
 	uint16_t sysregs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -140,9 +141,8 @@ private:
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
 	void k054539_nmi_gen(int state);
-	uint16_t palette_read(offs_t offset);
-	void palette_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
+	uint16_t palette_r(offs_t offset);
+	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	K055673_CB_MEMBER(sprite_callback);
 
@@ -152,7 +152,7 @@ private:
 	uint32_t screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	bitmap_ind16 m_rng_dual_demultiplex_left_temp;
 	bitmap_ind16 m_rng_dual_demultiplex_right_temp;
-	void   sprite_dma_trigger(void);
+	void sprite_dma_trigger(void);
 
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
 
@@ -182,10 +182,11 @@ uint16_t rungun_state::sysregs_r(offs_t offset, uint16_t mem_mask)
 			*/
 			{
 				uint8_t field_bit = m_screen->frame_number() & 1;
-				if(m_single_screen_mode == true)
+				if (m_single_screen_mode == true)
 					field_bit = 1;
 				return (m_system->read() & 0xfdff) | (field_bit << 9);
 			}
+
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
@@ -231,7 +232,7 @@ void rungun_state::sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				if (!(data & 0x400)) // actually a 0 -> 1 transition
 					m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 			}
-		break;
+			break;
 
 		case 0x0c/2:
 			/*
@@ -243,7 +244,7 @@ void rungun_state::sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			*/
 			m_k055673->k053246_set_objcha_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 			m_roz_rombase = (data & 0xf0) >> 4;
-		break;
+			break;
 	}
 }
 
@@ -267,38 +268,36 @@ uint8_t rungun_state::k53936_rom_r(offs_t offset)
 {
 	// TODO: odd addresses returns ...?
 	uint32_t rom_addr = offset;
-	rom_addr+= (m_roz_rombase)*0x20000;
+	rom_addr += m_roz_rombase * 0x20000;
 	return m_roz_rom[rom_addr];
 }
 
-uint16_t rungun_state::palette_read(offs_t offset)
+uint16_t rungun_state::palette_r(offs_t offset)
 {
 	return m_pal_ram[offset + m_video_mux_bank*0x800/2];
 }
 
-void rungun_state::palette_write(offs_t offset, uint16_t data, uint16_t mem_mask)
+void rungun_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	palette_device &cur_paldevice = m_video_mux_bank == 0 ? *m_palette : *m_palette2;
 	uint32_t addr = offset + m_video_mux_bank*0x800/2;
 	COMBINE_DATA(&m_pal_ram[addr]);
 
-	uint8_t r,g,b;
+	uint8_t r = m_pal_ram[addr] & 0x1f;
+	uint8_t g = (m_pal_ram[addr] & 0x3e0) >> 5;
+	uint8_t b = (m_pal_ram[addr] & 0x7e00) >> 10;
 
-	r = m_pal_ram[addr] & 0x1f;
-	g = (m_pal_ram[addr] & 0x3e0) >> 5;
-	b = (m_pal_ram[addr] & 0x7e00) >> 10;
-
-	cur_paldevice.set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_device &cur_paldevice = m_video_mux_bank == 0 ? *m_palette : *m_palette2;
+	cur_paldevice.set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 void rungun_state::rungun_map(address_map &map)
 {
 	map(0x000000, 0x2fffff).rom();                                         // main program + data
-	map(0x300000, 0x3007ff).rw(FUNC(rungun_state::palette_read), FUNC(rungun_state::palette_write));
+	map(0x300000, 0x3007ff).rw(FUNC(rungun_state::palette_r), FUNC(rungun_state::palette_w));
 	map(0x380000, 0x39ffff).ram();                                         // work RAM
 	map(0x400000, 0x43ffff).r(FUNC(rungun_state::k53936_rom_r)).umask16(0x00ff);               // '936 ROM readback window
 	map(0x480000, 0x48001f).rw(FUNC(rungun_state::sysregs_r), FUNC(rungun_state::sysregs_w)).share("sysreg");
-	map(0x4c0000, 0x4c001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                        // CCU (for scanline and vblank polling)
+	map(0x4c0000, 0x4c001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); // CCU (for scanline and vblank polling)
 	map(0x540000, 0x540001).w(FUNC(rungun_state::sound_irq_w));
 	map(0x580000, 0x58001f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0xff00);
 	map(0x5c0000, 0x5c000f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));                       // 246A ROM readback window
@@ -334,12 +333,12 @@ K055673_CB_MEMBER(rungun_state::sprite_callback)
 
 uint16_t rungun_state::ttl_ram_r(offs_t offset)
 {
-	return m_ttl_vram[offset+(m_video_mux_bank*0x1000)];
+	return m_ttl_vram[offset + (m_video_mux_bank*0x1000)];
 }
 
 void rungun_state::ttl_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_ttl_vram[offset+(m_video_mux_bank*0x1000)]);
+	COMBINE_DATA(&m_ttl_vram[offset + (m_video_mux_bank*0x1000)]);
 	m_ttl_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
 }
 
@@ -398,7 +397,7 @@ void rungun_state::video_start()
 	m_ttl_gfx_index = gfx_index;
 
 	// create the tilemaps
-	for(uint32_t screen_num = 0;screen_num < 2;screen_num++)
+	for (uint32_t screen_num = 0; screen_num < 2; screen_num++)
 	{
 		m_ttl_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rungun_state::ttl_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 		m_ttl_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x2000));
@@ -420,10 +419,10 @@ uint32_t rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bi
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 	m_current_display_bank = m_screen->frame_number() & 1;
-	if(m_single_screen_mode == true)
+	if (m_single_screen_mode == true)
 		m_current_display_bank = 0;
 
-	if(m_video_priority_mode == false)
+	if (m_video_priority_mode == false)
 	{
 		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap[m_current_display_bank], 0, 0, 1);
 		m_k055673->k053247_sprites_draw(bitmap, cliprect);
@@ -464,14 +463,14 @@ void rungun_state::sprite_dma_trigger(void)
 {
 	uint32_t src_address;
 
-	if(m_single_screen_mode == true)
+	if (m_single_screen_mode == true)
 		src_address = 1*0x2000;
 	else
 		src_address = m_current_display_bank*0x2000;
 
 	// TODO: size could be programmable somehow.
-	for(int i=0;i<0x1000;i+=2)
-		m_k055673->k053247_word_w(i/2, m_banked_ram[(i + src_address) /2]);
+	for (int i = 0; i < 0x1000; i += 2)
+		m_k055673->k053247_word_w(i / 2, m_banked_ram[(i + src_address) / 2]);
 }
 
 
@@ -514,9 +513,9 @@ void rungun_state::rungun_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank2");
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe22f).rw(m_k054539_1, FUNC(k054539_device::read), FUNC(k054539_device::write));
+	map(0xe000, 0xe22f).rw(m_k054539[0], FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xe230, 0xe3ff).ram();
-	map(0xe400, 0xe62f).rw(m_k054539_2, FUNC(k054539_device::read), FUNC(k054539_device::write));
+	map(0xe400, 0xe62f).rw(m_k054539[1], FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xe630, 0xe7ff).ram();
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
 	map(0xf800, 0xf800).w(FUNC(rungun_state::sound_ctrl_w));
@@ -624,19 +623,16 @@ void rungun_state::machine_start()
 	m_bank2->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	m_banked_ram = make_unique_clear<uint16_t[]>(0x2000);
-	m_pal_ram = make_unique_clear<uint16_t[]>(0x800*2);
-	m_spriteram_bank->configure_entries(0,2,&m_banked_ram[0],0x2000);
+	m_pal_ram = make_unique_clear<uint16_t[]>(0x800);
+	m_spriteram_bank->configure_entries(0, 2, &m_banked_ram[0], 0x2000);
 
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_nmi_clk));
-	//save_item(NAME(m_ttl_vram));
 }
 
 void rungun_state::machine_reset()
 {
 	memset(m_sysreg, 0, 0x20);
-	//memset(m_ttl_vram, 0, 0x1000 * sizeof(uint16_t));
-
 	m_sound_ctrl = 0;
 }
 
@@ -685,8 +681,8 @@ void rungun_state::rng(machine_config &config)
 	m_k053252->set_screen("screen");
 
 	PALETTE(config, m_palette2).set_format(palette_device::xBGR_555, 1024);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette2->enable_shadows();
+	m_palette2->enable_hilights();
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -695,17 +691,17 @@ void rungun_state::rng(machine_config &config)
 	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	// SFX
-	K054539(config, m_k054539_1, 18.432_MHz_XTAL);
-	m_k054539_1->set_device_rom_tag("k054539");
-	m_k054539_1->timer_handler().set(FUNC(rungun_state::k054539_nmi_gen));
-	m_k054539_1->add_route(0, "rspeaker", 1.0);
-	m_k054539_1->add_route(1, "lspeaker", 1.0);
+	K054539(config, m_k054539[0], 18.432_MHz_XTAL);
+	m_k054539[0]->set_device_rom_tag("k054539");
+	m_k054539[0]->timer_handler().set(FUNC(rungun_state::k054539_nmi_gen));
+	m_k054539[0]->add_route(0, "rspeaker", 1.0);
+	m_k054539[0]->add_route(1, "lspeaker", 1.0);
 
 	// BGM, volumes handtuned to make SFXs audible (still not 100% right tho)
-	K054539(config, m_k054539_2, 18.432_MHz_XTAL);
-	m_k054539_2->set_device_rom_tag("k054539");
-	m_k054539_2->add_route(0, "rspeaker", 0.6);
-	m_k054539_2->add_route(1, "lspeaker", 0.6);
+	K054539(config, m_k054539[1], 18.432_MHz_XTAL);
+	m_k054539[1]->set_device_rom_tag("k054539");
+	m_k054539[1]->add_route(0, "rspeaker", 0.6);
+	m_k054539[1]->add_route(1, "lspeaker", 0.6);
 }
 
 // for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.
@@ -717,16 +713,16 @@ void rungun_state::rng_dual(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(rungun_state::screen_update_rng_dual_left));
 
-	screen_device &demultiplex2(SCREEN(config, "demultiplex2", SCREEN_TYPE_RASTER));
-	demultiplex2.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	demultiplex2.set_refresh_hz(59.185606);
-	demultiplex2.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	demultiplex2.set_size(64*8, 32*8);
-	demultiplex2.set_visarea(88, 88+416-1, 24, 24+224-1);
-	demultiplex2.set_screen_update(FUNC(rungun_state::screen_update_rng_dual_right));
-	demultiplex2.set_palette(m_palette2);
+	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen2.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen2.set_refresh_hz(59.185606);
+	screen2.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen2.set_size(64*8, 32*8);
+	screen2.set_visarea(88, 88+416-1, 24, 24+224-1);
+	screen2.set_screen_update(FUNC(rungun_state::screen_update_rng_dual_right));
+	screen2.set_palette(m_palette2);
 
-	m_k053252->set_slave_screen("demultiplex2");
+	m_k053252->set_slave_screen("screen2");
 }
 
 

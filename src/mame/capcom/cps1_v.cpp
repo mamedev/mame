@@ -2013,6 +2013,9 @@ static const struct CPS1config cps1_config_table[]=
 
 	{"kenseim",     CPS_B_21_DEF, mapper_KNM10B },
 
+	/* CPS1 multi game bootleg */
+	{"cps1mult",    CPS_B_21_DEF, mapper_CP1B1F }, // TODO: not correct for all games
+
 	{nullptr}     /* End of table */
 };
 

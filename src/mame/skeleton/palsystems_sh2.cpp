@@ -250,6 +250,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, mpoker2,  0,       palsystems_sh2, mpoker2, palsystems_sh2_state, empty_init, ROT0, "PAL Systems", "Major Poker 2 (set 1)", MACHINE_IS_SKELETON )
-GAME( 199?, mpoker2a, mpoker2, palsystems_sh2, mpoker2, palsystems_sh2_state, empty_init, ROT0, "PAL Systems", "Major Poker 2 (set 2)", MACHINE_IS_SKELETON )
-GAME( 199?, mpoker2b, mpoker2, palsystems_sh2, mpoker2, palsystems_sh2_state, empty_init, ROT0, "PAL Systems", "Major Poker 2 (set 3)", MACHINE_IS_SKELETON )
+GAME( 199?, mpoker2,  0,       palsystems_sh2, mpoker2, palsystems_sh2_state, empty_init, ROT0, "PAL Systems", "Major Poker 2 (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, mpoker2a, mpoker2, palsystems_sh2, mpoker2, palsystems_sh2_state, empty_init, ROT0, "PAL Systems", "Major Poker 2 (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, mpoker2b, mpoker2, palsystems_sh2, mpoker2, palsystems_sh2_state, empty_init, ROT0, "PAL Systems", "Major Poker 2 (set 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

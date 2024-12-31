@@ -5,11 +5,10 @@
     NAMCO sound driver.
 
     This driver handles the four known types of NAMCO wavetable sounds:
-
-        - 3-voice mono (PROM-based design: Pac-Man, Pengo, Dig Dug, etc)
-        - 8-voice quadrophonic (Pole Position 1, Pole Position 2)
-        - 8-voice mono (custom 15XX: Mappy, Dig Dug 2, etc)
-        - 8-voice stereo (System 1)
+    - 3-voice mono (PROM-based design: Pac-Man, Pengo, Dig Dug, etc)
+    - 8-voice quadrophonic (Pole Position 1, Pole Position 2)
+    - 8-voice mono (custom 15XX: Mappy, Dig Dug 2, etc)
+    - 8-voice stereo (System 1)
 
     The 15XX custom does not have a DAC of its own; instead, it streams
     the 4-bit PROM data directly into the 99XX custom DAC. Most pre-99XX
@@ -31,18 +30,18 @@
 #include "namco.h"
 
 
-/* quality parameter: internal sample rate is 192 KHz, output is 48 KHz */
+// quality parameter: internal sample rate is 192 KHz, output is 48 KHz
 #define INTERNAL_RATE   192000
 
-/* 16 bits: sample bits of the stream buffer    */
-/* 4 bits:  volume                  */
-/* 4 bits:  prom sample bits            */
+// 16 bits: sample bits of the stream buffer
+// 4 bits:  volume
+// 4 bits:  prom sample bits
 #define MIXLEVEL    (1 << (16 - 4 - 4))
 
-/* stream output level */
+// stream output level
 #define OUTPUT_LEVEL(n)     ((n) * MIXLEVEL / m_voices)
 
-/* a position of waveform sample */
+// a position of waveform sample
 #define WAVEFORM_POSITION(n)    (((n) >> m_f_fracbits) & 0x1f)
 
 DEFINE_DEVICE_TYPE(NAMCO,       namco_device,       "namco",       "Namco")
@@ -73,7 +72,7 @@ namco_device::namco_device(const machine_config &mconfig, const char *tag, devic
 }
 
 namco_15xx_device::namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:namco_audio_device(mconfig, NAMCO_15XX, tag, owner, clock)
+	: namco_audio_device(mconfig, NAMCO_15XX, tag, owner, clock)
 	, m_soundregs(nullptr)
 {
 }
@@ -90,22 +89,22 @@ namco_cus30_device::namco_cus30_device(const machine_config &mconfig, const char
 
 void namco_audio_device::device_start()
 {
-	/* extract globals from the interface */
+	// extract globals from the interface
 	m_last_channel = m_channel_list + m_voices;
 
-	/* build the waveform table */
+	// build the waveform table
 	build_decoded_waveform(m_wave_ptr);
 
-	/* get stream channels */
+	// get stream channels
 	if (m_stereo)
 		m_stream = stream_alloc(0, 2, 192000);
 	else
 		m_stream = stream_alloc(0, 1, 192000);
 
-	/* start with sound enabled, many games don't have a sound enable register */
+	// start with sound enabled, many games don't have a sound enable register
 	m_sound_enable = true;
 
-	/* register with the save state system */
+	// register with the save state system
 	if (m_wave_ptr == nullptr)
 		save_pointer(NAME(m_wavedata), 0x400);
 
@@ -114,7 +113,7 @@ void namco_audio_device::device_start()
 	for (int v = 0; v < MAX_VOLUME; v++)
 		save_pointer(NAME(m_waveform[v]), 32 * 8 * (1+m_wave_size), v);
 
-	/* reset all the voices */
+	// reset all the voices
 	for (sound_channel *voice = m_channel_list; voice < m_last_channel; voice++)
 	{
 		voice->frequency = 0;
@@ -128,7 +127,7 @@ void namco_audio_device::device_start()
 		voice->noise_hold = 0;
 	}
 
-	/* register with the save state system */
+	// register with the save state system
 	save_pointer(STRUCT_MEMBER(m_channel_list, frequency), m_voices);
 	save_pointer(STRUCT_MEMBER(m_channel_list, counter), m_voices);
 	save_pointer(STRUCT_MEMBER(m_channel_list, volume), m_voices);
@@ -163,14 +162,14 @@ void namco_audio_device::device_clock_changed()
 {
 	int clock_multiple;
 
-	/* adjust internal clock */
+	// adjust internal clock
 	m_namco_clock = clock();
 	for (clock_multiple = 0; m_namco_clock < INTERNAL_RATE; clock_multiple++)
 		m_namco_clock *= 2;
 
 	m_f_fracbits = clock_multiple + 15;
 
-	/* adjust output clock */
+	// adjust output clock
 	m_sample_rate = m_namco_clock;
 
 	logerror("Namco: freq fractional bits = %d: internal freq = %d, output freq = %d\n", m_f_fracbits, m_namco_clock, m_sample_rate);
@@ -179,18 +178,15 @@ void namco_audio_device::device_clock_changed()
 }
 
 
-/* update the decoded waveform data */
+// update the decoded waveform data
 void namco_audio_device::update_namco_waveform(int offset, uint8_t data)
 {
 	if (m_wave_size == 1)
 	{
-		int16_t wdata;
-		int v;
-
-		/* use full byte, first 4 high bits, then low 4 bits */
-		for (v = 0; v < MAX_VOLUME; v++)
+		// use full byte, first 4 high bits, then low 4 bits
+		for (int v = 0; v < MAX_VOLUME; v++)
 		{
-			wdata = ((data >> 4) & 0x0f) - 8;
+			int16_t wdata = ((data >> 4) & 0x0f) - 8;
 			m_waveform[v][offset * 2] = OUTPUT_LEVEL(wdata * v);
 			wdata = (data & 0x0f) - 8;
 			m_waveform[v][offset * 2 + 1] = OUTPUT_LEVEL(wdata * v);
@@ -198,16 +194,14 @@ void namco_audio_device::update_namco_waveform(int offset, uint8_t data)
 	}
 	else
 	{
-		int v;
-
-		/* use only low 4 bits */
-		for (v = 0; v < MAX_VOLUME; v++)
+		// use only low 4 bits
+		for (int v = 0; v < MAX_VOLUME; v++)
 			m_waveform[v][offset] = OUTPUT_LEVEL(((data & 0x0f) - 8) * v);
 	}
 }
 
 
-/* build the decoded waveform table */
+// build the decoded waveform table
 void namco_audio_device::build_decoded_waveform(uint8_t *rgnbase)
 {
 	if (rgnbase != nullptr)
@@ -218,17 +212,17 @@ void namco_audio_device::build_decoded_waveform(uint8_t *rgnbase)
 		m_wavedata = m_waveram_alloc.get();
 	}
 
-	/* 20pacgal has waves in RAM but old sound system */
+	// 20pacgal has waves in RAM but old sound system
 	int size;
 	if (rgnbase == nullptr && m_voices != 3)
 	{
 		m_wave_size = 1;
-		size = 32 * 16;     /* 32 samples, 16 waveforms */
+		size = 32 * 16; // 32 samples, 16 waveforms
 	}
 	else
 	{
 		m_wave_size = 0;
-		size = 32 * 8;      /* 32 samples, 8 waveforms */
+		size = 32 * 8; // 32 samples, 8 waveforms
 	}
 
 	for (int v = 0; v < MAX_VOLUME; v++)
@@ -239,7 +233,7 @@ void namco_audio_device::build_decoded_waveform(uint8_t *rgnbase)
 }
 
 
-/* generate sound by oversampling */
+// generate sound by oversampling
 uint32_t namco_audio_device::namco_update_one(write_stream_view &buffer, const int16_t *wave, uint32_t counter, uint32_t freq)
 {
 	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
@@ -285,10 +279,10 @@ void namco_device::pacman_sound_w(offs_t offset, uint8_t data)
 	if (m_soundregs[offset] == data)
 		return;
 
-	/* update the streams */
+	// update the streams
 	m_stream->update();
 
-	/* set the register */
+	// set the register
 	m_soundregs[offset] = data;
 
 	if (offset < 0x10)
@@ -301,7 +295,7 @@ void namco_device::pacman_sound_w(offs_t offset, uint8_t data)
 	if (ch >= m_voices)
 		return;
 
-	/* recompute the voice parameters */
+	// recompute the voice parameters
 	voice = m_channel_list + ch;
 	switch (offset - ch * 5)
 	{
@@ -314,13 +308,13 @@ void namco_device::pacman_sound_w(offs_t offset, uint8_t data)
 	case 0x12:
 	case 0x13:
 	case 0x14:
-		/* the frequency has 20 bits */
-		/* the first voice has extra frequency bits */
+		// the frequency has 20 bits
+		// the first voice has extra frequency bits
 		voice->frequency = (ch == 0) ? m_soundregs[0x10] : 0;
 		voice->frequency += (m_soundregs[ch * 5 + 0x11] << 4);
 		voice->frequency += (m_soundregs[ch * 5 + 0x12] << 8);
 		voice->frequency += (m_soundregs[ch * 5 + 0x13] << 12);
-		voice->frequency += (m_soundregs[ch * 5 + 0x14] << 16); /* always 0 */
+		voice->frequency += (m_soundregs[ch * 5 + 0x14] << 16); // always 0
 		break;
 
 	case 0x15:
@@ -340,10 +334,10 @@ void namco_cus30_device::pacman_sound_w(offs_t offset, uint8_t data)
 	if (soundregs[offset] == data)
 		return;
 
-	/* update the streams */
+	// update the streams
 	m_stream->update();
 
-	/* set the register */
+	// set the register
 	soundregs[offset] = data;
 
 	if (offset < 0x10)
@@ -356,7 +350,7 @@ void namco_cus30_device::pacman_sound_w(offs_t offset, uint8_t data)
 	if (ch >= m_voices)
 		return;
 
-	/* recompute the voice parameters */
+	// recompute the voice parameters
 	voice = m_channel_list + ch;
 	switch (offset - ch * 5)
 	{
@@ -369,13 +363,13 @@ void namco_cus30_device::pacman_sound_w(offs_t offset, uint8_t data)
 	case 0x12:
 	case 0x13:
 	case 0x14:
-		/* the frequency has 20 bits */
-		/* the first voice has extra frequency bits */
+		// the frequency has 20 bits
+		// the first voice has extra frequency bits
 		voice->frequency = (ch == 0) ? soundregs[0x10] : 0;
 		voice->frequency += (soundregs[ch * 5 + 0x11] << 4);
 		voice->frequency += (soundregs[ch * 5 + 0x12] << 8);
 		voice->frequency += (soundregs[ch * 5 + 0x13] << 12);
-		voice->frequency += (soundregs[ch * 5 + 0x14] << 16); /* always 0 */
+		voice->frequency += (soundregs[ch * 5 + 0x14] << 16); // always 0
 		break;
 
 	case 0x15:
@@ -433,21 +427,21 @@ void namco_device::polepos_sound_w(offs_t offset, uint8_t data)
 	if (m_soundregs[offset] == data)
 		return;
 
-	/* update the streams */
+	// update the streams
 	m_stream->update();
 
-	/* set the register */
+	// set the register
 	m_soundregs[offset] = data;
 
 	ch = (offset & 0x1f) / 4;
 
-	/* recompute the voice parameters */
+	// recompute the voice parameters
 	voice = m_channel_list + ch;
 	switch (offset & 0x23)
 	{
 	case 0x00:
 	case 0x01:
-		/* the frequency has 16 bits */
+		// the frequency has 16 bits
 		voice->frequency = m_soundregs[ch * 4 + 0x00];
 		voice->frequency += m_soundregs[ch * 4 + 0x01] << 8;
 		break;
@@ -468,7 +462,7 @@ void namco_device::polepos_sound_w(offs_t offset, uint8_t data)
 		voice->volume[0] /= 2;
 		voice->volume[1] /= 2;
 
-		/* if 54XX or 52XX selected, silence this voice */
+		// if 54XX or 52XX selected, silence this voice
 		if (m_soundregs[ch * 4 + 0x23] & 8)
 			voice->volume[0] = voice->volume[1] = 0;
 		break;
@@ -509,19 +503,19 @@ void namco_15xx_device::namco_15xx_w(offs_t offset, uint8_t data)
 	if (m_soundregs[offset] == data)
 		return;
 
-	/* update the streams */
+	// update the streams
 	m_stream->update();
 
-	/* set the register */
+	// set the register
 	m_soundregs[offset] = data;
 
 	ch = offset / 8;
 	if (ch >= m_voices)
 		return;
 
-	/* recompute the voice parameters */
+	// recompute the voice parameters
 	voice = m_channel_list + ch;
-	switch (offset - ch * 8)
+	switch (offset & 7)
 	{
 	case 0x02:
 		voice->counter &= util::make_bitmask<uint32_t>(m_f_fracbits);
@@ -537,10 +531,10 @@ void namco_15xx_device::namco_15xx_w(offs_t offset, uint8_t data)
 		[[fallthrough]];
 	case 0x04:
 	case 0x05:
-		/* the frequency has 20 bits */
+		// the frequency has 20 bits
 		voice->frequency = m_soundregs[ch * 8 + 0x04];
 		voice->frequency += m_soundregs[ch * 8 + 0x05] << 8;
-		voice->frequency += (m_soundregs[ch * 8 + 0x06] & 15) << 16;    /* high bits are from here */
+		voice->frequency += (m_soundregs[ch * 8 + 0x06] & 15) << 16; // high bits are from here
 		break;
 	}
 }
@@ -575,11 +569,8 @@ void namco_15xx_device::namco_15xx_w(offs_t offset, uint8_t data)
 void namco_cus30_device::namcos1_sound_w(offs_t offset, uint8_t data)
 {
 	sound_channel *voice;
-	int ch;
-	int nssw;
 
-
-	/* verify the offset */
+	// verify the offset
 	if (offset > 63)
 	{
 		logerror("NAMCOS1 sound: Attempting to write past the 64 registers segment\n");
@@ -591,19 +582,19 @@ void namco_cus30_device::namcos1_sound_w(offs_t offset, uint8_t data)
 	if (soundregs[offset] == data)
 		return;
 
-	/* update the streams */
+	// update the streams
 	m_stream->update();
 
-	/* set the register */
+	// set the register
 	soundregs[offset] = data;
 
-	ch = offset / 8;
+	int ch = offset / 8;
 	if (ch >= m_voices)
 		return;
 
-	/* recompute the voice parameters */
+	// recompute the voice parameters
 	voice = m_channel_list + ch;
-	switch (offset - ch * 8)
+	switch (offset & 7)
 	{
 	case 0x00:
 		voice->volume[0] = data & 0x0f;
@@ -614,8 +605,8 @@ void namco_cus30_device::namcos1_sound_w(offs_t offset, uint8_t data)
 		[[fallthrough]];
 	case 0x02:
 	case 0x03:
-		/* the frequency has 20 bits */
-		voice->frequency = (soundregs[ch * 8 + 0x01] & 15) << 16; /* high bits are from here */
+		// the frequency has 20 bits
+		voice->frequency = (soundregs[ch * 8 + 0x01] & 15) << 16; // high bits are from here
 		voice->frequency += soundregs[ch * 8 + 0x02] << 8;
 		voice->frequency += soundregs[ch * 8 + 0x03];
 		break;
@@ -623,7 +614,7 @@ void namco_cus30_device::namcos1_sound_w(offs_t offset, uint8_t data)
 	case 0x04:
 		voice->volume[1] = data & 0x0f;
 
-		nssw = ((data & 0x80) >> 7);
+		int nssw = ((data & 0x80) >> 7);
 		if (++voice == m_last_channel)
 			voice = m_channel_list;
 		voice->noise_sw = nssw;
@@ -637,23 +628,36 @@ void namco_cus30_device::namcos1_cus30_w(offs_t offset, uint8_t data)
 	{
 		if (m_wavedata[offset] != data)
 		{
-			/* update the streams */
+			// update the streams
 			m_stream->update();
 
 			m_wavedata[offset] = data;
 
-			/* update the decoded waveform table */
+			// update the decoded waveform table
 			update_namco_waveform(offset, data);
 		}
 	}
 	else if (offset < 0x140)
-		namcos1_sound_w(offset - 0x100,data);
+		namcos1_sound_w(offset - 0x100, data);
 	else
 		m_wavedata[offset] = data;
 }
 
 uint8_t namco_cus30_device::namcos1_cus30_r(offs_t offset)
 {
+	if (offset >= 0x100 && offset < 0x140)
+	{
+		int ch = (offset - 0x100) / 8;
+		int reg = offset & 7;
+
+		// reading from register 5 returns the counter (used by baraduke)
+		if (ch < m_voices && reg == 5)
+		{
+			m_stream->update();
+			return WAVEFORM_POSITION(m_channel_list[ch].counter);
+		}
+	}
+
 	return m_wavedata[offset];
 }
 
@@ -680,15 +684,15 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 {
 	if (m_stereo)
 	{
-		/* zap the contents of the buffers */
+		// zap the contents of the buffers
 		outputs[0].fill(0);
 		outputs[1].fill(0);
 
-		/* if no sound, we're done */
+		// if no sound, we're done
 		if (!m_sound_enable)
 			return;
 
-		/* loop over each voice and add its contribution */
+		// loop over each voice and add its contribution
 		for (sound_channel *voice = m_channel_list; voice < m_last_channel; voice++)
 		{
 			auto &lmix = outputs[0];
@@ -700,7 +704,7 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 			{
 				int f = voice->frequency & 0xff;
 
-				/* only update if we have non-zero volume */
+				// only update if we have non-zero volume
 				if (lv || rv)
 				{
 					int hold_time = 1 << (m_f_fracbits - 16);
@@ -709,13 +713,10 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 					uint32_t c = voice->noise_counter;
 					int16_t l_noise_data = OUTPUT_LEVEL(0x07 * (lv >> 1));
 					int16_t r_noise_data = OUTPUT_LEVEL(0x07 * (rv >> 1));
-					int i;
 
-					/* add our contribution */
-					for (i = 0; i < lmix.samples(); i++)
+					// add our contribution
+					for (int i = 0; i < lmix.samples(); i++)
 					{
-						int cnt;
-
 						if (voice->noise_state)
 						{
 							lmix.add_int(i, l_noise_data, 32768);
@@ -736,7 +737,7 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 						hold =  hold_time;
 
 						c += delta;
-						cnt = (c >> 12);
+						int cnt = (c >> 12);
 						c &= (1 << 12) - 1;
 						for( ;cnt > 0; cnt--)
 						{
@@ -746,35 +747,35 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 						}
 					}
 
-					/* update the counter and hold time for this voice */
+					// update the counter and hold time for this voice
 					voice->noise_counter = c;
 					voice->noise_hold = hold;
 				}
 			}
 			else
 			{
-				/* save the counter for this voice */
+				// save the counter for this voice
 				uint32_t c = voice->counter;
 
-				/* only update if we have non-zero left volume */
+				// only update if we have non-zero left volume
 				if (lv)
 				{
 					const int16_t *lw = &m_waveform[lv][voice->waveform_select * 32];
 
-					/* generate sound into the buffer */
+					// generate sound into the buffer
 					c = namco_update_one(lmix, lw, voice->counter, voice->frequency);
 				}
 
-				/* only update if we have non-zero right volume */
+				// only update if we have non-zero right volume
 				if (rv)
 				{
 					const int16_t *rw = &m_waveform[rv][voice->waveform_select * 32];
 
-					/* generate sound into the buffer */
+					// generate sound into the buffer
 					c = namco_update_one(rmix, rw, voice->counter, voice->frequency);
 				}
 
-				/* update the counter for this voice */
+				// update the counter for this voice
 				voice->counter = c;
 			}
 		}
@@ -784,14 +785,15 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 		sound_channel *voice;
 
 		auto &buffer = outputs[0];
-		/* zap the contents of the buffer */
+
+		// zap the contents of the buffer
 		buffer.fill(0);
 
-		/* if no sound, we're done */
+		// if no sound, we're done
 		if (!m_sound_enable)
 			return;
 
-		/* loop over each voice and add its contribution */
+		// loop over each voice and add its contribution
 		for (voice = m_channel_list; voice < m_last_channel; voice++)
 		{
 			int v = voice->volume[0];
@@ -799,7 +801,7 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 			{
 				int f = voice->frequency & 0xff;
 
-				/* only update if we have non-zero volume */
+				// only update if we have non-zero volume
 				if (v)
 				{
 					int hold_time = 1 << (m_f_fracbits - 16);
@@ -807,13 +809,10 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 					uint32_t delta = f << 4;
 					uint32_t c = voice->noise_counter;
 					int16_t noise_data = OUTPUT_LEVEL(0x07 * (v >> 1));
-					int i;
 
-					/* add our contribution */
-					for (i = 0; i < buffer.samples(); i++)
+					// add our contribution
+					for (int i = 0; i < buffer.samples(); i++)
 					{
-						int cnt;
-
 						if (voice->noise_state)
 							buffer.add_int(i, noise_data, 32768);
 						else
@@ -828,7 +827,7 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 						hold =  hold_time;
 
 						c += delta;
-						cnt = (c >> 12);
+						int cnt = (c >> 12);
 						c &= (1 << 12) - 1;
 						for( ;cnt > 0; cnt--)
 						{
@@ -838,19 +837,19 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, std::vector<r
 						}
 					}
 
-					/* update the counter and hold time for this voice */
+					// update the counter and hold time for this voice
 					voice->noise_counter = c;
 					voice->noise_hold = hold;
 				}
 			}
 			else
 			{
-				/* only update if we have non-zero volume */
+				// only update if we have non-zero volume
 				if (v)
 				{
 					const int16_t *w = &m_waveform[v][voice->waveform_select * 32];
 
-					/* generate sound into buffer and update the counter for this voice */
+					// generate sound into buffer and update the counter for this voice
 					voice->counter = namco_update_one(buffer, w, voice->counter, voice->frequency);
 				}
 			}

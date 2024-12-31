@@ -42,8 +42,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_DEVICES_TMC600_EURO_H
-#define MAME_DEVICES_TMC600_EURO_H
+#ifndef MAME_BUS_TMC600_EURO_H
+#define MAME_BUS_TMC600_EURO_H
 
 #pragma once
 
@@ -104,5 +104,4 @@ void tmc600_eurobus_cards(device_slot_interface &device);
 
 typedef device_type_enumerator<tmc600_eurobus_slot_device> tmc600_eurobus_slot_enumerator;
 
-
-#endif // MAME_DEVICES_TMC600_EURO_H
+#endif // MAME_BUS_TMC600_EURO_H

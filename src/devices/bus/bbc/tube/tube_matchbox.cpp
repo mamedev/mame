@@ -20,7 +20,7 @@
 
 #include "cpu/arm/arm.h"
 #include "cpu/i86/i286.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/r65c02.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/ns32000/ns32000.h"
@@ -44,10 +44,10 @@ public:
 		, m_ram(*this, "ram")
 		, m_soft_dip(0)
 		, m_prst(0)
-		, m_m65c102(*this, "m65c102")
-		, m_m65c102_rom(*this, "m65c102_rom")
-		, m_m65c102_view(*this, "m65c102_view")
-		, m_m65c102_bank(*this, "m65c102_bank%u", 0)
+		, m_r65c102(*this, "r65c102")
+		, m_r65c102_rom(*this, "r65c102_rom")
+		, m_r65c102_view(*this, "r65c102_view")
+		, m_r65c102_bank(*this, "r65c102_bank%u", 0)
 		, m_z80(*this, "z80")
 		, m_z80_rom(*this, "z80_rom")
 		, m_z80_view(*this, "z80_view")
@@ -98,15 +98,15 @@ private:
 	int m_prst;
 
 	// 65C102
-	required_device<m6502_device> m_m65c102;
-	required_region_ptr<uint8_t> m_m65c102_rom;
-	memory_passthrough_handler m_m65c102_rom_shadow_tap;
-	memory_view m_m65c102_view;
-	required_memory_bank_array<8> m_m65c102_bank;
+	required_device<r65c102_device> m_r65c102;
+	required_region_ptr<uint8_t> m_r65c102_rom;
+	memory_passthrough_handler m_r65c102_rom_shadow_tap;
+	memory_view m_r65c102_view;
+	required_memory_bank_array<8> m_r65c102_bank;
 
-	void m65c102_mem(address_map &map) ATTR_COLD;
-	void m65c102_reset(uint8_t dip);
-	void m65c102_bank_w(offs_t offset, uint8_t data);
+	void r65c102_mem(address_map &map) ATTR_COLD;
+	void r65c102_reset(uint8_t dip);
+	void r65c102_bank_w(offs_t offset, uint8_t data);
 
 	// Z80
 	required_device<z80_device> m_z80;
@@ -179,23 +179,23 @@ private:
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( m65c102_mem )
+//  ADDRESS_MAP( r65c102_mem )
 //-------------------------------------------------
 
-void bbc_tube_matchbox_device::m65c102_mem(address_map &map)
+void bbc_tube_matchbox_device::r65c102_mem(address_map &map)
 {
-	map(0x0000, 0xffff).view(m_m65c102_view);
-	m_m65c102_view[0](0x0000, 0xffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
-	m_m65c102_view[0](0xf800, 0xffff).rom().region("m65c102_rom", 0);
-	m_m65c102_view[1](0x0000, 0x1fff).bankrw("m65c102_bank0");
-	m_m65c102_view[1](0x2000, 0x3fff).bankrw("m65c102_bank1");
-	m_m65c102_view[1](0x4000, 0x5fff).bankrw("m65c102_bank2");
-	m_m65c102_view[1](0x6000, 0x7fff).bankrw("m65c102_bank3");
-	m_m65c102_view[1](0x8000, 0x9fff).bankrw("m65c102_bank4");
-	m_m65c102_view[1](0xa000, 0xbfff).bankrw("m65c102_bank5");
-	m_m65c102_view[1](0xc000, 0xdfff).bankrw("m65c102_bank6");
-	m_m65c102_view[1](0xe000, 0xffff).bankrw("m65c102_bank7");
-	m_m65c102_view[1](0xfee0, 0xfee7).w(FUNC(bbc_tube_matchbox_device::m65c102_bank_w));
+	map(0x0000, 0xffff).view(m_r65c102_view);
+	m_r65c102_view[0](0x0000, 0xffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
+	m_r65c102_view[0](0xf800, 0xffff).rom().region("r65c102_rom", 0);
+	m_r65c102_view[1](0x0000, 0x1fff).bankrw("r65c102_bank0");
+	m_r65c102_view[1](0x2000, 0x3fff).bankrw("r65c102_bank1");
+	m_r65c102_view[1](0x4000, 0x5fff).bankrw("r65c102_bank2");
+	m_r65c102_view[1](0x6000, 0x7fff).bankrw("r65c102_bank3");
+	m_r65c102_view[1](0x8000, 0x9fff).bankrw("r65c102_bank4");
+	m_r65c102_view[1](0xa000, 0xbfff).bankrw("r65c102_bank5");
+	m_r65c102_view[1](0xc000, 0xdfff).bankrw("r65c102_bank6");
+	m_r65c102_view[1](0xe000, 0xffff).bankrw("r65c102_bank7");
+	m_r65c102_view[1](0xfee0, 0xfee7).w(FUNC(bbc_tube_matchbox_device::r65c102_bank_w));
 	map(0xfef8, 0xfeff).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w));
 }
 
@@ -353,7 +353,7 @@ ioport_constructor bbc_tube_matchbox_device::device_input_ports() const
 //-------------------------------------------------
 
 ROM_START( matchbox )
-	ROM_REGION(0x0800, "m65c102_rom", 0)
+	ROM_REGION(0x0800, "r65c102_rom", 0)
 	ROM_LOAD("client65v2.bin", 0x0000, 0x0800, CRC(866a5b7b) SHA1(40e2de0443e3447483fe6ee43fe66bac87fed1c4)) // latest from https://mdfs.net/Software/Tube/Matchbox/
 
 	ROM_REGION(0x1000, "z80_rom", 0)
@@ -402,8 +402,8 @@ void bbc_tube_matchbox_device::device_add_mconfig(machine_config &config)
 	RAM(config, m_ram).set_default_size("2MB");
 
 	// 65C102
-	M65C02(config, m_m65c102, 32_MHz_XTAL);
-	m_m65c102->set_addrmap(AS_PROGRAM, &bbc_tube_matchbox_device::m65c102_mem);
+	R65C102(config, m_r65c102, 32_MHz_XTAL);
+	m_r65c102->set_addrmap(AS_PROGRAM, &bbc_tube_matchbox_device::r65c102_mem);
 
 	SOFTWARE_LIST(config, "flop_ls_6502").set_original("bbc_flop_6502");
 
@@ -472,7 +472,7 @@ void bbc_tube_matchbox_device::device_start()
 
 void bbc_tube_matchbox_device::device_reset_after_children()
 {
-	m_m65c102->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_r65c102->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_z80->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_i80286->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_m6809->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -486,8 +486,8 @@ void bbc_tube_matchbox_device::device_reset_after_children()
 	switch (m_copro)
 	{
 	case 0x00: case 0x01: case 0x02: case 0x03:
-		m65c102_reset(m_copro);
-		m_m65c102->set_input_line(INPUT_LINE_RESET, m_prst);
+		r65c102_reset(m_copro);
+		m_r65c102->set_input_line(INPUT_LINE_RESET, m_prst);
 		break;
 
 	case 0x04: case 0x05: case 0x06: case 0x07:
@@ -534,15 +534,15 @@ void bbc_tube_matchbox_device::device_reset_after_children()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void bbc_tube_matchbox_device::m65c102_reset(uint8_t copro)
+void bbc_tube_matchbox_device::r65c102_reset(uint8_t copro)
 {
-	address_space &program = m_m65c102->space(AS_PROGRAM);
+	address_space &program = m_r65c102->space(AS_PROGRAM);
 
 	// address map during booting
-	m_m65c102_view.select(0);
+	m_r65c102_view.select(0);
 
-	m_m65c102_rom_shadow_tap.remove();
-	m_m65c102_rom_shadow_tap = program.install_read_tap(
+	m_r65c102_rom_shadow_tap.remove();
+	m_r65c102_rom_shadow_tap = program.install_read_tap(
 			0x0fef8, 0xfeff,
 			"rom_shadow_r",
 			[this](offs_t offset, u8 &data, u8 mem_mask)
@@ -550,119 +550,119 @@ void bbc_tube_matchbox_device::m65c102_reset(uint8_t copro)
 				if (!machine().side_effects_disabled())
 				{
 					// delete this tap
-					m_m65c102_rom_shadow_tap.remove();
+					m_r65c102_rom_shadow_tap.remove();
 
 					// address map after booting
-					m_m65c102_view.select(1);
+					m_r65c102_view.select(1);
 				}
 
 				// return the original data
 				return data;
 			},
-			&m_m65c102_rom_shadow_tap);
+			&m_r65c102_rom_shadow_tap);
 
 	for (int i = 0; i < 8; i++)
 	{
-		m_m65c102_bank[i]->set_base(m_ram->pointer() + (i * 0x2000));
+		m_r65c102_bank[i]->set_base(m_ram->pointer() + (i * 0x2000));
 	}
 
 	switch (copro & 3)
 	{
 	case 0: // 3MHz
-		m_m65c102->set_clock_scale(1.0 / 11);
+		m_r65c102->set_clock_scale(1.0 / 11);
 
 		// original startup banner
-		m_m65c102_rom[0x06f] = '6';
-		m_m65c102_rom[0x070] = '5';
-		m_m65c102_rom[0x071] = 'C';
-		m_m65c102_rom[0x072] = '1';
-		m_m65c102_rom[0x073] = '0';
-		m_m65c102_rom[0x074] = '2';
-		m_m65c102_rom[0x075] = ' ';
-		m_m65c102_rom[0x076] = 'C';
-		m_m65c102_rom[0x077] = 'o';
-		m_m65c102_rom[0x078] = '-';
-		m_m65c102_rom[0x079] = 'P';
-		m_m65c102_rom[0x07a] = 'r';
-		m_m65c102_rom[0x07b] = 'o';
-		m_m65c102_rom[0x07c] = 'c';
-		m_m65c102_rom[0x07d] = 'e';
-		m_m65c102_rom[0x07e] = 's';
-		m_m65c102_rom[0x07f] = 's';
-		m_m65c102_rom[0x080] = 'o';
-		m_m65c102_rom[0x081] = 'r';
+		m_r65c102_rom[0x06f] = '6';
+		m_r65c102_rom[0x070] = '5';
+		m_r65c102_rom[0x071] = 'C';
+		m_r65c102_rom[0x072] = '1';
+		m_r65c102_rom[0x073] = '0';
+		m_r65c102_rom[0x074] = '2';
+		m_r65c102_rom[0x075] = ' ';
+		m_r65c102_rom[0x076] = 'C';
+		m_r65c102_rom[0x077] = 'o';
+		m_r65c102_rom[0x078] = '-';
+		m_r65c102_rom[0x079] = 'P';
+		m_r65c102_rom[0x07a] = 'r';
+		m_r65c102_rom[0x07b] = 'o';
+		m_r65c102_rom[0x07c] = 'c';
+		m_r65c102_rom[0x07d] = 'e';
+		m_r65c102_rom[0x07e] = 's';
+		m_r65c102_rom[0x07f] = 's';
+		m_r65c102_rom[0x080] = 'o';
+		m_r65c102_rom[0x081] = 'r';
 		break;
 	case 1: // 4MHz
-		m_m65c102->set_clock_scale(1.0 / 8);
+		m_r65c102->set_clock_scale(1.0 / 8);
 
 		// patch startup banner
-		m_m65c102_rom[0x06f] = '0';
-		m_m65c102_rom[0x070] = '4';
-		m_m65c102_rom[0x071] = 'M';
-		m_m65c102_rom[0x072] = 'H';
-		m_m65c102_rom[0x073] = 'z';
-		m_m65c102_rom[0x074] = ' ';
-		m_m65c102_rom[0x075] = '6';
-		m_m65c102_rom[0x076] = '5';
-		m_m65c102_rom[0x077] = 'C';
-		m_m65c102_rom[0x078] = '1';
-		m_m65c102_rom[0x079] = '0';
-		m_m65c102_rom[0x07a] = '2';
-		m_m65c102_rom[0x07b] = ' ';
-		m_m65c102_rom[0x07c] = 'C';
-		m_m65c102_rom[0x07d] = 'o';
-		m_m65c102_rom[0x07e] = '-';
-		m_m65c102_rom[0x07f] = 'P';
-		m_m65c102_rom[0x080] = 'r';
-		m_m65c102_rom[0x081] = 'o';
+		m_r65c102_rom[0x06f] = '0';
+		m_r65c102_rom[0x070] = '4';
+		m_r65c102_rom[0x071] = 'M';
+		m_r65c102_rom[0x072] = 'H';
+		m_r65c102_rom[0x073] = 'z';
+		m_r65c102_rom[0x074] = ' ';
+		m_r65c102_rom[0x075] = '6';
+		m_r65c102_rom[0x076] = '5';
+		m_r65c102_rom[0x077] = 'C';
+		m_r65c102_rom[0x078] = '1';
+		m_r65c102_rom[0x079] = '0';
+		m_r65c102_rom[0x07a] = '2';
+		m_r65c102_rom[0x07b] = ' ';
+		m_r65c102_rom[0x07c] = 'C';
+		m_r65c102_rom[0x07d] = 'o';
+		m_r65c102_rom[0x07e] = '-';
+		m_r65c102_rom[0x07f] = 'P';
+		m_r65c102_rom[0x080] = 'r';
+		m_r65c102_rom[0x081] = 'o';
 		break;
 	case 2: // 16MHz
-		m_m65c102->set_clock_scale(1.0 / 2);
+		m_r65c102->set_clock_scale(1.0 / 2);
 
 		// patch startup banner
-		m_m65c102_rom[0x06f] = '1';
-		m_m65c102_rom[0x070] = '6';
-		m_m65c102_rom[0x071] = 'M';
-		m_m65c102_rom[0x072] = 'H';
-		m_m65c102_rom[0x073] = 'z';
-		m_m65c102_rom[0x074] = ' ';
-		m_m65c102_rom[0x075] = '6';
-		m_m65c102_rom[0x076] = '5';
-		m_m65c102_rom[0x077] = 'C';
-		m_m65c102_rom[0x078] = '1';
-		m_m65c102_rom[0x079] = '0';
-		m_m65c102_rom[0x07a] = '2';
-		m_m65c102_rom[0x07b] = ' ';
-		m_m65c102_rom[0x07c] = 'C';
-		m_m65c102_rom[0x07d] = 'o';
-		m_m65c102_rom[0x07e] = '-';
-		m_m65c102_rom[0x07f] = 'P';
-		m_m65c102_rom[0x080] = 'r';
-		m_m65c102_rom[0x081] = 'o';
+		m_r65c102_rom[0x06f] = '1';
+		m_r65c102_rom[0x070] = '6';
+		m_r65c102_rom[0x071] = 'M';
+		m_r65c102_rom[0x072] = 'H';
+		m_r65c102_rom[0x073] = 'z';
+		m_r65c102_rom[0x074] = ' ';
+		m_r65c102_rom[0x075] = '6';
+		m_r65c102_rom[0x076] = '5';
+		m_r65c102_rom[0x077] = 'C';
+		m_r65c102_rom[0x078] = '1';
+		m_r65c102_rom[0x079] = '0';
+		m_r65c102_rom[0x07a] = '2';
+		m_r65c102_rom[0x07b] = ' ';
+		m_r65c102_rom[0x07c] = 'C';
+		m_r65c102_rom[0x07d] = 'o';
+		m_r65c102_rom[0x07e] = '-';
+		m_r65c102_rom[0x07f] = 'P';
+		m_r65c102_rom[0x080] = 'r';
+		m_r65c102_rom[0x081] = 'o';
 		break;
 	case 3: // 64MHz
-		m_m65c102->set_clock_scale(1.0 * 2);
+		m_r65c102->set_clock_scale(1.0 * 2);
 
 		// patch startup banner
-		m_m65c102_rom[0x06f] = '6';
-		m_m65c102_rom[0x070] = '4';
-		m_m65c102_rom[0x071] = 'M';
-		m_m65c102_rom[0x072] = 'H';
-		m_m65c102_rom[0x073] = 'z';
-		m_m65c102_rom[0x074] = ' ';
-		m_m65c102_rom[0x075] = '6';
-		m_m65c102_rom[0x076] = '5';
-		m_m65c102_rom[0x077] = 'C';
-		m_m65c102_rom[0x078] = '1';
-		m_m65c102_rom[0x079] = '0';
-		m_m65c102_rom[0x07a] = '2';
-		m_m65c102_rom[0x07b] = ' ';
-		m_m65c102_rom[0x07c] = 'C';
-		m_m65c102_rom[0x07d] = 'o';
-		m_m65c102_rom[0x07e] = '-';
-		m_m65c102_rom[0x07f] = 'P';
-		m_m65c102_rom[0x080] = 'r';
-		m_m65c102_rom[0x081] = 'o';
+		m_r65c102_rom[0x06f] = '6';
+		m_r65c102_rom[0x070] = '4';
+		m_r65c102_rom[0x071] = 'M';
+		m_r65c102_rom[0x072] = 'H';
+		m_r65c102_rom[0x073] = 'z';
+		m_r65c102_rom[0x074] = ' ';
+		m_r65c102_rom[0x075] = '6';
+		m_r65c102_rom[0x076] = '5';
+		m_r65c102_rom[0x077] = 'C';
+		m_r65c102_rom[0x078] = '1';
+		m_r65c102_rom[0x079] = '0';
+		m_r65c102_rom[0x07a] = '2';
+		m_r65c102_rom[0x07b] = ' ';
+		m_r65c102_rom[0x07c] = 'C';
+		m_r65c102_rom[0x07d] = 'o';
+		m_r65c102_rom[0x07e] = '-';
+		m_r65c102_rom[0x07f] = 'P';
+		m_r65c102_rom[0x080] = 'r';
+		m_r65c102_rom[0x081] = 'o';
 		break;
 	}
 }
@@ -872,7 +872,7 @@ void bbc_tube_matchbox_device::pnmi_w(int state)
 	switch (m_copro)
 	{
 	case 0x00: case 0x01: case 0x02: case 0x03:
-		m_m65c102->set_input_line(M65C02_NMI_LINE, state);
+		m_r65c102->set_input_line(R65C02_NMI_LINE, state);
 		break;
 	case 0x04: case 0x05: case 0x06: case 0x07:
 		m_z80->set_input_line(INPUT_LINE_NMI, state);
@@ -904,7 +904,7 @@ void bbc_tube_matchbox_device::pirq_w(int state)
 	switch (m_copro)
 	{
 	case 0x00: case 0x01: case 0x02: case 0x03:
-		m_m65c102->set_input_line(M65C02_IRQ_LINE, state);
+		m_r65c102->set_input_line(R65C02_IRQ_LINE, state);
 		break;
 	case 0x04: case 0x05: case 0x06: case 0x07:
 		m_z80->set_input_line(INPUT_LINE_IRQ0, state);
@@ -943,12 +943,12 @@ void bbc_tube_matchbox_device::prst_w(int state)
 //  65C102
 //-------------------------------------------------
 
-void bbc_tube_matchbox_device::m65c102_bank_w(offs_t offset, uint8_t data)
+void bbc_tube_matchbox_device::r65c102_bank_w(offs_t offset, uint8_t data)
 {
 	if (BIT(data, 7))
-		m_m65c102_bank[offset & 7]->set_base(m_ram->pointer() + (data & 0x7f) * 0x2000 + 0x100000); // external RAM
+		m_r65c102_bank[offset & 7]->set_base(m_ram->pointer() + (data & 0x7f) * 0x2000 + 0x100000); // external RAM
 	else
-		m_m65c102_bank[offset & 7]->set_base(m_ram->pointer() + (data & 0x07) * 0x2000); // internal RAM
+		m_r65c102_bank[offset & 7]->set_base(m_ram->pointer() + (data & 0x07) * 0x2000); // internal RAM
 }
 
 

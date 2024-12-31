@@ -213,7 +213,9 @@ void quadra605_state::macqd605(machine_config &config)
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_primetime, FUNC(primetime_device::cb1_w));
 	m_cuda->via_data_callback().set(m_primetime, FUNC(primetime_device::cb2_w));
+	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	m_primetime->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));

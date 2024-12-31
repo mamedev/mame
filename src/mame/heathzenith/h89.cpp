@@ -44,9 +44,8 @@
 #include "emu.h"
 
 #include "intr_cntrl.h"
-#include "sigmasoft_parallel_port.h"
-#include "tlb.h"
 
+#include "bus/heathzenith/h19/tlb.h"
 #include "bus/heathzenith/h89/h89bus.h"
 #include "bus/heathzenith/h89/cards.h"
 #include "cpu/z80/z80.h"
@@ -198,19 +197,23 @@ class h89_sigmasoft_state : public h89_state
 {
 public:
 	h89_sigmasoft_state(const machine_config &mconfig, device_type type, const char *tag):
-		h89_state(mconfig, type, tag),
-		m_sigma_parallel(*this, "sigma_parallel")
+		h89_state(mconfig, type, tag)
 	{
 	}
 
 	void h89_sigmasoft(machine_config &config);
-
-protected:
-	required_device<sigmasoft_parallel_port> m_sigma_parallel;
-
-	void h89_sigmasoft_io(address_map &map);
 };
 
+class h89_cdr_state : public h89_base_state
+{
+public:
+	h89_cdr_state(const machine_config &mconfig, device_type type, const char *tag):
+		h89_base_state(mconfig, type, tag)
+	{
+	}
+
+	void h89_cdr(machine_config &config);
+};
 
 /**
  * Heathkit H89 with MMS hardware
@@ -376,44 +379,6 @@ void h89_base_state::h89_base_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 }
-
-void h89_sigmasoft_state::h89_sigmasoft_io(address_map &map)
-{
-	h89_base_io(map);
-
-	// Add SigmaSoft parallel port board, required for IGC graphics
-	map(0x08,0x0f).rw(m_sigma_parallel, FUNC(sigmasoft_parallel_port::read), FUNC(sigmasoft_parallel_port::write));
-}
-
-/*
-    Memory Map for MMS 444-61C PROM
-
-                                  PORT
-    Use                        |  Hex  |
-   ----------------------------+-------+
-    Not specified, available   |  0-37 |
-    MMS 77316                  | 38-3F |
-    MMS Internal test fixtures | 40-47 |
-    MMS 77317 ACT/XCOMP I/O    | 48-4F |
-    MMS 77315 CAMEO I/O        | 50-56 |
-    Unused                     |    57 |
-    MMS 77314 Corvus I/O       | 58-59 |
-    MMS 77314 REMEX I/O        | 5A-5B |
-    MMS 77314,15,17 Conf Port  |    5C |
-    Unused                     | 5D-77 |
-    Disk I/O #1                | 78-7B |
-    Disk I/O #2                | 7C-7F |
-    HDOS reserved              | 80-CF |
-    DCE Serial I/O             | D0-D7 |
-    DTE Serial I/O             | D8-DF |
-    DCE Serial I/O             | EO-E7 |
-    Console I/O                | E8-EF |
-    NMI                        | F0-F1 |
-    General purpose port       |    F2 |
-    Unused                     | F8-F9 |
-    NMI                        | FA-FB |
-    Unused                     | FC-FF |
- */
 
 // Input ports
 static INPUT_PORTS_START( h88 )
@@ -650,6 +615,30 @@ static INPUT_PORTS_START( h89 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x80, "Auto" )
 
+	// CDR8390 ROM
+	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )                        PORT_DIPLOCATION("SW501:1,2")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "H-88-1" )
+	PORT_DIPSETTING(    0x01, "undefined" )
+	PORT_DIPSETTING(    0x02, "undefined" )
+	PORT_DIPSETTING(    0x03, "undefined" )
+	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )                        PORT_DIPLOCATION("SW501:3,4")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "undefined" )
+	PORT_DIPSETTING(    0x04, "CDR FDC-880H" )
+	PORT_DIPSETTING(    0x08, "undefined" )
+	PORT_DIPSETTING(    0x0c, "undefined" )
+	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )                  PORT_DIPLOCATION("SW501:5")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "Disk I/O #2" )
+	PORT_DIPSETTING(    0x10, "Disk I/O #1" )
+	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )       PORT_DIPLOCATION("SW501:6")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x00, "Console Baud rate" )                  PORT_DIPLOCATION("SW501:7")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "9600" )
+	PORT_DIPSETTING(    0x40, "19200" )
+	PORT_DIPNAME( 0x80, 0x00, "Boot mode" )                          PORT_DIPLOCATION("SW501:8")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, "Auto" )
+
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x03, 0x00, "CPU Clock Speed Upgrade")
@@ -665,6 +654,7 @@ static INPUT_PORTS_START( h89 )
 	PORT_CONFSETTING(   0x14, "Ultimeth MTRHEX-4k")
 	PORT_CONFSETTING(   0x18, "Ultimeth MTRHEX-2k")
 	PORT_CONFSETTING(   0x1c, "SigmaROM")
+	PORT_CONFSETTING(   0x20, "CDR8390 ROM")
 
 INPUT_PORTS_END
 
@@ -1032,19 +1022,21 @@ void h89_sigmasoft_state::h89_sigmasoft(machine_config &config)
 {
 	h89(config);
 	m_h89bus->set_default_bios_tag("444-61");
-	m_maincpu->set_addrmap(AS_IO, &h89_sigmasoft_state::h89_sigmasoft_io);
 
 	sigma_tlb_options(m_tlbc);
 
-	SIGMASOFT_PARALLEL_PORT(config, m_sigma_parallel);
-	m_sigma_parallel->ctrl_r_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_ctrl_r));
-	m_sigma_parallel->video_mem_r_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_video_mem_r));
-	m_sigma_parallel->video_mem_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_video_mem_w));
-	m_sigma_parallel->io_lo_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_io_lo_addr_w));
-	m_sigma_parallel->io_hi_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_io_hi_addr_w));
-	m_sigma_parallel->window_lo_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_window_lo_addr_w));
-	m_sigma_parallel->window_hi_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_window_hi_addr_w));
-	m_sigma_parallel->ctrl_cb().set(m_tlbc, FUNC(heath_tlb_connector::sigma_ctrl_w));
+	H89BUS_LEFT_SLOT(config.replace(), "p501", "h89bus", h89_left_cards, "ss_parallel");
+}
+
+void h89_cdr_state::h89_cdr(machine_config &config)
+{
+	h89_base(config);
+	m_h89bus->set_default_bios_tag("cdr86");
+
+	m_intr_socket->set_default_option("original");
+	m_intr_socket->set_fixed(true);
+
+	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", h89_right_cards, "cdr_fdc");
 }
 
 void h89_mms_state::h89_mms(machine_config &config)
@@ -1107,6 +1099,15 @@ void h89_mms_state::h89_mms(machine_config &config)
 		ROM_SYSTEM_BIOS(x, "sigmarom_v1_2", "SigmaROM v1.2") \
 		ROMX_LOAD("2732_sigma_rom_v_1.2.bin", 0x0000, 0x1000, CRC(c4ff47c5) SHA1(d6f3d71ff270a663003ec18a3ed1fa49f627123a), ROM_BIOS(x))
 
+#define ROM_CDR_8390(x) \
+	ROM_SYSTEM_BIOS(x, "cdr8390", "CDR 8390") \
+	ROMX_LOAD("2732_cdr8390.u518",        0x0000, 0x1000, CRC(1d30fe43) SHA1(170092d1b62cf88edd29338b474e799c249a0dd7), ROM_BIOS(x))
+
+// NOTE: this rom is not currently working
+#define ROM_CDR_80B2(x) \
+	ROM_SYSTEM_BIOS(x, "cdr80b2", "CDR 80B2") \
+	ROMX_LOAD("2732_cdr80b2.u518",        0x0000, 0x1000, CRC(804a6898) SHA1(a58daca0baf7b5d7c1485531680bd63168eb2d7e), ROM_BIOS(x))
+
 
 ROM_START( h88 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
@@ -1141,6 +1142,10 @@ ROM_START( h89 )
 	ROM_SIGMA_V_1_3(8)
 
 	ROM_SIGMA_V_1_2(9)
+
+	ROM_CDR_8390(10)
+
+	ROM_CDR_80B2(11)
 ROM_END
 
 ROM_START( h89_sigmasoft )
@@ -1168,6 +1173,25 @@ ROM_START( h89_sigmasoft )
 	ROM_SIGMA_V_1_3(8)
 
 	ROM_SIGMA_V_1_2(9)
+
+	ROM_CDR_8390(10)
+
+	ROM_CDR_80B2(11)
+ROM_END
+
+ROM_START( h89_cdr )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("cdr8390")
+
+	ROM_H17
+
+	ROM_CDR_8390(0)
+
+	ROM_CDR_80B2(1)
+
+	ROM_KMR_100(2)
+
+	ROM_ULTIMETH_4K(3)
 ROM_END
 
 ROM_START( h89_mms )
@@ -1208,6 +1232,10 @@ ROM_START( z90 )
 	ROM_SIGMA_V_1_3(6)
 
 	ROM_SIGMA_V_1_2(7)
+
+	ROM_CDR_8390(8)
+
+	ROM_CDR_80B2(9)
 ROM_END
 
 } // anonymous namespace
@@ -1216,6 +1244,7 @@ ROM_END
 //    year  name           parent compat machine        input class                init        company                fullname                   flags
 COMP( 1979, h88,           h89,   0,     h88,           h88,  h88_state,           empty_init, "Heath Company",       "H-88",                    MACHINE_SUPPORTS_SAVE)
 COMP( 1979, h89,           0,     0,     h89,           h89,  h89_state,           empty_init, "Heath Company",       "H-89",                    MACHINE_SUPPORTS_SAVE)
+COMP( 1981, h89_cdr,       h89,   0,     h89_cdr,       h89,  h89_cdr_state,       empty_init, "Heath Company",       "H-89 with CDR Equipment", MACHINE_SUPPORTS_SAVE)
 COMP( 1981, h89_mms,       h89,   0,     h89_mms,       h89,  h89_mms_state,       empty_init, "Heath Company",       "H-89 with MMS Equipment", MACHINE_SUPPORTS_SAVE)
 COMP( 1981, z90,           h89,   0,     h89,           h89,  h89_state,           empty_init, "Zenith Data Systems", "Z-90",                    MACHINE_SUPPORTS_SAVE)
 COMP( 1984, h89_sigmasoft, h89,   0,     h89_sigmasoft, h89,  h89_sigmasoft_state, empty_init, "Heath Company",       "H-89 with SigmaSoft IGC", MACHINE_SUPPORTS_SAVE)

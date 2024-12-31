@@ -35,6 +35,11 @@
  *   today also use IEEE FP.
  *
  */
+#ifndef MAME_CPU_I860_I860DEC_HXX
+#define MAME_CPU_I860_I860DEC_HXX
+
+#pragma once
+
 #include "i860.h"
 #include <cmath>
 
@@ -4670,3 +4675,5 @@ void debugger (i860s *cpustate)
 }
 
 #endif
+
+#endif // MAME_CPU_I860_I860DEC_HXX

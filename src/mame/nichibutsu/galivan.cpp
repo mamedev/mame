@@ -1197,11 +1197,17 @@ void galivan_state::common(machine_config &config)
 	    Sum:                  0.67015
 	    Multiply all 3 values by 1 / 0.67015 (i.e. 1.492203):
 	   Final values are: ym: 0.492203; dac1: 0.209505; dac2: 0.298291 */
-	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R15, R14, nothing(infinite resistance), wire(short), C9, C11
+
+	// R15, R14, nothing(infinite resistance), wire(short), C9, C11
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0));
 	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R11, R10, nothing(infinite resistance), wire(short), C7, C17
+
+	// R11, R10, nothing(infinite resistance), wire(short), C7, C17
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7));
 	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R13, R12, nothing(infinite resistance), wire(short), C8, C18
+
+	// R13, R12, nothing(infinite resistance), wire(short), C8, C18
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7));
 	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	YM3526(config, "ymsnd", XTAL(8'000'000) / 2).add_route(ALL_OUTPUTS, m_ymfilter, 0.4922);
@@ -1902,5 +1908,5 @@ GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, ninjemak_state, empty_init, 
 GAME( 1986, ninjemat, ninjemak, galivan,  galivan,  ninjemak_state, empty_init,  ROT270, "Nichibutsu (Tecfri license)", "Ninja Emaki (Tecfri license)",                        MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan)",                           MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan, alt)",                      MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, youmab_state,   empty_init , ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 1)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // player is invincible
+GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, youmab_state,   empty_init,  ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 1)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // player is invincible
 GAME( 1986, youmab2,  ninjemak, youmab,   ninjemak, youmab_state,   empty_init,  ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 2)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // ""

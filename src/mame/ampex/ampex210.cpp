@@ -243,5 +243,5 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1988, ampex210p, 0, 0, ampex210p, ampex210p, ampex210_state, empty_init, "Ampex", "Ampex 210 plus Terminal (v3.0)", MACHINE_IS_SKELETON)
-COMP(1988, ampex230p, 0, 0, ampex230p, ampex210p, ampex210_state, empty_init, "Ampex", "Ampex 230 plus Terminal (v4.0)", MACHINE_IS_SKELETON)
+COMP(1988, ampex210p, 0, 0, ampex210p, ampex210p, ampex210_state, empty_init, "Ampex", "Ampex 210 plus Terminal (v3.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1988, ampex230p, 0, 0, ampex230p, ampex210p, ampex210_state, empty_init, "Ampex", "Ampex 230 plus Terminal (v4.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

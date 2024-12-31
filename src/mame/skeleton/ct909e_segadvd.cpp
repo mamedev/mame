@@ -116,4 +116,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2007, megatrix,    0,       0,      megatrix, megatrix, ct909e_megatrix_state, empty_init, "<unknown>", "MeGaTrix (Spain)", MACHINE_IS_SKELETON )
+CONS( 2007, megatrix,    0,       0,      megatrix, megatrix, ct909e_megatrix_state, empty_init, "<unknown>", "MeGaTrix (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

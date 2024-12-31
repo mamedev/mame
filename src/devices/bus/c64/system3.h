@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_BUS_SYSTEM3_H
-#define MAME_BUS_BUS_SYSTEM3_H
+#ifndef MAME_BUS_C64_SYSTEM3_H
+#define MAME_BUS_C64_SYSTEM3_H
 
 #pragma once
 

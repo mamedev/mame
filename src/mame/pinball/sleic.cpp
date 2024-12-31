@@ -372,7 +372,7 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1992,  bikerace,  0,         sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Bike Race",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  bikerace2, bikerace,  sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Bike Race (2-ball play)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993,  sleicpin,  0,         sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Sleic Pin Ball",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1994,  iomoon,    0,         sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Io Moon",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  bikerace,  0,         sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Bike Race",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  bikerace2, bikerace,  sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Bike Race (2-ball play)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993,  sleicpin,  0,         sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Sleic Pin Ball",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  iomoon,    0,         sleic,  sleic, sleic_state, empty_init, ROT0, "Sleic", "Io Moon",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

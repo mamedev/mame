@@ -296,6 +296,6 @@ void mks3_device::req_w(int state)
 		return;
 
 	m_req = state;
-	m_cpu->set_input_line(M6805V0_INT_IRQ1, m_req);
+	m_cpu->set_input_line(HD6305_INT_IRQ1, m_req);
 	logerror("req %d\n", m_req);
 }

@@ -9,10 +9,12 @@ Progress   (c) 1984 Chuo
 driver by Ernesto Corvi
 
 Notes:
-- Sprite colors are wrong (missing colortable?)
+- sprite colors are wrong (missing colortable?)
 - driver should probably be merged with venture/suprridr.cpp and
   thepit/thepit.cpp
 - unused color bank for tilemaps? (colors 0x10-0x1f & 0x30-0x3f)
+- verify clocks, they're currently borrowed from thepit, maincpu clock
+  used to be 5MHz in older MAME versions but that's doubtful
 
 ***************************************************************************/
 
@@ -445,6 +447,7 @@ INTERRUPT_GEN_MEMBER(timelimt_state::main_nmi)
 {
 	m_nmi_state = !m_nmi_state;
 
+	// gameplay pace matches PCB video like this
 	if (m_nmi_enabled && m_nmi_state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	else if (!m_nmi_state)
@@ -456,12 +459,12 @@ INTERRUPT_GEN_MEMBER(timelimt_state::main_nmi)
 void timelimt_state::timelimt(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 5'000'000);   // 5.000 MHz
+	Z80(config, m_maincpu, 18'432'000 / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &timelimt_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &timelimt_state::main_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(timelimt_state::main_nmi));
 
-	Z80(config, m_audiocpu, 18'432'000 / 6);    // 3.072 MHz
+	Z80(config, m_audiocpu, 10'000'000 / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &timelimt_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &timelimt_state::sound_io_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(timelimt_state::irq0_line_hold)); // ?

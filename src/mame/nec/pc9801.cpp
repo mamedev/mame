@@ -847,6 +847,8 @@ void pc9801vm_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
 			pal4bit(m_analog16.g[m_analog16.pal_entry]),
 			pal4bit(m_analog16.b[m_analog16.pal_entry])
 		);
+		// lemmings raster effects
+		m_screen->update_partial(m_screen->vpos());
 		return;
 	}
 
@@ -1066,9 +1068,15 @@ void pc9801vm_state::dma_access_ctrl_w(offs_t offset, u8 data)
 
 // ARTIC device
 
+/*
+ * [0] read bits 15-0 of the counter device
+ * [1] read bits 23-8 of the counter device
+ *
+ * FreeDOS(98) Kernel will test [1] a whole lot during HMA allocation
+ */
 uint16_t pc9801vm_state::timestamp_r(offs_t offset)
 {
-	return (m_maincpu->total_cycles() >> (16 * offset));
+	return (m_maincpu->total_cycles() >> (8 * offset));
 }
 
 void pc9801vm_state::artic_wait_w(u8 data)
@@ -2374,12 +2382,12 @@ void pc9801_state::pc9801_common(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(21.0526_MHz_XTAL, 848, 0, 640, 440, 0, 400);
 	m_screen->set_screen_update(FUNC(pc9801_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(pc9801_state::vrtc_irq));
 
 	UPD7220(config, m_hgdc[0], 21.0526_MHz_XTAL / 8, "screen");
 	m_hgdc[0]->set_addrmap(0, &pc9801_state::upd7220_1_map);
 	m_hgdc[0]->set_draw_text(FUNC(pc9801_state::hgdc_draw_text));
 	m_hgdc[0]->vsync_wr_callback().set(m_hgdc[1], FUNC(upd7220_device::ext_sync_w));
+	m_hgdc[0]->vsync_wr_callback().append(FUNC(pc9801_state::vrtc_irq));
 
 	UPD7220(config, m_hgdc[1], 21.0526_MHz_XTAL / 8, "screen");
 	m_hgdc[1]->set_addrmap(0, &pc9801_state::upd7220_2_map);

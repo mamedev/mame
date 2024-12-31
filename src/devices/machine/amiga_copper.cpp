@@ -236,7 +236,8 @@ void amiga_copper_device::vblank_sync()
 	set_pc(0, true);
 }
 
-int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
+// TODO: h/vblank checks against xpos/vpos
+int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, int num_planes)
 {
 	int word0, word1;
 
@@ -268,11 +269,7 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 			(!m_state_waitblit || !(is_blitter_busy)))
 		{
 			m_state_waiting = false;
-//#if GUESS_COPPER_OFFSET
-//          return xpos + COPPER_CYCLES_TO_PIXELS(1 + m_wait_offset);
-//#else
-			return xpos + COPPER_CYCLES_TO_PIXELS(1 + 3);
-//#endif
+			return xpos + COPPER_CYCLES_TO_PIXELS(1);
 		}
 
 		/* otherwise, see if this line is even a possibility; if not, punt */
@@ -355,13 +352,18 @@ int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy)
 		/* handle a wait */
 		if ((word1 & 1) == 0)
 		{
-			LOGINST("  WAIT %04x & %04x (currently %04x)\n",
+			const int wait_offset = std::max(num_planes - 4, 0) + 1;
+
+			LOGINST("  WAIT %04x & %04x (currently %04x, num planes %d +%d)\n",
 				m_waitval,
 				m_waitmask,
-				(ypos << 8) | (xpos >> 1)
+				(ypos << 8) | (xpos >> 1),
+				num_planes,
+				wait_offset
 			);
 
 			m_state_waiting = true;
+			xpos += COPPER_CYCLES_TO_PIXELS(wait_offset);
 		}
 
 		/* handle a skip */

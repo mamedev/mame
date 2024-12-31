@@ -9,8 +9,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_SG1000_EXP_SK1100_PRN_H
-#define MAME_BUS_SG1000_EXP_SK1100_PRN_H
+#ifndef MAME_BUS_SG1000_EXP_SK1100PRN_H
+#define MAME_BUS_SG1000_EXP_SK1100PRN_H
 
 #pragma once
 
@@ -84,5 +84,4 @@ DECLARE_DEVICE_TYPE(SK1100_PRINTER_PORT, sk1100_printer_port_device)
 
 void sk1100_printer_port_devices(device_slot_interface &device);
 
-
-#endif // MAME_BUS_SG1000_EXP_SK1100_PRN_H
+#endif // MAME_BUS_SG1000_EXP_SK1100PRN_H

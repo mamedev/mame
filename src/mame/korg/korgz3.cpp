@@ -148,4 +148,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1988, korgz3, 0, 0, korgz3, korgz3, korgz3_state, empty_init, "Korg", "Z3 Guitar Synthesizer", MACHINE_IS_SKELETON)
+SYST(1988, korgz3, 0, 0, korgz3, korgz3, korgz3_state, empty_init, "Korg", "Z3 Guitar Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

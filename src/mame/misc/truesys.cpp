@@ -115,4 +115,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, unkts, 0, unkts, unkts, truesys_state, empty_init, ROT0, "<unknown>", "unknown game on TrueSys hardware", MACHINE_IS_SKELETON )
+GAME( 200?, unkts, 0, unkts, unkts, truesys_state, empty_init, ROT0, "<unknown>", "unknown game on TrueSys hardware", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -488,8 +488,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::irq)
 }
 
 
-
-
 void ikki_state::ikki(machine_config &config)
 {
 	constexpr XTAL MASTER_CLOCK = 20_MHz_XTAL;

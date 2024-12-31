@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett
-#pragma once
+#ifndef MAME_CPU_I386_X87PRIV_H
+#define MAME_CPU_I386_X87PRIV_H
 
-#ifndef __X87PRIV_H__
-#define __X87PRIV_H__
+#pragma once
 
 #include <cmath>
 
@@ -165,4 +165,4 @@ void i386_device::WRITE80(uint32_t ea, floatx80 t)
 	WRITE16(ea + 8, t.high);
 }
 
-#endif /* __X87PRIV_H__ */
+#endif // MAME_CPU_I386_X87PRIV_H

@@ -396,6 +396,37 @@
 		return "\"" .. str:gsub("[\"\\\"]", "\\%0") .. "\""
 	end
 
+--
+-- Set the deployment target in the project or target options.
+--
+-- @param cfg
+--    The configuration in use.
+-- @param def
+--    The default version overrides.
+-- @param opts
+--    The options to set deployment target in.
+--
+
+	function xcode.setdeploymenttarget(cfg, def, opts)
+		local get_opt = function(opt, def)
+			return (opt and #opt > 0) and opt or def
+		end
+
+		local iosversion = get_opt(cfg.iostargetplatformversion, def.iOSTargetPlatformVersion)
+		local macosversion = get_opt(cfg.macostargetplatformversion, def.macOSTargetPlatformVersion)
+		local tvosversion = get_opt(cfg.tvostargetplatformversion, def.tvOSTargetPlatformVersion)
+		local visionosversion = get_opt(cfg.visionostargetplatformversion, def.visionOSTargetPlatformVersion)
+
+		if iosversion then
+			opts.IPHONEOS_DEPLOYMENT_TARGET = iosversion
+		elseif macosversion then
+			opts.MACOSX_DEPLOYMENT_TARGET = macosversion
+		elseif tvosversion then
+			opts.TVOS_DEPLOYMENT_TARGET = tvosversion
+		elseif visionosversion then
+			opts.XROS_DEPLOYMENT_TARGET = tvosversion
+		end
+	end
 
 
 ---------------------------------------------------------------------------
@@ -1269,6 +1300,21 @@ end
 		_p('')
 	end
 
+	function xcode.versionge(version, reference)
+		local vparts = string.explode(version, ".", true)
+		local rparts = string.explode(reference, ".", true)
+
+		for i=1,#rparts do
+			local rnum = tonumber(rparts[i]) or 0
+			local vnum = tonumber(vparts[i]) or 0
+
+			if vnum < rnum then
+				return false
+			end
+		end
+
+		return true
+	end
 
 	function xcode.Footer()
 		_p(1,'};')

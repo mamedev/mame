@@ -461,4 +461,4 @@ void slapfght_ms_state::init_decryption() // same as the one for blktiger_ms
 } // anonymous namespace
 
 
-GAME( 199?, slapfighm, alcon, slapfighm, slapfighm, slapfght_ms_state, init_decryption, ROT270, "bootleg (Gaelco / Ervisa)", "Slap Fight (Modular System)", MACHINE_IS_SKELETON )
+GAME( 199?, slapfighm, alcon, slapfighm, slapfighm, slapfght_ms_state, init_decryption, ROT270, "bootleg (Gaelco / Ervisa)", "Slap Fight (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

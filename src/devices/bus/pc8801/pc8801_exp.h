@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_BUS_PC8801_EXP_H
-#define MAME_BUS_PC8801_EXP_H
+#ifndef MAME_BUS_PC8801_PC8801_EXP_H
+#define MAME_BUS_PC8801_PC8801_EXP_H
 
 #pragma once
 
@@ -91,4 +91,4 @@ DECLARE_DEVICE_TYPE(PC8801_EXP_SLOT, pc8801_exp_slot_device)
 
 void pc8801_exp_devices(device_slot_interface &device);
 
-#endif // MAME_MACHINE_PC8801_EXP_H
+#endif // MAME_MACHINE_PC8801_PC8801_EXP_H

@@ -58,8 +58,8 @@
                             <B>          <A>
 
 **********************************************************************/
-#ifndef MAME_MACHINE_PC9801_CBUS_H
-#define MAME_MACHINE_PC9801_CBUS_H
+#ifndef MAME_BUS_CBUS_PC9801_CBUS_H
+#define MAME_BUS_CBUS_PC9801_CBUS_H
 
 #pragma once
 
@@ -135,4 +135,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801CBUS_SLOT, pc9801_slot_device)
 
-#endif // MAME_MACHINE_PC9801_CBUS_H
+#endif // MAME_BUS_CBUS_PC9801_CBUS_H

@@ -315,4 +315,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2002?, queen,  0,    queen, 0, queen_state, empty_init, ROT0, "STG", "Queen?", MACHINE_IS_SKELETON )
+GAME( 2002?, queen,  0,    queen, 0, queen_state, empty_init, ROT0, "STG", "Queen?", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -137,7 +137,7 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info)
 			code + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
-	tileinfo.category = Which ? (attr & 0x40) >> 6 : 0;
+	tileinfo.category = Which ? 0 : (attr & 0x40) >> 6;
 }
 
 
@@ -217,7 +217,7 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		}
 
 		m_layer[0]->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(0), 0);
-		m_k007121->sprites_draw(bitmap, cliprect, m_spriteram, (m_k007121->ctrlram_r(6) & 0x30) * 2, 40, 0, screen.priority(), (m_k007121->ctrlram_r(3) & 0x40) >> 5);
+		m_k007121->sprites_draw(bitmap, cliprect, m_spriteram, (m_k007121->ctrlram_r(6) & 0x30) * 2, 40, 0, screen.priority(), (m_k007121->ctrlram_r(3) & 0x20) >> 4);
 		m_layer[0]->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(1), 0);
 		// we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites
 		m_layer[1]->draw(screen, bitmap, finalclip1, TILEMAP_DRAW_OPAQUE, 0);
@@ -248,7 +248,6 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			}
 
 			finalclip1.max_x = cliprect.max_x - ctrl_0 + 8;
-
 		}
 		else
 		{
@@ -284,7 +283,7 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		if (use_clip3[0])
 			m_layer[0]->draw(screen, bitmap, finalclip3, TILEMAP_DRAW_CATEGORY(0), 0);
 
-		m_k007121->sprites_draw(bitmap, cliprect, m_spriteram, (m_k007121->ctrlram_r(6) & 0x30) * 2,40,0,screen.priority(),(m_k007121->ctrlram_r(3) & 0x40) >> 5);
+		m_k007121->sprites_draw(bitmap, cliprect, m_spriteram, (m_k007121->ctrlram_r(6) & 0x30) * 2, 40, 0, screen.priority(), (m_k007121->ctrlram_r(3) & 0x20) >> 4);
 
 		m_layer[0]->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_CATEGORY(1), 0);
 		if (use_clip3[0])
@@ -293,8 +292,8 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_layer[1]->draw(screen, bitmap, finalclip1, 0, 0);
 		if (use_clip3[1])
 			m_layer[1]->draw(screen, bitmap, finalclip3, 0, 0);
-
 	}
+
 	return 0;
 }
 
@@ -317,7 +316,7 @@ void labyrunr_state::bankswitch_w(uint8_t data)
 	if (data & 0xe0) logerror("bankswitch %02x", data);
 
 	// bits 0-2 = bank number
-	m_mainbank->set_entry(data & 0x07);   // shall we check if data & 7 > #banks?
+	m_mainbank->set_entry(data & 0x07); // shall we check if data & 7 > #banks?
 
 	// bits 3 and 4 are coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x08);
@@ -418,6 +417,7 @@ static GFXDECODE_START( gfx_labyrunr )
 	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x4_packed_msb, 0, 8*16 )
 GFXDECODE_END
 
+
 /***************************************************************************
 
     Machine Driver
@@ -490,14 +490,14 @@ ROM_START( tricktrp )
 	ROM_LOAD( "771e03",     0x18000, 0x10000, CRC(d0d68036) SHA1(8589ee07e229259341a4cc22bc64de8f06536472) )
 
 	ROM_REGION( 0x40000, "gfx", 0 )
-	ROM_LOAD16_BYTE( "771e01a", 0x00001, 0x10000, CRC(103ffa0d) SHA1(1949c49ca3b243e4cfb5fb19ecd3a1e1492cfddd) )    // tiles + sprites
+	ROM_LOAD16_BYTE( "771e01a", 0x00001, 0x10000, CRC(103ffa0d) SHA1(1949c49ca3b243e4cfb5fb19ecd3a1e1492cfddd) ) // tiles + sprites
 	ROM_LOAD16_BYTE( "771e01c", 0x00000, 0x10000, CRC(cfec5be9) SHA1(2b6a32e2608a70c47d1ec9b4de38b5c3a0898cde) )
 	ROM_LOAD16_BYTE( "771d01b", 0x20001, 0x10000, CRC(07f2a71c) SHA1(63c79e75e71539e69d4d9d35e629a6021124f6d0) )
 	ROM_LOAD16_BYTE( "771d01d", 0x20000, 0x10000, CRC(f6810a49) SHA1(b40e9f0d0919188a05c1990347da8dc8ff12d65a) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "771d02.08d", 0x0000, 0x0100, CRC(3d34bb5a) SHA1(3f3c845f1197457244e7c7e4f9b2a03c278613e4) )  // sprite lookup table
-															// there is no char lookup table
+	ROM_LOAD( "771d02.08d", 0x0000, 0x0100, CRC(3d34bb5a) SHA1(3f3c845f1197457244e7c7e4f9b2a03c278613e4) ) // sprite lookup table
+	// there is no char lookup table
 ROM_END
 
 ROM_START( labyrunr )
@@ -507,11 +507,11 @@ ROM_START( labyrunr )
 	ROM_LOAD( "771j03.08f", 0x18000, 0x10000, CRC(12b49044) SHA1(e9b22fb093cfb746a9767e94ef5deef98bed5b7a) )
 
 	ROM_REGION( 0x40000, "gfx", 0 )
-	ROM_LOAD16_WORD_SWAP( "771d01.14a", 0x00000, 0x40000, CRC(15c8f5f9) SHA1(e4235e1315d0331f3ce5047834a68764ed43aa4b) )    // tiles + sprites
+	ROM_LOAD16_WORD_SWAP( "771d01.14a", 0x00000, 0x40000, CRC(15c8f5f9) SHA1(e4235e1315d0331f3ce5047834a68764ed43aa4b) ) // tiles + sprites
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "771d02.08d", 0x0000, 0x0100, CRC(3d34bb5a) SHA1(3f3c845f1197457244e7c7e4f9b2a03c278613e4) )  // sprite lookup table
-															// there is no char lookup table
+	ROM_LOAD( "771d02.08d", 0x0000, 0x0100, CRC(3d34bb5a) SHA1(3f3c845f1197457244e7c7e4f9b2a03c278613e4) ) // sprite lookup table
+	// there is no char lookup table
 ROM_END
 
 ROM_START( labyrunrk )
@@ -521,14 +521,14 @@ ROM_START( labyrunrk )
 	ROM_LOAD( "771k03.8f",  0x18000, 0x10000, CRC(48d732ae) SHA1(8bc7917397f32cf5f995b3763ae921725e27de05) )
 
 	ROM_REGION( 0x40000, "gfx", 0 )
-	ROM_LOAD16_BYTE( "771d01a.13a", 0x00001, 0x10000, CRC(0cd1ed1a) SHA1(eac6c106de28acc54535ae1fb99f778c1ed4013e) )    // tiles + sprites
+	ROM_LOAD16_BYTE( "771d01a.13a", 0x00001, 0x10000, CRC(0cd1ed1a) SHA1(eac6c106de28acc54535ae1fb99f778c1ed4013e) ) // tiles + sprites
 	ROM_LOAD16_BYTE( "771d01c.13a", 0x00000, 0x10000, CRC(d75521fe) SHA1(72f0c4d9511bc70d77415f50be93293026305bd5) )
 	ROM_LOAD16_BYTE( "771d01b",     0x20001, 0x10000, CRC(07f2a71c) SHA1(63c79e75e71539e69d4d9d35e629a6021124f6d0) )
 	ROM_LOAD16_BYTE( "771d01d",     0x20000, 0x10000, CRC(f6810a49) SHA1(b40e9f0d0919188a05c1990347da8dc8ff12d65a) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "771d02.08d", 0x0000, 0x0100, CRC(3d34bb5a) SHA1(3f3c845f1197457244e7c7e4f9b2a03c278613e4) )  // sprite lookup table
-															// there is no char lookup table
+	ROM_LOAD( "771d02.08d", 0x0000, 0x0100, CRC(3d34bb5a) SHA1(3f3c845f1197457244e7c7e4f9b2a03c278613e4) ) // sprite lookup table
+	// there is no char lookup table
 ROM_END
 
 ROM_START( labyrunrf )
@@ -538,14 +538,14 @@ ROM_START( labyrunrf )
 	ROM_LOAD( "771k03.8f",  0x18000, 0x10000, CRC(6c073295) SHA1(67be17ad0c3bfd5ff8cd6ed31b217e438733ed1c) )
 
 	ROM_REGION( 0x40000, "gfx", 0 )
-	ROM_LOAD16_BYTE( "771d01a.13a", 0x00001, 0x10000, CRC(0cd1ed1a) SHA1(eac6c106de28acc54535ae1fb99f778c1ed4013e) )    // tiles + sprites
+	ROM_LOAD16_BYTE( "771d01a.13a", 0x00001, 0x10000, CRC(0cd1ed1a) SHA1(eac6c106de28acc54535ae1fb99f778c1ed4013e) ) // tiles + sprites
 	ROM_LOAD16_BYTE( "771d01c.13a", 0x00000, 0x10000, CRC(d75521fe) SHA1(72f0c4d9511bc70d77415f50be93293026305bd5) )
 	ROM_LOAD16_BYTE( "771d01b",     0x20001, 0x10000, CRC(07f2a71c) SHA1(63c79e75e71539e69d4d9d35e629a6021124f6d0) )
 	ROM_LOAD16_BYTE( "771d01d",     0x20000, 0x10000, CRC(f6810a49) SHA1(b40e9f0d0919188a05c1990347da8dc8ff12d65a) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "771d02.08d", 0x0000, 0x0100, CRC(3d34bb5a) SHA1(3f3c845f1197457244e7c7e4f9b2a03c278613e4) )  // sprite lookup table
-															// there is no char lookup table
+	ROM_LOAD( "771d02.08d", 0x0000, 0x0100, CRC(3d34bb5a) SHA1(3f3c845f1197457244e7c7e4f9b2a03c278613e4) ) // sprite lookup table
+	// there is no char lookup table
 ROM_END
 
 } // anonymous namespace

@@ -751,6 +751,9 @@ class ppc601_device : public ppc_device
 {
 public:
 	ppc601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 

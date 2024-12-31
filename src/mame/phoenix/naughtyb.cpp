@@ -336,7 +336,7 @@ static INPUT_PORTS_START( naughtyb )
 	PORT_START( "FAKE" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(naughtyb_state::coin_inserted), 0)
 	// when reading DSW0, bit 7 doesn't read cabinet, but vblank
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( trvmstr )
@@ -384,7 +384,7 @@ static INPUT_PORTS_START( trvmstr )
 	PORT_START( "FAKE" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(naughtyb_state::coin_inserted), 0)
 	// when reading DSW0, bit 7 doesn't read cabinet, but vblank
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 

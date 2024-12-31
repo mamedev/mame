@@ -2,7 +2,6 @@
 // copyright-holders:Ernesto Corvi
 /*******************************************************************************
 
-    mb88dasm.cpp
     Core implementation for the portable Fujitsu MB88xx series MCU disassembler.
 
     Written by Ernesto Corvi

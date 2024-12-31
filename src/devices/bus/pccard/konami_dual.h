@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:smf
-#ifndef MAME_BUS_PCCARD_KONAMI_DUAL_PCCARD_H
-#define MAME_BUS_PCCARD_KONAMI_DUAL_PCCARD_H
+#ifndef MAME_BUS_PCCARD_KONAMI_DUAL_H
+#define MAME_BUS_PCCARD_KONAMI_DUAL_H
 
 #pragma once
 
@@ -27,4 +27,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(KONAMI_DUAL_PCCARD, konami_dual_pccard_device)
 
-#endif // MAME_BUS_PCCARD_KONAMI_DUAL_PCCARD_H
+#endif // MAME_BUS_PCCARD_KONAMI_DUAL_H

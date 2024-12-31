@@ -156,6 +156,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1978, crazybal,  0,        crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems / NAT",      "Crazy Balls (NAT)",             MACHINE_IS_SKELETON )
-GAME( 1978, crazybala, crazybal, crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems / Bontempi", "Crazy Balls (Bontempi, set 1)", MACHINE_IS_SKELETON )
-GAME( 1978, crazybalb, crazybal, crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems / Bontempi", "Crazy Balls (Bontempi, set 2)", MACHINE_IS_SKELETON )
+GAME( 1978, crazybal,  0,        crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems / NAT",      "Crazy Balls (NAT)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1978, crazybala, crazybal, crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems / Bontempi", "Crazy Balls (Bontempi, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1978, crazybalb, crazybal, crazybal, 0, crazybal_state, empty_init, ROT0, "Electronic Games Systems / Bontempi", "Crazy Balls (Bontempi, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

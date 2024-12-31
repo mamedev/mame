@@ -293,6 +293,6 @@ ROM_END
 
 
 // TODO: possibly licensed to LSE, verify once it works
-GAME( 2001, dmndhrt,  0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "LSE", "Diamond Heart (v1.06)",     MACHINE_IS_SKELETON ) // 2001/02/15
-GAME( 2003, dmndhrtn, 0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "CLE", "Diamond Heart New (v20.0)", MACHINE_IS_SKELETON ) // 2003/04/25
-GAME( 2004, honeybee, 0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "LSE", "Honey-Bee (v3.0)",          MACHINE_IS_SKELETON ) // 2004/07/01
+GAME( 2001, dmndhrt,  0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "LSE", "Diamond Heart (v1.06)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 2001/02/15
+GAME( 2003, dmndhrtn, 0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "CLE", "Diamond Heart New (v20.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 2003/04/25
+GAME( 2004, honeybee, 0, cle68k, dmndhrt, cle68k_state, empty_init, ROT0, "LSE", "Honey-Bee (v3.0)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 2004/07/01

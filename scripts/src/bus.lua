@@ -3372,6 +3372,14 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.h",
 	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/rs232/teletex800.cpp",   GEN_DIR .. "emu/layout/teletex800.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "teletex800"),
+	}
 end
 
 ---------------------------------------------------
@@ -4688,6 +4696,14 @@ if (BUSES["ZORRO"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/zorro/action_replay.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.h",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/picasso2.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/picasso2.h",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/rainbow2.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/rainbow2.h",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/ripple.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/ripple.h",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/toccata.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/toccata.h",
 	}
 end
 
@@ -5753,6 +5769,8 @@ if (BUSES["H89BUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/cards.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/cards.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/cdr_fdc_880h.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/cdr_fdc_880h.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h89bus.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h89bus.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h17_fdc.cpp",
@@ -5765,9 +5783,25 @@ if (BUSES["H89BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/mms77316_fdc.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_sound.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_sound.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_parallel_port.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_parallel_port.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/we_pullup.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/we_pullup.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/z_89_11.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/z_89_11.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/z37_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/z37_fdc.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/heathzenith/h19/tlb.h,BUSES["HEATH_TLB_CONNECTOR"] = true
+---------------------------------------------------
+
+if (BUSES["HEATH_TLB_CONNECTOR"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlb.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlb.h",
 	}
 end

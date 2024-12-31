@@ -449,6 +449,8 @@ Please stick to using the floppy versions for the time being...
 		<description>3D Boxing (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="James Software" />
+		<info name="serial" value="SOFT 06025" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="alt_title" value="3D Boxkampf" />
 		<part name="cass1" interface="cpc_cass">
@@ -489,6 +491,8 @@ Please stick to using the floppy versions for the time being...
 		<description>3D Fight (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1985" />
+		<info name="serial" value="070" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="48531">
@@ -501,6 +505,8 @@ Please stick to using the floppy versions for the time being...
 		<description>3D Grand Prix (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Exopal" />
+		<info name="serial" value="SOFT 961" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="59311">
@@ -573,6 +579,8 @@ Please stick to using the floppy versions for the time being...
 		<description>3D Stunt Rider (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="DJL Software" />
+		<info name="serial" value="SOFT 183" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="alt_title" value="Cascadeur 3D" />
 		<part name="cass1" interface="cpc_cass">
@@ -598,6 +606,8 @@ Please stick to using the floppy versions for the time being...
 		<description>3D-Invaders (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Quark Data" />
+		<info name="serial" value="SOFT 136" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="alt_title" value="Le 3eme Dimension, Invasores" />
 		<part name="cass1" interface="cpc_cass">
@@ -623,6 +633,8 @@ Please stick to using the floppy versions for the time being...
 		<description>3D-Sub (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="developer" value="Novasoft" />
+		<info name="notice" value="Copyright LORICIELS Novembre 1985" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="41785">
@@ -647,6 +659,7 @@ Please stick to using the floppy versions for the time being...
 		<description>4 Game Pack No. 1 (UK)</description>
 		<year>1991</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 427" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="96487">
@@ -664,6 +677,7 @@ Please stick to using the floppy versions for the time being...
 		<description>4 Game Pack No. 2 (UK)</description>
 		<year>1992</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 428" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="86842">
@@ -681,6 +695,7 @@ Please stick to using the floppy versions for the time being...
 		<description>4 Game Pack No. 3 (UK)</description>
 		<year>1992</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 429" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="91204">
@@ -799,7 +814,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="500ccgp" supported="no">
 		<description>500cc Grand Prix (UK)</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
+		<info name="serial" value="UQK 710" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="84380">
@@ -809,9 +825,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="5axe" supported="no">
-		<description>Le 5eme Axe (France)</description>
+		<description>Le 5ème Axe (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Novembre 1985" />
+		<info name="serial" value="102" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="22015">
@@ -915,6 +933,7 @@ Please stick to using the floppy versions for the time being...
 		<description>A 320 (France)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="Copyright LORICIELS SEPTEMBRE 1988" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<!-- According to CPC-Power faces 1a and 1b are identical -->
 		<part name="cass1" interface="cpc_cass">
@@ -1227,6 +1246,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Admiral Graf Spee (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Temptation Software" />
+		<info name="serial" value="SOFT 146" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="alt_title" value="Almirante Graf Spee" />
 		<part name="cass1" interface="cpc_cass">
@@ -1240,6 +1261,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Admiral Graf Spee (Spain)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="serial" value="AMC-118" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="alt_title" value="Almirante Graf Spee" />
 		<part name="cass1" interface="cpc_cass">
@@ -1250,9 +1272,9 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="ads" supported="no">
-		<description>Advanced Destroyer Simulator (Spain)</description>
+		<description>A.D.S. - Advanced Destroyer Simulator (Spain)</description>
 		<year>1990</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Futura / Proein Soft Line</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="53253">
@@ -1471,6 +1493,8 @@ Please stick to using the floppy versions for the time being...
 		<description>L'Aigle d'Or (France)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Avril 1986" />
+		<info name="serial" value="126" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="52958">
@@ -1485,9 +1509,9 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="airtraff" supported="no">
-		<description>Air Traffic Control (UK)</description>
+		<description>Heathrow International Air Traffic Control (UK)</description>
 		<year>1984</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="15571">
@@ -1532,6 +1556,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Airwolf (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Elite Systems" />
+		<info name="serial" value="SOFT 06011" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="39316">
@@ -1544,6 +1570,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Airwolf (UK, alt)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Elite Systems" />
+		<info name="serial" value="SOFT 06011" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="58537">
@@ -1636,9 +1664,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="higpool" supported="no">
-		<description>Alex Higgins World Pool (UK)</description>
+		<description>Alex Higgins' World Pool (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Gem Software" />
+		<info name="serial" value="SOFT 964" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="35838">
@@ -1648,9 +1678,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="higsnook" supported="no">
-		<description>Alex Higgins World Snooker (UK)</description>
+		<description>Alex Higgins' World Snooker (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Gem Software" />
+		<info name="serial" value="SOFT 978" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="35611">
@@ -1687,6 +1719,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Alien (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Argus Press Software" />
+		<info name="serial" value="SOFT 956" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="53323">
@@ -1723,8 +1757,10 @@ Please stick to using the floppy versions for the time being...
 		<description>Alien Break-In (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Romik Software" />
+		<info name="serial" value="SOFT 137" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
-		<info name="alt_title" value="Les Envahisseurs De L'Au Dela" />
+		<info name="alt_title" value="Les Envahisseurs de l'Au-Dela" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="18199">
 				<rom name="alien break-in (uk) (1985) [original] [tape].cdt" size="18199" crc="66b31cff" sha1="3ec0b3845a386db81708673e34b8c96a50039bd8"/>
@@ -1855,6 +1891,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Alpine Games (UK)</description>
 		<year>1987</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="author" value="Barry Jones" />
+		<info name="serial" value="AT 406X" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="63535">
@@ -2098,6 +2136,8 @@ Please stick to using the floppy versions for the time being...
 		<description>American Football (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Argus Press Software" />
+		<info name="serial" value="SOFT 901" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="37207">
@@ -2160,9 +2200,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="amlettre" cloneof="easiaw" supported="no">
-		<description>Amlettres (France)</description>
+		<description>Amlettres - Traitement de Textes (France)</description>
 		<year>1984</year>
 		<publisher>Amsoft France</publisher>
+		<info name="developer" value="Juniper Computing" />
+		<info name="serial" value="SOFT 454" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="25073">
@@ -2201,9 +2243,10 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="amsbase" supported="no">
-		<description>Amsbase (Spain)</description>
+		<description>Amsbase - Base de Datos (Spain)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="serial" value="S-501" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="17181">
@@ -2242,6 +2285,8 @@ Please stick to using the floppy versions for the time being...
 		<description>AmsGolf (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Computersmith" />
+		<info name="serial" value="SOFT 185" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="40046">
@@ -2345,6 +2390,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Amstest</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="serial" value="SOFT 06017" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="7494">
@@ -2537,9 +2583,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="amstroid" supported="no">
-		<description>Amstroid (France)</description>
+		<description>Amstroïd (France)</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Pietro Pancino" />
+		<info name="serial" value="CP 005" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="59308">
@@ -2587,7 +2635,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="anarchy" supported="no">
 		<description>Anarchy (UK)</description>
 		<year>1988</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="40222">
@@ -2693,9 +2741,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="avm" supported="no">
-		<description>Animal / Vegetable / Mineral (UK)</description>
+		<description>Animal, Vegetable, Mineral (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Bourne Educational Software" />
+		<info name="serial" value="SOFT 104" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="21391">
@@ -2705,7 +2755,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="avmf" cloneof="avm" supported="no">
-		<description>Animal / Vegetal / Mineral (France)</description>
+		<description>Animal, Vegetal, Mineral (France)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -2717,9 +2767,10 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="avms" cloneof="avm" supported="no">
-		<description>Animal / Vegetable / Mineral (Spain)</description>
+		<description>Animal, Vegetable, Mineral (Spain)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="serial" value="AMC-300" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="21651">
@@ -2872,6 +2923,8 @@ Please stick to using the floppy versions for the time being...
 		<description>L'Apprenti Sorcier (France)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Richard Meyer" />
+		<info name="serial" value="SOFT 4202" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="83421">
@@ -3267,6 +3320,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Asalto (Spain)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Shirekilo" />
+		<info name="serial" value="AMC-174" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="19795">
@@ -3368,6 +3423,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Astro Attack (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Ian Beynon" />
+		<info name="serial" value="SOFT 175" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="21082">
@@ -3427,7 +3484,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="athlete" supported="no">
 		<description>Athlete (France)</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="46805">
@@ -3464,6 +3521,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Atom Smasher (Spain)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Romik Software" />
+		<info name="serial" value="SOFT 139" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="14283">
@@ -3476,6 +3535,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Atom Smasher (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Romik Software" />
+		<info name="serial" value="SOFT 139" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="13914">
@@ -3488,6 +3549,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Atomic Driver (France)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Jean-Philippe Biscay" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="40846">
@@ -3606,6 +3668,9 @@ Please stick to using the floppy versions for the time being...
 		<description>Automec (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="André Gandon" />
+		<info name="notice" value="COPYRIGHT LORICIELS Décembre 1985" />
+		<info name="serial" value="109" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="50147">
@@ -3795,6 +3860,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Bactron (UK)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="UQK 708" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="61800">
@@ -3807,6 +3873,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Bactron (France)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1986" />
+		<info name="serial" value="144" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="60820">
@@ -4375,7 +4443,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="btvalley" supported="no">
 		<description>Battle Valley (UK)</description>
 		<year>1988</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="48541">
@@ -4703,6 +4771,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Billar - Snooker (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Gem Software" />
+		<info name="serial" value="SOFT 190" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="22987">
@@ -4715,6 +4785,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Billy La Banlieue (France)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Juin 1986" />
+		<info name="serial" value="139" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="57535">
@@ -4726,7 +4798,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="billys" cloneof="billy" supported="no">
 		<description>Billy La Banlieue (Spain)</description>
 		<year>1986</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciels / Proein Soft Line</publisher>
+		<info name="notice" value="© Loriciels. Junio 1986" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="alt_title" value="Billy El Barriobajero (Box)" />
 		<part name="cass1" interface="cpc_cass">
@@ -4848,6 +4921,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Birdie (UK)</description>
 		<year>1987</year>
 		<publisher>Ere Informatique</publisher>
+		<info name="author" value="Stephane Picq" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="82918">
@@ -4983,6 +5057,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Blagger (UK, AMSoft)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Alligata Software" />
+		<info name="serial" value="SOFT 926" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="42465">
@@ -5330,6 +5406,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Boinggg! (UK)</description>
 		<year>1988</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="author" value="Barry Jones" />
+		<info name="serial" value="AT 412" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="63535">
@@ -5676,6 +5754,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Braxx Bluff (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Micromega" />
+		<info name="serial" value="SOFT 955" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="32677">
@@ -5773,6 +5853,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Bridge-It (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Epicsoft" />
+		<info name="serial" value="SOFT 913" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="30871">
@@ -6718,6 +6800,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Catastrophes - Ile Infernale (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Andromeda Software" />
+		<info name="serial" value="SOFT 934" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="47514">
@@ -6802,6 +6886,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Cavemania (UK)</description>
 		<year>1991</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 424" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="49903">
@@ -6838,6 +6923,9 @@ Please stick to using the floppy versions for the time being...
 		<description>Centre Court (Spain)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="alt_title" value="Tenis" />
+		<info name="developer" value="Epicsoft" />
+		<info name="serial" value="S-508" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="29066">
@@ -7335,7 +7423,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="chicag90" supported="no">
 		<description>Chicago 90 (France)</description>
 		<year>1989</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="102535">
@@ -7360,6 +7448,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Des Chiffres et des Lettres (France)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS juin 1987" />
+		<info name="serial" value="LA 42" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="37297">
@@ -7372,6 +7462,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Les Chiffres Magiques (France)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Bourne Educational Software" />
+		<info name="serial" value="SOFT 402" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="21391">
@@ -7441,7 +7533,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="techted" supported="no">
 		<description>The Chip Factory Featuring 'Technician Ted' (UK)</description>
 		<year>1984</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="alt_title" value="Technician Ted (Box)" />
 		<part name="cass1" interface="cpc_cass">
@@ -7729,7 +7821,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="cityslic" supported="no">
 		<description>City Slicker (UK)</description>
 		<year>1986</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="54963">
@@ -7742,6 +7834,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Classic Adventure (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Abersoft" />
+		<info name="serial" value="SOFT 187" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="36688">
@@ -7868,6 +7962,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Classic Racing (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Paul Neal" />
+		<info name="serial" value="SOFT 928" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="35363">
@@ -8059,6 +8155,9 @@ Please stick to using the floppy versions for the time being...
 		<description>Codename Mat (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Derek Brewster" />
+		<info name="developer" value="Micromega" />
+		<info name="serial" value="SOFT 1129" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="44833">
@@ -8980,9 +9079,9 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="coursolf" supported="no">
-		<description>Cours de Solfege, Niveau 1 (France)</description>
+		<description>Cours de Solfège, Niveau 1 (France)</description>
 		<year>1984</year>
-		<publisher>TMPI</publisher>
+		<publisher>Techni-Musique &amp; Parole Informatique (TMPI)</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="43898">
@@ -8992,9 +9091,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="courbous" cloneof="maprally" supported="no">
-		<description>La Course a la Boussole (France)</description>
+		<description>La Course à la Boussole (France)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Bourne Educational Software" />
+		<info name="serial" value="SOFT 448" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="60703">
@@ -9089,6 +9190,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Crack-Up (UK)</description>
 		<year>1989</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 416" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="48409">
@@ -9173,6 +9275,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Crazy Golf (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Mr. Micro" />
+		<info name="serial" value="SOFT 149" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="20923">
@@ -9196,7 +9300,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="crazysht" supported="no">
 		<description>Crazy Shot (Spain)</description>
 		<year>1989</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciels / Proein Soft Line</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="105646">
@@ -9291,6 +9395,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Crossfire (UK)</description>
 		<year>1990</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="developer" value="Pantheon Software" />
+		<info name="serial" value="AT 415" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="51709">
@@ -9385,6 +9491,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Cubit (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Mr. Micro" />
+		<info name="serial" value="SOFT 166" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="10067">
@@ -9556,7 +9664,9 @@ Please stick to using the floppy versions for the time being...
 	<software name="cybernod" supported="no">
 		<description>Cybernoid (UK)</description>
 		<year>1988</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
+		<info name="alt_title" value="Cybernoid: The Fighting Machine" />
+		<info name="author" value="Raffaele Cecco and Nick Jones" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="54884">
@@ -9568,7 +9678,9 @@ Please stick to using the floppy versions for the time being...
 	<software name="cybernd2" supported="no">
 		<description>Cybernoid II (UK)</description>
 		<year>1988</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
+		<info name="alt_title" value="Cybernoid II: The Revenge" />
+		<info name="author" value="Raffaele Cecco" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="66207">
@@ -9617,6 +9729,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Cyrus II Chess (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Intelligent Chess Software" />
+		<info name="serial" value="SOFT 06026" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="42442">
@@ -10485,7 +10599,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="delivern" supported="no">
 		<description>Deliverance (UK)</description>
 		<year>1990</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="alt_title" value="Deliverance - Stormlord II (Box)" />
 		<part name="cass1" interface="cpc_cass">
@@ -10498,7 +10612,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="deliverns" cloneof="delivern" supported="no">
 		<description>Deliverance (Spain)</description>
 		<year>1990</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<info name="alt_title" value="Deliverance - Stormlord II (Box)" />
 		<part name="cass1" interface="cpc_cass">
@@ -10691,6 +10805,9 @@ Please stick to using the floppy versions for the time being...
 		<description>Detective (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Peter Green" />
+		<info name="developer" value="Argus Press Software" />
+		<info name="serial" value="SOFT 920" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="22998">
@@ -10763,6 +10880,8 @@ Please stick to using the floppy versions for the time being...
 		<description>DFM 464 (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Dialog Software" />
+		<info name="serial" value="SOFT 941" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="26905">
@@ -10789,9 +10908,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="diamanmd" supported="no">
-		<description>Le Diamant de l'Ile Maudite (France)</description>
+		<description>Le Diamant de l'Île Maudite (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Octobre 1985" />
+		<info name="serial" value="083" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="55375">
@@ -10833,6 +10954,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Dianne - Mission Rubidiums (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="developer" value="Novasoft" />
+		<info name="notice" value="Copyright LORICIELS Novembre 1985" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="41313">
@@ -11360,6 +11483,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Doors of Doom (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Gem Software" />
+		<info name="serial" value="SOFT 06047" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="46318">
@@ -11691,6 +11816,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Dragon's Gold (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Roland Stokes" />
+		<info name="serial" value="SOFT 935" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="24793">
@@ -11731,7 +11858,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="dragntor" supported="no">
 		<description>The Dragontorc of Avalon (UK)</description>
 		<year>1985</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
+		<info name="author" value="Steve Turner" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="54680">
@@ -11917,9 +12045,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="daa" supported="no">
-		<description>Dungeons Amethysts Alchemists (UK)</description>
+		<description>Dungeons, Amethysts, Alchemists (UK)</description>
 		<year>1987</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="author" value="Richard Robinson" />
+		<info name="serial" value="AT 408" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="69562">
@@ -12156,6 +12286,9 @@ Please stick to using the floppy versions for the time being...
 		<description>Easi-Amsword (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="alt_title" value="Amsoft Easy Word Processor" />
+		<info name="developer" value="Juniper Computing" />
+		<info name="serial" value="SOFT 154" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="26603">
@@ -12168,6 +12301,9 @@ Please stick to using the floppy versions for the time being...
 		<description>Easi-Amsword (Spain)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="alt_title" value="Procesador de Texto" />
+		<info name="developer" value="Juniper Computing" />
+		<info name="serial" value="AMC-502" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="25873">
@@ -12177,9 +12313,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="easytopw" cloneof="easiaw" supported="no">
-		<description>Easy Topword (Germany)</description>
+		<description>Easy-Topword - Textverarbeitung (Germany)</description>
 		<year>1984</year>
-		<publisher>Schneider Computer Software</publisher>
+		<publisher>Schneider Computer Division</publisher>
+		<info name="developer" value="Juniper Computing" />
+		<info name="serial" value="SOFT 254" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="24841">
@@ -12273,7 +12411,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="superski" supported="no">
 		<description>Eddie Edwards Super Ski (UK)</description>
 		<year>1988</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciels / Microïds</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="140083">
@@ -12295,9 +12433,12 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="editmus" supported="no">
-		<description>Edit-Music (France)</description>
+		<description>Music Edit (France)</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="alt_title" value="Edit-Music" />
+		<info name="author" value="Stéphane Mayet" />
+		<info name="serial" value="CP 007" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="27679">
@@ -12426,6 +12567,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Electro Freddy (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Softspot" />
+		<info name="serial" value="SOFT 144" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="19813">
@@ -12485,7 +12628,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="eliminat" supported="no">
 		<description>Eliminator (UK)</description>
 		<year>1988</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="90635">
@@ -12599,6 +12742,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Empire (France, Loriciels)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Mai 1985" />
+		<info name="serial" value="068" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="41738">
@@ -12898,6 +13043,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Escape From Khoshima (UK)</description>
 		<year>1986</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="author" value="John Betteridge" />
+		<info name="serial" value="AT 404" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="69307">
@@ -13144,7 +13291,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="evenstar" supported="no">
 		<description>Evening Star (UK)</description>
 		<year>1987</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
+		<info name="author" value="Mike Male and Bob Hillyer" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="27739">
@@ -13186,7 +13334,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="everywalmg" cloneof="everywal" supported="no">
 		<description>Everyone's A Wally - Meet The Gang (UK, Mikro-Gen)</description>
 		<year>1985</year>
-		<publisher>Mikro-gen</publisher>
+		<publisher>Mikro-Gen</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="58269">
@@ -13234,7 +13382,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="exolon" supported="no">
 		<description>Exolon (UK)</description>
 		<year>1987</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
+		<info name="author" value="Raffaele Cecco" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="54110">
@@ -13246,7 +13395,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="exolons" cloneof="exolon" supported="no">
 		<description>Exolon (Spain)</description>
 		<year>1987</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants / Erbe Software</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="47198">
@@ -13565,7 +13714,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="fantdiam" supported="no">
 		<description>Fantasia Diamond (UK)</description>
 		<year>1985</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
+		<info name="author" value="Kim Topley" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="41173">
@@ -13623,6 +13773,8 @@ Please stick to using the floppy versions for the time being...
 		<description>The Fantastic Voyage (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Edmonds Software" />
+		<info name="serial" value="SOFT 984" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="45283">
@@ -13632,7 +13784,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="fantcity" supported="no">
-		<description>Fantome City (France)</description>
+		<description>Fantôme City (France)</description>
 		<year>1986</year>
 		<publisher>Coktel Vision</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -13973,7 +14125,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="firelord" supported="no">
 		<description>Firelord (UK)</description>
 		<year>1986</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
+		<info name="author" value="Stephen Crow" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="66377">
@@ -14114,6 +14267,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Flash (France)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Avril 1986" />
+		<info name="serial" value="LA 39" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="69088">
@@ -14608,6 +14763,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Frank 'N' Stein (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="PSS Software" />
+		<info name="serial" value="SOFT 907" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="46034">
@@ -14849,6 +15006,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Fruit Machine (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Paul Aitman" />
+		<info name="serial" value="SOFT 919" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="17989">
@@ -14897,6 +15056,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Fu-Kung In Las Vegas (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Romik" />
+		<info name="serial" value="SOFT 979" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="35563">
@@ -15076,6 +15237,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Fusion II (France)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="Copyright LORICIELS SEPTEMBRE 1988" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="55179">
@@ -15182,6 +15344,8 @@ Please stick to using the floppy versions for the time being...
 		<description>The Galactic Plague (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Indescomp" />
+		<info name="serial" value="SOFT 196" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="17167">
@@ -15235,6 +15399,9 @@ Please stick to using the floppy versions for the time being...
 		<description>The Game of Dragons (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="alt_title" value="Dragons" />
+		<info name="author" value="O. Goodman" />
+		<info name="serial" value="SOFT 977" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="33013">
@@ -15466,6 +15633,9 @@ Please stick to using the floppy versions for the time being...
 		<description>Gatecrasher (UK)</description>
 		<year>1986</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Dave Mendes &amp; Mick O'Neill" />
+		<info name="developer" value="Exopal Software" />
+		<info name="serial" value="SOFT 958" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="30116">
@@ -15686,6 +15856,9 @@ Please stick to using the floppy versions for the time being...
 		<description>Gems of Stradus (UK, Amsoft, BASIC 1.0)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Mike Shaw" />
+		<info name="developer" value="Kuma Computers" />
+		<info name="serial" value="SOFT 121" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="51677">
@@ -15875,9 +16048,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="gestf464" supported="no">
-		<description>Gestion de Fichier CPC 464 (France)</description>
+		<description>Gestion de Fichier (France)</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Pietro Pancino" />
+		<info name="serial" value="CP 004" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="16087">
@@ -16080,6 +16255,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Glen Hoddle Soccer (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Shirekilo" />
+		<info name="serial" value="SOFT 06021" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="30403">
@@ -16293,7 +16470,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="gp500cc" cloneof="500ccgp" supported="no">
 		<description>Grand Prix 500cc (France)</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
+		<info name="notice" value="COPYRIGHT MICROÏDS Juillet 1986" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="69307">
@@ -16305,7 +16483,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="gp500ccs" cloneof="500ccgp" supported="no">
 		<description>Grand Prix 500cc (Spain)</description>
 		<year>1986</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds / Proein Soft Line</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="90520">
@@ -16330,6 +16508,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Grand Prix Driver (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Britannia Software" />
+		<info name="serial" value="SOFT 110" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="13726">
@@ -16484,6 +16664,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Graphisto (France, BASIC 1.0)</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Adriano Cimenti" />
+		<info name="serial" value="CP 001" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="34783">
@@ -16777,7 +16959,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="guardns" supported="no">
 		<description>Guardians (UK)</description>
 		<year>1991</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciel</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="105452">
@@ -16894,6 +17076,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Gunfighter (UK)</description>
 		<year>1990</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="author" value="Tony Love (CPC version)" />
+		<info name="serial" value="AT 419" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="52459">
@@ -17129,6 +17313,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Happy Letters (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Bourne Educational Software" />
+		<info name="serial" value="SOFT 105" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="24793">
@@ -17141,6 +17327,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Happy Numbers (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Bourne Educational Software" />
+		<info name="serial" value="SOFT 102" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="19022">
@@ -17153,6 +17341,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Happy Writing (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Bourne Educational Software" />
+		<info name="serial" value="SOFT 106" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="21134">
@@ -17200,7 +17390,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="harrican" supported="no">
 		<description>Harricana - Raid International Motoneige (France)</description>
 		<year>1990</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciel</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="89170">
@@ -17213,6 +17403,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Harrier Attack (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Durell Software" />
+		<info name="serial" value="SOFT 112" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="10879">
@@ -17273,6 +17465,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Haunted Hedges (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Micromega" />
+		<info name="serial" value="SOFT 128" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="15975">
@@ -17501,6 +17695,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Heliot (France)</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Bernard Auré" />
+		<info name="serial" value="CP 009" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="13201">
@@ -17813,7 +18009,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="hitsport" supported="no">
 		<description>Hit Sports</description>
 		<year>1991</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciel</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="109756">
@@ -18060,11 +18256,13 @@ Please stick to using the floppy versions for the time being...
 		<publisher>Loriciels</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
+			<feature name="part_id" value="Side A: Rally II, 3D Fight" />
 			<dataarea name="cass" size="57952">
 				<rom name="les hits 1 de loriciels (f) (face a) (rally ii - 3d fight) [original] [tape] [compilation].cdt" size="57952" crc="843b271f" sha1="b3b5e3e73f8baf4d24950a9b16f0b10eec6d98db"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cpc_cass">
+			<feature name="part_id" value="Side B: Infernal Runner" />
 			<dataarea name="cass" size="37519">
 				<rom name="les hits 1 de loriciels (f) (face b) (infernal runner) [original] [tape] [compilation].cdt" size="37519" crc="88c6af8d" sha1="d6fbdbd36500e22236afdf0bbb8d0a8168e71037"/>
 			</dataarea>
@@ -18075,13 +18273,16 @@ Please stick to using the floppy versions for the time being...
 		<description>Les Hits 2 de Loriciels (France)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="LA H2" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
+			<feature name="part_id" value="Side A: Foot, Le 5ème Axe" />
 			<dataarea name="cass" size="73434">
 				<rom name="les hits 2 de loriciels (f) (face a) (1987) (foot - le 5eme axe) [original] [tape] [compilation].cdt" size="73434" crc="3f6c21c6" sha1="10a6345f127ce5e97a5247452ead97aaf4058b5b"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cpc_cass">
+			<feature name="part_id" value="Side B: Tennis" />
 			<dataarea name="cass" size="47065">
 				<rom name="les hits 2 de loriciels (f) (face b) (1987) (tennis) [original] [tape] [compilation].cdt" size="47065" crc="66eda86a" sha1="3c73498932fdf5b362885838cbfb419703ef977f"/>
 			</dataarea>
@@ -18128,6 +18329,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Hobgoblin (UK)</description>
 		<year>1991</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="developer" value="Pantheon Software (conversion)" />
+		<info name="serial" value="AT 425" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="53773">
@@ -18446,6 +18649,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Hunchback (UK, v1)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Ocean Software" />
+		<info name="serial" value="SOFT 132" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="20872">
@@ -18458,6 +18663,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Hunchback (UK, v2)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Ocean Software" />
+		<info name="serial" value="SOFT 132" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="19299">
@@ -18562,6 +18769,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Hunter Killer (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Protek Computing" />
+		<info name="serial" value="SOFT 135" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="46696">
@@ -18855,7 +19064,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="impossab" supported="no">
 		<description>Impossaball (UK)</description>
 		<year>1987</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
+		<info name="author" value="John Phillips" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="55393">
@@ -19044,6 +19254,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Infernal Runner (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Aôut 1985" />
+		<info name="serial" value="077" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="53159">
@@ -19448,6 +19660,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Isoleur (France)</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Xavier Fagre &amp; Christophe Marchal" />
+		<info name="serial" value="CP 010" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="47904">
@@ -19731,6 +19945,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Jammin (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Taskset" />
+		<info name="serial" value="SOFT 911" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="47453">
@@ -19807,6 +20023,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Jet-Boot Jack (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="English Software" />
+		<info name="serial" value="SOFT 172" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="46421">
@@ -20181,6 +20399,7 @@ Please stick to using the floppy versions for the time being...
 		<description>K.Y.A. (France)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Avril 1987" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="38269">
@@ -21027,6 +21246,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Laserwarp (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Mikro-Gen" />
+		<info name="serial" value="SOFT 126" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="25099">
@@ -21164,6 +21385,8 @@ Please stick to using the floppy versions for the time being...
 		<description>League Challenge (UK)</description>
 		<year>1987</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="author" value="Nigel Edwards" />
+		<info name="serial" value="AT 407X" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="27679">
@@ -22040,6 +22263,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Macrocosmica (UK)</description>
 		<year>1986</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="David Reading" />
+		<info name="serial" value="SOFT 06024" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="61634">
@@ -22381,6 +22606,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Manic Miner (UK, Amsoft, BASIC 1.0)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Software Projects" />
+		<info name="serial" value="SOFT 173" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="27680">
@@ -22466,6 +22693,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Map Rally (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Bourne Educational Software" />
+		<info name="serial" value="SOFT 148" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="56007">
@@ -22513,7 +22742,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="marauder" supported="no">
 		<description>Marauder (UK)</description>
 		<year>1988</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="76426">
@@ -22574,6 +22803,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Marius Tresor Foot (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Octobre 1985" />
+		<info name="serial" value="096" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="30529">
@@ -22658,6 +22889,8 @@ Please stick to using the floppy versions for the time being...
 		<description>MasterChess (UK, Amsoft)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Mikro-Gen" />
+		<info name="serial" value="SOFT 1125" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="33762">
@@ -22951,7 +23184,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="mazemani" supported="no">
 		<description>Maze Mania (Spain)</description>
 		<year>1989</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants / Erbe Software</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="68826">
@@ -23248,7 +23481,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="menacart" supported="no">
-		<description>Menace sur l'Arctique (France)</description>
+		<description>Les Aventures du Ka 6 - Menace sur l'Arctique (France)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -23460,7 +23693,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="meurgvit" supported="no">
-		<description>Meurtre a Grande Vitesse (France)</description>
+		<description>Meurtre à Grande Vitesse (France)</description>
 		<year>1985</year>
 		<publisher>Cobra Soft</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -24065,6 +24298,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Mobile Man (France)</description>
 		<year>1990</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Jean-Philippe Biscay" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="65881">
@@ -24322,7 +24556,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="moonblst" supported="no">
 		<description>Moon Blaster (UK)</description>
 		<year>1990</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciel</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="45397">
@@ -24340,6 +24574,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Moontorc (UK)</description>
 		<year>1991</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 426" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="56869">
@@ -24608,6 +24843,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Mr. Wong's Loopy Laundry (UK, v2)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Artic Computing" />
+		<info name="serial" value="SOFT 923" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="20572">
@@ -24620,6 +24857,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Mr. Wong's Loopy Laundry (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Artic Computing" />
+		<info name="serial" value="SOFT 923" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="20584">
@@ -24855,6 +25094,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Mutant Monty (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Artic Computing" />
+		<info name="serial" value="SOFT 922" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="42721">
@@ -24922,9 +25163,12 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="kikekan" supported="no">
-		<description>Le Mystere de Kikekankoi (France)</description>
+		<description>Le Mystère de Kikekankoi (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="L. Benès, D. Berchiatti, R. Nicolle" />
+		<info name="notice" value="COPYRIGHT LORICIELS Mars 1985" />
+		<info name="serial" value="051" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="7687">
@@ -25139,7 +25383,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="nebulus" supported="no">
 		<description>Nebulus (UK)</description>
 		<year>1988</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="66748">
@@ -25211,7 +25455,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="netherwd" supported="no">
 		<description>Netherworld (UK)</description>
 		<year>1988</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
+		<info name="author" value="Jukka Tapanimaki" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="66699">
@@ -25812,6 +26057,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Nuclear Defence (UK)</description>
 		<year>1986</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="James Software" />
+		<info name="serial" value="SOFT 06031" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="39642">
@@ -25847,7 +26094,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="numberpt" supported="no">
 		<description>Number Painter (UK)</description>
 		<year>1984</year>
-		<publisher>ASK</publisher>
+		<publisher>Applied Systems Knowledge (ASK)</publisher>
+		<info name="author" value="Don Walton" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="21134">
@@ -25961,7 +26209,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="oceancnq" supported="no">
 		<description>Ocean Conqueror (UK)</description>
 		<year>1988</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="62569">
@@ -26039,6 +26287,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Oh Mummy (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Gem Software" />
+		<info name="serial" value="SOFT 115" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="18763">
@@ -26051,6 +26301,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Oh Mummy (Spain)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Gem Software" />
+		<info name="serial" value="AMC-138" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="18763">
@@ -26121,9 +26373,10 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="olympiad" supported="no">
-		<description>Olympiad (UK)</description>
+		<description>Olympiad '86 (UK)</description>
 		<year>1986</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 403X" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="65131">
@@ -26649,7 +26902,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="panzakbf" cloneof="panzakb" supported="no">
 		<description>Panza Kick Boxing (France)</description>
 		<year>1990</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Futura</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="62096">
@@ -26666,7 +26919,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="panzakb" supported="no">
 		<description>Panza Kick Boxing (Spain)</description>
 		<year>1990</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Futura / Proein Soft Line</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="77077">
@@ -26920,9 +27173,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="pearlhrb" supported="no">
-		<description>Pearl Harbour (France, BASIC 1.0)</description>
+		<description>Pearl Harbor (France, BASIC 1.0)</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="François Le Griguer" />
+		<info name="serial" value="CP 016" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="29607">
@@ -27057,6 +27312,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Periscope Up (UK)</description>
 		<year>1989</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 417" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="41437">
@@ -27213,11 +27469,13 @@ Please stick to using the floppy versions for the time being...
 		<publisher>Loriciels</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
+			<feature name="part_id" value="A: Jeu" />
 			<dataarea name="cass" size="72289">
 				<rom name="pharaon (f) (face a) (1987) [original] [tape].cdt" size="72289" crc="d741c6f2" sha1="01285288bba72d9b62cbcf8b1cb3b8fd419f6085"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="cpc_cass">
+			<feature name="part_id" value="B: Dessins" />
 			<dataarea name="cass" size="251833">
 				<rom name="pharaon (f) (face b) (1987) [original] [tape].cdt" size="251833" crc="b1d4fc8a" sha1="895f0669981bb830aea174eecee3aef17ac9f492"/>
 			</dataarea>
@@ -27326,7 +27584,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="pinmagic" supported="no">
 		<description>Pinball Magic (France)</description>
 		<year>1990</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciel</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="103453">
@@ -27463,6 +27721,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Pitman Typing Tutor (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Pitman Publishing" />
+		<info name="serial" value="SOFT 924" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="38241">
@@ -27475,6 +27735,8 @@ Please stick to using the floppy versions for the time being...
 		<description>La Plaga Galactica (Spain)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="James Software" />
+		<info name="serial" value="AMC-125" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="17167">
@@ -27559,9 +27821,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="planbase" supported="no">
-		<description>Planete Base (France)</description>
+		<description>Planète Base (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Juin 1985" />
+		<info name="serial" value="065" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="53577">
@@ -27835,6 +28099,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Pouvoir (France)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Février 1986" />
+		<info name="serial" value="118" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="50705">
@@ -28138,6 +28404,8 @@ Please stick to using the floppy versions for the time being...
 		<description>The Prize (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Arcade Software" />
+		<info name="serial" value="SOFT 952" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="33787">
@@ -28150,6 +28418,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Pro Golf (UK)</description>
 		<year>1987</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 410X" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="65955">
@@ -28598,6 +28867,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Punchy (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Mr. Micro" />
+		<info name="serial" value="SOFT 150" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="14286">
@@ -28651,6 +28922,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Pyjamarama (UK, Amsoft)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Mikro-Gen" />
+		<info name="serial" value="SOFT 943" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="44061">
@@ -28728,6 +29001,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Qabbalah (UK)</description>
 		<year>1986</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Gem Software" />
+		<info name="serial" value="SOFT 06062" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="43543">
@@ -28740,6 +29015,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Quack A Jack (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Paul Shirley" />
+		<info name="serial" value="SOFT 181" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="31129">
@@ -28751,7 +29028,9 @@ Please stick to using the floppy versions for the time being...
 	<software name="quad" supported="no">
 		<description>Quad (Spain)</description>
 		<year>1987</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
+		<info name="notice" value="COPYRIGHT MICROÏDS Octobre 1987" />
+		<info name="serial" value="MA 07" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="70908">
@@ -28763,7 +29042,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="quadrel" supported="no">
 		<description>Quadrel (France)</description>
 		<year>1991</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciel</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="111853">
@@ -28781,6 +29060,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Quaterne (France)</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Jérôme Bermond" />
+		<info name="serial" value="CP 006" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="42946">
@@ -29099,6 +29380,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Rally II (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Mars 1985" />
+		<info name="serial" value="053" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="54726">
@@ -29108,9 +29391,9 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="rally2" supported="no">
-		<description>Rally II (UK)</description>
+		<description>Grand Prix Rally II (UK)</description>
 		<year>1985</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciels / Amsoft</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="33120">
@@ -29218,7 +29501,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="ranaramas" cloneof="ranarama" supported="no">
 		<description>Ranarama (Spain)</description>
 		<year>1987</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants / Erbe Software</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="33627">
@@ -29230,7 +29513,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="ranarama" supported="no">
 		<description>Ranarama (UK)</description>
 		<year>1987</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
+		<info name="author" value="Steve Turner" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="34716">
@@ -29578,6 +29862,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Relief Action (France)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Mai 1987" />
+		<info name="serial" value="LA 40" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="90764">
@@ -29749,6 +30035,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Revenge of the C5 (UK)</description>
 		<year>1986</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 402X" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="37339">
@@ -29761,6 +30048,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Reversi Champion (France)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Avril 1986" />
+		<info name="serial" value="128" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="26196">
@@ -30366,6 +30655,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Roland Ahoy! (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Computersmith" />
+		<info name="serial" value="SOFT 192" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="24557">
@@ -30378,6 +30669,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Roland en el Espacio (Spain)</description>
 		<year>1984</year>
 		<publisher>Indescomp</publisher>
+		<info name="serial" value="AMC-145" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="57507">
@@ -30390,6 +30682,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Roland Goes Digging (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Gem Software" />
+		<info name="serial" value="SOFT 169" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="26131">
@@ -30402,6 +30696,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Roland Goes Square Bashing (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Durell Software" />
+		<info name="serial" value="SOFT 937" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="15117">
@@ -30413,7 +30709,9 @@ Please stick to using the floppy versions for the time being...
 	<software name="rolandcv" supported="no">
 		<description>Roland in the Caves (UK)</description>
 		<year>1984</year>
-		<publisher>Indescomp</publisher>
+		<publisher>Amsoft</publisher>
+		<info name="developer" value="Indescomp" />
+		<info name="serial" value="SOFT 117" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="30355">
@@ -30426,6 +30724,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Roland in Time (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Gem Software" />
+		<info name="serial" value="SOFT 170" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="38802">
@@ -30437,7 +30737,9 @@ Please stick to using the floppy versions for the time being...
 	<software name="rolandrp" supported="no">
 		<description>Roland on the Ropes (UK)</description>
 		<year>1984</year>
-		<publisher>Zigurat</publisher>
+		<publisher>Amsoft</publisher>
+		<info name="developer" value="Indescomp" />
+		<info name="serial" value="SOFT 118" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="45351">
@@ -30450,6 +30752,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Roland on the Run (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Epicsoft" />
+		<info name="serial" value="SOFT 199" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="24532">
@@ -30915,6 +31219,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Salut l'Artiste (France)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="David Radisic" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="41743">
@@ -30999,6 +31304,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Sapiens (France)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Juin 1986" />
+		<info name="serial" value="149" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="39817">
@@ -31035,6 +31342,7 @@ Please stick to using the floppy versions for the time being...
 		<description>S.A.S. Assault Course. (UK)</description>
 		<year>1986</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 405X" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="63535">
@@ -31117,6 +31425,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Satellite Warrior (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="D.M. Lock" />
+		<info name="serial" value="SOFT 949" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="41261">
@@ -31177,9 +31487,10 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="lehrbas1" cloneof="teachbs1" supported="no">
-		<description>Schneider Basic-Lehrbuch Teil 1 (Germany)</description>
+		<description>Schneider BASIC-Lehrbuch Teil 1 (Germany)</description>
 		<year>1984</year>
-		<publisher>Amsoft</publisher>
+		<publisher>Schneider Computer Division</publisher>
+		<info name="serial" value="SOFT 211" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="51049">
@@ -31204,9 +31515,10 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="lehrbas2" cloneof="teachbs2" supported="no">
-		<description>Schneider Basic-Lehrbuch Teil 2 (Germany)</description>
+		<description>Schneider BASIC-Lehrbuch Teil 2 (Germany)</description>
 		<year>1985</year>
-		<publisher>Amsoft</publisher>
+		<publisher>Schneider Computer Division</publisher>
+		<info name="serial" value="SOFT 256" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="99211">
@@ -31282,6 +31594,8 @@ Please stick to using the floppy versions for the time being...
 		<description>The Scout Steps Out (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="H R Software" />
+		<info name="serial" value="SOFT 988" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="47719">
@@ -31419,6 +31733,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Le Secret du Tombeau (France)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Avril 1986" />
+		<info name="serial" value="LA 39" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="74656">
@@ -31430,7 +31746,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="sectumba" cloneof="sectomb" supported="no">
 		<description>El Secreto de la Tumba (Spain)</description>
 		<year>1986</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciels / Proein Soft Line</publisher>
+		<info name="notice" value="© Loriciels. Octubre 1986" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="74801">
@@ -31793,7 +32110,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="shermnm4" supported="no">
 		<description>Sherman M4 (Spain)</description>
 		<year>1990</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciel</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="59827">
@@ -32279,6 +32596,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Skatin' USA (UK)</description>
 		<year>1990</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 422" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="50419">
@@ -32343,7 +32661,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="skweeks" cloneof="skweek" supported="no">
 		<description>Skweek (Spain)</description>
 		<year>1989</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciels / Proein Soft Line</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="85536">
@@ -32488,6 +32806,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Snoball in Hell! (UK)</description>
 		<year>1989</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 418X" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="36433">
@@ -32925,7 +33244,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="southbel" supported="no">
 		<description>Southern Belle (UK)</description>
 		<year>1985</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
+		<info name="author" value="Mike Male and Bob Hillyer" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="42317">
@@ -33025,6 +33345,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Space Hawks (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Durell Software" />
+		<info name="serial" value="SOFT 177" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="10833">
@@ -33037,6 +33359,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Space Racer (France)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Mai 1988" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="85825">
@@ -33108,7 +33431,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="spacetrd" cloneof="macrocos" supported="no">
 		<description>Space Trader (UK)</description>
 		<year>1986</year>
-		<publisher>Amsoft</publisher>
+		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 414X" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="68839">
@@ -33335,6 +33659,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Spindrone (UK)</description>
 		<year>1988</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 413" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="61539">
@@ -33494,6 +33819,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Spooky Castle (UK)</description>
 		<year>1990</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="author" value="Roy York and Brian Ison" />
+		<info name="serial" value="AT 420X" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="41389">
@@ -34163,6 +34490,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Stock-Aid (Spain)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Gem Software" />
+		<info name="serial" value="AMC-505" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="27986">
@@ -34187,6 +34516,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Stockmarket (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Argus Press Software" />
+		<info name="serial" value="SOFT 903" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="51081">
@@ -34270,7 +34601,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="stormlor" supported="no">
 		<description>Stormlord (UK)</description>
 		<year>1989</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
+		<info name="author" value="Raffaele Cecco" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="80280">
@@ -34789,6 +35121,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Subterranean Stryker (UK)</description>
 		<year>1986</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Insight Software" />
+		<info name="serial" value="SOFT 06010" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="66219">
@@ -34813,6 +35147,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Sultan's Maze (Spain)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="alt_title" value="El Laberinto del Sultán" />
+		<info name="serial" value="AMC-134" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="40609">
@@ -34825,6 +35161,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Sultan's Maze (UK, BASIC 1.0)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="author" value="Gem Software" />
+		<info name="serial" value="SOFT 113" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="40331">
@@ -35035,6 +35373,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Super Pipeline II (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Taskset" />
+		<info name="serial" value="SOFT 987" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="46687">
@@ -35143,7 +35483,9 @@ Please stick to using the floppy versions for the time being...
 	<software name="superskif" cloneof="superski" supported="no">
 		<description>Super Ski (France)</description>
 		<year>1988</year>
-		<publisher>Microids</publisher>
+		<publisher>Microïds</publisher>
+		<info name="notice" value="COPYRIGHT MICROÏDS Novembre 1987" />
+		<info name="serial" value="MA 07" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="140110">
@@ -35155,7 +35497,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="sskweekf" cloneof="sskweek" supported="no">
 		<description>Super Skweek (France)</description>
 		<year>1990</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciel</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="72142">
@@ -35172,7 +35514,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="sskweek" supported="no">
 		<description>Super Skweek (Spain)</description>
 		<year>1990</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciels / Proein Soft Line</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="72123">
@@ -35327,6 +35669,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Superkid (UK)</description>
 		<year>1990</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 421x" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="48101">
@@ -35339,6 +35682,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Superkid in Space (UK)</description>
 		<year>1991</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 423" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="50419">
@@ -35494,6 +35838,7 @@ Please stick to using the floppy versions for the time being...
 		<description>The Survivors (UK)</description>
 		<year>1988</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 411" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="39835">
@@ -35776,6 +36121,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Tank Commander (UK)</description>
 		<year>1986</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Magic Logic" />
+		<info name="serial" value="SOFT 06023" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="68017">
@@ -35836,6 +36183,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Tapper (UK)</description>
 		<year>1986</year>
 		<publisher>Amsoft</publisher>
+		<info name="serial" value="SOFT 06007" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="58331">
@@ -35908,6 +36256,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Tascopy 464 (Spain)</description>
 		<year>1984</year>
 		<publisher>Microbyte</publisher>
+		<info name="serial" value="MUA-01" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="17991">
@@ -35937,6 +36286,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Tasprint 464 (Spain)</description>
 		<year>1984</year>
 		<publisher>Microbyte</publisher>
+		<info name="serial" value="MUA-01" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="39837">
@@ -35970,7 +36320,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="teachbs1" supported="no">
-		<description>Teach Yourself Amstrad Basic Part 1 (UK)</description>
+		<description>Teach Yourself Amstrad BASIC Part 1 (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -35987,7 +36337,7 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="teachbs2" supported="no">
-		<description>Teach Yourself Amstrad Basic Part 2 (UK)</description>
+		<description>Teach Yourself Amstrad BASIC Part 2 (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
@@ -36185,7 +36535,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="temphero" supported="no">
 		<description>Le Temps des Heros (Europe?)</description>
 		<year>1991</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciel</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="45397">
@@ -36228,6 +36578,7 @@ Please stick to using the floppy versions for the time being...
 		<description>Ten-Pin Challenge (UK)</description>
 		<year>1987</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="serial" value="AT 409" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="81463">
@@ -36240,6 +36591,9 @@ Please stick to using the floppy versions for the time being...
 		<description>Tennis 3D (France)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Bernard Auré" />
+		<info name="notice" value="COPYRIGHT LORICIELS Décembre 1985" /><!-- title screen: Janvier 1986 -->
+		<info name="serial" value="112" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="47065">
@@ -36251,7 +36605,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="tenniscp" supported="no">
 		<description>Tennis Cup (France)</description>
 		<year>1989</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Loriciel</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="73109">
@@ -36983,6 +37337,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Tie Break (France)</description>
 		<year>1985</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Bernard Auré" />
+		<info name="serial" value="CP 017" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="46295">
@@ -37096,6 +37452,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Timeman One (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Bourne Educational Software" />
+		<info name="serial" value="SOFT 107" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="23761">
@@ -37108,6 +37466,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Timeman Two (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Bourne Educational Software" />
+		<info name="serial" value="SOFT 108" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="25626">
@@ -37413,6 +37773,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Tombstowne (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Premier Software" />
+		<info name="serial" value="SOFT 06040" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="51169">
@@ -37449,6 +37811,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Tony Truand (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Octobre 1985" />
+		<info name="serial" value="106" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="63007">
@@ -37582,6 +37946,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Torann (France)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
+		<info name="developer" value="Novasoft" />
+		<info name="notice" value="COPYRIGHT LORICIELS Novembre 1985" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="41337">
@@ -37765,6 +38131,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Traffic (UK)</description>
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Andromeda Software" />
+		<info name="serial" value="SOFT 929" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="42744">
@@ -38874,7 +39242,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="uridium" supported="no">
 		<description>Uridium (UK)</description>
 		<year>1987</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="45321">
@@ -38899,6 +39267,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Vagan Attack (UK)</description>
 		<year>1985</year>
 		<publisher>Atlantis Software</publisher>
+		<info name="author" value="John Green" />
+		<info name="serial" value="AT 401" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="37393">
@@ -40177,6 +40547,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Wordhang (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Bourne Educational Software" />
+		<info name="serial" value="SOFT 101, SOFT 201" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="34256">
@@ -40411,6 +40783,8 @@ Please stick to using the floppy versions for the time being...
 		<description>World-Wise (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Bourne Educational Software" />
+		<info name="serial" value="SOFT 103" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="46224">
@@ -40420,9 +40794,11 @@ Please stick to using the floppy versions for the time being...
 	</software>
 
 	<software name="worldwisf" cloneof="worldwis" supported="no">
-		<description>World-Wise (France)</description>
+		<description>Le Géographe - France (France)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Bourne Educational Software" />
+		<info name="serial" value="SOFT 403" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="54059">
@@ -40599,6 +40975,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Xanagrams (UK)</description>
 		<year>1984</year>
 		<publisher>Amsoft</publisher>
+		<info name="developer" value="Dean Software (Postern)" />
+		<info name="serial" value="SOFT 133" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="44575">
@@ -40925,7 +41303,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="zapp" supported="no">
 		<description>Zapp (UK)</description>
 		<year>1985</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="12427">
@@ -40973,7 +41351,8 @@ Please stick to using the floppy versions for the time being...
 	<software name="zedis2" supported="no">
 		<description>Zedis II (Spain)</description>
 		<year>1984</year>
-		<publisher>Amsoft</publisher>
+		<publisher>Microbyte</publisher>
+		<info name="serial" value="MUA-08" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="11137">
@@ -41092,6 +41471,8 @@ Please stick to using the floppy versions for the time being...
 		<description>Zox 2099 (France)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Janvier 1987" />
+		<info name="serial" value="LA 37" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="42399">
@@ -41115,7 +41496,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="zynaps" supported="no">
 		<description>Zynaps (UK)</description>
 		<year>1987</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="56143">
@@ -41127,7 +41508,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="zynapss" cloneof="zynaps" supported="no">
 		<description>Zynaps (Spain)</description>
 		<year>1987</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants / Erbe Software</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="55018">
@@ -41139,7 +41520,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="zynapsa" cloneof="zynaps" supported="no">
 		<description>Zynaps (UK, alt)</description>
 		<year>1987</year>
-		<publisher>Hewson</publisher>
+		<publisher>Hewson Consultants</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="56146">

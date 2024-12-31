@@ -8230,8 +8230,8 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		</part>
 	</software>
 
-	<software name="danchits">
-		<description>Danchi Tsuma no Yuuwaku</description>
+	<software name="danchizm">
+		<description>Danchizuma no Yuuwaku</description>
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801 -->
@@ -8244,8 +8244,8 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		</part>
 	</software>
 
-	<software name="danchitsa" cloneof="danchits">
-		<description>Danchi Tsuma no Yuuwaku (alt)</description>
+	<software name="danchizma" cloneof="danchizm">
+		<description>Danchizuma no Yuuwaku (alt)</description>
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801 -->

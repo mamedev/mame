@@ -201,7 +201,6 @@ private:
 	void scc_mouse_irq( int x, int y );
 	void set_via_interrupt(int value);
 	void field_interrupts();
-	void vblank_irq();
 	void mouse_callback();
 
 	uint16_t ram_r(offs_t offset);
@@ -415,14 +414,6 @@ void mac128_state::set_via_interrupt(int value)
 	field_interrupts();
 }
 
-void mac128_state::vblank_irq()
-{
-	if (m_macadb)
-	{
-		m_macadb->adb_vblank();
-	}
-}
-
 void mac128_state::update_volume()
 {
 	/* LS161 audio PWM counters TC (SND) -> LS04 inverter (/SND) ->
@@ -460,11 +451,6 @@ void mac128_state::vblank_w(int state)
 TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 {
 	const int scanline = param;
-
-	if (scanline == 0)
-	{
-		vblank_irq();
-	}
 
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
 	if (scanline >= 28)

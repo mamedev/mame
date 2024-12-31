@@ -910,7 +910,7 @@ void slapfght_state::perfrman(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &slapfght_state::perfrman_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(slapfght_state::sound_nmi), attotime::from_hz(240)); // music speed, verified
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -960,7 +960,7 @@ void slapfght_state::tigerh(machine_config &config)
 
 	TAITO68705_MCU_TIGER(config, m_bmcu, 36_MHz_XTAL/12); // 3MHz
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1043,7 +1043,7 @@ void slapfght_state::slapfigh(machine_config &config)
 	m_bmcu->aux_out_cb<5>().set(FUNC(slapfght_state::flipscreen_w));
 	m_bmcu->aux_strobe_cb().set(FUNC(slapfght_state::scroll_from_mcu_w));
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

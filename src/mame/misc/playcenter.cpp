@@ -136,7 +136,7 @@ ROM_END
 } // Anonymous namespace
 
 //   YEAR  NAME          PARENT       MACHINE     INPUT       CLASS             INIT        ROT   COMPANY                             FULLNAME                                                      FLAGS
-GAME(2000, plycntrchtr,  0,           playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'Epox' hardware)",    MACHINE_IS_SKELETON)
-GAME(2000, plycntrchtrk, plycntrchtr, playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'K6' hardware)",      MACHINE_IS_SKELETON)
-GAME(2000, plycntrchtrc, plycntrchtr, playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'Celeron' hardware)", MACHINE_IS_SKELETON)
-GAME(2004, plycntre3,    0,           playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "Playcenter Evolution III (v14.0, 'Epox' hardware)",          MACHINE_IS_SKELETON) // E.14.0.TCT
+GAME(2000, plycntrchtr,  0,           playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'Epox' hardware)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2000, plycntrchtrk, plycntrchtr, playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'K6' hardware)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2000, plycntrchtrc, plycntrchtr, playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'Celeron' hardware)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2004, plycntre3,    0,           playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "Playcenter Evolution III (v14.0, 'Epox' hardware)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // E.14.0.TCT

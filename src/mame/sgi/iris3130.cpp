@@ -720,4 +720,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME           FLAGS
-COMP( 1985, iris3130, 0,      0,      iris3130, iris3130, iris3000_state, empty_init, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_IS_SKELETON )
+COMP( 1985, iris3130, 0,      0,      iris3130, iris3130, iris3000_state, empty_init, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -11258,18 +11258,37 @@ Has optional [RS-MIDI] sound support
 		</part>
 	</software>
 
+	<!-- TODO: non-bootable .hdm version known to exist (will Abort Retry Fail when dir from MS-DOS) -->
 	<software name="chittyt" supported="no">
-		<description>Chitty Chitty Train</description>
+		<description>Chitty Chitty Train (.fdi installed hack)</description>
 		<year>1993</year>
 		<publisher>ビッツー (Bit²)</publisher>
 		<notes><![CDATA[
 Requires 3.5" floppy emulation
+Throws MSDOS.SYS error when booted from pc9821 class machines, I/O Error otherwise
 ]]></notes>
 		<info name="alt_title" value="チキチキトレイン" />
 		<info name="release" value="19930811" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="chitty chitty train (1993)(bit^2).fdi" size="1478656" crc="af527d06" sha1="53b4e459c9eab0c4573021fa6a724125e5e64a8e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chittyta" cloneof="chittyt" supported="yes">
+		<!-- Version provided by INSTAL.COM on disk -->
+		<description>Chitty Chitty Train (Ver 1.00, .hdm installed hack)</description>
+		<year>1993</year>
+		<publisher>ビッツー (Bit²)</publisher>
+		<notes><![CDATA[
+Game directory on autobootable disk
+]]></notes>
+		<info name="alt_title" value="チキチキトレイン" />
+		<info name="release" value="19930811" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="chitty chitty train fd installed.hdm" size="1261568" crc="e352d546" sha1="791be0e897981c71f49acb28fbd6bc580c4ea617" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -30090,6 +30109,21 @@ Black screen, keeps hitting an empty divide by zero exception at PC=1fcb6
 		</part>
 	</software>
 
+	<software name="lemmings" supported="partial">
+		<description>Lemmings</description>
+		<year>1991</year>
+		<publisher>イマジニア (Imagineer)</publisher>
+		<notes><![CDATA[
+Heavy uses of palette raster effects (best results on pc9821)
+]]></notes>
+		<info name="alt_title" value="レミングス"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="lemmings.hdm" size="1261568" crc="1679be28" sha1="77a0c88d749b4affdc761cbefeabaa2673c05577"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lenam">
 		<description>Lenam - Sword of Legend</description>
 		<year>1990</year>
@@ -43682,6 +43716,18 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt, tests
 		</part>
 	</software>
 
+	<software name="shikinjo">
+		<description>Shikinjou</description>
+		<year>1990</year>
+		<publisher>スキャップトラスト (Scap Trust)</publisher>
+		<info name="alt_title" value="紫禁城"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="shikinjou.hdm" size="1261568" crc="b409b669" sha1="9b303f6c7b1bacef3d4165db6693093039a71555"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sbest9py">
 		<description>Shin Best Nine Pro Yakyuu</description>
 		<year>1986</year>
@@ -45190,12 +45236,12 @@ OPN channel 1 keeps repeating on deaths (verify)
 		</part>
 	</software>
 
-	<software name="spindiz2" supported="no">
+	<software name="spindiz2" supported="partial">
 		<description>Spindizzy II</description>
 		<year>1991</year>
 		<publisher>アルシスソフト (Arsys Software)</publisher>
 		<notes><![CDATA[
-Hangs on new game after selecting any stage, waits for an irq to happen
+Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="スピンディジー２" />
 		<info name="release" value="19910927" />

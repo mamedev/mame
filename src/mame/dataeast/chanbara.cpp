@@ -33,7 +33,7 @@ DE-0207-0
 |-----------------------------------------------------------|
 Notes:
       6809   - MC68B09EP, clock 1.500MHz [12/8]
-      YM2203 - clock 1.500MHz [12/8]
+      YM2203 - clock 1.500MHz [12/8] on øM (pin 38), øS (pin 39) is 1MHz
       VSC30  - clock 3.000MHz [12/4, pin 7), custom DECO DIP40 IC
       HMC20  - DECO HMC20 custom DIP28 IC. Provides many clocks each divided by 2
                (i.e. 12MHz, 6MHz, 3MHz, 1.5MHz, 750kHz etc)
@@ -45,14 +45,14 @@ Notes:
 ------------------------
 
 TODO:
-- Verify what happens if you skip an enemy, on MAME the next one may appear out of
-  thin air. MAME previously showed garbage sprites moving fast to the left and later
-  changing into an enemy character, disable the (~attr & 0x01) check to see.
 - BGM tempo is too slow, what is it caused by? See https://mametesters.org/view.php?id=8024
 
 BTANB:
-- on enemies that hide behind the roof on the 3rd level, their feet are visible below
-  the roof, and their head is behind the sky
+- If you skip an upper floor enemy (just walk under them), the next time one shows up,
+  it may appear out of thin air instead of scrolling in from the right. This doesn't
+  happen when skipping lower floor enemies.
+- On enemies that hide behind the roof on the 3rd level, their feet are visible below
+  the roof, and their head is behind the sky.
 
 ****************************************************************************************/
 
@@ -188,7 +188,7 @@ void chanbara_state::draw_sprites(screen_device &screen, bitmap_ind16& bitmap, c
 		int sx = (240 - m_spriteram[offs + 3]) & 0xff;
 		int sy = (240 - m_spriteram[offs + 2]) & 0xff;
 
-		// disabled?
+		// not visible
 		if (~attr & 0x01)
 			continue;
 
@@ -292,7 +292,7 @@ static INPUT_PORTS_START( chanbara )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) // same coinage as COIN1
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN )  PORT_4WAY

@@ -303,4 +303,4 @@ ROM_END
 
 
 //    YEAR  NAME        PARENT    COMPAT    MACHINE     INPUT        CLASS           INIT            COMPANY          FULLNAME            FLAGS
-COMP( 1988, junior80,   0,        0,        junior80,   junior80,    junior80_state, empty_init,     "<unknown>",     "Junior 80",        MACHINE_IS_SKELETON )
+COMP( 1988, junior80,   0,        0,        junior80,   junior80,    junior80_state, empty_init,     "<unknown>",     "Junior 80",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
