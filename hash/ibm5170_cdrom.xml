@@ -6304,6 +6304,460 @@ Includes DOS and Windows installation setup.
 		</part>
 	</software>
 
+	<!-- Windows 95/98/Me -->
+	<!-- Requires Pentium 75 MHz or better -->
+	<!-- Source: http://redump.org/disc/24559/ -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814).cue" size="4501" crc="29cfb958" sha1="381c53deee68714a1d4eae960e7f7b933a093140" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 01).bin" size="210863856" crc="ca1380db" sha1="7362ded5fbe9f0dace33daebae59c1760d15156f" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 02).bin" size="1808688" crc="9a20219b" sha1="53bd3b15973d850eb609cc2190d592e6169142c1" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 03).bin" size="19935552" crc="40da6c84" sha1="9c22dcaf8411c2c1ee8f4073207d73f7d165b226" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 04).bin" size="14834064" crc="a28f7d55" sha1="d3646a032892c41af78299213b3e983a28b4e234" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 05).bin" size="15553776" crc="a710eb1b" sha1="f242b096f27b073defd9a84650deb5f817ad2fcf" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 06).bin" size="18195072" crc="524ddd6c" sha1="0fd6576fdd05c4213e26543fe7d1615e7f1466de" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 07).bin" size="14664720" crc="c04168b8" sha1="185bdb1b8dc567d2114973d8b8a9e0b0bd5b80bc" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 08).bin" size="15003408" crc="2ff8ab4c" sha1="6762d1c002a10b567bec4a780aaa81a96b7158d9" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 09).bin" size="20848128" crc="dcdc3041" sha1="a6683d2615a0a775a47ec4c32f8f24a6a2e49023" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 10).bin" size="14655312" crc="29553e37" sha1="7f99e94ccba7aa073b88bab8eae8176e4d78114b" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 11).bin" size="14311920" crc="4750fe5f" sha1="6197d436417ac38b681af75ab2b30b85f9e2d5cc" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 12).bin" size="18719568" crc="c80721e6" sha1="3aad760f688cabe3333e3c77a967bb6c287bc65a" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 13).bin" size="14194320" crc="03101e05" sha1="9ed9e85d73c589e5b6b52311750f73a64e24e641" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 14).bin" size="12035184" crc="f085e021" sha1="3cd98e78f91c88cfadccecc71d4a6726b71baf72" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 15).bin" size="16753296" crc="f331287d" sha1="2eba0d6d0bc9db590a46dc74b0328280ea63bc94" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 16).bin" size="11501280" crc="95ee4e0b" sha1="2fc7760688961a50d530d380598bc12a9650018a" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 17).bin" size="14627088" crc="313070fc" sha1="11605f4a7a7c53265591fb72d6cf2168b1044b03" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 18).bin" size="20850480" crc="f6492eec" sha1="06476cdacd6d0024978f8e9c1d801c82ca451874" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 19).bin" size="13441680" crc="5453e82a" sha1="56766471e47c558c1d8a18f2d6f23b8b33b2d474" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 20).bin" size="12373872" crc="a06bdbcc" sha1="db12b136e4f10a20610e5975230018c5ce914dea" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 21).bin" size="15546720" crc="81b6dd5b" sha1="c733460166ac7986d44a7f49ce28a32266363289" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 22).bin" size="12192768" crc="2ca7905c" sha1="06e42f91107d459e2e9f7c8eb9797b8b69b7266d" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 23).bin" size="13429920" crc="8a9a9d1c" sha1="6bb7aca74f3f8a1732c6ea2496bbeac7da3b45a6" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 24).bin" size="14660016" crc="c3027392" sha1="e8385914d0d83c0998c8ebc55a6955c5441239c7" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 25).bin" size="15360912" crc="b1d8f5cf" sha1="9222018cdfef47fd6f81dda3d1865ef13350424d" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 26).bin" size="5752992" crc="941c546f" sha1="38a01ac1cf5d6eef783be70a91c3d11d23789c50" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 27).bin" size="5752992" crc="626755c7" sha1="6c60bc226b3ca6352adb31019c064d0e0299f0ee" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 28).bin" size="2208528" crc="2563d1ce" sha1="0e7c4aacd047e4078efc1e5e7a0a5e7367c78f2d" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 29).bin" size="6155184" crc="536a929a" sha1="22697ea05b845f5379d4fb91e5664b9982fdc11b" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 30).bin" size="6338640" crc="076fe05f" sha1="8bb8b152707743f38a853a19716da2a9f6d02bf0" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 31).bin" size="2646000" crc="18e86840" sha1="76544baee1d9af4b1dca0aa8dd2d9363f0131c60" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 32).bin" size="22082928" crc="7f388d53" sha1="3282908d0274bc50abbfcbe68fd7c23d79f0a386" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 33).bin" size="22431024" crc="9abde560" sha1="299358af39fc7eff54a5b3ae6adabff87f3b4f9f" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 34).bin" size="16767408" crc="346134ad" sha1="6815e27233647a1f7ecb439e8ecdbe22f460d33a" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 35).bin" size="1455888" crc="b74d7fa9" sha1="1e141141321f7b798d82de296686370b4c03414e" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 36).bin" size="16010064" crc="cebe5e3f" sha1="87ea369932a29db498c47fd1f84f7800603f91fd" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 37).bin" size="15817200" crc="b0c11ef7" sha1="bbc7770ca6a8c66e79da489942552176589a1791" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 38).bin" size="14784672" crc="a536e03e" sha1="31603bf0355fe971fd2772ca4f14b0283c501e53" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 39).bin" size="15629040" crc="44017c12" sha1="2ebca76693c96325a16889a2708e26970ae79d10" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 40).bin" size="19361664" crc="641b6729" sha1="7be5dcab1dccc8c2ae80cb0b40a545cd6d2be89d" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 41).bin" size="14942256" crc="d3bdce2d" sha1="08c9d9f560ca00004eac06b9182c59320c63643e" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814) (Track 42).bin" size="12938352" crc="7b3d3984" sha1="da8b4097c388bf3066183212665034f4866e990c" /> -->
+	<software name="soniccd">
+		<description>Sonic CD (USA)</description>
+		<year>2000</year>
+		<publisher>Sega / Expert Software</publisher>
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic cd (usa 2000 release)" sha1="e93a6b4da206b06e4094c70eeebb0ae7db980c13" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/54285/ -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease).cue" size="5507" crc="f0ec8262" sha1="dd1709003801435a91ee83b2495557625f199464" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 01).bin" size="218884176" crc="abc2a43b" sha1="e9ef17afa8c566d07a3fee7355b88c33bcf4ba25" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 02).bin" size="1462944" crc="e585e0c6" sha1="45d26d3f3a0862c9e75c10e8bee492d2c3575923" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 03).bin" size="19935552" crc="f7a6b795" sha1="6034eb6d6ee3462467e1be53e81394075c347251" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 04).bin" size="14834064" crc="41885790" sha1="30517d47388f0368140e7ab34174d8dba680f276" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 05).bin" size="15553776" crc="7690f251" sha1="76c273d32e13463ae0cdb32deb66b74ae57d5109" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 06).bin" size="18195072" crc="3d0d8457" sha1="e5e95bd5257de07aaf539396f0741289e283c051" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 07).bin" size="14664720" crc="3fe68767" sha1="f2947e05d0174317721e2cf5e6f763cfde223f93" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 08).bin" size="15003408" crc="478ce897" sha1="25a659346d1cd11b42512960270845ffbfb08b5a" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 09).bin" size="20848128" crc="8288514e" sha1="ec63c7aca99566e59a8f86a46332e8d74ce168d9" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 10).bin" size="14655312" crc="6dd2cc39" sha1="e028e6ad6d94734bcb9f1f6a2fac1253c9a10791" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 11).bin" size="14311920" crc="c7636722" sha1="ce58a82bfbd9d0dd9ef6db6ce3654ffeda3f4428" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 12).bin" size="18719568" crc="569f9b8d" sha1="78b92071acd33675137e67395b3530ace98d509e" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 13).bin" size="14194320" crc="6bac75d0" sha1="4ef3371a6521b0a6e75ae799166214ab679b6ba4" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 14).bin" size="12035184" crc="52b7f559" sha1="8a413a272fdca068e224eb3db670ff4cff4101f1" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 15).bin" size="16753296" crc="6ae6a933" sha1="d3f217708552fa9eaed44656e57711c8a5659a74" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 16).bin" size="11501280" crc="d6b22031" sha1="f2a549879390cee5ba27c47a2e80763867b7990e" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 17).bin" size="14627088" crc="77804511" sha1="a274f5b7be0ef02d849f053a9c23075d95d7ec06" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 18).bin" size="20850480" crc="5937c771" sha1="9d0323b268bf14eb769b4e273fe0957395e86433" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 19).bin" size="13441680" crc="8f34572b" sha1="95dc66a4b4c7e106838837bd5f3f665ddaf45c29" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 20).bin" size="12373872" crc="6c55a368" sha1="5be697dc8b9a9ab67b6c70b119c3b5b280d4ded4" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 21).bin" size="15546720" crc="e1dc4c57" sha1="0a6317d6cbe372200fa790a36eb20fff1697ab72" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 22).bin" size="12192768" crc="90c7820d" sha1="23ed5c622ed3859b082c823dd649a47c78ecc429" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 23).bin" size="13429920" crc="89f119de" sha1="3063e2a93c3be30585cc9600ce54f4b0d9420b50" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 24).bin" size="14660016" crc="9cd673d1" sha1="a51cbb6ec3520d26e1c2bd2fc28352a898c80c91" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 25).bin" size="15360912" crc="23bacb8d" sha1="72c777f6102d77ebe6725b14e674b7f8ffbcf0fe" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 26).bin" size="5752992" crc="06caf170" sha1="adaa7d5e265416dfd5780276944ecfa5370c0475" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 27).bin" size="5752992" crc="c8bd7ec3" sha1="7bdbc5a1f717d12c03999f85cf021662f78b02a0" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 28).bin" size="2208528" crc="5f295417" sha1="21adfe16aa5042f7cb4c1ed0d0e19c92247be89d" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 29).bin" size="6155184" crc="44525a43" sha1="0093a6186a01a211cc17fabcad09b2e6b1cd9b49" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 30).bin" size="6338640" crc="8f769927" sha1="6c367e1bdd3c330a9db107f7c49e7121895ece6f" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 31).bin" size="2646000" crc="f34fd531" sha1="4a4eeea2239b94be2751898a7048b9ce1d3afda2" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 32).bin" size="22082928" crc="9dd41cd5" sha1="70e5b2139058f4266a5140ecc10ae0517c8b1f39" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 33).bin" size="22431024" crc="98cbe15d" sha1="d8daa7d89235c0578d0dd51965f77feda14d6bf4" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 34).bin" size="16767408" crc="9c8605d3" sha1="61fcd1929149fe5b56df4548c2f887dcbd4bc004" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 35).bin" size="1455888" crc="5de591e4" sha1="60fe39bcbd6e1dc873c06aeb0970946228c7be16" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 36).bin" size="16010064" crc="3731841a" sha1="11123f04899d6de0cdb0eaf9b89cf5c1f8faa87c" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 37).bin" size="15817200" crc="1f26d9db" sha1="2e5faa8de4e3499b6f3560caff2a4abe981dac09" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 38).bin" size="14784672" crc="9b4a3d51" sha1="02b25561a566925b978326a4ccdbc70008e8d076" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 39).bin" size="15629040" crc="5f911745" sha1="39d824eb19cfec165249ba325e259c6e5e79abcd" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 40).bin" size="19361664" crc="363dd11f" sha1="bb030458eaba98113037ea0e11f71f83fba3c242" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 41).bin" size="14942256" crc="08d1f953" sha1="eac728e0248e8d01f94062340ab789080b38f6a2" /> -->
+	<!-- <rom name="Sonic CD (USA) (Rerelease) (Track 42).bin" size="13288800" crc="9e733fde" sha1="012f16a73d312306f466bd0529162bb0f7a1ee38" /> -->
+	<software name="soniccdo" cloneof="soniccd">
+		<description>Sonic CD (USA, 1997 release)</description>
+		<year>1997</year>
+		<publisher>Sega / Expert Software</publisher>
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic cd (usa 1997 release)" sha1="82eb717a15b65bd0853892f242b8c67b2afab2b3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/45321/ -->
+	<!-- <rom name="Sonic CD (USA).cue" size="4393" crc="ffe8f354" sha1="a714470ede676d4378aa45e418083f2b76d9f88a" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 01).bin" size="200181072" crc="c2f4027b" sha1="d277818c762f88140a549b2f76be4f48b14b1b0c" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 02).bin" size="1272432" crc="b6db3328" sha1="77c0ca622758e0ddef2394f5c72e686316cf68df" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 03).bin" size="19970832" crc="5c408f19" sha1="6d308207582da11f0281962ac2ed167a19587554" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 04).bin" size="14829360" crc="a30295af" sha1="9c9b7427777476b0bb28b47cd65e1c278b6d01cd" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 05).bin" size="15551424" crc="38860d9e" sha1="ce451518ebcfc86b1d67fb82b40b327791f05b00" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 06).bin" size="18185664" crc="456c4de9" sha1="2987c863bd830ec3fa764afed7be7a2b6e7cd7c0" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 07).bin" size="14657664" crc="14efe496" sha1="05770655d1189517d9751092ab927fe445291b07" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 08).bin" size="15001056" crc="ebd2567b" sha1="274d218e857bc66ee1939b9b445407b7bb94da72" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 09).bin" size="20848128" crc="87b1cfbd" sha1="853ecc97167e968116b9b2d2c3e197ef392bd655" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 10).bin" size="14650608" crc="cb9d307d" sha1="186709b944ec82ffb0c2d6609f5192141e71ecc3" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 11).bin" size="14302512" crc="0497cb13" sha1="f7518a37a8c03813c73594e700da27391be97c8f" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 12).bin" size="18712512" crc="f8be5345" sha1="4cfc98409a0c685f7e630d2804daad0273eb58b2" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 13).bin" size="14370720" crc="6fe7a22f" sha1="97e0825fdac8c149fb16a9b05c6b24c05ac85958" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 14).bin" size="12028128" crc="f4a94dec" sha1="7e03bd40adbb3c838ae7b627a93aad3bfdb7e3c7" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 15).bin" size="16769760" crc="7fa1876e" sha1="305dc1c48a0bba1629c7b7314128cceef20240a2" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 16).bin" size="11494224" crc="597c7c37" sha1="3e0c5bcb3b53ec7b6bc1d6b40f8aaef7839228c8" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 17).bin" size="14660016" crc="95967be1" sha1="f42f1622d11345bb07107ec490cf773f2f8a2c8b" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 18).bin" size="20843424" crc="26b46e07" sha1="5f7fff37413f4ded329968af009c096c6a0f2b3d" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 19).bin" size="13434624" crc="4527e70e" sha1="455bf7a11164ef3a1a3e5743b87bd87f34584f37" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 20).bin" size="12366816" crc="46851694" sha1="b4450d116585eb98eb90a5260e52a675775ea462" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 21).bin" size="15544368" crc="a1813894" sha1="2e39eefb54f8fb8ba1cba8e6d50159eecaa865a8" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 22).bin" size="12192768" crc="3983d8b1" sha1="79b20f099a01ebd3681e74d2f4e7bc7a93b10c07" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 23).bin" size="13425216" crc="ce90c65d" sha1="02d3393459fe8ad72ea17cf31c348b6301409002" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 24).bin" size="14655312" crc="0a58684d" sha1="3e2dc7ce79f4d5c71dcb0f7234464ea89ca5c383" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 25).bin" size="15353856" crc="efb50392" sha1="419df5f389fe6b82d96d7f5fb2ce047b00f8f7be" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 26).bin" size="5828256" crc="727720f4" sha1="727d0b69afd5cf8554164fed3c5029493763be90" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 27).bin" size="5828256" crc="af5865e1" sha1="95dcaabe915a52e354e68ee92a2664f8e60cb565" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 28).bin" size="2203824" crc="33edcac3" sha1="aa9a82153da07a443c2346724a4dd6b4c0ba18a4" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 29).bin" size="6355104" crc="cd01fcf8" sha1="45023e0c8552cf00ed86dc1abc6ed1ac6bb80315" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 30).bin" size="6333936" crc="e1ea3bd0" sha1="8b0d2186ea37bc8eb320af1c2d63b385c8f545ff" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 31).bin" size="2653056" crc="5f30755a" sha1="1fa01a613efbce61828711053acd9133640cb6ed" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 32).bin" size="22078224" crc="5dcc5dda" sha1="094f65315245072aded274f39bb630d29069f94e" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 33).bin" size="22428672" crc="a11f6b86" sha1="c020c64766fa04a746dee59de15c8f7bc9e2c0cc" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 34).bin" size="16767408" crc="e9296a83" sha1="28dfc3e12994ac0edb8169d2e1ba403f86c08788" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 35).bin" size="1448832" crc="f35e374a" sha1="4e6e674b9e98cee38d9c13ebc9b1163a94cae882" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 36).bin" size="16003008" crc="6d3342cd" sha1="44db9d6f1e7176e3389fce96c8b138476b9938d4" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 37).bin" size="15810144" crc="6e5498b0" sha1="a0aa9b7eaa51416339c5954b3cbd06561a666cbe" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 38).bin" size="14782320" crc="6a4752db" sha1="68dbf86f668bbd254be9b922a637eeafc730134a" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 39).bin" size="15624336" crc="e9567c41" sha1="f5b39191bb54ac086c3435e42d4cf719a35469d9" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 40).bin" size="19356960" crc="82b7324d" sha1="42b58a0e47690e36a13e4ca984c596f840c7f917" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 41).bin" size="14937552" crc="7d205133" sha1="ae7a6199463042b8aadf269b5d4fc0f19398a5a5" /> -->
+	<!-- <rom name="Sonic CD (USA) (Track 42).bin" size="13636896" crc="4a1f4050" sha1="f070c9ac2b541242ad222b0aec248e6fba1b7217" /> -->
+	<software name="soniccdo1" cloneof="soniccd">
+		<description>Sonic CD (USA, 1996 release)</description>
+		<year>1996</year>
+		<publisher>Sega / Expert Software</publisher>
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic cd (usa 1996 release)" sha1="e1c3fca9a192a94b15c758ea11cdd6221759e048" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/2820/ -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt).cue" size="4353" crc="3d7267ac" sha1="108165cc63d2676cdbdcb9cd019fac9a9620b3f1" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 01).bin" size="185725680" crc="14a06afd" sha1="f6a7b4662a4ab5ab05fc8d519ef49f177aa69b8b" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 02).bin" size="1667568" crc="bfc979ab" sha1="8641b38d029c6aeaa37d2f82846f76fd473dcc56" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 03).bin" size="19792080" crc="990d9a2f" sha1="e50a2c4defb57610fe84cff5e0f0013bab04edeb" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 04).bin" size="14692944" crc="3044bb56" sha1="77e811ab2d077d682d11fd08ba99e900cfd9a9b2" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 05).bin" size="15415008" crc="0405bf26" sha1="819d3f1d4c453577123b2f1c512033dc240135c5" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 06).bin" size="18053952" crc="cdc00e3f" sha1="0fa4fddedf3f055492dd684b8d5c40bcb8284b7f" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 07).bin" size="14518896" crc="39278078" sha1="971b65de492b66caa8135cfcb93a7b4bd455d9cd" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 08).bin" size="14862288" crc="446626db" sha1="976b4e61b5d7b63b95d6c68352b2dd1433476c6b" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 09).bin" size="20711712" crc="638b2909" sha1="69df6d80fe44cc3b24fcc8ec5c83749f0225b3b8" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 10).bin" size="14511840" crc="eeb1e49f" sha1="605ff49a344f9e4b174b1f8ea35de57c73964964" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 11).bin" size="14161392" crc="0f4f8431" sha1="1319be069c947786da194f578e1e5f2e59d24c75" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 12).bin" size="18578448" crc="9b95efa8" sha1="61f7957b3aae30353b944d68d71f58c4fc3d7ca4" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 13).bin" size="14187264" crc="5c3c1083" sha1="bad6c12b949fa8bc0b6d53f74a3d69f5b333627a" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 14).bin" size="11891712" crc="85741e16" sha1="0a983e2d241abf81c0ea741698bf7c515629d38c" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 15).bin" size="16612176" crc="8bc1afd4" sha1="3ab8206c72db2b080c61343b46c6ee4ad6ba3e7f" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 16).bin" size="11360160" crc="110c49db" sha1="35ea449ab6eb99ad8a9c20c8f451089edbd74b74" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 17).bin" size="14488320" crc="52ff5c7b" sha1="dface0a17f9462fa520d9d6ca920f70a4b888af0" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 18).bin" size="20709360" crc="855479ac" sha1="5cf271a13bcb26fc596c2ca95524319786303d79" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 19).bin" size="13298208" crc="5a0ee21f" sha1="cdc65b271c2e8ee111e70c9eb65a084b9337eb90" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 20).bin" size="12232752" crc="0b07d865" sha1="9adba6b129d214551bf30b1a466d094f83a550d6" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 21).bin" size="15407952" crc="55dd3f44" sha1="d87968cfecd2841e5913563da54200f8aefe1768" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 22).bin" size="12056352" crc="55dc7933" sha1="f5e71a608757b30fdfb37aa1dd30f9e2b9fcbcbe" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 23).bin" size="13288800" crc="cf109eb5" sha1="69f52e724307d172ea02d8844e8078b65be8c343" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 24).bin" size="14521248" crc="9adc29fa" sha1="b971b17ed6e4881e4887844e17aff94b4cde3c13" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 25).bin" size="15219792" crc="dce74faa" sha1="df8fc36a3391cfaaeb5d07286d213fa7ad52f794" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 26).bin" size="5611872" crc="0bdf26d7" sha1="31968be43391bfd2eed07ce60a08f687a1796c98" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 27).bin" size="5611872" crc="e2f856b8" sha1="25ee20c989108891558e300b4fb76000ae445a7d" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 28).bin" size="2069760" crc="02b222bf" sha1="5825e7b9f0b21e4d76637070e72a2e7d9151cb58" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 29).bin" size="4449984" crc="b49684ea" sha1="0112025f206eda01b29d545d3dfc19355c1e779a" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 30).bin" size="4372368" crc="98056bbd" sha1="f821e46be994bb6f0ec87624bdf300242b9a324f" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 31).bin" size="2511936" crc="20e0c5a2" sha1="262826fd0f4167047dbe23470276bba32628b16f" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 32).bin" size="21941808" crc="b9d7004e" sha1="aae92fd5d7e6837527e573f7c550180ed9668680" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 33).bin" size="22294608" crc="0f9f71f0" sha1="db6f660edb2482307a32eb2984cbf11e99b0ea05" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 34).bin" size="16633344" crc="4588d9eb" sha1="2903a44815cf8200ef377748010e85072d47b266" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 35).bin" size="32156544" crc="f35c5785" sha1="c6e91176e608ebb322410621a351323b57d8fa48" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 36).bin" size="15866592" crc="cfbe7e4f" sha1="136b587c03d9df9e75a1f1c0f36ed4bf57838364" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 37).bin" size="15676080" crc="05ba1957" sha1="7cd7eaa2c17f9ba31874c3d7ab81b6257a4b5a2c" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 38).bin" size="14648256" crc="3119cfeb" sha1="b75c1ed7bfe1640bd0ab8036f4cb17456b37e7a8" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 39).bin" size="15490272" crc="335dd050" sha1="d8560ed3c3b9b539700a9af7730205967cf4a9b9" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 40).bin" size="19220544" crc="c857b14a" sha1="4be2e5ac9abb99020f29f9948fd4b3f9c7df9a4b" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 41).bin" size="14803488" crc="b04fb2af" sha1="e94120542ffcc36f75ecd9dd43bfd630d9b14485" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Alt) (Track 42).bin" size="13855632" crc="36c99a26" sha1="28ab24400f850db254b435ec88320c2e4a917da9" /> -->
+	<software name="soniccdoem" cloneof="soniccd">
+		<description>Sonic CD (USA, Pentium Processor Edition)</description>
+		<year>1996</year> <!-- Date on CD is 1995-12-28, but very likely this released in 1996 -->
+		<publisher>Sega / Intel</publisher>
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic cd (pentium processor edition)" sha1="5682e9c4b629e423ac310867df61345d9126d45b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/38428/ -->
+	<!-- <rom name="Sonic CD (USA) (OEM).cue" size="5233" crc="ed8845c6" sha1="f59542a56618bc6164cee1de7dac5548ccd977d0" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 01).bin" size="185713920" crc="76a4f899" sha1="4e7a3cd6881c52dd25f38667413b04185a5735ff" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 02).bin" size="1495872" crc="0dc4147b" sha1="cdfe2345099c3f7d1cbc5bcb5e33c53dd3356cd4" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 03).bin" size="19792080" crc="92007c35" sha1="ff4e77efd211098f12529077f873807481c6b7ac" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 04).bin" size="14692944" crc="c75fed10" sha1="22c0112c7d50146f63e2fe9dac8b5f228575eca0" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 05).bin" size="15415008" crc="e4ed4598" sha1="7c2caf3a9dd760291345302eafb85f604bc93b82" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 06).bin" size="18053952" crc="5411ef88" sha1="0f59d6c0b136e863496f75eea01a4d815b9e71f9" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 07).bin" size="14518896" crc="06888cb8" sha1="208d62525220f17ce23ff30df187adec71df0420" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 08).bin" size="14862288" crc="d03e1290" sha1="b8af9fd527255edfd4819a4611ecb3e668c06b37" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 09).bin" size="20714064" crc="c62f61f2" sha1="794e402385965e4b4a6adddb4bc09b9f6ebc2102" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 10).bin" size="14509488" crc="6a4a5673" sha1="438befd05f69d82cbf7479e010446d940c9970be" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 11).bin" size="14161392" crc="1d7010c9" sha1="ca72fdbf941184cc85eb0d5cba9a3aa0577cb906" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 12).bin" size="18578448" crc="6f6c3021" sha1="733dd0e047afbce44fead34087342dcc6759daf3" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 13).bin" size="14187264" crc="807562e7" sha1="917120838554d00ec1cde751a0c329ac3a6f48ab" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 14).bin" size="11891712" crc="601d4106" sha1="f5900724ad093e824c32915539101f18ae38dcbd" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 15).bin" size="16612176" crc="30c4d94f" sha1="6c07986b8042cb1a1e38d0311690f5b275ce6bc2" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 16).bin" size="11360160" crc="7dae6a5a" sha1="4bca5936004fc1f9d17dd7e91e9b21a22b044b0c" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 17).bin" size="14488320" crc="8c472015" sha1="fadf27d793bdf908529e0da3db6ab998d4577060" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 18).bin" size="20709360" crc="35cdf8d0" sha1="f137c939daefa5e1eb10974bd038981bf39e23f9" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 19).bin" size="13298208" crc="fe8cebaf" sha1="59277763110e8565a491cc045b09cd3c27abd932" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 20).bin" size="12232752" crc="a309aab0" sha1="33108c93958f4bf768b89078a0ecbf250fc71c69" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 21).bin" size="15407952" crc="244b2699" sha1="2cd7e5ee8f5011a03f7bba055af035ea36a444a4" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 22).bin" size="12056352" crc="fe282ba4" sha1="7655fc82211c25d70dda0853fc518950161327ce" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 23).bin" size="13288800" crc="30a43c51" sha1="527314d2108d350b295e115ecfab1da3b445d144" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 24).bin" size="14521248" crc="faf4c29d" sha1="b6ec28d413a3db6871c924e36d9bed78d747ab28" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 25).bin" size="15219792" crc="a76ba05c" sha1="e06d39decf2238f302852621d7a9907192e40fac" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 26).bin" size="5611872" crc="369fea33" sha1="7e3954f64c8f2c4c51cb3ef274ceacdc47dce809" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 27).bin" size="5611872" crc="1365b6f4" sha1="df0706106208c50002a7b87fe18aa46151784074" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 28).bin" size="2069760" crc="fa87cbcf" sha1="8762691279fdb59a68972cc14831955d1c0e6a0d" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 29).bin" size="4449984" crc="bc9defbc" sha1="4bb604e3f22ffbb5d06a651c2880b0e60ac1ddb8" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 30).bin" size="4372368" crc="9ef70b1b" sha1="4b5c667c433f1ea4f9b6a30a969dc47bb9acb458" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 31).bin" size="2511936" crc="a6006a11" sha1="fbcecd3ed6b3ab7dd88c7c02c1029b6c1311edd4" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 32).bin" size="21941808" crc="12a48522" sha1="12f9d94c2c7f723a3a296f9d8dbcf2e7cb6f93cd" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 33).bin" size="22294608" crc="1b0af6ee" sha1="72adefd182a5c217118ca9a97733fecfa0611280" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 34).bin" size="16633344" crc="b85fa030" sha1="9a3f57daea7d34a97824d8be85eac5e8e30158e4" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 35).bin" size="32156544" crc="6cf32bf6" sha1="9d7a8a8fe70693d684a060d80d1e09635ead4f28" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 36).bin" size="15866592" crc="d00f350b" sha1="b3a77e28eb0d0a5bd0a4aa55201f3b6c3d73e4da" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 37).bin" size="15676080" crc="06bf65ff" sha1="cf6e6693a6758775ec1befd9a0fa0f3cad1e6f1e" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 38).bin" size="14648256" crc="922a82e2" sha1="fb7c584c1492c62fee6170360b4c644ff38f3ed1" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 39).bin" size="15490272" crc="4d5766d5" sha1="2f1b25c9014229a2eff4dc01c1c057862d130779" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 40).bin" size="19220544" crc="5d8ef82c" sha1="29cd3368b2ecb96070732448d15fd55befb347dc" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 41).bin" size="14803488" crc="fde56203" sha1="d4623261ca0c8eeab6aa1e8a7a1ffd091482d125" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (Track 42).bin" size="13498128" crc="e4cbd243" sha1="cc517df4479946828c9a6fc6e9bb956f9a83821a" /> -->
+	<software name="soniccdoem1" cloneof="soniccd">
+		<description>Sonic CD (USA, Pentium Processor Edition alt)</description>
+		<year>1995</year>
+		<publisher>Sega / Intel</publisher>
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic cd (pentium processor edition alt)" sha1="4cd719c7f16d21316d7d798606f8e621814e48c4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/36027/ -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01).cue" size="4123" crc="08c5b1b8" sha1="e4522615e58c1f120bbf3abc5d5e6a93f52f8924" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 01).bin" size="185728032" crc="d3a79c87" sha1="0ff28e88e5fec2f55e1f50eddb2e512ae5a8b305" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 02).bin" size="1665216" crc="304247e1" sha1="4e5f31ae82c5e6d096d3a3494fd489f1bfd44e22" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 03).bin" size="19792080" crc="7a93d47e" sha1="d2a1603970776cd492c33f656f7814c87774d38e" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 04).bin" size="14692944" crc="a8e29ede" sha1="672771d87871f5d805124efa65e18700ab273e13" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 05).bin" size="15415008" crc="795bfa70" sha1="432c2c81df252e9761119c83882daff2309f8cce" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 06).bin" size="18053952" crc="0adeac6b" sha1="4616304a0f40d334d3129245e943f5a761a267c0" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 07).bin" size="14518896" crc="04effb03" sha1="3697191da97f679470ddfba20ffba62af1764769" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 08).bin" size="14862288" crc="afc02f9b" sha1="e92ac01826200941ddde9b66ba85692aeb3a398e" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 09).bin" size="20711712" crc="603f150d" sha1="e79ad780424c785c98282404bd2163fb482584b2" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 10).bin" size="14511840" crc="7f0cfa03" sha1="b3cecc63f0676eebd6316abdeaadbea0c6f33fb2" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 11).bin" size="14161392" crc="fe8115cf" sha1="ecf43ca3ede412d22739b98f3e592c2ef4454585" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 12).bin" size="18578448" crc="0e89f6c4" sha1="e9283f71b16c91cd3d4096e37d1c7a0ad95163fe" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 13).bin" size="14187264" crc="54a941e0" sha1="62a0be1b712528787ca29c255e7642c55cc28d4f" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 14).bin" size="11891712" crc="bb03bf87" sha1="3169e50af9f9ffcafdb33f5b01dd1b04817bfccf" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 15).bin" size="16612176" crc="58bbae49" sha1="c7c92059956b988021184584b5dd8ce3db275b54" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 16).bin" size="11360160" crc="5efcc4f5" sha1="0c3396c00d3305779ae3a023001044a8f4f959c5" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 17).bin" size="14488320" crc="8fb3dd1f" sha1="217193b3c661b1f45d0ccb1e23e1f3300c4b3c7f" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 18).bin" size="20709360" crc="4a765d01" sha1="0e1a92b4a670c3ffb86999e1df256888748b3c05" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 19).bin" size="13298208" crc="9d9d68de" sha1="3a8f6c5bf42225d480066a7cf7cef46f0725c9b6" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 20).bin" size="12232752" crc="83f767d2" sha1="30206677fe4e43b82c923627fc1aea1c29a57653" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 21).bin" size="15407952" crc="97d60e1c" sha1="6902eb07e9819fa352a3872b046066e1a2f080dc" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 22).bin" size="12056352" crc="45a4ed4f" sha1="33a547e78a3957699e2cebccbd0afd43c81403c7" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 23).bin" size="13288800" crc="89a9fe62" sha1="d6d99d3def87953c8f8acfd642f917b46ceae09a" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 24).bin" size="14521248" crc="ef4f8ca7" sha1="220c67496c7973c943d39ca7bac7d5bec6a8b9a4" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 25).bin" size="15219792" crc="070f497b" sha1="11fb423cb587909898b00b0b8ed4a7251990c3f7" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 26).bin" size="5611872" crc="3b1b92e1" sha1="06c29655fbbdf9634d3e24f1031f090f2daaf171" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 27).bin" size="5611872" crc="3cde4865" sha1="7e28650aa0801ab90cbcd0edabbb035156a4b24d" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 28).bin" size="2069760" crc="2d0672b3" sha1="417a6ff18ff925a9d25f18037ba29f1b53600bc5" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 29).bin" size="4449984" crc="5db9e4b4" sha1="e6842da14a0176029312f8366643825307769c4e" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 30).bin" size="4372368" crc="649b922d" sha1="82dbfa9683417f2a9a29294bb09554409ee1e21e" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 31).bin" size="2511936" crc="def61de0" sha1="f02c79081d9f5cc09244ffcd31ad130b92d17205" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 32).bin" size="21941808" crc="83e51eb5" sha1="f19ea7f16c8bee5a89ea95a215cae205aec6e56b" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 33).bin" size="22294608" crc="d1eb8136" sha1="cdcf66f8343641721bc45a4e16569ba8d8c0e806" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 34).bin" size="16633344" crc="46f3e8f2" sha1="c5d1bbf67cf8fc90bec2e89e4971504e1a51f72c" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 35).bin" size="32156544" crc="d2cc0de8" sha1="f8c7bf8189e9de9bd3ea162204f06d9ab8488e16" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 36).bin" size="15866592" crc="c911c49c" sha1="b31d9d4ebff83fc233b8e529a0c2af80511c5122" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 37).bin" size="15676080" crc="c3f4da85" sha1="085ef3811336724fef6bc87bd0177fe9b0a2df7a" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 38).bin" size="14648256" crc="d43d0968" sha1="4a9d6f110e6b714a139751dab0cc4cb0dd4369a8" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 39).bin" size="15490272" crc="0bed044e" sha1="bafffccb37960a56aa506d5d33d98bfaf0c64c71" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 40).bin" size="19220544" crc="a747ffee" sha1="f7d4ba40870a36cf1fc0e37d7d5015cd629c9f5d" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 41).bin" size="14803488" crc="0f8221a1" sha1="9f48782db81c79d2874773fa47eb4522079866fc" /> -->
+	<!-- <rom name="Sonic CD (USA) (OEM) (v1.01) (Track 42).bin" size="13502832" crc="8630a19a" sha1="94dceeef603fcfeb3486c6cfcfb7c25077981525" /> -->
+	<software name="soniccdoem2" cloneof="soniccd">
+		<description>Sonic CD (USA, Packard Bell)</description>
+		<year>1996</year> <!-- Date on CD is 1995-12-28, but very likely this released in 1996 -->
+		<publisher>Sega / Packard Bell</publisher>
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic cd (packard bell)" sha1="046bb546be4f42c9871ffb351aee064b4ac240ac" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/47718/ -->
+	<!-- <rom name="Sonic CD (Europe) (Alt).cue" size="3913" crc="95c53b23" sha1="c1ff9d0dfe83637666ee0a28a5ab6215761b2b12" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 01).bin" size="202911744" crc="4b3e0035" sha1="706ef60744eb2505c6ebb23c149dd7ce3f9d8f0e" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 02).bin" size="1801632" crc="afd1aebc" sha1="e39634034abbef489d1e8db515e447855945c6ee" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 03).bin" size="19970832" crc="dc08a965" sha1="ee812028401b3d8175adc90b4b0fdfc322c6e939" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 04).bin" size="14829360" crc="222340fa" sha1="03167c4e119f3dcd386c709985399afc35bf8798" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 05).bin" size="15551424" crc="dd616b5b" sha1="f56733bd627db53694caeaf9d93ca8aae1f51b85" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 06).bin" size="18185664" crc="7d66ca1d" sha1="4ccd03488c96dbd98cb48e1d589b010985cacde1" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 07).bin" size="14657664" crc="e67aa5f4" sha1="df041d31d5707fcfc7f3de81883bc365c3e4df9f" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 08).bin" size="15001056" crc="681de6e1" sha1="9c30a8edc5a51e55209bfc2d001a8af7788f86ba" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 09).bin" size="20848128" crc="9f847186" sha1="6429391356801e68886cf0db2824fd8611e7ed0e" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 10).bin" size="14650608" crc="16162234" sha1="f93674c2f97a6268ebcc3a6db995b0515737dbd6" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 11).bin" size="14302512" crc="20fa1a48" sha1="e6b18e4f5b702f13ec9ad115f77a561af107ffcd" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 12).bin" size="18712512" crc="ee385ddc" sha1="1ed2d19a943a0f113958ba29f7a9b1eaad9c5005" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 13).bin" size="14370720" crc="48f8b1f7" sha1="d26b772ca3f54e212464ef5b3d0946480426fe9c" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 14).bin" size="12028128" crc="fb44ea07" sha1="b2b74c071ca1a9089c8d9dafaf0f5fa66356043c" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 15).bin" size="16769760" crc="31327051" sha1="1ccc49002eb73e1c5a0459beeeefa0d8ea743043" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 16).bin" size="11494224" crc="c297c7cb" sha1="6639e3508ce191e2c4962a4cef425fd9c81f627b" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 17).bin" size="14660016" crc="a78c677a" sha1="e2ed7d0ccaf22482a0f4dc413f46dc6833d4a853" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 18).bin" size="20843424" crc="5316130a" sha1="ed678ba465c52b386df420d37e5ca377f328141b" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 19).bin" size="13434624" crc="9f5e7a71" sha1="7e1f6c7bf732e04c2841ad1a302e180dd00f0f1a" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 20).bin" size="12366816" crc="7ab3b7a3" sha1="b10624a2b826092bad02119114d4d93f62b0df2e" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 21).bin" size="15544368" crc="a1e58b6d" sha1="7774b73347aa96c88666af6f2656fa166e59ba63" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 22).bin" size="12192768" crc="1c31dacd" sha1="b4d5659ca5a160c8abebb95c0e4135183762c3c3" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 23).bin" size="13425216" crc="a69d013a" sha1="1add2371bf5411c2a2d85ce452f20e13fdb277fd" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 24).bin" size="14655312" crc="b50fa82c" sha1="c3f237926681c8ccc2757c5561f6d4d0c35f5245" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 25).bin" size="15353856" crc="6b2774ad" sha1="1757caf632c89b61cc79666cbb7126702e414956" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 26).bin" size="5828256" crc="91db8f35" sha1="03b29863a649a38899a27e1238eec0ed00a777b7" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 27).bin" size="5828256" crc="4bd51c05" sha1="698d69ff8a9039acff5337b9a6cfb0f48d70fee0" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 28).bin" size="2203824" crc="57f075ac" sha1="298e2f3b5b3cce7c50d1c1cdad09bb1e3cf18a50" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 29).bin" size="6355104" crc="b482b3fd" sha1="29804905f80e68cb9f8709cd275517f4db68a545" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 30).bin" size="6333936" crc="02d1a9d4" sha1="dd460276143901b5911a34aadb1fe481e2c1c89c" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 31).bin" size="2653056" crc="3ceaf5ab" sha1="a46a953e80713775d2730ccb267e0de1e54e8c2f" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 32).bin" size="22078224" crc="247efa19" sha1="3ab2c7188d842d1a00c9bc11daa762931c657b46" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 33).bin" size="22428672" crc="22a47973" sha1="cc7c5529ebfdc4176f83dfb164442e25634e40d2" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 34).bin" size="16767408" crc="6aba8c63" sha1="682fe4acb202d77df80e96c38b48977323cd1f74" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 35).bin" size="1448832" crc="07f4d794" sha1="d4357d92ebbcfd8405195743c24e51a716663945" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 36).bin" size="16003008" crc="9d3103e7" sha1="2159f2e4ec571d5a7947c07274c320694bcd7796" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 37).bin" size="15810144" crc="fba72bc0" sha1="1399273ec1524e4d11f3921b7b273ae183ca8d54" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 38).bin" size="14782320" crc="bbe7f8d1" sha1="704b56eaaa72252642e861d8e623d3ce1efa5f5c" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 39).bin" size="15624336" crc="69ea62df" sha1="be317d77d9a44d153deee7f966fc8c86d554a555" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 40).bin" size="19356960" crc="afc1fe67" sha1="b0c290aee25fd432a68c94a6e3c388db6b2f4d91" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 41).bin" size="14937552" crc="d6f5face" sha1="c065bf9cc471a8e28a02e457023256d132cdd446" /> -->
+	<!-- <rom name="Sonic CD (Europe) (Alt) (Track 42).bin" size="13636896" crc="c212d279" sha1="4e8cd03b05406c1adb7490f5984498a00267e305" /> -->
+	<software name="soniccde" cloneof="soniccd">
+		<description>Sonic CD (Europe)</description>
+		<year>1996</year>
+		<publisher>Sega / Expert Software</publisher>
+		<info name="language" value="English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic cd (europe)" sha1="74414fef89e25d6187e09bce7256e783bae76beb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/62356/ -->
+	<!-- <rom name="Sonic CD (China) (Rerelease).cue" size="4981" crc="4b6fd759" sha1="9eaf1e1e6662e70399a5ddcb2bbef5c52eca2208" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 01).bin" size="218307936" crc="c23e7d1c" sha1="0584a6bd6086fab14426792d3a3233585282c0ce" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 02).bin" size="1982736" crc="e4443c10" sha1="c32f98e65193a9cb4ea7b95bf0742698b3bd3ab3" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 03).bin" size="16805040" crc="f23a330d" sha1="4c2e29f399827866447bc3fbe640fa00336e3d60" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 04).bin" size="15186864" crc="5d9be717" sha1="57b3989ffb92b77d2e92d0a349a3ce197bd8d3ff" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 05).bin" size="15908928" crc="aa89d4d6" sha1="e0641276ed1d6d1e243dd5d1fbd18a2fb591b070" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 06).bin" size="18543168" crc="7672c3a0" sha1="67d7dc3e5027b25e6dc3f9b377ed42ac652531c5" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 07).bin" size="15015168" crc="2386f03a" sha1="429f657a6b7b3c6c543fe549879979d0b680cfb9" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 08).bin" size="15358560" crc="1bce4c29" sha1="2170942d953f087751e32dd3f1c24ec8ef2d8dd9" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 09).bin" size="21205632" crc="02d477b0" sha1="d891cc6bd0c48843c5c13721b6385a2e3011e28a" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 10).bin" size="15008112" crc="2b750a3a" sha1="e24a6fc1c7b81b94a8a6bf6b501fb5831284e676" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 11).bin" size="14660016" crc="ccc49ab7" sha1="be07ce492b5dea166804a4eed4b7764e0def3cbf" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 12).bin" size="19070016" crc="22c69dbd" sha1="061c36871f636f854d98d032e7a50a8d57a6af3f" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 13).bin" size="14728224" crc="d7955d3f" sha1="82d90bc6ff83a07f9e2ae770374788a683d67880" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 14).bin" size="12385632" crc="3daf862e" sha1="70e7de4a6ef7f6f31745f297075f38b468775458" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 15).bin" size="17127264" crc="1e6ce764" sha1="8f0d764849df6239e5b13aad86579d442b51b546" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 16).bin" size="11851728" crc="aa245cb3" sha1="99e5905a8722f0afd33db5f9b49cbabc9e1faf39" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 17).bin" size="15017520" crc="2a9756fc" sha1="b6b42f0ce5e0fde8698ee0d00a7761279016d9ce" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 18).bin" size="21200928" crc="ef7c9403" sha1="9a27ca3d6a9e81172786be974104b7a4ae027351" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 19).bin" size="13792128" crc="f24e5d08" sha1="7727be36089fb20ed20e9e8018f6ad6f82a99983" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 20).bin" size="12724320" crc="a1d61859" sha1="4c04c8f1c1b3b742f6dcb2b4c83a9463f1f2e968" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 21).bin" size="15901872" crc="d9d0688e" sha1="64ab8c8f35e2e6e865bf1e8f04d8dafee8f14454" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 22).bin" size="12550272" crc="6cacaa70" sha1="76e381393c66d4777059999f07083d099b158a05" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 23).bin" size="13782720" crc="f6f095f3" sha1="da5049cf9d455ea4c4acbe44e5d74bc1a7ce7333" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 24).bin" size="15012816" crc="670e0384" sha1="522bf286bc7299faa7e70255fa9e51bd42780632" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 25).bin" size="15711360" crc="ec2aa329" sha1="24a5dca94839df6bae9d7e1f2bf1fd074589e6bd" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 26).bin" size="6185760" crc="f6a6a7bd" sha1="f97ccb2c3d3919c159896931d09fbb1483089c6b" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 27).bin" size="6185760" crc="48355ae2" sha1="a1ab3e8c5c4c20cca18843574c8769a7b87cc386" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 28).bin" size="2561328" crc="b2b138d1" sha1="cd85ff4a73abe4ecb8967f13456afe0fd46972e5" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 29).bin" size="6712608" crc="0b3ec447" sha1="dbbe5fef644b8697380de378af8cd29a62a20f04" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 30).bin" size="6691440" crc="825f4cea" sha1="4340d217d43870880b4a78143525086477567c90" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 31).bin" size="3010560" crc="767423cc" sha1="b57d9bea099a11a3aca207e1b08661075314f86b" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 32).bin" size="22435728" crc="c20b1e27" sha1="a2ca4dd412554debf79d924dc5519ada943da09f" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 33).bin" size="22786176" crc="2fef1244" sha1="3fe30f1884528ff1e5eea667d7fd1b9bc8c464ed" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 34).bin" size="17124912" crc="f774eb11" sha1="7738dadd27c3f829737662327962ac561f421930" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 35).bin" size="1806336" crc="f743e15e" sha1="3352378655b4fc382b8b47c822e4f1f768df3e7b" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 36).bin" size="2072112" crc="917c2094" sha1="e5b6ba4da6772625fb3a9ad909b2f824e1a068d8" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 37).bin" size="16167648" crc="614d28ce" sha1="49ab3b7dfc49563c4d133b2549f6a9fc6f4afc35" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 38).bin" size="15139824" crc="84253d70" sha1="7e5d115ed78deebbe7b32257cd82de49cd9c54e3" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 39).bin" size="15981840" crc="912b8f21" sha1="23963e4b41275e0b56cf7621632e4f6b6d7be760" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 40).bin" size="19714464" crc="ae513d33" sha1="684d728c2c3006d04d1ade734421307a332b7e0b" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 41).bin" size="15295056" crc="08592d43" sha1="4557d702900b35982881892f980f7684bc6a1b1f" /> -->
+	<!-- <rom name="Sonic CD (China) (Rerelease) (Track 42).bin" size="13634544" crc="fcf2356b" sha1="520bbdce51114a163117980e0f87aa1af33c40aa" /> -->
+	<software name="soniccdzh" cloneof="soniccd">
+		<description>Sonic CD (China)</description>
+		<year>2001</year>
+		<publisher>Sega / Expert Software</publisher>
+		<notes><![CDATA[
+		Autorun fails to launch on Windows 95, but setup.exe and the game work.
+		]]></notes>
+		<info name="alt_title" value="索尼克CD" />
+		<info name="language" value="Chinese/English" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic cd (china)" sha1="14aba3162a0ed8c734c7713a1986f80aa58c6e47" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 3.1 / 95 -->
 	<software name="spaceinv" supported="yes">
 		<description>Space Invaders for Windows</description>
@@ -8038,7 +8492,7 @@ Installation and Open Circulation CDs are bootable.
 	</software>
 
 	<software name="winnt40e" cloneof="winnt40">
-		<description>Windows NT Server, Enterpise Edition 4.0 (4.0.1381.4)</description>
+		<description>Windows NT Server, Enterprise Edition 4.0 (4.0.1381.4)</description>
 		<year>1997</year>
 		<publisher>Microsoft</publisher>
 		<notes><![CDATA[

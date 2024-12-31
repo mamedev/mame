@@ -48,38 +48,59 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<!-- boot OK -->
 	<software name="007tnd">
 		<!--
-		Original images (Redump)
+		redump.org/disc/830
 		<rom name="007 - Tomorrow Never Dies (USA).cue" size="97" crc="dc22c9e3" sha1="55b145bd5563c4b62cf3fadeda704340824c7b55"/>
 		<rom name="007 - Tomorrow Never Dies (USA).bin" size="573594000" crc="02f976df" sha1="5c635e990dc77c481eb177dc86deb7a198f17cf8"/>
 		-->
 		<description>007 - Tomorrow Never Dies (USA)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="language" value="English" />
 		<info name="serial" value="SLUS-00975, SLUS-00975CE, SLUS-00975GH"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="007 - tomorrow never dies (usa)" sha1="f48f0e79572be7d676341fb9f6cb0ccb5a31e0d9"/>
+				<disk name="007 - Tomorrow Never Dies (USA)" sha1="603abd8d718ddb72cf34a0d8eece062c03463dc5"/>
 			</diskarea>
 		</part>
 	</software>
 
 	<software name="007twine">
-		<!-- Original images (Redump)
+		<!--
+		redump.org/disc/2387
 		<rom name="007 - The World Is Not Enough (USA).cue" size="101" crc="adc163bd" sha1="1e4a0731b245ab3419a5e0f23cb1001e1f1e7613"/>
 		<rom name="007 - The World Is Not Enough (USA).bin" size="726429312" crc="6e91b75f" sha1="0d6f886485318959b9a86209a91228840b61fbad"/>
 		-->
 		<description>007 - The World Is Not Enough (USA)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="language" value="English" />
 		<info name="serial" value="SLUS-01272, SLUS-01272GH"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="007 - the world is not enough (usa)" sha1="d79f4b8ce9db7c5dacd841e7d7ebbb306f88de70"/>
+				<disk name="007 - The World Is Not Enough (USA)" sha1="3af01c1f0a584751d161dc2c102639cd8c892ea9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="007twine_p" cloneof="007twine">
+		<!--
+		redump.org/disc/59807
+		<rom name="007 - The World Is Not Enough (USA) (Beta) (2000-08-26).cue" size="121" crc="503a4cf6" sha1="79cf7463d72934e8887c3d9977bb384858588dae"/>
+		<rom name="007 - The World Is Not Enough (USA) (Beta) (2000-08-26).bin" size="750278592" crc="a709d8bd" sha1="edb14c9b988cf2a6052c9f770a0190077bd7de8e"/>
+		-->
+		<description>007 - The World Is Not Enough (USA, prototype 20000826)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="language" value="English" />
+		<info name="serial" value="SLUS-00978"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 - The World Is Not Enough (USA) (Beta) (2000-08-26)" sha1="385715ee6e34fa375a25582b9f3ebf03f46a1418"/>
 			</diskarea>
 		</part>
 	</software>
@@ -37207,6 +37228,27 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 -->
 
+	<software name="007tnd_jp" cloneof="007tnd">
+		<!--
+		redump.org/disc/20884
+		<rom name="007 - Tomorrow Never Dies (Japan).cue" size="99" crc="424cea74" sha1="a87f7a645cb57ae467656682773ea1e7a926adec"/>
+		<rom name="007 - Tomorrow Never Dies (Japan).bin" size="564764592" crc="da5649d7" sha1="b189c39cde5e35cd1d4f20c912de4aa0e2fc5897"/>
+		-->
+		<description>007 - Tomorrow Never Dies (Japan)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts Square</publisher>
+		<info name="alt_title" value="００７　～トゥモロー・ネバー・ダイ～"/>
+		<info name="language" value="Japanese" />
+		<info name="release" value="20000210" />
+		<info name="serial" value="SLPS-02604" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 - Tomorrow Never Dies (Japan)" sha1="7ee3f0181a623f760884417eadd070a02b59d605"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- http://redump.org/disc/38429/ http://redump.org/disc/38430/ -->
 	<software name="crshock">
 		<description>Creature Shock (Japan)</description>
@@ -37493,27 +37535,6 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	Images below are 'low-grade' i.e. not dumped to any specific standard, or verified to be of any specific quality, they could have bad gaps or audio tracks etc.
 	They should be replaced with better quality images once said images are available (and verified to be the same versions)
 	-->
-
-	<!-- boot OK -->
-	<software name="007tndj" cloneof="007tnd">
-		<!--
-		Unknown source
-		<rom name="007 - Tomorrow Never Dies (Japan) [SLPS-02604].bin" size="564764592" crc="e8376955" sha1="516e6098930268494fd32038c49a07ed5feac3d4"/>
-		<rom name="007 - Tomorrow Never Dies (Japan) [SLPS-02604].cue" size="110" crc="f85b1630" sha1="f4be16a5d138e75d6b0635d5fc48aad290710fc3"/>
-		-->
-		<description>007 - Tomorrow Never Dies (Japan)</description>
-		<year>2000</year>
-		<publisher>Electronic Arts Square</publisher>
-		<info name="serial" value="SLPS-02604" />
-		<info name="release" value="20000210" />
-		<info name="alt_title" value="００７　～トゥモロー・ネバー・ダイ～"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="psx_cdrom">
-			<diskarea name="cdrom">
-				<disk name="007 - tomorrow never dies (japan) [slps-02604]" sha1="966f52044cad485c3adab30e27683fc5f2e78c89" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
 
 	<!-- boot OK, a sound note seems stuck (btanb?) -->
 	<software name="10101wil">
@@ -59449,6 +59470,159 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<!-- Redump PAL (Europe) -->
+
+	<software name="007tnd_eu" cloneof="007tnd">
+		<!--
+		redump.org/disc/967
+		<rom name="007 - Tomorrow Never Dies (Europe).cue" size="100" crc="765606dd" sha1="fd5f043ce416db55a16a72ea4cd7b408aef20f2f"/>
+		<rom name="007 - Tomorrow Never Dies (Europe).bin" size="572408592" crc="763e4df9" sha1="c7022a564fa7d839f6a84c09c2ec47c96778b7c8"/>
+		-->
+		<description>007 - Tomorrow Never Dies (Europe)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-01324, SLES-01324-T, SLES-01324/P"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 - Tomorrow Never Dies (Europe)" sha1="0d341a0e7b704eaa1d44d4450666c4a8a95ce158"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="007tnd_fr" cloneof="007tnd">
+		<!--
+		redump.org/disc/13398
+		<rom name="007 - Demain ne Meurt Jamais (France).cue" size="103" crc="804de764" sha1="079196f7c1bce6e74a32db7185aa889cd40f634f"/>
+		<rom name="007 - Demain ne Meurt Jamais (France).bin" size="570611664" crc="20d12f7b" sha1="077bddb3f832e3f2ec660634cd37b50f0d927eb9"/>
+		-->
+		<description>007 - Demain ne Meurt Jamais (France)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="language" value="French" />
+		<info name="serial" value="SLES-02375, SLES-02375-P"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 - Demain ne Meurt Jamais (France)" sha1="93e62f8c5d1fcbb32aceda03f6b319df2a238b5a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="007tnd_de" cloneof="007tnd">
+		<!--
+		redump.org/disc/4003
+		<rom name="007 - Die Welt Ist Nicht Genug (Germany).cue" size="106" crc="4a7ed159" sha1="79eb3b595147b7b1058162d3aa126355a15e448e"/>
+		<rom name="007 - Die Welt Ist Nicht Genug (Germany).bin" size="724728816" crc="40fb0330" sha1="109bb1cb7e7fc9c9305d85a42d19c17bf467060d"/>
+		-->
+		<description>007 - Der Morgen Stirbt Nie (Germany)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="language" value="German" />
+		<info name="serial" value="SLES-02376, SLES-02376-T"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 - Der Morgen Stirbt Nie (Germany)" sha1="18f50fbfc857c874c4a89a3689b99ea870f20d54"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="007twine_eu" cloneof="007twine">
+		<!--
+		redump.org/disc/968
+		<rom name="007 - The World Is Not Enough (Europe).cue" size="104" crc="7d9fe2b7" sha1="b46ef39f671f819d7077d38b401d251ebbb208fd"/>
+		<rom name="007 - The World Is Not Enough (Europe).bin" size="727292496" crc="8df63204" sha1="9062140eb4952b3addd0197cb6202723032117f7"/>
+		-->
+		<description>007 - The World Is Not Enough (Europe)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-03134, SLES-03134-T"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 - The World Is Not Enough (Europe)" sha1="9626cffce3e2713aa9bbc3e2c07d1cc1b95c9831"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="007twine_fr" cloneof="007twine">
+		<!--
+		redump.org/disc/28132
+		<rom name="007 - Le Monde ne Suffit Pas (France).cue" size="103" crc="b7873d96" sha1="ff26ea5b4c4a840afbdc90123686a3012494b9d8"/>
+		<rom name="007 - Le Monde ne Suffit Pas (France).bin" size="727325424" crc="c2d1c87a" sha1="183815d71895adf29c7111ea9ac57ebdc4df7333"/>
+		-->
+		<description>007 - Le Monde ne Suffit Pas (France)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="language" value="French" />
+		<info name="serial" value="SLES-03135"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 - Le Monde ne Suffit Pas (France)" sha1="c6725b155f2ac290d80a7e99fee18147c79e17b4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="007twine_de" cloneof="007twine">
+		<!--
+		redump.org/disc/3271
+		<rom name="007 - Die Welt Ist Nicht Genug (Germany).cue" size="106" crc="4a7ed159" sha1="79eb3b595147b7b1058162d3aa126355a15e448e"/>
+		<rom name="007 - Die Welt Ist Nicht Genug (Germany).bin" size="724728816" crc="40fb0330" sha1="109bb1cb7e7fc9c9305d85a42d19c17bf467060d"/>
+		-->
+		<description>007 - Die Welt Ist Nicht Genug (Germany)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="language" value="German" />
+		<info name="serial" value="SLES-03136, SLES-03136-P, SLES-03136-T"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 - Die Welt Ist Nicht Genug (Germany)" sha1="63e6b4667bad77fc9ecabf23d889cc06883e70d7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="007twine_es" cloneof="007twine">
+		<!--
+		redump.org/disc/4881
+		<rom name="007 - El Mundo Nunca es Suficiente (Spain).cue" size="108" crc="a0760ab7" sha1="4a3db376fded915a172ff249bd27b2b219c2455f"/>
+		<rom name="007 - El Mundo Nunca es Suficiente (Spain).bin" size="725182752" crc="f2614069" sha1="d058f1ae8891e5dcbb05fd872e2b4cf263be1a00"/>
+		-->
+		<description>007 - El Mundo Nunca es Suficiente (Spain)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-03137-T"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 - El Mundo Nunca es Suficiente (Spain)" sha1="2d1c93aa8452e051e30ba5045b1eb19ef0182538"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="007twine_sv" cloneof="007twine">
+		<!--
+		redump.org/disc/48547
+		<rom name="007 - The World Is Not Enough (Sweden).cue" size="104" crc="02fe70a7" sha1="535fe9288f572c2eff15a7cc1800ce33ec33296b"/>
+		<rom name="007 - The World Is Not Enough (Sweden).bin" size="727299552" crc="b535d4c5" sha1="73376a3287a874068ef32cc3bd2d918fb7f33d2b"/>
+		-->
+		<description>007 - The World Is Not Enough (Sweden)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="language" value="Swedish" />
+		<info name="speech" value="English" />
+		<info name="serial" value="SLES-03138"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="007 - The World Is Not Enough (Sweden)" sha1="3e7f2b632ef1c5db17d8c17cc26ff75cada9382d"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- http://redump.org/disc/19444/ -->
 	<!-- Bundled with "Action Replay 2 Version 2" for PlayStation 2. Should be moved to that list when possible. -->

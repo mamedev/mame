@@ -22,8 +22,9 @@
 
 Name        Board No      Maker         Game name
 ----------------------------------------------------------------------------
-pwrkick     SW931201      Sunwise       Power Kick
-burgkids    SW931201      Sunwise       Burger Kids
+pwrkick     SW931201-1    Sunwise       Power Kick
+burgkids    SW931201-1    Sunwise       Burger Kids
+pyutakun    SW931201-1    Sunwise       Pyuuta-kun
 othldrby    S951060-VGP   Sunwise       Othello Derby
 
 
@@ -282,6 +283,15 @@ static INPUT_PORTS_START( burgkids )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin 1 (Medal)")
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( pyutakun )
+	PORT_INCLUDE( burgkids )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( 2b )
 	PORT_START("IN1")
@@ -557,7 +567,7 @@ NOTE: This PCB uses an 8-Liner style edge connector
         MB3771 Voltage monitor
         BT1 - CR2550 3Volt battery
 
-NOTE: Sunwise's S951060-VGP PCB uses identical componenets to the SW931201 but has a standard JAMMA connector
+NOTE: Sunwise's S951060-VGP PCB uses identical components to the SW931201 but has a standard JAMMA connector
 */
 
 ROM_START( burgkids ) // Sunwise SW931201-1 PCB - 8-liner connections
@@ -570,6 +580,18 @@ ROM_START( burgkids ) // Sunwise SW931201-1 PCB - 8-liner connections
 
 	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 )
 	ROM_LOAD( "ffk4.u33", 0x000000, 0x080000,  CRC(3b032d4f) SHA1(69056bf205aadf6c9fee56ce396b11a5187caa03) )
+ROM_END
+
+ROM_START( pyutakun ) // Sunwise SW931201-1 PCB - 8-liner connections
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "sunwise_p1.u61", 0x00000, 0x80000, CRC(00907713) SHA1(0822044bcf476b3e8aaba752e503ee79459b34ed) )
+
+	ROM_REGION( 0x100000, "gp9001", 0 )
+	ROM_LOAD( "sunwise_p2.u26", 0x00000, 0x80000, CRC(180b8b13) SHA1(4a317bd0825f4e4383293220e775c0f807cdd80f) )
+	ROM_LOAD( "sunwise_p3.u27", 0x80000, 0x80000, CRC(a23ccb8e) SHA1(5f2f23fa86817ff491058123d775ffebd7e98dee) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "sunwise_p4.u33", 0x00000, 0x40000, CRC(b1c5a8bc) SHA1(aa18165a9214f9ed0969da073e4b6092be3c5c1a) )
 ROM_END
 
 ROM_START( othldrby ) // Sunwise S951060-VGP PCB - JAMMA compliant (components identical to Sunwise SW931201-1 PCB)
@@ -588,4 +610,5 @@ ROM_END
 
 GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Power Kick (Japan)",    0 )
 GAME( 1995, burgkids,    0,        pwrkick,    burgkids,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Burger Kids (Japan)",   0 )
+GAME( 1995, pyutakun,    0,        pwrkick,    pyutakun,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Pyuuta-kun (Japan)",    0 )
 GAME( 1995, othldrby,    0,        othldrby,   othldrby,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )

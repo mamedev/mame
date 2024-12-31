@@ -11,8 +11,6 @@ to run on IDENTICAL hardware (they were sold by Bally-Midway as ROM swaps).
 
 TODO:
 - fully understand nobb ports involved in the protection
-- different XTAL/divider configurations for some Star Jacker cabinets?
-  See you.tube/-a7srHVPb_U
 
 *******************************************************************************
 

@@ -152,12 +152,12 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 		}
 		else
 		{
-			return m_extbus_space->read_byte((databank << 16) | adr);
+			return m_extbus_space->read_byte(((databank << 16) | adr) & 0x7fffff );
 		}
 	}
 	else
 	{
-		return m_extbus_space->read_byte((databank << 16) | adr);
+		return m_extbus_space->read_byte(((databank << 16) | adr) & 0x7fffff );
 	}
 }
 
@@ -257,12 +257,12 @@ inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_
 		}
 		else
 		{
-			m_extbus_space->write_byte((databank << 16) | adr, val);
+			m_extbus_space->write_byte(((databank << 16) | adr) & 0x7fffff, val);
 		}
 	}
 	else
 	{
-		m_extbus_space->write_byte((databank << 16) | adr, val);
+		m_extbus_space->write_byte(((databank << 16) | adr) & 0x7fffff, val);
 	}
 }
 

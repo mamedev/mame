@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-/*************************************************************************
+/*******************************************************************************
 
    Run and Gun / Slam Dunk
    (c) 1993 Konami
@@ -15,13 +15,16 @@
    should be fine.
 
    Known Issues:
-   - CRTC and video registers needs syncronization with current video draw state, it's very noticeable if for example scroll values are in very different states between screens.
-   - Current draw state could be improved optimization-wise (for example by supporting it in the core in some way).
+   - CRTC and video registers needs syncronization with current video draw state,
+     it's very noticeable if for example scroll values are in very different states
+     between screens.
+   - Current draw state could be improved optimization-wise (for example by supporting
+     it in the core in some way).
    - sprite palettes are not entirely right (fixed?)
    - sound volume mixing, handtune with set_gain() with m_k054539 devices.
      Also notice that "volume" in sound options is for k054539_1 (SFX)
 
-*************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
