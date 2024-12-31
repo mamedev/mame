@@ -23,71 +23,34 @@ sprite_data[8] =
 	{  8,  8, 0 }, { 16,  8, 6 }, {  8, 16, 3 }, { 16, 16, 1 }
 };
 
-
-TILE_GET_INFO_MEMBER(nemesis_state::get_bg_tile_info)
+template <unsigned Which>
+TILE_GET_INFO_MEMBER(gx400_base_state::get_tile_info)
 {
-	int code, color, flags, mask, layer;
+	int code = m_videoram[Which][tile_index];
+	int color = m_colorram[Which][tile_index];
+	int flags = 0;
 
-	code = m_videoram2[tile_index];
-	color = m_colorram2[tile_index];
-	flags = 0;
-
-	if (color & 0x80)
+	if (BIT(color, 7))
 		flags |= TILE_FLIPX;
 
-	if (code & 0x0800)
+	if (BIT(code, 11))
 		flags |= TILE_FLIPY;
 
-	if ((~code & 0x2000) || ((code & 0xc000) == 0x4000))
+	if (BIT(~code, 13) || ((code & 0xc000) == 0x4000))
 			flags |= TILE_FORCE_LAYER0;     /* no transparency */
 
 	if (code & 0xf800)
 	{
-		tileinfo.set(0, code & 0x7ff, color & 0x7f, flags );
+		tileinfo.set(0, code & 0x7ff, color & 0x7f, flags);
 	}
 	else
 	{
-		tileinfo.set(0, 0, 0x00, 0 );
+		tileinfo.set(0, 0, 0x00, 0);
 		tileinfo.pen_data = m_blank_tile;
 	}
 
-	mask = (code & 0x1000) >> 12;
-	layer = (code & 0x4000) >> 14;
-	if (mask && !layer)
-		layer = 1;
-
-	tileinfo.category = mask | (layer << 1);
-}
-
-TILE_GET_INFO_MEMBER(nemesis_state::get_fg_tile_info)
-{
-	int code, color, flags, mask, layer;
-
-	code = m_videoram1[tile_index];
-	color = m_colorram1[tile_index];
-	flags = 0;
-
-	if (color & 0x80)
-		flags |= TILE_FLIPX;
-
-	if (code & 0x0800)
-		flags |= TILE_FLIPY;
-
-	if ((~code & 0x2000) || ((code & 0xc000) == 0x4000))
-			flags |= TILE_FORCE_LAYER0;     /* no transparency */
-
-	if (code & 0xf800)
-	{
-		tileinfo.set(0, code & 0x7ff, color & 0x7f, flags );
-	}
-	else
-	{
-		tileinfo.set(0, 0, 0x00, 0 );
-		tileinfo.pen_data = m_blank_tile;
-	}
-
-	mask = (code & 0x1000) >> 12;
-	layer = (code & 0x4000) >> 14;
+	int const mask = BIT(code, 12);
+	int layer = BIT(code, 14);
 	if (mask && !layer)
 		layer = 1;
 
@@ -95,7 +58,7 @@ TILE_GET_INFO_MEMBER(nemesis_state::get_fg_tile_info)
 }
 
 
-void nemesis_state::gfx_flipx_w(int state)
+void gx400_state::gfx_flipx_w(int state)
 {
 	m_flipscreen = state;
 
@@ -107,7 +70,7 @@ void nemesis_state::gfx_flipx_w(int state)
 	machine().tilemap().set_flip_all(m_tilemap_flip);
 }
 
-void nemesis_state::gfx_flipy_w(int state)
+void gx400_state::gfx_flipy_w(int state)
 {
 	if (state)
 		m_tilemap_flip |= TILEMAP_FLIPY;
@@ -118,22 +81,22 @@ void nemesis_state::gfx_flipy_w(int state)
 }
 
 
-void nemesis_state::salamand_control_port_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void salamand_state::control_port_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		uint8_t accessing_bits = data ^ m_irq_port_last;
+		uint8_t const accessing_bits = data ^ m_irq_port_last;
 
-		m_irq_on = data & 0x01;
-		m_irq2_on = data & 0x02;
-		m_flipscreen = data & 0x04;
+		m_irq_on = BIT(data, 0);
+		m_irq2_on = BIT(data, 1);
+		m_flipscreen = BIT(data, 2);
 
-		if (data & 0x04)
+		if (BIT(data, 2))
 			m_tilemap_flip |= TILEMAP_FLIPX;
 		else
 			m_tilemap_flip &= ~TILEMAP_FLIPX;
 
-		if (data & 0x08)
+		if (BIT(data, 3))
 			m_tilemap_flip |= TILEMAP_FLIPY;
 		else
 			m_tilemap_flip &= ~TILEMAP_FLIPY;
@@ -146,17 +109,24 @@ void nemesis_state::salamand_control_port_word_w(offs_t offset, uint16_t data, u
 
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().bookkeeping().coin_lockout_w(0, data & 0x0200);
-		machine().bookkeeping().coin_lockout_w(1, data & 0x0400);
+		machine().bookkeeping().coin_lockout_w(0, BIT(data, 9));
+		machine().bookkeeping().coin_lockout_w(1, BIT(data, 10));
 
-		if (data & 0x0800)
+		if (BIT(data, 11))
 			m_audiocpu->set_input_line(0, HOLD_LINE);
-
-		m_selected_ip = (~data & 0x1000) >> 12;     /* citybomb steering & accel */
 	}
 }
 
-void nemesis_state::create_palette_lookups()
+void hcrash_state::citybomb_control_port_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	control_port_word_w(offset, data, mem_mask);
+	if (ACCESSING_BITS_8_15)
+	{
+		m_selected_ip = BIT(~data, 12);     /* citybomb steering & accel */
+	}
+}
+
+void gx400_state::create_palette_lookups()
 {
 	// driver is 74LS09 (AND gates with open collector)
 	static const res_net_info nemesis_net_info =
@@ -180,64 +150,38 @@ void nemesis_state::create_palette_lookups()
 }
 
 
-void nemesis_state::nemesis_palette_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gx400_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 	data = m_paletteram[offset];
 
-	int r = (data >> 0) & 0x1f;
-	int g = (data >> 5) & 0x1f;
-	int b = (data >> 10) & 0x1f;
+	int const r = (data >> 0) & 0x1f;
+	int const g = (data >> 5) & 0x1f;
+	int const b = (data >> 10) & 0x1f;
 	m_palette->set_pen_color(offset, m_palette_lookup[r],m_palette_lookup[g],m_palette_lookup[b]);
 }
 
 
-void nemesis_state::nemesis_videoram1_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gx400_base_state::charram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(m_videoram1 + offset);
-	m_foreground->mark_tile_dirty(offset);
-}
-
-void nemesis_state::nemesis_videoram2_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(m_videoram2 + offset);
-	m_background->mark_tile_dirty(offset);
-}
-
-void nemesis_state::nemesis_colorram1_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(m_colorram1 + offset);
-	m_foreground->mark_tile_dirty(offset);
-}
-
-void nemesis_state::nemesis_colorram2_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(m_colorram2 + offset);
-	m_background->mark_tile_dirty(offset);
-}
-
-
-void nemesis_state::nemesis_charram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	uint16_t oldword = m_charram[offset];
+	uint16_t const oldword = m_charram[offset];
 
 	COMBINE_DATA(m_charram + offset);
 	data = m_charram[offset];
 
 	if (oldword != data)
 	{
-		int i;
-		for (i = 0; i < 8; i++)
+		for (int i = 0; i < 8; i++)
 		{
-			int w = sprite_data[i].width;
-			int h = sprite_data[i].height;
+			int const w = sprite_data[i].width;
+			int const h = sprite_data[i].height;
 			m_gfxdecode->gfx(sprite_data[i].char_type)->mark_dirty(offset * 4 / (w * h));
 		}
 	}
 }
 
 
-void nemesis_state::nemesis_postload()
+void gx400_base_state::device_post_load()
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -246,29 +190,32 @@ void nemesis_state::nemesis_postload()
 }
 
 
-void nemesis_state::video_start()
+void gx400_base_state::video_start()
 {
-	create_palette_lookups();
-
 	m_spriteram_words = m_spriteram.bytes() / 2;
 
-	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nemesis_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nemesis_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gx400_base_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gx400_base_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	m_background->set_transparent_pen(0);
-	m_foreground->set_transparent_pen(0);
-	m_background->set_scroll_rows(256);
-	m_foreground->set_scroll_rows(256);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[0]->set_scroll_rows(256);
+	m_tilemap[1]->set_scroll_rows(256);
 
 	memset(m_charram, 0, m_charram.bytes());
 	std::fill(std::begin(m_blank_tile), std::end(m_blank_tile), 0);
-
-	/* Set up save state */
-	machine().save().register_postload(save_prepost_delegate(FUNC(nemesis_state::nemesis_postload), this));
 }
 
 
-void nemesis_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void gx400_state::video_start()
+{
+	create_palette_lookups();
+
+	gx400_base_state::video_start();
+}
+
+
+void gx400_base_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/*
 	 *  16 bytes per sprite, in memory from 56000-56fff
@@ -285,52 +232,39 @@ void nemesis_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 	 *  byte    E : not used.
 	 */
 
-	uint16_t *spriteram = m_spriteram;
-	int address;    /* start of sprite in spriteram */
-	int sx; /* sprite X-pos */
-	int sy; /* sprite Y-pos */
-	int code;   /* start of sprite in obj RAM */
-	int color;  /* color of the sprite */
-	int flipx,flipy;
-	int zoom;
-	int char_type;
-	int priority;
-	int size;
-	int w,h;
-	int idx;
-
-	for (priority = 256 - 1; priority >= 0; priority--)
+	for (int priority = 256 - 1; priority >= 0; priority--)
 	{
-		for (address = m_spriteram_words - 8; address >= 0; address -= 8)
+		for (int address = m_spriteram_words - 8; address >= 0; address -= 8)
 		{
-			if((spriteram[address] & 0xff) != priority)
+			if((m_spriteram[address] & 0xff) != priority)
 				continue;
 
-			zoom = spriteram[address + 2] & 0xff;
-			if (!(spriteram[address + 2] & 0xff00) && ((spriteram[address + 3] & 0xff00) != 0xff00))
-				code = spriteram[address + 3] + ((spriteram[address + 4] & 0xc0) << 2);
+			int zoom = m_spriteram[address + 2] & 0xff;
+			int code;   /* start of sprite in obj RAM */
+			if (!(m_spriteram[address + 2] & 0xff00) && ((m_spriteram[address + 3] & 0xff00) != 0xff00))
+				code = m_spriteram[address + 3] + ((m_spriteram[address + 4] & 0xc0) << 2);
 			else
-				code = (spriteram[address + 3] & 0xff) + ((spriteram[address + 4] & 0xc0) << 2);
+				code = (m_spriteram[address + 3] & 0xff) + ((m_spriteram[address + 4] & 0xc0) << 2);
 
 			if (zoom != 0xff || code != 0)
 			{
-				size = spriteram[address + 1];
+				int const size = m_spriteram[address + 1];
 				zoom += (size & 0xc0) << 2;
 
-				sx = spriteram[address + 5] & 0xff;
-				sy = spriteram[address + 6] & 0xff;
-				if (spriteram[address + 4] & 0x01)
-					sx-=0x100;  /* fixes left side clip */
+				int sx = m_spriteram[address + 5] & 0xff;
+				int sy = m_spriteram[address + 6] & 0xff;
+				if (BIT(m_spriteram[address + 4], 0))
+					sx -= 0x100;  /* fixes left side clip */
 
-				color = (spriteram[address + 4] & 0x1e) >> 1;
-				flipx = spriteram[address + 1] & 0x01;
-				flipy = spriteram[address + 4] & 0x20;
+				int const color = (m_spriteram[address + 4] & 0x1e) >> 1;
+				bool flipx = BIT(m_spriteram[address + 1], 0);
+				bool flipy = BIT(m_spriteram[address + 4], 5);
 
-				idx = (size >> 3) & 7;
-				w = sprite_data[idx].width;
-				h = sprite_data[idx].height;
+				int const idx = (size >> 3) & 7;
+				int const w = sprite_data[idx].width;
+				int const h = sprite_data[idx].height;
 				code = code * 8 * 16 / (w * h);
-				char_type = sprite_data[idx].char_type;
+				int const char_type = sprite_data[idx].char_type;
 
 				if (zoom)
 				{
@@ -343,13 +277,13 @@ void nemesis_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 						flipy = !flipy;
 					}
 
-					m_gfxdecode->gfx(char_type)->prio_zoom_transpen(bitmap,cliprect,
+					m_gfxdecode->gfx(char_type)->prio_zoom_transpen(bitmap, cliprect,
 						code,
 						color,
-						flipx,flipy,
-						sx,sy,
-						zoom,zoom,
-						screen.priority(),0xffcc,0 );
+						flipx, flipy,
+						sx, sy,
+						zoom, zoom,
+						screen.priority(), 0xffcc, 0);
 				}
 			}
 		}
@@ -358,9 +292,8 @@ void nemesis_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 
 /******************************************************************************/
 
-uint32_t nemesis_state::screen_update_nemesis(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gx400_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
 	rectangle clip;
 
 	screen.priority().fill(0, cliprect);
@@ -369,25 +302,24 @@ uint32_t nemesis_state::screen_update_nemesis(screen_device &screen, bitmap_ind1
 	clip.min_x = 0;
 	clip.max_x = 255;
 
-	m_background->set_scroll_cols(64);
-	m_foreground->set_scroll_cols(64);
-	m_background->set_scroll_rows(1);
-	m_foreground->set_scroll_rows(1);
+	m_tilemap[1]->set_scroll_cols(64);
+	m_tilemap[0]->set_scroll_cols(64);
+	m_tilemap[1]->set_scroll_rows(1);
+	m_tilemap[0]->set_scroll_rows(1);
 
-	for (offs = 0; offs < 64; offs++)
+	for (int offs = 0; offs < 64; offs++)
 	{
 		int offset_x = offs;
 
 		if (m_flipscreen)
 			offset_x = (offs + 0x20) & 0x3f;
 
-		m_background->set_scrolly(offs, m_yscroll2[offset_x]);
-		m_foreground->set_scrolly(offs, m_yscroll1[offset_x]);
+		m_tilemap[1]->set_scrolly(offs, m_yscroll[1][offset_x]);
+		m_tilemap[0]->set_scrolly(offs, m_yscroll[0][offset_x]);
 	}
 
-	for (offs = cliprect.min_y; offs <= cliprect.max_y; offs++)
+	for (int offs = cliprect.min_y; offs <= cliprect.max_y; offs++)
 	{
-		int i;
 		int offset_y = offs;
 
 		clip.min_y = offs;
@@ -396,15 +328,15 @@ uint32_t nemesis_state::screen_update_nemesis(screen_device &screen, bitmap_ind1
 		if (m_flipscreen)
 			offset_y = 255 - offs;
 
-		m_background->set_scrollx(0, (m_xscroll2[offset_y] & 0xff) + ((m_xscroll2[0x100 + offset_y] & 0x01) << 8) - (m_flipscreen ? 0x107 : 0));
-		m_foreground->set_scrollx(0, (m_xscroll1[offset_y] & 0xff) + ((m_xscroll1[0x100 + offset_y] & 0x01) << 8) - (m_flipscreen ? 0x107 : 0));
+		m_tilemap[1]->set_scrollx(0, (m_xscroll[1][offset_y] & 0xff) + ((m_xscroll[1][0x100 + offset_y] & 0x01) << 8) - (m_flipscreen ? 0x107 : 0));
+		m_tilemap[0]->set_scrollx(0, (m_xscroll[0][offset_y] & 0xff) + ((m_xscroll[0][0x100 + offset_y] & 0x01) << 8) - (m_flipscreen ? 0x107 : 0));
 
-		for (i = 0; i < 4; i += 2)
+		for (int i = 0; i < 4; i += 2)
 		{
-			m_background->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
-			m_background->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
-			m_foreground->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
-			m_foreground->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
+			m_tilemap[1]->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
+			m_tilemap[1]->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
+			m_tilemap[0]->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 0), 1);
+			m_tilemap[0]->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(i + 1), 2);
 		}
 	}
 
