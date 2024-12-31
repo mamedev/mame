@@ -418,12 +418,7 @@ uint8_t ngcd_state::transfer_r(offs_t offset)
 			uint32_t const address = (m_sprite_transfer_bank + (seek_address & 0x0fffff));
 
 			// address is swizzled a bit due to out sprite decoding
-			if ((address & 3) == 0) return m_sprite_ram[address];
-			if ((address & 3) == 1) return m_sprite_ram[address ^ 3];
-			if ((address & 3) == 2) return m_sprite_ram[address ^ 3];
-			if ((address & 3) == 3) return m_sprite_ram[address];
-
-			return m_sprite_ram[m_sprite_transfer_bank + (seek_address & 0x0fffff)];
+			return m_sprite_ram[address ^ ((BIT(address, 0) == BIT(address, 1)) ? 0 : 3)];
 		}
 		case 1:                         // ADPCM
 			return m_adpcm_ram[m_adpcm_transfer_bank + ((seek_address & 0x0fffff) >> 1)];
@@ -454,11 +449,7 @@ void ngcd_state::transfer_w(offs_t offset, uint8_t data)
 			uint32_t const address = (m_sprite_transfer_bank + (seek_address & 0x0fffff));
 
 			// address is swizzled a bit due to out sprite decoding
-			if ((address & 3) == 0) m_sprite_ram[address] = data;
-			if ((address & 3) == 1) m_sprite_ram[address ^ 3] = data;
-			if ((address & 3) == 2) m_sprite_ram[address ^ 3] = data;
-			if ((address & 3) == 3) m_sprite_ram[address] = data;
-
+			m_sprite_ram[address ^ ((BIT(address, 0) == BIT(address, 1)) ? 0 : 3)] = data;
 			break;
 		}
 		case 1:                         // ADPCM

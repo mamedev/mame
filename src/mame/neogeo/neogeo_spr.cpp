@@ -630,7 +630,7 @@ void neosprite_regular_device::set_sprite_region(u8* region_sprites, u32 region_
 
 inline void neosprite_regular_device::draw_pixel(int romaddr, u32* dst, const pen_t *line_pens)
 {
-	const u8* src = m_region_sprites + (((romaddr &~0xff)>>1) | (((romaddr&0x8)^0x8)<<3) | ((romaddr & 0xf0)  >> 2));
+	u8 const *const src = m_region_sprites + (((romaddr &~0xff)>>1) | (((romaddr&0x8)^0x8)<<3) | ((romaddr & 0xf0)  >> 2));
 	const int x = romaddr & 0x7;
 
 	const u8 gfx = (BIT(src[0x3], x) << 3) |
@@ -736,7 +736,7 @@ neosprite_midas_device::neosprite_midas_device(const machine_config &mconfig, co
 
 inline void neosprite_midas_device::draw_pixel(int romaddr, u32* dst, const pen_t *line_pens)
 {
-	const u8* src = m_region_sprites + (((romaddr &~0xff)) | (((romaddr&0x8)^0x8)<<4) | ((romaddr & 0xf0)  >> 1));
+	u8 const *const src = m_region_sprites + (((romaddr &~0xff)) | (((romaddr&0x8)^0x8)<<4) | ((romaddr & 0xf0)  >> 1));
 	const int x = romaddr & 0x7;
 
 	const u8 gfx =   (BIT(src[0x7],  x) << 7) |

@@ -751,6 +751,12 @@ protected:
 // 1146 mclks from the rising edge of /HSYNC.
 #define NEOGEO_VBLANK_RELOAD_HTIM (attotime::from_ticks(1146, NEOGEO_MASTER_CLOCK))
 
+static constexpr unsigned IRQ2CTRL_ENABLE          = 4;
+static constexpr unsigned IRQ2CTRL_LOAD_RELATIVE   = 5;
+static constexpr unsigned IRQ2CTRL_AUTOLOAD_VBLANK = 6;
+static constexpr unsigned IRQ2CTRL_AUTOLOAD_REPEAT = 7;
+
+
 void neogeo_base_state::adjust_display_position_interrupt_timer()
 {
 	attotime period = attotime::from_ticks((uint64_t)m_display_counter + 1, NEOGEO_PIXEL_CLOCK);
@@ -780,7 +786,7 @@ void neogeo_base_state::set_display_counter_lsb(uint16_t data)
 
 	LOGMASKED(LOG_VIDEO_SYSTEM, "PC %06x: set_display_counter %08x\n", m_maincpu->pc(), m_display_counter);
 
-	if (BIT(m_display_position_interrupt_control, 5))
+	if (BIT(m_display_position_interrupt_control, IRQ2CTRL_LOAD_RELATIVE))
 	{
 		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_RELATIVE ");
 		adjust_display_position_interrupt_timer();
@@ -813,7 +819,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 {
 	LOGMASKED(LOG_VIDEO_SYSTEM, "--- Scanline @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
 
-	if (BIT(m_display_position_interrupt_control, 4))
+	if (BIT(m_display_position_interrupt_control, IRQ2CTRL_ENABLE))
 	{
 		LOGMASKED(LOG_VIDEO_SYSTEM, "*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", m_screen->vpos(), m_screen->hpos());
 		m_display_position_interrupt_pending = 1;
@@ -821,7 +827,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 		update_interrupts();
 	}
 
-	if (BIT(m_display_position_interrupt_control, 7))
+	if (BIT(m_display_position_interrupt_control, IRQ2CTRL_AUTOLOAD_REPEAT))
 	{
 		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_REPEAT ");
 		adjust_display_position_interrupt_timer();
@@ -831,7 +837,7 @@ TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_interrupt_callback)
 
 TIMER_CALLBACK_MEMBER(neogeo_base_state::display_position_vblank_callback)
 {
-	if (BIT(m_display_position_interrupt_control, 6))
+	if (BIT(m_display_position_interrupt_control, IRQ2CTRL_AUTOLOAD_VBLANK))
 	{
 		LOGMASKED(LOG_VIDEO_SYSTEM, "AUTOLOAD_VBLANK ");
 		adjust_display_position_interrupt_timer();
@@ -1019,11 +1025,9 @@ uint16_t neogeo_base_state::unmapped_r(address_space &space)
 		ret = 0xffff;
 	else
 	{
-		if (!machine().side_effects_disabled())
-			m_recurse = true;
+		m_recurse = true;
 		ret = space.read_word(m_maincpu->pc());
-		if (!machine().side_effects_disabled())
-			m_recurse = false;
+		m_recurse = false;
 	}
 	return ret;
 }
