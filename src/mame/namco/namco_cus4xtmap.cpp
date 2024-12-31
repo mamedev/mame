@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "namco_cus4xtmap.h"
 
-DEFINE_DEVICE_TYPE(NAMCO_CUS4XTMAP, namco_cus4xtmap_device, "namco_cus4xtmap", "Namco CUS42 + CUS43 (2x Tilemaps)")
+DEFINE_DEVICE_TYPE(NAMCO_CUS4XTMAP, namco_cus4xtmap_device, "namco_cus4xtmap", "Namco CUS42 + CUS43 (dual tilemaps)")
 
 namco_cus4xtmap_device::namco_cus4xtmap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NAMCO_CUS4XTMAP, tag, owner, clock)
@@ -54,10 +54,8 @@ void namco_cus4xtmap_device::device_start()
 
 void namco_cus4xtmap_device::mark_all_dirty(void)
 {
-	for (int i = 0; i < 2; i++)
-	{
-		m_tilemap[i]->mark_all_dirty();
-	}
+	for (auto &tilemap : m_tilemaps)
+		tilemap->mark_all_dirty();
 }
 
 template <unsigned Layer>
@@ -96,7 +94,7 @@ void namco_cus4xtmap_device::draw(screen_device &screen, bitmap_ind16 &bitmap, c
 void namco_cus4xtmap_device::vram_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
-	m_tilemap[(offset >> 12) & 1]->mark_tile_dirty((offset & 0xfff) >> 1);
+	m_tilemap[BIT(offset, 12)]->mark_tile_dirty((offset & 0xfff) >> 1);
 }
 
 u8 namco_cus4xtmap_device::vram_r(offs_t offset)
