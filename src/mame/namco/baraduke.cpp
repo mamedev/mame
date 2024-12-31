@@ -107,10 +107,11 @@ DIP locations verified for:
 
 #include "emu.h"
 
+#include "namco_cus4xtmap.h"
+
 #include "cpu/m6800/m6801.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
-#include "namco_cus4xtmap.h"
 #include "sound/namco.h"
 #include "video/resnet.h"
 
@@ -141,8 +142,8 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void init_baraduke();
-	void baraduke(machine_config &config);
+	void init_baraduke() ATTR_COLD;
+	void baraduke(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -157,8 +158,8 @@ private:
 	void spriteram_w(offs_t offset, uint8_t data);
 	TILEMAP_MAPPER_MEMBER(tx_tilemap_scan);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
-	void tile_cb(u8 layer, u8& gfxno, u32& code);
-	void palette(palette_device &palette) const;
+	void tile_cb(u8 layer, u8 &gfxno, u32 &code);
+	void palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
