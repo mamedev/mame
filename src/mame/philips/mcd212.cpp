@@ -724,7 +724,7 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 
 						uint32_t entry = (limit_rgb[m_dyuv_v_to_r[v0]] << 16) | (limit_rgb[m_dyuv_u_to_g[u0] + m_dyuv_v_to_g[v0]] << 8) | limit_rgb[m_dyuv_u_to_b[u0]];
 						pixels[x] = entry;
-						transparent[x] = (transp_always || (use_region_flag && region_flags[x])) != invert_transp_condition;
+						transparent[x] = (transp_always || (use_region_flag && region_flags[x<<1])) != invert_transp_condition;
 
 						x++;
 
@@ -732,7 +732,7 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 
 						entry = (limit_rgb[m_dyuv_v_to_r[v1]] << 16) | (limit_rgb[m_dyuv_u_to_g[u1] + m_dyuv_v_to_g[v1]] << 8) | limit_rgb[m_dyuv_u_to_b[u1]];
 						pixels[x] = entry;
-						transparent[x] = (transp_always || (use_region_flag && region_flags[x])) != invert_transp_condition;
+						transparent[x] = (transp_always || (use_region_flag && region_flags[x<<1])) != invert_transp_condition;
 
 						byte = data[(vsr++ & 0x0007ffff) ^ 1];
 
