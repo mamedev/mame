@@ -242,7 +242,7 @@ void xybots_state::video_int_ack_w(uint16_t data)
 uint16_t xybots_state::special_port1_r()
 {
 	int result = m_ffe200->read();
-	result ^= m_h256;
+	result ^= m_h256 ^ 0x0400;
 	if (!machine().side_effects_disabled())
 		m_h256 ^= 0x0400;
 	return result;

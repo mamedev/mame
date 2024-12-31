@@ -313,10 +313,10 @@ void atari_vad_device::internal_control_write(offs_t offset, uint16_t newword)
 		// latch enable
 		case 0x0a:
 			// check for palette banking
-			if (m_palette_bank != (BIT(newword, 10) ^ 1))
+			if (m_palette_bank != BIT(~newword, 10))
 			{
 				screen().update_partial(screen().vpos());
-				m_palette_bank = BIT(newword, 10) ^ 1;
+				m_palette_bank = BIT(~newword, 10);
 			}
 //if ((oldword & ~0x0080) != (newword & ~0x0080)) printf("Latch control = %04X\n", newword);
 			break;
