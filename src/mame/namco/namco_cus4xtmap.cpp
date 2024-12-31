@@ -54,7 +54,7 @@ void namco_cus4xtmap_device::device_start()
 
 void namco_cus4xtmap_device::mark_all_dirty(void)
 {
-	for (auto &tilemap : m_tilemaps)
+	for (auto &tilemap : m_tilemap)
 		tilemap->mark_all_dirty();
 }
 
