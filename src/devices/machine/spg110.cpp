@@ -151,7 +151,7 @@ void spg110_device::internal_map(address_map &map)
 	map(0x002065, 0x002065).rw(m_spg_video, FUNC(spg110_video_device::dma_manual_r), FUNC(spg110_video_device::dma_manual_w));
 	map(0x002066, 0x002066).w(m_spg_video, FUNC(spg110_video_device::dma_src_w));
 	map(0x002067, 0x002067).w(m_spg_video, FUNC(spg110_video_device::dma_unk_2067_w));
-	map(0x002068, 0x002068).w(m_spg_video, FUNC(spg110_video_device::dma_src_step_w));
+	map(0x002068, 0x002068).rw(m_spg_video, FUNC(spg110_video_device::dma_src_step_r), FUNC(spg110_video_device::dma_src_step_w));
 
 	map(0x002100, 0x0021ff).ram(); // jak_spdmo only
 	map(0x002200, 0x0022ff).ram(); // looks like per-pen brightness or similar? strange because palette isn't memory mapped here (maybe rowscroll?)

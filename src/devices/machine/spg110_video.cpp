@@ -405,6 +405,7 @@ void spg110_video_device::dma_unk_2061_w(offs_t offset, uint16_t data, uint16_t 
 void spg110_video_device::dma_dst_step_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst_step); }
 void spg110_video_device::dma_unk_2067_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_high); }
 void spg110_video_device::dma_src_step_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_step); }
+uint16_t spg110_video_device::dma_src_step_r(offs_t offset, uint16_t mem_mask) { return m_dma_src_step; }
 
 void spg110_video_device::dma_dst_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst); }
 void spg110_video_device::dma_src_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src); }
