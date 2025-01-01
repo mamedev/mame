@@ -539,10 +539,12 @@ void minitel_state::minitel2(machine_config &config)
 	RS232_PORT(config, m_modem, default_rs232_devices, nullptr);
 	m_modem->rxd_handler().set_inputline(m_maincpu, MCS51_INT1_LINE).invert();
 	m_modem->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(m_modem));
+	m_modem->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(m_modem));
 
 	RS232_PORT(config, m_serport, default_rs232_devices, nullptr);
 	m_serport->rxd_handler().set(FUNC(minitel_state::serial_rxd));
 	m_serport->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(m_serport));
+	m_serport->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(m_serport));
 
 	lineconnected = 0;
 
