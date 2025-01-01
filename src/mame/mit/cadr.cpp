@@ -8,8 +8,8 @@ TODO:
 - No cursor is displayed on screen.
 - Network not supported yet.
 - Add support for a second disk controller board.
-- Input and execution on system 300 is a bit unreliable and can sometimes cause
-  the emulated system to hang.
+- System 300 hangs just after trying transmitting something to the
+  network. Waiting for a response?
 
 **********************************************************************************/
 #include "emu.h"

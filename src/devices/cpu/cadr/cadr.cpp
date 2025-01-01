@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(CADR, cadr_cpu_device, "cadr_cpu", "MIT CADR")
 #define LOG_VMA (1 << 3)
 #define LOG_INT (1 << 4)
 //#define VERBOSE (LOG_GENERAL | LOG_TRACE | LOG_DIAG | LOG_VMA)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 

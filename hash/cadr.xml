@@ -7,7 +7,7 @@ license:CC0-1.0
 
 	<software name="sys78" supported="no">
 		<description>System 78.48</description>
-		<year>19??</year>
+		<year>1981</year>
 		<publisher>MIT</publisher>
 		<notes>Expects to run on a single board disk controller. Gives errors about the filesystem.</notes>
 		<part name="hdd" interface="hdd">
@@ -19,8 +19,8 @@ license:CC0-1.0
 
 	<software name="sys100" supported="no">
 		<description>System 100.0</description>
-		<year>202?</year>
-		<publisher>MIT</publisher>
+		<year>2023</year>
+		<publisher>ams</publisher>
 		<notes>Network/Chaosnet is not implemented.</notes>
 		<part name="hdd" interface="hdd">
 			<diskarea name="harddriv">
@@ -32,7 +32,7 @@ license:CC0-1.0
 	<software name="sys300" supported="no">
 		<description>System 300.0</description>
 		<year>2023</year>
-		<publisher>MIT</publisher>
+		<publisher>ams</publisher>
 		<notes>Network/Chaosnet is not emulated. The system can sometimes become unresponsive.</notes>
 		<part name="hdd" interface="hdd">
 			<diskarea name="harddriv">

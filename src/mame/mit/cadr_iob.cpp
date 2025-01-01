@@ -291,6 +291,7 @@ void cadr_iob_device::device_reset()
 
 void cadr_iob_device::chaos_transmit_start()
 {
+	LOG("Transmitting %04x\n", m_chaos_transmit);
 	m_chaos_csr &= ~CHAOSNET_TRANSMIT_DONE;
 	// TODO transmit the data
 	// TODO set proper timing
@@ -353,12 +354,14 @@ void cadr_iob_device::write(offs_t offset, u16 data)
 		}
 		if (BIT(data, CHAOSNET_RESET_TRANSMIT_BIT))
 		{
-			// TODO Reset the transmitter
+			// Reset the transmitter
+			m_transmit_timer->adjust(attotime::never);
 			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
 		}
 		if (BIT(data, CHAOSNET_RESET_BIT))
 		{
-			// TODO Stop transmitter
+			// Stop transmitter
+			m_transmit_timer->adjust(attotime::never);
 			// TODO Clear and enable receiver
 			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
 			// Clear interrupt enables and receive done
