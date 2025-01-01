@@ -51,8 +51,7 @@ public:
 	enum class dma_mode : u8
 	{
 		ZILOG = 0,
-		UA858D = 1,
-		SPEC_NEXT = 2
+		UA858D = 1
 	};
 
 	// construction/destruction
@@ -179,20 +178,8 @@ public:
 	ua858d_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
-class specnext_dma_device : public z80dma_device
-{
-public:
-	specnext_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	virtual void write(u8 data) override;
-
-protected:
-	virtual void do_write() override;
-};
-
 // device type definition
 DECLARE_DEVICE_TYPE(Z80DMA, z80dma_device)
 DECLARE_DEVICE_TYPE(UA858D, ua858d_device)
-DECLARE_DEVICE_TYPE(SPECNEXT_DMA, specnext_dma_device)
 
 #endif // MAME_MACHINE_Z80DMA_H
