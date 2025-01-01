@@ -903,7 +903,7 @@ void spg110_video_device::palette_w(offs_t offset, uint16_t data, uint16_t mem_m
 	m_palette->set_pen_color(offset, std::get<0>(rgb), std::get<1>(rgb), std::get<2>(rgb));
 }
 
-uint32_t spg110_video_device::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pens = m_palette->pens();
 	const uint32_t page1_addr = 0x40 * m_tilebase[0];//0x40 * m_video_regs[0x20];
