@@ -716,30 +716,41 @@ u) uniwars
     ------------------------------------------------------------
 
     - What is the warp effect?
-      The game PCB has several fly wires of which Red & Green relate to the warp effect.
+      Between levels there is an intermission display showing "WARP" over flashing pixel snow simulating "warp speed".
+
+    - What generates the warp effect?
+      There are no known schematics for the Irem Galaxian PCB so the Midway schematic is used as a reference.
+      The Irem game PCB has several fly wires of which Red & Green relate to the warp effect.
 
       Video PCB connections
       Red   => IC K8 (7420)  pin 12
       Green => IC F6 (74161) pin 14
 
-      The Green signal is a clock generated on the video PCB and the 161 is likely one of the video H/V counters.
-      It measured 10.44us.
+      The Green signal is a clock generated on the video PCB that measured 10.44us period, TTL square, wave 50% duty cycle.
+      The Irem F6 LS161 is likely one of the horizontal or virtical video counters, equivalent to one of the Midway IC 3A/4A/5A/6A.
+      TODO: Determine which signal it is on a Midway PCB.
 
       The Red signal is input to the video PCB:
       - Warp off => idle high
       - Warp on  => Green clock
 
       The effect can be manually triggered by disconnecting the plug and bridging the red & green wire.
-      The warp comes from the star field generator - with warp enabled all other graphics elements are unchanged.
+      The warp comes from the star field generator - with warp enabled all other graphics elements remain unchanged.
 
       There is a cut track isolating K8 pin 12 to allow the Red wire to control pin 12.
 
-      Trace of the K8 pin 12 cut track:
+      Trace of the K8 pin 12 cut track goes to at least 3 other places:
       => IC K9 (7402)  pin  3 (input, 2-in NOR)
-      => IC E9 (7432)  pin 12 (input, 2 in OR)
+      => IC E9 (7432)  pin 12 (input, 2-in OR)
       => IC D9 (74173) pin  4 (Q output, latch)
 
-      Comparing with the Midway schematic suggests Irem IC K8 === Midway IC 3C and K8 pin 12 corresponds to ~256H* feeding Midway IC 3C pin 9.
+      Comparing with the Midway schematic suggests this cut signal is Midway signal ~256H* where:
+      - Irem IC K8 pin 12 === Midway IC 3C pin  9
+      - Irem IC K9 pin  3 === Midway IC 3R pin  3
+      - Irem IC E9 pin 12 === Midway IC 3S pin 10
+      - Irem IC D9 pin  4 === Midway IC 6P pin 12 (74377)
+
+      Therefore, the warp effect occurs when the ~256H* input to the star field generator circuit is replaced by a fast video clock.
 
     - How is the effect triggered?
       A spare IC position is populated with a 74LS157 mux connected as follows:
@@ -750,8 +761,11 @@ u) uniwars
       - pin 4 - Q => Red wire
       - pin 15 - ~E => GND
 
+      TODO: To confirm where the missing A wire connection went. Potentially it could be ~256H* for a normal star field.
+
       Comparing with the Midway schematic suggests Irem IC C2 === Midway IC 9L and warp is controlled by address 0x6804 of the sound latch, unused on Galaxian.
       This was confirmed with an In Circuit Emulator on the PCB - address 0x6804 turns the warp effect on & off.
+
 
       MAME reported writes of 0x00 to address 0x0006 appeared to have no visual effect on the game PCB.
 
