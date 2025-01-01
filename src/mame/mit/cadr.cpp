@@ -7,10 +7,8 @@ MIT CADR emulation
 TODO:
 - No cursor is displayed on screen.
 - Network not supported yet.
-- There single disk configuration using 1 disk controller board and multiple
-  disks by using a configuration with 2 disk controller boards. The actual
-  differences are not described.
-- Input and execution on system 300 is a bit unreliable and can someimtes cause
+- Add support for a second disk controller board.
+- Input and execution on system 300 is a bit unreliable and can sometimes cause
   the emulated system to hang.
 
 **********************************************************************************/
@@ -80,7 +78,7 @@ private:
 	// -------- -------x - Disable interrupt grant
 	u16 m_interrupt_status;
 
-	// -------- --x----- - Uninus map error
+	// -------- --x----- - Unibus map error
 	// -------- ---x---- - CADR parity error
 	// -------- ----x--- - Unibus NXM error
 	// -------- -----x-- - CADR address parity error
@@ -251,7 +249,7 @@ ROM_START(cadr)
 	ROM_LOAD64_BYTE("cadr_4.bin", 0x005, 0x200, CRC(d8e9c9d1) SHA1(e2a4ae957f146b44b9efef150d7f984443df45f0)) // 1D16 ?
 	ROM_LOAD64_BYTE("cadr_5.bin", 0x006, 0x200, CRC(ad31e93a) SHA1(0a0b9eca440fa2f7eee9307c17185489714ea571)) // 1E19 ?
 	ROM_LOAD64_BYTE("cadr_6.bin", 0x007, 0x200, CRC(bf79cdd4) SHA1(65592629e2ec5b188610e45e25f4b9d265a408d5)) // 1E17 ?
-	// PROMs at locations 1B20, 1B18, 1B16, 1D17, 1E20, !E18 are not populated?
+	// PROMs at locations 1B20, 1B18, 1B16, 1D17, 1E20, 1E18 are not populated?
 ROM_END
 
 } // anonymous namespace
