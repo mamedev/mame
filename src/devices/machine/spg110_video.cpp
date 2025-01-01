@@ -38,17 +38,12 @@ void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 
 	uint32_t nc = (bpp + 1) << 1;
 
-	switch (bpp)
-	{
-	case 0x03: pal = 0; break; // 8 bpp
-	case 0x02: pal &=0x03; break; // 6 bpp
-	case 0x01: break; // 4 bpp
-	case 0x00: break; // 2 bpp
-	}
-
 	uint32_t palette_offset = pal;
 
-	palette_offset <<= nc;
+	if (bpp == 3)
+		palette_offset = 0;
+
+	palette_offset <<= 4;
 
 	uint32_t bits_per_row = nc * w / 16;
 	uint32_t words_per_tile = bits_per_row * h;
@@ -81,7 +76,7 @@ void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 		}
 		nbits -= nc;
 
-		uint32_t pal = palette_offset + (bits >> 16);
+		uint8_t pennum = (palette_offset + (bits >> 16));
 		bits &= 0xffff;
 
 		xx &= 0x01ff;
@@ -92,14 +87,14 @@ void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 		{
 			int pix_index = xx + y_index;
 			const pen_t *pens = m_palette->pens();
-			uint32_t paldata = pens[pal];
+			uint32_t paldata = pens[pennum];
 
-			int transmap = m_palctrlram[(pal & 0xf0)>>4];
+			int transmap = m_palctrlram[(pennum & 0xf0)>>4];
 
 			bool trans = false;
 
 			if (transmap & 0x10) // maybe values other than 0x010 have other meanings, like blending?
-				if ((pal & 0x0f) == (transmap & 0xf))
+				if ((pennum & 0x0f) == (transmap & 0xf))
 					trans = true;
 
 			if (!trans)
@@ -129,11 +124,12 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 //  {
 //      return;
 //  }
-
-	uint8_t bpp = attr & 0x03;
-
-	uint32_t tile_h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	uint32_t tile_w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	uint8_t bpp = (attr & 0x0003);
+	// flip               0x000c
+	uint32_t tile_w = 8 << ((attr & 0x0030) >> PAGE_TILE_WIDTH_SHIFT);
+	uint32_t tile_h = 8 << ((attr & 0x00c0) >> PAGE_TILE_HEIGHT_SHIFT);
+	uint8_t pal = (attr & 0x0f00)>>8;
+	uint8_t pri = (attr & 0x3000)>>12;
 
 	uint32_t tile_count_x = 512 / tile_w;
 
@@ -151,8 +147,6 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 		if (!tile)
 			continue;
 
-		uint8_t pal = 0x000;
-		uint8_t pri = 0x00;
 		bool flip_x = false;
 		bool flip_y = false;
 
@@ -214,8 +208,8 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 	if (!(attr2 & 0x8000))
 		y+= 0x100;
 
-	const uint32_t h = 8 << ((attr2 & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	const uint32_t w = 8 << ((attr2 & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	const uint32_t h = 8 << ((attr2 & 0x00c0) >> PAGE_TILE_HEIGHT_SHIFT);
+	const uint32_t w = 8 << ((attr2 & 0x0030) >> PAGE_TILE_WIDTH_SHIFT);
 
 //  if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
 //  {
