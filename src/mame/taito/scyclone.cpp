@@ -5,7 +5,7 @@
 
     3 board stack? - the PCB pictures make it very difficult to figure much out
 
-    seems a bit like 8080bw hardware but with extra sprites and a z80 cpu?
+    seems a bit like 8080bw hardware but with extra sprites and a Z80 cpu?
     maybe an evolution of Polaris etc.?
 
 
@@ -75,7 +75,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -135,11 +134,34 @@ private:
 	uint8_t vram_r(offs_t offset);
 
 	// sound related
+	bool m_speech_enabled = false;
+	uint8_t m_speech_data = 0;
+	uint8_t m_dac2_output = 0x80;
+
 	void snd_3001_w(uint8_t data);
+	void snd_3002_w(uint8_t data);
 	void snd_3003_w(uint8_t data);
 	void snd_3004_w(uint8_t data);
 	void snd_3005_w(uint8_t data);
 };
+
+void scyclone_state::machine_start()
+{
+	save_item(NAME(m_videowritemask));
+	save_item(NAME(m_videowritemask2));
+	save_item(NAME(m_sprite_xpos));
+	save_item(NAME(m_sprite_ypos));
+	save_item(NAME(m_sprite_colour));
+	save_item(NAME(m_sprite_tile));
+	save_item(NAME(m_starscroll));
+	save_item(NAME(m_p0e));
+	save_item(NAME(m_vidctrl));
+	save_item(NAME(m_hascollided));
+
+	save_item(NAME(m_speech_enabled));
+	save_item(NAME(m_speech_data));
+	save_item(NAME(m_dac2_output));
+}
 
 
 
@@ -215,7 +237,7 @@ uint32_t scyclone_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bit
 
 	// This is not correct, but the first 0x80 bytes of the PROM are blank suggesting that this
 	// part is for the non-visible 32 rows at least, so it should be something like this.
-	// Blinking and colours are not understood at all.
+	// Starfield looks too dense and blinking is not understood at all.
 
 	for (int strip = 0; strip < 16; strip++)
 	{
@@ -294,8 +316,8 @@ uint32_t scyclone_state::draw_bitmap_and_sprite(screen_device &screen, bitmap_rg
 
 uint32_t scyclone_state::screen_update_scyclone(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	draw_starfield(screen,bitmap,cliprect);
-	draw_bitmap_and_sprite(screen,bitmap,cliprect);
+	draw_starfield(screen,bitmap, cliprect);
+	draw_bitmap_and_sprite(screen, bitmap, cliprect);
 
 	//popmessage("%02x %02x %02x %02x %02x %02x", m_sprite_xpos, m_sprite_ypos, m_sprite_colour, m_sprite_tile, m_starscroll, m_p0e);
 
@@ -456,8 +478,14 @@ void scyclone_state::snd_3001_w(uint8_t data)
 	m_soundlatch->clear_w();
 }
 
+void scyclone_state::snd_3002_w(uint8_t data)
+{
+	m_speech_data = data;
+}
+
 void scyclone_state::snd_3003_w(uint8_t data)
 {
+	m_speech_enabled = !bool(BIT(data, 1));
 }
 
 void scyclone_state::snd_3004_w(uint8_t data)
@@ -473,6 +501,22 @@ void scyclone_state::snd_3005_w(uint8_t data)
 INTERRUPT_GEN_MEMBER(scyclone_state::sound_irq)
 {
 	m_subcpu->set_input_line(0, HOLD_LINE);
+
+	// speech DAC is some sort of 1-bit delta modulation?
+	if (m_speech_enabled)
+	{
+		int bit = BIT(m_speech_data, 7);
+
+		if (bit && m_dac2_output < 0xff)
+			m_dac2_output++;
+		else if (!bit && m_dac2_output > 0)
+			m_dac2_output--;
+	}
+	else
+		m_dac2_output += (m_dac2_output < 0x80) ? +1 : -1;
+
+	m_speech_data <<= 1;
+	m_dac[1]->write(m_dac2_output);
 }
 
 
@@ -519,7 +563,7 @@ void scyclone_state::scyclone_sub_map(address_map &map)
 
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_dac[0], FUNC(dac_byte_interface::data_w)); // music
 	map(0x3001, 0x3001).w(FUNC(scyclone_state::snd_3001_w));
-	map(0x3002, 0x3002).w(m_dac[1], FUNC(dac_byte_interface::data_w)); // speech
+	map(0x3002, 0x3002).w(FUNC(scyclone_state::snd_3002_w)); // speech
 	map(0x3003, 0x3003).w(FUNC(scyclone_state::snd_3003_w));
 	map(0x3004, 0x3004).w(FUNC(scyclone_state::snd_3004_w));
 	map(0x3005, 0x3005).w(FUNC(scyclone_state::snd_3005_w));
@@ -617,40 +661,6 @@ GFXDECODE_END
 
 /***************************************************************************
 
-  Machine initialization
-
-***************************************************************************/
-
-void scyclone_state::machine_start()
-{
-	save_item(NAME(m_videowritemask));
-	save_item(NAME(m_videowritemask2));
-	save_item(NAME(m_sprite_xpos));
-	save_item(NAME(m_sprite_ypos));
-	save_item(NAME(m_sprite_colour));
-	save_item(NAME(m_sprite_tile));
-	save_item(NAME(m_starscroll));
-	save_item(NAME(m_p0e));
-	save_item(NAME(m_vidctrl));
-	save_item(NAME(m_hascollided));
-}
-
-void scyclone_state::machine_reset()
-{
-	m_sprite_xpos = 0;
-	m_sprite_ypos = 0;
-	m_sprite_colour = 0;
-	m_sprite_tile = 0;
-	m_starscroll = 0;
-	m_p0e = 0;
-
-	m_hascollided = 0;
-}
-
-
-
-/***************************************************************************
-
   Machine configs
 
 ***************************************************************************/
@@ -672,8 +682,9 @@ void scyclone_state::scyclone(machine_config &config)
 	Z80(config, m_subcpu, 5_MHz_XTAL/2); // LH0080 Z80-CPU SHARP 2.5MHz (5Mhz XTAL on this sub-pcb)
 	m_subcpu->set_addrmap(AS_PROGRAM, &scyclone_state::scyclone_sub_map);
 	m_subcpu->set_addrmap(AS_IO, &scyclone_state::scyclone_sub_iomap);
-	// no idea, but it does wait on an irq in places, irq0 increases a register checked in the wait loop so without it sound dies after a while
-	m_subcpu->set_periodic_int(FUNC(scyclone_state::sound_irq), attotime::from_hz(400*60));
+
+	attotime snd_irq_period = attotime::from_hz(14400); // drives speech pitch, unknown source but this matches PCB recording
+	m_subcpu->set_periodic_int(FUNC(scyclone_state::sound_irq), snd_irq_period);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
@@ -696,14 +707,14 @@ void scyclone_state::scyclone(machine_config &config)
 
 	SN76477(config, m_snsnd[0]);
 	m_snsnd[0]->set_enable(1);
-	m_snsnd[0]->add_route(ALL_OUTPUTS, "speaker", 0.2);
+	m_snsnd[0]->add_route(ALL_OUTPUTS, "speaker", 0.05);
 
 	SN76477(config, m_snsnd[1]);
 	m_snsnd[1]->set_enable(1);
-	m_snsnd[1]->add_route(ALL_OUTPUTS, "speaker", 0.2);
+	m_snsnd[1]->add_route(ALL_OUTPUTS, "speaker", 0.05);
 
-	DAC_8BIT_R2R(config, m_dac[0]).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
-	DAC_8BIT_R2R(config, m_dac[1]).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac[0]).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac[1]).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
 }
 
 
@@ -746,4 +757,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1980, scyclone, 0, scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, scyclone, 0, scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
