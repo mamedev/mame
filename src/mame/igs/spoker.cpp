@@ -71,6 +71,7 @@ public:
 	void init_spk100();
 	void init_spk114it();
 	void init_spk116it();
+	void init_spk120in();
 	void init_3super8();
 
 	int hopper_r();
@@ -1338,6 +1339,26 @@ ROM_END
    Super Poker
    Italian sets...
 */
+
+ROM_START( spk120in ) // IGS PCB NO-0102-6. Has a IGS009 instead of the IGS001/2 and PPI instead of the IGS026A.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "super_v120_8.u44", 0x00000, 0x10000, CRC(321c0971) SHA1(ee556b8d883c870919e54b4cfd82d5af1cac8718) ) // MX26C512
+	// u43 not populated
+
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // all TMS27C020
+	ROM_LOAD( "super_v120in_6.u23", 0x80000, 0x40000, CRC(55b54b11) SHA1(decf27d40ec842374af02c93d761375690be83a3) )
+	ROM_LOAD( "super_v120in_5.u24", 0x40000, 0x40000, CRC(163f5b64) SHA1(5d3a5c2a64691ee9e2bb3a7c283aa9efa53fb35e) )
+	ROM_LOAD( "super_v120in_4.u25", 0x00000, 0x40000, CRC(ec2c6ac3) SHA1(e0a38da26202d2b9a481060fe5b88a38e284201e) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 ) // all MX26C512
+	ROM_LOAD( "super_v120_3.u15", 0x20000, 0x10000, CRC(5f18b012) SHA1(c9a96237eaf3138f136bbaffb29dde0ef568ce73) )
+	ROM_LOAD( "super_v120_2.u16", 0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
+	ROM_LOAD( "super_v120_1.u17", 0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // TMS27C020
+	ROM_LOAD( "super_v120insp.u38", 0x00000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
+ROM_END
+
 ROM_START( spk116it )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "v.bin",   0x0000, 0x10000, CRC(e44e943a)  SHA1(78e32d07e2be9a452be10735641cbcf269068c55) )
@@ -1600,6 +1621,19 @@ void spoker_state::init_spk100()
 	}
 }
 
+void spoker_state::init_spk120in()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	for (int a = 0; a < 0x10000; a++)
+	{
+		rom[a] ^= 0x02;
+		if ((a & 0x0208) == 0x0208) rom[a] ^= 0x20;
+		if ((a & 0x0248) == 0x0008) rom[a] ^= 0x20;
+		if ((a & 0x04a0) == 0x04a0) rom[a] ^= 0x02;
+		if ((a & 0x1208) == 0x1208) rom[a] ^= 0x01;
+	}
+}
+
 void spoker_state::init_3super8()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1651,6 +1685,7 @@ GAME( 1996,  spk205us,   spk306us, spokeru,  spoker,   spokeru_state,  init_spok
 GAME( 1996,  spk203us,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_SUPPORTS_SAVE ) // LS1. 8 203US in test mode
 GAME( 1996,  spk201ua,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v201UA)",     MACHINE_SUPPORTS_SAVE ) // still shows 200UA in test mode
 GAME( 1996,  spk200ua,   spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,  ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk120in,   spk306us, spoker,   spoker,   spoker_state,   init_spk120in, ROT0,  "IGS",       "Super Poker (v120IN)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1993?, spk116it,   spk306us, spoker,   spoker,   spoker_state,   init_spk116it, ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1993?, spk116itmx, spk306us, spoker,   spoker,   spoker_state,   init_spk114it, ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1993?, spk115it,   spk306us, spoker,   spoker,   spoker_state,   init_spk116it, ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
