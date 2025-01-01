@@ -41,7 +41,7 @@ const char *const cadr_disassembler::mult_div_op[0x20] =
 
 const char *const cadr_disassembler::output_bus_control[0x04] =
 {
-	"o(ill),", "o(alu),", "o(alu>>),", "o(alu<<),"
+	"ill ", "", ">> ", "<< "
 };
 
 const char *const cadr_disassembler::q_control[0x04] =
@@ -427,7 +427,7 @@ void cadr_disassembler::disassemble_destination(std::ostream &stream, u64 op)
 {
 	if (BIT(op, 25))
 	{
-		util::stream_format(stream, "->a[%o] ", (op >> 14) & 0x3ff);
+		util::stream_format(stream, "a[%o] ", (op >> 14) & 0x3ff);
 	}
 	else
 	{
@@ -511,7 +511,9 @@ offs_t cadr_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	u64 op = opcodes.r64(cpc++);
 
 	if (BIT(op, 42))
+	{
 		stream << "popj, ";
+	}
 
 	switch (op & (u64(3) << 43))
 	{
@@ -524,29 +526,41 @@ offs_t cadr_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		else
 		{
 			disassemble_alu_op(stream, op);
-			stream << " -> ";
 			stream << output_bus_control[(op >> 12) & 0x03];
+			stream << " -> ";
 			stream << q_control[op & 0x03];
 			disassemble_destination(stream, op);
 		}
 		break;
 	case u64(1) << 43: // JUMP
 		if (((op >> 8) & 0x03) != 0x02)
+		{
 			util::stream_format(stream, "%s %05o ", rp[(op >> 8) & 0x03], (op >> 12) & 0x3fff);
+		}
 		else
+		{
 			util::stream_format(stream, "%s ", rp[(op >> 8) & 0x03]);
+		}
 		if (BIT(op, 7))
+		{
 			stream << "!next ";
+		}
 		if (BIT(op, 6))
+		{
 			stream << "not ";
+		}
 		disassemble_condition(stream, op);
 		break;
 	case u64(2) << 43: // DISPATCH
 		stream << "dispatch ";
 		if (BIT(op, 25))
+		{
 			stream << "!N+1 ";
+		}
 		if (BIT(op, 24))
+		{
 			stream << "ISH ";
+		}
 		m_source(stream, op);
 		util::stream_format(stream, " disp-const %o, disp-addr %o, map %o, len %o, rot %o", (op >> 32) & 0x2ff,
 			(op >> 12) & 0x7ff, (op >> 8) & 0x03, (op >> 5) & 0x07, op & 0x1f
@@ -561,14 +575,20 @@ offs_t cadr_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		if (BIT(op, 13))
 		{
 			if (BIT(op, 12))
+			{
 				util::stream_format(stream, "dpb pos=%02o, width=%03o ", op & 0x1f, ((op >> 5) & 0x1f) + 1);
+			}
 			else
+			{
 				util::stream_format(stream, "sdp pos=%02o, width=%03o ", op & 0x1f, ((op >> 5) & 0x1f) + 1);
+			}
 		}
 		else
 		{
 			if (BIT(op, 12))
+			{
 				util::stream_format(stream, "ldb pos=%02o, width=%03o ", op & 0x1f, ((op >> 5) & 0x1f) + 1);
+			}
 		}
 		disassemble_destination(stream, op);
 		break;
