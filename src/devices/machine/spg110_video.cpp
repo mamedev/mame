@@ -365,6 +365,11 @@ DMA_IRQ_EN - DMA IRQ Enable
 NOTE: if an IRQ flag is active when the IRQ Enable is turned on the IRQ will be taken
       writing 0 to IRQ enable does not clear IRQ flag
 
+by default:
+BLK IRQ is asserted during the Vblank period, and deasserted when it ends
+DMA IRQ is asserted at the end of a DMA, and deasserted when a new one starts
+VDO IRQ is asserted when screen position in 2036 / 2037 is hit (has to be manually deasserted?)
+
 */
 
 uint16_t spg110_video_device::spg110_2063_r()
