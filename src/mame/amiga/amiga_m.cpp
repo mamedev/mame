@@ -1126,26 +1126,26 @@ void amiga_state::ocs_map(address_map &map)
 //  map(0x00a, 0x00b).r(FUNC(amiga_state::joydat_r<0>));
 //  map(0x00c, 0x00d).r(FUNC(amiga_state::joydat_r<1>));
 //  map(0x00e, 0x00f).r(FUNC(amiga_state::clxdat_r));
-	map(0x010, 0x011).r(m_fdc, FUNC(amiga_fdc_device::adkcon_r));
+	map(0x010, 0x011).r(m_fdc, FUNC(paula_fdc_device::adkcon_r));
 //  map(0x012, 0x013).r(FUNC(amiga_state::potdat_r<0>)); // POT0DAT
 //  map(0x014, 0x015).r(FUNC(amiga_state::potdat_r<1>));
 //  map(0x016, 0x017).r(FUNC(amiga_state::potgor_r)); // a.k.a. POTINP
 //  map(0x018, 0x019).r(FUNC(amiga_state::serdat_r));
-	map(0x01a, 0x01b).r(m_fdc, FUNC(amiga_fdc_device::dskbytr_r));
-//  map(0x01c, 0x01d).r(m_paula, FUNC(paula_8364_device::intenar_r));
-//  map(0x01e, 0x01f).r(m_paula, FUNC(paula_8364_device::intreqr_r));
+	map(0x01a, 0x01b).r(m_fdc, FUNC(paula_fdc_device::dskbytr_r));
+//  map(0x01c, 0x01d).r(m_paula, FUNC(paula_device::intenar_r));
+//  map(0x01e, 0x01f).r(m_paula, FUNC(paula_device::intreqr_r));
 
 	// FDC writes
 	// FIXME: these two belongs to Agnus, also shouldn't be readable
-	map(0x020, 0x021).rw(m_fdc, FUNC(amiga_fdc_device::dskpth_r), FUNC(amiga_fdc_device::dskpth_w));
-	map(0x022, 0x023).rw(m_fdc, FUNC(amiga_fdc_device::dskptl_r), FUNC(amiga_fdc_device::dskptl_w));
-	map(0x024, 0x025).w(m_fdc, FUNC(amiga_fdc_device::dsklen_w));
-//  map(0x026, 0x027).w(m_fdc, FUNC(amiga_fdc_device::dskdat_w));
+	map(0x020, 0x021).rw(m_fdc, FUNC(paula_fdc_device::dskpth_r), FUNC(paula_fdc_device::dskpth_w));
+	map(0x022, 0x023).rw(m_fdc, FUNC(paula_fdc_device::dskptl_r), FUNC(paula_fdc_device::dskptl_w));
+	map(0x024, 0x025).w(m_fdc, FUNC(paula_fdc_device::dsklen_w));
+//  map(0x026, 0x027).w(m_fdc, FUNC(paula_fdc_device::dskdat_w));
 
 //  map(0x028, 0x029).w(FUNC(amiga_state::refptr_w));
 	map(0x02a, 0x02b).w(FUNC(amiga_state::vposw_w));
 //  map(0x02c, 0x02d).w(FUNC(amiga_state::vhposw_w));
-	map(0x02e, 0x02f).w(m_copper, FUNC(amiga_copper_device::copcon_w));
+	map(0x02e, 0x02f).w(m_copper, FUNC(agnus_copper_device::copcon_w));
 
 	// input strobes
 //  map(0x030, 0x031).w(FUNC(amiga_state::serdat_w));
@@ -1160,11 +1160,11 @@ void amiga_state::ocs_map(address_map &map)
 
 //  map(0x040, 0x075).m(m_blitter, FUNC(amiga_blitter_device::regs_map));
 //  map(0x07c, 0x07d).r <open bus for OCS>
-	map(0x07e, 0x07f).w(m_fdc, FUNC(amiga_fdc_device::dsksync_w));
+	map(0x07e, 0x07f).w(m_fdc, FUNC(paula_fdc_device::dsksync_w));
 
 	// Copper
-	map(0x080, 0x08b).m(m_copper, FUNC(amiga_copper_device::regs_map));
-	map(0x08c, 0x08d).w(m_copper, FUNC(amiga_copper_device::copins_w));
+	map(0x080, 0x08b).m(m_copper, FUNC(agnus_copper_device::regs_map));
+	map(0x08c, 0x08d).w(m_copper, FUNC(agnus_copper_device::copins_w));
 	// Display window
 //  map(0x08e, 0x08f).w(FUNC(amiga_state::diwstrt_w));
 //  map(0x090, 0x091).w(FUNC(amiga_state::diwstop_w));
@@ -1174,14 +1174,14 @@ void amiga_state::ocs_map(address_map &map)
 
 //  map(0x096, 0x097).w(FUNC(amiga_state::dmacon_w));
 //  map(0x098, 0x099).w(FUNC(amiga_state::clxcon_w));
-//  map(0x09a, 0x09b).w(m_paula, FUNC(paula_8364_device::intena_w));
-//  map(0x09c, 0x09d).w(m_paula, FUNC(paula_8364_device::intreq_w));
-//  map(0x09e, 0x09f).w(m_paula, FUNC(paula_8364_device::adkcon_w));
+//  map(0x09a, 0x09b).w(m_paula, FUNC(paula_device::intena_w));
+//  map(0x09c, 0x09d).w(m_paula, FUNC(paula_device::intreq_w));
+//  map(0x09e, 0x09f).w(m_paula, FUNC(paula_device::adkcon_w));
 	// Audio section
-	map(0x0a0, 0x0ab).m(m_paula, FUNC(paula_8364_device::audio_channel_map<0>));
-	map(0x0b0, 0x0bb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<1>));
-	map(0x0c0, 0x0cb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<2>));
-	map(0x0d0, 0x0db).m(m_paula, FUNC(paula_8364_device::audio_channel_map<3>));
+	map(0x0a0, 0x0ab).m(m_paula, FUNC(paula_device::audio_channel_map<0>));
+	map(0x0b0, 0x0bb).m(m_paula, FUNC(paula_device::audio_channel_map<1>));
+	map(0x0c0, 0x0cb).m(m_paula, FUNC(paula_device::audio_channel_map<2>));
+	map(0x0d0, 0x0db).m(m_paula, FUNC(paula_device::audio_channel_map<3>));
 
 	// Bitplane pointer section
 //  map(0x0e0, 0x0ff).m(amiga_state::bplxptr_map));

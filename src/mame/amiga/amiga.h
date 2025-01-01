@@ -25,11 +25,11 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "machine/msm6242.h"
 #include "machine/i2cmem.h"
 
-#include "8364_paula.h"
+#include "agnus_copper.h"
 #include "akiko.h"
 #include "amigaaga.h"
-#include "amigafdc.h"
-#include "amiga_copper.h"
+#include "paula.h"
+#include "paulafdc.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -307,8 +307,6 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define INTENA_INTEN    0x4000
 #define INTENA_SETCLR   0x8000
 
-#define MAX_PLANES 6 /* 0 to 6, inclusive ( but we count from 0 to 5 ) */
-
 
 class amiga_state : public driver_device
 {
@@ -409,7 +407,6 @@ public:
 	uint16_t m_copper_waitmask = 0;
 	uint16_t m_copper_pending_offset = 0;
 	uint16_t m_copper_pending_data = 0;
-	int m_wait_offset = 0;
 
 	/* playfield states */
 	int m_last_scanline = 0;
@@ -588,9 +585,9 @@ protected:
 	required_device<mos8520_device> m_cia_1;
 	optional_device<rs232_port_device> m_rs232;
 	optional_device<centronics_device> m_centronics;
-	required_device<amiga_copper_device> m_copper;
-	required_device<paula_8364_device> m_paula;
-	optional_device<amiga_fdc_device> m_fdc;
+	required_device<agnus_copper_device> m_copper;
+	required_device<paula_device> m_paula;
+	optional_device<paula_fdc_device> m_fdc;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_overlay;

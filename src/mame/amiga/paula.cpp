@@ -2,11 +2,16 @@
 // copyright-holders: Aaron Giles, Dirk Best
 /******************************************************************************
 
-    MOS Technology 8364 "Paula"
+    MOS Technology/Commodore 8364 "Paula"
+
+    Multi-purpose chip that is part of the Amiga chipset. The name "Paula"
+    is derived from "Ports, Audio, UART and Logic". It features 4-channel
+    DMA driven audio, the floppy controller, a serial receiver/transmitter,
+    analog inputs and contains the interrupt controller.
 
     TODO:
     - Inherit FDC, serial and irq controller to here;
-    - Move Agnus "location" logic from here;
+    - Move Agnus "location" logic out of here;
     - low-pass filter;
     - convert volume values to non-linear dB scale (cfr. )
     - Verify ADKCON modulation;
@@ -20,7 +25,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "8364_paula.h"
+#include "paula.h"
 
 #define LIVE_AUDIO_VIEW 0
 
@@ -33,7 +38,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PAULA_8364, paula_8364_device, "paula_8364", "MOS 8364 \"Paula\"")
+DEFINE_DEVICE_TYPE(PAULA_8364, paula_device, "paula_8364", "MOS 8364 \"Paula\"")
 
 
 //*************************************************************************
@@ -41,10 +46,10 @@ DEFINE_DEVICE_TYPE(PAULA_8364, paula_8364_device, "paula_8364", "MOS 8364 \"Paul
 //**************************************************************************
 
 //-------------------------------------------------
-//  paula_8364_device - constructor
+//  paula_device - constructor
 //-------------------------------------------------
 
-paula_8364_device::paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+paula_device::paula_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PAULA_8364, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_chipmem_r(*this, 0)
@@ -57,20 +62,20 @@ paula_8364_device::paula_8364_device(const machine_config &mconfig, const char *
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void paula_8364_device::device_start()
+void paula_device::device_start()
 {
 	// initialize channels
 	for (int i = 0; i < 4; i++)
 	{
 		m_channel[i].index = i;
-		m_channel[i].irq_timer = timer_alloc(FUNC(paula_8364_device::signal_irq), this);
+		m_channel[i].irq_timer = timer_alloc(FUNC(paula_device::signal_irq), this);
 	}
 
 	// create the stream
 	m_stream = stream_alloc(0, 4, clock() / CLOCK_DIVIDER);
 }
 
-void paula_8364_device::device_reset()
+void paula_device::device_reset()
 {
 	m_dma_master_enable = false;
 	for (auto &chan : m_channel)
@@ -93,7 +98,7 @@ void paula_8364_device::device_reset()
 //  update - stream updater
 //-------------------------------------------------
 
-void paula_8364_device::update()
+void paula_device::update()
 {
 	m_stream->update();
 }
@@ -103,62 +108,62 @@ void paula_8364_device::update()
 //  IMPLEMENTATION
 //**************************************************************************
 
-template <u8 ch> void paula_8364_device::audio_channel_map(address_map &map)
+template <u8 ch> void paula_device::audio_channel_map(address_map &map)
 {
 	// TODO: location addresses belongs to Agnus
-	map(0x00, 0x01).w(FUNC(paula_8364_device::audxlch_w<ch>));
-	map(0x02, 0x03).w(FUNC(paula_8364_device::audxlcl_w<ch>));
-	map(0x04, 0x05).w(FUNC(paula_8364_device::audxlen_w<ch>));
-	map(0x06, 0x07).w(FUNC(paula_8364_device::audxper_w<ch>));
-	map(0x08, 0x09).w(FUNC(paula_8364_device::audxvol_w<ch>));
-	map(0x0a, 0x0b).w(FUNC(paula_8364_device::audxdat_w<ch>));
+	map(0x00, 0x01).w(FUNC(paula_device::audxlch_w<ch>));
+	map(0x02, 0x03).w(FUNC(paula_device::audxlcl_w<ch>));
+	map(0x04, 0x05).w(FUNC(paula_device::audxlen_w<ch>));
+	map(0x06, 0x07).w(FUNC(paula_device::audxper_w<ch>));
+	map(0x08, 0x09).w(FUNC(paula_device::audxvol_w<ch>));
+	map(0x0a, 0x0b).w(FUNC(paula_device::audxdat_w<ch>));
 }
 
 // Instantiate channel maps
-template void paula_8364_device::audio_channel_map<0>(address_map &map);
-template void paula_8364_device::audio_channel_map<1>(address_map &map);
-template void paula_8364_device::audio_channel_map<2>(address_map &map);
-template void paula_8364_device::audio_channel_map<3>(address_map &map);
+template void paula_device::audio_channel_map<0>(address_map &map);
+template void paula_device::audio_channel_map<1>(address_map &map);
+template void paula_device::audio_channel_map<2>(address_map &map);
+template void paula_device::audio_channel_map<3>(address_map &map);
 
-template <u8 ch> void paula_8364_device::audxlch_w(u16 data)
+template <u8 ch> void paula_device::audxlch_w(u16 data)
 {
 	m_stream->update();
 	// TODO: chipmem mask
 	m_channel[ch].loc = (m_channel[ch].loc & 0x0000ffff) | ((data & 0x001f) << 16);
 }
 
-template <u8 ch> void paula_8364_device::audxlcl_w(u16 data)
+template <u8 ch> void paula_device::audxlcl_w(u16 data)
 {
 	m_stream->update();
 	m_channel[ch].loc = (m_channel[ch].loc & 0xffff0000) | ((data & 0xfffe) <<  0);
 }
 
-template <u8 ch> void paula_8364_device::audxlen_w(u16 data)
+template <u8 ch> void paula_device::audxlen_w(u16 data)
 {
 	m_stream->update();
 	m_channel[ch].len = data;
 }
 
-template <u8 ch> void paula_8364_device::audxper_w(u16 data)
+template <u8 ch> void paula_device::audxper_w(u16 data)
 {
 	m_stream->update();
 	m_channel[ch].per = data;
 }
 
-template <u8 ch> void paula_8364_device::audxvol_w(u16 data)
+template <u8 ch> void paula_device::audxvol_w(u16 data)
 {
 	m_stream->update();
 	m_channel[ch].vol = data & 0x7f;
 }
 
-template <u8 ch> void paula_8364_device::audxdat_w(u16 data)
+template <u8 ch> void paula_device::audxdat_w(u16 data)
 {
 	m_stream->update();
 	m_channel[ch].dat = data;
 	m_channel[ch].manualmode = true;
 }
 
-void paula_8364_device::dmacon_set(u16 data)
+void paula_device::dmacon_set(u16 data)
 {
 	m_stream->update();
 
@@ -178,7 +183,7 @@ void paula_8364_device::dmacon_set(u16 data)
 	}
 }
 
-void paula_8364_device::adkcon_set(u16 data)
+void paula_device::adkcon_set(u16 data)
 {
 	m_stream->update();
 
@@ -195,7 +200,7 @@ void paula_8364_device::adkcon_set(u16 data)
 //  signal_irq - irq signaling
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER( paula_8364_device::signal_irq )
+TIMER_CALLBACK_MEMBER( paula_device::signal_irq )
 {
 	m_int_w(param, 1);
 }
@@ -204,7 +209,7 @@ TIMER_CALLBACK_MEMBER( paula_8364_device::signal_irq )
 //  dma_reload
 //-------------------------------------------------
 
-void paula_8364_device::dma_reload(audio_channel *chan, bool startup)
+void paula_device::dma_reload(audio_channel *chan, bool startup)
 {
 	chan->curlocation = chan->loc;
 	// TODO: Unconfirmed, assume max size if length is 0.
@@ -219,7 +224,7 @@ void paula_8364_device::dma_reload(audio_channel *chan, bool startup)
 	LOG("dma_reload(%d): offs=%06X len=%04X\n", chan->index, chan->curlocation, chan->curlength);
 }
 
-std::string paula_8364_device::print_audio_state()
+std::string paula_device::print_audio_state()
 {
 	std::ostringstream outbuffer;
 
@@ -249,7 +254,7 @@ std::string paula_8364_device::print_audio_state()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int channum, sampoffs = 0;
 

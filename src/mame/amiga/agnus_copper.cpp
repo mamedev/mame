@@ -25,7 +25,7 @@
 **************************************************************************************************/
 
 #include "emu.h"
-#include "amiga_copper.h"
+#include "agnus_copper.h"
 
 #define LOG_WARN    (1U << 1)   // Show warnings
 #define LOG_COPINS  (1U << 2)   // Show instruction fetches thru COPINS
@@ -54,7 +54,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(AMIGA_COPPER, amiga_copper_device, "amiga_copper", "Amiga Copper")
+DEFINE_DEVICE_TYPE(AGNUS_COPPER, agnus_copper_device, "agnus_copper", "Amiga Agnus Copper")
 
 
 //**************************************************************************
@@ -63,12 +63,12 @@ DEFINE_DEVICE_TYPE(AMIGA_COPPER, amiga_copper_device, "amiga_copper", "Amiga Cop
 
 
 //-------------------------------------------------
-//  amiga_copper_device - constructor
+//  agnus_copper_device - constructor
 //-------------------------------------------------
 
 
-amiga_copper_device::amiga_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AMIGA_COPPER, tag, owner, clock)
+agnus_copper_device::agnus_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AGNUS_COPPER, tag, owner, clock)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_chipmem_r(*this, 0)
 {
@@ -80,7 +80,7 @@ amiga_copper_device::amiga_copper_device(const machine_config &mconfig, const ch
 //-------------------------------------------------
 
 
-void amiga_copper_device::device_start()
+void agnus_copper_device::device_start()
 {
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 
@@ -94,7 +94,6 @@ void amiga_copper_device::device_start()
 	save_item(NAME(m_state_waitblit));
 	save_item(NAME(m_waitval));
 	save_item(NAME(m_waitmask));
-//  save_item(NAME(m_wait_offset));
 	save_item(NAME(m_pending_data));
 	save_item(NAME(m_pending_offset));
 }
@@ -105,7 +104,7 @@ void amiga_copper_device::device_start()
 //-------------------------------------------------
 
 
-void amiga_copper_device::device_reset()
+void agnus_copper_device::device_reset()
 {
 	m_cdang_setting = 0x40;
 	m_dma_master_enable = false;
@@ -119,19 +118,19 @@ void amiga_copper_device::device_reset()
 //**************************************************************************
 
 // $dff080-8d memory map
-void amiga_copper_device::regs_map(address_map &map)
+void agnus_copper_device::regs_map(address_map &map)
 {
 	// TODO: location addresses belongs to Agnus
-	map(0x00, 0x01).w(FUNC(amiga_copper_device::copxlch_w<0>));
-	map(0x02, 0x03).w(FUNC(amiga_copper_device::copxlcl_w<0>));
-	map(0x04, 0x05).w(FUNC(amiga_copper_device::copxlch_w<1>));
-	map(0x06, 0x07).w(FUNC(amiga_copper_device::copxlcl_w<1>));
-	map(0x08, 0x09).rw(FUNC(amiga_copper_device::copjmpx_r<0>), FUNC(amiga_copper_device::copjmpx_w<0>));
-	map(0x0a, 0x0b).rw(FUNC(amiga_copper_device::copjmpx_r<1>), FUNC(amiga_copper_device::copjmpx_w<1>));
-//  map(0x0c, 0x0d).w(FUNC(amiga_copper_device::copins_w));
+	map(0x00, 0x01).w(FUNC(agnus_copper_device::copxlch_w<0>));
+	map(0x02, 0x03).w(FUNC(agnus_copper_device::copxlcl_w<0>));
+	map(0x04, 0x05).w(FUNC(agnus_copper_device::copxlch_w<1>));
+	map(0x06, 0x07).w(FUNC(agnus_copper_device::copxlcl_w<1>));
+	map(0x08, 0x09).rw(FUNC(agnus_copper_device::copjmpx_r<0>), FUNC(agnus_copper_device::copjmpx_w<0>));
+	map(0x0a, 0x0b).rw(FUNC(agnus_copper_device::copjmpx_r<1>), FUNC(agnus_copper_device::copjmpx_w<1>));
+//  map(0x0c, 0x0d).w(FUNC(agnus_copper_device::copins_w));
 }
 
-void amiga_copper_device::dmacon_set(u16 data)
+void agnus_copper_device::dmacon_set(u16 data)
 {
 	m_dma_master_enable = bool(BIT(data, 9));
 	m_dma_copen = bool(BIT(data, 7));
@@ -155,7 +154,7 @@ void amiga_copper_device::dmacon_set(u16 data)
  *       sense to write via Copper).
  *
  */
-void amiga_copper_device::copcon_w(u16 data)
+void agnus_copper_device::copcon_w(u16 data)
 {
 	bool cdang = bool(BIT(data, 1));
 
@@ -167,13 +166,13 @@ void amiga_copper_device::copcon_w(u16 data)
 		LOGWARN("%s: COPCON undocumented setting write %04x\n", machine().describe_context(), data);
 }
 
-template <u8 ch> void amiga_copper_device::copxlch_w(u16 data)
+template <u8 ch> void agnus_copper_device::copxlch_w(u16 data)
 {
 	// TODO: chipmem mask
 	m_lc[ch] = (m_lc[ch] & 0x0000ffff) | ((data & 0x001f) << 16);
 }
 
-template <u8 ch> void amiga_copper_device::copxlcl_w(u16 data)
+template <u8 ch> void agnus_copper_device::copxlcl_w(u16 data)
 {
 	m_lc[ch] = (m_lc[ch] & 0xffff0000) | ((data & 0xfffe) <<  0);
 }
@@ -187,19 +186,19 @@ template <u8 ch> void amiga_copper_device::copxlcl_w(u16 data)
  *     do conditional branching by clever use of the skip opcode.
  *
  */
-template <u8 ch> void amiga_copper_device::copjmpx_w(u16 data)
+template <u8 ch> void agnus_copper_device::copjmpx_w(u16 data)
 {
 	set_pc(ch, false);
 }
 
-template <u8 ch> u16 amiga_copper_device::copjmpx_r()
+template <u8 ch> u16 agnus_copper_device::copjmpx_r()
 {
 	if (!machine().side_effects_disabled())
 		set_pc(ch, false);
 	return m_host_space->unmap();
 }
 
-inline void amiga_copper_device::set_pc(u8 ch, bool is_sync)
+inline void agnus_copper_device::set_pc(u8 ch, bool is_sync)
 {
 	m_pc = m_lc[ch];
 	m_state_waiting = false;
@@ -221,7 +220,7 @@ inline void amiga_copper_device::set_pc(u8 ch, bool is_sync)
  * (such as our debugger ;=).
  *
  */
-void amiga_copper_device::copins_w(u16 data)
+void agnus_copper_device::copins_w(u16 data)
 {
 	LOGCOPINS("%s: COPINS %04x\n", machine().describe_context(), data);
 }
@@ -231,13 +230,13 @@ void amiga_copper_device::copins_w(u16 data)
 //**************************************************************************
 
 // executed on scanline == 0
-void amiga_copper_device::vblank_sync()
+void agnus_copper_device::vblank_sync()
 {
 	set_pc(0, true);
 }
 
 // TODO: h/vblank checks against xpos/vpos
-int amiga_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, int num_planes)
+int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, int num_planes)
 {
 	int word0, word1;
 
