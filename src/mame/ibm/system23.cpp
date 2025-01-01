@@ -127,7 +127,7 @@ namespace
 		I8255(config, m_ppi_settings);
 		m_ppi_settings->in_pc_callback().set(FUNC(system23_state::memory_settings_r));
 
-		I8257(config, m_dma);
+		I8257(config, m_dma, 6.144_MHz_XTAL / 2); //frequency needs to be adjusted
 
 		RAM(config, m_ram).set_default_size("16k");
 
