@@ -158,7 +158,6 @@ const atari_motion_objects_config thunderj_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x03ff,0,0,0 }}, // mask for the link
@@ -366,7 +365,7 @@ void thunderj_state::latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (ACCESSING_BITS_0_7)
 	{
 		// 0 means hold CPU 2's reset low
-		if (data & 1)
+		if (BIT(data, 0))
 			m_extra->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		else
 			m_extra->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -496,9 +495,9 @@ static const gfx_layout anlayout =
 
 
 static GFXDECODE_START( gfx_thunderj )
-	GFXDECODE_ENTRY( "sprites_tiles1", 0, gfx_8x8x4_planar,  512,  96 )
-	GFXDECODE_ENTRY( "sprites_tiles2", 0, gfx_8x8x4_planar,  256, 112 )
-	GFXDECODE_ENTRY( "chars",          0, anlayout,            0, 512 )
+	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x4_planar,  512,  96 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_planar,  256, 112 )
+	GFXDECODE_ENTRY( "chars",   0, anlayout,            0, 512 )
 GFXDECODE_END
 
 
@@ -533,7 +532,7 @@ void thunderj_state::thunderj(machine_config &config)
 	m_vad->scanline_int_cb().set(FUNC(thunderj_state::scanline_int_write_line));
 	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(thunderj_state::get_playfield_tile_info));
 	TILEMAP(config, "vad:playfield2", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(thunderj_state::get_playfield2_tile_info));
-	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(thunderj_state::get_alpha_tile_info));
+	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 30, 0).set_info_callback(FUNC(thunderj_state::get_alpha_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, thunderj_state::s_mob_config).set_gfxdecode("gfxdecode");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -582,7 +581,7 @@ ROM_START( thunderj )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136076-2015.1b", 0x00000, 0x10000, CRC(d8feb7fb) SHA1(684ebf2f0c0df742c98e7f45f74de86a11c8d6e8) ) // Rev 2 program ROM
 
-	ROM_REGION( 0x100000, "sprites_tiles1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136076-1021.5s",   0x000000, 0x10000, CRC(d8432766) SHA1(04e7d820974c0890fde1257b4710cf7b520d7d48) ) // graphics, plane 0 */
 	ROM_LOAD( "136076-1025.5r",   0x010000, 0x10000, CRC(839feed5) SHA1(c683ef5b78f8fd63dd557a630544f1e21aebe665) )
 	ROM_LOAD( "136076-1029.3p",   0x020000, 0x10000, CRC(fa887662) SHA1(5d19022e8d40be86b85d0bcc28c97207ab9ec403) )
@@ -600,7 +599,7 @@ ROM_START( thunderj )
 	ROM_LOAD( "136076-1032.14p",  0x0e0000, 0x10000, CRC(f639161a) SHA1(cc2549f7fdd251fa44735a6cd5fdb8ffb97948be) )
 	ROM_LOAD( "136076-1036.16p",  0x0f0000, 0x10000, CRC(b342443d) SHA1(fa7865f8a90c0e761e1cc5e155931d0574f2d81c) )
 
-	ROM_REGION( 0x100000, "sprites_tiles2", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "136076-1037.2s",   0x000000, 0x10000, CRC(07addba6) SHA1(4a3286ee570bf4263944854bf959c8ef114cc123) )
 	ROM_LOAD( "136076-1041.2r",   0x010000, 0x10000, CRC(1e9c29e4) SHA1(e4afa2c469bfa22504cba5dfd23704c5c2bb33c4) )
 	ROM_LOAD( "136076-1045.34s",  0x020000, 0x10000, CRC(e7235876) SHA1(0bb03baec1de3e520dc270a3ed44bec953e08c00) )
@@ -658,7 +657,7 @@ ROM_START( thunderja )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "136076-2015.1b", 0x00000, 0x10000, CRC(d8feb7fb) SHA1(684ebf2f0c0df742c98e7f45f74de86a11c8d6e8) ) // Rev 2 program ROM
 
-	ROM_REGION( 0x100000, "sprites_tiles1", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "136076-1021.5s",   0x000000, 0x10000, CRC(d8432766) SHA1(04e7d820974c0890fde1257b4710cf7b520d7d48) ) // graphics, plane 0 */
 	ROM_LOAD( "136076-1025.5r",   0x010000, 0x10000, CRC(839feed5) SHA1(c683ef5b78f8fd63dd557a630544f1e21aebe665) )
 	ROM_LOAD( "136076-1029.3p",   0x020000, 0x10000, CRC(fa887662) SHA1(5d19022e8d40be86b85d0bcc28c97207ab9ec403) )
@@ -676,7 +675,7 @@ ROM_START( thunderja )
 	ROM_LOAD( "136076-1032.14p",  0x0e0000, 0x10000, CRC(f639161a) SHA1(cc2549f7fdd251fa44735a6cd5fdb8ffb97948be) )
 	ROM_LOAD( "136076-1036.16p",  0x0f0000, 0x10000, CRC(b342443d) SHA1(fa7865f8a90c0e761e1cc5e155931d0574f2d81c) )
 
-	ROM_REGION( 0x100000, "sprites_tiles2", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "136076-1037.2s",   0x000000, 0x10000, CRC(07addba6) SHA1(4a3286ee570bf4263944854bf959c8ef114cc123) )
 	ROM_LOAD( "136076-1041.2r",   0x010000, 0x10000, CRC(1e9c29e4) SHA1(e4afa2c469bfa22504cba5dfd23704c5c2bb33c4) )
 	ROM_LOAD( "136076-1045.34s",  0x020000, 0x10000, CRC(e7235876) SHA1(0bb03baec1de3e520dc270a3ed44bec953e08c00) )

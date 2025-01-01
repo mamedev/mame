@@ -152,7 +152,6 @@ const atari_motion_objects_config toobin_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0,0,0x00ff,0 }}, // mask for the link
@@ -191,7 +190,7 @@ void toobin_state::video_start()
 void toobin_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
-	uint16_t newword = m_paletteram[offset];
+	uint16_t const newword = m_paletteram[offset];
 
 	{
 		int red = (((newword >> 10) & 31) * 224) >> 5;
@@ -203,7 +202,7 @@ void toobin_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		if (blue) blue += 38;
 
 		m_palette->set_pen_color(offset & 0x3ff, rgb_t(red, green, blue));
-		if (!(newword & 0x8000))
+		if (BIT(~newword, 15))
 			m_palette->set_pen_contrast(offset & 0x3ff, m_brightness);
 		else
 			m_palette->set_pen_contrast(offset & 0x3ff, 1.0);
@@ -218,7 +217,7 @@ void toobin_state::intensity_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_brightness = (double)(~data & 0x1f) / 31.0;
 
 		for (int i = 0; i < 0x400; i++)
-			if (!BIT(m_paletteram[i], 15))
+			if (BIT(~m_paletteram[i], 15))
 				m_palette->set_pen_contrast(i, m_brightness);
 	}
 }
@@ -501,9 +500,9 @@ static const gfx_layout molayout =
 
 
 static GFXDECODE_START( gfx_toobin )
-	GFXDECODE_ENTRY( "gfx1", 0, pflayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, molayout,   256, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, anlayout,   512, 64 )
+	GFXDECODE_ENTRY( "tiles",   0, pflayout,     0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, molayout,   256, 16 )
+	GFXDECODE_ENTRY( "chars",   0, anlayout,   512, 64 )
 GFXDECODE_END
 
 
@@ -516,7 +515,7 @@ GFXDECODE_END
 
 void toobin_state::toobin(machine_config &config)
 {
-	static constexpr XTAL MASTER_CLOCK = 32_MHz_XTAL;
+	constexpr XTAL MASTER_CLOCK = 32_MHz_XTAL;
 
 	// basic machine hardware
 	m68010_device &maincpu(M68010(config, m_maincpu, MASTER_CLOCK / 4));
@@ -576,7 +575,7 @@ ROM_START( toobin )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "1101-1a.061",  0x000000, 0x010000, CRC(02696f15) SHA1(51856c331c45d287e574e2e4013b62a6472ad720) )
 	ROM_LOAD( "1102-2a.061",  0x010000, 0x010000, CRC(4bed4262) SHA1(eda16ece14cb60012edbe006b2839986d082822e) )
 	ROM_LOAD( "1103-4a.061",  0x020000, 0x010000, CRC(e62b037f) SHA1(9a2341b822265269c07b65c4bc0fbc760c1bd456) )
@@ -586,7 +585,7 @@ ROM_START( toobin )
 	ROM_LOAD( "1107-4b.061",  0x060000, 0x010000, CRC(fe6f6aed) SHA1(11bd17be3c9fe409db8268cb17515040bfd92ee2) )
 	ROM_LOAD( "1108-5b.061",  0x070000, 0x010000, CRC(26fe71e1) SHA1(cac22f969c943e184a58d7bb62072f93273638de) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "1143-10a.061", 0x000000, 0x020000, CRC(211c1049) SHA1(fcf4d9321b2871723a10b7607069da83d3402723) )
 	ROM_LOAD( "1144-13a.061", 0x020000, 0x020000, CRC(ef62ed2c) SHA1(c2c21023b2f559b8a63e6ae9c59c33a3055cc465) )
 	ROM_LOAD( "1145-16a.061", 0x040000, 0x020000, CRC(067ecb8a) SHA1(a42e4602e1de1cc83a30a901a9adb5519f426cff) )
@@ -612,7 +611,7 @@ ROM_START( toobin )
 	ROM_LOAD( "1132-25b.061", 0x1b0000, 0x010000, CRC(c79f8ffc) SHA1(6e90044755097387011e7cc04548bedb399b7cc3) )
 	ROM_RELOAD(               0x1f0000, 0x010000 )
 
-	ROM_REGION( 0x004000, "gfx3", 0 )
+	ROM_REGION( 0x004000, "chars", 0 )
 	ROM_LOAD( "1142-20h.061", 0x000000, 0x004000, CRC(a6ab551f) SHA1(6a11e16f3965416c81737efcb81e751484ba5ace) )
 ROM_END
 
@@ -631,7 +630,7 @@ ROM_START( toobine )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "1101-1a.061",  0x000000, 0x010000, CRC(02696f15) SHA1(51856c331c45d287e574e2e4013b62a6472ad720) )
 	ROM_LOAD( "1102-2a.061",  0x010000, 0x010000, CRC(4bed4262) SHA1(eda16ece14cb60012edbe006b2839986d082822e) )
 	ROM_LOAD( "1103-4a.061",  0x020000, 0x010000, CRC(e62b037f) SHA1(9a2341b822265269c07b65c4bc0fbc760c1bd456) )
@@ -641,7 +640,7 @@ ROM_START( toobine )
 	ROM_LOAD( "1107-4b.061",  0x060000, 0x010000, CRC(fe6f6aed) SHA1(11bd17be3c9fe409db8268cb17515040bfd92ee2) )
 	ROM_LOAD( "1108-5b.061",  0x070000, 0x010000, CRC(26fe71e1) SHA1(cac22f969c943e184a58d7bb62072f93273638de) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "1143-10a.061", 0x000000, 0x020000, CRC(211c1049) SHA1(fcf4d9321b2871723a10b7607069da83d3402723) )
 	ROM_LOAD( "1144-13a.061", 0x020000, 0x020000, CRC(ef62ed2c) SHA1(c2c21023b2f559b8a63e6ae9c59c33a3055cc465) )
 	ROM_LOAD( "1145-16a.061", 0x040000, 0x020000, CRC(067ecb8a) SHA1(a42e4602e1de1cc83a30a901a9adb5519f426cff) )
@@ -667,7 +666,7 @@ ROM_START( toobine )
 	ROM_LOAD( "1132-25b.061", 0x1b0000, 0x010000, CRC(c79f8ffc) SHA1(6e90044755097387011e7cc04548bedb399b7cc3) )
 	ROM_RELOAD(               0x1f0000, 0x010000 )
 
-	ROM_REGION( 0x004000, "gfx3", 0 )
+	ROM_REGION( 0x004000, "chars", 0 )
 	ROM_LOAD( "1142-20h.061", 0x000000, 0x004000, CRC(a6ab551f) SHA1(6a11e16f3965416c81737efcb81e751484ba5ace) )
 ROM_END
 
@@ -686,7 +685,7 @@ ROM_START( toobing )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "1101-1a.061",  0x000000, 0x010000, CRC(02696f15) SHA1(51856c331c45d287e574e2e4013b62a6472ad720) )
 	ROM_LOAD( "1102-2a.061",  0x010000, 0x010000, CRC(4bed4262) SHA1(eda16ece14cb60012edbe006b2839986d082822e) )
 	ROM_LOAD( "1103-4a.061",  0x020000, 0x010000, CRC(e62b037f) SHA1(9a2341b822265269c07b65c4bc0fbc760c1bd456) )
@@ -696,7 +695,7 @@ ROM_START( toobing )
 	ROM_LOAD( "1107-4b.061",  0x060000, 0x010000, CRC(fe6f6aed) SHA1(11bd17be3c9fe409db8268cb17515040bfd92ee2) )
 	ROM_LOAD( "1108-5b.061",  0x070000, 0x010000, CRC(26fe71e1) SHA1(cac22f969c943e184a58d7bb62072f93273638de) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "1143-10a.061", 0x000000, 0x020000, CRC(211c1049) SHA1(fcf4d9321b2871723a10b7607069da83d3402723) )
 	ROM_LOAD( "1144-13a.061", 0x020000, 0x020000, CRC(ef62ed2c) SHA1(c2c21023b2f559b8a63e6ae9c59c33a3055cc465) )
 	ROM_LOAD( "1145-16a.061", 0x040000, 0x020000, CRC(067ecb8a) SHA1(a42e4602e1de1cc83a30a901a9adb5519f426cff) )
@@ -722,7 +721,7 @@ ROM_START( toobing )
 	ROM_LOAD( "1132-25b.061", 0x1b0000, 0x010000, CRC(c79f8ffc) SHA1(6e90044755097387011e7cc04548bedb399b7cc3) )
 	ROM_RELOAD(               0x1f0000, 0x010000 )
 
-	ROM_REGION( 0x004000, "gfx3", 0 )
+	ROM_REGION( 0x004000, "chars", 0 )
 	ROM_LOAD( "1142-20h.061", 0x000000, 0x004000, CRC(a6ab551f) SHA1(6a11e16f3965416c81737efcb81e751484ba5ace) )
 ROM_END
 
@@ -741,7 +740,7 @@ ROM_START( toobin2e )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "1101-1a.061",  0x000000, 0x010000, CRC(02696f15) SHA1(51856c331c45d287e574e2e4013b62a6472ad720) )
 	ROM_LOAD( "1102-2a.061",  0x010000, 0x010000, CRC(4bed4262) SHA1(eda16ece14cb60012edbe006b2839986d082822e) )
 	ROM_LOAD( "1103-4a.061",  0x020000, 0x010000, CRC(e62b037f) SHA1(9a2341b822265269c07b65c4bc0fbc760c1bd456) )
@@ -751,7 +750,7 @@ ROM_START( toobin2e )
 	ROM_LOAD( "1107-4b.061",  0x060000, 0x010000, CRC(fe6f6aed) SHA1(11bd17be3c9fe409db8268cb17515040bfd92ee2) )
 	ROM_LOAD( "1108-5b.061",  0x070000, 0x010000, CRC(26fe71e1) SHA1(cac22f969c943e184a58d7bb62072f93273638de) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "1143-10a.061", 0x000000, 0x020000, CRC(211c1049) SHA1(fcf4d9321b2871723a10b7607069da83d3402723) )
 	ROM_LOAD( "1144-13a.061", 0x020000, 0x020000, CRC(ef62ed2c) SHA1(c2c21023b2f559b8a63e6ae9c59c33a3055cc465) )
 	ROM_LOAD( "1145-16a.061", 0x040000, 0x020000, CRC(067ecb8a) SHA1(a42e4602e1de1cc83a30a901a9adb5519f426cff) )
@@ -777,7 +776,7 @@ ROM_START( toobin2e )
 	ROM_LOAD( "1132-25b.061", 0x1b0000, 0x010000, CRC(c79f8ffc) SHA1(6e90044755097387011e7cc04548bedb399b7cc3) )
 	ROM_RELOAD(               0x1f0000, 0x010000 )
 
-	ROM_REGION( 0x004000, "gfx3", 0 )
+	ROM_REGION( 0x004000, "chars", 0 )
 	ROM_LOAD( "1142-20h.061", 0x000000, 0x004000, CRC(a6ab551f) SHA1(6a11e16f3965416c81737efcb81e751484ba5ace) )
 ROM_END
 
@@ -796,7 +795,7 @@ ROM_START( toobin2 )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "1101-1a.061",  0x000000, 0x010000, CRC(02696f15) SHA1(51856c331c45d287e574e2e4013b62a6472ad720) )
 	ROM_LOAD( "1102-2a.061",  0x010000, 0x010000, CRC(4bed4262) SHA1(eda16ece14cb60012edbe006b2839986d082822e) )
 	ROM_LOAD( "1103-4a.061",  0x020000, 0x010000, CRC(e62b037f) SHA1(9a2341b822265269c07b65c4bc0fbc760c1bd456) )
@@ -806,7 +805,7 @@ ROM_START( toobin2 )
 	ROM_LOAD( "1107-4b.061",  0x060000, 0x010000, CRC(fe6f6aed) SHA1(11bd17be3c9fe409db8268cb17515040bfd92ee2) )
 	ROM_LOAD( "1108-5b.061",  0x070000, 0x010000, CRC(26fe71e1) SHA1(cac22f969c943e184a58d7bb62072f93273638de) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "1143-10a.061", 0x000000, 0x020000, CRC(211c1049) SHA1(fcf4d9321b2871723a10b7607069da83d3402723) )
 	ROM_LOAD( "1144-13a.061", 0x020000, 0x020000, CRC(ef62ed2c) SHA1(c2c21023b2f559b8a63e6ae9c59c33a3055cc465) )
 	ROM_LOAD( "1145-16a.061", 0x040000, 0x020000, CRC(067ecb8a) SHA1(a42e4602e1de1cc83a30a901a9adb5519f426cff) )
@@ -832,7 +831,7 @@ ROM_START( toobin2 )
 	ROM_LOAD( "1132-25b.061", 0x1b0000, 0x010000, CRC(c79f8ffc) SHA1(6e90044755097387011e7cc04548bedb399b7cc3) )
 	ROM_RELOAD(               0x1f0000, 0x010000 )
 
-	ROM_REGION( 0x004000, "gfx3", 0 )
+	ROM_REGION( 0x004000, "chars", 0 )
 	ROM_LOAD( "1142-20h.061", 0x000000, 0x004000, CRC(a6ab551f) SHA1(6a11e16f3965416c81737efcb81e751484ba5ace) )
 ROM_END
 
@@ -851,7 +850,7 @@ ROM_START( toobin1 )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_REGION( 0x080000, "tiles", 0 )
 	ROM_LOAD( "1101-1a.061",  0x000000, 0x010000, CRC(02696f15) SHA1(51856c331c45d287e574e2e4013b62a6472ad720) )
 	ROM_LOAD( "1102-2a.061",  0x010000, 0x010000, CRC(4bed4262) SHA1(eda16ece14cb60012edbe006b2839986d082822e) )
 	ROM_LOAD( "1103-4a.061",  0x020000, 0x010000, CRC(e62b037f) SHA1(9a2341b822265269c07b65c4bc0fbc760c1bd456) )
@@ -861,7 +860,7 @@ ROM_START( toobin1 )
 	ROM_LOAD( "1107-4b.061",  0x060000, 0x010000, CRC(fe6f6aed) SHA1(11bd17be3c9fe409db8268cb17515040bfd92ee2) )
 	ROM_LOAD( "1108-5b.061",  0x070000, 0x010000, CRC(26fe71e1) SHA1(cac22f969c943e184a58d7bb62072f93273638de) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "1143-10a.061", 0x000000, 0x020000, CRC(211c1049) SHA1(fcf4d9321b2871723a10b7607069da83d3402723) )
 	ROM_LOAD( "1144-13a.061", 0x020000, 0x020000, CRC(ef62ed2c) SHA1(c2c21023b2f559b8a63e6ae9c59c33a3055cc465) )
 	ROM_LOAD( "1145-16a.061", 0x040000, 0x020000, CRC(067ecb8a) SHA1(a42e4602e1de1cc83a30a901a9adb5519f426cff) )
@@ -887,7 +886,7 @@ ROM_START( toobin1 )
 	ROM_LOAD( "1132-25b.061", 0x1b0000, 0x010000, CRC(c79f8ffc) SHA1(6e90044755097387011e7cc04548bedb399b7cc3) )
 	ROM_RELOAD(               0x1f0000, 0x010000 )
 
-	ROM_REGION( 0x004000, "gfx3", 0 )
+	ROM_REGION( 0x004000, "chars", 0 )
 	ROM_LOAD( "1142-20h.061", 0x000000, 0x004000, CRC(a6ab551f) SHA1(6a11e16f3965416c81737efcb81e751484ba5ace) )
 ROM_END
 

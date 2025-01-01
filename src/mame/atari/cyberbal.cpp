@@ -234,7 +234,6 @@ const atari_motion_objects_config cyberbal_base_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x600,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0,0,0x07f8,0 }}, // mask for the link
@@ -668,24 +667,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout pfanlayout =
-{
-	16,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0,0, 4,4, 8,8, 12,12, 16,16, 20,20, 24,24, 28,28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
-	32*8
-};
-
 static const gfx_layout pfanlayout_interleaved =
 {
-	16,8,
+	8,8,
 	RGN_FRAC(1,2),
 	4,
 	{ 0, 1, 2, 3 },
-	{ RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+4, 0,0, 4,4, RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+12,RGN_FRAC(1,2)+12, 8,8, 12,12 },
+	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 0, 4, RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+12, 8, 12 },
 	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
 	16*8
 };
@@ -703,15 +691,15 @@ static const gfx_layout molayout =
 };
 
 static GFXDECODE_START( gfx_cyberbal )
-	GFXDECODE_ENTRY( "tiles",   0, pfanlayout,     0, 128 )
-	GFXDECODE_ENTRY( "sprites", 0, molayout,   0x600, 16 )
-	GFXDECODE_ENTRY( "chars",   0, pfanlayout, 0x780, 8 )
+	GFXDECODE_SCALE( "tiles",   0, gfx_8x8x4_packed_msb,     0, 128, 2, 1 )
+	GFXDECODE_ENTRY( "sprites", 0, molayout,             0x600, 16 )
+	GFXDECODE_SCALE( "chars",   0, gfx_8x8x4_packed_msb, 0x780, 8,   2, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_interleaved )
-	GFXDECODE_ENTRY( "tiles",   0, pfanlayout_interleaved,     0, 128 )
+	GFXDECODE_SCALE( "tiles",   0, pfanlayout_interleaved,     0, 128, 2, 1 )
 	GFXDECODE_ENTRY( "sprites", 0, molayout,               0x600, 16 )
-	GFXDECODE_ENTRY( "chars",   0, pfanlayout_interleaved, 0x780, 8 )
+	GFXDECODE_SCALE( "chars",   0, pfanlayout_interleaved, 0x780, 8,   2, 1 )
 GFXDECODE_END
 
 
