@@ -649,7 +649,6 @@ void spg110_video_device::map_video(address_map &map)
 	map(0x04200, 0x043ff).ram().share("sprattr1");
 	map(0x04400, 0x045ff).ram().share("sprattr2");
 
-	// jak_bobb needs the mirror to write bridge colour pieces, is this correct or an error in the DMA?
 	map(0x08000, 0x081ff).ram().w(FUNC(spg110_video_device::palette_w)).share("palram"); // palette format unknown
 }
 
