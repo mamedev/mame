@@ -59,8 +59,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-
-
 	<!-- Has missing text (uses raster effect) -->
 	<software name="tutankhm" supported="partial">
 		<description>Tutankham</description>
