@@ -27,10 +27,11 @@
     Notes:
 
     (to check on hardware)
-    the stars scroll backwards when in cocktail mode, the direction changes when the screen
+    The stars scroll backwards when in cocktail mode, the direction changes when the screen
     is flipped but is still reversed compared to upright.  We would have no way of knowing
-    if we're in cocktail mode without checking the dipswitch, so I think this is a game bug
-    furthermore the game seems to set what I believe to be the 'flipscreen' bit for player 2
+    if we're in cocktail mode without checking the dipswitch, so I think this is a game bug.
+
+    Furthermore, the game seems to set what I believe to be the 'flipscreen' bit for player 2
     even when in 'upright' mode, so it's possible this romset was only really made for a
     cocktail table?
 */
@@ -245,7 +246,7 @@ uint32_t scyclone_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bit
 
 			bool noclipped = false;
 
-			if (m_vidctrl & 0x08)
+			if (flip_screen())
 			{
 				dx = 255 - dx;
 				dy = 255 - 32 - dy;
@@ -277,7 +278,7 @@ uint32_t scyclone_state::draw_bitmap_and_sprite(screen_device &screen, bitmap_rg
 				int realx = 0;
 				int realy = 0;
 
-				if (m_vidctrl & 0x08)
+				if (flip_screen())
 				{
 					realx = 255 - ((x*8) + i);
 					realy = 255 - 32 - y;
@@ -384,11 +385,14 @@ void scyclone_state::vram_w(offs_t offset, uint8_t data)
 void scyclone_state::vidctrl_w(uint8_t data)
 {
 	// ---- facu
-	// f = flipscreen (always set during player 2 turn, even in upright mode?!)
+	// f = flipscreen? (always set during player 2 turn, even in upright mode?!)
 	// a = alternates during attract mode, enabled during gameplay
 	// u = unknown but used (set to 1 during gameplay)
 	// c = coinlock
 	m_vidctrl = data;
+
+	// breaks upright mode, so it's commented out
+	//flip_screen_set(BIT(data, 3));
 
 	if (data & 0xf0)
 	{
@@ -599,12 +603,12 @@ static INPUT_PORTS_START( scyclone )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL PORT_CONDITION("DSW0", 0x04, EQUALS, 0x00)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )   PORT_DIPLOCATION("DSW0:1,2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )      PORT_DIPLOCATION("DSW0:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW0:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )    PORT_DIPLOCATION("DSW0:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
 	PORT_DIPNAME( 0x08, 0x00, "Disable Collision (Buggy!)" ) PORT_DIPLOCATION("DSW0:4") // this causes the game to malfunction, likely leftover debug feature
@@ -751,4 +755,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1980, scyclone, 0, scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, scyclone, 0, scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
