@@ -344,7 +344,29 @@ device_memory_interface::space_config_vector spg110_video_device::memory_space_c
 }
 
 
-// irq source or similar?
+/* 0x2063 P_DMA_control 
+despite the name this address is more IRQ control than DMA, although there are some DMA flags in here
+
+bit15     bit14     bit13     bit12     bit11     bit10     bit9    bit8    bit7    bit6      bit5          bit4        bit3          bit2        bit1          bit0
+(unused)  (unused)  (unused)  (unused)  DMA_Busy  wrtS      readS   testmd  extsrc  (unused)  VDO_IRQ_Flag  VDO_IRQ_EN  BLK_IRQ_Flag  BLK_IRQ_EN  DMA_IRQ_Flag  DMA_IRQ_EN
+
+DMA_Busy - 0 = free, 1 = busy
+wrtS - used when writing 0x2065
+readS - used when reading 0x2065
+testmd - memory dump mode, causes data from dma_dst to be read in 0x2065?
+extsrc - 0 = work RAM, 1 = External Memory
+VDO_IRQ_Flag (aka TMc or VDO_IRQ) - Positional IRQ Status / Clear IRQ on write
+VDO_IRQ_EN (aka Tme) - Positional IRQ Enable
+BLK_IRQ_Flag - VBlank IRQ Status / Clear IRQ on write
+BLK_IRQ_EN - VBlank IRQ Enable
+DMA_IRQ_Flag - DMA IRQ Status / Clear IRQ on write (can also be cleared by starting a new DMA)
+DMA_IRQ_EN - DMA IRQ Enable
+
+NOTE: if an IRQ flag is active when the IRQ Enable is turned on the IRQ will be taken
+      writing 0 to IRQ enable does not clear IRQ flag
+
+*/
+
 uint16_t spg110_video_device::spg110_2063_r()
 {
 	// checks for bits 0x20 and 0x08 in the IRQ function (all IRQs point to the same place)
