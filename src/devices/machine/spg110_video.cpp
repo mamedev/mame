@@ -539,6 +539,12 @@ void spg110_video_device::dma_len_trigger_2062_w(uint16_t data)
 	int source = m_dma_src | m_dma_src_seg << 16;
 	int dest = m_dma_dst;
 
+	// bits 0xc000 are 'DMABANK'
+	// the use of other bits change slightly depending on them, for example
+	// palette tranfsers only use the bottom 8 bits of dest, jak_bobb relies on this or bridge pieces have no palette
+	if ((m_dma_dst & 0xc000) == 0x4000)
+		dest &= 0x40ff;
+
 	for (int i = 0; i < length; i++)
 	{
 		address_space &mem = m_cpu->space(AS_PROGRAM);
@@ -637,12 +643,13 @@ void spg110_video_device::tmap1_regs_w(offs_t offset, uint16_t data)
 void spg110_video_device::map_video(address_map &map)
 {
 	// are these addresses hardcoded, or can they move (in which case tilemap system isn't really suitable)
-	map(0x00000, 0x03fff).ram(); // 2fff?
+	map(0x00000, 0x02fff).ram(); // 2fff?
 
 	map(0x04000, 0x041ff).ram().share("sprtileno"); // seems to be 3 blocks, almost certainly spritelist
 	map(0x04200, 0x043ff).ram().share("sprattr1");
 	map(0x04400, 0x045ff).ram().share("sprattr2");
 
+	// jak_bobb needs the mirror to write bridge colour pieces, is this correct or an error in the DMA?
 	map(0x08000, 0x081ff).ram().w(FUNC(spg110_video_device::palette_w)).share("palram"); // palette format unknown
 }
 
