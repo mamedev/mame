@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_AMIGA_COPPER_H
-#define MAME_MACHINE_AMIGA_COPPER_H
+#ifndef MAME_AMIGA_AMIGA_COPPER_H
+#define MAME_AMIGA_AMIGA_COPPER_H
 
 #pragma once
 
@@ -98,4 +98,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(AMIGA_COPPER, amiga_copper_device)
 
-#endif // MAME_MACHINE_AMIGA_COPPER_H
+#endif // MAME_AMIGA_AMIGA_COPPER_H

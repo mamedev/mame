@@ -37,8 +37,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_8364_PAULA_H
-#define MAME_MACHINE_8364_PAULA_H
+#ifndef MAME_AMIGA_8364_PAULA_H
+#define MAME_AMIGA_8364_PAULA_H
 
 #pragma once
 

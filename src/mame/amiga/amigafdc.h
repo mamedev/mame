@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_AMIGAFDC_H
-#define MAME_MACHINE_AMIGAFDC_H
+#ifndef MAME_AMIGA_AMIGAFDC_H
+#define MAME_AMIGA_AMIGAFDC_H
 
 #pragma once
 
@@ -127,4 +127,4 @@ private:
 
 DECLARE_DEVICE_TYPE(AMIGA_FDC, amiga_fdc_device)
 
-#endif // MAME_MACHINE_AMIGAFDC_H
+#endif // MAME_AMIGA_AMIGAFDC_H
