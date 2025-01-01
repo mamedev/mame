@@ -903,17 +903,19 @@ void spg110_video_device::palette_w(offs_t offset, uint16_t data, uint16_t mem_m
 	m_palette->set_pen_color(offset, std::get<0>(rgb), std::get<1>(rgb), std::get<2>(rgb));
 }
 
-uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t spg110_video_device::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	memset(&m_screenbuf[320 * cliprect.min_y], 0, 4 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
-
+	const pen_t *pens = m_palette->pens();
 	const uint32_t page1_addr = 0x40 * m_tilebase[0];//0x40 * m_video_regs[0x20];
 	const uint32_t page2_addr = 0x40 * m_tilebase[0];//0x40 * m_video_regs[0x21];
-	uint16_t *page1_regs = tmap0_regs;
-	uint16_t *page2_regs = tmap1_regs;
+	uint16_t* page1_regs = tmap0_regs;
+	uint16_t* page2_regs = tmap1_regs;
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			m_screenbuf[(320 * scanline) + x] = pens[0];
+
 		for (int i = 0; i < 4; i++)
 		{
 			draw_page(cliprect, scanline, i, page2_addr, page2_regs);
@@ -924,8 +926,8 @@ uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
-		const uint32_t *src = &m_screenbuf[cliprect.min_x + 320 * y];
+		uint32_t* dest = &bitmap.pix(y, cliprect.min_x);
+		const uint32_t* src = &m_screenbuf[cliprect.min_x + 320 * y];
 		std::copy_n(src, cliprect.width(), dest);
 	}
 
