@@ -166,8 +166,8 @@ void isa16_sad8852_device::sad8852_io(address_map &map)
 //----------------------------------------------------------
 static INPUT_PORTS_START( sad8852_ports )
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x3ff, 0x001, "Unknown" )
-	PORT_DIPSETTING( 0x00, "None" )
+	PORT_DIPNAME( 0x3ff, 0x001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( None ) )
 	PORT_DIPSETTING( 0x01, "Default" )
 
 	PORT_START("J1")

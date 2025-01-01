@@ -606,17 +606,17 @@ static INPUT_PORTS_START( bmcpokr )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DIP1:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Double-Up Game" ) PORT_DIPLOCATION("DIP1:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x00, "Slot Machine" ) PORT_DIPLOCATION("DIP1:3")
 	PORT_DIPSETTING(    0x00, "Machinery" )
 	PORT_DIPSETTING(    0x04, "??" )
 	PORT_DIPNAME( 0x08, 0x00, "Poker Game" ) PORT_DIPLOCATION("DIP1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP1:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP1:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP1:7" )
@@ -745,8 +745,8 @@ static INPUT_PORTS_START( mjmaglmp )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DIP1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Double-Up Game" )            PORT_DIPLOCATION("DIP1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -800,7 +800,7 @@ static INPUT_PORTS_START( mjmaglmp )
 	PORT_DIPNAME( 0x30, 0x30, "Game Enhance Type" )         PORT_DIPLOCATION("DIP3:5,6")
 	PORT_DIPSETTING(    0x10, "Small" )
 	PORT_DIPSETTING(    0x00, "Big" )
-	PORT_DIPSETTING(    0x30, "Normal" )
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, "Bonus" )
 	PORT_DIPNAME( 0xc0, 0xc0, "Credit Limit" )              PORT_DIPLOCATION("DIP3:7,8")
 	PORT_DIPSETTING(    0x00, "300" )
@@ -958,8 +958,8 @@ static INPUT_PORTS_START( fengyunh )
 
 	PORT_START("DSW4")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DIP1:1")     // not displayed in test mode
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Double-Up Game" )            PORT_DIPLOCATION("DIP1:2")     // 比倍遊戲
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )                                              // 無
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                             // 有
@@ -1060,8 +1060,8 @@ static INPUT_PORTS_START( shendeng )
 
 	PORT_MODIFY("DSW4")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DIP1:1")     // not displayed in test mode
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, "Double-Up Game" )            PORT_DIPLOCATION("DIP1:2")     // 比倍遊戲
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )                                              // 無
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                             // 有

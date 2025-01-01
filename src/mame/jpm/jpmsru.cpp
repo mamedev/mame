@@ -1249,7 +1249,7 @@ static INPUT_PORTS_START( j_lal )
 
 	PORT_START("DIP0")
 	PORT_DIPNAME( 0x0f, 0x00, "Credit limit" )
-	PORT_DIPSETTING(    0x00, "None" )
+	PORT_DIPSETTING(    0x00, DEF_STR(None) )
 	PORT_DIPSETTING(    0x01, "50" )
 	PORT_DIPSETTING(    0x02, "70" )
 	PORT_DIPSETTING(    0x04, "100" )

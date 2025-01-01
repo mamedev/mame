@@ -1493,7 +1493,7 @@ static INPUT_PORTS_START( f1superb )
 	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Region ) ) PORT_DIPLOCATION("SW2:2,1") // English manual only gives 0x48 and 0x80 as valid
 	PORT_DIPSETTING(          0x0080, DEF_STR( USA ) )
 	PORT_DIPSETTING(          0x0000, DEF_STR( Europe ) )
-	PORT_DIPSETTING(          0x0040, "Europe" )
+	PORT_DIPSETTING(          0x0040, DEF_STR( Europe ) )
 	PORT_DIPSETTING(          0x00c0, DEF_STR( Japan ) )
 	PORT_DIPUNUSED_DIPLOC( 0x00000100, 0x00000100, "SW1:8" )
 	PORT_DIPUNUSED_DIPLOC( 0x00000200, 0x00000200, "SW1:7" )

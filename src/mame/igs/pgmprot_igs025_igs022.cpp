@@ -397,7 +397,7 @@ INPUT_PORTS_START( killbld )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
 	PORT_BIT(     0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x00ff, 0x0021, "Region" )
+	PORT_DIPNAME( 0x00ff, 0x0021, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0016, DEF_STR( Taiwan ) )
 	PORT_DIPSETTING(      0x0017, DEF_STR( China ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Hong_Kong ) )

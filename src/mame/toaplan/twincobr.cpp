@@ -527,8 +527,8 @@ static INPUT_PORTS_START( ktiger )
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, "Invulnerability" ) PORT_DIPLOCATION("SW1:!1")
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 // Verified from M68000 and Z80 code

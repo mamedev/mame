@@ -230,14 +230,14 @@ static INPUT_PORTS_START(mps1250)  // all DIP switches correct as per manual
 
 // when Epson #2 is selected these settings apply....
 	PORT_DIPNAME(0x000e, 0x000e, "International Character Set" )  PORT_DIPLOCATION("SW1:5,6,7") PORT_CONDITION("SW", 0xb0, EQUALS, 0x20)
-	PORT_DIPSETTING(0x000e, "USA" )     // off off off  USA
-	PORT_DIPSETTING(0x000c, "England" ) // on  on  off  England
-	PORT_DIPSETTING(0x000a, "Sweden" )  // on  off on   Sweden
-	PORT_DIPSETTING(0x0008, "France" )  // on  off off  Unused
-	PORT_DIPSETTING(0x0006, "Italy" )   // off on  on   Italy
-	PORT_DIPSETTING(0x0004, "Germany" ) // off on  off  Germany
-	PORT_DIPSETTING(0x0002, "Denmark" ) // off off on   Denmark
-	PORT_DIPSETTING(0x0000, "Spain" )   // on  on  on   Spain
+	PORT_DIPSETTING(0x000e, DEF_STR(USA) ) // off off off  USA
+	PORT_DIPSETTING(0x000c, "England" )    // on  on  off  England
+	PORT_DIPSETTING(0x000a, "Sweden" )     // on  off on   Sweden
+	PORT_DIPSETTING(0x0008, "France" )     // on  off off  Unused
+	PORT_DIPSETTING(0x0006, "Italy" )      // off on  on   Italy
+	PORT_DIPSETTING(0x0004, "Germany" )    // off on  off  Germany
+	PORT_DIPSETTING(0x0002, "Denmark" )    // off off on   Denmark
+	PORT_DIPSETTING(0x0000, "Spain" )      // on  on  on   Spain
 	PORT_DIPNAME(0x0001, 0x0001, "Page Length" )                  PORT_DIPLOCATION("SW1:8") PORT_CONDITION("SW", 0xb0, EQUALS, 0x20)
 	PORT_DIPSETTING(0x0001, "11 inch" )
 	PORT_DIPSETTING(0x0000, "12 inch" )
@@ -247,10 +247,10 @@ static INPUT_PORTS_START(mps1250)  // all DIP switches correct as per manual
 	PORT_DIPSETTING(0x0008, "High-bit Control Codes" )   // standard characters
 	PORT_DIPSETTING(0x0000, "Line and Block Graphics" )  // graphics characters
 	PORT_DIPNAME(0x0006, 0x0006, "International Character Set" )  PORT_DIPLOCATION("SW1:6,7") PORT_CONDITION("SW", 0xb0, EQUALS, 0x10)
-	PORT_DIPSETTING(0x0006, "USA" )     // off off  USA
-	PORT_DIPSETTING(0x0004, "France" )  // on  off  France
-	PORT_DIPSETTING(0x0002, "Germany" ) // off on   Germany
-	PORT_DIPSETTING(0x0000, "England" ) // on  on   England
+	PORT_DIPSETTING(0x0006, DEF_STR(USA) ) // off off  USA
+	PORT_DIPSETTING(0x0004, "France" )     // on  off  France
+	PORT_DIPSETTING(0x0002, "Germany" )    // off on   Germany
+	PORT_DIPSETTING(0x0000, "England" )    // on  on   England
 	PORT_DIPNAME(0x0001, 0x0001, "Character Spacing" )            PORT_DIPLOCATION("SW1:8") PORT_CONDITION("SW", 0xb0, EQUALS, 0x10)
 	PORT_DIPSETTING(0x0001, "Pica / 10 cpi" )      // 10 characters per inch (standard character spacing)
 	PORT_DIPSETTING(0x0000, "Compressed / 17 cpi") // 17 characters per inch

@@ -362,7 +362,7 @@ static INPUT_PORTS_START( catnmous )
 	PORT_DIPSETTING(    0x80, DEF_STR(On) )
 
 	PORT_MODIFY("SW2")
-	PORT_DIPNAME( 0x01, 0x01, "Free Play" )             PORT_DIPLOCATION("SW-2:1") // taken from manual, assuming poor translation
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Free_Play) )      PORT_DIPLOCATION("SW-2:1") // taken from manual, assuming poor translation
 	PORT_DIPSETTING(    0x01, "Win Play" )
 	PORT_DIPSETTING(    0x00, "No Win Play" )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Unused) )         PORT_DIPLOCATION("SW-2:2") // manual says not used

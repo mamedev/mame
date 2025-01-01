@@ -200,7 +200,7 @@ static INPUT_PORTS_START( exechess )
 
 	PORT_START("IN.3")
 	PORT_CONFNAME( 0x01, 0x00, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(exechess_state::battery), 0)
-	PORT_CONFSETTING(    0x01, "Low" )
+	PORT_CONFSETTING(    0x01, DEF_STR( Low ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 

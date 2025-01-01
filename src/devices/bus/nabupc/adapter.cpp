@@ -156,8 +156,8 @@ uint16_t network_adapter::segment_file::update_crc(uint16_t crc, uint8_t data)
 static INPUT_PORTS_START( nabu_network_adapter )
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x01, 0x00, "Prompt for channel?")
-	PORT_CONFSETTING(0x01, "Yes")
-	PORT_CONFSETTING(0x00, "No")
+	PORT_CONFSETTING(0x00, DEF_STR(No))
+	PORT_CONFSETTING(0x01, DEF_STR(Yes))
 INPUT_PORTS_END
 
 //**************************************************************************

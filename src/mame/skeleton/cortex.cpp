@@ -123,8 +123,8 @@ static INPUT_PORTS_START( cortex )
 	PORT_DIPSETTING(    0x04, "20cm")
 	PORT_DIPSETTING(    0x00, "13cm")
 	PORT_DIPNAME( 0x08, 0x08, "DISK DENSITY")
+	PORT_DIPSETTING(    0x00, DEF_STR(Single))
 	PORT_DIPSETTING(    0x08, "Double")
-	PORT_DIPSETTING(    0x00, "Single")
 INPUT_PORTS_END
 
 u8 cortex_state::pio_r(offs_t offset)

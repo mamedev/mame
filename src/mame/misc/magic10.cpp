@@ -614,8 +614,8 @@ static INPUT_PORTS_START( magic10 )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Yes ) )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_DIPNAME( 0x0008, 0x0008, "Clear NVRAM" ) // Needs to enabled by other DSW
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_NAME("Hopper Refill") PORT_CODE(KEYCODE_F) // empty dispenser
 	PORT_DIPNAME( 0x00e4, 0x00e4, "Disable Free Play" )
 	PORT_DIPSETTING(      0x00e4, DEF_STR( Off ) )

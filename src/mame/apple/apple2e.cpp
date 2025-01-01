@@ -3870,11 +3870,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::ay3600_repeat)
 static INPUT_PORTS_START( apple2_sysconfig_accel )
 	PORT_START("a2_config")
 	PORT_CONFNAME(0x10, 0x00, "CPU type")
-	PORT_CONFSETTING(0x00, "Standard")
+	PORT_CONFSETTING(0x00, DEF_STR(Standard))
 	PORT_CONFSETTING(0x10, "4 MHz Zip Chip")
 
 	PORT_CONFNAME(0x20, 0x00, "Bootup speed")
-	PORT_CONFSETTING(0x00, "Standard")
+	PORT_CONFSETTING(0x00, DEF_STR(Standard))
 	PORT_CONFSETTING(0x20, "4 MHz")
 
 INPUT_PORTS_END
@@ -3900,10 +3900,10 @@ static INPUT_PORTS_START( apple2c_common_config )
 	PORT_CONFSETTING(0x00, "80 columns")
 	PORT_CONFSETTING(0x40, "40 columns")
 	PORT_CONFNAME(0x10, 0x00, "CPU type")
-	PORT_CONFSETTING(0x00, "Standard")
+	PORT_CONFSETTING(0x00, DEF_STR(Standard))
 	PORT_CONFSETTING(0x10, "4 MHz Zip Chip")
 	PORT_CONFNAME(0x20, 0x00, "Bootup speed")
-	PORT_CONFSETTING(0x00, "Standard")
+	PORT_CONFSETTING(0x00, DEF_STR(Standard))
 	PORT_CONFSETTING(0x20, "4 MHz")
 INPUT_PORTS_END
 
@@ -4614,7 +4614,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( apple2ede_sysconfig )
 	PORT_START("kbd_lang_select")
 	PORT_CONFNAME(0xff, 0x00, "Keyboard")
-	PORT_CONFSETTING(0x00, "German")
+	PORT_CONFSETTING(0x00, DEF_STR(German))
 	PORT_CONFSETTING(0x12, "US English")
 INPUT_PORTS_END
 
@@ -4893,7 +4893,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( apple2ees_sysconfig )
 	PORT_START("kbd_lang_select")
 	PORT_CONFNAME(0xff, 0x00, "Keyboard")
-	PORT_CONFSETTING(0x00, "Spanish")
+	PORT_CONFSETTING(0x00, DEF_STR(Spanish))
 	PORT_CONFSETTING(0x12, "US English")
 INPUT_PORTS_END
 
@@ -4946,7 +4946,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( apple2efr_sysconfig )
 	PORT_START("kbd_lang_select")
 	PORT_CONFNAME(0xff, 0x00, "Keyboard")
-	PORT_CONFSETTING(0x00, "French")
+	PORT_CONFSETTING(0x00, DEF_STR(French))
 	PORT_CONFSETTING(0x12, "US English")
 INPUT_PORTS_END
 

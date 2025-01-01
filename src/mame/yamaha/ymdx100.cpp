@@ -550,7 +550,7 @@ static INPUT_PORTS_START(dx100)
 	// "CNG RAM BATTERY!" displayed unless value is between 0x70 and 0xcc
 	PORT_CONFSETTING( 0x6f, "Too Low" )
 	PORT_CONFSETTING( 0x70, "Lowest Allowed" )
-	PORT_CONFSETTING( 0x80, "Normal" ) // for some arbitrary definition of "normal"
+	PORT_CONFSETTING( 0x80, DEF_STR( Normal ) ) // for some arbitrary definition of "normal"
 	PORT_CONFSETTING( 0xcb, "Highest Allowed" )
 	PORT_CONFSETTING( 0xcc, "Too High" )
 

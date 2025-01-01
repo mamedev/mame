@@ -705,7 +705,7 @@ static INPUT_PORTS_START( f1gp )
 	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW3:7" )        // Listed as "Unused"
 	// listed as "Unused" in manual, it selects between joystick or steering wheel
 	PORT_DIPNAME( 0x8000, 0x8000, "Input Method" )      PORT_DIPLOCATION("SW3:8")
-	PORT_DIPSETTING(      0x8000, "Joystick" )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Joystick ) )
 	// TODO: doesn't work in-game, reads from $fff002 ingame too but doesn't have an effect,
 	//       maybe outputs threshold to $fff000 or it's not supposed to be enabled like the manual claims.
 	PORT_DIPSETTING(      0x0000, "Steering Wheel" )

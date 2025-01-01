@@ -435,7 +435,7 @@ static INPUT_PORTS_START( dragon200e )
 	PORT_START("LK1")
 	PORT_CONFNAME(0x01, 0x01, "Inverse Video")
 	PORT_CONFSETTING(0x00, "Inverse")
-	PORT_CONFSETTING(0x01, "Normal")
+	PORT_CONFSETTING(0x01, DEF_STR(Normal))
 INPUT_PORTS_END
 
 void dragon_state::dragon_cart(device_slot_interface &device)

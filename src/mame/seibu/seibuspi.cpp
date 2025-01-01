@@ -1254,7 +1254,7 @@ static INPUT_PORTS_START( sxx2c )
 	PORT_START("JUMPERS")
 	PORT_DIPNAME( 0x03, 0x03, "JP1" ) // "Only used when game-board is changed with a new game" in manual
 	PORT_DIPSETTING(    0x03, "Update" ) // "Changing game" in manual
-	PORT_DIPSETTING(    0x00, "Normal" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 

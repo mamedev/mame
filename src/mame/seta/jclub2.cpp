@@ -992,8 +992,8 @@ static INPUT_PORTS_START( jclub2v100 )
 	PORT_START("EEPROM") // 580000.w
 	PORT_BIT( 0x74ff0000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_CONFNAME(0x01000000, 0x01000000, "Coin Chutes Polarity" )
-	PORT_CONFSETTING(         0x01000000, DEF_STR( Normal) )
-	PORT_CONFSETTING(         0x00000000, "Reverse" ) // warning message
+	PORT_CONFSETTING(         0x01000000, DEF_STR( Normal ) )
+	PORT_CONFSETTING(         0x00000000, DEF_STR( Reverse ) ) // warning message
 	PORT_CONFNAME(0x02000000, 0x02000000, "Main Loop Down" )
 	PORT_CONFSETTING(         0x02000000, DEF_STR( Off ) )
 	PORT_CONFSETTING(         0x00000000, DEF_STR( On )  ) // Emergency Error 0001
@@ -1050,7 +1050,7 @@ static INPUT_PORTS_START( jclub2v112 )
 	PORT_CONFNAME(0x03000000, 0x03000000, "Backup Battery" )
 	PORT_CONFSETTING(         0x00000000, "Off (0)" ) // Hardware Error 0001
 	PORT_CONFSETTING(         0x01000000, "Off (1)" ) // ""
-	PORT_CONFSETTING(         0x02000000, "Low" )     // warning message (checked at boot)
+	PORT_CONFSETTING(         0x02000000, DEF_STR( Low ) )     // warning message (checked at boot)
 	PORT_CONFSETTING(         0x03000000, DEF_STR( On ) )
 	PORT_CONFNAME(0x08000000, 0x08000000, "Disable Coins?") // causes lockout and coins to not register (same as an hardware error)
 	PORT_CONFSETTING(         0x08000000, DEF_STR( Off ))

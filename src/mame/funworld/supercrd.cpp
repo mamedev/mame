@@ -626,7 +626,7 @@ static INPUT_PORTS_START( fruitstra )
 	PORT_DIPSETTING(    0x00, "On (Ein)" )
 	PORT_DIPNAME( 0x80, 0x80, "BH")                     PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x80, "Dreifach")
-	PORT_DIPSETTING(    0x00, "Normal")
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
 INPUT_PORTS_END
 
 

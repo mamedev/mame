@@ -118,7 +118,7 @@ void play_1_state::io_map(address_map &map)
 
 static INPUT_PORTS_START( chance )
 	PORT_START("X0")
-	PORT_DIPNAME(0x01, 0x01, "Unknown" ) // Shows in schematic, not mentioned in the manuals, appears to have no effect
+	PORT_DIPNAME(0x01, 0x01, DEF_STR( Unknown ) ) // Shows in schematic, not mentioned in the manuals, appears to have no effect
 	PORT_DIPSETTING (  0x00, "3 games" )
 	PORT_DIPSETTING (  0x01, "1 game" )
 	PORT_DIPNAME(0x02, 0x00, "Balls")

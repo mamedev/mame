@@ -244,8 +244,8 @@ static INPUT_PORTS_START(uchroma68)
 	// the Semi-graphics 6 mode of the MC6847.
 	PORT_START("SEMI_GRAPHICS_SIX_MOD")
 	PORT_CONFNAME(0x01, 0x00, "Semi-graphics 6 mode modification")
-	PORT_CONFSETTING(0x00, "No")
-	PORT_CONFSETTING(0x01, "Yes")
+	PORT_CONFSETTING(0x00, DEF_STR(No))
+	PORT_CONFSETTING(0x01, DEF_STR(Yes))
 
 INPUT_PORTS_END
 

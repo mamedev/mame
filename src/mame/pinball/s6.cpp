@@ -236,7 +236,7 @@ static INPUT_PORTS_START( s6 )
 
 	PORT_START("DS1") // DS1 only 3 switches do anything
 	PORT_DIPNAME( 0x70, 0x70, "Diagnostic" )
-	PORT_DIPSETTING(    0x70, "Off" )
+	PORT_DIPSETTING(    0x70, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x60, "SW8 - Zero Audit Tables" )
 	PORT_DIPSETTING(    0x50, "SW7 - Reset to Defaults" )
 	PORT_DIPSETTING(    0x30, "SW6 - Auto Diagnostic Test" )

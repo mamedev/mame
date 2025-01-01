@@ -1233,13 +1233,13 @@ static INPUT_PORTS_START( pastelis )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) ) PORT_DIPLOCATION( "DSW1:5,6" )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION( "DSW1:7,8" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
 
 	PORT_MODIFY("DSW2") // IN0 - $210004
@@ -1817,8 +1817,8 @@ static INPUT_PORTS_START( mslider )
 
 	PORT_MODIFY("DSW2") // IN1 - $210004
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION( "DSW2:1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ) ) // service mode calls this OFF
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) // and this ON, TODO: check if it's an error in the video code, or a mistake in the game
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) ) // service mode calls this ON
+	PORT_DIPSETTING(      0x0001, DEF_STR( On ) ) // and this OFF, TODO: check if it's an error in the video code, or a mistake in the game
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION( "DSW2:2" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )

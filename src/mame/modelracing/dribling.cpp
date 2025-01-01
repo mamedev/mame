@@ -423,8 +423,8 @@ static INPUT_PORTS_START( dribling )
 	PORT_DIPSETTING(    0x00, "1:50" ) // actually circa 1:25 emulated. Bug?
 	PORT_DIPSETTING(    0x40, "2:30" ) // actually circa 1:40 emulated. Bug?
 	PORT_DIPNAME( 0x80, 0x80, "New game with one coin" ) PORT_DIPLOCATION( "SW:1" ) // according to the manual, for this to work both (unimplemented) coinage dip banks must be set to 1 coin 1 play
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 

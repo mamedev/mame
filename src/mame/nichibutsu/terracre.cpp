@@ -662,9 +662,9 @@ static INPUT_PORTS_START( horekid )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc000, 0xc000, "Debug Mode" )                PORT_DIPLOCATION("DSW2:7,8")
 	PORT_DIPSETTING(      0xc000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )       // "Cabinet" Dip Switch must be set to "Upright" too !
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )      // duplicated setting
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )      // duplicated setting
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )       // "Cabinet" Dip Switch must be set to "Upright" too !
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )

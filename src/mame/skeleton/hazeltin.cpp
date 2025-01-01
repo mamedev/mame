@@ -669,8 +669,8 @@ static INPUT_PORTS_START( hazl1500 )
 	PORT_DIPSETTING( 0x00, "Upper and Lower" )
 	PORT_DIPSETTING( 0x40, "Upper" )
 	PORT_DIPNAME( 0x80, 0x80, "Video" )
-	PORT_DIPSETTING( 0x00, "Standard" )
-	PORT_DIPSETTING( 0x80, "Reverse" )
+	PORT_DIPSETTING( 0x00, DEF_STR( Standard ) )
+	PORT_DIPSETTING( 0x80, DEF_STR( Reverse ) )
 INPUT_PORTS_END
 
 /* F4 Character Displayer */

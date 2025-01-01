@@ -460,7 +460,7 @@ static void pcd_floppies(device_slot_interface &device)
 static INPUT_PORTS_START(pcx)
 	PORT_START("mmu")
 	PORT_CONFNAME(0x03, 0x00, "MMU Type")
-	PORT_CONFSETTING(0x00, "None")
+	PORT_CONFSETTING(0x00, DEF_STR(None))
 	PORT_CONFSETTING(0x01, "SINIX 1.0")
 	PORT_CONFSETTING(0x02, "SINIX 1.2")
 INPUT_PORTS_END

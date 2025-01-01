@@ -1136,7 +1136,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, "5 Coins/2 Credits" )     // 2.5 coins per credit
+	PORT_DIPSETTING(    0x20, DEF_STR( 5C_2C ) )     // 2.5 coins per credit
 	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )

@@ -287,10 +287,10 @@ static INPUT_PORTS_START( mjsenpu )
 	PORT_DIPSETTING(          0x00000004, "50" )
 	PORT_DIPSETTING(          0x00000000, "100" )
 	PORT_DIPNAME( 0x00000030, 0x00000030, "Coin Out Rate" )           PORT_DIPLOCATION("SW1:5,6")   // 退幣比率
-	PORT_DIPSETTING(          0x00000030, DEF_STR(1C_1C) )                                          // 1:1
-	PORT_DIPSETTING(          0x00000020, DEF_STR(2C_1C) )                                          // 1:2
-	PORT_DIPSETTING(          0x00000010, DEF_STR(5C_1C) )                                          // 1:5
-	PORT_DIPSETTING(          0x00000000, "10 Coins/1 Credit" )                                     // 1:10
+	PORT_DIPSETTING(          0x00000030, "1 Credit/1 Coin" )                                       // 1:1
+	PORT_DIPSETTING(          0x00000020, "1 Credit/2 Coins" )                                      // 1:2
+	PORT_DIPSETTING(          0x00000010, "1 Credit/5 Coins" )                                      // 1:5
+	PORT_DIPSETTING(          0x00000000, "1 Credit/10 Coins" )                                     // 1:10
 	PORT_DIPNAME( 0x000000c0, 0x000000c0, "Jackpot Odds" )            PORT_DIPLOCATION("SW1:7,8")   // 大滿貫機率
 	PORT_DIPSETTING(          0x000000c0, "84%" )
 	PORT_DIPSETTING(          0x00000080, "88%" )

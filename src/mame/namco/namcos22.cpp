@@ -3046,7 +3046,7 @@ static INPUT_PORTS_START( ridgeracf )
 	// Some of the other dipswitches are for debugging, like with Ridge Racer 2.
 	PORT_MODIFY("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x00010000, 0x00010000, "SW2:1" )
-	PORT_DIPNAME( 0x00020000, 0x00000000, "Unknown" ) PORT_DIPLOCATION("SW2:2") // always on?
+	PORT_DIPNAME( 0x00020000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2") // always on?
 	PORT_DIPSETTING(          0x00020000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80000000, 0x80000000, "Test Mode 2" ) PORT_DIPLOCATION("SW3:8")

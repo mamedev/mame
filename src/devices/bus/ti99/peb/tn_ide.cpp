@@ -710,7 +710,7 @@ INPUT_PORTS_START( tn_ide )
 	// Set to off as default, because random contents in SRAM may lead to lockup
 	PORT_START("MODE")
 	PORT_DIPNAME(0x3, MODE_OFF, "Card mode") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nouspikel_ide_card_device::mode_changed), 1)
-		PORT_DIPSETTING(MODE_OFF, "Off")
+		PORT_DIPSETTING(MODE_OFF, DEF_STR(Off))
 		PORT_DIPSETTING(MODE_GENEVE, "Geneve")
 		PORT_DIPSETTING(MODE_TI, "TI")
 

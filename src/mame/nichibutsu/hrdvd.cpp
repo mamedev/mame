@@ -410,8 +410,8 @@ static INPUT_PORTS_START( hrdvd )
 	PORT_DIPSETTING(      0x1000, "Girls in-game, color in attract" )
 	PORT_DIPSETTING(      0x1800, "Girls in-game and attract" )
 	PORT_DIPNAME( 0x2000, 0x2000, "Analyzer" ) PORT_DIPLOCATION("SWB:6") //in some games
-	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 	PORT_DIPUNUSED_DIPLOC( 0x4000, IP_ACTIVE_LOW, "SWB:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SWB:8" )
 

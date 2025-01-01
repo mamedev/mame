@@ -58,13 +58,13 @@ static INPUT_PORTS_START( tk02_links )
 
 	PORT_START("M003")
 	PORT_DIPNAME(0x01, 0x00, "Startup Mode")     PORT_DIPLOCATION("M003:1")
-	PORT_DIPSETTING(0x00, "Normal")
+	PORT_DIPSETTING(0x00, DEF_STR(Normal))
 	PORT_DIPSETTING(0x01, "Automatic 80 Column")
 
 	PORT_START("M004")
 	PORT_DIPNAME(0x01, 0x00, "Character Set")    PORT_DIPLOCATION("M004:1")
 	PORT_DIPSETTING(0x00, "Modified")
-	PORT_DIPSETTING(0x01, "Normal")
+	PORT_DIPSETTING(0x01, DEF_STR(Normal))
 INPUT_PORTS_END
 
 ioport_constructor tk02_device::device_input_ports() const

@@ -289,8 +289,8 @@ static INPUT_PORTS_START( cz101 )
 
 	PORT_START("AN2")
 	PORT_CONFNAME(0xff, 0xff, "Battery Level")
-	PORT_CONFSETTING(   0xff, "Normal")
-	PORT_CONFSETTING(   0x00, "Low")
+	PORT_CONFSETTING(   0x00, DEF_STR(Low))
+	PORT_CONFSETTING(   0xff, DEF_STR(Normal))
 INPUT_PORTS_END
 
 

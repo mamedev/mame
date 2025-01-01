@@ -991,7 +991,7 @@ uint32_t sun3_state::bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap,
 static INPUT_PORTS_START( sun3 )
 	PORT_START("diagsw")
 	PORT_CONFNAME(1, 0, "Diagnostic Switch")
-	PORT_CONFSETTING(0, "Normal")
+	PORT_CONFSETTING(0, DEF_STR(Normal))
 	PORT_CONFSETTING(1, "Diagnostic")
 INPUT_PORTS_END
 

@@ -284,8 +284,8 @@ INPUT_PORTS_START(ctk2100)
 	PORT_BIT( 0x3ff, IP_ACTIVE_LOW, IPT_UNUSED )   PORT_CONDITION("AIN2", 0x3ff, EQUALS, 0)
 	PORT_CONFNAME( 0x3ff, 0x3ff, "Battery Level" ) PORT_CONDITION("AIN2", 0x3ff, NOTEQUALS, 0)
 	// values here are somewhat arbitrary - ctk2100 only checks if the value is above/below a certain threshold
-	PORT_CONFSETTING(     0x100, "Low" )
-	PORT_CONFSETTING(     0x3ff, "Normal" )
+	PORT_CONFSETTING(     0x100, DEF_STR( Low ) )
+	PORT_CONFSETTING(     0x3ff, DEF_STR( Normal ) )
 
 INPUT_PORTS_END
 

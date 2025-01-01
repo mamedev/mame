@@ -141,7 +141,7 @@ static INPUT_PORTS_START( spectra )
 	PORT_DIPNAME( 0x60, 0x60, "Test Switch" ) // 3-position slide switch
 	PORT_DIPSETTING(    0x60, "Play" )
 	PORT_DIPSETTING(    0x20, "Setup" )
-	PORT_DIPSETTING(    0x40, "Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Test ) )
 INPUT_PORTS_END
 
 u8 spectra_state::porta_r()

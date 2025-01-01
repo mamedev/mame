@@ -201,8 +201,8 @@ static INPUT_PORTS_START( quizo )
 	PORT_DIPSETTING(    0x00, "A 2 Coin/1 Credit, B 1 Coin/1 Credit" )
 	PORT_DIPSETTING(    0x40, "A 1 Coin/1 Credit, B 1 Coin/2 Credit" )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void quizo_state::quizo(machine_config &config)

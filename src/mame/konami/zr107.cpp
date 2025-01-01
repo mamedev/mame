@@ -613,7 +613,7 @@ static INPUT_PORTS_START( midnrun )
 	PORT_DIPSETTING( 0x02, "'T'Gate" )
 	PORT_DIPSETTING( 0x00, "Button" )
 	PORT_DIPNAME( 0x01, 0x01, "CG Board Type" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING( 0x01, "Single" )
+	PORT_DIPSETTING( 0x01, DEF_STR( Single ) )
 	PORT_DIPSETTING( 0x00, "Twin" ) //unused
 
 	PORT_START("ANALOG1")
@@ -649,8 +649,8 @@ static INPUT_PORTS_START( jetwave )
 	PORT_DIPSETTING( 0x00, "4" )
 	// TODO: make these two less confusing
 	PORT_DIPNAME( 0x02, 0x00, "Drive System" ) PORT_DIPLOCATION("SW:2") //Sensors for force feedback. Todo: "Disable" the sensors so this switch can be set to off without errors.
-	PORT_DIPSETTING( 0x02, DEF_STR( On ) ) // Enables the sensors/normal use.
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) ) //Disables and bypasses all sensor checks. This disables the force feedback on actual hardware.
+	PORT_DIPSETTING( 0x02, DEF_STR( On ) ) // Enables the sensors/normal use.
 	PORT_DIPNAME( 0x01, 0x01, "Running Mode" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x01, "Product" ) //Enables the analog inputs; normal usage
 	PORT_DIPSETTING( 0x00, "Check" ) //Disables them for use with a JAMMA interface; intended for development purposes.

@@ -308,13 +308,13 @@ void sx1000_state::sx1010(machine_config &config)
 static INPUT_PORTS_START(sx1010)
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x20, 0x00, "Ignore keyboard error" ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "Off" )
-	PORT_DIPSETTING(    0x20, "On" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 
 	PORT_START("SW2")
 	PORT_DIPNAME( 0x02, 0x00, "Serial console" ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x00, "Off" )
-	PORT_DIPSETTING(    0x02, "On" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
 ROM_START(sx1010)

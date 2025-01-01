@@ -897,9 +897,9 @@ static INPUT_PORTS_START( bchance )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Language" )
-	PORT_DIPSETTING(    0x80, "French" )
-	PORT_DIPSETTING(    0x00, "English" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( French ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 INPUT_PORTS_END
 
 

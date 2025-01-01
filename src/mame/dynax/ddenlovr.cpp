@@ -5573,7 +5573,7 @@ static INPUT_PORTS_START( animaljr )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x1c, 0x1c, "Difficulty" ) PORT_DIPLOCATION("DSWA:3,4,5") // manual lists 6 valid settings
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSWA:3,4,5") // manual lists 6 valid settings
 	PORT_DIPSETTING(    0x08, "Level 1" )
 	PORT_DIPSETTING(    0x18, "Level 2" )
 	PORT_DIPSETTING(    0x14, "Level 3" )
@@ -7122,7 +7122,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x70, 0x40, "Bonus Chance Cycle" )            PORT_DIPLOCATION("SW 2:5,6,7")
-	PORT_DIPSETTING(    0x70, "None" )
+	PORT_DIPSETTING(    0x70, DEF_STR(None) )
 	PORT_DIPSETTING(    0x60, "First time only" )
 	PORT_DIPSETTING(    0x50, "Every 300 coins" )
 	PORT_DIPSETTING(    0x40, "Every 500 coins" )
@@ -7429,7 +7429,7 @@ static INPUT_PORTS_START( hgokou )
 	// SW5 is used to select either the Mahjong edge connector, or the 18/10 Edge connectors (i.e. emulation of SW5 is not required)
 	// SW5 All off = Mahjong connector, all on = 18/10 connector.
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, "Difficulty" )               PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )      PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )
 	PORT_DIPSETTING(    0x06, "2" )
 	PORT_DIPSETTING(    0x05, "3" )
@@ -7442,8 +7442,8 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x08, "Often" )
 	PORT_DIPSETTING(    0x00, "Rarely" )
 	PORT_DIPNAME( 0x10, 0x10, "Biggest Bonus Enabled" )    PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x60, 0x60, "W-Up Win Percentage" )      PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x60, "80%" ) // Easy
 	PORT_DIPSETTING(    0x40, "75%" )
@@ -7506,23 +7506,23 @@ static INPUT_PORTS_START( hgokou )
 
 	PORT_START("DSW4")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x02, 0x02, "In-Game Music" )            PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x04, 0x04, "Girls" )                    PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x08, 0x08, "Secret Technique ?" )       PORT_DIPLOCATION("SW4:4")  // What is this? Manual says 秘技
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x10, 0x10, "Hint" )                     PORT_DIPLOCATION("SW4:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Win Bonus" )                PORT_DIPLOCATION("SW4:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                          //                                   7   8   9
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0xc0, "Panel" )                    PORT_DIPLOCATION("SW4:7,8")  // SW4-7,8,9        Hanafuda Panel: OFF OFF OFF
 	PORT_DIPSETTING(    0xc0, "Hanafuda" ) //                                                               Mahjong Panel : ON  OFF OFF
 	PORT_DIPSETTING(    0x80, "Mahjong" )  // Requires different inputs                                     Hanagoku Panel: OFF ON  OFF
@@ -7536,11 +7536,11 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x00, "Lever" )
 	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )                    PORT_DIPLOCATION("SW4:10")
 	PORT_DIPNAME( 0x04, 0x04, "Show Girl at Game Start" )  PORT_DIPLOCATION("SW3:9")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x08, 0x08, "In-Game Voice" )            PORT_DIPLOCATION("SW3:10")
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x30, "Ameshikou Odds" )           PORT_DIPLOCATION("SW2:9,10")
 	PORT_DIPSETTING(    0x30, "20" )
 	PORT_DIPSETTING(    0x20, "30" )
@@ -7603,7 +7603,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x04, "3" )                                                               // レート　３
 	PORT_DIPSETTING(    0x00, "5" )                                                               // レート　５
 	PORT_DIPNAME( 0x70, 0x40, "Bonus Chance Cycle" )            PORT_DIPLOCATION("SW 2:5,6,7")    // ボーナスチャンスの周期設定
-	PORT_DIPSETTING(    0x70, "None" )                                                            // 無し
+	PORT_DIPSETTING(    0x70, DEF_STR(None) )                                                     // 無し
 	PORT_DIPSETTING(    0x60, "First time only" )                                                 // 初回のみ
 	PORT_DIPSETTING(    0x50, "Every 300 coins" )                                                 // ３００コイン毎
 	PORT_DIPSETTING(    0x40, "Every 500 coins" )                                                 // ５００コイン毎

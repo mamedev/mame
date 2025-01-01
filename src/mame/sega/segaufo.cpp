@@ -726,8 +726,8 @@ static INPUT_PORTS_START( newufo )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )              PORT_DIPLOCATION("SW2:1") // Manual states "Sounds"
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )                                                 // Manual states "Always"
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                                // Manual states "Only During Play"
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )                                                 // Manual states "Always"
 	PORT_DIPNAME( 0x02, 0x02, "Arm X, Y-Move" )                     PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, "Each Once" )
 	PORT_DIPSETTING(    0x00, "Unrestricted" )

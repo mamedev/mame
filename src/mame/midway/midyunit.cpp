@@ -490,8 +490,8 @@ static INPUT_PORTS_START( hiimpact )
 	PORT_DIPUNUSED_DIPLOC ( 0x0002, 0x0002, "DS1:7" )
 	PORT_DIPUNUSED_DIPLOC ( 0x0004, 0x0004, "DS1:6" )
 	PORT_DIPNAME( 0x0078, 0x0078, DEF_STR( Coinage )) PORT_DIPLOCATION("DS1:5,4,3,2")
-	PORT_DIPSETTING(      0x0078, DEF_STR( 1C_1C ))        PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000) // Generic coinage (no denomination); 2 identical chutes
-	PORT_DIPSETTING(      0x0058, DEF_STR( 2C_1C ))        PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
+	PORT_DIPSETTING(      0x0058, DEF_STR( 2C_1C ))        PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000) // Generic coinage (no denomination); 2 identical chutes
+	PORT_DIPSETTING(      0x0078, DEF_STR( 1C_1C ))        PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
 	PORT_DIPSETTING(      0x0068, "2 Coins/1 Credit 4/3" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
 	PORT_DIPSETTING(      0x0048, "2 Coins/1 Credit 4/4" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
 	PORT_DIPSETTING(      0x0070, "ECA" )                  PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000) // 25 cents; 4 chutes - dollar/quarter/dime/nickel
@@ -539,8 +539,8 @@ static INPUT_PORTS_START( shimpact )
 	PORT_INCLUDE( hiimpact )
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x0001, 0x0000, "Card Dispenser" ) PORT_DIPLOCATION("DS1:8")
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0001, DEF_STR( On ))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( smashtv )
@@ -897,7 +897,7 @@ static INPUT_PORTS_START( term2 )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0080, 0x0080, "Display" )                 PORT_DIPLOCATION("DS1:1")
-	PORT_DIPSETTING(      0x0080, "Normal" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Mirrored" )
 	PORT_DIPNAME( 0x0040, 0x0040, "Coinage Source" )          PORT_DIPLOCATION("DS1:2")
 	PORT_DIPSETTING(      0x0000, "CMOS" )
