@@ -187,7 +187,6 @@ void spg110_video_device::draw_page(const rectangle &cliprect, uint32_t scanline
 
 void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
 {
-
 	// m_sprtileno  tttt tttt tttt tttt    t =  tile number (all bits?)
 	// m_sprattr1   xxxx xxxx yyyy yyyy    x = low x bits, y = low y bits
 	// m_sprattr2   YXzz pppp hhww fFbb    X = high x bit, z = priority, p = palette, h = height, w = width, f = flipy,  F = flipx, b = bpp, Y = high y bit
@@ -909,8 +908,8 @@ uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 		for (int i = 0; i < 4; i++)
 		{
-			draw_page(cliprect, scanline, i, page2_addr, page2_regs);
 			draw_page(cliprect, scanline, i, page1_addr, page1_regs);
+			draw_page(cliprect, scanline, i, page2_addr, page2_regs);
 			draw_sprites(cliprect, scanline, i);
 		}
 	}
