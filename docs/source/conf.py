@@ -56,7 +56,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'MAME Documentation'
-copyright = u'1997-2024, MAMEdev and contributors'
+copyright = u'1997-2025, MAMEdev and contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
