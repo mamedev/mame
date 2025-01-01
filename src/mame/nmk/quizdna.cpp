@@ -14,6 +14,7 @@ Quiz Gekiretsu Scramble (Gakuen Paradise 2) (c) 1993 Face
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
 
@@ -29,15 +30,15 @@ class quizdna_state : public driver_device
 {
 public:
 	quizdna_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_spriteram(*this, "spriteram"),
-		m_generic_paletteram_8(*this, "paletteram"),
-		m_banked_ram(*this, "banked_ram", 0x4000, ENDIANNESS_LITTLE),
-		m_fgctrl_rom(*this, "fgctrl"),
-		m_mainbank(*this, "mainbank")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_mainbank(*this, "mainbank")
+		, m_fg_ram(*this, "fg_ram")
+		, m_bg_ram(*this, "bg_ram")
+		, m_spriteram(*this, "spriteram")
+		, m_fgctrl_rom(*this, "fgctrl")
 	{ }
 
 	void gakupara(machine_config &config);
@@ -52,26 +53,26 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<address_map_bank_device> m_mainbank;
 
+	required_shared_ptr<uint8_t> m_fg_ram;
+	required_shared_ptr<uint8_t> m_bg_ram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_generic_paletteram_8;
-	memory_share_creator<uint8_t> m_banked_ram;
 	required_region_ptr<uint8_t> m_fgctrl_rom;
-	required_memory_bank m_mainbank;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
-	uint8_t m_bg_xscroll[2];
+	uint8_t m_bg_xscroll[2]{};
 	int8_t m_flipscreen = 0;
-	uint8_t m_video_enable = 0;
+	bool m_video_enable = false;
 
 	// common
+	static rgb_t quizdna_xBGR_RRRR_GGGG_BBBB(uint32_t raw);
 	void bg_ram_w(offs_t offset, uint8_t data);
 	void fg_ram_w(offs_t offset, uint8_t data);
 	void bg_yscroll_w(uint8_t data);
 	void bg_xscroll_w(offs_t offset, uint8_t data);
 	void screen_ctrl_w(uint8_t data);
-	void paletteram_xBGR_RRRR_GGGG_BBBB_w(offs_t offset, uint8_t data);
 	void rombank_w(uint8_t data);
 
 	// game specific
@@ -82,6 +83,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void bank_map(address_map &map) ATTR_COLD;
 	void gakupara_io_map(address_map &map) ATTR_COLD;
 	void gekiretu_io_map(address_map &map) ATTR_COLD;
 	void gekiretu_map(address_map &map) ATTR_COLD;
@@ -92,8 +94,8 @@ private:
 
 TILE_GET_INFO_MEMBER(quizdna_state::get_bg_tile_info)
 {
-	int code = m_banked_ram[0x2000 + tile_index * 2] + m_banked_ram[0x2000 + tile_index * 2 + 1] * 0x100;
-	int const col = m_banked_ram[0x2000 + tile_index * 2 + 0x1000] & 0x7f;
+	int code = m_bg_ram[tile_index * 2] + m_bg_ram[tile_index * 2 + 1] * 0x100;
+	int const col = m_bg_ram[tile_index * 2 + 0x1000] & 0x7f;
 
 	if (code > 0x7fff)
 		code &= 0x83ff;
@@ -109,8 +111,8 @@ TILE_GET_INFO_MEMBER(quizdna_state::get_fg_tile_info)
 
 	y >>= 1;
 
-	int col = m_banked_ram[x * 2 + y * 0x40 + 1];
-	code += (m_banked_ram[x * 2 + y * 0x40] + (col & 0x1f) * 0x100) * 2;
+	int col = m_fg_ram[x * 2 + y * 0x40 + 1];
+	code += (m_fg_ram[x * 2 + y * 0x40] + (col & 0x1f) * 0x100) * 2;
 	col >>= 5;
 	col = (col & 3) | ((col & 4) << 1);
 
@@ -121,7 +123,7 @@ TILE_GET_INFO_MEMBER(quizdna_state::get_fg_tile_info)
 void quizdna_state::video_start()
 {
 	m_flipscreen = -1;
-	m_video_enable = 0;
+	m_video_enable = false;
 	m_bg_xscroll[0] = 0;
 	m_bg_xscroll[1] = 0;
 
@@ -137,20 +139,17 @@ void quizdna_state::video_start()
 
 void quizdna_state::bg_ram_w(offs_t offset, uint8_t data)
 {
-	m_banked_ram[offset + 0x2000] = data;
+	m_bg_ram[offset] = data;
 
 	m_bg_tilemap->mark_tile_dirty((offset & 0xfff) / 2);
 }
 
 void quizdna_state::fg_ram_w(offs_t offset, uint8_t data)
 {
-	int const offs = offset & 0xfff;
-
-	m_banked_ram[offs] = data;
-	m_banked_ram[offs + 0x1000] = data; // mirror
+	m_fg_ram[offset] = data;
 
 	for (int i = 0; i < 32; i++)
-		m_fg_tilemap->mark_tile_dirty(((offs/2) & 0x1f) + i * 0x20);
+		m_fg_tilemap->mark_tile_dirty(((offset/2) & 0x1f) + i * 0x20);
 }
 
 void quizdna_state::bg_yscroll_w(uint8_t data)
@@ -168,10 +167,10 @@ void quizdna_state::bg_xscroll_w(offs_t offset, uint8_t data)
 
 void quizdna_state::screen_ctrl_w(uint8_t data)
 {
-	int const tmp = (data & 0x10) >> 4;
-	m_video_enable = data & 0x20;
+	int const tmp = BIT(data, 4);
+	m_video_enable = BIT(data, 5);
 
-	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 
 	if (m_flipscreen == tmp)
 		return;
@@ -182,20 +181,13 @@ void quizdna_state::screen_ctrl_w(uint8_t data)
 	m_fg_tilemap->set_scrolldx(64, -64 +16);
 }
 
-void quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w(offs_t offset, uint8_t data)
+rgb_t quizdna_state::quizdna_xBGR_RRRR_GGGG_BBBB(uint32_t raw)
 {
-	int const offs = offset & ~1;
+	int const r = ((raw >> 7) & 0x1e) | ((raw >> 12) & 1);
+	int const g = ((raw >> 3) & 0x1e) | ((raw >> 13) & 1);
+	int const b = ((raw << 1) & 0x1e) | ((raw >> 14) & 1);
 
-	m_generic_paletteram_8[offset] = data;
-
-	int const d0 = m_generic_paletteram_8[offs];
-	int const d1 = m_generic_paletteram_8[offs+1];
-
-	int const r = ((d1 << 1) & 0x1e) | ((d1 >> 4) & 1);
-	int const g = ((d0 >> 3) & 0x1e) | ((d1 >> 5) & 1);
-	int const b = ((d0 << 1) & 0x1e) | ((d1 >> 6) & 1);
-
-	m_palette->set_pen_color(offs / 2, pal5bit(r), pal5bit(g), pal5bit(b));
+	return rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 void quizdna_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -206,8 +198,8 @@ void quizdna_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		int y = (m_spriteram[offs + 1] & 1) * 0x100 + m_spriteram[offs + 0];
 		int code = (m_spriteram[offs + 5] * 0x100 + m_spriteram[offs + 4]) & 0x3fff;
 		int col = m_spriteram[offs + 6];
-		int const fx = col & 0x80;
-		int const fy = col & 0x40;
+		int const fx = BIT(col, 7);
+		int const fy = BIT(col, 6);
 		int const ysize = (m_spriteram[offs + 1] & 0xc0) >> 6;
 		int dy = 0x10;
 		col &= 0x1f;
@@ -262,12 +254,12 @@ uint32_t quizdna_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 void quizdna_state::rombank_w(uint8_t data)
 {
-	m_mainbank->set_entry(data & 0x3f);
+	m_mainbank->set_bank(data & 0x3f);
 }
 
 void quizdna_state::gekiretu_rombank_w(uint8_t data)
 {
-	m_mainbank->set_entry((data & 0x3f) ^ 0x0a);
+	m_mainbank->set_bank((data & 0x3f) ^ 0x0a);
 }
 
 /****************************************************************************/
@@ -275,25 +267,32 @@ void quizdna_state::gekiretu_rombank_w(uint8_t data)
 void quizdna_state::quizdna_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr(m_mainbank);
-	map(0x8000, 0x9fff).w(FUNC(quizdna_state::fg_ram_w));
-	map(0xa000, 0xbfff).w(FUNC(quizdna_state::bg_ram_w));
+	map(0x8000, 0xbfff).r(m_mainbank, FUNC(address_map_bank_device::read8));
+	map(0x8000, 0x8fff).mirror(0x1000).w(FUNC(quizdna_state::fg_ram_w)).share(m_fg_ram);
+	map(0xa000, 0xbfff).w(FUNC(quizdna_state::bg_ram_w)).share(m_bg_ram);
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe1ff).ram().share(m_spriteram);
 	map(0xe200, 0xefff).ram();
-	map(0xf000, 0xffff).ram().w(FUNC(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)).share("paletteram");
+	map(0xf000, 0xffff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
 void quizdna_state::gekiretu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr(m_mainbank);
-	map(0x8000, 0x9fff).w(FUNC(quizdna_state::fg_ram_w));
-	map(0xa000, 0xbfff).w(FUNC(quizdna_state::bg_ram_w));
+	map(0x8000, 0xbfff).r(m_mainbank, FUNC(address_map_bank_device::read8));
+	map(0x8000, 0x8fff).mirror(0x1000).w(FUNC(quizdna_state::fg_ram_w)).share(m_fg_ram);
+	map(0xa000, 0xbfff).w(FUNC(quizdna_state::bg_ram_w)).share(m_bg_ram);
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xefff).ram().w(FUNC(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)).share("paletteram");
+	map(0xe000, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf000, 0xf1ff).ram().share(m_spriteram);
 	map(0xf200, 0xffff).ram();
+}
+
+void quizdna_state::bank_map(address_map &map)
+{
+	map(0x00000, 0x00fff).mirror(0x1000).readonly().share(m_fg_ram);
+	map(0x02000, 0x03fff).readonly().share(m_bg_ram);
+	map(0x04000, 0xfffff).rom().region("maincpu", 0x14000);
 }
 
 void quizdna_state::quizdna_io_map(address_map &map)
@@ -675,8 +674,7 @@ GFXDECODE_END
 
 void quizdna_state::machine_start()
 {
-	m_mainbank->configure_entry(0, m_banked_ram);
-	m_mainbank->configure_entries(1, 63, memregion("maincpu")->base() + 0x14000, 0x4000);
+	m_mainbank->set_bank(0);
 }
 
 
@@ -690,6 +688,8 @@ void quizdna_state::quizdna(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &quizdna_state::quizdna_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(quizdna_state::irq0_line_hold));
 
+	ADDRESS_MAP_BANK(config, m_mainbank).set_map(&quizdna_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x4000);
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -700,7 +700,7 @@ void quizdna_state::quizdna(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quizdna);
-	PALETTE(config, m_palette).set_entries(2048);
+	PALETTE(config, m_palette).set_format(2, &quizdna_state::quizdna_xBGR_RRRR_GGGG_BBBB, 2048);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -739,7 +739,7 @@ void quizdna_state::gekiretu(machine_config &config)
 /****************************************************************************/
 
 ROM_START( quizdna )
-	ROM_REGION( 0xd0000, "maincpu", 0 )
+	ROM_REGION( 0x110000, "maincpu", 0 )
 	ROM_LOAD( "quiz2-pr.28",  0x00000,  0x08000, CRC(a428ede4) SHA1(cdca3bd84b2ea421fb05502ea29e9eb605e574eb) )
 	ROM_CONTINUE(             0x18000,  0x78000 ) // banked
 	// empty
@@ -764,7 +764,7 @@ ROM_START( quizdna )
 ROM_END
 
 ROM_START( gakupara )
-	ROM_REGION( 0xd0000, "maincpu", 0 )
+	ROM_REGION( 0x110000, "maincpu", 0 )
 	ROM_LOAD( "u28.bin",  0x00000,  0x08000, CRC(72124bb8) SHA1(e734acff7e9d6b8c6a95c76860732320a2e3a828) )
 	ROM_CONTINUE(         0x18000,  0x78000 )             // banked
 	ROM_LOAD( "u29.bin",  0x90000,  0x40000, CRC(09f4948e) SHA1(21ccf5af6935cf40c0cf73fbee14bff3c4e1d23d) ) // banked
@@ -789,7 +789,7 @@ ROM_START( gakupara )
 ROM_END
 
 ROM_START( gakupara102 ) // ARC-0004-1 PCB
-	ROM_REGION( 0xd0000, "maincpu", 0 )
+	ROM_REGION( 0x110000, "maincpu", 0 )
 	ROM_LOAD( "u28.bin",  0x00000,  0x08000, CRC(9256c18a) SHA1(6704fa48c468621af76ce91b38addeee0d654b56) ) // SLDH
 	ROM_CONTINUE(         0x18000,  0x78000 )             // banked
 	ROM_LOAD( "u29.bin",  0x90000,  0x40000, CRC(09f4948e) SHA1(21ccf5af6935cf40c0cf73fbee14bff3c4e1d23d) ) // banked
@@ -814,7 +814,7 @@ ROM_START( gakupara102 ) // ARC-0004-1 PCB
 ROM_END
 
 ROM_START( gekiretu )
-	ROM_REGION( 0xd0000, "maincpu", 0 )
+	ROM_REGION( 0x110000, "maincpu", 0 )
 	ROM_LOAD( "quiz3-pr.28",  0x00000,  0x08000, CRC(a761e86f) SHA1(85331ef53598491e78c2d123b1ebd358aff46436) )
 	ROM_CONTINUE(             0x18000,  0x78000 ) // banked
 	// empty
@@ -839,7 +839,7 @@ ROM_START( gekiretu )
 ROM_END
 
 ROM_START( gekiretup ) // ARC-0005-1 PCB, hand-written labels
-	ROM_REGION( 0xd0000, "maincpu", 0 )
+	ROM_REGION( 0x110000, "maincpu", 0 )
 	ROM_LOAD( "quiz3-pr.28",  0x00000,  0x08000, CRC(a761e86f) SHA1(85331ef53598491e78c2d123b1ebd358aff46436) ) // same as final
 	ROM_CONTINUE(             0x18000,  0x78000 ) // banked
 	// empty
