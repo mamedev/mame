@@ -2,8 +2,8 @@
 // copyright-holders:R. Belmont
 // SiS 85c496 northbridge (PCI & CPU Memory Controller)
 
-#ifndef SIS85C496_H
-#define SIS85C496_H
+#ifndef MAME_MACHINE_SIS85C496_H
+#define MAME_MACHINE_SIS85C496_H
 
 #include "pci.h"
 #include "machine/ds128x.h"
@@ -193,4 +193,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SIS85C496_HOST, sis85c496_host_device)
 
-#endif
+#endif // MAME_MACHINE_SIS85C496_H

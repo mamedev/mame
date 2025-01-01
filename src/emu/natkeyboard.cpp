@@ -516,6 +516,8 @@ void natural_keyboard::post_coded(std::string_view text, const attotime &rate)
 		{ "BACKSPACE"sv, 8 },
 		{ "BS"sv,       8 },
 		{ "BKSP"sv,     8 },
+		{ "CAPSLOCK"sv, UCHAR_MAMEKEY(CAPSLOCK) },
+		{ "CR"sv,       13 },
 		{ "DEL"sv,      UCHAR_MAMEKEY(DEL) },
 		{ "DELETE"sv,   UCHAR_MAMEKEY(DEL) },
 		{ "END"sv,      UCHAR_MAMEKEY(END) },
@@ -524,6 +526,7 @@ void natural_keyboard::post_coded(std::string_view text, const attotime &rate)
 		{ "HOME"sv,     UCHAR_MAMEKEY(HOME) },
 		{ "INS"sv,      UCHAR_MAMEKEY(INSERT) },
 		{ "INSERT"sv,   UCHAR_MAMEKEY(INSERT) },
+		{ "LF"sv,       10 },
 		{ "PGDN"sv,     UCHAR_MAMEKEY(PGDN) },
 		{ "PGUP"sv,     UCHAR_MAMEKEY(PGUP) },
 		{ "SPACE"sv,    32 },
@@ -678,11 +681,11 @@ void natural_keyboard::build_codes()
 				{
 					if (!(curshift & ~mask))
 					{
-						// fetch the code, ignoring 0 and shifters
+						// fetch the code, ignoring shifters
 						std::vector<char32_t> const codes = field.keyboard_codes(curshift);
 						for (char32_t code : codes)
 						{
-							if (((code < UCHAR_SHIFT_BEGIN) || (code > UCHAR_SHIFT_END)) && (code != 0))
+							if ((code < UCHAR_SHIFT_BEGIN) || (code > UCHAR_SHIFT_END))
 							{
 								m_have_charkeys = true;
 								keycode_map::iterator const found(devinfo.codemap.find(code));

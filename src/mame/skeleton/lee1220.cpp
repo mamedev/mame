@@ -148,4 +148,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1983, lee1220, 0, 0, lee1220, lee1220, lee1220_state, empty_init, "Lee Data", "1220 Display Terminal", MACHINE_IS_SKELETON)
+COMP(1983, lee1220, 0, 0, lee1220, lee1220, lee1220_state, empty_init, "Lee Data", "1220 Display Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -7,16 +7,19 @@
    Hewlett Packard HP48 S/SX & G/GX and HP49 G
 
 **********************************************************************/
-#ifndef MAME_HP_HP84_H
-#define MAME_HP_HP84_H
+#ifndef MAME_HP_HP48_H
+#define MAME_HP_HP48_H
 
 #pragma once
 
-#include "cpu/saturn/saturn.h"
 #include "hp48_port.h"
+
+#include "cpu/saturn/saturn.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
+
 
 /* model */
 typedef enum {
@@ -215,4 +218,4 @@ private:
 #define HP48_NCE3 4
 #define HP48_NCE1 5
 
-#endif // MAME_HP_HP84_H
+#endif // MAME_HP_HP48_H

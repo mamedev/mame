@@ -17,19 +17,8 @@
 #include "emu.h"
 #include "namcos2_roz.h"
 
-static const gfx_layout layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	{ STEP8(0,8*8) },
-	8*8*8
-};
-
 GFXDECODE_START( namcos2_roz_device::gfxinfo )
-	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout, 0, 16 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, gfx_8x8x8_raw, 0, 16 )
 GFXDECODE_END
 
 DEFINE_DEVICE_TYPE(NAMCOS2_ROZ, namcos2_roz_device, "namcos2_roz", "Namco System 2 ROZ (C102)")
@@ -51,8 +40,7 @@ void namcos2_roz_device::device_start()
 
 TILE_GET_INFO_MEMBER(namcos2_roz_device::roz_tile_info)
 {
-	int tile = m_rozram[tile_index];
-	tileinfo.set(0, tile, 0/*color*/, 0);
+	tileinfo.set(0, m_rozram[tile_index], 0/*color*/, 0);
 }
 
 struct roz_param
@@ -70,13 +58,13 @@ draw_roz_helper_block(const struct roz_param *rozInfo, int destx, int desty,
 	bitmap_ind16 &destbitmap, bitmap_ind8 &flagsbitmap,
 	bitmap_ind16 &srcbitmap, uint32_t size_mask)
 {
-	int desty_end = desty + height;
+	const int desty_end = desty + height;
 
-	int end_incrx = rozInfo->incyx - (width * rozInfo->incxx);
-	int end_incry = rozInfo->incyy - (width * rozInfo->incxy);
+	const int end_incrx = rozInfo->incyx - (width * rozInfo->incxx);
+	const int end_incry = rozInfo->incyy - (width * rozInfo->incxy);
 
 	uint16_t *dest = &destbitmap.pix(desty, destx);
-	int dest_rowinc = destbitmap.rowpixels() - width;
+	const int dest_rowinc = destbitmap.rowpixels() - width;
 
 	while (desty < desty_end)
 	{
@@ -155,7 +143,7 @@ draw_roz_helper(
 
 #define ROZ_BLOCK_SIZE 8
 
-		uint32_t size_mask = rozInfo->size - 1;
+		const uint32_t size_mask = rozInfo->size - 1;
 		bitmap_ind16 &srcbitmap = tmap->pixmap();
 		bitmap_ind8 &flagsbitmap = tmap->flagsmap();
 		uint32_t srcx = (rozInfo->startx + (clip.min_x * rozInfo->incxx) +
@@ -165,29 +153,27 @@ draw_roz_helper(
 		int destx = clip.min_x;
 		int desty = clip.min_y;
 
-		int row_count = (clip.max_y - desty) + 1;
-		int row_block_count = row_count / ROZ_BLOCK_SIZE;
-		int row_extra_count = row_count % ROZ_BLOCK_SIZE;
+		const int row_count = (clip.max_y - desty) + 1;
+		const int row_block_count = row_count / ROZ_BLOCK_SIZE;
+		const int row_extra_count = row_count % ROZ_BLOCK_SIZE;
 
-		int column_count = (clip.max_x - destx) + 1;
-		int column_block_count = column_count / ROZ_BLOCK_SIZE;
-		int column_extra_count = column_count % ROZ_BLOCK_SIZE;
+		const int column_count = (clip.max_x - destx) + 1;
+		const int column_block_count = column_count / ROZ_BLOCK_SIZE;
+		const int column_extra_count = column_count % ROZ_BLOCK_SIZE;
 
-		int row_block_size_incxx = ROZ_BLOCK_SIZE * rozInfo->incxx;
-		int row_block_size_incxy = ROZ_BLOCK_SIZE * rozInfo->incxy;
-		int row_block_size_incyx = ROZ_BLOCK_SIZE * rozInfo->incyx;
-		int row_block_size_incyy = ROZ_BLOCK_SIZE * rozInfo->incyy;
-
-		int i, j;
+		const int row_block_size_incxx = ROZ_BLOCK_SIZE * rozInfo->incxx;
+		const int row_block_size_incxy = ROZ_BLOCK_SIZE * rozInfo->incxy;
+		const int row_block_size_incyx = ROZ_BLOCK_SIZE * rozInfo->incyx;
+		const int row_block_size_incyy = ROZ_BLOCK_SIZE * rozInfo->incyy;
 
 		// Do the block rows
-		for (i = 0; i < row_block_count; i++)
+		for (int i = 0; i < row_block_count; i++)
 		{
 			int sx = srcx;
 			int sy = srcy;
 			int dx = destx;
 			// Do the block columns
-			for (j = 0; j < column_block_count; j++)
+			for (int j = 0; j < column_block_count; j++)
 			{
 				draw_roz_helper_block(rozInfo, dx, desty, sx, sy, ROZ_BLOCK_SIZE,
 					ROZ_BLOCK_SIZE, bitmap, flagsbitmap, srcbitmap, size_mask);
@@ -211,7 +197,7 @@ draw_roz_helper(
 		if (row_extra_count)
 		{
 			// Do the block columns
-			for (i = 0; i < column_block_count; i++)
+			for (int i = 0; i < column_block_count; i++)
 			{
 				draw_roz_helper_block(rozInfo, destx, desty, srcx, srcy, ROZ_BLOCK_SIZE,
 					row_extra_count, bitmap, flagsbitmap, srcbitmap, size_mask);

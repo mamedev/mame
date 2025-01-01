@@ -166,7 +166,7 @@ static INPUT_PORTS_START(freeway)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MEMORY_RESET) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, freeway_state, nmi_w)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MEMORY_RESET) PORT_WRITE_LINE_MEMBER(FUNC(freeway_state::nmi_w))
 INPUT_PORTS_END
 
 static GFXDECODE_START(gfx_freeway)
@@ -280,5 +280,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1999, freeway,        0, freeway, freeway, freeway_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V5.12)", MACHINE_IS_SKELETON)
-GAME(1997, freewaya, freeway, freeway, freeway, freeway_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V4.31)", MACHINE_IS_SKELETON)
+GAME(1999, freeway,        0, freeway, freeway, freeway_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V5.12)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1997, freewaya, freeway, freeway, freeway, freeway_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V4.31)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

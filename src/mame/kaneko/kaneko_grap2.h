@@ -21,7 +21,7 @@ public:
 
 	void grap2_map(address_map &map) ATTR_COLD;
 
-	void do_rle(uint32_t address);
+	void do_rle(uint32_t address, uint32_t dstaddress);
 	void set_color_555(pen_t color, int rshift, int gshift, int bshift, uint16_t data);
 
 	uint16_t m_framebuffer_scrolly = 0;
@@ -40,10 +40,8 @@ public:
 	void framebuffer1_scrolly_w(uint16_t data) { m_framebuffer_scrolly = data; }
 	void framebuffer1_scrollx_w(uint16_t data) { m_framebuffer_scrollx = data; }
 
-
 	uint16_t framebuffer1_fbbright1_r() { return m_framebuffer_bright1; }
 	uint16_t framebuffer1_fbbright2_r() { return m_framebuffer_bright2; }
-
 
 	void framebuffer1_fbbright1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_framebuffer_bright1); }
 	void framebuffer1_fbbright2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_framebuffer_bright2); }

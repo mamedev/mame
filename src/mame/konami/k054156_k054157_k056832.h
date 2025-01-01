@@ -63,6 +63,7 @@ public:
 	u32 k_6bpp_rom_long_r(offs_t offset, u32 mem_mask = ~0);
 	u16 rom_word_r(offs_t offset);
 	u8 konmedal_rom_r(offs_t offset);
+	u8 chusenoh_rom_r(offs_t offset);
 	u16 piratesh_rom_r(offs_t offset);
 	u16 mw_rom_word_r(offs_t offset);
 	u16 bishi_rom_word_r(offs_t offset);

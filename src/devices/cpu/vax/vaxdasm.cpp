@@ -23,36 +23,10 @@ u32 vax_disassembler::opcode_alignment() const
 	return 1;
 }
 
-enum class vax_disassembler::mode : u8
-{
-	none,
-	rb, srb, urb, cntb, rw, srw, urw, mskw, rl, srl, url, posl, prl, rq, srq, urq, ro, uro,
-	mb, mw, ml, mq, mo,
-	wb, ww, wl, wq, wo,
-	ab, aw, al, aq, ao,
-	bb, bw,
-	vb
-};
-
 namespace {
 
 using namespace std::literals;
 using mode = vax_disassembler::mode;
-
-static constexpr bool is_read_mode(mode m)
-{
-	switch (m)
-	{
-	case mode::rb: case mode::srb: case mode::urb: case mode::cntb:
-	case mode::rw: case mode::srw: case mode::urw: case mode::mskw:
-	case mode::rl: case mode::srl: case mode::url: case mode::posl: case mode::prl:
-	case mode::rq: case mode::urq:
-	case mode::ro: case mode::uro:
-		return true;
-	default:
-		return false;
-	}
-}
 
 static constexpr bool is_address_mode(mode m)
 {
@@ -1118,4 +1092,24 @@ offs_t vax_disassembler::disassemble(std::ostream &stream, offs_t pc, const vax_
 	}
 	else
 		return disassemble_inst(stream, s_nonprefix_ops[op], pc, ppc, opcodes);
+}
+
+bool vax_disassembler::is_read_mode(vax_disassembler::mode m)
+{
+	switch (m)
+	{
+	case mode::rb: case mode::srb: case mode::urb: case mode::cntb:
+	case mode::rw: case mode::srw: case mode::urw: case mode::mskw:
+	case mode::rl: case mode::srl: case mode::url: case mode::posl: case mode::prl:
+	case mode::rq: case mode::urq:
+	case mode::ro: case mode::uro:
+		return true;
+	default:
+		return false;
+	}
+}
+
+const vax_disassembler::mode* vax_disassembler::get_operands(u8 op)
+{
+	return s_nonprefix_ops[op].operand;
 }

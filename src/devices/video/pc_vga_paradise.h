@@ -78,6 +78,8 @@ protected:
 
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
+	virtual void enter_setup_mode() override;
+
 private:
 	virtual u8 crtc_data_r(offs_t offset) override;
 	virtual void crtc_data_w(offs_t offset, u8 data) override;

@@ -302,10 +302,10 @@ void microbx2_state::microbx2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &microbx2_state::mem_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(16_MHz_XTAL, 1024, 0, 768, 674, 31, 607);
+	screen.set_raw(16_MHz_XTAL / 3, 1024, 0, 768, 674, 31, 607);
 	screen.set_screen_update("gdc", FUNC(upd7220a_device::screen_update));
 
-	upd7220a_device &gdc(UPD7220A(config, "gdc", 16_MHz_XTAL / 8));
+	upd7220a_device &gdc(UPD7220A(config, "gdc", 16_MHz_XTAL / 3)); // unverified clock, hand tuned for ~60 Hz
 	gdc.set_addrmap(0, &microbx2_state::upd7220_map);
 	gdc.set_display_pixels(FUNC(microbx2_state::display_pixels));
 	gdc.set_screen("screen");

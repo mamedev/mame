@@ -91,4 +91,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2003, pullttrig, 0, pullttrig, pullttrig, pullttrig_state, empty_init, ROT0, "Digital Silkroad", "Pull The Trigger", MACHINE_IS_SKELETON)
+GAME(2003, pullttrig, 0, pullttrig, pullttrig, pullttrig_state, empty_init, ROT0, "Digital Silkroad", "Pull The Trigger", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

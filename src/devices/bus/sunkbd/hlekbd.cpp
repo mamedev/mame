@@ -24,7 +24,7 @@
     0000 1110  ---k lscn    LED (1 = on: k = kana, l = caps lock, s = scroll lock, c = compose, n = num lock)
     0000 1111               layout request (keyboard responds with layout response)
 
-    message from keyboad to host:
+    message from keyboard to host:
     0xxx xxxx               key make
     1xxx xxxx               key break
     0111 1111               all keys up

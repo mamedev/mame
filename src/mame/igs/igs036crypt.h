@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:Andreas Naive,David Haywood
-#ifndef _IGS036CRYPT_H_
-#define _IGS036CRYPT_H_
+// copyright-holders:Andreas Naive, David Haywood
+#ifndef MAME_IGS_IGS036CRYPT_H
+#define MAME_IGS_IGS036CRYPT_H
+
+#pragma once
 
 
 class igs036_decryptor
@@ -29,4 +31,4 @@ extern const uint8_t   m312cn_key[0x100];
 extern const uint8_t  cjddzsp_key[0x100];
 extern const uint8_t    cjdh2_key[0x100];
 
-#endif
+#endif // MAME_IGS_IGS036CRYPT_H

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_MTX_EXP_SDX_H
-#define MAME_BUS_MTX_EXP_SDX_H
+#ifndef MAME_BUS_MTX_SDX_H
+#define MAME_BUS_MTX_SDX_H
 
 #include "exp.h"
 #include "imagedev/floppy.h"
@@ -97,5 +97,4 @@ private:
 DECLARE_DEVICE_TYPE(MTX_SDXBAS, mtx_sdxbas_device)
 DECLARE_DEVICE_TYPE(MTX_SDXCPM, mtx_sdxcpm_device)
 
-
-#endif // MAME_BUS_MTX_EXP_SDX_H
+#endif // MAME_BUS_MTX_SDX_H

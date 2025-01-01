@@ -80,7 +80,6 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 		<year>1995</year>
 		<publisher>AV Artisan</publisher>
 		<notes><![CDATA[
-[video] title animation glitches some sprites.
 [video] uses per-tile priority during gameplay.
 [sound] noisy channels 13-15 when jump occurs (12 00 0f 79)
 [sound] jump (1f 0f 0e a9) and attack (1f 00 0f 69) channels 11-12 keeps repeating
@@ -205,7 +204,6 @@ Erratic gameplay speed, controls [irq 3] as FRC
 [sound] BGM plays random tune on title (verify, two video refs plays different BGMs there wtf?)
 [video] title screen doesn't cliprect properly against white
 [video] title screen has priority issues with overlapping overlays (layer 1 + ROZ)
-[video] garbage sprites in 1p vs. com gameplay, [DMA]s with invalid dest pointers.
 [sound] main menu selection channel 14 keeps repeating (1f 15 0b dd)
 ]]></notes>
 		<info name="serial" value="F010" />

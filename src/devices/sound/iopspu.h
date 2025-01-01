@@ -9,8 +9,8 @@
 *
 */
 
-#ifndef MAME_MACHINE_IOPSPU_H
-#define MAME_MACHINE_IOPSPU_H
+#ifndef MAME_SOUND_IOPSPU_H
+#define MAME_SOUND_IOPSPU_H
 
 #pragma once
 
@@ -98,4 +98,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SONYIOP_SPU, iop_spu_device)
 
-#endif // MAME_MACHINE_IOPSPU_H
+#endif // MAME_SOUND_IOPSPU_H

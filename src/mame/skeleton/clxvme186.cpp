@@ -88,7 +88,7 @@ static INPUT_PORTS_START(clxvme186)
 	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN) // Printer busy
 	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN) // Printer paper empty
 	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN) // /SYSFAIL
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("rtc", m3000_device, busy_r)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("rtc", FUNC(m3000_device::busy_r))
 	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN) // Colex use only
 	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN) // Colex use only
 	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN) // /ACFAIL
@@ -121,4 +121,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1983, clxvme186, 0, 0, clxvme186, clxvme186, clxvme186_state, empty_init, "Colex", "Colex VME-80186", MACHINE_IS_SKELETON)
+COMP(1983, clxvme186, 0, 0, clxvme186, clxvme186, clxvme186_state, empty_init, "Colex", "Colex VME-80186", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

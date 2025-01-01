@@ -382,11 +382,11 @@ void namcos1_state::coin_w(offs_t offset, u8 data, u8 mem_mask)
 void namcos1_state::dac_gain_w(u8 data)
 {
 	/* DAC0 (GAIN0 = bit0, GAIN1 = bit2) */
-	int dac0_gain = (BIT(data, 2) << 1) | BIT(data, 0);
+	const int dac0_gain = (BIT(data, 2) << 1) | BIT(data, 0);
 	m_dac[0]->set_output_gain(ALL_OUTPUTS, (dac0_gain + 1) / 4.0f);
 
 	/* DAC1 (GAIN2 = bit3, GAIN3 = bit4) */
-	int dac1_gain = (BIT(data, 4) << 1) | BIT(data, 3);
+	const int dac1_gain = (BIT(data, 4) << 1) | BIT(data, 3);
 	m_dac[1]->set_output_gain(ALL_OUTPUTS, (dac1_gain + 1) / 4.0f);
 }
 
@@ -411,7 +411,7 @@ void namcos1_state::virtual_map(address_map &map)
 	map(0x2fc000, 0x2fcfff).ram().w(FUNC(namcos1_state::spriteram_w)).share("spriteram");
 	map(0x2fd000, 0x2fd01f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control8_r), FUNC(namco_c123tmap_device::control8_w)).mirror(0xfe0);
 	map(0x2fe000, 0x2fe3ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0xc00); /* PSG ( Shared ) */
-	map(0x2ff000, 0x2ff7ff).ram().share("triram").mirror(0x800);
+	map(0x2ff000, 0x2ff7ff).ram().share(m_triram).mirror(0x800);
 	map(0x300000, 0x307fff).ram();
 	map(0x400000, 0x7fffff).rom().region("user1", 0);
 }
@@ -419,10 +419,10 @@ void namcos1_state::virtual_map(address_map &map)
 
 void namcos1_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("soundbank");   /* Banked ROMs */
+	map(0x0000, 0x3fff).bankr(m_soundbank);   /* Banked ROMs */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::write));
 	map(0x5000, 0x53ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0x400); /* PSG ( Shared ) */
-	map(0x7000, 0x77ff).ram().share("triram");
+	map(0x7000, 0x77ff).ram().share(m_triram);
 	map(0x8000, 0x9fff).ram(); /* Sound RAM 3 */
 	map(0xc000, 0xc001).w(FUNC(namcos1_state::sound_bankswitch_w)); /* ROM bank selector */
 	map(0xd001, 0xd001).w(m_c117, FUNC(namco_c117_device::sound_watchdog_w));
@@ -436,13 +436,20 @@ void namcos1_state::mcu_map(address_map &map)
 	map(0x1000, 0x1003).r(FUNC(namcos1_state::dsw_r));
 	map(0x1400, 0x1400).portr("CONTROL0");
 	map(0x1401, 0x1401).portr("CONTROL1");
-	map(0x4000, 0xbfff).bankr("mcubank"); /* banked external ROM */
-	map(0xc000, 0xc7ff).ram().share("triram");
+	map(0x4000, 0xbfff).bankr(m_mcubank); /* banked external ROM */
+	map(0xc000, 0xc7ff).ram().share(m_triram);
 	map(0xc800, 0xcfff).ram().share("nvram"); /* EEPROM */
 	map(0xd000, 0xd000).w(m_dac[0], FUNC(dac_byte_interface::data_w));
 	map(0xd400, 0xd400).w(m_dac[1], FUNC(dac_byte_interface::data_w));
 	map(0xd800, 0xd800).w(FUNC(namcos1_state::mcu_bankswitch_w)); /* ROM bank selector */
 	map(0xf000, 0xf000).w(FUNC(namcos1_state::mcu_irq_ack_w));
+}
+
+
+void quester_state::quester_mcu_map(address_map &map)
+{
+	mcu_map(map);
+	map(0x1400, 0x1401).r(FUNC(quester_state::paddle_r));
 }
 
 
@@ -1071,6 +1078,12 @@ void namcos1_state::ns1(machine_config &config)
 	DAC_8BIT_R2R(config, m_dac[1], 0); // 10-pin 1Kx8R SIP with HC374 latch
 	m_dac[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_dac[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+}
+
+void quester_state::quester(machine_config &config)
+{
+	ns1(config);
+	m_mcu->set_addrmap(AS_PROGRAM, &quester_state::quester_mcu_map);
 }
 
 
@@ -2887,8 +2900,8 @@ GAME( 1987, dspirit,   0,        ns1,     dspirit,  namcos1_state, init_dspirit,
 GAME( 1987, dspirit2,  dspirit,  ns1,     dspirit,  namcos1_state, init_dspirit,  ROT90,  "Namco", "Dragon Spirit (DS2)", MACHINE_SUPPORTS_SAVE ) /* Atari had rights to US market */
 GAME( 1987, dspirit1,  dspirit,  ns1,     dspirit,  namcos1_state, init_dspirit,  ROT90,  "Namco", "Dragon Spirit (old version (DS1))", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blazer,    0,        ns1,     ns1,      namcos1_state, init_blazer,   ROT90,  "Namco", "Blazer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, quester,   0,        ns1,     quester,  namcos1_state, init_quester,  ROT90,  "Namco", "Quester (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, questers,  quester,  ns1,     quester,  namcos1_state, init_quester,  ROT90,  "Namco", "Quester Special Edition (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, quester,   0,        quester, quester,  quester_state, init_quester,  ROT90,  "Namco", "Quester (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, questers,  quester,  quester, quester,  quester_state, init_quester,  ROT90,  "Namco", "Quester Special Edition (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pacmania,  0,        ns1,     pacmania, namcos1_state, init_pacmania, ROT270, "Namco", "Pac-Mania", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pacmaniao, pacmania, ns1,     pacmania, namcos1_state, init_pacmania, ROT270, "Namco", "Pac-Mania (111187 sound program)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pacmaniaj, pacmania, ns1,     pacmania, namcos1_state, init_pacmania, ROT90,  "Namco", "Pac-Mania (Japan)", MACHINE_SUPPORTS_SAVE )

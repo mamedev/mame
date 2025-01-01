@@ -14,8 +14,6 @@
 class f2mc16_device : public cpu_device
 {
 public:
-	friend class mb9061x_device;
-
 	enum
 	{
 		F2MC16_PC, F2MC16_PS, F2MC16_USP, F2MC16_SSP, F2MC16_ACC,
@@ -39,6 +37,9 @@ public:
 
 	// construction/destruction
 	f2mc16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	bool rmw() { return m_rmw; }
+	void set_irq_level(int level);
 
 protected:
 	f2mc16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -67,9 +68,11 @@ private:
 
 	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16, m_tmp16aux;
 	u8 m_pcb, m_dtb, m_usb, m_ssb, m_adb, m_dpr, m_tmp8, m_tmp8aux, m_shifted_carry, m_prefix;
-	u32 m_acc, m_temp, m_tmp32, m_tmpea;
+	u32 m_pcbase, m_acc, m_temp, m_tmp32, m_tmpea;
 	s32 m_icount;
 	bool m_prefix_valid;
+	u16 m_irq_level;
+	bool m_rmw;
 
 	inline u8 read_8(u32 addr)
 	{
@@ -720,12 +723,8 @@ private:
 	void opcodes_earwi7d(u8 operand);
 	void opcodes_rwiea7f(u8 operand);
 
-	void set_irq(int vector, int level);
-	void clear_irq(int vector);
-	void take_irq(int vector, int level);
-
-	int m_vector_level[256];
-	int m_outstanding_irqs;
+	void take_irq();
+	void take_irq_vector(uint8_t irq_vector);
 };
 
 DECLARE_DEVICE_TYPE(F2MC16, f2mc16_device)

@@ -112,5 +112,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 1990, apvm110,  0,       0, marsvending, marsvending, marsvending_state, empty_init, "Mars Electronics", "Automatic Products Vending Machine model 110 (set 1)", MACHINE_IS_SKELETON )
-SYST( 1990, apvm110a, apvm110, 0, marsvending, marsvending, marsvending_state, empty_init, "Mars Electronics", "Automatic Products Vending Machine model 110 (set 2)", MACHINE_IS_SKELETON )
+SYST( 1990, apvm110,  0,       0, marsvending, marsvending, marsvending_state, empty_init, "Mars Electronics", "Automatic Products Vending Machine model 110 (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+SYST( 1990, apvm110a, apvm110, 0, marsvending, marsvending, marsvending_state, empty_init, "Mars Electronics", "Automatic Products Vending Machine model 110 (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

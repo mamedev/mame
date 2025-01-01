@@ -864,7 +864,7 @@ void spectrum_betav3_device::motors_control()
 
 INPUT_PORTS_START(betaplus)
 	PORT_START("BUTTON") // don't use F12, it clashes with the 'exit from debugger' button
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Magic Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_betaplus_device, magic_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Magic Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spectrum_betaplus_device::magic_button), 0)
 INPUT_PORTS_END
 
 INPUT_PORTS_START(gamma)
@@ -877,7 +877,7 @@ INPUT_PORTS_START(gamma)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_8WAY
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)
 	PORT_BIT(0x60, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(spectrum_gamma_device, busy_r)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(spectrum_gamma_device::busy_r))
 INPUT_PORTS_END
 
 

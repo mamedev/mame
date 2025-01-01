@@ -9459,7 +9459,7 @@ void upd7810_device::STM_7801()
 	upd7810_to_output_change(1);
 
 	/* Reload the timer */
-	m_ovc0 = 16 * ( TM0 + ( ( TM1 & 0x0f ) << 8 ) );
+	m_ovc0 = 8 * ( TM0 + ( ( TM1 & 0x0f ) << 8 ) );
 }
 
 void upd7810_device::MOV_MC_A_7801()
@@ -9474,5 +9474,8 @@ void upd7810_device::MOV_MC_A_7801()
 	/* PC5  Output  IO/-M Output */
 	/* PC6  Output  HLDA Output  */
 	/* PC7  Input   HOLD Input   */
-	MC = 0x84 | ( ( A & 0x02 ) ? 0x02 : 0x00 ) | ( ( A & 0x01 ) ? 0x01 : 0x00 );
+	if (MC == A)
+		return;
+	MC = A;
+	WP(UPD7810_PORTC, m_pc_out);
 }

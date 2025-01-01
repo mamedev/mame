@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_DRCBEUT_H
+#define MAME_CPU_DRCBEUT_H
 
-#ifndef __DRCBEUT_H__
-#define __DRCBEUT_H__
+#pragma once
 
 #include "drcuml.h"
 
@@ -163,4 +163,4 @@ private:
 };
 
 
-#endif /* __DRCBEUT_H__ */
+#endif // MAME_CPU_DRCBEUT_H

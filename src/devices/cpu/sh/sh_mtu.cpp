@@ -316,6 +316,7 @@ u8 sh_mtu_channel_device::tier_r()
 
 void sh_mtu_channel_device::tier_w(u8 data)
 {
+	update_counter();
 	m_tier = data;
 	if(0)
 		logerror("irq %c%c%c%c%c%c\n",

@@ -9,10 +9,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugvw.h"
 #include "dvdisasm.h"
+
+#include "debugbuf.h"
 #include "debugcpu.h"
-#include "debugger.h"
+
 
 //**************************************************************************
 //  DEBUG VIEW DISASM SOURCE

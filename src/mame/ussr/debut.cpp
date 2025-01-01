@@ -75,7 +75,6 @@ public:
 	// assume that RESET button is tied to CPU RESET pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
-	// machine configs
 	void debutm(machine_config &config);
 
 protected:
@@ -107,7 +106,6 @@ private:
 
 void debut_state::machine_start()
 {
-	// resolve handlers
 	m_out_digit.resolve();
 
 	// register for savestates
@@ -216,7 +214,7 @@ static INPUT_PORTS_START( debutm )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME(u8"ВВ (Enter Position)")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, debut_state, reset_button, 0) PORT_NAME(u8"СБ (Reset)")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(debut_state::reset_button), 0) PORT_NAME(u8"СБ (Reset)")
 INPUT_PORTS_END
 
 

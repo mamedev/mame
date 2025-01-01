@@ -760,8 +760,8 @@ static INPUT_PORTS_START(rf53_3297)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_NAME("Moneda/Coin 25 Pts")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )  PORT_NAME("Recupere/Recover (Change)") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )  PORT_NAME("Loteria/Lottery")           PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_NAME("sw hopper out 100 Pts")     PORT_READ_LINE_DEVICE_MEMBER("hopper1", ticket_dispenser_device, line_r)  // hopper 100 pts
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_NAME("sw hopper out 25 Pts")      PORT_READ_LINE_DEVICE_MEMBER("hopper0", ticket_dispenser_device, line_r)  // hopper 25 pts
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_NAME("sw hopper out 100 Pts")     PORT_READ_LINE_DEVICE_MEMBER("hopper1", FUNC(ticket_dispenser_device::line_r))  // hopper 100 pts
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_NAME("sw hopper out 25 Pts")      PORT_READ_LINE_DEVICE_MEMBER("hopper0", FUNC(ticket_dispenser_device::line_r))  // hopper 25 pts
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )  PORT_NAME("Moneda/Coin 100 Pts")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )  PORT_NAME("Falta/Fault")               PORT_CODE(KEYCODE_8)
 
@@ -776,7 +776,7 @@ static INPUT_PORTS_START(rf53_3297)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )      PORT_NAME("Lento/Slow")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )       PORT_NAME("sw bingo roller")         PORT_READ_LINE_MEMBER(rfslots8085_state, reel_opto_r) // bingo roller
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )       PORT_NAME("sw bingo roller")         PORT_READ_LINE_MEMBER(FUNC(rfslots8085_state::reel_opto_r)) // bingo roller
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("sw hopper load 100 Pts.") PORT_TOGGLE  PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("sw hopper load 25 Pts.")  PORT_TOGGLE  PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_NAME("Door & hopper out")       PORT_TOGGLE

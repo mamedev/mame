@@ -8,8 +8,8 @@
 
 */
 
-#ifndef MAME_CPU_SSP1601_SSP1601DASM_H
-#define MAME_CPU_SSP1601_SSP1601DASM_H
+#ifndef MAME_CPU_SSP1601_SSP1601D_H
+#define MAME_CPU_SSP1601_SSP1601D_H
 
 #pragma once
 
@@ -34,4 +34,4 @@ private:
 	static std::string get_cond(int op);
 };
 
-#endif
+#endif // MAME_CPU_SSP1601_SSP1601D_H

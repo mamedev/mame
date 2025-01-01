@@ -713,7 +713,7 @@ static INPUT_PORTS_START( honeydol )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")    /* Must be low or game stops! */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))    /* Must be low or game stops! */
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
@@ -789,7 +789,7 @@ static INPUT_PORTS_START( twinadv )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")    /* Must be low or game stops! */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))    /* Must be low or game stops! */
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )

@@ -344,7 +344,7 @@ void pgm_arm_type1_state::init_kovshxas()
 
 void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
 {
-	u16 *src = (u16 *)(memregion("tiles")->base() + 0x180000);
+	u16 *src = (u16 *)(memregion("igs023")->base() + 0x180000);
 	std::vector<u16> dst(0x800000);
 
 	for (int i = 0; i < 0x800000 / 2; i++)
@@ -418,14 +418,14 @@ void pgm_arm_type1_state::init_kovlsqh2()
 	pgm_decode_kovqhsgs2_program();
 	pgm_decode_kovlsqh2_tiles();
 
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x1000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x1800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x2000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x2800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprmask")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprmask")->base() + 0x0800000);
 
 	pgm_decode_kovlsqh2_samples();
 	pgm_basic_init();
@@ -439,14 +439,14 @@ void pgm_arm_type1_state::init_kovqhsgs()
 	pgm_decode_kovqhsgs_program();
 	pgm_decode_kovlsqh2_tiles();
 
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprcol")->base() + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(memregion("sprmask")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x0800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x1000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x1800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x2000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprcol")->base() + 0x2800000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprmask")->base() + 0x0000000);
+	pgm_decode_kovlsqh2_sprites(memregion("igs023:sprmask")->base() + 0x0800000);
 
 	pgm_decode_kovlsqh2_samples();
 	pgm_basic_init();

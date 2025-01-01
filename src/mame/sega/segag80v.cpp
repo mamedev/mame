@@ -512,17 +512,17 @@ void segag80v_state::spacfurybl_speech_io_map(address_map &map) // TODO: everyth
 
 static INPUT_PORTS_START( g80v_generic )
 	PORT_START("D7D6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<0>) // P1.5
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_MEMBER(FUNC(segag80v_state::coin_w<0>)) // P1.5
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<1>) // P1.8
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(segag80v_state, draw_r)   // P1.13
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_MEMBER(FUNC(segag80v_state::coin_w<1>)) // P1.8
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(segag80v_state::draw_r))   // P1.13
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.14
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                 // n/c
 
 	PORT_START("D5D4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_MEMBER(segag80v_state, coin_w<2>) // P1.10
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_MEMBER(FUNC(segag80v_state::coin_w<2>)) // P1.10
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )                 // P1.15
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.16
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 // P1.17
@@ -588,7 +588,7 @@ static INPUT_PORTS_START( g80v_generic )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )                // P1.30
 
 	PORT_START("SERVICESW")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_WRITE_LINE_MEMBER(segag80v_state, service_switch_w)
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_WRITE_LINE_MEMBER(FUNC(segag80v_state::service_switch_w))
 INPUT_PORTS_END
 
 
@@ -663,7 +663,7 @@ static INPUT_PORTS_START( elim4 )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D7D6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(segag80v_state, elim4_joint_coin_r)   // combination of all four coin inputs
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(segag80v_state::elim4_joint_coin_r))   // combination of all four coin inputs
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 

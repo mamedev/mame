@@ -3452,10 +3452,13 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 	</software>
 
 	<!-- Omake: press F5 during gameplay for music test -->
-	<software name="arcus" supported="yes">
+	<software name="arcus" supported="no">
 		<description>Arcus</description>
 		<year>1988</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
+		<notes><![CDATA[
+Hangs if title screen intro is skipped (regression?)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198805xx"/>
 		<info name="alt_title" value="アークス"/>
@@ -8227,8 +8230,8 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		</part>
 	</software>
 
-	<software name="danchits">
-		<description>Danchi Tsuma no Yuwaku</description>
+	<software name="danchizm">
+		<description>Danchizuma no Yuuwaku</description>
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801 -->
@@ -8241,8 +8244,8 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		</part>
 	</software>
 
-	<software name="danchitsa" cloneof="danchits">
-		<description>Danchi Tsuma no Yuwaku (alt)</description>
+	<software name="danchizma" cloneof="danchizm">
+		<description>Danchizuma no Yuuwaku (alt)</description>
 		<year>1983</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801 -->
@@ -15716,7 +15719,7 @@ Should be supported by [PC8001mkIISR] too
 	</software>
 
 	<software name="herolanc">
-		<description>Heroes of the Lance</description>
+		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance</description>
 		<year>1989</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>
 		<!-- PC8801mk2SR -->
@@ -25389,9 +25392,12 @@ Should be supported by [PC8001mkIISR] too
 	</software>
 
 	<software name="okumanch">
-		<description>Okumanchoja</description>
+		<description>Okumanchouja</description>
 		<year>1987</year>
 		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
+		<notes><![CDATA[
+Weird wobbling on main menu (raster effects? verify)
+]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198711xx"/>
 		<info name="alt_title" value="億万長者"/>

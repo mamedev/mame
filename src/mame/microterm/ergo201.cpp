@@ -186,4 +186,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1985, ergo201, 0, 0, ergo201, ergo201, ergo201_state, empty_init, "Micro-Term / Kurzweil Computer Products", "ERGO 201 (Special #9233)", MACHINE_IS_SKELETON)
+COMP(1985, ergo201, 0, 0, ergo201, ergo201, ergo201_state, empty_init, "Micro-Term / Kurzweil Computer Products", "ERGO 201 (Special #9233)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

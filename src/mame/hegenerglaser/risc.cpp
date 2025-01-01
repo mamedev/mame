@@ -23,7 +23,7 @@ Hardware notes:
 #include "mmboard.h"
 #include "mmdisplay2.h"
 
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "machine/74259.h"
 #include "machine/chessmachine.h"
 #include "machine/nvram.h"
@@ -145,7 +145,7 @@ INPUT_PORTS_END
 void risc_state::mrisc(machine_config &config)
 {
 	// basic machine hardware
-	M65SC02(config, m_maincpu, 10_MHz_XTAL / 4);
+	G65SC02(config, m_maincpu, 10_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &risc_state::mrisc_mem);
 
 	const attotime irq_period = attotime::from_hz(10_MHz_XTAL / 0x4000);

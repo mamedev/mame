@@ -106,4 +106,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(200?, kisssite, 0,         0,      kisssite, kisssite, kisssite_state, empty_init, "Tomy", "Kiss-Site", MACHINE_IS_SKELETON)
+SYST(200?, kisssite, 0,         0,      kisssite, kisssite, kisssite_state, empty_init, "Tomy", "Kiss-Site", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -219,7 +219,7 @@ void fd2000_device::floppy_formats(format_registration &fr)
 
 void fd2000_device::add_common_devices(machine_config &config)
 {
-	M65C02(config, m_maincpu, 24_MHz_XTAL / 12);
+	W65C02(config, m_maincpu, 24_MHz_XTAL / 12);
 
 	via6522_device &via(R65C22(config, G65SC22P2_TAG, 24_MHz_XTAL / 12));
 	via.readpa_handler().set(FUNC(fd2000_device::via_pa_r));

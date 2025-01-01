@@ -4,18 +4,55 @@
 license:CC0-1.0
 -->
 
-<softwarelist name="juku" description="Juku E5101 floppy disks">
+<softwarelist name="juku" description="Juku E5104 floppy disks">
 
 	<software name="cpm22">
 		<description>CP/M 2.2</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2018</year>
+		<publisher>Универсальный эмулятор</publisher>
+		<info name="version" value="2.2" />
 		<info name="usage" value="Press t d d" />
+		<info name="comment" value="System floppy disk with XD and STAT. Published for initial testing at the file section of the Башкирия-2М emulator web site."/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
 				<rom name="cpm22.juk" size="819200" crc="a66233aa" sha1="5bb58a70b87e9ee9ca78c9cc3d90e197d3b4663e" />
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="ekdos229">
+		<description>EKDOS 2.29</description>
+		<year>1988</year>
+		<publisher>EKTA</publisher>
+		<info name="usage" value="Press t d d" />
+		<info name="release" value="19880501" /><!-- Based on ИTCРВ E5104 руководство по эксплуатации (Таллинн 1988). -->
+		<info name="version" value="2.29" />
+		<info name="author" value="Andres Kaukver"/>
+		<info name="developer" value="EktaSoft"/>
+		<info name="comment" value="System floppy disk, empty."/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="ekdos229.juk" size="819200" crc="b7b9c3a5" sha1="cf257935a447cd2d795076b3a7a922ca7a478822" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ekdos230">
+		<description>EKDOS 2.30</description>
+		<year>1989</year>
+		<publisher>EKTA</publisher>
+		<info name="usage" value="Press t d d" />
+		<info name="release" value="19890410" /><!-- From EKDOS 2.30 source code header https://github.com/infoaed/juku3000/blob/master/src/EKDOS30.ASM#L10. -->
+		<info name="version" value="2.30" />
+		<info name="author" value="Andres Kaukver"/>
+		<info name="developer" value="EktaSoft"/>
+		<info name="comment" value="System floppy disk, empty. Source code from 10.04.1989 was published on Juku PC utilities disk #4 from December 1989."/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="ekdos230.juk" size="819200" crc="0d422966" sha1="1f6b7ade822ba563de16153d272f12add337a3d5" />
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>

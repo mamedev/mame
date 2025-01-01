@@ -338,7 +338,7 @@ uint32_t deadang_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	    0x01: Background playfield disable
 	    0x02: Middle playfield disable
 	    0x04: Top playfield disable
-	    0x08: ?  Toggles at start of game
+	    0x08: Text layer disable
 	    0x10: Sprite disable
 	    0x20: Unused?
 	    0x40: Flipscreen
@@ -347,6 +347,7 @@ uint32_t deadang_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_pf_layer[2]->enable(!(m_scroll_ram[0x34] & 1));
 	m_pf_layer[0]->enable(!(m_scroll_ram[0x34] & 2));
 	m_pf_layer[1]->enable(!(m_scroll_ram[0x34] & 4));
+	m_text_layer->enable(!(m_scroll_ram[0x34] & 8));
 	flip_screen_set(m_scroll_ram[0x34] & 0x40);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);

@@ -1222,10 +1222,18 @@ void mc68hc11_cpu_device::execute_run()
 
 		check_irq_lines();
 
-		m_ppc = m_pc;
-		debugger_instruction_hook(m_pc);
+		if (m_wait_state != 0)
+		{
+			debugger_wait_hook();
+			m_icount = 0;
+		}
+		else
+		{
+			m_ppc = m_pc;
+			debugger_instruction_hook(m_pc);
 
-		op = FETCH();
-		(this->*hc11_optable[op])();
+			op = FETCH();
+			(this->*hc11_optable[op])();
+		}
 	}
 }

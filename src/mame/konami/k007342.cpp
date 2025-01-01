@@ -1,12 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
 /*
+
 Konami 007342
 ------
 The 007342 manages 2 64x32 scrolling tilemaps with 8x8 characters, and
 optionally generates timing clocks and interrupt signals. It uses 0x2000
 bytes of RAM, plus 0x0200 bytes for scrolling, and a variable amount of ROM.
 It cannot read the ROMs.
+
+Some of the control flags are specifically meant for other Konami chips,
+such as the sprite wraparound flag for 007420.
 
 control registers
 000: ------x- INT control
@@ -26,6 +30,11 @@ control registers
 005: x scroll 2
 006: y scroll 2
 007: not used
+
+TODO:
+- device should be combined with 007420? see comment from AWJ here:
+  https://mametesters.org/view.php?id=4902
+
 */
 
 #include "emu.h"
@@ -48,10 +57,9 @@ k007342_device::k007342_device(const machine_config &mconfig, const char *tag, d
 	m_tilemap{ nullptr, nullptr },
 	m_flipscreen(false),
 	m_int_enabled(false),
-	//m_regs[8],
-	//m_scrollx[2],
-	//m_scrolly[2],
-	m_callback(*this)
+	m_callback(*this),
+	m_flipscreen_cb(*this),
+	m_sprite_wrap_y_cb(*this)
 {
 }
 
@@ -95,6 +103,10 @@ void k007342_device::device_reset()
 {
 	m_int_enabled = false;
 	m_flipscreen = false;
+
+	m_flipscreen_cb(0);
+	m_sprite_wrap_y_cb(0);
+
 	m_scrollx[0] = 0;
 	m_scrollx[1] = 0;
 	m_scrolly[0] = 0;
@@ -117,9 +129,9 @@ void k007342_device::write(offs_t offset, uint8_t data)
 {
 	m_ram[offset] = data;
 
-	if (offset < 0x1000)    /* layer 0 */
+	if (offset < 0x1000)
 		m_tilemap[0]->mark_tile_dirty(offset & 0x7ff);
-	else                /* layer 1 */
+	else
 		m_tilemap[1]->mark_tile_dirty(offset & 0x7ff);
 }
 
@@ -138,33 +150,37 @@ void k007342_device::vreg_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0x00:
-			/* bit 1: INT control */
+			// bit 1: INT control
 			m_int_enabled = BIT(data, 1);
+
+			// bit 4: flip screen
 			m_flipscreen = BIT(data, 4);
+			m_flipscreen_cb(BIT(data, 4));
 			m_tilemap[0]->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			m_tilemap[1]->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			break;
-		case 0x01:  /* used for banking in Rock'n'Rage */
+		case 0x01: // used for banking in Rock'n'Rage
 			if (data != m_regs[1])
 				machine().tilemap().mark_all_dirty();
-			[[fallthrough]];
+			break;
 		case 0x02:
 			m_scrollx[0] = (m_scrollx[0] & 0xff) | ((data & 0x01) << 8);
 			m_scrollx[1] = (m_scrollx[1] & 0xff) | ((data & 0x02) << 7);
+			m_sprite_wrap_y_cb(BIT(data, 7));
 			break;
-		case 0x03:  /* scroll x (register 0) */
+		case 0x03: // scroll x (register 0)
 			m_scrollx[0] = (m_scrollx[0] & 0x100) | data;
 			break;
-		case 0x04:  /* scroll y (register 0) */
+		case 0x04: // scroll y (register 0)
 			m_scrolly[0] = data;
 			break;
-		case 0x05:  /* scroll x (register 1) */
+		case 0x05: // scroll x (register 1)
 			m_scrollx[1] = (m_scrollx[1] & 0x100) | data;
 			break;
-		case 0x06:  /* scroll y (register 1) */
+		case 0x06: // scroll y (register 1)
 			m_scrolly[1] = data;
 			break;
-		case 0x07:  /* unused */
+		case 0x07: // unused
 			break;
 	}
 	m_regs[offset] = data;
@@ -172,18 +188,18 @@ void k007342_device::vreg_w(offs_t offset, uint8_t data)
 
 void k007342_device::tilemap_update()
 {
-	/* update scroll */
+	// update scroll
 	switch (m_regs[2] & 0x1c)
 	{
 		case 0x00:
-		case 0x08:  /* unknown, blades of steel shootout between periods */
+		case 0x08: // unknown, blades of steel shootout between periods
 			m_tilemap[0]->set_scroll_rows(1);
 			m_tilemap[0]->set_scroll_cols(1);
 			m_tilemap[0]->set_scrollx(0, m_scrollx[0]);
 			m_tilemap[0]->set_scrolly(0, m_scrolly[0]);
 			break;
 
-		case 0x0c:  /* 32 columns */
+		case 0x0c: // 32 columns
 			m_tilemap[0]->set_scroll_rows(1);
 			m_tilemap[0]->set_scroll_cols(512);
 			m_tilemap[0]->set_scrollx(0, m_scrollx[0]);
@@ -192,7 +208,7 @@ void k007342_device::tilemap_update()
 						m_scroll_ram[2 * (offs / 8)] + 256 * m_scroll_ram[2 * (offs / 8) + 1]);
 			break;
 
-		case 0x14:  /* 256 rows */
+		case 0x14: // 256 rows
 			m_tilemap[0]->set_scroll_rows(256);
 			m_tilemap[0]->set_scroll_cols(1);
 			m_tilemap[0]->set_scrolly(0, m_scrolly[0]);
@@ -202,7 +218,7 @@ void k007342_device::tilemap_update()
 			break;
 
 		default:
-//          popmessage("unknown scroll ctrl %02x", m_regs[2] & 0x1c);
+			//popmessage("unknown scroll ctrl %02x", m_regs[2] & 0x1c);
 			break;
 	}
 
@@ -230,11 +246,6 @@ void k007342_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, c
 	m_tilemap[num]->draw(screen, bitmap, cliprect, flags, priority);
 }
 
-int k007342_device::is_int_enabled()
-{
-	return m_int_enabled;
-}
-
 
 /***************************************************************************
 
@@ -254,7 +265,7 @@ int k007342_device::is_int_enabled()
 
 TILEMAP_MAPPER_MEMBER(k007342_device::scan)
 {
-	/* logical (col,row) -> memory offset */
+	// logical (col,row) -> memory offset
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5);
 }
 
@@ -269,11 +280,7 @@ void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, uint8_t
 	if (!m_callback.isnull())
 		m_callback(layer, m_regs[1], code, color, flags);
 
-
-	tileinfo.set(0,
-			code,
-			color,
-			flags);
+	tileinfo.set(0, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(k007342_device::get_tile_info0)

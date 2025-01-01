@@ -161,4 +161,4 @@ ROM_END
 } // Anonymous namespace
 
 
-CONS( 1988, iq7000, 0, 0, iq7000, iq7000, wizard_state, empty_init, "Sharp", "IQ-7000", MACHINE_IS_SKELETON )
+CONS( 1988, iq7000, 0, 0, iq7000, iq7000, wizard_state, empty_init, "Sharp", "IQ-7000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

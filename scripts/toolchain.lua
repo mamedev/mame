@@ -211,7 +211,7 @@ function toolchain(_buildDir, _subDir)
 			premake.gcc.ar  = toolchainPrefix .. "ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-osx-clang")
 		end
-	elseif _ACTION == "vs2019" then
+	elseif _ACTION == "vs2022" then
 
 		if "clangcl" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("ClangCL")

@@ -1,8 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:
-
-#ifndef MAME_BUS_PCI_RTL8129_PCI_H
-#define MAME_BUS_PCI_RTL8129_PCI_H
+#ifndef MAME_BUS_PCI_RTL8139_PCI_H
+#define MAME_BUS_PCI_RTL8139_PCI_H
 
 #pragma once
 
@@ -35,4 +34,4 @@ private:
 
 DECLARE_DEVICE_TYPE(RTL8139_PCI, rtl8139_pci_device)
 
-#endif // MAME_NETWORK_RTL8129_PCI_H
+#endif // MAME_NETWORK_RTL8139_PCI_H

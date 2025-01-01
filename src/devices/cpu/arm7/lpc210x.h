@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_CPU_ARM7_LPC2103_H
-#define MAME_CPU_ARM7_LPC2103_H
+#ifndef MAME_CPU_ARM7_LPC210X_H
+#define MAME_CPU_ARM7_LPC210X_H
 
 #pragma once
 
@@ -87,4 +87,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(LPC2103, lpc210x_device)
 
-#endif // MAME_CPU_ARM7_LPC2103_H
+#endif // MAME_CPU_ARM7_LPC210X_H

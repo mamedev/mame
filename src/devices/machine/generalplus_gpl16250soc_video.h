@@ -35,6 +35,7 @@ public:
 	void set_alt_tile_addressing(int alt_tile_addressing) { m_alt_tile_addressing = alt_tile_addressing; }
 	void set_alt_extrasprite(int alt_extrasprite_hack) { m_alt_extrasprite_hack = alt_extrasprite_hack; }
 	void set_legacy_video_mode() { m_use_legacy_mode = true; }
+	void set_disallow_resolution_control() { m_disallow_resolution_control = true; }
 
 	void set_video_spaces(address_space& cpuspace, address_space& cs_space, int csbase) { m_cpuspace = &cpuspace; m_cs_space = &cs_space; m_csbase = csbase; }
 
@@ -233,6 +234,7 @@ protected:
 	int m_alt_extrasprite_hack;
 	int m_alt_tile_addressing;
 	bool m_use_legacy_mode; // could be related to the 'unused' bits in the palete bank select being set, but uncertain
+	bool m_disallow_resolution_control;
 
 	required_device<spg_renderer_device> m_renderer;
 

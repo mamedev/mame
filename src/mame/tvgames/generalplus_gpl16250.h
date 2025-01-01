@@ -1,14 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_TVGAMES_SUNPLUS_GCM394_H
-#define MAME_TVGAMES_SUNPLUS_GCM394_H
+#ifndef MAME_TVGAMES_GENERALPLUS_GPL16250_H
+#define MAME_TVGAMES_GENERALPLUS_GPL16250_H
 
 #pragma once
 
-#include "machine/generalplus_gpl16250soc.h"
 #include "generalplus_gpl16250_m.h"
-#include "bus/generic/slot.h"
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "machine/generalplus_gpl16250soc.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -141,4 +142,40 @@ private:
 };
 
 
-#endif // MAME_TVGAMES_SUNPLUS_GCM394_H
+class gameu_handheld_game_state : public gcm394_game_state
+{
+public:
+	gameu_handheld_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag)
+	{
+	}
+
+	virtual uint16_t cs0_r(offs_t offset) override;
+
+	void gameu(machine_config &config);
+
+	void init_gameu();
+	void init_gameu108();
+
+protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void decrypt_gameu();
+
+	uint32_t m_upperbase;
+	uint16_t m_porta_data;
+	uint16_t m_portb_data;
+	uint16_t m_portc_data;
+	uint16_t m_portd_data;
+};
+
+
+#endif // MAME_TVGAMES_GENERALPLUS_GPL16250_H

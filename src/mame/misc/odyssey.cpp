@@ -283,4 +283,4 @@ ROM_END
 **************************************/
 
 /*    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT        ROT      COMPANY           FULLNAME    FLAGS  */
-GAME( 1998, odyssey,  0,      odyssey, odyssey, odyssey_state, empty_init, ROT270, "Silicon Gaming", "Odyssey",   MACHINE_IS_SKELETON )
+GAME( 1998, odyssey,  0,      odyssey, odyssey, odyssey_state, empty_init, ROT270, "Silicon Gaming", "Odyssey",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

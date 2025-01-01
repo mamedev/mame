@@ -169,4 +169,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, bingowav, 0, bingowav, bingowav, bingowav_state, empty_init, ROT0, "Taito", "Bingo Wave", MACHINE_IS_SKELETON )
+GAME( 1994, bingowav, 0, bingowav, bingowav, bingowav_state, empty_init, ROT0, "Taito", "Bingo Wave", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

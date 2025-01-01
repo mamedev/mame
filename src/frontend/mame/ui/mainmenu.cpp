@@ -243,7 +243,7 @@ bool menu_main::handle(event const *ev)
 			break;
 
 		case IMAGE_MENU_FILE_MANAGER:
-			menu::stack_push<menu_file_manager>(ui(), container(), nullptr);
+			menu::stack_push<menu_file_manager>(ui(), container(), std::string());
 			break;
 
 		case TAPE_CONTROL:

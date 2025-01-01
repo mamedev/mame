@@ -220,7 +220,7 @@ private:
 
 	required_device<beta_disk_device> m_beta;
 	required_device<tsconfdma_device> m_dma;
-	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	required_device<spi_sdcard_device> m_sdcard;
 	u8 m_zctl_di = 0;
 	u8 m_zctl_cs = 0;
 

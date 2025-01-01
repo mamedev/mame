@@ -17,6 +17,7 @@
 #include "screen.h"
 
 #define IR_TIMING               1       /* try to emulate MB and VG running time */
+#define DISASSEMBLE_MB_ROM      0       /* generate a disassembly of the mathbox ROMs */
 
 class irobot_state : public driver_device
 {
@@ -41,11 +42,17 @@ public:
 
 	void irobot(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	struct irmb_ops
 	{
 		const struct irmb_ops *nxtop;
 		uint32_t func;
+		uint32_t nxtadd;
 		uint32_t diradd;
 		uint32_t latchmask;
 		uint32_t *areg;
@@ -55,36 +62,6 @@ private:
 		uint8_t flags;
 		uint8_t ramsel;
 	};
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-	void irobot_map(address_map &map) ATTR_COLD;
-
-	void irobot_clearirq_w(uint8_t data);
-	void irobot_clearfirq_w(uint8_t data);
-	uint8_t irobot_sharedmem_r(offs_t offset);
-	void irobot_sharedmem_w(offs_t offset, uint8_t data);
-	void irobot_statwr_w(uint8_t data);
-	void irobot_out0_w(uint8_t data);
-	void irobot_rom_banksel_w(uint8_t data);
-	uint8_t irobot_status_r();
-	void irobot_paletteram_w(offs_t offset, uint8_t data);
-	uint8_t quad_pokeyn_r(offs_t offset);
-	void quad_pokeyn_w(offs_t offset, uint8_t data);
-	void irobot_palette(palette_device &palette) const;
-	uint32_t screen_update_irobot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(scanline_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(irobot_irvg_done_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(irobot_irmb_done_callback);
-	void irobot_poly_clear(uint8_t *bitmap_base);
-	void irobot_poly_clear();
-	void draw_line(uint8_t *polybitmap, int x1, int y1, int x2, int y2, int col);
-	void irobot_run_video();
-	uint32_t irmb_din(const irmb_ops *curop);
-	void irmb_dout(const irmb_ops *curop, uint32_t d);
-	void load_oproms();
-	void irmb_run();
 
 	required_shared_ptr<uint8_t> m_videoram;
 	uint8_t m_vg_clear = 0U;
@@ -125,6 +102,39 @@ private:
 	required_device<x2212_device> m_novram;
 	required_device_array<pokey_device, 4> m_pokey;
 	output_finder<2> m_leds;
+
+#if DISASSEMBLE_MB_ROM
+	void disassemble_instruction(uint16_t offset, const irmb_ops *op);
+#endif
+
+	void irobot_map(address_map &map) ATTR_COLD;
+
+	void irobot_clearirq_w(uint8_t data);
+	void irobot_clearfirq_w(uint8_t data);
+	uint8_t irobot_sharedmem_r(offs_t offset);
+	void irobot_sharedmem_w(offs_t offset, uint8_t data);
+	void irobot_statwr_w(uint8_t data);
+	void irobot_out0_w(uint8_t data);
+	void irobot_rom_banksel_w(uint8_t data);
+	uint8_t irobot_status_r();
+	void irobot_paletteram_w(offs_t offset, uint8_t data);
+	uint8_t quad_pokeyn_r(offs_t offset);
+	void quad_pokeyn_w(offs_t offset, uint8_t data);
+
+	void irobot_palette(palette_device &palette) const;
+	uint32_t screen_update_irobot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(scanline_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(irobot_irvg_done_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(irobot_irmb_done_callback);
+	void irobot_poly_clear(uint8_t *bitmap_base);
+	void irobot_poly_clear();
+	void draw_line(uint8_t *polybitmap, int x1, int y1, int x2, int y2, int col);
+	void irobot_run_video();
+
+	uint32_t irmb_din(const irmb_ops *curop);
+	void irmb_dout(const irmb_ops *curop, uint32_t d);
+	void load_oproms();
+	void irmb_run();
 };
 
 #endif // MAME_ATARI_IROBOT_H

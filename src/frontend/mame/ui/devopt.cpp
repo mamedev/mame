@@ -18,6 +18,7 @@
 #include "util/unicode.h"
 
 #include <locale>
+#include <sstream>
 
 
 namespace ui {
@@ -235,11 +236,13 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 
 		int input = 0, input_mj = 0, input_hana = 0, input_gamble = 0, input_analog = 0, input_adjust = 0;
 		int input_keypad = 0, input_keyboard = 0, dips = 0, confs = 0;
-		std::string errors;
 		std::ostringstream dips_opt, confs_opt;
 		ioport_list portlist;
-		for (device_t &iptdev : device_enumerator(*dev))
-			portlist.append(iptdev, errors);
+		{
+			std::ostringstream errors;
+			for (device_t &iptdev : device_enumerator(*dev))
+				portlist.append(iptdev, errors);
+		}
 
 		// check if the device adds inputs to the system
 		for (auto &port : portlist)

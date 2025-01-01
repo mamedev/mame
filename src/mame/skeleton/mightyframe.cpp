@@ -55,4 +55,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1985?, mightyframe, 0, 0, mightyframe, mightyframe, mightyframe_state, empty_init, "Convergent Technologies", "Mightyframe", MACHINE_IS_SKELETON )
+COMP( 1985?, mightyframe, 0, 0, mightyframe, mightyframe, mightyframe_state, empty_init, "Convergent Technologies", "Mightyframe", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -141,8 +141,8 @@ TODO:
 
 /* macros for CC -- CC bits affected should be reset before calling */
 #define SET_Z(a)        if(!(a))SEZ
-#define SET_Z8(a)       SET_Z((u8)(a))
-#define SET_Z16(a)      SET_Z((u16)(a))
+#define SET_Z8(a)       SET_Z(u8(a))
+#define SET_Z16(a)      SET_Z(u16(a))
 #define SET_N8(a)       CC|=(((a)&0x80)>>4)
 #define SET_N16(a)      CC|=(((a)&0x8000)>>12)
 #define SET_H(a,b,r)    CC|=((((a)^(b)^(r))&0x10)<<1)
@@ -202,7 +202,7 @@ const u8 m6800_cpu_device::flags8d[256]= /* decrement */
 #define SET_FLAGS16(a,b,r)  {SET_N16(r);SET_Z16(r);SET_V16(a,b,r);SET_C16(r);}
 
 /* for treating an u8 as a signed s16 */
-#define SIGNED(b) ((s16)(b&0x80?b|0xff00:b))
+#define SIGNED(b) (s16(b&0x80?b|0xff00:b))
 
 /* Macros for addressing modes */
 #define DIRECT IMMBYTE(EAD)
@@ -245,9 +245,9 @@ const u8 m6800_cpu_device::flags8d[256]= /* decrement */
 /* include the opcode functions */
 #include "6800ops.hxx"
 
-/* Note: don't use 0 cycles here for invalid opcodes so that we don't */
-/* hang in an infinite loop if we hit one */
-#define XX 4 // invalid opcode unknown cc
+// to prevent the possibility of MAME locking up, don't use 0 cycles here
+#define XX 4 // illegal opcode unknown cycle count
+
 const u8 m6800_cpu_device::cycles_6800[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
@@ -272,7 +272,7 @@ const u8 m6800_cpu_device::cycles_6800[256] =
 const u8 m6800_cpu_device::cycles_nsc8105[256] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
-	/*0*/  5,XX, 2,XX,XX, 2,XX, 2, 4, 2, 4, 2, 2, 2, 2, 2,
+	/*0*/ XX,XX, 2,XX,XX, 2,XX, 2, 4, 2, 4, 2, 2, 2, 2, 2,
 	/*1*/  2,XX, 2,XX,XX, 2,XX, 2,XX,XX, 2, 2,XX,XX,XX,XX,
 	/*2*/  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
 	/*3*/  4, 4, 4, 4, 4, 4, 4, 4,XX,XX, 5,10,XX, 9,XX,12,
@@ -283,13 +283,14 @@ const u8 m6800_cpu_device::cycles_nsc8105[256] =
 	/*8*/  2,XX,XX, 2, 2, 2,XX, 2, 2, 2, 2,XX, 2,XX, 2, 2,
 	/*9*/  2,XX,XX, 2, 2, 2,XX, 2, 2, 2, 2,XX, 2,XX, 2, 2,
 	/*A*/  7,XX,XX, 7, 7, 7,XX, 7, 7, 7, 7,XX, 7, 4, 7, 7,
-	/*B*/  6,XX,XX, 6, 6, 6,XX, 6, 6, 6, 6, 5, 6, 3, 6, 6,
+	/*B*/  6,XX, 6, 6, 6, 6,XX, 6, 6, 6, 6, 6, 6, 3, 6, 6,
 	/*C*/  2, 2, 2,XX, 2, 2, 2, 3, 2, 2, 2, 2,XX, 3,XX, 4,
 	/*D*/  3, 3, 3,XX, 3, 3, 3, 4, 3, 3, 3, 3,XX, 4,XX, 5,
 	/*E*/  5, 5, 5,XX, 5, 5, 5, 6, 5, 5, 5, 5, 5, 6,XX, 7,
 	/*F*/  4, 4, 4,XX, 4, 4, 4, 5, 4, 4, 4, 4, 4, 5,XX, 6
 };
-#undef XX // /invalid opcode unknown cc
+
+#undef XX // /illegal opcode unknown cc
 
 
 const m6800_cpu_device::op_func m6800_cpu_device::m6800_insn[0x100] = {
@@ -612,6 +613,7 @@ void m6800_cpu_device::execute_run()
 	{
 		if (m_wai_state & (M6800_WAI | M6800_SLP))
 		{
+			debugger_wait_hook();
 			eat_cycles();
 		}
 		else

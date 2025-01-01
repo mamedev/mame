@@ -889,6 +889,7 @@ void lua_engine::initialize()
 	// TODO: stuff below here needs to be rationalised
 	emu["app_name"] = &emulator_info::get_appname_lower;
 	emu["app_version"] = &emulator_info::get_bare_build_version;
+	emu["app_build"] = &emulator_info::get_build_version;
 	emu["gamename"] = [this] () { return machine().system().type.fullname(); };
 	emu["romname"] = [this] () { return machine().basename(); };
 	emu["softname"] = [this] () { return machine().options().software_name(); };
@@ -1461,6 +1462,19 @@ void lua_engine::initialize()
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
 	machine_type["slots"] = sol::property([](running_machine &m) { return devenum<slot_interface_enumerator>(m.root_device()); });
+	machine_type["phase"] = sol::property(
+			[] (running_machine const &m) -> char const *
+			{
+				switch (m.phase())
+				{
+				case machine_phase::PREINIT:    return "preinit";
+				case machine_phase::INIT:       return "init";
+				case machine_phase::RESET:      return "reset";
+				case machine_phase::RUNNING:    return "running";
+				case machine_phase::EXIT:       return "exit";
+				}
+				return nullptr;
+			});
 
 
 	auto game_driver_type = sol().registry().new_usertype<game_driver>("game_driver", sol::no_constructor);
@@ -2092,6 +2106,7 @@ void lua_engine::initialize()
 	ui_type["options"] = sol::property([] (mame_ui_manager &m) { return static_cast<core_options *>(&m.options()); });
 	ui_type["line_height"] = sol::property([] (mame_ui_manager &m) { return m.get_line_height(); });
 	ui_type["menu_active"] = sol::property(&mame_ui_manager::is_menu_active);
+	ui_type["show_menu"] = &mame_ui_manager::show_menu;
 	ui_type["ui_active"] = sol::property(&mame_ui_manager::ui_active, &mame_ui_manager::set_ui_active);
 	ui_type["single_step"] = sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step);
 	ui_type["show_fps"] = sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps);

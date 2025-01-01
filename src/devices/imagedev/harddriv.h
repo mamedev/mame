@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_HARDDRIV_H
-#define MAME_DEVICES_IMAGEDEV_HARDDRIV_H
+#ifndef MAME_IMAGEDEV_HARDDRIV_H
+#define MAME_IMAGEDEV_HARDDRIV_H
 
 #include "softlist_dev.h"
 
@@ -111,4 +111,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(HARDDISK, harddisk_image_device)
 
-#endif // MAME_DEVICES_IMAGEDEV_HARDDRIV_H
+#endif // MAME_IMAGEDEV_HARDDRIV_H

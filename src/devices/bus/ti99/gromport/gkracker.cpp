@@ -424,28 +424,28 @@ void ti99_gkracker_device::device_add_mconfig(machine_config &config)
 
 INPUT_PORTS_START(gkracker)
 	PORT_START( GKSWITCH1_TAG )
-	PORT_DIPNAME( 0x01, 0x01, "GK switch 1" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti99_gkracker_device, gk_changed, 1)
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 1" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ti99_gkracker_device::gk_changed), 1)
 		PORT_DIPSETTING(    0x00, "GK Off" )
 		PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 
 	PORT_START( GKSWITCH2_TAG )
-	PORT_DIPNAME( 0x01, 0x01, "GK switch 2" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti99_gkracker_device, gk_changed, 2)
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 2" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ti99_gkracker_device::gk_changed), 2)
 		PORT_DIPSETTING(    0x00, "GRAM 0" )
 		PORT_DIPSETTING(    0x01, "Op Sys" )
 
 	PORT_START( GKSWITCH3_TAG )
-	PORT_DIPNAME( 0x01, 0x01, "GK switch 3" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti99_gkracker_device, gk_changed, 3)
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 3" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ti99_gkracker_device::gk_changed), 3)
 		PORT_DIPSETTING(    0x00, "GRAM 1-2" )
 		PORT_DIPSETTING(    0x01, "TI BASIC" )
 
 	PORT_START( GKSWITCH4_TAG )
-	PORT_DIPNAME( 0x03, 0x01, "GK switch 4" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti99_gkracker_device, gk_changed, 4)
+	PORT_DIPNAME( 0x03, 0x01, "GK switch 4" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ti99_gkracker_device::gk_changed), 4)
 		PORT_DIPSETTING(    0x00, "Bank 1" )
 		PORT_DIPSETTING(    0x01, "W/P" )
 		PORT_DIPSETTING(    0x02, "Bank 2" )
 
 	PORT_START( GKSWITCH5_TAG )
-	PORT_DIPNAME( 0x01, 0x00, "GK switch 5" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti99_gkracker_device, gk_changed, 5)
+	PORT_DIPNAME( 0x01, 0x00, "GK switch 5" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ti99_gkracker_device::gk_changed), 5)
 		PORT_DIPSETTING(    0x00, "Loader On" )
 		PORT_DIPSETTING(    0x01, "Loader Off" )
 INPUT_PORTS_END

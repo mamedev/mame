@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license: GPL-2.0+
+// copyright-holders: Dirk Best
 /***************************************************************************
 
     Commodore A2065
@@ -11,27 +11,29 @@
 #include "emu.h"
 #include "a2065.h"
 
-
-//**************************************************************************
-//  CONSTANTS / MACROS
-//**************************************************************************
-
 #define VERBOSE 1
 #include "logmacro.h"
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(ZORRO_A2065, bus::amiga::zorro::a2065_device, "zorro_a2065", "CBM A2065 Ethernet Card")
 
-
 namespace bus::amiga::zorro {
 
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
+a2065_device::a2065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ZORRO_A2065, tag, owner, clock),
+	device_zorro2_card_interface(mconfig, *this),
+	m_lance(*this, "lance")
+{
+}
+
+
+//**************************************************************************
+//  MACHINE DEFINITIONS
+//**************************************************************************
 
 void a2065_device::device_add_mconfig(machine_config &config)
 {
@@ -43,23 +45,8 @@ void a2065_device::device_add_mconfig(machine_config &config)
 
 
 //**************************************************************************
-//  LIVE DEVICE
+//  MACHINE EMULATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  a2065_device - constructor
-//-------------------------------------------------
-
-a2065_device::a2065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ZORRO_A2065, tag, owner, clock),
-	device_zorro2_card_interface(mconfig, *this),
-	m_lance(*this, "lance")
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
 void a2065_device::device_start()
 {
@@ -69,67 +56,6 @@ void a2065_device::device_start()
 
 	// register for save states
 	save_pointer(NAME(m_ram), 0x4000);
-}
-
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
-void a2065_device::autoconfig_base_address(offs_t address)
-{
-	LOG("%s: autoconfig_base_address received: 0x%06x\n", shortname(), address);
-	LOG("-> installing a2065\n");
-
-	// stop responding to default autoconfig
-	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
-
-	// install autoconfig handler to new location
-	m_slot->space().install_readwrite_handler(address, address + 0x7f,
-			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
-
-	// install access to lance registers
-	m_slot->space().install_read_handler(address + 0x4000, address + 0x4003,
-			read16m_delegate(*m_lance, FUNC(am7990_device::regs_r)), 0xffff);
-	m_slot->space().install_write_handler(address + 0x4000, address + 0x4003,
-			write16sm_delegate(*m_lance, FUNC(am7990_device::regs_w)), 0xffff);
-
-	// install access to onboard ram (32k)
-	m_slot->space().install_read_handler(address + 0x8000, address + 0x8000 + 0x7fff,
-			read16sm_delegate(*this, FUNC(a2065_device::host_ram_r)), 0xffff);
-	m_slot->space().install_write_handler(address + 0x8000, address + 0x8000 + 0x7fff,
-			write16s_delegate(*this, FUNC(a2065_device::host_ram_w)), 0xffff);
-
-	// we're done
-	m_slot->cfgout_w(0);
-}
-
-void a2065_device::cfgin_w(int state)
-{
-	LOG("%s: configin_w (%d)\n", shortname(), state);
-
-	if (state == 0)
-	{
-		// setup autoconfig
-		autoconfig_board_type(BOARD_TYPE_ZORRO2);
-		autoconfig_board_size(BOARD_SIZE_64K);
-
-		autoconfig_product(0x70);
-		autoconfig_manufacturer(0x0202);
-		autoconfig_serial(0x00123456); // last 3 bytes = last 3 bytes of mac address
-
-		autoconfig_link_into_memory(false);
-		autoconfig_rom_vector_valid(false);
-		autoconfig_multi_device(false);
-		autoconfig_8meg_preferred(false);
-		autoconfig_can_shutup(true); // ?
-
-		// install autoconfig handler
-		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
-				read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-				write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
-	}
 }
 
 uint16_t a2065_device::host_ram_r(offs_t offset)
@@ -162,6 +88,67 @@ void a2065_device::lance_irq_w(int state)
 {
 	// default is irq 2, can be changed via jumper
 	m_slot->int2_w(!state);
+}
+
+
+//**************************************************************************
+//  AUTOCONFIG
+//**************************************************************************
+
+void a2065_device::autoconfig_base_address(offs_t address)
+{
+	LOG("%s: autoconfig_base_address received: 0x%06x\n", shortname(), address);
+	LOG("-> installing a2065\n");
+
+	// stop responding to default autoconfig
+	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
+
+	// install autoconfig handler to new location
+	m_slot->space().install_readwrite_handler(address, address + 0x7f,
+			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffffffff);
+
+	// install access to lance registers
+	m_slot->space().install_read_handler(address + 0x4000, address + 0x4003,
+			read16m_delegate(*m_lance, FUNC(am7990_device::regs_r)), 0xffffffff);
+	m_slot->space().install_write_handler(address + 0x4000, address + 0x4003,
+			write16sm_delegate(*m_lance, FUNC(am7990_device::regs_w)), 0xffffffff);
+
+	// install access to onboard ram (32k)
+	m_slot->space().install_read_handler(address + 0x8000, address + 0x8000 + 0x7fff,
+			read16sm_delegate(*this, FUNC(a2065_device::host_ram_r)), 0xffffffff);
+	m_slot->space().install_write_handler(address + 0x8000, address + 0x8000 + 0x7fff,
+			write16s_delegate(*this, FUNC(a2065_device::host_ram_w)), 0xffffffff);
+
+	// we're done
+	m_slot->cfgout_w(0);
+}
+
+void a2065_device::cfgin_w(int state)
+{
+	LOG("%s: configin_w (%d)\n", shortname(), state);
+
+	if (state == 0)
+	{
+		// setup autoconfig
+		autoconfig_board_type(BOARD_TYPE_ZORRO2);
+		autoconfig_board_size(BOARD_SIZE_64K);
+
+		autoconfig_product(112);
+		autoconfig_manufacturer(514);
+		autoconfig_serial(0x00123456); // last 3 bytes = last 3 bytes of mac address
+
+		autoconfig_link_into_memory(false);
+		autoconfig_rom_vector_valid(false);
+		autoconfig_multi_device(false);
+		autoconfig_8meg_preferred(false);
+		autoconfig_can_shutup(true); // ?
+
+		// install autoconfig handler
+		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
+				read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
+				write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffffffff);
+	}
 }
 
 } // namespace bus::amiga::zorro

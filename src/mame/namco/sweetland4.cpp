@@ -212,5 +212,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004, sweetld4,  0, sweetland4, sweetld4, sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 Bright (ver 2004.9.29)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 2000, tairyodk,  0, tairyodk,   tairyodk, sweetland4_state, empty_init, ROT0, "Namco", "Tairyo-Daiko 337 Byoshi",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2004, sweetld4,  0, sweetland4, sweetld4, sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 Bright (ver 2004.9.29)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2000, tairyodk,  0, tairyodk,   tairyodk, sweetland4_state, empty_init, ROT0, "Namco", "Tairyo-Daiko 337 Byoshi",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

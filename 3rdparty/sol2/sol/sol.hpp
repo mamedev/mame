@@ -6747,12 +6747,9 @@ namespace sol {
 		/// one.
 		///
 		/// \group emplace
-		template <class... Args>
-		T& emplace(Args&&... args) noexcept {
-			static_assert(std::is_constructible<T, Args&&...>::value, "T must be constructible with Args");
-
-			*this = nullopt;
-			this->construct(std::forward<Args>(args)...);
+		T& emplace(T& arg) noexcept {
+			m_value = &arg;
+			return **this;
 		}
 
 		/// Swaps this optional with the other.

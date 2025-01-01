@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_UNIVERSAL_LADYBUG_H
-#define MAME_UNIVERSAL_LADYBUG_H
+#ifndef MAME_UNIVERSAL_LADYBUG_VIDEO_H
+#define MAME_UNIVERSAL_LADYBUG_VIDEO_H
 
 #pragma once
 
@@ -41,4 +41,4 @@ private:
 
 DECLARE_DEVICE_TYPE(LADYBUG_VIDEO, ladybug_video_device)
 
-#endif // MAME_UNIVERSAL_LADYBUG_H
+#endif // MAME_UNIVERSAL_LADYBUG_VIDEO_H

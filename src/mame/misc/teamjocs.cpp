@@ -83,4 +83,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(199?, diaelite, 0, teamjocs, teamjocs, teamjocs_state, empty_init, ROT0, "Recreativos Presas", "Diana Elite", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, diaelite, 0, teamjocs, teamjocs, teamjocs_state, empty_init, ROT0, "Recreativos Presas", "Diana Elite", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

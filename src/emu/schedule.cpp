@@ -473,7 +473,7 @@ void device_scheduler::timeslice()
 
 					// update the local time for this CPU
 					attotime deltatime;
-					if (ran < exec->m_cycles_per_second)
+					if (EXPECTED(ran < exec->m_cycles_per_second))
 						deltatime = attotime(0, exec->m_attoseconds_per_cycle * ran);
 					else
 					{

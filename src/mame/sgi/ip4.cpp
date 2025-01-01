@@ -3,6 +3,11 @@
 
 /*
  * Silicon Graphics Professional IRIS 4D/50 and 4D/70 CPU board.
+ *
+ * WIP:
+ *  setenv root dks0d1s0
+ *  setenv bootfile dksc(0,1,8)sash
+ *  auto
  */
 
 #include "emu.h"
@@ -137,9 +142,7 @@ void sgi_ip4_device::map(address_map &map)
 		NAME([this](offs_t offset) { return m_duart[BIT(offset, 0, 2)]->read(offset >> 2); }),
 		NAME([this](offs_t offset, u8 data) { m_duart[BIT(offset, 0, 2)]->write(offset >> 2, data); }));
 
-	map(0x1fbc'0000, 0x1fbc'1fff).umask32(0xff00'0000).lrw8(
-		NAME([this](offs_t offset) { return m_nvram[offset]; }),
-		NAME([this](offs_t offset, u8 data) { m_nvram[offset] = data; }));
+	map(0x1fbc'0000, 0x1fbc'1fff).umask32(0xff00'0000).rw(FUNC(sgi_ip4_device::nvram_r), FUNC(sgi_ip4_device::nvram_w));
 
 	map(0x1fc0'0000, 0x1fc3'ffff).rom().region("boot", 0);
 }
@@ -279,23 +282,17 @@ void sgi_ip4_device::device_add_mconfig(machine_config &config)
 	SAA1099(config, m_saa, 8_MHz_XTAL);
 	m_saa->add_route(0, "lspeaker", 0.5);
 	m_saa->add_route(1, "rspeaker", 0.5);
-}
 
-void sgi_ip4_device::device_config_complete()
-{
-	if (owner() && owner()->owner())
-	{
 	// TODO: ACFAIL -> vme_irq<0>
-	device_vme_card_interface::vme_irq<1>().append(*this, FUNC(sgi_ip4_device::vme_irq<1>));
-	device_vme_card_interface::vme_irq<2>().append(*this, FUNC(sgi_ip4_device::vme_irq<2>));
-	device_vme_card_interface::vme_irq<3>().append(*this, FUNC(sgi_ip4_device::vme_irq<3>));
-	device_vme_card_interface::vme_irq<4>().append(*this, FUNC(sgi_ip4_device::vme_irq<4>));
-	device_vme_card_interface::vme_irq<5>().append(*this, FUNC(sgi_ip4_device::vme_irq<5>));
-	device_vme_card_interface::vme_irq<6>().append(*this, FUNC(sgi_ip4_device::vme_irq<6>));
-	device_vme_card_interface::vme_irq<7>().append(*this, FUNC(sgi_ip4_device::vme_irq<7>));
+	device_vme_card_interface::vme_irq<1>().set(*this, FUNC(sgi_ip4_device::vme_irq<1>));
+	device_vme_card_interface::vme_irq<2>().set(*this, FUNC(sgi_ip4_device::vme_irq<2>));
+	device_vme_card_interface::vme_irq<3>().set(*this, FUNC(sgi_ip4_device::vme_irq<3>));
+	device_vme_card_interface::vme_irq<4>().set(*this, FUNC(sgi_ip4_device::vme_irq<4>));
+	device_vme_card_interface::vme_irq<5>().set(*this, FUNC(sgi_ip4_device::vme_irq<5>));
+	device_vme_card_interface::vme_irq<6>().set(*this, FUNC(sgi_ip4_device::vme_irq<6>));
+	device_vme_card_interface::vme_irq<7>().set(*this, FUNC(sgi_ip4_device::vme_irq<7>));
 
 	vme_berr().set_inputline(m_cpu, INPUT_LINE_IRQ5).invert();
-	}
 }
 
 void sgi_ip4_device::device_start()
@@ -323,26 +320,6 @@ void sgi_ip4_device::device_start()
 
 	m_lio_irq = false;
 	m_vme_irq = false;
-
-	// install phantom rtc with a memory tap
-	m_cpu->space(AS_PROGRAM).install_readwrite_tap(0x1fbc'1ffc, 0x1fbc'1fff, "rtc",
-		[this](offs_t offset, u32 &data, u32 mem_mask)
-		{
-			if (m_rtc->chip_enable())
-				data = u32(m_rtc->read_data()) << 24;
-		},
-		[this](offs_t offset, u32 &data, u32 mem_mask)
-		{
-			if (!m_rtc->chip_enable())
-			{
-				if (data)
-					m_rtc->read_1();
-				else
-					m_rtc->read_0();
-			}
-			else
-				m_rtc->write_data(data >> 24);
-		});
 
 	m_parity_bad = 0;
 }
@@ -407,7 +384,7 @@ void sgi_ip4_device::scsi_drq(int state)
 
 void sgi_ip4_device::cpucfg_w(u16 data)
 {
-	LOG("cpucfg_w 0x%04x\n", data);
+	//LOG("cpucfg_w 0x%04x (%s)\n", data, machine().describe_context());
 
 	// update leds
 	for (unsigned i = 0; i < 5; i++)
@@ -530,13 +507,51 @@ void sgi_ip4_device::mailbox_w(offs_t offset, u8 data)
 	}
 }
 
+u8 sgi_ip4_device::nvram_r(offs_t offset)
+{
+	if (offset == 0x7ff && !machine().side_effects_disabled())
+	{
+		if (m_rtc->chip_enable())
+			m_rtc->read_data();
+		else
+			return m_rtc->read_data();
+	}
+
+	return m_nvram[offset];
+}
+
+void sgi_ip4_device::nvram_w(offs_t offset, u8 data)
+{
+	if (offset != 0x7ff || !m_rtc->chip_enable())
+		m_nvram[offset] = data;
+
+	if (offset == 0x7ff)
+	{
+		if (!m_rtc->chip_enable())
+		{
+			if (data)
+				m_rtc->read_1();
+			else
+				m_rtc->read_0();
+		}
+		else
+			m_rtc->write_data(data);
+	}
+}
+
 ROM_START(ip4)
 	ROM_REGION32_BE(0x40000, "boot", 0)
-	ROM_SYSTEM_BIOS(0, "4d1v3", "Version 4D1-3.0 PROM IP4 Mon Jan  4 20:29:51 PST 1988 SGI")
+	ROM_SYSTEM_BIOS(0, "4d1v30", "Version 4D1-3.0 PROM IP4 Mon Jan  4 20:29:51 PST 1988 SGI")
 	ROMX_LOAD("070-0093-009.bin", 0x000000, 0x010000, CRC(261b0a4c) SHA1(59f73d0e022a502dc5528289e388700b51b308da), ROM_BIOS(0) | ROM_SKIP(3))
 	ROMX_LOAD("070-0094-009.bin", 0x000001, 0x010000, CRC(8c05f591) SHA1(d4f86ad274f9dfe10c38551f3b6b9ba73570747f), ROM_BIOS(0) | ROM_SKIP(3))
 	ROMX_LOAD("070-0095-009.bin", 0x000002, 0x010000, CRC(2dacfcb7) SHA1(0149274a11d61e3ada0f7b055e79d884a65481d3), ROM_BIOS(0) | ROM_SKIP(3))
 	ROMX_LOAD("070-0096-009.bin", 0x000003, 0x010000, CRC(72dd0246) SHA1(6df99bdf7afaded8ef68a9644dd06ca69a996db0), ROM_BIOS(0) | ROM_SKIP(3))
+
+	ROM_SYSTEM_BIOS(1, "4d1v31", "Version 4D1-3.1 PROM IP4 OPT Thu Dec  8 16:12:10 PST 1988 SGI")
+	ROMX_LOAD("070-0093-010.bin", 0x000000, 0x010000, CRC(f46871bf) SHA1(bda07b083dbb350d90a9145539c389180c800fb4), ROM_BIOS(1) | ROM_SKIP(3))
+	ROMX_LOAD("070-0094-010.bin", 0x000001, 0x010000, CRC(7b183793) SHA1(b5471a990f755333378f77e7a4d1102479ccfdc1), ROM_BIOS(1) | ROM_SKIP(3))
+	ROMX_LOAD("070-0095-010.bin", 0x000002, 0x010000, CRC(af2a2f0b) SHA1(beda300a5b1633f7682fdf3b8b0650bfea253567), ROM_BIOS(1) | ROM_SKIP(3))
+	ROMX_LOAD("070-0096-010.bin", 0x000003, 0x010000, CRC(eaa2bdc3) SHA1(8f1f37ec8875f36b45d335412ae1c298af84f20f), ROM_BIOS(1) | ROM_SKIP(3))
 
 	ROM_REGION32_BE(0x20, "idprom", 0)
 	ROM_LOAD("idprom.bin", 0, 0x20, NO_DUMP)

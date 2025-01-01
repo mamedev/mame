@@ -19,19 +19,8 @@
 #include "emu.h"
 #include "namco_c169roz.h"
 
-static const gfx_layout layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP16(0,8) },
-	{ STEP16(0,8*16) },
-	16*128
-};
-
 GFXDECODE_START( namco_c169roz_device::gfxinfo )
-	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout, 0, 32 )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, gfx_16x16x8_raw, 0, 32 )
 GFXDECODE_END
 
 DEFINE_DEVICE_TYPE(NAMCO_C169ROZ, namco_c169roz_device, "namco_c169roz", "Namco C169 (ROZ)")
@@ -76,13 +65,13 @@ void namco_c169roz_device::mark_all_dirty()
 
 /**
  * Graphics ROM addressing varies across games.
- * (mostly scrambling, which could be handled in the game inits, but NB1 also has banking)
+ * (mostly scrambling, which could be handled in the game inits, but NB2 also has banking)
  */
 template<int Which>
 TILE_GET_INFO_MEMBER(namco_c169roz_device::get_info)
 {
 	int tile = 0, mask = 0;
-	m_c169_cb(m_videoram[tile_index&(m_ramsize-1)] & 0x3fff, &tile, &mask, Which); // need to mask with ramsize because the nb1/fl games have twice as much RAM, presumably the tilemaps mirror in ns2?
+	m_c169_cb(m_videoram[tile_index & (m_ramsize - 1)] & 0x3fff, tile, mask, Which); // need to mask with ramsize because the nb1/fl games have twice as much RAM, presumably the tilemaps mirror in ns2?
 
 	tileinfo.mask_data = m_mask + 32 * mask;
 	tileinfo.set(0, tile, 0/*color*/, 0/*flag*/);
@@ -116,20 +105,20 @@ void namco_c169roz_device::unpack_params(const uint16_t *source, roz_parameters 
 
 	temp = source[2];
 	params.left = (temp & 0x7000) >> 3;
-	if (temp & 0x8000) temp |= 0xf000; else temp &= 0x0fff; // sign extend
+	if (BIT(temp, 15)) temp |= 0xf000; else temp &= 0x0fff; // sign extend
 	params.incxx = int16_t(temp);
 
 	temp = source[3];
-	params.top = (temp&0x7000)>>3;
-	if (temp & 0x8000) temp |= 0xf000; else temp &= 0x0fff; // sign extend
+	params.top = (temp & 0x7000) >> 3;
+	if (BIT(temp, 15)) temp |= 0xf000; else temp &= 0x0fff; // sign extend
 	params.incxy = int16_t(temp);
 
 	temp = source[4];
-	if (temp & 0x8000) temp |= 0xf000; else temp &= 0x0fff; // sign extend
+	if (BIT(temp, 15)) temp |= 0xf000; else temp &= 0x0fff; // sign extend
 	params.incyx = int16_t(temp);
 
 	temp = source[5];
-	if (temp & 0x8000) temp |= 0xf000; else temp &= 0x0fff; // sign extend
+	if (BIT(temp, 15)) temp |= 0xf000; else temp &= 0x0fff; // sign extend
 	params.incyy = int16_t(temp);
 
 	params.startx = int16_t(source[6]);
@@ -154,7 +143,7 @@ void namco_c169roz_device::draw_helper(screen_device &screen, bitmap_ind16 &bitm
 	if (!m_is_namcofl)
 //  if (m_gametype != NAMCOFL_FINAL_LAP_R) // Fix speedrcr some title animations, but broke at road scene
 	{
-		uint32_t size_mask = params.size - 1;
+		const uint32_t size_mask = params.size - 1;
 		bitmap_ind16 &srcbitmap = tmap.pixmap();
 		bitmap_ind8 &flagsbitmap = tmap.flagsmap();
 		uint32_t startx = params.startx + clip.min_x * params.incxx + clip.min_y * params.incyx;
@@ -169,8 +158,8 @@ void namco_c169roz_device::draw_helper(screen_device &screen, bitmap_ind16 &bitm
 			uint16_t *dest = &bitmap.pix(sy, sx);
 			while (x <= clip.max_x)
 			{ // TODO : Wraparound disable isn't implemented
-				uint32_t xpos = (((cx >> 16) & size_mask) + params.left) & 0xfff;
-				uint32_t ypos = (((cy >> 16) & size_mask) + params.top) & 0xfff;
+				const uint32_t xpos = (((cx >> 16) & size_mask) + params.left) & 0xfff;
+				const uint32_t ypos = (((cy >> 16) & size_mask) + params.top) & 0xfff;
 				if (flagsbitmap.pix(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
 					*dest = srcbitmap.pix(ypos, xpos) + params.color + m_color_base;
 				cx += params.incxx;
@@ -201,12 +190,12 @@ void namco_c169roz_device::draw_scanline(screen_device &screen, bitmap_ind16 &bi
 {
 	if (line >= cliprect.min_y && line <= cliprect.max_y)
 	{
-		int row = line / 8;
-		int offs = row * 0x100 + (line & 7) * 0x10 + 0xe080;
+		const int row = line >> 3;
+		const int offs = row * 0x100 + (line & 7) * 0x10 + 0xe080;
 		uint16_t *source = &m_videoram[offs / 2];
 
 		// if enabled
-		if ((source[1] & 0x8000) == 0)
+		if (BIT(~source[1], 15))
 		{
 			roz_parameters params;
 			unpack_params(source, params);
@@ -224,16 +213,16 @@ void namco_c169roz_device::draw_scanline(screen_device &screen, bitmap_ind16 &bi
 
 void namco_c169roz_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
-	int special = (m_is_namcofl) ? 0 : 1;
-	int mode = m_control[0]; // 0x8000 or 0x1000
+	const int special = (m_is_namcofl) ? 0 : 1;
+	const int mode = m_control[0]; // 0x8000 or 0x1000
 
 	for (int which = 1; which >= 0; which--)
 	{
 		const uint16_t *source = &m_control[which * 8];
-		uint16_t attrs = source[1];
+		const uint16_t attrs = source[1];
 
 		// if enabled
-		if ((attrs & 0x8000) == 0)
+		if (BIT(~attrs, 15))
 		{
 			// second ROZ layer is configured to use per-scanline registers
 			if (which == special && mode == 0x8000)

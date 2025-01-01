@@ -633,7 +633,6 @@ void dday_state::dday(machine_config &config)
 	Z80(config, m_maincpu, 2'000'000);     // 2 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &dday_state::program_map);
 
-
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

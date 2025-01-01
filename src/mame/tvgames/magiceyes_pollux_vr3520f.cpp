@@ -121,4 +121,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2008, didj,      0,       0,      leapfrog_didj, leapfrog_didj, magiceyes_vr3520f_game_state, empty_init, "LeapFrog", "Didj", MACHINE_IS_SKELETON )
+CONS( 2008, didj,      0,       0,      leapfrog_didj, leapfrog_didj, magiceyes_vr3520f_game_state, empty_init, "LeapFrog", "Didj", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

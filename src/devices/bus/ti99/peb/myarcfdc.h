@@ -9,8 +9,8 @@
 
 *****************************************************************************/
 
-#ifndef MAME_BUS_TI99_PEB_DDCC_H
-#define MAME_BUS_TI99_PEB_DDCC_H
+#ifndef MAME_BUS_TI99_PEB_MYARCFDC_H
+#define MAME_BUS_TI99_PEB_MYARCFDC_H
 
 #pragma once
 
@@ -134,4 +134,4 @@ private:
 DECLARE_DEVICE_TYPE_NS(TI99_DDCC1, bus::ti99::peb, myarc_fdc_device)
 DECLARE_DEVICE_TYPE_NS(DDCC1_PAL, bus::ti99::peb, ddcc1_pal_device)
 
-#endif // MAME_BUS_TI99_PEB_DDCC_H
+#endif // MAME_BUS_TI99_PEB_MYARCFDC_H

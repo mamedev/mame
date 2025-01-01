@@ -15,7 +15,7 @@
         * VR4310 CPU (similar to the N64's VR4300)
         * VR4373 "Nile 3" system controller / PCI bridge
         * CMD 646U2 Ultra DMA IDE controller
-        * M4T28-8R128H1 TimeKeeper RTC/CMOS
+        * M4T28-BR128H1 TimeKeeper RTC/CMOS
         * PLX PCI9050 Bus Target Interface Chip (interfaces ISA-style designs to PCI)
         * Midway ZeusII-series custom video
         * Actiontec PM560LKI PCI Data/Fax Modem (PCI\VEN_11C1&DEV_0480&SUBSYS_04801668)
@@ -363,7 +363,6 @@ uint8_t atlantis_state::cmos_r(offs_t offset)
 
 void atlantis_state::cmos_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	system_time systime;
 	// User I/O 0 = Allow write to cmos[0]. Serial Write Enable?
 	if (offset == 0 && (m_user_io_state & 0x1)) {
 		// Data written is shifted by 1 bit each time.  Maybe a serial line output?
@@ -760,7 +759,7 @@ static INPUT_PORTS_START( mwskins )
 	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
-	//PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(atlantis_state, port_mod_r)
+	//PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(atlantis_state::port_mod_r))
 	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("AN.0")

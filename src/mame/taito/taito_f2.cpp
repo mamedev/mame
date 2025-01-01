@@ -5386,6 +5386,8 @@ ROM_START( qcrayon )    /* Quiz Crayon */
 	ROM_REGION( 0x200000, "sprites", 0 )   /* OBJ */
 	ROM_LOAD16_BYTE( "d55-05", 0x000000, 0x100000, CRC(f0e59902) SHA1(44d93e0e9622a98796a128a0273065947f586a1d) )
 	ROM_LOAD16_BYTE( "d55-04", 0x000001, 0x100000, CRC(412975ce) SHA1(32058a87947d6b6cdc8b147ddfcf359792f9c9fc) )
+	// also seen with a single mask ROM containing the same content:
+	//ROM_LOAD( "d55-06", 0x000000, 0x200000, CRC(26db21b3) SHA1(78dab15a585b7180acd170f618947728a2ca022d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "d55-15",  0x00000, 0x10000, CRC(ba782eff) SHA1(ce24654db49b9694e444e93b9a8d529a86729e03) )

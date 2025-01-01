@@ -214,5 +214,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1994, lancelot, 0, lancelot, lancelot, lancelot_state, empty_init, ROT0, "Peyper", "Sir Lancelot", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1994, lancelot, 0, lancelot, lancelot, lancelot_state, empty_init, ROT0, "Peyper", "Sir Lancelot", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 

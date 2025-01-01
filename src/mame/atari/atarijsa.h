@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_ATARI_ATARI_JSA_H
-#define MAME_ATARI_ATARI_JSA_H
+#ifndef MAME_ATARI_ATARIJSA_H
+#define MAME_ATARI_ATARIJSA_H
 
 #pragma once
 
@@ -36,10 +36,10 @@ DECLARE_DEVICE_TYPE(ATARI_JSA_IIIS, atari_jsa_iiis_device)
 //**************************************************************************
 
 #define PORT_ATARI_JSA_SOUND_TO_MAIN_READY(_tag) \
-	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_jsa_base_device, sound_to_main_ready)
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, FUNC(atari_jsa_base_device::sound_to_main_ready))
 
 #define PORT_ATARI_JSA_MAIN_TO_SOUND_READY(_tag) \
-	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_jsa_base_device, main_to_sound_ready)
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, FUNC(atari_jsa_base_device::main_to_sound_ready))
 
 
 
@@ -264,4 +264,4 @@ protected:
 };
 
 
-#endif // MAME_ATARI_ATARI_JSA_H
+#endif // MAME_ATARI_ATARIJSA_H

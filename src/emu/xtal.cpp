@@ -151,6 +151,7 @@ const double XTAL::known_xtals[] = {
 	  7'987'000, // 7.987_MHz_XTAL         PC9801-86 YM2608 clock
 	  7'995'500, // 7.9955_MHz_XTAL        Used on Electronic Devices Italy Galaxy Gunners sound board
 	  8'000'000, // 8_MHz_XTAL             Extremely common, used on 100's of PCBs
+	  8'053'000, // 8.053_MHz_XTAL         Mad Motor
 	  8'200'000, // 8.2_MHz_XTAL           Universal Mr. Do - Model 8021 PCB
 	  8'388'000, // 8.388_MHz_XTAL         Nintendo Game Boy Color
 	  8'448'000, // 8.448_MHz_XTAL         Banpresto's Note Chance - Used to drive OKI M6295 chips, usually with /8 divider
@@ -398,6 +399,7 @@ const double XTAL::known_xtals[] = {
 	 28'224'000, // 28.224_MHz_XTAL        Roland JD-800
 	 28'322'000, // 28.322_MHz_XTAL        Saitek RISC 2500, Mephisto Montreux
 	 28'375'160, // 28.37516_MHz_XTAL      Amiga PAL systems
+	 28'432'000, // 28.432_MHz_XTAL        Fuuki FG-3J MAIN-J PCB
 	 28'475'000, // 28.475_MHz_XTAL        CoCo 3 PAL
 	 28'480'000, // 28.48_MHz_XTAL         Chromatics CGC-7900
 	 28'636'000, // 28.636_MHz_XTAL        Super Kaneko Nova System
@@ -455,6 +457,7 @@ const double XTAL::known_xtals[] = {
 	 42'105'200, // 42.1052_MHz_XTAL       NEC PC-88xx
 	 42'954'545, // 42.954545_MHz_XTAL     CPS3 (12x NTSC subcarrier)
 	 43'320'000, // 43.32_MHz_XTAL         DEC VT420
+	 44'000'000, // 44_MHz_XTAL            VGame slots
 	 44'100'000, // 44.1_MHz_XTAL          Subsino's Bishou Jan
 	 44'236'800, // 44.2368_MHz_XTAL       ReCo6502, Fortune 32:16
 	 44'452'800, // 44.4528_MHz_XTAL       TeleVideo 965
@@ -484,6 +487,7 @@ const double XTAL::known_xtals[] = {
 	 53'693'175, // 53.693175_MHz_XTAL     PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier)
 	 54'000'000, // 54_MHz_XTAL            Taito JC
 	 55'000'000, // 55_MHz_XTAL            Eolith Vega
+	 56'000'000, // 56_MHz_XTAL            ARM7500 based Belatra slot machines
 	 57'272'727, // 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)
 	 57'283'200, // 57.2832_MHz_XTAL       Macintosh IIci RBV, 15-inch portrait display
 	 58'000'000, // 58_MHz_XTAL            Magic Reel (Play System)

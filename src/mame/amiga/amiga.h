@@ -22,13 +22,15 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "bus/rs232/rs232.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/mos6526.h"
-#include "machine/amigafdc.h"
-#include "machine/amiga_copper.h"
 #include "machine/msm6242.h"
-#include "machine/akiko.h"
 #include "machine/i2cmem.h"
-#include "machine/8364_paula.h"
+
+#include "agnus_copper.h"
+#include "akiko.h"
 #include "amigaaga.h"
+#include "paula.h"
+#include "paulafdc.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -305,8 +307,6 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define INTENA_INTEN    0x4000
 #define INTENA_SETCLR   0x8000
 
-#define MAX_PLANES 6 /* 0 to 6, inclusive ( but we count from 0 to 5 ) */
-
 
 class amiga_state : public driver_device
 {
@@ -407,7 +407,6 @@ public:
 	uint16_t m_copper_waitmask = 0;
 	uint16_t m_copper_pending_offset = 0;
 	uint16_t m_copper_pending_data = 0;
-	int m_wait_offset = 0;
 
 	/* playfield states */
 	int m_last_scanline = 0;
@@ -493,12 +492,15 @@ public:
 	// screen layout
 	enum
 	{
-		SCREEN_WIDTH = 910,
+		// standard htotal is $e3 x 2 -> 908
+		// https://videogameperfection.com/forums/topic/advanced-timing-settings-for-amiga/
+		SCREEN_WIDTH = 908,
 		SCREEN_HEIGHT_PAL = 625,
 		SCREEN_HEIGHT_NTSC = 525,
 		VBLANK_PAL = 58, // 52
 		VBLANK_NTSC = 42,
-		HBLANK = 186
+		// first possible diw is $5c x 2 -> 184
+		HBLANK = 184
 	};
 
 	emu_timer *m_blitter_timer = nullptr;
@@ -583,9 +585,9 @@ protected:
 	required_device<mos8520_device> m_cia_1;
 	optional_device<rs232_port_device> m_rs232;
 	optional_device<centronics_device> m_centronics;
-	required_device<amiga_copper_device> m_copper;
-	required_device<paula_8364_device> m_paula;
-	optional_device<amiga_fdc_device> m_fdc;
+	required_device<agnus_copper_device> m_copper;
+	required_device<paula_device> m_paula;
+	optional_device<paula_fdc_device> m_fdc;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_overlay;

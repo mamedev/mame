@@ -2,15 +2,15 @@
 // copyright-holders:Jonathan Edwards
 /*********************************************************************
 
-    bml3mp1805.h
+    mp1805.h
 
     Hitachi MP-1805 floppy disk controller card for the MB-6890
     Floppy drive is attached
 
 *********************************************************************/
 
-#ifndef MAME_BUS_BML3_BML3MP1805_H
-#define MAME_BUS_BML3_BML3MP1805_H
+#ifndef MAME_BUS_BML3_MP1805_H
+#define MAME_BUS_BML3_MP1805_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(BML3BUS_MP1805, bml3bus_mp1805_device)
 
-#endif // MAME_BUS_BML3_BML3MP1805_H
+#endif // MAME_BUS_BML3_MP1805_H

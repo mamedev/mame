@@ -76,7 +76,7 @@ static INPUT_PORTS_START( mps )
 	PORT_CONFSETTING(0x0f, "1200")
 
 	PORT_START("CTS_ROUTE")
-	PORT_CONFNAME(1, 0, "CTS route") PORT_CHANGED_MEMBER(DEVICE_SELF, ss50_mps_device, cts_route_change, 0)
+	PORT_CONFNAME(1, 0, "CTS route") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ss50_mps_device::cts_route_change), 0)
 	PORT_CONFSETTING(0, "Wired low (standard)")
 	PORT_CONFSETTING(1, "Connected through (modified)")
 

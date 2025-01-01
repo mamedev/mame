@@ -162,20 +162,20 @@ void _1942p_state::video_start()
 
 ***************************************************************************/
 
-void _1942_state::_1942_fgvideoram_w(offs_t offset, uint8_t data)
+void _1942_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-void _1942_state::_1942_bgvideoram_w(offs_t offset, uint8_t data)
+void _1942_state::bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty((offset & 0x0f) | ((offset >> 1) & 0x01f0));
 }
 
 
-void _1942_state::_1942_palette_bank_w(uint8_t data)
+void _1942_state::palette_bank_w(uint8_t data)
 {
 	if (m_palette_bank != data)
 	{
@@ -184,14 +184,14 @@ void _1942_state::_1942_palette_bank_w(uint8_t data)
 	}
 }
 
-void _1942_state::_1942_scroll_w(offs_t offset, uint8_t data)
+void _1942_state::scroll_w(offs_t offset, uint8_t data)
 {
 	m_scroll[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll[0] | (m_scroll[1] << 8));
 }
 
 
-void _1942_state::_1942_c804_w(uint8_t data)
+void _1942_state::control_w(uint8_t data)
 {
 	/* bit 7: flip screen
 	   bit 4: cpu B reset
@@ -331,5 +331,4 @@ void _1942p_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, col, flip_screen(), flip_screen(), sx+128, sy+6, 15);
 	}
-
 }

@@ -110,4 +110,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2010, leapexpr,     0,       0,      leapfrog_leapster_explorer, leapfrog_leapster_explorer, leapfrog_leapster_explorer_state, empty_init, "LeapFrog", "Leapster Explorer",   MACHINE_IS_SKELETON )
+CONS( 2010, leapexpr,     0,       0,      leapfrog_leapster_explorer, leapfrog_leapster_explorer, leapfrog_leapster_explorer_state, empty_init, "LeapFrog", "Leapster Explorer",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

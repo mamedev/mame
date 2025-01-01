@@ -39,8 +39,6 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	virtual void set_current_time(const system_time &systime) override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

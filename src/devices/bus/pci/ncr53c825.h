@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-#ifndef MAME_BUS_PCI_NCR53C825_PCI_H
-#define MAME_BUS_PCI_NCR53C825_PCI_H
+#ifndef MAME_BUS_PCI_NCR53C825_H
+#define MAME_BUS_PCI_NCR53C825_H
 
 #pragma once
 
@@ -36,4 +36,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NCR53C825_PCI, ncr53c825_pci_device)
 
-#endif // MAME_BUS_PCI_NCR53C825_PCI_H
+#endif // MAME_BUS_PCI_NCR53C825_H

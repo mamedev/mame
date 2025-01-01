@@ -6,8 +6,8 @@
 //void saturn_SMPC_w(offs_t offset, uint8_t data);
 //uint8_t saturn_SMPC_r(offs_t offset);
 
-#ifndef MAME_MACHINE_SMPC_HLE_H
-#define MAME_MACHINE_SMPC_HLE_H
+#ifndef MAME_MACHINE_SMPC_H
+#define MAME_MACHINE_SMPC_H
 
 #pragma once
 
@@ -199,12 +199,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device)
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
-#endif // MAME_MACHINE_SMPC_HLE_H
-
+#endif // MAME_MACHINE_SMPC_H

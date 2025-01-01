@@ -19,7 +19,6 @@ public:
 	// construction/destruction
 	stfight_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-
 	void stfight_text_char_w(offs_t offset, uint8_t data);
 	void stfight_sprite_bank_w(uint8_t data);
 	void stfight_vh_latch_w(offs_t offset, uint8_t data);
@@ -63,7 +62,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
 	// internal variables
-	int m_sprite_base = 0;
+	int m_sprite_base;
 
 	// rendering / mixing
 	bitmap_ind16 m_temp_bitmap;

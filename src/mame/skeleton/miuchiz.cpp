@@ -144,4 +144,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY              FULLNAME                      FLAGS
-COMP( 2006, miuchiz, 0,      0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "MIUCHIZ Virtual Companions", MACHINE_IS_SKELETON )
+COMP( 2006, miuchiz, 0,      0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "MIUCHIZ Virtual Companions", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

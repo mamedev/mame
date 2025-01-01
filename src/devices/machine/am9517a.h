@@ -29,8 +29,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_AM9517_H
-#define MAME_MACHINE_AM9517_H
+#ifndef MAME_MACHINE_AM9517A_H
+#define MAME_MACHINE_AM9517A_H
 
 #pragma once
 
@@ -244,4 +244,4 @@ DECLARE_DEVICE_TYPE(V5X_DMAU,     v5x_dmau_device)
 DECLARE_DEVICE_TYPE(PCXPORT_DMAC, pcxport_dmac_device)
 DECLARE_DEVICE_TYPE(EISA_DMA,     eisa_dma_device)
 
-#endif // MAME_MACHINE_AM9517_H
+#endif // MAME_MACHINE_AM9517A_H

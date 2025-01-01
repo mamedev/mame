@@ -177,7 +177,7 @@ static INPUT_PORTS_START( accord )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_B) PORT_NAME("Black/White")
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, accord_state, power_off, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(accord_state::power_off), 0)
 INPUT_PORTS_END
 
 
@@ -189,7 +189,7 @@ INPUT_PORTS_END
 void accord_state::accord(machine_config &config)
 {
 	// basic machine hardware
-	HD6301X0(config, m_maincpu, 8'000'000);
+	HD6301X0(config, m_maincpu, 8'000'000); // approximation, no XTAL
 	m_maincpu->nvram_enable_backup(true);
 	m_maincpu->standby_cb().set(m_maincpu, FUNC(hd6301v1_cpu_device::nvram_set_battery));
 	m_maincpu->standby_cb().append([this](int state) { if (state) m_display->clear(); });

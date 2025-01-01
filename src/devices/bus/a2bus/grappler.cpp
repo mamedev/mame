@@ -497,7 +497,7 @@ INPUT_PORTS_START(grapplerplus)
 	PORT_DIPSETTING(   0x06, "Okidata 84 w/o Step II Graphics")
 	PORT_DIPSETTING(   0x05, "Apple Dot Matrix")
 	PORT_DIPSETTING(   0x07, "invalid")
-	PORT_DIPNAME(0x08, 0x08, "Most Significant Bit")            PORT_DIPLOCATION("S1:1")        PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_grapplerplus_device_base, sw_msb, 0)
+	PORT_DIPNAME(0x08, 0x08, "Most Significant Bit")            PORT_DIPLOCATION("S1:1")        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(a2bus_grapplerplus_device_base::sw_msb), 0)
 	PORT_DIPSETTING(   0x08, "Software Control")
 	PORT_DIPSETTING(   0x00, "Not Transmitted")
 INPUT_PORTS_END

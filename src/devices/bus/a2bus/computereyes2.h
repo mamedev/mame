@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_A2BUS_COMPEYES2_H
-#define MAME_BUS_A2BUS_COMPEYES2_H
+#ifndef MAME_BUS_A2BUS_COMPUTEREYES2_H
+#define MAME_BUS_A2BUS_COMPUTEREYES2_H
 
 #pragma once
 
@@ -18,4 +18,4 @@
 // device type declaration
 DECLARE_DEVICE_TYPE(A2BUS_COMPUTEREYES2, device_a2bus_card_interface)
 
-#endif // MAME_BUS_A2BUS_COMPEYES2_H
+#endif // MAME_BUS_A2BUS_COMPUTEREYES2_H

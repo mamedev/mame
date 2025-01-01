@@ -8,9 +8,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_TUBE_TUBE_RC6502_H
+#define MAME_BUS_BBC_TUBE_TUBE_RC6502_H
 
-#ifndef MAME_BUS_BBC_TUBE_RC6502_H
-#define MAME_BUS_BBC_TUBE_RC6502_H
+#pragma once
 
 #include "tube.h"
 #include "cpu/m6502/w65c02s.h"
@@ -94,5 +95,4 @@ private:
 DECLARE_DEVICE_TYPE(BBC_TUBE_RC6502, bbc_tube_rc6502_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_RC65816, bbc_tube_rc65816_device)
 
-
-#endif /* MAME_BUS_BBC_TUBE_RC6502_H */
+#endif // MAME_BUS_BBC_TUBE_TUBE_RC6502_H

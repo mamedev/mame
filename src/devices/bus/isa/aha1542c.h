@@ -10,8 +10,8 @@
 
  **********************************************************************/
 
-#ifndef MAME_BUS_AHA1542C_H
-#define MAME_BUS_AHA1542C_H
+#ifndef MAME_BUS_ISA_AHA1542C_H
+#define MAME_BUS_ISA_AHA1542C_H
 
 #pragma once
 
@@ -51,6 +51,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_ioport m_switches;
 
 private:
 	void z84c0010_mem(address_map &map) ATTR_COLD;
@@ -93,4 +94,4 @@ DECLARE_DEVICE_TYPE(AHA1542C, aha1542c_device)
 DECLARE_DEVICE_TYPE(AHA1542CF, aha1542cf_device)
 DECLARE_DEVICE_TYPE(AHA1542CP, aha1542cp_device)
 
-#endif // MAME_BUS_AHA1542C_H
+#endif // MAME_BUS_ISA_AHA1542C_H

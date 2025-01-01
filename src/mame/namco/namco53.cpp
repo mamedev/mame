@@ -63,51 +63,33 @@
 void namco_53xx_device::reset(int state)
 {
 	// The incoming signal is active low
-	m_cpu->set_input_line(INPUT_LINE_RESET, !state);
+	m_cpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 uint8_t namco_53xx_device::K_r()
 {
-	return m_k(0);
+	return m_k();
 }
 
-uint8_t namco_53xx_device::R0_r()
+template<int N>
+uint8_t namco_53xx_device::R_r()
 {
-	return m_in[0](0);
-}
-
-uint8_t namco_53xx_device::R1_r()
-{
-	return m_in[1](0);
-}
-
-uint8_t namco_53xx_device::R2_r()
-{
-	return m_in[2](0);
-}
-
-uint8_t namco_53xx_device::R3_r()
-{
-	return m_in[3](0);
+	return m_in[N]();
 }
 
 void namco_53xx_device::O_w(uint8_t data)
 {
-	uint8_t out = (data & 0x0f);
-	if (data & 0x10)
-		m_portO = (m_portO & 0x0f) | (out << 4);
-	else
-		m_portO = (m_portO & 0xf0) | (out);
+	m_portO = data;
 }
 
 void namco_53xx_device::P_w(uint8_t data)
 {
-	m_p(0, data);
+	m_p(data);
 }
 
 void namco_53xx_device::chip_select(int state)
 {
-	m_cpu->set_input_line(0, state);
+	m_cpu->set_input_line(MB88XX_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint8_t namco_53xx_device::read()
@@ -122,7 +104,7 @@ uint8_t namco_53xx_device::read()
 
 ROM_START( namco_53xx )
 	ROM_REGION( 0x400, "mcu", 0 )
-	ROM_LOAD( "53xx.bin",     0x0000, 0x0400, CRC(b326fecb) SHA1(758d8583d658e4f1df93184009d86c3eb8713899) )
+	ROM_LOAD( "53xx.bin", 0x0000, 0x0400, CRC(b326fecb) SHA1(758d8583d658e4f1df93184009d86c3eb8713899) )
 ROM_END
 
 DEFINE_DEVICE_TYPE(NAMCO_53XX, namco_53xx_device, "namco53", "Namco 53xx")
@@ -151,14 +133,14 @@ void namco_53xx_device::device_start()
 
 void namco_53xx_device::device_add_mconfig(machine_config &config)
 {
-	MB8843(config, m_cpu, DERIVED_CLOCK(1,1)); /* parent clock, internally divided by 6 */
+	MB8843(config, m_cpu, DERIVED_CLOCK(1,1)); // parent clock, internally divided by 6
 	m_cpu->read_k().set(FUNC(namco_53xx_device::K_r));
 	m_cpu->write_o().set(FUNC(namco_53xx_device::O_w));
 	m_cpu->write_p().set(FUNC(namco_53xx_device::P_w));
-	m_cpu->read_r<0>().set(FUNC(namco_53xx_device::R0_r));
-	m_cpu->read_r<1>().set(FUNC(namco_53xx_device::R1_r));
-	m_cpu->read_r<2>().set(FUNC(namco_53xx_device::R2_r));
-	m_cpu->read_r<3>().set(FUNC(namco_53xx_device::R3_r));
+	m_cpu->read_r<0>().set(FUNC(namco_53xx_device::R_r<0>));
+	m_cpu->read_r<1>().set(FUNC(namco_53xx_device::R_r<1>));
+	m_cpu->read_r<2>().set(FUNC(namco_53xx_device::R_r<2>));
+	m_cpu->read_r<3>().set(FUNC(namco_53xx_device::R_r<3>));
 }
 
 //-------------------------------------------------

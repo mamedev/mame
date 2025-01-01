@@ -67,8 +67,8 @@ is integrated.
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/sensorboard.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
@@ -299,7 +299,7 @@ void conchess_state::concvicp(machine_config &config)
 	concams5(config);
 
 	// basic machine hardware
-	M65C02(config.replace(), m_maincpu, 12.288_MHz_XTAL/2);
+	W65C02(config.replace(), m_maincpu, 12.288_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
 
 	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x4000);

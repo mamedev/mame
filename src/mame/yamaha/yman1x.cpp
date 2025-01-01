@@ -13,7 +13,7 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/h8/h83002.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/hd6305.h"
 #include "mulcd.h"
 #include "machine/nvram.h"
 #include "sound/meg.h"

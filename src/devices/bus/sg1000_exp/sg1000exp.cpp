@@ -124,5 +124,6 @@ bool sg1000_expansion_slot_device::is_writeable(uint8_t offset)
 void sg1000_expansion_devices(device_slot_interface &device)
 {
 	device.option_add("sk1100", SEGA_SK1100);
+	device.option_add("sk1100e", SEGA_SK1100E);
 	device.option_add("fm", SEGA_FM_UNIT);
 }

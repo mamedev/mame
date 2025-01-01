@@ -14,8 +14,9 @@
 
 #pragma once
 
+#include "h8_intc.h"
+
 class h8_device;
-class h8_intc_device;
 
 class h8_sci_device : public device_t {
 public:
@@ -117,7 +118,7 @@ protected:
 	u32 m_clock_mode;
 	bool m_ext_clock_value, m_rx_value;
 
-	u8 m_rdr, m_tdr, m_smr, m_scr, m_ssr, m_brr, m_rsr, m_tsr;
+	u8 m_rdr, m_tdr, m_smr, m_scr, m_ssr, m_ssr_read, m_brr, m_rsr, m_tsr;
 	u64 m_clock_event, m_clock_step, m_divider;
 
 	std::string m_last_clock_message;
@@ -144,7 +145,7 @@ protected:
 	void rx_sync_tick();
 	void rx_sync_step();
 
-	bool is_sync_start() const;
+	void sync_rx_start();
 	bool has_recv_error() const;
 };
 

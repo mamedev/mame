@@ -41,10 +41,7 @@ protected:
 private:
 	bool m_is_sound_alu = false;
 
-	uint8_t m_alu_oprand[4];
-	uint8_t m_alu_oprand_mult[2];
-	uint8_t m_alu_oprand_div[2];
-	uint8_t m_alu_out[6];
+	uint8_t m_alu_oprand[8];
 };
 
 #endif // MAME_NINTENDO_VT1682_ALU_H

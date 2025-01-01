@@ -303,4 +303,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1981, aaa, 0, 0, aaa, aaa, aaa_state, empty_init, "Ann Arbor", "Ambassador", MACHINE_IS_SKELETON )
+COMP( 1981, aaa, 0, 0, aaa, aaa, aaa_state, empty_init, "Ann Arbor", "Ambassador", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

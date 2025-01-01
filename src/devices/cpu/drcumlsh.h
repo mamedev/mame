@@ -29,6 +29,7 @@
 
 /* ----- Control Flow Operations ----- */
 #define UML_NOP(block)                                      do { using namespace uml; block.append().nop(); } while (0)
+#define UML_BREAK(block)                                    do { using namespace uml; block.append().break_(); } while (0)
 #define UML_DEBUG(block, pc)                                do { using namespace uml; block.append().debug(pc); } while (0)
 #define UML_EXIT(block, param)                              do { using namespace uml; block.append().exit(param); } while (0)
 #define UML_EXITc(block, cond, param)                       do { using namespace uml; block.append().exit(param, cond); } while (0)
@@ -53,6 +54,7 @@
 #define UML_GETFMOD(block, dst)                             do { using namespace uml; block.append().getfmod(dst); } while (0)
 #define UML_GETEXP(block, dst)                              do { using namespace uml; block.append().getexp(dst); } while (0)
 #define UML_GETFLGS(block, dst, flags)                      do { using namespace uml; block.append().getflgs(dst, flags); } while (0)
+#define UML_SETFLGS(block, flags)                           do { using namespace uml; block.append().setflgs(flags); } while (0)
 #define UML_SAVE(block, dst)                                do { using namespace uml; block.append().save(dst); } while (0)
 #define UML_RESTORE(block, src)                             do { using namespace uml; block.append().restore(src); } while (0)
 
@@ -78,7 +80,9 @@
 #define UML_SUBB(block, dst, src1, src2)                    do { using namespace uml; block.append().subb(dst, src1, src2); } while (0)
 #define UML_CMP(block, src1, src2)                          do { using namespace uml; block.append().cmp(src1, src2); } while (0)
 #define UML_MULU(block, dst, edst, src1, src2)              do { using namespace uml; block.append().mulu(dst, edst, src1, src2); } while (0)
+#define UML_MULULW(block, dst, src1, src2)                  do { using namespace uml; block.append().mululw(dst, src1, src2); } while (0)
 #define UML_MULS(block, dst, edst, src1, src2)              do { using namespace uml; block.append().muls(dst, edst, src1, src2); } while (0)
+#define UML_MULSLW(block, dst, src1, src2)                  do { using namespace uml; block.append().mulslw(dst, src1, src2); } while (0)
 #define UML_DIVU(block, dst, edst, src1, src2)              do { using namespace uml; block.append().divu(dst, edst, src1, src2); } while (0)
 #define UML_DIVS(block, dst, edst, src1, src2)              do { using namespace uml; block.append().divs(dst, edst, src1, src2); } while (0)
 #define UML_AND(block, dst, src1, src2)                     do { using namespace uml; block.append()._and(dst, src1, src2); } while (0)
@@ -118,7 +122,9 @@
 #define UML_DSUBB(block, dst, src1, src2)                   do { using namespace uml; block.append().dsubb(dst, src1, src2); } while (0)
 #define UML_DCMP(block, src1, src2)                         do { using namespace uml; block.append().dcmp(src1, src2); } while (0)
 #define UML_DMULU(block, dst, edst, src1, src2)             do { using namespace uml; block.append().dmulu(dst, edst, src1, src2); } while (0)
+#define UML_DMULULW(block, dst, src1, src2)                 do { using namespace uml; block.append().dmululw(dst, src1, src2); } while (0)
 #define UML_DMULS(block, dst, edst, src1, src2)             do { using namespace uml; block.append().dmuls(dst, edst, src1, src2); } while (0)
+#define UML_DMULSLW(block, dst, src1, src2)                 do { using namespace uml; block.append().dmulslw(dst, src1, src2); } while (0)
 #define UML_DDIVU(block, dst, edst, src1, src2)             do { using namespace uml; block.append().ddivu(dst, edst, src1, src2); } while (0)
 #define UML_DDIVS(block, dst, edst, src1, src2)             do { using namespace uml; block.append().ddivs(dst, edst, src1, src2); } while (0)
 #define UML_DAND(block, dst, src1, src2)                    do { using namespace uml; block.append().dand(dst, src1, src2); } while (0)
@@ -140,8 +146,8 @@
 /* ----- 32-bit Floating Point Arithmetic Operations ----- */
 #define UML_FSLOAD(block, dst, base, index)                 do { using namespace uml; block.append().fsload(dst, base, index); } while (0)
 #define UML_FSSTORE(block, base, index, src1)               do { using namespace uml; block.append().fsstore(base, index, src1); } while (0)
-#define UML_FSREAD(block, dst, src1, space)                 do { using namespace uml; block.append().fsread(dst, src1, AS_##space); } while (0)
-#define UML_FSWRITE(block, dst, src1, space)                do { using namespace uml; block.append().fswrite(dst, src1, AS_##space); } while (0)
+#define UML_FSREAD(block, dst, src1, space)                 do { using namespace uml; block.append().fsread(dst, src1, space); } while (0)
+#define UML_FSWRITE(block, dst, src1, space)                do { using namespace uml; block.append().fswrite(dst, src1, space); } while (0)
 #define UML_FSMOV(block, dst, src1)                         do { using namespace uml; block.append().fsmov(dst, src1); } while (0)
 #define UML_FSMOVc(block, cond, dst, src1)                  do { using namespace uml; block.append().fsmov(cond, dst, src1); } while (0)
 #define UML_FSTOINT(block, dst, src1, size, round)          do { using namespace uml; block.append().fstoint(dst, src1, size, round); } while (0)
@@ -164,8 +170,8 @@
 /* ----- 64-bit Floating Point Arithmetic Operations ----- */
 #define UML_FDLOAD(block, dst, base, index)                 do { using namespace uml; block.append().fdload(dst, base, index); } while (0)
 #define UML_FDSTORE(block, base, index, src1)               do { using namespace uml; block.append().fdstore(base, index, src1); } while (0)
-#define UML_FDREAD(block, dst, src1, space)                 do { using namespace uml; block.append().fdread(dst, src1, AS_##space); } while (0)
-#define UML_FDWRITE(block, dst, src1, space)                do { using namespace uml; block.append().fdwrite(dst, src1, AS_##space); } while (0)
+#define UML_FDREAD(block, dst, src1, space)                 do { using namespace uml; block.append().fdread(dst, src1, space); } while (0)
+#define UML_FDWRITE(block, dst, src1, space)                do { using namespace uml; block.append().fdwrite(dst, src1, space); } while (0)
 #define UML_FDMOV(block, dst, src1)                         do { using namespace uml; block.append().fdmov(dst, src1); } while (0)
 #define UML_FDMOVc(block, cond, dst, src1)                  do { using namespace uml; block.append().fdmov(cond, dst, src1); } while (0)
 #define UML_FDTOINT(block, dst, src1, size, round)          do { using namespace uml; block.append().fdtoint(dst, src1, size, round); } while (0)

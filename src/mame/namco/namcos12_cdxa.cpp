@@ -2,7 +2,61 @@
 // copyright-holders:windyfairy
 /***************************************************************************
 
-    Namco System 12 CDXA PCB
+CDXA PCB
+--------
+SYSTEM12 CDXA PCB 8661962101 (8661972101)
+|---------------------------------------------------|
+|                               J8     J9           |
+|           6734               4556   3121          |
+|                                                   |
+|    J2                                    MB87078  |
+|    |-|        IS61C256                            |
+|    | |        IS61C256                   LC78836M |
+|    | |                                            |
+|    | |                                            |
+|    | |        |--------|                          |
+|    | |        |        |    |------|   TC558128   |
+|    | |        |  C448  |    | SH2  |              |
+|    | |        |        |    |      |              |
+|    | |        |        |    |------|   TC558128   |
+|    | |        |--------|                          |
+|    | |                                            |
+|    | |                                            |
+|    |-|                                            |
+|        2061ASC-1        |------|                  |
+|                         |ALTERA|                  |
+|        14.7456MHz       |MAX   |                  |
+|                         |EPM7128                  |
+|                         |------|                  |
+|               J3              J4                  |
+|---------------------------------------------------|
+Notes:
+      6734     : Texas Instruments TPS6734 Fixed 12V 120mA Boost-Converter Supply compatible with MAX734 (SOIC8)
+      4556     : NJM4556 Dual High Current Operational Amplifier (SOIC8)
+      3121     : Rohm BA3121 Ground Isolation Amplifier (SOIC8)
+      C448     : Namco Custom C448 (QFP160)
+      SH2      : Hitachi SH2 HD6417014F28 CPU (QFP112)
+      2061ASC-1: IC Designs 2061ASC-1 programmable clock generator (SOIC16)
+      TC558128 : Toshiba TC558128BFT-15 128k x8 SRAM (x2, SOJ32)
+      IS61C256 : ISSI IS61C256AH-12T 32k x8 SRAM (x2, TSOP28)
+      EPM7128  : Altera Max EPM7128 CPLD with sticker 'S12C DX0A' (QFP100)
+      LC78836  : Sanyo LC78836 2-Channel 16-Bit D/A Converter with On-Chip 8X Oversampling Digital Filters (SOIC24)
+      MB87078  : Fujitsu MB87078 6-bit, 4-channel Electronic Volume Controller (SOIC24)
+      J2       : Custom Namco connector for plug-in CPU PCB
+      J3       : 40 pin connector for IDE CDROM data cable
+      J4       : 6 pin connector (serial)
+                 For Um Jammer Lammy Now this goes to J205 on the M148 EMI DRIVE PCB.
+                 According to the manual schematics, only GND and TX are connected going to RxD0 on EMI DRIVE PCB side.
+      J8       : 4 pin connector (left/right audio output, RGND/R/LGND/L pinout)
+      J9       : 3 pin connector (left/right audio output, L/GND/R pinout)
+
+      This PCB was found on the following games (so far)....
+
+      -Truck Kyosokyoku (TKK2/VER.A)
+            A CDROM drive and CDROM disc is also required
+            The disc is labelled 'TKK2-A'
+      -Tekno Werk
+            A CDROM drive and CDROM disc is also required
 
 ***************************************************************************/
 
@@ -71,6 +125,32 @@ void namcos12_cdxa_device::device_start()
 	m_lc78836m->emp_w(0);
 }
 
+void namcos12_cdxa_device::amap(address_map &map)
+{
+	map(0x7c0000, 0x7cffff).rw(FUNC(namcos12_cdxa_device::sh2_ram_r), FUNC(namcos12_cdxa_device::sh2_ram_w));
+
+	map(0x7d6002, 0x7d6003).w(FUNC(namcos12_cdxa_device::reset_sh2_w));
+	map(0x7d6004, 0x7d600b).w(FUNC(namcos12_cdxa_device::clockgen_w));
+	map(0x7d6010, 0x7d6011).w(FUNC(namcos12_cdxa_device::ide_sh2_enabled_w));
+	map(0x7d6012, 0x7d6013).w(FUNC(namcos12_cdxa_device::ide_ps1_enabled_w));
+	// 1f7d6018 unknown, only set once to 1 between the "SH2 Reset" and "SH2 Pll Clock Set" steps during boot
+	map(0x7d601a, 0x7d601b).w(FUNC(namcos12_cdxa_device::sram_enabled_w));
+	map(0x7d601e, 0x7d601f).w(FUNC(namcos12_cdxa_device::ps1_int10_finished_w));
+
+	map(0x7d800a, 0x7d800b).lr16(NAME([]() {
+		// Might be for the M148 PCB instead of CDXA PCB
+		// Code loops until this returns 0x20 before it starts writing to 0x1f7d8000
+		// Writes "55 x y z" to 0x1f7d8000 where x, y, z are related to the current I/O state
+		// Maybe used for lights?
+		return 0x20;
+	}));
+
+	map(0x7e0000, 0x7e000f).rw(FUNC(namcos12_cdxa_device::cdrom_cs0_r), FUNC(namcos12_cdxa_device::cdrom_cs0_w));
+	// map(0x1f7e8000, 0x1f7e800f).rw(FUNC(namcos12_cdxa_device::cdrom_cs1_r), FUNC(namcos12_cdxa_device::cdrom_cs1_w));
+	// 1f7d7000 volume enabled/set? gets set to 6 between the "SH2 Volume Set" and "SH2 Trf Program" steps, after setting 4 volumes registers to 0x7e
+	map(0x7f8000, 0x7f80ff).w(FUNC(namcos12_cdxa_device::volume_w));
+}
+
 void namcos12_cdxa_device::device_reset()
 {
 	m_ide_sh2_enabled = m_ide_ps1_enabled = false;
@@ -109,8 +189,8 @@ void namcos12_cdxa_device::device_add_mconfig(machine_config &config)
 
 void namcos12_cdxa_device::sh7014_map(address_map &map)
 {
-	map(0x00000000, 0x0003ffff).ram().share("cram"); // 128k x8 SRAM (x2) connected directly to both the SH2 and C448
-	map(0x00400000, 0x0040ffff).ram().share("sram"); // 32k x8 SRAM (x2) connected via the C448 chip
+	map(0x00000000, 0x0003ffff).ram().share(m_cram); // 128k x8 SRAM (x2) connected directly to both the SH2 and C448
+	map(0x00400000, 0x0040ffff).ram().share(m_sram); // 32k x8 SRAM (x2) connected via the C448 chip
 	map(0x0041601c, 0x0041601f).w(FUNC(namcos12_cdxa_device::trigger_psx_int10_w));
 	// 417000 ?
 	map(0x0041c000, 0x0041c003).nopw().r(FUNC(namcos12_cdxa_device::cdrom_status_flag_r));
@@ -131,21 +211,18 @@ void namcos12_cdxa_device::reset_sh2_w(uint16_t data)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-uint32_t namcos12_cdxa_device::sh2_ram_r(offs_t offset)
+uint16_t namcos12_cdxa_device::sh2_ram_r(offs_t offset)
 {
-	auto r = m_sram_enabled ? m_sram : m_cram;
-	return rotl_32(r[offset], 16);
+	uint16_t *r = (uint16_t *)(m_sram_enabled ? &m_sram[0] : &m_cram[0]);
+	return r[offset ^ NATIVE_ENDIAN_VALUE_LE_BE(1, 0)];
 }
 
-void namcos12_cdxa_device::sh2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void namcos12_cdxa_device::sh2_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	mem_mask = rotl_32(mem_mask, 16);
-	data = rotl_32(data, 16);
-
 	if (!m_sram_enabled)
-		COMBINE_DATA(&m_cram[offset]);
+		COMBINE_DATA(((uint16_t *)&m_cram[0]) + (offset ^ NATIVE_ENDIAN_VALUE_LE_BE(1, 0)));
 
-	COMBINE_DATA(&m_sram[offset]);
+	COMBINE_DATA(((uint16_t *)&m_sram[0]) + (offset ^ NATIVE_ENDIAN_VALUE_LE_BE(1, 0)));
 }
 
 void namcos12_cdxa_device::sram_enabled_w(uint16_t data)
@@ -169,6 +246,7 @@ void namcos12_cdxa_device::ide_ps1_enabled_w(uint16_t data)
 
 void namcos12_cdxa_device::ps1_int10_finished_w(uint16_t data)
 {
+	m_psx_int10_cb(0);
 	m_psx_int10_busy = false;
 }
 

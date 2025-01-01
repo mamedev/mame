@@ -203,7 +203,7 @@ uint8_t super6_state::fdc_r()
 		if (!m_z80_wait)
 		{
 			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-			m_maincpu->defer_access();
+			m_maincpu->retry_access();
 		}
 
 		m_z80_wait = !m_z80_wait;
@@ -285,7 +285,7 @@ void super6_state::super6_io(address_map &map)
 	map(0x0c, 0x0f).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0x10, 0x10).mirror(0x03).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
 	map(0x14, 0x14).rw(FUNC(super6_state::fdc_r), FUNC(super6_state::fdc_w));
-	map(0x15, 0x15).portr("J7").w(FUNC(super6_state::s100_w));
+	map(0x15, 0x15).portr(m_j7).w(FUNC(super6_state::s100_w));
 	map(0x16, 0x16).w(FUNC(super6_state::bank0_w));
 	map(0x17, 0x17).w(FUNC(super6_state::bank1_w));
 	map(0x18, 0x18).mirror(0x03).w(BR1945_TAG, FUNC(com8116_device::stt_str_w));

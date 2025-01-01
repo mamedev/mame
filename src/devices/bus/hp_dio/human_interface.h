@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Sven Schnelle
 
-#ifndef MAME_BUS_HPDIO_HUMAN_INTERFACE_H
-#define MAME_BUS_HPDIO_HUMAN_INTERFACE_H
+#ifndef MAME_BUS_HP_DIO_HUMAN_INTERFACE_H
+#define MAME_BUS_HP_DIO_HUMAN_INTERFACE_H
 
 #pragma once
 
@@ -102,4 +102,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE_NS(HPDIO_HUMAN_INTERFACE, bus::hp_dio, human_interface_device)
 
-#endif // MAME_BUS_HPDIO_HUMAN_INTERFACE_H
+#endif // MAME_BUS_HP_DIO_HUMAN_INTERFACE_H

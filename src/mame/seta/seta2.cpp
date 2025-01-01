@@ -1723,7 +1723,7 @@ static INPUT_PORTS_START( reelquak )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
 	PORT_START("TICKET")    // $400003.b
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r)    // ticket sensor
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", FUNC(ticket_dispenser_device::line_r))    // ticket sensor
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Knock Down")    // knock down
@@ -1837,7 +1837,7 @@ static INPUT_PORTS_START( staraudi )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE4 ) // unused?
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2   ) // something (flash activity)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START3   ) // unused?
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM   ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM   ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_START4   ) // unused?
 INPUT_PORTS_END
 
@@ -2111,7 +2111,7 @@ static INPUT_PORTS_START( telpacfl )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1       ) PORT_NAME("Bet") // bet switch (converts credits into balls)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR   ) // door switch
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r) // coin out switch (medals jam error when stuck i.e. メダルづまり)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", FUNC(ticket_dispenser_device::line_r)) // coin out switch (medals jam error when stuck i.e. メダルづまり)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -

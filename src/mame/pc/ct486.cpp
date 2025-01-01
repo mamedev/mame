@@ -47,6 +47,11 @@ public:
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
+	void ct486(machine_config &config);
+	void ast6000(machine_config &config);
+	void ast611(machine_config &config);
+
+private:
 	virtual void machine_start() override ATTR_COLD;
 
 	uint16_t cs4031_ior(offs_t offset);
@@ -54,7 +59,6 @@ public:
 	void cs4031_hold(int state);
 	void cs4031_tc(offs_t offset, uint8_t data) { m_isabus->eop_w(offset, data); }
 	void cs4031_spkr(int state) { m_speaker->level_w(state); }
-	void ct486(machine_config &config);
 	void ct486_io(address_map &map) ATTR_COLD;
 	void ct486_map(address_map &map) ATTR_COLD;
 };
@@ -172,7 +176,7 @@ void ct486_state::ct486(machine_config &config)
 	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
 	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
-	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "svga_et4kw32i", false);
 	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
@@ -190,6 +194,38 @@ void ct486_state::ct486(machine_config &config)
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 }
 
+void ct486_state::ast6000(machine_config &config)
+{
+	ct486_state::ct486(config);
+	// Socket 1 CPU
+	// 1 ISA slot only, with ISA bridge x3
+	// CL-GD5428 on-board
+	// Chips & Technologies F82C721 Super I/O
+	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "clgd542x", true);
+	ISA16_SLOT(config.replace(), "isa1", 0, "isabus", pc_isa16_cards, nullptr, false);
+}
+
+void ct486_state::ast611(machine_config &config)
+{
+	ct486_state::ct486(config);
+	// Socket 3 CPU
+	I486DX4(config.replace(), m_maincpu, XTAL(33'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ct486_state::ct486_map);
+	m_maincpu->set_addrmap(AS_IO, &ct486_state::ct486_io);
+	m_maincpu->set_irq_acknowledge_callback("cs4031", FUNC(cs4031_device::int_ack_r));
+
+	m_cs4031->set_clock(XTAL(33'000'000));
+
+	// 1 ISA slot only, with ISA bridge x3
+	// CL-GD5428 on-board
+	// SMC/SMSC FDC37C653** Super I/O
+	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "clgd542x", true);
+	// TODO: Creative CT2504 / Vibra 16S on-board
+//  ISA16_SLOT(config, "board6", 0, "isabus", pc_isa16_cards, "vibra16s", true);
+
+	ISA16_SLOT(config.replace(), "isa1", 0, "isabus", pc_isa16_cards, nullptr, false);
+}
+
 
 //**************************************************************************
 //  ROM DEFINITIONS
@@ -201,6 +237,19 @@ ROM_START( ct486 )
 	ROM_LOAD("chips_1.ami", 0xf0000, 0x10000, CRC(a14a7511) SHA1(b88d09be66905ed2deddc26a6f8522e7d2d6f9a8))
 ROM_END
 
+ROM_START( ast6000 )
+	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
+	ROM_REGION(0x100000, "bios", 0)
+	ROM_LOAD("ast6000.bin", 0xe0000, 0x20000, CRC(8982ac34) SHA1(07c10a8857bb91fc673c4299b17214e9ebad4524))
+ROM_END
+
+ROM_START( ast611 )
+	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
+	ROM_REGION(0x100000, "bios", 0)
+	ROM_LOAD("ast_611s.bin", 0xe0000, 0x20000, CRC(5e7a4eef) SHA1(955a346d882298ad623d9a31079b059d28e43b9e))
+ROM_END
+
+
 } // anonymous namespace
 
 
@@ -208,4 +257,6 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1993, ct486, 0, 0, ct486, 0, ct486_state, empty_init, "<unknown>", "PC/AT 486 with CS4031 chipset", 0 )
+COMP( 1993, ct486,   0, 0, ct486,   0, ct486_state, empty_init, "<unknown Taiwanese vendor 8029>", "PC/AT 486 with CS4031 chipset", 0 )
+COMP( 1994, ast6000, 0, 0, ast6000, 0, ct486_state, empty_init, "AST", "Advantage! 6050d/6066d", MACHINE_NOT_WORKING ) // long beep, hangs after testing memory, will jump to empty reset vector at PC=ffff'fff0 (???)
+COMP( 1994, ast611, 0, 0,  ast611, 0, ct486_state, empty_init, "AST", "Advantage! 610/611", MACHINE_NOT_WORKING ) // constant beep with FDC access (different Super I/O?)

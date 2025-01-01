@@ -360,7 +360,7 @@ static INPUT_PORTS_START( bondwell )
 	PORT_INCLUDE(pccga)
 
 	PORT_MODIFY("DSW2") /* IN3 */
-	PORT_DIPNAME( 0x02, 0x02, "Turbo Switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, pc_state, pc_turbo_callback, 0)
+	PORT_DIPNAME( 0x02, 0x02, "Turbo Switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pc_state::pc_turbo_callback), 0)
 	PORT_DIPSETTING(    0x00, "Off (4.77 MHz)" )
 	PORT_DIPSETTING(    0x02, "On (12 MHz)" )
 INPUT_PORTS_END

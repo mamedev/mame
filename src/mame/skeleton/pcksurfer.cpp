@@ -88,4 +88,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME       PARENT COMPAT MACHINE    INPUT      CLASS            INIT        COMPANY     FULLNAME                     FLAGS
-COMP( 2006, pcksurfer, 0,     0,     pcksurfer, pcksurfer, pcksurfer_state, empty_init, "Datawind", "Pocket Surfer (prototype)", MACHINE_IS_SKELETON )
+COMP( 2006, pcksurfer, 0,     0,     pcksurfer, pcksurfer, pcksurfer_state, empty_init, "Datawind", "Pocket Surfer (prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
