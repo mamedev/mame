@@ -114,7 +114,8 @@ void spg110_easports_game_state::mem_map(address_map &map)
 {
 	//map(0x001000, 0x007fff).ram(); // ??
 	map(0x004000, 0x2fffff).rom().region("maincpu", 0x8000);
-	map(0x3e0000, 0x3fffff).ram().share("nvram"); // size? is all of it backed up?
+	map(0x3e0000, 0x3effff).ram().share("nvram"); // size? is all of it backed up?
+	map(0x3f0000, 0x3fffff).ram(); // seems to only be used for GFX data
 }
 
 
@@ -626,7 +627,7 @@ void spg110_game_state::spg110_base_pal(machine_config &config)
 void spg110_easports_game_state::easports_pal(machine_config &config)
 {
 	spg110_base_pal(config);
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
 
@@ -687,6 +688,12 @@ ROM_START( easports )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ea.u3", 0x000000, 0x400000, CRC(d750089e) SHA1(426f04c3d841103d434a892561db55ade684db54) )
 	ROM_LOAD16_WORD_SWAP( "ea.u4", 0x400000, 0x200000, CRC(20a63445) SHA1(8c3383a353638c7d6b795d15a751275043eacbd0) )
+
+	ROM_REGION( 0x20000, "nvram", ROMREGION_ERASE00 )
+	// There is a coin style battery backing up at least some of the RAM.
+	// The games seems to fail to initialize it properly first time, resulting in a hang shortly after
+	// selecting a game. Provide a default (at least for now)
+	ROM_LOAD( "nvram", 0x000000, 0x20000, CRC(bfcbd206) SHA1(0f5b730679762547a0658c2cd0d4fa5169b857af) )
 ROM_END
 
 
