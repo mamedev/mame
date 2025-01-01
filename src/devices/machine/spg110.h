@@ -77,6 +77,9 @@ private:
 	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_portb_out(offset, data, mem_mask); }
 	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_portc_out(offset, data, mem_mask); }
 
+	void timerirq_w(int state);
+	void uartirq_w(int state);
+	void extirq_w(int state);
 	void ffreq1_w(int state);
 	void ffreq2_w(int state);
 

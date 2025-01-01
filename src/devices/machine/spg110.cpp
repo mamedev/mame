@@ -45,14 +45,47 @@ void spg110_device::videoirq_w(int state)
 	set_state_unsynced(UNSP_IRQ0_LINE, state);
 }
 
+void spg110_device::timerirq_w(int state)
+{
+	set_state_unsynced(UNSP_IRQ3_LINE, state);
+}
+
+void spg110_device::uartirq_w(int state)
+{
+	set_state_unsynced(UNSP_IRQ4_LINE, state);
+}
+
+void spg110_device::extirq_w(int state)
+{
+	// External Int1 is IRQ4 (was 5 on SPG2xx)
+	// External Int2 is IRQ2 (was 5 on SPG2xx)
+	set_state_unsynced(UNSP_IRQ4_LINE, state);
+}
+
 void spg110_device::ffreq1_w(int state)
 {
+	set_state_unsynced(UNSP_IRQ5_LINE, state);
 }
 
 void spg110_device::ffreq2_w(int state)
 {
+	set_state_unsynced(UNSP_IRQ6_LINE, state);
 }
 
+// notes about IRQ differences from 2xx
+// 
+// TMB1 / TMB2 are IRQ7 (same as SPG2xx)
+// Key Change is IRQ4 (was 7 on SPG2xx)
+// LVD (Low Voltage Reset) is IRQ6 (doesn't exist on SPG2xx?)
+// ADC is IRQ1 (was 3 on SPG2xx)
+// 
+// on SPG2xx 0x3D2E can redirect any other interrupt to the FIQ
+// on SPG110 FIQ is always from SPUIRQ (sound)
+//
+// on SPG2xx SPU_Ch_Irq (sound) is IRQ1, and SPU_Env_Irq / SPU_Beat_Irq is IRQ4
+// SPU_Ch_Irq / SPU_Env_Irq and SPU_Beat_Irq don't exist on SPG110? (assume SPU_Ch_Irq is SPUIRQ?)
+//
+// SPG2xx has SPI Interrupt on IRQ3, no SPI interrupt on SPG110?
 
 void spg110_device::configure_spg_io(spg2xx_io_device* io)
 {
@@ -68,9 +101,9 @@ void spg110_device::configure_spg_io(spg2xx_io_device* io)
 	io->adc_in<3>().set(FUNC(spg110_device::adc_r<3>));
 	io->chip_select().set(FUNC(spg110_device::cs_w));
 //  io->pal_read_callback().set(FUNC(spg110_device::get_pal_r));
-//  io->write_timer_irq_callback().set(FUNC(spg110_device::timerirq_w));
-//  io->write_uart_adc_irq_callback().set(FUNC(spg110_device::uartirq_w));
-//  io->write_external_irq_callback().set(FUNC(spg110_device::extirq_w));
+	io->write_timer_irq_callback().set(FUNC(spg110_device::timerirq_w));
+	io->write_uart_adc_irq_callback().set(FUNC(spg110_device::uartirq_w));
+	io->write_external_irq_callback().set(FUNC(spg110_device::extirq_w));
 	io->write_ffrq_tmr1_irq_callback().set(FUNC(spg110_device::ffreq1_w));
 	io->write_ffrq_tmr2_irq_callback().set(FUNC(spg110_device::ffreq2_w));
 }
