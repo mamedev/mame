@@ -580,6 +580,10 @@ static INPUT_PORTS_START( easports )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
+	PORT_MODIFY("PC") // different configurations were hardwired, this can't be changed by the user
+	PORT_CONFNAME(0x01, 0x00, "Pad Configuration")
+	PORT_CONFSETTING(0x01, "Single")
+	PORT_CONFSETTING(0x00, "Double")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( conyteni )
@@ -693,6 +697,7 @@ ROM_START( easports )
 	// There is a coin style battery backing up at least some of the RAM.
 	// The games seems to fail to initialize it properly first time, resulting in a hang shortly after
 	// selecting a game. Provide a default (at least for now)
+	// Random default fills, All 1, or All 0 do not work in this case
 	ROM_LOAD( "nvram", 0x000000, 0x20000, CRC(bfcbd206) SHA1(0f5b730679762547a0658c2cd0d4fa5169b857af) )
 ROM_END
 
