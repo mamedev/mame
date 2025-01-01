@@ -436,15 +436,6 @@ void spg110_video_device::update_video_irqs()
 	if ((m_vdo_irq_enable) && (m_vdo_irq_flag))
 		irq_on = true;
 
-	if (irq_on)
-	{
-		logerror("turning IRQ ---ON--- blk_irq_enable %d blk_irq_flag %d dma_irq_enable %d dma_irq_flag %d vdo_irq_enable %d vdo_irq_flag %d\n", m_blk_irq_enable ? 1 : 0, m_blk_irq_flag ? 1 : 0, m_dma_irq_enable ? 1 : 0, m_dma_irq_flag ? 1 : 0, m_vdo_irq_enable ? 1 : 0, m_vdo_irq_flag ? 1 : 0);
-	}
-	else
-	{
-		logerror("turning IRQ ---OFF--- blk_irq_enable %d blk_irq_flag %d dma_irq_enable %d dma_irq_flag %d vdo_irq_enable %d vdo_irq_flag %d\n", m_blk_irq_enable ? 1 : 0, m_blk_irq_flag ? 1 : 0, m_dma_irq_enable ? 1 : 0, m_dma_irq_flag ? 1 : 0, m_vdo_irq_enable ? 1 : 0, m_vdo_irq_flag ? 1 : 0);
-	}
-
 	m_video_irq_cb(irq_on ? ASSERT_LINE : CLEAR_LINE);
 }
 
