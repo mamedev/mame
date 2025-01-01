@@ -33,9 +33,6 @@
     furthermore the game seems to set what I believe to be the 'flipscreen' bit for player 2
     even when in 'upright' mode, so it's possible this romset was only really made for a
     cocktail table?
-
-    it looks like the stars should roughly align with the constellations during the
-    intermissions
 */
 
 #include "emu.h"
@@ -63,6 +60,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_stars(*this, "stars"),
 		m_gfx1pal(*this, "gfx1pal"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_snsnd(*this, "snsnd%u", 0),
 		m_dac(*this, "dac%u", 0),
@@ -84,6 +82,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_region_ptr<uint8_t> m_stars;
 	required_region_ptr<uint8_t> m_gfx1pal;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device_array<sn76477_device, 2> m_snsnd;
 	required_device_array<dac_byte_interface, 2> m_dac;
@@ -233,37 +232,31 @@ const uint8_t scyclone_state::get_bitmap_pixel(int x, int y)
 
 uint32_t scyclone_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *paldata = m_palette->pens();
-
-	// This is not correct, but the first 0x80 bytes of the PROM are blank suggesting that this
-	// part is for the non-visible 32 rows at least, so it should be something like this.
-	// Starfield looks too dense and blinking is not understood at all.
-
-	for (int strip = 0; strip < 16; strip++)
+	for (int x = 0; x < 32; x++)
 	{
-		for (int x = 0; x < 256; x++)
+		for (int y = 0; y < 32; y++)
 		{
-			const uint8_t star = m_stars[((x + m_starscroll) & 0x3f) + (strip * 0x40)];
+			const uint8_t sx = (x + (m_starscroll >> 3)) & 0x1f;
+			const uint8_t star = m_stars[y << 5 | sx];
+			const bool blink = BIT((star << 1) + m_screen->frame_number(), 4);
 
-			for (int y = 0; y < 16; y++)
+			uint8_t dx = x << 3 | (~m_starscroll & 7);
+			uint8_t dy = (y << 3) - 32 + 4;
+
+			bool noclipped = false;
+
+			if (m_vidctrl & 0x08)
 			{
-				const int ypos = (y + 16 * strip) - 32;
+				dx = 255 - dx;
+				dy = 255 - 32 - dy;
 
-				if (ypos >= 0 && ypos < 256)
-				{
-					int noclipped = 0;
-
-					if (m_vidctrl & 0x08)
-						noclipped = x < 64*3;
-					else
-						noclipped = x >= 64;
-
-					if (y == star && star != 0 && noclipped)
-						bitmap.pix(ypos, x) = paldata[7];
-					else
-						bitmap.pix(ypos, x) = paldata[0];
-				}
+				noclipped = dx < 64*3;
 			}
+			else
+				noclipped = dx >= 64;
+
+			if (noclipped && blink && star)
+				bitmap.pix(dy, dx) = rgb_t::white();
 		}
 	}
 
@@ -316,7 +309,8 @@ uint32_t scyclone_state::draw_bitmap_and_sprite(screen_device &screen, bitmap_rg
 
 uint32_t scyclone_state::screen_update_scyclone(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	draw_starfield(screen,bitmap, cliprect);
+	bitmap.fill(0, cliprect);
+	draw_starfield(screen, bitmap, cliprect);
 	draw_bitmap_and_sprite(screen, bitmap, cliprect);
 
 	//popmessage("%02x %02x %02x %02x %02x %02x", m_sprite_xpos, m_sprite_ypos, m_sprite_colour, m_sprite_tile, m_starscroll, m_p0e);
@@ -485,7 +479,7 @@ void scyclone_state::snd_3002_w(uint8_t data)
 
 void scyclone_state::snd_3003_w(uint8_t data)
 {
-	m_speech_enabled = !bool(BIT(data, 1));
+	m_speech_enabled = !BIT(data, 1);
 }
 
 void scyclone_state::snd_3004_w(uint8_t data)
@@ -505,14 +499,14 @@ INTERRUPT_GEN_MEMBER(scyclone_state::sound_irq)
 	// speech DAC is some sort of 1-bit delta modulation?
 	if (m_speech_enabled)
 	{
-		int bit = BIT(m_speech_data, 7);
+		const int bit = BIT(m_speech_data, 7);
 
 		if (bit && m_dac2_output < 0xff)
 			m_dac2_output++;
 		else if (!bit && m_dac2_output > 0)
 			m_dac2_output--;
 	}
-	else
+	else if (m_dac2_output != 0x80)
 		m_dac2_output += (m_dac2_output < 0x80) ? +1 : -1;
 
 	m_speech_data <<= 1;
@@ -545,7 +539,7 @@ void scyclone_state::scyclone_iomap(address_map &map)
 	map(0x03, 0x03).portr("DSW0").w(FUNC(scyclone_state::vidctrl_w));
 	map(0x04, 0x04).w(FUNC(scyclone_state::sprite_xpos_w));
 	map(0x05, 0x05).w(FUNC(scyclone_state::sprite_ypos_w));
-	map(0x06, 0x06).w(FUNC(scyclone_state::port06_w)); // possible watchdog, unlikely to be twinkle related.
+	map(0x06, 0x06).w(FUNC(scyclone_state::port06_w));
 	map(0x08, 0x08).w(FUNC(scyclone_state::sprite_colour_w));
 	map(0x09, 0x09).w(FUNC(scyclone_state::sprite_tile_w));
 	map(0x0a, 0x0a).w(FUNC(scyclone_state::starscroll_w));
@@ -691,13 +685,13 @@ void scyclone_state::scyclone(machine_config &config)
 	MB14241(config, "mb14241");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 256-1, 0, 256-32-1);
-	screen.set_screen_update(FUNC(scyclone_state::screen_update_scyclone));
-	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE); // due to hw collisions
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0, 256-32-1);
+	m_screen->set_screen_update(FUNC(scyclone_state::screen_update_scyclone));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // due to hw collisions
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scyclone);
 	PALETTE(config, m_palette).set_entries(8 + 4*4);
@@ -746,7 +740,7 @@ ROM_START( scyclone )
 	ROM_REGION( 0x0400, "gfx1pal", 0 ) // only 16 bytes of this are actually used
 	ROM_LOAD( "de02.5b.82s137", 0x0000, 0x0400, CRC(fe4b278c) SHA1(c03080ab4d3fb84b8eec7087b925d1a1d8565fcc) )
 
-	ROM_REGION( 0x0840, "stars", 0 ) // probably the starfield bitmap
+	ROM_REGION( 0x0400, "stars", 0 ) // starfield bitmap
 	ROM_LOAD( "de15.3a.82s137", 0x0000, 0x0400, CRC(c2816161) SHA1(2d0e7b4dbdb2af1481a4b7e45b1f9e3640f69aec) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
