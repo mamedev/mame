@@ -27,7 +27,10 @@
 #include "bus/generic/carts.h"
 
 #include "cpu/unsp/unsp.h"
+
+#include "machine/nvram.h"
 #include "machine/spg110.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -45,7 +48,6 @@ public:
 	{ }
 
 	void spg110_base(machine_config &config);
-	void spg110_spdmo(machine_config& config);
 
 	void spg110_base_pal(machine_config &config);
 
@@ -112,7 +114,7 @@ void spg110_easports_game_state::mem_map(address_map &map)
 {
 	//map(0x001000, 0x007fff).ram(); // ??
 	map(0x004000, 0x2fffff).rom().region("maincpu", 0x8000);
-	map(0x3e0000, 0x3fffff).ram();
+	map(0x3e0000, 0x3fffff).ram().share("nvram"); // size? is all of it backed up?
 }
 
 
@@ -618,20 +620,15 @@ void spg110_game_state::spg110_base_pal(machine_config &config)
 {
 	spg110_base(config);
 	m_screen->set_refresh_hz(50);
-	m_maincpu->set_video_irq_spidman(true);
 }
 
-void spg110_game_state::spg110_spdmo(machine_config& config)
-{
-	spg110_base(config);
-	m_maincpu->set_video_irq_spidman(true);
-}
 
 void spg110_easports_game_state::easports_pal(machine_config &config)
 {
 	spg110_base_pal(config);
-	m_maincpu->set_video_irq_spidman(true);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 }
+
 
 
 void spg110_sstarkar_game_state::machine_start()
@@ -725,8 +722,8 @@ ROM_END
 // JAKKS Pacific Inc TV games
 CONS( 2004, jak_capb,  0,        0, spg110_base, jak_capb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Classic Arcade Pinball (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2004, jak_spdmo, jak_spdm, 0, spg110_spdmo, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the smaller more 'square' style joystick that was originally released before the GameKey slot was added.
-CONS( 2004, jak_spdmoa,jak_spdm, 0, spg110_spdmo, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the resdesigned stick, but before the GameKey release
+CONS( 2004, jak_spdmo, jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the smaller more 'square' style joystick that was originally released before the GameKey slot was added.
+CONS( 2004, jak_spdmoa,jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the resdesigned stick, but before the GameKey release
 
 // this was sold by SDW Games for the US market, ROM not yet verified to be the same, also appears in some multigames?
 CONS( 2003, conyteni,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny",      "TV Virtual Tennis", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs motion inputs, and video fixes, setting to PAL

@@ -26,8 +26,6 @@ public:
 		m_screen.set_tag(std::forward<T>(screen_tag));
 	}
 
-	void set_video_irq_spidman(bool is_spiderman) { m_is_spiderman = is_spiderman; }
-
 	auto porta_out() { return m_porta_out.bind(); }
 	auto portb_out() { return m_portb_out.bind(); }
 	auto portc_out() { return m_portc_out.bind(); }
@@ -88,7 +86,6 @@ private:
 	void configure_spg_io(spg2xx_io_device* io);
 
 	void videoirq_w(int state);
-	bool m_is_spiderman;
 };
 
 DECLARE_DEVICE_TYPE(SPG110, spg110_device)
