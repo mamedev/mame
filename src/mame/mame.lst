@@ -17701,6 +17701,7 @@ mjmywrldt
 mjreach1
 mjreach1a
 mjschuka
+mjswacad
 mjtenho
 mjxysl
 mmpanic
@@ -28544,6 +28545,7 @@ rfmpbr2
 swe1pb
 
 @source:midway/seattle.cpp
+<<<<<<< HEAD
 biofreak
 blitz
 blitz2k
@@ -28565,6 +28567,30 @@ vaportrx
 vaportrxp
 wg3dh
 wg3dhfe
+=======
+biofreak                        // (c) 1997 Midway Games (prototype)
+blitz                           // (c) 1997 Midway Games
+blitz2k                         // (c) 1999 Midway Games
+blitz99                         // (c) 1998 Midway Games
+blitz99a                        // (c) 1998 Midway Games
+calspeed                        // (c) 1996 Atari Games
+calspeeda                       // (c) 1996 Atari Games
+calspeedb                       // (c) 1996 Atari Games
+carnevil                        // (c) 1998 Midway Games (v1.0.3)
+carnevil1                       // (c) 1998 Midway Games (v1.0.1)
+hyprdriv                        // (c) 1998 Midway Games (v1.40)
+hyprdriv31                      // (c) 1998 Midway Games (v1.31)
+mace                            // (c) 1996 Atari Games
+macea                           // (c) 1996 Atari Games
+sfrush                          // (c) 1996 Atari Games
+sfrushrk                        // (c) 1996 Atari Games
+sfrushrkw                       // (c) 1996 Atari Games
+sfrushrkwo                      // (c) 1996 Atari Games
+vaportrx                        // (c) 1998 Atari Games
+vaportrxp                       // (c) 1998 Atari Games
+wg3dh                           // (c) 1996 Atari Games
+wg3dhfe                         // (c) 1996 Atari Games
+>>>>>>> f8433c6c112 (New working clone)
 
 @source:midway/spyhuntertec.cpp
 spyhuntsp
@@ -47152,17 +47178,18 @@ ban_bkgj
 ban_dn1j
 ban_gkrj
 ban_kksj
+ban_ordj
 ban_ult
 ban_utmj
-epo_ntpj
-epo_rgfj
-ban_ordj
+ban_um2j
 domdance
 domfitch
 domfitex
 domstepc
 doradraw
 epo_doka
+epo_ntpj
+epo_rgfj
 epo_tfit
 maxheart
 mrangbat

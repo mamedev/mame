@@ -2853,6 +2853,24 @@ ROM_START( hyprdriv )
 ROM_END
 
 
+ROM_START( hyprdriv31 )
+	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
+	ROM_LOAD16_BYTE( "seattle.snd", 0x000000, 0x8000, BAD_DUMP CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
+
+	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
+	ROM_SYSTEM_BIOS( 1, "update",       "Unknown Update" )
+	ROMX_LOAD( "hyperdrive1.2.u33", 0x000000, 0x100000, CRC(fcc922fb) SHA1(7bfa4f0614f561ba77ad2dc7d776af2c3e84b7e7), ROM_BIOS(1) )
+
+	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )
+	ROM_LOAD( "hyperdrive1.1.u32", 0x000000, 0x80000, CRC(3120991e) SHA1(8e47888a5a23c9d3c0d0c64497e1cfb4e46c2cd6) )  // Boot Rom Version 2. Doesn't work, maybe for older drive?
+	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )  // Boot Rom Version 9.
+
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Version 1.31  Oct 21 1998  14:16:44
+	DISK_IMAGE( "hyprdriv31", 0, SHA1(1c4746bfa39f9395a111f0cc6cbea678b69b9976) )
+ROM_END
+
+
 
 /*************************************
  *
@@ -3041,3 +3059,4 @@ GAME(  1999, blitz2k,    0,        blitz2k,   blitz99,  seattle_state, init_blit
 GAME(  1998, carnevil,   0,        carnevil,  carnevil, seattle_state, init_carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", MACHINE_SUPPORTS_SAVE )
 GAME(  1998, carnevil1,  carnevil, carnevil,  carnevil, seattle_state, init_carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1998, hyprdriv,   0,        hyprdriv,  hyprdriv, seattle_state, init_hyprdriv, ROT0, "Midway Games", "Hyperdrive (ver 1.40, Oct 23 1998)", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
+GAMEL( 1998, hyprdriv31, hyprdriv, hyprdriv,  hyprdriv, seattle_state, init_hyprdriv, ROT0, "Midway Games", "Hyperdrive (ver 1.31, Oct 21 1998)", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
