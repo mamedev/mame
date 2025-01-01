@@ -46,8 +46,8 @@ public:
 	void win_attribute_w(uint16_t data);
 	void win_mask_3_2034_w(uint16_t data);
 	void win_mask_4_2035_w(uint16_t data);
-	void irq_tm_v_2036_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void irq_tm_h_2037_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void irq_tm_v_2036_w(uint16_t data);
+	void irq_tm_h_2037_w(uint16_t data);
 	void effect_control_2039_w(uint16_t data);
 
 	void huereference_203c_w(uint16_t data);

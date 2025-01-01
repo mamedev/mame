@@ -465,26 +465,24 @@ void spg110_video_device::win_attribute_w(uint16_t data) { logerror("%s: win_att
 void spg110_video_device::win_mask_3_2034_w(uint16_t data) { logerror("%s: win_mask_3_2034_w: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
 void spg110_video_device::win_mask_4_2035_w(uint16_t data) { logerror("%s: win_mask_4_2035_w: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
 
-void spg110_video_device::irq_tm_v_2036_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void spg110_video_device::irq_tm_v_2036_w(uint16_t data)
 {
 	// used for scanline raster effects, including ball shadow in capb
-	logerror("%s: irq_tm_v_2036_w: %04x\n", machine().describe_context(), data);
-	COMBINE_DATA(&m_tm_v_2036);
+	m_tm_v_2036 = data & 0x1ff;
 	update_raster_interrupt_timer();
 }
 
 uint16_t spg110_video_device::irq_tm_h_2037_r()
 {
-	// added to something from the PRNG
-	// should this return the *current* horizontal position?
-	return 0x0000;
+	// added to value from the PRNG for some random number generation cases
+	// should this return the *current* horizontal position? or the register value written?
+	return m_screen->hpos();
 } 
 
-void spg110_video_device::irq_tm_h_2037_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void spg110_video_device::irq_tm_h_2037_w(uint16_t data)
 {
 	// horizontal position for the scanline IRQ
-	logerror("%s: irq_tm_h_2037_w: %04x\n", machine().describe_context(), data);
-	COMBINE_DATA(&m_tm_h_2037);
+	m_tm_h_2037 = data & 0x1ff;
 	update_raster_interrupt_timer();
 }
 
@@ -879,8 +877,11 @@ TIMER_CALLBACK_MEMBER(spg110_video_device::dma_done)
 
 void spg110_video_device::update_raster_interrupt_timer()
 {
-	if (m_tm_h_2037 < 160 && m_tm_v_2036 < 240)
-		m_screenpos_timer->adjust(m_screen->time_until_pos(m_tm_v_2036, m_tm_h_2037 << 1));
+	if (m_tm_h_2037 < 320 && m_tm_v_2036 < 240)
+	{
+		m_screenpos_timer->adjust(m_screen->time_until_pos(m_tm_v_2036, m_tm_h_2037));
+
+	}
 	else
 		m_screenpos_timer->adjust(attotime::never);
 }
@@ -893,7 +894,7 @@ TIMER_CALLBACK_MEMBER(spg110_video_device::screenpos_hit)
 	m_screen->update_partial(m_screen->vpos());
 
 	// fire again (based on spg2xx logic)
-	m_screenpos_timer->adjust(m_screen->time_until_pos(m_tm_v_2036, m_tm_h_2037 << 1));
+	m_screenpos_timer->adjust(m_screen->time_until_pos(m_tm_v_2036, m_tm_h_2037));
 }
 
 void spg110_video_device::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
