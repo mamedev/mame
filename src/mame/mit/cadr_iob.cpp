@@ -302,7 +302,9 @@ TIMER_CALLBACK_MEMBER(cadr_iob_device::transmit_callback)
 {
 	m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
 	if (BIT(m_chaos_csr, CHAOSNET_TRANSMIT_IRQ_ENABLE_BIT))
+	{
 		m_irq_vector_cb(IRQ_VECTOR_CHAOS_TRANSMIT);
+	}
 }
 
 
@@ -346,7 +348,9 @@ void cadr_iob_device::write(offs_t offset, u16 data)
 			m_chaos_csr = (m_chaos_csr & ~CHAOSNET_LOST_COUNT);
 		}
 		if (BIT(data, CHAOSNET_TRANSMIT_IRQ_ENABLE_BIT))
+		{
 			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
+		}
 		if (BIT(data, CHAOSNET_RESET_TRANSMIT_BIT))
 		{
 			// TODO Reset the transmitter
@@ -439,7 +443,9 @@ INPUT_CHANGED_MEMBER(cadr_iob_device::mouse_changed)
 {
 	m_csr |= 0x10;
 	if (BIT(m_csr, CSR_MOUSE_IRQ_ENABLE_BIT))
+	{
 		m_irq_vector_cb(IRQ_VECTOR_MOUSE);
+	}
 }
 
 
@@ -462,7 +468,9 @@ void cadr_iob_device::mcu_bus_w(u8 data)
 		m_keyboard_data = m_bus >> 1;
 		m_csr |= CSR_KEYBOARD_READY;
 		if (BIT(m_csr, CSR_KEYBOARD_IRQ_ENABLE_BIT))
+		{
 			m_irq_vector_cb(IRQ_VECTOR_KEYBOARD);
+		}
 		break;
 	case 0x60:
 		m_bus = (m_bus & 0xff00ffff) | (data << 16);

@@ -406,15 +406,23 @@ void cadr_cpu_device::alu_operation(u32 &res, u32 &carry_out)
 			break;
 		case 0x01: // div step
 			if (BIT(m_q, 0))
+			{
 				sub32(m_a, m_m, BIT(~m_op, 2), res, carry_out);
+			}
 			else
+			{
 				add32(m_a, m_m, BIT(m_op, 2), res, carry_out);
+			}
 			break;
 		case 0x05: // remainder correction
 			if (BIT(m_q, 0))
+			{
 				res = m_m;
+			}
 			else
+			{
 				add32(m_a, m_m, BIT(m_op, 2), res, carry_out);
+			}
 			break;
 		default:
 			fatalerror("%x(%o): alu div/mult %02x operation not implemented", m_prev_pc, m_prev_pc, (m_op >> 3) & 0x1f);
@@ -529,7 +537,9 @@ void cadr_cpu_device::write_destination(u32 output)
 		case 0x01:
 			m_lc = (1 << 31) | (m_ic & 0x3c000000) | (output & 0x3ffffff);
 			if (!BIT(m_ic, 29))
+			{
 				m_lc &= ~1;
+			}
 			LOGMASKED(LOG_TRACE, "LC <- %x(%o)\n", output, output);
 			break;
 		case 0x02: // IC
@@ -644,7 +654,9 @@ bool cadr_cpu_device::jump_condition(s32 a, s32 m)
 	}
 
 	if (BIT(m_op, 6))
+	{
 		condition = !condition;
+	}
 
 	return condition;
 }
@@ -789,9 +801,13 @@ void cadr_cpu_device::execute_dispatch()
 		LOGMASKED(LOG_TRACE, "l2_index=%x(%o), l2=%x(%o)\n", l2_index, l2_index, l2, l2);
 
 		if (BIT(m_op, 8))
+		{
 			index |= BIT(l2, 18);
+		}
 		if (BIT(m_op, 9))
+		{
 			index |= BIT(l2, 19);
+		}
 	}
 
 	const u32 dispatch = m_dpc[index];
@@ -882,7 +898,9 @@ void cadr_cpu_device::execute_run()
 		}
 
 		if (!m_n)
+		{
 			debugger_instruction_hook(m_pc);
+		}
 		m_prev_pc = m_pc;
 		m_pc = m_next_pc;
 		u64 next_op = m_program.read_qword(m_next_pc++);
@@ -909,7 +927,9 @@ void cadr_cpu_device::execute_run()
 			}
 		}
 		else
+		{
 			m_n = false;
+		}
 
 		m_op = next_op;
 

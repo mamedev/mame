@@ -64,7 +64,9 @@ uint32_t cadr_tv_control_device::screen_update(screen_device &screen, bitmap_rgb
 			const u32 xs = x * 32;
 
 			for (int i = 0; i < 32; i++)
+			{
 				bitmap.pix(y, xs + i) = BIT(d, i) ? white : black;
+			}
 		}
 	}
 	return 0;
