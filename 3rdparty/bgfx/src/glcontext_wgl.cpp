@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -335,8 +335,9 @@ namespace bgfx { namespace gl
 		return BGFX_CAPS_SWAP_CHAIN;
 	}
 
-	SwapChainGL* GlContext::createSwapChain(void* _nwh)
+	SwapChainGL* GlContext::createSwapChain(void* _nwh, int _width, int _height)
 	{
+		BX_UNUSED(_width, _height);
 		SwapChainGL* swapChain = BX_NEW(g_allocator, SwapChainGL)(_nwh);
 
 		int result = SetPixelFormat(swapChain->m_hdc, m_pixelFormat, &m_pfd);
@@ -349,7 +350,7 @@ namespace bgfx { namespace gl
 
 	void GlContext::destroySwapChain(SwapChainGL*  _swapChain)
 	{
-		BX_DELETE(g_allocator, _swapChain);
+		bx::deleteObject(g_allocator, _swapChain);
 		wglMakeCurrent(m_hdc, m_context);
 	}
 

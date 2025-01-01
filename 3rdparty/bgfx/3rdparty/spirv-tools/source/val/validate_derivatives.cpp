@@ -14,13 +14,11 @@
 
 // Validates correctness of derivative SPIR-V instructions.
 
-#include "source/val/validate.h"
-
 #include <string>
 
-#include "source/diagnostic.h"
 #include "source/opcode.h"
 #include "source/val/instruction.h"
+#include "source/val/validate.h"
 #include "source/val/validation_state.h"
 
 namespace spvtools {
@@ -28,25 +26,26 @@ namespace val {
 
 // Validates correctness of derivative instructions.
 spv_result_t DerivativesPass(ValidationState_t& _, const Instruction* inst) {
-  const SpvOp opcode = inst->opcode();
+  const spv::Op opcode = inst->opcode();
   const uint32_t result_type = inst->type_id();
 
   switch (opcode) {
-    case SpvOpDPdx:
-    case SpvOpDPdy:
-    case SpvOpFwidth:
-    case SpvOpDPdxFine:
-    case SpvOpDPdyFine:
-    case SpvOpFwidthFine:
-    case SpvOpDPdxCoarse:
-    case SpvOpDPdyCoarse:
-    case SpvOpFwidthCoarse: {
+    case spv::Op::OpDPdx:
+    case spv::Op::OpDPdy:
+    case spv::Op::OpFwidth:
+    case spv::Op::OpDPdxFine:
+    case spv::Op::OpDPdyFine:
+    case spv::Op::OpFwidthFine:
+    case spv::Op::OpDPdxCoarse:
+    case spv::Op::OpDPdyCoarse:
+    case spv::Op::OpFwidthCoarse: {
       if (!_.IsFloatScalarOrVectorType(result_type)) {
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Expected Result Type to be float scalar or vector type: "
                << spvOpcodeString(opcode);
       }
-      if (!_.ContainsSizedIntOrFloatType(result_type, SpvOpTypeFloat, 32)) {
+      if (!_.ContainsSizedIntOrFloatType(result_type, spv::Op::OpTypeFloat,
+                                         32)) {
         return _.diag(SPV_ERROR_INVALID_DATA, inst)
                << "Result type component width must be 32 bits";
       }
@@ -58,15 +57,17 @@ spv_result_t DerivativesPass(ValidationState_t& _, const Instruction* inst) {
                << spvOpcodeString(opcode);
       }
       _.function(inst->function()->id())
-          ->RegisterExecutionModelLimitation([opcode](SpvExecutionModel model,
+          ->RegisterExecutionModelLimitation([opcode](spv::ExecutionModel model,
                                                       std::string* message) {
-            if (model != SpvExecutionModelFragment &&
-                model != SpvExecutionModelGLCompute) {
+            if (model != spv::ExecutionModel::Fragment &&
+                model != spv::ExecutionModel::GLCompute &&
+                model != spv::ExecutionModel::MeshEXT &&
+                model != spv::ExecutionModel::TaskEXT) {
               if (message) {
                 *message =
                     std::string(
-                        "Derivative instructions require Fragment or GLCompute "
-                        "execution model: ") +
+                        "Derivative instructions require Fragment, GLCompute, "
+                        "MeshEXT or TaskEXT execution model: ") +
                     spvOpcodeString(opcode);
               }
               return false;
@@ -80,19 +81,23 @@ spv_result_t DerivativesPass(ValidationState_t& _, const Instruction* inst) {
             const auto* models = state.GetExecutionModels(entry_point->id());
             const auto* modes = state.GetExecutionModes(entry_point->id());
             if (models &&
-                models->find(SpvExecutionModelGLCompute) != models->end() &&
+                (models->find(spv::ExecutionModel::GLCompute) !=
+                     models->end() ||
+                 models->find(spv::ExecutionModel::MeshEXT) != models->end() ||
+                 models->find(spv::ExecutionModel::TaskEXT) != models->end()) &&
                 (!modes ||
-                 (modes->find(SpvExecutionModeDerivativeGroupLinearNV) ==
+                 (modes->find(spv::ExecutionMode::DerivativeGroupLinearKHR) ==
                       modes->end() &&
-                  modes->find(SpvExecutionModeDerivativeGroupQuadsNV) ==
+                  modes->find(spv::ExecutionMode::DerivativeGroupQuadsKHR) ==
                       modes->end()))) {
               if (message) {
-                *message = std::string(
-                               "Derivative instructions require "
-                               "DerivativeGroupQuadsNV "
-                               "or DerivativeGroupLinearNV execution mode for "
-                               "GLCompute execution model: ") +
-                           spvOpcodeString(opcode);
+                *message =
+                    std::string(
+                        "Derivative instructions require "
+                        "DerivativeGroupQuadsKHR "
+                        "or DerivativeGroupLinearKHR execution mode for "
+                        "GLCompute, MeshEXT or TaskEXT execution model: ") +
+                    spvOpcodeString(opcode);
               }
               return false;
             }

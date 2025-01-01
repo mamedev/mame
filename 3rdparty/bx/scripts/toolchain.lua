@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2024 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bx/blob/master/LICENSE
 --
 
@@ -70,7 +70,6 @@ function toolchain(_buildDir, _libDir)
 			{ "android-x86_64",  "Android - x86_64"           },
 			{ "wasm2js",         "Emscripten/Wasm2JS"         },
 			{ "wasm",            "Emscripten/Wasm"            },
-			{ "freebsd",         "FreeBSD"                    },
 			{ "linux-gcc",       "Linux (GCC compiler)"       },
 			{ "linux-gcc-afl",   "Linux (GCC + AFL fuzzer)"   },
 			{ "linux-clang",     "Linux (Clang compiler)"     },
@@ -78,15 +77,16 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
 			{ "linux-ppc64le-gcc",  "Linux (PPC64LE, GCC compiler)"  },
 			{ "linux-ppc64le-clang",  "Linux (PPC64LE, Clang compiler)"  },
+			{ "linux-riscv64-gcc",  "Linux (RISC-V 64, GCC compiler)"  },
 			{ "ios-arm",         "iOS - ARM"                  },
 			{ "ios-arm64",       "iOS - ARM64"                },
 			{ "ios-simulator",   "iOS - Simulator"            },
-			{ "ios-simulator64", "iOS - Simulator 64"         },
 			{ "tvos-arm64",      "tvOS - ARM64"               },
+			{ "xros-arm64",      "visionOS ARM64"             },
+			{ "xros-simulator",  "visionOS - Simulator"       },
 			{ "tvos-simulator",  "tvOS - Simulator"           },
 			{ "mingw-gcc",       "MinGW"                      },
 			{ "mingw-clang",     "MinGW (clang compiler)"     },
-			{ "netbsd",          "NetBSD"                     },
 			{ "osx-x64",         "OSX - x64"                  },
 			{ "osx-arm64",       "OSX - ARM64"                },
 			{ "orbis",           "Orbis"                      },
@@ -116,6 +116,7 @@ function toolchain(_buildDir, _libDir)
 			{ "osx", "OSX" },
 			{ "ios", "iOS" },
 			{ "tvos", "tvOS" },
+			{ "xros", "visionOS" },
 		}
 	}
 
@@ -128,19 +129,25 @@ function toolchain(_buildDir, _libDir)
 	newoption {
 		trigger     = "with-ios",
 		value       = "#",
-		description = "Set iOS target version (default: 8.0).",
+		description = "Set iOS target version (default: 13.0).",
 	}
 
 	newoption {
 		trigger     = "with-macos",
 		value       = "#",
-		description = "Set macOS target version (default 10.11).",
+		description = "Set macOS target version (default 13.0).",
 	}
 
 	newoption {
 		trigger     = "with-tvos",
 		value       = "#",
-		description = "Set tvOS target version (default: 9.0).",
+		description = "Set tvOS target version (default: 13.0).",
+	}
+
+	newoption {
+		trigger     = "with-visionos",
+		value       = "#",
+		description = "Set visionOS target version (default: 1.0).",
 	}
 
 	newoption {
@@ -195,6 +202,11 @@ function toolchain(_buildDir, _libDir)
 		tvosPlatform = _OPTIONS["with-tvos"]
 	end
 
+	local xrosPlatform = ""
+	if _OPTIONS["with-xros"] then
+		xrosPlatform = _OPTIONS["with-xros"]
+	end
+
 	local windowsPlatform = nil
 	if _OPTIONS["with-windows"] then
 		windowsPlatform = _OPTIONS["with-windows"]
@@ -208,7 +220,7 @@ function toolchain(_buildDir, _libDir)
 	end
 
 	flags {
-		"Cpp14",
+		"Cpp17",
 		"ExtraWarnings",
 		"FloatFast",
 	}
@@ -245,11 +257,15 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.namestyle = "Emscripten"
 			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
-		elseif "freebsd" == _OPTIONS["gcc"] then
-			location (path.join(_buildDir, "projects", _ACTION .. "-freebsd"))
-
 		elseif "ios-arm"   == _OPTIONS["gcc"]
 			or "ios-arm64" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+			premake.gcc.ar  = "ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
+
+		elseif "xros-arm64"     == _OPTIONS["gcc"]
+			or "xros-simulator" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
@@ -260,12 +276,6 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator"))
-
-		elseif "ios-simulator64" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
-			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator64"))
 
 		elseif "tvos-arm64" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
@@ -280,13 +290,13 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-tvos-simulator"))
 
 		elseif "linux-gcc" == _OPTIONS["gcc"] then
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-gcc"))
 
 		elseif "linux-gcc-afl" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "afl-gcc"
 			premake.gcc.cxx = "afl-g++"
 			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-gcc"))
 
 		elseif "linux-clang" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "clang"
@@ -313,6 +323,9 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-ppc64le-clang"))
 
+		elseif "linux-riscv64-gcc" == _OPTIONS["gcc"] then
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-riscv64-gcc"))
+
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW") then
 				print("Set MINGW environment variable.")
@@ -333,6 +346,14 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-mingw-gcc"))
 
 		elseif "mingw-clang" == _OPTIONS["gcc"] then
+			if not os.getenv("MINGW") then
+				print("Set MINGW environment variable.")
+			end
+
+			if not os.getenv("CLANG") then
+				print("Set CLANG environment variable.")
+			end
+
 			premake.gcc.cc   = "$(CLANG)/bin/clang"
 			premake.gcc.cxx  = "$(CLANG)/bin/clang++"
 			premake.gcc.ar   = "$(MINGW)/bin/ar"
@@ -340,12 +361,8 @@ function toolchain(_buildDir, _libDir)
 --			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-mingw-clang"))
 
-		elseif "netbsd" == _OPTIONS["gcc"] then
-			location (path.join(_buildDir, "projects", _ACTION .. "-netbsd"))
-
 		elseif "osx-x64"   == _OPTIONS["gcc"]
 			or "osx-arm64" == _OPTIONS["gcc"] then
-
 
 			if os.is("linux") then
 				if not os.getenv("OSXCROSS") then
@@ -436,19 +453,24 @@ function toolchain(_buildDir, _libDir)
 		end
 
 		if "osx" == _OPTIONS["xcode"] then
-			action.xcode.macOSTargetPlatformVersion = str_or(macosPlatform, "10.11")
+			action.xcode.macOSTargetPlatformVersion = str_or(macosPlatform, "13.0")
 			premake.xcode.toolset = "macosx"
 			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
 
 		elseif "ios" == _OPTIONS["xcode"] then
-			action.xcode.iOSTargetPlatformVersion = str_or(iosPlatform, "8.0")
+			action.xcode.iOSTargetPlatformVersion = str_or(iosPlatform, "13.0")
 			premake.xcode.toolset = "iphoneos"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios"))
 
 		elseif "tvos" == _OPTIONS["xcode"] then
-			action.xcode.tvOSTargetPlatformVersion = str_or(tvosPlatform, "9.0")
+			action.xcode.tvOSTargetPlatformVersion = str_or(tvosPlatform, "13.0")
 			premake.xcode.toolset = "appletvos"
 			location (path.join(_buildDir, "projects", _ACTION .. "-tvos"))
+
+		elseif "xros" == _OPTIONS["xcode"] then
+			action.xcode.visionOSTargetPlatformVersion = str_or(xrosPlatform, "1.0")
+			premake.xcode.toolset = "xros"
+			location (path.join(_buildDir, "projects", _ACTION .. "-xros"))
 		end
 	end
 
@@ -487,6 +509,7 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "Release" }
+		targetsuffix "Release"
 		flags {
 			"NoBufferSecurityCheck",
 			"OptimizeSpeed",
@@ -494,16 +517,16 @@ function toolchain(_buildDir, _libDir)
 		defines {
 			"NDEBUG",
 		}
-		targetsuffix "Release"
 
 	configuration { "*-clang" }
 		buildoptions {
+			"-Wno-nan-infinity-disabled",
 			"-Wno-tautological-constant-compare",
 		}
 
-	configuration { "vs*", "x32" }
+	configuration { "vs*", "not NX32", "not NX64" }
 		flags {
-			"EnableSSE2",
+			"EnableAVX",
 		}
 
 	configuration { "vs*", "not orbis", "not NX32", "not NX64" }
@@ -522,7 +545,9 @@ function toolchain(_buildDir, _libDir)
 			"/wd4201", -- warning C4201: nonstandard extension used: nameless struct/union
 			"/wd4324", -- warning C4324: '': structure was padded due to alignment specifier
 			"/Ob2",    -- The Inline Function Expansion
-			"/Zc:__cplusplus", -- Enable updated __cplusplus macro
+
+			"/Zc:__cplusplus",  -- Enable updated __cplusplus macro.
+			"/Zc:preprocessor", -- Enable preprocessor conformance mode.
 		}
 		linkoptions {
 			"/ignore:4221", -- LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
@@ -599,12 +624,12 @@ function toolchain(_buildDir, _libDir)
 			"MINGW_HAS_SECURE_API=1",
 		}
 		buildoptions {
+			"-Wa,-mbig-obj",
+			"-Wundef",
 			"-Wunused-value",
 			"-fdata-sections",
 			"-ffunction-sections",
-			"-msse2",
-			"-Wunused-value",
-			"-Wundef",
+			"-msse4.2",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
@@ -637,6 +662,7 @@ function toolchain(_buildDir, _libDir)
 			"-isystem $(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++",
 			"-isystem $(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32",
 			"-isystem $(MINGW)/x86_64-w64-mingw32/include",
+			"-Wno-nan-infinity-disabled",
 		}
 		linkoptions {
 			"-Qunused-arguments",
@@ -669,7 +695,7 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "linux-gcc* or linux-clang*" }
 		buildoptions {
-			"-msse2",
+			"-msse4.2",
 --			"-Wdouble-promotion",
 --			"-Wduplicated-branches",
 --			"-Wduplicated-cond",
@@ -809,7 +835,7 @@ function toolchain(_buildDir, _libDir)
 			"--target=i686-none-linux-android" .. androidApiLevel,
 			"-mtune=atom",
 			"-mstackrealign",
-			"-msse3",
+			"-msse4.2",
 			"-mfpmath=sse",
 		}
 		linkoptions {
@@ -851,6 +877,20 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,--gc-sections",
 		}
 
+	configuration { "linux-riscv64*" }
+		buildoptions {
+			"-Wunused-value",
+			"-Wundef",
+			"-march=rv64g"
+		}
+		links {
+			"rt",
+			"dl",
+		}
+		linkoptions {
+			"-Wl,--gc-sections",
+		}
+
 	configuration { "linux-ppc64le-gcc" }
 		targetdir (path.join(_buildDir, "linux_ppc64le_gcc/bin"))
 		objdir (path.join(_buildDir, "linux_ppc64le_gcc/obj"))
@@ -860,6 +900,11 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "linux_ppc64le_clang/bin"))
 		objdir (path.join(_buildDir, "linux_ppc64le_clang/obj"))
 		libdirs { path.join(_libDir, "lib/linux_ppc64le_clang") }
+
+	configuration { "linux-riscv64-gcc" }
+		targetdir (path.join(_buildDir, "linux_riscv64_gcc/bin"))
+		objdir (path.join(_buildDir, "linux_riscv64_gcc/obj"))
+		libdirs { path.join(_libDir, "lib/linux_riscv64_gcc") }
 
 	configuration { "wasm2js" }
 		targetdir (path.join(_buildDir, "wasm2js/bin"))
@@ -874,23 +919,6 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "wasm/obj"))
 		libdirs { path.join(_libDir, "lib/wasm") }
 
-	configuration { "freebsd" }
-		targetdir (path.join(_buildDir, "freebsd/bin"))
-		objdir (path.join(_buildDir, "freebsd/obj"))
-		libdirs { path.join(_libDir, "lib/freebsd") }
-		includedirs {
-			path.join(bxDir, "include/compat/freebsd"),
-		}
-
-	configuration { "xbox360" }
-		targetdir (path.join(_buildDir, "xbox360/bin"))
-		objdir (path.join(_buildDir, "xbox360/obj"))
-		includedirs { path.join(bxDir, "include/compat/msvc") }
-		libdirs { path.join(_libDir, "lib/xbox360") }
-		defines {
-			"NOMINMAX",
-		}
-
 	configuration { "durango" }
 		targetdir (path.join(_buildDir, "durango/bin"))
 		objdir (path.join(_buildDir, "durango/obj"))
@@ -901,14 +929,6 @@ function toolchain(_buildDir, _libDir)
 			"NOMINMAX",
 		}
 
-	configuration { "netbsd" }
-		targetdir (path.join(_buildDir, "netbsd/bin"))
-		objdir (path.join(_buildDir, "netbsd/obj"))
-		libdirs { path.join(_libDir, "lib/netbsd") }
-		includedirs {
-			path.join(bxDir, "include/compat/freebsd"),
-		}
-
 	configuration { "osx-x64" }
 		targetdir (path.join(_buildDir, "osx-x64/bin"))
 		objdir (path.join(_buildDir, "osx-x64/obj"))
@@ -917,8 +937,8 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions {
 			"-arch x86_64",
-			"-msse2",
-			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "10.11"),
+			"-msse4.2",
+			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "13.0"),
 		}
 
 	configuration { "osx-arm64" }
@@ -938,6 +958,8 @@ function toolchain(_buildDir, _libDir)
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
+--			"-Wno-overriding-t-option",
+--			"-mmacosx-version-min=13.0",
 		}
 		includedirs { path.join(bxDir, "include/compat/osx") }
 
@@ -949,6 +971,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
+--			"-mios-version-min=16.0",
 		}
 		includedirs { path.join(bxDir, "include/compat/ios") }
 
@@ -980,16 +1003,53 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "ios-arm*" }
 		linkoptions {
-			"-miphoneos-version-min=9.0",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/usr/lib/system",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/Frameworks",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"-miphoneos-version-min=9.0",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 			"-fembed-bitcode",
+		}
+
+	configuration { "xros*" }
+		linkoptions {
+			"-lc++",
+		}
+		buildoptions {
+			"-Wfatal-errors",
+			"-Wunused-value",
+			"-Wundef",
+		}
+		includedirs { path.join(bxDir, "include/compat/ios") }
+
+	configuration { "xros-arm64" }
+		targetdir (path.join(_buildDir, "xros-arm64/bin"))
+		objdir (path.join(_buildDir, "xros-arm64/obj"))
+		libdirs { path.join(_libDir, "lib/xros-arm64") }
+		linkoptions {
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..xrosPlatform.. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..xrosPlatform .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..xrosPlatform .. ".sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..xrosPlatform .. ".sdk/System/Library/PrivateFrameworks",
+		}
+		buildoptions {
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..tvosPlatform .. ".sdk",
+		}
+
+	configuration { "xros-simulator" }
+		targetdir (path.join(_buildDir, "xros-simulator/bin"))
+		objdir (path.join(_buildDir, "xros-simulator/obj"))
+		libdirs { path.join(_libDir, "lib/xros-simulator") }
+
+		linkoptions {
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" ..xrosPlatform.. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" ..xrosPlatform .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" ..xrosPlatform .. ".sdk/System/Library/Frameworks",
+		}
+		buildoptions {
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" ..xrosPlatform .. ".sdk",
 		}
 
 	configuration { "ios-simulator" }
@@ -997,34 +1057,12 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "ios-simulator/obj"))
 		libdirs { path.join(_libDir, "lib/ios-simulator") }
 		linkoptions {
-			"-mios-simulator-version-min=9.0",
-			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/Frameworks",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"-mios-simulator-version-min=9.0",
-			"-arch i386",
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
-		}
-
-	configuration { "ios-simulator64" }
-		targetdir (path.join(_buildDir, "ios-simulator64/bin"))
-		objdir (path.join(_buildDir, "ios-simulator64/obj"))
-		libdirs { path.join(_libDir, "lib/ios-simulator64") }
-		linkoptions {
-			"-mios-simulator-version-min=9.0",
-			"-arch x86_64",
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
-			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/Frameworks",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
-		}
-		buildoptions {
-			"-mios-simulator-version-min=9.0",
-			"-arch x86_64",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 		}
 
@@ -1066,16 +1104,12 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "tvos-simulator/obj"))
 		libdirs { path.join(_libDir, "lib/tvos-simulator") }
 		linkoptions {
-			"-mtvos-simulator-version-min=9.0",
-			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk/usr/lib/system",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk/System/Library/Frameworks",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"-mtvos-simulator-version-min=9.0",
-			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk",
 		}
 

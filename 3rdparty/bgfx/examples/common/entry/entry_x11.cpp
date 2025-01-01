@@ -1,11 +1,11 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "entry_p.h"
 
-#if ENTRY_CONFIG_USE_NATIVE && (BX_PLATFORM_BSD || BX_PLATFORM_LINUX || BX_PLATFORM_RPI)
+#if ENTRY_CONFIG_USE_NATIVE && (BX_PLATFORM_LINUX || BX_PLATFORM_RPI)
 
 #define XK_MISCELLANY
 #define XK_LATIN1
@@ -336,8 +336,13 @@ namespace entry
 			m_display = XOpenDisplay(NULL);
 			if (NULL == m_display)
 			{
-				bx::printf("XOpenDisplay failed: DISPLAY environment variable must be set.\n\n");
-				return bx::kExitFailure;
+				// Use `DISPLAY` environment variable to pick display. If `DISPLAY` is not set try ":0"
+				m_display = XOpenDisplay(":0");
+				if (NULL == m_display)
+				{
+					bx::printf("XOpenDisplay failed: DISPLAY environment variable must be set.\n\n");
+					return bx::kExitFailure;
+				}
 			}
 
 			int32_t screen = DefaultScreen(m_display);
@@ -771,9 +776,8 @@ namespace entry
 		return s_ctx.m_display;
 	}
 
-	bgfx::NativeWindowHandleType::Enum getNativeWindowHandleType(WindowHandle _handle)
+	bgfx::NativeWindowHandleType::Enum getNativeWindowHandleType()
 	{
-		BX_UNUSED(_handle);
 		return bgfx::NativeWindowHandleType::Default;
 	}
 
@@ -785,4 +789,4 @@ int main(int _argc, const char* const* _argv)
 	return s_ctx.run(_argc, _argv);
 }
 
-#endif // ENTRY_CONFIG_USE_NATIVE && (BX_PLATFORM_BSD || BX_PLATFORM_LINUX || BX_PLATFORM_RPI)
+#endif // ENTRY_CONFIG_USE_NATIVE && (BX_PLATFORM_LINUX || BX_PLATFORM_RPI)

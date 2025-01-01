@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2024 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
@@ -9,7 +9,6 @@ project "bimg"
 	includedirs {
 		path.join(BIMG_DIR, "include"),
 		path.join(BIMG_DIR, "3rdparty/astc-encoder/include"),
-		path.join(BIMG_DIR, "3rdparty/tinyexr/deps/miniz"),
 	}
 
 	files {
@@ -19,8 +18,6 @@ project "bimg"
 
 		path.join(BIMG_DIR, "3rdparty/astc-encoder/source/**.cpp"),
 		path.join(BIMG_DIR, "3rdparty/astc-encoder/source/**.h"),
-
-		path.join(BIMG_DIR, "3rdparty/tinyexr/deps/miniz/miniz.*"),
 	}
 
 	using_bx()

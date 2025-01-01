@@ -33,14 +33,12 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 
-#if !defined(GLSLANG_WEB)
-
 #ifndef _REFLECTION_INCLUDED
 #define _REFLECTION_INCLUDED
 
 #include "../Public/ShaderLang.h"
-#include "../Include/Types.h"
-
+#include "../Include/BaseTypes.h"
+#include "../Include/visibility.h"
 #include <list>
 #include <set>
 
@@ -67,6 +65,7 @@ public:
     virtual ~TReflection() {}
 
     // grow the reflection stage by stage
+    GLSLANG_EXPORT_FOR_TESTS
     bool addStage(EShLanguage, const TIntermediate&);
 
     // for mapping a uniform index to a uniform object's description
@@ -219,5 +218,3 @@ protected:
 } // end namespace glslang
 
 #endif // _REFLECTION_INCLUDED
-
-#endif // !GLSLANG_WEB

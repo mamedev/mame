@@ -1426,7 +1426,6 @@ project "bimg"
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_partition_tables.cpp",
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_percentile_tables.cpp",
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_pick_best_endpoint_format.cpp",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_platform_isa_detection.cpp",
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_quantization.cpp",
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_symbolic_physical.cpp",
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_weight_align.cpp",
@@ -1598,15 +1597,12 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_agc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d12.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d9.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_gl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_gnm.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_noop.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_nvn.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/renderer_webgpu.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dxbc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_spirv.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/topology.cpp",
@@ -1621,8 +1617,6 @@ end
 	}
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
-			MAME_DIR .. "3rdparty/bgfx/src/glcontext_eagl.mm",
-			MAME_DIR .. "3rdparty/bgfx/src/glcontext_nsgl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/renderer_mtl.mm",
 		}
 		buildoptions {

@@ -41,13 +41,22 @@
 #include <cstdlib>
 #include <exception>
 
-namespace spv {
-
-// MSVC defines __cplusplus as an older value, even when it supports almost all of 11.
-// We handle that here by making our own symbol.
-#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1700)
-#   define use_cpp11 1
+#ifdef GLSLANG_IS_SHARED_LIBRARY
+    #ifdef _WIN32
+        #ifdef GLSLANG_EXPORTING
+            #define GLSLANG_EXPORT __declspec(dllexport)
+        #else
+            #define GLSLANG_EXPORT __declspec(dllimport)
+        #endif
+    #elif __GNUC__ >= 4
+        #define GLSLANG_EXPORT __attribute__((visibility("default")))
+    #endif
+#endif // GLSLANG_IS_SHARED_LIBRARY
+#ifndef GLSLANG_EXPORT
+#define GLSLANG_EXPORT
 #endif
+
+namespace spv {
 
 class spirvbin_base_t
 {
@@ -74,27 +83,6 @@ public:
 
 } // namespace SPV
 
-#if !defined (use_cpp11)
-#include <cstdio>
-#include <cstdint>
-
-namespace spv {
-class spirvbin_t : public spirvbin_base_t
-{
-public:
-    spirvbin_t(int /*verbose = 0*/) { }
-
-    void remap(std::vector<std::uint32_t>& /*spv*/, unsigned int /*opts = 0*/)
-    {
-        printf("Tool not compiled for C++11, which is required for SPIR-V remapping.\n");
-        exit(5);
-    }
-};
-
-} // namespace SPV
-
-#else // defined (use_cpp11)
-
 #include <functional>
 #include <cstdint>
 #include <unordered_map>
@@ -104,12 +92,13 @@ public:
 #include <cassert>
 
 #include "spirv.hpp"
-#include "spvIR.h"
 
 namespace spv {
 
+static inline constexpr Id NoResult = 0;
+
 // class to hold SPIR-V binary data for remapping, DCE, and debug stripping
-class spirvbin_t : public spirvbin_base_t
+class GLSLANG_EXPORT spirvbin_t : public spirvbin_base_t
 {
 public:
    spirvbin_t(int verbose = 0) : entryPoint(spv::NoResult), largestNewId(0), verbose(verbose), errorLatch(false)
@@ -308,5 +297,4 @@ private:
 
 } // namespace SPV
 
-#endif // defined (use_cpp11)
 #endif // SPIRVREMAPPER_H

@@ -1,0 +1,151 @@
+name: CI
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  msvc:
+    strategy:
+      fail-fast: true
+      matrix:
+        include: [
+          { config: Debug, platform: x64, bindir: 'win64_vs2022' },
+          { config: Release, platform: x64, bindir: 'win64_vs2022' },
+        ]
+    name: msvc-${{ matrix.config }}-${{ matrix.platform }}
+    runs-on: windows-2022
+    steps:
+      - name: Checkout bx
+        uses: actions/checkout@v4
+        with:
+          repository: bkaradzic/bx
+          path: bx
+      - name: Prepare
+        uses: microsoft/setup-msbuild@v2
+      - name: Build
+        shell: cmd
+        run: |
+          cd bx
+          tools\bin\windows\genie.exe vs2022
+          msbuild ".build/projects/vs2022/bx.sln" /m /v:minimal /p:Configuration=${{ matrix.config }} /p:Platform=${{ matrix.platform }}
+      - name: Check
+        shell: cmd
+        run: |
+          cd bx
+          ".build\${{ matrix.bindir }}\bin\bx.test${{ matrix.config }}.exe" -d yes
+  mingw:
+    strategy:
+      fail-fast: true
+      matrix:
+        include: [
+          { msystem: MINGW64, project: 'mingw-gcc', bindir: 'win64_mingw-gcc' },
+#          { msystem: CLANG64, project: 'mingw-clang', bindir: 'win64_mingw-clang' },
+        ]
+    name: mingw-${{ matrix.msystem }}
+    runs-on: windows-2022
+    steps:
+      - name: Checkout bx
+        uses: actions/checkout@v4
+        with:
+          repository: bkaradzic/bx
+          path: bx
+      - name: Prepare
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          update: true
+          install: make
+          pacboy: cc:p
+      - name: Build
+        shell: msys2 {0}
+        run: |
+          cd bx
+          tools/bin/windows/genie.exe --gcc=${{ matrix.project }} gmake
+          make -R -C .build/projects/gmake-${{ matrix.project }} config=release64 -j$(nproc) AR=ar CC=cc CXX=c++ MINGW=$MINGW_PREFIX
+      - name: Check
+        shell: cmd
+        run: |
+          cd bx
+          ".build\${{ matrix.bindir }}\bin\bx.testRelease.exe" -d yes
+  linux:
+    strategy:
+      fail-fast: true
+      matrix:
+        include: [
+          { config: debug, binsuffix: Debug },
+          { config: release, binsuffix: Release },
+        ]
+    name: linux-gcc-${{ matrix.config }}64
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout bx
+        uses: actions/checkout@v4
+        with:
+          repository: bkaradzic/bx
+          path: bx
+      - name: Build
+        run: |
+          cd bx
+          tools/bin/linux/genie --gcc=linux-gcc gmake
+          make -R -C .build/projects/gmake-linux-gcc config=${{ matrix.config }}64 -j$(nproc)
+      - name: Check
+        run: |
+          cd bx
+          ".build/linux64_gcc/bin/bx.test${{ matrix.binsuffix}}" -d yes
+  osx:
+    strategy:
+      fail-fast: true
+      matrix:
+        include: [
+          { config: debug, binsuffix: Debug },
+          { config: release, binsuffix: Release },
+        ]
+    name: osx-x64-${{ matrix.config }}
+    runs-on: macos-14
+    steps:
+      - name: Checkout bx
+        uses: actions/checkout@v4
+        with:
+          repository: bkaradzic/bx
+          path: bx
+      - name: Build
+        run: |
+          cd bx
+          tools/bin/darwin/genie --gcc=osx-x64 gmake
+          make -C .build/projects/gmake-osx-x64 config=${{ matrix.config }} -j$(sysctl -n hw.physicalcpu)
+      - name: Check
+        run: |
+          cd bx
+          ".build/osx-x64/bin/bx.test${{ matrix.binsuffix}}" -d yes
+  emscripten:
+    strategy:
+      fail-fast: true
+      matrix:
+        include: [
+          { config: debug, binsuffix: Debug },
+          { config: release, binsuffix: Release },
+        ]
+    name: wasm-${{ matrix.config }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout bx
+        uses: actions/checkout@v4
+        with:
+          repository: bkaradzic/bx
+          path: bx
+      - uses: mymindstorm/setup-emsdk@v14
+      - uses: browser-actions/setup-chrome@v1
+      - name: Build
+        run: |
+          cd bx
+          tools/bin/linux/genie --gcc=wasm gmake
+          make -C .build/projects/gmake-wasm config=${{ matrix.config }} -j$(nproc) EMSCRIPTEN=$EMSDK/upstream/emscripten
+      - name: Check
+        run: |
+          cd bx
+#          npx http-server -o .build/wasm/bin/ & chromium http://127.0.0.1:8080/.build/wasm/bin/bx.testRelease.html

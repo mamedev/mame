@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -164,6 +164,14 @@ namespace bx
 	/// Returns true if type `Ty` is unsigned integer type, otherwise returns false.
 	template<typename Ty>
 	constexpr bool isUnsigned();
+
+	/// Returns value of `_t` as signed type value.
+	template<typename Ty>
+	constexpr auto asSigned(Ty _value);
+
+	/// Returns value of `_t` as unsigned type value.
+	template<typename Ty>
+	constexpr auto asUnsigned(Ty _value);
 
 	/// Returns true if type `Ty` is integer type, otherwise returns false.
 	template<typename Ty>

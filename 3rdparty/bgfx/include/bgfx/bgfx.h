@@ -1,10 +1,12 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #ifndef BGFX_H_HEADER_GUARD
 #define BGFX_H_HEADER_GUARD
+
+#define BGFX_IDL_CPP 0
 
 #include <stdarg.h> // va_list
 #include <stdint.h> // uint32_t
@@ -53,7 +55,6 @@ namespace bgfx
 		{
 			Noop,         //!< No rendering.
 			Agc,          //!< AGC
-			Direct3D9,    //!< Direct3D 9.0
 			Direct3D11,   //!< Direct3D 11.0
 			Direct3D12,   //!< Direct3D 12.0
 			Gnm,          //!< GNM
@@ -62,7 +63,6 @@ namespace bgfx
 			OpenGLES,     //!< OpenGL ES 2.0+
 			OpenGL,       //!< OpenGL 2.1+
 			Vulkan,       //!< Vulkan
-			WebGPU,       //!< WebGPU
 
 			Count
 		};
@@ -180,19 +180,19 @@ namespace bgfx
 			ATCE,         //!< ATCE RGBA 8 BPP explicit alpha
 			ATCI,         //!< ATCI RGBA 8 BPP interpolated alpha
 			ASTC4x4,      //!< ASTC 4x4 8.0 BPP
-			ASTC5x4,	  //!< ASTC 5x4 6.40 BPP
+			ASTC5x4,      //!< ASTC 5x4 6.40 BPP
 			ASTC5x5,      //!< ASTC 5x5 5.12 BPP
-			ASTC6x5,	  //!< ASTC 6x5 4.27 BPP
+			ASTC6x5,      //!< ASTC 6x5 4.27 BPP
 			ASTC6x6,      //!< ASTC 6x6 3.56 BPP
 			ASTC8x5,      //!< ASTC 8x5 3.20 BPP
 			ASTC8x6,      //!< ASTC 8x6 2.67 BPP
-			ASTC8x8,	  //!< ASTC 8x8 2.00 BPP
+			ASTC8x8,      //!< ASTC 8x8 2.00 BPP
 			ASTC10x5,     //!< ASTC 10x5 2.56 BPP
-			ASTC10x6,	  //!< ASTC 10x6 2.13 BPP
-			ASTC10x8,	  //!< ASTC 10x8 1.60 BPP
-			ASTC10x10,	  //!< ASTC 10x10 1.28 BPP
-			ASTC12x10,	  //!< ASTC 12x10 1.07 BPP
-			ASTC12x12,	  //!< ASTC 12x12 0.89 BPP
+			ASTC10x6,     //!< ASTC 10x6 2.13 BPP
+			ASTC10x8,     //!< ASTC 10x8 1.60 BPP
+			ASTC10x10,    //!< ASTC 10x10 1.28 BPP
+			ASTC12x10,    //!< ASTC 12x10 1.07 BPP
+			ASTC12x12,    //!< ASTC 12x12 0.89 BPP
 
 			Unknown,      // Compressed formats above.
 
@@ -350,7 +350,7 @@ namespace bgfx
 		enum Enum
 		{
 			TriListFlipWinding,  //!< Flip winding order of triangle list.
-			TriStripFlipWinding, //!< Flip winding order of trinagle strip.
+			TriStripFlipWinding, //!< Flip winding order of triangle strip.
 			TriListToLineList,   //!< Convert triangle list to line list.
 			TriStripToTriList,   //!< Convert triangle strip to triangle list.
 			LineStripToLineList, //!< Convert line strip to line list.
@@ -664,6 +664,7 @@ namespace bgfx
 		uint32_t reset;             //!< Reset parameters.
 		uint8_t  numBackBuffers;    //!< Number of back buffers.
 		uint8_t  maxFrameLatency;   //!< Maximum frame latency.
+		uint8_t  debugTextScale;    //!< Scale factor for debug text.
 	};
 
 	/// Initialization parameters used by `bgfx::init`.
@@ -1011,7 +1012,7 @@ namespace bgfx
 		uint32_t numCompute;                //!< Number of compute calls submitted.
 		uint32_t numBlit;                   //!< Number of blit calls submitted.
 		uint32_t maxGpuLatency;             //!< GPU driver latency.
-		uint32_t gpuFrameNum;               //<! Frame which generated gpuTimeBegin, gpuTimeEnd.
+		uint32_t gpuFrameNum;               //!< Frame which generated gpuTimeBegin, gpuTimeEnd.
 
 		uint16_t numDynamicIndexBuffers;    //!< Number of used dynamic index buffers.
 		uint16_t numDynamicVertexBuffers;   //!< Number of used dynamic vertex buffers.
@@ -1054,13 +1055,16 @@ namespace bgfx
 	///
 	struct Encoder
 	{
-		/// Sets a debug marker. This allows you to group
-		/// graphics calls together for easy browsing in
-		/// graphics debugging tools.
+		/// Sets a debug marker. This allows you to group graphics calls together for easy
+		/// browsing in graphics debugging tools.
+		///
+		/// @param[in] _name Marker name.
+		/// @param[in] _len Marker name length (if length is INT32_MAX, it's expected that _name
+		///   is zero terminated string.
 		///
 		/// @attention C99's equivalent binding is `bgfx_encoder_set_marker`.
 		///
-		void setMarker(const char* _marker);
+		void setMarker(const char* _name, int32_t _len = INT32_MAX);
 
 		/// Set render states for draw primitive.
 		///
@@ -1518,8 +1522,8 @@ namespace bgfx
 			  ViewId _id
 			, ProgramHandle _program
 			, IndirectBufferHandle _indirectHandle
-			, uint16_t _start = 0
-			, uint16_t _num = 1
+			, uint32_t _start = 0
+			, uint32_t _num = 1
 			, uint32_t _depth = 0
 			, uint8_t _flags = BGFX_DISCARD_ALL
 			);
@@ -1545,10 +1549,10 @@ namespace bgfx
 			  ViewId _id
 			, ProgramHandle _program
 			, IndirectBufferHandle _indirectHandle
-			, uint16_t _start
+			, uint32_t _start
 			, IndexBufferHandle _numHandle
 			, uint32_t _numIndex = 0
-			, uint16_t _numMax = UINT16_MAX
+			, uint32_t _numMax = UINT32_MAX
 			, uint32_t _depth = 0
 			, uint8_t _flags = BGFX_DISCARD_ALL
 			);
@@ -1676,8 +1680,8 @@ namespace bgfx
 			  ViewId _id
 			, ProgramHandle _handle
 			, IndirectBufferHandle _indirectHandle
-			, uint16_t _start = 0
-			, uint16_t _num   = 1
+			, uint32_t _start = 0
+			, uint32_t _num   = 1
 			, uint8_t _flags  = BGFX_DISCARD_ALL
 			);
 
@@ -2004,7 +2008,7 @@ namespace bgfx
 	/// Returns supported backend API renderers.
 	///
 	/// @param[in] _max Maximum number of elements in _enum array.
-	/// @param[inout] _enum Array where supported renderers will be written.
+	/// @param[in,out] _enum Array where supported renderers will be written.
 	///
 	/// @returns Number of supported renderers.
 	///
@@ -2190,7 +2194,8 @@ namespace bgfx
 
 	/// Print into internal debug text character-buffer (VGA-compatible text mode).
 	///
-	/// @param[in] _x, _y 2D position from top-left.
+	/// @param[in] _x The X coordinate (2D position from top-left)
+	/// @param[in] _y The Y coordinate (2D position from top-left)
 	/// @param[in] _attr Color palette. Where top 4-bits represent index of background, and bottom
 	///   4-bits represent foreground color from standard VGA text palette (ANSI escape codes).
 	/// @param[in] _format `printf` style format.
@@ -2207,7 +2212,8 @@ namespace bgfx
 
 	/// Print into internal debug text character-buffer (VGA-compatible text mode).
 	///
-	/// @param[in] _x, _y 2D position from top-left.
+	/// @param[in] _x The X coordinate (2D position from top-left)
+	/// @param[in] _y The Y coordinate (2D position from top-left)
 	/// @param[in] _attr Color palette. Where top 4-bits represent index of background, and bottom
 	///   4-bits represent foreground color from standard VGA text palette (ANSI escape codes).
 	/// @param[in] _format `printf` style format.
@@ -2225,8 +2231,10 @@ namespace bgfx
 
 	/// Draw image into internal debug text buffer.
 	///
-	/// @param[in] _x, _y 2D position from top-left.
-	/// @param[in] _width, _height  Image width and height.
+	/// @param[in] _x The X coordinate (2D position from top-left)
+	/// @param[in] _y The Y coordinate (2D position from top-left)
+	/// @param[in] _width  Image width
+	/// @param[in] _height  Image height
 	/// @param[in] _data  Raw image data (character/attribute raw encoding).
 	/// @param[in] _pitch Image pitch in bytes.
 	///
@@ -2617,6 +2625,9 @@ namespace bgfx
 	/// Create shader from memory buffer.
 	///
 	/// @returns Shader handle.
+	///
+	/// @remarks
+	///   Shader binary is obtained by compiling shader offline with shaderc command line tool.
 	///
 	/// @attention C99's equivalent binding is `bgfx_create_shader`.
 	///
@@ -3065,7 +3076,8 @@ namespace bgfx
 	/// @param[in] _width Texture width.
 	/// @param[in] _height Texture height.
 	/// @param[in] _format Texture format. See: `TextureFormat::Enum`.
-	/// @param[in] _textureFlags Default texture sampling mode is linear, and wrap mode
+	/// @param[in] _textureFlags Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`)
+	///   flags. Default texture sampling mode is linear, and wrap mode
 	///   is repeat.
 	///   - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
 	///     mode.
@@ -3089,7 +3101,8 @@ namespace bgfx
 	/// @param[in] _ratio Frame buffer size in respect to back-buffer size. See:
 	///   `BackbufferRatio::Enum`.
 	/// @param[in] _format Texture format. See: `TextureFormat::Enum`.
-	/// @param[in] _textureFlags Default texture sampling mode is linear, and wrap mode
+	/// @param[in] _textureFlags Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`)
+	///   flags. Default texture sampling mode is linear, and wrap mode
 	///   is repeat.
 	///   - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap
 	///     mode.
@@ -3307,7 +3320,10 @@ namespace bgfx
 	/// Set palette color value.
 	///
 	/// @param[in] _index Index into palette.
-	/// @param[in] _r, _g, _b, _a RGBA floating point values.
+	/// @param[in] _r Red value (RGBA floating point values)
+	/// @param[in] _g Green value (RGBA floating point values)
+	/// @param[in] _b Blue value (RGBA floating point values)
+	/// @param[in] _a Alpha value (RGBA floating point values)
 	///
 	/// @attention C99's equivalent binding is `bgfx_set_palette_color`.
 	///
@@ -3335,6 +3351,8 @@ namespace bgfx
 	///
 	/// @param[in] _id View id.
 	/// @param[in] _name View name.
+	/// @param[in] _len View name length (if length is INT32_MAX, it's expected that _name
+	///   is zero terminated string.
 	///
 	/// @remarks
 	///   This is debug only feature.
@@ -3352,6 +3370,7 @@ namespace bgfx
 	void setViewName(
 		  ViewId _id
 		, const char* _name
+		, int32_t _len = INT32_MAX
 		);
 
 	/// Set view rectangle. Draw primitive outside view will be clipped.
@@ -3532,11 +3551,16 @@ namespace bgfx
 	///
 	void resetView(ViewId _id);
 
-	/// Sets debug marker.
+	/// Sets a debug marker. This allows you to group graphics calls together for easy
+	/// browsing in graphics debugging tools.
+	///
+	/// @param[in] _name Marker name.
+	/// @param[in] _len Marker name length (if length is INT32_MAX, it's expected that _name
+	///   is zero terminated string.
 	///
 	/// @attention C99's equivalent binding is `bgfx_set_marker`.
 	///
-	void setMarker(const char* _marker);
+	void setMarker(const char* _name, int32_t _len = INT32_MAX);
 
 	/// Set render states for draw primitive.
 	///
@@ -3992,8 +4016,8 @@ namespace bgfx
 		  ViewId _id
 		, ProgramHandle _program
 		, IndirectBufferHandle _indirectHandle
-		, uint16_t _start = 0
-		, uint16_t _num   = 1
+		, uint32_t _start = 0
+		, uint32_t _num   = 1
 		, uint32_t _depth = 0
 		, uint8_t _flags  = BGFX_DISCARD_ALL
 		);
@@ -4019,10 +4043,10 @@ namespace bgfx
 		  ViewId _id
 		, ProgramHandle _program
 		, IndirectBufferHandle _indirectHandle
-		, uint16_t _start
+		, uint32_t _start
 		, IndexBufferHandle _numHandle
 		, uint32_t _numIndex = 0
-		, uint16_t _numMax = UINT16_MAX
+		, uint32_t _numMax = UINT32_MAX
 		, uint32_t _depth = 0
 		, uint8_t _flags = BGFX_DISCARD_ALL
 		);
@@ -4150,8 +4174,8 @@ namespace bgfx
 		  ViewId _id
 		, ProgramHandle _handle
 		, IndirectBufferHandle _indirectHandle
-		, uint16_t _start = 0
-		, uint16_t _num   = 1
+		, uint32_t _start = 0
+		, uint32_t _num   = 1
 		, uint8_t _flags  = BGFX_DISCARD_ALL
 		);
 

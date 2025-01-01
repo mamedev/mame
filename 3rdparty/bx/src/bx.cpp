@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -12,6 +12,84 @@
 
 namespace bx
 {
+	Location Location::current(const char* _filePath, uint32_t _line)
+	{
+		return Location(_filePath, _line);
+	}
+
+	LocationFull LocationFull::current(const char* _function, const char* _filePath, uint32_t _line)
+	{
+		return LocationFull(_function, _filePath, _line);
+	}
+
+	static bool defaultAssertHandler(const Location& _location, const char* _format, va_list _argList)
+	{
+		char    temp[8192];
+		int32_t total = 0;
+
+		StaticMemoryBlockWriter smb(temp, BX_COUNTOF(temp) );
+
+		ErrorIgnore err;
+
+		total += write(&smb, &err, "\n--- ASSERT ---\n\n");
+
+		total += write(&smb, &err, "%s(%d): "
+			, _location.filePath
+			, _location.line
+			);
+		total += write(&smb, _format, _argList, &err);
+		total += write(&smb, "\n\n", &err);
+
+		uintptr_t stack[32];
+		const uint32_t num = getCallStack(2 /* skip self */, BX_COUNTOF(stack), stack);
+		total += writeCallstack(&smb, stack, num, &err);
+
+		total += write(&smb, &err,
+			"\nBuild info:\n"
+			"\tCompiler: " BX_COMPILER_NAME
+			", CPU: " BX_CPU_NAME
+			", Arch: " BX_ARCH_NAME
+			", OS: " BX_PLATFORM_NAME
+			", CRT: " BX_CRT_NAME
+			", C++: " BX_CPP_NAME
+
+			", Date: " __DATE__
+			", Time: " __TIME__
+			"\n"
+			);
+
+		total += write(&smb, &err, "\n--- END ---\n\n");
+
+		write(getDebugOut(), temp, total, ErrorIgnore{});
+
+		return true;
+	}
+
+	static AssertHandlerFn s_assertHandler = defaultAssertHandler;
+
+	void setAssertHandler(AssertHandlerFn _assertHandlerFn)
+	{
+		BX_WARN(defaultAssertHandler == s_assertHandler, "Assert handler is already set.");
+
+		if (defaultAssertHandler == s_assertHandler)
+		{
+			s_assertHandler = NULL == _assertHandlerFn
+				? defaultAssertHandler
+				: _assertHandlerFn
+				;
+		}
+	}
+
+	bool assertFunction(const Location& _location, const char* _format, ...)
+	{
+		va_list argList;
+		va_start(argList, _format);
+		const bool result = s_assertHandler(_location, _format, argList);
+		va_end(argList);
+
+		return result;
+	}
+
 	void swap(void* _a, void* _b, size_t _numBytes)
 	{
 		uint8_t* lhs = (uint8_t*)_a;

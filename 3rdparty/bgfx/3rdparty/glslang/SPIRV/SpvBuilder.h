@@ -48,6 +48,7 @@
 #define SpvBuilder_H
 
 #include "Logger.h"
+#define SPV_ENABLE_UTILITY_CODE
 #include "spirv.hpp"
 #include "spvIR.h"
 namespace spv {
@@ -56,6 +57,7 @@ namespace spv {
 }
 
 #include <algorithm>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <set>
@@ -103,31 +105,53 @@ public:
         stringIds[file_c_str] = strId;
         return strId;
     }
-    spv::Id getSourceFile() const 
+
+    spv::Id getMainFileId() const { return mainFileId; }
+
+    // Initialize the main source file name
+    void setDebugMainSourceFile(const std::string& file)
     {
-        return sourceFileStringId;
+        if (trackDebugInfo) {
+            dirtyLineTracker = true;
+            mainFileId = getStringId(file);
+            currentFileId = mainFileId;
+        }
     }
-    void setSourceFile(const std::string& file)
+
+    // Set the debug source location tracker in the builder.
+    // The upcoming instructions in basic blocks will be associated to this location.
+    void setDebugSourceLocation(int line, const char* filename)
     {
-        sourceFileStringId = getStringId(file);
-        currentFileId = sourceFileStringId;
+        if (trackDebugInfo) {
+            dirtyLineTracker = true;
+            if (line != 0) {
+                // TODO: This is special handling of some AST nodes having (untracked) line 0. 
+                //       But they should have a valid line number.
+                currentLine = line;
+                if (filename) {
+                    currentFileId = getStringId(filename);
+                }
+            }
+        }
     }
+
     void setSourceText(const std::string& text) { sourceText = text; }
     void addSourceExtension(const char* ext) { sourceExtensions.push_back(ext); }
     void addModuleProcessed(const std::string& p) { moduleProcesses.push_back(p.c_str()); }
-    void setEmitOpLines() { emitOpLines = true; }
-    void setEmitNonSemanticShaderDebugInfo(bool const emit)
+    void setEmitSpirvDebugInfo()
     {
-        emitNonSemanticShaderDebugInfo = emit;
-
-        if(emit)
-        {
-            importNonSemanticShaderDebugInfoInstructions();
-        }
+        trackDebugInfo = true;
+        emitSpirvDebugInfo = true;
     }
-    void setEmitNonSemanticShaderDebugSource(bool const src)
+    void setEmitNonSemanticShaderDebugInfo(bool emitSourceText)
     {
-        emitNonSemanticShaderDebugSource = src;
+        trackDebugInfo = true;
+        emitNonSemanticShaderDebugInfo = true;
+        importNonSemanticShaderDebugInfoInstructions();
+
+        if (emitSourceText) {
+            emitNonSemanticShaderDebugSource = emitSourceText;
+        }
     }
     void addExtension(const char* ext) { extensions.insert(ext); }
     void removeExtension(const char* ext)
@@ -169,23 +193,9 @@ public:
         return id;
     }
 
-    // Generate OpLine for non-filename-based #line directives (ie no filename
-    // seen yet): Log the current line, and if different than the last one,
-    // issue a new OpLine using the new line and current source file name.
-    void setLine(int line);
-
-    // If filename null, generate OpLine for non-filename-based line directives,
-    // else do filename-based: Log the current line and file, and if different
-    // than the last one, issue a new OpLine using the new line and file
-    // name.
-    void setLine(int line, const char* filename);
-    // Low-level OpLine. See setLine() for a layered helper.
-    void addLine(Id fileName, int line, int column);
-    void addDebugScopeAndLine(Id fileName, int line, int column);
-
     // For creating new types (will return old type if the requested one was already made).
     Id makeVoidType();
-    Id makeBoolType(bool const compilerGenerated = true);
+    Id makeBoolType();
     Id makePointer(StorageClass, Id pointee);
     Id makeForwardPointer(StorageClass);
     Id makePointerFromForwardPointer(StorageClass, Id forwardPointerType, Id pointee);
@@ -203,7 +213,9 @@ public:
     Id makeImageType(Id sampledType, Dim, bool depth, bool arrayed, bool ms, unsigned sampled, ImageFormat format);
     Id makeSamplerType();
     Id makeSampledImageType(Id imageType);
-    Id makeCooperativeMatrixType(Id component, Id scope, Id rows, Id cols);
+    Id makeCooperativeMatrixTypeKHR(Id component, Id scope, Id rows, Id cols, Id use);
+    Id makeCooperativeMatrixTypeNV(Id component, Id scope, Id rows, Id cols);
+    Id makeCooperativeMatrixTypeWithSameShape(Id component, Id otherType);
     Id makeGenericType(spv::Op opcode, std::vector<spv::IdImmediate>& operands);
 
     // SPIR-V NonSemantic Shader DebugInfo Instructions
@@ -224,22 +236,32 @@ public:
     Id makeMemberDebugType(Id const memberType, DebugTypeLoc const& debugTypeLoc);
     Id makeCompositeDebugType(std::vector<Id> const& memberTypes, char const*const name,
         NonSemanticShaderDebugInfo100DebugCompositeType const tag, bool const isOpaqueType = false);
+    Id makePointerDebugType(StorageClass storageClass, Id const baseType);
+    Id makeForwardPointerDebugType(StorageClass storageClass);
     Id makeDebugSource(const Id fileName);
     Id makeDebugCompilationUnit();
     Id createDebugGlobalVariable(Id const type, char const*const name, Id const variable);
     Id createDebugLocalVariable(Id type, char const*const name, size_t const argNumber = 0);
     Id makeDebugExpression();
-    Id makeDebugDeclare(Id const debugLocalVariable, Id const localVariable);
+    Id makeDebugDeclare(Id const debugLocalVariable, Id const pointer);
     Id makeDebugValue(Id const debugLocalVariable, Id const value);
     Id makeDebugFunctionType(Id returnType, const std::vector<Id>& paramTypes);
     Id makeDebugFunction(Function* function, Id nameId, Id funcTypeId);
-    Id makeDebugLexicalBlock(uint32_t line);
+    Id makeDebugLexicalBlock(uint32_t line, uint32_t column);
     std::string unmangleFunctionName(std::string const& name) const;
+
+    // Initialize non-semantic debug information for a function, including those of:
+    // - The function definition
+    // - The function parameters
+    void setupFunctionDebugInfo(Function* function, const char* name, const std::vector<Id>& paramTypes,
+                                const std::vector<char const*>& paramNames);
 
     // accelerationStructureNV type
     Id makeAccelerationStructureType();
     // rayQueryEXT type
     Id makeRayQueryType();
+    // hitObjectNV type
+    Id makeHitObjectNVType();
 
     // For querying about types.
     Id getTypeId(Id resultId) const { return module.getTypeId(resultId); }
@@ -247,9 +269,9 @@ public:
     Op getOpCode(Id id) const { return module.getInstruction(id)->getOpCode(); }
     Op getTypeClass(Id typeId) const { return getOpCode(typeId); }
     Op getMostBasicTypeClass(Id typeId) const;
-    int getNumComponents(Id resultId) const { return getNumTypeComponents(getTypeId(resultId)); }
-    int getNumTypeConstituents(Id typeId) const;
-    int getNumTypeComponents(Id typeId) const { return getNumTypeConstituents(typeId); }
+    unsigned int getNumComponents(Id resultId) const { return getNumTypeComponents(getTypeId(resultId)); }
+    unsigned int getNumTypeConstituents(Id typeId) const;
+    unsigned int getNumTypeComponents(Id typeId) const { return getNumTypeConstituents(typeId); }
     Id getScalarTypeId(Id typeId) const;
     Id getContainedTypeId(Id typeId) const;
     Id getContainedTypeId(Id typeId, int) const;
@@ -257,6 +279,7 @@ public:
     ImageFormat getImageTypeFormat(Id typeId) const
         { return (ImageFormat)module.getInstruction(typeId)->getImmediateOperand(6); }
     Id getResultingAccessChainType() const;
+    Id getIdOperand(Id resultId, int idx) { return module.getInstruction(resultId)->getIdOperand(idx); }
 
     bool isPointer(Id resultId)      const { return isPointerType(getTypeId(resultId)); }
     bool isScalar(Id resultId)       const { return isScalarType(getTypeId(resultId)); }
@@ -281,11 +304,10 @@ public:
     bool isMatrixType(Id typeId)       const { return getTypeClass(typeId) == OpTypeMatrix; }
     bool isStructType(Id typeId)       const { return getTypeClass(typeId) == OpTypeStruct; }
     bool isArrayType(Id typeId)        const { return getTypeClass(typeId) == OpTypeArray; }
-#ifdef GLSLANG_WEB
-    bool isCooperativeMatrixType(Id typeId)const { return false; }
-#else
-    bool isCooperativeMatrixType(Id typeId)const { return getTypeClass(typeId) == OpTypeCooperativeMatrixNV; }
-#endif
+    bool isCooperativeMatrixType(Id typeId)const
+    {
+        return getTypeClass(typeId) == OpTypeCooperativeMatrixKHR || getTypeClass(typeId) == OpTypeCooperativeMatrixNV;
+    }
     bool isAggregateType(Id typeId)    const
         { return isArrayType(typeId) || isStructType(typeId) || isCooperativeMatrixType(typeId); }
     bool isImageType(Id typeId)        const { return getTypeClass(typeId) == OpTypeImage; }
@@ -310,8 +332,6 @@ public:
     // See if a resultId is valid for use as an initializer.
     bool isValidInitializer(Id resultId) const { return isConstant(resultId) || isGlobalVariable(resultId); }
 
-    bool isRayTracingOpCode(Op opcode) const;
-
     int getScalarTypeWidth(Id typeId) const
     {
         Id scalarTypeId = getScalarTypeId(typeId);
@@ -319,18 +339,18 @@ public:
         return module.getInstruction(scalarTypeId)->getImmediateOperand(0);
     }
 
-    int getTypeNumColumns(Id typeId) const
+    unsigned int getTypeNumColumns(Id typeId) const
     {
         assert(isMatrixType(typeId));
         return getNumTypeConstituents(typeId);
     }
-    int getNumColumns(Id resultId) const { return getTypeNumColumns(getTypeId(resultId)); }
-    int getTypeNumRows(Id typeId) const
+    unsigned int getNumColumns(Id resultId) const { return getTypeNumColumns(getTypeId(resultId)); }
+    unsigned int getTypeNumRows(Id typeId) const
     {
         assert(isMatrixType(typeId));
         return getNumTypeComponents(getContainedTypeId(typeId));
     }
-    int getNumRows(Id resultId) const { return getTypeNumRows(getTypeId(resultId)); }
+    unsigned int getNumRows(Id resultId) const { return getTypeNumRows(getTypeId(resultId)); }
 
     Dim getTypeDimensionality(Id typeId) const
     {
@@ -389,6 +409,7 @@ public:
     void addDecoration(Id, Decoration, const char*);
     void addDecoration(Id, Decoration, const std::vector<unsigned>& literals);
     void addDecoration(Id, Decoration, const std::vector<const char*>& strings);
+    void addLinkageDecoration(Id id, const char* name, spv::LinkageType linkType);
     void addDecorationId(Id id, Decoration, Id idDecoration);
     void addDecorationId(Id id, Decoration, const std::vector<Id>& operandIds);
     void addMemberDecoration(Id, unsigned int member, Decoration, int num = -1);
@@ -400,10 +421,19 @@ public:
     // Also reset current last DebugScope and current source line to unknown
     void setBuildPoint(Block* bp) {
         buildPoint = bp;
-        lastDebugScopeId = NoResult;
-        currentLine = 0;
+        dirtyLineTracker = true;
+        dirtyScopeTracker = true;
     }
     Block* getBuildPoint() const { return buildPoint; }
+
+    // Append an instruction to the end of the current build point.
+    // Optionally, additional debug info instructions may also be prepended.
+    void addInstruction(std::unique_ptr<Instruction> inst);
+
+    // Append an instruction to the end of the current build point without prepending any debug instructions.
+    // This is useful for insertion of some debug info instructions themselves or some control flow instructions
+    // that are attached to its predecessor instruction.
+    void addInstructionNoDebugInfo(std::unique_ptr<Instruction> inst);
 
     // Make the entry-point function. The returned pointer is only valid
     // for the lifetime of this builder.
@@ -412,19 +442,19 @@ public:
     // Make a shader-style function, and create its entry block if entry is non-zero.
     // Return the function, pass back the entry.
     // The returned pointer is only valid for the lifetime of this builder.
-    Function* makeFunctionEntry(Decoration precision, Id returnType, const char* name,
-        const std::vector<Id>& paramTypes, const std::vector<char const*>& paramNames,
-        const std::vector<std::vector<Decoration>>& precisions, Block **entry = 0);
+    Function* makeFunctionEntry(Decoration precision, Id returnType, const char* name, LinkageType linkType,
+                                const std::vector<Id>& paramTypes,
+                                const std::vector<std::vector<Decoration>>& precisions, Block** entry = nullptr);
 
     // Create a return. An 'implicit' return is one not appearing in the source
     // code.  In the case of an implicit return, no post-return block is inserted.
     void makeReturn(bool implicit, Id retVal = 0);
 
     // Initialize state and generate instructions for new lexical scope
-    void enterScope(uint32_t line);
+    void enterLexicalBlock(uint32_t line, uint32_t column);
 
     // Set state and generate instructions to exit current lexical scope
-    void leaveScope();
+    void leaveLexicalBlock();
 
     // Prepare builder for generation of instructions for a function.
     void enterFunction(Function const* function);
@@ -462,8 +492,10 @@ public:
     // Create an OpArrayLength instruction
     Id createArrayLength(Id base, unsigned int member);
 
+    // Create an OpCooperativeMatrixLengthKHR instruction
+    Id createCooperativeMatrixLengthKHR(Id type);
     // Create an OpCooperativeMatrixLengthNV instruction
-    Id createCooperativeMatrixLength(Id type);
+    Id createCooperativeMatrixLengthNV(Id type);
 
     // Create an OpCompositeExtract instruction
     Id createCompositeExtract(Id composite, Id typeId, unsigned index);
@@ -616,7 +648,7 @@ public:
                     const std::vector<int>& valueToSegment, int defaultSegment, std::vector<Block*>& segmentBB);
 
     // Add a branch to the innermost switch's merge block.
-    void addSwitchBreak();
+    void addSwitchBreak(bool implicit);
 
     // Move to the next code segment, passing in the return argument in makeSwitch()
     void nextSwitchSegment(std::vector<Block*>& segmentBB, int segment);
@@ -698,11 +730,6 @@ public:
         // Accumulate whether anything in the chain of structures has coherent decorations.
         struct CoherentFlags {
             CoherentFlags() { clear(); }
-#ifdef GLSLANG_WEB
-            void clear() { }
-            bool isVolatile() const { return false; }
-            CoherentFlags operator |=(const CoherentFlags &other) { return *this; }
-#else
             bool isVolatile() const { return volatil; }
             bool isNonUniform() const { return nonUniform; }
             bool anyCoherent() const {
@@ -747,7 +774,6 @@ public:
                 nonUniform |= other.nonUniform;
                 return *this;
             }
-#endif
         };
         CoherentFlags coherentFlags;
     };
@@ -828,23 +854,25 @@ public:
 
     // Add capabilities, extensions, remove unneeded decorations, etc.,
     // based on the resulting SPIR-V.
-    void postProcess();
+    void postProcess(bool compileOnly);
 
     // Prune unreachable blocks in the CFG and remove unneeded decorations.
     void postProcessCFG();
 
-#ifndef GLSLANG_WEB
     // Add capabilities, extensions based on instructions in the module.
     void postProcessFeatures();
     // Hook to visit each instruction in a block in a function
     void postProcess(Instruction&);
     // Hook to visit each non-32-bit sized float/int operation in a block.
     void postProcessType(const Instruction&, spv::Id typeId);
-#endif
+    // move OpSampledImage instructions to be next to their users.
+    void postProcessSamplers();
 
     void dump(std::vector<unsigned int>&) const;
 
-    void createBranch(Block* block);
+    // Add a branch to the target block.
+    // If set implicit, the branch instruction shouldn't have debug source location.
+    void createBranch(bool implicit, Block* block);
     void createConditionalBranch(Id condition, Block* thenBlock, Block* elseBlock);
     void createLoopMerge(Block* mergeBlock, Block* continueBlock, unsigned int control,
         const std::vector<unsigned int>& operands);
@@ -855,6 +883,8 @@ public:
     void setToNormalCodeGenMode() { generatingOpCodeForSpecConst = false; }
     // Check if the builder is generating code for spec constants.
     bool isInSpecConstCodeGenMode() { return generatingOpCodeForSpecConst; }
+
+    void setUseReplicatedComposites(bool use) { useReplicatedComposites = use; }
 
  protected:
     Id makeIntConstant(Id typeId, unsigned value, bool specConstant);
@@ -871,29 +901,48 @@ public:
     void createSelectionMerge(Block* mergeBlock, unsigned int control);
     void dumpSourceInstructions(std::vector<unsigned int>&) const;
     void dumpSourceInstructions(const spv::Id fileId, const std::string& text, std::vector<unsigned int>&) const;
-    void dumpInstructions(std::vector<unsigned int>&, const std::vector<std::unique_ptr<Instruction> >&) const;
+    template <class Range> void dumpInstructions(std::vector<unsigned int>& out, const Range& instructions) const;
     void dumpModuleProcesses(std::vector<unsigned int>&) const;
     spv::MemoryAccessMask sanitizeMemoryAccessForStorageClass(spv::MemoryAccessMask memoryAccess, StorageClass sc)
         const;
+    struct DecorationInstructionLessThan {
+        bool operator()(const std::unique_ptr<Instruction>& lhs, const std::unique_ptr<Instruction>& rhs) const;
+    };
 
     unsigned int spvVersion;     // the version of SPIR-V to emit in the header
     SourceLanguage sourceLang;
     int sourceVersion;
-    spv::Id sourceFileStringId;
     spv::Id nonSemanticShaderCompilationUnitId {0};
     spv::Id nonSemanticShaderDebugInfo {0};
     spv::Id debugInfoNone {0};
     spv::Id debugExpression {0}; // Debug expression with zero operations.
     std::string sourceText;
-    int currentLine;
-    const char* currentFile;
-    spv::Id currentFileId;
+
+    // True if an new OpLine/OpDebugLine may need to be inserted. Either:
+    // 1. The current debug location changed
+    // 2. The current build point changed
+    bool dirtyLineTracker;
+    int currentLine = 0;
+    // OpString id of the current file name. Always 0 if debug info is off.
+    spv::Id currentFileId = 0;
+    // OpString id of the main file name. Always 0 if debug info is off.
+    spv::Id mainFileId = 0;
+
+    // True if an new OpDebugScope may need to be inserted. Either:
+    // 1. A new lexical block is pushed
+    // 2. The current build point changed
+    bool dirtyScopeTracker;
     std::stack<spv::Id> currentDebugScopeId;
-    spv::Id lastDebugScopeId;
-    bool emitOpLines;
-    bool emitNonSemanticShaderDebugInfo;
-    bool restoreNonSemanticShaderDebugInfo;
-    bool emitNonSemanticShaderDebugSource;
+
+    // This flag toggles tracking of debug info while building the SPIR-V.
+    bool trackDebugInfo = false;
+    // This flag toggles emission of SPIR-V debug instructions, like OpLine and OpSource.
+    bool emitSpirvDebugInfo = false;
+    // This flag toggles emission of Non-Semantic Debug extension debug instructions.
+    bool emitNonSemanticShaderDebugInfo = false;
+    bool restoreNonSemanticShaderDebugInfo = false;
+    bool emitNonSemanticShaderDebugSource = false;
+
     std::set<std::string> extensions;
     std::vector<const char*> sourceExtensions;
     std::vector<const char*> moduleProcesses;
@@ -906,6 +955,7 @@ public:
     Id uniqueId;
     Function* entryPointFunction;
     bool generatingOpCodeForSpecConst;
+    bool useReplicatedComposites { false };
     AccessChain accessChain;
 
     // special blocks of instructions for output
@@ -914,7 +964,7 @@ public:
     std::vector<std::unique_ptr<Instruction> > entryPoints;
     std::vector<std::unique_ptr<Instruction> > executionModes;
     std::vector<std::unique_ptr<Instruction> > names;
-    std::vector<std::unique_ptr<Instruction> > decorations;
+    std::set<std::unique_ptr<Instruction>, DecorationInstructionLessThan> decorations;
     std::vector<std::unique_ptr<Instruction> > constantsTypesGlobals;
     std::vector<std::unique_ptr<Instruction> > externals;
     std::vector<std::unique_ptr<Function> > functions;
@@ -954,6 +1004,6 @@ public:
     SpvBuildLogger* logger;
 };  // end Builder class
 
-};  // end spv namespace
+} // end spv namespace
 
 #endif // SpvBuilder_H

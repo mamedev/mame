@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -35,8 +35,8 @@ public:
 			char ch = data[ii];
 
 			asCStr &= false
-				| bx::isPrint(ch)
-				| bx::isSpace(ch)
+				|| bx::isPrint(ch)
+				|| bx::isSpace(ch)
 				;
 		}
 
@@ -84,21 +84,21 @@ public:
 				{
 					switch (ch)
 					{
-					case '\"': bx::write(_writer, "\\\"",        &err); break;
-					case '\n': bx::write(_writer, "\\n\"\n\t\"", &err); break;
-					case '\r': bx::write(_writer, "\\r",         &err); break;
-					case '\\': escaped = true;                 BX_FALLTHROUGH;
-					default:   bx::write(_writer, ch, &err);            break;
+					case '\"': bx::write(_writer, "\\\"",        &err);  break;
+					case '\n': bx::write(_writer, "\\n\"\n\t\"", &err);  break;
+					case '\r': bx::write(_writer, "\\r",         &err);  break;
+					case '\\': escaped = true;                 [[fallthrough]];
+					default:   bx::write(_writer, ch, &err);             break;
 					}
 				}
 				else
 				{
 					switch (ch)
 					{
-					case '\n': bx::write(_writer, "\\\"\n\t\"", &err);  break;
-					case '\r':                                 BX_FALLTHROUGH;
-					case '\t': bx::write(_writer, "\\", &err); BX_FALLTHROUGH;
-					default  : bx::write(_writer, ch,   &err);          break;
+					case '\n': bx::write(_writer, "\\\"\n\t\"", &err);   break;
+					case '\r':                                 [[fallthrough]];
+					case '\t': bx::write(_writer, "\\", &err); [[fallthrough]];
+					default  : bx::write(_writer, ch,   &err);           break;
 					}
 
 					escaped = false;
@@ -196,7 +196,7 @@ void help(const char* _error = NULL)
 
 	bx::write(stdOut, &err
 		, "bin2c, binary to C\n"
-		  "Copyright 2011-2022 Branimir Karadzic. All rights reserved.\n"
+		  "Copyright 2011-2024 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bx/blob/master/LICENSE\n\n"
 		);
 
@@ -251,7 +251,7 @@ int main(int _argc, const char* _argv[])
 		size = uint32_t(bx::getSize(&fr) );
 
 		bx::DefaultAllocator allocator;
-		data = BX_ALLOC(&allocator, size);
+		data = bx::alloc(&allocator, size);
 		bx::read(&fr, data, size, bx::ErrorAssert{});
 		bx::close(&fr);
 
@@ -270,7 +270,7 @@ int main(int _argc, const char* _argv[])
 			error("Failed to open output file '%.*s'.\n", path.getLength(), path.getPtr() );
 		}
 
-		BX_FREE(&allocator, data);
+		bx::free(&allocator, data);
 	}
 	else
 	{

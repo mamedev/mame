@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -14,7 +14,7 @@
 #endif // BX_CONFIG_CRT_DIRECTORY_READER
 
 #if BX_CRT_NONE
-#	include "crt0.h"
+#	include <bx/crt0.h>
 #else
 #	if BX_CONFIG_CRT_DIRECTORY_READER
 #		include <dirent.h>
@@ -70,12 +70,13 @@ namespace bx
 #	if BX_CRT_MSVC
 #		define fseeko64 _fseeki64
 #		define ftello64 _ftelli64
-#	elif 0                   \
-	  || BX_PLATFORM_ANDROID \
-	  || BX_PLATFORM_BSD     \
-	  || BX_PLATFORM_HAIKU   \
-	  || BX_PLATFORM_IOS     \
-	  || BX_PLATFORM_OSX
+#	elif 0                      \
+	  || BX_PLATFORM_ANDROID    \
+	  || BX_PLATFORM_EMSCRIPTEN \
+	  || BX_PLATFORM_IOS        \
+	  || BX_PLATFORM_OSX        \
+	  || BX_PLATFORM_VISIONOS   \
+		|| BX_PLATFORM_NX
 #		define fseeko64 fseeko
 #		define ftello64 ftello
 #	elif BX_PLATFORM_PS4
@@ -800,7 +801,7 @@ namespace bx
 #if BX_CRT_MSVC
 		int32_t result = ::_mkdir(_filePath.getCPtr() );
 #elif BX_CRT_MINGW
-		int32_t result = ::mkdir(_filePath.getCPtr());
+		int32_t result = ::mkdir(_filePath.getCPtr() );
 #elif BX_CRT_NONE
 		BX_UNUSED(_filePath);
 		int32_t result = -1;
@@ -864,14 +865,18 @@ namespace bx
 			return false;
 		}
 
-#if BX_CRT_MSVC
+#if BX_CRT_MSVC || BX_CRT_MINGW
 		int32_t result = -1;
 		FileInfo fi;
 		if (stat(fi, _filePath) )
 		{
 			if (FileType::Dir == fi.type)
 			{
+#	if BX_CRT_MINGW
+				result = ::rmdir(_filePath.getCPtr() );
+#	else
 				result = ::_rmdir(_filePath.getCPtr() );
+#	endif // BX_CRT_MINGW
 			}
 			else
 			{

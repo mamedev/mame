@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -7,10 +7,7 @@
 
 #if ENTRY_CONFIG_USE_SDL
 
-#if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-#	if ENTRY_CONFIG_USE_WAYLAND
-#		include <wayland-egl.h>
-#	endif
+#if BX_PLATFORM_LINUX
 #elif BX_PLATFORM_WINDOWS
 #	define SDL_MAIN_HANDLED
 #endif
@@ -48,50 +45,22 @@ namespace entry
 			return NULL;
 		}
 
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-#		if ENTRY_CONFIG_USE_WAYLAND
-			if (wmi.subsystem == SDL_SYSWM_WAYLAND)
-				{
-					wl_egl_window *win_impl = (wl_egl_window*)SDL_GetWindowData(_window, "wl_egl_window");
-					if(!win_impl)
-					{
-						int width, height;
-						SDL_GetWindowSize(_window, &width, &height);
-						struct wl_surface* surface = wmi.info.wl.surface;
-						if(!surface)
-							return nullptr;
-						win_impl = wl_egl_window_create(surface, width, height);
-						SDL_SetWindowData(_window, "wl_egl_window", win_impl);
-					}
-					return (void*)(uintptr_t)win_impl;
-				}
-			else
-#		endif // ENTRY_CONFIG_USE_WAYLAND
-				return (void*)wmi.info.x11.window;
-#	elif BX_PLATFORM_OSX || BX_PLATFORM_IOS
+#	if BX_PLATFORM_LINUX
+		if (wmi.subsystem == SDL_SYSWM_WAYLAND)
+		{
+			return (void*)wmi.info.wl.surface;
+		}
+		else
+		{
+			return (void*)wmi.info.x11.window;
+		}
+#	elif BX_PLATFORM_OSX || BX_PLATFORM_IOS || BX_PLATFORM_VISIONOS
 		return wmi.info.cocoa.window;
 #	elif BX_PLATFORM_WINDOWS
 		return wmi.info.win.window;
 #   elif BX_PLATFORM_ANDROID
 		return wmi.info.android.window;
 #	endif // BX_PLATFORM_
-	}
-
-	static void sdlDestroyWindow(SDL_Window* _window)
-	{
-		if(!_window)
-			return;
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-#		if ENTRY_CONFIG_USE_WAYLAND
-		wl_egl_window *win_impl = (wl_egl_window*)SDL_GetWindowData(_window, "wl_egl_window");
-		if(win_impl)
-		{
-			SDL_SetWindowData(_window, "wl_egl_window", nullptr);
-			wl_egl_window_destroy(win_impl);
-		}
-#		endif
-#	endif
-		SDL_DestroyWindow(_window);
 	}
 
 	static uint8_t translateKeyModifiers(uint16_t _sdl)
@@ -164,22 +133,6 @@ namespace entry
 		return GamepadAxis::Enum(s_translateGamepadAxis[_sdl]);
 	}
 
-	struct AxisDpadRemap
-	{
-		Key::Enum first;
-		Key::Enum second;
-	};
-
-	static AxisDpadRemap s_axisDpad[] =
-	{
-		{ Key::GamepadLeft, Key::GamepadRight },
-		{ Key::GamepadUp,   Key::GamepadDown  },
-		{ Key::None,        Key::None         },
-		{ Key::GamepadLeft, Key::GamepadRight },
-		{ Key::GamepadUp,   Key::GamepadDown  },
-		{ Key::None,        Key::None         },
-	};
-
 	struct GamepadSDL
 	{
 		GamepadSDL()
@@ -217,22 +170,6 @@ namespace entry
 			{
 				_eventQueue.postAxisEvent(_handle, _gamepad, _axis, _value);
 
-				if (Key::None != s_axisDpad[_axis].first)
-				{
-					if (_value == 0)
-					{
-						_eventQueue.postKeyEvent(_handle, s_axisDpad[_axis].first,  0, false);
-						_eventQueue.postKeyEvent(_handle, s_axisDpad[_axis].second, 0, false);
-					}
-					else
-					{
-						_eventQueue.postKeyEvent(_handle
-								, 0 > _value ? s_axisDpad[_axis].first : s_axisDpad[_axis].second
-								, 0
-								, true
-								);
-					}
-				}
 			}
 		}
 
@@ -493,7 +430,7 @@ namespace entry
 
 			// Force window resolution...
 			WindowHandle defaultWindow = { 0 };
-			setWindowSize(defaultWindow, m_width, m_height, true);
+			entry::setWindowSize(defaultWindow, m_width, m_height);
 
 			SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 
@@ -508,7 +445,7 @@ namespace entry
 			{
 				bx::AllocatorI* allocator = getAllocator();
 				uint32_t size = (uint32_t)bx::getSize(reader);
-				void* data = BX_ALLOC(allocator, size + 1);
+				void* data = bx::alloc(allocator, size + 1);
 				bx::read(reader, data, size, bx::ErrorAssert{});
 				bx::close(reader);
 				((char*)data)[size] = '\0';
@@ -517,7 +454,7 @@ namespace entry
 					DBG("SDL game controller add mapping failed: %s", SDL_GetError());
 				}
 
-				BX_FREE(allocator, data);
+				bx::free(allocator, data);
 			}
 
 			bool exit = false;
@@ -671,7 +608,15 @@ namespace entry
 							case SDL_WINDOWEVENT_SIZE_CHANGED:
 								{
 									WindowHandle handle = findHandle(wev.windowID);
-									setWindowSize(handle, wev.data1, wev.data2);
+									uint32_t width = wev.data1;
+									uint32_t height = wev.data2;
+									if (width  != m_width
+									||  height != m_height)
+									{
+										m_width  = width;
+										m_height = height;
+										m_eventQueue.postSizeEvent(handle, m_width, m_height);
+									}
 								}
 								break;
 
@@ -702,16 +647,14 @@ namespace entry
 						}
 						break;
 
+					// Ignore Joystick events. Example's Gamepad concept mirrors SDL Game Controller.
+					// Game Controllers are higher level wrapper around Joystick and both events come through.
+					// Respond to only the controller events. Controller events are properly remapped.
 					case SDL_JOYAXISMOTION:
-						{
-							const SDL_JoyAxisEvent& jev = event.jaxis;
-							GamepadHandle handle = findGamepad(jev.which);
-							if (isValid(handle) )
-							{
-								GamepadAxis::Enum axis = translateGamepadAxis(jev.axis);
-								m_gamepad[handle.idx].update(m_eventQueue, defaultWindow, handle, axis, jev.value);
-							}
-						}
+					case SDL_JOYBUTTONDOWN:
+					case SDL_JOYBUTTONUP:
+					case SDL_JOYDEVICEADDED:
+					case SDL_JOYDEVICEREMOVED:
 						break;
 
 					case SDL_CONTROLLERAXISMOTION:
@@ -722,23 +665,6 @@ namespace entry
 							{
 								GamepadAxis::Enum axis = translateGamepadAxis(aev.axis);
 								m_gamepad[handle.idx].update(m_eventQueue, defaultWindow, handle, axis, aev.value);
-							}
-						}
-						break;
-
-					case SDL_JOYBUTTONDOWN:
-					case SDL_JOYBUTTONUP:
-						{
-							const SDL_JoyButtonEvent& bev = event.jbutton;
-							GamepadHandle handle = findGamepad(bev.which);
-
-							if (isValid(handle) )
-							{
-								Key::Enum key = translateGamepad(bev.button);
-								if (Key::Count != key)
-								{
-									m_eventQueue.postKeyEvent(defaultWindow, key, 0, event.type == SDL_JOYBUTTONDOWN);
-								}
 							}
 						}
 						break;
@@ -755,31 +681,6 @@ namespace entry
 								{
 									m_eventQueue.postKeyEvent(defaultWindow, key, 0, event.type == SDL_CONTROLLERBUTTONDOWN);
 								}
-							}
-						}
-						break;
-
-					case SDL_JOYDEVICEADDED:
-						{
-							GamepadHandle handle = { m_gamepadAlloc.alloc() };
-							if (isValid(handle) )
-							{
-								const SDL_JoyDeviceEvent& jev = event.jdevice;
-								m_gamepad[handle.idx].create(jev);
-								m_eventQueue.postGamepadEvent(defaultWindow, handle, true);
-							}
-						}
-						break;
-
-					case SDL_JOYDEVICEREMOVED:
-						{
-							const SDL_JoyDeviceEvent& jev = event.jdevice;
-							GamepadHandle handle = findGamepad(jev.which);
-							if (isValid(handle) )
-							{
-								m_gamepad[handle.idx].destroy();
-								m_gamepadAlloc.free(handle.idx);
-								m_eventQueue.postGamepadEvent(defaultWindow, handle, false);
 							}
 						}
 						break;
@@ -865,7 +766,7 @@ namespace entry
 									if (isValid(handle) )
 									{
 										m_eventQueue.postWindowEvent(handle);
-										sdlDestroyWindow(m_window[handle.idx]);
+										SDL_DestroyWindow(m_window[handle.idx]);
 										m_window[handle.idx] = NULL;
 									}
 								}
@@ -916,7 +817,7 @@ namespace entry
 									Msg* msg = (Msg*)uev.data2;
 									if (isValid(handle) )
 									{
-										setWindowSize(handle, msg->m_width, msg->m_height);
+										SDL_SetWindowSize(m_window[handle.idx], msg->m_width, msg->m_height);
 									}
 									delete msg;
 								}
@@ -959,7 +860,7 @@ namespace entry
 			while (bgfx::RenderFrame::NoContext != bgfx::renderFrame() ) {};
 			m_thread.shutdown();
 
-			sdlDestroyWindow(m_window[0]);
+			SDL_DestroyWindow(m_window[0]);
 			SDL_Quit();
 
 			return m_thread.getExitCode();
@@ -986,20 +887,6 @@ namespace entry
 
 			WindowHandle invalid = { UINT16_MAX };
 			return invalid;
-		}
-
-		void setWindowSize(WindowHandle _handle, uint32_t _width, uint32_t _height, bool _force = false)
-		{
-			if (_width  != m_width
-			||  _height != m_height
-			||  _force)
-			{
-				m_width  = _width;
-				m_height = _height;
-
-				SDL_SetWindowSize(m_window[_handle.idx], m_width, m_height);
-				m_eventQueue.postSizeEvent(_handle, m_width, m_height);
-			}
 		}
 
 		GamepadHandle findGamepad(SDL_JoystickID _jid)
@@ -1102,6 +989,7 @@ namespace entry
 
 	void setWindowSize(WindowHandle _handle, uint32_t _width, uint32_t _height)
 	{
+		// Function to set the window size programmatically from the examples/tools.
 		Msg* msg = new Msg;
 		msg->m_width  = _width;
 		msg->m_height = _height;
@@ -1148,33 +1036,33 @@ namespace entry
 		{
 			return NULL;
 		}
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-#		if ENTRY_CONFIG_USE_WAYLAND
-			if (wmi.subsystem == SDL_SYSWM_WAYLAND)
-				return wmi.info.wl.display;
-			else
-#		endif // ENTRY_CONFIG_USE_WAYLAND
-				return wmi.info.x11.display;
+#	if BX_PLATFORM_LINUX
+		if (wmi.subsystem == SDL_SYSWM_WAYLAND)
+			return wmi.info.wl.display;
+		else
+			return wmi.info.x11.display;
 #	else
 		return NULL;
 #	endif // BX_PLATFORM_*
 	}
 
-	bgfx::NativeWindowHandleType::Enum getNativeWindowHandleType(WindowHandle _handle)
+	bgfx::NativeWindowHandleType::Enum getNativeWindowHandleType()
 	{
 		SDL_SysWMinfo wmi;
 		SDL_VERSION(&wmi.version);
-		if (!SDL_GetWindowWMInfo(s_ctx.m_window[_handle.idx], &wmi) )
+		if (!SDL_GetWindowWMInfo(s_ctx.m_window[kDefaultWindowHandle.idx], &wmi) )
 		{
 			return bgfx::NativeWindowHandleType::Default;
 		}
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-#		if ENTRY_CONFIG_USE_WAYLAND
+#	if BX_PLATFORM_LINUX
 		if (wmi.subsystem == SDL_SYSWM_WAYLAND)
+		{
 			return bgfx::NativeWindowHandleType::Wayland;
+		}
 		else
-#		endif // ENTRY_CONFIG_USE_WAYLAND
+		{
 			return bgfx::NativeWindowHandleType::Default;
+		}
 #	else
 		return bgfx::NativeWindowHandleType::Default;
 #	endif // BX_PLATFORM_*

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -88,7 +88,7 @@ public:
 		init.vendorId = args.m_pciId;
 		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
 		init.platformData.ndt  = entry::getNativeDisplayHandle();
-		init.platformData.type = entry::getNativeWindowHandleType(entry::kDefaultWindowHandle);
+		init.platformData.type = entry::getNativeWindowHandleType();
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;
@@ -99,7 +99,7 @@ public:
 
 		if (swapChainSupported)
 		{
-			m_bindings = (InputBinding*)BX_ALLOC(entry::getAllocator(), sizeof(InputBinding)*3);
+			m_bindings = (InputBinding*)bx::alloc(entry::getAllocator(), sizeof(InputBinding)*3);
 			m_bindings[0].set(entry::Key::KeyC, entry::Modifier::None, 1, cmdCreateWindow,  this);
 			m_bindings[1].set(entry::Key::KeyD, entry::Modifier::None, 1, cmdDestroyWindow, this);
 			m_bindings[2].end();
@@ -161,7 +161,7 @@ public:
 		}
 
 		inputRemoveBindings("22-windows");
-		BX_FREE(entry::getAllocator(), m_bindings);
+		bx::free(entry::getAllocator(), m_bindings);
 
 		// Cleanup.
 		bgfx::destroy(m_ibh);
@@ -203,6 +203,20 @@ public:
 							bgfx::destroy(m_fbh[viewId]);
 							m_fbh[viewId].idx = bgfx::kInvalidHandle;
 						}
+
+						// Before we reattach a SwapChain to the window
+						// we must actually free up the previous one.
+						// The DestroyFrameBuffer command goes in the
+						// cmdPost CommandBuffer, which happens after
+						// the frame. The CreateFrameBuffer command goes
+						// int the cmdPre CommandBuffer, which happens
+						// at the beginning of the frame. Without this
+						// bgfx::frame() call, the creation would happen
+						// before it's destroyed, which would cause
+						// the platform window to have two SwapChains
+						// associated with it.
+						// Ideally, we have an operation of ResizeFrameBuffer.
+						bgfx::frame();
 
 						win.m_nwh    = m_state.m_nwh;
 						win.m_width  = m_state.m_width;
@@ -276,6 +290,7 @@ public:
 			int64_t now = bx::getHPCounter();
 			float time = (float)( (now-m_timeOffset)/double(bx::getHPFrequency() ) );
 
+			bgfx::dbgTextClear();
 			if (NULL != m_bindings)
 			{
 				bgfx::dbgTextPrintf(0, 1, 0x2f, "Press 'c' to create or 'd' to destroy window.");

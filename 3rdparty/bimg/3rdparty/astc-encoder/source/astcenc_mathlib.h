@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // ----------------------------------------------------------------------------
-// Copyright 2011-2021 Arm Limited
+// Copyright 2011-2024 Arm Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy
@@ -48,8 +48,6 @@
     #define ASTCENC_SSE 42
   #elif defined(__SSE4_1__)
     #define ASTCENC_SSE 41
-  #elif defined(__SSE3__)
-    #define ASTCENC_SSE 30
   #elif defined(__SSE2__)
     #define ASTCENC_SSE 20
   #else
@@ -75,10 +73,22 @@
   #endif
 #endif
 
+// Force vector-sized SIMD alignment
 #if ASTCENC_AVX
   #define ASTCENC_VECALIGN 32
-#else
+#elif ASTCENC_SSE || ASTCENC_NEON
   #define ASTCENC_VECALIGN 16
+// Use default alignment for non-SIMD builds
+#else
+  #define ASTCENC_VECALIGN 0
+#endif
+
+// C++11 states that alignas(0) should be ignored but GCC doesn't do
+// this on some versions, so workaround and avoid emitting alignas(0)
+#if ASTCENC_VECALIGN > 0
+	#define ASTCENC_ALIGNAS alignas(ASTCENC_VECALIGN)
+#else
+	#define ASTCENC_ALIGNAS
 #endif
 
 #if ASTCENC_SSE != 0 || ASTCENC_AVX != 0 || ASTCENC_POPCNT != 0

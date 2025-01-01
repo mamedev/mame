@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -17,12 +17,8 @@ namespace bgfx
 #define SPV_OPERAND_7(_a0, _a1, _a2, _a3, _a4, _a5, _a6) SPV_OPERAND_1(_a0), SPV_OPERAND_6(_a1, _a2, _a3, _a4, _a5, _a6)
 #define SPV_OPERAND_8(_a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7) SPV_OPERAND_1(_a0), SPV_OPERAND_7(_a1, _a2, _a3, _a4, _a5, _a6, _a7)
 #define SPV_OPERAND_9(_a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8) SPV_OPERAND_1(_a0), SPV_OPERAND_8(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8)
-#if BX_COMPILER_MSVC && (!defined(_MSVC_TRADITIONAL) || _MSVC_TRADITIONAL)
-// Workaround MSVS bug...
-#	define SPV_OPERAND(...) { BX_MACRO_DISPATCHER(SPV_OPERAND_, __VA_ARGS__) BX_VA_ARGS_PASS(__VA_ARGS__) }
-#else
-#	define SPV_OPERAND(...) { BX_MACRO_DISPATCHER(SPV_OPERAND_, __VA_ARGS__)(__VA_ARGS__) }
-#endif // BX_COMPILER_MSVC
+#define SPV_OPERAND(...) { BX_MACRO_DISPATCHER(SPV_OPERAND_, __VA_ARGS__)(__VA_ARGS__) }
+
 #define _ Count
 
 	bool isDebug(SpvOpcode::Enum _opcode)
@@ -940,7 +936,7 @@ namespace bgfx
 
 		if (_instruction.opcode >= SpvOpcode::Count)
 		{
-			BX_ERROR_SET(_err, BGFX_SHADER_SPIRV_INVALID_INSTRUCTION, "SPIR-V: Invalid instruction.");
+			BX_ERROR_SET(_err, kShaderInvalidInstruction, "SPIR-V: Invalid instruction.");
 			return size;
 		}
 
@@ -1158,7 +1154,7 @@ namespace bgfx
 		||  _spirv.header.magic != SPIRV_MAGIC
 		   )
 		{
-			BX_ERROR_SET(_err, BGFX_SHADER_SPIRV_INVALID_HEADER, "SPIR-V: Invalid header.");
+			BX_ERROR_SET(_err, kShaderInvalidHeader, "SPIR-V: Invalid header.");
 			return size;
 		}
 
@@ -1198,7 +1194,7 @@ namespace bgfx
 						, instruction.length
 						, getName(instruction.opcode)
 						);
-				BX_ERROR_SET(_err, BGFX_SHADER_SPIRV_INVALID_INSTRUCTION, "SPIR-V: Invalid instruction.");
+				BX_ERROR_SET(_err, kShaderInvalidInstruction, "SPIR-V: Invalid instruction.");
 				return;
 			}
 

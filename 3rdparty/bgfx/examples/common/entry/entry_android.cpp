@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -189,9 +189,10 @@ namespace entry
 
 			while (0 == m_app->destroyRequested)
 			{
-				int32_t num;
 				android_poll_source* source;
-				/*int32_t id =*/ ALooper_pollAll(-1, NULL, &num, (void**)&source);
+				int32_t result = ALooper_pollOnce(-1, NULL, NULL, reinterpret_cast<void**>(&source));
+
+				BX_ASSERT(ALOOPER_POLL_ERROR != result, "ALooper_pollOnce returned an error.");
 
 				if (NULL != source)
 				{
@@ -550,9 +551,8 @@ namespace entry
 		return NULL;
 	}
 
-	bgfx::NativeWindowHandleType::Enum getNativeWindowHandleType(WindowHandle _handle)
+	bgfx::NativeWindowHandleType::Enum getNativeWindowHandleType()
 	{
-		BX_UNUSED(_handle);
 		return bgfx::NativeWindowHandleType::Default;
 	}
 
@@ -561,11 +561,13 @@ namespace entry
 		BX_UNUSED(_thread);
 
 		int32_t result = chdir("/sdcard/bgfx/examples/runtime");
-		BX_ASSERT(0 == result, "Failed to chdir to dir. android.permission.WRITE_EXTERNAL_STORAGE?", errno);
+		BX_ASSERT(0 == result
+			, "Failed to chdir to directory (errno: %d, android.permission.WRITE_EXTERNAL_STORAGE?)."
+			, errno
+			);
 
 		MainThreadEntry* self = (MainThreadEntry*)_userData;
 		result = main(self->m_argc, self->m_argv);
-//		PostMessage(s_ctx.m_hwnd, WM_QUIT, 0, 0);
 		return result;
 	}
 

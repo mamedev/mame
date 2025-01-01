@@ -1,4 +1,4 @@
-// Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+// Copyright 2011-2024 Branimir Karadzic. All rights reserved.
 // License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
 
 
@@ -641,81 +641,84 @@ pub const CapsFlags_ConservativeRaster: CapsFlags     = 0x0000000000000008;
 /// Draw indirect is supported.
 pub const CapsFlags_DrawIndirect: CapsFlags           = 0x0000000000000010;
 
+/// Draw indirect with indirect count is supported.
+pub const CapsFlags_DrawIndirectCount: CapsFlags      = 0x0000000000000020;
+
 /// Fragment depth is available in fragment shader.
-pub const CapsFlags_FragmentDepth: CapsFlags          = 0x0000000000000020;
+pub const CapsFlags_FragmentDepth: CapsFlags          = 0x0000000000000040;
 
 /// Fragment ordering is available in fragment shader.
-pub const CapsFlags_FragmentOrdering: CapsFlags       = 0x0000000000000040;
+pub const CapsFlags_FragmentOrdering: CapsFlags       = 0x0000000000000080;
 
 /// Graphics debugger is present.
-pub const CapsFlags_GraphicsDebugger: CapsFlags       = 0x0000000000000080;
+pub const CapsFlags_GraphicsDebugger: CapsFlags       = 0x0000000000000100;
 
 /// HDR10 rendering is supported.
-pub const CapsFlags_Hdr10: CapsFlags                  = 0x0000000000000100;
+pub const CapsFlags_Hdr10: CapsFlags                  = 0x0000000000000200;
 
 /// HiDPI rendering is supported.
-pub const CapsFlags_Hidpi: CapsFlags                  = 0x0000000000000200;
+pub const CapsFlags_Hidpi: CapsFlags                  = 0x0000000000000400;
 
 /// Image Read/Write is supported.
-pub const CapsFlags_ImageRw: CapsFlags                = 0x0000000000000400;
+pub const CapsFlags_ImageRw: CapsFlags                = 0x0000000000000800;
 
 /// 32-bit indices are supported.
-pub const CapsFlags_Index32: CapsFlags                = 0x0000000000000800;
+pub const CapsFlags_Index32: CapsFlags                = 0x0000000000001000;
 
 /// Instancing is supported.
-pub const CapsFlags_Instancing: CapsFlags             = 0x0000000000001000;
+pub const CapsFlags_Instancing: CapsFlags             = 0x0000000000002000;
 
 /// Occlusion query is supported.
-pub const CapsFlags_OcclusionQuery: CapsFlags         = 0x0000000000002000;
+pub const CapsFlags_OcclusionQuery: CapsFlags         = 0x0000000000004000;
+
+/// PrimitiveID is available in fragment shader.
+pub const CapsFlags_PrimitiveId: CapsFlags            = 0x0000000000008000;
 
 /// Renderer is on separate thread.
-pub const CapsFlags_RendererMultithreaded: CapsFlags  = 0x0000000000004000;
+pub const CapsFlags_RendererMultithreaded: CapsFlags  = 0x0000000000010000;
 
 /// Multiple windows are supported.
-pub const CapsFlags_SwapChain: CapsFlags              = 0x0000000000008000;
-
-/// 2D texture array is supported.
-pub const CapsFlags_Texture2DArray: CapsFlags         = 0x0000000000010000;
-
-/// 3D textures are supported.
-pub const CapsFlags_Texture3D: CapsFlags              = 0x0000000000020000;
+pub const CapsFlags_SwapChain: CapsFlags              = 0x0000000000020000;
 
 /// Texture blit is supported.
 pub const CapsFlags_TextureBlit: CapsFlags            = 0x0000000000040000;
 
-/// Transparent back buffer supported.
-pub const CapsFlags_TransparentBackbuffer: CapsFlags  = 0x0000000000080000;
+/// Texture compare less equal mode is supported.
+pub const CapsFlags_TextureCompareLequal: CapsFlags   = 0x0000000000080000;
 pub const CapsFlags_TextureCompareReserved: CapsFlags = 0x0000000000100000;
 
-/// Texture compare less equal mode is supported.
-pub const CapsFlags_TextureCompareLequal: CapsFlags   = 0x0000000000200000;
-
 /// Cubemap texture array is supported.
-pub const CapsFlags_TextureCubeArray: CapsFlags       = 0x0000000000400000;
+pub const CapsFlags_TextureCubeArray: CapsFlags       = 0x0000000000200000;
 
 /// CPU direct access to GPU texture memory.
-pub const CapsFlags_TextureDirectAccess: CapsFlags    = 0x0000000000800000;
+pub const CapsFlags_TextureDirectAccess: CapsFlags    = 0x0000000000400000;
 
 /// Read-back texture is supported.
-pub const CapsFlags_TextureReadBack: CapsFlags        = 0x0000000001000000;
+pub const CapsFlags_TextureReadBack: CapsFlags        = 0x0000000000800000;
+
+/// 2D texture array is supported.
+pub const CapsFlags_Texture2DArray: CapsFlags         = 0x0000000001000000;
+
+/// 3D textures are supported.
+pub const CapsFlags_Texture3D: CapsFlags              = 0x0000000002000000;
+
+/// Transparent back buffer supported.
+pub const CapsFlags_TransparentBackbuffer: CapsFlags  = 0x0000000004000000;
 
 /// Vertex attribute half-float is supported.
-pub const CapsFlags_VertexAttribHalf: CapsFlags       = 0x0000000002000000;
+pub const CapsFlags_VertexAttribHalf: CapsFlags       = 0x0000000008000000;
 
 /// Vertex attribute 10_10_10_2 is supported.
-pub const CapsFlags_VertexAttribUint10: CapsFlags     = 0x0000000004000000;
+pub const CapsFlags_VertexAttribUint10: CapsFlags     = 0x0000000010000000;
 
 /// Rendering with VertexID only is supported.
-pub const CapsFlags_VertexId: CapsFlags               = 0x0000000008000000;
+pub const CapsFlags_VertexId: CapsFlags               = 0x0000000020000000;
 
 /// Viewport layer is available in vertex shader.
-pub const CapsFlags_ViewportLayerArray: CapsFlags     = 0x0000000010000000;
-
-/// Draw indirect with indirect count is supported.
-pub const CapsFlags_DrawIndirectCount: CapsFlags      = 0x0000000020000000;
+pub const CapsFlags_ViewportLayerArray: CapsFlags     = 0x0000000040000000;
 
 /// All texture compare modes are supported.
-pub const CapsFlags_TextureCompareAll: CapsFlags      = 0x0000000000300000;
+pub const CapsFlags_TextureCompareAll: CapsFlags      = 0x0000000000180000;
 
 pub const CapsFormatFlags = u32;
 /// Texture format is not supported.
@@ -837,9 +840,6 @@ pub const RendererType = enum(c_int) {
     /// AGC
     Agc,
 
-    /// Direct3D 9.0
-    Direct3D9,
-
     /// Direct3D 11.0
     Direct3D11,
 
@@ -863,9 +863,6 @@ pub const RendererType = enum(c_int) {
 
     /// Vulkan
     Vulkan,
-
-    /// WebGPU
-    WebGPU,
 
     Count
 };
@@ -1257,6 +1254,16 @@ pub const ViewMode = enum(c_int) {
     Count
 };
 
+pub const NativeWindowHandleType = enum(c_int) {
+    /// Platform default handle type (X11 on Linux).
+    Default,
+
+    /// Wayland.
+    Wayland,
+
+    Count
+};
+
 pub const RenderFrame = enum(c_int) {
     /// Renderer context is not created yet.
     NoContext,
@@ -1329,6 +1336,7 @@ pub const Caps = extern struct {
         context: ?*anyopaque,
         backBuffer: ?*anyopaque,
         backBufferDS: ?*anyopaque,
+        type: NativeWindowHandleType,
     };
 
     pub const Resolution = extern struct {
@@ -1338,6 +1346,7 @@ pub const Caps = extern struct {
         reset: u32,
         numBackBuffers: u8,
         maxFrameLatency: u8,
+        debugTextScale: u8,
     };
 
 pub const Init = extern struct {
@@ -1521,11 +1530,6 @@ pub const Init = extern struct {
         pub inline fn decode(self: *const VertexLayout, _attrib: Attrib, _num: [*c]u8 , _type: [*c]AttribType, _normalized: [*c]bool, _asInt: [*c]bool) void {
             return bgfx_vertex_layout_decode(self, _attrib, _num, _type, _normalized, _asInt);
         }
-        /// Returns `true` if VertexLayout contains attribute.
-        /// <param name="_attrib">Attribute semantics. See: `bgfx::Attrib`</param>
-        pub inline fn has(self: *const VertexLayout, _attrib: Attrib) bool {
-            return bgfx_vertex_layout_has(self, _attrib);
-        }
         /// Skip `_num` bytes in vertex stream.
         /// <param name="_num">Number of bytes to skip.</param>
         pub inline fn skip(self: *VertexLayout, _num: u8) *VertexLayout {
@@ -1540,9 +1544,10 @@ pub const Init = extern struct {
     pub const Encoder = opaque {
         /// Sets a debug marker. This allows you to group graphics calls together for easy browsing in
         /// graphics debugging tools.
-        /// <param name="_marker">Marker string.</param>
-        pub inline fn setMarker(self: ?*Encoder, _marker: [*c]const u8) void {
-            return bgfx_encoder_set_marker(self, _marker);
+        /// <param name="_name">Marker name.</param>
+        /// <param name="_len">Marker name length (if length is INT32_MAX, it's expected that _name is zero terminated string.</param>
+        pub inline fn setMarker(self: ?*Encoder, _name: [*c]const u8, _len: i32) void {
+            return bgfx_encoder_set_marker(self, _name, _len);
         }
         /// Set render states for draw primitive.
         /// @remarks
@@ -1699,7 +1704,7 @@ pub const Init = extern struct {
         /// Set instance data buffer for draw primitive.
         /// <param name="_handle">Vertex buffer.</param>
         /// <param name="_startVertex">First instance data.</param>
-        /// <param name="_num">Number of data instances. Set instance data buffer for draw primitive.</param>
+        /// <param name="_num">Number of data instances.</param>
         pub inline fn setInstanceDataFromVertexBuffer(self: ?*Encoder, _handle: VertexBufferHandle, _startVertex: u32, _num: u32) void {
             return bgfx_encoder_set_instance_data_from_vertex_buffer(self, _handle, _startVertex, _num);
         }
@@ -1761,7 +1766,7 @@ pub const Init = extern struct {
         /// <param name="_num">Number of draws.</param>
         /// <param name="_depth">Depth for sorting.</param>
         /// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
-        pub inline fn submitIndirect(self: ?*Encoder, _id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u16, _num: u16, _depth: u32, _flags: u8) void {
+        pub inline fn submitIndirect(self: ?*Encoder, _id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u32, _num: u32, _depth: u32, _flags: u8) void {
             return bgfx_encoder_submit_indirect(self, _id, _program, _indirectHandle, _start, _num, _depth, _flags);
         }
         /// Submit primitive for rendering with index and instance data info and
@@ -1776,7 +1781,7 @@ pub const Init = extern struct {
         /// <param name="_numMax">Max number of draws.</param>
         /// <param name="_depth">Depth for sorting.</param>
         /// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
-        pub inline fn submitIndirectCount(self: ?*Encoder, _id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u16, _numHandle: IndexBufferHandle, _numIndex: u32, _numMax: u16, _depth: u32, _flags: u8) void {
+        pub inline fn submitIndirectCount(self: ?*Encoder, _id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u32, _numHandle: IndexBufferHandle, _numIndex: u32, _numMax: u32, _depth: u32, _flags: u8) void {
             return bgfx_encoder_submit_indirect_count(self, _id, _program, _indirectHandle, _start, _numHandle, _numIndex, _numMax, _depth, _flags);
         }
         /// Set compute index buffer.
@@ -1840,7 +1845,7 @@ pub const Init = extern struct {
         /// <param name="_start">First element in indirect buffer.</param>
         /// <param name="_num">Number of dispatches.</param>
         /// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
-        pub inline fn dispatchIndirect(self: ?*Encoder, _id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u16, _num: u16, _flags: u8) void {
+        pub inline fn dispatchIndirect(self: ?*Encoder, _id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u32, _num: u32, _flags: u8) void {
             return bgfx_encoder_dispatch_indirect(self, _id, _program, _indirectHandle, _start, _num, _flags);
         }
         /// Discard previously set state for draw or compute call.
@@ -1949,10 +1954,6 @@ extern fn bgfx_vertex_layout_add(self: [*c]VertexLayout, _attrib: Attrib, _num: 
 /// <param name="_asInt">Attribute is packed as int.</param>
 extern fn bgfx_vertex_layout_decode(self: [*c]const VertexLayout, _attrib: Attrib, _num: [*c]u8 , _type: [*c]AttribType, _normalized: [*c]bool, _asInt: [*c]bool) void;
 
-/// Returns `true` if VertexLayout contains attribute.
-/// <param name="_attrib">Attribute semantics. See: `bgfx::Attrib`</param>
-extern fn bgfx_vertex_layout_has(self: [*c]const VertexLayout, _attrib: Attrib) bool;
-
 /// Skip `_num` bytes in vertex stream.
 /// <param name="_num">Number of bytes to skip.</param>
 extern fn bgfx_vertex_layout_skip(self: [*c]VertexLayout, _num: u8) [*c]VertexLayout;
@@ -2049,6 +2050,8 @@ pub inline fn getRendererName(_type: RendererType) [*c]const u8 {
 }
 extern fn bgfx_get_renderer_name(_type: RendererType) [*c]const u8;
 
+/// Fill bgfx::Init struct with default values, before using it to initialize the library.
+/// <param name="_init">Pointer to structure to be initialized. See: `bgfx::Init` for more info.</param>
 pub inline fn initCtor(_init: [*c]Init) void {
     return bgfx_init_ctor(_init);
 }
@@ -2392,6 +2395,8 @@ pub inline fn destroyIndirectBuffer(_handle: IndirectBufferHandle) void {
 extern fn bgfx_destroy_indirect_buffer(_handle: IndirectBufferHandle) void;
 
 /// Create shader from memory buffer.
+/// @remarks
+///   Shader binary is obtained by compiling shader offline with shaderc command line tool.
 /// <param name="_mem">Shader binary.</param>
 pub inline fn createShader(_mem: [*c]const Memory) ShaderHandle {
     return bgfx_create_shader(_mem);
@@ -2782,6 +2787,17 @@ extern fn bgfx_set_palette_color(_index: u8, _rgba: [4]f32) void;
 
 /// Set palette color value.
 /// <param name="_index">Index into palette.</param>
+/// <param name="_r">Red value (RGBA floating point values)</param>
+/// <param name="_g">Green value (RGBA floating point values)</param>
+/// <param name="_b">Blue value (RGBA floating point values)</param>
+/// <param name="_a">Alpha value (RGBA floating point values)</param>
+pub inline fn setPaletteColorRgba32f(_index: u8, _r: f32, _g: f32, _b: f32, _a: f32) void {
+    return bgfx_set_palette_color_rgba32f(_index, _r, _g, _b, _a);
+}
+extern fn bgfx_set_palette_color_rgba32f(_index: u8, _r: f32, _g: f32, _b: f32, _a: f32) void;
+
+/// Set palette color value.
+/// <param name="_index">Index into palette.</param>
 /// <param name="_rgba">Packed 32-bit RGBA value.</param>
 pub inline fn setPaletteColorRgba8(_index: u8, _rgba: u32) void {
     return bgfx_set_palette_color_rgba8(_index, _rgba);
@@ -2798,10 +2814,11 @@ extern fn bgfx_set_palette_color_rgba8(_index: u8, _rgba: u32) void;
 ///        +------ view id
 /// <param name="_id">View id.</param>
 /// <param name="_name">View name.</param>
-pub inline fn setViewName(_id: ViewId, _name: [*c]const u8) void {
-    return bgfx_set_view_name(_id, _name);
+/// <param name="_len">View name length (if length is INT32_MAX, it's expected that _name is zero terminated string.</param>
+pub inline fn setViewName(_id: ViewId, _name: [*c]const u8, _len: i32) void {
+    return bgfx_set_view_name(_id, _name, _len);
 }
-extern fn bgfx_set_view_name(_id: ViewId, _name: [*c]const u8) void;
+extern fn bgfx_set_view_name(_id: ViewId, _name: [*c]const u8, _len: i32) void;
 
 /// Set view rectangle. Draw primitive outside view will be clipped.
 /// <param name="_id">View id.</param>
@@ -2928,8 +2945,9 @@ extern fn bgfx_encoder_end(_encoder: ?*Encoder) void;
 
 /// Sets a debug marker. This allows you to group graphics calls together for easy browsing in
 /// graphics debugging tools.
-/// <param name="_marker">Marker string.</param>
-extern fn bgfx_encoder_set_marker(self: ?*Encoder, _marker: [*c]const u8) void;
+/// <param name="_name">Marker name.</param>
+/// <param name="_len">Marker name length (if length is INT32_MAX, it's expected that _name is zero terminated string.</param>
+extern fn bgfx_encoder_set_marker(self: ?*Encoder, _name: [*c]const u8, _len: i32) void;
 
 /// Set render states for draw primitive.
 /// @remarks
@@ -3066,7 +3084,7 @@ extern fn bgfx_encoder_set_instance_data_buffer(self: ?*Encoder, _idb: [*c]const
 /// Set instance data buffer for draw primitive.
 /// <param name="_handle">Vertex buffer.</param>
 /// <param name="_startVertex">First instance data.</param>
-/// <param name="_num">Number of data instances. Set instance data buffer for draw primitive.</param>
+/// <param name="_num">Number of data instances.</param>
 extern fn bgfx_encoder_set_instance_data_from_vertex_buffer(self: ?*Encoder, _handle: VertexBufferHandle, _startVertex: u32, _num: u32) void;
 
 /// Set instance data buffer for draw primitive.
@@ -3121,7 +3139,7 @@ extern fn bgfx_encoder_submit_occlusion_query(self: ?*Encoder, _id: ViewId, _pro
 /// <param name="_num">Number of draws.</param>
 /// <param name="_depth">Depth for sorting.</param>
 /// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
-extern fn bgfx_encoder_submit_indirect(self: ?*Encoder, _id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u16, _num: u16, _depth: u32, _flags: u8) void;
+extern fn bgfx_encoder_submit_indirect(self: ?*Encoder, _id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u32, _num: u32, _depth: u32, _flags: u8) void;
 
 /// Submit primitive for rendering with index and instance data info and
 /// draw count from indirect buffers.
@@ -3135,7 +3153,7 @@ extern fn bgfx_encoder_submit_indirect(self: ?*Encoder, _id: ViewId, _program: P
 /// <param name="_numMax">Max number of draws.</param>
 /// <param name="_depth">Depth for sorting.</param>
 /// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
-extern fn bgfx_encoder_submit_indirect_count(self: ?*Encoder, _id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u16, _numHandle: IndexBufferHandle, _numIndex: u32, _numMax: u16, _depth: u32, _flags: u8) void;
+extern fn bgfx_encoder_submit_indirect_count(self: ?*Encoder, _id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u32, _numHandle: IndexBufferHandle, _numIndex: u32, _numMax: u32, _depth: u32, _flags: u8) void;
 
 /// Set compute index buffer.
 /// <param name="_stage">Compute stage.</param>
@@ -3191,7 +3209,7 @@ extern fn bgfx_encoder_dispatch(self: ?*Encoder, _id: ViewId, _program: ProgramH
 /// <param name="_start">First element in indirect buffer.</param>
 /// <param name="_num">Number of dispatches.</param>
 /// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
-extern fn bgfx_encoder_dispatch_indirect(self: ?*Encoder, _id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u16, _num: u16, _flags: u8) void;
+extern fn bgfx_encoder_dispatch_indirect(self: ?*Encoder, _id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u32, _num: u32, _flags: u8) void;
 
 /// Discard previously set state for draw or compute call.
 /// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
@@ -3290,11 +3308,12 @@ extern fn bgfx_override_internal_texture(_handle: TextureHandle, _width: u16, _h
 
 /// Sets a debug marker. This allows you to group graphics calls together for easy browsing in
 /// graphics debugging tools.
-/// <param name="_marker">Marker string.</param>
-pub inline fn setMarker(_marker: [*c]const u8) void {
-    return bgfx_set_marker(_marker);
+/// <param name="_name">Marker name.</param>
+/// <param name="_len">Marker name length (if length is INT32_MAX, it's expected that _name is zero terminated string.</param>
+pub inline fn setMarker(_name: [*c]const u8, _len: i32) void {
+    return bgfx_set_marker(_name, _len);
 }
-extern fn bgfx_set_marker(_marker: [*c]const u8) void;
+extern fn bgfx_set_marker(_name: [*c]const u8, _len: i32) void;
 
 /// Set render states for draw primitive.
 /// @remarks
@@ -3497,7 +3516,7 @@ extern fn bgfx_set_instance_data_buffer(_idb: [*c]const InstanceDataBuffer, _sta
 /// Set instance data buffer for draw primitive.
 /// <param name="_handle">Vertex buffer.</param>
 /// <param name="_startVertex">First instance data.</param>
-/// <param name="_num">Number of data instances. Set instance data buffer for draw primitive.</param>
+/// <param name="_num">Number of data instances.</param>
 pub inline fn setInstanceDataFromVertexBuffer(_handle: VertexBufferHandle, _startVertex: u32, _num: u32) void {
     return bgfx_set_instance_data_from_vertex_buffer(_handle, _startVertex, _num);
 }
@@ -3571,10 +3590,10 @@ extern fn bgfx_submit_occlusion_query(_id: ViewId, _program: ProgramHandle, _occ
 /// <param name="_num">Number of draws.</param>
 /// <param name="_depth">Depth for sorting.</param>
 /// <param name="_flags">Which states to discard for next draw. See `BGFX_DISCARD_*`.</param>
-pub inline fn submitIndirect(_id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u16, _num: u16, _depth: u32, _flags: u8) void {
+pub inline fn submitIndirect(_id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u32, _num: u32, _depth: u32, _flags: u8) void {
     return bgfx_submit_indirect(_id, _program, _indirectHandle, _start, _num, _depth, _flags);
 }
-extern fn bgfx_submit_indirect(_id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u16, _num: u16, _depth: u32, _flags: u8) void;
+extern fn bgfx_submit_indirect(_id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u32, _num: u32, _depth: u32, _flags: u8) void;
 
 /// Submit primitive for rendering with index and instance data info and
 /// draw count from indirect buffers.
@@ -3588,10 +3607,10 @@ extern fn bgfx_submit_indirect(_id: ViewId, _program: ProgramHandle, _indirectHa
 /// <param name="_numMax">Max number of draws.</param>
 /// <param name="_depth">Depth for sorting.</param>
 /// <param name="_flags">Which states to discard for next draw. See `BGFX_DISCARD_*`.</param>
-pub inline fn submitIndirectCount(_id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u16, _numHandle: IndexBufferHandle, _numIndex: u32, _numMax: u16, _depth: u32, _flags: u8) void {
+pub inline fn submitIndirectCount(_id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u32, _numHandle: IndexBufferHandle, _numIndex: u32, _numMax: u32, _depth: u32, _flags: u8) void {
     return bgfx_submit_indirect_count(_id, _program, _indirectHandle, _start, _numHandle, _numIndex, _numMax, _depth, _flags);
 }
-extern fn bgfx_submit_indirect_count(_id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u16, _numHandle: IndexBufferHandle, _numIndex: u32, _numMax: u16, _depth: u32, _flags: u8) void;
+extern fn bgfx_submit_indirect_count(_id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u32, _numHandle: IndexBufferHandle, _numIndex: u32, _numMax: u32, _depth: u32, _flags: u8) void;
 
 /// Set compute index buffer.
 /// <param name="_stage">Compute stage.</param>
@@ -3668,10 +3687,10 @@ extern fn bgfx_dispatch(_id: ViewId, _program: ProgramHandle, _numX: u32, _numY:
 /// <param name="_start">First element in indirect buffer.</param>
 /// <param name="_num">Number of dispatches.</param>
 /// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
-pub inline fn dispatchIndirect(_id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u16, _num: u16, _flags: u8) void {
+pub inline fn dispatchIndirect(_id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u32, _num: u32, _flags: u8) void {
     return bgfx_dispatch_indirect(_id, _program, _indirectHandle, _start, _num, _flags);
 }
-extern fn bgfx_dispatch_indirect(_id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u16, _num: u16, _flags: u8) void;
+extern fn bgfx_dispatch_indirect(_id: ViewId, _program: ProgramHandle, _indirectHandle: IndirectBufferHandle, _start: u32, _num: u32, _flags: u8) void;
 
 /// Discard previously set state for draw or compute call.
 /// <param name="_flags">Draw/compute states to discard.</param>

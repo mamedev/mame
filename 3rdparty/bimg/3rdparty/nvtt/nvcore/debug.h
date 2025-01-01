@@ -1,4 +1,4 @@
-// This code is in the public domain -- Ignacio Castaño <castano@gmail.com>
+// This code is in the public domain -- Ignacio CastaÃ±o <castano@gmail.com>
 
 #ifndef NV_CORE_DEBUG_H
 #define NV_CORE_DEBUG_H
@@ -24,6 +24,7 @@
 
 #   define nvAssert(exp) nvNoAssert(exp)
 #   define nvCheck(exp) nvNoAssert(exp)
+#	define nvCheckMacro(exp) (exp)
 #   define nvDebugAssert(exp) nvNoAssert(exp)
 #   define nvDebugCheck(exp) nvNoAssert(exp)
 #   define nvDebugBreak() nvNoAssert(0)

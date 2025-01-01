@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // ----------------------------------------------------------------------------
-// Copyright 2011-2022 Arm Limited
+// Copyright 2011-2024 Arm Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy
@@ -51,89 +51,85 @@ struct astcenc_preset_config
 	unsigned int tune_4partitioning_candidate_limit;
 	float tune_db_limit_a_base;
 	float tune_db_limit_b_base;
-	float tune_mode0_mse_overshoot;
-	float tune_refinement_mse_overshoot;
-	float tune_2_partition_early_out_limit_factor;
-	float tune_3_partition_early_out_limit_factor;
-	float tune_2_plane_early_out_limit_correlation;
+	float tune_mse_overshoot;
+	float tune_2partition_early_out_limit_factor;
+	float tune_3partition_early_out_limit_factor;
+	float tune_2plane_early_out_limit_correlation;
+	float tune_search_mode0_enable;
 };
 
-
 /**
- * @brief The static quality presets that are built-in for high bandwidth
- * presets (x < 25 texels per block).
+ * @brief The static presets for high bandwidth encodings (x < 25 texels per block).
  */
 static const std::array<astcenc_preset_config, 6> preset_configs_high {{
 	{
 		ASTCENC_PRE_FASTEST,
-		2, 10, 6, 4, 43, 2, 2, 2, 2, 2, 85.2f, 63.2f, 3.5f, 3.5f, 1.0f, 1.0f, 0.85f
+		2, 10, 6, 4, 43, 2, 2, 2, 2, 2, 85.2f, 63.2f, 3.5f, 1.0f, 1.0f, 0.85f, 0.0f
 	}, {
 		ASTCENC_PRE_FAST,
-		3, 18, 10, 8, 55, 3, 3, 2, 2, 2, 85.2f, 63.2f, 3.5f, 3.5f, 1.0f, 1.0f, 0.90f
+		3, 18, 10, 8, 55, 3, 3, 2, 2, 2, 85.2f, 63.2f, 3.5f, 1.0f, 1.0f, 0.90f, 0.0f
 	}, {
 		ASTCENC_PRE_MEDIUM,
-		4, 34, 28, 16, 77, 3, 3, 2, 2, 2, 95.0f, 70.0f, 2.5f, 2.5f, 1.1f, 1.05f, 0.95f
+		4, 34, 28, 16, 77, 3, 3, 2, 2, 2, 95.0f, 70.0f, 2.5f, 1.1f, 1.05f, 0.95f, 0.0f
 	}, {
 		ASTCENC_PRE_THOROUGH,
-		4, 82, 60, 30, 94, 4, 4, 3, 2, 2, 105.0f, 77.0f, 10.0f, 10.0f, 1.35f, 1.15f, 0.97f
+		4, 82, 60, 30, 94, 4, 4, 3, 2, 2, 105.0f, 77.0f, 10.0f, 1.35f, 1.15f, 0.97f, 0.0f
 	}, {
 		ASTCENC_PRE_VERYTHOROUGH,
-		4, 256, 128, 64, 98, 4, 6, 20, 14, 8, 200.0f, 200.0f, 10.0f, 10.0f, 1.6f, 1.4f, 0.98f
+		4, 256, 128, 64, 98, 4, 6, 8, 6, 4, 200.0f, 200.0f, 10.0f, 1.6f, 1.4f, 0.98f, 0.0f
 	}, {
 		ASTCENC_PRE_EXHAUSTIVE,
-		4, 512, 512, 512, 100, 4, 8, 32, 32, 32, 200.0f, 200.0f, 10.0f, 10.0f, 2.0f, 2.0f, 0.99f
+		4, 512, 512, 512, 100, 4, 8, 8, 8, 8, 200.0f, 200.0f, 10.0f, 2.0f, 2.0f, 0.99f, 0.0f
 	}
 }};
 
 /**
- * @brief The static quality presets that are built-in for medium bandwidth
- * presets (25 <= x < 64 texels per block).
+ * @brief The static presets for medium bandwidth encodings (25 <= x < 64 texels per block).
  */
 static const std::array<astcenc_preset_config, 6> preset_configs_mid {{
 	{
 		ASTCENC_PRE_FASTEST,
-		2, 10, 6, 4, 43, 2, 2, 2, 2, 2, 85.2f, 63.2f, 3.5f, 3.5f, 1.0f, 1.0f, 0.80f
+		2, 10, 6, 4, 43, 2, 2, 2, 2, 2, 85.2f, 63.2f, 3.5f, 1.0f, 1.0f, 0.80f, 1.0f
 	}, {
 		ASTCENC_PRE_FAST,
-		3, 18, 12, 10, 55, 3, 3, 2, 2, 2, 85.2f, 63.2f, 3.5f, 3.5f, 1.0f, 1.0f, 0.85f
+		3, 18, 12, 10, 55, 3, 3, 2, 2, 2, 85.2f, 63.2f, 3.5f, 1.0f, 1.0f, 0.85f, 1.0f
 	}, {
 		ASTCENC_PRE_MEDIUM,
-		4, 34, 28, 16, 77, 3, 3, 2, 2, 2, 95.0f, 70.0f, 3.0f, 3.0f, 1.1f, 1.05f, 0.90f
+		3, 34, 28, 16, 77, 3, 3, 2, 2, 2, 95.0f, 70.0f, 3.0f, 1.1f, 1.05f, 0.90f, 1.0f
 	}, {
 		ASTCENC_PRE_THOROUGH,
-		4, 82, 60, 30, 94, 4, 4, 3, 2, 2, 105.0f, 77.0f, 10.0f, 10.0f, 1.4f, 1.2f, 0.95f
+		4, 82, 60, 30, 94, 4, 4, 3, 2, 2, 105.0f, 77.0f, 10.0f, 1.4f, 1.2f, 0.95f, 0.0f
 	}, {
 		ASTCENC_PRE_VERYTHOROUGH,
-		4, 256, 128, 64, 98, 4, 6, 12, 8, 3, 200.0f, 200.0f, 10.0f, 10.0f, 1.6f, 1.4f, 0.98f
+		4, 256, 128, 64, 98, 4, 6, 8, 6, 3, 200.0f, 200.0f, 10.0f, 1.6f, 1.4f, 0.98f, 0.0f
 	}, {
 		ASTCENC_PRE_EXHAUSTIVE,
-		4, 256, 256, 256, 100, 4, 8, 32, 32, 32, 200.0f, 200.0f, 10.0f, 10.0f, 2.0f, 2.0f, 0.99f
+		4, 256, 256, 256, 100, 4, 8, 8, 8, 8, 200.0f, 200.0f, 10.0f, 2.0f, 2.0f, 0.99f, 0.0f
 	}
 }};
 
 /**
- * @brief The static quality presets that are built-in for low bandwidth
- * presets (64 <= x texels per block).
+ * @brief The static presets for low bandwidth encodings (64 <= x texels per block).
  */
 static const std::array<astcenc_preset_config, 6> preset_configs_low {{
 	{
 		ASTCENC_PRE_FASTEST,
-		2, 10, 6, 4, 40, 2, 2, 2, 2, 2, 85.0f, 63.0f, 3.5f, 3.5f, 1.0f, 1.0f, 0.80f
+		2, 10, 6, 4, 40, 2, 2, 2, 2, 2, 85.0f, 63.0f, 3.5f, 1.0f, 1.0f, 0.80f, 1.0f
 	}, {
 		ASTCENC_PRE_FAST,
-		2, 18, 12, 10, 55, 3, 3, 2, 2, 2, 85.0f, 63.0f, 3.5f, 3.5f, 1.0f, 1.0f, 0.85f
+		2, 18, 12, 10, 55, 3, 3, 2, 2, 2, 85.0f, 63.0f, 3.5f, 1.0f, 1.0f, 0.85f, 1.0f
 	}, {
 		ASTCENC_PRE_MEDIUM,
-		3, 34, 28, 16, 77, 3, 3, 2, 2, 2, 95.0f, 70.0f, 3.5f, 3.5f, 1.1f, 1.05f, 0.90f
+		3, 34, 28, 16, 77, 3, 3, 2, 2, 2, 95.0f, 70.0f, 3.5f, 1.1f, 1.05f, 0.90f, 1.0f
 	}, {
 		ASTCENC_PRE_THOROUGH,
-		4, 82, 60, 30, 93, 4, 4, 3, 2, 2, 105.0f, 77.0f, 10.0f, 10.0f, 1.3f, 1.2f, 0.97f
+		4, 82, 60, 30, 93, 4, 4, 3, 2, 2, 105.0f, 77.0f, 10.0f, 1.3f, 1.2f, 0.97f, 1.0f
 	}, {
 		ASTCENC_PRE_VERYTHOROUGH,
-		4, 256, 128, 64, 98, 4, 6, 9, 5, 2, 200.0f, 200.0f, 10.0f, 10.0f, 1.6f, 1.4f, 0.98f
+		4, 256, 128, 64, 98, 4, 6, 8, 5, 2, 200.0f, 200.0f, 10.0f, 1.6f, 1.4f, 0.98f, 1.0f
 	}, {
 		ASTCENC_PRE_EXHAUSTIVE,
-		4, 256, 256, 256, 100, 4, 8, 32, 32, 32, 200.0f, 200.0f, 10.0f, 10.0f, 2.0f, 2.0f, 0.99f
+		4, 256, 256, 256, 100, 4, 8, 8, 8, 8, 200.0f, 200.0f, 10.0f, 2.0f, 2.0f, 0.99f, 1.0f
 	}
 }};
 
@@ -158,48 +154,6 @@ static astcenc_error validate_cpu_float()
 	{
 		return ASTCENC_ERR_BAD_CPU_FLOAT;
 	}
-
-	return ASTCENC_SUCCESS;
-}
-
-/**
- * @brief Validate CPU ISA support meets the requirements of this build of the library.
- *
- * Each library build is statically compiled for a particular set of CPU ISA features, such as the
- * SIMD support or other ISA extensions such as POPCNT. This function checks that the host CPU
- * actually supports everything this build needs.
- *
- * @return Return @c ASTCENC_SUCCESS if validated, otherwise an error on failure.
- */
-static astcenc_error validate_cpu_isa()
-{
-	#if ASTCENC_SSE >= 41
-		if (!cpu_supports_sse41())
-		{
-			return ASTCENC_ERR_BAD_CPU_ISA;
-		}
-	#endif
-
-	#if ASTCENC_POPCNT >= 1
-		if (!cpu_supports_popcnt())
-		{
-			return ASTCENC_ERR_BAD_CPU_ISA;
-		}
-	#endif
-
-	#if ASTCENC_F16C >= 1
-		if (!cpu_supports_f16c())
-		{
-			return ASTCENC_ERR_BAD_CPU_ISA;
-		}
-	#endif
-
-	#if ASTCENC_AVX >= 2
-		if (!cpu_supports_avx2())
-		{
-			return ASTCENC_ERR_BAD_CPU_ISA;
-		}
-	#endif
 
 	return ASTCENC_SUCCESS;
 }
@@ -263,11 +217,13 @@ static astcenc_error validate_block_size(
 /**
  * @brief Validate flags.
  *
- * @param flags   The flags to check.
+ * @param profile   The profile to check.
+ * @param flags     The flags to check.
  *
  * @return Return @c ASTCENC_SUCCESS if validated, otherwise an error on failure.
  */
 static astcenc_error validate_flags(
+	astcenc_profile profile,
 	unsigned int flags
 ) {
 	// Flags field must not contain any unknown flag bits
@@ -278,12 +234,19 @@ static astcenc_error validate_flags(
 	}
 
 	// Flags field must only contain at most a single map type
-	exMask = ASTCENC_FLG_MAP_MASK
-	       | ASTCENC_FLG_MAP_NORMAL
+	exMask = ASTCENC_FLG_MAP_NORMAL
 	       | ASTCENC_FLG_MAP_RGBM;
 	if (popcount(flags & exMask) > 1)
 	{
 		return ASTCENC_ERR_BAD_FLAGS;
+	}
+
+	// Decode_unorm8 must only be used with an LDR profile
+	bool is_unorm8 = flags & ASTCENC_FLG_USE_DECODE_UNORM8;
+	bool is_hdr = (profile == ASTCENC_PRF_HDR) || (profile == ASTCENC_PRF_HDR_RGB_LDR_A);
+	if (is_unorm8 && is_hdr)
+	{
+		return ASTCENC_ERR_BAD_DECODE_MODE;
 	}
 
 	return ASTCENC_SUCCESS;
@@ -411,7 +374,7 @@ static astcenc_error validate_config(
 		return status;
 	}
 
-	status = validate_flags(config.flags);
+	status = validate_flags(config.profile, config.flags);
 	if (status != ASTCENC_SUCCESS)
 	{
 		return status;
@@ -440,15 +403,14 @@ static astcenc_error validate_config(
 	config.tune_block_mode_limit = astc::clamp(config.tune_block_mode_limit, 1u, 100u);
 	config.tune_refinement_limit = astc::max(config.tune_refinement_limit, 1u);
 	config.tune_candidate_limit = astc::clamp(config.tune_candidate_limit, 1u, TUNE_MAX_TRIAL_CANDIDATES);
-	config.tune_2partitioning_candidate_limit = astc::clamp(config.tune_2partitioning_candidate_limit, 1u, TUNE_MAX_PARTITIIONING_CANDIDATES);
-	config.tune_3partitioning_candidate_limit = astc::clamp(config.tune_3partitioning_candidate_limit, 1u, TUNE_MAX_PARTITIIONING_CANDIDATES);
-	config.tune_4partitioning_candidate_limit = astc::clamp(config.tune_4partitioning_candidate_limit, 1u, TUNE_MAX_PARTITIIONING_CANDIDATES);
+	config.tune_2partitioning_candidate_limit = astc::clamp(config.tune_2partitioning_candidate_limit, 1u, TUNE_MAX_PARTITIONING_CANDIDATES);
+	config.tune_3partitioning_candidate_limit = astc::clamp(config.tune_3partitioning_candidate_limit, 1u, TUNE_MAX_PARTITIONING_CANDIDATES);
+	config.tune_4partitioning_candidate_limit = astc::clamp(config.tune_4partitioning_candidate_limit, 1u, TUNE_MAX_PARTITIONING_CANDIDATES);
 	config.tune_db_limit = astc::max(config.tune_db_limit, 0.0f);
-	config.tune_mode0_mse_overshoot = astc::max(config.tune_mode0_mse_overshoot, 1.0f);
-	config.tune_refinement_mse_overshoot = astc::max(config.tune_refinement_mse_overshoot, 1.0f);
-	config.tune_2_partition_early_out_limit_factor = astc::max(config.tune_2_partition_early_out_limit_factor, 0.0f);
-	config.tune_3_partition_early_out_limit_factor = astc::max(config.tune_3_partition_early_out_limit_factor, 0.0f);
-	config.tune_2_plane_early_out_limit_correlation = astc::max(config.tune_2_plane_early_out_limit_correlation, 0.0f);
+	config.tune_mse_overshoot = astc::max(config.tune_mse_overshoot, 1.0f);
+	config.tune_2partition_early_out_limit_factor = astc::max(config.tune_2partition_early_out_limit_factor, 0.0f);
+	config.tune_3partition_early_out_limit_factor = astc::max(config.tune_3partition_early_out_limit_factor, 0.0f);
+	config.tune_2plane_early_out_limit_correlation = astc::max(config.tune_2plane_early_out_limit_correlation, 0.0f);
 
 	// Specifying a zero weight color component is not allowed; force to small value
 	float max_weight = astc::max(astc::max(config.cw_r_weight, config.cw_g_weight),
@@ -481,14 +443,6 @@ astcenc_error astcenc_config_init(
 	astcenc_config* configp
 ) {
 	astcenc_error status;
-
-	// Check basic library compatibility options here so they are checked early. Note, these checks
-	// are repeated in context_alloc for cases where callers use a manually defined config struct
-	status = validate_cpu_isa();
-	if (status != ASTCENC_SUCCESS)
-	{
-		return status;
-	}
 
 	status = validate_cpu_float();
 	if (status != ASTCENC_SUCCESS)
@@ -561,19 +515,19 @@ astcenc_error astcenc_config_init(
 		config.tune_4partition_index_limit = (*preset_configs)[start].tune_4partition_index_limit;
 		config.tune_block_mode_limit = (*preset_configs)[start].tune_block_mode_limit;
 		config.tune_refinement_limit = (*preset_configs)[start].tune_refinement_limit;
-		config.tune_candidate_limit = astc::min((*preset_configs)[start].tune_candidate_limit, TUNE_MAX_TRIAL_CANDIDATES);
-		config.tune_2partitioning_candidate_limit = astc::min((*preset_configs)[start].tune_2partitioning_candidate_limit, TUNE_MAX_PARTITIIONING_CANDIDATES);
-		config.tune_3partitioning_candidate_limit = astc::min((*preset_configs)[start].tune_3partitioning_candidate_limit, TUNE_MAX_PARTITIIONING_CANDIDATES);
-		config.tune_4partitioning_candidate_limit = astc::min((*preset_configs)[start].tune_4partitioning_candidate_limit, TUNE_MAX_PARTITIIONING_CANDIDATES);
+		config.tune_candidate_limit = (*preset_configs)[start].tune_candidate_limit;
+		config.tune_2partitioning_candidate_limit = (*preset_configs)[start].tune_2partitioning_candidate_limit;
+		config.tune_3partitioning_candidate_limit = (*preset_configs)[start].tune_3partitioning_candidate_limit;
+		config.tune_4partitioning_candidate_limit = (*preset_configs)[start].tune_4partitioning_candidate_limit;
 		config.tune_db_limit = astc::max((*preset_configs)[start].tune_db_limit_a_base - 35 * ltexels,
 		                                 (*preset_configs)[start].tune_db_limit_b_base - 19 * ltexels);
 
-		config.tune_mode0_mse_overshoot = (*preset_configs)[start].tune_mode0_mse_overshoot;
-		config.tune_refinement_mse_overshoot = (*preset_configs)[start].tune_refinement_mse_overshoot;
+		config.tune_mse_overshoot = (*preset_configs)[start].tune_mse_overshoot;
 
-		config.tune_2_partition_early_out_limit_factor = (*preset_configs)[start].tune_2_partition_early_out_limit_factor;
-		config.tune_3_partition_early_out_limit_factor =(*preset_configs)[start].tune_3_partition_early_out_limit_factor;
-		config.tune_2_plane_early_out_limit_correlation = (*preset_configs)[start].tune_2_plane_early_out_limit_correlation;
+		config.tune_2partition_early_out_limit_factor = (*preset_configs)[start].tune_2partition_early_out_limit_factor;
+		config.tune_3partition_early_out_limit_factor = (*preset_configs)[start].tune_3partition_early_out_limit_factor;
+		config.tune_2plane_early_out_limit_correlation = (*preset_configs)[start].tune_2plane_early_out_limit_correlation;
+		config.tune_search_mode0_enable = (*preset_configs)[start].tune_search_mode0_enable;
 	}
 	// Start and end node are not the same - so interpolate between them
 	else
@@ -600,23 +554,19 @@ astcenc_error astcenc_config_init(
 		config.tune_4partition_index_limit = LERPI(tune_4partition_index_limit);
 		config.tune_block_mode_limit = LERPI(tune_block_mode_limit);
 		config.tune_refinement_limit = LERPI(tune_refinement_limit);
-		config.tune_candidate_limit = astc::min(LERPUI(tune_candidate_limit),
-		                                        TUNE_MAX_TRIAL_CANDIDATES);
-		config.tune_2partitioning_candidate_limit = astc::min(LERPUI(tune_2partitioning_candidate_limit),
-		                                                      BLOCK_MAX_PARTITIONINGS);
-		config.tune_3partitioning_candidate_limit = astc::min(LERPUI(tune_3partitioning_candidate_limit),
-		                                                      BLOCK_MAX_PARTITIONINGS);
-		config.tune_4partitioning_candidate_limit = astc::min(LERPUI(tune_4partitioning_candidate_limit),
-		                                                      BLOCK_MAX_PARTITIONINGS);
+		config.tune_candidate_limit = LERPUI(tune_candidate_limit);
+		config.tune_2partitioning_candidate_limit = LERPUI(tune_2partitioning_candidate_limit);
+		config.tune_3partitioning_candidate_limit = LERPUI(tune_3partitioning_candidate_limit);
+		config.tune_4partitioning_candidate_limit = LERPUI(tune_4partitioning_candidate_limit);
 		config.tune_db_limit = astc::max(LERP(tune_db_limit_a_base) - 35 * ltexels,
 		                                 LERP(tune_db_limit_b_base) - 19 * ltexels);
 
-		config.tune_mode0_mse_overshoot = LERP(tune_mode0_mse_overshoot);
-		config.tune_refinement_mse_overshoot = LERP(tune_refinement_mse_overshoot);
+		config.tune_mse_overshoot = LERP(tune_mse_overshoot);
 
-		config.tune_2_partition_early_out_limit_factor = LERP(tune_2_partition_early_out_limit_factor);
-		config.tune_3_partition_early_out_limit_factor = LERP(tune_3_partition_early_out_limit_factor);
-		config.tune_2_plane_early_out_limit_correlation = LERP(tune_2_plane_early_out_limit_correlation);
+		config.tune_2partition_early_out_limit_factor = LERP(tune_2partition_early_out_limit_factor);
+		config.tune_3partition_early_out_limit_factor = LERP(tune_3partition_early_out_limit_factor);
+		config.tune_2plane_early_out_limit_correlation = LERP(tune_2plane_early_out_limit_correlation);
+		config.tune_search_mode0_enable = LERP(tune_search_mode0_enable);
 		#undef LERP
 		#undef LERPI
 		#undef LERPUI
@@ -644,13 +594,14 @@ astcenc_error astcenc_config_init(
 	case ASTCENC_PRF_HDR_RGB_LDR_A:
 	case ASTCENC_PRF_HDR:
 		config.tune_db_limit = 999.0f;
+		config.tune_search_mode0_enable = 0.0f;
 		break;
 	default:
 		return ASTCENC_ERR_BAD_PROFILE;
 	}
 
 	// Flags field must not contain any unknown flag bits
-	status = validate_flags(flags);
+	status = validate_flags(profile, flags);
 	if (status != ASTCENC_SUCCESS)
 	{
 		return status;
@@ -665,17 +616,11 @@ astcenc_error astcenc_config_init(
 
 		config.cw_g_weight = 0.0f;
 		config.cw_b_weight = 0.0f;
-		config.tune_2_partition_early_out_limit_factor *= 1.5f;
-		config.tune_3_partition_early_out_limit_factor *= 1.5f;
-		config.tune_2_plane_early_out_limit_correlation = 0.99f;
+		config.tune_2partition_early_out_limit_factor *= 1.5f;
+		config.tune_3partition_early_out_limit_factor *= 1.5f;
+		config.tune_2plane_early_out_limit_correlation = 0.99f;
 
 		// Normals are prone to blocking artifacts on smooth curves
-		// so force compressor to try harder here ...
-		config.tune_db_limit *= 1.03f;
-	}
-	else if (flags & ASTCENC_FLG_MAP_MASK)
-	{
-		// Masks are prone to blocking artifacts on mask edges
 		// so force compressor to try harder here ...
 		config.tune_db_limit *= 1.03f;
 	}
@@ -717,12 +662,6 @@ astcenc_error astcenc_context_alloc(
 	astcenc_error status;
 	const astcenc_config& config = *configp;
 
-	status = validate_cpu_isa();
-	if (status != ASTCENC_SUCCESS)
-	{
-		return status;
-	}
-
 	status = validate_cpu_float();
 	if (status != ASTCENC_SUCCESS)
 	{
@@ -760,6 +699,12 @@ astcenc_error astcenc_context_alloc(
 	}
 
 	ctx->bsd = aligned_malloc<block_size_descriptor>(sizeof(block_size_descriptor), ASTCENC_VECALIGN);
+	if (!ctx->bsd)
+	{
+		delete ctxo;
+		return ASTCENC_ERR_OUT_OF_MEM;
+	}
+
 	bool can_omit_modes = static_cast<bool>(config.flags & ASTCENC_FLG_SELF_DECOMPRESS_ONLY);
 	init_block_size_descriptor(config.block_x, config.block_y, config.block_z,
 	                           can_omit_modes,
@@ -769,7 +714,7 @@ astcenc_error astcenc_context_alloc(
 
 #if !defined(ASTCENC_DECOMPRESS_ONLY)
 	// Do setup only needed by compression
-	if (!(status & ASTCENC_FLG_DECOMPRESS_ONLY))
+	if (!(ctx->config.flags & ASTCENC_FLG_DECOMPRESS_ONLY))
 	{
 		// Turn a dB limit into a per-texel error for faster use later
 		if ((ctx->config.profile == ASTCENC_PRF_LDR) || (ctx->config.profile == ASTCENC_PRF_LDR_SRGB))
@@ -783,7 +728,7 @@ astcenc_error astcenc_context_alloc(
 
 		size_t worksize = sizeof(compression_working_buffers) * thread_count;
 		ctx->working_buffers = aligned_malloc<compression_working_buffers>(worksize, ASTCENC_VECALIGN);
-		static_assert((sizeof(compression_working_buffers) % ASTCENC_VECALIGN) == 0,
+		static_assert((ASTCENC_VECALIGN == 0) || ((sizeof(compression_working_buffers) % ASTCENC_VECALIGN) == 0),
 		              "compression_working_buffers size must be multiple of vector alignment");
 		if (!ctx->working_buffers)
 		{
@@ -873,6 +818,8 @@ static void compress_image(
 	int row_blocks = xblocks;
 	int plane_blocks = xblocks * yblocks;
 
+	blk.decode_unorm8 = ctxo.context.config.flags & ASTCENC_FLG_USE_DECODE_UNORM8;
+
 	// Populate the block channel weights
 	blk.channel_weight = vfloat4(ctx.config.cw_r_weight,
 	                             ctx.config.cw_g_weight,
@@ -883,7 +830,7 @@ static void compress_image(
 	auto& temp_buffers = ctx.working_buffers[thread_index];
 
 	// Only the first thread actually runs the initializer
-	ctxo.manage_compress.init(block_count);
+	ctxo.manage_compress.init(block_count, ctx.config.progress_callback);
 
 	// Determine if we can use an optimized load function
 	bool needs_swz = (swizzle.r != ASTCENC_SWZ_R) || (swizzle.g != ASTCENC_SWZ_G) ||
@@ -985,8 +932,7 @@ static void compress_image(
 
 			int offset = ((z * yblocks + y) * xblocks + x) * 16;
 			uint8_t *bp = buffer + offset;
-			physical_compressed_block* pcb = reinterpret_cast<physical_compressed_block*>(bp);
-			compress_block(ctx, blk, *pcb, temp_buffers);
+			compress_block(ctx, blk, bp, temp_buffers);
 		}
 
 		ctxo.manage_compress.complete_task_assignment(count);
@@ -1209,6 +1155,7 @@ astcenc_error astcenc_decompress_image(
 	unsigned int xblocks = (image_out.dim_x + block_x - 1) / block_x;
 	unsigned int yblocks = (image_out.dim_y + block_y - 1) / block_y;
 	unsigned int zblocks = (image_out.dim_z + block_z - 1) / block_z;
+	unsigned int block_count = zblocks * yblocks * xblocks;
 
 	int row_blocks = xblocks;
 	int plane_blocks = xblocks * yblocks;
@@ -1220,8 +1167,11 @@ astcenc_error astcenc_decompress_image(
 		return ASTCENC_ERR_OUT_OF_MEM;
 	}
 
-	image_block blk;
+	image_block blk {};
 	blk.texel_count = static_cast<uint8_t>(block_x * block_y * block_z);
+
+	// Decode mode inferred from the output data type
+	blk.decode_unorm8 = image_out.data_type == ASTCENC_TYPE_U8;
 
 	// If context thread count is one then implicitly reset
 	if (ctx->thread_count == 1)
@@ -1230,7 +1180,7 @@ astcenc_error astcenc_decompress_image(
 	}
 
 	// Only the first thread actually runs the initializer
-	ctxo->manage_decompress.init(zblocks * yblocks * xblocks);
+	ctxo->manage_decompress.init(block_count, nullptr);
 
 	// All threads run this processing loop until there is no work remaining
 	while (true)
@@ -1253,10 +1203,9 @@ astcenc_error astcenc_decompress_image(
 			unsigned int offset = (((z * yblocks + y) * xblocks) + x) * 16;
 			const uint8_t* bp = data + offset;
 
-			const physical_compressed_block& pcb = *reinterpret_cast<const physical_compressed_block*>(bp);
 			symbolic_compressed_block scb;
 
-			physical_to_symbolic(*ctx->bsd, pcb, scb);
+			physical_to_symbolic(*ctx->bsd, bp, scb);
 
 			decompress_symbolic_block(ctx->config.profile, *ctx->bsd,
 			                          x * block_x, y * block_y, z * block_z,
@@ -1295,9 +1244,8 @@ astcenc_error astcenc_get_block_info(
 	astcenc_contexti* ctx = &ctxo->context;
 
 	// Decode the compressed data into a symbolic form
-	const physical_compressed_block&pcb = *reinterpret_cast<const physical_compressed_block*>(data);
 	symbolic_compressed_block scb;
-	physical_to_symbolic(*ctx->bsd, pcb, scb);
+	physical_to_symbolic(*ctx->bsd, data, scb);
 
 	// Fetch the appropriate partition and decimation tables
 	block_size_descriptor& bsd = *ctx->bsd;
@@ -1414,8 +1362,6 @@ const char* astcenc_get_error_string(
 		return "ASTCENC_ERR_OUT_OF_MEM";
 	case ASTCENC_ERR_BAD_CPU_FLOAT:
 		return "ASTCENC_ERR_BAD_CPU_FLOAT";
-	case ASTCENC_ERR_BAD_CPU_ISA:
-		return "ASTCENC_ERR_BAD_CPU_ISA";
 	case ASTCENC_ERR_BAD_PARAM:
 		return "ASTCENC_ERR_BAD_PARAM";
 	case ASTCENC_ERR_BAD_BLOCK_SIZE:
@@ -1432,6 +1378,8 @@ const char* astcenc_get_error_string(
 		return "ASTCENC_ERR_BAD_CONTEXT";
 	case ASTCENC_ERR_NOT_IMPLEMENTED:
 		return "ASTCENC_ERR_NOT_IMPLEMENTED";
+	case ASTCENC_ERR_BAD_DECODE_MODE:
+		return "ASTCENC_ERR_BAD_DECODE_MODE";
 #if defined(ASTCENC_DIAGNOSTICS)
 	case ASTCENC_ERR_DTRACE_FAILURE:
 		return "ASTCENC_ERR_DTRACE_FAILURE";

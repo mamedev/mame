@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -76,7 +76,7 @@ namespace bx
 		uint32_t m_hash;
 	};
 
-	/// 32-bit multiply and rotate hash.
+	/// 32-bit non-cryptographic multiply and rotate hash.
 	class HashMurmur2A
 	{
 	public:
@@ -101,9 +101,39 @@ namespace bx
 
 	private:
 		uint32_t m_hash;
-		uint32_t m_tail;
-		uint32_t m_count;
 		uint32_t m_size;
+		uint8_t  m_tail[4];
+		uint8_t  m_count;
+	};
+
+	/// 32-bit non-cryptographic multiply and rotate hash.
+	class HashMurmur3
+	{
+	public:
+		///
+		void begin(uint32_t _seed = 0);
+
+		///
+		void add(const void* _data, int32_t _len);
+
+		///
+		void add(const char* _data);
+
+		///
+		void add(const StringView& _data);
+
+		///
+		template<typename Ty>
+		void add(const Ty& _data);
+
+		///
+		uint32_t end();
+
+	private:
+		uint32_t m_hash;
+		uint32_t m_size;
+		uint8_t  m_tail[4];
+		uint8_t  m_count;
 	};
 
 	///

@@ -1,11 +1,13 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #include "test.h"
 #include <bx/typetraits.h>
 
+BX_PRAGMA_DIAGNOSTIC_PUSH();
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wunused-private-field");
 struct TestClass                {                                                                        };
 struct TestClassFinal final     {                                                                        };
 struct TestClassMember          { int32_t x;                                                             };
@@ -27,6 +29,7 @@ union  TestUnionEmpty           {                                               
 union  TestUnion                { int32_t x; float y;                                                    };
 enum   TestEnumEmpty            {                                                                        };
 enum   TestEnum                 { Enum                                                                   };
+BX_PRAGMA_DIAGNOSTIC_POP();
 
 TEST_CASE("type-traits isReference", "")
 {
@@ -227,6 +230,20 @@ TEST_CASE("type-traits isTriviallyDestructible", "")
 	STATIC_REQUIRE(!bx::isTriviallyDestructible<TestClassVirtualDtor >() );
 }
 
+TEST_CASE("type-traits isConst", "")
+{
+	STATIC_REQUIRE(!bx::isConst<char>() );
+	STATIC_REQUIRE( bx::isConst<const char>() );
+	STATIC_REQUIRE( bx::isConst<bx::AddConstType<char>>() );
+}
+
+TEST_CASE("type-traits isVolatile", "")
+{
+	STATIC_REQUIRE(!bx::isVolatile<char>() );
+	STATIC_REQUIRE( bx::isVolatile<volatile char>() );
+	STATIC_REQUIRE( bx::isVolatile<bx::AddVolatileType<char>>() );
+}
+
 TEST_CASE("type-traits isSigned", "")
 {
 	STATIC_REQUIRE(!bx::isSigned<bool                   >() );
@@ -297,6 +314,92 @@ TEST_CASE("type-traits isUnsigned", "")
 	STATIC_REQUIRE(!bx::isUnsigned<float                  >() );
 	STATIC_REQUIRE(!bx::isUnsigned<double                 >() );
 	STATIC_REQUIRE(!bx::isUnsigned<long double            >() );
+}
+
+TEST_CASE("type-traits MakeSignedT", "")
+{
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<char                   >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<signed char            >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<unsigned char          >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<short                  >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<unsigned short         >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<int                    >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<unsigned int           >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<long                   >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<unsigned long          >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<long long              >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<unsigned long long     >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<long long int          >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<unsigned long long int >::Type >() );
+
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<int8_t                 >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<uint8_t                >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<int16_t                >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<uint16_t               >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<int32_t                >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<uint32_t               >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<int64_t                >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<uint64_t               >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<intmax_t               >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<uintmax_t              >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<uintptr_t              >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<ptrdiff_t              >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<size_t                 >::Type >() );
+
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<float                  >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<double                 >::Type >() );
+	STATIC_REQUIRE(bx::isSigned<bx::MakeSignedT<long double            >::Type >() );
+
+	using charType = bx::MakeSignedType<unsigned char>;
+	using intType  = bx::MakeSignedType<unsigned int>;
+	using longType = bx::MakeSignedType<volatile unsigned long>;
+
+	STATIC_REQUIRE(true
+		&& bx::isSame<charType, signed char>()
+		&& bx::isSame<intType, signed int>()
+		&& bx::isSame<longType, volatile signed long>()
+		);
+}
+
+TEST_CASE("type-traits MakeUnsignedT", "")
+{
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<char                   >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<signed char            >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<unsigned char          >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<short                  >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<unsigned short         >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<int                    >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<unsigned int           >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<long                   >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<unsigned long          >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<long long              >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<unsigned long long     >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<long long int          >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<unsigned long long int >::Type >() );
+
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<int8_t                 >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<uint8_t                >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<int16_t                >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<uint16_t               >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<int32_t                >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<uint32_t               >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<int64_t                >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<uint64_t               >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<intmax_t               >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<uintmax_t              >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<uintptr_t              >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<ptrdiff_t              >::Type >() );
+	STATIC_REQUIRE(bx::isUnsigned<bx::MakeUnsignedT<size_t                 >::Type >() );
+
+	using ucharType = bx::MakeUnsignedType<char>;
+	using uintType  = bx::MakeUnsignedType<int>;
+	using ulongType = bx::MakeUnsignedType<volatile long>;
+
+	STATIC_REQUIRE(true
+		&& bx::isSame<ucharType, unsigned char>()
+		&& bx::isSame<uintType, unsigned int>()
+		&& bx::isSame<ulongType, volatile unsigned long>()
+		);
 }
 
 TEST_CASE("type-traits isInteger", "")

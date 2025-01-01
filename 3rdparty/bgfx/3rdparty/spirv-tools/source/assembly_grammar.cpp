@@ -21,6 +21,7 @@
 #include "source/ext_inst.h"
 #include "source/opcode.h"
 #include "source/operand.h"
+#include "source/spirv_target_env.h"
 #include "source/table.h"
 
 namespace spvtools {
@@ -78,16 +79,16 @@ spv_result_t spvTextParseMaskOperand(spv_target_env env,
 
 // Associates an opcode with its name.
 struct SpecConstantOpcodeEntry {
-  SpvOp opcode;
+  spv::Op opcode;
   const char* name;
 };
 
 // All the opcodes allowed as the operation for OpSpecConstantOp.
-// The name does not have the usual "Op" prefix. For example opcode SpvOpIAdd
-// is associated with the name "IAdd".
+// The name does not have the usual "Op" prefix. For example opcode
+// spv::Op::IAdd is associated with the name "IAdd".
 //
 // clang-format off
-#define CASE(NAME) { SpvOp##NAME, #NAME }
+#define CASE(NAME) { spv::Op::Op##NAME, #NAME }
 const SpecConstantOpcodeEntry kOpSpecConstantOpcodes[] = {
     // Conversion
     CASE(SConvert),
@@ -154,11 +155,12 @@ const SpecConstantOpcodeEntry kOpSpecConstantOpcodes[] = {
     CASE(InBoundsAccessChain),
     CASE(PtrAccessChain),
     CASE(InBoundsPtrAccessChain),
-    CASE(CooperativeMatrixLengthNV)
+    CASE(CooperativeMatrixLengthNV),
+    CASE(CooperativeMatrixLengthKHR)
 };
 
 // The 60 is determined by counting the opcodes listed in the spec.
-static_assert(60 == sizeof(kOpSpecConstantOpcodes)/sizeof(kOpSpecConstantOpcodes[0]),
+static_assert(61 == sizeof(kOpSpecConstantOpcodes)/sizeof(kOpSpecConstantOpcodes[0]),
               "OpSpecConstantOp opcode table is incomplete");
 #undef CASE
 // clang-format on
@@ -173,17 +175,20 @@ bool AssemblyGrammar::isValid() const {
 }
 
 CapabilitySet AssemblyGrammar::filterCapsAgainstTargetEnv(
-    const SpvCapability* cap_array, uint32_t count) const {
+    const spv::Capability* cap_array, uint32_t count) const {
   CapabilitySet cap_set;
+  const auto version = spvVersionForTargetEnv(target_env_);
   for (uint32_t i = 0; i < count; ++i) {
-    spv_operand_desc cap_desc = {};
+    spv_operand_desc entry = {};
     if (SPV_SUCCESS == lookupOperand(SPV_OPERAND_TYPE_CAPABILITY,
                                      static_cast<uint32_t>(cap_array[i]),
-                                     &cap_desc)) {
-      // spvOperandTableValueLookup() filters capabilities internally
-      // according to the current target environment by itself. So we
-      // should be safe to add this capability if the lookup succeeds.
-      cap_set.Add(cap_array[i]);
+                                     &entry)) {
+      // This token is visible in this environment if it's in an appropriate
+      // core version, or it is enabled by a capability or an extension.
+      if ((version >= entry->minVersion && version <= entry->lastVersion) ||
+          entry->numExtensions > 0u || entry->numCapabilities > 0u) {
+        cap_set.insert(cap_array[i]);
+      }
     }
   }
   return cap_set;
@@ -194,7 +199,7 @@ spv_result_t AssemblyGrammar::lookupOpcode(const char* name,
   return spvOpcodeTableNameLookup(target_env_, opcodeTable_, name, desc);
 }
 
-spv_result_t AssemblyGrammar::lookupOpcode(SpvOp opcode,
+spv_result_t AssemblyGrammar::lookupOpcode(spv::Op opcode,
                                            spv_opcode_desc* desc) const {
   return spvOpcodeTableValueLookup(target_env_, opcodeTable_, opcode, desc);
 }
@@ -214,7 +219,7 @@ spv_result_t AssemblyGrammar::lookupOperand(spv_operand_type_t type,
 }
 
 spv_result_t AssemblyGrammar::lookupSpecConstantOpcode(const char* name,
-                                                       SpvOp* opcode) const {
+                                                       spv::Op* opcode) const {
   const auto* last = kOpSpecConstantOpcodes + kNumOpSpecConstantOpcodes;
   const auto* found =
       std::find_if(kOpSpecConstantOpcodes, last,
@@ -226,7 +231,7 @@ spv_result_t AssemblyGrammar::lookupSpecConstantOpcode(const char* name,
   return SPV_SUCCESS;
 }
 
-spv_result_t AssemblyGrammar::lookupSpecConstantOpcode(SpvOp opcode) const {
+spv_result_t AssemblyGrammar::lookupSpecConstantOpcode(spv::Op opcode) const {
   const auto* last = kOpSpecConstantOpcodes + kNumOpSpecConstantOpcodes;
   const auto* found =
       std::find_if(kOpSpecConstantOpcodes, last,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -149,18 +149,19 @@ namespace bx
 
 	/// Count number of bits set.
 	///
-	template<typename Ty>
-	BX_CONSTEXPR_FUNC uint32_t uint32_cntbits(Ty _val);
+	BX_CONSTEXPR_FUNC uint32_t uint32_cntbits(uint32_t _val);
 
 	/// Count number of leading zeros.
 	///
-	template<typename Ty>
-	BX_CONSTEXPR_FUNC uint32_t uint32_cntlz(Ty _val);
+	BX_CONSTEXPR_FUNC uint32_t uint32_cntlz(uint32_t _val);
 
 	/// Count number of trailing zeros.
 	///
-	template<typename Ty>
-	BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(Ty _val);
+	BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(uint32_t _val);
+
+	/// Find first set.
+	///
+	BX_CONSTEXPR_FUNC uint32_t uint32_ffs(uint32_t _val);
 
 	///
 	BX_CONSTEXPR_FUNC uint32_t uint32_part1by1(uint32_t _a);
@@ -233,6 +234,15 @@ namespace bx
 
 	///
 	BX_CONSTEXPR_FUNC uint64_t uint64_mul(uint64_t _a, uint64_t _b);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_cntbits(uint64_t _val);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_cntlz(uint64_t _val);
+
+	///
+	BX_CONSTEXPR_FUNC uint64_t uint64_cnttz(uint64_t _val);
 
 	/// Greatest common divisor.
 	///

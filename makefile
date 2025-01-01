@@ -38,7 +38,6 @@
 # USE_PCAP = 1
 # USE_QTDEBUG = 1
 # NO_X11 = 1
-# USE_WAYLAND = 1
 # NO_USE_XINPUT = 1
 # NO_USE_XINPUT_WII_LIGHTGUN_HACK = 1
 # FORCE_DRC_C_BACKEND = 1
@@ -805,10 +804,6 @@ endif
 
 ifdef MESA_INSTALL_ROOT
 PARAMS += --MESA_INSTALL_ROOT='$(MESA_INSTALL_ROOT)'
-endif
-
-ifdef USE_WAYLAND
-PARAMS += --USE_WAYLAND='$(USE_WAYLAND)'
 endif
 
 ifdef NO_X11
@@ -1727,7 +1722,6 @@ bgfx-tools:
 
 shaders: bgfx-tools
 	-$(call MKDIR,build/shaders/dx11)
-	-$(call MKDIR,build/shaders/dx9)
 	-$(call MKDIR,build/shaders/pssl)
 	-$(call MKDIR,build/shaders/metal)
 	-$(call MKDIR,build/shaders/essl)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -299,7 +299,7 @@ namespace entry
 	void* getNativeDisplayHandle();
 
 	///
-	bgfx::NativeWindowHandleType::Enum getNativeWindowHandleType(WindowHandle _handle);
+	bgfx::NativeWindowHandleType::Enum getNativeWindowHandleType();
 
 	///
 	void setCurrentDir(const char* _dir);

@@ -146,7 +146,7 @@ public:
 		init.vendorId = args.m_pciId;
 		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
 		init.platformData.ndt  = entry::getNativeDisplayHandle();
-		init.platformData.type = entry::getNativeWindowHandleType(entry::kDefaultWindowHandle);
+		init.platformData.type = entry::getNativeWindowHandleType();
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;
@@ -376,7 +376,7 @@ public:
 				// This is done here for demonstration purposes
 
 				// The model matrix for each instance is also set on compute
-				// you could modify this to, eg, do frustrum culling on the GPU
+				// you could modify this to, eg, do frustum culling on the GPU
 				float ud[4] = { float(m_nDrawElements), float(m_sideSize), float(time), 0 };
 				uint32_t numToDraw = (m_sideSize*m_sideSize);
 
@@ -415,7 +415,7 @@ public:
 				}
 				else
 				{
-					bgfx::submit(0, m_program, m_indirect_buffer_handle, 0, uint16_t(numToDraw));
+					bgfx::submit(0, m_program, m_indirect_buffer_handle, 0, numToDraw);
 				}
 			}
 			else

@@ -128,7 +128,7 @@ struct PosTexCoord0Vertex
 bgfx::VertexLayout PosTexCoord0Vertex::ms_layout;
 
 // Utility function to draw a screen space quad for deferred rendering
-void screenSpaceQuad(float _textureWidth, float _textureHeight, float _texelHalf, bool _originBottomLeft, float _width = 1.0f, float _height = 1.0f)
+void screenSpaceQuad(bool _originBottomLeft, float _width = 1.0f, float _height = 1.0f)
 {
 	if (3 == bgfx::getAvailTransientVertexBuffer(3, PosTexCoord0Vertex::ms_layout) )
 	{
@@ -141,15 +141,13 @@ void screenSpaceQuad(float _textureWidth, float _textureHeight, float _texelHalf
 		const float miny = 0.0f;
 		const float maxy = _height*2.0f;
 
-		const float texelHalfW = _texelHalf/_textureWidth;
-		const float texelHalfH = _texelHalf/_textureHeight;
-		const float minu = -1.0f + texelHalfW;
-		const float maxu =  1.0f + texelHalfH;
+		const float minu = -1.0f;
+		const float maxu =  1.0f;
 
 		const float zz = 0.0f;
 
-		float minv = texelHalfH;
-		float maxv = 2.0f + texelHalfH;
+		float minv = 0.0f;
+		float maxv = 2.0f;
 
 		if (_originBottomLeft)
 		{
@@ -195,7 +193,6 @@ public:
 		, m_lightAzimuth(215.0f)
 		, m_rsmAmount(0.25f)
 		, m_vplRadius(3.0f)
-		, m_texelHalf(0.0f)
 	{
 	}
 
@@ -213,7 +210,7 @@ public:
 		init.vendorId = args.m_pciId;
 		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
 		init.platformData.ndt  = entry::getNativeDisplayHandle();
-		init.platformData.type = entry::getNativeWindowHandleType(entry::kDefaultWindowHandle);
+		init.platformData.type = entry::getNativeWindowHandleType();
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;
@@ -374,8 +371,6 @@ public:
 
 		// Get renderer capabilities info.
 		m_caps = bgfx::getCaps();
-		const bgfx::RendererType::Enum renderer = bgfx::getRendererType();
-		m_texelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
 
 		imguiCreate();
 	}
@@ -516,7 +511,7 @@ public:
 					bgfx::setTexture(0, s_normal, bgfx::getTexture(m_gbuffer, GBUFFER_RT_NORMAL) );  // Normal for lighting calculations
 					bgfx::setTexture(1, s_depth,  bgfx::getTexture(m_gbuffer, GBUFFER_RT_DEPTH) );   // Depth to reconstruct world position
 
-					// Thse are used in the vert shader
+					// These are used in the vert shader
 					bgfx::setTexture(2, s_shadowMap, bgfx::getTexture(m_shadowBuffer, SHADOW_RT_DEPTH) );  // Used to place sphere
 					bgfx::setTexture(3, s_rsm,       bgfx::getTexture(m_shadowBuffer, SHADOW_RT_RSM) );    // Used to scale/color sphere
 
@@ -580,7 +575,7 @@ public:
 			bgfx::setViewTransform(RENDER_PASS_COMBINE, NULL, orthoProj);
 			bgfx::setViewRect(RENDER_PASS_COMBINE, 0, 0, uint16_t(m_width), uint16_t(m_height) );
 			// Bind vertex buffer and draw quad
-			screenSpaceQuad( (float)m_width, (float)m_height, m_texelHalf, m_caps->originBottomLeft);
+			screenSpaceQuad(m_caps->originBottomLeft);
 			bgfx::submit(RENDER_PASS_COMBINE, m_combineProgram);
 
 			// Draw UI
@@ -754,8 +749,6 @@ public:
 
 	float m_rsmAmount; // Amount of rsm
 	float m_vplRadius; // Radius of virtual point light
-
-	float m_texelHalf;
 };
 
 } // namespace

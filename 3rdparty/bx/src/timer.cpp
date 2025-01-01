@@ -1,12 +1,12 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #include <bx/timer.h>
 
 #if BX_CRT_NONE
-#	include "crt0.h"
+#	include <bx/crt0.h>
 #elif BX_PLATFORM_ANDROID
 #	include <time.h> // clock, clock_gettime
 #elif BX_PLATFORM_EMSCRIPTEN
@@ -40,7 +40,7 @@ namespace bx
 		int64_t i64 = int64_t(1000.0f * emscripten_get_now() );
 #elif !BX_PLATFORM_NONE
 		struct timeval now;
-		gettimeofday(&now, 0);
+		gettimeofday(&now, NULL);
 		int64_t i64 = now.tv_sec*INT64_C(1000000) + now.tv_usec;
 #else
 		BX_ASSERT(false, "Not implemented!");

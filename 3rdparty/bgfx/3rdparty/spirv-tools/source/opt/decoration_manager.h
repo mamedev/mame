@@ -71,14 +71,14 @@ class DecorationManager {
                                               bool include_linkage);
   std::vector<const Instruction*> GetDecorationsFor(uint32_t id,
                                                     bool include_linkage) const;
-  // Returns whether two IDs have the same decorations. Two SpvOpGroupDecorate
-  // instructions that apply the same decorations but to different IDs, still
-  // count as being the same.
+  // Returns whether two IDs have the same decorations. Two
+  // spv::Op::OpGroupDecorate instructions that apply the same decorations but
+  // to different IDs, still count as being the same.
   bool HaveTheSameDecorations(uint32_t id1, uint32_t id2) const;
 
-  // Returns whether two IDs have the same decorations. Two SpvOpGroupDecorate
-  // instructions that apply the same decorations but to different IDs, still
-  // count as being the same.
+  // Returns whether two IDs have the same decorations. Two
+  // spv::Op::OpGroupDecorate instructions that apply the same decorations but
+  // to different IDs, still count as being the same.
   bool HaveSubsetOfDecorations(uint32_t id1, uint32_t id2) const;
 
   // Returns whether the two decorations instructions are the same and are
@@ -92,20 +92,21 @@ class DecorationManager {
 
   // Returns whether a decoration instruction for |id| with decoration
   // |decoration| exists or not.
-  bool HasDecoration(uint32_t id, uint32_t decoration);
+  bool HasDecoration(uint32_t id, uint32_t decoration) const;
+  bool HasDecoration(uint32_t id, spv::Decoration decoration) const;
 
   // |f| is run on each decoration instruction for |id| with decoration
   // |decoration|. Processed are all decorations which target |id| either
   // directly or indirectly by Decoration Groups.
   void ForEachDecoration(uint32_t id, uint32_t decoration,
-                         std::function<void(const Instruction&)> f);
+                         std::function<void(const Instruction&)> f) const;
 
   // |f| is run on each decoration instruction for |id| with decoration
   // |decoration|. Processes all decoration which target |id| either directly or
   // indirectly through decoration groups. If |f| returns false, iteration is
   // terminated and this function returns false.
   bool WhileEachDecoration(uint32_t id, uint32_t decoration,
-                           std::function<bool(const Instruction&)> f);
+                           std::function<bool(const Instruction&)> f) const;
 
   // |f| is run on each decoration instruction for |id| with decoration
   // |decoration|. Processes all decoration which target |id| either directly or
@@ -123,14 +124,15 @@ class DecorationManager {
   // Same as above, but only clone the decoration if the decoration operand is
   // in |decorations_to_copy|.  This function has the extra restriction that
   // |from| and |to| must not be an object, not a type.
-  void CloneDecorations(uint32_t from, uint32_t to,
-                        const std::vector<SpvDecoration>& decorations_to_copy);
+  void CloneDecorations(
+      uint32_t from, uint32_t to,
+      const std::vector<spv::Decoration>& decorations_to_copy);
 
   // Informs the decoration manager of a new decoration that it needs to track.
   void AddDecoration(Instruction* inst);
 
   // Add decoration with |opcode| and operands |opnds|.
-  void AddDecoration(SpvOp opcode, const std::vector<Operand> opnds);
+  void AddDecoration(spv::Op opcode, const std::vector<Operand> opnds);
 
   // Add |decoration| of |inst_id| to module.
   void AddDecoration(uint32_t inst_id, uint32_t decoration);
@@ -140,7 +142,7 @@ class DecorationManager {
                         uint32_t decoration_value);
 
   // Add |decoration, decoration_value| of |inst_id, member| to module.
-  void AddMemberDecoration(uint32_t member, uint32_t inst_id,
+  void AddMemberDecoration(uint32_t inst_id, uint32_t member,
                            uint32_t decoration, uint32_t decoration_value);
 
   friend bool operator==(const DecorationManager&, const DecorationManager&);
@@ -195,9 +197,9 @@ class DecorationManager {
 
   // Mapping from ids to the instructions applying a decoration to those ids.
   // In other words, for each id you get all decoration instructions
-  // referencing that id, be it directly (SpvOpDecorate, SpvOpMemberDecorate
-  // and SpvOpDecorateId), or indirectly (SpvOpGroupDecorate,
-  // SpvOpMemberGroupDecorate).
+  // referencing that id, be it directly (spv::Op::OpDecorate,
+  // spv::Op::OpMemberDecorate and spv::Op::OpDecorateId), or indirectly
+  // (spv::Op::OpGroupDecorate, spv::Op::OpMemberGroupDecorate).
   std::unordered_map<uint32_t, TargetData> id_to_decoration_insts_;
   // The enclosing module.
   Module* module_;

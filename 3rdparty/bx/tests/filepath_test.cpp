@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -88,7 +88,7 @@ static const FilePathSplit s_filePathSplit[] =
 	{ "/tmp/abv/gd/", true, "/tmp/abv/gd/", "", "", "" },
 };
 
-TEST_CASE("FilePath", "")
+TEST_CASE("FilePath", "[filepath][string]")
 {
 	bx::FilePath fp;
 	for (uint32_t ii = 0; ii < BX_COUNTOF(s_filePathTest); ++ii)
@@ -118,18 +118,51 @@ TEST_CASE("FilePath", "")
 	};
 }
 
-TEST_CASE("FilePath temp", "")
+TEST_CASE("FilePath temp", "[filepath]")
 {
 	bx::FilePath tmp(bx::Dir::Temp);
 	REQUIRE(0 != bx::strCmp(".", tmp.getPath().getPtr() ) );
 
-	bx::Error err;
-	tmp.join("test/abvgd/555333/test");
-	REQUIRE(bx::makeAll(tmp, &err) );
-	REQUIRE(err.isOk() );
+	tmp.set(bx::Dir::Temp);
+	tmp.join("bx.test");
+	bx::removeAll(tmp, bx::ErrorIgnore{});
+
+	tmp.join("bx.test/abvgd/555333/test");
+	REQUIRE(bx::makeAll(tmp, bx::ErrorAssert{}) );
+
+	if (BX_ENABLED(BX_PLATFORM_EMSCRIPTEN) )
+	{
+		SKIP("Not supported by wasm.");
+	}
 
 	tmp.set(bx::Dir::Temp);
-	tmp.join("test");
-	REQUIRE(bx::removeAll(tmp, &err) );
-	REQUIRE(err.isOk() );
+	tmp.join("bx.test");
+	REQUIRE(bx::removeAll(tmp, bx::ErrorAssert{}) );
+}
+
+TEST_CASE("FilePath special", "[filepath]")
+{
+	{
+		bx::FilePath tmp(bx::Dir::Current);
+		bx::StringView sv(tmp);
+		DBG("%S", &sv);
+	}
+
+	{
+		bx::FilePath tmp(bx::Dir::Executable);
+		bx::StringView sv(tmp);
+		DBG("%S", &sv);
+	}
+
+	{
+		bx::FilePath tmp(bx::Dir::Home);
+		bx::StringView sv(tmp);
+		DBG("%S", &sv);
+	}
+
+	{
+		bx::FilePath tmp(bx::Dir::Temp);
+		bx::StringView sv(tmp);
+		DBG("%S", &sv);
+	}
 }

@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2024 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bimg/blob/master/LICENSE
 --
 
@@ -20,6 +20,14 @@ project "texturec"
 		"bimg_encode",
 		"bimg",
 	}
+
+	if _OPTIONS["with-libheif"] then
+		links {
+			"heif",
+		}
+
+		configuration {}
+	end
 
 	using_bx()
 

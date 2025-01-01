@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -67,7 +67,7 @@ namespace bx
 
 	inline MemoryBlock::~MemoryBlock()
 	{
-		BX_FREE(m_allocator, m_data);
+		free(m_allocator, m_data);
 	}
 
 	inline void* MemoryBlock::more(uint32_t _size)
@@ -75,7 +75,7 @@ namespace bx
 		if (0 < _size)
 		{
 			m_size += _size;
-			m_data = BX_REALLOC(m_allocator, m_data, m_size);
+			m_data = realloc(m_allocator, m_data, m_size);
 		}
 
 		return m_data;
@@ -297,16 +297,6 @@ namespace bx
 		return _writer->write(_data, _size, _err);
 	}
 
-	inline int32_t write(WriterI* _writer, const char* _str, Error* _err)
-	{
-		return write(_writer, _str, strLen(_str), _err);
-	}
-
-	inline int32_t write(WriterI* _writer, const StringView& _str, Error* _err)
-	{
-		return write(_writer, _str.getPtr(), _str.getLength(), _err);
-	}
-
 	inline int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
@@ -318,7 +308,7 @@ namespace bx
 		memSet(temp, _byte, blockSize);
 
 		int32_t size = 0;
-		while (0 < _size)
+		while (0 < _size && _err->isOk() )
 		{
 			int32_t bytes = write(_writer, temp, uint32_min(blockSize, _size), _err);
 			size  += bytes;
@@ -334,6 +324,23 @@ namespace bx
 		BX_ERROR_SCOPE(_err);
 		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
 		return _writer->write(&_value, sizeof(Ty), _err);
+	}
+
+	template<>
+	inline int32_t write(WriterI* _writer, const StringView& _str, Error* _err)
+	{
+		return write(_writer, _str.getPtr(), _str.getLength(), _err);
+	}
+
+	template<>
+	inline int32_t write(WriterI* _writer, const StringLiteral& _str, Error* _err)
+	{
+		return write<StringView>(_writer, _str, _err);
+	}
+
+	inline int32_t write(WriterI* _writer, const char* _str, Error* _err)
+	{
+		return write<StringView>(_writer, _str, _err);
 	}
 
 	template<typename Ty>
@@ -397,9 +404,9 @@ namespace bx
 	inline int32_t peek(ReaderSeekerI* _reader, void* _data, int32_t _size, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
-		int64_t offset = bx::seek(_reader);
+		int64_t offset = seek(_reader);
 		int32_t size = _reader->read(_data, _size, _err);
-		bx::seek(_reader, offset, bx::Whence::Begin);
+		seek(_reader, offset, Whence::Begin);
 		return size;
 	}
 
@@ -414,12 +421,12 @@ namespace bx
 	inline int32_t align(ReaderSeekerI* _reader, uint32_t _alignment, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
-		const int64_t current = bx::seek(_reader);
+		const int64_t current = seek(_reader);
 		const int64_t aligned = ( (current + _alignment-1)/_alignment) * _alignment;
 		const int32_t size    = int32_t(aligned - current);
 		if (0 != size)
 		{
-			const int64_t offset  = bx::seek(_reader, size);
+			const int64_t offset  = seek(_reader, size);
 			if (offset != aligned)
 			{
 				BX_ERROR_SET(_err, kErrorReaderWriterWrite, "Align: read truncated.");
@@ -433,7 +440,7 @@ namespace bx
 	inline int32_t align(WriterSeekerI* _writer, uint32_t _alignment, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
-		const int64_t current = bx::seek(_writer);
+		const int64_t current = seek(_writer);
 		const int64_t aligned = ( (current + _alignment-1)/_alignment) * _alignment;
 		const int32_t size    = int32_t(aligned - current);
 		if (0 != size)

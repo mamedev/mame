@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -8,9 +8,9 @@
 
 #include <alloca.h> // alloca
 #include <stdarg.h> // va_list
+#include <stddef.h> // ptrdiff_t
 #include <stdint.h> // uint32_t
 #include <stdlib.h> // size_t
-#include <stddef.h> // ptrdiff_t
 
 #include "platform.h"
 #include "config.h"
@@ -36,8 +36,111 @@
 ///
 #define BX_ENABLED(_x) BX_IGNORE_C4127(bx::isEnabled<!!(_x)>::value)
 
+///
+#define BX_DECLARE_TAG(_name)  \
+	struct    _name ## Tag {}; \
+	constexpr _name ## Tag _name
+
 namespace bx
 {
+	/// Placement new tag.
+	BX_DECLARE_TAG(PlacementNew);
+
+	/// Fields are left uninitialized.
+	BX_DECLARE_TAG(InitNone);
+
+	/// Fields are initialized to zero.
+	BX_DECLARE_TAG(InitZero);
+
+	/// Fields are initialized to identity value.
+	BX_DECLARE_TAG(InitIdentity);
+
+	/// Source location with file path, and file line.
+	///
+	struct Location
+	{
+		/// Default constructor.
+		///
+		constexpr Location()
+			: filePath(""), line(0) {}
+
+		/// Constructor with specific file name, and line number.
+		///
+		constexpr Location(const char* _filePath, uint32_t _line)
+			: filePath(_filePath), line(_line) {}
+
+		/// Current source location.
+		///
+		static Location current(
+			  const char* _filePath = __builtin_FILE()
+			, uint32_t _line = __builtin_LINE()
+			);
+
+		const char* filePath; //!< File path.
+		uint32_t    line;     //!< File line.
+	};
+
+	/// Unknown source code location.
+	static constexpr Location kUnknownLocation("Unknown?", 0);
+
+	/// Source location with file path, file line, and function name.
+	///
+	struct LocationFull
+	{
+		/// Default constructor.
+		///
+		constexpr LocationFull()
+			: function(""), filePath(""), line(0) {}
+
+		/// Constructor with specific function name, file name, and line number.
+		///
+		constexpr LocationFull(const char* _function, const char* _filePath, uint32_t _line)
+			: function(_function), filePath(_filePath), line(_line) {}
+
+		/// Current source location.
+		///
+		static LocationFull current(
+			  const char* _function = __builtin_FUNCTION()
+			, const char* _filePath = __builtin_FILE()
+			, uint32_t _line = __builtin_LINE()
+			);
+
+		const char* function; //!< Function name.
+		const char* filePath; //!< File path.
+		uint32_t    line;     //!< File line.
+	};
+
+	/// Unknown source code location.
+	static constexpr LocationFull kUnknownLocationFull("Unknown?", "Unknown?", 0);
+
+	/// Assert handler function.
+	///
+	/// @param[in] _location Source code location where function is called.
+	/// @param[in] _format Printf style format.
+	/// @param[in] _argList Arguments for `_format` specification.
+	///
+	/// @returns True if assert should stop code execution, otherwise returns false.
+	///
+	typedef bool (*AssertHandlerFn)(const Location& _location, const char* _format, va_list _argList);
+
+	/// Set assert handler function.
+	///
+	/// @param[in] _assertHandlerFn Pointer to AssertHandlerFn function.
+	///
+	/// @remarks It can be set only once. This is usually done on application startup.
+	///
+	void setAssertHandler(AssertHandlerFn _assertHandlerFn);
+
+	/// Assert function calls AssertHandlerFn.
+	///
+	/// @param[in] _location Source code location where function is called.
+	/// @param[in] _format Printf style format.
+	/// @param[in] ... Arguments for `_format` specification.
+	///
+	/// @returns True if assert should stop code execution, otherwise returns false.
+	///
+	bool assertFunction(const Location& _location, const char* _format, ...);
+
 	/// Arithmetic type `Ty` limits.
 	template<typename Ty, bool SignT = isSigned<Ty>()>
 	struct LimitsT;
@@ -112,6 +215,18 @@ namespace bx
 	/// Returns true if value `_a` is power of 2.
 	template<typename Ty>
 	constexpr bool isPowerOf2(Ty _a);
+
+	/// Returns true if it's evaluated as constexpr.
+	constexpr bool isConstantEvaluated();
+
+	/// Returns a value of type `Ty` by reinterpreting the object representation of `FromT`.
+	template <typename Ty, typename FromT>
+	constexpr Ty bitCast(const FromT& _from);
+
+	/// Performs `static_cast` of value `_from`, and in debug build runtime verifies/asserts
+	/// that the value didn't change.
+	template<typename Ty, typename FromT>
+	Ty narrowCast(const FromT& _from, Location _location = Location::current() );
 
 	/// Copy memory block.
 	///

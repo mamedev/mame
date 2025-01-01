@@ -1,11 +1,85 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #include "test.h"
 #include <bx/handlealloc.h>
 #include <bx/hash.h>
+#include <bx/rng.h>
+
+#include <set>
+
+TEST_CASE("HandleAllocT", "")
+{
+	constexpr int32_t kMax = 64;
+	bx::HandleAllocT<kMax> alloc;
+
+	REQUIRE(sizeof(alloc) == sizeof(uint16_t) * kMax * 2 + sizeof(bx::HandleAlloc) );
+
+	for (uint16_t ii = 0; ii < kMax; ++ii)
+	{
+		REQUIRE(!alloc.isValid(ii) );
+	}
+
+	bx::RngMwc random;
+	std::set<uint16_t> handleSet;
+
+	int32_t count = 0;
+
+	for (int32_t ii = 0; ii < 200000; ++ii)
+	{
+		const bool add = random.gen() % 2;
+
+		if (add && count < kMax)
+		{
+			count++;
+			uint16_t handle = alloc.alloc();
+			handleSet.insert(handle);
+		}
+		else if (count > 0)
+		{
+			count--;
+
+			const int32_t idx = rand() % handleSet.size();
+			auto it = handleSet.begin();
+
+			for (int32_t it_idx = 0; it_idx < idx; ++it_idx)
+			{
+				it++;
+				REQUIRE(alloc.isValid(*it) );
+			}
+
+			uint16_t handleToRemove = *it;
+			alloc.free(handleToRemove);
+
+			REQUIRE(!alloc.isValid(handleToRemove) );
+
+			handleSet.erase(it);
+		}
+
+		// Check if it's still correct
+		for (auto it = handleSet.begin(); it != handleSet.end(); ++it)
+		{
+			REQUIRE(alloc.isValid(*it) );
+		}
+	}
+
+	// Finally delete all
+	for (auto it = handleSet.begin(); it != handleSet.end(); ++it)
+	{
+		REQUIRE(alloc.isValid(*it) );
+
+		alloc.free(*it);
+	}
+
+	handleSet.clear();
+
+	for (uint16_t ii = 0; ii < kMax; ++ii)
+	{
+		REQUIRE(!alloc.isValid(ii) );
+	}
+}
 
 TEST_CASE("HandleListT", "")
 {

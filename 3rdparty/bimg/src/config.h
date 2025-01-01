@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg/blob/master/LICENSE
  */
 
@@ -55,5 +55,9 @@
 #ifndef BIMG_DECODE_ETC2
 #	define BIMG_DECODE_ETC2 BIMG_DECODE_ENABLE
 #endif // BIMG_DECODE_ETC2
+
+#ifndef BIMG_DECODE_HEIF
+#	define BIMG_DECODE_HEIF 0
+#endif // BIMG_DECODE_HEIF
 
 #endif // BIMG_CONFIG_H_HEADER_GUARD

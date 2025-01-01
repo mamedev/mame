@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg/blob/master/LICENSE
  */
 
@@ -34,6 +34,10 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4334) // warning C4334: '<<' : result of 32 - 
 #include <lodepng/lodepng.cpp>
 BX_PRAGMA_DIAGNOSTIC_POP();
 
+#if BIMG_DECODE_HEIF
+#	include <libheif/heif.h>
+#endif // BIMG_DECODE_HEIF
+
 void* lodepng_malloc(size_t _size)
 {
 	return ::malloc(_size);
@@ -67,6 +71,7 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wimplicit-fallthrough");
 #define STBI_REALLOC(_ptr, _size) lodepng_realloc(_ptr, _size)
 #define STBI_FREE(_ptr)           lodepng_free(_ptr)
 #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_STATIC
 #include <stb/stb_image.h>
 BX_PRAGMA_DIAGNOSTIC_POP();
 
@@ -88,17 +93,16 @@ namespace bimg
 		uint32_t width  = 0;
 		uint32_t height = 0;
 
-		unsigned error;
 		LodePNGState state;
 		lodepng_state_init(&state);
 		state.decoder.color_convert = 0;
 
 		uint8_t* data = NULL;
-		error = lodepng_decode(&data, &width, &height, &state, (uint8_t*)_data, _size);
+		const uint32_t lodePngError = lodepng_decode(&data, &width, &height, &state, (uint8_t*)_data, _size);
 
-		if (0 != error)
+		if (0 != lodePngError)
 		{
-			_err->setError(BIMG_ERROR, lodepng_error_text(error) );
+			BX_ERROR_SET(_err, BIMG_ERROR, "lodepng_decode failed.");
 		}
 		else
 		{
@@ -244,7 +248,8 @@ namespace bimg
 
 				if (palette)
 				{
-					if (1 == state.info_raw.bitdepth) {
+					if (1 == state.info_raw.bitdepth)
+					{
 						for (uint32_t ii = 0, num = width*height/8; ii < num; ++ii)
 						{
 							uint8_t* dst = (uint8_t*)output->m_data + ii*32;
@@ -258,7 +263,8 @@ namespace bimg
 							bx::memCopy(dst + 28, state.info_raw.palette + (  data[ii]    &0x1)*4, 4);
 						}
 					}
-					else if (2 == state.info_raw.bitdepth) {
+					else if (2 == state.info_raw.bitdepth)
+					{
 						for (uint32_t ii = 0, num = width*height/4; ii < num; ++ii)
 						{
 							uint8_t* dst = (uint8_t*)output->m_data + ii*16;
@@ -268,7 +274,8 @@ namespace bimg
 							bx::memCopy(dst + 12, state.info_raw.palette + (  data[ii]    &0x3)*4, 4);
 						}
 					}
-					else if (4 == state.info_raw.bitdepth) {
+					else if (4 == state.info_raw.bitdepth)
+					{
 						for (uint32_t ii = 0, num = width*height/2; ii < num; ++ii)
 						{
 							uint8_t* dst = (uint8_t*)output->m_data + ii*8;
@@ -276,7 +283,8 @@ namespace bimg
 							bx::memCopy(dst +  4, state.info_raw.palette + (  data[ii]    &0xf)*4, 4);
 						}
 					}
-					else {
+					else
+					{
 						for (uint32_t ii = 0, num = width*height; ii < num; ++ii)
 						{
 							bx::memCopy( (uint8_t*)output->m_data + ii*4, state.info_raw.palette + data[ii]*4, 4);
@@ -312,10 +320,10 @@ namespace bimg
 						uint8_t* dst = (uint8_t*)output->m_data + ii*4;
 						// Note: not exactly precise.
 						// Correct way: dst[0] = uint8_t(float( (eightBits>>6)&0x3)*(255.0f/4.0f) );
-						dst[0] = uint8_t(uint32_t(((eightBits>>6)&0x3)*64)&0xff);
-						dst[1] = uint8_t(uint32_t(((eightBits>>4)&0x3)*64)&0xff);
-						dst[2] = uint8_t(uint32_t(((eightBits>>2)&0x3)*64)&0xff);
-						dst[3] = uint8_t(uint32_t(((eightBits   )&0x3)*64)&0xff);
+						dst[0] = uint8_t(uint32_t( ( (eightBits>>6)&0x3)*64)&0xff);
+						dst[1] = uint8_t(uint32_t( ( (eightBits>>4)&0x3)*64)&0xff);
+						dst[2] = uint8_t(uint32_t( ( (eightBits>>2)&0x3)*64)&0xff);
+						dst[3] = uint8_t(uint32_t( ( (eightBits   )&0x3)*64)&0xff);
 					}
 				}
 				else if (4 == state.info_raw.bitdepth)
@@ -328,8 +336,8 @@ namespace bimg
 						uint8_t* dst = (uint8_t*)output->m_data + ii*2;
 						// Note: not exactly precise.
 						// Correct way: dst[0] = uint8_t(float( (eightBits>>4)&0xf)*(255.0f/16.0f) );
-						dst[0] = uint8_t(uint32_t(((eightBits>>4)&0xf)*16)&0xff);
-						dst[1] = uint8_t(uint32_t(((eightBits   )&0xf)*16)&0xff);
+						dst[0] = uint8_t(uint32_t( ( (eightBits>>4)&0xf)*16)&0xff);
+						dst[1] = uint8_t(uint32_t( ( (eightBits   )&0xf)*16)&0xff);
 					}
 				}
 				else if (16      == state.info_raw.bitdepth
@@ -366,7 +374,7 @@ namespace bimg
 								}
 							}
 						}
-						else if(16 == state.info_raw.bitdepth)
+						else if (16 == state.info_raw.bitdepth)
 						{
 							for (uint32_t ii = 0, num = width * height; ii < num; ++ii)
 							{
@@ -519,7 +527,7 @@ namespace bimg
 						stepA  = 1;
 					}
 
-					data   = (uint8_t*)BX_ALLOC(_allocator, exrImage.width * exrImage.height * dstBpp/8);
+					data   = (uint8_t*)bx::alloc(_allocator, exrImage.width * exrImage.height * dstBpp/8);
 					width  = exrImage.width;
 					height = exrImage.height;
 
@@ -627,10 +635,9 @@ namespace bimg
 				, false
 				, data
 				);
-			BX_FREE(_allocator, data);
+			bx::free(_allocator, data);
 			output->m_hasAlpha = hasAlpha;
 		}
-
 
 		return output;
 	}
@@ -678,8 +685,8 @@ namespace bimg
 
 		ImageContainer* output = imageAlloc(_allocator
 			, format
-			, uint16_t(width)
-			, uint16_t(height)
+			, bx::narrowCast<uint16_t>(width)
+			, bx::narrowCast<uint16_t>(height)
 			, 0
 			, 1
 			, false
@@ -827,6 +834,57 @@ namespace bimg
 		return image;
 	}
 
+	static ImageContainer* imageParseLibHeif(bx::AllocatorI* _allocator, const void* _data, uint32_t _size, bx::Error* _err)
+	{
+#if BIMG_DECODE_HEIF
+		heif_context* ctx = heif_context_alloc();
+
+		heif_context_read_from_memory_without_copy(ctx, _data, _size, NULL);
+
+		heif_image_handle* handle;
+		heif_context_get_primary_image_handle(ctx, &handle);
+
+		heif_image* image;
+		heif_decode_image(handle, &image, heif_colorspace_RGB, heif_chroma_interleaved_RGBA, NULL);
+
+		int32_t srcStride;
+		const uint8_t* data = heif_image_get_plane_readonly(image, heif_channel_interleaved, &srcStride);
+
+		ImageContainer* output = NULL;
+		if (NULL != data)
+		{
+			const bimg::TextureFormat::Enum format = bimg::TextureFormat::RGBA8;
+			const int32_t width  = heif_image_handle_get_width(handle);
+			const int32_t height = heif_image_handle_get_height(handle);
+			const int32_t dstStride = width*4;
+
+			output = imageAlloc(_allocator
+				, format
+				, bx::narrowCast<uint16_t>(width)
+				, bx::narrowCast<uint16_t>(height)
+				, 0
+				, 1
+				, false
+				, false
+				, NULL
+				);
+
+			bx::memCopy(output->m_data, dstStride, data, srcStride, dstStride, height);
+		}
+
+		heif_image_release(image);
+		heif_image_handle_release(handle);
+
+		heif_context_free(ctx);
+
+		BX_UNUSED(_err);
+		return output;
+#else
+		BX_UNUSED(_allocator, _data, _size, _err);
+		return NULL;
+#endif // BIMG_DECODE_HEIF
+	}
+
 	ImageContainer* imageParse(bx::AllocatorI* _allocator, const void* _data, uint32_t _size, TextureFormat::Enum _dstFormat, bx::Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
@@ -839,6 +897,7 @@ namespace bimg
 		input = NULL == input ? imageParseTinyExr (_allocator, _data, _size, _err) : input;
 		input = NULL == input ? imageParseJpeg    (_allocator, _data, _size, _err) : input;
 		input = NULL == input ? imageParseStbImage(_allocator, _data, _size, _err) : input;
+		input = NULL == input ? imageParseLibHeif (_allocator, _data, _size, _err) : input;
 
 		if (NULL == input)
 		{

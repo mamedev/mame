@@ -15,6 +15,7 @@
 #ifndef SOURCE_VAL_DECORATION_H_
 #define SOURCE_VAL_DECORATION_H_
 
+#include <cassert>
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
@@ -39,35 +40,45 @@ namespace val {
 //
 // Example 1: Decoration for an object<id> with no parameters:
 // OpDecorate %obj Flat
-//            dec_type_ = SpvDecorationFlat
+//            dec_type_ = spv::Decoration::Flat
 //              params_ = empty vector
 // struct_member_index_ = kInvalidMember
 //
 // Example 2: Decoration for an object<id> with two parameters:
 // OpDecorate %obj LinkageAttributes "link" Import
-//            dec_type_ = SpvDecorationLinkageAttributes
+//            dec_type_ = spv::Decoration::LinkageAttributes
 //              params_ = vector { link, Import }
 // struct_member_index_ = kInvalidMember
 //
 // Example 3: Decoration for a member of a structure with one parameter:
 // OpMemberDecorate %struct 2 Offset 2
-//            dec_type_ = SpvDecorationOffset
+//            dec_type_ = spv::Decoration::Offset
 //              params_ = vector { 2 }
 // struct_member_index_ = 2
+//
+// Example 4: Decoration for a Builtin:
+// OpDecorate %var BuiltIn FragDepth
+//            dec_type_ = spv::Decoration::BuiltIn
+//              params_ = vector { FragDepth }
+// struct_member_index_ = kInvalidMember
 //
 class Decoration {
  public:
   enum { kInvalidMember = -1 };
-  Decoration(SpvDecoration t,
+  Decoration(spv::Decoration t,
              const std::vector<uint32_t>& parameters = std::vector<uint32_t>(),
              uint32_t member_index = kInvalidMember)
       : dec_type_(t), params_(parameters), struct_member_index_(member_index) {}
 
   void set_struct_member_index(uint32_t index) { struct_member_index_ = index; }
   int struct_member_index() const { return struct_member_index_; }
-  SpvDecoration dec_type() const { return dec_type_; }
+  spv::Decoration dec_type() const { return dec_type_; }
   std::vector<uint32_t>& params() { return params_; }
   const std::vector<uint32_t>& params() const { return params_; }
+  spv::BuiltIn builtin() const {
+    assert(dec_type_ == spv::Decoration::BuiltIn);
+    return spv::BuiltIn(params_[0]);
+  }
 
   inline bool operator<(const Decoration& rhs) const {
     // Note: Sort by struct_member_index_ first, then type, so look up can be
@@ -84,7 +95,7 @@ class Decoration {
   }
 
  private:
-  SpvDecoration dec_type_;
+  spv::Decoration dec_type_;
   std::vector<uint32_t> params_;
 
   // If the decoration applies to a member of a structure type, then the index

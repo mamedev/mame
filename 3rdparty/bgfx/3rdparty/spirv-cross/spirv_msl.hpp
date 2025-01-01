@@ -287,9 +287,6 @@ static const uint32_t kArgumentBufferBinding = ~(3u);
 
 static const uint32_t kMaxArgumentBuffers = 8;
 
-// The arbitrary maximum for the nesting of array of array copies.
-static const uint32_t kArrayCopyMultidimMax = 6;
-
 // Decompiles SPIR-V to Metal Shading Language
 class CompilerMSL : public CompilerGLSL
 {
@@ -339,9 +336,27 @@ public:
 		bool dispatch_base = false;
 		bool texture_1D_as_2D = false;
 
-		// Enable use of MSL 2.0 indirect argument buffers.
+		// Enable use of Metal argument buffers.
 		// MSL 2.0 must also be enabled.
 		bool argument_buffers = false;
+
+		// Defines Metal argument buffer tier levels.
+		// Uses same values as Metal MTLArgumentBuffersTier enumeration.
+		enum class ArgumentBuffersTier
+		{
+			Tier1 = 0,
+			Tier2 = 1,
+		};
+
+		// When using Metal argument buffers, indicates the Metal argument buffer tier level supported by the Metal platform.
+		// Ignored when Options::argument_buffers is disabled.
+		// - Tier1 supports writable images on macOS, but not on iOS.
+		// - Tier2 supports writable images on macOS and iOS, and higher resource count limits.
+		// Tier capabilities based on recommendations from Apple engineering.
+		ArgumentBuffersTier argument_buffers_tier = ArgumentBuffersTier::Tier1;
+
+		// Enables specifick argument buffer format with extra information to track SSBO-length
+		bool runtime_array_rich_descriptor = false;
 
 		// Ensures vertex and instance indices start at zero. This reflects the behavior of HLSL with SV_VertexID and SV_InstanceID.
 		bool enable_base_index_zero = false;
@@ -471,6 +486,55 @@ public:
 		// bug is fixed in Metal; it is provided as an option so it can be enabled
 		// only when the bug is present.
 		bool check_discarded_frag_stores = false;
+
+		// If set, Lod operands to OpImageSample*DrefExplicitLod for 1D and 2D array images
+		// will be implemented using a gradient instead of passing the level operand directly.
+		// Some Metal devices have a bug where the level() argument to depth2d_array<T>::sample_compare()
+		// in a fragment shader is biased by some unknown amount, possibly dependent on the
+		// partial derivatives of the texture coordinates. This is a workaround that is only
+		// expected to be needed until the bug is fixed in Metal; it is provided as an option
+		// so it can be enabled only when the bug is present.
+		bool sample_dref_lod_array_as_grad = false;
+
+		// MSL doesn't guarantee coherence between writes and subsequent reads of read_write textures.
+		// This inserts fences before each read of a read_write texture to ensure coherency.
+		// If you're sure you never rely on this, you can set this to false for a possible performance improvement.
+		// Note: Only Apple's GPU compiler takes advantage of the lack of coherency, so make sure to test on Apple GPUs if you disable this.
+		bool readwrite_texture_fences = true;
+
+		// Metal 3.1 introduced a Metal regression bug which causes infinite recursion during 
+		// Metal's analysis of an entry point input structure that is itself recursive. Enabling
+		// this option will replace the recursive input declaration with a alternate variable of
+		// type void*, and then cast to the correct type at the top of the entry point function.
+		// The bug has been reported to Apple, and will hopefully be fixed in future releases.
+		bool replace_recursive_inputs = false;
+
+		// If set, manual fixups of gradient vectors for cube texture lookups will be performed.
+		// All released Apple Silicon GPUs to date behave incorrectly when sampling a cube texture
+		// with explicit gradients. They will ignore one of the three partial derivatives based
+		// on the selected major axis, and expect the remaining derivatives to be partially
+		// transformed.
+		bool agx_manual_cube_grad_fixup = false;
+
+		// Metal will discard fragments with side effects under certain circumstances prematurely.
+		// Example: CTS test dEQP-VK.fragment_operations.early_fragment.discard_no_early_fragment_tests_depth
+		// Test will render a full screen quad with varying depth [0,1] for each fragment.
+		// Each fragment will do an operation with side effects, modify the depth value and
+		// discard the fragment. The test expects the fragment to be run due to:
+		// https://registry.khronos.org/vulkan/specs/1.0-extensions/html/vkspec.html#fragops-shader-depthreplacement
+		// which states that the fragment shader must be run due to replacing the depth in shader.
+		// However, Metal may prematurely discards fragments without executing them
+		// (I believe this to be due to a greedy optimization on their end) making the test fail.
+		// This option enforces fragment execution for such cases where the fragment has operations
+		// with side effects. Provided as an option hoping Metal will fix this issue in the future.
+		bool force_fragment_with_side_effects_execution = false;
+
+		// If set, adds a depth pass through statement to circumvent the following issue:
+		// When the same depth/stencil is used as input and depth/stencil attachment, we need to
+		// force Metal to perform the depth/stencil write after fragment execution. Otherwise,
+		// Metal will write to the depth attachment before fragment execution. This happens
+		// if the fragment does not modify the depth value.
+		bool input_attachment_is_ds_attachment = false;
 
 		bool is_ios() const
 		{
@@ -705,17 +769,11 @@ protected:
 		SPVFuncImplFindSMsb,
 		SPVFuncImplFindUMsb,
 		SPVFuncImplSSign,
-		SPVFuncImplArrayCopyMultidimBase,
-		// Unfortunately, we cannot use recursive templates in the MSL compiler properly,
-		// so stamp out variants up to some arbitrary maximum.
-		SPVFuncImplArrayCopy = SPVFuncImplArrayCopyMultidimBase + 1,
-		SPVFuncImplArrayOfArrayCopy2Dim = SPVFuncImplArrayCopyMultidimBase + 2,
-		SPVFuncImplArrayOfArrayCopy3Dim = SPVFuncImplArrayCopyMultidimBase + 3,
-		SPVFuncImplArrayOfArrayCopy4Dim = SPVFuncImplArrayCopyMultidimBase + 4,
-		SPVFuncImplArrayOfArrayCopy5Dim = SPVFuncImplArrayCopyMultidimBase + 5,
-		SPVFuncImplArrayOfArrayCopy6Dim = SPVFuncImplArrayCopyMultidimBase + 6,
+		SPVFuncImplArrayCopy,
+		SPVFuncImplArrayCopyMultidim,
 		SPVFuncImplTexelBufferCoords,
 		SPVFuncImplImage2DAtomicCoords, // Emulate texture2D atomic operations
+		SPVFuncImplGradientCube,
 		SPVFuncImplFMul,
 		SPVFuncImplFAdd,
 		SPVFuncImplFSub,
@@ -734,6 +792,8 @@ protected:
 		SPVFuncImplTextureSwizzle,
 		SPVFuncImplGatherSwizzle,
 		SPVFuncImplGatherCompareSwizzle,
+		SPVFuncImplGatherConstOffsets,
+		SPVFuncImplGatherCompareConstOffsets,
 		SPVFuncImplSubgroupBroadcast,
 		SPVFuncImplSubgroupBroadcastFirst,
 		SPVFuncImplSubgroupBallot,
@@ -771,6 +831,15 @@ protected:
 		SPVFuncImplConvertYCbCrBT601,
 		SPVFuncImplConvertYCbCrBT2020,
 		SPVFuncImplDynamicImageSampler,
+		SPVFuncImplRayQueryIntersectionParams,
+		SPVFuncImplVariableDescriptor,
+		SPVFuncImplVariableSizedDescriptor,
+		SPVFuncImplVariableDescriptorArray,
+		SPVFuncImplPaddedStd140,
+		SPVFuncImplReduceAdd,
+		SPVFuncImplImageFence,
+		SPVFuncImplTextureCast,
+		SPVFuncImplMulExtended,
 	};
 
 	// If the underlying resource has been used for comparison then duplicate loads of that resource must be too
@@ -801,19 +870,16 @@ protected:
 	void emit_block_hints(const SPIRBlock &block) override;
 
 	// Allow Metal to use the array<T> template to make arrays a value type
-	std::string type_to_array_glsl(const SPIRType &type) override;
+	std::string type_to_array_glsl(const SPIRType &type, uint32_t variable_id) override;
 	std::string constant_op_expression(const SPIRConstantOp &cop) override;
-
-	// Threadgroup arrays can't have a wrapper type
-	std::string variable_decl(const SPIRVariable &variable) override;
 
 	bool variable_decl_is_remapped_storage(const SPIRVariable &variable, spv::StorageClass storage) const override;
 
 	// GCC workaround of lambdas calling protected functions (for older GCC versions)
 	std::string variable_decl(const SPIRType &type, const std::string &name, uint32_t id = 0) override;
 
-	std::string image_type_glsl(const SPIRType &type, uint32_t id = 0) override;
-	std::string sampler_type(const SPIRType &type, uint32_t id);
+	std::string image_type_glsl(const SPIRType &type, uint32_t id, bool member) override;
+	std::string sampler_type(const SPIRType &type, uint32_t id, bool member);
 	std::string builtin_to_glsl(spv::BuiltIn builtin, spv::StorageClass storage) override;
 	std::string to_func_call_arg(const SPIRFunction::Parameter &arg, uint32_t id) override;
 	std::string to_name(uint32_t id, bool allow_alias = true) const override;
@@ -849,7 +915,7 @@ protected:
 	bool is_non_native_row_major_matrix(uint32_t id) override;
 	bool member_is_non_native_row_major_matrix(const SPIRType &type, uint32_t index) override;
 	std::string convert_row_major_matrix(std::string exp_str, const SPIRType &exp_type, uint32_t physical_type_id,
-	                                     bool is_packed) override;
+	                                     bool is_packed, bool relaxed) override;
 
 	bool is_tesc_shader() const;
 	bool is_tese_shader() const;
@@ -908,7 +974,8 @@ protected:
 	                                                      uint32_t mbr_idx, InterfaceBlockMeta &meta,
 	                                                      const std::string &mbr_name_qual,
 	                                                      const std::string &var_chain_qual,
-	                                                      uint32_t &location, uint32_t &var_mbr_idx);
+	                                                      uint32_t &location, uint32_t &var_mbr_idx,
+	                                                      const Bitset &interpolation_qual);
 	void add_tess_level_input_to_interface_block(const std::string &ib_var_ref, SPIRType &ib_type, SPIRVariable &var);
 	void add_tess_level_input(const std::string &base_ref, const std::string &mbr_name, SPIRVariable &var);
 
@@ -926,7 +993,8 @@ protected:
 	void emit_specialization_constants_and_structs();
 	void emit_interface_block(uint32_t ib_var_id);
 	bool maybe_emit_array_assignment(uint32_t id_lhs, uint32_t id_rhs);
-	uint32_t get_resource_array_size(uint32_t id) const;
+	bool is_var_runtime_size_array(const SPIRVariable &var) const;
+	uint32_t get_resource_array_size(const SPIRType &type, uint32_t id) const;
 
 	void fix_up_shader_inputs_outputs();
 
@@ -961,6 +1029,8 @@ protected:
 
 	uint32_t get_physical_tess_level_array_size(spv::BuiltIn builtin) const;
 
+	uint32_t get_physical_type_stride(const SPIRType &type) const override;
+
 	// MSL packing rules. These compute the effective packing rules as observed by the MSL compiler in the MSL output.
 	// These values can change depending on various extended decorations which control packing rules.
 	// We need to make these rules match up with SPIR-V declared rules.
@@ -993,6 +1063,7 @@ protected:
 	bool validate_member_packing_rules_msl(const SPIRType &type, uint32_t index) const;
 	std::string get_argument_address_space(const SPIRVariable &argument);
 	std::string get_type_address_space(const SPIRType &type, uint32_t id, bool argument = false);
+	static bool decoration_flags_signal_volatile(const Bitset &flags);
 	const char *to_restrict(uint32_t id, bool space);
 	SPIRType &get_stage_in_struct_type();
 	SPIRType &get_stage_out_struct_type();
@@ -1008,7 +1079,7 @@ protected:
 	void add_pragma_line(const std::string &line);
 	void add_typedef_line(const std::string &line);
 	void emit_barrier(uint32_t id_exe_scope, uint32_t id_mem_scope, uint32_t id_mem_sem);
-	void emit_array_copy(const std::string &lhs, uint32_t lhs_id, uint32_t rhs_id,
+	bool emit_array_copy(const char *expr, uint32_t lhs_id, uint32_t rhs_id,
 	                     spv::StorageClass lhs_storage, spv::StorageClass rhs_storage) override;
 	void build_implicit_builtins();
 	uint32_t build_constant_uint_array_pointer();
@@ -1033,6 +1104,7 @@ protected:
 	uint32_t builtin_stage_input_size_id = 0;
 	uint32_t builtin_local_invocation_index_id = 0;
 	uint32_t builtin_workgroup_size_id = 0;
+	uint32_t builtin_frag_depth_id = 0;
 	uint32_t swizzle_buffer_id = 0;
 	uint32_t buffer_size_buffer_id = 0;
 	uint32_t view_mask_buffer_id = 0;
@@ -1052,7 +1124,7 @@ protected:
 	void analyze_sampled_image_usage();
 
 	bool access_chain_needs_stage_io_builtin_translation(uint32_t base) override;
-	void prepare_access_chain_for_scalar_access(std::string &expr, const SPIRType &type, spv::StorageClass storage,
+	bool prepare_access_chain_for_scalar_access(std::string &expr, const SPIRType &type, spv::StorageClass storage,
 	                                            bool &is_packed) override;
 	void fix_up_interpolant_access_chain(const uint32_t *ops, uint32_t length);
 	void check_physical_type_cast(std::string &expr, const SPIRType *type, uint32_t physical_type) override;
@@ -1129,6 +1201,7 @@ protected:
 	bool needs_subgroup_size = false;
 	bool needs_sample_id = false;
 	bool needs_helper_invocation = false;
+	bool writes_to_depth = false;
 	std::string qual_pos_var_name;
 	std::string stage_in_var_name = "in";
 	std::string stage_out_var_name = "out";
@@ -1153,11 +1226,13 @@ protected:
 	const MSLConstexprSampler *find_constexpr_sampler(uint32_t id) const;
 
 	std::unordered_set<uint32_t> buffers_requiring_array_length;
-	SmallVector<uint32_t> buffer_arrays_discrete;
 	SmallVector<std::pair<uint32_t, uint32_t>> buffer_aliases_argument;
 	SmallVector<uint32_t> buffer_aliases_discrete;
-	std::unordered_set<uint32_t> atomic_image_vars; // Emulate texture2D atomic operations
+	std::unordered_set<uint32_t> atomic_image_vars_emulated; // Emulate texture2D atomic operations
 	std::unordered_set<uint32_t> pull_model_inputs;
+	std::unordered_set<uint32_t> recursive_inputs;
+
+	SmallVector<SPIRVariable *> entry_point_bindings;
 
 	// Must be ordered since array is in a specific order.
 	std::map<SetBindingPair, std::pair<uint32_t, uint32_t>> buffers_requiring_dynamic_offset;
@@ -1170,9 +1245,12 @@ protected:
 	uint32_t argument_buffer_discrete_mask = 0;
 	uint32_t argument_buffer_device_storage_mask = 0;
 
+	void emit_argument_buffer_aliased_descriptor(const SPIRVariable &aliased_var,
+	                                             const SPIRVariable &base_var);
+
 	void analyze_argument_buffers();
 	bool descriptor_set_is_argument_buffer(uint32_t desc_set) const;
-	MSLResourceBinding &get_argument_buffer_resource(uint32_t desc_set, uint32_t arg_idx);
+	const MSLResourceBinding &get_argument_buffer_resource(uint32_t desc_set, uint32_t arg_idx) const;
 	void add_argument_buffer_padding_buffer_type(SPIRType &struct_type, uint32_t &mbr_idx, uint32_t &arg_buff_index, MSLResourceBinding &rez_bind);
 	void add_argument_buffer_padding_image_type(SPIRType &struct_type, uint32_t &mbr_idx, uint32_t &arg_buff_index, MSLResourceBinding &rez_bind);
 	void add_argument_buffer_padding_sampler_type(SPIRType &struct_type, uint32_t &mbr_idx, uint32_t &arg_buff_index, MSLResourceBinding &rez_bind);
@@ -1184,14 +1262,13 @@ protected:
 	uint32_t build_msl_interpolant_type(uint32_t type_id, bool is_noperspective);
 
 	bool suppress_missing_prototypes = false;
+	bool suppress_incompatible_pointer_types_discard_qualifiers = false;
 
 	void add_spv_func_and_recompile(SPVFuncImpl spv_func);
 
 	void activate_argument_buffer_resources();
 
 	bool type_is_msl_framebuffer_fetch(const SPIRType &type) const;
-	bool type_is_pointer(const SPIRType &type) const;
-	bool type_is_pointer_to_pointer(const SPIRType &type) const;
 	bool is_supported_argument_buffer_type(const SPIRType &type) const;
 
 	bool variable_storage_requires_stage_io(spv::StorageClass storage) const;
@@ -1223,7 +1300,7 @@ protected:
 
 		CompilerMSL &compiler;
 		std::unordered_map<uint32_t, uint32_t> result_types;
-		std::unordered_map<uint32_t, uint32_t> image_pointers; // Emulate texture2D atomic operations
+		std::unordered_map<uint32_t, uint32_t> image_pointers_emulated; // Emulate texture2D atomic operations
 		bool suppress_missing_prototypes = false;
 		bool uses_atomics = false;
 		bool uses_image_write = false;

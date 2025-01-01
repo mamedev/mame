@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -24,10 +24,6 @@
 #ifndef ENTRY_CONFIG_USE_GLFW
 #	define ENTRY_CONFIG_USE_GLFW 0
 #endif // ENTRY_CONFIG_USE_GLFW
-
-#ifndef ENTRY_CONFIG_USE_WAYLAND
-#	define ENTRY_CONFIG_USE_WAYLAND 0
-#endif // ENTRY_CONFIG_USE_WAYLAND
 
 #if !defined(ENTRY_CONFIG_USE_NATIVE) \
 	&& !ENTRY_CONFIG_USE_NOOP \
@@ -318,7 +314,7 @@ namespace entry
 
 		void release(const Event* _event) const
 		{
-			BX_DELETE(getAllocator(), const_cast<Event*>(_event) );
+			bx::deleteObject(getAllocator(), const_cast<Event*>(_event) );
 		}
 
 	private:

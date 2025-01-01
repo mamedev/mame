@@ -1,11 +1,10 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2024 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "bgfx_p.h"
 #include "shader_dxbc.h"
-#include "shader_dx9bc.h"
 #include "shader_spirv.h"
 
 namespace bgfx
@@ -128,19 +127,6 @@ namespace bgfx
 		return true;
 	}
 
-	static bool printAsm(uint32_t _offset, const Dx9bcInstruction& _instruction, void* _userData)
-	{
-		BX_UNUSED(_offset);
-		bx::WriterI* writer = reinterpret_cast<bx::WriterI*>(_userData);
-		char temp[512];
-		toString(temp, sizeof(temp), _instruction);
-
-		bx::Error err;
-		bx::write(writer, temp, (int32_t)bx::strLen(temp), &err);
-		bx::write(writer, '\n', &err);
-		return true;
-	}
-
 	static bool printAsm(uint32_t _offset, const SpvInstruction& _instruction, void* _userData)
 	{
 		BX_UNUSED(_offset);
@@ -173,9 +159,8 @@ namespace bgfx
 		}
 		else
 		{
-			Dx9bc dx9bc;
-			read(_reader, dx9bc, _err);
-			parse(dx9bc.shader, printAsm, _writer, _err);
+			BX_TRACE("Unrecognized shader binary format (magic: 0x%08x)!", magic);
+			BX_ERROR_SET(_err, kShaderInvalidHeader, "Failed to read shader binary. Invalid magic number.");
 		}
 	}
 
@@ -250,7 +235,7 @@ namespace bgfx
 
 			if (!_err->isOk() ) { return; }
 
-			uint8_t* shaderCode = (uint8_t*)BX_ALLOC(g_allocator, shaderSize);
+			uint8_t* shaderCode = (uint8_t*)bx::alloc(g_allocator, shaderSize);
 			bx::read(_reader, shaderCode, shaderSize, _err);
 
 			bx::MemoryReader reader(shaderCode, shaderSize);
@@ -258,7 +243,7 @@ namespace bgfx
 
 			bx::write(_writer, '\0', _err);
 
-			BX_FREE(g_allocator, shaderCode);
+			bx::free(g_allocator, shaderCode);
 		}
 		else
 		{

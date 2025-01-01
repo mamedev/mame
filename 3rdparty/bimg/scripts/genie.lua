@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2024 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bimg/blob/master/LICENSE
 --
 
@@ -16,6 +16,11 @@ newoption {
 newoption {
 	trigger = "with-tools",
 	description = "Enable building tools.",
+}
+
+newoption {
+	trigger = "with-libheif",
+	description = "Enable building with libheif HEIF and AVIF file format decoder.",
 }
 
 solution "bimg"

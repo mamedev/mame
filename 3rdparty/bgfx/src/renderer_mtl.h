@@ -14,9 +14,13 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
 
-#if BX_PLATFORM_IOS
+#if BX_PLATFORM_IOS || BX_PLATFORM_VISIONOS
 #	import <UIKit/UIKit.h>
 #endif // BX_PLATFORM_*
+
+#if BX_PLATFORM_VISIONOS
+#import <CompositorServices/CompositorServices.h>
+#endif
 
 #define BGFX_MTL_PROFILER_BEGIN(_view, _abgr)         \
 	BX_MACRO_BLOCK_BEGIN                              \
@@ -38,7 +42,7 @@ namespace bgfx { namespace mtl
 	//runtime os check
 	inline bool iOSVersionEqualOrGreater(const char* _version)
 	{
-#if BX_PLATFORM_IOS
+#if BX_PLATFORM_IOS || BX_PLATFORM_VISIONOS
 		return ([[[UIDevice currentDevice] systemVersion] compare:@(_version) options:NSNumericSearch] != NSOrderedAscending);
 #else
 		BX_UNUSED(_version);
@@ -61,7 +65,6 @@ namespace bgfx { namespace mtl
 		return false;
 #endif
 	}
-
 
 	// c++ wrapper
 	// objects with creation functions starting with 'new' has a refcount 1 after creation, object must be destroyed with release.
@@ -251,8 +254,11 @@ namespace bgfx { namespace mtl
 			[m_obj dispatchThreadgroups:_threadgroupsPerGrid threadsPerThreadgroup:_threadsPerThreadgroup];
 		}
 
-		void dispatchThreadgroupsWithIndirectBuffer(id <MTLBuffer> _indirectBuffer,
-												NSUInteger _indirectBufferOffset, MTLSize _threadsPerThreadgroup)
+		void dispatchThreadgroupsWithIndirectBuffer(
+			  id <MTLBuffer> _indirectBuffer
+			, NSUInteger _indirectBufferOffset
+			, MTLSize _threadsPerThreadgroup
+			)
 		{
 			[m_obj dispatchThreadgroupsWithIndirectBuffer:_indirectBuffer indirectBufferOffset:_indirectBufferOffset threadsPerThreadgroup:_threadsPerThreadgroup];
 		}
@@ -274,9 +280,9 @@ namespace bgfx { namespace mtl
 	MTL_CLASS_END
 
 	MTL_CLASS(Device)
-		bool supportsFeatureSet(MTLFeatureSet _featureSet)
+		bool supportsFamily(MTLGPUFamily _featureSet)
 		{
-			return [m_obj supportsFeatureSet:_featureSet];
+			return [m_obj supportsFamily:_featureSet];
 		}
 
 		id<MTLLibrary> newLibraryWithData(const void* _data)
@@ -384,19 +390,23 @@ namespace bgfx { namespace mtl
 
 		bool supportsTextureSampleCount(int sampleCount)
 		{
-			if (BX_ENABLED(BX_PLATFORM_IOS) && !iOSVersionEqualOrGreater("9.0.0") )
+			if (BX_ENABLED(BX_PLATFORM_IOS) && !iOSVersionEqualOrGreater("9.0.0"))
+			{
 				return sampleCount == 1 || sampleCount == 2 ||  sampleCount == 4;
+			}
 			else
+			{
 				return [m_obj supportsTextureSampleCount:sampleCount];
+			}
 		}
 
 		bool depth24Stencil8PixelFormatSupported()
 		{
-#if BX_PLATFORM_IOS
+#if BX_PLATFORM_IOS || BX_PLATFORM_VISIONOS
 			return false;
 #else
 			return m_obj.depth24Stencil8PixelFormatSupported;
-#endif // BX_PLATFORM_IOS
+#endif // BX_PLATFORM_IOS || BX_PLATFORM_VISIONOS
 		}
 	MTL_CLASS_END
 
@@ -427,6 +437,11 @@ namespace bgfx { namespace mtl
 		void setBlendColor(float _red, float _green, float _blue, float _alpha)
 		{
 			[m_obj setBlendColorRed:_red green:_green blue:_blue alpha:_alpha];
+		}
+
+		void setVertexAmplificationCount(NSUInteger count, MTLVertexAmplificationViewMapping* viewMappings)
+		{
+			[m_obj setVertexAmplificationCount:count viewMappings:viewMappings];
 		}
 
 		void setCullMode(MTLCullMode _cullMode)
@@ -472,6 +487,11 @@ namespace bgfx { namespace mtl
 		void setViewport(MTLViewport _viewport)
 		{
 			[m_obj setViewport:_viewport];
+		}
+
+		void setViewports(MTLViewport _viewport[], NSInteger count)
+		{
+			[m_obj setViewports:_viewport count:count];
 		}
 
 		void setVisibilityResultMode(MTLVisibilityResultMode _mode, NSUInteger _offset)
@@ -727,11 +747,11 @@ namespace bgfx { namespace mtl
 		return [_str UTF8String];
 	}
 
-#define MTL_RELEASE(_obj)        \
-			BX_MACRO_BLOCK_BEGIN \
-				[_obj release];  \
-				_obj = nil;      \
-			BX_MACRO_BLOCK_END
+#define MTL_RELEASE(_obj) \
+	BX_MACRO_BLOCK_BEGIN  \
+		[_obj release];   \
+		_obj = NULL;      \
+	BX_MACRO_BLOCK_END
 
 	// end of c++ wrapper
 
@@ -803,7 +823,7 @@ namespace bgfx { namespace mtl
 
 			if (NULL != m_dynamic)
 			{
-				BX_DELETE(g_allocator, m_dynamic);
+				bx::deleteObject(g_allocator, m_dynamic);
 				m_dynamic = NULL;
 			}
 		}
@@ -938,7 +958,7 @@ namespace bgfx { namespace mtl
 
 	void release(PipelineStateMtl* _ptr)
 	{
-		BX_DELETE(g_allocator, _ptr);
+		bx::deleteObject(g_allocator, _ptr);
 	}
 
 	struct TextureMtl
@@ -974,6 +994,7 @@ namespace bgfx { namespace mtl
 			if (0 == (m_flags & BGFX_SAMPLER_INTERNAL_SHARED))
 			{
 				MTL_RELEASE(m_ptr);
+				MTL_RELEASE(m_ptrMsaa);
 			}
 			MTL_RELEASE(m_ptrStencil);
 			for (uint32_t ii = 0; ii < m_numMips; ++ii)
@@ -1030,6 +1051,12 @@ namespace bgfx { namespace mtl
 	{
 		SwapChainMtl()
 			: m_metalLayer(nil)
+#if BX_PLATFORM_VISIONOS
+			, m_layerRenderer(NULL)
+			, m_layerRendererDrawable(NULL)
+			, m_frame(NULL)
+			, m_useLayerRenderer(true)
+#endif
 			, m_drawable(nil)
 			, m_drawableTexture(nil)
 			, m_backBufferColorMsaa()
@@ -1045,9 +1072,17 @@ namespace bgfx { namespace mtl
 		void resize(FrameBufferMtl &_frameBuffer, uint32_t _width, uint32_t _height, uint32_t _flags, uint32_t _maximumDrawableCount);
 
 		id <MTLTexture> 	currentDrawableTexture();
-
+		
 		CAMetalLayer* m_metalLayer;
+#if BX_PLATFORM_VISIONOS
+		cp_layer_renderer_t m_layerRenderer;
+		cp_drawable_t m_layerRendererDrawable;
+		cp_layer_renderer_configuration_t m_layerRendererConfiguration;
+		cp_frame_t m_frame;
+		bool m_useLayerRenderer;
+#endif
 		id <CAMetalDrawable> m_drawable;
+
 		id <MTLTexture> 	 m_drawableTexture;
 		Texture m_backBufferColorMsaa;
 		Texture m_backBufferDepth;
@@ -1159,7 +1194,7 @@ namespace bgfx { namespace mtl
 		uint64_t m_elapsed;
 		uint64_t m_frequency;
 
-		Result m_result[4*2];
+		Result m_result[BGFX_CONFIG_MAX_VIEWS+1];
 		bx::RingBufferControl m_control;
 	};
 

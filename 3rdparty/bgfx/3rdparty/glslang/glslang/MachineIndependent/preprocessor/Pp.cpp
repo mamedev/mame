@@ -241,6 +241,7 @@ int TPpContext::CPPundef(TPpToken* ppToken)
 */
 int TPpContext::CPPelse(int matchelse, TPpToken* ppToken)
 {
+    inElseSkip = true;
     int depth = 0;
     int token = scanToken(ppToken);
 
@@ -297,7 +298,7 @@ int TPpContext::CPPelse(int matchelse, TPpToken* ppToken)
                     elseSeen[elsetracker] = false;
                     --elsetracker;
                 }
-
+                inElseSkip = false;
                 return CPPif(ppToken);
             }
         } else if (nextAtom == PpAtomElse) {
@@ -311,7 +312,8 @@ int TPpContext::CPPelse(int matchelse, TPpToken* ppToken)
                 parseContext.ppError(ppToken->loc, "#elif after #else", "#elif", "");
         }
     }
-
+    
+    inElseSkip = false;
     return token;
 }
 
@@ -374,11 +376,9 @@ namespace {
     int op_div(int a, int b) { return a == INT_MIN && b == -1 ? 0 : a / b; }
     int op_mod(int a, int b) { return a == INT_MIN && b == -1 ? 0 : a % b; }
     int op_pos(int a) { return a; }
-    int op_neg(int a) { return -a; }
+    int op_neg(int a) { return a == INT_MIN ? INT_MIN : -a; }
     int op_cmpl(int a) { return ~a; }
     int op_not(int a) { return !a; }
-
-};
 
 struct TBinop {
     int token, precedence, (*op)(int, int);
@@ -411,6 +411,8 @@ struct TUnop {
     { '~', op_cmpl },
     { '!', op_not },
 };
+
+} // anonymous namespace
 
 #define NUM_ELEMENTS(A) (sizeof(A) / sizeof(A[0]))
 
@@ -736,7 +738,6 @@ int TPpContext::CPPline(TPpToken* ppToken)
         parseContext.setCurrentLine(lineRes);
 
         if (token != '\n') {
-#ifndef GLSLANG_WEB
             if (token == PpAtomConstString) {
                 parseContext.ppRequireExtensions(directiveLoc, 1, &E_GL_GOOGLE_cpp_style_line_directive, "filename-based #line");
                 // We need to save a copy of the string instead of pointing
@@ -746,9 +747,7 @@ int TPpContext::CPPline(TPpToken* ppToken)
                 parseContext.setCurrentSourceName(sourceName);
                 hasFile = true;
                 token = scanToken(ppToken);
-            } else
-#endif
-            {
+            } else {
                 token = eval(token, MIN_PRECEDENCE, false, fileRes, fileErr, ppToken);
                 if (! fileErr) {
                     parseContext.setCurrentString(fileRes);
@@ -974,17 +973,16 @@ int TPpContext::readCPPline(TPpToken* ppToken)
         case PpAtomLine:
             token = CPPline(ppToken);
             break;
-#ifndef GLSLANG_WEB
         case PpAtomInclude:
             if(!parseContext.isReadingHLSL()) {
-                parseContext.ppRequireExtensions(ppToken->loc, 1, &E_GL_GOOGLE_include_directive, "#include");
+                const std::array exts = { E_GL_GOOGLE_include_directive, E_GL_ARB_shading_language_include };
+                parseContext.ppRequireExtensions(ppToken->loc, exts, "#include");
             }
             token = CPPinclude(ppToken);
             break;
         case PpAtomPragma:
             token = CPPpragma(ppToken);
             break;
-#endif
         case PpAtomUndef:
             token = CPPundef(ppToken);
             break;
@@ -1126,9 +1124,6 @@ int TPpContext::tMacroInput::scan(TPpToken* ppToken)
         pasting = true;
     }
 
-    // HLSL does expand macros before concatenation
-    if (pasting && pp->parseContext.isReadingHLSL())
-        pasting = false;
 
     // TODO: preprocessor:  properly handle whitespace (or lack of it) between tokens when expanding
     if (token == PpAtomIdentifier) {
@@ -1138,9 +1133,12 @@ int TPpContext::tMacroInput::scan(TPpToken* ppToken)
                 break;
         if (i >= 0) {
             TokenStream* arg = expandedArgs[i];
-            if (arg == nullptr || pasting)
+            bool expanded = !!arg && !pasting;
+            // HLSL does expand macros before concatenation
+            if (arg == nullptr || (pasting && !pp->parseContext.isReadingHLSL()) ) {
                 arg = args[i];
-            pp->pushTokenStreamInput(*arg, prepaste);
+            }
+            pp->pushTokenStreamInput(*arg, prepaste, expanded);
 
             return pp->scanToken(ppToken);
         }
@@ -1183,6 +1181,9 @@ MacroExpandResult TPpContext::MacroExpand(TPpToken* ppToken, bool expandUndef, b
 {
     ppToken->space = false;
     int macroAtom = atomStrings.getAtom(ppToken->name);
+    if (ppToken->fullyExpanded)
+        return MacroExpandNotStarted;
+
     switch (macroAtom) {
     case PpAtomLineMacro:
         // Arguments which are macro have been replaced in the first stage.
@@ -1214,8 +1215,10 @@ MacroExpandResult TPpContext::MacroExpand(TPpToken* ppToken, bool expandUndef, b
     MacroSymbol* macro = macroAtom == 0 ? nullptr : lookupMacroDef(macroAtom);
 
     // no recursive expansions
-    if (macro != nullptr && macro->busy)
+    if (macro != nullptr && macro->busy) {
+        ppToken->fullyExpanded = true;
         return MacroExpandNotStarted;
+    }
 
     // not expanding undefined macros
     if ((macro == nullptr || macro->undef) && ! expandUndef)

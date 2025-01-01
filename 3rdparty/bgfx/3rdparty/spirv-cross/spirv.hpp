@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2020 The Khronos Group Inc.
+// Copyright (c) 2014-2024 The Khronos Group Inc.
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and/or associated documentation files (the "Materials"),
@@ -505,6 +505,9 @@ enum Decoration {
     DecorationMaxByteOffsetId = 47,
     DecorationNoSignedWrap = 4469,
     DecorationNoUnsignedWrap = 4470,
+    DecorationWeightTextureQCOM = 4487,
+    DecorationBlockMatchTextureQCOM = 4488,
+    DecorationBlockMatchSamplerQCOM = 4499,
     DecorationExplicitInterpAMD = 4999,
     DecorationOverrideCoverageNV = 5248,
     DecorationPassthroughNV = 5250,
@@ -987,6 +990,10 @@ enum Capability {
     CapabilityRayQueryKHR = 4472,
     CapabilityRayTraversalPrimitiveCullingKHR = 4478,
     CapabilityRayTracingKHR = 4479,
+    CapabilityTextureSampleWeightedQCOM = 4484,
+    CapabilityTextureBoxFilterQCOM = 4485,
+    CapabilityTextureBlockMatchQCOM = 4486,
+    CapabilityTextureBlockMatch2QCOM = 4498,
     CapabilityFloat16ImageAMD = 5008,
     CapabilityImageGatherBiasLodAMD = 5009,
     CapabilityFragmentMaskAMD = 5010,
@@ -1592,6 +1599,14 @@ enum Op {
     OpRayQueryConfirmIntersectionKHR = 4476,
     OpRayQueryProceedKHR = 4477,
     OpRayQueryGetIntersectionTypeKHR = 4479,
+    OpImageSampleWeightedQCOM = 4480,
+    OpImageBoxFilterQCOM = 4481,
+    OpImageBlockMatchSSDQCOM = 4482,
+    OpImageBlockMatchSADQCOM = 4483,
+    OpImageBlockMatchWindowSSDQCOM = 4500,
+    OpImageBlockMatchWindowSADQCOM = 4501,
+    OpImageBlockMatchGatherSSDQCOM = 4502,
+    OpImageBlockMatchGatherSADQCOM = 4503,
     OpGroupIAddNonUniformAMD = 5000,
     OpGroupFAddNonUniformAMD = 5001,
     OpGroupFMinNonUniformAMD = 5002,
@@ -2267,6 +2282,14 @@ inline void HasResultAndType(Op opcode, bool *hasResult, bool *hasResultType) {
     case OpRayQueryConfirmIntersectionKHR: *hasResult = false; *hasResultType = false; break;
     case OpRayQueryProceedKHR: *hasResult = true; *hasResultType = true; break;
     case OpRayQueryGetIntersectionTypeKHR: *hasResult = true; *hasResultType = true; break;
+    case OpImageSampleWeightedQCOM: *hasResult = true; *hasResultType = true; break;
+    case OpImageBoxFilterQCOM: *hasResult = true; *hasResultType = true; break;
+    case OpImageBlockMatchSSDQCOM: *hasResult = true; *hasResultType = true; break;
+    case OpImageBlockMatchSADQCOM: *hasResult = true; *hasResultType = true; break;
+    case OpImageBlockMatchWindowSSDQCOM: *hasResult = true; *hasResultType = true; break;
+    case OpImageBlockMatchWindowSADQCOM: *hasResult = true; *hasResultType = true; break;
+    case OpImageBlockMatchGatherSSDQCOM: *hasResult = true; *hasResultType = true; break;
+    case OpImageBlockMatchGatherSADQCOM: *hasResult = true; *hasResultType = true; break;
     case OpGroupIAddNonUniformAMD: *hasResult = true; *hasResultType = true; break;
     case OpGroupFAddNonUniformAMD: *hasResult = true; *hasResultType = true; break;
     case OpGroupFMinNonUniformAMD: *hasResult = true; *hasResultType = true; break;
