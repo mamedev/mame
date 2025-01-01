@@ -22,13 +22,15 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "bus/rs232/rs232.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/mos6526.h"
-#include "machine/amigafdc.h"
-#include "machine/amiga_copper.h"
 #include "machine/msm6242.h"
-#include "machine/akiko.h"
 #include "machine/i2cmem.h"
-#include "machine/8364_paula.h"
+
+#include "8364_paula.h"
+#include "akiko.h"
 #include "amigaaga.h"
+#include "amigafdc.h"
+#include "amiga_copper.h"
+
 #include "emupal.h"
 #include "screen.h"
 

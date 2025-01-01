@@ -29,7 +29,6 @@
 #include "amiga.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/amigafdc.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 

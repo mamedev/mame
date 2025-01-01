@@ -155,22 +155,6 @@ if (SOUNDS["TIA"]~=null) then
 	}
 end
 
-
-
----------------------------------------------------
--- Amiga audio hardware
---@src/devices/machine/8364_paula.h,SOUNDS["PAULA_8364"] = true
----------------------------------------------------
-
-if (SOUNDS["PAULA_8364"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/8364_paula.cpp",
-		MAME_DIR .. "src/devices/machine/8364_paula.h",
-	}
-end
-
-
-
 ---------------------------------------------------
 -- Bally Astrocade sound system
 --@src/devices/sound/astrocde.h,SOUNDS["ASTROCADE"] = true

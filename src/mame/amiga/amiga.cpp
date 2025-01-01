@@ -27,7 +27,6 @@
 #include "machine/dmac.h"
 #include "machine/nvram.h"
 #include "machine/i2cmem.h"
-#include "machine/amigafdc.h"
 #include "machine/cr511b.h"
 #include "machine/rp5c01.h"
 #include "softlist.h"

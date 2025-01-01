@@ -142,18 +142,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/akiko.h,MACHINES["AKIKO"] = true
----------------------------------------------------
-
-if (MACHINES["AKIKO"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/akiko.cpp",
-		MAME_DIR .. "src/devices/machine/akiko.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/am2901b.h,MACHINES["AM2901B"] = true
 ---------------------------------------------------
 
@@ -161,18 +149,6 @@ if (MACHINES["AM2901B"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/am2901b.cpp",
 		MAME_DIR .. "src/devices/machine/am2901b.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/amiga_copper.h,MACHINES["AMIGA_COPPER"] = true
----------------------------------------------------
-
-if (MACHINES["AMIGA_COPPER"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/amiga_copper.cpp",
-		MAME_DIR .. "src/devices/machine/amiga_copper.h",
 	}
 end
 
@@ -831,18 +807,6 @@ if (MACHINES["AM9519"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/am9519.cpp",
 		MAME_DIR .. "src/devices/machine/am9519.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/amigafdc.h,MACHINES["AMIGAFDC"] = true
----------------------------------------------------
-
-if (MACHINES["AMIGAFDC"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/amigafdc.cpp",
-		MAME_DIR .. "src/devices/machine/amigafdc.h",
 	}
 end
 

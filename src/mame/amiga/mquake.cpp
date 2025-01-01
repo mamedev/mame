@@ -39,7 +39,6 @@
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
-#include "machine/amigafdc.h"
 #include "sound/es5503.h"
 #include "speaker.h"
 
