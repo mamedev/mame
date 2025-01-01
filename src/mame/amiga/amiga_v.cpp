@@ -554,7 +554,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		const bool out_of_beam = x >= amiga_state::SCREEN_WIDTH / 2;
 
 		/* time to execute the copper? */
-		if (x == next_copper_x)
+		if (x == next_copper_x && !out_of_beam)
 		{
 			/* execute the next batch, restoring and re-saving color 0 around it */
 			CUSTOM_REG(REG_COLOR00) = save_color0;

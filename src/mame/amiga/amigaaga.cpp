@@ -551,7 +551,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		const bool out_of_beam = x >= amiga_state::SCREEN_WIDTH / 2;
 
 		/* time to execute the copper? */
-		if (x == next_copper_x)
+		if (x == next_copper_x && !out_of_beam)
 		{
 			planes = (CUSTOM_REG(REG_BPLCON0) & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) >> 12;
 			// TODO: verify number of planes that doesn't go beyond 8
