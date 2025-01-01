@@ -137,8 +137,8 @@ private:
 
 	uint16_t m_dma_src_step;
 	uint16_t m_dma_dst_step;
-	uint16_t m_dma_unk_2061;
-	uint16_t m_dma_src_high;
+	uint16_t m_dma_dst_seg;
+	uint16_t m_dma_src_seg;
 
 	uint16_t m_dma_dst;
 	uint16_t m_dma_src;

@@ -239,7 +239,7 @@ void spg110_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanli
 	//bool blend = (attr & 0x4000);
 	const uint8_t bpp = attr2 & 0x0003;
 	const uint32_t yflipmask = flip_y ? h - 1 : 0;
-	const uint32_t palette_offset = (attr2 & 0x0f00) >> 8;
+	uint32_t palette_offset = (attr2 & 0x0f00) >> 8;
 
 	if (pri == priority)
 	{
@@ -510,9 +510,9 @@ void spg110_video_device::transparent_color_205x_w(offs_t offset, uint16_t data,
 	COMBINE_DATA(&m_palctrlram[offset]);
 }
 
-void spg110_video_device::dma_dst_seg_2061_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_unk_2061); }
+void spg110_video_device::dma_dst_seg_2061_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst_seg); }
 void spg110_video_device::dma_dst_step_2064_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_dst_step); }
-void spg110_video_device::dma_source_seg_2067_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_high); }
+void spg110_video_device::dma_source_seg_2067_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_seg); }
 void spg110_video_device::dma_src_step_2068_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_dma_src_step); }
 uint16_t spg110_video_device::dma_src_step_2068_r(offs_t offset, uint16_t mem_mask) { return m_dma_src_step; }
 
@@ -527,16 +527,16 @@ void spg110_video_device::dma_len_trigger_2062_w(uint16_t data)
 	update_video_irqs();
 
 	// this is presumably a counter that underflows to 0x1fff, because that's what the wait loop waits for?
-	logerror("%s: (trigger len) %04x with values (unk) %04x (dststep) %04x (srchigh) %04x (src step) %04x | (dst) %04x (src) %04x\n", machine().describe_context(), data, m_dma_unk_2061, m_dma_dst_step, m_dma_src_high, m_dma_src_step, m_dma_dst, m_dma_src);
+	logerror("%s: (trigger len) %04x with values (dstseg) %04x (dststep) %04x (srchigh) %04x (src step) %04x | (dst) %04x (src) %04x\n", machine().describe_context(), data, m_dma_dst_seg, m_dma_dst_step, m_dma_src_seg, m_dma_src_step, m_dma_dst, m_dma_src);
 
 	/*
-	if (m_dma_unk_2061 != 0x0000)
+	if (m_dma_dst_seg != 0x0000)
 	{
 	    logerror("unknown DMA params are not zero!\n");
 	}
 	*/
 
-	int source = m_dma_src | m_dma_src_high << 16;
+	int source = m_dma_src | m_dma_src_seg << 16;
 	int dest = m_dma_dst;
 
 	for (int i = 0; i < length; i++)
@@ -551,12 +551,12 @@ void spg110_video_device::dma_len_trigger_2062_w(uint16_t data)
 	}
 
 	// not sure, spiderman would suggest that some of these need to reset (unless a missing IRQ clears them)
-	m_dma_unk_2061 = 0;
+	m_dma_dst_seg = 0;
 	//m_dma_dst_step = 0; // conyteni says no
-	m_dma_src_high = 0;
+	m_dma_src_seg = 0;
 	//m_dma_src_step = 0; // conyteni says no
-	m_dma_dst = 0;
-	m_dma_src = 0;
+	m_dma_dst = dest;
+	m_dma_src = source;
 
 	m_dma_timer->adjust(attotime::from_usec(20));
 }
@@ -796,8 +796,8 @@ void spg110_video_device::device_start()
 {
 	save_item(NAME(m_dma_src_step));
 	save_item(NAME(m_dma_dst_step));
-	save_item(NAME(m_dma_unk_2061));
-	save_item(NAME(m_dma_src_high));
+	save_item(NAME(m_dma_dst_seg));
+	save_item(NAME(m_dma_src_seg));
 	save_item(NAME(m_dma_dst));
 	save_item(NAME(m_dma_src));
 	save_item(NAME(m_bg_scrollx));
@@ -825,8 +825,8 @@ void spg110_video_device::device_reset()
 {
 	m_dma_src_step = 0;
 	m_dma_dst_step = 0;
-	m_dma_unk_2061 = 0;
-	m_dma_src_high = 0;
+	m_dma_dst_seg = 0;
+	m_dma_src_seg = 0;
 	m_dma_dst = 0;
 	m_dma_src = 0;
 	m_bg_scrollx = 0;
