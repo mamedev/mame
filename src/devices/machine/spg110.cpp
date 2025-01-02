@@ -172,10 +172,8 @@ void spg110_device::internal_map(address_map &map)
 
 	map(0x002045, 0x002045).w(m_spg_video, FUNC(spg110_video_device::spg110_2045_w)); // not documented?
 
-	// seems to be 16 entries for.. something? on jak_capb these seem connected to the palette DMA operations, 0x2050 for 0x8000, 0x2051 for 0x8020, 0x2052 for 0x8040 etc. maybe 1 bit per pen?
 	map(0x002050, 0x00205f).ram().w(m_spg_video, FUNC(spg110_video_device::transparent_color_205x_w)).share("spg_video:palctrlram"); // P_Trptcolor0 - 15
 
-	// everything (dma? and interrupt flag?!)
 	map(0x002060, 0x002060).w(m_spg_video, FUNC(spg110_video_device::dma_dst_2060_w)); // P_DMA_Target_adr
 	map(0x002061, 0x002061).w(m_spg_video, FUNC(spg110_video_device::dma_dst_seg_2061_w)); // P_DMA_Target_seg
 	map(0x002062, 0x002062).rw(m_spg_video, FUNC(spg110_video_device::dma_len_status_2062_r),FUNC(spg110_video_device::dma_len_trigger_2062_w)); // P_DMA_numbr 
@@ -194,7 +192,6 @@ void spg110_device::internal_map(address_map &map)
 	map(0x003080, 0x0030ff).ram(); // extra ram? doesn't seem to be phase, and there only appear to be 8 channels on SPG110
 
 	map(0x003100, 0x00310f).rw(m_spg_audio, FUNC(spg110_audio_device::audio_ctrl_r), FUNC(spg2xx_audio_device::audio_ctrl_w));
-
 
 	// 0032xx looks like it could be the same as 003d00 on spg2xx
 	map(0x003200, 0x00322f).rw(m_spg_io, FUNC(spg2xx_io_device::io_r), FUNC(spg2xx_io_device::io_w));
