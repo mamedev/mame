@@ -471,6 +471,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	int pl;
 	int defbitoffs = 0;
 	rgb_t *aga_palette = m_aga_palette;
+	bool bitplane_dma_enabled = false;
 
 	int save_scanline = scanline;
 
@@ -679,10 +680,12 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		/* need to run the sprite engine every pixel to ensure display */
 		sprpix = aga_get_sprite_pixel(x);
 
+		bitplane_dma_enabled = (CUSTOM_REG(REG_DMACON) & (DMACON_BPLEN | DMACON_DMAEN)) == (DMACON_BPLEN | DMACON_DMAEN);
+
 		/* to render, we must have bitplane DMA enabled, at least 1 plane, and be within the */
 		/* vertical display window */
-		if ((CUSTOM_REG(REG_DMACON) & (DMACON_BPLEN | DMACON_DMAEN)) == (DMACON_BPLEN | DMACON_DMAEN) &&
-			planes > 0 && scanline >= m_diw.top() && scanline < m_diw.bottom())
+		// TODO: bitplane DMA enabled applies to fetch_bitplane_data only
+		if (bitplane_dma_enabled && planes > 0 && scanline >= m_diw.top() && scanline < m_diw.bottom())
 		{
 			int pfpix0 = 0, pfpix1 = 0, collide;
 
@@ -905,7 +908,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 #endif
 
 	/* end of the line: time to add the modulos */
-	if (scanline >= m_diw.top() && scanline < m_diw.bottom())
+	if (scanline >= m_diw.top() && scanline < m_diw.bottom() && bitplane_dma_enabled)
 	{
 		int16_t odd_modulo = CUSTOM_REG_SIGNED(REG_BPL1MOD);
 		int16_t even_modulo = CUSTOM_REG_SIGNED(REG_BPL2MOD);
