@@ -296,16 +296,16 @@ void h89_base_state::h89_mem(address_map &map)
 	// View 0 - ROM / Floppy RAM R/O
 	// View 1 - ROM / Floppy RAM R/W
 	// monitor ROM
-	m_mem_view[0](0x0000, 0x0fff).rom().region("maincpu", 0).unmapw();
-	m_mem_view[1](0x0000, 0x0fff).rom().region("maincpu", 0).unmapw();
+	m_mem_view[0](0x0000, 0x0fff).rom().region(m_maincpu_region, 0).unmapw();
+	m_mem_view[1](0x0000, 0x0fff).rom().region(m_maincpu_region, 0).unmapw();
 
 	// Floppy RAM
 	m_mem_view[0](0x1400, 0x17ff).readonly().share(m_floppy_ram);
 	m_mem_view[1](0x1400, 0x17ff).ram().share(m_floppy_ram);
 
 	// Floppy ROM
-	m_mem_view[0](0x1800, 0x1fff).rom().region("maincpu", 0x1800).unmapw();
-	m_mem_view[1](0x1800, 0x1fff).rom().region("maincpu", 0x1800).unmapw();
+	m_mem_view[0](0x1800, 0x1fff).rom().region(m_maincpu_region, 0x1800).unmapw();
+	m_mem_view[1](0x1800, 0x1fff).rom().region(m_maincpu_region, 0x1800).unmapw();
 }
 
 void h89_base_state::map_fetch(address_map &map)

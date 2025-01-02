@@ -835,6 +835,12 @@ static INPUT_PORTS_START( ultra19 )
 	PORT_DIPNAME( 0x80, 0x00, "Interlace Scan Mode")                         PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_MODIFY("CONFIG")
+	PORT_CONFNAME(0x10, 0x10, "Page 2 RAM present")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+
 INPUT_PORTS_END
 
 
@@ -1316,8 +1322,21 @@ ioport_constructor heath_watz_tlb_device::device_input_ports() const
  * Developed by William G. Parrott, III, sold by Software Wizardry, Inc.
  */
 heath_ultra_tlb_device::heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_tlb_device(mconfig, HEATH_ULTRA, tag, owner, clock)
+	heath_tlb_device(mconfig, HEATH_ULTRA, tag, owner, clock),
+	m_maincpu_region(*this, "maincpu"),
+	m_page_2_ram(*this, "page2ram"),
+	m_mem_view(*this, "mem")
 {
+}
+
+void heath_ultra_tlb_device::device_reset()
+{
+	heath_tlb_device::device_reset();
+
+	ioport_value const cfg(m_config->read());
+
+	// Page 2 memory
+	m_mem_view.select(BIT(cfg, 4));
 }
 
 void heath_ultra_tlb_device::device_add_mconfig(machine_config &config)
@@ -1331,11 +1350,11 @@ void heath_ultra_tlb_device::mem_map(address_map &map)
 {
 	heath_tlb_device::mem_map(map);
 
-	// update rom mirror setting to allow page 2 memory
-	map(0x0000, 0x0fff).mirror(0x2000).rom();
+	map(0x0000, 0x3fff).view(m_mem_view);
 
-	// Page 2 memory
-	map(0x1000, 0x1fff).mirror(0x2000).ram();
+	m_mem_view[0](0x0000, 0x0fff).mirror(0x3000).rom().region(m_maincpu_region, 0x0000).unmapw();
+	m_mem_view[1](0x0000, 0x0fff).mirror(0x2000).rom().region(m_maincpu_region, 0x0000).unmapw();
+	m_mem_view[1](0x1000, 0x1fff).mirror(0x2000).ram().share(m_page_2_ram);
 }
 
 const tiny_rom_entry *heath_ultra_tlb_device::device_rom_region() const
@@ -1954,13 +1973,26 @@ ioport_constructor heath_igc_super19_tlb_device::device_input_ports() const
  *
  */
 heath_igc_ultra_tlb_device::heath_igc_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_igc_tlb_device(mconfig, HEATH_IGC_ULTRA, tag, owner, clock)
+	heath_igc_tlb_device(mconfig, HEATH_IGC_ULTRA, tag, owner, clock),
+	m_maincpu_region(*this, "maincpu"),
+	m_page_2_ram(*this, "page2ram"),
+	m_mem_view(*this, "mem")
 {
+}
+
+void heath_igc_ultra_tlb_device::device_reset()
+{
+	heath_igc_tlb_device::device_reset();
+
+	ioport_value const cfg(m_config->read());
+
+	// Page 2 memory
+	m_mem_view.select(BIT(cfg, 4));
 }
 
 void heath_igc_ultra_tlb_device::device_add_mconfig(machine_config &config)
 {
-	heath_tlb_device::device_add_mconfig(config);
+	heath_igc_tlb_device::device_add_mconfig(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_igc_ultra_tlb_device::mem_map);
 }
@@ -1969,11 +2001,11 @@ void heath_igc_ultra_tlb_device::mem_map(address_map &map)
 {
 	heath_tlb_device::mem_map(map);
 
-	// update rom mirror setting to allow page 2 memory
-	map(0x0000, 0x0fff).mirror(0x2000).rom();
+	map(0x0000, 0x3fff).view(m_mem_view);
 
-	// Page 2 memory
-	map(0x1000, 0x1fff).mirror(0x2000).ram();
+	m_mem_view[0](0x0000, 0x0fff).mirror(0x3000).rom().region(m_maincpu_region, 0x0000).unmapw();
+	m_mem_view[1](0x0000, 0x0fff).mirror(0x2000).rom().region(m_maincpu_region, 0x0000).unmapw();
+	m_mem_view[1](0x1000, 0x1fff).mirror(0x2000).ram().share(m_page_2_ram);
 }
 
 const tiny_rom_entry *heath_igc_ultra_tlb_device::device_rom_region() const
