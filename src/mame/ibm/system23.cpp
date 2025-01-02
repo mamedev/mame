@@ -5,6 +5,7 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "machine/i8257.h"
+#include "video/i8275.h"
 #include "machine/ram.h"
 
 #include "ibmsystem23.lh"
@@ -21,6 +22,7 @@ namespace
 				m_ppi_diag(*this, "ppi_diag"),
 				m_ppi_settings(*this, "ppi_settings"),
 				m_dma(*this,"dma"),
+				m_crtc(*this,"crtc"),
 				m_ram(*this, RAM_TAG),
 				m_diag_digits(*this, "digit%u", 0U)
 
@@ -40,6 +42,7 @@ namespace
 			required_device<i8255_device> m_ppi_diag;
 			required_device<i8255_device> m_ppi_settings;
 			required_device<i8257_device> m_dma;
+			required_device<i8275_device> m_crtc;
 			required_device<ram_device> m_ram;
 			output_finder<2> m_diag_digits;
 
@@ -98,6 +101,7 @@ namespace
 		map(0x00, 0x0f).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 		map(0x2c, 0x2f).rw(m_ppi_settings, FUNC(i8255_device::read), FUNC(i8255_device::write));
 		map(0x40, 0x43).rw(m_ppi_diag, FUNC(i8255_device::read), FUNC(i8255_device::write));
+		map(0x44, 0x47).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 		map(0x4c, 0x4f).rw(m_ppi_kbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	}
 
@@ -106,7 +110,7 @@ namespace
 		map.unmap_value_high();
 		map(0x0000, 0x3fff).rom().region("ros_unpaged",0);
 		map(0x8000, 0xbfff).ram();
-		//map(0xC000, 0xffff).ram();
+
 	}
 
 	void system23_state::system23(machine_config &config)
@@ -128,6 +132,8 @@ namespace
 		m_ppi_settings->in_pc_callback().set(FUNC(system23_state::memory_settings_r));
 
 		I8257(config, m_dma, 6.144_MHz_XTAL / 2); //frequency needs to be adjusted
+
+		I8275(config, m_crtc, (18'432'000 / 8));
 
 		RAM(config, m_ram).set_default_size("16k");
 
