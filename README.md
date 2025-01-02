@@ -1,7 +1,4 @@
-
 # MAME
-
-![Alt](https://repobeats.axiom.co/api/embed/8461d8ae4630322dafc736fc25782de214b49630.svg "Repobeats analytics image")
 
 ## What is MAME?
 
@@ -13,12 +10,20 @@ MAME's purpose is to preserve decades of software history. As electronic technol
 
 * [Official MAME Development Team Site](https://www.mamedev.org/) (includes binary downloads, wiki, forums, and more)
 * [MAME Testers](https://mametesters.org/) (official bug tracker for MAME and MESS)
+
+### Community
+
 * [MAME Forums on bannister.org](https://forums.bannister.org/ubbthreads.php?ubb=cfrm&c=5)
+* [r/MAME](https://www.reddit.com/r/MAME/) on Reddit
 * [MAMEWorld Forums](https://www.mameworld.info/ubbthreads/)
 
 ## Development
 
-![CI (Linux)](https://github.com/mamedev/mame/workflows/CI%20(Linux)/badge.svg) ![CI (Windows)](https://github.com/mamedev/mame/workflows/CI%20(Windows)/badge.svg) ![CI (macOS)](https://github.com/mamedev/mame/workflows/CI%20(macOS)/badge.svg) ![Compile UI translations](https://github.com/mamedev/mame/workflows/Compile%20UI%20translations/badge.svg) ![Build documentation](https://github.com/mamedev/mame/workflows/Build%20documentation/badge.svg)  [![Coverity Scan Status](https://scan.coverity.com/projects/5727/badge.svg?flat=1)](https://scan.coverity.com/projects/mame-emulator)
+![Alt](https://repobeats.axiom.co/api/embed/8461d8ae4630322dafc736fc25782de214b49630.svg "Repobeats analytics image")
+
+### CI status and code scanning
+
+[![CI (Linux)](https://github.com/mamedev/mame/workflows/CI%20(Linux)/badge.svg)](https://github.com/mamedev/mame/actions/workflows/ci-linux.yml) [![CI (Windows](https://github.com/mamedev/mame/workflows/CI%20(Windows)/badge.svg)](https://github.com/mamedev/mame/actions/workflows/ci-windows.yml) [![CI (macOS)](https://github.com/mamedev/mame/workflows/CI%20(macOS)/badge.svg)](https://github.com/mamedev/mame/actions/workflows/ci-macos.yml) [![Compile UI translations](https://github.com/mamedev/mame/workflows/Compile%20UI%20translations/badge.svg)](https://github.com/mamedev/mame/actions/workflows/language.yml) [![Build documentation](https://github.com/mamedev/mame/workflows/Build%20documentation/badge.svg)](https://github.com/mamedev/mame/actions/workflows/docs.yml)  [![Coverity Scan Status](https://scan.coverity.com/projects/5727/badge.svg?flat=1)](https://scan.coverity.com/projects/mame-emulator)
 
 ### How to compile?
 
