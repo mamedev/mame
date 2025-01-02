@@ -602,8 +602,6 @@ void spg110_video_device::tilemap_write_regs(int which, uint16_t* regs, int regn
 		break;
 
 	case 0x2: // Page Attributes
-		// 'priority' can't be priority here as it is on spg2xx, or the scores in attract will be behind the table, it really seems to be per attribute bit instead
-
 		logerror("video_w: Page %d Attributes = %04x (Priority:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n", which, data
 			, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
 		regs[regno] = data;
