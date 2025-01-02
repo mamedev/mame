@@ -14,7 +14,6 @@ Quiz Gekiretsu Scramble (Gakuen Paradise 2) (c) 1993 Face
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/bankdev.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
 
@@ -34,11 +33,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_mainbank(*this, "mainbank")
 		, m_fg_ram(*this, "fg_ram")
 		, m_bg_ram(*this, "bg_ram")
 		, m_spriteram(*this, "spriteram")
 		, m_fgctrl_rom(*this, "fgctrl")
+		, m_mainbank(*this, "mainbank")
+		, m_romview(*this, "romview")
 	{ }
 
 	void gakupara(machine_config &config);
@@ -53,12 +53,13 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<address_map_bank_device> m_mainbank;
 
 	required_shared_ptr<uint8_t> m_fg_ram;
 	required_shared_ptr<uint8_t> m_bg_ram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_region_ptr<uint8_t> m_fgctrl_rom;
+	required_memory_bank m_mainbank;
+	memory_view m_romview;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
@@ -83,7 +84,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void bank_map(address_map &map) ATTR_COLD;
+	void common_map(address_map &map) ATTR_COLD;
 	void gakupara_io_map(address_map &map) ATTR_COLD;
 	void gekiretu_io_map(address_map &map) ATTR_COLD;
 	void gekiretu_map(address_map &map) ATTR_COLD;
@@ -254,23 +255,34 @@ uint32_t quizdna_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 void quizdna_state::rombank_w(uint8_t data)
 {
-	m_mainbank->set_bank(data & 0x3f);
+	if (data & 0x3f)
+		m_romview.select(0);
+	else
+		m_romview.disable();
+	m_mainbank->set_entry(data & 0x3f);
 }
 
 void quizdna_state::gekiretu_rombank_w(uint8_t data)
 {
-	m_mainbank->set_bank((data & 0x3f) ^ 0x0a);
+	rombank_w((data & 0x3f) ^ 0x0a);
 }
 
 /****************************************************************************/
 
-void quizdna_state::quizdna_map(address_map &map)
+void quizdna_state::common_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).r(m_mainbank, FUNC(address_map_bank_device::read8));
-	map(0x8000, 0x8fff).mirror(0x1000).w(FUNC(quizdna_state::fg_ram_w)).share(m_fg_ram);
-	map(0xa000, 0xbfff).w(FUNC(quizdna_state::bg_ram_w)).share(m_bg_ram);
+	map(0x8000, 0x8fff).mirror(0x1000).ram().w(FUNC(quizdna_state::fg_ram_w)).share(m_fg_ram);
+	map(0xa000, 0xbfff).ram().w(FUNC(quizdna_state::bg_ram_w)).share(m_bg_ram);
+	map(0x8000, 0xbfff).view(m_romview);
+	m_romview[0](0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xdfff).ram();
+}
+
+void quizdna_state::quizdna_map(address_map &map)
+{
+	common_map(map);
+
 	map(0xe000, 0xe1ff).ram().share(m_spriteram);
 	map(0xe200, 0xefff).ram();
 	map(0xf000, 0xffff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -278,21 +290,11 @@ void quizdna_state::quizdna_map(address_map &map)
 
 void quizdna_state::gekiretu_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).r(m_mainbank, FUNC(address_map_bank_device::read8));
-	map(0x8000, 0x8fff).mirror(0x1000).w(FUNC(quizdna_state::fg_ram_w)).share(m_fg_ram);
-	map(0xa000, 0xbfff).w(FUNC(quizdna_state::bg_ram_w)).share(m_bg_ram);
-	map(0xc000, 0xdfff).ram();
+	common_map(map);
+
 	map(0xe000, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf000, 0xf1ff).ram().share(m_spriteram);
 	map(0xf200, 0xffff).ram();
-}
-
-void quizdna_state::bank_map(address_map &map)
-{
-	map(0x00000, 0x00fff).mirror(0x1000).readonly().share(m_fg_ram);
-	map(0x02000, 0x03fff).readonly().share(m_bg_ram);
-	map(0x04000, 0xfffff).rom().region("maincpu", 0x14000);
 }
 
 void quizdna_state::quizdna_io_map(address_map &map)
@@ -636,7 +638,7 @@ INPUT_PORTS_END
 static const gfx_layout fglayout =
 {
 	16,8,     // 16*8 characters
-	8192*2,   // 16384 characters
+	RGN_FRAC(1,1),   // 16384 characters
 	1,        // 1 bit per pixel
 	{0},
 	{ STEP16(0,1) },
@@ -644,37 +646,15 @@ static const gfx_layout fglayout =
 	16*8
 };
 
-static const gfx_layout bglayout =
-{
-	8,8,        // 8*8 characters
-	32768+1024, // 32768+1024 characters
-	4,          // 4 bits per pixel
-	{0,1,2,3},
-	{ STEP8(0,4) },
-	{ STEP8(0,32) },
-	8*8*4
-};
-
-static const gfx_layout objlayout =
-{
-	16,16,    // 16*16 characters
-	8192+256, // 8192+256 characters
-	4,        // 4 bits per pixel
-	{0,1,2,3},
-	{ STEP16(0,4) },
-	{ STEP16(0,64) },
-	16*16*4
-};
-
 static GFXDECODE_START( gfx_quizdna )
-	GFXDECODE_ENTRY( "fgtiles", 0x0000, fglayout,  0x7e0,  16 )
-	GFXDECODE_ENTRY( "bgtiles", 0x0000, bglayout,  0x000, 128 )
-	GFXDECODE_ENTRY( "sprites", 0x0000, objlayout, 0x600,  32 )
+	GFXDECODE_ENTRY( "fgtiles", 0x0000, fglayout,               0x7e0,  16 )
+	GFXDECODE_ENTRY( "bgtiles", 0x0000, gfx_8x8x4_packed_msb,   0x000, 128 )
+	GFXDECODE_ENTRY( "sprites", 0x0000, gfx_16x16x4_packed_msb, 0x600,  32 )
 GFXDECODE_END
 
 void quizdna_state::machine_start()
 {
-	m_mainbank->set_bank(0);
+	m_mainbank->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -687,8 +667,6 @@ void quizdna_state::quizdna(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &quizdna_state::quizdna_map);
 	m_maincpu->set_addrmap(AS_IO, &quizdna_state::quizdna_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(quizdna_state::irq0_line_hold));
-
-	ADDRESS_MAP_BANK(config, m_mainbank).set_map(&quizdna_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x4000);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
