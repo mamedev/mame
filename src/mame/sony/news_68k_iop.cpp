@@ -164,7 +164,7 @@ namespace
             FDCDRQ          // DRQ from FDC
         };
         static constexpr std::array iop_irq_names = {"CPIRQ"sv, "SCSI_IRQ"sv, "SCSI_DRQ"sv, "LANCE"sv, "CPU"sv, "SCC"sv, "SCC_PERIPHERAL"sv, "TIMEOUT"sv, "FDCIRQ"sv, "FDCDRQ"sv};
-        static constexpr uint32_t nmi_mask = (1 << SCSI_IRQ) | (1 << SCC) | (1 << LANCE) | (1 << FDCIRQ) | (1 << FDCDRQ);
+        static constexpr uint32_t iop_nmi_mask = (1 << SCSI_IRQ) | (1 << SCC) | (1 << LANCE) | (1 << FDCIRQ) | (1 << FDCDRQ);
         static const std::map<int, std::vector<iop_irq_number>> iop_irq_line_map;
 
         template <iop_irq_number Number>
@@ -178,18 +178,21 @@ namespace
         // CPU IRQ setup
         enum cpu_irq_number : unsigned
         {
-            AST = 1,     // Asynchronous System Trap interrupt
-            CPIRQ1 = 2,  // VME bus interrupt
-            IOPIRQ3 = 3, // Low-priority interprocessor communication interrupts (from IOP)
-            CPIRQ3 = 4,  // VME bus interrupt
-            IOPIRQ5 = 5, // High-priority interprocessor communication interrupts (from IOP)
-            TIMER = 6,   // 100Hz timer interrupt
-            PERR = 7     // Parity error interrupt
+            AST,     // Asynchronous System Trap interrupt
+            CPIRQ1,  // VME bus interrupt
+            IOPIRQ3, // Low-priority interprocessor communication interrupts (from IOP)
+            CPIRQ3,  // VME bus interrupt
+            IOPIRQ5, // High-priority interprocessor communication interrupts (from IOP)
+            TIMER,   // 100Hz timer interrupt
+            PERR     // Parity error interrupt
         };
-        static constexpr std::array cpu_irq_names = {"ERROR"sv, "AST"sv, "CPIRQ1"sv, "IOPIRQ3"sv, "CPIRQ3"sv, "IOPIRQ5"sv, "TIMER"sv, "PERR"sv};
+        static constexpr std::array cpu_irq_names = {"AST"sv, "CPIRQ1"sv, "IOPIRQ3"sv, "CPIRQ3"sv, "IOPIRQ5"sv, "TIMER"sv, "PERR"sv};
+        static const std::map<int, cpu_irq_number> cpu_irq_line_map;
 
         template <cpu_irq_number Number>
         void cpu_irq_w(int state);
+        template <cpu_irq_number Number>
+        void cpu_inten_w(uint8_t state);
         void int_check_cpu();
 
         // 68k bus error handlers
@@ -206,6 +209,7 @@ namespace
         uint8_t rtcreg_r();
         void rtcreg_w(uint8_t data);
         void rtcsel_w(uint8_t data);
+        void set_rtc_data_bit(uint8_t bit_number, int data);
         uint32_t scsi_dma_r(offs_t offset, uint32_t mem_mask);
         void scsi_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask);
         void scsi_drq_handler(int status);
@@ -218,7 +222,6 @@ namespace
         // Platform hardware used by the main processor
         void cpu_romdis_w(uint8_t data);
         void mmuen_w(uint8_t data);
-        void timerenc_w(uint8_t data);
         uint8_t berr_status_r();
         void astreset_w(uint8_t data);
         void astset_w(uint8_t data);
@@ -249,47 +252,50 @@ namespace
         required_device<am5380_device> m_scsi;
         required_device<news_iop_scsi_helper_device> m_scsi_dma;
         required_ioport m_dip_switch;
-
         required_device_array<rs232_port_device, 2> m_serial;
-
         std::unique_ptr<u16[]> m_net_ram;
 
         // IOP IRQ state
         uint8_t m_iop_intst = 0;
-        uint8_t m_iop_inten = nmi_mask;
+        uint8_t m_iop_inten = iop_nmi_mask;
         std::map<int, bool> m_iop_int_state = {
-            {CPIRQ_3_1, false},
-            {SCSI_IRQ, false},
-            {SCSI_DRQ, false},
-            {LANCE, false},
-            {CPU, false},
-            {SCC, false},
-            {TIMEOUT, false},
-            {FDCIRQ, false},
-            {FDCDRQ, false},
-            {SCC_PERIPHERAL, false} // TODO: is this right?
+            {INPUT_LINE_IRQ1, false},
+            {INPUT_LINE_IRQ2, false},
+            {INPUT_LINE_IRQ3, false},
+            {INPUT_LINE_IRQ4, false},
+            {INPUT_LINE_IRQ5, false},
+            {INPUT_LINE_IRQ6, false},
+            {INPUT_LINE_IRQ7, false}
         };
 
         // CPU IRQ state
+        bool m_ast = false;
         uint8_t m_cpu_intst = 0;
         uint8_t m_cpu_inten = 0;
-        bool m_cpu_int_state[8] = {false, false, false, false, false, false, false, false}; // 0 is unused
-        bool m_cpu_timerenc = false;
-        bool m_cpu_timerout = false;
-        bool m_ast = false;
-        bool m_ast_latched = false;
+        std::map<int, bool> m_cpu_int_state = {
+            {INPUT_LINE_IRQ1, false},
+            {INPUT_LINE_IRQ2, false},
+            {INPUT_LINE_IRQ3, false},
+            {INPUT_LINE_IRQ4, false},
+            {INPUT_LINE_IRQ5, false},
+            {INPUT_LINE_IRQ6, false},
+            {INPUT_LINE_IRQ7, false}
+        };
+
+        // Bus error details
         bool m_cpu_bus_error = false;
         offs_t m_last_berr_pc_cpu = 0;
+        uint8_t m_cpu_bus_error_status = 0;
         emu_timer *m_cpu_bus_error_timer;
 
-        int m_sw1_first_read = 0;
-
+        // Front panel
         bool m_panel_clear = false;
         bool m_panel_shift = false;
+        int m_sw1_first_read = 0;
         int m_panel_shift_count = 0;
-        uint8_t m_cpu_bus_error_status = 0;
         uint8_t m_rtc_data = 0;
 
+        // Other constants
         static constexpr int NET_RAM_SIZE = 8192; // 16K RAM, in 16-bit words
     };
 
@@ -301,6 +307,16 @@ namespace
         {INPUT_LINE_IRQ5, {SCC, SCC_PERIPHERAL}},
         {INPUT_LINE_IRQ6, {TIMEOUT, FDCIRQ}},
         {INPUT_LINE_IRQ7, {FDCDRQ}}
+    };
+
+    const std::map<int, news_iop_state::cpu_irq_number> news_iop_state::cpu_irq_line_map = {
+        {INPUT_LINE_IRQ1, AST},
+        {INPUT_LINE_IRQ2, CPIRQ1},
+        {INPUT_LINE_IRQ3, IOPIRQ3},
+        {INPUT_LINE_IRQ4, CPIRQ3},
+        {INPUT_LINE_IRQ5, IOPIRQ5},
+        {INPUT_LINE_IRQ6, TIMER},
+        {INPUT_LINE_IRQ7, PERR}
     };
 
     void news_iop_state::machine_start()
@@ -326,12 +342,7 @@ namespace
         // Math: 0x4e20 cycles * 500ns = 10ms period, 1 / 10ms = 100Hz
 
         iop_irq_w<TIMEOUT>(data > 0);
-
-        if (data > 0)
-        {
-            m_cpu_timerout = true;
-        }
-        int_check_cpu();
+        cpu_irq_w<TIMER>(data > 0);
     }
 
     TIMER_CALLBACK_MEMBER(news_iop_state::bus_error_off_cpu)
@@ -351,7 +362,7 @@ namespace
         // 2: RI CHB
         // 1: DSR CHA
         // 0: RI CHA
-        
+
         // TODO: this is SCSI IRQ, not DRQ, right?
         const uint8_t status = (is_iop_irq_set<SCSI_IRQ>() ? 0x10 : 0) | (is_iop_irq_set<FDCIRQ>() ? 0x80 : 0);
         LOGMASKED(LOG_ALL_INTERRUPT, "Read IOPSTATUS = 0x%x\n", status);
@@ -451,6 +462,12 @@ namespace
         m_rtc->cs2_w(0);
     }
 
+    void news_iop_state::set_rtc_data_bit(uint8_t bit_number, int data)
+    {
+        const uint8_t bit = 1 << bit_number;
+        m_rtc_data = (m_rtc_data & ~bit) | (data ? bit : 0x0);
+    }
+
     uint32_t news_iop_state::scsi_dma_r(offs_t offset, uint32_t mem_mask)
     {
         uint32_t result = 0;
@@ -520,7 +537,6 @@ namespace
         m_cpu->set_input_line(INPUT_LINE_HALT, 1);
 
         // Clear AST state
-        m_ast_latched = false;
         m_ast = false;
     }
 
@@ -590,7 +606,7 @@ namespace
 
     void news_iop_state::cpu_romdis_w(uint8_t data)
     {
-        LOG("CPU ROMDIS 0x%x\n", data);
+        LOG("(%s) CPU ROMDIS 0x%x\n", machine().describe_context(), data);
         m_mmu->set_rom_enable(data == 0);
     }
 
@@ -602,21 +618,9 @@ namespace
         m_mmu->set_mmu_enable(mmu_enable);
     }
 
-    void news_iop_state::timerenc_w(uint8_t data)
-    {
-        LOGMASKED(LOG_TIMER, "TIMERENC 0x%x (%s)\n", data, machine().describe_context());
-
-        m_cpu_timerenc = data > 0;
-        if (!m_cpu_timerenc)
-        {
-            m_cpu_timerout = false;
-        }
-        int_check_cpu();
-    }
-
     uint8_t news_iop_state::berr_status_r()
     {
-        LOGMASKED(LOG_MEMORY, "(%s) r BERR_STATUS = 0x%x\n", machine().describe_context(), m_cpu_bus_error_status);
+        LOGMASKED(LOG_MEMORY, "(%s) BERR_STATUS read = 0x%x\n", machine().describe_context(), m_cpu_bus_error_status);
         uint8_t status = m_cpu_bus_error_status;
         m_cpu_bus_error_status = 0;
         m_last_berr_pc_cpu = 0;
@@ -625,7 +629,7 @@ namespace
 
     void news_iop_state::astreset_w(uint8_t data)
     {
-        LOGMASKED(LOG_AST, "(%s) AST_RESET 0x%x\n", machine().describe_context(), data);
+        LOGMASKED(LOG_AST, "(%s) AST_RESET 0x%x as %s\n", machine().describe_context(), data, m_cpu->supervisor_mode() ? "supervisor" : "user");
         m_ast = false;
     }
 
@@ -637,13 +641,13 @@ namespace
 
     void news_iop_state::update_ast()
     {
-        // Logic equation: !AST || (AST && AST_LATCH && SUPERVISOR), 0 is IRQ active
-        const bool previous_ast_latch = m_ast_latched;
-        m_ast_latched = !m_ast || (m_ast && previous_ast_latch && m_cpu->supervisor_mode());
-        if (!m_ast_latched && previous_ast_latch) {
+        // Logic equation: !AST || (AST && PREV_AST && SUPERVISOR), 0 is IRQ active
+        const bool previous_ast_state = m_cpu_int_state[INPUT_LINE_IRQ1];
+        m_cpu_int_state[INPUT_LINE_IRQ1] = !m_ast || (m_ast && previous_ast_state && m_cpu->supervisor_mode());
+        if (!m_cpu_int_state[INPUT_LINE_IRQ1] && previous_ast_state) {
             LOGMASKED(LOG_AST, "Setting AST IRQ!\n");
             m_cpu->set_input_line(INPUT_LINE_IRQ1, 1);
-        } else if (m_ast_latched && !previous_ast_latch) {
+        } else if (m_cpu_int_state[INPUT_LINE_IRQ1] && !previous_ast_state) {
             m_cpu->set_input_line(INPUT_LINE_IRQ1, 0);
         }
     }
@@ -655,40 +659,11 @@ namespace
         // Various platform control registers (MMU and otherwise)
         map(0x04400000, 0x04400000).w(FUNC(news_iop_state::cpu_romdis_w));
         map(0x04400001, 0x04400001).w(FUNC(news_iop_state::mmuen_w));
-        map(0x04400002, 0x04400002).lw8([this](uint8_t data)
-                                        {
-                                            // TODO: resolve copy-paste between this, some of the IOP stuff, and CPINT4EN
-                                            LOGMASKED(LOG_ALL_INTERRUPT, "CPU CPINT2EN 0x%x\n", data);
-                                            if (data)
-                                            {
-                                                m_cpu_inten |= (1 << IOPIRQ3);
-                                            }
-                                            else
-                                            {
-                                                m_cpu_inten &= ~(1 << IOPIRQ3);
-                                                m_cpu_intst &= ~(1 << IOPIRQ3);
-                                            }
-                                            int_check_cpu();
-                                        }, "CPINT2EN");
-
-        map(0x04400003, 0x04400003).lw8([this](uint8_t data)
-                                        {
-                                            LOGMASKED(LOG_ALL_INTERRUPT, "CPU CPINT4EN 0x%x\n", data);
-                                            if (data)
-                                            {
-                                                m_cpu_inten |= (1 << IOPIRQ5);
-                                            }
-                                            else
-                                            {
-                                                m_cpu_inten &= ~(1 << IOPIRQ5);
-                                                m_cpu_intst &= ~(1 << IOPIRQ5);
-                                            }
-                                            int_check_cpu();
-                                        }, "CPINT4EN");
-
-        map(0x04400004, 0x04400004).w(FUNC(news_iop_state::timerenc_w));
+        map(0x04400002, 0x04400002).w(FUNC(news_iop_state::cpu_inten_w<IOPIRQ3>));
+        map(0x04400003, 0x04400003).w(FUNC(news_iop_state::cpu_inten_w<IOPIRQ5>));
+        map(0x04400004, 0x04400004).w(FUNC(news_iop_state::cpu_inten_w<TIMER>));
         map(0x04400005, 0x04400005).lw8(NAME([this](uint8_t data) { LOG("CACHEEN 0x%x\n", data); }));
-        map(0x04400006, 0x04400006).lw8(NAME([this](uint8_t data) { LOG("PARITYEN 0x%x\n", data); }));
+        map(0x04400006, 0x04400006).w(FUNC(news_iop_state::cpu_inten_w<PERR>));
         map(0x04800000, 0x04800000).lw8([this](uint8_t data) { iop_irq_w<CPU>(1); }, "INT_IOP");
         map(0x04c00000, 0x04c00000).select(0x10000000).w(m_mmu, FUNC(news_020_mmu_device::clear_entries));
 
@@ -745,7 +720,7 @@ namespace
     template <news_iop_state::iop_irq_number Number>
     void news_iop_state::iop_inten_w(uint8_t state)
     {
-        if ((1 << Number) & nmi_mask)
+        if ((1 << Number) & iop_nmi_mask)
         {
             fatalerror("news_iop_state: tried to disable non-maskable interrupt %s!", iop_irq_names[Number]);
         }
@@ -770,7 +745,7 @@ namespace
 
     void news_iop_state::int_check_iop()
     {
-       int active_irq = m_iop_intst & m_iop_inten;
+       const int active_irq = m_iop_intst & m_iop_inten;
        for (auto irq : iop_irq_line_map)
        {
             // Calculate state of input pin (logical OR of all attached inputs)
@@ -797,12 +772,12 @@ namespace
     {
         if (Number != TIMER)
         {
-            LOG("cpu irq number %d state %d\n", Number, state);
+             LOGMASKED(LOG_INTERRUPT, "(%s) CPU IRQ %s %s\n", machine().describe_context(), cpu_irq_names[Number], state ? "set" : "cleared");
         }
 
         if (state)
         {
-            m_cpu_intst |= 1U << Number; // TODO: index from 0?
+            m_cpu_intst |= 1U << Number;
         }
         else
         {
@@ -812,27 +787,43 @@ namespace
         int_check_cpu();
     }
 
-    void news_iop_state::int_check_cpu()
+    template <news_iop_state::cpu_irq_number Number>
+    void news_iop_state::cpu_inten_w(uint8_t state)
     {
-        // TODO: make this not jank
-        static const int interrupt_map[] = {INPUT_LINE_IRQ0, INPUT_LINE_IRQ1, INPUT_LINE_IRQ2, INPUT_LINE_IRQ3, INPUT_LINE_IRQ4, INPUT_LINE_IRQ5, INPUT_LINE_IRQ6, INPUT_LINE_IRQ7};
-        int active_irq = m_cpu_intst & m_cpu_inten;
-        for (int i = 1; i <= 7; i++)
+        if (Number != TIMER)
         {
-            bool state = active_irq & (1 << i);
-
-            if (m_cpu_int_state[i] != state)
-            {
-                if (i != 6)
-                {
-                    LOGMASKED(LOG_GENERAL, "(%s) Setting CPU input line %d to %d (%d)\n", machine().describe_context(), interrupt_map[i], state ? 1 : 0, i);
-                }
-                m_cpu_int_state[i] = state;
-                m_cpu->set_input_line(interrupt_map[i], state ? 1 : 0);
-            }
+            LOGMASKED(LOG_INTERRUPT, "(%s) CPU IRQ %s %s\n", machine().describe_context(), cpu_irq_names[Number], state ? "enabled" : "disabled");
         }
 
-        m_cpu->set_input_line(INPUT_LINE_IRQ6, m_cpu_timerenc && m_cpu_timerout);
+        if (state)
+        {
+            m_cpu_inten |= (1 << Number);
+        }
+        else
+        {
+            m_cpu_inten &= ~(1 << Number);
+            m_cpu_intst &= ~(1 << Number); // TODO: does this actually clear in all cases?
+        }
+
+        int_check_cpu();
+    }
+
+    void news_iop_state::int_check_cpu()
+    {
+        const int active_irq = m_cpu_intst & m_cpu_inten;
+        for (auto irq : cpu_irq_line_map)
+        {
+            // Update input pin status if it has changed
+            const bool state = active_irq & (1 << irq.second);
+            if (m_cpu_int_state[irq.first] != state) {
+                if (irq.first != INPUT_LINE_IRQ6)
+                {
+                    LOGMASKED(LOG_INTERRUPT, "Setting CPU input line %d to %d\n", irq.first, state ? 1 : 0);
+                }
+                m_cpu_int_state[irq.first] = state;
+                m_cpu->set_input_line(irq.first, state ? 1 : 0);
+            }
+        }
     }
 
     static void news_scsi_devices(device_slot_interface &device)
@@ -1049,14 +1040,10 @@ namespace
 
         // Epson RTC-58321B
         RTC58321(config, m_rtc, 32.768_kHz_XTAL);
-        m_rtc->d0_handler().set([this](int data)
-                                { m_rtc_data = (m_rtc_data & ~0x1) | (data ? 0x1 : 0x0); }); // TODO: clean this up - move shared data into a func
-        m_rtc->d1_handler().set([this](int data)
-                                { m_rtc_data = (m_rtc_data & ~0x2) | (data ? 0x2 : 0x0); });
-        m_rtc->d2_handler().set([this](int data)
-                                { m_rtc_data = (m_rtc_data & ~0x4) | (data ? 0x4 : 0x0); });
-        m_rtc->d3_handler().set([this](int data)
-                                { m_rtc_data = (m_rtc_data & ~0x8) | (data ? 0x8 : 0x0); });
+        m_rtc->d0_handler().set([this](int data) { set_rtc_data_bit(0, data); });
+        m_rtc->d1_handler().set([this](int data) { set_rtc_data_bit(1, data); });
+        m_rtc->d2_handler().set([this](int data) { set_rtc_data_bit(2, data); });
+        m_rtc->d3_handler().set([this](int data) { set_rtc_data_bit(3, data); });
     }
 
     void news_iop_state::iop_autovector_map(address_map &map)
