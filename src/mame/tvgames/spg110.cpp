@@ -48,7 +48,6 @@ public:
 	{ }
 
 	void spg110_base(machine_config &config);
-
 	void spg110_base_pal(machine_config &config);
 
 	ioport_value plunger_r();
@@ -66,10 +65,8 @@ public:
 	spg110_easports_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg110_game_state(mconfig, type, tag)
 	{ }
-public:
 	void easports_pal(machine_config &config);
 
-protected:
 private:
 	virtual void mem_map(address_map &map) override ATTR_COLD;
 };
@@ -82,7 +79,7 @@ public:
 		m_cart(*this, "cartslot"),
 		m_cartrom(*this, "cartrom")
 	{ }
-public:
+
 	void sstarkar(machine_config &config);
 
 protected:

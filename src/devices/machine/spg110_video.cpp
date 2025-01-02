@@ -923,14 +923,6 @@ uint32_t spg110_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 void spg110_video_device::vblank(int state)
 {
-	if (!state)
-	{
-		m_blk_irq_flag = 0;
-		update_video_irqs();
-	}
-	else
-	{
-		m_blk_irq_flag = 1;
-		update_video_irqs();
-	}
+	m_blk_irq_flag = state;
+	update_video_irqs();
 }
