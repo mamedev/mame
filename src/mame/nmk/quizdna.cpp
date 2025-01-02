@@ -41,9 +41,9 @@ public:
 		, m_romview(*this, "romview")
 	{ }
 
-	void gakupara(machine_config &config);
-	void quizdna(machine_config &config);
-	void gekiretu(machine_config &config);
+	void gakupara(machine_config &config) ATTR_COLD;
+	void quizdna(machine_config &config) ATTR_COLD;
+	void gekiretu(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -84,12 +84,13 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void common_map(address_map &map) ATTR_COLD;
-	void gakupara_io_map(address_map &map) ATTR_COLD;
-	void gekiretu_io_map(address_map &map) ATTR_COLD;
+	void quizdna_map(address_map &map) ATTR_COLD;
 	void gekiretu_map(address_map &map) ATTR_COLD;
 	void quizdna_io_map(address_map &map) ATTR_COLD;
-	void quizdna_map(address_map &map) ATTR_COLD;
+	void gakupara_io_map(address_map &map) ATTR_COLD;
+	void gekiretu_io_map(address_map &map) ATTR_COLD;
 };
 
 
