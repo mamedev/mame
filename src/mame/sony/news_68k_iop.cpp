@@ -98,7 +98,7 @@
 #define LOG_SCSI (1U << 8)
 #define LOG_AST (1U << 9)
 
-#define VERBOSE (LOG_GENERAL|LOG_AST|LOG_INTERRUPT)
+#define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
 
@@ -310,7 +310,7 @@ namespace
     };
 
     const std::map<int, news_iop_state::cpu_irq_number> news_iop_state::cpu_irq_line_map = {
-        {INPUT_LINE_IRQ1, AST},
+        // AST is excluded from this check since it is handled separately
         {INPUT_LINE_IRQ2, CPIRQ1},
         {INPUT_LINE_IRQ3, IOPIRQ3},
         {INPUT_LINE_IRQ4, CPIRQ3},
@@ -553,12 +553,12 @@ namespace
         // IOP bus expansion I/O
         map(0x20000000, 0x20ffffff).lrw32([this](offs_t offset, uint32_t mem_mask)
                                           {
-                                              LOG("extio_r(0x%x, 0x%x) = 0x%x (%s)\n", offset, mem_mask, 0xff, machine().describe_context());
+                                              LOG("extio_r(0x%x, 0x%x) -> 0x%x = 0x%x (%s)\n", offset, mem_mask, 0x20000000 + offset, 0xff, machine().describe_context());
                                               return 0xff;
                                           }, "extio_r",
                                           [this](offs_t offset, uint32_t data, uint32_t mem_mask)
                                           {
-                                              LOG("extio_w(0x%x, 0x%x, 0x%x) (%s)\n", offset, data, mem_mask, machine().describe_context());
+                                              LOG("extio_w(0x%x, 0x%x, 0x%x) -> 0x%x = (%s)\n", offset, data, mem_mask, 0x20000000 + offset, machine().describe_context());
                                           }, "extio_w").mirror(0x1f000000);
 
         // map(0x4c000100, 0x4c0001ff).lrw8(NAME([this](){ iop_bus_error(); return 0; }), NAME([this](uint8_t data){ iop_bus_error(); }));
@@ -629,13 +629,13 @@ namespace
 
     void news_iop_state::astreset_w(uint8_t data)
     {
-        LOGMASKED(LOG_AST, "(%s) AST_RESET 0x%x as %s\n", machine().describe_context(), data, m_cpu->supervisor_mode() ? "supervisor" : "user");
+        LOGMASKED(LOG_AST, "(%s) AST_RESET 0x%x\n", machine().describe_context(), data);
         m_ast = false;
     }
 
     void news_iop_state::astset_w(uint8_t data)
     {
-        LOGMASKED(LOG_AST, "(%s) AST_SET 0x%x as %s\n", machine().describe_context(), data, m_cpu->supervisor_mode() ? "supervisor" : "user");
+        LOGMASKED(LOG_AST, "(%s) AST_SET 0x%x\n", machine().describe_context(), data);
         m_ast = true;
     }
 
@@ -645,9 +645,10 @@ namespace
         const bool previous_ast_state = m_cpu_int_state[INPUT_LINE_IRQ1];
         m_cpu_int_state[INPUT_LINE_IRQ1] = !m_ast || (m_ast && previous_ast_state && m_cpu->supervisor_mode());
         if (!m_cpu_int_state[INPUT_LINE_IRQ1] && previous_ast_state) {
-            LOGMASKED(LOG_AST, "Setting AST IRQ!\n");
+            LOGMASKED(LOG_INTERRUPT, "Setting AST interrupt!\n");
             m_cpu->set_input_line(INPUT_LINE_IRQ1, 1);
         } else if (m_cpu_int_state[INPUT_LINE_IRQ1] && !previous_ast_state) {
+            LOGMASKED(LOG_INTERRUPT, "Clearing AST interrupt!\n");
             m_cpu->set_input_line(INPUT_LINE_IRQ1, 0);
         }
     }
