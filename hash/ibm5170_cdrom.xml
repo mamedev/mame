@@ -7469,7 +7469,7 @@ Other stuff untested
 	</software>
 
 	<!-- DOS, Windows 95B, Windows 98, Windows Me, Windows 2000, Windows XP
-	     and bootable. -->
+	     and El Torito bootable. -->
 	<software name="pmagic">
 		<description>Norton PartitionMagic 8.05</description>
 		<year>2004</year>
