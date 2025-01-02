@@ -338,24 +338,31 @@ void diablo_state::scorpio68(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( diablo68 ) // ID = D 1.08, serial 90999x
+ROM_START( diablo68 ) // ID = D 1.08, serial 91017x
 	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("d_904.u3", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
-	ROM_LOAD16_BYTE("d_a09.u2", 0x00001, 0x8000, CRC(bcd27647) SHA1(2de5bccd4e7b9a32957811c0028dbca1a407b9b0) )
+	ROM_LOAD16_BYTE("d_c18.u2", 0x00001, 0x8000, CRC(7a957540) SHA1(756ad377e2425be02be49603d571df2fcc5f06a6) )
 	ROM_LOAD16_BYTE("502.u4",   0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
 ROM_END
 
-ROM_START( diablo68a ) // ID = D 1.08, serial 90984x
+ROM_START( diablo68a ) // ID = D 1.08, serial 90999x
 	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("d_904.u3", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
-	ROM_LOAD16_BYTE("d_924.u2", 0x00001, 0x8000, CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5) ) // only 4 bytes different from diablo68
+	ROM_LOAD16_BYTE("d_a09.u2", 0x00001, 0x8000, CRC(bcd27647) SHA1(2de5bccd4e7b9a32957811c0028dbca1a407b9b0) ) // only 2 bytes different from diablo68
 	ROM_LOAD16_BYTE("502.u4",   0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
 ROM_END
 
-ROM_START( diablo68b ) // ID = D 1.08, serial 90973x
+ROM_START( diablo68b ) // ID = D 1.08, serial 90984x
+	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE("d_904.u3", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
+	ROM_LOAD16_BYTE("d_924.u2", 0x00001, 0x8000, CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5) ) // only 4 bytes different from diablo68a
+	ROM_LOAD16_BYTE("502.u4",   0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
+ROM_END
+
+ROM_START( diablo68c ) // ID = D 1.08, serial 90973x
 	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE("d_evn_904.u3", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
-	ROM_LOAD16_BYTE("d_odd_904.u2", 0x00001, 0x8000, CRC(d46fcc7a) SHA1(8ed69cd0fec07bf5451eaa882c87cf7cf70c87eb) ) // only 2 bytes different from diablo68a
+	ROM_LOAD16_BYTE("d_odd_904.u2", 0x00001, 0x8000, CRC(d46fcc7a) SHA1(8ed69cd0fec07bf5451eaa882c87cf7cf70c87eb) ) // only 2 bytes different from diablo68b
 	ROM_LOAD16_BYTE("ds_bk.u4",     0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
 ROM_END
 
@@ -379,5 +386,6 @@ ROM_END
 SYST( 1991, diablo68,  0,        0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Diablo 68000 (set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1991, diablo68a, diablo68, 0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Diablo 68000 (set 2)", MACHINE_SUPPORTS_SAVE )
 SYST( 1991, diablo68b, diablo68, 0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Diablo 68000 (set 3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1991, diablo68c, diablo68, 0,      diablo68,  diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Diablo 68000 (set 4)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1991, scorpio68, 0,        0,      scorpio68, diablo68,  diablo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Scorpio 68000", MACHINE_SUPPORTS_SAVE )
