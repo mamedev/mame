@@ -1947,6 +1947,9 @@ project "asmjit"
 	end
 
 	configuration { }
+		defines {
+			"ASMJIT_STATIC",
+		}
 
 	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
 		if string.find(_OPTIONS["gcc"], "clang") and (version < 80000) then
@@ -1954,6 +1957,13 @@ project "asmjit"
 				"TARGET_OS_OSX=1",
 			}
 		end
+	end
+
+	if (_OPTIONS["PLATFORM"]=="arm" or _OPTIONS["PLATFORM"]=="arm64") then
+		configuration { "x64" }
+			defines {
+				"ASMJIT_NO_X86",
+			}
 	end
 
 	files {
