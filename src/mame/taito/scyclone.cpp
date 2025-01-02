@@ -216,9 +216,9 @@ const uint8_t scyclone_state::get_sprite_pixel(int x, int y)
 
 const uint8_t scyclone_state::get_bitmap_pixel(int x, int y)
 {
-	const uint8_t video_data0 = m_vram[(y * 32 + (x / 8))];
-	const uint8_t video_data1 = m_vram[(y * 32 + (x / 8)) + 0x3800];
-	const uint8_t video_data2 = m_vram[(y * 32 + (x / 8)) + 0x3800 + 0x3800];
+	const uint8_t video_data0 = m_vram[(y * 32 + (x / 8)) + 0x3800 * 0];
+	const uint8_t video_data1 = m_vram[(y * 32 + (x / 8)) + 0x3800 * 1];
+	const uint8_t video_data2 = m_vram[(y * 32 + (x / 8)) + 0x3800 * 2];
 
 	int const bit(x & 0x07);
 
@@ -233,16 +233,18 @@ const uint8_t scyclone_state::get_bitmap_pixel(int x, int y)
 
 uint32_t scyclone_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const pen_t *paldata = m_palette->pens();
+
 	for (int x = 0; x < 32; x++)
 	{
 		for (int y = 0; y < 32; y++)
 		{
 			const uint8_t sx = (x + (m_starscroll >> 3)) & 0x1f;
-			const uint8_t star = m_stars[y << 5 | sx];
-			const bool blink = BIT((star << 1) + m_screen->frame_number(), 4);
+			const uint8_t star = m_stars[y << 5 | sx] & 0xf;
+			const uint8_t color = (m_screen->frame_number() + (star << 2)) >> 3 & 7;
 
 			uint8_t dx = x << 3 | (~m_starscroll & 7);
-			uint8_t dy = (y << 3) - 32 + 4;
+			uint8_t dy = (y << 3) - 32 + 7;
 
 			bool noclipped = false;
 
@@ -256,8 +258,8 @@ uint32_t scyclone_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bit
 			else
 				noclipped = dx >= 64;
 
-			if (noclipped && blink && star)
-				bitmap.pix(dy, dx) = rgb_t::white();
+			if (noclipped && star)
+				bitmap.pix(dy, dx) = paldata[color];
 		}
 	}
 
@@ -327,9 +329,9 @@ uint8_t scyclone_state::vram_r(offs_t offset)
 	uint8_t ret = 0;
 
 	// not sure, collisions depend on readback
-	ret |= m_vram[offset];
-	ret |= m_vram[offset + 0x3800];
-	ret |= m_vram[offset + 0x3800 + 0x3800];
+	ret |= m_vram[offset + 0x3800 * 0];
+	ret |= m_vram[offset + 0x3800 * 1];
+	ret |= m_vram[offset + 0x3800 * 2];
 
 	return ret;
 }
@@ -370,14 +372,14 @@ void scyclone_state::vram_w(offs_t offset, uint8_t data)
 		else if (i >= 2) videowritemask = (m_videowritemask2 >> 4) & 0x0f;
 		else videowritemask = (m_videowritemask2 >> 0) & 0x0f;
 
-		if (!(videowritemask & 1) && databit) m_vram[offset] |= databit;
-		else m_vram[offset] &= ~nodatabit;
+		if (!(videowritemask & 1) && databit) m_vram[offset + 0x3800 * 0] |= databit;
+		else m_vram[offset + 0x3800 * 0] &= ~nodatabit;
 
-		if (!(videowritemask & 2) && databit) m_vram[offset + 0x3800] |= databit;
-		else m_vram[offset + 0x3800] &= ~nodatabit;
+		if (!(videowritemask & 2) && databit) m_vram[offset + 0x3800 * 1] |= databit;
+		else m_vram[offset + 0x3800 * 1] &= ~nodatabit;
 
-		if (!(videowritemask & 4) && databit) m_vram[offset + 0x3800 + 0x3800] |= databit;
-		else m_vram[offset + 0x3800 + 0x3800] &= ~nodatabit;
+		if (!(videowritemask & 4) && databit) m_vram[offset + 0x3800 * 2] |= databit;
+		else m_vram[offset + 0x3800 * 2] &= ~nodatabit;
 	}
 }
 
@@ -755,4 +757,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1980, scyclone, 0, scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, scyclone, 0, scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito Corporation", "Space Cyclone (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
