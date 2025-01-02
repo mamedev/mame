@@ -32729,6 +32729,9 @@ sshot                           // (c) 1979 Model Racing
 @source:modelracing/subhuntr.cpp
 subhuntr                        // 1979 Model Racing
 
+@source:moog/memorymoog.cpp
+memorymoog                      // Moog Memorymoog
+
 @source:moog/source.cpp
 moogsource                      // Moog Source
 
