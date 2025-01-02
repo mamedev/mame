@@ -15,7 +15,7 @@
 #pragma once
 
 #include "cpcexp.h"
-#include "machine/ds1315.h"
+#include "machine/ds1215.h"
 
 class cpc_smartwatch_device : public device_t, public device_cpc_expansion_card_interface
 {
@@ -23,8 +23,7 @@ public:
 	// construction/destruction
 	cpc_smartwatch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t rtc_w(offs_t offset);
-	uint8_t rtc_r();
+	uint8_t rtc_r(offs_t offset);
 
 protected:
 	// device-level overrides
@@ -38,7 +37,7 @@ protected:
 private:
 	cpc_expansion_slot_device *m_slot;
 
-	required_device<ds1315_device> m_rtc;
+	required_device<ds1216e_device> m_rtc;
 	memory_bank* m_bank;
 };
 

@@ -1170,13 +1170,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ds1315.h,MACHINES["DS1315"] = true
+--@src/devices/machine/ds1215.h,MACHINES["DS1215"] = true
 ---------------------------------------------------
 
-if (MACHINES["DS1315"]~=null) then
+if (MACHINES["DS1215"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/ds1315.cpp",
-		MAME_DIR .. "src/devices/machine/ds1315.h",
+		MAME_DIR .. "src/devices/machine/ds1215.cpp",
+		MAME_DIR .. "src/devices/machine/ds1215.h",
 	}
 end
 

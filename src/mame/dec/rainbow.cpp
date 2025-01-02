@@ -350,7 +350,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "machine/timer.h"
 #include "machine/ram.h"
 
-#include "machine/ds1315.h"
+#include "machine/ds1215.h"
 #include "emupal.h"
 #include "softlist.h"
 #include "screen.h"
@@ -492,7 +492,6 @@ public:
 		m_p_vol_ram(*this, "vol_ram"),
 		m_p_nvram(*this, "nvram"),
 
-		m_rtc(*this, "rtc"),
 		m_hgdc(*this, "upd7220"), // GDC
 
 		m_screen2(*this, "screen2"),
@@ -518,8 +517,6 @@ protected:
 	void rainbow8088_base_io(address_map &map) ATTR_COLD;
 
 	uint8_t ext_ram_r(offs_t offset);
-
-	void rtc_w(offs_t offset, uint8_t data);
 
 	uint8_t read_video_ram_r(offs_t offset);
 	void video_interrupt(int state);
@@ -650,8 +647,6 @@ protected:
 	required_shared_ptr<uint8_t> m_p_vol_ram;
 	required_shared_ptr<uint8_t> m_p_nvram;
 
-	optional_device<ds1315_device> m_rtc;
-
 	required_device<upd7220_device> m_hgdc;  // GDC
 	required_device<screen_device> m_screen2;
 	required_device<palette_device> m_palette2;
@@ -753,7 +748,8 @@ class rainbow_modela_state : public rainbow_base_state
 {
 public:
 	rainbow_modela_state(const machine_config &mconfig, device_type type, const char *tag) :
-		rainbow_base_state(mconfig, type, tag)
+		rainbow_base_state(mconfig, type, tag),
+		m_rtc(*this, "rtc")
 	{
 	}
 
@@ -767,15 +763,19 @@ private:
 
 	void ext_ram_w(offs_t offset, uint8_t data);
 	uint8_t rtc_r(offs_t offset);
+	void rtc_w(offs_t offset, uint8_t data);
 	void irq_hi_w(int state);
 	uint8_t system_parameter_r();
+
+	required_device<ds1215_device> m_rtc;
 };
 
 class rainbow_modelb_state : public rainbow_base_state
 {
 public:
 	rainbow_modelb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		rainbow_base_state(mconfig, type, tag)
+		rainbow_base_state(mconfig, type, tag),
+		m_rtc(*this, "rtc")
 	{
 	}
 
@@ -791,6 +791,8 @@ private:
 	uint8_t rtc_r(offs_t offset);
 	void irq_hi_w(int state);
 	uint8_t system_parameter_r();
+
+	required_device<ds1216e_device> m_rtc;
 };
 
 // It * should be * OK to RESET the SCROLL_BUFFER and the COLOR_MAP (at least with WELL WRITTEN programs)
@@ -1180,8 +1182,6 @@ void rainbow_base_state::machine_reset()
 
 	m_crtc->MHFU(MHFU_RESET_and_DISABLE);
 
-	m_rtc->chip_reset();     // * Reset RTC to a defined state *
-
 	//  *********** HARD DISK CONTROLLERS...
 	address_space &io = m_i8088->space(AS_IO);
 	if (m_inp5->read() == 0x01) // ...PRESENT?
@@ -1528,27 +1528,20 @@ void rainbow_modelb_state::ext_ram_w(offs_t offset, uint8_t data)
 
 // Requires a short program from the Suitable Solutions ClikClok distribution disk (CLIKA.COM)
 // - also needed to set time/date (*).                   Reads $ed000, writes ed0fe/ed0ff.
-void rainbow_base_state::rtc_w(offs_t offset, uint8_t data)
+void rainbow_modela_state::rtc_w(offs_t offset, uint8_t data)
 {
 	if (m_inp11->read() == 0x01) // if enabled...
 	{
-		switch (offset)
+		if (m_rtc->ceo_r())
 		{
-		case 0x00: // Write to 0xED0FE
-			if (m_rtc->chip_enable())
-				m_rtc->write_data(offset & 0x01); // Transfer data to DS1315 (data = offset):
-			else
-				m_rtc->read_0(); // (RTC ACTIVATION) read magic pattern 0
-			break;
+			m_rtc->write(offset & 0x01);
 
-		case 0x01: // Write to 0xED0FF
-			if (m_rtc->chip_enable())
-				m_rtc->write_data(offset & 0x01); // Transfer data to DS1315 (data = offset):
-			else
-				m_rtc->read_1(); // (RTC ACTIVATION) read magic pattern 1
-			break;
+			return;
 		}
+
+		m_rtc->write(offset & 0x01);
 	}
+
 	m_p_vol_ram[offset] = data;  // Poke value into VOL_RAM.
 }
 
@@ -1561,10 +1554,10 @@ uint8_t rainbow_modela_state::rtc_r(offs_t offset)
 	{
 		if (offset == 0x00) // read time/date from 0xED000 (ClikClok for 100-A)
 		{
-			if (m_rtc->chip_enable())
-				return m_rtc->read_data() & 0x01;
+			if (m_rtc->ceo_r())
+				return m_rtc->read();
 			 else
-				m_rtc->chip_reset();
+				m_rtc->read();
 		}
 	}
 
@@ -1575,41 +1568,10 @@ uint8_t rainbow_modelb_state::rtc_r(offs_t offset)
 {
 	if (m_inp11->read() == 0x01) // if enabled...
 	{
-		switch (offset)
-		{
-		// Transfer data to DS1315 (data = offset):
-		case 0x0000:  // RTC_WRITE_DATA_0 0xFC000
-		case 0x2000:  // RTC_WRITE_DATA_0 0xFE000 (MIRROR)
-
-		case 0x0001:  // RTC_WRITE_DATA_1 0xFC001
-		case 0x2001:  // RTC_WRITE_DATA_1 0xFE001 (MIRROR)
-			m_rtc->write_data(offset & 0x01);
-			break;
-
-		// Read actual time/date from ClikClok:
-		case 0x0004:  // 0xFC004
-		case 0x2004:  // 0xFE004 (MIRROR)
-			if (m_rtc->chip_enable())
-				return (m_rtc->read_data() & 0x01);
-			[[fallthrough]]; // FIXME: really?
-		// (RTC ACTIVATION) read magic pattern 0
-		case 0x0100:  // 0xFC100
-		case 0x2100:  // 0xFE100 (MIRROR)
-			m_rtc->read_0();
-			break;
-
-		// (RTC ACTIVATION) read magic pattern 1
-		case 0x0101:  // 0xFC101
-		case 0x2101:  // 0xFE101 (MIRROR)
-			m_rtc->read_1();
-			break;
-
-		// RESET
-		case 0x0104:  // 0xFC104
-		case 0x2104:  // 0xFE104 (MIRROR)
-			m_rtc->chip_reset();
-			break;
-		}
+		if (m_rtc->ceo_r())
+			return m_rtc->read(offset);
+		else
+			m_rtc->read(offset);
 	}
 
 	uint8_t *rom = memregion("maincpu")->base();
@@ -3278,8 +3240,6 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 	HARDDISK(config, "harddisk3", "corvus_hdd");
 	HARDDISK(config, "harddisk4", "corvus_hdd");
 
-	DS1315(config, m_rtc, 0); // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
-
 	COM8116_003(config, m_dbrg, 24.0734_MHz_XTAL / 4); // 6.01835 MHz (nominally 6 MHz)
 	m_dbrg->fr_handler().set(FUNC(rainbow_base_state::dbrg_fr_w));
 	m_dbrg->ft_handler().set(FUNC(rainbow_base_state::dbrg_ft_w));
@@ -3330,6 +3290,8 @@ void rainbow_modela_state::rainbow_modela(machine_config &config)
 	m_i8088->set_addrmap(AS_IO, &rainbow_modela_state::rainbow8088_io);
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("64K,128K,192K,256K,320K,384K,448K,512K,576K,640K,704K,768K");
 	m_kbd8251->dtr_handler().set(FUNC(rainbow_modela_state::irq_hi_w));
+
+	DS1215(config, m_rtc); // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 }
 
 void rainbow_modelb_state::rainbow_modelb(machine_config &config)
@@ -3339,6 +3301,8 @@ void rainbow_modelb_state::rainbow_modelb(machine_config &config)
 	m_i8088->set_addrmap(AS_IO, &rainbow_modelb_state::rainbow8088_io);
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("128K,192K,256K,320K,384K,448K,512K,576K,640K,704K,768K,832K,896K");
 	m_kbd8251->dtr_handler().set(FUNC(rainbow_modelb_state::irq_hi_w));
+
+	DS1216E(config, m_rtc); // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 }
 
 //----------------------------------------------------------------------------------------

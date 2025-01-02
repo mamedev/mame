@@ -8,7 +8,7 @@
 
 #include "cpu/mips/mips1.h"
 
-#include "machine/ds1315.h"
+#include "machine/ds1215.h"
 #include "machine/mc68681.h"
 #include "machine/pit8253.h"
 #include "machine/wd33c9x.h"
@@ -52,7 +52,7 @@ protected:
 
 private:
 	required_device<mips1_device_base> m_cpu;
-	required_device<ds1315_device> m_rtc;
+	required_device<ds1215_device> m_rtc;
 	required_device<pit8254_device> m_pit;
 	required_device<wd33c9x_base_device> m_scsi;
 	required_device_array<scn2681_device, 3> m_duart;

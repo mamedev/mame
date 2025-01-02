@@ -168,7 +168,7 @@ void sgi_ip4_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &sgi_ip4_device::map);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
-	DS1315(config, m_rtc, 0); // DS1216?
+	DS1215(config, m_rtc); // DS1216B?
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // CXK5816PN-15L
 
@@ -511,10 +511,11 @@ u8 sgi_ip4_device::nvram_r(offs_t offset)
 {
 	if (offset == 0x7ff && !machine().side_effects_disabled())
 	{
-		if (m_rtc->chip_enable())
-			m_rtc->read_data();
+		// return SmartWatch data if /CEO is negated
+		if (m_rtc->ceo_r())
+			return m_rtc->read();
 		else
-			return m_rtc->read_data();
+			m_rtc->read();
 	}
 
 	return m_nvram[offset];
@@ -522,21 +523,12 @@ u8 sgi_ip4_device::nvram_r(offs_t offset)
 
 void sgi_ip4_device::nvram_w(offs_t offset, u8 data)
 {
-	if (offset != 0x7ff || !m_rtc->chip_enable())
+	// write to NVRAM if SmartWatch /CEO is asserted
+	if (offset != 0x7ff || !m_rtc->ceo_r())
 		m_nvram[offset] = data;
 
 	if (offset == 0x7ff)
-	{
-		if (!m_rtc->chip_enable())
-		{
-			if (data)
-				m_rtc->read_1();
-			else
-				m_rtc->read_0();
-		}
-		else
-			m_rtc->write_data(data);
-	}
+		m_rtc->write(data);
 }
 
 ROM_START(ip4)
