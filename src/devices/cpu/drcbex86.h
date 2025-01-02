@@ -58,7 +58,6 @@ private:
 			PTYPE_IMMEDIATE,                    // immediate; value = sign-extended to 64 bits
 			PTYPE_INT_REGISTER,                 // integer register; value = 0-REG_MAX
 			PTYPE_FLOAT_REGISTER,               // floating point register; value = 0-REG_MAX
-			PTYPE_VECTOR_REGISTER,              // vector register; value = 0-REG_MAX
 			PTYPE_MEMORY,                       // memory; value = pointer to memory
 			PTYPE_MAX
 		};
