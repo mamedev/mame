@@ -98,12 +98,14 @@
 #define LOG_SCSI (1U << 8)
 #define LOG_AST (1U << 9)
 
-#define VERBOSE (LOG_GENERAL|LOG_AST)
+#define VERBOSE (LOG_GENERAL|LOG_AST|LOG_INTERRUPT)
 
 #include "logmacro.h"
 
 namespace
 {
+    using namespace std::literals::string_view_literals;
+
     class news_iop_state : public driver_device
     {
     public:
@@ -147,23 +149,33 @@ namespace
         // machine config
         void common(machine_config &config);
 
-        // IRQ setup
+        // IOP IRQ setup
         enum iop_irq_number : unsigned
         {
-            CPIRQ_3_1 = 1,      // Expansion I/O bus and VME bus interrupts
-            SCSI = 2,           // SCSI interrupts
-            LANCE = 3,          // Ethernet controller interrupts
-            CPU = 4,            // Interprocessor communication interrupt (from CPU)
-            SCC = 5,            // Serial communication interrupts
-            TIMEOUT_FDCIRQ = 6, // IOP timeout and IRQ from FDC
-            FDCDRQ = 7,         // DRQ from FDC
-            SCC_PERIPHERAL = 99 // hack to differentiate SCC interrupts better
+            CPIRQ_3_1,      // Expansion I/O bus and VME bus interrupts
+            SCSI_IRQ,       // SCSI IRQ (unmaskable)
+            SCSI_DRQ,       // SCSI DRQ (maskable)
+            LANCE,          // Ethernet controller interrupts
+            CPU,            // Interprocessor communication interrupt (from CPU)
+            SCC,            // Serial communication interrupts
+            SCC_PERIPHERAL, // IRQ from kb/ms SCC
+            TIMEOUT,        // IOP timeout and IRQ from FDC
+            FDCIRQ,         // IRQ from FDC (uses same IRQ input as TIMEOUT)
+            FDCDRQ          // DRQ from FDC
         };
+        static constexpr std::array iop_irq_names = {"CPIRQ"sv, "SCSI_IRQ"sv, "SCSI_DRQ"sv, "LANCE"sv, "CPU"sv, "SCC"sv, "SCC_PERIPHERAL"sv, "TIMEOUT"sv, "FDCIRQ"sv, "FDCDRQ"sv};
+        static constexpr uint32_t nmi_mask = (1 << SCSI_IRQ) | (1 << SCC) | (1 << LANCE) | (1 << FDCIRQ) | (1 << FDCDRQ);
+        static const std::map<int, std::vector<iop_irq_number>> iop_irq_line_map;
 
         template <iop_irq_number Number>
         void iop_irq_w(int state);
+        template <iop_irq_number Number>
+        void iop_inten_w(uint8_t state);
+        template <iop_irq_number Number>
+        bool is_iop_irq_set();
         void int_check_iop();
 
+        // CPU IRQ setup
         enum cpu_irq_number : unsigned
         {
             AST = 1,     // Asynchronous System Trap interrupt
@@ -174,6 +186,7 @@ namespace
             TIMER = 6,   // 100Hz timer interrupt
             PERR = 7     // Parity error interrupt
         };
+        static constexpr std::array cpu_irq_names = {"ERROR"sv, "AST"sv, "CPIRQ1"sv, "IOPIRQ3"sv, "CPIRQ3"sv, "IOPIRQ5"sv, "TIMER"sv, "PERR"sv};
 
         template <cpu_irq_number Number>
         void cpu_irq_w(int state);
@@ -186,12 +199,9 @@ namespace
         // Platform hardware used by the IOP
         uint8_t iop_status_r();
         void iop_romdis_w(uint8_t data);
-        void timereni_w(uint8_t data);
         void min_w(uint8_t data);
         void motoron_w(uint8_t data);
-        void scsiinte_w(uint8_t data);
         void powoff_w(uint8_t data);
-        void iointen_w(uint8_t data);
         void cpureset_w(uint8_t data);
         uint8_t rtcreg_r();
         void rtcreg_w(uint8_t data);
@@ -244,19 +254,28 @@ namespace
 
         std::unique_ptr<u16[]> m_net_ram;
 
+        // IOP IRQ state
         uint8_t m_iop_intst = 0;
-        uint8_t m_iop_inten = 0;
+        uint8_t m_iop_inten = nmi_mask;
+        std::map<int, bool> m_iop_int_state = {
+            {CPIRQ_3_1, false},
+            {SCSI_IRQ, false},
+            {SCSI_DRQ, false},
+            {LANCE, false},
+            {CPU, false},
+            {SCC, false},
+            {TIMEOUT, false},
+            {FDCIRQ, false},
+            {FDCDRQ, false},
+            {SCC_PERIPHERAL, false} // TODO: is this right?
+        };
+
+        // CPU IRQ state
         uint8_t m_cpu_intst = 0;
         uint8_t m_cpu_inten = 0;
-        bool m_iop_int_state[8] = {false, false, false, false, false, false, false, false}; // 0 is unused
         bool m_cpu_int_state[8] = {false, false, false, false, false, false, false, false}; // 0 is unused
-        bool m_iop_timereni = false;
-        bool m_iop_timerout = false;
         bool m_cpu_timerenc = false;
         bool m_cpu_timerout = false;
-        bool m_scsi_intst = false;
-        bool m_scsi_inte = false;
-        bool m_blame_peripheral = false;
         bool m_ast = false;
         bool m_ast_latched = false;
         bool m_cpu_bus_error = false;
@@ -271,7 +290,17 @@ namespace
         uint8_t m_cpu_bus_error_status = 0;
         uint8_t m_rtc_data = 0;
 
-        static const int NET_RAM_SIZE = 8192; // 16K RAM, in 16-bit words
+        static constexpr int NET_RAM_SIZE = 8192; // 16K RAM, in 16-bit words
+    };
+
+    const std::map<int, std::vector<news_iop_state::iop_irq_number>> news_iop_state::iop_irq_line_map = {
+        {INPUT_LINE_IRQ1, {CPIRQ_3_1}},
+        {INPUT_LINE_IRQ2, {SCSI_IRQ, SCSI_DRQ}},
+        {INPUT_LINE_IRQ3, {LANCE}},
+        {INPUT_LINE_IRQ4, {CPU}},
+        {INPUT_LINE_IRQ5, {SCC, SCC_PERIPHERAL}},
+        {INPUT_LINE_IRQ6, {TIMEOUT, FDCIRQ}},
+        {INPUT_LINE_IRQ7, {FDCDRQ}}
     };
 
     void news_iop_state::machine_start()
@@ -296,8 +325,7 @@ namespace
         // generated elsewhere (or some other trickery is afoot) on the real system, so this needs more investigation in the future.
         // Math: 0x4e20 cycles * 500ns = 10ms period, 1 / 10ms = 100Hz
 
-        m_iop_timerout = (data > 0) && m_iop_timereni;
-        int_check_iop();
+        iop_irq_w<TIMEOUT>(data > 0);
 
         if (data > 0)
         {
@@ -323,7 +351,9 @@ namespace
         // 2: RI CHB
         // 1: DSR CHA
         // 0: RI CHA
-        const uint8_t status = ((m_scsi_intst ? 0x10 : 0) | ((m_iop_intst & (1 << 6)) ? 0x80 : 0));
+        
+        // TODO: this is SCSI IRQ, not DRQ, right?
+        const uint8_t status = (is_iop_irq_set<SCSI_IRQ>() ? 0x10 : 0) | (is_iop_irq_set<FDCIRQ>() ? 0x80 : 0);
         LOGMASKED(LOG_ALL_INTERRUPT, "Read IOPSTATUS = 0x%x\n", status);
         return status;
     }
@@ -343,17 +373,6 @@ namespace
         m_panel_shift_count = 0; // hack, clear state from init
     }
 
-    void news_iop_state::timereni_w(uint8_t data)
-    {
-        LOGMASKED(LOG_TIMER, "Write TIMERENI = 0x%x (%s)\n", data, machine().describe_context());
-        m_iop_timereni = data > 0;
-        if (!m_iop_timereni)
-        {
-            m_iop_timerout = false;
-        }
-        int_check_iop();
-    }
-
     void news_iop_state::min_w(uint8_t data)
     {
         constexpr int HD_RATE = 500000;
@@ -370,13 +389,6 @@ namespace
         m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? 1 : 0);
     }
 
-    void news_iop_state::scsiinte_w(uint8_t data)
-    {
-        LOGMASKED(LOG_INTERRUPT, "Write SCSIINTE = 0x%x (%s)\n", data, machine().describe_context());
-        m_scsi_inte = data > 0;
-        int_check_iop();
-    }
-
     void news_iop_state::powoff_w(uint8_t data)
     {
         LOG("Write POWOFF = 0x%x (%s)\n", data, machine().describe_context());
@@ -387,32 +399,10 @@ namespace
         }
     }
 
-    void news_iop_state::iointen_w(uint8_t data)
-    {
-        LOGMASKED(LOG_INTERRUPT, "%s Write IOINTEN = 0x%x\n", machine().describe_context(), data);
-        if (data)
-        {
-            m_iop_inten |= (1 << CPU);
-        }
-        else
-        {
-            m_iop_inten &= ~(1 << CPU);
-            m_iop_intst &= ~(1 << CPU);
-        }
-        int_check_iop();
-    }
-
     void news_iop_state::cpureset_w(uint8_t data)
     {
         LOG("Write CPURESET = 0x%x\n", data);
-        if (data > 0)
-        {
-            m_cpu->set_input_line(INPUT_LINE_HALT, 0);
-        }
-        else
-        {
-            m_cpu->set_input_line(INPUT_LINE_HALT, 1);
-        }
+        m_cpu->set_input_line(INPUT_LINE_HALT, data ? 0 : 1);
     }
 
     uint8_t news_iop_state::rtcreg_r()
@@ -517,9 +507,8 @@ namespace
     void news_iop_state::scsi_drq_handler(int status)
     {
         LOGMASKED(LOG_SCSI, "SCSI DRQ changed to 0x%x\n", status);
-        m_scsi_intst = status; // can be masked, unlike SCSI IRQ
         m_scsi_dma->drq_w(status);
-        int_check_iop();
+        iop_irq_w<SCSI_DRQ>(status);
     }
 
     void news_iop_state::machine_reset()
@@ -559,13 +548,13 @@ namespace
         // map(0x4c000100, 0x4c0001ff).lrw8(NAME([this](){ iop_bus_error(); return 0; }), NAME([this](uint8_t data){ iop_bus_error(); }));
 
         map(0x60000000, 0x60000000).r(FUNC(news_iop_state::iop_status_r));
-        map(0x40000000, 0x40000000).w(FUNC(news_iop_state::timereni_w));
+        map(0x40000000, 0x40000000).w(FUNC(news_iop_state::iop_inten_w<TIMEOUT>));
         map(0x40000001, 0x40000001).w(FUNC(news_iop_state::min_w));
         map(0x40000002, 0x40000002).w(FUNC(news_iop_state::motoron_w));
-        map(0x40000003, 0x40000003).w(FUNC(news_iop_state::scsiinte_w));
+        map(0x40000003, 0x40000003).w(FUNC(news_iop_state::iop_inten_w<SCSI_DRQ>));
         map(0x40000004, 0x40000004).w(FUNC(news_iop_state::iop_romdis_w));
         map(0x40000005, 0x40000005).w(FUNC(news_iop_state::powoff_w));
-        map(0x40000006, 0x40000006).w(FUNC(news_iop_state::iointen_w));
+        map(0x40000006, 0x40000006).w(FUNC(news_iop_state::iop_inten_w<CPU>));
         map(0x40000007, 0x40000007).w(FUNC(news_iop_state::cpureset_w));
 
         map(0x42000000, 0x42000003).rw(m_interval_timer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -728,26 +717,52 @@ namespace
     }
 
     template <news_iop_state::iop_irq_number Number>
+    bool news_iop_state::is_iop_irq_set()
+    {
+        return (m_iop_intst & (1 << Number)) > 0;
+    }
+
+    template <news_iop_state::iop_irq_number Number>
     void news_iop_state::iop_irq_w(int state)
     {
-        if (Number != TIMEOUT_FDCIRQ)
+        if (Number != TIMEOUT)
         {
-            LOGMASKED(LOG_INTERRUPT, "iop irq number %d state %d\n", Number, state);
-        }
-
-        int shift = Number == SCC_PERIPHERAL ? SCC : Number;
-        if (Number == SCC_PERIPHERAL)
-        {
-            m_blame_peripheral = state > 0;
+            LOGMASKED(LOG_INTERRUPT, "(%s) IOP IRQ %s %s\n", machine().describe_context(), iop_irq_names[Number], state ? "set" : "cleared");
         }
 
         if (state)
         {
-            m_iop_intst |= 1U << shift; // TODO: index from 0?
+            m_iop_intst |= 1U << Number;
         }
         else
         {
-            m_iop_intst &= ~(1U << shift);
+            m_iop_intst &= ~(1U << Number);
+        }
+
+        int_check_iop();
+    }
+
+    template <news_iop_state::iop_irq_number Number>
+    void news_iop_state::iop_inten_w(uint8_t state)
+    {
+        if ((1 << Number) & nmi_mask)
+        {
+            fatalerror("news_iop_state: tried to disable non-maskable interrupt %s!", iop_irq_names[Number]);
+        }
+
+        if (Number != TIMEOUT)
+        {
+            LOGMASKED(LOG_INTERRUPT, "(%s) IOP IRQ %s %s\n", machine().describe_context(), iop_irq_names[Number], state ? "enabled" : "disabled");
+        }
+
+        if (state)
+        {
+            m_iop_inten |= (1 << Number);
+        }
+        else
+        {
+            m_iop_inten &= ~(1 << Number);
+            m_iop_intst &= ~(1 << Number); // TODO: does this actually clear in all cases?
         }
 
         int_check_iop();
@@ -755,39 +770,26 @@ namespace
 
     void news_iop_state::int_check_iop()
     {
-        // TODO: make this not jank
-        static const int interrupt_map[] = {INPUT_LINE_IRQ0, INPUT_LINE_IRQ1, INPUT_LINE_IRQ2, INPUT_LINE_IRQ3, INPUT_LINE_IRQ4, INPUT_LINE_IRQ5, INPUT_LINE_IRQ6, INPUT_LINE_IRQ7};
-        int active_irq = m_iop_intst & (m_iop_inten | (1 << SCSI) | (1 << SCC) | (1 << LANCE) | (1 << TIMEOUT_FDCIRQ) | (1 << FDCDRQ));
-
-        if (m_scsi_intst && m_scsi_inte)
-        {
-            active_irq |= (1 << SCSI);
-        }
-
-        for (int i = 1; i <= 7; i++)
-        {
-            bool state = active_irq & (1 << i);
-
-            if (m_iop_int_state[i] != state)
+       int active_irq = m_iop_intst & m_iop_inten;
+       for (auto irq : iop_irq_line_map)
+       {
+            // Calculate state of input pin (logical OR of all attached inputs)
+            bool state = false;
+            for (auto irq_input : irq.second)
             {
-                if (i != 6)
-                {
-                    LOGMASKED(LOG_INTERRUPT, "Setting IOP input line %d to %d (%d)\n", interrupt_map[i], state ? 1 : 0, i);
-                }
-                m_iop_int_state[i] = state;
-                m_iop->set_input_line(interrupt_map[i], state ? 1 : 0);
+                state |= active_irq & (1 << irq_input);
             }
-        }
 
-        if ((m_iop_timereni && m_iop_timerout) || (m_iop_intst & (1 << TIMEOUT_FDCIRQ))) // bad hack for now
-        {
-            m_iop->set_input_line(INPUT_LINE_IRQ6, 1);
-        }
-        else
-        {
-            m_iop->set_input_line(INPUT_LINE_IRQ6, 0);
-            m_iop_timerout = false; // just in case
-        }
+            // Update input pin status if it has changed
+            if (m_iop_int_state[irq.first] != state) {
+                if (irq.first != INPUT_LINE_IRQ6)
+                {
+                    LOGMASKED(LOG_INTERRUPT, "Setting IOP input line %d to %d\n", irq.first, state ? 1 : 0);
+                }
+                m_iop_int_state[irq.first] = state;
+                m_iop->set_input_line(irq.first, state ? 1 : 0);
+            }
+       }
     }
 
     template <news_iop_state::cpu_irq_number Number>
@@ -1001,8 +1003,8 @@ namespace
                              { COMBINE_DATA(&m_net_ram[(offset >> 1) & 0x1fff]); });
 
         // uPD7265 FDC (Compatible with 765A except it should use Sony/ECMA format by default?)
-        UPD765A(config, m_fdc, 4'000'000); // TODO: clock rate
-        m_fdc->intrq_wr_callback().set(FUNC(news_iop_state::iop_irq_w<TIMEOUT_FDCIRQ>));
+        UPD765A(config, m_fdc, 4'000'000); // TODO: confirm clock rate
+        m_fdc->intrq_wr_callback().set(FUNC(news_iop_state::iop_irq_w<FDCIRQ>));
         m_fdc->drq_wr_callback().set(FUNC(news_iop_state::iop_irq_w<FDCDRQ>));
         FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
@@ -1043,7 +1045,7 @@ namespace
         m_scsi_dma->scsi_dma_write_callback().set(m_scsi, FUNC(ncr53c80_device::dma_w));
         m_scsi_dma->iop_halt_callback().set_inputline(m_iop, INPUT_LINE_HALT);
         m_scsi_dma->bus_error_callback().set(FUNC(news_iop_state::iop_bus_error));
-        m_scsi_dma->irq_out_callback().set(FUNC(news_iop_state::iop_irq_w<SCSI>));
+        m_scsi_dma->irq_out_callback().set(FUNC(news_iop_state::iop_irq_w<SCSI_IRQ>));
 
         // Epson RTC-58321B
         RTC58321(config, m_rtc, 32.768_kHz_XTAL);
@@ -1070,17 +1072,14 @@ namespace
         map(0xfffffffb, 0xfffffffb).lr8(NAME([this]()
                                              {
                                                 uint8_t vector = m68000_base_device::autovector(5);
-                                                if (m_iop_intst & (1 << SCC))
+                                                // TODO: serial port vs peripheral SCC vector priority?
+                                                if (is_iop_irq_set<SCC>())
                                                 {
-                                                    // find the scc to blame
-                                                    if(m_blame_peripheral)
-                                                    {
-                                                        vector = m_scc_peripheral->m1_r();
-                                                    }
-                                                    else
-                                                    {
-                                                        vector = m_scc_external->m1_r();
-                                                    }
+                                                    vector = m_scc_external->m1_r();
+                                                }
+                                                else if (is_iop_irq_set<SCC_PERIPHERAL>())
+                                                {
+                                                    vector = m_scc_peripheral->m1_r();
                                                 }
                                                 return vector;
                                              }));
