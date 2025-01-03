@@ -1257,7 +1257,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tak_wdg )
 	PORT_INCLUDE(xavix)
 
-	// there is unemulated IR connectivity with other devices that isn't emulated, might rely on some of the unused bits here
+	// there is unemulated IR(maybe, uncertain) connectivity with other devices that isn't emulated, might rely on some of the unused bits here
+	// could also just be that the other robots change the state of another port somewhere in order to be detected
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) // shoot (robot form) / whistle (train form)
@@ -2899,7 +2900,7 @@ CONS( 2005, has_wamg,  0,          0,  xavix_4mb,        has_wamg, xavix_state, 
 // GEIGEKI ゴーゴーシューティング
 CONS( 2002, tak_geig,  0,          0,  xavix_4mb_nv,     tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
 
-// some unemulated IR connectivity features to add other robots into the game
+// some unemulated connectivity features to add other robots into the game
 CONS( 2001, tak_wdg,   0,          0,  xavix_2mb_nv,     tak_wdg,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Webdiver Gladion W-05 DX (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // TVホッケー
