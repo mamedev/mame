@@ -99,9 +99,10 @@ void ripple_ide_device::device_start()
 	save_item(NAME(m_flash_bank));
 }
 
-void ripple_ide_device::device_reset()
+void ripple_ide_device::busrst_w(int state)
 {
-	m_flash_bank = 0;
+	if (state == 0)
+		m_flash_bank = 0;
 }
 
 void ripple_ide_device::bank_select_w(offs_t offset, uint16_t data, uint16_t mem_mask)

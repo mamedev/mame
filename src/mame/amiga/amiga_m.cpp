@@ -175,8 +175,11 @@ void amiga_state::machine_start()
 
 void amiga_state::m68k_reset(int state)
 {
-	logerror("%s: Executed RESET\n", machine().describe_context());
-	machine_reset();
+	if (state)
+	{
+		logerror("%s: Executed RESET\n", machine().describe_context());
+		machine_reset();
+	}
 }
 
 void amiga_state::machine_reset()
