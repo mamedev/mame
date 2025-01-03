@@ -20,7 +20,6 @@ using namespace uml;
 
 using namespace asmjit;
 
-
 const uint32_t PTYPE_M   = 1 << parameter::PTYPE_MEMORY;
 const uint32_t PTYPE_I   = 1 << parameter::PTYPE_IMMEDIATE;
 const uint32_t PTYPE_R   = 1 << parameter::PTYPE_INT_REGISTER;
@@ -957,6 +956,8 @@ void drcbe_arm64::reset()
 	emit_ldr_mem(a, FLAGS_REG.w(), &m_near.emulated_flags);
 	a.mov(SCRATCH_REG1, a64::sp);
 	emit_str_mem(a, SCRATCH_REG1, &m_near.stackpointer);
+	emit_str_mem(a, a64::wzr, &m_near.calldepth);
+	emit_str_mem(a, a64::xzr, &m_near.hashstacksave);
 
 	a.emitArgsAssignment(frame, args);
 
@@ -1212,10 +1213,7 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 	const parameter &exp = inst.param(2);
 	assert(exp.is_code_handle());
 
-	Label lab = a.newLabel();
-	a.bind(lab);
-	a.adr(SCRATCH_REG1, lab);
-	emit_str_mem(a, SCRATCH_REG1, &m_near.hashstacksave);
+	emit_str_mem(a, a64::wzr, &m_near.calldepth);
 
 	if (modep.is_immediate() && m_hash.is_mode_populated(modep.immediate()))
 	{
@@ -1297,6 +1295,13 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 
 	call_arm(a, TEMP_REG1);
 
+	Label lab = a.newLabel();
+	a.bind(lab);
+	a.adr(SCRATCH_REG1, lab);
+	emit_str_mem(a, SCRATCH_REG1, &m_near.hashstacksave);
+	a.mov(SCRATCH_REG1, 1);
+	emit_str_mem(a, SCRATCH_REG1.w(), &m_near.calldepth);
+
 	mov_mem_param(a, 4, &m_state.exp, pcp);
 
 	const drccodeptr *targetptr = exp.handle().codeptr_addr();
@@ -1348,11 +1353,6 @@ void drcbe_arm64::op_exh(a64::Assembler &a, const uml::instruction &inst)
 	assert(handp.is_code_handle());
 	be_parameter exp(*this, inst.param(1), PTYPE_MRI);
 
-	Label lab = a.newLabel();
-	a.bind(lab);
-	a.adr(SCRATCH_REG1, lab);
-	emit_str_mem(a, SCRATCH_REG1, &m_near.hashstacksave);
-
 	// perform the exception processing
 	Label no_exception = a.newLabel();
 	if (inst.condition() != uml::COND_ALWAYS)
@@ -1365,6 +1365,15 @@ void drcbe_arm64::op_exh(a64::Assembler &a, const uml::instruction &inst)
 		else
 			a.b(ARM_NOT_CONDITION(a, inst.condition()), no_exception);
 	}
+
+	Label lab = a.newLabel();
+	emit_ldr_mem(a, SCRATCH_REG1.w(), &m_near.calldepth);
+	a.cbnz(SCRATCH_REG1, lab);
+	a.adr(SCRATCH_REG2, lab);
+	emit_str_mem(a, SCRATCH_REG2, &m_near.hashstacksave);
+	a.add(SCRATCH_REG1, SCRATCH_REG1, 1);
+	emit_str_mem(a, SCRATCH_REG1.w(), &m_near.calldepth);
+	a.bind(lab);
 
 	mov_mem_param(a, 4, &m_state.exp, exp);
 
@@ -1392,11 +1401,6 @@ void drcbe_arm64::op_callh(a64::Assembler &a, const uml::instruction &inst)
 	const parameter &handp = inst.param(0);
 	assert(handp.is_code_handle());
 
-	Label lab = a.newLabel();
-	a.bind(lab);
-	a.adr(SCRATCH_REG1, lab);
-	emit_str_mem(a, SCRATCH_REG1, &m_near.hashstacksave);
-
 	Label skip = a.newLabel();
 	if (inst.condition() != uml::COND_ALWAYS)
 	{
@@ -1408,6 +1412,15 @@ void drcbe_arm64::op_callh(a64::Assembler &a, const uml::instruction &inst)
 		else
 			a.b(ARM_NOT_CONDITION(a, inst.condition()), skip);
 	}
+
+	Label lab = a.newLabel();
+	emit_ldr_mem(a, SCRATCH_REG1.w(), &m_near.calldepth);
+	a.cbnz(SCRATCH_REG1, lab);
+	a.adr(SCRATCH_REG2, lab);
+	emit_str_mem(a, SCRATCH_REG2, &m_near.hashstacksave);
+	a.add(SCRATCH_REG1, SCRATCH_REG1, 1);
+	emit_str_mem(a, SCRATCH_REG1.w(), &m_near.calldepth);
+	a.bind(lab);
 
 	const drccodeptr *targetptr = handp.handle().codeptr_addr();
 	if (targetptr != nullptr && handp.handle().codeptr() != nullptr)
@@ -1442,6 +1455,13 @@ void drcbe_arm64::op_ret(a64::Assembler &a, const uml::instruction &inst)
 		else
 			a.b(ARM_NOT_CONDITION(a, inst.condition()), skip);
 	}
+
+	Label lab = a.newLabel();
+	emit_ldr_mem(a, SCRATCH_REG1.w(), &m_near.calldepth);
+	a.cbz(SCRATCH_REG1, lab);
+	a.sub(SCRATCH_REG1, SCRATCH_REG1, 1);
+	emit_str_mem(a, SCRATCH_REG1.w(), &m_near.calldepth);
+	a.bind(lab);
 
 	a.ret(a64::x30);
 

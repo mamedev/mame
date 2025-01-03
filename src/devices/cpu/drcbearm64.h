@@ -242,6 +242,7 @@ private:
 
 		uint32_t emulated_flags;
 		uint64_t stackpointer;
+		uint32_t calldepth;
 	};
 	near_state &m_near;
 
