@@ -1262,7 +1262,7 @@ static INPUT_PORTS_START( tak_wdg )
 
 	// test mode code suggesting IR is at 0eb771 (part of it requires opposing directions to be held as this is not a joystick)
 
-	// To access test moe (do this on a fresh boot, not after an F3 reset):
+	// To access test mode (do this on a fresh boot, not after an F3 reset or it will hang after the red screen):
 	// first it checks bits 0x01 in port IN1 and expects them to be 0 (this doesn't seem to be connected to anything normally?)
 	// then reads port IN0, masks with 0xf7 and expects only LEFT & RIGHT to he held together
 
