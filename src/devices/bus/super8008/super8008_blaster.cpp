@@ -38,14 +38,22 @@ public:
 	
 	
 protected:
-	//I did not see another way to get the S0, S1 and S2 so we know when the PC has been halted?
-	//I am including the enums from the 8008 here so that I'm able to access the HALT signal.
+
+	// I did not see another way to get the S0, S1 and S2 pins from the 8008.
+	// These pins are used to identify the CPUs running states such as stopped.
+	//
+	// In the blaster pld, this state is the "running" output pin which goes to
+	// the set of ext_run jumpers and then on to the bus.
+	//
+	// I am including the enums from the 8008 here so that I'm able to access
+	// the stopped signal.
+
 	enum
 	{
 		I8008_PC,
 		I8008_A,I8008_B,I8008_C,I8008_D,I8008_E,I8008_H,I8008_L,
 		I8008_ADDR1,I8008_ADDR2,I8008_ADDR3,I8008_ADDR4,I8008_ADDR5,I8008_ADDR6,I8008_ADDR7,I8008_ADDR8,
-		I8008_HALT
+		I8008_STOPPED
 	};
 
 	// device-level overrides
@@ -68,7 +76,6 @@ protected:
 	void blaster_mem(address_map &map);
 	void blaster_io(address_map &map);
 
-	//TODO rename this
 	int handle_irq(device_t &device, int data);
 
 private:
@@ -82,8 +89,9 @@ private:
 	required_ioport m_ext_req;
 	required_ioport m_ext_int;
 
-	//TODO(jhe) I'm not sure how to dynamically bind these based on the jumpers.  I'm binding all of them
-	//          for now and setting values based on the TAKE jumper.
+	//TODO(jhe) I'm not sure how to dynamically bind these based on the
+	//jumpers.  I'm binding all of them for now and setting values based on the
+	//TAKE jumper.
 	output_finder<8, 8> m_leds;
 
 	
@@ -129,14 +137,16 @@ void super8008_blaster_device::device_post_load()
 }
 
 
-//The /Take signal controls which buffer on blaster has access to the 16kb of ram.
-//If an internal read happens, while blaster is taken, the local 8008 will get back 0 since the 
-//data lines will be tied low.  This will HALT the internal CPU.
+//The /Take signal controls which buffer on blaster has access to the 16kb of
+//ram.  If an internal read happens, while blaster is taken, the local 8008
+//will get back 0 since the data lines will be tied low.  This will HALT the
+//internal CPU.
+
 uint8_t super8008_blaster_device::blaster_memory_read(offs_t offset)
 {
 #if 1
 	int jumper = m_ext_take->read();
-	if (BIT(take_state, jumper)){
+	if (BIT(take_state, jumper) && 0 <= offset && offset < m_ram->size()){
 		uint8_t data = m_ram->pointer()[offset];
 		return data;
 	} else {
@@ -153,7 +163,7 @@ void super8008_blaster_device::blaster_memory_write(offs_t offset, uint8_t data)
 {
 	int jumper = m_ext_take->read();
 	//Only allow writes when the correct buffer is activated.
-	if (BIT(take_state, jumper)){
+	if (BIT(take_state, jumper) && 0 <= offset && offset < m_ram->size()){
 		m_ram->pointer()[offset] = data;
 	}
 }
@@ -243,7 +253,10 @@ void super8008_blaster_device::ext_write(offs_t offset, uint8_t data)
 		
 	if (!BIT(take_state, jumper) || !BIT(take_state, 7))
 	{
-		m_ram->pointer()[offset] = data;
+		if (0 <= offset && offset < m_ram->size())
+		{
+			m_ram->pointer()[offset] = data;
+		}
 	}
 }
 
@@ -251,7 +264,7 @@ uint8_t super8008_blaster_device::ext_read(offs_t offset)
 {
 	int jumper = m_ext_take->read();
 	//Selected when the ext_take line is low
-	if (!BIT(take_state, jumper))
+	if (!BIT(take_state, jumper) && 0 <= offset && offset < m_ram->size())
 	{
 		return m_ram->pointer()[offset];
 	}
@@ -291,8 +304,9 @@ void super8008_blaster_device::serial_leds(uint8_t data)
 
 uint8_t super8008_blaster_device::ext_run()
 {
+	//This is shifted by the ext_run jumper 
 	int id = m_ext_run->read();
-	return m_maincpu->state_int(I8008_HALT) << id;
+	return m_maincpu->state_int(I8008_STOPPED) << id;
 }
 
 void super8008_blaster_device::blaster_io(address_map &map)
@@ -302,10 +316,10 @@ void super8008_blaster_device::blaster_io(address_map &map)
 	// serial I/O at 2400 bps N-8-1
 	//
 	// INPORT      equ 0           ; serial input port address
-    // OUTPORT     equ 08H         ; serial output port address
-    //
+	// OUTPORT     equ 08H         ; serial output port address
+	//
 	// out 10                      ; clear the EPROM bank switch address outputs A13 and A14
-    // out 09                      ; turn off orange LEDs      
+	// out 09                      ; turn off orange LEDs      
 	// out 08                      ; set serial output high (mark)
 	// in 1                        ; reset the bootstrap flip-flop internal to GAL22V10 #2
 

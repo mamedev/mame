@@ -184,18 +184,25 @@ uint8_t super8008_state::memory_read(offs_t offset)
 	}
 	else if (!mmap_info.ext_cs)
 	{
-		log_mmap_info(machine().describe_context(), "ext_cs read", offset, &mmap_info);
+		//log_mmap_info(machine().describe_context(), "ext_cs read", offset, &mmap_info);
 		return m_bus->ext_read(mmap_info.address);
 	}
 	else
 	{
-		if (!mmap_info.rom_cs)
+		if (!mmap_info.rom_cs && 0 <= mmap_info.address && mmap_info.address < m_ram->size())
 		{
 			return ((uint8_t*)m_rom->base())[mmap_info.address];
 		}
 		else
 		{
-			return m_ram->pointer()[mmap_info.address];
+			if (0 <= mmap_info.address && mmap_info.address < m_ram->size())
+			{
+				return m_ram->pointer()[mmap_info.address];
+			}
+			else
+			{
+				return 0;
+			}
 		}
 	}
 }
@@ -232,18 +239,21 @@ void super8008_state::memory_write(offs_t offset, uint8_t data)
 		log_mmap_info(machine().describe_context(), "ERROR writing to ROM", offset, &mmap_info);
 	}
 	else if (!mmap_info.ext_cs){ //Do I need to check the rom_cs here? External is always ram.
-		log_mmap_info(machine().describe_context(), "ext_cs write", offset, &mmap_info);
+		//log_mmap_info(machine().describe_context(), "ext_cs write", offset, &mmap_info);
 		m_bus->ext_write(mmap_info.address, data);
 		
 		//TAKEW logic
-		if (!BIT(take_state, 7))
+		if (!BIT(take_state, 7) && 0 <= mmap_info.address && mmap_info.address < m_ram->size())
 		{ 
 			m_ram->pointer()[mmap_info.address] = data; 
 		}
 	}
 	else
 	{
-		m_ram->pointer()[mmap_info.address] = data; 
+		if (0 <= mmap_info.address && mmap_info.address < m_ram->size())
+		{
+			m_ram->pointer()[mmap_info.address] = data; 
+		}
 	}
 }
 
@@ -259,7 +269,6 @@ void super8008_state::memory_write(offs_t offset, uint8_t data)
 uint8_t super8008_state::port_1_read()
 {
 	start = false;//This is required!
-	logerror("master port 1 read start %d\n", start);
 	return m_bus->ext_run();
 }
 
@@ -315,7 +324,7 @@ void super8008_state::memory_mapper_w(offs_t offset, uint8_t data)
 {
 	uint8_t index = offset & MMAP_MASK;
 	mmap[index] = data & 0xff;
-	logerror("super-8008 memory mapper write ($%04X) masked ($%04X) data %04X \n", offset, index, mmap[index]);
+	//logerror("super-8008 memory mapper write ($%04X) masked ($%04X) data %04X \n", offset, index, mmap[index]);
 }
 
 void super8008_state::super8008_mem(address_map &map)
@@ -463,25 +472,11 @@ void super8008_state::super8008(machine_config &config)
 
 }
 
-// These are the ROM files from Jim Loos's github page
-//
-// The combinded eprom is not used since we can load the monitor and basic to different areas using the mapper.
-//
-// 067c016c
-// a9b87bc2322404ecbb97842a4fc74c07c9b5535f  eprom.bin
-//
-// 0f3aa663
-// 27679a370b45050b504a2c8f640d20e39afd78d6  monitor.bin
-//
-// 3d25b65a
-// e1db1ba610ed0103d142f889a1995a5d95883c79  scelbal-in-eprom.bin
-
 ROM_START(super8008)
 	ROM_REGION(0x10000, "rom",0) //For the addresses to makes since, setup a huge rom chip and load the roms to the cooresponding machine addresses	
-	//         Name                   offset  Length   hash
-	//TODO(JHE) do I need to pad the rom out to 8k?
-	ROM_LOAD("monitor-8251-master.bin",          0x0000, 0x14b7, CRC(eca59d83) SHA1(b6056657088973792fc926faa71680c7359f26d6))
-	ROM_LOAD("scelbal-8251-master.bin", 0x2000, 0x2000, CRC(3588716d) SHA1(b1360494111eb8a59e560cea339709cc3bff2c5b))
+	//         Name                     offset  Length   hash
+	ROM_LOAD("monitor-8251-master.bin", 0x0000, 0x14b5, CRC(8cfd849e) SHA1(ea40b0066823df6c1dd896e5425285dddd3432e3))
+	ROM_LOAD("scelbal-8251-master.bin", 0x2000, 0x2000, CRC(51f98937) SHA1(83705305c24313cd81e14d1e3cefb3422a9e8118))
 ROM_END
 
 } // anonymous namespace

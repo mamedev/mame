@@ -109,7 +109,7 @@ uint8_t sbc8008_state::memory_read(offs_t offset)
 	{			
 		return ((uint8_t*)m_rom_bank->base())[offset];
 	} 
-	else if (offset < m_ram->size())
+	else if (0 <= offset && offset < m_ram->size())
 	{
 		return m_ram->pointer()[offset];
 	} 
@@ -123,7 +123,7 @@ uint8_t sbc8008_state::memory_read(offs_t offset)
 
 void sbc8008_state::memory_write(offs_t offset, uint8_t data)
 {
-	if (offset < m_ram->size())
+	if (0 <= offset && offset < m_ram->size())
 	{
 		 m_ram->pointer()[offset] = data;
 	}
