@@ -572,7 +572,8 @@ namespace
                                             }
                                           }, "extio_w").mirror(0x1f000000);
 
-        // map(0x4c000100, 0x4c0001ff).lrw8(NAME([this](){ iop_bus_error(); return 0; }), NAME([this](uint8_t data){ iop_bus_error(); }));
+        // Expansion slot SCC (bus errors here kill iopboot, so the probe process may not use bus errors, at least not with the same setup as extio)
+        map(0x4c000100, 0x4c0001ff).noprw();
 
         map(0x60000000, 0x60000000).r(FUNC(news_iop_state::iop_status_r));
         map(0x40000000, 0x40000000).w(FUNC(news_iop_state::iop_inten_w<TIMEOUT>));
