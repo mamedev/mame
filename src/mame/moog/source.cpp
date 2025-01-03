@@ -53,7 +53,7 @@ TODO:
 #define LOG_KEYBOARD            (1U << 4)
 #define LOG_CV_KEYBOARD_APPROX  (1U << 5)
 
-#define VERBOSE (LOG_GENERAL|LOG_CV)
+#define VERBOSE (LOG_GENERAL | LOG_CV)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
@@ -66,7 +66,7 @@ constexpr const char NVRAM_TAG[] = "nvram";
 class source_state : public driver_device
 {
 public:
-	source_state(const machine_config &mconfig, device_type type, const char* tag) ATTR_COLD
+	source_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
 		, m_octave_io(*this, "octave_buttons")
@@ -112,13 +112,13 @@ private:
 
 	float get_keyboard_v() const;
 	u8 keyboard_r();
-	u8 buttons_r(const required_ioport_array<6>& button_io, const char* name) const;
+	u8 buttons_r(const required_ioport_array<6> &button_io, const char *name) const;
 	u8 buttons_a_r();
 	u8 buttons_b_r();
 	u8 encoder_r();
 
-	void memory_map(address_map& map) ATTR_COLD;
-	void io_map(address_map& map) ATTR_COLD;
+	void memory_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_ioport m_octave_io;
@@ -481,7 +481,7 @@ u8 source_state::keyboard_r()
 }
 
 u8 source_state::buttons_r(
-	const required_ioport_array<6>& button_io, const char* name) const
+	const required_ioport_array<6> &button_io, const char *name) const
 {
 	// Button presses are active low, but the result is inverted by a CD4502.
 	// So they look active high to the firmware.
@@ -526,7 +526,7 @@ u8 source_state::encoder_r()
 	return m_encoder_incr ? 1 : 0;
 }
 
-void source_state::memory_map(address_map& map)
+void source_state::memory_map(address_map &map)
 {
 	// Address decoding done through U26, 74LS138, E1=E2=0, E3=1,
 	// A0-A2 = Z80 A13-A15.
@@ -576,7 +576,7 @@ void source_state::memory_map(address_map& map)
 	map(0xe000, 0xe000).mirror(0x1fff).r(FUNC(source_state::encoder_r));
 }
 
-void source_state::io_map(address_map& map)
+void source_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x1f).mirror(0xe0).w(FUNC(source_state::cv_w));
@@ -607,7 +607,7 @@ void source_state::machine_reset()
 	update_octave_leds();
 }
 
-void source_state::source(machine_config& config)
+void source_state::source(machine_config &config)
 {
 	// /M1, /RFSH not Connected.
 	// /HALT, /NMI pulled up to 5V, with no other connection.
