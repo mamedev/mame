@@ -4081,7 +4081,7 @@ void gorgon_state::render_run(screen_device &screen, bitmap_rgb32 &bitmap)
 	{
 		bool y_lowres = !BIT(m_c435.spritedata[0], 2);
 		s16 deltax = (s16)((s16)m_c435.spritedata[6] + (s16)m_c435.spritedata[10] + 0x50);
-		s16 deltay = (s16)((s16)m_c435.spritedata[12] + (0x2a >> y_lowres));
+		s16 deltay = (s16)((s16)m_c435.spritedata[12] + (0x2a >> (y_lowres ? 1 : 0)));
 		u16 base = m_c435.spritedata[2];
 		u16 sprite_count = (m_c435.spritedata[4] - base) + 1;
 		for (int i = 0; i < sprite_count; i++)

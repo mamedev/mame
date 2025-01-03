@@ -2934,11 +2934,11 @@ void nes_bmc_f600_device::write_l(offs_t offset, u8 data)
 		m_reg = offset;
 
 		m_prg_base = (m_reg & 0x38) << 1;
-		m_prg_mask = 0x1f >> BIT(m_reg, 5);
+		m_prg_mask = 0x1f >> (BIT(m_reg, 5) ? 1 : 0);
 		set_prg(m_prg_base, m_prg_mask);
 
 		m_chr_base = (m_reg & 0x07) << 7;
-		m_chr_mask = 0xff >> !BIT(m_reg, 2);
+		m_chr_mask = 0xff >> (BIT(m_reg, 2) ? 0 : 1);
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 	}
 }
@@ -3332,7 +3332,7 @@ void nes_bmc_810305c_device::write_h(offs_t offset, u8 data)
 		m_outer = BIT(offset, 13, 2);
 
 		m_prg_base = m_outer << 5;
-		m_prg_mask = 0x1f >> (m_outer == 2);
+		m_prg_mask = 0x1f >> ((m_outer == 2) ? 1 : 0);
 		set_prg(m_prg_base, m_prg_mask);
 
 		m_chr_base = m_outer << 7;
