@@ -473,9 +473,9 @@ void drcbe_arm64::emit_float_str_mem(a64::Assembler &a, const a64::Vec &reg, con
 void drcbe_arm64::mov_reg_param(a64::Assembler &a, uint32_t regsize, const a64::Gp &dst, const be_parameter &src) const
 {
 	if (src.is_immediate())
-		get_imm_relative(a, dst.x(), src.immediate());
+		get_imm_relative(a, select_register(dst, regsize), src.immediate());
 	else if (src.is_int_register() && dst.id() != src.ireg())
-		a.mov(dst.x(), src.get_register_int(8));
+		a.mov(select_register(dst, regsize), src.get_register_int(regsize));
 	else if (src.is_memory())
 		emit_ldr_mem(a, select_register(dst, regsize), src.memory());
 }
@@ -2349,7 +2349,7 @@ void drcbe_arm64::op_sext(a64::Assembler &a, const uml::instruction &inst)
 	assert(sizep.is_size());
 	const auto size = sizep.size();
 
-	const a64::Gp dstreg = dstp.select_register(TEMP_REG2, 8);
+	const a64::Gp dstreg = dstp.select_register(TEMP_REG2, inst.size());
 
 	if ((1 << size) >= inst.size())
 	{
@@ -2662,8 +2662,8 @@ void drcbe_arm64::op_mulu(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src2p(*this, inst.param(3), PTYPE_MRI);
 	const bool compute_hi = (dstp != edstp);
 
-	const a64::Gp src1 = src1p.select_register(TEMP_REG1, 8);
-	const a64::Gp src2 = src2p.select_register(TEMP_REG2, 8);
+	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+	const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 	const a64::Gp lo = TEMP_REG3;
 	const a64::Gp hi = TEMP_REG2;
 
@@ -2677,11 +2677,16 @@ void drcbe_arm64::op_mulu(a64::Assembler &a, const uml::instruction &inst)
 		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
 
-		a.mul(lo, src1, src2);
 		if (inst.size() == 8)
+		{
+			a.mul(lo, src1, src2);
 			a.umulh(hi, src1, src2);
+		}
 		else
+		{
+			a.umull(lo, src1, src2);
 			a.lsr(hi, lo, 32);
+		}
 	}
 
 	mov_param_reg(a, inst.size(), dstp, lo);
@@ -2720,8 +2725,8 @@ void drcbe_arm64::op_mululw(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	const a64::Gp src1 = src1p.select_register(TEMP_REG1, 8);
-	const a64::Gp src2 = src2p.select_register(TEMP_REG2, 8);
+	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+	const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 	const a64::Gp lo = TEMP_REG3;
 	const a64::Gp hi = TEMP_REG2;
 
@@ -2735,11 +2740,16 @@ void drcbe_arm64::op_mululw(a64::Assembler &a, const uml::instruction &inst)
 		mov_reg_param(a, inst.size(), src1, src1p);
 		mov_reg_param(a, inst.size(), src2, src2p);
 
-		a.mul(lo, src1, src2);
 		if (inst.size() == 8)
+		{
+			a.mul(lo, src1, src2);
 			a.umulh(hi, src1, src2);
+		}
 		else
+		{
+			a.umull(lo, src1, src2);
 			a.lsr(hi, lo, 32);
+		}
 	}
 
 	mov_param_reg(a, inst.size(), dstp, lo);
@@ -2748,7 +2758,7 @@ void drcbe_arm64::op_mululw(a64::Assembler &a, const uml::instruction &inst)
 	{
 		a.mrs(TEMP_REG1, a64::Predicate::SysReg::kNZCV);
 
-		a.tst(lo, lo);
+		a.tst(select_register(lo, inst.size()), select_register(lo, inst.size()));
 		a.cset(SCRATCH_REG1, a64::CondCode::kEQ);
 		a.bfi(TEMP_REG1, SCRATCH_REG1, 30, 1); // zero flag
 
@@ -2775,8 +2785,8 @@ void drcbe_arm64::op_muls(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src2p(*this, inst.param(3), PTYPE_MRI);
 	const bool compute_hi = (dstp != edstp);
 
-	const a64::Gp src1 = src1p.select_register(TEMP_REG1, 8);
-	const a64::Gp src2 = src2p.select_register(TEMP_REG2, 8);
+	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+	const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 	const a64::Gp lo = TEMP_REG3;
 	const a64::Gp hi = TEMP_REG2;
 
@@ -2797,7 +2807,7 @@ void drcbe_arm64::op_muls(a64::Assembler &a, const uml::instruction &inst)
 		}
 		else
 		{
-			a.smull(lo, src1.w(), src2.w());
+			a.smull(lo, src1, src2);
 			a.lsr(hi, lo, 32);
 		}
 	}
@@ -2848,15 +2858,17 @@ void drcbe_arm64::op_mulslw(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	const a64::Gp src1 = src1p.select_register(TEMP_REG1, 8);
-	const a64::Gp src2 = src2p.select_register(TEMP_REG2, 8);
+	const a64::Gp src1 = src1p.select_register(TEMP_REG1, inst.size());
+	const a64::Gp src2 = src2p.select_register(TEMP_REG2, inst.size());
 	const a64::Gp lo = TEMP_REG3;
 	const a64::Gp hi = TEMP_REG2;
 
 	if ((src1p.is_immediate() && src1p.immediate() == 0) || (src1p.is_immediate() && src1p.immediate() == 0))
 	{
 		a.mov(lo, a64::xzr);
-		a.mov(hi, a64::xzr);
+
+		if (inst.flags() && inst.size() == 8)
+			a.mov(hi, a64::xzr);
 	}
 	else
 	{
@@ -2866,12 +2878,13 @@ void drcbe_arm64::op_mulslw(a64::Assembler &a, const uml::instruction &inst)
 		if (inst.size() == 8)
 		{
 			a.mul(lo, src1, src2);
-			a.smulh(hi, src1, src2);
+
+			if (inst.flags())
+				a.smulh(hi, src1, src2);
 		}
 		else
 		{
-			a.smull(lo, src1.w(), src2.w());
-			a.lsr(hi, lo, 32);
+			a.smull(lo, src1, src2);
 		}
 	}
 
@@ -2881,7 +2894,7 @@ void drcbe_arm64::op_mulslw(a64::Assembler &a, const uml::instruction &inst)
 	{
 		a.mrs(SCRATCH_REG1, a64::Predicate::SysReg::kNZCV);
 
-		a.tst(lo, lo);
+		a.tst(select_register(lo, inst.size()), select_register(lo, inst.size()));
 		a.cset(TEMP_REG1, a64::CondCode::kEQ);
 		a.bfi(SCRATCH_REG1, TEMP_REG1, 30, 1); // zero flag
 
