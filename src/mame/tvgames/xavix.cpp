@@ -1257,24 +1257,27 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tak_wdg )
 	PORT_INCLUDE(xavix)
 
-	// there is unemulated IR(maybe, uncertain) connectivity with other devices that isn't emulated, might rely on some of the unused bits here
+	// there is unemulated IR connectivity with other devices that isn't emulated, might rely on some of the unused bits here
 	// could also just be that the other robots change the state of another port somewhere in order to be detected
+	// test mode code suggesting IR is at 0eb771 (part of it requires opposing directions to be held as this is not a joystick)
+	// first it checks bits 0x01 in port IN1 and expects them to be 0 (this doesn't seem to be connected to anything normally?)
+	// then reads port IN0, masks with 0xf7 and expects only LEFT & RIGHT to he held together
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) // shoot (robot form) / whistle (train form)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // charge shot (robot form) maybe should be a toggle if it represents an arm position?
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Pause Toggle") PORT_TOGGLE // not sure, if you toggle it in the robot game it pauses, no effect in train game
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Combine") PORT_TOGGLE // if you toggle it in the robot game it pauses, no effect in train game
 	// 0x08 not used?
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) // robot form only?
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) // robot form only?
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_16WAY // robot form only?
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_16WAY // robot form only?
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_16WAY
 
 	PORT_MODIFY("IN1")
 	// these must all be flipped to one state or the other to transform (not sure the best way to handle this)
 	// pre-rendered animations will play for each transform, and any running game mode will exit when you start this process
 
-	// 0x01 doesn't trigger any animation, not used?
+	// 0x01 doesn't trigger any animation, is not used by game, and isn't listed in test mode, but it must be 'off' (returning 0) to access the test mode in the first place (debug pin maybe)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Transformation Head State") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Transformation Body State") PORT_TOGGLE
 	// 0x08 doesn't trigger any animation, not used?
