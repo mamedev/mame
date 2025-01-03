@@ -56,7 +56,6 @@
 
     not dumped: no TSOP pads
     2003      Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       have
-    2001      Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
 
 
     not dumped: xavix2.cpp
@@ -66,7 +65,8 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's!TV Play Dragon Ball Z Battle Experience Kamehameha ~ Ometo Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-	          Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's!TV Play Mahou Sentai Magiranger Dance & Battle at Magimat / Bandai / Japan
+	          Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
+			  Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル / バンダイ / 日本        Let's!TV Play Mahou Sentai Magiranger Dance & Battle at Magimat / Bandai / Japan
 			  anpan-man pyon-pyon ikunou mat /JoyPalette/Japan                                                -           -               -           -               -                   -                       -
 			  どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！ / エポック社 / 日本          Doraemon anywhere - Japan travel game DX experience! Where is the Dragon Grand Prix! / Epoch / Japan
               Let's!TVプレイ ふたりはプリキュアMaxHeart マットでダンス MaxHeartにおどっちゃおう / バンダイ / 日本         Let's!TV Play Futari wa PreCure MaxHeart Dance on the mat Let's go to MaxHeart / Bandai / Japan
@@ -1252,6 +1252,33 @@ static INPUT_PORTS_START( tak_geig )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) // pause
 
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tak_wdg )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) // shoot (robot form) / whistle (train form)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // charge shot (robot form) maybe should be a toggle if it represents an arm position?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Pause Toggle") PORT_TOGGLE // not sure, if you toggle it in the robot game it pauses, no effect in train game
+	// 0x08 not used?
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) // robot form only?
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) // robot form only?
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+
+	PORT_MODIFY("IN1")
+	// these must all be flipped to one state or the other to transform (not sure the best way to handle this)
+	// pre-rendered animations will play for each transform, and any running game mode will exit when you start this process
+
+	// 0x01 doesn't trigger any animation, not used?
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Transformation Head State") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Transformation Body State") PORT_TOGGLE
+	// 0x08 doesn't trigger any animation, not used?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Transformation Arm 1 State") PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Transformation Arm 2 State") PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF )
+	// 0x80 not used?
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tak_comt )
@@ -2469,6 +2496,11 @@ ROM_START( tak_geig )
 	ROM_LOAD("geigeki.bin", 0x000000, 0x400000, CRC(bd0c3576) SHA1(06f614dbec0225ce4ed866b98450912986d72faf) )
 ROM_END
 
+ROM_START( tak_wdg )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("wdgrobot.bin", 0x000000, 0x200000, CRC(7ffc6386) SHA1(e33de5f8e6686e4160d1b90d59167418e87f5a47) )
+ROM_END
+
 ROM_START( tom_tvho ) // ET105 REV 0.0
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("tvhockey.u4", 0x000000, 0x200000, CRC(9cd72ae2) SHA1(0530851123b607ddb85f9513405ce97c493f5fd6) )
@@ -2864,6 +2896,8 @@ CONS( 2005, has_wamg,  0,          0,  xavix_4mb,        has_wamg, xavix_state, 
 
 // GEIGEKI ゴーゴーシューティング
 CONS( 2002, tak_geig,  0,          0,  xavix_4mb_nv,     tak_geig, xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Geigeki Go Go Shooting (Japan)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2001, tak_wdg,   0,          0,  xavix_2mb_nv,     tak_wdg,  xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Webdiver Gladion W-05 DX (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // TVホッケー
 // playable but could do with better deadzome handling on the controls at least
