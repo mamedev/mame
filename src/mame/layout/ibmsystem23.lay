@@ -9,7 +9,10 @@ license:CC0-1.0
 		</led7seg>
 	</element>
 
-	<view name="Diagnostics Port">
+	<view name="Default Layout">
+		<screen index="0">
+			<bounds x="0" y="0" width="~scr0width~" height="~scr0height~" />
+		</screen>
 		<element name="digit0" ref="digit">
 			<bounds x="2.070" y="3.1" width="0.145" height="0.2" />
 		</element>
