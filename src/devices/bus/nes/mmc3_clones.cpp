@@ -2934,11 +2934,11 @@ void nes_bmc_f600_device::write_l(offs_t offset, u8 data)
 		m_reg = offset;
 
 		m_prg_base = (m_reg & 0x38) << 1;
-		m_prg_mask = 0x1f >> (BIT(m_reg, 5) ? 1 : 0);
+		m_prg_mask = 0x1f >> BIT(m_reg, 5);
 		set_prg(m_prg_base, m_prg_mask);
 
 		m_chr_base = (m_reg & 0x07) << 7;
-		m_chr_mask = 0xff >> (BIT(m_reg, 2) ? 0 : 1);
+		m_chr_mask = 0xff >> BIT(~m_reg, 2);
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 	}
 }
