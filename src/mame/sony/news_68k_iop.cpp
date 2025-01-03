@@ -97,6 +97,7 @@
 #define LOG_TIMER (1U << 7)
 #define LOG_SCSI (1U << 8)
 #define LOG_AST (1U << 9)
+#define LOG_RTC (1U << 10)
 
 #define VERBOSE (LOG_GENERAL)
 
@@ -426,13 +427,13 @@ namespace
         m_rtc->read_w(0);
         m_rtc->cs2_w(0);
 
-        LOG("rtc r 0x%x\n", result);
+        LOGMASKED(LOG_RTC, "rtc r 0x%x\n", result);
         return result;
     }
 
     void news_iop_state::rtcreg_w(uint8_t data)
     {
-        LOG("rtc w 0x%x\n", data);
+        LOGMASKED(LOG_RTC, "rtc w 0x%x\n", data);
         m_rtc->cs1_w(1);
         m_rtc->cs2_w(1);
 
@@ -448,7 +449,7 @@ namespace
 
     void news_iop_state::rtcsel_w(uint8_t data)
     {
-        LOG("rtc sel w 0x%x\n", data);
+        LOGMASKED(LOG_RTC, "rtc sel w 0x%x\n", data);
         m_rtc->cs1_w(1);
         m_rtc->cs2_w(1);
 
@@ -553,12 +554,22 @@ namespace
         // IOP bus expansion I/O
         map(0x20000000, 0x20ffffff).lrw32([this](offs_t offset, uint32_t mem_mask)
                                           {
-                                              LOG("extio_r(0x%x, 0x%x) -> 0x%x = 0x%x (%s)\n", offset, mem_mask, 0x20000000 + offset, 0xff, machine().describe_context());
-                                              return 0xff;
+                                            if (!machine().side_effects_disabled())
+                                            {
+                                                LOG("extio_r(0x%x, 0x%x) -> 0x%x = 0x%x (%s)\n", offset, mem_mask, 0x20000000 + offset, 0xff, machine().describe_context());
+                                                m_iop->set_buserror_details(0x20000000+offset, 1, m_iop->get_fc());
+                                                m_iop->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+                                            }
+                                            return 0xff;
                                           }, "extio_r",
                                           [this](offs_t offset, uint32_t data, uint32_t mem_mask)
                                           {
-                                              LOG("extio_w(0x%x, 0x%x, 0x%x) -> 0x%x = (%s)\n", offset, data, mem_mask, 0x20000000 + offset, machine().describe_context());
+                                            if (!machine().side_effects_disabled())
+                                            {
+                                                LOG("extio_w(0x%x, 0x%x, 0x%x) -> 0x%x = (%s)\n", offset, data, mem_mask, 0x20000000 + offset, machine().describe_context());
+                                                m_iop->set_buserror_details(0x20000000+offset, 0, m_iop->get_fc());
+                                                m_iop->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+                                            }
                                           }, "extio_w").mirror(0x1f000000);
 
         // map(0x4c000100, 0x4c0001ff).lrw8(NAME([this](){ iop_bus_error(); return 0; }), NAME([this](uint8_t data){ iop_bus_error(); }));
