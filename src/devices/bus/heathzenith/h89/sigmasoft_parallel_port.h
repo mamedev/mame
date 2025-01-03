@@ -37,12 +37,7 @@ protected:
 
 private:
 
-	//required_device<heath_tlb_connector> m_tlbc;
 	required_ioport m_jumpers;
-
-	// flag to allow multiple paralllel boards to be install (up to 3) and configure
-	// only one to connect to the tlbc and igc boards.
-	//bool m_connected_tlbc;
 
 	// physical jumper on the board to enable/disable entire board
 	bool m_enabled;
