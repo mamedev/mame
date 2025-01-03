@@ -137,45 +137,49 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 
 	// Control Flow Operations
 	OPINFO0(NOP,     "nop",      4,   false, NONE, NONE, NONE)
-	OPINFO1(DEBUG,   "debug",    4,   false, NONE, NONE, ALL,  PINFO(IN, OP, IANY))
+	OPINFO1(DEBUG,   "debug",    4,   false, NONE, NONE, ALL,  PINFO(IN, OP, IANY)) // MAME debugger breakpoint
+	OPINFO0(BREAK,   "break",    4,   false, NONE, NONE, NONE) // (for debugging) Issues a breakpoint exception to allow for debugging the generated assembly
 	OPINFO1(EXIT,    "exit",     4,   true,  NONE, NONE, ALL,  PINFO(IN, OP, IANY))
 	OPINFO3(HASHJMP, "hashjmp",  4,   false, NONE, NONE, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, HANDLE))
 	OPINFO1(JMP,     "jmp",      4,   true,  NONE, NONE, NONE, PINFO(IN, OP, LABEL))
-	OPINFO2(EXH,     "exh",      4,   true,  NONE, NONE, ALL,  PINFO(IN, OP, HANDLE), PINFO(IN, OP, IANY))
-	OPINFO1(CALLH,   "callh",    4,   true,  NONE, NONE, ALL,  PINFO(IN, OP, HANDLE))
+	OPINFO2(EXH,     "exh",      4,   true,  NONE, NONE, ALL,  PINFO(IN, OP, HANDLE), PINFO(IN, OP, IANY)) // Call exception handler
+	OPINFO1(CALLH,   "callh",    4,   true,  NONE, NONE, ALL,  PINFO(IN, OP, HANDLE)) // Call handle
 	OPINFO0(RET,     "ret",      4,   true,  NONE, NONE, ALL)
-	OPINFO2(CALLC,   "callc",    4,   true,  NONE, NONE, ALL,  PINFO(IN, OP, CFUNC), PINFO(IN, OP, PTR))
-	OPINFO2(RECOVER, "recover",  4,   false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, MVAR))
+	OPINFO2(CALLC,   "callc",    4,   true,  NONE, NONE, ALL,  PINFO(IN, OP, CFUNC), PINFO(IN, OP, PTR)) // Call C function
+	OPINFO2(RECOVER, "recover",  4,   false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, MVAR)) // Get value from mapvar
 
 	// Internal Register Operations
-	OPINFO1(SETFMOD, "setfmod",  4,   false, NONE, NONE, ALL,  PINFO(IN, OP, IANY))
-	OPINFO1(GETFMOD, "getfmod",  4,   false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
-	OPINFO1(GETEXP,  "getexp",   4,   false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
-	OPINFO2(GETFLGS, "getflgs",  4,   false, P2,   NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IMV))
-	OPINFO1(SAVE,    "save",     4,   false, ALL,  NONE, ALL,  PINFO(OUT, OP, STATE))
-	OPINFO1(RESTORE, "restore",  4,   false, NONE, ALL,  ALL,  PINFO(IN, OP, STATE))
+	OPINFO1(SETFMOD, "setfmod",  4,   false, NONE, NONE, ALL,  PINFO(IN, OP, IANY)) // Set floating point control mode
+	OPINFO1(GETFMOD, "getfmod",  4,   false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM)) // Get floating point control mode
+	OPINFO1(GETEXP,  "getexp",   4,   false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM)) // Get exception parameter value
+	OPINFO2(GETFLGS, "getflgs",  4,   false, P2,   NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, IMV)) // Get status register flags
+	OPINFO1(SETFLGS, "setflgs",  4,   false, NONE, ALL,  ALL,  PINFO(IN, OP, IANY)) // (for debugging) Set status register flags
+	OPINFO1(SAVE,    "save",     4,   false, ALL,  NONE, ALL,  PINFO(OUT, OP, STATE)) // Save current state to drcuml_machine_state
+	OPINFO1(RESTORE, "restore",  4,   false, NONE, ALL,  ALL,  PINFO(IN, OP, STATE)) // Load saved state from drcuml_machine_state
 
 	// Integer Operations
-	OPINFO4(LOAD,    "!load",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SCSIZE))
-	OPINFO4(LOADS,   "!loads",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SCSIZE))
-	OPINFO4(STORE,   "!store",   4|8, false, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SCSIZE))
-	OPINFO3(READ,    "!read",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPSIZE))
-	OPINFO4(READM,   "!readm",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSIZE))
-	OPINFO3(WRITE,   "!write",   4|8, false, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSIZE))
-	OPINFO4(WRITEM,  "!writem",  4|8, false, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSIZE))
-	OPINFO2(CARRY,   "!carry",   4|8, false, NONE, C,    ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO1(SET,     "!set",     4|8, true,  NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
+	OPINFO4(LOAD,    "!load",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SCSIZE)) // Load unsigned value from specified memory location
+	OPINFO4(LOADS,   "!loads",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SCSIZE)) // Load signed value from specified memory location
+	OPINFO4(STORE,   "!store",   4|8, false, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SCSIZE)) // Store value to specified memory location
+	OPINFO3(READ,    "!read",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPSIZE)) // Read memory from emulated machine using memory space reader
+	OPINFO4(READM,   "!readm",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSIZE)) // Read memory from emulated machine using memory space reader (masked)
+	OPINFO3(WRITE,   "!write",   4|8, false, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSIZE)) // Write to emulated machine's memory using memory space writer
+	OPINFO4(WRITEM,  "!writem",  4|8, false, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSIZE)) // Write to emulated machine's memory using memory space writer (masked)
+	OPINFO2(CARRY,   "!carry",   4|8, false, NONE, C,    ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Set carry status flag on CPU
+	OPINFO1(SET,     "!set",     4|8, true,  NONE, NONE, ALL,  PINFO(OUT, OP, IRM)) // Get the state of the specified condition (e.g. calling UML_SET with COND_NZ will return 0 if the condition is not met and 1 if the condition is met)
 	OPINFO2(MOV,     "!mov",     4|8, true,  NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
 	OPINFO3(SEXT,    "!sext",    4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, P3, IANY), PINFO(IN, OP, SIZE))
-	OPINFO4(ROLAND,  "!roland",  4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO4(ROLINS,  "!rolins",  4|8, false, NONE, SZ,   ALL,  PINFO(INOUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(ROLAND,  "!roland",  4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Rotate left + AND (see drcbec.cpp for implementation)
+	OPINFO4(ROLINS,  "!rolins",  4|8, false, NONE, SZ,   ALL,  PINFO(INOUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Rotate left + OR (see drcbec.cpp for implementation)
 	OPINFO3(ADD,     "!add",     4|8, false, NONE, SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO3(ADDC,    "!addc",    4|8, false, C,    SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO3(SUB,     "!sub",     4|8, false, NONE, SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO3(SUBB,    "!subb",    4|8, false, C,    SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO2(CMP,     "!cmp",     4|8, false, NONE, SZVC, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO4(MULU,    "!mulu",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO4(MULS,    "!muls",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(MULU,    "!mulu",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Unsigned 32x32=64 and 64x64=128 multiplication
+	OPINFO3(MULULW,  "!mululw",  4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Unsigned 32x32=32 and 64x64=64 multiplication (overflow set based on 32x32=64 calculation but zero and sign based on 32-bit result)
+	OPINFO4(MULS,    "!muls",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Signed 32x32=64 and 64x64=128 multiplication
+	OPINFO3(MULSLW,  "!mulslw",  4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Signed 32x32=32 and 64x64=64 multiplication (overflow set based on 32x32=64 calculation but zero and sign based on 32-bit result)
 	OPINFO4(DIVU,    "!divu",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO4(DIVS,    "!divs",    4|8, false, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO3(AND,     "!and",     4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
@@ -194,18 +198,18 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO3(RORC,    "!rorc",    4|8, false, C,    SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 
 	// Floating Point Operations
-	OPINFO3(FLOAD,   "f#load",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY))
-	OPINFO3(FSTORE,  "f#store",  4|8, false, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, FRM))
-	OPINFO3(FREAD,   "f#read",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPSIZE))
-	OPINFO3(FWRITE,  "f#write",  4|8, false, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, FANY), PINFO(IN, OP, SPSIZE))
+	OPINFO3(FLOAD,   "f#load",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY)) // Load float/double value from specified memory location
+	OPINFO3(FSTORE,  "f#store",  4|8, false, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, FRM)) // Save float/double value to specified memory location
+	OPINFO3(FREAD,   "f#read",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPSIZE)) // Read float/double value from emulated machine using memory space reader
+	OPINFO3(FWRITE,  "f#write",  4|8, false, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, FANY), PINFO(IN, OP, SPSIZE)) // Write float/double value to emulated machine using memory space writer
 	OPINFO2(FMOV,    "f#mov",    4|8, true,  NONE, NONE, NONE, PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
-	OPINFO4(FTOINT,  "f#toint",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, P3, IRM), PINFO(IN, OP, FANY), PINFO(IN, OP, SIZE), PINFO(IN, OP, ROUND))
-	OPINFO3(FFRINT,  "f#frint",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, IANY), PINFO(IN, OP, SIZE))
-	OPINFO3(FFRFLT,  "f#frflt",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, FANY), PINFO(IN, OP, SIZE))
-	OPINFO2(FRNDS,   "f#rnds",     8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, FANY))
+	OPINFO4(FTOINT,  "f#toint",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, P3, IRM), PINFO(IN, OP, FANY), PINFO(IN, OP, SIZE), PINFO(IN, OP, ROUND)) // Float/double to integer
+	OPINFO3(FFRINT,  "f#frint",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, IANY), PINFO(IN, OP, SIZE)) // Float/double from integer
+	OPINFO3(FFRFLT,  "f#frflt",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, FANY), PINFO(IN, OP, SIZE)) // Convert float to double or double to float
+	OPINFO2(FRNDS,   "f#rnds",     8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, FANY)) // Convert double to float and then back to double, or float to double and back to float
 	OPINFO3(FADD,    "f#add",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
 	OPINFO3(FSUB,    "f#sub",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
-	OPINFO2(FCMP,    "f#cmp",    4|8, false, NONE, UZC,  ALL,  PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
+	OPINFO2(FCMP,    "f#cmp",    4|8, false, NONE, UZC,  ALL,  PINFO(IN, OP, FANY), PINFO(IN, OP, FANY)) // Note: status flags except FLAG_U are undefined when comparing with NaN
 	OPINFO3(FMUL,    "f#mul",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
 	OPINFO3(FDIV,    "f#div",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
 	OPINFO2(FNEG,    "f#neg",    4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
@@ -213,8 +217,8 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO2(FSQRT,   "f#sqrt",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
 	OPINFO2(FRECIP,  "f#recip",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
 	OPINFO2(FRSQRT,  "f#rsqrt",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
-	OPINFO2(FCOPYI,  "f#copyi",  4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, FRM), PINFO(IN, OP, IRM))
-	OPINFO2(ICOPYF,  "icopyf#",  4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, FRM))
+	OPINFO2(FCOPYI,  "f#copyi",  4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, FRM), PINFO(IN, OP, IRM)) // Load float/double value from integer representation (e.g. 0x3f800000 -> 1.0f)
+	OPINFO2(ICOPYF,  "icopyf#",  4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, FRM)) // Store float/double value as integer representation (e.g. 1.0f -> 0x3f800000)
 };
 
 
@@ -389,7 +393,7 @@ void uml::instruction::simplify()
 			if (m_param[2].is_immediate_value(paramsizemask[m_param[3].size()]))
 			{
 				m_opcode = OP_READ;
-				m_numparams = 2;
+				m_numparams = 3;
 				m_param[2] = m_param[3];
 			}
 			break;
@@ -399,7 +403,7 @@ void uml::instruction::simplify()
 			if (m_param[2].is_immediate_value(paramsizemask[m_param[3].size()]))
 			{
 				m_opcode = OP_WRITE;
-				m_numparams = 2;
+				m_numparams = 3;
 				m_param[2] = m_param[3];
 			}
 			break;
@@ -504,10 +508,23 @@ void uml::instruction::simplify()
 				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate(u32(u32(m_param[1].immediate()) * u32(m_param[2].immediate())));
+						convert_to_mov_immediate(u32(u32(m_param[2].immediate()) * u32(m_param[3].immediate())));
 					else if (m_size == 8)
-						convert_to_mov_immediate(u64(u64(m_param[1].immediate()) * u64(m_param[2].immediate())));
+						convert_to_mov_immediate(u64(u64(m_param[2].immediate()) * u64(m_param[3].immediate())));
 				}
+			}
+			break;
+
+		// MULULW: convert simple form to MOV if immediate, or if multiplying by 0
+		case OP_MULULW:
+			if (m_param[1].is_immediate_value(0) || m_param[2].is_immediate_value(0))
+				convert_to_mov_immediate(0);
+			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
+			{
+				if (m_size == 4)
+					convert_to_mov_immediate(u32(u32(m_param[1].immediate()) * u32(m_param[2].immediate())));
+				else if (m_size == 8)
+					convert_to_mov_immediate(u64(u64(m_param[1].immediate()) * u64(m_param[2].immediate())));
 			}
 			break;
 
@@ -520,10 +537,23 @@ void uml::instruction::simplify()
 				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate(s32(s32(m_param[1].immediate()) * s32(m_param[2].immediate())));
+						convert_to_mov_immediate(s32(s32(m_param[2].immediate()) * s32(m_param[3].immediate())));
 					else if (m_size == 8)
-						convert_to_mov_immediate(s64(s64(m_param[1].immediate()) * s64(m_param[2].immediate())));
+						convert_to_mov_immediate(s64(s64(m_param[2].immediate()) * s64(m_param[3].immediate())));
 				}
+			}
+			break;
+
+		// MULSLW: convert simple form to MOV if immediate, or if multiplying by 0
+		case OP_MULSLW:
+			if (m_param[1].is_immediate_value(0) || m_param[2].is_immediate_value(0))
+				convert_to_mov_immediate(0);
+			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
+			{
+				if (m_size == 4)
+					convert_to_mov_immediate(s32(s32(m_param[1].immediate()) * s32(m_param[2].immediate())));
+				else if (m_size == 8)
+					convert_to_mov_immediate(s64(s64(m_param[1].immediate()) * s64(m_param[2].immediate())));
 			}
 			break;
 
@@ -536,9 +566,9 @@ void uml::instruction::simplify()
 				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate(u32(u32(m_param[1].immediate()) / u32(m_param[2].immediate())));
+						convert_to_mov_immediate(u32(u32(m_param[2].immediate()) / u32(m_param[3].immediate())));
 					else if (m_size == 8)
-						convert_to_mov_immediate(u64(u64(m_param[1].immediate()) / u64(m_param[2].immediate())));
+						convert_to_mov_immediate(u64(u64(m_param[2].immediate()) / u64(m_param[3].immediate())));
 				}
 			}
 			break;
@@ -552,9 +582,9 @@ void uml::instruction::simplify()
 				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate(s32(s32(m_param[1].immediate()) / s32(m_param[2].immediate())));
+						convert_to_mov_immediate(s32(s32(m_param[2].immediate()) / s32(m_param[3].immediate())));
 					else if (m_size == 8)
-						convert_to_mov_immediate(s64(s64(m_param[1].immediate()) / s64(m_param[2].immediate())));
+						convert_to_mov_immediate(s64(s64(m_param[2].immediate()) / s64(m_param[3].immediate())));
 				}
 			}
 			break;
@@ -624,7 +654,12 @@ void uml::instruction::simplify()
 		// SHL: convert to MOV if immediate or shifting by 0
 		case OP_SHL:
 			if (m_param[1].is_immediate() && m_param[2].is_immediate())
-				convert_to_mov_immediate(m_param[1].immediate() << m_param[2].immediate());
+			{
+				if (m_size == 4)
+					convert_to_mov_immediate(u32(m_param[1].immediate()) << (m_param[2].immediate() & 31));
+				else if (m_size == 8)
+					convert_to_mov_immediate(u64(m_param[1].immediate()) << (m_param[2].immediate() & 63));
+			}
 			else if (m_param[2].is_immediate_value(0))
 				convert_to_mov_param(1);
 			break;
@@ -634,9 +669,9 @@ void uml::instruction::simplify()
 			if (m_param[1].is_immediate() && m_param[2].is_immediate())
 			{
 				if (m_size == 4)
-					convert_to_mov_immediate(u32(m_param[1].immediate()) >> m_param[2].immediate());
+					convert_to_mov_immediate(u32(m_param[1].immediate()) >> (m_param[2].immediate() & 31));
 				else if (m_size == 8)
-					convert_to_mov_immediate(u64(m_param[1].immediate()) >> m_param[2].immediate());
+					convert_to_mov_immediate(u64(m_param[1].immediate()) >> (m_param[2].immediate() & 63));
 			}
 			else if (m_param[2].is_immediate_value(0))
 				convert_to_mov_param(1);
@@ -647,9 +682,9 @@ void uml::instruction::simplify()
 			if (m_param[1].is_immediate() && m_param[2].is_immediate())
 			{
 				if (m_size == 4)
-					convert_to_mov_immediate(s32(m_param[1].immediate()) >> m_param[2].immediate());
+					convert_to_mov_immediate(s32(m_param[1].immediate()) >> (m_param[2].immediate() & 31));
 				else if (m_size == 8)
-					convert_to_mov_immediate(s64(m_param[1].immediate()) >> m_param[2].immediate());
+					convert_to_mov_immediate(s64(m_param[1].immediate()) >> (m_param[2].immediate() & 63));
 			}
 			else if (m_param[2].is_immediate_value(0))
 				convert_to_mov_param(1);
@@ -660,9 +695,9 @@ void uml::instruction::simplify()
 			if (m_param[1].is_immediate() && m_param[2].is_immediate())
 			{
 				if (m_size == 4)
-					convert_to_mov_immediate(rotl_32(m_param[1].immediate(), m_param[2].immediate()));
+					convert_to_mov_immediate(rotl_32(m_param[1].immediate(), m_param[2].immediate() & 31));
 				else if (m_size == 8)
-					convert_to_mov_immediate(rotl_64(m_param[1].immediate(), m_param[2].immediate()));
+					convert_to_mov_immediate(rotl_64(m_param[1].immediate(), m_param[2].immediate() & 63));
 			}
 			else if (m_param[2].is_immediate_value(0))
 				convert_to_mov_param(1);
@@ -673,9 +708,9 @@ void uml::instruction::simplify()
 			if (m_param[1].is_immediate() && m_param[2].is_immediate())
 			{
 				if (m_size == 4)
-					convert_to_mov_immediate(rotr_32(m_param[1].immediate(), m_param[2].immediate()));
+					convert_to_mov_immediate(rotr_32(m_param[1].immediate(), m_param[2].immediate() & 31));
 				else if (m_size == 8)
-					convert_to_mov_immediate(rotr_64(m_param[1].immediate(), m_param[2].immediate()));
+					convert_to_mov_immediate(rotr_64(m_param[1].immediate(), m_param[2].immediate() & 63));
 			}
 			else if (m_param[2].is_immediate_value(0))
 				convert_to_mov_param(1);

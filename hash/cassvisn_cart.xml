@@ -104,7 +104,7 @@ the ROM files below store 12 bit in a 16-bit word with 4 bits unused, so 128 * 1
 		<description>Battle Vader</description>
 		<year>1982</year>
 		<publisher>Epoch</publisher>
-		<info name="alt_title" value="バトルヘーダー"/>
+		<info name="alt_title" value="バトルべーダー"/>
 		<info name="release" value="19820303"/>
 		<part name="cart" interface="cassvisn_cart">
 			<dataarea name="prg" width="16" endianness="big" size="0xf00">

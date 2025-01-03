@@ -919,7 +919,8 @@ void amiga_state::blitter_setup()
 	/* is there another blitting in progress? */
 	if (CUSTOM_REG(REG_DMACON) & 0x4000)
 	{
-		logerror("%s - This program is playing tricks with the blitter\n", machine().describe_context() );
+		popmessage("In-flight blitter_setup() call, ignored");
+		//logerror("%s - This program is playing tricks with the blitter\n", machine().describe_context() );
 		return;
 	}
 
@@ -1412,7 +1413,9 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			return;
 
 		case REG_DSKDAT:
-			popmessage("DSKDAT W %04x",data);
+			// WHDLoad inits with a 0 here, not enough for actual use case.
+			if (data)
+				popmessage("DSKDAT W %04x",data);
 			break;
 
 		case REG_DSKSYNC:

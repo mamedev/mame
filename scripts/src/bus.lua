@@ -5787,6 +5787,8 @@ if (BUSES["H89BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_parallel_port.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/we_pullup.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/we_pullup.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/z_89_11.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/z_89_11.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/z37_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/z37_fdc.h",
 	}

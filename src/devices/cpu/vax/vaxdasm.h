@@ -9,7 +9,16 @@
 class vax_disassembler : public util::disasm_interface
 {
 public:
-	enum class mode : u8;
+	enum class mode : u8
+	{
+		none,
+		rb, srb, urb, cntb, rw, srw, urw, mskw, rl, srl, url, posl, prl, rq, srq, urq, ro, uro,
+		mb, mw, ml, mq, mo,
+		wb, ww, wl, wq, wo,
+		ab, aw, al, aq, ao,
+		bb, bw,
+		vb
+	};
 
 	struct opdef
 	{
@@ -20,6 +29,9 @@ public:
 
 	// construction/destruction
 	vax_disassembler();
+
+	static bool is_read_mode(mode m);
+	static const mode* get_operands(u8 op);
 
 protected:
 	// disassembler overrides

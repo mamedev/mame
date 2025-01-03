@@ -590,6 +590,7 @@ public:
 	void daimyojn(machine_config &config);
 	void kotbinyo(machine_config &config);
 	void daireach(machine_config &config);
+	void hnrose(machine_config &config);
 
 	void init_momotaro();
 
@@ -630,6 +631,7 @@ private:
 	uint8_t momotaro_protection_r();
 	uint8_t jongteia_protection_r();
 	uint8_t daireach_protection_r();
+	uint8_t hnrose_protection_r();
 	void daimyojn_palette_sel_w(uint8_t data);
 	void daimyojn_blitter_data_palette_w(uint8_t data);
 	uint8_t daimyojn_year_hack_r(offs_t offset);
@@ -645,6 +647,7 @@ private:
 	void daireach_portmap(address_map &map) ATTR_COLD;
 	void hanakanz_portmap(address_map &map) ATTR_COLD;
 	void hkagerou_portmap(address_map &map) ATTR_COLD;
+	void hnrose_portmap(address_map &map) ATTR_COLD;
 	void jongtei_portmap(address_map &map) ATTR_COLD;
 	void jongteia_portmap(address_map &map) ATTR_COLD;
 	void kotbinsp_portmap(address_map &map) ATTR_COLD;
@@ -4685,6 +4688,46 @@ void hanakanz_state::daireach_portmap(address_map &map)
 	map(0x74, 0x74).r(FUNC(hanakanz_state::daimyojn_keyb2_r));
 	map(0x78, 0x78).w(FUNC(hanakanz_state::mjchuuka_oki_bank_w));
 	map(0x7e, 0x7e).w(FUNC(hanakanz_state::seljan2_palette_enab_w));    // writes: 1 = palette RAM at b000, 0 = ROM
+}
+
+/***************************************************************************
+                            Hana Night Rose
+***************************************************************************/
+
+// 29EE: D4 ED 76 C9 CB
+// 29F3: 4D 74 EF 50 52
+
+uint8_t hanakanz_state::hnrose_protection_r()
+{
+	switch (m_prot_val)
+	{
+		case 0xd4:  return 0x4d;
+		case 0xed:  return 0x74;
+		case 0x76:  return 0xef;
+		case 0xc9:  return 0x50;
+		case 0xcb:  return 0x52;
+	}
+	return 0xff;
+}
+
+
+void hanakanz_state::hnrose_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).w(FUNC(hanakanz_state::daimyojn_blitter_data_palette_w));
+	map(0x42, 0x44).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
+	map(0x60, 0x61).w("ym2413", FUNC(ym2413_device::write));
+	map(0x62, 0x62).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x68, 0x68).portr("SYSTEM");
+	map(0x6a, 0x6a).r(FUNC(hanakanz_state::daimyojn_keyb1_r));
+	map(0x6c, 0x6c).r(FUNC(hanakanz_state::daimyojn_keyb2_r));
+	map(0x6e, 0x6e).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
+	map(0x70, 0x70).w(FUNC(hanakanz_state::mjmyster_rambank_w));
+	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x8a, 0x8b).r(FUNC(hanakanz_state::daimyojn_year_hack_r));  // ?
+	map(0xa0, 0xa0).r(FUNC(hanakanz_state::hanakanz_rand_r));
+	map(0xb0, 0xb0).rw(FUNC(hanakanz_state::hnrose_protection_r), FUNC(hanakanz_state::daimyojn_protection_w));
+	map(0xc0, 0xc0).w(FUNC(hanakanz_state::mjflove_rombank_w));
 }
 
 static INPUT_PORTS_START( ddenlovj )
@@ -9942,6 +9985,12 @@ void hanakanz_state::daimyojn(machine_config &config)
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set("maincpu:kp69", FUNC(kp69_device::ir_w<1>));
 }
 
+void hanakanz_state::hnrose(machine_config &config)
+{
+	daimyojn(config);
+
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::hnrose_portmap);
+}
 
 /***************************************************************************
 
@@ -12372,6 +12421,56 @@ ROM_START( htengoku )
 	ROM_LOAD( "6510.11b", 0x280000, 0x20000, CRC(0fdd6edf) SHA1(c6870ab538987110337e6e154cba98391c68fb98) )
 ROM_END
 
+/***************************************************************************
+
+Mahjong Tenho
+
+Techno-Top, Limited
+
+TTL.0302 sticker
+
+Has 4 banks of 10 DIP switches
+
+***************************************************************************/
+
+ROM_START( mjtenho )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "p016021.6b", 0x00000, 0x80000, CRC(8acd16f1) SHA1(07120be1da0d72aea9f9499673d4e3bd99c291ba) )
+
+	ROM_REGION( 0x400000, "blitter", 0 )
+	ROM_LOAD( "t01063.7b", 0x000000, 0x200000, CRC(ead305a8) SHA1(a794fa7ed31c5f33538eba1d7f1bb4aa367ce55c) )
+	ROM_LOAD( "t01064.8b", 0x200000, 0x200000, CRC(9d3240d8) SHA1(71fa31732300d60dedaa5d98c846e83b6130ce60) )
+
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
+	ROM_LOAD( "t01601.2b", 0x00000, 0x80000, CRC(e5678713) SHA1(e5442111b3306869dba13a2b0a0085effc55b52a) )
+ROM_END
+
+/***************************************************************************
+
+Hana Night Rose
+
+Techno-Top, Limited
+
+TTL.1001 and TSM008-0008 stickers
+
+Has 4 banks of 10 DIP switches
+
+***************************************************************************/
+
+ROM_START( hnrose )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "00802a4.6b", 0x00000, 0x80000, CRC(f08f7d21) SHA1(e47a10c1ec0544ec5457d4bd5e0d080a515ddc6a) )
+
+	ROM_REGION( 0x800000, "blitter", 0 )
+	ROM_LOAD( "00803.7b",  0x000000, 0x200000, CRC(93060501) SHA1(908d63b0ac81a23a3b972916e313c0f9f0f74d6e) )
+	ROM_LOAD( "00804.8b",  0x200000, 0x200000, CRC(7deb12ab) SHA1(a021c02071820bed4c3f2cb158ed12f9c2f42f92) )
+	ROM_LOAD( "00805.9b",  0x400000, 0x200000, CRC(6f026843) SHA1(ea88e21af8247e125de99bf96295eb005e18b77c) )
+	ROM_LOAD( "00806.11b", 0x600000, 0x200000, CRC(ab006626) SHA1(6c9a68a6c4e4a229769a3cc07894eb6d848130d4) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "00801.2a", 0x000000, 0x200000, CRC(3e9f7a5a) SHA1(c4d79d250fbff7922b19da4029529e2d0d1a1a0f) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
 } // anonymous namespace
 
 
@@ -12458,8 +12557,12 @@ GAME( 2000, jongteia,  jongtei,  jongteia,  jongtei,  hanakanz_state, empty_init
 
 GAME( 2000, mjgnight,  0,        mjgnight,  mjgnight, hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night (Japan, TSM003-01)",                      MACHINE_NO_COCKTAIL  )
 
+GAME( 2000, hnrose,    0,        hnrose,    daimyojn, hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Hana Night Rose (Japan, TSM008-04)",                             MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  )
+
 GAME( 2001, daireach,  0,        daireach,  seljan2,  hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Dai-Reach (Japan, TSM012-C01)",                          MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL )
 
 GAME( 2002, daimyojn,  0,        daimyojn,  daimyojn, hanakanz_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                          MACHINE_NO_COCKTAIL  )
+
+GAME( 2002, mjtenho,   0,        daimyojn,  daimyojn, hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Tenho (Japan, P016B-000)",                               MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  )
 
 GAME( 2004, momotaro,  0,        daimyojn,  daimyojn, hanakanz_state, init_momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou (Japan, T027-RB-01)",                          MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

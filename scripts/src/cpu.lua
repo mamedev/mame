@@ -1424,6 +1424,8 @@ if CPUS["KL1839VM1"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1.cpp",
 		MAME_DIR .. "src/devices/cpu/mpk1839/kl1839vm1.h",
+		MAME_DIR .. "src/devices/cpu/vax/vaxdasm.cpp",
+		MAME_DIR .. "src/devices/cpu/vax/vaxdasm.h",
 	}
 end
 
@@ -3927,6 +3929,13 @@ end
 -- uPD177x - Disassembler only
 --@src/devices/cpu/upd177x/upd177x.h,CPUS["UPD177X"] = true
 --------------------------------------------------
+
+if CPUS["UPD177X"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/upd177x/upd177x.cpp",
+		MAME_DIR .. "src/devices/cpu/upd177x/upd177x.h",
+	}
+end
 
 if opt_tool(CPUS, "UPD177X") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd177x/upd177xd.cpp")

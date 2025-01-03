@@ -255,7 +255,8 @@ void gime_device::update_composite_palette()
 
 inline gime_device::pixel_t gime_device::get_composite_color(int color)
 {
-	static pixel_t composite_palette[64] = {
+	static const pixel_t composite_palette[64] =
+	{
 		0x000000, 0x004c00, 0x004300, 0x0a3100, 0x2f1b00, 0x550100, 0x6c0000, 0x770006,
 		0x71004b, 0x5c008b, 0x3b00b8, 0x1100ca, 0x001499, 0x002c62, 0x004011, 0x004b00,
 		0x2d2d2d, 0x069800, 0x288f00, 0x537d00, 0x786700, 0xa04c00, 0xb63402, 0xc3224c,
@@ -267,7 +268,8 @@ inline gime_device::pixel_t gime_device::get_composite_color(int color)
 	};
 
 	// composite output with phase inverted
-	static pixel_t composite_palette_180[64] = {
+	static const pixel_t composite_palette_180[64] =
+	{
 		0x000000, 0x5a0e5a, 0x4f0c4f, 0x360f40, 0x0d213c, 0x003334, 0x004141, 0x004943,
 		0x005409, 0x005600, 0x114c00, 0x263700, 0x392500, 0x491d00, 0x4f0f3e, 0x590e59,
 		0x2d2d2d, 0xb11fb7, 0x9932c1, 0x7248c5, 0x4a5bc2, 0x1a6eba, 0x0077a9, 0x008c62,
@@ -1331,7 +1333,7 @@ inline uint16_t gime_device::get_lines_per_row()
 	{
 		if (m_ff22_value & MODE_AG)
 		{
-			static int gime_legacy_lines_per_row_graphic[8] =
+			static const int gime_legacy_lines_per_row_graphic[8] =
 			{
 				3, 3, 3, 2, 2, 1, 1, 1
 			};
@@ -1342,7 +1344,7 @@ inline uint16_t gime_device::get_lines_per_row()
 		else
 		{
 			// http://cocogamedev.mxf.yuku.com/topic/4299238#.VyC6ozArI-U
-			static int ff9c_lines_per_row_alpha[16] =
+			static const int ff9c_lines_per_row_alpha[16] =
 			{
 				11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 4, 3, 2, 1, 12
 			};

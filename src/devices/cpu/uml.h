@@ -62,16 +62,16 @@ namespace uml
 	{
 		COND_ALWAYS = 0,
 
-		COND_Z = 0x80,              // requires Z
-		COND_NZ,                    // requires Z
-		COND_S,                     // requires S
-		COND_NS,                    // requires S
-		COND_C,                     // requires C
-		COND_NC,                    // requires C
-		COND_V,                     // requires V
-		COND_NV,                    // requires V
-		COND_U,                     // requires U
-		COND_NU,                    // requires U
+		COND_Z = 0x80,              // requires Z (zero/equal)
+		COND_NZ,                    // requires Z (not zero/unequal)
+		COND_S,                     // requires S (signed)
+		COND_NS,                    // requires S (not signed)
+		COND_C,                     // requires C (carry)
+		COND_NC,                    // requires C (no carry)
+		COND_V,                     // requires V (overflow)
+		COND_NV,                    // requires V (no overflow)
+		COND_U,                     // requires U (unordered)
+		COND_NU,                    // requires U (not unordered)
 		COND_A,                     // requires CZ, unsigned
 		COND_BE,                    // requires CZ, unsigned
 		COND_G,                     // requires SVZ, signed
@@ -143,6 +143,7 @@ namespace uml
 		// control flow operations
 		OP_NOP,                     // NOP
 		OP_DEBUG,                   // DEBUG   pc
+		OP_BREAK,                   // BREAK
 		OP_EXIT,                    // EXIT    src1[,c]
 		OP_HASHJMP,                 // HASHJMP mode,pc,handle
 		OP_JMP,                     // JMP     imm[,c]
@@ -157,6 +158,7 @@ namespace uml
 		OP_GETFMOD,                 // GETFMOD dst
 		OP_GETEXP,                  // GETEXP  dst
 		OP_GETFLGS,                 // GETFLGS dst[,f]
+		OP_SETFLGS,                 // SETFLGS src
 		OP_SAVE,                    // SAVE    mem
 		OP_RESTORE,                 // RESTORE mem
 
@@ -180,7 +182,9 @@ namespace uml
 		OP_SUBB,                    // SUBB    dst,src1,src2[,f]
 		OP_CMP,                     // CMP     src1,src2[,f]
 		OP_MULU,                    // MULU    dst,edst,src1,src2[,f]
+		OP_MULULW,                  // MULULW  dst,src1,src2[,f]
 		OP_MULS,                    // MULS    dst,edst,src1,src2[,f]
+		OP_MULSLW,                  // MULSLW  dst,src1,src2[,f]
 		OP_DIVU,                    // DIVU    dst,edst,src1,src2[,f]
 		OP_DIVS,                    // DIVS    dst,edst,src1,src2[,f]
 		OP_AND,                     // AND     dst,src1,src2[,f]
@@ -394,6 +398,8 @@ namespace uml
 		// construction/destruction
 		constexpr instruction() : m_param{ } { }
 
+		bool is_param_out(int paramnum) const { assert(m_opcode < OP_MAX); assert(paramnum < m_numparams); return (s_opcode_info_table[m_opcode].param[paramnum].output & 0x02) != 0; }
+
 		// getters
 		constexpr opcode_t opcode() const { return m_opcode; }
 		constexpr condition_t condition() const { return m_condition; }
@@ -422,6 +428,7 @@ namespace uml
 
 		// control flow operations
 		void nop() { configure(OP_NOP, 4); }
+		void break_() { configure(OP_BREAK, 4); }
 		void debug(u32 pc) { configure(OP_DEBUG, 4, pc); }
 		void exit(parameter param) { configure(OP_EXIT, 4, param); }
 		void exit(condition_t cond, parameter param) { configure(OP_EXIT, 4, param, cond); }
@@ -443,6 +450,7 @@ namespace uml
 		void getfmod(parameter dst) { configure(OP_GETFMOD, 4, dst); }
 		void getexp(parameter dst) { configure(OP_GETEXP, 4, dst); }
 		void getflgs(parameter dst, u32 flags) { configure(OP_GETFLGS, 4, dst, flags); }
+		void setflgs(u32 flags) { configure(OP_SETFLGS, 4, flags); }
 		void save(drcuml_machine_state *dst) { configure(OP_SAVE, 4, parameter::make_memory(dst)); }
 		void restore(drcuml_machine_state *src) { configure(OP_RESTORE, 4, parameter::make_memory(src)); }
 
@@ -467,7 +475,9 @@ namespace uml
 		void subb(parameter dst, parameter src1, parameter src2) { configure(OP_SUBB, 4, dst, src1, src2); }
 		void cmp(parameter src1, parameter src2) { configure(OP_CMP, 4, src1, src2); }
 		void mulu(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_MULU, 4, dst, edst, src1, src2); }
+		void mululw(parameter dst, parameter src1, parameter src2) { configure(OP_MULULW, 4, dst, src1, src2); }
 		void muls(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_MULS, 4, dst, edst, src1, src2); }
+		void mulslw(parameter dst, parameter src1, parameter src2) { configure(OP_MULSLW, 4, dst, src1, src2); }
 		void divu(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_DIVU, 4, dst, edst, src1, src2); }
 		void divs(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_DIVS, 4, dst, edst, src1, src2); }
 		void _and(parameter dst, parameter src1, parameter src2) { configure(OP_AND, 4, dst, src1, src2); }
@@ -506,7 +516,9 @@ namespace uml
 		void dsubb(parameter dst, parameter src1, parameter src2) { configure(OP_SUBB, 8, dst, src1, src2); }
 		void dcmp(parameter src1, parameter src2) { configure(OP_CMP, 8, src1, src2); }
 		void dmulu(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_MULU, 8, dst, edst, src1, src2); }
+		void dmululw(parameter dst, parameter src1, parameter src2) { configure(OP_MULULW, 8, dst, src1, src2); }
 		void dmuls(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_MULS, 8, dst, edst, src1, src2); }
+		void dmulslw(parameter dst, parameter src1, parameter src2) { configure(OP_MULSLW, 8, dst, src1, src2); }
 		void ddivu(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_DIVU, 8, dst, edst, src1, src2); }
 		void ddivs(parameter dst, parameter edst, parameter src1, parameter src2) { configure(OP_DIVS, 8, dst, edst, src1, src2); }
 		void dand(parameter dst, parameter src1, parameter src2) { configure(OP_AND, 8, dst, src1, src2); }

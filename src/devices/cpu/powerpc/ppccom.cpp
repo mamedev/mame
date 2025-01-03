@@ -285,6 +285,12 @@ ppc601_device::ppc601_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+std::unique_ptr<util::disasm_interface> ppc601_device::create_disassembler()
+{
+	// 601 has both POWER and PowerPC instructions
+	return std::make_unique<powerpc_disassembler>((powerpc_disassembler::implementation)(powerpc_disassembler::I_POWER|powerpc_disassembler::I_POWERPC));
+}
+
 ppc604_device::ppc604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ppc_device(mconfig, PPC604, tag, owner, clock, 32, 64, PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, address_map_constructor())
 {
@@ -1219,7 +1225,7 @@ void ppc_device::device_reset()
 
 std::unique_ptr<util::disasm_interface> ppc_device::create_disassembler()
 {
-	return std::make_unique<powerpc_disassembler>();
+	return std::make_unique<powerpc_disassembler>(powerpc_disassembler::I_POWERPC);
 }
 
 

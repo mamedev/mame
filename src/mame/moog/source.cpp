@@ -47,17 +47,18 @@ TODO:
 
 #include "moog_source.lh"
 
-#define LOG_CV (1U << 1)
-#define LOG_BUTTONS (1U << 2)
-#define LOG_ENCODER (1U << 3)
-#define LOG_KEYBOARD (1U << 4)
-#define LOG_CV_KEYBOARD_APPROX (1U << 5)
+#define LOG_CV                  (1U << 1)
+#define LOG_BUTTONS             (1U << 2)
+#define LOG_ENCODER             (1U << 3)
+#define LOG_KEYBOARD            (1U << 4)
+#define LOG_CV_KEYBOARD_APPROX  (1U << 5)
+
 #define VERBOSE (LOG_GENERAL|LOG_CV)
-#define LOG_OUTPUT_FUNC osd_printf_info
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
 #include "logmacro.h"
 
-namespace
-{
+namespace {
 
 constexpr const char MAINCPU_TAG[] = "z80";
 constexpr const char NVRAM_TAG[] = "nvram";
@@ -65,8 +66,7 @@ constexpr const char NVRAM_TAG[] = "nvram";
 class source_state : public driver_device
 {
 public:
-	source_state(const machine_config& mconfig, device_type type,
-				 const char* tag) ATTR_COLD
+	source_state(const machine_config &mconfig, device_type type, const char* tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
 		, m_octave_io(*this, "octave_buttons")
@@ -90,13 +90,14 @@ public:
 		, m_cv(static_cast<int>(CV::SIZE), -1)
 	{}
 
-	void source(machine_config& config) ATTR_COLD;
-
-	void machine_start() override ATTR_COLD;
-	void machine_reset() override ATTR_COLD;
+	void source(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(octave_button_pressed);
 	DECLARE_INPUT_CHANGED_MEMBER(encoder_moved);
+
+protected:
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	void update_octave_leds();
@@ -144,6 +145,8 @@ private:
 	u8 m_button_row_latch = 0xff;
 	bool m_encoder_incr = false;
 
+	std::vector<float> m_cv;
+
 	// All MUXes are CD4051B.
 	// Component designations refer to board 2 (synthesizer board).
 	// The enum names match the CV labels in the schematic, but some
@@ -182,7 +185,6 @@ private:
 
 		SIZE
 	};
-	std::vector<float> m_cv;
 
 	static constexpr const float MAX_CV = 10;  // In Volts.
 	static constexpr const u8 PATTERNS_7447[16] =
@@ -365,9 +367,9 @@ void source_state::cv_w(offs_t offset, u8 data)
 		return;
 
 	const float cv = MAX_CV * data / 255.0f;
-	if (cv == m_cv.at(offset))
+	if (cv == m_cv[offset])
 		return;
-	m_cv.at(offset) = cv;
+	m_cv[offset] = cv;
 
 	if (offset == static_cast<int>(CV::KEYBOARD_APPROX))
 		LOGMASKED(LOG_CV_KEYBOARD_APPROX,
@@ -408,7 +410,7 @@ float source_state::get_keyboard_v() const
 
 	// *** Convert pressed key to a voltage.
 
-	static constexpr const float KEYBOARD_VREF = 8.24;  // From schematic.
+	static constexpr const float KEYBOARD_VREF = 8.24f;  // From schematic.
 	static constexpr const float RKEY = RES_R(100);
 	static constexpr const float R74 = RES_R(150);
 	static constexpr const float R76 = RES_K(220);
@@ -445,7 +447,7 @@ u8 source_state::keyboard_r()
 	// TODO: Compute keyboard voltage in an input callback.
 	static constexpr const int KB_APPROX_INDEX =
 		static_cast<int>(CV::KEYBOARD_APPROX);
-	const u8 d0 = (get_keyboard_v() >= m_cv.at(KB_APPROX_INDEX)) ? 1 : 0;
+	const u8 d0 = (get_keyboard_v() >= m_cv[KB_APPROX_INDEX]) ? 1 : 0;
 
 	// D1, D2: Loudness and Filter contour peaks.
 	// D1 <- U32, FILT CNTR <- S22-11: 0 when envolope reaches almost 10V
@@ -833,7 +835,6 @@ ROM_START(moogsource)
 	ROMX_LOAD("3p3.u23", 0x000000, 0x001000, CRC(4211331f) SHA1(8767ef6b1cbb032a89a78bdb77bb7dbc1c187974), ROM_BIOS(0))
 ROM_END
 
-}  // Anonymous namespace.
+}  // anonymous namespace.
 
-SYST(1981, moogsource, 0, 0, source, source, source_state, empty_init, "Moog Music", "Moog Source", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
-
+SYST(1981, moogsource, 0, 0, source, source, source_state, empty_init, "Moog Music", "Moog Source", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND)
