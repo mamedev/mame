@@ -303,7 +303,7 @@ void quizdna_state::common_io(address_map &map)
 	map(0x81, 0x81).portr("P2");
 	map(0x90, 0x90).portr("SYSTEM");
 	map(0x91, 0x91).portr("SERVICE");
-	map(0xc0, 0xc0).w(FUNC(quizdna_state::rombank_w));
+	map(0xc0, 0xc0).w(FUNC(quizdna_state::rombank_w<0>));
 	map(0xd0, 0xd0).w(FUNC(quizdna_state::screen_ctrl_w));
 	map(0xe0, 0xe1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf0, 0xf0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
