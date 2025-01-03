@@ -772,18 +772,18 @@ static const gfx_layout charlayout_memory =
 
 
 static GFXDECODE_START( gfx_sasuke )
-	GFXDECODE_ENTRY( nullptr,           0x1000, swapcharlayout,      0, 4 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, swapcharlayout,    4*4, 4 )
+	GFXDECODE_RAM(   nullptr, 0x1000, swapcharlayout,      0, 4 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, swapcharlayout,    4*4, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_satansat )
-	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 4 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        4*4, 4 )
+	GFXDECODE_RAM(   nullptr, 0x1000, charlayout_memory,   0, 4 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout,        4*4, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_vanguard )
-	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 8 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        8*4, 8 )
+	GFXDECODE_RAM(   nullptr, 0x1000, charlayout_memory,   0, 8 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout,        8*4, 8 )
 GFXDECODE_END
 
 

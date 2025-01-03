@@ -86,8 +86,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	virtual void device_post_load() override ATTR_COLD;
-
 	void fixeight_68k_mem(address_map &map) ATTR_COLD;
 	void fixeight_v25_mem(address_map &map) ATTR_COLD;
 
@@ -282,12 +280,6 @@ void fixeight_state::tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 		COMBINE_DATA(&m_tx_gfxram[offset]);
 		m_gfxdecode->gfx(0)->mark_dirty(offset/32);
 	}
-}
-
-void fixeight_state::device_post_load()
-{
-	if (m_tx_gfxram != nullptr)
-		m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
 
@@ -512,7 +504,7 @@ static const gfx_layout truxton2_tx_tilelayout =
 
 
 static GFXDECODE_START( gfx )
-	GFXDECODE_ENTRY( nullptr, 0, truxton2_tx_tilelayout, 64*16, 64 )
+	GFXDECODE_RAM( nullptr, 0, truxton2_tx_tilelayout, 64*16, 64 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_textrom )
