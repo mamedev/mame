@@ -1259,7 +1259,10 @@ static INPUT_PORTS_START( tak_wdg )
 
 	// there is unemulated IR connectivity with other devices that isn't emulated, might rely on some of the unused bits here
 	// could also just be that the other robots change the state of another port somewhere in order to be detected
+
 	// test mode code suggesting IR is at 0eb771 (part of it requires opposing directions to be held as this is not a joystick)
+
+	// To access test moe (do this on a fresh boot, not after an F3 reset):
 	// first it checks bits 0x01 in port IN1 and expects them to be 0 (this doesn't seem to be connected to anything normally?)
 	// then reads port IN0, masks with 0xf7 and expects only LEFT & RIGHT to he held together
 
