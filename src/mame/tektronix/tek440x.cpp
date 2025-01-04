@@ -713,21 +713,23 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		return 1;
 	}
 
-	u16 invert = BIT(m_videocntl, 4) ? 0x0000 : 0xffff;
-
+	u32 invert = BIT(m_videocntl, 4) ? 0 : -1;
+	int pan = (m_videocntl & 15) ^ 15;
+	
 	for (int y = 0; y < 480; y++)
 	{
 	
-		//  FIXME: add in videopan
 		u16 *const line = &bitmap.pix(y);
-		u16 const *video_ram = &m_vram[y * 64 + m_videoaddr[0]];
+		u16 const *video_ram = &m_vram[y * 64];
 
 		for (int x = 0; x < 640; x += 16)
 		{
-			u16 const word = *(video_ram++) ^ invert;
+			u16 const word = *(video_ram++);
+			u16 const word2 = *(video_ram);
+			u32 dword = ((word << 16) | word2) ^ invert;
 			for (int b = 0; b < 16; b++)
 			{
-				line[x + b] = BIT(word, 15 - b);
+				line[x + b] = BIT(dword, 31 - pan - b);
 			}
 		}
 	}
