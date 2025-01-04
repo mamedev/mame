@@ -32,13 +32,11 @@
 #include "emu.h"
 #include "lasso.h"
 
-/***************************************************************************
-
-
-                            Colors (BBGGGRRR)
-
-
-***************************************************************************/
+/*************************************
+ *
+ *  Colors (BBGGGRRR)
+ *
+ *************************************/
 
 rgb_t lasso_state::get_color(int data)
 {
@@ -103,22 +101,18 @@ void lasso_state::wwjgtin_set_last_four_colors()
 }
 
 
-
-/***************************************************************************
-
-  Callbacks for the TileMap code
-
-***************************************************************************/
+/*************************************
+ *
+ *  Callbacks for the TileMap code
+ *
+ *************************************/
 
 TILE_GET_INFO_MEMBER(lasso_state::lasso_get_bg_tile_info)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	tileinfo.set(0,
-					code + ((uint16_t)m_gfxbank << 8),
-					color & 0x0f,
-					0);
+	tileinfo.set(0, code + ((uint16_t)m_gfxbank << 8), color & 0x0f, 0);
 }
 
 TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
@@ -127,10 +121,7 @@ TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
 	int code = ROM[tile_index];
 	int color = ROM[tile_index + 0x2000];
 
-	tileinfo.set(2,
-					code,
-					color & 0x0f,
-					0);
+	tileinfo.set(2, code, color & 0x0f, 0);
 }
 
 TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
@@ -138,10 +129,7 @@ TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
 	int code  = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	tileinfo.set(0,
-					code + ((color & 0x30) << 4),
-					color & 0x0f,
-					0);
+	tileinfo.set(0, code + ((color & 0x30) << 4), color & 0x0f, 0);
 }
 
 
@@ -153,7 +141,7 @@ TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
 
 void lasso_state::video_start()
 {
-	/* create tilemap */
+	// create tilemap
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lasso_state::lasso_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
@@ -161,7 +149,7 @@ void lasso_state::video_start()
 
 VIDEO_START_MEMBER(lasso_state,wwjgtin)
 {
-	/* create tilemaps */
+	// create tilemaps
 	m_bg_tilemap =    &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lasso_state::lasso_get_bg_tile_info)),      TILEMAP_SCAN_ROWS,  8,  8,  32, 32);
 	m_track_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lasso_state::wwjgtin_get_track_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 64);
 
@@ -170,7 +158,7 @@ VIDEO_START_MEMBER(lasso_state,wwjgtin)
 
 VIDEO_START_MEMBER(lasso_state,pinbo)
 {
-	/* create tilemap */
+	// create tilemap
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lasso_state::pinbo_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
@@ -198,7 +186,7 @@ void lasso_state::lasso_colorram_w(offs_t offset, uint8_t data)
 
 void lasso_state::lasso_flip_screen_w(uint8_t data)
 {
-	/* don't know which is which, but they are always set together */
+	// don't know which is which, but they are always set together
 	flip_screen_x_set(data & 0x01);
 	flip_screen_y_set(data & 0x02);
 
@@ -235,7 +223,7 @@ void lasso_state::wwjgtin_video_control_w(uint8_t data)
 
 void lasso_state::pinbo_video_control_w(uint8_t data)
 {
-	/* no need to dirty the tilemap -- only the sprites use the global bank */
+	// no need to dirty the tilemap -- only the sprites use the global bank
 	m_gfxbank = (data & 0x0c) >> 2;
 
 	lasso_flip_screen_w(data);
@@ -374,7 +362,7 @@ uint32_t lasso_state::screen_update_wwjgtin(screen_device &screen, bitmap_ind16 
 	else
 		bitmap.fill(m_palette->black_pen(), cliprect);
 
-	draw_sprites(bitmap, cliprect, 1);   // reverse order
+	draw_sprites(bitmap, cliprect, 1); // reverse order
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;

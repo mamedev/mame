@@ -19,7 +19,7 @@ Notes:
 
 - unknown CPU speeds unless noted above (affect game timing), currently using
   same as the Rock-Ola games of the same area.  Lot of similarities between
-  these hardware.  The music ends at the perfect time with this clock speed
+  these hardware.
 - Lasso: fire button auto-repeats on high score entry screen (real behavior?)
 - Pinbo: bgcolor is wrong, how does it generate it? ($a0, should be darkblue)
 
@@ -43,33 +43,31 @@ DIP locations verified for:
 
 INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
 {
-	/* coin insertion causes an NMI */
+	// coin insertion causes an NMI
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-/* Write to the sound latch and generate an IRQ on the sound CPU */
 void lasso_state::sound_command_w(uint8_t data)
 {
+	// Write to the sound latch and generate an IRQ on the sound CPU
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 uint8_t lasso_state::sound_status_r()
 {
-	/*  0x01: chip#0 ready; 0x02: chip#1 ready */
-	return 0x03;
+	// 0x01: chip#0 ready; 0x02: chip#1 ready
+	return m_sn[0]->ready_r() | m_sn[1]->ready_r() << 1;
 }
 
 void lasso_state::sound_select_w(uint8_t data)
 {
-	uint8_t to_write = bitswap<8>(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
-
-	if (~data & 0x01)   /* chip #0 */
-		m_sn_1->write(to_write);
-
-	if (~data & 0x02)   /* chip #1 */
-		m_sn_2->write(to_write);
+	for (int i = 0; i < 2; i++)
+	{
+		if (BIT(~data, i))
+			m_sn[i]->write(bitswap<8>(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7));
+	}
 }
 
 
@@ -85,7 +83,7 @@ void lasso_state::lasso_main_map(address_map &map)
 	map(0x1802, 0x1802).w(FUNC(lasso_state::lasso_video_control_w));
 	map(0x1804, 0x1804).portr("1804");
 	map(0x1805, 0x1805).portr("1805");
-	map(0x1806, 0x1806).portr("1806").nopw();   /* game uses 'lsr' to read port */
+	map(0x1806, 0x1806).portr("1806").nopw(); // game uses 'lsr' to read port
 	map(0x1807, 0x1807).portr("1807");
 	map(0x8000, 0xbfff).mirror(0x4000).rom();
 }
@@ -209,8 +207,8 @@ void lasso_state::pinbo_audio_io_map(address_map &map)
 	map(0x02, 0x02).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x04, 0x05).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x06, 0x06).r("ay2", FUNC(ay8910_device::data_r));
-	map(0x08, 0x08).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); /* ??? */
-	map(0x14, 0x14).nopw();    /* ??? */
+	map(0x08, 0x08).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // ???
+	map(0x14, 0x14).nopw(); // ???
 }
 
 
@@ -492,42 +490,42 @@ MACHINE_RESET_MEMBER(lasso_state,wwjgtin)
 
 void lasso_state::base(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, 11289000/16); /* guess */
+	// basic machine hardware
+	M6502(config, m_maincpu, 11'289'000/16); // guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &lasso_state::lasso_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(lasso_state::irq0_line_hold));
 
-	M6502(config, m_audiocpu, 600000);
+	M6502(config, m_audiocpu, 11'289'000/16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lasso_state::lasso_audio_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);    /* guess, but avoids glitching of Chameleon's high score table */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(lasso_state::screen_update_lasso));
-	screen.set_palette(m_palette);
+	// video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(61); // guess based on intro song finish time compared to PCB
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(lasso_state::screen_update_lasso));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lasso);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	SN76489(config, m_sn_1, 2000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	SN76489(config, m_sn_2, 2000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	SN76489(config, m_sn[0], 11'289'000/4).add_route(ALL_OUTPUTS, "speaker", 0.5); // correct
+	SN76489(config, m_sn[1], 11'289'000/4).add_route(ALL_OUTPUTS, "speaker", 0.5); // "
 }
 
 void lasso_state::lasso(machine_config &config)
 {
 	base(config);
 
-	/* basic machine hardware */
-	m6502_device & blitter(M6502(config, "blitter", 11289000/16)); /* guess */
+	// basic machine hardware
+	m6502_device &blitter(M6502(config, "blitter", 11'289'000/16)); // guess
 	blitter.set_addrmap(AS_PROGRAM, &lasso_state::lasso_coprocessor_map);
 
 	PALETTE(config, m_palette, FUNC(lasso_state::lasso_palette), 0x40);
@@ -537,67 +535,73 @@ void lasso_state::chameleo(machine_config &config)
 {
 	base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
+	m_maincpu->set_clock(18'000'000/24);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lasso_state::chameleo_main_map);
 
+	m_audiocpu->set_clock(18'000'000/24);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lasso_state::chameleo_audio_map);
 
-	/* video hardware */
+	// video hardware
 	PALETTE(config, m_palette, FUNC(lasso_state::lasso_palette), 0x40);
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(lasso_state::screen_update_chameleo));
+	m_screen->set_refresh_hz(59); // guess based on intro song finish time compared to PCB
+	m_screen->set_screen_update(FUNC(lasso_state::screen_update_chameleo));
+
+	// sound hardware
+	m_sn[0]->set_clock(18'000'000/6); // correct
+	m_sn[1]->set_clock(18'000'000/6); // "
 }
 
 void lasso_state::wwjgtin(machine_config &config)
 {
-	base(config);
+	chameleo(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &lasso_state::wwjgtin_main_map);
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lasso_state::wwjgtin_audio_map);
 
-	MCFG_MACHINE_START_OVERRIDE(lasso_state,wwjgtin)
-	MCFG_MACHINE_RESET_OVERRIDE(lasso_state,wwjgtin)
+	MCFG_MACHINE_START_OVERRIDE(lasso_state, wwjgtin)
+	MCFG_MACHINE_RESET_OVERRIDE(lasso_state, wwjgtin)
 
-	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(lasso_state::screen_update_wwjgtin));
-	m_gfxdecode->set_info(gfx_wwjgtin); // Has 1 additional layer
+	// video hardware
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(lasso_state::screen_update_wwjgtin));
+	m_gfxdecode->set_info(gfx_wwjgtin); // has 1 additional layer
 
-	PALETTE(config, m_palette, FUNC(lasso_state::wwjgtin_palette), 0x40 + 16*16, 64);
+	PALETTE(config.replace(), m_palette, FUNC(lasso_state::wwjgtin_palette), 0x40 + 16*16, 64);
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,wwjgtin)
 
-	/* sound hardware */
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	// sound hardware
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 void lasso_state::pinbo(machine_config &config)
 {
-	base(config);
+	chameleo(config);
 
-	/* basic machine hardware */
-	M6502(config.replace(), m_maincpu, XTAL(18'000'000)/24);
+	// basic machine hardware
+	m_maincpu->set_clock(18_MHz_XTAL/24);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lasso_state::pinbo_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(lasso_state::irq0_line_hold));
 
-	Z80(config.replace(), m_audiocpu, XTAL(18'000'000)/6);
+	Z80(config.replace(), m_audiocpu, 18_MHz_XTAL/6);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lasso_state::pinbo_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &lasso_state::pinbo_audio_io_map);
 
-	/* video hardware */
+	// video hardware
 	m_gfxdecode->set_info(gfx_pinbo);
 
-	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
+	PALETTE(config.replace(), m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(lasso_state::screen_update_chameleo));
 
-	/* sound hardware */
-	config.device_remove("sn76489.1");
-	config.device_remove("sn76489.2");
+	// sound hardware
+	config.device_remove("sn76489_0");
+	config.device_remove("sn76489_1");
 
-	AY8910(config, "ay1", XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.55);
-	AY8910(config, "ay2", XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.55);
+	AY8910(config, "ay1", 18_MHz_XTAL/12).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8910(config, "ay2", 18_MHz_XTAL/12).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -683,12 +687,12 @@ ROM_START( wwjgtin )
 	ROM_CONTINUE(       0x7800, 0x0800 )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "ic47.3", 0x0000, 0x2000, CRC(40594c59) SHA1(94533be8e267d9aa5bcdd52b45f6974436d3fed5) )  // 1xxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "ic47.3", 0x0000, 0x2000, CRC(40594c59) SHA1(94533be8e267d9aa5bcdd52b45f6974436d3fed5) ) // 1xxxxxxxxxxxx = 0xFF
 	ROM_LOAD( "ic46.4", 0x2000, 0x2000, CRC(d1921348) SHA1(8b5506ff80a31ce721aed515cad1b4a7e52e47a2) )
 
-	ROM_REGION( 0x4000, "user1", 0 )                /* tilemap */
+	ROM_REGION( 0x4000, "user1", 0 ) // tilemap
 	ROM_LOAD( "ic48.2", 0x0000, 0x2000, CRC(a4a7df77) SHA1(476aab702346a402169ab404a8b06589e4932d37) )
-	ROM_LOAD( "ic49.1", 0x2000, 0x2000, CRC(e480fbba) SHA1(197c86747ef8477040169f90eb6e04d928aedbe5) )  // FIXED BITS (1111xxxx)
+	ROM_LOAD( "ic49.1", 0x2000, 0x2000, CRC(e480fbba) SHA1(197c86747ef8477040169f90eb6e04d928aedbe5) ) // FIXED BITS (1111xxxx)
 
 	ROM_REGION( 0x40, "proms", 0 )
 	ROM_LOAD( "2.bpr",  0x0000, 0x0020, CRC(79adda5d) SHA1(e54de3eb02f744d49f524cd81e1cf993338916e3) )
@@ -722,12 +726,12 @@ ROM_START( photof )
 	ROM_CONTINUE(       0x7800, 0x0800 )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "3-ic47.bin", 0x0000, 0x2000, CRC(40594c59) SHA1(94533be8e267d9aa5bcdd52b45f6974436d3fed5) )  // 1xxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "3-ic47.bin", 0x0000, 0x2000, CRC(40594c59) SHA1(94533be8e267d9aa5bcdd52b45f6974436d3fed5) ) // 1xxxxxxxxxxxx = 0xFF
 	ROM_LOAD( "4-ic46.bin", 0x2000, 0x2000, CRC(d1921348) SHA1(8b5506ff80a31ce721aed515cad1b4a7e52e47a2) )
 
-	ROM_REGION( 0x4000, "user1", 0 )                /* tilemap */
+	ROM_REGION( 0x4000, "user1", 0 ) // tilemap
 	ROM_LOAD( "2-ic48.bin", 0x0000, 0x2000, CRC(a4a7df77) SHA1(476aab702346a402169ab404a8b06589e4932d37) )
-	ROM_LOAD( "1-ic49.bin", 0x2000, 0x2000, CRC(e480fbba) SHA1(197c86747ef8477040169f90eb6e04d928aedbe5) )  // FIXED BITS (1111xxxx)
+	ROM_LOAD( "1-ic49.bin", 0x2000, 0x2000, CRC(e480fbba) SHA1(197c86747ef8477040169f90eb6e04d928aedbe5) ) // FIXED BITS (1111xxxx)
 
 	ROM_REGION( 0x40, "proms", 0 )
 	ROM_LOAD( "2.bpr",  0x0000, 0x0020, CRC(79adda5d) SHA1(e54de3eb02f744d49f524cd81e1cf993338916e3) )
@@ -745,7 +749,7 @@ ROM_START( pinbo )
 	ROM_LOAD( "rom1.s8",     0x0000, 0x2000, CRC(ca45a1be) SHA1(d0b2d8f1e6d01b60cba83d2bd458a57548549b4b) )
 
 	ROM_REGION( 0xc000, "gfx1", 0 )
-	ROM_LOAD( "rom6.a1",     0x0000, 0x0800, CRC(74fe8e98) SHA1(3c9ac38d7054b2831a515786b6f204b1804aaea3) ) /* tiles   */
+	ROM_LOAD( "rom6.a1",     0x0000, 0x0800, CRC(74fe8e98) SHA1(3c9ac38d7054b2831a515786b6f204b1804aaea3) ) // tiles
 	ROM_CONTINUE(            0x2000, 0x0800 )
 	ROM_CONTINUE(            0x0800, 0x0800 )
 	ROM_CONTINUE(            0x2800, 0x0800 )
@@ -761,7 +765,7 @@ ROM_START( pinbo )
 	ROM_CONTINUE(            0x7000, 0x0800 )
 	ROM_CONTINUE(            0x5800, 0x0800 )
 	ROM_CONTINUE(            0x7800, 0x0800 )
-	ROM_LOAD( "rom7.d1",     0x8000, 0x0800, CRC(327a3c21) SHA1(e938915d28ac4ec033b20d33728788493e3f30f6) ) /* 3rd bitplane */
+	ROM_LOAD( "rom7.d1",     0x8000, 0x0800, CRC(327a3c21) SHA1(e938915d28ac4ec033b20d33728788493e3f30f6) ) // 3rd bitplane
 	ROM_CONTINUE(            0xa000, 0x0800 )
 	ROM_CONTINUE(            0x8800, 0x0800 )
 	ROM_CONTINUE(            0xa800, 0x0800 )
@@ -787,7 +791,7 @@ ROM_START( pinboa )
 	ROM_LOAD( "8.bin",       0x0000, 0x2000, CRC(32d1df14) SHA1(c0d4181378bbd6f2c594e923e2f8b21647c7fb0e) )
 
 	ROM_REGION( 0xc000, "gfx1", 0 )
-	ROM_LOAD( "rom6.a1",     0x0000, 0x0800, CRC(74fe8e98) SHA1(3c9ac38d7054b2831a515786b6f204b1804aaea3) ) /* tiles   */
+	ROM_LOAD( "rom6.a1",     0x0000, 0x0800, CRC(74fe8e98) SHA1(3c9ac38d7054b2831a515786b6f204b1804aaea3) ) // tiles
 	ROM_CONTINUE(            0x2000, 0x0800 )
 	ROM_CONTINUE(            0x0800, 0x0800 )
 	ROM_CONTINUE(            0x2800, 0x0800 )
@@ -803,7 +807,7 @@ ROM_START( pinboa )
 	ROM_CONTINUE(            0x7000, 0x0800 )
 	ROM_CONTINUE(            0x5800, 0x0800 )
 	ROM_CONTINUE(            0x7800, 0x0800 )
-	ROM_LOAD( "2.bin",       0x8000, 0x0800, CRC(33cac92e) SHA1(55d4ff3ae9c9519a59bd6021a53584c873b4d327) ) /* 3rd bitplane */
+	ROM_LOAD( "2.bin",       0x8000, 0x0800, CRC(33cac92e) SHA1(55d4ff3ae9c9519a59bd6021a53584c873b4d327) ) // 3rd bitplane
 	ROM_CONTINUE(            0xa000, 0x0800 )
 	ROM_CONTINUE(            0x8800, 0x0800 )
 	ROM_CONTINUE(            0xa800, 0x0800 )
@@ -829,7 +833,7 @@ ROM_START( pinbos )
 	ROM_LOAD( "b8.bin",      0x0000, 0x2000, CRC(32d1df14) SHA1(c0d4181378bbd6f2c594e923e2f8b21647c7fb0e) )
 
 	ROM_REGION( 0xc000, "gfx1", 0 )
-	ROM_LOAD( "rom6.a1",     0x0000, 0x0800, CRC(74fe8e98) SHA1(3c9ac38d7054b2831a515786b6f204b1804aaea3) ) /* tiles   */
+	ROM_LOAD( "rom6.a1",     0x0000, 0x0800, CRC(74fe8e98) SHA1(3c9ac38d7054b2831a515786b6f204b1804aaea3) ) // tiles
 	ROM_CONTINUE(            0x2000, 0x0800 )
 	ROM_CONTINUE(            0x0800, 0x0800 )
 	ROM_CONTINUE(            0x2800, 0x0800 )
@@ -845,7 +849,7 @@ ROM_START( pinbos )
 	ROM_CONTINUE(            0x7000, 0x0800 )
 	ROM_CONTINUE(            0x5800, 0x0800 )
 	ROM_CONTINUE(            0x7800, 0x0800 )
-	ROM_LOAD( "rom7.d1",     0x8000, 0x0800, CRC(327a3c21) SHA1(e938915d28ac4ec033b20d33728788493e3f30f6) ) /* 3rd bitplane */
+	ROM_LOAD( "rom7.d1",     0x8000, 0x0800, CRC(327a3c21) SHA1(e938915d28ac4ec033b20d33728788493e3f30f6) ) // 3rd bitplane
 	ROM_CONTINUE(            0xa000, 0x0800 )
 	ROM_CONTINUE(            0x8800, 0x0800 )
 	ROM_CONTINUE(            0xa800, 0x0800 )

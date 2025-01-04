@@ -833,7 +833,6 @@ void snk6502_state::sasuke(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,sasuke)
 
 	// video hardware
-
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz((MASTER_CLOCK / 16) / (45 * 32 * 8));
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
