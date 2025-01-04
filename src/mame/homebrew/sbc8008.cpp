@@ -35,6 +35,8 @@
 namespace
 {
 
+#define SBC8008_ROM_SIZE (0x2000)
+
 // State class - derives from driver_device
 class sbc8008_state : public driver_device
 {
@@ -105,7 +107,7 @@ void sbc8008_state::machine_start()
 
 uint8_t sbc8008_state::memory_read(offs_t offset)
 {
-	if (start)
+	if (start && 0 <= offset && offset < SBC8008_ROM_SIZE)
 	{			
 		return ((uint8_t*)m_rom_bank->base())[offset];
 	} 
@@ -267,8 +269,8 @@ ROM_START(sbc8008)
 	//For the addresses to makes since, setup a huge rom chip and load the roms to the cooresponding machine addresses
 	ROM_REGION(0x10000, "rom",0)
 	//         Name                   offset  Length   hash
-	ROM_LOAD("monitor.bin",          0x2000, 0x2000, CRC(0f3aa663) SHA1(27679a370b45050b504a2c8f640d20e39afd78d6))
-	ROM_LOAD("scelbal-in-eprom.bin", 0x4000, 0x2000, CRC(3d25b65a) SHA1(e1db1ba610ed0103d142f889a1995a5d95883c79))
+	ROM_LOAD("monitor.bin",          0x2000, SBC8008_ROM_SIZE, CRC(0f3aa663) SHA1(27679a370b45050b504a2c8f640d20e39afd78d6))
+	ROM_LOAD("scelbal-in-eprom.bin", 0x4000, SBC8008_ROM_SIZE, CRC(3d25b65a) SHA1(e1db1ba610ed0103d142f889a1995a5d95883c79))
 ROM_END
 
 } // anonymous namespace
