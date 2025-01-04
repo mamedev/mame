@@ -176,12 +176,6 @@ void h_88_3_device::modem_w(offs_t reg, u8 val)
 
 void h_88_3_device::device_start()
 {
-	save_item(NAME(m_lp_enabled));
-	save_item(NAME(m_lp_int_idx));
-	save_item(NAME(m_aux_enabled));
-	save_item(NAME(m_aux_int_idx));
-	save_item(NAME(m_modem_enabled));
-	save_item(NAME(m_modem_int_idx));
 	save_item(NAME(m_lp_intr));
 	save_item(NAME(m_aux_intr));
 	save_item(NAME(m_modem_intr));
