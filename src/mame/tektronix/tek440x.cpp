@@ -68,6 +68,9 @@
 
 #include "tek4404.lh"
 
+#define LOG_GENERAL (1U << 0)
+#define LOG_MMU (1U << 1)
+
 #define VERBOSE 1
 #include "logmacro.h"
 
@@ -149,7 +152,7 @@ class m68010_tekmmu_device : public m68010_device
 		{
 			// page 2.1-54 implies that this can only be read in user mode
 
-			LOG("mapcntl_r(%02x) cpuWr(%d) BlockAccess(%d) SysWrEn(%d) PID(%d) pc(%08x)\n",m_map_control,
+			LOGMASKED(LOG_MMU, "mapcntl_r(%02x) cpuWr(%d) BlockAccess(%d) SysWrEn(%d) PID(%d) pc(%08x)\n",m_map_control,
 				BIT(m_map_control, MAP_CPU_WR) ? 1 : 0,
 				BIT(m_map_control, MAP_BLOCK_ACCESS) ? 1 : 0,
 				BIT(m_map_control, MAP_SYS_WR_ENABLE) ? 1 : 0,
@@ -174,15 +177,15 @@ class m68010_tekmmu_device : public m68010_device
 		
 		if (m_map_control != (data & 0x3f))
 		{
-			LOG("mapcntl_w mmu_enable   %2d pc(%8x)\n", BIT(data, MAP_VM_ENABLE),  pc());
-			LOG("mapcntl_w write_enable %2d\n", BIT(data, MAP_SYS_WR_ENABLE));
-			LOG("mapcntl_w pte PID      %2d\n", data & 15);
-			
+			LOGMASKED(LOG_MMU, "mapcntl_w mmu_enable   %2d pc(%8x)\n", BIT(data, MAP_VM_ENABLE),  pc());
+			LOGMASKED(LOG_MMU, "mapcntl_w write_enable %2d\n", BIT(data, MAP_SYS_WR_ENABLE));
+			LOGMASKED(LOG_MMU, "mapcntl_w pte PID      %2d\n", data & 15);
+
 			if (BIT(data, MAP_VM_ENABLE) && (data & 15))
 			for(uint32_t i=0; i<2048; i++)
 			{
 				if (m_map[i])
-				LOG("XXXmapcntl_w: %08x -> paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
+				LOGMASKED(LOG_MMU, "mapcntl_w: %08x -> paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
 					OFF16_TO_OFF8(i << 11), OFF16_TO_OFF8(BIT(m_map[i], 0, 11)<<11),
 					BIT(m_map[i], 11, 3), m_map[i] & 0x8000 ? 1 : 0, m_map[i] & 0x4000 ? 1 : 0);
 			}
@@ -717,7 +720,7 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	
 		//  FIXME: add in videopan
 		u16 *const line = &bitmap.pix(y);
-		u16 const *video_ram = &m_vram[y * 64];
+		u16 const *video_ram = &m_vram[y * 64 + m_videoaddr[0]];
 
 		for (int x = 0; x < 640; x += 16)
 		{
@@ -853,6 +856,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		else mem_mask = 0;
 
 		// write-enabled page?
+		if (mem_mask)
 		if (BIT(m_map[offset >> 11], 14) == 0)
 		{
 			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
@@ -961,15 +965,18 @@ void tek440x_state::mapcntl_w(u8 data)
 	
 	if (m_map_control != (data & 0x3f))
 	{
-		LOG("mapcntl_w mmu_enable   %2d pc(%8x)\n", BIT(data, MAP_VM_ENABLE),  m_maincpu->pc());
-		LOG("mapcntl_w write_enable %2d\n", BIT(data, MAP_SYS_WR_ENABLE));
-		LOG("mapcntl_w pte PID      %2d\n", data & 15);
+		LOGMASKED(LOG_MMU, "mapcntl_w(%02x) cpuWr(%d) BlockAccess(%d) SysWrEn(%d) PID(%d) pc(%08x)\n",m_latched_map_control,
+			BIT(m_latched_map_control, MAP_CPU_WR) ? 1 : 0,
+			BIT(m_latched_map_control, MAP_BLOCK_ACCESS) ? 1 : 0,
+			BIT(m_latched_map_control, MAP_SYS_WR_ENABLE) ? 1 : 0,
+			m_latched_map_control & 15,
+			m_maincpu->pc());
 		
 		if (BIT(data, MAP_VM_ENABLE) && (data & 15))
 		for(uint32_t i=0; i<2048; i++)
 		{
 			if (m_map[i])
-			LOG("XXXmapcntl_w: %08x -> paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
+				LOGMASKED(LOG_MMU, "XXXmapcntl_w: %08x -> paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
 				OFF16_TO_OFF8(i << 11), OFF16_TO_OFF8(BIT(m_map[i], 0, 11)<<11),
 				BIT(m_map[i], 11, 3), m_map[i] & 0x8000 ? 1 : 0, m_map[i] & 0x4000 ? 1 : 0);
 		}
@@ -978,8 +985,7 @@ void tek440x_state::mapcntl_w(u8 data)
 
 	// NB bit 6 & 7 is not used
 	
-	// disable using latched state for now
-	
+	// disable using latched state below
 	//m_map_control = data & 0x3f;
 	
 }
@@ -993,7 +999,7 @@ u16 tek440x_state::videoaddr_r(offs_t offset)
 
 void tek440x_state::videoaddr_w(offs_t offset, u16 data)
 {
-//	LOG("videoaddr_w %08x %04x\n", offset, data);
+	LOG("videoaddr_w %08x %04x\n", offset, data);
 	m_videoaddr[offset] = data;
 }
 
@@ -1077,7 +1083,7 @@ const int mouse_xyb[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 
 	uint8_t x = m_mousex->read();
 	uint8_t y = m_mousey->read();
-
+	
 	if(m_mouse_pc == 0)
 	{
 		if(x == m_mouse_x)
@@ -1118,16 +1124,18 @@ const int mouse_xyb[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 
 u8 tek440x_state::mouse_r(offs_t offset)
 {
-
 	u8 ans = 0;
+	static u8 oldmx,oldmy;
 	
 	switch(offset)
 	{
 		case 0:
-			ans = m_mouse_x;
+			ans = ~(oldmx - m_mouse_x);
+			oldmx = m_mouse_x;
 			break;
 		case 2:
-			ans = m_mouse;
+			ans = ~(oldmy - m_mouse_y);
+			oldmy = m_mouse_y;
 			ans ^= (m_diag & 15);
 			
 			break;
@@ -1144,11 +1152,10 @@ u8 tek440x_state::mouse_r(offs_t offset)
 			break;
 
 		default:
+			oldmx = oldmy = 0;
 			break;
 	}
 
-	//LOG("mouse_r %04x => %04x\n", offset, ans);
-	
 	return ans;
 }
 
@@ -1308,7 +1315,7 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x600000, 0x61ffff).ram().share("vram");
 
 	// 700000-71ffff spare 0
-	// 720000-73ffff spare 1
+	// 720000-73ffff spare 1  (ethernet)
 	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0).w(FUNC(tek440x_state::led_w));
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
 
