@@ -9,11 +9,14 @@
     DMA driven audio, the floppy controller, a serial receiver/transmitter,
     analog inputs and contains the interrupt controller.
 
+    References:
+    - https://www.amigarealm.com/computing/knowledge/hardref/ch5.htm
+
     TODO:
     - Inherit FDC, serial and irq controller to here;
     - Move Agnus "location" logic out of here;
-    - low-pass filter;
-    - convert volume values to non-linear dB scale (cfr. )
+    - low-pass filter control thru Amiga Power LED where available, technically
+      outside of Paula;
     - Verify ADKCON modulation;
     - Verify manual mode:
       \- AGA roadkill during gameplay, which also has very long period setups,
@@ -298,13 +301,12 @@ void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		for (channum = 0; channum < 4; channum++)
 		{
 			audio_channel *chan = &m_channel[channum];
-			int volume = (nextvol == -1) ? chan->vol : nextvol;
-			int period = (nextper == -1) ? chan->per : nextper;
-			s32 sample;
+			s16 volume = (nextvol == -1) ? chan->vol : nextvol;
+			s16 period = (nextper == -1) ? chan->per : nextper;
+			s16 sample;
 			int i;
 
 			// normalize the volume value
-			// FIXME: definitely not linear
 			volume = (volume & 0x40) ? 64 : (volume & 0x3f);
 			volume *= 4;
 
@@ -333,7 +335,7 @@ void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 
 			// fill the buffer with the sample
 			for (i = 0; i < ticks; i += CLOCK_DIVIDER)
-				outputs[channum].put_int((sampoffs + i) / CLOCK_DIVIDER, sample, 32768);
+				outputs[channum].put_int_clamp((sampoffs + i) / CLOCK_DIVIDER, sample, 32768);
 
 			// account for the ticks; if we hit 0, advance
 			chan->curticks -= ticks;
@@ -341,6 +343,7 @@ void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			{
 				// reset the clock and ensure we're above the minimum ticks
 				chan->curticks = period;
+				// TODO: 123 for PAL machines, derive formula from clock()
 				if (chan->curticks < 124)
 					chan->curticks = 124;
 

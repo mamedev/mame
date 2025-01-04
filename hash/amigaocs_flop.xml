@@ -3547,9 +3547,10 @@ ATK test: C:0 H:U Bad
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<!-- baddump: Sector 1086 damaged by Lamer Exterminator -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2159)astatin.ipf" size="1049180" crc="8817db76" sha1="74a4d3f19c165c5fe3277f5534ea0a453da5fae1"/>
+				<rom name="(sps2159)astatin.ipf" size="1049180" crc="8817db76" sha1="74a4d3f19c165c5fe3277f5534ea0a453da5fae1" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3763,6 +3764,10 @@ ATK test: failed
 		<year>1989</year>
 		<publisher>Mindware</publisher>
 		<notes><![CDATA[
+Black screen after initial credits, [FDC] DSKSYNC $a425
+[Denise] title off with defbitoffs
+[Denise] bitplanes off by a whole screen size in gameplay
+WHDLoad issue #5120 (for Hot Shots release?)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -3789,7 +3794,7 @@ ATK test: C:0 H:U 1 Sector Bad
 		</part>
 	</software>
 
-	<software name="australo" supported="no">
+	<software name="australo" supported="partial">
 		<!-- SPS (CAPS) release 809 -->
 		<description>Australo Piticus Mechanicus (Europe)</description>
 		<!-- retail, standalone -->
@@ -3797,8 +3802,13 @@ ATK test: C:0 H:U 1 Sector Bad
 		<year>1988</year>
 		<publisher>Timewarp</publisher>
 		<notes><![CDATA[
+Aliased sound SFX samples during gameplay, ch. 0 and 3 [Paula] audxlch_w points to file structure (verify, unlikely)
+Pressing HELP on "run TaskForceInfo" will quick load then skip each profile (verify)
 ATK test: OK
 ]]></notes>
+		<!-- Omake: "copy protection" with SYSTEM at second prompt, "logon superoper helix", -->
+		<!--        "help" for further commands -->
+		<info name="usage" value="To enter main game, type anything at first prompt then GAME at second" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps809)australopiticusmechanicus.ipf" size="1049612" crc="2650009b" sha1="4cb791388927cadb0ce6ac928404092bc62f49ca"/>
@@ -4202,7 +4212,7 @@ ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1591)backgammon.ipf" size="1049612" crc="efbe5e06" sha1="8e586af18898906f691aa1afcc782392bfd42d46"/>
+				<rom name="(sps1591)backgammon.ipf" size="1049612" crc="efbe5e06" sha1="8e586af18898906f691aa1afcc782392bfd42d46" />
 			</dataarea>
 		</part>
 	</software>
@@ -4214,10 +4224,11 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1987</year>
 		<publisher>King Size</publisher>
-		<info name="additional" value="Mastered with virus" />
+		<info name="warning" value="Mastered with virus" />
+		<!-- baddump: SCA bootblock -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps206)backgammon.ipf" size="1049180" crc="b7e159cb" sha1="64a12d9db73c704195ce0d6733fb3c52cc5fba7b" status="baddump"/>
+				<rom name="(sps206)backgammon.ipf" size="1049180" crc="b7e159cb" sha1="64a12d9db73c704195ce0d6733fb3c52cc5fba7b" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -5591,7 +5602,8 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Magic Bytes</publisher>
-		<info name="additional" value="Mastered with virus" />
+		<info name="warning" value="Mastered with virus" />
+		<!-- baddump: NorthStar 2 Bootblock -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1043202">
 				<rom name="(sps1304)beam.ipf" size="1043202" crc="7b894a65" sha1="d88c483405e7b3cb3c1ab2e4fb374036f342e032" status="baddump"/>
@@ -10180,9 +10192,10 @@ ATK test: C:0 H:U Bad
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<!-- baddump: Sector 1369 damaged by Lamer Exterminator -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2804)chariotsofwrath.ipf" size="1049180" crc="80a90a55" sha1="3a82d6211323170f4ac9ad5bf815e5fe06c75a8b"/>
+				<rom name="(sps2804)chariotsofwrath.ipf" size="1049180" crc="80a90a55" sha1="3a82d6211323170f4ac9ad5bf815e5fe06c75a8b" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -10262,13 +10275,14 @@ ATK test: C:0 H:U Bad
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>Ocean</publisher>
-		<info name="additional" value="Mastered with virus" />
+		<info name="warning" value="Mastered with virus" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
 				<rom name="(sps1246)chasehqii-specialcriminalinvestigation_disk1.ipf" size="1049304" crc="7c1fd4ab" sha1="7fe8f14785d048c1e9fad7e4b162f998107f1e3c"/>
 			</dataarea>
 		</part>
+		<!-- baddump: Lamer Exterminator Bootblock -->
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
@@ -17405,8 +17419,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Grandslam</publisher>
-		<info name="additional" value="Mastered with virus" />
+		<info name="warning" value="Mastered with virus" />
 		<info name="alt_title" value="Espionage - The Computer Game (Box)" />
+		<!-- baddump: NorthStar 2 Bootblock -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps11)espionage.ipf" size="1049612" crc="258a0c8e" sha1="604fbea189f9f2a1dc252bb9dc952f4af2f3b051" status="baddump"/>
@@ -29547,7 +29562,7 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>Rainbow Arts</publisher>
-		<info name="additional" value="Mastered with virus" />
+		<info name="warning" value="Mastered with virus" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -29560,6 +29575,7 @@ ATK test: OK
 				<rom name="(sps1589)legendoffaerghail_disk2.ipf" size="1049180" crc="f12792ce" sha1="089a3f0df65662aadadefab3a8502a07c4cfe49b"/>
 			</dataarea>
 		</part>
+		<!-- baddump: Byte Bandit Bootblock -->
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049180">
@@ -36190,7 +36206,8 @@ ATK test: failed
 		<year>1988</year>
 		<publisher>Ariolasoft</publisher>
 		<info name="alt_title" value="Ooze - Als die Geister mürbe wurden (Box)" />
-		<info name="additional" value="Mastered with virus" />
+		<info name="warning" value="Mastered with virus" />
+		<!-- baddump: PvL Virus Protector v5.0 Bootblock -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1255)ooze.ipf" size="1049612" crc="40d448b7" sha1="66c53d7a931bae8c5436db777c19e40893fd0c9d" status="baddump"/>
@@ -39081,7 +39098,8 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>MicroProse</publisher>
-		<info name="additional" value="Mastered with virus" />
+		<info name="warning" value="Mastered with virus" />
+		<!-- baddump: Byte Warrior (DASA) Bootblock -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps712)presidentismissing,the.ipf" size="1049612" crc="03a617da" sha1="d5d5028f8b834567ee9b5a55264a9b860f00b6f8" status="baddump"/>
@@ -43151,6 +43169,7 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
+WHDLoad has issues reading disk 3, baddump?
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -44194,7 +44213,8 @@ ATK test: C:0 H:U Bad
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
 		<publisher>Accrosoft</publisher>
-		<info name="additional" value="Mastered with virus" />
+		<info name="warning" value="Mastered with virus" />
+		<!-- baddump: SADDAM disk-validator -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disquette 0" />
 			<dataarea name="flop" size="1049180">
@@ -47807,7 +47827,8 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Logotron</publisher>
-		<info name="additional" value="Mastered with virus" />
+		<info name="warning" value="Mastered with virus" />
+		<!-- baddump: SCA Bootblock -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1049612">
@@ -57168,7 +57189,8 @@ ATK test: failed
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Ubi Soft</publisher>
-		<info name="additional" value="Mastered with virus" />
+		<info name="warning" value="Mastered with virus" />
+		<!-- baddump: Lamer Exterminator Bootblock -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1055523">
 				<rom name="(sps2768)zombi.ipf" size="1055523" crc="97261026" sha1="922fdade85ab40968c3c4d028ab841151573d572" status="baddump"/>

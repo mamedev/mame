@@ -1421,6 +1421,12 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 				popmessage("DSKDAT W %04x",data);
 			break;
 
+		case REG_BPL1DAT:
+			// TODO: bpl1dat serial conversion (Team17 + some demos)
+			if (data)
+				popmessage("BPL1DAT W %04x", data);
+			break;
+
 		case REG_DSKSYNC:
 			m_fdc->dsksync_w(data);
 			break;

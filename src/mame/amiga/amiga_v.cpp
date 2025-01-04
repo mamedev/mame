@@ -644,6 +644,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		sprpix = get_sprite_pixel(x);
 
 		bitplane_dma_enabled = (CUSTOM_REG(REG_DMACON) & (DMACON_BPLEN | DMACON_DMAEN)) == (DMACON_BPLEN | DMACON_DMAEN);
+
 		/* to render, we must have bitplane DMA enabled, at least 1 plane, and be within the */
 		/* vertical display window */
 		// TODO: bitplane DMA enabled applies to fetch_bitplane_data only
