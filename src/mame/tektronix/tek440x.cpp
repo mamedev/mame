@@ -715,12 +715,14 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	u32 invert = BIT(m_videocntl, 4) ? 0 : -1;
 	int pan = (m_videocntl & 15) ^ 15;
-	
+
+	int woffset = m_videoaddr[0] - 0xffe9;  // ??? why
+
 	for (int y = 0; y < 480; y++)
 	{
 	
 		u16 *const line = &bitmap.pix(y);
-		u16 const *video_ram = &m_vram[y * 64];
+		u16 const *video_ram = &m_vram[y * 64 + woffset];
 
 		for (int x = 0; x < 640; x += 16)
 		{
