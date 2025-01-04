@@ -74,6 +74,8 @@ namespace
 
 			void dmac_hrq_w(int state);
 
+			uint8_t language_r();
+
 			void crtc_dack_w(offs_t offset, uint8_t data);
 			I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
@@ -81,11 +83,15 @@ namespace
 			void system23_mem(address_map &map) ATTR_COLD;
 	};
 
+	//This routine deals with the diagnostics "miniprobe" that signals the test where the computer remains stuck
+
 	void system23_state::diag_digits_w(uint8_t data)
 	{
 		m_diag_digits[0] = system23_state::hex_seven_segment[data & 0x0f];
 		m_diag_digits[1] = system23_state::hex_seven_segment[(data >> 4) & 0x0f];
 	}
+
+	//Those routines deal with a register used only to verify the data bus
 
 	void system23_state::cpu_test_register_w(uint8_t data)
 	{
@@ -97,20 +103,28 @@ namespace
 		return m_bus_test_register;
 	}
 
+	//This routine deals with an unknown register whose purpose is still to be discovered. The memory test fails if it does not return 0
+
 	uint8_t system23_state::memory_settings_r()
 	{
 		return 0;	//Patch to make the memory test work while port 2e is being studied
 	}
+
+	//This routine deals with the SID signal being read. The CPU test fails if the line is not asserted high
 
 	int system23_state::sid_r()
 	{
 		return ASSERT_LINE; // Actually, SID is tied to VCC at the motherboard
 	}
 
+	//This routine deals with the SOD signal being written. As of writting this comment there is no known purpose for SOD
+
 	void system23_state::sod_w(int state)
 	{
 		sid_sod_connection = state;
 	}
+
+	//Those routines deal with the DMA controller accesses to memory and I/O devices
 
 	uint8_t system23_state::dmac_mem_r(offs_t offset)
 	{
@@ -127,6 +141,8 @@ namespace
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 		m_dmac->hlda_w(state);
 	}
+
+	//This routine deals with the responsability of writing a character to the screen
 
 	I8275_DRAW_CHARACTER_MEMBER( system23_state::display_pixels )
 	{
@@ -145,7 +161,7 @@ namespace
 			gfx ^= 0xff;
 
 		// Highlight not used
-		bitmap.pix(y, x++) = BIT(gfx, 1) ? palette[1] : palette[0];
+		bitmap.pix(y, x++) = BIT(gfx, 1) ? 1 : 0;
 		bitmap.pix(y, x++) = BIT(gfx, 2) ? palette[1] : palette[0];
 		bitmap.pix(y, x++) = BIT(gfx, 3) ? palette[1] : palette[0];
 		bitmap.pix(y, x++) = BIT(gfx, 4) ? palette[1] : palette[0];
@@ -153,6 +169,13 @@ namespace
 		bitmap.pix(y, x++) = BIT(gfx, 6) ? palette[1] : palette[0];
 		bitmap.pix(y, x++) = BIT(gfx, 7) ? palette[1] : palette[0];
 	}
+
+	uint8_t system23_state::language_r()
+	{
+		return 3;	//hack to set region to Spain
+	}
+
+	//This routine describes the computer's I/O map
 
 	void system23_state::system23_io(address_map &map)
 	{
@@ -164,6 +187,8 @@ namespace
 		map(0x4c, 0x4f).rw(m_ppi_kbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	}
 
+	//This routine describes the computer's memory map
+
 	void system23_state::system23_mem(address_map &map)
 	{
 		map.unmap_value_high();
@@ -172,13 +197,15 @@ namespace
 
 	}
 
+	//This is the constructor of the class
+
 	void system23_state::system23(machine_config &config)
 	{
-		i8085a_cpu_device &maincpu(I8085A(config, "maincpu", (18'432'000 / 3))); //frequency needs to be adjusted
-		maincpu.set_addrmap(AS_PROGRAM, &system23_state::system23_mem);
-		maincpu.set_addrmap(AS_IO, &system23_state::system23_io);
-		maincpu.in_sid_func().set(FUNC(system23_state::sid_r));
-		maincpu.out_sod_func().set(FUNC(system23_state::sod_w));
+		I8085A(config, m_maincpu, (18'432'000 / 3));
+		m_maincpu->set_addrmap(AS_PROGRAM, &system23_state::system23_mem);
+		m_maincpu->set_addrmap(AS_IO, &system23_state::system23_io);
+		m_maincpu->in_sid_func().set(FUNC(system23_state::sid_r));
+		m_maincpu->out_sod_func().set(FUNC(system23_state::sod_w));
 
 		I8255(config, m_ppi_kbd);
 		m_ppi_kbd->in_pa_callback().set(FUNC(system23_state::cpu_test_register_r));
@@ -189,6 +216,7 @@ namespace
 
 		I8255(config, m_ppi_settings);
 		m_ppi_settings->in_pc_callback().set(FUNC(system23_state::memory_settings_r));
+		m_ppi_settings->in_pa_callback().set(FUNC(system23_state::language_r));
 
 		I8257(config, m_dmac, (18'432'000 / 6)); //frequency needs to be adjusted
 		m_dmac->out_memw_cb().set(FUNC(system23_state::dmac_mem_w));
@@ -207,10 +235,12 @@ namespace
 		m_crtc->set_character_width(8);
 		m_crtc->set_screen(m_screen);
 		m_crtc->set_display_callback(FUNC(system23_state::display_pixels));
+		m_crtc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
+		//m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE); // Only when jumper J1 is bridged
 
 		RAM(config, m_ram).set_default_size("16k");
 
-		config.set_perfect_quantum("maincpu");
+		config.set_perfect_quantum(m_maincpu);
 		config.set_default_layout(layout_ibmsystem23);
 	}
 
@@ -226,12 +256,18 @@ namespace
 
 
 	ROM_START( system23 )
+		ROM_SYSTEM_BIOS(0, "R Set", "1982?")
+		ROM_SYSTEM_BIOS(1, "TM Set", "1981?")
+
 		ROM_REGION(0x4000, "ros_unpaged", 0)
-		ROM_LOAD("02_61c9866a_4481186.bin", 0x0000, 0x2000, CRC(61c9866a) SHA1(43f2bed5cc2374c7fde4632948329062e57e994b) )
-		ROM_LOAD("09_07843020_8493747.bin", 0x2000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e) )
+		ROMX_LOAD("02_61c9866a_4481186.bin", 0x0000, 0x2000, CRC(61c9866a) SHA1(43f2bed5cc2374c7fde4632948329062e57e994b),ROM_BIOS(0))
+		ROMX_LOAD("09_07843020_8493747.bin", 0x2000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e),ROM_BIOS(0))
+
+		ROMX_LOAD("02_081AE664_8493746.bin", 0x0000, 0x2000, CRC(081AE664) SHA1(82561e33012f21918927c85527531f21d66deba8),ROM_BIOS(1))
+		ROMX_LOAD("09_07843020_8493747.bin", 0x2000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e),ROM_BIOS(1))
 
 		ROM_REGION(0x2000, "chargen", 0)
-		ROM_LOAD("chr_73783bc7_8519412.bin", 0x0000, 0x2000, CRC(73783bc7) SHA1(45ee2a9acbb577b281ad8181b7ec0c5ef05c346a))
+		ROM_LOAD("chr_73783bc7_8519412.bin", 0x0000, 0x2000, CRC(73783bc7) SHA1(45ee2a9acbb577b281ad8181b7ec0c5ef05c346a) )
 	ROM_END
 
 }
