@@ -920,6 +920,9 @@ void drcbe_arm64::reset()
 	CodeHolder ch;
 	ch.init(Environment::host(), uint64_t(dst));
 
+	m_near.calldepth = 0;
+	m_near.hashstacksave = nullptr;
+
 	FileLogger logger(m_log_asmjit);
 	if (logger.file())
 	{
@@ -1371,9 +1374,9 @@ void drcbe_arm64::op_exh(a64::Assembler &a, const uml::instruction &inst)
 	a.cbnz(SCRATCH_REG1, lab);
 	a.adr(SCRATCH_REG2, lab);
 	emit_str_mem(a, SCRATCH_REG2, &m_near.hashstacksave);
+	a.bind(lab);
 	a.add(SCRATCH_REG1, SCRATCH_REG1, 1);
 	emit_str_mem(a, SCRATCH_REG1.w(), &m_near.calldepth);
-	a.bind(lab);
 
 	mov_mem_param(a, 4, &m_state.exp, exp);
 
@@ -1418,9 +1421,9 @@ void drcbe_arm64::op_callh(a64::Assembler &a, const uml::instruction &inst)
 	a.cbnz(SCRATCH_REG1, lab);
 	a.adr(SCRATCH_REG2, lab);
 	emit_str_mem(a, SCRATCH_REG2, &m_near.hashstacksave);
+	a.bind(lab);
 	a.add(SCRATCH_REG1, SCRATCH_REG1, 1);
 	emit_str_mem(a, SCRATCH_REG1.w(), &m_near.calldepth);
-	a.bind(lab);
 
 	const drccodeptr *targetptr = handp.handle().codeptr_addr();
 	if (targetptr != nullptr && handp.handle().codeptr() != nullptr)
