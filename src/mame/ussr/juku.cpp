@@ -21,8 +21,10 @@
       and T to boot from tape/disk/network
 
     TODO:
+    - E5103 (Juss) and IBM AT keyboard layouts?
     - Work out how the floppy interface really works?
     - Tape? (split up to E5101 batch as tape only?)
+    - Separate FDC 1791, 1792 and 1793 versions
     - И41 (=Multibus-1) compatibility?
     - Network?
     - Ramdisk?
@@ -802,7 +804,7 @@ ROM_START( juku )
 	ROM_DEFAULT_BIOS("3.43m_37")
 	ROM_REGION(0x4000, "maincpu", 0)
 
-	// Monitor 3.3 with Bootstrap 3.3, FDC 1791 from early 1985 prototype
+	// Monitor 3.3 with Bootstrap 3.3, FDC 1791 from early prototypes
 	// Does not seem to be compatible with JBASIC expansion cartridge
 	ROM_SYSTEM_BIOS(0, "jmon3.3", "Monitor/Bootstrap 3.3 \\w JBASIC")
 	ROMX_LOAD("jmon33.bin", 0x0000, 0x4000, CRC(ed22c287) SHA1(76407d99bf83035ef526d980c9468cb04972608c), ROM_BIOS(0))
