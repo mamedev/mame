@@ -18,7 +18,7 @@ namespace drc {
 
 class drcbe_arm64 : public drcbe_interface
 {
-	typedef uint32_t (*arm64_entry_point_func)(void *entry);
+	using arm64_entry_point_func = uint32_t (*)(void *entry);
 
 public:
 	drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits);
@@ -34,7 +34,7 @@ public:
 private:
 	class be_parameter
 	{
-		static int const REG_MAX = 30;
+		static inline constexpr int REG_MAX = 30;
 
 	public:
 		// parameter types
@@ -51,14 +51,14 @@ private:
 		typedef uint64_t be_parameter_value;
 
 		be_parameter() : m_type(PTYPE_NONE), m_value(0) { }
-		be_parameter(const be_parameter &param) : m_type(param.m_type), m_value(param.m_value) { }
 		be_parameter(uint64_t val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
 		be_parameter(drcbe_arm64 &drcbe, const uml::parameter &param, uint32_t allowed);
+		be_parameter(const be_parameter &param) = default;
 
-		static inline be_parameter make_ireg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_INT_REGISTER, regnum); }
-		static inline be_parameter make_freg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_FLOAT_REGISTER, regnum); }
-		static inline be_parameter make_memory(void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(base)); }
-		static inline be_parameter make_memory(const void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(const_cast<void *>(base))); }
+		static be_parameter make_ireg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_INT_REGISTER, regnum); }
+		static be_parameter make_freg(int regnum) { assert(regnum >= 0 && regnum < REG_MAX); return be_parameter(PTYPE_FLOAT_REGISTER, regnum); }
+		static be_parameter make_memory(void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(base)); }
+		static be_parameter make_memory(const void *base) { return be_parameter(PTYPE_MEMORY, reinterpret_cast<be_parameter_value>(const_cast<void *>(base))); }
 
 		bool operator==(const be_parameter &rhs) const { return (m_type == rhs.m_type && m_value == rhs.m_value); }
 		bool operator!=(const be_parameter &rhs) const { return (m_type != rhs.m_type || m_value != rhs.m_value); }
@@ -76,12 +76,13 @@ private:
 
 		bool is_immediate_value(uint64_t value) const { return (m_type == PTYPE_IMMEDIATE && m_value == value); }
 
-		be_parameter(be_parameter_type type, be_parameter_value value) : m_type(type), m_value(value) { }
-
 		asmjit::a64::Vec get_register_float(uint32_t regsize) const;
 		asmjit::a64::Gp get_register_int(uint32_t regsize) const;
 		asmjit::a64::Vec select_register(asmjit::a64::Vec const &reg, uint32_t regsize) const;
 		asmjit::a64::Gp select_register(asmjit::a64::Gp const &reg, uint32_t regsize) const;
+
+	private:
+		be_parameter(be_parameter_type type, be_parameter_value value) : m_type(type), m_value(value) { }
 
 		be_parameter_type   m_type;
 		be_parameter_value  m_value;
