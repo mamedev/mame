@@ -198,7 +198,11 @@ namespace
 
         // 68k bus error handlers
         void cpu_bus_error(offs_t offset, uint32_t mem_mask, bool write, uint8_t status);
-        void iop_bus_error(uint8_t data);
+        void scsi_bus_error(uint8_t data);
+        uint32_t extio_bus_error_r(offs_t offset, uint32_t mem_mask);
+        void extio_bus_error_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+        uint32_t vme_bus_error_r(offs_t offset, uint32_t mem_mask);
+        void vme_bus_error_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
         // Platform hardware used by the IOP
         uint8_t iop_status_r();
@@ -552,25 +556,7 @@ namespace
         map(0x00800000, 0x00ffffff).noprw(); // TODO: how to handle this, lower RAM
 
         // IOP bus expansion I/O
-        map(0x20000000, 0x20ffffff).lrw32([this](offs_t offset, uint32_t mem_mask)
-                                          {
-                                            if (!machine().side_effects_disabled())
-                                            {
-                                                LOG("extio_r(0x%x, 0x%x) -> 0x%x = 0x%x (%s)\n", offset, mem_mask, 0x20000000 + offset, 0xff, machine().describe_context());
-                                                m_iop->set_buserror_details(0x20000000+offset, 1, m_iop->get_fc());
-                                                m_iop->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
-                                            }
-                                            return 0xff;
-                                          }, "extio_r",
-                                          [this](offs_t offset, uint32_t data, uint32_t mem_mask)
-                                          {
-                                            if (!machine().side_effects_disabled())
-                                            {
-                                                LOG("extio_w(0x%x, 0x%x, 0x%x) -> 0x%x = (%s)\n", offset, data, mem_mask, 0x20000000 + offset, machine().describe_context());
-                                                m_iop->set_buserror_details(0x20000000+offset, 0, m_iop->get_fc());
-                                                m_iop->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
-                                            }
-                                          }, "extio_w").mirror(0x1f000000);
+        map(0x20000000, 0x20ffffff).rw(FUNC(news_iop_state::extio_bus_error_r),FUNC(news_iop_state::extio_bus_error_w)).mirror(0x1f000000);
 
         // Expansion slot SCC (bus errors here kill iopboot, so the probe process may not use bus errors, at least not with the same setup as extio)
         map(0x4c000100, 0x4c0001ff).noprw();
@@ -669,13 +655,16 @@ namespace
     {
         map(0x03000000, 0x0300ffff).rom().region("eprom", 0).mirror(0x007f0000);
 
+        // VME bus
+        map(0x03900000, 0x039fffff).rw(FUNC(news_iop_state::vme_bus_error_r), FUNC(news_iop_state::vme_bus_error_w)); // TODO: actual region start/end
+
         // Various platform control registers (MMU and otherwise)
         map(0x04400000, 0x04400000).w(FUNC(news_iop_state::cpu_romdis_w));
         map(0x04400001, 0x04400001).w(FUNC(news_iop_state::mmuen_w));
         map(0x04400002, 0x04400002).w(FUNC(news_iop_state::cpu_inten_w<IOPIRQ3>));
         map(0x04400003, 0x04400003).w(FUNC(news_iop_state::cpu_inten_w<IOPIRQ5>));
         map(0x04400004, 0x04400004).w(FUNC(news_iop_state::cpu_inten_w<TIMER>));
-        map(0x04400005, 0x04400005).lw8(NAME([this](uint8_t data) { LOG("CACHEEN 0x%x\n", data); }));
+        map(0x04400005, 0x04400005).lw8([this](uint8_t data) { LOG("(%s) Write CACHEEN = 0x%x\n", machine().describe_context(), data); }, "CACHEEN");
         map(0x04400006, 0x04400006).w(FUNC(news_iop_state::cpu_inten_w<PERR>));
         map(0x04800000, 0x04800000).lw8([this](uint8_t data) { iop_irq_w<CPU>(1); }, "INT_IOP");
         map(0x04c00000, 0x04c00000).select(0x10000000).w(m_mmu, FUNC(news_020_mmu_device::clear_entries));
@@ -733,11 +722,6 @@ namespace
     template <news_iop_state::iop_irq_number Number>
     void news_iop_state::iop_inten_w(uint8_t state)
     {
-        if ((1 << Number) & iop_nmi_mask)
-        {
-            fatalerror("news_iop_state: tried to disable non-maskable interrupt %s!", iop_irq_names[Number]);
-        }
-
         if (Number != TIMEOUT)
         {
             LOGMASKED(LOG_INTERRUPT, "(%s) IOP IRQ %s %s\n", machine().describe_context(), iop_irq_names[Number], state ? "enabled" : "disabled");
@@ -758,7 +742,7 @@ namespace
 
     void news_iop_state::int_check_iop()
     {
-       const int active_irq = m_iop_intst & m_iop_inten;
+       const int active_irq = m_iop_intst & (m_iop_inten | iop_nmi_mask);
        for (auto irq : iop_irq_line_map)
        {
             // Calculate state of input pin (logical OR of all attached inputs)
@@ -934,13 +918,55 @@ namespace
         m_cpu_bus_error_timer->adjust(m_cpu->cycles_to_attotime(16)); // TODO: 16 is what hcpu30 uses for a similar implementation - is that OK for NEWS?
     }
 
-    void news_iop_state::iop_bus_error(uint8_t data)
+    void news_iop_state::scsi_bus_error(uint8_t data)
     {
         if (!machine().side_effects_disabled())
         {
-            // For now, only SCSI will cause bus errors, so the offset is hardcoded
             m_iop->set_buserror_details(0x64000000, data == news_iop_scsi_helper_device::READ_ERROR, m_iop->get_fc());
             m_iop->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+        }
+    }
+
+    uint32_t news_iop_state::extio_bus_error_r(offs_t offset, uint32_t mem_mask)
+    {
+        if (!machine().side_effects_disabled())
+        {
+            LOG("extio_bus_error_r(0x%x, 0x%x) -> 0x%x = 0x%x (%s)\n", offset, mem_mask, 0x20000000 + offset, 0xff, machine().describe_context());
+            m_iop->set_buserror_details(0x20000000 + offset, 1, m_iop->get_fc());
+            m_iop->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+        }
+        return 0xff;
+    }
+
+    void news_iop_state::extio_bus_error_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+    {
+        if (!machine().side_effects_disabled())
+        {
+            LOG("extio_bus_error_w(0x%x, 0x%x, 0x%x) -> 0x%x = (%s)\n", offset, data, mem_mask, 0x20000000 + offset, machine().describe_context());
+            m_iop->set_buserror_details(0x20000000 + offset, 0, m_iop->get_fc());
+            m_iop->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+        }
+    }
+
+    uint32_t news_iop_state::vme_bus_error_r(offs_t offset, uint32_t mem_mask)
+    {
+        if (!machine().side_effects_disabled())
+        {
+            // TODO: try using full cpu bus error func and setting the status to HB_BERR
+            LOG("vme_r(0x%x, 0x%x) -> 0x%x = 0x%x (%s)\n", offset, mem_mask, 0x03900000 + offset, 0xff, machine().describe_context());
+            m_cpu->set_buserror_details(0x03900000 + offset, 1, m_cpu->get_fc());
+            m_cpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+        }
+        return 0xff;
+    }
+
+    void news_iop_state::vme_bus_error_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+    {
+        if (!machine().side_effects_disabled())
+        {
+            LOG("vme_w(0x%x, 0x%x, 0x%x) -> 0x%x = (%s)\n", offset, data, mem_mask, 0x03900000 + offset, machine().describe_context());
+            m_cpu->set_buserror_details(0x03900000 + offset, 0, m_cpu->get_fc());
+            m_cpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
         }
     }
 
@@ -957,11 +983,9 @@ namespace
         m_mmu->set_addrmap(AS_PROGRAM, &news_iop_state::mmu_map);
         m_mmu->set_bus_error_callback(FUNC(news_iop_state::cpu_bus_error));
 
-        ADDRESS_MAP_BANK(config, "mainbus").set_map(&news_iop_state::mmu_map).set_options(ENDIANNESS_BIG, 32, 32); // TODO: is the address length here actually 32? It might be, but it might not.
-
         RAM(config, m_ram);
         m_ram->set_default_size("8M");
-        m_ram->set_extra_options("16M"); // TODO: any other configurations supported?
+        m_ram->set_extra_options("16M");
         m_ram->set_default_value(0);
 
         // NEC uPD8253 programmable interval timer
@@ -1048,7 +1072,7 @@ namespace
         m_scsi_dma->scsi_dma_read_callback().set(m_scsi, FUNC(ncr53c80_device::dma_r));
         m_scsi_dma->scsi_dma_write_callback().set(m_scsi, FUNC(ncr53c80_device::dma_w));
         m_scsi_dma->iop_halt_callback().set_inputline(m_iop, INPUT_LINE_HALT);
-        m_scsi_dma->bus_error_callback().set(FUNC(news_iop_state::iop_bus_error));
+        m_scsi_dma->bus_error_callback().set(FUNC(news_iop_state::scsi_bus_error));
         m_scsi_dma->irq_out_callback().set(FUNC(news_iop_state::iop_irq_w<SCSI_IRQ>));
 
         // Epson RTC-58321B
