@@ -496,6 +496,27 @@ static INPUT_PORTS_START( dmbtjunc )
 	// battery state is likely in here too
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ban_quiz )
+	// inputs shown in hidden text mode, although it refers to the physical placement of the each button on the mat rather than the colours / symbols
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Blue/Top-Left")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Yellow/Top-Right")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Red/Bottom-Left")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Green/Bottom-Right")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Select")
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Blue/Top-Left")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Yellow/Top-Right")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Red/Bottom-Left")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Green/Bottom-Right")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Select")
+
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_CUSTOM ) // Battery State
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( drumsups )
 	PORT_INCLUDE( spg2xx )
@@ -507,7 +528,6 @@ static INPUT_PORTS_START( drumsups )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Drum pad 3: Purple")
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Drum pad 4: Red")
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Drum pad 5: Green")
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lexiart )
@@ -2398,6 +2418,11 @@ ROM_START( dmbtjunc )
 	ROM_LOAD16_WORD_SWAP( "battlejunction.u3", 0x000000, 0x800000, CRC(31471c53) SHA1(94fdd8c4c67914054e304a55042c10710af2e596) )
 ROM_END
 
+ROM_START( ban_quiz )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "quiz.bin", 0x000000, 0x400000, CRC(6f51180a) SHA1(38017ecaae4eead38482aeb04c90b5a5eeebd6ca) )
+ROM_END
+
 ROM_START( prail )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "traingame.u1", 0x000000, 0x8000000, CRC(5c96d526) SHA1(cda0280b320762bda7a7358ec7ce29690aa815fb) )
@@ -2594,6 +2619,8 @@ CONS( 2006, anpantv,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,   
 // 
 // Will report 'ERROR' sometimes, maybe as a result of these not being hooked up.
 CONS( 2006, dmbtjunc,   0,        0, spg2xx,    dmbtjunc,  spg2xx_game_state,          empty_init,    "Bandai",                                                "Let's! TV Play Digital Monster Battle Junction (Japan)",                MACHINE_NOT_WORKING )
+
+CONS( 2006, ban_quiz,   0,        0, spg2xx,    ban_quiz,  spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Bandai Quiz",                                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Train Game V1.4 2012-08-15 on PCB. SPG243 headers in each chunk.
 // Last few bytes of SEEPROM have 'JUNGT' in them, is this developed by JungleSoft/JungleTac?
