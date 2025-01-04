@@ -20717,11 +20717,11 @@ jbell                           // (c) 1997 IGS
 jinhulu2                        // (c) 1995 IGS
 spk100                          // (c) 1996 IGS
 spk102ua                        // (c) 1996 IGS
-spk114it                        // (c) 199? IGS
-spk115it                        // (c) 199? IGS
-spk116it                        // (c) 199? IGS
-spk116itmx                      // (c) 199? IGS
-spk120in                        // (c) 199? IGS
+spk114it                        // (c) 1996 IGS
+spk115it                        // (c) 1996 IGS
+spk116it                        // (c) 1996 IGS
+spk116itmx                      // (c) 1996 IGS
+spk120in                        // (c) 1996 IGS
 spk200ua                        // (c) 1996 IGS
 spk201ua                        // (c) 1996 IGS
 spk203us                        // (c) 1996 IGS
@@ -34481,6 +34481,7 @@ vipclub                         // (c) 1988 Daiichi Denshi
 
 @source:nichibutsu/nbmj8891.cpp
 abunai                          // (c) 1989
+avmjts                          // (c) 1990
 bananadr                        // (c) 1989 DIGITAL SOFT
 chinmoku                        // (c) 1990
 club90s                         // (c) 1990
