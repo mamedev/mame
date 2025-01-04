@@ -496,7 +496,7 @@ static INPUT_PORTS_START( dmbtjunc )
 	// battery state is likely in here too
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ban_quiz )
+static INPUT_PORTS_START( ban_krkk )
 	// inputs shown in hidden text mode, although it refers to the physical placement of the each button on the mat rather than the colours / symbols
 	PORT_INCLUDE( spg2xx )
 
@@ -2418,7 +2418,7 @@ ROM_START( dmbtjunc )
 	ROM_LOAD16_WORD_SWAP( "battlejunction.u3", 0x000000, 0x800000, CRC(31471c53) SHA1(94fdd8c4c67914054e304a55042c10710af2e596) )
 ROM_END
 
-ROM_START( ban_quiz )
+ROM_START( ban_krkk )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "quiz.bin", 0x000000, 0x400000, CRC(6f51180a) SHA1(38017ecaae4eead38482aeb04c90b5a5eeebd6ca) )
 ROM_END
@@ -2620,7 +2620,8 @@ CONS( 2006, anpantv,    0,        0, spg2xx,    spg2xx,    spg2xx_game_state,   
 // Will report 'ERROR' sometimes, maybe as a result of these not being hooked up.
 CONS( 2006, dmbtjunc,   0,        0, spg2xx,    dmbtjunc,  spg2xx_game_state,          empty_init,    "Bandai",                                                "Let's! TV Play Digital Monster Battle Junction (Japan)",                MACHINE_NOT_WORKING )
 
-CONS( 2006, ban_quiz,   0,        0, spg2xx,    ban_quiz,  spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Bandai Quiz",                                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// 川島隆太教授監修 脳と体を鍛える 体感頭脳ファミリーマットレ  - Let's! TV Play branding appears on the box
+CONS( 2006, ban_krkk,   0,        0, spg2xx,    ban_krkk,  spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Kawashima Ryuuta Kyouju Kanshuu - Nou to Karata o Kitaeru Taikan Zunou Family Mattore (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Train Game V1.4 2012-08-15 on PCB. SPG243 headers in each chunk.
 // Last few bytes of SEEPROM have 'JUNGT' in them, is this developed by JungleSoft/JungleTac?
