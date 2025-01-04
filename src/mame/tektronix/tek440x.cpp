@@ -905,12 +905,12 @@ u16 tek440x_state::map_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 	{
 		if ((offset>>11) < 0x20)
-			LOG("map_r 0x%08x => %04x\n",offset>>11, m_map[(offset >> 11)&0x7ff] );
+			LOGMASKED(LOG_MMU, "map_r 0x%08x => %04x\n",offset>>11, m_map[(offset >> 11)&0x7ff] );
 
 		// selftest does a read and expects it to fail iff !MAP_SYS_WR_ENABLE; its not WR enable, its enable..
 		if (!BIT(m_map_control, MAP_SYS_WR_ENABLE))
 		{
-				LOG("map_r: bus error: PID(%d) %08x fc(%d) pc(%08x)\n", BIT(m_map[(offset >> 11) & 0x7ff], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
+				LOGMASKED(LOG_MMU, "map_r: bus error: PID(%d) %08x fc(%d) pc(%08x)\n", BIT(m_map[(offset >> 11) & 0x7ff], 11, 3), OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
 				m_maincpu->set_buserror_details(offset, 1, m_maincpu->get_fc(), true);
 				return 0;
 		}
@@ -923,7 +923,7 @@ void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if ((offset>>11) < 0x20)
 	{
-		LOG("map_w: %08x  <= %04x paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
+		LOGMASKED(LOG_MMU, "map_w: %08x  <= %04x paddr(%08x) PID(%d) dirty(%d) write_enable(%d)\n",
 			(offset >> 11) & 0x7ff, data,
 			OFF16_TO_OFF8(BIT(data, 0, 11)<<11),BIT(data, 11, 3), data & 0x8000 ? 1 : 0, data & 0x4000 ? 1 : 0,
 			m_maincpu->pc());
