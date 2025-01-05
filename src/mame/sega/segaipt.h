@@ -106,6 +106,43 @@
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) ) \
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 
+#define SEGA_COINAGE2_A_PART_H \
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) ) \
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) ) \
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) ) \
+	PORT_DIPSETTING(    0x05, "2 Coins/1 Credit, 3/2, 5/3, 6/4" ) \
+	PORT_DIPSETTING(    0x04, "2 Coins/1 Credit, 4/3" ) \
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+
+#define SEGA_COINAGE2_A_PART_L \
+	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit, 5/6" ) \
+	PORT_DIPSETTING(    0x02, "1 Coin/1 Credit, 4/5" ) \
+	PORT_DIPSETTING(    0x01, "1 Coin/1 Credit, 2/3" ) \
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) ) \
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) ) \
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) ) \
+	PORT_DIPSETTING(    0x0c, DEF_STR( 5C_1C ) ) \
+	PORT_DIPSETTING(    0x0b, DEF_STR( 6C_1C ) ) \
+	PORT_DIPSETTING(    0x0a, DEF_STR( 7C_1C ) )
+
+#define SEGA_COINAGE2_B_PART_H \
+	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) ) \
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) ) \
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) ) \
+	PORT_DIPSETTING(    0x50, "2 Coins/1 Credit, 3/2, 5/3, 6/4" ) \
+	PORT_DIPSETTING(    0x40, "2 Coins/1 Credit, 4/3" ) \
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+#define SEGA_COINAGE2_B_PART_L \
+	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit, 5/6" ) \
+	PORT_DIPSETTING(    0x20, "1 Coin/1 Credit, 4/5" ) \
+	PORT_DIPSETTING(    0x10, "1 Coin/1 Credit, 2/3" ) \
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) ) \
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) ) \
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) ) \
+	PORT_DIPSETTING(    0xc0, DEF_STR( 5C_1C ) ) \
+	PORT_DIPSETTING(    0xb0, DEF_STR( 6C_1C ) ) \
+	PORT_DIPSETTING(    0xa0, DEF_STR( 7C_1C ) )
+
 // [standard]
 #define SEGA_COINAGE_LOC(DIPBANK) \
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION(#DIPBANK":1,2,3,4") \
@@ -147,3 +184,14 @@
 	SEGA_COINAGE_B_PART_H \
 	SEGA_COINAGE_B_PART_L \
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+
+// [standard2] (aburner2, ...)
+#define SEGA_COINAGE2_LOC(DIPBANK) \
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION(#DIPBANK":1,2,3,4") \
+	SEGA_COINAGE2_A_PART_H \
+	SEGA_COINAGE2_A_PART_L \
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too) or 1/1" ) \
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION(#DIPBANK":5,6,7,8") \
+	SEGA_COINAGE2_B_PART_H \
+	SEGA_COINAGE2_B_PART_L \
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
