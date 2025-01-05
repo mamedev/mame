@@ -3311,12 +3311,6 @@ void hd63266f_device::map(address_map &map)
 	map(0x2, 0x2).r(FUNC(hd63266f_device::extstat_r));
 }
 
-uint8_t hd63266f_device::get_st3(floppy_info &fi)
-{
-	// wk1800 seems to expect TS to be inverted (or possibly the bit is actually something else?)
-	return upd765_family_device::get_st3(fi) ^ ST3_TS;
-}
-
 void hd63266f_device::soft_reset()
 {
 	upd765_family_device::soft_reset();

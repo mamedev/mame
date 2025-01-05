@@ -17,7 +17,13 @@
 			88 keys, 8MB wave ROM, floppy drive
 
 	TODO:
-		- fix floppy controller hookup for wk1800
+		- fix floppy controller hookup for wk1800. current issues:
+			- pressing the Disk button with the drive empty starts the drive motor,
+			  then the firmware waits forever on some status bit that is never set
+			- pressing the Disk button with a disk inserted results in several 'forced abort'
+			  errors from the H8 DMA controller
+			- wk1800 firmware seems to rely on different TS bit behavior from the HD63266
+			  compared to a standard uPD765
 		- add software list for style/program disks
  */
 
@@ -215,8 +221,8 @@ void wk1800_state::wk1800_map(address_map& map)
 	map(0x20000, 0x2ffff).rw(m_gt155, FUNC(gt155_device::read), FUNC(gt155_device::write));
 	map(0x30000, 0x30001).mirror(0x0fff0).r("kbd", FUNC(gt913_kbd_hle_device::read));
 	map(0x30002, 0x30003).mirror(0x0fff0).r("kbd", FUNC(gt913_kbd_hle_device::status_r));
-	map(0x40000, 0x40003).mirror(0x1fffc).m(m_fdc, FUNC(hd63266f_device::map));
-	map(0x60000, 0x7ffff).rw(m_fdc, FUNC(hd63266f_device::dma_r), FUNC(hd63266f_device::dma_w));
+//	map(0x40000, 0x40003).mirror(0x1fffc).m(m_fdc, FUNC(hd63266f_device::map));
+//	map(0x60000, 0x7ffff).rw(m_fdc, FUNC(hd63266f_device::dma_r), FUNC(hd63266f_device::dma_w));
 	map(0x80000, 0xbffff).mirror(0x40000).ram().share("nvram");
 }
 
@@ -301,7 +307,7 @@ void wk1800_state::wk1600(machine_config &config)
 } 
 
 /**************************************************************************/
-static void wk1800_floppies(device_slot_interface& device)
+[[maybe_unused]] static void wk1800_floppies(device_slot_interface& device)
 {
 	device.option_add("35hd", FLOPPY_35_HD);
 }
@@ -312,6 +318,7 @@ void wk1800_state::wk1800(machine_config &config)
 	wk1600(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wk1800_state::wk1800_map);
 
+	/*
 	HD63266F(config, m_fdc, 16'000'000);
 	m_fdc->set_ready_line_connected(false);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, H8_INPUT_LINE_DREQ0);
@@ -320,6 +327,7 @@ void wk1800_state::wk1800(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy, wk1800_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 	m_floppy->enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_compatible("midi_flop");
+	*/
 }
 
 
