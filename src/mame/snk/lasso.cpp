@@ -1,18 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Nicola Salmoria, Luca Elia
-/***************************************************************************
+/*******************************************************************************
 
- Lasso and similar hardware
+  Lasso and similar hardware
 
-        driver by Phil Stroffolino, Nicola Salmoria, Luca Elia
+  driver by Phil Stroffolino, Nicola Salmoria, Luca Elia
 
---------------------------------------------------------------------------------------
-Year + Game                 By              CPUs        Sound Chips         Misc Info
---------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Year + Game                 By              CPUs        Sound Chips    Misc Info
+--------------------------------------------------------------------------------
 82  Lasso                   SNK             3 x 6502    2 x SN76489
 83  Chameleon               Jaleco          2 x 6502    2 x SN76489
-84  Wai Wai Jockey Gate-In! Jaleco/Casio    2 x 6502    2 x SN76489 + DAC
-84  Pinbo                   Jaleco          6502 + Z80  2 x AY-8910         6502 @ 18MHz/24, Z80 @ 18MHz/6, AY @ 18MHz/12
+84  Wai Wai Jockey Gate-In! Jaleco/Casio    2 x 6502    2 x SN76489
+84  Pinbo                   Jaleco          6502 + Z80  2 x AY-8910    6502 @ 18MHz/24, Z80 @ 18MHz/6, AY @ 18MHz/12
 --------------------------------------------------------------------------------------
 
 Notes:
@@ -21,24 +21,471 @@ Notes:
   same as the Rock-Ola games of the same area.  Lot of similarities between
   these hardware.
 - Lasso: fire button auto-repeats on high score entry screen (real behavior?)
-- Pinbo: bgcolor is wrong, how does it generate it? ($a0, should be darkblue)
 
-***************************************************************************
+********************************************************************************
 
-DIP locations verified for:
-    - lasso
+Video hardware notes:
 
-***************************************************************************/
+Every game has 1 256 x 256 tilemap (non scrollable) made of 8 x 8 tiles, and
+16 x 16 sprites (some games use 32, some more). The graphics for tiles and
+sprites are held inside the same ROMs, but aren't shared between the two:
+
+the first $100 tiles are for the tilemap, the following $100 are for sprites.
+This constitutes the first graphics bank. There can be several.
+
+Lasso has an additional pixel layer (256 x 256 x 1) and a third CPU devoted to
+drawing into it (the lasso!)
+
+Wwjgtin has an additional $800 x $400 scrolling tilemap in ROM and $100 more
+16 x 16 x 4 tiles for it.
+
+The colors are static ($40 colors, 2 PROMs) but the background color can be
+changed at runtime. Wwjgtin can change the last 4 colors (= last palette) too.
+
+*******************************************************************************/
 
 #include "emu.h"
-#include "lasso.h"
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
+#include "sound/sn76496.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class lasso_state : public driver_device
+{
+public:
+	lasso_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"),
+		m_back_color(*this, "back_color"),
+		m_chip_data(*this, "chip_data"),
+		m_bitmap_ram(*this, "bitmap_ram"),
+		m_last_colors(*this, "last_colors"),
+		m_track_scroll(*this, "track_scroll"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_sn(*this, "sn76489_%u", 0),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch")
+	{ }
+
+	void base(machine_config &config);
+	void wwjgtin(machine_config &config);
+	void lasso(machine_config &config);
+	void chameleo(machine_config &config);
+	void pinbo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_back_color;
+	optional_shared_ptr<uint8_t> m_chip_data;
+	optional_shared_ptr<uint8_t> m_bitmap_ram; // 0x2000 bytes for a 256 x 256 x 1 bitmap
+	optional_shared_ptr<uint8_t> m_last_colors;
+	optional_shared_ptr<uint8_t> m_track_scroll;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_track_tilemap = nullptr;
+	uint8_t m_vidctrl = 0;
+	uint8_t m_gfxbank = 0;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device_array<sn76489_device, 2> m_sn;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	uint8_t sound_status_r();
+	void sound_select_w(uint8_t data);
+	void lasso_videoram_w(offs_t offset, uint8_t data);
+	void lasso_colorram_w(offs_t offset, uint8_t data);
+	void common_vidctrl_w(uint8_t data);
+	void lasso_vidctrl_w(uint8_t data);
+	void wwjgtin_vidctrl_w(uint8_t data);
+	void pinbo_vidctrl_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(lasso_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(wwjgtin_get_track_tile_info);
+	TILE_GET_INFO_MEMBER(pinbo_get_bg_tile_info);
+	void lasso_palette(palette_device &palette) const;
+	DECLARE_VIDEO_START(wwjgtin);
+	void wwjgtin_palette(palette_device &palette) const;
+	DECLARE_VIDEO_START(pinbo);
+	uint32_t screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pinbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	static rgb_t get_color(int data);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse);
+	void draw_lasso(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void chameleo_audio_map(address_map &map) ATTR_COLD;
+	void chameleo_main_map(address_map &map) ATTR_COLD;
+	void lasso_audio_map(address_map &map) ATTR_COLD;
+	void lasso_coprocessor_map(address_map &map) ATTR_COLD;
+	void lasso_main_map(address_map &map) ATTR_COLD;
+	void pinbo_audio_io_map(address_map &map) ATTR_COLD;
+	void pinbo_audio_map(address_map &map) ATTR_COLD;
+	void pinbo_main_map(address_map &map) ATTR_COLD;
+	void wwjgtin_audio_map(address_map &map) ATTR_COLD;
+	void wwjgtin_main_map(address_map &map) ATTR_COLD;
+};
+
+void lasso_state::machine_start()
+{
+	save_item(NAME(m_vidctrl));
+	save_item(NAME(m_gfxbank));
+}
+
+
+/*************************************
+ *
+ *  Colors (BBGGGRRR)
+ *
+ *************************************/
+
+rgb_t lasso_state::get_color(int data)
+{
+	int bit0, bit1, bit2;
+
+	// red component
+	bit0 = BIT(data, 0);
+	bit1 = BIT(data, 1);
+	bit2 = BIT(data, 2);
+	int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+	// green component
+	bit0 = BIT(data, 3);
+	bit1 = BIT(data, 4);
+	bit2 = BIT(data, 5);
+	int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+	// blue component
+	bit0 = BIT(data, 6);
+	bit1 = BIT(data, 7);
+	int const b = 0x52 * bit0 + 0xad * bit1;
+
+	return rgb_t(r, g, b);
+}
+
+
+void lasso_state::lasso_palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < 0x40; i++)
+		palette.set_pen_color(i, get_color(color_prom[i]));
+}
+
+
+void lasso_state::wwjgtin_palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < 0x40; i++)
+		palette.set_indirect_color(i, get_color(color_prom[i]));
+
+	// characters/sprites
+	for (int i = 0; i < 0x40; i++)
+		palette.set_pen_indirect(i, i);
+
+	// track
+	for (int i = 0; i < 0x100; i++)
+	{
+		uint8_t const ctabentry = (i & 0x03) ? ((((i & 0xf0) >> 2) + (i & 0x03)) & 0x3f) : 0;
+		palette.set_pen_indirect(i + 0x40, ctabentry);
+	}
+}
+
+
+/*************************************
+ *
+ *  Callbacks for the TileMap code
+ *
+ *************************************/
+
+TILE_GET_INFO_MEMBER(lasso_state::lasso_get_bg_tile_info)
+{
+	int code = m_videoram[tile_index];
+	int color = m_colorram[tile_index];
+
+	tileinfo.set(0, code | (m_gfxbank << 8), color & 0x0f, 0);
+}
+
+TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
+{
+	uint8_t *ROM = memregion("user1")->base();
+	int code = ROM[tile_index];
+	int color = ROM[tile_index + 0x2000];
+
+	tileinfo.set(2, code, color & 0x0f, 0);
+}
+
+TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
+{
+	int code  = m_videoram[tile_index];
+	int color = m_colorram[tile_index];
+
+	tileinfo.set(0, code + ((color & 0x30) << 4), color & 0x0f, 0);
+}
+
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+void lasso_state::video_start()
+{
+	// create tilemap
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lasso_state::lasso_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_transparent_pen(0);
+}
+
+VIDEO_START_MEMBER(lasso_state, wwjgtin)
+{
+	// create tilemaps
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lasso_state::lasso_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_transparent_pen(0);
+
+	m_track_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lasso_state::wwjgtin_get_track_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 64);
+}
+
+VIDEO_START_MEMBER(lasso_state, pinbo)
+{
+	// create tilemap
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lasso_state::pinbo_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_transparent_pen(0);
+}
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+void lasso_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse)
+{
+	const uint8_t *finish, *source;
+	int inc;
+
+	if (reverse)
+	{
+		source = m_spriteram;
+		finish = m_spriteram + m_spriteram.bytes();
+		inc = 4;
+	}
+	else
+	{
+		source = m_spriteram + m_spriteram.bytes() - 4;
+		finish = m_spriteram - 4;
+		inc = -4;
+	}
+
+	while (source != finish)
+	{
+		int sx = source[3];
+		int sy = source[0];
+		int flipx = source[1] & 0x40;
+		int flipy = source[1] & 0x80;
+
+		if (flip_screen_x())
+		{
+			sx = 240 - sx;
+			flipx = !flipx;
+		}
+
+		if (flip_screen_y())
+			flipy = !flipy;
+		else
+			sy = 240 - sy;
+
+		int code = (source[1] & 0x3f) | (m_gfxbank << 6);
+		int color = source[2] & 0x0f;
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
+
+		// wraparound
+		const int dx = flip_screen_x() ? +256 : -256;
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx + dx, sy, 0);
+
+		source += inc;
+	}
+}
+
+
+void lasso_state::draw_lasso(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (offs_t offs = 0; offs < 0x2000; offs++)
+	{
+		uint8_t y = offs >> 5;
+
+		if (flip_screen_y())
+			y = ~y;
+
+		if ((y < cliprect.min_y) || (y > cliprect.max_y))
+			continue;
+
+		uint8_t x = (offs & 0x1f) << 3;
+		uint8_t data = m_bitmap_ram[offs];
+
+		if (flip_screen_x())
+			x = ~x;
+
+		for (int bit = 0; bit < 8; bit++)
+		{
+			if ((data & 0x80) && (x >= cliprect.min_x) && (x <= cliprect.max_x))
+				bitmap.pix(y, x) = 0x3f;
+
+			if (flip_screen_x())
+				x--;
+			else
+				x++;
+
+			data <<= 1;
+		}
+	}
+}
+
+
+uint32_t lasso_state::screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_palette->set_pen_color(0, get_color(*m_back_color));
+	bitmap.fill(0, cliprect);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_lasso(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect, 0);
+
+	return 0;
+}
+
+uint32_t lasso_state::screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_palette->set_pen_color(0, get_color(*m_back_color));
+	bitmap.fill(0, cliprect);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, 0);
+
+	return 0;
+}
+
+uint32_t lasso_state::screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_palette->set_indirect_color(0, get_color(*m_back_color));
+
+	// the last palette entries can be changed
+	for (int i = 0; i < 3; i++)
+		m_palette->set_indirect_color(0x3d + i, get_color(m_last_colors[i]));
+
+	m_track_tilemap->set_scrollx(0, m_track_scroll[0] + m_track_scroll[1] * 256);
+	m_track_tilemap->set_scrolly(0, m_track_scroll[2] + m_track_scroll[3] * 256);
+
+	if (m_vidctrl & 8)
+		m_track_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	else
+		bitmap.fill(m_palette->black_pen(), cliprect);
+
+	draw_sprites(bitmap, cliprect, 1); // reverse order
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+uint32_t lasso_state::screen_update_pinbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// background color (always 0xa0?)
+	int r = pal4bit(*m_back_color & 7);
+	int g = pal4bit(*m_back_color >> 3 & 7);
+	int b = pal4bit(*m_back_color >> 4 & 0xc);
+
+	m_palette->set_pen_color(0, rgb_t(r, g, b));
+	bitmap.fill(0, cliprect);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, 0);
+
+	return 0;
+}
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
+void lasso_state::lasso_videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void lasso_state::lasso_colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+void lasso_state::common_vidctrl_w(uint8_t data)
+{
+	// don't know which is which, but they are always set together
+	flip_screen_x_set(data & 0x01);
+	flip_screen_y_set(data & 0x02);
+
+	machine().tilemap().set_flip_all((flip_screen_x() ? TILEMAP_FLIPX : 0) | (flip_screen_y() ? TILEMAP_FLIPY : 0));
+
+	m_vidctrl = data;
+}
+
+void lasso_state::lasso_vidctrl_w(uint8_t data)
+{
+	if (m_gfxbank != BIT(data, 2))
+		machine().tilemap().mark_all_dirty();
+	m_gfxbank = BIT(data, 2);
+
+	common_vidctrl_w(data);
+}
+
+void lasso_state::wwjgtin_vidctrl_w(uint8_t data)
+{
+	m_gfxbank = BIT(~data, 2) | BIT(data, 4) << 1;
+	common_vidctrl_w(data);
+}
+
+void lasso_state::pinbo_vidctrl_w(uint8_t data)
+{
+	m_gfxbank = (data & 0x0c) >> 2;
+	common_vidctrl_w(data);
+}
 
 
 INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
@@ -47,13 +494,6 @@ INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-
-void lasso_state::sound_command_w(uint8_t data)
-{
-	// Write to the sound latch and generate an IRQ on the sound CPU
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
 
 uint8_t lasso_state::sound_status_r()
 {
@@ -65,11 +505,18 @@ void lasso_state::sound_select_w(uint8_t data)
 {
 	for (int i = 0; i < 2; i++)
 	{
+		// 0x01: chip#0; 0x02: chip#1
 		if (BIT(~data, i))
 			m_sn[i]->write(bitswap<8>(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7));
 	}
 }
 
+
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 void lasso_state::lasso_main_map(address_map &map)
 {
@@ -78,9 +525,9 @@ void lasso_state::lasso_main_map(address_map &map)
 	map(0x0800, 0x0bff).ram().w(FUNC(lasso_state::lasso_colorram_w)).share("colorram");
 	map(0x0c00, 0x0c7f).ram().share("spriteram");
 	map(0x1000, 0x17ff).ram().share("share1");
-	map(0x1800, 0x1800).w(FUNC(lasso_state::sound_command_w));
+	map(0x1800, 0x1800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1801, 0x1801).writeonly().share("back_color");
-	map(0x1802, 0x1802).w(FUNC(lasso_state::lasso_video_control_w));
+	map(0x1802, 0x1802).w(FUNC(lasso_state::lasso_vidctrl_w));
 	map(0x1804, 0x1804).portr("1804");
 	map(0x1805, 0x1805).portr("1805");
 	map(0x1806, 0x1806).portr("1806").nopw(); // game uses 'lsr' to read port
@@ -117,9 +564,9 @@ void lasso_state::chameleo_main_map(address_map &map)
 	map(0x0c00, 0x0fff).ram();
 	map(0x1000, 0x107f).ram().share("spriteram");
 	map(0x1080, 0x10ff).ram();
-	map(0x1800, 0x1800).w(FUNC(lasso_state::sound_command_w));
+	map(0x1800, 0x1800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1801, 0x1801).writeonly().share("back_color");
-	map(0x1802, 0x1802).w(FUNC(lasso_state::lasso_video_control_w));
+	map(0x1802, 0x1802).w(FUNC(lasso_state::lasso_vidctrl_w));
 	map(0x1804, 0x1804).portr("1804");
 	map(0x1805, 0x1805).portr("1805");
 	map(0x1806, 0x1806).portr("1806");
@@ -148,15 +595,15 @@ void lasso_state::wwjgtin_main_map(address_map &map)
 	map(0x0800, 0x0bff).ram().w(FUNC(lasso_state::lasso_videoram_w)).share("videoram");
 	map(0x0c00, 0x0fff).ram().w(FUNC(lasso_state::lasso_colorram_w)).share("colorram");
 	map(0x1000, 0x10ff).ram().share("spriteram");
-	map(0x1800, 0x1800).w(FUNC(lasso_state::sound_command_w));
+	map(0x1800, 0x1800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1801, 0x1801).writeonly().share("back_color");
-	map(0x1802, 0x1802).w(FUNC(lasso_state::wwjgtin_video_control_w));
+	map(0x1802, 0x1802).w(FUNC(lasso_state::wwjgtin_vidctrl_w));
 	map(0x1804, 0x1804).portr("1804");
 	map(0x1805, 0x1805).portr("1805");
 	map(0x1806, 0x1806).portr("1806");
 	map(0x1807, 0x1807).portr("1807");
-	map(0x1c00, 0x1c02).writeonly().share("last_colors");
-	map(0x1c04, 0x1c07).writeonly().share("track_scroll");
+	map(0x1c00, 0x1c02).nopr().writeonly().share("last_colors");
+	map(0x1c04, 0x1c07).nopr().writeonly().share("track_scroll");
 	map(0x4000, 0xbfff).rom();
 	map(0xc000, 0xffff).rom().region("maincpu", 0x8000);
 }
@@ -168,7 +615,7 @@ void lasso_state::wwjgtin_audio_map(address_map &map)
 	map(0x4000, 0x7fff).mirror(0x8000).rom();
 	map(0xb000, 0xb000).writeonly().share("chip_data");
 	map(0xb001, 0xb001).w(FUNC(lasso_state::sound_select_w));
-	map(0xb003, 0xb003).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0xb003, 0xb003).nopw(); // ?
 	map(0xb004, 0xb004).r(FUNC(lasso_state::sound_status_r));
 	map(0xb005, 0xb005).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -180,9 +627,9 @@ void lasso_state::pinbo_main_map(address_map &map)
 	map(0x0400, 0x07ff).ram().w(FUNC(lasso_state::lasso_videoram_w)).share("videoram");
 	map(0x0800, 0x0bff).ram().w(FUNC(lasso_state::lasso_colorram_w)).share("colorram");
 	map(0x1000, 0x10ff).ram().share("spriteram");
-	map(0x1800, 0x1800).w(FUNC(lasso_state::sound_command_w));
+	map(0x1800, 0x1800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1801, 0x1801).writeonly().share("back_color");
-	map(0x1802, 0x1802).w(FUNC(lasso_state::pinbo_video_control_w));
+	map(0x1802, 0x1802).w(FUNC(lasso_state::pinbo_vidctrl_w));
 	map(0x1804, 0x1804).portr("1804");
 	map(0x1805, 0x1805).portr("1805");
 	map(0x1806, 0x1806).portr("1806");
@@ -207,11 +654,16 @@ void lasso_state::pinbo_audio_io_map(address_map &map)
 	map(0x02, 0x02).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x04, 0x05).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x06, 0x06).r("ay2", FUNC(ay8910_device::data_r));
-	map(0x08, 0x08).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // ???
-	map(0x14, 0x14).nopw(); // ???
+	map(0x08, 0x08).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // ?
+	map(0x14, 0x14).nopw(); // ?
 }
 
 
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( lasso )
 	PORT_START("1804")
@@ -219,8 +671,8 @@ static INPUT_PORTS_START( lasso )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) /* lasso */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) /* shoot */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // lasso
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // shoot
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -244,18 +696,18 @@ static INPUT_PORTS_START( lasso )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ) )
-//  PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )        /* Not documented */
-//  PORT_DIPSETTING(    0x0a, DEF_STR( 1C_1C ) )        /* Not documented */
-//  PORT_DIPSETTING(    0x0e, DEF_STR( 1C_1C ) )        /* Not documented */
+//  PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )        // Not documented
+//  PORT_DIPSETTING(    0x0a, DEF_STR( 1C_1C ) )        // Not documented
+//  PORT_DIPSETTING(    0x0e, DEF_STR( 1C_1C ) )        // Not documented
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
-//  PORT_DIPSETTING(    0x30, "3" )                     /* Not documented */
+//  PORT_DIPSETTING(    0x30, "3" )                     // Not documented
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x80, 0x80, "Warm-Up Instructions" )  PORT_DIPLOCATION("SW1:!4") /* Listed as "Unused" */
+	PORT_DIPNAME( 0x80, 0x80, "Warm-Up Instructions" )  PORT_DIPLOCATION("SW1:!4") // Listed as "Unused"
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
@@ -266,8 +718,8 @@ static INPUT_PORTS_START( lasso )
 	PORT_DIPNAME( 0x02, 0x00, "Warm-Up Language" )      PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( German ) )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW1:!5" )       /* Listed as "Unused" */
-	PORT_DIPNAME( 0x08, 0x00, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW1:!6") /* Listed as "Test" */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW1:!5" )       // Listed as "Unused"
+	PORT_DIPNAME( 0x08, 0x00, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW1:!6") // Listed as "Test"
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(lasso_state::coin_inserted), 0)
@@ -294,9 +746,9 @@ static INPUT_PORTS_START( chameleo )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!4" )
 
 	PORT_MODIFY("1807")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW1:!3" )      /* Probably unused */
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW1:!2" )      /* Probably unused */
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!5" )      /* Probably unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW1:!3" )      // Probably unused
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "SW1:!2" )      // Probably unused
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!5" )      // Probably unused
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
@@ -314,10 +766,10 @@ static INPUT_PORTS_START( wwjgtin )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 
 	PORT_MODIFY("1806")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW2:!1" )      /* used - has to do with the controls */
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )      /* probably unused */
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:!6" )      /* probably unused */
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!4" )      /* probably unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW2:!1" )      // used - has to do with the controls
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:!5" )      // probably unused
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:!6" )      // probably unused
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!4" )      // probably unused
 
 	PORT_MODIFY("1807")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life) )    PORT_DIPLOCATION("SW1:!3")
@@ -326,8 +778,8 @@ static INPUT_PORTS_START( wwjgtin )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!5" )      /* probably unused */
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!6" )      /* probably unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!5" )      // probably unused
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!6" )      // probably unused
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(lasso_state::coin_inserted), 0)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(lasso_state::coin_inserted), 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
@@ -363,7 +815,7 @@ static INPUT_PORTS_START( pinbo )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "70 (Cheat)")
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!4" )      /* probably unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:!4" )      // probably unused
 
 	PORT_MODIFY("1807")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life) )    PORT_DIPLOCATION("SW1:!3")
@@ -372,7 +824,7 @@ static INPUT_PORTS_START( pinbo )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Controls ) )     PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Reversed" )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW1:!5" )       /* probably unused */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW1:!5" )       // probably unused
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
@@ -389,6 +841,12 @@ static INPUT_PORTS_START( pinboa )
 	PORT_DIPSETTING(    0x30, "70 (Cheat)")
 INPUT_PORTS_END
 
+
+/*************************************
+ *
+ *  GFX layouts
+ *
+ *************************************/
 
 static const gfx_layout lasso_charlayout =
 {
@@ -423,7 +881,7 @@ static const gfx_layout wwjgtin_tracklayout =
 	16*16
 };
 
-/* Pinbo is 3bpp, otherwise the same */
+// Pinbo is 3bpp, otherwise the same
 static const gfx_layout pinbo_charlayout =
 {
 	8,8,
@@ -464,29 +922,11 @@ static GFXDECODE_START( gfx_pinbo )
 GFXDECODE_END
 
 
-void lasso_state::machine_start()
-{
-	save_item(NAME(m_gfxbank));
-}
-
-MACHINE_START_MEMBER(lasso_state,wwjgtin)
-{
-	lasso_state::machine_start();
-
-	save_item(NAME(m_track_enable));
-}
-
-void lasso_state::machine_reset()
-{
-	m_gfxbank = 0;
-}
-
-MACHINE_RESET_MEMBER(lasso_state,wwjgtin)
-{
-	lasso_state::machine_reset();
-
-	m_track_enable = 0;
-}
+/*************************************
+ *
+ *  Machine configs
+ *
+ *************************************/
 
 void lasso_state::base(machine_config &config)
 {
@@ -498,14 +938,12 @@ void lasso_state::base(machine_config &config)
 	M6502(config, m_audiocpu, 11'289'000/16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lasso_state::lasso_audio_map);
 
-	config.set_maximum_quantum(attotime::from_hz(6000));
-
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(61); // guess based on intro song finish time compared to PCB
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(lasso_state::screen_update_lasso));
 	m_screen->set_palette(m_palette);
 
@@ -515,6 +953,7 @@ void lasso_state::base(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	SN76489(config, m_sn[0], 11'289'000/4).add_route(ALL_OUTPUTS, "speaker", 0.5); // correct
 	SN76489(config, m_sn[1], 11'289'000/4).add_route(ALL_OUTPUTS, "speaker", 0.5); // "
@@ -527,6 +966,8 @@ void lasso_state::lasso(machine_config &config)
 	// basic machine hardware
 	m6502_device &blitter(M6502(config, "blitter", 11'289'000/16)); // guess
 	blitter.set_addrmap(AS_PROGRAM, &lasso_state::lasso_coprocessor_map);
+
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	PALETTE(config, m_palette, FUNC(lasso_state::lasso_palette), 0x40);
 }
@@ -562,19 +1003,12 @@ void lasso_state::wwjgtin(machine_config &config)
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lasso_state::wwjgtin_audio_map);
 
-	MCFG_MACHINE_START_OVERRIDE(lasso_state, wwjgtin)
-	MCFG_MACHINE_RESET_OVERRIDE(lasso_state, wwjgtin)
-
 	// video hardware
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(lasso_state::screen_update_wwjgtin));
 	m_gfxdecode->set_info(gfx_wwjgtin); // has 1 additional layer
 
 	PALETTE(config.replace(), m_palette, FUNC(lasso_state::wwjgtin_palette), 0x40 + 16*16, 64);
-	MCFG_VIDEO_START_OVERRIDE(lasso_state,wwjgtin)
-
-	// sound hardware
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	MCFG_VIDEO_START_OVERRIDE(lasso_state, wwjgtin)
 }
 
 void lasso_state::pinbo(machine_config &config)
@@ -594,7 +1028,9 @@ void lasso_state::pinbo(machine_config &config)
 	m_gfxdecode->set_info(gfx_pinbo);
 
 	PALETTE(config.replace(), m_palette, palette_device::RGB_444_PROMS, "proms", 256);
-	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)
+	MCFG_VIDEO_START_OVERRIDE(lasso_state, pinbo)
+
+	m_screen->set_screen_update(FUNC(lasso_state::screen_update_pinbo));
 
 	// sound hardware
 	config.device_remove("sn76489_0");
@@ -604,6 +1040,12 @@ void lasso_state::pinbo(machine_config &config)
 	AY8910(config, "ay2", 18_MHz_XTAL/12).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( lasso )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -864,13 +1306,14 @@ ROM_START( pinbos )
 	ROM_LOAD( "blue.n10",    0x0200, 0x0100, CRC(e41250ad) SHA1(2e9a2babbacb1753057d46cf1dd6dc183611747e) )
 ROM_END
 
+} // anonymous namespace
 
 
-/***************************************************************************
-
-                                Game Drivers
-
-***************************************************************************/
+/*************************************
+ *
+ *  Game Drivers
+ *
+ *************************************/
 
 GAME( 1982, lasso,    0,       lasso,    lasso,    lasso_state, empty_init, ROT90, "SNK",              "Lasso",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1983, chameleo, 0,       chameleo, chameleo, lasso_state, empty_init, ROT0,  "Jaleco",           "Chameleon",               MACHINE_SUPPORTS_SAVE )

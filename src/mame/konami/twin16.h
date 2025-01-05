@@ -64,15 +64,15 @@ protected:
 	uint16_t m_CPUA_register = 0;
 	uint16_t m_CPUB_register = 0;
 	bool m_is_fround = false;
-	uint16_t m_sprite_buffer[0x800] { };
+	uint16_t m_sprite_buffer[0x800] = { };
 	emu_timer *m_sprite_timer = nullptr;
 	int m_sprite_busy = 0;
 	int m_need_process_spriteram = 0;
-	uint16_t m_scrollx[3] { };
-	uint16_t m_scrolly[3] { };
+	uint16_t m_scrollx[3] = { };
+	uint16_t m_scrolly[3] = { };
 	uint16_t m_video_register = 0;
 	tilemap_t *m_fixed_tmap = nullptr;
-	tilemap_t *m_scroll_tmap[2] { };
+	tilemap_t *m_scroll_tmap[2] = { };
 
 	void CPUA_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void CPUB_register_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -130,7 +130,7 @@ private:
 	virtual void video_start() override ATTR_COLD;
 	virtual void tile_get_info(tile_data &tileinfo, uint16_t data, int color_base) override;
 
-	uint8_t m_gfx_bank[4] { };
+	uint8_t m_gfx_bank[4] = { };
 };
 
 class cuebrickj_state : public twin16_state
