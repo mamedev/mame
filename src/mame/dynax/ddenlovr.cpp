@@ -5976,7 +5976,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_DIPNAME( 0x02, 0x02, "In-Game Music" )                     PORT_DIPLOCATION("SW4:2")            // ゲームサウンド
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                             // 無
 	PORT_DIPSETTING(    0x02, DEF_STR(On) )                                                              // 有
-	PORT_DIPNAME( 0x04, 0x04, "Show Gals" )                         PORT_DIPLOCATION("SW4:3")            // ？？ギャル表示
+	PORT_DIPNAME( 0x04, 0x04, "Show Gals" )                         PORT_DIPLOCATION("SW4:3")            // ？？ギャル表示  (TODO: manual scan illegible)
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                             // 無
 	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                                              // 有
 	PORT_DIPNAME( 0x08, 0x08, "Higi" )                              PORT_DIPLOCATION("SW4:4")            // 秘技
@@ -5985,7 +5985,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_DIPNAME( 0x10, 0x10, "Hand Lesson" )                       PORT_DIPLOCATION("SW4:5")            // 手札教え
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                             // 無
 	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                                              // 有
-	PORT_DIPNAME( 0x20, 0x20, "Renchan Bonus" )                     PORT_DIPLOCATION("SW4:6")            // 連？ボーナス
+	PORT_DIPNAME( 0x20, 0x20, "Renchan Bonus" )                     PORT_DIPLOCATION("SW4:6")            // 連？ボーナス  (TODO: manual scan illegible)
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                             // 無
 	PORT_DIPSETTING(    0x20, DEF_STR(On) )                                                              // 有
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR(Controls) )                   PORT_DIPLOCATION("SW4:7,8")          // パネルタイプ
@@ -7058,7 +7058,15 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x00, "20" )
 
 	PORT_START("DSW2")
-	MAHJONG_COINAGE(0, "SW2:1,2")                                                                 // COIN RATE
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )                PORT_DIPLOCATION("SW2:1,2")       // Coin Rate
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )       PORT_CONDITION("DSW5", 0x01, EQUALS, 0x01)   // 1コイン  1プレイ
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )       PORT_CONDITION("DSW5", 0x01, EQUALS, 0x01)   // 1コイン  2プレイ
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_5C) )       PORT_CONDITION("DSW5", 0x01, EQUALS, 0x01)   // 1コイン  5プレイ
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW5", 0x01, EQUALS, 0x01)   // 1コイン 10プレイ
+	PORT_DIPSETTING(    0x02, DEF_STR(2C_1C) )       PORT_CONDITION("DSW5", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x01, DEF_STR(2C_2C) )       PORT_CONDITION("DSW5", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )       PORT_CONDITION("DSW5", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR(2C_3C) )       PORT_CONDITION("DSW5", 0x01, EQUALS, 0x00)
 	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                   PORT_DIPLOCATION("SW2:3,4")       // 最低 BET RATE
 	PORT_DIPSETTING(    0x0c, "1" )                                                               // レート　１
 	PORT_DIPSETTING(    0x08, "2" )                                                               // レート　２
@@ -7125,7 +7133,9 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x00, DEF_STR(Hong_Kong) )
 
 	PORT_START("DSW5")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW4:9" )                                                // OFF固定
+	PORT_DIPNAME( 0x01, 0x01, "Alternate Coinage" )             PORT_DIPLOCATION("SW4:9")        // OFF固定
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW4:10" )                                               // OFF固定
 	PORT_DIPNAME( 0x04, 0x00, "Auto Reach" )                    PORT_DIPLOCATION("SW3:9")        // オートリーチ機能
 	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                     // 無
@@ -7138,7 +7148,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x20, "Equal Yakuman/Fever Chance" )                                     // 役満チャンスとフィバーチャンスが同等
 	PORT_DIPSETTING(    0x10, "Frequent Fever Chance" )                                          // フィバーチャンスが多い
 	PORT_DIPSETTING(    0x00, "Fever Chance Only" )                                              // フィバーチャンスのみ
-	MAHJONG_NOTE_CREDITS(6, "SW1:9", "DSW2", 0)                                                  // NOTE RATE
+	MAHJONG_NOTE_CREDITS(6, "SW1:9", "DSW2", 0)                                                  // NOTE RATE  (TODO: this is affected by the alternate coinage setting)
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Flip_Screen) )            PORT_DIPLOCATION("SW1:10")       // 画面反転
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                     // 通常
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                      // 反転
