@@ -4698,6 +4698,8 @@ if (BUSES["ZORRO"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/zorro/action_replay.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/buddha.h",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/merlin.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/merlin.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/picasso2.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/picasso2.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/rainbow2.cpp",
