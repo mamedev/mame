@@ -155,11 +155,6 @@ private:
 	void wwjgtin_main_map(address_map &map) ATTR_COLD;
 };
 
-void lasso_state::machine_start()
-{
-	save_item(NAME(m_vidctrl));
-	save_item(NAME(m_gfxbank));
-}
 
 
 /*************************************
@@ -924,9 +919,15 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Machine configs
+ *  Machine driver
  *
  *************************************/
+
+void lasso_state::machine_start()
+{
+	save_item(NAME(m_vidctrl));
+	save_item(NAME(m_gfxbank));
+}
 
 void lasso_state::base(machine_config &config)
 {

@@ -2,8 +2,6 @@
 // copyright-holders:Nicola Salmoria, Dan Boris
 /***************************************************************************
 
-  snk6502.c
-
   Functions to emulate the video hardware of the machine.
 
 ***************************************************************************/

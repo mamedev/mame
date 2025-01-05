@@ -795,7 +795,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(snk6502_state::satansat_interrupt)
 {
-	if(m_irq_mask)
+	if (m_irq_mask)
 		device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE); /* one IRQ per frame */
 }
 
@@ -1047,9 +1047,6 @@ ROM_START( zarzon )
 	ROM_LOAD( "zarz133.53",   0x0000, 0x0800, CRC(b253cf78) SHA1(56a73b22ed2866222c407a3e9b51b8e0c92cf2aa) )
 	ROM_LOAD( "zarz134.54",   0x0800, 0x0800, CRC(580934d2) SHA1(c1c7eba56bca2a0ea6a68c0245b071a3308f92bd) )
 ROM_END
-
-
-
 
 ROM_START( satansatind )
 	ROM_REGION( 0x10000, "maincpu", 0 )
