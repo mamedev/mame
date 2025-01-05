@@ -153,10 +153,10 @@ void amiga_state::aga_fetch_sprite_data(int scanline, int sprite)
 	m_aga_sprite_dma_used_words[sprite] = 0;
 }
 
-void amiga_state::aga_update_sprite_dma(int scanline)
+void amiga_state::aga_update_sprite_dma(int scanline, int num)
 {
 	int dmaenable = (CUSTOM_REG(REG_DMACON) & (DMACON_SPREN | DMACON_DMAEN)) == (DMACON_SPREN | DMACON_DMAEN);
-	int num, maxdma;
+	int maxdma;
 	const u16 sprctl_offs[4] = {2, 4, 4, 8};
 	const u16 spr_fmode_inc = sprctl_offs[(CUSTOM_REG(REG_FMODE) >> 2) & 0x03];
 
@@ -165,63 +165,62 @@ void amiga_state::aga_update_sprite_dma(int scanline)
 	if (maxdma > 8)
 		maxdma = 8;
 
-	/* loop over sprite channels */
-	for (num = 0; num < maxdma; num++)
+	if (num >= maxdma)
+		return;
+
+	int bitmask = 1 << num;
+	int vstart, vstop;
+
+	/* if we are == VSTOP, fetch new control words */
+	if (dmaenable && (m_sprite_dma_live_mask & bitmask) && (m_sprite_dma_reload_mask & bitmask) && !(m_sprite_ctl_written & bitmask))
 	{
-		int bitmask = 1 << num;
-		int vstart, vstop;
+		/* disable the sprite */
+		m_sprite_comparitor_enable_mask &= ~bitmask;
+		m_sprite_dma_reload_mask &= ~bitmask;
 
-		/* if we are == VSTOP, fetch new control words */
-		if (dmaenable && (m_sprite_dma_live_mask & bitmask) && (m_sprite_dma_reload_mask & bitmask) && !(m_sprite_ctl_written & bitmask))
-		{
-			/* disable the sprite */
-			m_sprite_comparitor_enable_mask &= ~bitmask;
-			m_sprite_dma_reload_mask &= ~bitmask;
+		/* fetch data into the control words */
+		CUSTOM_REG(REG_SPR0POS + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
+		// diggers AGA suggests that the fmode increments with ctl are interleaved,
+		// otherwise no sprites are drawn.
+		// (it enables sprite 0 only, and +8 for the vstop values)
+		CUSTOM_REG(REG_SPR0CTL + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + spr_fmode_inc);
+		CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 2 * spr_fmode_inc;
+		LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
+	}
 
-			/* fetch data into the control words */
-			CUSTOM_REG(REG_SPR0POS + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
-			// diggers AGA suggests that the fmode increments with ctl are interleaved,
-			// otherwise no sprites are drawn.
-			// (it enables sprite 0 only, and +8 for the vstop values)
-			CUSTOM_REG(REG_SPR0CTL + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + spr_fmode_inc);
-			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 2 * spr_fmode_inc;
-			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
-		}
+	u16 spr0ctl = CUSTOM_REG(REG_SPR0CTL + 4 * num);
+	/* compute vstart/vstop */
+	// bits 6 and 5 are respectively vstart bit 9 and vstop bit 9
+	// TODO: do they disable with non-AGA modes?
+	vstart = (CUSTOM_REG(REG_SPR0POS + 4 * num) >> 8);
+	vstart |= (spr0ctl & 0x04) ? 0x100 : 0;
+	vstart |= (spr0ctl & 0x40) ? 0x200 : 0;
+	vstop = (spr0ctl >> 8);
+	vstop |= (spr0ctl & 0x02) ? 0x100 : 0;
+	vstop |= (spr0ctl & 0x20) ? 0x200 : 0;
 
-		u16 spr0ctl = CUSTOM_REG(REG_SPR0CTL + 4 * num);
-		/* compute vstart/vstop */
-		// bits 6 and 5 are respectively vstart bit 9 and vstop bit 9
-		// TODO: do they disable with non-AGA modes?
-		vstart = (CUSTOM_REG(REG_SPR0POS + 4 * num) >> 8);
-		vstart |= (spr0ctl & 0x04) ? 0x100 : 0;
-		vstart |= (spr0ctl & 0x40) ? 0x200 : 0;
-		vstop = (spr0ctl >> 8);
-		vstop |= (spr0ctl & 0x02) ? 0x100 : 0;
-		vstop |= (spr0ctl & 0x20) ? 0x200 : 0;
+	/* if we hit vstart, enable the comparitor */
+	if (scanline == vstart)
+	{
+		m_sprite_comparitor_enable_mask |= 1 << num;
+		LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d comparitor enable\n", scanline, num);
+	}
 
-		/* if we hit vstart, enable the comparitor */
-		if (scanline == vstart)
-		{
-			m_sprite_comparitor_enable_mask |= 1 << num;
-			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d comparitor enable\n", scanline, num);
-		}
+	/* if we hit vstop, disable the comparitor and trigger a reload for the next scanline */
+	if (scanline == vstop)
+	{
+		m_sprite_ctl_written &= ~bitmask;
+		m_sprite_comparitor_enable_mask &= ~bitmask;
+		m_sprite_dma_reload_mask |= 1 << num;
+		CUSTOM_REG(REG_SPR0DATA + 4 * num) = 0;     /* just a guess */
+		CUSTOM_REG(REG_SPR0DATB + 4 * num) = 0;
+		LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
+	}
 
-		/* if we hit vstop, disable the comparitor and trigger a reload for the next scanline */
-		if (scanline == vstop)
-		{
-			m_sprite_ctl_written &= ~bitmask;
-			m_sprite_comparitor_enable_mask &= ~bitmask;
-			m_sprite_dma_reload_mask |= 1 << num;
-			CUSTOM_REG(REG_SPR0DATA + 4 * num) = 0;     /* just a guess */
-			CUSTOM_REG(REG_SPR0DATB + 4 * num) = 0;
-			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
-		}
-
-		/* fetch data if this sprite is enabled */
-		if (dmaenable && (m_sprite_dma_live_mask & bitmask) && (m_sprite_comparitor_enable_mask & bitmask))
-		{
-			aga_fetch_sprite_data(scanline, num);
-		}
+	/* fetch data if this sprite is enabled */
+	if (dmaenable && (m_sprite_dma_live_mask & bitmask) && (m_sprite_comparitor_enable_mask & bitmask))
+	{
+		aga_fetch_sprite_data(scanline, num);
 	}
 }
 
@@ -462,6 +461,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	int hires = 0, dualpf = 0, ham = 0, ehb = 0;
 	int pf1pri = 0, pf2pri = 0;
 	int planes = 0;
+	int raw_scanline = 0;
 
 	uint32_t *dst = nullptr;
 	int ebitoffs = 0, obitoffs = 0;
@@ -513,13 +513,11 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		}
 	}
 
+	raw_scanline = scanline;
+
 	scanline /= 2;
 
 	m_last_scanline = scanline;
-
-	/* update sprite data fetching */
-	// FIXME: verify and apply same logic as per OCS
-	aga_update_sprite_dma(scanline);
 
 	/* all sprites off at the start of the line */
 	memset(m_sprite_remain, 0, sizeof(m_sprite_remain));
@@ -621,6 +619,17 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			/* extract collision masks */
 			ocolmask = (CUSTOM_REG(REG_CLXCON) >> 6) & 0x15;
 			ecolmask = (CUSTOM_REG(REG_CLXCON) >> 6) & 0x2a;
+		}
+
+		if ((raw_scanline & 1) == 0)
+		{
+			// TODO: refine, merge with OCS version
+			if (x >= 0x18 && x <= 0x34 && (x & 3) == 0)
+			{
+				int num = (x - 0x18) >> 2;
+				//printf("%d %02x\n", num, x);
+				aga_update_sprite_dma(raw_scanline >> 1, num);
+			}
 		}
 
 		/* clear the target pixels to the background color as a starting point */
