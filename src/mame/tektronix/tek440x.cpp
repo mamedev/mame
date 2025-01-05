@@ -568,6 +568,8 @@ private:
 	u8 videocntl_r();
 	void videocntl_w(u8 data);
 
+	u8 nvram_r(offs_t offset);
+
 	// fake output of serial
 	void write_txd(int state);
 
@@ -1079,6 +1081,15 @@ void tek440x_state::diag_w(u8 data)
 	m_diag = data;
 }
 
+
+u8 tek440x_state::nvram_r(offs_t offset)
+{
+	static u8  nvram[32] = {0xbf,0x6f,0x4f,0x0f,0x41,0x44,0x41,0x4d,0x42,0x2f,0x6f,0x4f,0x0f,0x41,0x5f,0x8f};
+
+	return nvram[offset>>1];
+}
+
+
 // copied from stkbd.cpp
 int tek440x_state::mouseupdate()
 {
@@ -1319,7 +1330,9 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x600000, 0x61ffff).ram().share("vram");
 
 	// 700000-71ffff spare 0
-	// 720000-73ffff spare 1  (ethernet)
+	// 720000-720fff spare 1 (ethernet)
+	// 721000-721fff nvram nybbles
+	map(0x721000, 0x721fff).r(FUNC(tek440x_state::nvram_r));
 	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0).w(FUNC(tek440x_state::led_w));
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
 
