@@ -45,8 +45,8 @@ Usage notes:
 - An interactive, clickable layout is included.
 - This driver is marked as "not working", due to the lack of audio support. But
   the UI is otherwise functional.
-- The volume faders can be controlled from the "Sliders" menu.
-- The drum keys are mapped to the keyboard in the same. for example:
+- The mixer faders can be controlled with the mouse, or from the "Sliders" menu.
+- The drum keys are mapped to the keyboard, starting at "Q". Specifically:
   Q - Bass 1, W - Snare 1, ...
   A - Bass 2, S - Snare 2, ...
   Z - Bass 3, X - Snare 3, ...

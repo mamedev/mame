@@ -3,9 +3,7 @@
 license:CC0-1.0
 copyright-holders:m1macrophage
 -->
-
 <mamelayout version="2">
-
 	<element name="panel">
 		<rect><color red="0.15" green="0.16" blue="0.15"/></rect>
 	</element>
@@ -77,22 +75,26 @@ copyright-holders:m1macrophage
 		</rect>
 	</element>
 
-	<element name="fader">
+	<element name="fader-knob">
 		<rect>
-			<bounds x="14" y="15" width="7" height="145"/>
-			<color red="0.0" green="0.0" blue="0.01"/>
-		</rect>
-		<rect>
-			<animate/>
-			<bounds state="100" x="0" y="0" width="35" height="35"/>
-			<bounds state="0" x="0" y="140" width="35" height="35"/>
+			<bounds x="0" y="0" width="35" height="35"/>
 			<color red="0.27" green="0.31" blue="0.29"/>
 		</rect>
 		<rect>
-			<animate/>
-			<bounds state="100" x="1" y="15" width="33" height="3"/>
-			<bounds state="0" x="1" y="160" width="33" height="3"/>
+			<bounds x="1" y="16" width="33" height="3"/>
 			<color red="0.97" green="0.97" blue="0.96"/>
+		</rect>
+	</element>
+
+	<element name="fader">
+		<rect>
+			<!-- Invisible fader knob, to ensure correct width. -->
+			<bounds x="0" y="0" width="35" height="35"/>
+			<color red="0" green="0" blue="0" alpha="0"/>
+		</rect>
+		<rect>
+			<bounds x="14" y="0" width="7" height="144"/>
+			<color red="0.0" green="0.0" blue="0.01"/>
 		</rect>
 	</element>
 
@@ -321,8 +323,13 @@ copyright-holders:m1macrophage
 			<param name="text_x" start="52" increment="65"/>
 			<param name="text_i" start="1" increment="1"/>
 			<param name="pot_i" start="1" increment="1"/>
-			<element ref="fader" inputtag="fader_p~pot_i~" inputmask="0x7f" inputraw="yes">
-				<bounds x="~fader_x~" y="207" width="35" height="159"/>
+			<element ref="fader" id="fader_p~pot_i~">
+				<bounds x="~fader_x~" y="222" width="35" height="144"/>
+			</element>
+			<element ref="fader-knob">
+				<animate inputtag="fader_p~pot_i~" inputmask="0x7f"/>
+				<bounds state="100" x="~fader_x~" y="213" width="35" height="35"/>
+				<bounds state="0" x="~fader_x~" y="340" width="35" height="35"/>
 			</element>
 			<element ref="fader-text-~text_i~">
 				<bounds x="~text_x~" y="380" width="65" height="10"/>
@@ -331,8 +338,13 @@ copyright-holders:m1macrophage
 		<element ref="fader-text-toms">
 			<bounds x="262" y="380" width="100" height="10"/>
 		</element>
-		<element ref="fader" inputtag="fader_p10" inputmask="0x7f" inputraw="yes">
-			<bounds x="669" y="207" width="35" height="159"/>
+		<element ref="fader" id="fader_p10">
+			<bounds x="669" y="222" width="35" height="144"/>
+		</element>
+		<element ref="fader-knob">
+			<animate inputtag="fader_p10" inputmask="0x7f"/>
+			<bounds state="100" x="669" y="213" width="35" height="35"/>
+			<bounds state="0" x="669" y="340" width="35" height="35"/>
 		</element>
 		<element ref="fader-text-volume">
 			<bounds x="656" y="380" width="60" height="10"/>
@@ -490,5 +502,88 @@ copyright-holders:m1macrophage
 			</element>
 		</repeat>
 	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function()
+				-- These constants need to match the "fader" and "fader-knob"
+				-- element attributes in the "Mixer" section.
+				local fader_height <const> = 144
+				local knob_height <const> = 35
+				local knob_fader_delta_y <const> = 9  -- fader y - knob y
+
+				local fader_deadzone <const> = math.floor(knob_height / 2) - knob_fader_delta_y
+
+				-- Local state used by the pointer update handler.
+				local faders = {}
+				local fader_fields = {}
+				local selected = 0
+
+				-- Gather relevant elements and inputs into local state.
+				local view = file.views["Default Layout"]
+				for i = 1, #view.items do
+					local item = view.items:at(i)
+					if item.id ~= nil and string.find(item.id, "fader_") == 1 then
+						local port_tag = item.id
+						local port = file.device:ioport(port_tag)
+						local field = nil
+						if port ~= nil then
+							for k, val in pairs(port.fields) do
+								field = val
+								break
+							end
+							if field == nil then
+								print("DMX LAYOUT ERROR - Port does not have a field: " .. port_tag)
+							end
+						else
+							print("DMX LAYOUT ERROR - Port not found: " .. port_tag)
+						end
+						table.insert(faders, item)
+						table.insert(fader_fields, field)
+					end
+				end
+
+				view:set_pointer_updated_callback(
+					function(type, id, dev, x, y, btn, dn, up, cnt)
+						-- No button pressed. Reset state.
+						if btn & 1 == 0 then
+							selected = 0
+							return
+						end
+
+						-- Button just pressed. Find affected fader.
+						if dn & 1 ~= 0 then
+							for i = 1, #faders do
+								if faders[i].bounds:includes(x, y) then
+									selected = i
+									break
+								end
+							end
+						end
+
+						-- No fader selected. Nothing to do.
+						if selected <= 0 then
+							return
+						end
+
+						-- A fader is selected. Update state and, indirectly,
+						-- fader knob position, based on the pointer's Y position.
+
+						-- It is assumed the attached IO field is an IPT_ADJUSTER
+						-- with a range of 0-100 (the default).
+
+						local bbox = faders[selected].bounds
+						local scale_factor = bbox.height / fader_height
+						local min_y = bbox.y0 + fader_deadzone * scale_factor
+						local max_y = bbox.y1 - fader_deadzone * scale_factor
+
+						local new_value = 100 - 100 * (y - min_y) / (max_y - min_y)
+						new_value = math.floor(new_value + 0.5)
+						if new_value < 0 then new_value = 0 end
+						if new_value > 100 then new_value = 100 end
+						fader_fields[selected].user_value = new_value
+					end)
+			end)
+	]]></script>
 </mamelayout>
 
