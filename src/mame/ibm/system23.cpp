@@ -29,6 +29,7 @@ namespace
 				m_chargen(*this, "chargen"),
 				m_ram(*this, RAM_TAG),
 				m_screen(*this, "screen"),
+				m_language(*this,"lang"),
 				m_diag_digits(*this, "digit%u", 0U)
 
 			{
@@ -52,7 +53,7 @@ namespace
 			required_region_ptr<uint8_t> m_chargen;
 			required_device<ram_device> m_ram;
 			required_device<screen_device> m_screen;
-
+			required_ioport m_language;
 			output_finder<2> m_diag_digits;
 
 			uint8_t m_bus_test_register = 0;
@@ -73,8 +74,6 @@ namespace
 			void dmac_mem_w(offs_t offset, uint8_t data);
 
 			void dmac_hrq_w(int state);
-
-			uint8_t language_r();
 
 			void crtc_dack_w(offs_t offset, uint8_t data);
 			I8275_DRAW_CHARACTER_MEMBER(display_pixels);
@@ -170,11 +169,6 @@ namespace
 		bitmap.pix(y, x++) = BIT(gfx, 7) ? palette[1] : palette[0];
 	}
 
-	uint8_t system23_state::language_r()
-	{
-		return 3;	//hack to set region to Spain
-	}
-
 	//This routine describes the computer's I/O map
 
 	void system23_state::system23_io(address_map &map)
@@ -216,7 +210,8 @@ namespace
 
 		I8255(config, m_ppi_settings);
 		m_ppi_settings->in_pc_callback().set(FUNC(system23_state::memory_settings_r));
-		m_ppi_settings->in_pa_callback().set(FUNC(system23_state::language_r));
+		//m_ppi_settings->in_pa_callback().set(FUNC(system23_state::language_r));
+		m_ppi_settings->in_pa_callback().set_ioport(m_language);
 
 		I8257(config, m_dmac, (18'432'000 / 6)); //frequency needs to be adjusted
 		m_dmac->out_memw_cb().set(FUNC(system23_state::dmac_mem_w));
@@ -254,16 +249,48 @@ namespace
 
 	}
 
+	static INPUT_PORTS_START(system23)
+		PORT_START("ce")
+			PORT_DIPNAME( 0x01, 0x00, "A1")
+			PORT_DIPSETTING(    0x01, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x02, 0x00, "A2")
+			PORT_DIPSETTING(    0x02, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x04, 0x00, "A3")
+			PORT_DIPSETTING(    0x04, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+
+		PORT_START("lang")
+			PORT_DIPNAME( 0x01, 0x00, "B1")
+			PORT_DIPSETTING(    0x01, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x02, 0x00, "B2")
+			PORT_DIPSETTING(    0x02, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x04, 0x00, "B3")
+			PORT_DIPSETTING(    0x04, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x08, 0x00, "B4")
+			PORT_DIPSETTING(    0x08, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+			PORT_DIPNAME( 0x10, 0x00, "B5")
+			PORT_DIPSETTING(    0x10, DEF_STR( Off ))
+			PORT_DIPSETTING(    0x00, DEF_STR( On ))
+
+
+	INPUT_PORTS_END
+
 
 	ROM_START( system23 )
-		ROM_SYSTEM_BIOS(0, "R Set", "1982?")
-		ROM_SYSTEM_BIOS(1, "TM Set", "1981?")
+		ROM_SYSTEM_BIOS(0, "r set", "1982?")
+		ROM_SYSTEM_BIOS(1, "tm set", "1981?")
 
 		ROM_REGION(0x4000, "ros_unpaged", 0)
 		ROMX_LOAD("02_61c9866a_4481186.bin", 0x0000, 0x2000, CRC(61c9866a) SHA1(43f2bed5cc2374c7fde4632948329062e57e994b),ROM_BIOS(0))
 		ROMX_LOAD("09_07843020_8493747.bin", 0x2000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e),ROM_BIOS(0))
 
-		ROMX_LOAD("02_081AE664_8493746.bin", 0x0000, 0x2000, CRC(081AE664) SHA1(82561e33012f21918927c85527531f21d66deba8),ROM_BIOS(1))
+		ROMX_LOAD("02_081ae664_8493746.bin", 0x0000, 0x2000, CRC(081ae664) SHA1(82561e33012f21918927c85527531f21d66deba8),ROM_BIOS(1))
 		ROMX_LOAD("09_07843020_8493747.bin", 0x2000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e),ROM_BIOS(1))
 
 		ROM_REGION(0x2000, "chargen", 0)
