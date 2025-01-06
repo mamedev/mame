@@ -422,8 +422,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(roland_d70_state::samples_timer_cb) {
 }
 
 void roland_d70_state::lcd_palette(palette_device &palette) const {
-	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(69, 62, 66));
+	palette.set_pen_color(0, rgb_t(0x9f, 0xb4, 0x86));
+	palette.set_pen_color(1, rgb_t(0x5e, 0x5f, 0x71));
 }
 
 void roland_d70_state::d70_map(address_map &map) {
