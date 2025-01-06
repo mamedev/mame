@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-06 18:43+0100\n"
-"PO-Revision-Date: 2025-01-06 20:00+0100\n"
+"PO-Revision-Date: 2025-01-06 20:07+0100\n"
 "Last-Translator: Daniel Nylander <github@danielnylander.se>\n"
 "Language-Team: MAME Language Team\n"
 "Language: sv\n"
@@ -855,7 +855,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Det finns fungerande varianter av detta system: %s"
+"Det finns fungerande kloner av detta system: %s"
 
 #: src/frontend/mame/ui/info.cpp:398
 #, c-format
