@@ -719,7 +719,7 @@ u) uniwars
       Between levels there is an intermission display showing "WARP" over flashing pixel snow simulating "warp speed".
 
     - What generates the warp effect?
-      There are no known schematics for the Irem Galaxian PCB so the Midway schematic is used as a reference.
+      There are no known schematics for the Irem Galaxian PCB so the Midway Galaxian schematic is used as a reference.
       The Irem game PCB has several fly wires of which Red & Green relate to the warp effect.
 
       Video PCB connections
@@ -727,8 +727,7 @@ u) uniwars
       Green => IC F6 (74161) pin 14
 
       The Green signal is a clock generated on the video PCB that measured 10.44us period, TTL square, wave 50% duty cycle.
-      The Irem F6 LS161 is likely one of the horizontal or virtical video counters, equivalent to one of the Midway IC 3A/4A/5A/6A.
-      TODO: Determine which signal it is on a Midway PCB.
+      Comparing with the Midway schematic, Irem IC F6 pin 14 === Midway IC 4A pin 14, signal 32H.
 
       The Red signal is input to the video PCB:
       - Warp off => idle high
@@ -750,7 +749,7 @@ u) uniwars
       - Irem IC E9 pin 12 === Midway IC 3S pin 10
       - Irem IC D9 pin  4 === Midway IC 6P pin 12 (74377)
 
-      Therefore, the warp effect occurs when the ~256H* input to the star field generator circuit is replaced by a fast video clock.
+      Therefore, the warp effect occurs when the ~256H* input to the star field generator circuit is replaced by 32H.
 
     - How is the effect triggered?
       A spare IC position is populated with a 74LS157 mux connected as follows:
@@ -761,7 +760,7 @@ u) uniwars
       - pin 4 - Q => Red wire
       - pin 15 - ~E => GND
 
-      TODO: To confirm where the missing A wire connection went. Potentially it could be ~256H* for a normal star field.
+      TODO: To confirm where the missing A wire connection went.
 
       Comparing with the Midway schematic suggests Irem IC C2 === Midway IC 9L and warp is controlled by address 0x6804 of the sound latch, unused on Galaxian.
       This was confirmed with an In Circuit Emulator on the PCB - address 0x6804 turns the warp effect on & off.
