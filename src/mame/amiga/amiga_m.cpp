@@ -1545,9 +1545,21 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 
 		case REG_SPR0DATA:  case REG_SPR1DATA:  case REG_SPR2DATA:  case REG_SPR3DATA:
 		case REG_SPR4DATA:  case REG_SPR5DATA:  case REG_SPR6DATA:  case REG_SPR7DATA:
+		{
 			/* enable comparitor on writes here */
 			sprite_enable_comparitor((offset - REG_SPR0DATA) / 4, true);
 			break;
+		}
+
+		case REG_SPR0POS:   case REG_SPR1POS:   case REG_SPR2POS:   case REG_SPR3POS:
+		case REG_SPR4POS:   case REG_SPR5POS:   case REG_SPR6POS:   case REG_SPR7POS:
+		{
+			// a bunch of games override position thru copper
+			// suprfrog, abreed, brian, jimpower (lives counter)
+			int which = (offset - REG_SPR0POS) / 4;
+			m_sprite_dma_reload_mask &= ~(1 << which);
+			break;
+		}
 
 		case REG_DDFSTRT:
 			/* impose hardware limits ( HRM, page 75 ) */

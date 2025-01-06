@@ -607,14 +607,16 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		// this is also unaffected by LACE
 		if ((raw_scanline & 1) == 0)
 		{
+			const int min_x = 0x18 << 1;
+			const int max_x = 0x34 << 1;
 			// TODO: refine
 			// Sprite DMA loads first two words at $14 + num * 4, other 2 words at $18 + num * 4
 			// NOTE: position $28 for sprite 4 has a typo on HRM diagram
 			// non-zero DMA fetches are required by:
-			// - beast gameplay, suprfrog player sprite, abreed (top left counter)
-			if (x >= 0x18 && x <= 0x34 && (x & 3) == 0)
+			// - beast gameplay, abreed (top left counter)
+			if (x >= min_x && x <= max_x && (x & 7) == 0)
 			{
-				int num = (x - 0x18) >> 2;
+				int num = (x - min_x) >> 3;
 				//printf("%d %02x\n", num, x);
 				update_sprite_dma(raw_scanline >> 1, num);
 			}
