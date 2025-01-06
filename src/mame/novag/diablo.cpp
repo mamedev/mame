@@ -7,7 +7,8 @@ Novag Diablo 68000 (model 908)
 Novag Scorpio 68000 (model 909)
 
 Hardware notes (Diablo 68000):
-- M68000 @ 16MHz, IPL1 256Hz, IPL2 from ACIA IRQ(always high)
+- PCB label: 100126 REV-2
+- TMP68HC000P-16 @ 16MHz, IPL1 256Hz, IPL2 from ACIA IRQ(always high)
 - 2*8KB RAM TC5565 battery-backed, 2*32KB hashtable RAM TC55257
 - 3*32KB ROM (27C256 or equivalent)
 - HD44780A00 LCD controller (16x1)
