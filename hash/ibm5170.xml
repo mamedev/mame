@@ -8920,7 +8920,7 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 	</software>
 
 	<software name="pmagic">
-		<description>Norton PartitionMagic 8.05 (English)</description>
+		<description>PartitionMagic 8.05 (English)</description>
 		<year>2004</year>
 		<publisher>Symantec</publisher>
 		<info name="release" value="20040505" />
@@ -8939,7 +8939,7 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 	</software>
 
 	<software name="pmagicfr" cloneof="pmagic">
-		<description>Norton PartitionMagic 8.05 (French)</description>
+		<description>PartitionMagic 8.05 (French)</description>
 		<year>2004</year>
 		<publisher>Symantec</publisher>
 		<info name="release" value="20040505" />
@@ -8958,7 +8958,7 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 	</software>
 
 	<software name="pmagicde" cloneof="pmagic">
-		<description>Norton PartitionMagic 8.05 (German)</description>
+		<description>PartitionMagic 8.05 (German)</description>
 		<year>2004</year>
 		<publisher>Symantec</publisher>
 		<info name="release" value="20040505" />
@@ -8977,7 +8977,7 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 	</software>
 
 	<software name="pmagicit" cloneof="pmagic">
-		<description>Norton PartitionMagic 8.05 (Italian)</description>
+		<description>PartitionMagic 8.05 (Italian)</description>
 		<year>2004</year>
 		<publisher>Symantec</publisher>
 		<info name="release" value="20040505" />
@@ -8996,7 +8996,7 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 	</software>
 
 	<software name="pmagices" cloneof="pmagic">
-		<description>Norton PartitionMagic 8.05 (Spanish)</description>
+		<description>PartitionMagic 8.05 (Spanish)</description>
 		<year>2004</year>
 		<publisher>Symantec</publisher>
 		<info name="release" value="20040505" />

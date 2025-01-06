@@ -7471,7 +7471,7 @@ Other stuff untested
 	<!-- DOS, Windows 95B, Windows 98, Windows Me, Windows 2000, Windows XP
 	     and El Torito bootable. -->
 	<software name="pmagic">
-		<description>Norton PartitionMagic 8.05</description>
+		<description>PartitionMagic 8.05</description>
 		<year>2004</year>
 		<publisher>Symantec</publisher>
 		<info name="language" value="English/French/German/Italian/Spanish" />
