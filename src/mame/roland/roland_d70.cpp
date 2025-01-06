@@ -510,8 +510,33 @@ void roland_d70_state::descramble_rom_internal(u8 *dst, const u8 *src) {
 
 ROM_START(d70)
 	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_SYSTEM_BIOS(0, "v203", "Version 2.03")
-	ROMX_LOAD("roland_d70_v110_combined.bin", 0x00000, 0x20000, CRC(52deab1e) SHA1(87d7196888edec65c9feddd16d4c715f6992abc7), ROM_BIOS(0))
+	ROM_DEFAULT_BIOS("v1.19")
+	ROM_SYSTEM_BIOS( 0, "v1.19", "Version 1.19 - March 9, 1993" )
+	ROM_SYSTEM_BIOS( 1, "v1.16", "Version 1.16 - January 28, 1991" )
+	ROM_SYSTEM_BIOS( 2, "v1.14", "Version 1.14 - September 20, 1990" )
+	ROM_SYSTEM_BIOS( 3, "v1.12", "Version 1.12 - August 8, 1990" )
+	ROM_SYSTEM_BIOS( 4, "v1.10", "Version 1.10 - April 19, 1990" )
+	ROM_SYSTEM_BIOS( 5, "v1.00", "Version 1.00 - March 10, 1990" )
+
+	ROMX_LOAD("roland_d70_v1.19_a_even.ic4", 0, 0x10000, CRC(95fcf250) SHA1(174962eb42f56aaf936aeca4db77228bf19ec97a), ROM_BIOS(0) | ROM_SKIP(1) )
+	ROMX_LOAD("roland_d70_v1.19_b_odd.ic9",  1, 0x10000, CRC(a14f0ce1) SHA1(9ef2d62b1be5c38b9fa0072a5889b8ab0e47623e), ROM_BIOS(0) | ROM_SKIP(1) )
+
+	ROMX_LOAD("roland_d70_v1.16_a_even.ic4", 0, 0x10000, CRC(761f6eac) SHA1(18bd2c8390d67f1000fae652f51a03322bb088cd), ROM_BIOS(1) | ROM_SKIP(1) )
+	ROMX_LOAD("roland_d70_v1.16_b_odd.ic9",  1, 0x10000, CRC(103a1f07) SHA1(530408a8ae8d74786cb8179892b7e3a24db93000), ROM_BIOS(1) | ROM_SKIP(1) )
+
+	ROMX_LOAD("roland_d70_v1.14_a_even.ic4", 0, 0x10000, CRC(651e7cd5) SHA1(73ad2d897f51449111064e92b515a4118fee4dad), ROM_BIOS(2) | ROM_SKIP(1) )
+	ROMX_LOAD("roland_d70_v1.14_b_odd.ic9",  1, 0x10000, CRC(b3533278) SHA1(8c2019c20b60d4fbb5f5956bce672a84f515215b), ROM_BIOS(2) | ROM_SKIP(1) )
+
+	ROMX_LOAD("roland_d70_v1.12_a_even.ic4", 0, 0x10000, CRC(86032879) SHA1(07e7545c2dae93311f7b5d77b65c548e56391748), ROM_BIOS(3) | ROM_SKIP(1) )
+	ROMX_LOAD("roland_d70_v1.12_b_odd.ic9",  1, 0x10000, CRC(910cf30e) SHA1(15cb5ecb956205dc9d6254822178139a228790d8), ROM_BIOS(3) | ROM_SKIP(1) )
+
+	ROMX_LOAD("roland_d70_v1.10_a_even.ic4", 0, 0x10000, CRC(5f7374c5) SHA1(15d9249c35c3db6a7d1df6a4f4e42f0ce99f11a5), ROM_BIOS(4) | ROM_SKIP(1) )
+	ROMX_LOAD("roland_d70_v1.10_b_odd.ic9",  1, 0x10000, CRC(f024220e) SHA1(cde358c1ec205f446114f478b43269b01b8be048), ROM_BIOS(4) | ROM_SKIP(1) )
+
+	// Seen at https://www.youtube.com/watch?v=9zGcHzpz7zo
+	ROMX_LOAD("roland_d70_v1.00_a_even.ic4", 0, 0x10000, NO_DUMP, ROM_BIOS(5) | ROM_SKIP(1) )
+	ROMX_LOAD("roland_d70_v1.00_b_odd.ic9",  1, 0x10000, NO_DUMP, ROM_BIOS(5) | ROM_SKIP(1) )
+
 
 	ROM_REGION(0x600000, "pcmorg", 0) // ROMs before descrambling
 	ROM_LOAD("roland_d70_waverom-a.bin", 0x000000, 0x80000, CRC(8e53b2a3) SHA1(4872530870d5079776e80e477febe425dc0ec1df))
