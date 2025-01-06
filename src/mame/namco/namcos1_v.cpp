@@ -214,7 +214,7 @@ u32 namcos1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	bitmap.fill(m_c116->black_pen(), cliprect);
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
-	int i = m_c116->get_reg(0) - 1;                         // min x
+	int i = m_c116->get_reg(0) - 1;                     // min x
 	if (new_clip.min_x < i) new_clip.min_x = i;
 	i = m_c116->get_reg(1) - 1 - 1;                     // max x
 	if (new_clip.max_x > i) new_clip.max_x = i;
@@ -259,8 +259,12 @@ void namcos1_state::screen_vblank(int state)
 
 			m_copy_sprites = false;
 		}
+
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	}
+	else
+	{
 		m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		m_mcu->set_input_line(HD6301_IRQ1_LINE, ASSERT_LINE);
 	}
