@@ -30,6 +30,7 @@ namespace
 				m_ram(*this, RAM_TAG),
 				m_screen(*this, "screen"),
 				m_language(*this,"lang"),
+				m_cedip(*this,"ce"),
 				m_diag_digits(*this, "digit%u", 0U)
 
 			{
@@ -54,6 +55,7 @@ namespace
 			required_device<ram_device> m_ram;
 			required_device<screen_device> m_screen;
 			required_ioport m_language;
+			required_ioport m_cedip;
 			output_finder<2> m_diag_digits;
 
 			uint8_t m_bus_test_register = 0;
@@ -177,7 +179,7 @@ namespace
 		map(0x00, 0x08).rw(m_dmac, FUNC(i8257_device::read), FUNC(i8257_device::write));
 		map(0x2c, 0x2f).rw(m_ppi_settings, FUNC(i8255_device::read), FUNC(i8255_device::write));
 		map(0x40, 0x43).rw(m_ppi_diag, FUNC(i8255_device::read), FUNC(i8255_device::write));
-		map(0x44, 0x47).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
+		map(0x44, 0x45).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 		map(0x4c, 0x4f).rw(m_ppi_kbd, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	}
 
@@ -186,7 +188,7 @@ namespace
 	void system23_state::system23_mem(address_map &map)
 	{
 		map.unmap_value_high();
-		map(0x0000, 0x3fff).rom().region("ros_unpaged",0);
+		map(0x0000, 0x3fff).rom();
 		map(0x8000, 0xbfff).ram();
 
 	}
@@ -210,14 +212,14 @@ namespace
 
 		I8255(config, m_ppi_settings);
 		m_ppi_settings->in_pc_callback().set(FUNC(system23_state::memory_settings_r));
-		//m_ppi_settings->in_pa_callback().set(FUNC(system23_state::language_r));
 		m_ppi_settings->in_pa_callback().set_ioport(m_language);
+		m_ppi_settings->in_pb_callback().set_ioport(m_cedip);
 
 		I8257(config, m_dmac, (18'432'000 / 6)); //frequency needs to be adjusted
 		m_dmac->out_memw_cb().set(FUNC(system23_state::dmac_mem_w));
 		m_dmac->in_memr_cb().set(FUNC(system23_state::dmac_mem_r));
 		m_dmac->out_iow_cb<2>().set(m_crtc, FUNC(i8275_device::dack_w));
-		m_dmac->out_hrq_cb().set(FUNC(dmac_hrq_w));
+		m_dmac->out_hrq_cb().set(FUNC(system23_state::dmac_hrq_w));
 
 		PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
@@ -277,20 +279,18 @@ namespace
 			PORT_DIPNAME( 0x10, 0x00, "B5")
 			PORT_DIPSETTING(    0x10, DEF_STR( Off ))
 			PORT_DIPSETTING(    0x00, DEF_STR( On ))
-
-
 	INPUT_PORTS_END
 
 
 	ROM_START( system23 )
-		ROM_SYSTEM_BIOS(0, "r set", "1982?")
-		ROM_SYSTEM_BIOS(1, "tm set", "1981?")
+		ROM_SYSTEM_BIOS(0, "r_set", "1982?")
+		ROM_SYSTEM_BIOS(1, "tm_set", "1981?")
 
-		ROM_REGION(0x4000, "ros_unpaged", 0)
+		ROM_REGION(0x4000, "maincpu", 0)
 		ROMX_LOAD("02_61c9866a_4481186.bin", 0x0000, 0x2000, CRC(61c9866a) SHA1(43f2bed5cc2374c7fde4632948329062e57e994b),ROM_BIOS(0))
 		ROMX_LOAD("09_07843020_8493747.bin", 0x2000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e),ROM_BIOS(0))
 
-		ROMX_LOAD("02_081ae664_8493746.bin", 0x0000, 0x2000, CRC(081ae664) SHA1(82561e33012f21918927c85527531f21d66deba8),ROM_BIOS(1))
+		ROMX_LOAD("02_765abd93_8493746.bin", 0x0000, 0x2000, CRC(765abd93) SHA1(1ec489f1d2f72bf7e9ddc5ef642a8336b3ff67e3),ROM_BIOS(1))
 		ROMX_LOAD("09_07843020_8493747.bin", 0x2000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e),ROM_BIOS(1))
 
 		ROM_REGION(0x2000, "chargen", 0)
@@ -299,4 +299,4 @@ namespace
 
 }
 
-COMP( 1981, system23, 0,      0,      system23, 0,     system23_state, empty_init, "IBM",   "IBM System/23 Datamaster", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP( 1981, system23, 0,      0,      system23, system23,     system23_state, empty_init, "IBM",   "IBM System/23 Datamaster", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
