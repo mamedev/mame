@@ -9,6 +9,8 @@
 
 #include "logmacro.h"
 
+static constexpr int MOUSE_RATE_HZ = 600;
+
 DEFINE_DEVICE_TYPE(JUKU_MOUSE, juku_mouse_device, "juku_mouse", "Juku E510x mouse")
 
 juku_mouse_device::juku_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -33,7 +35,7 @@ void juku_mouse_device::device_reset()
 	m_prev_mouse_y = 0;
 	m_prev_mouse_x = 0;
 	m_prev_byte = 0;
-	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(1400));
+	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(MOUSE_RATE_HZ));
 }
 
 /*
