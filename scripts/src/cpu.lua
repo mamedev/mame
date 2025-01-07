@@ -42,7 +42,7 @@ if (CPU_INCLUDE_DRC) then
 		MAME_DIR .. "src/devices/cpu/drcumlsh.h",
 	}
 	if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
-		if (_OPTIONS["PLATFORM"]=="arm" or _OPTIONS["PLATFORM"]=="arm64") then
+		if (_OPTIONS["PLATFORM"]=="arm64") then
 			files {
 				MAME_DIR .. "src/devices/cpu/drcbearm64.cpp",
 				MAME_DIR .. "src/devices/cpu/drcbearm64.h",

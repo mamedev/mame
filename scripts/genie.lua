@@ -710,12 +710,11 @@ end
 
 if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 	if _OPTIONS["BIGENDIAN"]~="1" then
-		if (_OPTIONS["PLATFORM"]=="arm" or _OPTIONS["PLATFORM"]=="arm64") then
-			configuration { "x64" }
+		if (_OPTIONS["PLATFORM"]=="arm64") then
+			configuration { }
 				defines {
 					"NATIVE_DRC=drcbe_arm64",
 				}
-			configuration {  }
 		else
 			configuration { "x64" }
 				defines {

@@ -1959,8 +1959,8 @@ project "asmjit"
 		end
 	end
 
-	if (_OPTIONS["PLATFORM"]=="arm" or _OPTIONS["PLATFORM"]=="arm64") then
-		configuration { "x64" }
+	if (_OPTIONS["PLATFORM"]=="arm64") then
+		configuration { }
 			defines {
 				"ASMJIT_NO_X86",
 			}

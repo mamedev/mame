@@ -390,6 +390,11 @@ endif
 
 ifeq ($(findstring arm,$(UNAME)),arm)
 ARCHITECTURE :=
+ifneq ($(PLATFORM),arm64)
+	ifndef FORCE_DRC_C_BACKEND
+		FORCE_DRC_C_BACKEND := 1
+	endif
+endif
 endif
 
 ifeq ($(findstring aarch64,$(UNAME)),aarch64)
