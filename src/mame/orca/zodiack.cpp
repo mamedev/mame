@@ -26,7 +26,7 @@ Notes:
 
 TODO:
 - improve video emulation (especially moguchan colors)
-- where do the sound related irqs come from exactly?
+- where do the sound NMIs come from exactly?
 - can eventually be merged with orca/espial.cpp
 
 ============================================================================
@@ -148,7 +148,7 @@ private:
 	uint8_t m_main_irq_enabled = 0;
 	uint8_t m_sound_nmi_enabled = 0;
 	uint8_t m_sound_nmi_freq = 0;
-	emu_timer *sound_nmi_timer;
+	emu_timer *m_sound_nmi_timer;
 
 	TIMER_CALLBACK_MEMBER(sound_nmi_gen);
 	void vblank(int state);
@@ -173,7 +173,7 @@ void zodiack_state::machine_start()
 	save_item(NAME(m_sound_nmi_enabled));
 	save_item(NAME(m_sound_nmi_freq));
 
-	sound_nmi_timer = timer_alloc(FUNC(zodiack_state::sound_nmi_gen), this);
+	m_sound_nmi_timer = timer_alloc(FUNC(zodiack_state::sound_nmi_gen), this);
 }
 
 void zodiack_state::machine_reset()
@@ -258,7 +258,7 @@ void zodiack_state::porta_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 				return;
 		}
 
-		sound_nmi_timer->adjust(period, 0, period);
+		m_sound_nmi_timer->adjust(period, 0, period);
 	}
 }
 
