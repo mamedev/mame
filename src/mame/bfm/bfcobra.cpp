@@ -2809,6 +2809,14 @@ void bfcobjam_state::bfcobjam_with_dmd(machine_config &config)
 
   Note: Two different versions of each 6809 ROM exist: standard and protocol
   It appears sets can be a combination of disk images, 6809 and Z80 ROMs!
+  
+  I have just dumped the roms from a board with the labels "95760002" and "viper".
+  The "viper" rom is the same as 9576002.bin below and 95760002 is the same
+  as inqvypp2!
+  The labels are original and don't appear to have been removed from the
+  chips before.
+  I'm unsure where 7 digit prom numbering would've come from. BFM always
+  used 8 digit numbers.
 
 ***************************************************************************/
 
@@ -2816,13 +2824,20 @@ ROM_START( inquiztr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "inq6809", 0x08000, 0x08000, CRC(ae996600) SHA1(f360399e77b81399d910770fa8106c196f04363c) )
 
+	// 9576002.bin is Version 1.2.
+	// inqvypp2 is the attract mode rom.
 	ROM_REGION( 0x20000, "user1", 0 )
 	ROM_LOAD( "9576002.bin", 0x00000, 0x10000, CRC(5b8c8a04) SHA1(af5328fee79c370f45bff36f534aaf50964b6900) )
+	ROM_LOAD( "inqvypp2", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
 
+	// 9576028.bin also identifies as Version 1.2.
+	// inqvypp2 is the attract mode rom.
 	ROM_REGION( 0x20000, "altuser1", 0 )
-	ROM_LOAD( "9576028.bin", 0x10000, 0x10000, CRC(2d85682c) SHA1(baec47bff4b8beef5afbb737dc57b22bf93ebcf8) )
+	ROM_LOAD( "9576028.bin", 0x00000, 0x10000, CRC(2d85682c) SHA1(baec47bff4b8beef5afbb737dc57b22bf93ebcf8) )
+	ROM_LOAD( "inqvypp2", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
 
-		// these look quite different.. (like they belong together) but booting with these gives a checksum error (banking?)
+	// inqvypp1.bin is Version 1.1 but fails the rom check so appears to be corrupt :(
+	// inqvypp2 is the attract mode rom.
 	ROM_LOAD( "inqvypp1", 0x00000, 0x010000, CRC(9bac8c6e) SHA1(15e24d60c2f3997e637694f60daa552b22628766) )
 	ROM_LOAD( "inqvypp2", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
 
