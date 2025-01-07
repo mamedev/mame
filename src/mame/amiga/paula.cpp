@@ -363,11 +363,12 @@ void paula_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 					if (chan->curlength == 0)
 					{
 						dma_reload(chan, false);
-						// reload the data pointer, otherwise aliasing / buzzing outside the given buffer will be heard
-						// For example: Xenon 2 sets up location=0x63298 length=0x20
+						// silence the data pointer, avoid DC offset
+						// - xenon2 sets up location=0x63298 length=0x20
 						// for silencing channels on-the-fly without relying on irqs.
 						// Without this the location will read at 0x632d8 (data=0x7a7d), causing annoying buzzing.
-						chan->dat = m_chipmem_r(chan->curlocation);
+						// - Ocean games (bchvolly, batmancc) also rely on this
+						chan->dat = 0; //m_chipmem_r(chan->curlocation);
 					}
 				}
 
