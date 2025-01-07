@@ -194,7 +194,6 @@ void gaelco3d_state::machine_start()
 	// Save state support
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_analog_ports));
-	save_item(NAME(m_framenum));
 	save_item(NAME(m_adsp_ireg));
 	save_item(NAME(m_adsp_ireg_base));
 	save_item(NAME(m_adsp_incs));
@@ -208,8 +207,6 @@ void gaelco3d_state::machine_start()
 
 MACHINE_RESET_MEMBER(gaelco3d_state,common)
 {
-	m_framenum = 0;
-
 	// Boot the ADSP chip
 	uint16_t const *const src = (uint16_t *)memregion("adsprom")->base();
 	for (int i = 0; i < (src[3] & 0xff) * 8; i++)

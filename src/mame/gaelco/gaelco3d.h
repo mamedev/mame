@@ -131,7 +131,6 @@ private:
 	uint32_t m_fp_lenght[2]{};
 	uint8_t m_fp_clock = 0;
 	uint8_t m_fp_state = 0;
-	uint8_t m_framenum = 0;
 	uint8_t m_adsp_ireg = 0;
 	offs_t m_adsp_ireg_base = 0;
 	offs_t m_adsp_incs = 0;
