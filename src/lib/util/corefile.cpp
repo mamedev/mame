@@ -313,7 +313,10 @@ int core_text_file::getc()
 				if (readlen > 0)
 				{
 					auto const charlen = osd_uchar_from_osdchar(&uchar, default_buffer, readlen / sizeof(default_buffer[0]));
-					seek(std::int64_t(charlen * sizeof(default_buffer[0])) - readlen, SEEK_CUR);
+					if( charlen == 0 ) // terminating null character ('\0') has been read. Corrupted file.
+						uchar = ~char32_t(0);
+					else
+						seek(std::int64_t(charlen * sizeof(default_buffer[0])) - readlen, SEEK_CUR);
 				}
 			}
 			break;
