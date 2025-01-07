@@ -10,31 +10,33 @@
 
 #include "emu.h"
 #include "gaelco3d.h"
+
 #include "cpu/tms32031/tms32031.h"
+
 #include "video/rgbutil.h"
 
 
 static constexpr unsigned MAX_POLYGONS = 4096;
-static constexpr unsigned MAX_POLYDATA = (MAX_POLYGONS * 21);
+static constexpr unsigned MAX_POLYDATA = MAX_POLYGONS * 21;
 static constexpr unsigned MAX_VERTICES = 32;
 
 #define DISPLAY_TEXTURE     0
 #define LOG_POLYGONS        0
 #define DISPLAY_STATS       0
 
-static inline bool IS_POLYEND(uint32_t x) { return BIT(x ^ (x >> 1), 14); }
+constexpr bool IS_POLYEND(uint32_t x) { return BIT(x ^ (x >> 1), 14); }
 
 
-gaelco3d_state::gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
-	: poly_manager<float, gaelco3d_object_data, 1>(state.machine()),
-		m_state(state),
-		m_screenbits(state.m_screen->width(), state.m_screen->height()),
-		m_zbuffer(state.m_screen->width(), state.m_screen->height()),
-		m_polygons(0),
-		m_texture_size(state.memregion("texture")->bytes()),
-		m_texmask_size(state.memregion("texmask")->bytes() * 8),
-		m_texture(std::make_unique<uint8_t[]>(m_texture_size)),
-		m_texmask(std::make_unique<uint8_t[]>(m_texmask_size))
+gaelco3d_state::gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state) :
+	poly_manager<float, gaelco3d_object_data, 1>(state.machine()),
+	m_state(state),
+	m_screenbits(state.m_screen->width(), state.m_screen->height()),
+	m_zbuffer(state.m_screen->width(), state.m_screen->height()),
+	m_polygons(0),
+	m_texture_size(state.memregion("texture")->bytes()),
+	m_texmask_size(state.memregion("texmask")->bytes() * 8),
+	m_texture(std::make_unique<uint8_t[]>(m_texture_size)),
+	m_texmask(std::make_unique<uint8_t[]>(m_texmask_size))
 {
 	state.machine().save().save_item(NAME(m_screenbits));
 	state.machine().save().save_item(NAME(m_zbuffer));
