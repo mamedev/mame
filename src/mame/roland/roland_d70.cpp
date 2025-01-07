@@ -32,15 +32,11 @@
 namespace {
 
 // unscramble address: ROM dump offset -> proper (descrambled) offset
-template <typename T>
-constexpr auto UNSCRAMBLE_ADDR_INT(T offset)
-{
+template <typename T> constexpr auto UNSCRAMBLE_ADDR_INT(T offset) {
 	return bitswap<19>(offset, 18, 17, 15, 14, 16, 12, 11, 7, 9, 13, 10, 8, 3, 2, 1, 6, 4, 5, 0);
 }
 // scramble address: proper offset -> ROM dump offset
-template <typename T>
-constexpr auto SCRAMBLE_ADDR_INT(T offset)
-{
+template <typename T> constexpr auto SCRAMBLE_ADDR_INT(T offset) {
 	return bitswap<19>(offset, 18, 17, 14, 16, 15, 9, 13, 12, 8, 10, 7, 11, 3, 1, 2, 6, 5, 4, 0);
 }
 
