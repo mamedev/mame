@@ -43,12 +43,18 @@
 
 #include "emu.h"
 
-#include "intr_cntrl.h"
-
 #include "bus/heathzenith/h19/tlb.h"
 #include "bus/heathzenith/h89/h89bus.h"
-#include "bus/heathzenith/h89/cards.h"
+#include "bus/heathzenith/h89/intr_cntrl.h"
+#include "bus/heathzenith/h89/cdr_fdc_880h.h"
+#include "bus/heathzenith/h89/h_88_3.h"
+#include "bus/heathzenith/h89/h_88_5.h"
+#include "bus/heathzenith/h89/mms77316_fdc.h"
 #include "bus/heathzenith/h89/sigmasoft_parallel_port.h"
+#include "bus/heathzenith/h89/sigmasoft_sound.h"
+#include "bus/heathzenith/h89/we_pullup.h"
+#include "bus/heathzenith/h89/z_89_11.h"
+#include "bus/heathzenith/h89/z37_fdc.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
@@ -161,6 +167,9 @@ protected:
 	template <int line> void slot_irq(int state);
 
 	void h89_left_cards(device_slot_interface &device);
+	void h89_right_cards(device_slot_interface &device);
+	void h89_right_cards_mms(device_slot_interface &device);
+	void h89_right_p506_cards(device_slot_interface &device);
 };
 
 /**
@@ -934,6 +943,39 @@ void h89_base_state::h89_left_cards(device_slot_interface &device)
 		});
 }
 
+void h89_base_state::h89_right_cards(device_slot_interface &device)
+{
+	device.option_add("cdr_fdc", H89BUS_CDR_FDC_880H);
+	device.option_add("h_88_3", H89BUS_H_88_3);
+	device.option_add("ha_88_3", H89BUS_HA_88_3);
+	device.option_add("h_88_5", H89BUS_H_88_5);
+	device.option_add("ss_snd", H89BUS_SIGMASOFT_SND);
+	device.option_add("z_89_11", H89BUS_Z_89_11);
+
+	device.option_add("z37fdc", H89BUS_Z37).machine_config(
+		[this](device_t *device)
+		{
+			downcast<h89bus_z37_device &>(*device).set_intr_cntrl(m_intr_socket);
+		});
+}
+
+void h89_base_state::h89_right_cards_mms(device_slot_interface &device)
+{
+	h89_right_cards(device);
+	device.option_add("mms77316", H89BUS_MMS77316).machine_config(
+		[this](device_t *device)
+		{
+			downcast<mms77316_fdc_device &>(*device).set_intr_cntrl(m_intr_socket);
+		});
+}
+
+void h89_base_state::h89_right_p506_cards(device_slot_interface &device)
+{
+	device.option_add("h_88_3", H89BUS_H_88_3);
+	device.option_add("ha_88_3", H89BUS_HA_88_3);
+	device.option_add("ss_snd", H89BUS_SIGMASOFT_SND);
+	device.option_add("we_pullup", H89BUS_WE_PULLUP);
+}
 
 void h89_base_state::h89_base(machine_config &config)
 {
@@ -979,16 +1021,13 @@ void h89_base_state::h89_base(machine_config &config)
 	m_h89bus->out_int4_callback().set(FUNC(h89_base_state::slot_irq<4>));
 	m_h89bus->out_int5_callback().set(FUNC(h89_base_state::slot_irq<5>));
 	m_h89bus->out_wait_callback().set(FUNC(h89_base_state::set_wait_state));
-	m_h89bus->out_fdcirq_callback().set(m_intr_socket, FUNC(heath_intr_socket::set_irq));
-	m_h89bus->out_fdcdrq_callback().set(m_intr_socket, FUNC(heath_intr_socket::set_drq));
-	m_h89bus->out_blockirq_callback().set(m_intr_socket, FUNC(heath_intr_socket::block_interrupts));
 	m_h89bus->out_fmwe_callback().set(FUNC(h89_base_state::set_fmwe));
 	H89BUS_LEFT_SLOT(config, "p501", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
 	H89BUS_LEFT_SLOT(config, "p502", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
 	H89BUS_LEFT_SLOT(config, "p503", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
-	H89BUS_RIGHT_SLOT(config, "p504", "h89bus", h89_right_cards, nullptr);
-	H89BUS_RIGHT_SLOT(config, "p505", "h89bus", h89_right_cards, "ha_88_3");
-	H89BUS_RIGHT_SLOT(config, "p506", "h89bus", h89_right_p506_cards, "we_pullup").set_p506_signalling(true);
+	H89BUS_RIGHT_SLOT(config, "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, nullptr);
+	H89BUS_RIGHT_SLOT(config, "p505", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "ha_88_3");
+	H89BUS_RIGHT_SLOT(config, "p506", "h89bus", [this](device_slot_interface &device) { h89_right_p506_cards(device); }, "we_pullup").set_p506_signalling(true);
 
 	// H89 interrupt interval is 2mSec
 	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_base_state::h89_irq_timer), attotime::from_msec(2));
@@ -1002,7 +1041,7 @@ void h88_state::h88(machine_config &config)
 	m_intr_socket->set_default_option("original");
 	m_intr_socket->set_fixed(true);
 
-	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", h89_right_cards, "h_88_5");
+	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "h_88_5");
 }
 
 void h89_state::h89(machine_config &config)
@@ -1013,7 +1052,7 @@ void h89_state::h89(machine_config &config)
 	m_intr_socket->set_default_option("h37");
 	m_intr_socket->set_fixed(true);
 
-	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", h89_right_cards, "z37fdc");
+	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "z37fdc");
 }
 
 void h89_cdr_state::h89_cdr(machine_config &config)
@@ -1024,7 +1063,7 @@ void h89_cdr_state::h89_cdr(machine_config &config)
 	m_intr_socket->set_default_option("original");
 	m_intr_socket->set_fixed(true);
 
-	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", h89_right_cards, "cdr_fdc");
+	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "cdr_fdc");
 }
 
 void h89_mms_state::h89_mms(machine_config &config)
@@ -1036,9 +1075,8 @@ void h89_mms_state::h89_mms(machine_config &config)
 	m_h89bus->out_gpp_callback().set(FUNC(h89_mms_state::port_f2_mms_w));
 
 	// the card selection is different with the MMS mapping PROM
-	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", h89_right_cards_mms, "mms77316");
-	H89BUS_RIGHT_SLOT(config.replace(), "p505", "h89bus", h89_right_cards_mms, "ha_88_3");
-	H89BUS_RIGHT_SLOT(config.replace(), "p506", "h89bus", h89_right_cards_mms, nullptr).set_p506_signalling(true);
+	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards_mms(device); }, "mms77316");
+	H89BUS_RIGHT_SLOT(config.replace(), "p505", "h89bus", [this](device_slot_interface &device) { h89_right_cards_mms(device); }, "ha_88_3");
 
 	m_intr_socket->set_default_option("mms");
 	m_intr_socket->set_fixed(true);
