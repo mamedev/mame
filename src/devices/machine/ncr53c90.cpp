@@ -196,7 +196,7 @@ ncr53c96_device::ncr53c96_device(const machine_config &mconfig, const char *tag,
 ncr53cf94_device::ncr53cf94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: ncr53c94_device(mconfig, type, tag, owner, clock)
 	, config4(0)
-	, family_id(0x02)
+	, family_id(0x04)
 	, revision_level(0x02)
 {
 }
