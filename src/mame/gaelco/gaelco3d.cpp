@@ -150,8 +150,8 @@ REF. 970429
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
-#include "emupal.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 #include "speedup.lh"
@@ -164,12 +164,12 @@ REF. 970429
 
 #define VERBOSE 0
 
+#include "logmacro.h"
+
 #define LOGEEPROM(...)      LOGMASKED(LOG_EEPROM, __VA_ARGS__)
 #define LOGSOUND(...)       LOGMASKED(LOG_SOUND, __VA_ARGS__)
 #define LOGTMS(...)         LOGMASKED(LOG_TMS, __VA_ARGS__)
 #define LOGADSP(...)        LOGMASKED(LOG_ADSP, __VA_ARGS__)
-
-#include "logmacro.h"
 
 
 void gaelco3d_state::ser_irq(int state)
