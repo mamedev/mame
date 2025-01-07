@@ -5,12 +5,19 @@
     Gaelco game hardware from 1991-1996
 
 ***************************************************************************/
+#ifndef MAME_GAELCO_GAELCO_H
+#define MAME_GAELCO_GAELCO_H
+
+#pragma once
+
+#include "gaelcrpt.h"
 
 #include "machine/gen_latch.h"
 #include "machine/74259.h"
-#include "gaelcrpt.h"
+
 #include "emupal.h"
 #include "tilemap.h"
+
 
 class gaelco_state : public driver_device
 {
@@ -28,10 +35,10 @@ public:
 		m_sprite_palette_force_high(0x38)
 	{ }
 
-	void maniacsq(machine_config &config);
+	void maniacsq(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
+	static constexpr double FRAMERATE_922804 = 57.42;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -48,13 +55,18 @@ protected:
 	/* video-related */
 	tilemap_t      *m_tilemap[2]{};
 
+	/* per-game configuration */
+	u8 m_sprite_palette_force_high = 0;
+
+	virtual void machine_start() override ATTR_COLD;
+
 	template <unsigned Which> void coin_lockout_w(int state);
 	template <unsigned Which> void coin_counter_w(int state);
 	void oki_bankswitch_w(u8 data);
 	void vram_w(offs_t offset, u16 data, u16 mem_mask);
 	void irqack_w(u16 data);
 
-	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	template <int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	DECLARE_VIDEO_START(bigkarnk);
 	DECLARE_VIDEO_START(maniacsq);
@@ -64,11 +76,6 @@ protected:
 
 	void maniacsq_map(address_map &map) ATTR_COLD;
 	void oki_map(address_map &map) ATTR_COLD;
-
-	/* per-game configuration */
-	u8 m_sprite_palette_force_high = 0;
-
-	static constexpr double FRAMERATE_922804 = 57.42;
 };
 
 class bigkarnk_state : public gaelco_state
@@ -80,7 +87,7 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void bigkarnk(machine_config &config);
+	void bigkarnk(machine_config &config) ATTR_COLD;
 
 private:
 	/* devices */
@@ -102,8 +109,8 @@ public:
 		m_screenram(*this, "screenram")
 	{ }
 
-	void thoop(machine_config &config);
-	void squash(machine_config &config);
+	void thoop(machine_config &config) ATTR_COLD;
+	void squash(machine_config &config) ATTR_COLD;
 
 private:
 	/* devices */
@@ -122,3 +129,5 @@ private:
 	void squash_map(address_map &map) ATTR_COLD;
 	void thoop_map(address_map &map) ATTR_COLD;
 };
+
+#endif // MAME_GAELCO_GAELCO_H
