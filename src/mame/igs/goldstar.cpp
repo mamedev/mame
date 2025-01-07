@@ -13300,6 +13300,39 @@ ROM_START( cmasterl ) // most similar to cmasterbv but without the extra ROM
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+ROM_START( cutyline ) // Dyna D9001 PCB, DYNA QL-1 V1.01 string in ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "16f", 0x0000, 0x1000, CRC(07accc1f) SHA1(fa6ff31acf93510530c81d474cccc0d4f73235dc) )
+	ROM_CONTINUE(    0x4000, 0x1000 )
+	ROM_CONTINUE(    0x3000, 0x1000 )
+	ROM_CONTINUE(    0x7000, 0x1000 )
+	ROM_CONTINUE(    0x1000, 0x1000 )
+	ROM_CONTINUE(    0x6000, 0x1000 )
+	ROM_CONTINUE(    0x2000, 0x1000 )
+	ROM_CONTINUE(    0x5000, 0x1000 )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "70.3e", 0x00000, 0x8000, CRC(19cc1d67) SHA1(47487f9362bfb36a32100ed772960628844462bf) )
+	ROM_LOAD( "60.2e", 0x08000, 0x8000, CRC(63b3df4e) SHA1(9bacd23da598805ec18ec5ad15cab95d71eb9262) )
+	ROM_LOAD( "50.1e", 0x10000, 0x8000, CRC(e39fff9c) SHA1(22fdc517fa478441622c6245cecb5728c5595757) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "4.3f", 0x0000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "3.2f", 0x2000, 0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "2.3h", 0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "1.2h", 0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 ) // girl bitmaps
+	ROM_LOAD( "8.10c", 0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "16.16c", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "15.15c", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "9.9e", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
 ROM_START( srmagic )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "real magic.u81", 0x00000, 0x10000, CRC(93ef9f6a) SHA1(ad482b5df9de02a245567642d20f51da2ec2dfed) )
@@ -13885,7 +13918,7 @@ ROM_START( cmast91 )
 	ROM_LOAD( "pld4.bin", 0x0600, 0x0104, NO_DUMP )
 ROM_END
 
-ROM_START( cll ) // Dyna D9004 PCB
+ROM_START( cll ) // Dyna D9004 PCB, DYNA CLLB  V1.30 string in ROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cll_80_t.bin",   0x0000, 0x1000, CRC(62d386db) SHA1(9a061e80d78ed13a6dae59e447c138b0f5e5d892) ) // M27512
 	ROM_CONTINUE(               0x4000, 0x1000 )
@@ -18674,6 +18707,25 @@ ROM_START( eldoraddo ) // String "DYNA ELD3 V1.1TA" on program ROM
 	ROM_LOAD( "pal16l8.e11", 0x200, 0x104, NO_DUMP )
 ROM_END
 
+// DYNA D9105 PCB with Sharp LH0080B (Z80B) CPU and 2 customs (DYNA DC4000 and DYNA 22A078803), 5x 8-dips, XTAL 24 MHz.
+// Seems to be using a different GFX hardware
+ROM_START( eldoraddoc ) // String "DYNA ELD3 V1.1J" in program ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "nel.20d.14c", 0x00000, 0x10000, CRC(fee901b9) SHA1(d304fd5ea39cada5787c9f742f6b7801cf12670c) )
+
+	ROM_REGION( 0x100000, "gfx", 0 )
+	ROM_LOAD( "tc538000p-dyna dm9106.g15", 0x000000, 0x100000, CRC(fa84c372) SHA1(a71e57e76321b7ebb16933d9bc983b9160995b4a) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "mb7114.e8",  0x000, 0x100, CRC(fa274678) SHA1(6712cb1f7ead1a7aa703ec799e7199c33ace857c) )
+	ROM_LOAD( "mb7114.e10", 0x100, 0x100, CRC(e58877ea) SHA1(30fa873fc05d91610ef68eef54b78f2c7301a62a) )
+	ROM_LOAD( "mb7114.e12", 0x200, 0x100, CRC(781b2842) SHA1(566667d4f81e93b29bb01dbc51bf144c02dff75d) )
+
+	ROM_REGION( 0x400, "plds", 0 ) // available as brute-forced dumps, need to be verified and converted
+	ROM_LOAD( "pal16l8.d13", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8.e11", 0x200, 0x104, NO_DUMP )
+ROM_END
+
 // DYNA D9101 PCB with Z0840006VSC CPU and 2 customs (scratched), AY38910A/P, 6x 8-dip banks, XTAL 12 MHz.
 ROM_START( eldoraddoa ) // String "DYNA ELD2  V1.4D" in program ROM. The two dumps are nearly identical, but preserving both for now until it can be determined what the (very small) differences are
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -22572,6 +22624,7 @@ GAMEL( 1991, cmasteri,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4
 GAMEL( 1991, cmasterj,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 10, BET stops all)",  0,          layout_cmasterb )
 GAMEL( 1991, cmasterk,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 11, TAKE stops all)", 0,          layout_cmasterb )
 GAMEL( 1991, cmasterl,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 12)",          0,                 layout_cmasterb )
+GAMEL( 1991, cutyline,   0,        cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cuty Line (ver.1.01)",                        0,                 layout_cmasterb )
 GAMEL( 199?, super7,     cmaster,  super7,   cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb ) // bad palette, no reels, decryption might be missing something, too
 GAME ( 199?, wcat3a,     wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 GAMEL( 199?, ll3,        cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III",                              MACHINE_NOT_WORKING, layout_cmasterb )  // not looked at yet
@@ -22597,6 +22650,7 @@ GAME(  1992, cmast92a,   cmast92,  eldoradd, cmast91,  cmaster_state,  init_cmas
 GAME(  1991, eldoradd,   0,        eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
 GAME(  1991, eldoraddo,  eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING ) // different GFX hw?
 GAME(  1991, eldoraddob, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V2.0D)",                           MACHINE_NOT_WORKING ) // different GFX hw?
+GAME(  1991, eldoraddoc, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1J)",                           MACHINE_NOT_WORKING ) // different GFX hw?
 GAME(  1996, cmast97,    0,        cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 1)",             MACHINE_NOT_WORKING ) // fix prom decode, reels
 GAME(  1996, cmast97a,   cmast97,  cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 2)",             MACHINE_NOT_WORKING ) // fix prom decode, reels
 GAME(  1996, cmast97i,   cmast97,  cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cheri Mondo '97 (V1.4I)",                     MACHINE_NOT_WORKING ) // fix prom decode, reels
