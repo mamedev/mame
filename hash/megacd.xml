@@ -10771,8 +10771,6 @@ Requires [disc swap]
 				<disk name="prize fighter (1993)(sega)(ntsc)(jp)(disc 1 of 2)" sha1="c8d895e85dc2b1e6a9f0aa606f98d7013bad0db4"/>
 			</diskarea>
 		</part>
-
-		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom2" interface="scd_cdrom">
 			<diskarea name="cdrom">
 				<disk name="prize fighter (1993)(sega)(ntsc)(jp)(disc 2 of 2)" sha1="342fd9fad3d5ae6530ea6ce756a2ba6b88858dfc"/>
