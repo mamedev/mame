@@ -14,7 +14,6 @@ Espial: The Orca logo is displayed, but looks to be "blacked out" via the
 TODO:
 - merge with orca/zodiack.cpp
 - where do the sound NMIs come from exactly?
-- locks up on soft reset (press F3)
 
 
 Stephh's notes (based on the games Z80 code and some tests) :
@@ -171,6 +170,9 @@ void espial_state::machine_reset()
 {
 	m_main_nmi_enabled = false;
 	m_sound_nmi_enabled = false;
+
+	// HACK: prevent NMI immediately after soft reset
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
