@@ -23,6 +23,7 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+#include "d70.lh"
 
 #include "multibyte.h"
 
@@ -84,12 +85,14 @@ static INPUT_PORTS_START(d70)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Number 8") PORT_CODE(KEYCODE_8)
 
 	PORT_START("KEY3")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Inc/Ins") PORT_CODE(KEYCODE_H)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dec/Del") PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("S") PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A") PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("W") PORT_CODE(KEYCODE_UP)
+	// NOTE: Signals for DEC and INC buttons seem to be incorrectly described
+	//       (swapped) on the schematics available in the service manual.
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dec/Del") PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Inc/Ins") PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Midi Out") PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Tone Display") PORT_CODE(KEYCODE_B)
 
@@ -111,7 +114,7 @@ static INPUT_PORTS_START(d70)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Tuning") PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Attack")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Release")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Pcm Card") PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM Card") PORT_CODE(KEYCODE_C)
 
 	PORT_START("KEY6")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Play") PORT_CODE(KEYCODE_Z)
@@ -132,7 +135,37 @@ static INPUT_PORTS_START(d70)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Effect/Ctrl") PORT_CODE(KEYCODE_M)
+
+	PORT_START("PROTECT_SW")
+	PORT_DIPNAME(0x01, 0x01, "Memory Protect Switch")
+	PORT_DIPSETTING(   0x00, DEF_STR(On))
+	PORT_DIPSETTING(   0x01, DEF_STR(Off))
+
+	PORT_START("SLIDER0")
+	PORT_ADJUSTER(100, "MODU")
+
+	PORT_START("SLIDER1")
+	PORT_ADJUSTER(100, "AFTER")
+
+	PORT_START("SLIDER2")
+	PORT_ADJUSTER(100, "C2")
+
+	PORT_START("SLIDER3")
+	PORT_ADJUSTER(100, "C1")
+
+	PORT_START("SLIDER4")
+	PORT_ADJUSTER(100, "LOWER (1)")
+
+	PORT_START("SLIDER5")
+	PORT_ADJUSTER(100, "LOWER (2)")
+
+	PORT_START("SLIDER6")
+	PORT_ADJUSTER(100, "UPPER (3)")
+
+	PORT_START("SLIDER7")
+	PORT_ADJUSTER(100, "UPPER (4)")
 INPUT_PORTS_END
+
 
 class roland_d70_state : public driver_device
 {
@@ -150,6 +183,9 @@ public:
 		m_lcd(*this, "lcd"),
 		m_midi_timer(*this, "midi_timer"),
 		m_keys(*this, "KEY%u", 0),
+		m_sliders(*this, "SLIDER%u", 0),
+		m_protect_sw(*this, "PROTECT_SW"),
+		m_selected_slider(0),
 		m_sw_scan_index(0),
 		m_sw_scan_bank(-1),
 		m_sw_scan_state(0xff),
@@ -175,7 +211,9 @@ private:
 	void ksga_io_w(offs_t offset, u8 data);
 	u16 port0_r();
 	u8 port1_r();
+	u8 port2_r();
 	void port1_w(u8 data);
+	void port2_w(u8 data);
 	u8 dsp_io_r(offs_t offset);
 	void dsp_io_w(offs_t offset, u8 data);
 	u8 tvf_io_r(offs_t offset);
@@ -210,9 +248,12 @@ private:
 	required_device<t6963c_device> m_lcd;
 	required_device<timer_device> m_midi_timer;
 	required_ioport_array<8> m_keys;
+	required_ioport_array<8> m_sliders;
+	required_ioport m_protect_sw;
 
 	u8 m_sound_io_buffer[0x100];
 	u8 m_dsp_io_buffer[0x80];
+	u8 m_selected_slider;
 	int m_sw_scan_index;
 	int m_sw_scan_bank;
 	u8 m_sw_scan_state;
@@ -327,6 +368,17 @@ void roland_d70_state::port1_w(u8 data) {
 	m_ram[0x0f / 2] = (m_ram[0x0f / 2] & 0x00ff) | (u16(m_sw_scan_current_out) << 8);
 }
 
+u8 roland_d70_state::port2_r() {
+	u8 value = m_selected_slider << 5;
+	if (m_protect_sw->read())
+		value |= (1 << 4);
+	return value;
+}
+
+void roland_d70_state::port2_w(u8 data) {
+	m_selected_slider = data >> 5;
+}
+
 u8 roland_d70_state::dsp_io_r(offs_t offset) {
 	return m_dsp_io_buffer[offset];
 }
@@ -415,11 +467,14 @@ void roland_d70_state::snd_io_w(offs_t offset, u8 data) {
 	m_sound_io_buffer[offset] = data;
 }
 
-u8 roland_d70_state::ach0_r() { return 128; }
-u8 roland_d70_state::ach1_r() { return 128; }
-u8 roland_d70_state::ach2_r() { return 128; }
-u8 roland_d70_state::ach3_r() { return 128; }
-u8 roland_d70_state::ach4_r() { return 128; }
+u8 roland_d70_state::ach0_r() {
+	return m_sliders[m_selected_slider & 7]->read();
+}
+
+u8 roland_d70_state::ach1_r() { return 128; } // TODO: EXT PEDAL
+u8 roland_d70_state::ach2_r() { return 128; } // TODO: BENDER
+u8 roland_d70_state::ach3_r() { return 128; } // TODO: BATTERY
+u8 roland_d70_state::ach4_r() { return 128; } // TODO: RAM CARD (VBB)
 
 TIMER_DEVICE_CALLBACK_MEMBER(roland_d70_state::samples_timer_cb) {
 }
@@ -450,6 +505,8 @@ void roland_d70_state::d70(machine_config &config) {
 	maincpu.in_p0_cb().set(FUNC(roland_d70_state::port0_r));
 	maincpu.in_p1_cb().set(FUNC(roland_d70_state::port1_r));
 	maincpu.out_p1_cb().set(FUNC(roland_d70_state::port1_w));
+	maincpu.in_p2_cb().set(FUNC(roland_d70_state::port2_r));
+	maincpu.out_p2_cb().set(FUNC(roland_d70_state::port2_w));
 	maincpu.ach0_cb().set(FUNC(roland_d70_state::ach0_r));
 	maincpu.ach1_cb().set(FUNC(roland_d70_state::ach1_r));
 	maincpu.ach2_cb().set(FUNC(roland_d70_state::ach2_r));
@@ -486,6 +543,8 @@ void roland_d70_state::d70(machine_config &config) {
 
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
+
+	config.set_default_layout(layout_d70);
 }
 
 void roland_d70_state::init_d70() {
