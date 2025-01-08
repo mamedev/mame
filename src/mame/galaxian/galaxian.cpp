@@ -10735,18 +10735,18 @@ ROM_END
 // Found on a PCB from the Spanish company "Sede 3"
 ROM_START( rocktcnvy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.bin",   0x0000, 0x1000, CRC(fbefae0a) SHA1(23eceded14286d6b61eee34819fb46318009054a) )
-	ROM_LOAD( "2.bin",   0x1000, 0x1000, CRC(311a47cb) SHA1(3f72010da0aa4d73a6160bffa7ee7dd3f944dd4b) )
-	ROM_LOAD( "3.bin",   0x2000, 0x1000, CRC(822749cb) SHA1(92e617088d462911118842f3f68b7ff8ac77fcf5) )
-	ROM_LOAD( "4.bin",   0x3000, 0x1000, CRC(f9dda0ed) SHA1(a77f6d8ec7b3df7f308354489954c3d9b4f61b0d) )
-	ROM_LOAD( "5.bin",   0x4000, 0x1000, CRC(c986ff34) SHA1(bf5e50a08a4401d09ff6c8f505062dffd900d066) )
+	ROM_LOAD( "center_1.bin", 0x0000, 0x1000, CRC(fbefae0a) SHA1(23eceded14286d6b61eee34819fb46318009054a) )
+	ROM_LOAD( "center_2.bin", 0x1000, 0x1000, CRC(311a47cb) SHA1(3f72010da0aa4d73a6160bffa7ee7dd3f944dd4b) )
+	ROM_LOAD( "center_3.bin", 0x2000, 0x1000, CRC(822749cb) SHA1(92e617088d462911118842f3f68b7ff8ac77fcf5) )
+	ROM_LOAD( "center_4.bin", 0x3000, 0x1000, CRC(f9dda0ed) SHA1(a77f6d8ec7b3df7f308354489954c3d9b4f61b0d) )
+	ROM_LOAD( "center_5.bin", 0x4000, 0x1000, CRC(c986ff34) SHA1(bf5e50a08a4401d09ff6c8f505062dffd900d066) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "c1.bin",  0x0000, 0x0800, CRC(a59a9f3f) SHA1(9564f1d013d566dc0b19762aec66119e2ece0b49) )
-	ROM_LOAD( "c2.bin",  0x0800, 0x0800, CRC(9b75b40a) SHA1(4ad94db3f1d6b45a3de1ed9b51d361f20c6706e4) )
+	ROM_LOAD( "center_c1.a9", 0x0000, 0x0800, CRC(a59a9f3f) SHA1(9564f1d013d566dc0b19762aec66119e2ece0b49) )
+	ROM_LOAD( "center_c2.a7", 0x0800, 0x0800, CRC(9b75b40a) SHA1(4ad94db3f1d6b45a3de1ed9b51d361f20c6706e4) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "prom.bin", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // Not dumped, borrowed from spactrai
+	ROM_LOAD( "prom.d10", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) // Not dumped, borrowed from spactrai
 ROM_END
 
 /*  Galaxian hardware mods for War of the Bugs warofbug/warofbugg
