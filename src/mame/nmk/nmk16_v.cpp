@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(nmk16_state::common_get_tx_tile_info)
 TILE_GET_INFO_MEMBER(nmk16_state::bioship_get_bg_tile_info)
 {
 	const u16 code = m_tilemap_rom[(m_bioship_background_bank << 13) | tile_index]; // ROM Based
-	tileinfo.set(3, code & 0xfff, code >> 12, 0);
+	tileinfo.set(2, code & 0xfff, code >> 12, 0);
 }
 
 TILE_GET_INFO_MEMBER(nmk16_state::bjtwin_get_bg_tile_info)
@@ -131,10 +131,18 @@ VIDEO_START_MEMBER(nmk16_state,macross)
 	m_tx_tilemap->set_scrolldx(92, 92);
 }
 
+VIDEO_START_MEMBER(nmk16_state,manybloc)
+{
+	VIDEO_START_CALL_MEMBER(macross);
+	// no video shift in this hardware
+	m_bg_tilemap[0]->set_scrolldx(0, 0);
+	m_tx_tilemap->set_scrolldx(0, 0);
+}
+
 VIDEO_START_MEMBER(nmk16_state,strahl)
 {
 	VIDEO_START_CALL_MEMBER(macross);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&nmk16_state::common_get_bg_tile_info<1, 3>))), tilemap_mapper_delegate(*this, FUNC(nmk16_state::tilemap_scan_pages)), 16, 16, 256, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&nmk16_state::common_get_bg_tile_info<1, 2>))), tilemap_mapper_delegate(*this, FUNC(nmk16_state::tilemap_scan_pages)), 16, 16, 256, 32);
 	m_bg_tilemap[1]->set_transparent_pen(15);
 
 	m_sprdma_base = 0xf000;
@@ -354,7 +362,7 @@ void nmk16_state::get_flip_extcode_powerins(u16 attr, int &flipx, int &flipy, in
 
 void nmk16_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *src)
 {
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), src, 0x1000 / 2);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, src, 0x1000 / 2);
 }
 
 /***************************************************************************

@@ -16,7 +16,7 @@
 
     Offset Bits              Description
            fedcba98 76543210
-    00     -------- -------s Visible
+    00     -------- -------x Visible
     02     ---x---- -------- Flip X (powerins)
            ------x- -------- Flip Y (manybloc)
            -------x -------- Flip X (manybloc) or Code hi bits (powerins)
@@ -39,6 +39,7 @@ DEFINE_DEVICE_TYPE(NMK_16BIT_SPRITE, nmk_16bit_sprite_device, "nmk16spr", "NMK 1
 
 nmk_16bit_sprite_device::nmk_16bit_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NMK_16BIT_SPRITE, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this)
 	, m_colpri_cb(*this)
 	, m_ext_cb(*this)
 	, m_flip_screen(false)
@@ -50,7 +51,7 @@ nmk_16bit_sprite_device::nmk_16bit_sprite_device(const machine_config &mconfig, 
 }
 
 // this implementation was originally from nmk16.cpp
-void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, u16* spriteram, int size)
+void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16* spriteram, int size)
 {
 	const bool priority = !m_colpri_cb.isnull();
 	sprite_t *sprite_ptr = m_spritelist.get();
@@ -64,7 +65,7 @@ void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &
 		if (clk >= m_max_sprite_clock)
 			break;
 
-		if (!(spriteram[offs + 0] & 0x0001))
+		if (BIT(~spriteram[offs + 0], 0))
 			continue;
 
 		// extract parameters
@@ -226,7 +227,7 @@ void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &
 				}
 				else
 				{
-					gfx->transpen(bitmap, cliprect,
+					gfx(0)->transpen(bitmap, cliprect,
 						codecol,
 						colour,
 						flipx_global, flipy_global,
@@ -246,7 +247,7 @@ void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &
 		{
 			sprite_ptr--;
 
-			gfx->prio_transpen(bitmap, cliprect,
+			gfx(0)->prio_transpen(bitmap, cliprect,
 					sprite_ptr->code,
 					sprite_ptr->colour,
 					sprite_ptr->flipx, sprite_ptr->flipy,

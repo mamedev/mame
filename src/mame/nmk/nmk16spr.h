@@ -8,13 +8,19 @@
 
 #include "screen.h"
 
-class nmk_16bit_sprite_device : public device_t
+class nmk_16bit_sprite_device : public device_t, public device_gfx_interface
 {
 public:
 	typedef device_delegate<void (u32 &colour, u32 &pri_mask)> colpri_cb_delegate;
 	typedef device_delegate<void (u16 attr, int &flipx, int &flipy, int &code)> ext_cb_delegate;
 
 	nmk_16bit_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T> nmk_16bit_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: nmk_16bit_sprite_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
 
 	// configuration
 	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb.set(std::forward<T>(args)...); }
@@ -24,7 +30,7 @@ public:
 	void set_screen_size(int width, int height) { m_screen_width = width, m_screen_height = height; }
 	void set_max_sprite_clock(u32 max) { m_max_sprite_clock = max; }
 
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, u16* spriteram, int size);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16* spriteram, int size);
 	void set_flip_screen(bool flip) { m_flip_screen = flip; }
 
 protected:
