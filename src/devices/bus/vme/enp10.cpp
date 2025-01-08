@@ -295,7 +295,7 @@ void vme_enp10_card_device::obr_w(offs_t offset, u8 data)
 
 	if (BIT(m_obr, offset) != state)
 	{
-		static char const *const reg[] = { "ier", "tir", "rir", "uir", "bit4", "bit5", "bit6", "mapr" };
+		//static char const *const reg[] = { "ier", "tir", "rir", "uir", "bit4", "bit5", "bit6", "mapr" };
 		//LOG("obr_w %s %u (%s)\n", reg[offset], state, machine().describe_context());
 
 		if (state)
