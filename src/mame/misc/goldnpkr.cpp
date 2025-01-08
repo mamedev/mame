@@ -12630,11 +12630,16 @@ ROM_END
   Voyageur de L'Espace Inc.
 
   Obscure vintage game.
+  Using IRQ instead of NMI.
 
-  Seems to use IRQ instead of NMI.
   VideoRAM: 0x800-0xbff
   ColorRAM: 0xc00-0xfff
-  CRTC and PIAs are mapped in different offsets.      
+
+  CRTC addr: 0x10b0-0x10b0
+  CRTC data: 0x10b1-0x10b1
+
+  PIA0 offs: 0x10f4-0x10f7      
+  PIA1 offs: 0x10f8-0x10fb      
 
 */
 ROM_START( codemagik )
@@ -12649,7 +12654,8 @@ ROM_START( codemagik )
 	ROM_REGION( 0x3000, "gfx2", 0 ) // 
 	ROM_LOAD( "3y_2732.1a", 0x0000, 0x1000, CRC(ea868221) SHA1(fcf9a840537feb28c9fb65b58b9a41b2412aa4ef) )    // cards deck gfx, bitplane1
 	ROM_LOAD( "2y_2732.3a", 0x1000, 0x1000, CRC(6d1da4bb) SHA1(dc8c70faa301e2f7e9089d38e0ef618e8352e569) )    // cards deck gfx, bitplane2
-	ROM_FILL(               0x2000, 0x1000, 0x0000 ) // filling the B bitplane
+	ROM_COPY( "gfx1",       0x4800, 0x2000, 0x0800 )    // cards deck gfx, bitplane3.
+	ROM_COPY( "gfx1",       0x5800, 0x2800, 0x0800 )    // cards deck alt gfx, bitplane3.
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "clr.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
