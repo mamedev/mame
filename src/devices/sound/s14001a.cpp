@@ -2,22 +2,20 @@
 // copyright-holders:Ed Bernard, Jonathan Gevaryahu, hap
 // thanks-to:Kevin Horton
 /*
-    SSi TSI S14001A speech IC emulator
-    aka CRC: Custom ROM Controller, designed in 1975, first usage in 1976 on TSI Speech+ calculator
-    Originally written for MAME by Jonathan Gevaryahu(Lord Nightmare) 2006-2013,
-    replaced with near-complete rewrite by Ed Bernard in 2016
 
-    TODO:
-    - nothing at the moment?
+SSi TSI S14001A speech IC emulator
+aka CRC: Custom ROM Controller, designed in 1975, first usage in 1976 on TSI Speech+ calculator
+Originally written for MAME by Jonathan Gevaryahu(Lord Nightmare) 2006-2013,
+replaced with near-complete rewrite by Ed Bernard in 2016
 
-    Further reading:
-    - http://www.vintagecalculators.com/html/speech-.html
-    - http://www.vintagecalculators.com/html/development_of_the_tsi_speech-.html
-    - http://www.vintagecalculators.com/html/speech-_state_machine.html
-    - https://archive.org/stream/pdfy-QPCSwTWiFz1u9WU_/david_djvu.txt
-*/
+Further reading:
+- http://www.vintagecalculators.com/html/speech-.html
+- http://www.vintagecalculators.com/html/development_of_the_tsi_speech-.html
+- http://www.vintagecalculators.com/html/speech-_state_machine.html
+- https://archive.org/stream/pdfy-QPCSwTWiFz1u9WU_/david_djvu.txt
 
-/* Chip Pinout:
+Chip Pinout:
+
 The original datasheet (which is lost as far as I know) clearly called the
 s14001a chip the 'CRC chip', or 'Custom Rom Controller', as it appears with
 this name on the Stern and Canon schematics, as well as on some TSI speech
@@ -101,14 +99,23 @@ line is held high, the first address byte of the first word will be read repeate
 every clock, with the rom enable line enabled constantly (i.e. it doesn't toggle on
 and off as it normally does during speech). Once START has gone low-high-low, the
 /BUSY line will go low until 3 clocks after the chip is done speaking.
+
 */
 
 #include "emu.h"
 #include "s14001a.h"
 
+#define LOG_SPEAK (1 << 1U) // speech start
+#define LOG_PPE   (1 << 2U) // pitch period end
+#define LOG_CTRL  (1 << 3U) // control word
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
 namespace {
 
-uint8_t Mux8To2(bool bVoicedP2, uint8_t uPPQtrP2, uint8_t uDeltaAdrP2, uint8_t uRomDataP2)
+u8 Mux8To2(bool bVoicedP2, u8 uPPQtrP2, u8 uDeltaAdrP2, u8 uRomDataP2)
 {
 	// pick two bits of rom data as delta
 
@@ -120,7 +127,7 @@ uint8_t Mux8To2(bool bVoicedP2, uint8_t uPPQtrP2, uint8_t uDeltaAdrP2, uint8_t u
 }
 
 
-void CalculateIncrement(bool bVoicedP2, uint8_t uPPQtrP2, bool bPPQStartP2, uint8_t uDelta, uint8_t uDeltaOldP2, uint8_t &uDeltaOldP1, uint8_t &uIncrementP2, bool &bAddP2)
+void CalculateIncrement(bool bVoicedP2, u8 uPPQtrP2, bool bPPQStartP2, u8 uDelta, u8 uDeltaOldP2, u8 &uDeltaOldP1, u8 &uIncrementP2, bool &bAddP2)
 {
 	// uPPQtr, pitch period quarter counter; 2 lsb of uLength
 	// bPPStart, start of a pitch period
@@ -130,7 +137,7 @@ void CalculateIncrement(bool bVoicedP2, uint8_t uPPQtrP2, bool bPPQStartP2, uint
 	if ((uPPQtrP2 == 0x00) && bPPQStartP2) // note this is done for voiced and unvoiced
 		uDeltaOldP2 = 0x02;
 
-	static constexpr uint8_t uIncrements[4][4] =
+	static constexpr u8 uIncrements[4][4] =
 	{
 	//    00  01  10  11
 		{ 3,  3,  1,  1,}, // 00
@@ -159,7 +166,7 @@ void CalculateIncrement(bool bVoicedP2, uint8_t uPPQtrP2, bool bPPQStartP2, uint
 }
 
 
-uint8_t CalculateOutput(bool bVoiced, bool bXSilence, uint8_t uPPQtr, bool bPPQStart, uint8_t uLOutput, uint8_t uIncrementP2, bool bAddP2)
+u8 CalculateOutput(bool bVoiced, bool bXSilence, u8 uPPQtr, bool bPPQStart, u8 uLOutput, u8 uIncrementP2, bool bAddP2)
 {
 	// implemented to mimic silicon (a bit)
 	// limits output to 0x00 and 0x0f
@@ -175,9 +182,9 @@ uint8_t CalculateOutput(bool bVoiced, bool bXSilence, uint8_t uPPQtr, bool bPPQS
 		uLOutput = 7;
 
 	// adder
-	uint8_t uTmp = uLOutput;
+	u8 uTmp = uLOutput;
 	if (!bAddP2)
-		uTmp ^= 0x0F; // turns subtraction into addition
+		uTmp ^= 0x0f; // turns subtraction into addition
 
 	// add 0, 1, 3; limit at 15
 	uTmp += uIncrementP2;
@@ -185,7 +192,7 @@ uint8_t CalculateOutput(bool bVoiced, bool bXSilence, uint8_t uPPQtr, bool bPPQS
 		uTmp = 15;
 
 	if (!bAddP2)
-		uTmp ^= 0x0F; // turns addition back to subtraction
+		uTmp ^= 0x0f; // turns addition back to subtraction
 
 	return uTmp;
 }
@@ -196,13 +203,12 @@ uint8_t CalculateOutput(bool bVoiced, bool bXSilence, uint8_t uPPQtr, bool bPPQS
 // device definition
 DEFINE_DEVICE_TYPE(S14001A, s14001a_device, "s14001a", "SSi TSI S14001A")
 
-s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, S14001A, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_SpeechRom(*this, DEVICE_SELF),
+	device_rom_interface(mconfig, *this),
 	m_stream(nullptr),
-	m_bsy_handler(*this),
-	m_ext_read_handler(*this, 0)
+	m_bsy_handler(*this)
 {
 }
 
@@ -241,13 +247,11 @@ void s14001a_device::device_start()
 	m_bPPQCarryP2 = false;
 	m_bRepeatCarryP2 = false;
 	m_bLengthCarryP2 = false;
-	m_RomAddrP1 = 0;
+	m_uRomAddrP1 = 0;
 	m_uRomAddrP2 = 0;
 	m_bBusyP1 = false;
 	m_bStart = false;
 	m_uWord = 0;
-
-	ClearStatistics();
 	m_uOutputP1 = m_uOutputP2 = 7;
 
 	// register for savestates
@@ -279,18 +283,13 @@ void s14001a_device::device_start()
 	save_item(NAME(m_bPPQCarryP2));
 	save_item(NAME(m_bRepeatCarryP2));
 	save_item(NAME(m_bLengthCarryP2));
-	save_item(NAME(m_RomAddrP1));
+	save_item(NAME(m_uRomAddrP1));
 
 	save_item(NAME(m_uOutputP2));
 	save_item(NAME(m_uRomAddrP2));
 	save_item(NAME(m_bBusyP1));
 	save_item(NAME(m_bStart));
 	save_item(NAME(m_uWord));
-
-	save_item(NAME(m_uNPitchPeriods));
-	save_item(NAME(m_uNVoiced));
-	save_item(NAME(m_uNControlWords));
-	save_item(NAME(m_uPrintLevel));
 }
 
 
@@ -303,7 +302,7 @@ void s14001a_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		Clock();
-		int16_t sample = m_uOutputP2 - 7; // range -7..8
+		s16 sample = m_uOutputP2 - 7; // range -7..8
 		outputs[0].put_int(i, sample, 8);
 	}
 }
@@ -312,11 +311,6 @@ void s14001a_device::sound_stream_update(sound_stream &stream, std::vector<read_
 /**************************************************************************
     External interface
 **************************************************************************/
-
-void s14001a_device::force_update()
-{
-	m_stream->update();
-}
 
 int s14001a_device::romen_r()
 {
@@ -330,7 +324,7 @@ int s14001a_device::busy_r()
 	return (m_bBusyP1) ? 1 : 0;
 }
 
-void s14001a_device::data_w(uint8_t data)
+void s14001a_device::data_w(u8 data)
 {
 	m_stream->update();
 	m_uWord = data & 0x3f; // C0-C5
@@ -339,14 +333,9 @@ void s14001a_device::data_w(uint8_t data)
 void s14001a_device::start_w(int state)
 {
 	m_stream->update();
+	if (state && !m_bStart)
+		m_uStateP1 = states::WORDWAIT;
 	m_bStart = (state != 0);
-	if (m_bStart) m_uStateP1 = states::WORDWAIT;
-}
-
-void s14001a_device::set_clock(uint32_t clock)
-{
-	m_stream->update();
-	m_stream->set_sample_rate(clock);
 }
 
 
@@ -354,10 +343,10 @@ void s14001a_device::set_clock(uint32_t clock)
     Device emulation
 **************************************************************************/
 
-uint8_t s14001a_device::readmem(uint16_t offset, bool phase)
+u8 s14001a_device::ReadMem(u16 offset, bool phase)
 {
 	offset &= 0xfff; // 11-bit internal
-	return (m_ext_read_handler.isunset()) ? m_SpeechRom[offset & (m_SpeechRom.bytes() - 1)] : m_ext_read_handler(offset);
+	return read_byte(offset);
 }
 
 bool s14001a_device::Clock()
@@ -390,13 +379,13 @@ bool s14001a_device::Clock()
 		m_uDeltaOldP2  = m_uDeltaOldP1;
 
 		m_uOutputP2    = m_uOutputP1;
-		m_uRomAddrP2   = m_RomAddrP1;
+		m_uRomAddrP2   = m_uRomAddrP1;
 
 		// setup carries from phase 2 values
-		m_bDAR04To00CarryP2  = m_uDAR04To00P2 == 0x1F;
-		m_bPPQCarryP2        = m_bDAR04To00CarryP2 && ((m_uLengthP2&0x03) == 0x03); // pitch period quarter
-		m_bRepeatCarryP2     = m_bPPQCarryP2       && ((m_uLengthP2&0x0C) == 0x0C);
-		m_bLengthCarryP2     = m_bRepeatCarryP2    && ( m_uLengthP2       == 0x7F);
+		m_bDAR04To00CarryP2 = m_uDAR04To00P2 == 0x1f;
+		m_bPPQCarryP2       = m_bDAR04To00CarryP2 && ((m_uLengthP2 & 0x03) == 0x03); // pitch period quarter
+		m_bRepeatCarryP2    = m_bPPQCarryP2       && ((m_uLengthP2 & 0x0c) == 0x0c);
+		m_bLengthCarryP2    = m_bRepeatCarryP2    && ( m_uLengthP2         == 0x7f);
 
 		return true;
 	}
@@ -407,7 +396,8 @@ bool s14001a_device::Clock()
 	{
 	case states::IDLE:
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = states::WORDWAIT;
+		if (m_bStart)
+			m_uStateP1 = states::WORDWAIT;
 
 		if (m_bBusyP1)
 			m_bsy_handler(0);
@@ -417,12 +407,12 @@ bool s14001a_device::Clock()
 	case states::WORDWAIT:
 		// the delta address register latches the word number into bits 03 to 08
 		// all other bits forced to 0.  04 to 08 makes a multiply by two.
-		m_uDAR13To05P1 = (m_uWord&0x3C)>>2;
-		m_uDAR04To00P1 = (m_uWord&0x03)<<3;
-		m_RomAddrP1 = (m_uDAR13To05P1<<3)|(m_uDAR04To00P1>>2); // remove lower two bits
+		m_uDAR13To05P1 = (m_uWord & 0x3c) >> 2;
+		m_uDAR04To00P1 = (m_uWord & 0x03) << 3;
+		m_uRomAddrP1 = (m_uDAR13To05P1 << 3) | (m_uDAR04To00P1 >> 2); // remove lower two bits
+
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = states::WORDWAIT;
-		else          m_uStateP1 = states::CWARMSB;
+		m_uStateP1  = m_bStart ? states::WORDWAIT : states::CWARMSB;
 
 		if (!m_bBusyP1)
 			m_bsy_handler(1);
@@ -430,100 +420,88 @@ bool s14001a_device::Clock()
 		break;
 
 	case states::CWARMSB:
-		if (m_uPrintLevel >= 1)
-			printf("\n speaking word %02x",m_uWord);
+		LOGMASKED(LOG_SPEAK, "speaking word %02x\n", m_uWord);
 
 		// use uDAR to load uCWAR 8 msb
-		m_uCWARP1 = readmem(m_uRomAddrP2,m_bPhase1)<<4; // note use of rom address setup in previous state
+		m_uCWARP1 = ReadMem(m_uRomAddrP2, m_bPhase1) << 4; // note use of rom address setup in previous state
 		// increment DAR by 4, 2 lsb's count deltas within a byte
 		m_uDAR04To00P1 += 4;
-		if (m_uDAR04To00P1 >= 32) m_uDAR04To00P1 = 0; // emulate 5 bit counter
-		m_RomAddrP1 = (m_uDAR13To05P1<<3)|(m_uDAR04To00P1>>2); // remove lower two bits
+		if (m_uDAR04To00P1 >= 32)
+			m_uDAR04To00P1 = 0; // emulate 5 bit counter
+		m_uRomAddrP1 = (m_uDAR13To05P1 << 3) | (m_uDAR04To00P1 >> 2); // remove lower two bits
 
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = states::WORDWAIT;
-		else          m_uStateP1 = states::CWARLSB;
+		m_uStateP1  = m_bStart ? states::WORDWAIT : states::CWARLSB;
 		break;
 
 	case states::CWARLSB:
-		m_uCWARP1   = m_uCWARP2|(readmem(m_uRomAddrP2,m_bPhase1)>>4); // setup in previous state
-		m_RomAddrP1 = m_uCWARP1;
+		m_uCWARP1   = m_uCWARP2 | (ReadMem(m_uRomAddrP2, m_bPhase1) >> 4); // setup in previous state
+		m_uRomAddrP1 = m_uCWARP1;
 
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = states::WORDWAIT;
-		else          m_uStateP1 = states::DARMSB;
+		m_uStateP1  = m_bStart ? states::WORDWAIT : states::DARMSB;
 		break;
 
 	case states::DARMSB:
-		m_uDAR13To05P1 = readmem(m_uRomAddrP2,m_bPhase1)<<1; // 9 bit counter, 8 MSBs from ROM, lsb zeroed
+		m_uDAR13To05P1 = ReadMem(m_uRomAddrP2, m_bPhase1) << 1; // 9 bit counter, 8 MSBs from ROM, lsb zeroed
 		m_uDAR04To00P1 = 0;
 		m_uCWARP1++;
-		m_RomAddrP1 = m_uCWARP1;
-		m_uNControlWords++; // statistics
+		m_uRomAddrP1 = m_uCWARP1;
 
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = states::WORDWAIT;
-		else          m_uStateP1 = states::CTRLBITS;
+		m_uStateP1  = m_bStart ? states::WORDWAIT : states::CTRLBITS;
 		break;
 
 	case states::CTRLBITS:
-		m_bStopP1    = readmem(m_uRomAddrP2,m_bPhase1)&0x80? true: false;
-		m_bVoicedP1  = readmem(m_uRomAddrP2,m_bPhase1)&0x40? true: false;
-		m_bSilenceP1 = readmem(m_uRomAddrP2,m_bPhase1)&0x20? true: false;
-		m_uXRepeatP1 = readmem(m_uRomAddrP2,m_bPhase1)&0x03;
-		m_uLengthP1  =(readmem(m_uRomAddrP2,m_bPhase1)&0x1F)<<2; // includes external length and repeat
+	{
+		u8 data = ReadMem(m_uRomAddrP2, m_bPhase1);
+
+		m_bStopP1    = bool(data & 0x80);
+		m_bVoicedP1  = bool(data & 0x40);
+		m_bSilenceP1 = bool(data & 0x20);
+		m_uXRepeatP1 = data & 0x03;
+		m_uLengthP1  = (data & 0x1f) << 2; // includes external length and repeat
 		m_uDAR04To00P1 = 0;
 		m_uCWARP1++; // gets ready for next DARMSB
-		m_RomAddrP1  = (m_uDAR13To05P1<<3)|(m_uDAR04To00P1>>2); // remove lower two bits
+		m_uRomAddrP1  = (m_uDAR13To05P1 << 3) | (m_uDAR04To00P1 >> 2); // remove lower two bits
 
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = states::WORDWAIT;
-		else          m_uStateP1 = states::PLAY;
+		m_uStateP1  = m_bStart ? states::WORDWAIT : states::PLAY;
 
-		if (m_uPrintLevel >= 2)
-			printf("\n cw %d %d %d %d %d",m_bStopP1,m_bVoicedP1,m_bSilenceP1,m_uLengthP1>>4,m_uXRepeatP1);
-
+		LOGMASKED(LOG_CTRL, "cw %d %d %d %d %d\n", m_bStopP1, m_bVoicedP1, m_bSilenceP1, m_uLengthP1 >> 4, m_uXRepeatP1);
 		break;
+	}
 
 	case states::PLAY:
 	{
-		// statistics
 		if (m_bPPQCarryP2)
-		{
-			// pitch period end
-			if (m_uPrintLevel >= 3)
-				printf("\n ppe: RomAddr %03x",m_uRomAddrP2);
-
-			m_uNPitchPeriods++;
-			if (m_bVoicedP2) m_uNVoiced++;
-		}
-		// end statistics
+			LOGMASKED(LOG_PPE, "ppe: RomAddr %03x\n", m_uRomAddrP2); // pitch period end
 
 		// modify output
-		uint8_t uDeltaP2;     // signal line
-		uint8_t uIncrementP2; // signal lines
-		bool bAddP2;        // signal line
+		u8 uDeltaP2;     // signal line
+		u8 uIncrementP2; // signal lines
+		bool bAddP2;     // signal line
 		uDeltaP2 = Mux8To2(m_bVoicedP2,
-					m_uLengthP2 & 0x03,     // pitch period quater counter
-					m_uDAR04To00P2 & 0x03,  // two bit delta address within byte
-					readmem(m_uRomAddrP2,m_bPhase1)
+				m_uLengthP2 & 0x03,     // pitch period quater counter
+				m_uDAR04To00P2 & 0x03,  // two bit delta address within byte
+				ReadMem(m_uRomAddrP2, m_bPhase1)
 		);
 		CalculateIncrement(m_bVoicedP2,
-					m_uLengthP2 & 0x03,     // pitch period quater counter
-					m_uDAR04To00P2 == 0,    // pitch period quarter start
-					uDeltaP2,
-					m_uDeltaOldP2,          // input
-					m_uDeltaOldP1,          // output
-					uIncrementP2,           // output 0, 1, or 3
-					bAddP2                  // output
+				m_uLengthP2 & 0x03,     // pitch period quater counter
+				m_uDAR04To00P2 == 0,    // pitch period quarter start
+				uDeltaP2,
+				m_uDeltaOldP2,          // input
+				m_uDeltaOldP1,          // output
+				uIncrementP2,           // output 0, 1, or 3
+				bAddP2                  // output
 		);
 		m_uOutputP1 = CalculateOutput(m_bVoicedP2,
-					m_bSilenceP2,
-					m_uLengthP2 & 0x03,     // pitch period quater counter
-					m_uDAR04To00P2 == 0,    // pitch period quarter start
-					m_uOutputP2,            // last output
-					uIncrementP2,
-					bAddP2
+				m_bSilenceP2,
+				m_uLengthP2 & 0x03,     // pitch period quater counter
+				m_uDAR04To00P2 == 0,    // pitch period quarter start
+				m_uOutputP2,            // last output
+				uIncrementP2,
+				bAddP2
 		);
 
 		// advance counters
@@ -542,59 +520,46 @@ bool s14001a_device::Clock()
 		if (m_bVoicedP2 && m_bRepeatCarryP2) // repeat complete
 		{
 			m_uLengthP1 &= 0x70; // keep current "length"
-			m_uLengthP1 |= (m_uXRepeatP1<<2); // load repeat from external repeat
+			m_uLengthP1 |= (m_uXRepeatP1 << 2); // load repeat from external repeat
 			m_uDAR13To05P1++; // advances ROM address 8 bytes
-			if (m_uDAR13To05P1 >= 0x200) m_uDAR13To05P1 = 0; // emulate 9 bit counter
+			if (m_uDAR13To05P1 >= 0x200)
+				m_uDAR13To05P1 = 0; // emulate 9 bit counter
 		}
 		if (!m_bVoicedP2 && m_bDAR04To00CarryP2)
 		{
 			// unvoiced advances each quarter pitch period
 			// note repeat counter not reloaded for non voiced speech
 			m_uDAR13To05P1++; // advances ROM address 8 bytes
-			if (m_uDAR13To05P1 >= 0x200) m_uDAR13To05P1 = 0; // emulate 9 bit counter
+			if (m_uDAR13To05P1 >= 0x200)
+				m_uDAR13To05P1 = 0; // emulate 9 bit counter
 		}
 
-		// construct m_RomAddrP1
-		m_RomAddrP1 = m_uDAR04To00P1;
-		if (m_bVoicedP2 && m_uLengthP1&0x1) // mirroring
-		{
-			m_RomAddrP1 ^= 0x1f; // count backwards
-		}
-		m_RomAddrP1 = (m_uDAR13To05P1<<3) | m_RomAddrP1>>2;
+		// construct m_uRomAddrP1
+		m_uRomAddrP1 = m_uDAR04To00P1;
+		if (m_bVoicedP2 && m_uLengthP1 & 0x1) // mirroring
+			m_uRomAddrP1 ^= 0x1f; // count backwards
+		m_uRomAddrP1 = (m_uDAR13To05P1 << 3) | m_uRomAddrP1 >> 2;
 
 		// next state
-		if (m_bStart) m_uStateP1 = states::WORDWAIT;
-		else if (m_bStopP2 && m_bLengthCarryP2) m_uStateP1 = states::DELAY;
+		if (m_bStart)
+			m_uStateP1 = states::WORDWAIT;
+		else if (m_bStopP2 && m_bLengthCarryP2)
+			m_uStateP1 = states::DELAY;
 		else if (m_bLengthCarryP2)
 		{
 			m_uStateP1  = states::DARMSB;
-			m_RomAddrP1 = m_uCWARP1; // output correct address
+			m_uRomAddrP1 = m_uCWARP1; // output correct address
 		}
-		else m_uStateP1 = states::PLAY;
+		else
+			m_uStateP1 = states::PLAY;
 		break;
 	}
 
 	case states::DELAY:
 		m_uOutputP1 = 7;
-		if (m_bStart) m_uStateP1 = states::WORDWAIT;
-		else          m_uStateP1 = states::IDLE;
+		m_uStateP1  = m_bStart ? states::WORDWAIT : states::IDLE;
 		break;
 	}
 
 	return true;
-}
-
-void s14001a_device::ClearStatistics()
-{
-	m_uNPitchPeriods = 0;
-	m_uNVoiced       = 0;
-	m_uPrintLevel    = 0;
-	m_uNControlWords = 0;
-}
-
-void s14001a_device::GetStatistics(uint32_t &uNPitchPeriods, uint32_t &uNVoiced, uint32_t &uNControlWords)
-{
-	uNPitchPeriods = m_uNPitchPeriods;
-	uNVoiced = m_uNVoiced;
-	uNControlWords = m_uNControlWords;
 }

@@ -207,7 +207,8 @@ void mm78_device::execute_one()
 
 				}
 				break; // 0xfc
-		}
+
+		} // 0xf0
 	}
 
 	// TAB is delayed by 1 opcode (including a single TR)

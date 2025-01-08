@@ -61,7 +61,7 @@ public:
 	void lcmate2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -74,8 +74,8 @@ private:
 	void speaker_w(u8 data);
 	void bankswitch_w(u8 data);
 	void lcmate2_palette(palette_device &palette) const;
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 void lcmate2_state::speaker_w(u8 data)

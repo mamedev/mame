@@ -210,10 +210,12 @@ uint8_t mm1_state::sasi_status_r(offs_t offset)
 	uint8_t data = 0;
 
 	data |= m_sasi->bsy_r();
+	data |= m_sasi->rst_r() << 1;
 	data |= m_sasi->msg_r() << 2;
 	data |= m_sasi->cd_r() << 3;
 	data |= m_sasi->req_r() << 4;
 	data |= m_sasi->io_r() << 5;
+	data |= m_sasi->ack_r() << 7;
 
 	//LOG("%s SASI STATUS %02x\n",machine().describe_context(),data);
 
@@ -226,6 +228,7 @@ void mm1_state::sasi_cmd_w(offs_t offset, uint8_t data)
 
 	m_sasi->sel_w(BIT(data, 0));
 	m_sasi->rst_w(BIT(data, 1));
+	m_sasi->atn_w(BIT(data, 2));
 }
 
 uint8_t mm1_state::sasi_data_r(offs_t offset)

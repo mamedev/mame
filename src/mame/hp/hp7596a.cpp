@@ -23,7 +23,7 @@ public:
 	void hp7596a(machine_config &config);
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -60,4 +60,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1988, hp7596a, 0, 0, hp7596a, hp7596a, hp7596a_state, empty_init, "Hewlett-Packard", "HP 7596A DraftMaster II", MACHINE_IS_SKELETON)
+SYST(1988, hp7596a, 0, 0, hp7596a, hp7596a, hp7596a_state, empty_init, "Hewlett-Packard", "HP 7596A DraftMaster II", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

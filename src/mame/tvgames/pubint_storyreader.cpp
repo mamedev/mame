@@ -91,8 +91,8 @@ public:
 	void pi_storyreader_v2(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -173,5 +173,5 @@ ROM_END
 //    year, name,        parent,    compat, machine,            input,            class,                  init,       company,    fullname,                         flags
 
 // These are said to not be compatible with each other
-CONS( 200?, pi_stry,     0,         0,      pi_storyreader,      pi_storyreader, pi_storyreader_state, empty_init, "Publications International Ltd", "Story Reader",                MACHINE_IS_SKELETON )
-CONS( 200?, pi_stry2,    0,         0,      pi_storyreader_v2,   pi_storyreader, pi_storyreader_state, empty_init, "Publications International Ltd", "Story Reader 2.0",            MACHINE_IS_SKELETON )
+CONS( 200?, pi_stry,     0,         0,      pi_storyreader,      pi_storyreader, pi_storyreader_state, empty_init, "Publications International Ltd", "Story Reader",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, pi_stry2,    0,         0,      pi_storyreader_v2,   pi_storyreader, pi_storyreader_state, empty_init, "Publications International Ltd", "Story Reader 2.0",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

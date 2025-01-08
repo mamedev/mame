@@ -27,10 +27,10 @@ public:
 private:
 	static constexpr uint32_t RAM_WRITE_TIME = 5;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	void install_tap_handler();
 
 	required_device<cassette_image_device> m_cassette;

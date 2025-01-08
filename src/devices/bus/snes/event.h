@@ -20,11 +20,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void speedup_addon_bios_access() override;
 
@@ -53,8 +53,8 @@ private:
 
 	emu_timer *pfest94_timer;
 
-	void dsp_data_map_lorom(address_map &map);
-	void dsp_prg_map_lorom(address_map &map);
+	void dsp_data_map_lorom(address_map &map) ATTR_COLD;
+	void dsp_prg_map_lorom(address_map &map) ATTR_COLD;
 };
 
 

@@ -27,16 +27,19 @@ public:
 	void mini5sx_config(machine_config &config);
 
 protected:
-	void mini5sx_map(address_map &map);
-	void mini5sx_io(address_map &map);
+	void mini5sx_map(address_map &map) ATTR_COLD;
+	void mini5sx_io(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 private:
 	required_device<v33_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;
 	required_shared_ptr<uint16_t> m_gvram;
 
 	u16 fake_dict_r(offs_t offset);
+
+	// just suppress for now, TBD
+	virtual void uart_irq_check() override {};
 
 	void bungo_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

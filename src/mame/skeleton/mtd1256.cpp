@@ -37,7 +37,7 @@ public:
 	void mtd1256(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -45,8 +45,8 @@ private:
 	u8 porta_r();
 	void portd_w(u8 data);
 
-	void bank0_map(address_map &map);
-	void mem_map(address_map &map);
+	void bank0_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bank0;
@@ -157,4 +157,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1992, mtd1256, 0, 0, mtd1256, mtd1256, mtd1256_state, empty_init, "Geonica", "Meteodata 1256", MACHINE_IS_SKELETON)
+SYST(1992, mtd1256, 0, 0, mtd1256, mtd1256, mtd1256_state, empty_init, "Geonica", "Meteodata 1256", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

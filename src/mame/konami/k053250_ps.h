@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_KONAMI_K053250PS_H
-#define MAME_KONAMI_K053250PS_H
+#ifndef MAME_KONAMI_K053250_PS_H
+#define MAME_KONAMI_K053250_PS_H
 
 #pragma once
 
@@ -45,8 +45,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(handle_od_wait);
 
@@ -84,4 +84,4 @@ private:
 
 DECLARE_DEVICE_TYPE(K053250PS, k053250ps_device)
 
-#endif // MAME_KONAMI_K053250PS_H
+#endif // MAME_KONAMI_K053250_PS_H

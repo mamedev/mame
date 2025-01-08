@@ -127,7 +127,7 @@ void sony_ldp1000_device::set_new_player_state(ldp1000_player_state which)
 {
 	m_player_state = which;
 	m_index_state = 0;
-	printf("set new player state\n");
+	logerror("set new player state\n");
 }
 
 // TODO: probably don't even need a size ...
@@ -171,7 +171,7 @@ void sony_ldp1000_device::exec_enter_cmd()
 // TODO: de-instantize this
 void sony_ldp1000_device::command_w(uint8_t data)
 {
-	printf("CMD %02x\n",data);
+	logerror("CMD %02x\n",data);
 	// 0x30 to 0x69 range causes an ACK, anything else is invalid
 	m_command = data;
 

@@ -24,16 +24,14 @@
 
 void gaelco2_state::ROM16_split_gfx(const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2)
 {
-	int i;
-
 	/* get a pointer to the source data */
-	uint8_t *src = (uint8_t *)memregion(src_reg)->base();
+	u8 *src = (u8 *)memregion(src_reg)->base();
 
 	/* get a pointer to the destination data */
-	uint8_t *dst = (uint8_t *)memregion(dst_reg)->base();
+	u8 *dst = (u8 *)memregion(dst_reg)->base();
 
 	/* fill destination areas with the proper data */
-	for (i = 0; i < length/2; i++){
+	for (int i = 0; i < length/2; i++){
 		dst[dest1 + i] = src[start + i*2 + 0];
 		dst[dest2 + i] = src[start + i*2 + 1];
 	}
@@ -49,13 +47,13 @@ void gaelco2_state::ROM16_split_gfx(const char *src_reg, const char *dst_reg, in
 void gaelco2_state::init_alighunt()
 {
 	/*
-	For "gfx2" we have this memory map:
+	For "gfx_temp" we have this memory map:
 	    0x0000000-0x03fffff ROM u48
 	    0x0400000-0x07fffff ROM u47
 	    0x0800000-0x0bfffff ROM u50
 	    0x0c00000-0x0ffffff ROM u49
 
-	and we are going to construct this one for "gfx1":
+	and we are going to construct this one for "gfx":
 	    0x0000000-0x01fffff ROM u48 even bytes
 	    0x0200000-0x03fffff ROM u47 even bytes
 	    0x0400000-0x05fffff ROM u48 odd bytes
@@ -67,28 +65,28 @@ void gaelco2_state::init_alighunt()
 	*/
 
 	/* split ROM u48 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0000000, 0x0400000, 0x0000000, 0x0400000);
+	ROM16_split_gfx("gfx_temp", "gfx", 0x0000000, 0x0400000, 0x0000000, 0x0400000);
 
 	/* split ROM u47 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0400000, 0x0400000, 0x0200000, 0x0600000);
+	ROM16_split_gfx("gfx_temp", "gfx", 0x0400000, 0x0400000, 0x0200000, 0x0600000);
 
 	/* split ROM u50 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
+	ROM16_split_gfx("gfx_temp", "gfx", 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
 
 	/* split ROM u49 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0c00000, 0x0400000, 0x0a00000, 0x0e00000);
+	ROM16_split_gfx("gfx_temp", "gfx", 0x0c00000, 0x0400000, 0x0a00000, 0x0e00000);
 }
 
 
 void gaelco2_state::init_touchgo()
 {
 	/*
-	For "gfx2" we have this memory map:
+	For "gfx_temp" we have this memory map:
 	    0x0000000-0x03fffff ROM ic65
 	    0x0400000-0x05fffff ROM ic66
 	    0x0800000-0x0bfffff ROM ic67
 
-	and we are going to construct this one for "gfx1":
+	and we are going to construct this one for "gfx":
 	    0x0000000-0x01fffff ROM ic65 even bytes
 	    0x0200000-0x02fffff ROM ic66 even bytes
 	    0x0400000-0x05fffff ROM ic65 odd bytes
@@ -98,25 +96,25 @@ void gaelco2_state::init_touchgo()
 	*/
 
 	/* split ROM ic65 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0000000, 0x0400000, 0x0000000, 0x0400000);
+	ROM16_split_gfx("gfx_temp", "gfx", 0x0000000, 0x0400000, 0x0000000, 0x0400000);
 
 	/* split ROM ic66 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0400000, 0x0200000, 0x0200000, 0x0600000);
+	ROM16_split_gfx("gfx_temp", "gfx", 0x0400000, 0x0200000, 0x0200000, 0x0600000);
 
 	/* split ROM ic67 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
+	ROM16_split_gfx("gfx_temp", "gfx", 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
 }
 
 
-void gaelco2_state::init_snowboara()
+void snowboar_state::init_snowboara()
 {
 	/*
-	For "gfx2" we have this memory map:
+	For "gfx_temp" we have this memory map:
 	    0x0000000-0x03fffff ROM sb44
 	    0x0400000-0x07fffff ROM sb45
 	    0x0800000-0x0bfffff ROM sb46
 
-	and we are going to construct this one for "gfx1":
+	and we are going to construct this one for "gfx":
 	    0x0000000-0x01fffff ROM sb44 even bytes
 	    0x0200000-0x03fffff ROM sb45 even bytes
 	    0x0400000-0x05fffff ROM sb44 odd bytes
@@ -126,25 +124,24 @@ void gaelco2_state::init_snowboara()
 	*/
 
 	/* split ROM sb44 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0000000, 0x0400000, 0x0000000, 0x0400000);
+	ROM16_split_gfx("gfx_temp", "gfx", 0x0000000, 0x0400000, 0x0000000, 0x0400000);
 
 	/* split ROM sb45 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0400000, 0x0400000, 0x0200000, 0x0600000);
+	ROM16_split_gfx("gfx_temp", "gfx", 0x0400000, 0x0400000, 0x0200000, 0x0600000);
 
 	/* split ROM sb46 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
-	init_snowboar();
+	ROM16_split_gfx("gfx_temp", "gfx", 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
 }
 
 
-void gaelco2_state::init_wrally2()
+void wrally2_state::init_wrally2()
 {
 	/*
-	For "gfx2" we have this memory map:
+	For "gfx_temp" we have this memory map:
 	    0x0000000-0x03fffff ROM wr2_ic69.ic69
 	    0x0400000-0x05fffff ROM wr2_ic70.ic70
 
-	and we are going to construct this one for "gfx1":
+	and we are going to construct this one for "gfx":
 	    0x0000000-0x01fffff ROM wr2_ic69.ic69 even bytes
 	    0x0200000-0x03fffff ROM wr2_ic69.ic69 odd bytes
 	    0x0400000-0x04fffff ROM wr2_ic70.ic70 even bytes
@@ -152,10 +149,10 @@ void gaelco2_state::init_wrally2()
 	*/
 
 	/* split ROM wr2_ic69.ic69 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0000000, 0x0400000, 0x0000000, 0x0200000);
+	ROM16_split_gfx("gfx_temp", "gfx", 0x0000000, 0x0400000, 0x0000000, 0x0200000);
 
 	/* split ROM wr2_ic70.ic70 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0400000, 0x0200000, 0x0400000, 0x0600000);
+	ROM16_split_gfx("gfx_temp", "gfx", 0x0400000, 0x0200000, 0x0400000, 0x0600000);
 }
 
 
@@ -212,12 +209,12 @@ void gaelco2_state::coin4_counter_w(int state)
 void gaelco2_state::alighunt_coin_w(u16 data)
 {
 	/* Coin Lockouts */
-	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
-	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 0));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 1));
 
 	/* Coin Counters */
-	machine().bookkeeping().coin_counter_w(0, data & 0x04);
-	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));
 }
 
 /***************************************************************************
@@ -226,27 +223,29 @@ void gaelco2_state::alighunt_coin_w(u16 data)
 
 ***************************************************************************/
 
-
-void bang_state::init_bang()
+void bang_state::machine_start()
 {
-	m_clr_gun_int = 0;
+	gaelco2_state::machine_start();
+
+	save_item(NAME(m_clr_gun_int));
 }
 
 void bang_state::bang_clr_gun_int_w(u16 data)
 {
-	m_clr_gun_int = 1;
+	m_clr_gun_int = true;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(bang_state::bang_irq)
 {
 	int scanline = param;
 
-	if (scanline == 256){
+	if (scanline == 256)
+	{
 		m_maincpu->set_input_line(2, HOLD_LINE);
-		m_clr_gun_int = 0;
+		m_clr_gun_int = false;
 	}
 
-	if ((scanline % 64) == 0 && m_clr_gun_int)
+	if (((scanline % 64) == 0) && m_clr_gun_int)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
@@ -256,8 +255,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(bang_state::bang_irq)
 
 ***************************************************************************/
 
-void gaelco2_state::init_snowboar()
+void snowboar_state::machine_start()
 {
+	gaelco2_state::machine_start();
+
 	save_item(NAME(m_snowboard_latch));
 }
 
@@ -320,14 +321,14 @@ u16 mangle(u32 x)
 	return get_out(((a ^ 0x0010) - (b ^ 0x0024)) ^ 0x5496);
 }
 
-u16 gaelco2_state::snowboar_protection_r()
+u16 snowboar_state::snowboar_protection_r()
 {
 	u16 ret = mangle(m_snowboard_latch);
 	ret = ((ret & 0xff00) >> 8) | ((ret & 0x00ff) << 8);
 	return ret;
 }
 
-void gaelco2_state::snowboar_protection_w(offs_t offset, u16 data, u16 mem_mask)
+void snowboar_state::snowboar_protection_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_snowboar_protection[offset]);
 

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-#ifndef MAME_VIDEO_PC_VGA_PROMOTION_H
-#define MAME_VIDEO_PC_VGA_PROMOTION_H
+#ifndef MAME_VIDEO_PC_VGA_ALLIANCE_H
+#define MAME_VIDEO_PC_VGA_ALLIANCE_H
 
 #pragma once
 
@@ -22,13 +22,13 @@ public:
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void crtc_map(address_map &map) override;
-	virtual void sequencer_map(address_map &map) override;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	u8 m_remap_blt = 0;
@@ -37,4 +37,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PROMOTION_VGA, promotion_vga_device)
 
-#endif // MAME_VIDEO_PC_VGA_PROMOTION_H
+#endif // MAME_VIDEO_PC_VGA_ALLIANCE_H

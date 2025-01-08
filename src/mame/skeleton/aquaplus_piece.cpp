@@ -93,5 +93,5 @@ ROM_END
 
 
 //   YEAR  NAME       PARENT     COMPAT  MACHINE    INPUT  CLASS        INIT        COMPANY     FULLNAME                FLAGS
-SYST(2001, piece512k, 0,         0,      piece512k, piece, piece_state, empty_init, "Aquaplus", "P/ECE (512 kB Flash)", MACHINE_IS_SKELETON)
-SYST(2001, piece2m,   piece512k, 0,      piece2m,   piece, piece_state, empty_init, "Aquaplus", "P/ECE (2 MB Flash)",   MACHINE_IS_SKELETON)
+SYST(2001, piece512k, 0,         0,      piece512k, piece, piece_state, empty_init, "Aquaplus", "P/ECE (512 kB Flash)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(2001, piece2m,   piece512k, 0,      piece2m,   piece, piece_state, empty_init, "Aquaplus", "P/ECE (2 MB Flash)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

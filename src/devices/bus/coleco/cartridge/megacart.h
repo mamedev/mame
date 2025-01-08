@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_COLECO_MEGACART_H
-#define MAME_BUS_COLECO_MEGACART_H
+#ifndef MAME_BUS_COLECO_CARTRIDGE_MEGACART_H
+#define MAME_BUS_COLECO_CARTRIDGE_MEGACART_H
 
 #pragma once
 
@@ -30,8 +30,8 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_colecovision_cartridge_interface overrides
 	virtual uint8_t read(offs_t offset, int _8000, int _a000, int _c000, int _e000) override;
@@ -46,4 +46,4 @@ private:
 DECLARE_DEVICE_TYPE(COLECOVISION_MEGACART, colecovision_megacart_cartridge_device)
 
 
-#endif // MAME_BUS_COLECO_MEGACART_H
+#endif // MAME_BUS_COLECO_CARTRIDGE_MEGACART_H

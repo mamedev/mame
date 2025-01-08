@@ -21,7 +21,7 @@ public:
 	i82371eb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(I82371EB_ISA, i82371eb_isa_device)

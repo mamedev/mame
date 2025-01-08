@@ -60,7 +60,7 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void krokha_mem(address_map &map);
+	void krokha_mem(address_map &map) ATTR_COLD;
 
 	void status_callback(uint8_t data);
 	void speaker_w(uint8_t data);

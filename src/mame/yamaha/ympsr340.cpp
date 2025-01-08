@@ -45,8 +45,8 @@ public:
 	void psr340(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<swx00_device> m_maincpu;
@@ -57,8 +57,8 @@ private:
 	output_finder<80, 8, 5> m_outputs;
 	required_ioport_array<8> m_key;
 
-	void c_map(address_map &map);
-	void s_map(address_map &map);
+	void c_map(address_map &map) ATTR_COLD;
+	void s_map(address_map &map) ATTR_COLD;
 
 	void pdt_w(u16 data);
 	u8 pad_r();

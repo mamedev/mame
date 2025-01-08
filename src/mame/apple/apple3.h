@@ -97,8 +97,8 @@ public:
 	uint8_t apple3_c0xx_r(offs_t offset);
 	void apple3_c0xx_w(offs_t offset, uint8_t data);
 	void init_apple3();
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanstart_cb);
 	TIMER_CALLBACK_MEMBER(scanend_cb);
@@ -139,7 +139,7 @@ public:
 	int m_enable_mask = 0;
 
 	void apple3(machine_config &config);
-	void apple3_map(address_map &map);
+	void apple3_map(address_map &map) ATTR_COLD;
 private:
 	bool m_reset_latch;
 	bool m_nmi_latch;

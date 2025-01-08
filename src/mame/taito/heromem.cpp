@@ -57,11 +57,11 @@ private:
 	required_device<tc0091lvc_device> m_tc0091lvc_l;
 	required_device<tc0091lvc_device> m_tc0091lvc_r;
 
-	void maincpu_prg_map(address_map &map);
-	void audiocpu_l_prg_map(address_map &map);
-	void audiocpu_r_prg_map(address_map &map);
-	void tc0091lvc_l_prg_map(address_map &map);
-	void tc0091lvc_r_prg_map(address_map &map);
+	void maincpu_prg_map(address_map &map) ATTR_COLD;
+	void audiocpu_l_prg_map(address_map &map) ATTR_COLD;
+	void audiocpu_r_prg_map(address_map &map) ATTR_COLD;
+	void tc0091lvc_l_prg_map(address_map &map) ATTR_COLD;
+	void tc0091lvc_r_prg_map(address_map &map) ATTR_COLD;
 
 	void screen_vblank_l(int state) { if (state) { m_tc0091lvc_l->screen_eof(); } }
 	void screen_vblank_r(int state) { if (state) { m_tc0091lvc_l->screen_eof(); } }
@@ -333,4 +333,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1997, heromem, 0, heromem, heromem, heromem_state, empty_init, ROT0, "Taito", "Heroine's Memory", MACHINE_IS_SKELETON_MECHANICAL ) // video is emulatable, coin pushing mechanics less so
+GAME( 1997, heromem, 0, heromem, heromem, heromem_state, empty_init, ROT0, "Taito", "Heroine's Memory", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // video is emulatable, coin pushing mechanics less so

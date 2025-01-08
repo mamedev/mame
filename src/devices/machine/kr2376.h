@@ -70,7 +70,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual uint8_t key_codes(int mode, int x, int y) { return 0x00; }
 
 	TIMER_CALLBACK_MEMBER(perform_scan);

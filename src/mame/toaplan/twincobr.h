@@ -45,8 +45,8 @@ public:
 	void init_twincobr();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	optional_shared_ptr<u8> m_sharedram;
 	optional_device<buffered_spriteram8_device> m_spriteram8;
@@ -144,13 +144,13 @@ protected:
 	required_device<ls259_device> m_mainlatch;
 	required_device<ls259_device> m_coinlatch;
 
-	void dsp_io_map(address_map &map);
-	void dsp_program_map(address_map &map);
-	void fnshark_sound_io_map(address_map &map);
-	void fsharkbt_i8741_io_map(address_map &map);
-	void main_program_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_program_map(address_map &map);
+	void dsp_io_map(address_map &map) ATTR_COLD;
+	void dsp_program_map(address_map &map) ATTR_COLD;
+	void fnshark_sound_io_map(address_map &map) ATTR_COLD;
+	void fsharkbt_i8741_io_map(address_map &map) ATTR_COLD;
+	void main_program_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_program_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TOAPLAN_TWINCOBR_H

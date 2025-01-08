@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_SNAPQUIK_H
-#define MAME_DEVICES_IMAGEDEV_SNAPQUIK_H
+#ifndef MAME_IMAGEDEV_SNAPQUIK_H
+#define MAME_IMAGEDEV_SNAPQUIK_H
 
 #pragma once
 
@@ -63,7 +63,7 @@ protected:
 	snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override;
@@ -112,4 +112,4 @@ DECLARE_DEVICE_TYPE(QUICKLOAD, quickload_image_device)
 #define QUICKLOAD_LOAD_MEMBER(_name)                std::pair<std::error_condition, std::string> _name(snapshot_image_device &image)
 #define DECLARE_QUICKLOAD_LOAD_MEMBER(_name)        QUICKLOAD_LOAD_MEMBER(_name)
 
-#endif // MAME_DEVICES_IMAGEDEV_SNAPQUIK_H
+#endif // MAME_IMAGEDEV_SNAPQUIK_H

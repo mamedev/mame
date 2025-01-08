@@ -2534,7 +2534,9 @@ TABLE_FUNCTION(void, set_reg, (int regnum, uint32_t val))
 
 TABLE_FUNCTION(int, execute, (int clocks))
 {
-	if(!CPU_STOPPED)
+	if(CPU_STOPPED)
+		debugger_wait_hook();
+	else
 	{
 		CLOCKS = clocks;
 		do

@@ -63,9 +63,9 @@ public:
 	void xyonix(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -99,8 +99,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void handle_coins(int coin);
-	void main_map(address_map &map);
-	void port_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
 
 	[[maybe_unused]] MC6845_UPDATE_ROW(crtc_update_row);
 };
@@ -158,7 +158,7 @@ void xyonix_state::palette(palette_device &palette) const
 		// blue component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

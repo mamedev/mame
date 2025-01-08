@@ -49,7 +49,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void frenzyxprss_map(address_map &map);
+	void frenzyxprss_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -103,4 +103,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(2001, frenzyxprss, 0, frenzyxprss, frenzyxprss, frenzyxprss_state, empty_init, ROT0, "ICE / Uniana", "Frenzy Express", MACHINE_IS_SKELETON)
+GAME(2001, frenzyxprss, 0, frenzyxprss, frenzyxprss, frenzyxprss_state, empty_init, ROT0, "ICE / Uniana", "Frenzy Express", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

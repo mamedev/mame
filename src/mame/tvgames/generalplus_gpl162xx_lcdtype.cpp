@@ -60,8 +60,8 @@ public:
 	void gpl162xx_lcdtype(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -72,7 +72,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	required_region_ptr<uint8_t> m_spirom;
 
@@ -210,8 +210,8 @@ static INPUT_PORTS_START( gpl162xx_lcdtype )
 	PORT_DIPNAME( 0x0004, 0x0000, "Show Vs in Test Mode" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0004, "0004" )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", bl_handhelds_menucontrol_device, status_r)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", bl_handhelds_menucontrol_device, data_r)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", FUNC(bl_handhelds_menucontrol_device::status_r))
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("menucontrol", FUNC(bl_handhelds_menucontrol_device::data_r))
 	PORT_DIPNAME( 0x0020, 0x0020, "P0:0020" )
 	PORT_DIPSETTING(      0x0000, "0000" )
 	PORT_DIPSETTING(      0x0020, "0020" )

@@ -60,11 +60,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void audio_io_map(address_map &map);
-	void audio_opcodes_map(address_map &map);
-	void audio_prg_map(address_map &map);
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void audio_opcodes_map(address_map &map) ATTR_COLD;
+	void audio_prg_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t cointek_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -257,4 +257,4 @@ void cointek_state::init_unkct()
 } // anonymous namespace
 
 
-GAME( 1989, unkct, 0, cointek, unkct, cointek_state, init_unkct, ROT0, "Cointek Enterprise Corp", "unknown Cointek game", MACHINE_IS_SKELETON ) // string in ROM at 0x7839: Ver 4.00 1989-08-01
+GAME( 1989, unkct, 0, cointek, unkct, cointek_state, init_unkct, ROT0, "Cointek Enterprise Corp", "unknown Cointek game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // string in ROM at 0x7839: Ver 4.00 1989-08-01

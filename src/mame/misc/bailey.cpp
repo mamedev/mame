@@ -54,10 +54,10 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 
@@ -159,5 +159,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1976, fun4,  0,    bailey, 0, bailey_state, empty_init, ROT0, "Bailey International", "Fun Four (set 1)", MACHINE_IS_SKELETON )
-GAME( 1976, fun4a, fun4, bailey, 0, bailey_state, empty_init, ROT0, "Bailey International", "Fun Four (set 2)", MACHINE_IS_SKELETON )
+GAME( 1976, fun4,  0,    bailey, 0, bailey_state, empty_init, ROT0, "Bailey International", "Fun Four (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1976, fun4a, fun4, bailey, 0, bailey_state, empty_init, ROT0, "Bailey International", "Fun Four (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

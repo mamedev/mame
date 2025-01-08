@@ -398,6 +398,7 @@ void cojag_devices(device_slot_interface &device)
 	device.option_add("hdd", COJAG_HARDDISK);
 }
 
+
 /*************************************
  *
  *  Machine init
@@ -671,6 +672,7 @@ void jaguar_state::gpuctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	m_gpu->iobus_w(offset, data, mem_mask);
 }
 
+
 /*************************************
  *
  *  32-bit access to the DSP
@@ -686,6 +688,7 @@ void jaguar_state::dspctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_dsp->iobus_w(offset, data, mem_mask);
 }
+
 
 /*************************************
  *
@@ -869,7 +872,6 @@ void jaguar_state::eeprom_data_w(offs_t offset, uint32_t data)
     run it until we get back to the spin loop.
 */
 
-
 void jaguar_state::gpu_jump_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* update the data in memory */
@@ -923,9 +925,6 @@ uint32_t jaguar_state::gpu_jump_r()
     crank through some random numbers, just not several thousand every frame.
 */
 
-#if ENABLE_SPEEDUP_HACKS
-
-
 uint32_t jaguar_state::cojagr3k_main_speedup_r()
 {
 	uint64_t curcycles = m_maincpu->total_cycles();
@@ -952,8 +951,6 @@ uint32_t jaguar_state::cojagr3k_main_speedup_r()
 	return *m_main_speedup;
 }
 
-#endif
-
 
 
 /*************************************
@@ -971,17 +968,12 @@ uint32_t jaguar_state::cojagr3k_main_speedup_r()
     makes sure we don't waste time emulating that spin loop.
 */
 
-#if ENABLE_SPEEDUP_HACKS
-
-
 uint32_t jaguar_state::main_gpu_wait_r()
 {
 	if (m_gpu_command_pending)
 		m_maincpu->spin_until_interrupt();
 	return *m_main_gpu_wait;
 }
-
-#endif
 
 
 
@@ -997,8 +989,6 @@ uint32_t jaguar_state::main_gpu_wait_r()
     Very similar to the R3000 code, except we need to verify that the value in
     *main_speedup is actually 0.
 */
-
-#if ENABLE_SPEEDUP_HACKS
 
 void jaguar_state::area51_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
@@ -1060,7 +1050,6 @@ void jaguar_state::area51mx_main_speedup_w(offs_t offset, uint32_t data, uint32_
 	m_main_speedup_last_cycles = curcycles;
 }
 
-#endif
 
 
 /*************************************
@@ -1119,8 +1108,8 @@ void jaguar_state::console_base_map(address_map &map)
 	map(0xf03000, 0xf03fff).mirror(0x008000).rw(FUNC(jaguar_state::gpu_ram_r16), FUNC(jaguar_state::gpu_ram_w16));
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w)); // might be reversed endian of the others..
 	map(0xf14000, 0xf14003).rw(FUNC(jaguar_state::joystick_r16), FUNC(jaguar_state::joystick_w16));
-	map(0xf14800, 0xf14803).rw(FUNC(jaguar_state::eeprom_clk16), FUNC(jaguar_state::eeprom_w16));  // GPI00
-	map(0xf15000, 0xf15003).r(FUNC(jaguar_state::eeprom_cs16));               // GPI01
+	map(0xf14800, 0xf14803).rw(FUNC(jaguar_state::eeprom_clk16), FUNC(jaguar_state::eeprom_w16));  // GPIO0
+	map(0xf15000, 0xf15003).r(FUNC(jaguar_state::eeprom_cs16));               // GPIO1
 	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r16), FUNC(jaguar_state::dspctrl_w16));
 	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r16), FUNC(jaguar_state::serial_w16));
 	map(0xf1b000, 0xf1cfff).rw(FUNC(jaguar_state::dsp_ram_r16), FUNC(jaguar_state::dsp_ram_w16));
@@ -1333,6 +1322,7 @@ void jaguarcd_state::jaguarcd_map(address_map &map)
 	map(0xdfff00, 0xdfff3f).rw(FUNC(jaguarcd_state::butch_regs_r16), FUNC(jaguarcd_state::butch_regs_w16));
 }
 
+
 /*************************************
  *
  *  Main CPU memory handlers
@@ -1351,10 +1341,10 @@ void jaguar_state::r3000_map(address_map &map)
 	map(0x04f02200, 0x04f022ff).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0x04f03000, 0x04f03fff).mirror(0x00008000).ram().share("gpuram");
 	map(0x04f10000, 0x04f103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
-	map(0x04f16000, 0x04f1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
-	map(0x04f17000, 0x04f17003).lr16(NAME([this] () { return uint16_t(m_system->read()); })); // GPI03
-	map(0x04f17800, 0x04f17803).w(FUNC(jaguar_state::latch_w));          // GPI04
-	map(0x04f17c00, 0x04f17c03).portr("P1_P2");      // GPI05
+	map(0x04f16000, 0x04f1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPIO2
+	map(0x04f17000, 0x04f17003).lr16(NAME([this] () { return uint16_t(m_system->read()); })); // GPIO3
+	map(0x04f17800, 0x04f17803).w(FUNC(jaguar_state::latch_w));          // GPIO4
+	map(0x04f17c00, 0x04f17c03).portr("P1_P2");      // GPIO5
 	map(0x04f1a100, 0x04f1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
 	map(0x04f1a140, 0x04f1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
 	map(0x04f1b000, 0x04f1cfff).ram().share("dspram");
@@ -1395,10 +1385,10 @@ void jaguar_state::m68020_map(address_map &map)
 	map(0xf02200, 0xf022ff).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0xf03000, 0xf03fff).mirror(0x008000).ram().share("gpuram");
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
-	map(0xf16000, 0xf1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
-	map(0xf17000, 0xf17003).lr16(NAME([this] () { return uint16_t(m_system->read()); })); // GPI03
-//  map(0xf17800, 0xf17803).w(FUNC(jaguar_state::(latch_w));          // GPI04
-	map(0xf17c00, 0xf17c03).portr("P1_P2");      // GPI05
+	map(0xf16000, 0xf1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPIO2
+	map(0xf17000, 0xf17003).lr16(NAME([this] () { return uint16_t(m_system->read()); })); // GPIO3
+//  map(0xf17800, 0xf17803).w(FUNC(jaguar_state::(latch_w));          // GPIO4
+	map(0xf17c00, 0xf17c03).portr("P1_P2");      // GPIO5
 	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
 	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
 	map(0xf1b000, 0xf1cfff).ram().share("dspram");
@@ -1488,6 +1478,7 @@ void jaguarcd_state::jagcd_gpu_dsp_map(address_map &map)
 	map(0x800000, 0x83ffff).r(FUNC(jaguarcd_state::cd_bios_r));
 	map(0xdfff00, 0xdfff3f).rw(FUNC(jaguarcd_state::butch_regs_r), FUNC(jaguarcd_state::butch_regs_w));
 }
+
 
 /*************************************
  *
@@ -1772,6 +1763,7 @@ static INPUT_PORTS_START( jaguar )
 	PORT_CONFSETTING(    0x10, "NTSC")
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  Machine driver
@@ -1874,10 +1866,10 @@ void jaguar_state::jaguar(machine_config &config)
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg").set_load_callback(FUNC(jaguar_state::quickload_cb));
+	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg,rom", attotime::from_seconds(1)).set_load_callback(FUNC(jaguar_state::quickload_cb));
 
 	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "jaguar_cart", "j64,rom,bin"));
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "jaguar_cart", "j64"));
 	cartslot.set_device_load(FUNC(jaguar_state::cart_load));
 
 	/* software lists */
@@ -1897,6 +1889,7 @@ void jaguarcd_state::jaguarcd(machine_config &config)
 
 	CDROM(config, "cdrom").set_interface("jag_cdrom");
 }
+
 
 /*************************************
  *
@@ -1930,14 +1923,13 @@ void jaguarcd_state::init_jaguarcd()
 
 std::pair<std::error_condition, std::string> jaguar_state::quickload_cb(snapshot_image_device &image)
 {
-	offs_t quickload_begin = 0x4000, start = quickload_begin, skip = 0;
+	offs_t quickload_begin = 0x1000, start = 0x4000, skip = 0;
 
-	memset(m_shared_ram, 0, 0x200000);
-	offs_t quickload_size = std::min(offs_t(image.length()), 0x200000 - quickload_begin);
+	offs_t quickload_size = std::min(offs_t(image.length()), 0x20000 - start);
 
-	image.fread( &memregion("maincpu")->base()[quickload_begin], quickload_size);
+	image.fread( &m_shared_ram[quickload_begin], quickload_size);
 
-	fix_endian(&memregion("maincpu")->base()[quickload_begin], quickload_size);
+	fix_endian(&m_shared_ram[quickload_begin], quickload_size);
 
 	/* Deal with some of the numerous homebrew header systems */
 		/* COF */
@@ -1973,18 +1965,29 @@ std::pair<std::error_condition, std::string> jaguar_state::quickload_cb(snapshot
 	else    /* JAG binary */
 	if (image.is_filetype("jag"))
 		start = 0x5000;
+	else
+	if (image.is_filetype("rom"))
+		start = 0x802000;
 
+	quickload_size = image.length();
 
 	/* Now that we have the info, reload the file */
-	if ((start != quickload_begin) || (skip))
+	if ((start + quickload_size) < 0x200000)
 	{
 		memset(m_shared_ram, 0, 0x200000);
-		image.fseek(0, SEEK_SET);
-		image.fread( &m_shared_ram[(start-skip)/4], quickload_size);
-		quickload_begin = start;
-		fix_endian(&memregion("maincpu")->base()[(start-skip)&0xfffffc], quickload_size);
+		image.fseek(skip, SEEK_SET);
+		image.fread( &m_shared_ram[start/4], quickload_size-skip);
+		fix_endian(&m_shared_ram[start/4], quickload_size-skip);
 	}
-
+	else
+	if (start >= 0x800000)
+	{
+		image.fseek(skip, SEEK_SET);
+		image.fread( &m_cart_base[(start - 0x800000) / 4], quickload_size - skip);
+		fix_endian(&m_cart_base[(start - 0x800000) / 4], quickload_size - skip);
+	}
+	else
+		return std::make_pair(image_error::UNSUPPORTED, "Unsupported start address for this quickload.");
 
 	/* Some programs are too lazy to set a stack pointer */
 	m_maincpu->set_state_int(M68K_SP, 0x1000);
@@ -2003,13 +2006,6 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state::cart_load )
 	if (!image.loaded_through_softlist())
 	{
 		size = image.length();
-
-		/* .rom files load & run at 802000 */
-		if (image.is_filetype("rom"))
-		{
-			load_offset = 0x2000;             // fix load address
-			m_cart_base[0x101] = 0x802000;    // fix exec address
-		}
 
 		/* Load cart into memory */
 		image.fread(&m_cart_base[load_offset/4], size);
@@ -2032,6 +2028,7 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state::cart_load )
 	m_maincpu->reset();
 	return std::make_pair(std::error_condition(), std::string());
 }
+
 
 /*************************************
  *
@@ -2246,7 +2243,6 @@ ROM_END
        ROM based games
 
 ****************************************/
-
 
 ROM_START( fishfren )
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for R3000 code */
@@ -2523,6 +2519,7 @@ void jaguar_state::init_area51()
 {
 	m_hacks_enabled = true;
 	cojag_common_init(0x0c0, 0x09e);
+
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;

@@ -43,15 +43,15 @@ public:
 	void init_hawk();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void hawk_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void hawk_mem(address_map &map);
-	void hawk_io(address_map &map);
+	void hawk_mem(address_map &map) ATTR_COLD;
+	void hawk_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -155,4 +155,4 @@ ROM_END
 
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY                FULLNAME      FLAGS
-COMP( 1987, hawk,    0,       0,      hawk,    hawk,  hawk_state, init_hawk, "Husky Computers Ltd", "Husky Hawk", MACHINE_IS_SKELETON )
+COMP( 1987, hawk,    0,       0,      hawk,    hawk,  hawk_state, init_hawk, "Husky Computers Ltd", "Husky Hawk", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

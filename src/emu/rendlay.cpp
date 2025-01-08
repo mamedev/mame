@@ -2147,7 +2147,7 @@ protected:
 			for (u32 y = bounds.top(); y <= bounds.bottom(); ++y)
 				std::fill_n(&dest.pix(y, bounds.left()), width, f);
 		}
-		else if (c.a)
+		else
 		{
 			// compute premultiplied color
 			u32 const a(c.a * 255.0F);
@@ -2155,6 +2155,9 @@ protected:
 			u32 const g(u32(c.g * (255.0F * 255.0F)) * a);
 			u32 const b(u32(c.b * (255.0F * 255.0F)) * a);
 			u32 const inva(255 - a);
+
+			if (!a)
+				return;
 
 			// we're translucent, add in the destination pixel contribution
 			for (u32 y = bounds.top(); y <= bounds.bottom(); ++y)
@@ -2189,6 +2192,7 @@ public:
 		u32 const g(c.g * (255.0F * 255.0F) * a);
 		u32 const b(c.b * (255.0F * 255.0F) * a);
 		u32 const inva(255 - a);
+
 		if (!a)
 			return;
 

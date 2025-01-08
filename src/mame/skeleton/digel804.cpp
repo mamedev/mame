@@ -93,8 +93,8 @@ public:
 	void digel804(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void op00(uint8_t data);
 	uint8_t ip40();
@@ -120,8 +120,8 @@ protected:
 	void acia_irq_w(int state);
 	void da_w(int state);
 
-	void z80_mem_804_1_4(address_map &map);
-	void z80_io_1_4(address_map &map);
+	void z80_mem_804_1_4(address_map &map) ATTR_COLD;
+	void z80_io_1_4(address_map &map) ATTR_COLD;
 
 	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
@@ -166,8 +166,8 @@ public:
 protected:
 	void ep804_acia_irq_w(int state);
 
-	void z80_mem_804_1_2(address_map &map);
-	void z80_io_1_2(address_map &map);
+	void z80_mem_804_1_2(address_map &map) ATTR_COLD;
+	void z80_io_1_2(address_map &map) ATTR_COLD;
 };
 
 
@@ -602,10 +602,10 @@ static INPUT_PORTS_START( digel804 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CLR") PORT_CODE(KEYCODE_MINUS)   PORT_CHAR('-')
 
 	PORT_START("MODE") // TODO, connects entirely separately from the keypad through some complicated latching logic
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KEY") PORT_CODE(KEYCODE_K)   PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_KEY )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REM") PORT_CODE(KEYCODE_R)   PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_REM )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SIM") PORT_CODE(KEYCODE_S)   PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_SIM )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OFF") PORT_CODE(KEYCODE_O)   PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_OFF )
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KEY") PORT_CODE(KEYCODE_K)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(digel804_state::mode_change), MODE_KEY)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REM") PORT_CODE(KEYCODE_R)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(digel804_state::mode_change), MODE_REM)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SIM") PORT_CODE(KEYCODE_S)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(digel804_state::mode_change), MODE_SIM)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OFF") PORT_CODE(KEYCODE_O)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(digel804_state::mode_change), MODE_OFF)
 
 	PORT_START("DEBUG") // debug jumper on the board
 	PORT_DIPNAME( 0x01, 0x01, "Debug Mode" )
@@ -788,6 +788,9 @@ ROM_START(ep804) // pcb v1.0; address mapper 804-1-2
 	ROM_SYSTEM_BIOS( 3, "promicron2k_v2.3", "Celectronic Berlin/Digelec promicron 2000 FWv2.3") // hardware 1.6
 	ROMX_LOAD("2023__1-03__be7d.m5l2764k.d41", 0x0000, 0x2000, CRC(8e5182f1) SHA1(e8409b6ace80fdaad862e6c06975aeabcf728f97), ROM_BIOS(3))
 	ROMX_LOAD("2023__2-03__c73e.m5l2764k.d42", 0x2000, 0x2000, CRC(ff7d959b) SHA1(75718fc1d98969739911cc51b6d5fef74b530e36), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 4, "ep804_v1.7", "Wavetek/Digelec EP804 FWv1.7") // hardware 1.1, all labels handwritten
+	ROMX_LOAD("804.2-1.7_3bc0.2764.d41", 0x0000, 0x2000, CRC(d39c2b51) SHA1(6e00d9c8f5037936618fd17475b72261f3e54826), ROM_BIOS(4))
+	ROMX_LOAD("804-3-1.7_1c96.2764.d42", 0x2000, 0x2000, CRC(994df376) SHA1(93bbc48b72e2126a9f40312e66ca2a87c7f67bf6), ROM_BIOS(4))
 	// on the promicron 2000, the bprom at d30 is an unlabeled TB18S030N part, but has the same contents as 804-1-2.mmi_6330-in.d30 below. it is possible the sticker fell off.
 	ROM_REGION(0x20, "proms", 0)
 	ROM_LOAD("804-1-2.mmi_6330-in.d30", 0x0000, 0x0020, CRC(30dd4721) SHA1(e4b2f5756118be4c8ab56c708dc4f42469c7e51b)) // Address mapper prom, 82s23/mmi6330/tbp18sa030 equivalent 32x8 open collector

@@ -140,9 +140,9 @@ protected:
 
 	void fdc_irq_w(int state);
 
-	void ngen386_io(address_map &map);
-	void ngen386_mem(address_map &map);
-	void ngen386i_mem(address_map &map);
+	void ngen386_io(address_map &map) ATTR_COLD;
+	void ngen386_mem(address_map &map) ATTR_COLD;
+	void ngen386i_mem(address_map &map) ATTR_COLD;
 
 	optional_device<i80186_cpu_device> m_maincpu;
 	optional_device<i386_device> m_i386cpu;
@@ -178,11 +178,11 @@ private:
 	void b38_keyboard_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t b38_crtc_r(offs_t offset, uint16_t mem_mask = ~0);
 	void b38_crtc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void ngen_io(address_map &map);
-	void ngen_mem(address_map &map);
+	void ngen_io(address_map &map) ATTR_COLD;
+	void ngen_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	optional_memory_region m_disk_rom;
 	memory_array m_vram;
@@ -1203,6 +1203,6 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1983, ngen,    0,    0, ngen,    ngen, ngen_state,    empty_init, "Convergent Technologies",  "NGEN CP-001", MACHINE_IS_SKELETON )
-COMP( 1991, ngenb38, ngen, 0, ngen386, ngen, ngen386_state, empty_init, "Financial Products Corp.", "B28/38",      MACHINE_IS_SKELETON )
-COMP( 1990, 386i,    ngen, 0, _386i,   ngen, ngen386_state, empty_init, "Convergent Technologies",  "386i",        MACHINE_IS_SKELETON )
+COMP( 1983, ngen,    0,    0, ngen,    ngen, ngen_state,    empty_init, "Convergent Technologies",  "NGEN CP-001", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1991, ngenb38, ngen, 0, ngen386, ngen, ngen386_state, empty_init, "Financial Products Corp.", "B28/38",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1990, 386i,    ngen, 0, _386i,   ngen, ngen386_state, empty_init, "Convergent Technologies",  "386i",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -68,7 +68,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void aim65_palette(palette_device &palette) const;
 	void u1_pa_w(u8 data);
@@ -94,7 +94,7 @@ private:
 
 	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	optional_device<palette_device> m_palette;
 	uint8_t m_riot_port_a = 0U;

@@ -74,19 +74,19 @@ public:
 	void maple_w(const uint32_t *data, uint32_t in_size) override;
 	virtual void maple_reset() override;
 
-	void mie_map(address_map &map);
-	void mie_port(address_map &map);
+	void mie_map(address_map &map) ATTR_COLD;
+	void mie_port(address_map &map) ATTR_COLD;
 
 protected:
 	template <uint8_t First> void set_gpio_names() { }
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_irq_reply);
 

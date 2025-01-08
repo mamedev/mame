@@ -242,20 +242,23 @@ const m6805_base_device::op_handler_table m6805_base_device::s_hc_b_ops =
 
 #undef big
 
+// to prevent the possibility of MAME locking up, don't use 0 cycles here
+#define XX 4 // illegal opcode unknown cycle count
+
 const m6805_base_device::cycle_count_table m6805_base_device::s_hmos_cycles =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 	/*0*/ 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
 	/*1*/  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
 	/*2*/  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-	/*3*/  6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 0, 6, 6, 0, 6,
-	/*4*/  4, 0, 0, 4, 4, 0, 4, 4, 4, 4, 4, 0, 4, 4, 0, 4,
-	/*5*/  4, 0, 0, 4, 4, 0, 4, 4, 4, 4, 4, 0, 4, 4, 0, 4,
-	/*6*/  7, 0, 0, 7, 7, 0, 7, 7, 7, 7, 7, 0, 7, 7, 0, 7,
-	/*7*/  6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 0, 6, 6, 0, 6,
-	/*8*/  9, 6, 0,11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	/*9*/  0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 0, 2,
-	/*A*/  2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 0, 8, 2, 0,
+	/*3*/  6,XX,XX, 6, 6,XX, 6, 6, 6, 6, 6,XX, 6, 6,XX, 6,
+	/*4*/  4,XX,XX, 4, 4,XX, 4, 4, 4, 4, 4,XX, 4, 4,XX, 4,
+	/*5*/  4,XX,XX, 4, 4,XX, 4, 4, 4, 4, 4,XX, 4, 4,XX, 4,
+	/*6*/  7,XX,XX, 7, 7,XX, 7, 7, 7, 7, 7,XX, 7, 7,XX, 7,
+	/*7*/  6,XX,XX, 6, 6,XX, 6, 6, 6, 6, 6,XX, 6, 6,XX, 6,
+	/*8*/  9, 6,XX,11,XX,XX,XX,XX,XX,XX,XX,XX,XX,XX,XX,XX,
+	/*9*/ XX,XX,XX,XX,XX,XX,XX, 2, 2, 2, 2, 2, 2, 2,XX, 2,
+	/*A*/  2, 2, 2, 2, 2, 2, 2,XX, 2, 2, 2, 2,XX, 8, 2,XX,
 	/*B*/  4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 7, 4, 5,
 	/*C*/  5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 8, 5, 6,
 	/*D*/  6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 5, 9, 6, 7,
@@ -269,14 +272,14 @@ const m6805_base_device::cycle_count_table m6805_base_device::s_cmos_cycles =
 	/*0*/  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
 	/*1*/  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
 	/*2*/  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	/*3*/  5, 0, 0, 5, 5, 0, 5, 5, 5, 5, 5, 0, 5, 4, 0, 5,
-	/*4*/  3, 0, 0, 3, 3, 0, 3, 3, 3, 3, 3, 0, 3, 3, 0, 3,
-	/*5*/  3, 0, 0, 3, 3, 0, 3, 3, 3, 3, 3, 0, 3, 3, 0, 3,
-	/*6*/  6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 0, 6, 5, 0, 6,
-	/*7*/  5, 0, 0, 5, 5, 0, 5, 5, 5, 5, 5, 0, 5, 4, 0, 5,
-	/*8*/  9, 6, 0,10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2,
-	/*9*/  0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 0, 2,
-	/*A*/  2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 0, 6, 2, 0,
+	/*3*/  5,XX,XX, 5, 5,XX, 5, 5, 5, 5, 5,XX, 5, 4,XX, 5,
+	/*4*/  3,XX,XX, 3, 3,XX, 3, 3, 3, 3, 3,XX, 3, 3,XX, 3,
+	/*5*/  3,XX,XX, 3, 3,XX, 3, 3, 3, 3, 3,XX, 3, 3,XX, 3,
+	/*6*/  6,XX,XX, 6, 6,XX, 6, 6, 6, 6, 6,XX, 6, 5,XX, 6,
+	/*7*/  5,XX,XX, 5, 5,XX, 5, 5, 5, 5, 5,XX, 5, 4,XX, 5,
+	/*8*/  9, 6,XX,10,XX,XX,XX,XX,XX,XX,XX,XX,XX,XX, 2, 2,
+	/*9*/ XX,XX,XX,XX,XX,XX,XX, 2, 2, 2, 2, 2, 2, 2,XX, 2,
+	/*A*/  2, 2, 2, 2, 2, 2, 2,XX, 2, 2, 2, 2,XX, 6, 2,XX,
 	/*B*/  3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 2, 5, 3, 4,
 	/*C*/  4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 6, 4, 5,
 	/*D*/  5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 7, 5, 6,
@@ -290,20 +293,64 @@ const m6805_base_device::cycle_count_table m6805_base_device::s_hc_cycles =
 	/*0*/  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
 	/*1*/  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
 	/*2*/  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	/*3*/  5, 0, 0, 5, 5, 0, 5, 5, 5, 5, 5, 0, 5, 4, 0, 5,
-	/*4*/  3, 0,11, 3, 3, 0, 3, 3, 3, 3, 3, 0, 3, 3, 0, 3,
-	/*5*/  3, 0, 0, 3, 3, 0, 3, 3, 3, 3, 3, 0, 3, 3, 0, 3,
-	/*6*/  6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 0, 6, 5, 0, 6,
-	/*7*/  5, 0, 0, 5, 5, 0, 5, 5, 5, 5, 5, 0, 5, 4, 0, 5,
-	/*8*/  9, 6, 0,10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2,
-	/*9*/  0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 0, 2,
-	/*A*/  2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 0, 6, 2, 0,
+	/*3*/  5,XX,XX, 5, 5,XX, 5, 5, 5, 5, 5,XX, 5, 4,XX, 5,
+	/*4*/  3,XX,11, 3, 3,XX, 3, 3, 3, 3, 3,XX, 3, 3,XX, 3,
+	/*5*/  3,XX,XX, 3, 3,XX, 3, 3, 3, 3, 3,XX, 3, 3,XX, 3,
+	/*6*/  6,XX,XX, 6, 6,XX, 6, 6, 6, 6, 6,XX, 6, 5,XX, 6,
+	/*7*/  5,XX,XX, 5, 5,XX, 5, 5, 5, 5, 5,XX, 5, 4,XX, 5,
+	/*8*/  9, 6,XX,10,XX,XX,XX,XX,XX,XX,XX,XX,XX,XX, 2, 2,
+	/*9*/ XX,XX,XX,XX,XX,XX,XX, 2, 2, 2, 2, 2, 2, 2,XX, 2,
+	/*A*/  2, 2, 2, 2, 2, 2, 2,XX, 2, 2, 2, 2,XX, 6, 2,XX,
 	/*B*/  3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 2, 5, 3, 4,
 	/*C*/  4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 6, 4, 5,
 	/*D*/  5, 5, 5, 5, 5, 5, 5, 6, 5, 5, 5, 5, 4, 7, 5, 6,
 	/*E*/  4, 4, 4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 3, 6, 4, 5,
 	/*F*/  3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 2, 5, 3, 4
 };
+
+const m6805_base_device::cycle_count_table m6805_base_device::s_hd6305_cycles =
+{
+		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+	/*0*/  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+	/*1*/  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+	/*2*/  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	/*3*/  5,XX,XX, 5, 5,XX, 5, 5, 5, 5, 5,XX, 5, 4,XX, 5,
+	/*4*/  2,XX,XX, 2, 2,XX, 2, 2, 2, 2, 2,XX, 2, 2,XX, 2,
+	/*5*/  2,XX,XX, 2, 2,XX, 2, 2, 2, 2, 2,XX, 2, 2,XX, 2,
+	/*6*/  6,XX,XX, 6, 6,XX, 6, 6, 6, 6, 6,XX, 6, 5,XX, 6,
+	/*7*/  5,XX,XX, 5, 5,XX, 5, 5, 5, 5, 5,XX, 5, 4,XX, 5,
+	/*8*/  8, 5,XX,10,XX,XX,XX,XX,XX,XX,XX,XX,XX, 2, 4, 4,
+	/*9*/ XX,XX,XX,XX,XX,XX,XX, 2, 1, 1, 2, 2, 2, 1,XX, 2,
+	/*A*/  2, 2, 2, 2, 2, 2, 2,XX, 2, 2, 2, 2,XX, 5, 2,XX,
+	/*B*/  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 5, 3, 3,
+	/*C*/  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 6, 4, 4,
+	/*D*/  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 6, 5, 5,
+	/*E*/  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 5, 4, 4,
+	/*F*/  3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 2, 5, 3, 4
+};
+
+const m6805_base_device::cycle_count_table m6805_base_device::s_hd63705_cycles =
+{
+		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+	/*0*/  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+	/*1*/  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+	/*2*/  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	/*3*/  5,XX,XX, 5, 5,XX, 5, 5, 5, 5, 5,XX, 5, 4,XX, 5,
+	/*4*/  2,XX,11, 2, 2,XX, 2, 2, 2, 2, 2,XX, 2, 2,XX, 2,
+	/*5*/  2,XX,XX, 2, 2,XX, 2, 2, 2, 2, 2,XX, 2, 2,XX, 2,
+	/*6*/  6,XX,XX, 6, 6,XX, 6, 6, 6, 6, 6,XX, 6, 5,XX, 6,
+	/*7*/  5,XX,XX, 5, 5,XX, 5, 5, 5, 5, 5,XX, 5, 4,XX, 5,
+	/*8*/  9, 6,XX,11,XX,XX,XX,XX,XX,XX,XX,XX,XX, 2, 4, 4,
+	/*9*/ XX,XX,XX,XX,XX,XX,XX, 2, 1, 1, 2, 2, 2, 1,XX, 2,
+	/*A*/  2, 2, 2, 2, 2, 2, 2,XX, 2, 2, 2, 2,XX, 6, 2,XX,
+	/*B*/  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 6, 3, 3,
+	/*C*/  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 7, 4, 4,
+	/*D*/  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 7, 5, 5,
+	/*E*/  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 6, 4, 4,
+	/*F*/  3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 2, 6, 3, 4
+};
+
+#undef XX // /illegal opcode unknown cc
 
 
 //-------------------------------------------------
@@ -349,11 +396,7 @@ void m6805_base_device::device_start()
 		space(AS_PROGRAM).specific(m_program13);
 	}
 
-	// get the minimum not including the zero placeholders for illegal instructions
-	m_min_cycles = *std::min_element(
-			std::begin(m_params.m_cycles),
-			std::end(m_params.m_cycles),
-			[] (u8 x, u8 y) { return u8(x - 1) < u8(y - 1); });
+	m_min_cycles = *std::min_element(std::begin(m_params.m_cycles), std::end(m_params.m_cycles));
 	m_max_cycles = *std::max_element(std::begin(m_params.m_cycles), std::end(m_params.m_cycles));
 
 	// set our instruction counter
@@ -395,7 +438,7 @@ void m6805_base_device::device_reset()
 
 	m_nmi_state = 0;
 
-	/* IRQ disabled */
+	// IRQ disabled
 	SEI;
 
 	if (m_params.m_addr_width > 14)
@@ -450,21 +493,23 @@ bool m6805_base_device::test_il()
 
 void m6805_base_device::interrupt_vector()
 {
+	m_pending_interrupts &= ~(1 << M6805_IRQ_LINE);
 	if (m_params.m_addr_width > 14)
 		rm16<true>(0xfffa & m_params.m_vector_mask, m_pc);
 	else
 		rm16<false>(0xfffa & m_params.m_vector_mask, m_pc);
 }
 
-/* Generate interrupts */
+// Generate interrupts
 void m6805_base_device::interrupt()
 {
-	/* the 6805 latches interrupt requests internally, so we don't clear */
-	/* pending_interrupts until the interrupt is taken, no matter what the */
-	/* external IRQ pin does. */
+	// the 6805 latches interrupt requests internally, so we don't clear
+	// pending_interrupts until the interrupt is taken, no matter what the
+	// external IRQ pin does.
 
-	if (BIT(m_pending_interrupts, HD63705_INT_NMI))
+	if (m_pending_interrupts != 0 && (CC & IFLAG) == 0)
 	{
+		// standard IRQ
 		if (m_params.m_addr_width > 14) {
 			pushword<true>(m_pc);
 			pushbyte<true>(m_x);
@@ -479,47 +524,14 @@ void m6805_base_device::interrupt()
 			pushbyte<false>(m_cc);
 		}
 		SEI;
-		/* no vectors supported, just do the callback to clear irq_state if needed */
+
+		// no vectors supported, just do the callback to clear irq_state if needed
 		standard_irq_callback(0, m_pc.w.l);
 
-		if (m_params.m_addr_width > 14)
-			rm16<true>(0x1ffc, m_pc);
-		else
-			rm16<false>(0x1ffc, m_pc);
-		m_pending_interrupts &= ~(1 << HD63705_INT_NMI);
+		interrupt_vector();
 
 		m_icount -= 11;
 		burn_cycles(11);
-	}
-	else if ((m_pending_interrupts & ((1 << M6805_IRQ_LINE) | HD63705_INT_MASK)) != 0)
-	{
-		if ((CC & IFLAG) == 0)
-		{
-			/* standard IRQ */
-			if (m_params.m_addr_width > 14) {
-				pushword<true>(m_pc);
-				pushbyte<true>(m_x);
-				pushbyte<true>(m_a);
-				pushbyte<true>(m_cc);
-			}
-			else
-			{
-				pushword<false>(m_pc);
-				pushbyte<false>(m_x);
-				pushbyte<false>(m_a);
-				pushbyte<false>(m_cc);
-			}
-			SEI;
-			/* no vectors supported, just do the callback to clear irq_state if needed */
-			standard_irq_callback(0, m_pc.w.l);
-
-			interrupt_vector();
-
-			m_pending_interrupts &= ~(1 << M6805_IRQ_LINE);
-
-			m_icount -= 11;
-			burn_cycles(11);
-		}
 	}
 }
 
@@ -581,21 +593,10 @@ uint32_t m6805_base_device::execute_max_cycles() const noexcept
 }
 
 
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t m6805_base_device::execute_input_lines() const noexcept
-{
-	return 9;
-}
-
-
-/* execute instructions on this CPU until icount expires */
+// execute instructions on this CPU until icount expires
 void m6805_base_device::execute_run()
 {
-	S = SP_ADJUST( S );     /* Taken from CPU_SET_CONTEXT when pointer'afying */
+	S = SP_ADJUST( S ); // Taken from CPU_SET_CONTEXT when pointer'ifying
 
 	do
 	{
@@ -632,6 +633,7 @@ void m6805_base_device::execute_set_input(int inputnum, int state)
 /****************************************************************************
  * M68HC05EG section
  ****************************************************************************/
+
 m68hc05eg_device::m68hc05eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m6805_base_device(
 			mconfig,
@@ -684,183 +686,5 @@ std::unique_ptr<util::disasm_interface> m68hc05eg_device::create_disassembler()
 	return std::make_unique<m68hc05_disassembler>();
 }
 
-/****************************************************************************
- * HD63705 section
- ****************************************************************************/
-hd6305_device::hd6305_device(
-		machine_config const &mconfig,
-		char const *tag,
-		device_t *owner,
-		uint32_t clock,
-		device_type const type,
-		configuration_params const &params,
-		address_map_constructor internal_map)
-	: m6805_base_device(mconfig, tag, owner, clock, type, params, internal_map)
-{
-}
-
-hd6305v0_device::hd6305v0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6305_device(
-			mconfig,
-			tag,
-			owner,
-			clock,
-			HD6305V0,
-			{ s_hmos_s_ops, s_hmos_cycles, 14, 0x00ff, 0x00c0, 0x1fff, 0x1ffc },
-			address_map_constructor(FUNC(hd6305v0_device::internal_map), this))
-{
-}
-
-void hd6305v0_device::internal_map(address_map &map)
-{
-	// TODO: ports, timer, SCI
-	map(0x0040, 0x00ff).ram();
-	map(0x1000, 0x1fff).rom().region(DEVICE_SELF, 0);
-}
-
-hd6305y2_device::hd6305y2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6305_device(
-			mconfig,
-			tag,
-			owner,
-			clock,
-			HD6305Y2,
-			{ s_hmos_s_ops, s_hmos_cycles, 14, 0x00ff, 0x00c0, 0x1fff, 0x1ffc },
-			address_map_constructor(FUNC(hd6305y2_device::internal_map), this))
-{
-}
-
-void hd6305y2_device::internal_map(address_map &map)
-{
-	// TODO: ports, timer, SCI
-	map(0x0040, 0x013f).ram();
-}
-
-hd63705z0_device::hd63705z0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hd6305_device(
-			mconfig,
-			tag,
-			owner,
-			clock,
-			HD63705Z0,
-			{ s_hmos_b_ops, s_hmos_cycles, 16, 0x017f, 0x0100, 0x1fff, 0x1ffa },
-			address_map_constructor(FUNC(hd63705z0_device::internal_map), this))
-{
-}
-
-void hd63705z0_device::internal_map(address_map &map)
-{
-	// TODO: ports, timer, SCI
-	map(0x0040, 0x01bf).ram();
-	map(0x01c0, 0x1fff).rom().region(DEVICE_SELF, 0x01c0);
-}
-
-void hd6305_device::device_reset()
-{
-	m6805_base_device::device_reset();
-}
-
-void hd6305_device::execute_set_input(int inputnum, int state)
-{
-	if (inputnum == INPUT_LINE_NMI)
-	{
-		if (m_nmi_state != state)
-		{
-			m_nmi_state = state;
-
-			if (state != CLEAR_LINE)
-			{
-				m_pending_interrupts |= 1 << HD63705_INT_NMI;
-			}
-		}
-	}
-	else if (inputnum <= HD63705_INT_ADCONV)
-	{
-		if (m_irq_state[inputnum] != state)
-		{
-			m_irq_state[inputnum] = state;
-
-			if (state != CLEAR_LINE)
-			{
-				m_pending_interrupts |= 1 << inputnum;
-			}
-		}
-	}
-}
-
-void hd6305_device::interrupt_vector()
-{
-	/* Need to add emulation of other interrupt sources here KW-2/4/99 */
-	/* This is just a quick patch for Namco System 2 operation         */
-
-	if ((m_pending_interrupts & (1 << HD63705_INT_IRQ1)) != 0)
-	{
-		m_pending_interrupts &= ~(1 << HD63705_INT_IRQ1);
-		if (m_params.m_addr_width > 14)
-			rm16<true>(0x1ff8, m_pc);
-		else
-			rm16<false>(0x1ff8, m_pc);
-	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_IRQ2)) != 0)
-	{
-		m_pending_interrupts &= ~(1 << HD63705_INT_IRQ2);
-		if (m_params.m_addr_width > 14)
-			rm16<true>(0x1fec, m_pc);
-		else
-			rm16<false>(0x1fec, m_pc);
-	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_ADCONV)) != 0)
-	{
-		m_pending_interrupts &= ~(1 << HD63705_INT_ADCONV);
-		if (m_params.m_addr_width > 14)
-			rm16<true>(0x1fea, m_pc);
-		else
-			rm16<false>(0x1fea, m_pc);
-	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_TIMER1)) != 0)
-	{
-		m_pending_interrupts &= ~(1 << HD63705_INT_TIMER1);
-		if (m_params.m_addr_width > 14)
-			rm16<true>(0x1ff6, m_pc);
-		else
-			rm16<false>(0x1ff6, m_pc);
-	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_TIMER2)) != 0)
-	{
-		m_pending_interrupts &= ~(1 << HD63705_INT_TIMER2);
-		if (m_params.m_addr_width > 14)
-			rm16<true>(0x1ff4, m_pc);
-		else
-			rm16<false>(0x1ff4, m_pc);
-	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_TIMER3)) != 0)
-	{
-		m_pending_interrupts &= ~(1<<HD63705_INT_TIMER3);
-		if (m_params.m_addr_width > 14)
-			rm16<true>(0x1ff2, m_pc);
-		else
-			rm16<false>(0x1ff2, m_pc);
-	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_PCI)) != 0)
-	{
-		m_pending_interrupts &= ~(1 << HD63705_INT_PCI);
-		if (m_params.m_addr_width > 14)
-			rm16<true>(0x1ff0, m_pc);
-		else
-			rm16<false>(0x1ff0, m_pc);
-	}
-	else if ((m_pending_interrupts & (1 << HD63705_INT_SCI)) != 0)
-	{
-		m_pending_interrupts &= ~(1 << HD63705_INT_SCI);
-		if (m_params.m_addr_width > 14)
-			rm16<true>(0x1fee, m_pc);
-		else
-			rm16<false>(0x1fee, m_pc);
-	}
-}
-
 
 DEFINE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device, "m68hc05eg", "Motorola MC68HC05EG")
-DEFINE_DEVICE_TYPE(HD6305V0,  hd6305v0_device,  "hd6305v0",  "Hitachi HD6305V0")
-DEFINE_DEVICE_TYPE(HD6305Y2,  hd6305y2_device,  "hd6305y2",  "Hitachi HD6305Y2")
-DEFINE_DEVICE_TYPE(HD63705Z0, hd63705z0_device, "hd63705z0", "Hitachi HD63705Z0")

@@ -72,7 +72,7 @@ public:
 	void dx7(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -100,8 +100,8 @@ private:
 
 	void dx7_dac_w  (offs_t offset, u8 data) {}; // TODO: DAC control
 
-	void main_map(address_map &map);
-	void sub_map (address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map (address_map &map) ATTR_COLD;
 
 	required_device<hd6303r_cpu_device> m_maincpu;
 	required_device<hd6805s1_device> m_subcpu;

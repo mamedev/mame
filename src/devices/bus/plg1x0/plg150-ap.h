@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-#ifndef MAME_BUS_PLG1X0_PLG150AP_H
-#define MAME_BUS_PLG1X0_PLG150AP_H
+#ifndef MAME_BUS_PLG1X0_PLG150_AP_H
+#define MAME_BUS_PLG1X0_PLG150_AP_H
 
 // Yamaha PLG150-AP
 

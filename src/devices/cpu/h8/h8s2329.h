@@ -47,8 +47,8 @@ protected:
 	required_device<h8_port_device> m_port6;
 
 	virtual void notify_standby(int state) override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	void map_2321(address_map &map);
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	void map_2321(address_map &map) ATTR_COLD;
 };
 
 class h8s2320_device : public h8s2321_device {
@@ -66,10 +66,10 @@ protected:
 
 	h8s2320_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 rom_size, u32 ram_size);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	void map_2320(address_map &map);
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	void map_2320(address_map &map) ATTR_COLD;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void execute_set_input(int inputnum, int state) override;
 };
 

@@ -24,8 +24,8 @@ public:
 protected:
 	m950x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, int capacity);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void process_instruction(const uint8_t insn);
 

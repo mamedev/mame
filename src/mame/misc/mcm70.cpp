@@ -46,8 +46,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(start);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t status_r(offs_t offset);
@@ -57,8 +57,8 @@ private:
 
 	uint8_t keyboard_r(offs_t offset);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void mcm70_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -254,7 +254,7 @@ static INPUT_PORTS_START( mcm70 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)   PORT_CODE(KEYCODE_RSHIFT)   PORT_NAME("SHIFT")
 
 	PORT_START("START")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) PORT_NAME("START") PORT_CHANGED_MEMBER(DEVICE_SELF, mcm70_state, start, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) PORT_NAME("START") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mcm70_state::start), 0)
 INPUT_PORTS_END
 
 
@@ -341,19 +341,19 @@ uint32_t mcm70_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			}
 
 			// gap around pixel
-			if (x < 222)
+			if (x < 221)
 			{
 				bitmap.pix(yl,     xl + 3) = pen[0];
 				bitmap.pix(yl + 1, xl + 3) = pen[0];
 				bitmap.pix(yl + 2, xl + 3) = pen[0];
 			}
-			if (y < 7)
+			if (y < 6)
 			{
 				bitmap.pix(yl + 3, xl    ) = pen[0];
 				bitmap.pix(yl + 3, xl + 1) = pen[0];
 				bitmap.pix(yl + 3, xl + 2) = pen[0];
 			}
-			if (x < 222 && y < 7)
+			if (x < 221 && y < 6)
 			{
 				bitmap.pix(yl + 3, xl + 3) = pen[0];
 			}
@@ -383,7 +383,7 @@ void mcm70_state::mcm70(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(mcm70_state::screen_update));
 	screen.set_size(887, 27);
-	screen.set_visarea(0, 886, 0, 26);
+	screen.set_visarea_full();
 	PALETTE(config, m_palette, FUNC(mcm70_state::mcm70_palette), 5);
 }
 

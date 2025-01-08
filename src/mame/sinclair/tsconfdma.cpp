@@ -4,10 +4,16 @@
 
     TS-Conf (ZX-Evolution) DMA Controller
 
+TODO:
+* Each memory cycle aligned to 7MHz clock and taking 1 tick
+
 **********************************************************************/
 
 #include "emu.h"
 #include "tsconfdma.h"
+
+#define VERBOSE ( LOG_GENERAL )
+#include "logmacro.h"
 
 tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TSCONF_DMA, tag, owner, clock),
@@ -36,11 +42,16 @@ void tsconfdma_device::device_start()
 	save_item(NAME(m_m2));
 	save_item(NAME(m_asz));
 	save_item(NAME(m_task));
+	save_item(NAME(m_tx_s_addr));
+	save_item(NAME(m_tx_d_addr));
+	save_item(NAME(m_tx_data));
+	save_item(NAME(m_tx_block_num));
+	save_item(NAME(m_tx_block));
 }
 
 void tsconfdma_device::device_reset()
 {
-	m_dma_clock->adjust(attotime::never);
+	m_dma_clock->reset();
 
 	m_block_num = 0;
 	m_ready = ASSERT_LINE;
@@ -98,9 +109,12 @@ void tsconfdma_device::set_block_num_h(u8 num_h)
 	m_block_num = (m_block_num & 0x00ff) | ((num_h & 0x03) << 8);
 }
 
-void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_opt)
+void tsconfdma_device::start_tx(u8 task, bool s_align, bool d_align, bool align_opt)
 {
-	m_task = dev;
+	if (!m_ready)
+		LOG("Starting new tx without previous completed\n");
+
+	m_task = task;
 	m_align_s = s_align;
 	m_align_d = d_align;
 	m_asz = align_opt;
@@ -109,127 +123,90 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 	m_m2 = m_asz ? 0x0001ff : 0x0000ff;
 	m_ready = CLEAR_LINE;
 
-	// TODO Transfers 2 byte/cycle at 7MHz
-	m_dma_clock->adjust(attotime::from_ticks(m_block_num + 1, 7_MHz_XTAL));
+	m_tx_block_num = 0;
+	m_tx_block = 0;
+	m_dma_clock->adjust(attotime::from_ticks(1, clock() / 6), 0, attotime::from_ticks(1, clock() / 6));
 }
 
 TIMER_CALLBACK_MEMBER(tsconfdma_device::dma_clock)
 {
+	if (m_tx_block == 0)
+	{
+		m_tx_s_addr = m_address_s;
+		m_tx_d_addr = m_address_d;
+	}
+
 	switch (m_task)
 	{
 	case 0b0001: // Mem -> Mem
-		for (u16 block = 0; block <= m_block_num; block++)
-		{
-			auto s_addr = m_address_s;
-			auto d_addr = m_address_d;
-			for (u16 len = 0; len <= m_block_len; len++)
-			{
-				m_out_mreq_cb(d_addr, m_in_mreq_cb(s_addr));
-				s_addr = m_align_s ? ((s_addr & m_m1) | ((s_addr + 2) & m_m2)) : ((s_addr + 2) & 0x3fffff);
-				d_addr = m_align_d ? ((d_addr & m_m1) | ((d_addr + 2) & m_m2)) : ((d_addr + 2) & 0x3fffff);
-			}
-			m_address_s = m_align_s ? (m_address_s + m_align) : s_addr;
-			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
-		}
+		m_out_mreq_cb(m_tx_d_addr, m_in_mreq_cb(m_tx_s_addr));
 		break;
 
 	case 0b0010: // SPI -> Mem
-		for (u16 block = 0; block <= m_block_num; block++)
-		{
-			auto d_addr = m_address_d;
-			for (u16 len = 0; len <= m_block_len; len++)
-			{
-				m_out_mreq_cb(d_addr, m_in_mspi_cb());
-				d_addr = m_align_d ? ((d_addr & m_m1) | ((d_addr + 2) & m_m2)) : ((d_addr + 2) & 0x3fffff);
-			}
-			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
-		}
+		m_out_mreq_cb(m_tx_d_addr, m_in_mspi_cb());
 		break;
 
 	case 0b0100: // Fill
-		for (u16 block = 0; block <= m_block_num; block++)
+		if (!m_tx_block_num && !m_tx_block)
 		{
-			u16 data = m_in_mreq_cb(m_address_s);
-			auto d_addr = m_address_d;
-			for (u16 len = 0; len <= m_block_len; len++)
-			{
-				m_out_mreq_cb(d_addr, data);
-				d_addr = m_align_d ? ((d_addr & m_m1) | ((d_addr + 2) & m_m2)) : ((d_addr + 2) & 0x3fffff);
-			}
-			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
+			m_tx_data = m_in_mreq_cb(m_address_s);
 		}
+		m_out_mreq_cb(m_tx_d_addr, m_tx_data);
 		break;
 
 	case 0b1001: // Blt -> Mem
-		for (u16 block = 0; block <= m_block_num; block++)
 		{
-			auto s_addr = m_address_s;
-			auto d_addr = m_address_d;
-			for (u16 len = 0; len <= m_block_len; len++)
+			u16 d_val = m_in_mreq_cb(m_tx_d_addr);
+			u16 s_val = m_in_mreq_cb(m_tx_s_addr);
+			if (m_asz)
 			{
-				u16 d_val = m_in_mreq_cb(d_addr);
-				u16 s_val = m_in_mreq_cb(s_addr);
-				if (m_asz)
-				{
-					d_val = (d_val & 0xff00) | (((s_val & 0x00ff) ? s_val : d_val) & 0x00ff);
-					d_val = (d_val & 0x00ff) | (((s_val & 0xff00) ? s_val : d_val) & 0xff00);
-				}
-				else
-				{
-					d_val = (d_val & 0xfff0) | (((s_val & 0x000f) ? s_val : d_val) & 0x000f);
-					d_val = (d_val & 0xff0f) | (((s_val & 0x00f0) ? s_val : d_val) & 0x00f0);
-					d_val = (d_val & 0xf0ff) | (((s_val & 0x0f00) ? s_val : d_val) & 0x0f00);
-					d_val = (d_val & 0x0fff) | (((s_val & 0xf000) ? s_val : d_val) & 0xf000);
-				}
-				m_out_mreq_cb(d_addr, d_val);
-				s_addr = m_align_s ? ((s_addr & m_m1) | ((s_addr + 2) & m_m2)) : ((s_addr + 2) & 0x3fffff);
-				d_addr = m_align_d ? ((d_addr & m_m1) | ((d_addr + 2) & m_m2)) : ((d_addr + 2) & 0x3fffff);
+				d_val = (d_val & 0xff00) | (((s_val & 0x00ff) ? s_val : d_val) & 0x00ff);
+				d_val = (d_val & 0x00ff) | (((s_val & 0xff00) ? s_val : d_val) & 0xff00);
 			}
-			m_address_s = m_align_s ? (m_address_s + m_align) : s_addr;
-			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
+			else
+			{
+				d_val = (d_val & 0xfff0) | (((s_val & 0x000f) ? s_val : d_val) & 0x000f);
+				d_val = (d_val & 0xff0f) | (((s_val & 0x00f0) ? s_val : d_val) & 0x00f0);
+				d_val = (d_val & 0xf0ff) | (((s_val & 0x0f00) ? s_val : d_val) & 0x0f00);
+				d_val = (d_val & 0x0fff) | (((s_val & 0xf000) ? s_val : d_val) & 0xf000);
+			}
+			m_out_mreq_cb(m_tx_d_addr, d_val);
 		}
 		break;
 
 	case 0b1100: // RAM -> CRAM
-		for (u16 block = 0; block <= m_block_num; block++)
-		{
-			auto s_addr = m_address_s;
-			auto d_addr = m_address_d;
-			for (u16 len = 0; len <= m_block_len; len++)
-			{
-				m_out_cram_cb(d_addr, m_in_mreq_cb(s_addr));
-				s_addr = m_align_s ? ((s_addr & m_m1) | ((s_addr + 2) & m_m2)) : ((s_addr + 2) & 0x3fffff);
-				d_addr = m_align_d ? ((d_addr & m_m1) | ((d_addr + 2) & m_m2)) : ((d_addr + 2) & 0x3fffff);
-			}
-			m_address_s = m_align_s ? (m_address_s + m_align) : s_addr;
-			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
-		}
+		m_out_cram_cb(m_tx_d_addr, m_in_mreq_cb(m_tx_s_addr));
 		break;
 
 	case 0b1101: // RAM -> SFILE
-		for (u16 block = 0; block <= m_block_num; block++)
-		{
-			auto s_addr = m_address_s;
-			auto d_addr = m_address_d;
-			for (u16 len = 0; len <= m_block_len; len++)
-			{
-				m_out_sfile_cb(d_addr, m_in_mreq_cb(s_addr));
-				s_addr = m_align_s ? ((s_addr & m_m1) | ((s_addr + 2) & m_m2)) : ((s_addr + 2) & 0x3fffff);
-				d_addr = m_align_d ? ((d_addr & m_m1) | ((d_addr + 2) & m_m2)) : ((d_addr + 2) & 0x3fffff);
-			}
-			m_address_s = m_align_s ? (m_address_s + m_align) : s_addr;
-			m_address_d = m_align_d ? (m_address_d + m_align) : d_addr;
-		}
+		m_out_sfile_cb(m_tx_d_addr, m_in_mreq_cb(m_tx_s_addr));
 		break;
 
 	default:
-		logerror("'tsdma': TX %02X: %06X (%02X:%04X) -> %06X\n", m_task, m_address_s, m_block_len, m_block_num, m_address_d);
+		LOG("Unknown task %02X: %06X (%02X:%04X) -> %06X\n", m_task, m_address_s, m_block_len, m_block_num, m_address_d);
+		m_tx_block_num = m_block_num;
+		m_tx_block = m_block_len;
 		break;
 	}
 
-	m_dma_clock->adjust(attotime::never);
-	m_ready = ASSERT_LINE;
-	m_on_ready_cb(0);
+	m_tx_s_addr = m_align_s ? ((m_tx_s_addr & m_m1) | ((m_tx_s_addr + 2) & m_m2)) : ((m_tx_s_addr + 2) & 0x3fffff);
+	m_tx_d_addr = m_align_d ? ((m_tx_d_addr & m_m1) | ((m_tx_d_addr + 2) & m_m2)) : ((m_tx_d_addr + 2) & 0x3fffff);
+
+	++m_tx_block;
+	if (m_tx_block > m_block_len)
+	{
+		m_address_s = m_align_s ? (m_address_s + m_align) : m_tx_s_addr;
+		m_address_d = m_align_d ? (m_address_d + m_align) : m_tx_d_addr;
+
+		m_tx_block = 0;
+		++m_tx_block_num;
+		if (m_tx_block_num > m_block_num)
+		{
+			m_dma_clock->reset();
+			m_ready = ASSERT_LINE;
+			m_on_ready_cb(1);
+		}
+	}
 }
 
 // device type definition

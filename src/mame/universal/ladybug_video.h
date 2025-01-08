@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_UNIVERSAL_LADYBUG_H
-#define MAME_UNIVERSAL_LADYBUG_H
+#ifndef MAME_UNIVERSAL_LADYBUG_VIDEO_H
+#define MAME_UNIVERSAL_LADYBUG_VIDEO_H
 
 #pragma once
 
@@ -25,7 +25,7 @@ public:
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, rectangle const &cliprect, bool flip);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -41,4 +41,4 @@ private:
 
 DECLARE_DEVICE_TYPE(LADYBUG_VIDEO, ladybug_video_device)
 
-#endif // MAME_UNIVERSAL_LADYBUG_H
+#endif // MAME_UNIVERSAL_LADYBUG_VIDEO_H

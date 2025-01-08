@@ -14,26 +14,26 @@ class mga2064w_device : public pci_card_device, public device_memory_interface {
 public:
 	mga2064w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void legacy_memory_map(address_map &map);
-	void legacy_io_map(address_map &map);
+	void legacy_memory_map(address_map &map) ATTR_COLD;
+	void legacy_io_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	void mgabase1_map(address_map &map);
-	void mgabase2_map(address_map &map);
+	void mgabase1_map(address_map &map) ATTR_COLD;
+	void mgabase2_map(address_map &map) ATTR_COLD;
 
-	void dwgreg_map(address_map &map);
+	void dwgreg_map(address_map &map) ATTR_COLD;
 
 	u32 dmawin_idump_r(offs_t offset, u32 mem_mask = ~0);
 	void dmawin_iload_w(offs_t offset, u32 data, u32 mem_mask = ~0);

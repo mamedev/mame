@@ -170,9 +170,9 @@ protected:
 	bitmap_ind16 m_typewriter_bitmap;
 	int m_pos = 0;
 	int m_case_shift = 0;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void tx0_palette(palette_device &palette) const;
 	uint32_t screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank_tx0(int state);
@@ -213,8 +213,8 @@ protected:
 	void tx0_io_reset_callback(int state);
 	void magtape_callback();
 
-	void tx0_64kw_map(address_map &map);
-	void tx0_8kw_map(address_map &map);
+	void tx0_64kw_map(address_map &map) ATTR_COLD;
+	void tx0_8kw_map(address_map &map) ATTR_COLD;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

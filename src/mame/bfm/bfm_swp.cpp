@@ -131,14 +131,14 @@ public:
 	}
 
 	void bfm_swp(machine_config &config);
-	void bfm_swp_map(address_map &map);
+	void bfm_swp_map(address_map &map) ATTR_COLD;
 protected:
 
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
 	required_region_ptr<uint16_t> m_cpuregion;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 uint16_t bfm_swp_state::bfm_swp_mem_r(offs_t offset, uint16_t mem_mask)
@@ -297,7 +297,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, c3_rtime, 0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "Radio Times (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
-GAME( 199?, c3_telly, 0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
-GAME( 199?, c3_totp,  0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "Top of the Pops (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )
-GAME( 199?, c3_ppays, 0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "The Phrase That Pays (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_rtime, 0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "Radio Times (Bellfruit) (Cobra 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, c3_telly, 0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, c3_totp,  0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "Top of the Pops (Bellfruit) (Cobra 3?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, c3_ppays, 0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "The Phrase That Pays (Bellfruit) (Cobra 3?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

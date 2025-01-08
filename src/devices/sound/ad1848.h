@@ -22,9 +22,9 @@ public:
 	void dack_w(uint8_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_tick);
 
@@ -55,6 +55,7 @@ private:
 	uint16_t m_count;
 	uint32_t m_samples;
 	uint8_t m_sam_cnt;
+	uint16_t m_calibration_cycles;
 	bool m_play, m_mce, m_trd, m_irq;
 	devcb_write_line m_irq_cb;
 	devcb_write_line m_drq_cb;

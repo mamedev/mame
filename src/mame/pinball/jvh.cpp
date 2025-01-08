@@ -48,13 +48,13 @@ public:
 	void jvh3(machine_config &config);
 
 private:
-	void escape_io(address_map &map);
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
-	void movmastr_io(address_map &map);
+	void escape_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void movmastr_io(address_map &map) ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	output_finder<50> m_digits;
 	output_finder<80> m_io_outputs; // ?? solenoids + ?? lamps
 };
@@ -247,7 +247,7 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1986, icemania, 0, jvh,  jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Ice Mania",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, escape,   0, jvh,  jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Escape",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, movmastr, 0, jvh2, jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Movie Masters",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, formula1, 0, jvh3, jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Formula 1",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, icemania, 0, jvh,  jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Ice Mania",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, escape,   0, jvh,  jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Escape",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, movmastr, 0, jvh2, jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Movie Masters",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, formula1, 0, jvh3, jvh, jvh_state, empty_init, ROT0, "Jac Van Ham (Royal)", "Formula 1",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

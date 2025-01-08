@@ -1380,18 +1380,6 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/vic4567.h,VIDEOS["VIC4567"] = true
---------------------------------------------------
-
-if (VIDEOS["VIC4567"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/vic4567.cpp",
-		MAME_DIR .. "src/devices/video/vic4567.h",
-	}
-end
-
---------------------------------------------------
---
 --@src/devices/video/v9938.h,VIDEOS["V9938"] = true
 --------------------------------------------------
 

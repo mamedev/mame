@@ -118,8 +118,8 @@ public:
 	void falco500(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -132,9 +132,9 @@ private:
 	required_shared_ptr<uint8_t> m_charram;
 	required_device<f5220_kbd_device> m_kbd;
 
-	void mem_map(address_map &map);
-	void bank_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void bank_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t asic_data_r();
 	uint8_t asic_status_r();
@@ -609,13 +609,11 @@ void falco500_state::falco500(machine_config &config)
 	porta.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
 	porta.cts_handler().set("sio", FUNC(z80sio_device::ctsa_w));
 	porta.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
-	porta.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 
 	rs232_port_device &portb(RS232_PORT(config, "portb", default_rs232_devices, nullptr));
 	portb.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
 	portb.cts_handler().set("sio", FUNC(z80sio_device::ctsb_w));
 	portb.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
-	portb.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -658,5 +656,5 @@ ROM_END
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE   INPUT  CLASS            INIT        COMPANY                FULLNAME       FLAGS
 COMP( 1987, falco5220e, 0,          0,      falco500, 0,     falco500_state, empty_init, "Falco Data Products", "Falco 5220e", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1991, falco500e,  falco5220e, 0,      falco500, 0,     falco500_state, empty_init, "Falco Data Products", "Falco 500e",  MACHINE_IS_SKELETON )
-COMP( 1989, falco5220s, falco5220e, 0,      falco500, 0,     falco500_state, empty_init, "Falco Data Products", "Falco 5220s", MACHINE_IS_SKELETON )
+COMP( 1991, falco500e,  falco5220e, 0,      falco500, 0,     falco500_state, empty_init, "Falco Data Products", "Falco 500e",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1989, falco5220s, falco5220e, 0,      falco500, 0,     falco500_state, empty_init, "Falco Data Products", "Falco 5220s", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

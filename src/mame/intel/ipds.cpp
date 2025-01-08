@@ -42,9 +42,9 @@ private:
 	void kbd_put(u8 data);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	uint8_t m_term_data = 0U;
-	virtual void machine_reset() override;
-	void ipds_io(address_map &map);
-	void ipds_mem(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	void ipds_io(address_map &map) ATTR_COLD;
+	void ipds_mem(address_map &map) ATTR_COLD;
 };
 
 uint8_t ipds_state::ipds_b0_r()

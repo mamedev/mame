@@ -44,8 +44,8 @@ private:
 	template<int N> void usart_w(offs_t offset, u8 data);
 	u8 keyboard_r(offs_t offset);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<scn2651_device, 2> m_usart;
@@ -303,4 +303,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1981, aaa, 0, 0, aaa, aaa, aaa_state, empty_init, "Ann Arbor", "Ambassador", MACHINE_IS_SKELETON )
+COMP( 1981, aaa, 0, 0, aaa, aaa, aaa_state, empty_init, "Ann Arbor", "Ambassador", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -26,8 +26,8 @@ protected:
 	DECLARE_MACHINE_START(pc_h98);
 	DECLARE_MACHINE_RESET(pc_h98);
 
-	void pc_h98_map(address_map &map);
-	void pc_h98_io(address_map &map);
+	void pc_h98_map(address_map &map) ATTR_COLD;
+	void pc_h98_io(address_map &map) ATTR_COLD;
 };
 
 void pc_hyper98_state::pc_h98_map(address_map &map)
@@ -44,6 +44,7 @@ void pc_hyper98_state::pc_h98_io(address_map &map)
 {
 	pc_hyper98_state::pc9801bx2_io(map);
 	// ...
+//  map(0x4*a*, 0x4*a*) μPD72120 "AGDC"
 }
 
 // TODO: backported from pc9801_epson.cpp, needs mods
@@ -207,4 +208,4 @@ ROM_START( pc_h98s )
 //  LOAD_IDE_ROM
 ROM_END
 
-COMP( 1991, pc_h98s, 0,   0, pc_h98s, pc_h98,   pc_hyper98_state, init_pc9801_kanji,   "NEC",   "PC-H98S model 8/U8", MACHINE_IS_SKELETON )
+COMP( 1991, pc_h98s, 0,   0, pc_h98s, pc_h98,   pc_hyper98_state, init_pc9801_kanji,   "NEC",   "PC-H98S model 8/U8", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

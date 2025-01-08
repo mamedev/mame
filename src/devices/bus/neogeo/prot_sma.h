@@ -37,8 +37,8 @@ public:
 	void kof2000_decrypt_68k(uint8_t* base);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t     m_sma_rng;

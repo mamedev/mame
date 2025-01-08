@@ -213,8 +213,8 @@ public:
 	void kungfuta(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -255,10 +255,10 @@ protected:
 	void draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int charbank, int colortype);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int set, int charbank);
 
-	void kungfut_main_map(address_map &map);
-	void kungfuta_main_map(address_map &map);
-	void sound_map(address_map &map);
-	void wiz_main_map(address_map &map);
+	void kungfut_main_map(address_map &map) ATTR_COLD;
+	void kungfuta_main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void wiz_main_map(address_map &map) ATTR_COLD;
 };
 
 class stinger_state : public wiz_state
@@ -276,8 +276,8 @@ public:
 	void init_stinger();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<discrete_device> m_discrete;
@@ -291,9 +291,9 @@ private:
 	void shot_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void decrypted_opcodes_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

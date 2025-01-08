@@ -25,22 +25,22 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_archimedes_podule_interface overrides
-	virtual void ioc_map(address_map &map) override;
+	virtual void ioc_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_memory_region m_podule_rom;
 	required_shared_ptr<u16> m_ram;
 	required_device<i82586_device> m_lance;
 
-	void lan_map(address_map &map);
+	void lan_map(address_map &map) ATTR_COLD;
 
 	void checksum();
 	void control_w(u8 data);

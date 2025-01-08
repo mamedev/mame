@@ -48,7 +48,7 @@ public:
 	void controlidx628(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void p0_w(uint8_t data);
@@ -59,7 +59,7 @@ private:
 	void p3_w(uint8_t data);
 	void controlidx628_palette(palette_device &palette) const;
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<nt7534_device> m_lcdc;
 

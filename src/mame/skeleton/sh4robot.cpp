@@ -47,8 +47,8 @@ public:
 	void sh4robot(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<sh4_device> m_maincpu;
 };
@@ -108,4 +108,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME  FLAGS
-COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, empty_init, "<unknown>", "Robot",  MACHINE_IS_SKELETON_MECHANICAL )
+COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, empty_init, "<unknown>", "Robot",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

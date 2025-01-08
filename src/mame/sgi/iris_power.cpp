@@ -48,7 +48,7 @@ public:
 	void ip15(machine_config &config);
 
 protected:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<r3000_device> m_maincpu;
 };

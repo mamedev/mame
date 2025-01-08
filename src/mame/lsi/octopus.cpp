@@ -174,9 +174,9 @@ public:
 	void octopus(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
@@ -223,11 +223,11 @@ private:
 	void dack6_w(int state) { m_dma1->hack_w(state ? 0 : 1); }
 	void dack7_w(int state) { m_dma1->hack_w(state ? 0 : 1); }
 
-	void octopus_io(address_map &map);
-	void octopus_mem(address_map &map);
-	void octopus_sub_io(address_map &map);
-	void octopus_sub_mem(address_map &map);
-	void octopus_vram(address_map &map);
+	void octopus_io(address_map &map) ATTR_COLD;
+	void octopus_mem(address_map &map) ATTR_COLD;
+	void octopus_sub_io(address_map &map) ATTR_COLD;
+	void octopus_sub_mem(address_map &map) ATTR_COLD;
+	void octopus_vram(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(beep_off);
 

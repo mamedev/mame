@@ -18,12 +18,11 @@ enigma2b (1981)
  Conversion like enigma2a, but boots with 1981 copyright and Phantoms II title
 
 TODO:
- - enigma2  - Star blinking frequency
- - enigma2  - Sound is incorrectly emulated (see MT07777)
- - enigma2a + enigma2b - bad sound ROM?
+- enigma2b - bad sound ROM?
 
 
 *********************************************************************
+
 Enigma II, Game Plan, 1981
 PCB hardware notes by Guru
 
@@ -125,9 +124,11 @@ DIP Switches
 *********************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -184,12 +185,12 @@ public:
 
 	void init_enigma2();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(p1_controls_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
+	ioport_value p1_controls_r();
+	ioport_value p2_controls_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -200,7 +201,7 @@ private:
 	optional_region_ptr<uint8_t> m_stars;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	int m_blink_count = 0;
+	uint8_t m_blink_count = 0;
 	uint8_t m_sound_latch = 0;
 	uint8_t m_last_sound_data = 0;
 	uint8_t m_protection_data = 0;
@@ -208,6 +209,7 @@ private:
 
 	emu_timer *m_interrupt_clear_timer = nullptr;
 	emu_timer *m_interrupt_assert_timer = nullptr;
+	emu_timer *m_audio_interrupt_timer = nullptr;
 
 	uint8_t dip_switch_r(offs_t offset);
 	void sound_data_w(uint8_t data);
@@ -218,15 +220,16 @@ private:
 	uint32_t screen_update_enigma2a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_clear_callback);
 	TIMER_CALLBACK_MEMBER(interrupt_assert_callback);
-	inline uint16_t vpos_to_vysnc_chain_counter( int vpos );
-	inline int vysnc_chain_counter_to_vpos( uint16_t counter );
+	TIMER_CALLBACK_MEMBER(audio_interrupt_callback);
+	inline uint16_t vpos_to_vysnc_chain_counter(int vpos);
+	inline int vysnc_chain_counter_to_vpos(uint16_t counter);
 	void create_interrupt_timers();
 	void start_interrupt_timers();
 
-	void enigma2_audio_cpu_map(address_map &map);
-	void enigma2_main_cpu_map(address_map &map);
-	void enigma2a_main_cpu_io_map(address_map &map);
-	void enigma2a_main_cpu_map(address_map &map);
+	void enigma2_audio_cpu_map(address_map &map) ATTR_COLD;
+	void enigma2_main_cpu_map(address_map &map) ATTR_COLD;
+	void enigma2a_main_cpu_io_map(address_map &map) ATTR_COLD;
+	void enigma2a_main_cpu_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -236,14 +239,13 @@ private:
  *
  *************************************/
 
-
-uint16_t enigma2_state::vpos_to_vysnc_chain_counter( int vpos )
+uint16_t enigma2_state::vpos_to_vysnc_chain_counter(int vpos)
 {
 	return vpos + VCOUNTER_START;
 }
 
 
-int enigma2_state::vysnc_chain_counter_to_vpos( uint16_t counter )
+int enigma2_state::vysnc_chain_counter_to_vpos(uint16_t counter)
 {
 	return counter - VCOUNTER_START;
 }
@@ -260,13 +262,13 @@ TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_assert_callback)
 	uint16_t next_counter;
 	int next_vpos;
 
-	/* compute vector and set the interrupt line */
+	// compute vector and set the interrupt line
 	int vpos = m_screen->vpos();
 	uint16_t counter = vpos_to_vysnc_chain_counter(vpos);
 	uint8_t vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
 	m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector); // Z80
 
-	/* set up for next interrupt */
+	// set up for next interrupt
 	if (counter == INT_TRIGGER_COUNT_1)
 		next_counter = INT_TRIGGER_COUNT_2;
 	else
@@ -278,17 +280,27 @@ TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_assert_callback)
 }
 
 
-void enigma2_state::create_interrupt_timers(  )
+TIMER_CALLBACK_MEMBER(enigma2_state::audio_interrupt_callback)
 {
-	m_interrupt_clear_timer = timer_alloc(FUNC(enigma2_state::interrupt_clear_callback), this);
-	m_interrupt_assert_timer = timer_alloc(FUNC(enigma2_state::interrupt_assert_callback), this);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
+	int next_vpos = m_screen->vpos() + 16;
+	m_audio_interrupt_timer->adjust(m_screen->time_until_pos(next_vpos >= VTOTAL ? 8 : next_vpos));
 }
 
 
-void enigma2_state::start_interrupt_timers(  )
+void enigma2_state::create_interrupt_timers()
+{
+	m_interrupt_clear_timer = timer_alloc(FUNC(enigma2_state::interrupt_clear_callback), this);
+	m_interrupt_assert_timer = timer_alloc(FUNC(enigma2_state::interrupt_assert_callback), this);
+	m_audio_interrupt_timer = timer_alloc(FUNC(enigma2_state::audio_interrupt_callback), this);
+}
+
+
+void enigma2_state::start_interrupt_timers()
 {
 	int vpos = vysnc_chain_counter_to_vpos(INT_TRIGGER_COUNT_1);
 	m_interrupt_assert_timer->adjust(m_screen->time_until_pos(vpos));
+	m_audio_interrupt_timer->adjust(m_screen->time_until_pos(8));
 }
 
 
@@ -340,7 +352,7 @@ uint32_t enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb3
 		uint8_t bit;
 		uint8_t color;
 
-		/* read the video RAM */
+		// read the video RAM
 		if ((x & 0x07) == 0x00)
 		{
 			offs_t color_map_address = (y >> 3 << 5) | (x >> 3);
@@ -348,9 +360,12 @@ uint32_t enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb3
 			/* the schematics shows it like this, but it doesn't work as this would
 			   produce no stars, due to the contents of the PROM -- maybe there is
 			   a star disabled bit somewhere that's connected here instead of flip_screen() */
-			/* star_map_address = (y >> 4 << 6) | (enigma2_flip_screen_get() << 5) | (x >> 3); */
+			//offs_t star_map_address = (y >> 4 << 6) | (m_flip_screen ? 0x20 : 0) | (x >> 3);
 			offs_t star_map_address = (y >> 4 << 6) | 0x20 | (x >> 3);
-			if (m_blink_count & 0x08)
+
+			// blink rate is with an RC osc, this is an estimation based on PCB video
+			// (yes, the intervals are uneven like this)
+			if (m_blink_count & 0x30)
 				star_map_address |= 0x400;
 
 			offs_t videoram_address = (y << 5) | (x >> 3);
@@ -369,7 +384,7 @@ uint32_t enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb3
 			star_color = m_stars[star_map_address] & 0x07;
 		}
 
-		/* plot the current pixel */
+		// plot the current pixel
 		if (m_flip_screen)
 		{
 			bit = video_data & 0x80;
@@ -384,28 +399,28 @@ uint32_t enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb3
 		if (bit)
 			color = fore_color;
 		else
-			/* stars only appear at certain positions */
+		{
+			// stars only appear at certain positions
 			color = ((x & y & 0x0f) == 0x0f) ? star_color : 0;
+		}
 
 		bitmap.pix(bitmap_y, x) = m_palette->pen_color(color);
 
-		/* next pixel */
+		// next pixel
 		x = x + 1;
 
-		/* end of line? */
+		// end of line?
 		if (x == 0)
 		{
-			/* end of screen? */
+			// end of screen?
 			if (bitmap_y == visarea.max_y)
 				break;
 
-			/* next row */
+			// next row
 			y = y + 1;
 			bitmap_y = bitmap_y + 1;
 		}
 	}
-
-	m_blink_count++;
 
 	return 0;
 }
@@ -424,19 +439,19 @@ uint32_t enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb
 		uint8_t bit;
 		pen_t pen;
 
-		/* read the video RAM */
+		// read the video RAM
 		if ((x & 0x07) == 0x00)
 		{
 			offs_t videoram_address = (y << 5) | (x >> 3);
 
 			/* when the screen is flipped, all the video address bits are inverted,
 			   and the adder at 16A is activated */
-			if (m_flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
+			if (m_flip_screen) videoram_address = (~videoram_address + 0x0400) & 0x1fff;
 
 			video_data = m_videoram[videoram_address];
 		}
 
-		/* plot the current pixel */
+		// plot the current pixel
 		if (m_flip_screen)
 		{
 			bit = video_data & 0x80;
@@ -451,17 +466,17 @@ uint32_t enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb
 		pen = bit ? rgb_t::white() : rgb_t::black();
 		bitmap.pix(bitmap_y, x) = pen;
 
-		/* next pixel */
+		// next pixel
 		x = x + 1;
 
-		/* end of line? */
+		// end of line?
 		if (x == 0)
 		{
-			/* end of screen? */
+			// end of screen?
 			if (bitmap_y == visarea.max_y)
 				break;
 
-			/* next row */
+			// next row
 			y = y + 1;
 			bitmap_y = bitmap_y + 1;
 		}
@@ -489,15 +504,12 @@ uint8_t enigma2_state::dip_switch_r(offs_t offset)
 		break;
 
 	case 0x02:
-		if (m_maincpu->pc() == 0x07e5)
-			ret = 0xaa;
-		else
-			ret = 0xf4;
+		ret = m_protection_data & ~0x01;
 		break;
 
-	case 0x35:  ret = 0x38; break;
-	case 0x51:  ret = 0xaa; break;
-	case 0x79:  ret = 0x38; break;
+	case 0x35: ret = 0x38; break;
+	case 0x51: ret = 0xaa; break;
+	case 0x79: ret = 0x38; break;
 	}
 
 	return ret;
@@ -506,9 +518,9 @@ uint8_t enigma2_state::dip_switch_r(offs_t offset)
 
 void enigma2_state::sound_data_w(uint8_t data)
 {
-	/* clock sound latch shift register on rising edge of D2 */
+	// clock sound latch shift register on rising edge of D2
 	if (!(data & 0x04) && (m_last_sound_data & 0x04))
-		m_sound_latch = (m_sound_latch << 1) | (~data & 0x01);
+		m_sound_latch = (m_sound_latch >> 1) | (~data << 7 & 0x80);
 
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
@@ -518,7 +530,7 @@ void enigma2_state::sound_data_w(uint8_t data)
 
 uint8_t enigma2_state::sound_latch_r()
 {
-	return bitswap<8>(m_sound_latch,0,1,2,3,4,5,6,7);
+	return m_sound_latch;
 }
 
 
@@ -535,13 +547,13 @@ void enigma2_state::enigma2_flip_screen_w(uint8_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(enigma2_state::p1_controls_r)
+ioport_value enigma2_state::p1_controls_r()
 {
 	return ioport("P1CONTROLS")->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(enigma2_state::p2_controls_r)
+ioport_value enigma2_state::p2_controls_r()
 {
 	if (m_flip_screen)
 		return ioport("P2CONTROLS")->read();
@@ -607,14 +619,14 @@ static INPUT_PORTS_START( enigma2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(enigma2_state, p1_controls_r)
+	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(enigma2_state::p1_controls_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(enigma2_state, p2_controls_r)
+	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(enigma2_state::p2_controls_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -662,7 +674,7 @@ static INPUT_PORTS_START( enigma2a )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(enigma2_state, p1_controls_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(enigma2_state::p1_controls_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -670,7 +682,7 @@ static INPUT_PORTS_START( enigma2a )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(enigma2_state, p2_controls_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(enigma2_state::p2_controls_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -712,22 +724,24 @@ INPUT_PORTS_END
 
 void enigma2_state::enigma2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_main_cpu_map);
 
-	Z80(config, m_audiocpu, 2500000);
+	Z80(config, m_audiocpu, CPU_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
-	m_audiocpu->set_periodic_int(FUNC(enigma2_state::irq0_line_hold), attotime::from_hz(8*52));
 
-	/* video hardware */
+	config.set_maximum_quantum(attotime::from_hz(m_audiocpu->clock() / 4));
+
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(enigma2_state::screen_update_enigma2));
+	m_screen->screen_vblank().set([this] (int state) { if (state) m_blink_count++; });
 
 	PALETTE(config, m_palette, palette_device::GBR_3BIT);
 
-	/* audio hardware */
+	// audio hardware
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY8910_CLOCK));
@@ -739,21 +753,22 @@ void enigma2_state::enigma2(machine_config &config)
 
 void enigma2_state::enigma2a(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2a_main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &enigma2_state::enigma2a_main_cpu_io_map);
 
-	Z80(config, m_audiocpu, 2500000);
+	Z80(config, m_audiocpu, CPU_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
-	m_audiocpu->set_periodic_int(FUNC(enigma2_state::irq0_line_hold), attotime::from_hz(8*52));
 
-	/* video hardware */
+	config.set_maximum_quantum(attotime::from_hz(m_audiocpu->clock() / 4));
+
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(enigma2_state::screen_update_enigma2a));
 
-	/* audio hardware */
+	// audio hardware
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY8910_CLOCK));
@@ -766,35 +781,35 @@ void enigma2_state::enigma2a(machine_config &config)
 
 ROM_START( enigma2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.5d",         0x0000, 0x0800, CRC(499749de) SHA1(401928ff41d3b4cbb68e6ad3bf3be4a10ae1781f) )
-	ROM_LOAD( "2.7d",         0x0800, 0x0800, CRC(173c1329) SHA1(3f1ad46d0e58ab236e4ff2b385d09fbf113627da) )
-	ROM_LOAD( "3.8d",         0x1000, 0x0800, CRC(c7d3e6b1) SHA1(43f7c3a02b46747998260d5469248f21714fe12b) )
-	ROM_LOAD( "4.10d",        0x1800, 0x0800, CRC(c6a7428c) SHA1(3503f09856655c5973fb89f60d1045fe41012aa9) )
-	ROM_LOAD( "5.11d",        0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
-	ROM_LOAD( "6.13d",        0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
+	ROM_LOAD( "1.5d",  0x0000, 0x0800, CRC(499749de) SHA1(401928ff41d3b4cbb68e6ad3bf3be4a10ae1781f) )
+	ROM_LOAD( "2.7d",  0x0800, 0x0800, CRC(173c1329) SHA1(3f1ad46d0e58ab236e4ff2b385d09fbf113627da) )
+	ROM_LOAD( "3.8d",  0x1000, 0x0800, CRC(c7d3e6b1) SHA1(43f7c3a02b46747998260d5469248f21714fe12b) )
+	ROM_LOAD( "4.10d", 0x1800, 0x0800, CRC(c6a7428c) SHA1(3503f09856655c5973fb89f60d1045fe41012aa9) )
+	ROM_LOAD( "5.11d", 0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
+	ROM_LOAD( "6.13d", 0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "9.2f",    0x0000, 0x1000, CRC(68fd8c54) SHA1(69996d5dfd996f0aacb26e397bef314204a2a88a) )
+	ROM_LOAD( "9.2f",  0x0000, 0x1000, CRC(68fd8c54) SHA1(69996d5dfd996f0aacb26e397bef314204a2a88a) )
 
 	ROM_REGION( 0x0800, "colors", 0 )
-	ROM_LOAD( "7.11f",        0x0000, 0x0800, CRC(409b5aad) SHA1(1b774a70f725637458ed68df9ed42476291b0e43) )
+	ROM_LOAD( "7.11f", 0x0000, 0x0800, CRC(409b5aad) SHA1(1b774a70f725637458ed68df9ed42476291b0e43) )
 
 	ROM_REGION( 0x0800, "stars", 0 )
-	ROM_LOAD( "8.13f",        0x0000, 0x0800, CRC(e9cb116d) SHA1(41da4f46c5614ec3345c233467ebad022c6b0bf5) )
+	ROM_LOAD( "8.13f", 0x0000, 0x0800, CRC(e9cb116d) SHA1(41da4f46c5614ec3345c233467ebad022c6b0bf5) )
 ROM_END
 
 
 ROM_START( enigma2a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "36_en1.bin",   0x0000, 0x0800, CRC(15f44806) SHA1(4a2f7bc91d4edf7a069e0865d964371c97af0a0a) )
-	ROM_LOAD( "35_en2.bin",   0x0800, 0x0800, CRC(e841072f) SHA1(6ab02fd9fdeac5ab887cd25eee3d6b70ab01f849) )
-	ROM_LOAD( "34_en3.bin",   0x1000, 0x0800, CRC(43d06cf4) SHA1(495af05d54c0325efb67347f691e64d194645d85) )
-	ROM_LOAD( "33_en4.bin",   0x1800, 0x0800, CRC(8879a430) SHA1(c97f44bef3741eef74e137d2459e79f1b3a90457) )
-	ROM_LOAD( "5.11d",        0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
-	ROM_LOAD( "6.13d",        0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
+	ROM_LOAD( "36_en1.bin", 0x0000, 0x0800, CRC(15f44806) SHA1(4a2f7bc91d4edf7a069e0865d964371c97af0a0a) )
+	ROM_LOAD( "35_en2.bin", 0x0800, 0x0800, CRC(e841072f) SHA1(6ab02fd9fdeac5ab887cd25eee3d6b70ab01f849) )
+	ROM_LOAD( "34_en3.bin", 0x1000, 0x0800, CRC(43d06cf4) SHA1(495af05d54c0325efb67347f691e64d194645d85) )
+	ROM_LOAD( "33_en4.bin", 0x1800, 0x0800, CRC(8879a430) SHA1(c97f44bef3741eef74e137d2459e79f1b3a90457) )
+	ROM_LOAD( "5.11d",      0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
+	ROM_LOAD( "6.13d",      0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sound.bin",    0x0000, 0x0800, BAD_DUMP CRC(5f092d3c) SHA1(17c70f6af1b5560a45e6b1bdb330a98b27570fe9) )
+	ROM_LOAD( "sound.bin",  0x0000, 0x0800, CRC(5f092d3c) SHA1(17c70f6af1b5560a45e6b1bdb330a98b27570fe9) )
 ROM_END
 
 ROM_START( enigma2b )
@@ -806,9 +821,9 @@ ROM_START( enigma2b )
 	ROM_LOAD( "ic32.bin",   0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
 	ROM_LOAD( "ic42.bin",   0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
 
-	/* this rom was completely broken on this pcb.. */
+	// this rom was completely broken on this pcb..
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sound.bin",    0x0000, 0x0800, BAD_DUMP CRC(5f092d3c) SHA1(17c70f6af1b5560a45e6b1bdb330a98b27570fe9) )
+	ROM_LOAD( "sound.bin",  0x0000, 0x0800, BAD_DUMP CRC(5f092d3c) SHA1(17c70f6af1b5560a45e6b1bdb330a98b27570fe9) )
 ROM_END
 
 

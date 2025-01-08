@@ -71,7 +71,7 @@ private:
 
 	int sid_read();
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(count_ar);
@@ -83,10 +83,10 @@ private:
 	void dark_2_clr(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void fastinvaders_map(address_map &map);
-	void fastinvaders_io_base(address_map &map);
-	void fastinvaders_6845_io(address_map &map);
-	void fastinvaders_8275_io(address_map &map);
+	void fastinvaders_map(address_map &map) ATTR_COLD;
+	void fastinvaders_io_base(address_map &map) ATTR_COLD;
+	void fastinvaders_6845_io(address_map &map) ATTR_COLD;
+	void fastinvaders_8275_io(address_map &map) ATTR_COLD;
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -537,8 +537,8 @@ void fastinvaders_state::fastinvaders_8275_io(address_map &map)
 {
 	fastinvaders_io_base(map);
 
-	map(0x20, 0x21).rw(m_crtc8275, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x10, 0x1f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x20, 0x21).rw(m_crtc8275, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x30, 0x33).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x40, 0x4f).w(FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
 	//map(0x50, 0x50).r(FUNC(fastinvaders_state::io_50_r));//latch
@@ -566,19 +566,19 @@ void fastinvaders_state::fastinvaders_8275_io(address_map &map)
 static INPUT_PORTS_START( fastinvaders )
 
 PORT_START("COIN")  /* FAKE async input */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state, coin_inserted, 0)   //I8085_RST65_LINE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state, start, 0)          //I8085_RST55_LINE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state, start2, 0)         //I8085_RST55_LINE
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in0, 0) // int0, sparo
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,tilt, 0)    //INPUT_LINE_NMI tilt
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fastinvaders_state::coin_inserted), 0)   //I8085_RST65_LINE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fastinvaders_state::start), 0)          //I8085_RST55_LINE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fastinvaders_state::start2), 0)         //I8085_RST55_LINE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fastinvaders_state::in0), 0) // int0, sparo
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fastinvaders_state::tilt), 0)    //INPUT_LINE_NMI tilt
 
 	PORT_START("IN0")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("1") PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in1, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("2") PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in2, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("3") PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in3, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("4") PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in4, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("5") PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in5, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("6") PORT_CHANGED_MEMBER(DEVICE_SELF, fastinvaders_state,in6, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fastinvaders_state::in1), 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fastinvaders_state::in2), 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fastinvaders_state::in3), 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fastinvaders_state::in4), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fastinvaders_state::in5), 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fastinvaders_state::in6), 0)
 
 	PORT_START("IN1")   //0x60 io port
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL

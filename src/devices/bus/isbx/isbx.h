@@ -31,8 +31,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_ISBX_ISBX_SLOT_H
-#define MAME_BUS_ISBX_ISBX_SLOT_H
+#ifndef MAME_BUS_ISBX_ISBX_H
+#define MAME_BUS_ISBX_ISBX_H
 
 #pragma once
 
@@ -113,7 +113,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	devcb_write_line   m_write_mintr0;
 	devcb_write_line   m_write_mintr1;
@@ -131,4 +131,4 @@ DECLARE_DEVICE_TYPE(ISBX_SLOT, isbx_slot_device)
 void isbx_cards(device_slot_interface &device);
 
 
-#endif // MAME_BUS_ISBX_ISBX_SLOT_H
+#endif // MAME_BUS_ISBX_ISBX_H

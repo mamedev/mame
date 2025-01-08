@@ -35,11 +35,11 @@ public:
 	void ice_tbd(machine_config &config);
 
 private:
-	void ice_tbd_io_map(address_map &map);
-	void ice_tbd_map(address_map &map);
+	void ice_tbd_io_map(address_map &map) ATTR_COLD;
+	void ice_tbd_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -91,4 +91,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1988, ice_tbd, 0, ice_tbd, ice_tbd, ice_tbd_state, empty_init, ROT0, "Innovative Creations in Entertainment", "Turbo Drive (ICE)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, ice_tbd, 0, ice_tbd, ice_tbd, ice_tbd_state, empty_init, ROT0, "Innovative Creations in Entertainment", "Turbo Drive (ICE)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -127,7 +127,7 @@ public:
 
 private:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	std::pair<std::error_condition, std::string> verify_header(const uint8_t *header);
 	int validate_header(int head, bool log) const;

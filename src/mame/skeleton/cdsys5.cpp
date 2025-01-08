@@ -28,13 +28,13 @@ public:
 	void minijook(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void shift_data_w(u8 data);
 	void shift_latch_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<mc68hc11_cpu_device> m_maincpu;
 
@@ -136,4 +136,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(199?, minijook, 0, 0, minijook, minijook, cdsys5_state, empty_init, "Sound Leisure", "MiniJook", MACHINE_IS_SKELETON_MECHANICAL)
+SYST(199?, minijook, 0, 0, minijook, minijook, cdsys5_state, empty_init, "Sound Leisure", "MiniJook", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

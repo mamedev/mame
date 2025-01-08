@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_SOUND_VGMVIZ_H
-#define MAME_SOUND_VGMVIZ_H
+#ifndef MAME_SOUND_VGM_VISUALIZER_H
+#define MAME_SOUND_VGM_VISUALIZER_H
 
 #pragma once
 
@@ -86,9 +86,9 @@ protected:
 	static constexpr size_t NORMALIZE_BUF_SIZE = 131072;
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface-level overrides
 	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -137,4 +137,4 @@ protected:
 	static const bool NEEDS_FFT[VIZ_COUNT];
 };
 
-#endif // MAME_SOUND_VGMVIZ_H
+#endif // MAME_SOUND_VGM_VISUALIZER_H

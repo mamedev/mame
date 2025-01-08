@@ -52,9 +52,9 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void bagman_palette(palette_device &palette) const;
 
 	void vblank_irq(int state);
@@ -63,8 +63,8 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_pal();
 	void bagman_base(machine_config &config);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;
@@ -108,8 +108,8 @@ private:
 	uint8_t aysnd_r();
 	void aysnd_w(offs_t offset, uint8_t data);
 
-	void pickin_map(address_map &map);
-	void pickin_portmap(address_map &map);
+	void pickin_map(address_map &map) ATTR_COLD;
+	void pickin_portmap(address_map &map) ATTR_COLD;
 
 	required_device_array<ay8910_device, 2> m_aysnd;
 };
@@ -125,10 +125,10 @@ public:
 		m_old_val{ 0, 0 }
 	{ }
 
-	template <unsigned N> DECLARE_CUSTOM_INPUT_MEMBER(dial_input_r);
+	template <unsigned N> ioport_value dial_input_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_ioport_array<2> m_dial;

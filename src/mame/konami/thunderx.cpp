@@ -1173,8 +1173,8 @@ ROM_END
 
 ROM_START( gbustersa )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
-	ROM_LOAD( "878_02.k13", 0x00000, 0x10000, CRC(57178414) SHA1(89b1403158f6ce18706c8a941109554d03cf77d9) ) /* unknown region/version leter */
-	ROM_LOAD( "878_03.k15", 0x10000, 0x10000, CRC(6c59e660) SHA1(66a92eb8a93c9f542489fa31bec6ed1819d174da) ) /* unknown region/version leter */
+	ROM_LOAD( "878_02.k13", 0x00000, 0x10000, CRC(57178414) SHA1(89b1403158f6ce18706c8a941109554d03cf77d9) ) /* unknown region/version letter */
+	ROM_LOAD( "878_03.k15", 0x10000, 0x10000, CRC(6c59e660) SHA1(66a92eb8a93c9f542489fa31bec6ed1819d174da) ) /* unknown region/version letter */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "878h01.f8", 0x00000, 0x08000, CRC(96feafaa) SHA1(8b6547e610cb4fa1c1f5bf12cb05e9a12a353903) )
@@ -1224,7 +1224,7 @@ ROM_END
 
 GAME( 1988, scontra,   0,        scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra (set 1)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1988, scontraa,  scontra,  scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra (set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, scontraj,  scontra,  scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra - Alien no Gyakushuu (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, scontraj,  scontra,  scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra: Alien no Gyakushuu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderx,  0,        thunderx, thunderx, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxa, thunderx, thunderx, thunderx, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxb, thunderx, thunderx, thunderx, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (set 3)", MACHINE_SUPPORTS_SAVE )

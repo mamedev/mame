@@ -8,7 +8,7 @@ authors:hap
 <!-- define elements -->
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
-	<element name="static_grey"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
+	<element name="static_gray"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
 	<element name="static_pink"><rect><color red="0.9" green="0.55" blue="0.75" /></rect></element>
 
 	<element name="text_ufored">
@@ -124,12 +124,11 @@ authors:hap
 			<bounds left="0" right="200" top="0" bottom="90" />
 		</element>
 
-		<element ref="static_grey">
+		<element ref="static_gray">
 			<bounds x="99" y="0" width="2" height="80" />
 		</element>
 
-	<!-- control panel -->
-
+		<!-- control panel -->
 		<element ref="static_pink">
 			<bounds x="0" y="60" width="200" height="30" />
 		</element>
@@ -162,9 +161,7 @@ authors:hap
 			<bounds x="129" y="71" width="10" height="15" />
 		</element>
 
-
-	<!-- left ufo info -->
-
+		<!-- left ufo info -->
 		<element ref="text_x">
 			<bounds x="5" y="5" width="10" height="4" />
 		</element>
@@ -214,8 +211,7 @@ authors:hap
 			<bounds x="66" y="44" width="3" height="3" />
 		</element>
 
-	<!-- right ufo info -->
-
+		<!-- right ufo info -->
 		<element ref="text_x">
 			<bounds x="105" y="5" width="10" height="4" />
 		</element>
@@ -264,7 +260,6 @@ authors:hap
 		<element name="lamp11" ref="lamp_rg1">
 			<bounds x="166" y="44" width="3" height="3" />
 		</element>
-
 
 	</view>
 </mamelayout>

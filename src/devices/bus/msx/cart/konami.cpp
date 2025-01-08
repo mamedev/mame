@@ -29,7 +29,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	template <int Bank> void bank_w(u8 data);
@@ -108,9 +108,9 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	template <int Bank> void bank_w(u8 data);
@@ -217,10 +217,10 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { save_item(NAME(m_selected_bank)); }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	template <int Bank> u8 flash_r(offs_t offset);
@@ -353,7 +353,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	template <int Bank> void bank_w(u8 data);
@@ -458,7 +458,7 @@ protected:
 	// device_t implementation
 	virtual void device_start() override { }
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<dac_8bit_r2r_device> m_dac;
@@ -514,10 +514,10 @@ protected:
 	{ }
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static constexpr u8 VIEW_READ = 0;
@@ -768,9 +768,9 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
@@ -781,7 +781,7 @@ private:
 	void io_20_w(uint8_t data);
 	uint8_t io_00_r();
 
-	void vlm_map(address_map &map);
+	void vlm_map(address_map &map) ATTR_COLD;
 };
 
 void msx_cart_keyboard_master_device::vlm_map(address_map &map)
@@ -865,7 +865,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override { }
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual std::error_condition initialize_cartridge(std::string &message) override;
 

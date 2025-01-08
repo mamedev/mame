@@ -27,6 +27,7 @@
 #include "osdepend.h"
 
 #include <cassert>
+#include <cmath>
 #include <cstdlib>
 #include <limits>
 #include <type_traits>
@@ -666,7 +667,9 @@ void menu::draw(uint32_t flags)
 
 	// compute top/left of inner menu area by centering
 	float const visible_left = (1.0F - visible_width) * 0.5F;
-	m_items_top = std::round((((1.0F - visible_main_menu_height - visible_extra_menu_height) * 0.5F) + top_extra_menu_height) * float(m_last_size.second)) / float(m_last_size.second);
+	m_items_top = ((1.0F - visible_main_menu_height - visible_extra_menu_height) * 0.5F) + top_extra_menu_height;
+	if (m_last_size.second != 0)
+		m_items_top = std::round(m_items_top * float(m_last_size.second)) / float(m_last_size.second);
 
 	// first add us a box
 	float const x1 = visible_left - lr_border();
@@ -978,7 +981,7 @@ void menu::recompute_metrics(uint32_t width, uint32_t height, float aspect)
 
 }
 
-void menu::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
+void menu::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 }
 
@@ -1176,13 +1179,14 @@ std::pair<int, bool> menu::handle_pointer_update(uint32_t flags, ui_event const 
 	// give derived class a chance to handle it
 	if ((track_pointer::IDLE == m_pointer_state) || (track_pointer::CUSTOM == m_pointer_state))
 	{
+		bool const wascustom(track_pointer::CUSTOM == m_pointer_state);
 		auto const [key, take, redraw] = custom_pointer_updated(changed, uievt);
 		if (take)
 		{
 			m_pointer_state = track_pointer::CUSTOM;
 			return std::make_pair(key, redraw);
 		}
-		else if (track_pointer::CUSTOM == m_pointer_state)
+		else if (wascustom)
 		{
 			if (uievt.pointer_buttons)
 			{
@@ -1930,7 +1934,7 @@ bool menu::check_metrics()
 	render_target &target(render.ui_target());
 	std::pair<uint32_t, uint32_t> const uisize(target.width(), target.height());
 	float const aspect = render.ui_aspect(&container());
-	if ((uisize == m_last_size) && (aspect == m_last_aspect))
+	if ((uisize == m_last_size) && (std::fabs(1.0F - (aspect / m_last_aspect)) < 1e-6F))
 		return false;
 
 	m_last_size = uisize;

@@ -66,7 +66,7 @@ public:
 	void buggybjr(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	struct math_t
@@ -236,11 +236,11 @@ private:
 	void screen_vblank_buggyboy(int state);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
-	void buggybjr_main(address_map &map);
-	void buggyboy_main(address_map &map);
-	void buggyboy_math(address_map &map);
-	void tx1_main(address_map &map);
-	void tx1_math(address_map &map);
+	void buggybjr_main(address_map &map) ATTR_COLD;
+	void buggyboy_main(address_map &map) ATTR_COLD;
+	void buggyboy_math(address_map &map) ATTR_COLD;
+	void tx1_main(address_map &map) ATTR_COLD;
+	void tx1_math(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TATSUMI_TX1_H

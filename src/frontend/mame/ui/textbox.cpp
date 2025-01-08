@@ -492,12 +492,12 @@ void menu_fixed_textbox::recompute_metrics(uint32_t width, uint32_t height, floa
 }
 
 
-void menu_fixed_textbox::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
+void menu_fixed_textbox::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	std::string_view const toptext[] = { m_heading };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
-			x1, x2, y1 - top, y1 - tb_border(),
+			origx1, origx2, origy1 - top, origy1 - tb_border(),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 			ui().colors().text_color(), UI_GREEN_COLOR);
 }

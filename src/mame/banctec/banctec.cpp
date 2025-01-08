@@ -44,9 +44,9 @@ protected:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	void videoram_w(u8 data);
 
-	virtual void machine_reset() override;
-	void banctec_mcu_mem(address_map &map);
-	void banctec_mem(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	void banctec_mcu_mem(address_map &map) ATTR_COLD;
+	void banctec_mem(address_map &map) ATTR_COLD;
 
 private:
 	required_device<palette_device> m_palette;

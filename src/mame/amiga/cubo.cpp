@@ -343,7 +343,7 @@ public:
 	void handle_joystick_cia(uint8_t pra, uint8_t dra);
 	uint16_t handle_joystick_potgor(uint16_t potgor);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
+	ioport_value cubo_input();
 	template <int P> int cd32_sel_mirror_input();
 
 	void akiko_int_w(int state);
@@ -366,8 +366,8 @@ public:
 	uint16_t m_potgo_value = 0;
 
 	void cubo(machine_config &config);
-	void cubo_mem(address_map &map);
-	void overlay_2mb_map32(address_map &map);
+	void cubo_mem(address_map &map) ATTR_COLD;
+	void overlay_2mb_map32(address_map &map) ATTR_COLD;
 protected:
 	virtual void rs232_tx(int state) override;
 	virtual void potgo_w(uint16_t data) override;
@@ -537,7 +537,7 @@ uint16_t cubo_state::handle_joystick_potgor(uint16_t potgor)
 	return potgor;
 }
 
-CUSTOM_INPUT_MEMBER( cubo_state::cubo_input )
+ioport_value cubo_state::cubo_input()
 {
 	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
@@ -555,22 +555,22 @@ static INPUT_PORTS_START( cubo )
 	PORT_START("CIA0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM )
 	/* this is the regular port for reading a single button joystick on the Amiga, many CD32 games require this to mirror the pad start button! */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cubo_state, cd32_sel_mirror_input<1>)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cubo_state, cd32_sel_mirror_input<0>)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(cubo_state::cd32_sel_mirror_input<1>))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(cubo_state::cd32_sel_mirror_input<0>))
 
 	PORT_START("CIA0PORTB")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cubo_state, amiga_joystick_convert<1>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(cubo_state::amiga_joystick_convert<1>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cubo_state, amiga_joystick_convert<0>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(cubo_state::amiga_joystick_convert<0>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("potgo")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cubo_state, cubo_input)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(cubo_state::cubo_input))
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 
@@ -1075,7 +1075,7 @@ void cubo_state::cubo(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&cubo_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cubo_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
 
-	AMIGA_COPPER(config, m_copper, amiga_state::CLK_28M_PAL / 2);
+	AGNUS_COPPER(config, m_copper, amiga_state::CLK_28M_PAL / 2);
 	m_copper->set_host_cpu_tag(m_maincpu);
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_copper->set_ecs_mode(true);
@@ -1122,7 +1122,7 @@ void cubo_state::cubo(machine_config &config)
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(FUNC(cubo_state::rs232_rx_w));
 
 	/* fdc */
-	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
+	PAULA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
 	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
 	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));

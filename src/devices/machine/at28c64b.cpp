@@ -96,7 +96,7 @@ void at28c64b_device::nvram_default()
 	/* populate from a memory region if present */
 	if (m_default_data.found())
 	{
-		for (offs_t offs = 0; offs < AT28C64B_DATA_BYTES; offs++)
+		for (offs_t offs = 0; offs < m_default_data.length(); offs++)
 			space(AS_PROGRAM).write_byte(offs, m_default_data[offs]);
 	}
 }

@@ -69,7 +69,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void calomega_videoram_w(offs_t offset, uint8_t data);
@@ -110,12 +110,12 @@ private:
 	uint32_t screen_update_calomega(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void calomega_palette(palette_device &palette) const;
 
-	void sys903_map(address_map &map);
-	void s903mod_map(address_map &map);
-	void sys905_map(address_map &map);
-	void sys906_map(address_map &map);
-	void kstec_mem_map(address_map &map);
-	void kstec_io_map(address_map &map);
+	void sys903_map(address_map &map) ATTR_COLD;
+	void s903mod_map(address_map &map) ATTR_COLD;
+	void sys905_map(address_map &map) ATTR_COLD;
+	void sys906_map(address_map &map) ATTR_COLD;
+	void kstec_mem_map(address_map &map) ATTR_COLD;
+	void kstec_io_map(address_map &map) ATTR_COLD;
 
 	optional_device_array<pia6821_device, 2> m_pia;
 	required_device<m6502_device> m_maincpu;

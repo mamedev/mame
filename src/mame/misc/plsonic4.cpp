@@ -44,7 +44,7 @@ public:
 	void plsonic4(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -56,8 +56,8 @@ private:
 	TILE_GET_INFO_MEMBER(tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
-	void io_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -229,4 +229,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1991, plsonic4, 0, plsonic4, plsonic4, plsonic4_state, empty_init, ROT0, "SegaSA / Sonic", "Play Sonic 4", MACHINE_IS_SKELETON )
+GAME( 1991, plsonic4, 0, plsonic4, plsonic4, plsonic4_state, empty_init, ROT0, "SegaSA / Sonic", "Play Sonic 4", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -41,9 +41,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -107,7 +107,7 @@ private:
 	uint8_t m_adpcm_dma_reg = 0;
 	uint8_t m_fader_ctrl = 0;
 
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 	void adpcm_stop(uint8_t irq_flag);
 	void adpcm_play();
 	void reply_status_byte(uint8_t status);

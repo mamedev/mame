@@ -36,7 +36,7 @@ class spifi3_device
 {
 public:
 	spifi3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	auto irq_handler_cb() { return m_irq_handler.bind(); }
 	auto drq_handler_cb() { return m_drq_handler.bind(); }
@@ -45,7 +45,7 @@ public:
 	void dma_w(uint8_t val);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void scsi_ctrl_changed() override;
 
 private:

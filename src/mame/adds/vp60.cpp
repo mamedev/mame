@@ -34,9 +34,9 @@ private:
 	u8 crtc_r(offs_t offset);
 	void crtc_w(offs_t offset, u8 data);
 
-	void io_map(address_map &map);
-	void kbd_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void kbd_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8275_device> m_crtc;
@@ -133,4 +133,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1982, vp60, 0, 0, vp60, vp60, vp60_state, empty_init, "ADDS", "Viewpoint 60", MACHINE_IS_SKELETON )
+COMP( 1982, vp60, 0, 0, vp60, vp60, vp60_state, empty_init, "ADDS", "Viewpoint 60", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

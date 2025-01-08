@@ -12,7 +12,6 @@
 #pragma once
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/acorn_vidc.h"
 #include "machine/at_keybc.h"
 #include "bus/pc_kbd/pc_kbdc.h"
@@ -51,7 +50,7 @@ public:
 	void keyboard_reset(int state);
 
 	// I/O operations
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 	template<class T> void set_vidc_tag(T &&tag) { m_vidc.set_tag(std::forward<T>(tag)); }
 	template<class T> void set_kbdc_tag(T &&tag) { m_kbdc.set_tag(std::forward<T>(tag)); }
@@ -59,13 +58,13 @@ public:
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(timer_elapsed);
 
-	void base_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
 	u16 m_id;
 	u8 m_version;
 
@@ -169,14 +168,14 @@ public:
 	// construction/destruction
 	arm7500fe_iomd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 	auto iolines_read() { return m_iolines_read_cb.bind(); }
 	auto iolines_write() { return m_iolines_write_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 private:
 	devcb_read8 m_iolines_read_cb;
 	devcb_write8 m_iolines_write_cb;

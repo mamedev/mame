@@ -65,8 +65,8 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 void cirsa820xxx_state::prg_map(address_map &map)
@@ -142,4 +142,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1982?, unk820501, 0, cirsa820xxx, cirsa820xxx, cirsa820xxx_state, empty_init, ROT0, "Cirsa", "unknown Cirsa slot machine on 820501 A PCB", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1982?, unk820501, 0, cirsa820xxx, cirsa820xxx, cirsa820xxx_state, empty_init, ROT0, "Cirsa", "unknown Cirsa slot machine on 820501 A PCB", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

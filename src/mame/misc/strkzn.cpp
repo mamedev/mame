@@ -28,10 +28,10 @@ public:
 	void strkzn(machine_config &config);
 
 private:
-	void light_io(address_map &map);
-	void light_mem(address_map &map);
-	void main_io(address_map &map);
-	void main_mem(address_map &map);
+	void light_io(address_map &map) ATTR_COLD;
+	void light_mem(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
+	void main_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_lightcpu;
@@ -87,4 +87,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, strkzn, 0, strkzn, strkzn, strkzn_state, empty_init, ROT0, "Purple Star", "Strike Zone (Purple Star)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1994, strkzn, 0, strkzn, strkzn, strkzn_state, empty_init, ROT0, "Purple Star", "Strike Zone (Purple Star)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -33,8 +33,8 @@ private:
 	void drive_sel_w(uint8_t data);
 	static void floppy_formats(format_registration &fr);
 	static void ncr5380(device_t *device);
-	void lb186_io(address_map &map);
-	void lb186_map(address_map &map);
+	void lb186_io(address_map &map) ATTR_COLD;
+	void lb186_map(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;

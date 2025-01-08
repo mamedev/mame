@@ -37,8 +37,8 @@ public:
 	void mu5(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<h83002_device> m_maincpu;
@@ -46,8 +46,8 @@ private:
 	required_device<mu5lcd_device> m_lcd;
 	required_ioport_array<6> m_key;
 
-	void mu5_map(address_map &map);
-	void ymw258_map(address_map &map);
+	void mu5_map(address_map &map) ATTR_COLD;
+	void ymw258_map(address_map &map) ATTR_COLD;
 
 	u8 m_lcd_ctrl = 0U;
 	u8 m_lcd_data = 0U;

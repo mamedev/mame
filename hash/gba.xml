@@ -19476,6 +19476,58 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		</part>
 	</software>
 
+	<software name="ljref">
+		<description>LOCKJAW: The Reference</description>
+		<year>2008</year>
+		<publisher>Pin Eight</publisher>
+		<info name="release" value="20081108" />
+		<info name="version" value="0.46a" />
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="73376">
+				<rom name="lockjaw the reference.bin" size="73376" crc="6897efa6" sha1="adb4627516929229054cef024d481f4f49d3469e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ljtod">
+		<description>LOCKJAW: The Overdose</description>
+		<year>2006</year>
+		<publisher>Pin Eight</publisher>
+		<info name="release" value="20060722" />
+		<info name="version" value="M4" />
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="147200">
+				<rom name="lockjaw the overdose.bin" size="147200" crc="7d286b94" sha1="e5f3eef9d7ed3aa3bf31a33b4b528e8d2384aaa2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="todm3" cloneof="ljtod">
+		<description>Tetanus on Drugs (Milestone 3)</description>
+		<year>2003</year>
+		<publisher>Pin Eight</publisher>
+		<info name="release" value="20030629" />
+		<info name="version" value="M3" />
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="156032">
+				<rom name="tetanus on drugs m3.bin" size="156032" crc="8ba01ad0" sha1="521b51f252e1c7ef33e1503f55877a7692e174ba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="todm1" cloneof="ljtod">
+		<description>Tetanus on Drugs (Preview Release 1)</description>
+		<year>2002</year>
+		<publisher>Pin Eight</publisher>
+		<info name="release" value="20020506" />
+		<info name="version" value="PR1" />
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="126064">
+				<rom name="tetanus on drugs pr1.bin" size="126064" crc="2fcadfd3" sha1="9eb41661684af832539b21455d01028ff7053444" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="loonybia">
 		<description>Looney Tunes - Back in Action (Europe, USA)</description>
 		<year>2003</year>

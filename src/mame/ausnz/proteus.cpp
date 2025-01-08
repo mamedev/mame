@@ -81,8 +81,8 @@ public:
 	void proteus(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	void ptm_o2_callback(int state);
 	void ptm_o3_callback(int state);
@@ -99,9 +99,9 @@ private:
 	void enable_z80_w(uint8_t data);
 	void enable_6809_w(uint8_t data);
 
-	void proteus_6809_mem(address_map &map);
-	void proteus_z80_mem(address_map &map);
-	void proteus_z80_io(address_map &map);
+	void proteus_6809_mem(address_map &map) ATTR_COLD;
+	void proteus_z80_mem(address_map &map) ATTR_COLD;
+	void proteus_z80_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_z80;

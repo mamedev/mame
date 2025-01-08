@@ -325,8 +325,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -343,8 +343,8 @@ private:
 
 	void nakajies_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
-	void nakajies_io_map(address_map &map);
-	void nakajies_map(address_map &map);
+	void nakajies_io_map(address_map &map) ATTR_COLD;
+	void nakajies_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<rp5c01_device> m_rtc;
@@ -517,14 +517,14 @@ INPUT_CHANGED_MEMBER(nakajies_state::trigger_irq)
 
 static INPUT_PORTS_START(nakajies)
 	PORT_START("debug")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_NAME("irq 0xff") PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state, trigger_irq, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_NAME("irq 0xfe") PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state, trigger_irq, 0)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_NAME("irq 0xfd") PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state, trigger_irq, 0)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) PORT_NAME("irq 0xfc") PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state, trigger_irq, 0)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_NAME("irq 0xfb") PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state, trigger_irq, 0)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) PORT_NAME("irq 0xfa") PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state, trigger_irq, 0)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) PORT_NAME("irq 0xf9") PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state, trigger_irq, 0)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_NAME("irq 0xf8") PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state, trigger_irq, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_NAME("irq 0xff") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_NAME("irq 0xfe") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_NAME("irq 0xfd") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) PORT_NAME("irq 0xfc") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_NAME("irq 0xfb") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) PORT_NAME("irq 0xfa") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) PORT_NAME("irq 0xf9") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_NAME("irq 0xf8") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
 
 	PORT_START("ROW0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT)

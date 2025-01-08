@@ -82,8 +82,8 @@ public:
 
 protected:
 	virtual void machine_start() override { m_led.resolve(); }
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -140,7 +140,7 @@ private:
 	void draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_shell(bitmap_ind16 &bitmap, const rectangle &cliprect, int picture_code, int hposition, int vstart, int vstop, int vstretch, int hstretch);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -637,7 +637,7 @@ static INPUT_PORTS_START( tunhunt )
 	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)

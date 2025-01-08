@@ -29,8 +29,8 @@ license:CC0-1.0
 
 -->
 
-	<software name="vcd">
-		<description>Video CD Card (Euro, v1.105)</description>
+	<software name="vcd" supported="no">
+		<description>Video CD Card (Europe, v1.105)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-80310" />
@@ -41,14 +41,14 @@ license:CC0-1.0
 			<feature name="ic303" value="MPR-17896-H" />
 			<feature name="ic304" value="HY514260B JC-70" /> <!-- 512k DRAM by Hyundai -->
 			<feature name="ic401" value="HD814102F" /> <!-- Custom ASIC by Hitachi -->
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-17896-h.ic303" size="524288" crc="192e52c2" sha1="2f5ebd434f6d5b82e93d03e5626007bd5380f652" offset="0" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="mpr-17896-h.ic303" size="0x80000" crc="192e52c2" sha1="2f5ebd434f6d5b82e93d03e5626007bd5380f652" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="hivcd2d">
-		<description>Hitachi Video CD Card (Jpn, Two Dots, v1.011)</description>
+	<software name="hivcd2d" supported="no">
+		<description>Hitachi Video CD Card (Japan, two white dots, v1.011)</description>
 		<year>1995</year>
 		<publisher>Hitachi</publisher>
 		<part name="cart" interface="sat_vcd_cart">
@@ -58,14 +58,14 @@ license:CC0-1.0
 			<feature name="ic303" value="MPR-17773D-H, MPR-17773E-T" /> <!-- Verified they have the same content, just different type of ROM chip (44pin PLCC vs 40pin SOP) -->
 			<feature name="ic304" value="[unpopulated]" /> <!-- This is not present in early PCB -->
 			<feature name="ic401" value="HD814102F" /> <!-- Custom ASIC by Hitachi -->
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-17773e-t.ic303" size="524288" crc="88bcb5ab" sha1="88aa35e48e655540e87ebeae10220413a8feee81" offset="0" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="mpr-17773e-t.ic303" size="0x80000" crc="88bcb5ab" sha1="88aa35e48e655540e87ebeae10220413a8feee81" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="hivcd1d" cloneof="hivcd2d">
-		<description>Hitachi Video CD Card (Jpn, One Dot, v1.009)</description>
+	<software name="hivcd1d" cloneof="hivcd2d" supported="no">
+		<description>Hitachi Video CD Card (Japan, one white dot, v1.009)</description>
 		<year>1995</year>
 		<publisher>Hitachi</publisher>
 		<part name="cart" interface="sat_vcd_cart">
@@ -74,14 +74,14 @@ license:CC0-1.0
 			<feature name="ic302" value="HY514260B JC-70" /> <!-- 512k DRAM by Hyundai -->
 			<feature name="ic303" value="MPR-17773C-H" />
 			<feature name="ic401" value="HD814102F" /> <!-- Custom ASIC by Hitachi -->
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-17773c-h.ic303" size="524288" crc="f9ca3180" sha1="40f284e79f205728b72c7d7c0cf0bae0ade38f76" offset="0" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="mpr-17773c-h.ic303" size="0x80000" crc="f9ca3180" sha1="40f284e79f205728b72c7d7c0cf0bae0ade38f76" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ssmovie">
-		<description>SegaSaturn Movie Card (Jpn, v1.102)</description>
+	<software name="ssmovie" supported="no">
+		<description>SegaSaturn Movie Card (Japan, v1.102)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="HSS-0119" />
@@ -91,14 +91,14 @@ license:CC0-1.0
 			<feature name="ic302" value="HY514260B JC-70" /> <!-- 512k DRAM by Hyundai -->
 			<feature name="ic303" value="MPR-17610A-H" />
 			<feature name="ic401" value="HD814102F" /> <!-- Custom ASIC by Hitachi -->
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-17610a-h.ic303" size="524288" crc="9688c629" sha1="f7171b2a8f1c464696771941225c32d636b59349" offset="0" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="mpr-17610a-h.ic303" size="0x80000" crc="9688c629" sha1="f7171b2a8f1c464696771941225c32d636b59349" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jvcvc20">
-		<description>JVC Video CD / Photo CD Decoder (Jpn, v3.000)</description>
+	<software name="jvcvc20" supported="no">
+		<description>JVC Video CD / Photo CD Decoder (Japan, v3.000)</description>
 		<year>1996?</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="RG-VC20" />
@@ -109,14 +109,14 @@ license:CC0-1.0
 			<feature name="ic303" value="PA32" />
 			<feature name="ic304" value="HM514260CJ7" /> <!-- 512k DRAM by Hitachi -->
 			<feature name="ic401" value="HD814102F" /> <!-- Custom ASIC by Hitachi -->
-			<dataarea name="rom" size="524288">
-				<rom name="pa32.ic303" size="524288" crc="afe194aa" sha1="bb6459da484864226616c5d45b779d4b1644c527" offset="0" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="pa32.ic303" size="0x80000" crc="afe194aa" sha1="bb6459da484864226616c5d45b779d4b1644c527" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jvcvc2">
-		<description>Victor Twin Operator Video CD &amp; Photo CD (Jpn, v2.001)</description>
+	<software name="jvcvc2" supported="no">
+		<description>Victor Twin Operator Video CD &amp; Photo CD (Japan, v2.001)</description>
 		<year>1995</year>
 		<publisher>Victor</publisher>
 		<info name="serial" value="RG-VC2" />
@@ -126,14 +126,14 @@ license:CC0-1.0
 			<feature name="ic302" value="HM514260AJ7" /> <!-- 512k DRAM by Hitachi -->
 			<feature name="ic303" value="PZE6 (early), PA26 (late)" /> <!-- Verified they have the same content, just different type of ROM chip (HN62444BNC vs HN62454BNC) -->
 			<feature name="ic401" value="HD814102F" /> <!-- Custom ASIC by Hitachi -->
-			<dataarea name="rom" size="524288">
-				<rom name="pa26.ic303" size="524288" crc="badf129d" sha1="286f2c75b1a5bb9d7df23db9f0a381e61b1ac76c" offset="0" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="pa26.ic303" size="0x80000" crc="badf129d" sha1="286f2c75b1a5bb9d7df23db9f0a381e61b1ac76c" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jvcvc2a" cloneof="jvcvc2">
-		<description>Victor Twin Operator Video CD &amp; Photo CD (Jpn, v2.000)</description>
+	<software name="jvcvc2a" cloneof="jvcvc2" supported="no">
+		<description>Victor Twin Operator Video CD &amp; Photo CD (Japan, v2.000)</description>
 		<year>1995</year>
 		<publisher>Victor</publisher>
 		<info name="serial" value="RG-VC2" />
@@ -143,14 +143,14 @@ license:CC0-1.0
 			<feature name="ic302" value="HM514260AJ7" /> <!-- 512k DRAM by Hitachi -->
 			<feature name="ic303" value="PZD9" />
 			<feature name="ic401" value="HD814102F" /> <!-- Custom ASIC by Hitachi -->
-			<dataarea name="rom" size="524288">
-				<rom name="pzd9.ic303" size="524288" crc="f2dde5c7" sha1="567f82a31d5f93676120d699869b3ca64995e167" offset="0" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="pzd9.ic303" size="0x80000" crc="f2dde5c7" sha1="567f82a31d5f93676120d699869b3ca64995e167" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jvcvc1">
-		<description>Victor Video CD Decoder (Jpn, v1.003)</description>
+	<software name="jvcvc1" supported="no">
+		<description>Victor Video CD Decoder (Japan, v1.003)</description>
 		<year>1995</year>
 		<publisher>Victor</publisher>
 		<info name="serial" value="RG-VC1" />
@@ -160,8 +160,26 @@ license:CC0-1.0
 			<feature name="ic302" value="HM514260AJ7" /> <!-- 512k DRAM by Hitachi -->
 			<feature name="ic303" value="PZA6" />
 			<feature name="ic401" value="HD814102F" /> <!-- Custom ASIC by Hitachi -->
-			<dataarea name="rom" size="524288">
-				<rom name="pza6.ic303" size="524288" crc="ef9d13ef" sha1="eaac576b8b5e79e7df5e3efd70275b220ff70d78" offset="0" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="pza6.ic303" size="0x80000" crc="ef9d13ef" sha1="eaac576b8b5e79e7df5e3efd70275b220ff70d78" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jvcvc3" supported="no">
+		<description>Victor Twin Operator Video CD &amp; Photo CD (Japan, v4.000)</description>
+		<year>1997</year>
+		<publisher>Victor</publisher>
+		<info name="serial" value="RG-VC3" />
+		<part name="cart" interface="sat_vcd_cart">
+			<feature name="pcb" value="171-7027B PC BD MPEG" />
+			<feature name="ic301" value="315-5745 / HD814101FE" /> <!-- Custom ASIC by Sega/Hitachi -->
+			<feature name="ic302" value="HM514260AJ7" /> <!-- 512k DRAM by Hitachi -->
+			<feature name="ic303" value="62454BNC" />
+			<feature name="ic304" value="HY514260B JC-70" /> <!-- 512k DRAM by Hyundai -->
+			<feature name="ic401" value="HD814102F" /> <!-- Custom ASIC by Hitachi -->
+			<dataarea name="rom" size="0x80000">
+				<rom name="62454bnc.ic303" size="0x80000" crc="7826f82c" sha1="2b070ecd1c10e9dd94454797395a57c6e53fd16c" />
 			</dataarea>
 		</part>
 	</software>

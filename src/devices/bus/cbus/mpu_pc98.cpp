@@ -32,6 +32,7 @@ DIP-SWs
 
 void mpu_pc98_device::mpu_irq_out(int state)
 {
+	m_bus->int_w<2>(state);
 }
 
 //**************************************************************************

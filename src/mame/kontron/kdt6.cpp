@@ -73,11 +73,10 @@ public:
 	void psi98(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void busreq_w(int state);
 	uint8_t memory_r(offs_t offset);
 	void memory_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
@@ -116,8 +115,8 @@ private:
 	void rs232b_rx_w(int state);
 	void siob_tx_w(int state);
 
-	void psi98_io(address_map &map);
-	void psi98_mem(address_map &map);
+	void psi98_io(address_map &map) ATTR_COLD;
+	void psi98_mem(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_cpu;
 	required_device<z80dma_device> m_dma;
@@ -387,12 +386,6 @@ void kdt6_state::siob_tx_w(int state)
 //  MACHINE
 //**************************************************************************
 
-void kdt6_state::busreq_w(int state)
-{
-	m_cpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
-	m_dma->bai_w(state);
-}
-
 uint8_t kdt6_state::memory_r(offs_t offset)
 {
 	return m_ram[m_dma_map << 16 | offset];
@@ -596,7 +589,7 @@ void kdt6_state::machine_start()
 	save_item(NAME(m_status0));
 	save_item(NAME(m_status1));
 	save_item(NAME(m_status2));
-	save_pointer(NAME(m_mapper), 16);
+	save_item(NAME(m_mapper));
 	save_item(NAME(m_video_address));
 }
 
@@ -627,6 +620,7 @@ void kdt6_state::psi98(machine_config &config)
 	m_cpu->set_addrmap(AS_PROGRAM, &kdt6_state::psi98_mem);
 	m_cpu->set_addrmap(AS_IO, &kdt6_state::psi98_io);
 	m_cpu->set_daisy_config(daisy_chain_intf);
+	m_cpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -653,7 +647,7 @@ void kdt6_state::psi98(machine_config &config)
 	TIMER(config, m_beep_timer).configure_generic(FUNC(kdt6_state::beeper_off));
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
-	m_dma->out_busreq_callback().set(FUNC(kdt6_state::busreq_w));
+	m_dma->out_busreq_callback().set_inputline(m_cpu, Z80_INPUT_LINE_BUSRQ);
 	m_dma->out_int_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set(FUNC(kdt6_state::memory_r));
 	m_dma->out_mreq_callback().set(FUNC(kdt6_state::memory_w));

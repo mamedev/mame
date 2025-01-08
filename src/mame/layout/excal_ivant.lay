@@ -8,6 +8,7 @@ authors:hap
 <!-- define elements -->
 
 	<element name="red"><rect><color red="0.6" green="0.12" blue="0.10" /></rect></element>
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="lcdm"><rect><color red="0.7" green="0.71" blue="0.72" /></rect></element>
 
 	<element name="text_cl00"><text string="A" align="2"><color red="0.41" green="0.4" blue="0.39" /></text></element>
@@ -92,9 +93,10 @@ authors:hap
 	</element>
 
 	<group name="sb_board">
-		<bounds x="-0.75" y="-0.75" width="81.5" height="81.5" />
-		<element ref="red"><bounds x="-0.75" y="-0.75" width="81.5" height="81.5" /></element>
-		<element ref="cwhite"><bounds x="-0.5" y="-0.5" width="81" height="81" /></element>
+		<bounds x="-1.25" y="-1.25" width="82.5" height="82.5" />
+		<element ref="cwhite"><bounds x="-1.25" y="-1.25" width="82.5" height="82.5" /></element>
+		<element ref="blackb"><bounds x="-1" y="-1" width="82" height="82" /></element>
+		<element ref="red"><bounds x="-0.25" y="-0.25" width="80.5" height="80.5" /></element>
 
 		<!-- squares (avoid seams) -->
 		<element ref="cwhite"><bounds x="0"  y="0" width="11" height="11" /></element>
@@ -333,25 +335,23 @@ authors:hap
 
 <!-- buttons -->
 
-	<element name="text_b00"><text string="SET UP"></text></element>
-	<element name="text_b01"><text string="LEVEL"></text></element>
-	<element name="text_b02"><text string="HINT"></text></element>
-	<element name="text_b10"><text string="VERIFY"></text></element>
-	<element name="text_b11"><text string="MULTI-MOVE"></text></element>
-	<element name="text_b12"><text string="MOVE"></text></element>
+	<element name="text_b00"><text string="MODE"></text></element>
+	<element name="text_b10"><text string="SET UP"></text></element>
+	<element name="text_b11"><text string="LEVEL"></text></element>
+	<element name="text_b12"><text string="HINT"></text></element>
+	<element name="text_b20"><text string="VERIFY"></text></element>
+	<element name="text_b21"><text string="MULTI-MOVE"></text></element>
+	<element name="text_b22"><text string="MOVE"></text></element>
 
-	<element name="text_b20"><text string="OFF/SAVE"></text></element>
-	<element name="text_b21"><text string="OPTION"></text></element>
-	<element name="text_b22"><text string="TAKE BACK"></text></element>
-	<element name="text_b23"><text string="NO"></text></element>
-	<element name="text_b30"><text string="ON/CLEAR"></text></element>
-	<element name="text_b31"><text string="BLACK/WHITE"></text></element>
-	<element name="text_b32"><text string="REPEAT"></text></element>
-	<element name="text_b33"><text string="YES"></text></element>
-	<element name="text_b40"><text string="NEW GAME"></text></element>
-	<element name="text_b41"><text string=" "></text></element>
-	<element name="text_b42"><text string="MODE"></text></element>
-	<element name="text_b43"><text string=" "></text></element>
+	<element name="text_b30"><text string="OFF/SAVE"></text></element>
+	<element name="text_b31"><text string="OPTION"></text></element>
+	<element name="text_b32"><text string="TAKE BACK"></text></element>
+	<element name="text_b33"><text string="NO"></text></element>
+	<element name="text_b40"><text string="ON/CLEAR"></text></element>
+	<element name="text_b41"><text string="BLACK/WHITE"></text></element>
+	<element name="text_b42"><text string="REPEAT"></text></element>
+	<element name="text_b43"><text string="YES"></text></element>
+	<element name="text_b50"><text string="NEW GAME"></text></element>
 
 	<element name="text_p1"><image file="chess/wk.svg"/></element>
 	<element name="text_p2"><image file="chess/wq.svg"/></element>
@@ -363,7 +363,7 @@ authors:hap
 	<element name="triangle">
 		<image><data><![CDATA[
 			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="10" height="10">
-				<path d="M 5,0 10,10 0,10 z" fill="#ffffff" stroke="none" stroke-width="0" />
+				<path d="M 5,0 10,10 0,10 z" fill="none" stroke="#ffffff" stroke-width="1.2" />
 			</svg>
 		]]></data></image>
 	</element>
@@ -399,28 +399,32 @@ authors:hap
 			<param name="y" start="7" increment="6" />
 			<param name="i" start="0" increment="1" />
 
-			<element ref="text_b0~i~"><bounds xc="6" y="~y~" width="10" height="1.4" /></element>
 			<element ref="text_b1~i~"><bounds xc="13.75" y="~y~" width="10" height="1.4" /></element>
+			<element ref="text_b2~i~"><bounds xc="21.5" y="~y~" width="10" height="1.4" /></element>
 		</repeat>
+
+		<element ref="text_b00"><bounds xc="6" y="7" width="10" height="1.4" /></element>
 
 		<repeat count="3">
 			<param name="y" start="3.9" increment="6" />
 			<param name="i1" start="1" increment="2" />
 			<param name="i2" start="2" increment="2" />
 
-			<element ref="text_p~i1~"><bounds xc="6" yc="~y~" width="2.4" height="2.4" /></element>
-			<element ref="text_p~i2~"><bounds xc="13.75" yc="~y~" width="2.4" height="2.4" /></element>
+			<element ref="text_p~i1~"><bounds xc="13.75" yc="~y~" width="2.4" height="2.4" /></element>
+			<element ref="text_p~i2~"><bounds xc="21.5" yc="~y~" width="2.4" height="2.4" /></element>
 		</repeat>
 
 		<element ref="cwhite" blend="multiply"><bounds x="0" y="0" width="30" height="30" /></element>
 
 		<element ref="butw" inputtag="IN.1" inputmask="0x01"><bounds xc="6" yc="6" width="5.5" height="1.5" /></element>
-		<element ref="butw" inputtag="IN.1" inputmask="0x80"><bounds xc="6" yc="12" width="5.5" height="1.5" /></element>
-		<element ref="butw" inputtag="IN.1" inputmask="0x40"><bounds xc="6" yc="18" width="5.5" height="1.5" /></element>
 
 		<element ref="butw" inputtag="IN.1" inputmask="0x02"><bounds xc="13.75" yc="6" width="5.5" height="1.5" /></element>
-		<element ref="butw" inputtag="IN.1" inputmask="0x04"><bounds xc="13.75" yc="12" width="5.5" height="1.5" /></element>
-		<element ref="butw" inputtag="IN.1" inputmask="0x20"><bounds xc="13.75" yc="18" width="5.5" height="1.5" /></element>
+		<element ref="butw" inputtag="IN.1" inputmask="0x40"><bounds xc="13.75" yc="12" width="5.5" height="1.5" /></element>
+		<element ref="butw" inputtag="IN.1" inputmask="0x80"><bounds xc="13.75" yc="18" width="5.5" height="1.5" /></element>
+
+		<element ref="butw" inputtag="IN.0" inputmask="0x04"><bounds xc="21.5" yc="6" width="5.5" height="1.5" /></element>
+		<element ref="butw" inputtag="IN.1" inputmask="0x04"><bounds xc="21.5" yc="12" width="5.5" height="1.5" /></element>
+		<element ref="butw" inputtag="IN.1" inputmask="0x20"><bounds xc="21.5" yc="18" width="5.5" height="1.5" /></element>
 	</group>
 
 	<group name="buttons2">
@@ -430,10 +434,11 @@ authors:hap
 			<param name="y" start="3.6" increment="4" />
 			<param name="i" start="0" increment="1" />
 
-			<element ref="text_b2~i~"><bounds xc="6" y="~y~" width="10" height="1.4" /></element>
-			<element ref="text_b3~i~"><bounds xc="13.75" y="~y~" width="10" height="1.4" /></element>
-			<element ref="text_b4~i~"><bounds xc="21.5" y="~y~" width="10" height="1.4" /></element>
+			<element ref="text_b3~i~"><bounds xc="6" y="~y~" width="10" height="1.4" /></element>
+			<element ref="text_b4~i~"><bounds xc="13.75" y="~y~" width="10" height="1.4" /></element>
 		</repeat>
+
+		<element ref="text_b50"><bounds xc="21.5" y="3.6" width="10" height="1.4" /></element>
 
 		<element ref="triangle"><bounds xc="6" y="19.3" width="1.5" height="1.1" /><orientation rotate="270" /></element>
 		<element ref="triangle"><bounds xc="13.75" y="19.3" width="1.5" height="1.1" /><orientation rotate="90" /></element>
@@ -451,22 +456,21 @@ authors:hap
 		<element ref="butr" inputtag="IN.0" inputmask="0x80"><bounds xc="13.75" yc="18" width="5.5" height="1.5" /></element>
 
 		<element ref="butr" inputtag="IN.0" inputmask="0x10"><bounds xc="21.5" yc="6" width="5.5" height="1.5" /></element>
-		<element ref="butr" inputtag="IN.0" inputmask="0x04"><bounds xc="21.5" yc="14" width="5.5" height="1.5" /></element>
 	</group>
 
 
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-3.75" right="92.75" top="7.25" bottom="111" />
+		<bounds left="-4.25" right="93.25" top="6.75" bottom="111.5" />
 
-		<group ref="buttons1"><bounds x="19.0" y="89" width="50" height="50" /></group>
-		<group ref="buttons2"><bounds x="61.25" y="89" width="50" height="50" /></group>
+		<group ref="buttons1"><bounds x="11.25" y="89.5" width="50" height="50" /></group>
+		<group ref="buttons2"><bounds x="61.25" y="89.5" width="50" height="50" /></group>
 
-		<screen index="0"><bounds xc="50" yc="97.9" width="20" height="7.264" /></screen>
-		<element ref="lcdm" blend="multiply"><bounds xc="50" yc="97.9" width="21" height="8" /></element>
+		<screen index="0"><bounds xc="50" yc="98.5" width="20" height="7.531" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds xc="50" yc="98.5" width="21" height="8.5" /></element>
 
-		<group ref="sb_board"><bounds xc="50" yc="50" width="81.5" height="81.5" /></group>
-		<group ref="sb_ui"><bounds x="-2.25" y="10" width="10" height="80" /></group>
+		<group ref="sb_board"><bounds xc="50" yc="50" width="82.5" height="82.5" /></group>
+		<group ref="sb_ui"><bounds x="-2.75" y="10" width="10" height="80" /></group>
 	</view>
 </mamelayout>

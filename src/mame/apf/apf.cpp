@@ -126,8 +126,8 @@ public:
 	void apfimag(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t videoram_r(offs_t offset);
@@ -141,8 +141,8 @@ private:
 	uint8_t serial_r(offs_t offset);
 	void serial_w(offs_t offset, uint8_t data);
 
-	void apfimag_map(address_map &map);
-	void apfm1000_map(address_map &map);
+	void apfimag_map(address_map &map) ATTR_COLD;
+	void apfm1000_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_latch = 0U;
 	uint8_t m_keyboard_data = 0U;

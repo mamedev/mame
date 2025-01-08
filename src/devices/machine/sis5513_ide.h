@@ -29,16 +29,16 @@ public:
 	auto irq_sec() { return m_irq_sec_callback.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 //  virtual void reset_all_mappings() override;
 
 //  virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 //                         uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_device<bus_master_ide_controller_device> m_ide1;
@@ -47,11 +47,11 @@ private:
 	devcb_write_line m_irq_sec_callback;
 	required_address_space m_bus_master_space;
 
-	void ide1_command_map(address_map &map);
-	void ide1_control_map(address_map &map);
-	void ide2_command_map(address_map &map);
-	void ide2_control_map(address_map &map);
-	void bus_master_ide_control_map(address_map &map);
+	void ide1_command_map(address_map &map) ATTR_COLD;
+	void ide1_control_map(address_map &map) ATTR_COLD;
+	void ide2_command_map(address_map &map) ATTR_COLD;
+	void ide2_control_map(address_map &map) ATTR_COLD;
+	void bus_master_ide_control_map(address_map &map) ATTR_COLD;
 
 	bool ide1_mode();
 	bool ide2_mode();
@@ -78,7 +78,7 @@ private:
 	uint8_t ide2_read_cs1_r();
 	void ide2_write_cs1_w(uint8_t data);
 
-//  void compatible_io_map(address_map &map);
+//  void compatible_io_map(address_map &map) ATTR_COLD;
 	void flush_ide_mode();
 
 	u8 unmap_log_r(offs_t offset);

@@ -22,9 +22,9 @@ public:
 	uint32_t data_r() const;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_resolve_objects() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 private:
 	struct dev_t {
@@ -61,7 +61,7 @@ public:
 	nscsi_device *get_device();
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class nscsi_slot_card_interface : public device_interface
@@ -133,7 +133,7 @@ public:
 protected:
 	nscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	int scsi_id;
 	int scsi_refid;
@@ -603,6 +603,12 @@ protected:
 		SC_REGENERATE                    = 0x82,
 		SC_EXTENDED_COPY                 = 0x83,
 		SC_RECEIVE_COPY_RESULTS          = 0x84,
+		SC_WRITE_16                      = 0x8a,
+		SC_SYNCHRONIZE_CACHE_16          = 0x91,
+		SC_WRITE_SAME_16                 = 0x93,
+		SC_READ_CAPACITY_16              = 0x9e,
+		SC_READ_LONG_16                  = 0x9e,
+		SC_WRITE_LONG_16                 = 0x9f,
 		SC_REPORT_LUNS                   = 0xa0,
 		SC_BLANK                         = 0xa1,
 		SC_SEND_EVENT                    = 0xa2,
@@ -633,7 +639,9 @@ protected:
 		SC_SCAN_MMC                      = 0xba,
 		SC_SET_CD_SPEED                  = 0xbb,
 		SC_PLAY_CD                       = 0xbc,
+		SC_SPARE_IN                      = 0xbc,
 		SC_MECHANISM_STATUS              = 0xbd,
+		SC_SPARE_OUT                     = 0xbd,
 		SC_READ_CD                       = 0xbe,
 		SC_SEND_DVD_STRUCTURE            = 0xbf
 	};
@@ -645,8 +653,8 @@ protected:
 
 	nscsi_full_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void scsi_message();
 	virtual void scsi_command();

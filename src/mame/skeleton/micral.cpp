@@ -88,8 +88,8 @@ public:
 	void micral(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	u8 keyin_r();
 	u8 status_r();
 	u8 unk_r();
@@ -97,9 +97,9 @@ private:
 	void video_w(offs_t offset, u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_kbd(address_map &map);
-	void mem_kbd(address_map &map);
-	void mem_map(address_map &map);
+	void io_kbd(address_map &map) ATTR_COLD;
+	void mem_kbd(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u16 s_curpos = 0U;
 	u8 s_command = 0U;
@@ -475,5 +475,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY           FULLNAME         FLAGS
-COMP( 1981, micral,   0,      0,      micral,  micral, micral_state, empty_init, "Bull R2E",       "Micral 80-22G", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
-COMP( 1982, questarm, micral, 0,      micral,  micral, micral_state, empty_init, "Honeywell Bull", "Questar/M",     MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, micral,   0,      0,      micral,  micral, micral_state, empty_init, "Bull R2E",       "Micral 80-22G", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, questarm, micral, 0,      micral,  micral, micral_state, empty_init, "Honeywell Bull", "Questar/M",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

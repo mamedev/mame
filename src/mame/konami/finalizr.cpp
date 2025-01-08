@@ -54,9 +54,9 @@ public:
 	void finalizrb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -93,8 +93,8 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -104,8 +104,8 @@ private:
   The palette PROMs are connected to the RGB output this way:
 
   bit 7 -- 220  ohm resistor  -- \
-        -- 470  ohm resistor  -- | -- 470 ohm pulldown resistor -- GREEN
-        -- 1   kohm resistor  -- |
+        -- 1   kohm resistor  -- | -- 470 ohm pulldown resistor -- GREEN
+        -- 470  ohm resistor  -- |
         -- 2.2 kohm resistor  -- /
         -- 220  ohm resistor  -- \
         -- 470  ohm resistor  -- | -- 470 ohm pulldown resistor -- RED
@@ -146,8 +146,8 @@ void finalizr_state::palette(palette_device &palette) const
 
 		// green component
 		bit0 = BIT(color_prom[i], 4);
-		bit1 = BIT(color_prom[i], 5);
-		bit2 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 5);
 		bit3 = BIT(color_prom[i], 7);
 		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
 
@@ -415,7 +415,7 @@ static INPUT_PORTS_START( finalizr )
 	KONAMI8_SYSTEM_10
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("P1")
 	KONAMI8_MONO_B12_UNK

@@ -34,7 +34,7 @@ public:
 	adb_device *get_device();
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class adb_slot_card_interface : public device_interface
@@ -59,8 +59,8 @@ public:
 
 protected:
 	adb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	devcb_write_line m_adb_cb;
 

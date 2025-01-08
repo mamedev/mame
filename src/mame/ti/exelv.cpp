@@ -166,7 +166,7 @@ private:
 	DECLARE_MACHINE_START(exl100);
 	DECLARE_MACHINE_START(exeltel);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 	void machine_common();
 
 	/* tms7020 i/o ports */
@@ -185,8 +185,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
-	void tms7020_mem(address_map &map);
-	void tms7040_mem(address_map &map);
+	void tms7020_mem(address_map &map) ATTR_COLD;
+	void tms7040_mem(address_map &map) ATTR_COLD;
 
 	// variables for the keyboard
 	u8 k_channels[3] = { 0xff, 0xff, 0x3e }; // [0] = key down, [1] = key being sent; [2] = ch62

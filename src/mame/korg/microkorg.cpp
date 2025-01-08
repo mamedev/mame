@@ -27,7 +27,7 @@ public:
 	void microkorg(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<h8s2320_device> m_maincpu;
 };
@@ -64,4 +64,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(2002, microkorg, 0, 0, microkorg, microkorg, microkorg_state, empty_init, "Korg", "microKORG Synthesizer/Vocoder", MACHINE_IS_SKELETON)
+SYST(2002, microkorg, 0, 0, microkorg, microkorg, microkorg_state, empty_init, "Korg", "microKORG Synthesizer/Vocoder", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -66,9 +66,9 @@ public:
 	void _3x3puzzle(machine_config &config);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -97,7 +97,7 @@ private:
 	void tilemap1_scrollx_w(uint16_t data);
 	void tilemap1_scrolly_w(uint16_t data);
 
-	void _3x3puzzle_map(address_map &map);
+	void _3x3puzzle_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -235,7 +235,7 @@ static INPUT_PORTS_START( _3x3puzzle )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW01")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )         PORT_DIPLOCATION("SW1:1")

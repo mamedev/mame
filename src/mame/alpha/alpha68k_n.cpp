@@ -379,7 +379,7 @@ void sstingray_state::main_map(address_map &map)
 	map(0x040000, 0x041fff).ram().share("spriteram"); // sprite RAM
 	map(0x060000, 0x060001).ram().share("videoram");  // MSB: watchdog, LSB: BGC
 	map(0x080000, 0x0801ff).rw(FUNC(sstingray_state::alpha8511_command_r), FUNC(sstingray_state::alpha8511_command_w)).umask16(0x00ff);
-	map(0x0c0000, 0x0c0001).portr("IN0");
+	map(0x0c0000, 0x0c0001).portr(m_in[0]);
 	map(0x0e0000, 0x0e0000).lr8(NAME([this] () -> u8 { return m_in[1]->read(); })).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
@@ -390,7 +390,7 @@ void alpha68k_N_state::main_map(address_map &map)
 	map(0x040000, 0x041fff).ram().share("spriteram"); // sprite RAM
 	map(0x060000, 0x060001).ram().share("videoram");  // MSB: watchdog, LSB: BGC
 	map(0x080000, 0x0801ff).rw(FUNC(kyros_state::kyros_alpha_trigger_r), FUNC(kyros_state::alpha_microcontroller_w));
-	map(0x0c0000, 0x0c0001).portr("IN0");
+	map(0x0c0000, 0x0c0001).portr(m_in[0]);
 	map(0x0e0000, 0x0e0000).lr8(NAME([this] () -> u8 { return m_in[1]->read(); })).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
@@ -831,6 +831,7 @@ void jongbou_state::jongbou(machine_config &config)
 }
 
 
+// also seen on a bootleg PCB CH86-01006A with double sized ROMs and the 8748 MCU
 ROM_START( sstingry )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_BYTE( "ss_05.rom",  0x0000,  0x4000, CRC(bfb28d53) SHA1(64a1b8627529ed13074bb949cb104077eb3eac1f) )

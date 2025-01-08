@@ -351,7 +351,7 @@ public:
 	void sstrangr(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -369,8 +369,8 @@ private:
 
 	uint32_t screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void sstrangr_io_map(address_map &map);
-	void sstrangr_map(address_map &map);
+	void sstrangr_io_map(address_map &map) ATTR_COLD;
+	void sstrangr_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -540,7 +540,7 @@ static INPUT_PORTS_START( sstrangr )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 
 	PORT_START("EXT")      // External switches
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -646,7 +646,7 @@ static INPUT_PORTS_START( sstrngr2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 
 	PORT_START("EXT")      /* External switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_DIPNAME( 0x02, 0x00, "Player's Bullet Speed" )  PORT_DIPLOCATION("EDGE:2")  // This is an edge connector pin listed in the manual as 'Fast Shoot'
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x02, "Fast" )

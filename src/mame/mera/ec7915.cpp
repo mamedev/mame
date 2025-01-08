@@ -30,8 +30,8 @@ public:
 	void ec7915(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_chargen;
@@ -95,4 +95,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(198?, ec7915, 0, 0, ec7915, ec7915, ec7915_state, empty_init, "Mera-Elzab", "EC-7915 (EC-7950)", MACHINE_IS_SKELETON)
+COMP(198?, ec7915, 0, 0, ec7915, ec7915, ec7915_state, empty_init, "Mera-Elzab", "EC-7915 (EC-7950)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

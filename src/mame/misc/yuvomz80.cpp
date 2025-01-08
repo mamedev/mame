@@ -55,11 +55,11 @@ public:
 	void hexaprsz(machine_config &config);
 
 private:
-	void audio_mem_map(address_map &map);
-	void audio_io_map(address_map &map);
-	void hexaprsz_audio_io_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void audio_mem_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void hexaprsz_audio_io_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -169,5 +169,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1995, hexaprs,  0,       hexaprs,  hexaprs, yuvomz80_state, empty_init, ROT0, "Yuvo / Yubis", "Hexa President (YM2610 set)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1995, hexaprsz, hexaprs, hexaprsz, hexaprs, yuvomz80_state, empty_init, ROT0, "Yuvo / Yubis", "Hexa President (YMZ280B set)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1995, hexaprs,  0,       hexaprs,  hexaprs, yuvomz80_state, empty_init, ROT0, "Yuvo / Yubis", "Hexa President (YM2610 set)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1995, hexaprsz, hexaprs, hexaprsz, hexaprs, yuvomz80_state, empty_init, ROT0, "Yuvo / Yubis", "Hexa President (YMZ280B set)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

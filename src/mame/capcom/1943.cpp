@@ -77,7 +77,7 @@ void _1943_state::c1943_map(address_map &map)
 	map(0xc004, 0xc004).portr("DSWB");
 	map(0xc007, 0xc007).lr8(NAME([this] () -> u8 { return m_mcu_to_cpu; }));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(FUNC(_1943_state::c804_w)); // ROM bank switch, screen flip
+	map(0xc804, 0xc804).w(FUNC(_1943_state::control_w)); // ROM bank switch, screen flip
 	map(0xc806, 0xc806).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xc807, 0xc807).lw8(NAME([this] (u8 data) { m_cpu_to_mcu = data; }));
 	map(0xd000, 0xd3ff).ram().w(FUNC(_1943_state::videoram_w)).share("videoram");
@@ -85,7 +85,7 @@ void _1943_state::c1943_map(address_map &map)
 	map(0xd800, 0xd801).ram().share("scrollx");
 	map(0xd802, 0xd802).ram().share("scrolly");
 	map(0xd803, 0xd804).ram().share("bgscrollx");
-	map(0xd806, 0xd806).w(FUNC(_1943_state::d806_w)); // sprites, bg1, bg2 enable
+	map(0xd806, 0xd806).w(FUNC(_1943_state::layer_w)); // sprites, bg1, bg2 enable
 	map(0xd808, 0xd808).nopw(); // ???
 	map(0xd868, 0xd868).nopw(); // ???
 	map(0xd888, 0xd888).nopw(); // ???
@@ -264,8 +264,8 @@ void _1943_state::machine_start()
 void _1943_state::machine_reset()
 {
 	// these latches are cleared at RESET
-	c804_w(0);
-	d806_w(0);
+	control_w(0);
+	layer_w(0);
 }
 
 void _1943_state::_1943(machine_config &config)
@@ -291,7 +291,7 @@ void _1943_state::_1943(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(24'000'000)/4, 384, 128, 0, 262, 22, 246);   // hsync is 50..77, vsync is 257..259
+	m_screen->set_raw(XTAL(24'000'000)/4, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	m_screen->set_screen_update(FUNC(_1943_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_mcu, MCS51_INT1_LINE);

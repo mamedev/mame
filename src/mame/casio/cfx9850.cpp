@@ -70,7 +70,7 @@ private:
 	void cfx9850_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void cfx9850_mem(address_map &map);
+	void cfx9850_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -320,7 +320,7 @@ public:
 	{ }
 
 	void cfx9850gb(machine_config &config);
-	void cfx9850gb_mem(address_map &map);
+	void cfx9850gb_mem(address_map &map) ATTR_COLD;
 };
 
 void cfx9850gb_state::cfx9850gb_mem(address_map &map)

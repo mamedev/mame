@@ -34,8 +34,8 @@ private:
 
 	u8 ga_hack_r();
 
-	void mem_map(address_map &map);
-	void program_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -118,4 +118,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1989, tv965, 0, 0, tv965, tv965, tv965_state, empty_init, "TeleVideo Systems", "TeleVideo 965", MACHINE_IS_SKELETON )
+COMP( 1989, tv965, 0, 0, tv965, tv965, tv965_state, empty_init, "TeleVideo Systems", "TeleVideo 965", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

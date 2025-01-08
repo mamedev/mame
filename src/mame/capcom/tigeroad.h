@@ -50,7 +50,7 @@ protected:
 	void videoctrl_w(u8 data);
 	void scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 	bool m_has_coinlock;
 
 private:
@@ -65,18 +65,18 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
 
-	void comad_sound_io_map(address_map &map);
-	void comad_sound_map(address_map &map);
-	void sample_map(address_map &map);
-	void sample_port_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_port_map(address_map &map);
+	void comad_sound_io_map(address_map &map) ATTR_COLD;
+	void comad_sound_map(address_map &map) ATTR_COLD;
+	void sample_map(address_map &map) ATTR_COLD;
+	void sample_port_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_port_map(address_map &map) ATTR_COLD;
 
 	void msm5205_w(u8 data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -101,7 +101,7 @@ public:
 	void bballs(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u16 mcu_comm_r(offs_t offset, u16 mem_mask = ~0);
@@ -112,8 +112,8 @@ private:
 	void mcu_pb_w(u8 data);
 	void mcu_pc_w(u8 data);
 
-	void bballs_map(address_map &map);
-	void pushman_map(address_map &map);
+	void bballs_map(address_map &map) ATTR_COLD;
+	void pushman_map(address_map &map) ATTR_COLD;
 
 	required_device<m68705u_device> m_mcu;
 
@@ -137,11 +137,11 @@ public:
 	void f1dream(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void f1dream_map(address_map &map);
-	void f1dream_mcu_io(address_map &map);
+	void f1dream_map(address_map &map) ATTR_COLD;
+	void f1dream_mcu_io(address_map &map) ATTR_COLD;
 
 	void out3_w(u8 data);
 

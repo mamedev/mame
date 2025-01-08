@@ -840,7 +840,7 @@ static imgtoolerr_t bml3_diskimage_deletefile(imgtool::partition &partition, con
 
 
 
-static imgtoolerr_t bml3_diskimage_suggesttransfer(imgtool::partition &partition, const char *fname, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
+static imgtoolerr_t bml3_diskimage_suggesttransfer(imgtool::partition &partition, const char *fname, imgtool::transfer_suggestion *suggestions, size_t suggestions_length)
 {
 	imgtoolerr_t err;
 	imgtool::image &image(partition.image());
@@ -856,27 +856,27 @@ static imgtoolerr_t bml3_diskimage_suggesttransfer(imgtool::partition &partition
 		if (ent.asciiflag == 0xFF)
 		{
 			/* ASCII file */
-			suggestions[0].viability = SUGGESTION_RECOMMENDED;
+			suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
 			suggestions[0].filter = filter_eoln_getinfo;
-			suggestions[1].viability = SUGGESTION_POSSIBLE;
-			suggestions[1].filter = NULL;
+			suggestions[1].viability = imgtool::SUGGESTION_POSSIBLE;
+			suggestions[1].filter = nullptr;
 		}
 		else if (ent.ftype == 0)
 		{
 			/* tokenized BASIC file */
-			suggestions[0].viability = SUGGESTION_RECOMMENDED;
-			suggestions[0].filter = NULL;
-			suggestions[1].viability = SUGGESTION_POSSIBLE;
+			suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
+			suggestions[0].filter = nullptr;
+			suggestions[1].viability = imgtool::SUGGESTION_POSSIBLE;
 			suggestions[1].filter = filter_bml3bas_getinfo;
 		}
 	}
 	else
 	{
-		suggestions[0].viability = SUGGESTION_RECOMMENDED;
-		suggestions[0].filter = NULL;
-		suggestions[1].viability = SUGGESTION_POSSIBLE;
+		suggestions[0].viability = imgtool::SUGGESTION_RECOMMENDED;
+		suggestions[0].filter = nullptr;
+		suggestions[1].viability = imgtool::SUGGESTION_POSSIBLE;
 		suggestions[1].filter = filter_eoln_getinfo;
-		suggestions[2].viability = SUGGESTION_POSSIBLE;
+		suggestions[2].viability = imgtool::SUGGESTION_POSSIBLE;
 		suggestions[2].filter = filter_bml3bas_getinfo;
 	}
 
@@ -911,9 +911,9 @@ void bml3_get_info(const imgtool_class *imgclass, uint32_t state, union imgtooli
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case IMGTOOLINFO_INT_PREFER_UCASE:                  info->i = 1; break;
 		case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:             info->i = sizeof(bml3_diskinfo); break;
-		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:             info->i = sizeof(struct bml3_direnum); break;
+		case IMGTOOLINFO_INT_DIRECTORY_EXTRA_BYTES:         info->i = sizeof(struct bml3_direnum); break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		/* --- the following bits of info are returned as NUL-terminated strings --- */
 		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "bml3"); break;
 		case IMGTOOLINFO_STR_DESCRIPTION:                   strcpy(info->s = imgtool_temp_str(), "Basic Master Level 3 format"); break;
 		case IMGTOOLINFO_STR_FILE:                          strcpy(info->s = imgtool_temp_str(), __FILE__); break;

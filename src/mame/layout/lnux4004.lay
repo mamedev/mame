@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Linux/4004 LED display
+-->
+<mamelayout version="2">
+
+	<element name="blank">
+		<rect />
+	</element>
+
+	<element name="led">
+		<disk state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="lbl_sdcard">
+		<text string="STORAGE" align="2" />
+	</element>
+
+	<element name="lbl_pc">
+		<text string="MIPS PC" align="1" />
+	</element>
+
+	<group name="leds">
+		<element ref="blank">
+			<bounds x="0" y="0" width="500" height="50" />
+			<color red="0" green="0" blue="0" />
+		</element>
+
+		<element ref="lbl_sdcard">
+			<bounds x="415" y="10" width="60" height="10" />
+		</element>
+
+		<element ref="lbl_pc">
+			<bounds x="10" y="15" width="60" height="10" />
+		</element>
+
+		<element ref="led" name="storage">
+			<bounds x="480" y="10" width="10" height="10" />
+		</element>
+
+		<repeat count="32">
+			<param name="n" start="31" increment="-1" />
+			<param name="x" start="10" increment="15" />
+			<element ref="led" name="pc~n~">
+				<bounds x="~x~" y="30" width="10" height="10" />
+			</element>
+		</repeat>
+	</group>
+
+	<view name="LEDs">
+		<group ref="leds" />
+	</view>
+
+	<view name="Terminal Below">
+		<group ref="leds">
+			<bounds x="0" y="0" width="500" height="50" />
+		</group>
+		<screen index="0">
+			<bounds x="0" y="50" width="500" height="375" />
+		</screen>
+	</view>
+
+	<view name="Terminal Above">
+		<group ref="leds">
+			<bounds x="0" y="375" width="500" height="50" />
+		</group>
+		<screen index="0">
+			<bounds x="0" y="0" width="500" height="375" />
+		</screen>
+	</view>
+
+</mamelayout>

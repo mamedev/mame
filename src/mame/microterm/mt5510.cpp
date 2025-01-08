@@ -27,16 +27,16 @@ public:
 	void mt5510(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void bank_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
@@ -121,4 +121,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1988, mt5510, 0, 0, mt5510, mt5510, mt5510_state, empty_init, "Microterm", "Microterm 5510", MACHINE_IS_SKELETON)
+COMP(1988, mt5510, 0, 0, mt5510, mt5510, mt5510_state, empty_init, "Microterm", "Microterm 5510", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

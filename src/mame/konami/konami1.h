@@ -35,7 +35,7 @@ protected:
 
 	uint16_t m_boundary;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };

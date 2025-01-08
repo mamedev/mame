@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license: GPL-2.0+
+// copyright-holders: Dirk Best
 /***************************************************************************
 
     Commodore A2058
@@ -21,12 +21,20 @@
 
 DEFINE_DEVICE_TYPE(ZORRO_A2058, bus::amiga::zorro::a2058_device, "zorro_a2058", "CBM A2058 Fast Memory")
 
-
 namespace bus::amiga::zorro {
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
+a2058_device::a2058_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ZORRO_A2058, tag, owner, clock),
+	device_zorro2_card_interface(mconfig, *this),
+	m_config(*this, "config"),
+	m_ram_size(0)
+{
+}
+
+
+//**************************************************************************
+//  INPUT DEFINITIONS
+//**************************************************************************
 
 static INPUT_PORTS_START( a2058 )
 	PORT_START("config")
@@ -44,24 +52,8 @@ ioport_constructor a2058_device::device_input_ports() const
 
 
 //**************************************************************************
-//  LIVE DEVICE
+//  MACHINE EMULATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  a2058_device - constructor
-//-------------------------------------------------
-
-a2058_device::a2058_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ZORRO_A2058, tag, owner, clock),
-	device_zorro2_card_interface(mconfig, *this),
-	m_config(*this, "config"),
-	m_ram_size(0)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
 void a2058_device::device_start()
 {
@@ -74,7 +66,7 @@ void a2058_device::device_start()
 
 
 //**************************************************************************
-//  IMPLEMENTATION
+//  AUTOCONFIG
 //**************************************************************************
 
 void a2058_device::autoconfig_base_address(offs_t address)
@@ -122,8 +114,8 @@ void a2058_device::cfgin_w(int state)
 			return;
 		}
 
-		autoconfig_product(0x0a);
-		autoconfig_manufacturer(0x0202);
+		autoconfig_product(10);
+		autoconfig_manufacturer(514);
 		autoconfig_serial(0x00000000);
 
 		autoconfig_link_into_memory(true);
@@ -134,8 +126,8 @@ void a2058_device::cfgin_w(int state)
 
 		// install autoconfig handler
 		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
-				read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-				write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
+			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffffffff);
 	}
 }
 

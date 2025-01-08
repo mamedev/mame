@@ -31,9 +31,9 @@ private:
 	void d40000_w(offs_t offset, u8 data);
 	void d80000_w(offs_t offset, u8 data);
 
-	void main_map(address_map &map);
-	void panel_map(address_map &map);
-	void panel_ext_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void panel_map(address_map &map) ATTR_COLD;
+	void panel_ext_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mcs51_cpu_device> m_panelcpu;
@@ -123,4 +123,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1994, hohnadam, 0, 0, hohnadam, hohnadam, hohnadam_state, empty_init, "Hohner", "ADAM Advanced Digital/Analog Musical Instrument", MACHINE_IS_SKELETON)
+SYST(1994, hohnadam, 0, 0, hohnadam, hohnadam, hohnadam_state, empty_init, "Hohner", "ADAM Advanced Digital/Analog Musical Instrument", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

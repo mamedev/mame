@@ -18,10 +18,12 @@
 #include "emu.h"
 
 #include "cuda.h"
+#include "dfac.h"
 #include "egret.h"
 #include "macadb.h"
 #include "macscsi.h"
 #include "mactoolbox.h"
+#include "omega.h"
 #include "sonora.h"
 
 #include "bus/nscsi/cd.h"
@@ -38,6 +40,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 #include "softlist_dev.h"
 
 namespace {
@@ -54,12 +57,15 @@ public:
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_sonora(*this, "sonora"),
+		m_dfac(*this, "dfac"),
+		m_omega(*this, "omega"),
 		m_scsibus1(*this, "scsi"),
 		m_ncr5380(*this, "scsi:7:ncr5380"),
 		m_scsihelp(*this, "scsihelp"),
 		m_scc(*this, "scc"),
 		m_egret(*this, "egret"),
-		m_cuda(*this, "cuda")
+		m_cuda(*this, "cuda"),
+		m_config(*this, "config")
 	{
 	}
 
@@ -68,25 +74,29 @@ public:
 	void maclc3p(machine_config &config);
 	void maclc520(machine_config &config);
 	void maclc550(machine_config &config);
-	void base_map(address_map &map);
-	void maclc3_map(address_map &map);
-	void maclc3p_map(address_map &map);
-	void maclc520_map(address_map &map);
-	void maclc550_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
+	void maclc3_map(address_map &map) ATTR_COLD;
+	void maclc3p_map(address_map &map) ATTR_COLD;
+	void maclc520_map(address_map &map) ATTR_COLD;
+	void maclc550_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<m68030_device> m_maincpu;
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	required_device<sonora_device> m_sonora;
+	optional_device<dfac_device> m_dfac;
+	required_device<omega_device> m_omega;
 	required_device<nscsi_bus_device> m_scsibus1;
 	required_device<ncr5380_device> m_ncr5380;
 	required_device<mac_scsi_helper_device> m_scsihelp;
 	required_device<z80scc_device> m_scc;
 	optional_device<egret_device> m_egret;
 	optional_device<cuda_device> m_cuda;
+	required_ioport m_config;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u16 scc_r(offs_t offset)
 	{
@@ -118,6 +128,14 @@ private:
 void macvail_state::machine_start()
 {
 	m_sonora->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
+}
+
+void macvail_state::machine_reset()
+{
+	if (m_config)
+	{
+		m_maincpu->set_fpu_enable(BIT(m_config->read(), 0));
+	}
 }
 
 /***************************************************************************
@@ -225,6 +243,10 @@ void macvail_state::scsi_drq_w(offs_t offset, u32 data, u32 mem_mask)
 ***************************************************************************/
 
 static INPUT_PORTS_START( macadb )
+	PORT_START("config")
+	PORT_CONFNAME(0x01, 0x00, "FPU")
+	PORT_CONFSETTING(0x00, "No FPU")
+	PORT_CONFSETTING(0x01, "FPU Present")
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -241,18 +263,18 @@ void macvail_state::maclc3_base(machine_config &config)
 	m_ram->set_extra_options("8M,16M,32M,48M,64M,80M");
 
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^sonora:lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^sonora:rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device)
 	{
 		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
@@ -287,16 +309,28 @@ void macvail_state::maclc3_base(machine_config &config)
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	APPLE_DFAC(config, m_dfac, 22257);
+	m_dfac->add_route(0, "lspeaker", 1.0);
+	m_dfac->add_route(1, "rspeaker", 1.0);
+
+	APPLE_OMEGA(config, m_omega, 31.3344_MHz_XTAL);
+	m_omega->pclock_changed().set(m_sonora, FUNC(sonora_device::pixel_clock_w));
+
 	SONORA(config, m_sonora, C15M);
 	m_sonora->set_maincpu_tag("maincpu");
 	m_sonora->set_rom_tag("bootrom");
+	m_sonora->add_route(0, m_dfac, 1.0);
+	m_sonora->add_route(1, m_dfac, 1.0);
 
 	nubus_device &nubus(NUBUS(config, "pds", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	// LC III style PDS cards have slot IRQs $C, $D, and $E connected
-	nubus.out_irqc_callback().set(m_sonora, FUNC(sonora_device::slot_irq_w<0x08>));
-	nubus.out_irqd_callback().set(m_sonora, FUNC(sonora_device::slot_irq_w<0x10>));
-	nubus.out_irqe_callback().set(m_sonora, FUNC(sonora_device::slot_irq_w<0x20>));
+	nubus.out_irqc_callback().set(m_sonora, FUNC(sonora_device::slot0_irq_w));
+	nubus.out_irqd_callback().set(m_sonora, FUNC(sonora_device::slot1_irq_w));
+	nubus.out_irqe_callback().set(m_sonora, FUNC(sonora_device::slot2_irq_w));
 	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 
 	MACADB(config, m_macadb, C15M);
@@ -306,10 +340,17 @@ void macvail_state::maclc3(machine_config &config)
 {
 	maclc3_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macvail_state::maclc3_map);
+	m_maincpu->set_fpu_enable(false); // this machine has no FPU
 
 	EGRET(config, m_egret, XTAL(32'768));
 	m_egret->set_default_bios_tag("341s0851");
 	m_egret->reset_callback().set(FUNC(macvail_state::cuda_reset_w));
+	m_egret->dfac_scl_callback().set(m_dfac, FUNC(dfac_device::clock_write));
+	m_egret->dfac_scl_callback().append(m_omega, FUNC(omega_device::clock_write));
+	m_egret->dfac_sda_callback().set(m_dfac, FUNC(dfac_device::data_write));
+	m_egret->dfac_sda_callback().append(m_omega, FUNC(omega_device::data_write));
+	m_egret->dfac_latch_callback().set(m_dfac, FUNC(dfac_device::latch_write));
+	m_egret->dfac_latch_callback().append(m_omega, FUNC(omega_device::latch_write));
 	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_egret->via_clock_callback().set(m_sonora, FUNC(sonora_device::cb1_w));
 	m_egret->via_data_callback().set(m_sonora, FUNC(sonora_device::cb2_w));
@@ -340,13 +381,24 @@ void macvail_state::maclc520(machine_config &config)
 	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_sonora, FUNC(sonora_device::cb1_w));
 	m_cuda->via_data_callback().set(m_sonora, FUNC(sonora_device::cb2_w));
+	m_cuda->iic_scl_callback().set(m_omega, FUNC(omega_device::clock_write));
+	m_cuda->iic_sda_callback().set(m_omega, FUNC(omega_device::data_write));
+	m_cuda->dfac_latch_callback().set(m_omega, FUNC(omega_device::latch_write));
+	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	m_sonora->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
 	m_sonora->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	m_sonora->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_sonora->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
+
+	// DFAC only is found in machines with Egret, and not the IIsi
+	m_sonora->reset_routes();
+	m_sonora->add_route(0, "lspeaker", 1.0);
+	m_sonora->add_route(1, "rspeaker", 1.0);
+	config.device_remove("dfac");
 }
 
 void macvail_state::maclc550(machine_config &config)

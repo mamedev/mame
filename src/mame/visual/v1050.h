@@ -158,14 +158,14 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void v1050_crt_mem(address_map &map);
-	void v1050_io(address_map &map);
-	void v1050_mem(address_map &map);
+	void v1050_crt_mem(address_map &map) ATTR_COLD;
+	void v1050_io(address_map &map) ATTR_COLD;
+	void v1050_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void bankswitch();
 	void update_fdc();

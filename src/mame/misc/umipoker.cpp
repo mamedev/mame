@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Roberto Fresca
+// copyright-holders: Angelo Salese, Roberto Fresca
+
 /***************************************************************************
 
     Umi de Poker (c) 1997 World Station Co.,LTD
@@ -42,18 +43,33 @@ class umipoker_state : public driver_device
 public:
 	umipoker_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_vram(*this, "vram.%u", 0U)
-		, m_z80_wram(*this, "z80_wram")
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_vram(*this, "vram.%u", 0U)
+		, m_z80_wram(*this, "z80_wram")
+		, m_z80_rom(*this, "audiocpu")
 	{
 	}
 
 	void umipoker(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+
+	void main_map(address_map &map) ATTR_COLD;
+
+private:
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_shared_ptr_array<uint16_t, 4> m_vram;
+	required_shared_ptr<uint8_t> m_z80_wram;
+	required_region_ptr<uint8_t> m_z80_rom;
+
+	tilemap_t *m_tilemap[4]{};
+	uint16_t m_scrolly[4]{};
 
 	uint8_t z80_rom_readback_r(offs_t offset);
 	uint8_t z80_shared_ram_r(offs_t offset);
@@ -65,18 +81,8 @@ protected:
 	template<uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void audio_io_map(address_map &map);
-	void audio_map(address_map &map);
-	void umipoker_map(address_map &map);
-
-	required_shared_ptr_array<uint16_t, 4> m_vram;
-	required_shared_ptr<uint8_t> m_z80_wram;
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
-	tilemap_t *m_tilemap[4]{};
-	int m_scrolly[4]{};
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
 };
 
 class saiyukip_state : public umipoker_state
@@ -91,13 +97,13 @@ public:
 	void saiyukip(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void lamps_w(uint16_t data);
 	void saiyu_counters_w(uint16_t data);
 
-	void saiyukip_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	output_finder<6> m_lamps;
 };
@@ -105,21 +111,18 @@ private:
 template<uint8_t Which>
 TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info)
 {
-	int tile = m_vram[Which][tile_index*2+0];
-	int color = m_vram[Which][tile_index*2+1] & 0x3f;
+	int const tile = m_vram[Which][tile_index * 2 + 0];
+	int const color = m_vram[Which][tile_index * 2 + 1] & 0x3f;
 
-	tileinfo.set(0,
-			tile,
-			color,
-			0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 void umipoker_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
-	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
@@ -139,19 +142,17 @@ uint32_t umipoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_tilemap[0]->draw(screen, bitmap, cliprect, 0,0);
-	m_tilemap[1]->draw(screen, bitmap, cliprect, 0,0);
-	m_tilemap[2]->draw(screen, bitmap, cliprect, 0,0);
-	m_tilemap[3]->draw(screen, bitmap, cliprect, 0,0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
 uint8_t umipoker_state::z80_rom_readback_r(offs_t offset)
 {
-	uint8_t *ROM = memregion("audiocpu")->base();
-
-	return ROM[offset];
+	return m_z80_rom[offset];
 }
 
 uint8_t umipoker_state::z80_shared_ram_r(offs_t offset)
@@ -172,9 +173,9 @@ void umipoker_state::irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 
-	/* shouldn't happen */
-	if(data)
-		popmessage("%04x IRQ ACK, contact MAMEdev",data);
+	// shouldn't happen
+	if (data)
+		popmessage("%04x IRQ ACK, contact MAMEdev", data);
 }
 
 template<uint8_t Which>
@@ -280,7 +281,7 @@ void saiyukip_state::saiyu_counters_w(uint16_t data)
 }
 
 
-void umipoker_state::umipoker_map(address_map &map)
+void umipoker_state::main_map(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x000000, 0x03ffff).rom();
@@ -308,9 +309,9 @@ void umipoker_state::umipoker_map(address_map &map)
 	map(0xe0002e, 0xe0002f).w(FUNC(umipoker_state::scrolly_w<3>));
 }
 
-void saiyukip_state::saiyukip_map(address_map &map)
+void saiyukip_state::main_map(address_map &map)
 {
-	umipoker_map(map);
+	umipoker_state::main_map(map);
 	map(0xe0000c, 0xe0000d).w(FUNC(saiyukip_state::lamps_w));
 	map(0xe00010, 0xe00011).w(FUNC(saiyukip_state::saiyu_counters_w));
 }
@@ -460,7 +461,7 @@ static INPUT_PORTS_START( umipoker )
 	PORT_DIPSETTING(    0x0030, "30000" )
 	PORT_DIPSETTING(    0x0038, "50000" )
 	PORT_DIPSETTING(    0x0000, "999999" )
-	PORT_DIPNAME( 0x0040, 0x0040, "Out Coin Counter" )  PORT_DIPLOCATION("DSW3:!7")     /* Conditional to 'Hopper Sub-Board' (DSW4-3) */
+	PORT_DIPNAME( 0x0040, 0x0040, "Out Coin Counter" )  PORT_DIPLOCATION("DSW3:!7")     // Conditional to 'Hopper Sub-Board' (DSW4-3)
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0040, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "Credit Cut" )        PORT_DIPLOCATION("DSW3:!8")
@@ -472,7 +473,7 @@ static INPUT_PORTS_START( umipoker )
 	PORT_DIPSETTING(    0x0100, "B Type" )
 	PORT_DIPSETTING(    0x0200, "C Type" )
 	PORT_DIPSETTING(    0x0300, "D Type" )
-	PORT_DIPNAME( 0x0400, 0x0400, "Hopper Sub-Board" )  PORT_DIPLOCATION("DSW4:!3")     /* When off, allow set the 'Out Coin Counter' (DSW3-7) */
+	PORT_DIPNAME( 0x0400, 0x0400, "Hopper Sub-Board" )  PORT_DIPLOCATION("DSW4:!3")     // When off, allow set the 'Out Coin Counter' (DSW3-7)
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0400, "Use" )
 	PORT_DIPNAME( 0x0800, 0x0000, "Title Type" )        PORT_DIPLOCATION("DSW4:!4")
@@ -486,7 +487,7 @@ static INPUT_PORTS_START( umipoker )
 	PORT_DIPNAME( 0x4000, 0x4000, "Fever Initialize" )  PORT_DIPLOCATION("DSW4:!7")
 	PORT_DIPSETTING(    0x0000, "A Type" )
 	PORT_DIPSETTING(    0x4000, "B Type" )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW4:!8")     /* Unmapped?... */
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW4:!8")     // Unmapped?...
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x8000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -601,10 +602,10 @@ static INPUT_PORTS_START( saiyukip )
 	PORT_DIPNAME( 0x1000, 0x1000, "Hopper" )            PORT_DIPLOCATION("DSW4:!5")
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Medal Sub-Board" )   PORT_DIPLOCATION("DSW4:!6")     /* When off, allow 'Out Counter' to be set */
+	PORT_DIPNAME( 0x2000, 0x2000, "Medal Sub-Board" )   PORT_DIPLOCATION("DSW4:!6")     // When off, allow 'Out Counter' to be set
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Out Counter" )       PORT_DIPLOCATION("DSW4:!7")     /* Conditional to 'Medal Sub-Board' */
+	PORT_DIPNAME( 0x4000, 0x4000, "Out Counter" )       PORT_DIPLOCATION("DSW4:!7")     // Conditional to 'Medal Sub-Board'
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, "Credit Over Cut" )   PORT_DIPLOCATION("DSW4:!8")
@@ -613,19 +614,8 @@ static INPUT_PORTS_START( saiyukip )
 INPUT_PORTS_END
 
 
-static const gfx_layout layout_8x8x4 =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4)  },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
 static GFXDECODE_START( gfx_umipoker )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,     0, 0x40)
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar, 0, 0x40)
 GFXDECODE_END
 
 void saiyukip_state::machine_start()
@@ -638,9 +628,9 @@ void saiyukip_state::machine_start()
 // TODO: Verify clocks (XTALs are 14.3181 and 2.000MHz)
 void umipoker_state::umipoker(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, XTAL(14'318'181)); // TMP68HC000-16
-	m_maincpu->set_addrmap(AS_PROGRAM, &umipoker_state::umipoker_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &umipoker_state::main_map);
 
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181) / 4)); // 3.579545MHz
 	audiocpu.set_addrmap(AS_PROGRAM, &umipoker_state::audio_map);
@@ -648,7 +638,7 @@ void umipoker_state::umipoker(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -661,7 +651,7 @@ void umipoker_state::umipoker(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_umipoker);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x400);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ym3812_device &ym(YM3812(config, "ym", XTAL(14'318'181) / 4)); // 3.579545MHz
@@ -675,7 +665,7 @@ void umipoker_state::umipoker(machine_config &config)
 void saiyukip_state::saiyukip(machine_config &config)
 {
 	umipoker(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &saiyukip_state::saiyukip_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &saiyukip_state::main_map);
 }
 
 
@@ -685,7 +675,30 @@ void saiyukip_state::saiyukip(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( umipoker )
+ROM_START( umipoker ) // W-ONE 1995-08 PCB
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "p0.u61",      0x000000, 0x020000, CRC(3a0c4a8b) SHA1(009cbbd4df68e31dc683a8cd3425e5f8b986fa92) )
+	ROM_LOAD16_BYTE( "p1.u60",      0x000001, 0x020000, CRC(44f475cb) SHA1(0c5044331dbcc617d200d052b4597dd4551fc95c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sz.u8",        0x000000, 0x010000, CRC(d874ba1a) SHA1(13c06f3b67694d5d5194023c4f7b75aea8b57129) ) // second half 1-filled
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "sg3.u39",      0x000000, 0x020000, CRC(ebd5f96d) SHA1(968c107ee17f1e92ffc2835e13803347881862f1) )
+	ROM_LOAD( "sg2.u40",      0x020000, 0x020000, CRC(eb31649b) SHA1(c0741d85537827e2396e81a1aa3005871dffad78) )
+	ROM_LOAD( "sg1.u41",      0x040000, 0x020000, CRC(7fcbfb17) SHA1(be2f308a8e8f0941c54125950702ddfbd8538733) )
+	ROM_LOAD( "sg0.u42",      0x060000, 0x020000, CRC(876f1f4f) SHA1(eca4c397be57812f2c34791736fee7c43925d927) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "sm.u17",       0x000000, 0x040000, CRC(99503aed) SHA1(011404fad01b3ced708a94143908be3e1d0194d3) ) // first half 1-filled
+	ROM_CONTINUE(             0x000000, 0x040000 )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8b.u11", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8b.u24", 0x200, 0x117, NO_DUMP )
+ROM_END
+
+ROM_START( umipokera )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sp0.u61",      0x000000, 0x020000, CRC(866eaa02) SHA1(445afdfe010aad1102219a0dbd3a363a22294b4c) )
 	ROM_LOAD16_BYTE( "sp1.u60",      0x000001, 0x020000, CRC(8db08696) SHA1(2854d511a8fd30b023e2a2a00b25413f88205d82) )
@@ -694,10 +707,10 @@ ROM_START( umipoker )
 	ROM_LOAD( "sz.u8",        0x000000, 0x010000, CRC(d874ba1a) SHA1(13c06f3b67694d5d5194023c4f7b75aea8b57129) ) // second half 1-filled
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "sg0.u42",      0x000000, 0x020000, CRC(876f1f4f) SHA1(eca4c397be57812f2c34791736fee7c43925d927) )
-	ROM_LOAD( "sg1.u41",      0x020000, 0x020000, CRC(7fcbfb17) SHA1(be2f308a8e8f0941c54125950702ddfbd8538733) )
-	ROM_LOAD( "sg2.u40",      0x040000, 0x020000, CRC(eb31649b) SHA1(c0741d85537827e2396e81a1aa3005871dffad78) )
-	ROM_LOAD( "sg3.u39",      0x060000, 0x020000, CRC(ebd5f96d) SHA1(968c107ee17f1e92ffc2835e13803347881862f1) )
+	ROM_LOAD( "sg3.u39",      0x000000, 0x020000, CRC(ebd5f96d) SHA1(968c107ee17f1e92ffc2835e13803347881862f1) )
+	ROM_LOAD( "sg2.u40",      0x020000, 0x020000, CRC(eb31649b) SHA1(c0741d85537827e2396e81a1aa3005871dffad78) )
+	ROM_LOAD( "sg1.u41",      0x040000, 0x020000, CRC(7fcbfb17) SHA1(be2f308a8e8f0941c54125950702ddfbd8538733) )
+	ROM_LOAD( "sg0.u42",      0x060000, 0x020000, CRC(876f1f4f) SHA1(eca4c397be57812f2c34791736fee7c43925d927) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sm.u17",       0x000000, 0x040000, CRC(99503aed) SHA1(011404fad01b3ced708a94143908be3e1d0194d3) ) // first half 1-filled
@@ -713,23 +726,24 @@ ROM_START( saiyukip )
 	ROM_LOAD( "slz.u8",       0x000000, 0x010000, CRC(4f32ba1c) SHA1(8f1f8c0995bcd05d19120dd3b64b135908caf759) ) // second half 1-filled
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "slg0.u42",     0x000000, 0x020000, CRC(49ba7ffd) SHA1(3bbb7656eafbd8c91c9054fca056c8fc3002ed13) )
-	ROM_LOAD( "slg1.u41",     0x020000, 0x020000, CRC(59b5f399) SHA1(2b999cebcc53b3b8fd38e3034a12434d82b6fad3) )
-	ROM_LOAD( "slg2.u40",     0x040000, 0x020000, CRC(fe6cd717) SHA1(65e59d88a30efd0cec642cda54e2bc38196f0231) )
-	ROM_LOAD( "slg3.u39",     0x060000, 0x020000, CRC(e99b2906) SHA1(77884d2dae2e7f7cf27103aa8bbd0eaa39628993) )
+	ROM_LOAD( "slg3.u39",     0x000000, 0x020000, CRC(e99b2906) SHA1(77884d2dae2e7f7cf27103aa8bbd0eaa39628993) )
+	ROM_LOAD( "slg2.u40",     0x020000, 0x020000, CRC(fe6cd717) SHA1(65e59d88a30efd0cec642cda54e2bc38196f0231) )
+	ROM_LOAD( "slg1.u41",     0x040000, 0x020000, CRC(59b5f399) SHA1(2b999cebcc53b3b8fd38e3034a12434d82b6fad3) )
+	ROM_LOAD( "slg0.u42",     0x060000, 0x020000, CRC(49ba7ffd) SHA1(3bbb7656eafbd8c91c9054fca056c8fc3002ed13) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "slm.u17",      0x000000, 0x040000, CRC(b50eb70b) SHA1(342fcb307844f4d0a02a85b2c61e73b5e8bacd44) ) // first half 1-filled
 	ROM_CONTINUE(             0x000000, 0x040000 )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /******************************************
 *              Game Drivers               *
 ******************************************/
 
-//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT        ROT   COMPANY                  FULLNAME                                  FLAGS                   LAYOUT
-GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", MACHINE_SUPPORTS_SAVE )                      // title screen is toggleable thru a dsw
-GAMEL( 1998, saiyukip,  0,        saiyukip,  saiyukip, saiyukip_state, empty_init, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             MACHINE_SUPPORTS_SAVE,  layout_saiyukip )
+//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT        ROT   COMPANY                  FULLNAME                                         FLAGS                   LAYOUT
+GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan, newer)", MACHINE_SUPPORTS_SAVE )                      // title screen is toggleable thru a dsw
+GAME(  1997, umipokera, umipoker, umipoker,  umipoker, umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan, older)", MACHINE_SUPPORTS_SAVE )                      // title screen is toggleable thru a dsw
+GAMEL( 1998, saiyukip,  0,        saiyukip,  saiyukip, saiyukip_state, empty_init, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",                    MACHINE_SUPPORTS_SAVE,  layout_saiyukip )

@@ -36,7 +36,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
@@ -83,4 +83,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 2002, t650c, 0, 0, t650c, t650c, clie_db_state, empty_init, "Sony", "Clie PEG-T650C", MACHINE_IS_SKELETON )
+SYST( 2002, t650c, 0, 0, t650c, t650c, clie_db_state, empty_init, "Sony", "Clie PEG-T650C", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

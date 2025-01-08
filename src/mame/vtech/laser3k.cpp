@@ -96,8 +96,8 @@ public:
 	void laser3k(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t ram_r(offs_t offset);
@@ -116,8 +116,8 @@ private:
 	int ay3600_control_r();
 	void ay3600_data_ready_w(int state);
 
-	void banks_map(address_map &map);
-	void laser3k_map(address_map &map);
+	void banks_map(address_map &map) ATTR_COLD;
+	void laser3k_map(address_map &map) ATTR_COLD;
 
 	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen);
 	void do_io(int offset);

@@ -62,10 +62,10 @@ public:
 	void shine(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void shine_mem(address_map &map);
+	void shine_mem(address_map &map) ATTR_COLD;
 	uint8_t via0_pa_r();
 	void via0_pb_w(uint8_t data);
 	void floppy_w(uint8_t data);

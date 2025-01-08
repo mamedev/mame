@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_MC10_MC10CART_H
-#define MAME_BUS_MC10_MC10CART_H
+#ifndef MAME_BUS_MC10_MC10_CART_H
+#define MAME_BUS_MC10_MC10_CART_H
 
 #pragma once
 
@@ -64,7 +64,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	required_address_space m_memspace;
 
@@ -83,6 +83,7 @@ public:
 	virtual ~device_mc10cart_interface();
 
 	virtual int max_rom_length() const;
+
 	virtual std::pair<std::error_condition, std::string> load();
 
 protected:
@@ -106,4 +107,4 @@ void mc10_cart_add_basic_devices(device_slot_interface &device);
 void alice_cart_add_basic_devices(device_slot_interface &device);
 void alice32_cart_add_basic_devices(device_slot_interface &device);
 
-#endif // MAME_BUS_MC10_MC10CART_H
+#endif // MAME_BUS_MC10_MC10_CART_H

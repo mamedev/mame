@@ -34,7 +34,7 @@ private:
 	void leds_w(offs_t offset, u8 data);
 	void dsp_w(offs_t offset, u8 data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<upd7810_device> m_maincpu;
 	required_device_array<tms32010_device, 2> m_dsp;
@@ -116,4 +116,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1985, dvp1, 0, 0, dvp1, dvp1, korgdvp1_state, empty_init, "Korg", "DVP-1 Digital Voice Processor", MACHINE_IS_SKELETON)
+SYST(1985, dvp1, 0, 0, dvp1, dvp1, korgdvp1_state, empty_init, "Korg", "DVP-1 Digital Voice Processor", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

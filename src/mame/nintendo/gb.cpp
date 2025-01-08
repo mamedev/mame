@@ -68,8 +68,8 @@ protected:
 
 	static constexpr XTAL MASTER_CLOCK = 4.194304_MHz_XTAL;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void gb_io_w(offs_t offset, uint8_t data);
 	uint8_t gb_ie_r();
@@ -123,8 +123,8 @@ public:
 	void gbpocket(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void disable_boot();
 
@@ -139,7 +139,7 @@ private:
 	void gb_palette(palette_device &palette) const;
 	void gbp_palette(palette_device &palette) const;
 
-	void gameboy_map(address_map &map);
+	void gameboy_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_bios_hack;
 };
@@ -156,15 +156,15 @@ public:
 	void supergb2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void sgb_palette(palette_device &palette) const;
 
 	void sgb_io_w(offs_t offset, uint8_t data);
 
-	void sgb_map(address_map &map);
+	void sgb_map(address_map &map) ATTR_COLD;
 
 	int8_t m_sgb_packets = 0;
 	uint8_t m_sgb_bitcount = 0;
@@ -189,8 +189,8 @@ public:
 	void gbcolor(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static constexpr XTAL GBC_CLOCK = 8.388_MHz_XTAL;
@@ -199,7 +199,7 @@ private:
 	void gbc_io2_w(offs_t offset, uint8_t data);
 	uint8_t gbc_io2_r(offs_t offset);
 
-	void gbc_map(address_map &map);
+	void gbc_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_rambank;
 	memory_share_creator<uint8_t> m_bankedram;
@@ -225,7 +225,7 @@ private:
 	void megaduck_sound_w2(offs_t offset, uint8_t data);
 	uint8_t megaduck_sound_r2(offs_t offset);
 	void megaduck_palette(palette_device &palette) const;
-	void megaduck_map(address_map &map);
+	void megaduck_map(address_map &map) ATTR_COLD;
 };
 
 

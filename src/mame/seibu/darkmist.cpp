@@ -73,8 +73,8 @@ public:
 	void init_darkmist();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void hw_w(uint8_t data);
@@ -95,8 +95,8 @@ private:
 	void decrypt_snd();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void decrypted_opcodes_map(address_map &map);
-	void memmap(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void memmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<t5182_device> m_t5182;

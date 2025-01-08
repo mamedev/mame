@@ -46,8 +46,8 @@ public:
 	void mdt60(machine_config &mconfig);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	MC6845_UPDATE_ROW(update_row);
@@ -58,7 +58,7 @@ private:
 	u8 dip0_r(offs_t offset);
 	void reg_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z29_keyboard_port_device> m_keyboard;

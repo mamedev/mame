@@ -17,15 +17,15 @@ public:
 	auto dma_r_cb() { return m_dma_r.bind(); }
 	auto dma_w_cb() { return m_dma_w.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	void eop_w(int state);
 	void req_w(int state);
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// register handlers
 	u32 control_r() { return m_control; }

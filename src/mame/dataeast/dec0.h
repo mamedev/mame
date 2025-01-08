@@ -54,7 +54,7 @@ public:
 	void init_ffantasybl();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -84,10 +84,10 @@ protected:
 	void robocop_colpri_cb(u32 &colour, u32 &pri_mask);
 	void baddudes_tile_cb(tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags);
 
-	void set_screen_raw_params_data_east(machine_config &config);
+	void set_screen_raw_params(machine_config &config);
 
 	void h6280_decrypt(const char *cputag);
-	void dec0_map(address_map &map);
+	void dec0_map(address_map &map) ATTR_COLD;
 
 private:
 	enum class mcu_type {
@@ -125,12 +125,12 @@ private:
 	void baddudes_i8751_write(int data);
 	void dec0_i8751_write(int data);
 	void dec0_i8751_reset();
-	void ffantasybl_map(address_map &map);
-	void dec0_tb_map(address_map &map);
-	void dec0_s_map(address_map &map);
-	void midres_map(address_map &map);
-	void midres_s_map(address_map &map);
-	void midresb_map(address_map &map);
+	void ffantasybl_map(address_map &map) ATTR_COLD;
+	void dec0_tb_map(address_map &map) ATTR_COLD;
+	void dec0_s_map(address_map &map) ATTR_COLD;
+	void midres_map(address_map &map) ATTR_COLD;
+	void midres_s_map(address_map &map) ATTR_COLD;
+	void midresb_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -149,8 +149,8 @@ protected:
 	required_device<h6280_device> m_subcpu;
 
 private:
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -178,8 +178,8 @@ private:
 	uint16_t sharedram_r(offs_t offset);
 	void sharedram_w(offs_t offset, uint16_t data);
 
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -198,7 +198,7 @@ public:
 	void init_slyspy();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	memory_view m_pfview;
@@ -215,15 +215,15 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
-class dec0_automat_state : public dec0_state
+class automat_state : public dec0_state
 {
 public:
-	dec0_automat_state(const machine_config &mconfig, device_type type, const char *tag) :
+	automat_state(const machine_config &mconfig, device_type type, const char *tag) :
 		dec0_state(mconfig, type, tag),
 		m_msm(*this, "msm%u", 1U),
 		m_adpcm_select(*this, "adpcm_select%u", 1U),
@@ -254,14 +254,14 @@ private:
 	void msm1_vclk_cb(int state);
 	void msm2_vclk_cb(int state);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void automat_map(address_map &map);
-	void automat_s_map(address_map &map);
-	void secretab_map(address_map &map);
-	void secretab_s_map(address_map &map);
+	void automat_map(address_map &map) ATTR_COLD;
+	void automat_s_map(address_map &map) ATTR_COLD;
+	void secretab_map(address_map &map) ATTR_COLD;
+	void secretab_s_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_DATAEAST_DEC0_H

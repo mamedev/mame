@@ -793,7 +793,7 @@ std::error_condition core_osd_file::write_some_at(std::uint64_t offset, void con
 		actual = bytes_written;
 		set_size((std::max)(size(), offset));
 	}
-	return std::error_condition();
+	return err;
 }
 
 

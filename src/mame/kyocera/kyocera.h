@@ -97,7 +97,7 @@ protected:
 	memory_bank_creator m_bank1;
 	memory_bank_creator m_bank2;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	memory_region *m_opt_region;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -125,9 +125,9 @@ protected:
 	int m_centronics_select;
 
 	void kc85_palette(palette_device &palette) const;
-	void kc85_io(address_map &map);
-	void kc85_mem(address_map &map);
-	void trsm100_io(address_map &map);
+	void kc85_io(address_map &map) ATTR_COLD;
+	void kc85_mem(address_map &map) ATTR_COLD;
+	void trsm100_io(address_map &map) ATTR_COLD;
 };
 
 class trsm100_state : public kc85_state
@@ -141,7 +141,7 @@ public:
 	void tandy102(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 class pc8201_state : public kc85_state
@@ -156,7 +156,7 @@ public:
 	void pc8201(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<generic_slot_device> m_cas_cart;
 
 	uint8_t bank_r();
@@ -176,8 +176,8 @@ private:
 
 	/* peripheral state */
 	int m_iosel = 0;                /* serial interface select */
-	void pc8201_io(address_map &map);
-	void pc8201_mem(address_map &map);
+	void pc8201_io(address_map &map) ATTR_COLD;
+	void pc8201_mem(address_map &map) ATTR_COLD;
 };
 
 class tandy200_state : public driver_device
@@ -204,7 +204,7 @@ public:
 	void tandy200(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<i8085a_cpu_device> m_maincpu;
@@ -259,9 +259,9 @@ private:
 	int m_centronics_busy;
 	int m_centronics_select;
 	void tandy200_video(machine_config &config);
-	void tandy200_io(address_map &map);
-	void tandy200_lcdc(address_map &map);
-	void tandy200_mem(address_map &map);
+	void tandy200_io(address_map &map) ATTR_COLD;
+	void tandy200_lcdc(address_map &map) ATTR_COLD;
+	void tandy200_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_KYOCERA_KYOCERA_H

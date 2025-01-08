@@ -53,7 +53,7 @@ public:
 	void ctvboy(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<m6801u4_cpu_device> m_maincpu;
@@ -71,7 +71,7 @@ private:
 
 	void speaker_decay_sim(s32 param);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void p1_w(u8 data);

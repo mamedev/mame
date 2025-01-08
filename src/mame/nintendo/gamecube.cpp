@@ -28,10 +28,10 @@ public:
 	{ }
 
 	void gc(machine_config &config);
-	void ppc_mem(address_map &map);
+	void ppc_mem(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void decrypt(uint8_t *data, unsigned size);
@@ -247,7 +247,7 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY     FULLNAME             FLAGS
-CONS( 2001, gcjp,  0,      0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Japan)",  MACHINE_IS_SKELETON )
-CONS( 2001, gcus,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (USA)",    MACHINE_IS_SKELETON )
-CONS( 2002, gceu,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (EUR)",    MACHINE_IS_SKELETON )
-CONS( 2002, gcbr,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Brazil)", MACHINE_IS_SKELETON )
+CONS( 2001, gcjp,  0,      0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Japan)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2001, gcus,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (USA)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, gceu,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (EUR)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, gcbr,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Brazil)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

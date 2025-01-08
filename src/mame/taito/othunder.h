@@ -47,8 +47,8 @@ public:
 	void othunder(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const u32 *primasks, int y_offs);
@@ -62,8 +62,8 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
 
-	void othunder_map(address_map &map);
-	void z80_sound_map(address_map &map);
+	void othunder_map(address_map &map) ATTR_COLD;
+	void z80_sound_map(address_map &map) ATTR_COLD;
 
 	/* memory pointers */
 	required_shared_ptr<u16> m_spriteram;

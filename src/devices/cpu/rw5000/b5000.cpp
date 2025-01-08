@@ -145,7 +145,8 @@ void b5000_cpu_device::execute_one()
 
 			}
 			break; // 0xfc
-	}
+
+	} // 0xf0
 }
 
 bool b5000_cpu_device::op_is_tl(u8 op)

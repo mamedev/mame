@@ -297,8 +297,7 @@ license:CC0-1.0
 		<description>Easy Calc Result (alt)</description>
 		<year>1985</year>
 		<publisher>Handic Software</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="easycalcres" />
 			<feature name="game" value="0" />
@@ -429,6 +428,9 @@ license:CC0-1.0
 		<description>Chase H.Q. 2: Special Criminal Investigation</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Black screen, self modifies code in the 0x100-0x14f range
+]]></notes>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
@@ -500,8 +502,7 @@ license:CC0-1.0
 		<description>Btx Decoder Modul (Germany)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot_unsupported" value="btx" />
 			<feature name="game" value="1" />
@@ -517,8 +518,7 @@ license:CC0-1.0
 		<description>Btx Decoder Modul II v3.1 (Germany)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot_unsupported" value="btx" />
 			<feature name="game" value="1" />
@@ -534,8 +534,7 @@ license:CC0-1.0
 		<description>Btx Decoder Modul II v3.3 (Germany)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot_unsupported" value="btx" />
 			<feature name="game" value="1" />
@@ -653,8 +652,9 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- TODO: verify region of this and one below, KCS manuals are also in German and Italian -->
 	<software name="spdsaver" supported="no">
-		<description>Speedsaver $C000 (Nld)</description>
+		<description>Speedsaver $C000 (Netherlands?)</description>
 		<year>1984</year>
 		<publisher>KCS Dordrecht</publisher>
 		<part name="cart" interface="c64_cart">
@@ -669,7 +669,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="spdsavrc" supported="no">
-		<description>Speedsaver Combi</description>
+		<description>Speedsaver Combi (Netherlands?)</description>
 		<year>1984</year>
 		<publisher>KCS Dordrecht</publisher>
 		<part name="cart" interface="c64_cart">
@@ -880,8 +880,7 @@ license:CC0-1.0
 		<description>BI-80</description>
 		<year>1984</year>
 		<publisher>Batteries Included</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot_unsupported" value="bi80" />
 			<feature name="game" value="1" />
@@ -1717,6 +1716,7 @@ license:CC0-1.0
 		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="serial" value="ABZ-C6" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -1812,6 +1812,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-001-04" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -1863,7 +1864,8 @@ license:CC0-1.0
 	</software>
 
 	<software name="blueprnt">
-		<description>Blueprint</description> <!-- spelt 'Blueprint' on cart and 'Blueprint', 'Blue-Print' and 'Blue - - Print' on various game screens -->
+		<!-- spelt 'Blueprint' on cart and 'Blueprint', 'Blue-Print' and 'Blue - - Print' on various game screens -->
+		<description>Blueprint</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64612" />
@@ -2109,10 +2111,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="decathln">
+	<software name="decathln" supported="no">
 		<description>The Activision Decathlon</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Cannot select (s)ingle or (a)ll events, no key press recognized
+]]></notes>
+
 		<info name="serial" value="DC-004-04" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -2179,6 +2185,7 @@ license:CC0-1.0
 		<description>Donkey Kong</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2219,6 +2226,7 @@ license:CC0-1.0
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64???" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2449,10 +2457,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hero">
+	<software name="hero" supported="partial">
 		<description>H.E.R.O.: Helicopter Emergency Rescue Operation</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+White lines on bottom, off in applying [VIC] GFXMODE=0 to 4 switches
+]]></notes>
 		<info name="serial" value="DC-003-04" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -2505,10 +2516,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="isoccer">
+	<software name="isoccer" supported="no">
 		<description>International Soccer</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
+		<notes><![CDATA[
+Starts a play by pressing any of the function keys, cfr. https://www.c64-wiki.com/wiki/International_Soccer#Controls
+Some erratic chars in playfield [VIC] GFXMODE=1, fixes on soft reset
+]]></notes>
 		<info name="serial" value="C-64635" />
 		<!--
 		ASSY 250423
@@ -2687,11 +2702,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lazarian">
+	<software name="lazarian" supported="no">
 		<description>Lazarian</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
+		<notes><![CDATA[
+Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fear"
+]]></notes>
 		<info name="serial" value="C-64613" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3149,6 +3168,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-104-04" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3198,11 +3218,12 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pitfall2">
+	<software name="pitfall2" supported="yes">
 		<description>Pitfall II: The Lost Caverns</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-007-04" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3231,6 +3252,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-002-04" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
@@ -3240,10 +3262,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pitstop" supported="partial">
+	<software name="pitstop" supported="no">
 		<description>Pitstop</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
+		<notes><![CDATA[
+Blue strips on title screen in place of tyres, mixes [VIC] GFXMODE=2 and 3
+Broken gameplay gfx, [VIC] GFXMODE=3
+]]></notes>
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3253,10 +3280,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pitstop1" cloneof="pitstop">
+	<software name="pitstop1" cloneof="pitstop" supported="no">
 		<description>Pitstop (alt)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3271,6 +3299,7 @@ license:CC0-1.0
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="serial" value="RX8536" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3284,6 +3313,7 @@ license:CC0-1.0
 		<description>Popeye</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3293,7 +3323,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="princess">
+	<software name="princess" supported="yes">
 		<description>Princess and the Frog</description>
 		<year>1983</year>
 		<publisher>Romox</publisher>
@@ -3516,10 +3546,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="riveraid">
+	<software name="riveraid" supported="no">
 		<description>River Raid</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Glitchy [VIC] status bar GFXMODE switches on gameplay
+]]></notes>
+		<info name="usage" value="Requires joystick in port 1" />
+
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3706,10 +3741,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="spaceric">
+	<software name="spaceric" supported="no">
 		<description>Space Ric-o-Shay</description>
 		<year>1983</year>
 		<publisher>Mr. Computer</publisher>
+		<notes><![CDATA[
+Erratic [VIC] collsion detection, will kill player(s) once gameplay starts
+Starts a 2 players game even if 1p is chosen?
+]]></notes>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
@@ -4163,11 +4202,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="zonerngr">
+	<software name="zonerngr" supported="no">
 		<description>Zone Ranger</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Erratic [VIC] collsion detection, warps and invincibility bonuses can kill player instead.
+]]></notes>
 		<info name="serial" value="DC-101-04" />
+		<info name="usage" value="Requires joystick in port 1" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -4432,7 +4475,8 @@ license:CC0-1.0
 
 	<software name="narco">
 		<description>Narco Police</description>
-		<year>19??</year>
+		<!-- Released in '90 or '91 -->
+		<year>199?</year>
 		<publisher>Dinamic Software</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="dinamic" />
@@ -7214,7 +7258,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="music64">
+	<software name="music64" supported="no">
 		<description>Wersiboard Music 64</description>
 		<year>1985</year>
 		<publisher>Wersi</publisher>

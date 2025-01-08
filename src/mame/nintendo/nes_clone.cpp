@@ -34,15 +34,15 @@ public:
 	void init_nes_clone();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual uint8_t in0_r();
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_clone_basemap(address_map &map);
+	void nes_clone_basemap(address_map &map) ATTR_COLD;
 
 	uint8_t* m_mainrom;
 	int m_mainromsize;
@@ -59,7 +59,7 @@ protected:
 
 private:
 
-	void nes_clone_map(address_map &map);
+	void nes_clone_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -76,7 +76,7 @@ public:
 	void nes_clone_dancexpt(machine_config &config);
 
 private:
-	void nes_clone_dancexpt_map(address_map &map);
+	void nes_clone_dancexpt_map(address_map &map) ATTR_COLD;
 	memory_bank_array_creator<4> m_nametables;
 	required_memory_bank m_prgrom;
 	memory_bank_creator m_gfxrom;
@@ -84,8 +84,8 @@ private:
 
 	std::unique_ptr<u8[]> m_nt_ram;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void mapper_5000_w(offs_t offset, uint8_t data);
 	void mapper_5100_w(offs_t offset, uint8_t data);
@@ -112,9 +112,9 @@ public:
 	void nes_clone_dnce2000(machine_config& config);
 
 private:
-	void nes_clone_dnce2000_map(address_map& map);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void nes_clone_dnce2000_map(address_map &map) ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint8_t rom_r(offs_t offset);
 	void bank_w(uint8_t data);
 	uint8_t m_rombase = 0;
@@ -131,7 +131,7 @@ public:
 	void init_vtvppong();
 
 private:
-	void nes_clone_vtvppong_map(address_map& map);
+	void nes_clone_vtvppong_map(address_map &map) ATTR_COLD;
 };
 
 class nes_clone_sudoku_state : public nes_clone_state
@@ -146,9 +146,9 @@ public:
 	void nes_clone_sudoku(machine_config& config);
 
 private:
-	void nes_clone_sudoku_map(address_map& map);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void nes_clone_sudoku_map(address_map &map) ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint8_t rom_r(offs_t offset);
 	void bank_w(uint8_t data);
 	uint8_t m_rombase = 0;
@@ -164,9 +164,9 @@ public:
 	void nes_clone_vtvsocr(machine_config& config);
 
 private:
-	void nes_clone_vtvsocr_map(address_map& map);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void nes_clone_vtvsocr_map(address_map &map) ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint8_t rom_r(offs_t offset);
 	void bank_w(offs_t offset, uint8_t data);
 	uint8_t m_bankregs[4];
@@ -188,14 +188,14 @@ public:
 	void nes_clone_afbm7800(machine_config& config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 protected:
 	// configured at startup
 	uint16_t m_maxchrbank = 0;
 
-	void nes_clone_afbm7800_map(address_map &map);
+	void nes_clone_afbm7800_map(address_map &map) ATTR_COLD;
 
 	void mapper_6000_w(uint8_t data);
 	void mapper_6001_w(uint8_t data);
@@ -239,9 +239,9 @@ protected:
 	void update_nt_mirroring();
 	std::vector<u8> m_nt_ram;
 
-	void vram_map(address_map &map);
-	void ntram_map(address_map &map);
-	void romarea_map(address_map &map);
+	void vram_map(address_map &map) ATTR_COLD;
+	void ntram_map(address_map &map) ATTR_COLD;
+	void romarea_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank_array<4> m_prgbank;
 	required_memory_bank_array<6> m_cbank;
@@ -264,7 +264,7 @@ protected:
 	virtual void vram_w(offs_t offset, uint8_t data) override;
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 // Standard NES style inputs (not using bus device as there are no real NES controller ports etc. these are all-in-one units and can be custom

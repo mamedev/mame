@@ -260,45 +260,39 @@ void imgtool_warn(const char *format, ...)
 static imgtoolerr_t evaluate_module(const char *fname, const imgtool_module *module, float &result)
 {
 	imgtoolerr_t err;
-	imgtool::image::ptr image;
-	imgtool::partition::ptr partition;
-	imgtool::directory::ptr imageenum;
-	imgtool_dirent ent;
-	float current_result;
 
 	result = 0.0;
 
+	imgtool::image::ptr image;
 	err = imgtool::image::open(module, fname, OSD_FOPEN_READ, image);
-	if (err)
-		goto done;
-
-	if (image)
+	if (!err && image)
 	{
-		current_result = module->open_is_strict ? 0.9 : 0.5;
-
+		imgtool::partition::ptr partition;
+		imgtool::directory::ptr imageenum;
 		err = imgtool::partition::open(*image, 0, partition);
-		if (err)
-			goto done;
+		if (!err)
+			err = imgtool::directory::open(*partition, "", imageenum);
 
-		err = imgtool::directory::open(*partition, "", imageenum);
-		if (err)
-			goto done;
-
-		memset(&ent, 0, sizeof(ent));
-		do
+		if (!err)
 		{
-			err = imageenum->get_next(ent);
-			if (err)
-				goto done;
+			float current_result = module->open_is_strict ? 0.9 : 0.5;
 
-			if (ent.corrupt)
-				current_result = (current_result * 99 + 1.00f) / 100;
-			else
-				current_result = (current_result + 1.00f) / 2;
+			imgtool_dirent ent;
+			do
+			{
+				err = imageenum->get_next(ent);
+				if (err)
+					goto done;
+
+				if (ent.corrupt)
+					current_result = (current_result * 99 + 1.00f) / 100;
+				else
+					current_result = (current_result + 1.00f) / 2;
+			}
+			while (!ent.eof);
+
+			result = current_result;
 		}
-		while(!ent.eof);
-
-		result = current_result;
 	}
 
 done:
@@ -589,8 +583,8 @@ imgtool::partition::partition(imgtool::image &image, const imgtool_class &imgcla
 	m_set_attrs = (imgtoolerr_t(*)(imgtool::partition &, const char *, const uint32_t *, const imgtool_attribute *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_SET_ATTRS);
 	m_attr_name = (imgtoolerr_t(*)(uint32_t, const imgtool_attribute *, char *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_ATTR_NAME);
 	m_get_iconinfo = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool_iconinfo *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_ICON_INFO);
-	m_suggest_transfer = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool_transfer_suggestion *, size_t))  imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_SUGGEST_TRANSFER);
-	m_get_chain = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool_chainent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_CHAIN);
+	m_suggest_transfer = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool::transfer_suggestion *, size_t))  imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_SUGGEST_TRANSFER);
+	m_get_chain = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool::chainent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_CHAIN);
 	m_writefile_optguide = (const util::option_guide *) imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 
 	const char *writefile_optspec = (const char *)imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC);
@@ -1293,37 +1287,31 @@ done:
 imgtoolerr_t imgtool::partition::get_file_size(const char *fname, uint64_t &filesize)
 {
 	imgtoolerr_t err;
+
+	filesize = ~uint64_t(0);
+
 	imgtool::directory::ptr imgenum;
-	imgtool_dirent ent;
-	const char *path;
-
-	path = nullptr;    /* TODO: Need to parse off the path */
-
-	filesize = ~((uint64_t) 0);
-	memset(&ent, 0, sizeof(ent));
-
+	const char *path = nullptr; // TODO: Need to parse off the path
 	err = imgtool::directory::open(*this, path, imgenum);
 	if (err)
-		goto done;
+		return err;
 
+	imgtool_dirent ent;
 	do
 	{
 		err = imgenum->get_next(ent);
 		if (err)
-			goto done;
+			return err;
 
 		if (!core_stricmp(fname, ent.filename))
 		{
 			filesize = ent.filesize;
-			goto done;
+			return err;
 		}
 	}
 	while(ent.filename[0]);
 
-	err = (imgtoolerr_t)IMGTOOLERR_FILENOTFOUND;
-
-done:
-	return err;
+	return (imgtoolerr_t)IMGTOOLERR_FILENOTFOUND;
 }
 
 
@@ -1466,12 +1454,10 @@ imgtoolerr_t imgtool::partition::get_icon_info(const char *path, imgtool_iconinf
 //-------------------------------------------------
 
 imgtoolerr_t imgtool::partition::suggest_file_filters(const char *path,
-	imgtool::stream *stream, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
+	imgtool::stream *stream, imgtool::transfer_suggestion *suggestions, size_t suggestions_length)
 {
 	imgtoolerr_t err;
-	int i, j;
-	imgtoolerr_t (*check_stream)(imgtool::stream &stream, imgtool_suggestion_viability_t *viability);
-	size_t position;
+	imgtoolerr_t (*check_stream)(imgtool::stream &stream, imgtool::suggestion_viability_t *viability);
 
 	// clear out buffer
 	memset(suggestions, 0, sizeof(*suggestions) * suggestions_length);
@@ -1493,15 +1479,15 @@ imgtoolerr_t imgtool::partition::suggest_file_filters(const char *path,
 	// loop on resulting suggestions, and do the following:
 	//  1.  Call check_stream if present, and remove disqualified streams
 	//  2.  Fill in missing descriptions
-	i = j = 0;
+	int i = 0, j = 0;
 	while(suggestions[i].viability)
 	{
 		if (stream && suggestions[i].filter)
 		{
-			check_stream = (imgtoolerr_t (*)(imgtool::stream &, imgtool_suggestion_viability_t *)) filter_get_info_fct(suggestions[i].filter, FILTINFO_PTR_CHECKSTREAM);
+			check_stream = (imgtoolerr_t (*)(imgtool::stream &, imgtool::suggestion_viability_t *)) filter_get_info_fct(suggestions[i].filter, FILTINFO_PTR_CHECKSTREAM);
 			if (check_stream)
 			{
-				position = stream->tell();
+				size_t const position = stream->tell();
 				err = check_stream(*stream, &suggestions[i].viability);
 				stream->seek(position, SEEK_SET);
 				if (err)
@@ -1529,7 +1515,7 @@ imgtoolerr_t imgtool::partition::suggest_file_filters(const char *path,
 		}
 		i++;
 	}
-	suggestions[j].viability = (imgtool_suggestion_viability_t)0;
+	suggestions[j].viability = (imgtool::suggestion_viability_t)0;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -1540,17 +1526,15 @@ imgtoolerr_t imgtool::partition::suggest_file_filters(const char *path,
 //  chain for a file or directory on a partition
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::partition::get_chain(const char *path, imgtool_chainent *chain, size_t chain_size)
+imgtoolerr_t imgtool::partition::get_chain(const char *path, imgtool::chainent *chain, size_t chain_size)
 {
-	size_t i;
-
 	assert(chain_size > 0);
 
 	if (!m_get_chain)
 		return imgtoolerr_t(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
 
 	// initialize the chain array, so the module's get_chain function can be lazy
-	for (i = 0; i < chain_size; i++)
+	for (int i = 0; i < chain_size; i++)
 	{
 		chain[i].level = 0;
 		chain[i].block = ~0;
@@ -1569,7 +1553,7 @@ imgtoolerr_t imgtool::partition::get_chain(const char *path, imgtool_chainent *c
 imgtoolerr_t imgtool::partition::get_chain_string(const char *path, char *buffer, size_t buffer_len)
 {
 	imgtoolerr_t err;
-	imgtool_chainent chain[512];
+	imgtool::chainent chain[512];
 	uint64_t last_block;
 	uint8_t cur_level = 0;
 	int len, i;
@@ -2318,9 +2302,8 @@ imgtoolerr_t imgtool::directory::get_next(imgtool_dirent &ent)
 {
 	imgtoolerr_t err;
 
-	// This makes it so that drivers don't have to take care of clearing
-	// the attributes if they don't apply
-	memset(&ent, 0, sizeof(ent));
+	// This makes it so that drivers don't have to take care of clearing the attributes if they don't apply
+	ent = imgtool_dirent();
 
 	err = m_partition.m_next_enum(*this, ent);
 	if (err)
@@ -2370,7 +2353,7 @@ void unknown_partition_get_info(const imgtool_class *imgclass, uint32_t state, u
 {
 	switch(state)
 	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		/* --- the following bits of info are returned as NUL-terminated strings --- */
 		case IMGTOOLINFO_STR_NAME:                          strcpy(info->s = imgtool_temp_str(), "unknown"); break;
 		case IMGTOOLINFO_STR_DESCRIPTION:                   strcpy(info->s = imgtool_temp_str(), "Unknown partition type"); break;
 	}

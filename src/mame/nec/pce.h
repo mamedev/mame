@@ -42,8 +42,8 @@ public:
 	void sgx(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<h6280_device> m_maincpu;
@@ -58,10 +58,10 @@ private:
 	void cd_intf_w(offs_t offset, u8 data);
 	u8 cd_intf_r(offs_t offset);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void pce_io(address_map &map);
-	void pce_mem(address_map &map);
-	void sgx_io(address_map &map);
-	void sgx_mem(address_map &map);
+	void pce_io(address_map &map) ATTR_COLD;
+	void pce_mem(address_map &map) ATTR_COLD;
+	void sgx_io(address_map &map) ATTR_COLD;
+	void sgx_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NEC_PCE_H

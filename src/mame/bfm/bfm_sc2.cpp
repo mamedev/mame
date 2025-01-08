@@ -266,7 +266,7 @@ protected:
 	int recdata(int changed, int data);
 	void nec_reset_w(uint8_t data);
 	void nec_latch_w(uint8_t data);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void on_scorpion2_reset();
 	void Scorpion2_SetSwitchState(int strobe, int data, int state);
@@ -282,7 +282,7 @@ protected:
 	void _3meters(machine_config &config);
 	void _5meters(machine_config &config);
 	void _8meters(machine_config &config);
-	void sc2_basemap(address_map &map);
+	void sc2_basemap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
@@ -355,12 +355,12 @@ public:
 	void scorpion2_vidm(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void reel12_vid_w(uint8_t data);
 	uint8_t vfd_status_hop_r();
 
-	void memmap_vid(address_map &map);
+	void memmap_vid(address_map &map) ATTR_COLD;
 };
 
 
@@ -387,7 +387,7 @@ protected:
 	void sc2awp_common_init(int reels, int decrypt);
 	void sc2awpdmd_common_init(int reels, int decrypt);
 
-	void memmap_no_vid(address_map &map);
+	void memmap_no_vid(address_map &map) ATTR_COLD;
 
 	optional_device<bfm_dm01_device> m_dm01;
 	optional_device_array<stepper_device, 6> m_reel;
@@ -411,7 +411,7 @@ public:
 	void scorpion2(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 
@@ -429,8 +429,8 @@ public:
 	void scorpion2_dm01_3m(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void vfd1_dmd_w(uint8_t data);
 	void dmd_reset_w(uint8_t data);

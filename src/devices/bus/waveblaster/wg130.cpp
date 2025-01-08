@@ -22,15 +22,15 @@ public:
 	virtual void midi_rx(int state) override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<gt913_device> m_gt913;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 INPUT_PORTS_START(wg130)

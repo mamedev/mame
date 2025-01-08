@@ -80,16 +80,16 @@ private:
 	void serial_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
-	void zac_2_data(address_map &map);
-	void zac_2_io(address_map &map);
-	void zac_2_map(address_map &map);
+	void zac_2_data(address_map &map) ATTR_COLD;
+	void zac_2_io(address_map &map) ATTR_COLD;
+	void zac_2_map(address_map &map) ATTR_COLD;
 
 	u8 m_row = 0U;
 	u8 m_t_c = 0U;
 	u8 m_out_offs = 0U;
 	u8 m_game = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<u8> m_p_ram;
 	required_ioport_array<8> m_io_keyboard;
@@ -1292,64 +1292,64 @@ ROM_END
 } // anonymous namespace
 
 // 1B1170 sound (IMDB), 1B1370 (schematics)
-GAME(1982,  socrking,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982,  socrkinga,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (alternate set)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982,  socrkingi,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (Italian speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982,  socrkingg,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (German speech)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  pinchamp,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  pinchampf,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (French speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  pinchampg,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (German speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  pinchampi,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (Italian speech)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  pinchamp7,  pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  pinchamp7f, pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits French speech)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  pinchamp7g, pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits German speech)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  pinchamp7i, pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits Italian speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  socrking,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  socrkinga,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (alternate set)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  socrkingi,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (Italian speech)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  socrkingg,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (German speech)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchamp,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchampf,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (French speech)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchampg,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (German speech)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchampi,  pinchamp, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ (Italian speech)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchamp7,  pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchamp7f, pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits French speech)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchamp7g, pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits German speech)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  pinchamp7i, pinchamp, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Pinball Champ (7 digits Italian speech)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // 1B11136 or 1B13136
-GAME(1983,  tmachzac,   0,        zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  tmachzacg,  tmachzac, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria, German speech)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  tmachzacf,  tmachzac, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria, French speech)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  tmachzaci,  tmachzac, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria, Italian speech)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  farfalla,   0,        zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  farfallai,  farfalla, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla (Italian speech)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  farfallag,  farfalla, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla (German speech)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1983,  farfallaf,  farfalla, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla (French speech)",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1984,  dvlrider,   0,        zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Devil Riders",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1984,  dvlrideri,  dvlrider, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Devil Riders (Italian speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1984,  dvlriderg,  dvlrider, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Devil Riders (German speech)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1984,  dvlriderf,  dvlrider, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Devil Riders (French speech)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1984,  mcastle,    0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1984,  mcastlei,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (Italian speech)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1984,  mcastleg,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (German speech)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1984,  mcastlef,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (French speech)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985,  robot,      0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria)",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985,  roboti,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, Italian speech)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985,  robotg,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, German speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985,  robotf,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, French speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  tmachzac,   0,        zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  tmachzacg,  tmachzac, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria, German speech)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  tmachzacf,  tmachzac, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria, French speech)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  tmachzaci,  tmachzac, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Time Machine (Zaccaria, Italian speech)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  farfalla,   0,        zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  farfallai,  farfalla, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla (Italian speech)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  farfallag,  farfalla, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla (German speech)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1983,  farfallaf,  farfalla, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Farfalla (French speech)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  dvlrider,   0,        zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Devil Riders",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  dvlrideri,  dvlrider, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Devil Riders (Italian speech)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  dvlriderg,  dvlrider, zac_2,  zac_2, zac_2_state, init_1,     ROT0, "Zaccaria",    "Devil Riders (German speech)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  dvlriderf,  dvlrider, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Devil Riders (French speech)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  mcastle,    0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  mcastlei,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (Italian speech)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  mcastleg,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (German speech)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  mcastlef,   mcastle,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Magic Castle (French speech)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  robot,      0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  roboti,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, Italian speech)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  robotg,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, German speech)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  robotf,     robot,    zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Robot (Zaccaria, French speech)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // 1B11178
-GAME(1985,  clown,      0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Clown",                                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985,  poolcham,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pool Champion",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985,  poolchami,  poolcham, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pool Champion (Italian speech)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  bbeltzac,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria)",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  bbeltzaci,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, Italian speech)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  bbeltzacg,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, German speech)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  bbeltzacf,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, French speech)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  mexico,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Mexico 86 (German speech)",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  mexicoi,    mexico,   zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Mexico 86 (Italian speech)",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  zankor,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Zankor (TMS5200 Italian speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  zankor2i,   zankor,   zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Zankor (TMS5220 Italian speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1987,  spookyp,    0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky",                                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1987,  spookyi,    spookyp,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky (Italian speech)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1987,  strsphnx,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Star's Phoenix (Italian speech)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1987,  strsphnxf,  strsphnx, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Star's Phoenix (French speech)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  clown,      0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Clown",                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  poolcham,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pool Champion",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  poolchami,  poolcham, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pool Champion (Italian speech)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  bbeltzac,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  bbeltzaci,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, Italian speech)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  bbeltzacg,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, German speech)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  bbeltzacf,  bbeltzac, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Black Belt (Zaccaria, French speech)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  mexico,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Mexico 86 (German speech)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  mexicoi,    mexico,   zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Mexico 86 (Italian speech)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  zankor,     0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Zankor (TMS5200 Italian speech)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  zankor2i,   zankor,   zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Zankor (TMS5220 Italian speech)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  spookyp,    0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  spookyi,    spookyp,  zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Spooky (Italian speech)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  strsphnx,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Star's Phoenix (Italian speech)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  strsphnxf,  strsphnx, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Star's Phoenix (French speech)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // 1B11183
-GAME(1987,  nstrphnx,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "New Star's Phoenix (Italian speech)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1987,  nstrphnxf,  nstrphnx, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "New Star's Phoenix (French speech)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  nstrphnx,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "New Star's Phoenix (Italian speech)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  nstrphnxf,  nstrphnx, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "New Star's Phoenix (French speech)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // unknown
-GAME(1987,  thndrman,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Apple Time",  "Thunder Man",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  thndrman,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Apple Time",  "Thunder Man",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // Technoplay sound card
-GAME(1987,  scram_tp,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Tecnoplay",   "Scramble (Pinball)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  scram_tp,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Tecnoplay",   "Scramble (Pinball)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

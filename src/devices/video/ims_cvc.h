@@ -27,8 +27,8 @@ protected:
 	ims_cvc_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_palette_interface overrides
 	virtual u32 palette_entries() const noexcept override { return 256; }
@@ -98,12 +98,12 @@ class g300_device : public ims_cvc_device
 public:
 	g300_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect) override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	u32 control_r() { return m_control; }
 	void control_w(u32 data) { m_control = data & MASK24; }
@@ -117,7 +117,7 @@ class g332_device : public ims_cvc_device
 public:
 	g332_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect) override;
 
@@ -171,14 +171,14 @@ protected:
 	g332_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device_t overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_palette_interface overrides
 	virtual u32 palette_entries() const noexcept override { return 256 + 3; }
 
-	virtual void microport_map(address_map &map);
+	virtual void microport_map(address_map &map) ATTR_COLD;
 
 	virtual void boot_w(u32 data) override;
 

@@ -67,7 +67,7 @@ public:
 	void init_suna8();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	enum GFXBANK_TYPE_T
@@ -151,25 +151,25 @@ private:
 	void draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int ypos, bool write_mask);
 	void brickzn_decrypt();
 
-	void brickzn11_map(address_map &map);
-	void brickzn_io_map(address_map &map);
-	void brickzn_map(address_map &map);
-	void brickzn_pcm_io_map(address_map &map);
-	void brickzn_pcm_map(address_map &map);
-	void brickzn_sound_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void hardhea2_map(address_map &map);
-	void hardhea2b_map(address_map &map);
-	void hardhea2b_decrypted_opcodes_map(address_map &map);
-	void hardhead_io_map(address_map &map);
-	void hardhead_map(address_map &map);
-	void hardhead_sound_io_map(address_map &map);
-	void hardhead_sound_map(address_map &map);
-	void rranger_io_map(address_map &map);
-	void rranger_map(address_map &map);
-	void rranger_sound_map(address_map &map);
-	void sparkman_map(address_map &map);
-	void starfigh_map(address_map &map);
+	void brickzn11_map(address_map &map) ATTR_COLD;
+	void brickzn_io_map(address_map &map) ATTR_COLD;
+	void brickzn_map(address_map &map) ATTR_COLD;
+	void brickzn_pcm_io_map(address_map &map) ATTR_COLD;
+	void brickzn_pcm_map(address_map &map) ATTR_COLD;
+	void brickzn_sound_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void hardhea2_map(address_map &map) ATTR_COLD;
+	void hardhea2b_map(address_map &map) ATTR_COLD;
+	void hardhea2b_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void hardhead_io_map(address_map &map) ATTR_COLD;
+	void hardhead_map(address_map &map) ATTR_COLD;
+	void hardhead_sound_io_map(address_map &map) ATTR_COLD;
+	void hardhead_sound_map(address_map &map) ATTR_COLD;
+	void rranger_io_map(address_map &map) ATTR_COLD;
+	void rranger_map(address_map &map) ATTR_COLD;
+	void rranger_sound_map(address_map &map) ATTR_COLD;
+	void sparkman_map(address_map &map) ATTR_COLD;
+	void starfigh_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_hardhead_ip;

@@ -60,10 +60,10 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 
@@ -147,4 +147,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1976, dmodrbcc, 0, chicago, 0, chicago_state, empty_init, ROT0, "Chicago Coin", "Demolition Derby (Chicago Coin)", MACHINE_IS_SKELETON )
+GAME( 1976, dmodrbcc, 0, chicago, 0, chicago_state, empty_init, ROT0, "Chicago Coin", "Demolition Derby (Chicago Coin)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

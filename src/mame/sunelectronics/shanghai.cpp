@@ -57,13 +57,13 @@ private:
 	void shanghai_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(half_vblank_irq);
 
-	void hd63484_map(address_map &map);
-	void kothello_map(address_map &map);
-	void kothello_sound_map(address_map &map);
-	void shangha2_map(address_map &map);
-	void shangha2_portmap(address_map &map);
-	void shanghai_map(address_map &map);
-	void shanghai_portmap(address_map &map);
+	void hd63484_map(address_map &map) ATTR_COLD;
+	void kothello_map(address_map &map) ATTR_COLD;
+	void kothello_sound_map(address_map &map) ATTR_COLD;
+	void shangha2_map(address_map &map) ATTR_COLD;
+	void shangha2_portmap(address_map &map) ATTR_COLD;
+	void shanghai_map(address_map &map) ATTR_COLD;
+	void shanghai_portmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

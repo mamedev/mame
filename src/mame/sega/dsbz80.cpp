@@ -13,11 +13,11 @@
 #include "dsbz80.h"
 #include "machine/clock.h"
 
-#define Z80_TAG "mpegcpu"
+#include <algorithm>
 
 void dsbz80_device::dsbz80_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().region(":mpegcpu", 0);
+	map(0x0000, 0x7fff).rom().region("mpegcpu", 0);
 	map(0x8000, 0xffff).ram();
 }
 
@@ -29,7 +29,7 @@ void dsbz80_device::dsbz80io_map(address_map &map)
 	map(0xe5, 0xe7).w(FUNC(dsbz80_device::mpeg_end_w));
 	map(0xe8, 0xe8).w(FUNC(dsbz80_device::mpeg_volume_w));
 	map(0xe9, 0xe9).w(FUNC(dsbz80_device::mpeg_stereo_w));
-	map(0xf0, 0xf1).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xf0, 0xf1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 
@@ -70,9 +70,22 @@ void dsbz80_device::device_add_mconfig(machine_config &config)
 dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DSBZ80, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_ourcpu(*this, Z80_TAG),
+	m_ourcpu(*this, "mpegcpu"),
 	m_uart(*this, "uart"),
-	m_rxd_handler(*this)
+	m_mpeg_rom(*this, "mpeg"),
+	m_rxd_handler(*this),
+	m_mp_start(0),
+	m_mp_end(0),
+	m_mp_vol(0x7f),
+	m_mp_pan(0),
+	m_mp_state(0),
+	m_lp_start(0),
+	m_lp_end(0),
+	m_start(0),
+	m_end(0),
+	m_mp_pos(0),
+	m_audio_pos(0),
+	m_audio_avail(0)
 {
 }
 
@@ -82,9 +95,21 @@ dsbz80_device::dsbz80_device(const machine_config &mconfig, const char *tag, dev
 
 void dsbz80_device::device_start()
 {
-	uint8_t *rom_base = machine().root_device().memregion("mpeg")->base();
-	decoder = new mpeg_audio(rom_base, mpeg_audio::L2, false, 0);
+	m_decoder.reset(new mpeg_audio(&m_mpeg_rom[0], mpeg_audio::L2, false, 0));
 	stream_alloc(0, 2, 32000);
+
+	save_item(NAME(m_mp_start));
+	save_item(NAME(m_mp_end));
+	save_item(NAME(m_mp_vol));
+	save_item(NAME(m_mp_pan));
+	save_item(NAME(m_mp_state));
+	save_item(NAME(m_lp_start));
+	save_item(NAME(m_lp_end));
+	save_item(NAME(m_start));
+	save_item(NAME(m_end));
+	save_item(NAME(m_mp_pos));
+	save_item(NAME(m_audio_pos));
+	save_item(NAME(m_audio_avail));
 }
 
 //-------------------------------------------------
@@ -93,12 +118,22 @@ void dsbz80_device::device_start()
 
 void dsbz80_device::device_reset()
 {
-	start = end = 0;
-	audio_pos = audio_avail = 0;
-	memset(audio_buf, 0, sizeof(audio_buf));
-	mp_state = 0;
+	m_start = m_end = 0;
+	m_audio_pos = m_audio_avail = 0;
+	std::fill(std::begin(m_audio_buf), std::end(m_audio_buf), 0);
+	m_mp_vol = 0x7f;
+	m_mp_state = 0;
 
 	m_uart->write_cts(0);
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific cleanup
+//-------------------------------------------------
+
+void dsbz80_device::device_stop()
+{
+	m_decoder.reset();
 }
 
 void dsbz80_device::write_txd(int state)
@@ -114,35 +149,35 @@ void dsbz80_device::output_txd(int state)
 
 void dsbz80_device::mpeg_trigger_w(uint8_t data)
 {
-	mp_state = data;
+	m_mp_state = data;
 
 	if (data == 0)  // stop
 	{
-		mp_state = 0;
-		audio_pos = audio_avail = 0;
+		m_mp_state = 0;
+		m_audio_pos = m_audio_avail = 0;
 	}
 	else if (data == 1) // play without loop
 	{
-		mp_pos = mp_start*8;
+		m_mp_pos = m_mp_start * 8;
 	}
 	else if (data == 2) // play with loop
 	{
-		mp_pos = mp_start*8;
+		m_mp_pos = m_mp_start * 8;
 	}
 }
 
 uint8_t dsbz80_device::mpeg_pos_r(offs_t offset)
 {
-	int mp_prg = mp_pos >> 3;
+	uint32_t const mp_prg = m_mp_pos >> 3;
 
 	switch (offset)
 	{
 		case 0:
-			return (mp_prg>>16)&0xff;
+			return (mp_prg >> 16) & 0xff;
 		case 1:
-			return (mp_prg>>8)&0xff;
+			return (mp_prg >> 8) & 0xff;
 		case 2:
-			return mp_prg&0xff;
+			return mp_prg & 0xff;
 	}
 
 	return 0;
@@ -160,32 +195,32 @@ void dsbz80_device::mpeg_start_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0:
-			start &= 0x00ffff;
-			start |= (int)data<<16;
+			m_start &= 0x00ffff;
+			m_start |= (uint32_t)data << 16;
 			break;
 		case 1:
-			start &= 0xff00ff;
-			start |= (int)data<<8;
+			m_start &= 0xff00ff;
+			m_start |= (uint32_t)data << 8;
 			break;
 		case 2:
-			start &= 0xffff00;
-			start |= data;
+			m_start &= 0xffff00;
+			m_start |= data;
 
-			if (mp_state == 0)
+			if (m_mp_state == 0)
 			{
-				mp_start = start;
+				m_mp_start = m_start;
 			}
 			else
 			{
-				lp_start = start;
+				m_lp_start = m_start;
 				// SWA: if loop end is zero, it means "keep previous end marker"
-				if (lp_end == 0)
+				if (m_lp_end == 0)
 				{
-//                  MPEG_Set_Loop(ROM + lp_start, mp_end-lp_start);
+//                  MPEG_Set_Loop(ROM + m_lp_start, m_mp_end-m_lp_start);
 				}
 				else
 				{
-//                  MPEG_Set_Loop(ROM + lp_start, lp_end-lp_start);
+//                  MPEG_Set_Loop(ROM + m_lp_start, m_lp_end-m_lp_start);
 				}
 			}
 			break;
@@ -197,25 +232,25 @@ void dsbz80_device::mpeg_end_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0:
-			end &= 0x00ffff;
-			end |= (int)data<<16;
+			m_end &= 0x00ffff;
+			m_end |= (uint32_t)data << 16;
 			break;
 		case 1:
-			end &= 0xff00ff;
-			end |= (int)data<<8;
+			m_end &= 0xff00ff;
+			m_end |= (uint32_t)data << 8;
 			break;
 		case 2:
-			end &= 0xffff00;
-			end |= data;
+			m_end &= 0xffff00;
+			m_end |= data;
 
-			if (mp_state == 0)
+			if (m_mp_state == 0)
 			{
-				mp_end = end;
+				m_mp_end = m_end;
 			}
 			else
 			{
-				lp_end = end;
-//              MPEG_Set_Loop(ROM + lp_start, lp_end-lp_start);
+				m_lp_end = m_end;
+//              MPEG_Set_Loop(ROM + m_lp_start, m_lp_end-m_lp_start);
 			}
 			break;
 	}
@@ -223,12 +258,13 @@ void dsbz80_device::mpeg_end_w(offs_t offset, uint8_t data)
 
 void dsbz80_device::mpeg_volume_w(uint8_t data)
 {
-	mp_vol = 0x7f - data;
+	// TODO: MSB used but unknown purpose
+	m_mp_vol = ~data & 0x7f;
 }
 
 void dsbz80_device::mpeg_stereo_w(uint8_t data)
 {
-	mp_pan = data & 3;  // 0 = stereo, 1 = left on both channels, 2 = right on both channels
+	m_mp_pan = data & 3;  // 0 = stereo, 1 = left on both channels, 2 = right on both channels
 }
 
 void dsbz80_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
@@ -238,40 +274,40 @@ void dsbz80_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 	int samples = out_l.samples();
 	int sampindex = 0;
-	for(;;)
+	for (;;)
 	{
-		while(samples && audio_pos < audio_avail)
+		while (samples && (m_audio_pos < m_audio_avail))
 		{
-			switch (mp_pan)
+			switch (m_mp_pan)
 			{
 				case 0: // stereo
-					out_l.put_int(sampindex, audio_buf[audio_pos*2], 32768);
-					out_r.put_int(sampindex, audio_buf[audio_pos*2+1], 32768);
+					out_l.put_int(sampindex, m_audio_buf[m_audio_pos*2] * m_mp_vol, 32768 * 128);
+					out_r.put_int(sampindex, m_audio_buf[m_audio_pos*2+1] * m_mp_vol, 32768 * 128);
 					sampindex++;
 					break;
 
 				case 1: // left only
-					out_l.put_int(sampindex, audio_buf[audio_pos*2], 32768);
-					out_r.put_int(sampindex, audio_buf[audio_pos*2], 32768);
+					out_l.put_int(sampindex, m_audio_buf[m_audio_pos*2] * m_mp_vol, 32768 * 128);
+					out_r.put_int(sampindex, m_audio_buf[m_audio_pos*2] * m_mp_vol, 32768 * 128);
 					sampindex++;
 					break;
 
 				case 2: // right only
-					out_l.put_int(sampindex, audio_buf[audio_pos*2+1], 32768);
-					out_r.put_int(sampindex, audio_buf[audio_pos*2+1], 32768);
+					out_l.put_int(sampindex, m_audio_buf[m_audio_pos*2+1] * m_mp_vol, 32768 * 128);
+					out_r.put_int(sampindex, m_audio_buf[m_audio_pos*2+1] * m_mp_vol, 32768 * 128);
 					sampindex++;
 					break;
 			}
-			audio_pos++;
+			m_audio_pos++;
 			samples--;
 		}
 
-		if(!samples)
+		if (!samples)
 		{
 			break;
 		}
 
-		if(mp_state == 0)
+		if (m_mp_state == 0)
 		{
 			out_l.fill(0, sampindex);
 			out_r.fill(0, sampindex);
@@ -281,31 +317,31 @@ void dsbz80_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		else
 		{
 			int sample_rate, channel_count;
-			bool ok = decoder->decode_buffer(mp_pos, mp_end*8, audio_buf, audio_avail, sample_rate, channel_count);
+			bool const ok = m_decoder->decode_buffer(m_mp_pos, m_mp_end*8, m_audio_buf, m_audio_avail, sample_rate, channel_count);
 
 			if (ok)
 			{
-				audio_pos = 0;
+				m_audio_pos = 0;
 			}
 			else
 			{
-				if(mp_state == 2)
+				if (m_mp_state == 2)
 				{
-					if (mp_pos == lp_start*8)
+					if (m_mp_pos == m_lp_start * 8)
 					{
 						// We're looping on un-decodable crap, abort abort abort
-						mp_state = 0;
+						m_mp_state = 0;
 					}
-					mp_pos = lp_start*8;
+					m_mp_pos = m_lp_start * 8;
 
-					if (lp_end)
+					if (m_lp_end)
 					{
-						mp_end = lp_end;
+						m_mp_end = m_lp_end;
 					}
 				}
 				else
 				{
-					mp_state = 0;
+					m_mp_state = 0;
 				}
 			}
 		}

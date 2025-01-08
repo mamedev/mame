@@ -86,18 +86,18 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(load_romboard);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void text_data_map(address_map &map);
-	void stack_map(address_map &map);
-	void kernel_map(address_map &map);
-	void system_map(address_map &map);
-	void multibus_mem_map(address_map &map);
-	void multibus_io_map(address_map &map);
-	void geometry_pipe_map(address_map &map);
-	void fpa_map(address_map &map);
+	void text_data_map(address_map &map) ATTR_COLD;
+	void stack_map(address_map &map) ATTR_COLD;
+	void kernel_map(address_map &map) ATTR_COLD;
+	void system_map(address_map &map) ATTR_COLD;
+	void multibus_mem_map(address_map &map) ATTR_COLD;
+	void multibus_io_map(address_map &map) ATTR_COLD;
+	void geometry_pipe_map(address_map &map) ATTR_COLD;
+	void fpa_map(address_map &map) ATTR_COLD;
 
 	uint32_t mmu_r(offs_t offset, uint32_t mem_mask = ~0);
 	void mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -134,8 +134,8 @@ private:
 	void duarta_irq_handler(int state);
 	void duartb_irq_handler(int state);
 
-	void mem_map(address_map &map);
-	void storager_map(address_map& map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void storager_map(address_map &map) ATTR_COLD;
 
 	required_device<m68020_device> m_maincpu;
 	required_device<m68000_device> m_storagercpu;
@@ -720,4 +720,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME           FLAGS
-COMP( 1985, iris3130, 0,      0,      iris3130, iris3130, iris3000_state, empty_init, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_IS_SKELETON )
+COMP( 1985, iris3130, 0,      0,      iris3130, iris3130, iris3000_state, empty_init, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

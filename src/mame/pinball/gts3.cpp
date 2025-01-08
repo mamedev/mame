@@ -64,7 +64,7 @@ ToDo:
 
 #include "gottlieb_a.h"
 
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
 #include "speaker.h"
@@ -94,8 +94,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void segbank_w(offs_t offset, u8 data);
@@ -105,8 +105,7 @@ private:
 	void solenoid_w(offs_t, u8);
 	void u4b_w(u8 data);
 	void u5a_w(u8 data);
-	void nmi_w(int state);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_dispclk = false;
 	bool m_lampclk = false;
@@ -115,7 +114,7 @@ private:
 	u8 m_segment[4]{};
 	u8 m_u4b = 0U;
 
-	required_device<m65c02_device> m_maincpu;
+	required_device<w65c02_device> m_maincpu;
 	required_device<via6522_device> m_u4;
 	required_device<via6522_device> m_u5;
 	optional_device<gottlieb_sound_p5_device> m_p5_sound;
@@ -140,7 +139,7 @@ void gts3_state::mem_map(address_map &map)
 
 static INPUT_PORTS_START( gts3 )
 	PORT_START("TTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") PORT_CHANGED_MEMBER(DEVICE_SELF, gts3_state, test_inp, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gts3_state::test_inp), 1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Tilt") PORT_CODE(KEYCODE_9)
 
@@ -240,12 +239,6 @@ INPUT_PORTS_END
 INPUT_CHANGED_MEMBER( gts3_state::test_inp )
 {
 	m_u4->write_ca1(newval);
-}
-
-// This trampoline needed; WRITELINE("maincpu", m65c02_device, nmi_line) does not work
-void gts3_state::nmi_w(int state)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
 }
 
 void gts3_state::lampret_w(u8 data)
@@ -348,7 +341,7 @@ void gts3_state::machine_reset()
 
 void gts3_state::p0(machine_config &config)
 {
-	M65C02(config, m_maincpu, XTAL(4'000'000) / 2);
+	W65C02(config, m_maincpu, XTAL(4'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gts3_state::mem_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -361,7 +354,7 @@ void gts3_state::p0(machine_config &config)
 	m_u4->readpb_handler().set(FUNC(gts3_state::u4b_r));
 	m_u4->writepb_handler().set(FUNC(gts3_state::u4b_w));
 	//m_u4->ca2_handler().set(FUNC(gts3_state::u4ca2_w));
-	m_u4->cb2_handler().set(FUNC(gts3_state::nmi_w));
+	m_u4->cb2_handler().set_inputline("maincpu", W65C02_NMI_LINE).invert();
 
 	R65C22(config, m_u5, XTAL(4'000'000) / 2);
 	m_u5->irq_handler().set("irq", FUNC(input_merger_device::in_w<1>));
@@ -372,7 +365,7 @@ void gts3_state::p0(machine_config &config)
 	//m_u5->cb1_handler().set(FUNC(gts3_state::u5cb1_w));
 	//m_u5->cb2_handler().set(FUNC(gts3_state::u5cb2_w));
 
-	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", m65c02_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", W65C02_IRQ_LINE);
 
 	/* Sound */
 	genpin_audio(config);
@@ -668,19 +661,19 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1989,  lca,      0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Lights...Camera...Action!",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  lca2,     lca, p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Lights...Camera...Action! (rev.2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  silvslug, 0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Silver Slugger",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  vegas,    0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Vegas",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  deadweap, 0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Deadly Weapon",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  tfight,   0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Title Fight",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  nudgeit,  0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Nudge-It",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  bellring, 0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Bell Ringer",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  carhop,   0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Car Hop",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  hoops,    0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Hoops",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  cactjack, 0,   p7, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Cactus Jack's",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  clas1812, 0,   p7, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Class of 1812",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  surfnsaf, 0,   p7, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Surf'n Safari",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  opthund,  0,   p7, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Operation: Thunder",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(19??,  tt_game,  0,   p7, gts3, gts3_state, empty_init, ROT0, "Toptronic", "unknown Toptronic pinball game",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  ccruise,  0,   p7, gts3, gts3_state, empty_init, ROT0, "International Concepts","Caribbean Cruise",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  lca,      0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Lights...Camera...Action!",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  lca2,     lca, p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Lights...Camera...Action! (rev.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  silvslug, 0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Silver Slugger",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  vegas,    0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Vegas",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  deadweap, 0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Deadly Weapon",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  tfight,   0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Title Fight",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  nudgeit,  0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Nudge-It",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  bellring, 0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Bell Ringer",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  carhop,   0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Car Hop",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  hoops,    0,   p5, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Hoops",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  cactjack, 0,   p7, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Cactus Jack's",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  clas1812, 0,   p7, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Class of 1812",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  surfnsaf, 0,   p7, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Surf'n Safari",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  opthund,  0,   p7, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Operation: Thunder",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(19??,  tt_game,  0,   p7, gts3, gts3_state, empty_init, ROT0, "Toptronic", "unknown Toptronic pinball game",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  ccruise,  0,   p7, gts3, gts3_state, empty_init, ROT0, "International Concepts","Caribbean Cruise",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

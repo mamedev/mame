@@ -9,12 +9,12 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_WAFADRIVE_H
-#define MAME_DEVICES_IMAGEDEV_WAFADRIVE_H
-
-#include "magtape.h"
+#ifndef MAME_IMAGEDEV_WAFADRIVE_H
+#define MAME_IMAGEDEV_WAFADRIVE_H
 
 #pragma once
+
+#include "magtape.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -39,11 +39,11 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(WAFADRIVE_IMAGE, wafadrive_image_device)
 
-#endif // MAME_DEVICES_IMAGEDEV_WAFADRIVE_H
+#endif // MAME_IMAGEDEV_WAFADRIVE_H

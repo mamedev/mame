@@ -47,7 +47,7 @@ public:
 	void cromptons(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 port_r();
@@ -57,8 +57,8 @@ private:
 	required_device_array<hc259_device, 4> m_outlatch;
 	required_ioport_array<4> m_inputs;
 
-	void prg_map(address_map &map);
-	void io_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	u8 m_port_select = 0;
 };
@@ -167,4 +167,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2000, ffruits,  0,   cromptons, cromptons, cromptons_state, empty_init, ROT0, "Cromptons Leisure Machines", "Frantic Fruits",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2000, ffruits,  0,   cromptons, cromptons, cromptons_state, empty_init, ROT0, "Cromptons Leisure Machines", "Frantic Fruits",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

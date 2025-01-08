@@ -22,7 +22,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void set_prg() override;
 	virtual void set_chr() override;
@@ -47,7 +47,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void set_prg() override { nes_sxrom_device::set_prg(0x18, 0x07); }
 	virtual void set_chr() override { nes_sxrom_device::set_chr(0x18, 0x07); }
@@ -72,7 +72,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void set_prg() override { nes_sxrom_device::set_prg((m_outer & 0x70) >> 1, 0x07); }
 	virtual void set_chr() override { nes_sxrom_device::set_chr((m_outer & 0x70) << 1, 0x1f); }
@@ -110,7 +110,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void set_prg() override { nes_sxrom_device::set_prg(m_reset_count << 3, 0x07); }
 	virtual void set_chr() override { nes_sxrom_device::set_chr(m_reset_count << 5, 0x1f); }
@@ -136,7 +136,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void set_prg() override { nes_sxrom_device::set_prg((m_outer & 0x07) << 4, 0x0f); }
 	virtual void set_chr() override { nes_sxrom_device::set_chr(0x00, 0x01); }
@@ -161,7 +161,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void set_prg() override { nes_sxrom_device::set_prg(0x08, 0x07); }
 	virtual void set_chr() override { nes_sxrom_device::set_chr(0x20, 0x1f); }

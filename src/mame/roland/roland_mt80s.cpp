@@ -27,7 +27,7 @@ public:
 	void mt80s(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	//required_device<hd63266_device> m_hdfdc;
@@ -35,6 +35,8 @@ private:
 
 void roland_mt80s_state::mem_map(address_map &map)
 {
+	map(0x000100, 0x0008ff).ram(); // TODO: should be mapped as internal memory by device
+	map(0x100000, 0x13ffff).ram();
 	map(0xf80000, 0xffffff).rom().region("maincpu", 0);
 }
 
@@ -62,4 +64,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1995, mt80s,    0, 0, mt80s,    mt80s, roland_mt80s_state, empty_init, "Roland", "MT 80s Music Player", MACHINE_IS_SKELETON)
+SYST(1995, mt80s,    0, 0, mt80s,    mt80s, roland_mt80s_state, empty_init, "Roland", "MT 80s Music Player", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

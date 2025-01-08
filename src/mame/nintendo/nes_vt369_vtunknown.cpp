@@ -42,14 +42,14 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint8_t in0_r();
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_vt369_vtunknown_map(address_map& map);
+	void nes_vt369_vtunknown_map(address_map &map) ATTR_COLD;
 
 	optional_ioport m_io0;
 	optional_ioport m_io1;
@@ -94,13 +94,13 @@ public:
 	void nes_vt369_vtunknown_4k_ram(machine_config& config);
 	void nes_vt369_vtunknown_4k_ram_16mb(machine_config& config);
 
-	void vt_external_space_map_32mbyte(address_map& map);
-	void vt_external_space_map_16mbyte(address_map& map);
-	void vt_external_space_map_8mbyte(address_map& map);
-	void vt_external_space_map_4mbyte(address_map& map);
-	[[maybe_unused]] void vt_external_space_map_2mbyte(address_map& map);
-	void vt_external_space_map_1mbyte(address_map& map);
-	[[maybe_unused]] void vt_external_space_map_512kbyte(address_map& map);
+	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_4mbyte(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void vt_external_space_map_2mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_1mbyte(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void vt_external_space_map_512kbyte(address_map &map) ATTR_COLD;
 
 	void init_lxcmcypp();
 
@@ -120,7 +120,7 @@ public:
 	void nes_vt369_vtunknown_bt(machine_config& config);
 	void nes_vt369_vtunknown_bt_2x16mb(machine_config& config);
 
-	void vt_external_space_map_bitboy_2x16mbyte(address_map& map);
+	void vt_external_space_map_bitboy_2x16mbyte(address_map &map) ATTR_COLD;
 
 private:
 
@@ -141,11 +141,11 @@ public:
 	void nes_vt369_vtunknown_fa_4x16mb(machine_config& config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
-	void vt_external_space_map_fapocket_4x16mbyte(address_map& map);
+	void vt_external_space_map_fapocket_4x16mbyte(address_map &map) ATTR_COLD;
 
 	uint8_t fapocket_412c_r();
 	void fapocket_412c_w(uint8_t data);
@@ -177,7 +177,7 @@ public:
 
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
-	[[maybe_unused]] void vt_external_space_map_fp_2x32mbyte(address_map& map);
+	[[maybe_unused]] void vt_external_space_map_fp_2x32mbyte(address_map &map) ATTR_COLD;
 };
 
 uint8_t nes_vt369_vtunknown_base_state::vt_rom_r(offs_t offset)
@@ -882,6 +882,13 @@ ROM_START( otrail )
 ROM_END
 
 
+
+
+ROM_START( hhgc319 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128n10tfi01.u3", 0x000000, 0x1000000, CRC(4b51125f) SHA1(bab3981ae1652cf6620c7c6769a6729a1e4d588f) )
+ROM_END
+
 void nes_vt369_vtunknown_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
@@ -992,12 +999,16 @@ CONS( 201?, 240in1ar,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknow
 CONS( 2019, unk2019hh,  0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2019 PCB)", MACHINE_NOT_WORKING )
 CONS( 2020, unk2020hh,  unk2019hh,0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
 
+
 /*****************************************************************************
 * below are VT369? games that use flash ROM
 *****************************************************************************/
 
 // portable fan + famiclone combo handheld
 CONS( 2020, nubsupmf,   0,      0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// unknown tech level, might be scrambled as default codebank/boot vectors don't seem valid
+CONS( 201?, hhgc319,  0,        0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use BGA on sub

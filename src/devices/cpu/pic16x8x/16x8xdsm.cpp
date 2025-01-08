@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Grull Osgo
+// copyright-holders:Tony La Porta, Grull Osgo
 /************************************************************************
 
   Microchip PIC16X8x Emulator
@@ -34,22 +34,22 @@ const char *const pic16x8x_disassembler::dest[2] = { "W", "Reg" };
 
 const char *const pic16x8x_disassembler::reg_flags[9][8] =
 {
-    {"0", "1", "2", "3", "4", "5", "6", "7"},                         // no flags
-    {"C", "DC", "Z", "PD", "TO", "RP0", "RP1", "IRP"},                // status
-    {"RA0", "RA1", "RA2", "RA3", "RA4/T0CKI", "5", "6", "7"},         // portA
-    {"RB0/INT", "RB1", "RB2", "RB3", "RB4", "RB5", "RB6", "RB7"},     // portB
-    {"RBIF", "INTF", "T0IF", "RBIE", "INTE", "T0IE", "EEIE", "GIE"},  // intcon
-    {"PS0", "PS1", "PS2", "PSA", "T0SE", "T0CS", "INTEDG", "RBPU"},   // option
-    {"RA0", "RA1", "RA2", "RA3", "RA4", "5", "6", "7"},               // trisa
-    {"RB0", "RB1", "RB2", "RB3", "RB4", "RB5", "RB6", "RB7"},         // trisb
-    {"RD", "WR", "WREN", "WRERR", "EEIF", "5", "6", "7"}              // eecon
+	{"0", "1", "2", "3", "4", "5", "6", "7"},                         // no flags
+	{"C", "DC", "Z", "PD", "TO", "RP0", "RP1", "IRP"},                // status
+	{"RA0", "RA1", "RA2", "RA3", "RA4/T0CKI", "5", "6", "7"},         // portA
+	{"RB0/INT", "RB1", "RB2", "RB3", "RB4", "RB5", "RB6", "RB7"},     // portB
+	{"RBIF", "INTF", "T0IF", "RBIE", "INTE", "T0IE", "EEIE", "GIE"},  // intcon
+	{"PS0", "PS1", "PS2", "PSA", "T0SE", "T0CS", "INTEDG", "RBPU"},   // option
+	{"RA0", "RA1", "RA2", "RA3", "RA4", "5", "6", "7"},               // trisa
+	{"RB0", "RB1", "RB2", "RB3", "RB4", "RB5", "RB6", "RB7"},         // trisb
+	{"RD", "WR", "WREN", "WRERR", "EEIF", "5", "6", "7"}              // eecon
 };
 
 const char *const pic16x8x_disassembler::PIC16X8xFormats[] =
 {
 	"00000000000000", "nop",
 	"00000000001000", "return",
-	"00000000001001", "retfie",	
+	"00000000001001", "retfie",
 	"00000000100000", "nop",
 	"00000001000000", "nop",
 	"00000001100000", "nop",
@@ -85,7 +85,7 @@ const char *const pic16x8x_disassembler::PIC16X8xFormats[] =
 	"110000kkkkkkkk", "movlw  %K",
 	"110001kkkkkkkk", "movlw  %K",
 	"110010kkkkkkkk", "movlw  %K",
-	"110011kkkkkkkk", "movlw  %K",	
+	"110011kkkkkkkk", "movlw  %K",
 	"111000kkkkkkkk", "iorlw  %K",
 	"111001kkkkkkkk", "andlw  %K",
 	"111010kkkkkkkk", "xorlw  %K",
@@ -191,8 +191,8 @@ offs_t pic16x8x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		}
 		cp++;
 	}
-	
-	
+
+
 	// now traverse format string
 	cp = Op[op].fmt;
 	if (!strncmp(cp, "call", 4))
@@ -217,9 +217,9 @@ offs_t pic16x8x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		default:
 			bit_option = false;
 			break;
-	}		
+	}
 
-	
+
 	while (*cp)
 	{
 		if (*cp == '%')
@@ -227,7 +227,7 @@ offs_t pic16x8x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			cp++;
 			switch (*cp++)
 			{
-				case 'A': util::stream_format(stream, "$%03X", a); break; 
+				case 'A': util::stream_format(stream, "$%03X", a); break;
 				case 'D': util::stream_format(stream, "%s", dest[d]); break;
 				case 'F': (f < 0xc) ? util::stream_format(stream, "%s", sfregs[f]) : util::stream_format(stream, "byte_DATA_$%02X", f); break;
 				case 'B':
@@ -237,7 +237,7 @@ offs_t pic16x8x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 					else
 						util::stream_format(stream, "%d", b);
 				}
-					break; 		
+					break;
 				case 'K': util::stream_format(stream, "%02xh", k); break;
 				default:
 					throw std::logic_error(util::string_format("illegal escape character in format '%s'\n",Op[op].fmt));
@@ -248,7 +248,7 @@ offs_t pic16x8x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			stream << *cp++;
 		}
 	}
-	
+
 	return cnt | flags | SUPPORTED;
 }
 

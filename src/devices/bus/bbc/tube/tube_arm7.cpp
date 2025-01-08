@@ -155,8 +155,8 @@ void bbc_tube_arm7_device::update_interrupts()
 	int firq = BIT(m_registers[INTERRUPT][4], 0) && m_efiq_state;
 	int irq = BIT(m_registers[EXP_INTERRUPT][6], 28, 4) && m_exint3_state;
 
-	m_maincpu->set_input_line(ARM7_FIRQ_LINE, firq ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(ARM7_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, firq ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void bbc_tube_arm7_device::efiq_w(int state)

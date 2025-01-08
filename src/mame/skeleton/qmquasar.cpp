@@ -34,8 +34,8 @@ private:
 	HD44780_PIXEL_UPDATE(quasar_pixel_update);
 	HD44780_PIXEL_UPDATE(technox_pixel_update);
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 };
@@ -146,5 +146,5 @@ void qmquasar_state::driver_start()
 
 } // anonymous namespace
 
-SYST(1993, qmquasar, 0, 0, quasar,  qmquasar, qmquasar_state, empty_init, "Quasimidi Musikelektronik GmbH", "Quasimidi Quasar", MACHINE_IS_SKELETON)
-SYST(1995, technox,  0, 0, technox, qmquasar, qmquasar_state, empty_init, "Quasimidi Musikelektronik GmbH", "TechnoX",          MACHINE_IS_SKELETON)
+SYST(1993, qmquasar, 0, 0, quasar,  qmquasar, qmquasar_state, empty_init, "Quasimidi Musikelektronik GmbH", "Quasimidi Quasar", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1995, technox,  0, 0, technox, qmquasar, qmquasar_state, empty_init, "Quasimidi Musikelektronik GmbH", "TechnoX",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

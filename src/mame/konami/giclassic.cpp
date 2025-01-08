@@ -73,9 +73,9 @@ public:
 	void giclassic(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -90,7 +90,7 @@ private:
 	void control_w(uint16_t data);
 	uint16_t vrom_r(offs_t offset);
 
-	void satellite_main(address_map &map);
+	void satellite_main(address_map &map) ATTR_COLD;
 
 	uint8_t m_control = 0;
 };
@@ -195,8 +195,8 @@ public:
 	void giclassvr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -213,7 +213,7 @@ private:
 	void control_w(uint16_t data);
 	uint16_t control_r();
 
-	void server_main(address_map &map);
+	void server_main(address_map &map) ATTR_COLD;
 
 	uint16_t m_control = 0;
 };

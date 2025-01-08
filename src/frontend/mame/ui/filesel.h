@@ -37,7 +37,8 @@ public:
 		EMPTY = 0x1000,
 		SOFTLIST,
 		CREATE,
-		FILE
+		FILE,
+		MIDI
 	};
 
 	using handler_function = std::function<void (result result, std::string &&directory, std::string &&file)>;
@@ -56,7 +57,7 @@ public:
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
 	virtual bool custom_ui_back() override { return !m_filename.empty(); }
 	virtual std::tuple<int, bool, bool> custom_pointer_updated(bool changed, ui_event const &uievt) override;
 	virtual void menu_activated() override;
@@ -65,6 +66,7 @@ private:
 	enum file_selector_entry_type
 	{
 		SELECTOR_ENTRY_TYPE_EMPTY,
+		SELECTOR_ENTRY_TYPE_MIDI,
 		SELECTOR_ENTRY_TYPE_CREATE,
 		SELECTOR_ENTRY_TYPE_SOFTWARE_LIST,
 		SELECTOR_ENTRY_TYPE_DRIVE,
@@ -94,6 +96,7 @@ private:
 	bool const                          m_has_empty;
 	bool const                          m_has_softlist;
 	bool const                          m_has_create;
+	bool const                          m_is_midi;
 	std::vector<file_selector_entry>    m_entrylist;
 	std::string                         m_filename;
 	std::pair<size_t, size_t>           m_clicked_directory;

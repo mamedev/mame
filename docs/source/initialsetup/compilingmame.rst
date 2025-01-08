@@ -184,9 +184,9 @@ configuration::
 Building with Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* You can generate Visual Studio 2019 projects using **make vs2019**.  The
+* You can generate Visual Studio 2022 projects using **make vs2022**.  The
   solution and project files will be created in
-  ``build/projects/windows/mame/vs2019`` by default (the name of the ``build``
+  ``build/projects/windows/mame/vs2022`` by default (the name of the ``build``
   folder can be changed using the ``BUILDDIR`` option).  This will always
   regenerate the settings, so **REGENIE=1** is *not* needed.
 * Adding **MSBUILD=1** to the make options will build the solution using
@@ -757,15 +757,16 @@ the Microsoft Windows SDK, you must do one of the following:
   Visual Studio project files.  This will set the target Windows version to
   Windows 8 (6.2).  The resulting binaries may not run on earlier versions of
   Windows.
-* Install the DirectX SDL and configure the **osd_windows** project to search
-  the DirectX header/library paths before searching the Microsoft Windows SDK
-  paths.
+* Install the `DirectX SDK <https://www.microsoft.com/en-US/download/details.aspx?id=6812>`_ (already included since Windows 8.0 SDK and
+  automatically installed with Visual Studio 2013 and later).  Configure the
+  **osd_windows** project to search the DirectX header/library paths before
+  searching the Microsoft Windows SDK paths.
 
 The MSVC compiler produces spurious warnings about potentially uninitialised
 local variables.  You currently need to add ``NOWERROR=1`` to the options passed
 to make when generating the Visual Studio project files.  This stops warnings
 from being treated as errors.  (MSVC seems to lack options to control which
-specific warnings are treated as error, which other compilers support.)
+specific warnings are treated as errors, which other compilers support.)
 
 
 .. _compiling-unusual:

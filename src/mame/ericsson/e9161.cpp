@@ -31,7 +31,7 @@ public:
 	void e9161(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<m68000_device> m_maincpu;
 	required_device<hd63450_device> m_dmac;
@@ -85,4 +85,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(198?, e9161, 0, 0, e9161, e9161, e9161_state, empty_init, "Ericsson", "9161 Display Processor Unit", MACHINE_IS_SKELETON)
+COMP(198?, e9161, 0, 0, e9161, e9161, e9161_state, empty_init, "Ericsson", "9161 Display Processor Unit", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

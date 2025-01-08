@@ -108,7 +108,7 @@ protected:
 	}
 
 	void sound_2151(machine_config &config, XTAL ymclk, XTAL okiclk);
-	void bluehawk_sound_map(address_map &map);
+	void bluehawk_sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -233,9 +233,9 @@ protected:
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
 
-	void bluehawk_map(address_map &map);
-	void flytiger_map(address_map &map);
-	void primella_map(address_map &map);
+	void bluehawk_map(address_map &map) ATTR_COLD;
+	void flytiger_map(address_map &map) ATTR_COLD;
+	void primella_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<u8[]> m_paletteram_flytiger;
 	u8 m_sprites_disabled = 0;
@@ -298,12 +298,12 @@ protected:
 	template <typename T>
 	void sound_2203(machine_config &config, T ymclk);
 
-	void lastday_map(address_map &map);
-	void gulfstrm_map(address_map &map);
-	void pollux_map(address_map &map);
+	void lastday_map(address_map &map) ATTR_COLD;
+	void gulfstrm_map(address_map &map) ATTR_COLD;
+	void pollux_map(address_map &map) ATTR_COLD;
 
-	void lastday_sound_map(address_map &map);
-	void pollux_sound_map(address_map &map);
+	void lastday_sound_map(address_map &map) ATTR_COLD;
+	void pollux_sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -364,8 +364,8 @@ protected:
 
 	void dooyong_68k(machine_config &config);
 
-	void rshark_map(address_map &map);
-	void superx_map(address_map &map);
+	void rshark_map(address_map &map) ATTR_COLD;
+	void superx_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -398,7 +398,7 @@ protected:
 		color = 0;
 	}
 
-	void popbingo_map(address_map &map);
+	void popbingo_map(address_map &map) ATTR_COLD;
 
 private:
 	bitmap_ind16 m_bg_bitmap[2];
@@ -1209,7 +1209,7 @@ INPUT_PORTS_START( gulfstrm )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")   /* ??? */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))   /* ??? */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1223,7 +1223,7 @@ INPUT_PORTS_START( pollux )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // palette cycle effects need this to work
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // palette cycle effects need this to work
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1242,7 +1242,7 @@ INPUT_PORTS_START( flytiger )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
 	PORT_MODIFY("SYSTEM")
-//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // allows title screen + ending screen colours to cycle (but I'm not sure they're meant to, reference shots suggest not, maybe a debug port?)
+//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // allows title screen + ending screen colours to cycle (but I'm not sure they're meant to, reference shots suggest not, maybe a debug port?)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( sadari )

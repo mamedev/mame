@@ -381,7 +381,7 @@ err_t coco_rsdos_impl::file_create(const std::vector<std::string> &path, const m
 
 				dir_block.wstr(file_index * DIRECTORY_ENTRY_SIZE + 0, fname);
 				dir_block.w8(file_index * DIRECTORY_ENTRY_SIZE + OFFSET_FIRST_GRANULE, granule);
-				// The file type, ascii flag, and number of bytes in last sector of file will be set during writing.
+				// The file type, ASCII flag, and number of bytes in last sector of file will be set during writing.
 			}
 		}
 	}
@@ -495,12 +495,12 @@ u8 coco_rsdos_impl::determine_file_type(const std::vector<u8> &data) const
 {
 	if (is_ascii(data))
 	{
-		// TODO: Distinguish between basic code and text editor data
+		// TODO: Distinguish between BASIC code and text editor data
 		return FILE_TYPE_BASIC;
 	}
 
 	const size_t data_length = data.size();
-	// Binary basic code seems to begin with ff <16bit size> 26
+	// Binary BASIC code seems to begin with ff <16bit size> 26
 	if (data_length > 4 && data[0] == 0xff && data[3] == 0x26 && ((data[1] << 8) | data[2]) == data_length - 3)
 		return FILE_TYPE_BASIC;
 

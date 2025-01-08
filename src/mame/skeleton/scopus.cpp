@@ -54,8 +54,8 @@ private:
 	uint8_t memory_read_byte(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
-	void maincpu_io_map(address_map &map);
-	void maincpu_map(address_map &map);
+	void maincpu_io_map(address_map &map) ATTR_COLD;
+	void maincpu_map(address_map &map) ATTR_COLD;
 
 	/* devices */
 	required_device<palette_device> m_palette;
@@ -66,8 +66,8 @@ private:
 	// Character generator
 	const uint8_t *m_chargen = nullptr;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 void sagitta180_state::machine_start()

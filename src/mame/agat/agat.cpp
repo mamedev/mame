@@ -164,8 +164,8 @@ protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 protected:
 	int m_speaker_state;
@@ -213,11 +213,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_irq);
 	uint8_t keyb_data_r();
 
-	void agat7_map(address_map &map);
-	void inhbank_map(address_map &map);
+	void agat7_map(address_map &map) ATTR_COLD;
+	void inhbank_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 };
@@ -237,11 +237,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_irq);
 	uint8_t keyb_data_r();
 
-	void agat9_map(address_map &map);
-	void inhbank_map(address_map &map);
+	void agat9_map(address_map &map) ATTR_COLD;
+	void inhbank_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t c090_r(offs_t offset);
 	void c090_w(offs_t offset, uint8_t data);
@@ -1264,11 +1264,11 @@ void agat7_state::agat7(machine_config &config)
 	m_a2bus->nmi_w().set(FUNC(agat_base_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(agat_base_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	A2BUS_SLOT(config, "sl2", m_a2bus, agat7_cards, "a7lang");
-	A2BUS_SLOT(config, "sl3", m_a2bus, agat7_cards, "a7fdc");
-	A2BUS_SLOT(config, "sl4", m_a2bus, agat7_cards, "a7ports");
-	A2BUS_SLOT(config, "sl5", m_a2bus, agat7_cards, nullptr);
-	A2BUS_SLOT(config, "sl6", m_a2bus, agat7_cards, "a7ram");
+	A2BUS_SLOT(config, "sl2", XTAL(14'300'000) / 2, m_a2bus, agat7_cards, "a7lang");
+	A2BUS_SLOT(config, "sl3", XTAL(14'300'000) / 2, m_a2bus, agat7_cards, "a7fdc");
+	A2BUS_SLOT(config, "sl4", XTAL(14'300'000) / 2, m_a2bus, agat7_cards, "a7ports");
+	A2BUS_SLOT(config, "sl5", XTAL(14'300'000) / 2, m_a2bus, agat7_cards, nullptr);
+	A2BUS_SLOT(config, "sl6", XTAL(14'300'000) / 2, m_a2bus, agat7_cards, "a7ram");
 
 	CASSETTE(config,m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
@@ -1306,12 +1306,12 @@ void agat9_state::agat9(machine_config &config)
 	m_a2bus->inh_w().set(FUNC(agat_base_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	// slot 0 does not exist
-	A2BUS_SLOT(config, "sl1", m_a2bus, agat9_cards, nullptr);
-	A2BUS_SLOT(config, "sl2", m_a2bus, agat9_cards, nullptr); // a9ram
-	A2BUS_SLOT(config, "sl3", m_a2bus, agat9_cards, nullptr); // printer->mouse
-	A2BUS_SLOT(config, "sl4", m_a2bus, agat9_cards, nullptr); // printer
-	A2BUS_SLOT(config, "sl5", m_a2bus, agat9_cards, "a9fdc");
-	A2BUS_SLOT(config, "sl6", m_a2bus, agat9_cards, "a9fdc140");
+	A2BUS_SLOT(config, "sl1", XTAL(14'300'000) / 2, m_a2bus, agat9_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", XTAL(14'300'000) / 2, m_a2bus, agat9_cards, nullptr); // a9ram
+	A2BUS_SLOT(config, "sl3", XTAL(14'300'000) / 2, m_a2bus, agat9_cards, nullptr); // printer->mouse
+	A2BUS_SLOT(config, "sl4", XTAL(14'300'000) / 2, m_a2bus, agat9_cards, nullptr); // printer
+	A2BUS_SLOT(config, "sl5", XTAL(14'300'000) / 2, m_a2bus, agat9_cards, "a9fdc");
+	A2BUS_SLOT(config, "sl6", XTAL(14'300'000) / 2, m_a2bus, agat9_cards, "a9fdc140");
 
 	CASSETTE(config,m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);

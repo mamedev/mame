@@ -132,6 +132,7 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  SLOT_STOP2,          N_p("input-name", "Stop Reel 2"),            input_seq(KEYCODE_C) ) \
 		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  SLOT_STOP3,          N_p("input-name", "Stop Reel 3"),            input_seq(KEYCODE_V) ) \
 		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  SLOT_STOP4,          N_p("input-name", "Stop Reel 4"),            input_seq(KEYCODE_B) ) \
+		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  SLOT_STOP5,          N_p("input-name", "Stop Reel 5"),            input_seq(KEYCODE_N) ) \
 		INPUT_PORT_DIGITAL_TYPE(  1, PLAYER1,  SLOT_STOP_ALL,       N_p("input-name", "Stop All Reels"),         input_seq(KEYCODE_Z) ) \
 		CORE_INPUT_TYPES_END()
 

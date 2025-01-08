@@ -359,8 +359,8 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	/* devices */
@@ -395,11 +395,11 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs, int chip);
 	void parse_control();
 	u32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip);
-	void darius2_master_map(address_map &map);
-	void darius2_slave_map(address_map &map);
-	void ninjaw_master_map(address_map &map);
-	void ninjaw_slave_map(address_map &map);
-	void sound_map(address_map &map);
+	void darius2_master_map(address_map &map) ATTR_COLD;
+	void darius2_slave_map(address_map &map) ATTR_COLD;
+	void ninjaw_master_map(address_map &map) ATTR_COLD;
+	void ninjaw_slave_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -1383,4 +1383,4 @@ GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0, 
 GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,    "Taito Corporation Japan",   "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,    "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,    "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US, Romstar license)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Uses same coinage as World, see notes */
-GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, empty_init, ROT0,    "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, empty_init, ROT0,    "Taito Corporation",         "Darius II (triple screen) (Japan, rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

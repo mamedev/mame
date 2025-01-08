@@ -55,8 +55,8 @@ public:
 	void subs(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -90,7 +90,7 @@ private:
 
 	template <uint8_t Which> int steering();
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -409,7 +409,7 @@ static INPUT_PORTS_START( subs )
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("lscreen")
+	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("lscreen", FUNC(screen_device::vblank))
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )

@@ -15,6 +15,8 @@ class gp9001vdp_device : public device_t,
 							public device_memory_interface
 {
 public:
+	static constexpr unsigned VDP_PALETTE_LENGTH = 0x10000;
+
 	typedef device_delegate<void (u8 layer, u32 &code)> gp9001_cb_delegate;
 
 	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -32,7 +34,7 @@ public:
 
 	bitmap_ind8 *custom_priority_bitmap;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	// game-specific hack stuff
 	void disable_sprite_buffer() { m_sp.use_sprite_buffer = 0; }
@@ -50,6 +52,7 @@ public:
 	int hsync_r();
 	int vsync_r();
 	int fblank_r();
+	u16 vdpcount_r();
 
 	// these bootlegs have strange access
 	u16 bootleg_videoram16_r(offs_t offset);
@@ -59,9 +62,9 @@ public:
 	void bootleg_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -137,9 +140,9 @@ private:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 	void voffs_w(u16 data, u16 mem_mask = ~0);
-	int videoram16_r(void);
+	int videoram16_r();
 	void videoram16_w(u16 data, u16 mem_mask = ~0);
-	u16 vdpstatus_r(void);
+	u16 vdpstatus_r();
 	void scroll_reg_select_w(u16 data, u16 mem_mask = ~0);
 	void scroll_reg_data_w(u16 data, u16 mem_mask = ~0);
 

@@ -5,8 +5,8 @@
     Bellfruit dotmatrix driver, (under heavy construction !!!)
 
 *************************************************************************************/
-#ifndef MAME_BFM_BFM_DM01
-#define MAME_BFM_BFM_DM01
+#ifndef MAME_BFM_BFM_DM01_H
+#define MAME_BFM_BFM_DM01_H
 
 #pragma once
 
@@ -32,12 +32,12 @@ public:
 	void writedata(uint8_t data);
 	int busy(void);
 
-	void bfm_dm01_memmap(address_map &map);
+	void bfm_dm01_memmap(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static constexpr unsigned BYTES_PER_ROW = 9;
@@ -64,4 +64,4 @@ private:
 
 DECLARE_DEVICE_TYPE(BFM_DM01, bfm_dm01_device)
 
-#endif // MAME_BFM_BFM_DM01
+#endif // MAME_BFM_BFM_DM01_H

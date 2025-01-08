@@ -68,8 +68,8 @@ protected:
 	tms5220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
@@ -89,7 +89,7 @@ private:
 	void register_for_save_states();
 	void data_write(int data);
 	void update_fifo_status_and_ints();
-	int extract_bits(int count);
+	int read_bits(int count);
 	uint8_t status_read(bool clear_int);
 	bool ready_read();
 	bool int_read();

@@ -175,7 +175,7 @@ private:
 	required_device<pia6821_device> m_pia_u17;
 	required_device<speaker_sound_device> m_speaker;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint8_t pia_u4_pa_r();
 	uint8_t pia_u4_pb_r();
 	int pia_u4_pca_r();
@@ -192,7 +192,7 @@ private:
 	void ptm_o1_callback(int state);
 
 	uint8_t read_keyboard(int pa);
-	void arachnid_map(address_map &map);
+	void arachnid_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************

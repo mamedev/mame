@@ -41,10 +41,10 @@ INPUT_PORTS_START( sms_xe1ap )
 	PORT_BIT(0xff, 0x00, IPT_UNUSED)
 
 	PORT_START("MODE")
-	PORT_CONFNAME(0x01, 0x01, "Mode") PORT_WRITE_LINE_DEVICE_MEMBER("xe1", micom_xe_1a_device, mode_w)
+	PORT_CONFNAME(0x01, 0x01, "Mode") PORT_WRITE_LINE_DEVICE_MEMBER("xe1", FUNC(micom_xe_1a_device::mode_w))
 	PORT_CONFSETTING(   0x00, "Digital")
 	PORT_CONFSETTING(   0x01, "Analog")
-	PORT_CONFNAME(0x02, 0x02, "Interface") PORT_WRITE_LINE_DEVICE_MEMBER("xe1", micom_xe_1a_device, interface_w)
+	PORT_CONFNAME(0x02, 0x02, "Interface") PORT_WRITE_LINE_DEVICE_MEMBER("xe1", FUNC(micom_xe_1a_device::interface_w))
 	PORT_CONFSETTING(   0x00, "Personal Computer")
 	PORT_CONFSETTING(   0x02, "MD")
 INPUT_PORTS_END

@@ -52,8 +52,8 @@ public:
 	void init_zx();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -71,13 +71,13 @@ private:
 	TIMER_CALLBACK_MEMBER(zx_tape_input);
 	TIMER_CALLBACK_MEMBER(zx_ula_hsync);
 
-	void pc8300_io_map(address_map &map);
-	void pow3000_io_map(address_map &map);
-	void ula_map(address_map &map);
-	void zx80_io_map(address_map &map);
-	void zx80_map(address_map &map);
-	void zx81_io_map(address_map &map);
-	void zx81_map(address_map &map);
+	void pc8300_io_map(address_map &map) ATTR_COLD;
+	void pow3000_io_map(address_map &map) ATTR_COLD;
+	void ula_map(address_map &map) ATTR_COLD;
+	void zx80_io_map(address_map &map) ATTR_COLD;
+	void zx80_map(address_map &map) ATTR_COLD;
+	void zx81_io_map(address_map &map) ATTR_COLD;
+	void zx81_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;

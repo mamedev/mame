@@ -45,8 +45,8 @@ protected:
 		, m_io_penb(*this, "PENB")
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
@@ -81,12 +81,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(button_check);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void palm_base(machine_config &config);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -130,12 +130,12 @@ protected:
 		, m_hardware_id(hardware_id)
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void palmez_base(machine_config &config);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void adc_enable_w(int state);
 
@@ -173,7 +173,7 @@ public:
 	void palmiiic(machine_config &config);
 
 protected:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<sed1375_device> m_sed1375;
 };
@@ -513,20 +513,20 @@ static INPUT_PORTS_START(palm_base)
 	PORT_BIT(0xff, 0x50, IPT_LIGHTGUN_Y) PORT_NAME("Pen Y") PORT_MINMAX(0, 0xa0) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
 
 	PORT_START("PENB")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Pen Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, palm_base_state, pen_check, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Pen Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palm_base_state::pen_check), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(palm)
 	PORT_INCLUDE(palm_base)
 
 	PORT_START("PORTD")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Power") PORT_CODE(KEYCODE_D)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Up") PORT_CODE(KEYCODE_Y)    PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 1)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Down") PORT_CODE(KEYCODE_H)    PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Button 1") PORT_CODE(KEYCODE_F)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 3)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Button 2") PORT_CODE(KEYCODE_G)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 4)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Button 3") PORT_CODE(KEYCODE_J)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 5)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Button 4") PORT_CODE(KEYCODE_K)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, 6)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Power") PORT_CODE(KEYCODE_D)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palm_state::button_check), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Up") PORT_CODE(KEYCODE_Y)    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palm_state::button_check), 1)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Down") PORT_CODE(KEYCODE_H)    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palm_state::button_check), 2)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Button 1") PORT_CODE(KEYCODE_F)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palm_state::button_check), 3)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Button 2") PORT_CODE(KEYCODE_G)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palm_state::button_check), 4)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Button 3") PORT_CODE(KEYCODE_J)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palm_state::button_check), 5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Button 4") PORT_CODE(KEYCODE_K)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palm_state::button_check), 6)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -534,20 +534,20 @@ static INPUT_PORTS_START(palmiiic)
 	PORT_INCLUDE(palm_base)
 
 	PORT_START("ROW0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Button 1") PORT_CODE(KEYCODE_F)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmiiic_state, button_check, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Button 2") PORT_CODE(KEYCODE_G)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmiiic_state, button_check, 0)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Button 3") PORT_CODE(KEYCODE_J)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmiiic_state, button_check, 0)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Button 4") PORT_CODE(KEYCODE_K)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmiiic_state, button_check, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Button 1") PORT_CODE(KEYCODE_F)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmiiic_state::button_check), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Button 2") PORT_CODE(KEYCODE_G)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmiiic_state::button_check), 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Button 3") PORT_CODE(KEYCODE_J)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmiiic_state::button_check), 0)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Button 4") PORT_CODE(KEYCODE_K)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmiiic_state::button_check), 0)
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("ROW1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Up") PORT_CODE(KEYCODE_Y)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmiiic_state, button_check, 1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Down") PORT_CODE(KEYCODE_H)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmiiic_state, button_check, 1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Up") PORT_CODE(KEYCODE_Y)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmiiic_state::button_check), 1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Down") PORT_CODE(KEYCODE_H)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmiiic_state::button_check), 1)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("ROW2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Power") PORT_CODE(KEYCODE_D)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmiiic_state, button_check, 2)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Contrast") PORT_CODE(KEYCODE_C)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmiiic_state, button_check, 2)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Power") PORT_CODE(KEYCODE_D)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmiiic_state::button_check), 2)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Contrast") PORT_CODE(KEYCODE_C)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmiiic_state::button_check), 2)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3)
 	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
@@ -556,19 +556,19 @@ static INPUT_PORTS_START(palmm100)
 	PORT_INCLUDE(palm_base)
 
 	PORT_START("ROW0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Button 1") PORT_CODE(KEYCODE_F)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmm100_state, button_check, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Button 2") PORT_CODE(KEYCODE_G)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmm100_state, button_check, 0)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Button 3") PORT_CODE(KEYCODE_J)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmm100_state, button_check, 0)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Button 4") PORT_CODE(KEYCODE_K)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmm100_state, button_check, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Button 1") PORT_CODE(KEYCODE_F)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmm100_state::button_check), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Button 2") PORT_CODE(KEYCODE_G)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmm100_state::button_check), 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Button 3") PORT_CODE(KEYCODE_J)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmm100_state::button_check), 0)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Button 4") PORT_CODE(KEYCODE_K)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmm100_state::button_check), 0)
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("ROW1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Down") PORT_CODE(KEYCODE_H)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmm100_state, button_check, 1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Down") PORT_CODE(KEYCODE_H)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmm100_state::button_check), 1)
 	PORT_BIT(0xfd, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("ROW2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Power") PORT_CODE(KEYCODE_D)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmm100_state, button_check, 2)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Up") PORT_CODE(KEYCODE_Y)   PORT_CHANGED_MEMBER(DEVICE_SELF, palmm100_state, button_check, 2)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Power") PORT_CODE(KEYCODE_D)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmm100_state::button_check), 2)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Up") PORT_CODE(KEYCODE_Y)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(palmm100_state::button_check), 2)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 

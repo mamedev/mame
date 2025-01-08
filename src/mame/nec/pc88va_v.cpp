@@ -680,7 +680,7 @@ void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 void pc88va_state::draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 which)
 {
 	// disable graphic B if screen 0 only setting is enabled
-	if (which > m_ymmd)
+	if (which && !m_ymmd)
 		return;
 
 	// ditto for 5bpp color mode

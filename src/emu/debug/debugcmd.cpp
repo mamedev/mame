@@ -720,11 +720,11 @@ void debugger_commands::execute_tracelog(const std::vector<std::string_view> &pa
 void debugger_commands::execute_tracesym(const std::vector<std::string_view> &params)
 {
 	// build a format string appropriate for the parameters and validate them
-	std::stringstream format;
+	std::ostringstream format;
 	for (int i = 0; i < params.size(); i++)
 	{
 		// find this symbol
-		symbol_entry *sym = m_console.visible_symtable().find(strmakelower(params[i]).c_str());
+		symbol_entry *const sym = m_console.visible_symtable().find(strmakelower(params[i]).c_str());
 		if (!sym)
 		{
 			m_console.printf("Unknown symbol: %s\n", params[i]);
@@ -738,9 +738,11 @@ void debugger_commands::execute_tracesym(const std::vector<std::string_view> &pa
 	}
 
 	// build parameters for printf
-	std::vector<std::string_view> printf_params(params);
-	auto const format_str = format.str(); // HACK: workaround for pre-C++20 str()
-	printf_params.insert(printf_params.begin(), format_str);
+	auto const format_str = std::move(format).str(); // need this to stay put as long as the string_view exists
+	std::vector<std::string_view> printf_params;
+	printf_params.reserve(params.size() + 1);
+	printf_params.emplace_back(format_str);
+	std::copy(params.begin(), params.end(), std::back_inserter(printf_params));
 
 	// then do a printf
 	std::ostringstream buffer;

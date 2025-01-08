@@ -76,7 +76,6 @@ Notes:
 #include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/ram.h"
 #include "machine/upd765.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
@@ -105,7 +104,6 @@ public:
 	sg1000_state_base(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
-		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
 		m_cart(*this, "slot"),
 		m_sgexpslot(*this, "sgexp")
@@ -113,7 +111,6 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	optional_device<sega8_cart_slot_device> m_cart;
 	required_device<sg1000_expansion_slot_device> m_sgexpslot;
@@ -136,15 +133,15 @@ public:
 protected:
 	required_device_array<sms_control_port_device, 2> m_ctrlports;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t peripheral_r(offs_t offset);
 	void peripheral_w(offs_t offset, uint8_t data);
 
-	void sg1000_map(address_map &map);
-	void sg1000_io_map(address_map &map);
-	void sc3000_map(address_map &map);
-	void sc3000_io_map(address_map &map);
+	void sg1000_map(address_map &map) ATTR_COLD;
+	void sg1000_io_map(address_map &map) ATTR_COLD;
+	void sc3000_map(address_map &map) ATTR_COLD;
+	void sc3000_io_map(address_map &map) ATTR_COLD;
 };
 
 class omv_state : public sg1000_state_base
@@ -160,8 +157,8 @@ private:
 	uint8_t omv_r(offs_t offset);
 	void omv_w(offs_t offset, uint8_t data);
 
-	void omv_map(address_map &map);
-	void omv_io_map(address_map &map);
+	void omv_map(address_map &map) ATTR_COLD;
+	void omv_io_map(address_map &map) ATTR_COLD;
 };
 
 class omv2000_state : public omv_state
@@ -179,7 +176,7 @@ public:
 private:
 	required_device<sms_control_port_device> m_ctrl2;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 class sc3000_state : public sg1000_state
@@ -190,9 +187,10 @@ public:
 	{ }
 
 	void sc3000(machine_config &config);
+	void sc3000pal(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void sc3000_base(machine_config &config);
 };
@@ -204,7 +202,8 @@ public:
 		sc3000_state(mconfig, type, tag),
 		m_fdc(*this, UPD765_TAG),
 		m_centronics(*this, "centronics"),
-		m_floppy0(*this, UPD765_TAG ":0:3ssdd")
+		m_floppy0(*this, UPD765_TAG ":0:3ssdd"),
+		m_romview(*this, "romview")
 	{ }
 
 	void sf7000(machine_config &config);
@@ -214,17 +213,18 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<floppy_image_device> m_floppy0;
 
+	memory_view m_romview;
+
 	int m_centronics_busy = 0;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void write_centronics_busy(int state);
 	uint8_t ppi_pa_r();
 	void ppi_pc_w(uint8_t data);
 
-	void sf7000_io_map(address_map &map);
-	void sf7000_map(address_map &map);
+	void sf7000_io_map(address_map &map) ATTR_COLD;
+	void sf7000_map(address_map &map) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 };
@@ -361,8 +361,9 @@ void sg1000_state::sc3000_io_map(address_map &map)
 
 void sf7000_state::sf7000_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bank1").bankw("bank2");
-	map(0x4000, 0xffff).ram();
+	map(0x0000, 0xffff).ram();
+	map(0x0000, 0x3fff).view(m_romview);
+	m_romview[0](0x0000, 0x3fff).rom().region(Z80_TAG, 0);
 }
 
 /*-------------------------------------------------
@@ -394,7 +395,7 @@ INPUT_CHANGED_MEMBER( sg1000_state::trigger_nmi )
 }
 
 /*-------------------------------------------------
-    CUSTOM_INPUT_MEMBER( ctrl2_r )
+    ioport_value ctrl2_r()
 -------------------------------------------------*/
 
 template <unsigned Shift>
@@ -409,7 +410,7 @@ ioport_value omv2000_state::ctrl2_r()
 
 static INPUT_PORTS_START( sg1000 )
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, sg1000_state, trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sg1000_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
 /*-------------------------------------------------
@@ -464,10 +465,10 @@ static INPUT_PORTS_START( omv2000 )
 	PORT_INCLUDE( omv1000 )
 
 	PORT_MODIFY("C4")
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(omv2000_state, ctrl2_r<0>);
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(omv2000_state::ctrl2_r<0>));
 
 	PORT_MODIFY("C5")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(omv2000_state, ctrl2_r<2>);
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(omv2000_state::ctrl2_r<2>));
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -479,7 +480,8 @@ static INPUT_PORTS_START( sc3000 )
 	// keyboard keys are added by the embedded sk1100 device
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, sg1000_state, trigger_nmi, 0)
+	// This is actually part of the main keyboard, though emulated separately here
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sg1000_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
 /*-------------------------------------------------
@@ -541,7 +543,7 @@ void sf7000_state::ppi_pc_w(uint8_t data)
 	/*
 	    Signal  Description
 
-	    PC0     /INUSE signal to FDD
+	    PC0     /INUSE signal to FDD (drives LED?)
 	    PC1     /MOTOR ON signal to FDD
 	    PC2     TC signal to FDC
 	    PC3     RESET signal to FDC
@@ -563,13 +565,13 @@ void sf7000_state::ppi_pc_w(uint8_t data)
 	m_fdc->tc_w(BIT(data, 2));
 
 	/* FDC reset */
-	if (BIT(data, 3))
-	{
-		m_fdc->reset();
-	}
+	m_fdc->reset_w(BIT(data, 3));
 
 	/* ROM selection */
-	membank("bank1")->set_entry(BIT(data, 6));
+	if (BIT(data, 6))
+		m_romview.disable();
+	else
+		m_romview.select(0);
 
 	/* printer strobe */
 	m_centronics->write_strobe(BIT(data, 7));
@@ -660,17 +662,6 @@ void sf7000_state::machine_start()
 	sc3000_state::machine_start();
 
 	save_item(NAME(m_centronics_busy));
-
-	/* configure memory banking */
-	membank("bank1")->configure_entry(0, m_rom->base());
-	membank("bank1")->configure_entry(1, m_ram->pointer());
-	membank("bank2")->configure_entry(0, m_ram->pointer());
-}
-
-void sf7000_state::machine_reset()
-{
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
 }
 
 /***************************************************************************
@@ -680,10 +671,10 @@ void sf7000_state::machine_reset()
 void sg1000_state_base::sg1000_base(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(10'738'635) / 3); // LH0080A
+	Z80(config, m_maincpu, 10.738635_MHz_XTAL / 3); // LH0080A
 
 	/* video hardware */
-	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
+	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, 10.738635_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -693,7 +684,7 @@ void sg1000_state_base::sg1000_base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, SN76489AN_TAG, XTAL(10'738'635) / 3).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SN76489A(config, SN76489AN_TAG, 10.738635_MHz_XTAL / 3).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sg1000");
@@ -733,9 +724,6 @@ void sg1000_state::sg1000(machine_config &config)
 
 	/* cartridge */
 	SG1000_CART_SLOT(config, m_cart, sg1000_cart, nullptr).set_must_be_loaded(true);
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("1K");
 }
 
 /*-------------------------------------------------
@@ -754,9 +742,6 @@ void omv_state::omv1000(machine_config &config)
 
 	/* cartridge */
 	OMV_CART_SLOT(config, m_cart, sg1000_cart, nullptr);
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("2K");
 }
 
 /*-------------------------------------------------
@@ -784,9 +769,22 @@ void sc3000_state::sc3000(machine_config &config)
 
 	/* cartridge */
 	SC3000_CART_SLOT(config, m_cart, sg1000_cart, nullptr).set_must_be_loaded(true);
+}
 
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("2K");
+void sc3000_state::sc3000pal(machine_config &config)
+{
+	sc3000(config);
+
+	tms9929a_device &vdp(TMS9929A(config.replace(), TMS9918A_TAG, 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	// Z80A and SN76489AN are clocked by a separate ceramic oscillator since TMS9929A has no CPUCLK output
+	m_maincpu->set_clock(3.58_MHz_XTAL);
+	subdevice(SN76489AN_TAG)->set_clock(3.58_MHz_XTAL);
+
+	m_sgexpslot->set_default_option("sk1100e");
 }
 
 /*-------------------------------------------------
@@ -807,17 +805,21 @@ void sf7000_state::sf7000(machine_config &config)
 	ppi.in_pa_callback().set(FUNC(sf7000_state::ppi_pa_r));
 	ppi.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ppi.out_pc_callback().set(FUNC(sf7000_state::ppi_pc_w));
+	ppi.tri_pc_callback().set_constant(0x8f); // /ROM SEL must be active after reset
 
-	i8251_device &upd8251(I8251(config, UPD8251_TAG, 0));
+	i8251_device &upd8251(I8251(config, UPD8251_TAG, 4.9152_MHz_XTAL / 2));
 	upd8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	upd8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	upd8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(UPD8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(UPD8251_TAG, FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set(UPD8251_TAG, FUNC(i8251_device::write_dsr));
 
-	UPD765A(config, m_fdc, 8'000'000, false, false);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 4); // clocked through SED9420C
+	m_fdc->set_ready_line_connected(true); // or disconnected by split pad?
+	m_fdc->set_select_lines_connected(false); // FIXME: actually connected according to schematics
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -828,9 +830,6 @@ void sf7000_state::sf7000(machine_config &config)
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_list").set_original("sf7000");
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("64K");
 }
 
 /***************************************************************************
@@ -845,7 +844,7 @@ ROM_END
 
 #define rom_sc3000 rom_sg1000
 
-#define rom_sc3000h rom_sg1000
+#define rom_sc3000pal rom_sg1000
 
 ROM_START( sf7000 )
 	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
@@ -869,11 +868,14 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME                                    FLAGS
-CONS( 1983, sg1000,   0,      0,      sg1000,  sg1000,  sg1000_state,  empty_init, "Sega",             "SG-1000",                                  MACHINE_SUPPORTS_SAVE )
-CONS( 1984, sg1000m2, sg1000, 0,      sc3000,  sc3000,  sc3000_state,  empty_init, "Sega",             "SG-1000 II",                               MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sc3000,   0,      sg1000, sc3000,  sc3000,  sc3000_state,  empty_init, "Sega",             "SC-3000",                                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sc3000h,  sc3000, 0,      sc3000,  sc3000,  sc3000_state,  empty_init, "Sega",             "SC-3000H",                                 MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sf7000,   sc3000, 0,      sf7000,  sf7000,  sf7000_state,  empty_init, "Sega",             "SC-3000/Super Control Station SF-7000",    MACHINE_SUPPORTS_SAVE )
-CONS( 1984, omv1000,  sg1000, 0,      omv1000, omv1000, omv_state,     empty_init, "Tsukuda Original", "Othello Multivision FG-1000",              MACHINE_SUPPORTS_SAVE )
-CONS( 1984, omv2000,  sg1000, 0,      omv2000, omv2000, omv2000_state, empty_init, "Tsukuda Original", "Othello Multivision FG-2000",              MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT    CLASS          INIT        COMPANY             FULLNAME                                    FLAGS
+CONS( 1983, sg1000,    0,      0,      sg1000,    sg1000,  sg1000_state,  empty_init, "Sega",             "SG-1000",                                  MACHINE_SUPPORTS_SAVE )
+CONS( 1984, sg1000m2,  sg1000, 0,      sc3000,    sc3000,  sc3000_state,  empty_init, "Sega",             "SG-1000 II",                               MACHINE_SUPPORTS_SAVE )
+CONS( 1984, omv1000,   sg1000, 0,      omv1000,   omv1000, omv_state,     empty_init, "Tsukuda Original", "Othello Multivision FG-1000",              MACHINE_SUPPORTS_SAVE )
+CONS( 1984, omv2000,   sg1000, 0,      omv2000,   omv2000, omv2000_state, empty_init, "Tsukuda Original", "Othello Multivision FG-2000",              MACHINE_SUPPORTS_SAVE )
+
+// SC-3000 and SC-3000H are identical except for key mechanism.
+// PAL/SECAM versions of SC-3000 were distributed by Yeno in France, by John Sands Electronics in Australia and by Grandstand Leisure in New Zealand.
+COMP( 1983, sc3000,    0,      sg1000, sc3000,    sc3000,  sc3000_state,  empty_init, "Sega",             "SC-3000 (NTSC)",                           MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sc3000pal, sc3000, 0,      sc3000pal, sc3000,  sc3000_state,  empty_init, "Sega",             "SC-3000 (PAL)",                            MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sf7000,    sc3000, 0,      sf7000,    sf7000,  sf7000_state,  empty_init, "Sega",             "SC-3000/Super Control Station SF-7000",    MACHINE_SUPPORTS_SAVE )

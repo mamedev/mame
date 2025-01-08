@@ -256,8 +256,8 @@ public:
 	void gunpey(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory handlers
@@ -328,8 +328,8 @@ private:
 	required_region_ptr<u8> m_blit_rom;
 
 	// address spaces
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 

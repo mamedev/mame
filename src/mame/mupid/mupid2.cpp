@@ -46,7 +46,7 @@ public:
 	void c2a2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
@@ -67,9 +67,9 @@ private:
 	required_memory_bank m_rambank;
 	required_device<palette_device> m_palette;
 
-	void maincpu_mem(address_map &map);
-	void maincpu_io(address_map &map);
-	void kbdcpu_mem(address_map &map);
+	void maincpu_mem(address_map &map) ATTR_COLD;
+	void maincpu_io(address_map &map) ATTR_COLD;
+	void kbdcpu_mem(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<std::array<uint8_t, 3>[]> m_color_ram;
 	bool m_nmi_enabled;

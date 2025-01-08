@@ -19,8 +19,8 @@ Undumped carts:
 		<info name="serial" value="GPA-101"/>
 		<info name="alt_title" value="プーヤン"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="pooyan.bin" size="8192" crc="bd6edc48" sha1="606b7d603da23e70012b361d7ffb53ea026f88f5" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="pooyan.bin" size="0x2000" crc="bd6edc48" sha1="606b7d603da23e70012b361d7ffb53ea026f88f5" />
 			</dataarea>
 		</part>
 	</software>
@@ -32,8 +32,8 @@ Undumped carts:
 		<info name="serial" value="GPA-102"/>
 		<info name="alt_title" value="スーパーコブラ"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="scobra.bin" size="8192" crc="cdffc2cd" sha1="9e748050ccb0fa948b06346d241dfcd11868e8e2" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="scobra.bin" size="0x2000" crc="cdffc2cd" sha1="9e748050ccb0fa948b06346d241dfcd11868e8e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -45,8 +45,8 @@ Undumped carts:
 		<info name="serial" value="GPA-103"/>
 		<info name="alt_title" value="ツターンカーム"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="tutnkham.bin" size="8192" crc="a0b606d8" sha1="56efa2ab7c4a6db7b44714e46c5bf2ba71983ee8" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="tutnkham.bin" size="0x2000" crc="a0b606d8" sha1="56efa2ab7c4a6db7b44714e46c5bf2ba71983ee8" />
 			</dataarea>
 		</part>
 	</software>
@@ -58,8 +58,8 @@ Undumped carts:
 		<info name="serial" value="GPA-104"/>
 		<info name="alt_title" value="アミダー"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="amidar.bin" size="8192" crc="c82628cc" sha1="00322d4025fef19728194442f9e06a4cccd01933" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="amidar.bin" size="0x2000" crc="c82628cc" sha1="00322d4025fef19728194442f9e06a4cccd01933" />
 			</dataarea>
 		</part>
 	</software>
@@ -71,8 +71,8 @@ Undumped carts:
 		<info name="serial" value="GPA-105"/>
 		<info name="alt_title" value="ディグダグ"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="digdug.bin" size="16384" crc="a94f02fa" sha1="502a163c1ae88eccc7e9782261d86d4090cb41e1" offset="0000" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="digdug.bin" size="0x4000" crc="a94f02fa" sha1="502a163c1ae88eccc7e9782261d86d4090cb41e1" />
 			</dataarea>
 		</part>
 	</software>
@@ -84,8 +84,8 @@ Undumped carts:
 		<info name="serial" value="GPA-106"/>
 		<info name="alt_title" value="ワープ&amp;ワープ"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="warpwarp.bin" size="8192" crc="2a0d4ad9" sha1="f9ffca3a1d85b116dd92f118f9ea940bf2449db5" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="warpwarp.bin" size="0x2000" crc="2a0d4ad9" sha1="f9ffca3a1d85b116dd92f118f9ea940bf2449db5" />
 			</dataarea>
 		</part>
 	</software>
@@ -97,8 +97,8 @@ Undumped carts:
 		<info name="serial" value="GPA-107"/>
 		<info name="alt_title" value="ターピン"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="07-turpin.bin" size="8192" crc="a3aef98d" sha1="1f49371b0ebf4fe6c5fb606fd9744f3bb15a619b" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="07-turpin.bin" size="0x2000" crc="a3aef98d" sha1="1f49371b0ebf4fe6c5fb606fd9744f3bb15a619b" />
 			</dataarea>
 		</part>
 	</software>
@@ -110,8 +110,8 @@ Undumped carts:
 		<info name="serial" value="GPA-109"/>
 		<info name="alt_title" value="パチンコUFO"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="pchnkufo.bin" size="16384" crc="9ee981ab" sha1="d6ca45430a34ce0090ba882ade5a2268a862d4f4" offset="0000" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="pchnkufo.bin" size="0x4000" crc="9ee981ab" sha1="d6ca45430a34ce0090ba882ade5a2268a862d4f4" />
 			</dataarea>
 		</part>
 	</software>
@@ -123,8 +123,8 @@ Undumped carts:
 		<info name="serial" value="GPA-110"/>
 		<info name="alt_title" value="ファイティング バグ"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="fightbug.bin" size="8192" crc="84986255" sha1="7202641a387da90323d149e2f327a5c828856556" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="fightbug.bin" size="0x2000" crc="84986255" sha1="7202641a387da90323d149e2f327a5c828856556" />
 			</dataarea>
 		</part>
 	</software>
@@ -136,8 +136,8 @@ Undumped carts:
 		<info name="serial" value="GPA-111"/>
 		<info name="alt_title" value="スペースパニック"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="11-space_panic.bin" size="8192" crc="23547111" sha1="b16dbea89ba9f934a08c274d8bb6cce06da13193" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="11-space_panic.bin" size="0x2000" crc="23547111" sha1="b16dbea89ba9f934a08c274d8bb6cce06da13193" />
 			</dataarea>
 		</part>
 	</software>
@@ -149,8 +149,8 @@ Undumped carts:
 		<info name="serial" value="GPA-112"/>
 		<info name="alt_title" value="ノーティーボーイ"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="naugtboy.bin" size="8192" crc="43a13e99" sha1="a72e8606b8b6c8d10050d6d7b1ff87455b623004" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="naugtboy.bin" size="0x2000" crc="43a13e99" sha1="a72e8606b8b6c8d10050d6d7b1ff87455b623004" />
 			</dataarea>
 		</part>
 	</software>
@@ -162,8 +162,8 @@ Undumped carts:
 		<info name="serial" value="GPA-114"/>
 		<info name="alt_title" value="ダーティー カメレオン"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="dirtychm.bin" size="8192" crc="8e7fb358" sha1="63e94cc01410aefd59b465105e701330dc13c398" offset="0000" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="dirtychm.bin" size="0x2000" crc="8e7fb358" sha1="63e94cc01410aefd59b465105e701330dc13c398" />
 			</dataarea>
 		</part>
 	</software>
@@ -175,8 +175,186 @@ Undumped carts:
 		<info name="serial" value="GPA-115"/>
 		<info name="alt_title" value="エキサイト麻雀"/>
 		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="excitemj.bin" size="16384" crc="0d2f829c" sha1="6cc9e5d234bc1b483108ae4dc79d644802a64ef0" offset="0000" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="excitemj.bin" size="0x4000" crc="0d2f829c" sha1="6cc9e5d234bc1b483108ae4dc79d644802a64ef0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Homebrew -->
+
+	<software name="aerial">
+		<description>Aerial</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="aerial.rom" size="0x4000" crc="9d3ddb26" sha1="00630321eef6237501ce099655f3a09cc651d516"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antiair">
+		<description>AntiAir</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="antiair.rom" size="0x4000" crc="1478db1a" sha1="b0c640776dcdb79db8a7cc8b2387a443182e1036"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ascend">
+		<description>Ascend</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="ascend.rom" size="0x4000" crc="f9f52261" sha1="8e126055e89de1da6c89a81948d78e50444de395"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlot">
+		<description>Battlot</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="battlot.rom" size="0x4000" crc="48c78955" sha1="674a054f657d99705285cc6fd81fe5c0fe507273"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bootskell">
+		<description>Bootskell</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="bootskell.rom" size="0x4000" crc="8e3222fe" sha1="454d4d8a6c7c7f5d670474e4780d82d2f8f43dee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cacorm">
+		<description>Cacorm</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="cacorm.rom" size="0x4000" crc="adfdaf22" sha1="6e4f2c3087fed744f3995ce09c7ed95fce9ef08d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavit">
+		<description>Cavit</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="cavit.rom" size="0x4000" crc="e393d6db" sha1="36bc381207f145d5cf7ee4d86d80ee5b0149ca15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cracky">
+		<description>Cracky</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="cracky.rom" size="0x4000" crc="8abdb1f5" sha1="9d2a95467705675503d0a671b3145548fb79a8f0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guntus">
+		<description>Guntus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="guntus.rom" size="0x4000" crc="8cfe7310" sha1="e95cd6f7b7925f9b0dba33d3c58058052287071a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopman">
+		<description>Hopman</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="hopman.rom" size="0x4000" crc="6f72e9ff" sha1="2a07dbdfdfb614b646f2a3457c3ab6d7230d7b90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lift">
+		<description>Lift</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="lift.rom" size="0x4000" crc="59a507c5" sha1="655f33cacbb4e927f5816b73faea4662e233b972"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy">
+		<description>Mazy</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="mazy.rom" size="0x4000" crc="a7aea98b" sha1="dd43677f67af8c6da80421b21461274d21c7af58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neuras">
+		<description>Neuras</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="neuras.rom" size="0x4000" crc="208817d1" sha1="f69e6ac9f7cf0be9c490a79f97a047982364f341"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osotos">
+		<description>Osotos</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="osotos.rom" size="0x4000" crc="629ba7e5" sha1="fe263973a09c6c158446ded4dd91e45e201bfa41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruptus">
+		<description>Ruptus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="ruptus.rom" size="0x4000" crc="f616befc" sha1="a581c771470d3feec70d42d2ad4d41cc475b2f50"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yewdow">
+		<description>Yewdow</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size = "0x4000">
+				<rom name="yewdow.rom" size="0x4000" crc="a9c8b257" sha1="3b27fbb288c866ddffd7045cf50fb9a8b078a06e"/>
 			</dataarea>
 		</part>
 	</software>

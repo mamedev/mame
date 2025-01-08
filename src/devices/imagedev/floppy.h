@@ -6,14 +6,14 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_FLOPPY_H
-#define MAME_DEVICES_IMAGEDEV_FLOPPY_H
+#ifndef MAME_IMAGEDEV_FLOPPY_H
+#define MAME_IMAGEDEV_FLOPPY_H
 
 #pragma once
 
 #include "sound/samples.h"
-#include "screen.h"
 
+// forward declarations
 class floppy_image;
 class floppy_image_format_t;
 
@@ -90,6 +90,8 @@ public:
 	const floppy_image_format_t *get_load_format() const;
 	std::pair<std::error_condition, const floppy_image_format_t *> identify(std::string_view filename);
 	void set_rpm(float rpm);
+	void set_sectoring_type(uint32_t sectoring_type);
+	uint32_t get_sectoring_type();
 
 	void init_fs(const fs_info *fs, const fs::meta_data &meta);
 
@@ -121,7 +123,6 @@ public:
 	virtual void mon_w(int state);
 	bool ready_r();
 	void set_ready(bool state);
-	double get_pos();
 	virtual void tfsel_w(int state) { }    // 35SEL line for Apple Sony drives
 
 	virtual bool wpt_r(); // Mac sony drives using this for various reporting
@@ -131,6 +132,8 @@ public:
 	int mon_r() { return m_mon; }
 	bool ss_r() { return m_ss; }
 	bool twosid_r();
+	bool floppy_is_hd();
+	bool floppy_is_ed();
 
 	virtual bool writing_disabled() const;
 
@@ -163,10 +166,10 @@ protected:
 	floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_config_complete() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override;
@@ -193,6 +196,7 @@ protected:
 	int m_tracks; /* addressable tracks */
 	int m_sides;  /* number of heads */
 	uint32_t m_form_factor; /* 3"5, 5"25, etc */
+	uint32_t m_sectoring_type; /* SOFT, Hard 10/16/32 */
 	bool m_motor_always_on;
 	bool m_dskchg_writable;
 	bool m_has_trk00_sensor;
@@ -254,6 +258,8 @@ protected:
 
 	void register_formats();
 
+	void add_variant(uint32_t variant);
+
 	void check_led();
 	uint32_t find_position(attotime &base, const attotime &when);
 	attotime position_to_time(const attotime &base, int position) const;
@@ -270,35 +276,6 @@ protected:
 	// Sound
 	bool    m_make_sound;
 	floppy_sound_device* m_sound_out;
-
-	// Flux visualization
-	struct flux_per_pixel_info {
-		uint32_t m_position;      // 0-199999999 Angular position in the track, 0xffffffff if not in the floppy image
-		uint16_t m_r;             // Distance from the center
-		uint8_t m_combined_track; // No need to store head, it's y >= flux_screen_sy/2
-		uint8_t m_color;          // Computed gray level from the flux counts
-	};
-
-	struct flux_per_combined_track_info {
-		std::vector<flux_per_pixel_info *> m_pixels[2];
-		uint32_t m_span;
-		uint8_t m_track;
-		uint8_t m_subtrack;
-	};
-
-	std::vector<flux_per_pixel_info> m_flux_per_pixel_infos;
-	std::vector<flux_per_combined_track_info> m_flux_per_combined_track_infos;
-
-	optional_device<screen_device> m_flux_screen;
-
-	static constexpr int flux_screen_sx = 501;
-	static constexpr int flux_screen_sy = 1002;
-	static constexpr int flux_min_r     = 100;
-	static constexpr int flux_max_r     = 245;
-
-	void flux_image_prepare();
-	void flux_image_compute_for_track(int track, int head);
-	uint32_t flux_screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 #define DECLARE_FLOPPY_IMAGE_DEVICE(Type, Name, Interface) \
@@ -312,8 +289,11 @@ protected:
 	}; \
 	DECLARE_DEVICE_TYPE(Type, Name)
 
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_SSSD,       floppy_3_sssd,       "floppy_3")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_DSSD,       floppy_3_dssd,       "floppy_3")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_SSDD,       floppy_3_ssdd,       "floppy_3")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_DSDD,       floppy_3_dsdd,       "floppy_3")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_DSQD,       floppy_3_dsqd,       "floppy_3")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_SSDD,      floppy_35_ssdd,      "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_DD,        floppy_35_dd,        "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_HD,        floppy_35_hd,        "floppy_3_5")
@@ -368,8 +348,8 @@ protected:
 
 	mac_floppy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void track_changed() override;
 
 	virtual bool is_2m() const = 0;
@@ -429,7 +409,7 @@ public:
 	void register_for_save_states();
 
 protected:
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 
 private:
 	// device_sound_interface overrides
@@ -487,16 +467,18 @@ public:
 
 	template <typename T> void set_formats(T &&_formats) { formats = std::forward<T>(_formats); }
 	void enable_sound(bool doit) { m_enable_sound = doit; }
+	void set_sectoring_type(uint32_t sectoring_type) { m_sectoring_type = sectoring_type; }
 
 	floppy_image_device *get_device();
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 private:
 	std::function<void (format_registration &fr)> formats;
 	bool m_enable_sound;
+	uint32_t m_sectoring_type;
 };
 
 
@@ -506,4 +488,4 @@ DECLARE_DEVICE_TYPE(FLOPPY_CONNECTOR, floppy_connector)
 extern template class device_finder<floppy_connector, false>;
 extern template class device_finder<floppy_connector, true>;
 
-#endif // MAME_DEVICES_IMAGEDEV_FLOPPY_H
+#endif // MAME_IMAGEDEV_FLOPPY_H

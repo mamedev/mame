@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_TANDBERG_DISP_LOGIC_H
-#define MAME_TANDBERG_DISP_LOGIC_H
+#ifndef MAME_TANDBERG_TDV2100_DISP_LOGIC_H
+#define MAME_TANDBERG_TDV2100_DISP_LOGIC_H
 
 #pragma once
 
@@ -46,11 +46,11 @@ public:
 	void break_w(int state);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 
@@ -144,4 +144,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TANDBERG_TDV2100_DISPLAY_LOGIC, tandberg_tdv2100_disp_logic_device)
 
-#endif // MAME_TANDBERG_DISP_LOGIC_H
+#endif // MAME_TANDBERG_TDV2100_DISP_LOGIC_H

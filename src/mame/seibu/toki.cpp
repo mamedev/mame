@@ -129,7 +129,7 @@ public:
 	{ }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -180,11 +180,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void jujuba_audio_map(address_map &map);
-	void jujuba_audio_opcodes_map(address_map &map);
-	void toki_audio_map(address_map &map);
-	void toki_audio_opcodes_map(address_map &map);
-	void main_map(address_map &map);
+	void jujuba_audio_map(address_map &map) ATTR_COLD;
+	void jujuba_audio_opcodes_map(address_map &map) ATTR_COLD;
+	void toki_audio_map(address_map &map) ATTR_COLD;
+	void toki_audio_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class tokib_state : public base_state
@@ -216,8 +216,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

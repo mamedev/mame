@@ -49,7 +49,7 @@ public:
 	void haplucky(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -59,9 +59,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -183,4 +183,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, haplucky, 0, haplucky, haplucky, haplucky_state, empty_init, ROT0, "Taito Corporation", "Happy Lucky!", MACHINE_IS_SKELETON )
+GAME( 1985, haplucky, 0, haplucky, haplucky, haplucky_state, empty_init, ROT0, "Taito Corporation", "Happy Lucky!", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

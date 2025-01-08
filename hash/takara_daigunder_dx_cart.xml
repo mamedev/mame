@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="takara_daigunder_dx_cart" description="Takara Daigunder DX cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
+
+	<!-- Cartridge Pinout (same as evio)
+
+	A01|NC
+	A02|GND
+	A03|GND
+	A04|A16
+	A05|A17
+	A06|A18
+	A07|A19
+	A08|A20
+	A09|A21
+	A10|A22
+	A11|A23
+	A12|GND
+	A13|TO A18
+	A14|/CE
+	A15|NC (SEEPROM 6)
+	A16|NC (SEEPROM 5)
+	A17|NC
+	A18|TO A13 (internal ROM /CE)
+	A19|/OE
+	A20|NC (/WE)
+	A21|VCC (/RP)
+	A22|D00
+	A23|D01
+	A24|D02
+	A25|D03
+	A26|VCC
+	B01|NC
+	B02|VCC
+	B03|VCC
+	B04|A15
+	B05|A14
+	B06|A13
+	B07|A12
+	B08|A11
+	B09|A10
+	B10|A09
+	B11|A08
+	B12|A07
+	B13|A06
+	B14|A05
+	B15|A04
+	B16|A03
+	B17|A02
+	B18|A01
+	B19|A00
+	B20|VCC
+	B21|GND
+	B22|D07
+	B23|D06
+	B24|D05
+	B25|D04
+	B26|GND
+
+	-->
+
+	<software name="r01rom" supported="no">
+		<description>R-01 ROM Robo Aoki Inazuma Bulion</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="R-01 ROMロボ 「蒼き稲妻」ブライオン" />
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bulion.bin" size="0x100000" crc="1e1d1b6f" sha1="5165a27aa556cff5e1379521e0ad84964a1472f3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="r02rom" supported="no">
+		<description>R-02 ROM Robo Jurassic Soldier Bonerex</description>
+		<year>2002</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="R-02 ROMロボ 「ジュラシックソルジャー」ボーンレックス" />
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bonerex.bin" size="0x100000" crc="40b65182" sha1="0399e5f5f1fd8438f4334e388de4bce547d79d73" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

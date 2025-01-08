@@ -47,11 +47,11 @@ public:
 	europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(EUROPC_FDC, europc_fdc_device, "europc_fdc", "EURO PC FDC hookup")
@@ -134,8 +134,8 @@ private:
 	uint8_t m_jim_state;
 	isa8_aga_device::mode_t m_jim_mode{};
 
-	void europc_io(address_map &map);
-	void europc_map(address_map &map);
+	void europc_io(address_map &map) ATTR_COLD;
+	void europc_map(address_map &map) ATTR_COLD;
 };
 
 /*

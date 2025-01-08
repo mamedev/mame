@@ -121,7 +121,7 @@ protected:
 	bool m_segment_34_encoding = false;
 	uint8_t m_segment_34_cache[32]{};
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void mux_output_w(offs_t offset, uint8_t data);
 	void mux_output2_w(offs_t offset, uint8_t data);
@@ -604,8 +604,8 @@ public:
 	void init_sc4corotb();
 	void init_sc4hyper();
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint8_t data, uint8_t line_mask);
 	void bfm_sc4_reel3_w(uint8_t data);
@@ -641,7 +641,7 @@ public:
 	void sc4_adder4(machine_config &config);
 	void sc4_no_reels(machine_config &config);
 	void sc4dmd(machine_config &config);
-	void sc4_map(address_map &map);
+	void sc4_map(address_map &map) ATTR_COLD;
 
 protected:
 	optional_ioport_array<16> m_io_ports;
@@ -661,12 +661,12 @@ public:
 
 	uint16_t adder4_mem_r(offs_t offset, uint16_t mem_mask = ~0);
 	void adder4_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// devices
 	required_device<m68340_cpu_device> m_adder4cpu;
 	void sc4_adder4(machine_config &config);
-	void sc4_adder4_map(address_map &map);
+	void sc4_adder4_map(address_map &map) ATTR_COLD;
 };
 
 

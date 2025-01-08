@@ -33,7 +33,7 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	// i2c_hle_interface overrides
 	virtual u8 read_data(u16 offset) override;
 	virtual const char *get_tag() override { return tag(); }

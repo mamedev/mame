@@ -7,7 +7,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "machine/input_merger.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
@@ -38,7 +38,7 @@ public:
 	void textelcomp(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void keyscan_w(u8 data);
 	u8 keyboard_r();
 	void shift_data_w(int state);
@@ -46,8 +46,8 @@ private:
 	void update_shift_output();
 	void rtc_w(u8 data);
 
-	void mem_map(address_map &map);
-	void lcdc_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void lcdc_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<msm58321_device> m_rtc;
@@ -325,10 +325,10 @@ INPUT_PORTS_END
 
 void textelcomp_state::textelcomp(machine_config &config)
 {
-	M65SC02(config, m_maincpu, 3.6864_MHz_XTAL / 2); // G65SC02P-2 (clock not verified)
+	G65SC02(config, m_maincpu, 3.6864_MHz_XTAL / 2); // G65SC02P-2 (clock not verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &textelcomp_state::mem_map);
 
-	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m65sc02_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, G65SC02_IRQ_LINE);
 
 	via6522_device &via0(R65C22(config, "via0", 3.6864_MHz_XTAL / 2)); // G65SC22P-2
 	via0.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
@@ -387,4 +387,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1993, a1010, 0, 0, textelcomp, textelcomp, textelcomp_state, empty_init, "Humantechnik", "Textel Compact A1010-0", MACHINE_IS_SKELETON)
+COMP(1993, a1010, 0, 0, textelcomp, textelcomp, textelcomp_state, empty_init, "Humantechnik", "Textel Compact A1010-0", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

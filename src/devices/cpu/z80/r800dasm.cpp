@@ -477,7 +477,7 @@ const r800_disassembler::r800dasm r800_disassembler::mnemonic_main[256] =
 
 char r800_disassembler::sign(s8 offset)
 {
-	return (offset < 0)? '-':'+';
+	return (offset < 0) ? '-' : '+';
 }
 
 u32 r800_disassembler::offs(s8 offset)
@@ -549,7 +549,7 @@ offs_t r800_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		{
 			switch (*src)
 			{
-			case '?':   // illegal opcode
+			case '?': // illegal opcode
 				util::stream_format(stream, "$%02x", op);
 				break;
 			case 'A':
@@ -558,25 +558,25 @@ offs_t r800_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				if (src != d->arguments)
 					flags |= STEP_COND;
 				break;
-			case 'B':   // Byte op arg
+			case 'B': // Byte op arg
 				util::stream_format(stream, "$%02X", params.r8(pos++));
 				break;
-			case 'N':   // Immediate 16 bit
+			case 'N': // Immediate 16 bit
 				util::stream_format(stream, "$%04X", params.r16(pos));
 				pos += 2;
 				break;
-			case 'O':   // Offset relative to PC
+			case 'O': // Offset relative to PC
 				util::stream_format(stream, "$%04X", (pc + s8(params.r8(pos++)) + 2) & 0xffff);
 				if (src != d->arguments)
 					flags |= STEP_COND;
 				break;
-			case 'P':   // Port number
+			case 'P': // Port number
 				util::stream_format(stream, "$%02X", params.r8(pos++));
 				break;
-			case 'V':   // Break vector
+			case 'V': // Break vector
 				util::stream_format(stream, "$%02X", op & 0x38);
 				break;
-			case 'W':   // Memory address word
+			case 'W': // Memory address word
 				util::stream_format(stream, "$%04X", params.r16(pos));
 				pos += 2;
 				break;
@@ -591,6 +591,7 @@ offs_t r800_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				break;
 			default:
 				stream << *src;
+				break;
 			}
 			src++;
 		}

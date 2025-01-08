@@ -43,7 +43,7 @@ private:
 	uint8_t keyboard_r();
 	void duart_out_w(uint8_t data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainnmi;
@@ -204,4 +204,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1986, qvt201, 0, 0, qvt201, qvt201, qvt201_state, empty_init, "Qume", "QVT-201 (Rev. T201VE)", MACHINE_IS_SKELETON )
+COMP( 1986, qvt201, 0, 0, qvt201, qvt201, qvt201_state, empty_init, "Qume", "QVT-201 (Rev. T201VE)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

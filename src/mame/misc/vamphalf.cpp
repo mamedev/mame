@@ -56,6 +56,7 @@ TODO:
 - boonggab: simulate photo sensors with a "stroke strength"
 - boonggab: what are sensors bit used for? are they used in the japanese version?
 - wyvernsg: fails a protection check after ~1 hour of play?
+- are CRTC parameters software-configurable?
 
 *********************************************************************/
 
@@ -138,7 +139,7 @@ public:
 	void init_mrkicker();
 	void init_solitaire();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(boonggab_photo_sensors_r);
+	ioport_value boonggab_photo_sensors_r();
 
 	u16 eeprom_r(offs_t offset);
 	u32 eeprom32_r();
@@ -151,11 +152,18 @@ public:
 
 	void banked_oki(int chip);
 
-	void common_map(address_map &map);
-	void common_32bit_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void common_32bit_map(address_map &map) ATTR_COLD;
+
+	static constexpr u16 HTOTAL = 448;
+	static constexpr u16 HBEND = 31;
+	static constexpr u16 HBSTART = 351;
+	static constexpr u16 VTOTAL = 264;
+	static constexpr u16 VBEND = 16;
+	static constexpr u16 VBSTART = 252;
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	u32 m_flip_bit;
 	u8 m_palshift;
@@ -212,18 +220,18 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void handle_flipped_visible_area(screen_device &screen);
-	void aoh_io(address_map &map);
-	void aoh_map(address_map &map);
-	void banked_oki_map(address_map &map);
-	void boonggab_io(address_map &map);
-	void coolmini_io(address_map &map);
-	void jmpbreak_io(address_map &map);
-	void worldadv_io(address_map &map);
-	void mrdig_io(address_map &map);
-	void mrkicker_io(address_map &map);
-	void solitaire_io(address_map &map);
-	void suplup_io(address_map &map);
-	void vamphalf_io(address_map &map);
+	void aoh_io(address_map &map) ATTR_COLD;
+	void aoh_map(address_map &map) ATTR_COLD;
+	void banked_oki_map(address_map &map) ATTR_COLD;
+	void boonggab_io(address_map &map) ATTR_COLD;
+	void coolmini_io(address_map &map) ATTR_COLD;
+	void jmpbreak_io(address_map &map) ATTR_COLD;
+	void worldadv_io(address_map &map) ATTR_COLD;
+	void mrdig_io(address_map &map) ATTR_COLD;
+	void mrkicker_io(address_map &map) ATTR_COLD;
+	void solitaire_io(address_map &map) ATTR_COLD;
+	void suplup_io(address_map &map) ATTR_COLD;
+	void vamphalf_io(address_map &map) ATTR_COLD;
 };
 
 class vamphalf_qdsp_state : public vamphalf_state
@@ -251,10 +259,10 @@ private:
 
 	void yorijori_eeprom_w(u32 data);
 
-	void misncrft_io(address_map &map);
-	void wyvernwg_io(address_map &map);
-	void yorijori_32bit_map(address_map &map);
-	void yorijori_io(address_map &map);
+	void misncrft_io(address_map &map) ATTR_COLD;
+	void wyvernwg_io(address_map &map) ATTR_COLD;
+	void yorijori_32bit_map(address_map &map) ATTR_COLD;
+	void yorijori_io(address_map &map) ATTR_COLD;
 };
 
 class vamphalf_nvram_state : public vamphalf_state
@@ -274,8 +282,8 @@ public:
 
 private:
 
-	void finalgdr_io(address_map &map);
-	void mrkickera_io(address_map &map);
+	void finalgdr_io(address_map &map) ATTR_COLD;
+	void mrkickera_io(address_map &map) ATTR_COLD;
 
 	required_device<nvram_device> m_nvram;
 
@@ -918,7 +926,7 @@ u32 vamphalf_state::screen_update_aoh(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(vamphalf_state::boonggab_photo_sensors_r)
+ioport_value vamphalf_state::boonggab_photo_sensors_r()
 {
 	static const u16 photo_sensors_table[8] = { 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 };
 	u8 res = m_photosensors->read();
@@ -1038,7 +1046,7 @@ static INPUT_PORTS_START( aoh )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // EEPROM bit
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // EEPROM bit
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1067,7 +1075,7 @@ static INPUT_PORTS_START( boonggab )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 3
-	PORT_BIT( 0x3800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(vamphalf_state, boonggab_photo_sensors_r) // photo sensors 1, 2 and 3
+	PORT_BIT( 0x3800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(vamphalf_state::boonggab_photo_sensors_r)) // photo sensors 1, 2 and 3
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1161,7 +1169,7 @@ GFXDECODE_END
 
 void vamphalf_state::common(machine_config &config)
 {
-	E116T(config, m_maincpu, 50000000);    /* 50 MHz */
+	E116T(config, m_maincpu, 50_MHz_XTAL);    // 50 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_state::common_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
 
@@ -1172,11 +1180,7 @@ void vamphalf_state::common(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	// 28MHz
-	screen.set_refresh_hz(59);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(31, 350, 16, 251);
+	screen.set_raw(28_MHz_XTAL / 4, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	screen.set_screen_update(FUNC(vamphalf_state::screen_update_common));
 	screen.set_palette(m_palette);
 
@@ -1189,9 +1193,9 @@ void vamphalf_state::sound_ym_oki(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(28'000'000)/8).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); /* 3.5MHz */
+	YM2151(config, "ymsnd", 28_MHz_XTAL / 8).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); // 3.5MHz
 
-	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(28'000'000)/16 , okim6295_device::PIN7_HIGH)); /* 1.75MHz */
+	okim6295_device &oki1(OKIM6295(config, "oki1", 28_MHz_XTAL / 16 , okim6295_device::PIN7_HIGH)); // 1.75MHz
 	oki1.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	oki1.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -1207,9 +1211,9 @@ void vamphalf_state::sound_suplup(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); /* 3.579545 MHz */
+	YM2151(config, "ymsnd", 14.318181_MHz_XTAL / 4).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); // 3.579545 MHz
 
-	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH)); /* 1.75MHz */
+	okim6295_device &oki1(OKIM6295(config, "oki1", 14.318181_MHz_XTAL / 8, okim6295_device::PIN7_HIGH)); // 1.75MHz
 	oki1.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	oki1.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
@@ -1224,7 +1228,7 @@ void vamphalf_state::sound_qs1000(machine_config &config)
 	m_soundlatch->data_pending_callback().set("qs1000", FUNC(qs1000_device::set_irq));
 	m_soundlatch->set_separate_acknowledge(true);
 
-	qs1000_device &qs1000(QS1000(config, "qs1000", XTAL(24'000'000)));
+	qs1000_device &qs1000(QS1000(config, "qs1000", 24_MHz_XTAL));
 	qs1000.set_external_rom(true);
 	qs1000.p1_in().set("soundlatch", FUNC(generic_latch_8_device::read));
 	qs1000.p3_out().set(FUNC(vamphalf_state::qs1000_p3_w));
@@ -1243,7 +1247,7 @@ void vamphalf_state::vamphalf(machine_config &config)
 void vamphalf_qdsp_state::misncrft(machine_config &config)
 {
 	common(config);
-	GMS30C2116(config.replace(), m_maincpu, XTAL(50'000'000)); /* 50 MHz */
+	GMS30C2116(config.replace(), m_maincpu, 50_MHz_XTAL); // 50 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_qdsp_state::common_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::misncrft_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
@@ -1273,6 +1277,7 @@ void vamphalf_state::suplup(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_state::suplup_io);
 
 	// 14.31818MHz instead 28MHz
+	subdevice<screen_device>("screen")->set_raw(14.318181_MHz_XTAL / 2, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	sound_suplup(config);
 }
 
@@ -1311,7 +1316,7 @@ void vamphalf_state::worldadv(machine_config &config)
 void vamphalf_state::mrdig(machine_config &config)
 {
 	common(config);
-	GMS30C2116(config.replace(), m_maincpu, XTAL(50'000'000));   /* 50 MHz */
+	GMS30C2116(config.replace(), m_maincpu, 50_MHz_XTAL);   // 50 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_state::common_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_state::mrdig_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
@@ -1322,7 +1327,7 @@ void vamphalf_state::mrdig(machine_config &config)
 void vamphalf_qdsp_state::wyvernwg(machine_config &config)
 {
 	common(config);
-	E132T(config.replace(), m_maincpu, XTAL(50'000'000));    /* 50 MHz */
+	E132T(config.replace(), m_maincpu, 50_MHz_XTAL);    // 50 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_qdsp_state::common_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::wyvernwg_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
@@ -1333,7 +1338,7 @@ void vamphalf_qdsp_state::wyvernwg(machine_config &config)
 void vamphalf_nvram_state::finalgdr(machine_config &config)
 {
 	common(config);
-	E132T(config.replace(), m_maincpu, XTAL(50'000'000));    /* 50 MHz */
+	E132T(config.replace(), m_maincpu, 50_MHz_XTAL);    // 50 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_nvram_state::common_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_nvram_state::finalgdr_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
@@ -1346,7 +1351,7 @@ void vamphalf_nvram_state::finalgdr(machine_config &config)
 void vamphalf_nvram_state::mrkickera(machine_config &config)
 {
 	common(config);
-	E132T(config.replace(), m_maincpu, XTAL(50'000'000));    /* 50 MHz */
+	E132T(config.replace(), m_maincpu, 50_MHz_XTAL);    // 50 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_nvram_state::common_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_nvram_state::mrkickera_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
@@ -1358,7 +1363,7 @@ void vamphalf_nvram_state::mrkickera(machine_config &config)
 
 void vamphalf_state::aoh(machine_config &config)
 {
-	E132XN(config, m_maincpu, XTAL(20'000'000) * 4); /* 4x internal multiplier */
+	E132XN(config, m_maincpu, 20_MHz_XTAL * 4); // 4x internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_state::aoh_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_state::aoh_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
@@ -1367,11 +1372,7 @@ void vamphalf_state::aoh(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	// 32MHz
-	screen.set_refresh_hz(59.185);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 512);
-	screen.set_visarea(64, 511-64, 16, 255-16);
+	screen.set_raw(32_MHz_XTAL / 4, 512, 64, 448, 264, 16, 240);
 	screen.set_screen_update(FUNC(vamphalf_state::screen_update_aoh));
 	screen.set_palette(m_palette);
 
@@ -1382,13 +1383,13 @@ void vamphalf_state::aoh(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(32'000'000)/8, okim6295_device::PIN7_HIGH)); /* 4MHz */
+	okim6295_device &oki1(OKIM6295(config, "oki1", 32_MHz_XTAL / 8, okim6295_device::PIN7_HIGH)); // 4MHz
 	oki1.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	oki1.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH)); /* 1MHz */
+	okim6295_device &oki2(OKIM6295(config, "oki2", 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH)); // 1MHz
 	oki2.set_addrmap(0, &vamphalf_state::banked_oki_map);
 	oki2.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	oki2.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -1405,12 +1406,13 @@ void vamphalf_state::boonggab(machine_config &config)
 void vamphalf_qdsp_state::yorijori(machine_config &config)
 {
 	common(config);
-	E132T(config.replace(), m_maincpu, XTAL(50'000'000));   /* 50 MHz */
+	E132T(config.replace(), m_maincpu, 50_MHz_XTAL);   // 50 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vamphalf_qdsp_state::yorijori_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_qdsp_state::yorijori_io);
 	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq2_line_hold));
 
 	// 27MHz instead 28MHz
+	subdevice<screen_device>("screen")->set_raw(27_MHz_XTAL / 4, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	sound_qs1000(config);
 }
 

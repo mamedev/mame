@@ -36,8 +36,8 @@ public:
 	void pdt3100(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<v25_device> m_maincpu;
 };
@@ -79,4 +79,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1998, pdt3100, 0, 0, pdt3100, pdt3100, pdt3100_state, empty_init, "Symbol", "PDT 3100 (v1.10-00)", MACHINE_IS_SKELETON)
+COMP(1998, pdt3100, 0, 0, pdt3100, pdt3100, pdt3100_state, empty_init, "Symbol", "PDT 3100 (v1.10-00)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

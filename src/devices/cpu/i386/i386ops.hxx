@@ -1278,7 +1278,7 @@ void i386_device::i386_repeat(int invert_flag)
 			count = --REG32(ECX);
 		else
 			count = --REG16(CX);
-		if (m_cycles <= 0)
+		if (count && (m_cycles <= 0))
 			goto outofcycles;
 	}
 	while( count && (!flag || (invert_flag ? !*flag : *flag)) );

@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_ABCBUS_LUXOR10828_H
-#define MAME_BUS_ABCBUS_LUXOR10828_H
+#ifndef MAME_BUS_ABCBUS_LUX10828_H
+#define MAME_BUS_ABCBUS_LUX10828_H
 
 #pragma once
 
@@ -57,13 +57,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
@@ -89,8 +89,8 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
-	void luxor_55_10828_io(address_map &map);
-	void luxor_55_10828_mem(address_map &map);
+	void luxor_55_10828_io(address_map &map) ATTR_COLD;
+	void luxor_55_10828_mem(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
@@ -112,4 +112,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(LUXOR_55_10828, luxor_55_10828_device)
 
-#endif // MAME_BUS_ABCBUS_LUXOR10828_H
+#endif // MAME_BUS_ABCBUS_LUX10828_H

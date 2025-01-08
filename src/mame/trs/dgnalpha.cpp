@@ -122,7 +122,7 @@ private:
 	void fdc_intrq_w(int state);
 	void fdc_drq_w(int state);
 
-	void dgnalpha_io1(address_map &map);
+	void dgnalpha_io1(address_map &map) ATTR_COLD;
 
 	required_device<pia6821_device> m_pia_2;
 	required_device<ay8912_device> m_ay8912;

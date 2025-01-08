@@ -52,8 +52,8 @@ public:
 	void play_1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 port07_r();
@@ -70,9 +70,9 @@ private:
 	int ef4_r();
 	void clock_w(int state);
 
-	void chance_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void chance_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_resetcnt = 0U;
 	u16 m_clockcnt = 0U;
@@ -675,10 +675,10 @@ ROM_END
 
 
 /* Big Town, Last Lap, Night Fever, Party and Third World all reportedly share the same roms with different playfield/machine artworks */
-GAME(1978, bigtown,  0,       play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Big Town",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978, lastlap,  bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Last Lap",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979, party,    bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Party",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979, ngtfever, bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Sonic",     "Night Fever",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978, thrdwrld, bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Sonic",     "Third World",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978, spcgambl, 0,       play_1, spcgambl, play_1_state, empty_init, ROT0, "Playmatic", "Space Gambler", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978, chance,   0,       chance, chance,   play_1_state, empty_init, ROT0, "Playmatic", "Chance",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978, bigtown,  0,       play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Big Town",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1978, lastlap,  bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Last Lap",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1979, party,    bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Party",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1979, ngtfever, bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Sonic",     "Night Fever",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1978, thrdwrld, bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Sonic",     "Third World",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1978, spcgambl, 0,       play_1, spcgambl, play_1_state, empty_init, ROT0, "Playmatic", "Space Gambler", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1978, chance,   0,       chance, chance,   play_1_state, empty_init, ROT0, "Playmatic", "Chance",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

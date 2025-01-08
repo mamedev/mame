@@ -86,12 +86,12 @@ public:
 private:
 
 	u8 m_port3 = 0U;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	void port3_w(u8 data);
 	u8 port3_r();
 	void rx_w(int state);
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 	required_device<i80c31_device> m_maincpu;
 	required_device<rs232_port_device> m_serial;
 	required_device<tms5220_device> m_speech;

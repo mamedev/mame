@@ -119,11 +119,11 @@ protected:
 	u16 m_pe;
 	u8 m_ledsw1, m_ledsw2;
 
-	void map_500(address_map &map);
-	void swp30_map(address_map &map);
+	void map_500(address_map &map) ATTR_COLD;
+	void swp30_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u16 adc_ar_r();
 	u16 adc_al_r();
@@ -153,7 +153,7 @@ public:
 
 protected:
 	required_device<swp30_device> m_swp30s;
-	void map_1000(address_map &map);
+	void map_1000(address_map &map) ATTR_COLD;
 };
 
 class mu2000_state : public mu1000_state
@@ -166,7 +166,7 @@ public:
 	void mu2000(machine_config &config);
 
 protected:
-	void map_2000(address_map &map);
+	void map_2000(address_map &map) ATTR_COLD;
 };
 
 

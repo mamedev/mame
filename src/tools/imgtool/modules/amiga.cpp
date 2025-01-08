@@ -1712,7 +1712,7 @@ static imgtoolerr_t write_file_ext_data(imgtool::image &img, int block, int *fil
 
 static imgtoolerr_t clear_file_ext_data(imgtool::image &img, int block, int *filesize)
 {
-	return walk_file_ext_data(img, block, filesize, NULL, false);
+	return walk_file_ext_data(img, block, filesize, nullptr, false);
 }
 
 
@@ -2340,7 +2340,7 @@ static imgtoolerr_t amiga_image_geticoninfo(imgtool::partition &partition, const
 }
 
 
-static imgtoolerr_t amiga_image_suggesttransfer(imgtool::partition &partition, const char *fname, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
+static imgtoolerr_t amiga_image_suggesttransfer(imgtool::partition &partition, const char *fname, imgtool::transfer_suggestion *suggestions, size_t suggestions_length)
 {
 	return IMGTOOLERR_UNIMPLEMENTED;
 }
@@ -2387,7 +2387,7 @@ void amiga_floppy_get_info(const imgtool_class *imgclass, uint32_t state, union 
 		case IMGTOOLINFO_INT_SUPPORTS_LASTMODIFIED_TIME: info->i = 1; break;
 		case IMGTOOLINFO_INT_PATH_SEPARATOR:             info->i = '/'; break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		/* --- the following bits of info are returned as NUL-terminated strings --- */
 		case IMGTOOLINFO_STR_NAME:                       strcpy(info->s = imgtool_temp_str(), "amiga_floppy"); break;
 		case IMGTOOLINFO_STR_DESCRIPTION:                strcpy(info->s = imgtool_temp_str(), "Amiga floppy disk image (OFS/FFS format)"); break;
 		case IMGTOOLINFO_STR_FILE_EXTENSIONS:            strcpy(info->s = imgtool_temp_str(), "adf"); break;

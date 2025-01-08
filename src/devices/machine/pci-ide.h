@@ -39,13 +39,13 @@ public:
 	void set_pif(int val) { m_pif = val & 0xff; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	void ide_interrupt(int state);
@@ -71,11 +71,11 @@ private:
 	required_address_space m_bus_master_space;
 
 	uint32_t m_config_data[0x10];
-	void chan1_data_command_map(address_map &map);
-	void chan1_control_map(address_map &map);
-	void chan2_data_command_map(address_map &map);
-	void chan2_control_map(address_map &map);
-	void bus_master_map(address_map &map);
+	void chan1_data_command_map(address_map &map) ATTR_COLD;
+	void chan1_control_map(address_map &map) ATTR_COLD;
+	void chan2_data_command_map(address_map &map) ATTR_COLD;
+	void chan2_control_map(address_map &map) ATTR_COLD;
+	void bus_master_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(IDE_PCI, ide_pci_device)

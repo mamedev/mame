@@ -29,7 +29,7 @@ public:
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<pic17c4x_device> m_maincpu;
 	required_device<pic17c4x_device> m_slavecpu;
@@ -92,4 +92,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1998, airbase99, 0, 0, airbase99, airbase99, airbase99_state, empty_init, "JoMoX", "AiRBase 99", MACHINE_IS_SKELETON)
+SYST(1998, airbase99, 0, 0, airbase99, airbase99, airbase99_state, empty_init, "JoMoX", "AiRBase 99", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

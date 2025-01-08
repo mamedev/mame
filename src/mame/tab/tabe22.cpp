@@ -68,7 +68,7 @@ public:
 	void tabe22(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<i8085a_cpu_device> m_maincpu;
@@ -78,12 +78,12 @@ private:
 	required_region_ptr<uint8_t> m_chargen;
 	required_device<address_map_bank_device> m_vram_bank;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void vram_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void vram_map(address_map &map) ATTR_COLD;
 
-	void char_map(address_map &map);
-	void attr_map(address_map &map);
+	void char_map(address_map &map) ATTR_COLD;
+	void attr_map(address_map &map) ATTR_COLD;
 
 	void video_ctrl_w(uint8_t data);
 	void crt_brightness_w(uint8_t data);

@@ -31,9 +31,9 @@ public:
 	void hk1000(machine_config &config);
 
 private:
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void slot_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void slot_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -146,4 +146,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(198?, hk1000, 0, 0, hk1000, hk1000, hk1000_state, empty_init, "Orla", "HK1000", MACHINE_IS_SKELETON)
+SYST(198?, hk1000, 0, 0, hk1000, hk1000, hk1000_state, empty_init, "Orla", "HK1000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

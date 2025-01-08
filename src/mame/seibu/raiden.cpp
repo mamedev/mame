@@ -145,7 +145,7 @@ protected:
 	bool m_sp_layer_enabled = 0;
 	bool m_flipscreen = 0;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	u32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *scrollregs);
 
@@ -182,13 +182,13 @@ protected:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap);
 
-	void main_map(address_map &map);
-	void sub_map(address_map &map);
-	void raiden_sound_map(address_map &map);
-	void raiden_sound_decrypted_opcodes_map(address_map &map);
-	void raidenu_main_map(address_map &map);
-	void raidenu_sub_map(address_map &map);
-	void sei80bu_encrypted_full_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void raiden_sound_map(address_map &map) ATTR_COLD;
+	void raiden_sound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void raidenu_main_map(address_map &map) ATTR_COLD;
+	void raidenu_sub_map(address_map &map) ATTR_COLD;
+	void sei80bu_encrypted_full_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -200,7 +200,7 @@ public:
 	void raidenb(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	u16 m_scroll_ram[6];
@@ -211,7 +211,7 @@ private:
 	void layer_enable_w(u16 data);
 	void layer_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -713,13 +713,13 @@ void raiden_state::vblank_irq(int state)
 void raiden_state::raiden(machine_config &config)
 {
 	// basic machine hardware
-	V30(config, m_maincpu, XTAL(20'000'000) / 2); // NEC V30 CPU, 20MHz verified on PCB
+	V30(config, m_maincpu, 20_MHz_XTAL / 2); // NEC V30 CPU, 20MHz verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_state::main_map);
 
-	V30(config, m_subcpu, XTAL(20'000'000) / 2); // NEC V30 CPU, 20MHz verified on PCB
+	V30(config, m_subcpu, 20_MHz_XTAL / 2); // NEC V30 CPU, 20MHz verified on PCB
 	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_state::sub_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181) / 4)); // verified on PCB
+	z80_device &audiocpu(Z80(config, "audiocpu", 14.318181_MHz_XTAL / 4)); // verified on PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &raiden_state::seibu_sound_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
@@ -744,11 +744,11 @@ void raiden_state::raiden(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181) / 4));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14.318181_MHz_XTAL / 4));
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH)); // frequency and pin 7 verified
+	okim6295_device &oki(OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH)); // frequency and pin 7 verified
 	oki.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
@@ -784,8 +784,8 @@ void raidenb_state::layer_scroll_w(offs_t offset, u16 data, u16 mem_mask)
 void raiden_state::raidenkb(machine_config &config)
 {
 	raiden(config);
-	m_maincpu->set_clock(XTAL(32'000'000) / 4); // Xtal and clock verified
-	m_subcpu->set_clock(XTAL(32'000'000) / 4); // Xtal and clock verified
+	m_maincpu->set_clock(32_MHz_XTAL / 4); // Xtal and clock verified
+	m_subcpu->set_clock(32_MHz_XTAL / 4); // Xtal and clock verified
 }
 
 void raidenb_state::raidenb(machine_config &config)

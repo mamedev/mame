@@ -163,23 +163,23 @@ public:
 	void profpac(machine_config &config);
 	void robby(machine_config &config);
 	void wow(machine_config &config);
-	void bank4000_map(address_map &map);
-	void demndrgn_map(address_map &map);
-	void port_map(address_map &map);
-	void port_map_16col_pattern(address_map &map);
-	void port_map_16col_pattern_nosound(address_map &map);
-	void port_map_mono_pattern(address_map &map);
-	void port_map_stereo_pattern(address_map &map);
-	void profpac_bank4000_map(address_map &map);
-	void profpac_map(address_map &map);
-	void robby_map(address_map &map);
-	void seawolf2_map(address_map &map);
-	void spacezap_map(address_map &map);
-	void wow_map(address_map &map);
+	void bank4000_map(address_map &map) ATTR_COLD;
+	void demndrgn_map(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
+	void port_map_16col_pattern(address_map &map) ATTR_COLD;
+	void port_map_16col_pattern_nosound(address_map &map) ATTR_COLD;
+	void port_map_mono_pattern(address_map &map) ATTR_COLD;
+	void port_map_stereo_pattern(address_map &map) ATTR_COLD;
+	void profpac_bank4000_map(address_map &map) ATTR_COLD;
+	void profpac_map(address_map &map) ATTR_COLD;
+	void robby_map(address_map &map) ATTR_COLD;
+	void seawolf2_map(address_map &map) ATTR_COLD;
+	void spacezap_map(address_map &map) ATTR_COLD;
+	void wow_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 };
 
 class seawolf2_state : public astrocde_state
@@ -193,13 +193,13 @@ public:
 	void seawolf2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void sound_1_w(uint8_t data);
 	void sound_2_w(uint8_t data);
 
-	void port_map_discrete(address_map &map);
+	void port_map_discrete(address_map &map) ATTR_COLD;
 
 	required_device<samples_device> m_samples;
 	uint8_t m_port_1_last = 0U;
@@ -215,17 +215,17 @@ public:
 	{ }
 
 	void ebases(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(trackball_r);
+	ioport_value trackball_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void trackball_select_w(uint8_t data);
 	void coin_w(uint8_t data);
 
-	void ebases_map(address_map &map);
-	void port_map_ebases(address_map &map);
+	void ebases_map(address_map &map) ATTR_COLD;
+	void port_map_ebases(address_map &map) ATTR_COLD;
 
 	required_ioport_array<4> m_trackball;
 	uint8_t m_trackball_last = 0U;
@@ -240,17 +240,17 @@ public:
 	{ }
 
 	void demndrgn(machine_config &config);
-	DECLARE_CUSTOM_INPUT_MEMBER(trackball_r);
+	ioport_value trackball_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void input_select_w(int state);
 	void sound_w(uint8_t data);
 	void trackball_reset_w(uint8_t data);
 
-	void port_map_16col_pattern_demndrgn(address_map &map);
+	void port_map_16col_pattern_demndrgn(address_map &map) ATTR_COLD;
 
 	required_ioport_array<2> m_trackball;
 	uint8_t m_trackball_last = 0U;
@@ -271,11 +271,11 @@ private:
 	void counter_w(uint8_t data);
 	void lights_w(uint8_t data);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void port_map_16col_pattern_tenpindx(address_map &map);
-	void sub_io_map(address_map &map);
-	void sub_map(address_map &map);
+	void port_map_16col_pattern_tenpindx(address_map &map) ATTR_COLD;
+	void sub_io_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_subcpu;
 	output_finder<19> m_lamps;

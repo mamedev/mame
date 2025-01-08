@@ -62,9 +62,9 @@ private:
 	void so_w(int state);
 	void dav_w(int state);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	u8 m_page = 0;
 	u8 m_attr = 0;
@@ -405,4 +405,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1980, dialog80, 0, 0, ampex, ampex, ampex_state, empty_init, "Ampex", "Dialogue 80", MACHINE_IS_SKELETON )
+COMP( 1980, dialog80, 0, 0, ampex, ampex, ampex_state, empty_init, "Ampex", "Dialogue 80", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

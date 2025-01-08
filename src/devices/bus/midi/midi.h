@@ -33,7 +33,7 @@ public:
 	int rx_r() { return m_rxd; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	void common(machine_config &config);

@@ -56,8 +56,8 @@ public:
 	void dgnbeta(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static constexpr unsigned RamSize           = 256;          // 256K by default
@@ -226,7 +226,7 @@ private:
 
 	offs_t dgnbeta_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
-	void dgnbeta_map(address_map &map);
+	void dgnbeta_map(address_map &map) ATTR_COLD;
 
 	void execute_beta_key_dump(const std::vector<std::string_view> &params);
 	void execute_beta_dat_log(const std::vector<std::string_view> &params);

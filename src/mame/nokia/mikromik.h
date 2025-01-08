@@ -93,7 +93,7 @@ public:
 	void mm1g_video(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<i8085a_cpu_device> m_maincpu;
@@ -179,10 +179,10 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	void mm1_palette(palette_device &palette) const;
-	void mm1_map(address_map &map);
-	void mmu_io_map(address_map &map);
-	void mm1g_mmu_io_map(address_map &map);
-	void mm1_upd7220_map(address_map &map);
+	void mm1_map(address_map &map) ATTR_COLD;
+	void mmu_io_map(address_map &map) ATTR_COLD;
+	void mm1g_mmu_io_map(address_map &map) ATTR_COLD;
+	void mm1_upd7220_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NOKIA_MIKROMIK_H

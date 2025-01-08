@@ -30,8 +30,8 @@ public:
 	void sigmab88(machine_config &config);
 
 private:
-	void h16_map(address_map &map);
-	void hd63484_map(address_map &map);
+	void h16_map(address_map &map) ATTR_COLD;
+	void hd63484_map(address_map &map) ATTR_COLD;
 
 	required_device<hd641016_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -120,5 +120,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1997, cool104,  0,        sigmab88, sigmab88, sigmab88_state, empty_init, ROT0, "Sigma", "Cool 104", MACHINE_IS_SKELETON )
-GAME( 1997, freedeal, 0,        sigmab88, sigmab88, sigmab88_state, empty_init, ROT0, "Sigma", "Free Deal Twin Jokers Progressive", MACHINE_IS_SKELETON )
+GAME( 1997, cool104,  0,        sigmab88, sigmab88, sigmab88_state, empty_init, ROT0, "Sigma", "Cool 104", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, freedeal, 0,        sigmab88, sigmab88, sigmab88_state, empty_init, ROT0, "Sigma", "Free Deal Twin Jokers Progressive", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

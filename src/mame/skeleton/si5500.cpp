@@ -35,7 +35,7 @@ public:
 	void si5500(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void mainic_w(offs_t offset, u8 data);
@@ -46,8 +46,8 @@ private:
 	void gpibc_dbin_w(int state);
 	u8 keypad_r(offs_t offset);
 
-	void mem_map(address_map &map);
-	void cru_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void cru_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9901_device> m_mainpsi;
@@ -235,4 +235,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1986, si5500, 0, 0, si5500, si5500, si5500_state, empty_init, "Scientific Instruments", "Model 5500 Temperature Controller", MACHINE_IS_SKELETON)
+COMP(1986, si5500, 0, 0, si5500, si5500, si5500_state, empty_init, "Scientific Instruments", "Model 5500 Temperature Controller", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

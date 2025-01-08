@@ -40,7 +40,7 @@ public:
 	void vsmilpro(machine_config &config);
 
 private:
-	void vsmilpro_map(address_map &map);
+	void vsmilpro_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -78,4 +78,4 @@ ROM_END
 // Driver
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS
-COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, empty_init, "VTech", "V.Smile Pro", MACHINE_IS_SKELETON )
+COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, empty_init, "VTech", "V.Smile Pro", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

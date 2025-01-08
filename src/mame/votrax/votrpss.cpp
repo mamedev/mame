@@ -395,7 +395,7 @@ public:
 	void votrpss(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void kbd_put(u8 data);
@@ -409,8 +409,8 @@ private:
 	void write_uart_clock(int state);
 	IRQ_CALLBACK_MEMBER(irq_ack);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_term_data = 0U;
 	uint8_t m_porta = 0U;

@@ -155,22 +155,6 @@ if (SOUNDS["TIA"]~=null) then
 	}
 end
 
-
-
----------------------------------------------------
--- Amiga audio hardware
---@src/devices/machine/8364_paula.h,SOUNDS["PAULA_8364"] = true
----------------------------------------------------
-
-if (SOUNDS["PAULA_8364"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/8364_paula.cpp",
-		MAME_DIR .. "src/devices/machine/8364_paula.h",
-	}
-end
-
-
-
 ---------------------------------------------------
 -- Bally Astrocade sound system
 --@src/devices/sound/astrocde.h,SOUNDS["ASTROCADE"] = true
@@ -186,7 +170,6 @@ end
 
 
 ---------------------------------------------------
----------------------------------------------------
 -- AC97
 --@src/devices/sound/pic-ac97.h,SOUNDS["AC97"] = true
 ---------------------------------------------------
@@ -197,6 +180,10 @@ if (SOUNDS["AC97"]~=null) then
 		MAME_DIR .. "src/devices/sound/pci-ac97.h",
 	}
 end
+
+
+
+---------------------------------------------------
 -- CEM 3394 analog synthesizer chip
 --@src/devices/sound/cem3394.h,SOUNDS["CEM3394"] = true
 ---------------------------------------------------
@@ -205,6 +192,20 @@ if (SOUNDS["CEM3394"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/cem3394.cpp",
 		MAME_DIR .. "src/devices/sound/cem3394.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- Creative Labs CT1745 SB16 Mixer
+--@src/devices/sound/ct1745.h,SOUNDS["CT1745"] = true
+---------------------------------------------------
+
+if (SOUNDS["CT1745"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ct1745.cpp",
+		MAME_DIR .. "src/devices/sound/ct1745.h",
 	}
 end
 
@@ -236,20 +237,6 @@ if (SOUNDS["ES1373"]~=null) then
 end
 
 ---------------------------------------------------
--- Data East custom sound chips
---@src/devices/sound/bsmt2000.h,SOUNDS["BSMT2000"] = true
----------------------------------------------------
-
-if (SOUNDS["BSMT2000"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/bsmt2000.cpp",
-		MAME_DIR .. "src/devices/sound/bsmt2000.h",
-	}
-end
-
-
-
----------------------------------------------------
 -- Ensoniq 5503 (Apple IIgs)
 --@src/devices/sound/es5503.h,SOUNDS["ES5503"] = true
 ---------------------------------------------------
@@ -260,7 +247,6 @@ if (SOUNDS["ES5503"]~=null) then
 		MAME_DIR .. "src/devices/sound/es5503.h",
 	}
 end
-
 
 
 ---------------------------------------------------
@@ -287,6 +273,20 @@ if (SOUNDS["ESQPUMP"]~=null) then
 		MAME_DIR .. "src/devices/sound/esqpump.h",
 	}
 end
+
+
+---------------------------------------------------
+-- Data East custom sound chips
+--@src/devices/sound/bsmt2000.h,SOUNDS["BSMT2000"] = true
+---------------------------------------------------
+
+if (SOUNDS["BSMT2000"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/bsmt2000.cpp",
+		MAME_DIR .. "src/devices/sound/bsmt2000.h",
+	}
+end
+
 
 
 ---------------------------------------------------
@@ -694,6 +694,20 @@ if (SOUNDS["UPD7759"]~=null) then
 		MAME_DIR .. "src/devices/sound/upd7759.h",
 		MAME_DIR .. "src/devices/sound/315-5641.cpp",
 		MAME_DIR .. "src/devices/sound/315-5641.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- IMA ADPCM sample player
+--@src/devices/sound/imaadpcm.h,SOUNDS["IMAADPCM"] = true
+---------------------------------------------------
+
+if (SOUNDS["IMAADPCM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/imaadpcm.cpp",
+		MAME_DIR .. "src/devices/sound/imaadpcm.h",
 	}
 end
 
@@ -1395,18 +1409,6 @@ if (SOUNDS["AD1848"]~=null) then
 end
 
 ---------------------------------------------------
--- UPD1771
---@src/devices/sound/upd1771.h,SOUNDS["UPD1771"] = true
----------------------------------------------------
-
-if (SOUNDS["UPD1771"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/upd1771.cpp",
-		MAME_DIR .. "src/devices/sound/upd1771.h",
-	}
-end
-
----------------------------------------------------
 -- GB_SOUND
 --@src/devices/sound/gb.h,SOUNDS["GB_SOUND"] = true
 ---------------------------------------------------
@@ -1450,18 +1452,6 @@ if (SOUNDS["MM5837"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/mm5837.cpp",
 		MAME_DIR .. "src/devices/sound/mm5837.h",
-	}
-end
-
----------------------------------------------------
--- Intelligent Designs DAVE
---@src/devices/sound/dave.h,SOUNDS["DAVE"] = true
----------------------------------------------------
-
-if (SOUNDS["DAVE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/dave.cpp",
-		MAME_DIR .. "src/devices/sound/dave.h",
 	}
 end
 
@@ -1610,14 +1600,26 @@ if (SOUNDS["XT446"]~=null) then
 end
 
 ---------------------------------------------------
--- Roland sample players
---@src/devices/sound/rolandpcm.h,SOUNDS["ROLANDPCM"] = true
+-- Roland GP-based sample players
+--@src/devices/sound/roland_gp.h,SOUNDS["ROLANDGP"] = true
 ---------------------------------------------------
 
-if (SOUNDS["ROLANDPCM"]~=null) then
+if (SOUNDS["ROLANDGP"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/rolandpcm.cpp",
-		MAME_DIR .. "src/devices/sound/rolandpcm.h",
+		MAME_DIR .. "src/devices/sound/roland_gp.cpp",
+		MAME_DIR .. "src/devices/sound/roland_gp.h",
+	}
+end
+
+---------------------------------------------------
+-- Roland LP-based sample players
+--@src/devices/sound/roland_lp.h,SOUNDS["ROLANDLP"] = true
+---------------------------------------------------
+
+if (SOUNDS["ROLANDLP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/roland_lp.cpp",
+		MAME_DIR .. "src/devices/sound/roland_lp.h",
 	}
 end
 
@@ -1738,5 +1740,17 @@ if (SOUNDS["CF61909"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/cf61909.cpp",
 		MAME_DIR .. "src/devices/sound/cf61909.h",
+	}
+end
+
+---------------------------------------------------
+-- NEC uPD65043GF-U01
+--@src/devices/sound/upd65043gfu01.h,SOUNDS["UPD65043GFU01"] = true
+---------------------------------------------------
+
+if (SOUNDS["UPD65043GFU01"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/upd65043gfu01.cpp",
+		MAME_DIR .. "src/devices/sound/upd65043gfu01.h",
 	}
 end

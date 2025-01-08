@@ -53,9 +53,9 @@ protected:
 	void sw_scan_w(offs_t offset, u8 data);
 	void led_latch_w(u8 data);
 
-	void prog_map(address_map &map);
-	void s10_ext_map(address_map &map);
-	void mks100_ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void s10_ext_map(address_map &map) ATTR_COLD;
+	void mks100_ext_map(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
 
@@ -84,7 +84,7 @@ private:
 	void led_latch1_w(u8 data);
 	void led_latch2_w(u8 data);
 
-	void s220_ext_map(address_map &map);
+	void s220_ext_map(address_map &map) ATTR_COLD;
 
 	required_device<bu3905_device> m_outctrl;
 };
@@ -305,6 +305,6 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1986, s10,    0,   0, s10,    s10,    roland_s10_state,  empty_init, "Roland", "S-10 Digital Sampling Keyboard", MACHINE_IS_SKELETON)
-SYST(1987, mks100, s10, 0, mks100, mks100, roland_s10_state,  empty_init, "Roland", "MKS-100 Digital Sampler",        MACHINE_IS_SKELETON)
-SYST(1987, s220,   0,   0, s220,   s220,   roland_s220_state, empty_init, "Roland", "S-220 Digital Sampler",          MACHINE_IS_SKELETON)
+SYST(1986, s10,    0,   0, s10,    s10,    roland_s10_state,  empty_init, "Roland", "S-10 Digital Sampling Keyboard", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1987, mks100, s10, 0, mks100, mks100, roland_s10_state,  empty_init, "Roland", "MKS-100 Digital Sampler",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1987, s220,   0,   0, s220,   s220,   roland_s220_state, empty_init, "Roland", "S-220 Digital Sampler",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

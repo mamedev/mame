@@ -22,7 +22,7 @@ protected:
 	pasopia_rampac2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 ram_size);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual bool nvram_read(util::read_stream &file) override;

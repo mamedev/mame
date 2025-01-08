@@ -69,14 +69,14 @@ public:
 	void wicat(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void main_mem(address_map &map);
-	void video_io(address_map &map);
-	void video_mem(address_map &map);
-	void wd1000_io(address_map &map);
-	void wd1000_mem(address_map &map);
+	void main_mem(address_map &map) ATTR_COLD;
+	void video_io(address_map &map) ATTR_COLD;
+	void video_mem(address_map &map) ATTR_COLD;
+	void wd1000_io(address_map &map) ATTR_COLD;
+	void wd1000_mem(address_map &map) ATTR_COLD;
 
 	uint16_t memmap_r();
 	void memmap_w(uint16_t data);

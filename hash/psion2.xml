@@ -50,11 +50,12 @@ Undumped datapack:
 -->
 
 <softwarelist name="psion2" description="Psion Organiser II Datapack">
+
 	<software name="abcode">
 		<description>Anteta Barcode Reader v5.1</description>
 		<year>198?</year>
-		<publisher>Anteta</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<publisher>Advanced New Technology</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="31046">
 				<rom name="anteta.opk" size="31046" crc="0ca68683" sha1="2599a7240f3d361a375e61e4d3d11e4ba2d63fef" />
@@ -65,7 +66,7 @@ Undumped datapack:
 	<software name="airnav">
 		<description>Airnav Professional 2C</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Interair Aviation</publisher>
 		<sharedfeat name="compatibility" value="LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="64978">
@@ -78,7 +79,7 @@ Undumped datapack:
 		<description>Angler Pack</description>
 		<year>1988</year>
 		<publisher>Skyfact Software</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="9365">
 				<rom name="angler.opk" size="9365" crc="92bc7d19" sha1="feaf62bc4349e91ac9c7beb6bd4a5e5cb548d520" />
@@ -86,11 +87,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="ascribe4">
+	<software name="ascribe4" cloneof="ascribe5">
 		<description>AutoScribe Plus v4.11</description>
 		<year>1989</year>
 		<publisher>Widget Software</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16328">
 				<rom name="ascribe411.opk" size="16328" crc="62c9fda6" sha1="f49b48b82eed30e4dc862f1e7d256e94f3c80f24" />
@@ -102,7 +103,7 @@ Undumped datapack:
 		<description>AutoScribe Plus v5.11</description>
 		<year>198?</year>
 		<publisher>Widget Software</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16026">
 				<rom name="ascribe511.opk" size="16026" crc="f15837ff" sha1="a23eba4ba8e94bdc3d3e3245cf13aad82093a03d" />
@@ -113,8 +114,8 @@ Undumped datapack:
 	<software name="assem">
 		<description>Assembler Pack v1.0</description>
 		<year>1989</year>
-		<publisher>A.R. Software</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<publisher>AR Software</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="30276">
 				<rom name="assem.opk" size="30276" crc="a3f863c7" sha1="505afa975ed0068c5cce0a004c924824f8004674" />
@@ -125,8 +126,8 @@ Undumped datapack:
 	<software name="bcprinte">
 		<description>Barcode Printer I v1.42</description>
 		<year>198?</year>
-		<publisher>Gaascom Ltd.</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<publisher>Gaascom</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16389">
 				<rom name="barcodeprinter.opk" size="16389" crc="9db80aad" sha1="2b39f10c9d09d3b473c816e434929893bffe8b62" />
@@ -138,9 +139,9 @@ Undumped datapack:
 		<description>Cipher v7.604</description>
 		<year>198?</year>
 		<publisher>British Telecom</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/POS"/>
+		<sharedfeat name="compatibility" value="CM,XP,POS"/>
 		<part name="cart" interface="psion_pack">
-			<dataarea name="flop" size="103611">
+			<dataarea name="rom" size="103611">
 				<rom name="cipher7604.opk" size="103611" crc="6e1f4e6d" sha1="c67d83f0fcd73160e0c6e2b565b1d7b4807470d2" />
 			</dataarea>
 		</part>
@@ -163,11 +164,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="coastal3">
-		<description>Coastal v3.1</description>
-		<year>198?</year>
-		<publisher>Maritek Ltd</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+	<software name="coastal3" cloneof="coastal4">
+		<description>Coastal Navigation v3.1</description>
+		<year>1989</year>
+		<publisher>Maritek</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="25888">
 				<rom name="coastal31.opk" size="25888" crc="87b055bf" sha1="1ca616d5a31a6589de7cb206cba84054ee921627" />
@@ -176,22 +177,47 @@ Undumped datapack:
 	</software>
 
 	<software name="coastal4">
-		<description>Coastal v4.2</description>
+		<description>Coastal Navigation v4.2</description>
 		<year>1989</year>
-		<publisher>Maritek Ltd</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<publisher>Maritek</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
+			<feature name="part_id" value="Coastal Procedures - Slot C" />
 			<dataarea name="rom" size="32659">
 				<rom name="coastal42.opk" size="32659" crc="380bf6a2" sha1="46fd072f43bf92afadf0bb3e0f7a5beef9c8443d" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="cosc1" cloneof="cosc2">
+		<description>Concise Oxford Spelling Checker v0.1</description>
+		<year>1986</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="65537">
+				<rom name="spllchk1.opk" size="65537" crc="39348a17" sha1="ba85c07037bcc84774d00c58811d664af5b0338b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosc2">
+		<description>Concise Oxford Spelling Checker v2.0</description>
+		<year>1989</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="65537">
+				<rom name="spllchk2.opk" size="65537" crc="8d23cb58" sha1="1cdf200e3361fd6dd4a64d56fc94397002084cfb" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dataorg">
-		<description>The Data Organiser v2.4</description>
+		<description>Data Organiser v2.4</description>
 		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16254">
 				<rom name="hvdo24.opk" size="16254" crc="c1718598" sha1="f18ee33dcdeb7ccb1d3d80ef9c4bd6c806476ff9" />
@@ -199,11 +225,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="dataorgs">
-		<description>The Data Organiser v2.5 (Spanish)</description>
+	<software name="dataorgs" cloneof="dataorg">
+		<description>Data Organiser v2.5 (Spanish)</description>
 		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16387">
 				<rom name="hvdo25s.opk" size="16387" crc="6b146a51" sha1="10c80af1591c11865a9eb30edf84edae97dcc9ba" />
@@ -211,11 +237,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="datorgd">
-		<description>The Data Organiser v2.52 (German)</description>
+	<software name="datorgd" cloneof="dataorg">
+		<description>Data Organiser v2.52 (German)</description>
 		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16386">
 				<rom name="hvdo252d.opk" size="16386" crc="f3f5f53b" sha1="6f8dfff172c25953c893c5ef106ffda25e30291a" />
@@ -223,11 +249,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="datorgi">
-		<description>The Data Organiser v2.52 (Italian)</description>
+	<software name="datorgi" cloneof="dataorg">
+		<description>Data Organiser v2.52 (Italian)</description>
 		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16387">
 				<rom name="hvdo252i.opk" size="16387" crc="b05824d8" sha1="d3dd7a5fed08eef6e53d54508f6f2d4a2e48432c" />
@@ -239,7 +265,7 @@ Undumped datapack:
 		<description>Ferret Helper v5.1N</description>
 		<year>198?</year>
 		<publisher>Ferret Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16357">
 				<rom name="ferret51n.opk" size="16357" crc="0c374de4" sha1="604308fbaeadc8f4bc0b6d79de1ac9e03bd7bfab" />
@@ -247,11 +273,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="fm375">
+	<software name="fm375" cloneof="fm3762">
 		<description>FileMaster v3.75</description>
 		<year>1988</year>
 		<publisher>Widget Software</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16335">
 				<rom name="filemaster375.opk" size="16335" crc="810554d7" sha1="505c7a52dc9f4563908532706d2b0e8122d59ce5" />
@@ -259,11 +285,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="fm376">
+	<software name="fm376" cloneof="fm3762">
 		<description>FileMaster v3.76</description>
 		<year>1988</year>
 		<publisher>Widget Software</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16201">
 				<rom name="filemaster376.opk" size="16201" crc="1c8cd832" sha1="6fe29328f19d3c36780a261c6df7e6cef5c291f8" />
@@ -275,7 +301,7 @@ Undumped datapack:
 		<description>FileMaster v3.762</description>
 		<year>1988</year>
 		<publisher>Widget Software</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16194">
 				<rom name="filemaster3762.opk" size="16194" crc="f626ed8a" sha1="08d70630ecf3b0160ee7a5c509bece1e1cc5bc39" />
@@ -283,11 +309,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="fmalt">
+	<software name="fmalt" cloneof="fm3762">
 		<description>FileMaster</description>
 		<year>1988</year>
 		<publisher>Widget Software</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16240">
 				<rom name="filemaster.opk" size="16240" crc="1386cc71" sha1="1468a8c93adbe8af4dea563073ffd77db8e537df" />
@@ -299,7 +325,7 @@ Undumped datapack:
 		<description>Finance Pack</description>
 		<year>1986</year>
 		<publisher>Aware</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart1" interface="psion_pack">
 			<dataarea name="rom" size="16379">
 				<rom name="finance1b.opk" size="16379" crc="1c34e46b" sha1="5ada96fe015abfc6712236c65d9e6644ac0826e7" />
@@ -316,7 +342,7 @@ Undumped datapack:
 		<description>Finance Pack II</description>
 		<year>1989</year>
 		<publisher>Aware</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32709">
 				<rom name="finance2.opk" size="32709" crc="e9295ae2" sha1="e168479fd171777e63441d7dd63ec6a46914d678" />
@@ -326,9 +352,9 @@ Undumped datapack:
 
 	<software name="finger13">
 		<description>Finger Organiser v1.3</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="13753">
 				<rom name="hvfo13.opk" size="13753" crc="84d9d158" sha1="9dcc8f2abfa9808e151686d5342dbfb0115167f4" />
@@ -338,9 +364,9 @@ Undumped datapack:
 
 	<software name="finger14">
 		<description>Finger Organiser v1.4</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="13890">
 				<rom name="hvfo14.opk" size="13890" crc="36785487" sha1="51a6abfcb68846425ae90e63ee228b39eba6ebb2" />
@@ -348,11 +374,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="finge14i">
+	<software name="finge14i" cloneof="finger14">
 		<description>Finger Organiser v1.4 (Italian)</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="12033">
 				<rom name="hvfo14i.opk" size="12033" crc="c744ea48" sha1="5124337b4e75104d88e2dd0338444f5f88a4fc7d" />
@@ -360,11 +386,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="finge15d">
+	<software name="finge15d" cloneof="finger14">
 		<description>Finger Organiser v1.5 (German)</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="12968">
 				<rom name="hvfo15d.opk" size="12968" crc="ded87814" sha1="19965f5644f7682ab727ab1c9987792c2471ae6f" />
@@ -372,11 +398,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="flightma">
+	<software name="flightma" cloneof="flightmb">
 		<description>Flightmaster v2.19</description>
 		<year>1993</year>
-		<publisher>Software 2000, Inc.</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<publisher>Software 2000</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart1" interface="psion_pack">
 			<dataarea name="rom" size="130236">
 				<rom name="flghtmstr219a.opk" size="130236" crc="47ad1343" sha1="f228c64bf9fc5a849f38fd52bc24f22f94c0c9b3" />
@@ -392,8 +418,8 @@ Undumped datapack:
 	<software name="flightmb">
 		<description>Flightmaster v2.28</description>
 		<year>1994</year>
-		<publisher>Software 2000, Inc.</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<publisher>Software 2000</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart1" interface="psion_pack">
 			<dataarea name="rom" size="130684">
 				<rom name="flghtmstr228a.opk" size="130684" crc="1d720f92" sha1="00e4e1898aed868faf89debba152b84623da55ef" />
@@ -406,11 +432,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="fnkey31">
+	<software name="fnkey31" cloneof="fnkey40">
 		<description>FnKey v3.1</description>
 		<year>1989</year>
 		<publisher>Cubsoft</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="4333">
 				<rom name="fnkey31.opk" size="4333" crc="46c198dc" sha1="1f9a94216c738649f00b51e3e5d07a0487a1bff9" />
@@ -420,9 +446,9 @@ Undumped datapack:
 
 	<software name="fnkey40">
 		<description>FnKey v4.0</description>
-		<year>1989</year>
+		<year>1991</year>
 		<publisher>Cubsoft</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="6822">
 				<rom name="fnkey40.opk" size="6822" crc="39ca0011" sha1="6a40cdb13c895ff5ac8e37894389b99a2bfbc4fe" />
@@ -432,9 +458,9 @@ Undumped datapack:
 
 	<software name="filepak">
 		<description>FilePak v2.0</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>KA</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16342">
 				<rom name="filepak20.opk" size="16342" crc="c24a599b" sha1="c3042eee28bd58174828a04a599818c91a011756" />
@@ -442,11 +468,24 @@ Undumped datapack:
 		</part>
 	</software>
 
+	<software name="fpakdriv">
+		<!-- A datapak with the flashpak driver, which can be used to reformat a flashpak in the other slot. -->
+		<description>Flash Datapak Formatter v1.9</description>
+		<year>198?</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="XP,LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="7135">
+				<rom name="flashpak19.opk" size="7135" crc="1138998a" sha1="954a60febab3c86233e2d62ddf42d6e4940eb858" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="formmast">
 		<description>Form Master</description>
 		<year>198?</year>
-		<publisher>Cascade Systems Ltd.</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<publisher>Cascade Systems</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16234">
 				<rom name="formmaster.opk" size="16234" crc="9e457b90" sha1="04d1f60543faeec8d4aa7fd7134ed3a636c954c8" />
@@ -454,11 +493,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="formul11">
+	<software name="formul11" cloneof="formul21">
 		<description>Formulator v1.1</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Psion</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="31604">
 				<rom name="xform1.opk" size="31604" crc="5a690ead" sha1="c226ade8e78bbbcccadfb4cf5007107f1ffe06d2" />
@@ -468,9 +507,9 @@ Undumped datapack:
 
 	<software name="formul21">
 		<description>Formulator v2.1</description>
-		<year>198?</year>
+		<year>1989</year>
 		<publisher>Psion</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32407">
 				<rom name="xform2.opk" size="32407" crc="cf3fd9c4" sha1="712ebace6fb711bd98ea7053105f3a072ffa695c" />
@@ -479,10 +518,10 @@ Undumped datapack:
 	</software>
 
 	<software name="gamesorg">
-		<description>The Games Organiser v0.2</description>
+		<description>Games Organiser v0.2</description>
 		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32770">
 				<rom name="hvgo02.opk" size="32770" crc="7120b260" sha1="5e707aacb669960406ece6d1d304c1e1009502c0" />
@@ -490,11 +529,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="gorgit">
-		<description>The Games Organiser (Italian)</description>
+	<software name="gorgit" cloneof="gamesorg">
+		<description>Games Organiser (Italian)</description>
 		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16377">
 				<rom name="hvgoti.opk" size="16377" crc="87b94723" sha1="42628f60499c6beca4aaca21771aaa73a98e4742" />
@@ -505,8 +544,9 @@ Undumped datapack:
 	<software name="gpack">
 		<description>Games Pack</description>
 		<year>1989</year>
-		<publisher>S.I.S. Ltd, Psion</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<publisher>Psion</publisher>
+		<info name="developer" value="S.I.S." />
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32633">
 				<rom name="games.opk" size="32633" crc="1e31b975" sha1="66cd712eb36ce145b465a32f5c256a315452a31c" />
@@ -526,11 +566,24 @@ Undumped datapack:
 		</part>
 	</software>
 
+	<software name="geac" supported="no">
+		<!-- Software for library stock tracking. Uses a bar code reader. -->
+		<description>GEAC Program Pack</description>
+		<year>198?</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="29662">
+				<rom name="geac.opk" size="29662" crc="2787177f" sha1="ff39d6158111a807a44832b89d092dacbd083fe7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="schip12">
 		<description>Harvester Superchip v1.2</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="31521">
 				<rom name="hvsc12.opk" size="31521" crc="51fe98ea" sha1="9579f63e3f2991ceeb1933645a038620eee62361" />
@@ -538,11 +591,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="schip11s">
+	<software name="schip11s" cloneof="schip12">
 		<description>Harvester Superchip 1.1 (Spanish)</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="52306">
 				<rom name="hvsc11s.opk" size="52306" crc="8b235ac7" sha1="fc8af39daba209b9aa6fafc20802a74356d0ea16" />
@@ -550,11 +603,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="schip12i">
+	<software name="schip12i" cloneof="schip12">
 		<description>Harvester Superchip 1.2 (Italian)</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="40884">
 				<rom name="hvsc12i.opk" size="40884" crc="55b1083b" sha1="e4b1cd281a10afb6d2c971331c64aa565a7f2c17" />
@@ -563,10 +616,10 @@ Undumped datapack:
 	</software>
 
 	<software name="infor23s">
-		<description>The Informed Organiser 2.3 (Spanish)</description>
-		<year>198?</year>
+		<description>Informed Organiser 2.3 (Spanish)</description>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="15904">
 				<rom name="hvio23s.opk" size="15904" crc="6610186b" sha1="9100666f4fc7ae9b67d499346f1955e938c8a79f" />
@@ -575,10 +628,10 @@ Undumped datapack:
 	</software>
 
 	<software name="infor23i">
-		<description>The Informed Organiser 2.3 (Italian)</description>
-		<year>198?</year>
+		<description>Informed Organiser 2.3 (Italian)</description>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16031">
 				<rom name="hvio23i.opk" size="16031" crc="ecac1464" sha1="4a19152755613337205c8a3749a252b509e7f513" />
@@ -587,10 +640,10 @@ Undumped datapack:
 	</software>
 
 	<software name="letor311">
-		<description>The Letter Organiser 3.11 (Italian)</description>
-		<year>198?</year>
+		<description>Letter Organiser 3.11 (Italian)</description>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16244">
 				<rom name="hvlo311i.opk" size="16244" crc="7cba777a" sha1="1f2a3b68bd6e2bee5f80e9410e8790e2c1c2fe28" />
@@ -599,73 +652,13 @@ Undumped datapack:
 	</software>
 
 	<software name="letor32s">
-		<description>The Letter Organiser 3.2 (Spanish)</description>
-		<year>198?</year>
+		<description>Letter Organiser 3.2 (Spanish)</description>
+		<year>1987</year>
 		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16374">
 				<rom name="hvlo32s.opk" size="16374" crc="cdcd065c" sha1="b96198b53eeadb1d5fbb2d8b12c2ff41848c0190" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="scior101">
-		<description>The Scientific Organiser v1.01</description>
-		<year>198?</year>
-		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="29394">
-				<rom name="hvso101.opk" size="29394" crc="69752fd1" sha1="fd7a54ec04d0efdee4601c0a10316d8edc403ade" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="safe">
-		<description>S.A.F.E.</description>
-		<year>198?</year>
-		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="41585">
-				<rom name="hvsafe.opk" size="41585" crc="6f306437" sha1="e24ad66550381b6c4413639d95e5f8c5a6157353" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sams13">
-		<description>S.A.M.S. v1.3</description>
-		<year>198?</year>
-		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="44571">
-				<rom name="hvsams13.opk" size="44571" crc="81488b12" sha1="92ad09a032d60993bff7ab0be37efc65a1aa35ec" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="slep">
-		<description>S.L.E.P</description>
-		<year>198?</year>
-		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="26686">
-				<rom name="hvslep.opk" size="26686" crc="a5476e29" sha1="23b596a46a1ae82a7c4d6837d7919cd33079a62d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sold12">
-		<description>S.O.L.D. v1.2</description>
-		<year>198?</year>
-		<publisher>Harvester Information Systems</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="42674">
-				<rom name="hvsold12.opk" size="42674" crc="a302f1a5" sha1="39111deada8cca0af85f09d2b4165c8ecfe5aa41" />
 			</dataarea>
 		</part>
 	</software>
@@ -674,7 +667,7 @@ Undumped datapack:
 		<description>Inkasencki v6.1</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="LZ/POS"/>
+		<sharedfeat name="compatibility" value="LZ,POS"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="48983">
 				<rom name="inkas.opk" size="48983" crc="fbade179" sha1="803c827124a59ff45ceaaf9f66b76b8ff08aba23" />
@@ -684,8 +677,8 @@ Undumped datapack:
 
 	<software name="jotter25">
 		<description>Jotter v2.5</description>
-		<year>198?</year>
-		<publisher>Camel Systems Ltd</publisher>
+		<year>1988</year>
+		<publisher>Camel Systems</publisher>
 		<sharedfeat name="compatibility" value="XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32749">
@@ -698,106 +691,10 @@ Undumped datapack:
 		<description>Maths Pack</description>
 		<year>1986</year>
 		<publisher>Psion</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16089">
 				<rom name="maths.opk" size="16089" crc="8cce0583" sha1="9b847068e2f6af575b1ba760245007f436bdf1dd" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="numbase">
-		<description>Numbase v1.23</description>
-		<year>198?</year>
-		<publisher>Eidersoft</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="32280">
-				<rom name="numbase.opk" size="32280" crc="c6eb1d7a" sha1="c16a48671cab827c37684907cbcff4bfd76d7bec" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="textbase">
-		<description>Textbase</description>
-		<year>198?</year>
-		<publisher>Eidersoft</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="15527">
-				<rom name="textbase.opk" size="15527" crc="84dcbde2" sha1="7d9e7b20012e51a958d49dc395898df6ac081435" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="persfin">
-		<description>Personal Finance</description>
-		<year>1987</year>
-		<publisher>Willow Enterprises Ltd</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="16179">
-				<rom name="persfin.opk" size="16179" crc="2fb0f433" sha1="21bedf9bd3de307650c9b6cad3f11dc9094d0a92" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="portfoli">
-		<description>Portfolio Pack</description>
-		<year>1987</year>
-		<publisher>DIP, Psion</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="16361">
-				<rom name="portfolio.opk" size="16361" crc="d2836be1" sha1="ca207dedec6f14c0c32ed1092ef13bdb60431ad4" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="result">
-		<description>Result Vers 4L</description>
-		<year>1989</year>
-		<publisher>Terrace Software</publisher>
-		<sharedfeat name="compatibility" value="LZ"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="16382">
-				<rom name="result.opk" size="16382" crc="8a7cd79f" sha1="40a385ab126c4a6b5ee23ed2097da15ec73aceb1" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sdrp">
-		<description>SDRP 01.05</description>
-		<year>198?</year>
-		<publisher>Datacom Group Ltd.</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="52878">
-				<rom name="sdrp.opk" size="52878" crc="550d0a7e" sha1="53669d69ec7aada6ea73f86697cd2eca6ed98a90" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cosc1">
-		<description>Concise Oxford Spelling Checker v0.1</description>
-		<year>1986</year>
-		<publisher>Psion</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="65537">
-				<rom name="spllchk1.opk" size="65537" crc="39348a17" sha1="ba85c07037bcc84774d00c58811d664af5b0338b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cosc2">
-		<description>Concise Oxford Spelling Checker v2.0</description>
-		<year>1989</year>
-		<publisher>Psion</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="65537">
-				<rom name="spllchk2.opk" size="65537" crc="8d23cb58" sha1="1cdf200e3361fd6dd4a64d56fc94397002084cfb" />
 			</dataarea>
 		</part>
 	</software>
@@ -806,7 +703,7 @@ Undumped datapack:
 		<description>National Survey Software v4.3</description>
 		<year>198?</year>
 		<publisher>Neil Draycott (?)</publisher>
-		<sharedfeat name="compatibility" value="LZ/LZ64"/>
+		<sharedfeat name="compatibility" value="LZ,LZ64"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="219159">
 				<rom name="nss43.opk" size="219159" crc="91b563c3" sha1="a72c6f6fd586d9400a2c3dfcb712d3175da46685" />
@@ -814,11 +711,48 @@ Undumped datapack:
 		</part>
 	</software>
 
+	<software name="numbase">
+		<description>Numbase v1.23</description>
+		<year>1987</year>
+		<publisher>Eidersoft</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="32280">
+				<rom name="numbase.opk" size="32280" crc="c6eb1d7a" sha1="c16a48671cab827c37684907cbcff4bfd76d7bec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="persfin">
+		<description>Personal Finance</description>
+		<year>1987</year>
+		<publisher>Willow Enterprises</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="16179">
+				<rom name="persfin.opk" size="16179" crc="2fb0f433" sha1="21bedf9bd3de307650c9b6cad3f11dc9094d0a92" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="portfoli">
+		<description>Portfolio</description>
+		<year>1987</year>
+		<publisher>Psion</publisher>
+		<info name="developer" value="Distributed Information Processing" />
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="16361">
+				<rom name="portfolio.opk" size="16361" crc="d2836be1" sha1="ca207dedec6f14c0c32ed1092ef13bdb60431ad4" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="purefin">
 		<description>Pure Finance Pack</description>
 		<year>1987</year>
-		<publisher>DIP</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<publisher>Distributed Information Processing</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16388">
 				<rom name="purfin.opk" size="16388" crc="0f7c25df" sha1="3c04b2273029cf0df4c7535c78e36afea06b52c4" />
@@ -829,8 +763,8 @@ Undumped datapack:
 	<software name="prakfrvc">
 		<description>Prakpak French Vocabulary I</description>
 		<year>198?</year>
-		<publisher>Mackay</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<publisher>Mackay Language Software</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32727">
 				<rom name="prakfrvc.opk" size="32727" crc="17137e83" sha1="e64f4da7bb1804bd759bdda9bab4d1122f12f6da" />
@@ -850,9 +784,93 @@ Undumped datapack:
 		</part>
 	</software>
 
+	<software name="result">
+		<description>Result Vers 4L</description>
+		<year>1989</year>
+		<publisher>Terrace Software</publisher>
+		<sharedfeat name="compatibility" value="LZ"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="16382">
+				<rom name="result.opk" size="16382" crc="8a7cd79f" sha1="40a385ab126c4a6b5ee23ed2097da15ec73aceb1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="safe">
+		<description>S.A.F.E. (Secure Access and Filing Efficiency)</description>
+		<year>198?</year>
+		<publisher>Harvester Information Systems</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="41585">
+				<rom name="hvsafe.opk" size="41585" crc="6f306437" sha1="e24ad66550381b6c4413639d95e5f8c5a6157353" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sams13">
+		<description>S.A.M.S. (Staff Attendance Monitoring System) v1.3</description>
+		<year>198?</year>
+		<publisher>Harvester Information Systems</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="44571">
+				<rom name="hvsams13.opk" size="44571" crc="81488b12" sha1="92ad09a032d60993bff7ab0be37efc65a1aa35ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scior101">
+		<description>Scientific Organiser v1.01</description>
+		<year>198?</year>
+		<publisher>Harvester Information Systems</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="29394">
+				<rom name="hvso101.opk" size="29394" crc="69752fd1" sha1="fd7a54ec04d0efdee4601c0a10316d8edc403ade" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdrp">
+		<description>SDRP 01.05</description>
+		<year>198?</year>
+		<publisher>Datacom Group</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="52878">
+				<rom name="sdrp.opk" size="52878" crc="550d0a7e" sha1="53669d69ec7aada6ea73f86697cd2eca6ed98a90" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slep">
+		<description>S.L.E.P. (Standard Letter Editing and Printing)</description>
+		<year>198?</year>
+		<publisher>Harvester Information Systems</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="26686">
+				<rom name="hvslep.opk" size="26686" crc="a5476e29" sha1="23b596a46a1ae82a7c4d6837d7919cd33079a62d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sold12">
+		<description>S.O.L.D. (Sales Organisation and Lead Development) v1.2</description>
+		<year>198?</year>
+		<publisher>Harvester Information Systems</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="42674">
+				<rom name="hvsold12.opk" size="42674" crc="a302f1a5" sha1="39111deada8cca0af85f09d2b4165c8ecfe5aa41" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ssheet12">
 		<description>Pocket Spreadsheet v1.2</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="XP"/>
 		<part name="cart" interface="psion_pack">
@@ -862,9 +880,9 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="ssheet13">
+	<software name="ssheet13" cloneof="ssheet34">
 		<description>Pocket Spreadsheet v1.3</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Psion</publisher>
 		<sharedfeat name="compatibility" value="XP"/>
 		<part name="cart" interface="psion_pack">
@@ -874,11 +892,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="ssheet33">
+	<software name="ssheet33" cloneof="ssheet34">
 		<description>Pocket Spreadsheet v3.3</description>
-		<year>1987</year>
+		<year>1989</year>
 		<publisher>Psion</publisher>
-		<sharedfeat name="compatibility" value="XP/LZ"/>
+		<sharedfeat name="compatibility" value="XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32504">
 				<rom name="sprdsht_v33.opk" size="32504" crc="28e2fcdb" sha1="f8869c5ff1bfb0ee4bec33eeadd5205962ec4ade" />
@@ -888,12 +906,24 @@ Undumped datapack:
 
 	<software name="ssheet34">
 		<description>Pocket Spreadsheet v3.4</description>
-		<year>1987</year>
+		<year>1989</year>
 		<publisher>Psion</publisher>
-		<sharedfeat name="compatibility" value="XP/LZ"/>
+		<sharedfeat name="compatibility" value="XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32508">
 				<rom name="sprdsht_v34.opk" size="32508" crc="6afc6dcc" sha1="b0b2059fd1c59ba7c7b55235745fd36186bdd5ca" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="textbase">
+		<description>Textbase</description>
+		<year>198?</year>
+		<publisher>Eidersoft</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
+		<part name="cart" interface="psion_pack">
+			<dataarea name="rom" size="15527">
+				<rom name="textbase.opk" size="15527" crc="84dcbde2" sha1="7d9e7b20012e51a958d49dc395898df6ac081435" />
 			</dataarea>
 		</part>
 	</software>
@@ -904,7 +934,7 @@ Undumped datapack:
 		<description>Thesaurus and Spelling Checker</description>
 		<year>1990</year>
 		<publisher>Psion</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="262150">
 				<rom name="thesaurus.opk" size="262150" crc="b24ca0af" sha1="31ba8482e5a0c17e2fe83341f393668c0bdcae0f" />
@@ -916,7 +946,7 @@ Undumped datapack:
 		<description>Top Finance v2.1</description>
 		<year>1988</year>
 		<publisher>Aware</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16338">
 				<rom name="topfin21.opk" size="16338" crc="480d3056" sha1="4d869fd7429465db78ceaa0f59ca5a447316474b" />
@@ -928,7 +958,7 @@ Undumped datapack:
 		<description>Top Finance v2.2</description>
 		<year>1988</year>
 		<publisher>Aware</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16350">
 				<rom name="topfin22.opk" size="16350" crc="8bfbfc3f" sha1="add342d0125896f802908bd6b6a13aa13a942311" />
@@ -936,11 +966,12 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="travel12">
+	<software name="travel12" cloneof="travel20">
 		<description>Travel Pack v1.2</description>
 		<year>1988</year>
-		<publisher>Organised Solutions Ltd, Psion</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<publisher>Psion</publisher>
+		<info name="developer" value="Organised Solutions" />
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="65458">
 				<rom name="travel12.opk" size="65458" crc="03946bc2" sha1="49be125001d557ea654aabd2dabab5c4f71f626f" />
@@ -948,11 +979,12 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="travel15">
+	<software name="travel15" cloneof="travel20">
 		<description>Travel Pack v1.5</description>
-		<year>1988</year>
-		<publisher>Organised Solutions Ltd, Psion</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<year>1989</year>
+		<publisher>Psion</publisher>
+		<info name="developer" value="Organised Solutions" />
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="65493">
 				<rom name="travel15.opk" size="65493" crc="38310574" sha1="5be0e7b121998c7d238fe8c639b732d0272d70ea" />
@@ -963,8 +995,9 @@ Undumped datapack:
 	<software name="travel20">
 		<description>Travel Pack v2.0</description>
 		<year>198?</year>
-		<publisher>Organised Solutions Ltd, Psion</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<publisher>Psion</publisher>
+		<info name="developer" value="Organised Solutions" />
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="65535">
 				<rom name="travel20.opk" size="65535" crc="2f00fb63" sha1="ec1898eb489ba01c137d712d9dd604f4da699124" />
@@ -972,11 +1005,11 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="xbase20">
+	<software name="xbase20" cloneof="xbase30">
 		<description>XBase v2.0</description>
-		<year>198?</year>
+		<year>1988</year>
 		<publisher>Cubsoft</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16350">
 				<rom name="xbase2.opk" size="16350" crc="faecaac5" sha1="6bcc4d0fed68fdac3c628ab5858c6a81da7627a7" />
@@ -986,9 +1019,9 @@ Undumped datapack:
 
 	<software name="xbase30">
 		<description>XBase v3.0</description>
-		<year>198?</year>
+		<year>1990</year>
 		<publisher>Cubsoft</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16350">
 				<rom name="xbase3.opk" size="16336" crc="4a97fe68" sha1="a1dde293b421ffbb248459e2af465fdbdba7f2bb" />
@@ -997,10 +1030,10 @@ Undumped datapack:
 	</software>
 
 	<software name="xforma">
-		<description>Formulator (Alt)</description>
+		<description>Formulator (alt)</description>
 		<year>198?</year>
-		<publisher>Psion Ltd</publisher>
-		<sharedfeat name="compatibility" value="XP/LZ"/>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="32773">
 				<rom name="xforma.opk" size="32773" crc="462ad96e" sha1="221235da3ecf22ac71a7ab248afc2d681ccd6d6d" />
@@ -1011,8 +1044,8 @@ Undumped datapack:
 	<software name="xformtop">
 		<description>Formulator Top</description>
 		<year>198?</year>
-		<publisher>Psion Ltd</publisher>
-		<sharedfeat name="compatibility" value="XP/LZ"/>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="47862">
 				<rom name="xformtop.opk" size="47862" crc="9e109d42" sha1="a91e9eb195ce865c38099cd56ceb29ec52323377" />
@@ -1020,12 +1053,14 @@ Undumped datapack:
 		</part>
 	</software>
 
+	<!-- Pack images related to hardware devices -->
+
 	<software name="diallink">
 		<!-- Software to control the Dial-Link dialler device (which does not have built-in ROM software). -->
 		<description>Dial-Link</description>
 		<year>198?</year>
 		<publisher>Widget Software</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16275">
 				<rom name="diallink.opk" size="16275" crc="e435edd2" sha1="394e343881b669d8764304706d788df4fd029632" />
@@ -1037,8 +1072,9 @@ Undumped datapack:
 		<!-- Software to control the Digitron SF10 Logger device (which does not have built-in ROM software) and for logging its readings. -->
 		<description>Digitron SF10 v1.10</description>
 		<year>198?</year>
-		<publisher>Silvertree Eng., Digitron Inst.</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<publisher>Digitron Instrumentation</publisher>
+		<info name="developer" value="Silvertree Engineering" />
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="29134">
 				<rom name="digitron110.opk" size="29134" crc="37d2dcee" sha1="05a17b8fdd0206fe1dd4e496aed1a973b9591402" />
@@ -1050,8 +1086,9 @@ Undumped datapack:
 		<!-- Software to control the Digitron SF10 Logger device (which does not have built-in ROM software) and for logging its readings. -->
 		<description>Digitron SF10 v1.14</description>
 		<year>198?</year>
-		<publisher>Silvertree Eng., Digitron Inst.</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<publisher>Digitron Instrumentation</publisher>
+		<info name="developer" value="Silvertree Engineering" />
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="29326">
 				<rom name="digitron114.opk" size="29326" crc="a838a41c" sha1="22b2e76828dafcdf8caab7c651f7078e730f1a39" />
@@ -1063,47 +1100,36 @@ Undumped datapack:
 		<!-- Software to control the Digitron SF12 Logger device (which does not have built-in ROM software) and for logging its readings. -->
 		<description>Digitron SF12 v2.7</description>
 		<year>198?</year>
-		<publisher>Silvertree Eng., Digitron Inst.</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<publisher>Digitron Instrumentation</publisher>
+		<info name="developer" value="Silvertree Engineering" />
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="54157">
-				<rom name="digitron27.opk" size="54157" crc="aa2a1682" sha1="d6b3362574c5171350bf1f8320b566e1a65d1a7a" />
+				<rom name="digitron27.opk" size="54157" crc="0d512c87" sha1="0987a1a549dce771814d879730c500e4c645942e" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="fpakdriv">
-		<!-- A datapak with the flashpak driver, which can be used to reformat a flashpak in the other slot. -->
-		<description>FlashPak Driver v1.9</description>
+	<software name="dynaplat" supported="no">
+		<!-- Staff attendance software for use with the Dyna/Poll 485 system. -->
+		<description>Dynapoll Attend</description>
 		<year>198?</year>
-		<publisher>Psion</publisher>
-		<sharedfeat name="compatibility" value="XP/LZ"/>
+		<publisher>Dynasys Technologies</publisher>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="7135">
-				<rom name="flashpak.opk" size="7135" crc="1138998a" sha1="954a60febab3c86233e2d62ddf42d6e4940eb858" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="geac" supported="no">
-		<!-- Software for library stock tracking. Uses a bar code reader. -->
-		<description>GEAC Program Pack</description>
-		<year>198?</year>
-		<publisher>Psion</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="29662">
-				<rom name="geac.opk" size="29662" crc="2787177f" sha1="ff39d6158111a807a44832b89d092dacbd083fe7" />
+			<dataarea name="rom" size="3677">
+				<rom name="dynaplat.opk" size="3677" crc="5ac6177f" sha1="205dc67dbf5ff265ba04b8f0fdb0ce9a160f784c" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="plink22f" supported="no">
 		<!-- French language software for use with versions of the Paralink that did not have the software built in. -->
-		<description>Paralink 2.2 French</description>
+		<description>Paralink 2.2 (French)</description>
 		<year>198?</year>
-		<publisher>Widget Software, Silvertree Eng.</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<publisher>Widget Software</publisher>
+		<info name="developer" value="Silvertree Engineering" />
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="7983">
 				<rom name="paralink22f.opk" size="7983" crc="5bad3e99" sha1="216da892a6c4877678effc5bfc0346279e66a608" />
@@ -1129,8 +1155,8 @@ Undumped datapack:
 		<!-- This file contains the software that should be installed on a pack using the Organiser Developer kit. -->
 		<description>One-Way Interface</description>
 		<year>198?</year>
-		<publisher>On-Line Design Inc</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<publisher>On-Line Design</publisher>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="2430">
 				<rom name="owi.bin" size="2430" crc="958509a9" sha1="934a729911d070c7de106684c354eebf16ee78ae" />
@@ -1141,8 +1167,8 @@ Undumped datapack:
 	<software name="psitex20">
 		<!-- Software used for programming the Microtima Series 4 Year -->
 		<!-- Programmable Controller which is connected through the Comms Link. -->
-		<description>PsiTex v2.000</description>
-		<year>198?</year>
+		<description>PSitex v2.000</description>
+		<year>1998</year>
 		<publisher>Microtima</publisher>
 		<sharedfeat name="compatibility" value="LZ"/>
 		<part name="cart" interface="psion_pack">
@@ -1155,8 +1181,8 @@ Undumped datapack:
 	<software name="sigset20">
 		<!-- Software used for programming type 141 Traffic Light Controllers -->
 		<!-- which are connected through the Comms Link. -->
-		<description>SigSet v2.01</description>
-		<year>198?</year>
+		<description>Sig-Set v2.01</description>
+		<year>1990</year>
 		<publisher>Microtima</publisher>
 		<sharedfeat name="compatibility" value="LZ"/>
 		<part name="cart" interface="psion_pack">
@@ -1172,7 +1198,7 @@ Undumped datapack:
 		<description>Sony Lisa-1 v3.0</description>
 		<year>198?</year>
 		<publisher>Sony</publisher>
-		<sharedfeat name="compatibility" value="CM/XP/LZ"/>
+		<sharedfeat name="compatibility" value="CM,XP,LZ"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16521">
 				<rom name="sony_lisa1.opk" size="16521" crc="417a9b34" sha1="b2747bcf6be33f0c27f263dbbdfe2512e68e1810" />
@@ -1185,7 +1211,7 @@ Undumped datapack:
 		<description>Sony Dealer Commander v2.2</description>
 		<year>198?</year>
 		<publisher>Sony</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
+		<sharedfeat name="compatibility" value="CM,XP"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="9789">
 				<rom name="sony_prm1.opk" size="9789" crc="2983982e" sha1="13caa1fee9578759401c1dcc091d8de4f5cca1da" />
@@ -1193,25 +1219,12 @@ Undumped datapack:
 		</part>
 	</software>
 
-	<software name="dynaplat" supported="no">
-		<!-- Staff attendance software for use with the Dyna/Poll 485 system. -->
-		<description>Dynapoll Attend</description>
-		<year>198?</year>
-		<publisher>Dynasys Technologies Inc.</publisher>
-		<sharedfeat name="compatibility" value="CM/XP"/>
-		<part name="cart" interface="psion_pack">
-			<dataarea name="rom" size="3677">
-				<rom name="dynaplat.opk" size="3677" crc="5ac6177f" sha1="205dc67dbf5ff265ba04b8f0fdb0ce9a160f784c" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="trep16" supported="no">
 		<!-- Time Recording for Excel Packages. -->
 		<description>T.R.E.P v1.6</description>
-		<year>198?</year>
-		<publisher>APT Projects Ltd.</publisher>
-		<sharedfeat name="compatibility" value="LZ/LZ64"/>
+		<year>1991</year>
+		<publisher>APT Projects</publisher>
+		<sharedfeat name="compatibility" value="LZ,LZ64"/>
 		<part name="cart" interface="psion_pack">
 			<dataarea name="rom" size="16667">
 				<rom name="treplz16.opk" size="16667" crc="3d270a1e" sha1="f1c460ee457dac2f311cab98c0a374065ba85cbd" />
@@ -1226,7 +1239,7 @@ Undumped datapack:
 		<description>RS232 Link 1.1</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="8137">
 				<rom name="comms11.opk" size="8137" crc="48c1564b" sha1="2c81bc1174290ed825945508f5ff4f62505831d6" />
 			</dataarea>
@@ -1237,7 +1250,7 @@ Undumped datapack:
 		<description>RS232 Link 1.5</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="7736">
 				<rom name="comms15.opk" size="7736" crc="b11cd524" sha1="b7d09c946c45915f854ac79cab24f652914ebd68" />
 			</dataarea>
@@ -1248,7 +1261,7 @@ Undumped datapack:
 		<description>Comms Link 2.2</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="22448">
 				<rom name="comms22.opk" size="22448" crc="5e5dc3eb" sha1="7901979615bbdb2a1f260cc8eed447c99723d18b" />
 			</dataarea>
@@ -1259,7 +1272,7 @@ Undumped datapack:
 		<description>Comms Link 2.4</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="22515">
 				<rom name="comms24.opk" size="22515" crc="3a42d92f" sha1="b7603f07f5479b1939e0486d819e1552a0e7dcac" />
 			</dataarea>
@@ -1270,7 +1283,7 @@ Undumped datapack:
 		<description>Comms Link 2.5</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="22510">
 				<rom name="comms25.opk" size="22510" crc="5c985379" sha1="dd4e5d17b83883cac75c5220dad0c51ddb6ba1c1" />
 			</dataarea>
@@ -1281,7 +1294,7 @@ Undumped datapack:
 		<description>Comms Link 4.0</description>
 		<year>1987</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="32312">
 				<rom name="comms40.opk" size="32312" crc="9d210b51" sha1="2307a773b30a95f3f09225821d619ff6cdd8ae7d" />
 			</dataarea>
@@ -1292,7 +1305,7 @@ Undumped datapack:
 		<description>Comms Link 4.1</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="32403">
 				<rom name="comms41.opk" size="32403" crc="dfb1dc85" sha1="4f0a6dd1cdeb4d3ed0d8e84017e2d73ac7f5e0c2" />
 			</dataarea>
@@ -1303,7 +1316,7 @@ Undumped datapack:
 		<description>Comms Link 4.2</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="32411">
 				<rom name="comms42.opk" size="32411" crc="9d7aa280" sha1="2d31f4c48f222ffa67fafe5689cc19d8187eafed" />
 			</dataarea>
@@ -1315,7 +1328,7 @@ Undumped datapack:
 		<description>Comms Modem v3.0</description>
 		<year>198?</year>
 		<publisher>Extech</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="25112">
 				<rom name="barcomm30.opk" size="25112" crc="58770787" sha1="129ec0fd2642bdef02a92e8432825f650cfacfbd" />
 			</dataarea>
@@ -1327,7 +1340,7 @@ Undumped datapack:
 		<description>Extech Comms Printer II 4.3</description>
 		<year>198?</year>
 		<publisher>Extech</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="46397">
 				<rom name="extprt43.opk" size="46397" crc="443d0905" sha1="10a3576786f5ac65082b2856bc1578373f30d6fc" />
 			</dataarea>
@@ -1338,8 +1351,8 @@ Undumped datapack:
 		<!-- The Dynapen contains Comms Link version 4.4 together with Bar Code Reader menu item and utilities. -->
 		<description>Dynapen 4.4</description>
 		<year>198?</year>
-		<publisher>Dynasys Technologies Inc.</publisher>
-		<part name="cart" interface="psion_pack">
+		<publisher>Dynasys Technologies</publisher>
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="55408">
 				<rom name="dynapen44.opk" size="55408" crc="fecb74ce" sha1="452c3776029475d025d9f7cfd562e3c5f24fe310" />
 			</dataarea>
@@ -1350,8 +1363,8 @@ Undumped datapack:
 		<!-- The Dynapen contains Comms Link version 4.3 together with Bar Code Reader menu item and utilities. -->
 		<description>Dynapen v4.3</description>
 		<year>198?</year>
-		<publisher>Dynasys Technologies Inc.</publisher>
-		<part name="cart" interface="psion_pack">
+		<publisher>Dynasys Technologies</publisher>
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="52482">
 				<rom name="dynapen43.opk" size="52482" crc="6f2d2423" sha1="86c3452242a0782656bfbefd07e22eda75482f79" />
 			</dataarea>
@@ -1362,8 +1375,8 @@ Undumped datapack:
 		<!-- The Dynasys Relay-Comm contains an adapted version of the Comms Link version 4.2 software. -->
 		<description>Dynasys Relay-Comm v4.2</description>
 		<year>198?</year>
-		<publisher>Dynasys Technologies Inc.</publisher>
-		<part name="cart" interface="psion_pack">
+		<publisher>Dynasys Technologies</publisher>
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="47391">
 				<rom name="relay42.opk" size="47391" crc="ab218a1e" sha1="3b138489f0fbb00e027a3ca67cc33a7b09052c63" />
 			</dataarea>
@@ -1375,8 +1388,8 @@ Undumped datapack:
 		<!-- It inserts the Comms menu item, a Port menu item for choosing the comms ports, and a Bcode menu item with bar code utilities. -->
 		<description>Dynasys Barcomm 2 v4.2</description>
 		<year>198?</year>
-		<publisher>Dynasys Technologies Inc.</publisher>
-		<part name="cart" interface="psion_pack">
+		<publisher>Dynasys Technologies</publisher>
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="52674">
 				<rom name="barcomm42.opk" size="52674" crc="d099ef44" sha1="38c277f8f71b10780cdc34da8f7c8c356c6b2585" />
 			</dataarea>
@@ -1386,8 +1399,8 @@ Undumped datapack:
 	<software name="dynapoll" supported="no">
 		<description>Dyna/Poll 485 station v1.0</description>
 		<year>198?</year>
-		<publisher>Dynasys Technologies Inc.</publisher>
-		<part name="cart" interface="psion_pack">
+		<publisher>Dynasys Technologies</publisher>
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="1545">
 				<rom name="dynapoll.opk" size="1545" crc="3d6d1f77" sha1="b02dd1d1b9e0558cc7844ed8d029b958f13ca67c" />
 			</dataarea>
@@ -1398,7 +1411,7 @@ Undumped datapack:
 		<description>Psion Printer 1.6</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="4550">
 				<rom name="printer16.opk" size="4550" crc="cb3c7bff" sha1="b3d3ef91ce07584504a5ddc92503e2bc291c8832" />
 			</dataarea>
@@ -1409,7 +1422,7 @@ Undumped datapack:
 		<description>Psion Printer 2.1</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="4913">
 				<rom name="printer21.opk" size="4913" crc="701f489e" sha1="784d07d2ad525bed5dc9511bd1716029cc91f1fc" />
 			</dataarea>
@@ -1420,7 +1433,7 @@ Undumped datapack:
 		<description>Psion Printer 2.2</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="4945">
 				<rom name="printer22.opk" size="4945" crc="d12a5b5d" sha1="18b2b5e7d84c8dbe7fe96c9c046e8239af65b9e6" />
 			</dataarea>
@@ -1431,7 +1444,7 @@ Undumped datapack:
 		<description>Magnetic Card Reader 2.0</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="748">
 				<rom name="swipe20.opk" size="748" crc="a7d1d051" sha1="325ac98d9330bb68d23d72610899c9176998a26b" />
 			</dataarea>
@@ -1439,10 +1452,10 @@ Undumped datapack:
 	</software>
 
 	<software name="bcread31" supported="no">
-		<description>Bad Code Reader 3.1</description>
+		<description>Bar Code Reader 3.1</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="11263">
 				<rom name="bar31.opk" size="11263" crc="3951726d" sha1="4ae19527dee89dc2909e716d1dbff40f17a1f361" />
 			</dataarea>
@@ -1450,10 +1463,10 @@ Undumped datapack:
 	</software>
 
 	<software name="bcread32" supported="no">
-		<description>Bad Code Reader 3.2</description>
+		<description>Bar Code Reader 3.2</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="11375">
 				<rom name="bar32.opk" size="11375" crc="d5c7079c" sha1="a04eeafcc3125131d18a0063b7db56e7a59f5108" />
 			</dataarea>
@@ -1464,7 +1477,7 @@ Undumped datapack:
 		<description>Pager 1.3</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="15226">
 				<rom name="pager13.opk" size="15226" crc="05045d72" sha1="4ccc8d32d34e65ec0bc3b0f50cda9b1146d1b6af" />
 			</dataarea>
@@ -1474,8 +1487,9 @@ Undumped datapack:
 	<software name="plink20" supported="no">
 		<description>Paralink 2.0</description>
 		<year>1989</year>
-		<publisher>Silvertree Engineering Ltd.</publisher>
-		<part name="cart" interface="psion_pack">
+		<publisher>Widget Software</publisher>
+		<info name="developer" value="Silvertree Engineering" />
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="6062">
 				<rom name="paralink20.opk" size="6062" crc="75a3596d" sha1="43dfdd4b39d9da00ccb7aa74b66d610e90867b75" />
 			</dataarea>
@@ -1485,8 +1499,9 @@ Undumped datapack:
 	<software name="plink33" supported="no">
 		<description>Paralink 3.3</description>
 		<year>198?</year>
-		<publisher>Silvertree Engineering Ltd.</publisher>
-		<part name="cart" interface="psion_pack">
+		<publisher>Widget Software</publisher>
+		<info name="developer" value="Silvertree Engineering" />
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="16352">
 				<rom name="paralink33.opk" size="16352" crc="b672445b" sha1="b3b49dd46fa6b0753d8aa5df4e447c263dbb58f5" />
 			</dataarea>
@@ -1496,8 +1511,9 @@ Undumped datapack:
 	<software name="plink34" supported="no">
 		<description>Paralink 3.4</description>
 		<year>198?</year>
-		<publisher>Silvertree Engineering Ltd.</publisher>
-		<part name="cart" interface="psion_pack">
+		<publisher>Widget Software</publisher>
+		<info name="developer" value="Silvertree Engineering" />
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="16352">
 				<rom name="paralink34.opk" size="16352" crc="3a22f0ae" sha1="e55cf03aed678da812096a926e70355f26ea2229" />
 			</dataarea>
@@ -1508,7 +1524,7 @@ Undumped datapack:
 		<description>Andover Controls Hand-Held Operator's Terminal</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="12959">
 				<rom name="andover.opk" size="12959" crc="dee5a895" sha1="a2fe553b3d0d5dc38ec5efb393e665676223b3dd" />
 			</dataarea>
@@ -1519,7 +1535,7 @@ Undumped datapack:
 		<description>CNF41 HART interface 1.0</description>
 		<year>198?</year>
 		<publisher>Psion</publisher>
-		<part name="cart" interface="psion_pack">
+		<part name="cart" interface="psion_topslot">
 			<dataarea name="rom" size="60686">
 				<rom name="cnf41_10.opk" size="60686" crc="720be551" sha1="74b7162acbada7f35a77010c201cf5506d909aae" />
 			</dataarea>

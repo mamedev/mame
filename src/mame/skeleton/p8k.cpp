@@ -112,11 +112,11 @@ private:
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 
-	void p8k_16_datamap(address_map &map);
-	void p8k_16_iomap(address_map &map);
-	void p8k_16_memmap(address_map &map);
-	void p8k_iomap(address_map &map);
-	void p8k_memmap(address_map &map);
+	void p8k_16_datamap(address_map &map) ATTR_COLD;
+	void p8k_16_iomap(address_map &map) ATTR_COLD;
+	void p8k_16_memmap(address_map &map) ATTR_COLD;
+	void p8k_iomap(address_map &map) ATTR_COLD;
+	void p8k_memmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu; // Z80 or Z8001 depending on the machine
 	optional_device<p8k_16_daisy_device> m_daisy;

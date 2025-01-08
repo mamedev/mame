@@ -27,9 +27,9 @@ public:
 	vtech_laser110_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual void mem_map(address_map &map) override;
+	virtual void mem_map(address_map &map) override ATTR_COLD;
 };
 
 // ======================> vtech_laser210_16k_device
@@ -41,9 +41,9 @@ public:
 	vtech_laser210_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual void mem_map(address_map &map) override;
+	virtual void mem_map(address_map &map) override ATTR_COLD;
 };
 
 // ======================> vtech_laser310_16k_device
@@ -55,9 +55,9 @@ public:
 	vtech_laser310_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual void mem_map(address_map &map) override;
+	virtual void mem_map(address_map &map) override ATTR_COLD;
 };
 
 // ======================> vtech_laser_64k_device
@@ -69,10 +69,10 @@ public:
 	vtech_laser_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual void mem_map(address_map &map) override;
-	virtual void io_map(address_map &map) override;
+	virtual void mem_map(address_map &map) override ATTR_COLD;
+	virtual void io_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_memory_bank m_fixed_bank;

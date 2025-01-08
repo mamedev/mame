@@ -122,7 +122,7 @@ public:
 	void vpoker(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	std::unique_ptr<uint8_t[]> m_videoram;
@@ -135,7 +135,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_ioport m_in0;
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 

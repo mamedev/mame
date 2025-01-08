@@ -28,13 +28,16 @@ public:
 	auto write_adb_st() { return m_adb_st.bind(); } // ADB state
 	auto write_cb1() { return m_cb1.bind(); }   // ADB clock
 	auto write_cb2() { return m_cb2.bind(); }   // ADB data
+	auto write_dfac_clock() { return m_dfac_clock_w.bind(); }
+	auto write_dfac_data() { return m_dfac_data_w.bind(); }
+	auto write_dfac_latch() { return m_dfac_latch_w.bind(); }
 
 	auto read_pa1()  { return m_pa1.bind(); }   // ID bits
 	auto read_pa2()  { return m_pa2.bind(); }
 	auto read_pa4()  { return m_pa4.bind(); }
 	auto read_pa6()  { return m_pa6.bind(); }
 
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_scsi_tag(T &&... args) { m_ncr.set_tag(std::forward<T>(args)...); }
@@ -58,9 +61,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual uint8_t via_in_b();
 	virtual void via_out_b(uint8_t data);
@@ -69,7 +72,7 @@ protected:
 	virtual void iosb_regs_w(offs_t offset, u16 data, u16 mem_mask);
 
 	devcb_write8 m_adb_st;
-	devcb_write_line m_cb1, m_cb2;
+	devcb_write_line m_cb1, m_cb2, m_dfac_clock_w, m_dfac_data_w, m_dfac_latch_w;
 	devcb_read_line m_pa1, m_pa2, m_pa4, m_pa6;
 
 	required_device<m68000_musashi_device> m_maincpu;
@@ -107,6 +110,7 @@ private:
 	void field_interrupts();
 	void via_out_cb1(int state);
 	void via_out_cb2(int state);
+	void via2_out_b(uint8_t data);
 	void via1_irq(int state);
 	void via2_irq(int state);
 	void asc_irq(int state);
@@ -129,7 +133,7 @@ public:
 	iosb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual uint8_t via_in_b() override;
 	virtual void via_out_b(uint8_t data) override;
@@ -166,12 +170,12 @@ public:
 	// construction/destruction
 	primetimeii_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 	void ata_irq_w(int state);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	u16 ata_regs_r(offs_t offset);

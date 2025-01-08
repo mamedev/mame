@@ -140,8 +140,8 @@ public:
 	void bbusters(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -170,9 +170,9 @@ private:
 	template<int Layer> void pf_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void coin_counter_w(uint8_t data);
 
-	void bbusters_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void bbusters_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 
 	uint16_t eprom_r(offs_t offset);
 	void three_gun_output_w(uint16_t data);

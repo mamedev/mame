@@ -13,9 +13,6 @@
 
 #pragma once
 
-#include "debugcpu.h"
-#include "debugcon.h"
-
 #include <string_view>
 
 

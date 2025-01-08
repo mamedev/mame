@@ -74,9 +74,9 @@ public:
 	void superwng(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -111,8 +111,8 @@ private:
 	void main_nmi_interrupt(int state);
 	INTERRUPT_GEN_MEMBER(sound_nmi_assert);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 void superwng_state::unk_a187_w(uint8_t data)
@@ -223,7 +223,7 @@ void superwng_state::palette(palette_device &palette) const
 
 		bit0 = BIT(colors[i], 6);
 		bit1 = BIT(colors[i], 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 
-Compaibility flags:
+Compatibility flags:
 3: needs MP1805 fdc
 5: needs MP1802 fdc
 
@@ -40,20 +40,23 @@ Compaibility flags:
 		</part>
 	</software>
 
-	<software name="ma5370" supported="no"><!-- mame crashes in the floppy subsystem -->
-		<description>MA5370</description>
+	<software name="ma5370" supported="no">
+		<description>MA-5370 Disk BASIC (Version 1.1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+"Device I/O Error" when FILES is issued.
+]]></notes>
 		<sharedfeat name="compatibility" value="3" />
 		<part name="disk" interface="floppy_3">
 			<dataarea name="flop" size="0x2d2b0">
-				<rom name="ma5370.d88" size="0x2d2b0" crc="04bfeb8a" sha1="e273c53286144d2cbdc1a9616945bf2c2f5267d5" />
+				<rom name="ma5370.d88" size="0x2d2b0" crc="ebbd9f99" sha1="052d942af0d5ae97a838f4df96a4d6cf10cc7553" status="baddump" /><!-- all tracks hacked to single density -->
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="dbu">
-		<description>Disk Basic and Utilities</description>
+		<description>Disk BASIC and Utilities</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="5" />
@@ -64,10 +67,14 @@ Compaibility flags:
 		</part>
 	</software>
 
-	<software name="fcg6890">
-		<description>FCG6890</description><!-- some kind of graphics package -->
+	<software name="fcg6890" supported="partial">
+		<!-- TODO: find actual title, "Font Character Generator 6890"? -->
+		<description>FCG6890</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Assume optional light pen or mouse support
+]]></notes>
 		<sharedfeat name="compatibility" value="5" />
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="0x54ab0">
@@ -107,7 +114,7 @@ Compaibility flags:
 		<sharedfeat name="compatibility" value="5" />
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="0x54ab0">
-				<rom name="tetris.d88" size="0x54ab0" crc="484cf520" sha1="adb4d687e8ace9e35b7bc9f9a20a9cc5c5cf6ae7" />
+				<rom name="subtreas.d88" size="0x54ab0" crc="484cf520" sha1="adb4d687e8ace9e35b7bc9f9a20a9cc5c5cf6ae7" />
 			</dataarea>
 		</part>
 	</software>

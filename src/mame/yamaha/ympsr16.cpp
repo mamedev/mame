@@ -23,7 +23,7 @@
 
 #include "emu.h"
 //#include "bus/midi/midi.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 
 namespace {
 
@@ -42,16 +42,16 @@ public:
 	void pss680(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 busy_r();
 	void bank_w(u8 data);
 
-	void common_map(address_map &map);
-	void psr16_map(address_map &map);
-	void psr36_map(address_map &map);
-	void pss680_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void psr16_map(address_map &map) ATTR_COLD;
+	void psr36_map(address_map &map) ATTR_COLD;
+	void pss680_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	optional_memory_bank m_rombank;
@@ -122,7 +122,7 @@ INPUT_PORTS_END
 
 void yamaha_psr16_state::psr16(machine_config &config)
 {
-	M65C02(config, m_maincpu, 5.5_MHz_XTAL / 4); // XTAL value from PSS-480; internal divider guessed
+	W65C02(config, m_maincpu, 5.5_MHz_XTAL / 4); // XTAL value from PSS-480; internal divider guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &yamaha_psr16_state::psr16_map);
 }
 
@@ -186,8 +186,8 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1988, psr16,  0,      0, psr16,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-16",  MACHINE_IS_SKELETON)
-SYST(1988, psr36,  0,      0, psr36,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-36",  MACHINE_IS_SKELETON)
-SYST(1988, pss480, 0,      0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-480 / PSS-580", MACHINE_IS_SKELETON)
-SYST(1988, pss680, 0,      0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-680", MACHINE_IS_SKELETON)
-SYST(1989, pss780, pss680, 0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-780", MACHINE_IS_SKELETON)
+SYST(1988, psr16,  0,      0, psr16,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-16",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1988, psr36,  0,      0, psr36,  psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSR-36",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1988, pss480, 0,      0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-480 / PSS-580", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1988, pss680, 0,      0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-680", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1989, pss780, pss680, 0, pss680, psr16, yamaha_psr16_state, empty_init, "Yamaha", "PSS-780", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

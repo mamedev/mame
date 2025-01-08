@@ -19,9 +19,9 @@
 
     Each keyboard has a different matrix layout, so the same key may appear
     at different indices on different keyboards. The one consistent feature
-    is the reservation of one row for an ID code. Some keyboards also have
-    LEDs whose state can be set by sending a few additional pulses
-    following the ID row.
+    is the reservation of one row for an ID code (though this is absent on
+    the earliest keyboards). Some keyboards also have LEDs whose state can
+    be set by sending a few additional pulses following the ID row.
 
 ***************************************************************************/
 
@@ -68,6 +68,16 @@ wyse_keyboard_interface::~wyse_keyboard_interface()
 //**************************************************************************
 //  KEYBOARD OPTIONS
 //**************************************************************************
+
+void wy85_keyboards(device_slot_interface &slot)
+{
+	slot.option_add("wy85", WY85_KEYBOARD);
+}
+
+void wy30_keyboards(device_slot_interface &slot)
+{
+	slot.option_add("wy30", WY30_KEYBOARD);
+}
 
 void wy60_keyboards(device_slot_interface &slot)
 {

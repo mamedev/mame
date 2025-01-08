@@ -27,7 +27,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void newcanasta_map(address_map &map);
+	void newcanasta_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -81,4 +81,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(2010, newcanasta, 0, newcanasta, newcanasta, newcanasta_state, empty_init, ROT0, "Marsaplay", "New Canasta", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(2010, newcanasta, 0, newcanasta, newcanasta, newcanasta_state, empty_init, ROT0, "Marsaplay", "New Canasta", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

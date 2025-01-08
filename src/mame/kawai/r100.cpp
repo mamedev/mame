@@ -30,7 +30,7 @@ public:
 	void r100(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -41,8 +41,8 @@ private:
 	void p3_w(u8 data);
 	void buffer_w(u8 data);
 
-	void main_map(address_map &map);
-	void data_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	required_device<m50734_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
@@ -153,4 +153,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1987, r100, 0, 0, r100, r100, kawai_r100_state, empty_init, "Kawai Musical Instrument Manufacturing", "R-100 Digital Drum Machine", MACHINE_IS_SKELETON)
+SYST(1987, r100, 0, 0, r100, r100, kawai_r100_state, empty_init, "Kawai Musical Instrument Manufacturing", "R-100 Digital Drum Machine", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

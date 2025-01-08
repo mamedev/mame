@@ -27,7 +27,7 @@ public:
 	void gs6502(machine_config &config);
 
 private:
-	void gs6502_mem(address_map &map);
+	void gs6502_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia;

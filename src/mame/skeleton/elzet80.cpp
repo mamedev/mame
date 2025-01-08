@@ -72,13 +72,13 @@ public:
 	void elzet80(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	floppy_image_device *m_floppy = nullptr;
 	required_device<cpu_device> m_maincpu;
@@ -181,5 +181,5 @@ ROM_END
 } // Anonymous namespace
 
 //    YEAR  NAME        PARENT    COMPAT    MACHINE     INPUT        CLASS           INIT             COMPANY          FULLNAME               FLAGS
-COMP( 1982, elzet80k,   elzet80p, 0,        elzet80,   elzet80,    elzet80_state, empty_init,     "Giesler & Danne GmbH & Co. KG",  "Elzet/K 80",        MACHINE_IS_SKELETON )
-COMP( 1982, elzet80p,   0,        0,        elzet80,   elzet80,    elzet80_state, empty_init,     "Giesler & Danne GmbH & Co. KG",  "Elzet/P 80",        MACHINE_IS_SKELETON )
+COMP( 1982, elzet80k,   elzet80p, 0,        elzet80,   elzet80,    elzet80_state, empty_init,     "Giesler & Danne GmbH & Co. KG",  "Elzet/K 80",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1982, elzet80p,   0,        0,        elzet80,   elzet80,    elzet80_state, empty_init,     "Giesler & Danne GmbH & Co. KG",  "Elzet/P 80",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

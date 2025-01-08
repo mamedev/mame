@@ -65,11 +65,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void emu3_map(address_map &map);
+	void emu3_map(address_map &map) ATTR_COLD;
 
 	void palette_init(palette_device &palette);
 
@@ -283,7 +283,7 @@ INPUT_CHANGED_MEMBER(emu3_state::nmi_button)
 
 static INPUT_PORTS_START(emu3)
 	PORT_START("ddt")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D') PORT_CHANGED_MEMBER(DEVICE_SELF, emu3_state, nmi_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(emu3_state::nmi_button), 0)
 INPUT_PORTS_END
 
 ROM_START(emu3)
@@ -298,4 +298,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1987, emu3, 0, 0, emu3, emu3, emu3_state, empty_init, "E-mu Systems", "Emulator Three Digital Sound Production System", MACHINE_IS_SKELETON)
+SYST(1987, emu3, 0, 0, emu3, emu3, emu3_state, empty_init, "E-mu Systems", "Emulator Three Digital Sound Production System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

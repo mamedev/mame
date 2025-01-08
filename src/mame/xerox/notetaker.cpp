@@ -147,14 +147,14 @@ public:
 	void notetakr(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void driver_start() override;
 
-	void iop_io(address_map &map);
-	void iop_mem(address_map &map);
-	void ep_io(address_map &map);
-	void ep_mem(address_map &map);
+	void iop_io(address_map &map) ATTR_COLD;
+	void iop_mem(address_map &map) ATTR_COLD;
+	void ep_io(address_map &map) ATTR_COLD;
+	void ep_mem(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_iop_cpu;
@@ -1001,4 +1001,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT           COMPANY  FULLNAME     FLAGS
-COMP( 1978, notetakr, 0,      0,      notetakr, notetakr, notetaker_state, empty_init, "Xerox", "NoteTaker", MACHINE_IS_SKELETON)
+COMP( 1978, notetakr, 0,      0,      notetakr, notetakr, notetaker_state, empty_init, "Xerox", "NoteTaker", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

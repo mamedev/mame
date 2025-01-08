@@ -77,8 +77,8 @@ public:
 	void rz1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<upd7811_device> m_maincpu;
@@ -96,9 +96,9 @@ private:
 	output_finder<> m_led_pattern;
 	output_finder<> m_led_startstop;
 
-	void map(address_map &map);
-	void pg0_map(address_map &map);
-	void pg1_map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
+	void pg0_map(address_map &map) ATTR_COLD;
+	void pg1_map(address_map &map) ATTR_COLD;
 
 	uint8_t key_r();
 

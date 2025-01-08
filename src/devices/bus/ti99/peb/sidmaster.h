@@ -33,8 +33,8 @@ public:
 	void cruwrite(offs_t offset, uint8_t data) override;
 
 private:
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void device_add_mconfig(machine_config &config) override;
 
 	required_device<mos6581_device> m_sid;

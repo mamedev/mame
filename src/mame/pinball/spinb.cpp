@@ -113,8 +113,8 @@ public:
 	void init_3() { m_game = 3; }
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void p1_w(u8 data);
 	u8 p3_r();
 	void p3_w(u8 data);
@@ -157,12 +157,12 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void dmd_io(address_map &map);
-	void dmd_mem(address_map &map);
-	void audio_map(address_map &map);
-	void spinb_map(address_map &map);
-	void music_map(address_map &map);
-	void vrnwrld_map(address_map &map);
+	void dmd_io(address_map &map) ATTR_COLD;
+	void dmd_mem(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void spinb_map(address_map &map) ATTR_COLD;
+	void music_map(address_map &map) ATTR_COLD;
+	void vrnwrld_map(address_map &map) ATTR_COLD;
 
 	bool m_pc0a = false;
 	bool m_pc0m = false;
@@ -1414,12 +1414,12 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1992, metalman, 0,       metalman, metalman, spinb_state, init_3,     ROT0, "Inder",    "Metal Man",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993, bushido,  0,       mach2,    bushido,  spinb_state, empty_init, ROT0, "Inder",    "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993, bushidoa, bushido, mach2,    bushido,  spinb_state, empty_init, ROT0, "Inder",    "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993, bushidob, bushido, mach2,    bushido,  spinb_state, empty_init, ROT0, "Inder",    "Bushido (set 3)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995, mach2,    0,       mach2,    mach2,    spinb_state, empty_init, ROT0, "Spinball", "Mach 2 (set 1)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995, mach2a,   mach2,   mach2,    mach2,    spinb_state, empty_init, ROT0, "Spinball", "Mach 2 (set 2)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1996, jolypark, 0,       jolypark, spinb,    spinb_state, init_1,     ROT0, "Spinball", "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1996, vrnwrld,  0,       vrnwrld,  vrnwrld,  spinb_state, init_2,     ROT0, "Spinball", "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1996, gunshot,  0,       gunshot,  spinb,    spinb_state, empty_init, ROT0, "Spinball", "Gun Shot",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+GAME(1992, metalman, 0,       metalman, metalman, spinb_state, init_3,     ROT0, "Inder",    "Metal Man",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993, bushido,  0,       mach2,    bushido,  spinb_state, empty_init, ROT0, "Inder",    "Bushido (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993, bushidoa, bushido, mach2,    bushido,  spinb_state, empty_init, ROT0, "Inder",    "Bushido (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993, bushidob, bushido, mach2,    bushido,  spinb_state, empty_init, ROT0, "Inder",    "Bushido (set 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995, mach2,    0,       mach2,    mach2,    spinb_state, empty_init, ROT0, "Spinball", "Mach 2 (set 1)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995, mach2a,   mach2,   mach2,    mach2,    spinb_state, empty_init, ROT0, "Spinball", "Mach 2 (set 2)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1996, jolypark, 0,       jolypark, spinb,    spinb_state, init_1,     ROT0, "Spinball", "Jolly Park",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1996, vrnwrld,  0,       vrnwrld,  vrnwrld,  spinb_state, init_2,     ROT0, "Spinball", "Verne's World",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1996, gunshot,  0,       gunshot,  spinb,    spinb_state, empty_init, ROT0, "Spinball", "Gun Shot",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

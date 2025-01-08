@@ -18,10 +18,10 @@ public:
 	void ay8910_45M_portb_w(uint8_t data);
 	void ay8910_45L_porta_w(uint8_t data);
 
-	void irem_sound_portmap(address_map &map);
-	void m52_large_sound_map(address_map &map);
-	void m52_small_sound_map(address_map &map);
-	void m62_sound_map(address_map &map);
+	void irem_sound_portmap(address_map &map) ATTR_COLD;
+	void m52_large_sound_map(address_map &map) ATTR_COLD;
+	void m52_small_sound_map(address_map &map) ATTR_COLD;
+	void m62_sound_map(address_map &map) ATTR_COLD;
 
 	optional_device<netlist_mame_logic_input_device> m_audio_SINH;
 
@@ -29,8 +29,8 @@ protected:
 	irem_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_cpu;
 	required_device<msm5205_device> m_adpcm1;
@@ -65,7 +65,7 @@ public:
 	m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class m52_soundc_audio_device : public irem_audio_device
@@ -74,7 +74,7 @@ public:
 	m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class m52_large_audio_device : public irem_audio_device
@@ -83,7 +83,7 @@ public:
 	m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 

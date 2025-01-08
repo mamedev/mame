@@ -36,11 +36,11 @@ protected:
 	// construction/destruction
 	trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void io_3bx_3dx_map(address_map &map) override;
-	virtual void io_3cx_map(address_map &map) override;
+	virtual void io_3bx_3dx_map(address_map &map) override ATTR_COLD;
+	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
 
 	u8 ramdac_hidden_mask_r(offs_t offset);
 	void ramdac_hidden_mask_w(offs_t offset, u8 data);
@@ -53,9 +53,9 @@ protected:
 	void svga_bank_read_w(offs_t offset, u8 data);
 
 
-	virtual void crtc_map(address_map &map) override;
-	virtual void sequencer_map(address_map &map) override;
-	virtual void gc_map(address_map &map) override;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void sequencer_map(address_map &map) override ATTR_COLD;
+	virtual void gc_map(address_map &map) override ATTR_COLD;
 
 	virtual void recompute_params() override;
 

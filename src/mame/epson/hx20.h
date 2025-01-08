@@ -66,7 +66,7 @@ private:
 	required_ioport_array<8> m_ksc_io;
 	required_ioport m_sw6;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void hx20_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -118,9 +118,9 @@ private:
 	int m_sio_rx = 0;
 	int m_sio_pin = 0;
 
-	void hx20_mem(address_map &map);
-	void cm6032_mem(address_map &map);
-	void cm6127_mem(address_map &map);
+	void hx20_mem(address_map &map) ATTR_COLD;
+	void cm6032_mem(address_map &map) ATTR_COLD;
+	void cm6127_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_EPSON_HX20_H

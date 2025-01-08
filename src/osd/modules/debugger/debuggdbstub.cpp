@@ -234,6 +234,33 @@ static const gdb_register_map gdb_register_map_r4600 =
 };
 
 //-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_m68030 =
+{
+	"m68k",
+	"org.gnu.gdb.m68k.core",
+	{
+		{ "D0", "d0", false, TYPE_INT },
+		{ "D1", "d1", false, TYPE_INT },
+		{ "D2", "d2", false, TYPE_INT },
+		{ "D3", "d3", false, TYPE_INT },
+		{ "D4", "d4", false, TYPE_INT },
+		{ "D5", "d5", false, TYPE_INT },
+		{ "D6", "d6", false, TYPE_INT },
+		{ "D7", "d7", false, TYPE_INT },
+		{ "A0", "a0", false, TYPE_INT },
+		{ "A1", "a1", false, TYPE_INT },
+		{ "A2", "a2", false, TYPE_INT },
+		{ "A3", "a3", false, TYPE_INT },
+		{ "A4", "a4", false, TYPE_INT },
+		{ "A5", "a5", false, TYPE_INT },
+		{ "A6", "fp", true,  TYPE_INT },
+		{ "SP", "sp", true,  TYPE_INT },
+		{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
+		{ "CURPC","pc", true,  TYPE_CODE_POINTER },
+	}
+};
+
+//-------------------------------------------------------------------------
 static const gdb_register_map gdb_register_map_m68020pmmu =
 {
 	"m68k",
@@ -475,16 +502,18 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "arm7_le",    gdb_register_map_arm7 },
 	{ "r4600",      gdb_register_map_r4600 },
 	{ "ppc601",     gdb_register_map_ppc601 },
+	{ "m68030",     gdb_register_map_m68030 },
 	{ "m68020pmmu", gdb_register_map_m68020pmmu },
 	{ "m68000",     gdb_register_map_m68000 },
 	{ "z80",        gdb_register_map_z80 },
+	{ "z80n",       gdb_register_map_z80 },
 	{ "z84c015",    gdb_register_map_z80 },
 	{ "m6502",      gdb_register_map_m6502 },
 	{ "m6507",      gdb_register_map_m6502 },
 	{ "m6510",      gdb_register_map_m6502 },
-	{ "m65c02",     gdb_register_map_m6502 },
 	{ "m65ce02",    gdb_register_map_m6502 },
 	{ "rp2a03",     gdb_register_map_m6502 },
+	{ "w65c02",     gdb_register_map_m6502 },
 	{ "w65c02s",    gdb_register_map_m6502 },
 	{ "m6809",      gdb_register_map_m6809 },
 	{ "score7",     gdb_register_map_score7 },
@@ -495,8 +524,8 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 class debug_gdbstub : public osd_module, public debug_module
 {
 public:
-	debug_gdbstub()
-	: osd_module(OSD_DEBUG_PROVIDER, "gdbstub"), debug_module(),
+	debug_gdbstub() :
+		osd_module(OSD_DEBUG_PROVIDER, "gdbstub"), debug_module(),
 		m_readbuf_state(PACKET_START),
 		m_machine(nullptr),
 		m_maincpu(nullptr),
@@ -505,6 +534,7 @@ public:
 		m_address_space(nullptr),
 		m_debugger_cpu(nullptr),
 		m_debugger_console(nullptr),
+		m_debugger_host(),
 		m_debugger_port(0),
 		m_socket(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE),
 		m_is_be(false),
@@ -599,6 +629,7 @@ private:
 	address_space *m_address_space;
 	debugger_cpu *m_debugger_cpu;
 	debugger_console *m_debugger_console;
+	std::string m_debugger_host;
 	int m_debugger_port;
 	emu_file m_socket;
 	bool m_is_be;
@@ -641,6 +672,7 @@ private:
 //-------------------------------------------------------------------------
 int debug_gdbstub::init(osd_interface &osd, const osd_options &options)
 {
+	m_debugger_host = options.debugger_host();
 	m_debugger_port = options.debugger_port();
 	return 0;
 }
@@ -788,11 +820,11 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name);
 #endif
 
-		std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);
+		std::string socket_name = string_format("socket.%s:%d", m_debugger_host, m_debugger_port);
 		std::error_condition const filerr = m_socket.open(socket_name);
 		if ( filerr )
-			fatalerror("gdbstub: failed to start listening on port %d\n", m_debugger_port);
-		osd_printf_info("gdbstub: listening on port %d\n", m_debugger_port);
+			fatalerror("gdbstub: failed to start listening on address %s port %d\n", m_debugger_host, m_debugger_port);
+		osd_printf_info("gdbstub: listening on address %s port %d\n", m_debugger_host, m_debugger_port);
 
 		m_initialized = true;
 	}

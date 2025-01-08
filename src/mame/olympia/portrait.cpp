@@ -136,7 +136,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); m_photo.resolve(); }
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void ctrl_w(uint8_t data);
@@ -152,8 +152,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, const uint8_t *source);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t priority);
-	void main_program_map(address_map &map);
-	void audio_program_map(address_map &map);
+	void main_program_map(address_map &map) ATTR_COLD;
+	void audio_program_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8039_device> m_audiocpu;

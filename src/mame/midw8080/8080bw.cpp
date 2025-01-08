@@ -237,7 +237,7 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw)
 /*                                                     */
 /*******************************************************/
 
-CUSTOM_INPUT_MEMBER(invaders_clone_state::sicv_in2_control_r)
+ioport_value invaders_clone_state::sicv_in2_control_r()
 {
 	return m_player_controls[is_cabinet_cocktail() ? 1 : 0]->read() | ioport("P2GATE")->read();
 }
@@ -260,7 +260,7 @@ static INPUT_PORTS_START( sicv_base )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )    // tied high via 1k resistor on schematic (shared with IN0 bit 3)
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in1_control_r))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )    // not connected (floating) on schematic
 
 	PORT_START("IN2")
@@ -273,7 +273,7 @@ static INPUT_PORTS_START( sicv_base )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "1500" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in2_control_r) // P2 controls gated by DIP switches on sicv
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in2_control_r)) // P2 controls gated by DIP switches on sicv
 	PORT_DIPNAME( 0x80, 0x00, "Coin Info" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -297,7 +297,7 @@ static INPUT_PORTS_START( sicv )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_clone_state, sicv_in2_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_clone_state::sicv_in2_control_r))
 
 	// DIP switches for disconnecting P2 inputs - labelled "FACTORY"
 	PORT_START("P2GATE")
@@ -352,7 +352,7 @@ static INPUT_PORTS_START( alieninv )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in1_control_r))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -364,7 +364,7 @@ static INPUT_PORTS_START( alieninv )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )     PORT_DIPLOCATION("SW1:3") /* Pence Coin */
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )   /* Not bonus */
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in2_control_r) PORT_DIPLOCATION("SW1:5,6,7")
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in2_control_r)) PORT_DIPLOCATION("SW1:5,6,7")
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )                  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "2C/1C 50p/3C (+ Bonus Life)" )
 	PORT_DIPSETTING(    0x80, "1C/1C 50p/5C" )
@@ -404,12 +404,12 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-CUSTOM_INPUT_MEMBER(invaders_clone_state::invadpt2_in1_control_r)
+ioport_value invaders_clone_state::invadpt2_in1_control_r()
 {
 	return m_player_controls[0]->read() | (m_player_controls[1]->read() & ~m_cabinet_type->read());
 }
 
-CUSTOM_INPUT_MEMBER(invaders_clone_state::invadpt2_in2_control_r)
+ioport_value invaders_clone_state::invadpt2_in2_control_r()
 {
 	return m_player_controls[1]->read() | (m_player_controls[0]->read() & ~m_cabinet_type->read());
 }
@@ -442,7 +442,7 @@ static INPUT_PORTS_START( invadpt2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // tied low on schematic
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_clone_state, invadpt2_in1_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_clone_state::invadpt2_in1_control_r))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED ) // tied high via 1k resistor on schematic (shared with IN0 bits 3/4/5/7, IN2 bit 2)
 
 	PORT_START("IN2")
@@ -454,7 +454,7 @@ static INPUT_PORTS_START( invadpt2 )
 	PORT_DIPNAME( 0x08, 0x00, "Preset Mode" )       PORT_DIPLOCATION("SW1:2") // in preset mode, 1P start increases score by 1000 to pre-set high score/name
 	PORT_DIPSETTING(    0x00, "Game Mode" )
 	PORT_DIPSETTING(    0x08, "Name Entry" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_clone_state, invadpt2_in2_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_clone_state::invadpt2_in2_control_r))
 	PORT_DIPNAME( 0x80, 0x00, "Coin Info" )         PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -865,7 +865,7 @@ static INPUT_PORTS_START( spacecom )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
 
 	PORT_START(CABINET_PORT_TAG)        /* Dummy port for cocktail mode */
@@ -970,7 +970,7 @@ static INPUT_PORTS_START( invrvnge )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in1_control_r))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -983,7 +983,7 @@ static INPUT_PORTS_START( invrvnge )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x08, "2000" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in2_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in2_control_r))
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) ) // 1 play 10p, 2 play 20p, 6 play 50p
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) // 1 play 20p, 2 play 40p, 3 play 50p
@@ -1318,11 +1318,11 @@ static INPUT_PORTS_START( cosmicmo )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(_8080bw_state, cosmicmo_cab_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(_8080bw_state::cosmicmo_cab_r))
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x08, "2500" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(_8080bw_state, invaders_in2_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(_8080bw_state::invaders_in2_control_r))
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
@@ -1403,7 +1403,7 @@ static INPUT_PORTS_START( invasion )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW1:6" )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED ) // floating
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in1_control_r))
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW1:5" )
 
 	PORT_START("IN1")
@@ -1411,7 +1411,7 @@ static INPUT_PORTS_START( invasion )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // pulled high via a 1k resistor
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in1_control_r))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_COIN2 )
 
 	PORT_START("IN2")
@@ -1424,7 +1424,7 @@ static INPUT_PORTS_START( invasion )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x08, "1500" )
 	PORT_DIPSETTING(    0x00, "2500" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in1_control_r))
 	PORT_DIPNAME( 0x80, 0x80, "Laser Bonus Info" )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1504,7 +1504,7 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-CUSTOM_INPUT_MEMBER(rollingc_state::game_select_r)
+ioport_value rollingc_state::game_select_r()
 {
 	// need the joystick left/right inputs to show in two places
 	return bitswap<2>(m_player_controls[0]->read(), 1, 2);
@@ -1559,7 +1559,7 @@ static INPUT_PORTS_START( rollingc )
 	// It checks for score overflow, and the game ends with message "YOU ARE TOO STRONG" when score
 	// overflows from 99990 to 0. If bit 0 value = 1, the game ends prematurely when score hits 1000.
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(rollingc_state, game_select_r)
+	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(rollingc_state::game_select_r))
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -1954,7 +1954,7 @@ static INPUT_PORTS_START( sflush )
 	PORT_DIPNAME( 0x40, 0x00, "Coinage Display" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(_8080bw_state, sflush_80_r) // 128V?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(_8080bw_state::sflush_80_r)) // 128V?
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x6a, IPT_PADDLE ) PORT_MINMAX(0x16,0xbf) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_CENTERDELTA(0)
@@ -2365,7 +2365,7 @@ INPUT_PORTS_END
 
 /*******************************************************/
 /*                                                     */
-/* Jatre Specter (Taito?)                              */
+/* Jatre "Jatre Specter"                               */
 /*                                                     */
 /*******************************************************/
 
@@ -2464,7 +2464,7 @@ static INPUT_PORTS_START( yosakdon )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(yosakdon_state, invaders_in1_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(yosakdon_state::invaders_in1_control_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -2479,7 +2479,7 @@ static INPUT_PORTS_START( yosakdon )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(yosakdon_state, invaders_in2_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(yosakdon_state::invaders_in2_control_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	// Dummy controls port, P1
@@ -2534,7 +2534,7 @@ static INPUT_PORTS_START( indianbt )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in1_control_r))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -2547,7 +2547,7 @@ static INPUT_PORTS_START( indianbt )
 	PORT_DIPNAME( 0x08, 0x00, "Number of Catch Animals" )
 	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPSETTING(    0x08, "3" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in2_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in2_control_r))
 	PORT_DIPNAME(0x80,  0x00, "Invulnerability (Cheat)")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -2735,7 +2735,7 @@ static INPUT_PORTS_START( steelwkr )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in1_control_r))
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
@@ -2745,7 +2745,7 @@ static INPUT_PORTS_START( steelwkr )
 	PORT_DIPSETTING(    0x03, "4" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )          PORT_DIPLOCATION("SW1:3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in2_control_r)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in2_control_r))
 
 	// P1 controls (read via IN1, and also via IN2 on upright cabinets)
 	INVADERS_CONTROL_PORT_P1
@@ -2880,7 +2880,7 @@ static INPUT_PORTS_START( shuttlei )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
@@ -2927,7 +2927,7 @@ static INPUT_PORTS_START( skylove )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) ) // must be off to boot
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
@@ -3080,7 +3080,7 @@ void darthvdr_state::io_map(address_map &map)
 static INPUT_PORTS_START( darthvdr )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in1_control_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "1000" )
@@ -3096,7 +3096,7 @@ static INPUT_PORTS_START( darthvdr )
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in2_control_r)
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in2_control_r))
 	PORT_DIPNAME( 0x10, 0x10, "One less life" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3456,8 +3456,8 @@ void claybust_state::io_map(address_map &map)
 
 static INPUT_PORTS_START( claybust )
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(claybust_state, gun_on_r)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(2) PORT_CHANGED_MEMBER(DEVICE_SELF, claybust_state, gun_trigger, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(claybust_state::gun_on_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(claybust_state::gun_trigger), 0)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 
@@ -3549,7 +3549,7 @@ static INPUT_PORTS_START( galactic )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in1_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in1_control_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -3564,7 +3564,7 @@ static INPUT_PORTS_START( galactic )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "6" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invaders_state, invaders_in2_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invaders_state::invaders_in2_control_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	/* Dummy controls port, P1 */
@@ -3700,17 +3700,17 @@ static INPUT_PORTS_START( invmulti )
 	/* same as Midway Space Invaders, except that SW is unused */
 	PORT_START("IN0")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW:8" )
-	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invmulti_state, invaders_sw6_sw7_r)
+	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invmulti_state::invaders_sw6_sw7_r))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invmulti_state, invaders_in0_control_r)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invmulti_state, invaders_sw5_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invmulti_state::invaders_in0_control_r))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invmulti_state::invaders_sw5_r))
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, invmulti_state, direct_coin_count, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(invmulti_state::direct_coin_count), 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invmulti_state, invaders_in1_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invmulti_state::invaders_in1_control_r))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
@@ -3718,7 +3718,7 @@ static INPUT_PORTS_START( invmulti )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW:4" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW:2" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(invmulti_state, invaders_in2_control_r)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(invmulti_state::invaders_in2_control_r))
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW:1" )
 
 	/* Dummy port for cocktail mode */
@@ -5158,6 +5158,27 @@ ROM_START( lrescuem2 )
 	ROM_LOAD( "cv02-7643.1c",   0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
+// still shows Taito copyright, but on Artic PCB
+ROM_START( lrescueabl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2708_1.1",    0x0000, 0x0400, CRC(e3796dec) SHA1(454558672f6959b8efe7d52e26796ad8c0b0da6c) )
+	ROM_LOAD( "2708_2.2",    0x0400, 0x0400, CRC(8067c036) SHA1(a9dd756c44ee80d5e6d646f1f48e9341297751cf) )
+	ROM_LOAD( "2708_3.3",    0x0800, 0x0400, CRC(90179fee) SHA1(35059f7399229b8d9588d34f79073fa4d3301614) )
+	ROM_LOAD( "2708_4.4",    0x0c00, 0x0400, CRC(1d197d87) SHA1(21e049f9c2a0fe1c0403d9d1a2dc695c4ee764f9) )
+	ROM_LOAD( "2708_5.5",    0x1000, 0x0400, CRC(4326d338) SHA1(ac31645bdf292f28dfcfcb9d5e158e5df7a6f95d) )
+	ROM_LOAD( "2708_6.6",    0x1400, 0x0400, CRC(3b272372) SHA1(39b807c810d093d7a34b102eec16f3d9baeb21f1) )
+	ROM_LOAD( "2708_7.7",    0x1800, 0x0400, CRC(06fc1ecc) SHA1(b5b04b32f3bd122329d0282628db197b0c39c8cb) )
+	ROM_LOAD( "2708_8.8",    0x1c00, 0x0400, CRC(b3a3f24e) SHA1(c084e7d891c76b9f6949490d48288df0da8c2af7) )
+	ROM_LOAD( "2708_9.9",    0x4000, 0x0400, CRC(3398798f) SHA1(d7dd9e65a1048df8edd217f4206b19cd01f143f4) )
+	ROM_LOAD( "2708_10.10",  0x4400, 0x0400, CRC(37c5bfc6) SHA1(b0aec85e6f979cdf7a3a985830c8530302804837) )
+	ROM_LOAD( "2708_11.11",  0x4800, 0x0400, CRC(1b7a5644) SHA1(d26530ea11ada86f7c99b11d6faf4416a8f5a9eb) )
+	ROM_LOAD( "2708_12.12",  0x4c00, 0x0400, CRC(c342b907) SHA1(327da029420c4eedabc2a0534199a008a3f341b8) )
+
+	ROM_REGION( 0x0800, "proms", 0 )  // not dumped for this set, but present
+	ROM_LOAD( "cv01-7643.2c",   0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "cv02-7643.1c",   0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
+ROM_END
+
 
 /*
 Cosmo
@@ -5978,8 +5999,8 @@ GAMEL(1979, supinvsion,  invaders, invaders,  searthin,  invaders_state, empty_i
 GAMEL(1980, searthie,    invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg (Electrocoin)",              "Super Earth Invasion (set 3)",                                    MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninv,    invaders, invaders,  alieninv,  invaders_state, empty_init,    ROT270, "bootleg (Margamatics)",              "Alien Invasion",                                                  MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninvp2,  invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg",                            "Alien Invasion Part II",                                          MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1979, jspecter,    invaders, invaders,  jspecter,  invaders_state, empty_init,    ROT270, "bootleg (Jatre)",                    "Jatre Specter (set 1)",                                           MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1979, jspecter2,   invaders, invaders,  jspecter,  invaders_state, empty_init,    ROT270, "bootleg (Jatre)",                    "Jatre Specter (set 2)",                                           MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, jspecter,    invaders, invaders,  jspecter,  invaders_state, empty_init,    ROT270, "Taito / Jatre",                      "Jatre Specter (set 1)",                                           MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, jspecter2,   invaders, invaders,  jspecter,  invaders_state, empty_init,    ROT270, "Taito / Jatre",                      "Jatre Specter (set 2)",                                           MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spacewr3,    invaders, spcewars,  sicv,      _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Space War Part 3",                                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Bootleg of Sanritsu's Space War
 GAMEL(1978, swipeout,    invaders, spcewars,  sicv,      _8080bw_state,  empty_init,    ROT270, "bootleg (Beyer and Brown)",          "Space Wipeout",                                                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Bootleg of Sanritsu's Space War
 GAME( 1978, darthvdr,    invaders, darthvdr,  darthvdr,  darthvdr_state, empty_init,    ROT270, "bootleg",                            "Darth Vader (bootleg of Space Invaders)",                         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
@@ -5993,9 +6014,9 @@ GAME( 1980, invaddlx,    invadpt2, invaders,  invadpt2,  sisv_state,     empty_i
 GAME( 1979, moonbase,    invadpt2, invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito / Nichibutsu",                 "Moon Base Zeta (set 1)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // This has a 'Taito Corp' string hidden away in the rom - to display it, press P1 Right+P1 Fire+2P Start then P1 Left+P1 Fire+P1 Start at the attract gameplay sequence
 GAME( 1979, moonbasea,   invadpt2, invadpt2,  invadpt2,  _8080bw_state,  empty_init,    ROT270, "Taito / Nichibutsu",                 "Moon Base Zeta (set 2)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // This has the same string replaced with Nichibutsu, no other differences
 
-GAME( 1979, spcewarl,    0,        invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "Leijac Corporation",                 "Space War (Leijac Corporation)",                                  MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Taito's version is actually a spin-off of this?
-GAME( 1980, spclaser,    spcewarl, invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "Taito",                              "Space Laser",                                                     MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, intruder,    spcewarl, invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "Taito (Game Plan license)",          "Intruder",                                                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, spcewarl,    0,        invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "Konami (Leijac Corporation license)","Space War (Leijac Corporation)",                                  MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spclaser,    spcewarl, invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "Konami (Taito license)",             "Space Laser",                                                     MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, intruder,    spcewarl, invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "Konami (Game Plan license)",         "Intruder",                                                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1980, laser,       spcewarl, invadpt2,  spclaser,  _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Astro Laser (bootleg of Space Laser)",                            MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1979, lrescue,     0,        lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "Taito",                              "Lunar Rescue",                                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
@@ -6003,6 +6024,7 @@ GAME( 1979, grescue,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_i
 GAME( 1980, mlander,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1979, lrescuem,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 1)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, lrescuem2,   lrescue,  lrescuem2, lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 2)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, lrescueabl,  lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Artic)",                    "Lunar Rescue (Artic bootleg)",                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, desterth,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Destination Earth (bootleg of Lunar Rescue)",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAMEL(1980, escmars,     lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Escape from Mars (bootleg of Lunar Rescue)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
 GAMEL(1980, resclunar,   lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Niemer S.A.)",              "Rescate Lunar (Spanish bootleg of Lunar Rescue)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )

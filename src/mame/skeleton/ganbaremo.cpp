@@ -107,10 +107,10 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<z80_device> m_displaycpu;
 
-	void main_program_map(address_map &map);
-	void display_program_map(address_map &map);
-	void main_io_map(address_map &map);
-	void display_io_map(address_map &map);
+	void main_program_map(address_map &map) ATTR_COLD;
+	void display_program_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void display_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -262,4 +262,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(19??, ganbaremo, 0, ganbaremo, ganbaremo, ganbaremo_state, empty_init, ROT0, "Shoken", "Ganbare Momotarou Oni Taiji", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1992?, ganbaremo, 0, ganbaremo, ganbaremo, ganbaremo_state, empty_init, ROT0, "Shoken", "Ganbare Momotarou Oni Taiji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // was advertised in 1992

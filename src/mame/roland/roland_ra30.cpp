@@ -24,7 +24,7 @@ public:
 	void ra30(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<h8510_device> m_maincpu;
 };
@@ -55,4 +55,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1995, ra30, 0, 0, ra30, ra30, roland_ra30_state, empty_init, "Roland", "RA-30 Realtime Arranger", MACHINE_IS_SKELETON)
+SYST(1995, ra30, 0, 0, ra30, ra30, roland_ra30_state, empty_init, "Roland", "RA-30 Realtime Arranger", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

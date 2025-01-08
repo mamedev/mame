@@ -45,9 +45,9 @@ public:
 	void fourx4(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	void mem_map(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	required_device<m6502_device> m_maincpu;
 	output_finder<68> m_digits;  // don't know how many
 	output_finder<80> m_io_outputs;   // ?? solenoids + ?? lamps
@@ -117,4 +117,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1982, fourx4, 0, fourx4, atari_4x4, atari_4x4_state, empty_init, ROT0, "Atari", "4x4", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, fourx4, 0, fourx4, atari_4x4, atari_4x4_state, empty_init, ROT0, "Atari", "4x4", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

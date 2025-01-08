@@ -27,13 +27,13 @@ public:
 	void xbase09(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void portb_w(u8 data);
 	u16 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u16 data);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<pic17c4x_device> m_maincpu;
 	required_ioport_array<0x16> m_analog_ports;
@@ -200,4 +200,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1997, xbase09, 0, 0, xbase09, xbase09, xbase09_state, empty_init, "JoMoX", "XBase 09 Midi Controlled Analogue Drum Module", MACHINE_IS_SKELETON)
+SYST(1997, xbase09, 0, 0, xbase09, xbase09, xbase09_state, empty_init, "JoMoX", "XBase 09 Midi Controlled Analogue Drum Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -95,8 +95,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_DEVICES_ABCBUS_ABCBUS_H
-#define MAME_DEVICES_ABCBUS_ABCBUS_H
+#ifndef MAME_BUS_ABCBUS_ABCBUS_H
+#define MAME_BUS_ABCBUS_ABCBUS_H
 
 #pragma once
 
@@ -236,8 +236,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_nmi;
@@ -275,4 +275,4 @@ void abc1600bus_cards(device_slot_interface &device);
 typedef device_type_enumerator<abcbus_slot_device> abcbus_slot_device_enumerator;
 
 
-#endif // MAME_DEVICES_ABCBUS_ABCBUS_H
+#endif // MAME_BUS_ABCBUS_ABCBUS_H

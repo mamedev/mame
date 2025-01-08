@@ -5,8 +5,6 @@
 
 #include "../xmlconfig.h"
 
-#include "debugger.h"
-
 #include <QtWidgets/QMainWindow>
 
 #include <deque>

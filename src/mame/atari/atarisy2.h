@@ -45,6 +45,11 @@ public:
 		, m_vmmu(*this, "vmmu")
 		, m_playfieldt(*this, "playfieldt")
 		, m_playfieldb(*this, "playfieldb")
+		, m_io_leta(*this, "LETA%u", 0U)
+		, m_io_select(*this, "SELECT")
+		, m_io_fake_joy_x(*this, "FAKE_JOY_X")
+		, m_io_fake_joy_y(*this, "FAKE_JOY_Y")
+		, m_io_fake_spinner(*this, "FAKE_SPINNER")
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
@@ -62,14 +67,11 @@ public:
 	void csprint(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_post_load() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void update_interrupts();
-
 	required_device<t11_device> m_maincpu;
 	required_device<m6502_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -77,14 +79,10 @@ private:
 	required_device<atari_motion_objects_device> m_mob;
 	required_region_ptr<uint16_t> m_slapstic_region;
 
-	uint8_t           m_interrupt_enable = 0U;
-
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_shared_ptr<uint16_t> m_xscroll;
 	required_shared_ptr<uint16_t> m_yscroll;
-
-	int8_t            m_pedal_count = 0U;
 
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mainlatch;
@@ -92,16 +90,28 @@ private:
 	required_device_array<pokey_device, 2> m_pokey;
 	optional_device<tms5220_device> m_tms5220;
 
-	bool            m_scanline_int_state = 0;
-	bool            m_video_int_state = 0;
-	bool            m_p2portwr_state = 0;
-	bool            m_p2portrd_state = 0;
-
 	required_memory_bank_array<2> m_rombank;
 	required_device<atari_slapstic_device> m_slapstic;
 	memory_view m_vmmu;
 	required_shared_ptr<uint16_t> m_playfieldt;
 	required_shared_ptr<uint16_t> m_playfieldb;
+
+	optional_ioport_array<4> m_io_leta;
+	optional_ioport m_io_select;
+	optional_ioport m_io_fake_joy_x;
+	optional_ioport m_io_fake_joy_y;
+	optional_ioport m_io_fake_spinner;
+
+	output_finder<2> m_leds;
+
+	uint8_t         m_interrupt_enable = 0U;
+
+	int8_t          m_pedal_count = 0U;
+
+	bool            m_scanline_int_state = 0;
+	bool            m_video_int_state = 0;
+	bool            m_p2portwr_state = 0;
+	bool            m_p2portrd_state = 0;
 
 	uint8_t         m_sound_reset_state = 0U;
 
@@ -117,7 +127,7 @@ private:
 	int32_t         m_spin_pos = 0;                 /* track fake position of spinner */
 	uint32_t        m_spin_center_count = 0U;
 
-	output_finder<2> m_leds;
+	void update_interrupts();
 
 	void scanline_int_ack_w(uint8_t data);
 	void video_int_ack_w(uint8_t data);
@@ -127,9 +137,6 @@ private:
 	INTERRUPT_GEN_MEMBER(sound_irq_gen);
 	void sound_irq_ack_w(uint8_t data);
 	void bankselect_w(offs_t offset, uint16_t data);
-	uint16_t switch_r();
-	uint8_t switch_6502_r();
-	void switch_6502_w(uint8_t data);
 	uint8_t leta_r(offs_t offset);
 	void mixer_w(uint8_t data);
 	void sndrst_6502_w(uint8_t data);
@@ -139,12 +146,13 @@ private:
 	void tms5220_w(uint8_t data);
 	void tms5220_strobe_w(offs_t offset, uint8_t data);
 	void coincount_w(uint8_t data);
+	void switch_6502_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	uint32_t screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_int(int state);
 	TIMER_CALLBACK_MEMBER(delayed_int_enable_w);
 	TIMER_CALLBACK_MEMBER(reset_yscroll_callback);
@@ -156,6 +164,6 @@ private:
 	static rgb_t RRRRGGGGBBBBIIII(uint32_t raw);
 
 	static const atari_motion_objects_config s_mob_config;
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };

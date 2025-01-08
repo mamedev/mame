@@ -45,10 +45,10 @@ public:
 	void qwak(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void qwak_map(address_map &map);
+	void qwak_map(address_map &map) ATTR_COLD;
 
 	tilemap_t *m_bg_tilemap;
 	required_shared_ptr<uint8_t> m_video_ram;
@@ -86,10 +86,10 @@ public:
 	void runaway(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void runaway_map(address_map &map);
+	void runaway_map(address_map &map) ATTR_COLD;
 
 private:
 	uint8_t earom_read();
@@ -330,7 +330,7 @@ void runaway_state::runaway_map(address_map &map)
 static INPUT_PORTS_START( qwak )
 	PORT_START("3000D7")    /* 3000 D7 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -382,7 +382,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( runaway )
 	PORT_START("3000D7") /* 3000 D7 */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )

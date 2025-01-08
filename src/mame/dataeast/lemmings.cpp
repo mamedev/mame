@@ -62,7 +62,7 @@ public:
 	void lemmings(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// video-related
@@ -100,8 +100,8 @@ private:
 
 	uint16_t protection_region_0_146_r(offs_t offset);
 	void protection_region_0_146_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -348,7 +348,7 @@ static INPUT_PORTS_START( lemmings )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 
 	PORT_START("DSW")
@@ -433,7 +433,7 @@ static const gfx_layout sprite_layout =
 };
 
 static GFXDECODE_START( gfx_lemmings )
-	GFXDECODE_ENTRY( nullptr,    0, charlayout,     0,   16 ) // Dynamically modified
+	GFXDECODE_RAM(   nullptr,    0, charlayout,     0,   16 ) // Dynamically modified
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_lemmings_spr1 )

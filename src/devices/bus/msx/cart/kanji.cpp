@@ -32,8 +32,8 @@ protected:
 	msx_cart_kanji_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	std::error_condition validate_kanji_regions(std::string &message);
 	void install_kanji_handlers();
@@ -137,8 +137,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	static constexpr size_t BANK_SIZE = 0x4000;

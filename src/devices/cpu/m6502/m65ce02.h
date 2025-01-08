@@ -12,9 +12,9 @@
 
 #pragma once
 
-#include "m65c02.h"
+#include "w65c02.h"
 
-class m65ce02_device : public m65c02_device {
+class m65ce02_device : public w65c02_device {
 public:
 	m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -30,8 +30,8 @@ protected:
 	uint16_t  B;                      /* Zero page base address (always xx00) */
 
 	virtual void init() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 

@@ -107,10 +107,10 @@ private:
 	required_device<acia6850_device> m_acia;
 	required_device<dac_1bit_device> m_dac;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	bool m_dac_state = false;
 };

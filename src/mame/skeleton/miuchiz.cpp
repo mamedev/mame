@@ -41,7 +41,7 @@ public:
 	void miuchiz(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<st2205u_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -144,4 +144,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY              FULLNAME                      FLAGS
-COMP( 2006, miuchiz, 0,      0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "MIUCHIZ Virtual Companions", MACHINE_IS_SKELETON )
+COMP( 2006, miuchiz, 0,      0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "MIUCHIZ Virtual Companions", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

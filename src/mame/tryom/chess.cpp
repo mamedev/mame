@@ -51,7 +51,7 @@ public:
 	void tchess(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -67,8 +67,8 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_digit_data = 0;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	u8 read_inputs();
 	void p0_w(u8 data);

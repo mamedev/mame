@@ -85,8 +85,8 @@ public:
 	void v6809(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void speaker_en_w(int state);
@@ -100,7 +100,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	void v6809_mem(address_map &map);
+	void v6809_mem(address_map &map) ATTR_COLD;
 
 	u16 m_video_address = 0U;
 	bool m_speaker_en = false;

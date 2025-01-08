@@ -18,6 +18,7 @@ Hardware notes (Systema Challenge fitted with Regency MCU):
 
 A26 MCU was used in:
 - Krypton Regency (with or without LEDs)
+- Excalibur Avenger (suspected, Excalibur brand Comet, with newer MCU)
 - Excalibur Legend III (suspected, Excalibur brand Regency)
 - Systema Challenge (1996 version)
 
@@ -64,7 +65,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(in1_changed) { update_irq2(); }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -247,7 +248,7 @@ void regency_state::p7_w(u8 data)
 *******************************************************************************/
 
 #define PORT_CHANGED_IN1() \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, regency_state, in1_changed, 0)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(regency_state::in1_changed), 0)
 
 static INPUT_PORTS_START( regency )
 	PORT_START("IN.0")

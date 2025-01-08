@@ -33,12 +33,12 @@ DEFINE_DEVICE_TYPE(CXD1185, cxd1185_device, "cxd1185", "Sony CXD1185 SCSI 1 Prot
 static char const *const nscsi_phase[] = { "DATA OUT", "DATA IN", "COMMAND", "STATUS", "*", "*", "MESSAGE OUT", "MESSAGE IN" };
 
 // FIXME: would be better to reuse from nscsi_full_device
-static unsigned const SCSI_ARB_DELAY  =  2'400;
-static unsigned const SCSI_BUS_CLEAR  =    800;
-static unsigned const SCSI_BUS_FREE   =    800;
-static unsigned const SCSI_BUS_SETTLE =    400;
-static unsigned const SCSI_BUS_SKEW   =     10;
-static unsigned const SCSI_RST_HOLD   = 25'000;
+static constexpr unsigned SCSI_ARB_DELAY  =  2'400;
+static constexpr unsigned SCSI_BUS_CLEAR  =    800;
+static constexpr unsigned SCSI_BUS_FREE   =    800;
+static constexpr unsigned SCSI_BUS_SETTLE =    400;
+static constexpr unsigned SCSI_BUS_SKEW   =     10;
+static constexpr unsigned SCSI_RST_HOLD   = 25'000;
 
 ALLOW_SAVE_TYPE(cxd1185_device::state);
 
@@ -328,12 +328,12 @@ void cxd1185_device::command_w(u8 data)
 	case 0xc0:
 		LOGMASKED(LOG_CMD, "transfer information\n");
 		m_state = XFR_INFO;
-		m_last_dma_direction = (m_command & DMA) ? ((scsi_bus->ctrl_r() & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE;
+		m_last_dma_direction = !(m_command & DMA) ? DMA_NONE : (scsi_bus->ctrl_r() & S_INP) ? DMA_IN : DMA_OUT;
 		break;
 	case 0xc1:
 		LOGMASKED(LOG_CMD, "transfer pad\n");
 		m_state = XFR_INFO;
-		m_last_dma_direction = (m_command & DMA) ? ((scsi_bus->ctrl_r() & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE;
+		m_last_dma_direction = !(m_command & DMA) ? DMA_NONE : (scsi_bus->ctrl_r() & S_INP) ? DMA_IN : DMA_OUT;
 		break;
 	case 0xc2:
 		LOGMASKED(LOG_CMD, "deassert ack\n");

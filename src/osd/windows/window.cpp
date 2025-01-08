@@ -66,6 +66,11 @@
 
 namespace {
 
+// If legacy mouse to pointer event translation is enabled, translated
+// WM_POINTER* events have pointer ID zero.  Assume this will never be
+// seen for "real" pointer events.
+constexpr WORD MOUSE_POINTER_ID = 0;
+
 constexpr unsigned get_pointer_buttons(WPARAM wparam)
 {
 	return
@@ -1943,11 +1948,8 @@ void win_window_info::pointer_capture_changed(WPARAM wparam, LPARAM lparam)
 	if (m_active_pointers.end() != info)
 	{
 		// treat this as the pointer being stolen - fail any gestures
-		if (BIT(info->buttons, 0))
-		{
-			assert(0 <= info->clickcnt);
+		if (BIT(info->buttons, 0) && (0 < info->clickcnt))
 			info->clickcnt = -info->clickcnt;
-		}
 
 		// push to UI manager and dump pointer data
 		machine().ui_input().push_pointer_abort(
@@ -2028,9 +2030,8 @@ void win_window_info::mouse_updated(WPARAM wparam, LPARAM lparam)
 void win_window_info::expire_pointer(std::vector<win_pointer_info>::iterator info, POINT const &where, bool canceled)
 {
 	// leaving implicitly releases buttons, so check hold/drag if necessary
-	if (BIT(info->buttons, 0))
+	if (BIT(info->buttons, 0) && (0 < info->clickcnt))
 	{
-		assert(0 <= info->clickcnt);
 		if (!canceled)
 		{
 			auto const now(std::chrono::steady_clock::now());
@@ -2226,9 +2227,8 @@ std::vector<win_window_info::win_pointer_info>::iterator win_window_info::find_p
 
 std::vector<win_window_info::win_pointer_info>::iterator win_window_info::map_mouse_pointer()
 {
-	WORD const ptrid(~WORD(0));
-	auto found(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), ptrid, &win_pointer_info::compare));
-	if ((m_active_pointers.end() != found) && (found->ptrid == ptrid))
+	auto found(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), MOUSE_POINTER_ID, &win_pointer_info::compare));
+	if ((m_active_pointers.end() != found) && (found->ptrid == MOUSE_POINTER_ID))
 		return found;
 
 	if ((sizeof(m_next_pointer) * 8) <= m_next_pointer)
@@ -2258,7 +2258,7 @@ std::vector<win_window_info::win_pointer_info>::iterator win_window_info::map_mo
 
 		found = m_active_pointers.emplace(
 				found,
-				win_pointer_info(ptrid, PT_MOUSE, m_next_pointer, devpos->second));
+				win_pointer_info(MOUSE_POINTER_ID, PT_MOUSE, m_next_pointer, devpos->second));
 		m_pointer_mask |= decltype(m_pointer_mask)(1) << m_next_pointer;
 		do
 		{
@@ -2277,9 +2277,8 @@ std::vector<win_window_info::win_pointer_info>::iterator win_window_info::map_mo
 
 std::vector<win_window_info::win_pointer_info>::iterator win_window_info::find_mouse_pointer()
 {
-	WORD const ptrid(~WORD(0));
-	auto const found(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), ptrid, &win_pointer_info::compare));
-	if ((m_active_pointers.end() != found) && (found->ptrid == ptrid))
+	auto const found(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), MOUSE_POINTER_ID, &win_pointer_info::compare));
+	if ((m_active_pointers.end() != found) && (found->ptrid == MOUSE_POINTER_ID))
 		return found;
 	else
 		return m_active_pointers.end();

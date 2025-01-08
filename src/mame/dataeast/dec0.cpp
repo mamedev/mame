@@ -3,32 +3,33 @@
 // thanks-to:Richard Bush
 /***************************************************************************
 
-  Data East 16 bit games - Bryan McPhail, mish@tendril.co.uk
+Data East 16 bit games - Bryan McPhail, mish@tendril.co.uk
 
-    Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome use the 'MEC-M1'
+Heavy Barrel, Bad Dudes, Robocop, Birdie Try & Hippodrome use the 'MEC-M1'
 motherboard and varying game boards.  Sly Spy, Midnight Resistance and
 Boulder Dash use the same graphics chips but are different pcbs.
 
-    Bandit (USA) is almost certainly a field test prototype, the software runs
-    on a Heavy Barrel board with the original Heavy Barrel MCU (which is effectively
-    not used).  There is also Japanese version known to run on a DE-0321-1 top board.
+Bandit (USA) is almost certainly a field test prototype, the software runs
+on a Heavy Barrel board with the original Heavy Barrel MCU (which is effectively
+not used).  There is also Japanese version known to run on a DE-0321-1 top board.
 
-    There are Secret Agent (bootleg) and Robocop (bootleg) sets to add.
+There are Secret Agent (bootleg) and Robocop (bootleg) sets to add.
 
-    Thanks to Gouky & Richard Bush for information along the way, especially
-    Gouky's patch for Bad Dudes & YM3812 information!
-    Thanks to JC Alexander for fix to Robocop ending!
+Thanks to Gouky & Richard Bush for information along the way, especially
+Gouky's patch for Bad Dudes & YM3812 information!
+Thanks to JC Alexander for fix to Robocop ending!
 
-    All games' Dip Switches (except Boulder Dash) have been verified against
+All games' Dip Switches (except Boulder Dash) have been verified against
 Original Service Manuals and Service Mode (when available).
 
 
-ToDo:
+TODO:
 - Fix remaining graphical problems in Automat (bootleg);
 - Fix remaining sound problems in Secret Agent (bootleg);
 - graphics are completely broken in Secret Agent (bootleg);
 - Fighting Fantasy (bootleg) doesn't move on when killing the Lamia, is the MCU involved?
-- Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
+- Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover
+  from the Fighting Fantasy bootleg on the same PCB?)
 - Get rid of ROM patch in Hippodrome;
 - background pen in Birdie Try is presumably wrong;
 - Unemulated coin counter, manuals mentions it but nowhere to be found, HW triggered?
@@ -57,8 +58,6 @@ $3B), $07 (return table index if parameter matches table, otherwise reset), and
 $09 (set table index to zero).  Dragonninja only seems to use commands $03 (on
 startup), $07 (same function as Bad Dudes) and $09 (same function as Bad Dudes).
 Most of the MCU program isn't utilised.
-
-
 
 ***************************************************************************
 
@@ -371,14 +370,16 @@ Notes:
 #include "dec0.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/r65c02.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m68705.h"
+#include "machine/input_merger.h"
 #include "machine/mb8421.h"
 #include "machine/upd4701.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
+
 #include "speaker.h"
 
 
@@ -427,7 +428,7 @@ void dec0_state::dec0_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-void dec0_automat_state::automat_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void automat_state::automat_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
@@ -813,7 +814,7 @@ void dec0_state::midres_s_map(address_map &map)
 
 
 
-void dec0_automat_state::machine_start()
+void automat_state::machine_start()
 {
 	m_adpcm_toggle[0] = false;
 	m_adpcm_toggle[1] = false;
@@ -826,13 +827,13 @@ void dec0_automat_state::machine_start()
 
 
 /* swizzle the palette writes around so we can use the same gfx plane ordering as the originals */
-uint16_t dec0_automat_state::automat_palette_r(offs_t offset)
+uint16_t automat_state::automat_palette_r(offs_t offset)
 {
 	offset ^=0xf;
 	return m_paletteram[offset];
 }
 
-void dec0_automat_state::automat_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void automat_state::automat_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset ^=0xf;
 	m_palette->write16(offset, data, mem_mask);
@@ -840,7 +841,7 @@ void dec0_automat_state::automat_palette_w(offs_t offset, uint16_t data, uint16_
 
 
 
-void dec0_automat_state::automat_map(address_map &map)
+void automat_state::automat_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
 
@@ -865,14 +866,14 @@ void dec0_automat_state::automat_map(address_map &map)
 
 	map(0x300000, 0x300001).portr("AN0");
 	map(0x300008, 0x300009).portr("AN1");
-	map(0x30c000, 0x30c00b).r(FUNC(dec0_automat_state::dec0_controls_r));
-	map(0x30c000, 0x30c01f).w(FUNC(dec0_automat_state::automat_control_w));            /* Priority, sound, etc. */
-	map(0x310000, 0x3107ff).rw(FUNC(dec0_automat_state::automat_palette_r), FUNC(dec0_automat_state::automat_palette_w)).share("palette");
+	map(0x30c000, 0x30c00b).r(FUNC(automat_state::dec0_controls_r));
+	map(0x30c000, 0x30c01f).w(FUNC(automat_state::automat_control_w));            /* Priority, sound, etc. */
+	map(0x310000, 0x3107ff).rw(FUNC(automat_state::automat_palette_r), FUNC(automat_state::automat_palette_w)).share("palette");
 	map(0x314000, 0x3147ff).ram();
 
 	// video regs are moved to here..
-	map(0x400000, 0x400007).w(FUNC(dec0_automat_state::automat_scroll_w));
-	map(0x400008, 0x400009).w(FUNC(dec0_automat_state::priority_w));
+	map(0x400000, 0x400007).w(FUNC(automat_state::automat_scroll_w));
+	map(0x400008, 0x400009).w(FUNC(automat_state::priority_w));
 
 	map(0x500000, 0x500001).nopw(); // ???
 
@@ -880,7 +881,7 @@ void dec0_automat_state::automat_map(address_map &map)
 	map(0xffc000, 0xffcfff).ram().share("spriteram");           /* Sprites */
 }
 
-void dec0_automat_state::secretab_map(address_map &map)
+void automat_state::secretab_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
 //  map(0x240000, 0x240007).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control_0_w));
@@ -895,7 +896,7 @@ void dec0_automat_state::secretab_map(address_map &map)
 //  map(0x340000, 0x34007f).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_colscroll_r), FUNC(deco_bac06_device::pf_colscroll_w));
 //  map(0x340400, 0x3407ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_r), FUNC(deco_bac06_device::pf_rowscroll_w));
 
-	map(0x314008, 0x31400f).r(FUNC(dec0_automat_state::slyspy_controls_r));
+	map(0x314008, 0x31400f).r(FUNC(automat_state::slyspy_controls_r));
 	map(0x314001, 0x314001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
 	map(0x300000, 0x300007).ram();
@@ -904,12 +905,12 @@ void dec0_automat_state::secretab_map(address_map &map)
 	map(0x300c00, 0x300fff).ram();
 	map(0x301000, 0x3017ff).rw(m_tilegen[2], FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 	map(0x301800, 0x307fff).ram().share("ram"); /* Sly Spy main ram */
-	map(0x310000, 0x3107ff).rw(FUNC(dec0_automat_state::automat_palette_r), FUNC(dec0_automat_state::automat_palette_w)).share("palette");
+	map(0x310000, 0x3107ff).rw(FUNC(automat_state::automat_palette_r), FUNC(automat_state::automat_palette_w)).share("palette");
 	map(0xb08000, 0xb08fff).ram().share("spriteram"); /* Sprites */
 }
 
 
-void dec0_automat_state::automat_s_map(address_map &map)
+void automat_state::automat_s_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("soundbank");
@@ -918,11 +919,11 @@ void dec0_automat_state::automat_s_map(address_map &map)
 	map(0xd000, 0xd001).rw("2203b", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe000).w(m_adpcm_select[1], FUNC(ls157_device::ba_w));
-	map(0xe800, 0xe800).w(FUNC(dec0_automat_state::sound_bankswitch_w));
+	map(0xe800, 0xe800).w(FUNC(automat_state::sound_bankswitch_w));
 	map(0xf000, 0xf000).w(m_adpcm_select[0], FUNC(ls157_device::ba_w));
 }
 
-void dec0_automat_state::secretab_s_map(address_map &map)
+void automat_state::secretab_s_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("soundbank");
@@ -931,7 +932,7 @@ void dec0_automat_state::secretab_s_map(address_map &map)
 	map(0xd000, 0xd001).rw("ym3812", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe000).w(m_adpcm_select[1], FUNC(ls157_device::ba_w));
-	map(0xe800, 0xe800).w(FUNC(dec0_automat_state::sound_bankswitch_w));
+	map(0xe800, 0xe800).w(FUNC(automat_state::sound_bankswitch_w));
 	map(0xf000, 0xf000).w(m_adpcm_select[0], FUNC(ls157_device::ba_w));
 }
 
@@ -964,7 +965,7 @@ static INPUT_PORTS_START( dec0 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dec1 )
@@ -990,7 +991,7 @@ static INPUT_PORTS_START( dec1 )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1447,7 +1448,7 @@ static INPUT_PORTS_START( ffantasybl )
 	PORT_DIPSETTING(      0x0000, DEF_STR( None ) ) // 0 Dot less
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Game does not want vblank here
@@ -1623,7 +1624,7 @@ static INPUT_PORTS_START( bouldash )
 //  PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")        /* extremely slow palette fades with ACTIVE_HIGH */
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))        /* extremely slow palette fades with ACTIVE_HIGH */
 
 	PORT_START("DSW")
 	/* Different Coinage. Just a few combinations from manual, the rest was figured out */
@@ -1771,14 +1772,17 @@ static GFXDECODE_START( gfx_secretab )
 	GFXDECODE_ENTRY( "tiles2",  0, automat_tilelayout2,  0x300, 0x10 )
 GFXDECODE_END
 
+
 /******************************************************************************/
 
-
-
 // DECO video CRTC, pixel clock is unverified (actually 24MHz/4?)
-void dec0_state::set_screen_raw_params_data_east(machine_config &config)
+void dec0_state::set_screen_raw_params(machine_config &config)
 {
-	m_screen->set_raw(XTAL(12'000'000)/2,384,0,256,272,8,248);
+//  m_screen->set_refresh_hz(57.41);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); / 57.41 Hz, 529us Vblank
+//  m_screen->set_size(32*8, 32*8);
+//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_raw(XTAL(12'000'000) / 2, 384, 0, 256, 272, 8, 248);
 }
 
 void dec0_state::dec0_base(machine_config &config)
@@ -1787,12 +1791,7 @@ void dec0_state::dec0_base(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	set_screen_raw_params_data_east(config);
-	//m_screen->set_refresh_hz(57.41);
-	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 57.41 Hz, 529us Vblank */
-	//m_screen->set_size(32*8, 32*8);
-	//m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	//screen update callback differs per game
+	set_screen_raw_params(config);
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dec0);
@@ -1825,8 +1824,11 @@ void dec0_state::dec0(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::dec0_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dec0_state::irq6_line_assert)); /* VBL */
 
-	M6502(config, m_audiocpu, XTAL(12'000'000) / 8);
+	R65C02(config, m_audiocpu, XTAL(12'000'000) / 8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec0_state::dec0_s_map);
+
+	input_merger_device &audio_irq(INPUT_MERGER_ANY_HIGH(config, "audio_irq"));
+	audio_irq.output_handler().set_inputline(m_audiocpu, 0);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0)
@@ -1841,10 +1843,11 @@ void dec0_state::dec0(machine_config &config)
 	ym1.add_route(1, "mono", 0.81);
 	ym1.add_route(2, "mono", 0.81);
 	ym1.add_route(3, "mono", 0.32);
-	ym1.irq_handler().set_inputline(m_audiocpu, 0); // Schematics show both ym2203 and ym3812 can trigger IRQ, but Bandit is the only game to program 2203 to do so
+	// Schematics show both ym2203 and ym3812 can trigger IRQ, but Bandit is the only game to program 2203 to do so
+	ym1.irq_handler().set("audio_irq", FUNC(input_merger_device::in_w<0>));
 
 	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000) / 4));
-	ym2.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2.irq_handler().set("audio_irq", FUNC(input_merger_device::in_w<1>));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.72);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(20'000'000) / 2 / 10, okim6295_device::PIN7_HIGH));
@@ -1881,7 +1884,7 @@ void dec0_state::dec1(machine_config &config)
 }
 
 
-void dec0_automat_state::sound_bankswitch_w(uint8_t data)
+void automat_state::sound_bankswitch_w(uint8_t data)
 {
 	m_msm[0]->reset_w(BIT(data, 3));
 	m_msm[1]->reset_w(BIT(data, 4));
@@ -1889,7 +1892,7 @@ void dec0_automat_state::sound_bankswitch_w(uint8_t data)
 	m_soundbank->set_entry(data & 7);
 }
 
-void dec0_automat_state::msm1_vclk_cb(int state)
+void automat_state::msm1_vclk_cb(int state)
 {
 	if (!state)
 		return;
@@ -1899,7 +1902,7 @@ void dec0_automat_state::msm1_vclk_cb(int state)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_adpcm_toggle[0]);
 }
 
-void dec0_automat_state::msm2_vclk_cb(int state)
+void automat_state::msm2_vclk_cb(int state)
 {
 	if (!state)
 		return;
@@ -1909,26 +1912,24 @@ void dec0_automat_state::msm2_vclk_cb(int state)
 }
 
 
-void dec0_automat_state::automat(machine_config &config)
+void automat_state::automat(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_automat_state::automat_map);
+	M68000(config, m_maincpu, 10'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &automat_state::automat_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dec0_state::irq6_line_hold)); /* VBL */
 
-	Z80(config, m_audiocpu, 3000000); // ?
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec0_automat_state::automat_s_map);
+	Z80(config, m_audiocpu, 3'000'000); // ?
+	m_audiocpu->set_addrmap(AS_PROGRAM, &automat_state::automat_s_map);
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(dec0_automat_state,dec0_nodma)
+	MCFG_VIDEO_START_OVERRIDE(automat_state,dec0_nodma)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(57.41);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 57.41 Hz, 529us Vblank */
-	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec0_automat_state::screen_update_automat));
+	set_screen_raw_params(config);
+	m_screen->set_screen_update(FUNC(automat_state::screen_update_automat));
 	m_screen->set_palette(m_palette);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
@@ -1944,7 +1945,7 @@ void dec0_automat_state::automat(machine_config &config)
 	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_MXC06(config, m_spritegen, 0, m_palette, gfx_automat_spr);
-	m_spritegen->set_colpri_callback(FUNC(dec0_automat_state::robocop_colpri_cb));
+	m_spritegen->set_colpri_callback(FUNC(automat_state::robocop_colpri_cb));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_automat);
@@ -1955,13 +1956,13 @@ void dec0_automat_state::automat(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	ym2203_device &ym2203a(YM2203(config, "2203a", 1250000));
+	ym2203_device &ym2203a(YM2203(config, "2203a", 1'250'000));
 	ym2203a.add_route(0, "mono", 0.90);
 	ym2203a.add_route(1, "mono", 0.90);
 	ym2203a.add_route(2, "mono", 0.90);
 	ym2203a.add_route(3, "mono", 0.35);
 
-	ym2203_device &ym2203b(YM2203(config, "2203b", 1250000));
+	ym2203_device &ym2203b(YM2203(config, "2203b", 1'250'000));
 	ym2203b.add_route(0, "mono", 0.90);
 	ym2203b.add_route(1, "mono", 0.90);
 	ym2203b.add_route(2, "mono", 0.90);
@@ -1973,38 +1974,36 @@ void dec0_automat_state::automat(machine_config &config)
 	LS157(config, m_adpcm_select[1], 0);
 	m_adpcm_select[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
-	msm5205_device &msm1(MSM5205(config, "msm1", 384000));
-	msm1.vck_legacy_callback().set(FUNC(dec0_automat_state::msm1_vclk_cb));
+	msm5205_device &msm1(MSM5205(config, "msm1", 384'000));
+	msm1.vck_legacy_callback().set(FUNC(automat_state::msm1_vclk_cb));
 	msm1.set_prescaler_selector(msm5205_device::S96_4B);
 	msm1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	msm5205_device &msm2(MSM5205(config, "msm2", 384000));
-	msm2.vck_legacy_callback().set(FUNC(dec0_automat_state::msm2_vclk_cb));
+	msm5205_device &msm2(MSM5205(config, "msm2", 384'000));
+	msm2.vck_legacy_callback().set(FUNC(automat_state::msm2_vclk_cb));
 	msm2.set_prescaler_selector(msm5205_device::S96_4B);
 	msm2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 // this seems very similar to the automat bootleg
-void dec0_automat_state::secretab(machine_config &config) // all clocks verified on PCB
+void automat_state::secretab(machine_config &config) // all clocks verified on PCB
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, 20_MHz_XTAL / 2); // verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz
-	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_automat_state::secretab_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &automat_state::secretab_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dec0_state::irq6_line_hold)); // VBL
 
 	Z80(config, m_audiocpu, 20_MHz_XTAL / 4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &dec0_automat_state::secretab_s_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &automat_state::secretab_s_map);
 
 	// video hardware
-	MCFG_VIDEO_START_OVERRIDE(dec0_automat_state,slyspy)
+	MCFG_VIDEO_START_OVERRIDE(automat_state,slyspy)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(57.41);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); // 57.41 Hz, 529us Vblank
-	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(dec0_automat_state::screen_update_secretab));
+	set_screen_raw_params(config);
+	m_screen->set_screen_update(FUNC(automat_state::screen_update_secretab));
 	m_screen->set_palette(m_palette);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
@@ -2014,7 +2013,7 @@ void dec0_automat_state::secretab(machine_config &config) // all clocks verified
 	DECO_BAC06(config, m_tilegen[1], 0);
 	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
 	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
-	m_tilegen[1]->set_tile_callback(FUNC(dec0_automat_state::baddudes_tile_cb));
+	m_tilegen[1]->set_tile_callback(FUNC(automat_state::baddudes_tile_cb));
 
 	DECO_BAC06(config, m_tilegen[2], 0);
 	m_tilegen[2]->set_gfx_region_wide(0, 2, 0);
@@ -2048,12 +2047,12 @@ void dec0_automat_state::secretab(machine_config &config) // all clocks verified
 	m_adpcm_select[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
 
 	msm5205_device &msm1(MSM5205(config, "msm1", 400_kHz_XTAL));
-	msm1.vck_legacy_callback().set(FUNC(dec0_automat_state::msm1_vclk_cb));
+	msm1.vck_legacy_callback().set(FUNC(automat_state::msm1_vclk_cb));
 	msm1.set_prescaler_selector(msm5205_device::S96_4B);
 	msm1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	msm5205_device &msm2(MSM5205(config, "msm2", 400_kHz_XTAL));
-	msm2.vck_legacy_callback().set(FUNC(dec0_automat_state::msm2_vclk_cb));
+	msm2.vck_legacy_callback().set(FUNC(automat_state::msm2_vclk_cb));
 	msm2.set_prescaler_selector(msm5205_device::S96_4B);
 	msm2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -2284,7 +2283,7 @@ void dec0_state::midresb(machine_config &config)
 	midres(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::midresb_map);
 
-	M6502(config.replace(), m_audiocpu, 1500000);
+	R65C02(config.replace(), m_audiocpu, 1'500'000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec0_state::dec0_s_map);
 
 	M68705R3(config, m_mcu, XTAL(3'579'545));
@@ -2365,18 +2364,71 @@ ROM_START( hbarrel ) /* DE-0289-2 main board, DE-0293-1 sub/rom board */
 ROM_END
 
 /*
-There are known PCBs with ROMs 01 & 04 stamped as "-1" revision
-At least 1 PCB was spotted with ROM labels as "MYF HEAVY BARREL 01-2" & "MYF HEAVY BARREL 04-2"
-Niether version has been dumped to verify they are indeed different versions
+There are known PCBs with ROMs 01 & 04 that have no revision markings and at least 1 PCB was
+spotted with ROM labels as "MYF HEAVY BARREL 01-2" & "MYF HEAVY BARREL 04-2". Neither version is
+currently dumped to verify they are indeed different versions but, clearly revision 2 is missing
 */
 ROM_START( hbarrelu ) /* DE-0297-1 main board, DE-0299-0 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "heavy_barrel_04.3c", 0x00000, 0x10000, CRC(4877b09e) SHA1(30c653b2f59fece881d088b675192ff2599adbe3) )
-	ROM_LOAD16_BYTE( "heavy_barrel_01.3a", 0x00001, 0x10000, CRC(8b41c219) SHA1(5155095f459c29bd1fa5b3e8e2555db20a3bcfbc) )
-	ROM_LOAD16_BYTE( "heavy_barrel_05.4c", 0x20000, 0x10000, CRC(2087d570) SHA1(625a33c2f4feed56f636d318531d0996cdee9194) )
-	ROM_LOAD16_BYTE( "heavy_barrel_02.4a", 0x20001, 0x10000, CRC(815536ae) SHA1(684f67dc92f2a3bd77effce68c50e4013e054d31) )
-	ROM_LOAD16_BYTE( "heavy_barrel_06.6c", 0x40000, 0x10000, CRC(da4e3fbc) SHA1(afc054eb5ee1d64d69fd8134d62e7c2d90f775c8) )
-	ROM_LOAD16_BYTE( "heavy_barrel_03.6a", 0x40001, 0x10000, CRC(7fed7c46) SHA1(697742a18a0b01acadb0bbddc54331ab7e097bd8) )
+	ROM_LOAD16_BYTE( "heavy_barrel_04-3u.3c", 0x00000, 0x10000, CRC(c8d26d56) SHA1(f686427f3f28bbec3e69b07f847b1478f6ada93a) ) // labeled as HEAVY BARREL 04-3U  (with the "3U" being stamped on the label)
+	ROM_LOAD16_BYTE( "heavy_barrel_01-3u.3a", 0x00001, 0x10000, CRC(ae05753e) SHA1(37a8c07a76ef950acaeddcf49fdcb5705dbc9f93) ) // labeled as HEAVY BARREL 01-3U  (with the "3U" being stamped on the label)
+	ROM_LOAD16_BYTE( "heavy_barrel_05.4c",    0x20000, 0x10000, CRC(2087d570) SHA1(625a33c2f4feed56f636d318531d0996cdee9194) )
+	ROM_LOAD16_BYTE( "heavy_barrel_02.4a",    0x20001, 0x10000, CRC(815536ae) SHA1(684f67dc92f2a3bd77effce68c50e4013e054d31) )
+	ROM_LOAD16_BYTE( "heavy_barrel_06.6c",    0x40000, 0x10000, CRC(da4e3fbc) SHA1(afc054eb5ee1d64d69fd8134d62e7c2d90f775c8) )
+	ROM_LOAD16_BYTE( "heavy_barrel_03.6a",    0x40001, 0x10000, CRC(7fed7c46) SHA1(697742a18a0b01acadb0bbddc54331ab7e097bd8) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 Sound */
+	ROM_LOAD( "heavy_barrel_07.8a", 0x8000, 0x8000, CRC(a127f0f7) SHA1(2cf962410936ac336e384dda2bf434a297bc940f) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "heavy_barrel_31.9a", 0x0000, 0x1000, CRC(239d726f) SHA1(969f38ae981ffde6053ece93cc51614d492edbbb) )
+
+	ROM_REGION( 0x20000, "char", 0 )
+	ROM_LOAD( "heavy_barrel_25.15h", 0x00000, 0x10000, CRC(8649762c) SHA1(84d3d82d4d011c54271ef7a0dc5857a34b61cf8a) )
+	ROM_LOAD( "heavy_barrel_26.16h", 0x10000, 0x10000, CRC(f8189bbd) SHA1(b4445f50e8771af6ba4fcbc34018f6ecd379779a) )
+
+	ROM_REGION( 0x80000, "tiles1", 0 )
+	ROM_LOAD( "heavy_barrel_18.14d", 0x00000, 0x10000, CRC(ef664373) SHA1(d66a8c685c44cc8583527297d7ea7778f0d9c8db) )
+	ROM_LOAD( "heavy_barrel_17.12d", 0x10000, 0x10000, CRC(a4f186ac) SHA1(ee422f8479c1f21bb62d040567a9748b646e6f9f) )
+	ROM_LOAD( "heavy_barrel_20.17d", 0x20000, 0x10000, CRC(2fc13be0) SHA1(cce46b91104c0ac4038e98131fe957e0ed2f1a88) )
+	ROM_LOAD( "heavy_barrel_19.15d", 0x30000, 0x10000, CRC(d6b47869) SHA1(eaef6ed5505395b1b829d6a126363031ad4e851a) )
+	ROM_LOAD( "heavy_barrel_22.14f", 0x40000, 0x10000, CRC(50d6a1ad) SHA1(e7b464f34d6f3796823de6fdcbfd79416f71a119) )
+	ROM_LOAD( "heavy_barrel_21.12f", 0x50000, 0x10000, CRC(f01d75c5) SHA1(959f9e2461db5f08b7ab12cc3b43f33be69318c9) )
+	ROM_LOAD( "heavy_barrel_24.17f", 0x60000, 0x10000, CRC(ae377361) SHA1(a9aa520044f5b5037a495402ef128d3d8522b20f) )
+	ROM_LOAD( "heavy_barrel_23.15f", 0x70000, 0x10000, CRC(bbdaf771) SHA1(7b29d6d606319337562b0431b6290df15cde17e2) )
+
+	ROM_REGION( 0x40000, "tiles2", 0 )
+	ROM_LOAD( "heavy_barrel_29.8h", 0x00000, 0x10000, CRC(5514b296) SHA1(d258134a95bb223db139780b8e7377cccbe01af0) )
+	ROM_LOAD( "heavy_barrel_30.9h", 0x10000, 0x10000, CRC(5855e8ef) SHA1(0f09143fed7c354231a4f343d0371424d8436877) )
+	ROM_LOAD( "heavy_barrel_27.8f", 0x20000, 0x10000, CRC(99db7b9c) SHA1(2faeb287d685c8ea72c21658777f62ff9e194a69) )
+	ROM_LOAD( "heavy_barrel_28.9f", 0x30000, 0x10000, CRC(33ce2b1a) SHA1(ef150dd5bc22368857ba27da18a17c161bb807a4) )
+
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD( "heavy_barrel_15.16c", 0x00000, 0x10000, CRC(21816707) SHA1(859a70dfc7d8c01124a035dcd5ea554af5f4e871) )
+	ROM_LOAD( "heavy_barrel_16.17c", 0x10000, 0x10000, CRC(a5684574) SHA1(2dfe429cd6e110645ab976dd3a2b27d54ad91e89) )
+	ROM_LOAD( "heavy_barrel_11.16a", 0x20000, 0x10000, CRC(5c768315) SHA1(00905e59dec90bf51f1d8e2482f54ede0895d142) )
+	ROM_LOAD( "heavy_barrel_12.17a", 0x30000, 0x10000, CRC(8b64d7a4) SHA1(4d880d97a8eabd9b0a50cba3357df4f70afdf909) )
+	ROM_LOAD( "heavy_barrel_13.13c", 0x40000, 0x10000, CRC(56e3ed65) SHA1(e7e4a53a7a18c81af8e395a33bcd82a41482c0da) )
+	ROM_LOAD( "heavy_barrel_14.14c", 0x50000, 0x10000, CRC(bedfe7f3) SHA1(9db9c632fbf5a98d2d21bb960cc7111f6f9410fc) )
+	ROM_LOAD( "heavy_barrel_09.13a", 0x60000, 0x10000, CRC(26240ea0) SHA1(25732986d787afd99a045ce4587f1079f84e675b) )
+	ROM_LOAD( "heavy_barrel_10.14a", 0x70000, 0x10000, CRC(47d95447) SHA1(d2ffe96a19cfcbddee0df07dad89bd83cba801fa) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "heavy_barrel_08.2c", 0x0000, 0x10000, CRC(645c5b68) SHA1(096ca5d7b5df752df6d2c856b3f94b29eea7c3de) )
+
+	ROM_REGION( 0x600, "proms", 0 )
+	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) ) /* Also known to be labeled as A-1 */
+	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) ) /* Also known to be labeled as A-2 */
+ROM_END
+
+ROM_START( hbarrelua ) /* DE-0297-1 main board, DE-0299-0 sub/rom board */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_LOAD16_BYTE( "heavy_barrel_04-1.3c", 0x00000, 0x10000, CRC(4877b09e) SHA1(30c653b2f59fece881d088b675192ff2599adbe3) ) // the revision "1" was stamped on the label
+	ROM_LOAD16_BYTE( "heavy_barrel_01-1.3a", 0x00001, 0x10000, CRC(8b41c219) SHA1(5155095f459c29bd1fa5b3e8e2555db20a3bcfbc) ) // the revision "1" was stamped on the label
+	ROM_LOAD16_BYTE( "heavy_barrel_05.4c",   0x20000, 0x10000, CRC(2087d570) SHA1(625a33c2f4feed56f636d318531d0996cdee9194) )
+	ROM_LOAD16_BYTE( "heavy_barrel_02.4a",   0x20001, 0x10000, CRC(815536ae) SHA1(684f67dc92f2a3bd77effce68c50e4013e054d31) )
+	ROM_LOAD16_BYTE( "heavy_barrel_06.6c",   0x40000, 0x10000, CRC(da4e3fbc) SHA1(afc054eb5ee1d64d69fd8134d62e7c2d90f775c8) )
+	ROM_LOAD16_BYTE( "heavy_barrel_03.6a",   0x40001, 0x10000, CRC(7fed7c46) SHA1(697742a18a0b01acadb0bbddc54331ab7e097bd8) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 Sound */
 	ROM_LOAD( "heavy_barrel_07.8a", 0x8000, 0x8000, CRC(a127f0f7) SHA1(2cf962410936ac336e384dda2bf434a297bc940f) )
@@ -2661,6 +2713,10 @@ ROM_START( drgninjab2 )
 ROM_END
 
 
+/*
+Known to exist a PCB with ROMs EK 01-3 & EK 04-3 ("3" stamped on label) & the EK-31 MCU was also stamped revision 3
+The first version, EK 01-1 & EK 04-1 and the above mentioned revision 3 ROMs still need to be found and archived.
+*/
 ROM_START( birdtry ) // DE-0311-0 main board, DE-0299-2 sub/rom board
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 6*64k for 68000 code
 	ROM_LOAD16_BYTE( "ek-04-2.3c", 0x00000, 0x10000, CRC(5f0f4686) SHA1(5eea74f5626339ebd50e623029f21f1cd0f93135) )
@@ -4163,9 +4219,9 @@ ROM_START( midresbj )
 
 	ROM_REGION( 0x20000, "char", 0 )
 	ROM_LOAD( "23",             0x08000, 0x08000, CRC(d75aba06) SHA1(cb3b969db3dd8e0c5c3729482f7461cde3a961f3) )
-	ROM_CONTINUE(                   0x00000, 0x08000 )  /* the two halves are swapped */
+	ROM_CONTINUE(               0x00000, 0x08000 )  /* the two halves are swapped */
 	ROM_LOAD( "24",             0x18000, 0x08000, CRC(8f5bbb79) SHA1(cb10f68787606111ba5e9967bf0b0cd21269a902) )
-	ROM_CONTINUE(                   0x10000, 0x08000 )
+	ROM_CONTINUE(               0x10000, 0x08000 )
 
 	ROM_REGION( 0x80000, "tiles1", 0 )
 	ROM_LOAD( "19",             0x00000, 0x20000, CRC(fd9ba1bd) SHA1(a105a4335eeed19662c89ab0f90485f1029cf03f) )
@@ -4227,10 +4283,10 @@ ROM_START( bouldash )
 	ROM_LOAD( "fn-02",        0x30000, 0x10000, CRC(4f060cba) SHA1(4063183e699bb8b6059d56f4e2fec5fa0b037c23) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
-	ROM_LOAD( "fn-11",      0x00000, 0x10000, CRC(990fd8d9) SHA1(a37bd96ecd75c610d98df3320f53ae4e2b7fdefd) )
+	ROM_LOAD( "fn-11",        0x00000, 0x10000, CRC(990fd8d9) SHA1(a37bd96ecd75c610d98df3320f53ae4e2b7fdefd) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "ta-16.21k",          0x0000, 0x0100, CRC(ad26e8d4) SHA1(827337aeb8904429a1c050279240ae38aa6ce064) )  /* Priority (not used) */
+	ROM_LOAD( "ta-16.21k",    0x0000, 0x0100, CRC(ad26e8d4) SHA1(827337aeb8904429a1c050279240ae38aa6ce064) )  /* Priority (not used) */
 ROM_END
 
 ROM_START( bouldashj )
@@ -4266,10 +4322,10 @@ ROM_START( bouldashj )
 	ROM_LOAD( "fn-02",        0x30000, 0x10000, CRC(4f060cba) SHA1(4063183e699bb8b6059d56f4e2fec5fa0b037c23) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
-	ROM_LOAD( "fn-11",      0x00000, 0x10000, CRC(990fd8d9) SHA1(a37bd96ecd75c610d98df3320f53ae4e2b7fdefd) )
+	ROM_LOAD( "fn-11",        0x00000, 0x10000, CRC(990fd8d9) SHA1(a37bd96ecd75c610d98df3320f53ae4e2b7fdefd) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "ta-16.21k",          0x0000, 0x0100, CRC(ad26e8d4) SHA1(827337aeb8904429a1c050279240ae38aa6ce064) )  /* Priority (not used) */
+	ROM_LOAD( "ta-16.21k",    0x0000, 0x0100, CRC(ad26e8d4) SHA1(827337aeb8904429a1c050279240ae38aa6ce064) )  /* Priority (not used) */
 ROM_END
 
 
@@ -4288,9 +4344,10 @@ uint16_t dec0_state::ffantasybl_242024_r()
 
 /******************************************************************************/
 
-//    YEAR, NAME,       PARENT,   MACHINE,    INPUT,      STATE/DEVICE,   INIT,        MONITOR,COMPANY,                 FULLNAME,            FLAGS
+//    YEAR, NAME,       PARENT,   MACHINE,    INPUT,      STATE/DEVICE,   INIT,            MONITOR,COMPANY,                 FULLNAME,            FLAGS
 GAME( 1987, hbarrel,    0,        hbarrel,    hbarrel,    dec0_state,     init_hbarrel,    ROT270, "Data East Corporation", "Heavy Barrel (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hbarrelu,   hbarrel,  hbarrel,    hbarrel,    dec0_state,     init_hbarrel,    ROT270, "Data East USA",         "Heavy Barrel (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hbarrelu,   hbarrel,  hbarrel,    hbarrel,    dec0_state,     init_hbarrel,    ROT270, "Data East USA",         "Heavy Barrel (US, revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hbarrelua,  hbarrel,  hbarrel,    hbarrel,    dec0_state,     init_hbarrel,    ROT270, "Data East USA",         "Heavy Barrel (US, revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, baddudes,   0,        baddudes,   baddudes,   dec0_state,     init_hbarrel,    ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US, revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, drgninja,   baddudes, baddudes,   drgninja,   dec0_state,     init_hbarrel,    ROT0,   "Data East Corporation", "Dragonninja (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, birdtry,    0,        birdtry,    birdtry,    dec0_state,     init_hbarrel,    ROT270, "Data East Corporation", "Birdie Try (Japan, revision 2, revision 1 MCU)", MACHINE_SUPPORTS_SAVE )
@@ -4322,17 +4379,16 @@ GAME( 1990, bouldashj,  bouldash, slyspy,     bouldash,   slyspy_state,   init_s
 // bootlegs
 
 // more or less just an unprotected versions of the game, everything intact
-GAME( 1988, robocopb,   robocop,  robocopb,   robocop,    dec0_state, empty_init,      ROT0, "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, drgninjab,  baddudes, drgninjab,  drgninja,   dec0_state, init_drgninja,   ROT0, "bootleg", "Dragonninja (bootleg)", MACHINE_SUPPORTS_SAVE )
-
+GAME( 1988, robocopb,   robocop,  robocopb,   robocop,    dec0_state,     empty_init,      ROT0,   "bootleg", "Robocop (World bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, drgninjab,  baddudes, drgninjab,  drgninja,   dec0_state,     init_drgninja,   ROT0,   "bootleg", "Dragonninja (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // this is a common bootleg board
-GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state, empty_init,      ROT0, "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
-GAME( 1989, midresbj,   midres,   midresbj,   midresb,    dec0_state, empty_init,      ROT0, "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, empty_init,      ROT0, "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
-GAME( 1988, drgninjab2, baddudes, drgninjab,  drgninja,   dec0_state, init_drgninja,   ROT0, "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text), 68705 dumped but not hooked up
+GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state,     empty_init,      ROT0,   "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
+GAME( 1989, midresbj,   midres,   midresbj,   midresb,    dec0_state,     empty_init,      ROT0,   "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state,     empty_init,      ROT0,   "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
+GAME( 1988, drgninjab2, baddudes, drgninjab,  drgninja,   dec0_state,     init_drgninja,   ROT0,   "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text), 68705 dumped but not hooked up
 
 // these are different to the above but quite similar to each other
-GAME( 1988, automat,    robocop,  automat,    robocop,    dec0_automat_state, empty_init,   ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
-GAME( 1989, secretab,   secretag, secretab,   slyspy,     dec0_automat_state, empty_init,   ROT0,   "bootleg", "Secret Agent (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mastbond,   secretag, secretab,   slyspy,     dec0_automat_state, empty_init,   ROT0,   "bootleg", "Master Bond (bootleg of Secret Agent)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, automat,    robocop,  automat,    robocop,    automat_state,  empty_init,      ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
+GAME( 1989, secretab,   secretag, secretab,   slyspy,     automat_state,  empty_init,      ROT0,   "bootleg", "Secret Agent (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mastbond,   secretag, secretab,   slyspy,     automat_state,  empty_init,      ROT0,   "bootleg", "Master Bond (bootleg of Secret Agent)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

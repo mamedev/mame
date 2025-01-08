@@ -96,8 +96,8 @@ private:
 
 	required_device<palette_device> m_palette;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t i8259_r(offs_t offset);
 	void i8259_w(offs_t offset, uint16_t data);
@@ -109,9 +109,9 @@ private:
 	void int_w(int state);
 	MC6845_UPDATE_ROW(update_row);
 
-	void m20_data_mem(address_map &map);
-	void m20_io(address_map &map);
-	void m20_program_mem(address_map &map);
+	void m20_data_mem(address_map &map) ATTR_COLD;
+	void m20_io(address_map &map) ATTR_COLD;
+	void m20_program_mem(address_map &map) ATTR_COLD;
 
 	offs_t m_memsize = 0;
 	uint8_t m_port21 = 0;
@@ -852,4 +852,4 @@ ROM_END
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME           FLAGS
 COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1981, m40,  m20,    0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1986, m44,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M44", MACHINE_IS_SKELETON )
+COMP( 1986, m44,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M44", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

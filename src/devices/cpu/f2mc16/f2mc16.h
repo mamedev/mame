@@ -14,8 +14,6 @@
 class f2mc16_device : public cpu_device
 {
 public:
-	friend class mb9061x_device;
-
 	enum
 	{
 		F2MC16_PC, F2MC16_PS, F2MC16_USP, F2MC16_SSP, F2MC16_ACC,
@@ -40,12 +38,15 @@ public:
 	// construction/destruction
 	f2mc16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	bool rmw() { return m_rmw; }
+	void set_irq_level(int level);
+
 protected:
 	f2mc16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
@@ -67,9 +68,11 @@ private:
 
 	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16, m_tmp16aux;
 	u8 m_pcb, m_dtb, m_usb, m_ssb, m_adb, m_dpr, m_tmp8, m_tmp8aux, m_shifted_carry, m_prefix;
-	u32 m_acc, m_temp, m_tmp32, m_tmpea;
+	u32 m_pcbase, m_acc, m_temp, m_tmp32, m_tmpea;
 	s32 m_icount;
 	bool m_prefix_valid;
+	u16 m_irq_level;
+	bool m_rmw;
 
 	inline u8 read_8(u32 addr)
 	{
@@ -622,7 +625,7 @@ private:
 		if (read_rwX(0) > 0)
 		{
 			m_icount -= 4;
-			while (read_rwX(0) > 0)
+			while (uint16_t n = read_rwX(0))
 			{
 				u16 al = (m_acc & 0xffff);
 				u16 ah = (m_acc >> 16) & 0xffff;
@@ -631,7 +634,7 @@ private:
 				al++;
 				ah++;
 				m_acc = (ah<<16) | al;
-				write_rwX(0, read_rwX(0) - 1);
+				write_rwX(0, n - 1);
 				m_icount -= 8;
 			}
 		}
@@ -647,7 +650,7 @@ private:
 		if (read_rwX(0) > 0)
 		{
 			m_icount -= 4;
-			while (read_rwX(0) > 0)
+			while (uint16_t n = read_rwX(0))
 			{
 				u16 al = (m_acc & 0xffff);
 				u16 ah = (m_acc >> 16) & 0xffff;
@@ -656,7 +659,7 @@ private:
 				al += 2;
 				ah += 2;
 				m_acc = (ah<<16) | al;
-				write_rwX(0, read_rwX(0) - 1);
+				write_rwX(0, n - 1);
 				m_icount -= 8;
 			}
 		}
@@ -670,15 +673,32 @@ private:
 	inline void filsi(u8 dst)
 	{
 		m_icount -= 6;
-		while (read_rwX(0) > 0)
+		while (uint16_t n = read_rwX(0))
 		{
 			u16 al = (m_acc & 0xffff);
 			u16 ah = (m_acc >> 16) & 0xffff;
 			write_8((dst<<16) | ah, al & 0xff);
 			ah++;
 			m_acc = (ah<<16) | al;
-			write_rwX(0, read_rwX(0) - 1);
+			write_rwX(0, n - 1);
 			setNZ_8(m_acc & 0xff);
+			m_icount -= 6;
+		}
+		m_pc += 2;
+	}
+
+	inline void filswi(u8 dst)
+	{
+		m_icount -= 6;
+		while (uint16_t n = read_rwX(0))
+		{
+			u16 al = (m_acc & 0xffff);
+			u16 ah = (m_acc >> 16) & 0xffff;
+			write_16((dst<<16) | ah, al);
+			ah += 2;
+			m_acc = (ah<<16) | al;
+			write_rwX(0, n - 1);
+			setNZ_16(m_acc & 0xffff);
 			m_icount -= 6;
 		}
 		m_pc += 2;
@@ -696,17 +716,15 @@ private:
 	void opcodes_ea76(u8 operand);
 	void opcodes_ea77(u8 operand);
 	void opcodes_ea78(u8 operand);
+	void opcodes_rwiea79(u8 operand);
 	void opcodes_riea7a(u8 operand);
 	void opcodes_rwiea7b(u8 operand);
 	void opcodes_eari7c(u8 operand);
+	void opcodes_earwi7d(u8 operand);
 	void opcodes_rwiea7f(u8 operand);
 
-	void set_irq(int vector, int level);
-	void clear_irq(int vector);
-	void take_irq(int vector, int level);
-
-	int m_vector_level[256];
-	int m_outstanding_irqs;
+	void take_irq();
+	void take_irq_vector(uint8_t irq_vector);
 };
 
 DECLARE_DEVICE_TYPE(F2MC16, f2mc16_device)

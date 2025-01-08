@@ -109,7 +109,7 @@ public:
 	virtual char const *image_brief_type_name()         const noexcept override { return "prom"; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	void allocate();

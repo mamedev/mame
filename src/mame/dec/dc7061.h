@@ -21,12 +21,12 @@ public:
 	auto dma_w() { return m_dma_w.bind(); }
 
 	// register access
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// ncsci_device implementation
 	virtual void scsi_ctrl_changed() override;

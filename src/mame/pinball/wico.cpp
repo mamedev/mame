@@ -75,8 +75,8 @@ private:
 	u8 gentmrcl_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_housekeeping);
 	TIMER_DEVICE_CALLBACK_MEMBER(firq_housekeeping);
-	void ccpu_map(address_map &map);
-	void hcpu_map(address_map &map);
+	void ccpu_map(address_map &map) ATTR_COLD;
+	void hcpu_map(address_map &map) ATTR_COLD;
 
 	bool m_zcen = false;
 	bool m_gten = false;
@@ -84,8 +84,8 @@ private:
 	bool m_diag_on = false;
 	u8 m_firqtimer = 0U;
 	u8 m_diag_segments = 0U;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_ccpu;
 	required_device<cpu_device> m_hcpu;
 	required_shared_ptr<u8> m_shared_ram;

@@ -109,6 +109,10 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
+		m_system(*this, "SYSTEM"),
+		m_dsw(*this, "DSW"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_spriteram(*this, "spriteram"),
@@ -145,17 +149,17 @@ protected:
 	uint32_t screen_update_champbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void champbas_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void champbas_map(address_map &map);
-	void champbasj_map(address_map &map);
-	void champbasja_map(address_map &map);
-	void champbasjb_map(address_map &map);
-	void champbb2_map(address_map &map);
-	void champbb2j_map(address_map &map);
-	void tbasebal_map(address_map &map);
-	void champbas_sound_map(address_map &map);
+	void champbas_map(address_map &map) ATTR_COLD;
+	void champbasj_map(address_map &map) ATTR_COLD;
+	void champbasja_map(address_map &map) ATTR_COLD;
+	void champbasjb_map(address_map &map) ATTR_COLD;
+	void champbb2_map(address_map &map) ATTR_COLD;
+	void champbb2j_map(address_map &map) ATTR_COLD;
+	void tbasebal_map(address_map &map) ATTR_COLD;
+	void champbas_sound_map(address_map &map) ATTR_COLD;
 
 	// devices, memory pointers
 	required_device<cpu_device> m_maincpu;
@@ -164,6 +168,7 @@ protected:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_ioport m_p1, m_p2, m_system, m_dsw;
 
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_vram;
@@ -201,13 +206,13 @@ protected:
 
 	void exctsccr_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void exctsccr_map(address_map &map);
-	void exctsccrb_map(address_map &map);
-	void exctsccr_sound_map(address_map &map);
-	void exctsccr_sound_io_map(address_map &map);
-	void exctscc2_sound_io_map(address_map &map);
+	void exctsccr_map(address_map &map) ATTR_COLD;
+	void exctsccrb_map(address_map &map) ATTR_COLD;
+	void exctsccr_sound_map(address_map &map) ATTR_COLD;
+	void exctsccr_sound_io_map(address_map &map) ATTR_COLD;
+	void exctscc2_sound_io_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_audiocpu;
@@ -575,10 +580,10 @@ void champbas_state::champbas_map(address_map &map)
 	map(0x8000, 0x87ff).ram().w(FUNC(champbas_state::tilemap_w)).share("vram");
 	map(0x8800, 0x8fff).ram().share("mainram");
 
-	map(0xa000, 0xa000).portr("P1");
-	map(0xa040, 0xa040).portr("P2");
-	map(0xa080, 0xa080).mirror(0x0020).portr("DSW");
-	map(0xa0c0, 0xa0c0).portr("SYSTEM");
+	map(0xa000, 0xa000).portr(m_p1);
+	map(0xa040, 0xa040).portr(m_p2);
+	map(0xa080, 0xa080).mirror(0x0020).portr(m_dsw);
+	map(0xa0c0, 0xa0c0).portr(m_system);
 
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 
@@ -737,7 +742,7 @@ static INPUT_PORTS_START( talbot )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(champbas_state, watchdog_bit2) // bit 2 of the watchdog counter
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(champbas_state::watchdog_bit2)) // bit 2 of the watchdog counter
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )

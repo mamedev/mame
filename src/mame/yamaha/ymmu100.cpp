@@ -219,11 +219,11 @@ protected:
 	void e1_tx(int state);
 	void e2_tx(int state);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void mu100_map(address_map &map);
-	void swp30_map(address_map &map);
+	void mu100_map(address_map &map) ATTR_COLD;
+	void swp30_map(address_map &map) ATTR_COLD;
 };
 
 class mu100r_state : public mu100_state {
@@ -298,7 +298,7 @@ u16 mu100_state::adc_battery_r()
 // model detect.  pulled to GND (0) on MU100, to 0.5Vcc on the card version, to Vcc on MU100R
 u16 mu100_state::adc_type_r()
 {
-	return 0;
+	return m_lcd ? 0 : 0x200;
 }
 
 u16 mu100r_state::adc_type_r()

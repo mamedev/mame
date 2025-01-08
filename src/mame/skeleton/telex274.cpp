@@ -114,9 +114,9 @@ public:
 	void telex274(machine_config &config);
 
 private:
-	void main_mem(address_map &map);
-	void coax_mem(address_map &map);
-	void exam_mem(address_map &map);
+	void main_mem(address_map &map) ATTR_COLD;
+	void coax_mem(address_map &map) ATTR_COLD;
+	void exam_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_coaxcpu;
@@ -182,4 +182,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1986, telex274, 0, 0, telex274, telex274, telex274_state, empty_init, "Telex Computer Products", "Telex 274-61C Sixteen Station Control Unit", MACHINE_IS_SKELETON)
+COMP(1986, telex274, 0, 0, telex274, telex274, telex274_state, empty_init, "Telex Computer Products", "Telex 274-61C Sixteen Station Control Unit", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

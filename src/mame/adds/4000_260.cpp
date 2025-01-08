@@ -47,13 +47,13 @@ public:
 	void _4000_260(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i80c32_device> m_maincpu;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -118,4 +118,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY  FULLNAME    FLAGS
-COMP( 1995, 4000_260, 0,      0,      _4000_260, _4000_260, _4000_260_state, empty_init, "ADDS",  "4000/260", MACHINE_IS_SKELETON )
+COMP( 1995, 4000_260, 0,      0,      _4000_260, _4000_260, _4000_260_state, empty_init, "ADDS",  "4000/260", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

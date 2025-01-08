@@ -49,15 +49,16 @@ public:
 	void reset_counter();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	TIMER_CALLBACK_MEMBER(update_stream);
 	void update_counter();
 	void update_mp3_decode_state();
 
+	uint16_t decrypt_common(uint16_t data, uint16_t key);
 	uint16_t decrypt_default(uint16_t data);
 	uint16_t decrypt_ddrsbm(uint16_t data);
 

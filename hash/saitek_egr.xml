@@ -16,7 +16,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="egr"/>
 		<part name="extrom" interface="saitek_egr">
 			<dataarea name="rom" size="0x8000">
-				<rom name="egr.bin" size="0x8000" crc="1f9800c8" sha1="6147ad3de65b897fa5f6ab06b2f8597403d6e32e" />
+				<rom name="egr_c10_u4" size="0x8000" crc="1f9800c8" sha1="6147ad3de65b897fa5f6ab06b2f8597403d6e32e" />
 			</dataarea>
 		</part>
 	</software>

@@ -73,8 +73,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void cavepc_io(address_map &map);
-	void cavepc_map(address_map &map);
+	void cavepc_io(address_map &map) ATTR_COLD;
+	void cavepc_map(address_map &map) ATTR_COLD;
 };
 
 /*****************************************************************************/
@@ -154,4 +154,4 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2009, deathsm2, 0, cavepc, cavepc, cavepc_state, empty_init, ROT0, "Cave", "Deathsmiles II: Makai no Merry Christmas (2009/10/14 MASTER VER 4.00)", MACHINE_IS_SKELETON )
+GAME(2009, deathsm2, 0, cavepc, cavepc, cavepc_state, empty_init, ROT0, "Cave", "Deathsmiles II: Makai no Merry Christmas (2009/10/14 MASTER VER 4.00)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

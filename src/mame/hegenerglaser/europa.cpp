@@ -59,7 +59,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -167,7 +167,7 @@ static INPUT_PORTS_START( europa )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("HELP")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, europa_state, on_button, 0) PORT_NAME("ON")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(europa_state::on_button), 0) PORT_NAME("ON")
 INPUT_PORTS_END
 
 

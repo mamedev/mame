@@ -25,7 +25,7 @@ public:
 	void vd56sp(machine_config &mconfig);
 
 private:
-	void exp_map(address_map &map);
+	void exp_map(address_map &map) ATTR_COLD;
 
 	required_device<r65c19_device> m_maincpu;
 };
@@ -59,4 +59,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(199?, vd56sp, 0, 0, vd56sp, vd56sp, vd56sp_state, empty_init, "Pro-Nets Technology", "Speedcom VD56SP", MACHINE_IS_SKELETON)
+SYST(199?, vd56sp, 0, 0, vd56sp, vd56sp, vd56sp_state, empty_init, "Pro-Nets Technology", "Speedcom VD56SP", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

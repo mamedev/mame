@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "pseudovia.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -22,7 +24,7 @@ public:
 
 	rbv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	void set_ram_info(u32 *ram, u32 size);
 
@@ -34,10 +36,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	devcb_write_line write_6015, write_irq;
@@ -45,16 +47,22 @@ private:
 	required_ioport m_montype;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<pseudovia_device> m_pseudovia;
 
 	emu_timer *m_6015_timer;
 	u8 m_pseudovia_regs[256], m_pseudovia_ier, m_pseudovia_ifr;
 	u8 m_pal_address, m_pal_idx;
 	u32 *m_ram_ptr;
 	u32 m_ram_size;
+	u8 m_video_config;
 
 	uint8_t pseudovia_r(offs_t offset);
 	void pseudovia_w(offs_t offset, uint8_t data);
 	void pseudovia_recalc_irqs();
+
+	u8 via2_video_config_r();
+	void via2_video_config_w(u8 data);
+	void via2_irq_w(int state);
 
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 

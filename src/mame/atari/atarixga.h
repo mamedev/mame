@@ -42,8 +42,8 @@ public:
 	virtual uint32_t read(offs_t offset, uint32_t mem_mask = ~0) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static const size_t RAM_WORDS = 2048;
@@ -77,8 +77,8 @@ public:
 	virtual uint32_t read(offs_t offset, uint32_t mem_mask = ~0) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static const size_t RAM_WORDS = 4096;

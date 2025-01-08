@@ -57,8 +57,8 @@ public:
 	void usg185(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -79,8 +79,8 @@ private:
 
 	void palette(palette_device &palette) const;
 
-	void usg185_map(address_map &map);
-	void usgames_map(address_map &map);
+	void usg185_map(address_map &map) ATTR_COLD;
+	void usgames_map(address_map &map) ATTR_COLD;
 	MC6845_UPDATE_ROW(update_row);
 };
 
@@ -230,7 +230,7 @@ static INPUT_PORTS_START( usg32 )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) // +12 Volts?
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("UNK1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )

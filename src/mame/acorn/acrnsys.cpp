@@ -96,8 +96,8 @@ public:
 	void acrnsys5(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void kbd_put(u8 data);
@@ -106,9 +106,9 @@ private:
 	uint8_t kbd_r();
 	void bus_nmi_w(int state);
 
-	void a6502_mem(address_map &map);
-	void a6809_mem(address_map &map);
-	void a6502a_mem(address_map &map);
+	void a6502_mem(address_map &map) ATTR_COLD;
+	void a6809_mem(address_map &map) ATTR_COLD;
+	void a6502a_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_irqs;
@@ -315,7 +315,7 @@ static INPUT_PORTS_START( acrnsys )
 //PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REPT")         PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 
 	PORT_START("BRK")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("BREAK") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, acrnsys_state, trigger_reset, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("BREAK") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(acrnsys_state::trigger_reset), 0)
 INPUT_PORTS_END
 
 

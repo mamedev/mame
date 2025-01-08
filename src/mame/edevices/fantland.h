@@ -30,7 +30,7 @@ public:
 	void wheelrun(machine_config &config);
 	void galaxygn(machine_config &config);
 
-	template <int Player> DECLARE_CUSTOM_INPUT_MEMBER(wheelrun_wheel_r);
+	template <int Player> ioport_value wheelrun_wheel_r();
 
 protected:
 	/* misc */
@@ -52,8 +52,8 @@ protected:
 
 	void nmi_enable_w(uint8_t data);
 	void soundlatch_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -65,13 +65,13 @@ private:
 	void spriteram2_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	void galaxygn_sound_irq(int state);
 	INTERRUPT_GEN_MEMBER(fantland_sound_irq);
-	void fantland_map(address_map &map);
-	void fantland_sound_iomap(address_map &map);
-	void fantland_sound_map(address_map &map);
-	void galaxygn_map(address_map &map);
-	void galaxygn_sound_iomap(address_map &map);
-	void wheelrun_map(address_map &map);
-	void wheelrun_sound_map(address_map &map);
+	void fantland_map(address_map &map) ATTR_COLD;
+	void fantland_sound_iomap(address_map &map) ATTR_COLD;
+	void fantland_sound_map(address_map &map) ATTR_COLD;
+	void galaxygn_map(address_map &map) ATTR_COLD;
+	void galaxygn_sound_iomap(address_map &map) ATTR_COLD;
+	void wheelrun_map(address_map &map) ATTR_COLD;
+	void wheelrun_sound_map(address_map &map) ATTR_COLD;
 };
 
 class borntofi_state : public fantland_state
@@ -102,13 +102,13 @@ private:
 
 	uint8_t inputs_r(offs_t offset);
 	void msm5205_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	template<int Voice> void adpcm_int(int state);
 	void adpcm_start(int voice);
 	void adpcm_stop(int voice);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_EDEVICES_FANTLAND_H

@@ -89,15 +89,15 @@ public:
 	void pi4d35(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void ip12(machine_config &config);
 	void pi4d3x(machine_config &config);
 
-	void ip12_map(address_map &map);
-	void pi4d3x_map(address_map &map);
-	void pbus_map(address_map &map);
+	void ip12_map(address_map &map) ATTR_COLD;
+	void pi4d3x_map(address_map &map) ATTR_COLD;
+	void pbus_map(address_map &map) ATTR_COLD;
 
 	required_device<r3000a_device> m_cpu;
 	required_device<sgi_pic1_device> m_pic;

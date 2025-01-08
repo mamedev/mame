@@ -8,8 +8,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_HEATHKIT_INTR_CNTRL_H
-#define MAME_HEATHKIT_INTR_CNTRL_H
+#ifndef MAME_HEATHZENITH_INTR_CNTRL_H
+#define MAME_HEATHZENITH_INTR_CNTRL_H
 
 #pragma once
 
@@ -53,7 +53,7 @@ protected:
 	virtual u8 get_instruction() override;
 	virtual void update_intr_line();
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	u8 m_intr_lines;
 };
@@ -72,7 +72,7 @@ public:
 protected:
 	ss_intr_cntrl(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	bool m_drq_raised;
 	bool m_irq_raised;
@@ -94,7 +94,7 @@ protected:
 	virtual u8 get_instruction() override;
 	virtual void update_intr_line() override;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	bool m_intr_blocked;
 };
@@ -113,7 +113,7 @@ protected:
 	virtual u8 get_instruction() override;
 	virtual void update_intr_line() override;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
@@ -155,7 +155,7 @@ public:
 
 protected:
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	devcb_write8                 m_irq_line;
 
@@ -165,4 +165,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(HEATH_INTR_SOCKET, heath_intr_socket)
 
-#endif // MAME_HEATHKIT_H89_INTR_CNTRL_H
+#endif // MAME_HEATHZENITH_H89_INTR_CNTRL_H

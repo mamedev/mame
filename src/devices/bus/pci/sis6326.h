@@ -19,28 +19,28 @@ public:
 protected:
 	sis6326_agp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	virtual u8 capptr_r() override;
 
-	void vram_aperture_map(address_map &map);
-	void mmio_map(address_map &map);
-	void vmi_map(address_map &map);
+	void vram_aperture_map(address_map &map) ATTR_COLD;
+	void mmio_map(address_map &map) ATTR_COLD;
+	void vmi_map(address_map &map) ATTR_COLD;
 private:
 	required_device<sis6236_vga_device> m_vga;
 	required_memory_region m_vga_rom;
 
-	void legacy_memory_map(address_map &map);
-	void legacy_io_map(address_map &map);
+	void legacy_memory_map(address_map &map) ATTR_COLD;
+	void legacy_io_map(address_map &map) ATTR_COLD;
 
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);

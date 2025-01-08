@@ -380,15 +380,15 @@ public:
 	void init_sf2049();
 	void init_sf2049se();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gauntleg_p12_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gauntleg_p34_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
+	ioport_value i40_r();
+	ioport_value gauntleg_p12_r();
+	ioport_value gauntleg_p34_r();
+	ioport_value keypad_r();
+	ioport_value gearshift_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static constexpr unsigned SYSTEM_CLOCK = 100000000;
@@ -468,13 +468,13 @@ private:
 
 	std::string sioIRQString(uint8_t data);
 
-	void vegas_cs2_map(address_map &map);
-	void vegas_cs3_map(address_map &map);
-	void vegas_cs4_map(address_map &map);
-	void vegas_cs5_map(address_map &map);
-	void vegas_cs6_map(address_map &map);
-	void vegas_cs7_map(address_map &map);
-	void vegas_cs8_map(address_map &map);
+	void vegas_cs2_map(address_map &map) ATTR_COLD;
+	void vegas_cs3_map(address_map &map) ATTR_COLD;
+	void vegas_cs4_map(address_map &map) ATTR_COLD;
+	void vegas_cs5_map(address_map &map) ATTR_COLD;
+	void vegas_cs6_map(address_map &map) ATTR_COLD;
+	void vegas_cs7_map(address_map &map) ATTR_COLD;
+	void vegas_cs8_map(address_map &map) ATTR_COLD;
 
 	static void hdd_config(device_t *device);
 };
@@ -1062,7 +1062,7 @@ void vegas_state::i40_w(uint32_t data)
 	m_i40_data = data;
 }
 
-CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
+ioport_value vegas_state::i40_r()
 {
 	if (m_io_dips->read() & 0x100) {
 		// 8 way joysticks
@@ -1117,7 +1117,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 /*************************************
 * Gauntlet Player 1 & 2 control read
 *************************************/
-CUSTOM_INPUT_MEMBER(vegas_state::gauntleg_p12_r)
+ioport_value vegas_state::gauntleg_p12_r()
 {
 	if (m_io_dips->read() & 0x2000) {
 		// 8 way joysticks
@@ -1133,7 +1133,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::gauntleg_p12_r)
 /*************************************
 * Gauntlet Player 3 & 4 control read
 *************************************/
-CUSTOM_INPUT_MEMBER(vegas_state::gauntleg_p34_r)
+ioport_value vegas_state::gauntleg_p34_r()
 {
 	if (m_io_dips->read() & 0x2000) {
 		// 8 way joysticks
@@ -1182,7 +1182,7 @@ void vegas_state::wheel_board_w(uint32_t data)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(vegas_state::keypad_r)
+ioport_value vegas_state::keypad_r()
 {
 	int row_sel;
 	for (row_sel=0; row_sel<4; row_sel++)
@@ -1204,7 +1204,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::keypad_r)
 *  Gearshift
 *
 *************************************/
-DECLARE_CUSTOM_INPUT_MEMBER(vegas_state::gearshift_r)
+ioport_value vegas_state::gearshift_r()
 {
 	// Check for gear change and save gear selection
 	uint32_t gear = m_io_gearshift->read();
@@ -1398,10 +1398,10 @@ static INPUT_PORTS_START( gauntleg )
 	PORT_DIPSETTING(      0x0000, "VGA Res 640x480" ) //VGA res not supported for gauntleg
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(vegas_state, gauntleg_p12_r)
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(FUNC(vegas_state::gauntleg_p12_r))
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(vegas_state, gauntleg_p34_r)
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(FUNC(vegas_state::gauntleg_p34_r))
 
 	PORT_MODIFY("8WAY_P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_8WAY
@@ -1632,7 +1632,7 @@ static INPUT_PORTS_START( nbashowt )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 Turbo")
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(vegas_state, i40_r)
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(vegas_state::i40_r))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 A")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("P4 B")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("P4 Turbo")
@@ -1695,8 +1695,8 @@ static INPUT_PORTS_START( sf2049 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 2")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("View 3")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Music")
-	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(vegas_state, keypad_r)
-	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(vegas_state, gearshift_r)
+	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(vegas_state::keypad_r))
+	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(vegas_state::gearshift_r))
 	PORT_BIT( 0xf080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("GEAR")
@@ -1792,7 +1792,7 @@ static INPUT_PORTS_START( cartfury )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 2")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("View 3")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Boost")
-	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(vegas_state, gearshift_r)
+	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(vegas_state::gearshift_r))
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("GEAR")
@@ -2550,6 +2550,9 @@ ROM_START( roadburn ) // version 1.04 - verified on hardware
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 5/19/1999 GAME 5/19/1999
 	DISK_IMAGE( "road burners v1.04", 0, SHA1(30567241c000ee572a9cfb1b080c02a51a2b12d2) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "325_road_burners.u37", 0x0000, 0x2000, CRC(146c1ea1) SHA1(4bfda77f2ea6a421f59bbbd251b193a4e7743691) )
 ROM_END
 
 ROM_START( roadburn1 ) // version 1.0 - verified on hardware
@@ -2561,6 +2564,9 @@ ROM_START( roadburn1 ) // version 1.0 - verified on hardware
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 4/22/1999 GAME 4/22/1999
 	DISK_IMAGE( "roadburn", 0, SHA1(a62870cceafa6357d7d3505aca250c3f16087566) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "325_road_burners.u37", 0x0000, 0x2000, CRC(146c1ea1) SHA1(4bfda77f2ea6a421f59bbbd251b193a4e7743691) )
 ROM_END
 
 

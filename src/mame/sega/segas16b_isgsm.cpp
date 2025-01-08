@@ -60,8 +60,8 @@ public:
 	void init_tetrbx();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// read/write handlers
@@ -101,7 +101,7 @@ private:
 	uint8_t           m_rle_control_byte;
 	bool              m_rle_latched;
 	uint8_t           m_rle_byte;
-	void isgsm_map(address_map &map);
+	void isgsm_map(address_map &map) ATTR_COLD;
 };
 
 

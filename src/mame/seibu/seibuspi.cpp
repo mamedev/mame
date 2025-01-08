@@ -554,7 +554,8 @@ SXX2C ROM SUB10 (C)1998
 -------------------------------------
 Notes:
 *     : These ROMs are surface mounted
-61256 : 32k x8 SRAM (x2)
+61256 : 32k x8 SRAM (x2). These are tied to the RISE11 chip with RAM A11-A14 tied to vcc/gnd so
+        these RAMs are configured as 2kB each and the RISE11 has a total of 4kB connected to it.
 RISE11: SEIBU custom stamped 'RISE11' (QFP240)
 PAL1  : PALCE 16V8 stamped 'SPI ROM 10-2'
 PAL2  : PALCE 16V8 stamped 'SPI ROM 10-1'
@@ -878,6 +879,8 @@ Notes:
 #include "emu.h"
 #include "seibuspi.h"
 
+#include "mahjong.h"
+
 #include "cpu/i386/i386.h"
 #include "cpu/z80/z80.h"
 #include "machine/ds2404.h"
@@ -981,10 +984,13 @@ u32 seibuspi_state::ejsakura_keyboard_r()
 	// coins/eeprom data
 	u32 ret = m_special->read();
 
-	// multiplexed inputs
-	for (int i = 0; i < 5; i++)
-		if (m_ejsakura_input_port >> i & 1)
-			ret &= m_key[i]->read();
+	// switch matrix
+	if (BIT(m_ejsakura_input_port, 0)) ret &= m_key[3]->read();
+	if (BIT(m_ejsakura_input_port, 1)) ret &= m_key[4]->read();
+	if (BIT(m_ejsakura_input_port, 2)) ret &= m_key[2]->read();
+	if (BIT(m_ejsakura_input_port, 3)) ret &= m_key[0]->read();
+	if (BIT(m_ejsakura_input_port, 4)) ret &= m_key[1]->read();
+	ret = (ret & ~u32(0x1f)) | bitswap<5>(ret, 0, 1, 2, 3, 4);
 
 	return ret;
 }
@@ -1205,7 +1211,7 @@ void seibuspi_state::ymf_irqhandler(int state)
 }
 
 template <int N>
-CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
+ioport_value seibuspi_state::ejanhs_encode()
 {
 	/* E-Jan Highschool has a keyboard with the following keys
 	The keys are encoded with 3 bits for each input port
@@ -1230,12 +1236,13 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 	RON   - 110 port C
 	Start - 111 port A
 	*/
-	static const u8 encoding[] = { 6, 5, 4, 3, 2, 7 };
-	ioport_value state = ~m_key[N]->read();
+	ioport_value const state = m_key[N]->read();
 
-	for (int bit = 0; bit < std::size(encoding); bit++)
-		if (state & (1 << bit))
-			return encoding[bit];
+	for (int bit = 0; bit < 6; bit++)
+	{
+		if (!BIT(state, bit))
+			return bit + 2;
+	}
 	return 0;
 }
 
@@ -1317,7 +1324,7 @@ static INPUT_PORTS_START( sxx2f )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
 
@@ -1336,77 +1343,25 @@ static INPUT_PORTS_START( sys386i )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( spi_mahjong_keyboard )
-	PORT_START("KEY.0")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY.1")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
-	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY.2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY.3")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY.4")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START( spi_ejanhs )
-	PORT_INCLUDE( spi_mahjong_keyboard )
+	PORT_INCLUDE( mahjong_matrix_1p )
 	PORT_INCLUDE( sxx2c )
 
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(seibuspi_state, ejanhs_encode<3>)
-	PORT_BIT( 0x00000038, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(seibuspi_state, ejanhs_encode<4>)
-	PORT_BIT( 0x00000700, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(seibuspi_state, ejanhs_encode<2>)
-	PORT_BIT( 0x00003800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(seibuspi_state, ejanhs_encode<0>)
+	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(seibuspi_state::ejanhs_encode<0>))
+	PORT_BIT( 0x00000038, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(seibuspi_state::ejanhs_encode<1>))
+	PORT_BIT( 0x00000700, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(seibuspi_state::ejanhs_encode<2>))
+	PORT_BIT( 0x00003800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(seibuspi_state::ejanhs_encode<3>))
 	PORT_SPECIAL_ONOFF_DIPLOC( 0x00008000, 0x00000000, Flip_Screen, "SW1:1" )
 	PORT_BIT( 0xffff4000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
 	// These need a noncontiguous encoding, but are nonfunctional in any case
-	//PORT_BIT( 0x00000013, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(seibuspi_state, ejanhs_encode<1>)
+	//PORT_BIT( 0x00000013, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(seibuspi_state::ejanhs_encode<1>))
 	PORT_SERVICE_NO_TOGGLE( 0x00000004, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x000000f3, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("KEY.1")
-	PORT_BIT( 0x0000003f, IP_ACTIVE_LOW, IPT_UNUSED ) // Decoded but not recognized
-
-	PORT_MODIFY("KEY.4")
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED ) // Decoded but not recognized
 
 	PORT_START("EXCH") // Another set of mahjong inputs is decoded from here but not used
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1419,17 +1374,29 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( ejsakura )
-	PORT_INCLUDE( spi_mahjong_keyboard )
+	PORT_INCLUDE( mahjong_matrix_1p_bet_wup )
 
-	PORT_MODIFY("KEY.4")
+	PORT_MODIFY("KEY0")
+	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("KEY1")
 	PORT_SERVICE_NO_TOGGLE( 0x00000200, IP_ACTIVE_LOW)
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0xfffff5c0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("KEY2")
+	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("KEY3")
+	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("KEY4")
+	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT( 0xffffbf3f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")

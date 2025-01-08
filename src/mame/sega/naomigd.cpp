@@ -1103,7 +1103,7 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 // Net-DIMM firmwares:
 // all VxWorkx based, can be updated up to 4.0x, actually 1MB in size, must have CRC32 FFFFFFFF, 1st MB of flash ROM contain stock version, 2nd MB have some updated version
 //  ?          - 2.03 factory only, introduced ALL.net features, so far was seen only as stock firmware in 1st half of flash ROM, factory updated to some newer ver in 2nd ROM half
-//  FPR23718   - 2.06 factory only, most common version of NAOMI Net-DIMMs, have stock 2.03, IC label need verification
+//  FPR23718   - 2.06 factory only, most common version of NAOMI Net-DIMMs, have stock 2.03
 //  ?            2.13 factory or update (NAOMI VF4)
 //  ?            2.17 factory or update (NAOMI VF4 Evolution)
 //  FPR23905C  - 3.01 factory, added network boot support, supports Triforce and Chihiro

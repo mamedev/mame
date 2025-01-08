@@ -53,8 +53,8 @@ private:
 	uint8_t fruit_inp_r(offs_t offset);
 	void dma8237_1_dack_w(uint8_t data);
 	static void fruitpc_sb_conf(device_t *device);
-	void fruitpc_io(address_map &map);
-	void fruitpc_map(address_map &map);
+	void fruitpc_io(address_map &map) ATTR_COLD;
+	void fruitpc_map(address_map &map) ATTR_COLD;
 };
 
 uint8_t fruitpc_state::fruit_inp_r(offs_t offset)

@@ -100,7 +100,7 @@ public:
 
 protected:
 
-	void mpu4_memmap_characteriser_bwb(address_map &map);
+	void mpu4_memmap_characteriser_bwb(address_map &map) ATTR_COLD;
 
 	void mpu4_install_mod4bwb_space(address_space &space);
 

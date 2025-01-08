@@ -20,7 +20,7 @@ public:
 
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(MCF5206E, mcf5206e_device)

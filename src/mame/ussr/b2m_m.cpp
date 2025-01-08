@@ -214,7 +214,7 @@ void b2m_state::machine_start()
 	save_item(NAME(m_video_page));
 	save_item(NAME(m_romdisk_lsb));
 	save_item(NAME(m_romdisk_msb));
-	save_pointer(NAME(m_color), 4);
+	save_item(NAME(m_color));
 	save_item(NAME(m_localmachine));
 	save_item(NAME(m_vblank_state));
 

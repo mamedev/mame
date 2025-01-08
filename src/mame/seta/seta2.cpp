@@ -681,12 +681,12 @@ class funcube_touchscreen_device : public device_t,
 public:
 	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	auto tx_cb() { return m_tx_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
@@ -1723,7 +1723,7 @@ static INPUT_PORTS_START( reelquak )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
 	PORT_START("TICKET")    // $400003.b
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r)    // ticket sensor
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", FUNC(ticket_dispenser_device::line_r))    // ticket sensor
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Knock Down")    // knock down
@@ -1837,7 +1837,7 @@ static INPUT_PORTS_START( staraudi )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE4 ) // unused?
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2   ) // something (flash activity)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START3   ) // unused?
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM   ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM   ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_START4   ) // unused?
 INPUT_PORTS_END
 
@@ -2111,7 +2111,7 @@ static INPUT_PORTS_START( telpacfl )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1       ) PORT_NAME("Bet") // bet switch (converts credits into balls)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR   ) // door switch
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r) // coin out switch (medals jam error when stuck i.e. メダルづまり)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", FUNC(ticket_dispenser_device::line_r)) // coin out switch (medals jam error when stuck i.e. メダルづまり)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
@@ -2371,7 +2371,7 @@ void seta2_state::reelquak(machine_config &config)
 	downcast<tmp68301_device &>(*m_maincpu).parallel_w_cb().set(FUNC(seta2_state::reelquak_leds_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	TICKET_DISPENSER(config, m_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, m_dispenser, attotime::from_msec(200));
 
 	m_screen->set_visarea(0x00, 0x140-1, 0x000, 0x0f0-1);
 }
@@ -2417,7 +2417,7 @@ void seta2_state::telpacfl(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom"); // not hooked up, seems unused
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	HOPPER(config, m_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_dispenser, attotime::from_msec(200));
 
 	// video hardware
 	m_screen->set_visarea(0x0, 0x180-1, 0x00, 0xf0-1); // still off by 1 because of different CRTC regs?
@@ -3753,6 +3753,24 @@ ROM_START( endrichsa )
 	ROM_LOAD( "gal16v8_kf-001.u38", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( endrichsb )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_BYTE( "kfp_u02_c11.u2", 0x00000, 0x80000, CRC(12613215) SHA1(b39526b13fdf6ce7d7ece664356a075f61fea368) )
+	ROM_LOAD16_BYTE( "kfp_u03_c11.u3", 0x00001, 0x80000, CRC(e32152eb) SHA1(2dbe413fc1fb84a88b3033ad567b743ca70e0d74) )
+
+	ROM_REGION( 0x800000, "sprites", 0 )    // Sprites
+	ROM_LOAD64_WORD( "kfc-u16-c00.u16", 0x000000, 0x200000, CRC(cbfe5e0f) SHA1(6c7c8088c43231997ac47ce05cf43c78c1fdad47) )
+	ROM_LOAD64_WORD( "kfc-u15-c00.u15", 0x000002, 0x200000, CRC(98e4c36c) SHA1(651be122b78f225d38878ae90776f66989440590) )
+	ROM_LOAD64_WORD( "kfc-u18-c00.u18", 0x000004, 0x200000, CRC(561ac136) SHA1(96da493157405a5d3d72b8cc3004abd3fa3eadfa) )
+	ROM_LOAD64_WORD( "kfc-u17-c00.u17", 0x000006, 0x200000, CRC(34660029) SHA1(cf09b97422497d739f71e6ff8b9974fca0329928) )
+
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kfs-u32-c00.u32", 0x000000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8_kf-001.u38", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 /***************************************************************************
 
 Star Audition
@@ -4415,6 +4433,7 @@ GAME( 1997, reelquak,  0,        reelquak, reelquak, seta2_state,    empty_init,
 
 GAME( 1999, endrichs,  0,        reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.21)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, endrichsa, endrichs, reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.20)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, endrichsb, endrichs, reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.10)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, empty_init,    ROT0,   "Namco",                 "Star Audition",                                       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs flipscreen hooking up properly with new code to function at all
 

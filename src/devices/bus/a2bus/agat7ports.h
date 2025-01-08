@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_A2BUS_AGAT7_PORTS_H
-#define MAME_BUS_A2BUS_AGAT7_PORTS_H
+#ifndef MAME_BUS_A2BUS_AGAT7PORTS_H
+#define MAME_BUS_A2BUS_AGAT7PORTS_H
 
 #pragma once
 
@@ -35,10 +35,10 @@ public:
 protected:
 	a2bus_agat7_ports_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
@@ -61,4 +61,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(A2BUS_AGAT7_PORTS, a2bus_agat7_ports_device)
 
-#endif // MAME_BUS_A2BUS_AGAT7_PORTS_H
+#endif // MAME_BUS_A2BUS_AGAT7PORTS_H

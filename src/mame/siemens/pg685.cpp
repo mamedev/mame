@@ -141,12 +141,12 @@ private:
 	void fdc_drq_w(int state);
 	void fdc_intrq_w(int state);
 
-	void pg675_mem(address_map &map);
-	void pg685_mem(address_map &map);
-	void pg685oua12_mem(address_map &map);
+	void pg675_mem(address_map &map) ATTR_COLD;
+	void pg685_mem(address_map &map) ATTR_COLD;
+	void pg685oua12_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_vram;
 	optional_shared_ptr<uint16_t> m_vram16;

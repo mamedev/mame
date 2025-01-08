@@ -101,7 +101,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	const char *m_interface;
 	int m_type;

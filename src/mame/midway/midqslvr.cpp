@@ -320,7 +320,7 @@ private:
 	// optional for debugging ...
 	optional_device<voodoo_2_pci_device> m_voodoo2;
 
-	void midqslvr_map(address_map &map);
+	void midqslvr_map(address_map &map) ATTR_COLD;
 
 	static void superio_config(device_t *device);
 };
@@ -338,7 +338,7 @@ public:
 private:
 	required_device<pentium3_device> m_maincpu;
 
-	void graphite_map(address_map &map);
+	void graphite_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -537,13 +537,13 @@ ROM_END
 
 
 // there are almost certainly multiple versions of these; updates were offered on floppy disk.  The version numbers for the existing CHDs are unknown.
-GAME(1999, hydrthnd,    0,        midqslvr, 0, midway_quicksilver2_state, empty_init, ROT0, "Midway Games", "Hydro Thunder", MACHINE_IS_SKELETON)
-GAME(1999, hydrthnd101b,hydrthnd, midqslvr, 0, midway_quicksilver2_state, empty_init, ROT0, "Midway Games", "Hydro Thunder (v1.01b)", MACHINE_IS_SKELETON)
-GAME(1999, hydrthnd100d,hydrthnd, midqslvr, 0, midway_quicksilver2_state, empty_init, ROT0, "Midway Games", "Hydro Thunder (v1.00d)", MACHINE_IS_SKELETON)
+GAME(1999, hydrthnd,    0,        midqslvr, 0, midway_quicksilver2_state, empty_init, ROT0, "Midway Games", "Hydro Thunder", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1999, hydrthnd101b,hydrthnd, midqslvr, 0, midway_quicksilver2_state, empty_init, ROT0, "Midway Games", "Hydro Thunder (v1.01b)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1999, hydrthnd100d,hydrthnd, midqslvr, 0, midway_quicksilver2_state, empty_init, ROT0, "Midway Games", "Hydro Thunder (v1.00d)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-GAME(2000, offrthnd,    0,        midqslvr, 0, midway_quicksilver2_state, empty_init, ROT0, "Midway Games", "Offroad Thunder", MACHINE_IS_SKELETON)
+GAME(2000, offrthnd,    0,        midqslvr, 0, midway_quicksilver2_state, empty_init, ROT0, "Midway Games", "Offroad Thunder", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-GAME(2001, arctthnd,    0,        graphite, 0, midway_graphite_state, empty_init, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
+GAME(2001, arctthnd,    0,        graphite, 0, midway_graphite_state, empty_init, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-GAME(2001, ultarctc,    0,        graphite, 0, midway_graphite_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
-GAME(2004, ultarctcup,  ultarctc, graphite, 0, midway_graphite_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)
+GAME(2001, ultarctc,    0,        graphite, 0, midway_graphite_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2004, ultarctcup,  ultarctc, graphite, 0, midway_graphite_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

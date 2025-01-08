@@ -73,7 +73,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	device_bbc_joyport_interface *m_device;
 

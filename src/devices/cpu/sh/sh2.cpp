@@ -287,6 +287,7 @@ void sh2_device::execute_run()
 
 	if (m_cpu_off)
 	{
+		debugger_wait_hook();
 		m_sh2_state->icount = 0;
 		return;
 	}

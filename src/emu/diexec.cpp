@@ -98,12 +98,11 @@ void device_execute_interface::abort_timeslice() noexcept
 		return;
 
 	// swallow the remaining cycles
-	if (m_icountptr != nullptr)
+	if (m_icountptr != nullptr && *m_icountptr > 0)
 	{
-		int delta = *m_icountptr;
-		m_cycles_stolen += delta;
-		m_cycles_running -= delta;
-		*m_icountptr -= delta;
+		m_cycles_stolen += *m_icountptr;
+		m_cycles_running -= *m_icountptr;
+		*m_icountptr = 0;
 	}
 }
 
@@ -128,7 +127,8 @@ void device_execute_interface::suspend_resume_changed()
 
 void device_execute_interface::suspend(u32 reason, bool eatcycles)
 {
-if (TEMPLOG) printf("suspend %s (%X)\n", device().tag(), reason);
+	if (TEMPLOG) printf("suspend %s (%X)\n", device().tag(), reason);
+
 	// set the suspend reason and eat cycles flag
 	m_nextsuspend |= reason;
 	m_nexteatcycles = eatcycles;
@@ -143,7 +143,8 @@ if (TEMPLOG) printf("suspend %s (%X)\n", device().tag(), reason);
 
 void device_execute_interface::resume(u32 reason)
 {
-if (TEMPLOG) printf("resume %s (%X)\n", device().tag(), reason);
+	if (TEMPLOG) printf("resume %s (%X)\n", device().tag(), reason);
+
 	// clear the suspend reason and eat cycles flag
 	m_nextsuspend &= ~reason;
 	suspend_resume_changed();
@@ -283,17 +284,6 @@ u32 device_execute_interface::execute_max_cycles() const noexcept
 
 
 //-------------------------------------------------
-//  execute_input_lines - return the total number
-//  of input lines for the device
-//-------------------------------------------------
-
-u32 device_execute_interface::execute_input_lines() const noexcept
-{
-	return 0;
-}
-
-
-//-------------------------------------------------
 //  execute_default_irq_vector - return the default
 //  IRQ vector when an acknowledge is processed
 //-------------------------------------------------
@@ -312,18 +302,6 @@ u32 device_execute_interface::execute_default_irq_vector(int linenum) const noex
 bool device_execute_interface::execute_input_edge_triggered(int linenum) const noexcept
 {
 	return false;
-}
-
-
-//-------------------------------------------------
-//  execute_burn - called after we consume a bunch
-//  of cycles for artifical reasons (such as
-//  spinning devices for performance optimization)
-//-------------------------------------------------
-
-void device_execute_interface::execute_burn(s32 cycles)
-{
-	// by default, do nothing
 }
 
 
@@ -679,7 +657,7 @@ void device_execute_interface::device_input::set_state_synced(int state, int vec
 {
 	LOG(("set_state_synced('%s',%d,%d,%02x)\n", m_execute->device().tag(), m_linenum, state, vector));
 
-if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linenum, state, (vector == USE_STORED_VECTOR) ? 0 : vector);
+	if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linenum, state, (vector == USE_STORED_VECTOR) ? 0 : vector);
 	assert(state == ASSERT_LINE || state == HOLD_LINE || state == CLEAR_LINE);
 
 	// if we're full of events, flush the queue and log a message
@@ -712,7 +690,8 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 
 TIMER_CALLBACK_MEMBER(device_execute_interface::device_input::empty_event_queue)
 {
-if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_execute->device().tag(), m_linenum, m_qindex);
+	if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_execute->device().tag(), m_linenum, m_qindex);
+
 	// loop over all events
 	for (int curevent = 0; curevent < m_qindex; curevent++)
 	{
@@ -721,7 +700,7 @@ if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_execute->device().tag(), m_line
 		// set the input line state and vector
 		m_curstate = input_event & 0xff;
 		m_curvector = input_event >> 8;
-if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
+		if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
 
 		assert(m_curstate == ASSERT_LINE || m_curstate == HOLD_LINE || m_curstate == CLEAR_LINE);
 

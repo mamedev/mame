@@ -54,12 +54,12 @@ private:
 	void v_irq3_w(int state);
 	void update_irq(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void exidy440_audio(machine_config &config);
-	void vertigo_map(address_map &map);
-	void vertigo_motor(address_map &map);
-	void exidy440_audio_map(address_map &map);
+	void vertigo_map(address_map &map) ATTR_COLD;
+	void vertigo_motor(address_map &map) ATTR_COLD;
+	void exidy440_audio_map(address_map &map) ATTR_COLD;
 
 	struct am2901
 	{

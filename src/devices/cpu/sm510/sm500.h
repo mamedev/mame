@@ -59,11 +59,11 @@ public:
 protected:
 	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
-	void program_1_2k(address_map &map);
-	void data_4x10x4(address_map &map);
+	void program_1_2k(address_map &map) ATTR_COLD;
+	void data_4x10x4(address_map &map) ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_one() override;
 	virtual bool op_argument() override;

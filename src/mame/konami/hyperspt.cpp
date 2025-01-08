@@ -61,12 +61,12 @@ public:
 	void base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void common_map(address_map &map);
-	void common_sound_map(address_map &map);
-	void hyperspt_common_main_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void common_sound_map(address_map &map) ATTR_COLD;
+	void hyperspt_common_main_map(address_map &map) ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -120,7 +120,7 @@ public:
 private:
 	required_device<vlm5030_device> m_vlm;
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class hypersptb_state : public base_state
@@ -131,8 +131,8 @@ public:
 	void hypersptb(machine_config &config);
 
 private:
-	void sound_map(address_map &map);
-	void adpcm_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void adpcm_map(address_map &map) ATTR_COLD;
 };
 
 class roadf_state : public base_state
@@ -144,13 +144,13 @@ public:
 	void roadfu(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

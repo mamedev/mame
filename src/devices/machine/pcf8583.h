@@ -87,7 +87,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_rtc_interface overrides
 	virtual bool rtc_feature_y2k() const override { return true; }

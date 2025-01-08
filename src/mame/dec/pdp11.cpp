@@ -116,8 +116,8 @@ public:
 	void sms1000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<t11_device> m_maincpu;
@@ -127,9 +127,9 @@ private:
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
-	void pdp11_mem(address_map &map);
-	void pdp11qb_mem(address_map &map);
-	void sms1000_mem_188(address_map &map);
+	void pdp11_mem(address_map &map) ATTR_COLD;
+	void pdp11qb_mem(address_map &map) ATTR_COLD;
+	void sms1000_mem_188(address_map &map) ATTR_COLD;
 };
 
 void pdp11_state::pdp11_mem(address_map &map)
@@ -487,4 +487,4 @@ ROM_END
 COMP( 197?, pdp11ub,  0,       0,      pdp11,    pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9301-YA)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 197?, pdp11ub2, pdp11ub, 0,      pdp11ub2, pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9312)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 198?, pdp11qb,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Q-BUS] (M7195 - MXV11-B)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1987, sms1000,  0,       0,      sms1000,  pdp11, pdp11_state, empty_init, "Scientific Micro Systems",      "SMS-1000",                         MACHINE_IS_SKELETON )
+COMP( 1987, sms1000,  0,       0,      sms1000,  pdp11, pdp11_state, empty_init, "Scientific Micro Systems",      "SMS-1000",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

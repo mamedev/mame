@@ -627,7 +627,7 @@ void tms5220_device::data_write(int data)
 			m_fifo[m_fifo_tail] = data;
 			m_fifo_tail = (m_fifo_tail + 1) % FIFO_SIZE;
 			m_fifo_count++;
-			LOGMASKED(LOG_FIFO, "data_write: Added byte to FIFO (current count=%2d)\n", m_fifo_count);
+			LOGMASKED(LOG_FIFO, "data_write: Added %02X byte to FIFO (current count=%2d)\n", data, m_fifo_count);
 			update_fifo_status_and_ints();
 
 			// if we just unset buffer low with that last write, and SPEN *was* zero (see circuit 251, sheet 12)
@@ -742,15 +742,18 @@ void tms5220_device::update_fifo_status_and_ints()
 	}
 	m_previous_talk_status = talk_status();
 
+	// update continuously when RSQ is held active low
+	if (m_rs_ws == 0x01 && !m_RDB_flag)
+		m_read_latch = status_read(false);
 }
 
 /**********************************************************************************************
 
-     extract_bits -- extract a specific number of bits from the current input stream (FIFO or VSM)
+     read_bits -- read a specific number of bits from the current input stream (FIFO or VSM)
 
 ***********************************************************************************************/
 
-int tms5220_device::extract_bits(int count)
+int tms5220_device::read_bits(int count)
 {
 	int val = 0;
 
@@ -881,7 +884,7 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 	int i, bitout;
 	int32_t this_sample;
 
-	LOG("process called with size of %d; IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", size, m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
+	LOGMASKED(LOG_GENERATION, "process called with size of %d; IP=%d, PC=%d, subcycle=%d, m_SPEN=%d, m_TALK=%d, m_TALKD=%d\n", size, m_IP, m_PC, m_subcycle, m_SPEN, m_TALK, m_TALKD);
 
 	/* loop until the buffer is full or we've stopped speaking */
 	while (size > 0)
@@ -936,12 +939,8 @@ void tms5220_device::process(int16_t *buffer, unsigned int size)
 					m_inhibit = false;
 
 				/* Debug info for current parsed frame */
-				LOGMASKED(LOG_GENERATION, "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d ", old_frame_silence_flag(), new_frame_silence_flag(), old_frame_unvoiced_flag(), new_frame_unvoiced_flag());
-				LOGMASKED(LOG_GENERATION, "Processing new frame: ");
-				if (!m_inhibit)
-					LOGMASKED(LOG_GENERATION, "Normal Frame\n");
-				else
-					LOGMASKED(LOG_GENERATION, "Interpolation Inhibited\n");
+				LOGMASKED(LOG_GENERATION, "OLDE: %d; NEWE: %d; OLDP: %d; NEWP: %d\n", old_frame_silence_flag(), new_frame_silence_flag(), old_frame_unvoiced_flag(), new_frame_unvoiced_flag());
+				LOGMASKED(LOG_GENERATION, "Processing new frame: %s\n", !m_inhibit ? "Normal Frame" : "Interpolation Inhibited");
 				LOGMASKED(LOG_GENERATION, "*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9]);
 				LOGMASKED(LOG_GENERATION, "*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",
 					(m_coeff->energytable[m_new_frame_energy_idx] * (1-m_zpar)),
@@ -1469,7 +1468,7 @@ void tms5220_device::parse_frame()
 	has a 2 bit rate preceding it, grab two bits here and store them as the rate; */
 	if ((TMS5220_HAS_RATE_CONTROL) && (m_c_variant_rate & 0x04))
 	{
-		i = extract_bits(2);
+		i = read_bits(2);
 		printbits(i, 2);
 		LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 		m_IP = reload_table[i];
@@ -1481,7 +1480,7 @@ void tms5220_device::parse_frame()
 	if (m_DDIS && m_buffer_empty) goto ranout;
 
 	// attempt to extract the energy index
-	m_new_frame_energy_idx = extract_bits(m_coeff->energy_bits);
+	m_new_frame_energy_idx = read_bits(m_coeff->energy_bits);
 	printbits(m_new_frame_energy_idx, m_coeff->energy_bits);
 	LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 	update_fifo_status_and_ints();
@@ -1492,12 +1491,12 @@ void tms5220_device::parse_frame()
 
 
 	// attempt to extract the repeat flag
-	rep_flag = extract_bits(1);
+	rep_flag = read_bits(1);
 	printbits(rep_flag, 1);
 	LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 
 	// attempt to extract the pitch
-	m_new_frame_pitch_idx = extract_bits(m_coeff->pitch_bits);
+	m_new_frame_pitch_idx = read_bits(m_coeff->pitch_bits);
 	printbits(m_new_frame_pitch_idx, m_coeff->pitch_bits);
 	LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 	// if the new frame is unvoiced, be sure to zero out the k5-k10 parameters
@@ -1511,7 +1510,7 @@ void tms5220_device::parse_frame()
 	// extract first 4 K coefficients
 	for (i = 0; i < 4; i++)
 	{
-		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+		m_new_frame_k_idx[i] = read_bits(m_coeff->kbits[i]);
 		printbits(m_new_frame_k_idx[i], m_coeff->kbits[i]);
 		LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 		update_fifo_status_and_ints();
@@ -1528,7 +1527,7 @@ void tms5220_device::parse_frame()
 	// If we got here, we need the remaining 6 K's
 	for (i = 4; i < m_coeff->num_k; i++)
 	{
-		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+		m_new_frame_k_idx[i] = read_bits(m_coeff->kbits[i]);
 		printbits(m_new_frame_k_idx[i], m_coeff->kbits[i]);
 		LOGMASKED(LOG_PARSE_FRAME_DUMP_BIN | LOG_PARSE_FRAME_DUMP_HEX, " ");
 		update_fifo_status_and_ints();

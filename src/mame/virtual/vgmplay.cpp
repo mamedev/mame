@@ -230,7 +230,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
-	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -282,8 +281,8 @@ public:
 	void toggle_loop() { m_loop = !m_loop; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum { ACT_LED_PERSIST_MS = 100 };
@@ -440,39 +439,39 @@ public:
 	template<int Index> void c140_c219_w(offs_t offset, uint8_t data);
 
 	void vgmplay(machine_config &config);
-	void file_map(address_map &map);
-	void soundchips_map(address_map &map);
-	void soundchips16le_map(address_map &map);
-	void soundchips16be_map(address_map &map);
-	template<int Index> void segapcm_map(address_map &map);
-	template<int Index> void rf5c68_map(address_map &map);
-	template<int Index> void ym2608_map(address_map &map);
-	template<int Index> void ym2610_adpcm_a_map(address_map &map);
-	template<int Index> void ym2610_adpcm_b_map(address_map &map);
-	template<int Index> void y8950_map(address_map &map);
-	template<int Index> void ymf278b_map(address_map &map);
-	template<int Index> void ymf271_map(address_map &map);
-	template<int Index> void ymz280b_map(address_map &map);
-	template<int Index> void rf5c164_map(address_map &map);
-	template<int Index> void nescpu_map(address_map &map);
-	template<int Index> void multipcm_map(address_map &map);
-	template<int Index> void upd7759_map(address_map &map);
-	template<int Index> void okim6295_map(address_map &map);
-	template<int Index> void k054539_map(address_map &map);
-	template<int Index> void c140_map(address_map &map);
-	template<int Index> void c219_map(address_map &map);
-	template<int Index> void k053260_map(address_map &map);
-	template<int Index> void qsound_map(address_map &map);
-	template<int Index> void scsp_map(address_map &map);
-	template<int Index> void wswan_map(address_map &map);
-	template<int Index> void es5503_map(address_map &map);
-	template<int Index> void es5505_map(address_map &map);
-	template<int Index> void x1_010_map(address_map &map);
-	template<int Index> void c352_map(address_map &map);
-	template<int Index> void ga20_map(address_map &map);
+	void file_map(address_map &map) ATTR_COLD;
+	void soundchips_map(address_map &map) ATTR_COLD;
+	void soundchips16le_map(address_map &map) ATTR_COLD;
+	void soundchips16be_map(address_map &map) ATTR_COLD;
+	template<int Index> void segapcm_map(address_map &map) ATTR_COLD;
+	template<int Index> void rf5c68_map(address_map &map) ATTR_COLD;
+	template<int Index> void ym2608_map(address_map &map) ATTR_COLD;
+	template<int Index> void ym2610_adpcm_a_map(address_map &map) ATTR_COLD;
+	template<int Index> void ym2610_adpcm_b_map(address_map &map) ATTR_COLD;
+	template<int Index> void y8950_map(address_map &map) ATTR_COLD;
+	template<int Index> void ymf278b_map(address_map &map) ATTR_COLD;
+	template<int Index> void ymf271_map(address_map &map) ATTR_COLD;
+	template<int Index> void ymz280b_map(address_map &map) ATTR_COLD;
+	template<int Index> void rf5c164_map(address_map &map) ATTR_COLD;
+	template<int Index> void nescpu_map(address_map &map) ATTR_COLD;
+	template<int Index> void multipcm_map(address_map &map) ATTR_COLD;
+	template<int Index> void upd7759_map(address_map &map) ATTR_COLD;
+	template<int Index> void okim6295_map(address_map &map) ATTR_COLD;
+	template<int Index> void k054539_map(address_map &map) ATTR_COLD;
+	template<int Index> void c140_map(address_map &map) ATTR_COLD;
+	template<int Index> void c219_map(address_map &map) ATTR_COLD;
+	template<int Index> void k053260_map(address_map &map) ATTR_COLD;
+	template<int Index> void qsound_map(address_map &map) ATTR_COLD;
+	template<int Index> void scsp_map(address_map &map) ATTR_COLD;
+	template<int Index> void wswan_map(address_map &map) ATTR_COLD;
+	template<int Index> void es5503_map(address_map &map) ATTR_COLD;
+	template<int Index> void es5505_map(address_map &map) ATTR_COLD;
+	template<int Index> void x1_010_map(address_map &map) ATTR_COLD;
+	template<int Index> void c352_map(address_map &map) ATTR_COLD;
+	template<int Index> void ga20_map(address_map &map) ATTR_COLD;
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t m_held_clock = 0;
 	std::vector<uint8_t> m_file_data;
@@ -662,11 +661,6 @@ uint32_t vgmplay_device::execute_min_cycles() const noexcept
 uint32_t vgmplay_device::execute_max_cycles() const noexcept
 {
 	return 65536;
-}
-
-uint32_t vgmplay_device::execute_input_lines() const noexcept
-{
-	return 0;
 }
 
 void vgmplay_device::blocks_clear()
@@ -3331,16 +3325,16 @@ INPUT_CHANGED_MEMBER(vgmplay_state::key_pressed)
 
 static INPUT_PORTS_START( vgmplay )
 	PORT_START("CONTROLS")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_STOP)        PORT_NAME("Stop")
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PAUSE)       PORT_NAME("Pause")
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_PLAY)        PORT_NAME("Play")
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RESTART)     PORT_NAME("Restart")
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_LOOP)        PORT_NAME("Loop")
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_VIZ)         PORT_NAME("Visualization Mode")
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_DOWN)   PORT_CODE(KEYCODE_R) PORT_NAME("Rate Down")
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_UP)     PORT_CODE(KEYCODE_T) PORT_NAME("Rate Up")
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_RATE_RST)    PORT_CODE(KEYCODE_Y) PORT_NAME("Rate Reset")
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CHANGED_MEMBER(DEVICE_SELF, vgmplay_state, key_pressed, VGMPLAY_HOLD)        PORT_CODE(KEYCODE_U) PORT_NAME("Rate Hold")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vgmplay_state::key_pressed), VGMPLAY_STOP)        PORT_NAME("Stop")
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2)  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vgmplay_state::key_pressed), VGMPLAY_PAUSE)       PORT_NAME("Pause")
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3)  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vgmplay_state::key_pressed), VGMPLAY_PLAY)        PORT_NAME("Play")
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4)  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vgmplay_state::key_pressed), VGMPLAY_RESTART)     PORT_NAME("Restart")
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5)  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vgmplay_state::key_pressed), VGMPLAY_LOOP)        PORT_NAME("Loop")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vgmplay_state::key_pressed), VGMPLAY_VIZ)         PORT_NAME("Visualization Mode")
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7)  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vgmplay_state::key_pressed), VGMPLAY_RATE_DOWN)   PORT_CODE(KEYCODE_R) PORT_NAME("Rate Down")
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vgmplay_state::key_pressed), VGMPLAY_RATE_UP)     PORT_CODE(KEYCODE_T) PORT_NAME("Rate Up")
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vgmplay_state::key_pressed), VGMPLAY_RATE_RST)    PORT_CODE(KEYCODE_Y) PORT_NAME("Rate Reset")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vgmplay_state::key_pressed), VGMPLAY_HOLD)        PORT_CODE(KEYCODE_U) PORT_NAME("Rate Hold")
 INPUT_PORTS_END
 
 void vgmplay_state::file_map(address_map &map)

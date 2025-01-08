@@ -67,16 +67,16 @@ private:
 	required_device<address_map_bank_device> m_subram;
 	required_device<address_map_bank_device> m_subrom;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void splashms_map(address_map &map);
-	void sub_map(address_map &map);
-	void sub_portmap(address_map &map);
-	void sound_map(address_map &map);
+	void splashms_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+	void sub_portmap(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	uint16_t unknown_0x40000c_r();
 	uint8_t frommain_command_r();
@@ -101,8 +101,8 @@ private:
 	void splash_adpcm_control_w(uint8_t data);
 	int m_adpcm_data = 0;
 
-	void subrambank_map(address_map& map);
-	void subrombank_map(address_map& map);
+	void subrambank_map(address_map &map) ATTR_COLD;
+	void subrombank_map(address_map &map) ATTR_COLD;
 
 	void descramble_16x16tiles(uint8_t* src, int len);
 

@@ -130,12 +130,12 @@ public:
 	auto an7_cb() { return m_analog_cb[7].bind(); }
 
 protected:
-	void ad_register_map(address_map &map);
-	void uart0_register_map(address_map &map);
-	void uart1_register_map(address_map &map);
-	void timer_register_map(address_map &map);
-	void timer_6channel_register_map(address_map &map);
-	void irq_register_map(address_map &map);
+	void ad_register_map(address_map &map) ATTR_COLD;
+	void uart0_register_map(address_map &map) ATTR_COLD;
+	void uart1_register_map(address_map &map) ATTR_COLD;
+	void timer_register_map(address_map &map) ATTR_COLD;
+	void timer_6channel_register_map(address_map &map) ATTR_COLD;
+	void irq_register_map(address_map &map) ATTR_COLD;
 
 	// internal registers
 	template <int Base> uint8_t port_r(offs_t offset);
@@ -202,15 +202,14 @@ protected:
 	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 20; /* rough guess */ }
-	virtual uint32_t execute_input_lines() const noexcept override { return M37710_LINE_MAX; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -2148,7 +2147,7 @@ public:
 	// construction/destruction
 	m37702s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 class m37702m2_device : public m37710_cpu_device
@@ -2158,7 +2157,7 @@ public:
 	m37702m2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	m37702m2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 class m37710s4_device : public m37710_cpu_device
@@ -2167,7 +2166,7 @@ public:
 	// construction/destruction
 	m37710s4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 class m37720s1_device : public m37710_cpu_device
@@ -2176,7 +2175,7 @@ public:
 	// construction/destruction
 	m37720s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 class m37730s2_device : public m37710_cpu_device
@@ -2185,7 +2184,7 @@ public:
 	// construction/destruction
 	m37730s2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 class m37732s4_device : public m37710_cpu_device
@@ -2194,7 +2193,7 @@ public:
 	// construction/destruction
 	m37732s4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(M37702M2, m37702m2_device)

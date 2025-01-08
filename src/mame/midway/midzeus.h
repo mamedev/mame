@@ -87,9 +87,9 @@ public:
 	optional_shared_ptr<uint32_t> m_zeusbase;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void cmos_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t cmos_r(offs_t offset);
@@ -105,7 +105,7 @@ protected:
 	INTERRUPT_GEN_MEMBER(display_irq);
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 
-	void zeus_map(address_map &map);
+	void zeus_map(address_map &map) ATTR_COLD;
 	void midzeus(machine_config &config);
 
 	emu_timer *     m_display_irq_off_timer = nullptr;
@@ -180,7 +180,7 @@ public:
 	void invasn(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void invasn_gun_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -189,7 +189,7 @@ private:
 	void update_gun_irq();
 	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
 
-	void invasnab_map(address_map &map);
+	void invasnab_map(address_map &map) ATTR_COLD;
 
 	uint32_t        m_gun_control = 0;
 	uint8_t         m_gun_irq_state = 0;

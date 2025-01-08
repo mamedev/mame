@@ -26,8 +26,8 @@ public:
 	template <int Line> void write_pbdr_bit(int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void execute_run() override;
 
@@ -184,7 +184,7 @@ protected:
 	uint16_t pfc_cascr_r();
 	void pfc_cascr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 
 	void recalc_irq();
 

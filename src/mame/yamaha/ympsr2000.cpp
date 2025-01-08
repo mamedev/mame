@@ -30,10 +30,10 @@ private:
 	required_device<sh3be_device> m_maincpu;
 	required_device<sed1330_device> m_lcdc;  // In reality a sed1335
 
-	void map(address_map &map);
-	void lcdc_map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
+	void lcdc_map(address_map &map) ATTR_COLD;
 
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 };
 
 void psr2000_state::machine_start()
@@ -103,4 +103,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 2001, psr2000, 0, 0, psr2000, psr2000, psr2000_state, empty_init, "Yamaha", "PSR-2000", MACHINE_IS_SKELETON )
+SYST( 2001, psr2000, 0, 0, psr2000, psr2000, psr2000_state, empty_init, "Yamaha", "PSR-2000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

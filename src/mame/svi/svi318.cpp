@@ -99,12 +99,12 @@ private:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void svi3x8_io(address_map &map);
-	void svi3x8_io_bank(address_map &map);
-	void svi3x8_mem(address_map &map);
+	void svi3x8_io(address_map &map) ATTR_COLD;
+	void svi3x8_io_bank(address_map &map) ATTR_COLD;
+	void svi3x8_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

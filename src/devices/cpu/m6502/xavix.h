@@ -168,8 +168,8 @@ protected:
 
 	uint32_t adr_with_codebank(uint16_t adr) { return adr | (get_codebank() << 16); }
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual offs_t pc_to_external(u16 pc) override;
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;

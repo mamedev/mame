@@ -11,8 +11,8 @@
 
 *****************************************************************************/
 
-#ifndef MAME_BUS_TI99_PED_BWG_H
-#define MAME_BUS_TI99_PED_BWG_H
+#ifndef MAME_BUS_TI99_PEB_BWG_H
+#define MAME_BUS_TI99_PEB_BWG_H
 
 #pragma once
 
@@ -39,12 +39,12 @@ public:
 	void cruwrite(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -135,4 +135,4 @@ private:
 
 DECLARE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device)
 
-#endif // MAME_BUS_TI99_PED_BWG_H
+#endif // MAME_BUS_TI99_PEB_BWG_H

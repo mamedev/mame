@@ -39,8 +39,8 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<m58846_device> m_maincpu;
@@ -192,7 +192,7 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_melps4_state::reset_button), 0)
 INPUT_PORTS_END
 
 // config
@@ -313,7 +313,7 @@ static INPUT_PORTS_START( gjungler )
 	PORT_CONFSETTING(    0x00, "B" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_melps4_state::reset_button), 0)
 INPUT_PORTS_END
 
 // config

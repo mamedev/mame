@@ -79,7 +79,7 @@ R8 mkII doesn't seem to store the tone list in the program ROM.
 #include "bus/generic/slot.h"
 #include "cpu/upd78k/upd78k2.h"
 #include "machine/nvram.h"
-#include "sound/rolandpcm.h"
+#include "sound/roland_lp.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -115,8 +115,8 @@ public:
 	void init_r8();
 
 protected:
-	void mk1_map(address_map &map);
-	void mk2_map(address_map &map);
+	void mk1_map(address_map &map) ATTR_COLD;
+	void mk2_map(address_map &map) ATTR_COLD;
 
 	std::pair<std::error_condition, std::string> pcmrom_load(generic_slot_device* pcmcard, int card_id, device_image_interface &image);
 	void pcmrom_unload(int card_id);
@@ -382,6 +382,6 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1989, r8,    0,  0, r8,    r8, roland_r8_state, init_r8, "Roland", "R-8 Human Rhythm Composer (v2.02)", MACHINE_IS_SKELETON)
-SYST(1990, r8m,   r8, 0, r8m,   r8, roland_r8m_state, init_r8, "Roland", "R-8M Total Percussion Sound Module (v1.04)", MACHINE_IS_SKELETON)
-SYST(1992, r8mk2, 0,  0, r8mk2, r8, roland_r8mk2_state, init_r8, "Roland", "R-8 Mk II Human Rhythm Composer (v1.0.3)", MACHINE_IS_SKELETON)
+SYST(1989, r8,    0,  0, r8,    r8, roland_r8_state, init_r8, "Roland", "R-8 Human Rhythm Composer (v2.02)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1990, r8m,   r8, 0, r8m,   r8, roland_r8m_state, init_r8, "Roland", "R-8M Total Percussion Sound Module (v1.04)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1992, r8mk2, 0,  0, r8mk2, r8, roland_r8mk2_state, init_r8, "Roland", "R-8 Mk II Human Rhythm Composer (v1.0.3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

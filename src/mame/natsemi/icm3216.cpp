@@ -70,13 +70,13 @@ public:
 	void icm3216(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	template <unsigned ST> void cpu_map(address_map &map);
-	void iop_mem_map(address_map &map);
-	void iop_pio_map(address_map &map);
+	template <unsigned ST> void cpu_map(address_map &map) ATTR_COLD;
+	void iop_mem_map(address_map &map) ATTR_COLD;
+	void iop_pio_map(address_map &map) ATTR_COLD;
 
 	// register read handlers
 	u8 iop_r();

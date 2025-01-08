@@ -62,14 +62,14 @@ private:
 	INTERRUPT_GEN_MEMBER(dlair2_timer_irq);
 	void dlair2_palette(palette_device &palette) const;
 
-	void dlair2_io(address_map &map);
-	void dlair2_map(address_map &map);
+	void dlair2_io(address_map &map) ATTR_COLD;
+	void dlair2_map(address_map &map) ATTR_COLD;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 void dlair2_state::video_start()
@@ -344,19 +344,19 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, dlair2,       0,        dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.19)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_319e,  dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Europe v3.19)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_319s,  dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Spanish v3.19)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_318,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.18)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_317e,  dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Europe v3.17)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_316e,  dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Europe v3.16)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_315,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.15)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_315s,  dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Spanish v3.15)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_314,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.14)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_312,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Europe v3.12)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_300,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.00)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_211,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v2.11)", MACHINE_IS_SKELETON )
-GAME( 1991, dlair2_200,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v2.00, AMOA prototype)", MACHINE_IS_SKELETON )
+GAME( 1991, dlair2,       0,        dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.19)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, dlair2_319e,  dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Europe v3.19)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, dlair2_319s,  dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Spanish v3.19)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, dlair2_318,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.18)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, dlair2_317e,  dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Europe v3.17)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, dlair2_316e,  dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Europe v3.16)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, dlair2_315,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.15)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, dlair2_315s,  dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Spanish v3.15)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, dlair2_314,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.14)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, dlair2_312,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (Europe v3.12)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, dlair2_300,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v3.00)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, dlair2_211,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v2.11)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, dlair2_200,   dlair2,   dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Leland Corporation", "Dragon's Lair 2: Time Warp (US v2.00, AMOA prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 1991, spacea91,     spaceace, dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Cinematronics (Leland Corporation license)", "Space Ace (DL2 Conversion) (US v1.3)", MACHINE_IS_SKELETON )
-GAME( 1991, spacea91_13e, spaceace, dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Cinematronics (Leland Corporation license)", "Space Ace (DL2 Conversion) (Europe v1.3)", MACHINE_IS_SKELETON )
+GAME( 1991, spacea91,     spaceace, dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Cinematronics (Leland Corporation license)", "Space Ace (DL2 Conversion) (US v1.3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, spacea91_13e, spaceace, dlair2,  dlair2, dlair2_state, empty_init, ROT0, "Cinematronics (Leland Corporation license)", "Space Ace (DL2 Conversion) (Europe v1.3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

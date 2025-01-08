@@ -57,8 +57,8 @@ public:
 	void kozure(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void legion_common(machine_config &config);
 	void video_config(machine_config &config, int hchar_start, int vstart, int vend);
@@ -149,24 +149,24 @@ protected:
 	void armedf_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 						u32 code, u32 color, u32 clut, int flipx, int flipy, int offsx, int offsy,
 						bitmap_ind8 &primap, u32 pmask, int transparent_color);
-	void common_map(address_map &map);
-	void armedf_map(address_map &map);
-	void cclimbr2_map(address_map &map);
-	void cclimbr2_soundmap(address_map &map);
-	void kozure_map(address_map &map);
-	void legion_common_map(address_map &map);
-	void legion_map(address_map &map);
-	void legionjb_map(address_map &map);
-	void legionjb2_map(address_map &map);
-	void sound_3526_portmap(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
-	void terraf_common_map(address_map &map);
-	void terraf_map(address_map &map);
-	void terrafb_map(address_map &map);
-	void terrafjb_map(address_map &map);
-	void terrafjb_extraz80_map(address_map &map);
-	void terrafjb_extraz80_portmap(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void armedf_map(address_map &map) ATTR_COLD;
+	void cclimbr2_map(address_map &map) ATTR_COLD;
+	void cclimbr2_soundmap(address_map &map) ATTR_COLD;
+	void kozure_map(address_map &map) ATTR_COLD;
+	void legion_common_map(address_map &map) ATTR_COLD;
+	void legion_map(address_map &map) ATTR_COLD;
+	void legionjb_map(address_map &map) ATTR_COLD;
+	void legionjb2_map(address_map &map) ATTR_COLD;
+	void sound_3526_portmap(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+	void terraf_common_map(address_map &map) ATTR_COLD;
+	void terraf_map(address_map &map) ATTR_COLD;
+	void terrafb_map(address_map &map) ATTR_COLD;
+	void terrafjb_map(address_map &map) ATTR_COLD;
+	void terrafjb_extraz80_map(address_map &map) ATTR_COLD;
+	void terrafjb_extraz80_portmap(address_map &map) ATTR_COLD;
 };
 
 class bigfghtr_state : public armedf_state
@@ -190,9 +190,9 @@ private:
 	u8 main_sharedram_r(offs_t offset);
 	void mcu_spritelist_w(offs_t offset, u8 data);
 
-	void bigfghtr_map(address_map &map);
-	void bigfghtr_mcu_io_map(address_map &map);
-	void bigfghtr_mcu_map(address_map &map);
+	void bigfghtr_map(address_map &map) ATTR_COLD;
+	void bigfghtr_mcu_io_map(address_map &map) ATTR_COLD;
+	void bigfghtr_mcu_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NICHIBUTSU_ARMEDF_H

@@ -643,7 +643,7 @@ OP( 0xed, i_inaxdx   ) { Wreg(AW) = read_port_word(Wreg(DW)); CLKW(12,12,7,12,8,
 OP( 0xee, i_outdxal  ) { write_port_byte(Wreg(DW), Breg(AL)); CLKS(8,8,3);  }
 OP( 0xef, i_outdxax  ) { write_port_word(Wreg(DW), Wreg(AW)); CLKW(12,12,5,12,8,3,Wreg(DW)); }
 
-OP( 0xf0, i_lock     ) { logerror("%06x: Warning - BUSLOCK\n",PC()); m_no_interrupt=1; CLK(2); }
+OP( 0xf0, i_lock     ) { LOGMASKED(LOG_BUSLOCK, "%06x: Warning - BUSLOCK\n",PC()); m_no_interrupt=1; CLK(2); }
 OP( 0xf2, i_repne    ) { uint32_t next = fetchop(); uint16_t c = Wreg(CW);
 	switch(next) { /* Segments */
 		case 0x26:  m_seg_prefix=true; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;

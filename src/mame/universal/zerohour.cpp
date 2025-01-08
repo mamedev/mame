@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/***************************************************************************
+/*******************************************************************************
 
 Zero Hour / Red Clash
 
@@ -32,7 +32,7 @@ BTANB:
 - other than the pitch being inaccurate (see TODO), redclash beeper really does
   sound like garbage, the only time it sounds pleasing is during the boss fight
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "zerohour_stars.h"
@@ -78,8 +78,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void videoram_w(offs_t offset, u8 data);
 	void irqack_w(u8 data) { m_maincpu->set_input_line(0, CLEAR_LINE); }
@@ -94,7 +94,7 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void zerohour_map(address_map &map);
+	void zerohour_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<u8> m_videoram;
 	required_shared_ptr<u8> m_spriteram;
@@ -128,7 +128,7 @@ public:
 	void redclash(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
@@ -140,7 +140,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beep_clock->set_period(attotime::never); }
 
-	void redclash_map(address_map &map);
+	void redclash_map(address_map &map) ATTR_COLD;
 
 	required_device<clock_device> m_beep_clock;
 	required_device<timer_device> m_beep_trigger;
@@ -180,18 +180,18 @@ void redclash_state::machine_start()
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Video
-***************************************************************************/
+*******************************************************************************/
 
-/***************************************************************************
+/*******************************************************************************
 
   Convert the color PROMs into a more useable format.
 
   I'm using the same palette conversion as Lady Bug, but the Zero Hour
   schematics show a different resistor network.
 
-***************************************************************************/
+*******************************************************************************/
 
 void zerohour_state::palette(palette_device &palette) const
 {
@@ -445,9 +445,9 @@ u32 redclash_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Sound
-***************************************************************************/
+*******************************************************************************/
 
 static const char *const zerohour_sample_names[] =
 {
@@ -527,9 +527,9 @@ void redclash_state::beep_trigger_w(int state)
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Address Maps
-***************************************************************************/
+*******************************************************************************/
 
 void zerohour_state::zerohour_map(address_map &map)
 {
@@ -567,9 +567,9 @@ void redclash_state::redclash_map(address_map &map)
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Input Ports
-***************************************************************************/
+*******************************************************************************/
 
 INPUT_CHANGED_MEMBER( zerohour_state::left_coin_inserted )
 {
@@ -605,8 +605,8 @@ static INPUT_PORTS_START( zerohour )
 	// Note that there are TWO VBlank inputs, one is active low, the other active
 	// high. There are probably other differences in the hardware, but emulating
 	// them this way is enough to get the game running.
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" ) // Switches 6-8 are not used
@@ -654,8 +654,8 @@ static INPUT_PORTS_START( zerohour )
 	// The coin slots are not memory mapped. Coin Left causes a NMI,
 	// Coin Right an IRQ. This fake input port is used by the interrupt
 	// handler to be notified of coin insertions.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zerohour_state, left_coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zerohour_state, right_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(zerohour_state::left_coin_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(zerohour_state::right_coin_inserted), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( redclash )
@@ -724,9 +724,9 @@ INPUT_PORTS_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     GFX Layouts
-***************************************************************************/
+*******************************************************************************/
 
 static const gfx_layout charlayout =
 {
@@ -794,9 +794,9 @@ GFXDECODE_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Machine Configs
-***************************************************************************/
+*******************************************************************************/
 
 void zerohour_state::base(machine_config &config)
 {
@@ -884,9 +884,9 @@ void redclash_state::redclash(machine_config &config)
 
 
 
-/***************************************************************************
+/*******************************************************************************
     ROM Definitions
-***************************************************************************/
+*******************************************************************************/
 
 ROM_START( zerohour )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1074,11 +1074,11 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT           SCREEN  COMPANY                        FULLNAME                     FLAGS
+//    YEAR  NAME        PARENT    MACHINE   INPUT     CLASS           INIT           SCREEN  COMPANY                        FULLNAME                     FLAGS
 GAME( 1980, zerohour,   0,        zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 1)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, zerohoura,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "Universal",                   "Zero Hour (set 2)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, zerohouri,  zerohour, zerohour, zerohour, zerohour_state, init_zerohour, ROT270, "bootleg (Inder SA)",          "Zero Hour (bootleg)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

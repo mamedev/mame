@@ -245,7 +245,7 @@ void nscsi_harddisk_device::scsi_command()
 			case 0x01: // read-write error recovery page
 				scsi_cmdbuf[pos++] = 0x01; // !PS, page id
 				scsi_cmdbuf[pos++] = 0x0a; // page length
-				scsi_cmdbuf[pos++] = 0; // various bits
+				scsi_cmdbuf[pos++] = 0x26; // various bits
 				scsi_cmdbuf[pos++] = 0; // read retry count
 				scsi_cmdbuf[pos++] = 0; // correction span
 				scsi_cmdbuf[pos++] = 0; // head offset count
@@ -384,7 +384,7 @@ void nscsi_harddisk_device::scsi_command()
 		}
 
 		if (!fail) {
-			scsi_cmdbuf[0] = pos;
+			scsi_cmdbuf[0] = pos - 1;
 			if (pos > size)
 				pos = size;
 
@@ -443,6 +443,11 @@ void nscsi_harddisk_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 	}
+
+	case SC_SYNCHRONIZE_CACHE:
+		LOG("command SYNCHRONIZE CACHE (10)\n");
+		scsi_status_complete(SS_GOOD);
+		break;
 
 	case SC_READ_CAPACITY: {
 		LOG("command READ CAPACITY\n");

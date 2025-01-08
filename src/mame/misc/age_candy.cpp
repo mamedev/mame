@@ -30,10 +30,10 @@ public:
 	void age_candy(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void age_candy_map(address_map &map);
+	void age_candy_map(address_map &map) ATTR_COLD;
 	required_device<hpc_device> m_maincpu;
 };
 
@@ -74,4 +74,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 19??, age_cand, 0, age_candy, age_candy, age_candy_state, empty_init, ROT0, "Advanced Games & Engineering", "Candy Crane (AGE)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, age_cand, 0, age_candy, age_candy, age_candy_state, empty_init, ROT0, "Advanced Games & Engineering", "Candy Crane (AGE)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

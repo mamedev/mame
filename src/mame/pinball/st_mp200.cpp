@@ -75,7 +75,6 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_s14001a(*this, "speech")
-		, m_speech(*this, "speech")
 		, m_pia_u10(*this, "pia_u10")
 		, m_pia_u11(*this, "pia_u11")
 		, m_io_test(*this, "TEST")
@@ -105,8 +104,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 u10_a_r();
@@ -116,14 +115,13 @@ private:
 	u8 u11_a_r();
 	void u11_a_w(u8 data);
 	void u11_b_w(u8 data);
-	u8 speech_r(offs_t offset);
 	void u10_ca2_w(int state);
 	void u10_cb2_w(int state);
 	void u11_ca2_w(int state);
 	void u11_cb2_w(int state);
 
-	void mem_map(address_map &map);
-	void sam4_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void sam4_map(address_map &map) ATTR_COLD;
 
 	u8 m_u10a = 0U;
 	u8 m_u10b = 0U;
@@ -140,7 +138,6 @@ private:
 	u8 m_last_solenoid = 31U;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<s14001a_device> m_s14001a;
-	optional_region_ptr<u8> m_speech;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
 	required_ioport m_io_test;
@@ -189,8 +186,8 @@ void st_mp200_state::sam4_map(address_map &map)
 
 static INPUT_PORTS_START( mp200 )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, st_mp200_state, self_test, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, st_mp200_state, activity_test, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(st_mp200_state::self_test), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(st_mp200_state::activity_test), 0)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 2")
@@ -426,12 +423,10 @@ void st_mp200_state::u11_ca2_w(int state)
 		}
 		else if (BIT(m_u10a, 6))
 		{
-			m_s14001a->force_update();
 			m_s14001a->set_output_gain(0, ((m_u10a >> 3 & 0xf) + 1) / 16.0);
 
 			u8 clock_divisor = 16 - (m_u10a & 0x07);
-
-			m_s14001a->set_clock(S14001_CLOCK / clock_divisor / 8);
+			m_s14001a->set_unscaled_clock(S14001_CLOCK / clock_divisor / 8);
 		}
 	}
 }
@@ -570,11 +565,6 @@ void st_mp200_state::u11_b_w(u8 data)
 	m_last_solenoid = data;
 }
 
-u8 st_mp200_state::speech_r(offs_t offset)
-{
-	return m_speech[offset];
-}
-
 void st_mp200_state::machine_start()
 {
 	genpin_class::machine_start();
@@ -677,7 +667,6 @@ void st_mp200_state::st_mp201(machine_config &config)
 	st_mp200(config);
 	SPEAKER(config, "mono").front_center();
 	S14001A(config, m_s14001a, S14001_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.00);
-	m_s14001a->ext_read().set(FUNC(st_mp200_state::speech_r));
 }
 
 void st_mp200_state::st_sam4(machine_config &config)
@@ -1143,34 +1132,34 @@ ROM_END
 
 
 // 6-digit
-GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (Bug fix release)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  meteorpo,   meteorp,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (First release)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  galaxypi,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Galaxy",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Ali",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (Bug fix release)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  meteorpo,   meteorp,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (First release)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  galaxypi,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Galaxy",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Ali",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // 7-digit
-GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cheetah (Black Cabinet)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  cheetahb,   cheetah,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Cheetah (Blue Cabinet)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  quicksil,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Quicksilver",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  biggame,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Big Game",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  seawitch,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Seawitch",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  stargzr,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Stargazer",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982,  dragfist,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Dragonfist",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982,  cue,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cue (Prototype)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cheetah (Black Cabinet)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  cheetahb,   cheetah,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Cheetah (Blue Cabinet)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  quicksil,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Quicksilver",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  biggame,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Big Game",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  seawitch,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Seawitch",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  stargzr,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Stargazer",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  dragfist,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Dragonfist",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  cue,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cue (Prototype)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // multiball
-GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Nine Ball",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981,  lightnin,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Lightning",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  flight2k,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Flight 2000",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981,  freefall,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Freefall",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981,  spltsecp,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Split Second (Pinball)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981,  catacomp,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Catacomb (Pinball)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981,  viperp,     0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Viper (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981,  ironmaid,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Iron Maiden",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982,  orbitor1,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Orbitor 1",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1984,  lazrlord,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Lazer Lord",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Nine Ball",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  lightnin,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Lightning",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  flight2k,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Flight 2000",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  freefall,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Freefall",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  spltsecp,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Split Second (Pinball)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  catacomp,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Catacomb (Pinball)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  viperp,     0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Viper (Pinball)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981,  ironmaid,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Iron Maiden",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  orbitor1,   0,          st_mp201,   mp200, st_mp200_state, init_st_mp201, ROT0, "Stern",     "Orbitor 1",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  lazrlord,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Lazer Lord",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // other manufacturer
-GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Pinstar",   "Gamatron",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(198?,  st_sam,     0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "SAM III Test Fixture",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(198?,  st_sam4,    st_sam,     st_sam4,    mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "SAM IV Test Fixture",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Pinstar",   "Gamatron",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(198?,  st_sam,     0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "SAM III Test Fixture",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(198?,  st_sam4,    st_sam,     st_sam4,    mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "SAM IV Test Fixture",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

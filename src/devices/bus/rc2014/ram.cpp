@@ -24,7 +24,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	std::unique_ptr<u8[]> m_ram;
@@ -62,11 +62,11 @@ protected:
 	ram_64k_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override { update_banks(); }
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	void page_w(int state) { m_bank = state; update_banks(); }
 
@@ -132,7 +132,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// base-class overrides
 	void update_banks() override;
@@ -177,7 +177,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// base-class overrides
 	void update_banks() override {};

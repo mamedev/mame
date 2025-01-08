@@ -405,14 +405,14 @@ void alpha_8201_device::bus_dir_w(int state)
 	// set RAM bus direction to 0: external, 1: MCU side
 	// selects one of two 74LS245 (octal bus transceiver) for databus, address bus via
 	// a couple of 74LS157 (2-input multiplexer)
-	m_bus = (state) ? 1 : 0;
+	m_bus = state ? 1 : 0;
 	mcu_writeram();
 }
 
 void alpha_8201_device::mcu_start_w(int state)
 {
 	// connected to MCU INT0
-	m_mcu->set_input_line(0, (state) ? ASSERT_LINE : CLEAR_LINE);
+	m_mcu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 u8 alpha_8201_device::ext_ram_r(offs_t offset)

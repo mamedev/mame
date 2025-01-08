@@ -51,7 +51,7 @@ public:
 	void cncchess3(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -60,7 +60,7 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void main_comm_w(u8 data);
@@ -158,4 +158,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, cncchess3, 0,      0,      cncchess3, cncchess3, cchess3_state, empty_init, "Conic", "Computer Chess (Conic, model 7013)", MACHINE_SUPPORTS_SAVE | MACHINE_IS_SKELETON )
+SYST( 1981, cncchess3, 0,      0,      cncchess3, cncchess3, cchess3_state, empty_init, "Conic", "Computer Chess (Conic, model 7013)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

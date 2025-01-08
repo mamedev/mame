@@ -400,9 +400,9 @@ public:
 	void sound_to_sh1_w(uint8_t data);
 	void init_coolridr();
 	void init_aquastge();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t m_colbase;
 
@@ -510,14 +510,14 @@ public:
 	objcachemanager m_decode[2];
 	void aquastge(machine_config &config);
 	void coolridr(machine_config &config);
-	void coolridr_h1_map(address_map &map);
-	void aquastge_h1_map(address_map &map);
-	void aquastge_submap(address_map &map);
-	void coolridr_submap(address_map &map);
-	void system_h1_map(address_map &map);
-	void system_h1_submap(address_map &map);
-	void system_h1_sound_map(address_map &map);
-	template<int Chip> void scsp_map(address_map &map);
+	void coolridr_h1_map(address_map &map) ATTR_COLD;
+	void aquastge_h1_map(address_map &map) ATTR_COLD;
+	void aquastge_submap(address_map &map) ATTR_COLD;
+	void coolridr_submap(address_map &map) ATTR_COLD;
+	void system_h1_map(address_map &map) ATTR_COLD;
+	void system_h1_submap(address_map &map) ATTR_COLD;
+	void system_h1_sound_map(address_map &map) ATTR_COLD;
+	template<int Chip> void scsp_map(address_map &map) ATTR_COLD;
 };
 
 #define PRINT_BLIT_STUFF \
@@ -2982,11 +2982,6 @@ void coolridr_state::scsp_map(address_map &map)
 }
 
 
-static GFXDECODE_START( gfx_coolridr )
-//  GFXDECODE_ENTRY( nullptr, 0, tiles16x16_layout, 0, 0x100 )
-GFXDECODE_END
-
-
 static INPUT_PORTS_START( coolridr )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_NAME("P1 Coin")
@@ -3253,7 +3248,7 @@ void coolridr_state::coolridr(machine_config &config)
 	io.an_port_callback<5>().set_ioport("AN5");
 	io.an_port_callback<6>().set_ioport("AN6");
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coolridr);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(57); // measured at 57.0426Hz

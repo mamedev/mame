@@ -102,7 +102,7 @@ private:
 	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	void init_vt240();
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_draw);
 	void irq_encoder(int irq, int state);
 	void irq7_w(int state);
@@ -120,11 +120,11 @@ private:
 	bool m_lb;
 	uint16_t m_scrl;
 
-	void bank_map(address_map &map);
-	void upd7220_map(address_map &map);
-	void vt240_char_io(address_map &map);
-	void vt240_char_mem(address_map &map);
-	void vt240_mem(address_map &map);
+	void bank_map(address_map &map) ATTR_COLD;
+	void upd7220_map(address_map &map) ATTR_COLD;
+	void vt240_char_io(address_map &map) ATTR_COLD;
+	void vt240_char_mem(address_map &map) ATTR_COLD;
+	void vt240_mem(address_map &map) ATTR_COLD;
 };
 
 void vt240_state::irq_encoder(int irq, int state)

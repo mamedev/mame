@@ -71,8 +71,8 @@ private:
 	required_ioport m_restore;
 	required_ioport m_lock;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -92,9 +92,9 @@ private:
 
 	void exp_reset_w(int state);
 
-	void vic10_mem(address_map &map);
-	void vic_colorram_map(address_map &map);
-	void vic_videoram_map(address_map &map);
+	void vic10_mem(address_map &map) ATTR_COLD;
+	void vic_colorram_map(address_map &map) ATTR_COLD;
+	void vic_videoram_map(address_map &map) ATTR_COLD;
 };
 
 

@@ -59,7 +59,7 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t winclub_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -127,4 +127,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2005, wwmspot, 0, winclub, winclub, winclub_state, empty_init, ROT0, "Sega", "Winner's Wheel - Magical Spot", MACHINE_IS_SKELETON ) // year taken from instructions on cabinet (see YouTube video)
+GAME( 2005, wwmspot, 0, winclub, winclub, winclub_state, empty_init, ROT0, "Sega", "Winner's Wheel - Magical Spot", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // year taken from instructions on cabinet (see YouTube video)

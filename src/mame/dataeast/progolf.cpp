@@ -179,8 +179,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -208,8 +208,8 @@ private:
 	void palette_init(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
 };
 
 void progolf_state::palette_init(palette_device &palette) const
@@ -428,7 +428,7 @@ INPUT_CHANGED_MEMBER(progolf_state::coin_inserted)
 static INPUT_PORTS_START( progolf )
 	PORT_START("VBLANK")
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
@@ -452,8 +452,8 @@ static INPUT_PORTS_START( progolf )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, progolf_state, coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, progolf_state, coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(progolf_state::coin_inserted), 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(progolf_state::coin_inserted), 0)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW1:1,2")
@@ -472,7 +472,7 @@ static INPUT_PORTS_START( progolf )
 	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH ) PORT_DIPLOCATION("DSW1:6")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )  PORT_DIPLOCATION("DSW1:7") PORT_CHANGED_MEMBER(DEVICE_SELF, progolf_state, coin_inserted, 0) // same coinage as COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )  PORT_DIPLOCATION("DSW1:7") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(progolf_state::coin_inserted), 0) // same coinage as COIN1
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH ) PORT_DIPLOCATION("DSW1:8")
 
 	PORT_START("DSW2")

@@ -38,13 +38,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 13; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 6; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 18+15; } // includes interrupt
 	virtual uint32_t execute_default_irq_vector(int inputnum) const noexcept override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -70,17 +69,17 @@ private:
 	devcb_write_line m_flag_handler;
 	devcb_read8 m_intack_handler;
 
-	uint16_t  m_ppc;    /* previous program counter (page + iar) */
-	uint16_t  m_page;   /* 8K page select register (A14..A13) */
-	uint16_t  m_iar;    /* instruction address register (A12..A0) */
-	uint16_t  m_ea;     /* effective address (A14..A0) */
-	uint8_t   m_psl;    /* processor status lower */
-	uint8_t   m_psu;    /* processor status upper */
-	uint8_t   m_r;      /* absolute addressing dst/src register */
-	uint8_t   m_reg[7]; /* 7 general purpose registers */
-	uint8_t   m_halt;   /* 1 if cpu is halted */
-	uint8_t   m_ir;     /* instruction register */
-	uint16_t  m_ras[8]; /* 8 return address stack entries */
+	uint16_t  m_ppc;    // previous program counter (page + iar)
+	uint16_t  m_page;   // 8K page select register (A14..A13)
+	uint16_t  m_iar;    // instruction address register (A12..A0)
+	uint16_t  m_ea;     // effective address (A14..A0)
+	uint8_t   m_psl;    // processor status lower
+	uint8_t   m_psu;    // processor status upper
+	uint8_t   m_r;      // absolute addressing dst/src register
+	uint8_t   m_reg[7]; // 7 general purpose registers
+	uint8_t   m_halt;   // 1 if cpu is halted
+	uint8_t   m_ir;     // instruction register
+	uint16_t  m_ras[8]; // 8 return address stack entries
 	uint8_t   m_irq_state;
 
 	int     m_icount;

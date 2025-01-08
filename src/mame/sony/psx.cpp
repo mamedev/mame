@@ -13,7 +13,7 @@
 
 #include "bus/psx/ctlrport.h"
 #include "bus/psx/parallel.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/hd6305.h"
 #include "cpu/psx/psx.h"
 #include "imagedev/cdromimg.h"
 #include "imagedev/snapquik.h"
@@ -67,8 +67,8 @@ private:
 	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
-	void psx_map(address_map &map);
-	void subcpu_map(address_map &map);
+	void psx_map(address_map &map) ATTR_COLD;
+	void subcpu_map(address_map &map) ATTR_COLD;
 
 	required_device<psx_parallel_slot_device> m_parallel;
 	required_device<psxcd_device> m_psxcd;

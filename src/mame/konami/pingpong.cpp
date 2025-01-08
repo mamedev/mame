@@ -43,11 +43,11 @@ public:
 	void init_merlinmm();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
-	void merlinmm_map(address_map &map);
+	void merlinmm_map(address_map &map) ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_colorram;
@@ -69,7 +69,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(merlinmm_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pingpong_map(address_map &map);
+	void pingpong_map(address_map &map) ATTR_COLD;
 };
 
 class cashquiz_state : public pingpong_state
@@ -85,7 +85,7 @@ public:
 	void init_cashquiz();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_memory_bank_array<8> m_banks;
@@ -95,7 +95,7 @@ private:
 	void question_bank_high_w(uint8_t data);
 	void question_bank_low_w(uint8_t data);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 

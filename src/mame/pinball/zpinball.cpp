@@ -46,8 +46,8 @@ public:
 	void eballchps(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 pal_r();
@@ -71,8 +71,8 @@ private:
 	void o5_w(u8 data);
 	void o6_w(u8 data);
 
-	void zpu_mem(address_map &map);
-	void zpu_io(address_map &map);
+	void zpu_mem(address_map &map) ATTR_COLD;
+	void zpu_io(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_zpumpu;
 	required_device<z80ctc_device> m_zpuctc;
@@ -328,6 +328,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(1986, eballchps, eballchp, eballchps, zpinball, zpinball_state, empty_init, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, cobrapb,   0,        zpinball,  zpinball, zpinball_state, empty_init, ROT0, "Playbar", "Cobra (Playbar)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?, comeback,  0,        zpinball,  zpinball, zpinball_state, empty_init, ROT0, "Nondum / CIFA", "Come Back", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, eballchps, eballchp, eballchps, zpinball, zpinball_state, empty_init, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1987, cobrapb,   0,        zpinball,  zpinball, zpinball_state, empty_init, ROT0, "Playbar", "Cobra (Playbar)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(198?, comeback,  0,        zpinball,  zpinball, zpinball_state, empty_init, ROT0, "Nondum / CIFA", "Come Back", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

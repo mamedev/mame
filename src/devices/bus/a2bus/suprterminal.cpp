@@ -52,10 +52,10 @@ public:
 protected:
 	a2bus_suprterminal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual u8 read_cnxx(u8 offset) override;
@@ -75,6 +75,8 @@ private:
 	std::unique_ptr<u8[]> m_fontram;
 //  u8 m_fontram[0x400];
 	bool m_bRasterRAM, m_bCharBank1, m_bC800IsRAM;
+
+	void access_c0nx(u8 offset);
 };
 
 //-------------------------------------------------
@@ -125,6 +127,7 @@ void a2bus_suprterminal_device::device_start()
 	m_vram = std::make_unique<u8[]>(0x800); // 4 2114 DRAMs
 	m_fontram = std::make_unique<u8[]>(0x400); // 2 2114 DRAMs
 
+	m_bC800IsRAM = false;
 	m_bRasterRAM = true;
 	m_bCharBank1 = false;
 
@@ -144,18 +147,7 @@ u8 a2bus_suprterminal_device::read_cnxx(u8 offset)
 	return m_rom[offset+0x300];
 }
 
-u8 a2bus_suprterminal_device::read_c0nx(u8 offset)
-{
-	switch (offset)
-	{
-		case 9:
-			return m_crtc->register_r();
-	}
-
-	return 0xff;
-}
-
-void a2bus_suprterminal_device::write_c0nx(u8 offset, u8 data)
+void a2bus_suprterminal_device::access_c0nx(u8 offset)
 {
 	switch (offset)
 	{
@@ -172,14 +164,39 @@ void a2bus_suprterminal_device::write_c0nx(u8 offset, u8 data)
 		case 6:
 			m_bCharBank1 ^= 1;
 			break;
+	}
+}
 
-		case 8:
-			m_crtc->address_w(data);
-			break;
+u8 a2bus_suprterminal_device::read_c0nx(u8 offset)
+{
+	if (offset < 8)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			access_c0nx(offset);
+		}
+	}
+	else if (offset == 9)
+	{
+		return m_crtc->register_r();
+	}
 
-		case 9:
-			m_crtc->register_w(data);
-			break;
+	return 0xff;
+}
+
+void a2bus_suprterminal_device::write_c0nx(u8 offset, u8 data)
+{
+	if (offset < 8)
+	{
+		access_c0nx(offset);
+	}
+	else if (offset == 8)
+	{
+		m_crtc->address_w(data);
+	}
+	else if (offset == 9)
+	{
+		m_crtc->register_w(data);
 	}
 }
 

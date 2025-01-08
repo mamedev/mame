@@ -34,11 +34,11 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void v0bowl_map(address_map &map);
+	void v0bowl_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<se3208_device> m_maincpu;
@@ -159,4 +159,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, v0bowl,  0,   v0bowl,  v0bowl, v0bowl_state, empty_init, ROT0, "A1 Amusement One",      "unknown VRender0+ bowling game", MACHINE_IS_SKELETON ) // Return Bowl?
+GAME( 200?, v0bowl,  0,   v0bowl,  v0bowl, v0bowl_state, empty_init, ROT0, "A1 Amusement One",      "unknown VRender0+ bowling game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Return Bowl?

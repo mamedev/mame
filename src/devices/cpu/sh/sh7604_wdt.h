@@ -6,11 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_SH7604_WDT_H
-#define MAME_CPU_SH7604_WDT_H
+#ifndef MAME_CPU_SH_SH7604_WDT_H
+#define MAME_CPU_SH_SH7604_WDT_H
 
 #pragma once
-
 
 
 //**************************************************************************
@@ -26,7 +25,7 @@ public:
 	sh7604_wdt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	void wdt_regs(address_map &map);
+	void wdt_regs(address_map &map) ATTR_COLD;
 
 	void write(address_space &space, offs_t offset, uint16_t data);
 	uint8_t read(address_space &space, offs_t offset);
@@ -34,8 +33,8 @@ public:
 protected:
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 private:
 	const address_space_config      m_space_config;
 };
@@ -44,4 +43,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SH7604_WDT, sh7604_wdt_device)
 
-#endif // MAME_CPU_SH7604_WDT_H
+#endif // MAME_CPU_SH_SH7604_WDT_H

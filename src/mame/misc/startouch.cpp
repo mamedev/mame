@@ -53,7 +53,7 @@ public:
 	void europl01(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -104,4 +104,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(2001, europl01, 0, europl01, europl01, startouch_state, empty_init, ROT0, "Sleic / Petaco", "EuroPlay 2001", MACHINE_IS_SKELETON)
+GAME(2001, europl01, 0, europl01, europl01, startouch_state, empty_init, ROT0, "Sleic / Petaco", "EuroPlay 2001", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -55,7 +55,7 @@ public:
 	void sv8000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void ay_port_a_w(u8 data);
@@ -66,8 +66,8 @@ private:
 
 	u8 mc6847_videoram_r(offs_t offset);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s68047_device> m_s68047p;

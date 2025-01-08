@@ -48,13 +48,13 @@ public:
 	void dangbar(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<mc68hc11_cpu_device> m_maincpu;
 
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -157,6 +157,6 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1993, sspanic,   0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Same Same Panic", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1994, dangbar,   0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Dangerous Bar",   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1994, bellybmbr, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Belly Bomber",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, sspanic,   0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Same Same Panic", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1994, dangbar,   0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Dangerous Bar",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1994, bellybmbr, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Belly Bomber",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

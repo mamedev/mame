@@ -20,8 +20,8 @@ protected:
 			device_t *owner,
 			u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void install_overlay();
 	u16 gatearray_r(offs_t offset, u16 mem_mask = ~0);

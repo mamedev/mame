@@ -2,20 +2,25 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Skeleton driver for Falco TS-series terminals.
+    Preliminary driver for Falco TS-series terminals.
 
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-//#include "bus/rs232/rs232.h"
+#include "machine/input_merger.h"
 #include "machine/nvram.h"
+#include "machine/ripple_counter.h"
 #include "machine/rstbuf.h"
 #include "machine/scn_pci.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
+#include "sound/spkrdev.h"
 #include "video/mc6845.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -27,7 +32,10 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_rstbuf(*this, "rstbuf")
+		, m_lineint(*this, "lineint")
+		, m_bell(*this, "bell")
 		, m_crtc(*this, "crtc")
+		, m_blinkcnt(*this, "blinkcnt")
 		, m_vram(*this, "vram")
 		, m_chargen(*this, "chargen")
 		, m_keys(*this, "KEY%X", 0U)
@@ -38,39 +46,193 @@ public:
 	void ts2624(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	MC6845_UPDATE_ROW(ts1_update_row);
 	MC6845_UPDATE_ROW(update_row);
+	void load_counters();
+	void row_clock_w(int state);
+	void vsync_w(int state);
+	void bell_toggle_w(int state);
 
 	u8 key_status_r();
 	void key_scan_w(u8 data);
-	void vram0_w(u8 data);
-	void vram1_w(u8 data);
+	void video_reset_w(u8 data);
+	void line_addr_upper_w(u8 data);
+	void line_addr_lower_w(u8 data);
+	void line_attr_w(u8 data);
+	void line_int_clear_w(u8 data);
+	void brightness_w(u8 data);
+	void bell_w(u8 data);
+	void control_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void ts1_mem_map(address_map &map);
-	void ts1_io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void ts1_mem_map(address_map &map) ATTR_COLD;
+	void ts1_io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	optional_device<rst_pos_buffer_device> m_rstbuf;
+	required_device<input_merger_device> m_lineint;
+	optional_device<speaker_sound_device> m_bell;
 	required_device<mc6845_device> m_crtc;
+	required_device<ripple_counter_device> m_blinkcnt;
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_chargen;
 	optional_ioport_array<16> m_keys;
 
+	u16 m_line_addr_latch = 0;
+	u16 m_line_addr_base = 0;
+	u8 m_lines_left = 0;
+	u8 m_line_attr_latch = 0;
+	u8 m_line_attr = 0;
+	u8 m_brightness = 0;
 	u8 m_key_scan = 0;
+	bool m_bell_toggle = false;
 };
 
 void falcots_state::machine_start()
 {
-	m_key_scan = 0;
+	save_item(NAME(m_line_addr_latch));
+	save_item(NAME(m_line_addr_base));
+	save_item(NAME(m_lines_left));
+	save_item(NAME(m_line_attr_latch));
+	save_item(NAME(m_line_attr));
+	save_item(NAME(m_brightness));
 	save_item(NAME(m_key_scan));
+	if (!m_rstbuf.found())
+		save_item(NAME(m_bell_toggle));
+}
+
+void falcots_state::machine_reset()
+{
+	control_w(0);
+}
+
+MC6845_UPDATE_ROW(falcots_state::ts1_update_row)
+{
+	rgb_t fg(m_brightness, m_brightness, m_brightness);
+	u32 *pix = &bitmap.pix(y);
+
+	if (BIT(m_line_attr, 5))
+		x_count /= 2;
+	for (int x = 0; x < x_count; ++x)
+	{
+		u8 char_code = BIT(m_line_attr, 4) ? m_vram[(m_line_addr_base + x) & 0x7ff] : 0;
+		u8 attr_code = BIT(m_line_attr, 4) ? m_vram[0x800 + ((m_line_addr_base + x) & 0x7ff)] : 0;
+
+		u8 dots = 0;
+		if (!BIT(attr_code, 5))
+		{
+			if (!BIT(attr_code, 1) || !BIT(m_blinkcnt->count(), 4))
+				dots = ~m_chargen[u16(char_code & 0x7f) << 4 | (m_line_attr & 0x0f)];
+			if (BIT(attr_code, 0) && (m_line_attr & 0x0b) == 0x0b)
+				dots = ~dots;
+			if (BIT(attr_code, 2))
+				dots = ~dots;
+		}
+
+		for (int n = 8; n-- != 0; )
+		{
+			*pix++ = BIT(dots, n) ? fg : rgb_t::black();
+			if (BIT(m_line_attr, 5))
+				*pix++ = BIT(dots, n) ? fg : rgb_t::black();
+		}
+	}
 }
 
 MC6845_UPDATE_ROW(falcots_state::update_row)
 {
+	rgb_t fg(m_brightness, m_brightness, m_brightness);
+	u32 *pix = &bitmap.pix(y);
+
+	if (!BIT(m_line_attr, 5))
+		x_count *= 2;
+	for (int x = 0; x < x_count; ++x)
+	{
+		u8 char_code = BIT(m_line_attr, 4) ? m_vram[(m_line_addr_base + x) & 0x0fff] : 0;
+		u8 attr_code = BIT(m_line_attr, 4) ? m_vram[0x1000 + ((m_line_addr_base + x) & 0x0fff)] : 0;
+
+		u8 dots = 0;
+		if (!BIT(attr_code, 5))
+		{
+			if (!BIT(attr_code, 1) || !BIT(m_blinkcnt->count(), 4))
+				dots = ~m_chargen[u16(attr_code & 0x18) << 8 | u16(char_code & 0x7f) << 4 | (m_line_attr & 0x0f)];
+			if (BIT(attr_code, 0) && (m_line_attr & 0x0b) == 0x0b)
+				dots = ~dots;
+			if (BIT(attr_code, 2))
+				dots = ~dots;
+		}
+
+		for (int n = 8; n-- != 0; )
+		{
+			*pix++ = BIT(dots, n) ? fg : rgb_t::black();
+			if (BIT(m_line_attr, 5))
+				*pix++ = BIT(dots, n) ? fg : rgb_t::black();
+		}
+	}
+}
+
+void falcots_state::load_counters()
+{
+	m_line_addr_base = m_line_addr_latch >> 4;
+	if (m_rstbuf.found())
+		m_lines_left = ((m_line_attr_latch & 0x0f) >= 0x0c ? 0x0f : 0x0b) - (m_line_attr_latch & 0x0f);
+	else
+		m_lines_left = ~m_line_addr_latch & 0x000f;
+	if (m_rstbuf.found() && BIT(m_line_attr_latch, 6))
+		m_line_attr = (m_line_attr_latch & 0xf0) | (m_line_attr & 0x0f);
+	else
+		m_line_attr = m_line_attr_latch;
+}
+
+void falcots_state::row_clock_w(int state)
+{
+	if (state)
+	{
+		if (m_lines_left == 0)
+			m_lineint->in_w<1>(1);
+	}
+	else
+	{
+		if (m_lines_left == 0)
+			load_counters();
+		else
+		{
+			--m_lines_left;
+			if (BIT(m_line_attr, 7) != m_rstbuf.found())
+				m_line_attr = (m_line_attr & 0xf0) | ((m_line_attr + 1) & 0x0f);
+			if (BIT(m_line_attr, 6))
+				m_line_attr ^= 0x80;
+		}
+		if (!m_rstbuf.found())
+			m_lineint->in_w<1>(0);
+	}
+}
+
+void falcots_state::vsync_w(int state)
+{
+	if (state)
+	{
+		m_lineint->in_w<1>(1);
+	}
+	else
+	{
+		if (!m_rstbuf.found())
+			m_lineint->in_w<1>(0);
+		load_counters();
+	}
+}
+
+void falcots_state::bell_toggle_w(int state)
+{
+	if (state)
+	{
+		m_bell_toggle = !m_bell_toggle;
+		m_bell->level_w(m_bell_toggle);
+	}
 }
 
 u8 falcots_state::key_status_r()
@@ -79,7 +241,7 @@ u8 falcots_state::key_status_r()
 
 	u8 i = (m_key_scan & 0x70) >> 4;
 	u8 j = m_key_scan & 0x0f;
-	if (BIT(m_keys[j].read_safe(0xff), i) == BIT(m_key_scan, 7))
+	if (!BIT(m_keys[j].read_safe(0xff), i))
 		status |= 0x01;
 
 	return status;
@@ -92,28 +254,67 @@ void falcots_state::key_scan_w(u8 data)
 	m_key_scan = data;
 }
 
-void falcots_state::vram0_w(u8 data)
+void falcots_state::video_reset_w(u8 data)
 {
+	m_line_addr_latch = 0;
+	m_line_attr_latch = 0;
 }
 
-void falcots_state::vram1_w(u8 data)
+void falcots_state::line_addr_upper_w(u8 data)
 {
+	m_line_addr_latch = u16(data) << 8 | (m_line_addr_latch & 0x00ff);
+}
+
+void falcots_state::line_addr_lower_w(u8 data)
+{
+	m_line_addr_latch = (m_line_addr_latch & 0xff00) | data;
+}
+
+void falcots_state::line_attr_w(u8 data)
+{
+	m_line_attr_latch = data;
+}
+
+void falcots_state::line_int_clear_w(u8 data)
+{
+	m_lineint->in_w<1>(0);
+}
+
+void falcots_state::brightness_w(u8 data)
+{
+	m_brightness = data;
+}
+
+void falcots_state::bell_w(u8 data)
+{
+	// TODO
+	logerror("%s: Bell triggered\n", machine().describe_context());
+}
+
+void falcots_state::control_w(u8 data)
+{
+	m_lineint->in_w<0>(BIT(data, 0));
 }
 
 void falcots_state::ts1_mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("maincpu", 0);
-	map(0x8000, 0xbfff).ram().share("vram"); // 8x NEC D416C
+	map(0x8000, 0xbfff).ram(); // 8x NEC D416C
 	map(0xec00, 0xefff).ram().share("nvram");
-	map(0xf000, 0xffff).ram(); // 6x(!?) AM9114EPC
+	map(0xf000, 0xffff).ram().share("vram"); // 6x(!?) AM9114EPC
 }
 
 void falcots_state::ts1_io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0xe0, 0xe0).w(FUNC(falcots_state::video_reset_w));
 	map(0xe1, 0xe1).w(FUNC(falcots_state::key_scan_w));
-	map(0xe2, 0xe2).w(FUNC(falcots_state::vram0_w));
-	map(0xe4, 0xe4).w(FUNC(falcots_state::vram1_w));
+	map(0xe2, 0xe2).w(FUNC(falcots_state::line_addr_upper_w));
+	map(0xe3, 0xe3).w(FUNC(falcots_state::brightness_w));
+	map(0xe4, 0xe4).w(FUNC(falcots_state::line_attr_w));
+	map(0xe5, 0xe5).w(FUNC(falcots_state::line_int_clear_w));
+	map(0xe6, 0xe6).w(FUNC(falcots_state::bell_w));
+	map(0xe7, 0xe7).w(FUNC(falcots_state::control_w));
 	map(0xe8, 0xe8).r(FUNC(falcots_state::key_status_r));
 	map(0xf0, 0xf0).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0xf1, 0xf1).w(m_crtc, FUNC(mc6845_device::register_w));
@@ -125,19 +326,24 @@ void falcots_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0xa000, 0xbfff).ram(); // 4x HM6116P-3
-	map(0xc000, 0xffff).ram().share("vram"); // 8x AM9016EPC (4116)
+	map(0xa000, 0xbfff).ram().share("vram"); // 4x HM6116P-3
+	map(0xc000, 0xffff).ram(); // 8x AM9016EPC (4116)
 }
 
 void falcots_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0xe0, 0xe0).r(FUNC(falcots_state::key_status_r));
+	map(0xe0, 0xe0).w(FUNC(falcots_state::video_reset_w));
 	map(0xe1, 0xe1).w(FUNC(falcots_state::key_scan_w));
-	map(0xe2, 0xe2).w(FUNC(falcots_state::vram0_w));
-	map(0xe4, 0xe4).w(FUNC(falcots_state::vram1_w));
+	map(0xe2, 0xe2).w(FUNC(falcots_state::line_addr_upper_w));
+	map(0xe3, 0xe3).w(FUNC(falcots_state::brightness_w));
+	map(0xe4, 0xe4).w(FUNC(falcots_state::line_attr_w));
+	map(0xe5, 0xe5).w(FUNC(falcots_state::line_addr_lower_w));
+	map(0xe7, 0xe7).w(FUNC(falcots_state::control_w));
 	map(0xe8, 0xe8).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0xe9, 0xe9).w(m_crtc, FUNC(mc6845_device::register_w));
+	map(0xeb, 0xeb).r(m_crtc, FUNC(mc6845_device::register_r));
 	map(0xf0, 0xf3).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0xf8, 0xfb).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
@@ -374,22 +580,39 @@ void falcots_state::ts1(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("rstbuf", FUNC(rst_pos_buffer_device::inta_cb));
 
 	RST_POS_BUFFER(config, m_rstbuf).int_callback().set_inputline(m_maincpu, 0);
+	INPUT_MERGER_ALL_HIGH(config, m_lineint).output_handler().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst4_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x NEC D444C + battery?
 
 	scn2651_device &pci(SCN2651(config, "pci", 15.2064_MHz_XTAL / 3)); // SCN2651N
+	pci.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	pci.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	pci.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	pci.txrdy_handler().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst1_w));
 	pci.rxrdy_handler().set(m_rstbuf, FUNC(rst_pos_buffer_device::rst2_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(15.2064_MHz_XTAL, 792, 0, 640, 320, 0, 300);
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	MC6845(config, m_crtc, 15.2064_MHz_XTAL / 8); // MC6845P
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(falcots_state::update_row));
+	m_crtc->set_update_row_callback(FUNC(falcots_state::ts1_update_row));
+	m_crtc->out_de_callback().set(FUNC(falcots_state::row_clock_w));
+	m_crtc->out_vsync_callback().set(FUNC(falcots_state::vsync_w));
+	m_crtc->out_vsync_callback().append(m_blinkcnt, FUNC(ripple_counter_device::clock_w)).invert();
+
+	RIPPLE_COUNTER(config, m_blinkcnt).set_stages(5);
+
+	// TODO: actually has two RS-232C ports (A & B)
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "loopback"));
+	rs232.rxd_handler().set("pci", FUNC(scn2651_device::rxd_w));
+	rs232.cts_handler().set("pci", FUNC(scn2651_device::cts_w));
+	rs232.dcd_handler().set("pci", FUNC(scn2651_device::dcd_w));
+	rs232.dsr_handler().set("pci", FUNC(scn2651_device::dsr_w));
 }
 
 static const z80_daisy_config daisy_chain[] =
@@ -406,29 +629,57 @@ void falcots_state::ts2624(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &falcots_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
+	INPUT_MERGER_ALL_HIGH(config, m_lineint).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + battery
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 14.7456_MHz_XTAL / 4)); // Z8430AB1
 	ctc.set_clk<0>(14.7456_MHz_XTAL / 16);
 	ctc.set_clk<1>(14.7456_MHz_XTAL / 16);
 	ctc.zc_callback<0>().set("dart", FUNC(z80dart_device::rxca_w));
-	ctc.zc_callback<1>().set("dart", FUNC(z80dart_device::txca_w));
-	ctc.zc_callback<2>().set("dart", FUNC(z80dart_device::rxtxcb_w));
+	ctc.zc_callback<0>().append("dart", FUNC(z80dart_device::txca_w));
+	ctc.zc_callback<1>().set("dart", FUNC(z80dart_device::rxtxcb_w));
+	ctc.zc_callback<2>().set(FUNC(falcots_state::bell_toggle_w));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80dart_device &dart(Z80DART(config, "dart", 14.7456_MHz_XTAL / 4)); // Z8470AB1
 	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dart.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	dart.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	dart.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	dart.out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	dart.out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	dart.out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_bell).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(14.7456_MHz_XTAL, 768, 0, 640, 320, 0, 286);
 	//screen.set_raw(23.9616_MHz_XTAL, 1248, 0, 1056, 320, 0, 286);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	MC6845(config, m_crtc, 14.7456_MHz_XTAL / 16);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(16);
 	m_crtc->set_update_row_callback(FUNC(falcots_state::update_row));
+	m_crtc->out_de_callback().set(FUNC(falcots_state::row_clock_w));
+	m_crtc->out_vsync_callback().set(FUNC(falcots_state::vsync_w));
+	m_crtc->out_vsync_callback().append(m_blinkcnt, FUNC(ripple_counter_device::clock_w)).invert();
+
+	RIPPLE_COUNTER(config, m_blinkcnt).set_stages(5); // 1/2 74LS393 + 1/2 74LS74
+
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set("dart", FUNC(z80dart_device::rxa_w));
+	rs232a.cts_handler().set("dart", FUNC(z80dart_device::ctsa_w));
+	rs232a.dcd_handler().set("dart", FUNC(z80dart_device::dcda_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set("dart", FUNC(z80dart_device::rxb_w));
+	rs232b.cts_handler().set("dart", FUNC(z80dart_device::ctsb_w));
+	rs232b.dcd_handler().set("dart", FUNC(z80dart_device::dcdb_w));
 }
 
 ROM_START(ts1)
@@ -459,5 +710,5 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1980, ts1,    0, 0, ts1,    ts1,    falcots_state, empty_init, "Falco Data Products", "TS-1 (v2.13.0)", MACHINE_IS_SKELETON)
-COMP(1982, ts2624, 0, 0, ts2624, ts2624, falcots_state, empty_init, "Falco Data Products", "TS-2624", MACHINE_IS_SKELETON)
+COMP(1980, ts1,    0, 0, ts1,    ts1,    falcots_state, empty_init, "Falco Data Products", "TS-1 (v2.13.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1982, ts2624, 0, 0, ts2624, ts2624, falcots_state, empty_init, "Falco Data Products", "TS-2624", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

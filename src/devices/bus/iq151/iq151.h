@@ -127,7 +127,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	devcb_write_line                m_out_irq0_cb;
 	devcb_write_line                m_out_irq1_cb;

@@ -69,14 +69,14 @@ public:
 	void mt440(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -190,4 +190,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY       FULLNAME          FLAGS
-COMP( 1986, mt440, 0,      0,      mt440,   mt440, mt440_state, empty_init, "Micro-Term", "Micro-Term 440", MACHINE_IS_SKELETON )
+COMP( 1986, mt440, 0,      0,      mt440,   mt440, mt440_state, empty_init, "Micro-Term", "Micro-Term 440", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

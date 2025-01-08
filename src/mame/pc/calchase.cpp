@@ -144,15 +144,15 @@ class isa16_calchase_jamma_if : public device_t, public device_isa16_card_interf
 public:
 	// construction/destruction
 	isa16_calchase_jamma_if(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	DECLARE_CUSTOM_INPUT_MEMBER( heartbeat_r );
+	ioport_value heartbeat_r();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// TODO: implement me once conversion to PCI kicks in
 //  virtual void remap(int space_id, offs_t start, offs_t end) override;
@@ -163,7 +163,7 @@ private:
 	emu_timer *m_hb_timer = nullptr;
 	bool m_hb_state = false;
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	template <unsigned N> uint16_t iocard_r();
 	uint8_t nvram_r(offs_t offset);
@@ -247,7 +247,7 @@ TIMER_CALLBACK_MEMBER(isa16_calchase_jamma_if::heartbeat_cb)
 	m_hb_state ^= 1;
 }
 
-CUSTOM_INPUT_MEMBER(isa16_calchase_jamma_if::heartbeat_r)
+ioport_value isa16_calchase_jamma_if::heartbeat_r()
 {
 	return m_hb_state;
 }
@@ -292,8 +292,8 @@ static INPUT_PORTS_START( calchase_jamma )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IOCARD3")
-//  PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("isa2:tgui9680:screen")
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(isa16_calchase_jamma_if, heartbeat_r)
+//  PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("isa2:tgui9680:screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(isa16_calchase_jamma_if::heartbeat_r))
 	PORT_BIT( 0xdfff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IOCARD4")
@@ -336,8 +336,8 @@ static INPUT_PORTS_START( calchase_jamma )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-//  PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("isa2:tgui9680:screen") // eggsplc
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(isa16_calchase_jamma_if, heartbeat_r)
+//  PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("isa2:tgui9680:screen", FUNC(screen_device::vblank)) // eggsplc
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(isa16_calchase_jamma_if::heartbeat_r))
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -417,8 +417,8 @@ public:
 	void init_hostinv();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
@@ -430,8 +430,8 @@ private:
 	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void intel82439tx_init();
-	void calchase_io(address_map &map);
-	void calchase_map(address_map &map);
+	void calchase_io(address_map &map) ATTR_COLD;
+	void calchase_map(address_map &map) ATTR_COLD;
 
 	uint8_t mtxc_config_r(int function, int reg);
 	void mtxc_config_w(int function, int reg, uint8_t data);

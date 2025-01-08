@@ -42,8 +42,8 @@ public:
 private:
 	MC6845_UPDATE_ROW(update_row);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_videoram;
@@ -127,4 +127,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1983, itt1700, 0, 0, itt1700, itt1700, itt1700_state, empty_init, "ITT Courier", "ITT 1700", MACHINE_IS_SKELETON)
+COMP(1983, itt1700, 0, 0, itt1700, itt1700, itt1700_state, empty_init, "ITT Courier", "ITT 1700", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

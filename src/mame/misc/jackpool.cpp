@@ -47,14 +47,14 @@ public:
 	void init_jackpool();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t jackpool_io_r(offs_t offset);
 	void map_vreg_w(int state);
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
-	void jackpool_mem(address_map &map);
+	void jackpool_mem(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint16_t> m_vram;
 	uint8_t m_map_vreg = 0;

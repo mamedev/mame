@@ -101,9 +101,9 @@ private:
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_device<ls259_device> m_latch;
-	void decrypted_opcodes_map(address_map &map);
-	void jrpacmbl_map(address_map &map);
-	void pengo_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void jrpacmbl_map(address_map &map) ATTR_COLD;
+	void pengo_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -395,11 +395,11 @@ void pengo_state::pengo(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pengo);
 	PALETTE(config, m_palette, FUNC(pengo_state::pacman_palette), 128 * 4, 32);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	screen.set_screen_update(FUNC(pengo_state::screen_update_pacman));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(pengo_state::vblank_irq));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(pengo_state::screen_update_pacman));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(pengo_state::vblank_irq));
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,pengo)
 
@@ -733,7 +733,6 @@ ROM_END
  *  Driver initialization
  *
  *************************************/
-
 
 void pengo_state::decode_pengo6(int end, int nodecend)
 {

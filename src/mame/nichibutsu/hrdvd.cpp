@@ -124,13 +124,13 @@ public:
 	void ata_irq(int state);
 	void ata_drq(int state);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void general_init(int patchaddress, int patchvalue);
 	void hrdvd(machine_config &config);
-	void hrdvd_map(address_map &map);
-	void hrdvd_sub_map(address_map &map);
+	void hrdvd_map(address_map &map) ATTR_COLD;
+	void hrdvd_sub_map(address_map &map) ATTR_COLD;
 
 	static void dvdrom_config(device_t *device);
 };

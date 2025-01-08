@@ -54,14 +54,14 @@ public:
 	void pegasos2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<ppc_device> m_maincpu;
 	required_device<mv64361_device> m_syscon;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -155,4 +155,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME      FLAGS
-COMP( 2003, pegasos2, 0,      0,      pegasos2, pegasos2, pegasos2_state, empty_init, "Genesi", "PEGASOS II", MACHINE_IS_SKELETON )
+COMP( 2003, pegasos2, 0,      0,      pegasos2, pegasos2, pegasos2_state, empty_init, "Genesi", "PEGASOS II", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

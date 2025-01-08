@@ -39,8 +39,8 @@ public:
 	void midxunit(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t cmos_r(offs_t offset);
@@ -58,7 +58,7 @@ private:
 	uint32_t dma_r(offs_t offset, uint32_t mem_mask = ~0);
 	void dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<tms340x0_device> m_maincpu;
 	required_device<midtunit_video_device> m_video;

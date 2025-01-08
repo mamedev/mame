@@ -179,7 +179,7 @@ public:
 		CR4241_7PIX = 0x06  // cross hair thickness 7 pixels
 	};
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u8 address_lo_r();
 	void address_lo_w(u8 data);
@@ -194,8 +194,8 @@ public:
 	void set_contrast(const u8 data) { m_contrast = data; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual u32 palette_entries() const noexcept override { return BT459_PIXEL_COLORS + BT459_OVERLAY_COLORS + BT459_CURSOR_COLORS; }
 

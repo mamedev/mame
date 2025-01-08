@@ -23,8 +23,8 @@ Hardware notes:
 
 #include "mmboard.h"
 
-#include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
@@ -58,7 +58,7 @@ public:
 	void montec4le(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -69,7 +69,7 @@ private:
 	required_ioport_array<2> m_keys;
 	output_finder<8> m_digits;
 
-	void montec_mem(address_map &map);
+	void montec_mem(address_map &map) ATTR_COLD;
 
 	template<int N> void lcd_output_w(u32 data);
 	void led_w(u8 data);
@@ -224,7 +224,7 @@ void montec_state::montec4le(machine_config &config)
 	montec4(config);
 
 	// basic machine hardware
-	M65C02(config.replace(), m_maincpu, 8_MHz_XTAL);
+	W65C02(config.replace(), m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &montec_state::montec_mem);
 
 	const attotime irq_period = attotime::from_hz(8_MHz_XTAL / 0x4000);

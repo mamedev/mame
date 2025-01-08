@@ -46,9 +46,9 @@ public:
 	int hotchase_sound_status_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	enum
 	{
@@ -127,9 +127,9 @@ protected:
 
 	output_finder<1> m_led;
 
-	void wecleman_map(address_map &map);
-	void wecleman_sound_map(address_map &map);
-	void wecleman_sub_map(address_map &map);
+	void wecleman_map(address_map &map) ATTR_COLD;
+	void wecleman_sound_map(address_map &map) ATTR_COLD;
+	void wecleman_sub_map(address_map &map) ATTR_COLD;
 
 	static constexpr int NUM_SPRITES = 256;
 	struct sprite_t
@@ -171,8 +171,8 @@ public:
 	void init_hotchase();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint32_t screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -194,9 +194,9 @@ private:
 
 	void hotchase_sprite_decode( int num16_banks, int bank_size );
 
-	void hotchase_map(address_map &map);
-	void hotchase_sound_map(address_map &map);
-	void hotchase_sub_map(address_map &map);
+	void hotchase_map(address_map &map) ATTR_COLD;
+	void hotchase_sound_map(address_map &map) ATTR_COLD;
+	void hotchase_sub_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_KONAMI_WECLEMAN_H

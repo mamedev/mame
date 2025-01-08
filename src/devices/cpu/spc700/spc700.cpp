@@ -1349,6 +1349,7 @@ void spc700_device::execute_run()
 {
 	if (CPU_STOPPED)
 	{
+		debugger_wait_hook();
 		CLOCKS = 0;
 		return;
 	}

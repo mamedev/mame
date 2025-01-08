@@ -67,13 +67,17 @@ fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, dev
 
 void fmscsi_device::device_start()
 {
-	m_input_lines = 0;
-	m_output_lines = 0;
-	m_data = 0;
-	m_command_index = 0;
-	m_last_id = 0;
-	m_target = 0;
-	m_phase = SCSI_PHASE_BUS_FREE;
+	save_item(NAME(m_command));
+	save_item(NAME(m_command_index));
+	save_item(NAME(m_result_length));
+	save_item(NAME(m_result_index));
+	save_item(NAME(m_input_lines));
+	save_item(NAME(m_output_lines));
+	save_item(NAME(m_data));
+	save_item(NAME(m_last_id));
+	save_item(NAME(m_phase));
+	save_item(NAME(m_target));
+	save_item(NAME(m_buffer));
 
 	// allocate read timer
 	m_transfer_timer = timer_alloc(FUNC(fmscsi_device::update_transfer), this);

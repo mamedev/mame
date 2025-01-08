@@ -14,8 +14,8 @@ public:
 	sgi_xmap2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_palette_interface overrides
 	virtual u32 palette_entries() const noexcept override { return 4096 + 16; }

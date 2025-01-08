@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
-#ifndef DEVICES_MACHINE_DP8573_H
-#define DEVICES_MACHINE_DP8573_H
+#ifndef MAME_MACHINE_DP8573A_H
+#define MAME_MACHINE_DP8573A_H
 
 #pragma once
 
@@ -24,7 +24,7 @@ protected:
 	dp8573a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_nvram_interface implementation
 	virtual void nvram_default() override;
@@ -70,4 +70,4 @@ protected:
 DECLARE_DEVICE_TYPE(DP8572A, dp8572a_device)
 DECLARE_DEVICE_TYPE(DP8573A, dp8573a_device)
 
-#endif // DEVICES_MACHINE_DP8573_H
+#endif // MAME_MACHINE_DP8573A_H

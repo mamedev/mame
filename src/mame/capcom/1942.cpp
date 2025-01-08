@@ -191,12 +191,12 @@ constexpr XTAL AUDIO_CLOCK_1942P(MASTER_CLOCK_1942P/16);
 } // anonymous namespace
 
 
-void _1942_state::_1942_bankswitch_w(uint8_t data)
+void _1942_state::bankswitch_w(uint8_t data)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::_1942_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::scanline)
 {
 	int scanline = param;
 
@@ -230,22 +230,17 @@ void _1942_state::_1942_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSWA");
 	map(0xc004, 0xc004).portr("DSWB");
 	map(0xc800, 0xc800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xc802, 0xc803).w(FUNC(_1942_state::_1942_scroll_w));
-	map(0xc804, 0xc804).w(FUNC(_1942_state::_1942_c804_w));
-	map(0xc805, 0xc805).w(FUNC(_1942_state::_1942_palette_bank_w));
-	map(0xc806, 0xc806).w(FUNC(_1942_state::_1942_bankswitch_w));
+	map(0xc802, 0xc803).w(FUNC(_1942_state::scroll_w));
+	map(0xc804, 0xc804).w(FUNC(_1942_state::control_w));
+	map(0xc805, 0xc805).w(FUNC(_1942_state::palette_bank_w));
+	map(0xc806, 0xc806).w(FUNC(_1942_state::bankswitch_w));
 	map(0xcc00, 0xcc7f).ram().share("spriteram");
-	map(0xd000, 0xd7ff).ram().w(FUNC(_1942_state::_1942_fgvideoram_w)).share("fg_videoram");
-	map(0xd800, 0xdbff).ram().w(FUNC(_1942_state::_1942_bgvideoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(_1942_state::fgvideoram_w)).share("fg_videoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(_1942_state::bgvideoram_w)).share("bg_videoram");
 	map(0xe000, 0xefff).ram();
 }
 
-void _1942p_state::_1942p_f600_w(uint8_t data)
-{
-//  printf("_1942p_f600_w %02x\n", data);
-}
-
-void _1942p_state::_1942p_palette_w(offs_t offset, uint8_t data)
+void _1942p_state::palette_w(offs_t offset, uint8_t data)
 {
 	m_protopal[offset] = data;
 
@@ -261,22 +256,22 @@ void _1942p_state::_1942p_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 
-	map(0xd000, 0xd7ff).ram().w(FUNC(_1942p_state::_1942_fgvideoram_w)).share("fg_videoram");
-	map(0xd800, 0xdbff).ram().w(FUNC(_1942p_state::_1942_bgvideoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(_1942p_state::fgvideoram_w)).share("fg_videoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(_1942p_state::bgvideoram_w)).share("bg_videoram");
 
 	map(0xe000, 0xefff).ram();
 
 	map(0xce00, 0xcfff).ram().share("spriteram");
 
-	map(0xdc02, 0xdc03).w(FUNC(_1942p_state::_1942_scroll_w));
-	map(0xc804, 0xc804).w(FUNC(_1942p_state::_1942_c804_w));
-	map(0xc805, 0xc805).w(FUNC(_1942p_state::_1942_palette_bank_w));
+	map(0xdc02, 0xdc03).w(FUNC(_1942p_state::scroll_w));
+	map(0xc804, 0xc804).w(FUNC(_1942p_state::control_w));
+	map(0xc805, 0xc805).w(FUNC(_1942p_state::palette_bank_w));
 
-	map(0xf000, 0xf3ff).ram().w(FUNC(_1942p_state::_1942p_palette_w)).share("protopal");
+	map(0xf000, 0xf3ff).ram().w(FUNC(_1942p_state::palette_w)).share("protopal");
 
-	map(0xf400, 0xf400).w(FUNC(_1942p_state::_1942_bankswitch_w));
+	map(0xf400, 0xf400).w(FUNC(_1942p_state::bankswitch_w));
 	map(0xf500, 0xf500).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf600, 0xf600).w(FUNC(_1942p_state::_1942p_f600_w));
+	map(0xf600, 0xf600).nopw(); // ?
 
 	map(0xf700, 0xf700).portr("DSWA");
 	map(0xf701, 0xf701).portr("SYSTEM");
@@ -410,7 +405,6 @@ static INPUT_PORTS_START( 1942p )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -605,7 +599,7 @@ void _1942_state::_1942(machine_config &config)
 	Z80(config, m_maincpu, MAIN_CPU_CLOCK);    /* 3 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1942_state::_1942_map);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(_1942_state::_1942_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(_1942_state::scanline), "screen", 0, 1);
 
 	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);  /* 3 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &_1942_state::sound_map);
@@ -616,7 +610,7 @@ void _1942_state::_1942(machine_config &config)
 	PALETTE(config, m_palette, FUNC(_1942_state::_1942_palette), 64*4+4*32*8+16*16, 256);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK/2, 384, 128, 0, 262, 22, 246);   // hsync is 50..77, vsync is 257..259
+	m_screen->set_raw(MASTER_CLOCK/2, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	m_screen->set_screen_update(FUNC(_1942_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -669,14 +663,13 @@ void _1942p_state::_1942p(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &_1942p_state::_1942p_sound_io);
 	m_audiocpu->set_periodic_int(FUNC(_1942p_state::irq0_line_hold), attotime::from_hz(4*60));
 
-
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1942p);
 
 	PALETTE(config, m_palette, FUNC(_1942p_state::_1942p_palette), 0x500, 0x400);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK/2, 384, 128, 0, 262, 22, 246);   // hsync is 50..77, vsync is 257..259
+	m_screen->set_raw(MASTER_CLOCK/2, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	m_screen->set_screen_update(FUNC(_1942p_state::screen_update));
 	m_screen->set_palette(m_palette);
 

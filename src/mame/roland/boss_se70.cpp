@@ -24,7 +24,7 @@ public:
 	void se70(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<h8510_device> m_maincpu;
 };
@@ -57,4 +57,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1993, se70, 0, 0, se70, se70, boss_se70_state, empty_init, "Roland", "Boss SE-70 Super Effects Processor", MACHINE_IS_SKELETON)
+SYST(1993, se70, 0, 0, se70, se70, boss_se70_state, empty_init, "Roland", "Boss SE-70 Super Effects Processor", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

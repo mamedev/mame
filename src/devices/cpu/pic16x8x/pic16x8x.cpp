@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Grull Osgo
+// copyright-holders:Tony La Porta, Grull Osgo
 /****************************************************************************************
 
   Microchip PIC16x8x Emulator
 
   https://ww1.microchip.com/downloads/en/DeviceDoc/30445D.pdf
-  
+
   Based on MAME's PIC16C5x/62x cpu devices developed by Tony La Porta
   and improvements to SFR's accesss made by ajrhacker.
 
@@ -26,9 +26,9 @@
 
     - Choose wich is the best option to set the config word, if via set instruction or from dump data or some sort of combination via default options.
 
-	- Improve the debug section.
-	
-	- Verify eeprom write sequence (see datashhet) 
+    - Improve the debug section.
+
+    - Verify eeprom write sequence (see datashhet)
 
   Improvements:
     - SFR's Flag description (bit oriented instructions) in disassembler where possible.
@@ -193,24 +193,23 @@ void pic16x8x_device::nvram_default()
 	// populate from a memory region if present
 	if (m_region.found())
 	{
-		if( m_region->bytes() != dump_size ) // pic memory dump total size
+		if (m_region->bytes() != dump_size) // pic memory dump total size
 		{
-			fatalerror( "Region '%s' wrong size (expected size = 0x%X)\n", tag(), dump_size );
+			fatalerror("Region '%s' wrong size (expected size = 0x%X)\n", tag(), dump_size);
 		}
 
-		if( m_region->bytewidth() != 2 ) // pic memory dumps are 16 bits wide
+		if (m_region->bytewidth() != 2) // pic memory dumps are 16 bits wide
 		{
-			fatalerror( "Region '%s' needs to be an 16-bit region\n", tag() );
+			fatalerror("Region '%s' needs to be an 16-bit region\n", tag());
 		}
 
 		// Get default NVRAM data from memory region
 		memcpy(m_buff, m_region->base() + eeprom_dump, m_internal_eeprom_size * 2);
 
 		// Data width conversion
-		for (u8 i=0; i < m_internal_eeprom_size; i++)
+		for (u8 i = 0; i < m_internal_eeprom_size; i++)
 			m_eeprom_data[i] = m_buff[i] & 0x00ff;
 	}
-
 }
 
 bool pic16x8x_device::nvram_read(util::read_stream &file)
@@ -522,7 +521,7 @@ u8 pic16x8x_device::portb_r()
 	u8 data = m_read_port[PORTB](PORTB, 0xff);
 	data &= m_port_tris[PORTB];
 	data |= (u8(~m_port_tris[PORTB]) & m_port_data[PORTB]);
-	return  data;
+	return data;
 }
 
 void pic16x8x_device::portb_w(u8 data)
@@ -632,9 +631,9 @@ u8 pic16x8x_device::eecon2_r()
 
 void pic16x8x_device::eecon2_w(u8 data)
 {
-	if((m_EECON2!=0x55) & (data==0x55))
+	if ((m_EECON2 != 0x55) & (data == 0x55))
 		m_EECON2 = data;
-	else if((m_EECON2==0x55) & (data==0xAA))
+	else if ((m_EECON2 == 0x55) & (data == 0xaa))
 		m_EECON2 = 0xff;
 	else
 		m_EECON2 = data;
@@ -1081,7 +1080,7 @@ void pic16x8x_device::device_start()
 	save_item(NAME(m_old_RB0));
 	save_item(NAME(m_irq_in_progress));
 	save_item(NAME(m_eeprom_data));
-	
+
 
 	// debugger
 	state_add( PIC16X8x_PC,   "PC",   m_PCL).mask(0xfff).formatstr("%03X");
@@ -1183,7 +1182,7 @@ void pic16x8x_device::device_reset()
 	CLR(m_STATUS, RP1_FLAG);
 
 	// Setting TO_FLAG from Config Word
-	if(WDTE)
+	if (WDTE)
 		SET(m_STATUS, TO_FLAG);
 	else
 		CLR(m_STATUS, TO_FLAG);
@@ -1326,37 +1325,33 @@ void pic16x8x_device::check_irqs()
 	if (m_irq_in_progress)
 		return;
 
-	if(m_read_port[PORTB](PORTB, 0xf0) != m_portb_chdetect_temp)
+	if (m_read_port[PORTB](PORTB, 0xf0) != m_portb_chdetect_temp)
 	{
 		m_portb_chdetect_temp = m_read_port[PORTB](PORTB, 0xf0);
 		SET(m_INTCON, RBIF_FLAG);
 	}
-
-	else if(GIE && RBIE && RBIF)
+	else if (GIE && RBIE && RBIF)
 	{
 		push_stack(m_PCL);
 		set_pc(INT_VECTOR);
 		standard_irq_callback(0, m_PCL);
 		m_irq_in_progress = true;
 	}
-
-	else if(GIE && INTE && INTF)
+	else if (GIE && INTE && INTF)
 	{
 		push_stack(m_PCL);
 		set_pc(INT_VECTOR);
 		standard_irq_callback(1, m_PCL);
 		m_irq_in_progress = true;
 	}
-
-	else if(GIE && T0IE && T0IF)
+	else if (GIE && T0IE && T0IF)
 	{
 		push_stack(m_PCL);
 		set_pc(INT_VECTOR);
 		standard_irq_callback(2, m_PCL);
 		m_irq_in_progress = true;
 	}
-	
-	else if(GIE && EEIE && EEIF)
+	else if (GIE && EEIE && EEIF)
 	{
 		push_stack(m_PCL);
 		set_pc(INT_VECTOR);

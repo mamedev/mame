@@ -17,6 +17,7 @@ public:
 	auto opt_cb() { return m_opt_cb.bind(); }
 	auto ki_cb() { return m_ki_cb.bind(); }
 	auto in0_cb() { return m_in0_cb.bind(); }
+	auto input_flag_cb() { return m_input_flag_cb.bind(); }
 
 protected:
 	enum
@@ -35,13 +36,12 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const noexcept override { return 4; }
 	virtual u32 execute_max_cycles() const noexcept override { return 48; }
-	virtual u32 execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -74,6 +74,7 @@ private:
 	void set_zl_flag(bool is_zl);
 	void set_zh_flag(bool is_zh);
 	void set_cl_flag(bool is_cl);
+	void set_input_flag(bool is_input_set);
 	void op_msk(int size);
 	void op_and(int size);
 	void op_or(int size);
@@ -82,8 +83,12 @@ private:
 	void op_addb(int size);
 	void op_subb(int size);
 	void op_sub(int size);
+	void op_pushb(u8 source);
 	void op_pushw(u16 source);
+	u8 op_popb();
 	u16 op_popw();
+	void set_reg(u8 i, u8 val) { m_reg[i] = val; /*logerror("R%02X = %02x @ %06X\n", i, val, (m_cseg << 16) | m_ip);*/ }
+	void timer_elapsed();
 
 	address_space_config m_program_config;
 
@@ -97,9 +102,14 @@ private:
 	u8 m_f;
 	u8 m_time;
 	u8 m_time_op;
+	u8 m_unk_f5;
 	s32 m_cycles_until_timeout;
 	bool m_is_timer_started;
+	bool m_is_timer_irq_enabled;
+	bool m_is_timer_irq_asserted;
+	bool m_is_timer_wait_elapsed;
 	bool m_is_infinite_timeout;
+	s32 m_timer_cycles;
 	emu_timer *m_timer;
 	u16 m_lar;
 	u8 m_reg[0x80];
@@ -126,6 +136,7 @@ private:
 	devcb_write8 m_opt_cb;
 	devcb_read8 m_ki_cb;
 	devcb_read8 m_in0_cb;
+	devcb_read8 m_input_flag_cb;
 };
 
 

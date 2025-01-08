@@ -169,7 +169,7 @@ public:
 	void canons80(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 keyboard_r();
@@ -177,7 +177,7 @@ private:
 
 	HD44780_PIXEL_UPDATE(pixel_update);
 
-	void canons80_map(address_map &map);
+	void canons80_map(address_map &map) ATTR_COLD;
 
 	optional_ioport_array<16> m_keyboard;
 	u8 m_keyscan;

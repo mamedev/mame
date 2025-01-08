@@ -44,6 +44,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Found on a Comelta DRAC-1 machine. -->
+	<software name="basic11a">
+		<description>AIM 65 BASIC v1.1 (alt)</description>
+		<year>1978</year>
+		<publisher>Rockwell/Microsoft</publisher>
+		<info name="usage" value="Load in &quot;cart1&quot; and &quot;cart2&quot;, then press 5 to start"/>
+
+		<part name="z26" interface="aim65_z26_cart">
+			<dataarea name="z26" size="4096">
+				<rom name="r3226.z26" size="4096" crc="36a61f39" sha1="f5ce0126cb594a565e730973fd140d03c298cefa"/>
+			</dataarea>
+		</part>
+		<part name="z25" interface="aim65_z25_cart">
+			<dataarea name="z25" size="4096">
+				<rom name="r3225.z25" size="4096" crc="d7b42d2a" sha1="4bbdb28d332429825adea0266ed9192786d9e392"/>
+			</dataarea>
+		</part>
+		<part name="z24" interface="aim65_z24_cart">
+			<dataarea name="z24" size="4096">
+				<rom name="crosaim_v1.3_b_asse-1_d000.z24" size="4096" crc="b7472a5e" sha1="333630bafa93e7236e3c7a8d14f16f2ba551fd26"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="extbas21">
 		<description>AIM 65/PC100 Extended BASIC v2.1</description>
 		<year>1980</year>

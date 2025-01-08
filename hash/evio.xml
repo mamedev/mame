@@ -32,7 +32,62 @@ license:CC0-1.0
 	*eM17   - Minna no evio                   (orange)
 	*eM18   - Evio Challenge!                 (red/pink)
 
-	(more?)
+
+
+	Cartridge Pinout
+
+	A01|NC
+	A02|GND
+	A03|GND
+	A04|A16
+	A05|A17
+	A06|A18
+	A07|A19
+	A08|A20
+	A09|A21
+	A10|A22
+	A11|A23
+	A12|GND
+	A13|TO A18
+	A14|/CE
+	A15|NC (SEEPROM 6)
+	A16|NC (SEEPROM 5)
+	A17|NC
+	A18|TO A13 (internal ROM /CE)
+	A19|/OE
+	A20|NC (/WE)
+	A21|VCC (/RP)
+	A22|D00
+	A23|D01
+	A24|D02
+	A25|D03
+	A26|VCC
+	B01|NC
+	B02|VCC
+	B03|VCC
+	B04|A15
+	B05|A14
+	B06|A13
+	B07|A12
+	B08|A11
+	B09|A10
+	B10|A09
+	B11|A08
+	B12|A07
+	B13|A06
+	B14|A05
+	B15|A04
+	B16|A03
+	B17|A02
+	B18|A01
+	B19|A00
+	B20|VCC
+	B21|GND
+	B22|D07
+	B23|D06
+	B24|D05
+	B25|D04
+	B26|GND
 
 	-->
 

@@ -60,7 +60,7 @@ public:
 	void zwackery(machine_config &config);
 
 private:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	void scanline_cb(uint32_t data);
 	void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t spriteram_r(offs_t offset);
@@ -77,9 +77,9 @@ private:
 
 	uint8_t ptm_r(offs_t offset);
 
-	void zwackery_map(address_map &map);
+	void zwackery_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<m68000_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;

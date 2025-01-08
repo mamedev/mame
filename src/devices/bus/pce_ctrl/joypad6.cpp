@@ -48,9 +48,9 @@ protected:
 	pce_joypad6_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_pce_control_port_interface overrides
 	virtual u8 peripheral_r() override;
@@ -85,10 +85,10 @@ protected:
 	pce_avenue_pad_6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	template<unsigned Buttonset> u8 buttons_r();
 
@@ -108,7 +108,7 @@ public:
 
 protected:
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 
@@ -134,7 +134,7 @@ INPUT_PORTS_START( pce_joypad6 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("%p Button VI")
 
 	PORT_START("JOY_MODE")
-	PORT_CONFNAME( 0x01, 0x00, "Joypad Mode" ) PORT_CHANGED_MEMBER(DEVICE_SELF, pce_joypad6_base_device, joypad_mode_changed, 0)
+	PORT_CONFNAME( 0x01, 0x00, "Joypad Mode" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pce_joypad6_base_device::joypad_mode_changed), 0)
 	PORT_CONFSETTING( 0x00, "2-buttons mode" ) // A at avenue pad 6
 	PORT_CONFSETTING( 0x01, "6-buttons mode" ) // B at avenue pad 6
 INPUT_PORTS_END

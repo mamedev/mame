@@ -29,8 +29,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_AM9517_H
-#define MAME_MACHINE_AM9517_H
+#ifndef MAME_MACHINE_AM9517A_H
+#define MAME_MACHINE_AM9517A_H
 
 #pragma once
 
@@ -82,8 +82,8 @@ protected:
 	am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
 	virtual void end_of_process();
@@ -160,8 +160,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void dma_read() override;
 	virtual void dma_write() override;
@@ -187,7 +187,7 @@ public:
 	pcxport_dmac_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void end_of_process() override;
 };
@@ -231,7 +231,7 @@ public:
 	}
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	u32 m_stop[4];
@@ -244,4 +244,4 @@ DECLARE_DEVICE_TYPE(V5X_DMAU,     v5x_dmau_device)
 DECLARE_DEVICE_TYPE(PCXPORT_DMAC, pcxport_dmac_device)
 DECLARE_DEVICE_TYPE(EISA_DMA,     eisa_dma_device)
 
-#endif // MAME_MACHINE_AM9517_H
+#endif // MAME_MACHINE_AM9517A_H

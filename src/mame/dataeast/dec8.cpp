@@ -4,95 +4,91 @@
 
 Various Data East 8 bit games:
 
-    Last Mission (rev 6)        (c) 1986 Data East USA (2*6809 + I8751)
-    Last Mission (rev 5)        (c) 1986 Data East USA (2*6809 + I8751)
-    Last Mission (Japan)        (c) 1986 Data East Corporation (2*6809 + I8751)
-    Shackled                    (c) 1986 Data East USA (2*6809 + I8751)
-    Breywood                    (c) 1986 Data East Corporation (2*6809 + I8751)
-    Gondomania                  (c) 1987 Data East USA (6809 + I8751)
-    Makyou Senshi               (c) 1987 Data East Corporation (6809 + I8751)
-    Garyo Retsuden              (c) 1987 Data East Corporation (6809 + I8751)
-    The Real Ghostbusters (2p)  (c) 1987 Data East USA (6809 + I8751)
-    The Real Ghostbusters (3p)  (c) 1987 Data East USA (6809 + I8751)
-    Meikyuu Hunter G            (c) 1987 Data East Corporation (6809 + I8751)
-    Captain Silver (World)      (c) 1987 Data East Corporation (2*6809 + I8751)
-    Captain Silver (Japan)      (c) 1987 Data East Corporation (2*6809 + I8751)
-    Psycho-Nics Oscar (World)   (c) 1987 Data East Corporation (2*6809)
-    Psycho-Nics Oscar (US)      (c) 1988 Data East USA (2*6809)
-    Psycho-Nics Oscar (Japan)   (c) 1987 Data East Corporation (2*6809)
-    Super Real Darwin (World)   (c) 1987 Data East Corporation (6809 + I8751)
-    Super Real Darwin (Japan)   (c) 1987 Data East Corporation (6809 + I8751)
-    Cobra Command (World)       (c) 1988 Data East Corporation (6809)
-    Cobra Command (Japan)       (c) 1988 Data East Corporation (6809)
+Last Mission (rev 6)        (c) 1986 Data East USA (2*6809 + I8751)
+Last Mission (rev 5)        (c) 1986 Data East USA (2*6809 + I8751)
+Last Mission (Japan)        (c) 1986 Data East Corporation (2*6809 + I8751)
+Shackled                    (c) 1986 Data East USA (2*6809 + I8751)
+Breywood                    (c) 1986 Data East Corporation (2*6809 + I8751)
+Gondomania                  (c) 1987 Data East USA (6809 + I8751)
+Makyou Senshi               (c) 1987 Data East Corporation (6809 + I8751)
+Garyo Retsuden              (c) 1987 Data East Corporation (6809 + I8751)
+The Real Ghostbusters (2p)  (c) 1987 Data East USA (6809 + I8751)
+The Real Ghostbusters (3p)  (c) 1987 Data East USA (6809 + I8751)
+Meikyuu Hunter G            (c) 1987 Data East Corporation (6809 + I8751)
+Captain Silver (World)      (c) 1987 Data East Corporation (2*6809 + I8751)
+Captain Silver (Japan)      (c) 1987 Data East Corporation (2*6809 + I8751)
+Psycho-Nics Oscar (World)   (c) 1987 Data East Corporation (2*6809)
+Psycho-Nics Oscar (US)      (c) 1988 Data East USA (2*6809)
+Psycho-Nics Oscar (Japan)   (c) 1987 Data East Corporation (2*6809)
+Super Real Darwin (World)   (c) 1987 Data East Corporation (6809 + I8751)
+Super Real Darwin (Japan)   (c) 1987 Data East Corporation (6809 + I8751)
+Cobra Command (World)       (c) 1988 Data East Corporation (6809)
+Cobra Command (Japan)       (c) 1988 Data East Corporation (6809)
 
-    All games use a 6502 for sound (some are encrypted), all games except Cobracom
-    and Oscar use an Intel 8751 for protection & coinage. For the games without
-    (fake) MCU, the coinage dip switch (sometimes based on the manual) is simulated.
+All games use a 6502 for sound (some are encrypted), all games except Cobracom
+and Oscar use an Intel 8751 for protection & coinage.
 
-    Meikyuu Hunter G was formerly known as Mazehunter.
+Meikyuu Hunter G was formerly known as Mazehunter. It's a Japan-only modified
+version of Ghostbusters, due to licensing restrictions.
 
-    Emulation by Bryan McPhail, mish@tendril.co.uk
+Emulation by Bryan McPhail, mish@tendril.co.uk
+Thanks to Jose Miguel Morales Farreras for Super Real Darwin information!
 
-To do:
-    Super Real Darwin 'Double' sprites appearing from the top of the screen are clipped
-    Strangely coloured butterfly on Garyo Retsuden water levels!
-
-  Thanks to Jose Miguel Morales Farreras for Super Real Darwin information!
+TODO:
+- shackled continue after game over does not work, see MT0418. It's not that
+  big of an issue user-wise, since credits add more health. For breywood, it
+  appears to work ok after the 1st level.
+- srdarwin 'double' sprites appearing from the top of the screen are clipped
+- strangely coloured butterfly on Garyo Retsuden water levels!
+- gondo 2nd coin doesn't work, probably due to hacked MCU ROM
+- ghostb coinage dipswitch
+- how does meikyuhbl circumvent the MCU? It won't boot in MAME if MCU is removed
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "dec8.h"
 
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/r65c02.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
-#include "deco222.h"
 #include "sound/msm5205.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
 
+#include "deco222.h"
 #include "speaker.h"
 
 
 /******************************************************************************/
 
-
 void dec8_state_base::buffer_spriteram16_w(u8 data)
 {
 	u8* spriteram = m_spriteram->live();
+
 	// copy to a 16-bit region for the sprite chip
-	for (int i=0;i<0x800/2;i++)
-	{
-		m_buffered_spriteram16[i] = spriteram[(i*2)+1] | (spriteram[(i*2)+0] <<8);
-	}
+	for (int i = 0; i < 0x800/2 ; i++)
+		m_buffered_spriteram16[i] = spriteram[(i * 2) + 1] | (spriteram[(i * 2) + 0] << 8);
 }
 
-/* Only used by ghostb, gondo, garyoret, other games can control buffering */
-void lastmisn_state::screen_vblank(int state)
+// Only used by ghostb, gondo, garyoret, other games can control buffering
+void ghostb_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
-	{
 		buffer_spriteram16_w(0);
-	}
 }
 
-u8 dec8_mcu_state_base::i8751_h_r()
+u8 dec8_mcu_state_base::i8751_hi_r()
 {
-	return m_i8751_return >> 8; /* MSB */
+	return m_i8751_return >> 8; // MSB
 }
 
-u8 dec8_mcu_state_base::i8751_l_r()
+u8 dec8_mcu_state_base::i8751_lo_r()
 {
-	return m_i8751_return & 0xff; /* LSB */
+	return m_i8751_return & 0xff; // LSB
 }
 
-void dec8_mcu_state_base::i8751_reset_w(u8 data)
-{
-	// ? reset the actual MCU?
-	//m_i8751_return = 0;
-}
 
 /******************************************************************************/
 
@@ -103,15 +99,14 @@ u8 gondo_state::player_io_r(offs_t offset)
 
 	switch (offset)
 	{
-		case 0: /* Rotary low byte */
+		case 0: // Rotary low byte
 			return ~(val & 0xff);
-		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
+		case 1: // Joystick = bottom 4 bits, rotary = top 4
 			return ((~val >> 4) & 0xf0) | (m_in_io[Which]->read() & 0xf);
 	}
 	return 0xff;
 }
 
-/******************************************************************************/
 
 /***************************************************
 *
@@ -119,34 +114,52 @@ u8 gondo_state::player_io_r(offs_t offset)
 *
 ***************************************************/
 
-TIMER_CALLBACK_MEMBER(dec8_mcu_state_base::mcu_irq_clear)
+TIMER_CALLBACK_MEMBER(ghostb_state::mcu_irq_clear)
 {
-	// The schematics show a clocked LS194 shift register (3A) is used to automatically
-	// clear the IRQ request.  The MCU does not clear it itself.
+	// Gondomania schematics show a clocked LS194 shift register (3A) is used to
+	// automatically clear the IRQ request. The MCU does not clear it itself.
 	m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(dec8_state_base::audiocpu_nmi_clear)
+TIMER_CALLBACK_MEMBER(ghostb_state::audiocpu_nmi_clear)
 {
 	// Gondomania schematics show a LS194 for the sound IRQ, sharing the 6502 clock
 	// S1=H, S0=L, LSI=H, and QA is the only output connected (to NMI)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void dec8_mcu_state_base::i8751_w(offs_t offset, u8 data)
+void dec8_mcu_state_base::i8751_lo_w(u8 data)
 {
-	switch (offset)
-	{
-	case 0: /* High byte - SECIRQ is trigged on activating this latch */
-		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
-		m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
-		m_i8751_timer->adjust(m_mcu->clocks_to_attotime(64)); // 64 clocks not confirmed
-		break;
-	case 1: /* Low byte */
-		m_i8751_value = (m_i8751_value & 0xff00) | data;
-		break;
-	}
+	m_i8751_value = (m_i8751_value & 0xff00) | data;
 }
+
+void dec8_mcu_state_base::i8751_hi_w(u8 data)
+{
+	m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
+
+	// SECIRQ is triggered on activating this latch
+	if (m_i8751_p2 & 2)
+		m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+}
+
+void ghostb_state::i8751_hi_w(u8 data)
+{
+	m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
+
+	// MCU interrupt is still level-triggered, but no ack?
+	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+	m_i8751_timer->adjust(attotime::from_ticks(64, 12_MHz_XTAL / 8)); // 64 clocks not confirmed
+}
+
+void ghostb_state::gondo_i8751_hi_w(u8 data)
+{
+	m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
+
+	// MCU interrupt is edge-triggered
+	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+	m_i8751_timer->adjust(attotime::from_ticks(4, 12_MHz_XTAL / 8));
+}
+
 
 /******************************************************************************/
 
@@ -155,8 +168,8 @@ void oscar_state::bank_w(u8 data)
 	m_mainbank->set_entry(data & 0x0f);
 }
 
-/* Used by Ghostbusters, Meikyuu Hunter G & Gondomania */
-void lastmisn_state::ghostb_bank_w(u8 data)
+// Used by Ghostbusters, Meikyuu Hunter G & Gondomania
+void ghostb_state::ghostb_bank_w(u8 data)
 {
 	/* Bit 0: SECCLR - acknowledge interrupt from I8751
 	   Bit 1: NMI enable/disable
@@ -164,7 +177,6 @@ void lastmisn_state::ghostb_bank_w(u8 data)
 	   Bit 3: Screen flip
 	   Bits 4-7: Bank switch
 	*/
-
 	m_mainbank->set_entry(data >> 4);
 
 	m_secclr = BIT(data, 0);
@@ -196,18 +208,18 @@ void csilver_state::control_w(u8 data)
 	m_mainbank->set_entry(data & 0x0f);
 }
 
-void dec8_state_base::sound_w(u8 data)
+void ghostb_state::sound_w(u8 data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(m6502_device::NMI_LINE, ASSERT_LINE);
-	m_m6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
+	m_6502_timer->adjust(m_audiocpu->cycles_to_attotime(4));
 }
 
 void csilver_state::adpcm_int(int state)
 {
 	m_toggle ^= 1;
 	if (m_toggle)
-		m_audiocpu->set_input_line(m6502_device::IRQ_LINE, HOLD_LINE);
+		m_audiocpu->set_input_line(m6502_device::IRQ_LINE, ASSERT_LINE);
 
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
@@ -222,12 +234,14 @@ u8 csilver_state::adpcm_reset_r()
 void csilver_state::adpcm_data_w(u8 data)
 {
 	m_msm5205next = data;
+	m_audiocpu->set_input_line(m6502_device::IRQ_LINE, CLEAR_LINE);
 }
 
 void csilver_state::sound_bank_w(u8 data)
 {
 	m_soundbank->set_entry((data & 0x08) >> 3);
 }
+
 
 /******************************************************************************/
 
@@ -241,11 +255,6 @@ void dec8_state_base::main_irq_off_w(u8 data)
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-void dec8_state_base::main_firq_off_w(u8 data)
-{
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
-}
-
 void dec8_state_base::sub_irq_on_w(u8 data)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
@@ -256,14 +265,14 @@ void dec8_state_base::sub_irq_off_w(u8 data)
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-void dec8_state_base::sub_firq_off_w(u8 data)
+void dec8_state_base::both_firq_off_w(u8 data)
 {
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	m_subcpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-/******************************************************************************/
-
 void dec8_state_base::flip_screen_w(u8 data) { flip_screen_set(data); }
+
 
 /******************************************************************************/
 
@@ -274,17 +283,18 @@ void lastmisn_state::lastmisn_map(address_map &map)
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
 	map(0x1800, 0x1800).portr("IN0").w(FUNC(lastmisn_state::sub_irq_off_w));
 	map(0x1801, 0x1801).portr("IN1").w(FUNC(lastmisn_state::main_irq_off_w));
-	map(0x1802, 0x1802).portr("IN2").w(FUNC(lastmisn_state::main_firq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(FUNC(lastmisn_state::both_firq_off_w));
 	map(0x1803, 0x1803).portr("DSW0").w(FUNC(lastmisn_state::main_irq_on_w));
 	map(0x1804, 0x1804).portr("DSW1").w(FUNC(lastmisn_state::sub_irq_on_w));
-	map(0x1805, 0x1805).w(FUNC(lastmisn_state::buffer_spriteram16_w)); /* DMA */
-	map(0x1806, 0x1806).r(FUNC(lastmisn_state::i8751_h_r));
-	map(0x1807, 0x1807).rw(FUNC(lastmisn_state::i8751_l_r), FUNC(lastmisn_state::flip_screen_w));
-	map(0x1809, 0x1809).w(FUNC(lastmisn_state::lastmisn_scrollx_w)); /* Scroll LSB */
-	map(0x180b, 0x180b).w(FUNC(lastmisn_state::lastmisn_scrolly_w)); /* Scroll LSB */
-	map(0x180c, 0x180c).w(FUNC(lastmisn_state::sound_w));
-	map(0x180d, 0x180d).w(FUNC(lastmisn_state::lastmisn_control_w)); /* Bank switch + Scroll MSB */
-	map(0x180e, 0x180f).w(FUNC(lastmisn_state::i8751_w));
+	map(0x1805, 0x1805).w(FUNC(lastmisn_state::buffer_spriteram16_w));
+	map(0x1806, 0x1806).r(FUNC(lastmisn_state::i8751_hi_r));
+	map(0x1807, 0x1807).rw(FUNC(lastmisn_state::i8751_lo_r), FUNC(lastmisn_state::flip_screen_w));
+	map(0x1809, 0x1809).w(FUNC(lastmisn_state::lastmisn_scrollx_w));
+	map(0x180b, 0x180b).w(FUNC(lastmisn_state::lastmisn_scrolly_w));
+	map(0x180c, 0x180c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x180d, 0x180d).w(FUNC(lastmisn_state::lastmisn_control_w));
+	map(0x180e, 0x180e).w(FUNC(lastmisn_state::i8751_hi_w));
+	map(0x180f, 0x180f).w(FUNC(lastmisn_state::i8751_lo_w));
 	map(0x2000, 0x27ff).ram().w(FUNC(lastmisn_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
@@ -300,14 +310,15 @@ void lastmisn_state::lastmisn_sub_map(address_map &map)
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
 	map(0x1800, 0x1800).portr("IN0").w(FUNC(lastmisn_state::sub_irq_off_w));
 	map(0x1801, 0x1801).portr("IN1").w(FUNC(lastmisn_state::main_irq_off_w));
-	map(0x1802, 0x1802).portr("IN2").w(FUNC(lastmisn_state::main_firq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(FUNC(lastmisn_state::both_firq_off_w));
 	map(0x1803, 0x1803).portr("DSW0").w(FUNC(lastmisn_state::main_irq_on_w));
 	map(0x1804, 0x1804).portr("DSW1").w(FUNC(lastmisn_state::sub_irq_on_w));
-	map(0x1805, 0x1805).w(FUNC(lastmisn_state::buffer_spriteram16_w)); /* DMA */
-	map(0x1806, 0x1806).r(FUNC(lastmisn_state::i8751_h_r));
-	map(0x1807, 0x1807).rw(FUNC(lastmisn_state::i8751_l_r), FUNC(lastmisn_state::flip_screen_w));
-	map(0x180c, 0x180c).w(FUNC(lastmisn_state::sound_w));
-	map(0x180e, 0x180f).w(FUNC(lastmisn_state::i8751_w));
+	map(0x1805, 0x1805).w(FUNC(lastmisn_state::buffer_spriteram16_w));
+	map(0x1806, 0x1806).r(FUNC(lastmisn_state::i8751_hi_r));
+	map(0x1807, 0x1807).rw(FUNC(lastmisn_state::i8751_lo_r), FUNC(lastmisn_state::flip_screen_w));
+	map(0x180c, 0x180c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x180e, 0x180e).w(FUNC(lastmisn_state::i8751_hi_w));
+	map(0x180f, 0x180f).w(FUNC(lastmisn_state::i8751_lo_w));
 	map(0x2000, 0x27ff).ram().w(FUNC(lastmisn_state::videoram_w));
 	map(0x2800, 0x2fff).writeonly().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
@@ -322,15 +333,15 @@ void lastmisn_state::shackled_map(address_map &map)
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
 	map(0x1800, 0x1800).portr("IN0").w(FUNC(lastmisn_state::sub_irq_off_w));
 	map(0x1801, 0x1801).portr("IN1").w(FUNC(lastmisn_state::main_irq_off_w));
-	map(0x1802, 0x1802).portr("IN2").w(FUNC(lastmisn_state::sub_firq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(FUNC(lastmisn_state::both_firq_off_w));
 	map(0x1803, 0x1803).portr("DSW0").w(FUNC(lastmisn_state::main_irq_on_w));
 	map(0x1804, 0x1804).portr("DSW1").w(FUNC(lastmisn_state::sub_irq_on_w));
-	map(0x1805, 0x1805).w(FUNC(lastmisn_state::buffer_spriteram16_w)); /* DMA */
+	map(0x1805, 0x1805).w(FUNC(lastmisn_state::buffer_spriteram16_w));
 	map(0x1807, 0x1807).w(FUNC(lastmisn_state::flip_screen_w));
-	map(0x1809, 0x1809).w(FUNC(lastmisn_state::lastmisn_scrollx_w)); /* Scroll LSB */
-	map(0x180b, 0x180b).w(FUNC(lastmisn_state::lastmisn_scrolly_w)); /* Scroll LSB */
-	map(0x180c, 0x180c).w(FUNC(lastmisn_state::sound_w));
-	map(0x180d, 0x180d).w(FUNC(lastmisn_state::shackled_control_w)); /* Bank switch + Scroll MSB */
+	map(0x1809, 0x1809).w(FUNC(lastmisn_state::lastmisn_scrollx_w));
+	map(0x180b, 0x180b).w(FUNC(lastmisn_state::lastmisn_scrolly_w));
+	map(0x180c, 0x180c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x180d, 0x180d).w(FUNC(lastmisn_state::shackled_control_w));
 	map(0x2000, 0x27ff).ram().w(FUNC(lastmisn_state::videoram_w));
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
@@ -346,22 +357,49 @@ void lastmisn_state::shackled_sub_map(address_map &map)
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
 	map(0x1800, 0x1800).portr("IN0").w(FUNC(lastmisn_state::sub_irq_off_w));
 	map(0x1801, 0x1801).portr("IN1").w(FUNC(lastmisn_state::main_irq_off_w));
-	map(0x1802, 0x1802).portr("IN2").w(FUNC(lastmisn_state::sub_firq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(FUNC(lastmisn_state::both_firq_off_w));
 	map(0x1803, 0x1803).portr("DSW0").w(FUNC(lastmisn_state::main_irq_on_w));
 	map(0x1804, 0x1804).portr("DSW1").w(FUNC(lastmisn_state::sub_irq_on_w));
-	map(0x1805, 0x1805).w(FUNC(lastmisn_state::buffer_spriteram16_w)); /* DMA */
-	map(0x1806, 0x1806).r(FUNC(lastmisn_state::i8751_h_r));
-	map(0x1807, 0x1807).rw(FUNC(lastmisn_state::i8751_l_r), FUNC(lastmisn_state::flip_screen_w));
-	map(0x1809, 0x1809).w(FUNC(lastmisn_state::lastmisn_scrollx_w)); /* Scroll LSB */
-	map(0x180b, 0x180b).w(FUNC(lastmisn_state::lastmisn_scrolly_w)); /* Scroll LSB */
-	map(0x180c, 0x180c).w(FUNC(lastmisn_state::sound_w));
-	map(0x180d, 0x180d).w(FUNC(lastmisn_state::shackled_control_w)); /* Bank switch + Scroll MSB */
-	map(0x180e, 0x180f).w(FUNC(lastmisn_state::i8751_w));
+	map(0x1805, 0x1805).w(FUNC(lastmisn_state::buffer_spriteram16_w));
+	map(0x1806, 0x1806).r(FUNC(lastmisn_state::i8751_hi_r));
+	map(0x1807, 0x1807).rw(FUNC(lastmisn_state::i8751_lo_r), FUNC(lastmisn_state::flip_screen_w));
+	map(0x1809, 0x1809).w(FUNC(lastmisn_state::lastmisn_scrollx_w));
+	map(0x180b, 0x180b).w(FUNC(lastmisn_state::lastmisn_scrolly_w));
+	map(0x180c, 0x180c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x180d, 0x180d).w(FUNC(lastmisn_state::shackled_control_w));
+	map(0x180e, 0x180e).w(FUNC(lastmisn_state::i8751_hi_w));
+	map(0x180f, 0x180f).w(FUNC(lastmisn_state::i8751_lo_w));
 	map(0x2000, 0x27ff).ram().w(FUNC(lastmisn_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
 	map(0x3800, 0x3fff).rw(FUNC(lastmisn_state::bg_ram_r), FUNC(lastmisn_state::bg_ram_w));
 	map(0x4000, 0xffff).rom();
+}
+
+void ghostb_state::ghostb_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x17ff).ram();
+	map(0x1800, 0x1fff).ram().w(FUNC(ghostb_state::videoram_w)).share(m_videoram);
+	map(0x2000, 0x27ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x2800, 0x2bff).ram(); // colscroll? mirror?
+	map(0x2c00, 0x2fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_8bit_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_w));
+	map(0x3000, 0x37ff).ram().share("spriteram");
+	map(0x3800, 0x3800).portr("IN0");
+	map(0x3800, 0x3800).w(FUNC(ghostb_state::sound_w));
+	map(0x3801, 0x3801).portr("IN1");
+	map(0x3802, 0x3802).portr("IN2");
+	map(0x3803, 0x3803).portr("DSW0");
+	map(0x3820, 0x3820).portr("DSW1");
+	map(0x3820, 0x3827).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x3830, 0x383f).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x3840, 0x3840).r(FUNC(ghostb_state::i8751_hi_r));
+	map(0x3840, 0x3840).w(FUNC(ghostb_state::ghostb_bank_w));
+	map(0x3860, 0x3860).r(FUNC(ghostb_state::i8751_lo_r));
+	map(0x3860, 0x3860).w(FUNC(ghostb_state::i8751_hi_w));
+	map(0x3861, 0x3861).w(FUNC(ghostb_state::i8751_lo_w));
+	map(0x4000, 0x7fff).bankr(m_mainbank);
+	map(0x8000, 0xffff).rom();
 }
 
 void gondo_state::gondo_map(address_map &map)
@@ -371,67 +409,44 @@ void gondo_state::gondo_map(address_map &map)
 	map(0x2000, 0x27ff).rw(FUNC(gondo_state::bg_ram_r), FUNC(gondo_state::bg_ram_w)).share("bg_ram");
 	map(0x2800, 0x2bff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x2c00, 0x2fff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x3000, 0x37ff).ram().share("spriteram");   /* Sprites */
-	map(0x3800, 0x3800).portr("DSW0");       /* Dip 1 */
-	map(0x3801, 0x3801).portr("DSW1");       /* Dip 2 */
-	map(0x380a, 0x380b).r(FUNC(gondo_state::player_io_r<0>));  /* Player 1 rotary */
-	map(0x380c, 0x380d).r(FUNC(gondo_state::player_io_r<1>));  /* Player 2 rotary */
-	map(0x380e, 0x380e).portr("IN3");        /* VBL */
-	map(0x380f, 0x380f).portr("IN2");        /* Fire buttons */
+	map(0x3000, 0x37ff).ram().share("spriteram");
+	map(0x3800, 0x3800).portr("DSW0");
+	map(0x3801, 0x3801).portr("DSW1");
+	map(0x380a, 0x380b).r(FUNC(gondo_state::player_io_r<0>));
+	map(0x380c, 0x380d).r(FUNC(gondo_state::player_io_r<1>));
+	map(0x380e, 0x380e).portr("IN3");
+	map(0x380f, 0x380f).portr("IN2");
 	map(0x3810, 0x3810).w(FUNC(gondo_state::sound_w));
 	map(0x3818, 0x382f).w(FUNC(gondo_state::gondo_scroll_w));
-	map(0x3830, 0x3830).w(FUNC(gondo_state::ghostb_bank_w)); /* Bank + NMI enable */
-	map(0x3838, 0x3838).r(FUNC(gondo_state::i8751_h_r));
-	map(0x3839, 0x3839).r(FUNC(gondo_state::i8751_l_r));
-	map(0x383a, 0x383b).w(FUNC(gondo_state::i8751_w));
+	map(0x3830, 0x3830).w(FUNC(gondo_state::ghostb_bank_w));
+	map(0x3838, 0x3838).r(FUNC(gondo_state::i8751_hi_r));
+	map(0x3839, 0x3839).r(FUNC(gondo_state::i8751_lo_r));
+	map(0x383a, 0x383a).w(FUNC(gondo_state::gondo_i8751_hi_w));
+	map(0x383b, 0x383b).w(FUNC(gondo_state::i8751_lo_w));
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
 
-void lastmisn_state::garyoret_map(address_map &map)
+void ghostb_state::garyoret_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
-	map(0x1800, 0x1fff).ram().w(FUNC(lastmisn_state::videoram_w)).share(m_videoram);
-	map(0x2000, 0x27ff).rw(FUNC(lastmisn_state::bg_ram_r), FUNC(lastmisn_state::bg_ram_w)).share("bg_ram");
+	map(0x1800, 0x1fff).ram().w(FUNC(ghostb_state::videoram_w)).share(m_videoram);
+	map(0x2000, 0x27ff).rw(FUNC(ghostb_state::bg_ram_r), FUNC(ghostb_state::bg_ram_w)).share("bg_ram");
 	map(0x2800, 0x2bff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x2c00, 0x2fff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x3000, 0x37ff).ram().share("spriteram");   /* Sprites */
-	map(0x3800, 0x3800).portr("DSW0");       /* Dip 1 */
-	map(0x3801, 0x3801).portr("DSW1");       /* Dip 2 */
-	map(0x3808, 0x3808).nopr();     /* ? */
-	map(0x380a, 0x380a).portr("IN1");    /* Player 2 + VBL */
-	map(0x380b, 0x380b).portr("IN0");    /* Player 1 */
-	map(0x3810, 0x3810).w(FUNC(lastmisn_state::sound_w));
-	map(0x3818, 0x382f).w(FUNC(lastmisn_state::gondo_scroll_w));
-	map(0x3830, 0x3830).w(FUNC(lastmisn_state::ghostb_bank_w)); /* Bank + NMI enable */
-	map(0x3838, 0x3839).w(FUNC(lastmisn_state::i8751_w));
-	map(0x383a, 0x383a).r(FUNC(lastmisn_state::i8751_h_r));
-	map(0x383b, 0x383b).r(FUNC(lastmisn_state::i8751_l_r));
-	map(0x4000, 0x7fff).bankr(m_mainbank);
-	map(0x8000, 0xffff).rom();
-}
-
-void lastmisn_state::meikyuh_map(address_map &map)
-{
-	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x17ff).ram();
-	map(0x1800, 0x1fff).ram().w(FUNC(lastmisn_state::videoram_w)).share(m_videoram);
-	map(0x2000, 0x27ff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
-	map(0x2800, 0x2bff).ram(); // colscroll? mirror?
-	map(0x2c00, 0x2fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_rowscroll_8bit_r), FUNC(deco_bac06_device::pf_rowscroll_8bit_w));
 	map(0x3000, 0x37ff).ram().share("spriteram");
-	map(0x3800, 0x3800).portr("IN0");    /* Player 1 */
-	map(0x3800, 0x3800).w(FUNC(lastmisn_state::sound_w));
-	map(0x3801, 0x3801).portr("IN1");    /* Player 2 */
-	map(0x3802, 0x3802).portr("IN2");    /* Player 3 */
-	map(0x3803, 0x3803).portr("DSW0");   /* Start buttons + VBL */
-	map(0x3820, 0x3820).portr("DSW1");   /* Dip */
-	map(0x3820, 0x3827).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x3830, 0x383f).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
-	map(0x3840, 0x3840).r(FUNC(lastmisn_state::i8751_h_r));
-	map(0x3840, 0x3840).w(FUNC(lastmisn_state::ghostb_bank_w));
-	map(0x3860, 0x3860).r(FUNC(lastmisn_state::i8751_l_r));
-	map(0x3860, 0x3861).w(FUNC(lastmisn_state::i8751_w));
+	map(0x3800, 0x3800).portr("DSW0");
+	map(0x3801, 0x3801).portr("DSW1");
+	map(0x3808, 0x3808).nopr(); // ?
+	map(0x380a, 0x380a).portr("IN1");
+	map(0x380b, 0x380b).portr("IN0");
+	map(0x3810, 0x3810).w(FUNC(ghostb_state::sound_w));
+	map(0x3818, 0x382f).w(FUNC(ghostb_state::gondo_scroll_w));
+	map(0x3830, 0x3830).w(FUNC(ghostb_state::ghostb_bank_w));
+	map(0x3838, 0x3838).w(FUNC(ghostb_state::gondo_i8751_hi_w));
+	map(0x3839, 0x3839).w(FUNC(ghostb_state::i8751_lo_w));
+	map(0x383a, 0x383a).r(FUNC(ghostb_state::i8751_hi_r));
+	map(0x383b, 0x383b).r(FUNC(ghostb_state::i8751_lo_r));
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
@@ -443,17 +458,18 @@ void csilver_state::main_map(address_map &map)
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
 	map(0x1800, 0x1800).portr("IN1").w(FUNC(csilver_state::sub_irq_off_w));
 	map(0x1801, 0x1801).portr("IN0").w(FUNC(csilver_state::main_irq_off_w));
-	map(0x1802, 0x1802).w(FUNC(csilver_state::main_firq_off_w));
+	map(0x1802, 0x1802).w(FUNC(csilver_state::both_firq_off_w));
 	map(0x1803, 0x1803).portr("IN2").w(FUNC(csilver_state::main_irq_on_w));
 	map(0x1804, 0x1804).portr("DSW1").w(FUNC(csilver_state::sub_irq_on_w));
-	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::buffer_spriteram16_w)); /* Dip 1, DMA */
+	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::buffer_spriteram16_w));
 	map(0x1807, 0x1807).w(FUNC(csilver_state::flip_screen_w));
 	map(0x1808, 0x180b).w(FUNC(csilver_state::scroll_w));
-	map(0x180c, 0x180c).w(FUNC(csilver_state::sound_w));
+	map(0x180c, 0x180c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x180d, 0x180d).w(FUNC(csilver_state::control_w));
-	map(0x180e, 0x180f).w(FUNC(csilver_state::i8751_w));
-	map(0x1c00, 0x1c00).r(FUNC(csilver_state::i8751_h_r));
-	map(0x1e00, 0x1e00).r(FUNC(csilver_state::i8751_l_r));
+	map(0x180e, 0x180e).w(FUNC(csilver_state::i8751_hi_w));
+	map(0x180f, 0x180f).w(FUNC(csilver_state::i8751_lo_w));
+	map(0x1c00, 0x1c00).r(FUNC(csilver_state::i8751_hi_r));
+	map(0x1e00, 0x1e00).r(FUNC(csilver_state::i8751_lo_r));
 	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::videoram_w));
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
@@ -469,11 +485,11 @@ void csilver_state::sub_map(address_map &map)
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
 	map(0x1800, 0x1800).w(FUNC(csilver_state::sub_irq_off_w));
 	map(0x1801, 0x1801).w(FUNC(csilver_state::main_irq_off_w));
-	map(0x1802, 0x1802).w(FUNC(csilver_state::main_firq_off_w));
+	map(0x1802, 0x1802).w(FUNC(csilver_state::both_firq_off_w));
 	map(0x1803, 0x1803).portr("IN2").w(FUNC(csilver_state::main_irq_on_w));
 	map(0x1804, 0x1804).portr("DSW1").w(FUNC(csilver_state::sub_irq_on_w));
-	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::buffer_spriteram16_w)); /* DMA */
-	map(0x180c, 0x180c).w(FUNC(csilver_state::sound_w));
+	map(0x1805, 0x1805).portr("DSW0").w(FUNC(csilver_state::buffer_spriteram16_w));
+	map(0x180c, 0x180c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x2000, 0x27ff).ram().w(FUNC(csilver_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
@@ -488,23 +504,23 @@ void oscar_state::oscar_map(address_map &map)
 	map(0x1000, 0x1fff).ram().share("share2");
 	map(0x2000, 0x27ff).ram().w(FUNC(oscar_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).rw(m_tilegen[0], FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
-	map(0x3000, 0x37ff).ram().share("spriteram"); /* Sprites */
+	map(0x3000, 0x37ff).ram().share("spriteram");
 	map(0x3800, 0x3bff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x3c00, 0x3c00).portr("IN0");
 	map(0x3c01, 0x3c01).portr("IN1");
-	map(0x3c02, 0x3c02).portr("IN2");    /* VBL & coins */
-	map(0x3c03, 0x3c03).portr("DSW0");   /* Dip 1 */
+	map(0x3c02, 0x3c02).portr("IN2");
+	map(0x3c03, 0x3c03).portr("DSW0");
 	map(0x3c04, 0x3c04).portr("DSW1");
 	map(0x3c00, 0x3c07).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
 	map(0x3c10, 0x3c1f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_w));
-	map(0x3c80, 0x3c80).w(FUNC(oscar_state::buffer_spriteram16_w));   /* DMA */
-	map(0x3d00, 0x3d00).w(FUNC(oscar_state::bank_w));          /* BNKS */
-	map(0x3d80, 0x3d80).w(m_soundlatch, FUNC(generic_latch_8_device::write));            /* SOUN */
-	map(0x3e00, 0x3e00).w(FUNC(oscar_state::coin_clear_w));   /* COINCL */
-	map(0x3e80, 0x3e80).w(FUNC(oscar_state::sub_irq_on_w));         /* IRQ 2 */
-	map(0x3e81, 0x3e81).w(FUNC(oscar_state::main_irq_off_w));       /* IRC 1 */
-	map(0x3e82, 0x3e82).w(FUNC(oscar_state::main_irq_on_w));        /* IRQ 1 */
-	map(0x3e83, 0x3e83).w(FUNC(oscar_state::sub_irq_off_w));        /* IRC 2 */
+	map(0x3c80, 0x3c80).w(FUNC(oscar_state::buffer_spriteram16_w)); // DMA
+	map(0x3d00, 0x3d00).w(FUNC(oscar_state::bank_w)); // BNKS
+	map(0x3d80, 0x3d80).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // SOUN
+	map(0x3e00, 0x3e00).w(FUNC(oscar_state::coin_clear_w)); // COINCL
+	map(0x3e80, 0x3e80).w(FUNC(oscar_state::sub_irq_on_w)); // IRQ 2
+	map(0x3e81, 0x3e81).w(FUNC(oscar_state::main_irq_off_w)); // IRC 1
+	map(0x3e82, 0x3e82).w(FUNC(oscar_state::main_irq_on_w)); // IRQ 1
+	map(0x3e83, 0x3e83).w(FUNC(oscar_state::sub_irq_off_w)); // IRC 2
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
@@ -514,10 +530,10 @@ void oscar_state::oscar_sub_map(address_map &map)
 	map(0x0000, 0x0eff).ram().share("share1");
 	map(0x0f00, 0x0fff).ram();
 	map(0x1000, 0x1fff).ram().share("share2");
-	map(0x3e80, 0x3e80).w(FUNC(oscar_state::sub_irq_on_w));         /* IRQ 2 */
-	map(0x3e81, 0x3e81).w(FUNC(oscar_state::main_irq_off_w));       /* IRC 1 */
-	map(0x3e82, 0x3e82).w(FUNC(oscar_state::main_irq_on_w));        /* IRQ 1 */
-	map(0x3e83, 0x3e83).w(FUNC(oscar_state::sub_irq_off_w));        /* IRC 2 */
+	map(0x3e80, 0x3e80).w(FUNC(oscar_state::sub_irq_on_w)); // IRQ 2
+	map(0x3e81, 0x3e81).w(FUNC(oscar_state::main_irq_off_w)); // IRC 1
+	map(0x3e82, 0x3e82).w(FUNC(oscar_state::main_irq_on_w)); // IRQ 1
+	map(0x3e83, 0x3e83).w(FUNC(oscar_state::sub_irq_off_w)); // IRC 2
 	map(0x4000, 0xffff).rom();
 }
 
@@ -528,21 +544,30 @@ void srdarwin_state::main_map(address_map &map)
 	map(0x0800, 0x0fff).ram().w(FUNC(srdarwin_state::srdarwin_videoram_w)).share(m_videoram);
 	map(0x1000, 0x13ff).ram();
 	map(0x1400, 0x17ff).rw(FUNC(srdarwin_state::bg_ram_r), FUNC(srdarwin_state::bg_ram_w)).share("bg_ram");
-	map(0x1800, 0x1801).w(FUNC(srdarwin_state::i8751_w));
-	map(0x1802, 0x1802).w(FUNC(srdarwin_state::i8751_reset_w));        /* Maybe.. */
-	map(0x1803, 0x1803).nopw();            /* NMI ack */
-	map(0x1804, 0x1804).w(m_spriteram, FUNC(buffered_spriteram8_device::write)); /* DMA */
-	map(0x1805, 0x1806).w(FUNC(srdarwin_state::control_w)); /* Scroll & Bank */
-	map(0x2000, 0x2000).rw(FUNC(srdarwin_state::i8751_h_r), FUNC(srdarwin_state::sound_w));  /* Sound */
-	map(0x2001, 0x2001).rw(FUNC(srdarwin_state::i8751_l_r), FUNC(srdarwin_state::flip_screen_w));     /* Flipscreen */
+	map(0x1800, 0x1800).w(FUNC(srdarwin_state::i8751_hi_w));
+	map(0x1801, 0x1801).w(FUNC(srdarwin_state::i8751_lo_w));
+	map(0x1803, 0x1803).nopw();
+	map(0x1804, 0x1804).w(m_spriteram, FUNC(buffered_spriteram8_device::write));
+	map(0x1805, 0x1806).w(FUNC(srdarwin_state::control_w));
+	map(0x2000, 0x2000).r(FUNC(srdarwin_state::i8751_hi_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x2001, 0x2001).rw(FUNC(srdarwin_state::i8751_lo_r), FUNC(srdarwin_state::flip_screen_w));
 	map(0x2800, 0x288f).w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x3000, 0x308f).w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x3800, 0x3800).portr("DSW0");   /* Dip 1 */
-	map(0x3801, 0x3801).portr("IN0");    /* Player 1 */
-	map(0x3802, 0x3802).portr("IN1");    /* Player 2 (cocktail) + VBL */
-	map(0x3803, 0x3803).portr("DSW1");   /* Dip 2 */
+	map(0x3800, 0x3800).portr("DSW0");
+	map(0x3801, 0x3801).portr("IN0");
+	map(0x3802, 0x3802).portr("IN1");
+	map(0x3803, 0x3803).portr("DSW1");
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
+}
+
+void srdarwin_state::srdarwinb_map(address_map &map)
+{
+	srdarwin_state::main_map(map);
+
+	map(0x1800, 0x1801).nopw();
+	map(0x2000, 0x2000).unmapr();
+	map(0x2001, 0x2001).portr("COIN");
 }
 
 void oscar_state::cobra_map(address_map &map)
@@ -554,26 +579,27 @@ void oscar_state::cobra_map(address_map &map)
 	map(0x2000, 0x27ff).ram().w(FUNC(oscar_state::videoram_w)).share(m_videoram);
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x31ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
-	map(0x3200, 0x37ff).nopw(); /* Unused */
-	map(0x3800, 0x3800).portr("IN0");    /* Player 1 */
-	map(0x3801, 0x3801).portr("IN1");    /* Player 2 */
-	map(0x3802, 0x3802).portr("DSW0");   /* Dip 1 */
-	map(0x3803, 0x3803).portr("DSW1");   /* Dip 2 */
+	map(0x3200, 0x37ff).nopw(); // Unused
+	map(0x3800, 0x3800).portr("IN0");
+	map(0x3801, 0x3801).portr("IN1");
+	map(0x3802, 0x3802).portr("DSW0");
+	map(0x3803, 0x3803).portr("DSW1");
 	map(0x3800, 0x3807).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control0_8bit_w));
 	map(0x3810, 0x381f).w(m_tilegen[0], FUNC(deco_bac06_device::pf_control1_8bit_w));
-	map(0x3a00, 0x3a00).portr("IN2");    /* VBL & coins */
+	map(0x3a00, 0x3a00).portr("IN2");
 	map(0x3a00, 0x3a07).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control0_8bit_w));
 	map(0x3a10, 0x3a1f).w(m_tilegen[1], FUNC(deco_bac06_device::pf_control1_8bit_w));
 	map(0x3c00, 0x3c00).w(FUNC(oscar_state::bank_w));
-	map(0x3c02, 0x3c02).w(FUNC(oscar_state::buffer_spriteram16_w)); /* DMA */
-	map(0x3e00, 0x3e00).w(FUNC(oscar_state::sound_w));
+	map(0x3c02, 0x3c02).w(FUNC(oscar_state::buffer_spriteram16_w));
+	map(0x3e00, 0x3e00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
 
+
 /******************************************************************************/
 
-/* Used for Cobra Command, Maze Hunter, Super Real Darwin etc */
+// Used for Cobra Command, Maze Hunter, Super Real Darwin etc
 void dec8_state_base::dec8_s_map(address_map &map)
 {
 	map(0x0000, 0x05ff).ram();
@@ -583,7 +609,7 @@ void dec8_state_base::dec8_s_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-/* Used by Gondomania, Psycho-Nics Oscar & Garyo Retsuden */
+// Used by Gondomania, Psycho-Nics Oscar & Garyo Retsuden
 void dec8_state_base::oscar_s_map(address_map &map)
 {
 	map(0x0000, 0x05ff).ram();
@@ -599,7 +625,7 @@ void oscar_state::oscarbl_s_opcodes_map(address_map &map)
 	map(0x8000, 0xffff).rom().region("audiocpu", 0x10000);
 }
 
-/* Used by Last Mission, Shackled & Breywood */
+// Used by Last Mission, Shackled & Breywood
 void lastmisn_state::ym3526_s_map(address_map &map)
 {
 	map(0x0000, 0x05ff).ram();
@@ -609,19 +635,20 @@ void lastmisn_state::ym3526_s_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-/* Captain Silver - same sound system as Pocket Gal */
+// Captain Silver - same sound system as Pocket Gal
 void csilver_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
 	map(0x1000, 0x1001).w("ym2", FUNC(ym3526_device::write));
-	map(0x1800, 0x1800).w(FUNC(csilver_state::adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
+	map(0x1800, 0x1800).w(FUNC(csilver_state::adpcm_data_w)); // ADPCM data for the MSM5205 chip
 	map(0x2000, 0x2000).w(FUNC(csilver_state::sound_bank_w));
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x3400, 0x3400).r(FUNC(csilver_state::adpcm_reset_r)); /* ? not sure */
+	map(0x3400, 0x3400).r(FUNC(csilver_state::adpcm_reset_r)); // ? not sure
 	map(0x4000, 0x7fff).bankr("soundbank");
 	map(0x8000, 0xffff).rom();
 }
+
 
 /******************************************************************************/
 
@@ -657,132 +684,140 @@ void dec8_mcu_state_base::i8751_port1_w(u8 data)
 	m_i8751_port1 = data;
 }
 
-void lastmisn_state::gondo_mcu_to_main_w(u8 data)
+void ghostb_state::mcu_to_main_w(u8 data)
 {
-	// P2 - controls latches for main CPU communication
-	if ((data&0x10)==0)
-		m_i8751_port0 = m_i8751_value>>8;
-	if ((data&0x20)==0)
-		m_i8751_port1 = m_i8751_value&0xff;
-	if ((data&0x40)==0)
+	const u8 fall = ~data & m_i8751_p2;
+	const u8 rise = data & ~m_i8751_p2;
+	m_i8751_p2 = data;
+
+	// P24-P27: controls latches for main CPU communication
+	if (BIT(fall, 4))
+		m_i8751_port0 = m_i8751_value >> 8;
+	if (BIT(fall, 5))
+		m_i8751_port1 = m_i8751_value & 0xff;
+	if (BIT(fall, 6))
 		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
-	if ((data&0x80)==0)
+	if (BIT(fall, 7))
 		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
 
-	// P2 - IRQ to main CPU
-	if (BIT(data, 2) && !BIT(m_i8751_p2, 2) && m_secclr)
+	// P22: IRQ to main CPU
+	if (BIT(rise, 2) && m_secclr)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-	m_i8751_p2 = data;
+
+	// P20,P21: N/C
 }
 
-void lastmisn_state::shackled_mcu_to_main_w(u8 data)
+void lastmisn_state::mcu_to_main_w(u8 data)
 {
-	// P2 - controls latches for main CPU communication
-	if ((data&0x10)==0)
-	{
-		m_i8751_port0 = m_i8751_value>>8;
-
-		// mcu sets p0 to 0x00
-		m_mcu->set_port_forced_input(0, m_i8751_port0);
-	}
-	if ((data&0x20)==0)
-		m_i8751_port1 = m_i8751_value&0xff;
-	if ((data&0x40)==0)
-		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
-	if ((data&0x80)==0)
-		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
-
-	// P2 - IRQ to main CPU
-	if (BIT(data, 2) && !BIT(m_i8751_p2, 2))
-		m_subcpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
-
-	if (!BIT(data, 0))
-		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
-	if (!BIT(data, 1))
-		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
-
+	const u8 fall = ~data & m_i8751_p2;
+	const u8 rise = data & ~m_i8751_p2;
 	m_i8751_p2 = data;
-}
 
-/*
-    Super Real Darwin is similar but only appears to have a single port
-*/
-
-void srdarwin_state::mcu_to_main_w(u8 data)
-{
-	// P2 - controls latches for main CPU communication
-	if ((data & 0x10) == 0)
+	// P24-P27: controls latches for main CPU communication
+	if (BIT(fall, 4))
 	{
 		m_i8751_port0 = m_i8751_value >> 8;
+
+		// lastmisn mcu sets p0 to 0x00
+		m_mcu->set_port_forced_input(0, m_i8751_port0);
 	}
-	if ((data & 0x20) == 0)
-	{
-		m_i8751_port0 =  m_i8751_value & 0xff;
-	}
-	if ((data&0x40)==0)
+	if (BIT(fall, 5))
+		m_i8751_port1 = m_i8751_value & 0xff;
+	if (BIT(fall, 6))
 		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
-	if ((data&0x80)==0)
+	if (BIT(fall, 7))
+		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
+
+	// P22: FIRQ to both CPUs
+	if (BIT(rise, 2))
+	{
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+		m_subcpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+	}
+
+	// P20,P21: clear MCU INT0/1
+	if (BIT(~data, 0))
+		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+	if (BIT(~data, 1))
+		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+}
+
+// Super Real Darwin is similar but only appears to have a single port
+void srdarwin_state::mcu_to_main_w(u8 data)
+{
+	const u8 fall = ~data & m_i8751_p2;
+	//const u8 rise = data & ~m_i8751_p2;
+	m_i8751_p2 = data;
+
+	// P24-P27: controls latches for main CPU communication
+	if (BIT(fall, 4))
+		m_i8751_port0 = m_i8751_value >> 8;
+	if (BIT(fall, 5))
+		m_i8751_port0 = m_i8751_value & 0xff;
+	if (BIT(fall, 6))
+		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
+	if (BIT(fall, 7))
 		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port0;
 
-	// P2 - IRQ to main CPU
-	if ((data&0x04)==0)
-		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	// P22: maincpu has no IRQ/FIRQ handler
 
-	// guess, toggled after above.
-	if ((data&0x02)==0)
-		m_maincpu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+	// P21: clear MCU INT1
+	if (BIT(~data, 1))
+		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 }
 
 
 void csilver_state::mcu_to_main_w(u8 data)
 {
-	if (~data & 0x10)
+	const u8 fall = ~data & m_i8751_p2;
+	const u8 rise = data & ~m_i8751_p2;
+	m_i8751_p2 = data;
+
+	// P24-P27: controls latches for main CPU communication
+	if (BIT(fall, 4))
 		m_i8751_port0 = m_i8751_value >> 8;
-
-	if (~data & 0x20)
+	if (BIT(fall, 5))
 		m_i8751_port1 = m_i8751_value & 0xff;
-
-	if (~data & 0x40)
-	{
+	if (BIT(fall, 6))
 		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
-		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); // FIRQ to main cpu
-	}
-
-	if (~data & 0x80)
+	if (BIT(fall, 7))
 		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
 
-	m_i8751_p2 = data;
+	// P22: FIRQ to both CPUs
+	if (BIT(rise, 2))
+	{
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+		m_subcpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+	}
+
+	// P21: clear MCU INT1
+	if (BIT(~data, 1))
+		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 }
+
 
 /******************************************************************************/
 
-#define PLAYER1_JOYSTICK /* Player 1 controls */ \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-
-#define PLAYER2_JOYSTICK /* Player 2 controls */ \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-
-
-/* verified from M6809 code */
+// verified from M6809 code
 static INPUT_PORTS_START( lastmisn )
 	PORT_START("IN0")
-	PLAYER1_JOYSTICK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                 /* shoot */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                 /* bomb */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )                 /* select */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // shoot
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // bomb
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) // select
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PLAYER2_JOYSTICK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL   /* shoot */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL   /* bomb */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL   /* select */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL // shoot
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL // bomb
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL // select
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -793,25 +828,25 @@ static INPUT_PORTS_START( lastmisn )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
-	PORT_START("I8751")
+	PORT_START("COIN")
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<1>))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<0>))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<2>))
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -829,7 +864,7 @@ static INPUT_PORTS_START( lastmisn )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:2,3") /* tables at 0x82c1 (4 words) and 0xde38 (3 words) in 'lastmisn', 0x82c1 and 0xde17 in 'lastmisno' */
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:2,3") // tables at 0x82c1 (4 words) and 0xde38 (3 words) in 'lastmisn', 0x82c1 and 0xde17 in 'lastmisno'
 	PORT_DIPSETTING(    0x06, "30k 70k 70k+" )
 	PORT_DIPSETTING(    0x04, "40k 90k 90k+" )
 	PORT_DIPSETTING(    0x02, "40k and 80k" )
@@ -846,36 +881,42 @@ static INPUT_PORTS_START( lastmisn )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-/* verified from M6809 code */
+// verified from M6809 code
 static INPUT_PORTS_START( lastmisnj )
 	PORT_INCLUDE(lastmisn)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:2,3") /* tables at 0x82b7 (4 words) and 0xdd29 (3 words) */
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:2,3") // tables at 0x82b7 (4 words) and 0xdd29 (3 words)
 	PORT_DIPSETTING(    0x06, "30k 50k 50k+" )
 	PORT_DIPSETTING(    0x04, "30k 70k 70k+" )
 	PORT_DIPSETTING(    0x02, "50k 100k 100k+" )
 	PORT_DIPSETTING(    0x00, "50k only" )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )             /* "difficult" */
-	PORT_DIPSETTING(    0x08, DEF_STR( Very_Hard ) )        /* "very difficult" */
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )          /* "top difficult" */
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )                 // "difficult"
+	PORT_DIPSETTING(    0x08, DEF_STR( Very_Hard ) )            // "very difficult"
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )              // "top difficult"
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")
 INPUT_PORTS_END
 
 
-/* verified from M6809 code */
+// verified from M6809 code
 static INPUT_PORTS_START( shackled )
 	PORT_START("IN0")
-	PLAYER1_JOYSTICK
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PLAYER2_JOYSTICK
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -889,13 +930,13 @@ static INPUT_PORTS_START( shackled )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // tested and discarded by vestigial code at start
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
-	PORT_START("I8751")
+	PORT_START("COIN")
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<0>))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<1>))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<2>))
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:1")
@@ -904,7 +945,7 @@ static INPUT_PORTS_START( shackled )
 	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:2")
 	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:3")
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:4")
-	PORT_DIPNAME( 0x10, 0x10, "Leave Off" )                     PORT_DIPLOCATION("SW1:5") /* game doesn't boot when this is On - code at 0x401a - related to MCU - "dias" in Dip Switches page */
+	PORT_DIPNAME( 0x10, 0x10, "Leave Off" )                     PORT_DIPLOCATION("SW1:5") // game doesn't boot when this is On - code at 0x401a - related to MCU - "dias" in Dip Switches page
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:6")
@@ -914,8 +955,8 @@ static INPUT_PORTS_START( shackled )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	/* tables in main CPU : 0x859b (Help), 0x85e9 (6-Help), 0x8fbe (Coin), 0x91b6 (Heart) */
-	PORT_DIPNAME( 0x07, 0x07, "Coin/Heart/Help/6-Help" )        PORT_DIPLOCATION("SW2:1,2,3") /* name from Dip Switches page */
+	// tables in main CPU : 0x859b (Help), 0x85e9 (6-Help), 0x8fbe (Coin), 0x91b6 (Heart)
+	PORT_DIPNAME( 0x07, 0x07, "Coin/Heart/Help/6-Help" )        PORT_DIPLOCATION("SW2:1,2,3") // name from Dip Switches page
 	PORT_DIPSETTING( 0x00, "2/100/50/200" )
 	PORT_DIPSETTING( 0x01, "4/100/60/300" )
 	PORT_DIPSETTING( 0x02, "6/200/70/300" )
@@ -936,12 +977,12 @@ static INPUT_PORTS_START( shackled )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-/* verified from M6809 code */
+// verified from M6809 code
 static INPUT_PORTS_START( breywood )
 	PORT_INCLUDE(shackled)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, "Power" )                         PORT_DIPLOCATION("SW2:1,2,3,4") /* table at 0x41be in sub CPU */
+	PORT_DIPNAME( 0x0f, 0x0f, "Power" )                         PORT_DIPLOCATION("SW2:1,2,3,4") // table at 0x41be in sub CPU
 	PORT_DIPSETTING( 0x07, "200" )
 	PORT_DIPSETTING( 0x0b, "300" )
 	PORT_DIPSETTING( 0x03, "400" )
@@ -961,15 +1002,21 @@ static INPUT_PORTS_START( breywood )
 INPUT_PORTS_END
 
 
-/* verified from HD6309 code */
+// verified from HD6309 code
 static INPUT_PORTS_START( gondo )
 	PORT_START("IN0")
-	PLAYER1_JOYSTICK
-	/* Top 4 bits are rotary controller */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	// Top 4 bits are rotary controller
 
 	PORT_START("IN1")
-	PLAYER2_JOYSTICK
-	/* Top 4 bits are rotary controller */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	// Top 4 bits are rotary controller
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -989,29 +1036,29 @@ static INPUT_PORTS_START( gondo )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
-	PORT_START("I8751") /* hooked up on the i8751 */
-	/* Low 4 bits not connected on schematics */
+	PORT_START("COIN") // hooked up on the i8751
+	// Low 4 bits not connected on schematics
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )              /* produces sound but gives 0 credits - coinage not initialised in the MCU */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // produces sound but gives 0 credits - coinage not initialised in the MCU
 
-	PORT_START("AN0")   /* player 1 12-way rotary control */
+	PORT_START("AN0") // player 1 12-way rotary control
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
-	PORT_START("AN1")   /* player 2 12-way rotary control */
+	PORT_START("AN1") // player 2 12-way rotary control
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2") /* table at 0x01b8 in MCU (4 bytes : coins in 4 MSbits and credits in 4 LSbits) */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2") // table at 0x01b8 in MCU (4 bytes : coins in 4 MSbits and credits in 4 LSbits)
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4") /* table at 0x01bc in MCU (4 bytes : coins in 4 MSbits and credits in 4 LSbits) */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4") // table at 0x01bc in MCU (4 bytes : coins in 4 MSbits and credits in 4 LSbits)
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
@@ -1023,7 +1070,7 @@ static INPUT_PORTS_START( gondo )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Swap buttons" )                  PORT_DIPLOCATION("SW1:8") /* code at 0x8a2b in 'gondo', 0x88c5 in 'makyosen' - undocumented in the manual */
+	PORT_DIPNAME( 0x80, 0x80, "Swap buttons" )                  PORT_DIPLOCATION("SW1:8") // code at 0x8a2b in 'gondo', 0x88c5 in 'makyosen' - undocumented in the manual
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -1032,7 +1079,7 @@ static INPUT_PORTS_START( gondo )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x00, "99 (Cheat)")  // gives 99 lives
+	PORT_DIPSETTING(    0x00, "99 (Cheat)") // gives 99 lives
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
@@ -1047,28 +1094,34 @@ static INPUT_PORTS_START( gondo )
 INPUT_PORTS_END
 
 
-/* verified from HD6309 code - coinage needs further checking when the MCU is available */
+// verified from HD6309 code
 static INPUT_PORTS_START( garyoret )
 	PORT_START("IN0")
-	PLAYER1_JOYSTICK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                 /* shoot */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                 /* bomb */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // shoot
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // bomb
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("IN1")
-	PLAYER2_JOYSTICK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)  /* shoot */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)  /* bomb */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // shoot
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // bomb
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
-	PORT_START("I8751") /* hooked up on the (fake) i8751 */
+	PORT_START("COIN") // hooked up on the i8751
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )              /* produces sound but gives 0 credits - coinage not initialised in the (fake) MCU */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // produces sound but gives 0 credits - coinage not initialised in the MCU
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
@@ -1088,7 +1141,7 @@ static INPUT_PORTS_START( garyoret )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:8") /* not tested - no cocktail when simultaneous players anyway */
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:8") // not tested - no cocktail when simultaneous players anyway
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1")
@@ -1102,26 +1155,32 @@ static INPUT_PORTS_START( garyoret )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:5")
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
-	PORT_DIPNAME( 0x40, 0x40, "Leave Off" )                     PORT_DIPLOCATION("SW2:7")  /* game doesn't boot when this is On - code at 0x807f and test at 0x819e */
+	PORT_DIPNAME( 0x40, 0x40, "Leave Off" )                     PORT_DIPLOCATION("SW2:7") // game doesn't boot when this is On - code at 0x807f and test at 0x819e
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")
 INPUT_PORTS_END
 
 
-/* verified from HD6309 code */
+// verified from HD6309 code
 static INPUT_PORTS_START( ghostb )
 	PORT_START("IN0")
-	PLAYER1_JOYSTICK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)  /* "FIRE" */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)  /* beam / upgradable shot when out of energy */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // "FIRE"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // beam / upgradable shot when out of energy
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PLAYER2_JOYSTICK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)  /* "FIRE" */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)  /* beam / upgradable shot when out of energy */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // "FIRE"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // beam / upgradable shot when out of energy
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1135,21 +1194,25 @@ static INPUT_PORTS_START( ghostb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("I8751")
-	/* Low 4 bits not connected on schematics */
+	PORT_START("COIN")
+	// Low 4 bits not connected on schematics
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )              /* produce sound but gives 0 credits - "ANDA" instruction at 0x8a5a */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // produce sound but gives 0 credits - "ANDA" instruction at 0x8a5a
 
 	PORT_START("DSW0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )     // Tested on real hardware     PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )     // 1-2 should be coinage.      PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-																				// PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-																				// PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-																				// PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")          // PORT_DIPLOCATION("SW1:3") // Manual says 'Must Be Off'. Note: Turning on 3+4+5+8 does nothing on real hardware.
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // Tested on real hardware
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	// 1-2 should be coinage.
+//  PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
+//  PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+//  PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+//  PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+//  PORT_DIPLOCATION("SW1:3") // Manual says 'Must Be Off'. Note: Turning on 3+4+5+8 does nothing on real hardware.
 	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:4") // Manual says 'Must Be Off'. See note
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:5") // Manual says 'Must Be Off'. See note
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
@@ -1161,17 +1224,17 @@ static INPUT_PORTS_START( ghostb )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:8") // not tested - no cocktail when simultaneous players anyway. Manual says 'Must Be Off'. See note
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2") /* lives are added when STARTn is pressed */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                PORT_DIPLOCATION("SW2:1,2") // lives are added when STARTn is pressed
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x00, "Invulnerability (Cheat)")  // gives 1 life and energy does not decrease
+	PORT_DIPSETTING(    0x00, "Invulnerability (Cheat)")        // gives 1 life and energy does not decrease
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, "Max Scene Time" )                PORT_DIPLOCATION("SW2:5,6") /* 1:00 is added when STARTn is pressed until max scene time is reached */
+	PORT_DIPNAME( 0x30, 0x30, "Max Scene Time" )                PORT_DIPLOCATION("SW2:5,6") // 1:00 is added when STARTn is pressed until max scene time is reached
 	PORT_DIPSETTING(    0x00, "4:00" )
 	PORT_DIPSETTING(    0x10, "4:30" )
 	PORT_DIPSETTING(    0x30, "5:00" )
@@ -1179,45 +1242,45 @@ static INPUT_PORTS_START( ghostb )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Energy Bonus" )                  PORT_DIPLOCATION("SW2:8") /* energy is set to value each new life */
-	PORT_DIPSETTING(    0x80, DEF_STR( None ) )                                           /* 0x0100 */
-	PORT_DIPSETTING(    0x00, "+25%" )                                                    /* 0x0140 */
+	PORT_DIPNAME( 0x80, 0x80, "Energy Bonus" )                  PORT_DIPLOCATION("SW2:8") // energy is set to value each new life
+	PORT_DIPSETTING(    0x80, DEF_STR( None ) )                                           // 0x0100
+	PORT_DIPSETTING(    0x00, "+25%" )                                                    // 0x0140
 INPUT_PORTS_END
 
-/* verified from HD6309 code */
+// verified from HD6309 code
 static INPUT_PORTS_START( ghostb2a )
 	PORT_INCLUDE(ghostb)
 
-	/* BUTTON1 : upgradable shot - BUTTON2 : beam (provided you have energy) */
+	// BUTTON1 : upgradable shot - BUTTON2 : beam (provided you have energy)
 
-	PORT_MODIFY("I8751")
-	/* Low 4 bits not connected on schematics */
+	PORT_MODIFY("COIN")
+	// Low 4 bits not connected on schematics
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )              /* produce sound but gives 0 lives - "ANDA" instruction at 0x8a20 */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // produce sound but gives 0 lives - "ANDA" instruction at 0x8a20
 
 	PORT_MODIFY("DSW0")
-	/* NO start buttons - to start a game, press any button from any player */
+	// NO start buttons - to start a game, press any button from any player
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-// 1 & 2 should be coinage
-// PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )                   PORT_DIPLOCATION("SW1:1,2")
-// PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-// PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-// PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-// PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	// 1 & 2 should be coinage
+//  PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
+//  PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+//  PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+//  PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
 
 	PORT_MODIFY("DSW1")
-	/* lives are added when COINn is pressed */
-	/* 1:00 is added when COINn is pressed until max scene time is reached */
-	PORT_DIPNAME( 0x80, 0x80, "Energy Bonus" )                  PORT_DIPLOCATION("SW2:8") /* energy is added when COINn is pressed */
-	PORT_DIPSETTING(    0x80, DEF_STR( None ) )                                           /* 0x0040 */
-	PORT_DIPSETTING(    0x00, "+50%" )                                                    /* 0x0060 */
+	// lives are added when COINn is pressed
+	// 1:00 is added when COINn is pressed until max scene time is reached
+	PORT_DIPNAME( 0x80, 0x80, "Energy Bonus" )                  PORT_DIPLOCATION("SW2:8") // energy is added when COINn is pressed
+	PORT_DIPSETTING(    0x80, DEF_STR( None ) )                                           // 0x0040
+	PORT_DIPSETTING(    0x00, "+50%" )                                                    // 0x0060
 INPUT_PORTS_END
 
-/* verified from HD6309 code */
+// verified from HD6309 code
 static INPUT_PORTS_START( ghostb3 )
 	PORT_INCLUDE(ghostb2a)
 
@@ -1226,11 +1289,11 @@ static INPUT_PORTS_START( ghostb3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)  /* upgradable shot */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)  /* beam (provided you have energy) */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) // upgradable shot
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) // beam (provided you have energy)
 
-	PORT_MODIFY("I8751")
-	/* Low 4 bits not connected on schematics */
+	PORT_MODIFY("COIN")
+	// Low 4 bits not connected on schematics
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1238,24 +1301,24 @@ static INPUT_PORTS_START( ghostb3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 INPUT_PORTS_END
 
-/* verified from HD6309 code */
+// verified from HD6309 code
 static INPUT_PORTS_START( meikyuh )
 	PORT_INCLUDE(ghostb)
 
-	PORT_MODIFY("I8751")
+	PORT_MODIFY("COIN")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )              /* gives 4 credits for 14 coins ! */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	/* BUTTON1 : upgradable shot - BUTTON2 : circular fire (provided you have energy) - BUTTON1 + BUTTON2 : beam (provided you have energy) */
+	// BUTTON1 : upgradable shot - BUTTON2 : circular fire (provided you have energy) - BUTTON1 + BUTTON2 : beam (provided you have energy)
 
 	PORT_MODIFY("DSW1")
-	/* lives are added when STARTn is pressed - 1 extra life is awarded on 2nd credit and after for the same player who gets then 2, 4 or 6 additional lives */
-	/* max time scene is always 6:00 at start - 0:30 is subed every 8 levels - 1:00 is added when STARTn is pressed until max scene time is reached */
-	PORT_DIPNAME( 0x10, 0x10, "Energy Bonus" )                  PORT_DIPLOCATION("SW2:5") /* energy is added when STARTn is pressed */
-	PORT_DIPSETTING(    0x10, DEF_STR( None ) )                                           /* 0x0020 */
-	PORT_DIPSETTING(    0x00, "+50%" )                                                    /* 0x0030 */
+	// lives are added when STARTn is pressed - 1 extra life is awarded on 2nd credit and after for the same player who gets then 2, 4 or 6 additional lives
+	// max time scene is always 6:00 at start - 0:30 is subed every 8 levels - 1:00 is added when STARTn is pressed until max scene time is reached
+	PORT_DIPNAME( 0x10, 0x10, "Energy Bonus" )                  PORT_DIPLOCATION("SW2:5") // energy is added when STARTn is pressed
+	PORT_DIPSETTING(    0x10, DEF_STR( None ) )                                           // 0x0020
+	PORT_DIPSETTING(    0x00, "+50%" )                                                    // 0x0030
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
 	PORT_DIPNAME( 0x80, 0x80, "Freeze" )                        PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -1263,19 +1326,25 @@ static INPUT_PORTS_START( meikyuh )
 INPUT_PORTS_END
 
 
-/* verified from M6809 code - coinage needs further checking when the MCU is available */
+// verified from M6809 code
 static INPUT_PORTS_START( csilver )
 	PORT_START("IN0")
-	PLAYER1_JOYSTICK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                 /* sword */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                 /* jump */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // sword
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // jump
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PLAYER2_JOYSTICK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL   /* sword */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL   /* jump */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL // sword
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL // jump
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1287,15 +1356,22 @@ static INPUT_PORTS_START( csilver )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+
+	PORT_START("COIN") // hooked up on the i8751
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -1326,30 +1402,23 @@ static INPUT_PORTS_START( csilver )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:6")
-	PORT_DIPNAME( 0x40, 0x40, "No Key for Door (Cheat)")        PORT_DIPLOCATION("SW2:7")  /* code at 0x9816 in sub CPU */
+	PORT_DIPNAME( 0x40, 0x40, "No Key for Door (Cheat)")        PORT_DIPLOCATION("SW2:7") // code at 0x9816 in sub CPU
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")
-
-	PORT_START("I8751") /* hooked up on the i8751 */
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 INPUT_PORTS_END
 
-/* verified from M6809 code - coinage needs further checking when the MCU is available */
+// verified from M6809 code
 static INPUT_PORTS_START( csilverj )
 	PORT_INCLUDE(csilver)
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
@@ -1357,40 +1426,45 @@ static INPUT_PORTS_START( csilverj )
 INPUT_PORTS_END
 
 
-
-/* verified from HD6309 code */
+// verified from HD6309 code
 static INPUT_PORTS_START( oscar )
 	PORT_START("IN0")
-	PLAYER1_JOYSTICK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                 /* shoot */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                 /* jump */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )                 /* select */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // shoot
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // jump
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) // select
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")
-	PLAYER2_JOYSTICK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL   /* shoot */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL   /* jump */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL   /* select */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL // shoot
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL // jump
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL // select
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<1>))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<0>))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", FUNC(input_merger_device::in_w<2>))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")  /* table at 0xf8e3 (4 * 2 bytes : coins then credits) */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:1,2") // table at 0xf8e3 (4 * 2 bytes : coins then credits)
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")  /* table at 0xf8eb (4 * 2 bytes : coins then credits) */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:3,4") // table at 0xf8eb (4 * 2 bytes : coins then credits)
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -1419,12 +1493,12 @@ static INPUT_PORTS_START( oscar )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:5,6")  /* tables at 0x82d8 (4 words) and 0xf3fe (3 words) */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:5,6") // tables at 0x82d8 (4 words) and 0xf3fe (3 words)
 	PORT_DIPSETTING(    0x30, "40k 100k 60k+" )
 	PORT_DIPSETTING(    0x20, "60k 160k 100k+" )
 	PORT_DIPSETTING(    0x10, "90k 240k 150k+" )
 	PORT_DIPSETTING(    0x00, "50k only" )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")        PORT_DIPLOCATION("SW2:7")  /* not when falling into void or water - also gives infinite time */
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")        PORT_DIPLOCATION("SW2:7") // not when falling into void or water - also gives infinite time
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:8")
@@ -1432,27 +1506,27 @@ static INPUT_PORTS_START( oscar )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-/* verified from HD6309 code */
+// verified from HD6309 code
 static INPUT_PORTS_START( oscarj )
 	PORT_INCLUDE(oscar)
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")  /* table at 0xf8d6 (4 * 2 bytes : coins then credits) in 'oscarj1', 0xf8e6 in 'oscarj2', 0xf8f2 in 'oscaru' */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:1,2") // table at 0xf8d6 (4 * 2 bytes : coins then credits) in 'oscarj1', 0xf8e6 in 'oscarj2', 0xf8f2 in 'oscaru'
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")  /* table at 0xf8de (4 * 2 bytes : coins then credits) in 'oscarj1', 0xf8ee in 'oscarj2', 0xf8fa in 'oscaru' */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:3,4") // table at 0xf8de (4 * 2 bytes : coins then credits) in 'oscarj1', 0xf8ee in 'oscarj2', 0xf8fa in 'oscaru'
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
 
-	/* bonus lives : tables at 0x82d8 (4 words) and 0xf3f1 (3 words) in 'oscarj1', 0x82de and 0xf401 in 'orscarj2', 0x82d8 and 0xf412 in 'orscaru' - same as in 'oscar' */
+	// bonus lives : tables at 0x82d8 (4 words) and 0xf3f1 (3 words) in 'oscarj1', 0x82de and 0xf401 in 'orscarj2', 0x82d8 and 0xf412 in 'orscaru' - same as in 'oscar'
 INPUT_PORTS_END
 
 
-/* verified from M6809 code - coinage needs further checking when the MCU is available */
+// verified from M6809 code
 static INPUT_PORTS_START( srdarwin )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -1471,23 +1545,22 @@ static INPUT_PORTS_START( srdarwin )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("I8751") /* hooked up on the i8751 */
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_START("COIN") // hooked up on the i8751
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -1515,9 +1588,9 @@ static INPUT_PORTS_START( srdarwin )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, "Every 50k" )                 /* table at 0xab06 - last bonus life at 850k */
-	PORT_DIPSETTING(    0x00, "Every 100k" )                /* table at 0xab17 - last bonus life at 900k */
-	PORT_DIPNAME( 0x20, 0x20, "After Stage 10" )                PORT_DIPLOCATION("SW2:6")  /* code at 0xab94 */
+	PORT_DIPSETTING(    0x10, "Every 50k" )                     // table at 0xab06 - last bonus life at 850k
+	PORT_DIPSETTING(    0x00, "Every 100k" )                    // table at 0xab17 - last bonus life at 900k
+	PORT_DIPNAME( 0x20, 0x20, "After Stage 10" )                PORT_DIPLOCATION("SW2:6") // code at 0xab94
 	PORT_DIPSETTING(    0x20, "Back to Stage 1" )
 	PORT_DIPSETTING(    0x00, "Game Over" )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:7")
@@ -1526,17 +1599,17 @@ static INPUT_PORTS_START( srdarwin )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-/* verified from M6809 code - coinage needs further checking when the MCU is available */
+// verified from M6809 code
 static INPUT_PORTS_START( srdarwinj )
 	PORT_INCLUDE(srdarwin)
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
@@ -1544,44 +1617,50 @@ static INPUT_PORTS_START( srdarwinj )
 INPUT_PORTS_END
 
 
-/* verified from M6809 code */
+// verified from M6809 code
 static INPUT_PORTS_START( cobracom )
 	PORT_START("IN0")
-	PLAYER1_JOYSTICK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                 /* fire */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                 /* missile */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // fire
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // missile
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")
-	PLAYER2_JOYSTICK
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)  /* fire */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)  /* missile */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // fire
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // missile
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )           /* always adds 1 credit */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // always adds 1 credit
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2")  /* code at 0x88b7 in 'cobracom', 0x890e in 'cobracomj' */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )               PORT_DIPLOCATION("SW1:1,2") // code at 0x88b7 in 'cobracom', 0x890e in 'cobracomj'
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4")  /* code at 0x889b in 'cobracom', 0x88f2 in 'cobracomj' */
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )               PORT_DIPLOCATION("SW1:3,4") // code at 0x889b in 'cobracom', 0x88f2 in 'cobracomj'
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )              PORT_DIPLOCATION("SW1:5")  // Manual says 'Off'
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )              PORT_DIPLOCATION("SW1:5") // Manual says 'Off'
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:6")
@@ -1599,7 +1678,7 @@ static INPUT_PORTS_START( cobracom )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPSETTING(    0x00, "99 (Cheat)")                 /* lose a life before getting 2nd bonus life ! */
+	PORT_DIPSETTING(    0x00, "99 (Cheat)")                     // lose a life before getting 2nd bonus life !
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
@@ -1608,12 +1687,13 @@ static INPUT_PORTS_START( cobracom )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:6")  /* table at 0xa898 (2* 2 words) in 'cobracomj', 0xa8fe in 'cobracomj' */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )           PORT_DIPLOCATION("SW2:6") // table at 0xa898 (2* 2 words) in 'cobracomj', 0xa8fe in 'cobracomj'
 	PORT_DIPSETTING(    0x20, "50k and 150k" )
 	PORT_DIPSETTING(    0x00, "100k and 200k" )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:7")
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8")  /* previously "Freeze" : code at 0x8849 in 'cobracomj', 0x88a0 in 'cobracomj' */
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW2:8") // previously "Freeze" : code at 0x8849 in 'cobracomj', 0x88a0 in 'cobracomj'
 INPUT_PORTS_END
+
 
 /******************************************************************************/
 
@@ -1625,7 +1705,7 @@ static const gfx_layout charlayout_32k =
 	{ 0x4000*8,0x0000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every sprite takes 8 consecutive bytes */
+	8*8 // every sprite takes 8 consecutive bytes
 };
 
 static const gfx_layout chars_3bpp =
@@ -1636,19 +1716,19 @@ static const gfx_layout chars_3bpp =
 	{ 0x6000*8,0x4000*8,0x2000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every sprite takes 8 consecutive bytes */
+	8*8 // every sprite takes 8 consecutive bytes
 };
 
-/* SRDarwin characters - very unusual layout for Data East */
+// SRDarwin characters - very unusual layout for Data East
 static const gfx_layout charlayout_16k =
 {
-	8,8,    /* 8*8 characters */
+	8,8,    // 8*8 characters
 	1024,
-	2,  /* 2 bits per pixel */
-	{ 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
+	2,  // 2 bits per pixel
+	{ 0, 4 },   // the two bitplanes for 4 pixels are packed into one byte
 	{ 0x2000*8+0, 0x2000*8+1, 0x2000*8+2, 0x2000*8+3, 0, 1, 2, 3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 static const gfx_layout oscar_charlayout =
@@ -1659,10 +1739,10 @@ static const gfx_layout oscar_charlayout =
 	{ 0x3000*8,0x2000*8,0x1000*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every sprite takes 8 consecutive bytes */
+	8*8 // every sprite takes 8 consecutive bytes
 };
 
-/* Darwin sprites - only 3bpp */
+// Darwin sprites - only 3bpp
 static const gfx_layout sr_sprites =
 {
 	16,16,
@@ -1672,6 +1752,7 @@ static const gfx_layout sr_sprites =
 	{ 16*8, 1+(16*8), 2+(16*8), 3+(16*8), 4+(16*8), 5+(16*8), 6+(16*8), 7+(16*8),
 		0,1,2,3,4,5,6,7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+//  { 0*8, 2*8, 1*8, 3*8, 4*8, 6*8, 5*8, 7*8 ,8*8,10*8,9*8,11*8,12*8,14*8,13*8,15*8 }, bootleg decode
 	16*16
 };
 
@@ -1685,7 +1766,7 @@ static const gfx_layout srdarwin_tiles =
 			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+1024*8*8+0, 16*8+1024*8*8+1, 16*8+1024*8*8+2, 16*8+1024*8*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8    /* every tile takes 32 consecutive bytes */
+	32*8    // every tile takes 32 consecutive bytes
 };
 
 static const gfx_layout tiles =
@@ -1700,7 +1781,7 @@ static const gfx_layout tiles =
 	16*16
 };
 
-/* X flipped on Ghostbusters tiles */
+// X flipped on Ghostbusters tiles
 static const gfx_layout tiles_r =
 {
 	16,16,
@@ -1729,7 +1810,7 @@ static GFXDECODE_START( gfx_ghostb )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_srdarwin )
-	GFXDECODE_ENTRY( "char",    0x00000, charlayout_16k, 128, 4 ) /* Only 1 used so far :/ */
+	GFXDECODE_ENTRY( "char",    0x00000, charlayout_16k, 128, 4 ) // Only 1 used so far :/
 	GFXDECODE_ENTRY( "sprites", 0x00000, sr_sprites,      64, 8 )
 	GFXDECODE_ENTRY( "tiles1",  0x00000, srdarwin_tiles,   0, 8 )
 	GFXDECODE_ENTRY( "tiles1",  0x10000, srdarwin_tiles,   0, 8 )
@@ -1738,21 +1819,21 @@ static GFXDECODE_START( gfx_srdarwin )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_gondo )
-	GFXDECODE_ENTRY( "char",    0, chars_3bpp, 0, 16 ) /* Chars */
-	GFXDECODE_ENTRY( "tiles1",  0, tiles,    768, 16 ) /* Tiles */
+	GFXDECODE_ENTRY( "char",    0, chars_3bpp, 0, 16 ) // Chars
+	GFXDECODE_ENTRY( "tiles1",  0, tiles,    768, 16 ) // Tiles
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_gondo_spr )
-	GFXDECODE_ENTRY( "sprites", 0, tiles, 256, 32 ) /* Sprites */
+	GFXDECODE_ENTRY( "sprites", 0, tiles, 256, 32 ) // Sprites
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_oscar )
-	GFXDECODE_ENTRY( "char",    0, oscar_charlayout, 256,  8 ) /* Chars */
-	GFXDECODE_ENTRY( "tiles1",  0, tiles,            384,  8 ) /* Tiles */
+	GFXDECODE_ENTRY( "char",    0, oscar_charlayout, 256,  8 ) // Chars
+	GFXDECODE_ENTRY( "tiles1",  0, tiles,            384,  8 ) // Tiles
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_oscar_spr )
-	GFXDECODE_ENTRY( "sprites", 0, tiles, 0, 16 ) /* Sprites */
+	GFXDECODE_ENTRY( "sprites", 0, tiles, 0, 16 ) // Sprites
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_shackled )
@@ -1764,9 +1845,10 @@ static GFXDECODE_START( gfx_shackled_spr )
 	GFXDECODE_ENTRY( "sprites", 0, tiles, 256, 16 )
 GFXDECODE_END
 
+
 /******************************************************************************/
 
-/* Coins generate NMI's */
+// Coins generate NMI's
 void oscar_state::coin_irq(int state)
 {
 	if (state && !m_coin_state)
@@ -1786,19 +1868,16 @@ void lastmisn_state::shackled_coin_irq(int state)
 	m_coin_state = bool(state);
 }
 
-/******************************************************************************/
 
+/******************************************************************************/
 
 void dec8_state_base::machine_start()
 {
 	u8 *ROM = memregion("maincpu")->base();
-	uint32_t max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
+	u32 max_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 	m_mainbank->configure_entries(0, max_bank, &ROM[0x10000], 0x4000);
 
-	m_m6502_timer = timer_alloc(FUNC(dec8_state_base::audiocpu_nmi_clear), this);
-
 	save_item(NAME(m_coin_state));
-
 	save_item(NAME(m_scroll));
 }
 
@@ -1812,7 +1891,6 @@ void dec8_mcu_state_base::machine_start()
 {
 	dec8_state_base::machine_start();
 
-	m_i8751_timer = timer_alloc(FUNC(dec8_mcu_state_base::mcu_irq_clear), this);
 	m_i8751_p2 = 0xff;
 
 	save_item(NAME(m_i8751_p2));
@@ -1831,16 +1909,19 @@ void dec8_mcu_state_base::machine_reset()
 }
 
 
-void lastmisn_state::machine_start()
+void ghostb_state::machine_start()
 {
-	dec8_mcu_state_base::machine_start();
+	lastmisn_state::machine_start();
+
+	m_6502_timer = timer_alloc(FUNC(ghostb_state::audiocpu_nmi_clear), this);
+	m_i8751_timer = timer_alloc(FUNC(ghostb_state::mcu_irq_clear), this);
 
 	save_item(NAME(m_secclr));
 }
 
-void lastmisn_state::machine_reset()
+void ghostb_state::machine_reset()
 {
-	dec8_state_base::machine_reset();
+	lastmisn_state::machine_reset();
 
 	// reset clears LS273 latch, which disables NMI
 	if (m_nmigate.found())
@@ -1869,46 +1950,46 @@ void csilver_state::machine_reset()
 
 
 // DECO video CRTC, unverified
-void dec8_state_base::set_screen_raw_params_data_east(machine_config &config)
+void dec8_state_base::set_screen_raw_params(machine_config &config)
 {
-	m_screen->set_raw(XTAL(12'000'000)/2,384,0,256,272,8,248);
+//  m_screen->set_refresh_hz(58);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); // 58Hz, 529us Vblank duration
+//  m_screen->set_size(32*8, 32*8);
+//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248);
 }
 
 void lastmisn_state::lastmisn(machine_config &config)
 {
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 2000000);
+	// basic machine hardware
+	MC6809E(config, m_maincpu, 12_MHz_XTAL / 8); // MC68B09EP in schematics
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastmisn_state::lastmisn_map);
 
-	MC6809E(config, m_subcpu, 2000000);
+	MC6809E(config, m_subcpu, 12_MHz_XTAL / 8); // MC68B09EP in schematics
 	m_subcpu->set_addrmap(AS_PROGRAM, &lastmisn_state::lastmisn_sub_map);
 
-	M6502(config, m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::ym3526_s_map); /* NMIs are caused by the main CPU */
+	R65C02(config, m_audiocpu, 12_MHz_XTAL / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::ym3526_s_map); // NMIs are caused by the main CPU
 
-	I8751(config, m_mcu, XTAL(8'000'000));
+	I8751(config, m_mcu, 8_MHz_XTAL);
 	m_mcu->port_in_cb<0>().set(FUNC(lastmisn_state::i8751_port0_r));
 	m_mcu->port_out_cb<0>().set(FUNC(lastmisn_state::i8751_port0_w));
 	m_mcu->port_in_cb<1>().set(FUNC(lastmisn_state::i8751_port1_r));
 	m_mcu->port_out_cb<1>().set(FUNC(lastmisn_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(lastmisn_state::shackled_mcu_to_main_w));
-	m_mcu->port_in_cb<3>().set_ioport("I8751");
+	m_mcu->port_out_cb<2>().set(FUNC(lastmisn_state::mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(lastmisn_state::shackled_coin_irq));
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0, m_palette, gfx_shackled_spr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 58Hz, 529us Vblank duration */
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	set_screen_raw_params_data_east(config);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(lastmisn_state::screen_update_lastmisn));
 	m_screen->set_palette(m_palette);
 
@@ -1917,58 +1998,58 @@ void lastmisn_state::lastmisn(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(lastmisn_state,lastmisn)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
-	ym1.add_route(0, "mono", 0.23);
-	ym1.add_route(1, "mono", 0.23);
-	ym1.add_route(2, "mono", 0.23);
-	ym1.add_route(3, "mono", 0.20);
+	INPUT_MERGER_ANY_HIGH(config, m_soundirq);
+	m_soundirq->output_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
-	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
-	ym2.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8));
+	ym1.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<0>));
+	ym1.add_route(0, "mono", 0.20);
+	ym1.add_route(1, "mono", 0.20);
+	ym1.add_route(2, "mono", 0.20);
+	ym1.add_route(3, "mono", 0.40);
+
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL / 4));
+	ym2.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<1>));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 void lastmisn_state::shackled(machine_config &config)
 {
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 2000000);
+	// basic machine hardware
+	MC6809E(config, m_maincpu, 12_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastmisn_state::shackled_map);
 
-	MC6809E(config, m_subcpu, 2000000);
+	MC6809E(config, m_subcpu, 12_MHz_XTAL / 8);
 	m_subcpu->set_addrmap(AS_PROGRAM, &lastmisn_state::shackled_sub_map);
 
-	M6502(config, m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::ym3526_s_map); /* NMIs are caused by the main CPU */
+	R65C02(config, m_audiocpu, 12_MHz_XTAL / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::ym3526_s_map); // NMIs are caused by the main CPU
 
-	I8751(config, m_mcu, XTAL(8'000'000));
+	I8751(config, m_mcu, 8_MHz_XTAL);
 	m_mcu->port_in_cb<0>().set(FUNC(lastmisn_state::i8751_port0_r));
 	m_mcu->port_out_cb<0>().set(FUNC(lastmisn_state::i8751_port0_w));
 	m_mcu->port_in_cb<1>().set(FUNC(lastmisn_state::i8751_port1_r));
 	m_mcu->port_out_cb<1>().set(FUNC(lastmisn_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(lastmisn_state::shackled_mcu_to_main_w));
-	m_mcu->port_in_cb<3>().set_ioport("I8751");
+	m_mcu->port_out_cb<2>().set(FUNC(lastmisn_state::mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
-//  config.set_maximum_quantum(attotime::from_hz(100000));
 	config.set_perfect_quantum(m_maincpu); // needs heavy sync, otherwise one of the two CPUs will miss an IRQ and cause the game to hang
 
 	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(lastmisn_state::shackled_coin_irq));
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0, m_palette, gfx_shackled_spr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 58Hz, 529us Vblank duration */
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	set_screen_raw_params_data_east(config);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(lastmisn_state::screen_update_shackled));
 	m_screen->set_palette(m_palette);
 
@@ -1977,54 +2058,58 @@ void lastmisn_state::shackled(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(lastmisn_state,shackled)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
-	ym1.add_route(0, "mono", 0.23);
-	ym1.add_route(1, "mono", 0.23);
-	ym1.add_route(2, "mono", 0.23);
-	ym1.add_route(3, "mono", 0.20);
+	INPUT_MERGER_ANY_HIGH(config, m_soundirq);
+	m_soundirq->output_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
-	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
-	ym2.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8));
+	ym1.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<0>));
+	ym1.add_route(0, "mono", 0.20);
+	ym1.add_route(1, "mono", 0.20);
+	ym1.add_route(2, "mono", 0.20);
+	ym1.add_route(3, "mono", 0.40);
+
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL / 4));
+	ym2.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<1>));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 void gondo_state::gondo(machine_config &config)
 {
-	/* basic machine hardware */
-	HD6309E(config, m_maincpu, 3000000); /* HD63C09EP */
+	// basic machine hardware
+	HD6309E(config, m_maincpu, 3'000'000); // HD63C09EP
 	m_maincpu->set_addrmap(AS_PROGRAM, &gondo_state::gondo_map);
 
-	M6502(config, m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gondo_state::oscar_s_map); /* NMIs are caused by the main CPU */
+	R65C02(config, m_audiocpu, 1'500'000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gondo_state::oscar_s_map); // NMIs are caused by the main CPU
 
-	I8751(config, m_mcu, XTAL(8'000'000));
+	I8751(config, m_mcu, 8_MHz_XTAL);
 	m_mcu->port_in_cb<0>().set(FUNC(gondo_state::i8751_port0_r));
 	m_mcu->port_out_cb<0>().set(FUNC(gondo_state::i8751_port0_w));
 	m_mcu->port_in_cb<1>().set(FUNC(gondo_state::i8751_port1_r));
 	m_mcu->port_out_cb<1>().set(FUNC(gondo_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(gondo_state::gondo_mcu_to_main_w));
-	m_mcu->port_in_cb<3>().set_ioport("I8751");
+	m_mcu->port_out_cb<2>().set(FUNC(gondo_state::mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
-	/* video hardware */
+	config.set_maximum_quantum(attotime::from_hz(6000));
+
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0, m_palette, gfx_gondo_spr);
 	m_spritegen_krn->set_colpri_callback(FUNC(gondo_state::gondo_colpri_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529us Vblank duration */);
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	set_screen_raw_params_data_east(config);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(gondo_state::screen_update_gondo));
 	m_screen->screen_vblank().set(FUNC(gondo_state::screen_vblank));
 	m_screen->screen_vblank().append(m_nmigate, FUNC(input_merger_device::in_w<1>));
+	m_screen->screen_vblank().append_inputline(m_mcu, MCS51_INT0_LINE);
 	m_screen->set_palette(m_palette);
 
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -2032,53 +2117,56 @@ void gondo_state::gondo(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gondo);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
-	ym1.add_route(0, "mono", 0.23);
-	ym1.add_route(1, "mono", 0.23);
-	ym1.add_route(2, "mono", 0.23);
-	ym1.add_route(3, "mono", 0.20);
+	INPUT_MERGER_ANY_HIGH(config, m_soundirq);
+	m_soundirq->output_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
-	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
-	ym2.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
+	ym2203_device &ym1(YM2203(config, "ym1", 1'500'000));
+	ym1.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<0>));
+	ym1.add_route(0, "mono", 0.20);
+	ym1.add_route(1, "mono", 0.20);
+	ym1.add_route(2, "mono", 0.20);
+	ym1.add_route(3, "mono", 0.40);
+
+	ym3526_device &ym2(YM3526(config, "ym2", 3'000'000));
+	ym2.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<1>));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void lastmisn_state::garyoret(machine_config &config)
+void ghostb_state::garyoret(machine_config &config)
 {
-	/* basic machine hardware */
-	HD6309E(config, m_maincpu, 3000000); /* HD63C09EP */
-	m_maincpu->set_addrmap(AS_PROGRAM, &lastmisn_state::garyoret_map);
+	// basic machine hardware
+	HD6309E(config, m_maincpu, 3'000'000); // HD63C09EP
+	m_maincpu->set_addrmap(AS_PROGRAM, &ghostb_state::garyoret_map);
 
-	M6502(config, m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::oscar_s_map); /* NMIs are caused by the main CPU */
+	R65C02(config, m_audiocpu, 1'500'000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ghostb_state::oscar_s_map); // NMIs are caused by the main CPU
 
-	I8751(config, m_mcu, XTAL(8'000'000));
-	m_mcu->port_in_cb<0>().set(FUNC(lastmisn_state::i8751_port0_r));
-	m_mcu->port_out_cb<0>().set(FUNC(lastmisn_state::i8751_port0_w));
-	m_mcu->port_in_cb<1>().set(FUNC(lastmisn_state::i8751_port1_r));
-	m_mcu->port_out_cb<1>().set(FUNC(lastmisn_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(lastmisn_state::gondo_mcu_to_main_w));
-	m_mcu->port_in_cb<3>().set_ioport("I8751");
+	I8751(config, m_mcu, 8_MHz_XTAL);
+	m_mcu->port_in_cb<0>().set(FUNC(ghostb_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(ghostb_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(ghostb_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(ghostb_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(ghostb_state::mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
-	/* video hardware */
+	config.set_maximum_quantum(attotime::from_hz(6000));
+
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0, m_palette, gfx_gondo_spr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529us Vblank duration */);
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(lastmisn_state::screen_update_garyoret));
-	m_screen->screen_vblank().set(FUNC(lastmisn_state::screen_vblank));
+	set_screen_raw_params(config);
+	m_screen->set_screen_update(FUNC(ghostb_state::screen_update_garyoret));
+	m_screen->screen_vblank().set(FUNC(ghostb_state::screen_vblank));
 	m_screen->screen_vblank().append(m_nmigate, FUNC(input_merger_device::in_w<1>));
+	m_screen->screen_vblank().append_inputline(m_mcu, MCS51_INT0_LINE);
 	m_screen->set_palette(m_palette);
 
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -2086,42 +2174,48 @@ void lastmisn_state::garyoret(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gondo);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 
-	MCFG_VIDEO_START_OVERRIDE(lastmisn_state,garyoret)
+	MCFG_VIDEO_START_OVERRIDE(ghostb_state,garyoret)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
-	ym1.add_route(0, "mono", 0.23);
-	ym1.add_route(1, "mono", 0.23);
-	ym1.add_route(2, "mono", 0.23);
-	ym1.add_route(3, "mono", 0.20);
+	INPUT_MERGER_ANY_HIGH(config, m_soundirq);
+	m_soundirq->output_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
-	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
-	ym2.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
+	ym2203_device &ym1(YM2203(config, "ym1", 1'500'000));
+	ym1.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<0>));
+	ym1.add_route(0, "mono", 0.20);
+	ym1.add_route(1, "mono", 0.20);
+	ym1.add_route(2, "mono", 0.20);
+	ym1.add_route(3, "mono", 0.40);
+
+	ym3526_device &ym2(YM3526(config, "ym2", 3'000'000));
+	ym2.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<1>));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
-void lastmisn_state::ghostb(machine_config &config)
+void ghostb_state::ghostb(machine_config &config)
 {
-	/* basic machine hardware */
-	HD6309E(config, m_maincpu, XTAL(12'000'000) / 4);  /* HD63C09EP, clock verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &lastmisn_state::meikyuh_map);
+	// basic machine hardware
+	HD6309E(config, m_maincpu, 12_MHz_XTAL / 4); // HD63C09EP, clock verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &ghostb_state::ghostb_map);
 
-	DECO_222(config, m_audiocpu, XTAL(12'000'000) / 8); /* also seen with stock M6502, clock verified */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::dec8_s_map); /* NMIs are caused by the main CPU */
+	DECO_222(config, m_audiocpu, 12_MHz_XTAL / 8); // also seen with stock M6502, clock verified
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ghostb_state::dec8_s_map); // NMIs are caused by the main CPU
 
-	I8751(config, m_mcu, XTAL(8'000'000)); /* 8.0MHz OSC next to MCU - clock verified */
-	m_mcu->port_in_cb<0>().set(FUNC(lastmisn_state::i8751_port0_r));
-	m_mcu->port_out_cb<0>().set(FUNC(lastmisn_state::i8751_port0_w));
-	m_mcu->port_in_cb<1>().set(FUNC(lastmisn_state::i8751_port1_r));
-	m_mcu->port_out_cb<1>().set(FUNC(lastmisn_state::i8751_port1_w));
-	m_mcu->port_out_cb<2>().set(FUNC(lastmisn_state::gondo_mcu_to_main_w));
-	m_mcu->port_in_cb<3>().set_ioport("I8751");
+	I8751(config, m_mcu, 8_MHz_XTAL); // 8.0MHz OSC next to MCU - clock verified
+	m_mcu->port_in_cb<0>().set(FUNC(ghostb_state::i8751_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(ghostb_state::i8751_port0_w));
+	m_mcu->port_in_cb<1>().set(FUNC(ghostb_state::i8751_port1_r));
+	m_mcu->port_out_cb<1>().set(FUNC(ghostb_state::i8751_port1_w));
+	m_mcu->port_out_cb<2>().set(FUNC(ghostb_state::mcu_to_main_w));
+	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
-	/* video hardware */
+	config.set_maximum_quantum(attotime::from_hz(6000));
+
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
@@ -2131,81 +2225,79 @@ void lastmisn_state::ghostb(machine_config &config)
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0, m_palette, gfx_shackled_spr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529us Vblank duration */);
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	set_screen_raw_params_data_east(config);
-	m_screen->set_screen_update(FUNC(lastmisn_state::screen_update_ghostb));
-	m_screen->screen_vblank().set(FUNC(lastmisn_state::screen_vblank));
+	set_screen_raw_params(config);
+	m_screen->set_screen_update(FUNC(ghostb_state::screen_update_ghostb));
+	m_screen->screen_vblank().set(FUNC(ghostb_state::screen_vblank));
 	m_screen->screen_vblank().append([this] (int state) { if (state && m_nmi_enable) m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE); });
+	m_screen->screen_vblank().append_inputline(m_mcu, MCS51_INT0_LINE);
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ghostb);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 	m_palette->set_prom_region("proms");
 	m_palette->set_init(m_palette, FUNC(deco_rmc3_device::palette_init_proms));
-	MCFG_VIDEO_START_OVERRIDE(lastmisn_state,ghostb)
+	MCFG_VIDEO_START_OVERRIDE(ghostb_state,ghostb)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000) / 8)); // clock verified
-	ym1.add_route(0, "mono", 0.23);
-	ym1.add_route(1, "mono", 0.23);
-	ym1.add_route(2, "mono", 0.23);
-	ym1.add_route(3, "mono", 0.20);
+	INPUT_MERGER_ANY_HIGH(config, m_soundirq);
+	m_soundirq->output_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
-	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000) / 4)); // clock verified
-	ym2.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8)); // clock verified
+	ym1.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<0>));
+	ym1.add_route(0, "mono", 0.20);
+	ym1.add_route(1, "mono", 0.20);
+	ym1.add_route(2, "mono", 0.20);
+	ym1.add_route(3, "mono", 0.40);
+
+	ym3812_device &ym2(YM3812(config, "ym2", 12_MHz_XTAL / 4)); // clock verified
+	ym2.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<1>));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
-void lastmisn_state::meikyuh(machine_config &config)
+void ghostb_state::meikyuh(machine_config &config)
 {
 	ghostb(config);
-	M6502(config.replace(), m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &lastmisn_state::dec8_s_map);
+
+	R65C02(config.replace(), m_audiocpu, 1'500'000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ghostb_state::dec8_s_map);
 }
 
 
 void csilver_state::csilver(machine_config &config)
 {
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, XTAL(12'000'000)/8); /* verified on pcb */
+	// basic machine hardware
+	MC6809E(config, m_maincpu, 12_MHz_XTAL / 8); // verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &csilver_state::main_map);
 
-	MC6809E(config, m_subcpu, XTAL(12'000'000)/8); /* verified on pcb */
+	MC6809E(config, m_subcpu, 12_MHz_XTAL / 8); // verified on pcb
 	m_subcpu->set_addrmap(AS_PROGRAM, &csilver_state::sub_map);
 
-	M6502(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &csilver_state::sound_map); /* NMIs are caused by the main CPU */
+	R65C02(config, m_audiocpu, 12_MHz_XTAL / 8); // verified on pcb
+	m_audiocpu->set_addrmap(AS_PROGRAM, &csilver_state::sound_map); // NMIs are caused by the main CPU
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	I8751(config, m_mcu, XTAL(8'000'000));
+	I8751(config, m_mcu, 8_MHz_XTAL);
 	m_mcu->port_in_cb<0>().set(FUNC(csilver_state::i8751_port0_r));
 	m_mcu->port_out_cb<0>().set(FUNC(csilver_state::i8751_port0_w));
 	m_mcu->port_in_cb<1>().set(FUNC(csilver_state::i8751_port1_r));
 	m_mcu->port_out_cb<1>().set(FUNC(csilver_state::i8751_port1_w));
 	m_mcu->port_out_cb<2>().set(FUNC(csilver_state::mcu_to_main_w));
-	m_mcu->port_in_cb<3>().set_ioport("I8751");
+	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
 	config.set_perfect_quantum(m_maincpu);
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0, m_palette, gfx_shackled_spr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 58Hz, 529us Vblank duration */
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	set_screen_raw_params_data_east(config);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(csilver_state::screen_update_lastmisn));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_subcpu, INPUT_LINE_NMI);
@@ -2215,44 +2307,44 @@ void csilver_state::csilver(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(csilver_state,lastmisn)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000)/8)); /* verified on pcb */
-	ym1.add_route(0, "mono", 0.23);
-	ym1.add_route(1, "mono", 0.23);
-	ym1.add_route(2, "mono", 0.23);
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8)); // verified on pcb
+	ym1.add_route(0, "mono", 0.10);
+	ym1.add_route(1, "mono", 0.10);
+	ym1.add_route(2, "mono", 0.10);
 	ym1.add_route(3, "mono", 0.20);
 
-	ym3526_device &ym2(YM3526(config, "ym2", XTAL(12'000'000)/4)); /* verified on pcb */
-	ym2.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL / 4)); // verified on pcb
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MSM5205(config, m_msm, XTAL(384'000)); /* verified on pcb */
-	m_msm->vck_legacy_callback().set(FUNC(csilver_state::adpcm_int));  /* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz */
-	m_msm->add_route(ALL_OUTPUTS, "mono", 0.88);
+	MSM5205(config, m_msm, 384_kHz_XTAL); // verified on pcb
+	m_msm->vck_legacy_callback().set(FUNC(csilver_state::adpcm_int)); // interrupt function
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // 8KHz
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 void oscar_state::oscar(machine_config &config)
 {
-	/* basic machine hardware */
-	HD6309(config, m_maincpu, XTAL(12'000'000)/2); /* PCB seen both HD6309EP or MC6809EP, clock verified on pcb */
+	// basic machine hardware
+	MC6809E(config, m_maincpu, 12_MHz_XTAL / 8); // PCB seen both HD6309EP or MC6809EP, clock verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &oscar_state::oscar_map);
 
-	HD6309(config, m_subcpu, XTAL(12'000'000)/2); /* PCB seen both HD6309EP or MC6809EP, clock verified on pcb */
+	MC6809E(config, m_subcpu, 12_MHz_XTAL / 8); // PCB seen both HD6309EP or MC6809EP, clock verified on pcb
 	m_subcpu->set_addrmap(AS_PROGRAM, &oscar_state::oscar_sub_map);
 
-	DECO_222(config, m_audiocpu, XTAL(12'000'000)/8); // IC labeled "C10707-1"
-	m_audiocpu->set_addrmap(AS_PROGRAM, &oscar_state::oscar_s_map); /* NMIs are caused by the main CPU */
+	DECO_222(config, m_audiocpu, 12_MHz_XTAL / 8); // IC labeled "C10707-1"
+	m_audiocpu->set_addrmap(AS_PROGRAM, &oscar_state::oscar_s_map); // NMIs are caused by the main CPU
 
-	config.set_maximum_quantum(attotime::from_hz(2400)); /* 40 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(oscar_state::coin_irq)); // 1S1588 x3 (D1-D3) + RCDM-I5
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
@@ -2263,11 +2355,7 @@ void oscar_state::oscar(machine_config &config)
 	DECO_MXC06(config, m_spritegen_mxc, 0, m_palette, gfx_oscar_spr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* 58Hz, 529us Vblank duration */
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	set_screen_raw_params_data_east(config);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(oscar_state::screen_update_oscar));
 	m_screen->set_palette(m_palette);
 
@@ -2276,58 +2364,58 @@ void oscar_state::oscar(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(oscar_state,oscar)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000)/8)); /* verified on pcb */
-	ym1.add_route(0, "mono", 0.23);
-	ym1.add_route(1, "mono", 0.23);
-	ym1.add_route(2, "mono", 0.23);
-	ym1.add_route(3, "mono", 0.20);
+	INPUT_MERGER_ANY_HIGH(config, m_soundirq);
+	m_soundirq->output_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
-	ym3526_device &ym2(YM3526(config, "ym2", XTAL(12'000'000)/4)); /* verified on pcb */
-	ym2.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8)); // verified on pcb
+	ym1.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<0>));
+	ym1.add_route(0, "mono", 0.20);
+	ym1.add_route(1, "mono", 0.20);
+	ym1.add_route(2, "mono", 0.20);
+	ym1.add_route(3, "mono", 0.40);
+
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL / 4)); // verified on pcb
+	ym2.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<1>));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 void oscar_state::oscarbl(machine_config &config)
 {
 	oscar(config);
 
-	M6502(config.replace(), m_audiocpu, XTAL(12'000'000)/8);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &oscar_state::oscar_s_map); /* NMIs are caused by the main CPU */
+	R65C02(config.replace(), m_audiocpu, 12_MHz_XTAL / 8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &oscar_state::oscar_s_map); // NMIs are caused by the main CPU
 	m_audiocpu->set_addrmap(AS_OPCODES, &oscar_state::oscarbl_s_opcodes_map);
 }
 
 void srdarwin_state::srdarwin(machine_config &config)
 {
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 2000000);  /* MC68A09EP */
+	// basic machine hardware
+	MC6809E(config, m_maincpu, 1'500'000); // MC68A09EP or HD63?09EP
 	m_maincpu->set_addrmap(AS_PROGRAM, &srdarwin_state::main_map);
 
-	DECO_222(config, m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &srdarwin_state::dec8_s_map); /* NMIs are caused by the main CPU */
+	DECO_222(config, m_audiocpu, 1'500'000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &srdarwin_state::dec8_s_map); // NMIs are caused by the main CPU
 
-	I8751(config, m_mcu, XTAL(8'000'000)); /* unknown frequency */
+	I8751(config, m_mcu, 8_MHz_XTAL); // unknown frequency
 	m_mcu->port_in_cb<0>().set(FUNC(srdarwin_state::i8751_port0_r));
 	m_mcu->port_out_cb<0>().set(FUNC(srdarwin_state::i8751_port0_w));
 	m_mcu->port_out_cb<2>().set(FUNC(srdarwin_state::mcu_to_main_w));
-	m_mcu->port_in_cb<3>().set_ioport("I8751");
+	m_mcu->port_in_cb<3>().set_ioport("COIN");
 
-	config.set_perfect_quantum(m_maincpu); /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
+	config.set_perfect_quantum(m_maincpu); // needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 58Hz, 529us Vblank duration */
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	set_screen_raw_params_data_east(config);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(srdarwin_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -2335,32 +2423,47 @@ void srdarwin_state::srdarwin(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_srdarwin);
 	DECO_RMC3(config, m_palette, 0, 144); // xxxxBBBBGGGGRRRR with custom weighting
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
-	ym1.add_route(0, "mono", 0.23);
-	ym1.add_route(1, "mono", 0.23);
-	ym1.add_route(2, "mono", 0.23);
-	ym1.add_route(3, "mono", 0.20);
+	INPUT_MERGER_ANY_HIGH(config, m_soundirq);
+	m_soundirq->output_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
-	ym3812_device &ym2(YM3812(config, "ym2", 3000000));
-	ym2.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
+	ym2203_device &ym1(YM2203(config, "ym1", 1'500'000));
+	ym1.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<0>));
+	ym1.add_route(0, "mono", 0.20);
+	ym1.add_route(1, "mono", 0.20);
+	ym1.add_route(2, "mono", 0.20);
+	ym1.add_route(3, "mono", 0.40);
+
+	ym3812_device &ym2(YM3812(config, "ym2", 3'000'000));
+	ym2.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<1>));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
+}
+
+void srdarwin_state::srdarwinb(machine_config &config)
+{
+	srdarwin(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &srdarwin_state::srdarwinb_map);
+
+	config.device_remove("mcu");
+	config.set_perfect_quantum("");
 }
 
 void oscar_state::cobracom(machine_config &config)
 {
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 2000000);  /* MC68B09EP */
+	// basic machine hardware
+	MC6809E(config, m_maincpu, 1'500'000); // MC68B09EP
 	m_maincpu->set_addrmap(AS_PROGRAM, &oscar_state::cobra_map);
 
-	M6502(config, m_audiocpu, 1500000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &oscar_state::dec8_s_map); /* NMIs are caused by the main CPU */
+	R65C02(config, m_audiocpu, 1'500'000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &oscar_state::dec8_s_map); // NMIs are caused by the main CPU
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
@@ -2375,11 +2478,7 @@ void oscar_state::cobracom(machine_config &config)
 	m_spritegen_mxc->set_colpri_callback(FUNC(oscar_state::cobracom_colpri_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 58Hz, 529us Vblank duration */
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	set_screen_raw_params_data_east(config);
+	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(oscar_state::screen_update_cobracom));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -2389,37 +2488,43 @@ void oscar_state::cobracom(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(oscar_state,cobracom)
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
-	ym1.add_route(0, "mono", 0.53);
-	ym1.add_route(1, "mono", 0.53);
-	ym1.add_route(2, "mono", 0.53);
-	ym1.add_route(3, "mono", 0.50);
+	INPUT_MERGER_ANY_HIGH(config, m_soundirq);
+	m_soundirq->output_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
-	ym3812_device &ym2(YM3812(config, "ym2", 3000000));
-	ym2.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
+	ym2203_device &ym1(YM2203(config, "ym1", 1'500'000));
+	ym1.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<0>));
+	ym1.add_route(0, "mono", 0.20);
+	ym1.add_route(1, "mono", 0.20);
+	ym1.add_route(2, "mono", 0.20);
+	ym1.add_route(3, "mono", 0.40);
+
+	ym3812_device &ym2(YM3812(config, "ym2", 3'000'000));
+	ym2.irq_handler().set(m_soundirq, FUNC(input_merger_device::in_w<1>));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
 }
+
 
 /******************************************************************************/
 
 ROM_START( lastmisn )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "last_mission_dl03-8.13h", 0x08000, 0x08000, CRC(a4f8d54b) SHA1(4525826fa5d12c22e0f3bc1c3a9673b86a34aad1) ) /* Rev 8 roms */
+	ROM_LOAD( "last_mission_dl03-8.13h", 0x08000, 0x08000, CRC(a4f8d54b) SHA1(4525826fa5d12c22e0f3bc1c3a9673b86a34aad1) ) // Rev 8 roms
 	ROM_LOAD( "last_mission_dl04-5.7h",  0x10000, 0x10000, CRC(7dea1552) SHA1(920684413e2ba4313111e79821c5714977b26b1a) )
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "last_mission_dl02-5.18h", 0x0000, 0x10000, CRC(ec9b5daf) SHA1(86d47bad123676abc82dd7c92943878c54c33075) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) BAD_DUMP ) /* not verified to be the same data as the "A" MCU dump */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
+	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) BAD_DUMP ) // not verified to be the same data as the "A" MCU dump
 
 	ROM_REGION( 0x08000, "char", 0 )
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2439,23 +2544,23 @@ ROM_START( lastmisn )
 	ROM_LOAD( "last_mission_dl07-.15k",   0x40000, 0x10000, CRC(1b60604d) SHA1(1ee15cfdac87f7eeb92050766293b894cfad1466) )
 	ROM_LOAD( "last_mission_dl06-.17k",   0x60000, 0x10000, CRC(c43c26a7) SHA1(896e278935b100edc12cd970469f2e8293eb96cc) )
 
-	ROM_REGION( 256, "proms", 0 )
-	ROM_LOAD( "dl-14.9c",    0x00000,  0x100,  CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) )    /* Priority (Not yet used) */
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "dl-14.9c",    0x0000, 0x0100, CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) ) // Priority (Not yet used)
 ROM_END
 
 ROM_START( lastmisnu6 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "last_mission_dl03-6.13h", 0x08000, 0x08000, CRC(47751a5e) SHA1(190970a6eb849781e8853f2bed7b34ac44e569ca) ) /* Rev 6 roms */
+	ROM_LOAD( "last_mission_dl03-6.13h", 0x08000, 0x08000, CRC(47751a5e) SHA1(190970a6eb849781e8853f2bed7b34ac44e569ca) ) // Rev 6 roms
 	ROM_LOAD( "last_mission_dl04-5.7h",  0x10000, 0x10000, CRC(7dea1552) SHA1(920684413e2ba4313111e79821c5714977b26b1a) )
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "last_mission_dl02-5.18h", 0x0000, 0x10000, CRC(ec9b5daf) SHA1(86d47bad123676abc82dd7c92943878c54c33075) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) ) // Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data
 
 	ROM_REGION( 0x08000, "char", 0 )
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2475,23 +2580,23 @@ ROM_START( lastmisnu6 )
 	ROM_LOAD( "last_mission_dl07-.15k",   0x40000, 0x10000, CRC(1b60604d) SHA1(1ee15cfdac87f7eeb92050766293b894cfad1466) )
 	ROM_LOAD( "last_mission_dl06-.17k",   0x60000, 0x10000, CRC(c43c26a7) SHA1(896e278935b100edc12cd970469f2e8293eb96cc) )
 
-	ROM_REGION( 256, "proms", 0 )
-	ROM_LOAD( "dl-14.9c",    0x00000,  0x100,  CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) )    /* Priority (Not yet used) */
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "dl-14.9c",    0x0000, 0x0100, CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) ) // Priority (Not yet used)
 ROM_END
 
 ROM_START( lastmisnu5 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "last_mission_dl03-5.13h", 0x08000, 0x08000, CRC(357f5f6b) SHA1(a114aac50db62a6bcb943681e517ad7c88ec47f4) ) /* Rev 5 roms */
+	ROM_LOAD( "last_mission_dl03-5.13h", 0x08000, 0x08000, CRC(357f5f6b) SHA1(a114aac50db62a6bcb943681e517ad7c88ec47f4) ) // Rev 5 roms
 	ROM_LOAD( "last_mission_dl04-5.7h",  0x10000, 0x10000, CRC(7dea1552) SHA1(920684413e2ba4313111e79821c5714977b26b1a) )
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "last_mission_dl02-5.18h", 0x0000, 0x10000, CRC(ec9b5daf) SHA1(86d47bad123676abc82dd7c92943878c54c33075) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) ) // Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data
 
 	ROM_REGION( 0x08000, "char", 0 )
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2511,8 +2616,8 @@ ROM_START( lastmisnu5 )
 	ROM_LOAD( "last_mission_dl07-.15k",   0x40000, 0x10000, CRC(1b60604d) SHA1(1ee15cfdac87f7eeb92050766293b894cfad1466) )
 	ROM_LOAD( "last_mission_dl06-.17k",   0x60000, 0x10000, CRC(c43c26a7) SHA1(896e278935b100edc12cd970469f2e8293eb96cc) )
 
-	ROM_REGION( 256, "proms", 0 )
-	ROM_LOAD( "dl-14.9c",    0x00000,  0x100,  CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) )    /* Priority (Not yet used) */
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "dl-14.9c",    0x00000, 0x0100, CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) ) // Priority (Not yet used)
 ROM_END
 
 ROM_START( lastmisnj )
@@ -2520,14 +2625,14 @@ ROM_START( lastmisnj )
 	ROM_LOAD( "dl03-.13h",   0x08000, 0x08000, CRC(4be5e7e1) SHA1(9f943658663da31947cebdcbcb5f4e2be0714c06) )
 	ROM_LOAD( "dl04-.7h",    0x10000, 0x10000, CRC(f026adf9) SHA1(4ccd0e714a6eb7cee388c93beee2d5510407c961) )
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "dl02-.18h",   0x0000, 0x10000, CRC(d0de2b5d) SHA1(e0bb34c2a2ef6fc6f05ab9a98bd23a39004c0c05) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    // created from dump of the US version
-	ROM_LOAD( "last_mission_japan.18a", 0x0000, 0x1000, BAD_DUMP CRC(0d58c3a1) SHA1(184e75324b7ab2de8e6441f0c954046db80b2640) ) /* correct ROM label when real MCU is dumped */
+	ROM_REGION( 0x1000, "mcu", 0 ) // created from dump of the US version
+	ROM_LOAD( "last_mission_japan.18a", 0x0000, 0x1000, BAD_DUMP CRC(0d58c3a1) SHA1(184e75324b7ab2de8e6441f0c954046db80b2640) ) // correct ROM label when real MCU is dumped
 
 	ROM_REGION( 0x08000, "char", 0 )
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2547,27 +2652,27 @@ ROM_START( lastmisnj )
 	ROM_LOAD( "last_mission_dl07-.15k",   0x40000, 0x10000, CRC(1b60604d) SHA1(1ee15cfdac87f7eeb92050766293b894cfad1466) )
 	ROM_LOAD( "last_mission_dl06-.17k",   0x60000, 0x10000, CRC(c43c26a7) SHA1(896e278935b100edc12cd970469f2e8293eb96cc) )
 
-	ROM_REGION( 256, "proms", 0 )
-	ROM_LOAD( "dl-14.9c",    0x00000,  0x100,  CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) )    /* Priority (Not yet used) */
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "dl-14.9c",    0x0000, 0x0100, CRC(2e55aa12) SHA1(c0f2b9649467eb9d2c1e47589b5990f5c5e8cc93) ) // Priority (Not yet used)
 ROM_END
 
 ROM_START( shackled )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "dk-02.13h", 0x08000, 0x08000, CRC(87f8fa85) SHA1(1cb93a60eefdb453a3cc6ec9c5cc2e367fb8aeb0) )
 	ROM_LOAD( "dk-06.7h",  0x10000, 0x10000, CRC(69ad62d1) SHA1(1aa23b12ab4f1908cddd25f091e1f9bd70a5113c) )
-	ROM_LOAD( "dk-05.8h",  0x20000, 0x10000, CRC(598dd128) SHA1(10843c5352eef03c8675df6abaf23c9c9c795aa3) )
+	ROM_LOAD( "dk-05.9h",  0x20000, 0x10000, CRC(598dd128) SHA1(10843c5352eef03c8675df6abaf23c9c9c795aa3) )
 	ROM_LOAD( "dk-04.10h", 0x30000, 0x10000, CRC(36d305d4) SHA1(17586c316aff405cf20c1467d69c98fa2a3c2630) )
 	ROM_LOAD( "dk-03.11h", 0x40000, 0x08000, CRC(6fd90fd1) SHA1(2f8db17e5545c82d243a7e23e7bda2c2a9101360) )
 	ROM_RELOAD(            0x48000, 0x08000 )
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "dk-01.18h", 0x00000, 0x10000, CRC(71fe3bda) SHA1(959cce01362b2c670c2e15b03a78a1ff9cea4ee9) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dk-07.5h", 0x08000, 0x08000, CRC(887e4bcc) SHA1(6427396080e9cd8647adff47c8ed04593a14268c) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H (fake) MCU (based on 'breywood' with ID byte changed from 00 to 01) */
-	ROM_LOAD( "dk-e.18a", 0x0000, 0x1000, CRC(1af06149) SHA1(b9cb2a4986dbcfc78b0cbea2c1e2bdac1db479cd) BAD_DUMP ) /* Hand written "E" */
+	ROM_REGION( 0x1000, "mcu", 0 ) // ID8751H (fake) MCU (based on 'breywood' with ID byte changed from 00 to 01)
+	ROM_LOAD( "dk-e.18a", 0x0000, 0x1000, CRC(1af06149) SHA1(b9cb2a4986dbcfc78b0cbea2c1e2bdac1db479cd) BAD_DUMP ) // Hand written "E"
 
 	ROM_REGION( 0x08000, "char", 0 )
 	ROM_LOAD( "dk-00.2a", 0x00000, 0x08000, CRC(69b975aa) SHA1(38cb96768c79ff1aa1b4b190e08ec9155baf698a) )
@@ -2588,26 +2693,26 @@ ROM_START( shackled )
 	ROM_LOAD( "dk-09.15k", 0x40000, 0x10000, CRC(c1557fac) SHA1(7d39ec793113a48baf45c2ea07abb07e2e48985a) )
 	ROM_LOAD( "dk-08.17k", 0x60000, 0x10000, CRC(5e54e9f5) SHA1(1ab41a3bde1f2c2be670e89cf402be28001c17d1) )
 
-	ROM_REGION( 256, "proms", 0 )
-	ROM_LOAD( "dk-20.9c", 0x00000, 0x100, CRC(ff3cd588) SHA1(7360a9f046d517885d456d89026d047fb1fd8d5a) )    /* Priority (Not yet used) BPROM type MB7052 */
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "dk-20.9c", 0x0000, 0x0100, CRC(ff3cd588) SHA1(7360a9f046d517885d456d89026d047fb1fd8d5a) ) // Priority (Not yet used) BPROM type MB7052
 ROM_END
 
 ROM_START( breywood )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "dj02-2.13h", 0x08000, 0x08000, CRC(c19856b9) SHA1(766994703bb59879c311675353d7231ad27c7c16) )
 	ROM_LOAD( "dj06-2.7h",  0x10000, 0x10000, CRC(2860ea02) SHA1(7ac090c3ae9d71baa6227ec9555f1c9f2d25ea0d) )
-	ROM_LOAD( "dj05-2.8h",  0x20000, 0x10000, CRC(0fdd915e) SHA1(262df956dfc727c710ade28af7f33fddaafd7ee2) )
+	ROM_LOAD( "dj05-2.9h",  0x20000, 0x10000, CRC(0fdd915e) SHA1(262df956dfc727c710ade28af7f33fddaafd7ee2) )
 	ROM_LOAD( "dj04-2.10h", 0x30000, 0x10000, CRC(71036579) SHA1(c58ff3222b5bcd75d58c5f282554e92103e80916) )
 	ROM_LOAD( "dj03-2.11h", 0x40000, 0x08000, CRC(308f4893) SHA1(539c138ff01c5718cc8a982482b989468d532699) )
 	ROM_RELOAD(             0x48000, 0x08000 )
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "dj1-2y.18h", 0x0000, 0x10000, CRC(3d9fb623) SHA1(6e5eaad9bb0a432e2da5da5b18a2ed36617bdde2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dj07-1.5h", 0x8000, 0x8000, CRC(4a471c38) SHA1(963ed7b6afeefdfc2cf0d65b0998f973330e6495) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "dj.18a", 0x0000, 0x1000, CRC(4cb20332) SHA1(e0bbba7be22e7bcff82fb0ae441410e559ec4566) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -2629,8 +2734,8 @@ ROM_START( breywood )
 	ROM_LOAD( "dj09.15k", 0x40000, 0x10000, CRC(e37d5dbe) SHA1(ff79b4f6d8b0a3061e78d15480df0155650f347f) )
 	ROM_LOAD( "dj08.17k", 0x60000, 0x10000, CRC(beee880f) SHA1(9a818a75cbec425a13f629bda6d50aa341aa1896) )
 
-	ROM_REGION( 256, "proms", 0 )
-	ROM_LOAD( "dk-20.9c", 0x00000, 0x100, CRC(ff3cd588) SHA1(7360a9f046d517885d456d89026d047fb1fd8d5a) )    /* Priority (Not yet used) BPROM type MB7052 */
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "dk-20.9c", 0x0000, 0x0100, CRC(ff3cd588) SHA1(7360a9f046d517885d456d89026d047fb1fd8d5a) ) // Priority (Not yet used) BPROM type MB7052
 ROM_END
 
 ROM_START( gondo )
@@ -2643,7 +2748,7 @@ ROM_START( gondo )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dt05-e.h5", 0x8000, 0x8000, CRC(ec08aa29) SHA1(ce83974ae095d9518d1ebf9f7e712f0cbc2c1b42) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "dt-e.b1", 0x0000, 0x1000, BAD_DUMP CRC(0d0532ec) SHA1(30894f69ff24c1be4b684e07729bbb3e0f353086) ) // hand-crafted from the US version
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -2673,8 +2778,8 @@ ROM_START( gondo )
 	ROM_CONTINUE(         0x70000, 0x08000 )
 	ROM_LOAD( "dt11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
-	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "ds-23.b10", 0x0000, 0x0400, CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for Priority (Not yet used)
 ROM_END
 
 ROM_START( gondou )
@@ -2687,7 +2792,7 @@ ROM_START( gondou )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dt05.h5", 0x8000, 0x8000, CRC(ec08aa29) SHA1(ce83974ae095d9518d1ebf9f7e712f0cbc2c1b42) ) // == dt05-e.h5
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "dt-a.b1", 0x0000, 0x1000, CRC(03abceeb) SHA1(a16b779d7cea1c1437f85fa6b6e08894a46a5674) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -2717,8 +2822,8 @@ ROM_START( gondou )
 	ROM_CONTINUE(         0x70000, 0x08000 )
 	ROM_LOAD( "dt11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
-	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "ds-23.b10", 0x0000, 0x0400, CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for Priority (Not yet used)
 ROM_END
 
 ROM_START( makyosen )
@@ -2731,7 +2836,7 @@ ROM_START( makyosen )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ds05.h5",  0x8000, 0x8000, CRC(e6e28ca9) SHA1(3b1f8219331db1910bfb428f8964f8fc1063df6f) ) // == dt05-e.h5
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "ds.b1",  0x0000, 0x1000, CRC(08f36e35) SHA1(e8913da71704a89fad41d5bfba45682119166681) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -2761,13 +2866,13 @@ ROM_START( makyosen )
 	ROM_CONTINUE(         0x70000, 0x08000 )
 	ROM_LOAD( "ds11.h15", 0x68000, 0x08000, CRC(53e9cf17) SHA1(8cbb45154a60f42f1b1e7299b12d2e92fc194df8) )
 
-	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "ds-23.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) /* BPROM type MB7122E for Priority (Not yet used) */
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "ds-23.b10", 0x0000, 0x0400, CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for Priority (Not yet used)
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "pal16r4nc.u10", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r4nc.g11", 0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r4nc.s1",  0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16r4nc.u10", 0x0000, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r4nc.g11", 0x0200, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r4nc.s1",  0x0400, 0x0104, NO_DUMP ) // PAL is read protected
 ROM_END
 
 ROM_START( garyoret )
@@ -2781,11 +2886,11 @@ ROM_START( garyoret )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dv05", 0x08000, 0x08000, CRC(c97c347f) SHA1(a1b22733dc15d524af97db3e608a82503a49b182) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H (fake) MCU based on 'gondo' one */
+	ROM_REGION( 0x1000, "mcu", 0 ) // ID8751H (fake) MCU based on 'gondo' one
 	ROM_LOAD( "dv__.mcu", 0x0000, 0x1000, BAD_DUMP CRC(37cacec6) SHA1(d81fe36939ccac784a83a69dfc6898b22a4515ec) )
 
 	ROM_REGION( 0x08000, "char", 0 )
-	ROM_LOAD( "dv14", 0x00000, 0x08000, CRC(fb2bc581) SHA1(d597976c5ae586166c49051cc3de8cf0c2e5a5e1) )    /* Characters */
+	ROM_LOAD( "dv14", 0x00000, 0x08000, CRC(fb2bc581) SHA1(d597976c5ae586166c49051cc3de8cf0c2e5a5e1) ) // Characters
 
 	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD( "dv22", 0x00000, 0x10000, CRC(cef0367e) SHA1(8beb3a6b91ec0a6ec052243c8f626a581d349f65) )
@@ -2827,10 +2932,10 @@ ROM_START( ghostb )
 	ROM_LOAD( "dz04-21.6d", 0x30000, 0x10000, CRC(7d46582f) SHA1(22e70675d76e2a93a732370fa42cc4b79381f4b0) )
 	ROM_LOAD( "dz05-21.7d", 0x40000, 0x10000, CRC(23e1c758) SHA1(c6432682e1d4429d0cfa8de6a05ca0152611b5b1) )
 
-	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "dz-1.1b", 0x0000, 0x1000, CRC(9f5f3cb5) SHA1(5ef2b8a5411dde28277d9364db014763019ecf15) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -2865,10 +2970,10 @@ ROM_START( ghostb2a )
 	ROM_LOAD( "dz04.6d", 0x30000, 0x10000, CRC(d09bad99) SHA1(bde8e4316cedf1d292f0aed8627b0dc6794c6e07) )
 	ROM_LOAD( "dz05.7d", 0x40000, 0x10000, CRC(0315f691) SHA1(3bfad18b9f230e64c608a22af20c3b00dca3e6da) )
 
-	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "dz-1.1b", 0x0000, 0x1000, CRC(9f5f3cb5) SHA1(5ef2b8a5411dde28277d9364db014763019ecf15) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -2903,10 +3008,10 @@ ROM_START( ghostb3 )
 	ROM_LOAD( "dz04-1.6d",  0x30000, 0x10000, CRC(3c3eb09f) SHA1(ae4975992698fa97c68a857a25b470a05539160a) )
 	ROM_LOAD( "dz05-1.7d",  0x40000, 0x10000, CRC(b4971d33) SHA1(25e052c4b414c7bd7b6e3ae9c211873902afb5f7) )
 
-	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "dz-1.1b", 0x0000, 0x1000, CRC(9f5f3cb5) SHA1(5ef2b8a5411dde28277d9364db014763019ecf15) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -2933,8 +3038,7 @@ ROM_START( ghostb3 )
 	ROM_LOAD( "dz20a.11d", 0x0400, 0x0400, CRC(d8fe2d99) SHA1(56f8fcf2f871c7d52d4299a5b9988401ada4319d) )
 ROM_END
 
-// DZ-1 is the verified correct MCU code for the ghostb3a set below - program ROMs work on a real PCB, but stall here in the demo mode
-// Both DZ01-2 & DZ04- ROMs have been verified correct from multiple sources
+// DZ-1 is the verified correct MCU code for the ghostb3a set below, both DZ01-2 & DZ04- ROMs have been verified correct from multiple sources
 ROM_START( ghostb3a )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "dz01-2.1d", 0x08000, 0x08000, CRC(1b16890e) SHA1(eebd253d616b6286937b72cfb64612877f383932) )
@@ -2943,10 +3047,10 @@ ROM_START( ghostb3a )
 	ROM_LOAD( "dz04-.6d",  0x30000, 0x10000, CRC(490b4525) SHA1(3066b76f8fe99c8f9f1cdf943209883a199a4184) )
 	ROM_LOAD( "dz05-.7d",  0x40000, 0x10000, CRC(b4971d33) SHA1(25e052c4b414c7bd7b6e3ae9c211873902afb5f7) ) // == dz05-1.7d (ghostb3)
 
-	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "dz-1.1b", 0x0000, 0x1000, CRC(9f5f3cb5) SHA1(5ef2b8a5411dde28277d9364db014763019ecf15) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -2974,6 +3078,7 @@ ROM_START( ghostb3a )
 ROM_END
 
 /*
+
 Meikyuu Hunter G (Data East, 1987)
 Hardware info by Guru
 
@@ -3017,8 +3122,8 @@ Notes:
       VSync       - 58Hz
       HSync       - 15.68kHz
       ROMs -
-            DW00/DW01/DW05    - 27C256
-            DW02/DW03/DW04    \
+            DW00/DW01/DW05      - 27C256
+            DW02/DW03/DW04      \
             DW06/DW07/DW08/DW09 / 27C512
             DW18 - Fujitsu MB7132, compatible with Philips 82S181
             DW19 - Fujitsu MB7122, compatible with Philips 82S137
@@ -3068,7 +3173,7 @@ ROM_START( meikyuh )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dw05.5f", 0x8000, 0x8000, CRC(c28c4d82) SHA1(ad88506bcbc9763e39d6e6bb25ef2bd6aa929f30) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "dw.1b", 0x0000, 0x1000, CRC(28e9ced9) SHA1(a3d6dfa1e44fa93c0f30fa0a88b6dd3d6e5c4dda) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -3150,6 +3255,7 @@ There is a small piggyback attached under CPUs PCB full of 74Sxx
 ALL MEMORIES ARE MASK ROMS!
 
 */
+
 ROM_START( meikyuhbl )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "27256.1d", 0x08000, 0x08000, CRC(d5b5e8a2) SHA1(0155d1d0ddbd764b960148c3c9ef34223e101659) ) // dw-01-5.1d matched 6.552124%
@@ -3160,7 +3266,7 @@ ROM_START( meikyuhbl )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "27256.5f", 0x8000, 0x8000, CRC(c28c4d82) SHA1(ad88506bcbc9763e39d6e6bb25ef2bd6aa929f30) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller - should be unpopulated
 	ROM_LOAD( "dw.1b", 0x0000, 0x1000, CRC(28e9ced9) SHA1(a3d6dfa1e44fa93c0f30fa0a88b6dd3d6e5c4dda) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -3194,6 +3300,9 @@ ROM_START( meikyuhbl )
 ROM_END
 
 /*
+
+Captain Silver
+
 Main Components
 ---------------
 
@@ -3240,45 +3349,44 @@ Lower board (DATA EAST DE-0251-2):
 
 */
 
-
 ROM_START( csilver )
 	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "dx03-12.18d", 0x08000, 0x08000, CRC(2d926e7c) SHA1(cf38e92904edb1870b0a4965f9049d67efe8cf6a) )
 	ROM_LOAD( "dx01.12d", 0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) )
 	ROM_LOAD( "dx02.13d", 0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) )
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "dx04-1.19d", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dx05.3f", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	// 017F: B4 4C 0D : cjne  a,#$4C,$018F   (ID code 0x4c = World version)
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
+	// 017F: B4 4C 0D : cjne  a,#$4C,$018F (ID code 0x4c = World version)
 	ROM_LOAD( "dx-8.19a", 0x0000, 0x1000, CRC(c0266263) SHA1(27ac6fa4af7195f04249c04dec168ab82158704e) )
 
 	ROM_REGION( 0x08000, "char", 0 )
 	ROM_LOAD( "dx00.3d",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) )
 
-	ROM_REGION( 0x80000, "sprites", 0 )    // 3bpp
+	ROM_REGION( 0x80000, "sprites", 0 ) // 3bpp
 	ROM_LOAD( "dx14.15k",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) )
-	/* 0x10000-0x1ffff empty */
+	// 0x10000-0x1ffff empty
 	ROM_LOAD( "dx13.13k",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) )
-	/* 0x30000-0x3ffff empty */
+	// 0x30000-0x3ffff empty
 	ROM_LOAD( "dx12.10k",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) )
-	/* 0x50000-0x5ffff empty */
-	/* 0x60000-0x7ffff empty (no 4th plane) */
+	// 0x50000-0x5ffff empty
+	// 0x60000-0x7ffff empty (no 4th plane)
 
-	ROM_REGION( 0x80000, "tiles1", 0 )    // 3bpp
+	ROM_REGION( 0x80000, "tiles1", 0 ) // 3bpp
 	ROM_LOAD( "dx06.5f",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) )
 	ROM_LOAD( "dx07.7f",  0x10000, 0x10000, CRC(ee3e1817) SHA1(013496976a9ffacf1587b3a6fc0f548becb1ab0e) )
 	ROM_LOAD( "dx08.8f",  0x20000, 0x10000, CRC(705900fe) SHA1(53b9d09f9780a3bf3545bc27a2855ebee3884124) )
 	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
-	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
-	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
+	ROM_LOAD( "dx10.12f", 0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
+	ROM_LOAD( "dx11.13f", 0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
 
-	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "dx-15.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "dx-15.b10", 0x0000, 0x0400, CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
 ROM_END
 
 // There is known to exist an identical ROM set with different PCB locations designated for an alternate ROM board (noted on the right of the ROM definition)
@@ -3288,38 +3396,38 @@ ROM_START( csilverj )
 	ROM_LOAD( "dx01.12d",   0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) ) // dx01.a2
 	ROM_LOAD( "dx02.13d",   0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) ) // dx01.a3
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "dx04-1.19d", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) ) // dx04-1.a5
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dx05.3f", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) ) // dx05.a6
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	// hand modified version of csilver ROM
 	ROM_LOAD( "id8751h_japan.mcu", 0x0000, 0x1000, BAD_DUMP CRC(6e801217) SHA1(2d8f7ae533dd8146acf8461d61ddd839544adf55) )
 
 	ROM_REGION( 0x08000, "char", 0 )
 	ROM_LOAD( "dx00.3d",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) ) // dx00.a1
 
-	ROM_REGION( 0x80000, "sprites", 0 )    // 3bpp
+	ROM_REGION( 0x80000, "sprites", 0 ) // 3bpp
 	ROM_LOAD( "dx14.15k",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) ) // dx14.b5
-	/* 0x10000-0x1ffff empty */
+	// 0x10000-0x1ffff empty
 	ROM_LOAD( "dx13.13k",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) ) // dx13.b4
-	/* 0x30000-0x3ffff empty */
+	// 0x30000-0x3ffff empty
 	ROM_LOAD( "dx12.10k",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) ) // dx12.b3
-	/* 0x50000-0x5ffff empty */
-	/* 0x60000-0x7ffff empty (no 4th plane) */
+	// 0x50000-0x5ffff empty
+	// 0x60000-0x7ffff empty (no 4th plane)
 
-	ROM_REGION( 0x80000, "tiles1", 0 )    // 3bpp
+	ROM_REGION( 0x80000, "tiles1", 0 ) // 3bpp
 	ROM_LOAD( "dx06.5f",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) ) // dx06.a7
 	ROM_LOAD( "dx07.7f",  0x10000, 0x10000, CRC(ee3e1817) SHA1(013496976a9ffacf1587b3a6fc0f548becb1ab0e) ) // dx07.a8
 	ROM_LOAD( "dx08.8f",  0x20000, 0x10000, CRC(705900fe) SHA1(53b9d09f9780a3bf3545bc27a2855ebee3884124) ) // dx08.a9
 	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) ) // dx09.a10
-	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) ) // dx10.b1
-	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) ) // dx11.b2
+	ROM_LOAD( "dx10.12f", 0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) ) // dx10.b1
+	ROM_LOAD( "dx11.13f", 0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) ) // dx11.b2
 
-	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "dx-15.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "dx-15.b10", 0x0000, 0x0400, CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
 ROM_END
 
 ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
@@ -3328,38 +3436,38 @@ ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
 	ROM_LOAD( "dx01.12d",   0x10000, 0x10000, CRC(570fb50c) SHA1(3002f53182834a060fc282be1bc5767906e19ba2) )
 	ROM_LOAD( "dx02.13d",   0x20000, 0x10000, CRC(58625890) SHA1(503a969085f6dcb16687217c48136ea22d07c89f) )
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "dx04-1.19d", 0x0000, 0x10000,  CRC(29432691) SHA1(a76ecd27d217c66a0e43f93e29efe83c657925c3) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dx05.3f", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	// hand modified version of csilver ROM
 	ROM_LOAD( "id8751h_japan.mcu", 0x0000, 0x1000, BAD_DUMP CRC(6e801217) SHA1(2d8f7ae533dd8146acf8461d61ddd839544adf55) )
 
 	ROM_REGION( 0x08000, "char", 0 )
 	ROM_LOAD( "dx00.3d",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) )
 
-	ROM_REGION( 0x80000, "sprites", 0 )    // 3bpp
+	ROM_REGION( 0x80000, "sprites", 0 ) // 3bpp
 	ROM_LOAD( "dx14.15k",  0x00000, 0x10000, CRC(80f07915) SHA1(ea100f12ef3a68110af911fa9beeb73b388f069d) )
-	/* 0x10000-0x1ffff empty */
+	// 0x10000-0x1ffff empty
 	ROM_LOAD( "dx13.13k",  0x20000, 0x10000, CRC(d32c02e7) SHA1(d0518ec31e9e3f7b4e76fba5d7c05c33c61a9c72) )
-	/* 0x30000-0x3ffff empty */
+	// 0x30000-0x3ffff empty
 	ROM_LOAD( "dx12.10k",  0x40000, 0x10000, CRC(ac78b76b) SHA1(c2be347fd950894401123ada8b27bfcfce53e66b) )
-	/* 0x50000-0x5ffff empty */
-	/* 0x60000-0x7ffff empty (no 4th plane) */
+	// 0x50000-0x5ffff empty
+	// 0x60000-0x7ffff empty (no 4th plane)
 
-	ROM_REGION( 0x80000, "tiles1", 0 )    // 3bpp
+	ROM_REGION( 0x80000, "tiles1", 0 ) // 3bpp
 	ROM_LOAD( "dx06.5f",  0x00000, 0x10000, CRC(b6fb208c) SHA1(027d33f0b5feb6f0433134213cfcef96790eaace) )
 	ROM_LOAD( "dx07.7f",  0x10000, 0x10000, CRC(ee3e1817) SHA1(013496976a9ffacf1587b3a6fc0f548becb1ab0e) )
 	ROM_LOAD( "dx08.8f",  0x20000, 0x10000, CRC(705900fe) SHA1(53b9d09f9780a3bf3545bc27a2855ebee3884124) )
 	ROM_LOAD( "dx09.10f", 0x30000, 0x10000, CRC(3192571d) SHA1(240c6c099f1e6edbf0be7d5a4ec396b056c9f70f) )
-	ROM_LOAD( "dx10.12f",  0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
-	ROM_LOAD( "dx11.13f",  0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
+	ROM_LOAD( "dx10.12f", 0x40000, 0x10000, CRC(3ef77a32) SHA1(97b97c35a6ca994d2e7a6e7a63101eda9709bcb1) )
+	ROM_LOAD( "dx11.13f", 0x50000, 0x10000, CRC(9cf3d5b8) SHA1(df4974f8412ab1cf65871b8e4e3dbee478bf4d21) )
 
-	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "dx-15.b10", 0x00000,  0x400,  CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "dx-15.b10", 0x0000, 0x400, CRC(dcbfec4e) SHA1(a375caef4575746870e285d90ba991ea7daefad6) ) // BPROM type MB7122E for priority (Not yet used), location on alternate board unknown
 ROM_END
 
 ROM_START( oscar )
@@ -3367,10 +3475,10 @@ ROM_START( oscar )
 	ROM_LOAD( "du10", 0x08000, 0x08000, CRC(120040d8) SHA1(22d5f84f3ca724cbf39dfc4790f2175ba4945aaf) ) // This label is probably incorrect. The correct label is needed
 	ROM_LOAD( "ed09", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) ) // for the world set because DU is the code for the Japanese version
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "du11", 0x0000, 0x10000, CRC(ff45c440) SHA1(4769944bcfebcdcba7ed7d5133d4d9f98890d75c) )
 
-	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -3389,7 +3497,7 @@ ROM_START( oscar )
 	ROM_LOAD( "ed02", 0x60000, 0x10000, CRC(7ddc5651) SHA1(f5ec5245cf3d9d4d9c1df6a8128c24565e331317) )
 ROM_END
 
-ROM_START( oscarbl )  // very similar to the original, main difference it's it uses a standard M6502 for sound with predecrypted opcodes.
+ROM_START( oscarbl ) // very similar to the original, main difference it's it uses a standard M6502 for sound with predecrypted opcodes.
 	ROM_REGION( 0x20000, "maincpu", 0 ) // same as the original
 	ROM_LOAD( "m27c256.3",  0x08000, 0x08000, CRC(120040d8) SHA1(22d5f84f3ca724cbf39dfc4790f2175ba4945aaf) )
 	ROM_LOAD( "at27c512.2", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
@@ -3421,10 +3529,10 @@ ROM_START( oscaru )
 	ROM_LOAD( "ed10", 0x08000, 0x08000, CRC(f9b0d4d4) SHA1(dc2aba978ba96f365027c7be5714728d5d7fb802) )
 	ROM_LOAD( "ed09", 0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "ed11", 0x0000, 0x10000,  CRC(10e5d919) SHA1(13bc3497cb4aaa6dd272853819212ad63656f8a7) )
 
-	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "ed12", 0x8000, 0x8000,  CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -3442,8 +3550,8 @@ ROM_START( oscaru )
 	ROM_LOAD( "ed00", 0x40000, 0x10000, CRC(ac201f2d) SHA1(77f13eb6a1a44444ca9b25363031451b0d68c988) )
 	ROM_LOAD( "ed02", 0x60000, 0x10000, CRC(7ddc5651) SHA1(f5ec5245cf3d9d4d9c1df6a8128c24565e331317) )
 
-	ROM_REGION( 512, "proms", 0 )
-	ROM_LOAD( "du-13.bin", 0x00000,  0x200,  CRC(bea1f87e) SHA1(f5215992e4b53c9cd4c7e0b20ff5cfdce3ab6d02) )    /* Priority (Not yet used) */
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "du-13.bin", 0x0000, 0x0200, CRC(bea1f87e) SHA1(f5215992e4b53c9cd4c7e0b20ff5cfdce3ab6d02) ) // Priority (Not yet used)
 ROM_END
 
 ROM_START( oscarj1 )
@@ -3451,10 +3559,10 @@ ROM_START( oscarj1 )
 	ROM_LOAD( "du10-1", 0x08000, 0x08000, CRC(4ebc9f7a) SHA1(df8fdc4b4b203dc1bdd048f069fb6b723bdea0d2) )
 	ROM_LOAD( "ed09",   0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "du11", 0x0000, 0x10000, CRC(ff45c440) SHA1(4769944bcfebcdcba7ed7d5133d4d9f98890d75c) )
 
-	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -3472,8 +3580,8 @@ ROM_START( oscarj1 )
 	ROM_LOAD( "ed00", 0x40000, 0x10000, CRC(ac201f2d) SHA1(77f13eb6a1a44444ca9b25363031451b0d68c988) )
 	ROM_LOAD( "ed02", 0x60000, 0x10000, CRC(7ddc5651) SHA1(f5ec5245cf3d9d4d9c1df6a8128c24565e331317) )
 
-	ROM_REGION( 512, "proms", 0 )
-	ROM_LOAD( "du-13.bin", 0x00000,  0x200,  CRC(bea1f87e) SHA1(f5215992e4b53c9cd4c7e0b20ff5cfdce3ab6d02) )    /* Priority (Not yet used) */
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "du-13.bin", 0x0000, 0x0200, CRC(bea1f87e) SHA1(f5215992e4b53c9cd4c7e0b20ff5cfdce3ab6d02) ) // Priority (Not yet used)
 ROM_END
 
 /***************************************************************************
@@ -3552,16 +3660,15 @@ Notes:
 
 ***************************************************************************/
 
-
 ROM_START( oscarj2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "du10-2.h12", 0x08000, 0x08000, CRC(114e898d) SHA1(1072ccabe6d53c50cdfa1e27d5d848ecdd6559cc) )
 	ROM_LOAD( "du09.h10",   0x10000, 0x10000, CRC(e2d4bba9) SHA1(99f0310debe51f4bcd00b5fdaedc1caf2eeccdeb) )
 
-	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
+	ROM_REGION( 0x10000, "sub", 0 ) // CPU 2, 1st 16k is empty
 	ROM_LOAD( "du11.h16", 0x0000, 0x10000, CRC(ff45c440) SHA1(4769944bcfebcdcba7ed7d5133d4d9f98890d75c) )
 
-	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "du12.k5", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -3579,8 +3686,8 @@ ROM_START( oscarj2 )
 	ROM_LOAD( "du00.a1", 0x40000, 0x10000, CRC(ac201f2d) SHA1(77f13eb6a1a44444ca9b25363031451b0d68c988) )
 	ROM_LOAD( "du02.a5", 0x60000, 0x10000, CRC(7ddc5651) SHA1(f5ec5245cf3d9d4d9c1df6a8128c24565e331317) )
 
-	ROM_REGION( 512, "proms", 0 )
-	ROM_LOAD( "du-13.c8", 0x00000,  0x200,  CRC(bea1f87e) SHA1(f5215992e4b53c9cd4c7e0b20ff5cfdce3ab6d02) )    /* Priority (Not yet used) */
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "du-13.c8", 0x0000, 0x0200, CRC(bea1f87e) SHA1(f5215992e4b53c9cd4c7e0b20ff5cfdce3ab6d02) ) // Priority (Not yet used)
 ROM_END
 
 ROM_START( srdarwin )
@@ -3589,11 +3696,11 @@ ROM_START( srdarwin )
 	ROM_CONTINUE(            0x08000, 0x08000 )
 	ROM_LOAD( "dy_00.b16",   0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
 
-	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "dy_04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
-	// 0160: B4 6B 0D : cjne  a,#$6B,$0170   (ID code 0x6b = World version)
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
+	// 0160: B4 6B 0D : cjne  a,#$6B,$0170 (ID code 0x6b = World version)
 	ROM_LOAD( "dy-e.d11", 0x0000, 0x1000, CRC(11cd6ca4) SHA1(ec70f84228e37f9fc1bda85fa52a009f61c500b2) )
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -3617,8 +3724,8 @@ ROM_START( srdarwin )
 	ROM_CONTINUE(          0x28000, 0x4000 )
 	ROM_CONTINUE(          0x38000, 0x4000 )
 
-	ROM_REGION( 256, "proms", 0 )
-	ROM_LOAD( "dy_12.f4",  0x00000,  0x100,  CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) )    /* Priority (Not yet used) */
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "dy_12.f4",  0x0000, 0x0100, CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) ) // Priority (Not yet used)
 ROM_END
 
 ROM_START( srdarwinj )
@@ -3627,10 +3734,10 @@ ROM_START( srdarwinj )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 	ROM_LOAD( "dy_00.b16", 0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
 
-	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
 	ROM_LOAD( "dy_04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 microcontroller
 	ROM_LOAD( "dy.d11", 0x0000, 0x1000, BAD_DUMP CRC(4ac2ca9d) SHA1(6e07788df9fcf4248a9d3e87b8c5f54776bd269e) ) // hand-modified copy of world version to correct region + coinage
 
 	ROM_REGION( 0x08000, "char", 0 )
@@ -3654,9 +3761,45 @@ ROM_START( srdarwinj )
 	ROM_CONTINUE(          0x28000, 0x4000 )
 	ROM_CONTINUE(          0x38000, 0x4000 )
 
-	ROM_REGION( 256, "proms", 0 )
-	ROM_LOAD( "dy_12.f4",  0x00000,  0x100,  CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) )    /* Priority (Not yet used) */
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "dy_12.f4",  0x0000, 0x0100, CRC(ebfaaed9) SHA1(5723dbfa3eb3fc4df8c8975b320a5c49848309d8) ) // Priority (Not yet used)
 ROM_END
+
+ROM_START( srdarwinb )
+	ROM_REGION( 0x28000, "maincpu", 0 )
+	ROM_LOAD( "3.bin",  0x20000, 0x08000, CRC(7942b43f) SHA1(15de0c02d45d06c145fba48ef05baae793a1cb46) )
+	ROM_CONTINUE(       0x08000, 0x08000 )
+	ROM_LOAD( "4.bin",  0x10000, 0x10000, CRC(2bf6b461) SHA1(435d922c7b9df7f2b2f774346caed81d330be8a0) )
+
+	ROM_REGION( 2*0x10000, "audiocpu", 0 ) // 64K for sound CPU + 64k for decrypted opcodes
+	ROM_LOAD( "5.bin", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
+
+	ROM_REGION( 0x8000, "char", 0 )
+	ROM_LOAD( "12.bin",  0x0000, 0x4000, CRC(f5c835cd) SHA1(8b41862dc18ba2e2677c94ecef45a40467aa89ad) )
+	ROM_CONTINUE(        0x0000, 0x4000 ) // all data in the 2nd half
+
+	ROM_REGION( 0x30000, "sprites", 0 )
+	ROM_LOAD( "6.bin",   0x00000, 0x8000, CRC(3c84a2c6) SHA1(558a7d9acb5af06a7728d010262e3a35c3cdbe25) )
+	ROM_LOAD( "7.bin",   0x08000, 0x8000, CRC(990cfc7b) SHA1(84ab42010a483e8a4cd86357898f55e644d1b11e) )
+	ROM_LOAD( "10.bin",  0x10000, 0x8000, CRC(cf7dcdc1) SHA1(a94a970ff564da0fef8cd7cdcbf9aee5f83b596c) )
+	ROM_LOAD( "11.bin",  0x18000, 0x8000, CRC(3674e392) SHA1(d91387c2412bf950993751c2e4764f818489316f) )
+	ROM_LOAD( "8.bin",   0x20000, 0x8000, CRC(cc39b73f) SHA1(8cdbef67526f29ccf77c04aec5e34253bcdf96c3) )
+	ROM_LOAD( "9.bin",   0x28000, 0x8000, CRC(d15aaa08) SHA1(69649f0cb2f11107b37ae7914dd90f4c6269316f) )
+
+	ROM_REGION( 0x40000, "tiles1", 0 )
+	ROM_LOAD( "1.bin",  0x00000, 0x4000, CRC(44f2a4f9) SHA1(97368dd112451cd630f2fa5ba54679e84e7d4d97) )
+	ROM_CONTINUE(       0x10000, 0x4000 )
+	ROM_CONTINUE(       0x20000, 0x4000 )
+	ROM_CONTINUE(       0x30000, 0x4000 )
+	ROM_LOAD( "2.bin",  0x08000, 0x4000, CRC(522d9a9e) SHA1(248274ed6df604357cad386fcf0521b26810aa0e) )
+	ROM_CONTINUE(       0x18000, 0x4000 )
+	ROM_CONTINUE(       0x28000, 0x4000 )
+	ROM_CONTINUE(       0x38000, 0x4000 )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s123.bin",  0x0000, 0x0100, NO_DUMP ) // Priority (Not yet used)
+ROM_END
+
 
 ROM_START( cobracom )
 	ROM_REGION( 0x30000, "maincpu", 0 )
@@ -3734,8 +3877,8 @@ ROM_END
 
 ROM_START( cobracomb )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "el11.5j", 0x08000, 0x08000, CRC(c6a102e3) SHA1(51d9781d13a8a98c9bbdf34fa79ebfd8a152567e) ) /* "zero" revision - IE: Original version */
-	ROM_LOAD( "el12.7j", 0x10000, 0x10000, CRC(72b2dab4) SHA1(ff84a04cfe920a0d8105fbbd1f44ee86822cf0d3) ) /* "zero" revision - IE: Original version */
+	ROM_LOAD( "el11.5j", 0x08000, 0x08000, CRC(c6a102e3) SHA1(51d9781d13a8a98c9bbdf34fa79ebfd8a152567e) ) // "zero" revision - IE: Original version
+	ROM_LOAD( "el12.7j", 0x10000, 0x10000, CRC(72b2dab4) SHA1(ff84a04cfe920a0d8105fbbd1f44ee86822cf0d3) ) // "zero" revision - IE: Original version
 	ROM_LOAD( "el13.9j", 0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
@@ -3850,11 +3993,10 @@ ROM_START( cobracomjb )
 ROM_END
 
 
-void lastmisn_state::init_meikyuhbl()
+void ghostb_state::init_meikyuhbl()
 {
 	// this bootleg has the high nibble of the first 0x400 bytes with reversed bits.
 	// Address it here instead of hacking the DECO RM-C3 device.
-
 	u8 *proms = memregion("proms")->base();
 
 	for (int i = 0; i < 0x400; i++)
@@ -3863,40 +4005,56 @@ void lastmisn_state::init_meikyuhbl()
 	m_palette->update();
 }
 
+void srdarwin_state::init_srdarwinb()
+{
+	// this bootleg has the sprite ROMs with bytes swapped.
+	// just worked here to avoid a new gfxdecode and machine driver.
+	u8 *rom = memregion("sprites")->base();
+
+	for (int i = 0; i < 0x30000; i += 4)
+	{
+		u8 byte1 = rom[i + 1];
+
+		rom[i + 1] = rom[i + 2];
+		rom[i + 2] = byte1;
+	}
+}
+
 
 /******************************************************************************/
 
-GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  lastmisn_state, empty_init,     ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  lastmisn_state, empty_init,     ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  lastmisn_state, empty_init,     ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, lastmisn_state, empty_init,     ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, shackled,   0,        shackled, shackled,  lastmisn_state, empty_init,     ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, breywood,   shackled, shackled, breywood,  lastmisn_state, empty_init,     ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondo,      0,        gondo,    gondo,     gondo_state,    empty_init,     ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondou,     gondo,    gondo,    gondo,     gondo_state,    empty_init,     ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, makyosen,   gondo,    gondo,    gondo,     gondo_state,    empty_init,     ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, garyoret,   0,        garyoret, garyoret,  lastmisn_state, empty_init,     ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb,     0,        ghostb,   ghostb,    lastmisn_state, empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  lastmisn_state, empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   lastmisn_state, empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   lastmisn_state, empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
-GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   lastmisn_state, empty_init,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuhbl,  ghostb,   meikyuh,  meikyuh,   lastmisn_state, init_meikyuhbl, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscar,      0,        oscar,    oscar,     oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarbl,    oscar,    oscarbl,  oscar,     oscar_state,    empty_init,     ROT0,   "bootleg",               "Psycho-Nics Oscar (World revision 0, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    oscar_state,    empty_init,     ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  srdarwin_state, empty_init,     ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, srdarwin_state, empty_init,     ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisn,   0,        lastmisn,  lastmisn,  lastmisn_state, empty_init,     ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu6, lastmisn, lastmisn,  lastmisn,  lastmisn_state, empty_init,     ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu5, lastmisn, lastmisn,  lastmisn,  lastmisn_state, empty_init,     ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnj,  lastmisn, lastmisn,  lastmisnj, lastmisn_state, empty_init,     ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shackled,   0,        shackled,  shackled,  lastmisn_state, empty_init,     ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, breywood,   shackled, shackled,  breywood,  lastmisn_state, empty_init,     ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondo,      0,        gondo,     gondo,     gondo_state,    empty_init,     ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondou,     gondo,    gondo,     gondo,     gondo_state,    empty_init,     ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, makyosen,   gondo,    gondo,     gondo,     gondo_state,    empty_init,     ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, garyoret,   0,        garyoret,  garyoret,  ghostb_state,   empty_init,     ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb,     0,        ghostb,    ghostb,    ghostb_state,   empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb2a,   ghostb,   ghostb,    ghostb2a,  ghostb_state,   empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3,    ghostb,   ghostb,    ghostb3,   ghostb_state,   empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3a,   ghostb,   ghostb,    ghostb3,   ghostb_state,   empty_init,     ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, meikyuh,    0,        meikyuh,   meikyuh,   ghostb_state,   empty_init,     ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan)", MACHINE_SUPPORTS_SAVE ) // modified Ghostbusters
+GAME( 1987, meikyuhbl,  meikyuh,  meikyuh,   meikyuh,   ghostb_state,   init_meikyuhbl, ROT0,   "bootleg",               "Meikyuu Hunter G (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilver,    0,        csilver,   csilver,   csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverj,   csilver,  csilver,   csilverj,  csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverja,  csilver,  csilver,   csilver,   csilver_state,  empty_init,     ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscar,      0,        oscar,     oscar,     oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarbl,    oscar,    oscarbl,   oscar,     oscar_state,    empty_init,     ROT0,   "bootleg",               "Psycho-Nics Oscar (World revision 0, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, oscaru,     oscar,    oscar,     oscarj,    oscar_state,    empty_init,     ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj1,    oscar,    oscar,     oscarj,    oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj2,    oscar,    oscar,     oscarj,    oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwin,   0,        srdarwin,  srdarwin,  srdarwin_state, empty_init,     ROT270, "Data East Corporation", "SRD: Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwinj,  srdarwin, srdarwin,  srdarwinj, srdarwin_state, empty_init,     ROT270, "Data East Corporation", "SRD: Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwinb,  srdarwin, srdarwinb, srdarwinj, srdarwin_state, init_srdarwinb, ROT270, "bootleg",               "SRD: Super Real Darwin (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Unlike most Deco games of this period Cobra Command does not seem to have a Data East USA release.  Instead the Data East Corporation release
 // was used in the US as evidenced by boards with the EL romset bearing AAMA seal stickers (American Amusement Machine Association)
-GAME( 1988, cobracom,   0,        cobracom, cobracom,  oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  oscar_state,    empty_init,     ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracom,   0,        cobracom,  cobracom,  oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracoma,  cobracom, cobracom,  cobracom,  oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomb,  cobracom, cobracom,  cobracom,  oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomj,  cobracom, cobracom,  cobracom,  oscar_state,    empty_init,     ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomjb, cobracom, cobracom,  cobracom,  oscar_state,    empty_init,     ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

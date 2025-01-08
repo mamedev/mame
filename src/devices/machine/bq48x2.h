@@ -59,7 +59,7 @@ protected:
 	bool nvram_read(util::read_stream &file) override;
 	bool nvram_write(util::write_stream &file) override;
 
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 
 	void set_watchdog_timer();
 

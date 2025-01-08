@@ -63,8 +63,8 @@ protected:
 	virtual u8 sr_page() { return 0; }
 	virtual u16 decode_digit(u8 data);
 
-	void program_448x8(address_map &map);
-	void data_45x4(address_map &map);
+	void program_448x8(address_map &map) ATTR_COLD;
+	void data_45x4(address_map &map) ATTR_COLD;
 
 	// opcode helpers
 	u8 ram_r();

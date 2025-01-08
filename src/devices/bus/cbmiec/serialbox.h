@@ -12,7 +12,7 @@
 #pragma once
 
 #include "cbmiec.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 
 
 
@@ -30,12 +30,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_cbm_iec_interface overrides
 	void cbm_iec_atn(int state) override;
@@ -43,9 +43,9 @@ protected:
 	void cbm_iec_reset(int state) override;
 
 private:
-	required_device<m65c02_device> m_maincpu;
+	required_device<w65c02_device> m_maincpu;
 
-	void serial_box_mem(address_map &map);
+	void serial_box_mem(address_map &map) ATTR_COLD;
 };
 
 

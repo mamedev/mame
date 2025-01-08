@@ -3677,8 +3677,9 @@ Debugging Options
         Acts as a remote debugging server for the GNU debugger (GDB).  Only a
         small subset of the CPUs emulated by MAME are supported.  Use the
         :ref:`debugger_port <mame-commandline-debuggerport>` option to set the
-        listening port on the loopback interface.  Supported on all platforms
-        with TCP socket support.
+        listening port and the
+        :ref:`debugger_host <mame-commandline-debuggerhost>` option to set the
+        address to bind to.  Supported on all platforms with TCP socket support.
 
     Example:
         .. code-block:: bash
@@ -3732,11 +3733,26 @@ Debugging Options
 
             mame ibm_5150 -watchdog 30
 
+.. _mame-commandline-debuggerhost:
+
+**-debugger_host** *<address>*
+
+    Set the IP address to listen on to accept GDB connections when using the
+    GDB stub debugger module (see the
+    :ref:`debugger <mame-commandline-debugger>` option).
+
+    The default is ``localhost``.
+
+    Example:
+        .. code-block:: bash
+
+            mame rfjet -debug -debugger gdbstub -debugger_host 0.0.0.0
+
 .. _mame-commandline-debuggerport:
 
 **-debugger_port** *<port>*
 
-    Set the TCP port number to listen on for GDB connections when using the GDB
+    Set the TCP port number to accept GDB connections on when using the GDB
     stub debugger module (see the :ref:`debugger <mame-commandline-debugger>`
     option).
 

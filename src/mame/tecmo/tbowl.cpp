@@ -55,9 +55,9 @@ public:
 	void tbowl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -105,9 +105,9 @@ private:
 
 	template <uint8_t Which> void adpcm_int(int state);
 
-	void _6206A_map(address_map &map);
-	void _6206B_map(address_map &map);
-	void _6206C_map(address_map &map);
+	void _6206A_map(address_map &map) ATTR_COLD;
+	void _6206B_map(address_map &map) ATTR_COLD;
+	void _6206C_map(address_map &map) ATTR_COLD;
 };
 
 

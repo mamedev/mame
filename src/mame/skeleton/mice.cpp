@@ -52,10 +52,10 @@ public:
 	void mice(machine_config &config);
 
 private:
-	void mice2_io(address_map &map);
-	void mice2_mem(address_map &map);
-	void mice_io(address_map &map);
-	void mice_mem(address_map &map);
+	void mice2_io(address_map &map) ATTR_COLD;
+	void mice2_mem(address_map &map) ATTR_COLD;
+	void mice_io(address_map &map) ATTR_COLD;
+	void mice_mem(address_map &map) ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 };
 

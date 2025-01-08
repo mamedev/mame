@@ -39,8 +39,8 @@ public:
 	void uknc(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<k1801vm2_device> m_maincpu;
 	required_device<k1801vm2_device> m_subcpu;
@@ -48,8 +48,8 @@ private:
 	required_device<qbus_device> m_cart;
 	required_device<cassette_image_device> m_cassette;
 
-	void uknc_mem(address_map &map);
-	void uknc_sub_mem(address_map &map);
+	void uknc_mem(address_map &map) ATTR_COLD;
+	void uknc_sub_mem(address_map &map) ATTR_COLD;
 };
 
 

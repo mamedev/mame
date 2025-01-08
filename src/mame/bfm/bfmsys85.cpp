@@ -91,7 +91,7 @@ public:
 	{ }
 
 	void bfmsys85(machine_config &config);
-	void memmap(address_map &map);
+	void memmap(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(timer_irq);
 
@@ -99,8 +99,8 @@ public:
 	void init_nodecode();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	int m_mmtr_latch = 0;

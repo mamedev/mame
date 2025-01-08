@@ -88,10 +88,6 @@ constexpr u64 MACHINE_NODEVICE_PRINTER          = 0x00000100'00000000;          
 constexpr u64 MACHINE_NODEVICE_LAN              = 0x00000200'00000000;                      ///< The system has unemulated local area networking
 constexpr u64 MACHINE_IMPERFECT_TIMING          = 0x00000400'00000000;                      ///< Timing is known to be imperfectly emulated for the system
 
-// useful combinations of flags
-constexpr u64 MACHINE_IS_SKELETON               = MACHINE_NO_SOUND | MACHINE_NOT_WORKING;   ///< Useful combination of flags for preliminary systems
-constexpr u64 MACHINE_IS_SKELETON_MECHANICAL    = MACHINE_IS_SKELETON | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK; // flag combination for skeleton mechanical machines
-
 /// \}
 /// \}
 

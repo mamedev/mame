@@ -30,9 +30,9 @@ public:
 protected:
 	enum
 	{
-		START_FILE, START_OTHER_PART, START_SOFTLIST,
+		START_FILE, START_OTHER_PART, START_SOFTLIST, START_MIDI,
 		SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART,
-		CREATE_FILE, CREATE_CONFIRM, CHECK_CREATE, DO_CREATE, SELECT_SOFTLIST,
+		CREATE_FILE, CREATE_CONFIRM, CHECK_CREATE, DO_CREATE, SELECT_SOFTLIST, SELECT_MIDI,
 		LAST_ID
 	};
 
@@ -63,6 +63,7 @@ private:
 	const software_part *           m_swp;
 	class software_list_device *    m_sld;
 	std::string                     m_software_info_name;
+	std::string                     m_midi;
 
 	// methods
 	virtual void populate() override;

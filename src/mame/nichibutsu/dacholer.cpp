@@ -33,11 +33,13 @@
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -87,17 +89,17 @@ private:
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void adpcm_int(int state);
-	void itaten_main_map(address_map &map);
-	void itaten_snd_io_map(address_map &map);
-	void itaten_snd_map(address_map &map);
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
-	void snd_io_map(address_map &map);
-	void snd_map(address_map &map);
+	void itaten_main_map(address_map &map) ATTR_COLD;
+	void itaten_snd_io_map(address_map &map) ATTR_COLD;
+	void itaten_snd_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void snd_io_map(address_map &map) ATTR_COLD;
+	void snd_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -308,7 +310,7 @@ void dacholer_state::snd_ack_w(uint8_t data)
 
 int dacholer_state::snd_ack_r()
 {
-	return m_snd_ack;       //guess ...
+	return m_snd_ack; // guess ...
 }
 
 void dacholer_state::snd_irq_w(uint8_t data)
@@ -386,7 +388,7 @@ static INPUT_PORTS_START( dacholer )
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dacholer_state, snd_ack_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(dacholer_state::snd_ack_r))
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            /* table at 0x0a9c */

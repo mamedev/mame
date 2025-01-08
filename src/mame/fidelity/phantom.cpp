@@ -20,7 +20,7 @@ spawn block and place it anywhere on a free spot at the designated box at the
 edge of the chessboard.
 
 Hardware notes:
-- PCB label 510.1128A01
+- PCB label: 510.1128A01
 - R65C02P4, XTAL marked 4.915200
 - 2*32KB ROM 27C256-15, 8KB RAM MS6264L-10
 - LCD driver, display panel for digits
@@ -83,8 +83,8 @@ public:
 	void init_phantom();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
@@ -111,7 +111,7 @@ protected:
 	u8 m_pieces_map[0x80][0x80] = { };
 
 	// address maps
-	virtual void main_map(address_map &map);
+	virtual void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_lcd(u8 select);
@@ -206,14 +206,14 @@ public:
 	void cphantom(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<dac_8bit_r2r_device> m_speech;
 	output_finder<> m_eye_led;
 
-	virtual void main_map(address_map &map) override;
+	virtual void main_map(address_map &map) override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 	virtual void control_w(offs_t offset, u8 data) override;

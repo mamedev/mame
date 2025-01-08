@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Mark McDougall, David Haywood
 
-// The Street Fight video appears to be 4 layers, very similar to Dark Mist and Air Raid, but at least without the CLUT transparency handling?
-// which are presumably handled by the SEI0100BU chips on the other games (with the GFX inside the modules on Air Raid)
+// The Street Fight video appears to be 4 layers, very similar to Dark Mist and Air Raid,
+// but at least without the CLUT transparency handling? which are presumably handled by
+// the SEI0100BU chips on the other games (with the GFX inside the modules on Air Raid)
 
 #include "emu.h"
 #include "stfight_dev.h"
@@ -25,7 +26,8 @@ stfight_video_device::stfight_video_device(const machine_config &mconfig, const 
 	m_bgmap(*this,"bg_map"),
 	m_vregs(*this,"^vregs"),
 	m_sprite_ram(*this, "^sprite_ram"),
-	m_txram(*this, "^txram")
+	m_txram(*this, "^txram"),
+	m_sprite_base(0)
 {
 }
 
@@ -48,14 +50,18 @@ static const gfx_layout fglayout =
 	1024,       /* 1024 tiles */
 	4,          /* 4 bits per pixel */
 	{ 64*1024*8+0, 64*1024*8+4, 0, 4 },
-	{      0,      1,       2,       3,
-			8,      9,      10,      11,
+	{
+		0,      1,       2,       3,
+		8,      9,      10,      11,
 		32*8+0, 32*8+1, 32*8+ 2, 32*8+ 3,
-		32*8+8, 32*8+9, 32*8+10, 32*8+11 },
-	{  0*8,  2*8,  4*8,  6*8,
-		8*8, 10*8, 12*8, 14*8,
+		32*8+8, 32*8+9, 32*8+10, 32*8+11
+	},
+	{
+		0*8,  2*8,  4*8,  6*8,
+		8*8,  10*8, 12*8, 14*8,
 		16*8, 18*8, 20*8, 22*8,
-		24*8, 26*8, 28*8, 30*8 },
+		24*8, 26*8, 28*8, 30*8
+	},
 	64*8        /* every char takes 64 consecutive bytes */
 };
 
@@ -72,14 +78,18 @@ static const gfx_layout bglayout =
 	512,        /* 512 tiles */
 	4,          /* 4 bits per pixel */
 	{ 64*1024*8+4, 64*1024*8+0, 4, 0 },
-	{      0,      1,       2,       3,
-			8,      9,      10,      11,
+	{
+		0,      1,       2,       3,
+		8,      9,      10,      11,
 		64*8+0, 64*8+1, 64*8+ 2, 64*8+ 3,
-		64*8+8, 64*8+9, 64*8+10, 64*8+11 },
-	{  0*8,  2*8,  4*8,  6*8,
-		8*8, 10*8, 12*8, 14*8,
+		64*8+8, 64*8+9, 64*8+10, 64*8+11
+	},
+	{
+		0*8,  2*8,  4*8,  6*8,
+		8*8,  10*8, 12*8, 14*8,
 		16*8, 18*8, 20*8, 22*8,
-		24*8, 26*8, 28*8, 30*8 },
+		24*8, 26*8, 28*8, 30*8
+	},
 	128*8       /* every tile takes 64/128 consecutive bytes */
 };
 
@@ -90,14 +100,18 @@ static const gfx_layout spritelayout =
 	1024,       /* 1024 sprites */
 	4,          /* 4 bits per pixel */
 	{ 64*1024*8+0, 64*1024*8+4, 0, 4 },
-	{      0,      1,       2,       3,
-			8,      9,      10,      11,
+	{
+		0,      1,       2,       3,
+		8,      9,      10,      11,
 		32*8+0, 32*8+1, 32*8+ 2, 32*8+ 3,
-		32*8+8, 32*8+9, 32*8+10, 32*8+11 },
-	{  0*8,  2*8,  4*8,  6*8,
-		8*8, 10*8, 12*8, 14*8,
+		32*8+8, 32*8+9, 32*8+10, 32*8+11
+	},
+	{
+		0*8,  2*8,  4*8,  6*8,
+		8*8,  10*8, 12*8, 14*8,
 		16*8, 18*8, 20*8, 22*8,
-		24*8, 26*8, 28*8, 30*8 },
+		24*8, 26*8, 28*8, 30*8
+	},
 	64*8        /* every sprite takes 64 consecutive bytes */
 };
 
@@ -124,24 +138,24 @@ void stfight_video_device::device_add_mconfig(machine_config &config)
 }
 
 /*
-        Graphics ROM Format
-        ===================
+    Graphics ROM Format
+    ===================
 
-        Each tile is 8x8 pixels
-        Each composite tile is 2x2 tiles, 16x16 pixels
-        Each screen is 32x32 composite tiles, 64x64 tiles, 256x256 pixels
-        Each layer is a 4-plane bitmap 8x16 screens, 2048x4096 pixels
+    Each tile is 8x8 pixels
+    Each composite tile is 2x2 tiles, 16x16 pixels
+    Each screen is 32x32 composite tiles, 64x64 tiles, 256x256 pixels
+    Each layer is a 4-plane bitmap 8x16 screens, 2048x4096 pixels
 
-        There are 4x256=1024 composite tiles defined for each layer
+    There are 4x256=1024 composite tiles defined for each layer
 
-        Each layer is mapped using 2 bytes/composite tile
-        - one byte for the tile
-        - one byte for the tile bank, attribute
-            - b7,b5     tile bank (0-3)
+    Each layer is mapped using 2 bytes/composite tile
+    - one byte for the tile
+    - one byte for the tile bank, attribute
+        - b7,b5     tile bank (0-3)
 
-        Each pixel is 4 bits = 16 colours.
+    Each pixel is 4 bits = 16 colours.
 
- */
+*/
 
 TILEMAP_MAPPER_MEMBER(stfight_video_device::fg_scan)
 {
@@ -199,9 +213,7 @@ TILE_GET_INFO_MEMBER(stfight_video_device::get_tx_tile_info)
 
 void stfight_video_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs, sx, sy;
-
-	for (offs = 4096 - 32;offs >= 0;offs -= 32)
+	for (int offs = 4096 - 32; offs >= 0; offs -= 32)
 	{
 		int code;
 		int attr = m_sprite_ram[offs + 1];
@@ -209,8 +221,8 @@ void stfight_video_device::draw_sprites(screen_device &screen, bitmap_ind16 &bit
 		int color = attr & 0x0f;
 		color |= (attr & 0x20) >> 1; // mix in priority bit
 
-		sy = m_sprite_ram[offs + 2];
-		sx = m_sprite_ram[offs + 3];
+		int sy = m_sprite_ram[offs + 2];
+		int sx = m_sprite_ram[offs + 3];
 
 		// non-active sprites have zero y coordinate value
 		if (sy > 0)
@@ -247,14 +259,14 @@ void stfight_video_device::draw_sprites(screen_device &screen, bitmap_ind16 &bit
 
 uint32_t stfight_video_device::screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);   /* in case m_bg_tilemap is disabled */
+	bitmap.fill(0, cliprect); // in case m_bg_tilemap is disabled
 
-	m_temp_sprite_bitmap.fill(-1, cliprect);
+	m_temp_sprite_bitmap.fill(0xffff, cliprect);
 	draw_sprites(screen, m_temp_sprite_bitmap, cliprect);
 
 	if (m_bg_tilemap->enabled())
 	{
-		m_temp_bitmap.fill(-1, cliprect);
+		m_temp_bitmap.fill(0xffff, cliprect);
 		m_bg_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
 		mix_txlayer(screen, bitmap, m_temp_bitmap, cliprect, m_bg_clut, 0x00, 0x00, 0x00, false);
 	}
@@ -263,7 +275,7 @@ uint32_t stfight_video_device::screen_update_stfight(screen_device &screen, bitm
 
 	if (m_fg_tilemap->enabled())
 	{
-		m_temp_bitmap.fill(-1, cliprect);
+		m_temp_bitmap.fill(0xffff, cliprect);
 		m_fg_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
 		mix_txlayer(screen, bitmap, m_temp_bitmap, cliprect, m_fg_clut, 0x40, 0x00, 0x00, false);
 	}
@@ -272,11 +284,11 @@ uint32_t stfight_video_device::screen_update_stfight(screen_device &screen, bitm
 
 	if (m_tx_tilemap->enabled())
 	{
-		m_temp_bitmap.fill(-1, cliprect);
+		m_temp_bitmap.fill(0xffff, cliprect);
 		m_tx_tilemap->draw(screen, m_temp_bitmap, cliprect, 0, 0);
 		mix_txlayer(screen, bitmap, m_temp_bitmap, cliprect, m_tx_clut, 0xc0, 0x00, 0x00, true);
 	}
-	//
+
 	return 0;
 }
 
@@ -289,7 +301,7 @@ void stfight_video_device::mix_txlayer(screen_device &screen, bitmap_ind16 &bitm
 		uint16_t const *const src = &bitmap2.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			if (src[x] == -1)
+			if (src[x] == 0xffff)
 				continue;
 
 			if ((src[x] & mask) == condition)
@@ -344,18 +356,16 @@ void stfight_video_device::stfight_text_char_w(offs_t offset, uint8_t data)
 
 void stfight_video_device::stfight_sprite_bank_w(uint8_t data)
 {
-	m_sprite_base = ( ( data & 0x04 ) << 7 ) |
-							( ( data & 0x01 ) << 8 );
+	m_sprite_base = ((data & 0x04) << 7) | ((data & 0x01) << 8);
 }
 
 void stfight_video_device::stfight_vh_latch_w(offs_t offset, uint8_t data)
 {
 	int scroll;
 
-
 	m_vregs[offset] = data;
 
-	switch( offset )
+	switch (offset)
 	{
 		case 0x00:
 		case 0x01:

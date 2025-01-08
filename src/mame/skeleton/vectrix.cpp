@@ -32,8 +32,8 @@ public:
 	void vectrix(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	//  required_device<cpu_device> m_maincpu;
 };
@@ -71,4 +71,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1983, vectrix, 0, 0, vectrix, vectrix, vectrix_state, empty_init, "Vectrix", "VX384 Graphics Processor Terminal", MACHINE_IS_SKELETON )
+COMP( 1983, vectrix, 0, 0, vectrix, vectrix, vectrix_state, empty_init, "Vectrix", "VX384 Graphics Processor Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -58,10 +58,10 @@ private:
 	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( quickload_cb );
-	void elf2_io(address_map &map);
-	void elf2_mem(address_map &map);
+	void elf2_io(address_map &map) ATTR_COLD;
+	void elf2_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;

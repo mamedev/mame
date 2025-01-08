@@ -93,8 +93,8 @@ public:
 	void thoop2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void oki_bankswitch_w(uint8_t data);
@@ -108,9 +108,9 @@ private:
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mcu_hostmem_map(address_map &map);
-	void oki_map(address_map &map);
-	void thoop2_map(address_map &map);
+	void mcu_hostmem_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+	void thoop2_map(address_map &map) ATTR_COLD;
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

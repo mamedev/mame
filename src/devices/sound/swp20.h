@@ -3,8 +3,8 @@
 
 // Yamaha SWP20, rompler
 
-#ifndef DEVICES_SOUND_SWP20_H
-#define DEVICES_SOUND_SWP20_H
+#ifndef MAME_SOUND_SWP20_H
+#define MAME_SOUND_SWP20_H
 
 #pragma once
 
@@ -15,11 +15,11 @@ class swp20_device : public device_t, public device_sound_interface, public devi
 public:
 	swp20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 11289600);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
@@ -72,4 +72,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SWP20, swp20_device)
 
-#endif
+#endif // MAME_SOUND_SWP20_H

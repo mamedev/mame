@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
 /*
+
 Konami 007420
 ------
 Sprite generator. 8 bytes per sprite with zoom. It uses 0x200 bytes of RAM,
@@ -8,6 +9,7 @@ and a variable amount of ROM. Nothing is known about its external interface.
 
 TODO:
 - sprite X wraparound? (Rock N Rage sprites disappears on left edge of screen)
+
 */
 
 #include "emu.h"
@@ -26,9 +28,9 @@ k007420_device::k007420_device(const machine_config &mconfig, const char *tag, d
 	, device_gfx_interface(mconfig, *this)
 	, m_ram(nullptr)
 	, m_flipscreen(false)
+	, m_wrap_y(false)
 	, m_banklimit(0)
 	, m_callback(*this)
-	//, m_regs[8]
 {
 }
 
@@ -41,11 +43,11 @@ void k007420_device::device_start()
 	// bind the init function
 	m_callback.resolve();
 
-	m_ram = make_unique_clear<uint8_t[]>(0x200);
+	m_ram = make_unique_clear<uint8_t[]>(K007420_SPRITERAM_SIZE);
 
-	save_pointer(NAME(m_ram), 0x200);
-	save_item(NAME(m_flipscreen));  // current one uses 7342 one
-	save_item(NAME(m_regs));        // current one uses 7342 ones
+	save_pointer(NAME(m_ram), K007420_SPRITERAM_SIZE);
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_wrap_y));
 }
 
 //-------------------------------------------------
@@ -54,9 +56,6 @@ void k007420_device::device_start()
 
 void k007420_device::device_reset()
 {
-	m_flipscreen = false;
-	for (int i = 0; i < 8; i++)
-		m_regs[i] = 0;
 }
 
 /*****************************************************************************
@@ -115,50 +114,71 @@ void k007420_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 		const uint32_t bank = code & bankmask;
 		code &= codemask;
 
-		/* 0x080 = normal scale, 0x040 = double size, 0x100 half size */
+		// 0x080 = normal scale, 0x040 = double size, 0x100 half size
 		uint32_t zoom = m_ram[offs + 5] | ((m_ram[offs + 4] & 0x03) << 8);
 		if (!zoom)
 			continue;
 		zoom = 0x10000 * 128 / zoom;
 
-		uint8_t w, h;
+		uint8_t width, height;
 		switch (m_ram[offs + 4] & 0x70)
 		{
-			case 0x30: w = h = 1; break;
-			case 0x20: w = 2; h = 1; code &= (~1); break;
-			case 0x10: w = 1; h = 2; code &= (~2); break;
-			case 0x00: w = h = 2; code &= (~3); break;
-			case 0x40: w = h = 4; code &= (~3); break;
-			default: w = 1; h = 1;
-//logerror("Unknown sprite size %02x\n",(m_ram[offs + 4] & 0x70) >> 4);
+			case 0x30:
+				width = height = 1;
+				break;
+
+			case 0x20:
+				width = 2; height = 1;
+				code &= ~1;
+				break;
+
+			case 0x10:
+				width = 1; height = 2;
+				code &= ~2;
+				break;
+
+			case 0x00:
+				width = height = 2;
+				code &= ~3;
+				break;
+
+			case 0x40:
+				width = height = 4;
+				code &= ~0xf;
+				break;
+
+			default:
+				width = 1; height = 1;
+				//logerror("Unknown sprite size %02x\n",(m_ram[offs + 4] & 0x70) >> 4);
+				break;
 		}
 
 		if (m_flipscreen)
 		{
-			ox = 256 - ox - ((zoom * w + (1 << 12)) >> 13);
-			oy = 256 - oy - ((zoom * h + (1 << 12)) >> 13);
+			ox = 256 - ox - ((zoom * width + (1 << 12)) >> 13);
+			oy = 256 - oy - ((zoom * height + (1 << 12)) >> 13);
 			flipx = !flipx;
 			flipy = !flipy;
 		}
 
 		if (zoom == 0x10000)
 		{
-			for (int y = 0; y < h; y++)
+			for (int y = 0; y < height; y++)
 			{
 				const int sy = oy + 8 * y;
 
-				for (int x = 0; x < w; x++)
+				for (int x = 0; x < width; x++)
 				{
 					uint32_t c = code;
 
 					const int sx = ox + 8 * x;
 					if (flipx)
-						c += xoffset[(w - 1 - x)];
+						c += xoffset[(width - 1 - x)];
 					else
 						c += xoffset[x];
 
 					if (flipy)
-						c += yoffset[(h - 1 - y)];
+						c += yoffset[(height - 1 - y)];
 					else
 						c += yoffset[y];
 
@@ -168,40 +188,43 @@ void k007420_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 						c += bank;
 
 					gfx(0)->transpen(bitmap,cliprect,
-						c,
-						color,
-						flipx,flipy,
-						sx,sy,0);
-
-					if (m_regs[2] & 0x80)
-						gfx(0)->transpen(bitmap,cliprect,
 							c,
 							color,
 							flipx,flipy,
-							sx,sy-256,0);
+							sx,sy,0);
+
+					if (m_wrap_y)
+					{
+						const int dy = m_flipscreen ? +256 : -256;
+						gfx(0)->transpen(bitmap,cliprect,
+								c,
+								color,
+								flipx,flipy,
+								sx,sy+dy,0);
+					}
 				}
 			}
 		}
 		else
 		{
-			for (int y = 0; y < h; y++)
+			for (int y = 0; y < height; y++)
 			{
 				const int sy = oy + ((zoom * y + (1 << 12)) >> 13);
 				const int zh = (oy + ((zoom * (y + 1) + (1 << 12)) >> 13)) - sy;
 
-				for (int x = 0; x < w; x++)
+				for (int x = 0; x < width; x++)
 				{
 					uint32_t c = code;
 
-					const int sx = ox + ((zoom * x + (1<<12)) >> 13);
+					const int sx = ox + ((zoom * x + (1 << 12)) >> 13);
 					const int zw = (ox + ((zoom * (x + 1) + (1 << 12)) >> 13)) - sx;
 					if (flipx)
-						c += xoffset[(w - 1 - x)];
+						c += xoffset[(width - 1 - x)];
 					else
 						c += xoffset[x];
 
 					if (flipy)
-						c += yoffset[(h - 1 - y)];
+						c += yoffset[(height - 1 - y)];
 					else
 						c += yoffset[y];
 
@@ -211,19 +234,22 @@ void k007420_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 						c += bank;
 
 					gfx(0)->zoom_transpen(bitmap,cliprect,
-						c,
-						color,
-						flipx,flipy,
-						sx,sy,
-						(zw << 16) / 8,(zh << 16) / 8,0);
-
-					if (m_regs[2] & 0x80)
-						gfx(0)->zoom_transpen(bitmap,cliprect,
 							c,
 							color,
 							flipx,flipy,
-							sx,sy-256,
+							sx,sy,
 							(zw << 16) / 8,(zh << 16) / 8,0);
+
+					if (m_wrap_y)
+					{
+						const int dy = m_flipscreen ? +256 : -256;
+						gfx(0)->zoom_transpen(bitmap,cliprect,
+								c,
+								color,
+								flipx,flipy,
+								sx,sy+dy,
+								(zw << 16) / 8,(zh << 16) / 8,0);
+					}
 				}
 			}
 		}

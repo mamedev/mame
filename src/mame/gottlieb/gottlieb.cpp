@@ -277,13 +277,13 @@ public:
 	void init_qbert();
 	void init_qbertqub();
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(track_delta_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
+	template <int N> ioport_value track_delta_r();
+	ioport_value stooges_joystick_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void analog_reset_w(u8 data);
@@ -306,22 +306,21 @@ private:
 	TILE_GET_INFO_MEMBER(get_screwloo_bg_tile_info);
 	DECLARE_VIDEO_START(screwloo);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(laserdisc_philips_callback);
 	TIMER_CALLBACK_MEMBER(laserdisc_bit_off_callback);
 	TIMER_CALLBACK_MEMBER(laserdisc_bit_callback);
-	TIMER_CALLBACK_MEMBER(nmi_clear);
+	void laserdisc_vblank(int state);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void audio_end_state();
 	void audio_process_clock(bool logit);
 	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
 	void laserdisc_audio_process(int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
 
-	void gottlieb_base_map(address_map &map);
-	void gottlieb_ram_map(address_map &map);
-	void gottlieb_ram_rom_map(address_map &map);
-	void gottlieb_rom_map(address_map &map);
-	void reactor_map(address_map &map);
+	void gottlieb_base_map(address_map &map) ATTR_COLD;
+	void gottlieb_ram_map(address_map &map) ATTR_COLD;
+	void gottlieb_ram_rom_map(address_map &map) ATTR_COLD;
+	void gottlieb_rom_map(address_map &map) ATTR_COLD;
+	void reactor_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -350,7 +349,6 @@ private:
 	emu_timer *m_laserdisc_bit_timer = nullptr;
 	emu_timer *m_laserdisc_bit_off_timer = nullptr;
 	emu_timer *m_laserdisc_philips_timer = nullptr;
-	emu_timer *m_nmi_clear_timer = nullptr;
 	u8 m_laserdisc_select = 0U;
 	u8 m_laserdisc_status = 0U;
 	uint16_t m_laserdisc_philips_code = 0U;
@@ -392,8 +390,6 @@ void gottlieb_state::machine_start()
 	save_item(NAME(m_gfxcharhi));
 	save_item(NAME(m_weights));
 
-	m_nmi_clear_timer = timer_alloc(FUNC(gottlieb_state::nmi_clear), this);
-
 	/* see if we have a laserdisc */
 	if (m_laserdisc != nullptr)
 	{
@@ -430,9 +426,12 @@ void gottlieb_state::machine_start()
 
 void gottlieb_state::machine_reset()
 {
-	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
+	// if we have a laserdisc, reset our philips code callback for the next line 17
 	if (m_laserdisc != nullptr)
 		m_laserdisc_philips_timer->adjust(m_screen->time_until_pos(17), 17);
+
+	// HACK: prevent NMI immediately after soft reset
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -493,12 +492,10 @@ VIDEO_START_MEMBER(gottlieb_state,screwloo)
 
 void gottlieb_state::palette_w(offs_t offset, u8 data)
 {
-	int val;
-
 	m_paletteram[offset] = data;
 
 	/* blue & green are encoded in the even bytes */
-	val = m_paletteram[offset & ~1];
+	int val = m_paletteram[offset & ~1];
 	int const g = combine_weights(m_weights, BIT(val, 4), BIT(val, 5), BIT(val, 6), BIT(val, 7));
 	int const b = combine_weights(m_weights, BIT(val, 0), BIT(val, 1), BIT(val, 2), BIT(val, 3));
 
@@ -606,13 +603,12 @@ TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
 void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip = cliprect;
-	int offs;
 
 	/* this is a temporary guess until the sprite hardware is better understood */
 	/* there is some additional clipping, but this may not be it */
 	clip.min_x = 8;
 
-	for (offs = 0; offs < 256; offs += 4)
+	for (int offs = 0; offs < 256; offs += 4)
 	{
 		/* coordinates hand tuned to make the position correct in Q*Bert Qubes start */
 		/* of level animation. */
@@ -626,7 +622,7 @@ void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		m_gfxdecode->gfx(2)->transpen(bitmap,clip,
 		code, 0,
 		flip_screen_x(), flip_screen_y(),
-		sx,sy, 0);
+		sx, sy, 0);
 	}
 }
 
@@ -665,7 +661,7 @@ uint32_t gottlieb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
  *************************************/
 
 template <int N>
-CUSTOM_INPUT_MEMBER(gottlieb_state::track_delta_r)
+ioport_value gottlieb_state::track_delta_r()
 {
 	return (N ? m_track_y : m_track_x)->read() - m_track[N];
 }
@@ -679,7 +675,7 @@ void gottlieb_state::analog_reset_w(u8 data)
 }
 
 
-CUSTOM_INPUT_MEMBER(gottlieb_state::stooges_joystick_r)
+ioport_value gottlieb_state::stooges_joystick_r()
 {
 	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", nullptr };
 	return (joyport[m_joystick_select & 3] != nullptr) ? ioport(joyport[m_joystick_select & 3])->read() : 0xff;
@@ -859,6 +855,19 @@ TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_callback)
 		m_laserdisc_bit_timer->adjust(duration, (bitsleft << 16) | data);
 	else
 		m_laserdisc_status |= 0x10;
+}
+
+
+void gottlieb_state::laserdisc_vblank(int state)
+{
+	if (!state)
+		return;
+
+	/* set the "disc ready" bit, which basically indicates whether or not we have a proper video frame */
+	if (!m_laserdisc->video_active())
+		m_laserdisc_status &= ~0x20;
+	else
+		m_laserdisc_status |= 0x20;
 }
 
 
@@ -1072,37 +1081,6 @@ void gottlieb_state::qbert_knocker(machine_config &config)
 
 
 /*************************************
-*
-*  Interrupt generation
-*
-*************************************/
-
-TIMER_CALLBACK_MEMBER(gottlieb_state::nmi_clear)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-}
-
-
-INTERRUPT_GEN_MEMBER(gottlieb_state::interrupt)
-{
-	/* assert the NMI and set a timer to clear it at the first visible line */
-	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	m_nmi_clear_timer->adjust(m_screen->time_until_pos(0));
-
-	/* if we have a laserdisc, update it */
-	if (m_laserdisc != nullptr)
-	{
-		/* set the "disc ready" bit, which basically indicates whether or not we have a proper video frame */
-		if (!m_laserdisc->video_active())
-			m_laserdisc_status &= ~0x20;
-		else
-			m_laserdisc_status |= 0x20;
-	}
-}
-
-
-
-/*************************************
  *
  *  Main CPU memory handlers
  *
@@ -1224,10 +1202,10 @@ static INPUT_PORTS_START( reactor )
 	PORT_BIT ( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")   /* trackball H */
-	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<0>)
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gottlieb_state::track_delta_r<0>))
 
 	PORT_START("IN3")   /* trackball V */
-	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<1>)
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gottlieb_state::track_delta_r<1>))
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -1435,10 +1413,10 @@ static INPUT_PORTS_START( argusg )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")   /* trackball H */
-	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<0>)
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gottlieb_state::track_delta_r<0>))
 
 	PORT_START("IN3")   /* trackball V */
-	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<1>)
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gottlieb_state::track_delta_r<1>))
 
 	/* NOTE: Buttons are shared for both players; are mirrored to each side of the controller */
 	PORT_START("IN4")
@@ -1492,7 +1470,7 @@ static INPUT_PORTS_START( mplanets )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")   /* trackball V (dial) */
-	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<1>)
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gottlieb_state::track_delta_r<1>))
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1971,7 +1949,7 @@ static INPUT_PORTS_START( 3stooges )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN4")   /* joystick inputs */
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, stooges_joystick_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gottlieb_state::stooges_joystick_r))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
@@ -2083,7 +2061,7 @@ static INPUT_PORTS_START( wizwarz )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")   /* trackball V is a dial input */
-	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gottlieb_state, track_delta_r<1>)
+	PORT_BIT( 0xff, 0, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gottlieb_state::track_delta_r<1>))
 
 	PORT_START("IN4")   /* ? */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -2140,7 +2118,6 @@ void gottlieb_state::gottlieb_core(machine_config &config)
 	/* basic machine hardware */
 	I8088(config, m_maincpu, CPU_CLOCK/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_ram_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gottlieb_state::interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -2150,6 +2127,7 @@ void gottlieb_state::gottlieb_core(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(SYSTEM_CLOCK/4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK);
 	m_screen->set_screen_update(FUNC(gottlieb_state::screen_update));
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode);
 	PALETTE(config, m_palette).set_entries(16);
@@ -2211,6 +2189,8 @@ void gottlieb_state::g2laser(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_SELF_RENDER);
 	m_screen->set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
 	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_screen->screen_vblank().append(FUNC(gottlieb_state::laserdisc_vblank));
 }
 
 
@@ -2272,6 +2252,8 @@ void gottlieb_state::cobram3(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_SELF_RENDER);
 	m_screen->set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
 	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_screen->screen_vblank().append(FUNC(gottlieb_state::laserdisc_vblank));
 
 	/* sound hardware */
 	subdevice<ad7528_device>("r2sound:dac")->reset_routes();

@@ -16,8 +16,8 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u16* ram, u32 size, bool flip_screen, bool rev_y);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_memory_region m_gfx_region;

@@ -55,7 +55,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_pa(); }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -68,8 +68,8 @@ private:
 
 	u8 m_inp_mux = 0;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	template <int N> void update_digits(offs_t offset, u16 data);
 
@@ -178,7 +178,7 @@ void bridgeb_state::main_io(address_map &map)
 *******************************************************************************/
 
 #define PORT_CHANGED_CB(x) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, bridgeb_state, x, 0)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bridgeb_state::x), 0)
 
 static INPUT_PORTS_START( bridgeb )
 	PORT_START("IN.0")

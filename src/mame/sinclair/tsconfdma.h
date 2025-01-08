@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_SINCLAIR_TSCONF_DMA_H
-#define MAME_SINCLAIR_TSCONF_DMA_H
+#ifndef MAME_SINCLAIR_TSCONFDMA_H
+#define MAME_SINCLAIR_TSCONFDMA_H
 
 #pragma once
 
@@ -34,11 +34,11 @@ public:
 	void set_block_len(uint8_t len);
 	void set_block_num_l(uint8_t num_l);
 	void set_block_num_h(uint8_t num_h);
-	void start_tx(uint8_t dev, bool s_align, bool d_align, bool blitting_opt);
+	void start_tx(uint8_t task, bool s_align, bool d_align, bool blitting_opt);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	devcb_read16 m_in_mreq_cb;
 	devcb_write16 m_out_mreq_cb;
@@ -57,6 +57,12 @@ private:
 	u8 m_block_len;
 	u16 m_block_num;
 
+	offs_t m_tx_s_addr;
+	offs_t m_tx_d_addr;
+	u16 m_tx_data;
+	u16 m_tx_block_num;
+	u16 m_tx_block;
+
 	emu_timer *m_dma_clock;
 	u8 m_task;
 	bool m_align_s;
@@ -68,4 +74,4 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TSCONF_DMA, tsconfdma_device)
-#endif // MAME_SINCLAIR_TSCONF_DMA_H
+#endif // MAME_SINCLAIR_TSCONFDMA_H

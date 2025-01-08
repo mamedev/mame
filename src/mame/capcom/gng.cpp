@@ -63,12 +63,12 @@ public:
 	{ }
 
 	void gng(machine_config &config);
-	void diamond(machine_config &config);
+	void diamrun(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -90,7 +90,7 @@ private:
 
 	void bankswitch_w(uint8_t data);
 	void ym_reset_w(int state);
-	uint8_t diamond_hack_r();
+	uint8_t diamrun_hack_r();
 	void fgvideoram_w(offs_t offset, uint8_t data);
 	void bgvideoram_w(offs_t offset, uint8_t data);
 	void bgscrollx_w(offs_t offset, uint8_t data);
@@ -100,9 +100,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void diamond_main_map(address_map &map);
-	void gng_main_map(address_map &map);
-	void sound_map(address_map &map);
+	void diamrun_main_map(address_map &map) ATTR_COLD;
+	void gng_main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -250,7 +250,7 @@ void gng_state::ym_reset_w(int state)
 	}
 }
 
-uint8_t gng_state::diamond_hack_r()
+uint8_t gng_state::diamrun_hack_r()
 {
 	return 0;
 }
@@ -278,7 +278,7 @@ void gng_state::gng_main_map(address_map &map)
 	map(0x6000, 0xffff).rom();
 }
 
-void gng_state::diamond_main_map(address_map &map)
+void gng_state::diamrun_main_map(address_map &map)
 {
 	map(0x0000, 0x1dff).ram();
 	map(0x1e00, 0x1fff).ram().share("spriteram");
@@ -301,7 +301,7 @@ void gng_state::diamond_main_map(address_map &map)
 	map(0x3e00, 0x3e00).w(FUNC(gng_state::bankswitch_w));
 	map(0x4000, 0x5fff).bankr(m_mainbank);
 	map(0x6000, 0xffff).rom();
-	map(0x6000, 0x6000).r(FUNC(gng_state::diamond_hack_r));
+	map(0x6000, 0x6000).r(FUNC(gng_state::diamrun_hack_r));
 	map(0x6048, 0x6048).nopw(); // ?
 }
 
@@ -321,32 +321,29 @@ static INPUT_PORTS_START( gng )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // pin 17 on edge connector
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:8,7,6,5")
@@ -409,7 +406,7 @@ static INPUT_PORTS_START( makaimur )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( diamond )
+static INPUT_PORTS_START( diamrun )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
@@ -559,31 +556,29 @@ void gng_state::machine_reset()
 	m_scrolly[0] = 0;
 	m_scrolly[1] = 0;
 
+	/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
+	         For now let's fill everything with white colors until we have better info about it */
+	for (int i = 0 ; i < 0x100; i += 4)
 	{
-		/* TODO: PCB reference clearly shows that the POST has random/filled data on the paletteram.
-		         For now let's fill everything with white colors until we have better info about it */
-		for(int i = 0 ; i < 0x100; i += 4)
-		{
-			m_palette->basemem().write8(i, 0x00); m_palette->extmem().write8(i, 0x00);
-			m_palette->basemem().write8(i + 1, 0x55); m_palette->extmem().write8(i + 1, 0x55);
-			m_palette->basemem().write8(i + 2, 0xaa); m_palette->extmem().write8(i + 2, 0xaa);
-			m_palette->basemem().write8(i + 3, 0xff); m_palette->extmem().write8(i + 3, 0xff);
-			m_palette->set_pen_color(i + 0, 0x00, 0x00, 0x00);
-			m_palette->set_pen_color(i + 1, 0x55, 0x55, 0x55);
-			m_palette->set_pen_color(i + 2, 0xaa, 0xaa, 0xaa);
-			m_palette->set_pen_color(i + 3, 0xff, 0xff, 0xff);
-		}
+		m_palette->basemem().write8(i, 0x00); m_palette->extmem().write8(i, 0x00);
+		m_palette->basemem().write8(i + 1, 0x55); m_palette->extmem().write8(i + 1, 0x55);
+		m_palette->basemem().write8(i + 2, 0xaa); m_palette->extmem().write8(i + 2, 0xaa);
+		m_palette->basemem().write8(i + 3, 0xff); m_palette->extmem().write8(i + 3, 0xff);
+		m_palette->set_pen_color(i + 0, 0x00, 0x00, 0x00);
+		m_palette->set_pen_color(i + 1, 0x55, 0x55, 0x55);
+		m_palette->set_pen_color(i + 2, 0xaa, 0xaa, 0xaa);
+		m_palette->set_pen_color(i + 3, 0xff, 0xff, 0xff);
 	}
 }
 
 void gng_state::gng(machine_config &config)
 {
 	// basic machine hardware
-	MC6809(config, m_maincpu, XTAL(12'000'000) / 2);        // verified on PCB
+	MC6809(config, m_maincpu, XTAL(12'000'000) / 2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &gng_state::gng_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gng_state::irq0_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(12'000'000) / 4));     // verified on PCB
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(12'000'000) / 4)); // verified on PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &gng_state::sound_map);
 	audiocpu.set_periodic_int(FUNC(gng_state::irq0_line_hold), attotime::from_hz(4 * 60));
 
@@ -598,7 +593,7 @@ void gng_state::gng(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(12'000'000) / 2, 384, 128, 0, 262, 22, 246);  // hsync is 50..77, vsync is 257..259
+	screen.set_raw(XTAL(12'000'000) / 2, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(gng_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -612,23 +607,23 @@ void gng_state::gng(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2203(config, m_ym[0], XTAL(12'000'000) / 8);     // verified on PCB
+	YM2203(config, m_ym[0], XTAL(12'000'000) / 8); // verified on PCB
 	m_ym[0]->add_route(0, "mono", 0.40);
 	m_ym[0]->add_route(1, "mono", 0.40);
 	m_ym[0]->add_route(2, "mono", 0.40);
 	m_ym[0]->add_route(3, "mono", 0.20);
 
-	YM2203(config, m_ym[1], XTAL(12'000'000) / 8);     // verified on PCB
+	YM2203(config, m_ym[1], XTAL(12'000'000) / 8); // verified on PCB
 	m_ym[1]->add_route(0, "mono", 0.40);
 	m_ym[1]->add_route(1, "mono", 0.40);
 	m_ym[1]->add_route(2, "mono", 0.40);
 	m_ym[1]->add_route(3, "mono", 0.20);
 }
 
-void gng_state::diamond(machine_config &config)
+void gng_state::diamrun(machine_config &config)
 {
 	gng(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gng_state::diamond_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gng_state::diamrun_main_map);
 
 	config.device_remove("mainlatch");
 }
@@ -951,6 +946,46 @@ ROM_START( makaimurb ) // 85606-A-3/85606-B-3
 	ROM_LOAD( "63s141.2e",    0x0100, 0x0100, CRC(4a1285a4) SHA1(5018c3950b675af58db499e2883ecbc55419b491) )  // priority (not used)
 ROM_END
 
+/*
+  Makaimura bootleg
+  Program is the same as set makaimurb, but different sized/arranged ROMs.
+  Sprite ROMs are the same as gng, so it has the shield instead of cross.
+*/
+ROM_START( makaimurbbl )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "gg5.bin",      0x04000, 0x4000, CRC(f8bda78f) SHA1(ed5d67996475504cdf7b9fa356f6e160cbbcfa77) ) // 4000-5fff is page 4
+	ROM_LOAD( "gg4.bin",      0x08000, 0x4000, CRC(ac0b25fb) SHA1(81b349b969e1ea4f90e8e523ec05a93b62252433) )
+	ROM_LOAD( "gg3.bin",      0x0c000, 0x4000, CRC(762b5af0) SHA1(1752b825b936f0f5ff338f81006f1dc84705d875) )
+	ROM_LOAD( "gg7.bin",      0x10000, 0x4000, CRC(fd9a8dda) SHA1(222c3c759c6b60f82351b9e6bf748fb4872e82b4) ) // page 0, 1, 2, 3
+	ROM_LOAD( "gg6.bin",      0x14000, 0x4000, CRC(2e44634f) SHA1(60b6b8630f14688488593ee439ef77a7a65cd467) ) // page 0, 1, 2, 3
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "gg2.bin",      0x0000, 0x8000, CRC(615f5b6f) SHA1(7ef9ec5c2072e21c787a6bbf700033f50c759c1d) )
+
+	ROM_REGION( 0x04000, "chars", 0 )
+	ROM_LOAD( "gg1.bin",      0x00000, 0x4000, CRC(ecfccf07) SHA1(0a1518e19a2e0a4cc3dde4b9568202ea911b5ece) )
+
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "gg13.bin",     0x00000, 0x4000, CRC(ddd56fa9) SHA1(f9d77eee5e2738b7e83ba02fcc55dd480391479f) ) // 0-1 Plane 1
+	ROM_LOAD( "gg12.bin",     0x04000, 0x4000, CRC(7302529d) SHA1(8434c994cc55d2586641f3b90b6b15fd65dfb67c) ) // 2-3 Plane 1
+	ROM_LOAD( "gg11.bin",     0x08000, 0x4000, CRC(20035bda) SHA1(bbb1fba0eb19471f66d29526fa8423ccb047bd63) ) // 0-1 Plane 2
+	ROM_LOAD( "gg10.bin",     0x0c000, 0x4000, CRC(f12ba271) SHA1(1c42fa02cb27b35d10c3f7f036005e747f9f6b79) ) // 2-3 Plane 2
+	ROM_LOAD( "gg9.bin",      0x10000, 0x4000, CRC(e525207d) SHA1(1947f159189b3a53f1251d8653b6e7c65c91fc3c) ) // 0-1 Plane 3
+	ROM_LOAD( "gg8.bin",      0x14000, 0x4000, CRC(2d77e9b2) SHA1(944da1ce29a18bf0fc8deff78bceacba0bf23a07) ) // 2-3 Plane 3
+
+	ROM_REGION( 0x20000, "sprites", ROMREGION_ERASEFF )
+	ROM_LOAD( "gg19.bin",     0x00000, 0x4000, CRC(93e50a8f) SHA1(42d367f57bb2fdf60a0445ac1533da99cfeaa617) ) // sprites 0 Plane 1-2
+	ROM_LOAD( "gg18.bin",     0x04000, 0x4000, CRC(06d7e5ca) SHA1(9e06012bcd82f98fad43de666ef9a75979d940ab) ) // sprites 1 Plane 1-2
+	ROM_LOAD( "gg17.bin",     0x08000, 0x4000, CRC(bc1fe02d) SHA1(e3a1421d465b87148ffa94f5673b2307f0246afe) ) // sprites 2 Plane 1-2
+	ROM_LOAD( "gg16.bin",     0x10000, 0x4000, CRC(6aaf12f9) SHA1(207a7407288182a4f3eddaea634c6a6452131182) ) // sprites 0 Plane 3-4
+	ROM_LOAD( "gg15.bin",     0x14000, 0x4000, CRC(e80c3fca) SHA1(cb641c25bb04b970b2cbeca41adb792bbe142fb5) ) // sprites 1 Plane 3-4
+	ROM_LOAD( "gg14.bin",     0x18000, 0x4000, CRC(7780a925) SHA1(3f129ca6d695548b659955fe538584bd9ac2ff17) ) // sprites 2 Plane 3-4
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom1",        0x0000, 0x0100, NO_DUMP )  // video timing (not used)
+	ROM_LOAD( "prom2",        0x0100, 0x0100, NO_DUMP )  // priority (not used)
+ROM_END
+
 ROM_START( makaimurc )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "mj04c.bin",      0x04000, 0x4000, CRC(1294edb1) SHA1(35d3b3ce4ee25d3cfa27097de0c9a2ab5e4892aa) )   // 4000-5fff is page 4
@@ -1017,7 +1052,7 @@ ROM_START( makaimurg )
 	ROM_LOAD( "63s141.2e",    0x0100, 0x0100, CRC(4a1285a4) SHA1(5018c3950b675af58db499e2883ecbc55419b491) )  // priority (not used)
 ROM_END
 
-ROM_START( diamond )
+ROM_START( diamrun )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "d3o",          0x04000, 0x4000, CRC(ba4bf9f1) SHA1(460e01f5ba9cd0c76d1a2ea1e66e9ad49ef1e13b) ) // 4000-5fff is page 4
 	ROM_LOAD( "d3",           0x08000, 0x8000, CRC(f436d6fa) SHA1(18287ac51e717ea2ba9b307a738f76735120f21b) )
@@ -1050,15 +1085,16 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, gng,       0,   gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gnga,      gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngbl,     gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg with Cross)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngprot,   gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (prototype)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngblita,  gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngc,      gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",            MACHINE_SUPPORTS_SAVE ) // rev c?
-GAME( 1985, gngt,      gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimur,  gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan)",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurb, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision B)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurc, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision C)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurg, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision G)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1989, diamond,   0,   diamond, diamond,  gng_state, empty_init, ROT0, "KH Video", "Diamond Run",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gng,         0,   gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gnga,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngbl,       gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg with Cross)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngprot,     gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (prototype)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngblita,    gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngc,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",             MACHINE_SUPPORTS_SAVE ) // rev c?
+GAME( 1985, gngt,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimur,    gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurb,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision B)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurbbl, gng, gng,     makaimur, gng_state, empty_init, ROT0, "bootleg",  "Makaimura (Japan revision B bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurc,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision C)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurg,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision G)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, diamrun,     0,   diamrun, diamrun,  gng_state, empty_init, ROT0, "KH Video", "Diamond Run",                                 MACHINE_SUPPORTS_SAVE ) // Kyle Hodgetts

@@ -53,7 +53,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	void cspin2(machine_config &config);
-	void cspin2_map(address_map &map);
+	void cspin2_map(address_map &map) ATTR_COLD;
 };
 
 void capr1_state::output_w(u8 data)
@@ -267,4 +267,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996, cspin2, 0, cspin2, cspin2, capr1_state, empty_init, ROT0, "Taito", "Capriccio Spin 2", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1996, cspin2, 0, cspin2, cspin2, capr1_state, empty_init, ROT0, "Taito", "Capriccio Spin 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

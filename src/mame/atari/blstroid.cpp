@@ -52,8 +52,8 @@ public:
 	void blstroid(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	TIMER_CALLBACK_MEMBER(irq_off);
@@ -65,7 +65,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<atari_jsa_i_device> m_jsa;
@@ -117,7 +117,6 @@ const atari_motion_objects_config blstroid_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x000,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0,0,0x0ff8,0 }}, // mask for the link
@@ -173,7 +172,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(blstroid_state::scanline_update)
 
 	// check for interrupts
 	if (offset < 0x800)
-		if (m_playfield_tilemap->basemem_read(offset) & 0x8000)
+		if (BIT(m_playfield_tilemap->basemem_read(offset), 15))
 		{
 			// FIXME: - the only thing this IRQ does it tweak the starting MO link
 			// unfortunately, it does it too early for the given MOs!
@@ -316,8 +315,8 @@ static INPUT_PORTS_START( blstroid )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_HBLANK("screen")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::hblank))
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -327,8 +326,8 @@ static INPUT_PORTS_START( blstroid )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_HBLANK("screen")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::hblank))
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -341,18 +340,6 @@ INPUT_PORTS_END
  *  Graphics definitions
  *
  *************************************/
-
-static const gfx_layout pflayout =
-{
-	16,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0,0, 4,4, 8,8, 12,12, 16,16, 20,20, 24,24, 28,28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
-	32*8
-};
-
 
 static const gfx_layout molayout =
 {
@@ -368,8 +355,8 @@ static const gfx_layout molayout =
 
 
 static GFXDECODE_START( gfx_blstroid )
-	GFXDECODE_ENTRY( "tiles", 0, pflayout,  256, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, molayout,    0, 16 )
+	GFXDECODE_SCALE( "tiles",   0, gfx_8x8x4_packed_msb, 256, 16, 2, 1 )
+	GFXDECODE_ENTRY( "sprites", 0, molayout,               0, 16 )
 GFXDECODE_END
 
 

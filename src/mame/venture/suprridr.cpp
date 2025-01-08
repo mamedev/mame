@@ -10,7 +10,7 @@
         * Super Rider
 
     Known issues:
-        * clocks on sound chips and CPU not verified yet
+        * clocks on sound chips and CPU not verified yet, taken from thepit
         * the board seems to contain a discrete sound portion
 
     Questions:
@@ -105,7 +105,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_soundlatch(*this, "soundlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_fgram(*this, "fgram"),
@@ -116,17 +115,16 @@ public:
 
 	void suprridr(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(control_r);
+	ioport_value control_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -162,10 +160,10 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -238,7 +236,7 @@ void suprridr_state::palette(palette_device &palette) const
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -361,6 +359,7 @@ uint32_t suprridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		}
 		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, color, fx, fy, x, y, 0);
 	}
+
 	return 0;
 }
 
@@ -372,8 +371,9 @@ void suprridr_state::machine_start()
 
 void suprridr_state::machine_reset()
 {
-	m_soundlatch->acknowledge_w();
 }
+
+
 
 /*************************************
  *
@@ -404,7 +404,7 @@ INTERRUPT_GEN_MEMBER(suprridr_state::main_nmi_gen)
 void suprridr_state::coin_lock_w(uint8_t data)
 {
 	// cleared when 9 credits are hit, but never reset!
-//  machine().bookkeeping().coin_lockout_global_w(~data & 1);
+	//machine().bookkeeping().coin_lockout_global_w(~data & 1);
 }
 
 
@@ -430,7 +430,7 @@ void suprridr_state::main_map(address_map &map)
 	map(0xb002, 0xb003).w(FUNC(suprridr_state::coin_lock_w));
 	map(0xb006, 0xb006).w(FUNC(suprridr_state::flipx_w));
 	map(0xb007, 0xb007).w(FUNC(suprridr_state::flipy_w));
-	map(0xb800, 0xb800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xb800, 0xb800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc801, 0xc801).w(FUNC(suprridr_state::fgdisable_w));
 	map(0xc802, 0xc802).w(FUNC(suprridr_state::fgscrolly_w));
 	map(0xc804, 0xc804).w(FUNC(suprridr_state::bgscrolly_w));
@@ -462,7 +462,7 @@ void suprridr_state::sound_map(address_map &map)
 void suprridr_state::sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
 	map(0x8c, 0x8d).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x8d, 0x8d).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x8e, 0x8f).w("ay2", FUNC(ay8910_device::address_data_w));
@@ -478,21 +478,20 @@ void suprridr_state::sound_portmap(address_map &map)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(suprridr_state::control_r)
+ioport_value suprridr_state::control_r()
 {
 	// screen flip multiplexes controls
-
 	return m_contp[m_flipx]->read(); // or is it flipy?
 }
 
 
 static INPUT_PORTS_START( suprridr )
 	PORT_START("INPUTS")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(suprridr_state, control_r)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(suprridr_state::control_r))
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -587,18 +586,21 @@ GFXDECODE_END
 void suprridr_state::suprridr(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(49'152'000) / 16);     // 3 MHz
+	Z80(config, m_maincpu, 18'432'000 / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &suprridr_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &suprridr_state::main_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(suprridr_state::main_nmi_gen));
 
-	Z80(config, m_audiocpu, 10000000 / 4);       // 2.5 MHz
+	Z80(config, m_audiocpu, 10'000'000 / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &suprridr_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &suprridr_state::sound_portmap);
+	m_audiocpu->set_vblank_int("screen", FUNC(suprridr_state::irq0_line_hold)); // ?
+
+	config.set_maximum_quantum(attotime::from_hz(3000));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -613,15 +615,13 @@ void suprridr_state::suprridr(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", XTAL(49'152'000) / 32).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay1", 18'432'000 / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(49'152'000) / 32));
-	ay2.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay8910_device &ay2(AY8910(config, "ay2", 18'432'000 / 12));
+	ay2.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
-	m_soundlatch->set_separate_acknowledge(true);
+	GENERIC_LATCH_8(config, "soundlatch");
 }
 
 

@@ -25,8 +25,8 @@ public:
 
 protected:
 	virtual void term_write(uint8_t data) override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	static inline constexpr unsigned WIDTH = 80;

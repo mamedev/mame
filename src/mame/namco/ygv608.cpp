@@ -1199,7 +1199,7 @@ inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &b
 		source_tilemap->draw(screen, bitmap, cliprect, 0, 0 );
 }
 
-void ygv608_device::ygv608_draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n)
+void ygv608_device::draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n)
 {
 	if (n <= 0)
 	{
@@ -1363,7 +1363,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	{
 		draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_B);
 		if(m_mosaic_bplane > 0)
-			ygv608_draw_mosaic(m_work_bitmap, finalclip, m_mosaic_bplane);
+			draw_mosaic(m_work_bitmap, finalclip, m_mosaic_bplane);
 
 		if(m_planeB_trans_enable == true)
 			copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
@@ -1382,7 +1382,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 
 	draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_A);
 	if(m_mosaic_aplane > 0)
-		ygv608_draw_mosaic(m_work_bitmap, finalclip, m_mosaic_aplane);
+		draw_mosaic(m_work_bitmap, finalclip, m_mosaic_aplane);
 
 	if(m_planeA_trans_enable == true)
 		copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);

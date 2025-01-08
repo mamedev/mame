@@ -6,6 +6,8 @@
 
      Driver by Frank Palazzolo (palazzol@comcast.net)
 
+     Hardware is extremely similar to nichibutsu/cclimber.cpp (possibly derived)
+
     - This driver was done with only flyer shots to go by.
     - Colors are a good guess (might be perfect)
     - Clock and interrupt speeds for the sound CPU is a guess, but seem
@@ -48,7 +50,7 @@ public:
 	void init_mouser();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -72,10 +74,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void nmi_interrupt(int state);
 	INTERRUPT_GEN_MEMBER(sound_nmi_assert);
-	void decrypted_opcodes_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -117,7 +119,7 @@ void mouser_state::palette(palette_device &palette) const
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

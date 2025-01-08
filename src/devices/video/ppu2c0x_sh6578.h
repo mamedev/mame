@@ -4,8 +4,8 @@
 
 ******************************************************************************/
 
-#ifndef MAME_VIDEO_PPU_SH6578_H
-#define MAME_VIDEO_PPU_SH6578_H
+#ifndef MAME_VIDEO_PPU2C0X_SH6578_H
+#define MAME_VIDEO_PPU2C0X_SH6578_H
 
 #pragma once
 
@@ -24,11 +24,11 @@ public:
 protected:
 	ppu_sh6578_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void ppu_internal_map(address_map& map);
+	void ppu_internal_map(address_map &map) ATTR_COLD;
 
 private:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void scanline_increment_fine_ycounter() override;
 
@@ -54,4 +54,4 @@ public:
 DECLARE_DEVICE_TYPE(PPU_SH6578,    ppu_sh6578_device)
 DECLARE_DEVICE_TYPE(PPU_SH6578PAL, ppu_sh6578pal_device)
 
-#endif // MAME_VIDEO_PPU_SH6578_H
+#endif // MAME_VIDEO_PPU2C0X_SH6578_H

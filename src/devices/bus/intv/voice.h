@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __INTV_VOICE_H
-#define __INTV_VOICE_H
+#ifndef MAME_BUS_INTV_VOICE_H
+#define MAME_BUS_INTV_VOICE_H
 
-#include "slot.h"
+#pragma once
+
 #include "rom.h"
+#include "slot.h"
+
 #include "sound/sp0256.h"
 
 
@@ -48,9 +51,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	required_device<sp0256_device> m_speech;
@@ -62,4 +65,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(INTV_ROM_VOICE, intv_voice_device)
 
-#endif // MAME_BUS_INTV_SLOT_H
+#endif // MAME_BUS_INTV_VOICE_H

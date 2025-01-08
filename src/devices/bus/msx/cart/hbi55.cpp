@@ -37,9 +37,9 @@ public:
 	{ }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual char const *file_extensions() const noexcept override { return "bin"; }
 	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
