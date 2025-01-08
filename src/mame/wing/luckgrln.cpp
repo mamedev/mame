@@ -968,6 +968,6 @@ ROM_END
 **********************************************/
 
 //     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT           ROT   COMPANY           FULL NAME                                 FLAGS                                     LAYOUT
-GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln )
-GAMEL( 1991, luckstrn, 0,      luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Star (newer Z180 based hardware)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln ) // missing internal ROM dump
+GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180-based hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln )
+GAMEL( 1991, luckstrn, 0,      luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Star (newer Z180-based hardware)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln ) // missing internal ROM dump
 GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  luckgrln_state, empty_init,    ROT0, "Sovic",          "7 Smash",                                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_7smash )

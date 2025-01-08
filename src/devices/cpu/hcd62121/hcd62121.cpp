@@ -369,14 +369,21 @@ void hcd62121_cpu_device::device_start()
 	save_item(NAME(m_f));
 	save_item(NAME(m_time));
 	save_item(NAME(m_time_op));
+	save_item(NAME(m_unk_f5));
+	save_item(NAME(m_cycles_until_timeout));
 	save_item(NAME(m_is_timer_started));
+	save_item(NAME(m_is_timer_irq_enabled));
+	save_item(NAME(m_is_timer_irq_asserted));
+	save_item(NAME(m_is_timer_wait_elapsed));
 	save_item(NAME(m_is_infinite_timeout));
+	save_item(NAME(m_timer_cycles));
 	save_item(NAME(m_lar));
 	save_item(NAME(m_reg));
-	save_item(NAME(m_temp1));
-	save_item(NAME(m_temp2));
 	save_item(NAME(m_opt));
 	save_item(NAME(m_port));
+
+	save_item(NAME(m_temp1));
+	save_item(NAME(m_temp2));
 
 	// Register state for debugger
 	state_add(STATE_GENPC,    "GENPC",    m_rtemp).callexport().formatstr("%8s");

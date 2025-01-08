@@ -93,14 +93,11 @@ public:
 		m_sprite_xhigh_ignore_hack(true),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
-		m_rom_dma_src(*this,"rom_dma_src"),
-		m_rom_dma_dst(*this,"rom_dma_dst"),
-		m_rom_dma_len(*this,"rom_dma_len"),
+		m_rom_dma_src(*this, "rom_dma_src"),
+		m_rom_dma_dst(*this, "rom_dma_dst"),
+		m_rom_dma_len(*this, "rom_dma_len"),
 		m_palram_sh(*this, "palram_sh"),
 		m_palram_l(*this, "palram_l"),
-		m_bmp_palram_sh(*this, "bmp_palram_sh"),
-		m_bmp_palram_l(*this, "bmp_palram_l"),
-		m_bmp_base(*this, "bmp_base"),
 		m_colmix_sh(*this, "colmix_sh"),
 		m_colmix_l(*this, "colmix_l"),
 		m_colmix_ctrl(*this, "colmix_ctrl"),
@@ -113,20 +110,31 @@ public:
 		m_sound(*this, "xavix_sound"),
 		m_adc(*this, "adc"),
 		m_anport(*this, "anport"),
-		m_math(*this, "math"),
-		m_xavix2002io(*this, "xavix2002io")
-	{ }
+		m_math(*this, "math")
+	{
+		m_video_hres_multiplier = 1;
+	}
 
 	void xavix(machine_config &config);
 	void xavix_nv(machine_config &config);
+	void xavix_1mb_nv(machine_config &config);
+	void xavix_2mb_nv(machine_config &config);
+	void xavix_4mb_nv(machine_config &config);
+	void xavix_4mb(machine_config &config);
+	void xavix_2mb(machine_config &config);
+	void xavix_1mb(machine_config &config);
 
 	void xavixp(machine_config &config);
 	void xavixp_nv(machine_config &config);
+	void xavixp_1mb_nv(machine_config &config);
+	void xavixp_4mb(machine_config &config);
+	void xavixp_2mb(machine_config &config);
+	void xavixp_1mb(machine_config &config);
 
 	void xavix2000(machine_config &config);
+	void xavix2000_4mb(machine_config &config);
 	void xavix2000_nv(machine_config &config);
-
-	void xavix2002(machine_config &config);
+	void xavix2000_4mb_nv(machine_config &config);
 
 	void xavix_43mhz(machine_config &config);
 
@@ -216,16 +224,18 @@ protected:
 
 	bool m_disable_timer_irq_hack = false; // hack for epo_mini which floods timer IRQs to the point it won't do anything else
 
-private:
+	virtual void xavix_extbus_map(address_map &map) ATTR_COLD;
+
+	void xavix_4mb_extbus_map(address_map &map) ATTR_COLD;
+	void xavix_2mb_extbus_map(address_map &map) ATTR_COLD;
+	void xavix_1mb_extbus_map(address_map &map) ATTR_COLD;
 
 	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void xavix_map(address_map &map) ATTR_COLD;
 
 	void xavix_lowbus_map(address_map &map) ATTR_COLD;
-	void xavix_extbus_map(address_map &map) ATTR_COLD;
-	void superxavix_lowbus_map(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
@@ -242,7 +252,14 @@ private:
 	{
 		if (offset & 0x8000)
 		{
-			return m_rgn[(offset) & (m_rgnlen - 1)];
+			if (m_disable_memory_bypass)
+			{
+				return m_maincpu->space(6).read_byte(offset & 0x7fffff);
+			}
+			else
+			{
+				return m_rgn[(offset) & (m_rgnlen - 1)];
+			}
 		}
 		else
 		{
@@ -252,16 +269,16 @@ private:
 
 	virtual uint8_t opcodes_800000_r(offs_t offset)
 	{
-		// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
-		return m_rgn[(offset) & (m_rgnlen - 1)];
+		if (m_disable_memory_bypass)
+		{
+			return m_maincpu->space(6).read_byte(offset & 0x7fffff);
+		}
+		else
+		{
+			// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
+			return m_rgn[(offset) & (m_rgnlen - 1)];
+		}
 	}
-
-	virtual uint8_t extbus_r(offs_t offset) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
-	virtual void extbus_w(offs_t offset, uint8_t data)
-	{
-		logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);
-	}
-
 
 	uint8_t sample_read(offs_t offset)
 	{
@@ -413,9 +430,8 @@ private:
 	void palram_l_w(offs_t offset, uint8_t data);
 	void colmix_sh_w(offs_t offset, uint8_t data);
 	void colmix_l_w(offs_t offset, uint8_t data);
-	void bmp_palram_sh_w(offs_t offset, uint8_t data);
-	void bmp_palram_l_w(offs_t offset, uint8_t data);
 	void spriteram_w(offs_t offset, uint8_t data);
+	void mainram_w(offs_t offset, uint8_t data);
 	bool m_sprite_xhigh_ignore_hack;
 
 	void tmap1_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
@@ -424,29 +440,6 @@ private:
 	uint8_t tmap2_regs_r(offs_t offset);
 
 	void spriteregs_w(uint8_t data);
-
-	void superxavix_bitmap_pal_index_w(uint8_t data);
-	uint8_t superxavix_bitmap_pal_index_r();
-	void superxavix_chr_pal_index_w(uint8_t data);
-	uint8_t superxavix_chr_pal_index_r();
-	uint8_t superxavix_bitmap_pal_hue_r();
-	uint8_t superxavix_bitmap_pal_saturation_r();
-	uint8_t superxavix_bitmap_pal_lightness_r();
-	uint8_t superxavix_chr_pal_hue_r();
-	uint8_t superxavix_chr_pal_saturation_r();
-	uint8_t superxavix_chr_pal_lightness_r();
-	uint8_t superxavix_pal_hue_r(bool bitmap);
-	uint8_t superxavix_pal_saturation_r(bool bitmap);
-	uint8_t superxavix_pal_lightness_r(bool bitmap);
-	void superxavix_bitmap_pal_hue_w(uint8_t data);
-	void superxavix_bitmap_pal_saturation_w(uint8_t data);
-	void superxavix_bitmap_pal_lightness_w(uint8_t data);
-	void superxavix_chr_pal_hue_w(uint8_t data);
-	void superxavix_chr_pal_saturation_w(uint8_t data);
-	void superxavix_chr_pal_lightness_w(uint8_t data);
-	void superxavix_pal_hue_w(uint8_t data, bool bitmap);
-	void superxavix_pal_saturation_w(uint8_t data, bool bitmap);
-	void superxavix_pal_lightness_w(uint8_t data, bool bitmap);
 
 	uint8_t pal_ntsc_r();
 
@@ -539,9 +532,6 @@ private:
 
 	uint8_t m_timer_baseval = 0;
 
-	uint8_t m_superxavix_pal_index = 0;
-	uint8_t m_superxavix_bitmap_pal_index = 0;
-
 	int16_t get_vectors(int which, int half);
 
 	// raster IRQ
@@ -559,10 +549,6 @@ private:
 	required_shared_ptr<uint8_t> m_palram_sh;
 	required_shared_ptr<uint8_t> m_palram_l;
 
-	optional_shared_ptr<uint8_t> m_bmp_palram_sh;
-	optional_shared_ptr<uint8_t> m_bmp_palram_l;
-	optional_shared_ptr<uint8_t> m_bmp_base;
-
 	required_shared_ptr<uint8_t> m_colmix_sh;
 	required_shared_ptr<uint8_t> m_colmix_l;
 	required_shared_ptr<uint8_t> m_colmix_ctrl;
@@ -577,6 +563,10 @@ private:
 	required_ioport m_region;
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<xavix_sound_device> m_sound;
+	required_device<xavix_adc_device> m_adc;
+	required_device<xavix_anport_device> m_anport;
+	required_device<xavix_math_device> m_math;
 
 	uint8_t get_pen_lightness_from_dat(uint16_t dat);
 	uint8_t get_pen_saturation_from_dat(uint16_t dat);
@@ -585,11 +575,15 @@ private:
 	uint16_t apply_pen_saturation_to_dat(uint16_t dat, uint16_t saturation);
 	uint16_t apply_pen_hue_to_dat(uint16_t dat, uint16_t hue);
 
+	virtual void get_tile_pixel_dat(uint8_t& dat, int bpp);
+
+	rectangle do_arena(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_pen(int pen, uint8_t shval, uint8_t lval);
-	void draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
-	void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which);
+	void draw_regular_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &clip);
+	virtual void draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line);
+	virtual void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which);
 	void draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which, int line);
-	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int line);
 	void decode_inline_header(int &flipx, int &flipy, int &test, int& pal, int debug_packets);
 
@@ -608,28 +602,16 @@ private:
 
 	int get_current_address_byte();
 
-	required_device<xavix_sound_device> m_sound;
-
-
 	uint8_t sound_regram_read_cb(offs_t offset);
-
-protected:
-	required_device<xavix_adc_device> m_adc;
-	required_device<xavix_anport_device> m_anport;
-	required_device<xavix_math_device> m_math;
-	optional_device<xavix2002_io_device> m_xavix2002io;
 
 	uint8_t m_extbusctrl[3]{};
 
 	virtual uint8_t extintrf_790x_r(offs_t offset);
 	virtual void extintrf_790x_w(offs_t offset, uint8_t data);
 
-	// additional SuperXaviX / XaviX2002 stuff
-	uint8_t m_sx_extended_extbus[3]{};
-
-	void extended_extbus_reg0_w(uint8_t data);
-	void extended_extbus_reg1_w(uint8_t data);
-	void extended_extbus_reg2_w(uint8_t data);
+	bool m_disable_memory_bypass = false;
+	bool m_disable_sprite_yflip = false;
+	int m_video_hres_multiplier;
 };
 
 class xavix_guru_state : public xavix_state
@@ -647,6 +629,135 @@ private:
 	uint8_t guru_anport2_r() { uint8_t ret = m_mouse1x->read()-0x10; return ret; }
 };
 
+class superxavix_state : public xavix_state
+{
+public:
+	superxavix_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+		, m_xavix2002io(*this, "xavix2002io")
+		, m_sx_crtc_1(*this, "sx_crtc_1")
+		, m_sx_crtc_2(*this, "sx_crtc_2")
+		, m_sx_plt_loc(*this, "sx_plt_loc")
+		, m_bmp_palram_sh(*this, "bmp_palram_sh")
+		, m_bmp_palram_l(*this, "bmp_palram_l")
+		, m_bmp_base(*this, "bmp_base")
+		, m_extra(*this, "extra")
+	{
+		m_video_hres_multiplier = 2;
+	}
+
+	void xavix2002(machine_config &config);
+	void xavix2002_4mb(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
+	void superxavix_lowbus_map(address_map &map) ATTR_COLD;
+
+	required_device<xavix2002_io_device> m_xavix2002io;
+
+	virtual void get_tile_pixel_dat(uint8_t &dat, int bpp) override;
+
+private:
+	void superxavix_plt_flush_w(uint8_t data);
+	uint8_t superxavix_plt_dat_r();
+	void superxavix_plt_dat_w(uint8_t data);
+	void superxavix_plt_loc_w(offs_t offset, uint8_t data);
+	uint8_t superxavix_plt_loc_r(offs_t offset);
+
+	void superxavix_bitmap_pal_index_w(uint8_t data);
+	uint8_t superxavix_bitmap_pal_index_r();
+	void superxavix_chr_pal_index_w(uint8_t data);
+	uint8_t superxavix_chr_pal_index_r();
+	uint8_t superxavix_bitmap_pal_hue_r();
+	uint8_t superxavix_bitmap_pal_saturation_r();
+	uint8_t superxavix_bitmap_pal_lightness_r();
+	uint8_t superxavix_chr_pal_hue_r();
+	uint8_t superxavix_chr_pal_saturation_r();
+	uint8_t superxavix_chr_pal_lightness_r();
+	uint8_t superxavix_pal_hue_r(bool bitmap);
+	uint8_t superxavix_pal_saturation_r(bool bitmap);
+	uint8_t superxavix_pal_lightness_r(bool bitmap);
+	void superxavix_bitmap_pal_hue_w(uint8_t data);
+	void superxavix_bitmap_pal_saturation_w(uint8_t data);
+	void superxavix_bitmap_pal_lightness_w(uint8_t data);
+	void superxavix_chr_pal_hue_w(uint8_t data);
+	void superxavix_chr_pal_saturation_w(uint8_t data);
+	void superxavix_chr_pal_lightness_w(uint8_t data);
+	void superxavix_pal_hue_w(uint8_t data, bool bitmap);
+	void superxavix_pal_saturation_w(uint8_t data, bool bitmap);
+	void superxavix_pal_lightness_w(uint8_t data, bool bitmap);
+
+	uint8_t bitmap_params_r(offs_t offset);
+	void bitmap_params_w(offs_t offset, uint8_t data);
+
+	void superxavix_crtc_1_w(offs_t offset, uint8_t data);
+	uint8_t superxavix_crtc_1_r(offs_t offset);
+	void superxavix_crtc_2_w(offs_t offset, uint8_t data);
+	uint8_t superxavix_crtc_2_r(offs_t offset);
+
+	void bmp_palram_sh_w(offs_t offset, uint8_t data);
+	void bmp_palram_l_w(offs_t offset, uint8_t data);
+
+	void extended_extbus_reg0_w(uint8_t data);
+	void extended_extbus_reg1_w(uint8_t data);
+	void extended_extbus_reg2_w(uint8_t data);
+
+	void draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	uint8_t get_next_bit_sx();
+	virtual void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which) override;
+
+	uint8_t m_superxavix_pal_index = 0;
+	uint8_t m_superxavix_bitmap_pal_index = 0;
+	uint32_t m_sx_plt_address = 0;
+	uint8_t m_sx_plt_mode = 0;
+	uint8_t m_plotter_has_byte = 0;
+	uint8_t m_plotter_current_byte = 0x00;
+
+	uint8_t m_sx_extended_extbus[3]{};
+
+	required_shared_ptr<uint8_t> m_sx_crtc_1;
+	required_shared_ptr<uint8_t> m_sx_crtc_2;
+	required_shared_ptr<uint8_t> m_sx_plt_loc;
+
+	required_shared_ptr<uint8_t> m_bmp_palram_sh;
+	required_shared_ptr<uint8_t> m_bmp_palram_l;
+	required_shared_ptr<uint8_t> m_bmp_base;
+
+	optional_region_ptr<uint8_t> m_extra;
+
+	bool m_use_superxavix_extra; // does not need saving
+};
+
+
+class superxavix_i2c_state : public superxavix_state
+{
+public:
+	superxavix_i2c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: superxavix_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void superxavix_i2c_24c16(machine_config &config);
+	void superxavix_i2c_24c08(machine_config &config);
+	void superxavix_i2c_24c04(machine_config &config);
+	void superxavix_i2c_24c04_4mb(machine_config &config);
+	void superxavix_i2c_24c02(machine_config &config);
+	void superxavix_i2c_mrangbat(machine_config& config);
+
+protected:
+	virtual void write_io1(uint8_t data, uint8_t direction) override;
+
+	required_device<i2cmem_device> m_i2cmem;
+};
+
+
+
 class xavix_i2c_state : public xavix_state
 {
 public:
@@ -656,19 +767,24 @@ public:
 	{ }
 
 	void xavix_i2c_24lc04(machine_config &config);
+	void xavix_i2c_24lc04_4mb(machine_config &config);
+	void xavix_i2c_24lc04_2mb(machine_config &config);
+	void xavix_i2c_24lc04_1mb(machine_config &config);
 	void xavix_i2c_24c02(machine_config &config);
+	void xavix_i2c_24c02_4mb(machine_config &config);
+	void xavix_i2c_24c02_2mb(machine_config &config);
 	void xavix_i2c_24c02_43mhz(machine_config &config);
 	void xavix_i2c_24c08(machine_config &config);
+	void xavix_i2c_24c08_4mb(machine_config &config);
 	void xavix_i2c_24c16(machine_config &config);
+	void xavix_i2c_24c16_4mb(machine_config &config);
 
 	void xavix2000_i2c_24c08(machine_config &config);
+	void xavix2000_i2c_24c08_4mb(machine_config &config);
 	void xavix2000_i2c_24c04(machine_config &config);
+	void xavix2000_i2c_24c04_2mb(machine_config &config);
+	void xavix2000_i2c_24c04_4mb(machine_config &config);
 	void xavix2000_i2c_24c02(machine_config &config);
-
-	void xavix2002_i2c_24c08(machine_config &config);
-	void xavix2002_i2c_24c04(machine_config &config);
-	void xavix2002_i2c_24c02(machine_config &config);
-	void xavix2002_i2c_mrangbat(machine_config& config);
 
 protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
@@ -796,10 +912,10 @@ public:
 private:
 
 private:
-	uint8_t tvho_anport0_r() { return m_mouse0x->read()^0x7f; }
-	uint8_t tvho_anport1_r() { return m_mouse0y->read()^0x7f; }
-	uint8_t tvho_anport2_r() { return m_mouse1x->read()^0x7f; }
-	uint8_t tvho_anport3_r() { return m_mouse1y->read()^0x7f; }
+	uint8_t tvho_anport0_r() { return (m_mouse0x->read()^0x7f)+1; }
+	uint8_t tvho_anport1_r() { return (m_mouse0y->read()^0x7f)+1; }
+	uint8_t tvho_anport2_r() { return (m_mouse1x->read()^0x7f)+1; }
+	uint8_t tvho_anport3_r() { return (m_mouse1y->read()^0x7f)+1; }
 };
 
 
@@ -842,7 +958,9 @@ public:
 		xavix_state(mconfig, type, tag),
 		m_cartslot(*this, "cartslot")
 	{
-		m_cartlimit = 0x400000;
+		// all signals 0x000000 - 0x5fffff go to the cart
+		// even if the largest cart is 0x400000 in size
+		m_cartlimit = 0x600000;
 	}
 
 	void xavix_cart(machine_config &config);
@@ -854,25 +972,51 @@ public:
 
 protected:
 
+	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
+
+	u8 cart_r(offs_t offset)
+	{
+		if (m_cartslot->has_cart())
+		{
+			return m_cartslot->read_cart(offset);
+		}
+		else
+		{
+			return m_rgn[(offset) & (m_rgnlen - 1)];
+		}
+	}
+
+	void cart_w(offs_t offset, uint8_t data)
+	{
+		if (m_cartslot->has_cart())
+		{
+			m_cartslot->write_cart(offset, data);
+		}
+		else
+		{
+			logerror("%s: unhandled write access to cart area with no cart installed %08x %02x\n", machine().describe_context(), offset, data);
+		}
+	}
+
 	// for Cart cases this memory bypass becomes more complex
 
 	virtual uint8_t opcodes_000000_r(offs_t offset) override
 	{
 		if (offset & 0x8000)
 		{
-			if ((offset & 0x7fffff) >= m_cartlimit)
+			if (m_disable_memory_bypass)
 			{
-				return m_rgn[(offset) & (m_rgnlen - 1)];
+				return m_maincpu->space(6).read_byte(offset & 0x7fffff);
 			}
 			else
 			{
-				if (m_cartslot->has_cart())
+				if ((offset & 0x7fffff) >= m_cartlimit)
 				{
-					return m_cartslot->read_cart(offset);
+					return m_rgn[(offset) & (m_rgnlen - 1)];
 				}
 				else
 				{
-					return m_rgn[(offset) & (m_rgnlen - 1)];
+					return cart_r(offset);
 				}
 			}
 		}
@@ -884,19 +1028,19 @@ protected:
 
 	virtual uint8_t opcodes_800000_r(offs_t offset) override
 	{
-		if ((offset & 0x7fffff) >= m_cartlimit)
+		if (m_disable_memory_bypass)
 		{
-			return m_rgn[(offset) & (m_rgnlen - 1)];
+			return m_maincpu->space(6).read_byte(offset & 0x7fffff);
 		}
 		else
 		{
-			if (m_cartslot->has_cart())
+			if ((offset & 0x7fffff) >= m_cartlimit)
 			{
-				return m_cartslot->read_cart(offset);
+				return m_rgn[(offset) & (m_rgnlen - 1)];
 			}
 			else
 			{
-				return m_rgn[(offset) & (m_rgnlen - 1)];
+				return cart_r(offset);
 			}
 		}
 	}
@@ -918,51 +1062,6 @@ protected:
 		}
 	};
 
-	virtual uint8_t extbus_r(offs_t offset) override
-	{
-		if (m_cartslot->has_cart() && m_cartslot->is_read_access_not_rom())
-		{
-			logerror("%s: read from external bus %06x (SEEPROM READ?)\n", machine().describe_context(), offset);
-			return m_cartslot->read_extra(offset);
-		}
-		else
-		{
-			if ((offset & 0x7fffff) >= m_cartlimit)
-			{
-				return m_rgn[(offset) & (m_rgnlen - 1)];
-			}
-			else
-			{
-				if (m_cartslot->has_cart())
-				{
-					return m_cartslot->read_cart(offset);
-				}
-				else
-				{
-					return m_rgn[(offset) & (m_rgnlen - 1)];
-				}
-			}
-		}
-	}
-	virtual void extbus_w(offs_t offset, uint8_t data) override
-	{
-		if (m_cartslot->has_cart() && m_cartslot->is_write_access_not_rom())
-		{
-			logerror("%s: write to external bus %06x %02x (SEEPROM WRITE?)\n", machine().describe_context(), offset, data);
-			return m_cartslot->write_extra(offset, data);
-		}
-		else
-		{
-			if (m_cartslot->has_cart())
-			{
-				return m_cartslot->write_cart(offset, data);
-			}
-			else
-			{
-				logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);
-			}
-		}
-	}
 
 	virtual inline uint8_t read_full_data_sp_bypass(uint32_t offset) override
 	{
@@ -976,14 +1075,7 @@ protected:
 			}
 			else
 			{
-				if (m_cartslot->has_cart())
-				{
-					return m_cartslot->read_cart(offset);
-				}
-				else
-				{
-					return m_rgn[(offset) & (m_rgnlen - 1)];
-				}
+				return cart_r(offset);
 			}
 		}
 		else
@@ -996,14 +1088,7 @@ protected:
 				}
 				else
 				{
-					if (m_cartslot->has_cart())
-					{
-						return m_cartslot->read_cart(offset);
-					}
-					else
-					{
-						return m_rgn[(offset) & (m_rgnlen - 1)];
-					}
+					return cart_r(offset);
 				}
 			}
 			else
@@ -1030,6 +1115,7 @@ public:
 	void xavix_cart_gcslottv(machine_config &config);
 
 protected:
+	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
 };
 
 class xavix_i2c_cart_state : public xavix_cart_state

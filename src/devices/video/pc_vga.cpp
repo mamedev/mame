@@ -60,7 +60,7 @@
 #define LOG_DSW       (1U << 3) // Input sense at $3c2
 #define LOG_CRTC      (1U << 4) // CRTC setups with monitor geometry
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_DSW)
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
@@ -117,6 +117,7 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 	, device_memory_interface(mconfig, *this)
 	, vga(*this)
 	, m_input_sense(*this, "VGA_SENSE")
+	, m_vsync_cb(*this)
 {
 	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(vga_device::io_3bx_3dx_map), this));
 	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(vga_device::crtc_map), this));
@@ -223,6 +224,7 @@ void vga_device::device_start()
 	save_item(NAME(vga.crtc.map13));
 	save_item(NAME(vga.crtc.irq_clear));
 	save_item(NAME(vga.crtc.irq_disable));
+	save_item(NAME(vga.crtc.irq_latch));
 	save_item(NAME(vga.crtc.no_wrap));
 
 	save_item(NAME(vga.gc.index));
@@ -498,6 +500,7 @@ u8 vga_device::input_status_0_r(offs_t offset)
 	LOGDSW("Reading sense bit %d\n", sense_bit);
 	if(BIT(m_input_sense->read(), sense_bit))
 		res |= 0x10;
+	res |= vga.crtc.irq_latch << 7;
 	return res;
 }
 
@@ -905,12 +908,20 @@ void vga_device::crtc_map(address_map &map)
 			return res;
 		}),
 		NAME([this](offs_t offset, u8 data) {
-			vga.crtc.protect_enable = (data & 0x80) >> 7;
-			vga.crtc.bandwidth = (data & 0x40) >> 6;
+			vga.crtc.protect_enable = BIT(data, 7);
+			vga.crtc.bandwidth = BIT(data, 6);
+			// IRQ: Original VGA only supports this for PS/2, but clone cards may supports this on ISA too
+			// see https://scalibq.wordpress.com/2022/12/06/the-myth-of-the-vertical-retrace-interrupt/
+			vga.crtc.irq_disable = BIT(data, 5);
+			vga.crtc.irq_clear = BIT(data, 4);
 			vga.crtc.vert_retrace_end = (vga.crtc.vert_retrace_end & ~0xf) | (data & 0x0f);
-			// TODO: these two doesn't seem part of the spec
-			vga.crtc.irq_clear = (data & 0x10) >> 4;
-			vga.crtc.irq_disable = (data & 0x20) >> 5;
+
+			if (vga.crtc.irq_clear == 0)
+			{
+				vga.crtc.irq_latch = 0;
+				m_vsync_cb(0);
+			}
+
 			LOGCRTC("CR11 V retrace end %02x -> %02d protect enable %d bandwidth %d irq %02x\n"
 				, data
 				, vga.crtc.vert_retrace_end
@@ -1839,6 +1850,13 @@ TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 {
 	vga.crtc.start_addr = latch_start_addr();
 	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
+
+	if (vga.crtc.irq_latch == 0 && vga.crtc.irq_disable == 0)
+	{
+		vga.crtc.irq_latch = 1;
+		m_vsync_cb(1);
+	}
+
 	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
 

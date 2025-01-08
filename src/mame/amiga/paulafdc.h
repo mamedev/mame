@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_AMIGAFDC_H
-#define MAME_MACHINE_AMIGAFDC_H
+#ifndef MAME_AMIGA_PAULAFDC_H
+#define MAME_AMIGA_PAULAFDC_H
 
 #pragma once
 
 #include "imagedev/floppy.h"
 
-class amiga_fdc_device : public device_t {
+class paula_fdc_device : public device_t {
 public:
-	amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	paula_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto index_callback() { return m_write_index.bind(); }
 	auto read_dma_callback() { return m_read_dma.bind(); }
@@ -125,6 +125,6 @@ private:
 	void live_run(const attotime &limit = attotime::never);
 };
 
-DECLARE_DEVICE_TYPE(AMIGA_FDC, amiga_fdc_device)
+DECLARE_DEVICE_TYPE(PAULA_FDC, paula_fdc_device)
 
-#endif // MAME_MACHINE_AMIGAFDC_H
+#endif // MAME_AMIGA_PAULAFDC_H

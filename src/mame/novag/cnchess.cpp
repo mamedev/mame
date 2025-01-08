@@ -5,9 +5,9 @@
 
 Novag Chinese Chess (象棋, model 866)
 
-Novag's first Xiangqi computer, mainly sold in Hong Kong. Model 8710 is the same
-as model 866, maybe one was for export. The newer model 9300 (distributed by Yorter)
-is also presumed to be the same.
+Novag's first Xiangqi computer, mainly sold in Hong Kong. Model 8710 (棋王, Chess
+King) was distributed by Yorter Electronics for the local market. It's the same
+hardware as model 866. The newer model 9300 is also presumed to be the same.
 
 Hardware notes:
 - PCB label: 100054

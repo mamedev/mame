@@ -205,7 +205,6 @@ const atari_motion_objects_config relief_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x00ff,0,0,0 }}, // mask for the link
@@ -340,7 +339,7 @@ void relief_state::machine_reset()
 uint16_t relief_state::special_port2_r()
 {
 	int result = m_260010->read();
-	if (!(result & 0x0080) || m_screen->hblank()) result ^= 0x0001;
+	if (BIT(~result, 7) || m_screen->hblank()) result ^= 0x0001;
 	return result;
 }
 

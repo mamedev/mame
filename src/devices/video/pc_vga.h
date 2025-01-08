@@ -48,6 +48,7 @@ public:
 
 	void set_offset(uint16_t val) { vga.crtc.offset = val; }
 	void set_vram_size(size_t vram_size) { vga.svga_intf.vram_size = vram_size; }
+	auto vsync_cb() { return m_vsync_cb.bind(); }
 	// FIXME: should be protected, but virge_pci.cpp violates this
 	inline uint16_t get_crtc_port() { return BIT(vga.miscellaneous_output, 0) ? 0x3d0 : 0x3b0; }
 
@@ -235,6 +236,7 @@ protected:
 	/**/    uint8_t map13;
 	/**/    uint8_t irq_clear;
 	/**/    uint8_t irq_disable;
+			uint8_t irq_latch;
 			uint8_t no_wrap;
 		} crtc;
 
@@ -305,6 +307,8 @@ protected:
 	address_space_config m_atc_space_config;
 
 	bool m_ioas = false;
+
+	devcb_write_line m_vsync_cb;
 private:
 	uint32_t start_addr();
 };

@@ -341,4 +341,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, yakyuken, 0, yakyuken, yakyuken, yakyuken_state, empty_init, ROT0, "bootleg", "The Yakyuken", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, yakyuken, 0, yakyuken, yakyuken, yakyuken_state, empty_init, ROT0, "bootleg", "The Yakyuken (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

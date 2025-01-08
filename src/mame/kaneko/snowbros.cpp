@@ -2955,7 +2955,7 @@ year : 1993.08.24
 
 */
 
-ROM_START( finalttr )
+ROM_START( finalttr ) // also seen on a PCB with half sized GFX ROMs
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "10.7o",    0x00000, 0x20000, CRC(eecc83e5) SHA1(48088a2fae8852a73a325a9659c24b241515eac3) )
 	ROM_LOAD16_BYTE( "9.5o",     0x00001, 0x20000, CRC(58d3640e) SHA1(361bc64174a6c7b15a13e0d1f048c7ea270182ca) )

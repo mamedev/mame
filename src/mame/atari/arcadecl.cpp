@@ -92,7 +92,6 @@ public:
 	sparkz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_oki(*this, "oki")
 		, m_bitmap(*this, "bitmap")
@@ -104,7 +103,6 @@ protected:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<okim6295_device> m_oki;
 	required_shared_ptr<uint16_t> m_bitmap;
@@ -122,6 +120,7 @@ class arcadecl_state : public sparkz_state
 public:
 	arcadecl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sparkz_state(mconfig, type, tag)
+		, m_gfxdecode(*this, "gfxdecode")
 		, m_mob(*this, "mob")
 	{ }
 
@@ -132,6 +131,7 @@ protected:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<atari_motion_objects_device> m_mob;
 
 	static const atari_motion_objects_config s_mob_config;
@@ -166,7 +166,6 @@ const atari_motion_objects_config arcadecl_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x00ff,0,0,0 }}, // mask for the link
@@ -288,7 +287,7 @@ void sparkz_state::latch_w(uint8_t data)
 	    0x001F == volume
 	*/
 
-	m_oki->set_rom_bank((data >> 7) & 1);
+	m_oki->set_rom_bank(BIT(data, 7));
 	m_oki->set_output_gain(ALL_OUTPUTS, (data & 0x001f) / 31.0f);
 }
 
@@ -319,7 +318,7 @@ void sparkz_state::main_map(address_map &map)
 	map(0x640041, 0x640041).mirror(0xe).w(FUNC(sparkz_state::latch_w));
 	map(0x640060, 0x64006f).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x641000, 0x6413ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-	map(0x642000, 0x642000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x642000, 0x642000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x646000, 0x646001).mirror(0xffe).w(FUNC(sparkz_state::scanline_int_ack_w));
 	map(0x647000, 0x647fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 }
@@ -476,7 +475,6 @@ void sparkz_state::sparkz(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_arcadecl);
 	palette_device &palette(PALETTE(config, "palette"));
 	palette.set_format(palette_device::IRGB_1555, 512);
 	palette.set_membits(8);
@@ -500,6 +498,7 @@ void arcadecl_state::arcadecl(machine_config &config)
 {
 	sparkz(config);
 
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_arcadecl);
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, arcadecl_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 }
@@ -529,8 +528,6 @@ ROM_START( sparkz )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sparkzpg.0", 0x00000, 0x80000, CRC(a75c331c) SHA1(855ed44bd23c1dd0ca64926cacc8be62aca82fe2) )
 	ROM_LOAD16_BYTE( "sparkzpg.1", 0x00001, 0x80000, CRC(1af1fc04) SHA1(6d92edb1a881ba6b63e0144c9c3e631b654bf8ae) )
-
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 ) // Unknown size, Unpopulated
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "sparkzsn",      0x00000, 0x80000, CRC(87097ce2) SHA1(dc4d199b5af692d111c087af3edc01e2ac0287a8) )

@@ -88,9 +88,10 @@ void picasso2p_device::device_start()
 {
 }
 
-void picasso2p_device::device_reset()
+void picasso2p_device::busrst_w(int state)
 {
-	m_autoconfig_memory_done = false;
+	if (state == 0)
+		m_autoconfig_memory_done = false;
 }
 
 device_memory_interface::space_config_vector picasso2p_device::memory_space_config() const

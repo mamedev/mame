@@ -152,7 +152,6 @@ const atari_motion_objects_config klax_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x000,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x00ff,0,0,0 }}, // mask for the link
@@ -396,7 +395,7 @@ void klax_state::klax_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_klax);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 512).set_membits(8);
 
-	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 32);
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 60, 32);
 	m_playfield_tilemap->set_info_callback(FUNC(klax_state::get_playfield_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, klax_state::s_mob_config);

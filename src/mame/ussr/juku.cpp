@@ -579,7 +579,7 @@ void juku_state::fdc_data_w(uint8_t data)
 
 void juku_state::speaker_w(int state)
 {
-	m_speaker->level_w((m_beep_state = state) << m_beep_level);
+	m_speaker->level_w((m_beep_state = state) << (m_beep_level ? 1 : 0));
 }
 
 
@@ -602,7 +602,7 @@ void juku_state::pio0_porta_w(uint8_t data)
 	m_contrdat = (col_data & 0b1100'0000) >> 6; // decoded by 2x К555ИД7
 
 	if (m_beep_level != BIT(data, 4))
-		m_speaker->level_w(m_beep_state << (m_beep_level = BIT(data, 4)));
+		m_speaker->level_w(m_beep_state << ((m_beep_level = BIT(data, 4)) ? 1 : 0));
 
 	m_key_encoder->update();
 }

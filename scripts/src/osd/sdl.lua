@@ -37,12 +37,6 @@ function maintargetosdoptions(_target,_subtarget)
 		end
 	end
 
-	if _OPTIONS["USE_WAYLAND"]=="1" then
-		links {
-			"wayland-egl"
-		}
-	end
-
 	if _OPTIONS["NO_USE_XINPUT"]~="1" then
 		links {
 			"Xext",
@@ -146,15 +140,6 @@ if not _OPTIONS["NO_X11"] then
 		_OPTIONS["NO_X11"] = "0"
 	end
 end
-
-newoption {
-	trigger = "USE_WAYLAND",
-	description = "Use Wayland",
-	allowed = {
-		{ "0",  "Do not use Wayland (use XWayland or X11)"  },
-		{ "1",  "Use Wayland" },
-	},
-}
 
 newoption {
 	trigger = "NO_USE_XINPUT",

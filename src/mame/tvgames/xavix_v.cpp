@@ -21,8 +21,10 @@ inline uint8_t xavix_state::get_next_bit()
 	// going through memory is slow, try not to do it too often!
 	if (m_tmp_databit == 0)
 	{
-		//m_bit = m_maincpu->read_full_data_sp(m_tmp_dataaddress);
-		m_bit = read_full_data_sp_bypass(m_tmp_dataaddress);
+		if (m_disable_memory_bypass)
+			m_bit = m_maincpu->space(AS_PROGRAM).read_byte(m_tmp_dataaddress);
+		else
+			m_bit = read_full_data_sp_bypass(m_tmp_dataaddress);
 	}
 
 	uint8_t ret = m_bit >> m_tmp_databit;
@@ -38,6 +40,28 @@ inline uint8_t xavix_state::get_next_bit()
 
 	return ret;
 }
+
+inline uint8_t superxavix_state::get_next_bit_sx()
+{
+	if (m_tmp_databit == 0)
+	{
+		m_bit = m_extra[m_tmp_dataaddress&0x7fffff];
+	}
+
+	uint8_t ret = m_bit >> m_tmp_databit;
+	ret &= 1;
+
+	m_tmp_databit++;
+
+	if (m_tmp_databit == 8)
+	{
+		m_tmp_databit = 0;
+		m_tmp_dataaddress++;
+	}
+
+	return ret;
+}
+
 
 inline uint8_t xavix_state::get_next_byte()
 {
@@ -73,13 +97,13 @@ void xavix_state::palram_l_w(offs_t offset, uint8_t data)
 	update_pen(offset, m_palram_sh[offset], m_palram_l[offset]);
 }
 
-void xavix_state::bmp_palram_sh_w(offs_t offset, uint8_t data)
+void superxavix_state::bmp_palram_sh_w(offs_t offset, uint8_t data)
 {
 	m_bmp_palram_sh[offset] = data;
 	update_pen(offset+256, m_bmp_palram_sh[offset], m_bmp_palram_l[offset]);
 }
 
-void xavix_state::bmp_palram_l_w(offs_t offset, uint8_t data)
+void superxavix_state::bmp_palram_l_w(offs_t offset, uint8_t data)
 {
 	m_bmp_palram_l[offset] = data;
 	update_pen(offset+256, m_bmp_palram_sh[offset], m_bmp_palram_l[offset]);
@@ -109,38 +133,141 @@ void xavix_state::spriteram_w(offs_t offset, uint8_t data)
 	}
 }
 
-void xavix_state::superxavix_bitmap_pal_index_w(uint8_t data)
+void superxavix_state::superxavix_crtc_1_w(offs_t offset, uint8_t data)
+{
+	logerror("%s superxavix_crtc_1_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_sx_crtc_1[offset] = data;
+}
+
+uint8_t superxavix_state::superxavix_crtc_1_r(offs_t offset)
+{
+	return m_sx_crtc_1[offset];
+}
+
+void superxavix_state::bitmap_params_w(offs_t offset, uint8_t data)
+{
+	logerror("%s bitmap_params_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_bmp_base[offset] = data;
+	// if anything changes these mid-screen we may need to trigger a partial update here
+}
+
+uint8_t superxavix_state::bitmap_params_r(offs_t offset)
+{
+	return m_bmp_base[offset];
+}
+
+void superxavix_state::superxavix_crtc_2_w(offs_t offset, uint8_t data)
+{
+	logerror("%s superxavix_crtc_2_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_sx_crtc_2[offset] = data;
+}
+
+uint8_t superxavix_state::superxavix_crtc_2_r(offs_t offset)
+{
+	return m_sx_crtc_2[offset];
+}
+
+void superxavix_state::superxavix_plt_flush_w(uint8_t data)
+{
+	// flush current write buffer (as we might not have filled a byte when plotting)
+	// and set write mode?
+	// do we need to cache the previous write address for the flush? (probably not, this seems to be explicitly
+	// written both after every transfer, and before the next one.
+	if (m_plotter_has_byte)
+	{
+		m_maincpu->space(6).write_byte((m_sx_plt_address >> 3) & 0x7fffff, m_plotter_current_byte);
+	}
+
+	m_plotter_has_byte = 0;
+	m_plotter_current_byte = 0x00;
+	//printf("%s: superxavix_plt_flush_w %02x\n", machine().describe_context().c_str(), data);
+	m_sx_plt_mode = data;
+}
+
+uint8_t superxavix_state::superxavix_plt_dat_r()
+{
+	return machine().rand();
+}
+
+void superxavix_state::superxavix_plt_dat_w(uint8_t data)
+{
+	uint8_t pixels = m_sx_plt_mode + 1;
+
+	while (pixels)
+	{
+		if (!m_plotter_has_byte)
+		{
+			m_plotter_current_byte = m_maincpu->space(6).read_byte((m_sx_plt_address>>3) & 0x7fffff);
+			m_plotter_has_byte = 1;
+		}
+
+		uint8_t bit_to_write = data & 1;
+		data >>= 1;
+
+		uint8_t destbit = m_sx_plt_address & 0x7;
+		m_plotter_current_byte &= ~(1 << destbit);
+		m_plotter_current_byte |= (bit_to_write << destbit);
+
+		m_sx_plt_address++;
+		if (!(m_sx_plt_address & 0x7))
+		{
+			m_maincpu->space(6).write_byte(((m_sx_plt_address-1)>>3) & 0x7fffff, m_plotter_current_byte);
+			m_plotter_has_byte = 0;
+		}
+
+		pixels--;
+	}
+}
+
+void superxavix_state::superxavix_plt_loc_w(offs_t offset, uint8_t data)
+{
+	logerror("%s superxavix_plt_loc_w %02x %02x\n", machine().describe_context(), offset, data);
+
+	m_sx_plt_loc[offset] = data;
+	if (offset == 3)
+	{
+		m_sx_plt_address = (m_sx_plt_loc[3] << 24) | (m_sx_plt_loc[2] << 16) | (m_sx_plt_loc[1] << 8) | (m_sx_plt_loc[0] << 0);
+		logerror("%s SuperXavix Bitmap Plotter set to address %08x\n", machine().describe_context(), m_sx_plt_address);
+	}
+}
+
+uint8_t superxavix_state::superxavix_plt_loc_r(offs_t offset)
+{
+	return m_sx_plt_loc[offset];
+}
+
+void superxavix_state::superxavix_bitmap_pal_index_w(uint8_t data)
 {
 	m_superxavix_bitmap_pal_index = data;
 }
 
-uint8_t xavix_state::superxavix_bitmap_pal_index_r()
+uint8_t superxavix_state::superxavix_bitmap_pal_index_r()
 {
 	return m_superxavix_bitmap_pal_index;
 }
 
-void xavix_state::superxavix_chr_pal_index_w(uint8_t data)
+void superxavix_state::superxavix_chr_pal_index_w(uint8_t data)
 {
 	m_superxavix_pal_index = data;
 }
 
-uint8_t xavix_state::superxavix_chr_pal_index_r()
+uint8_t superxavix_state::superxavix_chr_pal_index_r()
 {
 	return m_superxavix_pal_index;
 }
 
 
-uint8_t xavix_state::superxavix_bitmap_pal_hue_r()
+uint8_t superxavix_state::superxavix_bitmap_pal_hue_r()
 {
 	return superxavix_pal_hue_r(true);
 }
 
-uint8_t xavix_state::superxavix_chr_pal_hue_r()
+uint8_t superxavix_state::superxavix_chr_pal_hue_r()
 {
 	return superxavix_pal_hue_r(false);
 }
 
-uint8_t xavix_state::superxavix_pal_hue_r(bool bitmap)
+uint8_t superxavix_state::superxavix_pal_hue_r(bool bitmap)
 {
 	u8 *sh, *sl;
 	u8 ind;
@@ -163,17 +290,17 @@ uint8_t xavix_state::superxavix_pal_hue_r(bool bitmap)
 	return val << 2;
 }
 
-uint8_t xavix_state::superxavix_bitmap_pal_saturation_r()
+uint8_t superxavix_state::superxavix_bitmap_pal_saturation_r()
 {
 	return superxavix_pal_saturation_r(true);
 }
 
-uint8_t xavix_state::superxavix_chr_pal_saturation_r()
+uint8_t superxavix_state::superxavix_chr_pal_saturation_r()
 {
 	return superxavix_pal_saturation_r(false);
 }
 
-uint8_t xavix_state::superxavix_pal_saturation_r(bool bitmap)
+uint8_t superxavix_state::superxavix_pal_saturation_r(bool bitmap)
 {
 	u8 *sh, *sl;
 	u8 ind;
@@ -196,17 +323,17 @@ uint8_t xavix_state::superxavix_pal_saturation_r(bool bitmap)
 	return val << 4;
 }
 
-uint8_t xavix_state::superxavix_bitmap_pal_lightness_r()
+uint8_t superxavix_state::superxavix_bitmap_pal_lightness_r()
 {
 	return superxavix_pal_lightness_r(true);
 }
 
-uint8_t xavix_state::superxavix_chr_pal_lightness_r()
+uint8_t superxavix_state::superxavix_chr_pal_lightness_r()
 {
 	return superxavix_pal_lightness_r(false);
 }
 
-uint8_t xavix_state::superxavix_pal_lightness_r(bool bitmap)
+uint8_t superxavix_state::superxavix_pal_lightness_r(bool bitmap)
 {
 	u8 *sh, *sl;
 	u8 ind;
@@ -229,17 +356,17 @@ uint8_t xavix_state::superxavix_pal_lightness_r(bool bitmap)
 	return val << 2;
 }
 
-void xavix_state::superxavix_bitmap_pal_hue_w(uint8_t data)
+void superxavix_state::superxavix_bitmap_pal_hue_w(uint8_t data)
 {
 	superxavix_pal_hue_w(data, true);
 }
 
-void xavix_state::superxavix_chr_pal_hue_w(uint8_t data)
+void superxavix_state::superxavix_chr_pal_hue_w(uint8_t data)
 {
 	superxavix_pal_hue_w(data, false);
 }
 
-void xavix_state::superxavix_pal_hue_w(uint8_t data, bool bitmap)
+void superxavix_state::superxavix_pal_hue_w(uint8_t data, bool bitmap)
 {
 	u8 *sh, *sl;
 	u8 ind;
@@ -267,17 +394,17 @@ void xavix_state::superxavix_pal_hue_w(uint8_t data, bool bitmap)
 	update_pen(ind+offset, sh[ind], sl[ind]);
 }
 
-void xavix_state::superxavix_bitmap_pal_saturation_w(uint8_t data)
+void superxavix_state::superxavix_bitmap_pal_saturation_w(uint8_t data)
 {
 	superxavix_pal_saturation_w(data, true);
 }
 
-void xavix_state::superxavix_chr_pal_saturation_w(uint8_t data)
+void superxavix_state::superxavix_chr_pal_saturation_w(uint8_t data)
 {
 	superxavix_pal_saturation_w(data, false);
 }
 
-void xavix_state::superxavix_pal_saturation_w(uint8_t data, bool bitmap)
+void superxavix_state::superxavix_pal_saturation_w(uint8_t data, bool bitmap)
 {
 	u8 *sh, *sl;
 	u8 ind;
@@ -305,17 +432,17 @@ void xavix_state::superxavix_pal_saturation_w(uint8_t data, bool bitmap)
 	update_pen(ind+offset, sh[ind], sl[ind]);
 }
 
-void xavix_state::superxavix_bitmap_pal_lightness_w(uint8_t data)
+void superxavix_state::superxavix_bitmap_pal_lightness_w(uint8_t data)
 {
 	superxavix_pal_lightness_w(data, true);
 }
 
-void xavix_state::superxavix_chr_pal_lightness_w(uint8_t data)
+void superxavix_state::superxavix_chr_pal_lightness_w(uint8_t data)
 {
 	superxavix_pal_lightness_w(data, false);
 }
 
-void xavix_state::superxavix_pal_lightness_w(uint8_t data, bool bitmap)
+void superxavix_state::superxavix_pal_lightness_w(uint8_t data, bool bitmap)
 {
 	u8 *sh, *sl;
 	u8 ind;
@@ -509,6 +636,12 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	}
 }
 
+void superxavix_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
+{
+	m_use_superxavix_extra = false;
+	xavix_state::draw_tilemap(screen, bitmap, cliprect, which);
+}
+
 void xavix_state::decode_inline_header(int &flipx, int &flipy, int &test, int &pal, int debug_packets)
 {
 	uint8_t byte1 = 0;
@@ -677,22 +810,31 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 		// the register being 0 probably isn't the condition here
 		if (tileregs[0x0] != 0x00)
 		{
-			//tile |= m_maincpu->read_full_data_sp((tileregs[0x0] << 8) + count);
-			tile |= read_full_data_sp_bypass((tileregs[0x0] << 8) + count);
+			const offs_t realaddress = (tileregs[0x0] << 8) + count;
+			if (m_disable_memory_bypass)
+				tile |= m_maincpu->space(AS_PROGRAM).read_byte(realaddress);
+			else
+				tile |= read_full_data_sp_bypass(realaddress);
 		}
 
 		// only read the next byte if we're not in an 8-bit mode
 		if (((tileregs[0x7] & 0x7f) != 0x00) && ((tileregs[0x7] & 0x7f) != 0x08))
 		{
-			//tile |= m_maincpu->read_full_data_sp((tileregs[0x1] << 8) + count) << 8;
-			tile |= read_full_data_sp_bypass((tileregs[0x1] << 8) + count) << 8;
+			const offs_t realaddress = (tileregs[0x1] << 8) + count;
+			if (m_disable_memory_bypass)
+				tile |= m_maincpu->space(AS_PROGRAM).read_byte(realaddress) << 8;
+			else
+				tile |= read_full_data_sp_bypass(realaddress) << 8;
 		}
 
 		// 24 bit modes can use reg 0x2, otherwise it gets used as extra attribute in other modes
 		if (alt_tileaddressing2 == 2)
 		{
-			//tile |= m_maincpu->read_full_data_sp((tileregs[0x2] << 8) + count) << 16;
-			tile |= read_full_data_sp_bypass((tileregs[0x2] << 8) + count) << 16;
+			const offs_t realaddress = (tileregs[0x2] << 8) + count;
+			if (m_disable_memory_bypass)
+				tile |= m_maincpu->space(AS_PROGRAM).read_byte(realaddress) << 16;
+			else
+				tile |= read_full_data_sp_bypass(realaddress) << 16;
 		}
 
 
@@ -736,19 +878,35 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 			}
 			else if (alt_tileaddressing2 == 1)
 			{
-				// 8-byte alignment Addressing Mode uses a fixed offset? (like sprites)
-				tile = tile * 8;
-				basereg = (tile & 0x70000) >> 16;
-				tile &= 0xffff;
-				gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
-				tile += gfxbase;
+				if (tileregs[0x7] & 0x01)
+				{
+					// only epo_stad has been seen using this mode (box behind dialog after you allow multiple strikes against you)
+					basereg = (tile & 0xf000) >> 12;
+					tile = tile & 0x0fff;
+					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+					tile += gfxbase;
+				}
+				else
+				{
+					// 8-byte alignment Addressing Mode uses a fixed offset? (like sprites)
+					basereg = (tile & 0xe000) >> 13;
+					tile &= 0x1fff;
+					tile = tile * 8;
+					gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+					tile += gfxbase;
+				}
 			}
 
 			// Tilemap specific mode extension with an 8-bit per tile attribute, works in all modes except 24-bit (no room for attribute) and header (not needed?)
 			if (tileregs[0x7] & 0x08)
 			{
-				//uint8_t extraattr = m_maincpu->read_full_data_sp((tileregs[0x2] << 8) + count);
-				uint8_t extraattr = read_full_data_sp_bypass((tileregs[0x2] << 8) + count);
+				const offs_t realaddress = (tileregs[0x2] << 8) + count;
+				uint8_t extraattr;
+
+				if (m_disable_memory_bypass)
+					extraattr = m_maincpu->space(AS_PROGRAM).read_byte(realaddress);
+				else
+					extraattr = read_full_data_sp_bypass(realaddress);
 
 				// make use of the extraattr stuff?
 				pal = (extraattr & 0xf0) >> 4;
@@ -791,6 +949,16 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	}
 }
 
+void superxavix_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+	if (m_extra)
+		m_use_superxavix_extra = true;
+
+	xavix_state::draw_sprites(screen, bitmap, cliprect);
+	m_use_superxavix_extra = false;
+}
+
+
 void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int line)
 {
 	int alt_addressing = 0;
@@ -813,6 +981,11 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		// 24-bit addressing (Addressing Mode 2)
 		alt_addressing = 0;
+	}
+	else if (m_spritereg == 0x07)
+	{
+		// used by anpanmdx - is this a specific 24-bit mode to enable SuperXaviX extra ROM access?
+		alt_addressing = 3;
 	}
 	else
 	{
@@ -847,8 +1020,8 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 		int xpos = spr_xpos[i];
 		int tile = 0;
 
-		// high 8-bits only used in 24-bit mode
-		if (((m_spritereg & 0x7f) == 0x04) || ((m_spritereg & 0x7f) == 0x15))
+		// high 8-bits only used in 24-bit modes
+		if (((m_spritereg & 0x7f) == 0x04) || ((m_spritereg & 0x7f) == 0x07) || ((m_spritereg & 0x7f) == 0x15))
 			tile |= (spr_addr_hi[i] << 16);
 
 		// mid 8-bits used in everything except 8-bit mode
@@ -865,7 +1038,11 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		int zval = (attr1 & 0xf0) >> 4;
 		int flipx = (attr1 & 0x01);
-		int flipy = (attr1 & 0x02);
+		int flipy = (attr1 & 0x02); 
+
+		// many elements, including the XaviX logo on xavmusic have yflip set, but don't want it, why?
+		if (m_disable_sprite_yflip)
+			flipy = 0;
 
 		int drawheight = 16;
 		int drawwidth = 16;
@@ -937,6 +1114,7 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 				xpos &= 0x7f;
 				xpos = -0x80 + xpos;
 
+				// this also breaks the epoch logo on suprtvpc, although some ingame elements need it
 				if (!m_sprite_xhigh_ignore_hack)
 					if (!xposh)
 						xpos -= 0x80;
@@ -973,20 +1151,32 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 				if (alt_addressing == 1)
 				{
 					tile = (tile * drawheight * drawwidth * bpp) / 8;
-					basereg = 0; // always uses segment register 0 in tile addressing mode?
-				}
-				else
-				{
-					// 8-byte alignment Addressing Mode uses a fixed offset?
-					if (alt_addressing == 2)
-						tile = tile * 8;
+					int gfxbase = (m_segment_regs[1] << 16) | (m_segment_regs[0] << 8); // always use segment 0
+					tile += gfxbase;
 
+				}
+				else if (alt_addressing == 2)
+				{
+					tile = tile * 8;
 					basereg = (tile & 0xf0000) >> 16;
 					tile &= 0xffff;
+					int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+					tile += gfxbase;
+				}
+				else if (alt_addressing == 3)
+				{
+					// 24-bit, with multiplier, no segment use?
+					// seen in anpanmdx, might be superxavix specific to be able to access more memory?
+					tile = tile * 8;
+				}
+				else // currently unused case
+				{
+					basereg = (tile & 0xf0000) >> 16;
+					tile &= 0xffff;
+					int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+					tile += gfxbase;
 				}
 
-				int gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
-				tile += gfxbase;
 			}
 
 			draw_tile_line(screen, bitmap, cliprect, tile, bpp, xpos , line, drawheight, drawwidth, flipx, flipy, pal, zval, drawline);
@@ -1001,13 +1191,39 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 }
 
+void xavix_state::get_tile_pixel_dat(uint8_t &dat, int bpp)
+{
+	for (int i = 0; i < bpp; i++)
+	{
+		dat |= (get_next_bit() << i);
+	}
+}
+
+void superxavix_state::get_tile_pixel_dat(uint8_t &dat, int bpp)
+{
+	if (m_use_superxavix_extra)
+	{
+		for (int i = 0; i < bpp; i++)
+		{
+			dat |= (get_next_bit_sx() << i);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < bpp; i++)
+		{
+			dat |= (get_next_bit() << i);
+		}
+	}
+}
+
 void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
 {
 	const pen_t *paldata = m_palette->pens();
 	if (ypos > cliprect.max_y || ypos < cliprect.min_y)
 		return;
 
-	if ((xpos > cliprect.max_x) || ((xpos + drawwidth) < cliprect.min_x))
+	if (((xpos * m_video_hres_multiplier) > cliprect.max_x) || (((xpos * m_video_hres_multiplier) + drawwidth * m_video_hres_multiplier) < cliprect.min_x))
 		return;
 
 	if ((ypos >= cliprect.min_y && ypos <= cliprect.max_y))
@@ -1043,10 +1259,9 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 			uint8_t dat = 0;
 
-			for (int i = 0; i < bpp; i++)
-			{
-				dat |= (get_next_bit() << i);
-			}
+			get_tile_pixel_dat(dat, bpp);
+
+			col = col * m_video_hres_multiplier;
 
 			if ((col >= cliprect.min_x && col <= cliprect.max_x))
 			{
@@ -1060,8 +1275,14 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, co
 					{
 						uint32_t *const yposptr = &bitmap.pix(ypos);
 						yposptr[col] = paldata[pen];
+						if (m_video_hres_multiplier == 2)
+							yposptr[col+1] = paldata[pen];
 
 						zyposptr[col] = zval;
+
+						if (m_video_hres_multiplier == 2)
+							zyposptr[col+1] = zval;
+
 					}
 				}
 			}
@@ -1069,12 +1290,10 @@ void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, co
 	}
 }
 
-uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+rectangle xavix_state::do_arena(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *paldata = m_palette->pens();
-	// not sure what you end up with if you fall through all layers as transparent, so far no issues noticed
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	m_zbuffer.fill(0, cliprect);
 
 	rectangle clip = cliprect;
 
@@ -1096,8 +1315,8 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		*/
 		if (((m_arena_start != 0x00) && (m_arena_end != 0x00)) && ((m_arena_start != 0xff) && (m_arena_end != 0xff)))
 		{
-			clip.max_x = m_arena_start - 3; // must be -3 to hide garbage on the right hand side of snowboarder
-			clip.min_x = m_arena_end - 2; // must be -2 to render a single pixel line of the left border on Mappy remix (verified to render), although this creates a single pixel gap on the left of snowboarder status bar (need to verify)
+			clip.max_x = (m_arena_start - 3) * m_video_hres_multiplier; // must be -3 to hide garbage on the right hand side of snowboarder
+			clip.min_x = (m_arena_end - 2) * m_video_hres_multiplier; // must be -2 to render a single pixel line of the left border on Mappy remix (verified to render), although this creates a single pixel gap on the left of snowboarder status bar (need to verify)
 
 			if (clip.min_x < cliprect.min_x)
 				clip.min_x = cliprect.min_x;
@@ -1106,18 +1325,34 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				clip.max_x = cliprect.max_x;
 		}
 	}
+
 	bitmap.fill(paldata[0], clip);
+	m_zbuffer.fill(0, clip);
 
-	draw_tilemap(screen, bitmap, clip, 1);
+	return clip;
+}
+
+void xavix_state::draw_regular_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &clip)
+{
 	draw_tilemap(screen, bitmap, clip, 0);
+	draw_tilemap(screen, bitmap, clip, 1); // epo_golf requires this layer in front when priorities are equal or menu doesn't show?
 	draw_sprites(screen, bitmap, clip);
+}
 
-	//popmessage("%02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x   %02x %02x %02x %02x", m_soundregs[0],m_soundregs[1],m_soundregs[2],m_soundregs[3],m_soundregs[4],m_soundregs[5],m_soundregs[6],m_soundregs[7],m_soundregs[8],m_soundregs[9],m_soundregs[10],m_soundregs[11],m_soundregs[12],m_soundregs[13],m_soundregs[14],m_soundregs[15]);
+uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	rectangle clip = do_arena(screen, bitmap, cliprect);
+	draw_regular_layers(screen, bitmap, clip);
+	return 0;
+}
 
-	// temp, needs priority, transparency etc. also it's far bigger than the screen, I guess it must get scaled?!
+void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	const pen_t *paldata = m_palette->pens();
+	// incomplete!
 	if (m_bmp_base)
 	{
-		// looks like it can zoom the bitmap using these?
+		// screen position for the bitmap?
 		uint16_t top = ((m_bmp_base[0x01] << 8) | m_bmp_base[0x00]);
 		uint16_t bot = ((m_bmp_base[0x03] << 8) | m_bmp_base[0x02]);
 		uint16_t lft = ((m_bmp_base[0x05] << 8) | m_bmp_base[0x04]);
@@ -1130,7 +1365,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		uint16_t rgtadr = ((m_bmp_base[0x0f] << 8) | m_bmp_base[0x0e]);
 
 		uint16_t start = ((m_bmp_base[0x11] << 8) | m_bmp_base[0x10]);
-		uint8_t end = m_bmp_base[0x12]; // ?? related to width?
+		uint8_t step = m_bmp_base[0x12]; // step value to next line base
 		uint8_t size = m_bmp_base[0x13]; // some kind of additional scaling?
 		uint8_t mode = m_bmp_base[0x14]; // enable,bpp, zval etc.
 
@@ -1138,10 +1373,18 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		if (mode & 0x01)
 		{
-			popmessage("bitmap t:%04x b:%04x l:%04x r:%04x  -- -- ba:%04x la:%04x ra:%04x   -- -- end:%02x - size:%02x unused:%08x",
-				top, bot, lft, rgt,
-				/*topadr*/ botadr, lftadr, rgtadr,
-				/*start*/ end, size, unused);
+			if (0)
+			{
+				popmessage("bitmap t:%04x b:%04x l:%04x r:%04x  -- -- ta: %04x ba:%04x la:%04x ra:%04x   -- -- start %04x (%08x) step:%02x - size:%02x unused:%08x\n",
+					top, bot, lft, rgt,
+					topadr, botadr, lftadr, rgtadr,
+					start, start * 0x800, step, size, unused);
+			}
+
+			// anpanmdx title screen ends up with a seemingly incorrect value for start
+			// when it does the scroller.  There is presumably an opcode or math bug causing this.
+			//if (start >= 0x7700)
+			///	start -= 0x3c00;
 
 			int base = start * 0x800;
 			int base2 = topadr * 0x8;
@@ -1149,50 +1392,107 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			int bpp = ((mode & 0x0e) >> 1) + 1;
 			int zval = ((mode & 0xf0) >> 4);
 
-			int width = (rgtadr * 8) / bpp;
+			int hposadjust, vpostadjust;
+			bool is_highres = true;
 
-			//int count = 0;
+			// SuperXaviX seems to have CRTC registers (0x6f80 - 0x6faf area), so in reality this probably
+			// comes from there due to different overall screen positioning; might also depend on bitmap
+			// bpp mode (so this is probably not the correct way to detect this)
+			// there could also be XaviX2000+ opcode bugs causing wrong register values!
+			if ((size & 0x70) == 0x70)
+				is_highres = false;
+
+			if (is_highres)
+				hposadjust = 0x90; // good for xavtenni, xavbowl, tmy_thom, tmy_rkmj, but not xavbaseb
+			else
+				hposadjust = 0x46; // good for udance, ban_ordj, not quite correct for ban_kksj in demo
+
+			vpostadjust = 0x06; // probably can vary (see XaviX boot-up logos, logo vs text positions)
+
+			top += vpostadjust;
+			bot += vpostadjust;
 
 			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
 				int line = y - top;
 
-				if ((line > 0) && (y < bot))
+				if ((line > 0) && (y < bot)) // should also clip if out of range for botadr
 				{
-					set_data_address(base + base2 + ((line * width * bpp) / 8), 0);
+					set_data_address(base + base2 + ((line * (step * 64)) / 8), 0);
 
-					for (int x = 0; x < width; x++)
+					// also needs to take into account 'lftadr' address from the line base
+					// and clip against 'rgtadr' address if reads go beyond linebase + that for the line
+					for (int x = lft - hposadjust; x < rgt - hposadjust; x++)
 					{
-						uint32_t *const yposptr = &bitmap.pix(y);
-						uint16_t *const zyposptr = &m_zbuffer.pix(y);
+						uint32_t* const yposptr = &bitmap.pix(y);
+						uint16_t* const zyposptr = &m_zbuffer.pix(y);
 
 						uint8_t dat = 0;
-						for (int i = 0; i < bpp; i++)
+
+						if (m_extra)
 						{
-							dat |= (get_next_bit() << i);
+							for (int i = 0; i < bpp; i++)
+							{
+								dat |= (get_next_bit_sx() << i);
+							}
+						}
+						else
+						{
+							for (int i = 0; i < bpp; i++)
+							{
+								dat |= (get_next_bit() << i);
+							}
 						}
 
-						if (((x <= cliprect.max_x) && (x >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
+						int realx;
+						realx = x;
+
+						if (!is_highres)
+							realx *= 2;
+
+						if (((realx <= cliprect.max_x) && (realx >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
 						{
 							if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
 							{
-								if (zval >= zyposptr[x])
+								if (zval >= zyposptr[realx])
 								{
-									yposptr[x] = paldata[dat + 0x100];
-									zyposptr[x] = zval;
+									yposptr[realx] = paldata[dat + 0x100];
+									zyposptr[realx] = zval;
 								}
 							}
 						}
+
+						// draw doubled pixel for low-res bitmap
+						if (!is_highres)
+							realx += 1;
+
+						if (((realx <= cliprect.max_x) && (realx >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
+						{
+							if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
+							{
+								if (zval >= zyposptr[realx])
+								{
+									yposptr[realx] = paldata[dat + 0x100];
+									zyposptr[realx] = zval;
+								}
+							}
+						}
+
 					}
 				}
 			}
 
 		}
 	}
-
-	return 0;
 }
 
+uint32_t superxavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	rectangle clip = do_arena(screen, bitmap, cliprect);
+	draw_bitmap_layer(screen, bitmap, clip); // maxheart suggests bitmap is drawn first or you get a black box over the display
+	draw_regular_layers(screen, bitmap, clip);
+	return 0;
+}
 
 void xavix_state::spritefragment_dma_params_1_w(offs_t offset, uint8_t data)
 {
@@ -1210,15 +1510,11 @@ void xavix_state::spritefragment_dma_trg_w(uint8_t data)
 	uint16_t src = (m_spritefragment_dmaparam1[1] << 8) | m_spritefragment_dmaparam1[0];
 	uint16_t dst = (m_spritefragment_dmaparam2[0] << 8);
 
-	uint8_t unk = m_spritefragment_dmaparam2[1];
+	uint8_t src_block_size = m_spritefragment_dmaparam2[1];
 
-	LOG("%s: spritefragment_dma_trg_w with trg %02x size %04x src %04x dest %04x unk (%02x)\n", machine().describe_context(), data & 0xf8, len, src, dst, unk);
+	LOG("%s: spritefragment_dma_trg_w with trg %02x size %04x src %04x dest %04x unk (%02x)\n", machine().describe_context(), data & 0xf8, len, src, dst, src_block_size);
 
-	if (unk)
-	{
-		// tak_chq triggers this, but probably due to bad xavix2000 opcodes, as many things look invalid
-		logerror("m_spritefragment_dmaparam2[1] != 0x00 (is %02x)\n", m_spritefragment_dmaparam2[1]);
-	}
+	src_block_size--; // 0x00 is maximum
 
 	if (len == 0x00)
 	{
@@ -1230,12 +1526,30 @@ void xavix_state::spritefragment_dma_trg_w(uint8_t data)
 
 	if (data & 0x40)
 	{
+		int readaddress = 0;
+
 		for (int i = 0; i < len; i++)
 		{
-			//uint8_t dat = m_maincpu->read_full_data_sp(src + i);
-			uint8_t dat = read_full_data_sp_bypass(src + i);
-			//m_fragment_sprite[(dst + i) & 0x7ff] = dat;
-			spriteram_w((dst + i) & 0x7ff, dat);
+			// tak_chq explicitly sets unk & 0x80
+			// and the source data is in 0x80 byte blocks, not 0x100
+			// epo_doka uses 0xb4, which seems to confirm this
+			if ((i & 0xff) > src_block_size)
+			{
+				// do nothing, maybe unk is the length of each section to copy?
+			}
+			else
+			{
+				//uint8_t dat = m_maincpu->read_full_data_sp(src + i);
+				const offs_t realaddress = src + readaddress;
+				uint8_t dat;
+				if (m_disable_memory_bypass)
+					dat = m_maincpu->space(AS_PROGRAM).read_byte(realaddress);
+				else
+					dat = read_full_data_sp_bypass(realaddress);
+				//m_fragment_sprite[(dst + i) & 0x7ff] = dat;
+				spriteram_w((dst + i) & 0x7ff, dat);
+				readaddress++;
+			}
 		}
 	}
 }

@@ -2,6 +2,57 @@
 // copyright-holders:Andrei I. Holub
 /**********************************************************************
     Elektronika PK-32
+
+* Terminal Commands:
+E <memoryType> <address>          (E)xamine
+                                  <memoryType>: /G - General purpose reg, /S - System mem, /I - Internal reg, /P - Phisical mem, /V - Virtual mem
+                                  Example: E /S 0
+D <memoryType> <address> <value>  (D)eposit
+                                  <memoryType>: see E
+                                  Example: D /S 0 44332211
+C                                 (C)ontinue user programm
+B                                 (B)oot
+T [<num>]                         (T)est All or <num>=1-6
+I                                 (I)nit
+
+
+* Sample User Program:
+2000: MOVB #20,R0  | 908f2050
+2004: MOVL #23,R6  | d08f2300000056
+200B: MOVL #22,R7  | d08f2200000057
+2012: MFPR R7,R8   | db5758
+2015: BITB #80,R8  | 938f8058
+2019: BEQL 2012    | 13f7
+201B: NOP          | 01
+201C: NOP          | 01
+201D: NOP          | 01
+201E: MTPR R0,R6   | da5056
+2021: INCB R0      | 9650
+2023: BICB2 #C0,R0 | 8a8fc050
+2027: BISB2 #30,R0 | 888f3050
+202B: BRB 2012     | 11e5
+
+** Use terminal:
+D 2000 50208F90
+D 2004 00238FD0
+D 2008 D0560000
+D 200C 0000228F
+D 2010 57DB5700
+D 2014 808F9358
+D 2018 01f71358
+D 201C 50DA0101
+D 2020 8A509656
+D 2024 8850C08f
+D 2028 1150308f
+D 202C 010101E5
+D /G F 2000
+C
+
+** Or MAME debugger:
+d@2000=50208F90
+...
+pc=2000
+
 **********************************************************************/
 
 #include "emu.h"
@@ -48,6 +99,7 @@ private:
 	void pk32_map_ram(address_map &map) ATTR_COLD;
 	void pk32_map_io(address_map &map) ATTR_COLD;
 
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	required_device<kl1839vm1_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<generic_terminal_device> m_terminal;
@@ -64,6 +116,7 @@ private:
 
 	u8 m_term_data = 0;
 	u16 m_term_status = 0;
+
 };
 
 
@@ -103,6 +156,13 @@ void pk32_state::term_tx_cs_w(u32 data)
 {
 	LOGTERM("TX CS <- %X\n", data);
 }
+
+void pk32_state::kbd_put(u8 data)
+{
+	m_term_data = data;
+	m_term_status = 0xff;
+}
+
 
 void pk32_state::pk32_map_microcode(address_map &map)
 {
@@ -145,15 +205,11 @@ static INPUT_PORTS_START( pk32 )
 	PORT_CONFSETTING(0x80, "Accelerator ON")
 INPUT_PORTS_END
 
-void pk32_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-	m_term_status = 0xff;
-}
-
 
 void pk32_state::machine_start()
 {
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
+
 	save_item(NAME(m_term_data));
 	save_item(NAME(m_term_status));
 }
@@ -182,14 +238,14 @@ ROM_START(pk32)
 	ROM_REGION32_BE(0x10000, "microcode", ROMREGION_ERASE00)
 	ROM_DEFAULT_BIOS("v1")
 
-	ROM_SYSTEM_BIOS(0, "v1", "1839src)")
-	ROMX_LOAD("fw-1839-src.bin", 0x0000, 0x10000, CRC(78c4d298) SHA1(eb3828718991968b4121e6819ae4c6859a8a3a5a), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(0, "v1", "1839src")
+	ROMX_LOAD("fw-1839-src.bin", 0x00000, 0x10000, CRC(78c4d298) SHA1(eb3828718991968b4121e6819ae4c6859a8a3a5a), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "v2", "1839isa")
-	ROMX_LOAD("fw-1839-isa.bin", 0x0000, 0x10000, CRC(180930a7) SHA1(dbcc7d665d28011b9c2beba3cc0e4073f34d7fc6), ROM_BIOS(1))
+	ROMX_LOAD("fw-1839-isa.bin", 0x00000, 0x10000, CRC(180930a7) SHA1(dbcc7d665d28011b9c2beba3cc0e4073f34d7fc6), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "v3", "1839pe1")
-	ROMX_LOAD("fw-1839pe1-006.bin", 0x0000, 0x10000, CRC(e6bb7639) SHA1(759993afc9b61d9cf83acf3e361dcec571beccf1), ROM_BIOS(2))
+	ROMX_LOAD("fw-1839pe1-006.bin", 0x00000, 0x10000, CRC(e6bb7639) SHA1(759993afc9b61d9cf83acf3e361dcec571beccf1), ROM_BIOS(2))
 ROM_END
 
 

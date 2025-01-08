@@ -12,8 +12,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_AKIKO_H
-#define MAME_MACHINE_AKIKO_H
+#ifndef MAME_AMIGA_AKIKO_H
+#define MAME_AMIGA_AKIKO_H
 
 #pragma once
 
@@ -130,4 +130,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(AKIKO, akiko_device)
 
-#endif // MAME_MACHINE_AKIKO_H
+#endif // MAME_AMIGA_AKIKO_H

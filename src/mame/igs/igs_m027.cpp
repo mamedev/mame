@@ -232,7 +232,6 @@ private:
 	u32 slqz3_gpio_r();
 	u32 lhdmg_gpio_r();
 	u32 lhzb3106c5m_gpio_r();
-	void unk2_w(u32 data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 

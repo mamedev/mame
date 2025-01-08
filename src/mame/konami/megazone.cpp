@@ -941,9 +941,9 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1983, megazone, 0,         megazone, megazone, megazone_state, empty_init, ROT90, "Konami",                               "Mega Zone (program code L)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonej, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami (Interlogic / Kosuka license)", "Mega Zone (program code J)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonei, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami",                               "Mega Zone (program code I)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazoneh, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami (Kosuka license)",              "Mega Zone (program code H)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazonea, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami (Interlogic / Kosuka license)", "Mega Zone (unknown program code 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, megazoneb, megazone, megazone, megazona, megazone_state, empty_init, ROT90, "Konami",                               "Mega Zone (unknown program code 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazone, 0,         megazone, megazone, megazone_state, empty_init, ROT90, "Konami",                               "Mega Zone (version L)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonej, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami (Interlogic / Kosuka license)", "Mega Zone (version J)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonei, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami",                               "Mega Zone (version I)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazoneh, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami (Kosuka license)",              "Mega Zone (version H)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazonea, megazone, megazone, megazone, megazone_state, empty_init, ROT90, "Konami (Interlogic / Kosuka license)", "Mega Zone (unknown version 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, megazoneb, megazone, megazone, megazona, megazone_state, empty_init, ROT90, "Konami",                               "Mega Zone (unknown version 2)", MACHINE_SUPPORTS_SAVE )

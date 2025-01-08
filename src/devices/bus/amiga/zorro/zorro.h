@@ -74,7 +74,7 @@
     88  Ground          87  Ground
     90  Ground          89  Ground
     92  7 MHz           91  Ground
-    94  /BURST          93  DOE
+    94  /BUSRST         93  DOE
     96  /EINT1          95  /BG *5
     98  N/C             97  N/C
    100  Ground          99  Ground
@@ -295,6 +295,7 @@ public:
 
 	// interface (from host)
 	virtual void fc_w(int code) override;
+	void busrst_w(int state);
 
 protected:
 	zorro2_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -337,6 +338,7 @@ public:
 	// interface (from host)
 	virtual void fc_w(int code);
 	virtual void cfgin_w(int state);
+	virtual void busrst_w(int state);
 
 protected:
 	device_zorro_card_interface(const machine_config &mconfig, device_t &device);

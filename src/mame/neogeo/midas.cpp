@@ -86,7 +86,6 @@ public:
 		m_zoomtable(*this, "spritegen:zoomy")
 	{ }
 
-	void hammer(machine_config &config);
 	void livequiz(machine_config &config);
 
 	void init_livequiz();
@@ -96,17 +95,18 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-private:
 	uint16_t ret_ffff();
 	void gfxregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void livequiz_coin_w(uint8_t data);
-	uint16_t hammer_sensor_r();
-	void hammer_coin_w(uint8_t data);
-	void hammer_motor_w(uint8_t data);
 	void eeprom_w(uint8_t data);
 	void zoomtable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void screen_vblank(int state);
+
+	void livequiz_map(address_map &map) ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -118,10 +118,30 @@ private:
 	required_shared_ptr<uint16_t> m_zoomram;
 	required_region_ptr<uint8_t> m_zoomtable;
 
-	void screen_vblank(int state);
+};
+
+class hammer_state : public midas_state
+{
+public:
+	hammer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		midas_state(mconfig, type, tag),
+		m_io_hammer(*this, "HAMMER"),
+		m_io_sensorx(*this, "SENSORX"),
+		m_io_sensory(*this, "SENSORY")
+	{ }
+
+	void hammer(machine_config &config);
+
+private:
+	uint16_t sensor_r();
+	void coin_w(uint8_t data);
+	void motor_w(uint8_t data);
 
 	void hammer_map(address_map &map) ATTR_COLD;
-	void livequiz_map(address_map &map) ATTR_COLD;
+
+	required_ioport m_io_hammer;
+	required_ioport m_io_sensorx;
+	required_ioport m_io_sensory;
 };
 
 
@@ -146,13 +166,13 @@ uint32_t midas_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 void midas_state::eeprom_w(uint8_t data)
 {
 	// latch the bit
-	m_eeprom->di_write((data & 0x04) >> 2);
+	m_eeprom->di_write(BIT(data, 2));
 
 	// reset line asserted: reset.
-	m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 
 	// clock line asserted: write latch or select next bit to read
-	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint16_t midas_state::ret_ffff()
@@ -193,7 +213,7 @@ void midas_state::zoomtable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void midas_state::livequiz_coin_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x0001);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
 #endif
@@ -237,15 +257,15 @@ void midas_state::livequiz_map(address_map &map)
                                           Hammer
 ***************************************************************************************/
 
-uint16_t midas_state::hammer_sensor_r()
+uint16_t hammer_state::sensor_r()
 {
-	if (ioport("HAMMER")->read() & 0x80)
+	if (m_io_hammer->read() & 0x80)
 		return 0xffff;
 
-	return (ioport("SENSORY")->read() << 8) | ioport("SENSORX")->read();
+	return (m_io_sensory->read() << 8) | m_io_sensorx->read();
 }
 
-void midas_state::hammer_coin_w(uint8_t data)
+void hammer_state::coin_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
@@ -254,18 +274,18 @@ void midas_state::hammer_coin_w(uint8_t data)
 #endif
 }
 
-void midas_state::hammer_motor_w(uint8_t data)
+void hammer_state::motor_w(uint8_t data)
 {
 	m_prize[0]->motor_w(BIT(data, 0));
 	m_prize[1]->motor_w(BIT(data, 1));
 	m_ticket->motor_w(BIT(data, 4));
-	// data & 0x0080 ?
+	// BIT(data, 7) ?
 #ifdef MAME_DEBUG
 //  popmessage("motor %04X", data);
 #endif
 }
 
-void midas_state::hammer_map(address_map &map)
+void hammer_state::hammer_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 
@@ -274,31 +294,31 @@ void midas_state::hammer_map(address_map &map)
 	map(0x940000, 0x940001).portr("IN0");
 	map(0x980000, 0x980001).portr("TILT");
 
-	map(0x980001, 0x980001).w(FUNC(midas_state::hammer_coin_w));
+	map(0x980001, 0x980001).w(FUNC(hammer_state::coin_w));
 
-	map(0x9a0001, 0x9a0001).w(FUNC(midas_state::eeprom_w));
+	map(0x9a0001, 0x9a0001).w(FUNC(hammer_state::eeprom_w));
 
-	map(0x9c0000, 0x9c0005).w(FUNC(midas_state::gfxregs_w));
+	map(0x9c0000, 0x9c0005).w(FUNC(hammer_state::gfxregs_w));
 	map(0x9c000c, 0x9c000d).nopw();    // IRQ Ack, temporary
 
 	map(0xa00000, 0xa3ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa40000, 0xa7ffff).ram();
 
-	map(0xb00000, 0xb00001).r(FUNC(midas_state::ret_ffff));
-	map(0xb20000, 0xb20001).r(FUNC(midas_state::ret_ffff));
-	map(0xb40000, 0xb40001).r(FUNC(midas_state::ret_ffff));
-	map(0xb60000, 0xb60001).r(FUNC(midas_state::ret_ffff));
+	map(0xb00000, 0xb00001).r(FUNC(hammer_state::ret_ffff));
+	map(0xb20000, 0xb20001).r(FUNC(hammer_state::ret_ffff));
+	map(0xb40000, 0xb40001).r(FUNC(hammer_state::ret_ffff));
+	map(0xb60000, 0xb60001).r(FUNC(hammer_state::ret_ffff));
 
 	map(0xb80008, 0xb8000b).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
 
 	map(0xba0000, 0xba0001).portr("IN1");
 	map(0xbc0000, 0xbc0001).portr("HAMMER");
 
-	map(0xbc0003, 0xbc0003).w(FUNC(midas_state::hammer_motor_w));
+	map(0xbc0003, 0xbc0003).w(FUNC(hammer_state::motor_w));
 
-	map(0xbc0004, 0xbc0005).r(FUNC(midas_state::hammer_sensor_r));
+	map(0xbc0004, 0xbc0005).r(FUNC(hammer_state::sensor_r));
 
-	map(0xd00000, 0xd1ffff).ram().w(FUNC(midas_state::zoomtable_w)).share("zoomtable"); // zoom table?
+	map(0xd00000, 0xd1ffff).ram().w(FUNC(hammer_state::zoomtable_w)).share("zoomtable"); // zoom table?
 
 	map(0xe00000, 0xe3ffff).ram();
 }
@@ -610,7 +630,7 @@ void midas_state::machine_start()
 	m_sprgen->set_pens(m_palette->pens());
 	m_sprgen->set_sprite_region(memregion("sprites")->base(), memregion("sprites")->bytes());
 	m_sprgen->set_fixed_regions(memregion("tiles")->base(), memregion("tiles")->bytes(), memregion("tiles"));
-	m_sprgen->neogeo_set_fixed_layer_source(0); // temporary: ensure banking is disabled
+	m_sprgen->set_fixed_layer_source(0); // temporary: ensure banking is disabled
 }
 
 void midas_state::machine_reset()
@@ -659,12 +679,12 @@ void midas_state::livequiz(machine_config &config)
 	ymz.add_route(1, "rspeaker", 0.80);
 }
 
-void midas_state::hammer(machine_config &config)
+void hammer_state::hammer(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(28'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &midas_state::hammer_map);
-	m_maincpu->set_vblank_int("screen", FUNC(midas_state::irq1_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hammer_state::hammer_map);
+	m_maincpu->set_vblank_int("screen", FUNC(hammer_state::irq1_line_hold));
 
 	at89c52_device &mcu(AT89C52(config, "mcu", XTAL(24'000'000) / 2)); // on top board, unknown MHz
 	mcu.set_disable(); // Currently not hooked up
@@ -678,8 +698,8 @@ void midas_state::hammer(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(24'000'000) / 4, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART);
-	m_screen->set_screen_update(FUNC(midas_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(midas_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(hammer_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(hammer_state::screen_vblank));
 
 	NEOGEO_SPRITE_MIDAS(config, m_sprgen, 0).set_screen(m_screen);
 
@@ -909,5 +929,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, init_livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
-GAME( 2000, hammer,   0, hammer,   hammer,   midas_state, empty_init,    ROT0, "Andamiro", "Hammer",         0 )
+GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state,  init_livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
+GAME( 2000, hammer,   0, hammer,   hammer,   hammer_state, empty_init,    ROT0, "Andamiro", "Hammer",         0 )

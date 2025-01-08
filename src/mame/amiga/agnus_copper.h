@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_AMIGA_COPPER_H
-#define MAME_MACHINE_AMIGA_COPPER_H
+#ifndef MAME_AMIGA_AGNUS_COPPER_H
+#define MAME_AMIGA_AGNUS_COPPER_H
 
 #pragma once
 
@@ -15,11 +15,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class amiga_copper_device : public device_t
+class agnus_copper_device : public device_t
 {
 public:
 	// construction/destruction
-	amiga_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	agnus_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// config
 	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
@@ -33,7 +33,7 @@ public:
 
 	// getters/setters
 	void vblank_sync();
-	int execute_next(int xpos, int ypos, bool is_blitter_busy);
+	int execute_next(int xpos, int ypos, bool is_blitter_busy, int num_planes);
 
 protected:
 	// device-level overrides
@@ -68,7 +68,6 @@ private:
 	u16 m_waitmask;
 	u16 m_pending_offset;
 	u16 m_pending_data;
-//  int m_wait_offset;
 
 	// waitstate delays for copper
 	// basically anything that doesn't belong to Angus has a penalty for Copper
@@ -97,6 +96,6 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(AMIGA_COPPER, amiga_copper_device)
+DECLARE_DEVICE_TYPE(AGNUS_COPPER, agnus_copper_device)
 
-#endif // MAME_MACHINE_AMIGA_COPPER_H
+#endif // MAME_AMIGA_AGNUS_COPPER_H
