@@ -61,7 +61,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	virtual void device_post_load() override;
 
 private:
 	required_shared_ptr_array<uint8_t, 3> m_videoram;

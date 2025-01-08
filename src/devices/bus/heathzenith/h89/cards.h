@@ -11,7 +11,6 @@
 
 #pragma once
 
-void h89_left_cards(device_slot_interface &device) ATTR_COLD;
 void h89_right_cards(device_slot_interface &device) ATTR_COLD;
 void h89_right_cards_mms(device_slot_interface &device) ATTR_COLD;
 void h89_right_p506_cards(device_slot_interface &device) ATTR_COLD;

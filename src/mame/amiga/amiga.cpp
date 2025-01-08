@@ -837,7 +837,8 @@ void a2000_state::machine_reset()
 	amiga_state::machine_reset();
 
 	// reset zorro devices
-	m_zorro->reset();
+	m_zorro->busrst_w(0);
+	m_zorro->busrst_w(1);
 }
 
 void a2000_state::zorro2_int2_w(int state)

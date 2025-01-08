@@ -69,7 +69,7 @@ TODO:
 #define LOG_CV       (1U << 2)
 #define LOG_ADC      (1U << 3)
 
-#define VERBOSE (LOG_GENERAL|LOG_CV)
+#define VERBOSE (LOG_GENERAL | LOG_CV)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
@@ -83,7 +83,7 @@ constexpr const char NVRAM_TAG[] = "nvram";
 class memorymoog_state : public driver_device
 {
 public:
-	memorymoog_state(const machine_config& mconfig, device_type type, const char* tag) ATTR_COLD
+	memorymoog_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
 		, m_ctc(*this, CTC_TAG)
@@ -119,7 +119,7 @@ public:
 		}
 	}
 
-	void memorymoog(machine_config& config) ATTR_COLD;
+	void memorymoog(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(octave_button_pressed);
 
@@ -133,8 +133,8 @@ private:
 	u8 u26_low4_r();
 
 	template<int N> u8 key_matrix_r(
-		const required_ioport_array<N>& input, u8 input_mask, u8 selection,
-		const char* name);
+		const required_ioport_array<N> &input, u8 input_mask, u8 selection,
+		const char *name);
 	u8 keyboard_r();
 	u8 switches_a_r();
 	u8 switches_b_r();
@@ -154,8 +154,8 @@ private:
 	void char_latch_b_w(u8 data);
 	void char_update_w(offs_t offset, u8 data);
 
-	void memory_map(address_map& map) ATTR_COLD;
-	void io_map(address_map& map) ATTR_COLD;
+	void memory_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -195,7 +195,7 @@ private:
 
 	// When these strings get converted to output names, they will include
 	// the "led_" prefix.
-	static constexpr const char* BOARD_6_LED_NAMES[8][4] =
+	static constexpr const char *BOARD_6_LED_NAMES[8][4] =
 	{
 		{"osc1_2'", "osc1_4'", "osc1_8'", "osc1_16'"},
 		{"osc2_2'", "osc2_4'", "osc2_8'", "osc2_16'"},
@@ -206,7 +206,7 @@ private:
 		{"osc1_ramp", "osc1_pulse", "osc1_tri", "return_to_zero"},
 		{"2/3_kybd_trk", "NOT_CONNECTED_2", "1/3_kybd_trk", "kybd_follow"},
 	};
-	static constexpr const char* BOARD_7_LED_NAMES[8][4] =
+	static constexpr const char *BOARD_7_LED_NAMES[8][4] =
 	{
 		{"saw_lfo", "osc2_freq_lfo", "hold", "kybd_mode"},
 		{"tri_lfo", "osc1_freq_lfo", "kybd_out", "mono"},
@@ -219,7 +219,7 @@ private:
 	};
 
 	static constexpr const int NUM_CVS = 64;
-	static constexpr const char* CV_NAMES[NUM_CVS] =
+	static constexpr const char *CV_NAMES[NUM_CVS] =
 	{
 		// U10
 		"GLIDE",
@@ -376,8 +376,8 @@ u8 memorymoog_state::u26_low4_r()
 }
 
 template<int N> u8 memorymoog_state::key_matrix_r(
-	const required_ioport_array<N>& input, u8 input_mask, u8 selection,
-	const char* name)
+	const required_ioport_array<N> &input, u8 input_mask, u8 selection,
+	const char *name)
 {
 	static_assert(N > 0 && N <= 8);
 
@@ -571,7 +571,7 @@ void memorymoog_state::char_update_w(offs_t offset, u8 data)
 	m_chars[offset] = data;
 }
 
-void memorymoog_state::memory_map(address_map& map)
+void memorymoog_state::memory_map(address_map &map)
 {
 	// Memory decoding done by 3 x 74LS138 (U9, U11, U17).
 	// "S4X" below refers to the expansion connector. This was unused in the
@@ -636,7 +636,7 @@ void memorymoog_state::memory_map(address_map& map)
 	map(0xd700, 0xd700).mirror(0x00ff).w(FUNC(memorymoog_state::switches_w));
 }
 
-void memorymoog_state::io_map(address_map& map)
+void memorymoog_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x7f).w(FUNC(memorymoog_state::cv_mux_control_w));
@@ -649,8 +649,8 @@ void memorymoog_state::machine_start()
 	m_chars.resolve();
 	m_octave_minus_1_led.resolve();
 	m_octave_0_led.resolve();
-	for (std::vector<output_finder<>>& led_row : m_leds)
-		for (output_finder<>& led_output : led_row)
+	for (std::vector<output_finder<>> &led_row : m_leds)
+		for (output_finder<> &led_output : led_row)
 			led_output.resolve();
 
 	save_item(NAME(m_keyboard_columns));
@@ -673,7 +673,7 @@ const z80_daisy_config memorymoog_daisy_chain[] =
 	{ nullptr }
 };
 
-void memorymoog_state::memorymoog(machine_config& config)
+void memorymoog_state::memorymoog(machine_config &config)
 {
 	Z80(config, m_maincpu, 4_MHz_XTAL / 2);  // Division done by U16.
 	m_maincpu->set_addrmap(AS_PROGRAM, &memorymoog_state::memory_map);
@@ -708,14 +708,14 @@ void memorymoog_state::memorymoog(machine_config& config)
 	// U54-U58 are connected on the +-7.5V inverted data bus.
 
 	// Bits 0, 1 and 3 are not connected.
-	output_latch_device& u54(OUTPUT_LATCH(config, "latch_u54"));
+	output_latch_device &u54(OUTPUT_LATCH(config, "latch_u54"));
 	u54.bit_handler<2>().set_output("CONTOUR_KBYD_TRK").invert();
 	u54.bit_handler<4>().set_output("VOICE_MOD_FILT").invert();
 	u54.bit_handler<5>().set_output("VOICE_MOD_INVERT_ENABLE").invert();
 
 	// Bit 0 translated from -+7.5V to ~ 0.7/15V via Zener CR4 (IN5237A,
 	// Vz ~= 8.2V) and R164 (10K, connected to +15V).
-	output_latch_device& u55(OUTPUT_LATCH(config, "latch_u55"));
+	output_latch_device &u55(OUTPUT_LATCH(config, "latch_u55"));
 	u55.bit_handler<0>().set_output("CONTOURED_OSC_3_AMT").invert();
 	u55.bit_handler<1>().set_output("VOICE_MOD_PW_1").invert();
 	u55.bit_handler<2>().set_output("VOIDE_MOD_PW_2").invert();
@@ -723,7 +723,7 @@ void memorymoog_state::memorymoog(machine_config& config)
 	u55.bit_handler<4>().set_output("VOICE_MOD_FREQ_1").invert();
 	u55.bit_handler<5>().set_output("TRANSPOSE_ENABLE").invert();
 
-	output_latch_device& u56(OUTPUT_LATCH(config, "latch_u56"));
+	output_latch_device &u56(OUTPUT_LATCH(config, "latch_u56"));
 	u56.bit_handler<0>().set_output("SAW_SW_ENABLE").invert();
 	u56.bit_handler<1>().set_output("RAMP_SW_ENABLE").invert();
 	u56.bit_handler<2>().set_output("SQUARE_SW_ENABLE").invert();
@@ -731,7 +731,7 @@ void memorymoog_state::memorymoog(machine_config& config)
 	u56.bit_handler<4>().set_output("SH_SW_ENABLE").invert();
 	u56.bit_handler<5>().set_output("MOD_VCF").invert();
 
-	output_latch_device& u57(OUTPUT_LATCH(config, "latch_u57"));
+	output_latch_device &u57(OUTPUT_LATCH(config, "latch_u57"));
 	u57.bit_handler<0>().set_output("MOD_PW_2").invert();
 	u57.bit_handler<1>().set_output("MOD_PW_3").invert();
 	u57.bit_handler<2>().set_output("MOD_PW_1").invert();
@@ -739,7 +739,7 @@ void memorymoog_state::memorymoog(machine_config& config)
 	u57.bit_handler<4>().set_output("MOD_FREQ_1").invert();
 	u57.bit_handler<5>().set_output("MOD_FREQ_2").invert();
 
-	output_latch_device& u58(OUTPUT_LATCH(config, "latch_u58"));
+	output_latch_device &u58(OUTPUT_LATCH(config, "latch_u58"));
 	u58.bit_handler<0>().set_output("TUNE").invert();
 	u58.bit_handler<1>().set_output("FP_1_VOL").invert();
 	u58.bit_handler<2>().set_output("FP_2_OSC_2").invert();
@@ -749,7 +749,7 @@ void memorymoog_state::memorymoog(machine_config& config)
 
 	// U59-U61 are on the 0/15V data bus.
 
-	output_latch_device& u59(OUTPUT_LATCH(config, "latch_u59"));
+	output_latch_device &u59(OUTPUT_LATCH(config, "latch_u59"));
 	u59.bit_handler<0>().set_output("OSC_1_TRI");
 	u59.bit_handler<1>().set_output("OSC_1_SAW");
 	u59.bit_handler<2>().set_output("OSC_1_PULSE");
@@ -757,7 +757,7 @@ void memorymoog_state::memorymoog(machine_config& config)
 	u59.bit_handler<4>().set_output("OSC_2_SAW");
 	u59.bit_handler<5>().set_output("OSC_2_PULSE");
 
-	output_latch_device& u60(OUTPUT_LATCH(config, "latch_u60"));
+	output_latch_device &u60(OUTPUT_LATCH(config, "latch_u60"));
 	u60.bit_handler<0>().set_output("OSC_3_TRI");
 	u60.bit_handler<1>().set_output("OSC_3_SAW");
 	u60.bit_handler<2>().set_output("OSC_3_PULSE");
@@ -766,12 +766,12 @@ void memorymoog_state::memorymoog(machine_config& config)
 	u60.bit_handler<5>().set_output("2/3-FILT");
 
 	// Bits 2-5 not connected.
-	output_latch_device& u61(OUTPUT_LATCH(config, "latch_u61"));
+	output_latch_device &u61(OUTPUT_LATCH(config, "latch_u61"));
 	u61.bit_handler<0>().set_output("SYNC_ENABLE");
 
 	// U51-U52 are on the 0/5V data bus.
 
-	output_latch_device& u51(OUTPUT_LATCH(config, "latch_u51"));
+	output_latch_device &u51(OUTPUT_LATCH(config, "latch_u51"));
 	u51.bit_handler<0>().set_output("MOD_OSC_RESET");
 	u51.bit_handler<1>().set_output("UNCOND_ATTACK");
 	u51.bit_handler<2>().set_output("RETURN_TO_ZERO");
@@ -780,7 +780,7 @@ void memorymoog_state::memorymoog(machine_config& config)
 	u51.bit_handler<5>().set_output("S-TRIG");  // Converted to 0-15V.
 	u51.bit_handler<5>().append_output("Y-TRIG").invert();  // 0-15V, inverted.
 
-	output_latch_device& u52(OUTPUT_LATCH(config, "trigger_latch_u52"));
+	output_latch_device &u52(OUTPUT_LATCH(config, "trigger_latch_u52"));
 	u52.bit_handler<0>().set_output("TRIG_A");
 	u52.bit_handler<1>().set_output("TRIG_B");
 	u52.bit_handler<2>().set_output("TRIG_C");
@@ -827,82 +827,82 @@ DECLARE_INPUT_CHANGED_MEMBER(memorymoog_state::octave_button_pressed)
 
 // All strings in PORT_NAME(...) match those in the schematic.
 INPUT_PORTS_START(memorymoog)
-	PORT_START("keyboard_column_0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C0") PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C#0")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D0")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D#0")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E0")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F0")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F#0")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G0")
+	PORT_START("keyboard_column_0")  // C0 - G0 in schematic.
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_C2 PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_CS2
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_D2
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_DS2
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_E2
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_F2
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_FS2
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_G2
 
-	PORT_START("keyboard_column_1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G#0")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A0")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A#0")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B0") PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C1")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C#1")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D1")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D#1")
+	PORT_START("keyboard_column_1")  // G#0 - D#1
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_GS2
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_A2
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_AS2
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_B2 PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_C3
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_CS3
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_D3
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_DS3
 
-	PORT_START("keyboard_column_2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E1")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F1")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F#1")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G1")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G#1")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A1")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A#1")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B1")
+	PORT_START("keyboard_column_2")  // E1 - B1
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_E3
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_F3
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_FS3
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_G3
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_GS3
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_A3
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_AS3
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_B3
 
-	PORT_START("keyboard_column_3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C2")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C#2")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D2")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D#2")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E2")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F2")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F#2")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G2")
+	PORT_START("keyboard_column_3")  // C2 - G2
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_C4
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_CS4
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_D4
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_DS4
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_E4
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_F4
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_FS4
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_G4
 
-	PORT_START("keyboard_column_4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G#2")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A2")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A#2")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B2")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C3")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C#3")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D3")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D#3")
+	PORT_START("keyboard_column_4")  // G#2 - D#3
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_GS4
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_A4
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_AS4
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_B4
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_C5
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_CS5
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_D5
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_DS5
 
-	PORT_START("keyboard_column_5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E3")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F3")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F#3")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G3")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G#3")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A3")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A#3")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B3")
+	PORT_START("keyboard_column_5")  // E3 - B3
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_E5
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_F5
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_FS5
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_G5
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_GS5
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_A5
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_AS5
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_B5
 
-	PORT_START("keyboard_column_6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C4")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C#4")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D4")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D#4")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E4")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F4")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F#4")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G4") PORT_CODE(KEYCODE_C)
+	PORT_START("keyboard_column_6")  // C4 - G4
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_C6
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_CS6
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_D6
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_DS6
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_E6
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_F6
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_FS6
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_G6 PORT_CODE(KEYCODE_C)
 
-	PORT_START("keyboard_column_7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G#4")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A4")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A#4")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B4")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C5") PORT_CODE(KEYCODE_V)
+	PORT_START("keyboard_column_7")  // G#4 - C5
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_GS6
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_A6
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_AS6
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_B6
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_C7 PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)  // NC
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)  // NC
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)  // NC

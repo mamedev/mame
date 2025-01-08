@@ -34,14 +34,21 @@
     Furthermore, the game seems to set what I believe to be the 'flipscreen' bit for player 2
     even when in 'upright' mode, so it's possible this romset was only really made for a
     cocktail table?
+
+    The speech chip is unknown, it seems like it's some sort of 1-bit delta modulation.
+    Probably HC55516 or something similar.
+
+    SN76477 parameters are unknown, so some sound effects are missing.
 */
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
 #include "machine/gen_latch.h"
 #include "machine/mb14241.h"
 #include "sound/dac.h"
+#include "sound/hc55516.h"
 #include "sound/sn76477.h"
 
 #include "emupal.h"
@@ -64,7 +71,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_snsnd(*this, "snsnd%u", 0),
-		m_dac(*this, "dac%u", 0),
+		m_cvsd(*this, "cvsd"),
+		m_cvsd_clock(*this, "cvsd_clock"),
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
@@ -86,7 +94,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device_array<sn76477_device, 2> m_snsnd;
-	required_device_array<dac_byte_interface, 2> m_dac;
+	required_device<hc55516_device> m_cvsd;
+	required_device<clock_device> m_cvsd_clock;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	void scyclone_iomap(address_map &map) ATTR_COLD;
@@ -95,7 +104,6 @@ private:
 	void scyclone_sub_map(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(main_irq);
-	INTERRUPT_GEN_MEMBER(sound_irq);
 
 	// video-related
 	std::unique_ptr<uint8_t[]> m_vram;
@@ -134,15 +142,14 @@ private:
 	uint8_t vram_r(offs_t offset);
 
 	// sound related
-	bool m_speech_enabled = false;
 	uint8_t m_speech_data = 0;
-	uint8_t m_dac2_output = 0x80;
 
 	void snd_3001_w(uint8_t data);
 	void snd_3002_w(uint8_t data);
 	void snd_3003_w(uint8_t data);
 	void snd_3004_w(uint8_t data);
 	void snd_3005_w(uint8_t data);
+	void cvsd_tick(int state);
 };
 
 void scyclone_state::machine_start()
@@ -157,10 +164,7 @@ void scyclone_state::machine_start()
 	save_item(NAME(m_p0e));
 	save_item(NAME(m_vidctrl));
 	save_item(NAME(m_hascollided));
-
-	save_item(NAME(m_speech_enabled));
 	save_item(NAME(m_speech_data));
-	save_item(NAME(m_dac2_output));
 }
 
 
@@ -485,7 +489,7 @@ void scyclone_state::snd_3002_w(uint8_t data)
 
 void scyclone_state::snd_3003_w(uint8_t data)
 {
-	m_speech_enabled = !BIT(data, 1);
+	m_cvsd->fzq_w(BIT(~data, 1));
 }
 
 void scyclone_state::snd_3004_w(uint8_t data)
@@ -498,25 +502,13 @@ void scyclone_state::snd_3005_w(uint8_t data)
 	// written at the same time, with the same data as 0x3001
 }
 
-INTERRUPT_GEN_MEMBER(scyclone_state::sound_irq)
+void scyclone_state::cvsd_tick(int state)
 {
-	m_subcpu->set_input_line(0, HOLD_LINE);
-
-	// speech DAC is some sort of 1-bit delta modulation?
-	if (m_speech_enabled)
+	if (state)
 	{
-		const int bit = BIT(m_speech_data, 7);
-
-		if (bit && m_dac2_output < 0xff)
-			m_dac2_output++;
-		else if (!bit && m_dac2_output > 0)
-			m_dac2_output--;
+		m_cvsd->digin_w(BIT(m_speech_data, 7));
+		m_speech_data <<= 1;
 	}
-	else if (m_dac2_output != 0x80)
-		m_dac2_output += (m_dac2_output < 0x80) ? +1 : -1;
-
-	m_speech_data <<= 1;
-	m_dac[1]->write(m_dac2_output);
 }
 
 
@@ -561,7 +553,7 @@ void scyclone_state::scyclone_sub_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
 
-	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_dac[0], FUNC(dac_byte_interface::data_w)); // music
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("dac", FUNC(dac_byte_interface::data_w)); // music
 	map(0x3001, 0x3001).w(FUNC(scyclone_state::snd_3001_w));
 	map(0x3002, 0x3002).w(FUNC(scyclone_state::snd_3002_w)); // speech
 	map(0x3003, 0x3003).w(FUNC(scyclone_state::snd_3003_w));
@@ -683,9 +675,6 @@ void scyclone_state::scyclone(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &scyclone_state::scyclone_sub_map);
 	m_subcpu->set_addrmap(AS_IO, &scyclone_state::scyclone_sub_iomap);
 
-	attotime snd_irq_period = attotime::from_hz(14400); // drives speech pitch, unknown source but this matches PCB recording
-	m_subcpu->set_periodic_int(FUNC(scyclone_state::sound_irq), snd_irq_period);
-
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MB14241(config, "mb14241");
@@ -707,14 +696,19 @@ void scyclone_state::scyclone(machine_config &config)
 
 	SN76477(config, m_snsnd[0]);
 	m_snsnd[0]->set_enable(1);
-	m_snsnd[0]->add_route(ALL_OUTPUTS, "speaker", 0.05);
+	m_snsnd[0]->add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	SN76477(config, m_snsnd[1]);
 	m_snsnd[1]->set_enable(1);
-	m_snsnd[1]->add_route(ALL_OUTPUTS, "speaker", 0.05);
+	m_snsnd[1]->add_route(ALL_OUTPUTS, "speaker", 0.1);
 
-	DAC_8BIT_R2R(config, m_dac[0]).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC
-	DAC_8BIT_R2R(config, m_dac[1]).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.1); // unknown DAC
+
+	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
+	CLOCK(config, m_cvsd_clock, 14400); // unknown clock source, but this matches PCB recording
+	m_cvsd_clock->signal_handler().set(FUNC(scyclone_state::cvsd_tick));
+	m_cvsd_clock->signal_handler().append(m_cvsd, FUNC(hc55516_device::mclock_w));
+	m_cvsd_clock->signal_handler().append_inputline(m_subcpu, 0, HOLD_LINE);
 }
 
 

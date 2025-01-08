@@ -3598,12 +3598,12 @@ static const gfx_layout namcos22_cg_layout =
 static GFXLAYOUT_RAW(sprite_layout, 32, 32, 32*8, 32*32*8)
 
 static GFXDECODE_START( gfx_namcos22 )
-	GFXDECODE_ENTRY( nullptr,   0, namcos22_cg_layout, 0, 0x800 )
+	GFXDECODE_RAM(   nullptr,   0, namcos22_cg_layout, 0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, gfx_16x16x8_raw,    0, 0x80 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_super )
-	GFXDECODE_ENTRY( nullptr,   0, namcos22_cg_layout, 0, 0x800 )
+	GFXDECODE_RAM(   nullptr,   0, namcos22_cg_layout, 0, 0x800 )
 	GFXDECODE_ENTRY( "textile", 0, gfx_16x16x8_raw,    0, 0x80 )
 	GFXDECODE_ENTRY( "sprite",  0, sprite_layout,      0, 0x80 )
 GFXDECODE_END
@@ -3616,11 +3616,6 @@ void namcos22_state::machine_reset()
 	m_dsp_irq_enabled = false;
 
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-}
-
-void namcos22_state::device_post_load()
-{
-	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
 // allow save_item on a non-fundamental type

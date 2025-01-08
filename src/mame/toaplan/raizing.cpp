@@ -142,14 +142,6 @@ void raizing_base_state::tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-
-void raizing_base_state::device_post_load()
-{
-	if (m_tx_gfxram != nullptr)
-		m_gfxdecode->gfx(0)->mark_all_dirty();
-}
-
-
 u32 raizing_base_state::screen_update_base(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);

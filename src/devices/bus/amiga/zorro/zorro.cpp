@@ -198,17 +198,6 @@ void zorro2_bus_device::device_reset()
 {
 	// call base device
 	zorro_bus_device_base::device_reset();
-
-	// reset zorro cards
-	for (device_zorro2_card_interface &card : m_dev)
-		card.device().reset();
-
-	// initiate autoconfig
-	m_autoconfig_device = 0;
-
-	// if we have a device, start the autoconfig chain
-	if (m_dev.size() > m_autoconfig_device)
-		m_dev[m_autoconfig_device].get().cfgin_w(0);
 }
 
 //-------------------------------------------------
@@ -248,6 +237,22 @@ void zorro2_bus_device::fc_w(int code)
 		entry.fc_w(code);
 }
 
+void zorro2_bus_device::busrst_w(int state)
+{
+	for (device_zorro2_card_interface &card : m_dev)
+		card.busrst_w(state);
+
+	if (state == 0)
+	{
+		// initiate autoconfig
+		m_autoconfig_device = 0;
+
+		// if we have a device, start the autoconfig chain
+		if (m_dev.size() > m_autoconfig_device)
+			m_dev[m_autoconfig_device].get().cfgin_w(0);
+	}
+}
+
 
 //**************************************************************************
 //  ZORRO INTERFACE
@@ -282,6 +287,10 @@ void device_zorro_card_interface::fc_w(int code)
 }
 
 void device_zorro_card_interface::cfgin_w(int state)
+{
+}
+
+void device_zorro_card_interface::busrst_w(int state)
 {
 }
 

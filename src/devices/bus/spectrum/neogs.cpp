@@ -310,7 +310,9 @@ void neogs_device::dac_flush()
 			right += out;
 
 		if (BIT(m_gscfg0, 2) && BIT(m_gscfg0, 6)) // PAN4CH
-			;
+		{
+			// TODO
+		}
 	}
 	m_dac[0]->data_w(left);
 	m_dac[1]->data_w(right);

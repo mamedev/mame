@@ -48,7 +48,7 @@
 #include "emu.h"
 #include "ds1215.h"
 
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
 
 #include "logmacro.h"
 
@@ -58,7 +58,6 @@ DEFINE_DEVICE_TYPE(DS1216E, ds1216e_device, "ds1216e", "Dallas Semiconductor DS1
 enum mode : u8
 {
 	MODE_IDLE,
-	MODE_MATCH,
 	MODE_DATA,
 };
 
@@ -178,17 +177,12 @@ u8 ds1215_device_base::read_bit()
 	switch (m_mode)
 	{
 	case MODE_IDLE:
-		// first read starts pattern recognition
-		LOG("pattern recognition started\n");
-		m_mode = MODE_MATCH;
-		m_count = 0;
-		break;
-
-	case MODE_MATCH:
-		// read during match aborts sequence
-		LOG("pattern recognition aborted\n");
-		m_mode = MODE_IDLE;
-		m_count = 0;
+		// read restarts pattern recognition
+		if (m_count)
+		{
+			LOG("pattern recognition restarted\n");
+			m_count = 0;
+		}
 		break;
 
 	case MODE_DATA:
@@ -217,9 +211,6 @@ void ds1215_device_base::write_bit(u8 data)
 	switch (m_mode)
 	{
 	case MODE_IDLE:
-		break;
-
-	case MODE_MATCH:
 		if (BIT(pattern[m_count >> 3], m_count & 7) == (data & 1))
 		{
 			// match, check if finished
@@ -234,11 +225,10 @@ void ds1215_device_base::write_bit(u8 data)
 			else
 				m_count++;
 		}
-		else
+		else if (m_count)
 		{
 			// no match, abort sequence
 			LOG("pattern recognition aborted\n");
-			m_mode = MODE_IDLE;
 			m_count = 0;
 		}
 		break;

@@ -515,7 +515,7 @@ static const gfx_layout char_16x16_layout =
 
 static GFXDECODE_START( gfx_dblcrown )
 	GFXDECODE_ENTRY( "gfx1", 0, char_16x16_layout, 0, 0x10 )
-	GFXDECODE_ENTRY( nullptr, 0, gfx_8x8x4_packed_lsb, 0, 0x10 )
+	GFXDECODE_RAM( nullptr, 0, gfx_8x8x4_packed_lsb, 0, 0x10 )
 GFXDECODE_END
 
 

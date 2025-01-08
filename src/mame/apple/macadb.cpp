@@ -82,8 +82,9 @@ enum
 DEFINE_DEVICE_TYPE(MACADB, macadb_device, "macadb", "Mac ADB HLE")
 
 static INPUT_PORTS_START( macadb )
-	PORT_START("MOUSE0") /* Mouse - button */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_START("MOUSE0") /* Mouse - buttons */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button 0") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON2)
 
 	PORT_START("MOUSE1") /* Mouse - X AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
@@ -477,7 +478,7 @@ bool macadb_device::adb_pollmouse()
 {
 	s32 NewX, NewY, NewButton;
 
-	NewButton = m_mouse0->read() & 0x01;
+	NewButton = m_mouse0->read() & 0x03;
 	NewX = m_mouse1->read();
 	NewY = m_mouse2->read();
 
@@ -529,7 +530,7 @@ void macadb_device::adb_accummouse(u8 *MouseX, u8 *MouseY )
 		m_lastmousey = NewY;
 	}
 
-	m_lastbutton = m_mouse0->read() & 0x01;
+	m_lastbutton = m_mouse0->read() & 0x03;
 
 	*MouseX = (u8)MouseCountX;
 	*MouseY = (u8)MouseCountY;
@@ -613,7 +614,8 @@ void macadb_device::adb_talk()
 							//printf("X %x Y %x\n", mouseX, mouseY);
 							m_buffer[0] = (m_lastbutton & 0x01) ? 0x00 : 0x80;
 							m_buffer[0] |= mouseY & 0x7f;
-							m_buffer[1] = (mouseX & 0x7f) | 0x80;
+							m_buffer[1] = (m_lastbutton & 0x02) ? 0x00 : 0x80;
+							m_buffer[1] |= mouseX & 0x7f;
 
 							if ((m_buffer[0] != m_last_mouse[0]) || (m_buffer[1] != m_last_mouse[1]))
 							{

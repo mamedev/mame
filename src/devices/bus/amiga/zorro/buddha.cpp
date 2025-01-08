@@ -112,11 +112,14 @@ void buddha_device::device_start()
 	save_item(NAME(m_ide_1_interrupt));
 }
 
-void buddha_device::device_reset()
+void buddha_device::busrst_w(int state)
 {
-	m_ide_interrupts_enabled = false;
-	m_ide_0_interrupt = 0;
-	m_ide_1_interrupt = 0;
+	if (state == 0)
+	{
+		m_ide_interrupts_enabled = false;
+		m_ide_0_interrupt = 0;
+		m_ide_1_interrupt = 0;
+	}
 }
 
 uint8_t buddha_device::rom_r(offs_t offset)

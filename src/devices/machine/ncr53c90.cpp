@@ -196,7 +196,7 @@ ncr53c96_device::ncr53c96_device(const machine_config &mconfig, const char *tag,
 ncr53cf94_device::ncr53cf94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: ncr53c94_device(mconfig, type, tag, owner, clock)
 	, config4(0)
-	, family_id(0x02)
+	, family_id(0x04)
 	, revision_level(0x02)
 {
 }
@@ -918,6 +918,15 @@ void ncr53c90_device::command_pop_and_chain()
 	}
 }
 
+void ncr53c90_device::load_tcounter()
+{
+	LOGMASKED(LOG_COMMAND, "DMA command: tcounter reloaded to %d\n", tcount & tcounter_mask);
+	tcounter = tcount & tcounter_mask;
+
+	// clear transfer count zero flag when counter is reloaded
+	status &= ~S_TC0;
+}
+
 void ncr53c90_device::start_command()
 {
 	uint8_t c = command[0] & 0x7f;
@@ -932,11 +941,7 @@ void ncr53c90_device::start_command()
 	dma_command = command[0] & 0x80;
 	if (dma_command)
 	{
-		LOGMASKED(LOG_COMMAND, "DMA command: tcounter reloaded to %d\n", tcount);
-		tcounter = tcount;
-
-		// clear transfer count zero flag when counter is reloaded
-		status &= ~S_TC0;
+		load_tcounter();
 	}
 	else
 	{
@@ -1417,6 +1422,15 @@ void ncr53cf94_device::device_reset()
 	ncr53c94_device::device_reset();
 }
 
+void ncr53cf94_device::load_tcounter()
+{
+	ncr53c94_device::load_tcounter();
+
+	// ID may be read by executing DMA NOP command twice, first with the features bit clear and then with it set
+	if ((config2 & S2FE) == 0)
+		tcount = (1 << 23) | (family_id << 19) | (revision_level << 16) | (tcount & 0xffff);
+}
+
 void ncr53cf94_device::conf2_w(uint8_t data)
 {
 	tcounter_mask = (data & S2FE) ? 0xffffff : 0xffff;
@@ -1425,10 +1439,6 @@ void ncr53cf94_device::conf2_w(uint8_t data)
 
 uint8_t ncr53cf94_device::tcounter_hi2_r()
 {
-	// tcounter is 24-bit when the features bit is set, otherwise it returns the ID
-	if ((config2 & S2FE) == 0)
-		return (1 << 7) | (family_id << 3) | revision_level;
-
 	LOG("tcounter_hi2_r %02x (%s)\n", (tcounter >> 16) & 0xff, machine().describe_context());
 	return tcounter >> 16;
 }
