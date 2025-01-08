@@ -9,6 +9,7 @@
 #include "machine/ram.h"
 #include "screen.h"
 #include "emupal.h"
+#include "logmacro.h"
 
 #include "ibmsystem23.lh"
 
@@ -68,7 +69,6 @@ namespace
 
 			uint8_t memory_settings_r();
 
-			uint8_t sid_sod_connection;
 			void sod_w(int state);
 			int sid_r();
 
@@ -122,7 +122,7 @@ namespace
 
 	void system23_state::sod_w(int state)
 	{
-		sid_sod_connection = state;
+		// At this point, it is unknown what SOD is attached to
 	}
 
 	//Those routines deal with the DMA controller accesses to memory and I/O devices
@@ -160,6 +160,16 @@ namespace
 
 		if (BIT(attrcode, RVV))
 			gfx ^= 0xff;
+
+		if (BIT(attrcode, GPA0) && BIT(attrcode, GPA1))
+		{
+			m_crtc->lpen_w(ASSERT_LINE);				//hack to test the light pen at test 05
+			LOG("Sytem/23: Light pen asserted\n");
+		}
+		else
+		{
+			m_crtc->lpen_w(CLEAR_LINE);
+		}
 
 		// Highlight not used
 		bitmap.pix(y, x++) = BIT(gfx, 1) ? 1 : 0;
@@ -235,6 +245,7 @@ namespace
 		m_crtc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq2_w));
 		//m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE); // Only when jumper J1 is bridged
 
+
 		RAM(config, m_ram).set_default_size("16k");
 
 		config.set_perfect_quantum(m_maincpu);
@@ -283,8 +294,8 @@ namespace
 
 
 	ROM_START( system23 )
-		ROM_SYSTEM_BIOS(0, "r_set", "1982?")
-		ROM_SYSTEM_BIOS(1, "tm_set", "1981?")
+		ROM_SYSTEM_BIOS(0, "r_set", "\"R\" Set - 1982?")
+		ROM_SYSTEM_BIOS(1, "tm_set", "\"TM\" Set - 1981?")
 
 		ROM_REGION(0x4000, "maincpu", 0)
 		ROMX_LOAD("02_61c9866a_4481186.bin", 0x0000, 0x2000, CRC(61c9866a) SHA1(43f2bed5cc2374c7fde4632948329062e57e994b),ROM_BIOS(0))
@@ -294,7 +305,8 @@ namespace
 		ROMX_LOAD("09_07843020_8493747.bin", 0x2000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e),ROM_BIOS(1))
 
 		ROM_REGION(0x2000, "chargen", 0)
-		ROM_LOAD("chr_73783bc7_8519412.bin", 0x0000, 0x2000, CRC(73783bc7) SHA1(45ee2a9acbb577b281ad8181b7ec0c5ef05c346a) )
+		ROMX_LOAD("chr_73783bc7_8519412.bin", 0x0000, 0x2000, CRC(73783bc7) SHA1(45ee2a9acbb577b281ad8181b7ec0c5ef05c346a),ROM_BIOS(0))
+		ROMX_LOAD("chr_73783bc7_6842372.bin", 0x0000, 0x2000, CRC(73783bc7) SHA1(45ee2a9acbb577b281ad8181b7ec0c5ef05c346a),ROM_BIOS(1))
 	ROM_END
 
 }

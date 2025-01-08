@@ -36,7 +36,7 @@
 
 #include "screen.h"
 
-//#define VERBOSE 1
+#define VERBOSE 1
 #include "logmacro.h"
 
 
@@ -144,6 +144,13 @@ void i8275_device::device_start()
 		m_drq_on_timer = timer_alloc(FUNC(i8275_device::drq_on), this);
 		m_scanline_timer = timer_alloc(FUNC(i8275_device::scanline_tick), this);
 	}
+
+	//preinitialize the device with valid data (in real hardware parameters initialize to random)
+	m_param[REG_SCN1] = 0x4f;
+	m_param[REG_SCN2] = 0x58;
+	m_param[REG_SCN3] = 0x89;
+	m_param[REG_SCN4] = 0xd9;
+	recompute_parameters();
 
 	// state saving
 	save_item(NAME(m_status));
@@ -300,6 +307,7 @@ TIMER_CALLBACK_MEMBER(i8275_device::scanline_tick)
 		{
 			if ((crtc->m_status & ST_IE) && !(crtc->m_status & ST_IR))
 			{
+				LOG("I8275 IRQ Set\n");
 				crtc->m_status |= ST_IR;
 				crtc->m_write_irq(ASSERT_LINE);
 			}
