@@ -106,24 +106,52 @@ xavix_device::mi_xavix::mi_xavix(xavix_device *_base)
 	base = _base;
 }
 
-void xavix_device::write_special_stack(uint8_t data)
+void xavix_device::write_special_stack(uint32_t addr, uint8_t data)
 {
-	m_special_stack[m_special_stackpos&0xff] = data;
+	if (USE_SPECIAL_STACK)
+	{
+		m_special_stack[m_special_stackpos & 0xff] = data;
+	}
+	else
+	{
+		write_stack(addr, data);
+	}
 }
 
 void xavix_device::dec_special_stack()
 {
-	m_special_stackpos--;
+	if (USE_SPECIAL_STACK)
+	{
+		m_special_stackpos--;
+	}
+	else
+	{
+		dec_SP();
+	}
 }
 
 void xavix_device::inc_special_stack()
 {
-	m_special_stackpos++;
+	if (USE_SPECIAL_STACK)
+	{
+		m_special_stackpos++;
+	}
+	else
+	{
+		inc_SP();
+	}
 }
 
-uint8_t xavix_device::read_special_stack()
+uint8_t xavix_device::read_special_stack(uint32_t addr)
 {
-	return m_special_stack[m_special_stackpos&0xff];
+	if (USE_SPECIAL_STACK)
+	{
+		return m_special_stack[m_special_stackpos & 0xff];
+	}
+	else
+	{
+		return read_stack(addr);
+	}
 }
 
 
