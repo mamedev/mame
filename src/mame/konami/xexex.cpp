@@ -196,6 +196,12 @@ public:
 
 	void xexex(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void device_post_load() override { parse_control2(); }
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_workram;
@@ -242,13 +248,9 @@ private:
 	void sound_irq_w(uint16_t data);
 	void sound_bankswitch_w(uint8_t data);
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(xexex_interrupt);
-	void xexex_postload();
 	void xexex_objdma(int limiter);
 	void parse_control2();
 	K056832_CB_MEMBER(tile_callback);
@@ -650,11 +652,6 @@ INPUT_PORTS_END
 
 
 
-void xexex_state::xexex_postload()
-{
-	parse_control2();
-}
-
 void xexex_state::machine_start()
 {
 	m_z80bank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
@@ -669,7 +666,6 @@ void xexex_state::machine_start()
 	save_item(NAME(m_frame));
 
 	save_item(NAME(m_cur_control2));
-	machine().save().register_postload(save_prepost_delegate(FUNC(xexex_state::xexex_postload), this));
 
 	m_dmadelay_timer = timer_alloc(FUNC(xexex_state::dmaend_callback), this);
 }
