@@ -105,5 +105,5 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY             FULLNAME                   FLAGS
-COMP(1987, pi4d50, 0,      0,      pi4d50,  0,     ip4_state, empty_init, "Silicon Graphics", "Professional IRIS 4D/50", MACHINE_NOT_WORKING)
-COMP(1987, pi4d70, 0,      0,      pi4d70,  0,     ip4_state, empty_init, "Silicon Graphics", "Professional IRIS 4D/70", MACHINE_NOT_WORKING)
+COMP(1987, pi4d50, 0,      0,      pi4d50,  0,     ip4_state, empty_init, "Silicon Graphics", "Professional IRIS 4D/50", 0)
+COMP(1987, pi4d70, 0,      0,      pi4d70,  0,     ip4_state, empty_init, "Silicon Graphics", "Professional IRIS 4D/70", 0)
