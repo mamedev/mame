@@ -20218,10 +20218,12 @@ cmwm                            // (c) 199? Dyna Electronics
 crazybon                        // (c) 199? Sang Ho
 crazybona                       // (c) 199? Sang Ho
 crazybonb                       // (c) 199? unknown
+cutyline                        //
 eldoradd                        // (c) 1991 Dyna Electronics
 eldoraddo                       // (c) 1991 Dyna Electronics
 eldoraddoa                      // (c) 1991 Dyna Electronics
 eldoraddob                      // (c) 1991 Dyna Electronics
+eldoraddoc                      // (c) 1991 Dyna Electronics
 fb2010                          // (c) 2009 Amcoe
 fl7_3121                        // (c) 199? Cyberdyne Systems, Inc.
 fl7_50                          // (c) 199? Cyberdyne Systems, Inc.
@@ -20487,13 +20489,18 @@ cjdh2a                          // (c) 200?
 cjdh2b                          // (c) 200?
 cjdh2c                          // (c) 200?
 igsm312                         // (c) 200?
+jhzb                            // (c) 200?
+jxry                            // (c) 200?
 lhfy                            // (c) 2010
 lhtb                            // (c) 2009
 lhzb3in1                        // (c) 200?
 lhzbgqb                         // (c) 2010
 mghammer                        // (c) 2015
 qhzb                            // (c) 2007
+slqzsp                          // (c) 200?
 super70s                        // (c) 200?
+sydh                            // (c) 200?
+xyddz                           // (c) 200?
 
 @source:igs/igspoker.cpp
 chleague                        // (c) 199? IGS
@@ -29405,6 +29412,7 @@ castrev                         // Revolution
 cb2001                          // (c) 2000 Dyna Electronics
 cb4                             // (c) 1997 Dyna Electronics
 cb5                             // (c) 1997 Dyna Electronics
+cb5_11                          // (c) 1997 Dyna Electronics
 crzybell                        // (c) 1995 Dyna Electronics
 dynastye                        // (c) 2002 Dyna Electronics
 mystjb                          // (c) 1998 Dyna Electronics
@@ -30952,7 +30960,9 @@ istellar                        // (c) 1983 Funai / Gakken
 istellar2                       // (c) 1984 Funai / Gakken
 
 @source:misc/itgambl2.cpp
+7gold                           // (c) 200? unknown
 btorneo                         // (c) 200? unknown
+ch3001r                         // (c) 200? unknown
 cmagica                         // (c) 200? unknown
 granfrat                        // (c) 200? unknown
 mcard_h8                        // (c) 200? unknown
@@ -30965,6 +30975,8 @@ mdrink                          // (c) 2001 unknown
 millsun                         // (c) 200? unknown
 mnumitg                         // (c) 200? unknown
 ntcash                          // (c) 1999 unknown
+ntcasha                         // (c) 1999 unknown
+pairsh8                         // (c) 200? unknown
 pirati                          // (c) 2001 Cin
 smcard                          // (c) 200? unknown
 sspac2k1                        // (c) 200? unknown
@@ -30975,6 +30987,7 @@ toptcash                        // (c) 2002 VideoIdea
 trstar2k                        // (c) 1999 A.M.
 unkh8gam                        // (c) 200? unknown
 wizard                          // (c) 1999 A.A.
+zupapah8                        // (c) 200? unknown
 
 @source:misc/itgambl3.cpp
 ejollyx5                        // (c) 200? Solar Games
@@ -30995,6 +31008,7 @@ capunc                          // (c) 2000 Nazionale Elettronica
 euro2k2                         // (c) 2001 Nazionale Elettronica
 euro2k2a                        // (c) 2001 Nazionale Elettronica
 euro2k2s                        // (c) 2002 Nazionale Elettronica
+gnumber                         // (c) 200? M.M. - B.R.L.
 labrinth                        // (c) 2001 Nazionale Elettronica
 laperla                         // (c) 2002 Nazionale Elettronica
 laperlag                        // (c) 2001 Nazionale Elettronica

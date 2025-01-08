@@ -1616,9 +1616,21 @@ ROM_START( cb5 ) // Wing W4 board + DYNA D9701 subboard; DYNA CB5 V1.3 in bookke
 	ROM_REGION( 0x100000, "gfx", 0 ) // not dumped for this set, but seems to work fine. Pics of another PCB show D9801 marked on the flash, so it could be different.
 	ROM_LOAD( "flash", 0x000000, 0x100000, BAD_DUMP CRC(07d711a6) SHA1(6b5a4017eb1d31dc184831f85d786331f4a8e01f) )
 
-	ROM_REGION( 0x400, "proms", 0 ) // not dumped for this set, but seem to work fine. Marked as bad dump as precaution
-	ROM_LOAD( "82s147.9b",  0x000, 0x200, BAD_DUMP CRC(dcf976d2) SHA1(73a08e4587f3516d694a8060b79470cf71df3925) )
-	ROM_LOAD( "82s147.11b", 0x200, 0x200, BAD_DUMP CRC(a67e7a63) SHA1(b23e0eb9af13e57bbc8602ddc7fb381ba5c8267e) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s135n.2b", 0x000, 0x100, CRC(502be98c) SHA1(4591d1d5cfe9e83032705139e630dfa5df79689a) )
+	ROM_LOAD( "n82s135n.2d", 0x100, 0x100, CRC(bb1865c9) SHA1(58acf909dd6de519d9675482d130b697856e1bf4) )
+ROM_END
+
+ROM_START( cb5_11) // Wing W4 board + DYNA D9701 subboard; DYNA CB5 V1.1 in bookkeeping screen.
+	ROM_REGION16_LE( 0x040000, "boot_prg", 0 )
+	ROM_LOAD16_WORD( "cb5.11d", 0x020000, 0x20000, CRC(ea99dad0) SHA1(eaa899583b199db140dcc0fe750d388996b111a5) )
+
+	ROM_REGION( 0x100000, "gfx", 0 ) // not dumped for this set, but seems to work fine. Pics of another PCB show D9801 marked on the flash, so it could be different.
+	ROM_LOAD( "flash", 0x000000, 0x100000, BAD_DUMP CRC(07d711a6) SHA1(6b5a4017eb1d31dc184831f85d786331f4a8e01f) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s135n.2b", 0x000, 0x100, CRC(502be98c) SHA1(4591d1d5cfe9e83032705139e630dfa5df79689a) )
+	ROM_LOAD( "n82s135n.2d", 0x100, 0x100, CRC(bb1865c9) SHA1(58acf909dd6de519d9675482d130b697856e1bf4) )
 ROM_END
 
 /* New DongmulDongmul 2 (뉴 동물동물 2, New AnimalAnimal 2) runs on slightly different hardware, but with same CPU, custom and I/O.
@@ -1755,7 +1767,8 @@ GAME( 1993, scherrym12 ,  scherrym,  scherrym,  cb2001,    cb2001_state, init_sm
 GAME( 1997, scherrymp,    0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Super Cherry Master Plus (V1.6)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, scherrymp10u, scherrymp, scherrymp, scherrymp, cb2001_state, empty_init,         ROT0, "Dyna",  "Super Cherry Master Plus (V1.0U)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, cb4,          0,         cb5,       cb5,       cb2001_state, empty_init,         ROT0, "Dyna",  "Cherry Bonus IV (V5.0)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, cb5,          0,         cb5,       cb5,       cb2001_state, empty_init,         ROT0, "Dyna",  "Cherry Bonus V Five (V1.3)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, cb5,          0,         cb5,       cb5,       cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Cherry Bonus V Five (V1.3)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, cb5_11,       cb5,       cb5,       cb5,       cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Cherry Bonus V Five (V1.1)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, mystjb,       0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Mystery J & B (V1.3G)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, tripjack,     0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Triple Jack (V1.6G)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, crzybell,     0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Crazy Bell (V1.2D)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

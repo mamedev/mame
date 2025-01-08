@@ -141,7 +141,7 @@ license:CC0-1.0
 		<element name="lamp4" ref="SMALL" inputtag="IN0-1" inputmask="0x10">
 			<bounds x="0.85" y="3.45" width="0.50" height="0.24" />
 		</element>
-		<element name="lamp0" ref="BET" inputtag="IN0-0" inputmask="0x01">
+		<element name="lamp0" ref="BET" inputtag="IN0-3" inputmask="0x08">
 			<bounds x="1.45" y="3.45" width="0.50" height="0.24" />
 		</element>
 		<element name="lamp4" ref="BIG" inputtag="IN0-1" inputmask="0x08">
