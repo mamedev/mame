@@ -15,6 +15,7 @@
 
 #include "zorro.h"
 #include "machine/autoconfig.h"
+#include "video/bt48x.h"
 #include "video/pc_vga_tseng.h"
 
 
@@ -39,8 +40,10 @@ protected:
 
 private:
 	void mmio_map(address_map &map) ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<et4kw32i_vga_device> m_vga;
+	required_device<bt482_device> m_ramdac;
 
 	bool m_autoconfig_memory_done;
 };
