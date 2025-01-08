@@ -12603,7 +12603,7 @@ ROM_END
   ICP-1 PCB.
 
   Obscure and rare roulette game with zillions of checks
-  and protected with password. See the notes above.
+  and protected with password. See the notes above...
 
 */
 ROM_START( icproul )
