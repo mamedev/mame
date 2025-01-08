@@ -333,8 +333,10 @@ public:
 	void goldfrui(machine_config &config);
 	void goldstar(machine_config &config);
 	void goldstbl(machine_config &config);
+	void feverch(machine_config &config);
 	void bonusch_portmap(address_map &map) ATTR_COLD;
 	void feverch_portmap(address_map &map) ATTR_COLD;
+	void feverch_map(address_map &map) ATTR_COLD;
 	void cm_map(address_map &map) ATTR_COLD;
 	void crazybon_portmap(address_map &map) ATTR_COLD;
 	void flaming7_map(address_map &map) ATTR_COLD;
@@ -683,11 +685,9 @@ public:
 	void megaline(machine_config &config);
 	void unkch(machine_config &config);
 	void bonusch(machine_config &config);
-	void feverch(machine_config &config);
 	void rolling(machine_config &config);
 
 	void bonusch_map(address_map &map) ATTR_COLD;
-	void feverch_map(address_map &map) ATTR_COLD;
 	void megaline_map(address_map &map) ATTR_COLD;
 	void unkch_map(address_map &map) ATTR_COLD;
 	void unkch_portmap(address_map &map) ATTR_COLD;
@@ -2865,30 +2865,25 @@ void goldstar_state::bonusch_portmap(address_map &map)
 	map(0x60, 0x60).portr("IN3");
 }
 
-void unkch_state::feverch_map(address_map &map)
+void goldstar_state::feverch_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 
-	map(0xc000, 0xc7ff).ram().w(FUNC(unkch_state::fg_atrram_w)).share("fg_atrram");
+	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).ram();
-	map(0xd000, 0xd7ff).ram().w(FUNC(unkch_state::fg_vidram_w)).share("fg_vidram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
+	map(0xd800, 0xdfff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
 
-	// placeholders to appease validation, should be 0x200 each.
-	map(0xe000, 0xe000).ram().w(FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe200, 0xe200).ram().w(FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe400, 0xe400).ram().w(FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xe200, 0xe3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xe400, 0xe5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xe600, 0xe7ff).ram();
 
-	// placeholders to appease validation, should be 0x40 each.
-	map(0xe640, 0xe640).ram().share("reel1_scroll");
-	map(0xe680, 0xe680).ram().share("reel2_scroll");
-	map(0xe700, 0xe700).ram().share("reel3_scroll");
+	map(0xe800, 0xe83f).ram().share("reel1_scroll");
+	map(0xea00, 0xea3f).ram().share("reel2_scroll");
+	map(0xec00, 0xec3f).ram().share("reel3_scroll");
 
-	// placeholders to appease validation, should be 0x200 each.
-	map(0xe800, 0xe800).ram().w(FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
-	map(0xea00, 0xea00).ram().w(FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
-	map(0xec00, 0xec00).ram().w(FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
-
-	map(0xf800, 0xffff).ram();
+	map(0xf000, 0xffff).ram();
 }
 
 void goldstar_state::feverch_portmap(address_map &map)
@@ -8499,44 +8494,44 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( feverch )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_B) PORT_NAME("P1 - Big / Switch Controls")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_C) PORT_NAME("P1 - Double-Up")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_V) PORT_NAME("P1 - Take Score")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("P1 - Bet")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_N) PORT_NAME("P1 - Small / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("P1 - Start")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_G) PORT_NAME("P2 - Big / Switch Controls")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_CODE(KEYCODE_D) PORT_NAME("P2 - Double-Up")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_CODE(KEYCODE_F) PORT_NAME("P2 - Take Score")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_CODE(KEYCODE_A) PORT_NAME("P2 - Bet")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_H) PORT_NAME("P2 - Small / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_CODE(KEYCODE_S) PORT_NAME("P2 - Start")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("IN2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("IN2-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN2-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN2-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN2-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("IN3-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("IN3-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin B")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2) PORT_NAME("Coin D")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME("Coin C")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
@@ -8545,112 +8540,115 @@ static INPUT_PORTS_START( feverch )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7") // if low "check voltage call attendant" message will appear
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Pay Rate" ) PORT_DIPLOCATION("DSW2:1,2,3,4")
+	PORT_DIPSETTING(    0x0f, "60%" )
+	PORT_DIPSETTING(    0x0e, "62%" )
+	PORT_DIPSETTING(    0x0d, "65%" )
+	PORT_DIPSETTING(    0x0c, "67%" )
+	PORT_DIPSETTING(    0x0b, "70%" )
+	PORT_DIPSETTING(    0x0a, "72%" )
+	PORT_DIPSETTING(    0x09, "75%" )
+	PORT_DIPSETTING(    0x08, "77%" )
+	PORT_DIPSETTING(    0x07, "80%" )
+	PORT_DIPSETTING(    0x06, "82%" )
+	PORT_DIPSETTING(    0x05, "85%" )
+	PORT_DIPSETTING(    0x04, "87%" )
+	PORT_DIPSETTING(    0x03, "90%" )
+	PORT_DIPSETTING(    0x02, "92%" )
+	PORT_DIPSETTING(    0x01, "95%" )
+	PORT_DIPSETTING(    0x00, "97%" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x07, 0x07, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2,3")
+	PORT_DIPSETTING(    0x00, "5 Credits" )
+	PORT_DIPSETTING(    0x01, "10 Credits" )
+	PORT_DIPSETTING(    0x02, "20 Credits" )
+	PORT_DIPSETTING(    0x03, "25 Credits" )
+	PORT_DIPSETTING(    0x04, "40 Credits" )
+	PORT_DIPSETTING(    0x05, "50 Credits" )
+	PORT_DIPSETTING(    0x06, "60 Credits" )
+	PORT_DIPSETTING(    0x07, "100 Credits" )
+	PORT_DIPNAME( 0x38, 0x38, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:4,5,6")
+	PORT_DIPSETTING(    0x38, "1 Coin/50 Credits" ) // why?? hacked?
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x28, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, "DSW4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0f, 0x0f, "Coin D Rate" ) PORT_DIPLOCATION("DSW4:1,2,3,4")
+	PORT_DIPSETTING(    0x0f, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x02, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0b, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x70, 0x70, "Coin C Rate" ) PORT_DIPLOCATION("DSW4:5,6,7")
+	PORT_DIPSETTING(    0x70, "1 Coin/50 Credits" ) // why?? hacked?
+	PORT_DIPSETTING(    0x10, "9 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x20, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x80, 0x80, "4th Coin" ) PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPSETTING(    0x80, "As Coin A" )
+	PORT_DIPSETTING(    0x00, "As Hopper Line" )
 
 INPUT_PORTS_END
 
@@ -11416,11 +11414,11 @@ void unkch_state::bonusch(machine_config &config)
 	SN76489(config, "sn4", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
-void unkch_state::feverch(machine_config &config)
+void goldstar_state::feverch(machine_config &config)
 {
 	Z80(config, m_maincpu, 12'000'000 / 2); // clock not verified
-	m_maincpu->set_addrmap(AS_PROGRAM, &unkch_state::feverch_map);
-	m_maincpu->set_addrmap(AS_IO, &unkch_state::feverch_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::feverch_map);
+	m_maincpu->set_addrmap(AS_IO, &goldstar_state::feverch_portmap);
 
 	I8255A(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
@@ -11441,13 +11439,13 @@ void unkch_state::feverch(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(unkch_state::screen_update_unkch));
+	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
-	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette)).set_format(palette_device::BGR_233, 256);
+	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
 
-	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	SPEAKER(config, "mono").front_center();
 
@@ -19419,6 +19417,32 @@ ROM_START( bonusch )
 	ROM_LOAD( "tbp24s10.4h", 0x0200, 0x0100, CRC(cbf0062d) SHA1(f49dfca34d2eb86b5ff16872fab23d3e3a10be9a) )
 ROM_END
 
+ROM_START( bonuscha )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rom5.1u", 0x00000, 0x10000, CRC(9395bfaa) SHA1(aec2bb78ce3fbcaebe9cddc5519ca47fb29455c7) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "0.5p", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "1.1c",  0x00000, 0x10000, CRC(33ce67c0) SHA1(8f3d7e78a4616bebafed2779b7f793d41576c9c8) )
+	ROM_LOAD( "2.1e",  0x10000, 0x10000, CRC(fc394767) SHA1(645bf0e60a7061771aa73bb4d10603eaaad17f20) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "3.1m",  0x00000, 0x10000, CRC(2acac012) SHA1(59d879214c4e473fa6fedb4a08dcd9b3c6a881a3) )
+	ROM_LOAD( "4.1p",  0x10000, 0x10000, CRC(530bdec2) SHA1(2ce0993386fe6b165363a053b54fc66d8bf385d7) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "tbp24s10.3e", 0x0000, 0x0100, CRC(f8d160c5) SHA1(a3cb9c4337f4f030d62e74ccc882052959b1fa4f) )
+	ROM_LOAD( "tbp24s10.3f", 0x0100, 0x0100, CRC(bbc03eb2) SHA1(c0e44df0ec8268344f59965e3b9d62a4dca2ebb2) )
+	ROM_LOAD( "tbp24s10.3h", 0x0200, 0x0100, CRC(77b2585d) SHA1(898302f9a0bd8e354794087461f8f1103bb63783) )
+
+	ROM_REGION( 0x300, "proms2", 0 )
+	ROM_LOAD( "tbp24s10.4e", 0x0000, 0x0100, CRC(06fa2649) SHA1(b2f17d37826317ccad19d535cd5afeedb143778b) )
+	ROM_LOAD( "tbp24s10.4f", 0x0100, 0x0100, CRC(38000593) SHA1(e0113590cb2dc338d61ae2e7e92b1046c5c2d19f) )
+	ROM_LOAD( "tbp24s10.4h", 0x0200, 0x0100, CRC(cbf0062d) SHA1(f49dfca34d2eb86b5ff16872fab23d3e3a10be9a) )
+ROM_END
+
 /*
 Fever Chance
 Wing 19?? (1986 in ROM).
@@ -19428,7 +19452,9 @@ Wing license seal but Eagle labeled ROMs
 1 x Z80
 3 x I8255A
 3 x SN76489AN
-1 x unknown at 8d (possibly battery backed RAM)
+1 x SM7831 at 8d (CMOS-LSI arithmetic processor)
+
+The Taiwan set doesn't have the SM7831 (hacked not to use it?)
 */
 
 ROM_START( feverch )
@@ -19440,23 +19466,82 @@ ROM_START( feverch )
 	ROM_LOAD( "cf19.8h", 0x08000, 0x08000, CRC(f0229490) SHA1(665d335cc030a0cbec0c11c685a6f1e2f9706989) )
 	ROM_LOAD( "cf20.10h", 0x10000, 0x08000, CRC(1d831a06) SHA1(42d235b8dd894d38579886940a3e13adb843e00d) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "cf1.1h", 0x00000, 0x02000, CRC(5f022073) SHA1(2e154837834cc9db452279b4933900234b568565) ) // 1st and 2nd half identical
-	ROM_CONTINUE(0x00000, 0x02000)
-	ROM_LOAD( "cf2.2h", 0x02000, 0x02000, CRC(e8f927b9) SHA1(29dec2f21a1bea250a4a2d75fab8d03a1fc70bcd) ) // 1st and 2nd half identical
-	ROM_CONTINUE(0x02000, 0x02000)
-	ROM_LOAD( "cf3.4h", 0x04000, 0x02000, CRC(79b06e00) SHA1(18f73527714914edb57e22909c95f2c764223900) ) // 1st and 2nd half identical
-	ROM_CONTINUE(0x04000, 0x02000)
-	ROM_LOAD( "cf4.5h", 0x06000, 0x02000, CRC(7f73744e) SHA1(7c07095f7ec4302a4839a279c755979ec10e0715) ) // 1st and 2nd half identical
-	ROM_CONTINUE(0x06000, 0x02000)
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "cf1.1h", 0x0000, 0x2000, CRC(5f022073) SHA1(2e154837834cc9db452279b4933900234b568565) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(       0x0000, 0x2000 )
+	ROM_LOAD( "cf2.2h", 0x2000, 0x2000, CRC(e8f927b9) SHA1(29dec2f21a1bea250a4a2d75fab8d03a1fc70bcd) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(       0x2000, 0x2000 )
+	ROM_LOAD( "cf3.4h", 0x4000, 0x2000, CRC(79b06e00) SHA1(18f73527714914edb57e22909c95f2c764223900) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(       0x4000, 0x2000 )
+	ROM_LOAD( "cf4.5h", 0x6000, 0x2000, CRC(7f73744e) SHA1(7c07095f7ec4302a4839a279c755979ec10e0715) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(       0x6000, 0x2000 )
 
-	// PROMs not dumped, taken from lucky8
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "d12",   0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
-	ROM_LOAD( "prom4", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+	ROM_LOAD_NIB_LOW(  "82s129.11f", 0x000, 0x100, CRC(0a15ccc6) SHA1(7915e2cbfe4264cab42a780364ca56038412a249) )
+	ROM_LOAD_NIB_HIGH( "82s129.12f", 0x000, 0x100, CRC(5b826df5) SHA1(c6e8ffec328f1bb8acdcad70d7045f96cc150166) )
+	ROM_LOAD(          "82s123.13f", 0x080, 0x020, CRC(82b2660a) SHA1(af4a8f4560ec22a7adda1f590651d6a84f894314) )
 
-	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+	ROM_REGION( 0x120, "unkproms", 0 )
+	ROM_LOAD( "82s129.4e",  0x000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) ) // same as megaline
+	ROM_LOAD( "82s123.10d", 0x100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
+ROM_END
+
+ROM_START( fevercha )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // only a small data table changes wrt feverch
+	ROM_LOAD( "main.c11", 0x00000, 0x8000, CRC(29661207) SHA1(9092a528c630224e7abb2419db8ec6d6a5153bed) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // slightly different wrt feverch
+	ROM_LOAD( "7h",  0x00000, 0x08000, CRC(ef8bbc3f) SHA1(6787e9320f8d13d4b35e73befaffc251b6b5db65) )
+	ROM_LOAD( "8h",  0x08000, 0x08000, CRC(7195d1cc) SHA1(cd7d55251cb1ce64dd4f9e9181acd7885317130c) )
+	ROM_LOAD( "10h", 0x10000, 0x08000, CRC(343182c7) SHA1(227f0db85a7191cfb90a12402c8107537e8ca6db) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1h", 0x0000, 0x2000, CRC(5f022073) SHA1(2e154837834cc9db452279b4933900234b568565) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(   0x0000, 0x2000 )
+	ROM_LOAD( "2h", 0x2000, 0x2000, CRC(e8f927b9) SHA1(29dec2f21a1bea250a4a2d75fab8d03a1fc70bcd) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(   0x2000, 0x2000 )
+	ROM_LOAD( "4h", 0x4000, 0x2000, CRC(79b06e00) SHA1(18f73527714914edb57e22909c95f2c764223900) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(   0x4000, 0x2000 )
+	ROM_LOAD( "5h", 0x6000, 0x2000, CRC(7f73744e) SHA1(7c07095f7ec4302a4839a279c755979ec10e0715) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(   0x6000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "82s129.11f", 0x000, 0x100, CRC(0a15ccc6) SHA1(7915e2cbfe4264cab42a780364ca56038412a249) )
+	ROM_LOAD_NIB_HIGH( "82s129.12f", 0x000, 0x100, CRC(5b826df5) SHA1(c6e8ffec328f1bb8acdcad70d7045f96cc150166) )
+	ROM_LOAD(          "82s123.13f", 0x080, 0x020, CRC(82b2660a) SHA1(af4a8f4560ec22a7adda1f590651d6a84f894314) )
+
+	ROM_REGION( 0x120, "unkproms", 0 )
+	ROM_LOAD( "82s129.4e",  0x000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) ) // same as megaline
+	ROM_LOAD( "82s123.10d", 0x100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
+ROM_END
+
+ROM_START( feverchtw )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "main_tw.c11", 0x00000, 0x8000, CRC(a38376d8) SHA1(34b1966becae4adbde5554db95707683157d4fa4) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7h",  0x00000, 0x08000, CRC(ef8bbc3f) SHA1(6787e9320f8d13d4b35e73befaffc251b6b5db65) )
+	ROM_LOAD( "8h",  0x08000, 0x08000, CRC(7195d1cc) SHA1(cd7d55251cb1ce64dd4f9e9181acd7885317130c) )
+	ROM_LOAD( "10h", 0x10000, 0x08000, CRC(343182c7) SHA1(227f0db85a7191cfb90a12402c8107537e8ca6db) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1h", 0x0000, 0x2000, CRC(5f022073) SHA1(2e154837834cc9db452279b4933900234b568565) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(   0x0000, 0x2000 )
+	ROM_LOAD( "2h", 0x2000, 0x2000, CRC(e8f927b9) SHA1(29dec2f21a1bea250a4a2d75fab8d03a1fc70bcd) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(   0x2000, 0x2000 )
+	ROM_LOAD( "4h", 0x4000, 0x2000, CRC(79b06e00) SHA1(18f73527714914edb57e22909c95f2c764223900) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(   0x4000, 0x2000 )
+	ROM_LOAD( "5h", 0x6000, 0x2000, CRC(7f73744e) SHA1(7c07095f7ec4302a4839a279c755979ec10e0715) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(   0x6000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "82s129.12f", 0x000, 0x100, CRC(5b826df5) SHA1(c6e8ffec328f1bb8acdcad70d7045f96cc150166) )
+	ROM_LOAD_NIB_HIGH( "82s129.11f", 0x000, 0x100, CRC(0a15ccc6) SHA1(7915e2cbfe4264cab42a780364ca56038412a249) )
+	ROM_LOAD(          "82s123.13f", 0x080, 0x020, CRC(82b2660a) SHA1(af4a8f4560ec22a7adda1f590651d6a84f894314) )
+
+	ROM_REGION( 0x120, "unkproms", 0 )
+	ROM_LOAD( "82s129.4e",  0x000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) ) // same as megaline
+	ROM_LOAD( "82s123.10d", 0x100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
 ROM_END
 
 /*
@@ -22715,11 +22800,14 @@ GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam
 
 
 // --- Wing W-6 hardware ---
-GAME(  1986, feverch,    0,        feverch,  feverch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6)",                                       MACHINE_NOT_WORKING )  // inputs, reels, etc..
+GAME(  1986, feverch,    0,        feverch,  feverch,  goldstar_state, empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )  // unimplemented arithmetic chip, reels scrolling, I/O
+GAME(  1986, fevercha,   feverch,  feverch,  feverch,  goldstar_state, empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )  // unimplemented arithmetic chip, reels scrolling, I/O
+GAME(  1986, feverchtw,  feverch,  feverch,  feverch,  goldstar_state, empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )  // reels scrolling, I/O
 
 
 // --- Wing W-8 hardware ---
-GAME(  1990, bonusch,    0,        bonusch,  bonusch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8)",                                       MACHINE_NOT_WORKING )  // M80C51F MCU
+GAME(  1990, bonusch,    0,        bonusch,  bonusch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 1)",                                MACHINE_NOT_WORKING )  // M80C51F MCU
+GAME(  1990, bonuscha,   bonusch,  bonusch,  bonusch,  unkch_state,    empty_init,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 2)",                                MACHINE_NOT_WORKING )  // M80C51F MCU
 
 
 // --- Magical Odds hardware ---

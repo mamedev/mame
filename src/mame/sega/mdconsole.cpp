@@ -657,7 +657,7 @@ void md_cons_cd_state::genesis_scd(machine_config &config)
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
-	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
+	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("NTSC-U");
 }
 
 void md_cons_cd_state::genesis2_scd(machine_config &config)
@@ -677,7 +677,7 @@ void md_cons_cd_state::genesis2_scd(machine_config &config)
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
-	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
+	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("NTSC-U");
 }
 
 void md_cons_cd_state::md_scd(machine_config &config)
@@ -698,7 +698,7 @@ void md_cons_cd_state::md_scd(machine_config &config)
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
-	SOFTWARE_LIST(config, "cd_list").set_original("megacd");
+	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("PAL");
 }
 
 void md_cons_cd_state::md2_scd(machine_config &config)
@@ -718,7 +718,7 @@ void md_cons_cd_state::md2_scd(machine_config &config)
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
-	SOFTWARE_LIST(config, "cd_list").set_original("megacd");
+	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("PAL");
 }
 
 void md_cons_cd_state::mdj_scd(machine_config &config)
@@ -739,7 +739,7 @@ void md_cons_cd_state::mdj_scd(machine_config &config)
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
-	SOFTWARE_LIST(config, "cd_list").set_original("megacdj");
+	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("NTSC-J");
 }
 
 void md_cons_cd_state::md2j_scd(machine_config &config)
@@ -759,7 +759,7 @@ void md_cons_cd_state::md2j_scd(machine_config &config)
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
-	SOFTWARE_LIST(config, "cd_list").set_original("megacdj");
+	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("NTSC-J");
 }
 
 /******************SEGA CD + 32X****************************/
@@ -781,7 +781,7 @@ void md_cons_cd_state::genesis_32x_scd(machine_config &config)
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_cd_state::_32x_cart));
 
 	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
-	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
+	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("NTSC-U");
 }
 
 void md_cons_cd_state::md_32x_scd(machine_config &config)
@@ -801,7 +801,7 @@ void md_cons_cd_state::md_32x_scd(machine_config &config)
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_cd_state::_32x_cart));
 
 	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
-	SOFTWARE_LIST(config, "cd_list").set_original("megacd");
+	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("PAL");
 }
 
 void md_cons_cd_state::mdj_32x_scd(machine_config &config)
@@ -821,7 +821,7 @@ void md_cons_cd_state::mdj_32x_scd(machine_config &config)
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_cd_state::_32x_cart));
 
 	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
-	SOFTWARE_LIST(config, "cd_list").set_original("megacdj");
+	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("NTSC-J");
 }
 
 /* We need proper names for most of these BIOS ROMs! */

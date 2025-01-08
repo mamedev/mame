@@ -170,14 +170,14 @@ private:
 
 void minitel_state::machine_start()
 {
-	m_palette->set_pen_color( 0, 0, 0, 0);
-	m_palette->set_pen_color( 1, 86, 86, 86);
-	m_palette->set_pen_color( 2, 172, 172, 172);
-	m_palette->set_pen_color( 3, 255, 255, 255);
-	m_palette->set_pen_color( 4, 44, 44, 44);
-	m_palette->set_pen_color( 5, 86, 86, 86);
-	m_palette->set_pen_color( 6, 172, 172, 172);
-	m_palette->set_pen_color( 7, 255, 255, 255);
+	m_palette->set_pen_color(0, 0, 0, 0);
+	m_palette->set_pen_color(1, 80, 80, 80);
+	m_palette->set_pen_color(2, 160, 160, 160);
+	m_palette->set_pen_color(3, 230, 230, 230);
+	m_palette->set_pen_color(4, 40, 40, 40);
+	m_palette->set_pen_color(5, 120, 120, 120);
+	m_palette->set_pen_color(6, 200, 200, 200);
+	m_palette->set_pen_color(7, 255, 255, 255);
 }
 
 void minitel_state::port1_w(uint8_t data)
